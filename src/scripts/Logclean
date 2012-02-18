@@ -1,0 +1,100 @@
+#!/bin/sh
+#
+# $Id: Logclean,v 1.10 2002/02/19 15:24:57 rmg Exp $
+#
+#	Logclean - Get rid of old logfiles of the format <filename>.<time>
+#		   If the MUSH is not running, also move <filename> to
+#		   <filename>.old
+#
+#       Options:
+#		-o	If the MUSH is running, this also deletes the 
+#			<filename>.old logs.
+#		-a	Gets rid of all logs. MUSH cannot be running.
+
+PATH=/usr/ucb:/bin:/usr/bin:.; export PATH
+#
+. mush.config
+. check_paths
+#
+#	Check if the MUSH is running.
+#
+if [ -r "$PIDFILE" ]; then
+	oldpid=`cat $PIDFILE`
+	if [ "$oldpid" -gt 1 ]; then
+		nmush=`ps | grep $oldpid | grep netmush | wc -l`
+	else
+		nmush=0
+	fi
+else
+	nmush=0
+fi
+
+#
+#	Check for options.
+#
+del_old=0
+del_all=0
+if [ "$1" = "-o" ]; then
+	if [ $nmush -le 0 ]; then
+		echo "Use the -o option only when the MUSH is running."
+		exit 0
+	fi
+	del_old=1
+elif [ "$1" = "-a" ]; then
+	if [ $nmush -gt 0 ]; then
+		echo "The -a option cannot be used when the MUSH is running."
+		exit 0
+	fi
+	del_all=1
+fi
+
+#	Save off the game log.
+
+ls $LOGNAME.* | egrep "^$LOGNAME\.([0-9])+$" | xargs rm -f
+if [ $del_all -eq 1 ]; then
+	echo "Removing game logs ($LOGNAME)"
+	rm -f $LOGNAME $LOGNAME.old
+else
+	if [ $del_old -eq 1 ]; then
+		if [ -r $LOGNAME.old ]; then
+			echo "Removing old game log"
+			rm -f $LOGNAME.old
+		fi
+	elif [ $nmush -le 0 ]; then
+		if [ -r $LOGNAME ]; then
+			echo "Saving old game log $LOGNAME"
+			mv -f $LOGNAME $LOGNAME.old
+		else
+			echo "No previous game log."
+		fi
+	fi
+fi
+
+#	Go through the conf file to find all of the diverted log filenames.
+#	Do something similar with them.
+
+log_list=`egrep -i divert_log $GAMENAME.conf | awk '{ print $3; }'`
+if [ -n "$log_list" ]; then
+	for logfile in $log_list
+	do
+		ls $logfile.* | egrep "^$logfile\.([0-9])+$" | xargs rm -f
+		if [ $del_all -eq 1 ]; then
+			echo "Removing logs ($logfile)"
+			rm -f $logfile $logfile.old
+		else
+			if [ $del_old -eq 1 ]; then
+				if [ -r $logfile.old ]; then
+					echo "Removing old log $logfile"
+					rm -f $logfile.old
+				fi
+			elif [ $nmush -le 0 ]; then
+				if [ -r $logfile ]; then
+					echo "Saving old log $logfile"
+					mv -f $logfile $logfile.old
+				fi
+			fi
+		fi
+	done
+fi
+
+echo "Log cleanup done."

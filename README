@@ -1,0 +1,57 @@
+This is the README file for TinyMUSH 3.
+
+Please look at the following files for details on specific aspects of
+TinyMUSH 3.
+
+INSTALL			Installation instructions
+CONVERT.MUX		Converting from TinyMUX
+CONVERT.TINY22		Converting from TinyMUSH 2.2
+FAQ			Frequently-asked questions
+
+CHANGES			TinyMUSH 3 general changelog
+BETA			TinyMUSH 3 beta changelog
+CHANGES.TINY20		The old CHANGES file from TinyMUSH 2.0.10p6
+CHANGES.TINY22		The old CHANGES file from TinyMUSH 2.2.5
+CHANGES.MUX		The old CHANGES file from TinyMUX 1.6
+
+MODULES			Developer information on creating modules
+README.TOOLS		Additional programs in src/tools
+
+CREDITS			Credits and thanks
+
+----------------------------------------------------------------------------
+
+TinyMUSH 3 began as a project to fuse the TinyMUSH 2.2 and TinyMUX
+codebases, in an effort to create a best-of-breed server that combined
+the best features and enhancements of both, and then built additional
+innovations and increased stability on top of that merged codebase.
+
+TinyMUSH 3.0 is not a rewrite; we wanted to maintain close to 100%
+backwards compatibility, and the sheer scope of effort that would have
+been necessary in order to create a new server from scratch was beyond
+our available time resources. However, every line of the code has been
+gone through in the process of creating TinyMUSH 3.0. A large number
+of bugs have been fixed, portions have been rewritten to be cleaner
+and more efficient, and a slew of new features have been added.
+TinyMUSH 3.1 and beyond will extend this further, providing a solidly
+stable server, improved efficiency, and many feature enhancements.
+
+The initial TinyMUSH 3.0 release was jointly developed by David
+Passmore and Lydia Leong; Robby Griffin joined the team with the
+release of 3.0 beta 18, and Scott Dorr joined with the release of
+3.0 beta 23, and the team expects to continue to maintain TinyMUSH 3
+into the forseeable future. Though we will continue to welcome
+contributions from the MUSH community, we expect to remain the primary
+developers. We believe that this will be a major platform of choice
+for MUSH users in the future, and we highly encourage existing
+TinyMUSH 2.2 and TinyMUX 1.x users to upgrade.
+
+We believe that server stability for TinyMUSH 3.0 to be excellent
+(no reported crash problems since the 3.0p2 release in January 2001),
+and we expect that TinyMUSH 3.1 stability to be at least as good.
+Server stability for beta versions should generally be good, but,
+of course, may not be as stable as full-fledged release versions.
+In general, TinyMUSH 3 should be more stable than any of its
+predecessor servers. Problems or issues should certainly be reported
+to the developers, and we will do our best to ensure that they're
+fixed promptly.

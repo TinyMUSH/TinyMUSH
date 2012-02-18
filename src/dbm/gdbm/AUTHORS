@@ -1,0 +1,8 @@
+The current version of LibTinyGDBM is maintained by the TinyMUSH development
+team, see http://sourceforge.net/projects/tinymush/ for a complete list of
+current members.
+
+Based on GDBM, the GNU database manager, by Philip A. Nelson and
+currently maintained by Jason Downs. Copyright (C) 1990, 1991, 1993  
+Free Software Foundation, Inc. See http://www.gnu.org/software/gdbm/
+for more information.

@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# $Id: Index,v 1.3 2002/02/19 05:30:35 rmg Exp $
+#
+#	Index - Create index files for all text files beginning with '&'.
+#		It is assumed that all files are named <something>.txt
+#		and the index files will be named <something>.indx
+#
+#		This is run automatically when Startmush is used to start
+#		the game, and should be run manually whenever any help-style
+#		files are changed. A @readcache must be done within the game
+#		in the latter case.
+#
+PATH=/usr/local/bin:/usr/sbin:/sbin:/usr/ucb:/usr/bsd:/bin:/usr/bin:.
+export PATH
+#
+. mush.config
+. check_paths
+#
+for file in $TEXT/*.txt; do
+    got=`head -1 $file | egrep '^\&'`
+    if [ "$got" != "" ]; then
+	prefix=`basename $file | cut -f1 -d"."`
+	echo "Indexing $prefix.txt"
+	$BIN/mkindx $file $TEXT/$prefix.indx
+    fi
+done

@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# $Id: Backup,v 1.16 2002/06/26 20:46:38 lwl Exp $
+#
+#	Backup - Make a backup copy of the database files.
+#                With '-f' option, only make a flatfile.
+#
+PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin:.; export PATH
+LTDL_LIBRARY_PATH=./lib:./bin:.:../src:../src/lib:../src/.libs:./lib/.libs; export LTDL_LIBRARY_PATH
+#
+. mush.config
+. check_paths
+#
+#   Figure out the file compression extension.
+#
+ZBASE=`basename $ZIP | cut -f1 -d" "`
+if [ "$ZBASE" = "" ]; then
+    ZIP=gzip
+    ZEXT="gz"
+elif [ "$ZBASE" = "gzip" ]; then
+    ZEXT="gz"
+elif [ "$ZBASE" = "compress" ]; then
+    ZEXT="Z"
+elif [ "$ZBASE" = "bzip2" ]; then
+    ZEXT="bz2"
+else
+    ZEXT="gz"
+fi
+#
+DBDATE=`date +%m%d-%H%M`
+#
+OUTFILE=$BACKUP_DIR/$GAMENAME.$DBDATE
+#
+if [ -r $DATA/$GDBM_DB ]; then
+    if [ "$1" = "-f" ]; then
+	echo "Creating flatfile $OUTFILE.$ZEXT"
+	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB | $ZIP -c > $OUTFILE.$ZEXT
+    else
+	echo "Creating flatfile $OUTFILE"
+	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB > $OUTFILE
+	echo "Creating database archive $OUTFILE.tar.$ZEXT"
+	tar -cvhf - $OUTFILE $DATA/mod_*.db | $ZIP -c > $OUTFILE.tar.$ZEXT
+	rm $OUTFILE
+    fi
+else
+    echo "No dbs. Backup attempt failed."
+fi

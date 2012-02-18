@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# $Id: Archive,v 1.14 2002/06/26 20:46:38 lwl Exp $
+#
+#	Archive - Build a tarfile of things we'd want to back up.
+#		  Includes mush.config, the main conf file, a flatfile,
+#		  the various module databases, and text files with a
+#		  .txt extension that are not help, wizhelp, qhelp, or mushman.
+#		  Symbolic links are followed. 
+#
+PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin:.; export PATH
+LTDL_LIBRARY_PATH=./lib:./bin:.:../src:../src/lib:../src/.libs:./lib/.libs; export LTDL_LIBRARY_PATH
+#
+. mush.config
+. check_paths
+#
+#   Figure out the file compression extension.
+#
+ZBASE=`basename $ZIP | cut -f1 -d" "`
+if [ "$ZBASE" = "" ]; then
+    ZIP=gzip
+    ZEXT="gz"
+elif [ "$ZBASE" = "gzip" ]; then
+    ZEXT="gz"
+elif [ "$ZBASE" = "compress" ]; then
+    ZEXT="Z"
+elif [ "$ZBASE" = "bzip2" ]; then
+    ZEXT="bz2"
+else
+    ZEXT="gz"
+fi
+#
+DBDATE=`date +%m%d-%H%M`
+FLATFILE=$GAMENAME.flat.$DBDATE
+#
+OUTFILE=$BACKUP_DIR/$GAMENAME-archive.$DBDATE.tar.$ZEXT
+#
+#	Make a flatfile.
+#
+if [ -r $DATA/$GDBM_DB ]; then
+    $BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB > $FLATFILE
+else
+    echo "No db. Backup attempt failed."
+    exit 1
+fi
+#
+#	Gather and archive.
+#
+TXTFILES=`ls $TEXT/*.txt | egrep -v '^(help|wizhelp|qhelp|mushman).txt'`
+ALLFILES="$FLATFILE $DATA/mod_*.db mush.config $GAMENAME.conf $TXTFILES"
+#
+echo "Archiving..."
+tar -cvhf - $ALLFILES | $ZIP -c > $OUTFILE
+rm $FLATFILE
+echo "Done: $OUTFILE archive saved."

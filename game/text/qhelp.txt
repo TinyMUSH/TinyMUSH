@@ -1,0 +1,307 @@
+& help
+ 
+This is the TinyMUSH 3 quick-reference help facility.
+Type 'help' if you'd like the detailed help entries instead.
+ 
+The available topics and commands in QuickHelp:
+ 
+  Building
+  Comsys
+  Exits
+  Objects
+  Permissions
+  Rooms
+  Talking
+  Vehicles
+  @dig
+  @link
+  @lock
+  @open
+ 
+Type 'qhelp <topic or command>' for QuickHelp on something.
+For example, 'qhelp @dig' will show the QuickHelp on the @dig command.
+ 
+& Building
+ 
+Before you do any building, it'd be a good idea to type 'news' to see
+if your MUSH has any special policies about building. Many MUSHes have
+a quota policy, which restricts how much you can build; if you try to
+build too much stuff, you'll see the message, "Sorry, your building
+contract has run out."  Most MUSHes have a policy restricting large
+areas, as well. If you do decide to build a large area, you'll
+probably want to plan it out in advance; graph paper works well for
+this, using boxes to represent rooms, with the lines that connect the
+boxes representing exits.
+ 
+Building an area consists of using @dig to create the rooms (and some
+exits between them), and @open to create additional exits between
+rooms. Read 'qhelp @dig' and 'qhelp @open' for more information on
+how to use those commands. You should also read 'qhelp Rooms' for
+information on describing your room and other useful tricks that you
+can do with it, as well as 'qhelp Exits' for information on how
+to name exits, set the appropriate messages on them, and lock and
+unlock them.
+ 
+& Comsys
+  
+QuickHelp:  ComSys
+ 
+Not all of these commands will work on all MUSHes. Some MUSHes don't
+enable the comsys (the "communication system'). Others don't have a
+Public channel.
+ 
+pub <message>
+  Sends a message to the Public channel. 'pub' is called a "channel alias".
+  You can use ':' and ';' to send poses to channels.
+ 
+pub who
+  Lists who is currently listening to the Public channel.
+  
+pub off
+  Lets you leave the Public channel, temporarily.
+ 
+pub on
+  Lets you join the Public channel, if you previously left it by typing
+  'pub off'.
+ 
+Continued in 'qhelp Comsys2'.
+ 
+& Comsys2
+ 
+comlist
+  This lists all the channels that you have joined.
+ 
+@clist
+  This lists all the available channels in the comsys.
+ 
+addcom <channel alias> = <channel name>
+  Lets you join -- i.e., starting listening to -- <channel name> (which is
+  case-sensitive). You use the <channel alias> to talk, to check who's on
+  it, and to get on and off the channel. For example, 'pub' is the default
+  channel alias for the Public channel, so 'pub <message>', 'pub who',
+  'pub on', and 'pub off' are the commands used for it. The 'addcom'
+  command allows you to join other channels as well.
+ 
+addcom <channel alias> = <channel name>, <title>
+  Lets you join <channel name> using <channel alias>. Anything that
+  you say will be prefixed with <title>.
+ 
+delcom <channel alias>
+  Lets you leave a channel, permanently (until you 'addcom' it again).
+ 
+& Exits
+ 
+QuickHelp: Exits
+ 
+  This topic hasn't been written yet.
+ 
+& Objects
+ 
+QuickHelp:  Objects
+ 
+look <obj>
+  Shows you the object's description (@desc). You can look at exits, too.
+ 
+get <mobile>
+  Picks up an object in your location, moving it into your inventory.
+  It's usually considered rude to pick up other people's objects without
+  permission.
+ 
+drop <mobile>
+  Drops an object that you're carrying, moving it from your inventory
+  into your location.
+ 
+inventory
+  Lists all the objects that you're carrying.
+ 
+Continued in 'qhelp Objects2'.
+ 
+& Objects2
+ 
+examine/brief <obj>
+  If you have permissions to examine the object, then this will show
+  you the object's dbref, flags, powers, owner, parent, zone, money,
+  home, location, contents, exits, basic lock ("Key"), and @desc.
+ 
+examine <obj>
+  Like 'examine/brief <obj>', except this also shows you all the attributes
+  on the object.
+ 
+@decompile <obj>
+  Shows you the sequence of commands needed to re-create this object.
+  It's often useful to save, to your local hard drive, the output of
+  this command, so that you can re-create it if anything ever happens
+  to the MUSH you're on.
+ 
+& Permissions
+ 
+QuickHelp:  Permissions
+ 
+In order to perform many actions on objects, especially special ones
+that alter the objects (such as setting attributes on them), you are
+required to "control" the object.
+ 
+You control all objects that you own. If you set yourself INHERIT,
+all of your objects control you, as well as each other. If you don't
+set yourself INHERIT, but you set one of your objects INHERIT, then
+it controls you, as well as controlling all your other objects.
+All non-INHERIT objects belonging to you, control each other.
+Wizards control everything, as does anything with the Control_All
+power. There are other complications to control, but they're unlikely
+to be important to you; see 'help Control' if you want the details. 
+ 
+Continued in 'qhelp Permissions2'.
+ 
+& Permissions2
+ 
+If you get a "Permission denied." message, it will usually be due to
+your not having control over something (such as a room that you're
+trying to @open an exit out of). A few commands do have special rules
+that have more conditions than just control. Some other commands, like
+'examine', have permission checks that are more lenient than control.
+ 
+See the help entry for the command that you're using for the details
+of exactly what permissions you need, if you run into an unexpected
+"Permission denied."
+
+& Rooms
+ 
+QuickHelp: Rooms
+ 
+  This topic hasn't been written yet.
+ 
+& Talking
+ 
+QuickHelp:  Talking
+ 
+say <message>
+  Say something out loud, to everyone in your current location.
+  You will see:  You say "<message>"
+  Everyone else will see:  <your name> says "<message>"
+ 
+"<message>
+  Just like 'say <message>' -- but easier to type.
+ 
+pose <action>
+  Do something out loud, to everyone in your current location. It's similar
+  to 'say', except it allows you to "act out" something.
+  Everyone will see:  <your name> <action>
+  For instance, if you type 'pose waves." everyone sees, "<your name> waves."
+ 
+:<action>
+  Just like 'pose <action>' -- but easier to type.
+ 
+Continued in 'qhelp Talking2'.
+ 
+& Talking2 
+ 
+pose/nospace <action>
+  Just like 'pose <action>', except there's no space between your name
+  and the action. For instance, if you type 'pose/nospace 's balloon pops.'
+  then everyone will see, "<your name>'s balloon pops."
+ 
+;<action>
+  Just like 'pose/nospace <action>' -- but a lot easier to type.
+ 
+: <action>
+  Just like 'pose/nospace <action>'. Basically, if you put a space between
+  the ':' and your action, there's no space between your name and the
+  action... but if you don't put in a space, there's a space between your
+  name and the action. (Yes, it's a little confusing.)
+ 
+Continued in 'qhelp Talking3'.
+ 
+& Talking3
+ 
+@emit <message>
+  Shows a message to everyone in your location.
+ 
+\\<message>
+  Just like '@emit <message>' -- but easier to type.
+ 
+page <player> = <message>
+  Sends a private message to the named player. You don't have to type 
+  the full name, just enough to make it unique. For example, if Joseph
+  and John are both logged on, you could 'page Jos' to get Joseph, and
+  'page Joh' to get John, but you couldn't 'page Jo' because the "Jo"
+  is not unique. You can also use ':' and ';' to put actions in pages.
+ 
+page <player 1> <player 2> <etc.> = <message>
+  You can send a page to multiple players at the same time.
+  
+You can also find more information in 'qhelp Comsys'.
+ 
+& Vehicles
+ 
+QuickHelp: Vehicles
+ 
+  This topic hasn't been written yet.
+
+& @dig
+ 
+QuickHelp:  @dig
+ 
+@dig <name>
+  Creates a new room named <name>.
+ 
+@dig/tel <name>
+  Creates a new room named <name>, and teleports you there.
+ 
+@dig <name> = <exit to>
+  Creates a new room named <name>, and opens <exit to> from your current
+  location to the new room. However, this won't create an exit going back
+  (a "backlink") from the new room to your current location.
+ 
+@dig <name> = <exit to>, <exit from>
+  Creates a new room named <name>, and opens <exit to> from your current
+  location to the new room, and opens <exit from> from the new room to
+  your current location. <exit to> and <exit from> are both exit names;
+  see 'qhelp Exits' for information on naming exits.
+ 
+& @link
+ 
+QuickHelp:  @link
+ 
+@link <exit> = <dbref>
+  Links <exit> to the room with the dbref <dbref>. This means that anyone
+  going through the exit will go to that room.
+ 
+@unlink <exit>
+  Unlinks <exit>. Unlinked exits don't go anywhere. Also, anyone can
+  do a '@link <exit> = <dbref>' on an unlinked exit, and become
+  the new owner of the exit. Thus, don't @unlink an exit unless you
+  want someone to be able to do that. If an exit is already linked, and
+  you want it to go somewhere else, you don't need to @unlink it; just
+  '@link <exit> = <new dbref>' to link it to a new destination.
+ 
+@link me = here
+  This sets your home (the room where you're teleported when you type
+  'home') to your current location.
+ 
+@link <mobile> = here
+  This sets the home of <mobile> to your current location.
+ 
+& @lock
+ 
+QuickHelp:  @lock
+ 
+& @open
+ 
+QuickHelp:  @open
+ 
+@open <exit to> = <room dbref>
+  Opens a new exit named <exit to>, from your current location to the
+  room specified by <room dbref>. However, this won't create an exit
+  going back from that room to your current location.
+ 
+@open <exit to> = <room dbref>, <exit from>
+  Opens a new exit named <exit to>, from your current location to the
+  room specified by <room dbref>. Also opens a return exit ("backlink")
+  named <exit from>, from <room dbref> to your current location.
+  See 'qhelp Exits' for information on naming exits.
+ 
+@open <exit to>
+  Opens an unlinked exit named <exit to>. Anyone can @link an unlinked
+  exit, and become its new owner. Thus, you should not open an unlinked
+  exit unless you want other people to be able to do that.
+  

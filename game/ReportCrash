@@ -1,0 +1,116 @@
+#!/bin/sh
+#
+# $Id: ReportCrash,v 1.9 2004/08/17 20:51:55 lwl Exp $
+#
+#	ReportCrash - Examine a coredump to produce information for a
+#		      bug report, and try to mail the bug report.
+#
+. mush.config
+. check_paths
+
+# This is where we send bugs.
+
+bug_address="tinymush-bugs@lists.sourceforge.net"
+
+# Check to make sure we have a core file.
+
+core="core"
+if [ ! -s "$core" ]; then
+    core="netmush.core"
+    if [ ! -s "$core" ]; then
+	echo "Error. No non-zero-size core file found."
+	exit 1
+    fi
+fi
+
+# Check to make sure that we can run gdb.
+
+gdb_path=`which gdb`
+if [ ! -x "$gdb_path" ]; then
+    echo "Error. gdb does not appear to be in your path. Is it installed?"
+    exit 1
+fi
+
+# Find a mailer. 
+
+mailer=`which Mail`
+if [ ! -x "$mailer" ]; then
+    mailer=`which mail`
+    if [ ! -x "$mailer" ]; then
+	echo "Error. Cannot find mail or Mail program."
+        exit 1
+   fi
+fi
+
+# Find out how many frames we have in the stack trace.
+
+echo "Determining number of stack frames (ignore non-fatal errors)..."
+
+echo "where" > gdb_script.$$
+echo "quit" >> gdb_script.$$
+num_frames=`$gdb_path --nx --command=gdb_script.$$ $BIN/netmush $core | \
+    tail -1 | cut -f1 -d" " | cut -f2 -d"#"`
+
+# Frames are numbered 0 through N - 1.
+
+total_frames=`expr $num_frames + 1`
+
+# Generate the script we need.
+
+echo
+echo "Generating debugger script..."
+
+echo 'echo ~########## Current state~' > gdb_script.$$
+echo "p mudstate" >> gdb_script.$$
+echo 'echo ~########## Configuration~' >> gdb_script.$$
+echo "p mudconf" >> gdb_script.$$
+echo 'echo ~########## Stack trace~' >> gdb_script.$$
+echo "where" >> gdb_script.$$
+echo 'echo ~########## Current frame~' >> gdb_script.$$
+echo "info frame" >> gdb_script.$$
+echo 'echo ~### Arguments~' >> gdb_script.$$
+echo "info args" >> gdb_script.$$
+echo 'echo ~### Locals~' >> gdb_script.$$
+echo "info locals" >> gdb_script.$$
+
+i=1
+while [ $i -lt $total_frames ]; do
+    echo 'echo ~########## Next Frame Up~' >> gdb_script.$$
+    echo "up" >> gdb_script.$$
+    echo 'echo ~### Arguments~' >> gdb_script.$$
+    echo "info args" >> gdb_script.$$
+    echo 'echo ~### Locals~' >> gdb_script.$$
+    echo "info locals" >> gdb_script.$$
+    i=`expr $i + 1`
+done
+
+echo 'echo ~########## End of backtrace~' >> gdb_script.$$
+
+echo "quit" >> gdb_script.$$
+
+# Some operating systems eat echo backslashes. This ensures consistency.
+
+nl_sub='\\n'
+sed "s/~/$nl_sub/g" < gdb_script.$$ > gdb_mod.$$
+mv -f gdb_mod.$$ gdb_script.$$
+
+# Go do it.
+
+echo
+echo "Dumping the contents of $total_frames stack frames..."
+
+uname -a > gdb_output.$$
+echo >> gdb_output.$$
+$gdb_path --nx --command=gdb_script.$$ $BIN/netmush $core >> gdb_output.$$
+
+rm -f gdb_script.$$
+
+echo
+echo "Sending mail to $bug_address using $mailer..."
+
+$mailer -s "Stack trace for $GAMENAME" $bug_address < gdb_output.$$
+
+rm -f gdb_output.$$
+
+echo
+echo "Done."

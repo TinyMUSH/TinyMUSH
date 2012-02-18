@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# $Id: Reconstruct,v 1.4 2002/02/19 05:30:35 rmg Exp $
+#
+#	Reconstruct - Try to extract data from a corrupted GDBM database.
+#
+#	Syntax: Reconstruct [GDBM database file to recover]
+#
+PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin:.; export PATH
+#
+. mush.config
+. check_paths
+#
+# If no filename was specified, use the name of the GDBM database.
+#
+DBFILE="$1"
+if [ ! "$DBFILE" ]; then
+    DBFILE=$DATA/$GDBM_DB
+fi
+if [ ! -r "$DBFILE" ]; then
+    echo "Could not find the database file to recover."
+    exit 1
+fi
+#
+# Move our files out of the way. 
+#
+echo "Moving old files out of the way. Please ignore file-not-found warnings."
+#
+DBDATE=`date +%m%d-%H%M`
+mkdir db-$DBDATE
+mv -f $DATA/$GDBM_DB $DATA/$CRASH_DB $DATA/$BACKUP_DB db-$DBDATE
+#
+# Of course, we might have just moved the file that we wanted.
+#
+if [ "$DBFILE" = "$DATA/$GDBM_DB" -o "$DBFILE" = "$GDBM_DB" ]; then
+    DBFILE=db-$DBDATE/$GDBM_DB
+fi
+#
+# Recover the database.
+#
+echo "Attempting to reconstruct database."
+$BIN/recover -i $DBFILE -o $DATA/$GDBM_DB
+if [ $? -eq 0 ]; then
+    echo "Reconstruction attempt completed (probably successful)."
+else
+    echo "Reconstruction attempt failed."
+    echo "The file $DATA/$GDBM_DB will only be partially complete."
+    echo "You will probably want to remove it. Use:  rm -f $DATA/$GDBM_DB"
+    echo "The moved files can be found in the db-$DBDATE directory."
+fi

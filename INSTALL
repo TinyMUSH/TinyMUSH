@@ -1,0 +1,384 @@
+INSTALLATION
+
+TinyMUSH 3 should be straightforward to install and run.
+
+The installation process assumes that you are familiar with basic Unix
+commands. If you are not familiar with basic Unix commands, you will
+probably need the help of someone with at least some Unix familiarity,
+in order to be able to reliably run your game. Also, your local
+bookstore can probably recommend some good books for Unix beginners,
+such as "Unix for Dummies" or "Unix for the Impatient".
+
+*Please* read the FAQ file. It contains important information about
+how to configure the server, make backups of your database, report
+bugs, and the like.
+
+----------------------------------------------------------------------------
+
+TABLE OF CONTENTS
+
+- One-step installation
+- Simple custom installation
+- Step-by-step installation
+- Starting a new game
+- Upgrading from TinyMUSH 3.0
+- Converting from another MU* type
+- Compatibility
+- System Requirements
+
+----------------------------------------------------------------------------
+
+ONE-STEP INSTALLATION
+
+If you want to build the server using the standard default configuration,
+just type:
+
+./Build
+
+(You must be in the directory that this INSTALL file is in.)
+
+When the build finishes, assuming there are no errors, you are ready to
+start a new MUSH, or convert an existing MUSH to TinyMUSH 3.
+
+If the build fails for some reason, look in the section of this
+install guide titled COMPATIBILITY for help.
+
+----------------------------------------------------------------------------
+
+SIMPLE CUSTOM INSTALLATION
+
+For your convenience, the Build script accepts options to be passed to
+the configure script. For more information, type:
+
+./Build --help
+
+(You must be in the directory that this INSTALL file is in.)
+
+This will show you a long list of optional features you can enable or
+disable using configure options, including modules, and lists the
+default settings. Make a note of the options you would like to use,
+and then run the Build script with those options. For example, to
+build the mush without Pueblo client support, you'd type:
+
+./Build --disable-pueblo
+
+(You must be in the directory that this INSTALL file is in.)
+
+When the build finishes, assuming there are no errors, you are ready to
+start a new MUSH, or convert an existing MUSH to TinyMUSH 3.
+
+If the build fails for some reason, look in the section of this
+install guide titled COMPATIBILITY for help.
+
+----------------------------------------------------------------------------
+
+STEP-BY-STEP INSTALLATION
+
+If you decide not to use the one-step install, or you encounter problems
+in the one-step install, the installation process is as follows:
+
+- Go to the top-level directory (the directory where this INSTALL file
+  is normally located).
+
+- Go into the directory for GNU dbm; 'cd src/gdbm-1.8.0' should take
+  you there.
+
+- Type './configure --enable-shared=no --enable-static=yes', then type
+  'make' . This will compile the GNU dbm library, which is required by
+  TinyMUSH 3.
+
+  Please Note: TinyMUSH 3 requires gdbm-1.8.0! If gdbm is already
+  installed on your system, chances are that it's version 1.7.3 or
+  earlier -- do NOT ignore this step.
+
+- Go back to the src directory ('cd ..').
+
+- View options for the configure script, by typing './configure --help'.
+  This will show you a long list of optional features you can enable or
+  disable using configure options, including modules, and lists the
+  default settings. Make a note of the options you would like to use.
+
+- Run the configure script, by typing './configure' followed by the
+  options you've selected. This will customize autoconf.h and the
+  Makefile for your system. If you have gcc (the GNU C compiler)
+  installed on your system, it will automatically be selected as the
+  compiler of choice.
+
+- Edit the Makefile and make any changes that might be necessary (go down
+  to the line that says 'CONFIGURATION SECTION'). Note that most of the
+  options that used to be set in this section are now set with ./configure
+  options. See the notes on Compatibility, later in this file, for some
+  operating-system-specific notes and modifications that might need to be
+  made that are not handled by the configure script.
+
+- Edit config.h and select the configuration options you want. The options
+  are documented in that file.
+
+- CAUTION: You CANNOT use your system GDBM libraries. TinyMUSH's included
+  GDBM library contains modifications specific to TinyMUSH, as well as
+  bugfixes. The auto-configuration will build and link tinygdbm; do not
+  change this!
+
+- To build the program (updating the dependencies if needed, producing a
+  number of binaries, as well as modules, and linking them into the
+  appropriate place in the directory structure),
+
+  If you are a bash, ksh, pdksh, bsh, or sh shell user, type:
+
+	make 2>&1 | tee Compile.log
+
+  If you are a csh or tcsh shell user, type:
+
+	make |& tee Compile.log
+
+  If you can't get either of the above to work, type:
+
+	make | tee Compile.log
+
+  To find out what shell you're using, type 'basename $SHELL'.
+
+  The record of the compilation will be saved in a file called Compile.log
+  (If the build fails for some reason, look in the section of this install
+  guide titled COMPATIBILITY for help.)
+
+- You are now ready to start a new game, or convert an existing game to
+  TinyMUSH 3.
+
+----------------------------------------------------------------------------
+
+STARTING A NEW GAME
+
+- Go into the game directory ('cd game' or 'cd ../game' should do it).
+
+- Edit mush.config, according to the directions in that file.
+
+- If you changed GAMENAME in mush.config, you will need to rename
+  netmush.conf to the appropriate thing (i.e., if GAMENAME is foo,
+  then you should 'mv netmush.conf foo.conf').
+
+- Edit that conf file (netmush.conf, or whatever you renamed it to).
+  Put in whatever configuration parameters are appropriate.
+
+- Start the game by typing './Startmush'.
+
+- Connect to the game using telnet or a MUD client. Log in the "God"
+  character with 'connect #1 potrzebie'.
+
+- Change the password of the God character; make sure you make it something
+  that you can remember, but which can't be guessed by someone else!
+  Type '@password potrzebie = YourNewPassword', where YourNewPassword
+  is the new password that you've chosen.
+
+- You are now ready to build your game. It is strongly recommended that
+  the God character only be logged in when absolutely necessary; create
+  another character for yourself and give it the Wizard flag, for day
+  to day use.
+
+- You may want to make sure that you can back up and restore your database:
+  Type '@shutdown'. Then, from the game directory, type './Backup'. If the
+  backup finishes successfully, type './Restore FILENAME' (where FILENAME
+  is the name of the backup file). If this finishes successfully, then
+  type './Startmush' to start the game again.
+
+  If you encounter problems at this stage, you have an installation
+  problem. The most common is a problem with GNU dbm; this is likely
+  the cause if you @shutdown, type './Startmush', and find that the
+  attributes in your database are gone. If this happens to you, check
+  your configuration and rebuild the netmush binary, if necessary.
+
+----------------------------------------------------------------------------
+
+UPGRADING FROM TINYMUSH 3.0
+
+For the sake of these examples, we will assume that your TinyMUSH 3.0
+installation is in ~/3.0/ and your TinyMUSH 3.1 installation is in
+~/3.1/ -- change these pathnames to whatever they actually are.
+
+Do NOT overwrite your 3.0 installation with 3.1! Once you have upgraded
+and tested to make sure your game is running properly, you can delete
+your 3.0 installation if you want to.
+
+- Go into the game directory from your TinyMUSH 3.0 install:  cd ~/3.0/game
+
+- Make an archive (using the old 3.0 binaries!) via ./Archive
+  It will be called <your game name>-archive.<date>.tar.gz
+  The examples below call it netmush-archive.0213-1548.tar.gz -- substitute
+  the filename of your own archive. (You may want to make sure you save
+  an extra copy of this file somewhere, since it's the archive of all
+  of your files from the 3.0 installation.)
+
+- Go into the 3.1 game directory:  cd ~/3.1/game
+
+- Preserve the current mush.config file:  mv mush.config mush.config.default
+
+- Inflate the archive file:
+  gzip -dc ~/3.0/game/netmush-archive.0213-1548.tar.gz | tar -xvf -
+
+  This will write the files into your current, 3.1 directory. If you are
+  given the option to overwrite files, do so; you want to replace the
+  existing defaults.
+
+- Edit the mush.config.default file. Replace the GAMENAME and OWNER
+  values with your own game name and email address of the owner. (Look
+  at the mush.config file you got from inflating an archive, if you
+  need a reminder of what they were.)
+ 
+- Overwrite your old mush.config file with the new one:
+  mv -f mush.config.default mush.config
+
+- Edit your game's conf file. It should be called GAMENAME.conf, where
+  GAMENAME is whatever you set GAMENAME to in mush.config  -- it's named
+  whatever you called it in your 3.0 installation and should have been
+  placed in your 3.1 game directory when you expanded the archive.
+
+  - If you have the following parameters set, simply remove them:
+    cache_depth
+    cache_width
+    input_database
+    output_database
+    mail_database
+    comsys_database
+    have_comsys
+    have_mailer
+    format_exits
+    format_contents
+
+  - If you were using the built-in comsys, add this line:
+    module comsys
+
+  - If you were using the built-in mailer, add this line:
+    module mail
+
+  - If you had your database files in the data directory, add this line:
+    database_home data
+    (If you have your database files in another directory, substitute that
+    in instead. Pathnames are relative to the ~/3.1/game directory.)
+
+  - If you have the gdbm_database parameter in your conf file, edit it
+    to take away any prepending path. For instance, if your conf file reads:
+    gdbm_database data/netmush.gdbm
+    change it to read:
+    gdbm_database netmush.gdbm
+
+  - If you have the crash_database parameter in your conf file, edit it
+    to take away any prepending path. For instance, if your conf file reads:
+    crash_database data/netmush.db.CRASH
+    change it to read:
+    crash_database netmush.db.CRASH
+
+- Convert your database to the new 3.1 format via the following:
+  ./Restore netmush.flat.02313-1548
+  (Substitute the name of whatever flatfile was in your archive.)
+
+- Rename your comsys and mail databases to the new 3.1 names:
+  mv comsys.db mod_comsys.db
+  mv mail.db mod_mail.db
+
+  You may need to go into your data directory ('cd data') in order to do
+  this; if you do, you should then return to the 3.1 game directory
+  ('cd ..') once you've moved the files.
+
+- Start the game by typing './Startmush'.
+
+- Connect to your game, and verify that it's running correctly.
+
+- You may want to make sure that you can back up and restore your database:
+  Type '@shutdown'. Then, from the game directory, type './Backup'. If the
+  backup finishes successfully, type './Restore FILENAME' (where FILENAME
+  is the name of the backup file; it will have a .tar.gz extension). If
+  this finishes successfully, then type './Startmush' to start the game
+  again.
+
+  If you encounter problems at this stage, you have an installation
+  problem. The most common is a problem with GNU dbm; this is likely
+  the cause if you @shutdown, type './Startmush', and find that the
+  attributes in your database are gone. If this happens to you, check
+  your configuration and rebuild the netmush binary, if necessary.
+
+----------------------------------------------------------------------------
+
+CONVERTING FROM ANOTHER MU* TYPE
+
+If you are upgrading from TinyMUSH 2.2, read the file 'CONVERT.TINY22'
+for instructions.
+
+If you are upgrading from TinyMUX 1.x, read the file 'CONVERT.MUX' for 
+instructions.
+
+There is, at present, no automated conversion from TinyMUX 2 or PennMUSH.
+
+----------------------------------------------------------------------------
+
+COMPATIBILITY
+
+TinyMUSH 3 is believed to be compatible with all major versions of
+Unix, including SunOS 4.1.x, Solaris, Irix, AIX, HP-UX, NetBSD, Linux,
+and MacOS X. There is no official native Windows NT/2000 port, at present,
+but it will work with the Cygwin or UWIN libraries.
+
+TinyMUSH 3.1 utilizes dynamically loadable modules on many platforms,
+thanks to the GNU libtool project, and will be statically linked with
+its modules on platforms that do not support dynamic loading.
+
+The frequent releases of new Linux versions, the proliferation of
+multiple Linux development paths, and the incompatibility between
+multiple versions of the C header files and GNU C library incorporated
+into most current versions of Linux, make it very difficult to
+maintain "out of the box" 100% compatibility with every version of
+Linux. If you are on a Linux system, it is possible that you will
+need to make minor tweaks to the Makefile and/or autoconf.h,
+particularly if you are running a Linux release more recent than
+the release date of this server version.
+
+The Build script (or the directions given above for step-by-step
+installation) produces a file in the src directory called Compile.log;
+if the compile fails, the developers would like to know what it failed
+on so it can be fixed in future releases (and so they can assist you
+in getting the server to work on your system), so please mail
+tinymush-bugs@lists.sourceforge.net with that file included or attached,
+as well as the output of the command 'uname -a' and any other relevant
+details about your machine's specific configuration. If you figured
+out what you needed to change in order to make the build successful,
+please include those instructions in your email, as well.
+
+----------------------------------------------------------------------------
+
+SYSTEM REQUIREMENTS
+
+The hardware requirements are minimal, by the standards of modern Unix
+servers.  You will need a machine with at least 16 MB of physical RAM,
+and at least 10 MB of available disk space for the game.
+
+The RAM requirements (actual RAM used) typically vary between 2 and 15
+MB; unless your game is huge (more than 50,000 objects), cache tuning
+should ensure that you do not consume more RAM.
+
+The network bandwidth needs are minimal; even with a very large MUSH,
+it is unlikely that you will pass more than 25 kbps. The average MUSH
+user transfers fewer bytes in an entire session, than does someone
+viewing a single typical web page.
+
+However, if you plan to run your game over an analog dialup connection
+(typically 14.4 kbps - 56 kbps), be aware that latency will affect the
+number of commands that have queued up interactively over a given
+timeslice, and that you should increase the queue_active_chunk config
+parameter.
+
+It is important that you allocate enough disk space; should you ever
+run out of it, you will end up with serious database corruption. If
+your disks are close to capacity, make sure that you do frequent
+backups.
+
+There are no significant security concerns involved in running a MUSH
+on a server, save for possibly increasing its "visibility" on the Internet
+and therefore making it the target of more attempts to breach the
+system's security. The MUSH server can run comfortably in a chroot'd
+environment, and does not provide any players with access to the
+filesystem or underlying system.
+
+Nonetheless, you should also obtain the consent of your systems
+administrator before running a MUSH on a system. Virtually all
+Internet service providers ban the running of MUDs on their shell
+machines. Therefore, you will probably need either a MUD hosting
+service or a personal server, if you plan to run a public game.
+

@@ -1,0 +1,26 @@
+& help
+ 
+This is an example of how to write an arbitrary indexed 'help'-like file.
+If you wanted to have your '+help' command look at this file, you would
+add the following line to your netmush.conf file (or equivalent):
+ 
+helpfile +help text/plushelp.txt
+ 
+The text within the helpfile will be evaluated, i.e., you can use
+ANSI substitutions like \%xh and \%xn. If you don't want the text
+evaluated, in this example, you would change your conf directive to:
+ 
+raw_helpfile +help text/plushelp.txt
+ 
+See 'wizhelp helpfile' and 'wizhelp raw_helpfile' for more details.
+ 
+& +help
+ 
+This is a sample +help entry for '+help +help'.
+ 
+& aliased help entries
+& aliased entries
+ 
+This is a sample +help entry with two names: '+help aliased help entries'
+and '+help aliased entries'.
+ 

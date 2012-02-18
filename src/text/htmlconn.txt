@@ -1,0 +1,14 @@
+<XCH_PAGE clear=text>
+
+Welcome to a Pueblo-enhanced TinyMUSH.
+
+<UL>
+<LI> "connect <name> <password>" connects you to an existing character.
+<LI> "create <name> <password>" creates a new character.
+<LI> "WHO" tells you who is logged in to the game (case sensitive).
+<LI> "QUIT" exits the game and saves your character.
+<LI> "news" informs you about recent program changes and items of interest.
+<LI> "help" gives help on the commands, "help commands" for a list.
+</UL>
+
+<HR>
