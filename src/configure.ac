@@ -2,33 +2,77 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([TinyMUSH], [3.3.0.0], [tinymush-bugs@lists.sourceforge.net])
-package_config=$@
-package_release_date="YYYY/MM/DD"
-AC_COPYRIGHT([Copyright (c) 2011 TinyMUSH development team.])
+
+dnl Autoconf define the following itself:
+
+dnl PACKAGE_NAME
+dnl PACKAGE_TARNAME
+dnl PACKAGE_VERSION
+dnl PACKAGE_STRING
+dnl PACKAGE_BUGREPORT
+dnl PACKAGE_URL
+AC_INIT([TinyMUSH], [3.3.0.0], [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
+dnl AC_INIT define the following itself:
+
+dnl PACKAGE_NAME
+dnl PACKAGE_TARNAME
+dnl PACKAGE_VERSION
+dnl PACKAGE_STRING
+dnl PACKAGE_BUGREPORT
+dnl PACKAGE_URL
+
+dnl With AX_SPLIT_VERSION, we define the following based on autoconf's values:
+
+dnl PACKAGE_VERSION_MAJOR
+dnl PACKAGE_VERSION_MINOR
+dnl PACKAGE_RELEASE_STATUS
+dnl PACKAGE_RELEASE_NAME
+dnl PACKAGE_RELEASE_REVISION
+AX_SPLIT_VERSION()
+dnl And we manually create a few other things tha need to be updated from time to time.
+dnl
+PACKAGE_RELEASE_DATE="2012-02-19"
+PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
+
+dnl Some default values
+dnl
+with_included_ltdl="yes"
+with_dbm="gdbm"
+with_module_comsys="yes"
+with_module_mail="yes"
+with_module_hello="no"
+
+AC_COPYRIGHT([$PACKAGE_COPYRIGHT])
 AC_CONFIG_AUX_DIR([libltdl/config])
 AC_CONFIG_SRCDIR([game.c])
 AC_CONFIG_HEADERS([autoconf.h])
 AC_CONFIG_MACRO_DIR([libltdl/m4])
 
-AX_SPLIT_VERSION()
+AX_PRINT_PACKAGE_TITLE()
 
-PRETTY_PRINT([
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION}%b.
-  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
-  See %Bhttp://tinymush.sourceforge.net%b for more informations.
-])
+PRETTY_PRINT([configure], [$ac_configure_args], [1])
 
 PRETTY_PRINT([configure], [Initializing Automake.], [1])
-
 AM_INIT_AUTOMAKE()
 
 PRETTY_PRINT([configure], [Initializing Libtools.], [1])
 
 LT_PREREQ([2.4])
 LT_CONFIG_LTDL_DIR([libltdl])
-LT_INIT([dlopen])
+LT_INIT([dlopen disable-shared static])
 LTDL_INIT([convenience])
+
+# The lt_dladvise_init symbol was added with libtool-2.2
+if test "x$with_included_ltdl" != "xyes"; then
+ save_CFLAGS="$CFLAGS"
+ save_LDFLAGS="$LDFLAGS"
+ CFLAGS="$CFLAGS $LTDLINCL"
+ LDFLAGS="$LDFLAGS $LIBLTDL"
+ AC_CHECK_LIB([ltdl], [lt_dladvise_init], [], [AC_MSG_ERROR([installed libltdl is too old])]) 
+ LDFLAGS="$save_LDFLAGS"
+ CFLAGS="$save_CFLAGS"
+fi
+
 
 PRETTY_PRINT([configure], [Checks for Options.], [1])
 
@@ -119,7 +163,6 @@ AC_ARG_WITH(module-comsys,
     *) if test -d "modules/comsys"; then
         mod_comsys=true
         AC_MSG_RESULT(yes)
-        package_config="$package_config --with-module-comsys=yes"
        else
         AC_MSG_ERROR(not found)
        fi;;
@@ -128,7 +171,6 @@ AC_ARG_WITH(module-comsys,
   if test -d "modules/comsys"; then
    mod_comsys=true
    AC_MSG_RESULT(yes)
-   package_config="$package_config --with-module-comsys=yes"
   else
    AC_MSG_ERROR(not found)
   fi
@@ -145,7 +187,6 @@ AC_ARG_WITH(module-mail,
     *) if test -d "modules/mail"; then
         mod_mail=true
         AC_MSG_RESULT(yes)
-        package_config="$package_config --with-module-mail=yes"
        else
         AC_MSG_ERROR(not found)
        fi;;
@@ -154,7 +195,6 @@ AC_ARG_WITH(module-mail,
   if test -d "modules/comsys"; then
    mod_mail=true
    AC_MSG_RESULT(yes)
-   package_config="$package_config --with-module-mail=yes"
   else
    AC_MSG_ERROR(not found)
   fi
@@ -171,7 +211,6 @@ AC_ARG_WITH(module-hello,
     *) if test -d "modules/hello"; then
         mod_hello=true
         AC_MSG_RESULT(yes)
-        package_config="$package_config --with-module-hello=yes"
        else
         AC_MSG_ERROR(not found)
        fi;;
@@ -729,8 +768,42 @@ AC_CHECK_FUNCS([alarm dup2 floor getdtablesize gethostbyaddr gethostbyname getpa
 
 PRETTY_PRINT([configure], [Writing configuration.], [1])
 # Write results.
-AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$package_config"], [Switches used with ./configure])
-AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], ["$package_release_date"], [Date of Release])
+AC_SUBST([ac_aux_dir])
+AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
+AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], ["$PACKAGE_RELEASE_DATE"], [Date of Release])
+
 AC_CONFIG_SUBDIRS([dbm/gdbm dbm/qdbm])
-AC_CONFIG_FILES([Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile])
+AC_CONFIG_FILES([modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile])
+
 AC_OUTPUT
+
+AX_PRINT_PACKAGE_TITLE()
+PRETTY_PRINT([Game will be install in directory], [$prefix])
+echo
+if [test x$dbm_gdbm = xtrue]; then  
+ PRETTY_PRINT([                       DBM Engine], [GDBM])
+fi 
+
+if [test x$dbm_qdbm = xtrue]; then
+ PRETTY_PRINT([                       DBM Engine], [QDBM])
+fi
+
+if [test x$mod_comsys = xtrue]; then
+ PRETTY_PRINT([                    Module ComSYS], [Enable])
+else
+ PRETTY_PRINT([                    Module ComSYS], [Disable]) 
+fi
+
+if [test x$mod_mail = xtrue]; then
+ PRETTY_PRINT([                      Module Mail], [Enable])
+else
+ PRETTY_PRINT([                      Module Mail], [Disable])
+fi
+
+if [test x$mod_hello = xtrue]; then
+ PRETTY_PRINT([                     Module Hello], [Enable])
+else
+ PRETTY_PRINT([                     Module Hello], [Disable])
+fi
+echo
+PRETTY_PRINT([If everything is ok, you can now type %Bmake install%b to install the engine.])

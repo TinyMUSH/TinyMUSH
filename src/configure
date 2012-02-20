@@ -13,7 +13,7 @@
 # This configure script is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 #
-# Copyright (c) 2011 TinyMUSH development team.
+# $PACKAGE_COPYRIGHT
 ## -------------------- ##
 ## M4sh Initialization. ##
 ## -------------------- ##
@@ -176,7 +176,6 @@ test x\$exitcode = x0 || exit 1"
   as_lineno_2=";as_suggested=$as_suggested$LINENO;as_suggested=$as_suggested" as_lineno_2a=\$LINENO
   eval 'test \"x\$as_lineno_1'\$as_run'\" != \"x\$as_lineno_2'\$as_run'\" &&
   test \"x\`expr \$as_lineno_1'\$as_run' + 1\`\" = \"x\$as_lineno_2'\$as_run'\"' || exit 1
-test \$(( 1 + 1 )) = 2 || exit 1
 
   test -n \"\${ZSH_VERSION+set}\${BASH_VERSION+set}\" || (
     ECHO='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
@@ -184,7 +183,8 @@ test \$(( 1 + 1 )) = 2 || exit 1
     ECHO=\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO
     PATH=/empty FPATH=/empty; export PATH FPATH
     test \"X\`printf %s \$ECHO\`\" = \"X\$ECHO\" \\
-      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1"
+      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1
+test \$(( 1 + 1 )) = 2 || exit 1"
   if (eval "$as_required") 2>/dev/null; then :
   as_have_required=yes
 else
@@ -579,7 +579,7 @@ PACKAGE_TARNAME='tinymush'
 PACKAGE_VERSION='3.3.0.0'
 PACKAGE_STRING='TinyMUSH 3.3.0.0'
 PACKAGE_BUGREPORT='tinymush-bugs@lists.sourceforge.net'
-PACKAGE_URL=''
+PACKAGE_URL='http://tinymush.sourceforge.net'
 
 ac_unique_file="game.c"
 # Factoring default headers for most tests.
@@ -625,6 +625,7 @@ am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+ac_aux_dir
 MALLOC_O
 MALLOC_S
 OPTIM_F
@@ -681,9 +682,11 @@ LD
 FGREP
 EGREP
 GREP
+SED
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
+am__nodep
 AMDEPBACKSLASH
 AMDEP_FALSE
 AMDEP_TRUE
@@ -729,7 +732,6 @@ am__isrc
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
-SED
 target_alias
 host_alias
 build_alias
@@ -1431,7 +1433,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-shared[=PKGS]  build shared libraries [default=yes]
+  --enable-shared[=PKGS]  build shared libraries [default=no]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
@@ -1482,7 +1484,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-pic              try to use only PIC/non-PIC objects [default=use
+  --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
@@ -1548,6 +1550,7 @@ Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
 Report bugs to <tinymush-bugs@lists.sourceforge.net>.
+TinyMUSH home page: <http://tinymush.sourceforge.net>.
 _ACEOF
 ac_status=$?
 fi
@@ -1617,7 +1620,7 @@ Copyright (C) 2010 Free Software Foundation, Inc.
 This configure script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it.
 
-Copyright (c) 2011 TinyMUSH development team.
+$PACKAGE_COPYRIGHT
 _ACEOF
   exit
 fi
@@ -2486,8 +2489,39 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-package_config=$@
-package_release_date="YYYY/MM/DD"
+
+
+
+
+ tmp=(`echo $PACKAGE_VERSION | tr "." "\n"`)
+
+ PACKAGE_VERSION_MAJOR=${tmp[0]}
+ PACKAGE_VERSION_MINOR=${tmp[1]}
+ PACKAGE_RELEASE_STATUS=${tmp[2]}
+ PACKAGE_RELEASE_REVISION=${tmp[3]}
+
+ case ${tmp[2]} in
+ 	0)	PACKAGE_RELEASE_NAME="Alpha ${tmp[3]}"
+ 		;;
+ 	1)	PACKAGE_RELEASE_NAME="Beta ${tmp[3]}"
+ 		;;
+ 	2)	if [ ${tmp[3]} -gt 0 ]; then
+ 			PACKAGE_RELEASE_NAME="PatchLevel ${tmp[3]}"
+ 		else
+ 			PACKAGE_RELEASE_NAME="Gold"
+		fi
+		;;
+ esac
+
+PACKAGE_RELEASE_DATE="2012-02-19"
+PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
+
+with_included_ltdl="yes"
+with_dbm="gdbm"
+with_module_comsys="yes"
+with_module_mail="yes"
+with_module_hello="no"
+
 
 ac_aux_dir=
 for ac_dir in libltdl/config "$srcdir"/libltdl/config; do
@@ -2523,116 +2557,43 @@ ac_config_headers="$ac_config_headers autoconf.h"
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
-$as_echo_n "checking for a sed that does not truncate output... " >&6; }
-if ${ac_cv_path_SED+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-            ac_script=s/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/
-     for ac_i in 1 2 3 4 5 6 7; do
-       ac_script="$ac_script$as_nl$ac_script"
-     done
-     echo "$ac_script" 2>/dev/null | sed 99q >conftest.sed
-     { ac_script=; unset ac_script;}
-     if test -z "$SED"; then
-  ac_path_SED_found=false
-  # Loop through the user's path and test for each of PROGNAME-LIST
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_prog in sed gsed; do
-    for ac_exec_ext in '' $ac_executable_extensions; do
-      ac_path_SED="$as_dir/$ac_prog$ac_exec_ext"
-      { test -f "$ac_path_SED" && $as_test_x "$ac_path_SED"; } || continue
-# Check for GNU ac_path_SED and select it if it is found.
-  # Check for GNU $ac_path_SED
-case `"$ac_path_SED" --version 2>&1` in
-*GNU*)
-  ac_cv_path_SED="$ac_path_SED" ac_path_SED_found=:;;
-*)
-  ac_count=0
-  $as_echo_n 0123456789 >"conftest.in"
-  while :
-  do
-    cat "conftest.in" "conftest.in" >"conftest.tmp"
-    mv "conftest.tmp" "conftest.in"
-    cp "conftest.in" "conftest.nl"
-    $as_echo '' >> "conftest.nl"
-    "$ac_path_SED" -f conftest.sed < "conftest.nl" >"conftest.out" 2>/dev/null || break
-    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
-    as_fn_arith $ac_count + 1 && ac_count=$as_val
-    if test $ac_count -gt ${ac_path_SED_max-0}; then
-      # Best one so far, save it but keep looking for a better one
-      ac_cv_path_SED="$ac_path_SED"
-      ac_path_SED_max=$ac_count
-    fi
-    # 10*(2^10) chars as input seems more than enough
-    test $ac_count -gt 10 && break
-  done
-  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
-esac
-
-      $ac_path_SED_found && break 3
-    done
-  done
-  done
-IFS=$as_save_IFS
-  if test -z "$ac_cv_path_SED"; then
-    as_fn_error $? "no acceptable sed could be found in \$PATH" "$LINENO" 5
-  fi
-else
-  ac_cv_path_SED=$SED
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_SED" >&5
-$as_echo "$ac_cv_path_SED" >&6; }
- SED="$ac_cv_path_SED"
-  rm -f conftest.sed
-
-
-
- awk '{split($PACKAGE_VERSION,a,"." ); for (i=1; i<=10; i++) print ai}'
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking Major version" >&5
-$as_echo_n "checking Major version... " >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: $a\1\" >&5
-$as_echo "$a\1\" >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking Minor version" >&5
-$as_echo_n "checking Minor version... " >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: $a\2\" >&5
-$as_echo "$a\2\" >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking Status version" >&5
-$as_echo_n "checking Status version... " >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: $a\3\" >&5
-$as_echo "$a\3\" >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking Revision version" >&5
-$as_echo_n "checking Revision version... " >&6; }
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: $a\4\" >&5
-$as_echo "$a\4\" >&6; }
-
 
 
  if test -z ""; then
   ${ac_aux_dir}/shtool echo -e "
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION}%b.
-  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
-  See %Bhttp://tinymush.sourceforge.net%b for more informations.
-"
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>."
  elif test -z ""; then
   ${ac_aux_dir}/shtool echo -e "
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION}%b.
-  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
-  See %Bhttp://tinymush.sourceforge.net%b for more informations.
-: %B%b"
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
  else
   echo
   ${ac_aux_dir}/shtool echo -e "
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION}%b.
-  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
-  See %Bhttp://tinymush.sourceforge.net%b for more informations.
-: %B%b"
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
+  echo
+ fi
+
+
+
+
+ if test -z "$ac_configure_args"; then
+  ${ac_aux_dir}/shtool echo -e "configure"
+ elif test -z "1"; then
+  ${ac_aux_dir}/shtool echo -e "configure: %B$ac_configure_args%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "configure: %B$ac_configure_args%b"
   echo
  fi
 
@@ -2647,7 +2608,6 @@ $as_echo "$a\4\" >&6; }
   ${ac_aux_dir}/shtool echo -e "configure: %BInitializing Automake.%b"
   echo
  fi
-
 
 am__api_version='1.11'
 
@@ -3117,11 +3077,11 @@ MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
-# Always define AMTAR for backward compatibility.
+# Always define AMTAR for backward compatibility.  Yes, it's still used
+# in the wild :-(  We should find a proper way to deprecate it ...
+AMTAR='$${TAR-tar}'
 
-AMTAR=${AMTAR-"${am_missing_run}tar"}
-
-am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
+am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
 
 
 
@@ -3156,8 +3116,8 @@ esac
 
 
 
-macro_version='2.4'
-macro_revision='1.3293'
+macro_version='2.4.2'
+macro_revision='1.3337'
 
 
 
@@ -3365,6 +3325,7 @@ fi
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
+  am__nodep='_no'
 fi
  if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
@@ -4178,6 +4139,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -4237,7 +4199,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -4981,6 +4943,11 @@ else
     lt_cv_sys_max_cmd_len=196608
     ;;
 
+  os2*)
+    # The test takes a long time on OS/2.
+    lt_cv_sys_max_cmd_len=8192
+    ;;
+
   osf*)
     # Dr. Hans Ekkehard Plesser reports seeing a kernel panic running configure
     # due to this test when exec_disable_arg_limit is 1 on Tru64. It is not
@@ -5020,7 +4987,7 @@ else
       # If test is not a shell built-in, we'll probably end up computing a
       # maximum length that is only half of the actual maximum length, but
       # we can't tell.
-      while { test "X"`func_fallback_echo "$teststring$teststring" 2>/dev/null` \
+      while { test "X"`env echo "$teststring$teststring" 2>/dev/null` \
 	         = "X$teststring$teststring"; } >/dev/null 2>&1 &&
 	      test $i != 17 # 1/2 MB should be enough
       do
@@ -5449,7 +5416,7 @@ irix5* | irix6* | nonstopux*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-# This must be Linux ELF.
+# This must be glibc/ELF.
 linux* | k*bsd*-gnu | kopensolaris*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
@@ -6090,13 +6057,13 @@ old_postuninstall_cmds=
 if test -n "$RANLIB"; then
   case $host_os in
   openbsd*)
-    old_postinstall_cmds="$old_postinstall_cmds~\$RANLIB -t \$oldlib"
+    old_postinstall_cmds="$old_postinstall_cmds~\$RANLIB -t \$tool_oldlib"
     ;;
   *)
-    old_postinstall_cmds="$old_postinstall_cmds~\$RANLIB \$oldlib"
+    old_postinstall_cmds="$old_postinstall_cmds~\$RANLIB \$tool_oldlib"
     ;;
   esac
-  old_archive_cmds="$old_archive_cmds~\$RANLIB \$oldlib"
+  old_archive_cmds="$old_archive_cmds~\$RANLIB \$tool_oldlib"
 fi
 
 case $host_os in
@@ -6243,6 +6210,7 @@ for ac_symprfx in "" "_"; do
     # which start with @ or ?.
     lt_cv_sys_global_symbol_pipe="$AWK '"\
 "     {last_section=section; section=\$ 3};"\
+"     /^COFF SYMBOL TABLE/{for(i in hide) delete hide[i]};"\
 "     /Section length .*#relocs.*(pick any)/{hide[last_section]=1};"\
 "     \$ 0!~/External *\|/{next};"\
 "     / 0+ UNDEF /{next}; / UNDEF \([^|]\)*()/{next};"\
@@ -6631,7 +6599,7 @@ $as_echo "$lt_cv_cc_needs_belf" >&6; }
     CFLAGS="$SAVE_CFLAGS"
   fi
   ;;
-sparc*-*solaris*)
+*-*solaris*)
   # Find out which ABI we are using.
   echo 'int i;' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
@@ -6642,7 +6610,20 @@ sparc*-*solaris*)
     case `/usr/bin/file conftest.o` in
     *64-bit*)
       case $lt_cv_prog_gnu_ld in
-      yes*) LD="${LD-ld} -m elf64_sparc" ;;
+      yes*)
+        case $host in
+        i?86-*-solaris*)
+          LD="${LD-ld} -m elf_x86_64"
+          ;;
+        sparc*-*-solaris*)
+          LD="${LD-ld} -m elf64_sparc"
+          ;;
+        esac
+        # GNU ld 2.21 introduced _sol2 emulations.  Use them if available.
+        if ${LD-ld} -V | grep _sol2 >/dev/null 2>&1; then
+          LD="${LD-ld}_sol2"
+        fi
+        ;;
       *)
 	if ${LD-ld} -64 -r -o conftest2.o conftest.o >/dev/null 2>&1; then
 	  LD="${LD-ld} -64"
@@ -7282,7 +7263,13 @@ else
 	$LTCC $LTCFLAGS $LDFLAGS -o libconftest.dylib \
 	  -dynamiclib -Wl,-single_module conftest.c 2>conftest.err
         _lt_result=$?
-	if test -f libconftest.dylib && test ! -s conftest.err && test $_lt_result = 0; then
+	# If there is a non-empty error log, and "single_module"
+	# appears in it, assume the flag caused a linker warning
+        if test -s conftest.err && $GREP single_module conftest.err; then
+	  cat conftest.err >&5
+	# Otherwise, if the output was created with a 0 exit code from
+	# the compiler, it worked.
+	elif test -f libconftest.dylib && test $_lt_result -eq 0; then
 	  lt_cv_apple_cc_single_mod=yes
 	else
 	  cat conftest.err >&5
@@ -7293,6 +7280,7 @@ else
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_apple_cc_single_mod" >&5
 $as_echo "$lt_cv_apple_cc_single_mod" >&6; }
+
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -exported_symbols_list linker flag" >&5
 $as_echo_n "checking for -exported_symbols_list linker flag... " >&6; }
 if ${lt_cv_ld_exported_symbols_list+:} false; then :
@@ -7325,6 +7313,7 @@ rm -f core conftest.err conftest.$ac_objext \
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_ld_exported_symbols_list" >&5
 $as_echo "$lt_cv_ld_exported_symbols_list" >&6; }
+
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -force_load linker flag" >&5
 $as_echo_n "checking for -force_load linker flag... " >&6; }
 if ${lt_cv_ld_force_load+:} false; then :
@@ -7346,7 +7335,9 @@ _LT_EOF
       echo "$LTCC $LTCFLAGS $LDFLAGS -o conftest conftest.c -Wl,-force_load,./libconftest.a" >&5
       $LTCC $LTCFLAGS $LDFLAGS -o conftest conftest.c -Wl,-force_load,./libconftest.a 2>conftest.err
       _lt_result=$?
-      if test -f conftest && test ! -s conftest.err && test $_lt_result = 0 && $GREP forced_load conftest 2>&1 >/dev/null; then
+      if test -s conftest.err && $GREP force_load conftest.err; then
+	cat conftest.err >&5
+      elif test -f conftest && test $_lt_result -eq 0 && $GREP forced_load conftest >/dev/null 2>&1 ; then
 	lt_cv_ld_force_load=yes
       else
 	cat conftest.err >&5
@@ -7678,14 +7669,7 @@ done
 
 # Set options
 enable_dlopen=yes
-
-
-
-
-  enable_win32_dll=no
-
-
-            # Check whether --enable-shared was given.
+# Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
   enableval=$enable_shared; p=${PACKAGE-default}
     case $enableval in
@@ -7705,7 +7689,7 @@ if test "${enable_shared+set}" = set; then :
       ;;
     esac
 else
-  enable_shared=yes
+  enable_shared=no
 fi
 
 
@@ -7714,9 +7698,7 @@ fi
 
 
 
-
-
-  # Check whether --enable-static was given.
+# Check whether --enable-static was given.
 if test "${enable_static+set}" = set; then :
   enableval=$enable_static; p=${PACKAGE-default}
     case $enableval in
@@ -7748,9 +7730,31 @@ fi
 
 
 
+
+  enable_win32_dll=no
+
+
+
+
+
 # Check whether --with-pic was given.
 if test "${with_pic+set}" = set; then :
-  withval=$with_pic; pic_mode="$withval"
+  withval=$with_pic; lt_p=${PACKAGE-default}
+    case $withval in
+    yes|no) pic_mode=$withval ;;
+    *)
+      pic_mode=default
+      # Look at the argument we got.  We use all the common list separators.
+      lt_save_ifs="$IFS"; IFS="${IFS}$PATH_SEPARATOR,"
+      for lt_pkg in $withval; do
+	IFS="$lt_save_ifs"
+	if test "X$lt_pkg" = "X$lt_p"; then
+	  pic_mode=yes
+	fi
+      done
+      IFS="$lt_save_ifs"
+      ;;
+    esac
 else
   pic_mode=default
 fi
@@ -7802,6 +7806,10 @@ LIBTOOL_DEPS="$ltmain"
 
 # Always use our own libtool.
 LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+
+
+
+
 
 
 
@@ -8287,7 +8295,9 @@ lt_prog_compiler_static=
     case $cc_basename in
     nvcc*) # Cuda Compiler Driver 2.2
       lt_prog_compiler_wl='-Xlinker '
-      lt_prog_compiler_pic='-Xcompiler -fPIC'
+      if test -n "$lt_prog_compiler_pic"; then
+        lt_prog_compiler_pic="-Xcompiler $lt_prog_compiler_pic"
+      fi
       ;;
     esac
   else
@@ -8378,17 +8388,32 @@ lt_prog_compiler_static=
 	;;
       *)
 	case `$CC -V 2>&1 | sed 5q` in
-	*Sun\ F* | *Sun*Fortran*)
+	*Sun\ Ceres\ Fortran* | *Sun*Fortran*\ [1-7].* | *Sun*Fortran*\ 8.[0-3]*)
 	  # Sun Fortran 8.3 passes all unrecognized flags to the linker
 	  lt_prog_compiler_pic='-KPIC'
 	  lt_prog_compiler_static='-Bstatic'
 	  lt_prog_compiler_wl=''
+	  ;;
+	*Sun\ F* | *Sun*Fortran*)
+	  lt_prog_compiler_pic='-KPIC'
+	  lt_prog_compiler_static='-Bstatic'
+	  lt_prog_compiler_wl='-Qoption ld '
 	  ;;
 	*Sun\ C*)
 	  # Sun C 5.9
 	  lt_prog_compiler_pic='-KPIC'
 	  lt_prog_compiler_static='-Bstatic'
 	  lt_prog_compiler_wl='-Wl,'
+	  ;;
+        *Intel*\ [CF]*Compiler*)
+	  lt_prog_compiler_wl='-Wl,'
+	  lt_prog_compiler_pic='-fPIC'
+	  lt_prog_compiler_static='-static'
+	  ;;
+	*Portland\ Group*)
+	  lt_prog_compiler_wl='-Wl,'
+	  lt_prog_compiler_pic='-fpic'
+	  lt_prog_compiler_static='-Bstatic'
 	  ;;
 	esac
 	;;
@@ -8751,7 +8776,6 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   hardcode_direct=no
   hardcode_direct_absolute=no
   hardcode_libdir_flag_spec=
-  hardcode_libdir_flag_spec_ld=
   hardcode_libdir_separator=
   hardcode_minus_L=no
   hardcode_shlibpath_var=unsupported
@@ -9001,8 +9025,7 @@ _LT_EOF
 	xlf* | bgf* | bgxlf* | mpixlf*)
 	  # IBM XL Fortran 10.1 on PPC cannot create shared libs itself
 	  whole_archive_flag_spec='--whole-archive$convenience --no-whole-archive'
-	  hardcode_libdir_flag_spec=
-	  hardcode_libdir_flag_spec_ld='-rpath $libdir'
+	  hardcode_libdir_flag_spec='${wl}-rpath ${wl}$libdir'
 	  archive_cmds='$LD -shared $libobjs $deplibs $linker_flags -soname $soname -o $lib'
 	  if test "x$supports_anon_versioning" = xyes; then
 	    archive_expsym_cmds='echo "{ global:" > $output_objdir/$libname.ver~
@@ -9381,6 +9404,7 @@ fi
 	# The linker will not automatically build a static lib if we build a DLL.
 	# _LT_TAGVAR(old_archive_from_new_cmds, )='true'
 	enable_shared_with_static_runtimes=yes
+	exclude_expsyms='_NULL_IMPORT_DESCRIPTOR|_IMPORT_DESCRIPTOR_.*'
 	export_symbols_cmds='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1,DATA/'\'' | $SED -e '\''/^[AITW][ ]/s/.*[ ]//'\'' | sort | uniq > $export_symbols'
 	# Don't use ranlib
 	old_postinstall_cmds='chmod 644 $oldlib'
@@ -9426,6 +9450,7 @@ fi
   hardcode_shlibpath_var=unsupported
   if test "$lt_cv_ld_force_load" = "yes"; then
     whole_archive_flag_spec='`for conv in $convenience\"\"; do test  -n \"$conv\" && new_convenience=\"$new_convenience ${wl}-force_load,$conv\"; done; func_echo_all \"$new_convenience\"`'
+
   else
     whole_archive_flag_spec=''
   fi
@@ -9454,10 +9479,6 @@ fi
       hardcode_shlibpath_var=no
       ;;
 
-    freebsd1*)
-      ld_shlibs=no
-      ;;
-
     # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
     # support.  Future versions do this automatically, but an explicit c++rt0.o
     # does not break anything, and helps significantly (at the cost of a little
@@ -9470,7 +9491,7 @@ fi
       ;;
 
     # Unfortunately, older versions of FreeBSD 2 do not have this feature.
-    freebsd2*)
+    freebsd2.*)
       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'
       hardcode_direct=yes
       hardcode_minus_L=yes
@@ -9509,7 +9530,6 @@ fi
       fi
       if test "$with_gnu_ld" = no; then
 	hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
-	hardcode_libdir_flag_spec_ld='+b $libdir'
 	hardcode_libdir_separator=:
 	hardcode_direct=yes
 	hardcode_direct_absolute=yes
@@ -10133,11 +10153,6 @@ esac
 
 
 
-
-
-
-
-
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking dynamic linker characteristics" >&5
 $as_echo_n "checking dynamic linker characteristics... " >&6; }
 
@@ -10227,7 +10242,7 @@ need_version=unknown
 
 case $host_os in
 aix3*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   library_names_spec='${libname}${release}${shared_ext}$versuffix $libname.a'
   shlibpath_var=LIBPATH
 
@@ -10236,7 +10251,7 @@ aix3*)
   ;;
 
 aix[4-9]*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   hardcode_into_libs=yes
@@ -10301,7 +10316,7 @@ beos*)
   ;;
 
 bsdi[45]*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
@@ -10440,16 +10455,12 @@ darwin* | rhapsody*)
   ;;
 
 dgux*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname$shared_ext'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
-  ;;
-
-freebsd1*)
-  dynamic_linker=no
   ;;
 
 freebsd* | dragonfly*)
@@ -10459,7 +10470,7 @@ freebsd* | dragonfly*)
     objformat=`/usr/bin/objformat`
   else
     case $host_os in
-    freebsd[123]*) objformat=aout ;;
+    freebsd[23].*) objformat=aout ;;
     *) objformat=elf ;;
     esac
   fi
@@ -10477,7 +10488,7 @@ freebsd* | dragonfly*)
   esac
   shlibpath_var=LD_LIBRARY_PATH
   case $host_os in
-  freebsd2*)
+  freebsd2.*)
     shlibpath_overrides_runpath=yes
     ;;
   freebsd3.[01]* | freebsdelf3.[01]*)
@@ -10497,17 +10508,18 @@ freebsd* | dragonfly*)
   ;;
 
 gnu*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
   hardcode_into_libs=yes
   ;;
 
 haiku*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   dynamic_linker="$host_os runtime_loader"
@@ -10568,7 +10580,7 @@ hpux9* | hpux10* | hpux11*)
   ;;
 
 interix[3-9]*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
@@ -10584,7 +10596,7 @@ irix5* | irix6* | nonstopux*)
     nonstopux*) version_type=nonstopux ;;
     *)
 	if test "$lt_cv_prog_gnu_ld" = yes; then
-		version_type=linux
+		version_type=linux # correct to gnu/linux during the next big refactor
 	else
 		version_type=irix
 	fi ;;
@@ -10621,9 +10633,9 @@ linux*oldld* | linux*aout* | linux*coff*)
   dynamic_linker=no
   ;;
 
-# This must be Linux ELF.
+# This must be glibc/ELF.
 linux* | k*bsd*-gnu | kopensolaris*-gnu)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
@@ -10705,7 +10717,7 @@ netbsd*)
   ;;
 
 newsos6)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
   shlibpath_var=LD_LIBRARY_PATH
   shlibpath_overrides_runpath=yes
@@ -10774,7 +10786,7 @@ rdos*)
   ;;
 
 solaris*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
@@ -10799,7 +10811,7 @@ sunos4*)
   ;;
 
 sysv4 | sysv4.3*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
@@ -10823,7 +10835,7 @@ sysv4 | sysv4.3*)
 
 sysv4*MP*)
   if test -d /usr/nec ;then
-    version_type=linux
+    version_type=linux # correct to gnu/linux during the next big refactor
     library_names_spec='$libname${shared_ext}.$versuffix $libname${shared_ext}.$major $libname${shared_ext}'
     soname_spec='$libname${shared_ext}.$major'
     shlibpath_var=LD_LIBRARY_PATH
@@ -10854,7 +10866,7 @@ sysv5* | sco3.2v5* | sco5v6* | unixware* | OpenUNIX* | sysv4*uw2*)
 
 tpf*)
   # TPF is a cross-target only.  Preferred cross-host = GNU/Linux.
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
@@ -10864,7 +10876,7 @@ tpf*)
   ;;
 
 uts4*)
-  version_type=linux
+  version_type=linux # correct to gnu/linux during the next big refactor
   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
   soname_spec='${libname}${release}${shared_ext}$major'
   shlibpath_var=LD_LIBRARY_PATH
@@ -11646,6 +11658,8 @@ CC="$lt_save_CC"
 
 
 
+
+
         ac_config_commands="$ac_config_commands libtool"
 
 
@@ -11662,6 +11676,8 @@ else
 
 module=yes
 eval libltdl_cv_shlibext=$shrext_cmds
+module=no
+eval libltdl_cv_shrext=$shrext_cmds
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libltdl_cv_shlibext" >&5
@@ -11670,6 +11686,13 @@ if test -n "$libltdl_cv_shlibext"; then
 
 cat >>confdefs.h <<_ACEOF
 #define LT_MODULE_EXT "$libltdl_cv_shlibext"
+_ACEOF
+
+fi
+if test "$libltdl_cv_shrext" != "$libltdl_cv_shlibext"; then
+
+cat >>confdefs.h <<_ACEOF
+#define LT_SHARED_EXT "$libltdl_cv_shrext"
 _ACEOF
 
 fi
@@ -12721,6 +12744,64 @@ eval "LTDLOPEN=\"$libname_spec\""
 
 
 
+# The lt_dladvise_init symbol was added with libtool-2.2
+if test "x$with_included_ltdl" != "xyes"; then
+ save_CFLAGS="$CFLAGS"
+ save_LDFLAGS="$LDFLAGS"
+ CFLAGS="$CFLAGS $LTDLINCL"
+ LDFLAGS="$LDFLAGS $LIBLTDL"
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lt_dladvise_init in -lltdl" >&5
+$as_echo_n "checking for lt_dladvise_init in -lltdl... " >&6; }
+if ${ac_cv_lib_ltdl_lt_dladvise_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lltdl  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lt_dladvise_init ();
+int
+main ()
+{
+return lt_dladvise_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ltdl_lt_dladvise_init=yes
+else
+  ac_cv_lib_ltdl_lt_dladvise_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ltdl_lt_dladvise_init" >&5
+$as_echo "$ac_cv_lib_ltdl_lt_dladvise_init" >&6; }
+if test "x$ac_cv_lib_ltdl_lt_dladvise_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBLTDL 1
+_ACEOF
+
+  LIBS="-lltdl $LIBS"
+
+else
+  as_fn_error $? "installed libltdl is too old" "$LINENO" 5
+fi
+
+ LDFLAGS="$save_LDFLAGS"
+ CFLAGS="$save_CFLAGS"
+fi
+
+
 
  if test -z "Checks for Options."; then
   ${ac_aux_dir}/shtool echo -e "configure"
@@ -12852,7 +12933,6 @@ $as_echo "no" >&6; };;
         mod_comsys=true
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-        package_config="$package_config --with-module-comsys=yes"
        else
         as_fn_error $? "not found" "$LINENO" 5
        fi;;
@@ -12864,7 +12944,6 @@ else
    mod_comsys=true
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-   package_config="$package_config --with-module-comsys=yes"
   else
    as_fn_error $? "not found" "$LINENO" 5
   fi
@@ -12894,7 +12973,6 @@ $as_echo "no" >&6; };;
         mod_mail=true
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-        package_config="$package_config --with-module-mail=yes"
        else
         as_fn_error $? "not found" "$LINENO" 5
        fi;;
@@ -12906,7 +12984,6 @@ else
    mod_mail=true
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-   package_config="$package_config --with-module-mail=yes"
   else
    as_fn_error $? "not found" "$LINENO" 5
   fi
@@ -12936,7 +13013,6 @@ $as_echo "no" >&6; };;
         mod_hello=true
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-        package_config="$package_config --with-module-hello=yes"
        else
         as_fn_error $? "not found" "$LINENO" 5
        fi;;
@@ -13877,6 +13953,7 @@ else
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -13936,7 +14013,7 @@ else
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -16174,18 +16251,21 @@ done
 
 # Write results.
 
+
 cat >>confdefs.h <<_ACEOF
-#define PACKAGE_CONFIG "$package_config"
+#define PACKAGE_CONFIG "$ac_configure_args"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define PACKAGE_RELEASE_DATE "$package_release_date"
+#define PACKAGE_RELEASE_DATE "$PACKAGE_RELEASE_DATE"
 _ACEOF
+
 
 subdirs="$subdirs dbm/gdbm dbm/qdbm"
 
-ac_config_files="$ac_config_files Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile"
+ac_config_files="$ac_config_files modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile"
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16834,7 +16914,8 @@ $config_headers
 Configuration commands:
 $config_commands
 
-Report bugs to <tinymush-bugs@lists.sourceforge.net>."
+Report bugs to <tinymush-bugs@lists.sourceforge.net>.
+TinyMUSH home page: <http://tinymush.sourceforge.net>."
 
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
@@ -16977,6 +17058,7 @@ pic_mode='`$ECHO "$pic_mode" | $SED "$delay_single_quote_subst"`'
 enable_fast_install='`$ECHO "$enable_fast_install" | $SED "$delay_single_quote_subst"`'
 SHELL='`$ECHO "$SHELL" | $SED "$delay_single_quote_subst"`'
 ECHO='`$ECHO "$ECHO" | $SED "$delay_single_quote_subst"`'
+PATH_SEPARATOR='`$ECHO "$PATH_SEPARATOR" | $SED "$delay_single_quote_subst"`'
 host_alias='`$ECHO "$host_alias" | $SED "$delay_single_quote_subst"`'
 host='`$ECHO "$host" | $SED "$delay_single_quote_subst"`'
 host_os='`$ECHO "$host_os" | $SED "$delay_single_quote_subst"`'
@@ -17059,7 +17141,6 @@ with_gnu_ld='`$ECHO "$with_gnu_ld" | $SED "$delay_single_quote_subst"`'
 allow_undefined_flag='`$ECHO "$allow_undefined_flag" | $SED "$delay_single_quote_subst"`'
 no_undefined_flag='`$ECHO "$no_undefined_flag" | $SED "$delay_single_quote_subst"`'
 hardcode_libdir_flag_spec='`$ECHO "$hardcode_libdir_flag_spec" | $SED "$delay_single_quote_subst"`'
-hardcode_libdir_flag_spec_ld='`$ECHO "$hardcode_libdir_flag_spec_ld" | $SED "$delay_single_quote_subst"`'
 hardcode_libdir_separator='`$ECHO "$hardcode_libdir_separator" | $SED "$delay_single_quote_subst"`'
 hardcode_direct='`$ECHO "$hardcode_direct" | $SED "$delay_single_quote_subst"`'
 hardcode_direct_absolute='`$ECHO "$hardcode_direct_absolute" | $SED "$delay_single_quote_subst"`'
@@ -17115,6 +17196,7 @@ _LTECHO_EOF'
 # Quote evaled strings.
 for var in SHELL \
 ECHO \
+PATH_SEPARATOR \
 SED \
 GREP \
 EGREP \
@@ -17165,7 +17247,6 @@ with_gnu_ld \
 allow_undefined_flag \
 no_undefined_flag \
 hardcode_libdir_flag_spec \
-hardcode_libdir_flag_spec_ld \
 hardcode_libdir_separator \
 exclude_expsyms \
 include_expsyms \
@@ -17249,10 +17330,10 @@ do
     "autoconf.h") CONFIG_HEADERS="$CONFIG_HEADERS autoconf.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
-    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "modules/comsys/Makefile") CONFIG_FILES="$CONFIG_FILES modules/comsys/Makefile" ;;
     "modules/mail/Makefile") CONFIG_FILES="$CONFIG_FILES modules/mail/Makefile" ;;
     "modules/hello/Makefile") CONFIG_FILES="$CONFIG_FILES modules/hello/Makefile" ;;
+    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -17964,8 +18045,8 @@ $as_echo X"$file" |
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 #   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
-#                 2006, 2007, 2008, 2009, 2010 Free Software Foundation,
-#                 Inc.
+#                 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+#                 Foundation, Inc.
 #   Written by Gordon Matzigkeit, 1996
 #
 #   This file is part of GNU Libtool.
@@ -18018,6 +18099,9 @@ SHELL=$lt_SHELL
 
 # An echo program that protects backslashes.
 ECHO=$lt_ECHO
+
+# The PATH separator for the build system.
+PATH_SEPARATOR=$lt_PATH_SEPARATOR
 
 # The host system.
 host_alias=$host_alias
@@ -18319,10 +18403,6 @@ no_undefined_flag=$lt_no_undefined_flag
 # Flag to hardcode \$libdir into a binary during linking.
 # This must work even if \$libdir does not exist
 hardcode_libdir_flag_spec=$lt_hardcode_libdir_flag_spec
-
-# If ld is used when linking, flag to hardcode \$libdir into a binary
-# during linking.  This must work even if \$libdir does not exist.
-hardcode_libdir_flag_spec_ld=$lt_hardcode_libdir_flag_spec_ld
 
 # Whether we need a single "-rpath" flag with a separated argument.
 hardcode_libdir_separator=$lt_hardcode_libdir_separator
@@ -18756,4 +18836,162 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
+
+
+
+
+ if test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>."
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations.
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
+  echo
+ fi
+
+
+
+ if test -z "$prefix"; then
+  ${ac_aux_dir}/shtool echo -e "Game will be install in directory"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "Game will be install in directory: %B$prefix%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "Game will be install in directory: %B$prefix%b"
+  echo
+ fi
+
+echo
+if test x$dbm_gdbm = xtrue; then
+
+ if test -z "GDBM"; then
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BGDBM%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BGDBM%b"
+  echo
+ fi
+
+fi
+
+if test x$dbm_qdbm = xtrue; then
+
+ if test -z "QDBM"; then
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BQDBM%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BQDBM%b"
+  echo
+ fi
+
+fi
+
+if test x$mod_comsys = xtrue; then
+
+ if test -z "Enable"; then
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BEnable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BEnable%b"
+  echo
+ fi
+
+else
+
+ if test -z "Disable"; then
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BDisable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BDisable%b"
+  echo
+ fi
+
+fi
+
+if test x$mod_mail = xtrue; then
+
+ if test -z "Enable"; then
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BEnable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BEnable%b"
+  echo
+ fi
+
+else
+
+ if test -z "Disable"; then
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BDisable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BDisable%b"
+  echo
+ fi
+
+fi
+
+if test x$mod_hello = xtrue; then
+
+ if test -z "Enable"; then
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BEnable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BEnable%b"
+  echo
+ fi
+
+else
+
+ if test -z "Disable"; then
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello"
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BDisable%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BDisable%b"
+  echo
+ fi
+
+fi
+echo
+
+ if test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine."
+ elif test -z ""; then
+  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
+ else
+  echo
+  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
+  echo
+ fi
 

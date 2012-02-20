@@ -2,21 +2,28 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([TinyMUSH:libTinyQDBM], [3.3.3.0], [tinymush-bugs@lists.sourceforge.net],,[http://tinymush.sourceforge.net])
-AC_CONFIG_AUX_DIR([config])
-AC_CONFIG_MACRO_DIR([m4])
+AC_INIT([TinyMUSH:libTinyQDBM], [3.3.2.0], [tinymush-bugs@lists.sourceforge.net],,[http://tinymush.sourceforge.net])
+AC_COPYRIGHT([Copyright (c) 2011 TinyMUSH development team.])
+AC_CONFIG_AUX_DIR([libltdl/config])
+AC_CONFIG_MACRO_DIR([libltdl/m4])
 AC_CONFIG_SRCDIR([hovel.c])
 AC_CONFIG_HEADERS([autoconf.h])
 
-PRETTY_PRINT([
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION}%b.
-  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
-  See %Bhttp://tinymush.sourceforge.net%b for more informations.
-])
+AX_SPLIT_VERSION()
+PACKAGE_RELEASE_DATE="2012-02-19"
+PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
+AX_PRINT_PACKAGE_TITLE()
 
 PRETTY_PRINT([configure], [Initializing Automake.], [1])
 
 AM_INIT_AUTOMAKE()
+
+PRETTY_PRINT([configure], [Initializing Libtools.], [1])
+
+LT_PREREQ([2.4])
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([dlopen])
+LTDL_INIT([convenience])
 
 PRETTY_PRINT([configure], [Checks for programs.], [1])
 # Checks for programs.
@@ -47,5 +54,6 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([atexit ftruncate localtime_r memset mkdir munmap rmdir strchr strrchr strstr strtol])
 
 PRETTY_PRINT([configure], [writting results], [1])
+AC_SUBST([ac_aux_dir])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

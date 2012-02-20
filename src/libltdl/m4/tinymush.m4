@@ -25,15 +25,34 @@ AC_DEFUN([CONFIG_MODULES], [
 
 
 AC_DEFUN([AX_SPLIT_VERSION],[
- AC_REQUIRE([AC_PROG_SED])
- awk '{split($PACKAGE_VERSION,a,"." ); for (i=1; i<=10; i++) print a[i]}'
- AC_MSG_CHECKING([Major version])
- AC_MSG_RESULT([$a\[1\]])
- AC_MSG_CHECKING([Minor version])
- AC_MSG_RESULT([$a\[2\]])
- AC_MSG_CHECKING([Status version])
- AC_MSG_RESULT([$a\[3\]])
- AC_MSG_CHECKING([Revision version])
- AC_MSG_RESULT([$a\[4\]])
+ tmp=(`echo $PACKAGE_VERSION | tr "." "\n"`)
+
+ PACKAGE_VERSION_MAJOR=${tmp[[0]]}
+ PACKAGE_VERSION_MINOR=${tmp[[1]]}
+ PACKAGE_RELEASE_STATUS=${tmp[[2]]}
+ PACKAGE_RELEASE_REVISION=${tmp[[3]]}
+ 
+ case ${tmp[[2]]} in
+ 	0)	PACKAGE_RELEASE_NAME="Alpha ${tmp[[3]]}"
+ 		;;
+ 	1)	PACKAGE_RELEASE_NAME="Beta ${tmp[[3]]}"
+ 		;;
+ 	2)	if [[ ${tmp[3]} -gt 0 ]]; then
+ 			PACKAGE_RELEASE_NAME="PatchLevel ${tmp[[3]]}"
+ 		else
+ 			PACKAGE_RELEASE_NAME="Gold"
+		fi
+		;;
+ esac
 ])
+
+AC_DEFUN([AX_PRINT_PACKAGE_TITLE],[
+PRETTY_PRINT([
+%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+
+  $PACKAGE_COPYRIGHT.
+  See %B$PACKAGE_URL%b for more informations. 
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.])
+])
+
                                         

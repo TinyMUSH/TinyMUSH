@@ -146,6 +146,9 @@
 /* Define to 1 if you have the `inet' library (-linet). */
 #undef HAVE_LIBINET
 
+/* Define to 1 if you have the `ltdl' library (-lltdl). */
+#undef HAVE_LIBLTDL
+
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
@@ -405,6 +408,9 @@
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define to the shared library suffix, say, ".dylib". */
+#undef LT_SHARED_EXT
 
 /* --- ADD DESCRIPTION --- */
 #undef MAX_GLOBAL_REGS

@@ -1,8 +1,9 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AUXDIR = @ac_aux_dir@
 AM_CPPFLAGS = $(LTDLINCL)
 
-SUBDIRS    = libltdl/
-DIST_SUBDIRS = libltdl/ modules/comsys/ modules/hello/ modules/mail/ dbm/gdbm/ dbm/qdbm/
+SUBDIRS    = libltdl
+#DIST_SUBDIRS = libltdl/
 
 TEXT_DIR   = $(srcdir)/text
 TEXT_SRC   = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt $(TEXT_DIR)/down.txt $(TEXT_DIR)/full.txt $(TEXT_DIR)/guest.txt $(TEXT_DIR)/help.txt $(TEXT_DIR)/htmlconn.txt $(TEXT_DIR)/motd.txt $(TEXT_DIR)/mushman.txt $(TEXT_DIR)/news.txt $(TEXT_DIR)/newuser.txt $(TEXT_DIR)/plushelp.txt $(TEXT_DIR)/qhelp.txt $(TEXT_DIR)/quit.txt $(TEXT_DIR)/register.txt $(TEXT_DIR)/wizhelp.txt $(TEXT_DIR)/wizmotd.txt $(TEXT_DIR)/wiznews.txt
@@ -28,8 +29,8 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 	malloc.h match.h mushconf.h patchlevel.h pcre.h powers.h slave.h \
 	udb.h udb_defs.h vattr.h walkdb.h
 EXTRA_netmush_SOURCES  = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h malloc.c mcheck.c mstats.c mtrace.c
-netmush_LDFLAGS        = -export-dynamic
-netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) -dlopen self $(SQL_O) $(MALLOC_O)
+netmush_LDFLAGS        = -export-dynamic -static
+netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(SQL_O) $(MALLOC_O)
 netmush_DEPENDENCIES   = $(LTDLDEPS) $(SQL_O) 
 
 nodist_include_HEADERS = version.h
@@ -43,36 +44,36 @@ slave_SOURCES          = slave.c
 BUILT_SOURCES          = version.h
 
 if WANT_DBM_GDBM
-SUBDIRS += dbm/gdbm/
-AM_CPPFLAGS += -I$(srcdir)/dbm/gdbm/
-netmush_LDADD += $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
-bin_PROGRAMS   += recover
-recover_SOURCES = recover.c
-recover_LDADD   = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
-else
-if WANT_DBM_QDBM
-SUBDIRS += dbm/qdbm/
-AM_CPPFLAGS += -I$(srcdir)/dbm/qdbm/
-netmush_LDADD += $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
-bin_PROGRAMS   += recover
-recover_SOURCES = recover.c
-recover_LDADD   = $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
+ SUBDIRS         += dbm/gdbm/
+ AM_CPPFLAGS     += -I$(srcdir)/dbm/gdbm/
+ netmush_LDADD   += $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
+ bin_PROGRAMS    += recover
+ recover_SOURCES  = recover.c
+ recover_LDADD    = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
 endif
+
+if WANT_DBM_QDBM
+ SUBDIRS         += dbm/qdbm/
+ AM_CPPFLAGS     += -I$(srcdir)/dbm/qdbm/
+ netmush_LDADD   += $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
+ bin_PROGRAMS    += recover
+ recover_SOURCES  = recover.c
+ recover_LDADD    = $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
 endif
 
 if WANT_MODULE_COMSYS
-SUBDIRS += modules/comsys/
+ SUBDIRS += modules/comsys/
 endif
 
 if WANT_MODULE_MAIL
-SUBDIRS += modules/mail/
+ SUBDIRS += modules/mail/
 endif
 
 if WANT_MODULE_HELLO
-SUBDIRS += modules/hello/
+ SUBDIRS += modules/hello/
 endif
 
-version.h: .PHONY
+version.h:
 	touch $(srcdir)/buildnum.data
 	expr 0`cat $(srcdir)/buildnum.data` + 1 > $(srcdir)/buildnum.data
 	rm -f $(srcdir)/version.h
@@ -98,8 +99,12 @@ indent:
 	done; 
 	
 autotools:
-	shtoolize -o config/shtool all
-	autoreconf -v -i
+	shtoolize -o $(ACLOCAL_AUXDIR)/shtool all
+	autoreconf -ivf
+	
+rmbackup:
+	for i in `find -name '*~'`; do rm $$i; done
+	for i in `find -name '.depend'`; do rm $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) $(prefix) 
