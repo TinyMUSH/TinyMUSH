@@ -1010,7 +1010,7 @@ distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags
+	distclean-hdr distclean-libtool distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -1085,18 +1085,18 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local \
 	dist-all dist-bzip2 dist-gzip dist-lzip dist-lzma dist-shar \
 	dist-tarZ dist-xz dist-zip distcheck distclean \
 	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
-	install-data-am install-data-local install-dvi install-dvi-am \
-	install-exec install-exec-am install-exec-local install-html \
-	install-html-am install-info install-info-am install-man \
-	install-nodist_includeHEADERS install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am \
+	distclean-libtool distclean-local distclean-tags \
+	distcleancheck distdir distuninstallcheck dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-data-local install-dvi \
+	install-dvi-am install-exec install-exec-am install-exec-local \
+	install-html install-html-am install-info install-info-am \
+	install-man install-nodist_includeHEADERS install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-local \
 	uninstall-nodist_includeHEADERS
 
@@ -1130,9 +1130,10 @@ autotools:
 	shtoolize -o $(ACLOCAL_AUXDIR)/shtool all
 	autoreconf -ivf
 
-rmbackup:
+distclean-local:
 	for i in `find -name '*~'`; do rm $$i; done
 	for i in `find -name '.depend'`; do rm $$i; done
+	for i in `find -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) $(prefix) 
@@ -1147,7 +1148,7 @@ install-data-local:
 
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
-	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done                	
+	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

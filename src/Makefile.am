@@ -102,9 +102,10 @@ autotools:
 	shtoolize -o $(ACLOCAL_AUXDIR)/shtool all
 	autoreconf -ivf
 	
-rmbackup:
+distclean-local:
 	for i in `find -name '*~'`; do rm $$i; done
 	for i in `find -name '.depend'`; do rm $$i; done
+	for i in `find -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) $(prefix) 
@@ -119,4 +120,4 @@ install-data-local:
 
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
-	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done                	
+	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done

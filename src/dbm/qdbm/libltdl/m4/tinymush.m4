@@ -29,32 +29,30 @@ AC_DEFUN([AX_SPLIT_VERSION],[
 
  PACKAGE_VERSION_MAJOR=${tmp[[0]]}
  PACKAGE_VERSION_MINOR=${tmp[[1]]}
- PACKAGE_RELEASE_STATUS=${tmp[[2]]}
- PACKAGE_RELEASE_REVISION=${tmp[[3]]}
+ PACKAGE_VERSION_RELEASE=${tmp[[2]]}
+ PACKAGE_VERSION_REVISION=${tmp[[3]]}
+ PACKAGE_VERSION_RELEASE_NUMBER=${tmp[[3]]}
+
  
  case ${tmp[[2]]} in
- 	0)	PACKAGE_RELEASE_NAME="Alpha ${tmp[[3]]}"
+ 	0)	PACKAGE_VERSION_RELEASE_NAME="Alpha"
  		;;
- 	1)	PACKAGE_RELEASE_NAME="Beta ${tmp[[3]]}"
+ 	1)	PACKAGE_VERSION_RELEASE_NAME="Beta"
  		;;
- 	2)	PACKAGE_RELEASE_NAME="Release Candidate ${tmp[[3]]}"
- 		;;
- 	3)	if [[ ${tmp[3]} -gt 0 ]]; then
- 			PACKAGE_RELEASE_NAME="PatchLevel ${tmp[[3]]}"
+ 	2)	if [[ ${tmp[3]} -gt 0 ]]; then
+ 			PACKAGE_VERSION_RELEASE_NAME="PatchLevel"
  		else
- 			PACKAGE_RELEASE_NAME="Gold"
+ 			PACKAGE_VERSION_RELEASE_NAME="Gold"
+			PACKAGE_VERSION_RELEASE_NUMBER=""
 		fi
 		;;
  esac
 ])
 
 AC_DEFUN([AX_PRINT_PACKAGE_TITLE],[
-PRETTY_PRINT([
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
-
-  $PACKAGE_COPYRIGHT.
-  See %B$PACKAGE_URL%b for more informations. 
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>.])
+PRETTY_PRINT([%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_VERSION_RELEASE_NAME} ${PACKAGE_VERSION_RELEASE_NUMBER} (PACKAGE_VERSION_RELEASE_DATE)%b
+  Copyright (c) 2011, TinyMUSH development team. All rights reserved.
+  See %Bhttp://tinymush.sourceforge.net%b for more informations.])
 ])
 
                                         
