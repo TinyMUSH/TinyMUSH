@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* this is not static so that applications may access the array if they
    like. it must be in the same order as the error codes! */

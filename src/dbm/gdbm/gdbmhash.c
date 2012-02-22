@@ -3,7 +3,7 @@
 /* $id$ */
 
 /* include system configuration before all else. */
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* This hash function computes a 31 bit value.  The value is used to index
    the hash directory using the top n bits.  It is also used in a hash bucket

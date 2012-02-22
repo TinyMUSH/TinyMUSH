@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Look up a given KEY and return the information associated with that KEY.
    The pointer in the structure that is  returned is a pointer to dynamically

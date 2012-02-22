@@ -7,6 +7,8 @@
 #ifndef __GDBMSYSTEM_H   
 #define __GDBMSYSTEM_H
 
+#include "../../autoconf.h"
+
 /* Include all system headers first. */
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -133,5 +135,11 @@
 #ifndef STDERR_FILENO
 #define STDERR_FILENO 2
 #endif
+
+#include "gdbmconst.h"
+#include "gdbmerrno.h"
+#include "gdbmdefs.h"
+#include "gdbmproto.h"
+#include "gdbmextern.h"
 
 #endif                                  /* __GDBMSYSTEM_H */

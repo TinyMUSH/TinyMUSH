@@ -3,7 +3,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* The global variables used for the "original" interface. */
 gdbm_file_info *_gdbm_file = NULL;

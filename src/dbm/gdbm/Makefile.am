@@ -1,13 +1,10 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4
-ACLOCAL_AUXDIR = @ac_aux_dir@
 
 lib_LTLIBRARIES     = libtinygdbm.la
 libtinygdbm_la_SOURCES = gdbmbucket.c gdbmfalloc.c gdbmfindkey.c gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c gdbmstore.c gdbmsync.c gdbmglobal.c gdbmhash.c gdbmupdate.c gdbmversion.c gdbmextern.h gdbmconst.h gdbmdefs.h gdbmerrno.h gdbmproto.h gdbmsystems.h gdbmcopyright.h
-libtinygdbm_la_LDFLAGS = -version-info 3:0:0
+libtinygdbm_la_LDFLAGS = -version-info 1:0:0
 
 nodist_include_HEADERS = libtinygdbm.h
-
-SUBDIRS = libltdl/
 
 EXTRA_DIST = libtinygdbm.head.h libtinygdbm.foot.h 
 CLEANFILES = libtinygdbm.h
@@ -28,15 +25,3 @@ libtinygdbm.h: libtinygdbm.head.h gdbmerrno.h gdbmconst.h gdbmdefs.h gdbmerrno.h
 	sed -n '/#ifndef __GDBMEXTERN_H/,/\/* __GDBMEXTERN_H *\//p' < gdbmextern.h >> libtinygdbm.h
 	cat $(srcdir)/libtinygdbm.foot.h >> libtinygdbm.h
 	chmod -w libtinygdbm.h
-
-indent:
-	for i in `ls *.c *.h`; do \
-	astyle --style=bsd $$i; \
-	done; 
-	
-autotools:
-	shtoolize -o $(ACLOCAL_AUXDIR)/shtool all
-	autoreconf -ivf
-	
-rmbackup:
-	for i in `find -name '*~'`; do rm $$i; done

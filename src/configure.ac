@@ -37,10 +37,10 @@ PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
 dnl Some default values
 dnl
 with_included_ltdl="yes"
-with_dbm="gdbm"
-with_module_comsys="yes"
-with_module_mail="yes"
-with_module_hello="no"
+dnl with_dbm="gdbm"
+dnl with_module_comsys="yes"
+dnl with_module_mail="yes"
+dnl with_module_hello="no"
 
 AC_COPYRIGHT([$PACKAGE_COPYRIGHT])
 AC_CONFIG_AUX_DIR([libltdl/config])
@@ -59,7 +59,7 @@ PRETTY_PRINT([configure], [Initializing Libtools.], [1])
 
 LT_PREREQ([2.4])
 LT_CONFIG_LTDL_DIR([libltdl])
-LT_INIT([dlopen disable-shared static])
+LT_INIT([dlopen])
 LTDL_INIT([convenience])
 
 # The lt_dladvise_init symbol was added with libtool-2.2
@@ -91,9 +91,6 @@ AH_BOTTOM([#include "autoinclude.h"
 
 #endif /* __AUTOCONF_H */])
 
-dbm_gdbm=false
-dbm_qdbm=false
-
 AC_MSG_CHECKING(dbm engine to use)
 AC_ARG_WITH(dbm,
   [  --with-dbm=TYPE         Select the DBM driver used to save game data:
@@ -107,26 +104,26 @@ AC_ARG_WITH(dbm,
                           @<:@default=gdbm@:>@],
   [
     case "$withval" in
-      gdbm) dbm_gdbm=true
-            AC_MSG_RESULT([TinyMUSH-GDBM]);;
-      qdbm) dbm_qdbm=true
-            AC_MSG_RESULT([TinyMUSH-QDBM]);;
-      *)    dbm_gdbm=true
+      gdbm) AC_MSG_RESULT([TinyMUSH-GDBM])
+            with_dbm="gdbm";;
+      qdbm) AC_MSG_RESULT([TinyMUSH-QDBM])
+      	    with_dbm="qdbm";;
+      *)    with_dbm="gdbm"
             AC_MSG_RESULT([TinyMUSH-GDBM]);;
     esac
-  ], dbm_gdbm=true
+  ], with_dbm="gdbm"
      AC_MSG_RESULT([TinyMUSH-GDBM]))
 
-if [test x$dbm_gdbm = xtrue]; then
+if [test "x$with_dbm" = "xgdbm"]; then
  AC_DEFINE([MUSH_DBM_GDBM], [], [TinyMUSH-GDBM engine used])
 else 
- if [test x$dbm_qdbm = xtrue]; then
+ if [test "x$with_dbm" = "xqdbm"]; then
   AC_DEFINE([MUSH_DBM_QDBM], [], [TinyMUSH-QDBM engine used])
  fi
 fi
 
-AM_CONDITIONAL([WANT_DBM_GDBM], [test x$dbm_gdbm = xtrue])
-AM_CONDITIONAL([WANT_DBM_QDBM], [test x$dbm_qdbm = xtrue])
+AM_CONDITIONAL([WANT_DBM_GDBM], [test "x$with_dbm" = "xgdbm"])
+AM_CONDITIONAL([WANT_DBM_QDBM], [test "x$with_dbm" = "xqdbm"])
 
 disk_based=true
 
@@ -153,72 +150,77 @@ AC_ARG_ENABLE(disk-based,
 
 AM_CONDITIONAL([WANT_DISK_BASED], [test x$disk_based = xtrue])
 
-mod_comsys=false
 AC_MSG_CHECKING(for module comsys)
 AC_ARG_WITH(module-comsys,
  [  --with-module-comsys    Enable module comsys. @<:@default=yes@:>@],
  [
   case "$withval" in
-   no) AC_MSG_RESULT(no);;
+   no) with_module_comsys="no"
+       AC_MSG_RESULT(no);;
     *) if test -d "modules/comsys"; then
-        mod_comsys=true
+	with_module_comsys="yes"
         AC_MSG_RESULT(yes)
        else
-        AC_MSG_ERROR(not found)
+        with_module_comsys="no"
+        AC_MSG_RESULT(no)
        fi;;
   esac
  ], [
   if test -d "modules/comsys"; then
-   mod_comsys=true
+   with_module_comsys="yes"
    AC_MSG_RESULT(yes)
   else
-   AC_MSG_ERROR(not found)
+   with_module_comsys="no"
+   AC_MSG_RESULT(no)
   fi
   ])
-AM_CONDITIONAL([WANT_MODULE_COMSYS], [test x$mod_comsys = xtrue])
+AM_CONDITIONAL([WANT_MODULE_COMSYS], [test "x$with_module_comsys" = "xyes"])
 
-mod_mail=false
 AC_MSG_CHECKING(for module mail)
 AC_ARG_WITH(module-mail,
  [  --with-module-mail      Enable module mail. @<:@default=yes@:>@],
  [
   case "$withval" in
-   no) AC_MSG_RESULT(no);;
+   no) with_module_mail="no"
+       AC_MSG_RESULT(no);;
     *) if test -d "modules/mail"; then
-        mod_mail=true
+	with_module_mail="yes"
         AC_MSG_RESULT(yes)
        else
-        AC_MSG_ERROR(not found)
+        with_module_mail="no"
+        AC_MSG_RESULT(no)
        fi;;
   esac
  ], [
-  if test -d "modules/comsys"; then
-   mod_mail=true
+  if test -d "modules/mail"; then
+   with_module_mail="yes"
    AC_MSG_RESULT(yes)
   else
-   AC_MSG_ERROR(not found)
+   with_module_mail="no"
+   AC_MSG_RESULT(no)
   fi
  ])
-AM_CONDITIONAL([WANT_MODULE_MAIL], [test x$mod_mail = xtrue])
+AM_CONDITIONAL([WANT_MODULE_MAIL], [test "x$with_module_mail"="xyes"])
 
-mod_hello=false
 AC_MSG_CHECKING(for module hello)
 AC_ARG_WITH(module-hello,
  [  --with-module-hello     Enable module hello. @<:@default=no@:>@],
  [
   case "$withval" in
-   no) AC_MSG_RESULT(no);;
+   no) AC_MSG_RESULT(no)
+       with_module_hello="no";;
     *) if test -d "modules/hello"; then
-        mod_hello=true
+	with_module_hello="yes"
         AC_MSG_RESULT(yes)
        else
         AC_MSG_ERROR(not found)
        fi;;
   esac
  ], [
+  with_module_hello="no"
   AC_MSG_RESULT(no)
  ])
-AM_CONDITIONAL([WANT_MODULE_HELLO], [test x$mod_hello = xtrue])
+AM_CONDITIONAL([WANT_MODULE_HELLO], [test "x$with_module_hello"="xyes"])
 
 dnl XXX Modules below this line need to be checked XXX
 
@@ -482,10 +484,12 @@ AC_ARG_WITH(global-regs,
 PRETTY_PRINT([configure], [Checks for programs.], [1])
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_CPP_WERROR
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 PRETTY_PRINT([configure], [Checks for platform.], [1])
 # Checks for platform.
@@ -586,6 +590,8 @@ AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_LIB(inet, gethostbyaddr)
 AC_CHECK_LIB(m, main)
+AC_CHECK_LIB(dbm, main)
+AC_CHECK_LIB(ndbm, main)
 dnl AC_CHECK_LIB(ltdl, lt_dlopen, LIBS="-lltdl $LIBS", AC_MSG_ERROR(unable to build with ltdl), )
 
 PRETTY_PRINT([configure], [Checks for header files.], [1])
@@ -696,6 +702,7 @@ AC_STRUCT_TM
 AC_STRUCT_TIMEZONE
 AC_ST_BLKSIZE
 AC_CHECK_TYPES([ptrdiff_t])
+AC_CHECK_MEMBERS([struct stat.st_blksize])
 
 PRETTY_PRINT([configure], [Check for Declarations.], [1])
 # Check for Declarations
@@ -760,11 +767,14 @@ AC_EGREP_HEADER(strtok_r,string.h,AC_MSG_RESULT(yes),AC_DEFINE(NEED_STRTOK_R_DCL
 PRETTY_PRINT([configure], [Checks for library functions.], [1])
 # Checks for library functions.
 AC_FUNC_FORK
+dnl AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MMAP
+dnl AC_FUNC_STRTOD
 dnl AC_FUNC_MALLOC
 dnl AC_FUNC_REALLOC
 AC_FUNC_VFORK
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm dup2 floor getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii memmove memset mktime pow select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtoul timelocal tzset vsnprintf wait3 wait4])
+AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii localtime_r memmove memset mkdir mktime munmap pow rename rmdir select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtol strtoul timelocal tzset vsnprintf wait3 wait4])
 
 PRETTY_PRINT([configure], [Writing configuration.], [1])
 # Write results.
@@ -772,35 +782,34 @@ AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
 AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], ["$PACKAGE_RELEASE_DATE"], [Date of Release])
 
-AC_CONFIG_SUBDIRS([dbm/gdbm dbm/qdbm])
-AC_CONFIG_FILES([modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile])
+AC_CONFIG_FILES([dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile])
 
 AC_OUTPUT
 
 AX_PRINT_PACKAGE_TITLE()
 PRETTY_PRINT([Game will be install in directory], [$prefix])
 echo
-if [test x$dbm_gdbm = xtrue]; then  
+if [test "x$with_dbm" = "xgdbm"]; then  
  PRETTY_PRINT([                       DBM Engine], [GDBM])
 fi 
 
-if [test x$dbm_qdbm = xtrue]; then
+if [test "x$with_dbm" = "xqdbm"]; then
  PRETTY_PRINT([                       DBM Engine], [QDBM])
 fi
 
-if [test x$mod_comsys = xtrue]; then
+if [test "x$with_module_comsys" = "xyes"]; then
  PRETTY_PRINT([                    Module ComSYS], [Enable])
 else
  PRETTY_PRINT([                    Module ComSYS], [Disable]) 
 fi
 
-if [test x$mod_mail = xtrue]; then
+if [test "x$with_module_mail" = "xyes"]; then
  PRETTY_PRINT([                      Module Mail], [Enable])
 else
  PRETTY_PRINT([                      Module Mail], [Disable])
 fi
 
-if [test x$mod_hello = xtrue]; then
+if [test "x$with_module_hello" = "xyes"]; then
  PRETTY_PRINT([                     Module Hello], [Enable])
 else
  PRETTY_PRINT([                     Module Hello], [Disable])

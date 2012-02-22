@@ -7,7 +7,7 @@
  * System configurations for QDBM
  */
 
-#include "autoconf.h"
+#include "../../autoconf.h"
 
 #if defined(__cplusplus)                 /* export for C++ */
 extern "C" {

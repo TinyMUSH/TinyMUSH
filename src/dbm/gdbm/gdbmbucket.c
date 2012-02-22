@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Initializing a new hash buckets sets all bucket entries to -1 hash value. */
 void

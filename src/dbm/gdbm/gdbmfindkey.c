@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Read the data found in bucket entry ELEM_LOC in file DBF and
    return a pointer to it.  Also, cache the read value. */

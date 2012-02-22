@@ -1,19 +1,29 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4
-ACLOCAL_AUXDIR = @ac_aux_dir@
-AM_CPPFLAGS = $(LTDLINCL)
+#ACLOCAL_AUXDIR  = @ac_aux_dir@
+AM_CPPFLAGS     = $(LTDLINCL)
 
-SUBDIRS    = libltdl
+SUBDIRS       = libltdl
 #DIST_SUBDIRS = libltdl/
 
-TEXT_DIR   = $(srcdir)/text
-TEXT_SRC   = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt $(TEXT_DIR)/down.txt $(TEXT_DIR)/full.txt $(TEXT_DIR)/guest.txt $(TEXT_DIR)/help.txt $(TEXT_DIR)/htmlconn.txt $(TEXT_DIR)/motd.txt $(TEXT_DIR)/mushman.txt $(TEXT_DIR)/news.txt $(TEXT_DIR)/newuser.txt $(TEXT_DIR)/plushelp.txt $(TEXT_DIR)/qhelp.txt $(TEXT_DIR)/quit.txt $(TEXT_DIR)/register.txt $(TEXT_DIR)/wizhelp.txt $(TEXT_DIR)/wizmotd.txt $(TEXT_DIR)/wiznews.txt
-SCRIPT_DIR = $(srcdir)/scripts
-SCRIPT_SRC = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/Startmush $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
-SCRIPT_DAT = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk $(SCRIPT_DIR)/netmush.conf
-EXTRA_DIST = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES = version.h buildnum.data
+TEXT_DIR     = $(srcdir)/text
+TEXT_SRC     = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt \
+	$(TEXT_DIR)/down.txt $(TEXT_DIR)/full.txt $(TEXT_DIR)/guest.txt $(TEXT_DIR)/help.txt \
+	$(TEXT_DIR)/htmlconn.txt $(TEXT_DIR)/motd.txt $(TEXT_DIR)/mushman.txt \
+	$(TEXT_DIR)/news.txt $(TEXT_DIR)/newuser.txt $(TEXT_DIR)/plushelp.txt \
+	$(TEXT_DIR)/qhelp.txt $(TEXT_DIR)/quit.txt $(TEXT_DIR)/register.txt \
+	$(TEXT_DIR)/wizhelp.txt $(TEXT_DIR)/wizmotd.txt $(TEXT_DIR)/wiznews.txt
+SCRIPT_DIR   = $(srcdir)/scripts
+SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
+	$(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash \
+	$(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/Startmush $(SCRIPT_DIR)/check_paths \
+	$(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
+SCRIPT_DAT   = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cvt22.sed \
+	$(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk \
+	$(SCRIPT_DIR)/netmush.conf
+EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
+CLEANFILES   = version.h buildnum.data
 
-bin_PROGRAMS         = netmush mkindx logwatch slave
+bin_PROGRAMS = netmush mkindx logwatch slave
 
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
@@ -99,7 +109,7 @@ indent:
 	done; 
 	
 autotools:
-	shtoolize -o $(ACLOCAL_AUXDIR)/shtool all
+	shtoolize -o $(ac_aux_dir)/shtool all
 	autoreconf -ivf
 	
 distclean-local:

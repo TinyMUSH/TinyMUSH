@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Close the dbm file and free all memory associated with the file DBF.
    Before freeing members of DBF, check and make sure that they were

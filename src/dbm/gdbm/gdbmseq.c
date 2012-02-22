@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Special extern for this file. */
 extern char *_gdbm_read_entry __P((gdbm_file_info *, int));

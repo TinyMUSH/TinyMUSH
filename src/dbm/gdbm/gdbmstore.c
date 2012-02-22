@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Add a new element to the database.  CONTENT is keyed by KEY.  The
    file on disk is updated to reflect the structure of the new database

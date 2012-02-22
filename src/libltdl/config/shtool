@@ -161,7 +161,7 @@ if [ ".$1" = ".-v" ] || [ ".$1" = ".--version" ]; then
     exit 0
 fi
 if [ ".$1" = ".-r" ] || [ ".$1" = ".--recreate" ]; then
-    shtoolize -oshtool all
+    shtoolize -olibltdl/config/shtool all
     exit 0
 fi
 if [ ".$1" = ".-d" ] || [ ".$1" = ".--debug" ]; then

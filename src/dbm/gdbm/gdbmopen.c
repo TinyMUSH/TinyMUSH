@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Initialize dbm system.  FILE is a pointer to the file name.  If the file
    has a size of zero bytes, a file initialization procedure is performed,

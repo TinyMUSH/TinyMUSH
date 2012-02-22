@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Keep a string with the version number in it! */
 const char *gdbm_version = PACKAGE_STRING;

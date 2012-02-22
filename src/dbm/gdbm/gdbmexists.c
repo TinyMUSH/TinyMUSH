@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* this is nothing more than a wrapper around _gdbm_findkey(). the
    point? it doesn't alloate any memory. */

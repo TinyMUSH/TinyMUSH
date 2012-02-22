@@ -2,7 +2,7 @@
 
 /* $id$ */
 
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 /* Remove the KEYed item and the KEY from the database DBF.  The file on disk
    is updated to reflect the structure of the new database before returning

@@ -3,7 +3,7 @@
 /* $id$ */
 
 /* include system configuration before all else. */
-#include "autoconf.h"
+#include "gdbmsystems.h"
 
 static void write_header __P((gdbm_file_info *));
 
