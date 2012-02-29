@@ -127,11 +127,6 @@ NDECL(cf_init)
     mudconf.pueblo_msg =
         XSTRDUP("</xch_mudtext><img xch_mode=html><tt>", "cf_string");
 #endif
-    mudconf.sql_host = XSTRDUP("127.0.0.1", "cf_string");
-    mudconf.sql_db = XSTRDUP("", "cf_string");
-    mudconf.sql_username = XSTRDUP("", "cf_string");
-    mudconf.sql_password = XSTRDUP("", "cf_string");
-    mudconf.sql_reconnect = 0;
     mudconf.infotext_list = NULL;
     mudconf.indent_desc = 0;
     mudconf.name_spaces = 1;
@@ -396,7 +391,6 @@ NDECL(cf_init)
     mudstate.moduletype_top = DBTYPE_RESERVED;
     mudstate.freelist = NOTHING;
     mudstate.markbits = NULL;
-    mudstate.sql_socket = -1;
     mudstate.cmd_nest_lev = 0;
     mudstate.cmd_invk_ctr = 0;
     mudstate.func_nest_lev = 0;
@@ -2166,11 +2160,6 @@ CONF		conftable [] =
     {(char *)"signal_action", cf_option, CA_STATIC, CA_GOD, &mudconf.sig_action, (long)sigactions_nametab},
     {(char *)"site_chars", cf_int, CA_GOD, CA_WIZARD, &mudconf.site_chars, MBUF_SIZE - 2},
     {(char *)"space_compress", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.space_compress, (long)"Multiple spaces are compressed to a single space"},
-    {(char *)"sql_database", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.sql_db, MBUF_SIZE},
-    {(char *)"sql_host", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.sql_host, MBUF_SIZE},
-    {(char *)"sql_username", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.sql_username, MBUF_SIZE},
-    {(char *)"sql_password", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.sql_password, MBUF_SIZE},
-    {(char *)"sql_reconnect", cf_bool, CA_GOD, CA_WIZARD, &mudconf.sql_reconnect, (long)"SQL queries re-initiate dropped connections"},
     {(char *)"stack_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.stack_lim, 0},
     {(char *)"starting_money", cf_int, CA_GOD, CA_PUBLIC, &mudconf.paystart, 0},
     {(char *)"starting_quota", cf_int, CA_GOD, CA_PUBLIC, &mudconf.start_quota, 0},

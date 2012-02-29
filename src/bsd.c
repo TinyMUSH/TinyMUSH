@@ -506,18 +506,6 @@ int port;
                      slave_socket);
                     ENDLOG boot_slave();
                 }
-                if ((mudstate.sql_socket != -1) &&
-                        (fstat(mudstate.sql_socket,
-                               &fstatbuf) < 0))
-                {
-                    /*
-                     * Just mark it dead.
-                     */
-                    STARTLOG(LOG_PROBLEMS, "ERR", "EBADF")
-                    log_printf("Bad SQL descriptor %d",
-                               mudstate.sql_socket);
-                    ENDLOG mudstate.sql_socket = -1;
-                }
                 if ((sock != -1) &&
                         (fstat(sock, &fstatbuf) < 0))
                 {
@@ -968,18 +956,6 @@ struct sockaddr_in *a;
         log_printf("Player descriptor clashes with slave fd %d",
                    slave_socket);
         ENDLOG slave_socket = -1;
-    }
-    if (s == mudstate.sql_socket)
-    {
-        /*
-         * We shouldn't be allocating this either, for the same
-         * reason.
-         */
-        STARTLOG(LOG_ALWAYS, "ERR", "SOCK")
-        log_printf
-        ("Player descriptor clashes with SQL server fd %d",
-         mudstate.sql_socket);
-        ENDLOG mudstate.sql_socket = -1;
     }
     ndescriptors++;
     d = alloc_desc("init_sock");

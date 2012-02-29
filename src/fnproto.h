@@ -26,7 +26,6 @@ XFUNCTION(fun_conn);
 XFUNCTION(fun_session);
 XFUNCTION(fun_programmer);
 XFUNCTION(fun_helptext);
-XFUNCTION(fun_sql);
 
 /* From funiter.c */
 
@@ -715,7 +714,6 @@ FUN		flist      [] =
     {"SPACE", fun_space, 1, 0, CA_PUBLIC, NULL},
     {"SPEAK", fun_speak, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"SPLICE", fun_splice, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    {"SQL", fun_sql, 0, FN_VARARGS, CA_SQL_OK, NULL},
     {"SQRT", fun_sqrt, 1, 0, CA_PUBLIC, NULL},
     {"SQUISH", fun_squish, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"STARTTIME", fun_starttime, 0, 0, CA_PUBLIC, NULL},

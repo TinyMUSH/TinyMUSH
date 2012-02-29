@@ -63,10 +63,6 @@ extern void NDECL(vattr_init);
 
 extern void NDECL(load_restart_db);
 
-extern int NDECL(sql_init);
-
-extern void NDECL(sql_shutdown);
-
 extern void NDECL(tcache_init);
 
 extern void FDECL(helpindex_load, (dbref));
@@ -2781,8 +2777,6 @@ char *argv[];
      */
     CALL_ALL_MODULES_NOCACHE("cleanup_startup", (void), ());
 
-    sql_init();		/* Make a connection to external SQL db */
-
     /*
      * You must do your startups AFTER you load your restart database, or
      * softcode that depends on knowing who is connected and so forth
@@ -2833,7 +2827,6 @@ char *argv[];
     muntrace();
 #endif
 
-    sql_shutdown();		/* Terminate external SQL db connection */
     close_sockets(0, (char *)"Going down - Bye");
     dump_database();
     CLOSE;

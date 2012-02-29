@@ -131,8 +131,6 @@ CMD_TWO_ARG(do_delcommand);	/* Delete an added global command */
 CMD_ONE_ARG(do_listcommands);	/* List added global commands */
 CMD_TWO_ARG(do_logwrite);	/* Write to the logfile */
 CMD_NO_ARG(do_logrotate);	/* Rotate the logfile */
-CMD_NO_ARG(do_sql_connect);	/* Create a SQL db connection */
-CMD_ONE_ARG(do_sql);		/* Execute a SQL command */
 
 typedef struct addedentry ADDENT;
 struct addedentry
@@ -193,10 +191,10 @@ struct cmdentry
 #define CA_IMMORTAL	0x00000008	/* Immortals only */
 #define CA_STAFF	0x00000010	/* Must have STAFF flag */
 #define CA_HEAD		0x00000020	/* Must have HEAD flag */
-#define CA_SQL_OK	0x00000040	/* Must have SQL_OK power */
+#define CA_MODULE_OK	0x00000040	/* Must have MODULE_OK power */
 #define CA_ADMIN	0x00000080	/* Wizard or royal */
 
-#define CA_ISPRIV_MASK  (CA_GOD|CA_WIZARD|CA_BUILDER|CA_IMMORTAL|CA_STAFF|CA_HEAD|CA_ADMIN|CA_SQL_OK)
+#define CA_ISPRIV_MASK  (CA_GOD|CA_WIZARD|CA_BUILDER|CA_IMMORTAL|CA_STAFF|CA_HEAD|CA_ADMIN|CA_MODULE_OK)
 
 #define CA_NO_HAVEN	0x00000100	/* Not by HAVEN players */
 #define CA_NO_ROBOT	0x00000200	/* Not by ROBOT players */

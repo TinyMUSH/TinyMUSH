@@ -1,9 +1,9 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4
-#ACLOCAL_AUXDIR  = @ac_aux_dir@
 AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS       = libltdl
-#DIST_SUBDIRS = libltdl/
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+                            
 
 TEXT_DIR     = $(srcdir)/text
 TEXT_SRC     = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt \
@@ -39,7 +39,7 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 	malloc.h match.h mushconf.h patchlevel.h pcre.h powers.h slave.h \
 	udb.h udb_defs.h vattr.h walkdb.h
 EXTRA_netmush_SOURCES  = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h malloc.c mcheck.c mstats.c mtrace.c
-netmush_LDFLAGS        = -export-dynamic -static
+netmush_LDFLAGS        = -export-dynamic
 netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(SQL_O) $(MALLOC_O)
 netmush_DEPENDENCIES   = $(LTDLDEPS) $(SQL_O) 
 
@@ -131,3 +131,7 @@ install-data-local:
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
 	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
+
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status libtool
+                            

@@ -14,7 +14,7 @@
 /* --- ADD DESCRIPTION --- */
 #undef EXTENDED_STDIO_DCLS
 
-/* --- ADD DESCRIPTION --- */
+/* Support for IEEE 754 floating-point */
 #undef FLOATING_POINTS
 
 /* Define to 1 if you have the `alarm' function. */
@@ -164,9 +164,6 @@
 /* Define to 1 if you have the `inet' library (-linet). */
 #undef HAVE_LIBINET
 
-/* Define to 1 if you have the `ltdl' library (-lltdl). */
-#undef HAVE_LIBLTDL
-
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
@@ -181,6 +178,12 @@
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have <libtinyqdbm.h>. */
+#undef HAVE_LIBTINYGDBM_H
+
+/* Define to 1 if you have <libtinyqdbm.h>. */
+#undef HAVE_LIBTINYQDBM_H
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
@@ -454,23 +457,14 @@
 /* Define to the shared library suffix, say, ".dylib". */
 #undef LT_SHARED_EXT
 
-/* --- ADD DESCRIPTION --- */
+/* How many global registers to use */
 #undef MAX_GLOBAL_REGS
-
-/* --- ADD DESCRIPTION --- */
-#undef MCHECK
 
 /* Enable memory-based DBM hashDB */
 #undef MEMORY_BASED
 
-/* --- ADD DESCRIPTION --- */
-#undef MTRACE_FILE
-
-/* TinyMUSH-GDBM engine used */
-#undef MUSH_DBM_GDBM
-
-/* TinyMUSH-QDBM engine used */
-#undef MUSH_DBM_QDBM
+/* TinyGDBM dbm used */
+#undef MUSH_DBM
 
 /* --- ADD DESCRIPTION --- */
 #undef NEED_GETPAGESIZE_DCL
@@ -514,13 +508,13 @@
 /* --- ADD DESCRIPTION --- */
 #undef NEED_WAIT4_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Support for command lag detection support */
 #undef NO_LAG_CHECK
 
 /* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
 
-/* --- ADD DESCRIPTION --- */
+/* Support for per-object time usage tracking */
 #undef NO_TIMECHECKING
 
 /* Name of package */
@@ -550,10 +544,10 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* --- ADD DESCRIPTION --- */
+/* Support for Pueblo Clients */
 #undef PUEBLO_SUPPORT
 
-/* --- ADD DESCRIPTION --- */
+/* Support for cpu time checking */
 #undef RAW_MEMTRACKING
 
 /* Define as the return type of signal handlers (`int' or `void'). */
@@ -568,7 +562,7 @@
 /* --- ADD DESCRIPTION --- */
 #undef STRUCT_RUSAGE_COMPLETE
 
-/* --- ADD DESCRIPTION --- */
+/* Support for cpu time checking */
 #undef TEST_MALLOC
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
@@ -577,7 +571,7 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
-/* --- ADD DESCRIPTION --- */
+/* Support for cpu time checking */
 #undef TRACK_USER_TIME
 
 /* Version number of package */

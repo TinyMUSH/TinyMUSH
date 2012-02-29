@@ -42,13 +42,7 @@ int extra;
         uname(&bpInfo);
         notify(player, tprintf("Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine));
 #endif
-#ifdef MUSH_DBM_GDBM
-        notify(player, "    DBM driver: TinyMUSH-GDBM");
-#else
-#ifdef MUSH_DBM_QDBM
-        notify(player, "    DBM driver: TinyMUSH-QDBM");
-#endif
-#endif
+        notify(player, tprintf("    DBM driver: %s", MUSH_DBM));
     if (mudstate.modloaded[0])
     {
         notify(player, tprintf("Modules loaded: %s",
@@ -95,15 +89,7 @@ NDECL(init_version)
     
     XFREE(string, "init_version");
 
-#ifdef MUSH_DBM_GDBM
-    mudstate.dbmdriver =
-        XSTRDUP(tprintf("TinyMUSH-GDBM"), "init_version");
-#else
-#ifdef MUSH_DBM_QDBM
-    mudstate.dbmdriver =
-        XSTRDUP(tprintf("TinyMUSH-QDBM"), "init_version");    
-#endif
-#endif
+    mudstate.dbmdriver = XSTRDUP(tprintf("%s", MUSH_DBM), "init_version");
     mudstate.buildinfo =
         XSTRDUP(tprintf("%s\n                %s\n                %s",
                         PACKAGE_CONFIG, MUSH_BUILD_COMPILE, MUSH_BUILD_LTCOMPILE), "init_version");

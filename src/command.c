@@ -15,7 +15,6 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "vattr.h"		/* required by code */
-#include "db_sql.h"		/* required by code */
 #include "pcre.h"		/* required by code */
 
 extern void FDECL(list_cf_access, (dbref));
@@ -251,7 +250,7 @@ int mask;
                     ((mask & CA_STAFF) && Staff(player)) ||
                     ((mask & CA_HEAD) && Head(player)) ||
                     ((mask & CA_IMMORTAL) && Immortal(player)) ||
-                    ((mask & CA_SQL_OK) && Can_Use_SQL(player))))
+                    ((mask & CA_MODULE_OK) && Can_Use_Module(player))))
                 return 0;
         }
         else if (!mval && nval)
@@ -276,7 +275,7 @@ int mask;
                     ((mask & CA_STAFF) && Staff(player)) ||
                     ((mask & CA_HEAD) && Head(player)) ||
                     ((mask & CA_IMMORTAL) && Immortal(player)) ||
-                    ((mask & CA_SQL_OK) && Can_Use_SQL(player)) ||
+                    ((mask & CA_MODULE_OK) && Can_Use_Module(player)) ||
                     ((mask & CA_MARKER0) && H_Marker0(player)) ||
                     ((mask & CA_MARKER1) && H_Marker1(player)) ||
                     ((mask & CA_MARKER2) && H_Marker2(player)) ||

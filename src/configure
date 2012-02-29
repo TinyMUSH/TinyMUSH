@@ -627,19 +627,12 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 ac_aux_dir
-MALLOC_O
-MALLOC_S
-OPTIM_F
-SQL_I
-SQL_O
 WANT_MODULE_HELLO_FALSE
 WANT_MODULE_HELLO_TRUE
 WANT_MODULE_MAIL_FALSE
 WANT_MODULE_MAIL_TRUE
 WANT_MODULE_COMSYS_FALSE
 WANT_MODULE_COMSYS_TRUE
-WANT_DISK_BASED_FALSE
-WANT_DISK_BASED_TRUE
 WANT_DBM_QDBM_FALSE
 WANT_DBM_QDBM_TRUE
 WANT_DBM_GDBM_FALSE
@@ -663,6 +656,7 @@ INCLTDL
 LTDLINCL
 LTDLDEPS
 LIBLTDL
+LIBTOOL_DEPS
 CPP
 OTOOL64
 OTOOL
@@ -788,20 +782,15 @@ with_ltdl_lib
 enable_ltdl_install
 with_dbm
 enable_disk_based
-with_module_comsys
-with_module_mail
-with_module_hello
-with_sql
-with_sql_inc
-with_sql_libs
-with_debug
-with_malloc
-enable_pueblo
-enable_fpmath
+enable_module_comsys
+enable_module_mail
+enable_module_hello
+enable_pueblo_support
+enable_floating_point
 enable_lag_checking
 enable_time_checking
 enable_cpu_checking
-enable_malloc_wrapper
+with_malloc_wrapper
 with_global_regs
 '
       ac_precious_vars='build_alias
@@ -1441,45 +1430,50 @@ Optional Features:
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-ltdl-install   install libltdl
-  --enable-disk-based     store the database on disk using a DBM hashfile,
-                          and cache some attributes in a limited amount of
-                          memory. The alternative is memory-based, where the
-                          database is kept in memory. Disk-based uses less
-                          memory. Disabling the disk-based cache can improve
-                          performance if enough memory is available.
-                          [default=yesyes]
-  --enable-pueblo         build with support for Pueblo client
-                          default=yes
-  --enable-fpmath         build math functions (lt, gt, add, etc.) with
-                          IEEE 754 floating-point support instead of allowing
-                          only integer calculations default=yes
-  --enable-lag-checking   enable warnings that a certain command has
-                          exceeded a certain amount of wall-clock time to
-                          execute. Disable this if you have severe problems
-                          with computational resources on your host machine.
-                          default=yes
-  --enable-time-checking  enable tracking of the amount of wall-clock time
-                          that individual objects are using. Disable this
-                          if you have severe problems with computational
+  --enable-disk-based     store the database on disk using a DBM hashfile, and
+                          cache some attributes in a limited amount of memory.
+                          The alternative is memory-based, where the database
+                          is kept in memory. Disabling the disk-based cache
+                          can improve performance if enough memory is
+                          available. [default=yes]
+
+    --enable-module-comsys  Enable support for the comsys module [default=yes]
+
+
+    --enable-module-mail    Enable support for the mail module [default=yes]
+
+
+    --enable-module-hello   Enable support for the hello module [default=no]
+
+
+    --enable-pueblo-support Enable support for Pueblo clients [default=yes]
+
+
+    --enable-floating-point Enable support for math functions (lt, gt, add,
+                          etc.) with IEEE 754 floating-point support
+                          [default=yes]
+
+
+    --enable-lag-checking   Enable warnings that a certain command has exceeded
+                          a certain amount of wall-clock time to execute.
+                          Disable this if you have severe problems with
+                          computational resources on your host machine.
+                          [default=yes]
+
+
+    --enable-time-checking  Enable tracking of the amount of wall-clock time
+                          that individual objects are using. Disable this if
+                          you have severe problems with computational
                           resources on your host machine. (This is assumed to
                           be disabled if lag-checking is disabled)
-                          default=yes
-  --enable-cpu-checking   for lag-checking and time-checking features,
-                          use CPU time reported with getrusage() instead
-                          of tracking wall-clock time. This is more accurate
-                          but also more computationally expensive
-                          default=no
-  --enable-malloc-wrapper=TYPE
-                          use wrapper macros for malloc(), free(), and
-                          related functions to do one of the following,
-                          which can help identify memory leaks:
-                          track - maintain a tagged list of memory
-                                  allocated for purposes other than the
-                                  buffer pool (see @list raw_memory)
-                          log   - print log messages when the functions
-                                  are called. This is spammy; try other
-                                  debugging tools first
-                          default=no
+                          [default=yes]
+
+
+    --enable-cpu-checking   Enable CPU time reported with getrusage() instead of
+                          tracking wall-clock time for lag-checking and
+                          time-checking features. This is more accurate but
+                          also more computationally expensive. [default=no]
+
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1492,49 +1486,26 @@ Optional Packages:
   --with-included-ltdl    use the GNU ltdl sources included here
   --with-ltdl-include=DIR use the ltdl headers installed in DIR
   --with-ltdl-lib=DIR     use the libltdl.la installed in DIR
-  --with-dbm=TYPE         Select the DBM driver used to save game data:
-                            gdbm : Use TinyMUSH-GDBM hash database driver.
-                                   This is the historical driver used by
-                                   most games. No it is not bogus.
-                            qdbm : Use TinyMUSH-QDBM hash database driver.
-                                   A newer implementation of the DBM
-                                   engine, a compromise between gdbm and
-                                   memory-based cache.
+  --with-dbm=gdbm|qdbm    Select the DBM driver used to save game data, valid
+                          values are : gdbm Use TinyMUSH-GDBM hash database
+                          driver, This is the historical driver used by most
+                          games or qdbm : Use TinyMUSH-QDBM hash database
+                          driver. A newer implementation of the DBM engine, a
+                          compromise between gdbm and memory-based cache.
                           [default=gdbm]
-  --with-module-comsys    Enable module comsys. [default=yes]
-  --with-module-mail      Enable module mail. [default=yes]
-  --with-module-hello     Enable module hello. [default=no]
-  --with-sql=TYPE         build with support for SQL database connection
-                    (TYPE can be msql, mysql, pgsql, or sqlite3) default=no
-  --with-sql-inc=PATH     set the include path for SQL header files
-                          default for msql=/usr/local/Hughes/include
-                          default for mysql=/usr/local/include/mysql
-                          default for pgsql=/usr/local/pgsql/include
-                          default for sqlite3=/usr/include
-  --with-sql-libs=PATH    set the library path for SQL library files
-                          default for msql=/usr/local/Hughes/lib
-                          default for mysql=/usr/local/lib/mysql
-                          default for pgsql=/usr/local/pgsql/lib
-                          default for sqlite3=/usr/lib
-  --with-debug=FLAGS      set debug flags for the compiler. After we
-                          finish beta testing, we'll take away the debugging
-                          -g flag. If you don't use GCC, don't use -g. Add
-                          -pg for profiling (gprof netmush gmon.out)
-                          default=-g
-  --with-malloc=TYPE      build with a particular malloc package.
-                          TYPE can be sys (use your system libraries),
-                          gnu (use our copy of GNU malloc), or trace (use
-                          our GNU malloc with mtrace turned on). If your
-                          system malloc library is broken for some reason,
-                          try gnu. Don't use trace unless you're debugging
-                          a memory leak or corruption problem and you're
-                          willing to put up with the performance hit. Try
-                          using Purify (make netmush-pure) if you have it.
-                          default=sys
-  --with-global-regs=N    use N global registers (%q0-%q9,%qa-%qz)
-                          N must be a number from 10 to 36. Set lower
-                          to conserve memory if you don't need all the
-                          possible registers default=36
+  --with-malloc-wrapper=[track|log]
+                          Enable use of wrapper macros for malloc(), free(),
+                          and related functions to do one of the following,
+                          which can help identify memory leaks: track -
+                          maintain a tagged list of memory allocated for
+                          purposes other than the buffer pool. (see @list
+                          raw_memory) log - print log messages when the
+                          function are called. This is spammy; try other
+                          debugging tools first.
+  --with-global-regs=N    use N global registers (%q0-%q9,%qa-%qz) N must be a
+                          number from 10 to 36. Set lower to conserve memory
+                          if you don't need all the possible registers
+                          [default=36]
 
 Some influential environment variables:
   CC          C compiler command
@@ -2493,9 +2464,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-
-
-
  tmp=(`echo $PACKAGE_VERSION | tr "." "\n"`)
 
  PACKAGE_VERSION_MAJOR=${tmp[0]}
@@ -2503,20 +2471,20 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
  PACKAGE_RELEASE_STATUS=${tmp[2]}
  PACKAGE_RELEASE_REVISION=${tmp[3]}
 
- case ${tmp[2]} in
- 	0)	PACKAGE_RELEASE_NAME="Alpha ${tmp[3]}"
- 		;;
- 	1)	PACKAGE_RELEASE_NAME="Beta ${tmp[3]}"
- 		;;
- 	2)	PACKAGE_RELEASE_NAME="Release Candidate ${tmp[3]}"
- 		;;
- 	3)	if [ ${tmp[3]} -gt 0 ]; then
- 			PACKAGE_RELEASE_NAME="PatchLevel ${tmp[3]}"
- 		else
- 			PACKAGE_RELEASE_NAME="Gold"
-		fi
-		;;
- esac
+ case ${PACKAGE_RELEASE_STATUS} in #(
+  0) :
+    PACKAGE_RELEASE_NAME="Alpha ${PACKAGE_RELEASE_REVISION}" ;; #(
+  1) :
+    PACKAGE_RELEASE_NAME="Beta ${PACKAGE_RELEASE_REVISION}" ;; #(
+  2) :
+    PACKAGE_RELEASE_NAME="Release Candidate ${PACKAGE_RELEASE_REVISION}" ;; #(
+  *) :
+    if  test ${PACKAGE_RELEASE_REVISION} -gt 0 ; then :
+  PACKAGE_RELEASE_NAME="PatchLevel ${PACKAGE_RELEASE_REVISION}"
+else
+  PACKAGE_RELEASE_NAME="Gold"
+fi ;;
+esac
 
 PACKAGE_RELEASE_DATE="2012-02-19"
 PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
@@ -2558,57 +2526,69 @@ ac_config_headers="$ac_config_headers autoconf.h"
 
 
 
-
-
- if test -z ""; then
+if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
 
   $PACKAGE_COPYRIGHT.
   See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>."
- elif test -z ""; then
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.
+"
+else
   ${ac_aux_dir}/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
 
   $PACKAGE_COPYRIGHT.
   See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
-
-  $PACKAGE_COPYRIGHT.
-  See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
-  echo
- fi
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.
+: %B%b"
+fi
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Initializing Automake$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XInitializing Automake" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Initializing Automake;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Initializing Automake ##
+_ASBOX
+$as_echo
 
- if test -z "$ac_configure_args"; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %B$ac_configure_args%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %B$ac_configure_args%b"
-  echo
- fi
-
-
-
- if test -z "Initializing Automake."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BInitializing Automake.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BInitializing Automake.%b"
-  echo
- fi
 
 am__api_version='1.11'
 
@@ -3089,16 +3069,49 @@ am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
 
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Initializing Libtools$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XInitializing Libtools" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Initializing Libtools;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Initializing Libtools."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BInitializing Libtools.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BInitializing Libtools.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Initializing Libtools ##
+_ASBOX
+$as_echo
 
 
 
@@ -11671,6 +11684,7 @@ CC="$lt_save_CC"
 # Only expand once:
 
 
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking which extension is used for runtime loadable modules" >&5
 $as_echo_n "checking which extension is used for runtime loadable modules... " >&6; }
 if ${libltdl_cv_shlibext+:} false; then :
@@ -12747,78 +12761,54 @@ eval "LTDLOPEN=\"$libname_spec\""
 
 
 
-# The lt_dladvise_init symbol was added with libtool-2.2
-if test "x$with_included_ltdl" != "xyes"; then
- save_CFLAGS="$CFLAGS"
- save_LDFLAGS="$LDFLAGS"
- CFLAGS="$CFLAGS $LTDLINCL"
- LDFLAGS="$LDFLAGS $LIBLTDL"
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking for lt_dladvise_init in -lltdl" >&5
-$as_echo_n "checking for lt_dladvise_init in -lltdl... " >&6; }
-if ${ac_cv_lib_ltdl_lt_dladvise_init+:} false; then :
-  $as_echo_n "(cached) " >&6
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lltdl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char lt_dladvise_init ();
-int
-main ()
-{
-return lt_dladvise_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_ltdl_lt_dladvise_init=yes
-else
-  ac_cv_lib_ltdl_lt_dladvise_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ltdl_lt_dladvise_init" >&5
-$as_echo "$ac_cv_lib_ltdl_lt_dladvise_init" >&6; }
-if test "x$ac_cv_lib_ltdl_lt_dladvise_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBLTDL 1
-_ACEOF
-
-  LIBS="-lltdl $LIBS"
-
-else
-  as_fn_error $? "installed libltdl is too old" "$LINENO" 5
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for Options$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for Options" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for Options;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
 fi
 
- LDFLAGS="$save_LDFLAGS"
- CFLAGS="$save_CFLAGS"
-fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for Options ##
+_ASBOX
+$as_echo
 
 
 
- if test -z "Checks for Options."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for Options.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for Options.%b"
-  echo
- fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for configuration prefix" >&5
-$as_echo_n "checking for configuration prefix... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking configuration prefix" >&5
+$as_echo_n "checking configuration prefix... " >&6; }
  case "$prefix" in
   NONE) prefix=`pwd -P | sed 's:/[^/]*$::'`/game;;
  esac
@@ -12834,36 +12824,40 @@ $as_echo_n "checking dbm engine to use... " >&6; }
 
 # Check whether --with-dbm was given.
 if test "${with_dbm+set}" = set; then :
-  withval=$with_dbm;
-    case "$withval" in
-      gdbm) { $as_echo "$as_me:${as_lineno-$LINENO}: result: TinyMUSH-GDBM" >&5
-$as_echo "TinyMUSH-GDBM" >&6; }
-            with_dbm="gdbm";;
-      qdbm) { $as_echo "$as_me:${as_lineno-$LINENO}: result: TinyMUSH-QDBM" >&5
-$as_echo "TinyMUSH-QDBM" >&6; }
-      	    with_dbm="qdbm";;
-      *)    with_dbm="gdbm"
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: TinyMUSH-GDBM" >&5
-$as_echo "TinyMUSH-GDBM" >&6; };;
-    esac
-
+  withval=$with_dbm; case $withval in #(
+  gdbm) :
+    with_dbm="gdbm" ;; #(
+  qdbm) :
+    with_dbm="qdbm" ;; #(
+  *) :
+    with_dbm="gdbm" ;;
+esac
 else
   with_dbm="gdbm"
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: TinyMUSH-GDBM" >&5
-$as_echo "TinyMUSH-GDBM" >&6; }
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_dbm" >&5
+$as_echo "$with_dbm" >&6; }
 
-if test "x$with_dbm" = "xgdbm"; then
+if test "x$with_dbm" = "xqdbm"; then :
 
-$as_echo "#define MUSH_DBM_GDBM /**/" >>confdefs.h
+
+$as_echo "#define MUSH_DBM \"QDBM\"" >>confdefs.h
+
+
+$as_echo "#define HAVE_LIBTINYQDBM_H 1" >>confdefs.h
+
 
 else
- if test "x$with_dbm" = "xqdbm"; then
 
-$as_echo "#define MUSH_DBM_QDBM /**/" >>confdefs.h
 
- fi
+$as_echo "#define MUSH_DBM \"GDBM\"" >>confdefs.h
+
+
+$as_echo "#define HAVE_LIBTINYGDBM_H 1" >>confdefs.h
+
+
+
 fi
 
  if test "x$with_dbm" = "xgdbm"; then
@@ -12883,78 +12877,55 @@ else
 fi
 
 
-disk_based=true
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable disk-based database" >&5
 $as_echo_n "checking whether to enable disk-based database... " >&6; }
 # Check whether --enable-disk-based was given.
 if test "${enable_disk_based+set}" = set; then :
-  enableval=$enable_disk_based;
-    if test "x$enableval" = "xno"; then
+  enableval=$enable_disk_based; if test "x$enableval" = "xno"; then :
+
 
 $as_echo "#define MEMORY_BASED /**/" >>confdefs.h
 
-      disk_based=false
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    fi
-
-else
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-fi
-
-
- if test x$disk_based = xtrue; then
-  WANT_DISK_BASED_TRUE=
-  WANT_DISK_BASED_FALSE='#'
-else
-  WANT_DISK_BASED_TRUE='#'
-  WANT_DISK_BASED_FALSE=
-fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for module comsys" >&5
-$as_echo_n "checking for module comsys... " >&6; }
-
-# Check whether --with-module-comsys was given.
-if test "${with_module_comsys+set}" = set; then :
-  withval=$with_module_comsys;
-  case "$withval" in
-   no) with_module_comsys="no"
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; };;
-    *) if test -d "modules/comsys"; then
-	with_module_comsys="yes"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-       else
-        with_module_comsys="no"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-       fi;;
-  esac
-
-else
-
-  if test -d "modules/comsys"; then
-   with_module_comsys="yes"
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  else
-   with_module_comsys="no"
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-  fi
+
+else
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 
 fi
 
- if test "x$with_module_comsys" = "xyes"; then
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the comsys module is enable" >&5
+$as_echo_n "checking whether the comsys module is enable... " >&6; }
+# Check whether --enable-module-comsys was given.
+if test "${enable_module_comsys+set}" = set; then :
+  enableval=$enable_module_comsys;
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+else
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  enable_module_comsys="yes"
+
+
+fi
+
+ if test "x$enable_module_comsys" = "xyes"; then
   WANT_MODULE_COMSYS_TRUE=
   WANT_MODULE_COMSYS_FALSE='#'
 else
@@ -12963,42 +12934,29 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for module mail" >&5
-$as_echo_n "checking for module mail... " >&6; }
-
-# Check whether --with-module-mail was given.
-if test "${with_module_mail+set}" = set; then :
-  withval=$with_module_mail;
-  case "$withval" in
-   no) with_module_mail="no"
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; };;
-    *) if test -d "modules/mail"; then
-	with_module_mail="yes"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the mail module is enable" >&5
+$as_echo_n "checking whether the mail module is enable... " >&6; }
+# Check whether --enable-module-mail was given.
+if test "${enable_module_mail+set}" = set; then :
+  enableval=$enable_module_mail;
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-       else
-        with_module_mail="no"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-       fi;;
-  esac
+fi
 
 else
 
-  if test -d "modules/mail"; then
-   with_module_mail="yes"
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-  else
-   with_module_mail="no"
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  fi
+  enable_module_mail="yes"
+
 
 fi
 
- if test "x$with_module_mail"="xyes"; then
+ if test "x$enable_module_mail" = "xyes"; then
   WANT_MODULE_MAIL_TRUE=
   WANT_MODULE_MAIL_FALSE='#'
 else
@@ -13007,34 +12965,29 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for module hello" >&5
-$as_echo_n "checking for module hello... " >&6; }
-
-# Check whether --with-module-hello was given.
-if test "${with_module_hello+set}" = set; then :
-  withval=$with_module_hello;
-  case "$withval" in
-   no) { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-       with_module_hello="no";;
-    *) if test -d "modules/hello"; then
-	with_module_hello="yes"
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the hello module is enable" >&5
+$as_echo_n "checking whether the hello module is enable... " >&6; }
+# Check whether --enable-module-hello was given.
+if test "${enable_module_hello+set}" = set; then :
+  enableval=$enable_module_hello;
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-       else
-        as_fn_error $? "not found" "$LINENO" 5
-       fi;;
-  esac
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
 else
 
-  with_module_hello="no"
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+  enable_module_hello="no"
+
 
 fi
 
- if test "x$with_module_hello"="xyes"; then
+ if test "x$enable_module_hello" = "xyes"; then
   WANT_MODULE_HELLO_TRUE=
   WANT_MODULE_HELLO_FALSE='#'
 else
@@ -13043,320 +12996,167 @@ else
 fi
 
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build with SQL support" >&5
-$as_echo_n "checking whether to build with SQL support... " >&6; }
-
-# Check whether --with-sql was given.
-if test "${with_sql+set}" = set; then :
-  withval=$with_sql;
-    case "$withval" in
-      msql)    SQL_O="db_sql_msql.o"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: msql" >&5
-$as_echo "msql" >&6; } ;;
-      mysql)   SQL_O="db_sql_mysql.o"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: mysql" >&5
-$as_echo "mysql" >&6; } ;;
-      pgsql)   SQL_O="db_sql_pgsql.o"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: pgsql" >&5
-$as_echo "pgsql" >&6; } ;;
-      sqlite3) SQL_O="db_sql_sqlite3.o"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: sqlite3" >&5
-$as_echo "sqlite3" >&6; } ;;
-      *)       SQL_O="db_sql_empty.o"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; } ;;
-    esac
-
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable pueblo support" >&5
+$as_echo_n "checking whether to enable pueblo support... " >&6; }
+# Check whether --enable-pueblo-support was given.
+if test "${enable_pueblo_support+set}" = set; then :
+  enableval=$enable_pueblo_support;
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 else
-  SQL_O="db_sql_empty.o"
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for location of SQL header files" >&5
-$as_echo_n "checking for location of SQL header files... " >&6; }
-
-# Check whether --with-sql-inc was given.
-if test "${with_sql_inc+set}" = set; then :
-  withval=$with_sql_inc;
-    case "$with_sql" in
-      msql | mysql | pgsql | sqlite3) SQL_I="-I$withval"
-                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
-$as_echo "$withval" >&6; } ;;
-      *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; } ;;
-    esac
-
 else
 
-    case "$with_sql" in
-      msql) SQL_I="-I/usr/local/Hughes/include"
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/Hughes/include" >&5
-$as_echo "/usr/local/Hughes/include" >&6; } ;;
-      mysql) SQL_I="-I/usr/local/include/mysql"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/include/mysql" >&5
-$as_echo "/usr/local/include/mysql" >&6; } ;;
-      pgsql) SQL_I="-I/usr/local/pgsql/include"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/pgsql/include" >&5
-$as_echo "/usr/local/pgsql/include" >&6; } ;;
-      sqlite3) SQL_I="-I/usr/include"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/include" >&5
-$as_echo "/usr/include" >&6; } ;;
-      *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; } ;;
-    esac
-
-fi
-
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for location of SQL library files" >&5
-$as_echo_n "checking for location of SQL library files... " >&6; }
-
-# Check whether --with-sql-libs was given.
-if test "${with_sql_libs+set}" = set; then :
-  withval=$with_sql_libs;
-    case "$with_sql" in
-      msql | mysql | pgsql | sqlite3) SQL_LIB="-L$withval"
-                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
-$as_echo "$withval" >&6; } ;;
-      *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; } ;;
-    esac
-
-else
-
-    case "$with_sql" in
-      msql) SQL_LIB="-L/usr/local/Hughes/lib"
-              { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/Hughes/lib" >&5
-$as_echo "/usr/local/Hughes/lib" >&6; } ;;
-      mysql) SQL_LIB="-L/usr/local/lib/mysql"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/lib/mysql" >&5
-$as_echo "/usr/local/lib/mysql" >&6; } ;;
-      pgsql) SQL_LIB="-L/usr/local/pgsql/lib"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/local/pgsql/lib" >&5
-$as_echo "/usr/local/pgsql/lib" >&6; } ;;
-      sqlite3) SQL_LIB="-L/usr/lib"
-               { $as_echo "$as_me:${as_lineno-$LINENO}: result: /usr/lib" >&5
-$as_echo "/usr/lib" >&6; } ;;
-      *) { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; } ;;
-    esac
-
-fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build with DEBUG support" >&5
-$as_echo_n "checking whether to build with DEBUG support... " >&6; }
-
-# Check whether --with-debug was given.
-if test "${with_debug+set}" = set; then :
-  withval=$with_debug;
-	if test -z "$withval"; then
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
-$as_echo "none" >&6; }
-	else
-          OPTIM_F=$withval
-	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $OPTIM_F" >&5
-$as_echo "$OPTIM_F" >&6; }
-	fi
-
-
-else
-
-	OPTIM_F="-g"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $OPTIM_F" >&5
-$as_echo "$OPTIM_F" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  enable_pueblo_support="yes"
 
 
 fi
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for which version of malloc to use" >&5
-$as_echo_n "checking for which version of malloc to use... " >&6; }
-
-# Check whether --with-malloc was given.
-if test "${with_malloc+set}" = set; then :
-  withval=$with_malloc;
-     case "$withval" in
-       gnu)
-         MALLOC_S="malloc.c"
-         MALLOC_O="malloc.o"
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: gnu" >&5
-$as_echo "gnu" >&6; }
-         ;;
-       trace)
-         MALLOC_S="malloc.c mcheck.c mstats.c mtrace.c"
-         MALLOC_O="malloc.o mcheck.o mstats.o mtrace.o"
-
-$as_echo "#define MCHECK /**/" >>confdefs.h
-
-
-$as_echo "#define MTRACE_FILE \"mtrace.out\"" >>confdefs.h
-
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: trace" >&5
-$as_echo "trace" >&6; }
-         ;;
-      *)
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: sys" >&5
-$as_echo "sys" >&6; }
-         ;;
-     esac
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: sys" >&5
-$as_echo "sys" >&6; }
-fi
-
-
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to build with Pueblo support" >&5
-$as_echo_n "checking whether to build with Pueblo support... " >&6; }
-# Check whether --enable-pueblo was given.
-if test "${enable_pueblo+set}" = set; then :
-  enableval=$enable_pueblo;
-    if test "x$enableval" = "xno"; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    else
+if test "x$enable_pueblo_support" = "xyes"; then :
 
 $as_echo "#define PUEBLO_SUPPORT /**/" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    fi
-
-else
-
-$as_echo "#define PUEBLO_SUPPORT /**/" >>confdefs.h
-
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
 fi
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use floating-point math" >&5
-$as_echo_n "checking whether to use floating-point math... " >&6; }
-# Check whether --enable-fpmath was given.
-if test "${enable_fpmath+set}" = set; then :
-  enableval=$enable_fpmath;
-    if test "x$enableval" = "xno"; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable IEEE 754 floating point support" >&5
+$as_echo_n "checking whether to enable IEEE 754 floating point support... " >&6; }
+# Check whether --enable-floating-point was given.
+if test "${enable_floating_point+set}" = set; then :
+  enableval=$enable_floating_point;
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    else
-
-$as_echo "#define FLOATING_POINTS /**/" >>confdefs.h
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    fi
+fi
 
 else
 
-$as_echo "#define FLOATING_POINTS /**/" >>confdefs.h
-
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+  enable_floating_point="yes"
+
+
 fi
 
+if test "x$enable_floating_point" = "xyes"; then :
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable command lag detection" >&5
-$as_echo_n "checking whether to enable command lag detection... " >&6; }
+$as_echo "#define FLOATING_POINTS /**/" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable command lag detection support" >&5
+$as_echo_n "checking whether to enable command lag detection support... " >&6; }
 # Check whether --enable-lag-checking was given.
 if test "${enable_lag_checking+set}" = set; then :
   enableval=$enable_lag_checking;
-    if test "x$enableval" = "xno"; then
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+else
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  enable_lag_checking="yes"
+
+
+fi
+
+if test "x$enable_lag_checking" = "xno"; then :
 
 $as_echo "#define NO_LAG_CHECK /**/" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    fi
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
 fi
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable per-object time usage tracking" >&5
 $as_echo_n "checking whether to enable per-object time usage tracking... " >&6; }
 # Check whether --enable-time-checking was given.
 if test "${enable_time_checking+set}" = set; then :
   enableval=$enable_time_checking;
-    if test "x$enableval" = "xno"; then
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+else
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  enable_time_checking="yes"
+
+
+fi
+
+if test "x$enable_time_checking" = "xno"; then :
 
 $as_echo "#define NO_TIMECHECKING /**/" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-    fi
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
 fi
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable cpu time checking" >&5
 $as_echo_n "checking whether to enable cpu time checking... " >&6; }
 # Check whether --enable-cpu-checking was given.
 if test "${enable_cpu_checking+set}" = set; then :
   enableval=$enable_cpu_checking;
-    if test "x$enableval" = "xno"; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    else
-
-$as_echo "#define TRACK_USER_TIME /**/" >>confdefs.h
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+  if test "x$enableval" = "xyes"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-    fi
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
+else
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable malloc-wrapper macros" >&5
-$as_echo_n "checking whether to enable malloc-wrapper macros... " >&6; }
-# Check whether --enable-malloc-wrapper was given.
-if test "${enable_malloc_wrapper+set}" = set; then :
-  enableval=$enable_malloc_wrapper;
-    case "$enableval" in
-    trac*)
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  enable_cpu_checking="no"
+
+
+fi
+
+if test "x$enable_cpu_checking" = "xyes"; then :
+
+$as_echo "#define TRACK_USER_TIME /**/" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which malloc-wrapper macros to use" >&5
+$as_echo_n "checking which malloc-wrapper macros to use... " >&6; }
+
+# Check whether --with-malloc-wrapper was given.
+if test "${with_malloc_wrapper+set}" = set; then :
+  withval=$with_malloc_wrapper; if  test "x$withval" = "xtrack" ; then :
 
 $as_echo "#define RAW_MEMTRACKING /**/" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: tracking" >&5
-$as_echo "tracking" >&6; } ;;
-    log*)
+else
+  if  test "x$withval" = "xlog" ; then :
 
 $as_echo "#define TEST_MALLOC /**/" >>confdefs.h
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: logging" >&5
-$as_echo "logging" >&6; } ;;
-    *)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; } ;;
-    esac
-
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
+  with_malloc_wrapper="none"
+fi
+fi
+else
+  with_malloc_wrapper="none"
+
 fi
 
 
@@ -13365,48 +13165,73 @@ $as_echo_n "checking how many global registers to use... " >&6; }
 
 # Check whether --with-global-regs was given.
 if test "${with_global_regs+set}" = set; then :
-  withval=$with_global_regs;
-    if test "$withval" -lt "10"; then
-
-$as_echo "#define MAX_GLOBAL_REGS 10" >>confdefs.h
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: 10" >&5
-$as_echo "10" >&6; }
-    elif test "$withval" -gt "36"; then
-
-$as_echo "#define MAX_GLOBAL_REGS 36" >>confdefs.h
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: 36" >&5
-$as_echo "36" >&6; }
-    else
-
-cat >>confdefs.h <<_ACEOF
-#define MAX_GLOBAL_REGS $withval
-_ACEOF
-
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
-$as_echo "$withval" >&6; }
-    fi
-
+  withval=$with_global_regs; if  test "$withval" -lt "10" ; then :
+  with_global_regs=10
 else
+  if  test "$withval" -gt "36" ; then :
+  with_global_regs=36
+else
+  with_global_regs=$withval
+fi
+fi
+else
+  with_global_regs=36
 
-$as_echo "#define MAX_GLOBAL_REGS 36" >>confdefs.h
-
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: 36" >&5
-$as_echo "36" >&6; }
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_global_regs" >&5
+$as_echo "$with_global_regs" >&6; }
 
- if test -z "Checks for programs."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for programs.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for programs.%b"
-  echo
- fi
+cat >>confdefs.h <<_ACEOF
+#define MAX_GLOBAL_REGS $with_global_regs
+_ACEOF
+
+
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for programs$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for programs" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for programs;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
+
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for programs ##
+_ASBOX
+$as_echo
+
 
 # Checks for programs.
 ac_ext=c
@@ -14375,36 +14200,97 @@ fi
 
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for platform$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for platform" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for platform;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Checks for platform."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for platform.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for platform.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for platform ##
+_ASBOX
+$as_echo
 
 # Checks for platform.
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for libraries$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for libraries" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for libraries;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
-
- if test -z "Checks for libraries."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for libraries.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for libraries.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for libraries ##
+_ASBOX
+$as_echo
 
 # Checks for libraries.
-
-
-
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lcrypt" >&5
 $as_echo_n "checking for main in -lcrypt... " >&6; }
@@ -14725,16 +14611,49 @@ _ACEOF
 fi
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for header files.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for header files." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for header files.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Checks for header files."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for header files.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for header files.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for header files. ##
+_ASBOX
+$as_echo
 
 # Checks for header files.
 for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h
@@ -14938,16 +14857,49 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
 fi
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for typedefs, structures, and compiler characteristics.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for typedefs, structures, and compiler characteristics." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for typedefs, structures, and compiler characteristics.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Checks for typedefs, structures, and compiler characteristics."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for typedefs, structures, and compiler characteristics.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for typedefs, structures, and compiler characteristics.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for typedefs, structures, and compiler characteristics. ##
+_ASBOX
+$as_echo
 
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
@@ -15586,16 +15538,49 @@ _ACEOF
 fi
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Check for Declarations.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XCheck for Declarations." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Check for Declarations.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Check for Declarations."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BCheck for Declarations.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BCheck for Declarations.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Check for Declarations. ##
+_ASBOX
+$as_echo
 
 # Check for Declarations
 ac_fn_c_check_decl "$LINENO" "sys_siglist" "ac_cv_have_decl_sys_siglist" "#include <signal.h>
@@ -16003,16 +15988,49 @@ fi
 rm -f conftest*
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for library functions.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for library functions." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for library functions.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Checks for library functions."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for library functions.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BChecks for library functions.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for library functions. ##
+_ASBOX
+$as_echo
 
 # Checks for library functions.
 for ac_header in vfork.h
@@ -16674,16 +16692,49 @@ fi
 done
 
 
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Writing configuration.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XWriting configuration." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Writing configuration.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
 
- if test -z "Writing configuration."; then
-  ${ac_aux_dir}/shtool echo -e "configure"
- elif test -z "1"; then
-  ${ac_aux_dir}/shtool echo -e "configure: %BWriting configuration.%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "configure: %BWriting configuration.%b"
-  echo
- fi
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Writing configuration. ##
+_ASBOX
+$as_echo
 
 # Write results.
 
@@ -16857,10 +16908,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_DBM_QDBM_TRUE}" && test -z "${WANT_DBM_QDBM_FALSE}"; then
   as_fn_error $? "conditional \"WANT_DBM_QDBM\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${WANT_DISK_BASED_TRUE}" && test -z "${WANT_DISK_BASED_FALSE}"; then
-  as_fn_error $? "conditional \"WANT_DISK_BASED\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_MODULE_COMSYS_TRUE}" && test -z "${WANT_MODULE_COMSYS_FALSE}"; then
@@ -19274,160 +19321,54 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-
-
- if test -z ""; then
+if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
 
   $PACKAGE_COPYRIGHT.
   See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>."
- elif test -z ""; then
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.
+"
+else
   ${ac_aux_dir}/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
 
   $PACKAGE_COPYRIGHT.
   See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
- else
-  echo
+  Report bugs to <%B$PACKAGE_BUGREPORT%b>.
+: %B%b"
+fi
+
+if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
-%B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} (${PACKAGE_RELEASE_DATE})%b
+         Installation directory : %B$prefix%b
+                     DBM Engine : %B$with_dbm%b
+                  Module ComSYS : %B$enable_module_comsys%b
+                    Module Mail : %B$enable_module_mail%b
+                   Module Hello : %B$enable_module_hello%b
+                 Pueblo clients : %B$enable_pueblo_support%b
+IEEE 754 floating point support	: %B$enable_floating_point%b
+          Command lag detection : %B$enable_lag_checking%b
+ Per-object time usage tracking : %B$enable_time_checking%b
+              CPU time checking : %B$enable_cpu_checking%b
+                 Malloc Wrapper : %B$with_malloc_wrapper%b
+        global registers to use : %B$with_global_regs%b
 
-  $PACKAGE_COPYRIGHT.
-  See %B$PACKAGE_URL%b for more informations.
-  Report bugs to <%B$PACKAGE_BUGREPORT%b>.: %B%b"
-  echo
- fi
-
-
-
- if test -z "$prefix"; then
-  ${ac_aux_dir}/shtool echo -e "Game will be install in directory"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "Game will be install in directory: %B$prefix%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "Game will be install in directory: %B$prefix%b"
-  echo
- fi
-
-echo
-if test "x$with_dbm" = "xgdbm"; then
-
- if test -z "GDBM"; then
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BGDBM%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BGDBM%b"
-  echo
- fi
-
-fi
-
-if test "x$with_dbm" = "xqdbm"; then
-
- if test -z "QDBM"; then
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BQDBM%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                       DBM Engine: %BQDBM%b"
-  echo
- fi
-
-fi
-
-if test "x$with_module_comsys" = "xyes"; then
-
- if test -z "Enable"; then
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BEnable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BEnable%b"
-  echo
- fi
-
+If everything is ok, you can now type %Bmake install%b to install the engine."
 else
+  ${ac_aux_dir}/shtool echo -e "
+         Installation directory : %B$prefix%b
+                     DBM Engine : %B$with_dbm%b
+                  Module ComSYS : %B$enable_module_comsys%b
+                    Module Mail : %B$enable_module_mail%b
+                   Module Hello : %B$enable_module_hello%b
+                 Pueblo clients : %B$enable_pueblo_support%b
+IEEE 754 floating point support	: %B$enable_floating_point%b
+          Command lag detection : %B$enable_lag_checking%b
+ Per-object time usage tracking : %B$enable_time_checking%b
+              CPU time checking : %B$enable_cpu_checking%b
+                 Malloc Wrapper : %B$with_malloc_wrapper%b
+        global registers to use : %B$with_global_regs%b
 
- if test -z "Disable"; then
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BDisable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                    Module ComSYS: %BDisable%b"
-  echo
- fi
-
+If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
 fi
-
-if test "x$with_module_mail" = "xyes"; then
-
- if test -z "Enable"; then
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BEnable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BEnable%b"
-  echo
- fi
-
-else
-
- if test -z "Disable"; then
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BDisable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                      Module Mail: %BDisable%b"
-  echo
- fi
-
-fi
-
-if test "x$with_module_hello" = "xyes"; then
-
- if test -z "Enable"; then
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BEnable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BEnable%b"
-  echo
- fi
-
-else
-
- if test -z "Disable"; then
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello"
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BDisable%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "                     Module Hello: %BDisable%b"
-  echo
- fi
-
-fi
-echo
-
- if test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine."
- elif test -z ""; then
-  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
- else
-  echo
-  ${ac_aux_dir}/shtool echo -e "If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
-  echo
- fi
-

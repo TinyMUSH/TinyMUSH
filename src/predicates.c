@@ -18,8 +18,6 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 #include "functions.h"		/* required by code */
-#include "db_sql.h"		/* required by code */
-//#include "ltdl.h"
 
 extern int FDECL(do_command, (DESC *, char *, int));
 
@@ -1874,8 +1872,6 @@ int key;
     SYNC;
     CLOSE;
 
-    sql_shutdown();
-
     if (slave_socket != -1)
     {
         shutdown(slave_socket, 2);
@@ -3252,26 +3248,6 @@ char *object, *argv[], *cargs[];
 }
 
 /* ---------------------------------------------------------------------------
- * Connect SQL database.
- */
-
-void
-do_sql_connect(player, cause, key)
-dbref player, cause;
-
-int key;
-{
-    if (sql_init() < 0)
-    {
-        notify(player, "Database connection attempt failed.");
-    }
-    else
-    {
-        notify(player, "Database connection succeeded.");
-    }
-}
-
-/* ---------------------------------------------------------------------------
  * do_redirect: Redirect PUPPET, TRACE, VERBOSE output to another player.
  */
 
@@ -3613,14 +3589,3 @@ char *ref_name, *obj_name;
 /* ---------------------------------------------------------------------------
  * Miscellaneous stuff below.
  */
-
-void
-do_sql(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
-    sql_query(player, name, NULL, NULL, &SPACE_DELIM, &SPACE_DELIM);
-}

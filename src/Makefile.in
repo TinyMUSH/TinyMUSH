@@ -65,7 +65,6 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
 	$(top_srcdir)/libltdl/m4/ltversion.m4 \
 	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
-	$(top_srcdir)/libltdl/m4/tinymush.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -263,6 +262,7 @@ LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTDLDEPS = @LTDLDEPS@
@@ -273,15 +273,12 @@ LT_CONFIG_H = @LT_CONFIG_H@
 LT_DLLOADERS = @LT_DLLOADERS@
 LT_DLPREOPEN = @LT_DLPREOPEN@
 MAKEINFO = @MAKEINFO@
-MALLOC_O = @MALLOC_O@
-MALLOC_S = @MALLOC_S@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OPTIM_F = @OPTIM_F@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -296,8 +293,6 @@ RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-SQL_I = @SQL_I@
-SQL_O = @SQL_O@
 STRIP = @STRIP@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
@@ -358,11 +353,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I libltdl/m4
-#ACLOCAL_AUXDIR  = @ac_aux_dir@
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_6)
 SUBDIRS = libltdl $(am__append_1) $(am__append_5) $(am__append_9) \
 	$(am__append_10) $(am__append_11)
-#DIST_SUBDIRS = libltdl/
 TEXT_DIR = $(srcdir)/text
 TEXT_SRC = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt \
 	$(TEXT_DIR)/down.txt $(TEXT_DIR)/full.txt $(TEXT_DIR)/guest.txt $(TEXT_DIR)/help.txt \
@@ -398,7 +391,7 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 	udb.h udb_defs.h vattr.h walkdb.h
 
 EXTRA_netmush_SOURCES = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h malloc.c mcheck.c mstats.c mtrace.c
-netmush_LDFLAGS = -export-dynamic -static
+netmush_LDFLAGS = -export-dynamic
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 	$(SQL_O) $(MALLOC_O) $(am__append_3) $(am__append_7)
 netmush_DEPENDENCIES = $(LTDLDEPS) $(SQL_O) 
@@ -1162,6 +1155,9 @@ install-data-local:
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
 	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
+
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status libtool
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

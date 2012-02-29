@@ -966,21 +966,6 @@ CMDENT		command_table[] =
         NULL, NULL, NULL, {do_shutdown}
     },
     {
-        (char *)"@sql", NULL, CA_SQL_OK,
-        0, CS_ONE_ARG,
-        NULL, NULL, NULL, {do_sql}
-    },
-    {
-        (char *)"@sqlconnect", NULL, CA_WIZARD,
-        0, CS_NO_ARGS,
-        NULL, NULL, NULL, {do_sql_connect}
-    },
-    {
-        (char *)"@sqldisconnect", NULL, CA_WIZARD,
-        0, CS_NO_ARGS,
-        NULL, NULL, NULL, {sql_shutdown}
-    },
-    {
         (char *)"@stats", stats_sw, CA_PUBLIC,
         0, CS_ONE_ARG | CS_INTERP,
         NULL, NULL, NULL, {do_stats}
@@ -1284,7 +1269,6 @@ NAMETAB		access_nametab[] =
     {(char *)"no_slave", 5, CA_PUBLIC, CA_NO_SLAVE},
     {(char *)"no_suspect", 5, CA_WIZARD, CA_NO_SUSPECT},
     {(char *)"no_guest", 5, CA_WIZARD, CA_NO_GUEST},
-    {(char *)"sql", 2, CA_GOD, CA_SQL_OK},
     {(char *)"staff", 3, CA_WIZARD, CA_STAFF},
     {(char *)"static", 3, CA_GOD, CA_STATIC},
     {(char *)"wizard", 3, CA_WIZARD, CA_WIZARD},

@@ -10,7 +10,6 @@
 #include "functions.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "command.h"		/* required by code */
-#include "db_sql.h"		/* required by code */
 
 extern void FDECL(make_ulist, (dbref, char *, char **));
 
@@ -205,33 +204,6 @@ FUNCTION(fun_helptext)
     }
     help_helper(player, (cmdp->extra & ~HELP_RAWHELP),
                 (cmdp->extra & HELP_RAWHELP) ? 0 : 1, fargs[1], buff, bufc);
-}
-
-/*---------------------------------------------------------------------------
- * SQL stuff.
- */
-
-FUNCTION(fun_sql)
-{
-    Delim row_delim, field_delim;
-
-    /*
-     * Special -- the last two arguments are output delimiters
-     */
-
-    VaChk_Range(1, 3);
-
-    VaChk_Sep(&row_delim, 2, DELIM_STRING | DELIM_NULL | DELIM_CRLF);
-    if (nfargs < 3)
-    {
-        Delim_Copy(&field_delim, &row_delim);
-    }
-    else
-    {
-        VaChk_Sep(&field_delim, 3,
-                  DELIM_STRING | DELIM_NULL | DELIM_CRLF);
-    }
-    sql_query(player, fargs[0], buff, bufc, &row_delim, &field_delim);
 }
 
 /*---------------------------------------------------------------------------

@@ -11,10 +11,10 @@
 #include "db.h"			/* required by externs */
 #include "externs.h"		/* required by code */
 
-#ifdef MUSH_DBM_GDBM
+#ifdef HAVE_LIBTINYGDBM_H
 #include "libtinygdbm.h"	/* required by code */
 #else      
-#ifdef MUSH_DBM_QDBM
+#ifdef HAVE_LIBTINYQDBM_H
 #include "libtinyqdbm.h"	/* required by code */
 #endif
 #endif

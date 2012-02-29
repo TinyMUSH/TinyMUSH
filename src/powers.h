@@ -49,7 +49,7 @@
 #define POW_LINKVAR	0x00000002	/* Can link an exit to "variable" */
 #define POW_LINKTOANY	0x00000004	/* Can link to any object */
 #define POW_OPENANYLOC	0x00000008	/* Can open from anywhere */
-#define POW_USE_SQL	0x00000010	/* Can use SQL queries directly */
+#define POW_USE_MODULE	0x00000010	/* Can use MODULE queries directly */
 #define POW_LINKHOME	0x00000020	/* Can link object to any home */
 #define POW_CLOAK	0x00000040	/* Can vanish from sight via DARK */
 
@@ -149,6 +149,6 @@ extern void	FDECL(decompile_powers, (dbref, dbref, char *));
 #define LinkAnyHome(c)		(((Powers2(c) & POW_LINKHOME) != 0) || Wizard(c))
 #define Open_Anywhere(c)	((Powers2(c) & POW_OPENANYLOC) != 0)
 #define Can_Cloak(c)		((Powers2(c) & POW_CLOAK) != 0)
-#define Can_Use_SQL(c)		((Powers2(c) & POW_USE_SQL) != 0)
+#define Can_Use_Module(c)	((Powers2(c) & POW_USE_MODULE) != 0)
 
 #endif /* __POWERS_H */

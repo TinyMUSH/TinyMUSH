@@ -1,28 +1,16 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-
 AC_PREREQ([2.68])
 
-dnl Autoconf define the following itself:
-
-dnl PACKAGE_NAME
-dnl PACKAGE_TARNAME
-dnl PACKAGE_VERSION
-dnl PACKAGE_STRING
-dnl PACKAGE_BUGREPORT
-dnl PACKAGE_URL
 AC_INIT([TinyMUSH], [3.3.0.0], [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
 dnl AC_INIT define the following itself:
-
 dnl PACKAGE_NAME
 dnl PACKAGE_TARNAME
 dnl PACKAGE_VERSION
 dnl PACKAGE_STRING
 dnl PACKAGE_BUGREPORT
 dnl PACKAGE_URL
-
 dnl With AX_SPLIT_VERSION, we define the following based on autoconf's values:
-
 dnl PACKAGE_VERSION_MAJOR
 dnl PACKAGE_VERSION_MINOR
 dnl PACKAGE_RELEASE_STATUS
@@ -37,10 +25,6 @@ PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
 dnl Some default values
 dnl
 with_included_ltdl="yes"
-dnl with_dbm="gdbm"
-dnl with_module_comsys="yes"
-dnl with_module_mail="yes"
-dnl with_module_hello="no"
 
 AC_COPYRIGHT([$PACKAGE_COPYRIGHT])
 AC_CONFIG_AUX_DIR([libltdl/config])
@@ -50,37 +34,27 @@ AC_CONFIG_MACRO_DIR([libltdl/m4])
 
 AX_PRINT_PACKAGE_TITLE()
 
-PRETTY_PRINT([configure], [$ac_configure_args], [1])
+AX_BOX([Initializing Automake])
 
-PRETTY_PRINT([configure], [Initializing Automake.], [1])
 AM_INIT_AUTOMAKE()
 
-PRETTY_PRINT([configure], [Initializing Libtools.], [1])
+AX_BOX([Initializing Libtools])
 
 LT_PREREQ([2.4])
 LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen])
+AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])
 
-# The lt_dladvise_init symbol was added with libtool-2.2
-if test "x$with_included_ltdl" != "xyes"; then
- save_CFLAGS="$CFLAGS"
- save_LDFLAGS="$LDFLAGS"
- CFLAGS="$CFLAGS $LTDLINCL"
- LDFLAGS="$LDFLAGS $LIBLTDL"
- AC_CHECK_LIB([ltdl], [lt_dladvise_init], [], [AC_MSG_ERROR([installed libltdl is too old])]) 
- LDFLAGS="$save_LDFLAGS"
- CFLAGS="$save_CFLAGS"
-fi
+AX_BOX([Checks for Options])
 
+dnl XXX // This really need to be check...
 
-PRETTY_PRINT([configure], [Checks for Options.], [1])
-
-AC_MSG_CHECKING(for configuration prefix)
+AC_MSG_CHECKING([configuration prefix])
  case "$prefix" in
   NONE) prefix=`pwd -P | sed 's:/[[^/]]*$::'`/game;;
  esac
-AC_MSG_RESULT($prefix)
+AC_MSG_RESULT([$prefix])
 
 AH_TOP([#ifndef __AUTOCONF_H
 #define __AUTOCONF_H
@@ -91,397 +65,158 @@ AH_BOTTOM([#include "autoinclude.h"
 
 #endif /* __AUTOCONF_H */])
 
-AC_MSG_CHECKING(dbm engine to use)
-AC_ARG_WITH(dbm,
-  [  --with-dbm=TYPE         Select the DBM driver used to save game data:
-                            gdbm : Use TinyMUSH-GDBM hash database driver.
-                                   This is the historical driver used by
-                                   most games. No it is not bogus. 
-                            qdbm : Use TinyMUSH-QDBM hash database driver.
-                                   A newer implementation of the DBM
-                                   engine, a compromise between gdbm and
-                                   memory-based cache.
-                          @<:@default=gdbm@:>@],
-  [
-    case "$withval" in
-      gdbm) AC_MSG_RESULT([TinyMUSH-GDBM])
-            with_dbm="gdbm";;
-      qdbm) AC_MSG_RESULT([TinyMUSH-QDBM])
-      	    with_dbm="qdbm";;
-      *)    with_dbm="gdbm"
-            AC_MSG_RESULT([TinyMUSH-GDBM]);;
-    esac
-  ], with_dbm="gdbm"
-     AC_MSG_RESULT([TinyMUSH-GDBM]))
+AC_MSG_CHECKING([dbm engine to use])
+AC_ARG_WITH([dbm],
+ [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use TinyMUSH-GDBM hash database driver, This is the historical driver used by most games or qdbm : Use TinyMUSH-QDBM hash database driver. A newer implementation of the DBM engine, a compromise between gdbm and memory-based cache. @<:@default=gdbm@:>@])],
+ [AS_CASE([$withval], [gdbm], [with_dbm="gdbm"], [qdbm], [with_dbm="qdbm"], [with_dbm="gdbm"])], 
+ [with_dbm="gdbm"])
+AC_MSG_RESULT([$with_dbm])
 
-if [test "x$with_dbm" = "xgdbm"]; then
- AC_DEFINE([MUSH_DBM_GDBM], [], [TinyMUSH-GDBM engine used])
-else 
- if [test "x$with_dbm" = "xqdbm"]; then
-  AC_DEFINE([MUSH_DBM_QDBM], [], [TinyMUSH-QDBM engine used])
- fi
-fi
+AS_IF([test "x$with_dbm" = "xqdbm"], 
+ [
+  AC_DEFINE([MUSH_DBM], ["QDBM"], [TinyQDBM dbm used])
+  AC_DEFINE([HAVE_LIBTINYQDBM_H], [1], [Define to 1 if you have <libtinyqdbm.h>.])
+ ], 
+ [
+  AC_DEFINE([MUSH_DBM], ["GDBM"], [TinyGDBM dbm used])
+  AC_DEFINE([HAVE_LIBTINYGDBM_H], [1], [Define to 1 if you have <libtinyqdbm.h>.])
+ ]
+)
 
 AM_CONDITIONAL([WANT_DBM_GDBM], [test "x$with_dbm" = "xgdbm"])
 AM_CONDITIONAL([WANT_DBM_QDBM], [test "x$with_dbm" = "xqdbm"])
 
-disk_based=true
-
-AC_MSG_CHECKING(whether to enable disk-based database)
-AC_ARG_ENABLE(disk-based,
-  [  --enable-disk-based     store the database on disk using a DBM hashfile,
-                          and cache some attributes in a limited amount of
-                          memory. The alternative is memory-based, where the
-                          database is kept in memory. Disk-based uses less
-                          memory. Disabling the disk-based cache can improve
-                          performance if enough memory is available.
-                          @<:@default=yesyes@:>@],
+AC_MSG_CHECKING([whether to enable disk-based database])
+AC_ARG_ENABLE([disk-based],
+ [AS_HELP_STRING([--enable-disk-based], [store the database on disk using a DBM hashfile, and cache some attributes in a limited amount of memory. The alternative is memory-based, where the database is kept in memory. Disabling the disk-based cache can improve performance if enough memory is available. @<:@default=yes@:>@])],
+ [AS_IF([test "x$enableval" = "xno"],
   [
-    if test "x$enableval" = "xno"; then
-      AC_DEFINE([MEMORY_BASED], [], [Enable memory-based DBM hashDB])
-      disk_based=false
-      AC_MSG_RESULT(no)
-    else
-      AC_MSG_RESULT(yes)
-    fi
-  ], [
-    AC_MSG_RESULT(yes)
-  ])
-
-AM_CONDITIONAL([WANT_DISK_BASED], [test x$disk_based = xtrue])
-
-AC_MSG_CHECKING(for module comsys)
-AC_ARG_WITH(module-comsys,
- [  --with-module-comsys    Enable module comsys. @<:@default=yes@:>@],
- [
-  case "$withval" in
-   no) with_module_comsys="no"
-       AC_MSG_RESULT(no);;
-    *) if test -d "modules/comsys"; then
-	with_module_comsys="yes"
-        AC_MSG_RESULT(yes)
-       else
-        with_module_comsys="no"
-        AC_MSG_RESULT(no)
-       fi;;
-  esac
- ], [
-  if test -d "modules/comsys"; then
-   with_module_comsys="yes"
-   AC_MSG_RESULT(yes)
-  else
-   with_module_comsys="no"
-   AC_MSG_RESULT(no)
-  fi
-  ])
-AM_CONDITIONAL([WANT_MODULE_COMSYS], [test "x$with_module_comsys" = "xyes"])
-
-AC_MSG_CHECKING(for module mail)
-AC_ARG_WITH(module-mail,
- [  --with-module-mail      Enable module mail. @<:@default=yes@:>@],
- [
-  case "$withval" in
-   no) with_module_mail="no"
-       AC_MSG_RESULT(no);;
-    *) if test -d "modules/mail"; then
-	with_module_mail="yes"
-        AC_MSG_RESULT(yes)
-       else
-        with_module_mail="no"
-        AC_MSG_RESULT(no)
-       fi;;
-  esac
- ], [
-  if test -d "modules/mail"; then
-   with_module_mail="yes"
-   AC_MSG_RESULT(yes)
-  else
-   with_module_mail="no"
-   AC_MSG_RESULT(no)
-  fi
- ])
-AM_CONDITIONAL([WANT_MODULE_MAIL], [test "x$with_module_mail"="xyes"])
-
-AC_MSG_CHECKING(for module hello)
-AC_ARG_WITH(module-hello,
- [  --with-module-hello     Enable module hello. @<:@default=no@:>@],
- [
-  case "$withval" in
-   no) AC_MSG_RESULT(no)
-       with_module_hello="no";;
-    *) if test -d "modules/hello"; then
-	with_module_hello="yes"
-        AC_MSG_RESULT(yes)
-       else
-        AC_MSG_ERROR(not found)
-       fi;;
-  esac
- ], [
-  with_module_hello="no"
-  AC_MSG_RESULT(no)
- ])
-AM_CONDITIONAL([WANT_MODULE_HELLO], [test "x$with_module_hello"="xyes"])
-
-dnl XXX Modules below this line need to be checked XXX
-
-AC_MSG_CHECKING(whether to build with SQL support)
-AC_ARG_WITH(sql,
-  [  --with-sql=TYPE         build with support for SQL database connection
-                    (TYPE can be msql, mysql, pgsql, or sqlite3) [default=no]],
-  [
-    case "$withval" in
-      msql)    SQL_O="db_sql_msql.o"
-               AC_MSG_RESULT(msql) ;;
-      mysql)   SQL_O="db_sql_mysql.o"
-               AC_MSG_RESULT(mysql) ;;
-      pgsql)   SQL_O="db_sql_pgsql.o"
-               AC_MSG_RESULT(pgsql) ;;
-      sqlite3) SQL_O="db_sql_sqlite3.o"
-               AC_MSG_RESULT(sqlite3) ;;
-      *)       SQL_O="db_sql_empty.o"
-               AC_MSG_RESULT(no) ;;
-    esac
-  ], SQL_O="db_sql_empty.o"
-     AC_MSG_RESULT(no))
-AC_SUBST(SQL_O)
-
-AC_MSG_CHECKING(for location of SQL header files)
-AC_ARG_WITH(sql-inc,
-  [  --with-sql-inc=PATH     set the include path for SQL header files
-                          [default for msql=/usr/local/Hughes/include]
-                          [default for mysql=/usr/local/include/mysql]
-                          [default for pgsql=/usr/local/pgsql/include]
-                          [default for sqlite3=/usr/include]],
-  [
-    case "$with_sql" in
-      msql | mysql | pgsql | sqlite3) SQL_I="-I$withval"
-                      AC_MSG_RESULT($withval) ;;
-      *) AC_MSG_RESULT(none) ;;
-    esac
-  ], [
-    case "$with_sql" in
-      msql) SQL_I="-I/usr/local/Hughes/include"
-              AC_MSG_RESULT(/usr/local/Hughes/include) ;;
-      mysql) SQL_I="-I/usr/local/include/mysql"
-               AC_MSG_RESULT(/usr/local/include/mysql) ;;
-      pgsql) SQL_I="-I/usr/local/pgsql/include"
-               AC_MSG_RESULT(/usr/local/pgsql/include) ;;
-      sqlite3) SQL_I="-I/usr/include"
-               AC_MSG_RESULT(/usr/include) ;;
-      *) AC_MSG_RESULT(none) ;;
-    esac
-  ])
-AC_SUBST(SQL_I)
-
-AC_MSG_CHECKING(for location of SQL library files)
-AC_ARG_WITH(sql-libs,
-  [  --with-sql-libs=PATH    set the library path for SQL library files
-                          [default for msql=/usr/local/Hughes/lib]
-                          [default for mysql=/usr/local/lib/mysql]
-                          [default for pgsql=/usr/local/pgsql/lib]
-                          [default for sqlite3=/usr/lib]],
-  [
-    case "$with_sql" in
-      msql | mysql | pgsql | sqlite3) SQL_LIB="-L$withval"
-                      AC_MSG_RESULT($withval) ;;
-      *) AC_MSG_RESULT(none) ;;
-    esac
-  ], [
-    case "$with_sql" in
-      msql) SQL_LIB="-L/usr/local/Hughes/lib"
-              AC_MSG_RESULT(/usr/local/Hughes/lib) ;;
-      mysql) SQL_LIB="-L/usr/local/lib/mysql"
-               AC_MSG_RESULT(/usr/local/lib/mysql) ;;
-      pgsql) SQL_LIB="-L/usr/local/pgsql/lib"
-               AC_MSG_RESULT(/usr/local/pgsql/lib) ;;
-      sqlite3) SQL_LIB="-L/usr/lib"
-               AC_MSG_RESULT(/usr/lib) ;;
-      *) AC_MSG_RESULT(none) ;;
-    esac
-  ])
-
-AC_MSG_CHECKING(whether to build with DEBUG support)
-AC_ARG_WITH(debug,
-  [  --with-debug=FLAGS      set debug flags for the compiler. After we
-                          finish beta testing, we'll take away the debugging
-                          -g flag. If you don't use GCC, don't use -g. Add
-                          -pg for profiling (gprof netmush gmon.out)
-                          [default=-g]],
-  [
-	if test -z "$withval"; then
-	  AC_MSG_RESULT(none)
-	else
-          OPTIM_F=$withval
-	  AC_MSG_RESULT($OPTIM_F)
-	fi
-
+   AC_DEFINE([MEMORY_BASED], [], [Enable memory-based DBM hashDB])
+   AC_MSG_RESULT([no])
   ],
   [
-	OPTIM_F="-g"
-	AC_MSG_RESULT($OPTIM_F)
+   AC_MSG_RESULT([yes])
   ]
+ )],
+ [AC_MSG_RESULT([yes])]
 )
-AC_SUBST(OPTIM_F)
 
-AC_MSG_CHECKING(for which version of malloc to use)
-AC_ARG_WITH(malloc,
-  [  --with-malloc=TYPE      build with a particular malloc package.
-                          TYPE can be sys (use your system libraries),
-                          gnu (use our copy of GNU malloc), or trace (use
-                          our GNU malloc with mtrace turned on). If your
-                          system malloc library is broken for some reason,
-                          try gnu. Don't use trace unless you're debugging
-                          a memory leak or corruption problem and you're
-                          willing to put up with the performance hit. Try
-                          using Purify (make netmush-pure) if you have it.
-                          [default=sys]],
-  [
-     case "$withval" in
-       gnu)
-         MALLOC_S="malloc.c"
-         MALLOC_O="malloc.o"
-         AC_MSG_RESULT(gnu)
-         ;;
-       trace)
-         MALLOC_S="malloc.c mcheck.c mstats.c mtrace.c"
-         MALLOC_O="malloc.o mcheck.o mstats.o mtrace.o"
-         AC_DEFINE(MCHECK, [], [--- ADD DESCRIPTION ---])
-         AC_DEFINE(MTRACE_FILE, "mtrace.out", [--- ADD DESCRIPTION ---])
-         AC_MSG_RESULT(trace)
-         ;;
-      *)
-         AC_MSG_RESULT(sys)
-         ;;
-     esac 
-  ], AC_MSG_RESULT(sys))
-AC_SUBST(MALLOC_S)
-AC_SUBST(MALLOC_O)
+AC_MSG_CHECKING([whether the comsys module is enable])
+AC_ARG_ENABLE([module-comsys], [ 
+  AS_HELP_STRING([--enable-module-comsys], [Enable support for the comsys module @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [
+  AC_MSG_RESULT([yes])
+  enable_module_comsys="yes"
+ ]
+)
+AM_CONDITIONAL([WANT_MODULE_COMSYS], [test "x$enable_module_comsys" = "xyes"])
 
-AC_MSG_CHECKING(whether to build with Pueblo support)
-AC_ARG_ENABLE(pueblo,
-  [  --enable-pueblo         build with support for Pueblo client
-                          [default=yes]],
-  [
-    if test "x$enableval" = "xno"; then
-      AC_MSG_RESULT(no)
-    else
-      AC_DEFINE(PUEBLO_SUPPORT, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(yes)
-    fi
-  ], AC_DEFINE(PUEBLO_SUPPORT, [], [--- ADD DESCRIPTION ---])
-       AC_MSG_RESULT(yes))
+AC_MSG_CHECKING([whether the mail module is enable])
+AC_ARG_ENABLE([module-mail], [ 
+  AS_HELP_STRING([--enable-module-mail], [Enable support for the mail module @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [
+  AC_MSG_RESULT([yes])
+  enable_module_mail="yes"
+ ]
+)
+AM_CONDITIONAL([WANT_MODULE_MAIL], [test "x$enable_module_mail" = "xyes"])
 
-AC_MSG_CHECKING(whether to use floating-point math)
-AC_ARG_ENABLE(fpmath,
-  [  --enable-fpmath         build math functions (lt, gt, add, etc.) with
-                          IEEE 754 floating-point support instead of allowing
-                          only integer calculations [default=yes]],
-  [
-    if test "x$enableval" = "xno"; then
-      AC_MSG_RESULT(no)
-    else
-      AC_DEFINE(FLOATING_POINTS, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(yes)
-    fi
-  ], AC_DEFINE(FLOATING_POINTS, [], [--- ADD DESCRIPTION ---])
-       AC_MSG_RESULT(yes))
+AC_MSG_CHECKING([whether the hello module is enable])
+AC_ARG_ENABLE([module-hello], [ 
+  AS_HELP_STRING([--enable-module-hello], [Enable support for the hello module @<:@default=no@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [
+  AC_MSG_RESULT([no])
+  enable_module_hello="no"
+ ]
+)
+AM_CONDITIONAL([WANT_MODULE_HELLO], [test "x$enable_module_hello" = "xyes"])
 
-AC_MSG_CHECKING(whether to enable command lag detection)
-AC_ARG_ENABLE(lag-checking,
-  [  --enable-lag-checking   enable warnings that a certain command has
-                          exceeded a certain amount of wall-clock time to
-                          execute. Disable this if you have severe problems
-                          with computational resources on your host machine.
-                          [default=yes]],
-  [
-    if test "x$enableval" = "xno"; then
-      AC_DEFINE(NO_LAG_CHECK, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(no)
-    else
-      AC_MSG_RESULT(yes)
-    fi
-  ], AC_MSG_RESULT(yes))
+dnl XXX Modukles below this line need to be checked XXX
+AC_MSG_CHECKING([whether to enable pueblo support])
+AC_ARG_ENABLE([pueblo-support], [ 
+  AS_HELP_STRING([--enable-pueblo-support], [Enable support for Pueblo clients @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [ 
+  AC_MSG_RESULT([yes])
+  enable_pueblo_support="yes"
+ ]
+)
+AS_IF([test "x$enable_pueblo_support" = "xyes"], [AC_DEFINE([PUEBLO_SUPPORT],[], [Support for Pueblo Clients])])
 
-AC_MSG_CHECKING(whether to enable per-object time usage tracking)
-AC_ARG_ENABLE(time-checking,
-  [  --enable-time-checking  enable tracking of the amount of wall-clock time
-                          that individual objects are using. Disable this
-                          if you have severe problems with computational
-                          resources on your host machine. (This is assumed to
-                          be disabled if lag-checking is disabled)
-                          [default=yes]],
-  [
-    if test "x$enableval" = "xno"; then
-      AC_DEFINE(NO_TIMECHECKING, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(no)
-    else
-      AC_MSG_RESULT(yes)
-    fi
-  ], AC_MSG_RESULT(yes))
+AC_MSG_CHECKING([whether to enable IEEE 754 floating point support])
+AC_ARG_ENABLE([floating-point], [
+  AS_HELP_STRING([--enable-floating-point], [Enable support for math functions (lt, gt, add, etc.) with IEEE 754 floating-point support @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [ 
+  AC_MSG_RESULT([yes])
+  enable_floating_point="yes"
+ ]
+)
+AS_IF([test "x$enable_floating_point" = "xyes"], [AC_DEFINE([FLOATING_POINTS],[], [Support for IEEE 754 floating-point])])
 
-AC_MSG_CHECKING(whether to enable cpu time checking)
-AC_ARG_ENABLE(cpu-checking,
-  [  --enable-cpu-checking   for lag-checking and time-checking features,
-                          use CPU time reported with getrusage() instead
-                          of tracking wall-clock time. This is more accurate
-                          but also more computationally expensive
-                          [default=no]],
-  [
-    if test "x$enableval" = "xno"; then
-      AC_MSG_RESULT(no)
-    else
-      AC_DEFINE(TRACK_USER_TIME, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(yes)
-    fi
-  ], AC_MSG_RESULT(no))
+AC_MSG_CHECKING([whether to enable command lag detection support])
+AC_ARG_ENABLE([lag-checking], [
+  AS_HELP_STRING([--enable-lag-checking], [Enable warnings that a certain command has exceeded a certain amount of wall-clock time to execute. Disable this if you have severe problems with computational resources on your host machine. @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [ 
+  AC_MSG_RESULT([yes])
+  enable_lag_checking="yes"
+ ]
+)
+AS_IF([test "x$enable_lag_checking" = "xno"], [AC_DEFINE([NO_LAG_CHECK],[], [Support for command lag detection support])])
 
-AC_MSG_CHECKING(whether to enable malloc-wrapper macros)
-AC_ARG_ENABLE(malloc-wrapper,
-  [  --enable-malloc-wrapper=TYPE
-                          use wrapper macros for malloc(), free(), and
-                          related functions to do one of the following,
-                          which can help identify memory leaks:
-                          track - maintain a tagged list of memory
-                                  allocated for purposes other than the
-                                  buffer pool (see @list raw_memory)
-                          log   - print log messages when the functions
-                                  are called. This is spammy; try other
-                                  debugging tools first
-                          [default=no]],
-  [
-    case "$enableval" in
-    trac*)
-      AC_DEFINE(RAW_MEMTRACKING, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(tracking) ;;
-    log*)
-      AC_DEFINE(TEST_MALLOC, [], [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(logging) ;;
-    *)
-      AC_MSG_RESULT(no) ;;
-    esac
-  ], AC_MSG_RESULT(no))
+AC_MSG_CHECKING([whether to enable per-object time usage tracking])
+AC_ARG_ENABLE([time-checking], [
+  AS_HELP_STRING([--enable-time-checking], [Enable tracking of the amount of wall-clock time that individual objects are using. Disable this if you have severe problems with computational resources on your host machine. (This is assumed to be disabled if lag-checking is disabled) @<:@default=yes@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [ 
+  AC_MSG_RESULT([yes])
+  enable_time_checking="yes"
+ ]
+)
+AS_IF([test "x$enable_time_checking" = "xno"], [AC_DEFINE([NO_TIMECHECKING],[], [Support for per-object time usage tracking])])
 
-AC_MSG_CHECKING(how many global registers to use)
-AC_ARG_WITH(global-regs,
-  [  --with-global-regs=N    use N global registers (%q0-%q9,%qa-%qz)
-                          N must be a number from 10 to 36. Set lower
-                          to conserve memory if you don't need all the
-                          possible registers [default=36]],
-  [
-    if test "$withval" -lt "10"; then
-      AC_DEFINE(MAX_GLOBAL_REGS, 10, [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(10)
-    elif test "$withval" -gt "36"; then
-      AC_DEFINE(MAX_GLOBAL_REGS, 36, [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT(36)
-    else
-      AC_DEFINE_UNQUOTED(MAX_GLOBAL_REGS, $withval, [--- ADD DESCRIPTION ---])
-        AC_MSG_RESULT($withval)
-    fi
-  ], AC_DEFINE(MAX_GLOBAL_REGS, 36, [--- ADD DESCRIPTION ---])
-       AC_MSG_RESULT(36))
+AC_MSG_CHECKING([whether to enable cpu time checking])
+AC_ARG_ENABLE([cpu-checking], [
+  AS_HELP_STRING([--enable-cpu-checking], [Enable CPU time reported with getrusage() instead of tracking wall-clock time for lag-checking and time-checking features. This is more accurate but also more computationally expensive. @<:@default=no@:>@])
+ ], [
+  AX_ENABLE_YESNO([$enableval])
+ ], [ 
+  AC_MSG_RESULT([no])
+  enable_cpu_checking="no"
+ ]
+)
+AS_IF([test "x$enable_cpu_checking" = "xyes"], [AC_DEFINE([TRACK_USER_TIME],[], [Support for cpu time checking])])
 
-PRETTY_PRINT([configure], [Checks for programs.], [1])
+AC_MSG_CHECKING([which malloc-wrapper macros to use])
+AC_ARG_WITH([malloc-wrapper],
+  AS_HELP_STRING([--with-malloc-wrapper=@<:@track|log@:>@], [Enable use of wrapper macros for malloc(), free(), and related functions to do one of the following, which can help identify memory leaks: track - maintain a tagged list of memory allocated for purposes other than the buffer pool. (see @list raw_memory) log - print log messages when the function are called. This is spammy; try other debugging tools first.]),
+  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[], [Support for cpu time checking]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[], [Support for cpu time checking]), [with_malloc_wrapper="none"])),
+  [with_malloc_wrapper="none"]
+)
+
+AC_MSG_CHECKING([how many global registers to use])
+AC_ARG_WITH([global-regs],
+  AS_HELP_STRING([--with-global-regs=N], [use N global registers (%q0-%q9,%qa-%qz) N must be a number from 10 to 36. Set lower to conserve memory if you don't need all the possible registers  @<:@default=36@:>@]),
+  AS_IF([ test "$withval" -lt "10" ], [with_global_regs=10], AS_IF([ test "$withval" -gt "36" ], [with_global_regs=36], [with_global_regs=$withval])),
+  [with_global_regs=36]
+)
+
+AC_MSG_RESULT([$with_global_regs])
+AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [$with_global_regs], [How many global registers to use])
+
+AX_BOX([Checks for programs])
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
@@ -491,98 +226,11 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
-PRETTY_PRINT([configure], [Checks for platform.], [1])
+AX_BOX([Checks for platform])
 # Checks for platform.
-dnl AC_ISC_POSIX
-dnl AC_MINIX
-dnl AC_AIX
 
-dnl Figure out preprocessor args to do 'make depend' stuff
-dnl MKDEP=""
-dnl AC_MSG_CHECKING(for preprocessor flag to list dependencies)
-dnl SAVECPPFLAGS="$CPPFLAGS"
-dnl CPPFLAGS="$SAVECPPFLAGS -xM1"
-dnl AC_TRY_CPP(,
-dnl   AC_MSG_RESULT(-xM1)
-dnl     MKDEP="$CPP -xM1",
-dnl   CPPFLAGS="$SAVECPPFLAGS -MM"
-dnl   AC_TRY_CPP(,
-dnl     AC_MSG_RESULT(-MM)
-dnl       MKDEP="$CPP -MM",
-dnl     CPPFLAGS="$SAVECPPFLAGS -M"
-dnl     AC_TRY_CPP(,
-dnl       AC_MSG_RESULT(-M)
-dnl         MKDEP="CPP -M",
-dnl       AC_MSG_RESULT(unknown))))
-dnl if test -z "$MKDEP"; then
-dnl   AC_MSG_CHECKING(for compiler flag to list dependencies)
-dnl   CPPFLAGS="$SAVECPPFLAGS -MM"
-dnl   AC_TRY_COMPILE(,,
-dnl     AC_MSG_RESULT(-MM)
-dnl       MKDEP="$CC -MM",
-dnl     CPPFLAGS="$SAVECPPFLAGS -M"
-dnl     AC_TRY_COMPILE(,,
-dnl       AC_MSG_RESULT(-M)
-dnl         MKDEP="$CC -M",
-dnl       AC_MSG_RESULT(unknown)))
-dnl fi
-dnl CPPFLAGS="$SAVECPPFLAGS"
-dnl if test -z "$MKDEP"; then
-dnl   AC_PATH_PROG(MKDEP, mkdep, :)
-dnl   MKDEP="$MKDEP -f -"
-dnl fi
-dnl AC_SUBST(MKDEP)
-
-PRETTY_PRINT([configure], [Checks for libraries.], [1])
+AX_BOX([Checks for libraries])
 # Checks for libraries.
-
-dnl case "$with_sql" in
-dnl   msql)
-dnl     LDFLAGS="$SQL_LIB $LDFLAGS"
-dnl     AC_CHECK_LIB(msql, main,
-dnl       LIBS="$SQL_LIB -lmsql $LIBS",
-dnl       AC_MSG_ERROR(unable to build with msql), ) ;;
-dnl   mysql)
-dnl     LDFLAGS="$SQL_LIB $LDFLAGS"
-dnl     AC_CHECK_LIB(z, compress)
-dnl     AC_CHECK_LIB(mysqlclient, mysql_real_connect,
-dnl       LIBS="$SQL_LIB -lmysqlclient $LIBS",
-dnl       AC_MSG_ERROR(unable to build with mysql), ) ;;
-dnl   pgsql)
-dnl     LDFLAGS="$SQL_LIB $LDFLAGS"
-dnl     AC_CHECK_LIB(pq, PQconnectdb,
-dnl       LIBS="$SQL_LIB -lpq $LIBS",
-dnl       AC_MSG_ERROR(unable to build with pgsql), ) ;;
-dnl   sqlite3)
-dnl     LDFLAGS="$SQL_LIB $LDFLAGS"
-dnl     AC_CHECK_LIB(sqlite3, sqlite3_open,
-dnl       LIBS="$SQL_LIB -lsqlite3 $LIBS",
-dnl       AC_MSG_ERROR(unable to build with sqlite3), ) ;;
-dnl esac
-
-dnl How to build GDBM if needed.
-dnl AC_DEFUN([BUILD_GDBM], [
-dnl
-dnl  PRETTY_PRINT([configure], [TinyGDBM library not found, building it.], 1)
-dnl  
-dnl   cd gdbm-1.8.3/
-dnl   make distclean
-dnl  ./configure --disable-shared --enable-static
-dnl  make
-dnl  cd ..
-dnl
-dnl  PRETTY_PRINT([configure], [TinyGDBM build done], 1)
-dnl
-dnl  LIBS="-L./gdbm-1.8.3/.libs -ltinygdbm $LIBS"
-dnl  LIBSINC="-I./gdbm-1.8.3"
-dnl
-dnl ])
-
-dnl INCDBM="@srcdir@/dbm/gdbm"
-
-dnl LDFLAGS="-L./dbm/gdbm/.libs $LDFLAGS"
-dnl LIBS="-L./dbm/gdbm/.libs -llibtinygdbm $LIBS"
-dnl  AC_CHECK_LIB(tinygdbm, main, LIBS="-L./gdbm-1.8.3/.libs -ltinygdbm $LIBS", LIBSINC="-I./gdbm-1.8.3" [BUILD_GDBM], )
 
 AC_CHECK_LIB(crypt, main)
 AC_CHECK_LIB(resolv, main)
@@ -592,9 +240,8 @@ AC_CHECK_LIB(inet, gethostbyaddr)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(dbm, main)
 AC_CHECK_LIB(ndbm, main)
-dnl AC_CHECK_LIB(ltdl, lt_dlopen, LIBS="-lltdl $LIBS", AC_MSG_ERROR(unable to build with ltdl), )
 
-PRETTY_PRINT([configure], [Checks for header files.], [1])
+AX_BOX([Checks for header files.])
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h])
 
@@ -685,7 +332,7 @@ char **argv;
   AC_DEFINE([BROKEN_GCC_PADDING], [], [--- ADD DESCRIPTION ---])
     AC_MSG_RESULT(unable to test... assuming yes))
     
-PRETTY_PRINT([configure], [Checks for typedefs, structures, and compiler characteristics.], [1])
+AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_HEADER_STDC
@@ -704,7 +351,7 @@ AC_ST_BLKSIZE
 AC_CHECK_TYPES([ptrdiff_t])
 AC_CHECK_MEMBERS([struct stat.st_blksize])
 
-PRETTY_PRINT([configure], [Check for Declarations.], [1])
+AX_BOX([Check for Declarations.])
 # Check for Declarations
 AC_DECL_SYS_SIGLIST
 
@@ -764,7 +411,7 @@ AC_EGREP_HEADER(getrlimit,sys/resource.h,AC_MSG_RESULT(yes),AC_DEFINE(NEED_GETRL
 AC_MSG_CHECKING(for strtok_r dcl)
 AC_EGREP_HEADER(strtok_r,string.h,AC_MSG_RESULT(yes),AC_DEFINE(NEED_STRTOK_R_DCL, [], [--- ADD DESCRIPTION ---]) AC_MSG_RESULT(no))
 
-PRETTY_PRINT([configure], [Checks for library functions.], [1])
+AX_BOX([Checks for library functions.])
 # Checks for library functions.
 AC_FUNC_FORK
 dnl AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
@@ -776,7 +423,7 @@ AC_FUNC_VFORK
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii localtime_r memmove memset mkdir mktime munmap pow rename rmdir select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtol strtoul timelocal tzset vsnprintf wait3 wait4])
 
-PRETTY_PRINT([configure], [Writing configuration.], [1])
+AX_BOX([Writing configuration.])
 # Write results.
 AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
@@ -787,32 +434,18 @@ AC_CONFIG_FILES([dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile mod
 AC_OUTPUT
 
 AX_PRINT_PACKAGE_TITLE()
-PRETTY_PRINT([Game will be install in directory], [$prefix])
-echo
-if [test "x$with_dbm" = "xgdbm"]; then  
- PRETTY_PRINT([                       DBM Engine], [GDBM])
-fi 
+AX_PRINT([
+         Installation directory : %B$prefix%b
+                     DBM Engine : %B$with_dbm%b
+                  Module ComSYS : %B$enable_module_comsys%b
+                    Module Mail : %B$enable_module_mail%b
+                   Module Hello : %B$enable_module_hello%b
+                 Pueblo clients : %B$enable_pueblo_support%b
+IEEE 754 floating point support	: %B$enable_floating_point%b
+          Command lag detection : %B$enable_lag_checking%b
+ Per-object time usage tracking : %B$enable_time_checking%b
+              CPU time checking : %B$enable_cpu_checking%b
+                 Malloc Wrapper : %B$with_malloc_wrapper%b
+        global registers to use : %B$with_global_regs%b
 
-if [test "x$with_dbm" = "xqdbm"]; then
- PRETTY_PRINT([                       DBM Engine], [QDBM])
-fi
-
-if [test "x$with_module_comsys" = "xyes"]; then
- PRETTY_PRINT([                    Module ComSYS], [Enable])
-else
- PRETTY_PRINT([                    Module ComSYS], [Disable]) 
-fi
-
-if [test "x$with_module_mail" = "xyes"]; then
- PRETTY_PRINT([                      Module Mail], [Enable])
-else
- PRETTY_PRINT([                      Module Mail], [Disable])
-fi
-
-if [test "x$with_module_hello" = "xyes"]; then
- PRETTY_PRINT([                     Module Hello], [Enable])
-else
- PRETTY_PRINT([                     Module Hello], [Disable])
-fi
-echo
-PRETTY_PRINT([If everything is ok, you can now type %Bmake install%b to install the engine.])
+If everything is ok, you can now type %Bmake install%b to install the engine.])

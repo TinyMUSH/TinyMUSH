@@ -224,11 +224,6 @@ struct confdata
     char	*htmlconn_file;	/* display on PUEBLOCLIENT message */
 #endif
     char	*exec_path;	/* argv[0] */
-    char	*sql_host;	/* IP address of SQL database */
-    char	*sql_db;	/* Database to use */
-    char	*sql_username;	/* Username for database */
-    char	*sql_password;	/* Password for database */
-    int	sql_reconnect;	/* Auto-reconnect if connection dropped? */
     LINKEDLIST *infotext_list; /* Linked list of INFO fields and values */
     int	indent_desc;	/* Newlines before and after descs? */
     int	name_spaces;	/* allow player names to have spaces */
@@ -594,7 +589,6 @@ struct statedata
     char	*poutnew;	/* The output being build by the current command */
     char	*poutbufc; 	/* Buffer position for poutnew */
     dbref	poutobj;	/* Object doing the piping */
-    int	sql_socket;	/* Socket fd for SQL database connection */
     clock_t	cputime_base;	/* CPU baselined at beginning of command */
     clock_t	cputime_now;	/* CPU time recorded during command */
     const unsigned char *retabs; /* PCRE regexp tables */

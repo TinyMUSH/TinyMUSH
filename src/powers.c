@@ -212,7 +212,7 @@ POWERENT gen_powers[] =
     {(char *)"tel_anywhere",	POW_TEL_ANYWHR, 0, 0,	ph_wiz},
     {(char *)"tel_anything",	POW_TEL_UNRST,	0, 0,	ph_wiz},
     {(char *)"unkillable",		POW_UNKILLABLE, 0, 0,	ph_wiz},
-    {(char *)"use_sql",		POW_USE_SQL,	POWER_EXT, 0,	ph_god},
+    {(char *)"use_module",	POW_USE_MODULE,	POWER_EXT, 0,	ph_god},
     {(char *)"watch_logins",	POW_WATCH,	0, 0,	ph_wiz},
     {NULL,				0,		POWER_EXT, 0,	0}
 };
