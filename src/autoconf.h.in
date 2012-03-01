@@ -5,17 +5,38 @@
 
 #include "copyright.h"
 
-/* --- ADD DESCRIPTION --- */
+/* default bin dirname */
+#undef BIN_DIR
+
+/* Define if your GCC break small struct padding */
 #undef BROKEN_GCC_PADDING
 
-/* --- ADD DESCRIPTION --- */
+/* default config filename */
+#undef CONF_FILE
+
+/* default crash db filename */
+#undef CRASH_FILE
+
+/* default data dirname */
+#undef DATA_DIR
+
+/* default db filename */
+#undef DB_FILE
+
+/* length of the DOING field in WHO */
+#undef DOING_LEN
+
+/* Define if your <sys/socket.h> doesn't declares setsockopt */
 #undef EXTENDED_SOCKET_DCLS
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <stdio.h> doesn't declares fread */
 #undef EXTENDED_STDIO_DCLS
 
 /* Support for IEEE 754 floating-point */
 #undef FLOATING_POINTS
+
+/* How much hashing you want */
+#undef HASH_FACTOR
 
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
@@ -188,7 +209,7 @@
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/socket.h> declares `struct linger'. */
 #undef HAVE_LINGER
 
 /* Define to 1 if you have the `localtime_r' function. */
@@ -344,10 +365,6 @@
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
 
-/* Define to 1 if your `struct stat' has `st_blksize'. Deprecated, use
-   `HAVE_STRUCT_STAT_ST_BLKSIZE' instead. */
-#undef HAVE_ST_BLKSIZE
-
 /* Define to 1 if you have the <sys/dl.h> header file. */
 #undef HAVE_SYS_DL_H
 
@@ -363,7 +380,7 @@
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <signal.h> doesn't declares `sys_signame'. */
 #undef HAVE_SYS_SIGNAME
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
@@ -395,7 +412,7 @@
 /* Define to 1 if you have the `tzset' function. */
 #undef HAVE_TZSET
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/wait.h> declares `union wait'. */
 #undef HAVE_UNION_WAIT
 
 /* Define to 1 if you have the <unistd.h> header file. */
@@ -431,6 +448,9 @@
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
 
+/* default log filename */
+#undef LOG_FILE
+
 /* Define if the OS needs help to load dependent libraries for dlopen(). */
 #undef LTDL_DLOPEN_DEPLIBS
 
@@ -457,8 +477,20 @@
 /* Define to the shared library suffix, say, ".dylib". */
 #undef LT_SHARED_EXT
 
+/* sep. of dbref from marker flags */
+#undef MARK_FLAG_SEP
+
+/* max # args from command processor */
+#undef MAX_ARG
+
+/* Maximum length of a delimiter */
+#undef MAX_DELIM_LEN
+
 /* How many global registers to use */
 #undef MAX_GLOBAL_REGS
+
+/* max # of iter levels */
+#undef MAX_ITER_NESTING
 
 /* Enable memory-based DBM hashDB */
 #undef MEMORY_BASED
@@ -466,46 +498,46 @@
 /* TinyGDBM dbm used */
 #undef MUSH_DBM
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <unistd.h> doesn't declares getpagesize */
 #undef NEED_GETPAGESIZE_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/resource.h> doesn't declares getrlimit */
 #undef NEED_GETRLIMIT_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/resource.h> doesn't declares getrusage */
 #undef NEED_GETRUSAGE_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <time.h> doesn't declares gettimeofday */
 #undef NEED_GETTIMEOFDAY_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <stdlib.h> doesn't declares realloc */
 #undef NEED_MALLOC_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <errno.h> doesn't declares perror */
 #undef NEED_PERROR_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <stdlib.h> doesn't declares random */
 #undef NEED_RANDOM_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <stdio.h> doesn't declares sprintf */
 #undef NEED_SPRINTF_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <math.h> or <stdlib.h> doesn't declares srandom */
 #undef NEED_SRANDOM_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <string.h> doesn't declares strtok_r */
 #undef NEED_STRTOK_R_DCL
 
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <stdio.h> doesn't declares vsprintf */
 #undef NEED_VSPRINTF_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <wait.h> doesn't declares wait3 */
 #undef NEED_WAIT3_DCL
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <wait.h> doesn't declares wait3 */
 #undef NEED_WAIT4_DCL
 
 /* Support for command lag detection support */
@@ -516,6 +548,12 @@
 
 /* Support for per-object time usage tracking */
 #undef NO_TIMECHECKING
+
+/* Number of env vars (%0 et al) */
+#undef NUM_ENV_VARS
+
+/* Maximum output block size */
+#undef OUTPUT_BLOCK_SIZE
 
 /* Name of package */
 #undef PACKAGE
@@ -544,8 +582,17 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* default pid filename */
+#undef PID_FILE
+
+/* Max length for player names */
+#undef PLAYER_NAME_LIMIT
+
 /* Support for Pueblo Clients */
 #undef PUEBLO_SUPPORT
+
+/* Pueblo support message */
+#undef PUEBLO_SUPPORT_MSG
 
 /* Support for cpu time checking */
 #undef RAW_MEMTRACKING
@@ -553,13 +600,14 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/signal> handle signals correctly. */
 #undef SIGNAL_SIGCHLD_BRAINDAMAGE
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* --- ADD DESCRIPTION --- */
+/* Define if your <sys/resource.h> declares everything we need in `struct
+   rusage'. */
 #undef STRUCT_RUSAGE_COMPLETE
 
 /* Support for cpu time checking */
@@ -573,6 +621,9 @@
 
 /* Support for cpu time checking */
 #undef TRACK_USER_TIME
+
+/* default txt dirname */
+#undef TXT_DIR
 
 /* Version number of package */
 #undef VERSION

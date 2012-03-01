@@ -792,6 +792,24 @@ enable_time_checking
 enable_cpu_checking
 with_malloc_wrapper
 with_global_regs
+with_conf_file
+with_log_file
+with_pid_file
+with_db_file
+with_crash_file
+with_bin_dir
+with_txt_dir
+with_data_dir
+with_pname_length
+with_env_vars
+with_max_args
+with_max_iter
+with_max_delim
+with_flag_sep
+with_hash_factor
+with_max_output
+with_doing_length
+with_pueblo_msg
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1436,44 +1454,28 @@ Optional Features:
                           is kept in memory. Disabling the disk-based cache
                           can improve performance if enough memory is
                           available. [default=yes]
-
-    --enable-module-comsys  Enable support for the comsys module [default=yes]
-
-
-    --enable-module-mail    Enable support for the mail module [default=yes]
-
-
-    --enable-module-hello   Enable support for the hello module [default=no]
-
-
-    --enable-pueblo-support Enable support for Pueblo clients [default=yes]
-
-
-    --enable-floating-point Enable support for math functions (lt, gt, add,
+  --enable-module-comsys  Enable support for the comsys module [default=yes]
+  --enable-module-mail    Enable support for the mail module [default=yes]
+  --enable-module-hello   Enable support for the hello module [default=no]
+  --enable-pueblo-support Enable support for Pueblo clients [default=yes]
+  --enable-floating-point Enable support for math functions (lt, gt, add,
                           etc.) with IEEE 754 floating-point support
                           [default=yes]
-
-
-    --enable-lag-checking   Enable warnings that a certain command has exceeded
+  --enable-lag-checking   Enable warnings that a certain command has exceeded
                           a certain amount of wall-clock time to execute.
                           Disable this if you have severe problems with
                           computational resources on your host machine.
                           [default=yes]
-
-
-    --enable-time-checking  Enable tracking of the amount of wall-clock time
+  --enable-time-checking  Enable tracking of the amount of wall-clock time
                           that individual objects are using. Disable this if
                           you have severe problems with computational
                           resources on your host machine. (This is assumed to
                           be disabled if lag-checking is disabled)
                           [default=yes]
-
-
-    --enable-cpu-checking   Enable CPU time reported with getrusage() instead of
+  --enable-cpu-checking   Enable CPU time reported with getrusage() instead of
                           tracking wall-clock time for lag-checking and
                           time-checking features. This is more accurate but
                           also more computationally expensive. [default=no]
-
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1506,6 +1508,34 @@ Optional Packages:
                           number from 10 to 36. Set lower to conserve memory
                           if you don't need all the possible registers
                           [default=36]
+  --with-conf-file=NAME   default name of the config file
+                          [default=netmush.conf]
+  --with-log-file=NAME    default name of the log file [default=netmush.log]
+  --with-pid-file=NAME    default name of the pid file [default=netmush.pid]
+  --with-db-file=NAME     default name of the db file [default=netmush.db]
+  --with-crash-file=NAME  default name of the crash db file
+                          [default=netmush.db.crash]
+  --with-bin-dir=NAME     default name of the bin directory [default=$bindir]
+  --with-txt-dir=NAME     default name of the txt directory [default=$datadir]
+  --with-data-dir=NAME    default name of the data directory
+                          [default=$localstatedir]
+  --with-pname-length=LENGTH
+                          maximum length for player names [default=22]
+  --with-env-vars=NUMBER  Number of env vars (%0 et al) [default=10]
+  --with-max-args=MAX     Maximum number of args for command processor
+                          [default=100]
+  --with-max-iter=MAX     Maximum number of iter levels [default=1024]
+  --with-max-delim=MAX    Maximum lenght of a delimiter [default=128]
+  --with-flag-sep=CHAR    separator of dbref from marker flags [default=_]
+  --with-hash-factor=NUMBER
+                          Hash factor [default=2]
+  --with-max-output=NUMBER
+                          Maximum output block size [default=16384]
+  --with-doing-length=NUMBER
+                          length of the DOING field in WHO [default=41]
+  --with-pueblo-msg="TEXT"0
+                          Text that indicate Pueblo Support [default="This
+                          world is Pueblo 1.0 enhanced\r\n\r\n"]
 
 Some influential environment variables:
   CC          C compiler command
@@ -12949,9 +12979,9 @@ fi
 
 else
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-  enable_module_mail="yes"
+ enable_module_mail="yes"
 
 
 fi
@@ -13179,13 +13209,341 @@ else
 
 fi
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_global_regs" >&5
 $as_echo "$with_global_regs" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define MAX_GLOBAL_REGS $with_global_regs
 _ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the configuration" >&5
+$as_echo_n "checking default filename for the configuration... " >&6; }
+
+# Check whether --with-conf-file was given.
+if test "${with_conf_file+set}" = set; then :
+  withval=$with_conf_file; with_conf_file="$withval"
+else
+  with_conf_file="netmush.conf"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_conf_file" >&5
+$as_echo "$with_conf_file" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define CONF_FILE "$with_conf_file"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for logs" >&5
+$as_echo_n "checking default filename for logs... " >&6; }
+
+# Check whether --with-log-file was given.
+if test "${with_log_file+set}" = set; then :
+  withval=$with_log_file; with_log_file="$withval"
+else
+  with_log_file="netmush.log"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_log_file" >&5
+$as_echo "$with_log_file" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define LOG_FILE "$with_log_file"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the pid" >&5
+$as_echo_n "checking default filename for the pid... " >&6; }
+
+# Check whether --with-pid-file was given.
+if test "${with_pid_file+set}" = set; then :
+  withval=$with_pid_file; with_pid_file="$withval"
+else
+  with_pid_file="netmush.pid"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_pid_file" >&5
+$as_echo "$with_pid_file" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define PID_FILE "$with_pid_file"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the db" >&5
+$as_echo_n "checking default filename for the db... " >&6; }
+
+# Check whether --with-db-file was given.
+if test "${with_db_file+set}" = set; then :
+  withval=$with_db_file; with_db_file="$withval"
+else
+  with_db_file="netmush.db"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_db_file" >&5
+$as_echo "$with_db_file" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define DB_FILE "$with_db_file"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the crash db" >&5
+$as_echo_n "checking default filename for the crash db... " >&6; }
+
+# Check whether --with-crash-file was given.
+if test "${with_crash_file+set}" = set; then :
+  withval=$with_crash_file; with_crash_file="$withval"
+else
+  with_crash_file="netmush.db.crash"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_crash_file" >&5
+$as_echo "$with_crash_file" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define CRASH_FILE "$with_crash_file"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the bin directory" >&5
+$as_echo_n "checking default name for the bin directory... " >&6; }
+
+# Check whether --with-bin-dir was given.
+if test "${with_bin_dir+set}" = set; then :
+  withval=$with_bin_dir; with_bin_dir="$withval"
+else
+  with_bin_dir="$prefix/bin"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_bin_dir" >&5
+$as_echo "$with_bin_dir" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define BIN_DIR "$with_bin_dir"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the txt directory" >&5
+$as_echo_n "checking default name for the txt directory... " >&6; }
+
+# Check whether --with-txt-dir was given.
+if test "${with_txt_dir+set}" = set; then :
+  withval=$with_txt_dir; with_txt_dir="$withval"
+else
+  with_txt_dir="$prefix/txt"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_txt_dir" >&5
+$as_echo "$with_txt_dir" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define TXT_DIR "$with_txt_dir"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the data directory" >&5
+$as_echo_n "checking default name for the data directory... " >&6; }
+
+# Check whether --with-data-dir was given.
+if test "${with_data_dir+set}" = set; then :
+  withval=$with_data_dir; with_data_dir="$withval"
+else
+  with_data_dir="$prefix/data"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_data_dir" >&5
+$as_echo "$with_data_dir" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define DATA_DIR "$with_data_dir"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum length for player names" >&5
+$as_echo_n "checking maximum length for player names... " >&6; }
+
+# Check whether --with-pname-length was given.
+if test "${with_pname_length+set}" = set; then :
+  withval=$with_pname_length; with_pname_length=$withval
+else
+  with_pname_length=22
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_pname_length" >&5
+$as_echo "$with_pname_length" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define PLAYER_NAME_LIMIT $with_pname_length
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking number of env vars" >&5
+$as_echo_n "checking number of env vars... " >&6; }
+
+# Check whether --with-env-vars was given.
+if test "${with_env_vars+set}" = set; then :
+  withval=$with_env_vars; with_env_vars=$withval
+else
+  with_env_vars=10
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_env_vars" >&5
+$as_echo "$with_env_vars" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define NUM_ENV_VARS $with_env_vars
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum number of args for command processor" >&5
+$as_echo_n "checking maximum number of args for command processor... " >&6; }
+
+# Check whether --with-max-args was given.
+if test "${with_max_args+set}" = set; then :
+  withval=$with_max_args; with_max_args=$withval
+else
+  with_max_args=100
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_args" >&5
+$as_echo "$with_max_args" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define MAX_ARG $with_max_args
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum number of iter levels" >&5
+$as_echo_n "checking maximum number of iter levels... " >&6; }
+
+# Check whether --with-max-iter was given.
+if test "${with_max_iter+set}" = set; then :
+  withval=$with_max_iter; with_max_iter=$withval
+else
+  with_max_iter=1024
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_iter" >&5
+$as_echo "$with_max_iter" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define MAX_ITER_NESTING $with_max_iter
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum length of a delimiter" >&5
+$as_echo_n "checking maximum length of a delimiter... " >&6; }
+
+# Check whether --with-max-delim was given.
+if test "${with_max_delim+set}" = set; then :
+  withval=$with_max_delim; with_max_delim=$withval
+else
+  with_max_delim=128
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_delim" >&5
+$as_echo "$with_max_delim" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define MAX_DELIM_LEN $with_max_delim
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking separator of dbref from marker flags" >&5
+$as_echo_n "checking separator of dbref from marker flags... " >&6; }
+
+# Check whether --with-flag-sep was given.
+if test "${with_flag_sep+set}" = set; then :
+  withval=$with_flag_sep; with_flag_sep="$withval"
+else
+  with_flag_sep="_"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_flag_sep" >&5
+$as_echo "$with_flag_sep" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define MARK_FLAG_SEP "$with_flag_sep"
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for hash factor" >&5
+$as_echo_n "checking for hash factor... " >&6; }
+
+# Check whether --with-hash-factor was given.
+if test "${with_hash_factor+set}" = set; then :
+  withval=$with_hash_factor; with_hash_factor=$withval
+else
+  with_hash_factor=2
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_hash_factor" >&5
+$as_echo "$with_hash_factor" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define HASH_FACTOR $with_hash_factor
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for output block size" >&5
+$as_echo_n "checking for output block size... " >&6; }
+
+# Check whether --with-max-output was given.
+if test "${with_max_output+set}" = set; then :
+  withval=$with_max_output; with_max_output=$withval
+else
+  with_max_output=16384
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_output" >&5
+$as_echo "$with_max_output" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define OUTPUT_BLOCK_SIZE $with_max_output
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking length of the DOING field in WHO" >&5
+$as_echo_n "checking length of the DOING field in WHO... " >&6; }
+
+# Check whether --with-doing-length was given.
+if test "${with_doing_length+set}" = set; then :
+  withval=$with_doing_length; with_doing_length=$withval
+else
+  with_doing_length=41
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_doing_length" >&5
+$as_echo "$with_doing_length" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define DOING_LEN $with_doing_length
+_ACEOF
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Pueblo support message" >&5
+$as_echo_n "checking for Pueblo support message... " >&6; }
+
+# Check whether --with-pueblo-msg was given.
+if test "${with_pueblo_msg+set}" = set; then :
+  withval=$with_pueblo_msg; with_pueblo_msg="$withval"
+else
+  with_pueblo_msg="This world is Pueblo 1.0 enhanced\r\n\r\n"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_pueblo_msg" >&5
+$as_echo "$with_pueblo_msg" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define PUEBLO_SUPPORT_MSG "$with_pueblo_msg"
+_ACEOF
+
+
+
+
+
 
 
 as_nl='
@@ -13232,8 +13590,8 @@ sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
 _ASBOX
 $as_echo
 
-
 # Checks for programs.
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14656,252 +15014,7 @@ _ASBOX
 $as_echo
 
 # Checks for header files.
-for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h
-do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
-_ACEOF
 
-fi
-
-done
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct linger" >&5
-$as_echo_n "checking for struct linger... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-#include <sys/socket.h>
-int
-main ()
-{
-struct linger ling; ling.l_onoff = 1;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-$as_echo "#define HAVE_LINGER /**/" >>confdefs.h
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for union wait" >&5
-$as_echo_n "checking for union wait... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/wait.h>
-int
-main ()
-{
-union wait stat;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-$as_echo "#define HAVE_UNION_WAIT /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct rusage completeness" >&5
-$as_echo_n "checking for struct rusage completeness... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/resource.h>
-int
-main ()
-{
-struct rusage usage; usage.ru_ixrss = 1
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-$as_echo "#define STRUCT_RUSAGE_COMPLETE /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for signal SIGCHLD braindamage" >&5
-$as_echo_n "checking for signal SIGCHLD braindamage... " >&6; }
-if test "$cross_compiling" = yes; then :
-
-$as_echo "#define SIGNAL_SIGCHLD_BRAINDAMAGE /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unable to test... assuming yes" >&5
-$as_echo "unable to test... assuming yes" >&6; }
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <sys/types.h>
-#include <signal.h>
-
-#ifndef SIGCHLD
-#define SIGCHLD SIGCLD
-#endif
-
-int rlev;
-
-RETSIGTYPE sighand(sig)
-int sig;
-{
-  int stat;
-
-  if (rlev++ > 2)
-    exit(1);
-  signal(SIGCHLD, sighand);
-  wait(&stat);
-  return;
-}
-
-main(argc, argv)
-int argc;
-char **argv;
-{
-
-  rlev = 0;
-  signal(SIGCHLD, sighand);
-  if (fork()) {
-    sleep(10);
-  } else {
-    sleep(2);
-    exit(1);
-  }
-  exit(0);
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-else
-
-$as_echo "#define SIGNAL_SIGCHLD_BRAINDAMAGE /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for broken small struct padding" >&5
-$as_echo_n "checking for broken small struct padding... " >&6; }
-if test "$cross_compiling" = yes; then :
-
-$as_echo "#define BROKEN_GCC_PADDING /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unable to test... assuming yes" >&5
-$as_echo "unable to test... assuming yes" >&6; }
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-main(argc, argv)
-int argc;
-char **argv;
-{
-  struct in_addr addr;
-  char *dq;
-
-  addr.s_addr = htonl(0x01020304);
-  dq = inet_ntoa(addr);
-  if (dq[0] != '1' || dq[1] != '.' || dq[2] != '2' || dq[3] != '.' ||
-      dq[4] != '3' || dq[5] != '.' || dq[6] != '4' || dq[7] != '\0')
-    return 1;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-else
-
-$as_echo "#define BROKEN_GCC_PADDING /**/" >>confdefs.h
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-as_nl='
-'
-export as_nl
-# Printing a long string crashes Solaris 7 /usr/bin/printf.
-as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
-as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
-as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
-# Prefer a ksh shell builtin over an external printf program on Solaris,
-# but without wasting forks for bash or zsh.
-if test -z "$BASH_VERSION$ZSH_VERSION" \
-    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
-  as_echo='print -r --'
-  as_echo_n='print -rn --'
-elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
-  as_echo='printf %s\n'
-  as_echo_n='printf %s'
-else
-  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
-    as_echo_body='eval /usr/ucb/echo -n "Checks for typedefs, structures, and compiler characteristics.$as_nl"'
-    as_echo_n='/usr/ucb/echo -n'
-  else
-    as_echo_body='eval expr "XChecks for typedefs, structures, and compiler characteristics." : "X\\(.*\\)"'
-    as_echo_n_body='eval
-      arg=Checks for typedefs, structures, and compiler characteristics.;
-      case $arg in #(
-      *"$as_nl"*)
-	expr "X$arg" : "X\\(.*\\)$as_nl";
-	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
-      esac;
-      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
-    '
-    export as_echo_n_body
-    as_echo_n='sh -c $as_echo_n_body as_echo'
-  fi
-  export as_echo_body
-  as_echo='sh -c $as_echo_body as_echo'
-fi
-
-$as_echo
-sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
-## Checks for typedefs, structures, and compiler characteristics. ##
-_ASBOX
-$as_echo
-
-# Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
 $as_echo_n "checking for stdbool.h that conforms to C99... " >&6; }
 if ${ac_cv_header_stdbool_h+:} false; then :
@@ -15181,6 +15294,66 @@ if test $ac_cv_header_sys_wait_h = yes; then
 $as_echo "#define HAVE_SYS_WAIT_H 1" >>confdefs.h
 
 fi
+
+for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for typedefs, structures, and compiler characteristics.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for typedefs, structures, and compiler characteristics." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for typedefs, structures, and compiler characteristics.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
+
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Checks for typedefs, structures, and compiler characteristics. ##
+_ASBOX
+$as_echo
+
+# Checks for typedefs, structures, and compiler characteristics.
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for an ANSI C-conforming const" >&5
 $as_echo_n "checking for an ANSI C-conforming const... " >&6; }
@@ -15504,16 +15677,185 @@ $as_echo "#define HAVE_TZNAME 1" >>confdefs.h
   fi
 fi
 
-ac_fn_c_check_member "$LINENO" "struct stat" "st_blksize" "ac_cv_member_struct_stat_st_blksize" "$ac_includes_default"
-if test "x$ac_cv_member_struct_stat_st_blksize" = xyes; then :
+#AC_ST_BLKSIZE
 
-cat >>confdefs.h <<_ACEOF
-#define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct linger in sys/socket.h" >&5
+$as_echo_n "checking for struct linger in sys/socket.h... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/types.h>
+#include <sys/socket.h>
+int
+main ()
+{
+struct linger ling; ling.l_onoff = 1;
+  ;
+  return 0;
+}
 _ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+$as_echo "#define HAVE_LINGER /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for union wait in sys/wait.h" >&5
+$as_echo_n "checking for union wait in sys/wait.h... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/wait.h>
+int
+main ()
+{
+union wait stat;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+$as_echo "#define HAVE_UNION_WAIT /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct rusage completeness in sys/resource.h" >&5
+$as_echo_n "checking for struct rusage completeness in sys/resource.h... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/resource.h>
+int
+main ()
+{
+struct rusage usage; usage.ru_ixrss = 1
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+$as_echo "#define STRUCT_RUSAGE_COMPLETE /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for signal SIGCHLD braindamage in signal.h" >&5
+$as_echo_n "checking for signal SIGCHLD braindamage in signal.h... " >&6; }
+if test "$cross_compiling" = yes; then :
+
+$as_echo "#define SIGNAL_SIGCHLD_BRAINDAMAGE /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: unable to test... assuming yes" >&5
+$as_echo "unable to test... assuming yes" >&6; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/types.h>
+#include <signal.h>
+
+#ifndef SIGCHLD
+#define SIGCHLD SIGCLD
+#endif
+
+int rlev;
+
+RETSIGTYPE sighand(sig)
+int sig;
+{
+  int stat;
+
+  if (rlev++ > 2)
+    exit(1);
+  signal(SIGCHLD, sighand);
+  wait(&stat);
+  return;
+}
+
+main(argc, argv)
+int argc;
+char **argv;
+{
+
+  rlev = 0;
+  signal(SIGCHLD, sighand);
+  if (fork()) {
+    sleep(10);
+  } else {
+    sleep(2);
+    exit(1);
+  }
+  exit(0);
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+else
+
+$as_echo "#define SIGNAL_SIGCHLD_BRAINDAMAGE /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
 
 
-$as_echo "#define HAVE_ST_BLKSIZE 1" >>confdefs.h
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for broken small struct padding" >&5
+$as_echo_n "checking for broken small struct padding... " >&6; }
+if test "$cross_compiling" = yes; then :
 
+$as_echo "#define BROKEN_GCC_PADDING /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: unable to test... assuming yes" >&5
+$as_echo "unable to test... assuming yes" >&6; }
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+main(argc, argv)
+int argc;
+char **argv;
+{
+  struct in_addr addr;
+  char *dq;
+
+  addr.s_addr = htonl(0x01020304);
+  dq = inet_ntoa(addr);
+  if (dq[0] != '1' || dq[1] != '.' || dq[2] != '2' || dq[3] != '.' ||
+      dq[4] != '3' || dq[5] != '.' || dq[6] != '4' || dq[7] != '\0')
+    return 1;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+else
+
+$as_echo "#define BROKEN_GCC_PADDING /**/" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
 
@@ -15583,6 +15925,7 @@ _ASBOX
 $as_echo
 
 # Check for Declarations
+
 ac_fn_c_check_decl "$LINENO" "sys_siglist" "ac_cv_have_decl_sys_siglist" "#include <signal.h>
 /* NetBSD declares sys_siglist in unistd.h.  */
 #ifdef HAVE_UNISTD_H
@@ -15602,8 +15945,8 @@ _ACEOF
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys_signame decl" >&5
-$as_echo_n "checking for sys_signame decl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys_signame in signal.h" >&5
+$as_echo_n "checking for sys_signame in signal.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <signal.h>
@@ -15622,8 +15965,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpagesize dcl" >&5
-$as_echo_n "checking for getpagesize dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getpagesize in unistd.h" >&5
+$as_echo_n "checking for getpagesize in unistd.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <unistd.h>
@@ -15642,8 +15985,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for malloc dcl" >&5
-$as_echo_n "checking for malloc dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for realloc in stdlib.h" >&5
+$as_echo_n "checking for realloc in stdlib.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
@@ -15662,8 +16005,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for vsprintf dcl" >&5
-$as_echo_n "checking for vsprintf dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for vsprintf in stdio.h" >&5
+$as_echo_n "checking for vsprintf in stdio.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
@@ -15682,8 +16025,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sprintf dcl" >&5
-$as_echo_n "checking for sprintf dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sprintf in stdio.h" >&5
+$as_echo_n "checking for sprintf in stdio.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
@@ -15702,8 +16045,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for extended stdio dcls" >&5
-$as_echo_n "checking for extended stdio dcls... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fread in stdio" >&5
+$as_echo_n "checking for fread in stdio... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
@@ -15722,8 +16065,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for extended socket dcls" >&5
-$as_echo_n "checking for extended socket dcls... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for setsockopts in socket.h" >&5
+$as_echo_n "checking for setsockopts in socket.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/socket.h>
@@ -15742,10 +16085,10 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gettimeofday dcl" >&5
-$as_echo_n "checking for gettimeofday dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gettimeofday in time.h or sys/time.h" >&5
+$as_echo_n "checking for gettimeofday in time.h or sys/time.h... " >&6; }
 if test $ac_cv_header_time = yes && test $ac_cv_header_sys_time_h = yes ; then
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/time.h>
 
@@ -15776,7 +16119,7 @@ fi
 rm -f conftest*
 
 elif test $ac_cv_header_sys_time_h = yes ; then
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/time.h>
 
@@ -15794,7 +16137,7 @@ fi
 rm -f conftest*
 
 else
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <time.h>
 
@@ -15812,11 +16155,11 @@ fi
 rm -f conftest*
 
 fi
-if test $ac_cv_header_sys_wait_h = yes ; then
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for wait3 dcl" >&5
-$as_echo_n "checking for wait3 dcl... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+if test $ac_cv_header_sys_wait_h = yes ; then
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for wait3 in wait.h" >&5
+$as_echo_n "checking for wait3 in wait.h... " >&6; }
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/wait.h>
 
@@ -15834,9 +16177,9 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for wait4 dcl" >&5
-$as_echo_n "checking for wait4 dcl... " >&6; }
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for wait4 in wait.h" >&5
+$as_echo_n "checking for wait4 in wait.h... " >&6; }
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/wait.h>
 
@@ -15855,8 +16198,8 @@ rm -f conftest*
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for srandom dcl" >&5
-$as_echo_n "checking for srandom dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for srandom in math.h or stdlib.h" >&5
+$as_echo_n "checking for srandom in math.h or stdlib.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <math.h>
@@ -15888,8 +16231,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for random dcl" >&5
-$as_echo_n "checking for random dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for random in stdlib.h" >&5
+$as_echo_n "checking for random in stdlib.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
@@ -15908,8 +16251,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for perror dcl" >&5
-$as_echo_n "checking for perror dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for perror in errno.h" >&5
+$as_echo_n "checking for perror in errno.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <errno.h>
@@ -15928,8 +16271,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getrusage dcl" >&5
-$as_echo_n "checking for getrusage dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getrusage in sys/resource.h" >&5
+$as_echo_n "checking for getrusage in sys/resource.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/resource.h>
@@ -15948,8 +16291,8 @@ fi
 rm -f conftest*
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getrlimit dcl" >&5
-$as_echo_n "checking for getrlimit dcl... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for getrlimit sys/resource.h" >&5
+$as_echo_n "checking for getrlimit sys/resource.h... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <sys/resource.h>
@@ -16692,6 +17035,18 @@ fi
 done
 
 
+
+
+cat >>confdefs.h <<_ACEOF
+#define PACKAGE_CONFIG "$ac_configure_args"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define PACKAGE_RELEASE_DATE "$PACKAGE_RELEASE_DATE"
+_ACEOF
+
+
 as_nl='
 '
 export as_nl
@@ -16710,12 +17065,12 @@ elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
   as_echo_n='printf %s'
 else
   if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
-    as_echo_body='eval /usr/ucb/echo -n "Writing configuration.$as_nl"'
+    as_echo_body='eval /usr/ucb/echo -n "Configuring files.$as_nl"'
     as_echo_n='/usr/ucb/echo -n'
   else
-    as_echo_body='eval expr "XWriting configuration." : "X\\(.*\\)"'
+    as_echo_body='eval expr "XConfiguring files." : "X\\(.*\\)"'
     as_echo_n_body='eval
-      arg=Writing configuration.;
+      arg=Configuring files.;
       case $arg in #(
       *"$as_nl"*)
 	expr "X$arg" : "X\\(.*\\)$as_nl";
@@ -16732,25 +17087,56 @@ fi
 
 $as_echo
 sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
-## Writing configuration. ##
+## Configuring files. ##
 _ASBOX
 $as_echo
 
-# Write results.
-
-
-cat >>confdefs.h <<_ACEOF
-#define PACKAGE_CONFIG "$ac_configure_args"
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
-#define PACKAGE_RELEASE_DATE "$PACKAGE_RELEASE_DATE"
-_ACEOF
-
-
 ac_config_files="$ac_config_files dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile"
 
+
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Generating config.status.$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XGenerating config.status." : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Generating config.status.;
+      case $arg in #(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
+
+$as_echo
+sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
+## Generating config.status. ##
+_ASBOX
+$as_echo
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19341,34 +19727,110 @@ fi
 
 if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
+                           %BPath
+-------------------------------%b
          Installation directory : %B$prefix%b
+             Binaries directory : %B$with_bin_dir%b
+            Help Text directory : %B$with_txt_dir%b
+                 Data directory : %B$with_data_dir%b
+
+                      %BFilenames
+-------------------------------%b
+ default configuration filename : %B$with_conf_file%b
+           default log filename : %B$with_log_file%b
+           default pid filename : %B$with_pid_file%b
+            default db filename : %B$with_db_file%b
+         default crash filename : %B$with_crash_file%b
+
+                         %BLimits
+-------------------------------%b
+        Length for player names : %B$with_pname_length%b
+             Number of env vars : %B$with_env_vars%b
+         Args for cmd processor : %B$with_max_args%b
+          Number of iter levels : %B$with_max_iter%b
+        global registers to use : %B$with_global_regs%b
+          Lenght of a delimiter : %B$with_max_delim%b
+                    Hash factor : %B$with_hash_factor%b
+              Output block size : %B$with_max_output%b
+             DOING field length : %B$with_doing_length%b
+
+                        %BMarkers
+---------------------------------%b
+     separator for marker flags : %B$with_flag_sep%b
+         Pueblo support message : %B$with_pueblo_msg%b
+
+                       %BDatabase
+-------------------------------%b
                      DBM Engine : %B$with_dbm%b
+
+                        %BModules
+-------------------------------%b
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
                    Module Hello : %B$enable_module_hello%b
+
+                           %BMisc
+-------------------------------%b
                  Pueblo clients : %B$enable_pueblo_support%b
 IEEE 754 floating point support	: %B$enable_floating_point%b
           Command lag detection : %B$enable_lag_checking%b
  Per-object time usage tracking : %B$enable_time_checking%b
               CPU time checking : %B$enable_cpu_checking%b
                  Malloc Wrapper : %B$with_malloc_wrapper%b
-        global registers to use : %B$with_global_regs%b
 
 If everything is ok, you can now type %Bmake install%b to install the engine."
 else
   ${ac_aux_dir}/shtool echo -e "
+                           %BPath
+-------------------------------%b
          Installation directory : %B$prefix%b
+             Binaries directory : %B$with_bin_dir%b
+            Help Text directory : %B$with_txt_dir%b
+                 Data directory : %B$with_data_dir%b
+
+                      %BFilenames
+-------------------------------%b
+ default configuration filename : %B$with_conf_file%b
+           default log filename : %B$with_log_file%b
+           default pid filename : %B$with_pid_file%b
+            default db filename : %B$with_db_file%b
+         default crash filename : %B$with_crash_file%b
+
+                         %BLimits
+-------------------------------%b
+        Length for player names : %B$with_pname_length%b
+             Number of env vars : %B$with_env_vars%b
+         Args for cmd processor : %B$with_max_args%b
+          Number of iter levels : %B$with_max_iter%b
+        global registers to use : %B$with_global_regs%b
+          Lenght of a delimiter : %B$with_max_delim%b
+                    Hash factor : %B$with_hash_factor%b
+              Output block size : %B$with_max_output%b
+             DOING field length : %B$with_doing_length%b
+
+                        %BMarkers
+---------------------------------%b
+     separator for marker flags : %B$with_flag_sep%b
+         Pueblo support message : %B$with_pueblo_msg%b
+
+                       %BDatabase
+-------------------------------%b
                      DBM Engine : %B$with_dbm%b
+
+                        %BModules
+-------------------------------%b
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
                    Module Hello : %B$enable_module_hello%b
+
+                           %BMisc
+-------------------------------%b
                  Pueblo clients : %B$enable_pueblo_support%b
 IEEE 754 floating point support	: %B$enable_floating_point%b
           Command lag detection : %B$enable_lag_checking%b
  Per-object time usage tracking : %B$enable_time_checking%b
               CPU time checking : %B$enable_cpu_checking%b
                  Malloc Wrapper : %B$with_malloc_wrapper%b
-        global registers to use : %B$with_global_regs%b
 
 If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
 fi

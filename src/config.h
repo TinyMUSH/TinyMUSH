@@ -8,40 +8,9 @@
 
 /* Do not change anything unless you are certain you know what it does.
  * General user-definable compile-time options can be found in the
- * Makefile.
+ * configure script.
  */
 
-#define CONF_FILE  "netmush.conf"	/* Default config file */
-#define LOG_FILE   "netmush.log"	/* Default log file */
-#define PID_FILE   "netmush.pid"	/* Default pid file */
-#define BIN_DIR    "./bin"		/* Default binary directory */
-#define TXT_DIR    "./text"		/* Default text directory */
-#define DATA_DIR   "./data"		/* Default data directory */
-#define DB_FILE    "netmush.gdbm"	/* Default database name */
-#define CRASH_FILE "netmush.db.CRASH"	/* Default crash database name */
-
-#define PLAYER_NAME_LIMIT	22	/* Max length for player names */
-#define NUM_ENV_VARS		10	/* Number of env vars (%0 et al) */
-#define MAX_ARG			100	/* max # args from command processor */
-#define MAX_ITER_NESTING	1024	/* max # of iter levels */
-
-#ifndef MAX_GLOBAL_REGS
-#define MAX_GLOBAL_REGS		36	/* r() registers: must be 10 or 36 */ 
-#endif
-
-#ifndef MAX_DELIM_LEN
-#define MAX_DELIM_LEN		128	/* Maximum length of a delimiter. */
-#endif
-
-#define MARK_FLAG_SEP		'_'	/* sep. of dbref from marker flags */
-
-#define HASH_FACTOR		2	/* How much hashing you want. */
-
-#define OUTPUT_BLOCK_SIZE	16384
-
-#define DOING_LEN		41	/* length of the DOING field in WHO */
-
-#define PUEBLO_SUPPORT_MSG "This world is Pueblo 1.0 enhanced\r\n\r\n"
 
 /* ---------------------------------------------------------------------------
  * Database R/W flags.
