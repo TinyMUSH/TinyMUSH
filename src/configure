@@ -1533,7 +1533,7 @@ Optional Packages:
                           Maximum output block size [default=16384]
   --with-doing-length=NUMBER
                           length of the DOING field in WHO [default=41]
-  --with-pueblo-msg="TEXT"0
+  --with-pueblo-msg="TEXT"
                           Text that indicate Pueblo Support [default="This
                           world is Pueblo 1.0 enhanced\r\n\r\n"]
 
@@ -13213,7 +13213,7 @@ fi
 $as_echo "$with_global_regs" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define MAX_GLOBAL_REGS $with_global_regs
+#define MAX_GLOBAL_REGS ${with_global_regs}
 _ACEOF
 
 
@@ -13231,7 +13231,7 @@ fi
 $as_echo "$with_conf_file" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define CONF_FILE "$with_conf_file"
+#define CONF_FILE "${with_conf_file}"
 _ACEOF
 
 
@@ -13249,7 +13249,7 @@ fi
 $as_echo "$with_log_file" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define LOG_FILE "$with_log_file"
+#define LOG_FILE "${with_log_file}"
 _ACEOF
 
 
@@ -13267,7 +13267,7 @@ fi
 $as_echo "$with_pid_file" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define PID_FILE "$with_pid_file"
+#define PID_FILE "${with_pid_file}"
 _ACEOF
 
 
@@ -13285,7 +13285,7 @@ fi
 $as_echo "$with_db_file" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define DB_FILE "$with_db_file"
+#define DB_FILE "${with_db_file}"
 _ACEOF
 
 
@@ -13303,7 +13303,7 @@ fi
 $as_echo "$with_crash_file" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define CRASH_FILE "$with_crash_file"
+#define CRASH_FILE "${with_crash_file}"
 _ACEOF
 
 
@@ -13321,7 +13321,7 @@ fi
 $as_echo "$with_bin_dir" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define BIN_DIR "$with_bin_dir"
+#define BIN_DIR "${with_bin_dir}"
 _ACEOF
 
 
@@ -13339,7 +13339,7 @@ fi
 $as_echo "$with_txt_dir" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define TXT_DIR "$with_txt_dir"
+#define TXT_DIR "${with_txt_dir}"
 _ACEOF
 
 
@@ -13357,7 +13357,7 @@ fi
 $as_echo "$with_data_dir" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define DATA_DIR "$with_data_dir"
+#define DATA_DIR "${with_data_dir}"
 _ACEOF
 
 
@@ -13375,7 +13375,7 @@ fi
 $as_echo "$with_pname_length" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define PLAYER_NAME_LIMIT $with_pname_length
+#define PLAYER_NAME_LIMIT ${with_pname_length}
 _ACEOF
 
 
@@ -13393,7 +13393,7 @@ fi
 $as_echo "$with_env_vars" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define NUM_ENV_VARS $with_env_vars
+#define NUM_ENV_VARS ${with_env_vars}
 _ACEOF
 
 
@@ -13411,7 +13411,7 @@ fi
 $as_echo "$with_max_args" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define MAX_ARG $with_max_args
+#define MAX_ARG ${with_max_args}
 _ACEOF
 
 
@@ -13429,7 +13429,7 @@ fi
 $as_echo "$with_max_iter" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define MAX_ITER_NESTING $with_max_iter
+#define MAX_ITER_NESTING ${with_max_iter}
 _ACEOF
 
 
@@ -13447,7 +13447,7 @@ fi
 $as_echo "$with_max_delim" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define MAX_DELIM_LEN $with_max_delim
+#define MAX_DELIM_LEN ${with_max_delim}
 _ACEOF
 
 
@@ -13465,7 +13465,7 @@ fi
 $as_echo "$with_flag_sep" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define MARK_FLAG_SEP "$with_flag_sep"
+#define MARK_FLAG_SEP '${with_flag_sep}'
 _ACEOF
 
 
@@ -13483,7 +13483,7 @@ fi
 $as_echo "$with_hash_factor" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define HASH_FACTOR $with_hash_factor
+#define HASH_FACTOR ${with_hash_factor}
 _ACEOF
 
 
@@ -13501,7 +13501,7 @@ fi
 $as_echo "$with_max_output" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define OUTPUT_BLOCK_SIZE $with_max_output
+#define OUTPUT_BLOCK_SIZE ${with_max_output}
 _ACEOF
 
 
@@ -13519,7 +13519,7 @@ fi
 $as_echo "$with_doing_length" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define DOING_LEN $with_doing_length
+#define DOING_LEN ${with_doing_length}
 _ACEOF
 
 
@@ -13537,7 +13537,7 @@ fi
 $as_echo "$with_pueblo_msg" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define PUEBLO_SUPPORT_MSG "$with_pueblo_msg"
+#define PUEBLO_SUPPORT_MSG "${with_pueblo_msg}"
 _ACEOF
 
 

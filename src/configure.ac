@@ -200,97 +200,97 @@ AC_ARG_WITH([global-regs], [AS_HELP_STRING([--with-global-regs=N], [use N global
   [with_global_regs=36]
 )
 AC_MSG_RESULT([$with_global_regs])
-AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [$with_global_regs], [How many global registers to use])
+AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [${with_global_regs}], [How many global registers to use])
 
 AC_MSG_CHECKING([default filename for the configuration])
 AC_ARG_WITH([conf-file], [AS_HELP_STRING([--with-conf-file=NAME], [default name of the config file @<:@default=netmush.conf@:>@])], [with_conf_file="$withval"], [with_conf_file="netmush.conf"])
 AC_MSG_RESULT([$with_conf_file])
-AC_DEFINE_UNQUOTED([CONF_FILE], ["$with_conf_file"], [default config filename])
+AC_DEFINE_UNQUOTED([CONF_FILE], ["${with_conf_file}"], [default config filename])
 
 AC_MSG_CHECKING([default filename for logs])
 AC_ARG_WITH([log-file], [AS_HELP_STRING([--with-log-file=NAME], [default name of the log file @<:@default=netmush.log@:>@])], [with_log_file="$withval"], [with_log_file="netmush.log"])
 AC_MSG_RESULT([$with_log_file])
-AC_DEFINE_UNQUOTED([LOG_FILE], ["$with_log_file"], [default log filename])
+AC_DEFINE_UNQUOTED([LOG_FILE], ["${with_log_file}"], [default log filename])
 
 AC_MSG_CHECKING([default filename for the pid])
 AC_ARG_WITH([pid-file], [AS_HELP_STRING([--with-pid-file=NAME], [default name of the pid file @<:@default=netmush.pid@:>@])], [with_pid_file="$withval"], [with_pid_file="netmush.pid"])
 AC_MSG_RESULT([$with_pid_file])
-AC_DEFINE_UNQUOTED([PID_FILE], ["$with_pid_file"], [default pid filename])
+AC_DEFINE_UNQUOTED([PID_FILE], ["${with_pid_file}"], [default pid filename])
 
 AC_MSG_CHECKING([default filename for the db])
 AC_ARG_WITH([db-file], [AS_HELP_STRING([--with-db-file=NAME], [default name of the db file @<:@default=netmush.db@:>@])], [with_db_file="$withval"], [with_db_file="netmush.db"])
 AC_MSG_RESULT([$with_db_file])
-AC_DEFINE_UNQUOTED([DB_FILE], ["$with_db_file"], [default db filename])
+AC_DEFINE_UNQUOTED([DB_FILE], ["${with_db_file}"], [default db filename])
 
 AC_MSG_CHECKING([default filename for the crash db])
 AC_ARG_WITH([crash-file], [AS_HELP_STRING([--with-crash-file=NAME], [default name of the crash db file @<:@default=netmush.db.crash@:>@])], [with_crash_file="$withval"], [with_crash_file="netmush.db.crash"])
 AC_MSG_RESULT([$with_crash_file])
-AC_DEFINE_UNQUOTED([CRASH_FILE], ["$with_crash_file"], [default crash db filename])
+AC_DEFINE_UNQUOTED([CRASH_FILE], ["${with_crash_file}"], [default crash db filename])
 
 AC_MSG_CHECKING([default name for the bin directory])
 AC_ARG_WITH([bin-dir], [AS_HELP_STRING([--with-bin-dir=NAME], [default name of the bin directory @<:@default=$bindir@:>@])], [with_bin_dir="$withval"], [with_bin_dir="$prefix/bin"])
 AC_MSG_RESULT([$with_bin_dir])
-AC_DEFINE_UNQUOTED([BIN_DIR], ["$with_bin_dir"], [default bin dirname])
+AC_DEFINE_UNQUOTED([BIN_DIR], ["${with_bin_dir}"], [default bin dirname])
 
 AC_MSG_CHECKING([default name for the txt directory])
 AC_ARG_WITH([txt-dir], [AS_HELP_STRING([--with-txt-dir=NAME], [default name of the txt directory @<:@default=$datadir@:>@])], [with_txt_dir="$withval"], [with_txt_dir="$prefix/txt"])
 AC_MSG_RESULT([$with_txt_dir])
-AC_DEFINE_UNQUOTED([TXT_DIR], ["$with_txt_dir"], [default txt dirname])
+AC_DEFINE_UNQUOTED([TXT_DIR], ["${with_txt_dir}"], [default txt dirname])
 
 AC_MSG_CHECKING([default name for the data directory])
 AC_ARG_WITH([data-dir], [AS_HELP_STRING([--with-data-dir=NAME], [default name of the data directory @<:@default=$localstatedir@:>@])], [with_data_dir="$withval"], [with_data_dir="$prefix/data"])
 AC_MSG_RESULT([$with_data_dir])
-AC_DEFINE_UNQUOTED([DATA_DIR], ["$with_data_dir"], [default data dirname])
+AC_DEFINE_UNQUOTED([DATA_DIR], ["${with_data_dir}"], [default data dirname])
 
 AC_MSG_CHECKING([maximum length for player names])
 AC_ARG_WITH([pname-length], [AS_HELP_STRING([--with-pname-length=LENGTH], [maximum length for player names @<:@default=22@:>@])], [with_pname_length=$withval], [with_pname_length=22])
 AC_MSG_RESULT([$with_pname_length])
-AC_DEFINE_UNQUOTED([PLAYER_NAME_LIMIT], [$with_pname_length], [Max length for player names])
+AC_DEFINE_UNQUOTED([PLAYER_NAME_LIMIT], [${with_pname_length}], [Max length for player names])
 
 AC_MSG_CHECKING([number of env vars])
 AC_ARG_WITH([env-vars], [AS_HELP_STRING([--with-env-vars=NUMBER], [Number of env vars (%0 et al) @<:@default=10@:>@])], [with_env_vars=$withval], [with_env_vars=10])
 AC_MSG_RESULT([$with_env_vars])
-AC_DEFINE_UNQUOTED([NUM_ENV_VARS], [$with_env_vars], [Number of env vars (%0 et al)])
+AC_DEFINE_UNQUOTED([NUM_ENV_VARS], [${with_env_vars}], [Number of env vars (%0 et al)])
 
 AC_MSG_CHECKING([maximum number of args for command processor])
 AC_ARG_WITH([max-args], [AS_HELP_STRING([--with-max-args=MAX], [Maximum number of args for command processor @<:@default=100@:>@])], [with_max_args=$withval], [with_max_args=100])
 AC_MSG_RESULT([$with_max_args])
-AC_DEFINE_UNQUOTED([MAX_ARG], [$with_max_args], [max # args from command processor])
+AC_DEFINE_UNQUOTED([MAX_ARG], [${with_max_args}], [max # args from command processor])
 
 AC_MSG_CHECKING([maximum number of iter levels])
 AC_ARG_WITH([max-iter], [AS_HELP_STRING([--with-max-iter=MAX], [Maximum number of iter levels @<:@default=1024@:>@])], [with_max_iter=$withval], [with_max_iter=1024])
 AC_MSG_RESULT([$with_max_iter])
-AC_DEFINE_UNQUOTED([MAX_ITER_NESTING], [$with_max_iter], [max # of iter levels])
+AC_DEFINE_UNQUOTED([MAX_ITER_NESTING], [${with_max_iter}], [max # of iter levels])
 
 AC_MSG_CHECKING([maximum length of a delimiter])
 AC_ARG_WITH([max-delim], [AS_HELP_STRING([--with-max-delim=MAX], [Maximum lenght of a delimiter @<:@default=128@:>@])], [with_max_delim=$withval], [with_max_delim=128])
 AC_MSG_RESULT([$with_max_delim])
-AC_DEFINE_UNQUOTED([MAX_DELIM_LEN], [$with_max_delim], [Maximum length of a delimiter])
+AC_DEFINE_UNQUOTED([MAX_DELIM_LEN], [${with_max_delim}], [Maximum length of a delimiter])
 
 AC_MSG_CHECKING([separator of dbref from marker flags])
 AC_ARG_WITH([flag-sep], [AS_HELP_STRING([--with-flag-sep=CHAR], [separator of dbref from marker flags @<:@default=_@:>@])], [with_flag_sep="$withval"], [with_flag_sep="_"])
 AC_MSG_RESULT([$with_flag_sep])
-AC_DEFINE_UNQUOTED([MARK_FLAG_SEP], ["$with_flag_sep"], [sep. of dbref from marker flags])
+AC_DEFINE_UNQUOTED([MARK_FLAG_SEP], ['${with_flag_sep}'], [sep. of dbref from marker flags])
 
 AC_MSG_CHECKING([for hash factor])
 AC_ARG_WITH([hash-factor], [AS_HELP_STRING([--with-hash-factor=NUMBER], [Hash factor @<:@default=2@:>@])], [with_hash_factor=$withval], [with_hash_factor=2])
 AC_MSG_RESULT([$with_hash_factor])
-AC_DEFINE_UNQUOTED([HASH_FACTOR], [$with_hash_factor], [How much hashing you want])
+AC_DEFINE_UNQUOTED([HASH_FACTOR], [${with_hash_factor}], [How much hashing you want])
 
 AC_MSG_CHECKING([for output block size])
 AC_ARG_WITH([max-output], [AS_HELP_STRING([--with-max-output=NUMBER], [Maximum output block size @<:@default=16384@:>@])], [with_max_output=$withval], [with_max_output=16384])
 AC_MSG_RESULT([$with_max_output])
-AC_DEFINE_UNQUOTED([OUTPUT_BLOCK_SIZE], [$with_max_output], [Maximum output block size])
+AC_DEFINE_UNQUOTED([OUTPUT_BLOCK_SIZE], [${with_max_output}], [Maximum output block size])
 
 AC_MSG_CHECKING([length of the DOING field in WHO])
 AC_ARG_WITH([doing-length], [AS_HELP_STRING([--with-doing-length=NUMBER], [length of the DOING field in WHO @<:@default=41@:>@])], [with_doing_length=$withval], [with_doing_length=41])
 AC_MSG_RESULT([$with_doing_length])
-AC_DEFINE_UNQUOTED([DOING_LEN], [$with_doing_length], [length of the DOING field in WHO])
+AC_DEFINE_UNQUOTED([DOING_LEN], [${with_doing_length}], [length of the DOING field in WHO])
 
 AC_MSG_CHECKING([for Pueblo support message])
-AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"0], [Text that indicate Pueblo Support @<:@default="This world is Pueblo 1.0 enhanced\r\n\r\n"@:>@])], [with_pueblo_msg="$withval"], [with_pueblo_msg="This world is Pueblo 1.0 enhanced\r\n\r\n"])
+AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"], [Text that indicate Pueblo Support @<:@default="This world is Pueblo 1.0 enhanced\r\n\r\n"@:>@])], [with_pueblo_msg="$withval"], [with_pueblo_msg="This world is Pueblo 1.0 enhanced\r\n\r\n"])
 AC_MSG_RESULT([$with_pueblo_msg])
-AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["$with_pueblo_msg"], [Pueblo support message])
+AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["${with_pueblo_msg}"], [Pueblo support message])
 
 dnl #define MARK_FLAG_SEP           '_'     /* sep. of dbref from marker flags */
 

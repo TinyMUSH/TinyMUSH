@@ -126,11 +126,8 @@ char *name, *data;
                                 a_size * sizeof(char *), "q_regs");
             tmp_lens = XREALLOC(mudstate.rdata->q_lens,
                                 a_size * sizeof(int), "q_lens");
-            memset(&tmp_regs[mudstate.rdata->q_alloc], (int)NULL,
-                   (a_size -
-                    mudstate.rdata->q_alloc) * sizeof(char *));
-            memset(&tmp_lens[mudstate.rdata->q_alloc], 0,
-                   (a_size - mudstate.rdata->q_alloc) * sizeof(int));
+            memset(&tmp_regs[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(char *));
+            memset(&tmp_lens[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(int));
             mudstate.rdata->q_regs = tmp_regs;
             mudstate.rdata->q_lens = tmp_lens;
             mudstate.rdata->q_alloc = a_size;
@@ -290,12 +287,9 @@ char *name, *data;
                                a_size * sizeof(int), funcname);
     mudstate.rdata->x_lens = tmp_lens;
 
-    memset(&mudstate.rdata->x_names[mudstate.rdata->xr_alloc], (int)NULL,
-           (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    memset(&mudstate.rdata->x_regs[mudstate.rdata->xr_alloc], (int)NULL,
-           (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    memset(&mudstate.rdata->x_lens[mudstate.rdata->xr_alloc], 0,
-           (a_size - mudstate.rdata->xr_alloc) * sizeof(int));
+    memset(&mudstate.rdata->x_names[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
+    memset(&mudstate.rdata->x_regs[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
+    memset(&mudstate.rdata->x_lens[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(int));
 
     mudstate.rdata->xr_alloc = a_size;
 

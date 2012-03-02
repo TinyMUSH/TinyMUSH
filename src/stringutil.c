@@ -619,7 +619,7 @@ char **p;
 
 char *
 remap_colors(s, cmap)
-char *s;
+const char *s;
 
 int *cmap;
 {
@@ -630,7 +630,7 @@ int *cmap;
     int n;
 
     if (!s || !*s || !cmap)
-        return s;
+        return (char *)s;
 
     bp = new;
 

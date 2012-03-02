@@ -230,6 +230,7 @@ extern int	FDECL(srandom, (int));
 #include <sys/types.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <stddef.h>
 
 #ifndef VMS
 #include <fcntl.h>

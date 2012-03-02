@@ -121,6 +121,7 @@ extern char    *FDECL(ansi_transition_esccode, (int, int));
 extern char    *FDECL(ansi_transition_mushcode, (int, int));
 extern char    *FDECL(ansi_transition_letters, (int, int));
 extern int	FDECL(ansi_map_states, (const char *, int **, char **));
+extern char     *FDECL(remap_colors, (const char *, int *));
 
 #define skip_esccode(s) \
 	++(s);						\
