@@ -2401,9 +2401,7 @@ dbref newtop;
 	newnames = (NAME *) XCALLOC(newsize + SIZE_HACK, sizeof(NAME),
 				    "db_grow.names");
 	if (!newnames) {
-	    fprintf(mainlog_fp,
-		    "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n",
-		    newsize);
+	    mainlog_printf("ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize);
 	    abort();
 	}
 
@@ -2434,8 +2432,7 @@ dbref newtop;
 					"db_grow.purenames");
 
 	if (!newpurenames) {
-	    fprintf(mainlog_fp,
-		    "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize);
+	    mainlog_printf("ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize);
 	    abort();
 	}
 	memset((char *)newpurenames, 0, (newsize + SIZE_HACK) * sizeof(NAME));
@@ -2842,7 +2839,7 @@ BOOLEXP *b;
 		r->sub1 = (BOOLEXP *) XSTRDUP((char *)b->sub1, "dup_bool.sub1");
 		break;
 	default:
-		fprintf(mainlog_fp, "bad bool type!!\n");
+		mainlog_printf("bad bool type!!\n");
 		return (TRUE_BOOLEXP);
 	}
 	return (r);

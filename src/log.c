@@ -178,7 +178,7 @@ int key;
             {
                 time((time_t *) (&now));
                 tp = localtime((time_t *) (&now));
-                fprintf(log_fp, "%02d%02d%02d.%02d%02d%02d ",
+                log_printf("%02d%02d%02d.%02d%02d%02d ",
                         (tp->tm_year % 100), tp->tm_mon + 1,
                         tp->tm_mday, tp->tm_hour,
                         tp->tm_min, tp->tm_sec);
@@ -189,10 +189,10 @@ int key;
              */
 
             if (secondary && *secondary)
-                fprintf(log_fp, "%s %3s/%-5s: ",
+                log_printf("%s %3s/%-5s: ",
                         MUDLOGNAME, primary, secondary);
             else
-                fprintf(log_fp, "%s %-9s: ",
+                log_printf("%s %-9s: ",
                         MUDLOGNAME, primary);
         }
 
@@ -202,7 +202,7 @@ int key;
 
         if (mudstate.logging == 1)
             return 1;
-        fprintf(mainlog_fp, "Recursive logging request.\r\n");
+        mainlog_printf("Recursive logging request.\r\n");
     default:
         mudstate.logging--;
     }
@@ -216,7 +216,7 @@ int key;
 void
 NDECL(end_log)
 {
-    fprintf(log_fp, "\n");
+    log_printf("\n");
     fflush(log_fp);
     mudstate.logging--;
 }
@@ -254,6 +254,48 @@ va_dcl
 #endif
 {
     va_list ap;
+    char *s;
+
+#if defined(__STDC__) && defined(STDC_HEADERS)
+    va_start(ap, format);
+    
+#else
+    char *format;
+
+    va_start(ap);
+    format = va_arg(ap, char *);
+
+#endif
+    s = (char *)XMALLOC(MBUF_SIZE, "log_printf");
+    vsprintf(s, format, ap);
+    XFREE(s, "log_printf");
+    fprintf(log_fp, "%s", s);
+    /*
+     * If we are starting up, log to stderr too..
+     */
+    if ( (log_fp != stderr) && (mudstate.startup == 1)) {
+        fprintf(stderr, "%s", s);
+    }
+#if defined(__STDC__) && defined(STDC_HEADERS)
+    va_end(ap);
+#endif
+}
+
+/* ---------------------------------------------------------------------------
+ * mainlog_printf: Format text and print to the mainlog file.
+ */
+
+#if defined(__STDC__) && defined(STDC_HEADERS)
+void
+mainlog_printf(const char *format, ...)
+#else
+void
+mainlog_printf(va_alist)
+va_dcl
+#endif
+{
+    va_list ap;
+    char *s;
 
 #if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
@@ -264,7 +306,16 @@ va_dcl
     format = va_arg(ap, char *);
 
 #endif
-    vfprintf(log_fp, format, ap);
+    s = (char *)XMALLOC(MBUF_SIZE, "mainlog_printf");
+    vsprintf(s, format, ap);
+    XFREE(s, "mainlog_printf"); 
+    fprintf(mainlog_fp, "%s", s);
+    /*
+     * If we are starting up, log to stderr too..
+     */
+    if ( (mainlog_fp != stderr) && (mudstate.startup == 1)) {
+        fprintf(stderr, "%s", s);
+    }
     va_end(ap);
 }
 
@@ -299,7 +350,7 @@ dbref target;
         tp = unparse_object((dbref) GOD, target, 0);
     else
         tp = unparse_object_numonly(target);
-    fprintf(log_fp, "%s", strip_ansi(tp));
+    log_printf("%s", strip_ansi(tp));
     free_lbuf(tp);
     if (((mudconf.log_info & LOGOPT_OWNER) != 0) &&
             (target != Owner(target)))
@@ -308,7 +359,7 @@ dbref target;
             tp = unparse_object((dbref) GOD, Owner(target), 0);
         else
             tp = unparse_object_numonly(Owner(target));
-        fprintf(log_fp, "[%s]", strip_ansi(tp));
+        log_printf("[%s]", strip_ansi(tp));
         free_lbuf(tp);
     }
     return;

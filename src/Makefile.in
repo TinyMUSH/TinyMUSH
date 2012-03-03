@@ -1123,10 +1123,6 @@ version.h:
 	echo '#endif /* __VERSION_H */' >> $(srcdir)/version.h
 	chmod -w $(srcdir)/version.h
 
-#buildnum.data: .PHONY
-#	touch $(srcdir)/buildnum.data
-#	expr 0`cat $(srcdir)/buildnum.data` + 1 > $(srcdir)/buildnum.data
-
 indent:
 	for i in `ls *.c *.h`; do \
 	astyle --style=bsd $$i; \

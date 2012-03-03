@@ -51,8 +51,7 @@ FILE *f;
          * break;
          */
     case EOF:
-        fprintf(mainlog_fp,
-                "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n");
+        mainlog_printf("ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n");
         abort();
         break;
     case '(':
@@ -127,8 +126,7 @@ FILE *f;
         {
             if (c == EOF)
             {
-                fprintf(mainlog_fp,
-                        "ABORT! db_rw.c, unexpected EOF in getboolexp1().\n");
+                mainlog_printf("ABORT! db_rw.c, unexpected EOF in getboolexp1().\n");
                 abort();
             }
         }
@@ -254,8 +252,7 @@ FILE *f;
     }
 
 error:
-    fprintf(mainlog_fp,
-            "ABORT! db_rw.c, reached error case in getboolexp1().\n");
+    mainlog_printf("ABORT! db_rw.c, reached error case in getboolexp1().\n");
     abort();		/* bomb out */
     return TRUE_BOOLEXP;	/* NOTREACHED */
 }
@@ -276,8 +273,7 @@ FILE *f;
     b = getboolexp1(f);
     if (getc(f) != '\n')
     {
-        fprintf(mainlog_fp,
-                "ABORT! db_rw.c, parse error in getboolexp().\n");
+        mainlog_printf("ABORT! db_rw.c, parse error in getboolexp().\n");
         abort();	/* parse error, we lose */
     }
     if ((c = getc(f)) != '\n')
@@ -379,14 +375,12 @@ int new_strings;
             if (c != '\n')
             {
                 ungetc(c, f);
-                fprintf(mainlog_fp,
-                        "No line feed on object %d\n", i);
+                mainlog_printf("No line feed on object %d\n", i);
                 return 1;
             }
             return 1;
         default:
-            fprintf(mainlog_fp,
-                    "Bad character '%c' when getting attributes on object %d\n",
+            mainlog_printf("Bad character '%c' when getting attributes on object %d\n",
                     c, i);
             /*
              * We've found a bad spot.  I hope things aren't too
@@ -483,8 +477,7 @@ BOOLEXP *b;
         }
         break;
     default:
-        fprintf(mainlog_fp,
-                "Unknown boolean type in putbool_subexp: %d\n", b->type);
+        mainlog_printf("Unknown boolean type in putbool_subexp: %d\n", b->type);
     }
 }
 
@@ -839,14 +832,14 @@ int *db_format, *db_version, *db_flags;
     deduce_zone = 1;
     deduce_name = 1;
     deduce_timestamps = 1;
-    fprintf(mainlog_fp, "Reading ");
+    mainlog_printf("Reading ");
     db_free();
     for (i = 0;; i++)
     {
 
         if (!(i % 100))
         {
-            fputc('.', mainlog_fp);
+            mainlog_printf(".");
         }
         switch (ch = getc(f))
         {
@@ -874,8 +867,7 @@ int *db_format, *db_version, *db_flags;
 
                 if (header_gotten)
                 {
-                    fprintf(mainlog_fp,
-                            "\nDuplicate MUSH version header entry at object %d, ignored.\n",
+                    mainlog_printf("\nDuplicate MUSH version header entry at object %d, ignored.\n",
                             i);
                     tstr = getstring_noalloc(f, 0);
                     break;
@@ -939,8 +931,7 @@ int *db_format, *db_version, *db_flags;
             case 'S':	/* SIZE */
                 if (size_gotten)
                 {
-                    fprintf(mainlog_fp,
-                            "\nDuplicate size entry at object %d, ignored.\n",
+                    mainlog_printf("\nDuplicate size entry at object %d, ignored.\n",
                             i);
                     tstr = getstring_noalloc(f, 0);
                 }
@@ -985,9 +976,7 @@ int *db_format, *db_version, *db_flags;
 					 * FREELIST */
                 if (nextattr_gotten)
                 {
-                    fprintf(mainlog_fp,
-                            "\nDuplicate next free vattr entry at object %d, ignored.\n",
-                            i);
+                    mainlog_printf("\nDuplicate next free vattr entry at object %d, ignored.\n", i);
                     tstr = getstring_noalloc(f, 0);
                 }
                 else
@@ -997,9 +986,7 @@ int *db_format, *db_version, *db_flags;
                 }
                 break;
             default:
-                fprintf(mainlog_fp,
-                        "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n",
-                        ch, i);
+                mainlog_printf("\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
                 tstr = getstring_noalloc(f, 0);
             }
             break;
@@ -1183,9 +1170,7 @@ int *db_format, *db_version, *db_flags;
             {
                 if (!get_list(f, i, read_new_strings))
                 {
-                    fprintf(mainlog_fp,
-                            "\nError reading attrs for object #%d\n",
-                            i);
+                    mainlog_printf("\nError reading attrs for object #%d\n", i);
                     return -1;
                 }
             }
@@ -1202,13 +1187,12 @@ int *db_format, *db_version, *db_flags;
             tstr = getstring_noalloc(f, 0);
             if (strcmp(tstr, "**END OF DUMP***"))
             {
-                fprintf(mainlog_fp,
-                        "\nBad EOF marker at object #%d\n", i);
+                mainlog_printf("\nBad EOF marker at object #%d\n", i);
                 return -1;
             }
             else
             {
-                fprintf(mainlog_fp, "\n");
+                mainlog_printf("\n");
                 *db_version = g_version;
                 *db_format = g_format;
                 *db_flags = g_flags;
@@ -1219,9 +1203,7 @@ int *db_format, *db_version, *db_flags;
                 return mudstate.db_top;
             }
         default:
-            fprintf(mainlog_fp,
-                    "\nIllegal character '%c' near object #%d\n", ch,
-                    i);
+            mainlog_printf("\nIllegal character '%c' near object #%d\n", ch, i);
             return -1;
         }
 
@@ -1253,7 +1235,7 @@ db_read()
 
     if (!data.dptr)
     {
-        fprintf(mainlog_fp, "\nCould not open main record");
+        mainlog_printf("\nCould not open main record");
         return -1;
     }
     /*
@@ -1305,10 +1287,7 @@ db_read()
                     /*
                      * Houston, we have a problem
                      */
-                    fprintf(mainlog_fp,
-                            "\nError reading attribute number %d\n",
-                            j + ENTRY_BLOCK_STARTS(i,
-                                                   blksize));
+                    mainlog_printf("\nError reading attribute number %d\n", j + ENTRY_BLOCK_STARTS(i, blksize));
                 }
                 s++;
             }
@@ -1321,7 +1300,7 @@ db_read()
      */
 
     if (mudstate.standalone)
-        fprintf(mainlog_fp, "Reading ");
+        mainlog_printf("Reading ");
 
     blksize = OBJECT_BLOCK_SIZE;
 
@@ -1347,7 +1326,7 @@ db_read()
 
                 if (mudstate.standalone && !(num % 100))
                 {
-                    fputc('.', mainlog_fp);
+                    mainlog_printf(".");
                 }
                 /*
                  * We read the entire object structure in and
@@ -1388,7 +1367,7 @@ db_read()
         load_player_names();
 
     if (mudstate.standalone)
-        fprintf(mainlog_fp, "\n");
+        mainlog_printf("\n");
 
     return (0);
 }
@@ -1556,11 +1535,11 @@ int format, version;
         flags = version;
         break;
     default:
-        fprintf(mainlog_fp, "Can only write TinyMUSH 3 format.\n");
+        mainlog_printf("Can only write TinyMUSH 3 format.\n");
         return -1;
     }
     if (mudstate.standalone)
-        fprintf(mainlog_fp, "Writing ");
+        mainlog_printf("Writing ");
 
     /*
      * Attribute cleaning, if standalone.
@@ -1719,7 +1698,7 @@ int format, version;
 
         if (mudstate.standalone && !(i % 100))
         {
-            fputc('.', mainlog_fp);
+            mainlog_printf(".");
         }
         n_objt += db_write_object_out(f, i, format, flags, &n_atrt);
     }
@@ -1729,19 +1708,19 @@ int format, version;
 
     if (mudstate.standalone)
     {
-        fprintf(mainlog_fp, "\n");
+        mainlog_printf("\n");
         if (dbclean)
         {
             if (n_objt)
             {
-                fprintf(mainlog_fp,
+                mainlog_printf(
                         "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n",
                         n_oldtotal, anxt, n_deleted, n_renumbered,
                         n_objt, n_atrt);
             }
             else if (n_deleted || n_renumbered)
             {
-                fprintf(mainlog_fp,
+                mainlog_printf(
                         "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n",
                         n_oldtotal, anxt, n_deleted, n_renumbered);
             }
@@ -1766,7 +1745,7 @@ db_write()
     al_store();
 
     if (mudstate.standalone)
-        fprintf(mainlog_fp, "Writing ");
+        mainlog_printf( "Writing ");
 
     /*
      * Lock the database
@@ -1954,7 +1933,7 @@ db_write()
 
             if (mudstate.standalone && !(j % 100))
             {
-                fputc('.', mainlog_fp);
+                mainlog_printf(".");
             }
             /*
              * We assume you always do a dbck before dump, and
@@ -2044,7 +2023,7 @@ db_write()
     db_unlock();
 
     if (mudstate.standalone)
-        fprintf(mainlog_fp, "\n");
+        mainlog_printf( "\n");
     return (mudstate.db_top);
 }
 

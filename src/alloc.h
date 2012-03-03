@@ -46,9 +46,9 @@ typedef struct pooldata
 #define	NUM_POOLS	7
 
 
-#define LBUF_SIZE	8000	/* standard lbuf */
+#define LBUF_SIZE	8192	/* standard lbuf */
 #define GBUF_SIZE       1024	/* generic buffer size */
-#define MBUF_SIZE	400	/* standard mbuf */
+#define MBUF_SIZE	512	/* standard mbuf */
 #define SBUF_SIZE	64	/* standard sbuf, short strings */
 
 /*

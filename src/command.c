@@ -1010,8 +1010,7 @@ char *command, *args[];
 
     if (!command)
     {
-        fprintf(mainlog_fp,
-                "ABORT! command.c, null command in process_command().\n");
+        mainlog_printf("ABORT! command.c, null command in process_command().\n");
         abort();
     }
     if (!Good_obj(player))

@@ -35,12 +35,12 @@ const char *txt;
     }
     else
     {
-        fprintf(mainlog_fp, "Could not %s object #%d", txt, obj);
+        mainlog_printf("Could not %s object #%d", txt, obj);
         if (attr != NOTHING)
         {
-            fprintf(mainlog_fp, " attr #%d", attr);
+            mainlog_printf(" attr #%d", attr);
         }
-        fprintf(mainlog_fp, "\n");
+        mainlog_printf("\n");
     }
 }
 
@@ -78,7 +78,7 @@ va_dcl
         if (p == (char *)-1)
             p = (char *)strerror(errno);
 
-        (void)fprintf(mainlog_fp, "%s", p);
+        (void)mainlog_printf("%s", p);
         p = va_arg(ap, char *);
     }
     va_end(ap);
@@ -118,7 +118,7 @@ va_dcl
         if (p == (char *)-1)
             p = (char *)strerror(errno);
 
-        (void)fprintf(mainlog_fp, "%s", p);
+        (void)mainlog_printf("%s", p);
         p = va_arg(ap, char *);
     }
     va_end(ap);

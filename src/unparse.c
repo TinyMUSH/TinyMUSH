@@ -218,8 +218,7 @@ int format;
         safe_str((char *)b->sub1, boolexp_buf, &buftop);
         break;
     default:
-        fprintf(mainlog_fp,
-                "ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n");
+        mainlog_printf("ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n");
         abort();
         break;
     }

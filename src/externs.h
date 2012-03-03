@@ -137,6 +137,7 @@ extern void	NDECL(end_log);
 extern void	FDECL(log_perror, (const char *, const char *, const char *,
                                const		char  *));
 extern void	VDECL(log_printf, (const char *,...));
+extern void	VDECL(mainlog_printf, (const char *,...));
 extern void	FDECL(log_vprintf, (const char *, va_list));
 extern void	FDECL(log_name, (dbref));
 extern void	FDECL(log_name_and_loc, (dbref));

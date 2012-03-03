@@ -170,35 +170,11 @@
 /* Define to 1 if you have the `isascii' function. */
 #undef HAVE_ISASCII
 
-/* Define to 1 if you have the `crypt' library (-lcrypt). */
-#undef HAVE_LIBCRYPT
-
-/* Define to 1 if you have the `dbm' library (-ldbm). */
-#undef HAVE_LIBDBM
-
 /* Define if you have the libdl library or equivalent. */
 #undef HAVE_LIBDL
 
 /* Define if libdlloader will be built on this platform */
 #undef HAVE_LIBDLLOADER
-
-/* Define to 1 if you have the `inet' library (-linet). */
-#undef HAVE_LIBINET
-
-/* Define to 1 if you have the `m' library (-lm). */
-#undef HAVE_LIBM
-
-/* Define to 1 if you have the `ndbm' library (-lndbm). */
-#undef HAVE_LIBNDBM
-
-/* Define to 1 if you have the `nsl' library (-lnsl). */
-#undef HAVE_LIBNSL
-
-/* Define to 1 if you have the `resolv' library (-lresolv). */
-#undef HAVE_LIBRESOLV
-
-/* Define to 1 if you have the `socket' library (-lsocket). */
-#undef HAVE_LIBSOCKET
 
 /* Define to 1 if you have <libtinyqdbm.h>. */
 #undef HAVE_LIBTINYGDBM_H

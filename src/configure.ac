@@ -292,16 +292,6 @@ AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"], [Text that
 AC_MSG_RESULT([$with_pueblo_msg])
 AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["${with_pueblo_msg}"], [Pueblo support message])
 
-dnl #define MARK_FLAG_SEP           '_'     /* sep. of dbref from marker flags */
-
-dnl #define HASH_FACTOR             2       /* How much hashing you want. */
-
-dnl #define OUTPUT_BLOCK_SIZE       16384
-
-dnl #define DOING_LEN               41      /* length of the DOING field in WHO */
-
-dnl #define PUEBLO_SUPPORT_MSG "This world is Pueblo 1.0 enhanced\r\n\r\n"
-
 AX_BOX([Checks for programs])
 # Checks for programs.
 
@@ -319,14 +309,19 @@ AX_BOX([Checks for platform])
 AX_BOX([Checks for libraries])
 # Checks for libraries.
 
-AC_CHECK_LIB(crypt, main)
-AC_CHECK_LIB(resolv, main)
-AC_CHECK_LIB(socket, main)
-AC_CHECK_LIB(nsl, main)
-AC_CHECK_LIB(inet, gethostbyaddr)
-AC_CHECK_LIB(m, main)
-AC_CHECK_LIB(dbm, main)
-AC_CHECK_LIB(ndbm, main)
+dnl AC_CHECK_LIB(crypt, main)
+AC_SEARCH_LIBS(crypt, crypt)
+dnl AC_CHECK_LIB(resolv, main)
+AC_SEARCH_LIBS(herror, resolv)
+dnl AC_CHECK_LIB(socket, main)
+AC_SEARCH_LIBS(socket, c socket)
+dnl AC_CHECK_LIB(nsl, main)
+dnl AC_CHECK_LIB(inet, gethostbyaddr)
+AC_SEARCH_LIBS(gethostbyaddr, nsl inet)
+dnl AC_CHECK_LIB(m, main)
+AC_SEARCH_LIBS(sqrt, m)
+dnl AC_CHECK_LIB(dbm, main)
+dnl AC_CHECK_LIB(ndbm, main)
 
 AX_BOX([Checks for header files.])
 # Checks for header files.

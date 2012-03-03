@@ -1479,8 +1479,7 @@ int sig;
         else
         {
             unset_signals();
-            fprintf(mainlog_fp,
-                    "ABORT! bsd.c, SA_EXIT requested.\n");
+            mainlog_printf("ABORT! bsd.c, SA_EXIT requested.\n");
             abort();
         }
     case SIGABRT:		/* Coredump now */
@@ -1489,7 +1488,7 @@ int sig;
         report();
 
         unset_signals();
-        fprintf(mainlog_fp, "ABORT! bsd.c, SIGABRT received.\n");
+        mainlog_printf("ABORT! bsd.c, SIGABRT received.\n");
         abort();
     }
     signal(sig, sighandler);

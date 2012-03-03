@@ -2069,78 +2069,66 @@ int fmt, flags, ver;
         cp = "*unknown*";
         break;
     }
-    fprintf(mainlog_fp, "%s version %d:", cp, ver);
+    mainlog_printf("%s version %d:", cp, ver);
     if (flags & V_ZONE)
-        fprintf(mainlog_fp, " Zone");
+        mainlog_printf(" Zone");
     if (flags & V_LINK)
-        fprintf(mainlog_fp, " Link");
+        mainlog_printf(" Link");
     if (flags & V_GDBM)
-        fprintf(mainlog_fp, " GDBM");
+        mainlog_printf(" GDBM");
     if (flags & V_ATRNAME)
-        fprintf(mainlog_fp, " AtrName");
+        mainlog_printf(" AtrName");
     if (flags & V_ATRKEY)
     {
         if ((fmt == F_MUSH) && (ver == 2))
-            fprintf(mainlog_fp, " ExtLocks");
+            mainlog_printf(" ExtLocks");
         else
-            fprintf(mainlog_fp, " AtrKey");
+            mainlog_printf(" AtrKey");
     }
     if (flags & V_PARENT)
-        fprintf(mainlog_fp, " Parent");
+        mainlog_printf(" Parent");
     if (flags & V_COMM)
-        fprintf(mainlog_fp, " Comm");
+        mainlog_printf(" Comm");
     if (flags & V_ATRMONEY)
-        fprintf(mainlog_fp, " AtrMoney");
+        mainlog_printf(" AtrMoney");
     if (flags & V_XFLAGS)
-        fprintf(mainlog_fp, " ExtFlags");
+        mainlog_printf(" ExtFlags");
     if (flags & V_3FLAGS)
-        fprintf(mainlog_fp, " MoreFlags");
+        mainlog_printf(" MoreFlags");
     if (flags & V_POWERS)
-        fprintf(mainlog_fp, " Powers");
+        mainlog_printf(" Powers");
     if (flags & V_QUOTED)
-        fprintf(mainlog_fp, " QuotedStr");
+        mainlog_printf(" QuotedStr");
     if (flags & V_TQUOTAS)
-        fprintf(mainlog_fp, " TypedQuotas");
+        mainlog_printf(" TypedQuotas");
     if (flags & V_TIMESTAMPS)
-        fprintf(mainlog_fp, " Timestamps");
+        mainlog_printf(" Timestamps");
     if (flags & V_VISUALATTRS)
-        fprintf(mainlog_fp, " VisualAttrs");
+        mainlog_printf(" VisualAttrs");
     if (flags & V_CREATETIME)
-        fprintf(mainlog_fp, " CreateTime");
-    fprintf(mainlog_fp, "\n");
+        mainlog_printf(" CreateTime");
+    mainlog_printf("\n");
 }
 
 void
 usage(prog)
 char *prog;
 {
-    fprintf(mainlog_fp,
-            "Usage: %s [options] gdbm-file [< in-file] [> out-file]\n", prog);
-    fprintf(mainlog_fp, "   Available flags are:\n");
-    fprintf(mainlog_fp,
-            "      -c <filename> - Config file     -C - Perform consistency check\n");
-    fprintf(mainlog_fp,
-            "      -d <path> - Data directory      -D <filename> - gdbm database\n");
-    fprintf(mainlog_fp, "      -r <filename> - gdbm crash db\n");
-    fprintf(mainlog_fp,
-            "      -G - Write in gdbm format       -g - Write in flat file format\n");
-    fprintf(mainlog_fp,
-            "      -K - Store key as an attribute  -k - Store key in the header\n");
-    fprintf(mainlog_fp,
-            "      -L - Include link information   -l - Don't include link information\n");
-    fprintf(mainlog_fp,
-            "      -M - Store attr map if GDBM     -m - Don't store attr map if GDBM\n");
-    fprintf(mainlog_fp,
-            "      -N - Store name as an attribute -n - Store name in the header\n");
-    fprintf(mainlog_fp,
-            "      -P - Include parent information -p - Don't include parent information\n");
-    fprintf(mainlog_fp,
-            "      -W - Write the output file  b   -w - Don't write the output file.\n");
-    fprintf(mainlog_fp,
-            "      -X - Create a default GDBM db   -x - Create a default flat file db\n");
-    fprintf(mainlog_fp,
-            "      -Z - Include zone information   -z - Don't include zone information\n");
-    fprintf(mainlog_fp, "      -<number> - Set output version number\n");
+    mainlog_printf("Usage: %s [options] gdbm-file [< in-file] [> out-file]\n", prog);
+    mainlog_printf("   Available flags are:\n");
+    mainlog_printf("      -c <filename> - Config file     -C - Perform consistency check\n");
+    mainlog_printf("      -d <path> - Data directory      -D <filename> - gdbm database\n");
+    mainlog_printf("      -r <filename> - gdbm crash db\n");
+    mainlog_printf("      -G - Write in gdbm format       -g - Write in flat file format\n");
+    mainlog_printf("      -K - Store key as an attribute  -k - Store key in the header\n");
+    mainlog_printf("      -L - Include link information   -l - Don't include link information\n");
+    mainlog_printf("      -M - Store attr map if GDBM     -m - Don't store attr map if GDBM\n");
+    mainlog_printf("      -N - Store name as an attribute -n - Store name in the header\n");
+    mainlog_printf("      -P - Include parent information -p - Don't include parent information\n");
+    mainlog_printf("      -W - Write the output file  b   -w - Don't write the output file.\n");
+    mainlog_printf("      -X - Create a default GDBM db   -x - Create a default flat file db\n");
+    mainlog_printf("      -Z - Include zone information   -z - Don't include zone information\n");
+    mainlog_printf("      -<number> - Set output version number\n");
 }
 
 int
@@ -2299,7 +2287,7 @@ char *argv[];
     vattr_init();
     if (init_gdbm_db(argv[optind]) < 0)
     {
-        fprintf(mainlog_fp, "Can't open GDBM file\n");
+        mainlog_printf("Can't open GDBM file\n");
         exit(1);
     }
     /*
@@ -2350,7 +2338,7 @@ char *argv[];
         }
     }
 
-    fprintf(mainlog_fp, "Input: ");
+    mainlog_printf("Input: ");
     info(db_format, db_flags, db_ver);
 
     if (do_check)
@@ -2363,7 +2351,7 @@ char *argv[];
             db_ver = ver;
         else
             db_ver = 3;
-        fprintf(mainlog_fp, "Output: ");
+        mainlog_printf("Output: ");
         info(F_TINYMUSH, db_flags, db_ver);
         if (db_flags & V_GDBM)
         {
@@ -2452,6 +2440,12 @@ char *argv[];
     MODHASHES *m_htab, *hp;
 
     MODNHASHES *m_ntab, *np;
+    
+    /*
+     * Starting up
+     */
+     
+    mudstate.startup = 1;	
 
     /*
      * Try to get the binary name
@@ -2589,9 +2583,7 @@ char *argv[];
     init_powertab();
     init_functab();
     init_attrtab();
-    printf("Calling init_version\n");
     init_version();
-    printf("End init_version\n");
     hashinit(&mudstate.player_htab, 250 * HASH_FACTOR, HT_STR);
     hashinit(&mudstate.nref_htab, 5 * HASH_FACTOR, HT_STR);
     nhashinit(&mudstate.qpid_htab, 50 * HASH_FACTOR);
@@ -2786,6 +2778,12 @@ char *argv[];
     STARTLOG(LOG_STARTUP, "INI", "LOAD")
     log_printf("Startup processing complete.");
     ENDLOG
+    /*
+     * Startup is done.
+     */
+    
+    mudstate.startup = 0;
+    
     /*
      * Clear all reference flags in the cache-- what happens when the
      * game loads is NOT representative of normal cache behavior :)
