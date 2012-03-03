@@ -1,9 +1,9 @@
 
-# libtool (GNU libtool) 2.4.2
+# libtool (GNU libtool) 2.4
 # Written by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005, 2006,
-# 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
+# 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -41,7 +41,6 @@
 #       --quiet, --silent    don't print informational messages
 #       --no-quiet, --no-silent
 #                            print informational messages (default)
-#       --no-warn            don't display warning messages
 #       --tag=TAG            use configuration variables from tag TAG
 #   -v, --verbose            print more informational messages than default
 #       --no-verbose         don't print the extra informational messages
@@ -70,7 +69,7 @@
 #         compiler:		$LTCC
 #         compiler flags:		$LTCFLAGS
 #         linker:		$LD (gnu? $with_gnu_ld)
-#         $progname:	(GNU libtool) 2.4.2
+#         $progname:	(GNU libtool) 2.4
 #         automake:	$automake_version
 #         autoconf:	$autoconf_version
 #
@@ -80,9 +79,9 @@
 
 PROGRAM=libtool
 PACKAGE=libtool
-VERSION=2.4.2
+VERSION=2.4
 TIMESTAMP=""
-package_revision=1.3337
+package_revision=1.3293
 
 # Be Bourne compatible
 if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
@@ -137,10 +136,15 @@ progpath="$0"
 
 : ${CP="cp -f"}
 test "${ECHO+set}" = set || ECHO=${as_echo-'printf %s\n'}
+: ${EGREP="grep -E"}
+: ${FGREP="grep -F"}
+: ${GREP="grep"}
+: ${LN_S="ln -s"}
 : ${MAKE="make"}
 : ${MKDIR="mkdir"}
 : ${MV="mv -f"}
 : ${RM="rm -f"}
+: ${SED="sed"}
 : ${SHELL="${CONFIG_SHELL-/bin/sh}"}
 : ${Xsed="$SED -e 1s/^X//"}
 
@@ -383,7 +387,7 @@ case $progpath in
      ;;
   *)
      save_IFS="$IFS"
-     IFS=${PATH_SEPARATOR-:}
+     IFS=:
      for progdir in $PATH; do
        IFS="$save_IFS"
        test -x "$progdir/$progname" && break
@@ -767,8 +771,8 @@ func_help ()
 	s*\$LTCFLAGS*'"$LTCFLAGS"'*
 	s*\$LD*'"$LD"'*
 	s/\$with_gnu_ld/'"$with_gnu_ld"'/
-	s/\$automake_version/'"`(${AUTOMAKE-automake} --version) 2>/dev/null |$SED 1q`"'/
-	s/\$autoconf_version/'"`(${AUTOCONF-autoconf} --version) 2>/dev/null |$SED 1q`"'/
+	s/\$automake_version/'"`(automake --version) 2>/dev/null |$SED 1q`"'/
+	s/\$autoconf_version/'"`(autoconf --version) 2>/dev/null |$SED 1q`"'/
 	p
 	d
      }
@@ -1048,7 +1052,6 @@ opt_finish=false
 opt_help=false
 opt_help_all=false
 opt_silent=:
-opt_warning=:
 opt_verbose=:
 opt_silent=false
 opt_verbose=false
@@ -1115,10 +1118,6 @@ esac
 			;;
       --no-silent|--no-quiet)
 			opt_silent=false
-func_append preserve_args " $opt"
-			;;
-      --no-warning|--no-warn)
-			opt_warning=false
 func_append preserve_args " $opt"
 			;;
       --no-verbose)
@@ -1375,6 +1374,21 @@ func_replace_sysroot ()
 func_infer_tag ()
 {
     $opt_debug
+
+    # FreeBSD-specific: where we install compilers with non-standard names
+    tag_compilers_CC="*cc cc* *gcc gcc* clang"
+    tag_compilers_CXX="*c++ c++* *g++ g++* clang++"
+    base_compiler=`set -- "$@"; echo $1`
+
+    # If $tagname isn't set, then try to infer if the default "CC" tag applies
+    if test -z "$tagname"; then
+      for zp in $tag_compilers_CC; do
+        case $base_compiler in
+	 $zp) tagname="CC"; break;;
+	esac
+      done
+    fi
+
     if test -n "$available_tags" && test -z "$tagname"; then
       CC_quoted=
       for arg in $CC; do
@@ -1411,7 +1425,22 @@ func_infer_tag ()
 	      break
 	      ;;
 	    esac
-	  fi
+
+	    # FreeBSD-specific: try compilers based on inferred tag
+	    if test -z "$tagname"; then
+	      eval "tag_compilers=\$tag_compilers_${z}"
+	      if test -n "$tag_compilers"; then
+		for zp in $tag_compilers; do
+		  case $base_compiler in   
+		    $zp) tagname=$z; break;;
+		  esac
+		done
+		if test -n "$tagname"; then
+		  break
+		fi
+	      fi
+            fi
+          fi
 	done
 	# If $tagname still isn't set, then no tagged configuration
 	# was found and let the user know that the "--tag" command
@@ -2060,7 +2089,7 @@ func_mode_compile ()
     *.[cCFSifmso] | \
     *.ada | *.adb | *.ads | *.asm | \
     *.c++ | *.cc | *.ii | *.class | *.cpp | *.cxx | \
-    *.[fF][09]? | *.for | *.java | *.go | *.obj | *.sx | *.cu | *.cup)
+    *.[fF][09]? | *.for | *.java | *.obj | *.sx | *.cu | *.cup)
       func_xform "$libobj"
       libobj=$func_xform_result
       ;;
@@ -3202,13 +3231,11 @@ func_mode_install ()
 
       # Set up the ranlib parameters.
       oldlib="$destdir/$name"
-      func_to_tool_file "$oldlib" func_convert_file_msys_to_w32
-      tool_oldlib=$func_to_tool_file_result
 
       func_show_eval "$install_prog \$file \$oldlib" 'exit $?'
 
       if test -n "$stripme" && test -n "$old_striplib"; then
-	func_show_eval "$old_striplib $tool_oldlib" 'exit $?'
+	func_show_eval "$old_striplib $oldlib" 'exit $?'
       fi
 
       # Do each command in the postinstall commands.
@@ -3473,7 +3500,7 @@ static const void *lt_preloaded_setup() {
 	  # linked before any other PIC object.  But we must not use
 	  # pic_flag when linking with -static.  The problem exists in
 	  # FreeBSD 2.2.6 and is fixed in FreeBSD 3.1.
-	  *-*-freebsd2.*|*-*-freebsd3.0*|*-*-freebsdelf3.0*)
+	  *-*-freebsd2*|*-*-freebsd3.0*|*-*-freebsdelf3.0*)
 	    pic_flag_for_symtable=" $pic_flag -DFREEBSD_WORKAROUND" ;;
 	  *-*-hpux*)
 	    pic_flag_for_symtable=" $pic_flag"  ;;
@@ -3516,6 +3543,9 @@ static const void *lt_preloaded_setup() {
 	  finalize_command=`$ECHO "$finalize_command" | $SED "s%@SYMFILE@%$symfileobj%"`
 	  ;;
 	esac
+	;;
+      *-*-freebsd*)
+	# FreeBSD doesn't need this...
 	;;
       *)
 	func_fatal_error "unknown suffix for \`$my_dlsyms'"
@@ -3985,17 +4015,14 @@ func_exec_program_core ()
 # launches target application with the remaining arguments.
 func_exec_program ()
 {
-  case \" \$* \" in
-  *\\ --lt-*)
-    for lt_wr_arg
-    do
-      case \$lt_wr_arg in
-      --lt-*) ;;
-      *) set x \"\$@\" \"\$lt_wr_arg\"; shift;;
-      esac
-      shift
-    done ;;
-  esac
+  for lt_wr_arg
+  do
+    case \$lt_wr_arg in
+    --lt-*) ;;
+    *) set x \"\$@\" \"\$lt_wr_arg\"; shift;;
+    esac
+    shift
+  done
   func_exec_program_core \${1+\"\$@\"}
 }
 
@@ -5063,15 +5090,9 @@ void lt_dump_script (FILE* f)
 {
 EOF
 	    func_emit_wrapper yes |
-	      $SED -n -e '
-s/^\(.\{79\}\)\(..*\)/\1\
-\2/
-h
-s/\([\\"]\)/\\\1/g
-s/$/\\n/
-s/\([^\n]*\).*/  fputs ("\1", f);/p
-g
-D'
+              $SED -e 's/\([\\"]\)/\\\1/g' \
+	           -e 's/^/  fputs ("/' -e 's/$/\\n", f);/'
+
             cat <<"EOF"
 }
 EOF
@@ -5595,6 +5616,7 @@ func_mode_link ()
 	  esac
 	  ;;
 	esac
+	deplibs="$deplibs $arg"
 	continue
 	;;
 
@@ -5655,8 +5677,7 @@ func_mode_link ()
 	continue
 	;;
 
-      -mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe \
-      |-threads|-fopenmp|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
+      -mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe|-threads)
 	func_append compiler_flags " $arg"
 	func_append compile_command " $arg"
 	func_append finalize_command " $arg"
@@ -6160,20 +6181,36 @@ func_mode_link ()
 	lib=
 	found=no
 	case $deplib in
-	-mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe \
-        |-threads|-fopenmp|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
+	-mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe|-threads)
 	  if test "$linkmode,$pass" = "prog,link"; then
 	    compile_deplibs="$deplib $compile_deplibs"
 	    finalize_deplibs="$deplib $finalize_deplibs"
 	  else
 	    func_append compiler_flags " $deplib"
-	    if test "$linkmode" = lib ; then
-		case "$new_inherited_linker_flags " in
-		    *" $deplib "*) ;;
-		    * ) func_append new_inherited_linker_flags " $deplib" ;;
-		esac
-	    fi
 	  fi
+
+	  case $linkmode in
+	  lib)
+	    deplibs="$deplib $deplibs"
+	    test "$pass" = conv && continue
+	    newdependency_libs="$deplib $newdependency_libs"
+	    ;;
+	  prog)
+	    if test "$pass" = conv; then
+	      deplibs="$deplib $deplibs"
+	      continue
+	    fi
+	    if test "$pass" = scan; then
+	      deplibs="$deplib $deplibs"
+	    else
+	      compile_deplibs="$deplib $compile_deplibs"
+	      finalize_deplibs="$deplib $finalize_deplibs"
+	    fi
+	    ;;
+	  *)
+	    ;;
+	  esac # linkmode
+
 	  continue
 	  ;;
 	-l*)
@@ -6845,7 +6882,7 @@ func_mode_link ()
 	         test "$hardcode_direct_absolute" = no; then
 		add="$dir/$linklib"
 	      elif test "$hardcode_minus_L" = yes; then
-		add_dir="-L$absdir"
+		add_dir="-L$dir"
 		# Try looking first in the location we're being installed to.
 		if test -n "$inst_prefix_dir"; then
 		  case $libdir in
@@ -7330,7 +7367,6 @@ func_mode_link ()
 	  # which has an extra 1 added just for fun
 	  #
 	  case $version_type in
-	  # correct linux to gnu/linux during the next big refactor
 	  darwin|linux|osf|windows|none)
 	    func_arith $number_major + $number_minor
 	    current=$func_arith_result
@@ -7447,7 +7483,7 @@ func_mode_link ()
 	  versuffix="$major.$revision"
 	  ;;
 
-	linux) # correct to gnu/linux during the next big refactor
+	linux)
 	  func_arith $current - $age
 	  major=.$func_arith_result
 	  versuffix="$major.$age.$revision"
@@ -8035,11 +8071,6 @@ EOF
 
       # Test again, we may have decided not to build it any more
       if test "$build_libtool_libs" = yes; then
-	# Remove ${wl} instances when linking with ld.
-	# FIXME: should test the right _cmds variable.
-	case $archive_cmds in
-	  *\$LD\ *) wl= ;;
-        esac
 	if test "$hardcode_into_libs" = yes; then
 	  # Hardcode the library paths
 	  hardcode_libdirs=
@@ -8070,7 +8101,7 @@ EOF
 	    elif test -n "$runpath_var"; then
 	      case "$perm_rpath " in
 	      *" $libdir "*) ;;
-	      *) func_append perm_rpath " $libdir" ;;
+	      *) func_apped perm_rpath " $libdir" ;;
 	      esac
 	    fi
 	  done
@@ -8078,7 +8109,11 @@ EOF
 	  if test -n "$hardcode_libdir_separator" &&
 	     test -n "$hardcode_libdirs"; then
 	    libdir="$hardcode_libdirs"
-	    eval "dep_rpath=\"$hardcode_libdir_flag_spec\""
+	    if test -n "$hardcode_libdir_flag_spec_ld"; then
+	      eval dep_rpath=\"$hardcode_libdir_flag_spec_ld\"
+	    else
+	      eval dep_rpath=\"$hardcode_libdir_flag_spec\"
+	    fi
 	  fi
 	  if test -n "$runpath_var" && test -n "$perm_rpath"; then
 	    # We should set the runpath_var.
@@ -9168,8 +9203,6 @@ EOF
 	    esac
 	  done
 	fi
-	func_to_tool_file "$oldlib" func_convert_file_msys_to_w32
-	tool_oldlib=$func_to_tool_file_result
 	eval cmds=\"$old_archive_cmds\"
 
 	func_len " $cmds"
@@ -9279,8 +9312,7 @@ EOF
 	      *.la)
 		func_basename "$deplib"
 		name="$func_basename_result"
-		func_resolve_sysroot "$deplib"
-		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $func_resolve_sysroot_result`
+		eval libdir=`${SED} -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
 		test -z "$libdir" && \
 		  func_fatal_error "\`$deplib' is not a valid libtool archive"
 		func_append newdependency_libs " ${lt_sysroot:+=}$libdir/$name"

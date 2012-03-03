@@ -450,9 +450,6 @@
    */
 #undef LT_OBJDIR
 
-/* Define to the shared library suffix, say, ".dylib". */
-#undef LT_SHARED_EXT
-
 /* sep. of dbref from marker flags */
 #undef MARK_FLAG_SEP
 
