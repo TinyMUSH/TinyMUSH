@@ -35,8 +35,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = netmush$(EXEEXT) mkindx$(EXEEXT) logwatch$(EXEEXT) \
-	slave$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2)
+bin_PROGRAMS = netmush$(EXEEXT) mkindx$(EXEEXT) slave$(EXEEXT) \
+	$(am__EXEEXT_1) $(am__EXEEXT_2)
 @WANT_DBM_GDBM_TRUE@am__append_1 = dbm/gdbm/
 @WANT_DBM_GDBM_TRUE@am__append_2 = -I$(srcdir)/dbm/gdbm/
 @WANT_DBM_GDBM_TRUE@am__append_3 = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
@@ -78,9 +78,6 @@ CONFIG_CLEAN_VPATH_FILES =
 @WANT_DBM_QDBM_TRUE@am__EXEEXT_2 = recover$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_logwatch_OBJECTS = logwatch.$(OBJEXT)
-logwatch_OBJECTS = $(am_logwatch_OBJECTS)
-logwatch_LDADD = $(LDADD)
 am_mkindx_OBJECTS = mkindx.$(OBJEXT)
 mkindx_OBJECTS = $(am_mkindx_OBJECTS)
 mkindx_LDADD = $(LDADD)
@@ -131,11 +128,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(logwatch_SOURCES) $(mkindx_SOURCES) $(netmush_SOURCES) \
+SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
 	$(EXTRA_netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES)
-DIST_SOURCES = $(logwatch_SOURCES) $(mkindx_SOURCES) \
-	$(netmush_SOURCES) $(EXTRA_netmush_SOURCES) \
-	$(am__recover_SOURCES_DIST) $(slave_SOURCES)
+DIST_SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
+	$(EXTRA_netmush_SOURCES) $(am__recover_SOURCES_DIST) \
+	$(slave_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -387,7 +384,6 @@ netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 netmush_DEPENDENCIES = $(LTDLDEPS) $(SQL_O) 
 nodist_include_HEADERS = version.h
 mkindx_SOURCES = mkindx.c
-logwatch_SOURCES = logwatch.c
 slave_SOURCES = slave.c
 BUILT_SOURCES = version.h
 @WANT_DBM_GDBM_TRUE@recover_SOURCES = recover.c
@@ -493,9 +489,6 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-logwatch$(EXEEXT): $(logwatch_OBJECTS) $(logwatch_DEPENDENCIES) 
-	@rm -f logwatch$(EXEEXT)
-	$(LINK) $(logwatch_OBJECTS) $(logwatch_LDADD) $(LIBS)
 mkindx$(EXEEXT): $(mkindx_OBJECTS) $(mkindx_DEPENDENCIES) 
 	@rm -f mkindx$(EXEEXT)
 	$(LINK) $(mkindx_OBJECTS) $(mkindx_LDADD) $(LIBS)
@@ -548,7 +541,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/help.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/htab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logwatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/look.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/malloc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@

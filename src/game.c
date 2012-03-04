@@ -2441,12 +2441,7 @@ char *argv[];
 
     MODNHASHES *m_ntab, *np;
     
-    /*
-     * Starting up
-     */
-     
-    mudstate.startup = 1;	
-
+    
     /*
      * Try to get the binary name
      */
@@ -2776,13 +2771,15 @@ char *argv[];
      */
     process_preload();
     STARTLOG(LOG_STARTUP, "INI", "LOAD")
-    log_printf("Startup processing complete.");
+    
+    log_printf("Startup processing complete. (Process ID : %d)",  getpid());
     ENDLOG
+
     /*
      * Startup is done.
      */
     
-    mudstate.startup = 0;
+    mudstate.running = 1;
     
     /*
      * Clear all reference flags in the cache-- what happens when the

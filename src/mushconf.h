@@ -480,7 +480,7 @@ struct statedata
     int	panicking;	/* Are we in the middle of dying horribly? */
     int	restarting;	/* Are we restarting? */
     int	dumping;	/* Are we dumping? */
-    int startup;	/* Are we starting up? */
+    int running;	/* Are we running? */
     pid_t	dumper;		/* If forked-dumping, with what pid? */
     int	logging;	/* Are we in the middle of logging? */
     int	epoch;		/* Generation number for dumps */

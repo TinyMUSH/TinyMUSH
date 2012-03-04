@@ -257,6 +257,4 @@ fi
 #	Kick off MUSH
 #
 touch $LOGNAME
-$BIN/netmush $make_db -c $GAMENAME.conf -l $LOGNAME -p $PIDFILE -t $TEXT -b $BIN -d $DATA -g $GDBM_DB -k $CRASH_DB >>$LOGNAME 2>&1 &
-echo "Process $!"
-#$BIN/logwatch -s "Cleanup completed." -l $LOGNAME
+$BIN/netmush $make_db -c $GAMENAME.conf -l $LOGNAME -p $PIDFILE -t $TEXT -b $BIN -d $DATA -g $GDBM_DB -k $CRASH_DB &

@@ -23,7 +23,7 @@ SCRIPT_DAT   = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/
 EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
 CLEANFILES   = version.h buildnum.data
 
-bin_PROGRAMS = netmush mkindx logwatch slave
+bin_PROGRAMS = netmush mkindx slave
 
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
@@ -46,8 +46,6 @@ netmush_DEPENDENCIES   = $(LTDLDEPS) $(SQL_O)
 nodist_include_HEADERS = version.h
 
 mkindx_SOURCES         = mkindx.c
-
-logwatch_SOURCES       = logwatch.c
 
 slave_SOURCES          = slave.c
 

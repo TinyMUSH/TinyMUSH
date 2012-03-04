@@ -268,14 +268,14 @@ va_dcl
 #endif
     s = (char *)XMALLOC(MBUF_SIZE, "log_printf");
     vsprintf(s, format, ap);
-    XFREE(s, "log_printf");
-    fprintf(log_fp, "%s", s);
+    fputs(s, log_fp);
     /*
      * If we are starting up, log to stderr too..
      */
-    if ( (log_fp != stderr) && (mudstate.startup == 1)) {
-        fprintf(stderr, "%s", s);
+    if ( (log_fp != stderr) && (mudstate.running == 0)) {
+        fputs(s, stderr);
     }
+    XFREE(s, "log_printf");
 #if defined(__STDC__) && defined(STDC_HEADERS)
     va_end(ap);
 #endif
@@ -308,15 +308,17 @@ va_dcl
 #endif
     s = (char *)XMALLOC(MBUF_SIZE, "mainlog_printf");
     vsprintf(s, format, ap);
-    XFREE(s, "mainlog_printf"); 
-    fprintf(mainlog_fp, "%s", s);
+    fputs(s, mainlog_fp);
     /*
      * If we are starting up, log to stderr too..
      */
-    if ( (mainlog_fp != stderr) && (mudstate.startup == 1)) {
-        fprintf(stderr, "%s", s);
+    if ( (mainlog_fp != stderr) && (mudstate.running == 0)) {
+        fputs(s, stderr);
     }
+    XFREE(s, "mainlog_printf"); 
+#if defined(__STDC__) && defined(STDC_HEADERS)
     va_end(ap);
+#endif
 }
 
 void

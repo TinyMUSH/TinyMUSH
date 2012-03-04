@@ -340,6 +340,7 @@ NDECL(cf_init)
     mudstate.loading_db = 0;
     mudstate.panicking = 0;
     mudstate.standalone = 0;
+    mudstate.running = 0;
     mudstate.dumping = 0;
     mudstate.dumper = 0;
     mudstate.logging = 0;
