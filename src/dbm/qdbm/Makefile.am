@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 
 lib_LTLIBRARIES     = libtinyqdbm.la
 libtinyqdbm_la_SOURCES = curia.c depot.c hovel.c myconf.c curia.h depot.h hovel.h myconf.h

@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 AM_CPPFLAGS = $(LTDLINCL)
 
 lib_LTLIBRARIES = hello.la

@@ -26,7 +26,7 @@ make changes to pcre.in. */
 
 #define PCRE_MAX_OFFSETS 99
 
-/* TM3 modification: This would have been defined in config.h */
+/* TM3 modification: This would have been defined in game.h */
 
 #define NEWLINE '\n'
 
@@ -170,7 +170,7 @@ typedef int BOOL;
 #define TRUE    1
 
 /* Escape items that are just an encoding of a particular data value. Note that
-ESC_N is defined as yet another macro, which is set in config.h to either \n
+ESC_N is defined as yet another macro, which is set in game.h to either \n
 (the default) or \r (which some people want). */
 
 #ifndef ESC_E

@@ -7,7 +7,7 @@
 #ifndef __GDBMSYSTEM_H   
 #define __GDBMSYSTEM_H
 
-#include "../../autoconf.h"
+#include "../../config.h"
 
 /* Include all system headers first. */
 #if HAVE_SYS_TYPES_H

@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 
 lib_LTLIBRARIES     = libtinygdbm.la
 libtinygdbm_la_SOURCES = gdbmbucket.c gdbmfalloc.c gdbmfindkey.c gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c gdbmstore.c gdbmsync.c gdbmglobal.c gdbmhash.c gdbmupdate.c gdbmversion.c gdbmextern.h gdbmconst.h gdbmdefs.h gdbmerrno.h gdbmproto.h gdbmsystems.h gdbmcopyright.h

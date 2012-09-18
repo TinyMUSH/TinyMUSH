@@ -5,11 +5,11 @@
 #define __MUSHCONF_H
 
 #include "copyright.h"
-#include "autoconf.h"
+#include "config.h"
 
 #include <netinet/in.h>
 
-#include "config.h"		/* required by mudconf */
+#include "game.h"		/* required by mudconf */
 #include "alloc.h"		/* required by mudconf */
 #include "flags.h"		/* required by mudconf */
 #include "htab.h"		/* required by mudconf */

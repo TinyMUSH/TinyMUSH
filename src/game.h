@@ -1,5 +1,5 @@
-/* config.h - Configuration of compile-time options, limits, db format, etc. */
-/* $Id: config.h,v 1.46 2009/02/21 20:06:11 lwl Exp $ */
+/* game.h - Configuration of compile-time options, limits, db format, etc. */
+/* $Id: game.h,v 1.46 2009/02/21 20:06:11 lwl Exp $ */
 
 #include "copyright.h"
 

@@ -4,7 +4,7 @@
  */
 
 #include "copyright.h"
-#include "autoconf.h"
+#include "config.h"
 #include "db.h"
 
 #include <sys/types.h>

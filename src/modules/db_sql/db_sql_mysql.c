@@ -31,9 +31,7 @@ sql_shutdown()
         return;
     mysql = mysql_struct;
     STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf
-    ("Disconnected from SQL server %s, SQL database selected: %s",
-     mysql->host, mysql->db);
+    log_printf("Disconnected from SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
     ENDLOG mysql_close(mysql);
     XFREE(mysql, "mysql");
     mysql_struct = NULL;
@@ -69,20 +67,15 @@ sql_init()
     mysql = (MYSQL *) XMALLOC(sizeof(MYSQL), "mysql");
     mysql_init(mysql);
 
-    result = mysql_real_connect(mysql, mudconf.sql_host,
-                                mudconf.sql_username, mudconf.sql_password,
-                                mudconf.sql_db, 0, NULL, 0);
-    if (!result)
-    {
+    result = mysql_real_connect(mysql, mudconf.sql_host, mudconf.sql_username, mudconf.sql_password, mudconf.sql_db, 0, NULL, 0);
+    if (!result) {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed connection to SQL server %s: %s",
-                   mudconf.sql_host, mysql_error(mysql));
+        log_printf("Failed connection to SQL server %s: %s", mudconf.sql_host, mysql_error(mysql));
         ENDLOG XFREE(mysql, "mysql");
         return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Connected to SQL server %s, SQL database selected: %s",
-               mysql->host, mysql->db);
+    log_printf("Connected to SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
     ENDLOG mysql_struct = mysql;
     mudstate.sql_socket = mysql->net.fd;
     return 1;
@@ -119,22 +112,19 @@ const Delim *row_delim, *field_delim;
      */
 
     mysql = mysql_struct;
-    if ((!mysql) & (mudconf.sql_reconnect != 0))
-    {
+    if ((!mysql) & (mudconf.sql_reconnect != 0)) {
         /*
          * Try to reconnect.
          */
         retries = 0;
-        while ((retries < MYSQL_RETRY_TIMES) && !mysql)
-        {
+        while ((retries < MYSQL_RETRY_TIMES) && !mysql) {
             sleep(1);
             sql_init();
             mysql = mysql_struct;
             retries++;
         }
     }
-    if (!mysql)
-    {
+    if (!mysql) {
         notify(player, "No SQL database connection.");
         if (buff)
             safe_str("#-1", buff, bufc);
@@ -148,8 +138,7 @@ const Delim *row_delim, *field_delim;
      */
 
     got_rows = mysql_real_query(mysql, q_string, strlen(q_string));
-    if ((got_rows) && (mysql_errno(mysql) == CR_SERVER_GONE_ERROR))
-    {
+    if ((got_rows) && (mysql_errno(mysql) == CR_SERVER_GONE_ERROR)) {
 
         /*
          * We got this error because the server died unexpectedly and
@@ -164,8 +153,7 @@ const Delim *row_delim, *field_delim;
         ENDLOG retries = 0;
         sql_shutdown();
 
-        while ((retries < MYSQL_RETRY_TIMES) && (!mysql))
-        {
+        while ((retries < MYSQL_RETRY_TIMES) && (!mysql)) {
             sleep(1);
             sql_init();
             mysql = mysql_struct;
@@ -173,12 +161,9 @@ const Delim *row_delim, *field_delim;
         }
 
         if (mysql)
-            got_rows =
-                mysql_real_query(mysql, q_string,
-                                 strlen(q_string));
+            got_rows = mysql_real_query(mysql, q_string, strlen(q_string));
     }
-    if (got_rows)
-    {
+    if (got_rows) {
         notify(player, mysql_error(mysql));
         if (buff)
             safe_str("#-1", buff, bufc);
@@ -189,14 +174,10 @@ const Delim *row_delim, *field_delim;
      */
 
     num_rows = mysql_affected_rows(mysql);
-    if (num_rows > 0)
-    {
-        notify(player, tprintf("SQL query touched %d %s.",
-                               num_rows, (num_rows == 1) ? "row" : "rows"));
+    if (num_rows > 0) {
+        notify(player, tprintf("SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows"));
         return 0;
-    }
-    else if (num_rows == 0)
-    {
+    } else if (num_rows == 0) {
         return 0;
     }
     /*
@@ -205,8 +186,7 @@ const Delim *row_delim, *field_delim;
 
     qres = mysql_store_result(mysql);
     got_rows = mysql_num_rows(qres);
-    if (got_rows == 0)
-    {
+    if (got_rows == 0) {
         mysql_free_result(qres);
         return 0;
     }
@@ -214,60 +194,36 @@ const Delim *row_delim, *field_delim;
      * Construct properly-delimited data.
      */
 
-    if (buff)
-    {
-        for (i = 0; i < got_rows; i++)
-        {
-            if (i > 0)
-            {
+    if (buff) {
+        for (i = 0; i < got_rows; i++) {
+            if (i > 0) {
                 print_sep(row_delim, buff, bufc);
             }
             row_p = mysql_fetch_row(qres);
-            if (row_p)
-            {
+            if (row_p) {
                 got_fields = mysql_num_fields(qres);
-                for (j = 0; j < got_fields; j++)
-                {
-                    if (j > 0)
-                    {
-                        print_sep(field_delim, buff,
-                                  bufc);
+                for (j = 0; j < got_fields; j++) {
+                    if (j > 0) {
+                        print_sep(field_delim, buff, bufc);
                     }
                     if (row_p[j] && *row_p[j])
                         safe_str(row_p[j], buff, bufc);
                 }
             }
         }
-    }
-    else
-    {
-        for (i = 0; i < got_rows; i++)
-        {
+    } else {
+        for (i = 0; i < got_rows; i++) {
             row_p = mysql_fetch_row(qres);
-            if (row_p)
-            {
+            if (row_p) {
                 got_fields = mysql_num_fields(qres);
-                for (j = 0; j < got_fields; j++)
-                {
-                    if (row_p[j] && *row_p[j])
-                    {
-                        notify(player,
-                               tprintf
-                               ("Row %d, Field %d: %s",
-                                i + 1, j + 1,
-                                row_p[j]));
-                    }
-                    else
-                    {
-                        notify(player,
-                               tprintf
-                               ("Row %d, Field %d: NULL",
-                                i + 1, j + 1));
+                for (j = 0; j < got_fields; j++) {
+                    if (row_p[j] && *row_p[j]) {
+                        notify(player, tprintf ("Row %d, Field %d: %s", i + 1, j + 1, row_p[j]));
+                    } else {
+                        notify(player, tprintf ("Row %d, Field %d: NULL", i + 1, j + 1));
                     }
                 }
-            }
-            else
-            {
+            } else {
                 notify(player, tprintf("Row %d: NULL", i + 1));
             }
         }

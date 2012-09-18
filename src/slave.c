@@ -6,7 +6,7 @@
  * It does normal fork()s, so the smaller it is, the faster it goes.
  */
 
-#include "autoconf.h"
+#include "config.h"
 
 #include <netdb.h>
 #include <netinet/in.h>

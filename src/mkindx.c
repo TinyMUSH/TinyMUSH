@@ -12,7 +12,7 @@
 *
 */
 #include "copyright.h"
-#include "autoconf.h"
+#include "config.h"
 
 #include  "help.h"
 

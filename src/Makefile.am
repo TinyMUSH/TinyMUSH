@@ -1,7 +1,7 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 AM_CPPFLAGS     = $(LTDLINCL)
 
-SUBDIRS       = libltdl
+SUBDIRS       = libltdl lib
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
                             
 
@@ -20,7 +20,7 @@ SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
 SCRIPT_DAT   = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cvt22.sed \
 	$(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk \
 	$(SCRIPT_DIR)/netmush.conf
-EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
+EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
 CLEANFILES   = version.h buildnum.data
 
 bin_PROGRAMS = netmush mkindx slave
@@ -34,11 +34,11 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 	udb_ochunk.c udb_obj.c udb_misc.c unparse.c vattr.c version.c \
 	walkdb.c wild.c wiz.c \
 	alloc.h ansi.h attrs.h autoinclude.h bitstring.h cmdtabs.h \
-	command.h config.h copyright.h db.h externs.h file_c.h \
+	command.h game.h copyright.h db.h externs.h file_c.h \
 	flags.h fnproto.h functions.h getpagesize.h help.h htab.h interface.h \
 	malloc.h match.h mushconf.h patchlevel.h pcre.h powers.h slave.h \
 	udb.h udb_defs.h vattr.h walkdb.h
-EXTRA_netmush_SOURCES  = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h malloc.c mcheck.c mstats.c mtrace.c
+EXTRA_netmush_SOURCES  = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h mcheck.c mstats.c mtrace.c
 netmush_LDFLAGS        = -export-dynamic
 netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(SQL_O) $(MALLOC_O)
 netmush_DEPENDENCIES   = $(LTDLDEPS) $(SQL_O) 
@@ -81,6 +81,10 @@ if WANT_MODULE_HELLO
  SUBDIRS += modules/hello/
 endif
 
+if WANT_MODULE_DB_SQL
+ SUBDIRS += modules/db_sql/
+endif
+
 version.h:
 	touch $(srcdir)/buildnum.data
 	expr 0`cat $(srcdir)/buildnum.data` + 1 > $(srcdir)/buildnum.data
@@ -107,9 +111,9 @@ autotools:
 	autoreconf -ivf
 	
 distclean-local:
-	for i in `find -name '*~'`; do rm $$i; done
-	for i in `find -name '.depend'`; do rm $$i; done
-	for i in `find -name 'autom4te.cache'`; do rm -rf $$i; done
+	for i in `find ./ -name '*~'`; do rm $$i; done
+	for i in `find ./ -name '.depend'`; do rm $$i; done
+	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) $(prefix) 

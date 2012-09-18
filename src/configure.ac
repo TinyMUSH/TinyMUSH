@@ -1,8 +1,17 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.68])
+AC_PREREQ([2.69])
 
-AC_INIT([TinyMUSH], [3.3.0.0], [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
+dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
+dnl to have multiple places to update when
+m4_define(TINYMUSH_VERSION, [3.3.0.0])
+m4_define(TINYMUSH_RELEASE_DATE, ["2012-02-19"])
+m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2012 TinyMUSH development team.])
+
+AC_INIT([TinyMUSH], TINYMUSH_VERSION, [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
+
+AX_VERSION()
+
 dnl AC_INIT define the following itself:
 dnl PACKAGE_NAME
 dnl PACKAGE_TARNAME
@@ -10,29 +19,55 @@ dnl PACKAGE_VERSION
 dnl PACKAGE_STRING
 dnl PACKAGE_BUGREPORT
 dnl PACKAGE_URL
-dnl With AX_SPLIT_VERSION, we define the following based on autoconf's values:
+dnl Aith AX_VERSION, We define the following.
 dnl PACKAGE_VERSION_MAJOR
 dnl PACKAGE_VERSION_MINOR
 dnl PACKAGE_RELEASE_STATUS
 dnl PACKAGE_RELEASE_NAME
 dnl PACKAGE_RELEASE_REVISION
-AX_SPLIT_VERSION()
 dnl And we manually create a few other things tha need to be updated from time to time.
 dnl
 PACKAGE_RELEASE_DATE="2012-02-19"
-PACKAGE_COPYRIGHT="Copyright (c) 2012 TinyMUSH development team"
+PACKAGE_COPYRIGHT="Copyright (C) 2012 TinyMUSH development team."
 
 dnl Some default values
 dnl
 with_included_ltdl="yes"
 
-AC_COPYRIGHT([$PACKAGE_COPYRIGHT])
+AC_COPYRIGHT([TINYMUSH_COPYRIGHT
+
+This software is release under the terms of the Artistic License 2.0.
+
+The Artistic License 2.0  establishes  the  terms  under  which a given free
+software Package may be copied, modified, distributed, and/or redistributed.
+The intent is that the Copyright Holder maintains some artistic control over
+the development of that Package while still keeping the Package available as
+open source and free software.
+
+You are always permitted to make arrangements wholly outside of this license
+directly with the Copyright Holder of a given Package.  If the terms of this
+license do not permit  the full use that you propose to make of the Package,
+you should contact  the Copyright Holder  and  seek  a  different  licensing 
+arrangement.])
 AC_CONFIG_AUX_DIR([libltdl/config])
 AC_CONFIG_SRCDIR([game.c])
-AC_CONFIG_HEADERS([autoconf.h])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([libltdl/m4])
 
 AX_PRINT_PACKAGE_TITLE()
+
+AX_BOX([Checks for programs])
+# Checks for programs.
+
+AC_PROG_CC
+gl_EARLY
+gl_INIT
+AC_PROG_CPP
+AC_PROG_CPP_WERROR
+AM_PROG_CC_C_O
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 AX_BOX([Initializing Automake])
 
@@ -45,6 +80,8 @@ LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])
+
+
 
 AX_BOX([Checks for Options])
 
@@ -61,7 +98,7 @@ AH_TOP([#ifndef __AUTOCONF_H
 
 #include "copyright.h"])
 
-AH_BOTTOM([#include "autoinclude.h"
+AH_BOTTOM([#include "autoconfig.h"
 
 #endif /* __AUTOCONF_H */])
 
@@ -121,6 +158,17 @@ AC_ARG_ENABLE([module-mail], [AS_HELP_STRING([--enable-module-mail], [Enable sup
  ]
 )
 AM_CONDITIONAL([WANT_MODULE_MAIL], [test "x$enable_module_mail" = "xyes"])
+
+AC_MSG_CHECKING([whether the db_sql module is enable])
+AC_ARG_ENABLE([module-dbsql], [AS_HELP_STRING([--enable-module-dbsql], [Enable support for the dbsql module @<:@default=no@:>@])],
+ [
+  AX_ENABLE_YESNO([$enableval])
+ ], [
+  AC_MSG_RESULT([no])
+  enable_module_dbsql="no"
+ ]
+)
+AM_CONDITIONAL([WANT_MODULE_DB_SQL], [test "x$enable_module_dbsql" = "xyes"])
 
 AC_MSG_CHECKING([whether the hello module is enable])
 AC_ARG_ENABLE([module-hello], [AS_HELP_STRING([--enable-module-hello], [Enable support for the hello module @<:@default=no@:>@])],
@@ -292,16 +340,7 @@ AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"], [Text that
 AC_MSG_RESULT([$with_pueblo_msg])
 AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["${with_pueblo_msg}"], [Pueblo support message])
 
-AX_BOX([Checks for programs])
-# Checks for programs.
 
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_CPP_WERROR
-AM_PROG_CC_C_O
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
-AC_PROG_LIBTOOL
 
 AX_BOX([Checks for platform])
 # Checks for platform.
@@ -330,7 +369,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h])
 
 AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.
@@ -484,21 +523,18 @@ AC_EGREP_HEADER(strtok_r,string.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_STRTOK_R_DC
 AX_BOX([Checks for library functions.])
 # Checks for library functions.
 AC_FUNC_FORK
-dnl AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-AC_FUNC_MMAP
-dnl AC_FUNC_STRTOD
-dnl AC_FUNC_MALLOC
-dnl AC_FUNC_REALLOC
 AC_FUNC_VFORK
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii localtime_r memmove memset mkdir mktime munmap pow rename rmdir select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtol strtoul timelocal tzset vsnprintf wait3 wait4])
+AC_FUNC_MMAP
+
+AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii localtime_r memmove memset mkdir mktime munmap pow rename rmdir select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtol strtoul timelocal tzset uname vsnprintf wait3 wait4])
 
 AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
-AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], ["$PACKAGE_RELEASE_DATE"], [Date of Release])
+AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Release])
 
 AX_BOX([Configuring files.])
-AC_CONFIG_FILES([dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile Makefile])
+AC_CONFIG_FILES([lib/Makefile dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile modules/db_sql/Makefile Makefile])
 
 AX_BOX([Generating config.status.])
 AC_OUTPUT
@@ -545,6 +581,7 @@ AX_PRINT([
 -------------------------------%b
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
+                   Module DBSQL : %B$enable_module_dbsql%b
                    Module Hello : %B$enable_module_hello%b
 
                            %BMisc

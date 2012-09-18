@@ -2,7 +2,7 @@
 /* $Id: compat.c,v 1.5 2000/05/29 22:20:10 rmg Exp $ */
 
 #include "copyright.h"
-#include "autoconf.h"
+#include "config.h"
 
 #ifdef NEED_TIMELOCAL
 

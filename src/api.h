@@ -6,7 +6,7 @@
 #define __API_H
 
 #include "copyright.h"
-#include "autoconf.h"
+#include "config.h"
 
 #include "mushconf.h"		/* required by code */
 #include "interface.h"		/* required by code */
