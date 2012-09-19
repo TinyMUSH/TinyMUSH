@@ -50,6 +50,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE@am__append_1 = db_sql_none.c
+@WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__append_2 = db_sql_msql.c
+@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__append_3 = db_sql_mysql.c
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__append_4 = db_sql_pgsqp.c
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__append_5 = sqlite3
 subdir = modules/db_sql
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/libltdl/config/depcomp
@@ -113,7 +118,15 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 db_sql_la_LIBADD =
-am_db_sql_la_OBJECTS = db_sql.lo
+am__db_sql_la_SOURCES_DIST = db_sql.c db_sql.h db_sql_none.c \
+	db_sql_msql.c db_sql_mysql.c db_sql_pgsqp.c sqlite3
+@WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE@am__objects_1 = db_sql_none.lo
+@WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__objects_2 = db_sql_msql.lo
+@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__objects_3 = db_sql_mysql.lo
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__objects_4 = db_sql_pgsqp.lo
+am__objects_5 =
+am_db_sql_la_OBJECTS = db_sql.lo $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5)
 db_sql_la_OBJECTS = $(am_db_sql_la_OBJECTS)
 db_sql_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -132,7 +145,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(db_sql_la_SOURCES)
-DIST_SOURCES = $(db_sql_la_SOURCES)
+DIST_SOURCES = $(am__db_sql_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -625,8 +638,9 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 AM_CPPFLAGS = $(LTDLINCL)
 lib_LTLIBRARIES = db_sql.la
-db_sql_la_SOURCES = db_sql.c
-db_sql_la_LDFLAGS = $(LIBOBJS) $(LIBLTDL) -dlopen self -module -avoid-version -shared
+db_sql_la_SOURCES = db_sql.c db_sql.h $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5)
+db_sql_la_LDFLAGS = $(LIBOBJS) $(LIBLTDL) -module -avoid-version -shared
 all: all-am
 
 .SUFFIXES:
@@ -705,6 +719,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_msql.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_mysql.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_none.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_pgsqp.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

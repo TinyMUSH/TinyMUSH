@@ -23,6 +23,9 @@
 /* default db filename */
 #undef DB_FILE
 
+/* DB_SQL use no driver driver */
+#undef DB_SQL_DRIVER
+
 /* length of the DOING field in WHO */
 #undef DOING_LEN
 

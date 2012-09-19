@@ -117,6 +117,7 @@ struct module_linked_list
     void (*do_second)(void);
     void (*cache_put_notify)(DBData, unsigned int);
     void (*cache_del_notify)(DBData, unsigned int);
+    void (*version)(dbref, dbref, int);
 };
 
 typedef struct api_function_data API_FUNCTION;
@@ -125,6 +126,15 @@ struct api_function_data
     const char *name;
     const char *param_fmt;
     void (*handler)(void *, void *);
+};
+
+typedef struct module_version_data MODULE_VERSION;
+struct module_version_data
+{
+  char *version;
+  char *author;
+  char *description;
+  char *parameters;
 };
 
 /* ---------------------------------------------------------------------------

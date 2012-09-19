@@ -3984,3 +3984,30 @@ void mod_mail_init()
     register_functions(mod_mail_functable);
     register_hashtables(NULL, mod_mail_nhashtable);
 }
+
+void mod_mail_version(player, cause, extra)
+	dbref player, cause;
+	int extra;
+{
+	char string[MBUF_SIZE];
+	
+	sprintf(string, "Module MAIL : version %d.%d", mudstate.version.major, mudstate.version.minor);
+	switch(mudstate.version.status){
+		case 0: 
+			sprintf(string, "%s, Alpha %d", string, mudstate.version.revision);
+                	break;
+		case 1: 
+			sprintf(string, "%s, Beta %d", string, mudstate.version.revision);
+			break;
+		case 2: 
+			sprintf(string,"%s, Release Candidate %d", string, mudstate.version.revision);
+			break;
+		default:
+			if(mudstate.version.revision > 0) {
+				sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
+			} else {
+				sprintf(string, "%s, Gold Release.", string);
+			}
+	}
+	notify(player, tprintf("%s (%s)", string, PACKAGE_RELEASE_DATE));
+}

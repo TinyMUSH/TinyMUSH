@@ -668,6 +668,16 @@ LIBOBJS
 ac_aux_dir
 WANT_MODULE_HELLO_FALSE
 WANT_MODULE_HELLO_TRUE
+WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE
+WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE
+WANT_MODULE_DB_SQL_DRIVER_PGSQL_FALSE
+WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE
+WANT_MODULE_DB_SQL_DRIVER_MYSQL_FALSE
+WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE
+WANT_MODULE_DB_SQL_DRIVER_MSQL_FALSE
+WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE
+WANT_MODULE_DB_SQL_DRIVER_NONE_FALSE
+WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE
 WANT_MODULE_DB_SQL_FALSE
 WANT_MODULE_DB_SQL_TRUE
 WANT_MODULE_MAIL_FALSE
@@ -1178,6 +1188,7 @@ enable_disk_based
 enable_module_comsys
 enable_module_mail
 enable_module_dbsql
+with_db_sql
 enable_module_hello
 enable_pueblo_support
 enable_floating_point
@@ -1891,6 +1902,13 @@ Optional Packages:
                           driver. A newer implementation of the DBM engine, a
                           compromise between gdbm and memory-based cache.
                           [default=gdbm]
+  --with-db-sql=none|msql|mysql|pgsql|sqlite3
+                          Select the SQL driver used by the db_sql module,
+                          valid values are : none, no database driver, msql
+                          (mSQL), mysql (MySQL), pgsql (PostgreSQL) or sqlite
+                          (SQLite). Of course support for the database must be
+                          avalable before trying to use anything but none.
+                          [default=none]
   --with-malloc-wrapper=[track|log]
                           Enable use of wrapper macros for malloc(), free(),
                           and related functions to do one of the following,
@@ -17006,6 +17024,92 @@ else
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking db_sql driver to use" >&5
+$as_echo_n "checking db_sql driver to use... " >&6; }
+
+# Check whether --with-db-sql was given.
+if test "${with_db_sql+set}" = set; then :
+  withval=$with_db_sql; case $withval in #(
+  msql) :
+    with_db_sql="msql" ;; #(
+  pgsql) :
+    with_db_sql="pgsql" ;; #(
+  sqlite) :
+    with_db_sql="sqlite" ;; #(
+  *) :
+    with_db_sql="none" ;;
+esac
+else
+  with_dbm="gdbm"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_db_sql" >&5
+$as_echo "$with_db_sql" >&6; }
+case $with_db_sql in #(
+  msql) :
+
+$as_echo "#define DB_SQL_DRIVER MSQL" >>confdefs.h
+ ;; #(
+  mysql) :
+
+$as_echo "#define DB_SQL_DRIVER MYSQL" >>confdefs.h
+ ;; #(
+  pgsql) :
+
+$as_echo "#define DB_SQL_DRIVER PGSQL" >>confdefs.h
+ ;; #(
+  sqlite3) :
+
+$as_echo "#define DB_SQL_DRIVER SQLITE" >>confdefs.h
+ ;; #(
+  *) :
+
+$as_echo "#define DB_SQL_DRIVER NONE" >>confdefs.h
+
+ ;;
+esac
+
+ if test "x$with_db_sql" = "xnone"; then
+  WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE=
+  WANT_MODULE_DB_SQL_DRIVER_NONE_FALSE='#'
+else
+  WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE='#'
+  WANT_MODULE_DB_SQL_DRIVER_NONE_FALSE=
+fi
+
+ if test "x$with_db_sql" = "xmsql"; then
+  WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE=
+  WANT_MODULE_DB_SQL_DRIVER_MSQL_FALSE='#'
+else
+  WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE='#'
+  WANT_MODULE_DB_SQL_DRIVER_MSQL_FALSE=
+fi
+
+ if test "x$with_db_sql" = "xmysql"; then
+  WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE=
+  WANT_MODULE_DB_SQL_DRIVER_MYSQL_FALSE='#'
+else
+  WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE='#'
+  WANT_MODULE_DB_SQL_DRIVER_MYSQL_FALSE=
+fi
+
+ if test "x$with_db_sql" = "xpgsql"; then
+  WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE=
+  WANT_MODULE_DB_SQL_DRIVER_PGSQL_FALSE='#'
+else
+  WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE='#'
+  WANT_MODULE_DB_SQL_DRIVER_PGSQL_FALSE=
+fi
+
+ if test "x$with_db_sql" = "xsqlite"; then
+  WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE=
+  WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE='#'
+else
+  WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE='#'
+  WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE=
+fi
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the hello module is enable" >&5
 $as_echo_n "checking whether the hello module is enable... " >&6; }
 # Check whether --enable-module-hello was given.
@@ -20299,6 +20403,26 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_MODULE_DB_SQL_TRUE}" && test -z "${WANT_MODULE_DB_SQL_FALSE}"; then
   as_fn_error $? "conditional \"WANT_MODULE_DB_SQL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE}" && test -z "${WANT_MODULE_DB_SQL_DRIVER_NONE_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_NONE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE}" && test -z "${WANT_MODULE_DB_SQL_DRIVER_MSQL_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_MSQL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE}" && test -z "${WANT_MODULE_DB_SQL_DRIVER_MYSQL_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_MYSQL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE}" && test -z "${WANT_MODULE_DB_SQL_DRIVER_PGSQL_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_PGSQL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE}" && test -z "${WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_SQLITE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_MODULE_HELLO_TRUE}" && test -z "${WANT_MODULE_HELLO_FALSE}"; then

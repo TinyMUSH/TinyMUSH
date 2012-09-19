@@ -26,15 +26,22 @@ int extra;
     
     switch(mudstate.version.status)
     {
-        case 0: sprintf(string, "%s, Alpha %d", string, mudstate.version.status);
+        case 0: 
+                sprintf(string, "%s, Alpha %d", string, mudstate.version.revision);
                 break;
-        case 1: sprintf(string, "%s, Beta %d", string, mudstate.version.status);
+        case 1: 
+                sprintf(string, "%s, Beta %d", string, mudstate.version.revision);
                 break;
-        case 2: sprintf(string,"%s, Release Candidate %d", string, mudstate.version.status);
+        case 2: 
+                sprintf(string,"%s, Release Candidate %d", string, mudstate.version.revision);
                 break;
+        default:
+                if(mudstate.version.revision > 0) {
+                  sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
+                } else {
+                  sprintf(string, "%s, Gold Release", string);
+                }
     }
-    if(mudstate.version.revision > 0)
-        sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
     notify(player, tprintf("%s (%s)", string, PACKAGE_RELEASE_DATE));
     if (Wizard(player))
     {
@@ -43,12 +50,13 @@ int extra;
         notify(player, tprintf("Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine));
 #endif
         notify(player, tprintf("    DBM driver: %s", MUSH_DBM));
-    if (mudstate.modloaded[0])
-    {
-        notify(player, tprintf("Modules loaded: %s",
-                               mudstate.modloaded));
-    }
         notify(player, tprintf("    Build info: %s", mudstate.buildinfo));
+        if (mudstate.modloaded[0])
+          {
+          notify(player, tprintf("Modules loaded: %s", mudstate.modloaded));
+          notify(player, "   Module info:");
+          CALL_ALL_MODULES_NOCACHE("version", (dbref, dbref, int), (player, cause, extra));
+          }
     }
 }
 

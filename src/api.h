@@ -17,6 +17,15 @@
 #include "ansi.h"		/* required by code */
 #include "functions.h"		/* required by code */
 
+
+/*
+ * Function prototype
+ */
+ 
+#define	XFUNCTION(x)	\
+	extern void FDECL(x, (char *, char **, dbref, dbref, dbref, \
+			      char *[], int, char *[], int))
+
 /*
  * ------------------------------------------------------------------------
  * Command handler macros.

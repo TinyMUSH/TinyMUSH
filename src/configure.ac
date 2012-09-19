@@ -170,6 +170,26 @@ AC_ARG_ENABLE([module-dbsql], [AS_HELP_STRING([--enable-module-dbsql], [Enable s
 )
 AM_CONDITIONAL([WANT_MODULE_DB_SQL], [test "x$enable_module_dbsql" = "xyes"])
 
+AC_MSG_CHECKING([db_sql driver to use])
+AC_ARG_WITH([db-sql],
+ [AS_HELP_STRING([--with-db-sql=none|msql|mysql|pgsql|sqlite3], [Select the SQL driver used by the db_sql module, valid values are : none, no database driver, msql (mSQL), mysql (MySQL), pgsql (PostgreSQL) or sqlite (SQLite). Of course support for the database must be avalable before trying to use anything but none. @<:@default=none@:>@])],
+ [AS_CASE([$withval], [msql], [with_db_sql="msql"], [pgsql], [with_db_sql="pgsql"], [sqlite], [with_db_sql="sqlite"], [with_db_sql="none"])], 
+ [with_dbm="gdbm"])
+AC_MSG_RESULT([$with_db_sql])
+AS_CASE([$with_db_sql],
+	[msql],AC_DEFINE([DB_SQL_DRIVER],[MSQL], [DB_SQL use the mSQL driver]),
+	[mysql],AC_DEFINE([DB_SQL_DRIVER],[MYSQL], [DB_SQL use the MySQL driver]),
+	[pgsql],AC_DEFINE([DB_SQL_DRIVER],[PGSQL], [DB_SQL use the PostgreSQL driver]),
+	[sqlite3],AC_DEFINE([DB_SQL_DRIVER],[SQLITE], [DB_SQL use the SQLite driver]),
+	AC_DEFINE([DB_SQL_DRIVER],[NONE], [DB_SQL use no driver driver])
+)
+	
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_NONE], [test "x$with_db_sql" = "xnone"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MSQL], [test "x$with_db_sql" = "xmsql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_db_sql" = "xmysql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_db_sql" = "xpgsql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_db_sql" = "xsqlite"])
+
 AC_MSG_CHECKING([whether the hello module is enable])
 AC_ARG_ENABLE([module-hello], [AS_HELP_STRING([--enable-module-hello], [Enable support for the hello module @<:@default=no@:>@])],
  [
