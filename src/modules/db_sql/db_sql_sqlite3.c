@@ -1,42 +1,22 @@
 /* db_sqlite3.c - Implements accessing a SQLite3 database. */
 /* $Id: db_sqlite3.c,v 1.2 2010/06/02 16:04:09 lwl Exp $ */
 
-#include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "../../copyright.h"
+#include "db_sql.h"		/* required by code */
 
-#include "db.h"			/* required by externs */
-#include "externs.h"		/* required by code */
-#include "functions.h"		/* required by code */
-
-#include <sqlite3.h>
-
-/* See db_sql.h for details of what each of these functions do. */
-
-/*
- * Number of times to retry a connection if we fail in the middle of a query.
- */
-
-#define SQLITE_RETRY_TIMES 3
-
-static sqlite3 *sqlite3_struct = NULL;
-
-void
-sql_shutdown()
-{
+void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     sqlite3 *sqlite;
 
     if (!sqlite3_struct)
         return;
     sqlite = sqlite3_struct;
     STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf("Closed SQLite3 database: %s", mudconf.sql_db);
+    log_printf("Closed SQLite3 database: %s", mod_db_sql_config.db);
     ENDLOG sqlite3_close(sqlite);
     sqlite3_struct = NULL;
 }
 
-int
-sql_init()
-{
+int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
     sqlite3 *sqlite;
 
     int retval;
@@ -46,7 +26,7 @@ sql_init()
      * only the db.
      */
 
-    if (!mudconf.sql_db || !*mudconf.sql_db)
+    if (!mod_db_sql_config.db || !*mod_db_sql_config.db)
         return -1;
 
     /*
@@ -55,36 +35,25 @@ sql_init()
      */
 
     if (sqlite3_struct)
-        sql_shutdown();
+        sql_shutdown(0,0,NULL,NULL);
 
-    retval = sqlite3_open(mudconf.sql_db, &sqlite);
+    retval = sqlite3_open(mod_db_sql_config.db, &sqlite);
     if (retval != SQLITE_OK)
     {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
         log_printf("Failed to open %s: %s",
-                   mudconf.sql_db, sqlite3_errmsg(sqlite));
+                   mod_db_sql_config.db, sqlite3_errmsg(sqlite));
         ENDLOG return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Opened SQLite3 file %s", mudconf.sql_db);
+    log_printf("Opened SQLite3 file %s", mod_db_sql_config.db);
     ENDLOG sqlite3_struct = sqlite;
-    mudstate.sql_socket = -1;
+    mod_db_sql_config.socket = -1;
     return 1;
 }
 
 
-int
-sql_query(player, q_string, buff, bufc, row_delim, field_delim)
-dbref player;
-
-char *q_string;
-
-char *buff;
-
-char **bufc;
-
-const Delim *row_delim, *field_delim;
-{
+int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
     sqlite3 *sqlite;
 
     const unsigned char *col_data;
@@ -108,7 +77,7 @@ const Delim *row_delim, *field_delim;
      */
 
     sqlite = sqlite3_struct;
-    if ((!sqlite) && (mudconf.sql_reconnect != 0))
+    if ((!sqlite) && (mod_db_sql_config.reconnect != 0))
     {
         /*
          * Try to reconnect.
@@ -117,7 +86,7 @@ const Delim *row_delim, *field_delim;
         while ((retries < SQLITE_RETRY_TIMES) && !sqlite)
         {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             sqlite = sqlite3_struct;
             retries++;
         }

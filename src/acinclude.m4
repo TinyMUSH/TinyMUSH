@@ -5,13 +5,17 @@ m4_include([libltdl/m4/ltoptions.m4])
 m4_include([libltdl/m4/ltsugar.m4])
 m4_include([libltdl/m4/ltversion.m4])
 m4_include([libltdl/m4/lt~obsolete.m4])
+m4_include([modules/db_sql/m4/ax_check_msql.m4])
+m4_include([modules/db_sql/m4/ax_check_mysql.m4])
+m4_include([modules/db_sql/m4/ax_check_pgsql.m4])
+m4_include([modules/db_sql/m4/ax_lib_sqlite3.m4])
 
 AC_DEFUN([AX_PRINT],AS_IF([test -z $2], [${ac_aux_dir}/shtool echo -e "$1"], [${ac_aux_dir}/shtool echo -e "$1: %B$2%b"]))
 
 AC_DEFUN([AX_VERSION], [
 	m4_define([count], [0])
 	m4_foreach([myvar], m4_split(TINYMUSH_VERSION, [\.]),[
-		AS_CASE([count], [0], [PACKAGE_VERSION_MAJOR=myvar], [1], [PACKAGE_VERSION_MINOR=myvar], [2], [PACKAGE_RELEASE_REVISION=myvar], [3], [PACKAGE_RELEASE_STATUS=myvar])
+		AS_CASE([count], [0], [PACKAGE_VERSION_MAJOR=myvar], [1], [PACKAGE_VERSION_MINOR=myvar], [2], [PACKAGE_RELEASE_STATUS=myvar], [3], [PACKAGE_RELEASE_REVISION=myvar])
 		m4_define([count], m4_eval(count + 1))
 	])
 	
@@ -34,4 +38,3 @@ AC_DEFUN([AX_PRINT_PACKAGE_TITLE], AX_PRINT([
 )
 
 AC_DEFUN([AX_ENABLE_YESNO], [AS_IF([test "x$1" = "xyes"], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])])
-

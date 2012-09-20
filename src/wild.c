@@ -463,7 +463,7 @@ int arg;
              * * First do the '*'...
              */
             strncpy(arglist[argpos], datapos,
-                            (dstr - datapos) - numextra);
+                    (dstr - datapos) - numextra);
             arglist[argpos][(dstr - datapos) - numextra] = '\0';
             datapos = dstr - numextra;
             argpos++;

@@ -3,8 +3,8 @@
 
 #include "copyright.h"
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#ifndef __GAME_H
+#define __GAME_H
 
 /* Do not change anything unless you are certain you know what it does.
  * General user-definable compile-time options can be found in the
@@ -24,7 +24,7 @@
 
 #define OUTPUT_VERSION	1			/* Version 1 */
 #define OUTPUT_FLAGS	(MANDFLAGS|OFLAGS1|OFLAGS2)
-						/* format for dumps */
+/* format for dumps */
 
 #define UNLOAD_VERSION	1			/* version for export */
 #define UNLOAD_OUTFLAGS	(MANDFLAGS)		/* format for export */
@@ -87,4 +87,4 @@
 #define READ read
 #define WRITE write
 
-#endif /* __CONFIG_H */
+#endif /* __GAME_H */

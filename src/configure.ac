@@ -4,8 +4,8 @@ AC_PREREQ([2.69])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
-m4_define(TINYMUSH_VERSION, [3.3.0.0])
-m4_define(TINYMUSH_RELEASE_DATE, ["2012-02-19"])
+m4_define(TINYMUSH_VERSION, [3.3.0.1])
+m4_define(TINYMUSH_RELEASE_DATE, ["2012-09-19"])
 m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2012 TinyMUSH development team.])
 
 AC_INIT([TinyMUSH], TINYMUSH_VERSION, [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
@@ -159,7 +159,7 @@ AC_ARG_ENABLE([module-mail], [AS_HELP_STRING([--enable-module-mail], [Enable sup
 )
 AM_CONDITIONAL([WANT_MODULE_MAIL], [test "x$enable_module_mail" = "xyes"])
 
-AC_MSG_CHECKING([whether the db_sql module is enable])
+AC_MSG_CHECKING([whether the dbsql module is enable])
 AC_ARG_ENABLE([module-dbsql], [AS_HELP_STRING([--enable-module-dbsql], [Enable support for the dbsql module @<:@default=no@:>@])],
  [
   AX_ENABLE_YESNO([$enableval])
@@ -170,25 +170,47 @@ AC_ARG_ENABLE([module-dbsql], [AS_HELP_STRING([--enable-module-dbsql], [Enable s
 )
 AM_CONDITIONAL([WANT_MODULE_DB_SQL], [test "x$enable_module_dbsql" = "xyes"])
 
-AC_MSG_CHECKING([db_sql driver to use])
-AC_ARG_WITH([db-sql],
- [AS_HELP_STRING([--with-db-sql=none|msql|mysql|pgsql|sqlite3], [Select the SQL driver used by the db_sql module, valid values are : none, no database driver, msql (mSQL), mysql (MySQL), pgsql (PostgreSQL) or sqlite (SQLite). Of course support for the database must be avalable before trying to use anything but none. @<:@default=none@:>@])],
+AC_MSG_CHECKING([dbsql module driver to use])
+AC_ARG_WITH([module-dbsql],
+ [AS_HELP_STRING([--with-module-dbsql=DRIVER], [Select the SQL driver used by the db_sql module, valid values are : none : no database driver, msql : use mSQL database, mysql : use MySQL database driver, pgsql : use PostgreSQL database driver or sqlite : use SQLite database driver. Of course support for the database must be avalable before trying to use anything but none. @<:@default=none@:>@])],
  [AS_CASE([$withval], [msql], [with_db_sql="msql"], [pgsql], [with_db_sql="pgsql"], [sqlite], [with_db_sql="sqlite"], [with_db_sql="none"])], 
- [with_dbm="gdbm"])
-AC_MSG_RESULT([$with_db_sql])
-AS_CASE([$with_db_sql],
-	[msql],AC_DEFINE([DB_SQL_DRIVER],[MSQL], [DB_SQL use the mSQL driver]),
-	[mysql],AC_DEFINE([DB_SQL_DRIVER],[MYSQL], [DB_SQL use the MySQL driver]),
-	[pgsql],AC_DEFINE([DB_SQL_DRIVER],[PGSQL], [DB_SQL use the PostgreSQL driver]),
-	[sqlite3],AC_DEFINE([DB_SQL_DRIVER],[SQLITE], [DB_SQL use the SQLite driver]),
-	AC_DEFINE([DB_SQL_DRIVER],[NONE], [DB_SQL use no driver driver])
+ [with_module_dbsql="none"])
+AC_MSG_RESULT([$with_module_dbsql])
+AS_CASE([$with_module_dbsql],
+	[msql], 	[
+			AX_CHECK_MSQL([yes])
+			],
+	[mysql],	[
+			AX_CHECK_MYSQL([yes])
+			AC_SUBST([MYSQL_LIBS])
+			AC_SUBST([MYSQL_CFLAGS])
+			AC_DEFINE([HAVE_MYSQL], [1], [DB_SQL use the MySQL driver])
+			],
+	[pgsql],	[
+			AX_CHECK_PGSQL([yes])
+			AC_SUBST([PGSQL_LIBS])  
+			AC_SUBST([PGSQL_CFLAGS])
+			AC_DEFINE([HAVE_PGSQL], [1], [DB_SQL use the PostgreSQL driver])
+			],
+	[sqlite],	[
+			AX_LIB_SQLITE3([3.0.0])
+			
+			dnl AC_CHECK_HEADER([sqlite3.h], [
+			dnl AC_DEFINE(HAVE_SQLITE, [1], [DB_SQL use the SQLite3 driver])
+			dnl AC_SUBST([PGSQL_CFLAGS], [""])
+			dnl AC_SUBST([SQLITE_LIBS], ["-lsqlite3"])
+			dnl ], [
+			dnl AC_MSG_ERROR([Unable to find SQLite Libraries])
+			dnl ])
+			],
+	[AC_DEFINE([DB_SQL_DRIVER],[NONE], [DB_SQL use no driver driver])]
 )
 	
-AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_NONE], [test "x$with_db_sql" = "xnone"])
-AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MSQL], [test "x$with_db_sql" = "xmsql"])
-AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_db_sql" = "xmysql"])
-AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_db_sql" = "xpgsql"])
-AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_db_sql" = "xsqlite"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_NONE], [test "x$with_module_dbsql" = "xnone"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MSQL], [test "x$with_module_dbsql" = "xmsql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_module_dbsql" = "xmysql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_module_dbsql" = "xpgsql"])
+AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_module_dbsql" = "xsqlite"])
 
 AC_MSG_CHECKING([whether the hello module is enable])
 AC_ARG_ENABLE([module-hello], [AS_HELP_STRING([--enable-module-hello], [Enable support for the hello module @<:@default=no@:>@])],
@@ -552,6 +574,7 @@ AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesiz
 AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
 AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Release])
+AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], TINYMUSH_COPYRIGHT, [Copyright Notice])
 
 AX_BOX([Configuring files.])
 AC_CONFIG_FILES([lib/Makefile dbm/gdbm/Makefile dbm/qdbm/Makefile modules/comsys/Makefile modules/mail/Makefile modules/hello/Makefile modules/db_sql/Makefile Makefile])
@@ -601,7 +624,7 @@ AX_PRINT([
 -------------------------------%b
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
-                   Module DBSQL : %B$enable_module_dbsql%b
+                   Module DBSQL : %B$enable_module_dbsql%b with driver %B$with_module_dbsql%b
                    Module Hello : %B$enable_module_hello%b
 
                            %BMisc

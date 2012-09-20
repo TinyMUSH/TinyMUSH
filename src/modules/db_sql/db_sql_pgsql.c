@@ -1,30 +1,10 @@
 /* db_pgsql.c - Implements accessing a PostgreSQL database. */
 /* $Id: db_pgsql.c,v 1.1 2010/06/01 19:45:22 lwl Exp $ */
 
-#include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "../../copyright.h"
+#include "db_sql.h"
 
-#include "db.h"			/* required by externs */
-#include "externs.h"		/* required by code */
-#include "functions.h"		/* required by code */
-
-#include <libpq-fe.h>
-
-/* See db_sql.h for details of what each of these functions do. */
-
-
-/*
- * Number of times to retry a connection if we fail in the middle of a query.
- */
-
-#define PGSQL_RETRY_TIMES 3
-#define CONNECT_STRING_SIZE 512
-
-static PGconn *pgsql_struct = NULL;
-
-void
-sql_shutdown()
-{
+void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     PGconn *pgsql;
 
     if (!pgsql_struct)
@@ -36,12 +16,10 @@ sql_shutdown()
      PQhost(pgsql), PQdb(pgsql));
     ENDLOG PQfinish(pgsql);
     pgsql_struct = NULL;
-    mudstate.sql_socket = -1;
+    mod_db_sql_config.socket = -1;
 }
 
-int
-sql_init()
-{
+int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
     PGconn *pgsql;
 
     PGresult *result;
@@ -52,9 +30,9 @@ sql_init()
      * Make sure we have valid config options.
      */
 
-    if (!mudconf.sql_host || !*mudconf.sql_host)
+    if (!mod_db_sql_config.host || !*mod_db_sql_config.host)
         return -1;
-    if (!mudconf.sql_db || !*mudconf.sql_db)
+    if (!mod_db_sql_config.db || !*mod_db_sql_config.db)
         return -1;
 
     /*
@@ -63,7 +41,7 @@ sql_init()
      */
 
     if (pgsql_struct)
-        sql_shutdown();
+        sql_shutdown(0,0,NULL,NULL);
 
     /*
      * Try to connect to the database host. If we have specified
@@ -71,37 +49,26 @@ sql_init()
      */
     snprintf(connect_string, CONNECT_STRING_SIZE,
              "host = '%s' dbname = '%s' user = '%s' password = '%s'",
-             mudconf.sql_host, mudconf.sql_db, mudconf.sql_username,
-             mudconf.sql_password);
+             mod_db_sql_config.host, mod_db_sql_config.db, mod_db_sql_config.username,
+             mod_db_sql_config.password);
     pgsql = PQconnectdb(connect_string);
 
     if (!pgsql)
     {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
         log_printf("Failed connection to SQL server %s: %s",
-                   mudconf.sql_host, PQerrorMessage(pgsql));
+                   mod_db_sql_config.host, PQerrorMessage(pgsql));
         ENDLOG return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
     log_printf("Connected to SQL server %s, SQL database selected: %s",
                PQhost(pgsql), PQdb(pgsql));
     ENDLOG pgsql_struct = pgsql;
-    mudstate.sql_socket = PQsocket(pgsql);
+    mod_db_sql_config.socket = PQsocket(pgsql);
     return 1;
 }
 
-int
-sql_query(player, q_string, buff, bufc, row_delim, field_delim)
-dbref player;
-
-char *q_string;
-
-char *buff;
-
-char **bufc;
-
-const Delim *row_delim, *field_delim;
-{
+int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
     PGresult *pgres;
 
     ExecStatusType pgstat;
@@ -123,7 +90,7 @@ const Delim *row_delim, *field_delim;
      */
 
     pgsql = pgsql_struct;
-    if ((!pgsql) && (mudconf.sql_reconnect != 0))
+    if ((!pgsql) && (mod_db_sql_config.reconnect != 0))
     {
         /*
          * Try to reconnect.
@@ -132,7 +99,7 @@ const Delim *row_delim, *field_delim;
         while ((retries < PGSQL_RETRY_TIMES) && !pgsql)
         {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             pgsql = pgsql_struct;
             retries++;
         }
@@ -168,8 +135,7 @@ const Delim *row_delim, *field_delim;
     num_rows = atoi(PQcmdTuples(pgres));
     if (num_rows > 0)
     {
-        notify(player, tprintf("SQL query touched %d %s.",
-                               num_rows, (num_rows == 1) ? "row" : "rows"));
+        notify(player, tprintf("SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows"));
         PQclear(pgres);
         return 0;
     }

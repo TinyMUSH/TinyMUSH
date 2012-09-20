@@ -13,7 +13,7 @@
 
 #ifdef HAVE_LIBTINYGDBM_H
 #include "libtinygdbm.h"	/* required by code */
-#else      
+#else
 #ifdef HAVE_LIBTINYQDBM_H
 #include "libtinyqdbm.h"	/* required by code */
 #endif
@@ -52,7 +52,7 @@ int flag;
     {
         gdbm_error = (char *)gdbm_strerror(gdbm_errno);
         warning("setsync: cannot toggle sync flag", dbfile, " ",
-                (char *)-1, "\n", gdbm_error, "\n", (char *)0);    
+                (char *)-1, "\n", gdbm_error, "\n", (char *)0);
     }
 }
 

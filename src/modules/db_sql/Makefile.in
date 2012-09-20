@@ -52,9 +52,17 @@ build_triplet = @build@
 host_triplet = @host@
 @WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE@am__append_1 = db_sql_none.c
 @WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__append_2 = db_sql_msql.c
-@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__append_3 = db_sql_mysql.c
-@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__append_4 = db_sql_pgsqp.c
-@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__append_5 = sqlite3
+@WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__append_3 = $(MSQL_CFLAGS)
+@WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__append_4 = $(MSQL_LIBS) 
+@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__append_5 = db_sql_mysql.c
+@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__append_6 = $(MYSQL_CFLAGS)
+@WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__append_7 = $(MYSQL_LIBS)
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__append_8 = db_sql_pgsql.c
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__append_9 = $(PGSQL_CFLAGS)
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__append_10 = $(PGSQL_LIBS)
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__append_11 = db_sql_sqlite3.c
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__append_12 = $(SQLITE3_CFLAGS)
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__append_13 = $(SQLITE3_LDFLAGS)
 subdir = modules/db_sql
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/libltdl/config/depcomp
@@ -81,6 +89,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
 	$(top_srcdir)/libltdl/m4/ltversion.m4 \
 	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_msql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_mysql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_pgsql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -119,12 +131,13 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 db_sql_la_LIBADD =
 am__db_sql_la_SOURCES_DIST = db_sql.c db_sql.h db_sql_none.c \
-	db_sql_msql.c db_sql_mysql.c db_sql_pgsqp.c sqlite3
+	db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c
 @WANT_MODULE_DB_SQL_DRIVER_NONE_TRUE@am__objects_1 = db_sql_none.lo
 @WANT_MODULE_DB_SQL_DRIVER_MSQL_TRUE@am__objects_2 = db_sql_msql.lo
 @WANT_MODULE_DB_SQL_DRIVER_MYSQL_TRUE@am__objects_3 = db_sql_mysql.lo
-@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__objects_4 = db_sql_pgsqp.lo
-am__objects_5 =
+@WANT_MODULE_DB_SQL_DRIVER_PGSQL_TRUE@am__objects_4 = db_sql_pgsql.lo
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@am__objects_5 =  \
+@WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE@	db_sql_sqlite3.lo
 am_db_sql_la_OBJECTS = db_sql.lo $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5)
 db_sql_la_OBJECTS = $(am_db_sql_la_OBJECTS)
@@ -457,6 +470,10 @@ LT_DLPREOPEN = @LT_DLPREOPEN@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+MSQL_CFLAGS = @MSQL_CFLAGS@
+MSQL_LIBS = @MSQL_LIBS@
+MYSQL_CFLAGS = @MYSQL_CFLAGS@
+MYSQL_LIBS = @MYSQL_LIBS@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDLIB_H = @NEXT_AS_FIRST_DIRECTIVE_STDLIB_H@
 NEXT_AS_FIRST_DIRECTIVE_STRING_H = @NEXT_AS_FIRST_DIRECTIVE_STRING_H@
@@ -485,6 +502,8 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PGSQL_CFLAGS = @PGSQL_CFLAGS@
+PGSQL_LIBS = @PGSQL_LIBS@
 PRAGMA_COLUMNS = @PRAGMA_COLUMNS@
 PRAGMA_SYSTEM_HEADER = @PRAGMA_SYSTEM_HEADER@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
@@ -562,6 +581,9 @@ REPLACE_WRITE = @REPLACE_WRITE@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE3_CFLAGS = @SQLITE3_CFLAGS@
+SQLITE3_LDFLAGS = @SQLITE3_LDFLAGS@
+SQLITE3_VERSION = @SQLITE3_VERSION@
 STDBOOL_H = @STDBOOL_H@
 STDDEF_H = @STDDEF_H@
 STRIP = @STRIP@
@@ -620,8 +642,10 @@ ltdl_LIBOBJS = @ltdl_LIBOBJS@
 ltdl_LTLIBOBJS = @ltdl_LTLIBOBJS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+mysqlconfig = @mysqlconfig@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pgconfig = @pgconfig@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -636,11 +660,14 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
-AM_CPPFLAGS = $(LTDLINCL)
+AM_CPPFLAGS = $(LTDLINCL) $(am__append_3) $(am__append_6) \
+	$(am__append_9) $(am__append_12)
 lib_LTLIBRARIES = db_sql.la
 db_sql_la_SOURCES = db_sql.c db_sql.h $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
-db_sql_la_LDFLAGS = $(LIBOBJS) $(LIBLTDL) -module -avoid-version -shared
+	$(am__append_5) $(am__append_8) $(am__append_11)
+db_sql_la_LDFLAGS = $(LIBOBJS) $(LIBLTDL) -module -avoid-version \
+	-shared $(am__append_4) $(am__append_7) $(am__append_10) \
+	$(am__append_13)
 all: all-am
 
 .SUFFIXES:
@@ -722,7 +749,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_msql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_mysql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_none.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_pgsqp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_pgsql.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/db_sql_sqlite3.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

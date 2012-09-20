@@ -179,9 +179,9 @@ int key;
                 time((time_t *) (&now));
                 tp = localtime((time_t *) (&now));
                 log_printf("%02d%02d%02d.%02d%02d%02d ",
-                        (tp->tm_year % 100), tp->tm_mon + 1,
-                        tp->tm_mday, tp->tm_hour,
-                        tp->tm_min, tp->tm_sec);
+                           (tp->tm_year % 100), tp->tm_mon + 1,
+                           tp->tm_mday, tp->tm_hour,
+                           tp->tm_min, tp->tm_sec);
             }
 
             /*
@@ -190,10 +190,10 @@ int key;
 
             if (secondary && *secondary)
                 log_printf("%s %3s/%-5s: ",
-                        MUDLOGNAME, primary, secondary);
+                           MUDLOGNAME, primary, secondary);
             else
                 log_printf("%s %-9s: ",
-                        MUDLOGNAME, primary);
+                           MUDLOGNAME, primary);
         }
 
         /*
@@ -258,7 +258,7 @@ va_dcl
 
 #if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
-    
+
 #else
     char *format;
 
@@ -315,7 +315,7 @@ va_dcl
     if ( (mainlog_fp != stderr) && (mudstate.running == 0)) {
         fputs(s, stderr);
     }
-    XFREE(s, "mainlog_printf"); 
+    XFREE(s, "mainlog_printf");
 #if defined(__STDC__) && defined(STDC_HEADERS)
     va_end(ap);
 #endif

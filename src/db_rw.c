@@ -381,7 +381,7 @@ int new_strings;
             return 1;
         default:
             mainlog_printf("Bad character '%c' when getting attributes on object %d\n",
-                    c, i);
+                           c, i);
             /*
              * We've found a bad spot.  I hope things aren't too
              * bad.
@@ -868,7 +868,7 @@ int *db_format, *db_version, *db_flags;
                 if (header_gotten)
                 {
                     mainlog_printf("\nDuplicate MUSH version header entry at object %d, ignored.\n",
-                            i);
+                                   i);
                     tstr = getstring_noalloc(f, 0);
                     break;
                 }
@@ -932,7 +932,7 @@ int *db_format, *db_version, *db_flags;
                 if (size_gotten)
                 {
                     mainlog_printf("\nDuplicate size entry at object %d, ignored.\n",
-                            i);
+                                   i);
                     tstr = getstring_noalloc(f, 0);
                 }
                 else
@@ -1714,15 +1714,15 @@ int format, version;
             if (n_objt)
             {
                 mainlog_printf(
-                        "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n",
-                        n_oldtotal, anxt, n_deleted, n_renumbered,
-                        n_objt, n_atrt);
+                    "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n",
+                    n_oldtotal, anxt, n_deleted, n_renumbered,
+                    n_objt, n_atrt);
             }
             else if (n_deleted || n_renumbered)
             {
                 mainlog_printf(
-                        "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n",
-                        n_oldtotal, anxt, n_deleted, n_renumbered);
+                    "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n",
+                    n_oldtotal, anxt, n_deleted, n_renumbered);
             }
             XFREE(used_attrs_table, "flatfile.used_attrs_table");
             XFREE(old_attrs_table, "flatfile.old_attrs_table");

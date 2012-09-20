@@ -102,6 +102,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
 	$(top_srcdir)/libltdl/m4/ltversion.m4 \
 	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_msql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_mysql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_check_pgsql.m4 \
+	$(top_srcdir)/modules/db_sql/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -565,6 +569,10 @@ LT_DLPREOPEN = @LT_DLPREOPEN@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+MSQL_CFLAGS = @MSQL_CFLAGS@
+MSQL_LIBS = @MSQL_LIBS@
+MYSQL_CFLAGS = @MYSQL_CFLAGS@
+MYSQL_LIBS = @MYSQL_LIBS@
 NEXT_AS_FIRST_DIRECTIVE_STDDEF_H = @NEXT_AS_FIRST_DIRECTIVE_STDDEF_H@
 NEXT_AS_FIRST_DIRECTIVE_STDLIB_H = @NEXT_AS_FIRST_DIRECTIVE_STDLIB_H@
 NEXT_AS_FIRST_DIRECTIVE_STRING_H = @NEXT_AS_FIRST_DIRECTIVE_STRING_H@
@@ -593,6 +601,8 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PGSQL_CFLAGS = @PGSQL_CFLAGS@
+PGSQL_LIBS = @PGSQL_LIBS@
 PRAGMA_COLUMNS = @PRAGMA_COLUMNS@
 PRAGMA_SYSTEM_HEADER = @PRAGMA_SYSTEM_HEADER@
 PTHREAD_H_DEFINES_STRUCT_TIMESPEC = @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
@@ -670,6 +680,9 @@ REPLACE_WRITE = @REPLACE_WRITE@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE3_CFLAGS = @SQLITE3_CFLAGS@
+SQLITE3_LDFLAGS = @SQLITE3_LDFLAGS@
+SQLITE3_VERSION = @SQLITE3_VERSION@
 STDBOOL_H = @STDBOOL_H@
 STDDEF_H = @STDDEF_H@
 STRIP = @STRIP@
@@ -728,8 +741,10 @@ ltdl_LIBOBJS = @ltdl_LIBOBJS@
 ltdl_LTLIBOBJS = @ltdl_LTLIBOBJS@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+mysqlconfig = @mysqlconfig@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pgconfig = @pgconfig@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -784,8 +799,8 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 EXTRA_netmush_SOURCES = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h mcheck.c mstats.c mtrace.c
 netmush_LDFLAGS = -export-dynamic
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
-	$(SQL_O) $(MALLOC_O) $(am__append_3) $(am__append_7)
-netmush_DEPENDENCIES = $(LTDLDEPS) $(SQL_O) 
+	$(MALLOC_O) $(am__append_3) $(am__append_7)
+netmush_DEPENDENCIES = $(LTDLDEPS) 
 nodist_include_HEADERS = version.h
 mkindx_SOURCES = mkindx.c
 slave_SOURCES = slave.c

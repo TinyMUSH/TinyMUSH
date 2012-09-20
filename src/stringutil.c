@@ -1613,3 +1613,33 @@ long num;
     *tp = '\0';
     *bufc = tp;
 }
+
+
+char *
+repeatchar(count, ch)
+int count;
+char ch;
+{
+    int num;
+    char *str, *ptr;
+
+    if (count < 1)
+    {
+        /*
+         * If negative or zero spaces return a single character, -except-
+         * allow 'repeatchar(0)' to return "" for calculated padding
+         */
+
+        if (count == 0 )
+        {
+            return NULL;
+        }
+    }
+    str = XMALLOC(count + 1, "repeatchar");
+    /*
+     * Yes i'm a bit paranoid here...
+     */
+    memset(str, 0, count + 1);
+    memset(str, ch, count -1);
+    return str;
+}

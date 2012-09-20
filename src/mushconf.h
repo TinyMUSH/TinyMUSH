@@ -131,10 +131,10 @@ struct api_function_data
 typedef struct module_version_data MODULE_VERSION;
 struct module_version_data
 {
-  char *version;
-  char *author;
-  char *description;
-  char *parameters;
+    char *version;
+    char *author;
+    char *description;
+    char *parameters;
 };
 
 /* ---------------------------------------------------------------------------
@@ -464,10 +464,10 @@ struct propdir_list
  */
 
 typedef struct {
-  int major;		/* Major Version */
-  int minor;		/* Minor Version */
-  int status;		/* Status : 0 - Alpha, 1 - Beta, 2 - Release Candidate, 3 - Gamma */
-  int revision;		/* Patch Level */
+    int major;		/* Major Version */
+    int minor;		/* Minor Version */
+    int status;		/* Status : 0 - Alpha, 1 - Beta, 2 - Release Candidate, 3 - Gamma */
+    int revision;		/* Patch Level */
 } versioninfo;
 
 typedef struct statedata STATEDATA;
@@ -479,9 +479,9 @@ struct statedata
     /* Number of object pipelines */
     unsigned int objc;	/* Object reference counter */
     versioninfo	version;	/* MUSH version info */
-//    char	*long_ver;	/* Complete version string */
-//    char	*short_ver;	/* Short version number (for INFO) */
-    char	*buildinfo;	/* Compile info */
+    char	*configureinfo;	/* Configure switches */
+    char	*compilerinfo;	/* Compiler command line */
+    char	*linkerinfo;	/* Linker command line */
     char	*dbmdriver;	/* DBM Driver */
     char	modloaded[MBUF_SIZE];	/* Modules loaded */
     int	initializing;	/* Are we reading config file at startup? */

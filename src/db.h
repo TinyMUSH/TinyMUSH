@@ -27,7 +27,7 @@
 
 
 #include "udb.h"
-#include "udb_defs.h" 
+#include "udb_defs.h"
 
 #define	ITER_PARENTS(t,p,l)	for ((l)=0, (p)=(t); \
 				     (Good_obj(p) && \

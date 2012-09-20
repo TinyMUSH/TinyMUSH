@@ -3476,7 +3476,7 @@ const unsigned char *tables;
                             {
                                 length += 4;
                                 branch_newextra
-                                = 2;
+                                    = 2;
                                 if (((set | unset) & PCRE_CASELESS) != 0)
                                     options
                                     |=

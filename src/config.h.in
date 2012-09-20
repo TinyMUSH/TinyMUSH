@@ -267,8 +267,14 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
+/* DB_SQL use the mSQL driver */
+#undef HAVE_MSQL
+
 /* Define to 1 if you have the `munmap' function. */
 #undef HAVE_MUNMAP
+
+/* DB_SQL use the MySQL driver */
+#undef HAVE_MYSQL
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
@@ -278,6 +284,9 @@
 
 /* Define to 1 if you have the `opendir' function. */
 #undef HAVE_OPENDIR
+
+/* DB_SQL use the PostgreSQL driver */
+#undef HAVE_PGSQL
 
 /* Define to 1 if you have the `pow' function. */
 #undef HAVE_POW
@@ -644,6 +653,9 @@
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
 
+/* Have the SQLITE3 library */
+#undef HAVE_SQLITE3
+
 /* Define to 1 if you have the `sqrt' function. */
 #undef HAVE_SQRT
 
@@ -930,6 +942,9 @@
 
 /* Switches used with ./configure */
 #undef PACKAGE_CONFIG
+
+/* Copyright Notice */
+#undef PACKAGE_COPYRIGHT
 
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME

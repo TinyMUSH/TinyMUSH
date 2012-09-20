@@ -1323,7 +1323,7 @@ FUNCTION(fun_version)
     /* XXX To fix once the new version scheme is done */
     //safe_str(mudstate.version, buff, bufc);
     safe_str("TinyMUSH", buff, bufc);
-    
+
 }
 
 /*

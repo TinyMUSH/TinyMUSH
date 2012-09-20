@@ -313,8 +313,8 @@ typedef char	boolexp_type;
 typedef char	IBUF[16];
 
 #ifndef HAVE_STRCASECMP
-/* 
- * Since strcasecmp isn't POSIX, some systems don't have it by default 
+/*
+ * Since strcasecmp isn't POSIX, some systems don't have it by default
  */
 #define strcasecmp(a,b)	memcmp((void *)a,(void *)b,strlen(a))
 #endif

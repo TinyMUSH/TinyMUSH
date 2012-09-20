@@ -241,7 +241,7 @@ extern int	FDECL(matches_exit_from_list, (char *, char *));
 extern char    *FDECL(translate_string, (char *, int));
 extern int	FDECL(ltos, (char *, long));
 extern INLINE void FDECL(safe_ltos, (char *, char **, long));
-
+extern char    *FDECL(repeatchar, (int, char));
 /* From timer.c */
 extern int	FDECL(call_cron, (dbref, dbref, int, char *));
 extern int	FDECL(cron_clr, (dbref, int));

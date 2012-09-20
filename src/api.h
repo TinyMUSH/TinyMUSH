@@ -9,6 +9,7 @@
 #include "config.h"
 
 #include "mushconf.h"		/* required by code */
+#include "game.h"		/* required by code */
 #include "interface.h"		/* required by code */
 #include "command.h"		/* required by code */
 #include "match.h"		/* required by code */
@@ -21,7 +22,7 @@
 /*
  * Function prototype
  */
- 
+
 #define	XFUNCTION(x)	\
 	extern void FDECL(x, (char *, char **, dbref, dbref, dbref, \
 			      char *[], int, char *[], int))

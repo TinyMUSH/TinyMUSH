@@ -1424,7 +1424,7 @@ See also: exit_attr_defaults, player_attr_defaults, room_attr_defaults,
 	public_calias		public_channel		queue_active_chunk
 	queue_idle_chunk	queue_max_size		site_chars
 	sql_database		sql_host		sql_password
-	sql_reconnect		sql_username
+	sql_reconnect		sql_username		sql_port
 
 & PARAM OBJECTS
 	default_home		exit_attr_defaults	exit_flags
@@ -3224,7 +3224,7 @@ use_global_aconn	visible_wizards		wizard_obeys_linklock
   space, and spaces at the ends of strings are removed.
 
 & sql_database
-  Config parameter: sql_database <database name>.  Default: <null>
+  Config parameter: sql_database <database name>.  Default: netmush
  
   Specifies the name of the SQL database that contains the tables 
   relevant to the MUSH.
@@ -3242,17 +3242,22 @@ use_global_aconn	visible_wizards		wizard_obeys_linklock
   127.0.0.1 (which is the IP address of localhost) instead.
  
 & sql_username
-  Config parameter: sql_username <username>.  Default: <null>
+  Config parameter: sql_username <username>.  Default: netmush
  
   Specifies the username if required to connect to the SQL database
   server. If not specified, the database server may assume you wish
   to connect as the user that owns the mush server process.
  
 & sql_password
-  Config parameter: sql_password <password>.  Default: <null>
+  Config parameter: sql_password <password>.  Default: netmush
  
   Specifies the password if required to connect to the SQL database
   server.
+
+& sql_port
+  Config parameter: sql_port <port>.  Default: 3306
+ 
+  Specifies the port required to connect to the SQL database server.
  
 & sql_reconnect
   Config parameter: sql_reconnect <yes/no>.  Default: no

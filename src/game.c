@@ -2440,8 +2440,8 @@ char *argv[];
     MODHASHES *m_htab, *hp;
 
     MODNHASHES *m_ntab, *np;
-    
-    
+
+
     /*
      * Try to get the binary name
      */
@@ -2771,16 +2771,16 @@ char *argv[];
      */
     process_preload();
     STARTLOG(LOG_STARTUP, "INI", "LOAD")
-    
+
     log_printf("Startup processing complete. (Process ID : %d)",  getpid());
     ENDLOG
 
     /*
      * Startup is done.
      */
-    
+
     mudstate.running = 1;
-    
+
     /*
      * Clear all reference flags in the cache-- what happens when the
      * game loads is NOT representative of normal cache behavior :)

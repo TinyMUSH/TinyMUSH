@@ -1563,7 +1563,7 @@ DESC *call_by;
 
     queue_rawstring(call_by, tprintf("Size: %d\r\n", mudstate.db_top));
     queue_rawstring(call_by, tprintf("Version: %d.%d.%d.%d\r\n",
-                                     mudstate.version.major, mudstate.version.minor, 
+                                     mudstate.version.major, mudstate.version.minor,
                                      mudstate.version.status, mudstate.version.revision));
 
     for (llp = mudconf.infotext_list; llp != NULL; llp = llp->next)

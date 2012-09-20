@@ -1,32 +1,8 @@
-/* db_msql.c - Implements accessing an mSQL 2.x database. */
-/* $Id: db_msql.c,v 1.15 2003/02/24 18:05:22 rmg Exp $ */
 
-#include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "../../copyright.h"
+#include "../../api.h"
 
-#include "db.h"			/* required by externs */
-#include "externs.h"		/* required by code */
-#include "functions.h"		/* required by code */
-
-#include "msql.h"		/* required by code */
-
-/* See db_sql.h for details of what each of these functions do. */
-
-
-/*
- * Because we cannot trap error codes in mSQL, just error messages, we have
- * to compare against error messages to find out what really happened with
- * something. This particular error message is SERVER_GONE_ERROR in mSQL's
- * errmsg.h -- this needs to change if that API definition changes.
- */
-
-#define MSQL_SERVER_GONE_ERROR "MSQL server has gone away"
-
-/*
- * Number of times to retry a connection if we fail in the middle of a query.
- */
-
-#define MSQL_RETRY_TIMES 3
+#include "db_sql.h"
 
 /*
  * ------------------------------------------------------------------------
@@ -34,28 +10,24 @@
  */
 
 
-void
-sql_shutdown()
-{
-    if (mudstate.sql_socket == -1)
+void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
+    if (mod_db_sql_config.socket == -1)
         return;
-    msqlClose(mudstate.sql_socket);
-    mudstate.sql_socket = -1;
+    msqlClose(mod_db_sql_config.socket);
+    mod_db_sql_config.socket = -1;
 }
 
 
-int
-sql_init()
-{
+int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
     int result;
 
     /*
      * Make sure we have valid config options.
      */
 
-    if (!mudconf.sql_host || !*mudconf.sql_host)
+    if (!mod_db_sql_config.host || !*mod_db_sql_config.host)
         return -1;
-    if (!mudconf.sql_db || !*mudconf.sql_db)
+    if (!mod_db_sql_config.db || !*mod_db_sql_config.db)
         return -1;
 
     /*
@@ -63,58 +35,47 @@ sql_init()
      * case for some reason the server went away.
      */
 
-    sql_shutdown();
+    sql_shutdown(0,0,NULL,NULL);
 
     /*
      * Try to connect to the database host. If we have specified
      * localhost, use the Unix domain socket instead.
      */
 
-    if (!strcmp(mudconf.sql_host, (char *)"localhost"))
+    if (!strcmp(mod_db_sql_config.host, (char *)"localhost"))
         result = msqlConnect(NULL);
     else
-        result = msqlConnect(mudconf.sql_host);
+        result = msqlConnect(mod_db_sql_config.host);
     if (result == -1)
     {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
         log_printf("Failed connection to SQL server %s: %s",
-                   mudconf.sql_host, msqlErrMsg);
+                   mod_db_sql_config.host, msqlErrMsg);
         ENDLOG return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
     log_printf("Connected to SQL server %s, socket fd %d",
-               mudconf.sql_host, result);
-    ENDLOG mudstate.sql_socket = result;
+               mod_db_sql_config.host, result);
+    ENDLOG mod_db_sql_config.socket = result;
 
     /*
      * Select the database we want. If we can't get it, disconnect.
      */
 
-    if (msqlSelectDB(mudstate.sql_socket, mudconf.sql_db) == -1)
+    if (msqlSelectDB(mod_db_sql_config.socket, mod_db_sql_config.db) == -1)
     {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
         log_printf("Failed db select: %s", msqlErrMsg);
-        ENDLOG msqlClose(mudstate.sql_socket);
-        mudstate.sql_socket = -1;
+        ENDLOG msqlClose(mod_db_sql_config.socket);
+        mod_db_sql_config.socket = -1;
         return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("SQL database selected: %s", mudconf.sql_db);
-    ENDLOG return (mudstate.sql_socket);
+    log_printf("SQL database selected: %s", mod_db_sql_config.db);
+    ENDLOG return (mod_db_sql_config.socket);
 }
 
-int
-sql_query(player, q_string, buff, bufc, row_delim, field_delim)
-dbref player;
-
-char *q_string;
-
-char *buff;
-
-char **bufc;
-
-const Delim *row_delim, *field_delim;
-{
+int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
     m_result *qres;
 
     m_row row_p;
@@ -131,21 +92,21 @@ const Delim *row_delim, *field_delim;
      * a #-1. Notify the player, too, and set the return code.
      */
 
-    if ((mudstate.sql_socket == -1) && (mudconf.sql_reconnect != 0))
+    if ((mod_db_sql_config.socket == -1) && (mod_db_sql_config.reconnect != 0))
     {
         /*
          * Try to reconnect.
          */
         retries = 0;
         while ((retries < MSQL_RETRY_TIMES) &&
-                (mudstate.sql_socket == -1))
+                (mod_db_sql_config.socket == -1))
         {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             retries++;
         }
     }
-    if (mudstate.sql_socket == -1)
+    if (mod_db_sql_config.socket == -1)
     {
         notify(player, "No SQL database connection.");
         if (buff)
@@ -159,7 +120,7 @@ const Delim *row_delim, *field_delim;
      * Send the query.
      */
 
-    got_rows = msqlQuery(mudstate.sql_socket, q_string);
+    got_rows = msqlQuery(mod_db_sql_config.socket, q_string);
     if ((got_rows == -1) && !strcmp(msqlErrMsg, MSQL_SERVER_GONE_ERROR))
     {
 
@@ -173,20 +134,20 @@ const Delim *row_delim, *field_delim;
 
         STARTLOG(LOG_PROBLEMS, "SQL", "GONE")
         log_printf("Connection died to SQL server on fd %d",
-                   mudstate.sql_socket);
+                   mod_db_sql_config.socket);
         ENDLOG retries = 0;
-        mudstate.sql_socket = -1;
+        mod_db_sql_config.socket = -1;
 
         while ((retries < MSQL_RETRY_TIMES) &&
-                (mudstate.sql_socket == -1))
+                (mod_db_sql_config.socket == -1))
         {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             retries++;
         }
 
-        if (mudstate.sql_socket != -1)
-            got_rows = msqlQuery(mudstate.sql_socket, q_string);
+        if (mod_db_sql_config.socket != -1)
+            got_rows = msqlQuery(mod_db_sql_config.socket, q_string);
     }
     if (got_rows == -1)
     {

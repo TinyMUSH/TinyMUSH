@@ -1,55 +1,39 @@
 /* db_mysql.c - Implements accessing a mySQL 3.22+ database. */
 /* $Id: db_mysql.c,v 1.11 2004/09/13 14:12:54 tyrspace Exp $ */
 
-#include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "../../copyright.h"
+#include "db_sql.h"
 
-#include "db.h"			/* required by externs */
-#include "externs.h"		/* required by code */
-#include "functions.h"		/* required by code */
-
-#include "mysql.h"
-#include "errmsg.h"
+//#include "db.h"			/* required by externs */
+//#include "externs.h"		/* required by code */
 
 /* See db_sql.h for details of what each of these functions do. */
 
-
-/*
- * Number of times to retry a connection if we fail in the middle of a query.
- */
-
-#define MYSQL_RETRY_TIMES 3
-
-static MYSQL *mysql_struct = NULL;
-
-void
-sql_shutdown()
-{
+void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     MYSQL *mysql;
 
-    if (!mysql_struct)
+    if (!mysql_struct) {
         return;
+    }
     mysql = mysql_struct;
     STARTLOG(LOG_ALWAYS, "SQL", "DISC")
     log_printf("Disconnected from SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
     ENDLOG mysql_close(mysql);
     XFREE(mysql, "mysql");
     mysql_struct = NULL;
-    mudstate.sql_socket = -1;
+    mod_db_sql_config.socket = -1;
 }
 
-int
-sql_init()
-{
+int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
     MYSQL *mysql, *result;
 
     /*
      * Make sure we have valid config options.
      */
 
-    if (!mudconf.sql_host || !*mudconf.sql_host)
+    if (!mod_db_sql_config.host || !*mod_db_sql_config.host)
         return -1;
-    if (!mudconf.sql_db || !*mudconf.sql_db)
+    if (!mod_db_sql_config.db || !*mod_db_sql_config.db)
         return -1;
 
     /*
@@ -58,7 +42,7 @@ sql_init()
      */
 
     if (mysql_struct)
-        sql_shutdown();
+        sql_shutdown(0,0,NULL,NULL);
 
     /*
      * Try to connect to the database host. If we have specified
@@ -67,32 +51,21 @@ sql_init()
     mysql = (MYSQL *) XMALLOC(sizeof(MYSQL), "mysql");
     mysql_init(mysql);
 
-    result = mysql_real_connect(mysql, mudconf.sql_host, mudconf.sql_username, mudconf.sql_password, mudconf.sql_db, 0, NULL, 0);
+    result = mysql_real_connect(mysql,        mod_db_sql_config.host, mod_db_sql_config.username, mod_db_sql_config.password, mod_db_sql_config.db, mod_db_sql_config.port,  NULL,                    0);
     if (!result) {
         STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed connection to SQL server %s: %s", mudconf.sql_host, mysql_error(mysql));
+        log_printf("Failed connection to SQL server %s: %s", mod_db_sql_config.host, mysql_error(mysql));
         ENDLOG XFREE(mysql, "mysql");
         return -1;
     }
     STARTLOG(LOG_ALWAYS, "SQL", "CONN")
     log_printf("Connected to SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
     ENDLOG mysql_struct = mysql;
-    mudstate.sql_socket = mysql->net.fd;
+    mod_db_sql_config.socket = mysql->net.fd;
     return 1;
 }
 
-int
-sql_query(player, q_string, buff, bufc, row_delim, field_delim)
-dbref player;
-
-char *q_string;
-
-char *buff;
-
-char **bufc;
-
-const Delim *row_delim, *field_delim;
-{
+int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
     MYSQL_RES *qres;
 
     MYSQL_ROW row_p;
@@ -112,14 +85,14 @@ const Delim *row_delim, *field_delim;
      */
 
     mysql = mysql_struct;
-    if ((!mysql) & (mudconf.sql_reconnect != 0)) {
+    if ((!mysql) & (mod_db_sql_config.reconnect != 0)) {
         /*
          * Try to reconnect.
          */
         retries = 0;
         while ((retries < MYSQL_RETRY_TIMES) && !mysql) {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             mysql = mysql_struct;
             retries++;
         }
@@ -151,11 +124,11 @@ const Delim *row_delim, *field_delim;
         STARTLOG(LOG_PROBLEMS, "SQL", "GONE")
         log_printf("Connection died to SQL server");
         ENDLOG retries = 0;
-        sql_shutdown();
+        sql_shutdown(0,0,NULL,NULL);
 
         while ((retries < MYSQL_RETRY_TIMES) && (!mysql)) {
             sleep(1);
-            sql_init();
+            sql_init(0,0,NULL,NULL);
             mysql = mysql_struct;
             retries++;
         }

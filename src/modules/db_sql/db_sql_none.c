@@ -1,40 +1,42 @@
 #include "../../copyright.h"
-#include "../../api.h"
+
 #include "db_sql.h"
 
-DO_CMD_NO_ARG(mod_db_sql_do_init) {
-	notify(player, "#-1 : @SQLINIT no database driver.");
+#define SQL_NONE_ERROR "NO EXTERNAL SQL DATABASE CONNECTIVITY IS CONFIGURED"
+
+void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
+    STARTLOG(LOG_ALWAYS, "SQL", "DISC")
+    log_printf("Disconnected from SQL server (simulated).");
+    ENDLOG;
+    
+    if(buff) {
+        mod_db_sql_notify(player, buff, bufc, "#-1 %s", SQL_NONE_ERROR);
+    } else if(player) {
+        mod_db_sql_notify(player, buff, bufc, "%s", SQL_NONE_ERROR);
+    }
 }
 
-DO_CMD_NO_ARG(mod_db_sql_do_connect) {
-	notify(player, "#-1 : @SQLCONNECT no database driver.");
+int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
+    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
+    log_printf("Connected to SQL server (simulated)");
+    ENDLOG
+    
+    if(buff) {
+        mod_db_sql_notify(player, buff, bufc, "#-1 %s", SQL_NONE_ERROR);
+    } else if(player) {
+        mod_db_sql_notify(player, buff, bufc, "%s", SQL_NONE_ERROR);
+    }
+
+    return 1;
 }
 
-DO_CMD_NO_ARG(mod_db_sql_do_disconnect) {
-	notify(player, "#-1 : @SQLDISCONNECT no database driver.");
-}
+int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
 
-DO_CMD_ONE_ARG(mod_db_sql_do_query) {
+    if(buff) {
+        mod_db_sql_notify(player, buff, bufc, "#-1 %s", SQL_NONE_ERROR);
+    } else if(player) {
+        mod_db_sql_notify(player, buff, bufc, "%s", SQL_NONE_ERROR);
+    }    
 
-	if (arg1 && *arg1) {
-		notify(player, tprintf("#-1 : @SQL no database driver \"%s\"", arg1));
-	} else {
-		notify(player, "#-1 : @SQL no database driver.");
-	}
-}
-
-FUNCTION(mod_db_sql_fun_init) {
-	safe_str("#-1 : SQL_INIT (No Database Driver)", buff, bufc);
-}
-
-FUNCTION(mod_db_sql_fun_connect) {
-	safe_str("#-1 : SQL_CONNECT (No Database Driver)", buff, bufc);
-}
-
-FUNCTION(mod_db_sql_fun_shutdown) {
-	safe_str((char *)"#-1 : SQL_SHUTDOWN (No Database Driver)", buff, bufc);
-}
-
-FUNCTION(mod_db_sql_fun_query) {
-	safe_str((char *)"#-1 : SQL_QUERY (No Database Driver)", buff, bufc);
+    return 0;
 }
