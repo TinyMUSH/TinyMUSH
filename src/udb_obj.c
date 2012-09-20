@@ -1,5 +1,4 @@
 /* udb_obj.c - Binary object handling gear. */
-/* $Id: udb_obj.c,v 1.22 2002/03/31 06:07:26 dpassmor Exp $ */
 
 /* Originally written by Andrew Molitor, amolitor@nmsu.edu 1992 */
 

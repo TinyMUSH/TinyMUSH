@@ -3,21 +3,23 @@ This is the README file for TinyMUSH 3.
 Please look at the following files for details on specific aspects of
 TinyMUSH 3.
 
-INSTALL			Installation instructions
-CONVERT.MUX		Converting from TinyMUX
-CONVERT.TINY22		Converting from TinyMUSH 2.2
-FAQ			Frequently-asked questions
+README			The mystery file nobody ever read...
 
-CHANGES			TinyMUSH 3 general changelog
-BETA			TinyMUSH 3 beta changelog
-CHANGES.TINY20		The old CHANGES file from TinyMUSH 2.0.10p6
-CHANGES.TINY22		The old CHANGES file from TinyMUSH 2.2.5
-CHANGES.MUX		The old CHANGES file from TinyMUX 1.6
+INSTALL			Installation instructions.
+CONVERTING		Conversion instructions.
 
-MODULES			Developer information on creating modules
-README.TOOLS		Additional programs in src/tools
+NEWS			Important news and events.
+FAQ			Frequently ask questions.
 
-CREDITS			Credits and thanks
+COPYING			TinyMUSH and previous licences.
+AUTHORS			Credits and thanks.
+
+ChangeLog		TinyMUSH 3 general changelog.
+ChangeLog.Alpha		TinyMUSH 3.3 Alpha changelog.
+ChangeLog.Beta		TinyMUSH 3.3 Beta changelog.
+ChangeLog.History	TinyMUX 1.0 and TinyMUSH 2.x changelog.
+
+MODULES			Developer information on creating modules.
 
 ----------------------------------------------------------------------------
 

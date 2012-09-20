@@ -1,7 +1,5 @@
 /* gdbmerrno.c - convert gdbm errors into english. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* this is not static so that applications may access the array if they

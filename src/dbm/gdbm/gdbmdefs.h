@@ -1,7 +1,5 @@
 /* gdbmdefs.h - The include file for dbm.  Defines structure and constants. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 /*

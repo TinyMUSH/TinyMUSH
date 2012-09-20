@@ -1,5 +1,4 @@
 /* bitstring.h */
-/* $Id: bitstring.h,v 1.2 2000/05/22 21:42:27 lwl Exp $ */
 
 /*
  * Copyright (c) 1989 The Regents of the University of California. All rights

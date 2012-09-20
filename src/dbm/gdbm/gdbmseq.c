@@ -1,7 +1,5 @@
 /* gdbmseq.c - Routines to visit all keys.  Not in sorted order. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Special extern for this file. */

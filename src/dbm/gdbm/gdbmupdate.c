@@ -1,7 +1,5 @@
 /* update.c - The routines for updating the file to a consistent state. */
 
-/* $id$ */
-
 /* include system configuration before all else. */
 #include "gdbmsystems.h"
 

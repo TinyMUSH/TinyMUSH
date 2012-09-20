@@ -1,5 +1,4 @@
 /* speech.c - Commands which involve speaking */
-/* $Id: speech.c,v 1.51 2008/03/09 17:09:03 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

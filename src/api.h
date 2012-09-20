@@ -1,6 +1,5 @@
 /* api.h.  Generated from api.h.in by configure.  */
 /* api.h - must be included by all dynamically loaded modules */
-/* $Id: api.h,v 1.15 2002/10/27 07:38:18 rmg Exp $ */
 
 #ifndef __API_H
 #define __API_H

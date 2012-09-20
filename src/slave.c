@@ -1,5 +1,4 @@
 /* slave.c - does iptoname conversions, and identquery lookups */
-/* $Id: slave.c,v 1.19 2010/12/29 04:20:40 tyrspace Exp $ */
 
 /*
  * The philosophy is to keep this program as simple/small as possible.

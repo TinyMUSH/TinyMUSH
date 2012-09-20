@@ -1,5 +1,4 @@
 /* autoinclude.h -- System-dependent configuration information part 2 */
-/* $Id:$ */
 
 /*
  * ---------------------------------------------------------------------------

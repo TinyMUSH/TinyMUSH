@@ -1,7 +1,5 @@
 /* hash.c - The gdbm hash function. */
 
-/* $id$ */
-
 /* include system configuration before all else. */
 #include "gdbmsystems.h"
 

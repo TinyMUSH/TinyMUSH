@@ -1,5 +1,4 @@
 /* interface.h -- network-related definitions */
-/* $Id: interface.h,v 1.21 2007/10/04 22:58:20 lwl Exp $ */
 
 #include "copyright.h"
 

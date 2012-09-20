@@ -1,5 +1,4 @@
 /* set.c - commands which set parameters */
-/* $Id: set.c,v 1.50 2004/08/17 21:21:12 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

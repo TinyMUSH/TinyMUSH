@@ -1,5 +1,4 @@
 /* help.h */
-/* $Id: help.h,v 1.6 2001/01/27 22:22:07 dpassmor Exp $ */
 
 #include "copyright.h"
 

@@ -1,5 +1,4 @@
 /* player.c */
-/* $Id: player.c,v 1.32 2008/01/08 23:35:24 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

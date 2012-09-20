@@ -1,7 +1,5 @@
 /* gdbmstore.c - Add a new key/data pair to the database. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Add a new element to the database.  CONTENT is keyed by KEY.  The

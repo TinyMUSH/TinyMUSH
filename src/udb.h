@@ -1,5 +1,4 @@
 /* udb.h */
-/* $Id: udb.h,v 1.25 2003/05/12 00:32:23 dpassmor Exp $ */
 
 #include "copyright.h"
 

@@ -1,5 +1,4 @@
 /* move.c - Routines for moving about */
-/* $Id: move.c,v 1.33 2008/02/22 18:54:07 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

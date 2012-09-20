@@ -1,3 +1,26 @@
+
+*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
+***                                                          ***
+*** THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE  ***
+*** FOR NOW, THE QUICK AND DIRTY INSTALL INSTRUCTIONS ARE:   ***
+***                                                          ***
+*** $ cd src                                                 ***
+*** $ ./configure --help                                     ***
+***                                                          ***
+***            READ HELP AND SELECT KNOBS YOU NEED           ***
+***                                                          ***
+*** $ ./configure <wathever knobs you need>                  ***
+*** $ make                                                   ***
+***                                                          ***
+***   THE NEXT STEP WILL OVERWRITE ANYTHING ALREADY IN THE   ***
+***                      game DIRECTORY                      ***
+***                                                          ***
+*** $ make install                                           ***
+***                                                          ***
+***  The rest is basically the same,  check the Changelog    ***
+***                                                          ***
+*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
+
 INSTALLATION
 
 TinyMUSH 3 should be straightforward to install and run.

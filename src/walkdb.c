@@ -1,5 +1,4 @@
 /* walkdb.c - Support for commands that walk the entire db */
-/* $Id: walkdb.c,v 1.35 2004/02/23 04:35:14 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

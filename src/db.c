@@ -1,5 +1,4 @@
 /* db.c - attribute interface, some flatfile and object routines */
-/* $Id: db.c,v 1.144 2009/02/21 20:58:58 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"	/* required by code */

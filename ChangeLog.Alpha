@@ -1,0 +1,128 @@
+TinyMUSH 3.3
+------------
+
+Alpha 1 : 2012-00-19
+--------------------
+
+Date:   Thu Sep 20 00:22:36 2012 -0400
+
+    - NEW : db-sql module.
+    - Fix : Some cleanup to @version
+    - Misc : Update version information (about to commit to 3.3 alpha 1)
+
+commit faaa5397bb39be15bd920e68a5e4996c763994ab
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 18 23:56:51 2012 -0400
+
+    - Fix : First version of db_sql able to link itself (only with
+    - driver_none...)
+    - Change : Add a hook for modules to @version.
+
+commit 80baf0508b1310994bbab6341d368f04db03192a
+Author: Charlie Root <root@studio.home.beaupre.biz>
+Date:   Tue Sep 18 16:50:53 2012 -0400
+
+    - Update : Use gnulib for malloc/realloc/strtod/lstat instead of the
+    - depreciated autoconf check
+    - Fix : Fixed autoconf's version parser (Linux usually simlink /bin/sh
+    - to bash, FreeBSD use a real SH. So the version parser wasn't working
+    - on BSD, rewrote it in M4)
+    - Update : Some work on the module version of db_sql.
+
+commit 0ac742cec75ef43846f44342ad35234cb810e023
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Apr 12 23:03:12 2012 -0400
+
+    Testing GIT.
+
+commit 4176a3da83dbbdcd3f9b0eb42e448557bbc517f8
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Apr 9 23:15:48 2012 -0400
+
+    Cleanup
+    
+    Cleanup...
+
+commit d19a5fad7742691d647106800bcab79b076fdb01
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Mar 4 09:33:04 2012 -0500
+
+    - New: Startmush no longer require logwatch to track the startup
+    - process.
+
+commit cbcdb800bf132d168980d94cfd4473aa501df975
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Mar 3 14:27:24 2012 -0500
+
+    - Fix Permissions.
+
+commit c16c8dd5b5fbd49a362e0a71ac223c4041b66ef5
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Mar 3 14:23:59 2012 -0500
+
+    - Make sure everything log thru log_printf or mainlog_printf in
+    preparation to get rid of logwatch...
+
+commit 40c38224e10b87545d2745f5e72f014d09abae3e
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Mar 2 13:06:14 2012 -0500
+
+    - Fix : Corrected some compilation warning.
+
+commit 40088d4e727f6b894c1611e0ec5dc6aa067c4594
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Mar 1 11:02:48 2012 -0500
+
+    - Changes : Moved config.h tunables to the configure script.
+
+commit 5bc77f001b1db02402681e2e23eef86fd57c6820
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Feb 29 09:31:26 2012 -0500
+
+    - Preparation to move *SQL to modules
+
+commit 4d71ced017aa6a6588b8c1c8e979f7f644571767
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Feb 29 09:28:12 2012 -0500
+
+    - Still cleaning up configure.ac.
+    - Remove the old GNU Malloc code.
+    - Preparation to move *SQL to modules.
+    - Move the content of tinymush.m4 to acinclude.m4
+
+commit 4255fd23d44e5ca72d8a59ead1ddead4de323c79
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Feb 22 00:37:26 2012 -0500
+
+    - Fix : Modules now compile and load correctly.
+    - Fix : GDBM/QDBM compilation is now part of the game engine.
+    - Misc : Directories Cleanup.
+
+commit 014994b21f9dbc41ef5e4aa0d226dac4b68bb5b1
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Feb 21 19:31:51 2012 -0500
+
+    Remove files that are not needed in the git. Add placeholders for empty
+    directories.
+
+commit c6bc33eca7742da57237da49d6dc0589310b7115
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Feb 19 19:29:01 2012 -0500
+
+    First version of 3.3 that actually boot itself alone with
+    automake/autoconf. Tested on FreeBSD 8.2 and CentOS 6.
+
+commit a0484f6f3d0308d8332f753c5925cd07a2957ad5
+Author: Eddy Beaupre <Eddy Beaupre@Eddy-XPS>
+Date:   Sat Feb 18 12:23:11 2012 -0500
+
+    Source Cleanup
+
+commit 9edb09f8316bf727a1f347fa22225b0512177a0c
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Feb 18 10:36:59 2012 -0500
+
+    Initial Commit
+
+Alpha 0 : 2012-02-19
+--------------------

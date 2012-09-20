@@ -1,5 +1,4 @@
 /* help.c - commands for giving help */
-/* $Id: help.c,v 1.31 2004/02/23 04:35:14 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

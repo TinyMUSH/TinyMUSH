@@ -1,5 +1,4 @@
 /* file_c.c - File cache management */
-/* $Id: file_c.c,v 1.10 2000/11/30 08:21:16 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

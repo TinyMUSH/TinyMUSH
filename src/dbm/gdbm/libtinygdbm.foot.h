@@ -1,6 +1,4 @@
 
-/* $id$ */
-
 /* The file information header. This is good enough for most applications. */
 typedef struct {int dummy[10];} *GDBM_FILE;
 

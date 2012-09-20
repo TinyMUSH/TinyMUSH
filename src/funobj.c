@@ -1,5 +1,4 @@
 /* funobj.c - object functions */
-/* $Id: funobj.c,v 1.82 2010/05/10 19:45:33 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

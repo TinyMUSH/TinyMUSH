@@ -1,7 +1,5 @@
 /* gdbmconst.h - The constants defined for use in gdbm. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 #ifndef __GDBMCONST_H   

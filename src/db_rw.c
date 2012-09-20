@@ -1,5 +1,4 @@
 /* db_rw.c - flatfile implementation */
-/* $Id: db_rw.c,v 1.97 2009/02/21 20:06:11 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

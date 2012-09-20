@@ -1,5 +1,4 @@
 /* rob.c - Commands dealing with giving/taking/killing things or money */
-/* $Id: rob.c,v 1.17 2002/08/07 20:27:17 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

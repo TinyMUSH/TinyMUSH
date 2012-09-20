@@ -1,5 +1,4 @@
 /* db.h */
-/* $Id: db.h,v 1.53 2009/02/21 20:58:58 lwl Exp $ */
 
 #include "copyright.h"
 

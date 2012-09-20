@@ -1,5 +1,4 @@
 /* vattr.h - Definitions for user-defined attributes */
-/* $Id: vattr.h,v 1.7 2002/08/28 15:24:09 rmg Exp $ */
 
 #include "copyright.h"
 

@@ -1,5 +1,4 @@
 /* match.c - Routines for parsing arguments */
-/* $Id: match.c,v 1.22 2010/10/26 02:41:50 tyrspace Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

@@ -1,7 +1,5 @@
 /* gdbmsync.c - Sync the disk with the in memory state. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Make sure the database is all on disk. */

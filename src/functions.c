@@ -1,5 +1,4 @@
 /* functions.c - MUSH function handlers */
-/* $Id: functions.c,v 1.175 2008/02/21 15:21:15 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

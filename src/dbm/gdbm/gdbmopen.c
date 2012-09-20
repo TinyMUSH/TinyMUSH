@@ -1,7 +1,5 @@
 /* gdbmopen.c - Open the dbm file and initialize data structures for use. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Initialize dbm system.  FILE is a pointer to the file name.  If the file

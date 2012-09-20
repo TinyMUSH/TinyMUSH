@@ -1,5 +1,4 @@
 /* stringutil.c - string utilities */
-/* $Id: stringutil.c,v 1.58 2010/10/26 02:41:50 tyrspace Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

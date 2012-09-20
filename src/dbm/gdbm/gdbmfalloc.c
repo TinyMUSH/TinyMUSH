@@ -1,7 +1,5 @@
 /* falloc.c - The file space management routines for dbm. */
 
-/* $id$ */
-
 /*
  * This file was modified for TinyMUSH:
  *

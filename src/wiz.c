@@ -1,5 +1,4 @@
 /* wiz.c - Wizard-only commands */
-/* $Id: wiz.c,v 1.34 2003/07/14 18:55:22 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

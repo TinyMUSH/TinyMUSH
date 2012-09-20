@@ -1,5 +1,4 @@
 /* mushconf.h */
-/* $Id: mudconf.h,v 1.149 2010/10/07 17:42:44 lwl Exp $ */
 
 #ifndef __MUSHCONF_H
 #define __MUSHCONF_H

@@ -1,5 +1,4 @@
 /* fnproto.h - function prototypes from funmath.c, etc. */
-/* $Id: fnproto.h,v 1.109 2010/05/31 23:01:52 lwl Exp $ */
 
 #include "copyright.h"
 

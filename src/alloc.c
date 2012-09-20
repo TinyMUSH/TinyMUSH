@@ -1,5 +1,4 @@
 /* alloc.c - memory allocation subsystem */
-/* $Id: alloc.c,v 1.23 2002/09/23 08:42:08 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

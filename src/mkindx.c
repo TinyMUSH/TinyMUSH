@@ -1,5 +1,4 @@
 /* mkindx.c - make help/news file indexes */
-/* $Id: mkindx.c,v 1.10 2000/11/25 21:40:52 merlin Exp $ */
 /*
 *  mkindx now supports multiple tags for a single entry.
 *  example:

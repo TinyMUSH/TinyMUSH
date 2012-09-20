@@ -1,7 +1,5 @@
 /* gdbmerrno.h - The enumeration type describing all the dbm errors. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 #ifndef __GDBMERRNO_H   

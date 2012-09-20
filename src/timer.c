@@ -1,5 +1,4 @@
 /* timer.c - Subroutines for (system-) timed events */
-/* $Id: timer.c,v 1.23 2007/09/29 13:04:31 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

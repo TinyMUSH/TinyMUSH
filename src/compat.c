@@ -1,5 +1,4 @@
 /* compat.c - functions that we need to provide because they are missing */
-/* $Id: compat.c,v 1.5 2000/05/29 22:20:10 rmg Exp $ */
 
 #include "copyright.h"
 #include "config.h"

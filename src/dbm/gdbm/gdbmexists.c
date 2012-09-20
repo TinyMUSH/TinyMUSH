@@ -1,7 +1,5 @@
 /* gdbmexists.c - Check to see if a key exists */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* this is nothing more than a wrapper around _gdbm_findkey(). the

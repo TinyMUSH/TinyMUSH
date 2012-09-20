@@ -1,7 +1,5 @@
 /* gdbmreorg.c - Reorganize the database file. */
 
-/* $id$ */
-
 /* include system configuration before all else. */
 #include "gdbmsystems.h"
 

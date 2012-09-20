@@ -1,5 +1,4 @@
 /* externs.h - Prototypes for externs not defined elsewhere */
-/* $Id: externs.h,v 1.140 2010/10/26 02:41:50 tyrspace Exp $ */
 
 #include "copyright.h"
 

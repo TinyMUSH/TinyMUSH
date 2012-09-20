@@ -1,5 +1,4 @@
 /* funvars.c - structure, variable, stack, and regexp functions */
-/* $Id: funvars.c,v 1.84 2009/12/22 14:17:49 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

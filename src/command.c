@@ -1,5 +1,4 @@
 /* command.c - command parser and support routines */
-/* $Id: command.c,v 1.213 2009/03/28 15:42:03 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

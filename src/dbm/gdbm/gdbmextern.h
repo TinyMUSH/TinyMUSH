@@ -1,7 +1,5 @@
 /* extern.h - The collection of external definitions needed. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 #ifndef __GDBMEXTERN_H

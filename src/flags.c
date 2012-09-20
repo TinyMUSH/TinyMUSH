@@ -1,5 +1,4 @@
 /* flags.c - flag manipulation routines */
-/* $Id: flags.c,v 1.65 2009/01/11 19:04:34 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

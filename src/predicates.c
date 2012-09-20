@@ -1,5 +1,4 @@
 /* predicates.c */
-/* $Id: predicates.c,v 1.137 2010/10/07 17:42:44 lwl Exp $ */
 
 #include "copyright.h"
 

@@ -1,8 +1,6 @@
 /* global.c - The external variables needed for "original" interface and
    error messages. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* The global variables used for the "original" interface. */

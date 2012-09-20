@@ -1,5 +1,4 @@
 /* file_c.h -- File cache header file */
-/* $Id: file_c.h,v 1.5 2000/05/29 22:20:23 rmg Exp $ */
 
 #include "copyright.h"
 

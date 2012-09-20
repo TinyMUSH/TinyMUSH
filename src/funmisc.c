@@ -1,5 +1,4 @@
 /* funmisc.c - misc functions */
-/* $Id: funmisc.c,v 1.50 2010/05/10 02:09:24 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

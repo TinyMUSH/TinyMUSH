@@ -1,5 +1,4 @@
 /* version.c - version information */
-/* $Id: version.c,v 1.16 2010/12/29 04:58:38 tyrspace Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

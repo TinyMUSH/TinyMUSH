@@ -1,5 +1,4 @@
 /* funlist.c - list functions */
-/* $Id: funlist.c,v 1.67 2010/05/31 23:01:52 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

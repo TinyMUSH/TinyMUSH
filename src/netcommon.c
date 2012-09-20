@@ -1,5 +1,4 @@
 /* netcommon.c */
-/* $Id: netcommon.c,v 1.91 2010/10/26 02:41:50 tyrspace Exp $ */
 
 /* This file contains routines used by the networking code that do not
  * depend on the implementation of the networking code.  The network-specific

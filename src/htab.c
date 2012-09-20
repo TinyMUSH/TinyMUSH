@@ -1,5 +1,4 @@
 /* htab.c - table hashing routines */
-/* $Id: htab.c,v 1.27 2002/10/20 18:26:43 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

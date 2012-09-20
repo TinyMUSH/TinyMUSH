@@ -1,5 +1,4 @@
 /* functions.h - declarations for functions & function processing */
-/* $Id: functions.h,v 1.78 2010/05/08 20:35:40 lwl Exp $ */
 
 #include "copyright.h"
 

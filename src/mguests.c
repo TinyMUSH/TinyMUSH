@@ -1,5 +1,4 @@
 /* mguests.c - multiguest code originally ported from DarkZone */
-/* $Id: mguests.c,v 1.18 2002/09/28 10:58:09 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

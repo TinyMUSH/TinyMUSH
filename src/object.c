@@ -1,5 +1,4 @@
 /* object.c - low-level object manipulation routines */
-/* $Id: object.c,v 1.68 2009/02/21 20:06:11 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

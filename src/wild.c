@@ -1,5 +1,4 @@
 /* wild.c - wildcard routines */
-/* $Id: wild.c,v 1.19 2002/08/28 15:24:09 rmg Exp $ */
 
 /*
  * Written by T. Alexander Popiel, 24 June 1993

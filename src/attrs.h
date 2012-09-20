@@ -1,5 +1,4 @@
 /* attrs.h - Attribute definitions */
-/* $Id: attrs.h,v 1.33 2008/10/25 22:35:10 lwl Exp $ */
 
 #include "copyright.h"
 

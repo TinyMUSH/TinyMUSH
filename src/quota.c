@@ -1,5 +1,4 @@
 /* quota.c - quota management commands */
-/* $Id: quota.c,v 1.18 2002/08/02 20:48:47 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

@@ -1,7 +1,5 @@
 /* version.c - This is file contains the version number for gdbm source. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Keep a string with the version number in it! */

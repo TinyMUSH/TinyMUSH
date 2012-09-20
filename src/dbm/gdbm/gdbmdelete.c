@@ -1,7 +1,5 @@
 /* gdbmdelete.c - Remove the key and its associated data from the database. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Remove the KEYed item and the KEY from the database DBF.  The file on disk

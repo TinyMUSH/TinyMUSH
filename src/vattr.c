@@ -1,5 +1,4 @@
 /* vattr.c - Manages the user-defined attributes. */
-/* $Id: vattr.c,v 1.30 2002/06/19 23:38:23 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

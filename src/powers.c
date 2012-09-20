@@ -1,5 +1,4 @@
 /* powers.c - power manipulation routines */
-/* $Id: powers.c,v 1.29 2002/05/11 16:34:40 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

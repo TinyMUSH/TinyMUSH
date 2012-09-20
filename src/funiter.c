@@ -1,5 +1,4 @@
 /* funiter.c - functions for user-defined iterations over lists */
-/* $Id: funiter.c,v 1.37 2010/05/10 18:54:22 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

@@ -1,7 +1,5 @@
 /* gdbmfetch.c - Find a key and return the associated data.  */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Look up a given KEY and return the information associated with that KEY.

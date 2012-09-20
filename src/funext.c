@@ -1,5 +1,4 @@
 /* funext.c - Functions that rely on external call-outs */
-/* $Id: funext.c,v 1.22 2007/07/14 02:02:04 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

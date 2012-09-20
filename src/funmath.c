@@ -1,5 +1,4 @@
 /* funmath.c - math and logic functions */
-/* $Id: funmath.c,v 1.33 2010/05/10 13:18:57 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

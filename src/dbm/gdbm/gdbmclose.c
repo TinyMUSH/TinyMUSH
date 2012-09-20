@@ -1,7 +1,5 @@
 /* gdbmclose.c - Close a previously opened dbm file. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Close the dbm file and free all memory associated with the file DBF.

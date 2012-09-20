@@ -1,5 +1,4 @@
 /* alloc.h - External definitions for memory allocation subsystem */
-/* $Id: alloc.h,v 1.18 2002/09/23 04:59:36 rmg Exp $ */
 
 #include "copyright.h"
 

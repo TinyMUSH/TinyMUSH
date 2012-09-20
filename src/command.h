@@ -1,5 +1,4 @@
 /* command.h - declarations used by the command processor */
-/* $Id: command.h,v 1.46 2010/05/06 13:39:26 lwl Exp $ */
 
 #include "copyright.h"
 

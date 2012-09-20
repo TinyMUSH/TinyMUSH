@@ -1,5 +1,4 @@
 /* htab.h - Structures and declarations needed for table hashing */
-/* $Id: htab.h,v 1.15 2002/10/20 18:26:43 rmg Exp $ */
 
 #include "copyright.h"
 

@@ -1,5 +1,4 @@
 /* match.h */
-/* $Id: match.h,v 1.6 2000/11/25 23:06:48 lwl Exp $ */
 
 #include "copyright.h"
 

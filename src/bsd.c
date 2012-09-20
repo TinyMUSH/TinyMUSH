@@ -1,5 +1,4 @@
 /* bsd.c - BSD-style network and signal routines */
-/* $Id: bsd.c,v 1.75 2007/10/04 22:58:20 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

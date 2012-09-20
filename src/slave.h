@@ -1,5 +1,4 @@
 /* slave.h */
-/* $Id: slave.h,v 1.4 2000/05/29 22:20:55 rmg Exp $ */
 
 #include "copyright.h"
 

@@ -1,7 +1,5 @@
 /* proto.h - The prototypes for the dbm routines. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 #ifndef __GDBMPROTO_H   

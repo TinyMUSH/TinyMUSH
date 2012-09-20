@@ -1,5 +1,4 @@
 /* unparse.c - convert boolexps to printable form */
-/* $Id: unparse.c,v 1.12 2003/02/04 05:06:33 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

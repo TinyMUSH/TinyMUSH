@@ -1,5 +1,4 @@
 /* game.c - main program and misc functions */
-/* $Id: game.c,v 1.198 2010/05/31 18:29:18 lwl Exp $ */
 
 #include "copyright.h"
 //#include <sys/stat.h>

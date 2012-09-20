@@ -1,5 +1,4 @@
 /* cque.c - commands and functions for manipulating the command queue */
-/* $Id: cque.c,v 1.45 2009/01/19 04:41:17 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

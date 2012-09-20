@@ -1,5 +1,4 @@
 /* udb_ocache.c - LRU caching */
-/* $Id: udb_ocache.c,v 1.81 2006/11/10 20:53:20 tyrspace Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

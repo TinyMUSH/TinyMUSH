@@ -1,5 +1,4 @@
 /* udb_misc.c - Misc support routines for unter style error management. */
-/* $Id: udb_misc.c,v 1.14 2006/11/10 20:53:20 tyrspace Exp $ */
 
 /*
  * Stolen from mjr.

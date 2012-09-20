@@ -1,5 +1,4 @@
 /* look.c - commands which look at things */
-/* $Id: look.c,v 1.78 2009/02/21 20:06:11 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

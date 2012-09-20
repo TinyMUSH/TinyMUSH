@@ -1,5 +1,4 @@
 /* eval.c - command evaluation and cracking */
-/* $Id: eval.c,v 1.83 2010/05/10 18:54:22 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

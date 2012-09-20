@@ -1,5 +1,4 @@
 /* ansi.h - ANSI control codes for various neat-o terminal effects. */
-/* $Id: ansi.h,v 1.19 2005/10/16 04:01:41 alierak Exp $ */
 
 #include "copyright.h"
 

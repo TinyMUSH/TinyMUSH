@@ -1,5 +1,4 @@
 /* udb_ochunk.c */
-/* $Id: udb_ochunk.c,v 1.54 2006/11/10 20:53:20 tyrspace Exp $ */
 
 /*
  * Copyright (C) 1991, Marcus J. Ranum. All rights reserved.

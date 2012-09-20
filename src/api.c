@@ -1,5 +1,4 @@
 /* api.c - functions called only by modules */
-/* $Id: api.c,v 1.14 2002/05/11 16:34:39 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

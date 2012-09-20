@@ -1,5 +1,4 @@
 /* create.c - Commands that create new objects */
-/* $Id: create.c,v 1.49 2005/10/21 16:13:15 alierak Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

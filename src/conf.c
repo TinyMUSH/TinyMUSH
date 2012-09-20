@@ -1,5 +1,4 @@
 /* conf.c - configuration functions and defaults */
-/* $Id: conf.c,v 1.203 2010/10/07 17:42:44 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

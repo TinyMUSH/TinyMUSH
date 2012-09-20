@@ -1,5 +1,4 @@
 /* cmdtabs.h - command and other supporting tables */
-/* $Id: cmdtabs.h,v 1.50 2010/05/31 18:29:18 lwl Exp $ */
 
 #include "copyright.h"
 

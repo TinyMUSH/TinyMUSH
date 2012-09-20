@@ -1,5 +1,4 @@
 /* player_c.c - Player cache routines */
-/* $Id: player_c.c,v 1.9 2005/10/30 02:02:54 alierak Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

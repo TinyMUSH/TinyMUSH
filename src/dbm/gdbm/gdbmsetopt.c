@@ -1,7 +1,5 @@
 /* gdbmsetopt.c - set options pertaining to a GDBM descriptor. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* operate on an already open descriptor. */

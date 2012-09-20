@@ -1,5 +1,4 @@
 /* boolexp.c */
-/* $Id: boolexp.c,v 1.30 2004/02/23 04:35:14 rmg Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

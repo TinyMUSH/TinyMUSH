@@ -1,7 +1,5 @@
 /* bucket.c - The routines for playing with hash buckets. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Initializing a new hash buckets sets all bucket entries to -1 hash value. */

@@ -1,5 +1,4 @@
 /* walkdb.h - structures used in commands that walk the entire db */
-/* $Id: walkdb.h,v 1.2 2002/07/25 15:47:28 lwl Exp $ */
 
 #include "copyright.h"
 

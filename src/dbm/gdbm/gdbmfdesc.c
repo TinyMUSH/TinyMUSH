@@ -1,7 +1,5 @@
 /* gdbfdesc.c - return the file descriptor associated with the database. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Return the file number of the DBF file. */

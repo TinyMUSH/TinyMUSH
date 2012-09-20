@@ -1,5 +1,4 @@
 /* log.c - logging routines */
-/* $Id: log.c,v 1.28 2008/01/12 06:53:52 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

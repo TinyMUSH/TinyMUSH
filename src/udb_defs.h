@@ -1,5 +1,4 @@
 /* udb_defs.h - Header file for the UnterMud DB layer, in TinyMUSH 3.0 */
-/* $Id: udb_defs.h,v 1.17 2001/08/23 21:44:53 dpassmor Exp $ */
 
 /*
 	Andrew Molitor, amolitor@eagle.wesleyan.edu

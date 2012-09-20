@@ -1,5 +1,4 @@
 /* funstring.c - string functions */
-/* $Id: funstring.c,v 1.73 2010/05/11 21:02:39 lwl Exp $ */
 
 #include "copyright.h"
 #include "mushconf.h"		/* required by code */

@@ -1,7 +1,5 @@
 /* findkey.c - The routine that finds a key entry in the file. */
 
-/* $id$ */
-
 #include "gdbmsystems.h"
 
 /* Read the data found in bucket entry ELEM_LOC in file DBF and

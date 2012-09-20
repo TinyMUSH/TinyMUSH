@@ -1,7 +1,5 @@
 /* systems.h - Most of the system dependant code and defines are here. */
 
-/* $id$ */
-
 #include "gdbmcopyright.h"
 
 #ifndef __GDBMSYSTEM_H   

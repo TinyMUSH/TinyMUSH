@@ -1,5 +1,4 @@
 /* patchlevel.h - version information */
-/* $Id: patchlevel.h,v 1.79 2011/06/07 00:57:18 tyrspace Exp $ */
 
 #include "copyright.h"
 
