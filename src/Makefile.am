@@ -40,8 +40,10 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c
 	udb.h udb_defs.h vattr.h walkdb.h
 EXTRA_netmush_SOURCES  = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h mcheck.c mstats.c mtrace.c
 netmush_LDFLAGS        = -export-dynamic
-netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O)
+netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES   = $(LTDLDEPS) 
+
+  
 
 nodist_include_HEADERS = version.h
 
@@ -57,7 +59,7 @@ if WANT_DBM_GDBM
  netmush_LDADD   += $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
  bin_PROGRAMS    += recover
  recover_SOURCES  = recover.c
- recover_LDADD    = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a
+ recover_LDADD    = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 endif
 
 if WANT_DBM_QDBM
@@ -66,7 +68,7 @@ if WANT_DBM_QDBM
  netmush_LDADD   += $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
  bin_PROGRAMS    += recover
  recover_SOURCES  = recover.c
- recover_LDADD    = $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a
+ recover_LDADD    = $(srcdir)/dbm/qdbm/.libs/libtinyqdbm.a $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 endif
 
 if WANT_MODULE_COMSYS

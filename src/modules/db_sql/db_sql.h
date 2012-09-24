@@ -3,6 +3,7 @@
 
 #include "../../copyright.h"
 #include "../../api.h"
+#include "../../config.h"
 
 #ifdef HAVE_MSQL
 

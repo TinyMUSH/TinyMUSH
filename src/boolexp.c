@@ -1,15 +1,24 @@
 /* boolexp.c */
 
 #include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "config.h"
 
-#include "db.h"			/* required by externs.h */
-#include "externs.h"		/* required by code */
+#include "game.h" 	/* required by mudconf */
+#include "alloc.h" 	/* required by mudconf */
+#include "flags.h" 	/* required by mudconf */
+#include "htab.h" 	/* required by mudconf */
+#include "ltdl.h" 	/* required by mudconf */
+#include "udb.h" 	/* required by mudconf */
+#include "udb_defs.h"	/* required by mudconf */ 
+#include "mushconf.h"	/* required by code */
 
-#include "attrs.h"		/* required by code */
-#include "match.h"		/* required by code */
-#include "ansi.h"		/* required by code */
-#include "powers.h"		/* required by code */
+#include "db.h"		/* required by externs.h */
+#include "externs.h"	/* required by code */
+
+#include "attrs.h"	/* required by code */
+#include "match.h"	/* required by code */
+#include "ansi.h"	/* required by code */
+#include "powers.h"	/* required by code */
 
 static int parsing_internal = 0;
 
@@ -322,7 +331,7 @@ char *s;
             free_lbuf(buff);
             return ((BOOLEXP *) NULL);
         }
-        anum = atoi(buff);
+        anum = (int)strtol(buff, (char **)NULL, 10);
         if (anum <= 0)
         {
             free_lbuf(buff);
@@ -426,7 +435,7 @@ NDECL(parse_boolexp_L)
                     free_bool(b);
                     return TRUE_BOOLEXP;
                 }
-                b->thing = atoi(&buf[1]);
+                b->thing = (int)strtol(&buf[1], (char **)NULL, 10);
                 if (!Good_obj(b->thing))
                 {
                     free_lbuf(buf);
@@ -469,7 +478,7 @@ NDECL(parse_boolexp_L)
                 free_bool(b);
                 return TRUE_BOOLEXP;
             }
-            b->thing = atoi(&buf[1]);
+            b->thing = (int)strtol(&buf[1], (char **)NULL, 10);
             if (b->thing < 0)
             {
                 free_lbuf(buf);

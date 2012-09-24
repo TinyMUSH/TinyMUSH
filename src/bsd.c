@@ -1,6 +1,15 @@
 /* bsd.c - BSD-style network and signal routines */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs.h */
@@ -1360,7 +1369,7 @@ int sig;
 #ifndef SIGNAL_SIGCHLD_BRAINDAMAGE
         signal(SIGCHLD, sighandler);
 #endif
-        while ((child = WAITOPT(&stat, WNOHANG)) > 0)
+        while ((child = waitpid(0, &stat, WNOHANG)) > 0)
         {
             if (mudconf.fork_dump && mudstate.dumping &&
                     child == mudstate.dumper &&

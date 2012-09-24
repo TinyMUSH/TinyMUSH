@@ -1,6 +1,15 @@
 /* object.c - low-level object manipulation routines */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -183,7 +192,7 @@ int obj_type;
         for (p = strtok_r(newobj_str, " ", &tokst), i = 0;
                 p && (i < 4); p = strtok_r(NULL, " ", &tokst), i++)
         {
-            obj_list[i] = atoi(p);
+            obj_list[i] = (int)strtol(p, (char **)NULL, 10);
         }
     }
     free_lbuf(newobj_str);
@@ -725,7 +734,7 @@ char *str;
         notify(player, NOMATCH_MESSAGE);
         return;
     }
-    thing = atoi(str);
+    thing = (int)strtol(str, (char **)NULL, 10);
     if (!Good_dbref(thing))
     {
         notify(player, NOMATCH_MESSAGE);
@@ -941,7 +950,7 @@ dbref victim;
     a_dest = atr_get_raw(victim, A_DESTROYER);
     if (a_dest)
     {
-        player = atoi(a_dest);
+        player = (int)strtol(a_dest, (char **)NULL, 10);
         if (!Good_owner(player))
             player = GOD;
     }

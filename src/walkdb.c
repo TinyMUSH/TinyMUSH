@@ -1,6 +1,15 @@
 /* walkdb.c - Support for commands that walk the entire db */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -548,7 +557,7 @@ SEARCH *parm;
     }
     else if (pname[0] == '#')
     {
-        parm->s_rst_owner = atoi(&pname[1]);
+        parm->s_rst_owner = (int)strtol(&pname[1], (char **)NULL, 10);
         if (!Good_obj(parm->s_rst_owner))
             parm->s_rst_owner = NOTHING;
         else if (Typeof(parm->s_rst_owner) != TYPE_PLAYER)

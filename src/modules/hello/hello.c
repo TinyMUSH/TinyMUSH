@@ -2,6 +2,7 @@
 /* $Id: hello.c,v 1.19 2001/12/13 04:39:28 dpassmor Exp $ */
 
 #include "../../api.h"
+#include "../../config.h"
 
 #define MOD_HELLO_HELLO_INFORMAL	1
 #define MOD_HELLO_FOOF_SHOW		1

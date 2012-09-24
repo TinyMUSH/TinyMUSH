@@ -1,6 +1,15 @@
 /* funext.c - Functions that rely on external call-outs */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -28,12 +37,12 @@ extern void FDECL(cf_display, (dbref, char *, char *, char **));
 
 extern void FDECL(help_helper, (dbref, int, int, char *, char *, char **));
 
-extern INLINE int FDECL(safe_chr_real_fn, (char, char *, char **, int));
+extern int FDECL(safe_chr_real_fn, (char, char *, char **, int));
 
 #define Find_Connection(x,s,t,p) \
 	p = t = NOTHING;	\
 	if (is_integer(s)) {	\
-		p = atoi(s);	\
+		p = (int)strtol(s, (char **)NULL, 10);	\
 	} else {	\
 		t = lookup_player(x, s, 1);	\
 		if (Good_obj(t) && Can_Hide(t) && Hidden(t) && \

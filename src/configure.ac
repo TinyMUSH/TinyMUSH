@@ -127,7 +127,7 @@ AC_MSG_CHECKING([whether to enable disk-based database])
 AC_ARG_ENABLE([disk-based], [AS_HELP_STRING([--enable-disk-based], [store the database on disk using a DBM hashfile, and cache some attributes in a limited amount of memory. The alternative is memory-based, where the database is kept in memory. Disabling the disk-based cache can improve performance if enough memory is available. @<:@default=yes@:>@])],
  [AS_IF([test "x$enableval" = "xno"],
   [
-   AC_DEFINE([MEMORY_BASED], [], [Enable memory-based DBM hashDB])
+   AC_DEFINE([MEMORY_BASED], [1], [Enable memory-based DBM hashDB])
    AC_MSG_RESULT([no])
   ],
   [
@@ -232,7 +232,7 @@ AC_ARG_ENABLE([pueblo-support], [AS_HELP_STRING([--enable-pueblo-support], [Enab
   enable_pueblo_support="yes"
  ]
 )
-AS_IF([test "x$enable_pueblo_support" = "xyes"], [AC_DEFINE([PUEBLO_SUPPORT],[], [Support for Pueblo Clients])])
+AS_IF([test "x$enable_pueblo_support" = "xyes"], [AC_DEFINE([PUEBLO_SUPPORT],[1], [Support for Pueblo Clients])])
 
 AC_MSG_CHECKING([whether to enable IEEE 754 floating point support])
 AC_ARG_ENABLE([floating-point], [AS_HELP_STRING([--enable-floating-point], [Enable support for math functions (lt, gt, add, etc.) with IEEE 754 floating-point support @<:@default=yes@:>@])],
@@ -243,7 +243,7 @@ AC_ARG_ENABLE([floating-point], [AS_HELP_STRING([--enable-floating-point], [Enab
   enable_floating_point="yes"
  ]
 )
-AS_IF([test "x$enable_floating_point" = "xyes"], [AC_DEFINE([FLOATING_POINTS],[], [Support for IEEE 754 floating-point])])
+AS_IF([test "x$enable_floating_point" = "xyes"], [AC_DEFINE([FLOATING_POINTS],[1], [Support for IEEE 754 floating-point])])
 
 AC_MSG_CHECKING([whether to enable command lag detection support])
 AC_ARG_ENABLE([lag-checking], [AS_HELP_STRING([--enable-lag-checking], [Enable warnings that a certain command has exceeded a certain amount of wall-clock time to execute. Disable this if you have severe problems with computational resources on your host machine. @<:@default=yes@:>@])],
@@ -254,7 +254,7 @@ AC_ARG_ENABLE([lag-checking], [AS_HELP_STRING([--enable-lag-checking], [Enable w
   enable_lag_checking="yes"
  ]
 )
-AS_IF([test "x$enable_lag_checking" = "xno"], [AC_DEFINE([NO_LAG_CHECK],[], [Support for command lag detection support])])
+AS_IF([test "x$enable_lag_checking" = "xno"], [AC_DEFINE([NO_LAG_CHECK],[1], [Support for command lag detection support])])
 
 AC_MSG_CHECKING([whether to enable per-object time usage tracking])
 AC_ARG_ENABLE([time-checking], [AS_HELP_STRING([--enable-time-checking], [Enable tracking of the amount of wall-clock time that individual objects are using. Disable this if you have severe problems with computational resources on your host machine. (This is assumed to be disabled if lag-checking is disabled) @<:@default=yes@:>@])], 
@@ -265,7 +265,7 @@ AC_ARG_ENABLE([time-checking], [AS_HELP_STRING([--enable-time-checking], [Enable
   enable_time_checking="yes"
  ]
 )
-AS_IF([test "x$enable_time_checking" = "xno"], [AC_DEFINE([NO_TIMECHECKING],[], [Support for per-object time usage tracking])])
+AS_IF([test "x$enable_time_checking" = "xno"], [AC_DEFINE([NO_TIMECHECKING],[1], [Support for per-object time usage tracking])])
 
 AC_MSG_CHECKING([whether to enable cpu time checking])
 AC_ARG_ENABLE([cpu-checking], [AS_HELP_STRING([--enable-cpu-checking], [Enable CPU time reported with getrusage() instead of tracking wall-clock time for lag-checking and time-checking features. This is more accurate but also more computationally expensive. @<:@default=no@:>@])],
@@ -276,11 +276,11 @@ AC_ARG_ENABLE([cpu-checking], [AS_HELP_STRING([--enable-cpu-checking], [Enable C
   enable_cpu_checking="no"
  ]
 )
-AS_IF([test "x$enable_cpu_checking" = "xyes"], [AC_DEFINE([TRACK_USER_TIME],[], [Support for cpu time checking])])
+AS_IF([test "x$enable_cpu_checking" = "xyes"], [AC_DEFINE([TRACK_USER_TIME],[1], [Support for cpu time checking])])
 
 AC_MSG_CHECKING([which malloc-wrapper macros to use])
 AC_ARG_WITH([malloc-wrapper], [AS_HELP_STRING([--with-malloc-wrapper=@<:@track|log@:>@], [Enable use of wrapper macros for malloc(), free(), and related functions to do one of the following, which can help identify memory leaks: track - maintain a tagged list of memory allocated for purposes other than the buffer pool. (see @list raw_memory) log - print log messages when the function are called. This is spammy; try other debugging tools first.])],
-  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[], [Support for cpu time checking]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[], [Support for cpu time checking]), [with_malloc_wrapper="none"])),
+  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[1], [Support for cpu time checking]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[1], [Support for cpu time checking]), [with_malloc_wrapper="none"])),
   [with_malloc_wrapper="none"]
 )
 
@@ -429,13 +429,13 @@ AC_STRUCT_TIMEZONE
 
 AC_MSG_CHECKING([for struct linger in sys/socket.h])
 AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>] , [struct linger ling; ling.l_onoff = 1;], AC_DEFINE([HAVE_LINGER], [], [Define if your <sys/socket.h> declares `struct linger'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+#include <sys/socket.h>] , [struct linger ling; ling.l_onoff = 1;], AC_DEFINE([HAVE_LINGER], [1], [Define if your <sys/socket.h> declares `struct linger'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING([for union wait in sys/wait.h])
-AC_TRY_COMPILE([#include <sys/wait.h>],[union wait stat;], AC_DEFINE([HAVE_UNION_WAIT], [], [Define if your <sys/wait.h> declares `union wait'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_TRY_COMPILE([#include <sys/wait.h>],[union wait stat;], AC_DEFINE([HAVE_UNION_WAIT], [1], [Define if your <sys/wait.h> declares `union wait'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING([for struct rusage completeness in sys/resource.h])
-AC_TRY_COMPILE([#include <sys/resource.h>], [struct rusage usage; usage.ru_ixrss = 1], AC_DEFINE([STRUCT_RUSAGE_COMPLETE], [], [Define if your <sys/resource.h> declares everything we need in `struct rusage'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_TRY_COMPILE([#include <sys/resource.h>], [struct rusage usage; usage.ru_ixrss = 1], AC_DEFINE([STRUCT_RUSAGE_COMPLETE], [1], [Define if your <sys/resource.h> declares everything we need in `struct rusage'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING([for signal SIGCHLD braindamage in signal.h])
 AC_TRY_RUN([
@@ -474,7 +474,7 @@ char **argv;
     exit(1);
   }
   exit(0);
-}], AC_MSG_RESULT([no]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([yes]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([unable to test... assuming yes]))
+}], AC_MSG_RESULT([no]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [1], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([yes]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [1], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([unable to test... assuming yes]))
 
 AC_MSG_CHECKING([for broken small struct padding])
 AC_TRY_RUN([
@@ -496,7 +496,7 @@ char **argv;
       dq[4] != '3' || dq[5] != '.' || dq[6] != '4' || dq[7] != '\0')
     return 1;
   return 0;
-}],AC_MSG_RESULT([no]), AC_DEFINE([BROKEN_GCC_PADDING], [], [Define if your GCC break small struct padding]) AC_MSG_RESULT([yes]), AC_DEFINE([BROKEN_GCC_PADDING], [], [Define if your GCC break small struct padding]) AC_MSG_RESULT([unable to test... assuming yes]))
+}],AC_MSG_RESULT([no]), AC_DEFINE([BROKEN_GCC_PADDING], [1], [Define if your GCC break small struct padding]) AC_MSG_RESULT([yes]), AC_DEFINE([BROKEN_GCC_PADDING], [1], [Define if your GCC break small struct padding]) AC_MSG_RESULT([unable to test... assuming yes]))
     
 AC_CHECK_TYPES([ptrdiff_t])
 AC_CHECK_MEMBERS([struct stat.st_blksize])
@@ -507,60 +507,7 @@ AX_BOX([Check for Declarations.])
 AC_DECL_SYS_SIGLIST
 
 AC_MSG_CHECKING(for sys_signame in signal.h)
-AC_EGREP_HEADER(sys_signame,signal.h,AC_DEFINE([HAVE_SYS_SIGNAME], [], [Define if your <signal.h> doesn't declares `sys_signame'.]) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for getpagesize in unistd.h)
-AC_EGREP_HEADER(getpagesize,unistd.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETPAGESIZE_DCL], [], [Define if your <unistd.h> doesn't declares getpagesize]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for realloc in stdlib.h)
-AC_EGREP_HEADER(realloc,stdlib.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_MALLOC_DCL], [], [Define if your <stdlib.h> doesn't declares realloc]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for vsprintf in stdio.h)
-AC_EGREP_HEADER(vsprintf,stdio.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_VSPRINTF_DCL], [], [Define if your <stdio.h> doesn't declares vsprintf]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for sprintf in stdio.h)
-AC_EGREP_HEADER(\<sprintf|\<*sprintf,stdio.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_SPRINTF_DCL], [], [Define if your <stdio.h> doesn't declares sprintf]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for fread in stdio)
-AC_EGREP_HEADER(fread,stdio.h,AC_DEFINE([EXTENDED_STDIO_DCLS], [], [Define if your <stdio.h> doesn't declares fread]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for setsockopts in socket.h)
-AC_EGREP_HEADER(setsockopt,sys/socket.h,AC_DEFINE([EXTENDED_SOCKET_DCLS], [], [Define if your <sys/socket.h> doesn't declares setsockopt]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for gettimeofday in time.h or sys/time.h)
-if test $ac_cv_header_time = yes && test $ac_cv_header_sys_time_h = yes ; then
- AC_EGREP_HEADER(gettimeofday,sys/time.h,AC_MSG_RESULT(yes),AC_EGREP_HEADER(gettimeofday,time.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETTIMEOFDAY_DCL], [], [Define if your <time.h> or <sys/time.h> doesn't declares gettimeofday]) AC_MSG_RESULT(no)))
-elif test $ac_cv_header_sys_time_h = yes ; then
- AC_EGREP_HEADER(gettimeofday,sys/time.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETTIMEOFDAY_DCL], [], [Define if your <sys/time.h> doesn't declares gettimeofday]) AC_MSG_RESULT(no))
-else
- AC_EGREP_HEADER(gettimeofday,time.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETTIMEOFDAY_DCL], [], [Define if your <time.h> doesn't declares gettimeofday]) AC_MSG_RESULT(no))
-fi
-
-if test $ac_cv_header_sys_wait_h = yes ; then
- AC_MSG_CHECKING(for wait3 in wait.h)
- AC_EGREP_HEADER(wait3,sys/wait.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_WAIT3_DCL], [], [Define if your <wait.h> doesn't declares wait3]) AC_MSG_RESULT(no))
-
- AC_MSG_CHECKING(for wait4 in wait.h)
- AC_EGREP_HEADER(wait4,sys/wait.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_WAIT4_DCL], [], [Define if your <wait.h> doesn't declares wait3]) AC_MSG_RESULT(no))
-fi
-
-AC_MSG_CHECKING(for srandom in math.h or stdlib.h)
-AC_EGREP_HEADER(srandom,math.h,AC_MSG_RESULT(yes),AC_EGREP_HEADER(srandom,stdlib.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_SRANDOM_DCL], [], [Define if your <math.h> or <stdlib.h> doesn't declares srandom]) AC_MSG_RESULT(no)))
-
-AC_MSG_CHECKING(for random in stdlib.h)
-AC_EGREP_HEADER(extern * random,stdlib.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_RANDOM_DCL], [], [Define if your <stdlib.h> doesn't declares random]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for perror in errno.h)
-AC_EGREP_HEADER(perror,errno.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_PERROR_DCL], [], [Define if your <errno.h> doesn't declares perror]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for getrusage in sys/resource.h)
-AC_EGREP_HEADER(getrusage,sys/resource.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETRUSAGE_DCL], [], [Define if your <sys/resource.h> doesn't declares getrusage]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for getrlimit sys/resource.h)
-AC_EGREP_HEADER(getrlimit,sys/resource.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_GETRLIMIT_DCL], [], [Define if your <sys/resource.h> doesn't declares getrlimit]) AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for strtok_r dcl)
-AC_EGREP_HEADER(strtok_r,string.h,AC_MSG_RESULT(yes),AC_DEFINE([NEED_STRTOK_R_DCL], [], [Define if your <string.h> doesn't declares strtok_r]) AC_MSG_RESULT(no))
+AC_EGREP_HEADER(sys_signame,signal.h,AC_DEFINE([HAVE_SYS_SIGNAME], [1], [Define if your <signal.h> doesn't declares `sys_signame'.]) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
 
 AX_BOX([Checks for library functions.])
 # Checks for library functions.
@@ -569,7 +516,7 @@ AC_FUNC_VFORK
 AC_FUNC_VPRINTF
 AC_FUNC_MMAP
 
-AC_CHECK_FUNCS([alarm atexit bcopy dup2 floor ftruncate flock fsync getdtablesize gethostbyaddr gethostbyname getpagesize getrusage gettimeofday inet_ntoa isascii localtime_r memmove memset mkdir mktime munmap pow rename rmdir select setrlimit socket sqrt srandom strcasecmp strchr strcspn strdup strerror strpbrk strrchr strspn strstr strtok_r strtol strtoul timelocal tzset uname vsnprintf wait3 wait4])
+AC_CHECK_FUNCS([alarm gethostbyaddr gethostbyname inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn])
 
 AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])

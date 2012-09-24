@@ -1,6 +1,15 @@
 /* funlist.c - list functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -131,7 +140,7 @@ char *dbr;
     if ((*dbr != '#') || (dbr[1] == '\0'))
         return 0;
     else
-        return atoi(dbr + 1);
+        return (int)strtol(dbr + 1, (char **)NULL, 10);
 }
 
 /*
@@ -413,8 +422,8 @@ FUNCTION(fun_extract)
     VaChk_Only_In_Out(5);
 
     s = fargs[0];
-    start = atoi(fargs[1]);
-    len = atoi(fargs[2]);
+    start = (int)strtol(fargs[1], (char **)NULL, 10);
+    len = (int)strtol(fargs[2], (char **)NULL, 10);
 
     if ((start < 1) || (len < 1))
     {
@@ -496,8 +505,8 @@ FUNCTION(fun_index)
 
     s = fargs[0];
     c = *fargs[1];
-    start = atoi(fargs[2]);
-    end = atoi(fargs[3]);
+    start = (int)strtol(fargs[2], (char **)NULL, 10);
+    end = (int)strtol(fargs[3], (char **)NULL, 10);
 
     if ((start < 1) || (end < 1) || (*s == '\0'))
         return;
@@ -729,7 +738,7 @@ FUNCTION(fun_ldelete)
     Delim isep;
 
     VaChk_Only_In(3);
-    do_itemfuns(buff, bufc, fargs[0], atoi(fargs[1]), NULL,
+    do_itemfuns(buff, bufc, fargs[0], (int)strtol(fargs[1], (char **)NULL, 10), NULL,
                 &isep, IF_DELETE);
 }
 
@@ -741,7 +750,7 @@ FUNCTION(fun_replace)
     Delim isep;
 
     VaChk_Only_In(4);
-    do_itemfuns(buff, bufc, fargs[0], atoi(fargs[1]), fargs[2],
+    do_itemfuns(buff, bufc, fargs[0], (int)strtol(fargs[1], (char **)NULL, 10), fargs[2],
                 &isep, IF_REPLACE);
 }
 
@@ -753,7 +762,7 @@ FUNCTION(fun_insert)
     Delim isep;
 
     VaChk_Only_In(4);
-    do_itemfuns(buff, bufc, fargs[0], atoi(fargs[1]), fargs[2],
+    do_itemfuns(buff, bufc, fargs[0], (int)strtol(fargs[1], (char **)NULL, 10), fargs[2],
                 &isep, IF_INSERT);
 }
 
@@ -821,7 +830,7 @@ FUNCTION(fun_lreplace)
 
     for (i = 0; i < npos; i++)
     {
-        cpos = atoi(pos_p[i]);
+        cpos = (int)strtol(pos_p[i], (char **)NULL, 10);
         if ((cpos > 0) && (cpos <= norig))
             orig_p[cpos - 1] = rep_p[i];
     }
@@ -1165,7 +1174,7 @@ int n, sort_type;
         for (i = 0; i < n; i++)
         {
             ip[i].str = s[i];
-            ip[i].data = atoi(s[i]);
+            ip[i].data = (int)strtol(s[i], (char **)NULL, 10);
             ip[i].pos = i + 1;
         }
         qsort((void *)ip, n, sizeof(i_rec),
@@ -1205,7 +1214,7 @@ int n, sort_type;
         for (i = 0; i < n; i++)
         {
             fp[i].str = s[i];
-            fp[i].data = aton(s[i]);
+            fp[i].data = strtod(s[i], (char **)NULL);
             fp[i].pos = i + 1;
         }
         qsort((void *)fp, n, sizeof(f_rec),
@@ -1311,7 +1320,7 @@ const void *s1, *s2;
     str = tbuf;
     exec(result, &bp, ucomp_player, ucomp_caller, ucomp_cause,
          EV_STRIP | EV_FCHECK | EV_EVAL, &str, elems, 2);
-    n = atoi(result);
+    n = (int)strtol(result, (char **)NULL, 10);
     free_lbuf(result);
     free_lbuf(tbuf);
     return n;
@@ -1527,9 +1536,9 @@ FUNCTION(handle_sets)
         ip1 = (int *)XCALLOC(n1, sizeof(int), "handle_sets.n1");
         ip2 = (int *)XCALLOC(n2, sizeof(int), "handle_sets.n2");
         for (val = 0; val < n1; val++)
-            ip1[val] = atoi(ptrs1[val]);
+            ip1[val] = (int)strtol(ptrs1[val], (char **)NULL, 10);
         for (val = 0; val < n2; val++)
-            ip2[val] = atoi(ptrs2[val]);
+            ip2[val] = (int)strtol(ptrs2[val], (char **)NULL, 10);
     }
     else if (sort_type == DBREF_LIST)
     {
@@ -1545,9 +1554,9 @@ FUNCTION(handle_sets)
         fp1 = (double *)XCALLOC(n1, sizeof(double), "handle_sets.n1");
         fp2 = (double *)XCALLOC(n2, sizeof(double), "handle_sets.n2");
         for (val = 0; val < n1; val++)
-            fp1[val] = aton(ptrs1[val]);
+            fp1[val] = strtod(ptrs1[val], (char **)NULL);
         for (val = 0; val < n2; val++)
-            fp2[val] = aton(ptrs2[val]);
+            fp2[val] = strtod(ptrs2[val], (char **)NULL);
     }
     i1 = i2 = 0;
     bb_p = oldp = *bufc;
@@ -1776,8 +1785,8 @@ FUNCTION(fun_columns)
     VaChk_Range(2, 4);
     VaChk_InSep(3, 0);
 
-    number = (unsigned int)safe_atoi(fargs[1]);
-    indent = (unsigned int)safe_atoi(fargs[3]);
+    number = (int)strtol(fargs[1], (char **)NULL, 10);
+    indent = (int)strtol(fargs[3], (char **)NULL, 10);
 
     if (indent > 77)  	/* unsigned int, always a positive number */
     {
@@ -2168,7 +2177,7 @@ FUNCTION(process_tables)
                        "process_tables.col_widths");
     for (i = 0; i < n_columns; i++)
     {
-        num = atoi(widths[i]);
+        num = (int)strtol(widths[i], (char **)NULL, 10);
         col_widths[i] = (num < 1) ? 1 : num;
     }
 
@@ -2207,7 +2216,7 @@ FUNCTION(fun_table)
 
     if (nfargs > 2)
     {
-        line_length = atoi(fargs[2]);
+        line_length = (int)strtol(fargs[2], (char **)NULL, 10);
         if (line_length < 2)
             line_length = 2;
     }
@@ -2229,7 +2238,7 @@ FUNCTION(fun_table)
             p++;
             break;
         }
-        field_width = atoi(p);
+        field_width = (int)strtol(p, (char **)NULL, 10);
         if (field_width < 1)
             field_width = 1;
         else if (field_width > LBUF_SIZE - 1)
@@ -2316,7 +2325,7 @@ FUNCTION(fun_elements)
              * Just a number. If negative, count back from end of
              * list.
              */
-            cur = atoi(r);
+            cur = (int)strtol(r, (char **)NULL, 10);
             if (cur < 0)
             {
                 cur += nwords;
@@ -2364,7 +2373,7 @@ FUNCTION(fun_elements)
             }
             else
             {
-                stepn = atoi(step_p);
+                stepn = (int)strtol(step_p, (char **)NULL, 10);
             }
 
             if (stepn > 0)
@@ -2378,7 +2387,7 @@ FUNCTION(fun_elements)
                 }
                 else
                 {
-                    cur = atoi(r);
+                    cur = (int)strtol(r, (char **)NULL, 10);
                     start =
                         (cur <
                          0) ? (nwords + cur) : (cur - 1);
@@ -2392,7 +2401,7 @@ FUNCTION(fun_elements)
                 }
                 else
                 {
-                    cur = atoi(end_p);
+                    cur = (int)strtol(end_p, (char **)NULL, 10);
                     end =
                         (cur < 0) ? (nwords + cur) : (cur);
                 }
@@ -2430,7 +2439,7 @@ FUNCTION(fun_elements)
                 }
                 else
                 {
-                    cur = atoi(r);
+                    cur = (int)strtol(r, (char **)NULL, 10);
                     start =
                         (cur <
                          0) ? (nwords + cur) : (cur - 1);
@@ -2444,7 +2453,7 @@ FUNCTION(fun_elements)
                 }
                 else
                 {
-                    cur = atoi(end_p);
+                    cur = (int)strtol(end_p, (char **)NULL, 10);
                     end =
                         (cur <
                          0) ? (nwords + cur - 1) : (cur -
@@ -2527,7 +2536,7 @@ FUNCTION(fun_exclude)
              * Just a number. If negative, count back from end of
              * list.
              */
-            cur = atoi(r);
+            cur = (int)strtol(r, (char **)NULL, 10);
             if (cur < 0)
                 cur += nwords;
             else
@@ -2555,7 +2564,7 @@ FUNCTION(fun_exclude)
             }
             else
             {
-                stepn = atoi(step_p);
+                stepn = (int)strtol(step_p, (char **)NULL, 10);
             }
 
             if (stepn > 0)
@@ -2569,7 +2578,7 @@ FUNCTION(fun_exclude)
                 }
                 else
                 {
-                    cur = atoi(r);
+                    cur = (int)strtol(r, (char **)NULL, 10);
                     start =
                         (cur <
                          0) ? (nwords + cur) : (cur - 1);
@@ -2583,7 +2592,7 @@ FUNCTION(fun_exclude)
                 }
                 else
                 {
-                    cur = atoi(end_p);
+                    cur = (int)strtol(end_p, (char **)NULL, 10);
                     end =
                         (cur < 0) ? (nwords + cur) : (cur);
                 }
@@ -2610,7 +2619,7 @@ FUNCTION(fun_exclude)
                 }
                 else
                 {
-                    cur = atoi(r);
+                    cur = (int)strtol(r, (char **)NULL, 10);
                     start =
                         (cur <
                          0) ? (nwords + cur) : (cur - 1);
@@ -2624,7 +2633,7 @@ FUNCTION(fun_exclude)
                 }
                 else
                 {
-                    cur = atoi(end_p);
+                    cur = (int)strtol(end_p, (char **)NULL, 10);
                     end =
                         (cur <
                          0) ? (nwords + cur - 1) : (cur -
@@ -2953,7 +2962,7 @@ FUNCTION(fun_choose)
     ip = (int *)XCALLOC(n_weights, sizeof(int), "fun_choose.ip");
     for (i = 0; i < n_weights; i++)
     {
-        num = atoi(weights[i]);
+        num = (int)strtol(weights[i], (char **)NULL, 10);
         if (num < 0)
             num = 0;
         if (num == 0)
@@ -3024,7 +3033,7 @@ FUNCTION(fun_group)
      * Go do it, unless the group size doesn't make sense.
      */
 
-    n_groups = atoi(fargs[1]);
+    n_groups = (int)strtol(fargs[1], (char **)NULL, 10);
     n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
     if (n_groups < 2)
     {

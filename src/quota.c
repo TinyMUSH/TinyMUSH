@@ -1,6 +1,15 @@
 /* quota.c - quota management commands */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -39,7 +48,7 @@ int qtype;
     for (p = strtok_r(quota_str, " ", &tokst), i = 0;
             p && (i < 5); p = strtok_r(NULL, " ", &tokst), i++)
     {
-        q_list[i] = atoi(p);
+        q_list[i] = (int)strtol(p, (char **)NULL, 10);
     }
 
     free_lbuf(quota_str);
@@ -295,7 +304,7 @@ char *arg1, *arg2;
     {
         if (arg1 && *arg1)
         {
-            value = atoi(arg1);
+            value = (int)strtol(arg1, (char **)NULL, 10);
             set = 1;
             if (value < 0)
             {
@@ -365,7 +374,7 @@ char *arg1, *arg2;
     if (arg2 && *arg2)
     {
         set = 1;
-        value = atoi(arg2);
+        value = (int)strtol(arg2, (char **)NULL, 10);
         if (value < 0)
         {
             notify(player, "Illegal quota value.");

@@ -5,8 +5,6 @@
 #ifndef __EXTERNS_H
 #define	__EXTERNS_H
 
-#include "db.h"
-
 /*
  * --------------------------------------------------------------------------
  * External function declarations.
@@ -14,11 +12,6 @@
 
 /* From external sources */
 extern char    *FDECL(crypt, (const char *, const char *));
-
-#ifdef NEED_VSPRINTF_DCL
-extern char    *FDECL(vsprintf, (char *, char *, va_list));
-
-#endif
 
 /* From boolexp.c */
 extern int	FDECL(eval_boolexp, (dbref, dbref, dbref, BOOLEXP *));
@@ -60,10 +53,10 @@ extern void	FDECL(putstring, (FILE *, const char *));
 extern void	NDECL(dump_restart_db);
 extern int	FDECL(Commer, (dbref));
 extern void	FDECL(s_Pass, (dbref, const char *));
-extern INLINE void FDECL(s_Name, (dbref, char *));
-extern INLINE char *FDECL(Name, (dbref));
-extern INLINE char *FDECL(PureName, (dbref));
-extern INLINE void FDECL(safe_name, (dbref, char *, char **));
+extern void FDECL(s_Name, (dbref, char *));
+extern char *FDECL(Name, (dbref));
+extern char *FDECL(PureName, (dbref));
+extern void FDECL(safe_name, (dbref, char *, char **));
 extern void	FDECL(safe_exit_name, (dbref, char *, char **));
 extern int	FDECL(fwdlist_load, (FWDLIST *, dbref, char *));
 extern void	FDECL(fwdlist_set, (dbref, FWDLIST *));
@@ -101,6 +94,10 @@ extern int	FDECL(check_zone, (dbref, dbref));
 extern int	FDECL(check_zone_for_player, (dbref, dbref));
 extern void	FDECL(toast_player, (dbref));
 
+/* from db_rw.c */
+extern BOOLEXP *FDECL(getboolexp1, (FILE *));
+extern void FDECL(putboolexp, (FILE *, BOOLEXP *));
+
 /* From eval.c */
 extern char    *FDECL(parse_to, (char **, char, int));
 extern char    *FDECL(parse_arglist, (dbref, dbref, dbref, char *, char, int,
@@ -114,6 +111,11 @@ extern void	FDECL(restore_global_regs, (const char *, GDATA *));
 extern dbref	FDECL(match_thing, (dbref, char *));
 extern int	FDECL(xlate, (char *));
 extern long	FDECL(random_range, (long, long));
+
+/* From funmisc.c */
+
+extern int FDECL(do_convtime, (char *, struct tm *));
+
 
 /* From game.c */
 extern void	FDECL(notify_except, (dbref, dbref, dbref,
@@ -232,14 +234,14 @@ extern char    *FDECL(replace_string, (const char *, const char *,
 extern void	FDECL(edit_string, (char *, char **, char *, char *));
 extern char    *FDECL(skip_space, (const char *));
 extern int	FDECL(minmatch, (char *, char *, int));
-extern INLINE void FDECL(safe_copy_str, (const char *, char *, char **, int));
-extern INLINE int FDECL(safe_copy_str_fn, (const char *, char *, char **, int));
+extern void FDECL(safe_copy_str, (const char *, char *, char **, int));
+extern int FDECL(safe_copy_str_fn, (const char *, char *, char **, int));
 extern int	FDECL(safe_copy_long_str, (char *, char *, char **, int));
-extern INLINE void FDECL(safe_known_str, (const char *, int, char *, char **));
+extern void FDECL(safe_known_str, (const char *, int, char *, char **));
 extern int	FDECL(matches_exit_from_list, (char *, char *));
 extern char    *FDECL(translate_string, (char *, int));
 extern int	FDECL(ltos, (char *, long));
-extern INLINE void FDECL(safe_ltos, (char *, char **, long));
+extern void FDECL(safe_ltos, (char *, char **, long));
 extern char    *FDECL(repeatchar, (int, char));
 /* From timer.c */
 extern int	FDECL(call_cron, (dbref, dbref, int, char *));
@@ -614,7 +616,7 @@ extern int	FDECL(register_match, (char *, char *, char *[], int));
  (Protect(CA_CONTENTS) && !Has_contents(x)) || \
  (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
 
-#define safe_atoi(s)	((s == NULL) ? 0 : atoi(s))
+#define safe_atoi(s)	((s == NULL) ? 0 : (int)strtol(s, (char **)NULL, 10))
 
 #define	STARTLOG(key,p,s) \
 	if ((((key) & mudconf.log_options) != 0) && start_log(p, s, key)) {

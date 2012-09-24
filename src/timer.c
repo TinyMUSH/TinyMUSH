@@ -1,6 +1,15 @@
 /* timer.c - Subroutines for (system-) timed events */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -160,7 +169,7 @@ char *bufp;
         }
         else if (isdigit(*bufp))
         {
-            n_begin = atoi(bufp);	/* atoi() ignores trailing non-digits */
+            n_begin = (int)strtol(bufp, (char **)NULL, 10);
             while (*bufp && isdigit(*bufp))
                 bufp++;
             if (*bufp != '-')
@@ -176,7 +185,7 @@ char *bufp;
                  * Eat the dash, get the range.
                  */
                 bufp++;
-                n_end = atoi(bufp);
+                n_end = (int)strtol(bufp, (char **)NULL, 10);
                 while (*bufp && isdigit(*bufp))
                     bufp++;
             }
@@ -195,7 +204,7 @@ char *bufp;
         if (*bufp == '/')
         {
             bufp++;	/* eat the slash */
-            step_size = atoi(bufp);
+            step_size = (int)strtol(bufp, (char **)NULL, 10);
             if (step_size < 1)
             {
                 notify(player, "Invalid step size.");
@@ -691,7 +700,7 @@ char *arg;
 {
     int secs;
 
-    secs = atoi(arg);
+    secs = (int)strtol(arg, (char **)NULL, 10);
 
     if ((key == 0) || (key & TWARP_QUEUE))	/*
 						 * Sem/Wait queues

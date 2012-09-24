@@ -1,10 +1,8 @@
 /* comsys.c - module implementing DarkZone-style channel system */
 /* $Id: comsys.c,v 1.81 2008/01/10 00:04:18 lwl Exp $ */
 
+#include "../../config.h"
 #include "../../api.h"
-
-extern BOOLEXP *FDECL(getboolexp1, (FILE *));
-extern void FDECL(putboolexp, (FILE *, BOOLEXP *));
 
 /* --------------------------------------------------------------------------
  * Constants.
@@ -169,7 +167,7 @@ hashdelete((n), &mod_comsys_calias_htab)
  * Basic channel utilities.
  */
 
-INLINE static int is_onchannel(player, chp)
+static int is_onchannel(player, chp)
     dbref player;
     CHANNEL *chp;
 {
@@ -183,7 +181,7 @@ INLINE static int is_onchannel(player, chp)
     return 0;
 }
 
-INLINE static int is_listenchannel(player, chp)
+static int is_listenchannel(player, chp)
     dbref player;
     CHANNEL *chp;
 {
@@ -198,7 +196,7 @@ INLINE static int is_listenchannel(player, chp)
 }
 
 
-INLINE static int is_listening_disconn(player, chp)
+static int is_listening_disconn(player, chp)
     dbref player;
     CHANNEL *chp;
 {
@@ -236,7 +234,7 @@ static int ok_channel_string(str, maxlen, ok_spaces, ok_ansi)
     return 1;
 }
 
-INLINE static char *munge_comtitle(title)
+static char *munge_comtitle(title)
     char *title;
 {
     static char tbuf[MBUF_SIZE];
@@ -254,7 +252,7 @@ INLINE static char *munge_comtitle(title)
     return tbuf;
 }
 
-INLINE static int ok_chanperms(player, chp, pflag, oflag, c_lock)
+static int ok_chanperms(player, chp, pflag, oflag, c_lock)
     dbref player;
     CHANNEL *chp;
     int pflag, oflag;
@@ -481,7 +479,7 @@ static void remove_from_channel(player, chp, is_quiet)
 }
 
 
-INLINE static void zorch_alias_from_list(cap)
+static void zorch_alias_from_list(cap)
     COMALIAS *cap;
 {
     COMLIST *clist, *cl_ptr, *prev;

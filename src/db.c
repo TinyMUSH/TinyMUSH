@@ -1,6 +1,15 @@
 /* db.c - attribute interface, some flatfile and object routines */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"	/* required by code */
 
 #include "db.h"		/* required by externs */
@@ -512,7 +521,7 @@ char *atext;
         if (*bp)
             *bp++ = '\0';	/* terminate string */
         if ((*dp++ == '#') && isdigit(*dp)) {
-            target = atoi(dp);
+            target = (int)strtol(dp, (char **)NULL, 10);
 
             if (!mudstate.standalone) {
                 fail = (!Good_obj(target) ||
@@ -735,7 +744,7 @@ char *atext;
         if (*bp)
             *bp++ = '\0';	/* terminate string */
         if ((*dp++ == '#') && isdigit(*dp)) {
-            target = atoi(dp);
+            target = (int)strtol(dp, (char **)NULL, 10);
 
             if (!mudstate.standalone) {
                 fail = (!Good_obj(target) || !Parentable(player, target));
@@ -884,7 +893,7 @@ char **ptr, *new;
  * Name, s_Name: Get or set an object's name.
  */
 
-INLINE void safe_name(thing, outbuf, bufc)
+void safe_name(thing, outbuf, bufc)
 dbref thing;
 char *outbuf, **bufc;
 {
@@ -913,7 +922,7 @@ char *outbuf, **bufc;
     s_AccessTime(thing, save_access_time);
 }
 
-INLINE char *Name(thing)
+char *Name(thing)
 dbref thing;
 {
     dbref aowner;
@@ -939,7 +948,7 @@ dbref thing;
     return names[thing];
 }
 
-INLINE char *PureName(thing)
+char *PureName(thing)
 dbref thing;
 {
     dbref aowner;
@@ -965,7 +974,7 @@ dbref thing;
     return purenames[thing];
 }
 
-INLINE void s_Name(thing, s)
+void s_Name(thing, s)
 dbref thing;
 char *s;
 {
@@ -1165,7 +1174,7 @@ char *arg1, *arg2;
         res = noisy_match_result();
         break;
     case FIXDB_PENNIES:
-        res = atoi(arg2);
+        res = (int)strtol(arg2, (char **)NULL, 10);
         break;
     }
 
@@ -1692,7 +1701,7 @@ int attrnum;
     return;
 }
 
-INLINE static void makekey(thing, atr, abuff)
+static void makekey(thing, atr, abuff)
 dbref thing;
 int atr;
 Aname *abuff;
@@ -2619,7 +2628,7 @@ const char *s;
             return NOTHING;
     }
 
-    x = atoi(s);
+    x = (int)strtol(s, (char **)NULL, 10);
     return ((x >= 0) ? x : NOTHING);
 }
 
@@ -2654,7 +2663,7 @@ const char *s, *p;
             if (!isdigit(*r))
                 return NOTHING;
         }
-        tt = (time_t) atol(p);
+        tt = (time_t) strtol(p, (char **)NULL, 10);
         return ((CreateTime(it) == tt) ? it : NOTHING);
     }
     return NOTHING;
@@ -2677,7 +2686,7 @@ const char *s;
         }
     }
 
-    x = atoi(s);
+    x = (int)strtol(s, (char **)NULL, 10);
     return ((x >= 0) ? x : NOTHING);
 }
 
@@ -2784,20 +2793,20 @@ int new_strings;
     }
 }
 
-INLINE dbref getref(f)
+dbref getref(f)
 FILE *f;
 {
     static char buf[SBUF_SIZE];
     fgets(buf, sizeof(buf), f);
-    return (atoi(buf));
+    return ((int)strtol(buf, (char **)NULL, 10));
 }
 
-INLINE long getlong(f)
+long getlong(f)
 FILE *f;
 {
     static char buf[SBUF_SIZE];
     fgets(buf, sizeof(buf), f);
-    return (atol(buf));
+    return (strtol(buf, (char **)NULL, 10));
 }
 
 void free_boolexp(b)

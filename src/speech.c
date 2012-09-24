@@ -1,6 +1,15 @@
 /* speech.c - Commands which involve speaking */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -662,7 +671,7 @@ char *tname, *message;
             for (ddp = strtok_r(dbref_list, " ", &tokst);
                     ddp; ddp = strtok_r(NULL, " ", &tokst))
             {
-                target = atoi(ddp);
+                target = (int)strtol(ddp, (char **)NULL, 10);
                 if (!Good_obj(target) || !isPlayer(target))
                 {
                     notify(player,

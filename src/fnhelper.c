@@ -1,6 +1,15 @@
 /* fnhelper.c - helper functions for MUSH functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -503,7 +512,7 @@ char *arg;
         {
             if (mudconf.bools_oldstyle)
             {
-                switch (atoi(arg))
+                switch ((int)strtol(arg, (char **)NULL, 10))
                 {
                 case -1:
                     return 0;
@@ -515,7 +524,7 @@ char *arg;
             }
             else
             {
-                return (atoi(arg) >= 0);
+                return ((int)strtol(arg, (char **)NULL, 10) >= 0);
             }
         }
         if (mudconf.bools_oldstyle)
@@ -535,7 +544,7 @@ char *arg;
     if (!*temp2)
         return 0;
     if (is_integer(temp2))
-        return atoi(temp2);
+        return (int)strtol(temp2, (char **)NULL, 10);
     return 1;
 }
 
@@ -544,7 +553,7 @@ char *arg;
  * used by fun_reverse and fun_revwords to reverse things
  */
 
-INLINE void
+void
 do_reverse(from, to)
 char *from, *to;
 {

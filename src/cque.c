@@ -1,6 +1,15 @@
 /* cque.c - commands and functions for manipulating the command queue */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -53,8 +62,7 @@ int am, attrnum;
 
     char *atr_gotten;
 
-    num = atoi(atr_gotten = atr_get(player, attrnum, &aowner,
-                                    &aflags, &alen));
+    num = (int)strtol(atr_gotten = atr_get(player, attrnum, &aowner, &aflags, &alen), (char **)NULL, 10);
     free_lbuf(atr_gotten);
     num += am;
     if (num)
@@ -293,7 +301,7 @@ char *pidstr;
         notify(player, "That is not a valid PID.");
         return;
     }
-    qpid = atoi(pidstr);
+    qpid = (int)strtol(pidstr, (char **)NULL, 10);
     if ((qpid < 1) || (qpid > mudconf.max_qpid))
     {
         notify(player, "That is not a valid PID.");
@@ -457,7 +465,7 @@ int attr, key, count;
     if (attr)
     {
         str = atr_get(sem, attr, &aowner, &aflags, &alen);
-        num = atoi(str);
+        num = (int)strtol(str, (char **)NULL, 10);;
         free_lbuf(str);
     }
     else
@@ -595,7 +603,7 @@ char *what, *count;
         }
 
         if (count && *count)
-            loccount = atoi(count);
+            loccount = (int)strtol(count, (char **)NULL, 10);
         else
             loccount = 1;
         if (loccount > 0)
@@ -929,7 +937,7 @@ char *pidstr, *timestr;
         notify(player, "That is not a valid PID.");
         return;
     }
-    qpid = atoi(pidstr);
+    qpid = (int)strtol(pidstr, (char **)NULL, 10);
     if ((qpid < 1) || (qpid > mudconf.max_qpid))
     {
         notify(player, "That is not a valid PID.");
@@ -959,7 +967,7 @@ char *pidstr, *timestr;
     }
     if (key & WAIT_UNTIL)
     {
-        wsecs = atoi(timestr);
+        wsecs = (int)strtol(timestr, (char **)NULL, 10);
         if (wsecs < 0)
             qptr->waittime = time(NULL);
         else
@@ -969,11 +977,11 @@ char *pidstr, *timestr;
     {
         if ((timestr[0] == '+') || (timestr[0] == '-'))
         {
-            qptr->waittime += atoi(timestr);
+            qptr->waittime += (int)strtol(timestr, (char **)NULL, 10);
         }
         else
         {
-            qptr->waittime = time(NULL) + atoi(timestr);
+            qptr->waittime = time(NULL) + (int)strtol(timestr, (char **)NULL, 10);;
         }
         if (qptr->waittime < 0)
         {
@@ -1045,13 +1053,13 @@ char *event, *cmd, *cargs[];
     {
         if (key & WAIT_UNTIL)
         {
-            howlong = atoi(event) - time(NULL);
+            howlong = (int)strtol(event, (char **)NULL, 10); - time(NULL);
             if (howlong < 0)
                 howlong = 0;
         }
         else
         {
-            howlong = atoi(event);
+            howlong = (int)strtol(event, (char **)NULL, 10);;
         }
         wait_que(player, cause, howlong, NOTHING, 0, cmd,
                  cargs, ncargs, mudstate.rdata);
@@ -1086,13 +1094,13 @@ char *event, *cmd, *cargs[];
             attr = A_SEMAPHORE;
             if (key & WAIT_UNTIL)
             {
-                howlong = atoi(event) - time(NULL);
+                howlong = (int)strtol(event, (char **)NULL, 10); - time(NULL);
                 if (howlong < 0)
                     howlong = 0;
             }
             else
             {
-                howlong = atoi(event);
+                howlong = (int)strtol(event, (char **)NULL, 10);;
             }
         }
         else
@@ -1620,7 +1628,7 @@ char *arg;
     was_disabled = 0;
     if (key == QUEUE_KICK)
     {
-        i = atoi(arg);
+        i = (int)strtol(arg, (char **)NULL, 10);;
         if ((mudconf.control_flags & CF_DEQUEUE) == 0)
         {
             was_disabled = 1;
@@ -1637,7 +1645,7 @@ char *arg;
     }
     else if (key == QUEUE_WARP)
     {
-        i = atoi(arg);
+        i = (int)strtol(arg, (char **)NULL, 10);;
         if ((mudconf.control_flags & CF_DEQUEUE) == 0)
         {
             was_disabled = 1;

@@ -9,7 +9,12 @@
  * -------------------------------------------------------------------
  */
 
+
+
+
+#include "../../config.h"
 #include "../../api.h"
+
 #include "mail.h"
 
 /* --------------------------------------------------------------------------
@@ -82,8 +87,6 @@ CONF mod_mail_conftable[] = {
     {(char *)"mail_expiration",		cf_int,		CA_GOD,		CA_PUBLIC,	&mod_mail_config.mail_expiration,	0},
     { NULL,					NULL,		0,		0,		NULL,				0}
 };
-
-extern int FDECL(do_convtime, (char *, struct tm *));
 
 static int FDECL(sign, (int));
 static void FDECL(do_mail_flags, (dbref, char *, mail_flag, int));
@@ -277,7 +280,7 @@ int number;
  * add_count - increments the reference count for any particular message
  */
 
-static INLINE void add_count(number)
+static void add_count(number)
 int number;
 {
     mod_mail_config.mail_list[number].count++;
@@ -305,7 +308,7 @@ int number;
  * should NOT be modified.
  */
 
-INLINE char *get_mail_message(number)
+char *get_mail_message(number)
 int number;
 {
     static char err[] = "MAIL: This mail message does not exist in the database. Please alert your admin.";
@@ -331,8 +334,6 @@ int number;
  * do_mail_purge - purge cleared messages
  * do_mail_change_folder - change current folder
  *-------------------------------------------------------------------------*/
-
-extern char *FDECL(upcasestr, (char *));
 
 /*
  * Change or rename a folder

@@ -1,6 +1,15 @@
 /* player.c */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -66,14 +75,14 @@ LDATA *info;
     if (*atrbuf == '#')
     {
         atrbuf++;
-        info->tot_good = atoi(grabto(&atrbuf, ';'));
+        info->tot_good = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
         for (i = 0; i < NUM_GOOD; i++)
         {
             info->good[i].host = grabto(&atrbuf, ';');
             info->good[i].dtm = grabto(&atrbuf, ';');
         }
-        info->new_bad = atoi(grabto(&atrbuf, ';'));
-        info->tot_bad = atoi(grabto(&atrbuf, ';'));
+        info->new_bad = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
+        info->tot_bad = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
         for (i = 0; i < NUM_BAD; i++)
         {
             info->bad[i].host = grabto(&atrbuf, ';');
@@ -293,7 +302,7 @@ char *name, *password, *host, *username, *ip_addr;
             if (*allowance == '\0')
                 giveto(player, mudconf.paycheck);
             else
-                giveto(player, atoi(allowance));
+                giveto(player, (int)strtol(allowance, (char **)NULL, 10));
             free_lbuf(allowance);
         }
     }
@@ -592,7 +601,7 @@ int check_who;
         name++;
         if (!is_number(name))
             return NOTHING;
-        thing = atoi(name);
+        thing = (int)strtol(name, (char **)NULL, 10);
         if (!Good_obj(thing))
             return NOTHING;
         if (!((Typeof(thing) == TYPE_PLAYER) || God(doer)))

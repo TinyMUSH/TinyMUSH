@@ -1,10 +1,15 @@
 /* predicates.c */
 
 #include "copyright.h"
+#include "config.h"
 
-
-//#include <signal.h>
-
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -38,7 +43,7 @@ static int FDECL(type_quota, (int));
 
 static int FDECL(pay_quota, (dbref, int, int));
 
-extern INLINE void FDECL(queue_rawstring, (DESC *, const char *));
+extern void FDECL(queue_rawstring, (DESC *, const char *));
 
 #ifdef HAVE_VSNPRINTF
 static char tprintf_buff[LBUF_SIZE];
@@ -2122,7 +2127,7 @@ dbref *low_bound, *high_bound;
                 buff1++;
             if (*buff1 == NUMBER_TOKEN)
                 buff1++;
-            *high_bound = atoi(buff1);
+            *high_bound = (int)strtol(buff1, (char **)NULL, 10);
             if (*high_bound >= mudstate.db_top)
                 *high_bound = mudstate.db_top - 1;
         }
@@ -2134,7 +2139,7 @@ dbref *low_bound, *high_bound;
             buff2++;
         if (*buff2 == NUMBER_TOKEN)
             buff2++;
-        *low_bound = atoi(buff2);
+        *low_bound = (int)strtol(buff2, (char **)NULL, 10);
         if (*low_bound < 0)
             *low_bound = 0;
     }
@@ -2896,7 +2901,7 @@ const char *def, *odef;
                          &alen);
             if (*charges)
             {
-                num = atoi(charges);
+                num = (int)strtol(charges, (char **)NULL, 10);
                 if (num > 0)
                 {
                     buff = alloc_sbuf("did_it.charges");

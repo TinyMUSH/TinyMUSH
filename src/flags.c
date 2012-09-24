@@ -1,6 +1,15 @@
 /* flags.c - flag manipulation routines */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -1262,7 +1271,7 @@ CF_HAND(cf_flag_name)
 
     if (numstr && (strlen(numstr) == 1))
     {
-        flagnum = atoi(numstr);
+        flagnum = (int)strtol(numstr, (char **)NULL, 10);
     }
     if ((flagnum < 0) || (flagnum > 9))
     {

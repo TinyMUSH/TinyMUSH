@@ -227,7 +227,7 @@ int sig;
     /*
      * see if any children have exited
      */
-    while ((child_pid = WAITOPT(NULL, WNOHANG)) > 0)
+    while ((child_pid = waitpid(0, NULL, WNOHANG)) > 0)
     {
         for (i = 0; i < MAX_CHILDREN; i++)
         {
@@ -303,7 +303,7 @@ char **argv;
             /*
              * see if any children have exited
              */
-            while ((child_pid = WAITOPT(NULL, WNOHANG)) > 0)
+            while ((child_pid = waitpid(0, NULL, WNOHANG)) > 0)
             {
                 for (i = 0; i < MAX_CHILDREN; i++)
                 {
@@ -329,7 +329,7 @@ char **argv;
             /*
              * no slot available, wait for some child to exit
              */
-            child_pid = WAITOPT(NULL, 0);
+            child_pid = waitpid(0, NULL, 0);
             for (i = 0; i < MAX_CHILDREN; i++)
             {
                 if (child_pids[i] == child_pid)
@@ -409,7 +409,7 @@ char **argv;
         if (child_pid != -1 && kill(child_pid, 0) != -1)
         {
             kill(child_pid, SIGKILL);
-            WAITPID(child_pid, NULL, 0);
+            waitpid(child_pid, NULL, 0);
         }
     }
     exit(0);

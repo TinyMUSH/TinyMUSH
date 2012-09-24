@@ -27,16 +27,38 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=libltdl/config --no-conditional-dependencies --no-libtool --macro-prefix=gl --no-vc-files lstat malloc-gnu realloc-gnu strdup-posix strtod
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=libltdl/config --no-conditional-dependencies --no-libtool --macro-prefix=gl --no-vc-files bcopy dup2 flock floor fsync ftruncate getdtablesize getpagesize getrusage gettimeofday lstat malloc-gnu mkdir mktime pow realloc-gnu rename rmdir select socket sqrt strdup-posix strerror strtod tzset uname vsprintf-posix
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
 gl_MODULES([
+  bcopy
+  dup2
+  flock
+  floor
+  fsync
+  ftruncate
+  getdtablesize
+  getpagesize
+  getrusage
+  gettimeofday
   lstat
   malloc-gnu
+  mkdir
+  mktime
+  pow
   realloc-gnu
+  rename
+  rmdir
+  select
+  socket
+  sqrt
   strdup-posix
+  strerror
   strtod
+  tzset
+  uname
+  vsprintf-posix
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([lib])

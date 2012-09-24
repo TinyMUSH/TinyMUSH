@@ -1,6 +1,15 @@
 /* funstring.c - string functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -598,7 +607,7 @@ FUNCTION(fun_space)
     }
     else
     {
-        num = atoi(fargs[0]);
+        num = (int)strtol(fargs[0], (char **)NULL, 10);
     }
 
     if (num < 1)
@@ -632,7 +641,7 @@ FUNCTION(fun_ljust)
     char *tp, *fillchars;
 
     VaChk_Range(2, 3);
-    spaces = atoi(fargs[1]) - strip_ansi_len(fargs[0]);
+    spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 
     safe_str(fargs[0], buff, bufc);
 
@@ -707,7 +716,7 @@ FUNCTION(fun_rjust)
     char *tp, *fillchars;
 
     VaChk_Range(2, 3);
-    spaces = atoi(fargs[1]) - strip_ansi_len(fargs[0]);
+    spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 
     /*
      * Sanitize number of spaces
@@ -787,7 +796,7 @@ FUNCTION(fun_center)
 
     VaChk_Range(2, 3);
 
-    width = atoi(fargs[1]);
+    width = (int)strtol(fargs[1], (char **)NULL, 10);
     len = strip_ansi_len(fargs[0]);
 
     width = (width > LBUF_SIZE - 1) ? LBUF_SIZE - 1 : width;
@@ -926,7 +935,7 @@ FUNCTION(fun_left)
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    nchars = atoi(fargs[1]);
+    nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
     if (nchars <= 0)
         return;
@@ -957,7 +966,7 @@ FUNCTION(fun_right)
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    nchars = atoi(fargs[1]);
+    nchars = (int)strtol(fargs[1], (char **)NULL, 10);
     start = strip_ansi_len(s) - nchars;
 
     if (nchars <= 0)
@@ -1520,8 +1529,8 @@ FUNCTION(fun_mid)
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    start = atoi(fargs[1]);
-    nchars = atoi(fargs[2]);
+    start = (int)strtol(fargs[1], (char **)NULL, 10);
+    nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
     if (nchars <= 0)
         return;
@@ -1739,7 +1748,7 @@ FUNCTION(fun_wordpos)
 
     VaChk_Only_In(3);
 
-    charpos = atoi(fargs[1]);
+    charpos = (int)strtol(fargs[1], (char **)NULL, 10);
     cp = strip_ansi(fargs[0]);
     if ((charpos > 0) && (charpos <= (int)strlen(cp)))
     {
@@ -1774,7 +1783,7 @@ FUNCTION(fun_ansipos)
     VaChk_Range(2, 3);
 
     s = fargs[0];
-    charpos = atoi(fargs[1]);
+    charpos = (int)strtol(fargs[1], (char **)NULL, 10);
     ansi_state = ANST_NORMAL;
     i = 0;
 
@@ -1810,7 +1819,7 @@ FUNCTION(fun_repeat)
 {
     int times, len, i, maxtimes;
 
-    times = atoi(fargs[1]);
+    times = (int)strtol(fargs[1], (char **)NULL, 10);
     if ((times < 1) || (fargs[0] == NULL) || (!*fargs[0]))
     {
         return;
@@ -1865,7 +1874,7 @@ FUNCTION(perform_border)
     if (!fargs[0] || !*fargs[0])
         return;
 
-    width = atoi(fargs[1]);
+    width = (int)strtol(fargs[1], (char **)NULL, 10);
     if (width < 1)
         width = 1;
 
@@ -2896,8 +2905,8 @@ FUNCTION(fun_delete)
     int ansi_state_r = ANST_NORMAL;
 
     s = fargs[0];
-    start = atoi(fargs[1]);
-    nchars = atoi(fargs[2]);
+    start = (int)strtol(fargs[1], (char **)NULL, 10);
+    nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
     if ((nchars <= 0) || (start + nchars <= 0))
     {

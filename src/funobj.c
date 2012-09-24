@@ -1,6 +1,15 @@
 /* funobj.c - object functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -183,7 +192,7 @@ FUNCTION(fun_rloc)
 
     dbref it;
 
-    levels = atoi(fargs[1]);
+    levels = (int)strtol(fargs[1], (char **)NULL, 10);
     if (levels > mudconf.ntfy_nest_lim)
         levels = mudconf.ntfy_nest_lim;
 
@@ -617,8 +626,8 @@ FUNCTION(fun_xcon)
             (Examinable(player, it) || (Location(player) == it) ||
              (it == cause)))
     {
-        first = atoi(fargs[1]);
-        last = atoi(fargs[2]);
+        first = (int)strtol(fargs[1], (char **)NULL, 10);
+        last = (int)strtol(fargs[2], (char **)NULL, 10);
         if ((first > 0) && (last > 0))
         {
 
@@ -769,7 +778,7 @@ FUNCTION(fun_entrances)
     VaChk_Range(0, 4);
     if (nfargs >= 3)
     {
-        low_bound = atoi(fargs[2] + (fargs[2][0] == NUMBER_TOKEN));
+        low_bound = (int)strtol(fargs[2] + (fargs[2][0] == NUMBER_TOKEN), (char **)NULL, 10);
         if (!Good_dbref(low_bound))
             low_bound = 0;
     }
@@ -779,7 +788,7 @@ FUNCTION(fun_entrances)
     }
     if (nfargs == 4)
     {
-        high_bound = atoi(fargs[3] + (fargs[3][0] == NUMBER_TOKEN));
+        high_bound = (int)strtol(fargs[3] + (fargs[3][0] == NUMBER_TOKEN), (char **)NULL, 10);
         if (!Good_dbref(high_bound))
             high_bound = mudstate.db_top - 1;
     }
@@ -2527,8 +2536,8 @@ FUNCTION(handle_lattr)
         if (nfargs > 2)
         {
             VaChk_Only_Out(4);
-            start = atoi(fargs[1]);
-            count = atoi(fargs[2]);
+            start = (int)strtol(fargs[1], (char **)NULL, 10);
+            count = (int)strtol(fargs[2], (char **)NULL, 10);
             if ((start < 1) || (count < 1))
             {
                 safe_str("#-1 ARGUMENT OUT OF RANGE", buff,
@@ -2912,7 +2921,7 @@ FUNCTION(fun_lastcreate)
     for (p = strtok_r(obj_str, " ", &tokst), i = 0;
             p && (i < 4); p = strtok_r(NULL, " ", &tokst), i++)
     {
-        obj_list[i] = atoi(p);
+        obj_list[i] = (int)strtol(p, (char **)NULL, 10);
     }
     free_lbuf(obj_str);
 

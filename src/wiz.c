@@ -1,6 +1,15 @@
 /* wiz.c - Wizard-only commands */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -454,7 +463,7 @@ char *name;
     {
         if (is_number(name))
         {
-            victim = atoi(name);
+            victim = (int)strtol(name, (char **)NULL, 10);
         }
         else
         {
@@ -535,7 +544,7 @@ char *arg1;
 
     if (!is_number(arg1))
         return;
-    amt = atoi(arg1);
+    amt = (int)strtol(arg1, (char **)NULL, 10);
     DO_WHOLE_DB(a)
     {
         if (isPlayer(a))

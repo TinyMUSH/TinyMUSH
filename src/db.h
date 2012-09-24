@@ -24,16 +24,14 @@
 #define ENTRY_BLOCK_STARTS(blk, blksize)	(int) (blk * blksize)
 #define ENTRY_BLOCK_ENDS(blk, blksize)	(int) (blk * blksize) + (blksize - 1)
 
-
-#include "udb.h"
-#include "udb_defs.h"
-
 #define	ITER_PARENTS(t,p,l)	for ((l)=0, (p)=(t); \
 				     (Good_obj(p) && \
 				      ((l) < mudconf.parent_nest_lim)); \
 				     (p)=Parent(p), (l)++)
 
 #define Hasprivs(x)      (Royalty(x) || Wizard(x))
+
+typedef char	boolexp_type;
 
 typedef struct attr ATTR;
 struct attr
@@ -315,8 +313,8 @@ extern FILE    *FDECL(tf_popen, (char *, int));
 #define putref(pr__f,pr__ref)	fprintf(pr__f, "%d\n", (int)pr__ref)
 #define putlong(pr__f,pr__i)	fprintf(pr__f, "%ld\n", (long)pr__i)
 
-extern INLINE dbref FDECL(getref, (FILE *));
-extern INLINE long FDECL(getlong, (FILE *));
+extern dbref FDECL(getref, (FILE *));
+extern long FDECL(getlong, (FILE *));
 extern BOOLEXP *FDECL(dup_bool, (BOOLEXP *));
 extern void	FDECL(free_boolexp, (BOOLEXP *));
 extern dbref	FDECL(parse_dbref, (const char *));

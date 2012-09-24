@@ -1,6 +1,15 @@
 /* rob.c - Commands dealing with giving/taking/killing things or money */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -63,7 +72,7 @@ char *what, *costchar;
          * go for it
          */
 
-        cost = atoi(costchar);
+        cost = (int)strtol(costchar, (char **)NULL, 10);
         if (key == KILL_KILL)
         {
             if (cost < mudconf.killmin)
@@ -364,7 +373,7 @@ int amount;
     if (Typeof(recipient) == TYPE_THING)
     {
         str = atr_pget(recipient, A_COST, &aowner, &aflags, &alen);
-        cost = atoi(str);
+        cost = (int)strtol(str, (char **)NULL, 10);
         free_lbuf(str);
 
         /*
@@ -486,7 +495,7 @@ char *who, *amnt;
     }
     if (is_number(amnt))
     {
-        give_money(player, recipient, key, atoi(amnt));
+        give_money(player, recipient, key, (int)strtol(amnt, (char **)NULL, 10));
     }
     else
     {

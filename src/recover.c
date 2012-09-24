@@ -5,6 +5,7 @@
 
 #include "copyright.h"
 #include "config.h"
+
 #include "db.h"
 
 #include <sys/types.h>

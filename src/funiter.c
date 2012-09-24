@@ -1,6 +1,15 @@
 /* funiter.c - functions for user-defined iterations over lists */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -320,7 +329,7 @@ FUNCTION(fun_inum)
 {
     int lev;
 
-    lev = atoi(fargs[0]);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
     if ((lev > mudstate.in_loop - 1) || (lev < 0))
     {
         safe_chr('0', buff, bufc);
@@ -333,7 +342,7 @@ FUNCTION(fun_itext)
 {
     int lev;
 
-    lev = atoi(fargs[0]);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
     if ((lev > mudstate.in_loop - 1) || (lev < 0))
         return;
 
@@ -344,7 +353,7 @@ FUNCTION(fun_itext2)
 {
     int lev;
 
-    lev = atoi(fargs[0]);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
     if ((lev > mudstate.in_loop - 1) || (lev < 0))
         return;
 
@@ -355,7 +364,7 @@ FUNCTION(fun_ibreak)
 {
     int lev;
 
-    lev = mudstate.in_loop - 1 - atoi(fargs[0]);
+    lev = mudstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
     if ((lev > mudstate.in_loop - 1) || (lev < 0))
         return;
     mudstate.loop_break[lev] = 1;
@@ -733,7 +742,7 @@ FUNCTION(fun_step)
 
     VaChk_Only_In_Out(5);
 
-    step_size = atoi(fargs[2]);
+    step_size = (int)strtol(fargs[2], (char **)NULL, 10);
     if ((step_size < 1) || (step_size > NUM_ENV_VARS))
     {
         notify(player, "Illegal step size.");

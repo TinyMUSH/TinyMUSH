@@ -1,6 +1,15 @@
 /* funmisc.c - misc functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -279,7 +288,7 @@ FUNCTION(handle_ifelse)
     }
     else
     {
-        n = !((atoi(mbuff) == 0) && is_number(mbuff));
+        n = !(((int)strtol(mbuff, (char **)NULL, 10) == 0) && is_number(mbuff));
     }
     if (flag & IFELSE_FALSE)
         n = !n;
@@ -354,7 +363,7 @@ FUNCTION(fun_rand)
 {
     int num;
 
-    num = atoi(fargs[0]);
+    num = (int)strtol(fargs[0], (char **)NULL, 10);
     if (num < 1)
     {
         safe_chr('0', buff, bufc);
@@ -382,8 +391,8 @@ FUNCTION(fun_die)
         safe_chr('0', buff, bufc);
         return;
     }
-    n = atoi(fargs[0]);
-    die = atoi(fargs[1]);
+    n = (int)strtol(fargs[0], (char **)NULL, 10);
+    die = (int)strtol(fargs[1], (char **)NULL, 10);
 
     if ((n == 0) || (die <= 0))
     {
@@ -425,7 +434,7 @@ FUNCTION(fun_lrand)
      * return empty, rather than returning 0.
      */
 
-    n_times = atoi(fargs[2]);
+    n_times = (int)strtol(fargs[2], (char **)NULL, 10);
     if (n_times < 1)
     {
         return;
@@ -434,8 +443,8 @@ FUNCTION(fun_lrand)
     {
         n_times = LBUF_SIZE;
     }
-    r_bot = atoi(fargs[0]);
-    r_top = atoi(fargs[1]);
+    r_bot = (int)strtol(fargs[0], (char **)NULL, 10);
+    r_top = (int)strtol(fargs[1], (char **)NULL, 10);
 
     if (r_top < r_bot)
     {
@@ -517,13 +526,13 @@ FUNCTION(fun_lnum)
 
     if (nfargs >= 2)
     {
-        bot = atoi(fargs[0]);
-        top = atoi(fargs[1]);
+        bot = (int)strtol(fargs[0], (char **)NULL, 10);
+        top = (int)strtol(fargs[1], (char **)NULL, 10);
     }
     else
     {
         bot = 0;
-        top = atoi(fargs[0]);
+        top = (int)strtol(fargs[0], (char **)NULL, 10);
         if (top-- < 1)	/* still want to generate if arg is 1 */
             return;
     }
@@ -663,7 +672,7 @@ FUNCTION(fun_convsecs)
 
     time_t tt;
 
-    tt = atol(fargs[0]);
+    tt = strtol(fargs[0], (char **)NULL, 10);
     temp = (char *)ctime(&tt);
     temp[strlen(temp) - 1] = '\0';
     safe_str(temp, buff, bufc);
@@ -746,7 +755,7 @@ struct tm *ttm;
     ttm->tm_mon = i;
 
     get_substr(p, q);	/* day of month */
-    if (!q || (ttm->tm_mday = atoi(p)) < 1 || ttm->tm_mday > daystab[i])
+    if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > daystab[i])
     {
         free_sbuf(buf);
         return 0;
@@ -758,7 +767,7 @@ struct tm *ttm;
         return 0;
     }
     *p++ = '\0';
-    if ((ttm->tm_hour = atoi(q)) > 23 || ttm->tm_hour < 0)
+    if ((ttm->tm_hour = (int)strtol(q, (char **)NULL, 10)) > 23 || ttm->tm_hour < 0)
     {
         free_sbuf(buf);
         return 0;
@@ -780,7 +789,7 @@ struct tm *ttm;
         return 0;
     }
     *q++ = '\0';
-    if ((ttm->tm_min = atoi(p)) > 59 || ttm->tm_min < 0)
+    if ((ttm->tm_min = (int)strtol(p, (char **)NULL, 10)) > 59 || ttm->tm_min < 0)
     {
         free_sbuf(buf);
         return 0;
@@ -796,7 +805,7 @@ struct tm *ttm;
         }
     }
     get_substr(q, p);	/* seconds */
-    if (!p || (ttm->tm_sec = atoi(q)) > 59 || ttm->tm_sec < 0)
+    if (!p || (ttm->tm_sec = (int)strtol(q, (char **)NULL, 10)) > 59 || ttm->tm_sec < 0)
     {
         free_sbuf(buf);
         return 0;
@@ -812,7 +821,7 @@ struct tm *ttm;
         }
     }
     get_substr(p, q);	/* year */
-    if ((ttm->tm_year = atoi(p)) == 0)
+    if ((ttm->tm_year = (int)strtol(p, (char **)NULL, 10)) == 0)
     {
         while (isspace(*p))
             p++;
@@ -845,7 +854,7 @@ FUNCTION(fun_convtime)
 
     ttm = localtime(&mudstate.now);
     if (do_convtime(fargs[0], ttm))
-        safe_ltos(buff, bufc, timelocal(ttm));
+        safe_ltos(buff, bufc, mktime(ttm));
     else
         safe_known_str("-1", 2, buff, bufc);
 }
@@ -877,7 +886,7 @@ FUNCTION(fun_timefmt)
     }
     else if (nfargs == 2)
     {
-        tt = (time_t) atol(fargs[1]);
+        tt = (time_t) strtol(fargs[1], (char **)NULL, 10);;
         if (tt < 0)
         {
             safe_str("#-1 INVALID TIME", buff, bufc);
@@ -967,7 +976,7 @@ FUNCTION(fun_etimefmt)
      * Figure out time values
      */
 
-    raw_secs = secs = atoi(fargs[1]);
+    raw_secs = secs = (int)strtol(fargs[1], (char **)NULL, 10);
     if (secs < 0)
     {
         /*
@@ -1413,7 +1422,7 @@ FUNCTION(fun_benchmark)
     s = fargs[1];
     exec(nstr, &tp, player, caller, cause,
          EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs);
-    times = atoi(nstr);
+    times = (int)strtol(nstr, (char **)NULL, 10);
     free_lbuf(nstr);
     if (times < 1)
     {
@@ -1716,7 +1725,7 @@ FUNCTION(fun_create)
         }
         if (fargs[1] && *fargs[1])
         {
-            cost = atoi(fargs[1]);
+            cost = (int)strtol(fargs[1], (char **)NULL, 10);
             if (cost < mudconf.createmin
                     || cost > mudconf.createmax)
             {
@@ -1956,7 +1965,7 @@ FUNCTION(fun_ps)
 
     if (fargs[0] && is_integer(fargs[0]))
     {
-        qpid = atoi(fargs[0]);
+        qpid = (int)strtol(fargs[0], (char **)NULL, 10);
         qptr = (BQUE *) nhashfind(qpid, &mudstate.qpid_htab);
         if (qptr == NULL)
             return;

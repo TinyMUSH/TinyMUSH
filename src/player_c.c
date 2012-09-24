@@ -1,6 +1,15 @@
 /* player_c.c - Player cache routines */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -17,6 +26,8 @@ typedef struct player_cache
     int cflags;
     struct player_cache *next;
 } PCACHE;
+
+typedef char	IBUF[16];
 
 NHSHTAB pcache_htab;
 
@@ -45,13 +56,13 @@ PCACHE *pp;
 
     cp = atr_get_raw(player, A_MONEY);
     if (cp && *cp)
-        pp->money = atoi(cp);
+        pp->money = (int)strtol(cp, (char **)NULL, 10);
     else
         pp->money = 0;
 
     cp = atr_get_raw(player, A_QUEUEMAX);
     if (cp && *cp)
-        pp->qmax = atoi(cp);
+        pp->qmax = (int)strtol(cp, (char **)NULL, 10);
     else if (!Wizard(player))
         pp->qmax = mudconf.queuemax;
     else
@@ -240,7 +251,7 @@ dbref obj;
     }
 
     cp = atr_get_raw(obj, A_MONEY);
-    return (safe_atoi(cp));
+    return ((int)strtol(cp, (char **)NULL, 10));
 }
 
 void

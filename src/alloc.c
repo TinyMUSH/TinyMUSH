@@ -1,10 +1,18 @@
 /* alloc.c - memory allocation subsystem */
 
 #include "copyright.h"
-#include "mushconf.h"		/* required by code */
+#include "config.h"
 
-#include "db.h"			/* required by externs.h */
-#include "externs.h"		/* required by code */
+#include "game.h"	/* required by mudconf */
+#include "alloc.h"	/* required by mudconf */
+#include "flags.h"	/* required by mudconf */
+#include "htab.h"	/* required by mudconf */
+#include "ltdl.h"	/* required by mudconf */
+#include "udb.h"	/* required by mudconf */
+#include "udb_defs.h"	/* required by mudconf */ 
+#include "mushconf.h"	/* required by code */
+#include "db.h"		/* required by externs.h */
+#include "externs.h"	/* required by code */
 
 POOL pools[NUM_POOLS];
 const char *poolnames[] =

@@ -6,6 +6,15 @@
  */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -421,7 +430,7 @@ int n;
     while (n > 0);
 }
 
-INLINE void
+void
 queue_string(d, s)
 DESC *d;
 
@@ -450,7 +459,7 @@ const char *s;
     }
 }
 
-INLINE void
+void
 queue_rawstring(d, s)
 DESC *d;
 
@@ -888,7 +897,7 @@ const char *reason;
         mudstate.record_players = count;
 
     buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
-    d->timeout = atoi(buf);
+    d->timeout = (int)strtol(buf, (char **)NULL, 10);
     if (d->timeout <= 0)
         d->timeout = mudconf.idle_timeout;
     free_lbuf(buf);
@@ -1183,7 +1192,7 @@ dbref player;
     DESC_ITER_PLAYER(player, d)
     {
         buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
-        d->timeout = atoi(buf);
+        d->timeout = (int)strtol(buf, (char **)NULL, 10);
         if (d->timeout <= 0)
             d->timeout = mudconf.idle_timeout;
         free_lbuf(buf);

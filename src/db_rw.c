@@ -1,6 +1,15 @@
 /* db_rw.c - flatfile implementation */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -1023,7 +1032,7 @@ int *db_format, *db_version, *db_flags;
                     if (isdigit(*tstr))
                     {
                         read_name = 0;
-                        s_Location(i, atoi(tstr));
+                        s_Location(i, (int)strtol(tstr, (char **)NULL, 10));
                     }
                     else
                     {

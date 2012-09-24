@@ -1,6 +1,15 @@
 /* conf.c - configuration functions and defaults */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -565,7 +574,7 @@ CF_HAND(cf_int)
      * Copy the numeric value to the parameter
      */
 
-    if ((extra > 0) && (atoi(str) > extra))
+    if ((extra > 0) && ((int)strtol(str, (char **)NULL, 10) > extra))
     {
         cf_log_syntax(player, cmd, "Value exceeds limit of %d", extra);
         return -1;
@@ -588,7 +597,7 @@ CF_HAND(cf_int_factor)
      * Copy the numeric value to the parameter
      */
 
-    num = atoi(str);
+    num = (int)strtol(str, (char **)NULL, 10);;
 
     if ((extra > 0) && (num > extra))
     {
@@ -636,9 +645,9 @@ CF_HAND(cf_dbref)
      */
 
     if (*str == '#')
-        num = atoi(str + 1);
+        num = (int)strtol(str + 1, (char **)NULL, 10);
     else
-        num = atoi(str);
+        num = (int)strtol(str, (char **)NULL, 10);
 
     if (((extra == NOTHING) && (num == NOTHING)) ||
             (Good_obj(num) && !Going(num)))
@@ -1582,7 +1591,7 @@ CF_AHAND(cf_site)
 
         addr_txt = str;
         *mask_txt++ = '\0';
-        mask_bits = atoi(mask_txt);
+        mask_bits = (int)strtol(mask_txt, (char **)NULL, 10);
         if ((mask_bits > 32) || (mask_bits < 0))
         {
             cf_log_syntax(player, cmd,

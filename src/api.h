@@ -1,21 +1,37 @@
-/* api.h.  Generated from api.h.in by configure.  */
 /* api.h - must be included by all dynamically loaded modules */
 
 #ifndef __API_H
 #define __API_H
 
 #include "copyright.h"
-#include "config.h"
+
+#include <ltdl.h>
+
+#include "alloc.h"
+
+#include "htab.h"
+#include "udb.h"
+#include "udb_defs.h"
+#include "flags.h"
+#include "powers.h"		/* required by code */
+#include "db.h"
 
 #include "mushconf.h"		/* required by code */
+
+
+
+
+
 #include "game.h"		/* required by code */
 #include "interface.h"		/* required by code */
 #include "command.h"		/* required by code */
 #include "match.h"		/* required by code */
 #include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
+
 #include "ansi.h"		/* required by code */
 #include "functions.h"		/* required by code */
+
+#include "externs.h"
 
 
 /*

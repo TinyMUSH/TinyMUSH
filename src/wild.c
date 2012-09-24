@@ -13,6 +13,15 @@
  */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -619,13 +628,13 @@ char *tstr, *dstr;
     case '>':
         tstr++;
         if (isdigit(*tstr) || (*tstr == '-'))
-            return (atoi(tstr) < atoi(dstr));
+            return ((int)strtol(tstr, (char **)NULL, 10) < (int)strtol(dstr, (char **)NULL, 10));
         else
             return (strcmp(tstr, dstr) < 0);
     case '<':
         tstr++;
         if (isdigit(*tstr) || (*tstr == '-'))
-            return (atoi(tstr) > atoi(dstr));
+            return ((int)strtol(tstr, (char **)NULL, 10) > (int)strtol(dstr, (char **)NULL, 10));
         else
             return (strcmp(tstr, dstr) > 0);
     }

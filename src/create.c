@@ -1,6 +1,15 @@
 /* create.c - Commands that create new objects */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -557,7 +566,7 @@ char *name, *coststr;
 
     int cost;
 
-    cost = atoi(coststr);
+    cost = (int)strtol(coststr, (char **)NULL, 10);
     if (!name || !*name || (strip_ansi_len(name) == 0))
     {
         notify_quiet(player, "Create what?");
@@ -668,7 +677,7 @@ char *name, *arg2;
 
     if (key & CLONE_SET_COST)
     {
-        cost = atoi(arg2);
+        cost = (int)strtol(arg2, (char **)NULL, 10);
         arg2 = NULL;
     }
     else

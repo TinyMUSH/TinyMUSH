@@ -1,6 +1,15 @@
 /* stringutil.c - string utilities */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -650,7 +659,7 @@ int *cmap;
                 s++;
                 do
                 {
-                    n = atoi(s);
+                    n = (int)strtol(s, (char **)NULL, 10);
                     if ((n >= I_ANSI_BLACK)
                             && (n < I_ANSI_NUM)
                             && (cmap[n - I_ANSI_BLACK] != 0))
@@ -1227,7 +1236,7 @@ int min;
  * watching for overflows.
  */
 
-INLINE void
+void
 safe_copy_str(src, buff, bufp, max)
 const char *src;
 
@@ -1275,7 +1284,7 @@ int max;
 }
 
 
-INLINE int
+int
 safe_copy_str_fn(src, buff, bufp, max)
 const char *src;
 
@@ -1363,7 +1372,7 @@ int max;
 }
 
 
-INLINE void
+void
 safe_known_str(src, known, buff, bufp)
 const char *src;
 
@@ -1411,7 +1420,7 @@ int known;
 }
 
 
-INLINE int
+int
 safe_chr_real_fn(src, buff, bufp, max)
 char src, *buff, **bufp;
 
@@ -1542,7 +1551,7 @@ long num;
     return 0;
 }
 
-INLINE void
+void
 safe_ltos(s, bufc, num)
 char *s;
 

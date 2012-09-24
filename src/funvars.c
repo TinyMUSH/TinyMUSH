@@ -1,6 +1,15 @@
 /* funvars.c - structure, variable, stack, and regexp functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -3263,7 +3272,7 @@ FUNCTION(fun_dup)
     }
     else
     {
-        pos = atoi(fargs[1]);
+        pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
     hp = stack_get(it);
@@ -3344,7 +3353,7 @@ FUNCTION(handle_pop)
     }
     else
     {
-        pos = atoi(fargs[1]);
+        pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
     sp = stack_get(it);
@@ -3399,8 +3408,8 @@ FUNCTION(fun_popn)
     VaChk_Only_Out(4);
 
     stack_object(player, it);
-    pos = atoi(fargs[1]);
-    nitems = atoi(fargs[2]);
+    pos = (int)strtol(fargs[1], (char **)NULL, 10);
+    nitems = (int)strtol(fargs[2], (char **)NULL, 10);
 
     sp = stack_get(it);
     if (!sp)
@@ -4349,8 +4358,8 @@ FUNCTION(fun_gridmake)
     VaChk_SepIn(csep, 4, 0);
     VaChk_SepIn(rsep, 5, 0);
 
-    rows = atoi(fargs[0]);
-    cols = atoi(fargs[1]);
+    rows = (int)strtol(fargs[0], (char **)NULL, 10);
+    cols = (int)strtol(fargs[1], (char **)NULL, 10);
     dimension = rows * cols;
 
     if ((dimension > mudconf.max_grid_size) || (dimension < 0))
@@ -4472,8 +4481,8 @@ FUNCTION(fun_gridset)
             *fargs[0] && !strchr(fargs[0], isep.str[0]) &&
             *fargs[1] && !strchr(fargs[1], isep.str[0]))
     {
-        r = atoi(fargs[0]) - 1;
-        c = atoi(fargs[1]) - 1;
+        r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
+        c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
         grid_set(ogp, r, c, fargs[2], errs);
         if (errs)
         {
@@ -4534,7 +4543,7 @@ FUNCTION(fun_gridset)
             {
                 for (i = 0; i < n_x; i++)
                 {
-                    c = atoi(x_elems[i]) - 1;
+                    c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                     grid_set(ogp, r, c, fargs[2], errs);
                 }
             }
@@ -4544,7 +4553,7 @@ FUNCTION(fun_gridset)
     {
         for (j = 0; j < n_y; j++)
         {
-            r = atoi(y_elems[j]) - 1;
+            r = (int)strtol(y_elems[j], (char **)NULL, 10) - 1;
             if ((r < 0) || (r >= ogp->rows))
             {
                 errs++;
@@ -4563,7 +4572,7 @@ FUNCTION(fun_gridset)
                 {
                     for (i = 0; i < n_x; i++)
                     {
-                        c = atoi(x_elems[i]) - 1;
+                        c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                         grid_set(ogp, r, c, fargs[2],
                                  errs);
                     }
@@ -4616,8 +4625,8 @@ FUNCTION(fun_grid)
     if (fargs[0] && *fargs[0] && !strchr(fargs[0], ' ') &&
             fargs[1] && *fargs[1] && !strchr(fargs[1], ' '))
     {
-        r = atoi(fargs[0]) - 1;
-        c = atoi(fargs[1]) - 1;
+        r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
+        c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
         grid_print(ogp, r, c, 0, csep);
         return;
     }
@@ -4676,7 +4685,7 @@ FUNCTION(fun_grid)
             {
                 for (i = 0; i < n_x; i++)
                 {
-                    c = atoi(x_elems[i]) - 1;
+                    c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                     grid_print(ogp, r, c, (i != 0), csep);
                 }
             }
@@ -4690,7 +4699,7 @@ FUNCTION(fun_grid)
             {
                 print_sep(&rsep, buff, bufc);
             }
-            r = atoi(y_elems[j]) - 1;
+            r = (int)strtol(y_elems[j], (char **)NULL, 10) - 1;
             if (!((r < 0) || (r >= ogp->rows)))
             {
                 if (n_x == -1)
@@ -4705,7 +4714,7 @@ FUNCTION(fun_grid)
                 {
                     for (i = 0; i < n_x; i++)
                     {
-                        c = atoi(x_elems[i]) - 1;
+                        c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                         grid_print(ogp, r, c, (i != 0),
                                    csep);
                     }

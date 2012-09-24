@@ -1,6 +1,15 @@
 /* funmath.c - math and logic functions */
 
 #include "copyright.h"
+#include "config.h"
+
+#include "game.h" /* required by mudconf */
+#include "alloc.h" /* required by mudconf */
+#include "flags.h" /* required by mudconf */
+#include "htab.h" /* required by mudconf */
+#include "ltdl.h" /* required by mudconf */
+#include "udb.h" /* required by mudconf */
+#include "udb_defs.h" /* required by mudconf */ 
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -194,7 +203,7 @@ FUNCTION(fun_sign)
 {
     NVAL num;
 
-    num = aton(fargs[0]);
+    num = strtod(fargs[0], (char **)NULL);
     if (num < 0)
     {
         safe_known_str("-1", 2, buff, bufc);
@@ -209,7 +218,7 @@ FUNCTION(fun_abs)
 {
     NVAL num;
 
-    num = aton(fargs[0]);
+    num = strtod(fargs[0], (char **)NULL);
     if (num == 0)
     {
         safe_chr('0', buff, bufc);
@@ -232,7 +241,7 @@ FUNCTION(fun_floor)
     NVAL x;
 
     oldp = *bufc;
-    x = floor(aton(fargs[0]));
+    x = floor(strtod(fargs[0], (char **)NULL));
     switch (fp_check_weird(buff, bufc, x))
     {
     case FP_EXP_WEIRD:
@@ -253,7 +262,7 @@ FUNCTION(fun_floor)
         *bufc = oldp + 1;
     }
 #else
-    fval(buff, bufc, aton(fargs[0]));
+    fval(buff, bufc, strtod(fargs[0], (char **)NULL));
 #endif
 }
 
@@ -265,7 +274,7 @@ FUNCTION(fun_ceil)
     NVAL x;
 
     oldp = *bufc;
-    x = ceil(aton(fargs[0]));
+    x = ceil(strtod(fargs[0], (char **)NULL));
     switch (fp_check_weird(buff, bufc, x))
     {
     case FP_EXP_WEIRD:
@@ -286,7 +295,7 @@ FUNCTION(fun_ceil)
         *bufc = oldp + 1;
     }
 #else
-    fval(buff, bufc, aton(fargs[0]));
+    fval(buff, bufc, strtod(fargs[0], (char **)NULL));
 #endif
 }
 
@@ -301,7 +310,7 @@ FUNCTION(fun_round)
 
     oldp = *bufc;
 
-    switch (atoi(fargs[1]))
+    switch ((int)strtol(fargs[1], (char **)NULL, 10))
     {
     case 1:
         fstr = "%.1f";
@@ -325,7 +334,7 @@ FUNCTION(fun_round)
         fstr = "%.0f";
         break;
     }
-    x = aton(fargs[0]);
+    x = strtod(fargs[0], (char **)NULL);
     switch (fp_check_weird(buff, bufc, x))
     {
     case FP_EXP_WEIRD:
@@ -347,7 +356,7 @@ FUNCTION(fun_round)
         *bufc = oldp + 1;
     }
 #else
-    fval(buff, bufc, aton(fargs[0]));
+    fval(buff, bufc, strtod(fargs[0], (char **)NULL));
 #endif
 }
 
@@ -356,7 +365,7 @@ FUNCTION(fun_trunc)
 #ifdef FLOATING_POINTS
     NVAL x;
 
-    x = aton(fargs[0]);
+    x = strtod(fargs[0], (char **)NULL);
     x = (x >= 0) ? floor(x) : ceil(x);
     switch (fp_check_weird(buff, bufc, x))
     {
@@ -369,25 +378,25 @@ FUNCTION(fun_trunc)
     }
     fval(buff, bufc, x);
 #else
-    fval(buff, bufc, aton(fargs[0]));
+    fval(buff, bufc, strtod(fargs[0], (char **)NULL));
 #endif
 }
 
 FUNCTION(fun_inc)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) + 1);
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) + 1);
 }
 
 FUNCTION(fun_dec)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) - 1);
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) - 1);
 }
 
 FUNCTION(fun_sqrt)
 {
     NVAL val;
 
-    val = aton(fargs[0]);
+    val = strtod(fargs[0], (char **)NULL);
     if (val < 0)
     {
         safe_str("#-1 SQUARE ROOT OF NEGATIVE", buff, bufc);
@@ -404,14 +413,14 @@ FUNCTION(fun_sqrt)
 
 FUNCTION(fun_exp)
 {
-    fval(buff, bufc, exp((double)aton(fargs[0])));
+    fval(buff, bufc, exp((double)strtod(fargs[0], (char **)NULL)));
 }
 
 FUNCTION(fun_ln)
 {
     NVAL val;
 
-    val = aton(fargs[0]);
+    val = strtod(fargs[0], (char **)NULL);
     if (val > 0)
         fval(buff, bufc, log((double)val));
     else
@@ -433,7 +442,7 @@ FUNCTION(handle_trig)
     flag = Func_Flags(fargs);
     oper = flag & TRIG_OPER;
 
-    val = aton(fargs[0]);
+    val = strtod(fargs[0], (char **)NULL);
     if ((flag & TRIG_ARC) && !(flag & TRIG_TAN) &&
             ((val < -1) || (val > 1)))
     {
@@ -528,8 +537,8 @@ FUNCTION(fun_baseconv)
         safe_known_str("#-1 INVALID BASE", 16, buff, bufc);
         return;
     }
-    from = atoi(fargs[1]);
-    to = atoi(fargs[2]);
+    from = (int)strtol(fargs[1], (char **)NULL, 10);
+    to = (int)strtol(fargs[2], (char **)NULL, 10);
 
     if ((from < 2) || (from > 64) || (to < 2) || (to > 64))
     {
@@ -617,40 +626,40 @@ FUNCTION(fun_baseconv)
 
 FUNCTION(fun_gt)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) > aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) > strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_gte)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) >= aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) >= strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_lt)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) < aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) < strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_lte)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) <= aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) <= strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_eq)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) == aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) == strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_neq)
 {
-    safe_bool(buff, bufc, (aton(fargs[0]) != aton(fargs[1])));
+    safe_bool(buff, bufc, (strtod(fargs[0], (char **)NULL) != strtod(fargs[1], (char **)NULL)));
 }
 
 FUNCTION(fun_ncomp)
 {
     NVAL x, y;
 
-    x = aton(fargs[0]);
-    y = aton(fargs[1]);
+    x = strtod(fargs[0], (char **)NULL);
+    y = strtod(fargs[1], (char **)NULL);
 
     if (x == y)
     {
@@ -674,7 +683,7 @@ FUNCTION(fun_ncomp)
 
 FUNCTION(fun_sub)
 {
-    fval(buff, bufc, aton(fargs[0]) - aton(fargs[1]));
+    fval(buff, bufc, strtod(fargs[0], (char **)NULL) - strtod(fargs[1], (char **)NULL));
 }
 
 FUNCTION(fun_div)
@@ -686,8 +695,8 @@ FUNCTION(fun_div)
      * operands, so we try not to give it negative operands here
      */
 
-    top = atoi(fargs[0]);
-    bot = atoi(fargs[1]);
+    top = (int)strtol(fargs[0], (char **)NULL, 10);
+    bot = (int)strtol(fargs[1], (char **)NULL, 10);
     if (bot == 0)
     {
         safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
@@ -719,8 +728,8 @@ FUNCTION(fun_floordiv)
      * operands, so we try not to give it negative operands here
      */
 
-    top = atoi(fargs[0]);
-    bot = atoi(fargs[1]);
+    top = (int)strtol(fargs[0], (char **)NULL, 10);
+    bot = (int)strtol(fargs[1], (char **)NULL, 10);
     if (bot == 0)
     {
         safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
@@ -759,14 +768,14 @@ FUNCTION(fun_fdiv)
 {
     NVAL bot;
 
-    bot = aton(fargs[1]);
+    bot = strtod(fargs[1], (char **)NULL);
     if (bot == 0)
     {
         safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
     }
     else
     {
-        fval(buff, bufc, (aton(fargs[0]) / bot));
+        fval(buff, bufc, (strtod(fargs[0], (char **)NULL) / bot));
     }
 }
 
@@ -779,8 +788,8 @@ FUNCTION(fun_modulo)
      * operands, so we try not to give it negative operands here
      */
 
-    top = atoi(fargs[0]);
-    bot = atoi(fargs[1]);
+    top = (int)strtol(fargs[0], (char **)NULL, 10);
+    bot = (int)strtol(fargs[1], (char **)NULL, 10);
     if (bot == 0)
         bot = 1;
     if (top < 0)
@@ -809,8 +818,8 @@ FUNCTION(fun_remainder)
      * operands, so we try not to give it negative operands here
      */
 
-    top = atoi(fargs[0]);
-    bot = atoi(fargs[1]);
+    top = (int)strtol(fargs[0], (char **)NULL, 10);
+    bot = (int)strtol(fargs[1], (char **)NULL, 10);
     if (bot == 0)
         bot = 1;
     if (top < 0)
@@ -834,8 +843,8 @@ FUNCTION(fun_power)
 {
     NVAL val1, val2;
 
-    val1 = aton(fargs[0]);
-    val2 = aton(fargs[1]);
+    val1 = strtod(fargs[0], (char **)NULL);
+    val2 = strtod(fargs[1], (char **)NULL);
     if (val1 < 0)
     {
         safe_str("#-1 POWER OF NEGATIVE", buff, bufc);
@@ -852,10 +861,10 @@ FUNCTION(fun_log)
 
     VaChk_Range(1, 2);
 
-    val = aton(fargs[0]);
+    val = strtod(fargs[0], (char **)NULL);
 
     if (nfargs == 2)
-        base = aton(fargs[1]);
+        base = strtod(fargs[1], (char **)NULL);
     else
         base = 10;
 
@@ -874,27 +883,27 @@ FUNCTION(fun_log)
 
 FUNCTION(fun_shl)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) << atoi(fargs[1]));
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) << (int)strtol(fargs[1], (char **)NULL, 10));
 }
 
 FUNCTION(fun_shr)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) >> atoi(fargs[1]));
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) >> (int)strtol(fargs[1], (char **)NULL, 10));
 }
 
 FUNCTION(fun_band)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) & atoi(fargs[1]));
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) & (int)strtol(fargs[1], (char **)NULL, 10));
 }
 
 FUNCTION(fun_bor)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) | atoi(fargs[1]));
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) | (int)strtol(fargs[1], (char **)NULL, 10));
 }
 
 FUNCTION(fun_bnand)
 {
-    safe_ltos(buff, bufc, atoi(fargs[0]) & ~(atoi(fargs[1])));
+    safe_ltos(buff, bufc, (int)strtol(fargs[0], (char **)NULL, 10) & ~((int)strtol(fargs[1], (char **)NULL, 10)));
 }
 
 /*
@@ -914,10 +923,10 @@ FUNCTION(fun_add)
     }
     else
     {
-        sum = aton(fargs[0]);
+        sum = strtod(fargs[0], (char **)NULL);
         for (i = 1; i < nfargs; i++)
         {
-            sum += aton(fargs[i]);
+            sum += strtod(fargs[i], (char **)NULL);
         }
         fval(buff, bufc, sum);
     }
@@ -936,10 +945,10 @@ FUNCTION(fun_mul)
     }
     else
     {
-        prod = aton(fargs[0]);
+        prod = strtod(fargs[0], (char **)NULL);
         for (i = 1; i < nfargs; i++)
         {
-            prod *= aton(fargs[i]);
+            prod *= strtod(fargs[i], (char **)NULL);
         }
         fval(buff, bufc, prod);
     }
@@ -958,10 +967,10 @@ FUNCTION(fun_max)
     }
     else
     {
-        max = aton(fargs[0]);
+        max = strtod(fargs[0], (char **)NULL);
         for (i = 1; i < nfargs; i++)
         {
-            val = aton(fargs[i]);
+            val = strtod(fargs[i], (char **)NULL);
             max = (max < val) ? val : max;
         }
         fval(buff, bufc, max);
@@ -980,10 +989,10 @@ FUNCTION(fun_min)
     }
     else
     {
-        min = aton(fargs[0]);
+        min = strtod(fargs[0], (char **)NULL);
         for (i = 1; i < nfargs; i++)
         {
-            val = aton(fargs[i]);
+            val = strtod(fargs[i], (char **)NULL);
             min = (min > val) ? val : min;
         }
         fval(buff, bufc, min);
@@ -1003,7 +1012,7 @@ FUNCTION(fun_bound)
 
     VaChk_Range(1, 3);
 
-    val = aton(fargs[0]);
+    val = strtod(fargs[0], (char **)NULL);
 
     if (nfargs < 2)  	/* just the number; no bounds enforced */
     {
@@ -1015,7 +1024,7 @@ FUNCTION(fun_bound)
         for (cp = fargs[1]; *cp && isspace(*cp); cp++);
         if (*cp)
         {
-            min = aton(fargs[1]);
+            min = strtod(fargs[1], (char **)NULL);
             val = (val < min) ? min : val;
         }
     }
@@ -1024,7 +1033,7 @@ FUNCTION(fun_bound)
         for (cp = fargs[2]; *cp && isspace(*cp); cp++);
         if (*cp)
         {
-            max = aton(fargs[2]);
+            max = strtod(fargs[2], (char **)NULL);
             val = (val > max) ? max : val;
         }
     }
@@ -1042,9 +1051,9 @@ FUNCTION(fun_dist2d)
 
     double r;
 
-    d = atoi(fargs[0]) - atoi(fargs[2]);
+    d = (int)strtol(fargs[0], (char **)NULL, 10) - (int)strtol(fargs[2], (char **)NULL, 10);
     r = (double)(d * d);
-    d = atoi(fargs[1]) - atoi(fargs[3]);
+    d = (int)strtol(fargs[1], (char **)NULL, 10) - (int)strtol(fargs[3], (char **)NULL, 10);
     r += (double)(d * d);
     d = (int)(sqrt(r) + 0.5);
     safe_ltos(buff, bufc, d);
@@ -1056,11 +1065,11 @@ FUNCTION(fun_dist3d)
 
     double r;
 
-    d = atoi(fargs[0]) - atoi(fargs[3]);
+    d = (int)strtol(fargs[0], (char **)NULL, 10) - (int)strtol(fargs[3], (char **)NULL, 10);
     r = (double)(d * d);
-    d = atoi(fargs[1]) - atoi(fargs[4]);
+    d = (int)strtol(fargs[1], (char **)NULL, 10) - (int)strtol(fargs[4], (char **)NULL, 10);
     r += (double)(d * d);
-    d = atoi(fargs[2]) - atoi(fargs[5]);
+    d = (int)strtol(fargs[2], (char **)NULL, 10) - (int)strtol(fargs[5], (char **)NULL, 10);
     r += (double)(d * d);
     d = (int)(sqrt(r) + 0.5);
     safe_ltos(buff, bufc, d);
@@ -1091,7 +1100,7 @@ FUNCTION(fun_ladd)
     while (cp)
     {
         curr = split_token(&cp, &isep);
-        sum += aton(curr);
+        sum += strtod(curr, (char **)NULL);
     }
     fval(buff, bufc, sum);
 }
@@ -1110,11 +1119,11 @@ FUNCTION(fun_lmax)
     if (cp)
     {
         curr = split_token(&cp, &isep);
-        max = aton(curr);
+        max = strtod(curr, (char **)NULL);
         while (cp)
         {
             curr = split_token(&cp, &isep);
-            val = aton(curr);
+            val = strtod(curr, (char **)NULL);
             if (max < val)
                 max = val;
         }
@@ -1136,11 +1145,11 @@ FUNCTION(fun_lmin)
     if (cp)
     {
         curr = split_token(&cp, &isep);
-        min = aton(curr);
+        min = strtod(curr, (char **)NULL);
         while (cp)
         {
             curr = split_token(&cp, &isep);
-            val = aton(curr);
+            val = strtod(curr, (char **)NULL);
             if (min > val)
                 min = val;
         }
@@ -1189,7 +1198,7 @@ FUNCTION(handle_vector)
      */
     for (i = 0; i < n; i++)
     {
-        tmp = aton(v1[i]);
+        tmp = strtod(v1[i], (char **)NULL);
         res += tmp * tmp;
     }
 
@@ -1217,11 +1226,11 @@ FUNCTION(handle_vector)
         return;
     }
     res = sqrt(res);
-    fval(buff, bufc, aton(v1[0]) / res);
+    fval(buff, bufc,  strtod(v1[0], (char **)NULL) / res);
     for (i = 1; i < n; i++)
     {
         print_sep(&osep, buff, bufc);
-        fval(buff, bufc, aton(v1[i]) / res);
+        fval(buff, bufc, strtod(v1[i], (char **)NULL) / res);
     }
     XFREE(v1, "handle_vector.v1");
 }
@@ -1281,19 +1290,19 @@ FUNCTION(handle_vectors)
     switch (oper)
     {
     case VEC_ADD:
-        fval(buff, bufc, aton(v1[0]) + aton(v2[0]));
+        fval(buff, bufc, strtod(v1[0], (char **)NULL) + strtod(v2[0], (char **)NULL));
         for (i = 1; i < n; i++)
         {
             print_sep(&osep, buff, bufc);
-            fval(buff, bufc, aton(v1[i]) + aton(v2[i]));
+            fval(buff, bufc, strtod(v1[0], (char **)NULL) + strtod(v2[0], (char **)NULL));
         }
         break;
     case VEC_SUB:
-        fval(buff, bufc, aton(v1[0]) - aton(v2[0]));
+        fval(buff, bufc, strtod(v1[0], (char **)NULL) - strtod(v2[0], (char **)NULL));
         for (i = 1; i < n; i++)
         {
             print_sep(&osep, buff, bufc);
-            fval(buff, bufc, aton(v1[i]) - aton(v2[i]));
+            fval(buff, bufc, strtod(v1[0], (char **)NULL) - strtod(v2[0], (char **)NULL));
         }
         break;
     case VEC_OR:
@@ -1331,22 +1340,22 @@ FUNCTION(handle_vectors)
          */
         if (n == 1)
         {
-            scalar = aton(v1[0]);
-            fval(buff, bufc, aton(v2[0]) * scalar);
+            scalar = strtod(v1[0], (char **)NULL);
+            fval(buff, bufc, strtod(v2[0], (char **)NULL) * scalar);
             for (i = 1; i < m; i++)
             {
                 print_sep(&osep, buff, bufc);
-                fval(buff, bufc, aton(v2[i]) * scalar);
+                fval(buff, bufc, strtod(v2[0], (char **)NULL) * scalar);
             }
         }
         else if (m == 1)
         {
-            scalar = aton(v2[0]);
-            fval(buff, bufc, aton(v1[0]) * scalar);
+            scalar = strtod(v2[0], (char **)NULL);
+            fval(buff, bufc, strtod(v1[0], (char **)NULL) * scalar);
             for (i = 1; i < n; i++)
             {
                 print_sep(&osep, buff, bufc);
-                fval(buff, bufc, aton(v1[i]) * scalar);
+                fval(buff, bufc, strtod(v1[0], (char **)NULL) * scalar);
             }
         }
         else
@@ -1360,11 +1369,11 @@ FUNCTION(handle_vectors)
              * but the actual behavior isn't. We implement dot
              * product separately!
              */
-            fval(buff, bufc, aton(v1[0]) * aton(v2[0]));
+            fval(buff, bufc, strtod(v1[0], (char **)NULL) * strtod(v2[0], (char **)NULL));
             for (i = 1; i < n; i++)
             {
                 print_sep(&osep, buff, bufc);
-                fval(buff, bufc, aton(v1[i]) * aton(v2[i]));
+                fval(buff, bufc, strtod(v1[0], (char **)NULL) * strtod(v2[0], (char **)NULL));
             }
         }
         break;
@@ -1378,7 +1387,7 @@ FUNCTION(handle_vectors)
         scalar = 0;
         for (i = 0; i < n; i++)
         {
-            scalar += aton(v1[i]) * aton(v2[i]);
+            scalar += strtod(v1[0], (char **)NULL) * strtod(v2[0], (char **)NULL);
         }
         fval(buff, bufc, scalar);
         break;
@@ -1400,7 +1409,7 @@ FUNCTION(handle_vectors)
 
 FUNCTION(fun_not)
 {
-    safe_bool(buff, bufc, !atoi(fargs[0]));
+    safe_bool(buff, bufc, !(int)strtol(fargs[0], (char **)NULL, 10));
 }
 
 FUNCTION(fun_notbool)
@@ -1413,12 +1422,19 @@ FUNCTION(fun_t)
     safe_bool(buff, bufc, xlate(fargs[0]));
 }
 
+int cvtfun(int flag, char *str) {
+    if(flag & LOGIC_BOOL) {
+        return(xlate(str));
+    } else {    
+        return((int)strtol(str, (char **)NULL, 10));
+    }
+}
+
 /*
  * ---------------------------------------------------------------------------
  * Multi-argument boolean funcs: various combinations of
  * [L,C][AND,OR,XOR][BOOL]
  */
-
 FUNCTION(handle_logic)
 {
     Delim isep;
@@ -1427,10 +1443,10 @@ FUNCTION(handle_logic)
 
     char *str, *tbuf, *bp;
 
-    int (*cvtfun) (char *);
+//    int (*cvtfun) (char *);
 
     flag = Func_Flags(fargs);
-    cvtfun = (flag & LOGIC_BOOL) ? xlate : (int (*)(char *))atoi;
+    //cvtfun = (flag & LOGIC_BOOL) ? xlate : (int (*)(char *))atoi;
     oper = (flag & LOGIC_OPER);
 
     /*
@@ -1456,7 +1472,7 @@ FUNCTION(handle_logic)
         {
             tbuf = split_token(&bp, &isep);
             val = ((oper == LOGIC_XOR)
-                   && val) ? !cvtfun(tbuf) : cvtfun(tbuf);
+                   && val) ? !cvtfun(flag, tbuf) : cvtfun(flag, tbuf);
             if (((oper == LOGIC_AND) && !val)
                     || ((oper == LOGIC_OR) && val))
                 break;
@@ -1486,7 +1502,7 @@ FUNCTION(handle_logic)
                  EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs,
                  ncargs);
             val = ((oper == LOGIC_XOR)
-                   && val) ? !cvtfun(tbuf) : cvtfun(tbuf);
+                   && val) ? !cvtfun(flag, tbuf) : cvtfun(flag, tbuf);
             if (((oper == LOGIC_AND) && !val)
                     || ((oper == LOGIC_OR) && val))
                 break;
@@ -1502,7 +1518,7 @@ FUNCTION(handle_logic)
         for (i = 0; i < nfargs; i++)
         {
             val = ((oper == LOGIC_XOR)
-                   && val) ? !cvtfun(fargs[i]) : cvtfun(fargs[i]);
+                   && val) ? !cvtfun(flag, fargs[i]) : cvtfun(flag, fargs[i]);
             if (((oper == LOGIC_AND) && !val)
                     || ((oper == LOGIC_OR) && val))
                 break;
@@ -1546,7 +1562,7 @@ FUNCTION(handle_listbool)
         }
         else
         {
-            n = !((atoi(tbuf) == 0) && is_number(tbuf));
+            n = !((int)strtol(tbuf, (char **)NULL, 10) == 0) && is_number(tbuf);
         }
         if (flag & IFELSE_FALSE)
             n = !n;
