@@ -1087,10 +1087,11 @@ location, and the destination is the object's home.
  
 & info
   Command: INFO
- 
-  This command is intended for the use of external automated programs. It
-  displays commonly-requested pieces of information about the MUSH, in
-  an easy-to-parse format. That format is as follows:
+
+  This command is intened for the use of automated MUD list data gatherers
+  and the like. It returns the MUSH's name, its start time, the number
+  of connected players, the number of objects in the database, and the
+  MUSH version in an easy-to-parse format. That format is as follows:
  
   ### Begin INFO <version>
   Name: <MUSH name>
@@ -1752,13 +1753,7 @@ See also: page, pose, say, @emit
  
   See also: @doing.
  
-& INFO
-  Command: INFO
- 
-  This command is intened for the use of automated MUD list data gatherers
-  and the like. It returns the MUSH's name, its start time, the number
-  of connected players, the number of objects in the database, and the
-  MUSH version.
+
 
 & IDLE
   Command: IDLE

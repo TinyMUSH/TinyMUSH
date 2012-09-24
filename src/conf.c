@@ -75,6 +75,15 @@ NDECL(cf_init)
     mudconf.guest_password = XSTRDUP("guest", "cf_string");
     mudconf.guest_prefixes = XSTRDUP("", "cf_string");
     mudconf.guest_suffixes = XSTRDUP("", "cf_string");
+    
+    mudconf.compressexe = XSTRDUP("gzip", "cf_string");
+
+    mudconf.mudowner = XSTRDUP("", "cf_string");
+
+    mudconf.binhome = XSTRDUP("./bin", "cf_string");    
+    mudconf.dbhome = XSTRDUP("./data", "cf_string");
+    mudconf.txthome = XSTRDUP("./text", "cf_string");
+    mudconf.bakhome = XSTRDUP("./backups", "cf_string");
 
     sprintf(s, "%s/guest.txt", mudconf.txthome);
     mudconf.guest_file = XSTRDUP(s, "cf_string");
@@ -154,9 +163,11 @@ NDECL(cf_init)
     mudconf.paycheck = 0;
     mudconf.paystart = 0;
     mudconf.paylimit = 10000;
-    mudconf.start_quota = mudconf.start_room_quota =
-                              mudconf.start_exit_quota = mudconf.start_thing_quota =
-                                          mudconf.start_player_quota = 20;
+    mudconf.start_quota = 20;
+    mudconf.start_room_quota = 20;
+    mudconf.start_exit_quota = 20;
+    mudconf.start_thing_quota = 20;
+    mudconf.start_player_quota = 20;
     mudconf.site_chars = 25;
     mudconf.payfind = 0;
     mudconf.digcost = 10;
@@ -283,7 +294,7 @@ NDECL(cf_init)
     mudconf.vattr_flags = 0;
     mudconf.vattr_flag_list = NULL;
     mudconf.mud_name = XSTRDUP("TinyMUSH", "cf_string");
-    mudconf.mud_shortname = XSTRDUP("", "cf_string");
+    //mudconf.mud_shortname = XSTRDUP("", "cf_string");
     mudconf.one_coin = XSTRDUP("penny", "cf_string");
     mudconf.many_coins = XSTRDUP("pennies", "cf_string");
     mudconf.struct_dstr = XSTRDUP("\r\n", "cf_string");
@@ -297,8 +308,7 @@ NDECL(cf_init)
 #endif
     mudconf.max_cmdsecs = 120;
     mudconf.control_flags = 0xffffffff;	/* Everything for now... */
-    mudconf.control_flags &= ~CF_GODMONITOR;	/* Except for
-							 * monitoring... */
+    mudconf.control_flags &= ~CF_GODMONITOR;	/* Except for monitoring... */
     mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY |
                           LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS |
                           LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD |
@@ -1618,8 +1628,7 @@ CF_AHAND(cf_site)
 
     /*
      * Link in the entry.  Link it at the start if not initializing, at
-     * the end if initializing.  This is so that entries in the config
-     * file are processed as you would think they would be, while entries
+     * the end if initializing.  This is so that entries in the config     * file are processed as you would think they would be, while entries
      * made while running are processed first.
      */
 
@@ -1969,6 +1978,7 @@ CONF		conftable [] =
     {(char *)"autozone", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.autozone, (long)"New objects are @chzoned to their creator's zone"},
     {(char *)"bad_name", cf_badname, CA_GOD, CA_DISABLED, NULL, 0},
     {(char *)"badsite_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.site_file, MBUF_SIZE},
+    {(char *)"backup_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.bakhome, MBUF_SIZE},
     {(char *)"binary_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.binhome, MBUF_SIZE},
     {(char *)"booleans_oldstyle", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.bools_oldstyle, (long)"Dbrefs #0 and #-1 are boolean false, all other\n\t\t\t\tdbrefs are boolean true"},
     {(char *)"building_limit", cf_int, CA_GOD, CA_PUBLIC, (int *)&mudconf.building_limit, 0},
@@ -1982,13 +1992,13 @@ CONF		conftable [] =
     {(char *)"command_quota_increment", cf_int, CA_GOD, CA_WIZARD, &mudconf.cmd_quota_incr, 0},
     {(char *)"command_quota_max", cf_int, CA_GOD, CA_WIZARD, &mudconf.cmd_quota_max, 0},
     {(char *)"command_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.cmd_nest_lim, 0},
+    {(char *)"compress_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.compressexe, MBUF_SIZE},
     {(char *)"concentrator_port", cf_int, CA_STATIC, CA_WIZARD, &mudconf.conc_port, 0},
     {(char *)"config_access", cf_cf_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
     {(char *)"config_read_access", cf_cf_access, CA_GOD, CA_DISABLED, (int *)1, (long)access_nametab},
     {(char *)"conn_timeout", cf_int, CA_GOD, CA_WIZARD, &mudconf.conn_timeout, 0},
     {(char *)"connect_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.conn_file, MBUF_SIZE},
     {(char *)"connect_reg_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.creg_file, MBUF_SIZE},
-    {(char *)"crash_database", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.crashdb, MBUF_SIZE},
     {(char *)"create_max_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.createmax, 0},
     {(char *)"create_min_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.createmin, 0},
     {(char *)"dark_actions", cf_bool, CA_GOD, CA_WIZARD, &mudconf.dark_actions, (long)"Dark objects still trigger @a-actions when moving"},
@@ -2031,7 +2041,6 @@ CONF		conftable [] =
     {(char *)"function_invocation_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.func_invk_lim, 0},
     {(char *)"function_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.func_nest_lim, 0},
     {(char *)"function_cpu_limit", cf_int, CA_STATIC, CA_PUBLIC, &mudconf.func_cpu_lim_secs, 0},
-    {(char *)"gdbm_database", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.gdbm, MBUF_SIZE},
     {(char *)"global_aconn_uselocks", cf_bool, CA_GOD, CA_WIZARD, &mudconf.global_aconn_uselocks, (long)"Obey UseLocks on global @Aconnect and @Adisconnect"},
     {(char *)"good_name", cf_badname, CA_GOD, CA_DISABLED, NULL, 1},
     {(char *)"gridsize_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.max_grid_size, 0},
@@ -2094,6 +2103,7 @@ CONF		conftable [] =
     {(char *)"move_match_more", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.move_match_more, (long)"Move command checks for global and zone exits,\n\t\t\t\tresolves ambiguity"},
     {(char *)"mud_name", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.mud_name, SBUF_SIZE},
     {(char *)"mud_shortname", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.mud_shortname, SBUF_SIZE},
+    {(char *)"mud_owner", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.mudowner, MBUF_SIZE},
     {(char *)"newuser_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.crea_file, MBUF_SIZE},
     {(char *)"no_ambiguous_match", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.no_ambiguous_match, (long)"Ambiguous matches resolve to the last match"},
     {(char *)"notify_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.ntfy_nest_lim, 0},
@@ -2348,9 +2358,6 @@ char *fn;
 {
     int retval;
 
-    char tmpfile[256], *c;
-
-    mudconf.config_file = XSTRDUP(fn, "cf_read.config_file");
     mudstate.initializing = 1;
     retval = cf_include(NULL, fn, 0, 0, (char *)"init");
     mudstate.initializing = 0;
@@ -2359,16 +2366,6 @@ char *fn;
      * Fill in missing DB file names
      */
 
-    strcpy(tmpfile, mudconf.gdbm);
-    if ((c = strchr(tmpfile, '.')) != NULL)
-        *c = '\0';
-
-    if (!*mudconf.crashdb)
-    {
-        XFREE(mudconf.crashdb, "cf_read_crashdb");
-        mudconf.crashdb = XSTRDUP(tprintf("%s.CRASH", tmpfile),
-                                  "cf_read_crashdb");
-    }
     return retval;
 }
 

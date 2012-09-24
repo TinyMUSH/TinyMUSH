@@ -403,7 +403,7 @@ int port;
             mudstate.dumping = 1;
             STARTLOG(LOG_DBSAVES, "DMP", "CHKPT")
             log_printf("Flatfiling: %s.#%d#",
-                       mudconf.gdbm, mudstate.epoch);
+                       mudconf.db_file, mudstate.epoch);
             ENDLOG dump_database_internal(DUMP_DB_FLATFILE);
             mudstate.dumping = 0;
 
@@ -1465,14 +1465,7 @@ int sig;
             alarm(0);
             dump_restart_db();
             execl(mudconf.exec_path, mudconf.exec_path,
-                  (char *)"-c", mudconf.config_file,
-                  (char *)"-l", mudconf.mudlogname,
-                  (char *)"-p", mudconf.pid_file,
-                  (char *)"-t", mudconf.txthome,
-                  (char *)"-b", mudconf.binhome,
-                  (char *)"-d", mudconf.dbhome,
-                  (char *)"-g", mudconf.gdbm,
-                  (char *)"-k", mudconf.crashdb, NULL);
+                  (char *)"-c", mudconf.mud_shortname, NULL);
             break;
         }
         else

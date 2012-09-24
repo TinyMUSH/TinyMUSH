@@ -1361,7 +1361,6 @@ char *fn;
 {
     FILE *f;
 
-    mudconf.pid_file = XSTRDUP(fn, "write_pidfile");
     if ((f = fopen(fn, "w")) != NULL)
     {
         fprintf(f, "%d\n", getpid());
@@ -1454,7 +1453,7 @@ int dump_type;
     switch (dump_type)
     {
     case DUMP_DB_CRASH:
-        sprintf(tmpfile, "%s/%s", mudconf.dbhome, mudconf.crashdb);
+        sprintf(tmpfile, "%s/%s.CRASH", mudconf.dbhome, mudconf.db_file);
         unlink(tmpfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL)
@@ -1503,7 +1502,7 @@ int dump_type;
          * Write the game's flatfile
          */
 
-        strcpy(prevfile, mudconf.gdbm);
+        strcpy(prevfile, mudconf.db_file);
         if ((c = strchr(prevfile, '.')) != NULL)
             *c = '\0';
         sprintf(tmpfile, "%s/%s.FLAT", mudconf.dbhome, prevfile);
@@ -1521,7 +1520,7 @@ int dump_type;
 
         break;
     case DUMP_DB_KILLED:
-        strcpy(prevfile, mudconf.gdbm);
+        strcpy(prevfile, mudconf.db_file);
         if ((c = strchr(prevfile, '.')) != NULL)
             *c = '\0';
         sprintf(tmpfile, "%s/%s.KILLED", mudconf.dbhome, prevfile);
@@ -1577,12 +1576,12 @@ NDECL(dump_database)
     mudstate.epoch++;
     mudstate.dumping = 1;
     STARTLOG(LOG_DBSAVES, "DMP", "DUMP")
-    log_printf("Dumping: %s.#%d#", mudconf.gdbm, mudstate.epoch);
+    log_printf("Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch);
     ENDLOG pcache_sync();
     SYNC;
     dump_database_internal(DUMP_DB_NORMAL);
     STARTLOG(LOG_DBSAVES, "DMP", "DONE")
-    log_printf("Dump complete: %s.#%d#", mudconf.gdbm, mudstate.epoch);
+    log_printf("Dump complete: %s.#%d#", mudconf.db_file, mudstate.epoch);
     ENDLOG mudstate.dumping = 0;
 }
 
@@ -1605,7 +1604,7 @@ int key;
     if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE))
     {
         log_printf("Checkpointing: %s.#%d#",
-                   mudconf.gdbm, mudstate.epoch);
+                   mudconf.db_file, mudstate.epoch);
     }
     ENDLOG al_store();	/* Save cached modified attribute list */
     if (!key || (key & DUMP_TEXT))
@@ -1876,9 +1875,9 @@ int key;
     else
     {
         fclose(mainlog_fp);
-        rename(mudconf.mudlogname,
-               tprintf("%s.%ld", mudconf.mudlogname, (long)mudstate.now));
-        logfile_init(mudconf.mudlogname);
+        rename(mudconf.log_file,
+               tprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
+        logfile_init(mudconf.log_file);
     }
 
     notify(player, "Logs rotated.");
@@ -2148,8 +2147,6 @@ char *argv[];
 
     char *opt_gdbmfile = (char *)DB_FILE;
 
-    char *opt_crashfile = (char *)CRASH_FILE;
-
     FILE *f;
 
     MODULE *mp;
@@ -2180,9 +2177,6 @@ char *argv[];
             break;
         case 'D':
             opt_gdbmfile = optarg;
-            break;
-        case 'r':
-            opt_crashfile = optarg;
             break;
         case 'C':
             do_check = 1;
@@ -2272,8 +2266,7 @@ char *argv[];
     pool_init(POOL_BOOL, sizeof(struct boolexp));
 
     mudconf.dbhome = XSTRDUP(opt_datadir, "argv");
-    mudconf.crashdb = XSTRDUP(opt_crashfile, "argv");
-    mudconf.gdbm = XSTRDUP(opt_gdbmfile, "argv");
+    mudconf.db_file = XSTRDUP(opt_gdbmfile, "argv");
 
     cf_init();
     mudstate.standalone = 1;
@@ -2414,22 +2407,6 @@ char *argv[];
 
     int errflg = 0;
 
-    char *opt_logfile = (char *)LOG_FILE;
-
-    char *opt_conf = (char *)CONF_FILE;
-
-    char *opt_pidfile = (char *)PID_FILE;
-
-    char *opt_bindir = (char *)BIN_DIR;
-
-    char *opt_txtdir = (char *)TXT_DIR;
-
-    char *opt_datadir = (char *)DATA_DIR;
-
-    char *opt_gdbmfile = (char *)DB_FILE;
-
-    char *opt_crashfile = (char *)CRASH_FILE;
-
     char *s;
 
     MODULE *mp;
@@ -2474,37 +2451,20 @@ char *argv[];
     /*
      * Parse options
      */
+     
+    mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
 
     while ((c = getopt(argc, argv, "c:l:p:b:t:d:g:k:s")) != -1)
     {
         switch (c)
         {
+        
         case 'c':
-            opt_conf = optarg;
-            break;
-        case 'l':
-            opt_logfile = optarg;
-            break;
-        case 'p':
-            opt_pidfile = optarg;
+            XFREE(mudconf.mud_shortname, "main_mudconf_mud_shortname");
+            mudconf.mud_shortname = XSTRDUP(optarg, "main_mudconf_mud_shortname");
             break;
         case 's':
             mindb = 1;
-            break;
-        case 'b':
-            opt_bindir = optarg;
-            break;
-        case 't':
-            opt_txtdir = optarg;
-            break;
-        case 'd':
-            opt_datadir = optarg;
-            break;
-        case 'g':
-            opt_gdbmfile = optarg;
-            break;
-        case 'k':
-            opt_crashfile = optarg;
             break;
         default:
             errflg++;
@@ -2514,12 +2474,16 @@ char *argv[];
 
     if (errflg)
     {
-        fprintf(stderr,
-                "Usage: %s [-s] [-c conf_file] [-l log_file] [-p pid_file] [-d data dir] [-g gdbm db] [-k crash db]\n",
-                argv[0]);
+        fprintf(stderr, "Usage: %s [-s] [-c mush short name]\n", argv[0]);
         exit(1);
     }
-    write_pidfile(opt_pidfile);
+
+    mudconf.db_file = XSTRDUP(tprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");
+    mudconf.config_file = XSTRDUP(tprintf("%s.conf", mudconf.mud_shortname), "main_mudconf_config_file");
+    mudconf.log_file = XSTRDUP(tprintf("%s.log", mudconf.mud_shortname), "main_mudconf_log_file");
+    mudconf.pid_file = XSTRDUP(tprintf("%s.pid", mudconf.mud_shortname), "main_mudconf_pidfile");
+    
+    write_pidfile(mudconf.pid_file);
 
     /*
      * Abort if someone tried to set the number of global registers to
@@ -2539,7 +2503,7 @@ char *argv[];
             qidx_chartab[122 - i] = -1;
         }
     }
-    logfile_init(opt_logfile);
+    logfile_init(mudconf.log_file);
     tf_init();
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
@@ -2555,18 +2519,6 @@ char *argv[];
     pool_init(POOL_QENTRY, sizeof(BQUE));
     tcache_init();
     pcache_init();
-
-    /*
-     * Initialize directories, crashdb and gdbm with values from the
-     * command line. We do it here so the config file can still override
-     * the command line for backward compatibility.
-     */
-
-    mudconf.dbhome = XSTRDUP(opt_datadir, "argv");
-    mudconf.crashdb = XSTRDUP(opt_crashfile, "argv");
-    mudconf.gdbm = XSTRDUP(opt_gdbmfile, "argv");
-    mudconf.txthome = XSTRDUP(opt_txtdir, "argv");
-    mudconf.binhome = XSTRDUP(opt_bindir, "argv");
 
     cf_init();
 
@@ -2595,6 +2547,8 @@ char *argv[];
     hashinit(&mudstate.instdata_htab, 25 * HASH_FACTOR, HT_STR);
     hashinit(&mudstate.api_func_htab, 5 * HASH_FACTOR, HT_STR);
 
+    cf_read(mudconf.config_file);
+
     s = (char *)XMALLOC(MBUF_SIZE, "main_add_helpfile");
 
     sprintf(s, "help %s/help", mudconf.txthome);
@@ -2615,8 +2569,6 @@ char *argv[];
 
     vattr_init();
 
-    cf_read(opt_conf);
-
     bp = mudstate.modloaded;
     WALK_ALL_MODULES(mp)
     {
@@ -2628,18 +2580,17 @@ char *argv[];
     }
 
     mudconf.exec_path = XSTRDUP(argv[0], "argv");
-    mudconf.mudlogname = XSTRDUP(opt_logfile, "argv");
 
     fcache_init();
     helpindex_init();
 
     if (mindb)
-        unlink(mudconf.gdbm);
-    if (init_gdbm_db(mudconf.gdbm) < 0)
+        unlink(mudconf.db_file);
+    if (init_gdbm_db(mudconf.db_file) < 0)
     {
         STARTLOG(LOG_ALWAYS, "INI", "LOAD")
         log_printf("Couldn't load text database: %s",
-                   mudconf.gdbm);
+                   mudconf.db_file);
         ENDLOG exit(2);
     }
     mudstate.record_players = 0;

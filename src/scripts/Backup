@@ -8,6 +8,15 @@
 PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin:.; export PATH
 LTDL_LIBRARY_PATH=./lib:./bin:.:../src:../src/lib:../src/.libs:./lib/.libs; export LTDL_LIBRARY_PATH
 #
+#       If we get a parameter, it's the name of
+#       our config file. Else, we use the default one.
+#
+if [ -z "$1" ]; then
+        GAMENAME=netmush
+else
+	GAMENAME=$1
+fi
+#
 . mush.config
 . check_paths
 #
@@ -29,15 +38,15 @@ fi
 #
 DBDATE=`date +%m%d-%H%M`
 #
-OUTFILE=$BACKUP_DIR/$GAMENAME.$DBDATE
+OUTFILE=$BACKUP/$GAMENAME.$DBDATE
 #
-if [ -r $DATA/$GDBM_DB ]; then
+if [ -r $DATA/$DBM_DB ]; then
     if [ "$1" = "-f" ]; then
 	echo "Creating flatfile $OUTFILE.$ZEXT"
-	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB | $ZIP -c > $OUTFILE.$ZEXT
+	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$DBM_DB | $ZIP -c > $OUTFILE.$ZEXT
     else
 	echo "Creating flatfile $OUTFILE"
-	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB > $OUTFILE
+	$BIN/dbconvert -c $GAMENAME.conf -x $DATA/$DBM_DB > $OUTFILE
 	echo "Creating database archive $OUTFILE.tar.$ZEXT"
 	tar -cvhf - $OUTFILE $DATA/mod_*.db | $ZIP -c > $OUTFILE.tar.$ZEXT
 	rm $OUTFILE

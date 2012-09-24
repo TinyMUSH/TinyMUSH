@@ -10,8 +10,16 @@
 #		-o	If the MUSH is running, this also deletes the 
 #			<filename>.old logs.
 #		-a	Gets rid of all logs. MUSH cannot be running.
-
 PATH=/usr/ucb:/bin:/usr/bin:.; export PATH
+#
+#       If we get a parameter, it's the name of
+#       our config file. Else, we use the default one.
+#
+if [ -z "$1" ]; then
+        GAMENAME=netmush
+else
+	GAMENAME=$1
+fi
 #
 . mush.config
 . check_paths

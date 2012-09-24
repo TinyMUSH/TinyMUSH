@@ -11,6 +11,15 @@
 PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin:.; export PATH
 LTDL_LIBRARY_PATH=./lib:./bin:.:../src:../src/lib:../src/.libs:./lib/.libs; export LTDL_LIBRARY_PATH
 #
+#       If we get a parameter, it's the name of
+#       our config file. Else, we use the default one.
+#
+if [ -z "$1" ]; then
+        GAMENAME=netmush
+else
+	GAMENAME=$1
+fi
+#
 . mush.config
 . check_paths
 #
@@ -33,12 +42,12 @@ fi
 DBDATE=`date +%m%d-%H%M`
 FLATFILE=$GAMENAME.flat.$DBDATE
 #
-OUTFILE=$BACKUP_DIR/$GAMENAME-archive.$DBDATE.tar.$ZEXT
+OUTFILE=$BACKUP/$GAMENAME-archive.$DBDATE.tar.$ZEXT
 #
 #	Make a flatfile.
 #
-if [ -r $DATA/$GDBM_DB ]; then
-    $BIN/dbconvert -c $GAMENAME.conf -x $DATA/$GDBM_DB > $FLATFILE
+if [ -r $DATA/$DBM_DB ]; then
+    $BIN/dbconvert -c $GAMENAME.conf -x $DATA/$DBM_DB > $FLATFILE
 else
     echo "No db. Backup attempt failed."
     exit 1

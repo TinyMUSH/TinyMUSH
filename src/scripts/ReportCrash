@@ -5,6 +5,16 @@
 #	ReportCrash - Examine a coredump to produce information for a
 #		      bug report, and try to mail the bug report.
 #
+#
+#       If we get a parameter, it's the name of
+#       our config file. Else, we use the default one.
+#
+if [ -z "$1" ]; then
+        GAMENAME=netmush
+else
+	GAMENAME=$1
+fi
+#
 . mush.config
 . check_paths
 

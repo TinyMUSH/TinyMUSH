@@ -2038,7 +2038,7 @@ int wrflag;
 
     FILE *f = NULL;
 
-    sprintf(filename, "%s/mod_%s.db", mudconf.dbhome, modname);
+    sprintf(filename, "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, modname);
 
     if (wrflag)
     {

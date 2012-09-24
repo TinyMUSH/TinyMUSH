@@ -18,7 +18,7 @@ if [ -z "$DATA" -o ! -d "$DATA" -o ! -w "$DATA" ]; then
 	echo "Error: Invalid DATA directory in mush.config"
 	exit 1
 fi
-if [ -z "$BACKUP_DIR" -o ! -d "$BACKUP_DIR" -o ! -w "$BACKUP_DIR" ]; then
+if [ -z "$BACKUP" -o ! -d "$BACKUP" -o ! -w "$BACKUP" ]; then
 	echo "Warning: Invalid BACKUP_DIR in mush.config; using . instead"
 	BACKUP_DIR=.
 fi

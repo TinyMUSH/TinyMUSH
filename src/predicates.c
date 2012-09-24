@@ -1896,8 +1896,8 @@ int key;
     if (mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
-        rename(mudconf.mudlogname,
-               tprintf("%s.%ld", mudconf.mudlogname, (long)mudstate.now));
+        rename(mudconf.log_file,
+               tprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
     }
 
     alarm(0);
@@ -1909,13 +1909,7 @@ int key;
     }
 
     execl(mudconf.exec_path, mudconf.exec_path,
-          (char *)"-c", mudconf.config_file,
-          (char *)"-l", mudconf.mudlogname,
-          (char *)"-p", mudconf.pid_file,
-          (char *)"-t", mudconf.txthome,
-          (char *)"-b", mudconf.binhome,
-          (char *)"-d", mudconf.dbhome,
-          (char *)"-g", mudconf.gdbm, (char *)"-k", mudconf.crashdb, NULL);
+          (char *)"-c", mudconf.mud_shortname, NULL);
 }
 
 /* ---------------------------------------------------------------------------

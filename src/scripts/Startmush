@@ -12,9 +12,10 @@ LTDL_LIBRARY_PATH=./lib:./bin:.:../src:../src/lib:../src/.libs:./lib/.libs; expo
 #	If we get a 2nd parameter, it's the name of
 #	our config file. Else, we use the default one.
 #
-config=$2
-if [ -z "$config" ]; then
-	config=mush
+if [ -z "$2" ]; then
+	GAMENAME=netmush
+else
+	GAMENAME=$2
 fi
 
 #
@@ -29,11 +30,11 @@ fi
 #
 #	Read our configuration file.
 #
-if [ -r "$config.config" ]; then
-	. $config.config
+if [ -r "$GAMENAME.conf" ]; then
+	. mush.config
 	. check_paths
 else
-	echo "'$config.config' not found."
+	echo "'$GAMENAME.conf' not found."
 	exit 1
 fi
 
@@ -131,7 +132,7 @@ echo "Checking for database files and creating backups of old files."
 #
 #	Refuse to start if the last line of the logfile is a GDBM panic.
 #
-if [ -r $DATA/$GDBM_DB ]; then
+if [ -r $DATA/$DBM_DB ]; then
     end="`tail -1 $LOGNAME`"
     if [ "$end" = "GDBM panic: write error" ]; then
 	echo "Your log file indicates that the MUSH went down on a GDBM panic"
@@ -176,7 +177,7 @@ if [ -r $DATA/$INPUT_DB.KILLED ]; then
 	DBDATE=`date +%m%d-%H%M`
 	end="`tail -1 $DATA/$INPUT_DB.KILLED`"
 	if [ "$end" = "***END OF DUMP***" ]; then
-		NEWFILE=$BACKUP_DIR/$GAMENAME.$DBDATE
+		NEWFILE=$BACKUP/$GAMENAME.$DBDATE
 		mv $DATA/$INPUT_DB.KILLED $NEWFILE
 		echo "A non-corrupt $INPUT_DB.KILLED file was present."
 		echo "This means that a flatfile was successfully saved after the reception"
@@ -186,7 +187,7 @@ if [ -r $DATA/$INPUT_DB.KILLED ]; then
 		echo "If this restoration is successful, you can then type ./Startmush again."
 		exit 1
 	else
-		NEWFILE=$BACKUP_DIR/$GAMENAME.$DBDATE.CORRUPT
+		NEWFILE=$BACKUP/$GAMENAME.$DBDATE.CORRUPT
 		mv $DATA/$INPUT_DB.KILLED $NEWFILE
 		echo "A corrupt $INPUT_DB.KILLED file was present."
 		echo "This means that there was an unsuccessful attempt to save a flatfile"
@@ -222,7 +223,7 @@ if [ -r $DATA/$CRASH_DB ]; then
 		exit 1
 	else
 		DBDATE=`date +%m%d-%H%M`
-		NEWFILE=$BACKUP_DIR/$GAMENAME.$DBDATE.CORRUPT
+		NEWFILE=$BACKUP/$GAMENAME.$DBDATE.CORRUPT
 		mv -f $DATA/$CRASH_DB $NEWFILE 
 		echo "A corrupt $CRASH_DB file is present."
 		echo "This indicates an unsuccessful flatfile save during a panic-restart."
@@ -245,7 +246,7 @@ make_db=""
 #	If we have a good checkpoint database, make it the input database.
 #	If not, use the backup of the input database.
 #
-if [ ! -r $DATA/$GDBM_DB ]; then
+if [ ! -r $DATA/$DBM_DB ]; then
 	echo "No recent db. Will initialize new database."
 	make_db="-s"
 fi
@@ -257,4 +258,6 @@ fi
 #	Kick off MUSH
 #
 touch $LOGNAME
-$BIN/netmush $make_db -c $GAMENAME.conf -l $LOGNAME -p $PIDFILE -t $TEXT -b $BIN -d $DATA -g $GDBM_DB -k $CRASH_DB &
+echo $BIN/netmush $make_db -c $GAMENAME.conf -l $LOGNAME -p $PIDFILE -t $TEXT -b $BIN -d $DATA -g $DBM_DB -k $CRASH_DB &
+$BIN/netmush $make_db -c $GAMENAME &
+

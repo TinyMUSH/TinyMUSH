@@ -186,13 +186,15 @@ struct confdata
     int	dbopt_interval; /* Optimize db every N dumps */
     char	*dbhome;	/* Database home directory */
     char	*txthome;	/* Text files home directory */
-    char	*binhome;	/* Binary home */
-    char	*config_file;	/* name of config file, used by @restart */
-    char	*crashdb;	/* write database here on crash */
-    char	*gdbm;		/* use this gdbm file if we need one */
+    char	*binhome;	/* Binary home directory */
+    char	*bakhome;	/* Backup home directory */
     char	*status_file;	/* Where to write arg to @shutdown */
-    char	*mudlogname;	/* Name of the game log file */
-    char	*pid_file;	/* Name of the game pid file */
+    char 	*config_file;	/* MUSH's config file */
+    char 	*log_file;	/* MUSH's log file */
+    char 	*pid_file;	/* MUSH's pid file */
+    char 	*db_file;	/* MUSH's db file */
+    char	*compressexe;	/* Executable run to compress file */
+    char	*mudowner;	/* Email of the game owner */
     int	have_pueblo;	/* Is Pueblo support compiled in? */
     int	have_zones;	/* Should zones be active? */
     int	port;		/* user port */
