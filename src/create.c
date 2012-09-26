@@ -21,26 +21,22 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-extern dbref FDECL(match_controlled_quiet, (dbref, const char *));
+extern dbref match_controlled_quiet(dbref, const char *);
 
-extern dbref FDECL(clone_home, (dbref, dbref));
+extern dbref clone_home(dbref, dbref);
 
-extern int FDECL(can_set_home, (dbref, dbref, dbref));
+extern int can_set_home(dbref, dbref, dbref);
 
 extern CONF conftable[];
 
-extern CF_HDCL(cf_dbref);
+extern int cf_dbref(int *, char *, long, dbref, char *);
 
 /*
  * ---------------------------------------------------------------------------
  * parse_linkable_room: Get a location to link to.
  */
 
-static dbref
-parse_linkable_room(player, room_name)
-dbref player;
-
-char *room_name;
+static dbref parse_linkable_room(dbref player, char *room_name)
 {
     dbref room;
 
@@ -80,11 +76,7 @@ char *room_name;
  * open_exit, do_open: Open a new exit and optionally link it somewhere.
  */
 
-static void
-open_exit(player, loc, direction, linkto)
-dbref player, loc;
-
-char *direction, *linkto;
+static void open_exit(dbref player, dbref loc, char *direction, char *linkto)
 {
     dbref exit;
 
@@ -159,13 +151,7 @@ char *direction, *linkto;
     }
 }
 
-void
-do_open(player, cause, key, direction, links, nlinks)
-dbref player, cause;
-
-int key, nlinks;
-
-char *direction, *links[];
+void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
 {
     dbref loc, destnum;
 
@@ -208,9 +194,7 @@ char *direction, *links[];
  * home(player,thing)
  */
 
-void
-link_exit(player, exit, dest)
-dbref player, exit, dest;
+void link_exit(dbref player, dbref exit, dbref dest)
 {
     int cost, quot;
 
@@ -276,14 +260,7 @@ dbref player, exit, dest;
     s_Modified(exit);
 }
 
-void
-do_link(player, cause, key, what, where)
-dbref player, cause;
-
-int key;
-
-char *what, *where;
-{
+void do_link(dbref player, dbref cause, int key, char *what, char *where) {
     dbref thing, room;
 
     /*
@@ -419,14 +396,7 @@ char *what, *where;
  * do_parent: Set an object's parent field.
  */
 
-void
-do_parent(player, cause, key, tname, pname)
-dbref player, cause;
-
-int key;
-
-char *tname, *pname;
-{
+void do_parent(dbref player, dbref cause, int key, char *tname, char *pname) {
     dbref thing, parent, curr;
 
     int lev;
@@ -506,13 +476,7 @@ char *tname, *pname;
  * do_dig: Create a new room.
  */
 
-void
-do_dig(player, cause, key, name, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *name, *args[];
+void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs)
 {
     dbref room;
 
@@ -554,13 +518,7 @@ char *name, *args[];
  * do_create: Make a new object.
  */
 
-void
-do_create(player, cause, key, name, coststr)
-dbref player, cause;
-
-int key;
-
-char *name, *coststr;
+void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
 {
     dbref thing;
 
@@ -597,13 +555,7 @@ char *name, *coststr;
  * do_clone: Create a copy of an object.
  */
 
-void
-do_clone(player, cause, key, name, arg2)
-dbref player, cause;
-
-int key;
-
-char *name, *arg2;
+void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 {
     dbref clone, thing, new_owner, loc;
 
@@ -856,13 +808,7 @@ char *name, *arg2;
  * do_pcreate: Create new players and robots.
  */
 
-void
-do_pcreate(player, cause, key, name, pass)
-dbref player, cause;
-
-int key;
-
-char *name, *pass;
+void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
 {
     int isrobot;
 
@@ -914,9 +860,7 @@ char *name, *pass;
  * can_destroy_exit, can_destroy_player, do_destroy: Destroy things.
  */
 
-static int
-can_destroy_exit(player, exit)
-dbref player, exit;
+static int can_destroy_exit(dbref player, dbref exit)
 {
     dbref loc;
 
@@ -938,9 +882,7 @@ dbref player, exit;
  * the database.
  */
 
-int
-destroyable(victim)
-dbref victim;
+int destroyable(dbref victim)
 {
     CONF *tp, *ctab;
 
@@ -974,9 +916,7 @@ dbref victim;
 }
 
 
-static int
-can_destroy_player(player, victim)
-dbref player, victim;
+static int can_destroy_player(dbref player, dbref victim)
 {
     if (!Wizard(player))
     {
@@ -991,13 +931,7 @@ dbref player, victim;
     return 1;
 }
 
-void
-do_destroy(player, cause, key, what)
-dbref player, cause;
-
-int key;
-
-char *what;
+void do_destroy(dbref player, dbref cause, int key, char *what)
 {
     dbref thing;
 

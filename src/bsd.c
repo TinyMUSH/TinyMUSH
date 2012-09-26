@@ -26,7 +26,7 @@ extern const int _sys_nsig;
 #define NSIG _sys_nsig
 #endif
 
-extern void NDECL(dispatch);
+extern void dispatch(void);
 
 int sock;
 
@@ -40,13 +40,13 @@ volatile pid_t slave_pid = 0;
 
 volatile int slave_socket = -1;
 
-DESC *FDECL(initializesock, (int, struct sockaddr_in *));
+DESC *initializesock(int, struct sockaddr_in *);
 
-DESC *FDECL(new_connection, (int));
+DESC *new_connection(int);
 
-int FDECL(process_output, (DESC *));
+int process_output(DESC *);
 
-int FDECL(process_input, (DESC *));
+int process_input(DESC *);
 
 /*
  * Some systems are lame, and inet_addr() returns -1 on failure, despite the
@@ -76,9 +76,7 @@ int FDECL(process_input, (DESC *));
 	} \
 	++(x)
 
-static int
-get_slave_result()
-{
+static int get_slave_result(void) {
     char *buf, *host1, *hostname, *host2, *p, *userid;
 
     int remote_port, len;
@@ -233,9 +231,7 @@ gsr_end:
     return 0;
 }
 
-void
-boot_slave()
-{
+void boot_slave(void) {
     int sv[2];
 
     int i;
@@ -319,10 +315,7 @@ boot_slave()
     ENDLOG
 }
 
-int
-make_socket(port)
-int port;
-{
+int make_socket(int port) {
     int s, opt;
 
     struct sockaddr_in server;
@@ -353,10 +346,7 @@ int port;
     return s;
 }
 
-void
-shovechars(port)
-int port;
-{
+void shovechars(int port) {
     fd_set input_set, output_set;
 
     struct timeval last_slice, current_time, next_slice, timeout,
@@ -630,10 +620,7 @@ int port;
 }
 
 #ifdef BROKEN_GCC_PADDING
-char *
-inet_ntoa(in)
-struct in_addr in;
-{
+char *inet_ntoa(struct in_addr in) {
     /*
      * gcc 2.8.1 does not correctly pass/return structures which are
      * smaller than 16 bytes, but are not 8 bytes. Structures get padded
@@ -656,10 +643,7 @@ struct in_addr in;
 
 #endif				/* BROKEN_GCC_PADDING */
 
-DESC *
-new_connection(sock)
-int sock;
-{
+DESC *new_connection(int sock) {
     int newsock;
 
     char *buff, *cmdsave;
@@ -771,12 +755,7 @@ const char *conn_messages[] =
     "logout"
 };
 
-void
-shutdownsock(d, reason)
-DESC *d;
-
-int reason;
-{
+void shutdownsock(DESC *d, int reason) {
     char *buff2;
 
     time_t now;
@@ -914,10 +893,7 @@ int reason;
     }
 }
 
-void
-make_nonblocking(s)
-int s;
-{
+void make_nonblocking(int s) {
 #ifdef HAVE_LINGER
     struct linger ling;
 
@@ -945,12 +921,7 @@ int s;
 #endif
 }
 
-DESC *
-initializesock(s, a)
-int s;
-
-struct sockaddr_in *a;
-{
+DESC *initializesock(int s, struct sockaddr_in *a) {
     DESC *d;
 
     if (s == slave_socket)
@@ -1011,10 +982,7 @@ struct sockaddr_in *a;
     return d;
 }
 
-int
-process_output(d)
-DESC *d;
-{
+int process_output(DESC *d) {
     TBLOCK *tb, *save;
 
     int cnt;
@@ -1055,10 +1023,7 @@ DESC *d;
     return 1;
 }
 
-int
-process_input(d)
-DESC *d;
-{
+int process_input(DESC *d) {
     char *buf;
 
     int got, in, lost;
@@ -1150,12 +1115,7 @@ DESC *d;
     return 1;
 }
 
-void
-close_sockets(emergency, message)
-int emergency;
-
-char *message;
-{
+void close_sockets(int emergency, char *message) {
     DESC *d, *dnext;
 
     DESC_SAFEITER_ALL(d, dnext)
@@ -1178,9 +1138,7 @@ char *message;
     close(sock);
 }
 
-void
-NDECL(emergency_shutdown)
-{
+void emergency_shutdown(void) {
     close_sockets(1, (char *)"Going down - Bye");
 }
 
@@ -1189,9 +1147,7 @@ NDECL(emergency_shutdown)
  * Print out stuff into error file.
  */
 
-void
-NDECL(report)
-{
+void report(void) {
     STARTLOG(LOG_BUGS, "BUG", "INFO")
     log_printf("Command: '%s'", mudstate.debug_cmd);
     ENDLOG if (Good_obj(mudstate.curr_player))
@@ -1218,7 +1174,7 @@ NDECL(report)
 #define SIGCHLD SIGCLD
 #endif
 
-static RETSIGTYPE FDECL(sighandler, (int));
+static RETSIGTYPE sighandler(int);
 
 /* *INDENT-OFF* */
 
@@ -1231,9 +1187,7 @@ NAMETAB		sigactions_nametab[] =
 
 /* *INDENT-ON* */
 
-void
-NDECL(set_signals)
-{
+void set_signals(void) {
     sigset_t sigs;
 
     /*
@@ -1279,19 +1233,14 @@ NDECL(set_signals)
 
 }
 
-static void
-unset_signals()
-{
+static void unset_signals(void) {
     int i;
 
     for (i = 0; i < NSIG; i++)
         signal(i, SIG_DFL);
 }
 
-static void
-check_panicking(sig)
-int sig;
-{
+static void check_panicking(int sig) {
     int i;
 
     /*
@@ -1307,19 +1256,13 @@ int sig;
     mudstate.panicking = 1;
 }
 
-void
-log_signal(signame)
-const char *signame;
-{
+void log_signal(const char *signame) {
     STARTLOG(LOG_PROBLEMS, "SIG", "CATCH")
     log_printf("Caught signal %s", signame);
     ENDLOG
 }
 
-static RETSIGTYPE
-sighandler(sig)
-int sig;
-{
+static RETSIGTYPE sighandler(int sig) {
 #ifdef HAVE_SYS_SIGNAME
 #define signames sys_signame
 #else

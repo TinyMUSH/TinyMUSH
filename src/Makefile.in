@@ -167,23 +167,22 @@ am_mkindx_OBJECTS = mkindx.$(OBJEXT)
 mkindx_OBJECTS = $(am_mkindx_OBJECTS)
 mkindx_LDADD = $(LDADD)
 am_netmush_OBJECTS = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
-	bsd.$(OBJEXT) command.$(OBJEXT) compat.$(OBJEXT) \
-	conf.$(OBJEXT) cque.$(OBJEXT) create.$(OBJEXT) db.$(OBJEXT) \
-	db_rw.$(OBJEXT) eval.$(OBJEXT) file_c.$(OBJEXT) \
-	flags.$(OBJEXT) fnhelper.$(OBJEXT) functions.$(OBJEXT) \
-	funext.$(OBJEXT) funiter.$(OBJEXT) funlist.$(OBJEXT) \
-	funmath.$(OBJEXT) funmisc.$(OBJEXT) funobj.$(OBJEXT) \
-	funstring.$(OBJEXT) funvars.$(OBJEXT) game.$(OBJEXT) \
-	help.$(OBJEXT) htab.$(OBJEXT) log.$(OBJEXT) look.$(OBJEXT) \
-	match.$(OBJEXT) mguests.$(OBJEXT) move.$(OBJEXT) \
-	netcommon.$(OBJEXT) object.$(OBJEXT) pcre.$(OBJEXT) \
-	player.$(OBJEXT) player_c.$(OBJEXT) powers.$(OBJEXT) \
-	predicates.$(OBJEXT) quota.$(OBJEXT) rob.$(OBJEXT) \
-	set.$(OBJEXT) speech.$(OBJEXT) stringutil.$(OBJEXT) \
-	timer.$(OBJEXT) udb_ocache.$(OBJEXT) udb_ochunk.$(OBJEXT) \
-	udb_obj.$(OBJEXT) udb_misc.$(OBJEXT) unparse.$(OBJEXT) \
-	vattr.$(OBJEXT) version.$(OBJEXT) walkdb.$(OBJEXT) \
-	wild.$(OBJEXT) wiz.$(OBJEXT)
+	bsd.$(OBJEXT) command.$(OBJEXT) conf.$(OBJEXT) cque.$(OBJEXT) \
+	create.$(OBJEXT) db.$(OBJEXT) db_rw.$(OBJEXT) eval.$(OBJEXT) \
+	file_c.$(OBJEXT) flags.$(OBJEXT) fnhelper.$(OBJEXT) \
+	functions.$(OBJEXT) funext.$(OBJEXT) funiter.$(OBJEXT) \
+	funlist.$(OBJEXT) funmath.$(OBJEXT) funmisc.$(OBJEXT) \
+	funobj.$(OBJEXT) funstring.$(OBJEXT) funvars.$(OBJEXT) \
+	game.$(OBJEXT) help.$(OBJEXT) htab.$(OBJEXT) log.$(OBJEXT) \
+	look.$(OBJEXT) match.$(OBJEXT) mguests.$(OBJEXT) \
+	move.$(OBJEXT) netcommon.$(OBJEXT) object.$(OBJEXT) \
+	pcre.$(OBJEXT) player.$(OBJEXT) player_c.$(OBJEXT) \
+	powers.$(OBJEXT) predicates.$(OBJEXT) quota.$(OBJEXT) \
+	rob.$(OBJEXT) set.$(OBJEXT) speech.$(OBJEXT) \
+	stringutil.$(OBJEXT) timer.$(OBJEXT) udb_ocache.$(OBJEXT) \
+	udb_ochunk.$(OBJEXT) udb_obj.$(OBJEXT) udb_misc.$(OBJEXT) \
+	unparse.$(OBJEXT) vattr.$(OBJEXT) version.$(OBJEXT) \
+	walkdb.$(OBJEXT) wild.$(OBJEXT) wiz.$(OBJEXT)
 netmush_OBJECTS = $(am_netmush_OBJECTS)
 am__DEPENDENCIES_1 =
 netmush_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -1425,7 +1424,7 @@ SCRIPT_DAT = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cv
 
 EXTRA_DIST = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
 CLEANFILES = version.h buildnum.data
-netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c \
+netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
 	funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c \
 	funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c \
@@ -1578,7 +1577,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boolexp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cque.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/create.Po@am__quote@

@@ -25,7 +25,7 @@ CLEANFILES   = version.h buildnum.data
 
 bin_PROGRAMS = netmush mkindx slave
 
-netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c compat.c conf.c cque.c \
+netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
 	funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c \
 	funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c \

@@ -31,12 +31,7 @@ extern CMDENT *prefix_cmds[256];
  * Exporting a module's own API.
  */
 
-void
-register_api(module_name, api_name, ftable)
-char *module_name, *api_name;
-
-API_FUNCTION *ftable;
-{
+void register_api(char *module_name, char *api_name, API_FUNCTION *ftable) {
     MODULE *mp;
 
     API_FUNCTION *afp;
@@ -70,10 +65,7 @@ API_FUNCTION *ftable;
     }
 }
 
-void *
-request_api_function(api_name, fn_name)
-char *api_name, *fn_name;
-{
+void *request_api_function(char *api_name, char *fn_name) {
     API_FUNCTION *afp;
 
     afp = (API_FUNCTION *) hashfind(tprintf("%s_%s", api_name, fn_name),
@@ -88,10 +80,7 @@ char *api_name, *fn_name;
  * Handle tables.
  */
 
-void
-register_commands(cmdtab)
-CMDENT *cmdtab;
-{
+void register_commands(CMDENT *cmdtab) {
     CMDENT *cp;
 
     if (cmdtab)
@@ -106,10 +95,7 @@ CMDENT *cmdtab;
     }
 }
 
-void
-register_prefix_cmds(cmdchars)
-const char *cmdchars;
-{
+void register_prefix_cmds(const char *cmdchars) {
     const char *cp;
 
     char cn[2] = "x";
@@ -125,10 +111,7 @@ const char *cmdchars;
     }
 }
 
-void
-register_functions(functab)
-FUN *functab;
-{
+void register_functions(FUN *functab) {
     FUN *fp;
 
     if (functab)
@@ -141,12 +124,7 @@ FUN *functab;
     }
 }
 
-void
-register_hashtables(htab, ntab)
-MODHASHES *htab;
-
-MODNHASHES *ntab;
-{
+void register_hashtables(MODHASHES *htab, MODNHASHES *ntab) {
     MODHASHES *hp;
 
     MODNHASHES *np;
@@ -173,10 +151,7 @@ MODNHASHES *ntab;
  * Deal with additional database info.
  */
 
-unsigned int
-register_dbtype(modname)
-char *modname;
-{
+unsigned int register_dbtype(char *modname) {
     unsigned int type;
 
     DBData key, data;

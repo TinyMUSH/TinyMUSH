@@ -62,8 +62,7 @@ extern LOGFILETAB logfds_table[];
  * cf_init: Initialize mudconf to default values.
  */
 
-void
-NDECL(cf_init)
+void cf_init(void)
 {
     char *s;
 
@@ -444,13 +443,7 @@ NDECL(cf_init)
  * cf_log_notfound: Log a 'parameter not found' error.
  */
 
-void
-cf_log_notfound(player, cmd, thingname, thing)
-dbref player;
-
-char *cmd, *thing;
-
-const char *thingname;
+void cf_log_notfound(dbref player, char *cmd, const char *thingname, char *thing)
 {
     if (mudstate.initializing)
     {
@@ -469,29 +462,11 @@ const char *thingname;
  * cf_log_syntax: Log a syntax error.
  */
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void
-cf_log_syntax(dbref player, char *cmd, const char *template, ...)
-#else
-void
-cf_log_syntax(va_alist)
-va_dcl
-#endif
+void cf_log_syntax(dbref player, char *cmd, const char *template, ...)
 {
     va_list ap;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, template);
-#else
-    dbref player;
-
-    char *cmd, *template;
-
-    player = va_arg(ap, dbref);
-    cmd = va_arg(ap, char *);
-
-    template = va_arg(ap, char *);
-#endif
 
     if (mudstate.initializing)
     {
@@ -512,14 +487,7 @@ va_dcl
  * cf_status_from_succfail: Return command status from succ and fail info
  */
 
-int
-cf_status_from_succfail(player, cmd, success, failure)
-dbref player;
-
-char *cmd;
-
-int success, failure;
-{
+int cf_status_from_succfail(dbref player, char *cmd, int success, int failure) {
     /*
      * If any successes, return SUCCESS(0) if no failures or
      * PARTIAL_SUCCESS(1) if any failures.
@@ -554,8 +522,7 @@ int success, failure;
  * cf_const: Read-only integer or boolean parameter.
  */
 
-CF_HAND(cf_const)
-{
+int cf_const(int *vp, char *str, long extra, dbref player, char *cmd) {
     /*
      * Fail on any attempt to change the value
      */
@@ -568,8 +535,7 @@ CF_HAND(cf_const)
  * cf_int: Set integer parameter.
  */
 
-CF_HAND(cf_int)
-{
+int cf_int(int *vp, char *str, long extra, dbref player, char *cmd) {
     /*
      * Copy the numeric value to the parameter
      */
@@ -589,8 +555,7 @@ CF_HAND(cf_int)
  * cannot be set to 0)
  */
 
-CF_HAND(cf_int_factor)
-{
+int cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd) {
     int num;
 
     /*
@@ -619,8 +584,7 @@ CF_HAND(cf_int_factor)
  * cf_dbref: Set dbref parameter.
  */
 
-CF_HAND(cf_dbref)
-{
+int cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd) {
     int num;
 
     /*
@@ -680,8 +644,7 @@ CF_HAND(cf_dbref)
  * startup.
  */
 
-CF_HAND(cf_module)
-{
+int cf_module(int *vp, char *str, long extra, dbref player, char *cmd) {
     lt_dlhandle handle;
 
     void (*initptr) (void);
@@ -770,8 +733,7 @@ NAMETAB		bool_names[] =
 /* *INDENT-ON* */
 
 
-CF_HAND(cf_bool)
-{
+int cf_bool(int *vp, char *str, long extra, dbref player, char *cmd) {
     *vp = (int)search_nametab(GOD, bool_names, str);
     if (*vp < 0)
         *vp = (long)0;
@@ -783,8 +745,7 @@ CF_HAND(cf_bool)
  * cf_option: Select one option from many choices.
  */
 
-CF_HAND(cf_option)
-{
+int cf_option(int *vp, char *str, long extra, dbref player, char *cmd) {
     int i;
 
     i = search_nametab(GOD, (NAMETAB *) extra, str);
@@ -802,8 +763,7 @@ CF_HAND(cf_option)
  * cf_string: Set string parameter.
  */
 
-CF_HAND(cf_string)
-{
+int cf_string(int *vp, char *str, long extra, dbref player, char *cmd) {
     int retval;
 
     /*
@@ -836,8 +796,7 @@ CF_HAND(cf_string)
  * cf_alias: define a generic hash table alias.
  */
 
-CF_HAND(cf_alias)
-{
+int cf_alias(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *alias, *orig, *p, *tokst;
 
     int *cp, upcase;
@@ -896,8 +855,7 @@ CF_HAND(cf_alias)
  * cf_infotext: Add an arbitrary field to INFO output.
  */
 
-CF_HAND(cf_infotext)
-{
+int cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *fname, *fvalue, *tokst;
 
     LINKEDLIST *itp, *prev;
@@ -978,8 +936,7 @@ CF_HAND(cf_infotext)
  * cf_divert_log: Redirect a log type.
  */
 
-CF_HAND(cf_divert_log)
-{
+int cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *type_str, *file_str, *tokst;
 
     int f, fd;
@@ -1097,8 +1054,7 @@ CF_HAND(cf_divert_log)
  * cf_modify_bits: set or clear bits in a flag word from a namelist.
  */
 
-CF_HAND(cf_modify_bits)
-{
+int cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *sp, *tokst;
 
     int f, negate, success, failure;
@@ -1159,16 +1115,7 @@ static NAMEDFUNC **all_named_funcs = NULL;
 
 static int num_named_funcs = 0;
 
-static int
-modify_xfuncs(fn_name, fn_ptr, xfuncs, negate)
-char *fn_name;
-
-int (*fn_ptr) (dbref);
-
-EXTFUNCS **xfuncs;
-
-int negate;		/* 0 - normal, 1 - remove */
-{
+static int modify_xfuncs(char *fn_name, int (*fn_ptr) (dbref), EXTFUNCS **xfuncs, int negate) {
     EXTFUNCS *xfp;
 
     NAMEDFUNC *np, **tp;
@@ -1284,20 +1231,7 @@ int negate;		/* 0 - normal, 1 - remove */
  * parse_ext_access: Parse an extended access list with module callouts.
  */
 
-int
-parse_ext_access(perms, xperms, str, ntab, player, cmd)
-int *perms;
-
-EXTFUNCS **xperms;
-
-char *str;
-
-NAMETAB *ntab;
-
-dbref player;
-
-char *cmd;
-{
+int parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd) {
     char *sp, *tokst, *cp, *ostr;
 
     int f, negate, success, failure, got_one;
@@ -1427,8 +1361,7 @@ char *cmd;
  * cf_set_flags: Clear flag word and then set from a flags htab.
  */
 
-CF_HAND(cf_set_flags)
-{
+int cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *sp, *tokst;
 
     FLAGENT *fp;
@@ -1501,8 +1434,7 @@ CF_HAND(cf_set_flags)
  * cf_badname: Disallow use of player name/alias.
  */
 
-CF_HAND(cf_badname)
-{
+int cf_badname(int *vp, char *str, long extra, dbref player, char *cmd) {
     if (extra)
         badname_remove(str);
     else
@@ -1518,9 +1450,7 @@ CF_HAND(cf_badname)
  * take steps here to deal with it.
  */
 
-static unsigned long
-sane_inet_addr(str)
-char *str;
+static unsigned long sane_inet_addr(char *str)
 {
     int i;
 
@@ -1540,8 +1470,7 @@ char *str;
  * cf_site: Update site information
  */
 
-CF_AHAND(cf_site)
-{
+int cf_site(long    **vp, char    *str, long extra, dbref player, char    *cmd) {
     SITE *site, *last, *head;
 
     char *addr_txt, *mask_txt, *tokst;
@@ -1668,18 +1597,7 @@ CF_AHAND(cf_site)
  * taken up with the access nametab.
  */
 
-static int
-helper_cf_cf_access(tp, player, vp, ap, cmd, extra)
-CONF *tp;
-
-dbref player;
-
-int *vp;
-
-char *ap, *cmd;
-
-long extra;
-{
+static int helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra) {
     /*
      * Cannot modify parameters set STATIC
      */
@@ -1706,8 +1624,7 @@ long extra;
     }
 }
 
-CF_HAND(cf_cf_access)
-{
+int cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     CONF *tp, *ctab;
 
     char *ap;
@@ -1752,13 +1669,7 @@ CF_HAND(cf_cf_access)
  * cf_helpfile: Add a help/news-style file. Only valid during startup.
  */
 
-int
-add_helpfile(player, confcmd, str, is_raw)
-dbref player;
-
-char *confcmd, *str;
-
-int is_raw;
+int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
 {
     char *fcmd, *fpath, *newstr, *tokst;
 
@@ -1873,13 +1784,11 @@ int is_raw;
     return 0;
 }
 
-CF_HAND(cf_helpfile)
-{
+int cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd) {
     return add_helpfile(player, cmd, str, 0);
 }
 
-CF_HAND(cf_raw_helpfile)
-{
+int cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cmd) {
     return add_helpfile(player, cmd, str, 1);
 }
 
@@ -1888,8 +1797,7 @@ CF_HAND(cf_raw_helpfile)
  * cf_include: Read another config file.  Only valid during startup.
  */
 
-CF_HAND(cf_include)
-{
+int cf_include(int *vp, char *str, long extra, dbref player, char *cmd) {
     FILE *fp;
 
     char *cp, *ap, *zp, *buf;
@@ -1947,23 +1855,23 @@ CF_HAND(cf_include)
     return 0;
 }
 
-extern CF_HDCL(cf_access);
+extern int cf_access(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_cmd_alias);
+extern int cf_cmd_alias(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_acmd_access);
+extern int cf_acmd_access(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_attr_access);
+extern int cf_attr_access(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_attr_type);
+extern int cf_attr_type(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_func_access);
+extern int cf_func_access(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_flag_access);
+extern int cf_flag_access(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_flag_name);
+extern int cf_flag_name(int *, char *, long, dbref, char *);
 
-extern CF_HDCL(cf_power_access);
+extern int cf_power_access(int *, char *, long, dbref, char *);
 
 /* *INDENT-OFF* */
 
@@ -2228,13 +2136,7 @@ CONF		conftable [] =
  * cf_set: Set config parameter.
  */
 
-static int
-helper_cf_set(cp, ap, player, tp)
-char *cp, *ap;
-
-dbref player;
-
-CONF *tp;
+static int helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
 {
     int i;
 
@@ -2278,11 +2180,7 @@ CONF *tp;
     return i;
 }
 
-int
-cf_set(cp, ap, player)
-char *cp, *ap;
-
-dbref player;
+int cf_set(char *cp, char *ap, dbref player)
 {
     CONF *tp, *ctab;
 
@@ -2340,13 +2238,7 @@ dbref player;
  * do_admin: Command handler to set config params at runtime
  */
 
-void
-do_admin(player, cause, extra, kw, value)
-dbref player, cause;
-
-int extra;
-
-char *kw, *value;
+void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
 {
     int i;
 
@@ -2361,9 +2253,7 @@ char *kw, *value;
  * cf_read: Read in config parameters from named file
  */
 
-int
-cf_read(fn)
-char *fn;
+int cf_read(char *fn)
 {
     int retval;
 
@@ -2384,9 +2274,7 @@ char *fn;
  * directives.
  */
 
-void
-list_cf_access(player)
-dbref player;
+void list_cf_access(dbref player)
 {
     CONF *tp, *ctab;
 
@@ -2427,9 +2315,7 @@ dbref player;
     free_mbuf(buff);
 }
 
-void
-list_cf_read_access(player)
-dbref player;
+void list_cf_read_access(dbref player)
 {
     CONF *tp, *ctab;
 
@@ -2487,8 +2373,7 @@ if ((x)->interpreter == cf_dbref) { \
     } \
 }
 
-void
-cf_verify()
+void cf_verify(void)
 {
     CONF *tp, *ctab;
 
@@ -2518,13 +2403,7 @@ cf_verify()
  * sane fashion.
  */
 
-static void
-helper_cf_display(player, buff, bufc, tp)
-dbref player;
-
-char *buff, **bufc;
-
-CONF *tp;
+static void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 {
     NAMETAB *opt;
 
@@ -2563,15 +2442,7 @@ CONF *tp;
     return;
 }
 
-void
-cf_display(player, param_name, buff, bufc)
-dbref player;
-
-char *param_name;
-
-char *buff;
-
-char **bufc;
+void cf_display(dbref player, char *param_name, char *buff, char **bufc)
 {
     CONF *tp, *ctab;
 
@@ -2606,9 +2477,7 @@ char **bufc;
     safe_nomatch(buff, bufc);
 }
 
-void
-list_options(player)
-dbref player;
+void list_options(dbref player)
 {
     CONF *tp, *ctab;
 

@@ -28,14 +28,7 @@ static int parsing_internal = 0;
  * by the object lockobj
  */
 
-static int
-check_attr(player, lockobj, attr, key)
-dbref player, lockobj;
-
-ATTR *attr;
-
-char *key;
-{
+static int check_attr(dbref player, dbref lockobj, ATTR *attr, char *key) {
     char *buff;
 
     dbref aowner;
@@ -70,12 +63,7 @@ char *key;
 
 static dbref lock_originator = NOTHING;	/* grotesque hack */
 
-int
-eval_boolexp(player, thing, from, b)
-dbref player, thing, from;
-
-BOOLEXP *b;
-{
+int eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b) {
     dbref aowner, obj, source;
 
     int aflags, alen, c, checkit;
@@ -240,12 +228,7 @@ BOOLEXP *b;
     }
 }
 
-int
-eval_boolexp_atr(player, thing, from, key)
-dbref player, thing, from;
-
-char *key;
-{
+int eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key) {
     BOOLEXP *b;
 
     int ret_value;
@@ -272,19 +255,14 @@ static char *parsebuf, *parsestore;
 
 static dbref parse_player;
 
-static void
-NDECL(skip_whitespace)
-{
+static void skip_whitespace(void) {
     while (*parsebuf && isspace(*parsebuf))
         parsebuf++;
 }
 
 static BOOLEXP *NDECL(parse_boolexp_E);	/* defined below */
 
-static BOOLEXP *
-test_atr(s)
-char *s;
-{
+static BOOLEXP *test_atr(char *s) {
     ATTR *attrib;
 
     BOOLEXP *b;
@@ -358,9 +336,7 @@ char *s;
  * L -> (E); L -> object identifier
  */
 
-static BOOLEXP *
-NDECL(parse_boolexp_L)
-{
+static BOOLEXP *parse_boolexp_L(void) {
     BOOLEXP *b;
 
     char *p, *buf;
@@ -498,9 +474,7 @@ NDECL(parse_boolexp_L)
  * The argument L must be type BOOLEXP_CONST
  */
 
-static BOOLEXP *
-NDECL(parse_boolexp_F)
-{
+static BOOLEXP *parse_boolexp_F(void) {
     BOOLEXP *b2;
 
     skip_whitespace();
@@ -596,9 +570,7 @@ NDECL(parse_boolexp_F)
  * T -> F; T -> F & T
  */
 
-static BOOLEXP *
-NDECL(parse_boolexp_T)
-{
+static BOOLEXP *parse_boolexp_T(void) {
     BOOLEXP *b, *b2;
 
     if ((b = parse_boolexp_F()) != TRUE_BOOLEXP)
@@ -626,9 +598,7 @@ NDECL(parse_boolexp_T)
  * E -> T; E -> T | E
  */
 
-static BOOLEXP *
-NDECL(parse_boolexp_E)
-{
+static BOOLEXP *parse_boolexp_E(void) {
     BOOLEXP *b, *b2;
 
     if ((b = parse_boolexp_T()) != TRUE_BOOLEXP)
@@ -652,14 +622,7 @@ NDECL(parse_boolexp_E)
     return b;
 }
 
-BOOLEXP *
-parse_boolexp(player, buf, internal)
-dbref player;
-
-const char *buf;
-
-int internal;
-{
+BOOLEXP *parse_boolexp(dbref player, const char *buf, int internal) {
     char *p;
 
     int num_opens = 0;

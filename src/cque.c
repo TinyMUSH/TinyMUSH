@@ -21,11 +21,11 @@
 #include "powers.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-extern int FDECL(a_Queue, (dbref, int));
+extern int a_Queue(dbref, int);
 
-extern void FDECL(s_Queue, (dbref, int));
+extern void s_Queue(dbref, int);
 
-extern int FDECL(QueueMax, (dbref));
+extern int QueueMax(dbref);
 
 static int qpid_top = 1;
 
@@ -34,9 +34,7 @@ static int qpid_top = 1;
  * Delete and free a queue entry.
  */
 
-static void
-delete_qentry(qptr)
-BQUE *qptr;
+static void delete_qentry(BQUE *qptr)
 {
     nhashdelete(qptr->pid, &mudstate.qpid_htab);
     Free_QData(qptr);
@@ -48,11 +46,7 @@ BQUE *qptr;
  * add_to: Adjust an object's queue or semaphore count.
  */
 
-static int
-add_to(doer, player, am, attrnum)
-dbref doer, player;
-
-int am, attrnum;
+static int add_to(dbref doer, dbref player, int am, int attrnum)
 {
     int num, aflags, alen;
 
@@ -78,9 +72,7 @@ int am, attrnum;
  * give_que: Thread a queue block onto the high or low priority queue
  */
 
-static void
-give_que(tmp)
-BQUE *tmp;
+static void give_que(BQUE *tmp)
 {
     tmp->next = NULL;
     tmp->waittime = 0;
@@ -116,11 +108,7 @@ BQUE *tmp;
  * que_want: Do we want this queue entry?
  */
 
-int
-que_want(entry, ptarg, otarg)
-BQUE *entry;
-
-dbref ptarg, otarg;
+int que_want(BQUE *entry, dbref ptarg, dbref otarg)
 {
     if (!Good_obj(entry->player))
         return 0;
@@ -136,9 +124,7 @@ dbref ptarg, otarg;
  * halt_que: Remove all queued commands from a certain player
  */
 
-int
-halt_que(player, object)
-dbref player, object;
+int halt_que(dbref player, dbref object)
 {
     BQUE *trail, *point, *next;
 
@@ -246,9 +232,7 @@ dbref player, object;
  * remove_waitq: Remove an entry from the wait queue.
  */
 
-static void
-remove_waitq(qptr)
-BQUE *qptr;
+static void remove_waitq(BQUE *qptr)
 {
     BQUE *point, *trail;
 
@@ -282,13 +266,7 @@ BQUE *qptr;
  * do_halt_pid: Halt a single queue entry.
  */
 
-static void
-do_halt_pid(player, cause, key, pidstr)
-dbref player, cause;
-
-int key;
-
-char *pidstr;
+static void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
     dbref victim;
 
@@ -368,13 +346,7 @@ char *pidstr;
  * do_halt: Command interface to halt_que.
  */
 
-void
-do_halt(player, cause, key, target)
-dbref player, cause;
-
-int key;
-
-char *target;
+void do_halt(dbref player, dbref cause, int key, char *target)
 {
     dbref player_targ, obj_targ;
 
@@ -448,11 +420,7 @@ char *target;
  * nfy_que: Notify commands from the queue and perform or discard them.
  */
 
-int
-nfy_que(player, sem, attr, key, count)
-dbref player, sem;
-
-int attr, key, count;
+int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 {
     BQUE *point, *trail, *next;
 
@@ -542,13 +510,7 @@ int attr, key, count;
  * do_notify: Command interface to nfy_que
  */
 
-void
-do_notify(player, cause, key, what, count)
-dbref player, cause;
-
-int key;
-
-char *what, *count;
+void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 {
     dbref thing, aowner;
 
@@ -625,8 +587,7 @@ char *what, *count;
  * Get the next available queue PID.
  */
 
-static int
-qpid_next()
+static int qpid_next(void)
 {
     int i;
 
@@ -654,15 +615,7 @@ qpid_next()
  * setup_que: Set up a queue entry.
  */
 
-static BQUE *
-setup_que(player, cause, command, args, nargs, gargs)
-dbref player, cause;
-
-char *command, *args[];
-
-int nargs;
-
-GDATA *gargs;
+static BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs)
 {
     int a, tlen, qpid;
 
@@ -841,15 +794,7 @@ GDATA *gargs;
  * wait_que: Add commands to the wait or semaphore queues.
  */
 
-void
-wait_que(player, cause, wait, sem, attr, command, args, nargs, gargs)
-dbref player, cause, sem;
-
-int wait, nargs, attr;
-
-char *command, *args[];
-
-GDATA *gargs;
+void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
 {
     BQUE *tmp, *point, *trail;
 
@@ -915,13 +860,7 @@ GDATA *gargs;
  * do_wait_pid: Adjust the wait time on an existing entry.
  */
 
-static void
-do_wait_pid(player, key, pidstr, timestr)
-dbref player;
-
-int key;
-
-char *pidstr, *timestr;
+static void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
     int qpid, wsecs;
 
@@ -1024,13 +963,7 @@ char *pidstr, *timestr;
  * do_wait: Command interface to wait_que
  */
 
-void
-do_wait(player, cause, key, event, cmd, cargs, ncargs)
-dbref player, cause;
-
-int key, ncargs;
-
-char *event, *cmd, *cargs[];
+void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {
     dbref thing, aowner;
 
@@ -1156,8 +1089,7 @@ char *event, *cmd, *cargs[];
  * from the queue.
  */
 
-int
-NDECL(que_next)
+int que_next(void)
 {
     int min, this;
 
@@ -1213,8 +1145,7 @@ NDECL(que_next)
  * do_second: Check the wait and semaphore queues for commands to remove.
  */
 
-void
-NDECL(do_second)
+void do_second(void)
 {
     BQUE *trail, *point, *next;
 
@@ -1296,9 +1227,7 @@ NDECL(do_second)
  * do_top: Execute the command at the top of the queue
  */
 
-int
-do_top(ncmds)
-int ncmds;
+int do_top(int ncmds)
 {
     BQUE *tmp;
 
@@ -1386,15 +1315,7 @@ int ncmds;
  * do_ps: tell player what commands they have pending in the queue
  */
 
-static void
-show_que(player, key, queue, qtot, qent, qdel, player_targ, obj_targ, header)
-dbref player, player_targ, obj_targ;
-
-int key, *qtot, *qent, *qdel;
-
-BQUE *queue;
-
-const char *header;
+static void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
     BQUE *tmp;
 
@@ -1506,13 +1427,7 @@ const char *header;
     return;
 }
 
-void
-do_ps(player, cause, key, target)
-dbref player, cause;
-
-int key;
-
-char *target;
+void do_ps(dbref player, dbref cause, int key, char *target)
 {
     char *bufp;
 
@@ -1613,13 +1528,7 @@ char *target;
  * do_queue: Queue management
  */
 
-void
-do_queue(player, cause, key, arg)
-dbref player, cause;
-
-int key;
-
-char *arg;
+void do_queue(dbref player, dbref cause, int key, char *arg)
 {
     BQUE *point;
 

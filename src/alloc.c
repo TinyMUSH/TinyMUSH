@@ -20,10 +20,7 @@ const char *poolnames[] =
 
 #define POOL_MAGICNUM 0xdeadbeef
 
-void
-pool_init(poolnum, poolsize)
-int poolnum, poolsize;
-{
+void pool_init(int poolnum, int poolsize) {
     pools[poolnum].pool_size = poolsize;
     pools[poolnum].free_head = NULL;
     pools[poolnum].chain_head = NULL;
@@ -34,14 +31,7 @@ int poolnum, poolsize;
     return;
 }
 
-static void
-pool_err(logsys, logflag, poolnum, tag, ph, action, reason)
-int logflag, poolnum;
-
-const char *logsys, *tag, *action, *reason;
-
-POOLHDR *ph;
-{
+static void pool_err(const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason) {
     if (!mudstate.logging)
     {
         STARTLOG(logflag, logsys, "ALLOC")
@@ -57,12 +47,7 @@ POOLHDR *ph;
     }
 }
 
-static void
-pool_vfy(poolnum, tag)
-int poolnum;
-
-const char *tag;
-{
+static void pool_vfy(int poolnum, const char *tag) {
     POOLHDR *ph, *lastph;
 
     POOLFTR *pf;
@@ -112,10 +97,7 @@ const char *tag;
     }
 }
 
-void
-pool_check(tag)
-const char *tag;
-{
+void pool_check(const char *tag) {
     int poolnum;
 
     for (poolnum = 0; poolnum < NUM_POOLS; ++poolnum)
@@ -124,12 +106,7 @@ const char *tag;
     }
 }
 
-char *
-pool_alloc(poolnum, tag)
-int poolnum;
-
-const char *tag;
-{
+char *pool_alloc(int poolnum, const char *tag) {
     int *p;
 
     char *h;
@@ -231,12 +208,7 @@ const char *tag;
     return (char *)p;
 }
 
-void
-pool_free(poolnum, buf)
-int poolnum;
-
-char **buf;
-{
+void pool_free(int poolnum, char **buf) {
     int *ibuf;
 
     char *h;
@@ -311,12 +283,7 @@ char **buf;
     }
 }
 
-static char *
-pool_stats(poolnum, text)
-int poolnum;
-
-const char *text;
-{
+static char *pool_stats(int poolnum, const char *text) {
     char *buf;
 
     buf = alloc_mbuf("pool_stats");
@@ -326,14 +293,7 @@ const char *text;
     return buf;
 }
 
-static void
-pool_trace(player, poolnum, text)
-dbref player;
-
-int poolnum;
-
-const char *text;
-{
+static void pool_trace(dbref player, int poolnum, const char *text) {
     POOLHDR *ph;
 
     int numfree, *ibuf;
@@ -364,10 +324,7 @@ const char *text;
     notify(player, tprintf("%d free %s", numfree, text));
 }
 
-void
-list_bufstats(player)
-dbref player;
-{
+void list_bufstats(dbref player) {
     int i;
 
     char *buff;
@@ -383,19 +340,14 @@ dbref player;
     }
 }
 
-void
-list_buftrace(player)
-dbref player;
-{
+void list_buftrace(dbref player) {
     int i;
 
     for (i = 0; i < NUM_POOLS; i++)
         pool_trace(player, i, poolnames[i]);
 }
 
-void
-pool_reset()
-{
+void pool_reset(void) {
     POOLHDR *ph, *phnext, *newchain;
 
     int i, *ibuf;
@@ -444,18 +396,12 @@ pool_reset()
 
 #ifdef RAW_MEMTRACKING
 
-static int
-sort_memtable(p1, p2)
-const void *p1, *p2;
-{
+static int sort_memtable(const void *p1, const void *p2) {
     return strcmp((*(MEMTRACK **) p1)->buf_tag,
                   (*(MEMTRACK **) p2)->buf_tag);
 }
 
-void
-list_rawmemory(player)
-dbref player;
-{
+void list_rawmemory(dbref player) {
     MEMTRACK *tptr, **t_array;
 
     int n_tags, total, c_tags, c_total, u_tags, i, j;
@@ -522,14 +468,7 @@ dbref player;
                 n_tags, u_tags, total, (int)total / 1024));
 }
 
-static void
-trace_alloc(amount, name, ptr)
-size_t amount;
-
-const char *name;
-
-void *ptr;
-{
+static void trace_alloc(site_t amount, const char *name, void *ptr) {
     /*
      * We maintain an unsorted list, most recently-allocated things at
      * the head, based on the belief that it's basically a stack -- when
@@ -550,12 +489,7 @@ void *ptr;
     mudstate.raw_allocs = tptr;
 }
 
-static void
-trace_free(name, ptr)
-const char *name;
-
-void *ptr;
-{
+static void trace_free(const char *name, void (ptr) {
     MEMTRACK *tptr, *prev;
 
     prev = NULL;
@@ -586,12 +520,7 @@ void *ptr;
     ENDLOG
 }
 
-void *
-track_malloc(amount, name)
-size_t amount;
-
-const char *name;
-{
+void *track_malloc(size_t amount, const char *name) {
     void *r;
 
     r = malloc(amount);
@@ -599,12 +528,7 @@ const char *name;
     return (r);
 }
 
-void *
-track_calloc(elems, esize, name)
-size_t elems, esize;
-
-const char *name;
-{
+void *track_calloc(size_t elems, size_t esize, const char *name) {
     void *r;
 
     r = calloc(elems, esize);
@@ -612,14 +536,7 @@ const char *name;
     return (r);
 }
 
-void *
-track_realloc(ptr, amount, name)
-void *ptr;
-
-size_t amount;
-
-const char *name;
-{
+void *track_realloc(void *ptr, size_tamount, const char *name) {
     void *r;
 
     trace_free(name, r);
@@ -628,10 +545,7 @@ const char *name;
     return (r);
 }
 
-char *
-track_strdup(str, name)
-const char *str, *name;
-{
+char *track_strdup(const char *str, const char *name) {
     char *r;
 
     r = strdup(str);
@@ -639,22 +553,14 @@ const char *str, *name;
     return (r);
 }
 
-void
-track_free(ptr, name)
-void *ptr;
-
-const char *name;
-{
+void track_free(void *ptr, const char *name) {
     trace_free(name, ptr);
     free(ptr);
 }
 
 #else
 
-void
-list_rawmemory(player)
-dbref player;
-{
+void list_rawmemory(dbref player) {
     notify(player, "Feature not supported.");
 }
 

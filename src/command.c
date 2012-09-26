@@ -25,37 +25,37 @@
 #include "vattr.h"		/* required by code */
 #include "pcre.h"		/* required by code */
 
-extern void FDECL(list_cf_access, (dbref));
+extern void list_cf_access(dbref);
 
-extern void FDECL(list_cf_read_access, (dbref));
+extern void list_cf_read_access(dbref);
 
-extern void FDECL(list_siteinfo, (dbref));
+extern void list_siteinfo(dbref);
 
-extern void FDECL(logged_out, (dbref, dbref, int, char *));
+extern void logged_out(dbref, dbref, int, char *);
 
-extern void FDECL(list_functable, (dbref));
+extern void list_functable(dbref);
 
-extern void FDECL(list_funcaccess, (dbref));
+extern void list_funcaccess(dbref);
 
-extern void FDECL(list_bufstats, (dbref));
+extern void list_bufstats(dbref);
 
-extern void FDECL(list_buftrace, (dbref));
+extern void list_buftrace(dbref);
 
-extern void FDECL(list_cached_objs, (dbref));
+extern void list_cached_objs(dbref);
 
-extern void FDECL(list_cached_attrs, (dbref));
+extern void list_cached_attrs(dbref);
 
-extern void FDECL(list_rawmemory, (dbref));
+extern void list_rawmemory(dbref);
 
-extern int FDECL(atr_match, (dbref, dbref, char, char *, char *, int));
+extern int atr_match(dbref, dbref, char, char *, char *, int);
 
-extern int FDECL(list_check, (dbref, dbref, char, char *, char *, int, int *));
+extern int list_check(dbref, dbref, char, char *, char *, int, int *);
 
-extern void FDECL(do_enter_internal, (dbref, dbref, int));
+extern void do_enter_internal(dbref, dbref, int);
 
-extern int FDECL(regexp_match, (char *, char *, int, char **, int));
+extern int regexp_match(char *, char *, int, char **, int);
 
-extern void FDECL(register_prefix_cmds, (const char *));
+extern void register_prefix_cmds(const char *);
 
 #define CACHING "attribute"
 
@@ -109,9 +109,7 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
  * Main body of code.
  */
 
-void
-NDECL(init_cmdtab)
-{
+void init_cmdtab(void) {
     CMDENT *cp;
 
     ATTR *ap;
@@ -196,9 +194,7 @@ NDECL(init_cmdtab)
         (CMDENT *) hashfind("internalgoto", &mudstate.command_htab);
 }
 
-void
-reset_prefix_cmds()
-{
+void reset_prefix_cmds(void) {
     int i;
 
     char cn[2] = "x";
@@ -220,12 +216,7 @@ reset_prefix_cmds()
  * calling function may also give permission denied messages on failure.
  */
 
-int
-check_access(player, mask)
-dbref player;
-
-int mask;
-{
+int check_access(dbref player, int mask) {
     int mval, nval;
 
     /*
@@ -320,12 +311,7 @@ int mask;
  * them like permission checks.
  */
 
-int
-check_mod_access(player, xperms)
-dbref player;
-
-EXTFUNCS *xperms;
-{
+int check_mod_access(dbref player, EXTFUNCS *xperms) {
     int i;
 
     for (i = 0; i < xperms->num_funcs; i++)
@@ -344,16 +330,7 @@ EXTFUNCS *xperms;
  * permissions.
  */
 
-int
-check_userdef_access(player, hookp, cargs, ncargs)
-dbref player;
-
-HOOKENT *hookp;
-
-char *cargs[];
-
-int ncargs;
-{
+int check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncargs) {
     char *buf;
 
     char *bp, *tstr, *str;
@@ -406,18 +383,7 @@ int ncargs;
  * process_hook: Evaluate a hook function.
  */
 
-static void
-process_hook(hp, save_globs, player, cause, cargs, ncargs)
-HOOKENT *hp;
-
-int save_globs;
-
-dbref player, cause;
-
-char *cargs[];
-
-int ncargs;
-{
+static void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause, char *cargs[], int ncargs) {
     char *buf, *bp;
 
     char *tstr, *str;
@@ -463,12 +429,7 @@ int ncargs;
     free_lbuf(tstr);
 }
 
-void
-call_move_hook(player, cause, state)
-dbref player, cause;
-
-int state;
-{
+void call_move_hook(dbref player, dbref cause, int state) {
     if (internalgoto_cmdp)
     {
         if (!state)  	/* before move */
@@ -488,17 +449,7 @@ int state;
  * process_cmdent: Perform indicated command with passed args.
  */
 
-void
-process_cmdent(cmdp, switchp, player, cause, interactive, arg,
-               unp_command, cargs, ncargs)
-CMDENT *cmdp;
-
-char *switchp, *arg, *unp_command, *cargs[];
-
-dbref player, cause;
-
-int interactive, ncargs;
-{
+void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, int interactive, char *arg, char *unp_command, char *cargs[], int ncargs) {
     char *buf1, *buf2, tchar, *bp, *str, *buff, *s, *j, *new;
 
     char *args[MAX_ARG], *aargs[NUM_ENV_VARS];
@@ -983,14 +934,7 @@ int interactive, ncargs;
  * process_command: Execute a command.
  */
 
-char *
-process_command(player, cause, interactive, command, args, nargs)
-dbref player, cause;
-
-int interactive, nargs;
-
-char *command, *args[];
-{
+char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs) {
     static char preserve_cmd[LBUF_SIZE];
 
     char *p, *q, *arg, *lcbuf, *slashp, *cmdsave, *bp, *str, *evcmd;
@@ -1697,16 +1641,7 @@ char *command, *args[];
  * process_cmdline: Execute a semicolon/pipe-delimited series of commands.
  */
 
-void
-process_cmdline(player, cause, cmdline, args, nargs, qent)
-dbref player, cause;
-
-char *cmdline, *args[];
-
-int nargs;
-
-BQUE *qent;
-{
+void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent) {
     char *cp, *cmdsave, *save_poutnew, *save_poutbufc, *save_pout;
 
     char *log_cmdbuf;
@@ -1885,10 +1820,7 @@ BQUE *qent;
  * permissions are ignored in this context.
  */
 
-static void
-list_cmdtable(player)
-dbref player;
-{
+static void list_cmdtable(dbref player) {
     CMDENT *cmdp, *modcmds;
 
     char *buf, *bp;
@@ -1951,10 +1883,7 @@ dbref player;
  * list_attrtable: List available attributes.
  */
 
-static void
-list_attrtable(player)
-dbref player;
-{
+static void list_attrtable(dbref player) {
     ATTR *ap;
 
     char *buf, *bp, *cp;
@@ -1982,14 +1911,7 @@ dbref player;
  * list_cmdaccess: List access commands.
  */
 
-static void
-helper_list_cmdaccess(player, ctab, buff)
-dbref player;
-
-CMDENT *ctab;
-
-char *buff;
-{
+static void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff) {
     CMDENT *cmdp;
 
     ATTR *ap;
@@ -2030,10 +1952,7 @@ char *buff;
     }
 }
 
-static void
-list_cmdaccess(player)
-dbref player;
-{
+static void list_cmdaccess(dbref player) {
     char *buff, *p, *q;
 
     CMDENT *cmdp, *ctab;
@@ -2083,10 +2002,7 @@ dbref player;
  * list_cmdswitches: List switches for commands.
  */
 
-static void
-list_cmdswitches(player)
-dbref player;
-{
+static void list_cmdswitches(dbref player) {
     char *buff;
 
     CMDENT *cmdp, *ctab;
@@ -2144,10 +2060,7 @@ dbref player;
  * list_attraccess: List access to attributes.
  */
 
-static void
-list_attraccess(player)
-dbref player;
-{
+static void list_attraccess(dbref player) {
     char *buff;
 
     ATTR *ap;
@@ -2170,10 +2083,7 @@ dbref player;
  * list_attrtypes: List attribute "types" (wildcards and permissions)
  */
 
-static void
-list_attrtypes(player)
-dbref player;
-{
+static void list_attrtypes(dbref player) {
     char *buff;
 
     KEYLIST *kp;
@@ -2197,8 +2107,7 @@ dbref player;
  * cf_access: Change command or switch permissions.
  */
 
-CF_HAND(cf_access)
-{
+int cf_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     CMDENT *cmdp;
 
     char *ap;
@@ -2242,8 +2151,7 @@ CF_HAND(cf_access)
  * cf_acmd_access: Change command permissions for all attr-setting cmds.
  */
 
-CF_HAND(cf_acmd_access)
-{
+int cf_acmd_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     CMDENT *cmdp;
 
     ATTR *ap;
@@ -2283,8 +2191,7 @@ CF_HAND(cf_acmd_access)
  * cf_attr_access: Change access on an attribute.
  */
 
-CF_HAND(cf_attr_access)
-{
+int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     ATTR *ap;
 
     char *sp;
@@ -2311,8 +2218,7 @@ CF_HAND(cf_attr_access)
  * names match a certain pattern.
  */
 
-CF_HAND(cf_attr_type)
-{
+int cf_attr_type(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *privs;
 
     KEYLIST *kp;
@@ -2363,8 +2269,7 @@ CF_HAND(cf_attr_type)
  * cf_cmd_alias: Add a command alias.
  */
 
-CF_HAND(cf_cmd_alias)
-{
+int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *alias, *orig, *ap, *tokst;
 
     CMDENT *cmdp, *cmd2;
@@ -2475,10 +2380,7 @@ CF_HAND(cf_cmd_alias)
  * list_df_flags: List default flags at create time.
  */
 
-static void
-list_df_flags(player)
-dbref player;
-{
+static void list_df_flags(dbref player) {
     char *playerb, *roomb, *thingb, *exitb, *robotb, *stripb, *buff;
 
     playerb = decode_flags(player, mudconf.player_flags);
@@ -2509,9 +2411,7 @@ dbref player;
 
 #define coin_name(s)	(((s)==1) ? mudconf.one_coin : mudconf.many_coins)
 
-static void
-list_costs(player)
-dbref player;
+static void list_costs(dbref player)
 {
     char *buff;
 
@@ -2624,11 +2524,9 @@ dbref player;
  * non-boolean game options.
  */
 
-extern void FDECL(list_options, (dbref));
+extern void list_options(dbref);
 
-static void
-list_params(player)
-dbref player;
+static void list_params(dbref player)
 {
     time_t now;
 
@@ -2759,9 +2657,7 @@ dbref player;
  * list_vattrs: List user-defined attributes
  */
 
-static void
-list_vattrs(player)
-dbref player;
+static void list_vattrs(dbref player)
 {
     VATTR *va;
 
@@ -2791,13 +2687,7 @@ dbref player;
  * list_hashstats: List information from hash tables
  */
 
-static void
-list_hashstat(player, tab_name, htab)
-dbref player;
-
-HASHTAB *htab;
-
-const char *tab_name;
+static void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
     char *buff;
 
@@ -2806,14 +2696,7 @@ const char *tab_name;
     free_mbuf(buff);
 }
 
-static void
-list_nhashstat(player, tab_name, htab)
-dbref player;
-
-NHSHTAB *htab;
-
-const char *tab_name;
-{
+static void list_nhashstat(dbref player, const char *tab_name, NHSHTAB *htab) {
     char *buff;
 
     buff = nhashinfo(tab_name, htab);
@@ -2821,9 +2704,7 @@ const char *tab_name;
     free_mbuf(buff);
 }
 
-static void
-list_hashstats(player)
-dbref player;
+static void list_hashstats(dbref player)
 {
     MODULE *mp;
 
@@ -2881,10 +2762,7 @@ dbref player;
     }
 }
 
-static void
-list_textfiles(player)
-dbref player;
-{
+static void list_textfiles(dbref player) {
     int i;
 
     raw_notify(player,
@@ -2929,10 +2807,7 @@ extern int cs_size;		/* total cache size */
  * list_db_stats: Get useful info from the DB layer about hash stats, etc.
  */
 
-static void
-list_db_stats(player)
-dbref player;
-{
+static void list_db_stats(dbref player) {
     raw_notify(player,
                tprintf("DB Cache Stats   Writes       Reads  (over %d seconds)",
                        (int)(time(NULL) - cs_ltime)));
@@ -2958,10 +2833,7 @@ dbref player;
  * from code by Claudius@PythonMUCK, posted to the net by Howard/Dark_Lord.
  */
 
-static void
-list_process(player)
-dbref player;
-{
+static void list_process(dbref player) {
     int pid, psize, maxfds;
 
 #if defined(HAVE_GETRUSAGE) && defined(STRUCT_RUSAGE_COMPLETE)
@@ -3054,8 +2926,7 @@ extern POOL pools[NUM_POOLS];
 
 extern int anum_alc_top;
 
-void
-list_memory(player)
+void list_memory(dbref player)
 {
     double total = 0, each = 0, each2 = 0;
 
@@ -3688,13 +3559,7 @@ extern NAMETAB logoptions_nametab[];
 
 extern NAMETAB logdata_nametab[];
 
-void
-do_list(player, cause, extra, arg)
-dbref player, cause;
-
-int extra;
-
-char *arg;
+void do_list(dbref player, dbref cause, int extra, char *arg)
 {
     int flagvalue;
 
