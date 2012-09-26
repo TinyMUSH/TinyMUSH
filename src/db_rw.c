@@ -20,7 +20,7 @@
 
 #include "powers.h"		/* required by code */
 
-extern void FDECL(db_grow, (dbref));
+extern void db_grow(dbref);
 
 extern struct object *db;
 
@@ -39,9 +39,7 @@ static int *used_attrs_table;
  * getboolexp1: Get boolean subexpression from file.
  */
 
-BOOLEXP *
-getboolexp1(f)
-FILE *f;
+BOOLEXP * getboolexp1(FILE *f)
 {
     BOOLEXP *b;
 
@@ -270,9 +268,7 @@ error:
  * getboolexp: Read a boolean expression from the flat file.
  */
 
-static BOOLEXP *
-getboolexp(f)
-FILE *f;
+static BOOLEXP *getboolexp(FILE *f)
 {
     BOOLEXP *b;
 
@@ -295,9 +291,7 @@ FILE *f;
  * unscramble_attrnum: Fix up attribute numbers from foreign muds
  */
 
-static int
-unscramble_attrnum(attrnum)
-int attrnum;
+static int unscramble_attrnum(int attrnum)
 {
     switch (g_format)
     {
@@ -333,13 +327,7 @@ int attrnum;
  * get_list: Read attribute list from flat file.
  */
 
-static int
-get_list(f, i, new_strings)
-FILE *f;
-
-dbref i;
-
-int new_strings;
+static int get_list(FILE *f, dbref i, int new_strings)
 {
     dbref atr;
 
@@ -405,11 +393,7 @@ int new_strings;
  * ---------------------------------------------------------------------------
  * putbool_subexp: Write a boolean sub-expression to the flat file.
  */
-static void
-putbool_subexp(f, b)
-FILE *f;
-
-BOOLEXP *b;
+static void putbool_subexp(FILE *f, BOOLEXP *b)
 {
     ATTR *va;
 
@@ -494,11 +478,7 @@ BOOLEXP *b;
  * putboolexp: Write boolean expression to the flat file.
  */
 
-void
-putboolexp(f, b)
-FILE *f;
-
-BOOLEXP *b;
+void putboolexp(FILE *f, BOOLEXP *b)
 {
     if (b != TRUE_BOOLEXP)
     {
@@ -512,13 +492,7 @@ BOOLEXP *b;
  * upgrade_flags: Convert foreign flags to MUSH format.
  */
 
-static void
-upgrade_flags(flags1, flags2, flags3, thing, db_format, db_version)
-FLAG *flags1, *flags2, *flags3;
-
-dbref thing;
-
-int db_format, db_version;
+static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version)
 {
     FLAG f1, f2, f3, newf1, newf2, newf3;
 
@@ -659,8 +633,7 @@ int db_format, db_version;
  * efo_convert: Fix things up for Exits-From-Objects
  */
 
-void
-NDECL(efo_convert)
+void efo_convert(void)
 {
     int i;
 
@@ -690,8 +663,7 @@ NDECL(efo_convert)
  * fix_mux_zones: Convert MUX-style zones to 3.0-style zones.
  */
 
-static void
-fix_mux_zones()
+static void fix_mux_zones(void)
 {
     /*
      * For all objects in the database where Zone(thing) != NOTHING, set
@@ -739,8 +711,7 @@ fix_mux_zones()
  * fix_typed_quotas: Explode standard quotas into typed quotas
  */
 
-static void
-fix_typed_quotas()
+static void fix_typed_quotas(void)
 {
     /*
      * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
@@ -778,11 +749,7 @@ fix_typed_quotas()
     }
 }
 
-dbref
-db_read_flatfile(f, db_format, db_version, db_flags)
-FILE *f;
-
-int *db_format, *db_version, *db_flags;
+dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 {
     dbref i, anum;
 
@@ -1219,8 +1186,7 @@ int *db_format, *db_version, *db_flags;
     }
 }
 
-int
-db_read()
+int db_read(void)
 {
     DBData key, data;
 
@@ -1380,16 +1346,7 @@ db_read()
     return (0);
 }
 
-static int
-db_write_object_out(f, i, db_format, flags, n_atrt)
-FILE *f;
-
-dbref i;
-
-int db_format, flags;
-
-int *n_atrt;
-{
+static int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt) {
     ATTR *a;
 
     char *got, *as;
@@ -1512,12 +1469,7 @@ int *n_atrt;
     return (changed);
 }
 
-dbref
-db_write_flatfile(f, format, version)
-FILE *f;
-
-int format, version;
-{
+dbref db_write_flatfile(FILE *f, int format, int version) {
     dbref i;
 
     int flags;
@@ -1739,8 +1691,7 @@ int format, version;
     return (mudstate.db_top);
 }
 
-dbref
-db_write()
+dbref db_write(void)
 {
     VATTR *vp;
 
@@ -2037,11 +1988,7 @@ db_write()
 
 /* Open a file pointer for a module to use when writing a flatfile */
 
-FILE *
-db_module_flatfile(modname, wrflag)
-char *modname;
-
-int wrflag;
+FILE *db_module_flatfile(char *modname, int wrflag)
 {
     char filename[256];
 

@@ -45,7 +45,7 @@ extern int maxd;
 extern int slave_socket;
 
 extern pid_t slave_pid;
-extern void FDECL(desc_addhash, (DESC *));
+extern void desc_addhash(DESC *);
 
 #ifdef TEST_MALLOC
 int malloc_count = 0;
@@ -54,7 +54,7 @@ char *malloc_ptr;
 char *malloc_str;
 #endif /* TEST_MALLOC */
 
-extern VATTR *FDECL(vattr_rename, (char *, char *));
+extern VATTR *vattr_rename(char *, char *);
 
 /* ---------------------------------------------------------------------------
  * Temp file management, used to get around static limits in some versions
@@ -69,8 +69,7 @@ int t_is_tli;
 
 #endif
 
-static void tf_xclose(fd)
-FILE *fd;
+static void tf_xclose(FILE *fd)
 {
     if (fd) {
         if (t_is_pipe)
@@ -88,8 +87,7 @@ FILE *fd;
     t_is_pipe = 0;
 }
 
-static int tf_fiddle(tfd)
-int tfd;
+static int tf_fiddle(int tfd)
 {
     if (tfd < 0) {
         tfd = open(DEV_NULL, O_RDONLY, 0);
@@ -102,9 +100,7 @@ int tfd;
     return 0;
 }
 
-static int tf_xopen(fname, mode)
-char *fname;
-int mode;
+static int tf_xopen(char *fname, int mode)
 {
     int fd;
 
@@ -115,8 +111,7 @@ int mode;
 
 /* #define t_xopen(f,m) t_fiddle(open(f, m, 0600)) */
 
-static const char *mode_txt(mode)
-int mode;
+static const char *mode_txt(int mode)
 {
     switch (mode & O_ACCMODE) {
     case O_RDONLY:
@@ -127,7 +122,7 @@ int mode;
     return "r+";
 }
 
-void NDECL(tf_init)
+void tf_init(void)
 {
     fclose(stdin);
     tf_xopen(DEV_NULL, O_RDONLY);
@@ -135,17 +130,14 @@ void NDECL(tf_init)
     t_is_pipe = 0;
 }
 
-int tf_open(fname, mode)
-char *fname;
-int mode;
+int tf_open(char *fname, int mode)
 {
     tf_xclose(t_fd);
     return tf_xopen(fname, mode);
 }
 
 #ifdef TLI
-int tf_topen(fam, mode)
-int fam, mode;
+int tf_topen(int fam, int mode)
 {
     tf_xclose(t_fd);
     return tf_fiddle(t_open(fam, mode, NULL));
@@ -153,16 +145,13 @@ int fam, mode;
 
 #endif
 
-void tf_close(fdes)
-int fdes;
+void tf_close(int fdes)
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);
 }
 
-FILE *tf_fopen(fname, mode)
-char *fname;
-int mode;
+FILE *tf_fopen(char *fname, int mode)
 {
     tf_xclose(t_fd);
     if (tf_xopen(fname, mode) >= 0) {
@@ -172,16 +161,13 @@ int mode;
     return NULL;
 }
 
-void tf_fclose(fd)
-FILE *fd;
+void tf_fclose(FILE *fd)
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);
 }
 
-FILE *tf_popen(fname, mode)
-char *fname;
-int mode;
+FILE *tf_popen(char *fname, int mode)
 {
     tf_xclose(t_fd);
     t_fd = popen(fname, mode_txt(mode));
@@ -201,11 +187,11 @@ extern unsigned int malloc_sbrk_used;	/* amount of data space used now */
 /*
  * Check routine forward declaration.
  */
-static int FDECL(fwdlist_ck, (int, dbref, dbref, int, char *));
-static int FDECL(propdir_ck, (int, dbref, dbref, int, char *));
+static int fwdlist_ck(int, dbref, dbref, int, char *);
+static int propdir_ck(int, dbref, dbref, int, char *);
 
-extern void FDECL(pcache_reload, (dbref));
-extern void FDECL(desc_reload, (dbref));
+extern void pcache_reload(dbref);
+extern void desc_reload(dbref);
 
 /* *INDENT-OFF* */
 
@@ -435,9 +421,7 @@ ATTR attr[] =
  * fwdlist_set, fwdlist_clr: Manage cached forwarding lists
  */
 
-void fwdlist_set(thing, ifp)
-dbref thing;
-FWDLIST *ifp;
+void fwdlist_set(dbref thing, FWDLIST *ifp)
 {
     FWDLIST *fp, *xfp;
     int i, stat = 0;
@@ -478,8 +462,7 @@ FWDLIST *ifp;
     }
 }
 
-void fwdlist_clr(thing)
-dbref thing;
+void fwdlist_clr(dbref thing)
 {
     FWDLIST *xfp;
 
@@ -498,10 +481,7 @@ dbref thing;
  * fwdlist_load: Load text into a forwardlist.
  */
 
-int fwdlist_load(fp, player, atext)
-FWDLIST *fp;
-dbref player;
-char *atext;
+int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
 {
     dbref target;
     char *tp, *bp, *dp;
@@ -572,9 +552,7 @@ char *atext;
  * fwdlist_rewrite: Generate a text string from a FWDLIST buffer.
  */
 
-int fwdlist_rewrite(fp, atext)
-FWDLIST *fp;
-char *atext;
+int fwdlist_rewrite(FWDLIST *fp, char *atext)
 {
     char *tp, *bp;
     int i, count;
@@ -604,10 +582,7 @@ char *atext;
  * fwdlist_ck:  Check a list of dbref numbers to forward to for AUDIBLE
  */
 
-static int fwdlist_ck(key, player, thing, anum, atext)
-int key, anum;
-dbref player, thing;
-char *atext;
+static int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     FWDLIST *fp;
     int count;
@@ -637,8 +612,7 @@ char *atext;
     return ((count > 0) || !atext || !*atext);
 }
 
-FWDLIST *fwdlist_get(thing)
-dbref thing;
+FWDLIST *fwdlist_get(dbref thing)
 {
     dbref aowner;
     int aflags, alen, errors;
@@ -662,9 +636,7 @@ dbref thing;
  * propdir functions
  */
 
-void propdir_set(thing, ifp)
-dbref thing;
-PROPDIR *ifp;
+void propdir_set(dbref thing, PROPDIR *ifp)
 {
     PROPDIR *fp, *xfp;
     int i, stat = 0;
@@ -705,8 +677,7 @@ PROPDIR *ifp;
     }
 }
 
-void propdir_clr(thing)
-dbref thing;
+void propdir_clr(dbref thing)
 {
     PROPDIR *xfp;
 
@@ -721,10 +692,7 @@ dbref thing;
     }
 }
 
-int propdir_load(fp, player, atext)
-PROPDIR *fp;
-dbref player;
-char *atext;
+int propdir_load(PROPDIR *fp, dbref player, char *atext)
 {
     dbref target;
     char *tp, *bp, *dp;
@@ -788,9 +756,7 @@ char *atext;
     return errors;
 }
 
-int propdir_rewrite(fp, atext)
-PROPDIR *fp;
-char *atext;
+int propdir_rewrite(PROPDIR *fp, char *atext)
 {
     char *tp, *bp;
     int i, count;
@@ -816,10 +782,7 @@ char *atext;
     return count;
 }
 
-static int propdir_ck(key, player, thing, anum, atext)
-int key, anum;
-dbref player, thing;
-char *atext;
+static int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     PROPDIR *fp;
     int count;
@@ -849,8 +812,7 @@ char *atext;
     return ((count > 0) || !atext || !*atext);
 }
 
-PROPDIR *propdir_get(thing)
-dbref thing;
+PROPDIR *propdir_get(dbref thing)
 {
     dbref aowner;
     int aflags, alen, errors;
@@ -873,8 +835,7 @@ dbref thing;
 /* ---------------------------------------------------------------------------
  */
 
-static char *set_string(ptr, new)
-char **ptr, *new;
+static char *set_string(char **ptr, char *new)
 {
     /* if pointer not null, free it */
 
@@ -893,9 +854,7 @@ char **ptr, *new;
  * Name, s_Name: Get or set an object's name.
  */
 
-void safe_name(thing, outbuf, bufc)
-dbref thing;
-char *outbuf, **bufc;
+void safe_name(dbref thing, char *outbuf, char **bufc)
 {
     dbref aowner;
     int aflags, alen;
@@ -922,8 +881,7 @@ char *outbuf, **bufc;
     s_AccessTime(thing, save_access_time);
 }
 
-char *Name(thing)
-dbref thing;
+char *Name(dbref thing)
 {
     dbref aowner;
     int aflags, alen;
@@ -948,8 +906,7 @@ dbref thing;
     return names[thing];
 }
 
-char *PureName(thing)
-dbref thing;
+char *PureName(dbref thing)
 {
     dbref aowner;
     int aflags, alen;
@@ -974,9 +931,7 @@ dbref thing;
     return purenames[thing];
 }
 
-void s_Name(thing, s)
-dbref thing;
-char *s;
+void s_Name(dbref thing, char *s)
 {
     int len;
 
@@ -998,9 +953,7 @@ char *s;
     set_string(&purenames[thing], strip_ansi((char *)s));
 }
 
-void safe_exit_name(it, buff, bufc)
-dbref it;
-char *buff, **bufc;
+void safe_exit_name(dbref it, char *buff, char **bufc)
 {
     char *s = *bufc;
     int ansi_state = ANST_NORMAL;
@@ -1019,9 +972,7 @@ char *buff, **bufc;
     safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
 }
 
-void s_Pass(thing, s)
-dbref thing;
-const char *s;
+void s_Pass(dbref thing, const char *s)
 {
     atr_add_raw(thing, A_PASS, (char *)s);
 }
@@ -1032,10 +983,7 @@ const char *s;
 
 extern NAMETAB attraccess_nametab[];
 
-void do_attribute(player, cause, key, aname, value)
-dbref player, cause;
-int key;
-char *aname, *value;
+void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
 {
     int success, negate, f;
     char *buff, *sp, *p, *q, *tbuf, *tokst;
@@ -1149,10 +1097,7 @@ char *aname, *value;
  * do_fixdb: Directly edit database fields
  */
 
-void do_fixdb(player, cause, key, arg1, arg2)
-dbref player, cause;
-int key;
-char *arg1, *arg2;
+void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
     dbref thing, res;
 
@@ -1250,7 +1195,7 @@ char *arg1, *arg2;
  * init_attrtab: Initialize the attribute hash tables.
  */
 
-void NDECL(init_attrtab)
+void init_attrtab(void)
 {
     ATTR *a;
     char *buff, *p, *q;
@@ -1272,8 +1217,7 @@ void NDECL(init_attrtab)
  * atr_str: Look up an attribute by name.
  */
 
-ATTR *atr_str(s)
-char *s;
+ATTR *atr_str(char *s)
 {
     char *buff, *p, *q;
     ATTR *a;
@@ -1350,8 +1294,7 @@ char *s;
 ATTR **anum_table = NULL;
 int anum_alc_top = 0;
 
-void anum_extend(newtop)
-int newtop;
+void anum_extend(int newtop)
 {
     ATTR **anum_table2;
     int delta, i;
@@ -1383,8 +1326,7 @@ int newtop;
  * atr_num: Look up an attribute by number.
  */
 
-ATTR *atr_num(anum)
-int anum;
+ATTR *atr_num(int anum)
 {
     VATTR *va;
     static ATTR tattr;
@@ -1416,8 +1358,7 @@ int anum;
  * mkattr: Lookup attribute by name, creating if needed.
  */
 
-int mkattr(buff)
-char *buff;
+int mkattr(char *buff)
 {
     ATTR *ap;
     VATTR *va;
@@ -1458,8 +1399,7 @@ char *buff;
  * al_decode: Fetch an attribute number from an alist.
  */
 
-static int al_decode(app)
-char **app;
+static int al_decode(char **app)
 {
     int atrnum = 0, anum, atrshft = 0;
     char *ap;
@@ -1485,9 +1425,7 @@ char **app;
  * al_code: Store an attribute number in an alist.
  */
 
-static void al_code(app, atrnum)
-char **app;
-int atrnum;
+static void al_code(char **app, int atrnum)
 {
     char *ap;
 
@@ -1508,8 +1446,7 @@ int atrnum;
  * Commer: check if an object has any $-commands in its attributes.
  */
 
-int Commer(thing)
-dbref thing;
+int Commer(dbref thing)
 {
     char *s, *as;
     int attr, aflags, alen;
@@ -1547,9 +1484,7 @@ dbref thing;
 
 /* al_extend: Get more space for attributes, if needed */
 
-void al_extend(buffer, bufsiz, len, copy)
-char **buffer;
-int *bufsiz, len, copy;
+void al_extend(char **buffer, int *bufsiz, int len, int copy)
 {
     char *tbuff;
     int newsize;
@@ -1569,8 +1504,7 @@ int *bufsiz, len, copy;
 
 /* al_size: Return length of attribute list in chars */
 
-int al_size(astr)
-char *astr;
+int al_size(char *astr)
 {
     if (!astr)
         return 0;
@@ -1579,7 +1513,7 @@ char *astr;
 
 /* al_store: Write modified attribute list */
 
-void NDECL(al_store)
+void al_store(void)
 {
     if (mudstate.mod_al_id != NOTHING) {
         if (mudstate.mod_alist && *mudstate.mod_alist) {
@@ -1594,8 +1528,7 @@ void NDECL(al_store)
 
 /* al_fetch: Load attribute list */
 
-char *al_fetch(thing)
-dbref thing;
+char *al_fetch(dbref thing)
 {
     char *astr;
     int len;
@@ -1623,9 +1556,7 @@ dbref thing;
 
 /* al_add: Add an attribute to an attribute list */
 
-void al_add(thing, attrnum)
-dbref thing;
-int attrnum;
+void al_add(dbref thing, int attrnum)
 {
     char *abuf, *cp;
     int anum;
@@ -1668,9 +1599,7 @@ int attrnum;
 
 /* al_delete: Remove an attribute from an attribute list */
 
-void al_delete(thing, attrnum)
-dbref thing;
-int attrnum;
+void al_delete(dbref thing, int attrnum)
 {
     int anum;
     char *abuf, *cp, *dp;
@@ -1701,10 +1630,7 @@ int attrnum;
     return;
 }
 
-static void makekey(thing, atr, abuff)
-dbref thing;
-int atr;
-Aname *abuff;
+static void makekey(dbref thing, int atr, Aname *abuff)
 {
     abuff->object = thing;
     abuff->attrnum = atr;
@@ -1715,8 +1641,7 @@ Aname *abuff;
  * al_destroy: wipe out an object's attribute list.
  */
 
-void al_destroy(thing)
-dbref thing;
+void al_destroy(dbref thing)
 {
     if (mudstate.mod_al_id == thing)
         al_store();	/* remove from cache */
@@ -1727,10 +1652,7 @@ dbref thing;
  * atr_encode: Encode an attribute string.
  */
 
-static char *atr_encode(iattr, thing, owner, flags, atr)
-char *iattr;
-dbref thing, owner;
-int flags, atr;
+static char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
 {
 
     /* If using the default owner and flags (almost all attributes will),
@@ -1751,10 +1673,7 @@ int flags, atr;
  * atr_decode: Decode an attribute string.
  */
 
-static void atr_decode(iattr, oattr, thing, owner, flags, atr, alen)
-char *iattr, *oattr;
-dbref thing, *owner;
-int *flags, atr, *alen;
+static void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr, int *alen)
 {
     char *cp;
     int neg;
@@ -1830,9 +1749,7 @@ int *flags, atr, *alen;
  * atr_clr: clear an attribute in the list.
  */
 
-void atr_clr(thing, atr)
-dbref thing;
-int atr;
+void atr_clr(dbref thing, int atr)
 {
     Aname okey;
     DBData key;
@@ -1886,10 +1803,7 @@ int atr;
  * atr_add_raw, atr_add: add attribute of type atr to list
  */
 
-void atr_add_raw(thing, atr, buff)
-dbref thing;
-int atr;
-char *buff;
+void atr_add_raw(dbref thing, int atr, char *buff)
 {
     Attr *a;
     Aname okey;
@@ -1962,10 +1876,7 @@ char *buff;
     }
 }
 
-void atr_add(thing, atr, buff, owner, flags)
-dbref thing, owner;
-int atr, flags;
-char *buff;
+void atr_add(dbref thing, int atr, char *buff, dbref owner, int flags)
 {
     char *tbuff;
 
@@ -1977,9 +1888,7 @@ char *buff;
     }
 }
 
-void atr_set_owner(thing, atr, owner)
-dbref thing, owner;
-int atr;
+void atr_set_owner(dbref thing, int atr, dbref owner)
 {
     dbref aowner;
     int aflags, alen;
@@ -1990,9 +1899,7 @@ int atr;
     free_lbuf(buff);
 }
 
-void atr_set_flags(thing, atr, flags)
-dbref thing, flags;
-int atr;
+void atr_set_flags(dbref thing, int atr, dbref flags)
 {
     dbref aowner;
     int aflags, alen;
@@ -2007,9 +1914,7 @@ int atr;
  * atr_get_raw, atr_get_str, atr_get: Get an attribute from the database.
  */
 
-char *atr_get_raw(thing, atr)
-dbref thing;
-int atr;
+char *atr_get_raw(dbref thing, int atr)
 {
     DBData key, data;
     Aname okey;
@@ -2030,10 +1935,7 @@ int atr;
     return data.dptr;
 }
 
-char *atr_get_str(s, thing, atr, owner, flags, alen)
-char *s;
-dbref thing, *owner;
-int atr, *flags, *alen;
+char *atr_get_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
     char *buff;
 
@@ -2049,9 +1951,7 @@ int atr, *flags, *alen;
     return s;
 }
 
-char *atr_get(thing, atr, owner, flags, alen)
-dbref thing, *owner;
-int atr, *flags, *alen;
+char *atr_get(dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
     char *buff;
 
@@ -2059,9 +1959,7 @@ int atr, *flags, *alen;
     return atr_get_str(buff, thing, atr, owner, flags, alen);
 }
 
-int atr_get_info(thing, atr, owner, flags)
-dbref thing, *owner;
-int atr, *flags;
+int atr_get_info(dbref thing, int atr, dbref *owner, int *flags)
 {
     int alen;
     char *buff;
@@ -2076,10 +1974,7 @@ int atr, *flags;
     return 1;
 }
 
-char *atr_pget_str(s, thing, atr, owner, flags, alen)
-char *s;
-dbref thing, *owner;
-int atr, *flags, *alen;
+char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
     char *buff;
     dbref parent;
@@ -2124,9 +2019,7 @@ int atr, *flags, *alen;
     return s;
 }
 
-char *atr_pget(thing, atr, owner, flags, alen)
-dbref thing, *owner;
-int atr, *flags, *alen;
+char *atr_pget(dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
     char *buff;
 
@@ -2134,9 +2027,7 @@ int atr, *flags, *alen;
     return atr_pget_str(buff, thing, atr, owner, flags, alen);
 }
 
-int atr_pget_info(thing, atr, owner, flags)
-dbref thing, *owner;
-int atr, *flags;
+int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
 {
     char *buff;
     dbref parent;
@@ -2166,7 +2057,7 @@ int atr, *flags;
             if (Good_obj(parent) && (parent != thing)) {
                 buff = atr_get_raw(parent, atr);
                 if (buff && *buff) {
-                    atr_decode(buff, NULL, thing, owner, flags, atr &alen);
+                    atr_decode(buff,        NULL,        thing,       owner, flags, atr, &alen);
                     if (!(*flags & AF_PRIVATE))
                         return 1;
                 }
@@ -2184,8 +2075,7 @@ int atr, *flags;
  * atr_free: Return all attributes of an object.
  */
 
-void atr_free(thing)
-dbref thing;
+void atr_free(dbref thing)
 {
     int attr;
     char *as;
@@ -2203,8 +2093,7 @@ dbref thing;
  * the player are copied.
  */
 
-void atr_cpy(player, dest, source)
-dbref player, dest, source;
+void atr_cpy(dbref player, dbref dest, dbref source)
 {
     int attr, aflags, alen;
     dbref owner, aowner;
@@ -2234,8 +2123,7 @@ dbref player, dest, source;
  * current owner if they are not locked.
  */
 
-void atr_chown(obj)
-dbref obj;
+void atr_chown(dbref obj)
 {
     int attr, aflags, alen;
     dbref owner, aowner;
@@ -2257,8 +2145,7 @@ dbref obj;
  * atr_next: Return next attribute in attribute list.
  */
 
-int atr_next(attrp)
-char **attrp;
+int atr_next(char **attrp)
 {
     if (!*attrp || !**attrp) {
         return 0;
@@ -2271,7 +2158,7 @@ char **attrp;
  * atr_push, atr_pop: Push and pop attr lists.
  */
 
-void NDECL(atr_push)
+void atr_push(void)
 {
     ALIST *new_alist;
 
@@ -2286,7 +2173,7 @@ void NDECL(atr_push)
     return;
 }
 
-void NDECL(atr_pop)
+void atr_pop(void)
 {
     ALIST *old_alist;
     char *cp;
@@ -2314,9 +2201,7 @@ void NDECL(atr_pop)
  * atr_head: Returns the head of the attr list for object 'thing'
  */
 
-int atr_head(thing, attrp)
-dbref thing;
-char **attrp;
+int atr_head(dbref thing, char **attrp)
 {
     char *astr;
     int alen;
@@ -2351,8 +2236,7 @@ char **attrp;
 
 #define	SIZE_HACK	1	/* So mistaken refs to #-1 won't die. */
 
-void initialize_objects(first, last)
-dbref first, last;
+void initialize_objects(dbref first, dbref last)
 {
     dbref thing;
 
@@ -2375,8 +2259,7 @@ dbref first, last;
     }
 }
 
-void db_grow(newtop)
-dbref newtop;
+void db_grow(dbref newtop)
 {
     int newsize, marksize, delta, i;
     MARKBUF *newmarkbuf;
@@ -2561,7 +2444,7 @@ dbref newtop;
     mudstate.markbits = newmarkbuf;
 }
 
-void NDECL(db_free)
+void db_free(void)
 {
     char *cp;
 
@@ -2576,7 +2459,7 @@ void NDECL(db_free)
     mudstate.freelist = NOTHING;
 }
 
-void NDECL(db_make_minimal)
+void db_make_minimal(void)
 {
     dbref obj;
 
@@ -2615,8 +2498,7 @@ void NDECL(db_make_minimal)
     s_Link(obj, 0);
 }
 
-dbref parse_dbref_only(s)
-const char *s;
+dbref parse_dbref_only(const char *s)
 {
     const char *p;
     int x;
@@ -2632,8 +2514,7 @@ const char *s;
     return ((x >= 0) ? x : NOTHING);
 }
 
-dbref parse_objid(s, p)
-const char *s, *p;
+dbref parse_objid(const char *s, const char *p)
 {
     dbref it;
     time_t tt;
@@ -2669,8 +2550,7 @@ const char *s, *p;
     return NOTHING;
 }
 
-dbref parse_dbref(s)
-const char *s;
+dbref parse_dbref(const char *s)
 {
     const char *p;
     int x;
@@ -2690,9 +2570,7 @@ const char *s;
     return ((x >= 0) ? x : NOTHING);
 }
 
-void putstring(f, s)
-FILE *f;
-const char *s;
+void putstring(FILE *f, const char *s)
 {
     putc('"', f);
 
@@ -2726,9 +2604,7 @@ const char *s;
     putc('\n', f);
 }
 
-const char *getstring_noalloc(f, new_strings)
-FILE *f;
-int new_strings;
+const char *getstring_noalloc(FILE *f, int new_strings)
 {
     static char buf[LBUF_SIZE];
     char *p;
@@ -2793,24 +2669,21 @@ int new_strings;
     }
 }
 
-dbref getref(f)
-FILE *f;
+dbref getref(FILE *f)
 {
     static char buf[SBUF_SIZE];
     fgets(buf, sizeof(buf), f);
     return ((int)strtol(buf, (char **)NULL, 10));
 }
 
-long getlong(f)
-FILE *f;
+long getlong(FILE *f)
 {
     static char buf[SBUF_SIZE];
     fgets(buf, sizeof(buf), f);
     return (strtol(buf, (char **)NULL, 10));
 }
 
-void free_boolexp(b)
-BOOLEXP *b;
+void free_boolexp(BOOLEXP *b)
 {
     if (b == TRUE_BOOLEXP)
         return;
@@ -2841,8 +2714,7 @@ BOOLEXP *b;
     }
 }
 
-BOOLEXP *dup_bool(b)
-BOOLEXP *b;
+BOOLEXP *dup_bool(BOOLEXP *b)
 {
     BOOLEXP *r;
 
@@ -2875,8 +2747,7 @@ BOOLEXP *b;
     return (r);
 }
 
-int init_gdbm_db(gdbmfile)
-char *gdbmfile;
+int init_gdbm_db(char *gdbmfile)
 {
     /* Calculate proper database block size */
 
@@ -2895,8 +2766,7 @@ char *gdbmfile;
 
 /* check_zone - checks back through a zone tree for control */
 
-int check_zone(player, thing)
-dbref player, thing;
+int check_zone(dbref player, dbref thing)
 {
     if (mudstate.standalone)
         return 0;
@@ -2930,8 +2800,7 @@ dbref player, thing;
 
 }
 
-int check_zone_for_player(player, thing)
-dbref player, thing;
+int check_zone_for_player(dbref player, dbref thing)
 {
     if (!Control_ok(Zone(thing))) {
         return 0;
@@ -2958,7 +2827,7 @@ dbref player, thing;
  * dump_restart_db: Writes out socket information.
  */
 
-void dump_restart_db()
+void dump_restart_db(void)
 {
     FILE *f;
     DESC *d;
@@ -3000,7 +2869,7 @@ void dump_restart_db()
     fclose(f);
 }
 
-void load_restart_db()
+void load_restart_db(void)
 {
     FILE *f;
     DESC *d;
