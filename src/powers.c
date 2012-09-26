@@ -25,14 +25,7 @@
  * * ph_any: set or clear indicated bit, no security checking
  */
 
-int
-ph_any(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_any(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (fpowers & POWER_EXT)
     {
         if (reset)
@@ -63,14 +56,7 @@ int fpowers, reset;
  * * ph_god: only GOD may set or clear the bit
  */
 
-int
-ph_god(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_god(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (!God(player))
         return 0;
     return (ph_any(target, player, power, fpowers, reset));
@@ -81,14 +67,7 @@ int fpowers, reset;
  * * ph_wiz: only WIZARDS (or GOD) may set or clear the bit
  */
 
-int
-ph_wiz(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_wiz(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (!Wizard(player) & !God(player))
         return 0;
     return (ph_any(target, player, power, fpowers, reset));
@@ -99,14 +78,7 @@ int fpowers, reset;
  * * ph_wizroy: only WIZARDS, ROYALTY, (or GOD) may set or clear the bit
  */
 
-int
-ph_wizroy(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_wizroy(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (!WizRoy(player) & !God(player))
         return 0;
     return (ph_any(target, player, power, fpowers, reset));
@@ -117,14 +89,7 @@ int fpowers, reset;
  * ordinary players can set it on other types of objects.
  */
 
-int
-ph_restrict_player(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_restrict_player(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (isPlayer(target) && !Wizard(player) && !God(player))
         return 0;
     return (ph_any(target, player, power, fpowers, reset));
@@ -137,13 +102,7 @@ int fpowers, reset;
  */
 
 int
-ph_privileged(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+ph_privileged(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (!God(player))
     {
 
@@ -166,14 +125,7 @@ int fpowers, reset;
  * * ph_inherit: only players may set or clear this bit.
  */
 
-int
-ph_inherit(target, player, power, fpowers, reset)
-dbref target, player;
-
-POWER power;
-
-int fpowers, reset;
-{
+int ph_inherit(dbref target, dbref player, POWER power, int fpowers, int reset) {
     if (!Inherits(player))
         return 0;
     return (ph_any(target, player, power, fpowers, reset));
@@ -235,9 +187,7 @@ POWERENT gen_powers[] =
  * * init_powertab: initialize power hash tables.
  */
 
-void
-NDECL(init_powertab)
-{
+void init_powertab(void) {
     POWERENT *fp;
 
     hashinit(&mudstate.powers_htab, 25 * HASH_FACTOR, HT_STR | HT_KEYREF);
@@ -254,10 +204,7 @@ NDECL(init_powertab)
  * * display_powers: display available powers.
  */
 
-void
-display_powertab(player)
-dbref player;
-{
+void display_powertab(dbref player) {
     char *buf, *bp;
 
     POWERENT *fp;
@@ -278,12 +225,7 @@ dbref player;
     free_lbuf(buf);
 }
 
-POWERENT *
-find_power(thing, powername)
-dbref thing;
-
-char *powername;
-{
+POWERENT *find_power(dbref thing, char *powername) {
     char *cp;
 
     /*
@@ -295,14 +237,7 @@ char *powername;
     return (POWERENT *) hashfind(powername, &mudstate.powers_htab);
 }
 
-int
-decode_power(player, powername, pset)
-dbref player;
-
-char *powername;
-
-POWERSET *pset;
-{
+int decode_power(dbref player, char *powername, POWERSET *pset) {
     POWERENT *pent;
 
     pset->word1 = 0;
@@ -327,14 +262,7 @@ POWERSET *pset;
  * * power_set: Set or clear a specified power on an object.
  */
 
-void
-power_set(target, player, power, key)
-dbref target, player;
-
-char *power;
-
-int key;
-{
+void power_set(dbref target, dbref player, char *power, int key) {
     POWERENT *fp;
 
     int negate, result;
@@ -394,12 +322,7 @@ int key;
  * * has_power: does object have power visible to player?
  */
 
-int
-has_power(player, it, powername)
-dbref player, it;
-
-char *powername;
-{
+int has_power(dbref player, dbref it, char *powername) {
     POWERENT *fp;
 
     POWER fv;
@@ -429,10 +352,7 @@ char *powername;
  * * power_description: Return an mbuf containing the type and powers on thing.
  */
 
-char *
-power_description(player, target)
-dbref player, target;
-{
+char *power_description(dbref player, dbref target) {
     char *buff, *bp;
 
     POWERENT *fp;
@@ -485,12 +405,7 @@ dbref player, target;
  * * decompile_powers: Produce commands to set powers on target.
  */
 
-void
-decompile_powers(player, thing, thingname)
-dbref player, thing;
-
-char *thingname;
-{
+void decompile_powers(dbref player, dbref thing, char *thingname) {
     POWER f1, f2;
 
     POWERENT *fp;
@@ -548,8 +463,7 @@ char *thingname;
  * cf_flag_access.
  */
 
-CF_HAND(cf_power_access)
-{
+int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *fstr, *permstr, *tokst;
 
     POWERENT *fp;

@@ -46,12 +46,7 @@ unsigned long addr;
 /*
  * copy a string, returning pointer to the null terminator of dest
  */
-char *
-stpcopy(dest, src)
-char *dest;
-
-const char *src;
-{
+char *stpcopy(char *dest, const char *src) {
     while ((*dest = *src))
     {
         ++dest;
@@ -60,19 +55,11 @@ const char *src;
     return (dest);
 }
 
-void
-child_timeout_signal(sig)
-int sig;
-{
+void child_timeout_signal(int sig) {
     exit(1);
 }
 
-int
-query(ip, orig_arg)
-char *ip;
-
-char *orig_arg;
-{
+int query(char *ip, char *orig_arg) {
     char *comma;
 
     char *port_pair;
@@ -216,10 +203,7 @@ char *orig_arg;
     return (0);
 }
 
-void
-child_signal(sig)
-int sig;
-{
+void child_signal(int sig) {
     pid_t child_pid;
 
     int i;
@@ -241,10 +225,7 @@ int sig;
     signal(SIGCHLD, (void (*)(int))child_signal);
 }
 
-void
-alarm_signal(sig)
-int sig;
-{
+void alarm_signal(int sig) {
     struct itimerval itime;
 
     struct timeval interval;
@@ -264,12 +245,7 @@ int sig;
 }
 
 
-int
-main(argc, argv)
-int argc;
-
-char **argv;
-{
+int main(int argc, char **argv) {
     char arg[MAX_STRING];
 
     char *p;

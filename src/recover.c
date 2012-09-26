@@ -24,10 +24,7 @@
 static GDBM_FILE dbp = (GDBM_FILE) 0;
 //static gdbm_file_info *dbp = NULL;
 
-static void
-gdbm_panic(mesg)
-char *mesg;
-{
+static void gdbm_panic(char *mesg) {
     fprintf(stderr, "GDBM panic: %s\n", mesg);
 }
 
@@ -35,12 +32,7 @@ extern char *optarg;
 
 extern int optind;
 
-int
-main(argc, argv)
-int argc;
-
-char *argv[];
-{
+int main(int argc, char *argv[]) {
     datum key, dat;
 
     FILE *f;

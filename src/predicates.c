@@ -23,7 +23,7 @@
 #include "ansi.h"		/* required by code */
 #include "functions.h"		/* required by code */
 
-extern int FDECL(do_command, (DESC *, char *, int));
+extern int do_command(DESC *, char *, int);
 
 extern void NDECL(dump_database);
 
@@ -33,110 +33,52 @@ extern volatile int slave_pid;
 
 extern volatile int slave_socket;
 
-extern void FDECL(load_quota, (int *, dbref, int));
+extern void load_quota(int *, dbref, int);
 
-extern void FDECL(save_quota, (int *, dbref, int));
+extern void save_quota(int *, dbref, int);
 
-extern int FDECL(get_gender, (dbref));
+extern int get_gender(dbref);
 
-static int FDECL(type_quota, (int));
+static int type_quota(int);
 
-static int FDECL(pay_quota, (dbref, int, int));
+static int pay_quota(dbref, int, int);
 
-extern void FDECL(queue_rawstring, (DESC *, const char *));
+extern void queue_rawstring(DESC *, const char *);
 
-#ifdef HAVE_VSNPRINTF
 static char tprintf_buff[LBUF_SIZE];
-#else
-static char tprintf_buff[20000];
-#endif
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
-char *
-tprintf(const char *format, ...)
-#else
-char *
-tprintf(va_alist)
-va_dcl
-#endif
-{
+char *tprintf(const char *format, ...) {
     va_list ap;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
-#else
-    char *format;
 
-    va_start(ap);
-    format = va_arg(ap, char *);
-
-#endif
-
-#ifdef HAVE_VSNPRINTF
     vsnprintf(tprintf_buff, LBUF_SIZE, format, ap);
-#else
-    vsprintf(tprintf_buff, format, ap);
-#endif
+
     va_end(ap);
     tprintf_buff[LBUF_SIZE - 1] = '\0';
     return tprintf_buff;
 }
 
 
-char *
-tvprintf(format, ap)
-const char *format;
-
-va_list ap;
+char *tvprintf(const char *format, va_list ap)
 {
-#ifdef HAVE_VSNPRINTF
     vsnprintf(tprintf_buff, LBUF_SIZE, format, ap);
-#else
-    vsprintf(tprintf_buff, format, ap);
-#endif
     tprintf_buff[LBUF_SIZE - 1] = '\0';
     return tprintf_buff;
 }
 
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
 void
-safe_tprintf_str(char *str, char **bp, const char *format, ...)
-#else
-void
-safe_tprintf_str(va_alist)
-va_dcl
-#endif
-{
-#ifdef HAVE_VSNPRINTF
+safe_tprintf_str(char *str, char **bp, const char *format, ...) {
     int len, n;
-#else
-    static char buff[20000];
-#endif
     va_list ap;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
-#else
-    char *str;
 
-    char **bp;
-
-    char *format;
-
-    va_start(ap);
-    str = va_arg(ap, char *);
-
-    bp = va_arg(ap, char **);
-
-    format = va_arg(ap, char *);
-
-#endif
     /*
      * Sigh, don't we wish _all_ vsprintf's returned int...
      */
 
-#ifdef HAVE_VSNPRINTF
     n = LBUF_SIZE - (*bp - str);
     if (n <= 0)
     {
@@ -149,31 +91,18 @@ va_dcl
     n = ((len < n) ? len : n);
     *bp += n;
     **bp = '\0';
-#else
-    vsprintf(buff, format, ap);
-    va_end(ap);
-    buff[LBUF_SIZE - 1] = '\0';
-    safe_str(buff, str, bp);
-    **bp = '\0';
-#endif
 }
 
 /* ---------------------------------------------------------------------------
  * insert_first, remove_first: Insert or remove objects from lists.
  */
 
-dbref
-insert_first(head, thing)
-dbref head, thing;
-{
+dbref insert_first(dbref head, dbref thing) {
     s_Next(thing, head);
     return thing;
 }
 
-dbref
-remove_first(head, thing)
-dbref head, thing;
-{
+dbref remove_first(dbref head, dbref thing) {
     dbref prev;
 
     if (head == thing)
@@ -194,10 +123,7 @@ dbref head, thing;
  * reverse_list: Reverse the order of members in a list.
  */
 
-dbref
-reverse_list(list)
-dbref list;
-{
+dbref reverse_list(dbref list) {
     dbref newlist, rest;
 
     newlist = NOTHING;
@@ -215,10 +141,7 @@ dbref list;
  * member - indicate if thing is in list
  */
 
-int
-member(thing, list)
-dbref thing, list;
-{
+int member(dbref thing, dbref list) {
     DOLIST(list, list)
     {
         if (list == thing)
@@ -231,10 +154,7 @@ dbref thing, list;
  * is_integer, is_number: see if string contains just a number.
  */
 
-int
-is_integer(str)
-char *str;
-{
+int is_integer(char *str) {
     while (*str && isspace(*str))
         str++;		/* Leading spaces */
     if ((*str == '-') || (*str == '+'))  	/* Leading minus or plus */
@@ -252,10 +172,7 @@ char *str;
     return (*str ? 0 : 1);
 }
 
-int
-is_number(str)
-char *str;
-{
+int is_number(char *str) {
     int got_one;
 
     while (*str && isspace(*str))
@@ -282,12 +199,7 @@ char *str;
     return ((*str || !got_one) ? 0 : 1);
 }
 
-int
-could_doit(player, thing, locknum)
-dbref player, thing;
-
-int locknum;
-{
+int could_doit(dbref player, dbref thing, int locknum) {
     char *key;
 
     dbref aowner;
@@ -311,12 +223,7 @@ int locknum;
     return doit;
 }
 
-static int
-canpayquota(player, who, cost, objtype)
-dbref player, who;
-
-int cost, objtype;
-{
+static int canpayquota(dbref player, dbref who, int cost, int objtype) {
     register int quota;
 
     int q_list[5];
@@ -355,12 +262,7 @@ int cost, objtype;
 }
 
 
-static int
-pay_quota(who, cost, objtype)
-dbref who;
-
-int cost, objtype;
-{
+static int pay_quota(dbref who, int cost, int objtype) {
     /*
      * If no cost, succeed.  Negative costs /must/ be managed, however
      */
@@ -373,12 +275,7 @@ int cost, objtype;
     return 1;
 }
 
-int
-canpayfees(player, who, pennies, quota, objtype)
-dbref player, who;
-
-int pennies, quota, objtype;
-{
+int canpayfees(dbref player, dbref who, int pennies, int quota, int objtype) {
     if (!Wizard(who) && !Wizard(Owner(who)) &&
             !Free_Money(who) && !Free_Money(Owner(who)) &&
             (Pennies(Owner(who)) < pennies))
@@ -418,10 +315,7 @@ int pennies, quota, objtype;
     return 1;
 }
 
-static int
-type_quota(objtype)
-int objtype;
-{
+static int type_quota(int objtype) {
     int qtype;
 
     /*
@@ -445,12 +339,7 @@ int objtype;
     return (qtype);
 }
 
-int
-payfor(who, cost)
-dbref who;
-
-int cost;
-{
+int payfor(dbref who, dbref cost) {
     dbref tmp;
 
     if (Wizard(who) || Wizard(Owner(who)) ||
@@ -468,12 +357,7 @@ int cost;
     return 0;
 }
 
-int
-payfees(who, pennies, quota, objtype)
-dbref who;
-
-int pennies, quota, objtype;
-{
+int payfees(dbref who, int pennies, int quota, int objtype) {
     /*
      * You /must/ have called canpayfees() first.  If not, your
      * * database will be eaten by rabid squirrels.
@@ -483,12 +367,7 @@ int pennies, quota, objtype;
     return payfor(who, pennies);
 }
 
-void
-add_quota(who, payment, type)
-dbref who;
-
-int payment, type;
-{
+void add_quota(dbref who, int payment, int type) {
     int q_list[5];
 
     load_quota(q_list, Owner(who), A_RQUOTA);
@@ -500,12 +379,7 @@ int payment, type;
     save_quota(q_list, Owner(who), A_RQUOTA);
 }
 
-void
-giveto(who, pennies)
-dbref who;
-
-int pennies;
-{
+void giveto(dbref who, int pennies) {
     if (Wizard(who) || Wizard(Owner(who)) ||
             Free_Money(who) || Free_Money(Owner(who)) ||
             Immortal(who) || Immortal(Owner(who)))
@@ -516,10 +390,7 @@ int pennies;
     s_Pennies(who, Pennies(who) + pennies);
 }
 
-int
-ok_name(name)
-const char *name;
-{
+int ok_name(const char *name) {
     const char *cp;
 
     char *purename = strip_ansi(name);
@@ -570,10 +441,7 @@ const char *name;
             string_compare(purename, "here"));
 }
 
-int
-ok_player_name(name)
-const char *name;
-{
+int ok_player_name(const char *name) {
     const char *cp, *good_chars;
 
     /*
@@ -606,10 +474,7 @@ const char *name;
     return 1;
 }
 
-int
-ok_attr_name(attrname)
-const char *attrname;
-{
+int ok_attr_name(const char *attrname) {
     const char *scan;
 
     if (!isalpha(*attrname) && (*attrname != '_'))
@@ -624,12 +489,7 @@ const char *attrname;
     return 1;
 }
 
-int
-ok_password(password, player)
-const char *password;
-
-dbref player;
-{
+int ok_password(const char *password, dbref player) {
     const char *scan;
 
     int num_upper = 0;
@@ -704,12 +564,7 @@ dbref player;
  * handle_ears: Generate the 'grows ears' and 'loses ears' messages.
  */
 
-void
-handle_ears(thing, could_hear, can_hear)
-dbref thing;
-
-int could_hear, can_hear;
-{
+void handle_ears(dbref thing, int could_hear, int can_hear) {
     char *buff, *bp;
 
     int gender;
@@ -734,14 +589,7 @@ int could_hear, can_hear;
 
 /* for lack of better place the @switch code is here */
 
-void
-do_switch(player, cause, key, expr, args, nargs, cargs, ncargs)
-dbref player, cause;
-
-int key, nargs, ncargs;
-
-char *expr, *args[], *cargs[];
-{
+void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int nargs, char *cargs[], int ncargs) {
     int a, any, now;
 
     char *buff, *tbuf, *bp, *str;
@@ -815,14 +663,7 @@ char *expr, *args[], *cargs[];
  * do_end: Stop processing an action list, based on a conditional.
  */
 
-void
-do_end(player, cause, key, condstr, cmdstr, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *condstr, *cmdstr, *args[];
-{
+void do_end(dbref player, dbref cause, int key, char *condstr, char *cmdstr, char *args[], int nargs) {
     int k = key & ENDCMD_ASSERT;
 
     int n = xlate(condstr);
@@ -842,14 +683,7 @@ char *condstr, *cmdstr, *args[];
  * Command hooks.
  */
 
-void
-do_hook(player, cause, key, cmdname, target)
-dbref player, cause;
-
-int key;
-
-char *cmdname, *target;
-{
+void do_hook(dbref player, dbref cause, int key, char *cmdname, char *target) {
     CMDENT *cmdp;
 
     char *p;
@@ -1093,14 +927,7 @@ char *cmdname, *target;
  * Command overriding and friends.
  */
 
-void
-do_addcommand(player, cause, key, name, command)
-dbref player, cause;
-
-int key;
-
-char *name, *command;
-{
+void do_addcommand(dbref player, dbref cause, int key, char *name, char *command) {
     CMDENT *old, *cmd;
 
     ADDENT *add, *nextp;
@@ -1232,14 +1059,7 @@ char *name, *command;
     notify(player, tprintf("Command %s added.", name));
 }
 
-void
-do_listcommands(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_listcommands(dbref player, dbref cause, int key, char *name) {
     CMDENT *old;
 
     ADDENT *nextp;
@@ -1322,14 +1142,7 @@ char *name;
         notify(player, "No added commands found in command table.");
 }
 
-void
-do_delcommand(player, cause, key, name, command)
-dbref player, cause;
-
-int key;
-
-char *name, *command;
-{
+void do_delcommand(dbref player, dbref cause, int key, char *name, char *command) {
     CMDENT *old, *cmd;
 
     ADDENT *prev = NULL, *nextp;
@@ -1543,12 +1356,7 @@ char *name, *command;
  * will be processed normally.
  */
 
-void
-handle_prog(d, message)
-DESC *d;
-
-char *message;
-{
+void handle_prog(DESC *d, char *message) {
     DESC *all, *dsave;
 
     char *cmd;
@@ -1612,12 +1420,7 @@ char *message;
     free_lbuf(cmd);
 }
 
-static int
-ok_program(player, doer)
-dbref player;
-
-dbref doer;
-{
+static int ok_program(dbref player, dbref doer) {
     if ((!(Prog(player) || Prog(Owner(player))) && !Controls(player, doer))
             || (God(doer) && !God(player)))
     {
@@ -1637,14 +1440,7 @@ dbref doer;
     return 1;
 }
 
-void
-do_quitprog(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_quitprog(dbref player, dbref cause, int key, char *name) {
     DESC *d;
 
     dbref doer;
@@ -1694,14 +1490,7 @@ char *name;
     notify(doer, "Your @program has been terminated.");
 }
 
-void
-do_prog(player, cause, key, name, command)
-dbref player, cause;
-
-int key;
-
-char *name, *command;
-{
+void do_prog(dbref player, dbref cause, int key, char *name, char *command) {
     DESC *d;
 
     PROG *program;
@@ -1827,12 +1616,7 @@ char *name, *command;
  * do_restart: Restarts the game.
  */
 
-void
-do_restart(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_restart(dbref player, dbref cause, int key) {
     LOGFILETAB *lp;
 
     MODULE *mp;
@@ -1922,31 +1706,16 @@ int key;
  * do_eval is similar, except it gets passed on arg.
  */
 
-void
-do_comment(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_comment(dbref player, dbref cause, int key) {
 }
 
-void
-do_eval(player, cause, key, str)
-dbref player, cause;
-
-int key;
-
-char *str;
-{
+void do_eval(dbref player, dbref cause, int key, char *str) {
 }
 
 /* ---------------------------------------------------------------------------
  */
 
-static dbref
-promote_dflt(old, new)
-dbref old, new;
-{
+static dbref promote_dflt(dbref old, dbref new) {
     switch (new)
     {
     case NOPERM:
@@ -1964,14 +1733,7 @@ dbref old, new;
     return NOTHING;
 }
 
-dbref
-match_possessed(player, thing, target, dflt, check_enter)
-dbref player, thing, dflt;
-
-char *target;
-
-int check_enter;
-{
+dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int check_enter) {
     dbref result, result1;
 
     int control;
@@ -2107,12 +1869,7 @@ int check_enter;
  * parse_range: break up <what>,<low>,<high> syntax
  */
 
-void
-parse_range(name, low_bound, high_bound)
-char **name;
-
-dbref *low_bound, *high_bound;
-{
+void parse_range(char **name, dbref *low_bound, dbref *high_bound) {
     char *buff1, *buff2;
 
     buff1 = *name;
@@ -2150,12 +1907,7 @@ dbref *low_bound, *high_bound;
     }
 }
 
-int
-parse_thing_slash(player, thing, after, it)
-dbref player, *it;
-
-char *thing, **after;
-{
+int parse_thing_slash(dbref player, char *thing, char **after, dbref *it) {
     char *str;
 
     /*
@@ -2193,14 +1945,7 @@ char *thing, **after;
 
 extern NAMETAB lock_sw[];
 
-int
-get_obj_and_lock(player, what, it, attr, errmsg, bufc)
-dbref player, *it;
-
-char *what, *errmsg, **bufc;
-
-ATTR **attr;
-{
+int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *errmsg, char **bufc) {
     char *str, *tbuf;
 
     int anum;
@@ -2258,10 +2003,7 @@ ATTR **attr;
  * ie. location for players/things, source for exits, NOTHING for rooms.
  */
 
-dbref
-where_is(what)
-dbref what;
-{
+dbref where_is(dbref what) {
     dbref loc;
 
     if (!Good_obj(what))
@@ -2289,10 +2031,7 @@ dbref what;
  * recursion exceeded.  If player is a room, returns itself.
  */
 
-dbref
-where_room(what)
-dbref what;
-{
+dbref where_room(dbref what) {
     int count;
 
     for (count = mudconf.ntfy_nest_lim; count > 0; count--)
@@ -2308,10 +2047,7 @@ dbref what;
     return NOTHING;
 }
 
-int
-locatable(player, it, cause)
-dbref player, it, cause;
-{
+int locatable(dbref player, dbref it, dbref cause) {
     dbref loc_it, room_it;
 
     int findable_room;
@@ -2366,10 +2102,7 @@ dbref player, it, cause;
  * IS the room.
  */
 
-int
-nearby(player, thing)
-dbref player, thing;
-{
+int nearby(dbref player, dbref thing) {
     int thing_loc, player_loc;
 
     if (!Good_obj(player) || !Good_obj(thing))
@@ -2389,18 +2122,7 @@ dbref player, thing;
  *              the caller.
  */
 
-char *
-master_attr(player, thing, what, sargs, nsargs, f_ptr)
-dbref player, thing;
-
-int what;
-
-char **sargs;
-
-int nsargs;
-
-int *f_ptr;
-{
+char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs, int *f_ptr) {
     /*
      * If the attribute exists, evaluate it and return pointer to lbuf.
      * * If not, return NULL.
@@ -2579,17 +2301,7 @@ int *f_ptr;
  * did_it: Have player do something to/with thing
  */
 
-void
-did_it(player, thing, what, def, owhat, odef, awhat, ctrl_flags, args, nargs,
-       msg_key)
-dbref player, thing;
-
-int what, owhat, awhat, ctrl_flags, nargs, msg_key;
-
-char *args[];
-
-const char *def, *odef;
-{
+void did_it(dbref player, dbref thing, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key) {
     GDATA *preserve;
 
     char *d, *m, *buff, *act, *charges, *bp, *str;
@@ -2978,14 +2690,7 @@ const char *def, *odef;
  * * do_verb: Command interface to did_it.
  */
 
-void
-do_verb(player, cause, key, victim_str, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *victim_str, *args[];
-{
+void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[], int nargs) {
     dbref actor, victim, aowner;
 
     int what, owhat, awhat, nxargs, restriction, aflags, i;
@@ -3172,14 +2877,7 @@ char *victim_str, *args[];
  * do not deplete charges.
  */
 
-void
-do_include(player, cause, key, object, argv, nargs, cargs, ncargs)
-dbref player, cause;
-
-int key, nargs, ncargs;
-
-char *object, *argv[], *cargs[];
-{
+void do_include(dbref player, dbref cause, int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int attrib, aflags, alen;
@@ -3249,14 +2947,7 @@ char *object, *argv[], *cargs[];
  * do_redirect: Redirect PUPPET, TRACE, VERBOSE output to another player.
  */
 
-void
-do_redirect(player, cause, key, from_name, to_name)
-dbref player, cause;
-
-int key;
-
-char *from_name, *to_name;
-{
+void do_redirect(dbref player, dbref cause, int key, char *from_name, char *to_name) {
     dbref from_ref, to_ref;
 
     NUMBERTAB *np;
@@ -3386,14 +3077,7 @@ char *from_name, *to_name;
  * do_reference: Manipulate nrefs.
  */
 
-void
-do_reference(player, cause, key, ref_name, obj_name)
-dbref player, cause;
-
-int key;
-
-char *ref_name, *obj_name;
-{
+void do_reference(dbref player, dbref cause, int key, char *ref_name, char *obj_name) {
     HASHENT *hptr;
 
     HASHTAB *htab;

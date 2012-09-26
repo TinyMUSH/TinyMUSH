@@ -24,14 +24,7 @@
  * load_quota: Load a quota into an array. Expects A_QUOTA or A_QUOTA.
  */
 
-void
-load_quota(q_list, player, qtype)
-int q_list[];
-
-dbref player;
-
-int qtype;
-{
+void load_quota(int q_list[], dbref player, int qtype) {
     int i, aowner, aflags, alen;
 
     char *quota_str, *p, *tokst;
@@ -57,14 +50,7 @@ int qtype;
 /* ---------------------------------------------------------------------------
  * save_quota: turns a quota array into an attribute.
  */
-void
-save_quota(q_list, player, qtype)
-int q_list[];
-
-dbref player;
-
-int qtype;
-{
+void save_quota(int q_list[], dbref player, int qtype) {
     char buf[MBUF_SIZE];
 
     sprintf(buf, "%d %d %d %d %d", q_list[0], q_list[1], q_list[2],
@@ -76,12 +62,7 @@ int qtype;
  * mung_quota, show_quota, do_quota: Manage quotas.
  */
 
-static void
-count_objquota(player, aq, rq, eq, tq, pq)
-dbref player;
-
-int *aq, *rq, *eq, *tq, *pq;
-{
+static void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq) {
     register int a, r, e, t, p, i;
 
     a = r = e = t = p = 0;
@@ -118,12 +99,7 @@ int *aq, *rq, *eq, *tq, *pq;
 }
 
 
-static void
-adjust_quota(player, qtype, value, key)
-dbref player;
-
-int qtype, value, key;
-{
+static void adjust_quota(dbref player, int qtype, int value, int key) {
     register int aq, rq;
 
     int q_list[5], rq_list[5];
@@ -160,12 +136,7 @@ int qtype, value, key;
 }
 
 
-static void
-mung_quotas(player, key, value)
-dbref player;
-
-int key, value;
-{
+static void mung_quotas(dbref player, int key, int value) {
     int xq, rooms, exits, things, players;
 
     int q_list[5], rq_list[5];
@@ -218,10 +189,7 @@ int key, value;
     }
 }
 
-static void
-show_quota(player, victim)
-dbref player, victim;
-{
+static void show_quota(dbref player, dbref victim) {
     int q_list[5], rq_list[5], dq_list[5], i;
 
     load_quota(q_list, victim, A_QUOTA);
@@ -263,10 +231,7 @@ dbref player, victim;
     }
 }
 
-static void
-show_quota_header(player)
-dbref player;
-{
+static void show_quota_header(dbref player) {
     if (mudconf.typed_quotas)
         notify_quiet(player,
                      "Name            : Quot - Lim  Room - Lim  Exit - Lim  Thin - Lim  Play - Lim");
@@ -274,14 +239,7 @@ dbref player;
         notify_quiet(player, "Name            : Quot - Lim");
 }
 
-void
-do_quota(player, cause, key, arg1, arg2)
-dbref player, cause;
-
-int key;
-
-char *arg1, *arg2;
-{
+void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     dbref who;
 
     register int set = 0, value = 0, i;

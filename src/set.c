@@ -22,12 +22,7 @@
 
 extern NAMETAB indiv_attraccess_nametab[];
 
-dbref
-match_controlled(player, name)
-dbref player;
-
-const char *name;
-{
+dbref match_controlled(dbref player, const char *name) {
     dbref mat;
 
     init_match(player, name, NOTYPE);
@@ -44,12 +39,7 @@ const char *name;
     }
 }
 
-dbref
-match_controlled_quiet(player, name)
-dbref player;
-
-const char *name;
-{
+dbref match_controlled_quiet(dbref player, const char *name) {
     dbref mat;
 
     init_match(player, name, NOTYPE);
@@ -65,12 +55,7 @@ const char *name;
     }
 }
 
-dbref
-match_affected(player, name)
-dbref player;
-
-const char *name;
-{
+dbref match_affected(dbref player, const char *name) {
     dbref mat;
 
     /*
@@ -92,16 +77,7 @@ const char *name;
     }
 }
 
-void
-do_chzone(player, cause, key, name, newobj)
-dbref player, cause;
-
-int key;
-
-const char *name;
-
-const char *newobj;
-{
+void do_chzone(dbref player, dbref cause, int key, const char *name, const char *newobj) {
     dbref thing;
 
     dbref zone;
@@ -202,16 +178,7 @@ const char *newobj;
     s_Modified(thing);
 }
 
-void
-do_name(player, cause, key, name, newname)
-dbref player, cause;
-
-int key;
-
-const char *name;
-
-char *newname;
-{
+void do_name(dbref player, dbref cause, int key, const char *name, const char *newname) {
     dbref thing;
 
     char *buff;
@@ -293,14 +260,7 @@ char *newname;
  * * do_alias: Make an alias for a player or object.
  */
 
-static void
-set_player_aliases(player, target, oldalias, list, aflags)
-dbref player, target;
-
-char *oldalias, *list;
-
-int aflags;
-{
+static void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, int aflags) {
     int i, j, n_aliases, retcode;
 
     char *p, *tokp;
@@ -445,14 +405,7 @@ int aflags;
     }
 }
 
-void
-do_alias(player, cause, key, name, alias)
-dbref player, cause;
-
-int key;
-
-char *name, *alias;
-{
+void do_alias(dbref player, dbref cause, int key, char *name, char *alias) {
     dbref thing, aowner;
 
     int aflags, alen;
@@ -542,14 +495,7 @@ char *name, *alias;
  * * do_lock: Set a lock on an object or attribute.
  */
 
-void
-do_lock(player, cause, key, name, keytext)
-dbref player, cause;
-
-int key;
-
-char *name, *keytext;
-{
+void do_lock(dbref player, dbref cause, int key, char *name, char *keytext) {
     dbref thing, aowner;
 
     int atr, aflags;
@@ -634,14 +580,7 @@ char *name, *keytext;
  * * Remove a lock from an object of attribute.
  */
 
-void
-do_unlock(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_unlock(dbref player, dbref cause, int key, char *name) {
     dbref thing, aowner;
 
     int atr, aflags;
@@ -693,14 +632,7 @@ char *name;
  * * do_unlink: Unlink an exit from its destination or remove a dropto.
  */
 
-void
-do_unlink(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_unlink(dbref player, dbref cause, int key, char *name) {
     dbref exit;
 
     init_match(player, name, TYPE_EXIT);
@@ -747,14 +679,7 @@ char *name;
  * do_chown: Change ownership of an object or attribute.
  */
 
-void
-do_chown(player, cause, key, name, newown)
-dbref player, cause;
-
-int key;
-
-char *name, *newown;
-{
+void do_chown(dbref player, dbref cause, int key, char *name, char *newown) {
     dbref thing, owner, aowner;
 
     int atr, aflags, do_it, cost, quota;
@@ -999,14 +924,7 @@ char *name, *newown;
  * * do_set: Set flags or attributes on objects, or flags on attributes.
  */
 
-void
-set_attr_internal(player, thing, attrnum, attrtext, key, buff, bufc)
-dbref player, thing;
-
-int attrnum, key;
-
-char *attrtext, *buff, **bufc;
-{
+void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, int key, char *buff, char **bufc) {
     dbref aowner;
 
     int aflags, could_hear;
@@ -1046,14 +964,7 @@ char *attrtext, *buff, **bufc;
     }
 }
 
-void
-do_set(player, cause, key, name, flag)
-dbref player, cause;
-
-int key;
-
-char *name, *flag;
-{
+void do_set(dbref player, dbref cause, int key, char *name, char *flag) {
     dbref thing, thing2, aowner;
 
     char *p, *buff;
@@ -1226,14 +1137,7 @@ char *name, *flag;
     flag_set(thing, player, flag, key);
 }
 
-void
-do_power(player, cause, key, name, flag)
-dbref player, cause;
-
-int key;
-
-char *name, *flag;
-{
+void do_power(dbref player, dbref cause, int key, char *name, char *flag) {
     dbref thing;
 
     if (!flag || !*flag)
@@ -1251,14 +1155,7 @@ char *name, *flag;
     power_set(thing, player, flag, key);
 }
 
-void
-do_setattr(player, cause, attrnum, name, attrtext)
-dbref player, cause;
-
-int attrnum;
-
-char *name, *attrtext;
-{
+void do_setattr(dbref player, dbref cause, int attrnum, char *name, char *attrtext) {
     dbref thing;
 
     init_match(player, name, NOTYPE);
@@ -1272,16 +1169,7 @@ char *name, *attrtext;
 
 
 
-void
-do_cpattr(player, cause, key, oldpair, newpair, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *oldpair;
-
-char *newpair[];
-{
+void do_cpattr(dbref player, dbref cause, int key, char *oldpair, char *newpair[], int nargs) {
     int i, ca, got = 0;
 
     dbref oldthing;
@@ -1342,14 +1230,7 @@ char *newpair[];
 }
 
 
-void
-do_mvattr(player, cause, key, what, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *what, *args[];
-{
+void do_mvattr(dbref player, dbref cause, int key, char *what, char *args[], int nargs) {
     dbref thing, aowner, axowner;
 
     ATTR *in_attr, *out_attr;
@@ -1503,16 +1384,7 @@ char *what, *args[];
  * * parse_attrib, parse_attrib_wild: parse <obj>/<attr> tokens.
  */
 
-int
-parse_attrib(player, str, thing, atr, ok_structs)
-dbref player, *thing;
-
-int *atr;
-
-char *str;
-
-int ok_structs;
-{
+int parse_attrib(dbref player, char *str, dbref *thing, int *atr, int ok_structs) {
     ATTR *attr;
 
     char *buff;
@@ -1562,15 +1434,7 @@ int ok_structs;
     return 1;
 }
 
-static void
-find_wild_attrs(player, thing, str, check_exclude, hash_insert,
-                get_locks, ok_structs)
-dbref player, thing;
-
-char *str;
-
-int check_exclude, hash_insert, get_locks, ok_structs;
-{
+static void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, int hash_insert, int get_locks, int ok_structs) {
     ATTR *attr;
 
     char *as;
@@ -1637,15 +1501,7 @@ int check_exclude, hash_insert, get_locks, ok_structs;
     atr_pop();
 }
 
-int
-parse_attrib_wild(player, str, thing, check_parents, get_locks, df_star,
-                  ok_structs)
-dbref player, *thing;
-
-char *str;
-
-int check_parents, get_locks, df_star, ok_structs;
-{
+int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, int get_locks, int df_star, int ok_structs) {
     char *buff;
 
     dbref parent;
@@ -1722,10 +1578,7 @@ int check_parents, get_locks, df_star, ok_structs;
  * edit_string_ansi, do_edit: Modify attributes.
  */
 
-void
-edit_string_ansi(src, dst, returnstr, from, to)
-char *src, **dst, **returnstr, *from, *to;
-{
+void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to) {
     edit_string(src, dst, from, to);
 
     if (mudconf.ansi_colors)
@@ -1741,14 +1594,7 @@ char *src, **dst, **returnstr, *from, *to;
     }
 }
 
-void
-do_edit(player, cause, key, it, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *it, *args[];
-{
+void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nargs) {
     dbref thing, aowner;
 
     int attr, got_one, aflags, alen, doit;
@@ -1865,14 +1711,7 @@ char *it, *args[];
     }
 }
 
-void
-do_wipe(player, cause, key, it)
-dbref player, cause;
-
-int key;
-
-char *it;
-{
+void do_wipe(dbref player, dbref cause, int key, char *it) {
     dbref thing, aowner;
 
     int attr, got_one, aflags, alen;
@@ -1936,14 +1775,7 @@ char *it;
     }
 }
 
-void
-do_trigger(player, cause, key, object, argv, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *object, *argv[];
-{
+void do_trigger(dbref player, dbref cause, int key, char *object, char *argv[], int nargs) {
     dbref thing;
 
     int attrib;
@@ -1973,14 +1805,7 @@ char *object, *argv[];
 
 }
 
-void
-do_use(player, cause, key, object)
-dbref player, cause;
-
-int key;
-
-char *object;
-{
+void do_use(dbref player, dbref cause, int key, char *object) {
     char *df_use, *df_ouse, *temp, *bp;
 
     dbref thing, aowner;
@@ -2047,14 +1872,7 @@ char *object;
  * * do_setvattr: Set a user-named (or possibly a predefined) attribute.
  */
 
-void
-do_setvattr(player, cause, key, arg1, arg2)
-dbref player, cause;
-
-int key;
-
-char *arg1, *arg2;
-{
+void do_setvattr(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     char *s;
 
     int anum;
