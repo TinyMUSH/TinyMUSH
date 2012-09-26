@@ -178,9 +178,7 @@ static const int posix_class_maps[] =
 
 /* Definition to allow mutual recursion */
 
-static BOOL FDECL(compile_regex,
-                  (int, int, int *, uschar **, const uschar **, const char **,
-                   BOOL, int, int *, int *, compile_data *));
+static BOOL compile_regex(int, int, int *, uschar **, const uschar **, const char **, BOOL, int, int *, int *, compile_data *);
 
 /* Structure for building a chain of data that actually lives on the
 stack, for holding the values of the subject pointer at the start of each
@@ -426,16 +424,7 @@ Arguments:
 Returns:     nothing
 */
 
-static void
-pchars(p, length, is_subject, match_data)
-const uschar *p;
-
-int length;
-
-BOOL is_subject;
-
-match_data *md;
-{
+static void pchars(const uschar *p, int length, BOOL is_subject, match_data *match_data) {
     int c;
 
     if (is_subject && length > md->end_subject - p)
@@ -472,18 +461,7 @@ Returns:     zero or positive => a data character
              on error, errorptr is set
 */
 
-static int
-check_escape(ptrptr, errorptr, bracount, options, isclass, cd)
-const uschar **ptrptr;
-
-const char **errorptr;
-
-int bracount, options;
-
-BOOL isclass;
-
-compile_data *cd;
-{
+static int check_escape(const uschar **ptrptr, const char **errorptr, int bracount, int options, BOOL isclass, compile_data *cd) {
     const uschar *ptr = *ptrptr;
 
     int c, i;
@@ -671,12 +649,7 @@ Arguments:
 Returns:    TRUE or FALSE
 */
 
-static BOOL
-is_counted_repeat(p, cd)
-const uschar *p;
-
-compile_data *cd;
-{
+static BOOL is_counted_repeat(const uschar *p, compile_data *cd) {
     if ((cd->ctypes[*p++] & ctype_digit) == 0)
         return FALSE;
     while ((cd->ctypes[*p] & ctype_digit) != 0)
@@ -718,16 +691,7 @@ Returns:     pointer to '}' on success;
              current ptr on error, with errorptr set
 */
 
-static const uschar *
-read_repeat_counts(p, minp, maxp, errorptr, cd)
-const uschar *p;
-
-int *minp, *maxp;
-
-const char **errorptr;
-
-compile_data *cd;
-{
+static const uschar *read_repeat_counts(const uschar *p, int *minp, int *maxp, const char **errorptr, compile_data *cd) {
     int min = 0;
 
     int max = -1;
@@ -783,12 +747,7 @@ Arguments:
 Returns:   the fixed length, or -1 if there is no fixed length
 */
 
-static int
-find_fixedlength(code, options)
-uschar *code;
-
-int options;
-{
+static int find_fixedlength(uschar *code, int options) {
     int length = -1;
 
     register int branchlength = 0;
@@ -987,14 +946,7 @@ Argument:
 Returns:   TRUE or FALSE
 */
 
-static BOOL
-check_posix_syntax(ptr, endptr, cd)
-const uschar *ptr;
-
-const uschar **endptr;
-
-compile_data *cd;
-{
+static BOOL check_posix_syntax(const uschar *ptr, const uschar **endptr, compile_data *cd) {
     int terminator;		/* Don't combine these lines; the Solaris cc */
 
     terminator = *(++ptr);	/* compiler warns about "non-constant" initializer. */
@@ -1027,12 +979,7 @@ Arguments:
 Returns:     a value representing the name, or -1 if unknown
 */
 
-static int
-check_posix_name(ptr, len)
-const uschar *ptr;
-
-int len;
-{
+static int check_posix_name(const uschar *ptr, int len) {
     register int yield = 0;
 
     while (posix_name_lengths[yield] != 0)
@@ -1070,20 +1017,7 @@ Returns:       TRUE on success
 */
 
 static BOOL
-compile_branch(options, brackets, codeptr, ptrptr, errorptr,
-               optchanged, reqchar, countlits, cd)
-int options, *brackets;
-
-uschar **codeptr;
-
-const uschar **ptrptr;
-
-const char **errorptr;
-
-int *optchanged, *reqchar, *countlits;
-
-compile_data *cd;
-{
+compile_branch(int options, int *brackets, uschar **codeptr, const uschar **ptrptr, const char **errorptr, int *optchanged, int *reqchar, int *countlits, compile_data *cd) {
     int repeat_type, op_type;
 
     int repeat_min, repeat_max;
@@ -2514,25 +2448,7 @@ Argument:
 Returns:      TRUE on success
 */
 
-static BOOL
-compile_regex(options, optchanged, brackets, codeptr, ptrptr,
-              errorptr, lookbehind, skipbytes, reqchar, countlits, cd)
-int options, optchanged, *brackets;
-
-uschar **codeptr;
-
-const uschar **ptrptr;
-
-const char **errorptr;
-
-BOOL lookbehind;
-
-int skipbytes;
-
-int *reqchar, *countlits;
-
-compile_data *cd;
-{
+static BOOL compile_regex(int options, int optchanged, int *brackets, uschar **codeptr, const uschar **ptrptr, const char **errorptr, BOOL lookbehind, int skipbytes, int *reqchar,int * countlits, compile_data *cd) {
     const uschar *ptr = *ptrptr;
 
     uschar *code = *codeptr;
@@ -2710,14 +2626,7 @@ Arguments:
 Returns:     pointer to the first significant opcode
 */
 
-static const uschar *
-first_significant_code(code, options, optbit, optstop)
-const uschar *code;
-
-int *options, optbit;
-
-BOOL optstop;
-{
+static const uschar *first_significant_code(const uschar *code, int *options, int optbit, BOOL optstop) {
     for (;;)
     {
         switch ((int)*code)
@@ -2786,12 +2695,7 @@ Arguments:
 Returns:     TRUE or FALSE
 */
 
-static BOOL
-is_anchored(code, options)
-register const uschar *code;
-
-int *options;
-{
+static BOOL is_anchored(register const uschar *code, int *options) {
     do
     {
         const uschar *scode = first_significant_code(code + 3, options,
@@ -2835,10 +2739,7 @@ Argument:  points to start of expression (the bracket)
 Returns:   TRUE or FALSE
 */
 
-static BOOL
-is_startline(code)
-const uschar *code;
-{
+static BOOL is_startline(const uschar *code) {
     do
     {
         const uschar *scode =
@@ -2883,12 +2784,7 @@ Arguments:
 Returns:     -1 or the fixed first char
 */
 
-static int
-find_firstchar(code, options)
-const uschar *code;
-
-int *options;
-{
+static int find_firstchar(const uschar *code, int *options) {
     register int c = -1;
 
     do
@@ -2963,18 +2859,7 @@ Returns:       pointer to compiled data block, or NULL on error,
                with errorptr and erroroffset set
 */
 
-pcre *
-pcre_compile(pattern, options, errorptr, erroroffset, tables)
-const char *pattern;
-
-int options;
-
-const char **errorptr;
-
-int *erroroffset;
-
-const unsigned char *tables;
-{
+pcre * pcre_compile(const char *pattern, int options, const char **errorptr, int *erroroffset, const unsigned char *tables) {
     real_pcre *re;
 
     int length = 3;		/* For initial BRA plus length */
@@ -4185,18 +4070,7 @@ Arguments:
 Returns:      TRUE if matched
 */
 
-static BOOL
-match_ref(offset, eptr, length, md, ims)
-int offset;
-
-register const uschar *eptr;
-
-int length;
-
-match_data *md;
-
-unsigned long int ims;
-{
+static BOOL match_ref(int offset, register const uschar *eptr, int length, match_data *md, unsigned long int ims) {
     const uschar *p = md->start_subject + md->offset_vector[offset];
 
 #ifdef PCRE_DEBUG
@@ -4265,22 +4139,7 @@ Arguments:
 Returns:       TRUE if matched
 */
 
-static BOOL
-match(eptr, ecode, offset_top, md, ims, eptrb, flags)
-register const uschar *eptr;
-
-register const uschar *ecode;
-
-int offset_top;
-
-match_data *md;
-
-unsigned long int ims;
-
-eptrblock *eptrb;
-
-int flags;
-{
+static BOOL match(register const uschar *eptr, register const uschar *ecode, int offset_top, match_data *md, unsigned long int ims, eptrblock *eptrb, int flags) {
     unsigned long int original_ims = ims;	/* Save for resetting on ')' */
 
     eptrblock newptrb;
@@ -6173,17 +6032,7 @@ Returns:          > 0 => success; value is the number of elements filled in
                  < -1 => some kind of unexpected problem
 */
 
-int
-pcre_exec(external_re, external_extra, subject, length, start_offset,
-          options, offsets, offsetcount)
-const pcre *external_re;
-
-const pcre_extra *external_extra;
-
-const char *subject;
-
-int length, start_offset, options, *offsets, offsetcount;
-{
+int pcre_exec(const pcre *external_re, const pcre_extra *external_extra, const char *subject, int length, int start_offset, int options, int *offsets, int offsetcount) {
     int resetcount, ocount;
 
     int first_char = -1;
@@ -6594,16 +6443,7 @@ Arguments:
 Returns:        nothing
 */
 
-static void
-set_bit(start_bits, c, caseless, cd)
-uschar *start_bits;
-
-int c;
-
-BOOL caseless;
-
-compile_data *cd;
-{
+static void set_bit(uschar *start_bits, int c, BOOL caseless, compile_data *cd) {
     start_bits[c / 8] |= (1 << (c & 7));
     if (caseless && (cd->ctypes[c] & ctype_letter) != 0)
         start_bits[cd->fcc[c] / 8] |= (1 << (cd->fcc[c] & 7));
@@ -6628,16 +6468,7 @@ Arguments:
 Returns:       TRUE if table built, FALSE otherwise
 */
 
-static BOOL
-set_start_bits(code, start_bits, caseless, cd)
-const uschar *code;
-
-uschar *start_bits;
-
-BOOL caseless;
-
-compile_data *cd;
-{
+static BOOL set_start_bits(const uschar *code, uschar *start_bits, BOOL caseless, compile_data *cd) {
     register int c;
 
     /*
@@ -6955,14 +6786,7 @@ Returns:    pointer to a pcre_extra block,
             NULL on error or if no optimization possible
 */
 
-pcre_extra *
-pcre_study(external_re, options, errorptr)
-const pcre *external_re;
-
-int options;
-
-const char **errorptr;
-{
+pcre_extra *pcre_study(const pcre *external_re, int options, const char **errorptr) {
     uschar start_bits[32];
 
     real_pcre_extra *extra;
@@ -7069,16 +6893,7 @@ Returns:         if successful:
                    PCRE_ERROR_NOSUBSTRING (-7) no such captured substring
 */
 
-int
-pcre_copy_substring(subject, ovector, stringcount, stringnumber, buffer, size)
-const char *subject;
-
-int *ovector, stringcount, stringnumber;
-
-char *buffer;
-
-int size;
-{
+int pcre_copy_substring(const char *subject, int *ovector, int stringcount, int stringnumber, char *buffer, int size) {
     int yield;
 
     if (stringnumber < 0 || stringnumber >= stringcount)
@@ -7110,9 +6925,7 @@ Arguments:   none
 Returns:     pointer to the contiguous block of data
 */
 
-const unsigned char *
-pcre_maketables()
-{
+const unsigned char * pcre_maketables(void) {
     unsigned char *yield, *p;
 
     int i;

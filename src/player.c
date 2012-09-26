@@ -42,20 +42,15 @@ struct logindata
     int new_bad;
 };
 
-extern int FDECL(can_set_home, (dbref, dbref, dbref));
+extern int can_set_home(dbref, dbref, dbref);
 
-extern dbref FDECL(clone_home, (dbref, dbref));
+extern dbref clone_home(dbref, dbref);
 
 /* ---------------------------------------------------------------------------
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.
  */
 
-static void
-decrypt_logindata(atrbuf, info)
-char *atrbuf;
-
-LDATA *info;
-{
+static void decrypt_logindata(char *atrbuf, LDATA *info) {
     int i;
 
     info->tot_good = 0;
@@ -91,12 +86,7 @@ LDATA *info;
     }
 }
 
-static void
-encrypt_logindata(atrbuf, info)
-char *atrbuf;
-
-LDATA *info;
-{
+static void encrypt_logindata(char *atrbuf, LDATA *info) {
     char *bp, nullc;
 
     int i;
@@ -142,14 +132,7 @@ LDATA *info;
  * last successful login.
  */
 
-void
-record_login(player, isgood, ldate, lhost, lusername)
-dbref player;
-
-int isgood;
-
-char *ldate, *lhost, *lusername;
-{
+void record_login(dbref player, int isgood, char *ldate, char *lhost, char *lusername) {
     LDATA login_info;
 
     char *atrbuf;
@@ -221,12 +204,7 @@ char *ldate, *lhost, *lusername;
  * check_pass: Test a password to see if it is correct.
  */
 
-int
-check_pass(player, password)
-dbref player;
-
-const char *password;
-{
+int check_pass(dbref player, const char *password) {
     dbref aowner;
 
     int aflags, alen;
@@ -258,10 +236,7 @@ const char *password;
  * connect_player: Try to connect to an existing player.
  */
 
-dbref
-connect_player(name, password, host, username, ip_addr)
-char *name, *password, *host, *username, *ip_addr;
-{
+dbref connect_player(char *name, char *password, char *host, char *username, char *ip_addr) {
     dbref player, aowner;
 
     int aflags, alen;
@@ -317,14 +292,7 @@ char *name, *password, *host, *username, *ip_addr;
  * create_player: Create a new player.
  */
 
-dbref
-create_player(name, password, creator, isrobot, isguest)
-char *name, *password;
-
-dbref creator;
-
-int isrobot, isguest;
-{
+dbref create_player(char *name, char *password, dbref creator, int isrobot, int isguest) {
     dbref player;
 
     char *pbuf;
@@ -366,14 +334,7 @@ int isrobot, isguest;
  * do_password: Change the password for a player
  */
 
-void
-do_password(player, cause, key, oldpass, newpass)
-dbref player, cause;
-
-int key;
-
-char *oldpass, *newpass;
-{
+void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpass) {
     dbref aowner;
 
     int aflags, alen;
@@ -403,12 +364,7 @@ char *oldpass, *newpass;
  * do_last Display login history data.
  */
 
-static void
-disp_from_on(player, dtm_str, host_str)
-dbref player;
-
-char *dtm_str, *host_str;
-{
+static void disp_from_on(dbref player, char *dtm_str, char *host_str) {
     if (dtm_str && *dtm_str && host_str && *host_str)
     {
         notify(player,
@@ -416,14 +372,7 @@ char *dtm_str, *host_str;
     }
 }
 
-void
-do_last(player, cause, key, who)
-dbref player, cause;
-
-int key;
-
-char *who;
-{
+void do_last(dbref player, dbref cause, int key, char *who) {
     dbref target, aowner;
 
     LDATA login_info;
@@ -481,12 +430,7 @@ char *who;
  * Manage playername->dbref mapping
  */
 
-int
-add_player_name(player, name)
-dbref player;
-
-char *name;
-{
+int add_player_name(dbref player, char *name) {
     int stat;
 
     dbref *p;
@@ -546,12 +490,7 @@ char *name;
     return stat;
 }
 
-int
-delete_player_name(player, name)
-dbref player;
-
-char *name;
-{
+int delete_player_name(dbref player, char *name) {
     dbref *p;
 
     char *temp, *tp;
@@ -572,14 +511,7 @@ char *name;
     return 1;
 }
 
-dbref
-lookup_player(doer, name, check_who)
-dbref doer;
-
-char *name;
-
-int check_who;
-{
+dbref lookup_player(dbref doer, char *name, int check_who) {
     dbref *p, thing;
 
     char *temp, *tp;
@@ -636,9 +568,7 @@ int check_who;
     return thing;
 }
 
-void
-NDECL(load_player_names)
-{
+void load_player_names(void) {
     dbref i, aowner;
 
     int aflags, alen;
@@ -676,10 +606,7 @@ NDECL(load_player_names)
  * badname_add, badname_check, badname_list: Add/look for/display bad names.
  */
 
-void
-badname_add(bad_name)
-char *bad_name;
-{
+void badname_add(char *bad_name) {
     BADNAME *bp;
 
     /*
@@ -692,10 +619,7 @@ char *bad_name;
     mudstate.badname_head = bp;
 }
 
-void
-badname_remove(bad_name)
-char *bad_name;
-{
+void badname_remove(char *bad_name) {
     BADNAME *bp, *backp;
 
     /*
@@ -718,10 +642,7 @@ char *bad_name;
     }
 }
 
-int
-badname_check(bad_name)
-char *bad_name;
-{
+int badname_check(char *bad_name) {
     BADNAME *bp;
 
     /*
@@ -737,12 +658,7 @@ char *bad_name;
     return 1;
 }
 
-void
-badname_list(player, prefix)
-dbref player;
-
-const char *prefix;
-{
+void badname_list(dbref player, const char *prefix) {
     BADNAME *bp;
 
     char *buff, *bufp;

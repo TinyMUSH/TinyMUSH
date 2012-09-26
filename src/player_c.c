@@ -38,20 +38,14 @@ PCACHE *pcache_head;
 #define	PF_MONEY_CH	0x0004
 #define	PF_QMAX_CH	0x0008
 
-void
-NDECL(pcache_init)
+void pcache_init(void)
 {
     pool_init(POOL_PCACHE, sizeof(PCACHE));
     nhashinit(&pcache_htab, 15 * HASH_FACTOR);
     pcache_head = NULL;
 }
 
-static void
-pcache_reload1(player, pp)
-dbref player;
-
-PCACHE *pp;
-{
+static void pcache_reload1(dbref player, PCACHE *pp) {
     char *cp;
 
     cp = atr_get_raw(player, A_MONEY);
@@ -70,10 +64,7 @@ PCACHE *pp;
 }
 
 
-PCACHE *
-pcache_find(player)
-dbref player;
-{
+PCACHE *pcache_find(dbref player) {
     PCACHE *pp;
 
     pp = (PCACHE *) nhashfind(player, &pcache_htab);
@@ -94,10 +85,7 @@ dbref player;
     return pp;
 }
 
-void
-pcache_reload(player)
-dbref player;
-{
+void pcache_reload(dbref player) {
     PCACHE *pp;
 
     if (Good_owner(player))
@@ -107,10 +95,7 @@ dbref player;
     }
 }
 
-static void
-pcache_save(pp)
-PCACHE *pp;
-{
+static void pcache_save(PCACHE *pp) {
     IBUF tbuf;
 
     if (pp->cflags & PF_DEAD)
@@ -128,9 +113,7 @@ PCACHE *pp;
     pp->cflags &= ~(PF_MONEY_CH | PF_QMAX_CH);
 }
 
-void
-NDECL(pcache_trim)
-{
+void pcache_trim(void) {
     PCACHE *pp, *pplast, *ppnext;
 
     pp = pcache_head;
@@ -162,9 +145,7 @@ NDECL(pcache_trim)
     }
 }
 
-void
-NDECL(pcache_sync)
-{
+void pcache_sync(void) {
     PCACHE *pp;
 
     pp = pcache_head;
@@ -175,12 +156,7 @@ NDECL(pcache_sync)
     }
 }
 
-int
-a_Queue(player, adj)
-dbref player;
-
-int adj;
-{
+int a_Queue(dbref player, int adj) {
     PCACHE *pp;
 
     if (Good_owner(player))
@@ -195,12 +171,7 @@ int adj;
     }
 }
 
-void
-s_Queue(player, val)
-dbref player;
-
-int val;
-{
+void s_Queue(dbref player, int val) {
     PCACHE *pp;
 
     if (Good_owner(player))
@@ -210,10 +181,7 @@ int val;
     }
 }
 
-int
-QueueMax(player)
-dbref player;
-{
+int QueueMax(dbref player) {
     PCACHE *pp;
 
     int m;
@@ -236,10 +204,7 @@ dbref player;
     return m;
 }
 
-int
-Pennies(obj)
-dbref obj;
-{
+int Pennies(dbref obj) {
     PCACHE *pp;
 
     char *cp;
@@ -254,12 +219,7 @@ dbref obj;
     return ((int)strtol(cp, (char **)NULL, 10));
 }
 
-void
-s_Pennies(obj, howfew)
-dbref obj;
-
-int howfew;
-{
+void s_Pennies(dbref obj, int howfew) {
     PCACHE *pp;
 
     IBUF tbuf;

@@ -25,12 +25,7 @@ typedef struct _help_indx_list
 
 int dump_entries(FILE * wfp, long pos, help_indx_list * entries);
 
-int
-main(argc, argv)
-int argc;
-
-char *argv[];
-{
+int main(int argc, char *argv[]) {
     long pos;
 
     int i, n, lineno, ntopics, actualdata;
@@ -147,11 +142,7 @@ char *argv[];
     exit(0);
 }
 
-
-
-int
-dump_entries(FILE * wfp, long pos, help_indx_list * entries)
-{
+int dump_entries(FILE * wfp, long pos, help_indx_list * entries) {
     int truepos;
 
     int truelen;
