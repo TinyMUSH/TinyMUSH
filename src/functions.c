@@ -22,16 +22,14 @@
 #include "functions.h"		/* required by code */
 #include "fnproto.h"		/* required by code */
 
-extern int FDECL(parse_ext_access, (int *, EXTFUNCS **, char *, NAMETAB *,
-                                    dbref, char *));
+extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 extern NAMETAB access_nametab[];
 
 UFUN *ufun_head;
 
 const Delim SPACE_DELIM = { 1, " " };
 
-void
-NDECL(init_functab)
+void init_functab(void)
 {
     FUN *fp;
 
@@ -45,13 +43,7 @@ NDECL(init_functab)
     hashinit(&mudstate.ufunc_htab, 15 * HASH_FACTOR, HT_STR);
 }
 
-void
-do_function(player, cause, key, fname, target)
-dbref player, cause;
-
-int key;
-
-char *fname, *target;
+void do_function(dbref player, dbref cause, int key, char *fname, char *target)
 {
     UFUN *ufp, *ufp2;
 
@@ -242,9 +234,7 @@ char *fname, *target;
  * list_functable: List available functions.
  */
 
-void
-list_functable(player)
-dbref player;
+void list_functable(dbref player)
 {
     FUN *fp, *modfns;
 
@@ -308,13 +298,7 @@ dbref player;
  * list_funcaccess: List access on functions.
  */
 
-static void
-helper_list_funcaccess(player, fp, buff)
-dbref player;
-
-FUN *fp;
-
-char *buff;
+static void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
 {
     char *bp;
 
@@ -351,9 +335,7 @@ char *buff;
     }
 }
 
-void
-list_funcaccess(player)
-dbref player;
+void list_funcaccess(dbref player)
 {
     char *buff;
 
@@ -394,8 +376,7 @@ dbref player;
  * cf_func_access: set access on functions
  */
 
-CF_HAND(cf_func_access)
-{
+int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     FUN *fp;
 
     UFUN *ufp;

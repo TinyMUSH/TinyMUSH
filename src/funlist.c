@@ -31,11 +31,7 @@
 #define	FLOAT_LIST	4
 #define NOCASE_LIST	5
 
-static int
-autodetect_list(ptrs, nitems)
-char *ptrs[];
-
-int nitems;
+static int autodetect_list(char *ptrs[], int nitems)
 {
     int sort_type, i;
 
@@ -106,11 +102,7 @@ int nitems;
     return sort_type;
 }
 
-static int
-get_list_type(fargs, nfargs, type_pos, ptrs, nitems)
-char *fargs[], *ptrs[];
-
-int nfargs, nitems, type_pos;
+static int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems)
 {
     if (nfargs >= type_pos)
     {
@@ -133,9 +125,7 @@ int nfargs, nitems, type_pos;
     return autodetect_list(ptrs, nitems);
 }
 
-static int
-dbnum(dbr)
-char *dbr;
+static int dbnum(char *dbr)
 {
     if ((*dbr != '#') || (dbr[1] == '\0'))
         return 0;
@@ -149,8 +139,7 @@ char *dbr;
  * Philip D. Wasson
  */
 
-FUNCTION(fun_words)
-{
+void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     if (nfargs == 0)
@@ -167,8 +156,7 @@ FUNCTION(fun_words)
  * fun_first: Returns first word in a string
  */
 
-FUNCTION(fun_first)
-{
+void fun_first(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *first;
 
     Delim isep;
@@ -195,8 +183,7 @@ FUNCTION(fun_first)
  * fun_rest: Returns all but the first word in a string
  */
 
-FUNCTION(fun_rest)
-{
+void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *rest;
 
     Delim isep;
@@ -227,8 +214,7 @@ FUNCTION(fun_rest)
  * fun_last: Returns last word in a string
  */
 
-FUNCTION(fun_last)
-{
+void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *last;
 
     Delim isep;
@@ -323,8 +309,7 @@ FUNCTION(fun_last)
  * match.
  */
 
-FUNCTION(fun_match)
-{
+void fun_match(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int wcount;
 
     char *r, *s;
@@ -354,8 +339,7 @@ FUNCTION(fun_match)
     safe_chr('0', buff, bufc);
 }
 
-FUNCTION(fun_matchall)
-{
+void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int wcount, flag;
 
     char *r, *s, *old;
@@ -411,8 +395,7 @@ FUNCTION(fun_matchall)
  * Now takes optional separator extract(foo-bar-baz,1,2,-) returns 'foo-bar'
  */
 
-FUNCTION(fun_extract)
-{
+void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int start, len;
 
     char *r, *s, *t;
@@ -497,8 +480,7 @@ FUNCTION(fun_extract)
  * gh | ij k, |, 2, 2) => c d e | f g h
  */
 
-FUNCTION(fun_index)
-{
+void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int start, end;
 
     char c, *s, *p;
@@ -587,14 +569,7 @@ FUNCTION(fun_index)
 #define	IF_REPLACE	1
 #define	IF_INSERT	2
 
-static void
-do_itemfuns(buff, bufc, str, el, word, sep, flag)
-char *buff, **bufc, *str, *word;
-
-const Delim *sep;
-
-int el, flag;
-{
+static void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const Delim *sep, int flag) {
     int ct, overrun;
 
     char *sptr, *iptr, *eptr;
@@ -730,8 +705,7 @@ int el, flag;
     }
 }
 
-FUNCTION(fun_ldelete)
-{
+void fun_ldelete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * delete a word at position X of a list
      */
@@ -742,8 +716,7 @@ FUNCTION(fun_ldelete)
                 &isep, IF_DELETE);
 }
 
-FUNCTION(fun_replace)
-{
+void fun_replace(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * replace a word at position X of a list
      */
@@ -754,8 +727,7 @@ FUNCTION(fun_replace)
                 &isep, IF_REPLACE);
 }
 
-FUNCTION(fun_insert)
-{
+void fun_insert(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * insert a word at position X of a list
      */
@@ -766,8 +738,7 @@ FUNCTION(fun_insert)
                 &isep, IF_INSERT);
 }
 
-FUNCTION(fun_lreplace)
-{
+void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     Delim osep;
@@ -849,8 +820,7 @@ FUNCTION(fun_lreplace)
  * fun_remove: Remove a word from a string
  */
 
-FUNCTION(fun_remove)
-{
+void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *sp, *word, *bb_p;
 
     Delim isep;
@@ -898,8 +868,7 @@ FUNCTION(fun_remove)
  * fun_member: Is a word in a string
  */
 
-FUNCTION(fun_member)
-{
+void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int wcount;
 
     char *r, *s;
@@ -928,8 +897,7 @@ FUNCTION(fun_member)
  * fun_revwords: Reverse the order of words in a list.
  */
 
-FUNCTION(fun_revwords)
-{
+void fun_revwords(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *bb_p, **elems;
 
     Delim isep;
@@ -979,8 +947,7 @@ FUNCTION(fun_revwords)
  * Compare to MERGE().
  */
 
-FUNCTION(fun_splice)
-{
+void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p1, *p2, *q1, *q2, *bb_p;
 
     Delim isep, osep;
@@ -1057,37 +1024,27 @@ struct a_record
     int pos;
 };
 
-static int
-a_comp(s1, s2)
-const void *s1, *s2;
+static int a_comp(const void *s1, const void *s2)
 {
     return strcmp(*(char **)s1, *(char **)s2);
 }
 
-static int
-c_comp(s1, s2)
-const void *s1, *s2;
+static int c_comp(const void *s1, const void *s2)
 {
     return strcasecmp(*(char **)s1, *(char **)s2);
 }
 
-static int
-arec_comp(s1, s2)
-const void *s1, *s2;
+static int arec_comp(const void *s1, const void *s2)
 {
     return strcmp(((a_rec *) s1)->str, ((a_rec *) s2)->str);
 }
 
-static int
-crec_comp(s1, s2)
-const void *s1, *s2;
+static int crec_comp(const void *s1, const void *s2)
 {
     return strcasecmp(((a_rec *) s1)->str, ((a_rec *) s2)->str);
 }
 
-static int
-f_comp(s1, s2)
-const void *s1, *s2;
+static int f_comp(const void *s1, const void *s2)
 {
     if (((f_rec *) s1)->data > ((f_rec *) s2)->data)
         return 1;
@@ -1096,9 +1053,7 @@ const void *s1, *s2;
     return 0;
 }
 
-static int
-i_comp(s1, s2)
-const void *s1, *s2;
+static int i_comp(const void*s1, const void*s2)
 {
     if (((i_rec *) s1)->data > ((i_rec *) s2)->data)
         return 1;
@@ -1111,11 +1066,7 @@ const void *s1, *s2;
     l = (int *) XCALLOC(n, sizeof(int), "do_asort.poslist"); \
     for (i = 0; i < n; i++) l[i] = p[i].pos;
 
-static int *
-do_asort(s, n, sort_type, listpos_only)
-char *s[];
-
-int n, sort_type;
+static int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 {
     int i;
 
@@ -1233,8 +1184,7 @@ int n, sort_type;
     return poslist;
 }
 
-FUNCTION(handle_sort)
-{
+void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int nitems, sort_type, oper, i;
 
     char *list, **ptrs;
@@ -1295,9 +1245,7 @@ static char ucomp_buff[LBUF_SIZE];
 
 static dbref ucomp_cause, ucomp_player, ucomp_caller;
 
-static int
-u_comp(s1, s2)
-const void *s1, *s2;
+static int u_comp(const void *s1, const void *s2)
 {
     /*
      * Note that this function is for use in conjunction with our own
@@ -1326,13 +1274,7 @@ const void *s1, *s2;
     return n;
 }
 
-static void
-sane_qsort(array, left, right, compare)
-void *array[];
-
-int left, right;
-
-int (*compare) ();
+static void sane_qsort(void *array[], int left, int right, int (*compare) ())
 {
     /*
      * Andrew Molitor's qsort, which doesn't require transitivity between
@@ -1415,8 +1357,7 @@ loop:
     }
 }
 
-FUNCTION(fun_sortby)
-{
+void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *atext, *list, **ptrs;
 
     Delim isep, osep;
@@ -1473,8 +1414,7 @@ FUNCTION(fun_sortby)
  ((s == NOCASE_LIST) ? strcasecmp(ptrs1[x1],ptrs2[x2]) : \
   ((s == FLOAT_LIST) ? NUMCMP(fp1[x1],fp2[x2]) : NUMCMP(ip1[x1],ip2[x2]))))
 
-FUNCTION(handle_sets)
-{
+void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep, osep;
 
     int oper, type_arg;
@@ -1770,8 +1710,7 @@ FUNCTION(handle_sets)
  * Format a list into columns.
  */
 
-FUNCTION(fun_columns)
-{
+void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     unsigned int spaces, number, ansinumber, striplen;
 
     unsigned int count, i, indent = 0;
@@ -1916,20 +1855,7 @@ FUNCTION(fun_columns)
  *     correctly, and doesn't mess up the character count.
  */
 
-static void
-tables_helper(list, last_state, n_cols, col_widths,
-              lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just)
-char *list;
-
-int *last_state, n_cols, col_widths[];
-
-char *lead_str, *trail_str;
-
-const Delim *list_sep, *field_sep, *pad_char;
-
-char *buff, **bufc;
-
-int just;
+static void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
     int i, nwords, nstates, cpos, wcount, over, ansi_state;
 
@@ -2105,22 +2031,7 @@ int just;
     XFREE(words, "tables_helper.words");
 }
 
-static void
-perform_tables(player, list, n_cols, col_widths,
-               lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just)
-dbref player;
-
-char *list;
-
-int n_cols, col_widths[];
-
-char *lead_str, *trail_str;
-
-const Delim *list_sep, *field_sep, *pad_char;
-
-char *buff, **bufc;
-
-int just;
+static void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
     char *p, *savep, *bb_p;
 
@@ -2149,8 +2060,7 @@ int just;
                   trail_str, list_sep, field_sep, pad_char, buff, bufc, just);
 }
 
-FUNCTION(process_tables)
-{
+void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int just;
 
     int i, num, n_columns, *col_widths;
@@ -2190,8 +2100,7 @@ FUNCTION(process_tables)
     XFREE(widths, "process_tables.widths");
 }
 
-FUNCTION(fun_table)
-{
+void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int line_length = 78;
 
     int field_width = 10;
@@ -2286,8 +2195,7 @@ FUNCTION(fun_table)
  * a separator, but the separator only applies to the first list.
  */
 
-FUNCTION(fun_elements)
-{
+void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int nwords, cur, start, end, stepn;
 
     char **ptrs;
@@ -2493,8 +2401,7 @@ FUNCTION(fun_elements)
  * fun_exclude: Return the elements of a list EXCEPT the numbered items.
  */
 
-FUNCTION(fun_exclude)
-{
+void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int nwords, cur, start, end, stepn;
 
     char **ptrs;
@@ -2684,8 +2591,7 @@ FUNCTION(fun_exclude)
  * elements that match, and we can take an output delimiter.
  */
 
-FUNCTION(fun_grab)
-{
+void fun_grab(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *r, *s;
 
     Delim isep;
@@ -2709,8 +2615,7 @@ FUNCTION(fun_grab)
     while (s);
 }
 
-FUNCTION(fun_graball)
-{
+void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *r, *s, *bb_p;
 
     Delim isep, osep;
@@ -2740,11 +2645,7 @@ FUNCTION(fun_graball)
  */
 
 /* Borrowed from PennMUSH 1.50 */
-static void
-swap(p, q)
-char **p;
-
-char **q;
+static void swap(char **p, char **q)
 {
     /*
      * swaps two points to strings
@@ -2757,8 +2658,7 @@ char **q;
     *q = temp;
 }
 
-FUNCTION(fun_shuffle)
-{
+void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char **words;
 
     int n, i, j;
@@ -2790,8 +2690,7 @@ FUNCTION(fun_shuffle)
  * is an EXACT, not a case-insensitive or wildcarded, match.
  */
 
-FUNCTION(fun_ledit)
-{
+void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep, osep;
 
     char *old_list, *new_list;
@@ -2863,8 +2762,7 @@ FUNCTION(fun_ledit)
  * fun_itemize: Turn a list into a punctuated list.
  */
 
-FUNCTION(fun_itemize)
-{
+void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep, osep;
 
     int n_elems, i;
@@ -2933,8 +2831,7 @@ FUNCTION(fun_itemize)
  * items>,<list of weights>,<input delim>)
  */
 
-FUNCTION(fun_choose)
-{
+void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     char **elems, **weights;
@@ -3000,8 +2897,7 @@ FUNCTION(fun_choose)
  * list to go down rather than across, for instance.
  */
 
-FUNCTION(fun_group)
-{
+void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *bb_p, **elems;
 
     Delim isep, osep, gsep;
@@ -3077,8 +2973,7 @@ FUNCTION(fun_group)
  * tokens(<string>[,<obj>/<attr>][,<open>][,<close>][,<sep>][,<osep>])
  */
 
-FUNCTION(fun_tokens)
-{
+void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *t, *bb_p, *atext, *atextbuf, *objs[1], *str;
 
     int anum, aflags, alen;

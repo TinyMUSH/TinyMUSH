@@ -21,9 +21,9 @@
 #include "powers.h"		/* required by code */
 #include "walkdb.h"		/* required by code */
 
-extern char *FDECL(upcasestr, (char *));
+extern char *upcasestr(char *);
 
-extern dbref FDECL(find_connected_ambiguous, (dbref, char *));
+extern dbref find_connected_ambiguous(dbref, char *);
 
 extern NAMETAB attraccess_nametab[];
 
@@ -42,8 +42,7 @@ extern NAMETAB indiv_attraccess_nametab[];
  * fun_objid: Returns an object's objectID.
  */
 
-FUNCTION(fun_objid)
-{
+void fun_objid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -64,8 +63,7 @@ FUNCTION(fun_objid)
  * fun_con: Returns first item in contents list of object/room
  */
 
-FUNCTION(fun_con)
-{
+void fun_con(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -86,8 +84,7 @@ FUNCTION(fun_con)
  * fun_exit: Returns first exit in exits list of room.
  */
 
-FUNCTION(fun_exit)
-{
+void fun_exit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, exit;
 
     int key;
@@ -118,8 +115,7 @@ FUNCTION(fun_exit)
  * fun_next: return next thing in contents or exits chain
  */
 
-FUNCTION(fun_next)
-{
+void fun_next(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, loc, exit, ex_here;
 
     int key;
@@ -165,8 +161,7 @@ FUNCTION(fun_next)
  * something. where(): Returns the "true" location of something
  */
 
-FUNCTION(handle_loc)
-{
+void handle_loc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -186,8 +181,7 @@ FUNCTION(handle_loc)
  * fun_rloc: Returns the recursed location of something (specifying #levels)
  */
 
-FUNCTION(fun_rloc)
-{
+void fun_rloc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, levels;
 
     dbref it;
@@ -221,8 +215,7 @@ FUNCTION(fun_rloc)
  * fun_room: Find the room an object is ultimately in.
  */
 
-FUNCTION(fun_room)
-{
+void fun_room(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     int count;
@@ -259,8 +252,7 @@ FUNCTION(fun_room)
  * fun_owner: Return the owner of an object.
  */
 
-FUNCTION(fun_owner)
-{
+void fun_owner(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atr, aflags;
@@ -291,8 +283,7 @@ FUNCTION(fun_owner)
  * fun_controls: Does x control y?
  */
 
-FUNCTION(fun_controls)
-{
+void fun_controls(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref x, y;
 
     x = match_thing(player, fargs[0]);
@@ -316,8 +307,7 @@ FUNCTION(fun_controls)
  * do not exist, 0 is returned.
  */
 
-FUNCTION(fun_sees)
-{
+void fun_sees(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, thing;
 
     it = match_thing(player, fargs[0]);
@@ -338,8 +328,7 @@ FUNCTION(fun_sees)
  * fun_nearby: Return whether or not obj1 is near obj2.
  */
 
-FUNCTION(fun_nearby)
-{
+void fun_nearby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref obj1, obj2;
 
     obj1 = match_thing(player, fargs[0]);
@@ -362,8 +351,7 @@ FUNCTION(fun_nearby)
  * <target>? moves(<object>, <mover>): Can <object> see <mover> move?
  */
 
-FUNCTION(handle_okpres)
-{
+void handle_okpres(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int oper;
 
     dbref object, actor;
@@ -411,8 +399,7 @@ FUNCTION(handle_okpres)
  * an object. fullname(): Return the fullname of an object (good for exits).
  */
 
-FUNCTION(handle_name)
-{
+void handle_name(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -440,8 +427,7 @@ FUNCTION(handle_name)
  * handle_pronoun: perform pronoun sub for object (OBJ, POSS, SUBJ, APOSS).
  */
 
-FUNCTION(handle_pronoun)
-{
+void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     char *str;
@@ -465,8 +451,7 @@ FUNCTION(handle_pronoun)
  * Locks.
  */
 
-FUNCTION(fun_lock)
-{
+void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int aflags, alen;
@@ -501,8 +486,7 @@ FUNCTION(fun_lock)
         free_lbuf(tbuf);
 }
 
-FUNCTION(fun_elock)
-{
+void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, victim, aowner;
 
     int aflags, alen;
@@ -560,8 +544,7 @@ FUNCTION(fun_elock)
     }
 }
 
-FUNCTION(fun_elockstr)
-{
+void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref locked_obj, actor_obj;
 
     BOOLEXP *okey;
@@ -607,8 +590,7 @@ FUNCTION(fun_elockstr)
  * specified element in the list and copying a specified number of elements.
  */
 
-FUNCTION(fun_xcon)
-{
+void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, it;
 
     char *bb_p;
@@ -664,8 +646,7 @@ FUNCTION(fun_xcon)
  * fun_lcon: Return a list of contents.
  */
 
-FUNCTION(fun_lcon)
-{
+void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, it;
 
     char *bb_p;
@@ -698,8 +679,7 @@ FUNCTION(fun_lcon)
  * fun_lexits: Return a list of exits.
  */
 
-FUNCTION(fun_lexits)
-{
+void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, it, parent;
 
     char *bb_p;
@@ -765,8 +745,7 @@ FUNCTION(fun_lexits)
  * part from PennMUSH.
  */
 
-FUNCTION(fun_entrances)
-{
+void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, i;
 
     char *bb_p;
@@ -887,8 +866,7 @@ FUNCTION(fun_entrances)
  * fun_home: Return an object's home
  */
 
-FUNCTION(fun_home)
-{
+void fun_home(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -920,8 +898,7 @@ FUNCTION(fun_home)
  * fun_money: Return an object's value
  */
 
-FUNCTION(fun_money)
-{
+void fun_money(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -937,8 +914,7 @@ FUNCTION(fun_money)
  */
 
 /* Borrowed from PennMUSH 1.50 */
-FUNCTION(fun_findable)
-{
+void fun_findable(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref obj = match_thing(player, fargs[0]);
 
     dbref victim = match_thing(player, fargs[1]);
@@ -960,8 +936,7 @@ FUNCTION(fun_findable)
  */
 
 /* Borrowed from PennMUSH 1.50 */
-FUNCTION(fun_visible)
-{
+void fun_visible(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, thing, aowner;
 
     int aflags, atr;
@@ -1001,8 +976,7 @@ FUNCTION(fun_visible)
  * fun_writable: Returns 1 if player could set <obj>/<attr>.
  */
 
-FUNCTION(fun_writable)
-{
+void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, thing, aowner;
 
     int aflags, atr, retval;
@@ -1070,8 +1044,7 @@ FUNCTION(fun_writable)
  * case-insensitive, not quite as useful as it could be.
  */
 
-FUNCTION(fun_flags)
-{
+void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atr, aflags;
@@ -1112,8 +1085,7 @@ FUNCTION(fun_flags)
  * andflags, orflags: Check a list of flags.
  */
 
-FUNCTION(handle_flaglists)
-{
+void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     char flagletter[2];
@@ -1231,15 +1203,7 @@ FUNCTION(handle_flaglists)
  * fun_hasflag:  plus auxiliary function atr_has_flag.
  */
 
-static int
-atr_has_flag(player, thing, attr, aowner, aflags, flagname)
-dbref player, thing;
-
-ATTR *attr;
-
-int aowner, aflags;
-
-char *flagname;
+static int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname)
 {
     int flagval;
 
@@ -1255,8 +1219,7 @@ char *flagname;
     return (aflags & flagval);
 }
 
-FUNCTION(fun_hasflag)
-{
+void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atr, aflags;
@@ -1298,8 +1261,7 @@ FUNCTION(fun_hasflag)
     }
 }
 
-FUNCTION(fun_haspower)
-{
+void fun_haspower(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -1323,8 +1285,7 @@ FUNCTION(fun_haspower)
  * hasflags(<object>, <flag list to AND>, <OR flag list to AND>, <etc.>)
  */
 
-FUNCTION(fun_hasflags)
-{
+void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     char **elems;
@@ -1382,8 +1343,7 @@ FUNCTION(fun_hasflags)
  * handle_timestamp: Get timestamps (LASTACCESS, LASTMOD, CREATION).
  */
 
-FUNCTION(handle_timestamp)
-{
+void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it = match_thing(player, fargs[0]);
 
     if (!Good_obj(it) || !Examinable(player, it))
@@ -1405,8 +1365,7 @@ FUNCTION(handle_timestamp)
  * Parent-child relationships.
  */
 
-FUNCTION(fun_parent)
-{
+void fun_parent(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -1421,8 +1380,7 @@ FUNCTION(fun_parent)
     return;
 }
 
-FUNCTION(fun_lparent)
-{
+void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, par;
 
     int i;
@@ -1457,8 +1415,7 @@ FUNCTION(fun_lparent)
     }
 }
 
-FUNCTION(fun_children)
-{
+void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref i, it;
 
     char *bb_p;
@@ -1504,8 +1461,7 @@ FUNCTION(fun_children)
  * Zones.
  */
 
-FUNCTION(fun_zone)
-{
+void fun_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     if (!mudconf.have_zones)
@@ -1522,8 +1478,7 @@ FUNCTION(fun_zone)
     safe_dbref(buff, bufc, Zone(it));
 }
 
-FUNCTION(scan_zone)
-{
+void scan_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref i, it;
 
     int type;
@@ -1572,8 +1527,7 @@ FUNCTION(scan_zone)
     }
 }
 
-FUNCTION(fun_zfun)
-{
+void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref aowner;
 
     int aflags, alen;
@@ -1628,8 +1582,7 @@ FUNCTION(fun_zfun)
  * fun_hasattr: does object X have attribute Y.
  */
 
-FUNCTION(fun_hasattr)
-{
+void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int aflags, alen, check_parents;
@@ -1700,8 +1653,7 @@ FUNCTION(fun_hasattr)
  * fun_v: Function form of %-substitution
  */
 
-FUNCTION(fun_v)
-{
+void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref aowner;
 
     int aflags, alen;
@@ -1754,8 +1706,7 @@ FUNCTION(fun_v)
  * perform_get: Get attribute from object: GET, XGET, GET_EVAL, EVAL(obj,atr)
  */
 
-FUNCTION(perform_get)
-{
+void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int attrib, aflags, alen, eval_it;
@@ -1802,8 +1753,7 @@ FUNCTION(perform_get)
     free_lbuf(atr_gotten);
 }
 
-FUNCTION(fun_eval)
-{
+void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str;
 
     VaChk_Range(1, 2);
@@ -1823,8 +1773,7 @@ FUNCTION(fun_eval)
  * do_ufun: Call a user-defined function: U, ULOCAL, UPRIVATE
  */
 
-FUNCTION(do_ufun)
-{
+void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref aowner, thing;
 
     int is_local, is_private, aflags, alen, anum, trace_flag;
@@ -1922,8 +1871,7 @@ FUNCTION(do_ufun)
  * specified object.
  */
 
-FUNCTION(fun_objcall)
-{
+void fun_objcall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref obj, aowner, thing;
 
     int aflags, alen, anum;
@@ -1969,8 +1917,7 @@ FUNCTION(fun_objcall)
  * function string directly.
  */
 
-FUNCTION(fun_localize)
-{
+void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str;
 
     GDATA *preserve;
@@ -1991,8 +1938,7 @@ FUNCTION(fun_localize)
  * uprivate() but with the function string directly.
  */
 
-FUNCTION(fun_private)
-{
+void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str;
 
     GDATA *preserve;
@@ -2017,8 +1963,7 @@ FUNCTION(fun_private)
  * are used as arguments to the u().
  */
 
-FUNCTION(fun_default)
-{
+void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int attrib, aflags, alen;
@@ -2070,8 +2015,7 @@ FUNCTION(fun_default)
          EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
-FUNCTION(fun_edefault)
-{
+void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int attrib, aflags, alen;
@@ -2125,8 +2069,7 @@ FUNCTION(fun_edefault)
          EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
-FUNCTION(fun_udefault)
-{
+void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, aowner;
 
     int aflags, alen, anum, i, j, trace_flag;
@@ -2239,8 +2182,7 @@ FUNCTION(fun_udefault)
  * Evaluate from a specific object's perspective.
  */
 
-FUNCTION(fun_objeval)
-{
+void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref obj;
 
     char *name, *bp, *str;
@@ -2277,13 +2219,11 @@ FUNCTION(fun_objeval)
  * Matching functions.
  */
 
-FUNCTION(fun_num)
-{
+void fun_num(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_dbref(buff, bufc, match_thing(player, fargs[0]));
 }
 
-FUNCTION(fun_pmatch)
-{
+void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *name, *temp, *tp;
 
     dbref thing;
@@ -2365,8 +2305,7 @@ FUNCTION(fun_pmatch)
     }
 }
 
-FUNCTION(fun_pfind)
-{
+void fun_pfind(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
     if (*fargs[0] == '#')
@@ -2388,8 +2327,7 @@ FUNCTION(fun_pfind)
  * fun_locate: Search for things with the perspective of another obj.
  */
 
-FUNCTION(fun_locate)
-{
+void fun_locate(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int pref_type, check_locks, verbose, multiple;
 
     dbref thing, what;
@@ -2512,8 +2450,7 @@ FUNCTION(fun_locate)
  * nattr: Ditto, but just count 'em up.
  */
 
-FUNCTION(handle_lattr)
-{
+void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
     ATTR *attr;
@@ -2607,8 +2544,7 @@ FUNCTION(handle_lattr)
  * fun_search: Search the db for things, returning a list of what matches
  */
 
-FUNCTION(fun_search)
-{
+void fun_search(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
     char *bp, *nbuf;
@@ -2649,8 +2585,7 @@ FUNCTION(fun_search)
  * fun_stats: Get database size statistics.
  */
 
-FUNCTION(fun_stats)
-{
+void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref who;
 
     STATS statinfo;
@@ -2685,9 +2620,7 @@ FUNCTION(fun_stats)
  * Memory usage.
  */
 
-static int
-mem_usage(thing)
-dbref thing;
+static int mem_usage(dbref thing)
 {
     int k;
 
@@ -2716,11 +2649,7 @@ dbref thing;
     return k;
 }
 
-static int
-mem_usage_attr(player, str)
-dbref player;
-
-char *str;
+static int mem_usage_attr(dbref player, char *str)
 {
     dbref thing, aowner;
 
@@ -2758,8 +2687,7 @@ char *str;
     return bytes_atext;
 }
 
-FUNCTION(fun_objmem)
-{
+void fun_objmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
     if (strchr(fargs[0], '/'))
@@ -2776,8 +2704,7 @@ FUNCTION(fun_objmem)
     safe_ltos(buff, bufc, mem_usage(thing));
 }
 
-FUNCTION(fun_playmem)
-{
+void fun_playmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int tot = 0;
 
     dbref thing;
@@ -2801,8 +2728,7 @@ FUNCTION(fun_playmem)
  * Type functions.
  */
 
-FUNCTION(fun_type)
-{
+void fun_type(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     it = match_thing(player, fargs[0]);
@@ -2831,8 +2757,7 @@ FUNCTION(fun_type)
     return;
 }
 
-FUNCTION(fun_hastype)
-{
+void fun_hastype(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it = match_thing(player, fargs[0]);
 
     if (!Good_obj(it))
@@ -2874,8 +2799,7 @@ FUNCTION(fun_hastype)
  * fun_lastcreate: Return the last object of type Y that X created.
  */
 
-FUNCTION(fun_lastcreate)
-{
+void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, aowner, aflags, alen, obj_list[4], obj_type;
 
     char *obj_str, *p, *tokst;
@@ -2954,18 +2878,7 @@ FUNCTION(fun_lastcreate)
  * as %0, and the speech part number as %1.
  */
 
-static void
-transform_say(speaker, sname,
-              str, key, say_str, trans_str, empty_str,
-              open_sep, close_sep, player, caller, cause, buff, bufc)
-dbref speaker, player, caller, cause;
-
-char *sname, *str, *say_str, *trans_str, *empty_str, *buff, **bufc;
-
-const Delim *open_sep, *close_sep;
-
-int key;
-{
+static void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim *open_sep, const Delim *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc) {
     char *sp, *ep, *save, *tp, *bp;
 
     char *result, *tstack[3], *estack[2], tbuf[LBUF_SIZE];
@@ -3097,8 +3010,7 @@ int key;
         free_lbuf(empty_str);
 }
 
-FUNCTION(fun_speak)
-{
+void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, obj1, obj2;
 
     Delim isep, osep;	/* really open and close separators */

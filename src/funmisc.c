@@ -24,15 +24,12 @@
 
 extern NAMETAB indiv_attraccess_nametab[];
 
-extern void FDECL(do_pemit_list, (dbref, char *, const char *, int));
+extern void do_pemit_list(dbref, char *, const char *, int);
 
-extern void FDECL(do_pemit, (dbref, dbref, int, char *, char *));
+extern void do_pemit(dbref, dbref, int, char *, char *);
 
-extern void
-
-
-FDECL(set_attr_internal, (dbref, dbref, int, char *, int, char *, char **));
-extern int FDECL(que_want, (BQUE *, dbref, dbref));
+extern void set_attr_internal(dbref, dbref, int, char *, int, char *, char **);
+extern int que_want(BQUE *, dbref, dbref);
 
 /*
  * ---------------------------------------------------------------------------
@@ -42,8 +39,7 @@ extern int FDECL(que_want, (BQUE *, dbref, dbref));
  * that their arguments have not been evaluated.
  */
 
-FUNCTION(fun_switchall)
-{
+void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, got_one;
 
     char *mbuff, *tbuff, *bp, *str, *save_token;
@@ -111,8 +107,7 @@ FUNCTION(fun_switchall)
     mudstate.switch_token = save_token;
 }
 
-FUNCTION(fun_switch)
-{
+void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     char *mbuff, *tbuff, *bp, *str, *save_token;
@@ -179,8 +174,7 @@ FUNCTION(fun_switch)
     mudstate.switch_token = save_token;
 }
 
-FUNCTION(fun_case)
-{
+void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     char *mbuff, *tbuff, *bp, *str;
@@ -239,8 +233,7 @@ FUNCTION(fun_case)
     return;
 }
 
-FUNCTION(handle_ifelse)
-{
+void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * This function now assumes that its arguments have not been
      * evaluated.
@@ -359,8 +352,7 @@ FUNCTION(handle_ifelse)
  * fun_rand: Return a random number from 0 to arg1-1
  */
 
-FUNCTION(fun_rand)
-{
+void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int num;
 
     num = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -380,8 +372,7 @@ FUNCTION(fun_rand)
  * top>,<times>[,<delim>]): Generate random list.
  */
 
-FUNCTION(fun_die)
-{
+void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int n, die, count;
 
     int total = 0;
@@ -411,8 +402,7 @@ FUNCTION(fun_die)
 }
 
 
-FUNCTION(fun_lrand)
-{
+void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim osep;
 
     int n_times, r_bot, r_top, i;
@@ -500,8 +490,7 @@ FUNCTION(fun_lrand)
 
 #define Lnum_Place(x)	(((x) < 10) ? (2*(x)) : ((3*(x))-10))
 
-FUNCTION(fun_lnum)
-{
+void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char tbuf[12];
 
     Delim osep;
@@ -642,8 +631,7 @@ FUNCTION(fun_lnum)
  * fun_time: Returns nicely-formatted time.
  */
 
-FUNCTION(fun_time)
-{
+void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *temp;
 
     temp = (char *)ctime(&mudstate.now);
@@ -656,8 +644,7 @@ FUNCTION(fun_time)
  * fun_time: Seconds since 0:00 1/1/70
  */
 
-FUNCTION(fun_secs)
-{
+void fun_secs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.now);
 }
 
@@ -666,8 +653,7 @@ FUNCTION(fun_secs)
  * fun_convsecs: converts seconds to time string, based off 0:00 1/1/70
  */
 
-FUNCTION(fun_convsecs)
-{
+void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *temp;
 
     time_t tt;
@@ -711,11 +697,7 @@ static const char daystab[] =
 	} \
 }
 
-int
-do_convtime(str, ttm)
-char *str;
-
-struct tm *ttm;
+int do_convtime(char *str, struct tm *ttm)
 {
     char *buf, *p, *q;
 
@@ -848,8 +830,7 @@ struct tm *ttm;
 #undef LEAPYEAR_1900
 }
 
-FUNCTION(fun_convtime)
-{
+void fun_convtime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     struct tm *ttm;
 
     ttm = localtime(&mudstate.now);
@@ -864,8 +845,7 @@ FUNCTION(fun_convtime)
  * fun_timefmt: Interface to strftime().
  */
 
-FUNCTION(fun_timefmt)
-{
+void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     time_t tt;
 
     struct tm *ttm;
@@ -956,8 +936,7 @@ FUNCTION(fun_timefmt)
  * fun_etimefmt: Format a number of seconds into a human-readable time.
  */
 
-FUNCTION(fun_etimefmt)
-{
+void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p, *mark, *tp;
 
     int raw_secs;
@@ -1288,8 +1267,7 @@ FUNCTION(fun_etimefmt)
  * fun_starttime: What time did this system last reboot?
  */
 
-FUNCTION(fun_starttime)
-{
+void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *temp;
 
     temp = (char *)ctime(&mudstate.start_time);
@@ -1302,8 +1280,7 @@ FUNCTION(fun_starttime)
  * fun_restarts: How many times have we restarted?
  */
 
-FUNCTION(fun_restarts)
-{
+void fun_restarts(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.reboot_nums);
 }
 
@@ -1312,8 +1289,7 @@ FUNCTION(fun_restarts)
  * fun_restarttime: When did we last restart?
  */
 
-FUNCTION(fun_restarttime)
-{
+void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *temp;
 
     temp = (char *)ctime(&mudstate.restart_time);
@@ -1326,8 +1302,7 @@ FUNCTION(fun_restarttime)
  * fun_version: Return the MUSH version.
  */
 
-FUNCTION(fun_version)
-{
+void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /* XXX To fix once the new version scheme is done */
     //safe_str(mudstate.version, buff, bufc);
     safe_str("TinyMUSH", buff, bufc);
@@ -1339,8 +1314,7 @@ FUNCTION(fun_version)
  * fun_mudname: Return the name of the mud.
  */
 
-FUNCTION(fun_mudname)
-{
+void fun_mudname(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_str(mudconf.mud_name, buff, bufc);
 }
 
@@ -1349,8 +1323,7 @@ FUNCTION(fun_mudname)
  * fun_hasmodule: Return 1 if a module is installed, 0 if it is not.
  */
 
-FUNCTION(fun_hasmodule)
-{
+void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     MODULE *mp;
 
     WALK_ALL_MODULES(mp)
@@ -1369,8 +1342,7 @@ FUNCTION(fun_hasmodule)
  * fun_connrecord: Get max number of simultaneous connects.
  */
 
-FUNCTION(fun_connrecord)
-{
+void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.record_players);
 }
 
@@ -1379,23 +1351,19 @@ FUNCTION(fun_connrecord)
  * State of the invocation and recursion counters.
  */
 
-FUNCTION(fun_fcount)
-{
+void fun_fcount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.func_invk_ctr);
 }
 
-FUNCTION(fun_fdepth)
-{
+void fun_fdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.func_nest_lev);
 }
 
-FUNCTION(fun_ccount)
-{
+void fun_ccount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.cmd_invk_ctr);
 }
 
-FUNCTION(fun_cdepth)
-{
+void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, mudstate.cmd_nest_lev);
 }
 
@@ -1404,7 +1372,7 @@ FUNCTION(fun_cdepth)
  * fun_benchmark: Benchmark softcode.
  */
 
-FUNCTION(fun_benchmark)
+void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) 
 {
     struct timeval bt, et;
 
@@ -1476,8 +1444,7 @@ FUNCTION(fun_benchmark)
  * function evaluations.
  */
 
-FUNCTION(fun_s)
-{
+void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str;
 
     str = fargs[0];
@@ -1485,8 +1452,7 @@ FUNCTION(fun_s)
          cargs, ncargs);
 }
 
-FUNCTION(fun_subeval)
-{
+void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str;
 
     str = fargs[0];
@@ -1499,15 +1465,7 @@ FUNCTION(fun_subeval)
  * Side-effect functions.
  */
 
-static int
-check_command(player, name, buff, bufc, cargs, ncargs)
-dbref player;
-
-char *name, *buff, **bufc;
-
-char *cargs[];
-
-int ncargs;
+static int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
 {
     CMDENT *cmdp;
 
@@ -1538,57 +1496,49 @@ int ncargs;
 }
 
 
-FUNCTION(fun_link)
-{
+void fun_link(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@link", buff, bufc, cargs, ncargs))
         return;
     do_link(player, cause, 0, fargs[0], fargs[1]);
 }
 
-FUNCTION(fun_tel)
-{
+void fun_tel(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@teleport", buff, bufc, cargs, ncargs))
         return;
     do_teleport(player, cause, 0, fargs[0], fargs[1]);
 }
 
-FUNCTION(fun_wipe)
-{
+void fun_wipe(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@wipe", buff, bufc, cargs, ncargs))
         return;
     do_wipe(player, cause, 0, fargs[0]);
 }
 
-FUNCTION(fun_pemit)
-{
+void fun_pemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
         return;
     do_pemit_list(player, fargs[0], fargs[1], 0);
 }
 
-FUNCTION(fun_remit)
-{
+void fun_remit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
         return;
     do_pemit_list(player, fargs[0], fargs[1], 1);
 }
 
-FUNCTION(fun_oemit)
-{
+void fun_oemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@oemit", buff, bufc, cargs, ncargs))
         return;
     do_pemit(player, cause, PEMIT_OEMIT, fargs[0], fargs[1]);
 }
 
-FUNCTION(fun_force)
-{
+void fun_force(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (check_command(player, "@force", buff, bufc, cargs, ncargs))
         return;
     do_force(player, cause, FRC_NOW, fargs[0], fargs[1], cargs, ncargs);
 }
 
-FUNCTION(fun_trigger)
-{
+void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     if (nfargs < 1)
     {
         safe_str("#-1 TOO FEW ARGUMENTS", buff, bufc);
@@ -1599,13 +1549,11 @@ FUNCTION(fun_trigger)
     do_trigger(player, cause, TRIG_NOW, fargs[0], &(fargs[1]), nfargs - 1);
 }
 
-FUNCTION(fun_wait)
-{
+void fun_wait(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
 }
 
-FUNCTION(fun_command)
-{
+void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CMDENT *cmdp;
 
     char tbuf1[1], tbuf2[1];
@@ -1678,8 +1626,7 @@ FUNCTION(fun_command)
  * fun_create: Creates a room, thing or exit
  */
 
-FUNCTION(fun_create)
-{
+void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
     int cost;
@@ -1699,14 +1646,14 @@ FUNCTION(fun_create)
     switch (isep.str[0])
     {
     case 'r':
-        if (check_command(player, "@dig", buff, bufc))
+        if (check_command(player, "@dig", buff, bufc, cargs, ncargs))
         {
             return;
         }
         thing = create_obj(player, TYPE_ROOM, name, 0);
         break;
     case 'e':
-        if (check_command(player, "@open", buff, bufc))
+        if (check_command(player, "@open", buff, bufc, cargs, ncargs))
         {
             return;
         }
@@ -1719,7 +1666,7 @@ FUNCTION(fun_create)
         }
         break;
     default:
-        if (check_command(player, "@create", buff, bufc))
+        if (check_command(player, "@create", buff, bufc, cargs, ncargs))
         {
             return;
         }
@@ -1752,8 +1699,7 @@ FUNCTION(fun_create)
  * fun_set: sets an attribute on an object
  */
 
-FUNCTION(fun_set)
-{
+void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing, thing2, aowner;
 
     char *p, *buff2;
@@ -1766,7 +1712,7 @@ FUNCTION(fun_set)
      * obj/attr form?
      */
 
-    if (check_command(player, "@set", buff, bufc))
+    if (check_command(player, "@set", buff, bufc, cargs, ncargs))
         return;
 
     if (parse_attrib(player, fargs[0], &thing, &atr, 0))
@@ -1924,13 +1870,7 @@ FUNCTION(fun_set)
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-static void
-list_qpids(player, player_targ, obj_targ, queue, buff, bufc, bb_p)
-dbref player, player_targ, obj_targ;
-
-BQUE *queue;
-
-char *buff, **bufc, *bb_p;
+static void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
 {
     BQUE *tmp;
 
@@ -1947,8 +1887,7 @@ char *buff, **bufc, *bb_p;
     }
 }
 
-FUNCTION(fun_ps)
-{
+void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int qpid;
 
     dbref player_targ, obj_targ;

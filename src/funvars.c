@@ -56,12 +56,7 @@ char qidx_chartab[256] =
 
 static const char *qidx_str = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-int
-set_register(funcname, name, data)
-const char *funcname;
-
-char *name, *data;
-{
+int set_register(const char *funcname, char *name, char *data) {
     /*
      * Return number of characters set. -1 indicates a name error. -2
      * indicates that a limit was exceeded.
@@ -314,12 +309,7 @@ char *name, *data;
     return len;
 }
 
-static char *
-get_register(g, r)
-GDATA *g;
-
-char *r;
-{
+static char *get_register(GDATA *g, char *r) {
     /*
      * Given a pointer to a register data structure, and the name of a
      * register, return a pointer to the string value of that register.
@@ -363,8 +353,7 @@ char *r;
     return NULL;
 }
 
-FUNCTION(fun_setq)
-{
+void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int result, count, i;
 
     if (nfargs < 2)
@@ -415,8 +404,7 @@ FUNCTION(fun_setq)
                          count);
 }
 
-FUNCTION(fun_setr)
-{
+void fun_setr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int result;
 
     result = set_register("fun_setr", fargs[0], fargs[1]);
@@ -428,14 +416,7 @@ FUNCTION(fun_setr)
         safe_known_str(fargs[1], result, buff, bufc);
 }
 
-static void
-read_register(regname, buff, bufc)
-char *regname;
-
-char *buff;
-
-char **bufc;
-{
+static void read_register(char *regname, char *buff, char **bufc) {
     int regnum;
 
     char *p;
@@ -482,8 +463,7 @@ char **bufc;
     }
 }
 
-FUNCTION(fun_r)
-{
+void fun_r(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     read_register(fargs[0], buff, bufc);
 }
 
@@ -492,8 +472,7 @@ FUNCTION(fun_r)
  * lregs: List all the non-empty q-registers.
  */
 
-FUNCTION(fun_lregs)
-{
+void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     GDATA *g;
@@ -538,8 +517,7 @@ FUNCTION(fun_lregs)
  * wildmatch(<string>,<wildcard pattern>,<register list>)
  */
 
-FUNCTION(fun_wildmatch)
-{
+void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, nqregs;
 
     char *t_args[NUM_ENV_VARS], **qregs;	/* %0-%9 is limiting */
@@ -580,8 +558,7 @@ FUNCTION(fun_wildmatch)
  * qvars(<register list>,<list of elements>[,<input delim>])
  */
 
-FUNCTION(fun_qvars)
-{
+void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, nqregs, n_elems;
 
     char **qreg_names, **elems;
@@ -634,8 +611,7 @@ FUNCTION(fun_qvars)
  *           Can specify beginning and ending variable markers.
  */
 
-FUNCTION(fun_qsub)
-{
+void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *nextp, *strp;
 
     Delim bdelim, edelim;
@@ -673,10 +649,7 @@ FUNCTION(fun_qsub)
  * fun_nofx: Prevent certain types of side-effects.
  */
 
-static int
-calc_limitmask(lstr)
-char *lstr;
-{
+static int calc_limitmask(char *lstr) {
     char *p;
 
     int lmask = 0;
@@ -720,8 +693,7 @@ char *lstr;
     return lmask;
 }
 
-FUNCTION(fun_nofx)
-{
+void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int save_state, lmask;
 
     char *str;
@@ -759,12 +731,7 @@ FUNCTION(fun_nofx)
  * return to original values, keeping new values on <list>
  */
 
-static char
-is_in_array(word, list, list_length)
-char *word, **list;
-
-int list_length;
-{
+static char is_in_array(char *word, char **list, int list_length) {
     int n;
 
     for (n = 0; n < list_length; n++)
@@ -773,8 +740,7 @@ int list_length;
     return 0;
 }
 
-FUNCTION(handle_ucall)
-{
+void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref aowner, thing, obj;
 
     int aflags, alen, anum, trace_flag, i, ncregs;
@@ -1073,16 +1039,7 @@ FUNCTION(handle_ucall)
 
 #define Set_Max(x,y)     (x) = ((y) > (x)) ? (y) : (x);
 
-static void
-print_htab_matches(obj, htab, buff, bufc)
-dbref obj;
-
-HASHTAB *htab;
-
-char *buff;
-
-char **bufc;
-{
+static void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc) {
     /*
      * Lists out hashtable matches. Things which use this are
      * computationally expensive, and should be discouraged.
@@ -1132,14 +1089,7 @@ char **bufc;
  */
 
 
-void
-set_xvar(obj, name, data)
-dbref obj;
-
-char *name;
-
-char *data;
-{
+void set_xvar(dbref obj, char *name, char *data) {
     VARENT *xvar;
 
     char tbuf[SBUF_SIZE], *tp, *p;
@@ -1225,14 +1175,7 @@ char *data;
 }
 
 
-static void
-clear_xvars(obj, xvar_names, n_xvars)
-dbref obj;
-
-char **xvar_names;
-
-int n_xvars;
-{
+static void clear_xvars(dbref obj, char **xvar_names, int n_xvars) {
     /*
      * Clear out an array of variable names.
      */
@@ -1282,9 +1225,7 @@ int n_xvars;
 }
 
 
-void
-xvars_clr(player)
-dbref player;
+void xvars_clr(dbref player)
 {
     char tbuf[SBUF_SIZE], *tp;
 
@@ -1336,8 +1277,7 @@ dbref player;
 }
 
 
-FUNCTION(fun_x)
-{
+void fun_x(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     VARENT *xvar;
 
     char tbuf[SBUF_SIZE], *tp, *p;
@@ -1359,19 +1299,16 @@ FUNCTION(fun_x)
 }
 
 
-FUNCTION(fun_setx)
-{
+void fun_setx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     set_xvar(player, fargs[0], fargs[1]);
 }
 
-FUNCTION(fun_store)
-{
+void fun_store(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     set_xvar(player, fargs[0], fargs[1]);
     safe_str(fargs[1], buff, bufc);
 }
 
-FUNCTION(fun_xvars)
-{
+void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char **xvar_names, **elems;
 
     int n_xvars, n_elems;
@@ -1429,8 +1366,7 @@ FUNCTION(fun_xvars)
 }
 
 
-FUNCTION(fun_let)
-{
+void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char **xvar_names, **elems;
 
     char *old_xvars[LBUF_SIZE / 2];
@@ -1570,14 +1506,12 @@ FUNCTION(fun_let)
 }
 
 
-FUNCTION(fun_lvars)
-{
+void fun_lvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     print_htab_matches(player, &mudstate.vars_htab, buff, bufc);
 }
 
 
-FUNCTION(fun_clearvars)
-{
+void fun_clearvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * This is computationally expensive. Necessary, but its use should
      * be avoided if possible.
@@ -1591,9 +1525,7 @@ FUNCTION(fun_clearvars)
  * Structures.
  */
 
-static int
-istype_char(str)
-char *str;
+static int istype_char(char *str)
 {
     if (strlen(str) == 1)
         return 1;
@@ -1601,9 +1533,7 @@ char *str;
         return 0;
 }
 
-static int
-istype_dbref(str)
-char *str;
+static int istype_dbref(char *str)
 {
     dbref it;
 
@@ -1617,23 +1547,17 @@ char *str;
     return 0;
 }
 
-static int
-istype_int(str)
-char *str;
+static int istype_int(char *str)
 {
     return (is_integer(str));
 }
 
-static int
-istype_float(str)
-char *str;
+static int istype_float(char *str)
 {
     return (is_number(str));
 }
 
-static int
-istype_string(str)
-char *str;
+static int istype_string(char *str)
 {
     char *p;
 
@@ -1646,8 +1570,7 @@ char *str;
 }
 
 
-FUNCTION(fun_structure)
-{
+void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;		/* delim for default values */
 
     Delim osep;		/* output delim for structure values */
@@ -1938,8 +1861,7 @@ FUNCTION(fun_structure)
 }
 
 
-FUNCTION(fun_construct)
-{
+void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     char tbuf[SBUF_SIZE], *tp;
@@ -2205,18 +2127,7 @@ FUNCTION(fun_construct)
 }
 
 
-static void
-load_structure(player, buff, bufc, inst_name, str_name, raw_text,
-               sep, use_def_delim)
-dbref player;
-
-char *buff, **bufc;
-
-char *inst_name, *str_name, *raw_text;
-
-char sep;
-
-int use_def_delim;
+static void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim)
 {
     char tbuf[SBUF_SIZE], *tp;
 
@@ -2375,8 +2286,7 @@ int use_def_delim;
     safe_chr('1', buff, bufc);
 }
 
-FUNCTION(fun_load)
-{
+void fun_load(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     VaChk_Only_InPure(4);
@@ -2385,8 +2295,7 @@ FUNCTION(fun_load)
                    fargs[0], fargs[1], fargs[2], isep.str[0], (nfargs != 4) ? 1 : 0);
 }
 
-FUNCTION(fun_read)
-{
+void fun_read(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atr, aflags, alen;
@@ -2404,8 +2313,7 @@ FUNCTION(fun_read)
     free_lbuf(atext);
 }
 
-FUNCTION(fun_delimit)
-{
+void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atr, aflags, alen, nitems, i, over = 0;
@@ -2451,8 +2359,7 @@ FUNCTION(fun_delimit)
 }
 
 
-FUNCTION(fun_z)
-{
+void fun_z(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char tbuf[SBUF_SIZE], *tp;
 
     char *p;
@@ -2478,8 +2385,7 @@ FUNCTION(fun_z)
 }
 
 
-FUNCTION(fun_modify)
-{
+void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char tbuf[SBUF_SIZE], *tp;
 
     char cbuf[SBUF_SIZE], *cp;
@@ -2600,18 +2506,7 @@ FUNCTION(fun_modify)
 }
 
 
-static void
-unload_structure(player, buff, bufc, inst_name, sep, use_def_delim)
-dbref player;
-
-char *buff, **bufc;
-
-char *inst_name;
-
-char sep;
-
-int use_def_delim;
-{
+static void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, char sep, int use_def_delim) {
     char tbuf[SBUF_SIZE], *tp;
 
     char ibuf[SBUF_SIZE], *ip;
@@ -2675,8 +2570,7 @@ int use_def_delim;
     }
 }
 
-FUNCTION(fun_unload)
-{
+void fun_unload(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep;
 
     VaChk_Only_InPure(2);
@@ -2684,8 +2578,7 @@ FUNCTION(fun_unload)
                      (nfargs != 2) ? 1 : 0);
 }
 
-FUNCTION(fun_write)
-{
+void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it, aowner;
 
     int atrnum, aflags;
@@ -2726,8 +2619,7 @@ FUNCTION(fun_write)
 }
 
 
-FUNCTION(fun_destruct)
-{
+void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char tbuf[SBUF_SIZE], *tp;
 
     char ibuf[SBUF_SIZE], *ip;
@@ -2796,8 +2688,7 @@ FUNCTION(fun_destruct)
 }
 
 
-FUNCTION(fun_unstructure)
-{
+void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char tbuf[SBUF_SIZE], *tp;
 
     char cbuf[SBUF_SIZE], *cp;
@@ -2881,19 +2772,15 @@ FUNCTION(fun_unstructure)
     safe_chr('1', buff, bufc);
 }
 
-FUNCTION(fun_lstructures)
-{
+void fun_lstructures(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     print_htab_matches(player, &mudstate.structs_htab, buff, bufc);
 }
 
-FUNCTION(fun_linstances)
-{
+void fun_linstances(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     print_htab_matches(player, &mudstate.instance_htab, buff, bufc);
 }
 
-void
-structure_clr(thing)
-dbref thing;
+void structure_clr(dbref thing)
 {
     /*
      * Wipe out all structure information associated with an object. Find
@@ -3109,9 +2996,7 @@ dbref thing;
  * Object stack functions.
  */
 
-void
-stack_clr(thing)
-dbref thing;
+void stack_clr(dbref thing)
 {
     OBJSTACK *sp, *tp, *xp;
 
@@ -3130,11 +3015,7 @@ dbref thing;
     }
 }
 
-static int
-stack_set(thing, sp)
-dbref thing;
-
-OBJSTACK *sp;
+static int stack_set(dbref thing, OBJSTACK *sp)
 {
     OBJSTACK *xsp;
 
@@ -3165,8 +3046,7 @@ OBJSTACK *sp;
     return 1;
 }
 
-FUNCTION(fun_empty)
-{
+void fun_empty(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     VaChk_Range(0, 1);
@@ -3183,8 +3063,7 @@ FUNCTION(fun_empty)
     stack_clr(it);
 }
 
-FUNCTION(fun_items)
-{
+void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     if (!fargs[0])
@@ -3200,7 +3079,7 @@ FUNCTION(fun_items)
 }
 
 
-FUNCTION(fun_push)
+void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) 
 {
     dbref it;
 
@@ -3240,8 +3119,7 @@ FUNCTION(fun_push)
         s_StackCount(it, StackCount(it) + 1);
 }
 
-FUNCTION(fun_dup)
-{
+void fun_dup(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     OBJSTACK *hp;		/* head of stack */
@@ -3295,8 +3173,7 @@ FUNCTION(fun_dup)
         s_StackCount(it, StackCount(it) + 1);
 }
 
-FUNCTION(fun_swap)
-{
+void fun_swap(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     OBJSTACK *sp, *tp;
@@ -3324,8 +3201,7 @@ FUNCTION(fun_swap)
     stack_set(it, tp);
 }
 
-FUNCTION(handle_pop)
-{
+void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     int pos, count = 0, peek_flag, toss_flag;
@@ -3391,8 +3267,7 @@ FUNCTION(handle_pop)
     }
 }
 
-FUNCTION(fun_popn)
-{
+void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     int pos, nitems, i, count = 0, over = 0;
@@ -3466,8 +3341,7 @@ FUNCTION(fun_popn)
     }
 }
 
-FUNCTION(fun_lstack)
-{
+void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim osep;
 
     dbref it;
@@ -3507,8 +3381,7 @@ FUNCTION(fun_lstack)
  * regedit(<string>,<regexp>,<replacement>) Derived from the PennMUSH code.
  */
 
-FUNCTION(perform_regedit)
-{
+void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     pcre *re;
 
     pcre_extra *study = NULL;
@@ -3681,8 +3554,7 @@ FUNCTION(perform_regedit)
  * wildparse(<string>,<pattern>,<list of variable names>)
  */
 
-FUNCTION(fun_wildparse)
-{
+void fun_wildparse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, nqregs;
 
     char *t_args[NUM_ENV_VARS], **qregs;
@@ -3716,8 +3588,7 @@ FUNCTION(fun_wildparse)
  * regparse(string, pattern, named vars)
  */
 
-FUNCTION(perform_regparse)
-{
+void perform_regparse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i, nqregs;
 
     int case_option;
@@ -3784,8 +3655,7 @@ FUNCTION(perform_regparse)
  * REGRAB, REGRABI. Derived from PennMUSH.
  */
 
-FUNCTION(perform_regrab)
-{
+void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep, osep;
 
     int case_option, all_option;
@@ -3880,8 +3750,7 @@ FUNCTION(perform_regrab)
  *
  */
 
-FUNCTION(perform_regmatch)
-{
+void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int case_option;
 
     int i, nqregs;
@@ -3969,8 +3838,7 @@ FUNCTION(perform_regmatch)
  * condition is NOT met').
  */
 
-FUNCTION(fun_until)
-{
+void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim isep, osep;
 
     dbref aowner1, thing1, aowner2, thing2;
@@ -4150,8 +4018,7 @@ FUNCTION(fun_until)
  * case-insensitive wildgrep, since all wildcard matches are caseless.)
  */
 
-FUNCTION(perform_grep)
-{
+void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int grep_type, caseless;
 
     pcre *re = NULL;
@@ -4315,12 +4182,7 @@ FUNCTION(perform_grep)
 	 safe_str((gp)->data[(gr)][(gc)], buff, bufc); \
      }
 
-static void
-grid_free(thing, ogp)
-dbref thing;
-
-OBJGRID *ogp;
-{
+static void grid_free(dbref thing, OBJGRID *ogp) {
     int r, c;
 
     if (ogp)
@@ -4342,8 +4204,7 @@ OBJGRID *ogp;
     }
 }
 
-FUNCTION(fun_gridmake)
-{
+void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     OBJGRID *ogp;
 
     int rows, cols, dimension, r, c, status, data_rows, data_elems, errs;
@@ -4437,8 +4298,7 @@ FUNCTION(fun_gridmake)
     free_lbuf(rbuf);
 }
 
-FUNCTION(fun_gridsize)
-{
+void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     OBJGRID *ogp;
 
     ogp = grid_get(player);
@@ -4452,8 +4312,7 @@ FUNCTION(fun_gridsize)
     }
 }
 
-FUNCTION(fun_gridset)
-{
+void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     OBJGRID *ogp;
 
     char *xlist, *ylist;
@@ -4596,8 +4455,7 @@ FUNCTION(fun_gridset)
     }
 }
 
-FUNCTION(fun_grid)
-{
+void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim csep, rsep;
 
     OBJGRID *ogp;

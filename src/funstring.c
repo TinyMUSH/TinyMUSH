@@ -25,8 +25,7 @@
  * character in the argument a letter or number?
  */
 
-FUNCTION(fun_isword)
-{
+void fun_isword(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
     for (p = fargs[0]; *p; p++)
@@ -40,8 +39,7 @@ FUNCTION(fun_isword)
     safe_chr('1', buff, bufc);
 }
 
-FUNCTION(fun_isalnum)
-{
+void fun_isalnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
     for (p = fargs[0]; *p; p++)
@@ -60,8 +58,7 @@ FUNCTION(fun_isalnum)
  * isnum: is the argument a number?
  */
 
-FUNCTION(fun_isnum)
-{
+void fun_isnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_chr((is_number(fargs[0]) ? '1' : '0'), buff, bufc);
 }
 
@@ -70,8 +67,7 @@ FUNCTION(fun_isnum)
  * isdbref: is the argument a valid dbref?
  */
 
-FUNCTION(fun_isdbref)
-{
+void fun_isdbref(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
     dbref dbitem;
@@ -97,8 +93,7 @@ FUNCTION(fun_isdbref)
  * isobjid: is the argument a valid objid?
  */
 
-FUNCTION(fun_isobjid)
-{
+void fun_isobjid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
     dbref dbitem;
@@ -127,9 +122,7 @@ FUNCTION(fun_isobjid)
  * side-effects, and now you have bunches of spaces you need to get rid of.
  */
 
-FUNCTION(fun_null)
-{
-    return;
+void fun_null(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)  {
 }
 
 /*
@@ -140,8 +133,7 @@ FUNCTION(fun_null)
  * call trim().
  */
 
-FUNCTION(fun_squish)
-{
+void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *tp, *bp;
 
     Delim isep;
@@ -209,8 +201,7 @@ FUNCTION(fun_squish)
 #define TRIM_L 0x1
 #define TRIM_R 0x2
 
-FUNCTION(fun_trim)
-{
+void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p, *q, *endchar, *ep;
 
     Delim isep;
@@ -321,8 +312,7 @@ FUNCTION(fun_trim)
  * string.
  */
 
-FUNCTION(fun_after)
-{
+void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *bp, *cp, *mp, *np;
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
@@ -427,8 +417,7 @@ FUNCTION(fun_after)
     return;
 }
 
-FUNCTION(fun_before)
-{
+void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *haystack, *bp, *cp, *mp, *np;
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
@@ -535,8 +524,7 @@ FUNCTION(fun_before)
  * fun_lcstr, fun_ucstr, fun_capstr: Lowercase, uppercase, or capitalize str.
  */
 
-FUNCTION(fun_lcstr)
-{
+void fun_lcstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *ap;
 
     ap = *bufc;
@@ -556,8 +544,7 @@ FUNCTION(fun_lcstr)
     }
 }
 
-FUNCTION(fun_ucstr)
-{
+void fun_ucstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *ap;
 
     ap = *bufc;
@@ -577,8 +564,7 @@ FUNCTION(fun_ucstr)
     }
 }
 
-FUNCTION(fun_capstr)
-{
+void fun_capstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *ap;
 
     ap = *bufc;
@@ -597,8 +583,7 @@ FUNCTION(fun_capstr)
  * fun_space: Make spaces.
  */
 
-FUNCTION(fun_space)
-{
+void fun_space(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int num, max;
 
     if (!fargs[0] || !(*fargs[0]))
@@ -634,8 +619,7 @@ FUNCTION(fun_space)
  * rjust, ljust, center: Justify or center text, specifying fill character
  */
 
-FUNCTION(fun_ljust)
-{
+void fun_ljust(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int spaces, max, i, slen;
 
     char *tp, *fillchars;
@@ -709,8 +693,7 @@ FUNCTION(fun_ljust)
     *bufc = tp;
 }
 
-FUNCTION(fun_rjust)
-{
+void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int spaces, max, i, slen;
 
     char *tp, *fillchars;
@@ -788,8 +771,7 @@ FUNCTION(fun_rjust)
     safe_str(fargs[0], buff, bufc);
 }
 
-FUNCTION(fun_center)
-{
+void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *tp, *fillchars;
 
     int len, lead_chrs, trail_chrs, width, max, i, slen;
@@ -926,8 +908,7 @@ FUNCTION(fun_center)
  * characters in a string strtrunc: now an alias for left
  */
 
-FUNCTION(fun_left)
-{
+void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     int count, nchars;
@@ -957,8 +938,7 @@ FUNCTION(fun_left)
     safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
 }
 
-FUNCTION(fun_right)
-{
+void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     int count, start, nchars;
@@ -1007,8 +987,7 @@ FUNCTION(fun_right)
  * fun_chomp: If the line ends with CRLF, CR, or LF, chop it off.
  */
 
-FUNCTION(fun_chomp)
-{
+void fun_chomp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *bb_p = *bufc;
 
     safe_str(fargs[0], buff, bufc);
@@ -1024,8 +1003,7 @@ FUNCTION(fun_chomp)
  * compare. fun_strmatch: wildcard string compare.
  */
 
-FUNCTION(fun_comp)
-{
+void fun_comp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int x;
 
     x = strcmp(fargs[0], fargs[1]);
@@ -1043,13 +1021,11 @@ FUNCTION(fun_comp)
     }
 }
 
-FUNCTION(fun_streq)
-{
+void fun_streq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_bool(buff, bufc, !string_compare(fargs[0], fargs[1]));
 }
 
-FUNCTION(fun_strmatch)
-{
+void fun_strmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * Check if we match the whole string.  If so, return 1
      */
@@ -1062,8 +1038,7 @@ FUNCTION(fun_strmatch)
  * fun_edit: Edit text.
  */
 
-FUNCTION(fun_edit)
-{
+void fun_edit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *tstr;
 
     edit_string(fargs[0], &tstr, fargs[1], fargs[2]);
@@ -1079,8 +1054,7 @@ FUNCTION(fun_edit)
  * be of the same length.
  */
 
-FUNCTION(fun_merge)
-{
+void fun_merge(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *str, *rep;
 
     char c;
@@ -1133,8 +1107,7 @@ FUNCTION(fun_merge)
  * only care about string evaluation, not a forced command.
  */
 
-FUNCTION(fun_secure)
-{
+void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     s = fargs[0];
@@ -1165,8 +1138,7 @@ FUNCTION(fun_secure)
     }
 }
 
-FUNCTION(fun_escape)
-{
+void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *d;
 
     s = fargs[0];
@@ -1202,8 +1174,7 @@ FUNCTION(fun_escape)
     }
 }
 
-FUNCTION(fun_esc)
-{
+void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     s = fargs[0];
@@ -1236,8 +1207,7 @@ FUNCTION(fun_esc)
  * stripchars: Remove all of a set of characters from a string.
  */
 
-FUNCTION(fun_stripchars)
-{
+void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     char stab[256] =
@@ -1296,8 +1266,7 @@ FUNCTION(fun_stripchars)
  * ANSI handlers.
  */
 
-FUNCTION(fun_ansi)
-{
+void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
     int ansi_state;
@@ -1333,8 +1302,7 @@ FUNCTION(fun_ansi)
     safe_str(ansi_transition_esccode(ansi_state, ANST_NONE), buff, bufc);
 }
 
-FUNCTION(fun_stripansi)
-{
+void fun_stripansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_str((char *)strip_ansi(fargs[0]), buff, bufc);
 }
 
@@ -1349,9 +1317,7 @@ FUNCTION(fun_stripansi)
 #define CRYPTCODE_HI  126	/* tilde */
 #define CRYPTCODE_MOD  95	/* count of printable ascii chars */
 
-static void
-crunch_code(code)
-char *code;
+static void crunch_code(char *code)
 {
     char *in, *out;
 
@@ -1374,11 +1340,7 @@ char *code;
     *out = '\0';
 }
 
-static void
-crypt_code(buff, bufc, code, text, type)
-char *buff, **bufc, *code, *text;
-
-int type;
+static void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
 {
     char *p, *q;
 
@@ -1434,13 +1396,11 @@ int type;
     }
 }
 
-FUNCTION(fun_encrypt)
-{
+void fun_encrypt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     crypt_code(buff, bufc, fargs[1], fargs[0], 1);
 }
 
-FUNCTION(fun_decrypt)
-{
+void fun_decrypt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     crypt_code(buff, bufc, fargs[1], fargs[0], 0);
 }
 
@@ -1450,8 +1410,7 @@ FUNCTION(fun_decrypt)
  */
 
 /* Borrowed from PennMUSH 1.50 */
-FUNCTION(fun_scramble)
-{
+void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int n, i, j, ansi_state, *ansi_map;
 
     char *stripped;
@@ -1487,8 +1446,7 @@ FUNCTION(fun_scramble)
  * fun_reverse: reverse a string
  */
 
-FUNCTION(fun_reverse)
-{
+void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int n, *ansi_map, ansi_state;
 
     char *stripped;
@@ -1520,8 +1478,7 @@ FUNCTION(fun_reverse)
  * fun_mid: mid(foobar,2,3) returns oba
  */
 
-FUNCTION(fun_mid)
-{
+void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *savep;
 
     int count, start, nchars;
@@ -1588,8 +1545,7 @@ FUNCTION(fun_mid)
  * or p, they're converted to percent substitutions.
  */
 
-FUNCTION(fun_translate)
-{
+void fun_translate(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     VaChk_Range(1, 2);
 
     /*
@@ -1609,8 +1565,7 @@ FUNCTION(fun_translate)
  * fun_pos: Find a word in a string
  */
 
-FUNCTION(fun_pos)
-{
+void fun_pos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i = 1;
 
     char *b, *s, *t, *u;
@@ -1659,8 +1614,7 @@ FUNCTION(fun_pos)
  * lpos(a-bc-def-g,-) ==> 1 4 8
  */
 
-FUNCTION(fun_lpos)
-{
+void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *bb_p, *scratch_chartab;
 
     int i;
@@ -1707,8 +1661,7 @@ FUNCTION(fun_lpos)
  * different.
  */
 
-FUNCTION(fun_diffpos)
-{
+void fun_diffpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     char *s1, *s2;
@@ -1738,8 +1691,7 @@ FUNCTION(fun_diffpos)
  * wordpos(<string>, <charpos>)
  */
 
-FUNCTION(fun_wordpos)
-{
+void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int charpos, i;
 
     char *cp, *tp, *xp;
@@ -1774,8 +1726,7 @@ FUNCTION(fun_wordpos)
  * ansipos(<string>, <charpos>[, <type>])
  */
 
-FUNCTION(fun_ansipos)
-{
+void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int charpos, i, ansi_state;
 
     char *s;
@@ -1815,8 +1766,7 @@ FUNCTION(fun_ansipos)
  * fun_repeat: repeats a string
  */
 
-FUNCTION(fun_repeat)
-{
+void fun_repeat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int times, len, i, maxtimes;
 
     times = (int)strtol(fargs[1], (char **)NULL, 10);
@@ -1853,8 +1803,7 @@ FUNCTION(fun_repeat)
  * fill>[,<R margin fill>]])
  */
 
-FUNCTION(perform_border)
-{
+void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int width, just;
 
     char *l_fill, *r_fill, *bb_p;
@@ -2159,17 +2108,7 @@ FUNCTION(perform_border)
  *   - ANSI states are not supported in the widths, as they are unnecessary.
  */
 
-static void
-perform_align(n_cols, raw_colstrs, data, fillc, col_sep, row_sep, buff, bufc)
-int n_cols;
-
-char **raw_colstrs, **data;
-
-char fillc;
-
-Delim col_sep, row_sep;
-
-char *buff, **bufc;
+static void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
 {
     int i, n;
 
@@ -2742,8 +2681,7 @@ char *buff, **bufc;
     XFREE(xew_p, "perform_align.xew_p");
 }
 
-FUNCTION(fun_align)
-{
+void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char **raw_colstrs;
 
     int n_cols;
@@ -2789,8 +2727,7 @@ FUNCTION(fun_align)
     XFREE(raw_colstrs, "fun_align.raw_colstrs");
 }
 
-FUNCTION(fun_lalign)
-{
+void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char **raw_colstrs, **data;
 
     int n_cols, n_data;
@@ -2834,8 +2771,7 @@ FUNCTION(fun_lalign)
  * String concatenation.
  */
 
-FUNCTION(fun_cat)
-{
+void fun_cat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     safe_str(fargs[0], buff, bufc);
@@ -2846,8 +2782,7 @@ FUNCTION(fun_cat)
     }
 }
 
-FUNCTION(fun_strcat)
-{
+void fun_strcat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int i;
 
     safe_str(fargs[0], buff, bufc);
@@ -2857,8 +2792,7 @@ FUNCTION(fun_strcat)
     }
 }
 
-FUNCTION(fun_join)
-{
+void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     Delim osep;
 
     char *bb_p;
@@ -2889,13 +2823,11 @@ FUNCTION(fun_join)
  * Misc functions.
  */
 
-FUNCTION(fun_strlen)
-{
+void fun_strlen(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_ltos(buff, bufc, strip_ansi_len(fargs[0]));
 }
 
-FUNCTION(fun_delete)
-{
+void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s, *savep;
 
     int count, start, nchars;
@@ -2963,16 +2895,14 @@ FUNCTION(fun_delete)
  * Misc PennMUSH-derived functions.
  */
 
-FUNCTION(fun_lit)
-{
+void fun_lit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * Just returns the argument, literally
      */
     safe_str(fargs[0], buff, bufc);
 }
 
-FUNCTION(fun_art)
-{
+void fun_art(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * checks a word and returns the appropriate article, "a" or "an"
      */
@@ -3004,8 +2934,7 @@ FUNCTION(fun_art)
     }
 }
 
-FUNCTION(fun_alphamax)
-{
+void fun_alphamax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *amax;
 
     int i = 1;
@@ -3027,8 +2956,7 @@ FUNCTION(fun_alphamax)
     safe_str(amax, buff, bufc);
 }
 
-FUNCTION(fun_alphamin)
-{
+void fun_alphamin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *amin;
 
     int i = 1;
@@ -3050,8 +2978,7 @@ FUNCTION(fun_alphamin)
     safe_str(amin, buff, bufc);
 }
 
-FUNCTION(fun_valid)
-{
+void fun_valid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * Checks to see if a given <something> is valid as a parameter of a
      * given type (such as an object name).
@@ -3080,7 +3007,6 @@ FUNCTION(fun_valid)
     }
 }
 
-FUNCTION(fun_beep)
-{
+void fun_beep(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_chr(BEEP_CHAR, buff, bufc);
 }

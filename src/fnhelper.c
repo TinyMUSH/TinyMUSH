@@ -28,11 +28,7 @@ static long NDECL(genrand_int31);
  * Trim off leading and trailing spaces if the separator char is a space
  */
 
-char *
-trim_space_sep(str, sep)
-char *str;
-
-const Delim *sep;
+char *trim_space_sep(char *str, const Delim *sep)
 {
     char *p;
 
@@ -55,11 +51,7 @@ const Delim *sep;
  * tell what color it is.
  */
 
-char *
-next_token(str, sep)
-char *str;
-
-const Delim *sep;
+char *next_token(char *str, const Delim *sep)
 {
     char *p;
 
@@ -95,11 +87,7 @@ const Delim *sep;
     return str;
 }
 
-char *
-split_token(sp, sep)
-char **sp;
-
-const Delim *sep;
+char *split_token(char **sp, const Delim *sep)
 {
     char *str, *save, *p;
 
@@ -153,13 +141,7 @@ const Delim *sep;
     return save;
 }
 
-char *
-next_token_ansi(str, sep, ansi_state_ptr)
-char *str;
-
-const Delim *sep;
-
-int *ansi_state_ptr;
+char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 {
     int ansi_state = *ansi_state_ptr;
 
@@ -209,11 +191,7 @@ int *ansi_state_ptr;
  * Count the words in a delimiter-separated list.
  */
 
-int
-countwords(str, sep)
-char *str;
-
-const Delim *sep;
+int countwords(char *str, const Delim *sep)
 {
     int n;
 
@@ -229,13 +207,7 @@ const Delim *sep;
  * list2arr, arr2list: Convert lists to arrays and vice versa.
  */
 
-int
-list2arr(arr, maxtok, list, sep)
-char ***arr, *list;
-
-const Delim *sep;
-
-int maxtok;
+int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
     static unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
 
@@ -307,13 +279,7 @@ int maxtok;
     return ntok;
 }
 
-void
-arr2list(arr, alen, list, bufc, sep)
-char **arr, **bufc, *list;
-
-const Delim *sep;
-
-int alen;
+void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 {
     int i;
 
@@ -335,13 +301,7 @@ int alen;
  * takes the same maxlen and returns the same number of words.
  */
 
-int
-list2ansi(arr, prior_state, maxlen, list, sep)
-int *arr, *prior_state, maxlen;
-
-char *list;
-
-const Delim *sep;
+int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep)
 {
     int i, ansi_state;
 
@@ -365,11 +325,7 @@ const Delim *sep;
  * Quick-matching for function purposes.
  */
 
-dbref
-match_thing(player, name)
-dbref player;
-
-char *name;
+dbref match_thing(dbref player, char *name)
 {
     init_match(player, name, NOTYPE);
     match_everything(MAT_EXIT_PARENTS);
@@ -382,13 +338,7 @@ char *name;
  * for validity.
  */
 
-int
-fn_range_check(fname, nfargs, minargs, maxargs, result, bufc)
-const char *fname;
-
-char *result, **bufc;
-
-int nfargs, minargs, maxargs;
+int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
 {
     if ((nfargs >= minargs) && (nfargs <= maxargs))
         return 1;
@@ -409,15 +359,7 @@ int nfargs, minargs, maxargs;
  * delim_check: obtain delimiter
  */
 
-int
-delim_check(FUNCTION_ARGLIST, sep_arg, sep, dflags)
-char *fargs[], *cargs[], *buff, **bufc;
-
-Delim *sep;
-
-int nfargs, ncargs, sep_arg, dflags;
-
-dbref player, caller, cause;
+int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags)
 {
     char *tstr, *bp, *str;
 
@@ -499,9 +441,7 @@ dbref player, caller, cause;
  * Boolean true/false check.
  */
 
-int
-xlate(arg)
-char *arg;
+int xlate(char *arg)
 {
     char *temp2;
 
@@ -553,9 +493,7 @@ char *arg;
  * used by fun_reverse and fun_revwords to reverse things
  */
 
-void
-do_reverse(from, to)
-char *from, *to;
+void do_reverse(char *from, char *to)
 {
     char *tp;
 
@@ -573,9 +511,7 @@ char *from, *to;
  * based on MUX2's RandomINT32().
  */
 
-long
-random_range(low, high)
-long low, high;
+long random_range(long low, long high)
 {
     unsigned long x, n, n_limit;
 
@@ -684,9 +620,7 @@ static int initf = 0;
 static unsigned long *next;
 
 /* initializes state[N] with a seed */
-void
-init_genrand(s)
-unsigned long s;
+void init_genrand(unsigned long s)
 {
     int j;
 
@@ -713,8 +647,7 @@ unsigned long s;
     initf = 1;
 }
 
-static void
-next_state()
+static void next_state(void)
 {
     unsigned long *p = state;
 
@@ -742,8 +675,7 @@ next_state()
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
-static long
-NDECL(genrand_int31)
+static long genrand_int31(void)
 {
     unsigned long y;
 

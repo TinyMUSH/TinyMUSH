@@ -19,25 +19,25 @@
 #include "powers.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-extern void FDECL(make_ulist, (dbref, char *, char **));
+extern void make_ulist(dbref, char *, char **);
 
-extern void FDECL(make_portlist, (dbref, dbref, char *, char **));
+extern void make_portlist(dbref, dbref, char *, char **);
 
-extern int FDECL(fetch_idle, (dbref, int));
+extern int fetch_idle(dbref, int);
 
-extern int FDECL(fetch_connect, (dbref, int));
+extern int fetch_connect(dbref, int);
 
-extern char *FDECL(get_doing, (dbref, int));
+extern char *get_doing(dbref, int);
 
-extern void FDECL(make_sessioninfo, (dbref, dbref, int, char *, char **));
+extern void make_sessioninfo(dbref, dbref, int, char *, char **);
 
-extern dbref FDECL(get_programmer, (dbref));
+extern dbref get_programmer(dbref);
 
-extern void FDECL(cf_display, (dbref, char *, char *, char **));
+extern void cf_display(dbref, char *, char *, char **);
 
-extern void FDECL(help_helper, (dbref, int, int, char *, char *, char **));
+extern void help_helper(dbref, int, int, char *, char *, char **);
 
-extern int FDECL(safe_chr_real_fn, (char, char *, char **, int));
+extern int safe_chr_real_fn(char, char *, char **, int);
 
 #define Find_Connection(x,s,t,p) \
 	p = t = NOTHING;	\
@@ -55,8 +55,7 @@ extern int FDECL(safe_chr_real_fn, (char, char *, char **, int));
  * config: Display a MUSH config parameter.
  */
 
-FUNCTION(fun_config)
-{
+void fun_config(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     cf_display(player, fargs[0], buff, bufc);
 }
 
@@ -65,8 +64,7 @@ FUNCTION(fun_config)
  * fun_lwho: Return list of connected users.
  */
 
-FUNCTION(fun_lwho)
-{
+void fun_lwho(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     make_ulist(player, buff, bufc);
 }
 
@@ -75,8 +73,7 @@ FUNCTION(fun_lwho)
  * fun_ports: Returns a list of ports for a user.
  */
 
-FUNCTION(fun_ports)
-{
+void fun_ports(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
 
     VaChk_Range(0, 1);
@@ -101,8 +98,7 @@ FUNCTION(fun_ports)
  * fun_doing: Returns a user's doing.
  */
 
-FUNCTION(fun_doing)
-{
+void fun_doing(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
 
     int port;
@@ -126,8 +122,7 @@ FUNCTION(fun_doing)
  * handle_conninfo: return seconds idle or connected (IDLE, CONN).
  */
 
-FUNCTION(handle_conninfo)
-{
+void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
 
     int port;
@@ -147,8 +142,7 @@ FUNCTION(handle_conninfo)
  * fun_session: Return session info about a port.
  */
 
-FUNCTION(fun_session)
-{
+void fun_session(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
 
     int port;
@@ -167,8 +161,7 @@ FUNCTION(fun_session)
  * fun_programmer: Returns the dbref or #1- of an object in a @program.
  */
 
-FUNCTION(fun_programmer)
-{
+void fun_programmer(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
 
     target = lookup_player(player, fargs[0], 1);
@@ -185,8 +178,7 @@ FUNCTION(fun_programmer)
  * fun_helptext: Read an entry from a helpfile.
  */
 
-FUNCTION(fun_helptext)
-{
+void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CMDENT *cmdp;
 
     char *p;
@@ -220,13 +212,11 @@ FUNCTION(fun_helptext)
 
 #ifdef PUEBLO_SUPPORT
 
-FUNCTION(fun_html_escape)
-{
+void fun_html_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     html_escape(fargs[0], buff, bufc);
 }
 
-FUNCTION(fun_html_unescape)
-{
+void fun_html_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     const char *msg_orig;
 
     int ret = 0;
@@ -268,8 +258,7 @@ FUNCTION(fun_html_unescape)
     }
 }
 
-FUNCTION(fun_url_escape)
-{
+void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /*
      * These are the characters which are converted to %<hex>
      */
@@ -299,8 +288,7 @@ FUNCTION(fun_url_escape)
     }
 }
 
-FUNCTION(fun_url_unescape)
-{
+void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     const char *msg_orig;
 
     int ret = 0;
