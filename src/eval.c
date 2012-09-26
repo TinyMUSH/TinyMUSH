@@ -32,11 +32,7 @@ extern char qidx_chartab[256];	/* from funvars.c */
  * delimiter, dstr is returned as NULL.
  */
 
-static char *
-parse_to_cleanup(eval, first, cstr, rstr, zstr)
-int eval, first;
-
-char *cstr, *rstr, *zstr;
+static char * parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
 {
     if ((mudconf.space_compress || (eval & EV_STRIP_TS)) &&
             !(eval & EV_NO_COMPRESS) && !first && (cstr[-1] == ' '))
@@ -73,11 +69,7 @@ char *cstr, *rstr, *zstr;
 		*zstr++ = *cstr++
 
 
-char *
-parse_to(dstr, delim, eval)
-char **dstr, delim;
-
-int eval;
+char *parse_to(char **dstr, char delim, int eval)
 {
 #define stacklim 32
     char stack[stacklim];
@@ -270,12 +262,7 @@ int eval;
  * destructively modified.
  */
 
-char *
-parse_arglist(player, caller, cause, dstr, delim, eval,
-              fargs, nfargs, cargs, ncargs)
-dbref player, caller, cause, eval, nfargs, ncargs;
-
-char *dstr, delim, *fargs[], *cargs[];
+char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char delim, dbref eval, char *fargs[], dbref nfargs, char *cargs[], dbref ncargs)
 {
     char *rstr, *tstr, *bp, *str;
 
@@ -319,9 +306,7 @@ char *dstr, delim, *fargs[], *cargs[];
  * %-substitutions.
  */
 
-int
-get_gender(player)
-dbref player;
+int get_gender(dbref player)
 {
     char first, *atr_gotten;
 
@@ -366,16 +351,14 @@ struct tcache_ent
 
 int tcache_top, tcache_count;
 
-void
-NDECL(tcache_init)
+void tcache_init(void)
 {
     tcache_head = NULL;
     tcache_top = 1;
     tcache_count = 0;
 }
 
-int
-NDECL(tcache_empty)
+int tcache_empty(void)
 {
     if (tcache_top)
     {
@@ -386,9 +369,7 @@ NDECL(tcache_empty)
     return 0;
 }
 
-static void
-tcache_add(orig, result)
-char *orig, *result;
+static void tcache_add(char *orig, char *result)
 {
     char *tp;
 
@@ -418,9 +399,7 @@ char *orig, *result;
     }
 }
 
-static void
-tcache_finish(player)
-dbref player;
+static void tcache_finish(dbref player)
 {
     TCENT *xp;
 
@@ -557,17 +536,7 @@ char *ansi_chartab[256] =
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void
-exec(buff, bufc, player, caller, cause, eval, dstr, cargs, ncargs)
-char *buff, **bufc;
-
-dbref player, caller, cause;
-
-int eval, ncargs;
-
-char **dstr;
-
-char *cargs[];
+void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs)
 {
     char *real_fargs[MAX_NFARGS + 1];
 
@@ -1631,9 +1600,7 @@ char *cargs[];
  * registers to protect them from various sorts of munging.
  */
 
-GDATA *
-save_global_regs(funcname)
-const char *funcname;
+GDATA *save_global_regs(const char *funcname)
 {
     GDATA *preserve;
 
@@ -1649,11 +1616,7 @@ const char *funcname;
     return preserve;
 }
 
-void
-restore_global_regs(funcname, preserve)
-const char *funcname;
-
-GDATA *preserve;
+void restore_global_regs(const char *funcname, GDATA *preserve)
 {
     if (!mudstate.rdata && !preserve)
         return;

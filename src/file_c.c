@@ -85,13 +85,7 @@ NAMETAB		list_files[] =
 
 /* *INDENT-ON* */
 
-void
-do_list_file(player, cause, extra, arg)
-dbref player, cause;
-
-int extra;
-
-char *arg;
+void do_list_file(dbref player, dbref cause, int extra, char *arg)
 {
     int flagvalue;
 
@@ -105,11 +99,7 @@ char *arg;
     fcache_send(player, flagvalue);
 }
 
-static FBLOCK *
-fcache_fill(fp, ch)
-FBLOCK *fp;
-
-char ch;
+static FBLOCK *fcache_fill(FBLOCK *fp, char ch)
 {
     FBLOCK *tfp;
 
@@ -130,11 +120,7 @@ char ch;
     return fp;
 }
 
-static int
-fcache_read(cp, filename)
-FBLOCK **cp;
-
-char *filename;
+static int fcache_read(FBLOCK **cp, char *filename)
 {
     int n, nmax, tchars, fd;
 
@@ -224,9 +210,7 @@ char *filename;
     return tchars;
 }
 
-void
-fcache_rawdump(fd, num)
-int fd, num;
+void fcache_rawdump(int fd, int num)
 {
     int cnt, remaining;
 
@@ -256,11 +240,7 @@ int fd, num;
     return;
 }
 
-void
-fcache_dump(d, num)
-DESC *d;
-
-int num;
+void fcache_dump(DESC *d, int num)
 {
     FBLOCK *fp;
 
@@ -275,11 +255,7 @@ int num;
     }
 }
 
-void
-fcache_send(player, num)
-dbref player;
-
-int num;
+void fcache_send(dbref player, int num)
 {
     DESC *d;
 
@@ -289,9 +265,7 @@ int num;
     }
 }
 
-void
-fcache_load(player)
-dbref player;
+void fcache_load(dbref player)
 {
     FCACHE *fp;
 
@@ -325,8 +299,7 @@ dbref player;
     free_sbuf(sbuf);
 }
 
-void
-NDECL(fcache_init)
+void fcache_init(void)
 {
     FCACHE *fp;
 

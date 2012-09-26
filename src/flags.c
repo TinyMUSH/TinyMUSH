@@ -25,13 +25,7 @@
  * fh_any: set or clear indicated bit, no security checking
  */
 
-int
-fh_any(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_any(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     /*
      * Never let God drop his own wizbit.
@@ -88,13 +82,7 @@ int fflags, reset;
  * fh_god: only GOD may set or clear the bit
  */
 
-int
-fh_god(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_god(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (!God(player))
         return 0;
@@ -106,13 +94,7 @@ int fflags, reset;
  * fh_wiz: only WIZARDS (or GOD) may set or clear the bit
  */
 
-int
-fh_wiz(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_wiz(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (!Wizard(player) && !God(player))
         return 0;
@@ -124,13 +106,7 @@ int fflags, reset;
  * fh_wizroy: only WIZARDS, ROYALTY, (or GOD) may set or clear the bit
  */
 
-int
-fh_wizroy(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_wizroy(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (!WizRoy(player) && !God(player))
         return 0;
@@ -143,13 +119,7 @@ int fflags, reset;
  * players can set it on other types of objects.
  */
 
-int
-fh_restrict_player(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_restrict_player(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (isPlayer(target) && !Wizard(player) && !God(player))
         return 0;
@@ -163,13 +133,7 @@ int fflags, reset;
  * robots). Only God can set this on a player.
  */
 
-int
-fh_privileged(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_privileged(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     int has_it;
 
@@ -199,13 +163,7 @@ int fflags, reset;
  * fh_inherit: only players may set or clear this bit.
  */
 
-int
-fh_inherit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_inherit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (!Inherits(player))
         return 0;
@@ -217,13 +175,7 @@ int fflags, reset;
  * fh_dark_bit: manipulate the dark bit. Nonwizards may not set on players.
  */
 
-int
-fh_dark_bit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_dark_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (!reset && isPlayer(target) && !((target == player) &&
                                         Can_Hide(player)) && (!Wizard(player) && !God(player)))
@@ -238,13 +190,7 @@ int fflags, reset;
  * destroy nondestroyable objects.
  */
 
-int
-fh_going_bit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_going_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (Going(target) && reset && (Typeof(target) != TYPE_GARBAGE))
     {
@@ -262,13 +208,7 @@ int fflags, reset;
  * fh_hear_bit: set or clear bits that affect hearing.
  */
 
-int
-fh_hear_bit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_hear_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     int could_hear;
 
@@ -285,13 +225,7 @@ int fflags, reset;
  * fh_player_bit: Can set and reset this on everything but players.
  */
 
-int
-fh_player_bit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_player_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (isPlayer(target))
         return 0;
@@ -303,13 +237,7 @@ int fflags, reset;
  * fh_power_bit: Check power bit to set/reset.
  */
 
-int
-fh_power_bit(target, player, flag, fflags, reset)
-dbref target, player;
-
-FLAG flag;
-
-int fflags, reset;
+int fh_power_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (flag & WATCHER)
     {
@@ -680,8 +608,7 @@ OBJENT		object_types[8] =
  * init_flagtab: initialize flag hash tables.
  */
 
-void
-NDECL(init_flagtab)
+void init_flagtab(void)
 {
     FLAGENT *fp;
 
@@ -699,9 +626,7 @@ NDECL(init_flagtab)
  * display_flags: display available flags.
  */
 
-void
-display_flagtab(player)
-dbref player;
+void display_flagtab(dbref player)
 {
     char *buf, *bp;
 
@@ -726,11 +651,7 @@ dbref player;
     free_lbuf(buf);
 }
 
-FLAGENT *
-find_flag(thing, flagname)
-dbref thing;
-
-char *flagname;
+FLAGENT *find_flag(dbref thing, char *flagname)
 {
     char *cp;
 
@@ -748,13 +669,7 @@ char *flagname;
  * flag_set: Set or clear a specified flag on an object.
  */
 
-void
-flag_set(target, player, flag, key)
-dbref target, player;
-
-char *flag;
-
-int key;
+void flag_set(dbref target, dbref player, char *flag, int key)
 {
     FLAGENT *fp;
 
@@ -814,11 +729,7 @@ int key;
  * decode_flags: converts a flag set into corresponding letters.
  */
 
-char *
-decode_flags(player, flagset)
-dbref player;
-
-FLAGSET flagset;
+char *decode_flags(dbref player, FLAGSET flagset)
 {
     char *buf, *bp, *s;
 
@@ -863,9 +774,7 @@ FLAGSET flagset;
  * unparse_flags: converts a thing's flags into corresponding letters.
  */
 
-char *
-unparse_flags(player, thing)
-dbref player, thing;
+char *unparse_flags(dbref player, dbref thing)
 {
     char *buf, *bp, *s;
 
@@ -937,11 +846,7 @@ dbref player, thing;
  * has_flag: does object have flag visible to player?
  */
 
-int
-has_flag(player, it, flagname)
-dbref player, it;
-
-char *flagname;
+int has_flag(dbref player, dbref it, char *flagname)
 {
     FLAGENT *fp;
 
@@ -989,9 +894,7 @@ char *flagname;
  * flag_description: Return an mbuf containing the type and flags on thing.
  */
 
-char *
-flag_description(player, target)
-dbref player, target;
+char *flag_description(dbref player, dbref target)
 {
     char *buff, *bp;
 
@@ -1058,9 +961,7 @@ dbref player, target;
  * Return an lbuf containing the name and number of an object
  */
 
-char *
-unparse_object_numonly(target)
-dbref target;
+char *unparse_object_numonly(dbref target)
 {
     char *buf, *bp;
 
@@ -1094,11 +995,7 @@ dbref target;
  * Return an lbuf pointing to the object name and possibly the db# and flags
  */
 
-char *
-unparse_object(player, target, obey_myopic)
-dbref player, target;
-
-int obey_myopic;
+char *unparse_object(dbref player, dbref target, int obey_myopic)
 {
     char *buf, *fp, *bp;
 
@@ -1165,9 +1062,7 @@ int obey_myopic;
  * pointer.
  */
 
-FLAGENT *
-letter_to_flag(this_letter)
-char this_letter;
+FLAGENT *letter_to_flag(char this_letter)
 {
     FLAGENT *fp;
 
@@ -1184,8 +1079,7 @@ char this_letter;
  * cf_flag_access: Modify who can set a flag.
  */
 
-CF_HAND(cf_flag_access)
-{
+int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *fstr, *permstr, *tokst;
 
     FLAGENT *fp;
@@ -1256,8 +1150,7 @@ CF_HAND(cf_flag_access)
  * cf_flag_name: Modify the name of a user-defined flag.
  */
 
-CF_HAND(cf_flag_name)
-{
+int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd) {
     char *numstr, *namestr, *tokst;
 
     FLAGENT *fp;
@@ -1333,15 +1226,7 @@ CF_HAND(cf_flag_name)
  * set the type qualifier if specified and not already set.
  */
 
-int
-convert_flags(player, flaglist, fset, p_type)
-dbref player;
-
-char *flaglist;
-
-FLAGSET *fset;
-
-FLAG *p_type;
+int convert_flags(dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type)
 {
     int i, handled;
 
@@ -1432,11 +1317,7 @@ FLAG *p_type;
  * decompile_flags: Produce commands to set flags on target.
  */
 
-void
-decompile_flags(player, thing, thingname)
-dbref player, thing;
-
-char *thingname;
+void decompile_flags(dbref player, dbref thing, char *thingname)
 {
     FLAG f1, f2, f3;
 
