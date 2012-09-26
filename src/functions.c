@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -29,22 +30,19 @@ UFUN *ufun_head;
 
 const Delim SPACE_DELIM = { 1, " " };
 
-void init_functab(void)
-{
+void init_functab(void) {
     FUN *fp;
 
     hashinit(&mudstate.func_htab, 250 * HASH_FACTOR, HT_STR | HT_KEYREF);
 
-    for (fp = flist; fp->name; fp++)
-    {
+    for (fp = flist; fp->name; fp++) {
         hashadd((char *)fp->name, (int *)fp, &mudstate.func_htab, 0);
     }
     ufun_head = NULL;
     hashinit(&mudstate.ufunc_htab, 15 * HASH_FACTOR, HT_STR);
 }
 
-void do_function(dbref player, dbref cause, int key, char *fname, char *target)
-{
+void do_function(dbref player, dbref cause, int key, char *fname, char *target) {
     UFUN *ufp, *ufp2;
 
     ATTR *ap;
@@ -59,32 +57,26 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Check for list first
      */
 
-    if (key & FUNCT_LIST)
-    {
+    if (key & FUNCT_LIST) {
 
-        if (fname && *fname)
-        {
+        if (fname && *fname) {
 
             /*
              * Make it case-insensitive, and look it up.
              */
 
-            for (bp = fname; *bp; bp++)
-            {
+            for (bp = fname; *bp; bp++) {
                 *bp = tolower(*bp);
             }
 
             ufp = (UFUN *) hashfind(fname, &mudstate.ufunc_htab);
 
-            if (ufp)
-            {
+            if (ufp) {
                 notify(player,
                        tprintf("%s: #%d/%s",
                                ufp->name, ufp->obj,
                                ((ATTR *) atr_num(ufp->atr))->name));
-            }
-            else
-            {
+            } else {
                 notify(player,
                        tprintf
                        ("%s not found in user function table.",
@@ -98,8 +90,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
 
         for (ufp = (UFUN *) hash_firstentry(&mudstate.ufunc_htab);
                 ufp != NULL;
-                ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab))
-        {
+                ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab)) {
             notify(player,
                    tprintf("%s: #%d/%s",
                            ufp->name, ufp->obj,
@@ -121,8 +112,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Verify that the function doesn't exist in the builtin table
      */
 
-    if (hashfind(np, &mudstate.func_htab) != NULL)
-    {
+    if (hashfind(np, &mudstate.func_htab) != NULL) {
         notify_quiet(player,
                      "Function already defined in builtin function table.");
         free_sbuf(np);
@@ -132,8 +122,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Make sure the target object exists
      */
 
-    if (!parse_attrib(player, target, &obj, &atr, 0))
-    {
+    if (!parse_attrib(player, target, &obj, &atr, 0)) {
         notify_quiet(player, NOMATCH_MESSAGE);
         free_sbuf(np);
         return;
@@ -142,8 +131,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Make sure the attribute exists
      */
 
-    if (atr == NOTHING)
-    {
+    if (atr == NOTHING) {
         notify_quiet(player, "No such attribute.");
         free_sbuf(np);
         return;
@@ -153,15 +141,13 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      */
 
     ap = atr_num(atr);
-    if (!ap)
-    {
+    if (!ap) {
         notify_quiet(player, "No such attribute.");
         free_sbuf(np);
         return;
     }
     atr_get_info(obj, atr, &aowner, &aflags);
-    if (!See_attr(player, obj, ap, aowner, aflags))
-    {
+    if (!See_attr(player, obj, ap, aowner, aflags)) {
         notify_quiet(player, NOPERM_MESSAGE);
         free_sbuf(np);
         return;
@@ -170,8 +156,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Privileged functions require you control the obj.
      */
 
-    if ((key & FUNCT_PRIV) && !Controls(player, obj))
-    {
+    if ((key & FUNCT_PRIV) && !Controls(player, obj)) {
         notify_quiet(player, NOPERM_MESSAGE);
         free_sbuf(np);
         return;
@@ -182,8 +167,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
 
     ufp = (UFUN *) hashfind(np, &mudstate.ufunc_htab);
 
-    if (!ufp)
-    {
+    if (!ufp) {
         ufp = (UFUN *) XMALLOC(sizeof(UFUN), "do_function");
         ufp->name = XSTRDUP(np, "do_function.name");
         for (bp = (char *)ufp->name; *bp; bp++)
@@ -192,17 +176,13 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
         ufp->atr = atr;
         ufp->perms = CA_PUBLIC;
         ufp->next = NULL;
-        if (!ufun_head)
-        {
+        if (!ufun_head) {
             ufun_head = ufp;
-        }
-        else
-        {
+        } else {
             for (ufp2 = ufun_head; ufp2->next; ufp2 = ufp2->next);
             ufp2->next = ufp;
         }
-        if (hashadd(np, (int *)ufp, &mudstate.ufunc_htab, 0))
-        {
+        if (hashadd(np, (int *)ufp, &mudstate.ufunc_htab, 0)) {
             notify_quiet(player,
                          tprintf("Function %s not defined.", fname));
             XFREE(ufp->name, "do_function");
@@ -234,8 +214,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
  * list_functable: List available functions.
  */
 
-void list_functable(dbref player)
-{
+void list_functable(dbref player) {
     FUN *fp, *modfns;
 
     UFUN *ufp;
@@ -248,28 +227,22 @@ void list_functable(dbref player)
 
     bp = buf;
     safe_str((char *)"Built-in functions:", buf, &bp);
-    for (fp = flist; fp->name; fp++)
-    {
-        if (Check_Func_Access(player, fp))
-        {
+    for (fp = flist; fp->name; fp++) {
+        if (Check_Func_Access(player, fp)) {
             safe_chr(' ', buf, &bp);
             safe_str((char *)fp->name, buf, &bp);
         }
     }
     notify(player, buf);
 
-    WALK_ALL_MODULES(mp)
-    {
+    WALK_ALL_MODULES(mp) {
         if ((modfns = DLSYM_VAR(mp->handle, mp->modname, "functable",
-                                FUN *)) != NULL)
-        {
+                                FUN *)) != NULL) {
             bp = buf;
             safe_tprintf_str(buf, &bp, "Module %s functions:",
                              mp->modname);
-            for (fp = modfns; fp->name; fp++)
-            {
-                if (Check_Func_Access(player, fp))
-                {
+            for (fp = modfns; fp->name; fp++) {
+                if (Check_Func_Access(player, fp)) {
                     safe_chr(' ', buf, &bp);
                     safe_str((char *)fp->name, buf, &bp);
                 }
@@ -280,10 +253,8 @@ void list_functable(dbref player)
 
     bp = buf;
     safe_str((char *)"User-defined functions:", buf, &bp);
-    for (ufp = ufun_head; ufp; ufp = ufp->next)
-    {
-        if (check_access(player, ufp->perms))
-        {
+    for (ufp = ufun_head; ufp; ufp = ufp->next) {
+        if (check_access(player, ufp->perms)) {
             safe_chr(' ', buf, &bp);
             safe_str(ufp->name, buf, &bp);
         }
@@ -298,29 +269,21 @@ void list_functable(dbref player)
  * list_funcaccess: List access on functions.
  */
 
-static void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
-{
+static void helper_list_funcaccess(dbref player, FUN *fp, char *buff) {
     char *bp;
 
     int i;
 
-    while (fp->name)
-    {
-        if (Check_Func_Access(player, fp))
-        {
-            if (!fp->xperms)
-            {
+    while (fp->name) {
+        if (Check_Func_Access(player, fp)) {
+            if (!fp->xperms) {
                 sprintf(buff, "%s:", fp->name);
-            }
-            else
-            {
+            } else {
                 bp = buff;
                 safe_str((char *)fp->name, buff, &bp);
                 safe_chr(':', buff, &bp);
-                for (i = 0; i < fp->xperms->num_funcs; i++)
-                {
-                    if (fp->xperms->ext_funcs[i])
-                    {
+                for (i = 0; i < fp->xperms->num_funcs; i++) {
+                    if (fp->xperms->ext_funcs[i]) {
                         safe_chr(' ', buff, &bp);
                         safe_str(fp->xperms->
                                  ext_funcs[i]->fn_name,
@@ -335,8 +298,7 @@ static void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
     }
 }
 
-void list_funcaccess(dbref player)
-{
+void list_funcaccess(dbref player) {
     char *buff;
 
     FUN *ftab;
@@ -348,19 +310,15 @@ void list_funcaccess(dbref player)
     buff = alloc_sbuf("list_funcaccess");
     helper_list_funcaccess(player, flist, buff);
 
-    WALK_ALL_MODULES(mp)
-    {
+    WALK_ALL_MODULES(mp) {
         if ((ftab = DLSYM_VAR(mp->handle, mp->modname, "functable",
-                              FUN *)) != NULL)
-        {
+                              FUN *)) != NULL) {
             helper_list_funcaccess(player, ftab, buff);
         }
     }
 
-    for (ufp = ufun_head; ufp; ufp = ufp->next)
-    {
-        if (check_access(player, ufp->perms))
-        {
+    for (ufp = ufun_head; ufp; ufp = ufp->next) {
+        if (check_access(player, ufp->perms)) {
             sprintf(buff, "%s:", ufp->name);
             listset_nametab(player, access_nametab,
                             ufp->perms, buff, 1);
@@ -387,18 +345,14 @@ int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     if (*ap)
         *ap++ = '\0';
 
-    for (fp = flist; fp->name; fp++)
-    {
-        if (!string_compare(fp->name, str))
-        {
+    for (fp = flist; fp->name; fp++) {
+        if (!string_compare(fp->name, str)) {
             return (parse_ext_access(&fp->perms, &fp->xperms,
                                      ap, (NAMETAB *) extra, player, cmd));
         }
     }
-    for (ufp = ufun_head; ufp; ufp = ufp->next)
-    {
-        if (!string_compare(ufp->name, str))
-        {
+    for (ufp = ufun_head; ufp; ufp = ufp->next) {
+        if (!string_compare(ufp->name, str)) {
             return (cf_modify_bits(&ufp->perms, ap, extra,
                                    player, cmd));
         }

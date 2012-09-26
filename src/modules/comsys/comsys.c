@@ -1,7 +1,10 @@
 /* comsys.c - module implementing DarkZone-style channel system */
 /* $Id: comsys.c,v 1.81 2008/01/10 00:04:18 lwl Exp $ */
 
+#include "../../copyright.h"
 #include "../../config.h"
+#include "../../system.h"
+
 #include "../../api.h"
 
 /* --------------------------------------------------------------------------

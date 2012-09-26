@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -46,14 +47,11 @@ void fun_objid(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (Good_obj(it))
-    {
+    if (Good_obj(it)) {
         safe_dbref(buff, bufc, it);
         safe_chr(':', buff, bufc);
         safe_ltos(buff, bufc, CreateTime(it));
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
 }
@@ -70,8 +68,7 @@ void fun_con(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (Good_loc(it) &&
             (Examinable(player, it) ||
-             (where_is(player) == it) || (it == cause)))
-    {
+             (where_is(player) == it) || (it == cause))) {
         safe_dbref(buff, bufc, Contents(it));
         return;
     }
@@ -90,17 +87,14 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int key;
 
     it = match_thing(player, fargs[0]);
-    if (Good_obj(it) && Has_exits(it) && Good_obj(Exits(it)))
-    {
+    if (Good_obj(it) && Has_exits(it) && Good_obj(Exits(it))) {
         key = 0;
         if (Examinable(player, it))
             key |= VE_LOC_XAM;
         if (Dark(it))
             key |= VE_LOC_DARK;
-        DOLIST(exit, Exits(it))
-        {
-            if (Exit_Visible(exit, player, key))
-            {
+        DOLIST(exit, Exits(it)) {
+            if (Exit_Visible(exit, player, key)) {
                 safe_dbref(buff, bufc, exit);
                 return;
             }
@@ -121,29 +115,22 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int key;
 
     it = match_thing(player, fargs[0]);
-    if (Good_obj(it) && Has_siblings(it))
-    {
+    if (Good_obj(it) && Has_siblings(it)) {
         loc = where_is(it);
         ex_here = Good_obj(loc) ? Examinable(player, loc) : 0;
-        if (ex_here || (loc == player) || (loc == where_is(player)))
-        {
-            if (!isExit(it))
-            {
+        if (ex_here || (loc == player) || (loc == where_is(player))) {
+            if (!isExit(it)) {
                 safe_dbref(buff, bufc, Next(it));
                 return;
-            }
-            else
-            {
+            } else {
                 key = 0;
                 if (ex_here)
                     key |= VE_LOC_XAM;
                 if (Dark(loc))
                     key |= VE_LOC_DARK;
-                DOLIST(exit, it)
-                {
+                DOLIST(exit, it) {
                     if ((exit != it) &&
-                            Exit_Visible(exit, player, key))
-                    {
+                            Exit_Visible(exit, player, key)) {
                         safe_dbref(buff, bufc, exit);
                         return;
                     }
@@ -165,13 +152,10 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (locatable(player, it, cause))
-    {
+    if (locatable(player, it, cause)) {
         safe_dbref(buff, bufc,
                    Is_Func(LOCFN_WHERE) ? where_is(it) : Location(it));
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
 }
@@ -191,16 +175,11 @@ void fun_rloc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         levels = mudconf.ntfy_nest_lim;
 
     it = match_thing(player, fargs[0]);
-    if (locatable(player, it, cause))
-    {
-        for (i = 0; i < levels; i++)
-        {
-            if (Good_obj(it) && (Has_location(it) || isExit(it)))
-            {
+    if (locatable(player, it, cause)) {
+        for (i = 0; i < levels; i++) {
+            if (Good_obj(it) && (Has_location(it) || isExit(it))) {
                 it = Location(it);
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
@@ -221,27 +200,20 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int count;
 
     it = match_thing(player, fargs[0]);
-    if (locatable(player, it, cause))
-    {
-        for (count = mudconf.ntfy_nest_lim; count > 0; count--)
-        {
+    if (locatable(player, it, cause)) {
+        for (count = mudconf.ntfy_nest_lim; count > 0; count--) {
             it = Location(it);
             if (!Good_obj(it))
                 break;
-            if (isRoom(it))
-            {
+            if (isRoom(it)) {
                 safe_dbref(buff, bufc, it);
                 return;
             }
         }
         safe_nothing(buff, bufc);
-    }
-    else if (isRoom(it))
-    {
+    } else if (isRoom(it)) {
         safe_dbref(buff, bufc, it);
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
     return;
@@ -257,20 +229,14 @@ void fun_owner(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     int atr, aflags;
 
-    if (parse_attrib(player, fargs[0], &it, &atr, 1))
-    {
-        if (atr == NOTHING)
-        {
+    if (parse_attrib(player, fargs[0], &it, &atr, 1)) {
+        if (atr == NOTHING) {
             it = NOTHING;
-        }
-        else
-        {
+        } else {
             atr_pget_info(it, atr, &aowner, &aflags);
             it = aowner;
         }
-    }
-    else
-    {
+    } else {
         it = match_thing(player, fargs[0]);
         if (Good_obj(it))
             it = Owner(it);
@@ -287,14 +253,12 @@ void fun_controls(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     dbref x, y;
 
     x = match_thing(player, fargs[0]);
-    if (!Good_obj(x))
-    {
+    if (!Good_obj(x)) {
         safe_str("#-1 ARG1 NOT FOUND", buff, bufc);
         return;
     }
     y = match_thing(player, fargs[1]);
-    if (!Good_obj(y))
-    {
+    if (!Good_obj(y)) {
         safe_str("#-1 ARG2 NOT FOUND", buff, bufc);
         return;
     }
@@ -312,8 +276,7 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     it = match_thing(player, fargs[0]);
     thing = match_thing(player, fargs[1]);
-    if (!Good_obj(it) || !Good_obj(thing))
-    {
+    if (!Good_obj(it) || !Good_obj(thing)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -334,12 +297,9 @@ void fun_nearby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     obj1 = match_thing(player, fargs[0]);
     obj2 = match_thing(player, fargs[1]);
     if (!(nearby_or_control(player, obj1) ||
-            nearby_or_control(player, obj2)))
-    {
+            nearby_or_control(player, obj2))) {
         safe_chr('0', buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_bool(buff, bufc, nearby(obj1, obj2));
     }
 }
@@ -359,36 +319,28 @@ void handle_okpres(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     object = match_thing(player, fargs[0]);
     actor = match_thing(player, fargs[1]);
 
-    if (!Good_obj(object) || !Good_obj(actor))
-    {
+    if (!Good_obj(object) || !Good_obj(actor)) {
         safe_chr('0', buff, bufc);
         return;
     }
     oper = Func_Mask(PRESFN_OPER);
 
-    if (oper == PRESFN_HEARS)
-    {
+    if (oper == PRESFN_HEARS) {
         safe_bool(buff, bufc,
                   ((Unreal(actor) && !Check_Heard(object, actor)) ||
                    (Unreal(object)
                     && !Check_Hears(actor, object))) ? 0 : 1);
-    }
-    else if (oper == PRESFN_MOVES)
-    {
+    } else if (oper == PRESFN_MOVES) {
         safe_bool(buff, bufc,
                   ((Unreal(actor) && !Check_Noticed(object, actor)) ||
                    (Unreal(object)
                     && !Check_Notices(actor, object))) ? 0 : 1);
-    }
-    else if (oper == PRESFN_KNOWS)
-    {
+    } else if (oper == PRESFN_KNOWS) {
         safe_bool(buff, bufc,
                   ((Unreal(actor) && !Check_Known(object, actor)) ||
                    (Unreal(object)
                     && !Check_Knows(actor, object))) ? 0 : 1);
-    }
-    else
-    {
+    } else {
         safe_chr('0', buff, bufc);
     }
 }
@@ -403,15 +355,12 @@ void handle_name(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         return;
     }
-    if (!mudconf.read_rem_name)
-    {
+    if (!mudconf.read_rem_name) {
         if (!nearby_or_control(player, it) &&
-                !isPlayer(it) && !Long_Fingers(player))
-        {
+                !isPlayer(it) && !Long_Fingers(player)) {
             safe_str("#-1 TOO FAR AWAY TO SEE", buff, bufc);
             return;
         }
@@ -435,12 +384,9 @@ void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller, dbref c
     char *pronouns[4] = { "%o", "%p", "%s", "%a" };
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it) || (!isPlayer(it) && !nearby_or_control(player, it)))
-    {
+    if (!Good_obj(it) || (!isPlayer(it) && !nearby_or_control(player, it))) {
         safe_nomatch(buff, bufc);
-    }
-    else
-    {
+    } else {
         str = pronouns[Func_Flags(fargs)];
         exec(buff, bufc, it, it, it, 0, &str, (char **)NULL, 0);
     }
@@ -474,15 +420,13 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
 
     tbuf = atr_get(it, attr->number, &aowner, &aflags, &alen);
-    if (Read_attr(player, it, attr, aowner, aflags))
-    {
+    if (Read_attr(player, it, attr, aowner, aflags)) {
         bool = parse_boolexp(player, tbuf, 1);
         free_lbuf(tbuf);
         tbuf = (char *)unparse_boolexp_function(player, bool);
         free_boolexp(bool);
         safe_str(tbuf, buff, bufc);
-    }
-    else
+    } else
         free_lbuf(tbuf);
 }
 
@@ -509,35 +453,24 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
 
     victim = match_thing(player, fargs[1]);
-    if (!Good_obj(victim))
-    {
+    if (!Good_obj(victim)) {
         safe_nomatch(buff, bufc);
-    }
-    else if (!nearby_or_control(player, victim) &&
-             !nearby_or_control(player, it))
-    {
+    } else if (!nearby_or_control(player, victim) &&
+               !nearby_or_control(player, it)) {
         safe_str("#-1 TOO FAR AWAY", buff, bufc);
-    }
-    else
-    {
+    } else {
         tbuf = atr_get(it, attr->number, &aowner, &aflags, &alen);
         if ((attr->flags & AF_IS_LOCK) ||
-                Read_attr(player, it, attr, aowner, aflags))
-        {
-            if (Pass_Locks(victim))
-            {
+                Read_attr(player, it, attr, aowner, aflags)) {
+            if (Pass_Locks(victim)) {
                 safe_chr('1', buff, bufc);
-            }
-            else
-            {
+            } else {
                 bool = parse_boolexp(player, tbuf, 1);
                 safe_bool(buff, bufc, eval_boolexp(victim, it,
                                                    it, bool));
                 free_boolexp(bool);
             }
-        }
-        else
-        {
+        } else {
             safe_chr('0', buff, bufc);
         }
         free_lbuf(tbuf);
@@ -552,31 +485,19 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     locked_obj = match_thing(player, fargs[0]);
     actor_obj = match_thing(player, fargs[1]);
 
-    if (!Good_obj(locked_obj) || !Good_obj(actor_obj))
-    {
+    if (!Good_obj(locked_obj) || !Good_obj(actor_obj)) {
         safe_nomatch(buff, bufc);
-    }
-    else if (!nearby_or_control(player, actor_obj))
-    {
+    } else if (!nearby_or_control(player, actor_obj)) {
         safe_str("#-1 TOO FAR AWAY", buff, bufc);
-    }
-    else if (!Controls(player, locked_obj))
-    {
+    } else if (!Controls(player, locked_obj)) {
         safe_noperm(buff, bufc);
-    }
-    else
-    {
+    } else {
         okey = parse_boolexp(player, fargs[2], 0);
-        if (okey == TRUE_BOOLEXP)
-        {
+        if (okey == TRUE_BOOLEXP) {
             safe_str("#-1 INVALID KEY", buff, bufc);
-        }
-        else if (Pass_Locks(actor_obj))
-        {
+        } else if (Pass_Locks(actor_obj)) {
             safe_chr('1', buff, bufc);
-        }
-        else
-        {
+        } else {
             safe_ltos(buff, bufc, eval_boolexp(actor_obj,
                                                locked_obj, locked_obj, okey));
         }
@@ -606,12 +527,10 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     bb_p = *bufc;
     if (Good_loc(it) &&
             (Examinable(player, it) || (Location(player) == it) ||
-             (it == cause)))
-    {
+             (it == cause))) {
         first = (int)strtol(fargs[1], (char **)NULL, 10);
         last = (int)strtol(fargs[2], (char **)NULL, 10);
-        if ((first > 0) && (last > 0))
-        {
+        if ((first > 0) && (last > 0)) {
 
             /*
              * Move to the first object that we want
@@ -627,17 +546,14 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             for (i = 0;
                     (i < last) && (thing != NOTHING)
                     && (Next(thing) != thing);
-                    thing = Next(thing), i++)
-            {
-                if (*bufc != bb_p)
-                {
+                    thing = Next(thing), i++) {
+                if (*bufc != bb_p) {
                     print_sep(&osep, buff, bufc);
                 }
                 safe_dbref(buff, bufc, thing);
             }
         }
-    }
-    else
+    } else
         safe_nothing(buff, bufc);
 }
 
@@ -659,18 +575,14 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     bb_p = *bufc;
     if (Good_loc(it) &&
             (Examinable(player, it) ||
-             (Location(player) == it) || (it == cause)))
-    {
-        DOLIST(thing, Contents(it))
-        {
-            if (*bufc != bb_p)
-            {
+             (Location(player) == it) || (it == cause))) {
+        DOLIST(thing, Contents(it)) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_dbref(buff, bufc, thing);
         }
-    }
-    else
+    } else
         safe_nothing(buff, bufc);
 }
 
@@ -692,14 +604,12 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     it = match_thing(player, fargs[0]);
 
-    if (!Good_obj(it) || !Has_exits(it))
-    {
+    if (!Good_obj(it) || !Has_exits(it)) {
         safe_nothing(buff, bufc);
         return;
     }
     exam = Examinable(player, it);
-    if (!exam && (where_is(player) != it) && (it != cause))
-    {
+    if (!exam && (where_is(player) != it) && (it != cause)) {
         safe_nothing(buff, bufc);
         return;
     }
@@ -708,8 +618,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      */
 
     bb_p = *bufc;
-    ITER_PARENTS(it, parent, lev)
-    {
+    ITER_PARENTS(it, parent, lev) {
 
         /*
          * Look for exits at each level
@@ -724,12 +633,9 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
             key |= VE_LOC_DARK;
         if (Dark(it))
             key |= VE_BASE_DARK;
-        DOLIST(thing, Exits(parent))
-        {
-            if (Exit_Visible(thing, player, key))
-            {
-                if (*bufc != bb_p)
-                {
+        DOLIST(thing, Exits(parent)) {
+            if (Exit_Visible(thing, player, key)) {
+                if (*bufc != bb_p) {
                     print_sep(&osep, buff, bufc);
                 }
                 safe_dbref(buff, bufc, thing);
@@ -755,33 +661,24 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     int find_ex, find_th, find_pl, find_rm;
 
     VaChk_Range(0, 4);
-    if (nfargs >= 3)
-    {
+    if (nfargs >= 3) {
         low_bound = (int)strtol(fargs[2] + (fargs[2][0] == NUMBER_TOKEN), (char **)NULL, 10);
         if (!Good_dbref(low_bound))
             low_bound = 0;
-    }
-    else
-    {
+    } else {
         low_bound = 0;
     }
-    if (nfargs == 4)
-    {
+    if (nfargs == 4) {
         high_bound = (int)strtol(fargs[3] + (fargs[3][0] == NUMBER_TOKEN), (char **)NULL, 10);
         if (!Good_dbref(high_bound))
             high_bound = mudstate.db_top - 1;
-    }
-    else
-    {
+    } else {
         high_bound = mudstate.db_top - 1;
     }
     find_ex = find_th = find_pl = find_rm = 0;
-    if (nfargs >= 2)
-    {
-        for (bb_p = fargs[1]; *bb_p; ++bb_p)
-        {
-            switch (*bb_p)
-            {
+    if (nfargs >= 2) {
+        for (bb_p = fargs[1]; *bb_p; ++bb_p) {
+            switch (*bb_p) {
             case 'a':
             case 'A':
                 find_ex = find_th = find_pl = find_rm = 1;
@@ -808,35 +705,28 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             }
         }
     }
-    if (!find_ex && !find_th && !find_pl && !find_rm)
-    {
+    if (!find_ex && !find_th && !find_pl && !find_rm) {
         find_ex = find_th = find_pl = find_rm = 1;
     }
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         if (Has_location(player))
             thing = Location(player);
         else
             thing = player;
-        if (!Good_obj(thing))
-        {
+        if (!Good_obj(thing)) {
             safe_nothing(buff, bufc);
             return;
         }
-    }
-    else
-    {
+    } else {
         init_match(player, fargs[0], NOTYPE);
         match_everything(MAT_EXIT_PARENTS);
         thing = noisy_match_result();
-        if (!Good_obj(thing))
-        {
+        if (!Good_obj(thing)) {
             safe_nothing(buff, bufc);
             return;
         }
     }
-    if (!payfor(player, mudconf.searchcost))
-    {
+    if (!payfor(player, mudconf.searchcost)) {
         notify(player, tprintf("You don't have enough %s.",
                                mudconf.many_coins));
         safe_nothing(buff, bufc);
@@ -844,15 +734,12 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
     control_thing = Examinable(player, thing);
     bb_p = *bufc;
-    for (i = low_bound; i <= high_bound; i++)
-    {
-        if (control_thing || Examinable(player, i))
-        {
+    for (i = low_bound; i <= high_bound; i++) {
+        if (control_thing || Examinable(player, i)) {
             if ((find_ex && isExit(i) && (Location(i) == thing)) ||
                     (find_rm && isRoom(i) && (Dropto(i) == thing)) ||
                     (find_th && isThing(i) && (Home(i) == thing)) ||
-                    (find_pl && isPlayer(i) && (Home(i) == thing)))
-            {
+                    (find_pl && isPlayer(i) && (Home(i) == thing))) {
                 if (*bufc != bb_p)
                     safe_chr(' ', buff, bufc);
                 safe_dbref(buff, bufc, i);
@@ -870,24 +757,15 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it) || !Examinable(player, it))
-    {
+    if (!Good_obj(it) || !Examinable(player, it)) {
         safe_nothing(buff, bufc);
-    }
-    else if (Has_home(it))
-    {
+    } else if (Has_home(it)) {
         safe_dbref(buff, bufc, Home(it));
-    }
-    else if (Has_dropto(it))
-    {
+    } else if (Has_dropto(it)) {
         safe_dbref(buff, bufc, Dropto(it));
-    }
-    else if (isExit(it))
-    {
+    } else if (isExit(it)) {
         safe_dbref(buff, bufc, where_is(it));
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
     return;
@@ -944,15 +822,12 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     ATTR *ap;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_chr('0', buff, bufc);
         return;
     }
-    if (parse_attrib(player, fargs[1], &thing, &atr, 1))
-    {
-        if (atr == NOTHING)
-        {
+    if (parse_attrib(player, fargs[1], &thing, &atr, 1)) {
+        if (atr == NOTHING) {
             safe_bool(buff, bufc, Examinable(it, thing));
             return;
         }
@@ -963,8 +838,7 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         return;
     }
     thing = match_thing(player, fargs[1]);
-    if (!Good_obj(thing))
-    {
+    if (!Good_obj(thing)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -986,8 +860,7 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     char *s;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -1002,13 +875,11 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * continue.
      */
 
-    if (retval == 0)
-    {
+    if (retval == 0) {
         safe_chr('0', buff, bufc);
         return;
     }
-    if ((retval == 1) && (atr != NOTHING))
-    {
+    if ((retval == 1) && (atr != NOTHING)) {
         ap = atr_num(atr);
         atr_pget_info(thing, atr, &aowner, &aflags);
         safe_bool(buff, bufc, Set_attr(it, thing, ap, aflags));
@@ -1018,19 +889,16 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Non-existent attribute. Go see if it's settable.
      */
 
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         safe_chr('0', buff, bufc);
         return;
     }
-    if (((s = strchr(fargs[1], '/')) == NULL) || !*s++)
-    {
+    if (((s = strchr(fargs[1], '/')) == NULL) || !*s++) {
         safe_chr('0', buff, bufc);
         return;
     }
     atr = mkattr(s);
-    if ((atr <= 0) || ((ap = atr_num(atr)) == NULL))
-    {
+    if ((atr <= 0) || ((ap = atr_num(atr)) == NULL)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -1051,31 +919,23 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     char *buff2, xbuf[16], *xbufp;
 
-    if (parse_attrib(player, fargs[0], &it, &atr, 1))
-    {
-        if (atr == NOTHING)
-        {
+    if (parse_attrib(player, fargs[0], &it, &atr, 1)) {
+        if (atr == NOTHING) {
             safe_nothing(buff, bufc);
-        }
-        else
-        {
+        } else {
             atr_pget_info(it, atr, &aowner, &aflags);
             Print_Attr_Flags(aflags, xbuf, xbufp);
             safe_str(xbuf, buff, bufc);
         }
-    }
-    else
-    {
+    } else {
         it = match_thing(player, fargs[0]);
         if (Good_obj(it) &&
                 (mudconf.pub_flags || Examinable(player, it) ||
-                 (it == cause)))
-        {
+                 (it == cause))) {
             buff2 = unparse_flags(player, it);
             safe_str(buff2, buff, bufc);
             free_sbuf(buff2);
-        }
-        else
+        } else
             safe_nothing(buff, bufc);
     }
 }
@@ -1103,39 +963,32 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
     negate = temp = 0;
 
     if (!Good_obj(it) ||
-            (!(mudconf.pub_flags || Examinable(player, it) || (it == cause))))
-    {
+            (!(mudconf.pub_flags || Examinable(player, it) || (it == cause)))) {
         safe_chr('0', buff, bufc);
         return;
     }
-    for (s = fargs[1]; *s; s++)
-    {
+    for (s = fargs[1]; *s; s++) {
 
         /*
          * Check for a negation sign. If we find it, we note it and
          * increment the pointer to the next character.
          */
 
-        if (*s == '!')
-        {
+        if (*s == '!') {
             negate = 1;
             s++;
-        }
-        else
-        {
+        } else {
             negate = 0;
         }
 
-        if (!*s)
-        {
+        if (!*s) {
             safe_chr('0', buff, bufc);
             return;
         }
         flagletter[0] = *s;
         flagletter[1] = '\0';
 
-        if (!convert_flags(player, flagletter, &fset, &p_type))
-        {
+        if (!convert_flags(player, flagletter, &fset, &p_type)) {
 
             /*
              * Either we got a '!' that wasn't followed by a
@@ -1144,17 +997,13 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
              * Otherwise we just go on.
              */
 
-            if (!type)
-            {
+            if (!type) {
                 safe_chr('0', buff, bufc);
                 return;
-            }
-            else
+            } else
                 continue;
 
-        }
-        else
-        {
+        } else {
 
             /*
              * does the object have this flag?
@@ -1163,8 +1012,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
             if ((Flags(it) & fset.word1) ||
                     (Flags2(it) & fset.word2) ||
                     (Flags3(it) & fset.word3) ||
-                    (Typeof(it) == p_type))
-            {
+                    (Typeof(it) == p_type)) {
                 if ((p_type == TYPE_PLAYER) &&
                         (fset.word2 == CONNECTED) &&
                         Can_Hide(it) && Hidden(it) &&
@@ -1172,14 +1020,11 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
                     temp = 0;
                 else
                     temp = 1;
-            }
-            else
-            {
+            } else {
                 temp = 0;
             }
 
-            if (!(type ^ negate ^ temp))
-            {
+            if (!(type ^ negate ^ temp)) {
 
                 /*
                  * Four ways to satisfy that test: AND, don't
@@ -1203,8 +1048,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
  * fun_hasflag:  plus auxiliary function atr_has_flag.
  */
 
-static int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname)
-{
+static int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname) {
     int flagval;
 
     if (!See_attr(player, thing, attr, aowner, aflags))
@@ -1226,36 +1070,26 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     ATTR *ap;
 
-    if (parse_attrib(player, fargs[0], &it, &atr, 1))
-    {
-        if (atr == NOTHING)
-        {
+    if (parse_attrib(player, fargs[0], &it, &atr, 1)) {
+        if (atr == NOTHING) {
             safe_str("#-1 NOT FOUND", buff, bufc);
-        }
-        else
-        {
+        } else {
             ap = atr_num(atr);
             atr_pget_info(it, atr, &aowner, &aflags);
             safe_bool(buff, bufc,
                       atr_has_flag(player, it, ap, aowner, aflags,
                                    fargs[1]));
         }
-    }
-    else
-    {
+    } else {
         it = match_thing(player, fargs[0]);
-        if (!Good_obj(it))
-        {
+        if (!Good_obj(it)) {
             safe_nomatch(buff, bufc);
             return;
         }
         if (mudconf.pub_flags || Examinable(player, it)
-                || (it == cause))
-        {
+                || (it == cause)) {
             safe_bool(buff, bufc, has_flag(player, it, fargs[1]));
-        }
-        else
-        {
+        } else {
             safe_noperm(buff, bufc);
         }
     }
@@ -1265,17 +1099,13 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
     }
-    if (mudconf.pub_flags || Examinable(player, it) || (it == cause))
-    {
+    if (mudconf.pub_flags || Examinable(player, it) || (it == cause)) {
         safe_bool(buff, bufc, has_power(player, it, fargs[1]));
-    }
-    else
-    {
+    } else {
         safe_noperm(buff, bufc);
     }
 }
@@ -1292,16 +1122,14 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     int n_elems, i, j, result;
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         safe_tprintf_str(buff, bufc,
                          "#-1 FUNCTION (HASFLAGS) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d",
                          nfargs);
         return;
     }
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
     }
@@ -1314,15 +1142,12 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     result = 0;
 
-    for (i = 1; !result && (i < nfargs); i++)
-    {
+    for (i = 1; !result && (i < nfargs); i++) {
         n_elems =
             list2arr(&elems, LBUF_SIZE / 2, fargs[i], &SPACE_DELIM);
-        if (n_elems > 0)
-        {
+        if (n_elems > 0) {
             result = 1;
-            for (j = 0; result && (j < n_elems); j++)
-            {
+            for (j = 0; result && (j < n_elems); j++) {
                 if (*elems[j] == '!')
                     result =
                         (has_flag(player, it,
@@ -1346,12 +1171,9 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it = match_thing(player, fargs[0]);
 
-    if (!Good_obj(it) || !Examinable(player, it))
-    {
+    if (!Good_obj(it) || !Examinable(player, it)) {
         safe_known_str("-1", 2, buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_ltos(buff, bufc,
                   Is_Func(TIMESTAMP_MOD) ?
                   ModTime(it) :
@@ -1369,12 +1191,9 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (Good_obj(it) && (Examinable(player, it) || (it == cause)))
-    {
+    if (Good_obj(it) && (Examinable(player, it) || (it == cause))) {
         safe_dbref(buff, bufc, Parent(it));
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
     return;
@@ -1390,13 +1209,10 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     VaChk_Only_Out(2);
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
-    }
-    else if (!(Examinable(player, it)))
-    {
+    } else if (!(Examinable(player, it))) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -1405,8 +1221,7 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     i = 1;
     while (Good_obj(par) && Examinable(player, it) &&
-            (i < mudconf.parent_nest_lim))
-    {
+            (i < mudconf.parent_nest_lim)) {
         print_sep(&osep, buff, bufc);
         safe_dbref(buff, bufc, par);
         it = par;
@@ -1424,31 +1239,23 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     VaChk_Only_Out(2);
 
-    if (!strcmp(fargs[0], "#-1"))
-    {
+    if (!strcmp(fargs[0], "#-1")) {
         it = NOTHING;
-    }
-    else
-    {
+    } else {
         it = match_thing(player, fargs[0]);
-        if (!Good_obj(it))
-        {
+        if (!Good_obj(it)) {
             safe_nomatch(buff, bufc);
             return;
         }
     }
-    if (!Controls(player, it) && !See_All(player))
-    {
+    if (!Controls(player, it) && !See_All(player)) {
         safe_noperm(buff, bufc);
         return;
     }
     bb_p = *bufc;
-    DO_WHOLE_DB(i)
-    {
-        if (Parent(i) == it)
-        {
-            if (*bufc != bb_p)
-            {
+    DO_WHOLE_DB(i) {
+        if (Parent(i) == it) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_dbref(buff, bufc, i);
@@ -1464,14 +1271,12 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void fun_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
-    if (!mudconf.have_zones)
-    {
+    if (!mudconf.have_zones) {
         safe_str("#-1 ZONES DISABLED", buff, bufc);
         return;
     }
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it) || !Examinable(player, it))
-    {
+    if (!Good_obj(it) || !Examinable(player, it)) {
         safe_nothing(buff, bufc);
         return;
     }
@@ -1487,38 +1292,28 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     type = Func_Mask(TYPE_MASK);
 
-    if (!mudconf.have_zones)
-    {
+    if (!mudconf.have_zones) {
         safe_str("#-1 ZONES DISABLED", buff, bufc);
         return;
     }
-    if (!strcmp(fargs[0], "#-1"))
-    {
+    if (!strcmp(fargs[0], "#-1")) {
         it = NOTHING;
-    }
-    else
-    {
+    } else {
         it = match_thing(player, fargs[0]);
-        if (!Good_obj(it))
-        {
+        if (!Good_obj(it)) {
             safe_nomatch(buff, bufc);
             return;
         }
     }
-    if (!Controls(player, it) && !WizRoy(player))
-    {
+    if (!Controls(player, it) && !WizRoy(player)) {
         safe_noperm(buff, bufc);
         return;
     }
     bb_p = *bufc;
-    DO_WHOLE_DB(i)
-    {
-        if (Typeof(i) == type)
-        {
-            if (Zone(i) == it)
-            {
-                if (*bufc != bb_p)
-                {
+    DO_WHOLE_DB(i) {
+        if (Typeof(i) == type) {
+            if (Zone(i) == it) {
+                if (*bufc != bb_p) {
                     safe_chr(' ', buff, bufc);
                 }
                 safe_dbref(buff, bufc, i);
@@ -1538,13 +1333,11 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     dbref zone = Zone(player);
 
-    if (!mudconf.have_zones)
-    {
+    if (!mudconf.have_zones) {
         safe_str("#-1 ZONES DISABLED", buff, bufc);
         return;
     }
-    if (zone == NOTHING)
-    {
+    if (zone == NOTHING) {
         safe_str("#-1 INVALID ZONE", buff, bufc);
         return;
     }
@@ -1555,14 +1348,12 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * find the user function attribute
      */
     ap = atr_str(upcasestr(fargs[0]));
-    if (!ap)
-    {
+    if (!ap) {
         safe_str("#-1 NO SUCH USER FUNCTION", buff, bufc);
         return;
     }
     tbuf1 = atr_pget(zone, ap->number, &aowner, &aflags, &alen);
-    if (!See_attr(player, zone, ap, aowner, aflags))
-    {
+    if (!See_attr(player, zone, ap, aowner, aflags)) {
         safe_str("#-1 NO PERMISSION TO GET ATTRIBUTE", buff, bufc);
         free_lbuf(tbuf1);
         return;
@@ -1594,54 +1385,38 @@ void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     check_parents = Is_Func(CHECK_PARENTS);
 
     thing = match_thing(player, fargs[0]);
-    if (!Good_obj(thing))
-    {
+    if (!Good_obj(thing)) {
         safe_nomatch(buff, bufc);
         return;
-    }
-    else if (!Examinable(player, thing))
-    {
+    } else if (!Examinable(player, thing)) {
         safe_noperm(buff, bufc);
         return;
     }
     attr = atr_str(fargs[1]);
-    if (!attr)
-    {
+    if (!attr) {
         safe_chr('0', buff, bufc);
         return;
     }
-    if (check_parents)
-    {
+    if (check_parents) {
         atr_pget_info(thing, attr->number, &aowner, &aflags);
-    }
-    else
-    {
+    } else {
         atr_get_info(thing, attr->number, &aowner, &aflags);
     }
-    if (!See_attr(player, thing, attr, aowner, aflags))
-    {
+    if (!See_attr(player, thing, attr, aowner, aflags)) {
         safe_chr('0', buff, bufc);
-    }
-    else
-    {
-        if (check_parents)
-        {
+    } else {
+        if (check_parents) {
             tbuf =
                 atr_pget(thing, attr->number, &aowner, &aflags,
                          &alen);
-        }
-        else
-        {
+        } else {
             tbuf =
                 atr_get(thing, attr->number, &aowner, &aflags,
                         &alen);
         }
-        if (*tbuf)
-        {
+        if (*tbuf) {
             safe_chr('1', buff, bufc);
-        }
-        else
-        {
+        } else {
             safe_chr('0', buff, bufc);
         }
         free_lbuf(tbuf);
@@ -1663,8 +1438,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
     ATTR *ap;
 
     tbuf = fargs[0];
-    if (isalpha(tbuf[0]) && tbuf[1])
-    {
+    if (isalpha(tbuf[0]) && tbuf[1]) {
 
         /*
          * Fetch an attribute from me.  First see if it exists,
@@ -1672,8 +1446,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
          */
 
         ap = atr_str(fargs[0]);
-        if (!ap)
-        {
+        if (!ap) {
             return;
         }
         /*
@@ -1715,24 +1488,19 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     eval_it = Is_Func(GET_EVAL);
 
-    if (Is_Func(GET_XARGS))
-    {
+    if (Is_Func(GET_XARGS)) {
         if (!*fargs[0] || !*fargs[1])
             return;
         str = tprintf("%s/%s", fargs[0], fargs[1]);
-    }
-    else
-    {
+    } else {
         str = fargs[0];
     }
 
-    if (!parse_attrib(player, str, &thing, &attrib, 0))
-    {
+    if (!parse_attrib(player, str, &thing, &attrib, 0)) {
         safe_nomatch(buff, bufc);
         return;
     }
-    if (attrib == NOTHING)
-    {
+    if (attrib == NOTHING) {
         return;
     }
     /*
@@ -1740,14 +1508,11 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * parse_attrib can never return one of those. Use fun_lock instead.
      */
     atr_gotten = atr_pget(thing, attrib, &aowner, &aflags, &alen);
-    if (eval_it)
-    {
+    if (eval_it) {
         str = atr_gotten;
         exec(buff, bufc, thing, player, player,
              EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
-    }
-    else
-    {
+    } else {
         safe_known_str(atr_gotten, alen, buff, bufc);
     }
     free_lbuf(atr_gotten);
@@ -1758,14 +1523,13 @@ void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     VaChk_Range(1, 2);
 
-    if (nfargs == 1)
-    {
+    if (nfargs == 1) {
         str = fargs[0];
         exec(buff, bufc, player, caller, cause, EV_EVAL | EV_FCHECK,
              &str, (char **)NULL, 0);
         return;
     }
-    perform_get(FUNCTION_ARGLIST);
+    perform_get(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs);
 }
 
 /*
@@ -1791,8 +1555,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * We need at least one argument
      */
 
-    if (nfargs < 1)
-    {
+    if (nfargs < 1) {
         safe_known_str("#-1 TOO FEW ARGUMENTS", 21, buff, bufc);
         return;
     }
@@ -1808,12 +1571,9 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * we're evaluating privately, preserve and wipe out.
      */
 
-    if (is_local)
-    {
+    if (is_local) {
         preserve = save_global_regs("fun_ulocal.save");
-    }
-    else if (is_private)
-    {
+    } else if (is_private) {
         preserve = mudstate.rdata;
         mudstate.rdata = NULL;
     }
@@ -1821,13 +1581,10 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * If the trace flag is on this attr, set the object Trace
      */
 
-    if (!Trace(thing) && (aflags & AF_TRACE))
-    {
+    if (!Trace(thing) && (aflags & AF_TRACE)) {
         trace_flag = 1;
         s_Trace(thing);
-    }
-    else
-    {
+    } else {
         trace_flag = 0;
     }
 
@@ -1844,8 +1601,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * Reset the trace flag if we need to
      */
 
-    if (trace_flag)
-    {
+    if (trace_flag) {
         c_Trace(thing);
     }
     /*
@@ -1853,12 +1609,9 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * we're evaluating privately, free whatever data we had and restore.
      */
 
-    if (is_local)
-    {
+    if (is_local) {
         restore_global_regs("fun_ulocal.restore", preserve);
-    }
-    else if (is_private)
-    {
+    } else if (is_private) {
         Free_RegData(mudstate.rdata);
         mudstate.rdata = preserve;
     }
@@ -1880,8 +1633,7 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     char *atext, *str;
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         safe_known_str("#-1 TOO FEW ARGUMENTS", 21, buff, bufc);
         return;
     }
@@ -1982,18 +1734,14 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * so, we grab it and use it.
      */
 
-    if (objname != NULL)
-    {
+    if (objname != NULL) {
         if (parse_attrib(player, objname, &thing, &attrib, 0) &&
-                (attrib != NOTHING))
-        {
+                (attrib != NOTHING)) {
             attr = atr_num(attrib);
-            if (attr && !(attr->flags & AF_IS_LOCK))
-            {
+            if (attr && !(attr->flags & AF_IS_LOCK)) {
                 atr_gotten = atr_pget(thing, attrib,
                                       &aowner, &aflags, &alen);
-                if (*atr_gotten)
-                {
+                if (*atr_gotten) {
                     safe_known_str(atr_gotten, alen,
                                    buff, bufc);
                     free_lbuf(atr_gotten);
@@ -2034,18 +1782,14 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * so, we grab it and use it.
      */
 
-    if (objname != NULL)
-    {
+    if (objname != NULL) {
         if (parse_attrib(player, objname, &thing, &attrib, 0) &&
-                (attrib != NOTHING))
-        {
+                (attrib != NOTHING)) {
             attr = atr_num(attrib);
-            if (attr && !(attr->flags & AF_IS_LOCK))
-            {
+            if (attr && !(attr->flags & AF_IS_LOCK)) {
                 atr_gotten = atr_pget(thing, attrib,
                                       &aowner, &aflags, &alen);
-                if (*atr_gotten)
-                {
+                if (*atr_gotten) {
                     str = atr_gotten;
                     exec(buff, bufc, thing, player,
                          player, EV_FIGNORE | EV_EVAL,
@@ -2091,25 +1835,20 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * so, we grab it and use it.
      */
 
-    if (objname != NULL)
-    {
+    if (objname != NULL) {
         Parse_Uattr(player, objname, thing, anum, ap);
-        if (ap)
-        {
+        if (ap) {
             atext =
                 atr_pget(thing, ap->number, &aowner, &aflags,
                          &alen);
-            if (*atext)
-            {
+            if (*atext) {
                 /*
                  * Now we have a problem -- we've got to go
                  * eval all of those arguments to the
                  * function.
                  */
-                for (i = 2, j = 0; j < NUM_ENV_VARS; i++, j++)
-                {
-                    if ((i < nfargs) && fargs[i])
-                    {
+                for (i = 2, j = 0; j < NUM_ENV_VARS; i++, j++) {
+                    if ((i < nfargs) && fargs[i]) {
                         bp = xargs[j] =
                                  alloc_lbuf
                                  ("fun_udefault.args");
@@ -2119,9 +1858,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                              EV_STRIP | EV_FCHECK |
                              EV_EVAL, &str, cargs,
                              ncargs);
-                    }
-                    else
-                    {
+                    } else {
                         xargs[j] = NULL;
                     }
                 }
@@ -2132,13 +1869,10 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                  * there is one.
                  */
 
-                if (!Trace(thing) && (aflags & AF_TRACE))
-                {
+                if (!Trace(thing) && (aflags & AF_TRACE)) {
                     trace_flag = 1;
                     s_Trace(thing);
-                }
-                else
-                {
+                } else {
                     trace_flag = 0;
                 }
 
@@ -2147,8 +1881,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                      EV_FCHECK | EV_EVAL, &str, xargs,
                      nfargs - 2);
 
-                if (trace_flag)
-                {
+                if (trace_flag) {
                     c_Trace(thing);
                 }
                 /*
@@ -2187,8 +1920,7 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     char *name, *bp, *str;
 
-    if (!*fargs[0])
-    {
+    if (!*fargs[0]) {
         return;
     }
     name = bp = alloc_lbuf("fun_objeval");
@@ -2234,15 +1966,11 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * If we have a valid dbref, it's okay if it's a player.
      */
 
-    if ((*fargs[0] == NUMBER_TOKEN) && fargs[0][1])
-    {
+    if ((*fargs[0] == NUMBER_TOKEN) && fargs[0][1]) {
         thing = parse_dbref(fargs[0] + 1);
-        if (Good_obj(thing) && isPlayer(thing))
-        {
+        if (Good_obj(thing) && isPlayer(thing)) {
             safe_dbref(buff, bufc, thing);
-        }
-        else
-        {
+        } else {
             safe_nothing(buff, bufc);
         }
         return;
@@ -2252,13 +1980,10 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      */
 
     name = fargs[0];
-    if (*fargs[0] == LOOKUP_TOKEN)
-    {
-        do
-        {
+    if (*fargs[0] == LOOKUP_TOKEN) {
+        do {
             name++;
-        }
-        while (isspace(*name));
+        } while (isspace(*name));
     }
     /*
      * Look up the full name
@@ -2271,17 +1996,13 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     p_ptr = (int *)hashfind(temp, &mudstate.player_htab);
     free_lbuf(temp);
 
-    if (p_ptr)
-    {
+    if (p_ptr) {
         /*
          * We've got it. Check to make sure it's a good object.
          */
-        if (Good_obj(*p_ptr) && isPlayer(*p_ptr))
-        {
+        if (Good_obj(*p_ptr) && isPlayer(*p_ptr)) {
             safe_dbref(buff, bufc, (int)*p_ptr);
-        }
-        else
-        {
+        } else {
             safe_nothing(buff, bufc);
         }
         return;
@@ -2291,16 +2012,11 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      */
 
     thing = find_connected_ambiguous(player, name);
-    if (thing == AMBIGUOUS)
-    {
+    if (thing == AMBIGUOUS) {
         safe_known_str("#-2", 3, buff, bufc);
-    }
-    else if (Good_obj(thing) && isPlayer(thing))
-    {
+    } else if (Good_obj(thing) && isPlayer(thing)) {
         safe_dbref(buff, bufc, thing);
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
 }
@@ -2308,17 +2024,14 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 void fun_pfind(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
-    if (*fargs[0] == '#')
-    {
+    if (*fargs[0] == '#') {
         safe_dbref(buff, bufc, match_thing(player, fargs[0]));
         return;
     }
-    if (!((thing = lookup_player(player, fargs[0], 1)) == NOTHING))
-    {
+    if (!((thing = lookup_player(player, fargs[0], 1)) == NOTHING)) {
         safe_dbref(buff, bufc, thing);
         return;
-    }
-    else
+    } else
         safe_nomatch(buff, bufc);
 }
 
@@ -2345,8 +2058,7 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         thing = match_thing(player, fargs[0]);
     else
         thing = match_controlled(player, fargs[0]);
-    if (!Good_obj(thing))
-    {
+    if (!Good_obj(thing)) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -2354,10 +2066,8 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Get pre- and post-conditions and modifiers
      */
 
-    for (cp = fargs[2]; *cp; cp++)
-    {
-        switch (*cp)
-        {
+    for (cp = fargs[2]; *cp; cp++) {
+        switch (*cp) {
         case 'E':
             pref_type = TYPE_EXIT;
             break;
@@ -2395,10 +2105,8 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Search for each requested thing
      */
 
-    for (cp = fargs[2]; *cp; cp++)
-    {
-        switch (*cp)
-        {
+    for (cp = fargs[2]; *cp; cp++) {
+        switch (*cp) {
         case 'a':
             match_absolute();
             break;
@@ -2463,27 +2171,22 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     count_only = Is_Func(LATTR_COUNT);
 
-    if (!count_only)
-    {
+    if (!count_only) {
         /*
          * We have two possible syntaxes:
          * lattr(<whatever>[,<odelim>])
          * lattr(<whatever>,<start>,<count>[,<odelim>])
          */
-        if (nfargs > 2)
-        {
+        if (nfargs > 2) {
             VaChk_Only_Out(4);
             start = (int)strtol(fargs[1], (char **)NULL, 10);
             count = (int)strtol(fargs[2], (char **)NULL, 10);
-            if ((start < 1) || (count < 1))
-            {
+            if ((start < 1) || (count < 1)) {
                 safe_str("#-1 ARGUMENT OUT OF RANGE", buff,
                          bufc);
                 return;
             }
-        }
-        else
-        {
+        } else {
             VaChk_Only_Out(2);
             start = 1;
             count = 0;
@@ -2496,24 +2199,17 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      */
 
     olist_push();
-    if (parse_attrib_wild(player, fargs[0], &thing, 0, 0, 1, 1))
-    {
+    if (parse_attrib_wild(player, fargs[0], &thing, 0, 0, 1, 1)) {
         bb_p = *bufc;
         for (ca = olist_first(), i = 1, got = 0;
                 (ca != NOTHING) && (!count || (got < count));
-                ca = olist_next(), i++)
-        {
+                ca = olist_next(), i++) {
             attr = atr_num(ca);
-            if (attr)
-            {
-                if (count_only)
-                {
+            if (attr) {
+                if (count_only) {
                     total++;
-                }
-                else if (i >= start)
-                {
-                    if (*bufc != bb_p)
-                    {
+                } else if (i >= start) {
+                    if (*bufc != bb_p) {
                         print_sep(&osep, buff, bufc);
                     }
                     safe_str((char *)attr->name, buff,
@@ -2524,15 +2220,10 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
         if (count_only)
             safe_ltos(buff, bufc, total);
-    }
-    else
-    {
-        if (!mudconf.lattr_oldstyle)
-        {
+    } else {
+        if (!mudconf.lattr_oldstyle) {
             safe_nomatch(buff, bufc);
-        }
-        else if (count_only)
-        {
+        } else if (count_only) {
             safe_chr('0', buff, bufc);
         }
     }
@@ -2555,8 +2246,7 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Set up for the search.  If any errors, abort.
      */
 
-    if (!search_setup(player, fargs[0], &searchparm))
-    {
+    if (!search_setup(player, fargs[0], &searchparm)) {
         safe_str("#-1 ERROR DURING SEARCH", buff, bufc);
         return;
     }
@@ -2568,8 +2258,7 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     search_perform(player, cause, &searchparm);
     bp = *bufc;
     nbuf = alloc_sbuf("fun_search");
-    for (thing = olist_first(); thing != NOTHING; thing = olist_next())
-    {
+    for (thing = olist_first(); thing != NOTHING; thing = olist_next()) {
         if (bp == *bufc)
             sprintf(nbuf, "#%d", thing);
         else
@@ -2590,21 +2279,16 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     STATS statinfo;
 
-    if ((!fargs[0]) || !*fargs[0] || !string_compare(fargs[0], "all"))
-    {
+    if ((!fargs[0]) || !*fargs[0] || !string_compare(fargs[0], "all")) {
         who = NOTHING;
-    }
-    else
-    {
+    } else {
         who = lookup_player(player, fargs[0], 1);
-        if (who == NOTHING)
-        {
+        if (who == NOTHING) {
             safe_str("#-1 NOT FOUND", buff, bufc);
             return;
         }
     }
-    if (!get_stats(player, who, &statinfo))
-    {
+    if (!get_stats(player, who, &statinfo)) {
         safe_str("#-1 ERROR GETTING STATS", buff, bufc);
         return;
     }
@@ -2620,8 +2304,7 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * Memory usage.
  */
 
-static int mem_usage(dbref thing)
-{
+static int mem_usage(dbref thing) {
     int k;
 
     int ca;
@@ -2633,14 +2316,12 @@ static int mem_usage(dbref thing)
     k = sizeof(OBJ);
 
     k += strlen(Name(thing)) + 1;
-    for (ca = atr_head(thing, &as); ca; ca = atr_next(&as))
-    {
+    for (ca = atr_head(thing, &as); ca; ca = atr_next(&as)) {
         str = atr_get_raw(thing, ca);
         if (str && *str)
             k += strlen(str);
         attr = atr_num(ca);
-        if (attr)
-        {
+        if (attr) {
             str = (char *)attr->name;
             if (str && *str)
                 k += strlen(((ATTR *) atr_num(ca))->name);
@@ -2649,8 +2330,7 @@ static int mem_usage(dbref thing)
     return k;
 }
 
-static int mem_usage_attr(dbref player, char *str)
-{
+static int mem_usage_attr(dbref player, char *str) {
     dbref thing, aowner;
 
     int atr, aflags, alen;
@@ -2663,10 +2343,8 @@ static int mem_usage_attr(dbref player, char *str)
 
     abuf = alloc_lbuf("mem_usage_attr");
     olist_push();
-    if (parse_attrib_wild(player, str, &thing, 0, 0, 1, 1))
-    {
-        for (atr = olist_first(); atr != NOTHING; atr = olist_next())
-        {
+    if (parse_attrib_wild(player, str, &thing, 0, 0, 1, 1)) {
+        for (atr = olist_first(); atr != NOTHING; atr = olist_next()) {
             ap = atr_num(atr);
             if (!ap)
                 continue;
@@ -2690,14 +2368,12 @@ static int mem_usage_attr(dbref player, char *str)
 void fun_objmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref thing;
 
-    if (strchr(fargs[0], '/'))
-    {
+    if (strchr(fargs[0], '/')) {
         safe_ltos(buff, bufc, mem_usage_attr(player, fargs[0]));
         return;
     }
     thing = match_thing(player, fargs[0]);
-    if (!Good_obj(thing) || !Examinable(player, thing))
-    {
+    if (!Good_obj(thing) || !Examinable(player, thing)) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -2712,8 +2388,7 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     dbref j;
 
     thing = match_thing(player, fargs[0]);
-    if (!Good_obj(thing) || !Examinable(player, thing))
-    {
+    if (!Good_obj(thing) || !Examinable(player, thing)) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -2732,13 +2407,11 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     dbref it;
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
     }
-    switch (Typeof(it))
-    {
+    switch (Typeof(it)) {
     case TYPE_ROOM:
         safe_known_str("ROOM", 4, buff, bufc);
         break;
@@ -2760,18 +2433,15 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_hastype(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it = match_thing(player, fargs[0]);
 
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
     }
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         safe_str("#-1 NO SUCH TYPE", buff, bufc);
         return;
     }
-    switch (*fargs[1])
-    {
+    switch (*fargs[1]) {
     case 'r':
     case 'R':
         safe_bool(buff, bufc, isRoom(it));
@@ -2806,13 +2476,11 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     dbref obj = match_thing(player, fargs[0]);
 
-    if (!controls(player, obj))  	/* Automatically checks for GoodObj */
-    {
+    if (!controls(player, obj)) {	/* Automatically checks for GoodObj */
         safe_nothing(buff, bufc);
         return;
     }
-    switch (*fargs[1])
-    {
+    switch (*fargs[1]) {
     case 'R':
     case 'r':
         obj_type = 0;
@@ -2836,15 +2504,13 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref c
     }
 
     obj_str = atr_get(obj, A_NEWOBJS, &aowner, &aflags, &alen);
-    if (!*obj_str)
-    {
+    if (!*obj_str) {
         free_lbuf(obj_str);
         safe_nothing(buff, bufc);
         return;
     }
     for (p = strtok_r(obj_str, " ", &tokst), i = 0;
-            p && (i < 4); p = strtok_r(NULL, " ", &tokst), i++)
-    {
+            p && (i < 4); p = strtok_r(NULL, " ", &tokst), i++) {
         obj_list[i] = (int)strtol(p, (char **)NULL, 10);
     }
     free_lbuf(obj_str);
@@ -2897,12 +2563,9 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
      */
 
     sp = str;
-    if (key == SAY_SAY)
-    {
+    if (key == SAY_SAY) {
         spos = 0;
-    }
-    else
-    {
+    } else {
         save = split_token(&sp, open_sep);
         safe_str(save, buff, bufc);
         if (!sp)
@@ -2913,21 +2576,17 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
     tstack[1] = alloc_sbuf("transform_say.dbref1");
     tstack[2] = alloc_sbuf("transform_say.pos1");
 
-    if (empty_str && *empty_str)
-    {
+    if (empty_str && *empty_str) {
         empty_len = strlen(empty_str);
         estack[0] = alloc_sbuf("transform_say.dbref2");
         estack[1] = alloc_sbuf("transform_say.pos2");
-    }
-    else
-    {
+    } else {
         empty_len = 0;
     }
 
     result = alloc_lbuf("transform_say.out");
 
-    while (!done)
-    {
+    while (!done) {
 
         /*
          * Find the end of the speech string.
@@ -2949,20 +2608,14 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
         bp = result;
         exec(result, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &tp, tstack, 3);
-        if (result && *result)
-        {
-            if ((key == SAY_SAY) && (spos == 0))
-            {
+        if (result && *result) {
+            if ((key == SAY_SAY) && (spos == 0)) {
                 safe_tprintf_str(buff, bufc, "%s %s %s",
                                  sname, say_str, result);
-            }
-            else
-            {
+            } else {
                 safe_str(result, buff, bufc);
             }
-        }
-        else if (empty_len > 0)
-        {
+        } else if (empty_len > 0) {
             sprintf(estack[0], "#%d", speaker);
             sprintf(estack[1], "%d", spos);
             StrCopyKnown(tbuf, empty_str, empty_len);
@@ -2970,8 +2623,7 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
             bp = result;
             exec(result, &bp, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &tp, estack, 2);
-            if (result && *result)
-            {
+            if (result && *result) {
                 safe_str(result, buff, bufc);
             }
         }
@@ -2980,16 +2632,13 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
          * beginning of the next speech string.
          */
 
-        if (ep && *ep)
-        {
+        if (ep && *ep) {
             sp = ep;
             save = split_token(&sp, open_sep);
             safe_str(save, buff, bufc);
             if (!sp)
                 done = 1;
-        }
-        else
-        {
+        } else {
             done = 1;
         }
 
@@ -2999,8 +2648,7 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
     free_lbuf(result);
     free_sbuf(tstack[1]);
     free_sbuf(tstack[2]);
-    if (empty_len > 0)
-    {
+    if (empty_len > 0) {
         free_sbuf(estack[0]);
         free_sbuf(estack[1]);
     }
@@ -3033,15 +2681,12 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     VaChk_Range(2, 7);
     VaChk_InSep(6, 0);
-    if ((isep.len == 1) && (isep.str[0] == ' '))
-    {
-        if ((nfargs < 6) || !fargs[5] || !*fargs[5])
-        {
+    if ((isep.len == 1) && (isep.str[0] == ' ')) {
+        if ((nfargs < 6) || !fargs[5] || !*fargs[5]) {
             isep.str[0] = '"';
         }
     }
-    VaChk_DefaultOut(7)
-    {
+    VaChk_DefaultOut(7) {
         VaChk_OutSep(7, 0);
     }
 
@@ -3051,37 +2696,30 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * (name string defaults to name of thing)
      */
 
-    if (*fargs[0] == '&')
-    {
+    if (*fargs[0] == '&') {
         /*
          * name only
          */
         thing = player;
         tname = fargs[0];
         tname++;
-    }
-    else if (((s = strchr(fargs[0], '&')) == NULL) || !*s++)
-    {
+    } else if (((s = strchr(fargs[0], '&')) == NULL) || !*s++) {
         /*
          * thing only
          */
         thing = match_thing(player, fargs[0]);
-        if (!Good_obj(thing))
-        {
+        if (!Good_obj(thing)) {
             safe_nomatch(buff, bufc);
             return;
         }
         tname = Name(thing);
-    }
-    else
-    {
+    } else {
         /*
          * thing and name
          */
         *(s - 1) = '\0';
         thing = match_thing(player, fargs[0]);
-        if (!Good_obj(thing))
-        {
+        if (!Good_obj(thing)) {
             safe_nomatch(buff, bufc);
             return;
         }
@@ -3112,26 +2750,19 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     atext1 = atext2 = NULL;
     is_transform = 0;
 
-    if (nfargs >= 4)
-    {
+    if (nfargs >= 4) {
         Parse_Uattr(player, fargs[3], obj1, anum1, ap1);
-        if (ap1)
-        {
+        if (ap1) {
             atext1 = atr_pget(obj1, ap1->number,
                               &aowner1, &aflags1, &alen1);
             if (!*atext1 || !(See_attr(player, obj1,
-                                       ap1, aowner1, aflags1)))
-            {
+                                       ap1, aowner1, aflags1))) {
                 free_lbuf(atext1);
                 atext1 = NULL;
-            }
-            else
-            {
+            } else {
                 is_transform = 1;
             }
-        }
-        else
-        {
+        } else {
             atext1 = NULL;
         }
     }
@@ -3139,22 +2770,17 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Do some up-front work on the empty-case u-function, too.
      */
 
-    if (nfargs >= 5)
-    {
+    if (nfargs >= 5) {
         Parse_Uattr(player, fargs[4], obj2, anum2, ap2);
-        if (ap2)
-        {
+        if (ap2) {
             atext2 = atr_pget(obj2, ap2->number,
                               &aowner2, &aflags2, &alen2);
             if (!*atext2 || !(See_attr(player, obj2,
-                                       ap2, aowner2, aflags2)))
-            {
+                                       ap2, aowner2, aflags2))) {
                 free_lbuf(atext2);
                 atext2 = NULL;
             }
-        }
-        else
-        {
+        } else {
             atext2 = NULL;
         }
     }
@@ -3162,18 +2788,13 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Take care of the easy case, no u-function.
      */
 
-    if (!is_transform)
-    {
-        switch (*fargs[1])
-        {
+    if (!is_transform) {
+        switch (*fargs[1]) {
         case ':':
-            if (*(fargs[1] + 1) == ' ')
-            {
+            if (*(fargs[1] + 1) == ' ') {
                 safe_tprintf_str(buff, bufc, "%s%s", tname,
                                  fargs[1] + 2);
-            }
-            else
-            {
+            } else {
                 safe_tprintf_str(buff, bufc, "%s %s", tname,
                                  fargs[1] + 1);
             }
@@ -3200,18 +2821,14 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Now for the nasty stuff.
      */
 
-    switch (*fargs[1])
-    {
+    switch (*fargs[1]) {
     case ':':
         safe_str(tname, buff, bufc);
-        if (*(fargs[1] + 1) != ' ')
-        {
+        if (*(fargs[1] + 1) != ' ') {
             safe_chr(' ', buff, bufc);
             str = fargs[1] + 1;
             key = SAY_POSE;
-        }
-        else
-        {
+        } else {
             str = fargs[1] + 2;
             key = SAY_POSE_NOSPC;
         }

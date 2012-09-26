@@ -1,7 +1,8 @@
-/* db_sqlite3.c - Implements accessing a SQLite3 database. */
-/* $Id: db_sqlite3.c,v 1.2 2010/06/02 16:04:09 lwl Exp $ */
-
 #include "../../copyright.h"
+#include "../../config.h"
+#include "../../system.h"
+
+#include "../../api.h"
 #include "db_sql.h"		/* required by code */
 
 void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {

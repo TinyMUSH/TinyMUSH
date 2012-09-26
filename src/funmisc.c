@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -48,8 +49,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If we don't have at least 2 args, return nothing
      */
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         return;
     }
     /*
@@ -69,14 +69,12 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     save_token = mudstate.switch_token;
 
     got_one = 0;
-    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-    {
+    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2) {
         tbuff = bp = alloc_lbuf("fun_switchall.2");
         str = fargs[i];
         exec(tbuff, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-        if (quick_wild(tbuff, mbuff))
-        {
+        if (quick_wild(tbuff, mbuff)) {
             got_one = 1;
             free_lbuf(tbuff);
             mudstate.switch_token = mbuff;
@@ -84,9 +82,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             exec(buff, bufc, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
                  ncargs);
-        }
-        else
-        {
+        } else {
             free_lbuf(tbuff);
         }
     }
@@ -95,8 +91,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If we didn't match, return the default if there is one
      */
 
-    if (!got_one && (i < nfargs) && fargs[i])
-    {
+    if (!got_one && (i < nfargs) && fargs[i]) {
         mudstate.switch_token = mbuff;
         str = fargs[i];
         exec(buff, bufc, player, caller, cause,
@@ -116,8 +111,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * If we don't have at least 2 args, return nothing
      */
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         return;
     }
     /*
@@ -136,14 +130,12 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     mudstate.in_switch++;
     save_token = mudstate.switch_token;
 
-    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-    {
+    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2) {
         tbuff = bp = alloc_lbuf("fun_switch.2");
         str = fargs[i];
         exec(tbuff, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-        if (quick_wild(tbuff, mbuff))
-        {
+        if (quick_wild(tbuff, mbuff)) {
             free_lbuf(tbuff);
             mudstate.switch_token = mbuff;
             str = fargs[i + 1];
@@ -162,8 +154,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Nope, return the default if there is one
      */
 
-    if ((i < nfargs) && fargs[i])
-    {
+    if ((i < nfargs) && fargs[i]) {
         mudstate.switch_token = mbuff;
         str = fargs[i];
         exec(buff, bufc, player, caller, cause,
@@ -183,8 +174,7 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * If we don't have at least 2 args, return nothing
      */
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         return;
     }
     /*
@@ -200,14 +190,12 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Loop through the patterns looking for an exact match
      */
 
-    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-    {
+    for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2) {
         tbuff = bp = alloc_lbuf("fun_case.2");
         str = fargs[i];
         exec(tbuff, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-        if (!strcmp(tbuff, mbuff))
-        {
+        if (!strcmp(tbuff, mbuff)) {
             free_lbuf(tbuff);
             str = fargs[i + 1];
             exec(buff, bufc, player, caller, cause,
@@ -224,8 +212,7 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Nope, return the default if there is one
      */
 
-    if ((i < nfargs) && fargs[i])
-    {
+    if ((i < nfargs) && fargs[i]) {
         str = fargs[i];
         exec(buff, bufc, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
@@ -247,12 +234,9 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     flag = Func_Flags(fargs);
 
-    if (flag & IFELSE_DEFAULT)
-    {
+    if (flag & IFELSE_DEFAULT) {
         VaChk_Range(1, 2);
-    }
-    else
-    {
+    } else {
         VaChk_Range(2, 3);
     }
 
@@ -266,38 +250,29 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * nonzero -- it's true if it's not empty or zero.
      */
 
-    if (!mbuff || !*mbuff)
-    {
+    if (!mbuff || !*mbuff) {
         n = 0;
-    }
-    else if (flag & IFELSE_BOOL)
-    {
+    } else if (flag & IFELSE_BOOL) {
         /*
          * xlate() destructively modifies the string
          */
         tbuf = XSTRDUP(mbuff, "handle_ifelse.tbuf");
         n = xlate(tbuf);
         XFREE(tbuf, "handle_ifelse.tbuf");
-    }
-    else
-    {
+    } else {
         n = !(((int)strtol(mbuff, (char **)NULL, 10) == 0) && is_number(mbuff));
     }
     if (flag & IFELSE_FALSE)
         n = !n;
 
-    if (flag & IFELSE_DEFAULT)
-    {
+    if (flag & IFELSE_DEFAULT) {
         /*
          * If we got our condition, return the string, otherwise
          * return our 'else' default clause.
          */
-        if (n)
-        {
+        if (n) {
             safe_str(mbuff, buff, bufc);
-        }
-        else
-        {
+        } else {
             str = fargs[1];
             exec(buff, bufc, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
@@ -310,10 +285,8 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Not default mode: Use our condition to execute result clause
      */
 
-    if (!n)
-    {
-        if (nfargs != 3)
-        {
+    if (!n) {
+        if (nfargs != 3) {
             free_lbuf(mbuff);
             return;
         }
@@ -321,17 +294,14 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
          * Do 'false' clause
          */
         str = fargs[2];
-    }
-    else
-    {
+    } else {
         /*
          * Do 'true' clause
          */
         str = fargs[1];
     }
 
-    if (flag & IFELSE_TOKEN)
-    {
+    if (flag & IFELSE_TOKEN) {
         mudstate.in_switch++;
         save_token = mudstate.switch_token;
         mudstate.switch_token = mbuff;
@@ -340,8 +310,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
          EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
     free_lbuf(mbuff);
 
-    if (flag & IFELSE_TOKEN)
-    {
+    if (flag & IFELSE_TOKEN) {
         mudstate.in_switch--;
         mudstate.switch_token = save_token;
     }
@@ -356,12 +325,9 @@ void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int num;
 
     num = (int)strtol(fargs[0], (char **)NULL, 10);
-    if (num < 1)
-    {
+    if (num < 1) {
         safe_chr('0', buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_tprintf_str(buff, bufc, "%ld", Randomize(num));
     }
 }
@@ -377,21 +343,18 @@ void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     int total = 0;
 
-    if (!fargs[0] || !fargs[1])
-    {
+    if (!fargs[0] || !fargs[1]) {
         safe_chr('0', buff, bufc);
         return;
     }
     n = (int)strtol(fargs[0], (char **)NULL, 10);
     die = (int)strtol(fargs[1], (char **)NULL, 10);
 
-    if ((n == 0) || (die <= 0))
-    {
+    if ((n == 0) || (die <= 0)) {
         safe_chr('0', buff, bufc);
         return;
     }
-    if ((n < 1) || (n > 100))
-    {
+    if ((n < 1) || (n > 100)) {
         safe_str("#-1 NUMBER OUT OF RANGE", buff, bufc);
         return;
     }
@@ -425,19 +388,16 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
 
     n_times = (int)strtol(fargs[2], (char **)NULL, 10);
-    if (n_times < 1)
-    {
+    if (n_times < 1) {
         return;
     }
-    if (n_times > LBUF_SIZE)
-    {
+    if (n_times > LBUF_SIZE) {
         n_times = LBUF_SIZE;
     }
     r_bot = (int)strtol(fargs[0], (char **)NULL, 10);
     r_top = (int)strtol(fargs[1], (char **)NULL, 10);
 
-    if (r_top < r_bot)
-    {
+    if (r_top < r_bot) {
 
         /*
          * This is an error condition. Just return an empty list. We
@@ -447,19 +407,15 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         return;
 
-    }
-    else if (r_bot == r_top)
-    {
+    } else if (r_bot == r_top) {
 
         /*
          * Just generate a list of n repetitions.
          */
 
         bb_p = *bufc;
-        for (i = 0; i < n_times; i++)
-        {
-            if (*bufc != bb_p)
-            {
+        for (i = 0; i < n_times; i++) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_ltos(buff, bufc, r_bot);
@@ -472,10 +428,8 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     n_range = (double)r_top - r_bot + 1;
     bb_p = *bufc;
-    for (i = 0; i < n_times; i++)
-    {
-        if (*bufc != bb_p)
-        {
+    for (i = 0; i < n_times; i++) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         tmp = (unsigned int)Randomize(n_range);
@@ -503,8 +457,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     static char lnum_buff[290];
 
-    if (nfargs == 0)
-    {
+    if (nfargs == 0) {
         return;
     }
     /*
@@ -513,13 +466,10 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
     VaChk_Out(1, 3);
 
-    if (nfargs >= 2)
-    {
+    if (nfargs >= 2) {
         bot = (int)strtol(fargs[0], (char **)NULL, 10);
         top = (int)strtol(fargs[1], (char **)NULL, 10);
-    }
-    else
-    {
+    } else {
         bot = 0;
         top = (int)strtol(fargs[0], (char **)NULL, 10);
         if (top-- < 1)	/* still want to generate if arg is 1 */
@@ -530,8 +480,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * We keep 0-100 pre-generated so we can do quick copies.
      */
 
-    if (!lnum_init)
-    {
+    if (!lnum_init) {
         strcpy(lnum_buff,
                (char *)
                "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99");
@@ -544,12 +493,9 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     bb_p = *bufc;
     over = 0;
-    if ((bot < 0) && (top >= 0) && (osep.len == 1) && (osep.str[0] == ' '))
-    {
-        while ((bot < 0) && !over)
-        {
-            if (*bufc != bb_p)
-            {
+    if ((bot < 0) && (top >= 0) && (osep.len == 1) && (osep.str[0] == ' ')) {
+        while ((bot < 0) && !over) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             ltos(tbuf, bot);
@@ -564,19 +510,14 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
 
     if ((bot >= 0) && (bot < 100) && (top > bot) &&
-            (osep.len == 1) && (osep.str[0] == ' '))
-    {
-        if (*bufc != bb_p)
-        {
+            (osep.len == 1) && (osep.str[0] == ' ')) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         startp = lnum_buff + Lnum_Place(bot);
-        if (top >= 99)
-        {
+        if (top >= 99) {
             safe_str(startp, buff, bufc);
-        }
-        else
-        {
+        } else {
             endp = lnum_buff + Lnum_Place(top + 1) - 1;
             *endp = '\0';
             safe_str(startp, buff, bufc);
@@ -591,33 +532,23 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Print a new list.
      */
 
-    if (top == bot)
-    {
-        if (*bufc != bb_p)
-        {
+    if (top == bot) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         safe_ltos(buff, bufc, bot);
         return;
-    }
-    else if (top > bot)
-    {
-        for (i = bot; (i <= top) && !over; i++)
-        {
-            if (*bufc != bb_p)
-            {
+    } else if (top > bot) {
+        for (i = bot; (i <= top) && !over; i++) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             ltos(tbuf, i);
             over = safe_str_fn(tbuf, buff, bufc);
         }
-    }
-    else
-    {
-        for (i = bot; (i >= top) && !over; i--)
-        {
-            if (*bufc != bb_p)
-            {
+    } else {
+        for (i = bot; (i >= top) && !over; i--) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             ltos(tbuf, i);
@@ -671,14 +602,12 @@ void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * no ANSI standard function are available to do this.
  */
 
-static const char *monthtab[] =
-{
+static const char *monthtab[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static const char daystab[] =
-{
+static const char daystab[] = {
     31, 29, 31, 30, 31, 30,
     31, 31, 30, 31, 30, 31
 };
@@ -697,8 +626,7 @@ static const char daystab[] =
 	} \
 }
 
-int do_convtime(char *str, struct tm *ttm)
-{
+int do_convtime(char *str, struct tm *ttm) {
     char *buf, *p, *q;
 
     int i;
@@ -712,23 +640,19 @@ int do_convtime(char *str, struct tm *ttm)
     *p = '\0';
 
     get_substr(buf, p);	/* day-of-week or month */
-    if (!p || strlen(buf) != 3)
-    {
+    if (!p || strlen(buf) != 3) {
         free_sbuf(buf);
         return 0;
     }
     for (i = 0; (i < 12) && string_compare(monthtab[i], p); i++);
-    if (i == 12)
-    {
+    if (i == 12) {
         get_substr(p, q);	/* month */
-        if (!q || strlen(p) != 3)
-        {
+        if (!q || strlen(p) != 3) {
             free_sbuf(buf);
             return 0;
         }
         for (i = 0; (i < 12) && string_compare(monthtab[i], p); i++);
-        if (i == 12)
-        {
+        if (i == 12) {
             free_sbuf(buf);
             return 0;
         }
@@ -737,78 +661,64 @@ int do_convtime(char *str, struct tm *ttm)
     ttm->tm_mon = i;
 
     get_substr(p, q);	/* day of month */
-    if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > daystab[i])
-    {
+    if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > daystab[i]) {
         free_sbuf(buf);
         return 0;
     }
     p = strchr(q, ':');	/* hours */
-    if (!p)
-    {
+    if (!p) {
         free_sbuf(buf);
         return 0;
     }
     *p++ = '\0';
-    if ((ttm->tm_hour = (int)strtol(q, (char **)NULL, 10)) > 23 || ttm->tm_hour < 0)
-    {
+    if ((ttm->tm_hour = (int)strtol(q, (char **)NULL, 10)) > 23 || ttm->tm_hour < 0) {
         free_sbuf(buf);
         return 0;
     }
-    if (ttm->tm_hour == 0)
-    {
+    if (ttm->tm_hour == 0) {
         while (isspace(*q))
             q++;
-        if (*q != '0')
-        {
+        if (*q != '0') {
             free_sbuf(buf);
             return 0;
         }
     }
     q = strchr(p, ':');	/* minutes */
-    if (!q)
-    {
+    if (!q) {
         free_sbuf(buf);
         return 0;
     }
     *q++ = '\0';
-    if ((ttm->tm_min = (int)strtol(p, (char **)NULL, 10)) > 59 || ttm->tm_min < 0)
-    {
+    if ((ttm->tm_min = (int)strtol(p, (char **)NULL, 10)) > 59 || ttm->tm_min < 0) {
         free_sbuf(buf);
         return 0;
     }
-    if (ttm->tm_min == 0)
-    {
+    if (ttm->tm_min == 0) {
         while (isspace(*p))
             p++;
-        if (*p != '0')
-        {
+        if (*p != '0') {
             free_sbuf(buf);
             return 0;
         }
     }
     get_substr(q, p);	/* seconds */
-    if (!p || (ttm->tm_sec = (int)strtol(q, (char **)NULL, 10)) > 59 || ttm->tm_sec < 0)
-    {
+    if (!p || (ttm->tm_sec = (int)strtol(q, (char **)NULL, 10)) > 59 || ttm->tm_sec < 0) {
         free_sbuf(buf);
         return 0;
     }
-    if (ttm->tm_sec == 0)
-    {
+    if (ttm->tm_sec == 0) {
         while (isspace(*q))
             q++;
-        if (*q != '0')
-        {
+        if (*q != '0') {
             free_sbuf(buf);
             return 0;
         }
     }
     get_substr(p, q);	/* year */
-    if ((ttm->tm_year = (int)strtol(p, (char **)NULL, 10)) == 0)
-    {
+    if ((ttm->tm_year = (int)strtol(p, (char **)NULL, 10)) == 0) {
         while (isspace(*p))
             p++;
-        if (*p != '0')
-        {
+        if (*p != '0') {
             free_sbuf(buf);
             return 0;
         }
@@ -816,8 +726,7 @@ int do_convtime(char *str, struct tm *ttm)
     free_sbuf(buf);
     if (ttm->tm_year > 100)
         ttm->tm_year -= 1900;
-    if (ttm->tm_year < 0)
-    {
+    if (ttm->tm_year < 0) {
         return 0;
     }
     /*
@@ -860,21 +769,15 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if ((nfargs < 1) || !fargs[0] || !*fargs[0])
         return;
-    if (nfargs == 1)
-    {
+    if (nfargs == 1) {
         tt = mudstate.now;
-    }
-    else if (nfargs == 2)
-    {
+    } else if (nfargs == 2) {
         tt = (time_t) strtol(fargs[1], (char **)NULL, 10);;
-        if (tt < 0)
-        {
+        if (tt < 0) {
             safe_str("#-1 INVALID TIME", buff, bufc);
             return;
         }
-    }
-    else
-    {
+    } else {
         safe_tprintf_str(buff, bufc,
                          "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d",
                          nfargs);
@@ -889,34 +792,23 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      */
 
     for (tp = tbuf, p = fargs[0], len = 0;
-            *p && (len < LBUF_SIZE - 2); tp++, p++)
-    {
-        if (*p == '%')
-        {
+            *p && (len < LBUF_SIZE - 2); tp++, p++) {
+        if (*p == '%') {
             *tp++ = '%';
             *tp = '%';
-        }
-        else if (*p == '$')
-        {
-            if (*(p + 1) == '$')
-            {
+        } else if (*p == '$') {
+            if (*(p + 1) == '$') {
                 *tp = '$';
                 p++;
-            }
-            else if (*(p + 1) == 'n')
-            {
+            } else if (*(p + 1) == 'n') {
                 *tp++ = '%';
                 *tp++ = '%';
                 *tp = 'n';
                 p++;
-            }
-            else
-            {
+            } else {
                 *tp = '%';
             }
-        }
-        else
-        {
+        } else {
             *tp = *p;
         }
     }
@@ -956,16 +848,13 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      */
 
     raw_secs = secs = (int)strtol(fargs[1], (char **)NULL, 10);
-    if (secs < 0)
-    {
+    if (secs < 0) {
         /*
          * Try to be semi-useful. Keep value of secs; zero out the
          * rest
          */
         mins = hours = days = 0;
-    }
-    else
-    {
+    } else {
         days = secs / 86400;
         secs %= 86400;
         hours = secs / 3600;
@@ -979,41 +868,32 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      */
 
     p = fargs[0];
-    while (*p)
-    {
-        if (*p == '$')
-        {
+    while (*p) {
+        if (*p == '$') {
             mark = p;	/* save place in case we need to go
 					 * back */
             p++;
-            if (!*p)
-            {
+            if (!*p) {
                 safe_chr('$', buff, bufc);
                 break;
-            }
-            else if (*p == '$')
-            {
+            } else if (*p == '$') {
                 safe_chr('$', buff, bufc);
                 p++;
-            }
-            else
-            {
+            } else {
                 hidezero = hideearly = showsuffix = clockfmt =
                                                         usecap = 0;
                 /*
                  * Optional width
                  */
                 for (width = 0;
-                        *p && isdigit((unsigned char)*p); p++)
-                {
+                        *p && isdigit((unsigned char)*p); p++) {
                     width *= 10;
                     width += *p - '0';
                 }
                 for (;
                         (*p == 'z') || (*p == 'Z') ||
                         (*p == 'x') || (*p == 'X') ||
-                        (*p == 'c') || (*p == 'C'); p++)
-                {
+                        (*p == 'c') || (*p == 'C'); p++) {
                     if (*p == 'z')
                         hidezero = 1;
                     else if (*p == 'Z')
@@ -1025,8 +905,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     else if (*p == 'C')
                         usecap = 1;
                 }
-                switch (*p)
-                {
+                switch (*p) {
                 case 's':
                 case 'S':
                     if (usecap)
@@ -1062,23 +941,16 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     /*
                      * Show the first non-zero thing
                      */
-                    if (days > 0)
-                    {
+                    if (days > 0) {
                         n = days;
                         timec = 'd';
-                    }
-                    else if (hours > 0)
-                    {
+                    } else if (hours > 0) {
                         n = hours;
                         timec = 'h';
-                    }
-                    else if (mins > 0)
-                    {
+                    } else if (mins > 0) {
                         n = mins;
                         timec = 'm';
-                    }
-                    else
-                    {
+                    } else {
                         n = secs;
                         timec = 's';
                     }
@@ -1086,15 +958,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                 default:
                     timec = ' ';
                 }
-                if (timec == ' ')
-                {
+                if (timec == ' ') {
                     while (*p && (*p != '$'))
                         p++;
                     safe_known_str(mark, p - mark, buff,
                                    bufc);
-                }
-                else if (!clockfmt)
-                {
+                } else if (!clockfmt) {
                     /*
                      * If it's 0 and we're hidezero, just
                      * hide it. If it's 0 and we're
@@ -1112,97 +981,73 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                         60))
                                 || ((timec == 'h')
                                     && (raw_secs >=
-                                        3600))))))
-                    {
-                        if (width > 0)
-                        {
+                                        3600)))))) {
+                        if (width > 0) {
                             padc =
                                 isupper(*p) ? '0' :
                                 ' ';
-                            if (showsuffix)
-                            {
+                            if (showsuffix) {
                                 x = width + 1;
                                 print_padding
                                 (x, max,
                                  padc);
-                            }
-                            else
-                            {
+                            } else {
                                 print_padding
                                 (width,
                                  max, padc);
                             }
                         }
-                    }
-                    else if (width > 0)
-                    {
-                        if (isupper(*p))
-                        {
+                    } else if (width > 0) {
+                        if (isupper(*p)) {
                             safe_tprintf_str(buff,
                                              bufc, "%0*d",
                                              width, n);
-                        }
-                        else
-                        {
+                        } else {
                             safe_tprintf_str(buff,
                                              bufc, "%*d", width,
                                              n);
                         }
-                        if (showsuffix)
-                        {
+                        if (showsuffix) {
                             safe_chr(timec, buff,
                                      bufc);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         safe_ltos(buff, bufc, n);
-                        if (showsuffix)
-                        {
+                        if (showsuffix) {
                             safe_chr(timec, buff,
                                      bufc);
                         }
                     }
                     p++;
-                }
-                else
-                {
+                } else {
                     /*
                      * In clock format, we show
                      * <d>:<h>:<m>:<s>. The field
                      * specifier tells us where our
                      * division stops.
                      */
-                    if (timec == 'd')
-                    {
+                    if (timec == 'd') {
                         cdays = days;
                         chours = hours;
                         cmins = mins;
                         csecs = secs;
-                    }
-                    else if (timec == 'h')
-                    {
+                    } else if (timec == 'h') {
                         cdays = 0;
                         csecs = raw_secs;
                         chours = csecs / 3600;
                         csecs %= 3600;
                         cmins = csecs / 60;
                         csecs %= 60;
-                    }
-                    else if (timec == 'm')
-                    {
+                    } else if (timec == 'm') {
                         cdays = chours = 0;
                         csecs = raw_secs;
                         cmins = csecs / 60;
                         csecs %= 60;
-                    }
-                    else
-                    {
+                    } else {
                         cdays = chours = cmins = 0;
                         csecs = raw_secs;
                     }
-                    if (!hidezero || (cdays != 0))
-                    {
+                    if (!hidezero || (cdays != 0)) {
                         safe_tprintf_str(buff, bufc,
                                          isupper(*p) ?
                                          "%0*d:%0*d:%0*d:%0*d" :
@@ -1211,15 +1056,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                          width, chours,
                                          width, cmins,
                                          width, csecs);
-                    }
-                    else
-                    {
+                    } else {
                         /*
                          * Start from the first
                          * non-zero thing
                          */
-                        if (chours != 0)
-                        {
+                        if (chours != 0) {
                             safe_tprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
@@ -1228,9 +1070,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                              width, chours,
                                              width, cmins,
                                              width, csecs);
-                        }
-                        else if (cmins != 0)
-                        {
+                        } else if (cmins != 0) {
                             safe_tprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
@@ -1238,9 +1078,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                              "%*d:%*d", width,
                                              cmins, width,
                                              csecs);
-                        }
-                        else
-                        {
+                        } else {
                             safe_tprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
@@ -1251,9 +1089,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     p++;
                 }
             }
-        }
-        else
-        {
+        } else {
             mark = p;
             while (*p && (*p != '$'))
                 p++;
@@ -1326,10 +1162,8 @@ void fun_mudname(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     MODULE *mp;
 
-    WALK_ALL_MODULES(mp)
-    {
-        if (!strcasecmp(fargs[0], mp->modname))
-        {
+    WALK_ALL_MODULES(mp) {
+        if (!strcasecmp(fargs[0], mp->modname)) {
             safe_chr('1', buff, bufc);
             return;
         }
@@ -1372,8 +1206,7 @@ void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_benchmark: Benchmark softcode.
  */
 
-void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) 
-{
+void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     struct timeval bt, et;
 
     int i, times;
@@ -1392,20 +1225,17 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
          EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs);
     times = (int)strtol(nstr, (char **)NULL, 10);
     free_lbuf(nstr);
-    if (times < 1)
-    {
+    if (times < 1) {
         safe_str("#-1 TOO FEW TIMES", buff, bufc);
         return;
     }
-    if (times > mudconf.func_invk_lim)
-    {
+    if (times > mudconf.func_invk_lim) {
         safe_str("#-1 TOO MANY TIMES", buff, bufc);
         return;
     }
     min = max = total = 0;
 
-    for (i = 0; i < times; i++)
-    {
+    for (i = 0; i < times; i++) {
         strcpy(ebuf, fargs[0]);
         s = ebuf;
         tp = tbuf;
@@ -1421,8 +1251,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             max = ut;
         total += ut;
         if ((mudstate.func_invk_ctr >= mudconf.func_invk_lim) ||
-                (Too_Much_CPU()))
-        {
+                (Too_Much_CPU())) {
             /*
              * Abort
              */
@@ -1465,12 +1294,10 @@ void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Side-effect functions.
  */
 
-static int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
-{
+static int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs) {
     CMDENT *cmdp;
 
-    if ((cmdp = (CMDENT *) hashfind(name, &mudstate.command_htab)))
-    {
+    if ((cmdp = (CMDENT *) hashfind(name, &mudstate.command_htab))) {
 
         /*
          * Note that these permission checks are NOT identical to the
@@ -1485,8 +1312,7 @@ static int check_command(dbref player, char *name, char *buff, char **bufc, char
         if (Invalid_Objtype(player) ||
                 !Check_Cmd_Access(player, cmdp, cargs, ncargs) ||
                 (!Builder(player) && Protect(CA_GBL_BUILD) &&
-                 !(mudconf.control_flags & CF_BUILD)))
-        {
+                 !(mudconf.control_flags & CF_BUILD))) {
 
             safe_noperm(buff, bufc);
             return 1;
@@ -1539,8 +1365,7 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
-    if (nfargs < 1)
-    {
+    if (nfargs < 1) {
         safe_str("#-1 TOO FEW ARGUMENTS", buff, bufc);
         return;
     }
@@ -1569,21 +1394,18 @@ void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         *p = tolower(*p);
 
     cmdp = (CMDENT *) hashfind(fargs[0], &mudstate.command_htab);
-    if (!cmdp)
-    {
+    if (!cmdp) {
         notify(player, "Command not found.");
         return;
     }
     if (Invalid_Objtype(player) ||
             !Check_Cmd_Access(player, cmdp, cargs, ncargs) ||
             (!Builder(player) && Protect(CA_GBL_BUILD) &&
-             !(mudconf.control_flags & CF_BUILD)))
-    {
+             !(mudconf.control_flags & CF_BUILD))) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
-    if (!(cmdp->callseq & CS_FUNCTION) || (cmdp->callseq & CS_ADDED))
-    {
+    if (!(cmdp->callseq & CS_FUNCTION) || (cmdp->callseq & CS_ADDED)) {
         notify(player, "Cannot call that command.");
         return;
     }
@@ -1601,8 +1423,7 @@ void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     tbuf1[0] = '\0';
     tbuf2[0] = '\0';
 
-    switch (cmdp->callseq & CS_NARG_MASK)
-    {
+    switch (cmdp->callseq & CS_NARG_MASK) {
     case CS_NO_ARGS:
         (*(cmdp->info.handler)) (player, cause, key);
         break;
@@ -1638,55 +1459,44 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     VaChk_Only_InPure(3);
     name = fargs[0];
 
-    if (!name || !*name)
-    {
+    if (!name || !*name) {
         safe_str("#-1 ILLEGAL NAME", buff, bufc);
         return;
     }
-    switch (isep.str[0])
-    {
+    switch (isep.str[0]) {
     case 'r':
-        if (check_command(player, "@dig", buff, bufc, cargs, ncargs))
-        {
+        if (check_command(player, "@dig", buff, bufc, cargs, ncargs)) {
             return;
         }
         thing = create_obj(player, TYPE_ROOM, name, 0);
         break;
     case 'e':
-        if (check_command(player, "@open", buff, bufc, cargs, ncargs))
-        {
+        if (check_command(player, "@open", buff, bufc, cargs, ncargs)) {
             return;
         }
         thing = create_obj(player, TYPE_EXIT, name, 0);
-        if (thing != NOTHING)
-        {
+        if (thing != NOTHING) {
             s_Exits(thing, player);
             s_Next(thing, Exits(player));
             s_Exits(player, thing);
         }
         break;
     default:
-        if (check_command(player, "@create", buff, bufc, cargs, ncargs))
-        {
+        if (check_command(player, "@create", buff, bufc, cargs, ncargs)) {
             return;
         }
-        if (fargs[1] && *fargs[1])
-        {
+        if (fargs[1] && *fargs[1]) {
             cost = (int)strtol(fargs[1], (char **)NULL, 10);
             if (cost < mudconf.createmin
-                    || cost > mudconf.createmax)
-            {
+                    || cost > mudconf.createmax) {
                 safe_str("#-1 COST OUT OF RANGE", buff, bufc);
                 return;
             }
-        }
-        else
-        {
+        } else {
             cost = mudconf.createmin;
         }
         thing = create_obj(player, TYPE_THING, name, cost);
-        if (thing != NOTHING)
-        {
+        if (thing != NOTHING) {
             move_via_generic(thing, player, NOTHING, 0);
             s_Home(thing, new_home(player));
         }
@@ -1715,17 +1525,14 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     if (check_command(player, "@set", buff, bufc, cargs, ncargs))
         return;
 
-    if (parse_attrib(player, fargs[0], &thing, &atr, 0))
-    {
-        if (atr != NOTHING)
-        {
+    if (parse_attrib(player, fargs[0], &thing, &atr, 0)) {
+        if (atr != NOTHING) {
 
             /*
              * must specify flag name
              */
 
-            if (!fargs[1] || !*fargs[1])
-            {
+            if (!fargs[1] || !*fargs[1]) {
 
                 safe_str("#-1 UNSPECIFIED PARAMETER", buff,
                          bufc);
@@ -1736,8 +1543,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
             clear = 0;
             p = fargs[1];
-            if (*fargs[1] == NOT_TOKEN)
-            {
+            if (*fargs[1] == NOT_TOKEN) {
                 p++;
                 clear = 1;
             }
@@ -1747,8 +1553,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
             flagvalue = search_nametab(player,
                                        indiv_attraccess_nametab, p);
-            if (flagvalue < 0)
-            {
+            if (flagvalue < 0) {
                 safe_str("#-1 CAN NOT SET", buff, bufc);
                 return;
             }
@@ -1756,8 +1561,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
              * make sure attribute is present
              */
 
-            if (!atr_get_info(thing, atr, &aowner, &aflags))
-            {
+            if (!atr_get_info(thing, atr, &aowner, &aflags)) {
                 safe_str("#-1 ATTRIBUTE NOT PRESENT ON OBJECT",
                          buff, bufc);
                 return;
@@ -1767,8 +1571,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
              */
 
             attr = atr_num(atr);
-            if (!attr || !Set_attr(player, thing, attr, aflags))
-            {
+            if (!attr || !Set_attr(player, thing, attr, aflags)) {
                 safe_noperm(buff, bufc);
                 return;
             }
@@ -1790,8 +1593,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * find thing
      */
 
-    if ((thing = match_controlled(player, fargs[0])) == NOTHING)
-    {
+    if ((thing = match_controlled(player, fargs[0])) == NOTHING) {
         safe_nothing(buff, bufc);
         return;
     }
@@ -1800,24 +1602,20 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
     for (p = fargs[1]; *p && (*p != ':'); p++);
 
-    if (*p)
-    {
+    if (*p) {
         *p++ = 0;
         atr = mkattr(fargs[1]);
-        if (atr <= 0)
-        {
+        if (atr <= 0) {
             safe_str("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
             return;
         }
         attr = atr_num(atr);
-        if (!attr)
-        {
+        if (!attr) {
             safe_noperm(buff, bufc);
             return;
         }
         atr_get_info(thing, atr, &aowner, &aflags);
-        if (!Set_attr(player, thing, attr, aflags))
-        {
+        if (!Set_attr(player, thing, attr, aflags)) {
             safe_noperm(buff, bufc);
             return;
         }
@@ -1826,12 +1624,10 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         /*
          * check for _
          */
-        if (*p == '_')
-        {
+        if (*p == '_') {
             strcpy(buff2, p + 1);
             if (!parse_attrib(player, p + 1, &thing2, &atr2, 0) ||
-                    (atr == NOTHING))
-            {
+                    (atr == NOTHING)) {
                 free_lbuf(buff2);
                 safe_nomatch(buff, bufc);
                 return;
@@ -1842,8 +1638,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
                          &aflags, &alen);
 
             if (!attr2 ||
-                    !See_attr(player, thing2, attr2, aowner, aflags))
-            {
+                    !See_attr(player, thing2, attr2, aowner, aflags)) {
                 free_lbuf(buff2);
                 safe_noperm(buff, bufc);
                 return;
@@ -1870,16 +1665,12 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-static void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
-{
+static void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p) {
     BQUE *tmp;
 
-    for (tmp = queue; tmp; tmp = tmp->next)
-    {
-        if (que_want(tmp, player_targ, obj_targ))
-        {
-            if (*bufc != bb_p)
-            {
+    for (tmp = queue; tmp; tmp = tmp->next) {
+        if (que_want(tmp, player_targ, obj_targ)) {
+            if (*bufc != bb_p) {
                 print_sep(&SPACE_DELIM, buff, bufc);
             }
             safe_ltos(buff, bufc, tmp->pid);
@@ -1902,51 +1693,37 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
      * Check for the PID case first.
      */
 
-    if (fargs[0] && is_integer(fargs[0]))
-    {
+    if (fargs[0] && is_integer(fargs[0])) {
         qpid = (int)strtol(fargs[0], (char **)NULL, 10);
         qptr = (BQUE *) nhashfind(qpid, &mudstate.qpid_htab);
         if (qptr == NULL)
             return;
-        if ((qptr->waittime > 0) && (Good_obj(qptr->sem)))
-        {
+        if ((qptr->waittime > 0) && (Good_obj(qptr->sem))) {
             safe_tprintf_str(buff, bufc, "#%d:#%d/%d %s",
                              qptr->player,
                              qptr->sem, qptr->waittime - mudstate.now,
                              qptr->comm);
-        }
-        else if (qptr->waittime > 0)
-        {
+        } else if (qptr->waittime > 0) {
             safe_tprintf_str(buff, bufc, "#%d:%d %s",
                              qptr->player,
                              qptr->waittime - mudstate.now, qptr->comm);
-        }
-        else if (Good_obj(qptr->sem))
-        {
-            if (qptr->attr == A_SEMAPHORE)
-            {
+        } else if (Good_obj(qptr->sem)) {
+            if (qptr->attr == A_SEMAPHORE) {
                 safe_tprintf_str(buff, bufc, "#%d:#%d %s",
                                  qptr->player, qptr->sem, qptr->comm);
-            }
-            else
-            {
+            } else {
                 ap = atr_num(qptr->attr);
-                if (ap && ap->name)
-                {
+                if (ap && ap->name) {
                     safe_tprintf_str(buff, bufc,
                                      "#%d:#%d/%s %s", qptr->player,
                                      qptr->sem, ap->name, qptr->comm);
-                }
-                else
-                {
+                } else {
                     safe_tprintf_str(buff, bufc,
                                      "#%d:#%d %s", qptr->player,
                                      qptr->sem, qptr->comm);
                 }
             }
-        }
-        else
-        {
+        } else {
             safe_tprintf_str(buff, bufc, "#%d: %s", qptr->player,
                              qptr->comm);
         }
@@ -1956,15 +1733,12 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
      * We either have nothing specified, or an object or player.
      */
 
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         if (!See_Queue(player))
             return;
         obj_targ = NOTHING;
         player_targ = NOTHING;
-    }
-    else
-    {
+    } else {
         player_targ = Owner(player);
         if (See_Queue(player))
             obj_targ = match_thing(player, fargs[0]);
@@ -1972,8 +1746,7 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
             obj_targ = match_controlled(player, fargs[0]);
         if (!Good_obj(obj_targ))
             return;
-        if (isPlayer(obj_targ))
-        {
+        if (isPlayer(obj_targ)) {
             player_targ = obj_targ;
             obj_targ = NOTHING;
         }

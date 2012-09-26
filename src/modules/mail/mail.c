@@ -9,12 +9,11 @@
  * -------------------------------------------------------------------
  */
 
-
-
-
+#include "../../copyright.h"
 #include "../../config.h"
-#include "../../api.h"
+#include "../../system.h"
 
+#include "../../api.h"
 #include "mail.h"
 
 /* --------------------------------------------------------------------------
@@ -88,33 +87,30 @@ CONF mod_mail_conftable[] = {
     { NULL,					NULL,		0,		0,		NULL,				0}
 };
 
-static int FDECL(sign, (int));
-static void FDECL(do_mail_flags, (dbref, char *, mail_flag, int));
-static void FDECL(send_mail, (dbref, dbref, const char *, const char *, \
-                              const char *, const char *, int, mail_flag, \
-                              int));
-static int FDECL(player_folder, (dbref));
-static int FDECL(parse_msglist, (char *, struct mail_selector *, dbref));
-static int FDECL(mail_match, (struct mail *, struct mail_selector, int));
-static int FDECL(parse_folder, (dbref, char *));
-static char *FDECL(status_chars, (struct mail *));
-static char *FDECL(status_string, (struct mail *));
-void FDECL(add_folder_name, (dbref, int, char *));
-static int FDECL(get_folder_number, (dbref, char *));
-void FDECL(check_mail, (dbref, int, int));
-static char *FDECL(get_folder_name, (dbref, int));
-static char *FDECL(mail_list_time, (const char *));
-static char *FDECL(make_numlist, (dbref, char *));
-static char *FDECL(make_namelist, (dbref, char *));
-static void FDECL(mail_to_list, (dbref, char *, char *, char *, char *, \
-                                 char *, int, int));
-static void FDECL(do_edit_msg, (dbref, char *, char *));
-static void FDECL(do_mail_proof, (dbref));
-static void FDECL(do_mail_to, (dbref, char *, int));
-static int FDECL(do_expmail_start, (dbref, char *, char *, char *));
-static void FDECL(do_expmail_stop, (dbref, int));
-static void FDECL(do_expmail_abort, (dbref));
-struct mail *FDECL(mail_fetch, (dbref, int));
+static int sign(int);
+static void do_mail_flags(dbref, char *, mail_flag, int);
+static void send_mail(dbref, dbref, const char *, const char *, const char *, const char *, int, mail_flag, int);
+static int player_folder(dbref);
+static int parse_msglist(char *, struct mail_selector *, dbref);
+static int mail_match(struct mail *, struct mail_selector, int);
+static int parse_folder(dbref, char *);
+static char *status_chars(struct mail *);
+static char *status_string(struct mail *);
+void add_folder_name(dbref, int, char *);
+static int get_folder_number(dbref, char *);
+void check_mail(dbref, int, int);
+static char *get_folder_name(dbref, int);
+static char *mail_list_time(const char *);
+static char *make_numlist(dbref, char *);
+static char *make_namelist(dbref, char *);
+static void mail_to_list(dbref, char *, char *, char *, char *, char *, int, int);
+static void do_edit_msg(dbref, char *, char *);
+static void do_mail_proof(dbref);
+static void do_mail_to(dbref, char *, int);
+static int do_expmail_start(dbref, char *, char *, char *);
+static void do_expmail_stop(dbref, int);
+static void do_expmail_abort(dbref);
+struct mail *mail_fetch(dbref, int);
 
 #define MALIAS_LEN 100
 

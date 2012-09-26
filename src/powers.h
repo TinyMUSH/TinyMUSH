@@ -56,8 +56,7 @@
  * POWERENT: Information about object powers.
  */
 
-typedef struct power_entry
-{
+typedef struct power_entry {
     const char *powername;	/* Name of the flag */
     int	powervalue;	/* Which bit in the object is the flag */
     int	powerpower;	/* Ctrl flags for this power (recursive? :-) */
@@ -65,19 +64,18 @@ typedef struct power_entry
     int	(*handler)();	/* Handler for setting/clearing this flag */
 } POWERENT;
 
-typedef struct powerset
-{
+typedef struct powerset {
     POWER	word1;
     POWER	word2;
 } POWERSET;
 
-extern void	NDECL(init_powertab);
-extern void	FDECL(display_powertab, (dbref));
-extern void	FDECL(power_set, (dbref, dbref, char *, int));
-extern char *	FDECL(power_description, (dbref, dbref));
-extern POWERENT *FDECL(find_power, (dbref, char *));
-extern int	FDECL(has_power, (dbref, dbref, char *));
-extern void	FDECL(decompile_powers, (dbref, dbref, char *));
+extern void	init_powertab(void);
+extern void	display_powertab(dbref);
+extern void	power_set(dbref, dbref, char *, int);
+extern char *	power_description(dbref, dbref);
+extern POWERENT *find_power(dbref, char *);
+extern int	has_power(dbref, dbref, char *);
+extern void	decompile_powers(dbref, dbref, char *);
 
 #define s_Change_Quotas(c)	s_Powers((c), Powers(c) | POW_CHG_QUOTAS)
 #define s_Chown_Any(c)		s_Powers((c), Powers(c) | POW_CHOWN_ANY)

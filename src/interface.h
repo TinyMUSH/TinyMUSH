@@ -52,41 +52,35 @@ extern NAMETAB logout_cmdtable[];
 
 typedef struct cmd_block CBLK;
 typedef struct cmd_block_hdr CBLKHDR;
-struct cmd_block_hdr
-{
+struct cmd_block_hdr {
     struct cmd_block *nxt;
 };
-struct cmd_block
-{
+struct cmd_block {
     CBLKHDR hdr;
     char	cmd[LBUF_SIZE - sizeof(CBLKHDR)];
 };
 
 typedef struct text_block TBLOCK;
 typedef struct text_block_hdr TBLKHDR;
-struct text_block_hdr
-{
+struct text_block_hdr {
     struct text_block *nxt;
     char	*start;
     char	*end;
     int	nchars;
 };
-struct text_block
-{
+struct text_block {
     TBLKHDR hdr;
     char	data[OUTPUT_BLOCK_SIZE - sizeof(TBLKHDR)];
 };
 
 typedef struct prog_data PROG;
-struct prog_data
-{
+struct prog_data {
     dbref wait_cause;
     GDATA *wait_data;
 };
 
 typedef struct descriptor_data DESC;
-struct descriptor_data
-{
+struct descriptor_data {
     int descriptor;
     int flags;
     int retries_left;
@@ -137,32 +131,32 @@ extern DESC *descriptor_list;
 
 /* from the net interface */
 
-extern void	NDECL(emergency_shutdown);
-extern void	FDECL(shutdownsock, (DESC *, int));
-extern void	FDECL(shovechars, (int));
-extern void	NDECL(set_signals);
+extern void	emergency_shutdown(void);
+extern void	shutdownsock(DESC *, int);
+extern void	shovechars(int);
+extern void	set_signals(void);
 
 /* from netcommon.c */
 
-extern struct timeval	FDECL(timeval_sub, (struct timeval, struct timeval));
-extern int	FDECL(msec_diff, (struct timeval now, struct timeval then));
-extern struct timeval	FDECL(msec_add, (struct timeval, int));
-extern struct timeval	FDECL(update_quotas, (struct timeval, struct timeval));
-extern void	FDECL(raw_notify, (dbref, char *));
-extern void	FDECL(raw_notify_newline, (dbref));
-extern void	FDECL(clearstrings, (DESC *));
-extern void	FDECL(queue_write, (DESC *, const char *, int));
-extern void	FDECL(queue_string, (DESC *, const char *));
-extern void	FDECL(freeqs, (DESC *));
-extern void	FDECL(welcome_user, (DESC *));
-extern void	FDECL(save_command, (DESC *, CBLK *));
-extern void	FDECL(announce_disconnect, (dbref, DESC *, const char *));
-extern int	FDECL(boot_off, (dbref, char *));
-extern int	FDECL(boot_by_port, (int, int, char *));
-extern void	NDECL(check_idle);
-extern void	NDECL(process_commands);
-extern int	FDECL(site_check, (struct in_addr, SITE *));
-extern dbref	FDECL(find_connected_name, (dbref, char *));
+extern struct timeval	timeval_sub(struct timeval, struct timeval);
+extern int	msec_diff(struct timeval now, struct timeval then);
+extern struct timeval	msec_add(struct timeval, int);
+extern struct timeval	update_quotas(struct timeval, struct timeval);
+extern void	raw_notify(dbref, char *);
+extern void	raw_notify_newline(dbref);
+extern void	clearstrings(DESC *);
+extern void	queue_write(DESC *, const char *, int);
+extern void	queue_string(DESC *, const char *);
+extern void	freeqs(DESC *);
+extern void	welcome_user(DESC *);
+extern void	save_command(DESC *, CBLK *);
+extern void	announce_disconnect(dbref, DESC *, const char *);
+extern int	boot_off(dbref, char *);
+extern int	boot_by_port(int, int, char *);
+extern void	check_idle(void);
+extern void	process_commands(void);
+extern int	site_check(struct in_addr, SITE *);
+extern dbref	find_connected_name(dbref, char *);
 
 /* From predicates.c */
 

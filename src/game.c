@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -99,8 +100,7 @@ extern int optind;
  */
 
 void do_dump(dbref player, dbref cause, int key) {
-    if (mudstate.dumping)
-    {
+    if (mudstate.dumping) {
         notify(player, "Dumping. Please try again later.");
         return;
     }
@@ -113,8 +113,7 @@ void do_dump(dbref player, dbref cause, int key) {
  * Hashtable resize.
  */
 
-void do_hashresize(dbref player, dbref cause, int key)
-{
+void do_hashresize(dbref player, dbref cause, int key) {
     MODULE *mp;
 
     MODHASHES *m_htab, *hp;
@@ -145,23 +144,18 @@ void do_hashresize(dbref player, dbref cause, int key)
                (mudstate.max_vars < 16) ? 16 : mudstate.max_vars);
     hashresize(&mudstate.api_func_htab, 8);
 
-    WALK_ALL_MODULES(mp)
-    {
+    WALK_ALL_MODULES(mp) {
         m_htab = DLSYM_VAR(mp->handle, mp->modname,
                            "hashtable", MODHASHES *);
-        if (m_htab)
-        {
-            for (hp = m_htab; hp->tabname != NULL; hp++)
-            {
+        if (m_htab) {
+            for (hp = m_htab; hp->tabname != NULL; hp++) {
                 hashresize(hp->htab, hp->min_size);
             }
         }
         m_ntab = DLSYM_VAR(mp->handle, mp->modname,
                            "nhashtable", MODNHASHES *);
-        if (m_ntab)
-        {
-            for (np = m_ntab; np->tabname != NULL; np++)
-            {
+        if (m_ntab) {
+            for (np = m_ntab; np->tabname != NULL; np++) {
                 nhashresize(np->htab, np->min_size);
             }
         }
@@ -193,8 +187,7 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
     int subpatterns;
 
     if ((re = pcre_compile(pattern, case_opt,
-                           &errptr, &erroffset, mudstate.retabs)) == NULL)
-    {
+                           &errptr, &erroffset, mudstate.retabs)) == NULL) {
         /*
          * This is a matching error. We have an error message in
          * errptr that we can ignore, since we're doing
@@ -207,8 +200,7 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
      * automatically be filled in by this.
      */
     if ((subpatterns = pcre_exec(re, NULL, str, strlen(str), 0, 0,
-                                 offsets, PCRE_MAX_OFFSETS)) < 0)
-    {
+                                 offsets, PCRE_MAX_OFFSETS)) < 0) {
         XFREE(re, "regexp_match.re");
         return 0;
     }
@@ -226,17 +218,14 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
      * languages.
      */
 
-    for (i = 0; i < nargs; i++)
-    {
+    for (i = 0; i < nargs; i++) {
         args[i] = NULL;
     }
 
-    for (i = 0; i < nargs; i++)
-    {
+    for (i = 0; i < nargs; i++) {
         args[i] = alloc_lbuf("regexp_match");
         if (pcre_copy_substring(str, offsets, subpatterns, i,
-                                args[i], LBUF_SIZE) < 0)
-        {
+                                args[i], LBUF_SIZE) < 0) {
             /*
              * Match behavior of wild(): clear out null values.
              */
@@ -275,8 +264,7 @@ static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *
     match = 0;
     buff = alloc_lbuf("atr_match1");
     atr_push();
-    for (attr = atr_head(parent, &as); attr; attr = atr_next(&as))
-    {
+    for (attr = atr_head(parent, &as); attr; attr = atr_next(&as)) {
         ap = atr_num(attr);
 
         /*
@@ -293,8 +281,7 @@ static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *
 
         if (check_exclude &&
                 ((ap->flags & AF_PRIVATE) ||
-                 nhashfind(ap->number, &mudstate.parent_htab)))
-        {
+                 nhashfind(ap->number, &mudstate.parent_htab))) {
             continue;
         }
         atr_get_str(buff, parent, attr, &aowner, &aflags, &alen);
@@ -303,8 +290,7 @@ static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *
          * Skip if private and on a parent
          */
 
-        if (check_exclude && (aflags & AF_PRIVATE))
-        {
+        if (check_exclude && (aflags & AF_PRIVATE)) {
             continue;
         }
         /*
@@ -346,21 +332,16 @@ static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *
                 ((aflags & AF_RMATCH) &&
                  register_match(buff + 1,
                                 ((aflags & AF_NOPARSE) ? raw_str : str),
-                                args, NUM_ENV_VARS)))
-        {
+                                args, NUM_ENV_VARS))) {
             match = 1;
-            if (aflags & AF_NOW)
-            {
+            if (aflags & AF_NOW) {
                 process_cmdline(thing, player, s, args,
                                 NUM_ENV_VARS, NULL);
-            }
-            else
-            {
+            } else {
                 wait_que(thing, player, 0, NOTHING, 0, s, args,
                          NUM_ENV_VARS, mudstate.rdata);
             }
-            for (i = 0; i < NUM_ENV_VARS; i++)
-            {
+            for (i = 0; i < NUM_ENV_VARS; i++) {
                 if (args[i])
                     free_lbuf(args[i]);
             }
@@ -402,18 +383,14 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
     exclude = 0;
     insert = 1;
     nhashflush(&mudstate.parent_htab, 0);
-    ITER_PARENTS(thing, parent, lev)
-    {
+    ITER_PARENTS(thing, parent, lev) {
         if (!Good_obj(Parent(parent)))
             insert = 0;
         result = atr_match1(thing, parent, player, type, str, raw_str,
                             exclude, insert);
-        if (result > 0)
-        {
+        if (result > 0) {
             match = 1;
-        }
-        else if (result < 0)
-        {
+        } else if (result < 0) {
             return match;
         }
         exclude = 1;
@@ -446,13 +423,11 @@ int check_filter(dbref object, dbref player, int filter, const char *msg) {
     GDATA *preserve;
 
     buf = atr_pget(object, filter, &aowner, &aflags, &alen);
-    if (!*buf)
-    {
+    if (!*buf) {
         free_lbuf(buf);
         return (1);
     }
-    if (!(aflags & AF_NOPARSE))
-    {
+    if (!(aflags & AF_NOPARSE)) {
         preserve = save_global_regs("check_filter.save");
         nbuf = dp = alloc_lbuf("check_filter");
         str = buf;
@@ -461,50 +436,38 @@ int check_filter(dbref object, dbref player, int filter, const char *msg) {
         dp = nbuf;
         free_lbuf(buf);
         restore_global_regs("check_filter.restore", preserve);
-    }
-    else
-    {
+    } else {
         dp = buf;
         nbuf = buf;	/* this way, buf will get freed correctly */
     }
 
-    if (!(aflags & AF_REGEXP))
-    {
-        do
-        {
+    if (!(aflags & AF_REGEXP)) {
+        do {
             cp = parse_to(&dp, ',', EV_STRIP);
-            if (quick_wild(cp, (char *)msg))
-            {
+            if (quick_wild(cp, (char *)msg)) {
                 free_lbuf(nbuf);
                 return (0);
             }
-        }
-        while (dp != NULL);
-    }
-    else
-    {
+        } while (dp != NULL);
+    } else {
         len = strlen(msg);
         case_opt = (aflags & AF_CASE) ? 0 : PCRE_CASELESS;
-        do
-        {
+        do {
             cp = parse_to(&dp, ',', EV_STRIP);
             re = pcre_compile(cp, case_opt, &errptr, &erroffset,
                               mudstate.retabs);
-            if (re != NULL)
-            {
+            if (re != NULL) {
                 subpatterns =
                     pcre_exec(re, NULL, (char *)msg, len, 0, 0,
                               offsets, PCRE_MAX_OFFSETS);
-                if (subpatterns >= 0)
-                {
+                if (subpatterns >= 0) {
                     XFREE(re, "check_filter.re");
                     free_lbuf(nbuf);
                     return (0);
                 }
                 XFREE(re, "check_filter.re");
             }
-        }
-        while (dp != NULL);
+        } while (dp != NULL);
     }
     free_lbuf(nbuf);
     return (1);
@@ -520,13 +483,10 @@ static char *add_prefix(dbref object, dbref player, int prefix, const char *msg,
     GDATA *preserve;
 
     buf = atr_pget(object, prefix, &aowner, &aflags, &alen);
-    if (!*buf)
-    {
+    if (!*buf) {
         cp = buf;
         safe_str((char *)dflt, buf, &cp);
-    }
-    else
-    {
+    } else {
         preserve = save_global_regs("add_prefix_save");
         nbuf = cp = alloc_lbuf("add_prefix");
         str = buf;
@@ -536,8 +496,7 @@ static char *add_prefix(dbref object, dbref player, int prefix, const char *msg,
         restore_global_regs("add_prefix_restore", preserve);
         buf = nbuf;
     }
-    if (cp != buf)
-    {
+    if (cp != buf) {
         safe_chr(' ', buf, &cp);
     }
     safe_str((char *)msg, buf, &cp);
@@ -574,15 +533,12 @@ void html_escape(const char *src, char *dest, char **destp) {
 
     char *temp;
 
-    if (destp == 0)
-    {
+    if (destp == 0) {
         temp = dest;
         destp = &temp;
     }
-    for (msg_orig = src; msg_orig && *msg_orig; msg_orig++)
-    {
-        switch (*msg_orig)
-        {
+    for (msg_orig = src; msg_orig && *msg_orig; msg_orig++) {
+        switch (*msg_orig) {
         case '<':
             safe_known_str("&lt;", 4, dest, destp);
             break;
@@ -644,8 +600,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
      */
 
     mudstate.ntfy_nest_lev++;
-    if (mudstate.ntfy_nest_lev >= mudconf.ntfy_nest_lim)
-    {
+    if (mudstate.ntfy_nest_lev >= mudconf.ntfy_nest_lim) {
         mudstate.ntfy_nest_lev--;
         return;
     }
@@ -654,49 +609,37 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
      * are sending the message to the target object
      */
 
-    if (key & MSG_ME)
-    {
+    if (key & MSG_ME) {
         mp = msg_ns = alloc_lbuf("notify_check");
         if (Nospoof(target) &&
                 (target != sender) &&
                 (target != mudstate.curr_enactor) &&
-                (target != mudstate.curr_player))
-        {
-            if (sender != Owner(sender))
-            {
-                if (sender != mudstate.curr_enactor)
-                {
+                (target != mudstate.curr_player)) {
+            if (sender != Owner(sender)) {
+                if (sender != mudstate.curr_enactor) {
                     safe_tprintf_str(msg_ns, &mp,
                                      "[%s(#%d){%s}<-(#%d)] ",
                                      Name(sender), sender,
                                      Name(Owner(sender)),
                                      mudstate.curr_enactor);
-                }
-                else
-                {
+                } else {
                     safe_tprintf_str(msg_ns, &mp,
                                      "[%s(#%d){%s}] ",
                                      Name(sender), sender,
                                      Name(Owner(sender)));
                 }
-            }
-            else if (sender != mudstate.curr_enactor)
-            {
+            } else if (sender != mudstate.curr_enactor) {
                 safe_tprintf_str(msg_ns, &mp,
                                  "[%s(#%d)<-(#%d)] ",
                                  Name(sender), sender,
                                  mudstate.curr_enactor);
-            }
-            else
-            {
+            } else {
                 safe_tprintf_str(msg_ns, &mp,
                                  "[%s(#%d)] ", Name(sender), sender);
             }
         }
         safe_str((char *)msg, msg_ns, &mp);
-    }
-    else
-    {
+    } else {
         msg_ns = NULL;
     }
 
@@ -709,25 +652,18 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
     herekey = key & (MSG_SPEECH | MSG_MOVE | MSG_PRESENCE);
     will_send = OK_To_Send(sender, target);
 
-    switch (Typeof(target))
-    {
+    switch (Typeof(target)) {
     case TYPE_PLAYER:
-        if (will_send)
-        {
+        if (will_send) {
 #ifndef PUEBLO_SUPPORT
             if (key & MSG_ME)
                 raw_notify(target, msg_ns);
 #else
-            if (key & MSG_ME)
-            {
-                if (key & MSG_HTML)
-                {
+            if (key & MSG_ME) {
+                if (key & MSG_HTML) {
                     raw_notify_html(target, msg_ns);
-                }
-                else
-                {
-                    if (Html(target))
-                    {
+                } else {
+                    if (Html(target)) {
                         char *msg_ns_escaped;
 
                         msg_ns_escaped =
@@ -738,9 +674,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
                         raw_notify(target,
                                    msg_ns_escaped);
                         free_lbuf(msg_ns_escaped);
-                    }
-                    else
-                    {
+                    } else {
                         raw_notify(target, msg_ns);
                     }
                 }
@@ -758,8 +692,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
          * above).
          */
 
-        if (mudstate.inpipe && !isPlayer(target) && will_send)
-        {
+        if (mudstate.inpipe && !isPlayer(target) && will_send) {
             raw_notify(target, msg_ns);
         }
         /*
@@ -775,8 +708,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
                 (target != Owner(target)) &&
                 ((key & MSG_PUP_ALWAYS) ||
                  ((targetloc != Location(Owner(target))) &&
-                  (targetloc != Owner(target)))))
-        {
+                  (targetloc != Owner(target))))) {
 
             tp = tbuff = alloc_lbuf("notify_check.puppet");
             safe_name(target, tbuff, &tp);
@@ -790,17 +722,13 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
              * redirection. Use of raw_notify() means that
              * recursion is avoided.
              */
-            if (H_Redirect(target))
-            {
+            if (H_Redirect(target)) {
                 np = (NUMBERTAB *) nhashfind(target,
                                              &mudstate.redir_htab);
-                if (np && Good_obj(np->num))
-                {
+                if (np && Good_obj(np->num)) {
                     raw_notify(Owner(np->num), tbuff);
                 }
-            }
-            else
-            {
+            } else {
                 raw_notify(Owner(target), tbuff);
             }
             free_lbuf(tbuff);
@@ -821,8 +749,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
         pass_listen = 0;
         nargs = 0;
         if (will_send && check_listens &&
-                (key & (MSG_ME | MSG_INV_L)) && H_Listen(target))
-        {
+                (key & (MSG_ME | MSG_INV_L)) && H_Listen(target)) {
             tp = atr_get(target, A_LISTEN, &aowner, &aflags,
                          &alen);
             if (*tp && ((!(aflags & AF_REGEXP)
@@ -831,8 +758,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
                                                     && regexp_match(tp, (char *)msg,
                                                             ((aflags & AF_CASE) ? 0 :
                                                                     PCRE_CASELESS), args,
-                                                            NUM_ENV_VARS))))
-            {
+                                                            NUM_ENV_VARS)))) {
                 for (nargs = NUM_ENV_VARS;
                         nargs && (!args[nargs - 1]
                                   || !(*args[nargs - 1])); nargs--);
@@ -854,8 +780,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
          * Process AxHEAR if we pass LISTEN, USElock and it's for me
          */
 
-        if (will_send && (key & MSG_ME) && pass_listen && pass_uselock)
-        {
+        if (will_send && (key & MSG_ME) && pass_listen && pass_uselock) {
             if (sender != target)
                 did_it(sender, target,
                        A_NULL, NULL, A_NULL, NULL,
@@ -871,8 +796,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
          * Get rid of match arguments. We don't need them any more
          */
 
-        if (pass_listen)
-        {
+        if (pass_listen) {
             for (i = 0; i < nargs; i++)
                 if (args[i] != NULL)
                     free_lbuf(args[i]);
@@ -882,8 +806,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
          */
 
         if (will_send && (key & MSG_ME) && pass_uselock &&
-                (sender != target) && Monitor(target))
-        {
+                (sender != target) && Monitor(target)) {
             (void)atr_match(target, sender,
                             AMATCH_LISTEN, (char *)msg, (char *)msg, 0);
         }
@@ -895,18 +818,15 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
 
         if (will_send && (key & MSG_FWDLIST) &&
                 Audible(target) && H_Fwdlist(target) &&
-                check_filter(target, sender, A_FILTER, msg))
-        {
+                check_filter(target, sender, A_FILTER, msg)) {
             tbuff = dflt_from_msg(sender, target);
             buff = add_prefix(target, sender, A_PREFIX,
                               msg, tbuff);
             free_lbuf(tbuff);
 
             fp = fwdlist_get(target);
-            if (fp)
-            {
-                for (i = 0; i < fp->count; i++)
-                {
+            if (fp) {
+                for (i = 0; i < fp->count; i++) {
                     recip = fp->data[i];
                     if (!Good_obj(recip) ||
                             (recip == target))
@@ -924,15 +844,12 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
          * it. Otherwise we have to continue checking.
          */
 
-        if (will_send && (key & MSG_INV_EXITS))
-        {
-            DOLIST(obj, Exits(target))
-            {
+        if (will_send && (key & MSG_INV_EXITS)) {
+            DOLIST(obj, Exits(target)) {
                 recip = Location(obj);
                 if (Audible(obj) && ((recip != target) &&
                                      check_filter(obj, sender, A_FILTER,
-                                                  msg)))
-                {
+                                                  msg))) {
                     buff =
                         add_prefix(obj, target, A_PREFIX,
                                    msg, "From a distance,");
@@ -955,34 +872,28 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
 
         if (has_neighbors &&
                 ((key & MSG_NBR_EXITS) ||
-                 ((key & MSG_NBR_EXITS_A) && is_audible)))
-        {
+                 ((key & MSG_NBR_EXITS_A) && is_audible))) {
 
             /*
              * If from inside, we have to add the prefix string
              * of the container.
              */
 
-            if (key & MSG_S_INSIDE)
-            {
+            if (key & MSG_S_INSIDE) {
                 tbuff = dflt_from_msg(sender, target);
                 buff = add_prefix(target, sender, A_PREFIX,
                                   msg, tbuff);
                 free_lbuf(tbuff);
-            }
-            else
-            {
+            } else {
                 buff = (char *)msg;
             }
 
-            DOLIST(obj, Exits(Location(target)))
-            {
+            DOLIST(obj, Exits(Location(target))) {
                 recip = Location(obj);
                 if (Good_obj(recip) && Audible(obj) &&
                         (recip != targetloc) &&
                         (recip != target) &&
-                        check_filter(obj, sender, A_FILTER, msg))
-                {
+                        check_filter(obj, sender, A_FILTER, msg)) {
                     tbuff = add_prefix(obj, target,
                                        A_PREFIX, buff,
                                        "From a distance,");
@@ -994,8 +905,7 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
                     free_lbuf(tbuff);
                 }
             }
-            if (key & MSG_S_INSIDE)
-            {
+            if (key & MSG_S_INSIDE) {
                 free_lbuf(buff);
             }
         }
@@ -1010,27 +920,21 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
         if (will_send &&
                 ((key & MSG_INV) ||
                  ((key & MSG_INV_L) && pass_listen &&
-                  check_filter(target, sender, A_INFILTER, msg))))
-        {
+                  check_filter(target, sender, A_INFILTER, msg)))) {
 
             /*
              * Don't prefix the message if we were given the
              * MSG_NOPREFIX key.
              */
 
-            if (key & MSG_S_OUTSIDE)
-            {
+            if (key & MSG_S_OUTSIDE) {
                 buff = add_prefix(target, sender, A_INPREFIX,
                                   msg, "");
-            }
-            else
-            {
+            } else {
                 buff = (char *)msg;
             }
-            DOLIST(obj, Contents(target))
-            {
-                if (obj != target)
-                {
+            DOLIST(obj, Contents(target)) {
+                if (obj != target) {
 #ifdef PUEBLO_SUPPORT
                     notify_check(obj, sender, buff,
                                  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE
@@ -1052,28 +956,21 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
         if (has_neighbors &&
                 ((key & MSG_NBR) ||
                  ((key & MSG_NBR_A) && is_audible &&
-                  check_filter(target, sender, A_FILTER, msg))))
-        {
-            if (key & MSG_S_INSIDE)
-            {
+                  check_filter(target, sender, A_FILTER, msg)))) {
+            if (key & MSG_S_INSIDE) {
                 buff = add_prefix(target, sender, A_PREFIX,
                                   msg, "");
-            }
-            else
-            {
+            } else {
                 buff = (char *)msg;
             }
-            DOLIST(obj, Contents(targetloc))
-            {
-                if ((obj != target) && (obj != targetloc))
-                {
+            DOLIST(obj, Contents(targetloc)) {
+                if ((obj != target) && (obj != targetloc)) {
                     notify_check(obj, sender, buff,
                                  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE
                                  | herekey);
                 }
             }
-            if (key & MSG_S_INSIDE)
-            {
+            if (key & MSG_S_INSIDE) {
                 free_lbuf(buff);
             }
         }
@@ -1084,23 +981,18 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
         if (has_neighbors &&
                 ((key & MSG_LOC) ||
                  ((key & MSG_LOC_A) && is_audible &&
-                  check_filter(target, sender, A_FILTER, msg))))
-        {
-            if (key & MSG_S_INSIDE)
-            {
+                  check_filter(target, sender, A_FILTER, msg)))) {
+            if (key & MSG_S_INSIDE) {
                 tbuff = dflt_from_msg(sender, target);
                 buff = add_prefix(target, sender, A_PREFIX,
                                   msg, tbuff);
                 free_lbuf(tbuff);
-            }
-            else
-            {
+            } else {
                 buff = (char *)msg;
             }
             notify_check(targetloc, sender, buff,
                          MSG_ME | MSG_F_UP | MSG_S_INSIDE | herekey);
-            if (key & MSG_S_INSIDE)
-            {
+            if (key & MSG_S_INSIDE) {
                 free_lbuf(buff);
             }
         }
@@ -1122,10 +1014,8 @@ void notify_except(dbref loc, dbref player, dbref exception, const char *msg, in
         notify_check(loc, player, msg,
                      (MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A |
                       flags));
-    DOLIST(first, Contents(loc))
-    {
-        if (first != exception)
-        {
+    DOLIST(first, Contents(loc)) {
+        if (first != exception) {
             notify_check(first, player, msg,
                          (MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags));
         }
@@ -1139,10 +1029,8 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, const char 
         notify_check(loc, player, msg,
                      (MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A |
                       flags));
-    DOLIST(first, Contents(loc))
-    {
-        if (first != exc1 && first != exc2)
-        {
+    DOLIST(first, Contents(loc)) {
+        if (first != exc1 && first != exc2) {
             notify_check(first, player, msg,
                          (MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags));
         }
@@ -1162,17 +1050,14 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
 
     struct timeval obj_time;
 
-    if (!(yes_log && (LOG_TIMEUSE & mudconf.log_options) != 0))
-    {
+    if (!(yes_log && (LOG_TIMEUSE & mudconf.log_options) != 0)) {
         yes_log = 0;
         STARTLOG(LOG_ALWAYS, "WIZ", "TIMECHECK")
         log_name(player);
         log_printf(" checks object time use over %d seconds\n",
                    (int)(time(NULL) - mudstate.cpu_count_from));
         ENDLOG
-    }
-    else
-    {
+    } else {
         STARTLOG(LOG_ALWAYS, "OBJ", "CPU")
         log_name(player);
         log_printf(" checks object time use over %d seconds\n",
@@ -1189,11 +1074,9 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
      * failing to abstract our log calls. Oh well.
      */
 
-    DO_WHOLE_DB(thing)
-    {
+    DO_WHOLE_DB(thing) {
         obj_time = Time_Used(thing);
-        if (obj_time.tv_sec || obj_time.tv_usec)
-        {
+        if (obj_time.tv_sec || obj_time.tv_usec) {
             obj_counted++;
             used_msecs =
                 (obj_time.tv_sec * 1000) +
@@ -1210,16 +1093,14 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
         s_Time_Used(thing, obj_time);
     }
 
-    if (yes_screen)
-    {
+    if (yes_screen) {
         raw_notify(player,
                    tprintf
                    ("Counted %d objects using %ld msecs over %d seconds.",
                     obj_counted, total_msecs,
                     (int)(time(NULL) - mudstate.cpu_count_from)));
     }
-    if (yes_log)
-    {
+    if (yes_log) {
         log_printf
         ("Counted %d objects using %ld msecs over %d seconds.",
          obj_counted, total_msecs,
@@ -1240,17 +1121,14 @@ void do_timecheck(dbref player, dbref cause, int key) {
 
     yes_screen = yes_log = yes_clear = 0;
 
-    if (key == 0)
-    {
+    if (key == 0) {
         /*
          * No switches, default to printing to screen and clearing
          * counters
          */
         yes_screen = 1;
         yes_clear = 1;
-    }
-    else
-    {
+    } else {
         if (key & TIMECHK_RESET)
             yes_clear = 1;
         if (key & TIMECHK_SCREEN)
@@ -1270,13 +1148,10 @@ void do_timecheck(dbref player, dbref cause, int key) {
 void write_pidfile(char *fn) {
     FILE *f;
 
-    if ((f = fopen(fn, "w")) != NULL)
-    {
+    if ((f = fopen(fn, "w")) != NULL) {
         fprintf(f, "%d\n", getpid());
         fclose(f);
-    }
-    else
-    {
+    } else {
         STARTLOG(LOG_ALWAYS, "PID", "FAIL")
         log_printf("Failed to write pidfile %s\n", fn);
         ENDLOG
@@ -1286,10 +1161,8 @@ void write_pidfile(char *fn) {
 void do_shutdown(dbref player, dbref cause, int key, char *message) {
     int fd;
 
-    if (key & SHUTDN_COREDUMP)
-    {
-        if (player != NOTHING)
-        {
+    if (key & SHUTDN_COREDUMP) {
+        if (player != NOTHING) {
             raw_broadcast(0, "GAME: Aborted by %s",
                           Name(Owner(player)));
             STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
@@ -1305,23 +1178,19 @@ void do_shutdown(dbref player, dbref cause, int key, char *message) {
          */
         abort();
     }
-    if (mudstate.dumping)
-    {
+    if (mudstate.dumping) {
         notify(player, "Dumping. Please try again later.");
         return;
     }
     do_dbck(NOTHING, NOTHING, 0);	/* dump consistent state */
 
-    if (player != NOTHING)
-    {
+    if (player != NOTHING) {
         raw_broadcast(0, "GAME: Shutdown by %s", Name(Owner(player)));
         STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
         log_printf("Shutdown by ");
         log_name(player);
         ENDLOG
-    }
-    else
-    {
+    } else {
         raw_broadcast(0, "GAME: Fatal Error: %s", message);
         STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
         log_printf("Fatal error: %s", message);
@@ -1349,20 +1218,16 @@ void dump_database_internal(int dump_type) {
 
     MODULE *mp;
 
-    switch (dump_type)
-    {
+    switch (dump_type) {
     case DUMP_DB_CRASH:
         sprintf(tmpfile, "%s/%s.CRASH", mudconf.dbhome, mudconf.db_file);
         unlink(tmpfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
-        if (f != NULL)
-        {
+        if (f != NULL) {
             db_write_flatfile(f, F_TINYMUSH,
                               UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
-        }
-        else
-        {
+        } else {
             log_perror("DMP", "FAIL", "Opening crash file",
                        tmpfile);
         }
@@ -1375,22 +1240,17 @@ void dump_database_internal(int dump_type) {
          * Trigger modules to write their flat-text dbs
          */
 
-        WALK_ALL_MODULES(mp)
-        {
-            if (mp->db_write_flatfile)
-            {
+        WALK_ALL_MODULES(mp) {
+            if (mp->db_write_flatfile) {
                 f = db_module_flatfile(mp->modname, 1);
-                if (f)
-                {
+                if (f) {
                     (*(mp->db_write_flatfile)) (f);
                     tf_fclose(f);
                 }
             }
-            if (mp->dump_database)
-            {
+            if (mp->dump_database) {
                 f = db_module_flatfile(mp->modname, 1);
-                if (f)
-                {
+                if (f) {
                     (*(mp->dump_database)) (f);
                     tf_fclose(f);
                 }
@@ -1406,14 +1266,11 @@ void dump_database_internal(int dump_type) {
             *c = '\0';
         sprintf(tmpfile, "%s/%s.FLAT", mudconf.dbhome, prevfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
-        if (f != NULL)
-        {
+        if (f != NULL) {
             db_write_flatfile(f, F_TINYMUSH,
                               UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
-        }
-        else
-        {
+        } else {
             log_perror("DMP", "FAIL", "Opening flatfile", tmpfile);
         }
 
@@ -1424,17 +1281,14 @@ void dump_database_internal(int dump_type) {
             *c = '\0';
         sprintf(tmpfile, "%s/%s.KILLED", mudconf.dbhome, prevfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
-        if (f != NULL)
-        {
+        if (f != NULL) {
             /*
              * Write a flatfile
              */
             db_write_flatfile(f, F_TINYMUSH,
                               UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
-        }
-        else
-        {
+        } else {
             log_perror("DMP", "FAIL", "Opening killed file",
                        tmpfile);
         }
@@ -1455,13 +1309,10 @@ void dump_database_internal(int dump_type) {
      * Call modules to write to their flat-text database
      */
 
-    WALK_ALL_MODULES(mp)
-    {
-        if (mp->dump_database)
-        {
+    WALK_ALL_MODULES(mp) {
+        if (mp->dump_database) {
             f = db_module_flatfile(mp->modname, 1);
-            if (f)
-            {
+            if (f) {
                 (*(mp->dump_database)) (f);
                 tf_fclose(f);
             }
@@ -1469,8 +1320,7 @@ void dump_database_internal(int dump_type) {
     }
 }
 
-void dump_database(void)
-{
+void dump_database(void) {
     mudstate.epoch++;
     mudstate.dumping = 1;
     STARTLOG(LOG_DBSAVES, "DMP", "DUMP")
@@ -1490,14 +1340,12 @@ void fork_and_dump(int key) {
     mudstate.epoch++;
     mudstate.dumping = 1;
     STARTLOG(LOG_DBSAVES, "DMP", "CHKPT")
-    if (!key || (key & DUMP_TEXT))
-    {
+    if (!key || (key & DUMP_TEXT)) {
         log_printf("SYNCing");
         if (!key || (key & DUMP_STRUCT))
             log_printf(" and ");
     }
-    if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE))
-    {
+    if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE)) {
         log_printf("Checkpointing: %s.#%d#",
                    mudconf.db_file, mudstate.epoch);
     }
@@ -1505,53 +1353,37 @@ void fork_and_dump(int key) {
     if (!key || (key & DUMP_TEXT))
         pcache_sync();
 
-    if (!(key & DUMP_FLATFILE))
-    {
+    if (!(key & DUMP_FLATFILE)) {
         SYNC;
         if ((key & DUMP_OPTIMIZE) ||
                 (mudconf.dbopt_interval &&
-                 (mudstate.epoch % mudconf.dbopt_interval == 0)))
-        {
+                 (mudstate.epoch % mudconf.dbopt_interval == 0))) {
             OPTIMIZE;
         }
     }
-    if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE))
-    {
-        if (mudconf.fork_dump)
-        {
-            if (mudconf.fork_vfork)
-            {
+    if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE)) {
+        if (mudconf.fork_dump) {
+            if (mudconf.fork_vfork) {
                 mudstate.dumper = vfork();
-            }
-            else
-            {
+            } else {
                 mudstate.dumper = fork();
             }
-        }
-        else
-        {
+        } else {
             mudstate.dumper = 0;
         }
-        if (mudstate.dumper == 0)
-        {
-            if (key & DUMP_FLATFILE)
-            {
+        if (mudstate.dumper == 0) {
+            if (key & DUMP_FLATFILE) {
                 dump_database_internal(DUMP_DB_FLATFILE);
-            }
-            else
-            {
+            } else {
                 dump_database_internal(DUMP_DB_NORMAL);
             }
             if (mudconf.fork_dump)
                 _exit(0);
-        }
-        else if (mudstate.dumper < 0)
-        {
+        } else if (mudstate.dumper < 0) {
             log_perror("DMP", "FORK", NULL, "fork()");
         }
     }
-    if (mudstate.dumper <= 0 || kill(mudstate.dumper, 0) == -1)
-    {
+    if (mudstate.dumper <= 0 || kill(mudstate.dumper, 0) == -1) {
         mudstate.dumping = 0;
         mudstate.dumper = 0;
     }
@@ -1568,8 +1400,7 @@ static int load_game(void) {
 
     STARTLOG(LOG_STARTUP, "INI", "LOAD")
     log_printf("Loading object structures.");
-    ENDLOG if (db_read() < 0)
-    {
+    ENDLOG if (db_read() < 0) {
         STARTLOG(LOG_ALWAYS, "INI", "FATAL")
         log_printf("Error loading object structures.");
         ENDLOG return -1;
@@ -1584,15 +1415,12 @@ static int load_game(void) {
      * Call modules to load data from their flat-text database
      */
 
-    WALK_ALL_MODULES(mp)
-    {
+    WALK_ALL_MODULES(mp) {
         if ((modfunc =
                     DLSYM(mp->handle, mp->modname, "load_database",
-                          (FILE *))) != NULL)
-        {
+                          (FILE *))) != NULL) {
             f = db_module_flatfile(mp->modname, 0);
-            if (f)
-            {
+            if (f) {
                 (*modfunc) (f);
                 tf_fclose(f);
             }
@@ -1610,25 +1438,19 @@ int list_check(dbref thing, dbref player, char type, char *str, char *raw_str, i
     int match;
 
     match = 0;
-    while (thing != NOTHING)
-    {
+    while (thing != NOTHING) {
         if ((thing != player) &&
                 (atr_match(thing, player, type, str, raw_str,
-                           check_parent) > 0))
-        {
+                           check_parent) > 0)) {
             match = 1;
-            if (Stop_Match(thing))
-            {
+            if (Stop_Match(thing)) {
                 *stop_status = 1;
                 return match;
             }
         }
-        if (thing != Next(thing))
-        {
+        if (thing != Next(thing)) {
             thing = Next(thing);
-        }
-        else
-        {
+        } else {
             thing = NOTHING;	/* make sure we don't
 						 * infinite loop */
         }
@@ -1656,8 +1478,7 @@ int Hearer(dbref thing) {
 
     buff = alloc_lbuf("Hearer");
     atr_push();
-    for (attr = atr_head(thing, &as); attr; attr = atr_next(&as))
-    {
+    for (attr = atr_head(thing, &as); attr; attr = atr_next(&as)) {
         ap = atr_num(attr);
         if (!ap || (ap->flags & AF_NOPROG))
             continue;
@@ -1676,8 +1497,7 @@ int Hearer(dbref thing) {
          */
 
         for (s = buff + 1; *s && (*s != ':'); s++);
-        if (s)
-        {
+        if (s) {
             free_lbuf(buff);
             atr_pop();
             return 1;
@@ -1703,13 +1523,10 @@ void do_logwrite(dbref player, dbref cause, int key, char *msgtype, char *messag
      * Otherwise, truncate msgtype to five characters and capitalize.
      */
 
-    if (!message || !*message)
-    {
+    if (!message || !*message) {
         mt = (const char *)"LOCAL";
         msg = msgtype;
-    }
-    else
-    {
+    } else {
         if (strlen(msgtype) > 5)
             msgtype[5] = '\0';
         for (p = msgtype; *p; p++)
@@ -1738,13 +1555,10 @@ void do_logrotate(dbref player, dbref cause, int key) {
 
     mudstate.mudlognum++;
 
-    if (mainlog_fp == stderr)
-    {
+    if (mainlog_fp == stderr) {
         notify(player,
                "Warning: can't rotate main log when logging to stderr.");
-    }
-    else
-    {
+    } else {
         fclose(mainlog_fp);
         rename(mudconf.log_file,
                tprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
@@ -1759,10 +1573,8 @@ void do_logrotate(dbref player, dbref cause, int key) {
     /*
      * Any additional special ones
      */
-    for (lp = logfds_table; lp->log_flag; lp++)
-    {
-        if (lp->filename && lp->fileptr)
-        {
+    for (lp = logfds_table; lp->log_flag; lp++) {
+        if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
             rename(lp->filename,
                    tprintf("%s.%ld", lp->filename,
@@ -1803,8 +1615,7 @@ static void process_preload(void) {
     pp = (PROPDIR *) XMALLOC(sizeof(PROPDIR), "process_preload.propdir");
     tstr = alloc_lbuf("process_preload.string");
     i = 0;
-    DO_WHOLE_DB(thing)
-    {
+    DO_WHOLE_DB(thing) {
 
         /*
          * Ignore GOING objects
@@ -1818,18 +1629,15 @@ static void process_preload(void) {
          * anything else, so startup notifications work correctly.
          */
 
-        if (H_Fwdlist(thing))
-        {
+        if (H_Fwdlist(thing)) {
             (void)atr_get_str(tstr, thing, A_FORWARDLIST,
                               &aowner, &aflags, &alen);
-            if (*tstr)
-            {
+            if (*tstr) {
                 fp->data = NULL;
                 fwdlist_load(fp, GOD, tstr);
                 if (fp->count > 0)
                     fwdlist_set(thing, fp);
-                if (fp->data)
-                {
+                if (fp->data) {
                     XFREE(fp->data,
                           "process_preload.fwdlist_data");
                 }
@@ -1839,18 +1647,15 @@ static void process_preload(void) {
          * Ditto for PROPDIRs
          */
 
-        if (H_Propdir(thing))
-        {
+        if (H_Propdir(thing)) {
             (void)atr_get_str(tstr, thing, A_PROPDIR,
                               &aowner, &aflags, &alen);
-            if (*tstr)
-            {
+            if (*tstr) {
                 pp->data = NULL;
                 propdir_load(pp, GOD, tstr);
                 if (pp->count > 0)
                     propdir_set(thing, pp);
-                if (pp->data)
-                {
+                if (pp->data) {
                     XFREE(pp->data,
                           "process_preload.propdir_data");
                 }
@@ -1862,10 +1667,8 @@ static void process_preload(void) {
          * Look for STARTUP and DAILY attributes on parents.
          */
 
-        ITER_PARENTS(thing, parent, lev)
-        {
-            if (H_Startup(thing))
-            {
+        ITER_PARENTS(thing, parent, lev) {
+            if (H_Startup(thing)) {
                 did_it(Owner(thing), thing,
                        A_NULL, NULL, A_NULL, NULL,
                        A_STARTUP, 0, (char **)NULL, 0, 0);
@@ -1879,10 +1682,8 @@ static void process_preload(void) {
             }
         }
 
-        ITER_PARENTS(thing, parent, lev)
-        {
-            if (Flags2(thing) & HAS_DAILY)
-            {
+        ITER_PARENTS(thing, parent, lev) {
+            if (Flags2(thing) & HAS_DAILY) {
                 sprintf(tbuf, "0 %d * * *",
                         mudconf.events_daily_hour);
                 call_cron(thing, thing, A_DAILY, tbuf);
@@ -1904,8 +1705,7 @@ static void process_preload(void) {
 void info(int fmt, int flags, int ver) {
     const char *cp;
 
-    switch (fmt)
-    {
+    switch (fmt) {
     case F_TINYMUSH:
         cp = "TinyMUSH-3";
         break;
@@ -1937,8 +1737,7 @@ void info(int fmt, int flags, int ver) {
         mainlog_printf(" GDBM");
     if (flags & V_ATRNAME)
         mainlog_printf(" AtrName");
-    if (flags & V_ATRKEY)
-    {
+    if (flags & V_ATRKEY) {
         if ((fmt == F_MUSH) && (ver == 2))
             mainlog_printf(" ExtLocks");
         else
@@ -2018,10 +1817,8 @@ int dbconvert(int argc, char *argv[]) {
 
     while ((c =
                 getopt(argc, argv,
-                       "c:d:D:CqGgZzLlNnKkPpWwXx0123456789")) != -1)
-    {
-        switch (c)
-        {
+                       "c:d:D:CqGgZzLlNnKkPpWwXx0123456789")) != -1) {
+        switch (c) {
         case 'c':
             opt_conf = optarg;
             break;
@@ -2106,8 +1903,7 @@ int dbconvert(int argc, char *argv[]) {
         }
     }
 
-    if (errflg || optind >= argc)
-    {
+    if (errflg || optind >= argc) {
         usage(argv[0]);
         exit(1);
     }
@@ -2130,8 +1926,7 @@ int dbconvert(int argc, char *argv[]) {
      */
 
     vattr_init();
-    if (init_gdbm_db(argv[optind]) < 0)
-    {
+    if (init_gdbm_db(argv[optind]) < 0) {
         mainlog_printf("Can't open GDBM file\n");
         exit(1);
     }
@@ -2145,8 +1940,7 @@ int dbconvert(int argc, char *argv[]) {
      * Go do it
      */
 
-    if (!(setflags & V_GDBM))
-    {
+    if (!(setflags & V_GDBM)) {
         db_read();
 
         /*
@@ -2158,24 +1952,19 @@ int dbconvert(int argc, char *argv[]) {
         db_format = F_TINYMUSH;
         db_ver = OUTPUT_VERSION;
         db_flags = OUTPUT_FLAGS;
-    }
-    else
-    {
+    } else {
         db_read_flatfile(stdin, &db_format, &db_ver, &db_flags);
 
         /*
          * Call modules to load their flatfiles
          */
 
-        WALK_ALL_MODULES(mp)
-        {
+        WALK_ALL_MODULES(mp) {
             if ((modfunc =
                         DLSYM(mp->handle, mp->modname,
-                              "db_read_flatfile", (FILE *))) != NULL)
-            {
+                              "db_read_flatfile", (FILE *))) != NULL) {
                 f = db_module_flatfile(mp->modname, 0);
-                if (f)
-                {
+                if (f) {
                     (*modfunc) (f);
                     tf_fclose(f);
                 }
@@ -2189,8 +1978,7 @@ int dbconvert(int argc, char *argv[]) {
     if (do_check)
         do_dbck(NOTHING, NOTHING, DBCK_FULL);
 
-    if (do_write)
-    {
+    if (do_write) {
         db_flags = (db_flags & ~clrflags) | setflags;
         if (ver != 0)
             db_ver = ver;
@@ -2198,8 +1986,7 @@ int dbconvert(int argc, char *argv[]) {
             db_ver = 3;
         mainlog_printf("Output: ");
         info(F_TINYMUSH, db_flags, db_ver);
-        if (db_flags & V_GDBM)
-        {
+        if (db_flags & V_GDBM) {
             db_write();
 
             /*
@@ -2209,9 +1996,7 @@ int dbconvert(int argc, char *argv[]) {
             db_lock();
             CALL_ALL_MODULES_NOCACHE("db_write", (void), ());
             db_unlock();
-        }
-        else
-        {
+        } else {
             db_write_flatfile(stdout, F_TINYMUSH,
                               db_ver | db_flags | dbclean);
 
@@ -2219,16 +2004,13 @@ int dbconvert(int argc, char *argv[]) {
              * Call all modules to write to flatfile
              */
 
-            WALK_ALL_MODULES(mp)
-            {
+            WALK_ALL_MODULES(mp) {
                 if ((modfunc =
                             DLSYM(mp->handle, mp->modname,
                                   "db_write_flatfile",
-                                  (FILE *))) != NULL)
-                {
+                                  (FILE *))) != NULL) {
                     f = db_module_flatfile(mp->modname, 1);
-                    if (f)
-                    {
+                    if (f) {
                         (*modfunc) (f);
                         tf_fclose(f);
                     }
@@ -2271,12 +2053,9 @@ int main(int argc, char *argv[]) {
      */
 
     s = strrchr(argv[0], (int)'/');
-    if (s)
-    {
+    if (s) {
         s++;
-    }
-    else
-    {
+    } else {
         s = argv[0];
     }
 
@@ -2285,8 +2064,7 @@ int main(int argc, char *argv[]) {
      * exit
      */
 
-    if (s && *s && !strcmp(s, "dbconvert"))
-    {
+    if (s && *s && !strcmp(s, "dbconvert")) {
         dbconvert(argc, argv);
     }
 #if !defined(TEST_MALLOC) && defined(RAW_MEMTRACKING)
@@ -2299,14 +2077,12 @@ int main(int argc, char *argv[]) {
     /*
      * Parse options
      */
-     
+
     mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
 
-    while ((c = getopt(argc, argv, "c:l:p:b:t:d:g:k:s")) != -1)
-    {
-        switch (c)
-        {
-        
+    while ((c = getopt(argc, argv, "c:l:p:b:t:d:g:k:s")) != -1) {
+        switch (c) {
+
         case 'c':
             XFREE(mudconf.mud_shortname, "main_mudconf_mud_shortname");
             mudconf.mud_shortname = XSTRDUP(optarg, "main_mudconf_mud_shortname");
@@ -2320,8 +2096,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (errflg)
-    {
+    if (errflg) {
         fprintf(stderr, "Usage: %s [-s] [-c mush short name]\n", argv[0]);
         exit(1);
     }
@@ -2330,23 +2105,20 @@ int main(int argc, char *argv[]) {
     mudconf.config_file = XSTRDUP(tprintf("%s.conf", mudconf.mud_shortname), "main_mudconf_config_file");
     mudconf.log_file = XSTRDUP(tprintf("%s.log", mudconf.mud_shortname), "main_mudconf_log_file");
     mudconf.pid_file = XSTRDUP(tprintf("%s.pid", mudconf.mud_shortname), "main_mudconf_pidfile");
-    
+
     write_pidfile(mudconf.pid_file);
 
     /*
      * Abort if someone tried to set the number of global registers to
      * something stupid. Also adjust the character table if we need to.
      */
-    if ((MAX_GLOBAL_REGS < 10) || (MAX_GLOBAL_REGS > 36))
-    {
+    if ((MAX_GLOBAL_REGS < 10) || (MAX_GLOBAL_REGS > 36)) {
         fprintf(stderr,
                 "You have compiled TinyMUSH with MAX_GLOBAL_REGS defined to be less than 10 or more than 36. Please fix this error and recompile.\n");
         exit(1);
     }
-    if (MAX_GLOBAL_REGS < 36)
-    {
-        for (i = 0; i < 36 - MAX_GLOBAL_REGS; i++)
-        {
+    if (MAX_GLOBAL_REGS < 36) {
+        for (i = 0; i < 36 - MAX_GLOBAL_REGS; i++) {
             qidx_chartab[90 - i] = -1;
             qidx_chartab[122 - i] = -1;
         }
@@ -2418,10 +2190,8 @@ int main(int argc, char *argv[]) {
     vattr_init();
 
     bp = mudstate.modloaded;
-    WALK_ALL_MODULES(mp)
-    {
-        if (bp != mudstate.modloaded)
-        {
+    WALK_ALL_MODULES(mp) {
+        if (bp != mudstate.modloaded) {
             safe_mb_chr(' ', mudstate.modloaded, &bp);
         }
         safe_mb_str(mp->modname, mudstate.modloaded, &bp);
@@ -2434,8 +2204,7 @@ int main(int argc, char *argv[]) {
 
     if (mindb)
         unlink(mudconf.db_file);
-    if (init_gdbm_db(mudconf.db_file) < 0)
-    {
+    if (init_gdbm_db(mudconf.db_file) < 0) {
         STARTLOG(LOG_ALWAYS, "INI", "LOAD")
         log_printf("Couldn't load text database: %s",
                    mudconf.db_file);
@@ -2444,13 +2213,10 @@ int main(int argc, char *argv[]) {
     mudstate.record_players = 0;
 
     mudstate.loading_db = 1;
-    if (mindb)
-    {
+    if (mindb) {
         db_make_minimal();
         CALL_ALL_MODULES_NOCACHE("make_minimal", (void), ());
-    }
-    else if (load_game() < 0)
-    {
+    } else if (load_game() < 0) {
         STARTLOG(LOG_ALWAYS, "INI", "LOAD")
         log_printf("Couldn't load objects.");
         ENDLOG exit(2);
@@ -2464,8 +2230,7 @@ int main(int argc, char *argv[]) {
      * Do a consistency check and set up the freelist
      */
 
-    if (!Good_obj(GOD) || !isPlayer(GOD))
-    {
+    if (!Good_obj(GOD) || !isPlayer(GOD)) {
         STARTLOG(LOG_ALWAYS, "CNF", "VRFY")
         log_printf
         ("Fatal error: GOD object #%d is not a valid player.",
@@ -2505,23 +2270,18 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < mudstate.helpfiles; i++)
         hashreset(&mudstate.hfile_hashes[i]);
 
-    WALK_ALL_MODULES(mp)
-    {
+    WALK_ALL_MODULES(mp) {
         m_htab = DLSYM_VAR(mp->handle, mp->modname,
                            "hashtable", MODHASHES *);
-        if (m_htab)
-        {
-            for (hp = m_htab; hp->tabname != NULL; hp++)
-            {
+        if (m_htab) {
+            for (hp = m_htab; hp->tabname != NULL; hp++) {
                 hashreset(hp->htab);
             }
         }
         m_ntab = DLSYM_VAR(mp->handle, mp->modname,
                            "nhashtable", MODNHASHES *);
-        if (m_ntab)
-        {
-            for (np = m_ntab; np->tabname != NULL; np++)
-            {
+        if (m_ntab) {
+            for (np = m_ntab; np->tabname != NULL; np++) {
                 nhashreset(np->htab);
             }
         }
@@ -2540,8 +2300,7 @@ int main(int argc, char *argv[]) {
 
     load_restart_db();
 
-    if (!mudstate.restarting)
-    {
+    if (!mudstate.restarting) {
         /*
          * CAUTION: We do this here rather than up at the top of this
          * function because we need to know if we're restarting. If
@@ -2601,8 +2360,7 @@ int main(int argc, char *argv[]) {
     do_hashresize(GOD, GOD, 0);
     STARTLOG(LOG_STARTUP, "INI", "LOAD")
     log_printf("Cleanup completed.");
-    ENDLOG if (mudstate.restarting)
-    {
+    ENDLOG if (mudstate.restarting) {
         raw_broadcast(0, "GAME: Restart finished.");
     }
 #ifdef MCHECK
@@ -2624,14 +2382,12 @@ int main(int argc, char *argv[]) {
     dump_database();
     CLOSE;
 
-    if (slave_socket != -1)
-    {
+    if (slave_socket != -1) {
         shutdown(slave_socket, 2);
         close(slave_socket);
         slave_socket = -1;
     }
-    if (slave_pid != 0)
-    {
+    if (slave_pid != 0) {
         kill(slave_pid, SIGKILL);
     }
     exit(0);
@@ -2643,8 +2399,7 @@ static void init_rlimit(void) {
 
     rlp = (struct rlimit *)XMALLOC(sizeof(struct rlimit), "rlimit");
 
-    if (getrlimit(RLIMIT_NOFILE, rlp))
-    {
+    if (getrlimit(RLIMIT_NOFILE, rlp)) {
         log_perror("RLM", "FAIL", NULL, "getrlimit()");
         free_lbuf(rlp);
         return;

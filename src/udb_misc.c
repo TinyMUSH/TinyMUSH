@@ -8,6 +8,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -15,7 +16,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -25,27 +26,17 @@
  * Log database errors
  */
 
-void
-log_db_err(obj, attr, txt)
-int obj, attr;
-
-const char *txt;
-{
-    if (!mudstate.standalone)
-    {
+void log_db_err(int obj, int attr, const char *txt) {
+    if (!mudstate.standalone) {
         STARTLOG(LOG_ALWAYS, "DBM", "ERROR")
         log_printf("Could not %s object #%d", txt, obj);
-        if (attr != NOTHING)
-        {
+        if (attr != NOTHING) {
             log_printf(" attr #%d", attr);
         }
         ENDLOG
-    }
-    else
-    {
+    } else {
         mainlog_printf("Could not %s object #%d", txt, obj);
-        if (attr != NOTHING)
-        {
+        if (attr != NOTHING) {
             mainlog_printf(" attr #%d", attr);
         }
         mainlog_printf("\n");
@@ -58,28 +49,12 @@ const char *txt;
 /*
  * VARARGS
  */
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void
-warning(char *p, ...)
-#else
-void
-warning(va_alist)
-va_dcl
-#endif
-{
+void warning(char *p, ...) {
     va_list ap;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, p);
-#else
-    char *p;
 
-    va_start(ap);
-    p = va_arg(ap, char *);
-
-#endif
-    while (1)
-    {
+    while (1) {
         if (p == (char *)0)
             break;
 
@@ -98,28 +73,12 @@ va_dcl
 /*
  * VARARGS
  */
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void
-fatal(char *p, ...)
-#else
-void
-fatal(va_alist)
-va_dcl
-#endif
-{
+void fatal(char *p, ...) {
     va_list ap;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, p);
-#else
-    char *p;
 
-    va_start(ap);
-    p = va_arg(ap, char *);
-
-#endif
-    while (1)
-    {
+    while (1) {
         if (p == (char *)0)
             break;
 

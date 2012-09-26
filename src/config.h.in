@@ -2134,6 +2134,5 @@
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
 
-#include "autoconfig.h"
 
 #endif /* __AUTOCONF_H */

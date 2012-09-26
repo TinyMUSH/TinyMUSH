@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -17,12 +18,7 @@
 
 #include "version.h"		/* required by code */
 
-void
-do_version(player, cause, extra)
-dbref player, cause;
-
-int extra;
-{
+void do_version(dbref player, dbref cause, int extra) {
 #ifdef HAVE_SYS_UTSNAME_H
     struct utsname bpInfo;
 #endif
@@ -78,9 +74,7 @@ int extra;
     }
 }
 
-void
-NDECL(init_version)
-{
+void init_version() {
 
     /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Revision.Status
         Major version	: The main branch.

@@ -98,8 +98,7 @@ AH_TOP([#ifndef __AUTOCONF_H
 
 #include "copyright.h"])
 
-AH_BOTTOM([#include "autoconfig.h"
-
+AH_BOTTOM([
 #endif /* __AUTOCONF_H */])
 
 AC_MSG_CHECKING([dbm engine to use])

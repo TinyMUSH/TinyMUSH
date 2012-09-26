@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -23,14 +24,7 @@
 #include "powers.h"		/* required by code */
 
 
-void
-do_teleport(player, cause, key, arg1, arg2)
-dbref player, cause;
-
-int key;
-
-char *arg1, *arg2;
-{
+void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     dbref victim, destination, loc, exitloc;
 
     char *to;
@@ -38,8 +32,7 @@ char *arg1, *arg2;
     int hush = 0;
 
     if (((Fixed(player)) || (Fixed(Owner(player)))) &&
-            !(Tel_Anywhere(player)))
-    {
+            !(Tel_Anywhere(player))) {
         notify(player, mudconf.fixed_tel_msg);
         return;
     }
@@ -48,13 +41,10 @@ char *arg1, *arg2;
      * get victim
      */
 
-    if (*arg2 == '\0')
-    {
+    if (*arg2 == '\0') {
         victim = player;
         to = arg1;
-    }
-    else
-    {
+    } else {
         init_match(player, arg1, NOTYPE);
         match_everything(0);
         victim = noisy_match_result();
@@ -68,8 +58,7 @@ char *arg1, *arg2;
      * Validate type of victim
      */
 
-    if (!Has_location(victim) && !isExit(victim))
-    {
+    if (!Has_location(victim) && !isExit(victim)) {
         notify_quiet(player, "You can't teleport that.");
         return;
     }
@@ -82,18 +71,14 @@ char *arg1, *arg2;
      * * the victim or the victim's location.
      */
 
-    if (isExit(victim))
-    {
+    if (isExit(victim)) {
         if ((Location(victim) != NOTHING) && !Controls(player, victim)
-                && !Controls(player, Exits(victim)))
-        {
+                && !Controls(player, Exits(victim))) {
             notify_quiet(player, NOPERM_MESSAGE);
             return;
         }
-    }
-    else if (!Controls(player, victim) &&
-             !Controls(player, Location(victim)) && !Tel_Anything(player))
-    {
+    } else if (!Controls(player, victim) &&
+               !Controls(player, Location(victim)) && !Tel_Anything(player)) {
         notify_quiet(player, NOPERM_MESSAGE);
         return;
     }
@@ -101,8 +86,7 @@ char *arg1, *arg2;
      * Check for teleporting home. Exits don't have homes.
      */
 
-    if (!string_compare(to, "home"))
-    {
+    if (!string_compare(to, "home")) {
         if (isExit(victim))
             notify_quiet(player, NOPERM_MESSAGE);
         else
@@ -117,8 +101,7 @@ char *arg1, *arg2;
     match_everything(0);
     destination = match_result();
 
-    switch (destination)
-    {
+    switch (destination) {
     case NOTHING:
         notify_quiet(player, "No match.");
         return;
@@ -127,8 +110,7 @@ char *arg1, *arg2;
                      "I don't know which destination you mean!");
         return;
     default:
-        if ((victim == destination) || Going(destination))
-        {
+        if ((victim == destination) || Going(destination)) {
             notify_quiet(player, "Bad destination.");
             return;
         }
@@ -139,13 +121,11 @@ char *arg1, *arg2;
      * location (after LEAVEing any objects) or it must be JUMP_OK.
      */
 
-    if (mudconf.fascist_tport)
-    {
+    if (mudconf.fascist_tport) {
         loc = where_room(victim);
         if (!Good_obj(loc) || !isRoom(loc) ||
                 !(Controls(player, loc) || Jump_ok(loc) ||
-                  Tel_Anywhere(player)))
-        {
+                  Tel_Anywhere(player))) {
             notify_quiet(player, NOPERM_MESSAGE);
             return;
         }
@@ -155,11 +135,9 @@ char *arg1, *arg2;
      * If this is an exit, the same privs involved as @open apply.
      */
 
-    if (isExit(victim))
-    {
+    if (isExit(victim)) {
         if (!Has_exits(destination) ||
-                (!Controls(player, destination) && !Open_Anywhere(player)))
-        {
+                (!Controls(player, destination) && !Open_Anywhere(player))) {
             notify_quiet(player, NOPERM_MESSAGE);
             return;
         }
@@ -172,8 +150,7 @@ char *arg1, *arg2;
         return;
     }
 
-    if (Has_contents(destination))
-    {
+    if (Has_contents(destination)) {
 
         /*
          * You must control the destination, or it must be a JUMP_OK
@@ -184,8 +161,7 @@ char *arg1, *arg2;
         if (!(Controls(player, destination) ||
                 (Jump_ok(destination) &&
                  could_doit(victim, destination, A_LTPORT)) ||
-                Tel_Anywhere(player)))
-        {
+                Tel_Anywhere(player))) {
 
             /*
              * Nope, report failure
@@ -206,24 +182,17 @@ char *arg1, *arg2;
         if (key & TELEPORT_QUIET)
             hush = HUSH_ENTER | HUSH_LEAVE;
 
-        if (move_via_teleport(victim, destination, cause, hush))
-        {
-            if (player != victim)
-            {
+        if (move_via_teleport(victim, destination, cause, hush)) {
+            if (player != victim) {
                 if (!Quiet(player))
                     notify_quiet(player, "Teleported.");
             }
         }
-    }
-    else if (isExit(destination))
-    {
-        if (Exits(destination) == Location(victim))
-        {
+    } else if (isExit(destination)) {
+        if (Exits(destination) == Location(victim)) {
             move_exit(victim, destination, 0,
                       "You can't go that way.", 0);
-        }
-        else
-        {
+        } else {
             notify_quiet(player, "I can't find that exit.");
         }
     }
@@ -234,14 +203,7 @@ char *arg1, *arg2;
  * do_force_prefixed: Interlude to do_force for the # command
  */
 
-void
-do_force_prefixed(player, cause, key, command, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *command, *args[];
-{
+void do_force_prefixed(dbref player, dbref cause, int key, char *command, char *args[], int nargs) {
     char *cp;
 
     cp = parse_to(&command, ' ', 0);
@@ -258,14 +220,7 @@ char *command, *args[];
  * do_force: Force an object to do something.
  */
 
-void
-do_force(player, cause, key, what, command, args, nargs)
-dbref player, cause;
-
-int key, nargs;
-
-char *what, *command, *args[];
-{
+void do_force(dbref player, dbref cause, int key, char *what, char *command, char *args[], int nargs) {
     dbref victim;
 
     if ((victim = match_controlled(player, what)) == NOTHING)
@@ -287,14 +242,7 @@ char *what, *command, *args[];
  * do_toad: Turn a player into an object.
  */
 
-void
-do_toad(player, cause, key, toad, newowner)
-dbref player, cause;
-
-int key;
-
-char *toad, *newowner;
-{
+void do_toad(dbref player, dbref cause, int key, char *toad, char *newowner) {
     dbref victim, recipient, loc, aowner;
 
     char *buf;
@@ -308,27 +256,22 @@ char *toad, *newowner;
     if ((victim = noisy_match_result()) == NOTHING)
         return;
 
-    if (!isPlayer(victim))
-    {
+    if (!isPlayer(victim)) {
         notify_quiet(player, "Try @destroy instead.");
         return;
     }
-    if (No_Destroy(victim))
-    {
+    if (No_Destroy(victim)) {
         notify_quiet(player, "You can't toad that player.");
         return;
     }
-    if ((newowner != NULL) && *newowner)
-    {
+    if ((newowner != NULL) && *newowner) {
         init_match(player, newowner, TYPE_PLAYER);
         match_neighbor();
         match_absolute();
         match_player();
         if ((recipient = noisy_match_result()) == NOTHING)
             return;
-    }
-    else
-    {
+    } else {
         recipient = player;
     }
 
@@ -340,12 +283,9 @@ char *toad, *newowner;
     /*
      * Clear everything out
      */
-    if (key & TOAD_NO_CHOWN)
-    {
+    if (key & TOAD_NO_CHOWN) {
         count = -1;
-    }
-    else
-    {
+    } else {
         count = chown_all(victim, recipient, player, 0);
         s_Owner(victim, recipient);	/*
 						 * you get it
@@ -391,33 +331,23 @@ char *toad, *newowner;
                                  count, (count == 1 ? "" : "s")));
 }
 
-void
-do_newpassword(player, cause, key, name, password)
-dbref player, cause;
-
-int key;
-
-char *name, *password;
-{
+void do_newpassword(dbref player, dbref cause, int key, char *name, char *password) {
     dbref victim;
 
     char *buf, *bp;
 
-    if ((victim = lookup_player(player, name, 0)) == NOTHING)
-    {
+    if ((victim = lookup_player(player, name, 0)) == NOTHING) {
         notify_quiet(player, "No such player.");
         return;
     }
-    if (*password != '\0' && !ok_password(password, player))
-    {
+    if (*password != '\0' && !ok_password(password, player)) {
         /*
          * Can set null passwords, but not bad passwords.
          * * Notification of reason done by ok_password().
          */
         return;
     }
-    if (God(victim))
-    {
+    if (God(victim)) {
         notify_quiet(player,
                      "You cannot change that player's password.");
         return;
@@ -440,33 +370,21 @@ char *name, *password;
     free_lbuf(buf);
 }
 
-void
-do_boot(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_boot(dbref player, dbref cause, int key, char *name) {
     dbref victim;
 
     char *buf, *bp;
 
     int count;
 
-    if (!(Can_Boot(player)))
-    {
+    if (!(Can_Boot(player))) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
-    if (key & BOOT_PORT)
-    {
-        if (is_number(name))
-        {
+    if (key & BOOT_PORT) {
+        if (is_number(name)) {
             victim = (int)strtol(name, (char **)NULL, 10);
-        }
-        else
-        {
+        } else {
             notify_quiet(player, "That's not a number!");
             return;
         }
@@ -474,9 +392,7 @@ char *name;
         log_printf("Port %d was @booted by ", victim);
         log_name(player);
         ENDLOG
-    }
-    else
-    {
+    } else {
         init_match(player, name, TYPE_PLAYER);
         match_neighbor();
         match_absolute();
@@ -484,13 +400,11 @@ char *name;
         if ((victim = noisy_match_result()) == NOTHING)
             return;
 
-        if (God(victim))
-        {
+        if (God(victim)) {
             notify_quiet(player, "You cannot boot that player!");
             return;
         }
-        if ((!isPlayer(victim) && !God(player)) || (player == victim))
-        {
+        if ((!isPlayer(victim) && !God(player)) || (player == victim)) {
             notify_quiet(player,
                          "You can only boot off other players!");
             return;
@@ -503,12 +417,9 @@ char *name;
         notify_quiet(player, tprintf("You booted %s off!",
                                      Name(victim)));
     }
-    if (key & BOOT_QUIET)
-    {
+    if (key & BOOT_QUIET) {
         buf = NULL;
-    }
-    else
-    {
+    } else {
         bp = buf = alloc_lbuf("do_boot.msg");
         safe_name(player, buf, &bp);
         safe_str((char *)" gently shows you the door.", buf, &bp);
@@ -530,14 +441,7 @@ char *name;
   do_poor: Reduce the wealth of anyone over a specified amount.
  */
 
-void
-do_poor(player, cause, key, arg1)
-dbref player, cause;
-
-int key;
-
-char *arg1;
-{
+void do_poor(dbref player, dbref cause, int key, char *arg1) {
     dbref a;
 
     int amt, curamt;
@@ -545,10 +449,8 @@ char *arg1;
     if (!is_number(arg1))
         return;
     amt = (int)strtol(arg1, (char **)NULL, 10);
-    DO_WHOLE_DB(a)
-    {
-        if (isPlayer(a))
-        {
+    DO_WHOLE_DB(a) {
+        if (isPlayer(a)) {
             curamt = Pennies(a);
             if (amt < curamt)
                 s_Pennies(a, amt);
@@ -561,19 +463,11 @@ char *arg1;
  * do_cut: Chop off a contents or exits chain after the named item.
  */
 
-void
-do_cut(player, cause, key, thing)
-dbref player, cause;
-
-int key;
-
-char *thing;
-{
+void do_cut(dbref player, dbref cause, int key, char *thing) {
     dbref object;
 
     object = match_controlled(player, thing);
-    switch (object)
-    {
+    switch (object) {
     case NOTHING:
         notify_quiet(player, "No match.");
         break;
@@ -590,19 +484,11 @@ char *thing;
  * do_motd: Wizard-settable message of the day (displayed on connect)
  */
 
-void
-do_motd(player, cause, key, message)
-dbref player, cause;
-
-int key;
-
-char *message;
-{
+void do_motd(dbref player, dbref cause, int key, char *message) {
     int is_brief;
 
     is_brief = 0;
-    if (key & MOTD_BRIEF)
-    {
+    if (key & MOTD_BRIEF) {
         is_brief = 1;
         key = key & ~MOTD_BRIEF;
         if (key == MOTD_ALL)
@@ -611,11 +497,9 @@ char *message;
             key |= MOTD_BRIEF;
     }
     message[GBUF_SIZE - 1] = '\0';
-    switch (key)
-    {
+    switch (key) {
     case MOTD_ALL:
-        if (mudconf.motd_msg)
-        {
+        if (mudconf.motd_msg) {
             XFREE(mudconf.motd_msg, "do_motd.motd");
         }
         mudconf.motd_msg = XSTRDUP(message, "do_motd.motd");
@@ -623,8 +507,7 @@ char *message;
             notify_quiet(player, "Set: MOTD.");
         break;
     case MOTD_WIZ:
-        if (mudconf.wizmotd_msg)
-        {
+        if (mudconf.wizmotd_msg) {
             XFREE(mudconf.wizmotd_msg, "do_motd.wizmotd");
         }
         mudconf.wizmotd_msg = XSTRDUP(message, "do_motd.wizmotd");
@@ -632,8 +515,7 @@ char *message;
             notify_quiet(player, "Set: Wizard MOTD.");
         break;
     case MOTD_DOWN:
-        if (mudconf.downmotd_msg)
-        {
+        if (mudconf.downmotd_msg) {
             XFREE(mudconf.downmotd_msg, "do_motd.downmotd");
         }
         mudconf.downmotd_msg = XSTRDUP(message, "do_motd.downmotd");
@@ -641,8 +523,7 @@ char *message;
             notify_quiet(player, "Set: Down MOTD.");
         break;
     case MOTD_FULL:
-        if (mudconf.fullmotd_msg)
-        {
+        if (mudconf.fullmotd_msg) {
             XFREE(mudconf.fullmotd_msg, "do_motd.fullmotd");
         }
         mudconf.fullmotd_msg = XSTRDUP(message, "do_motd.fullmotd");
@@ -650,10 +531,8 @@ char *message;
             notify_quiet(player, "Set: Full MOTD.");
         break;
     case MOTD_LIST:
-        if (Wizard(player))
-        {
-            if (!is_brief)
-            {
+        if (Wizard(player)) {
+            if (!is_brief) {
                 notify_quiet(player, "----- motd file -----");
                 fcache_send(player, FC_MOTD);
                 notify_quiet(player,
@@ -662,58 +541,41 @@ char *message;
                 notify_quiet(player,
                              "----- motd messages -----");
             }
-            if (mudconf.motd_msg && *mudconf.motd_msg)
-            {
+            if (mudconf.motd_msg && *mudconf.motd_msg) {
                 notify_quiet(player,
                              tprintf("MOTD: %s", mudconf.motd_msg));
-            }
-            else
-            {
+            } else {
                 notify_quiet(player, "No MOTD.");
             }
-            if (mudconf.wizmotd_msg && *mudconf.wizmotd_msg)
-            {
+            if (mudconf.wizmotd_msg && *mudconf.wizmotd_msg) {
                 notify_quiet(player,
                              tprintf("Wizard MOTD: %s",
                                      mudconf.wizmotd_msg));
-            }
-            else
-            {
+            } else {
                 notify_quiet(player, "No Wizard MOTD.");
             }
-            if (mudconf.downmotd_msg && *mudconf.downmotd_msg)
-            {
+            if (mudconf.downmotd_msg && *mudconf.downmotd_msg) {
                 notify_quiet(player,
                              tprintf("Down MOTD: %s",
                                      mudconf.downmotd_msg));
-            }
-            else
-            {
+            } else {
                 notify_quiet(player, "No Down MOTD.");
             }
-            if (mudconf.fullmotd_msg && *mudconf.fullmotd_msg)
-            {
+            if (mudconf.fullmotd_msg && *mudconf.fullmotd_msg) {
                 notify_quiet(player,
                              tprintf("Full MOTD: %s",
                                      mudconf.fullmotd_msg));
-            }
-            else
-            {
+            } else {
                 notify_quiet(player, "No Full MOTD.");
             }
-        }
-        else
-        {
+        } else {
             if (Guest(player))
                 fcache_send(player, FC_CONN_GUEST);
             else
                 fcache_send(player, FC_MOTD);
-            if (mudconf.motd_msg && *mudconf.motd_msg)
-            {
+            if (mudconf.motd_msg && *mudconf.motd_msg) {
                 notify_quiet(player, mudconf.motd_msg);
-            }
-            else
-            {
+            } else {
                 notify_quiet(player, "No MOTD.");
             }
         }
@@ -728,8 +590,7 @@ char *message;
  */
 /* *INDENT-OFF* */
 
-NAMETAB enable_names[] =
-{
+NAMETAB enable_names[] = {
     {(char *)"building",		1,	CA_PUBLIC,	CF_BUILD},
     {(char *)"checkpointing",	2,	CA_PUBLIC,	CF_CHECKPOINT},
     {(char *)"cleaning",		2,	CA_PUBLIC,	CF_DBCHECK},
@@ -745,14 +606,7 @@ NAMETAB enable_names[] =
 /* *INDENT-ON* */
 
 
-void
-do_global(player, cause, key, flag)
-dbref player, cause;
-
-int key;
-
-char *flag;
-{
+void do_global(dbref player, dbref cause, int key, char *flag) {
     int flagvalue;
 
     /*
@@ -760,30 +614,23 @@ char *flag;
      */
 
     flagvalue = search_nametab(player, enable_names, flag);
-    if (flagvalue < 0)
-    {
+    if (flagvalue < 0) {
         notify_quiet(player, "I don't know about that flag.");
-    }
-    else if (key == GLOB_ENABLE)
-    {
+    } else if (key == GLOB_ENABLE) {
         mudconf.control_flags |= flagvalue;
         STARTLOG(LOG_CONFIGMODS, "CFG", "GLOBAL")
         log_name(player);
         log_printf(" enabled: %s", flag);
         ENDLOG if (!Quiet(player))
             notify_quiet(player, "Enabled.");
-    }
-    else if (key == GLOB_DISABLE)
-    {
+    } else if (key == GLOB_DISABLE) {
         mudconf.control_flags &= ~flagvalue;
         STARTLOG(LOG_CONFIGMODS, "CFG", "GLOBAL")
         log_name(player);
         log_printf(" disabled: %s", flag);
         ENDLOG if (!Quiet(player))
             notify_quiet(player, "Disabled.");
-    }
-    else
-    {
+    } else {
         notify_quiet(player, "Illegal combination of switches.");
     }
 }

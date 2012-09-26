@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -34,8 +35,7 @@
  * specials	(8 rows)
  */
 
-char qidx_chartab[256] =
-{
+char qidx_chartab[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -69,8 +69,7 @@ int set_register(const char *funcname, char *name, char *data) {
     if (!name || !*name)
         return -1;
 
-    if (name[1] == '\0')
-    {
+    if (name[1] == '\0') {
 
         /*
          * Single-letter q-register. We allocate these either as a
@@ -89,13 +88,11 @@ int set_register(const char *funcname, char *name, char *data) {
          * we wipe out the data.
          */
 
-        if (!data || !*data)
-        {
+        if (!data || !*data) {
             if (!mudstate.rdata || !mudstate.rdata->q_alloc ||
                     (regnum >= mudstate.rdata->q_alloc))
                 return 0;
-            if (mudstate.rdata->q_regs[regnum])
-            {
+            if (mudstate.rdata->q_regs[regnum]) {
                 free_lbuf(mudstate.rdata->q_regs[regnum]);
                 mudstate.rdata->q_regs[regnum] = NULL;
                 mudstate.rdata->q_lens[regnum] = 0;
@@ -108,12 +105,10 @@ int set_register(const char *funcname, char *name, char *data) {
          * space first.
          */
 
-        if (!mudstate.rdata)
-        {
+        if (!mudstate.rdata) {
             Init_RegData(funcname, mudstate.rdata);
         }
-        if (!mudstate.rdata->q_alloc)
-        {
+        if (!mudstate.rdata->q_alloc) {
             a_size = (regnum < 10) ? 10 : MAX_GLOBAL_REGS;
             mudstate.rdata->q_alloc = a_size;
             mudstate.rdata->q_regs =
@@ -121,9 +116,7 @@ int set_register(const char *funcname, char *name, char *data) {
             mudstate.rdata->q_lens =
                 XCALLOC(a_size, sizeof(int), "q_lens");
             mudstate.rdata->q_alloc = a_size;
-        }
-        else if (regnum >= mudstate.rdata->q_alloc)
-        {
+        } else if (regnum >= mudstate.rdata->q_alloc) {
             a_size = MAX_GLOBAL_REGS;
             tmp_regs = XREALLOC(mudstate.rdata->q_regs,
                                 a_size * sizeof(char *), "q_regs");
@@ -153,19 +146,15 @@ int set_register(const char *funcname, char *name, char *data) {
      * first, since that's easier.
      */
 
-    if (!data || !*data)
-    {
+    if (!data || !*data) {
         if (!mudstate.rdata || !mudstate.rdata->xr_alloc)
             return 0;
         for (p = name; *p; p++)
             *p = tolower(*p);
-        for (i = 0; i < mudstate.rdata->xr_alloc; i++)
-        {
+        for (i = 0; i < mudstate.rdata->xr_alloc; i++) {
             if (mudstate.rdata->x_names[i] &&
-                    !strcmp(name, mudstate.rdata->x_names[i]))
-            {
-                if (mudstate.rdata->x_regs[i])
-                {
+                    !strcmp(name, mudstate.rdata->x_names[i])) {
+                if (mudstate.rdata->x_regs[i]) {
                     free_sbuf(mudstate.rdata->x_names[i]);
                     mudstate.rdata->x_names[i] = NULL;
                     free_lbuf(mudstate.rdata->x_regs[i]);
@@ -173,9 +162,7 @@ int set_register(const char *funcname, char *name, char *data) {
                     mudstate.rdata->x_lens[i] = 0;
                     mudstate.rdata->dirty++;
                     return 0;
-                }
-                else
-                {
+                } else {
                     return 0;
                 }
             }
@@ -194,8 +181,7 @@ int set_register(const char *funcname, char *name, char *data) {
     if (!isalpha(*name))
         return -1;
 
-    for (p = name; *p; p++)
-    {
+    for (p = name; *p; p++) {
         if (isalnum(*p) ||
                 (*p == '_') || (*p == '-') || (*p == '.') || (*p == '#'))
             *p = tolower(*p);
@@ -209,12 +195,10 @@ int set_register(const char *funcname, char *name, char *data) {
      * If we have no existing data, life is easy; just set it.
      */
 
-    if (!mudstate.rdata)
-    {
+    if (!mudstate.rdata) {
         Init_RegData(funcname, mudstate.rdata);
     }
-    if (!mudstate.rdata->xr_alloc)
-    {
+    if (!mudstate.rdata->xr_alloc) {
         a_size = NUM_ENV_VARS;
         mudstate.rdata->x_names =
             XCALLOC(a_size, sizeof(char *), "x_names");
@@ -235,11 +219,9 @@ int set_register(const char *funcname, char *name, char *data) {
      * Search for an existing entry to replace.
      */
 
-    for (i = 0; i < mudstate.rdata->xr_alloc; i++)
-    {
+    for (i = 0; i < mudstate.rdata->xr_alloc; i++) {
         if (mudstate.rdata->x_names[i] &&
-                !strcmp(name, mudstate.rdata->x_names[i]))
-        {
+                !strcmp(name, mudstate.rdata->x_names[i])) {
             memcpy(mudstate.rdata->x_regs[i], data, len + 1);
             mudstate.rdata->x_lens[i] = len;
             mudstate.rdata->dirty++;
@@ -251,10 +233,8 @@ int set_register(const char *funcname, char *name, char *data) {
      * Check for an empty cell to insert into.
      */
 
-    for (i = 0; i < mudstate.rdata->xr_alloc; i++)
-    {
-        if (mudstate.rdata->x_names[i] == NULL)
-        {
+    for (i = 0; i < mudstate.rdata->xr_alloc; i++) {
+        if (mudstate.rdata->x_names[i] == NULL) {
             mudstate.rdata->x_names[i] = alloc_sbuf(funcname);
             strcpy(mudstate.rdata->x_names[i], name);
             if (!mudstate.rdata->x_regs[i])	/* should never happen */
@@ -274,8 +254,7 @@ int set_register(const char *funcname, char *name, char *data) {
 
     regnum = mudstate.rdata->xr_alloc;
     a_size = regnum + NUM_ENV_VARS;
-    if (a_size > mudconf.register_limit)
-    {
+    if (a_size > mudconf.register_limit) {
         a_size = mudconf.register_limit;
         if (a_size <= regnum)
             return -2;
@@ -323,8 +302,7 @@ static char *get_register(GDATA *g, char *r) {
     if (!g || !r || !*r)
         return NULL;
 
-    if (r[1] == '\0')
-    {
+    if (r[1] == '\0') {
         regnum = qidx_chartab[(unsigned char)r[0]];
         if ((regnum < 0) || (regnum >= MAX_GLOBAL_REGS))
             return NULL;
@@ -338,12 +316,9 @@ static char *get_register(GDATA *g, char *r) {
     for (p = r; *p; p++)
         *p = tolower(*p);
 
-    for (regnum = 0; regnum < g->xr_alloc; regnum++)
-    {
-        if (g->x_names[regnum] && !strcmp(r, g->x_names[regnum]))
-        {
-            if (g->x_regs[regnum])
-            {
+    for (regnum = 0; regnum < g->xr_alloc; regnum++) {
+        if (g->x_names[regnum] && !strcmp(r, g->x_names[regnum])) {
+            if (g->x_regs[regnum]) {
                 return g->x_regs[regnum];
             }
             return NULL;
@@ -356,22 +331,19 @@ static char *get_register(GDATA *g, char *r) {
 void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int result, count, i;
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         safe_tprintf_str(buff, bufc,
                          "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d",
                          nfargs);
         return;
     }
-    if (nfargs % 2 != 0)
-    {
+    if (nfargs % 2 != 0) {
         safe_tprintf_str(buff, bufc,
                          "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d",
                          nfargs);
         return;
     }
-    if (nfargs > MAX_NFARGS - 2)
-    {
+    if (nfargs > MAX_NFARGS - 2) {
         /*
          * Prevent people from doing something dumb by providing this
          * too many arguments and thus having the fifteenth register
@@ -383,8 +355,7 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                          MAX_NFARGS - 2, nfargs);
         return;
     }
-    if (nfargs == 2)
-    {
+    if (nfargs == 2) {
         result = set_register("fun_setq", fargs[0], fargs[1]);
         if (result == -1)
             safe_str("#-1 INVALID GLOBAL REGISTER", buff, bufc);
@@ -393,8 +364,7 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
     count = 0;
-    for (i = 0; i < nfargs; i += 2)
-    {
+    for (i = 0; i < nfargs; i += 2) {
         result = set_register("fun_setq", fargs[i], fargs[i + 1]);
         if (result < 0)
             count++;
@@ -421,19 +391,14 @@ static void read_register(char *regname, char *buff, char **bufc) {
 
     char *p;
 
-    if (regname[1] == '\0')
-    {
+    if (regname[1] == '\0') {
         regnum = qidx_chartab[(unsigned char)*regname];
-        if ((regnum < 0) || (regnum >= MAX_GLOBAL_REGS))
-        {
+        if ((regnum < 0) || (regnum >= MAX_GLOBAL_REGS)) {
             safe_str("#-1 INVALID GLOBAL REGISTER", buff, bufc);
-        }
-        else
-        {
+        } else {
             if (mudstate.rdata
                     && (mudstate.rdata->q_alloc > regnum)
-                    && mudstate.rdata->q_regs[regnum])
-            {
+                    && mudstate.rdata->q_regs[regnum]) {
                 safe_known_str(mudstate.rdata->q_regs[regnum],
                                mudstate.rdata->q_lens[regnum], buff,
                                bufc);
@@ -447,13 +412,10 @@ static void read_register(char *regname, char *buff, char **bufc) {
     for (p = regname; *p; p++)
         *p = tolower(*p);
 
-    for (regnum = 0; regnum < mudstate.rdata->xr_alloc; regnum++)
-    {
+    for (regnum = 0; regnum < mudstate.rdata->xr_alloc; regnum++) {
         if (mudstate.rdata->x_names[regnum] &&
-                !strcmp(regname, mudstate.rdata->x_names[regnum]))
-        {
-            if (mudstate.rdata->x_regs[regnum])
-            {
+                !strcmp(regname, mudstate.rdata->x_names[regnum])) {
+            if (mudstate.rdata->x_regs[regnum]) {
                 safe_known_str(mudstate.rdata->x_regs[regnum],
                                mudstate.rdata->x_lens[regnum],
                                buff, bufc);
@@ -485,25 +447,19 @@ void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     bb_p = *bufc;
     g = mudstate.rdata;
 
-    for (i = 0; i < g->q_alloc; i++)
-    {
-        if (g->q_regs[i] && *(g->q_regs[i]))
-        {
-            if (*bufc != bb_p)
-            {
+    for (i = 0; i < g->q_alloc; i++) {
+        if (g->q_regs[i] && *(g->q_regs[i])) {
+            if (*bufc != bb_p) {
                 print_sep(&SPACE_DELIM, buff, bufc);
             }
             safe_chr(qidx_str[i], buff, bufc);
         }
     }
 
-    for (i = 0; i < g->xr_alloc; i++)
-    {
+    for (i = 0; i < g->xr_alloc; i++) {
         if (g->x_names[i] && *(g->x_names[i]) &&
-                g->x_regs[i] && *(g->x_regs[i]))
-        {
-            if (*bufc != bb_p)
-            {
+                g->x_regs[i] && *(g->x_regs[i])) {
+            if (*bufc != bb_p) {
                 print_sep(&SPACE_DELIM, buff, bufc);
             }
             safe_str(g->x_names[i], buff, bufc);
@@ -522,8 +478,7 @@ void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     char *t_args[NUM_ENV_VARS], **qregs;	/* %0-%9 is limiting */
 
-    if (!wild(fargs[1], fargs[0], t_args, NUM_ENV_VARS))
-    {
+    if (!wild(fargs[1], fargs[0], t_args, NUM_ENV_VARS)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -535,8 +490,7 @@ void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
 
     nqregs = list2arr(&qregs, NUM_ENV_VARS, fargs[2], &SPACE_DELIM);
-    for (i = 0; i < nqregs; i++)
-    {
+    for (i = 0; i < nqregs; i++) {
         set_register("fun_wildmatch", qregs[i], t_args[i]);
     }
 
@@ -544,8 +498,7 @@ void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Need to free up allocated memory from the match.
      */
 
-    for (i = 0; i < NUM_ENV_VARS; i++)
-    {
+    for (i = 0; i < NUM_ENV_VARS; i++) {
         if (t_args[i])
             free_lbuf(t_args[i]);
     }
@@ -576,8 +529,7 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     strcpy(varlist, fargs[0]);
     nqregs = list2arr(&qreg_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
-    if (nqregs == 0)
-    {
+    if (nqregs == 0) {
         free_lbuf(varlist);
         XFREE(qreg_names, "fun_qvars.qreg_names");
         return;
@@ -586,8 +538,7 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     strcpy(elemlist, fargs[1]);
     n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
-    if (n_elems != nqregs)
-    {
+    if (n_elems != nqregs) {
         safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         free_lbuf(varlist);
         free_lbuf(elemlist);
@@ -595,8 +546,7 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         XFREE(elems, "fun_qvars.elems");
         return;
     }
-    for (i = 0; i < n_elems; i++)
-    {
+    for (i = 0; i < n_elems; i++) {
         set_register("fun_qvars", qreg_names[i], elems[i]);
     }
 
@@ -620,9 +570,9 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (!fargs[0] || !*fargs[0])
         return;
-    if (!delim_check(FUNCTION_ARGLIST, 2, &bdelim, DELIM_STRING))
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &bdelim, DELIM_STRING))
         return;
-    if (!delim_check(FUNCTION_ARGLIST, 3, &edelim, DELIM_STRING))
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &edelim, DELIM_STRING))
         return;
 
     /*
@@ -634,11 +584,9 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         edelim.str[0] = '$';
 
     nextp = fargs[0];
-    while (nextp && ((strp = split_token(&nextp, &bdelim)) != NULL))
-    {
+    while (nextp && ((strp = split_token(&nextp, &bdelim)) != NULL)) {
         safe_str(strp, buff, bufc);
-        if (nextp)
-        {
+        if (nextp) {
             strp = split_token(&nextp, &edelim);
             read_register(strp, buff, bufc);
         }
@@ -654,10 +602,8 @@ static int calc_limitmask(char *lstr) {
 
     int lmask = 0;
 
-    for (p = lstr; *p; p++)
-    {
-        switch (*p)
-        {
+    for (p = lstr; *p; p++) {
+        switch (*p) {
         case 'd':
         case 'D':
             lmask |= FN_DBFX;
@@ -699,8 +645,7 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     char *str;
 
     lmask = calc_limitmask(fargs[0]);
-    if (lmask == -1)
-    {
+    if (lmask == -1) {
         safe_known_str("#-1 INVALID LIMIT", 17, buff, bufc);
         return;
     }
@@ -763,13 +708,11 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Three arguments to ucall(), five to sandbox()
      */
 
-    if (nfargs < 3)
-    {
+    if (nfargs < 3) {
         safe_known_str("#-1 TOO FEW ARGUMENTS", 21, buff, bufc);
         return;
     }
-    if (is_sandbox && (nfargs < 5))
-    {
+    if (is_sandbox && (nfargs < 5)) {
         safe_known_str("#-1 TOO FEW ARGUMENTS", 21, buff, bufc);
         return;
     }
@@ -777,11 +720,9 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Figure our our limits
      */
 
-    if (is_sandbox)
-    {
+    if (is_sandbox) {
         lmask = calc_limitmask(fargs[1]);
-        if (lmask == -1)
-        {
+        if (lmask == -1) {
             safe_known_str("#-1 INVALID LIMIT", 17, buff, bufc);
             return;
         }
@@ -793,30 +734,22 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      */
 
     preserve = save_global_regs("fun_ucall.save");
-    if (is_sandbox)
-    {
+    if (is_sandbox) {
         callp = Eat_Spaces(fargs[2]);
-    }
-    else
-    {
+    } else {
         callp = Eat_Spaces(fargs[0]);
     }
-    if (!*callp)
-    {
+    if (!*callp) {
         Free_RegData(mudstate.rdata);
         mudstate.rdata = NULL;
-    }
-    else if (!strcmp(callp, "@_"))
-    {
+    } else if (!strcmp(callp, "@_")) {
         /*
          * Pass everything in
          */
         /*
          * EMPTY
          */
-    }
-    else if (!strncmp(callp, "@_ ", 3) && callp[3])
-    {
+    } else if (!strncmp(callp, "@_ ", 3) && callp[3]) {
         /*
          * Pass in everything EXCEPT the named registers
          */
@@ -824,14 +757,11 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         strcpy(call_list, callp + 3);
         ncregs =
             list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
-        for (i = 0; i < ncregs; i++)
-        {
+        for (i = 0; i < ncregs; i++) {
             set_register("fun_ucall", cregs[i], NULL);
         }
         free_lbuf(call_list);
-    }
-    else
-    {
+    } else {
         /*
          * Pass in ONLY the named registers
          */
@@ -841,8 +771,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         strcpy(call_list, callp);
         ncregs =
             list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
-        for (i = 0; i < ncregs; i++)
-        {
+        for (i = 0; i < ncregs; i++) {
             set_register("fun_ucall", cregs[i],
                          get_register(preserve, cregs[i]));
         }
@@ -860,14 +789,11 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Find our perspective
      */
 
-    if (is_sandbox)
-    {
+    if (is_sandbox) {
         obj = match_thing(player, fargs[0]);
         if (Cannot_Objeval(player, obj))
             obj = player;
-    }
-    else
-    {
+    } else {
         obj = thing;
     }
 
@@ -875,13 +801,10 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * If the trace flag is on this attr, set the object Trace
      */
 
-    if (!Trace(obj) && (aflags & AF_TRACE))
-    {
+    if (!Trace(obj) && (aflags & AF_TRACE)) {
         trace_flag = 1;
         s_Trace(obj);
-    }
-    else
-    {
+    } else {
         trace_flag = 0;
     }
 
@@ -899,41 +822,31 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Reset the trace flag if we need to
      */
 
-    if (trace_flag)
-    {
+    if (trace_flag) {
         c_Trace(obj);
     }
     /*
      * Restore / clean registers
      */
 
-    if (is_sandbox)
-    {
+    if (is_sandbox) {
         callp = Eat_Spaces(fargs[3]);
-    }
-    else
-    {
+    } else {
         callp = Eat_Spaces(fargs[1]);
     }
-    if (!*callp)
-    {
+    if (!*callp) {
         /*
          * Restore nothing, so we keep our data as-is.
          */
         Free_RegData(preserve);
-    }
-    else if (!strncmp(callp, "@_!", 3) &&
-             ((callp[3] == '\0') || (callp[3] == ' ')))
-    {
-        if (callp[3] == '\0')
-        {
+    } else if (!strncmp(callp, "@_!", 3) &&
+               ((callp[3] == '\0') || (callp[3] == ' '))) {
+        if (callp[3] == '\0') {
             /*
              * Clear out all data
              */
             restore_global_regs("fun_ucall.restore", preserve);
-        }
-        else
-        {
+        } else {
             /*
              * Go back to the original registers, but ADD BACK IN
              * the new values of the registers on the list.
@@ -948,27 +861,21 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             strcpy(call_list, callp + 4);
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list,
                               &SPACE_DELIM);
-            for (i = 0; i < ncregs; i++)
-            {
+            for (i = 0; i < ncregs; i++) {
                 set_register("fun_ucall", cregs[i],
                              get_register(preserve, cregs[i]));
             }
             free_lbuf(call_list);
             Free_RegData(preserve);
         }
-    }
-    else if (!strncmp(callp, "@_", 2) &&
-             ((callp[2] == '\0') || (callp[2] == ' ')))
-    {
-        if (callp[2] == '\0')
-        {
+    } else if (!strncmp(callp, "@_", 2) &&
+               ((callp[2] == '\0') || (callp[2] == ' '))) {
+        if (callp[2] == '\0') {
             /*
              * Restore all registers we had before
              */
             call_list = NULL;
-        }
-        else
-        {
+        } else {
             /*
              * Restore all registers EXCEPT the ones listed. We
              * assume that this list is going to be pretty short,
@@ -979,10 +886,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list,
                               &SPACE_DELIM);
         }
-        for (i = 0; i < preserve->q_alloc; i++)
-        {
-            if (preserve->q_regs[i] && *(preserve->q_regs[i]))
-            {
+        for (i = 0; i < preserve->q_alloc; i++) {
+            if (preserve->q_regs[i] && *(preserve->q_regs[i])) {
                 cbuf[0] = qidx_str[i];
                 cbuf[1] = '\0';
                 if (!call_list
@@ -991,15 +896,12 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                  preserve->q_regs[i]);
             }
         }
-        for (i = 0; i < preserve->xr_alloc; i++)
-        {
+        for (i = 0; i < preserve->xr_alloc; i++) {
             if (preserve->x_names[i] && *(preserve->x_names[i]) &&
-                    preserve->x_regs[i] && *(preserve->x_regs[i]))
-            {
+                    preserve->x_regs[i] && *(preserve->x_regs[i])) {
                 if (!call_list ||
                         !is_in_array(preserve->x_names[i], cregs,
-                                     ncregs))
-                {
+                                     ncregs)) {
                     set_register("fun_ucall",
                                  preserve->x_names[i],
                                  preserve->x_regs[i]);
@@ -1009,9 +911,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         if (call_list != NULL)
             free_lbuf(call_list);
         Free_RegData(preserve);
-    }
-    else
-    {
+    } else {
         /*
          * Restore ONLY these named registers
          */
@@ -1019,8 +919,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         strcpy(call_list, callp);
         ncregs =
             list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
-        for (i = 0; i < ncregs; i++)
-        {
+        for (i = 0; i < ncregs; i++) {
             set_register("fun_ucall", cregs[i],
                          get_register(preserve, cregs[i]));
         }
@@ -1059,12 +958,9 @@ static void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc
 
     bb_p = *bufc;
 
-    for (i = 0; i < htab->hashsize; i++)
-    {
-        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next)
-        {
-            if (!strncmp(tbuf, hptr->target.s, len))
-            {
+    for (i = 0; i < htab->hashsize; i++) {
+        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next) {
+            if (!strncmp(tbuf, hptr->target.s, len)) {
                 if (*bufc != bb_p)
                     safe_chr(' ', buff, bufc);
                 safe_str(strchr(hptr->target.s, '.') + 1, buff,
@@ -1120,31 +1016,24 @@ void set_xvar(dbref obj, char *name, char *data) {
      * delete the variable.
      */
 
-    if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab)))
-    {
-        if (xvar->text)
-        {
+    if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab))) {
+        if (xvar->text) {
             XFREE(xvar->text, "xvar_data");
         }
-        if (data && *data)
-        {
+        if (data && *data) {
             xvar->text =
                 (char *)XMALLOC(sizeof(char) * (strlen(data) + 1),
                                 "xvar_data");
             if (!xvar->text)
                 return;	/* out of memory */
             strcpy(xvar->text, data);
-        }
-        else
-        {
+        } else {
             xvar->text = NULL;
             XFREE(xvar, "xvar_struct");
             hashdelete(tbuf, &mudstate.vars_htab);
             s_VarsCount(obj, VarsCount(obj) - 1);
         }
-    }
-    else
-    {
+    } else {
 
         /*
          * We haven't found it. If it's non-empty, set it, provided
@@ -1155,8 +1044,7 @@ void set_xvar(dbref obj, char *name, char *data) {
         if (VarsCount(obj) + 1 > mudconf.numvars_lim)
             return;
 
-        if (data && *data)
-        {
+        if (data && *data) {
             xvar =
                 (VARENT *) XMALLOC(sizeof(VARENT), "xvar_struct");
             if (!xvar)
@@ -1199,8 +1087,7 @@ static void clear_xvars(dbref obj, char **xvar_names, int n_xvars) {
      * Go clear stuff.
      */
 
-    for (i = 0; i < n_xvars; i++)
-    {
+    for (i = 0; i < n_xvars; i++) {
 
         for (p = xvar_names[i]; *p; p++)
             *p = tolower(*p);
@@ -1209,10 +1096,8 @@ static void clear_xvars(dbref obj, char **xvar_names, int n_xvars) {
         safe_sb_str(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
-        if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab)))
-        {
-            if (xvar->text)
-            {
+        if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab))) {
+            if (xvar->text) {
                 XFREE(xvar->text, "xvar_data");
                 xvar->text = NULL;
             }
@@ -1225,8 +1110,7 @@ static void clear_xvars(dbref obj, char **xvar_names, int n_xvars) {
 }
 
 
-void xvars_clr(dbref player)
-{
+void xvars_clr(dbref player) {
     char tbuf[SBUF_SIZE], *tp;
 
     HASHTAB *htab;
@@ -1244,14 +1128,11 @@ void xvars_clr(dbref player)
     len = strlen(tbuf);
 
     htab = &mudstate.vars_htab;
-    for (i = 0; i < htab->hashsize; i++)
-    {
+    for (i = 0; i < htab->hashsize; i++) {
         last = NULL;
-        for (hptr = htab->entry[i]; hptr != NULL; hptr = next)
-        {
+        for (hptr = htab->entry[i]; hptr != NULL; hptr = next) {
             next = hptr->next;
-            if (!strncmp(tbuf, hptr->target.s, len))
-            {
+            if (!strncmp(tbuf, hptr->target.s, len)) {
                 if (last == NULL)
                     htab->entry[i] = next;
                 else
@@ -1265,9 +1146,7 @@ void xvars_clr(dbref player)
                 htab->entries--;
                 if (htab->entry[i] == NULL)
                     htab->nulls++;
-            }
-            else
-            {
+            } else {
                 last = hptr;
             }
         }
@@ -1325,14 +1204,12 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     strcpy(varlist, fargs[0]);
     n_xvars = list2arr(&xvar_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
-    if (n_xvars == 0)
-    {
+    if (n_xvars == 0) {
         free_lbuf(varlist);
         XFREE(xvar_names, "fun_xvars.xvar_names");
         return;
     }
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         /*
          * Empty list, clear out the data.
          */
@@ -1345,8 +1222,7 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     strcpy(elemlist, fargs[1]);
     n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
-    if (n_elems != n_xvars)
-    {
+    if (n_elems != n_xvars) {
         safe_str("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
         free_lbuf(varlist);
         free_lbuf(elemlist);
@@ -1354,8 +1230,7 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         XFREE(elems, "fun_xvars.elems");
         return;
     }
-    for (i = 0; i < n_elems; i++)
-    {
+    for (i = 0; i < n_elems; i++) {
         set_xvar(player, xvar_names[i], elems[i]);
     }
 
@@ -1396,8 +1271,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
          EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
     n_xvars = list2arr(&xvar_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
-    if (n_xvars == 0)
-    {
+    if (n_xvars == 0) {
         free_lbuf(varlist);
         XFREE(xvar_names, "fun_let.xvar_names");
         return;
@@ -1421,30 +1295,25 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     safe_sb_chr('.', pre, &tp);
     *tp = '\0';
 
-    for (i = 0; i < n_xvars; i++)
-    {
+    for (i = 0; i < n_xvars; i++) {
 
         tp = tbuf;
         safe_sb_str(pre, tbuf, &tp);
         safe_sb_str(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
-        if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab)))
-        {
+        if ((xvar = (VARENT *) hashfind(tbuf, &mudstate.vars_htab))) {
             if (xvar->text)
                 old_xvars[i] =
                     XSTRDUP(xvar->text, "fun_let.preserve");
             else
                 old_xvars[i] = NULL;
-        }
-        else
-        {
+        } else {
             old_xvars[i] = NULL;
         }
     }
 
-    if (fargs[1] && *fargs[1])
-    {
+    if (fargs[1] && *fargs[1]) {
 
         /*
          * We have data, so we should initialize variables to their
@@ -1459,13 +1328,11 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
              EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
         n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
-        if (n_elems != n_xvars)
-        {
+        if (n_elems != n_xvars) {
             safe_str("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
             free_lbuf(varlist);
             free_lbuf(elemlist);
-            for (i = 0; i < n_xvars; i++)
-            {
+            for (i = 0; i < n_xvars; i++) {
                 if (old_xvars[i])
                     XFREE(old_xvars[i], "fun_let");
             }
@@ -1473,8 +1340,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
             XFREE(elems, "fun_let.elems");
             return;
         }
-        for (i = 0; i < n_elems; i++)
-        {
+        for (i = 0; i < n_elems; i++) {
             set_xvar(player, xvar_names[i], elems[i]);
         }
 
@@ -1493,8 +1359,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * Restore the old values.
      */
 
-    for (i = 0; i < n_xvars; i++)
-    {
+    for (i = 0; i < n_xvars; i++) {
         set_xvar(player, xvar_names[i], old_xvars[i]);
         if (old_xvars[i])
             XFREE(old_xvars[i], "fun_let");
@@ -1525,44 +1390,37 @@ void fun_clearvars(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Structures.
  */
 
-static int istype_char(char *str)
-{
+static int istype_char(char *str) {
     if (strlen(str) == 1)
         return 1;
     else
         return 0;
 }
 
-static int istype_dbref(char *str)
-{
+static int istype_dbref(char *str) {
     dbref it;
 
     if (*str++ != NUMBER_TOKEN)
         return 0;
-    if (*str)
-    {
+    if (*str) {
         it = parse_dbref_only(str);
         return (Good_obj(it));
     }
     return 0;
 }
 
-static int istype_int(char *str)
-{
+static int istype_int(char *str) {
     return (is_integer(str));
 }
 
-static int istype_float(char *str)
-{
+static int istype_float(char *str) {
     return (is_number(str));
 }
 
-static int istype_string(char *str)
-{
+static int istype_string(char *str) {
     char *p;
 
-    for (p = str; *p; p++)
-    {
+    for (p = str; *p; p++) {
         if (isspace(*p))
             return 0;
     }
@@ -1601,8 +1459,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Prevent null delimiters and line delimiters.
      */
 
-    if ((osep.len > 1) || (osep.str[0] == '\0') || (osep.str[0] == '\r'))
-    {
+    if ((osep.len > 1) || (osep.str[0] == '\0') || (osep.str[0] == '\r')) {
         notify_quiet(player, "You cannot use that output delimiter.");
         safe_chr('0', buff, bufc);
         return;
@@ -1611,8 +1468,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Enforce limits.
      */
 
-    if (StructCount(player) > mudconf.struct_lim)
-    {
+    if (StructCount(player) > mudconf.struct_lim) {
         notify_quiet(player, "Too many structures.");
         safe_chr('0', buff, bufc);
         return;
@@ -1621,8 +1477,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If our structure name is too long, reject it.
      */
 
-    if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
-    {
+    if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9) {
         notify_quiet(player, "Structure name is too long.");
         safe_chr('0', buff, bufc);
         return;
@@ -1631,8 +1486,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * No periods in structure names
      */
 
-    if (strchr(fargs[0], '.'))
-    {
+    if (strchr(fargs[0], '.')) {
         notify_quiet(player,
                      "Structure names cannot contain periods.");
         safe_chr('0', buff, bufc);
@@ -1654,8 +1508,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If we have this structure already, reject.
      */
 
-    if (hashfind(tbuf, &mudstate.structs_htab))
-    {
+    if (hashfind(tbuf, &mudstate.structs_htab)) {
         notify_quiet(player, "Structure is already defined.");
         safe_chr('0', buff, bufc);
         return;
@@ -1670,8 +1523,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     n_comps =
         list2arr(&comp_array, LBUF_SIZE / 2, comp_names, &SPACE_DELIM);
 
-    if (n_comps < 1)
-    {
+    if (n_comps < 1) {
         notify_quiet(player, "There must be at least one component.");
         safe_chr('0', buff, bufc);
         XFREE(comp_names, "struct.comps");
@@ -1683,10 +1535,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * be smaller than half an SBUF.
      */
 
-    for (i = 0; i < n_comps; i++)
-    {
-        if (strlen(comp_array[i]) > (SBUF_SIZE / 2) - 9)
-        {
+    for (i = 0; i < n_comps; i++) {
+        if (strlen(comp_array[i]) > (SBUF_SIZE / 2) - 9) {
             notify_quiet(player, "Component name is too long.");
             safe_chr('0', buff, bufc);
             XFREE(comp_names, "struct.comps");
@@ -1705,10 +1555,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * typos will not be caught.
      */
 
-    for (i = 0; i < n_types; i++)
-    {
-        switch (*(type_array[i]))
-        {
+    for (i = 0; i < n_types; i++) {
+        switch (*(type_array[i])) {
         case 'a':
         case 'A':
         case 'c':
@@ -1736,28 +1584,23 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
     }
 
-    if (fargs[3] && *fargs[3])
-    {
+    if (fargs[3] && *fargs[3]) {
         default_vals = XSTRDUP(fargs[3], "struct.defaults");
         n_defs =
             list2arr(&def_array, LBUF_SIZE / 2, default_vals, &isep);
-    }
-    else
-    {
+    } else {
         default_vals = NULL;
         n_defs = 0;
     }
 
-    if ((n_comps != n_types) || (n_defs && (n_comps != n_defs)))
-    {
+    if ((n_comps != n_types) || (n_defs && (n_comps != n_defs))) {
         notify_quiet(player, "List sizes must be identical.");
         safe_chr('0', buff, bufc);
         XFREE(comp_names, "struct.comps");
         XFREE(comp_array, "fun_structure.comp_array");
         free_lbuf(type_names);
         XFREE(type_array, "fun_structure.type_array");
-        if (default_vals)
-        {
+        if (default_vals) {
             XFREE(default_vals, "struct.defaults");
             XFREE(def_array, "fun_structure.def_array");
         }
@@ -1794,8 +1637,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Allocate each individual component.
      */
 
-    for (i = 0; i < n_comps; i++)
-    {
+    for (i = 0; i < n_comps; i++) {
 
         cp = cbuf;
         safe_sb_str(tbuf, cbuf, &cp);
@@ -1807,8 +1649,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         this_comp =
             (COMPONENT *) XMALLOC(sizeof(COMPONENT), "comp_alloc");
         this_comp->def_val = (default_vals ? def_array[i] : NULL);
-        switch (*(type_array[i]))
-        {
+        switch (*(type_array[i])) {
         case 'a':
         case 'A':
             this_comp->typer_func = NULL;
@@ -1852,8 +1693,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     free_lbuf(type_names);
     XFREE(type_array, "fun_structure.type_array");
-    if (default_vals)
-    {
+    if (default_vals) {
         XFREE(def_array, "fun_structure.def_array");
     }
     s_StructCount(player, StructCount(player) + 1);
@@ -1895,8 +1735,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
 
     VaChk_In(2, 5);
-    if (nfargs == 3)
-    {
+    if (nfargs == 3) {
         safe_tprintf_str(buff, bufc,
                          "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d",
                          nfargs);
@@ -1906,8 +1745,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Enforce limits.
      */
 
-    if (InstanceCount(player) > mudconf.instance_lim)
-    {
+    if (InstanceCount(player) > mudconf.instance_lim) {
         notify_quiet(player, "Too many instances.");
         safe_chr('0', buff, bufc);
         return;
@@ -1916,8 +1754,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If our instance name is too long, reject it.
      */
 
-    if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
-    {
+    if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9) {
         notify_quiet(player, "Instance name is too long.");
         safe_chr('0', buff, bufc);
         return;
@@ -1934,8 +1771,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     safe_sb_str(fargs[0], ibuf, &ip);
     *ip = '\0';
 
-    if (hashfind(ibuf, &mudstate.instance_htab))
-    {
+    if (hashfind(ibuf, &mudstate.instance_htab)) {
         notify_quiet(player,
                      "That instance has already been defined.");
         safe_chr('0', buff, bufc);
@@ -1954,8 +1790,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     *tp = '\0';
 
     this_struct = (STRUCTDEF *) hashfind(tbuf, &mudstate.structs_htab);
-    if (!this_struct)
-    {
+    if (!this_struct) {
         notify_quiet(player, "No such structure.");
         safe_chr('0', buff, bufc);
         return;
@@ -1969,8 +1804,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     safe_sb_chr('.', tbuf, &tp);
     *tp = '\0';
 
-    if (fargs[2] && *fargs[2] && fargs[3] && *fargs[3])
-    {
+    if (fargs[2] && *fargs[2] && fargs[3] && *fargs[3]) {
 
         comp_names = alloc_lbuf("construct.comps");
         strcpy(comp_names, fargs[2]);
@@ -1981,8 +1815,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         strcpy(init_vals, fargs[3]);
         n_vals =
             list2arr(&vals_array, LBUF_SIZE / 2, init_vals, &isep);
-        if (n_comps != n_vals)
-        {
+        if (n_comps != n_vals) {
             notify_quiet(player, "List sizes must be identical.");
             safe_chr('0', buff, bufc);
             free_lbuf(comp_names);
@@ -1991,8 +1824,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             XFREE(vals_array, "fun_construct.vals_array");
             return;
         }
-        for (i = 0; i < n_comps; i++)
-        {
+        for (i = 0; i < n_comps; i++) {
             cp = cbuf;
             safe_sb_str(tbuf, cbuf, &cp);
             for (p = comp_array[i]; *p; p++)
@@ -2000,8 +1832,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             safe_sb_str(comp_array[i], cbuf, &cp);
             c_ptr =
                 (COMPONENT *) hashfind(cbuf, &mudstate.cdefs_htab);
-            if (!c_ptr)
-            {
+            if (!c_ptr) {
                 notify_quiet(player,
                              "Invalid component name.");
                 safe_chr('0', buff, bufc);
@@ -2011,12 +1842,10 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 XFREE(vals_array, "fun_construct.vals_array");
                 return;
             }
-            if (c_ptr->typer_func)
-            {
+            if (c_ptr->typer_func) {
                 retval =
                     (*(c_ptr->typer_func)) (vals_array[i]);
-                if (!retval)
-                {
+                if (!retval) {
                     notify_quiet(player,
                                  "Default value is of invalid type.");
                     safe_chr('0', buff, bufc);
@@ -2031,18 +1860,14 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             }
         }
 
-    }
-    else if ((!fargs[2] || !*fargs[2]) && (!fargs[3] || !*fargs[3]))
-    {
+    } else if ((!fargs[2] || !*fargs[2]) && (!fargs[3] || !*fargs[3])) {
         /*
          * Blank initializers. This is just fine.
          */
         comp_names = init_vals = NULL;
         comp_array = vals_array = NULL;
         n_comps = n_vals = 0;
-    }
-    else
-    {
+    } else {
         notify_quiet(player, "List sizes must be identical.");
         safe_chr('0', buff, bufc);
         return;
@@ -2062,19 +1887,15 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Populate with default values.
      */
 
-    for (i = 0; i < this_struct->c_count; i++)
-    {
+    for (i = 0; i < this_struct->c_count; i++) {
         d_ptr =
             (STRUCTDATA *) XMALLOC(sizeof(STRUCTDATA),
                                    "constructor.data");
-        if (this_struct->c_array[i]->def_val)
-        {
+        if (this_struct->c_array[i]->def_val) {
             d_ptr->text = (char *)
                           XSTRDUP(this_struct->c_array[i]->def_val,
                                   "constructor.dtext");
-        }
-        else
-        {
+        } else {
             d_ptr->text = NULL;
         }
         tp = tbuf;
@@ -2090,16 +1911,14 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Overwrite with component values.
      */
 
-    for (i = 0; i < n_comps; i++)
-    {
+    for (i = 0; i < n_comps; i++) {
         tp = tbuf;
         safe_sb_str(ibuf, tbuf, &tp);
         safe_sb_chr('.', tbuf, &tp);
         safe_sb_str(comp_array[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *) hashfind(tbuf, &mudstate.instdata_htab);
-        if (d_ptr)
-        {
+        if (d_ptr) {
             if (d_ptr->text)
                 XFREE(d_ptr->text, "constructor.dtext");
             if (vals_array[i] && *(vals_array[i]))
@@ -2111,13 +1930,11 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
     }
 
-    if (comp_names)
-    {
+    if (comp_names) {
         free_lbuf(comp_names);
         XFREE(comp_array, "fun_construct.comp_array");
     }
-    if (init_vals)
-    {
+    if (init_vals) {
         free_lbuf(init_vals);
         XFREE(vals_array, "fun_construct.vals_array");
     }
@@ -2127,8 +1944,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 }
 
 
-static void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim)
-{
+static void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim) {
     char tbuf[SBUF_SIZE], *tp;
 
     char ibuf[SBUF_SIZE], *ip;
@@ -2155,8 +1971,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
      * Enforce limits.
      */
 
-    if (InstanceCount(player) > mudconf.instance_lim)
-    {
+    if (InstanceCount(player) > mudconf.instance_lim) {
         notify_quiet(player, "Too many instances.");
         safe_chr('0', buff, bufc);
         return;
@@ -2165,8 +1980,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
      * If our instance name is too long, reject it.
      */
 
-    if (strlen(inst_name) > (SBUF_SIZE / 2) - 9)
-    {
+    if (strlen(inst_name) > (SBUF_SIZE / 2) - 9) {
         notify_quiet(player, "Instance name is too long.");
         safe_chr('0', buff, bufc);
         return;
@@ -2183,8 +1997,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
     safe_sb_str(inst_name, ibuf, &ip);
     *ip = '\0';
 
-    if (hashfind(ibuf, &mudstate.instance_htab))
-    {
+    if (hashfind(ibuf, &mudstate.instance_htab)) {
         notify_quiet(player,
                      "That instance has already been defined.");
         safe_chr('0', buff, bufc);
@@ -2203,8 +2016,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
     *tp = '\0';
 
     this_struct = (STRUCTDEF *) hashfind(tbuf, &mudstate.structs_htab);
-    if (!this_struct)
-    {
+    if (!this_struct) {
         notify_quiet(player, "No such structure.");
         safe_chr('0', buff, bufc);
         return;
@@ -2221,8 +2033,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
     val_list = alloc_lbuf("load.val_list");
     strcpy(val_list, raw_text);
     n_vals = list2arr(&val_array, LBUF_SIZE / 2, val_list, &isep);
-    if (n_vals != this_struct->c_count)
-    {
+    if (n_vals != this_struct->c_count) {
         notify_quiet(player, "Incorrect number of components.");
         safe_chr('0', buff, bufc);
         free_lbuf(val_list);
@@ -2233,11 +2044,9 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
      * Check the types of the data we've been passed.
      */
 
-    for (i = 0; i < n_vals; i++)
-    {
+    for (i = 0; i < n_vals; i++) {
         if (this_struct->c_array[i]->typer_func &&
-                !((*(this_struct->c_array[i]->typer_func)) (val_array[i])))
-        {
+                !((*(this_struct->c_array[i]->typer_func)) (val_array[i]))) {
             notify_quiet(player, "Value is of invalid type.");
             safe_chr('0', buff, bufc);
             free_lbuf(val_list);
@@ -2260,8 +2069,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
      * Stuff data into memory.
      */
 
-    for (i = 0; i < this_struct->c_count; i++)
-    {
+    for (i = 0; i < this_struct->c_count; i++) {
         d_ptr =
             (STRUCTDATA *) XMALLOC(sizeof(STRUCTDATA),
                                    "constructor.data");
@@ -2302,8 +2110,7 @@ void fun_read(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     char *atext;
 
-    if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
-    {
+    if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -2337,19 +2144,16 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if (nfargs != 3)
         isep.str[0] = GENERIC_STRUCT_DELIM;
 
-    if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
-    {
+    if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING)) {
         safe_noperm(buff, bufc);
         return;
     }
     atext = atr_pget(it, atr, &aowner, &aflags, &alen);
     nitems = list2arr(&ptrs, LBUF_SIZE / 2, atext, &isep);
-    if (nitems)
-    {
+    if (nitems) {
         over = safe_str_fn(ptrs[0], buff, bufc);
     }
-    for (i = 1; !over && (i < nitems); i++)
-    {
+    for (i = 1; !over && (i < nitems); i++) {
         over = safe_str_fn(fargs[1], buff, bufc);
         if (!over)
             over = safe_str_fn(ptrs[i], buff, bufc);
@@ -2420,8 +2224,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     endp = tp;		/* save where we are */
 
     inst_ptr = (INSTANCE *) hashfind(tbuf, &mudstate.instance_htab);
-    if (!inst_ptr)
-    {
+    if (!inst_ptr) {
         notify_quiet(player, "No such instance.");
         safe_chr('0', buff, bufc);
         return;
@@ -2434,15 +2237,13 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     nvals = list2arr(&vals, LBUF_SIZE / 2, fargs[2], &isep);
 
     n_mod = 0;
-    for (i = 0; i < nwords; i++)
-    {
+    for (i = 0; i < nwords; i++) {
 
         /*
          * Find the component and check the type.
          */
 
-        if (inst_ptr->datatype->need_typecheck)
-        {
+        if (inst_ptr->datatype->need_typecheck) {
 
             cp = cbuf;
             safe_ltos(cbuf, &cp, player);
@@ -2456,16 +2257,13 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
             c_ptr =
                 (COMPONENT *) hashfind(cbuf, &mudstate.cdefs_htab);
-            if (!c_ptr)
-            {
+            if (!c_ptr) {
                 notify_quiet(player, "No such component.");
                 continue;
             }
-            if (c_ptr->typer_func)
-            {
+            if (c_ptr->typer_func) {
                 retval = (*(c_ptr->typer_func)) (fargs[2]);
-                if (!retval)
-                {
+                if (!retval) {
                     notify_quiet(player,
                                  "Value is of invalid type.");
                     continue;
@@ -2482,19 +2280,15 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         *tp = '\0';
 
         s_ptr = (STRUCTDATA *) hashfind(tbuf, &mudstate.instdata_htab);
-        if (!s_ptr)
-        {
+        if (!s_ptr) {
             notify_quiet(player, "No such data.");
             continue;
         }
         if (s_ptr->text)
             XFREE(s_ptr->text, "modify.dtext");
-        if ((i < nvals) && vals[i] && *vals[i])
-        {
+        if ((i < nvals) && vals[i] && *vals[i]) {
             s_ptr->text = XSTRDUP(vals[i], "modify.dtext");
-        }
-        else
-        {
+        } else {
             s_ptr->text = NULL;
         }
         n_mod++;
@@ -2554,10 +2348,8 @@ static void unload_structure(dbref player, char *buff, char **bufc, char *inst_n
     if (use_def_delim)
         sep = this_struct->delim;
 
-    for (i = 0; i < this_struct->c_count; i++)
-    {
-        if (i != 0)
-        {
+    for (i = 0; i < this_struct->c_count; i++) {
+        if (i != 0) {
             safe_chr(sep, buff, bufc);
         }
         tp = tbuf;
@@ -2587,31 +2379,25 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     ATTR *attr;
 
-    if (!parse_thing_slash(player, fargs[0], &str, &it))
-    {
+    if (!parse_thing_slash(player, fargs[0], &str, &it)) {
         safe_nomatch(buff, bufc);
         return;
     }
     tp = tbuf;
     *tp = '\0';
     unload_structure(player, tbuf, &tp, fargs[1], GENERIC_STRUCT_DELIM, 0);
-    if (*tbuf)
-    {
+    if (*tbuf) {
         atrnum = mkattr(str);
-        if (atrnum <= 0)
-        {
+        if (atrnum <= 0) {
             safe_str("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
             return;
         }
         attr = atr_num(atrnum);
         atr_pget_info(it, atrnum, &aowner, &aflags);
         if (!attr || !Set_attr(player, it, attr, aflags) ||
-                (attr->check != NULL))
-        {
+                (attr->check != NULL)) {
             safe_noperm(buff, bufc);
-        }
-        else
-        {
+        } else {
             atr_add(it, atrnum, tbuf, Owner(player),
                     aflags | AF_STRUCTURE);
         }
@@ -2647,8 +2433,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     *ip = '\0';
 
     inst_ptr = (INSTANCE *) hashfind(ibuf, &mudstate.instance_htab);
-    if (!inst_ptr)
-    {
+    if (!inst_ptr) {
         notify_quiet(player, "No such instance.");
         safe_chr('0', buff, bufc);
         return;
@@ -2666,15 +2451,13 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     safe_sb_chr('.', ibuf, &ip);
     *ip = '\0';
 
-    for (i = 0; i < this_struct->c_count; i++)
-    {
+    for (i = 0; i < this_struct->c_count; i++) {
         tp = tbuf;
         safe_sb_str(ibuf, tbuf, &tp);
         safe_sb_str(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *) hashfind(tbuf, &mudstate.instdata_htab);
-        if (d_ptr)
-        {
+        if (d_ptr) {
             if (d_ptr->text)
                 XFREE(d_ptr->text, "constructor.data");
             XFREE(d_ptr, "constructor.data");
@@ -2712,8 +2495,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     *tp = '\0';
 
     this_struct = (STRUCTDEF *) hashfind(tbuf, &mudstate.structs_htab);
-    if (!this_struct)
-    {
+    if (!this_struct) {
         notify_quiet(player, "No such structure.");
         safe_chr('0', buff, bufc);
         return;
@@ -2722,8 +2504,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
      * Can't delete what's in use.
      */
 
-    if (this_struct->n_instances > 0)
-    {
+    if (this_struct->n_instances > 0) {
         notify_quiet(player, "This structure is in use.");
         safe_chr('0', buff, bufc);
         return;
@@ -2742,14 +2523,12 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     *tp = '\0';
 
 
-    for (i = 0; i < this_struct->c_count; i++)
-    {
+    for (i = 0; i < this_struct->c_count; i++) {
         cp = cbuf;
         safe_sb_str(tbuf, cbuf, &cp);
         safe_sb_str(this_struct->c_names[i], cbuf, &cp);
         *cp = '\0';
-        if (this_struct->c_array[i])
-        {
+        if (this_struct->c_array[i]) {
             XFREE(this_struct->c_array[i], "comp_alloc");
         }
         hashdelete(cbuf, &mudstate.cdefs_htab);
@@ -2780,8 +2559,7 @@ void fun_linstances(char *buff, char **bufc, dbref player, dbref caller, dbref c
     print_htab_matches(player, &mudstate.instance_htab, buff, bufc);
 }
 
-void structure_clr(dbref thing)
-{
+void structure_clr(dbref thing) {
     /*
      * Wipe out all structure information associated with an object. Find
      * all the object's instances. Destroy them. Then, find all the
@@ -2830,12 +2608,9 @@ void structure_clr(dbref thing)
 
     htab = &mudstate.instance_htab;
     count = 0;
-    for (i = 0; i < htab->hashsize; i++)
-    {
-        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next)
-        {
-            if (!strncmp(tbuf, hptr->target.s, len))
-            {
+    for (i = 0; i < htab->hashsize; i++) {
+        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next) {
+            if (!strncmp(tbuf, hptr->target.s, len)) {
                 name_array[count] = (char *)hptr->target.s;
                 inst_array[count] = (INSTANCE *) hptr->data;
                 count++;
@@ -2849,10 +2624,8 @@ void structure_clr(dbref thing)
      * components.
      */
 
-    if (count > 0)
-    {
-        for (i = 0; i < count; i++)
-        {
+    if (count > 0) {
+        for (i = 0; i < count; i++) {
             this_struct = inst_array[i]->datatype;
             XFREE(inst_array[i], "constructor.inst");
             hashdelete(name_array[i], &mudstate.instance_htab);
@@ -2860,8 +2633,7 @@ void structure_clr(dbref thing)
             safe_sb_str(name_array[i], ibuf, &ip);
             safe_sb_chr('.', ibuf, &ip);
             *ip = '\0';
-            for (j = 0; j < this_struct->c_count; j++)
-            {
+            for (j = 0; j < this_struct->c_count; j++) {
                 cp = cbuf;
                 safe_sb_str(ibuf, cbuf, &cp);
                 safe_sb_str(this_struct->c_names[j], cbuf,
@@ -2870,8 +2642,7 @@ void structure_clr(dbref thing)
                 d_ptr =
                     (STRUCTDATA *) hashfind(cbuf,
                                             &mudstate.instdata_htab);
-                if (d_ptr)
-                {
+                if (d_ptr) {
                     if (d_ptr->text)
                         XFREE(d_ptr->text,
                               "constructor.data");
@@ -2907,12 +2678,9 @@ void structure_clr(dbref thing)
 
     htab = &mudstate.structs_htab;
     count = 0;
-    for (i = 0; i < htab->hashsize; i++)
-    {
-        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next)
-        {
-            if (!strncmp(tbuf, hptr->target.s, len))
-            {
+    for (i = 0; i < htab->hashsize; i++) {
+        for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next) {
+            if (!strncmp(tbuf, hptr->target.s, len)) {
                 name_array[count] = (char *)hptr->target.s;
                 struct_array[count] = (STRUCTDEF *) hptr->data;
                 count++;
@@ -2926,12 +2694,9 @@ void structure_clr(dbref thing)
      * every component definition. Free up the memory.
      */
 
-    if (count > 0)
-    {
-        for (i = 0; i < count; i++)
-        {
-            if (struct_array[i]->n_instances > 0)
-            {
+    if (count > 0) {
+        for (i = 0; i < count; i++) {
+            if (struct_array[i]->n_instances > 0) {
                 STARTLOG(LOG_ALWAYS, "BUG", "STRUCT")
                 log_name(thing);
                 log_printf
@@ -2945,15 +2710,13 @@ void structure_clr(dbref thing)
             safe_sb_str(name_array[i], ibuf, &ip);
             safe_sb_chr('.', ibuf, &ip);
             *ip = '\0';
-            for (j = 0; j < struct_array[i]->c_count; j++)
-            {
+            for (j = 0; j < struct_array[i]->c_count; j++) {
                 cp = cbuf;
                 safe_sb_str(ibuf, cbuf, &cp);
                 safe_sb_str(struct_array[i]->c_names[j], cbuf,
                             &cp);
                 *cp = '\0';
-                if (struct_array[i]->c_array[j])
-                {
+                if (struct_array[i]->c_array[j]) {
                     XFREE(struct_array[i]->c_array[j],
                           "comp_alloc");
                 }
@@ -2996,15 +2759,12 @@ void structure_clr(dbref thing)
  * Object stack functions.
  */
 
-void stack_clr(dbref thing)
-{
+void stack_clr(dbref thing) {
     OBJSTACK *sp, *tp, *xp;
 
     sp = stack_get(thing);
-    if (sp)
-    {
-        for (tp = sp; tp != NULL;)
-        {
+    if (sp) {
+        for (tp = sp; tp != NULL;) {
             XFREE(tp->data, "stack_clr_data");
             xp = tp;
             tp = tp->next;
@@ -3015,29 +2775,23 @@ void stack_clr(dbref thing)
     }
 }
 
-static int stack_set(dbref thing, OBJSTACK *sp)
-{
+static int stack_set(dbref thing, OBJSTACK *sp) {
     OBJSTACK *xsp;
 
     int stat;
 
-    if (!sp)
-    {
+    if (!sp) {
         nhashdelete(thing, &mudstate.objstack_htab);
         return 1;
     }
     xsp = stack_get(thing);
-    if (xsp)
-    {
+    if (xsp) {
         stat = nhashrepl(thing, (int *)sp, &mudstate.objstack_htab);
-    }
-    else
-    {
+    } else {
         stat = nhashadd(thing, (int *)sp, &mudstate.objstack_htab);
         Set_Max(mudstate.max_stacks, mudstate.objstack_htab.entries);
     }
-    if (stat < 0)  		/* failure for some reason */
-    {
+    if (stat < 0) {		/* failure for some reason */
         STARTLOG(LOG_BUGS, "STK", "SET")
         log_name(thing);
         ENDLOG stack_clr(thing);
@@ -3051,12 +2805,9 @@ void fun_empty(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     VaChk_Range(0, 1);
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
 
@@ -3066,12 +2817,9 @@ void fun_empty(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
 
@@ -3079,8 +2827,7 @@ void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 
-void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) 
-{
+void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref it;
 
     char *data;
@@ -3089,16 +2836,13 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     VaChk_Range(0, 2);
 
-    if (!fargs[1])
-    {
+    if (!fargs[1]) {
         it = player;
         if (!fargs[0] || !*fargs[0])
             data = (char *)"";
         else
             data = fargs[0];
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
         data = fargs[1];
     }
@@ -3132,31 +2876,24 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     VaChk_Range(0, 2);
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
 
     if (StackCount(it) + 1 > mudconf.stack_lim)
         return;
 
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         pos = 0;
-    }
-    else
-    {
+    } else {
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
     hp = stack_get(it);
     for (tp = hp; (count != pos) && (tp != NULL); count++, tp = tp->next);
-    if (!tp)
-    {
+    if (!tp) {
         notify_quiet(player, "No such item on stack.");
         return;
     }
@@ -3180,18 +2917,14 @@ void fun_swap(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     VaChk_Range(0, 1);
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
 
     sp = stack_get(it);
-    if (!sp || (sp->next == NULL))
-    {
+    if (!sp || (sp->next == NULL)) {
         notify_quiet(player, "Not enough items on stack.");
         return;
     }
@@ -3215,20 +2948,14 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     VaChk_Range(0, 2);
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         pos = 0;
-    }
-    else
-    {
+    } else {
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
@@ -3236,8 +2963,7 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if (!sp)
         return;
 
-    while (count != pos)
-    {
+    while (count != pos) {
         if (!sp)
             return;
         prev = sp;
@@ -3247,18 +2973,13 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if (!sp)
         return;
 
-    if (!toss_flag)
-    {
+    if (!toss_flag) {
         safe_str(sp->data, buff, bufc);
     }
-    if (!peek_flag)
-    {
-        if (count == 0)
-        {
+    if (!peek_flag) {
+        if (count == 0) {
             stack_set(it, sp->next);
-        }
-        else
-        {
+        } else {
             prev->next = sp->next;
         }
         XFREE(sp->data, "stack_pop_data");
@@ -3290,8 +3011,7 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     if (!sp)
         return;
 
-    while (count != pos)
-    {
+    while (count != pos) {
         if (!sp)
             return;
         prev = sp;
@@ -3305,17 +3025,14 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * We've now hit the start item, the first item. Copy 'em off.
      */
 
-    for (i = 0, tp = sp, bb_p = *bufc; (i < nitems) && (tp != NULL); i++)
-    {
-        if (!over)
-        {
+    for (i = 0, tp = sp, bb_p = *bufc; (i < nitems) && (tp != NULL); i++) {
+        if (!over) {
             /*
              * We have to pop off the items regardless of whether
              * or not there's an overflow, but we can save
              * ourselves some copying if so.
              */
-            if (*bufc != bb_p)
-            {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             over = safe_str_fn(tp->data, buff, bufc);
@@ -3331,12 +3048,9 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Relink the chain.
      */
 
-    if (count == 0)
-    {
+    if (count == 0) {
         stack_set(it, tp);
-    }
-    else
-    {
+    } else {
         prev->next = tp;
     }
 }
@@ -3354,21 +3068,16 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     VaChk_Out(0, 2);
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         it = player;
-    }
-    else
-    {
+    } else {
         stack_object(player, it);
     }
 
     bp = buff;
     bb_p = *bufc;
-    for (sp = stack_get(it); (sp != NULL) && !over; sp = sp->next)
-    {
-        if (*bufc != bb_p)
-        {
+    for (sp = stack_get(it); (sp != NULL) && !over; sp = sp->next) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         over = safe_str_fn(sp->data, buff, bufc);
@@ -3406,8 +3115,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
     all_option = Func_Mask(REG_MATCH_ALL);
 
     if ((re = pcre_compile(fargs[1], case_option,
-                           &errptr, &erroffset, mudstate.retabs)) == NULL)
-    {
+                           &errptr, &erroffset, mudstate.retabs)) == NULL) {
         /*
          * Matching error. Note that this returns a null string
          * rather than '#-1 REGEXP ERROR: <error>', as PennMUSH does,
@@ -3421,11 +3129,9 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
      * Study the pattern for optimization, if we're going to try multiple
      * matches.
      */
-    if (all_option)
-    {
+    if (all_option) {
         study = pcre_study(re, 0, &errptr);
-        if (errptr != NULL)
-        {
+        if (errptr != NULL) {
             XFREE(re, "perform_regedit.re");
             notify_quiet(player, errptr);
             return;
@@ -3440,18 +3146,15 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
      * If there's no match, just return the original.
      */
 
-    if (subpatterns < 0)
-    {
+    if (subpatterns < 0) {
         XFREE(re, "perform_regedit.re");
-        if (study)
-        {
+        if (study) {
             XFREE(study, "perform_regedit.study");
         }
         safe_str(fargs[0], buff, bufc);
         return;
     }
-    do
-    {
+    do {
         /*
          * If we had too many subpatterns for the offsets vector, set
          * the number to 1/3rd of the size of the offsets vector.
@@ -3473,26 +3176,22 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
          * sub-expressions.
          */
 
-        for (r = fargs[2]; *r; r++)
-        {
+        for (r = fargs[2]; *r; r++) {
             int offset, have_brace = 0;
 
             char *endsub;
 
-            if (*r != '$')
-            {
+            if (*r != '$') {
                 safe_chr(*r, buff, bufc);
                 continue;
             }
             r++;
-            if (*r == '{')
-            {
+            if (*r == '{') {
                 have_brace = 1;
                 r++;
             }
             offset = strtoul(r, &endsub, 10);
-            if (r == endsub || (have_brace && *endsub != '}'))
-            {
+            if (r == endsub || (have_brace && *endsub != '}')) {
                 /*
                  * Not a valid number.
                  */
@@ -3507,8 +3206,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
                 r++;
 
             if (pcre_copy_substring(fargs[0], offsets, subpatterns,
-                                    offset, tbuf, LBUF_SIZE) >= 0)
-            {
+                                    offset, tbuf, LBUF_SIZE) >= 0) {
                 safe_str(tbuf, buff, bufc);
             }
         }
@@ -3516,25 +3214,24 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
         start = fargs[0] + offsets[1];
         match_offset = offsets[1];
 
-    }
-    while (all_option && (((offsets[0] == offsets[1]) &&
-                           /*
-                            * PCRE docs note: Perl special-cases the empty-string match in split
-                            * and /g. To emulate, first try the match again at the same position
-                            * with PCRE_NOTEMPTY, then advance the starting offset if that
-                            * fails.
-                            */
-                           (((subpatterns = pcre_exec(re, study, fargs[0], len,
-                                            match_offset, PCRE_NOTEMPTY, offsets,
-                                            PCRE_MAX_OFFSETS)) >= 0) ||
-                            ((match_offset++ < len) &&
+    } while (all_option && (((offsets[0] == offsets[1]) &&
+                             /*
+                              * PCRE docs note: Perl special-cases the empty-string match in split
+                              * and /g. To emulate, first try the match again at the same position
+                              * with PCRE_NOTEMPTY, then advance the starting offset if that
+                              * fails.
+                              */
+                             (((subpatterns = pcre_exec(re, study, fargs[0], len,
+                                     match_offset, PCRE_NOTEMPTY, offsets,
+                                     PCRE_MAX_OFFSETS)) >= 0) ||
+                              ((match_offset++ < len) &&
+                               (subpatterns = pcre_exec(re, study, fargs[0], len,
+                                       match_offset, 0, offsets,
+                                       PCRE_MAX_OFFSETS)) >= 0))) ||
+                            ((match_offset <= len) &&
                              (subpatterns = pcre_exec(re, study, fargs[0], len,
                                             match_offset, 0, offsets,
-                                            PCRE_MAX_OFFSETS)) >= 0))) ||
-                          ((match_offset <= len) &&
-                           (subpatterns = pcre_exec(re, study, fargs[0], len,
-                                          match_offset, 0, offsets,
-                                          PCRE_MAX_OFFSETS)) >= 0)));
+                                            PCRE_MAX_OFFSETS)) >= 0)));
 
     /*
      * Copy everything after the matched bit.
@@ -3542,8 +3239,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
 
     safe_str(start, buff, bufc);
     XFREE(re, "perform_regedit.re");
-    if (study)
-    {
+    if (study) {
         XFREE(study, "perform_regedit.study");
     }
 }
@@ -3563,8 +3259,7 @@ void fun_wildparse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         return;
 
     nqregs = list2arr(&qregs, NUM_ENV_VARS, fargs[2], &SPACE_DELIM);
-    for (i = 0; i < nqregs; i++)
-    {
+    for (i = 0; i < nqregs; i++) {
         if (qregs[i] && *qregs[i])
             set_xvar(player, qregs[i], t_args[i]);
     }
@@ -3573,8 +3268,7 @@ void fun_wildparse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Need to free up allocated memory from the match.
      */
 
-    for (i = 0; i < NUM_ENV_VARS; i++)
-    {
+    for (i = 0; i < NUM_ENV_VARS; i++) {
         if (t_args[i])
             free_lbuf(t_args[i]);
     }
@@ -3610,8 +3304,7 @@ void perform_regparse(char *buff, char **bufc, dbref player, dbref caller, dbref
     case_option = Func_Mask(REG_CASELESS);
 
     if ((re = pcre_compile(fargs[1], case_option,
-                           &errptr, &erroffset, mudstate.retabs)) == NULL)
-    {
+                           &errptr, &erroffset, mudstate.retabs)) == NULL) {
         /*
          * Matching error.
          */
@@ -3629,17 +3322,12 @@ void perform_regparse(char *buff, char **bufc, dbref player, dbref caller, dbref
         subpatterns = PCRE_MAX_OFFSETS / 3;
 
     nqregs = list2arr(&qregs, NUM_ENV_VARS, fargs[2], &SPACE_DELIM);
-    for (i = 0; i < nqregs; i++)
-    {
-        if (qregs[i] && *qregs[i])
-        {
+    for (i = 0; i < nqregs; i++) {
+        if (qregs[i] && *qregs[i]) {
             if (pcre_copy_substring(fargs[0], offsets, subpatterns,
-                                    i, matchbuf, LBUF_SIZE) < 0)
-            {
+                                    i, matchbuf, LBUF_SIZE) < 0) {
                 set_xvar(player, qregs[i], NULL);
-            }
-            else
-            {
+            } else {
                 set_xvar(player, qregs[i], matchbuf);
             }
         }
@@ -3675,12 +3363,9 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case_option = Func_Mask(REG_CASELESS);
     all_option = Func_Mask(REG_MATCH_ALL);
 
-    if (all_option)
-    {
+    if (all_option) {
         VaChk_Only_In_Out(4);
-    }
-    else
-    {
+    } else {
         VaChk_Only_In(3);
     }
 
@@ -3688,8 +3373,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     bb_p = *bufc;
 
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset,
-                           mudstate.retabs)) == NULL)
-    {
+                           mudstate.retabs)) == NULL) {
         /*
          * Matching error. Note difference from PennMUSH behavior:
          * Regular expression errors return 0, not #-1 with an error
@@ -3699,20 +3383,16 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
         return;
     }
     study = pcre_study(re, 0, &errptr);
-    if (errptr != NULL)
-    {
+    if (errptr != NULL) {
         notify_quiet(player, errptr);
         XFREE(re, "perform_regrab.re");
         return;
     }
-    do
-    {
+    do {
         r = split_token(&s, &isep);
         if (pcre_exec(re, study, r, strlen(r), 0, 0,
-                      offsets, PCRE_MAX_OFFSETS) >= 0)
-        {
-            if (*bufc != bb_p)
-            {
+                      offsets, PCRE_MAX_OFFSETS) >= 0) {
+            if (*bufc != bb_p) {
                 /*
                  * if true, all_option also
                  * * true
@@ -3723,12 +3403,10 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
             if (!all_option)
                 break;
         }
-    }
-    while (s);
+    } while (s);
 
     XFREE(re, "perform_regrab.re");
-    if (study)
-    {
+    if (study) {
         XFREE(study, "perform_regrab.study");
     }
 }
@@ -3774,8 +3452,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref
     VaChk_Range(2, 3);
 
     if ((re = pcre_compile(fargs[1], case_option,
-                           &errptr, &erroffset, mudstate.retabs)) == NULL)
-    {
+                           &errptr, &erroffset, mudstate.retabs)) == NULL) {
         /*
          * Matching error. Note difference from PennMUSH behavior:
          * Regular expression errors return 0, not #-1 with an error
@@ -3799,8 +3476,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref
     /*
      * If we don't have a third argument, we're done.
      */
-    if (nfargs != 3)
-    {
+    if (nfargs != 3) {
         XFREE(re, "perform_regmatch.re");
         return;
     }
@@ -3812,15 +3488,11 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref
      */
 
     nqregs = list2arr(&qregs, NUM_ENV_VARS, fargs[2], &SPACE_DELIM);
-    for (i = 0; i < nqregs; i++)
-    {
+    for (i = 0; i < nqregs; i++) {
         if (pcre_copy_substring(fargs[0], offsets, subpatterns, i,
-                                tbuf, LBUF_SIZE) < 0)
-        {
+                                tbuf, LBUF_SIZE) < 0) {
             set_register("perform_regmatch", qregs[i], NULL);
-        }
-        else
-        {
+        } else {
             set_register("perform_regmatch", qregs[i], tbuf);
         }
     }
@@ -3884,8 +3556,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
 
     if ((re = pcre_compile(fargs[lastn + 1], 0,
-                           &errptr, &erroffset, mudstate.retabs)) == NULL)
-    {
+                           &errptr, &erroffset, mudstate.retabs)) == NULL) {
         /*
          * Return nothing on a bad match.
          */
@@ -3904,8 +3575,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     Parse_Uattr(player, fargs[0], thing1, anum1, ap);
     Get_Uattr(player, thing1, ap, atext1, aowner1, aflags1, alen1);
     Parse_Uattr(player, fargs[1], thing2, anum2, ap2);
-    if (!ap2)
-    {
+    if (!ap2) {
         free_lbuf(atext1);	/* we allocated this, remember? */
         return;
     }
@@ -3916,19 +3586,15 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * text.
      */
 
-    if ((thing1 == thing2) && (ap->number == ap2->number))
-    {
+    if ((thing1 == thing2) && (ap->number == ap2->number)) {
         is_same = 1;
         is_exact_same = 1;
-    }
-    else
-    {
+    } else {
         is_exact_same = 0;
         atext2 =
             atr_pget(thing2, ap2->number, &aowner2, &aflags2, &alen2);
         if (!*atext2
-                || !See_attr(player, thing2, ap2, aowner2, aflags2))
-        {
+                || !See_attr(player, thing2, ap2, aowner2, aflags2)) {
             free_lbuf(atext1);
             free_lbuf(atext2);
             return;
@@ -3953,8 +3619,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         cp[i] = NULL;
     cp[2] = trim_space_sep(fargs[2], &isep);
     nwords = count[2] = countwords(cp[2], &isep);
-    for (i = 3; i <= lastn; i++)
-    {
+    for (i = 3; i <= lastn; i++) {
         cp[i] = trim_space_sep(fargs[i], &isep);
         count[i] = countwords(cp[i], &isep);
         if (count[i] > nwords)
@@ -3963,23 +3628,17 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     for (wc = 0;
             (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim)
-            && !Too_Much_CPU(); wc++)
-    {
-        for (i = 2; i <= lastn; i++)
-        {
-            if (count[i])
-            {
+            && !Too_Much_CPU(); wc++) {
+        for (i = 2; i <= lastn; i++) {
+            if (count[i]) {
                 os[i - 2] = split_token(&cp[i], &isep);
-            }
-            else
-            {
+            } else {
                 tmpbuf[0] = '\0';
                 os[i - 2] = tmpbuf;
             }
         }
 
-        if (*bufc != bb_p)
-        {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         StrCopyKnown(atextbuf, atext1, alen1);
@@ -3987,8 +3646,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         savep = *bufc;
         exec(buff, bufc, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
-        if (!is_same)
-        {
+        if (!is_same) {
             StrCopyKnown(atextbuf, atext2, alen2);
             dp = savep = condbuf;
             str = atextbuf;
@@ -4045,13 +3703,10 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     caseless = Func_Mask(REG_CASELESS);
 
     it = match_thing(player, fargs[0]);
-    if (!Good_obj(it))
-    {
+    if (!Good_obj(it)) {
         safe_nomatch(buff, bufc);
         return;
-    }
-    else if (!(Examinable(player, it)))
-    {
+    } else if (!(Examinable(player, it))) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -4059,35 +3714,29 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Make sure there's an attribute and a pattern
      */
 
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         safe_str("#-1 NO SUCH ATTRIBUTE", buff, bufc);
         return;
     }
-    if (!fargs[2] || !*fargs[2])
-    {
+    if (!fargs[2] || !*fargs[2]) {
         safe_str("#-1 INVALID GREP PATTERN", buff, bufc);
         return;
     }
-    switch (grep_type)
-    {
+    switch (grep_type) {
     case GREP_EXACT:
-        if (caseless)
-        {
+        if (caseless) {
             for (p = fargs[2]; *p; p++)
                 *p = tolower(*p);
         }
         break;
     case GREP_REGEXP:
         if ((re = pcre_compile(fargs[2], caseless, &errptr, &erroffset,
-                               mudstate.retabs)) == NULL)
-        {
+                               mudstate.retabs)) == NULL) {
             notify_quiet(player, errptr);
             return;
         }
         study = pcre_study(re, 0, &errptr);
-        if (errptr != NULL)
-        {
+        if (errptr != NULL) {
             XFREE(re, "perform_grep.re");
             notify_quiet(player, errptr);
             return;
@@ -4104,13 +3753,10 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     patc = patbuf = alloc_lbuf("perform_grep.parse_attrib");
     safe_tprintf_str(patbuf, &patc, "#%d/%s", it, fargs[1]);
     olist_push();
-    if (parse_attrib_wild(player, patbuf, &thing, 0, 0, 1, 1))
-    {
-        for (ca = olist_first(); ca != NOTHING; ca = olist_next())
-        {
+    if (parse_attrib_wild(player, patbuf, &thing, 0, 0, 1, 1)) {
+        for (ca = olist_first(); ca != NOTHING; ca = olist_next()) {
             attrib = atr_get(thing, ca, &aowner, &aflags, &alen);
-            if ((grep_type == GREP_EXACT) && caseless)
-            {
+            if ((grep_type == GREP_EXACT) && caseless) {
                 for (p = attrib; *p; p++)
                     *p = tolower(*p);
             }
@@ -4120,10 +3766,8 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                         && quick_wild(fargs[2], attrib))
                     || ((grep_type == GREP_REGEXP)
                         && (pcre_exec(re, study, attrib, alen, 0, 0,
-                                      offsets, PCRE_MAX_OFFSETS) >= 0)))
-            {
-                if (*bufc != bb_p)
-                {
+                                      offsets, PCRE_MAX_OFFSETS) >= 0))) {
+                if (*bufc != bb_p) {
                     print_sep(&osep, buff, bufc);
                 }
                 safe_str((char *)(atr_num(ca))->name, buff,
@@ -4134,12 +3778,10 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
     free_lbuf(patbuf);
     olist_pop();
-    if (re)
-    {
+    if (re) {
         XFREE(re, "perform_grep.re");
     }
-    if (study)
-    {
+    if (study) {
         XFREE(study, "perform_grep.study");
     }
 }
@@ -4185,14 +3827,10 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 static void grid_free(dbref thing, OBJGRID *ogp) {
     int r, c;
 
-    if (ogp)
-    {
-        for (r = 0; r < ogp->rows; r++)
-        {
-            for (c = 0; c < ogp->cols; c++)
-            {
-                if (ogp->data[r][c] != NULL)
-                {
+    if (ogp) {
+        for (r = 0; r < ogp->rows; r++) {
+            for (c = 0; c < ogp->cols; c++) {
+                if (ogp->data[r][c] != NULL) {
                     XFREE(ogp->data[r][c],
                           "grid_free_elem");
                 }
@@ -4223,14 +3861,12 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     cols = (int)strtol(fargs[1], (char **)NULL, 10);
     dimension = rows * cols;
 
-    if ((dimension > mudconf.max_grid_size) || (dimension < 0))
-    {
+    if ((dimension > mudconf.max_grid_size) || (dimension < 0)) {
         safe_str("#-1 INVALID GRID SIZE", buff, bufc);
         return;
     }
     ogp = grid_get(player);
-    if (ogp)
-    {
+    if (ogp) {
         grid_free(player, ogp);
     }
     if (dimension == 0)
@@ -4246,15 +3882,13 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     ogp->cols = cols;
     ogp->data = (char ***)XCALLOC(rows, sizeof(char ***), "grid_data");
 
-    for (r = 0; r < rows; r++)
-    {
+    for (r = 0; r < rows; r++) {
         ogp->data[r] =
             (char **)XCALLOC(cols, sizeof(char *), "grid_row");
     }
 
     status = nhashadd(player, (int *)ogp, &mudstate.objgrid_htab);
-    if (status < 0)
-    {
+    if (status < 0) {
         STARTLOG(LOG_BUGS, "GRD", "MAKE")
         log_name(player);
         ENDLOG grid_free(player, ogp);
@@ -4270,28 +3904,24 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     rbuf = alloc_lbuf("fun_gridmake.rows");
     strcpy(rbuf, fargs[2]);
     data_rows = list2arr(&row_text, LBUF_SIZE / 2, rbuf, &rsep);
-    if (data_rows > rows)
-    {
+    if (data_rows > rows) {
         safe_str("#-1 TOO MANY DATA ROWS", buff, bufc);
         free_lbuf(rbuf);
         grid_free(player, ogp);
         return;
     }
     errs = 0;
-    for (r = 0; r < data_rows; r++)
-    {
+    for (r = 0; r < data_rows; r++) {
         data_elems =
             list2arr(&elem_text, LBUF_SIZE / 2, row_text[r], &csep);
-        if (data_elems > cols)
-        {
+        if (data_elems > cols) {
             safe_tprintf_str(buff, bufc,
                              "#-1 ROW %d HAS TOO MANY ELEMS", r);
             free_lbuf(rbuf);
             grid_free(player, ogp);
             return;
         }
-        for (c = 0; c < data_elems; c++)
-        {
+        for (c = 0; c < data_elems; c++) {
             grid_raw_set(ogp, r, c, elem_text[c]);
         }
     }
@@ -4302,12 +3932,9 @@ void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     OBJGRID *ogp;
 
     ogp = grid_get(player);
-    if (!ogp)
-    {
+    if (!ogp) {
         safe_str("0 0", buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_tprintf_str(buff, bufc, "%d %d", ogp->rows, ogp->cols);
     }
 }
@@ -4326,8 +3953,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     VaChk_Only_In(4);
 
     ogp = grid_get(player);
-    if (!ogp)
-    {
+    if (!ogp) {
         safe_str("#-1 NO GRID", buff, bufc);
         return;
     }
@@ -4338,13 +3964,11 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if ((isep.len == 1) &&
             *fargs[0] && !strchr(fargs[0], isep.str[0]) &&
-            *fargs[1] && !strchr(fargs[1], isep.str[0]))
-    {
+            *fargs[1] && !strchr(fargs[1], isep.str[0])) {
         r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
         c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
         grid_set(ogp, r, c, fargs[2], errs);
-        if (errs)
-        {
+        if (errs) {
             safe_tprintf_str(buff, bufc,
                              "#-1 GOT %d OUT OF RANGE ERRORS", errs);
         }
@@ -4354,83 +3978,57 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * Complex ranges
      */
 
-    if (fargs[0] && *fargs[0])
-    {
+    if (fargs[0] && *fargs[0]) {
         ylist = alloc_lbuf("fun_gridset.ylist");
         strcpy(ylist, fargs[0]);
         n_y = list2arr(&y_elems, LBUF_SIZE / 2, ylist, &isep);
-        if ((n_y == 1) && !*y_elems[0])
-        {
+        if ((n_y == 1) && !*y_elems[0]) {
             free_lbuf(ylist);
             n_y = -1;
         }
-    }
-    else
-    {
+    } else {
         n_y = -1;
     }
 
-    if (fargs[1] && *fargs[1])
-    {
+    if (fargs[1] && *fargs[1]) {
         xlist = alloc_lbuf("fun_gridset.xlist");
         strcpy(xlist, fargs[1]);
         n_x = list2arr(&x_elems, LBUF_SIZE / 2, xlist, &isep);
-        if ((n_x == 1) && !*x_elems[0])
-        {
+        if ((n_x == 1) && !*x_elems[0]) {
             free_lbuf(xlist);
             n_x = -1;
         }
-    }
-    else
-    {
+    } else {
         n_x = -1;
     }
 
     errs = 0;
-    if (n_y == -1)
-    {
-        for (r = 0; r < ogp->rows; r++)
-        {
-            if (n_x == -1)
-            {
-                for (c = 0; c < ogp->cols; c++)
-                {
+    if (n_y == -1) {
+        for (r = 0; r < ogp->rows; r++) {
+            if (n_x == -1) {
+                for (c = 0; c < ogp->cols; c++) {
                     grid_raw_set(ogp, r, c, fargs[2]);
                 }
-            }
-            else
-            {
-                for (i = 0; i < n_x; i++)
-                {
+            } else {
+                for (i = 0; i < n_x; i++) {
                     c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                     grid_set(ogp, r, c, fargs[2], errs);
                 }
             }
         }
-    }
-    else
-    {
-        for (j = 0; j < n_y; j++)
-        {
+    } else {
+        for (j = 0; j < n_y; j++) {
             r = (int)strtol(y_elems[j], (char **)NULL, 10) - 1;
-            if ((r < 0) || (r >= ogp->rows))
-            {
+            if ((r < 0) || (r >= ogp->rows)) {
                 errs++;
-            }
-            else
-            {
-                if (n_x == -1)
-                {
-                    for (c = 0; c < ogp->cols; c++)
-                    {
+            } else {
+                if (n_x == -1) {
+                    for (c = 0; c < ogp->cols; c++) {
                         grid_set(ogp, r, c, fargs[2],
                                  errs);
                     }
-                }
-                else
-                {
-                    for (i = 0; i < n_x; i++)
-                    {
+                } else {
+                    for (i = 0; i < n_x; i++) {
                         c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                         grid_set(ogp, r, c, fargs[2],
                                  errs);
@@ -4440,16 +4038,13 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         }
     }
 
-    if (n_x > 0)
-    {
+    if (n_x > 0) {
         free_lbuf(xlist);
     }
-    if (n_y > 0)
-    {
+    if (n_y > 0) {
         free_lbuf(ylist);
     }
-    if (errs)
-    {
+    if (errs) {
         safe_tprintf_str(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS",
                          errs);
     }
@@ -4471,8 +4066,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     VaChk_SepOut(rsep, 4, 0);
 
     ogp = grid_get(player);
-    if (!ogp)
-    {
+    if (!ogp) {
         safe_str("#-1 NO GRID", buff, bufc);
         return;
     }
@@ -4481,8 +4075,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
 
     if (fargs[0] && *fargs[0] && !strchr(fargs[0], ' ') &&
-            fargs[1] && *fargs[1] && !strchr(fargs[1], ' '))
-    {
+            fargs[1] && *fargs[1] && !strchr(fargs[1], ' ')) {
         r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
         c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
         grid_print(ogp, r, c, 0, csep);
@@ -4492,86 +4085,60 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Complex ranges
      */
 
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         n_y = -1;
-    }
-    else
-    {
+    } else {
         ylist = alloc_lbuf("fun_grid.ylist");
         strcpy(ylist, fargs[0]);
         n_y = list2arr(&y_elems, LBUF_SIZE / 2, ylist, &SPACE_DELIM);
-        if ((n_y == 1) && !*y_elems[0])
-        {
+        if ((n_y == 1) && !*y_elems[0]) {
             free_lbuf(ylist);
             n_y = -1;
         }
     }
 
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         n_x = -1;
-    }
-    else
-    {
+    } else {
         xlist = alloc_lbuf("fun_grid.xlist");
         strcpy(xlist, fargs[1]);
         n_x = list2arr(&x_elems, LBUF_SIZE / 2, xlist, &SPACE_DELIM);
-        if ((n_x == 1) && !*x_elems[0])
-        {
+        if ((n_x == 1) && !*x_elems[0]) {
             free_lbuf(xlist);
             n_x = -1;
         }
     }
 
-    if (n_y == -1)
-    {
-        for (r = 0; r < ogp->rows; r++)
-        {
-            if (r != 0)
-            {
+    if (n_y == -1) {
+        for (r = 0; r < ogp->rows; r++) {
+            if (r != 0) {
                 print_sep(&rsep, buff, bufc);
             }
-            if (n_x == -1)
-            {
-                for (c = 0; c < ogp->cols; c++)
-                {
+            if (n_x == -1) {
+                for (c = 0; c < ogp->cols; c++) {
                     grid_print(ogp, r, c, (c != 0), csep);
                 }
-            }
-            else
-            {
-                for (i = 0; i < n_x; i++)
-                {
+            } else {
+                for (i = 0; i < n_x; i++) {
                     c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                     grid_print(ogp, r, c, (i != 0), csep);
                 }
             }
         }
-    }
-    else
-    {
-        for (j = 0; j < n_y; j++)
-        {
-            if (j != 0)
-            {
+    } else {
+        for (j = 0; j < n_y; j++) {
+            if (j != 0) {
                 print_sep(&rsep, buff, bufc);
             }
             r = (int)strtol(y_elems[j], (char **)NULL, 10) - 1;
-            if (!((r < 0) || (r >= ogp->rows)))
-            {
-                if (n_x == -1)
-                {
-                    for (c = 0; c < ogp->cols; c++)
-                    {
+            if (!((r < 0) || (r >= ogp->rows))) {
+                if (n_x == -1) {
+                    for (c = 0; c < ogp->cols; c++) {
                         grid_print(ogp, r, c, (c != 0),
                                    csep);
                     }
-                }
-                else
-                {
-                    for (i = 0; i < n_x; i++)
-                    {
+                } else {
+                    for (i = 0; i < n_x; i++) {
                         c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
                         grid_print(ogp, r, c, (i != 0),
                                    csep);
@@ -4581,12 +4148,10 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         }
     }
 
-    if (n_x > 0)
-    {
+    if (n_x > 0) {
         free_lbuf(xlist);
     }
-    if (n_y > 0)
-    {
+    if (n_y > 0) {
         free_lbuf(ylist);
     }
 }

@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -37,8 +38,7 @@ static void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear,
         dest = Home(thing);
 
 #ifdef PUEBLO_SUPPORT
-    if (Html(thing))
-    {
+    if (Html(thing)) {
         notify_html(thing, "<xch_page clear=links>");
     }
 #endif
@@ -83,11 +83,9 @@ static void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear,
      * * - The object can hear and is not a dark wizard.
      */
 
-    if (!quiet && !Blind(thing) && !Blind(loc))
-    {
+    if (!quiet && !Blind(thing) && !Blind(loc)) {
         if ((!Dark(thing) && !Dark(loc)) ||
-                (canhear && !DarkMover(thing)))
-        {
+                (canhear && !DarkMover(thing))) {
             notify_except2(loc, thing, thing, cause,
                            tprintf("%s has left.", Name(thing)), MSG_MOVE);
         }
@@ -153,8 +151,7 @@ static void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, 
      */
 
     if (!quiet && canhear &&
-            !Blind(thing) && !Blind(loc) && !DarkMover(thing))
-    {
+            !Blind(thing) && !Blind(loc) && !DarkMover(thing)) {
         notify_except2(loc, thing, thing, cause,
                        tprintf("%s has arrived.", Name(thing)), MSG_MOVE);
     }
@@ -187,12 +184,9 @@ void move_object(dbref thing, dbref dest) {
      * Add to destination location
      */
 
-    if (dest != NOTHING)
-    {
+    if (dest != NOTHING) {
         s_Contents(dest, insert_first(Contents(dest), thing));
-    }
-    else
-    {
+    } else {
         s_Next(thing, NOTHING);
     }
     s_Location(thing, dest);
@@ -205,8 +199,7 @@ void move_object(dbref thing, dbref dest) {
     if (isPlayer(thing) &&
             (mudconf.payfind > 0) &&
             (Pennies(thing) < mudconf.paylimit) &&
-            (!Controls(thing, dest)) && (Randomize(mudconf.payfind) == 0))
-    {
+            (!Controls(thing, dest)) && (Randomize(mudconf.payfind) == 0)) {
         giveto(thing, 1);
         notify(thing, tprintf("You found a %s!", mudconf.one_coin));
     }
@@ -254,8 +247,7 @@ static void process_sticky_dropto(dbref loc, dbref player) {
      * Make sure no players hanging out
      */
 
-    DOLIST(thing, Contents(loc))
-    {
+    DOLIST(thing, Contents(loc)) {
         if (Dropper(thing))
             return;
     }
@@ -265,8 +257,7 @@ static void process_sticky_dropto(dbref loc, dbref player) {
      */
 
     s_Contents(loc, reverse_list(Contents(loc)));
-    SAFE_DOLIST(thing, next, Contents(loc))
-    {
+    SAFE_DOLIST(thing, next, Contents(loc)) {
         send_dropto(thing, player);
     }
 }
@@ -280,8 +271,7 @@ static void process_dropped_dropto(dbref thing, dbref player) {
      * If STICKY, send home
      */
 
-    if (Sticky(thing))
-    {
+    if (Sticky(thing)) {
         move_via_generic(thing, HOME, player, 0);
         divest_object(thing);
         return;
@@ -376,18 +366,14 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush) {
     char *failmsg;
 
     src = Location(thing);
-    if ((dest != HOME) && Good_obj(src))
-    {
+    if ((dest != HOME) && Good_obj(src)) {
         curr = src;
-        for (count = mudconf.ntfy_nest_lim; count > 0; count--)
-        {
-            if (!could_doit(thing, curr, A_LTELOUT))
-            {
+        for (count = mudconf.ntfy_nest_lim; count > 0; count--) {
+            if (!could_doit(thing, curr, A_LTELOUT)) {
                 if ((thing == cause) || (cause == NOTHING))
                     failmsg = (char *)
                               "You can't teleport out!";
-                else
-                {
+                else {
                     failmsg = (char *)
                               "You can't be teleported out!";
                     notify_quiet(cause,
@@ -436,8 +422,7 @@ static dbref find_var_dest(dbref player, dbref exit) {
     GDATA *preserve;
 
     buf = atr_pget(exit, A_EXITVARDEST, &aowner, &aflags, &alen);
-    if (!*buf)
-    {
+    if (!*buf) {
         free_lbuf(buf);
         return NOTHING;
     }
@@ -469,8 +454,7 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
     int oattr, aattr;
 
     loc = Location(exit);
-    switch (loc)
-    {
+    switch (loc) {
     case HOME:
         loc = Home(player);
         break;
@@ -484,10 +468,8 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
         break;
     }
 
-    if (Good_obj(loc) && could_doit(player, exit, A_LOCK))
-    {
-        switch (Typeof(loc))
-        {
+    if (Good_obj(loc) && could_doit(player, exit, A_LOCK)) {
+        switch (Typeof(loc)) {
         case TYPE_ROOM:
             move_via_exit(player, loc, NOTHING, exit, hush);
             if (divest)
@@ -495,8 +477,7 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
             break;
         case TYPE_PLAYER:
         case TYPE_THING:
-            if (Going(loc))
-            {
+            if (Going(loc)) {
                 notify(player, "You can't go that way.");
                 return;
             }
@@ -507,9 +488,7 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
             notify(player, "You can't go that way.");
             return;
         }
-    }
-    else
-    {
+    } else {
         oattr = (Dark(player) || (hush & HUSH_EXIT)) ?
                 A_NULL : A_OFAIL;
         aattr = ((hush & HUSH_EXIT) ||
@@ -530,18 +509,15 @@ void do_move(dbref player, dbref cause, int key, char *direction) {
 
     int i, quiet;
 
-    if (!string_compare(direction, "home"))  	/* go home w/o stuff */
-    {
+    if (!string_compare(direction, "home")) {	/* go home w/o stuff */
         if (((Fixed(player)) || (Fixed(Owner(player)))) &&
-                !(WizRoy(player)))
-        {
+                !(WizRoy(player))) {
             notify(player, mudconf.fixed_home_msg);
             return;
         }
 
         if ((loc = Location(player)) != NOTHING &&
-                !Dark(player) && !Dark(loc))
-        {
+                !Dark(player) && !Dark(loc)) {
 
             /*
              * tell all
@@ -565,33 +541,27 @@ void do_move(dbref player, dbref cause, int key, char *direction) {
      * find the exit
      */
 
-    if (mudconf.move_match_more)
-    {
+    if (mudconf.move_match_more) {
         init_match_check_keys(player, direction, TYPE_EXIT);
         match_exit_with_parents();
         exit = last_match_result();
-        if (exit == NOTHING)
-        {
+        if (exit == NOTHING) {
             init_match_check_keys(player, direction, TYPE_EXIT);
             match_master_exit();
             exit = last_match_result();
         }
-        if (exit == NOTHING)
-        {
+        if (exit == NOTHING) {
             init_match_check_keys(player, direction, TYPE_EXIT);
             match_zone_exit();
             exit = last_match_result();
         }
-    }
-    else
-    {
+    } else {
         init_match_check_keys(player, direction, TYPE_EXIT);
         match_exit();
         exit = match_result();
     }
 
-    switch (exit)
-    {
+    switch (exit) {
     case NOTHING:		/* try to force the object */
         notify(player, "You can't go that way.");
         break;
@@ -626,8 +596,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
      */
 
     if (!isRoom(playerloc) && !Enter_ok(playerloc) &&
-            !controls(player, playerloc))
-    {
+            !controls(player, playerloc)) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
@@ -657,8 +626,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
      */
 
     quiet = 0;
-    switch (Typeof(thing))
-    {
+    switch (Typeof(thing)) {
     case TYPE_PLAYER:
     case TYPE_THING:
         /*
@@ -666,22 +634,17 @@ void do_get(dbref player, dbref cause, int key, char *what) {
          */
 
         thingloc = Location(thing);
-        if (thingloc == player)
-        {
+        if (thingloc == player) {
             notify(player, "You already have that!");
             break;
         }
         if ((key & GET_QUIET) && Controls(player, thing))
             quiet = 1;
 
-        if (thing == player)
-        {
+        if (thing == player) {
             notify(player, "You cannot get yourself!");
-        }
-        else if (could_doit(player, thing, A_LOCK))
-        {
-            if (thingloc != Location(player))
-            {
+        } else if (could_doit(player, thing, A_LOCK)) {
+            if (thingloc != Location(player)) {
                 notify(thingloc,
                        tprintf("%s was taken from you.",
                                Name(thing)));
@@ -692,9 +655,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
             aattr = quiet ? 0 : A_ASUCC;
             did_it(player, thing, A_SUCC, "Taken.", oattr, NULL,
                    aattr, 0, (char **)NULL, 0, MSG_MOVE);
-        }
-        else
-        {
+        } else {
             oattr = quiet ? 0 : A_OFAIL;
             aattr = quiet ? 0 : A_AFAIL;
             if (thingloc != Location(player))
@@ -713,8 +674,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
          */
 
         thingloc = Exits(thing);
-        if (thingloc == player)
-        {
+        if (thingloc == player) {
             notify(player, "You already have that!");
             break;
         }
@@ -723,8 +683,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
          */
 
         playerloc = Location(player);
-        if (!Controls(player, thing) && !Controls(player, playerloc))
-        {
+        if (!Controls(player, thing) && !Controls(player, playerloc)) {
             notify(player, NOPERM_MESSAGE);
             break;
         }
@@ -763,8 +722,7 @@ void do_drop(dbref player, dbref cause, int key, char *name) {
     match_possession();
     match_carried_exit();
 
-    switch (thing = match_result())
-    {
+    switch (thing = match_result()) {
     case NOTHING:
         notify(player, "You don't have that!");
         return;
@@ -773,8 +731,7 @@ void do_drop(dbref player, dbref cause, int key, char *name) {
         return;
     }
 
-    switch (Typeof(thing))
-    {
+    switch (Typeof(thing)) {
     case TYPE_THING:
     case TYPE_PLAYER:
 
@@ -783,8 +740,7 @@ void do_drop(dbref player, dbref cause, int key, char *name) {
          */
 
         if (((Location(thing) != player) && !Wizard(player)) ||
-                (!could_doit(player, thing, A_LDROP)))
-        {
+                (!could_doit(player, thing, A_LDROP))) {
             did_it(player, thing, A_DFAIL, "You can't drop that.",
                    A_ODFAIL, NULL, A_ADFAIL, 0, (char **)NULL, 0,
                    MSG_MOVE);
@@ -820,13 +776,11 @@ void do_drop(dbref player, dbref cause, int key, char *name) {
          * You have to be carrying it
          */
 
-        if ((Exits(thing) != player) && !Wizard(player))
-        {
+        if ((Exits(thing) != player) && !Wizard(player)) {
             notify(player, "You can't drop that.");
             return;
         }
-        if (!Controls(player, loc) && !Open_Anywhere(player))
-        {
+        if (!Controls(player, loc) && !Open_Anywhere(player)) {
             notify(player, NOPERM_MESSAGE);
             return;
         }
@@ -857,27 +811,20 @@ void do_enter_internal(dbref player, dbref thing, int quiet) {
 
     int oattr, aattr;
 
-    if (!Enter_ok(thing) && !controls(player, thing))
-    {
+    if (!Enter_ok(thing) && !controls(player, thing)) {
         oattr = quiet ? 0 : A_OEFAIL;
         aattr = quiet ? 0 : A_AEFAIL;
         did_it(player, thing, A_EFAIL, NOPERM_MESSAGE,
                oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
-    }
-    else if (player == thing)
-    {
+    } else if (player == thing) {
         notify(player, "You can't enter yourself!");
-    }
-    else if (could_doit(player, thing, A_LENTER))
-    {
+    } else if (could_doit(player, thing, A_LENTER)) {
         loc = Location(player);
         oattr = quiet ? HUSH_ENTER : 0;
         move_via_generic(player, thing, NOTHING, oattr);
         divest_object(player);
         process_sticky_dropto(loc, player);
-    }
-    else
-    {
+    } else {
         oattr = quiet ? 0 : A_OEFAIL;
         aattr = quiet ? 0 : A_AEFAIL;
         did_it(player, thing, A_EFAIL, "You can't enter that.",
@@ -898,8 +845,7 @@ void do_enter(dbref player, dbref cause, int key, char *what) {
     if ((thing = noisy_match_result()) == NOTHING)
         return;
 
-    switch (Typeof(thing))
-    {
+    switch (Typeof(thing)) {
     case TYPE_PLAYER:
     case TYPE_THING:
         quiet = 0;
@@ -920,20 +866,16 @@ void do_leave(dbref player, dbref cause, int key) {
 
     loc = Location(player);
 
-    if (!Good_obj(loc) || isRoom(loc) || Going(loc))
-    {
+    if (!Good_obj(loc) || isRoom(loc) || Going(loc)) {
         notify(player, "You can't leave.");
         return;
     }
     quiet = 0;
     if ((key & MOVE_QUIET) && Controls(player, loc))
         quiet = HUSH_LEAVE;
-    if (could_doit(player, loc, A_LLEAVE))
-    {
+    if (could_doit(player, loc, A_LLEAVE)) {
         move_via_generic(player, Location(loc), NOTHING, quiet);
-    }
-    else
-    {
+    } else {
         oattr = quiet ? 0 : A_OLFAIL;
         aattr = quiet ? 0 : A_ALFAIL;
         did_it(player, loc, A_LFAIL, "You can't leave.",

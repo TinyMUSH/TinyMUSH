@@ -34,16 +34,15 @@
 typedef char	boolexp_type;
 
 typedef struct attr ATTR;
-struct attr
-{
+struct attr {
     const char     *name;	/* This has to be first.  braindeath. */
     int		number;	/* attr number */
     int		flags;
-    int		FDECL      ((*check), (int, dbref, dbref, int, char *));
+    int		(*check)(int, dbref, dbref, int, char *);
 };
 
-extern ATTR    *FDECL(atr_num, (int anum));
-extern ATTR    *FDECL(atr_str, (char *s));
+extern ATTR    *atr_num(int anum);
+extern ATTR    *atr_str(char *s);
 
 extern ATTR	attr[];
 
@@ -51,7 +50,7 @@ extern ATTR   **anum_table;
 
 #define anum_get(x)	(anum_table[(x)])
 #define anum_set(x,v)	anum_table[(x)] = v
-extern void	FDECL(anum_extend, (int));
+extern void	anum_extend(int);
 
 #define	ATR_INFO_CHAR	'\1'	/* Leadin char for attr control data */
 
@@ -68,8 +67,7 @@ extern void	FDECL(anum_extend, (int));
 #define	BOOLEXP_EVAL	9
 
 typedef struct boolexp BOOLEXP;
-struct boolexp
-{
+struct boolexp {
     boolexp_type	type;
     struct boolexp *sub1;
     struct boolexp *sub2;
@@ -115,8 +113,7 @@ struct boolexp
 #define	NOPERM		(-4)	/* Error status, no permission */
 
 typedef struct object OBJ;
-struct object
-{
+struct object {
     dbref		location;	/* PLAYER, THING: where it is */
     /* ROOM: dropto: */
     /* EXIT: where it goes to */
@@ -174,8 +171,7 @@ struct object
  */
 
 typedef struct dump_object DUMPOBJ;
-struct dump_object
-{
+struct dump_object {
     dbref		location;	/* PLAYER, THING: where it is */
     /* ROOM: dropto: */
     /* EXIT: where it goes to */
@@ -298,43 +294,43 @@ extern NAME    *names;
 #define s_StructCount(t,n)	db[t].struct_count = n;
 #define s_InstanceCount(t,n)	db[t].instance_count = n;
 
-extern int	FDECL(Pennies, (dbref));
-extern void	FDECL(s_Pennies, (dbref, int));
+extern int	Pennies(dbref);
+extern void	s_Pennies(dbref, int);
 
-extern void	NDECL(tf_init);
-extern int	FDECL(tf_open, (char *, int));
-extern void	FDECL(tf_close, (int));
-extern FILE    *FDECL(tf_fopen, (char *, int));
-extern void	FDECL(tf_fclose, (FILE *));
-extern FILE    *FDECL(tf_popen, (char *, int));
+extern void	tf_init(void);
+extern int	tf_open(char *, int);
+extern void	tf_close(int);
+extern FILE    *tf_fopen(char *, int);
+extern void	tf_fclose(FILE *);
+extern FILE    *tf_popen(char *, int);
 
 #define tf_pclose(f)	tf_fclose(f)
 
 #define putref(pr__f,pr__ref)	fprintf(pr__f, "%d\n", (int)pr__ref)
 #define putlong(pr__f,pr__i)	fprintf(pr__f, "%ld\n", (long)pr__i)
 
-extern dbref FDECL(getref, (FILE *));
-extern long FDECL(getlong, (FILE *));
-extern BOOLEXP *FDECL(dup_bool, (BOOLEXP *));
-extern void	FDECL(free_boolexp, (BOOLEXP *));
-extern dbref	FDECL(parse_dbref, (const char *));
-extern dbref	FDECL(parse_dbref_only, (const char *));
-extern dbref	FDECL(parse_objid, (const char *, const char *));
-extern int	FDECL(mkattr, (char *));
-extern void	FDECL(al_add, (dbref, int));
-extern void	FDECL(al_delete, (dbref, int));
-extern void	FDECL(al_destroy, (dbref));
-extern void	NDECL(al_store);
-extern void	FDECL(db_grow, (dbref));
-extern void	NDECL(db_free);
-extern void	NDECL(db_make_minimal);
-extern dbref	FDECL(db_convert, (FILE *, int *, int *, int *));
-extern dbref	NDECL(db_read);
-extern dbref	FDECL(db_write_flatfile, (FILE *, int, int));
-extern dbref	NDECL(db_write);
-extern FILE    *FDECL(db_module_flatfile, (char *, int));
-extern void	FDECL(destroy_thing, (dbref));
-extern void	FDECL(destroy_exit, (dbref));
+extern dbref getref(FILE *);
+extern long getlong(FILE *);
+extern BOOLEXP *dup_bool(BOOLEXP *);
+extern void	free_boolexp(BOOLEXP *);
+extern dbref	parse_dbref(const char *);
+extern dbref	parse_dbref_only(const char *);
+extern dbref	parse_objid(const char *, const char *);
+extern int	mkattr(char *);
+extern void	al_add(dbref, int);
+extern void	al_delete(dbref, int);
+extern void	al_destroy(dbref);
+extern void	al_store(void);
+extern void	db_grow(dbref);
+extern void	db_free(void);
+extern void	db_make_minimal(void);
+extern dbref	db_convert(FILE *, int *, int *, int *);
+extern dbref	db_read(void);
+extern dbref	db_write_flatfile(FILE *, int, int);
+extern dbref	db_write(void);
+extern FILE    *db_module_flatfile(char *, int);
+extern void	destroy_thing(dbref);
+extern void	destroy_exit(dbref);
 
 #define	DOLIST(thing,list) \
 	for ((thing)=(list); \
@@ -362,16 +358,14 @@ extern void	FDECL(destroy_exit, (dbref));
 }
 
 typedef struct logfiletable LOGFILETAB;
-struct logfiletable
-{
+struct logfiletable {
     int		log_flag;
     FILE           *fileptr;
     char           *filename;
 };
 
 typedef struct numbertable NUMBERTAB;
-struct numbertable
-{
+struct numbertable {
     int		num;
 };
 

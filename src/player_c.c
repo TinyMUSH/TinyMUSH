@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -17,8 +18,7 @@
 
 #include "attrs.h"		/* required by code */
 
-typedef struct player_cache
-{
+typedef struct player_cache {
     dbref player;
     int money;
     int queue;
@@ -38,8 +38,7 @@ PCACHE *pcache_head;
 #define	PF_MONEY_CH	0x0004
 #define	PF_QMAX_CH	0x0008
 
-void pcache_init(void)
-{
+void pcache_init(void) {
     pool_init(POOL_PCACHE, sizeof(PCACHE));
     nhashinit(&pcache_htab, 15 * HASH_FACTOR);
     pcache_head = NULL;
@@ -68,8 +67,7 @@ PCACHE *pcache_find(dbref player) {
     PCACHE *pp;
 
     pp = (PCACHE *) nhashfind(player, &pcache_htab);
-    if (pp)
-    {
+    if (pp) {
         pp->cflags |= PF_REF;
         return pp;
     }
@@ -88,8 +86,7 @@ PCACHE *pcache_find(dbref player) {
 void pcache_reload(dbref player) {
     PCACHE *pp;
 
-    if (Good_owner(player))
-    {
+    if (Good_owner(player)) {
         pp = pcache_find(player);
         pcache_reload1(player, pp);
     }
@@ -100,13 +97,11 @@ static void pcache_save(PCACHE *pp) {
 
     if (pp->cflags & PF_DEAD)
         return;
-    if (pp->cflags & PF_MONEY_CH)
-    {
+    if (pp->cflags & PF_MONEY_CH) {
         ltos(tbuf, pp->money);
         atr_add_raw(pp->player, A_MONEY, tbuf);
     }
-    if (pp->cflags & PF_QMAX_CH)
-    {
+    if (pp->cflags & PF_QMAX_CH) {
         sprintf(tbuf, "%d", pp->qmax);
         atr_add_raw(pp->player, A_QUEUEMAX, tbuf);
     }
@@ -118,24 +113,19 @@ void pcache_trim(void) {
 
     pp = pcache_head;
     pplast = NULL;
-    while (pp)
-    {
+    while (pp) {
         if (!(pp->cflags & PF_DEAD) &&
-                (pp->queue || (pp->cflags & PF_REF)))
-        {
+                (pp->queue || (pp->cflags & PF_REF))) {
             pp->cflags &= ~PF_REF;
             pplast = pp;
             pp = pp->next;
-        }
-        else
-        {
+        } else {
             ppnext = pp->next;
             if (pplast)
                 pplast->next = ppnext;
             else
                 pcache_head = ppnext;
-            if (!(pp->cflags & PF_DEAD))
-            {
+            if (!(pp->cflags & PF_DEAD)) {
                 pcache_save(pp);
                 nhashdelete(pp->player, &pcache_htab);
             }
@@ -149,8 +139,7 @@ void pcache_sync(void) {
     PCACHE *pp;
 
     pp = pcache_head;
-    while (pp)
-    {
+    while (pp) {
         pcache_save(pp);
         pp = pp->next;
     }
@@ -159,14 +148,11 @@ void pcache_sync(void) {
 int a_Queue(dbref player, int adj) {
     PCACHE *pp;
 
-    if (Good_owner(player))
-    {
+    if (Good_owner(player)) {
         pp = pcache_find(player);
         pp->queue += adj;
         return pp->queue;
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
@@ -174,8 +160,7 @@ int a_Queue(dbref player, int adj) {
 void s_Queue(dbref player, int val) {
     PCACHE *pp;
 
-    if (Good_owner(player))
-    {
+    if (Good_owner(player)) {
         pp = pcache_find(player);
         pp->queue = val;
     }
@@ -187,15 +172,11 @@ int QueueMax(dbref player) {
     int m;
 
     m = 0;
-    if (Good_owner(player))
-    {
+    if (Good_owner(player)) {
         pp = pcache_find(player);
-        if (pp->qmax >= 0)
-        {
+        if (pp->qmax >= 0) {
             m = pp->qmax;
-        }
-        else
-        {
+        } else {
             m = mudstate.db_top + 1;
             if (m < mudconf.queuemax)
                 m = mudconf.queuemax;
@@ -209,8 +190,7 @@ int Pennies(dbref obj) {
 
     char *cp;
 
-    if (!mudstate.standalone && Good_owner(obj))
-    {
+    if (!mudstate.standalone && Good_owner(obj)) {
         pp = pcache_find(obj);
         return pp->money;
     }
@@ -224,8 +204,7 @@ void s_Pennies(dbref obj, int howfew) {
 
     IBUF tbuf;
 
-    if (!mudstate.standalone && Good_owner(obj))
-    {
+    if (!mudstate.standalone && Good_owner(obj)) {
         pp = pcache_find(obj);
         pp->money = howfew;
         pp->cflags |= PF_MONEY_CH;

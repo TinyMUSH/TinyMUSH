@@ -1,11 +1,9 @@
-/* db_mysql.c - Implements accessing a mySQL 3.22+ database. */
-/* $Id: db_mysql.c,v 1.11 2004/09/13 14:12:54 tyrspace Exp $ */
-
 #include "../../copyright.h"
-#include "db_sql.h"
+#include "../../config.h"
+#include "../../system.h"
 
-//#include "db.h"			/* required by externs */
-//#include "externs.h"		/* required by code */
+#include "../../api.h"
+#include "db_sql.h"
 
 /* See db_sql.h for details of what each of these functions do. */
 

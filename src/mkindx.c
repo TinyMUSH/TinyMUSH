@@ -12,13 +12,13 @@
 */
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include  "help.h"
 
 char line[LINE_SIZE + 1];
 
-typedef struct _help_indx_list
-{
+typedef struct _help_indx_list {
     help_indx entry;
     struct _help_indx_list *next;
 } help_indx_list;
@@ -36,19 +36,16 @@ int main(int argc, char *argv[]) {
 
     FILE *rfp, *wfp;
 
-    if (argc < 2 || argc > 3)
-    {
+    if (argc < 2 || argc > 3) {
         printf
         ("Usage:\tmkindx <file_to_be_indexed> <output_index_filename>\n");
         exit(-1);
     }
-    if ((rfp = fopen(argv[1], "r")) == NULL)
-    {
+    if ((rfp = fopen(argv[1], "r")) == NULL) {
         fprintf(stderr, "can't open %s for reading\n", argv[1]);
         exit(-1);
     }
-    if ((wfp = fopen(argv[2], "w")) == NULL)
-    {
+    if ((wfp = fopen(argv[2], "w")) == NULL) {
         fprintf(stderr, "can't open %s for writing\n", argv[2]);
         exit(-1);
     }
@@ -64,28 +61,23 @@ int main(int argc, char *argv[]) {
     entries = (help_indx_list *) malloc(sizeof(help_indx_list));
     memset(entries, 0, sizeof(help_indx_list));
 
-    while (fgets(line, LINE_SIZE, rfp) != NULL)
-    {
+    while (fgets(line, LINE_SIZE, rfp) != NULL) {
         ++lineno;
 
         n = strlen(line);
-        if (line[n - 1] != '\n')
-        {
+        if (line[n - 1] != '\n') {
             fprintf(stderr, "line %d: line too long\n", lineno);
         }
-        if (line[0] == '&')
-        {
+        if (line[0] == '&') {
             ++ntopics;
 
-            if ((ntopics > 1) && actualdata)
-            {
+            if ((ntopics > 1) && actualdata) {
                 /*
                  *  we've hit the next topic, time to write the ones we've been
                  *  building
                  */
                 actualdata = 0;
-                if (dump_entries(wfp, pos, entries))
-                {
+                if (dump_entries(wfp, pos, entries)) {
                     fprintf(stderr, "error writing %s\n",
                             argv[2]);
                     exit(-1);
@@ -93,8 +85,7 @@ int main(int argc, char *argv[]) {
                 memset(entries, 0, sizeof(help_indx_list));
             }
 
-            if (entries->entry.pos)
-            {
+            if (entries->entry.pos) {
                 /*
                  *  we're already working on an entry... time to start nesting
                  */
@@ -109,8 +100,7 @@ int main(int argc, char *argv[]) {
             for (topic = &line[1];
                     (*topic == ' ' || *topic == '\t')
                     && *topic != '\0'; topic++);
-            for (i = -1, s = topic; *s != '\n' && *s != '\0'; s++)
-            {
+            for (i = -1, s = topic; *s != '\n' && *s != '\0'; s++) {
                 if (i >= TOPIC_NAME_LEN - 1)
                     break;
                 if (*s != ' '
@@ -119,9 +109,7 @@ int main(int argc, char *argv[]) {
             }
             entries->entry.topic[++i] = '\0';
             entries->entry.pos = pos + (long)n;
-        }
-        else if (n > 1)
-        {
+        } else if (n > 1) {
             /*
              *  a non blank line.  we can flush entries to the .indx file the next
              *  time we run into a topic line...
@@ -130,8 +118,7 @@ int main(int argc, char *argv[]) {
         }
         pos += n;
     }
-    if (dump_entries(wfp, pos, entries))
-    {
+    if (dump_entries(wfp, pos, entries)) {
         fprintf(stderr, "error writing %s\n", argv[2]);
         exit(-1);
     }
@@ -161,8 +148,7 @@ int dump_entries(FILE * wfp, long pos, help_indx_list * entries) {
     prev_ep = 0;
     depth = 0;
 
-    for (ep = entries; ep; ep = ep->next)
-    {
+    for (ep = entries; ep; ep = ep->next) {
         ep->entry.pos = (long)truepos;
         ep->entry.len = truelen;
         if (fwrite(&ep->entry, sizeof(help_indx), 1, wfp) < 1)

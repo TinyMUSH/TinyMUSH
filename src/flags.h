@@ -112,8 +112,7 @@
  * FLAGENT: Information about object flags.
  */
 
-typedef struct flag_entry
-{
+typedef struct flag_entry {
     const char     *flagname;	/* Name of the flag */
     int		flagvalue;	/* Which bit in the object is the
 					 * flag */
@@ -130,8 +129,7 @@ typedef struct flag_entry
  * OBJENT: Fundamental object types
  */
 
-typedef struct object_entry
-{
+typedef struct object_entry {
     const char     *name;
     char		lett;
     int		perm;
@@ -147,25 +145,24 @@ extern OBJENT	object_types[8];
 #define	OF_OWNER	0x0020	/* Object can own other objects */
 #define	OF_SIBLINGS	0x0040	/* Object has siblings: Next() */
 
-typedef struct flagset
-{
+typedef struct flagset {
     FLAG		word1;
     FLAG		word2;
     FLAG		word3;
 }		FLAGSET;
 
-extern void	NDECL(init_flagtab);
-extern void	FDECL(display_flagtab, (dbref));
-extern void	FDECL(flag_set, (dbref, dbref, char *, int));
-extern char    *FDECL(flag_description, (dbref, dbref));
-extern FLAGENT *FDECL(find_flag, (dbref, char *));
-extern char    *FDECL(decode_flags, (dbref, FLAGSET));
-extern char    *FDECL(unparse_flags, (dbref, dbref));
-extern int	FDECL(has_flag, (dbref, dbref, char *));
-extern char    *FDECL(unparse_object, (dbref, dbref, int));
-extern char    *FDECL(unparse_object_numonly, (dbref));
-extern int	FDECL(convert_flags, (dbref, char *, FLAGSET *, FLAG *));
-extern void	FDECL(decompile_flags, (dbref, dbref, char *));
+extern void	init_flagtab(void);
+extern void	display_flagtab(dbref);
+extern void	flag_set(dbref, dbref, char *, int);
+extern char    *flag_description(dbref, dbref);
+extern FLAGENT *find_flag(dbref, char *);
+extern char    *decode_flags(dbref, FLAGSET);
+extern char    *unparse_flags(dbref, dbref);
+extern int	has_flag(dbref, dbref, char *);
+extern char    *unparse_object(dbref, dbref, int);
+extern char    *unparse_object_numonly(dbref);
+extern int	convert_flags(dbref, char *, FLAGSET *, FLAG *);
+extern void	decompile_flags(dbref, dbref, char *);
 
 #define	GOD ((dbref) 1)
 

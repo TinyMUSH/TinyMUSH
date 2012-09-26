@@ -5,6 +5,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "db.h"
 
@@ -59,10 +60,8 @@ int main(int argc, char *argv[]) {
 
     infile = outfile = NULL;
 
-    while ((c = getopt(argc, argv, "i:o:")) != -1)
-    {
-        switch (c)
-        {
+    while ((c = getopt(argc, argv, "i:o:")) != -1) {
+        switch (c) {
         case 'i':
             infile = optarg;
             break;
@@ -73,8 +72,7 @@ int main(int argc, char *argv[]) {
             errflg++;
         }
     }
-    if (errflg || !infile || !outfile)
-    {
+    if (errflg || !infile || !outfile) {
         fprintf(stderr, "Usage: %s -i input_file -o output_file\n",
                 argv[0]);
         exit(1);
@@ -85,15 +83,13 @@ int main(int argc, char *argv[]) {
      */
 
     if ((dbp = gdbm_open(outfile, 8192, GDBM_WRCREAT, 0600,
-                         gdbm_panic)) == NULL)
-    {
+                         gdbm_panic)) == NULL) {
         fprintf(stderr, "Fatal error in gdbm_open (%s): %s\n",
                 outfile, strerror(errno));
         exit(1);
     }
 
-    if (stat(infile, &buf))
-    {
+    if (stat(infile, &buf)) {
         fprintf(stderr, "Fatal error in stat (%s): %s\n",
                 infile, strerror(errno));
         exit(1);
@@ -103,13 +99,11 @@ int main(int argc, char *argv[]) {
 
     f = fopen(infile, "r");
 
-    while (fread((void *)&cp, 1, 1, f) != 0)
-    {
+    while (fread((void *)&cp, 1, 1, f) != 0) {
         /*
          * Quick and dirty
          */
-        if (cp == 'T')
-        {
+        if (cp == 'T') {
             filepos = ftell(f);
 
             /*
@@ -118,8 +112,7 @@ int main(int argc, char *argv[]) {
             fseek(f, -1, SEEK_CUR);
 
             if (fread((void *)&be, sizeof(bucket_element),
-                      1, f) == 0)
-            {
+                      1, f) == 0) {
                 fprintf(stderr,
                         "Fatal error at file position %ld.\n",
                         filepos);
@@ -135,8 +128,7 @@ int main(int argc, char *argv[]) {
                         (void *)"TM3S", 4) &&
                     be.data_pointer < filesize &&
                     be.key_size < filesize &&
-                    be.data_size < filesize)
-            {
+                    be.data_size < filesize) {
                 filepos = ftell(f);
 
                 /*
@@ -150,8 +142,7 @@ int main(int argc, char *argv[]) {
                 dat.dsize = be.data_size;
 
                 if ((numbytes = fread((void *)(key.dptr), 1,
-                                      key.dsize, f)) == 0)
-                {
+                                      key.dsize, f)) == 0) {
                     fprintf(stderr,
                             "Fatal error at file position %ld.\n",
                             filepos);
@@ -159,16 +150,14 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (fread((void *)(dat.dptr), dat.dsize,
-                          1, f) == 0)
-                {
+                          1, f) == 0) {
                     fprintf(stderr,
                             "Fatal error at file position %ld.\n",
                             filepos);
                     exit(1);
                 }
 
-                if (gdbm_store(dbp, key, dat, GDBM_REPLACE))
-                {
+                if (gdbm_store(dbp, key, dat, GDBM_REPLACE)) {
                     fprintf(stderr,
                             "Fatal error in gdbm_store (%s): %s\n",
                             outfile, strerror(errno));
@@ -183,9 +172,7 @@ int main(int argc, char *argv[]) {
                  */
 
                 fseek(f, filepos, SEEK_SET);
-            }
-            else
-            {
+            } else {
                 /*
                  * Seek back to one byte after we started
                  * * and continue

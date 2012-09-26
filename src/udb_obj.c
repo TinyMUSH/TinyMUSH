@@ -13,6 +13,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -20,7 +21,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -37,10 +38,7 @@
 /* Take a chunk of data which contains an object, and parse it into an
  * object structure. */
 
-Obj *
-unroll_obj(data)
-char *data;
-{
+Obj * unroll_obj(char *data) {
     int i, j;
 
     Obj *o;
@@ -62,15 +60,13 @@ char *data;
      * Read in the header
      */
 
-    if (memcpy((void *)&(o->name), (void *)dptr, sizeof(Objname)) == NULL)
-    {
+    if (memcpy((void *)&(o->name), (void *)dptr, sizeof(Objname)) == NULL) {
         XFREE(o, "unroll_obj.o");
         return (NULL);
     }
     dptr += sizeof(Objname);
 
-    if (memcpy((void *)&i, (void *)dptr, sizeof(int)) == NULL)
-    {
+    if (memcpy((void *)&i, (void *)dptr, sizeof(int)) == NULL) {
         XFREE(o, "unroll_obj.o");
         return (NULL);
     }
@@ -83,8 +79,7 @@ char *data;
      */
 
     a = o->atrs = (Attrib *) XMALLOC(i * sizeof(Attrib), "unroll_obj.a");
-    if (!o->atrs)
-    {
+    if (!o->atrs) {
         XFREE(o, "unroll_obj.o");
         return (NULL);
     }
@@ -93,8 +88,7 @@ char *data;
      * Now go get the attrs, one at a time.
      */
 
-    for (j = 0; j < i;)
-    {
+    for (j = 0; j < i;) {
 
         /*
          * Attribute size
@@ -166,10 +160,7 @@ bail:
 
 /* Rollup an object structure into a single buffer for a write to disk. */
 
-char *
-rollup_obj(o)
-Obj *o;
-{
+char * rollup_obj(Obj *o) {
     int i;
 
     Attrib *a;
@@ -201,8 +192,7 @@ Obj *o;
      */
 
     a = o->atrs;
-    for (i = 0; i < o->at_count; i++)
-    {
+    for (i = 0; i < o->at_count; i++) {
 
         /*
          * Attribute size.
@@ -241,10 +231,7 @@ Obj *o;
 
 /* Return the size, on disk, the thing is going to take up.*/
 
-int
-obj_siz(o)
-Obj *o;
-{
+int obj_siz(Obj *o) {
     int i;
 
     int siz;
@@ -259,22 +246,17 @@ Obj *o;
 
 /* And something to free all the goo on an Obj, as well as the Obj.*/
 
-static void
-objfree(o)
-Obj *o;
-{
+static void objfree(Obj *o) {
     int i;
 
     Attrib *a;
 
-    if (!o->atrs)
-    {
+    if (!o->atrs) {
         XFREE(o, "objfree.o");
         return;
     }
     a = o->atrs;
-    for (i = 0; i < o->at_count; i++)
-    {
+    for (i = 0; i < o->at_count; i++) {
         XFREE(a[i].data, "objfree.data");
     }
 
@@ -284,12 +266,7 @@ Obj *o;
 
 /* Routines to manipulate attributes within the object structure */
 
-char *
-obj_get_attrib(anam, obj)
-int anam;
-
-Obj *obj;
-{
+char *obj_get_attrib(int anam, Obj *obj) {
     int lo, mid, hi;
 
     Attrib *a;
@@ -301,34 +278,21 @@ Obj *obj;
     lo = 0;
     hi = obj->at_count - 1;
     a = obj->atrs;
-    while (lo <= hi)
-    {
+    while (lo <= hi) {
         mid = ((hi - lo) >> 1) + lo;
-        if (a[mid].attrnum == anam)
-        {
+        if (a[mid].attrnum == anam) {
             return (char *)a[mid].data;
             break;
-        }
-        else if (a[mid].attrnum > anam)
-        {
+        } else if (a[mid].attrnum > anam) {
             hi = mid - 1;
-        }
-        else
-        {
+        } else {
             lo = mid + 1;
         }
     }
     return (NULL);
 }
 
-void
-obj_set_attrib(anam, obj, value)
-int anam;
-
-Obj *obj;
-
-char *value;
-{
+void obj_set_attrib(int anam, Obj *obj, char *value) {
     int hi, lo, mid;
 
     Attrib *a;
@@ -338,8 +302,7 @@ char *value;
      * * empty object.
      */
 
-    if (obj->atrs == NULL)
-    {
+    if (obj->atrs == NULL) {
         a = (Attrib *) XMALLOC(sizeof(Attrib), "obj_set_attrib.a");
         obj->atrs = a;
         obj->at_count = 1;
@@ -357,22 +320,16 @@ char *value;
     hi = obj->at_count - 1;
 
     a = obj->atrs;
-    while (lo <= hi)
-    {
+    while (lo <= hi) {
         mid = ((hi - lo) >> 1) + lo;
-        if (a[mid].attrnum == anam)
-        {
+        if (a[mid].attrnum == anam) {
             XFREE(a[mid].data, "obj_set_attrib");
             a[mid].data = (char *)value;
             a[mid].size = strlen(value) + 1;
             return;
-        }
-        else if (a[mid].attrnum > anam)
-        {
+        } else if (a[mid].attrnum > anam) {
             hi = mid - 1;
-        }
-        else
-        {
+        } else {
             lo = mid + 1;
         }
     }
@@ -400,12 +357,7 @@ char *value;
     obj->atrs = a;
 }
 
-void
-obj_del_attrib(anam, obj)
-int anam;
-
-Obj *obj;
-{
+void obj_del_attrib(int anam, Obj *obj) {
     int hi, lo, mid;
 
     Attrib *a;
@@ -423,11 +375,9 @@ Obj *obj;
     lo = 0;
     hi = obj->at_count - 1;
     a = obj->atrs;
-    while (lo <= hi)
-    {
+    while (lo <= hi) {
         mid = ((hi - lo) >> 1) + lo;
-        if (a[mid].attrnum == anam)
-        {
+        if (a[mid].attrnum == anam) {
             XFREE(a[mid].data, "obj_del_attrib.data");
             obj->at_count--;
             if (mid != obj->at_count)
@@ -435,19 +385,14 @@ Obj *obj;
                        (void *)(a + mid + 1),
                        (obj->at_count - mid) * sizeof(Attrib));
 
-            if (obj->at_count == 0)
-            {
+            if (obj->at_count == 0) {
                 XFREE(obj->atrs, "del_attrib.atrs");
                 obj->atrs = NULL;
             }
             return;
-        }
-        else if (a[mid].attrnum > anam)
-        {
+        } else if (a[mid].attrnum > anam) {
             hi = mid - 1;
-        }
-        else
-        {
+        } else {
             lo = mid + 1;
         }
     }
@@ -460,10 +405,7 @@ Obj *obj;
 
 /* get_free_objpipe: return an object pipeline */
 
-Obj *
-get_free_objpipe(obj)
-int obj;
-{
+Obj *get_free_objpipe(int obj) {
     DBData key, data;
 
     int i, j = 0;
@@ -472,10 +414,8 @@ int obj;
      * Try to see if it's already in a pipeline first
      */
 
-    for (i = 0; i < NUM_OBJPIPES; i++)
-    {
-        if (mudstate.objpipes[i] && mudstate.objpipes[i]->name == obj)
-        {
+    for (i = 0; i < NUM_OBJPIPES; i++) {
+        if (mudstate.objpipes[i] && mudstate.objpipes[i]->name == obj) {
             mudstate.objpipes[i]->counter = mudstate.objc;
             mudstate.objc++;
             return mudstate.objpipes[i];
@@ -486,10 +426,8 @@ int obj;
      * Look for an empty pipeline
      */
 
-    for (i = 0; i < NUM_OBJPIPES; i++)
-    {
-        if (!mudstate.objpipes[i])
-        {
+    for (i = 0; i < NUM_OBJPIPES; i++) {
+        if (!mudstate.objpipes[i]) {
             /*
              * If there's no object there, read one in
              */
@@ -498,13 +436,10 @@ int obj;
             key.dsize = sizeof(int);
             data = db_get(key, DBTYPE_ATTRIBUTE);
 
-            if (data.dptr)
-            {
+            if (data.dptr) {
                 mudstate.objpipes[i] = unroll_obj(data.dptr);
                 XFREE(data.dptr, "get_free_objpipe");
-            }
-            else
-            {
+            } else {
                 /*
                  * New object
                  */
@@ -523,8 +458,7 @@ int obj;
             return mudstate.objpipes[i];
         }
         if (mudstate.objpipes[i]->counter <
-                mudstate.objpipes[j]->counter)
-        {
+                mudstate.objpipes[j]->counter) {
             j = i;
         }
 
@@ -535,8 +469,7 @@ int obj;
      * * dirty, write it first
      */
 
-    if (mudstate.objpipes[j]->dirty)
-    {
+    if (mudstate.objpipes[j]->dirty) {
         data.dptr = rollup_obj(mudstate.objpipes[j]);
         data.dsize = obj_siz(mudstate.objpipes[j]);
         key.dptr = &mudstate.objpipes[j]->name;
@@ -556,20 +489,16 @@ int obj;
     key.dsize = sizeof(int);
     data = db_get(key, DBTYPE_ATTRIBUTE);
 
-    if (data.dptr)
-    {
+    if (data.dptr) {
         mudstate.objpipes[j] = unroll_obj(data.dptr);
         XFREE(data.dptr, "get_free_objpipe.3");
-        if (mudstate.objpipes[j] == NULL)
-        {
+        if (mudstate.objpipes[j] == NULL) {
             STARTLOG(LOG_PROBLEMS, "ERR", "CACHE")
             log_printf("Null returned on unroll of object #%d",
                        j);
             ENDLOG return (NULL);
         }
-    }
-    else
-    {
+    } else {
         /*
          * New object
          */
@@ -588,37 +517,22 @@ int obj;
 }
 
 
-char *
-pipe_get_attrib(anum, obj)
-int anum;
-
-int obj;
-{
+char *pipe_get_attrib(int anum, int obj) {
     Obj *object;
 
     char *value, *tmp;
 
     object = get_free_objpipe(obj);
     value = obj_get_attrib(anum, object);
-    if (value)
-    {
+    if (value) {
         tmp = XSTRDUP(value, "pipe_get_attrib");
         return tmp;
-    }
-    else
-    {
+    } else {
         return NULL;
     }
 }
 
-void
-pipe_set_attrib(anum, obj, value)
-int anum;
-
-int obj;
-
-char *value;
-{
+void pipe_set_attrib(int anum, int obj, char *value) {
     Obj *object;
 
     char *newvalue;
@@ -634,12 +548,7 @@ char *value;
     return;
 }
 
-void
-pipe_del_attrib(anum, obj)
-int anum;
-
-int obj;
-{
+void pipe_del_attrib(int anum, int obj) {
     Obj *object;
 
     /*
@@ -652,9 +561,7 @@ int obj;
     return;
 }
 
-void
-attrib_sync()
-{
+void attrib_sync(void) {
     DBData key, data;
 
     int i;
@@ -663,10 +570,8 @@ attrib_sync()
      * Make sure dirty objects are written to disk
      */
 
-    for (i = 0; i < NUM_OBJPIPES; i++)
-    {
-        if (mudstate.objpipes[i] && mudstate.objpipes[i]->dirty)
-        {
+    for (i = 0; i < NUM_OBJPIPES; i++) {
+        if (mudstate.objpipes[i] && mudstate.objpipes[i]->dirty) {
             data.dptr = rollup_obj(mudstate.objpipes[i]);
             data.dsize = obj_siz(mudstate.objpipes[i]);
             key.dptr = &mudstate.objpipes[i]->name;

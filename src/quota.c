@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -31,16 +32,14 @@ void load_quota(int q_list[], dbref player, int qtype) {
 
     quota_str = atr_get(player, qtype, &aowner, &aflags, &alen);
 
-    if (!*quota_str)
-    {
+    if (!*quota_str) {
         for (i = 0; i < 5; i++)
             q_list[i] = 0;
         free_lbuf(quota_str);
         return;
     }
     for (p = strtok_r(quota_str, " ", &tokst), i = 0;
-            p && (i < 5); p = strtok_r(NULL, " ", &tokst), i++)
-    {
+            p && (i < 5); p = strtok_r(NULL, " ", &tokst), i++) {
         q_list[i] = (int)strtol(p, (char **)NULL, 10);
     }
 
@@ -67,12 +66,10 @@ static void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int
 
     a = r = e = t = p = 0;
 
-    DO_WHOLE_DB(i)
-    {
+    DO_WHOLE_DB(i) {
         if ((Owner(i) != player) || (Going(i) && !isRoom(i)))
             continue;
-        switch (Typeof(i))
-        {
+        switch (Typeof(i)) {
         case TYPE_ROOM:
             a += mudconf.room_quota;
             r++;
@@ -114,13 +111,10 @@ static void adjust_quota(dbref player, int qtype, int value, int key) {
      * Adjust values
      */
 
-    if (key & QUOTA_REM)
-    {
+    if (key & QUOTA_REM) {
         aq += (value - rq);
         rq = value;
-    }
-    else
-    {
+    } else {
         rq += (value - aq);
         aq = value;
     }
@@ -141,8 +135,7 @@ static void mung_quotas(dbref player, int key, int value) {
 
     int q_list[5], rq_list[5];
 
-    if (key & QUOTA_FIX)
-    {
+    if (key & QUOTA_FIX) {
 
         /*
          * Get value of stuff owned and good value, set other values
@@ -150,14 +143,11 @@ static void mung_quotas(dbref player, int key, int value) {
          */
 
         count_objquota(player, &xq, &rooms, &exits, &things, &players);
-        if (key & QUOTA_TOT)
-        {
+        if (key & QUOTA_TOT) {
             load_quota(rq_list, player, A_RQUOTA);
             rq_list[QTYPE_ALL] += xq;
             save_quota(rq_list, player, A_QUOTA);
-        }
-        else
-        {
+        } else {
             load_quota(q_list, player, A_QUOTA);
             q_list[QTYPE_ALL] -= xq;
             q_list[QTYPE_ROOM] -= rooms;
@@ -166,25 +156,15 @@ static void mung_quotas(dbref player, int key, int value) {
             q_list[QTYPE_PLAYER] -= players;
             save_quota(q_list, player, A_RQUOTA);
         }
-    }
-    else if (key & QUOTA_ROOM)
-    {
+    } else if (key & QUOTA_ROOM) {
         adjust_quota(player, QTYPE_ROOM, value, key);
-    }
-    else if (key & QUOTA_EXIT)
-    {
+    } else if (key & QUOTA_EXIT) {
         adjust_quota(player, QTYPE_EXIT, value, key);
-    }
-    else if (key & QUOTA_THING)
-    {
+    } else if (key & QUOTA_THING) {
         adjust_quota(player, QTYPE_THING, value, key);
-    }
-    else if (key & QUOTA_PLAYER)
-    {
+    } else if (key & QUOTA_PLAYER) {
         adjust_quota(player, QTYPE_PLAYER, value, key);
-    }
-    else
-    {
+    } else {
         adjust_quota(player, QTYPE_ALL, value, key);
     }
 }
@@ -198,8 +178,7 @@ static void show_quota(dbref player, dbref victim) {
     for (i = 0; i < 5; i++)
         dq_list[i] = q_list[i] - rq_list[i];
 
-    if (Free_Quota(victim))
-    {
+    if (Free_Quota(victim)) {
         if (mudconf.typed_quotas)
             notify_quiet(player,
                          tprintf
@@ -211,9 +190,7 @@ static void show_quota(dbref player, dbref victim) {
             notify_quiet(player,
                          tprintf("%-16s: %4d - N/A", Name(victim),
                                  dq_list[QTYPE_ALL]));
-    }
-    else
-    {
+    } else {
         if (mudconf.typed_quotas)
             notify_quiet(player,
                          tprintf
@@ -244,13 +221,11 @@ void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2) {
 
     register int set = 0, value = 0, i;
 
-    if (!(mudconf.quotas || Can_Set_Quota(player)))
-    {
+    if (!(mudconf.quotas || Can_Set_Quota(player))) {
         notify_quiet(player, "Quotas are not enabled.");
         return;
     }
-    if ((key & QUOTA_TOT) && (key & QUOTA_REM))
-    {
+    if ((key & QUOTA_TOT) && (key & QUOTA_REM)) {
         notify_quiet(player, "Illegal combination of switches.");
         return;
     }
@@ -258,35 +233,27 @@ void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2) {
      * Show or set all quotas if requested
      */
 
-    if (key & QUOTA_ALL)
-    {
-        if (arg1 && *arg1)
-        {
+    if (key & QUOTA_ALL) {
+        if (arg1 && *arg1) {
             value = (int)strtol(arg1, (char **)NULL, 10);
             set = 1;
-            if (value < 0)
-            {
+            if (value < 0) {
                 notify(player, "Illegal quota value.");
                 return;
             }
-        }
-        else if (key & (QUOTA_SET | QUOTA_FIX))
-        {
+        } else if (key & (QUOTA_SET | QUOTA_FIX)) {
             value = 0;
             set = 1;
         }
-        if (set)
-        {
+        if (set) {
             STARTLOG(LOG_WIZARD, "WIZ", "QUOTA")
             log_name(player);
             log_printf(" changed everyone's quota.");
             ENDLOG
         }
         show_quota_header(player);
-        DO_WHOLE_DB(i)
-        {
-            if (isPlayer(i))
-            {
+        DO_WHOLE_DB(i) {
+            if (isPlayer(i)) {
                 if (set)
                     mung_quotas(i, key, value);
                 show_quota(player, i);
@@ -298,15 +265,11 @@ void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2) {
      * Find out whose quota to show or set
      */
 
-    if (!arg1 || *arg1 == '\0')
-    {
+    if (!arg1 || *arg1 == '\0') {
         who = Owner(player);
-    }
-    else
-    {
+    } else {
         who = lookup_player(player, arg1, 1);
-        if (!Good_obj(who))
-        {
+        if (!Good_obj(who)) {
             notify_quiet(player, "Not found.");
             return;
         }
@@ -316,36 +279,28 @@ void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2) {
      * Make sure we have permission to do it
      */
 
-    if (!Can_Set_Quota(player))
-    {
-        if (arg2 && *arg2)
-        {
+    if (!Can_Set_Quota(player)) {
+        if (arg2 && *arg2) {
             notify_quiet(player, NOPERM_MESSAGE);
             return;
         }
-        if (Owner(player) != who)
-        {
+        if (Owner(player) != who) {
             notify_quiet(player, NOPERM_MESSAGE);
             return;
         }
     }
-    if (arg2 && *arg2)
-    {
+    if (arg2 && *arg2) {
         set = 1;
         value = (int)strtol(arg2, (char **)NULL, 10);
-        if (value < 0)
-        {
+        if (value < 0) {
             notify(player, "Illegal quota value.");
             return;
         }
-    }
-    else if (key & QUOTA_FIX)
-    {
+    } else if (key & QUOTA_FIX) {
         set = 1;
         value = 0;
     }
-    if (set)
-    {
+    if (set) {
         STARTLOG(LOG_WIZARD, "WIZ", "QUOTA")
         log_name(player);
         log_printf(" changed the quota of ");

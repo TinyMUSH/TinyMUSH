@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -20,9 +21,9 @@
 #include "functions.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-static void FDECL(fixcase, (char *));
+static void fixcase(char *);
 
-static char FDECL(*store_string, (char *));
+static char *store_string(char *);
 
 extern int anum_alc_top;
 
@@ -44,26 +45,16 @@ static char *stringblock = (char *)0;
 
 static int stringblock_hwm = 0;
 
-void
-NDECL(vattr_init)
-{
+void vattr_init(void) {
     hashinit(&mudstate.vattr_name_htab, VATTR_HASH_SIZE,
              HT_STR | HT_KEYREF);
 }
 
-VATTR *
-vattr_find(name)
-char *name;
-{
+VATTR *vattr_find(char *name) {
     return (VATTR *) hashfind(name, &mudstate.vattr_name_htab);
 }
 
-VATTR *
-vattr_alloc(name, flags)
-char *name;
-
-int flags;
-{
+VATTR *vattr_alloc(char *name, int flags) {
     int number;
 
     if (((number = mudstate.attr_next++) & 0x7f) == 0)
@@ -73,12 +64,7 @@ int flags;
     return (vattr_define(name, number, flags));
 }
 
-VATTR *
-vattr_define(name, number, flags)
-char *name;
-
-int number, flags;
-{
+VATTR *vattr_define(char *name, int number, int flags) {
     VATTR *vp;
 
     /*
@@ -109,12 +95,7 @@ int number, flags;
 }
 
 #ifdef NEVER
-void
-do_dbclean(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_dbclean(dbref player, dbref cause, int key) {
     VATTR *vp, *vpx;
 
     dbref i, end;
@@ -155,10 +136,8 @@ int key;
      */
 
     atr_push();
-    DO_WHOLE_DB(i)
-    {
-        for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
-        {
+    DO_WHOLE_DB(i) {
+        for (ca = atr_head(i, &as); ca; ca = atr_next(&as)) {
             used_table[ca] = ca;
         }
     }
@@ -169,12 +148,10 @@ int key;
      */
 
     vp = vattr_first();
-    while (vp)
-    {
+    while (vp) {
         vpx = vp;
         vp = vattr_next(vp);
-        if (used_table[vpx->number] == 0)
-        {
+        if (used_table[vpx->number] == 0) {
             anum_set(vpx->number, NULL);
             hashdelete(vpx->name, &mudstate.vattr_name_htab);
             XFREE(vpx, "dbclean.vpx");
@@ -189,35 +166,28 @@ int key;
      */
 
     for (ufp = (UFUN *) hash_firstentry(&mudstate.ufunc_htab);
-            ufp != NULL; ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab))
-    {
+            ufp != NULL; ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab)) {
         if (used_table[ufp->atr] == 0)
             ufp->atr = A_TEMP;
     }
     for (cmdp = (CMDENT *) hash_firstentry(&mudstate.command_htab);
             cmdp != NULL;
-            cmdp = (CMDENT *) hash_nextentry(&mudstate.command_htab))
-    {
-        if (cmdp->pre_hook)
-        {
+            cmdp = (CMDENT *) hash_nextentry(&mudstate.command_htab)) {
+        if (cmdp->pre_hook) {
             if (used_table[cmdp->pre_hook->atr] == 0)
                 cmdp->pre_hook->atr = A_TEMP;
         }
-        if (cmdp->post_hook)
-        {
+        if (cmdp->post_hook) {
             if (used_table[cmdp->post_hook->atr] == 0)
                 cmdp->post_hook->atr = A_TEMP;
         }
-        if (cmdp->userperms)
-        {
+        if (cmdp->userperms) {
             if (used_table[cmdp->userperms->atr] == 0)
                 cmdp->userperms->atr = A_TEMP;
         }
-        if (cmdp->callseq & CS_ADDED)
-        {
+        if (cmdp->callseq & CS_ADDED) {
             for (addp = (ADDENT *) cmdp->info.added;
-                    addp != NULL; addp = addp->next)
-            {
+                    addp != NULL; addp = addp->next) {
                 if (used_table[addp->atr] == 0)
                     addp->atr = A_TEMP;
             }
@@ -231,16 +201,12 @@ int key;
      */
 
     for (i = A_USER_START, end = mudstate.attr_next - 1;
-            (i < mudstate.attr_next) && (i < end); i++)
-    {
-        if (used_table[i] == 0)
-        {
-            while ((end > i) && (used_table[end] == 0))
-            {
+            (i < mudstate.attr_next) && (i < end); i++) {
+        if (used_table[i] == 0) {
+            while ((end > i) && (used_table[end] == 0)) {
                 end--;
             }
-            if (end > i)
-            {
+            if (end > i) {
                 used_table[end] = used_table[i] = i;
                 end--;
             }
@@ -251,13 +217,10 @@ int key;
      * Renumber the necessary attributes in the vattr tables.
      */
 
-    for (i = A_USER_START; i < mudstate.attr_next; i++)
-    {
-        if (used_table[i] != i)
-        {
+    for (i = A_USER_START; i < mudstate.attr_next; i++) {
+        if (used_table[i] != i) {
             vp = (VATTR *) anum_get(i);
-            if (vp)
-            {
+            if (vp) {
                 vp->number = used_table[i];
                 vp->flags |= AF_DIRTY;
                 anum_set(used_table[i], (ATTR *) vp);
@@ -274,13 +237,10 @@ int key;
      */
 
     atr_push();
-    DO_WHOLE_DB(i)
-    {
+    DO_WHOLE_DB(i) {
         got = 0;
-        for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
-        {
-            if (used_table[ca] != ca)
-            {
+        for (ca = atr_head(i, &as); ca; ca = atr_next(&as)) {
+            if (used_table[ca] != ca) {
                 str = atr_get_raw(i, ca);
                 atr_add_raw(i, used_table[ca], str);
                 atr_clr(i, ca);
@@ -310,18 +270,13 @@ int key;
      * * initial size, as if we'd just called anum_extend() for it.
      */
 
-    if (anum_alc_top > mudconf.init_size + A_USER_START)
-    {
-        if (mudstate.attr_next < mudconf.init_size + A_USER_START)
-        {
+    if (anum_alc_top > mudconf.init_size + A_USER_START) {
+        if (mudstate.attr_next < mudconf.init_size + A_USER_START) {
             end = mudconf.init_size + A_USER_START;
-        }
-        else
-        {
+        } else {
             end = mudstate.attr_next + mudconf.init_size;
         }
-        if (end < anum_alc_top)
-        {
+        if (end < anum_alc_top) {
             new_table = (ATTR **) XCALLOC(end + 1, sizeof(ATTR *),
                                           "dbclean.new_table");
             for (i = 0; i < mudstate.attr_next; i++)
@@ -338,41 +293,34 @@ int key;
      */
 
     for (ufp = (UFUN *) hash_firstentry(&mudstate.ufunc_htab);
-            ufp != NULL; ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab))
-    {
+            ufp != NULL; ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab)) {
         if (used_table[ufp->atr] != ufp->atr)
             ufp->atr = used_table[ufp->atr];
     }
     for (cmdp = (CMDENT *) hash_firstentry(&mudstate.command_htab);
             cmdp != NULL;
-            cmdp = (CMDENT *) hash_nextentry(&mudstate.command_htab))
-    {
-        if (cmdp->pre_hook)
-        {
+            cmdp = (CMDENT *) hash_nextentry(&mudstate.command_htab)) {
+        if (cmdp->pre_hook) {
             if (used_table[cmdp->pre_hook->atr] !=
                     cmdp->pre_hook->atr)
                 cmdp->pre_hook->atr =
                     used_table[cmdp->pre_hook->atr];
         }
-        if (cmdp->post_hook)
-        {
+        if (cmdp->post_hook) {
             if (used_table[cmdp->post_hook->atr] !=
                     cmdp->post_hook->atr)
                 cmdp->post_hook->atr =
                     used_table[cmdp->post_hook->atr];
         }
-        if (cmdp->userperms)
-        {
+        if (cmdp->userperms) {
             if (used_table[cmdp->userperms->atr] !=
                     cmdp->userperms->atr)
                 cmdp->userperms->atr =
                     used_table[cmdp->userperms->atr];
         }
-        if (cmdp->callseq & CS_ADDED)
-        {
+        if (cmdp->callseq & CS_ADDED) {
             for (addp = (ADDENT *) cmdp->info.added;
-                    addp != NULL; addp = addp->next)
-            {
+                    addp != NULL; addp = addp->next) {
                 if (used_table[addp->atr] != addp->atr)
                     addp->atr = used_table[addp->atr];
             }
@@ -385,17 +333,14 @@ int key;
 
     XFREE(used_table, "dbclean.used_table");
 
-    if (anum_alc_top != n_oldtop)
-    {
+    if (anum_alc_top != n_oldtop) {
         notify(player,
                tprintf
                ("Cleaned %d user attribute slots (reduced to %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched). Table size reduced from %d to %d.",
                 n_oldtotal - A_USER_START,
                 mudstate.attr_next - A_USER_START, n_deleted,
                 n_renumbered, n_objt, n_atrt, n_oldtop, anum_alc_top));
-    }
-    else
-    {
+    } else {
         notify(player,
                tprintf
                ("Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).",
@@ -408,10 +353,7 @@ int key;
 }
 #endif				/* NEVER */
 
-void
-vattr_delete(name)
-char *name;
-{
+void vattr_delete(char *name) {
     VATTR *vp;
 
     int number;
@@ -424,8 +366,7 @@ char *name;
 
     vp = (VATTR *) hashfind(name, &mudstate.vattr_name_htab);
 
-    if (vp)
-    {
+    if (vp) {
         number = vp->number;
         anum_set(number, NULL);
         hashdelete(name, &mudstate.vattr_name_htab);
@@ -435,10 +376,7 @@ char *name;
     return;
 }
 
-VATTR *
-vattr_rename(name, newname)
-char *name, *newname;
-{
+VATTR *vattr_rename(char *name, char *newname) {
     VATTR *vp;
 
     fixcase(name);
@@ -463,8 +401,7 @@ char *name, *newname;
 
     vp = (VATTR *) hashfind(name, &mudstate.vattr_name_htab);
 
-    if (vp)
-    {
+    if (vp) {
         vp->name = store_string(newname);
         hashdelete(name, &mudstate.vattr_name_htab);
         hashadd(newname, (int *)vp, &mudstate.vattr_name_htab, 0);
@@ -473,30 +410,21 @@ char *name, *newname;
     return (vp);
 }
 
-VATTR *
-NDECL(vattr_first)
-{
+VATTR *vattr_first(void) {
     return (VATTR *) hash_firstentry(&mudstate.vattr_name_htab);
 }
 
-VATTR *
-vattr_next(vp)
-VATTR *vp;
-{
+VATTR *vattr_next(VATTR *vp) {
     if (vp == NULL)
         return (vattr_first());
 
     return ((VATTR *) hash_nextentry(&mudstate.vattr_name_htab));
 }
 
-static void
-fixcase(name)
-char *name;
-{
+static void fixcase(char *name) {
     char *cp = name;
 
-    while (*cp)
-    {
+    while (*cp) {
         *cp = toupper(*cp);
         cp++;
     }
@@ -510,10 +438,7 @@ char *name;
  * keep forever. There is no freeing mechanism.
  */
 
-static char *
-store_string(str)
-char *str;
-{
+static char *store_string(char *str) {
     int len;
 
     char *ret;
@@ -525,8 +450,7 @@ char *str;
      * current one, get a new one.
      */
 
-    if (!stringblock || (STRINGBLOCK - stringblock_hwm) < (len + 1))
-    {
+    if (!stringblock || (STRINGBLOCK - stringblock_hwm) < (len + 1)) {
         stringblock = (char *)XMALLOC(STRINGBLOCK, "store_string");
         if (!stringblock)
             return ((char *)0);

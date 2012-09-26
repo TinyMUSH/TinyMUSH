@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -25,16 +26,14 @@
 
 typedef struct hostdtm HOSTDTM;
 
-struct hostdtm
-{
+struct hostdtm {
     char *host;
     char *dtm;
 };
 
 typedef struct logindata LDATA;
 
-struct logindata
-{
+struct logindata {
     HOSTDTM good[NUM_GOOD];
     HOSTDTM bad[NUM_BAD];
     int tot_good;
@@ -56,30 +55,25 @@ static void decrypt_logindata(char *atrbuf, LDATA *info) {
     info->tot_good = 0;
     info->tot_bad = 0;
     info->new_bad = 0;
-    for (i = 0; i < NUM_GOOD; i++)
-    {
+    for (i = 0; i < NUM_GOOD; i++) {
         info->good[i].host = NULL;
         info->good[i].dtm = NULL;
     }
-    for (i = 0; i < NUM_BAD; i++)
-    {
+    for (i = 0; i < NUM_BAD; i++) {
         info->bad[i].host = NULL;
         info->bad[i].dtm = NULL;
     }
 
-    if (*atrbuf == '#')
-    {
+    if (*atrbuf == '#') {
         atrbuf++;
         info->tot_good = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
-        for (i = 0; i < NUM_GOOD; i++)
-        {
+        for (i = 0; i < NUM_GOOD; i++) {
             info->good[i].host = grabto(&atrbuf, ';');
             info->good[i].dtm = grabto(&atrbuf, ';');
         }
         info->new_bad = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
         info->tot_bad = (int)strtol(grabto(&atrbuf, ';'), (char **)NULL, 10);
-        for (i = 0; i < NUM_BAD; i++)
-        {
+        for (i = 0; i < NUM_BAD; i++) {
             info->bad[i].host = grabto(&atrbuf, ';');
             info->bad[i].dtm = grabto(&atrbuf, ';');
         }
@@ -97,15 +91,13 @@ static void encrypt_logindata(char *atrbuf, LDATA *info) {
      */
 
     nullc = '\0';
-    for (i = 0; i < NUM_GOOD; i++)
-    {
+    for (i = 0; i < NUM_GOOD; i++) {
         if (!info->good[i].host)
             info->good[i].host = &nullc;
         if (!info->good[i].dtm)
             info->good[i].dtm = &nullc;
     }
-    for (i = 0; i < NUM_BAD; i++)
-    {
+    for (i = 0; i < NUM_BAD; i++) {
         if (!info->bad[i].host)
             info->bad[i].host = &nullc;
         if (!info->bad[i].dtm)
@@ -143,10 +135,8 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
 
     atrbuf = atr_get(player, A_LOGINDATA, &aowner, &aflags, &alen);
     decrypt_logindata(atrbuf, &login_info);
-    if (isgood)
-    {
-        if (login_info.new_bad > 0)
-        {
+    if (isgood) {
+        if (login_info.new_bad > 0) {
             notify(player, "");
             notify(player,
                    tprintf
@@ -161,16 +151,14 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
             login_info.new_bad = 0;
         }
         if (login_info.good[0].host && *login_info.good[0].host &&
-                login_info.good[0].dtm && *login_info.good[0].dtm)
-        {
+                login_info.good[0].dtm && *login_info.good[0].dtm) {
             notify(player,
                    tprintf("Last connect was from %s on %s.",
                            login_info.good[0].host,
                            login_info.good[0].dtm));
         }
 
-        for (i = NUM_GOOD - 1; i > 0; i--)
-        {
+        for (i = NUM_GOOD - 1; i > 0; i--) {
             login_info.good[i].dtm = login_info.good[i - 1].dtm;
             login_info.good[i].host = login_info.good[i - 1].host;
         }
@@ -182,11 +170,8 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
                                                     lusername, lhost));
         else
             atr_add_raw(player, A_LASTSITE, lhost);
-    }
-    else
-    {
-        for (i = NUM_BAD - 1; i > 0; i--)
-        {
+    } else {
+        for (i = NUM_BAD - 1; i > 0; i--) {
             login_info.bad[i].dtm = login_info.bad[i - 1].dtm;
             login_info.bad[i].host = login_info.bad[i - 1].host;
         }
@@ -213,8 +198,7 @@ int check_pass(dbref player, const char *password) {
 
     target = atr_get(player, A_PASS, &aowner, &aflags, &alen);
     if (*target && strcmp(target, password) &&
-            strcmp(crypt(password, "XX"), target))
-    {
+            strcmp(crypt(password, "XX"), target)) {
         free_lbuf(target);
         return 0;
     }
@@ -251,8 +235,7 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
 
     if ((player = lookup_player(NOTHING, name, 0)) == NOTHING)
         return NOTHING;
-    if (!check_pass(player, password))
-    {
+    if (!check_pass(player, password)) {
         record_login(player, 0, time_str, host, username);
         return NOTHING;
     }
@@ -264,10 +247,8 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
      * compare to last connect see if player gets salary
      */
     player_last = atr_get(player, A_LAST, &aowner, &aflags, &alen);
-    if (strncmp(player_last, time_str, 10) != 0)
-    {
-        if (Pennies(player) < mudconf.paylimit)
-        {
+    if (strncmp(player_last, time_str, 10) != 0) {
+        if (Pennies(player) < mudconf.paylimit) {
             /*
              * Don't heap coins on players who already have lots of money.
              */
@@ -302,8 +283,7 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
      */
 
     pbuf = trim_spaces(password);
-    if (!isguest && !ok_password(pbuf, creator))
-    {
+    if (!isguest && !ok_password(pbuf, creator)) {
         free_lbuf(pbuf);
         return NOTHING;
     }
@@ -312,8 +292,7 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
      */
 
     player = create_obj(creator, TYPE_PLAYER, name, isrobot);
-    if (player == NOTHING)
-    {
+    if (player == NOTHING) {
         free_lbuf(pbuf);
         return NOTHING;
     }
@@ -342,18 +321,13 @@ void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpas
     char *target;
 
     target = atr_get(player, A_PASS, &aowner, &aflags, &alen);
-    if (!*target || !check_pass(player, oldpass))
-    {
+    if (!*target || !check_pass(player, oldpass)) {
         notify(player, "Sorry.");
-    }
-    else if (!ok_password(newpass, player))
-    {
+    } else if (!ok_password(newpass, player)) {
         /*
          * Do nothing, notification is handled by ok_password()
          */
-    }
-    else
-    {
+    } else {
         atr_add_raw(player, A_PASS, crypt(newpass, "XX"));
         notify(player, "Password changed.");
     }
@@ -365,8 +339,7 @@ void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpas
  */
 
 static void disp_from_on(dbref player, char *dtm_str, char *host_str) {
-    if (dtm_str && *dtm_str && host_str && *host_str)
-    {
+    if (dtm_str && *dtm_str && host_str && *host_str) {
         notify(player,
                tprintf("     From: %s   On: %s", dtm_str, host_str));
     }
@@ -381,43 +354,31 @@ void do_last(dbref player, dbref cause, int key, char *who) {
 
     int i, aflags, alen;
 
-    if (!who || !*who)
-    {
+    if (!who || !*who) {
         target = Owner(player);
-    }
-    else if (!(string_compare(who, "me")))
-    {
+    } else if (!(string_compare(who, "me"))) {
         target = Owner(player);
-    }
-    else
-    {
+    } else {
         target = lookup_player(player, who, 1);
     }
 
-    if (target == NOTHING)
-    {
+    if (target == NOTHING) {
         notify(player, "I couldn't find that player.");
-    }
-    else if (!Controls(player, target))
-    {
+    } else if (!Controls(player, target)) {
         notify(player, NOPERM_MESSAGE);
-    }
-    else
-    {
+    } else {
         atrbuf = atr_get(target, A_LOGINDATA, &aowner, &aflags, &alen);
         decrypt_logindata(atrbuf, &login_info);
 
         notify(player, tprintf("Total successful connects: %d",
                                login_info.tot_good));
-        for (i = 0; i < NUM_GOOD; i++)
-        {
+        for (i = 0; i < NUM_GOOD; i++) {
             disp_from_on(player,
                          login_info.good[i].host, login_info.good[i].dtm);
         }
         notify(player, tprintf("Total failed connects: %d",
                                login_info.tot_bad));
-        for (i = 0; i < NUM_BAD; i++)
-        {
+        for (i = 0; i < NUM_BAD; i++) {
             disp_from_on(player,
                          login_info.bad[i].host, login_info.bad[i].dtm);
         }
@@ -447,8 +408,7 @@ int add_player_name(dbref player, char *name) {
         *tp = tolower(*tp);
 
     p = (int *)hashfind(temp, &mudstate.player_htab);
-    if (p)
-    {
+    if (p) {
 
         /*
          * Entry found in the hashtable.  If a player, succeed if the
@@ -456,15 +416,11 @@ int add_player_name(dbref player, char *name) {
          * * fail if they don't.
          */
 
-        if (Good_obj(*p) && isPlayer(*p))
-        {
+        if (Good_obj(*p) && isPlayer(*p)) {
             free_lbuf(temp);
-            if (*p == player)
-            {
+            if (*p == player) {
                 return 1;
-            }
-            else
-            {
+            } else {
                 return 0;
             }
         }
@@ -477,9 +433,7 @@ int add_player_name(dbref player, char *name) {
         *p = player;
         stat = hashrepl(temp, p, &mudstate.player_htab);
         free_lbuf(temp);
-    }
-    else
-    {
+    } else {
         p = (dbref *) XMALLOC(sizeof(dbref), "add_player_name.2");
 
         *p = player;
@@ -500,8 +454,7 @@ int delete_player_name(dbref player, char *name) {
     for (tp = temp; *tp; tp++)
         *tp = tolower(*tp);
     p = (int *)hashfind(temp, &mudstate.player_htab);
-    if (!p || (*p == NOTHING) || ((player != NOTHING) && (*p != player)))
-    {
+    if (!p || (*p == NOTHING) || ((player != NOTHING) && (*p != player))) {
         free_lbuf(temp);
         return 0;
     }
@@ -519,17 +472,13 @@ dbref lookup_player(dbref doer, char *name, int check_who) {
     if (!string_compare(name, "me"))
         return doer;
 
-    if (*name == LOOKUP_TOKEN)
-    {
-        do
-        {
+    if (*name == LOOKUP_TOKEN) {
+        do {
             name++;
-        }
-        while (isspace(*name));
+        } while (isspace(*name));
     }
 
-    if (*name == NUMBER_TOKEN)
-    {
+    if (*name == NUMBER_TOKEN) {
         name++;
         if (!is_number(name))
             return NOTHING;
@@ -547,22 +496,16 @@ dbref lookup_player(dbref doer, char *name, int check_who) {
         *tp = tolower(*tp);
     p = (int *)hashfind(temp, &mudstate.player_htab);
     free_lbuf(temp);
-    if (!p)
-    {
-        if (check_who)
-        {
+    if (!p) {
+        if (check_who) {
             thing = find_connected_name(doer, name);
             if (Hidden(thing) && !See_Hidden(doer))
                 thing = NOTHING;
-        }
-        else
+        } else
             thing = NOTHING;
-    }
-    else if (!Good_obj(*p))
-    {
+    } else if (!Good_obj(*p)) {
         thing = NOTHING;
-    }
-    else
+    } else
         thing = *p;
 
     return thing;
@@ -575,25 +518,19 @@ void load_player_names(void) {
 
     char *alias, *p, *tokp;
 
-    DO_WHOLE_DB(i)
-    {
-        if (Typeof(i) == TYPE_PLAYER)
-        {
+    DO_WHOLE_DB(i) {
+        if (Typeof(i) == TYPE_PLAYER) {
             add_player_name(i, Name(i));
         }
     }
     alias = alloc_lbuf("load_player_names");
-    DO_WHOLE_DB(i)
-    {
-        if (Typeof(i) == TYPE_PLAYER)
-        {
+    DO_WHOLE_DB(i) {
+        if (Typeof(i) == TYPE_PLAYER) {
             alias = atr_get_str(alias, i, A_ALIAS,
                                 &aowner, &aflags, &alen);
-            if (*alias)
-            {
+            if (*alias) {
                 for (p = strtok_r(alias, ";", &tokp); p;
-                        p = strtok_r(NULL, ";", &tokp))
-                {
+                        p = strtok_r(NULL, ";", &tokp)) {
                     add_player_name(i, p);
                 }
             }
@@ -627,10 +564,8 @@ void badname_remove(char *bad_name) {
      */
 
     backp = NULL;
-    for (bp = mudstate.badname_head; bp; backp = bp, bp = bp->next)
-    {
-        if (!string_compare(bad_name, bp->name))
-        {
+    for (bp = mudstate.badname_head; bp; backp = bp, bp = bp->next) {
+        if (!string_compare(bad_name, bp->name)) {
             if (backp)
                 backp->next = bp->next;
             else
@@ -650,8 +585,7 @@ int badname_check(char *bad_name) {
      * * then return false.  If no matches in the list, return true.
      */
 
-    for (bp = mudstate.badname_head; bp; bp = bp->next)
-    {
+    for (bp = mudstate.badname_head; bp; bp = bp->next) {
         if (quick_wild(bp->name, bad_name))
             return 0;
     }
@@ -669,8 +603,7 @@ void badname_list(dbref player, const char *prefix) {
 
     buff = bufp = alloc_lbuf("badname_list");
     safe_str((char *)prefix, buff, &bufp);
-    for (bp = mudstate.badname_head; bp; bp = bp->next)
-    {
+    for (bp = mudstate.badname_head; bp; bp = bp->next) {
         safe_chr(' ', buff, &bufp);
         safe_str(bp->name, buff, &bufp);
     }

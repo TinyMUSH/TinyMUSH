@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -38,12 +39,9 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     flag = Func_Mask(LOOP_NOTIFY);
 
-    if (flag)
-    {
+    if (flag) {
         VaChk_Only_InEval(3);
-    }
-    else
-    {
+    } else {
         VaChk_InEval_OutEval(2, 4);
     }
 
@@ -52,18 +50,15 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     exec(curr, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL,
          &str, cargs, ncargs);
     cp = trim_space_sep(cp, &isep);
-    if (!*cp)
-    {
+    if (!*cp) {
         free_lbuf(curr);
         return;
     }
     bb_p = *bufc;
 
     while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
-        if (!flag && (*bufc != bb_p))
-        {
+            !Too_Much_CPU()) {
+        if (!flag && (*bufc != bb_p)) {
             print_sep(&osep, buff, bufc);
         }
         number++;
@@ -72,14 +67,11 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         ltos(tbuf, number);
         buff3 = replace_string(LISTPLACE_VAR, tbuf, buff2);
         str = buff3;
-        if (!flag)
-        {
+        if (!flag) {
             exec(buff, bufc, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
                  ncargs);
-        }
-        else
-        {
+        } else {
             dp = result = alloc_lbuf("perform_loop.2");
             exec(result, &dp, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
@@ -143,8 +135,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Enforce maximum nesting level.
      */
 
-    if (mudstate.in_loop >= MAX_ITER_NESTING - 1)
-    {
+    if (mudstate.in_loop >= MAX_ITER_NESTING - 1) {
         notify_quiet(player, "Exceeded maximum iteration nesting.");
         return;
     }
@@ -161,26 +152,17 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     need_bool = ((bool_flag != BOOL_COND_NONE) ||
                  (filt_flag != FILT_COND_NONE)) ? 1 : 0;
 
-    if (!two_flag)
-    {
-        if (flag)
-        {
+    if (!two_flag) {
+        if (flag) {
             VaChk_Only_InEval(3);
-        }
-        else
-        {
+        } else {
             VaChk_InEval_OutEval(2, 4);
         }
         ep = fargs[1];
-    }
-    else
-    {
-        if (flag)
-        {
+    } else {
+        if (flag) {
             VaChk_Only_InEval(4);
-        }
-        else
-        {
+        } else {
             VaChk_InEval_OutEval(3, 5);
         }
         ep = fargs[2];
@@ -200,16 +182,13 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Same thing for the second list arg, if we have it
      */
 
-    if (two_flag)
-    {
+    if (two_flag) {
         input_p2 = lp2 = list_str2 = alloc_lbuf("perform_iter.list2");
         str = fargs[1];
         exec(list_str2, &lp2, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
         input_p2 = trim_space_sep(input_p2, &isep);
-    }
-    else
-    {
+    } else {
         input_p2 = lp2 = list_str2 = NULL;
     }
 
@@ -217,11 +196,9 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * If both lists are empty, we're done
      */
 
-    if (!(input_p && *input_p) && !(input_p2 && *input_p2))
-    {
+    if (!(input_p && *input_p) && !(input_p2 && *input_p2)) {
         free_lbuf(list_str);
-        if (list_str2)
-        {
+        if (list_str2) {
             free_lbuf(list_str2);
         }
         return;
@@ -238,10 +215,8 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     while ((input_p || input_p2) &&
             !mudstate.loop_break[cur_lev] &&
             (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
-        if (!need_result && (*bufc != bb_p))
-        {
+            !Too_Much_CPU()) {
+        if (!need_result && (*bufc != bb_p)) {
             print_sep(&osep, buff, bufc);
         }
         if (input_p)
@@ -259,35 +234,26 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         StrCopyKnown(work_buf, ep, elen);	/* we might nibble this */
         str = work_buf;
         savep = *bufc;
-        if (!need_result)
-        {
+        if (!need_result) {
             exec(buff, bufc, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
                  ncargs);
-            if (need_bool)
-            {
+            if (need_bool) {
                 is_true = xlate(savep);
             }
-        }
-        else
-        {
+        } else {
             dp = result = alloc_lbuf("perform_iter.out");
             exec(result, &dp, player, caller, cause,
                  EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs,
                  ncargs);
-            if (need_bool)
-            {
+            if (need_bool) {
                 is_true = xlate(result);
             }
-            if (flag)
-            {
+            if (flag) {
                 notify(cause, result);
-            }
-            else if (((filt_flag == FILT_COND_TRUE) && is_true)
-                     || ((filt_flag == FILT_COND_FALSE) && !is_true))
-            {
-                if (*bufc != bb_p)
-                {
+            } else if (((filt_flag == FILT_COND_TRUE) && is_true)
+                       || ((filt_flag == FILT_COND_FALSE) && !is_true)) {
+                if (*bufc != bb_p) {
                     print_sep(&osep, buff, bufc);
                 }
                 safe_str(mudstate.loop_token[cur_lev], buff,
@@ -296,8 +262,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             free_lbuf(result);
         }
         free_lbuf(work_buf);
-        if (bool_flag != BOOL_COND_NONE)
-        {
+        if (bool_flag != BOOL_COND_NONE) {
             if (!is_true && (bool_flag == BOOL_COND_TRUE))
                 break;
             if (is_true && (bool_flag == BOOL_COND_FALSE))
@@ -306,8 +271,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
 
     free_lbuf(list_str);
-    if (list_str2)
-    {
+    if (list_str2) {
         free_lbuf(list_str2);
     }
     mudstate.in_loop--;
@@ -326,8 +290,7 @@ void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int lev;
 
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
-    if ((lev > mudstate.in_loop - 1) || (lev < 0))
-    {
+    if ((lev > mudstate.in_loop - 1) || (lev < 0)) {
         safe_chr('0', buff, bufc);
         return;
     }
@@ -421,8 +384,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     op = clist[2];
     safe_ltos(clist[2], &op, i);
 
-    if ((nfargs >= 3) && (fargs[2]))
-    {
+    if ((nfargs >= 3) && (fargs[2])) {
         clist[0] = fargs[2];
         clist[1] = split_token(&cp, &isep);
         result = bp = alloc_lbuf("fun_fold");
@@ -430,9 +392,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         exec(result, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
         i++;
-    }
-    else
-    {
+    } else {
         clist[0] = split_token(&cp, &isep);
         clist[1] = split_token(&cp, &isep);
         result = bp = alloc_lbuf("fun_fold");
@@ -446,8 +406,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     result = NULL;
 
     while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
+            !Too_Much_CPU()) {
         clist[0] = rstore;
         clist[1] = split_token(&cp, &isep);
         op = clist[2];
@@ -514,8 +473,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     objs[1] = alloc_sbuf("fun_filter.objplace");
     bb_p = *bufc;
     i = 1;
-    while (cp)
-    {
+    while (cp) {
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
         safe_ltos(objs[1], &op, i);
@@ -524,10 +482,8 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         str = atextbuf;
         exec(result, &bp, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
-        if ((!flag && (*result == '1')) || (flag && xlate(result)))
-        {
-            if (*bufc != bb_p)
-            {
+        if ((!flag && (*result == '1')) || (flag && xlate(result))) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_str(objs[0], buff, bufc);
@@ -587,10 +543,8 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     bb_p = *bufc;
     i = 1;
     while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
-        if (*bufc != bb_p)
-        {
+            !Too_Much_CPU()) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         objs[0] = split_token(&cp, &isep);
@@ -637,18 +591,13 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
 
     VaChk_Range(3, 12);
-    if (nfargs < 4)
-    {
+    if (nfargs < 4) {
         isep.str[0] = ' ';
         isep.len = 1;
         lastn = nfargs - 1;
-    }
-    else if (!delim_check(FUNCTION_ARGLIST, nfargs, &isep, DELIM_STRING))
-    {
+    } else if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, nfargs, &isep, DELIM_STRING)) {
         return;
-    }
-    else
-    {
+    } else {
         lastn = nfargs - 2;
     }
 
@@ -669,8 +618,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
 
     nwords = 0;
-    for (i = 0; i < lastn; i++)
-    {
+    for (i = 0; i < lastn; i++) {
         cp[i] = trim_space_sep(fargs[i + 1], &isep);
         count[i] = countwords(cp[i], &isep);
         if (count[i] > nwords)
@@ -680,23 +628,17 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     for (wc = 0;
             (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim)
-            && !Too_Much_CPU(); wc++)
-    {
-        for (i = 0; i < lastn; i++)
-        {
-            if (wc < count[i])
-            {
+            && !Too_Much_CPU(); wc++) {
+        for (i = 0; i < lastn; i++) {
+            if (wc < count[i]) {
                 os[i] = split_token(&cp[i], &isep);
-            }
-            else
-            {
+            } else {
                 os[i] = tmpbuf;
             }
         }
         StrCopyKnown(atextbuf, atext, alen);
 
-        if (*bufc != bb_p)
-        {
+        if (*bufc != bb_p) {
             print_sep(&isep, buff, bufc);
         }
         str = atextbuf;
@@ -731,8 +673,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     VaChk_Only_In_Out(5);
 
     step_size = (int)strtol(fargs[2], (char **)NULL, 10);
-    if ((step_size < 1) || (step_size > NUM_ENV_VARS))
-    {
+    if ((step_size < 1) || (step_size > NUM_ENV_VARS)) {
         notify(player, "Illegal step size.");
         return;
     }
@@ -747,10 +688,8 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     atextbuf = alloc_lbuf("fun_step");
     bb_p = *bufc;
     while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
-        if (*bufc != bb_p)
-        {
+            !Too_Much_CPU()) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         for (i = 0; cp && (i < step_size); i++)
@@ -796,29 +735,24 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     start_token = '\0';
     end_token = '\0';
 
-    if (nfargs > 2)
-    {
+    if (nfargs > 2) {
         in_string = 0;
         start_token = *fargs[2];
     }
-    if (nfargs > 3)
-    {
+    if (nfargs > 3) {
         end_token = *fargs[3];
     }
     i = -1;			/* first letter in string is 0, not 1 */
     cbuf[1] = alloc_sbuf("fun_foreach.objplace");
 
     while (cp && *cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
+            !Too_Much_CPU()) {
 
-        if (!in_string)
-        {
+        if (!in_string) {
             /*
              * Look for a start token.
              */
-            while (*cp && (*cp != start_token))
-            {
+            while (*cp && (*cp != start_token)) {
                 safe_chr(*cp, buff, bufc);
                 cp++;
                 i++;
@@ -835,8 +769,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 break;
             in_string = 1;
         }
-        if (*cp == end_token)
-        {
+        if (*cp == end_token) {
             /*
              * We've found an end token. Skip over it. Note that
              * it's possible to have a start and end token next
@@ -885,8 +818,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     Delim isep, osep;
 
     oldp = *bufc;
-    if ((nfargs == 0) || !fargs[0] || !*fargs[0])
-    {
+    if ((nfargs == 0) || !fargs[0] || !*fargs[0]) {
         return;
     }
     VaChk_Only_In_Out(5);
@@ -909,8 +841,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     nptrs1 = list2arr(&ptrs1, LBUF_SIZE / 2, list1, &isep);
     nptrs2 = list2arr(&ptrs2, LBUF_SIZE / 2, list2, &isep);
 
-    if (nptrs1 != nptrs2)
-    {
+    if (nptrs1 != nptrs2) {
         safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         free_lbuf(atext);
         free_lbuf(list1);
@@ -942,14 +873,10 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     nresults = list2arr(&results, LBUF_SIZE / 2, rlist, &isep);
 
-    for (i = 0; i < nresults; i++)
-    {
-        for (j = 0; j < nptrs1; j++)
-        {
-            if (!strcmp(results[i], ptrs1[j]))
-            {
-                if (*bufc != oldp)
-                {
+    for (i = 0; i < nresults; i++) {
+        for (j = 0; j < nptrs1; j++) {
+            if (!strcmp(results[i], ptrs1[j])) {
+                if (*bufc != oldp) {
                     print_sep(&osep, buff, bufc);
                 }
                 safe_str(ptrs2[j], buff, bufc);
@@ -1014,8 +941,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     Get_Uattr(player, thing1, ap, atext1, aowner1, aflags1, alen1);
     tmp_num = ap->number;
     Parse_Uattr(player, fargs[1], thing2, anum2, ap2);
-    if (!ap2)
-    {
+    if (!ap2) {
         free_lbuf(atext1);	/* we allocated this, remember? */
         return;
     }
@@ -1026,19 +952,15 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * text.
      */
 
-    if ((thing1 == thing2) && (tmp_num == ap2->number))
-    {
+    if ((thing1 == thing2) && (tmp_num == ap2->number)) {
         is_same = 1;
         is_exact_same = 1;
-    }
-    else
-    {
+    } else {
         is_exact_same = 0;
         atext2 =
             atr_pget(thing2, ap2->number, &aowner2, &aflags2, &alen2);
         if (!*atext2
-                || !See_attr(player, thing2, ap2, aowner2, aflags2))
-        {
+                || !See_attr(player, thing2, ap2, aowner2, aflags2)) {
             free_lbuf(atext1);
             free_lbuf(atext2);
             return;
@@ -1061,10 +983,8 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     bb_p = *bufc;
     i = 1;
     while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) &&
-            !Too_Much_CPU())
-    {
-        if (*bufc != bb_p)
-        {
+            !Too_Much_CPU()) {
+        if (*bufc != bb_p) {
             print_sep(&osep, buff, bufc);
         }
         objs[0] = split_token(&cp, &isep);
@@ -1075,8 +995,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         savep = *bufc;
         exec(buff, bufc, player, caller, cause,
              EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
-        if (!is_same)
-        {
+        if (!is_same) {
             StrCopyKnown(atextbuf, atext2, alen2);
             dp = savep = condbuf;
             str = atextbuf;

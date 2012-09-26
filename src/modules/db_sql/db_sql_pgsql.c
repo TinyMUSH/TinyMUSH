@@ -1,7 +1,8 @@
-/* db_pgsql.c - Implements accessing a PostgreSQL database. */
-/* $Id: db_pgsql.c,v 1.1 2010/06/01 19:45:22 lwl Exp $ */
-
 #include "../../copyright.h"
+#include "../../config.h"
+#include "../../system.h"
+
+#include "../../api.h"
 #include "db_sql.h"
 
 void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {

@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -18,15 +19,15 @@
 #include "udb_defs.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-extern void VDECL(warning, (char *, ...));
+extern void warning(char *, ...);
 
-extern void VDECL(fatal, (char *, ...));
+extern void fatal(char *, ...);
 
-extern void FDECL(log_db_err, (int, int, const char *));
+extern void log_db_err(int, int, const char *);
 
-extern void FDECL(dddb_setsync, (int));
+extern void dddb_setsync(int);
 
-extern void FDECL(raw_notify, (dbref, const char *));
+extern void raw_notify(dbref, const char *);
 
 #define NAMECMP(a,b,c,d,e)	((d == e) && !memcmp(a,b,c))
 
@@ -92,9 +93,9 @@ extern void FDECL(raw_notify, (dbref, const char *));
 			q->tail = e; \
 			e->nxtfree = (Cache *)0;
 
-static Cache *FDECL(get_free_entry, (int));
+static Cache *get_free_entry(int);
 
-static int FDECL(cache_write, (Cache *));
+static int cache_write(Cache *);
 
 /* initial settings for cache sizes */
 
@@ -140,14 +141,7 @@ int cs_syncs = 0;		/* total cache syncs */
 
 int cs_size = 0;		/* total cache size */
 
-int
-cachehash(keydata, keylen, type)
-void *keydata;
-
-int keylen;
-
-unsigned int type;
-{
+int cachehash(void *keydata, int keylen, unsigned int type) {
     unsigned int hash = 0;
 
     char *sp;
@@ -159,18 +153,7 @@ unsigned int type;
     return ((hash + type) % cwidth);
 }
 
-void
-cache_repl(cp, new, len, type, flags)
-Cache *cp;
-
-void *new;
-
-int len;
-
-unsigned int type;
-
-unsigned int flags;
-{
+void cache_repl(Cache *cp, void *new, int len, unsigned int type, unsigned int flags) {
     cs_size -= cp->datalen;
     if (cp->data != NULL)
         RAW_FREE(cp->data, "cache_repl");
@@ -181,10 +164,7 @@ unsigned int flags;
     cs_size += cp->datalen;
 }
 
-int
-cache_init(width)
-int width;
-{
+int cache_init(int width) {
     int x;
 
     Chain *sp;
@@ -205,8 +185,7 @@ int width;
     sp = sys_c =
              (Chain *) RAW_MALLOC((unsigned)cwidth * sizeof(Chain),
                                   "cache_init");
-    if (sys_c == (Chain *) 0)
-    {
+    if (sys_c == (Chain *) 0) {
         warning(ncmsg, (char *)-1, "\n", (char *)0);
         return (-1);
     }
@@ -216,8 +195,7 @@ int width;
      * Allocate the initial cache entries
      */
 
-    for (x = 0; x < cwidth; x++, sp++)
-    {
+    for (x = 0; x < cwidth; x++, sp++) {
         sp->head = (Cache *) 0;
         sp->tail = (Cache *) 0;
     }
@@ -233,8 +211,7 @@ int width;
      * Initialize the object pipelines
      */
 
-    for (x = 0; x < NUM_OBJPIPES; x++)
-    {
+    for (x = 0; x < NUM_OBJPIPES; x++) {
         mudstate.objpipes[x] = NULL;
     }
 
@@ -254,9 +231,7 @@ int width;
     return (0);
 }
 
-void
-cache_reset()
-{
+void cache_reset(void) {
     int x;
 
     Cache *cp, *nxt;
@@ -270,23 +245,18 @@ cache_reset()
      */
 
     db_lock();
-    for (x = 0; x < cwidth; x++, sp++)
-    {
+    for (x = 0; x < cwidth; x++, sp++) {
         sp = &sys_c[x];
 
         /*
          * traverse the chain
          */
-        for (cp = sp->head; cp != NULL; cp = nxt)
-        {
+        for (cp = sp->head; cp != NULL; cp = nxt) {
             nxt = cp->nxt;
 
-            if (cp->flags & CACHE_DIRTY)
-            {
-                if (cp->data == NULL)
-                {
-                    switch (cp->type)
-                    {
+            if (cp->flags & CACHE_DIRTY) {
+                if (cp->data == NULL) {
+                    switch (cp->type) {
                     case DBTYPE_ATTRIBUTE:
                         pipe_del_attrib(((Aname *) cp->
                                          keydata)->attrnum,
@@ -299,11 +269,8 @@ cache_reset()
                         db_del(key, cp->type);
                     }
                     cs_dels++;
-                }
-                else
-                {
-                    switch (cp->type)
-                    {
+                } else {
+                    switch (cp->type) {
                     case DBTYPE_ATTRIBUTE:
                         pipe_set_attrib(((Aname *) cp->
                                          keydata)->attrnum,
@@ -355,10 +322,7 @@ cache_reset()
 
 /* list dbrefs of objects in the cache. */
 
-void
-list_cached_objs(player)
-dbref player;
-{
+void list_cached_objs(dbref player) {
     Chain *sp;
 
     Cache *cp;
@@ -376,13 +340,10 @@ dbref player;
     size_array = (int *)XCALLOC(mudstate.db_top, sizeof(int),
                                 "list_cached_objs.size");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
-    {
-        for (cp = sp->head; cp != NULL; cp = cp->nxt)
-        {
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt) {
             if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) &&
-                    !(cp->flags & CACHE_DIRTY))
-            {
+                    !(cp->flags & CACHE_DIRTY)) {
                 aco++;
                 asize += cp->datalen;
                 count_array[((Aname *) cp->keydata)->object] +=
@@ -399,10 +360,8 @@ dbref player;
     raw_notify(player,
                "========================================================");
 
-    for (x = 0; x < mudstate.db_top; x++)
-    {
-        if (count_array[x] > 0)
-        {
+    for (x = 0; x < mudstate.db_top; x++) {
+        if (count_array[x] > 0) {
             raw_notify(player,
                        tprintf("%-30.30s  #%-6d  %5d  %8d",
                                strip_ansi(Name(x)), x, count_array[x],
@@ -419,13 +378,10 @@ dbref player;
     raw_notify(player,
                "========================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
-    {
-        for (cp = sp->head; cp != NULL; cp = cp->nxt)
-        {
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt) {
             if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) &&
-                    (cp->flags & CACHE_DIRTY))
-            {
+                    (cp->flags & CACHE_DIRTY)) {
                 maco++;
                 msize += cp->datalen;
                 count_array[((Aname *) cp->keydata)->object] +=
@@ -436,10 +392,8 @@ dbref player;
         }
     }
 
-    for (x = 0; x < mudstate.db_top; x++)
-    {
-        if (count_array[x] > 0)
-        {
+    for (x = 0; x < mudstate.db_top; x++) {
+        if (count_array[x] > 0) {
             raw_notify(player,
                        tprintf("%-30.30s  #%-6d  %5d  %8d",
                                strip_ansi(Name(x)), x, count_array[x],
@@ -460,10 +414,7 @@ dbref player;
     XFREE(size_array, "list_cached_objs.size");
 }
 
-void
-list_cached_attrs(player)
-dbref player;
-{
+void list_cached_attrs(dbref player) {
     Chain *sp;
 
     Cache *cp;
@@ -482,13 +433,10 @@ dbref player;
     raw_notify(player,
                "====================================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
-    {
-        for (cp = sp->head; cp != NULL; cp = cp->nxt)
-        {
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt) {
             if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) &&
-                    !(cp->flags & CACHE_DIRTY))
-            {
+                    !(cp->flags & CACHE_DIRTY)) {
                 aco++;
                 asize += cp->datalen;
                 atr =
@@ -510,13 +458,10 @@ dbref player;
     raw_notify(player,
                "====================================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
-    {
-        for (cp = sp->head; cp != NULL; cp = cp->nxt)
-        {
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt) {
             if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) &&
-                    (cp->flags & CACHE_DIRTY))
-            {
+                    (cp->flags & CACHE_DIRTY)) {
                 maco++;
                 msize += cp->datalen;
                 atr =
@@ -545,12 +490,7 @@ dbref player;
  * and length into pointers provided by the caller, if not, fetch from DB.
  * You do not need to free data returned by this call. */
 
-DBData
-cache_get(key, type)
-DBData key;
-
-unsigned int type;
-{
+DBData cache_get(DBData key, unsigned int type) {
     Cache *cp;
 
     Chain *sp;
@@ -563,8 +503,7 @@ unsigned int type;
     char *cdata;
 #endif
 
-    if (!key.dptr || !cache_initted)
-    {
+    if (!key.dptr || !cache_initted) {
         data.dptr = NULL;
         data.dsize = 0;
         return data;
@@ -591,12 +530,9 @@ unsigned int type;
     hv = cachehash(key.dptr, key.dsize, type);
     sp = &sys_c[hv];
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt)
-    {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
-        {
-            if (!mudstate.standalone && !mudstate.dumping)
-            {
+    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
+            if (!mudstate.standalone && !mudstate.dumping) {
                 cs_rhits++;
                 cs_ahits++;
             }
@@ -623,13 +559,11 @@ skipcacheget:
      * Grab the data from wherever
      */
 
-    switch (type)
-    {
+    switch (type) {
     case DBTYPE_ATTRIBUTE:
 #ifdef MEMORY_BASED
         cdata = obj_get_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext));
-        if (cdata)
-        {
+        if (cdata) {
             data.dptr = cdata;
             data.dsize = strlen(cdata) + 1;
             return data;
@@ -638,20 +572,16 @@ skipcacheget:
         data.dptr =
             (void *)pipe_get_attrib(((Aname *) key.dptr)->attrnum,
                                     ((Aname *) key.dptr)->object);
-        if (data.dptr == NULL)
-        {
+        if (data.dptr == NULL) {
             data.dsize = 0;
-        }
-        else
-        {
+        } else {
             data.dsize = strlen(data.dptr) + 1;
         }
 
 #ifdef MEMORY_BASED
         if (!mudstate.standalone && !mudstate.dumping)
             cs_dbreads++;
-        if (data.dptr)
-        {
+        if (data.dptr) {
             data.dsize = strlen(data.dptr) + 1;
             cdata = XMALLOC(data.dsize, "cache_get.membased");
             memcpy((void *)cdata, (void *)data.dptr, data.dsize);
@@ -661,9 +591,7 @@ skipcacheget:
                            cdata);
             data.dptr = cdata;
             return data;
-        }
-        else
-        {
+        } else {
             data.dptr = NULL;
             data.dsize = 0;
             return data;
@@ -677,13 +605,11 @@ skipcacheget:
     if (!mudstate.standalone && !mudstate.dumping)
         cs_dbreads++;
 
-    if (data.dptr == NULL)
-    {
+    if (data.dptr == NULL) {
         return data;
     }
 
-    if ((cp = get_free_entry(data.dsize)) == NULL)
-    {
+    if ((cp = get_free_entry(data.dsize)) == NULL) {
         return data;
     }
 
@@ -706,8 +632,7 @@ skipcacheget:
 
     cs_size += cp->datalen;
 
-    if (mudstate.dumping)
-    {
+    if (mudstate.dumping) {
         /*
          * Link at head of chain
          */
@@ -716,9 +641,7 @@ skipcacheget:
          * Link at head of LRU freelist
          */
         F_INSHEAD(freelist, cp);
-    }
-    else
-    {
+    } else {
         /*
          * Link at tail of chain
          */
@@ -754,14 +677,7 @@ skipcacheget:
  *
  */
 
-int
-cache_put(key, data, type)
-DBData key;
-
-DBData data;
-
-unsigned int type;
-{
+int cache_put(DBData key, DBData data, unsigned int type) {
     Cache *cp;
 
     Chain *sp;
@@ -772,8 +688,7 @@ unsigned int type;
     char *cdata;
 #endif
 
-    if (!key.dptr || !data.dptr || !cache_initted)
-    {
+    if (!key.dptr || !data.dptr || !cache_initted) {
         return (1);
     }
 
@@ -783,16 +698,13 @@ unsigned int type;
 
     CALL_ALL_MODULES(cache_put_notify, (key, type))
 #ifndef MEMORY_BASED
-    if (mudstate.standalone)
-    {
+    if (mudstate.standalone) {
 #endif
         /*
          * Bypass the cache when standalone or memory based for writes
          */
-        if (data.dptr == NULL)
-        {
-            switch (type)
-            {
+        if (data.dptr == NULL) {
+            switch (type) {
             case DBTYPE_ATTRIBUTE:
                 pipe_del_attrib(((Aname *) key.dptr)->attrnum,
                                 ((Aname *) key.dptr)->object);
@@ -807,11 +719,8 @@ unsigned int type;
                 db_del(key, type);
                 db_unlock();
             }
-        }
-        else
-        {
-            switch (type)
-            {
+        } else {
+            switch (type) {
             case DBTYPE_ATTRIBUTE:
                 pipe_set_attrib(((Aname *) key.dptr)->attrnum,
                                 ((Aname *) key.dptr)->object,
@@ -856,16 +765,12 @@ unsigned int type;
      * step one, search chain, and if we find the obj, dirty it
      */
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt)
-    {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
-        {
-            if (!mudstate.dumping)
-            {
+    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
+            if (!mudstate.dumping) {
                 cs_whits++;
             }
-            if (cp->data != data.dptr)
-            {
+            if (cp->data != data.dptr) {
                 cache_repl(cp, data.dptr, data.dsize, type,
                            CACHE_DIRTY);
             }
@@ -910,10 +815,7 @@ unsigned int type;
     return (0);
 }
 
-static Cache *
-get_free_entry(atrsize)
-int atrsize;
-{
+static Cache *get_free_entry(int atrsize) {
     DBData key, data;
 
     Chain *sp;
@@ -931,26 +833,21 @@ int atrsize;
      */
 
     while ((cs_size + atrsize) >
-            (mudconf.cache_size ? mudconf.cache_size : CACHE_SIZE))
-    {
+            (mudconf.cache_size ? mudconf.cache_size : CACHE_SIZE)) {
 
         cp = freelist->head;
 
-        if (cp)
-        {
+        if (cp) {
             F_DEQUEUE(freelist, cp);
         }
 
-        if (cp && (cp->flags & CACHE_DIRTY))
-        {
+        if (cp && (cp->flags & CACHE_DIRTY)) {
             /*
              * Flush the modified attributes to disk
              */
 
-            if (cp->data == NULL)
-            {
-                switch (cp->type)
-                {
+            if (cp->data == NULL) {
+                switch (cp->type) {
                 case DBTYPE_ATTRIBUTE:
                     pipe_del_attrib(((Aname *) cp->
                                      keydata)->attrnum,
@@ -964,11 +861,8 @@ int atrsize;
                     db_unlock();
                 }
                 cs_dels++;
-            }
-            else
-            {
-                switch (cp->type)
-                {
+            } else {
+                switch (cp->type) {
                 case DBTYPE_ATTRIBUTE:
                     pipe_set_attrib(((Aname *) cp->
                                      keydata)->attrnum,
@@ -993,8 +887,7 @@ int atrsize;
          * attribute's memory
          */
 
-        if (cp)
-        {
+        if (cp) {
             /*
              * Find the cache entry inside the real cache
              */
@@ -1002,10 +895,8 @@ int atrsize;
             sp = &sys_c[hv];
 
             prv = NULL;
-            for (p = sp->head; p != NULL; p = p->nxt)
-            {
-                if (cp == p)
-                {
+            for (p = sp->head; p != NULL; p = p->nxt) {
+                if (cp == p) {
                     break;
                 }
                 prv = p;
@@ -1043,27 +934,20 @@ int atrsize;
     return (cp);
 }
 
-static int
-cache_write(cp)
-Cache *cp;
-{
+static int cache_write(Cache *cp) {
     DBData key, data;
 
     /*
      * Write a single cache chain to disk
      */
 
-    while (cp != NULL)
-    {
-        if (!(cp->flags & CACHE_DIRTY))
-        {
+    while (cp != NULL) {
+        if (!(cp->flags & CACHE_DIRTY)) {
             cp = cp->nxt;
             continue;
         }
-        if (cp->data == NULL)
-        {
-            switch (cp->type)
-            {
+        if (cp->data == NULL) {
+            switch (cp->type) {
             case DBTYPE_ATTRIBUTE:
                 pipe_del_attrib(((Aname *) cp->keydata)->
                                 attrnum, ((Aname *) cp->keydata)->object);
@@ -1074,11 +958,8 @@ Cache *cp;
                 db_del(key, cp->type);
             }
             cs_dels++;
-        }
-        else
-        {
-            switch (cp->type)
-            {
+        } else {
+            switch (cp->type) {
             case DBTYPE_ATTRIBUTE:
                 pipe_set_attrib(((Aname *) cp->keydata)->
                                 attrnum, ((Aname *) cp->keydata)->object,
@@ -1100,9 +981,7 @@ Cache *cp;
     return (0);
 }
 
-int
-NDECL(cache_sync)
-{
+int cache_sync(void) {
     int x;
 
     Chain *sp;
@@ -1115,8 +994,7 @@ NDECL(cache_sync)
     if (cache_frozen)
         return (0);
 
-    if (mudstate.standalone || mudstate.restarting)
-    {
+    if (mudstate.standalone || mudstate.restarting) {
         /*
          * If we're restarting or standalone, having DBM wait for
          * * each write is a performance no-no; run asynchronously
@@ -1131,8 +1009,7 @@ NDECL(cache_sync)
 
     db_lock();
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
-    {
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
         if (cache_write(sp->head))
             return (1);
     }
@@ -1149,20 +1026,14 @@ NDECL(cache_sync)
 
     db_unlock();
 
-    if (mudstate.standalone || mudstate.restarting)
-    {
+    if (mudstate.standalone || mudstate.restarting) {
         dddb_setsync(1);
     }
 
     return (0);
 }
 
-void
-cache_del(key, type)
-DBData key;
-
-unsigned int type;
-{
+void cache_del(DBData key, unsigned int type) {
     Cache *cp;
 
     Chain *sp;
@@ -1178,8 +1049,7 @@ unsigned int type;
 
     CALL_ALL_MODULES(cache_del_notify, (key, type))
 #ifdef MEMORY_BASED
-    if (type == DBTYPE_ATTRIBUTE)
-    {
+    if (type == DBTYPE_ATTRIBUTE) {
         pipe_del_attrib(((Aname *) key.dptr)->attrnum,
                         ((Aname *) key.dptr)->object);
         obj_del_attrib(((Aname *) key.dptr)->attrnum,
@@ -1197,10 +1067,8 @@ unsigned int type;
      * mark dead in cache
      */
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt)
-    {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
-        {
+    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
             F_DEQUEUE(freelist, cp);
             F_INSHEAD(freelist, cp);
             cache_repl(cp, NULL, 0, type, CACHE_DIRTY);

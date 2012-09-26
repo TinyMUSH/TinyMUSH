@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -25,8 +26,7 @@ static FILE *log_fp = NULL;
 
 /* *INDENT-OFF* */
 
-NAMETAB logdata_nametab[] =
-{
+NAMETAB logdata_nametab[] = {
     {(char *)"flags",		1,	0,	LOGOPT_FLAGS},
     {(char *)"location",		1,	0,	LOGOPT_LOC},
     {(char *)"owner",		1,	0,	LOGOPT_OWNER},
@@ -34,8 +34,7 @@ NAMETAB logdata_nametab[] =
     { NULL,				0,	0,	0}
 };
 
-NAMETAB logoptions_nametab[] =
-{
+NAMETAB logoptions_nametab[] = {
     {(char *)"accounting",		2,	0,	LOG_ACCOUNTING},
     {(char *)"all_commands",	2,	0,	LOG_ALLCOMMANDS},
     {(char *)"bad_commands",	2,	0,	LOG_BADCOMMANDS},
@@ -59,8 +58,7 @@ NAMETAB logoptions_nametab[] =
     { NULL,				0,	0,	0}
 };
 
-LOGFILETAB logfds_table[] =
-{
+LOGFILETAB logfds_table[] = {
     { LOG_ACCOUNTING,	NULL,		NULL},
     { LOG_ALLCOMMANDS,	NULL,		NULL},
     { LOG_BADCOMMANDS,	NULL,		NULL},
@@ -91,15 +89,13 @@ LOGFILETAB logfds_table[] =
  */
 
 void logfile_init(char *filename) {
-    if (!filename)
-    {
+    if (!filename) {
         mainlog_fp = stderr;
         return;
     }
 
     mainlog_fp = fopen(filename, "w");
-    if (!mainlog_fp)
-    {
+    if (!mainlog_fp) {
         fprintf(stderr, "Could not open logfile %s for writing.\n",
                 filename);
         mainlog_fp = stderr;
@@ -124,25 +120,20 @@ int start_log(const char *primary, const char *secondary, int key) {
 
     static int last_key = 0;
 
-    if (!mudstate.standalone)
-    {
-        if (mudconf.log_diversion & key)
-        {
-            if (key != last_key)
-            {
+    if (!mudstate.standalone) {
+        if (mudconf.log_diversion & key) {
+            if (key != last_key) {
                 /*
                  * Try to save ourselves some lookups
                  */
                 last_key = key;
-                for (lp = logfds_table; lp->log_flag; lp++)
-                {
+                for (lp = logfds_table; lp->log_flag; lp++) {
                     /*
                      * Though keys can be OR'd, use the first one
                      * * matched
                      */
 
-                    if (lp->log_flag & key)
-                    {
+                    if (lp->log_flag & key) {
                         log_fp = lp->fileptr;
                         break;
                     }
@@ -150,32 +141,25 @@ int start_log(const char *primary, const char *secondary, int key) {
                 if (!log_fp)
                     log_fp = mainlog_fp;
             }
-        }
-        else
-        {
+        } else {
             last_key = key;
             log_fp = mainlog_fp;
         }
-    }
-    else
-    {
+    } else {
         log_fp = mainlog_fp;
     }
 
     mudstate.logging++;
-    switch (mudstate.logging)
-    {
+    switch (mudstate.logging) {
     case 1:
     case 2:
 
-        if (!mudstate.standalone)
-        {
+        if (!mudstate.standalone) {
             /*
              * Format the timestamp
              */
 
-            if ((mudconf.log_info & LOGOPT_TIMESTAMP) != 0)
-            {
+            if ((mudconf.log_info & LOGOPT_TIMESTAMP) != 0) {
                 time((time_t *) (&now));
                 tp = localtime((time_t *) (&now));
                 log_printf("%02d%02d%02d.%02d%02d%02d ",
@@ -227,8 +211,7 @@ void log_perror(const char *primary, const char *secondary, const char *extra, c
     int my_errno = errno;
 
     start_log(primary, secondary, LOG_ALWAYS);
-    if (extra && *extra)
-    {
+    if (extra && *extra) {
         log_printf("(%s) ", extra);
     }
     log_printf("%s: %s", failing_object, strerror(my_errno));
@@ -295,8 +278,7 @@ void log_vprintf(const char *format, va_list ap) {
 void log_name(dbref target) {
     char *tp;
 
-    if (mudstate.standalone)
-    {
+    if (mudstate.standalone) {
         fprintf(stderr, "%s(#%d)", Name(target), target);
         return;
     }
@@ -308,8 +290,7 @@ void log_name(dbref target) {
     log_printf("%s", strip_ansi(tp));
     free_lbuf(tp);
     if (((mudconf.log_info & LOGOPT_OWNER) != 0) &&
-            (target != Owner(target)))
-    {
+            (target != Owner(target))) {
         if ((mudconf.log_info & LOGOPT_FLAGS) != 0)
             tp = unparse_object((dbref) GOD, Owner(target), 0);
         else
@@ -326,20 +307,17 @@ void log_name(dbref target) {
 
 void log_name_and_loc(dbref player) {
     log_name(player);
-    if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
-    {
+    if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player)) {
         log_printf(" in ");
         log_name(Location(player));
     }
 }
 
 char * OBJTYP(dbref thing) {
-    if (!Good_dbref(thing))
-    {
+    if (!Good_dbref(thing)) {
         return (char *)"??OUT-OF-RANGE??";
     }
-    switch (Typeof(thing))
-    {
+    switch (Typeof(thing)) {
     case TYPE_PLAYER:
         return (char *)"PLAYER";
     case TYPE_THING:

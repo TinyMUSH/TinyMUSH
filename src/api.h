@@ -38,39 +38,24 @@
  * Function prototype
  */
 
-#define	XFUNCTION(x)	\
-	extern void FDECL(x, (char *, char **, dbref, dbref, dbref, \
-			      char *[], int, char *[], int))
+/*
+#define	XFUNCTION(x)	extern void FDECL(x, (char *, char **, dbref, dbref, dbref, char *[], int, char *[], int))
+*/
 
 /*
  * ------------------------------------------------------------------------
  * Command handler macros.
  */
 
-#define DO_CMD_NO_ARG(name) \
-	void name (player, cause, key) \
-	dbref player, cause; \
-	int key;
+/*
+#define DO_CMD_NO_ARG(name)	void name (dbref player, dbref cause, int key)
 
-#define DO_CMD_ONE_ARG(name) \
-	void name (player, cause, key, arg1) \
-	dbref player, cause; \
-	int key; \
-	char *arg1;
+#define DO_CMD_ONE_ARG(name) 	void name (dbref player, dbref cause, int key, char *arg1)
 
-#define DO_CMD_TWO_ARG(name) \
-	void name (player, cause, key, arg1, arg2) \
-	dbref player, cause; \
-	int key; \
-	char *arg1, *arg2;
+#define DO_CMD_TWO_ARG(name)	void name (dbref player, dbref cause, int key, char *arg1, char *arg2)
 
-#define DO_CMD_TWO_ARG_ARGV(name) \
-	void name (player, cause, key, arg1, arg2_vector, vector_size) \
-	dbref player, cause; \
-	int key; \
-	char *arg1; \
-	char *arg2_vector[]; \
-	int vector_size;
+#define DO_CMD_TWO_ARG_ARGV(name)	void name (dbref player, dbref cause, int key, char *arg1, char *arg2_vector[], int vector_size)
+*/
 
 /*
  * ------------------------------------------------------------------------
@@ -114,30 +99,30 @@
  * API interface functions.
  */
 
-extern void	FDECL(register_api, (char *, char *, API_FUNCTION *));
-extern void    *FDECL(request_api_function, (char *, char *));
+extern void	register_api(char *, char *, API_FUNCTION *);
+extern void    *request_api_function(char *, char *);
 
-extern void	FDECL(register_commands, (CMDENT *));
-extern void	FDECL(register_prefix_cmds, (const char *));
-extern void	FDECL(register_functions, (FUN *));
-extern void	FDECL(register_hashtables, (MODHASHES *, MODNHASHES *));
-extern unsigned int FDECL(register_dbtype, (char *));
+extern void	register_commands(CMDENT *);
+extern void	register_prefix_cmds(const char *);
+extern void	register_functions(FUN *);
+extern void	register_hashtables(MODHASHES *, MODNHASHES *);
+extern unsigned int register_dbtype(char *);
 
 /*
  * ------------------------------------------------------------------------
  * External necessities.
  */
 
-extern		CF_HDCL (cf_alias);
-extern		CF_HDCL (cf_bool);
-extern		CF_HDCL (cf_const);
-extern		CF_HDCL (cf_dbref);
-extern		CF_HDCL (cf_int);
-extern		CF_HDCL (cf_int_factor);
-extern		CF_HDCL (cf_modify_bits);
-extern		CF_HDCL (cf_ntab_access);
-extern		CF_HDCL (cf_option);
-extern		CF_HDCL (cf_set_flags);
-extern		CF_HDCL (cf_string);
+extern	int cf_alias(int *, char *, long, dbref, char *);
+extern	int cf_bool(int *, char *, long, dbref, char *);
+extern	int cf_const(int *, char *, long, dbref, char *);
+extern	int cf_dbref(int *, char *, long, dbref, char *);
+extern	int cf_int(int *, char *, long, dbref, char *);
+extern	int cf_int_factor(int *, char *, long, dbref, char *);
+extern	int cf_int_modify_bits(int *, char *, long, dbref, char *);
+extern	int cf_int_ntab_access(int *, char *, long, dbref, char *);
+extern	int cf_option(int *, char *, long, dbref, char *);
+extern	int cf_set_flags(int *, char *, long, dbref, char *);
+extern	int cf_string(int *, char *, long, dbref, char *);
 
 #endif				/* __API_H */

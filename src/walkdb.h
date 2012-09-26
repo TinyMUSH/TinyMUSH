@@ -8,8 +8,7 @@
 /* Search structure, used by @search and search(). */
 
 typedef struct search_type SEARCH;
-struct search_type
-{
+struct search_type {
     int	s_wizard;
     dbref	s_owner;
     dbref	s_rst_owner;
@@ -28,8 +27,7 @@ struct search_type
 /* Stats structure, used by @stats and stats(). */
 
 typedef struct stats_type STATS;
-struct stats_type
-{
+struct stats_type {
     int	s_total;
     int	s_rooms;
     int	s_exits;
@@ -40,8 +38,8 @@ struct stats_type
     int	s_unknown;
 };
 
-extern int	FDECL(search_setup, (dbref, char *, SEARCH *));
-extern void	FDECL(search_perform, (dbref, dbref, SEARCH *));
-extern int	FDECL(get_stats, (dbref, dbref, STATS *));
+extern int	search_setup(dbref, char *, SEARCH *);
+extern void	search_perform(dbref, dbref, SEARCH *);
+extern int	get_stats(dbref, dbref, STATS *);
 
 #endif /* __WALKDB_H */

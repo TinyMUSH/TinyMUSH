@@ -102,13 +102,11 @@ extern "C" {
 
     /* Functions */
 
-    extern pcre * FDECL(pcre_compile, (const char *, int, const char **, int *,
-                                       const unsigned char *));
-    extern int  FDECL(pcre_copy_substring, (const char *, int *, int, int, char *, int));
-    extern int  FDECL(pcre_exec, (const pcre *, const pcre_extra *, const char *,
-                                  int, int, int, int *, int));
-    extern const unsigned char * NDECL(pcre_maketables);
-    extern pcre_extra * FDECL(pcre_study, (const pcre *, int, const char **));
+    extern pcre * pcre_compile(const char *, int, const char **, int *, const unsigned char *);
+    extern int  pcre_copy_substring(const char *, int *, int, int, char *, int);
+    extern int  pcre_exec(const pcre *, const pcre_extra *, const char *, int, int, int, int *, int);
+    extern const unsigned char * pcre_maketables(void);
+    extern pcre_extra * pcre_study(const pcre *, int, const char **);
 
 #ifdef __cplusplus
 }  /* extern "C" */
@@ -210,8 +208,7 @@ enum { ESC_A = 1, ESC_B, ESC_b, ESC_D, ESC_d, ESC_S, ESC_s, ESC_W, ESC_w,
 that extract substrings. Starting from 1 (i.e. after OP_END), the values up to
 OP_EOD must correspond in order to the list of escapes immediately above. */
 
-enum
-{
+enum {
     OP_END,            /* End of pattern */
 
     /* Values corresponding to backslashed metacharacters */
@@ -370,8 +367,7 @@ typedef unsigned char uschar;
 /* The real format of the start of the pcre block; the actual code vector
 runs on as long as necessary after the end. */
 
-typedef struct real_pcre
-{
+typedef struct real_pcre {
     unsigned long int magic_number;
     size_t size;
     const unsigned char *tables;
@@ -385,8 +381,7 @@ typedef struct real_pcre
 
 /* The real format of the extra block returned by pcre_study(). */
 
-typedef struct real_pcre_extra
-{
+typedef struct real_pcre_extra {
     uschar options;
     uschar start_bits[32];
 } real_pcre_extra;
@@ -395,8 +390,7 @@ typedef struct real_pcre_extra
 /* Structure for passing "static" information around between the functions
 doing the compiling, so that they are thread-safe. */
 
-typedef struct compile_data
-{
+typedef struct compile_data {
     const uschar *lcc;            /* Points to lower casing table */
     const uschar *fcc;            /* Points to case-flipping table */
     const uschar *cbits;          /* Points to character type table */
@@ -406,8 +400,7 @@ typedef struct compile_data
 /* Structure for passing "static" information around between the functions
 doing the matching, so that they are thread-safe. */
 
-typedef struct match_data
-{
+typedef struct match_data {
     int    errorcode;             /* As it says */
     int   *offset_vector;         /* Offset vector */
     int    offset_end;            /* One past the end */

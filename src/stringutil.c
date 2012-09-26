@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -17,43 +18,11 @@
 
 #include "ansi.h"		/* required by code */
 
-/* Provide strtok_r (reentrant strtok) if needed */
-
-#ifndef HAVE_STRTOK_R
-char *
-strtok_r(s, sep, last)
-char *s;
-
-const char *sep;
-
-char **last;
-{
-    if (!s)
-        s = *last;
-#ifdef HAVE_STRCSPN
-    s += strspn(s, sep);
-    *last = s + strcspn(s, sep);
-#else				/* HAVE_STRCSPN */
-    while (strchr(sep, *s) && *s)
-        s++;
-    *last = s;
-    while (!strchr(sep, **last) && **last)
-        (*last)++;
-#endif				/* HAVE_STRCSPN */
-    if (s == *last)
-        return NULL;
-    if (**last)
-        *((*last)++) = '\0';
-    return s;
-}
-#endif				/* HAVE_STRTOK_R */
-
 /* ---------------------------------------------------------------------------
  * ANSI character-to-number translation table.
  */
 
-int ansi_nchartab[256] =
-{
+int ansi_nchartab[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -88,8 +57,7 @@ int ansi_nchartab[256] =
  * ANSI number-to-character translation table.
  */
 
-char ansi_lettab[I_ANSI_NUM] =
-{
+char ansi_lettab[I_ANSI_NUM] = {
     '\0', 'h', '\0', '\0', 'u', 'f', '\0', 'i',
     '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
     '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
@@ -115,8 +83,7 @@ char ansi_lettab[I_ANSI_NUM] =
  *  0x0007 -- three bits of fg color
  */
 
-int ansi_mask_bits[I_ANSI_LIM] =
-{
+int ansi_mask_bits[I_ANSI_LIM] = {
     0x1fff, 0x1100, 0x1100, 0, 0x1200, 0x1400, 0, 0x1800, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0x1100, 0x1100, 0, 0x1200, 0x1400, 0, 0x1800, 0, 0,
@@ -128,8 +95,7 @@ int ansi_mask_bits[I_ANSI_LIM] =
  * ANSI packed state definitions -- number-to-bitvalue translation table.
  */
 
-int ansi_bits[I_ANSI_LIM] =
-{
+int ansi_bits[I_ANSI_LIM] = {
     0x0099, 0x0100, 0x0000, 0, 0x0200, 0x0400, 0, 0x0800, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0x0000, 0x0000, 0, 0x0000, 0x0000, 0, 0x0000, 0, 0,
@@ -141,26 +107,19 @@ int ansi_bits[I_ANSI_LIM] =
  * strip_ansi -- return a new string with escape codes removed
  */
 
-char *
-strip_ansi(s)
-const char *s;
-{
+char *strip_ansi(const char *s) {
     static char buf[LBUF_SIZE];
 
     char *p = buf;
 
-    if (s)
-    {
-        while (*s == ESC_CHAR)
-        {
+    if (s) {
+        while (*s == ESC_CHAR) {
             skip_esccode(s);
         }
 
-        while (*s)
-        {
+        while (*s) {
             *p++ = *s++;
-            while (*s == ESC_CHAR)
-            {
+            while (*s == ESC_CHAR) {
                 skip_esccode(s);
             }
         }
@@ -174,24 +133,17 @@ const char *s;
  * strip_ansi_len -- count non-escape-code characters
  */
 
-int
-strip_ansi_len(s)
-const char *s;
-{
+int strip_ansi_len(const char *s) {
     int n = 0;
 
-    if (s)
-    {
-        while (*s == ESC_CHAR)
-        {
+    if (s) {
+        while (*s == ESC_CHAR) {
             skip_esccode(s);
         }
 
-        while (*s)
-        {
+        while (*s) {
             ++s, ++n;
-            while (*s == ESC_CHAR)
-            {
+            while (*s == ESC_CHAR) {
                 skip_esccode(s);
             }
         }
@@ -202,10 +154,7 @@ const char *s;
 
 /* normal_to_white -- This function implements the NOBLEED flag */
 
-char *
-normal_to_white(raw)
-const char *raw;
-{
+char *normal_to_white(const char *raw) {
     static char buf[LBUF_SIZE];
 
     char *p = (char *)raw;
@@ -220,52 +169,41 @@ const char *raw;
 
     int has_zero;
 
-    while (p && *p)
-    {
-        if (*p == ESC_CHAR)
-        {
+    while (p && *p) {
+        if (*p == ESC_CHAR) {
             safe_known_str(just_after_esccode,
                            p - just_after_esccode, buf, &q);
-            if (p[1] == ANSI_CSI)
-            {
+            if (p[1] == ANSI_CSI) {
                 safe_chr(*p, buf, &q);
                 ++p;
                 safe_chr(*p, buf, &q);
                 ++p;
                 just_after_csi = p;
                 has_zero = 0;
-                while ((*p & 0xf0) == 0x30)
-                {
+                while ((*p & 0xf0) == 0x30) {
                     if (*p == '0')
                         has_zero = 1;
                     ++p;
                 }
-                while ((*p & 0xf0) == 0x20)
-                {
+                while ((*p & 0xf0) == 0x20) {
                     ++p;
                 }
-                if (*p == ANSI_END && has_zero)
-                {
+                if (*p == ANSI_END && has_zero) {
                     /*
                      * it really was an ansi code,
                      * * go back and fix up the zero
                      */
                     p = just_after_csi;
                     param_val = 0;
-                    while ((*p & 0xf0) == 0x30)
-                    {
-                        if (*p < 0x3a)
-                        {
+                    while ((*p & 0xf0) == 0x30) {
+                        if (*p < 0x3a) {
                             param_val <<= 1;
                             param_val +=
                                 (param_val << 2) +
                                 (*p & 0x0f);
                             safe_chr(*p, buf, &q);
-                        }
-                        else
-                        {
-                            if (param_val == 0)
-                            {
+                        } else {
+                            if (param_val == 0) {
                                 /*
                                  * ansi normal
                                  */
@@ -273,9 +211,7 @@ const char *raw;
                                 ("m\033[37m\033[",
                                  8, buf,
                                  &q);
-                            }
-                            else
-                            {
+                            } else {
                                 /*
                                  * some other color
                                  */
@@ -286,33 +222,25 @@ const char *raw;
                         }
                         ++p;
                     }
-                    while ((*p & 0xf0) == 0x20)
-                    {
+                    while ((*p & 0xf0) == 0x20) {
                         ++p;
                     }
                     safe_chr(*p, buf, &q);
                     ++p;
-                    if (param_val == 0)
-                    {
+                    if (param_val == 0) {
                         safe_known_str(ANSI_WHITE, 5,
                                        buf, &q);
                     }
-                }
-                else
-                {
+                } else {
                     ++p;
                     safe_known_str(just_after_csi,
                                    p - just_after_csi, buf, &q);
                 }
-            }
-            else
-            {
+            } else {
                 safe_copy_esccode(p, buf, &q);
             }
             just_after_esccode = p;
-        }
-        else
-        {
+        } else {
             ++p;
         }
     }
@@ -320,10 +248,7 @@ const char *raw;
     return buf;
 }
 
-char *
-ansi_transition_esccode(ansi_before, ansi_after)
-int ansi_before, ansi_after;
-{
+char *ansi_transition_esccode(int ansi_before, int ansi_after) {
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -346,8 +271,7 @@ int ansi_before, ansi_after;
     ansi_bits_clr = ansi_before & (~ansi_after);
     if ((ansi_bits_clr & 0xf00) ||	/* highlights off */
             (ansi_bits_set & 0x088) ||	/* normal to color */
-            (ansi_bits_clr == 0x1000))  	/* explicit normal */
-    {
+            (ansi_bits_clr == 0x1000)) {	/* explicit normal */
         strcpy(p, "0;");
         p += 2;
         ansi_bits_set = (~ansi_bits[0]) & ansi_after;
@@ -358,23 +282,19 @@ int ansi_before, ansi_after;
      * Next reproduce the highlight state
      */
 
-    if (ansi_bits_set & 0x100)
-    {
+    if (ansi_bits_set & 0x100) {
         strcpy(p, "1;");
         p += 2;
     }
-    if (ansi_bits_set & 0x200)
-    {
+    if (ansi_bits_set & 0x200) {
         strcpy(p, "4;");
         p += 2;
     }
-    if (ansi_bits_set & 0x400)
-    {
+    if (ansi_bits_set & 0x400) {
         strcpy(p, "5;");
         p += 2;
     }
-    if (ansi_bits_set & 0x800)
-    {
+    if (ansi_bits_set & 0x800) {
         strcpy(p, "7;");
         p += 2;
     }
@@ -382,8 +302,7 @@ int ansi_before, ansi_after;
     /*
      * Foreground color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x00f) {
         strcpy(p, "30;");
         p += 3;
         p[-2] |= (ansi_after & 0x00f);
@@ -392,8 +311,7 @@ int ansi_before, ansi_after;
     /*
      * Background color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0) {
         strcpy(p, "40;");
         p += 3;
         p[-2] |= ((ansi_after & 0x0f0) >> 4);
@@ -402,24 +320,18 @@ int ansi_before, ansi_after;
     /*
      * Terminate
      */
-    if (p > buffer + 2)
-    {
+    if (p > buffer + 2) {
         p[-1] = ANSI_END;
         /*
          * Buffer is already null-terminated by strcpy
          */
-    }
-    else
-    {
+    } else {
         buffer[0] = '\0';
     }
     return buffer;
 }
 
-char *
-ansi_transition_mushcode(ansi_before, ansi_after)
-int ansi_before, ansi_after;
-{
+char *ansi_transition_mushcode(int ansi_before, int ansi_after) {
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -444,8 +356,7 @@ int ansi_before, ansi_after;
     ansi_bits_clr = ansi_before & (~ansi_after);
     if ((ansi_bits_clr & 0xf00) ||	/* highlights off */
             (ansi_bits_set & 0x088) ||	/* normal to color */
-            (ansi_bits_clr == 0x1000))  	/* explicit normal */
-    {
+            (ansi_bits_clr == 0x1000)) {	/* explicit normal */
         strcpy(p, "%xn");
         p += 3;
         ansi_bits_set = (~ansi_bits[0]) & ansi_after;
@@ -456,23 +367,19 @@ int ansi_before, ansi_after;
      * Next reproduce the highlight state
      */
 
-    if (ansi_bits_set & 0x100)
-    {
+    if (ansi_bits_set & 0x100) {
         strcpy(p, "%xh");
         p += 3;
     }
-    if (ansi_bits_set & 0x200)
-    {
+    if (ansi_bits_set & 0x200) {
         strcpy(p, "%xu");
         p += 3;
     }
-    if (ansi_bits_set & 0x400)
-    {
+    if (ansi_bits_set & 0x400) {
         strcpy(p, "%xf");
         p += 3;
     }
-    if (ansi_bits_set & 0x800)
-    {
+    if (ansi_bits_set & 0x800) {
         strcpy(p, "%xi");
         p += 3;
     }
@@ -480,8 +387,7 @@ int ansi_before, ansi_after;
     /*
      * Foreground color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x00f) {
         strcpy(p, "%xx");
         p += 3;
         p[-1] = ansi_mushcode_fg[(ansi_after & 0x00f)];
@@ -490,8 +396,7 @@ int ansi_before, ansi_after;
     /*
      * Background color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0) {
         strcpy(p, "%xX");
         p += 3;
         p[-1] = ansi_mushcode_bg[(ansi_after & 0x0f0) >> 4];
@@ -504,10 +409,7 @@ int ansi_before, ansi_after;
     return buffer;
 }
 
-char *
-ansi_transition_letters(ansi_before, ansi_after)
-int ansi_before, ansi_after;
-{
+char *ansi_transition_letters(int ansi_before, int ansi_after) {
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -532,8 +434,7 @@ int ansi_before, ansi_after;
     ansi_bits_clr = ansi_before & (~ansi_after);
     if ((ansi_bits_clr & 0xf00) ||	/* highlights off */
             (ansi_bits_set & 0x088) ||	/* normal to color */
-            (ansi_bits_clr == 0x1000))  	/* explicit normal */
-    {
+            (ansi_bits_clr == 0x1000)) {	/* explicit normal */
         *p++ = 'n';
         ansi_bits_set = (~ansi_bits[0]) & ansi_after;
         ansi_bits_clr = ansi_bits[0] & (~ansi_after);
@@ -543,36 +444,30 @@ int ansi_before, ansi_after;
      * Next reproduce the highlight state
      */
 
-    if (ansi_bits_set & 0x100)
-    {
+    if (ansi_bits_set & 0x100) {
         *p++ = 'h';
     }
-    if (ansi_bits_set & 0x200)
-    {
+    if (ansi_bits_set & 0x200) {
         *p++ = 'u';
     }
-    if (ansi_bits_set & 0x400)
-    {
+    if (ansi_bits_set & 0x400) {
         *p++ = 'f';
     }
-    if (ansi_bits_set & 0x800)
-    {
+    if (ansi_bits_set & 0x800) {
         *p++ = 'i';
     }
 
     /*
      * Foreground color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x00f) {
         *p++ = ansi_mushcode_fg[(ansi_after & 0x00f)];
     }
 
     /*
      * Background color
      */
-    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-    {
+    if ((ansi_bits_set | ansi_bits_clr) & 0x0f0) {
         *p++ = ansi_mushcode_bg[(ansi_after & 0x0f0) >> 4];
     }
 
@@ -585,14 +480,7 @@ int ansi_before, ansi_after;
 
 /* ansi_map_states -- Identify ansi state of every character in a string */
 
-int
-ansi_map_states(s, m, p)
-const char *s;
-
-int **m;
-
-char **p;
-{
+int ansi_map_states(const char *s, int **m, char **p) {
     static int ansi_map[LBUF_SIZE + 1];
 
     static char stripped[LBUF_SIZE + 1];
@@ -602,14 +490,10 @@ char **p;
     n = 0;
     ansi_state = ANST_NORMAL;
 
-    while (*s)
-    {
-        if (*s == ESC_CHAR)
-        {
+    while (*s) {
+        if (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
-        }
-        else
-        {
+        } else {
             ansi_map[n] = ansi_state;
             stripped[n++] = *s++;
         }
@@ -625,12 +509,7 @@ char **p;
 
 /* remap_colors -- allow a change of the color sequences */
 
-char *
-remap_colors(s, cmap)
-const char *s;
-
-int *cmap;
-{
+char *remap_colors(const char *s, int *cmap) {
     static char new[LBUF_SIZE];
 
     char *bp;
@@ -642,62 +521,47 @@ int *cmap;
 
     bp = new;
 
-    do
-    {
-        while (*s && (*s != ESC_CHAR))
-        {
+    do {
+        while (*s && (*s != ESC_CHAR)) {
             safe_chr(*s, new, &bp);
             s++;
         }
-        if (*s == ESC_CHAR)
-        {
+        if (*s == ESC_CHAR) {
             safe_chr(*s, new, &bp);
             s++;
-            if (*s == ANSI_CSI)
-            {
+            if (*s == ANSI_CSI) {
                 safe_chr(*s, new, &bp);
                 s++;
-                do
-                {
+                do {
                     n = (int)strtol(s, (char **)NULL, 10);
                     if ((n >= I_ANSI_BLACK)
                             && (n < I_ANSI_NUM)
-                            && (cmap[n - I_ANSI_BLACK] != 0))
-                    {
+                            && (cmap[n - I_ANSI_BLACK] != 0)) {
                         safe_ltos(new, &bp,
                                   cmap[n - I_ANSI_BLACK]);
                         while (isdigit(*s))
                             s++;
-                    }
-                    else
-                    {
-                        while (isdigit(*s))
-                        {
+                    } else {
+                        while (isdigit(*s)) {
                             safe_chr(*s, new, &bp);
                             s++;
                         }
                     }
-                    if (*s == ';')
-                    {
+                    if (*s == ';') {
                         safe_chr(*s, new, &bp);
                         s++;
                     }
-                }
-                while (*s && (*s != ANSI_END));
-                if (*s == ANSI_END)
-                {
+                } while (*s && (*s != ANSI_END));
+                if (*s == ANSI_END) {
                     safe_chr(*s, new, &bp);
                     s++;
                 }
-            }
-            else if (*s)
-            {
+            } else if (*s) {
                 safe_chr(*s, new, &bp);
                 s++;
             }
         }
-    }
-    while (*s);
+    } while (*s);
 
     return new;
 }
@@ -707,31 +571,22 @@ int *cmap;
  * MUSH substitutions or strip them (type = 0).
  */
 
-char *
-translate_string(str, type)
-char *str;
-
-int type;
-{
+char *translate_string(char *str, int type) {
     static char new[LBUF_SIZE];
 
     char *bp;
 
     bp = new;
 
-    if (type)
-    {
+    if (type) {
         int ansi_state = ANST_NORMAL;
 
         int ansi_state_prev = ANST_NORMAL;
 
-        while (*str)
-        {
-            switch (*str)
-            {
+        while (*str) {
+            switch (*str) {
             case ESC_CHAR:
-                while (*str == ESC_CHAR)
-                {
+                while (*str == ESC_CHAR) {
                     track_esccode(str, ansi_state);
                 }
                 safe_str(ansi_transition_mushcode
@@ -739,12 +594,9 @@ int type;
                 ansi_state_prev = ansi_state;
                 continue;
             case ' ':
-                if (str[1] == ' ')
-                {
+                if (str[1] == ' ') {
                     safe_known_str("%b", 2, new, &bp);
-                }
-                else
-                {
+                } else {
                     safe_chr(' ', new, &bp);
                 }
                 break;
@@ -772,13 +624,9 @@ int type;
             }
             str++;
         }
-    }
-    else
-    {
-        while (*str)
-        {
-            switch (*str)
-            {
+    } else {
+        while (*str) {
+            switch (*str) {
             case ESC_CHAR:
                 skip_esccode(str);
                 continue;
@@ -802,10 +650,7 @@ int type;
  * capitalizes an entire string
  */
 
-char *
-upcasestr(s)
-char *s;
-{
+char *upcasestr(char *s) {
     char *p;
 
     for (p = s; p && *p; p++)
@@ -819,10 +664,7 @@ char *s;
  * also remove leading and trailing spaces.
  */
 
-char *
-munge_space(string)
-char *string;
-{
+char *munge_space(char *string) {
     char *buffer, *p, *q;
 
     buffer = alloc_lbuf("munge_space");
@@ -832,8 +674,7 @@ char *string;
         p++;		/*
 				 * remove initial spaces
 				 */
-    while (p && *p)
-    {
+    while (p && *p) {
         while (*p && !isspace(*p))
             *q++ = *p++;
         while (*p && isspace(*++p));
@@ -852,10 +693,7 @@ char *string;
  * * trim_spaces: Remove leading and trailing spaces.
  */
 
-char *
-trim_spaces(string)
-char *string;
-{
+char *trim_spaces(char *string) {
     char *buffer, *p, *q;
 
     buffer = alloc_lbuf("trim_spaces");
@@ -863,8 +701,7 @@ char *string;
     q = buffer;
     while (p && *p && isspace(*p))	/* remove inital spaces */
         p++;
-    while (p && *p)
-    {
+    while (p && *p) {
         while (*p && !isspace(*p))	/* copy nonspace chars */
             *q++ = *p++;
         while (*p && isspace(*p))	/* compress spaces */
@@ -882,10 +719,7 @@ char *string;
  * returns a modified pointer to the string ready for another call.
  */
 
-char *
-grabto(str, targ)
-char **str, targ;
-{
+char *grabto(char **str, char targ) {
     char *savec, *cp;
 
     if (!str || !*str || !**str)
@@ -900,21 +734,15 @@ char **str, targ;
     return savec;
 }
 
-int
-string_compare(s1, s2)
-const char *s1, *s2;
-{
-    if (mudstate.standalone || mudconf.space_compress)
-    {
+int string_compare(const char *s1, const char *s2) {
+    if (mudstate.standalone || mudconf.space_compress) {
         while (isspace(*s1))
             s1++;
         while (isspace(*s2))
             s2++;
         while (*s1 && *s2 && ((tolower(*s1) == tolower(*s2)) ||
-                              (isspace(*s1) && isspace(*s2))))
-        {
-            if (isspace(*s1) && isspace(*s2))
-            {
+                              (isspace(*s1) && isspace(*s2)))) {
+            if (isspace(*s1) && isspace(*s2)) {
                 /*
                  * skip all
                  * * other spaces
@@ -923,23 +751,19 @@ const char *s1, *s2;
                     s1++;
                 while (isspace(*s2))
                     s2++;
-            }
-            else
-            {
+            } else {
                 s1++;
                 s2++;
             }
         }
         if ((*s1) && (*s2))
             return (1);
-        if (isspace(*s1))
-        {
+        if (isspace(*s1)) {
             while (isspace(*s1))
                 s1++;
             return (*s1);
         }
-        if (isspace(*s2))
-        {
+        if (isspace(*s2)) {
             while (isspace(*s2))
                 s2++;
             return (*s2);
@@ -947,9 +771,7 @@ const char *s1, *s2;
         if ((*s1) || (*s2))
             return (1);
         return (0);
-    }
-    else
-    {
+    } else {
         while (*s1 && *s2 && tolower(*s1) == tolower(*s2))
             s1++, s2++;
 
@@ -957,10 +779,7 @@ const char *s1, *s2;
     }
 }
 
-int
-string_prefix(string, prefix)
-const char *string, *prefix;
-{
+int string_prefix(const char *string, const char *prefix) {
     int count = 0;
 
     while (*string && *prefix && tolower(*string) == tolower(*prefix))
@@ -975,14 +794,9 @@ const char *string, *prefix;
  * accepts only nonempty matches starting at the beginning of a word
  */
 
-const char *
-string_match(src, sub)
-const char *src, *sub;
-{
-    if ((*sub != '\0') && (src))
-    {
-        while (*src)
-        {
+const char *string_match(const char *src, const char *sub) {
+    if ((*sub != '\0') && (src)) {
+        while (*src) {
             if (string_prefix(src, sub))
                 return src;
             /*
@@ -1007,10 +821,7 @@ const char *src, *sub;
  * handles special ^ and $ cases.
  */
 
-char *
-replace_string(old, new, string)
-const char *old, *new, *string;
-{
+char *replace_string(const char *old, const char *new, const char *string) {
     char *result, *r, *s;
 
     int olen;
@@ -1020,15 +831,13 @@ const char *old, *new, *string;
     s = (char *)string;
     olen = strlen(old);
     r = result = alloc_lbuf("replace_string");
-    while (*s)
-    {
+    while (*s) {
 
         /*
          * Copy up to the next occurrence of the first char of OLD
          */
 
-        while (*s && *s != *old)
-        {
+        while (*s && *s != *old) {
             safe_chr(*s, result, &r);
             s++;
         }
@@ -1039,15 +848,11 @@ const char *old, *new, *string;
          * OLD. Otherwise, copy the char and try again.
          */
 
-        if (*s)
-        {
-            if (!strncmp(old, s, olen))
-            {
+        if (*s) {
+            if (!strncmp(old, s, olen)) {
                 safe_str((char *)new, result, &r);
                 s += olen;
-            }
-            else
-            {
+            } else {
                 safe_chr(*s, result, &r);
                 s++;
             }
@@ -1057,10 +862,7 @@ const char *old, *new, *string;
     return result;
 }
 
-void
-edit_string(src, dst, from, to)
-char *src, **dst, *from, *to;
-{
+void edit_string(char *src, char **dst, char *from, char *to) {
     char *cp, *p;
 
     int ansi_state, to_ansi_set, to_ansi_clr, tlen, flen;
@@ -1100,8 +902,7 @@ char *src, **dst, *from, *to;
 
     cp = *dst = alloc_lbuf("edit_string");
 
-    if (!strcmp(from, "^"))
-    {
+    if (!strcmp(from, "^")) {
         /*
          * Prepend 'to' to string
          */
@@ -1109,9 +910,7 @@ char *src, **dst, *from, *to;
         safe_known_str(to, tlen, *dst, &cp);
         safe_copy_tracking(src, p, ansi_state, *dst, &cp);
 
-    }
-    else if (!strcmp(from, "$"))
-    {
+    } else if (!strcmp(from, "$")) {
 
         /*
          * Append 'to' to string
@@ -1124,9 +923,7 @@ char *src, **dst, *from, *to;
         ansi_state &= ~to_ansi_clr;
         safe_known_str(to, tlen, *dst, &cp);
 
-    }
-    else
-    {
+    } else {
         /*
          * Replace all occurances of 'from' with 'to'.  Handle the
          * special cases of from = \$ and \^.
@@ -1140,8 +937,7 @@ char *src, **dst, *from, *to;
         flen = strlen(from);
 
         ansi_state = ANST_NONE;
-        while (*src)
-        {
+        while (*src) {
 
             /*
              * Copy up to the next occurrence of the first
@@ -1149,14 +945,10 @@ char *src, **dst, *from, *to;
              */
 
             p = src;
-            while (*src && (*src != *from))
-            {
-                if (*src == ESC_CHAR)
-                {
+            while (*src && (*src != *from)) {
+                if (*src == ESC_CHAR) {
                     track_esccode(src, ansi_state);
-                }
-                else
-                {
+                } else {
                     ++src;
                 }
             }
@@ -1168,10 +960,8 @@ char *src, **dst, *from, *to;
              * * FROM. Otherwise, copy the char and try again.
              */
 
-            if (*src)
-            {
-                if (!strncmp(from, src, flen))
-                {
+            if (*src) {
+                if (!strncmp(from, src, flen)) {
                     /*
                      * Apply whatever ANSI transition
                      * * happens in TO
@@ -1181,9 +971,7 @@ char *src, **dst, *from, *to;
 
                     safe_known_str(to, tlen, *dst, &cp);
                     src += flen;
-                }
-                else
-                {
+                } else {
                     /*
                      * We have to handle the case where
                      * * the first character in FROM is the
@@ -1192,15 +980,12 @@ char *src, **dst, *from, *to;
                      * * ANSI code. Otherwise we just copy
                      * * the character.
                      */
-                    if (*from == ESC_CHAR)
-                    {
+                    if (*from == ESC_CHAR) {
                         p = src;
                         track_esccode(src, ansi_state);
                         safe_known_str(p, src - p,
                                        *dst, &cp);
-                    }
-                    else
-                    {
+                    } else {
                         safe_chr(*src, *dst, &cp);
                         ++src;
                     }
@@ -1212,14 +997,8 @@ char *src, **dst, *from, *to;
     safe_str(ansi_transition_esccode(ansi_state, ANST_NONE), *dst, &cp);
 }
 
-int
-minmatch(str, target, min)
-char *str, *target;
-
-int min;
-{
-    while (*str && *target && (tolower(*str) == tolower(*target)))
-    {
+int minmatch(char *str, char *target, int min) {
+    while (*str && *target && (tolower(*str) == tolower(*target))) {
         str++;
         target++;
         min--;
@@ -1236,21 +1015,13 @@ int min;
  * watching for overflows.
  */
 
-void
-safe_copy_str(src, buff, bufp, max)
-const char *src;
-
-char *buff, **bufp;
-
-int max;
-{
+void safe_copy_str(const char *src, char *buff,  char **bufp, int max) {
     char *tp, *maxtp, *longtp;
 
     int n, len;
 
     tp = *bufp;
-    if (src == NULL)
-    {
+    if (src == NULL) {
         *tp = '\0';
         return;
     }
@@ -1261,8 +1032,7 @@ int max;
     while (*src && (tp < maxtp))
         *tp++ = *src++;
 
-    if (*src == '\0')  	/* copied whole src, and tp is at most maxtp */
-    {
+    if (*src == '\0') {	/* copied whole src, and tp is at most maxtp */
         *tp = '\0';
         *bufp = tp;
         return;
@@ -1270,8 +1040,7 @@ int max;
 
     len = strlen(src);
     n = max - (tp - buff);	/* tp is either maxtp or longtp */
-    if (n <= 0)
-    {
+    if (n <= 0) {
         *tp = '\0';
         *bufp = tp;
         return;
@@ -1284,21 +1053,13 @@ int max;
 }
 
 
-int
-safe_copy_str_fn(src, buff, bufp, max)
-const char *src;
-
-char *buff, **bufp;
-
-int max;
-{
+int safe_copy_str_fn(const char *src, char *buff, char **bufp, int max) {
     char *tp, *maxtp, *longtp;
 
     int n, len;
 
     tp = *bufp;
-    if (src == NULL)
-    {
+    if (src == NULL) {
         *tp = '\0';
         return 0;
     }
@@ -1309,8 +1070,7 @@ int max;
     while (*src && (tp < maxtp))
         *tp++ = *src++;
 
-    if (*src == '\0')  	/* copied whole src, and tp is at most maxtp */
-    {
+    if (*src == '\0') {	/* copied whole src, and tp is at most maxtp */
         *tp = '\0';
         *bufp = tp;
         return 0;
@@ -1318,8 +1078,7 @@ int max;
 
     len = strlen(src);
     n = max - (tp - buff);	/* tp is either maxtp or longtp */
-    if (n <= 0)
-    {
+    if (n <= 0) {
         len -= (tp - *bufp);
         *tp = '\0';
         *bufp = tp;
@@ -1334,19 +1093,13 @@ int max;
     return (len - n);
 }
 
-int
-safe_copy_long_str(src, buff, bufp, max)
-char *src, *buff, **bufp;
-
-int max;
-{
+int safe_copy_long_str(char *src, char *buff, char **bufp, int max) {
     int len, n;
 
     char *tp;
 
     tp = *bufp;
-    if (src == NULL)
-    {
+    if (src == NULL) {
         *tp = '\0';
         return 0;
     }
@@ -1359,46 +1112,33 @@ int max;
     strncpy(tp, src, n);
     buff[max] = '\0';
 
-    if (len <= n)
-    {
+    if (len <= n) {
         *bufp = tp + len;
         return (0);
-    }
-    else
-    {
+    } else {
         *bufp = tp + n;
         return (len - n);
     }
 }
 
 
-void
-safe_known_str(src, known, buff, bufp)
-const char *src;
-
-char *buff, **bufp;
-
-int known;
-{
+void safe_known_str(const char *src, int known, char *buff, char **bufp) {
     int n;
 
     char *tp, *maxtp;
 
     tp = *bufp;
 
-    if (!src)
-    {
+    if (!src) {
         *tp = '\0';
         return;
     }
 
     maxtp = buff + LBUF_SIZE - 1;
 
-    if (known > 7)
-    {
+    if (known > 7) {
         n = maxtp - tp;
-        if (n <= 0)
-        {
+        if (n <= 0) {
             *tp = '\0';
             return;
         }
@@ -1420,25 +1160,17 @@ int known;
 }
 
 
-int
-safe_chr_real_fn(src, buff, bufp, max)
-char src, *buff, **bufp;
-
-int max;
-{
+int safe_chr_real_fn(char src, char *buff, char **bufp, int max) {
     char *tp;
 
     int retval = 0;
 
     tp = *bufp;
-    if ((tp - buff) < max)
-    {
+    if ((tp - buff) < max) {
         *tp++ = src;
         *bufp = tp;
         *tp = '\0';
-    }
-    else
-    {
+    } else {
         buff[max] = '\0';
         retval = 1;
     }
@@ -1450,17 +1182,13 @@ int max;
  * More utilities.
  */
 
-int
-matches_exit_from_list(str, pattern)
-char *str, *pattern;
-{
+int matches_exit_from_list(char *str, char *pattern) {
     char *s;
 
     if (*str == '\0')	/* never match empty */
         return 0;
 
-    while (*pattern)
-    {
+    while (*pattern) {
         for (s = str;	/* check out this one */
                 (*s && (tolower(*s) == tolower(*pattern)) &&
                  *pattern && (*pattern != EXIT_DELIMITER));
@@ -1470,8 +1198,7 @@ char *str, *pattern;
          * Did we match it all?
          */
 
-        if (*s == '\0')
-        {
+        if (*s == '\0') {
 
             /*
              * Make sure nothing afterwards
@@ -1498,12 +1225,7 @@ char *str, *pattern;
     return 0;
 }
 
-int
-ltos(s, num)
-char *s;
-
-long num;
-{
+int ltos(char *s, long num) {
     /*
      * Mark Vasoll's long int to string converter.
      */
@@ -1521,8 +1243,7 @@ long num;
     /*
      * build up the digits backwards by successive division
      */
-    while (anum > 9)
-    {
+    while (anum > 9) {
         *p++ = '0' + (anum % 10);
         anum /= 10;
     }
@@ -1551,14 +1272,7 @@ long num;
     return 0;
 }
 
-void
-safe_ltos(s, bufc, num)
-char *s;
-
-char **bufc;
-
-long num;
-{
+void safe_ltos(char *s, char **bufc, long num) {
     /*
      * Mark Vasoll's long int to string converter.
      */
@@ -1577,14 +1291,12 @@ long num;
     /*
      * build up the digits backwards by successive division
      */
-    while (anum > 9)
-    {
+    while (anum > 9) {
         *p++ = '0' + (anum % 10);
         anum /= 10;
     }
 
-    if (tp > s + LBUF_SIZE - 21)
-    {
+    if (tp > s + LBUF_SIZE - 21) {
         endp = s + LBUF_SIZE - 1;
         /*
          * put in the sign if needed
@@ -1605,9 +1317,7 @@ long num;
          */
         while ((p-- > buf) && (tp < endp))
             *tp++ = *p;
-    }
-    else
-    {
+    } else {
         if (num < 0)
             *tp++ = '-';
         *tp++ = '0' + (char)anum;
@@ -1623,23 +1333,17 @@ long num;
 }
 
 
-char *
-repeatchar(count, ch)
-int count;
-char ch;
-{
+char *repeatchar(int count, char ch) {
     int num;
     char *str, *ptr;
 
-    if (count < 1)
-    {
+    if (count < 1) {
         /*
          * If negative or zero spaces return a single character, -except-
          * allow 'repeatchar(0)' to return "" for calculated padding
          */
 
-        if (count == 0 )
-        {
+        if (count == 0 ) {
             return NULL;
         }
     }

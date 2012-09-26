@@ -1,5 +1,8 @@
 #include "../../copyright.h"
+#include "../../config.h"
+#include "../../system.h"
 
+#include "../../api.h"
 #include "db_sql.h"
 
 /* --------------------------------------------------------------------------
@@ -23,19 +26,19 @@ CONF	mod_db_sql_conftable[] = {
  * Commands.
  */
 
-DO_CMD_NO_ARG(mod_db_sql_do_init) {
+void mod_db_sql_do_init(dbref player, dbref cause, int key) {
         sql_init(player, cause, NULL, NULL);
 }
 
-DO_CMD_NO_ARG(mod_db_sql_do_connect) {
+void mod_db_sql_do_connect(dbref player, dbref cause, int key) {
         sql_init(player, cause, NULL, NULL);
 }
 
-DO_CMD_NO_ARG(mod_db_sql_do_disconnect) {
+void mod_db_sql_do_disconnect(dbref player, dbref cause, int key) {
         sql_shutdown(player, cause, NULL, NULL);
 }
 
-DO_CMD_ONE_ARG(mod_db_sql_do_query) {
+void mod_db_sql_do_query(dbref player, dbref cause, int key, char *arg1) {
         sql_query(player, arg1, NULL, NULL, &SPACE_DELIM, &SPACE_DELIM);
 }
 
@@ -51,19 +54,19 @@ CMDENT	mod_db_sql_cmdtable[] = {
  * Functions.
  */
 
-FUNCTION(mod_db_sql_fun_init) {
+void mod_db_sql_fun_init(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
         sql_init(player, cause, buff, bufc);
 }
 
-FUNCTION(mod_db_sql_fun_connect) {
+void mod_db_sql_fun_connect(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
         sql_init(player, cause, buff, bufc);
 }
 
-FUNCTION(mod_db_sql_fun_shutdown) {
+void mod_db_sql_fun_shutdown(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
         sql_init(player, cause, buff, bufc);
 }
 
-FUNCTION(mod_db_sql_fun_query) {
+void mod_db_sql_fun_query(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
 	Delim row_delim, field_delim;
 
 	/* 
@@ -136,25 +139,12 @@ void mod_db_sql_version(dbref player, dbref cause, int extra) {
 #endif
 }
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...)
-#else
-void mod_db_sql_notify(dbref player, char *buff, char **bufc, va_dlc va_alist)
-#endif
-{
+void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...) {
     va_list ap;
     char *s;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
     
-#else
-    char *format;
-
-    va_start(ap);
-    format = va_arg(ap, char *);
-
-#endif
     s = (char *)XMALLOC(MBUF_SIZE, "mod_db_sql_notify");
     vsprintf(s, format, ap);
     
@@ -165,7 +155,6 @@ void mod_db_sql_notify(dbref player, char *buff, char **bufc, va_dlc va_alist)
     }
     
     XFREE(s, "mod_db_sql_notify");
-#if defined(__STDC__) && defined(STDC_HEADERS)
+
     va_end(ap);
-#endif
 }

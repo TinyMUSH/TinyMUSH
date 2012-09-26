@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -28,10 +29,8 @@
 void fun_isword(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
-    for (p = fargs[0]; *p; p++)
-    {
-        if (!isalpha(*p))
-        {
+    for (p = fargs[0]; *p; p++) {
+        if (!isalpha(*p)) {
             safe_chr('0', buff, bufc);
             return;
         }
@@ -42,10 +41,8 @@ void fun_isword(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 void fun_isalnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *p;
 
-    for (p = fargs[0]; *p; p++)
-    {
-        if (!isalnum(*p))
-        {
+    for (p = fargs[0]; *p; p++) {
+        if (!isalnum(*p)) {
             safe_chr('0', buff, bufc);
             return;
         }
@@ -73,13 +70,10 @@ void fun_isdbref(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     dbref dbitem;
 
     p = fargs[0];
-    if (*p++ == NUMBER_TOKEN)
-    {
-        if (*p)  	/* just the string '#' won't do! */
-        {
+    if (*p++ == NUMBER_TOKEN) {
+        if (*p) {	/* just the string '#' won't do! */
             dbitem = parse_dbref_only(p);
-            if (Good_obj(dbitem))
-            {
+            if (Good_obj(dbitem)) {
                 safe_chr('1', buff, bufc);
                 return;
             }
@@ -99,13 +93,10 @@ void fun_isobjid(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     dbref dbitem;
 
     p = fargs[0];
-    if (*p++ == NUMBER_TOKEN)
-    {
-        if (*p)  	/* just the string '#' won't do! */
-        {
+    if (*p++ == NUMBER_TOKEN) {
+        if (*p) {	/* just the string '#' won't do! */
             dbitem = parse_objid(p, NULL);
-            if (Good_obj(dbitem))
-            {
+            if (Good_obj(dbitem)) {
                 safe_chr('1', buff, bufc);
                 return;
             }
@@ -138,29 +129,23 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     Delim isep;
 
-    if (nfargs == 0)
-    {
+    if (nfargs == 0) {
         return;
     }
     VaChk_Only_InPure(2);
 
     bp = tp = fargs[0];
 
-    while (*tp)
-    {
+    while (*tp) {
 
         /*
          * Move over and copy the non-sep characters
          */
 
-        while (*tp && *tp != isep.str[0])
-        {
-            if (*tp == ESC_CHAR)
-            {
+        while (*tp && *tp != isep.str[0]) {
+            if (*tp == ESC_CHAR) {
                 copy_esccode(tp, bp);
-            }
-            else
-            {
+            } else {
                 *bp++ = *tp++;
             }
         }
@@ -208,15 +193,12 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     int trim;
 
-    if (nfargs == 0)
-    {
+    if (nfargs == 0) {
         return;
     }
     VaChk_In(1, 3);
-    if (nfargs >= 2)
-    {
-        switch (tolower(*fargs[1]))
-        {
+    if (nfargs >= 2) {
+        switch (tolower(*fargs[1])) {
         case 'l':
             trim = TRIM_L;
             break;
@@ -227,9 +209,7 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             trim = TRIM_L | TRIM_R;
             break;
         }
-    }
-    else
-    {
+    } else {
         trim = TRIM_L | TRIM_R;
     }
 
@@ -239,27 +219,19 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Single-character delimiters are easy.
      */
 
-    if (isep.len == 1)
-    {
-        if (trim & TRIM_L)
-        {
-            while (*p == isep.str[0])
-            {
+    if (isep.len == 1) {
+        if (trim & TRIM_L) {
+            while (*p == isep.str[0]) {
                 p++;
             }
         }
-        if (trim & TRIM_R)
-        {
+        if (trim & TRIM_R) {
             q = endchar = p;
-            while (*q != '\0')
-            {
-                if (*q == ESC_CHAR)
-                {
+            while (*q != '\0') {
+                if (*q == ESC_CHAR) {
                     skip_esccode(q);
                     endchar = q;
-                }
-                else if (*q++ != isep.str[0])
-                {
+                } else if (*q++ != isep.str[0]) {
                     endchar = q;
                 }
             }
@@ -274,29 +246,21 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     ep = p + strlen(fargs[0]) - 1;	/* last char in string */
 
-    if (trim & TRIM_L)
-    {
+    if (trim & TRIM_L) {
         while (!strncmp(p, isep.str, isep.len) && (p <= ep))
             p = p + isep.len;
         if (p > ep)
             return;
     }
-    if (trim & TRIM_R)
-    {
+    if (trim & TRIM_R) {
         q = endchar = p;
-        while (q <= ep)
-        {
-            if (*q == ESC_CHAR)
-            {
+        while (q <= ep) {
+            if (*q == ESC_CHAR) {
                 skip_esccode(q);
                 endchar = q;
-            }
-            else if (!strncmp(q, isep.str, isep.len))
-            {
+            } else if (!strncmp(q, isep.str, isep.len)) {
                 q = q + isep.len;
-            }
-            else
-            {
+            } else {
                 q++;
                 endchar = q;
             }
@@ -317,8 +281,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
 
-    if (nfargs == 0)
-    {
+    if (nfargs == 0) {
         return;
     }
     VaChk_Range(1, 2);
@@ -342,8 +305,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Get ansi state of the first needle char
      */
     ansi_needle = ANST_NONE;
-    while (*mp == ESC_CHAR)
-    {
+    while (*mp == ESC_CHAR) {
         track_esccode(mp, ansi_needle);
         if (!*mp)
             mp = (char *)" ";
@@ -354,17 +316,14 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Look for the needle string
      */
 
-    while (*bp)
-    {
-        while (*bp == ESC_CHAR)
-        {
+    while (*bp) {
+        while (*bp == ESC_CHAR) {
             track_esccode(bp, ansi_haystack);
         }
 
         if ((*bp == *mp) &&
                 (ansi_needle == ANST_NONE ||
-                 ansi_haystack == ansi_needle))
-        {
+                 ansi_haystack == ansi_needle)) {
 
             /*
              * See if what follows is what we are looking for
@@ -375,14 +334,11 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             cp = bp;
             np = mp;
 
-            while (1)
-            {
-                while (*cp == ESC_CHAR)
-                {
+            while (1) {
+                while (*cp == ESC_CHAR) {
                     track_esccode(cp, ansi_haystack2);
                 }
-                while (*np == ESC_CHAR)
-                {
+                while (*np == ESC_CHAR) {
                     track_esccode(np, ansi_needle2);
                 }
                 if ((*cp != *np) ||
@@ -393,8 +349,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 ++cp, ++np;
             }
 
-            if (!*np)
-            {
+            if (!*np) {
                 /*
                  * Yup, return what follows
                  */
@@ -422,8 +377,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
 
-    if (nfargs == 0)
-    {
+    if (nfargs == 0) {
         return;
     }
     VaChk_Range(1, 2);
@@ -448,8 +402,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Get ansi state of the first needle char
      */
     ansi_needle = ANST_NONE;
-    while (*mp == ESC_CHAR)
-    {
+    while (*mp == ESC_CHAR) {
         track_esccode(mp, ansi_needle);
         if (!*mp)
             mp = (char *)" ";
@@ -460,8 +413,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Look for the needle string
      */
 
-    while (*bp)
-    {
+    while (*bp) {
         /*
          * See if what follows is what we are looking for
          */
@@ -471,14 +423,11 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         cp = bp;
         np = mp;
 
-        while (1)
-        {
-            while (*cp == ESC_CHAR)
-            {
+        while (1) {
+            while (*cp == ESC_CHAR) {
                 track_esccode(cp, ansi_haystack2);
             }
-            while (*np == ESC_CHAR)
-            {
+            while (*np == ESC_CHAR) {
                 track_esccode(np, ansi_needle2);
             }
             if ((*cp != *np) ||
@@ -489,8 +438,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
             ++cp, ++np;
         }
 
-        if (!*np)
-        {
+        if (!*np) {
             /*
              * Yup, return what came before this
              */
@@ -503,8 +451,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         /*
          * Nope, continue searching
          */
-        while (*bp == ESC_CHAR)
-        {
+        while (*bp == ESC_CHAR) {
             track_esccode(bp, ansi_haystack);
         }
 
@@ -530,14 +477,10 @@ void fun_lcstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     ap = *bufc;
     safe_str(fargs[0], buff, bufc);
 
-    while (*ap)
-    {
-        if (*ap == ESC_CHAR)
-        {
+    while (*ap) {
+        if (*ap == ESC_CHAR) {
             skip_esccode(ap);
-        }
-        else
-        {
+        } else {
             *ap = tolower(*ap);
             ap++;
         }
@@ -550,14 +493,10 @@ void fun_ucstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     ap = *bufc;
     safe_str(fargs[0], buff, bufc);
 
-    while (*ap)
-    {
-        if (*ap == ESC_CHAR)
-        {
+    while (*ap) {
+        if (*ap == ESC_CHAR) {
             skip_esccode(ap);
-        }
-        else
-        {
+        } else {
             *ap = toupper(*ap);
             ap++;
         }
@@ -570,8 +509,7 @@ void fun_capstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     ap = *bufc;
     safe_str(fargs[0], buff, bufc);
 
-    while (*ap == ESC_CHAR)
-    {
+    while (*ap == ESC_CHAR) {
         skip_esccode(ap);
     }
 
@@ -586,24 +524,19 @@ void fun_capstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 void fun_space(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     int num, max;
 
-    if (!fargs[0] || !(*fargs[0]))
-    {
+    if (!fargs[0] || !(*fargs[0])) {
         num = 1;
-    }
-    else
-    {
+    } else {
         num = (int)strtol(fargs[0], (char **)NULL, 10);
     }
 
-    if (num < 1)
-    {
+    if (num < 1) {
         /*
          * If negative or zero spaces return a single space, -except-
          * allow 'space(0)' to return "" for calculated padding
          */
 
-        if (!is_integer(fargs[0]) || (num != 0))
-        {
+        if (!is_integer(fargs[0]) || (num != 0)) {
             num = 1;
         }
     }
@@ -639,39 +572,31 @@ void fun_ljust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     max = LBUF_SIZE - 1 - (tp - buff);	/* chars left in buffer */
     spaces = (spaces > max) ? max : spaces;
 
-    if (fargs[2])
-    {
+    if (fargs[2]) {
         fillchars = strip_ansi(fargs[2]);
         slen = strlen(fillchars);
         slen = (slen > spaces) ? spaces : slen;
-        if (slen == 0)
-        {
+        if (slen == 0) {
             /*
              * NULL character fill
              */
             memset(tp, ' ', spaces);
             tp += spaces;
-        }
-        else if (slen == 1)
-        {
+        } else if (slen == 1) {
             /*
              * single character fill
              */
             memset(tp, *fillchars, spaces);
             tp += spaces;
-        }
-        else
-        {
+        } else {
             /*
              * multi character fill
              */
-            for (i = spaces; i >= slen; i -= slen)
-            {
+            for (i = spaces; i >= slen; i -= slen) {
                 memcpy(tp, fillchars, slen);
                 tp += slen;
             }
-            if (i)
-            {
+            if (i) {
                 /*
                  * we have a remainder here
                  */
@@ -679,9 +604,7 @@ void fun_ljust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 tp += i;
             }
         }
-    }
-    else
-    {
+    } else {
         /*
          * no fill character specified
          */
@@ -705,8 +628,7 @@ void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Sanitize number of spaces
      */
 
-    if (spaces <= 0)
-    {
+    if (spaces <= 0) {
         /*
          * no padding needed, just return string
          */
@@ -717,39 +639,31 @@ void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     max = LBUF_SIZE - 1 - (tp - buff);	/* chars left in buffer */
     spaces = (spaces > max) ? max : spaces;
 
-    if (fargs[2])
-    {
+    if (fargs[2]) {
         fillchars = strip_ansi(fargs[2]);
         slen = strlen(fillchars);
         slen = (slen > spaces) ? spaces : slen;
-        if (slen == 0)
-        {
+        if (slen == 0) {
             /*
              * NULL character fill
              */
             memset(tp, ' ', spaces);
             tp += spaces;
-        }
-        else if (slen == 1)
-        {
+        } else if (slen == 1) {
             /*
              * single character fill
              */
             memset(tp, *fillchars, spaces);
             tp += spaces;
-        }
-        else
-        {
+        } else {
             /*
              * multi character fill
              */
-            for (i = spaces; i >= slen; i -= slen)
-            {
+            for (i = spaces; i >= slen; i -= slen) {
                 memcpy(tp, fillchars, slen);
                 tp += slen;
             }
-            if (i)
-            {
+            if (i) {
                 /*
                  * we have a remainder here
                  */
@@ -757,9 +671,7 @@ void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 tp += i;
             }
         }
-    }
-    else
-    {
+    } else {
         /*
          * no fill character specified
          */
@@ -782,8 +694,7 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     len = strip_ansi_len(fargs[0]);
 
     width = (width > LBUF_SIZE - 1) ? LBUF_SIZE - 1 : width;
-    if (len >= width)
-    {
+    if (len >= width) {
         safe_str(fargs[0], buff, bufc);
         return;
     }
@@ -792,39 +703,31 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     max = LBUF_SIZE - 1 - (tp - buff);	/* chars left in buffer */
     lead_chrs = (lead_chrs > max) ? max : lead_chrs;
 
-    if (fargs[2])
-    {
+    if (fargs[2]) {
         fillchars = (char *)strip_ansi(fargs[2]);
         slen = strlen(fillchars);
         slen = (slen > lead_chrs) ? lead_chrs : slen;
-        if (slen == 0)
-        {
+        if (slen == 0) {
             /*
              * NULL character fill
              */
             memset(tp, ' ', lead_chrs);
             tp += lead_chrs;
-        }
-        else if (slen == 1)
-        {
+        } else if (slen == 1) {
             /*
              * single character fill
              */
             memset(tp, *fillchars, lead_chrs);
             tp += lead_chrs;
-        }
-        else
-        {
+        } else {
             /*
              * multi character fill
              */
-            for (i = lead_chrs; i >= slen; i -= slen)
-            {
+            for (i = lead_chrs; i >= slen; i -= slen) {
                 memcpy(tp, fillchars, slen);
                 tp += slen;
             }
-            if (i)
-            {
+            if (i) {
                 /*
                  * we have a remainder here
                  */
@@ -832,9 +735,7 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 tp += i;
             }
         }
-    }
-    else
-    {
+    } else {
         /*
          * no fill character specified
          */
@@ -851,36 +752,28 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     max = LBUF_SIZE - 1 - (tp - buff);
     trail_chrs = (trail_chrs > max) ? max : trail_chrs;
 
-    if (fargs[2])
-    {
-        if (slen == 0)
-        {
+    if (fargs[2]) {
+        if (slen == 0) {
             /*
              * NULL character fill
              */
             memset(tp, ' ', trail_chrs);
             tp += trail_chrs;
-        }
-        else if (slen == 1)
-        {
+        } else if (slen == 1) {
             /*
              * single character fill
              */
             memset(tp, *fillchars, trail_chrs);
             tp += trail_chrs;
-        }
-        else
-        {
+        } else {
             /*
              * multi character fill
              */
-            for (i = trail_chrs; i >= slen; i -= slen)
-            {
+            for (i = trail_chrs; i >= slen; i -= slen) {
                 memcpy(tp, fillchars, slen);
                 tp += slen;
             }
-            if (i)
-            {
+            if (i) {
                 /*
                  * we have a remainder here
                  */
@@ -888,9 +781,7 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 tp += i;
             }
         }
-    }
-    else
-    {
+    } else {
         /*
          * no fill character specified
          */
@@ -921,15 +812,12 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     if (nchars <= 0)
         return;
 
-    for (count = 0; (count < nchars) && *s; count++)
-    {
-        while (*s == ESC_CHAR)
-        {
+    for (count = 0; (count < nchars) && *s; count++) {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
         }
 
-        if (*s)
-        {
+        if (*s) {
             ++s;
         }
     }
@@ -952,30 +840,25 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if (nchars <= 0)
         return;
 
-    if (start < 0)
-    {
+    if (start < 0) {
         nchars += start;
         if (nchars <= 0)
             return;
         start = 0;
     }
-    while (*s == ESC_CHAR)
-    {
+    while (*s == ESC_CHAR) {
         track_esccode(s, ansi_state);
     }
 
-    for (count = 0; (count < start) && *s; count++)
-    {
+    for (count = 0; (count < start) && *s; count++) {
         ++s;
 
-        while (*s == ESC_CHAR)
-        {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
         }
     }
 
-    if (*s)
-    {
+    if (*s) {
         safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state),
                  buff, bufc);
     }
@@ -1007,16 +890,11 @@ void fun_comp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int x;
 
     x = strcmp(fargs[0], fargs[1]);
-    if (x > 0)
-    {
+    if (x > 0) {
         safe_chr('1', buff, bufc);
-    }
-    else if (x < 0)
-    {
+    } else if (x < 0) {
         safe_str("-1", buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_chr('0', buff, bufc);
     }
 }
@@ -1063,13 +941,11 @@ void fun_merge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * do length checks first
      */
 
-    if (strlen(fargs[0]) != strlen(fargs[1]))
-    {
+    if (strlen(fargs[0]) != strlen(fargs[1])) {
         safe_str("#-1 STRING LENGTHS MUST BE EQUAL", buff, bufc);
         return;
     }
-    if (strlen(fargs[2]) > 1)
-    {
+    if (strlen(fargs[2]) > 1) {
         safe_str("#-1 TOO MANY CHARACTERS", buff, bufc);
         return;
     }
@@ -1089,8 +965,7 @@ void fun_merge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     for (str = fargs[0], rep = fargs[1];
             *str && *rep && ((*bufc - buff) < (LBUF_SIZE - 1));
-            str++, rep++, (*bufc)++)
-    {
+            str++, rep++, (*bufc)++) {
         if (*str == c)
             **bufc = *rep;
         else
@@ -1111,10 +986,8 @@ void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     char *s;
 
     s = fargs[0];
-    while (*s)
-    {
-        switch (*s)
-        {
+    while (*s) {
+        switch (*s) {
         case ESC_CHAR:
             safe_copy_esccode(s, buff, bufc);
             continue;
@@ -1148,10 +1021,8 @@ void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     safe_chr('\\', buff, bufc);
     d = *bufc;
 
-    while (*s)
-    {
-        switch (*s)
-        {
+    while (*s) {
+        switch (*s) {
         case ESC_CHAR:
             safe_copy_esccode(s, buff, bufc);
             continue;
@@ -1180,10 +1051,8 @@ void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     s = fargs[0];
     if (!*s)
         return;
-    while (*s)
-    {
-        switch (*s)
-        {
+    while (*s) {
+        switch (*s) {
         case ESC_CHAR:
             safe_copy_esccode(s, buff, bufc);
             continue;
@@ -1210,8 +1079,7 @@ void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     char *s;
 
-    char stab[256] =
-    {
+    char stab[256] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1239,23 +1107,17 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
 
     VaChk_Only_Out(3);
-    if (nfargs < 3)
-    {
+    if (nfargs < 3) {
         osep.str[0] = '\0';
     }
-    for (s = fargs[1]; *s; s++)
-    {
+    for (s = fargs[1]; *s; s++) {
         stab[(unsigned char)*s] = 1;
     }
 
-    for (s = fargs[0]; *s; s++)
-    {
-        if (stab[(unsigned char)*s] == 0)
-        {
+    for (s = fargs[0]; *s; s++) {
+        if (stab[(unsigned char)*s] == 0) {
             safe_chr(*s, buff, bufc);
-        }
-        else if (nfargs > 2)
-        {
+        } else if (nfargs > 2) {
             print_sep(&osep, buff, bufc);
         }
     }
@@ -1271,13 +1133,11 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     int ansi_state;
 
-    if (!mudconf.ansi_colors)
-    {
+    if (!mudconf.ansi_colors) {
         safe_str(fargs[1], buff, bufc);
         return;
     }
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         safe_str(fargs[1], buff, bufc);
         return;
     }
@@ -1286,14 +1146,10 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     safe_str(ansi_transition_esccode(ANST_NONE, ansi_state), buff, bufc);
 
     s = fargs[1];
-    while (*s)
-    {
-        if (*s == ESC_CHAR)
-        {
+    while (*s) {
+        if (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
-        }
-        else
-        {
+        } else {
             ++s;
         }
     }
@@ -1317,38 +1173,29 @@ void fun_stripansi(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 #define CRYPTCODE_HI  126	/* tilde */
 #define CRYPTCODE_MOD  95	/* count of printable ascii chars */
 
-static void crunch_code(char *code)
-{
+static void crunch_code(char *code) {
     char *in, *out;
 
     in = out = code;
-    while (*in)
-    {
-        if ((*in >= CRYPTCODE_LO) && (*in <= CRYPTCODE_HI))
-        {
+    while (*in) {
+        if ((*in >= CRYPTCODE_LO) && (*in <= CRYPTCODE_HI)) {
             *out++ = *in++;
-        }
-        else if (*in == ESC_CHAR)
-        {
+        } else if (*in == ESC_CHAR) {
             skip_esccode(in);
-        }
-        else
-        {
+        } else {
             ++in;
         }
     }
     *out = '\0';
 }
 
-static void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
-{
+static void crypt_code(char *buff, char **bufc, char *code, char *text, int type) {
     char *p, *q;
 
     if (!*text)
         return;
     crunch_code(code);
-    if (!*code)
-    {
+    if (!*code) {
         safe_str(text, buff, bufc);
         return;
     }
@@ -1362,35 +1209,25 @@ static void crypt_code(char *buff, char **bufc, char *code, char *text, int type
      * ascii value, subtract LO, add the ascii value (less LO) of the
      * code, mod the result, add LO. Continue
      */
-    while (*p)
-    {
-        if ((*p >= CRYPTCODE_LO) && (*p <= CRYPTCODE_HI))
-        {
-            if (type)
-            {
+    while (*p) {
+        if ((*p >= CRYPTCODE_LO) && (*p <= CRYPTCODE_HI)) {
+            if (type) {
                 *p = (((*p - CRYPTCODE_LO) + (*q -
                                               CRYPTCODE_LO)) % CRYPTCODE_MOD) +
                      CRYPTCODE_LO;
-            }
-            else
-            {
+            } else {
                 *p = (((*p - *q) +
                        2 * CRYPTCODE_MOD) % CRYPTCODE_MOD) +
                      CRYPTCODE_LO;
             }
             ++p, ++q;
 
-            if (!*q)
-            {
+            if (!*q) {
                 q = code;
             }
-        }
-        else if (*p == ESC_CHAR)
-        {
+        } else if (*p == ESC_CHAR) {
             skip_esccode(p);
-        }
-        else
-        {
+        } else {
             ++p;
         }
     }
@@ -1415,20 +1252,17 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     char *stripped;
 
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         return;
     }
     n = ansi_map_states(fargs[0], &ansi_map, &stripped);
 
     ansi_state = ANST_NORMAL;
 
-    for (i = 0; i < n; i++)
-    {
+    for (i = 0; i < n; i++) {
         j = random_range(i, n - 1);
 
-        if (ansi_state != ansi_map[j])
-        {
+        if (ansi_state != ansi_map[j]) {
             safe_str(ansi_transition_esccode(ansi_state,
                                              ansi_map[j]), buff, bufc);
             ansi_state = ansi_map[j];
@@ -1451,18 +1285,15 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     char *stripped;
 
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         return;
     }
     n = ansi_map_states(fargs[0], &ansi_map, &stripped);
 
     ansi_state = ansi_map[n];
 
-    while (n--)
-    {
-        if (ansi_state != ansi_map[n])
-        {
+    while (n--) {
+        if (ansi_state != ansi_map[n]) {
             safe_str(ansi_transition_esccode(ansi_state,
                                              ansi_map[n]), buff, bufc);
             ansi_state = ansi_map[n];
@@ -1492,43 +1323,35 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     if (nchars <= 0)
         return;
 
-    if (start < 0)
-    {
+    if (start < 0) {
         nchars += start;
         if (nchars <= 0)
             return;
         start = 0;
     }
-    while (*s == ESC_CHAR)
-    {
+    while (*s == ESC_CHAR) {
         track_esccode(s, ansi_state);
     }
 
-    for (count = 0; (count < start) && *s; ++count)
-    {
+    for (count = 0; (count < start) && *s; ++count) {
         ++s;
 
-        while (*s == ESC_CHAR)
-        {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
         }
     }
 
-    if (*s)
-    {
+    if (*s) {
         safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state),
                  buff, bufc);
     }
     savep = s;
-    for (count = 0; (count < nchars) && *s; ++count)
-    {
-        while (*s == ESC_CHAR)
-        {
+    for (count = 0; (count < nchars) && *s; ++count) {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
         }
 
-        if (*s)
-        {
+        if (*s) {
             ++s;
         }
     }
@@ -1577,27 +1400,21 @@ void fun_pos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     b = tbuf;
     s = strip_ansi(fargs[1]);
 
-    if (*b && !*(b + 1))  	/* single character */
-    {
+    if (*b && !*(b + 1)) {	/* single character */
         t = strchr(s, *b);
-        if (t)
-        {
+        if (t) {
             safe_ltos(buff, bufc, (int)(t - s + 1));
-        }
-        else
-        {
+        } else {
             safe_nothing(buff, bufc);
         }
         return;
     }
-    while (*s)
-    {
+    while (*s) {
         u = s;
         t = b;
         while (*t && *t == *u)
             ++t, ++u;
-        if (*t == '\0')
-        {
+        if (*t == '\0') {
             safe_ltos(buff, bufc, i);
             return;
         }
@@ -1628,24 +1445,18 @@ void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     scratch_chartab = (char *)XCALLOC(256, sizeof(char), "lpos.chartab");
 
-    if (!fargs[1] || !*fargs[1])
-    {
+    if (!fargs[1] || !*fargs[1]) {
         scratch_chartab[(unsigned char)' '] = 1;
-    }
-    else
-    {
+    } else {
         for (s = fargs[1]; *s; s++)
             scratch_chartab[(unsigned char)*s] = 1;
     }
 
     bb_p = *bufc;
 
-    for (i = 0, s = strip_ansi(fargs[0]); *s; i++, s++)
-    {
-        if (scratch_chartab[(unsigned char)*s])
-        {
-            if (*bufc != bb_p)
-            {
+    for (i = 0, s = strip_ansi(fargs[0]); *s; i++, s++) {
+        if (scratch_chartab[(unsigned char)*s]) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_ltos(buff, bufc, i);
@@ -1666,18 +1477,14 @@ void fun_diffpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     char *s1, *s2;
 
-    for (i = 0, s1 = fargs[0], s2 = fargs[1]; *s1 && *s2; i++, s1++, s2++)
-    {
-        while (*s1 == ESC_CHAR)
-        {
+    for (i = 0, s1 = fargs[0], s2 = fargs[1]; *s1 && *s2; i++, s1++, s2++) {
+        while (*s1 == ESC_CHAR) {
             skip_esccode(s1);
         }
-        while (*s2 == ESC_CHAR)
-        {
+        while (*s2 == ESC_CHAR) {
             skip_esccode(s2);
         }
-        if (*s1 != *s2)
-        {
+        if (*s1 != *s2) {
             safe_ltos(buff, bufc, i);
             return;
         }
@@ -1702,13 +1509,11 @@ void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     charpos = (int)strtol(fargs[1], (char **)NULL, 10);
     cp = strip_ansi(fargs[0]);
-    if ((charpos > 0) && (charpos <= (int)strlen(cp)))
-    {
+    if ((charpos > 0) && (charpos <= (int)strlen(cp))) {
         tp = &(cp[charpos - 1]);
         cp = trim_space_sep(cp, &isep);
         xp = split_token(&cp, &isep);
-        for (i = 1; xp; i++)
-        {
+        for (i = 1; xp; i++) {
             if (tp < (xp + strlen(xp)))
                 break;
             xp = split_token(&cp, &isep);
@@ -1738,14 +1543,10 @@ void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     ansi_state = ANST_NORMAL;
     i = 0;
 
-    while (*s && i < charpos)
-    {
-        if (*s == ESC_CHAR)
-        {
+    while (*s && i < charpos) {
+        if (*s == ESC_CHAR) {
             track_esccode(s, ansi_state);
-        }
-        else
-        {
+        } else {
             ++s, ++i;
         }
     }
@@ -1770,27 +1571,20 @@ void fun_repeat(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     int times, len, i, maxtimes;
 
     times = (int)strtol(fargs[1], (char **)NULL, 10);
-    if ((times < 1) || (fargs[0] == NULL) || (!*fargs[0]))
-    {
+    if ((times < 1) || (fargs[0] == NULL) || (!*fargs[0])) {
         return;
-    }
-    else if (times == 1)
-    {
+    } else if (times == 1) {
         safe_str(fargs[0], buff, bufc);
-    }
-    else
-    {
+    } else {
         len = strlen(fargs[0]);
         maxtimes = (LBUF_SIZE - 1 - (*bufc - buff)) / len;
         maxtimes = (times > maxtimes) ? maxtimes : times;
 
-        for (i = 0; i < maxtimes; i++)
-        {
+        for (i = 0; i < maxtimes; i++) {
             memcpy(*bufc, fargs[0], len);
             *bufc += len;
         }
-        if (times > maxtimes)
-        {
+        if (times > maxtimes) {
             safe_known_str(fargs[0], len, buff, bufc);
         }
     }
@@ -1827,20 +1621,14 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
     if (width < 1)
         width = 1;
 
-    if (nfargs > 2)
-    {
+    if (nfargs > 2) {
         l_fill = fargs[2];
-    }
-    else
-    {
+    } else {
         l_fill = NULL;
     }
-    if (nfargs > 3)
-    {
+    if (nfargs > 3) {
         r_fill = fargs[3];
-    }
-    else
-    {
+    } else {
         r_fill = NULL;
     }
 
@@ -1852,16 +1640,13 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
     sw_ansi_state = ew_ansi_state = ANST_NORMAL;
     sl_pos = el_pos = sw_pos = ew_pos = 0;
 
-    while (1)
-    {
+    while (1) {
         /*
          * Locate the next start-of-word (SW)
          */
         for (sw = ew, sw_ansi_state = ew_ansi_state, sw_pos = ew_pos;
-                *sw; ++sw)
-        {
-            switch (*sw)
-            {
+                *sw; ++sw) {
+            switch (*sw) {
             case ESC_CHAR:
                 track_esccode(sw, sw_ansi_state);
                 --sw;
@@ -1893,10 +1678,8 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Decide where start-of-line (SL) was
          */
-        if (sl == NULL)
-        {
-            if (ew == fargs[0] || ew[-1] == '\n')
-            {
+        if (sl == NULL) {
+            if (ew == fargs[0] || ew[-1] == '\n') {
                 /*
                  * Preserve indentation at SS or after
                  * explicit EL
@@ -1904,9 +1687,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
                 sl = ew;
                 sl_ansi_state = ew_ansi_state;
                 sl_pos = ew_pos;
-            }
-            else
-            {
+            } else {
                 /*
                  * Discard whitespace if previous line
                  * wrapped
@@ -1916,22 +1697,17 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
                 sl_pos = sw_pos;
             }
         }
-        if (*sw == '\n')  	/* EL, so we have to output */
-        {
+        if (*sw == '\n') {	/* EL, so we have to output */
             ew = sw;
             ew_ansi_state = sw_ansi_state;
             ew_pos = sw_pos;
-        }
-        else
-        {
+        } else {
             /*
              * Locate the next end-of-word (EW)
              */
             for (ew = sw, ew_ansi_state = sw_ansi_state, ew_pos =
-                        sw_pos; *ew; ++ew)
-            {
-                switch (*ew)
-                {
+                        sw_pos; *ew; ++ew) {
+                switch (*ew) {
                 case ESC_CHAR:
                     track_esccode(ew, ew_ansi_state);
                     --ew;
@@ -1966,8 +1742,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
             /*
              * If it fits on the line, add it
              */
-            if (ew_pos - sl_pos <= width)
-            {
+            if (ew_pos - sl_pos <= width) {
                 el = ew;
                 el_ansi_state = ew_ansi_state;
                 el_pos = ew_pos;
@@ -1987,8 +1762,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Could be a blank line, no words fit
          */
-        if (el == NULL)
-        {
+        if (el == NULL) {
             el = sw;
             el_ansi_state = sw_ansi_state;
             el_pos = sw_pos;
@@ -1996,8 +1770,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Newline if this isn't the first line
          */
-        if (*bufc != bb_p)
-        {
+        if (*bufc != bb_p) {
             safe_crlf(buff, bufc);
         }
         /*
@@ -2008,13 +1781,10 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Left space padding if needed
          */
-        if (just == JUST_RIGHT)
-        {
+        if (just == JUST_RIGHT) {
             nleft = width - el_pos + sl_pos;
             print_padding(nleft, max, ' ');
-        }
-        else if (just == JUST_CENTER)
-        {
+        } else if (just == JUST_CENTER) {
             lead_chrs =
                 (int)((width / 2) - ((el_pos - sl_pos) / 2) + .5);
             print_padding(lead_chrs, max, ' ');
@@ -2039,13 +1809,10 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Right space padding if needed
          */
-        if (just == JUST_LEFT)
-        {
+        if (just == JUST_LEFT) {
             nleft = width - el_pos + sl_pos;
             print_padding(nleft, max, ' ');
-        }
-        else if (just == JUST_CENTER)
-        {
+        } else if (just == JUST_CENTER) {
             nleft = width - lead_chrs - el_pos + sl_pos;
             print_padding(nleft, max, ' ');
         }
@@ -2057,31 +1824,24 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * Update pointers for the next line
          */
-        if (!*el)
-        {
+        if (!*el) {
             /*
              * ES, and nothing left to output
              */
             break;
-        }
-        else if (*ew == '\n' && sw == ew)
-        {
+        } else if (*ew == '\n' && sw == ew) {
             /*
              * EL already handled on this line, and no new word
              * yet
              */
             ++ew;
             sl = el = NULL;
-        }
-        else if (sl == sw)
-        {
+        } else if (sl == sw) {
             /*
              * No new word yet
              */
             sl = el = NULL;
-        }
-        else
-        {
+        } else {
             /*
              * ES with more to output, EL for next line, or just
              * a full line
@@ -2108,8 +1868,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
  *   - ANSI states are not supported in the widths, as they are unnecessary.
  */
 
-static void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
-{
+static void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc) {
     int i, n;
 
     int *col_widths, *col_justs, *col_done;
@@ -2139,11 +1898,9 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
     col_widths =
         (int *)XCALLOC(n_cols, sizeof(int), "perform_align.widths");
     col_justs = (int *)XCALLOC(n_cols, sizeof(int), "perform_align.justs");
-    for (i = 0; i < n_cols; i++)
-    {
+    for (i = 0; i < n_cols; i++) {
         p = raw_colstrs[i];
-        switch (*p)
-        {
+        switch (*p) {
         case '<':
             col_justs[i] = JUST_LEFT;
             p++;
@@ -2159,21 +1916,18 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
         default:
             col_justs[i] = JUST_LEFT;
         }
-        for (n = 0; *p && isdigit((unsigned char)*p); p++)
-        {
+        for (n = 0; *p && isdigit((unsigned char)*p); p++) {
             n *= 10;
             n += *p - '0';
         }
-        if (n < 1)
-        {
+        if (n < 1) {
             safe_str("#-1 INVALID COLUMN WIDTH", buff, bufc);
             XFREE(col_widths, "perform_align.widths");
             XFREE(col_justs, "perform_align.justs");
             return;
         }
         col_widths[i] = n;
-        switch (*p)
-        {
+        switch (*p) {
         case '.':
             col_justs[i] |= JUST_REPEAT;
             p++;
@@ -2187,8 +1941,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
             p++;
             break;
         }
-        if (*p)
-        {
+        if (*p) {
             safe_str("#1 INVALID ALIGN STRING", buff, bufc);
             XFREE(col_widths, "perform_align.widths");
             XFREE(col_justs, "perform_align.justs");
@@ -2214,8 +1967,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
      * calloc() auto-initializes things to 0, so just do the other things
      */
 
-    for (i = 0; i < n_cols; i++)
-    {
+    for (i = 0; i < n_cols; i++) {
         xew[i] = data[i];
         xsl_a[i] = xel_a[i] = xsw_a[i] = xew_a[i] = ANST_NORMAL;
     }
@@ -2223,17 +1975,14 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
     bb_p = *bufc;
     l_p = *bufc;
 
-    while (n_done < n_cols)
-    {
-        for (i = 0; i < n_cols; i++)
-        {
+    while (n_done < n_cols) {
+        for (i = 0; i < n_cols; i++) {
 
             /*
              * If this is the first column, and it's not our
              * first line, output a row separator.
              */
-            if ((i == 0) && (*bufc != bb_p))
-            {
+            if ((i == 0) && (*bufc != bb_p)) {
                 print_sep(&row_sep, buff, bufc);
                 l_p = *bufc;
             }
@@ -2248,8 +1997,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
              * If this is not the first column of this line,
              * output a column separator.
              */
-            if (*bufc != l_p)
-            {
+            if (*bufc != l_p) {
                 print_sep(&col_sep, buff, bufc);
             }
             /*
@@ -2266,8 +2014,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
              */
 
             width = col_widths[i];
-            if (pending_coaright)
-            {
+            if (pending_coaright) {
                 if (i > 0)
                     col_widths[i] +=
                         pending_coaright + col_sep.len;
@@ -2279,8 +2026,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
              * before we continue.
              */
 
-            if (col_done[i] && !(col_justs[i] & JUST_REPEAT))
-            {
+            if (col_done[i] && !(col_justs[i] & JUST_REPEAT)) {
                 print_padding(width, max, fillc);
                 continue;
             }
@@ -2302,17 +2048,14 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
             ew_pos = xew_p[i];
             just = col_justs[i];
 
-            while (1)
-            {
+            while (1) {
                 /*
                  * Locate the next start-of-word (SW)
                  */
                 for (sw = ew, sw_ansi_state =
                             ew_ansi_state, sw_pos = ew_pos; *sw;
-                        ++sw)
-                {
-                    switch (*sw)
-                    {
+                        ++sw) {
+                    switch (*sw) {
                     case ESC_CHAR:
                         track_esccode(sw,
                                       sw_ansi_state);
@@ -2341,8 +2084,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                  * start-of-word (SW)
                  */
 
-                if (!*sw && sl == NULL)
-                {
+                if (!*sw && sl == NULL) {
                     /*
                      * ES, and nothing left
                      * * to output
@@ -2362,13 +2104,11 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                      * more than once, since we might
                      * repeat several times.
                      */
-                    if (!col_done[i])
-                    {
+                    if (!col_done[i]) {
                         n_done++;
                         col_done[i] = 1;
                     }
-                    if (i && (just & JUST_COALEFT))
-                    {
+                    if (i && (just & JUST_COALEFT)) {
                         /*
                          * Find the next-left column
                          * with a nonzero width,
@@ -2389,16 +2129,12 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                             col_widths[i] +
                             col_sep.len;
                         col_widths[i] = 0;
-                    }
-                    else if ((just & JUST_COARIGHT)
-                             && (i + 1 < n_cols))
-                    {
+                    } else if ((just & JUST_COARIGHT)
+                               && (i + 1 < n_cols)) {
                         pending_coaright =
                             col_widths[i];
                         col_widths[i] = 0;
-                    }
-                    else if (just & JUST_REPEAT)
-                    {
+                    } else if (just & JUST_REPEAT) {
                         xsl[i] = xel[i] = xsw[i] =
                                               NULL;
                         xew[i] = data[i];
@@ -2415,10 +2151,8 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                 /*
                  * Decide where start-of-line (SL) was
                  */
-                if (sl == NULL)
-                {
-                    if (ew == data[i] || ew[-1] == '\n')
-                    {
+                if (sl == NULL) {
+                    if (ew == data[i] || ew[-1] == '\n') {
                         /*
                          * Preserve indentation at SS
                          * or after explicit EL
@@ -2426,9 +2160,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                         sl = ew;
                         sl_ansi_state = ew_ansi_state;
                         sl_pos = ew_pos;
-                    }
-                    else
-                    {
+                    } else {
                         /*
                          * Discard whitespace if
                          * previous line wrapped
@@ -2438,8 +2170,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                         sl_pos = sw_pos;
                     }
                 }
-                if (*sw == '\n')
-                {
+                if (*sw == '\n') {
                     /*
                      * EL, so we have to
                      * * output
@@ -2448,18 +2179,14 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                     ew_ansi_state = sw_ansi_state;
                     ew_pos = sw_pos;
                     break;
-                }
-                else
-                {
+                } else {
                     /*
                      * Locate the next end-of-word (EW)
                      */
                     for (ew = sw, ew_ansi_state =
                                 sw_ansi_state, ew_pos = sw_pos;
-                            *ew; ++ew)
-                    {
-                        switch (*ew)
-                        {
+                            *ew; ++ew) {
+                        switch (*ew) {
                         case ESC_CHAR:
                             track_esccode(ew,
                                           ew_ansi_state);
@@ -2498,8 +2225,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                     /*
                      * If it fits on the line, add it
                      */
-                    if (ew_pos - sl_pos <= width)
-                    {
+                    if (ew_pos - sl_pos <= width) {
                         el = ew;
                         el_ansi_state = ew_ansi_state;
                         el_pos = ew_pos;
@@ -2524,8 +2250,7 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
             /*
              * Could be a blank line, no words fit
              */
-            if (el == NULL)
-            {
+            if (el == NULL) {
                 el = sw;
                 el_ansi_state = sw_ansi_state;
                 el_pos = sw_pos;
@@ -2533,13 +2258,10 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
             /*
              * Left space padding if needed
              */
-            if (just & JUST_RIGHT)
-            {
+            if (just & JUST_RIGHT) {
                 nleft = width - el_pos + sl_pos;
                 print_padding(nleft, max, fillc);
-            }
-            else if (just & JUST_CENTER)
-            {
+            } else if (just & JUST_CENTER) {
                 lead_chrs =
                     (int)((width / 2) - ((el_pos -
                                           sl_pos) / 2) + .5);
@@ -2565,13 +2287,10 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
             /*
              * Right space padding if needed
              */
-            if (just & JUST_LEFT)
-            {
+            if (just & JUST_LEFT) {
                 nleft = width - el_pos + sl_pos;
                 print_padding(nleft, max, fillc);
-            }
-            else if (just & JUST_CENTER)
-            {
+            } else if (just & JUST_CENTER) {
                 nleft = width - lead_chrs - el_pos + sl_pos;
                 print_padding(nleft, max, fillc);
             }
@@ -2579,33 +2298,26 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
              * Update pointers for the next line
              */
 
-            if (!*el)
-            {
+            if (!*el) {
                 /*
                  * ES, and nothing left to output
                  */
-                if (!col_done[i])
-                {
+                if (!col_done[i]) {
                     n_done++;
                     col_done[i] = 1;
                 }
-                if ((just & JUST_COALEFT) && (i - 1 >= 0))
-                {
+                if ((just & JUST_COALEFT) && (i - 1 >= 0)) {
                     for (n = i - 1;
                             (n > 0) && (col_widths[n] == 0);
                             n--);
                     col_widths[n] +=
                         col_widths[i] + col_sep.len;
                     col_widths[i] = 0;
-                }
-                else if ((just & JUST_COARIGHT)
-                         && (i + 1 < n_cols))
-                {
+                } else if ((just & JUST_COARIGHT)
+                           && (i + 1 < n_cols)) {
                     pending_coaright = col_widths[i];
                     col_widths[i] = 0;
-                }
-                else if (just & JUST_REPEAT)
-                {
+                } else if (just & JUST_REPEAT) {
                     xsl[i] = xel[i] = xsw[i] = NULL;
                     xew[i] = data[i];
                     xsl_a[i] = xel_a[i] = xsw_a[i] =
@@ -2613,27 +2325,20 @@ static void perform_align(int n_cols, char **raw_colstrs, char **data, char fill
                     xsl_p[i] = xel_p[i] = xsw_p[i] =
                                               xew_p[i] = 0;
                 }
-            }
-            else
-            {
-                if (*ew == '\n' && sw == ew)
-                {
+            } else {
+                if (*ew == '\n' && sw == ew) {
                     /*
                      * EL already handled on this line,
                      * and no new word yet
                      */
                     ++ew;
                     sl = el = NULL;
-                }
-                else if (sl == sw)
-                {
+                } else if (sl == sw) {
                     /*
                      * No new word yet
                      */
                     sl = el = NULL;
-                }
-                else
-                {
+                } else {
                     /*
                      * ES with more to output, EL for
                      * next line, or just a full line
@@ -2688,8 +2393,7 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     Delim filler, col_sep, row_sep;
 
-    if (nfargs < 2)
-    {
+    if (nfargs < 2) {
         safe_str("#-1 FUNCTION (ALIGN) EXPECTS AT LEAST 2 ARGUMENTS",
                  buff, bufc);
         return;
@@ -2700,14 +2404,12 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
 
     n_cols = list2arr(&raw_colstrs, LBUF_SIZE / 2, fargs[0], &SPACE_DELIM);
-    if (nfargs < n_cols + 1)
-    {
+    if (nfargs < n_cols + 1) {
         safe_str("#-1 NOT ENOUGH COLUMNS FOR ALIGN", buff, bufc);
         XFREE(raw_colstrs, "fun_align.raw_colstrs");
         return;
     }
-    if (nfargs > n_cols + 4)
-    {
+    if (nfargs > n_cols + 4) {
         safe_str("#-1 TOO MANY COLUMNS FOR ALIGN", buff, bufc);
         XFREE(raw_colstrs, "fun_align.raw_colstrs");
         return;
@@ -2718,8 +2420,7 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     VaChk_Sep(&filler, n_cols + 2, 0);
     VaChk_SepOut(col_sep, n_cols + 3, 0);
     VaChk_SepOut(row_sep, n_cols + 4, 0);
-    if (nfargs < n_cols + 4)
-    {
+    if (nfargs < n_cols + 4) {
         row_sep.str[0] = '\r';
     }
     perform_align(n_cols, raw_colstrs, fargs + 1, filler.str[0],
@@ -2739,15 +2440,13 @@ void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     n_cols = list2arr(&raw_colstrs, LBUF_SIZE / 2, fargs[0], &SPACE_DELIM);
     VaChk_InSep(3, 0);
     n_data = list2arr(&data, LBUF_SIZE / 2, fargs[1], &isep);
-    if (n_cols > n_data)
-    {
+    if (n_cols > n_data) {
         safe_str("#-1 NOT ENOUGH COLUMNS FOR LALIGN", buff, bufc);
         XFREE(raw_colstrs, "fun_lalign.raw_colstrs");
         XFREE(data, "fun_lalign.data");
         return;
     }
-    if (n_cols < n_data)
-    {
+    if (n_cols < n_data) {
         safe_str("#-1 TOO MANY COLUMNS FOR LALIGN", buff, bufc);
         XFREE(raw_colstrs, "fun_lalign.raw_colstrs");
         XFREE(data, "fun_lalign.data");
@@ -2756,8 +2455,7 @@ void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     VaChk_Sep(&filler, 4, 0);
     VaChk_SepOut(col_sep, 5, 0);
     VaChk_SepOut(row_sep, 6, 0);
-    if (nfargs < 6)
-    {
+    if (nfargs < 6) {
         row_sep.str[0] = '\r';
     }
     perform_align(n_cols, raw_colstrs, data, filler.str[0],
@@ -2775,8 +2473,7 @@ void fun_cat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     int i;
 
     safe_str(fargs[0], buff, bufc);
-    for (i = 1; i < nfargs; i++)
-    {
+    for (i = 1; i < nfargs; i++) {
         safe_chr(' ', buff, bufc);
         safe_str(fargs[i], buff, bufc);
     }
@@ -2786,8 +2483,7 @@ void fun_strcat(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     int i;
 
     safe_str(fargs[0], buff, bufc);
-    for (i = 1; i < nfargs; i++)
-    {
+    for (i = 1; i < nfargs; i++) {
         safe_str(fargs[i], buff, bufc);
     }
 }
@@ -2805,12 +2501,9 @@ void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     VaChk_OutSep(1, 0);
 
     bb_p = *bufc;
-    for (i = 1; i < nfargs; i++)
-    {
-        if (*fargs[i])
-        {
-            if (*bufc != bb_p)
-            {
+    for (i = 1; i < nfargs; i++) {
+        if (*fargs[i]) {
+            if (*bufc != bb_p) {
                 print_sep(&osep, buff, bufc);
             }
             safe_str(fargs[i], buff, bufc);
@@ -2840,21 +2533,17 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     start = (int)strtol(fargs[1], (char **)NULL, 10);
     nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
-    if ((nchars <= 0) || (start + nchars <= 0))
-    {
+    if ((nchars <= 0) || (start + nchars <= 0)) {
         safe_str(s, buff, bufc);
         return;
     }
     savep = s;
-    for (count = 0; (count < start) && *s; ++count)
-    {
-        while (*s == ESC_CHAR)
-        {
+    for (count = 0; (count < start) && *s; ++count) {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state_l);
         }
 
-        if (*s)
-        {
+        if (*s) {
             ++s;
         }
     }
@@ -2862,29 +2551,23 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     safe_known_str(savep, s - savep, buff, bufc);
     ansi_state_r = ansi_state_l;
 
-    while (*s == ESC_CHAR)
-    {
+    while (*s == ESC_CHAR) {
         track_esccode(s, ansi_state_r);
     }
 
-    for (; (count < start + nchars) && *s; ++count)
-    {
+    for (; (count < start + nchars) && *s; ++count) {
         ++s;
 
-        while (*s == ESC_CHAR)
-        {
+        while (*s == ESC_CHAR) {
             track_esccode(s, ansi_state_r);
         }
     }
 
-    if (*s)
-    {
+    if (*s) {
         safe_str(ansi_transition_esccode(ansi_state_l, ansi_state_r),
                  buff, bufc);
         safe_str(s, buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_str(ansi_transition_esccode(ansi_state_l, ANST_NORMAL),
                  buff, bufc);
     }
@@ -2910,26 +2593,19 @@ void fun_art(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     char c;
 
-    while (*s && (isspace(*s) || iscntrl(*s)))
-    {
-        if (*s == ESC_CHAR)
-        {
+    while (*s && (isspace(*s) || iscntrl(*s))) {
+        if (*s == ESC_CHAR) {
             skip_esccode(s);
-        }
-        else
-        {
+        } else {
             ++s;
         }
     }
 
     c = tolower(*s);
 
-    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
-    {
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
         safe_known_str("an", 2, buff, bufc);
-    }
-    else
-    {
+    } else {
         safe_chr('a', buff, bufc);
     }
 }
@@ -2939,16 +2615,13 @@ void fun_alphamax(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     int i = 1;
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         safe_str("#-1 TOO FEW ARGUMENTS", buff, bufc);
         return;
-    }
-    else
+    } else
         amax = fargs[0];
 
-    while ((i < nfargs) && fargs[i])
-    {
+    while ((i < nfargs) && fargs[i]) {
         amax = (strcmp(amax, fargs[i]) > 0) ? amax : fargs[i];
         i++;
     }
@@ -2961,16 +2634,13 @@ void fun_alphamin(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     int i = 1;
 
-    if (!fargs[0])
-    {
+    if (!fargs[0]) {
         safe_str("#-1 TOO FEW ARGUMENTS", buff, bufc);
         return;
-    }
-    else
+    } else
         amin = fargs[0];
 
-    while ((i < nfargs) && fargs[i])
-    {
+    while ((i < nfargs) && fargs[i]) {
         amin = (strcmp(amin, fargs[i]) < 0) ? amin : fargs[i];
         i++;
     }
@@ -2984,25 +2654,16 @@ void fun_valid(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * given type (such as an object name).
      */
 
-    if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1])
-    {
+    if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1]) {
         safe_chr('0', buff, bufc);
-    }
-    else if (!strcasecmp(fargs[0], "name"))
-    {
+    } else if (!strcasecmp(fargs[0], "name")) {
         safe_bool(buff, bufc, ok_name(fargs[1]));
-    }
-    else if (!strcasecmp(fargs[0], "attrname"))
-    {
+    } else if (!strcasecmp(fargs[0], "attrname")) {
         safe_bool(buff, bufc, ok_attr_name(fargs[1]));
-    }
-    else if (!strcasecmp(fargs[0], "playername"))
-    {
+    } else if (!strcasecmp(fargs[0], "playername")) {
         safe_bool(buff, bufc, (ok_player_name(fargs[1]) &&
                                badname_check(fargs[1])));
-    }
-    else
-    {
+    } else {
         safe_nothing(buff, bufc);
     }
 }

@@ -7,8 +7,7 @@
 
 /* We need to 64-bit-align the end of the pool header. */
 
-typedef struct pool_header
-{
+typedef struct pool_header {
     int		magicnum;	/* For consistency check */
     int		pool_size;	/* For consistency check */
     struct pool_header *next;	/* Next pool header in chain */
@@ -17,13 +16,11 @@ typedef struct pool_header
     char		align     [(256 - 2 * sizeof(int) - 3 * sizeof(char *)) & 0x7];
 }		POOLHDR;
 
-typedef struct pool_footer
-{
+typedef struct pool_footer {
     int		magicnum;	/* For consistency check */
 }		POOLFTR;
 
-typedef struct pooldata
-{
+typedef struct pooldata {
     int		pool_size;	/* Size in bytes of a buffer */
     POOLHDR        *free_head;	/* Buffer freelist head */
     POOLHDR        *chain_head;	/* Buffer chain head */
@@ -107,14 +104,13 @@ extern char    *malloc_ptr;
 #define XSTRDUP(x,y) (track_strdup((x),(y)))
 #define XFREE(x,y) (track_free((void *)(x),(y)), (x) = NULL)
 
-extern void    *FDECL(track_malloc, (size_t, const char *));
-extern void    *FDECL(track_calloc, (size_t, size_t, const char *));
-extern void    *FDECL(track_realloc, (void *, size_t, const char *));
-extern char    *FDECL(track_strdup, (const char *, const char *));
-extern void	FDECL(track_free, (void *, const char *));
+extern void    *track_malloc(size_t, const char *);
+extern void    *track_calloc(size_t, size_t, const char *);
+extern void    *track_realloc(void *, size_t, const char *);
+extern char    *track_strdup(const char *, const char *);
+extern void	track_free(void *, const char *);
 
-typedef struct tracemem_header
-{
+typedef struct tracemem_header {
     void           *bptr;
     const char     *buf_tag;
     size_t		alloc;
@@ -137,11 +133,11 @@ typedef struct tracemem_header
  * Pool allocation.
  */
 
-extern void	FDECL(pool_init, (int, int));
-extern char    *FDECL(pool_alloc, (int, const char *));
-extern void	FDECL(pool_free, (int, char **));
-extern void	FDECL(list_bufstats, (dbref));
-extern void	FDECL(list_buftrace, (dbref));
+extern void	pool_init(int, int);
+extern char    *pool_alloc(int, const char *);
+extern void	pool_free(int, char **);
+extern void	list_bufstats(dbref);
+extern void	list_buftrace(dbref);
 
 #define	alloc_lbuf(s)	pool_alloc(POOL_LBUF,s)
 #define	free_lbuf(b)	pool_free(POOL_LBUF,((char **)&(b)))

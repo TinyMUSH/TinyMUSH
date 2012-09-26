@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -21,15 +22,14 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-static long NDECL(genrand_int31);
+static long genrand_int31(void);
 
 /*
  * ---------------------------------------------------------------------------
  * Trim off leading and trailing spaces if the separator char is a space
  */
 
-char *trim_space_sep(char *str, const Delim *sep)
-{
+char *trim_space_sep(char *str, const Delim *sep) {
     char *p;
 
     if ((sep->len > 1) || (sep->str[0] != ' ') || !*str)
@@ -51,35 +51,27 @@ char *trim_space_sep(char *str, const Delim *sep)
  * tell what color it is.
  */
 
-char *next_token(char *str, const Delim *sep)
-{
+char *next_token(char *str, const Delim *sep) {
     char *p;
 
-    if (sep->len == 1)
-    {
-        while (*str == ESC_CHAR)
-        {
+    if (sep->len == 1) {
+        while (*str == ESC_CHAR) {
             skip_esccode(str);
         }
-        while (*str && (*str != sep->str[0]))
-        {
+        while (*str && (*str != sep->str[0])) {
             ++str;
-            while (*str == ESC_CHAR)
-            {
+            while (*str == ESC_CHAR) {
                 skip_esccode(str);
             }
         }
         if (!*str)
             return NULL;
         ++str;
-        if (sep->str[0] == ' ')
-        {
+        if (sep->str[0] == ' ') {
             while (*str == ' ')
                 ++str;
         }
-    }
-    else
-    {
+    } else {
         if ((p = strstr(str, sep->str)) == NULL)
             return NULL;
         str = p + sep->len;
@@ -87,53 +79,38 @@ char *next_token(char *str, const Delim *sep)
     return str;
 }
 
-char *split_token(char **sp, const Delim *sep)
-{
+char *split_token(char **sp, const Delim *sep) {
     char *str, *save, *p;
 
     save = str = *sp;
-    if (!str)
-    {
+    if (!str) {
         *sp = NULL;
         return NULL;
     }
-    if (sep->len == 1)
-    {
-        while (*str == ESC_CHAR)
-        {
+    if (sep->len == 1) {
+        while (*str == ESC_CHAR) {
             skip_esccode(str);
         }
-        while (*str && (*str != sep->str[0]))
-        {
+        while (*str && (*str != sep->str[0])) {
             ++str;
-            while (*str == ESC_CHAR)
-            {
+            while (*str == ESC_CHAR) {
                 skip_esccode(str);
             }
         }
-        if (*str)
-        {
+        if (*str) {
             *str++ = '\0';
-            if (sep->str[0] == ' ')
-            {
+            if (sep->str[0] == ' ') {
                 while (*str == ' ')
                     ++str;
             }
-        }
-        else
-        {
+        } else {
             str = NULL;
         }
-    }
-    else
-    {
-        if ((p = strstr(str, sep->str)) != NULL)
-        {
+    } else {
+        if ((p = strstr(str, sep->str)) != NULL) {
             *p = '\0';
             str = p + sep->len;
-        }
-        else
-        {
+        } else {
             str = NULL;
         }
     }
@@ -141,40 +118,31 @@ char *split_token(char **sp, const Delim *sep)
     return save;
 }
 
-char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
-{
+char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr) {
     int ansi_state = *ansi_state_ptr;
 
     char *p;
 
-    if (sep->len == 1)
-    {
-        while (*str == ESC_CHAR)
-        {
+    if (sep->len == 1) {
+        while (*str == ESC_CHAR) {
             track_esccode(str, ansi_state);
         }
-        while (*str && (*str != sep->str[0]))
-        {
+        while (*str && (*str != sep->str[0])) {
             ++str;
-            while (*str == ESC_CHAR)
-            {
+            while (*str == ESC_CHAR) {
                 track_esccode(str, ansi_state);
             }
         }
-        if (!*str)
-        {
+        if (!*str) {
             *ansi_state_ptr = ansi_state;
             return NULL;
         }
         ++str;
-        if (sep->str[0] == ' ')
-        {
+        if (sep->str[0] == ' ') {
             while (*str == ' ')
                 ++str;
         }
-    }
-    else
-    {
+    } else {
         /*
          * ansi tracking not supported yet in multichar delims
          */
@@ -191,8 +159,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
  * Count the words in a delimiter-separated list.
  */
 
-int countwords(char *str, const Delim *sep)
-{
+int countwords(char *str, const Delim *sep) {
     int n;
 
     str = trim_space_sep(str, sep);
@@ -207,8 +174,7 @@ int countwords(char *str, const Delim *sep)
  * list2arr, arr2list: Convert lists to arrays and vice versa.
  */
 
-int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
-{
+int list2arr(char ***arr, int maxtok, char *list, const Delim *sep) {
     static unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
 
     static int initted = 0;
@@ -223,21 +189,18 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
      * pointers.
      */
 
-    if (!initted)
-    {
+    if (!initted) {
         memset(tok_starts, 0, sizeof(tok_starts));
         initted = 1;
     }
     liststart = list = trim_space_sep(list, sep);
     tok = split_token(&list, sep);
     for (ntok = 0, tokpos = 0; tok && ntok < maxtok;
-            ++ntok, tok = split_token(&list, sep))
-    {
+            ++ntok, tok = split_token(&list, sep)) {
         tokpos = tok - liststart;
         tok_starts[tokpos >> 3] |= (1 << (tokpos & 0x7));
     }
-    if (ntok == 0)
-    {
+    if (ntok == 0) {
         /*
          * So we don't try to malloc(0).
          */
@@ -252,10 +215,8 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 
     tokpos >>= 3;
     ntok = 0;
-    for (i = 0; i <= tokpos; ++i)
-    {
-        if (tok_starts[i])
-        {
+    for (i = 0; i <= tokpos; ++i) {
+        if (tok_starts[i]) {
             /*
              * There's at least one token starting in this byte
              * of the bitstring, so we scan the bits.
@@ -263,32 +224,26 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
             bits = tok_starts[i];
             tok_starts[i] = 0;
             tok = liststart + (i << 3);
-            do
-            {
-                if (bits & 0x1)
-                {
+            do {
+                if (bits & 0x1) {
                     (*arr)[ntok] = tok;
                     ++ntok;
                 }
                 bits >>= 1;
                 ++tok;
-            }
-            while (bits);
+            } while (bits);
         }
     }
     return ntok;
 }
 
-void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
-{
+void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep) {
     int i;
 
-    if (alen)
-    {
+    if (alen) {
         safe_str(arr[0], list, bufc);
     }
-    for (i = 1; i < alen; i++)
-    {
+    for (i = 1; i < alen; i++) {
         print_sep(sep, list, bufc);
         safe_str(arr[i], list, bufc);
     }
@@ -301,8 +256,7 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
  * takes the same maxlen and returns the same number of words.
  */
 
-int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep)
-{
+int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep) {
     int i, ansi_state;
 
     if (maxlen <= 0)
@@ -312,8 +266,7 @@ int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *s
     list = trim_space_sep(list, sep);
 
     for (i = 1; list && i < maxlen;
-            list = next_token_ansi(list, sep, &ansi_state), ++i)
-    {
+            list = next_token_ansi(list, sep, &ansi_state), ++i) {
         arr[i - 1] = ansi_state;
     }
     arr[i] = ANST_NONE;
@@ -325,8 +278,7 @@ int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *s
  * Quick-matching for function purposes.
  */
 
-dbref match_thing(dbref player, char *name)
-{
+dbref match_thing(dbref player, char *name) {
     init_match(player, name, NOTYPE);
     match_everything(MAT_EXIT_PARENTS);
     return (noisy_match_result());
@@ -338,8 +290,7 @@ dbref match_thing(dbref player, char *name)
  * for validity.
  */
 
-int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
-{
+int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc) {
     if ((nfargs >= minargs) && (nfargs <= maxargs))
         return 1;
 
@@ -359,14 +310,12 @@ int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char
  * delim_check: obtain delimiter
  */
 
-int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags)
-{
+int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags) {
     char *tstr, *bp, *str;
 
     int tlen;
 
-    if (nfargs < sep_arg)
-    {
+    if (nfargs < sep_arg) {
         sep->str[0] = ' ';
         sep->len = 1;
         return 1;
@@ -375,55 +324,37 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if (tlen <= 1)
         dflags &= ~DELIM_EVAL;
 
-    if (dflags & DELIM_EVAL)
-    {
+    if (dflags & DELIM_EVAL) {
         tstr = bp = alloc_lbuf("delim_check");
         str = fargs[sep_arg - 1];
         exec(tstr, &bp, player, caller, cause,
              EV_EVAL | EV_FCHECK, &str, cargs, ncargs);
         tlen = strlen(tstr);
-    }
-    else
-    {
+    } else {
         tstr = fargs[sep_arg - 1];
     }
 
     sep->len = 1;
-    if (tlen == 0)
-    {
+    if (tlen == 0) {
         sep->str[0] = ' ';
-    }
-    else if (tlen == 1)
-    {
+    } else if (tlen == 1) {
         sep->str[0] = *tstr;
-    }
-    else
-    {
+    } else {
         if ((dflags & DELIM_NULL) &&
-                !strcmp(tstr, (char *)NULL_DELIM_VAR))
-        {
+                !strcmp(tstr, (char *)NULL_DELIM_VAR)) {
             sep->str[0] = '\0';
-        }
-        else if ((dflags & DELIM_CRLF) &&
-                 !strcmp(tstr, (char *)"\r\n"))
-        {
+        } else if ((dflags & DELIM_CRLF) &&
+                   !strcmp(tstr, (char *)"\r\n")) {
             sep->str[0] = '\r';
-        }
-        else if (dflags & DELIM_STRING)
-        {
-            if (tlen > MAX_DELIM_LEN)
-            {
+        } else if (dflags & DELIM_STRING) {
+            if (tlen > MAX_DELIM_LEN) {
                 safe_str("#-1 SEPARATOR TOO LONG", buff, bufc);
                 sep->len = 0;
-            }
-            else
-            {
+            } else {
                 strcpy(sep->str, tstr);
                 sep->len = tlen;
             }
-        }
-        else
-        {
+        } else {
             safe_str("#-1 SEPARATOR MUST BE ONE CHARACTER",
                      buff, bufc);
             sep->len = 0;
@@ -441,19 +372,14 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * Boolean true/false check.
  */
 
-int xlate(char *arg)
-{
+int xlate(char *arg) {
     char *temp2;
 
-    if (arg[0] == '#')
-    {
+    if (arg[0] == '#') {
         arg++;
-        if (is_integer(arg))
-        {
-            if (mudconf.bools_oldstyle)
-            {
-                switch ((int)strtol(arg, (char **)NULL, 10))
-                {
+        if (is_integer(arg)) {
+            if (mudconf.bools_oldstyle) {
+                switch ((int)strtol(arg, (char **)NULL, 10)) {
                 case -1:
                     return 0;
                 case 0:
@@ -461,18 +387,13 @@ int xlate(char *arg)
                 default:
                     return 1;
                 }
-            }
-            else
-            {
+            } else {
                 return ((int)strtol(arg, (char **)NULL, 10) >= 0);
             }
         }
-        if (mudconf.bools_oldstyle)
-        {
+        if (mudconf.bools_oldstyle) {
             return 0;
-        }
-        else
-        {
+        } else {
             /*
              * Case of '#-1 <string>'
              */
@@ -493,14 +414,12 @@ int xlate(char *arg)
  * used by fun_reverse and fun_revwords to reverse things
  */
 
-void do_reverse(char *from, char *to)
-{
+void do_reverse(char *from, char *to) {
     char *tp;
 
     tp = to + strlen(from);
     *tp-- = '\0';
-    while (*from)
-    {
+    while (*from) {
         *tp-- = *from++;
     }
 }
@@ -511,8 +430,7 @@ void do_reverse(char *from, char *to)
  * based on MUX2's RandomINT32().
  */
 
-long random_range(long low, long high)
-{
+long random_range(long low, long high) {
     unsigned long x, n, n_limit;
 
     /*
@@ -543,11 +461,9 @@ long random_range(long low, long high)
      */
 
     n_limit = INT_MAX - (INT_MAX % x);
-    do
-    {
+    do {
         n = genrand_int31();
-    }
-    while (n >= n_limit);
+    } while (n >= n_limit);
 
     return low + (n % x);
 }
@@ -620,13 +536,11 @@ static int initf = 0;
 static unsigned long *next;
 
 /* initializes state[N] with a seed */
-void init_genrand(unsigned long s)
-{
+void init_genrand(unsigned long s) {
     int j;
 
     state[0] = s & 0xffffffffUL;
-    for (j = 1; j < N; j++)
-    {
+    for (j = 1; j < N; j++) {
         state[j] =
             (1812433253UL * (state[j - 1] ^ (state[j - 1] >> 30)) + j);
         /*
@@ -647,8 +561,7 @@ void init_genrand(unsigned long s)
     initf = 1;
 }
 
-static void next_state(void)
-{
+static void next_state(void) {
     unsigned long *p = state;
 
     int j;
@@ -675,8 +588,7 @@ static void next_state(void)
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
-static long genrand_int31(void)
-{
+static long genrand_int31(void) {
     unsigned long y;
 
     if (--left == 0)

@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -26,25 +27,16 @@
  */
 
 int ph_any(dbref target, dbref player, POWER power, int fpowers, int reset) {
-    if (fpowers & POWER_EXT)
-    {
-        if (reset)
-        {
+    if (fpowers & POWER_EXT) {
+        if (reset) {
             s_Powers2(target, Powers2(target) & ~power);
-        }
-        else
-        {
+        } else {
             s_Powers2(target, Powers2(target) | power);
         }
-    }
-    else
-    {
-        if (reset)
-        {
+    } else {
+        if (reset) {
             s_Powers(target, Powers(target) & ~power);
-        }
-        else
-        {
+        } else {
             s_Powers(target, Powers(target) | power);
         }
     }
@@ -103,8 +95,7 @@ int ph_restrict_player(dbref target, dbref player, POWER power, int fpowers, int
 
 int
 ph_privileged(dbref target, dbref player, POWER power, int fpowers, int reset) {
-    if (!God(player))
-    {
+    if (!God(player)) {
 
         if (!isPlayer(player) || (player != Owner(player)))
             return 0;
@@ -134,8 +125,7 @@ int ph_inherit(dbref target, dbref player, POWER power, int fpowers, int reset) 
 
 /* All power names must be in lowercase! */
 
-POWERENT gen_powers[] =
-{
+POWERENT gen_powers[] = {
     {(char *)"announce", 		POW_ANNOUNCE,	0, 0,	ph_wiz},
     {(char *)"attr_read",		POW_MDARK_ATTR,	0, 0,	ph_wiz},
     {(char *)"attr_write",		POW_WIZ_ATTR,	0, 0,	ph_wiz},
@@ -192,8 +182,7 @@ void init_powertab(void) {
 
     hashinit(&mudstate.powers_htab, 25 * HASH_FACTOR, HT_STR | HT_KEYREF);
 
-    for (fp = gen_powers; fp->powername; fp++)
-    {
+    for (fp = gen_powers; fp->powername; fp++) {
         hashadd((char *)fp->powername, (int *)fp,
                 &mudstate.powers_htab, 0);
     }
@@ -211,8 +200,7 @@ void display_powertab(dbref player) {
 
     bp = buf = alloc_lbuf("display_powertab");
     safe_str((char *)"Powers:", buf, &bp);
-    for (fp = gen_powers; fp->powername; fp++)
-    {
+    for (fp = gen_powers; fp->powername; fp++) {
         if ((fp->listperm & CA_WIZARD) && !Wizard(player))
             continue;
         if ((fp->listperm & CA_GOD) && !God(player))
@@ -244,8 +232,7 @@ int decode_power(dbref player, char *powername, POWERSET *pset) {
     pset->word2 = 0;
 
     pent = (POWERENT *) hashfind(powername, &mudstate.powers_htab);
-    if (!pent)
-    {
+    if (!pent) {
         notify(player, tprintf("%s: Power not found.", powername));
         return 0;
     }
@@ -274,8 +261,7 @@ void power_set(dbref target, dbref player, char *power, int key) {
     negate = 0;
     while (*power && isspace(*power))
         power++;
-    if (*power == '!')
-    {
+    if (*power == '!') {
         negate = 1;
         power++;
     }
@@ -286,8 +272,7 @@ void power_set(dbref target, dbref player, char *power, int key) {
      * Make sure a power name was specified
      */
 
-    if (*power == '\0')
-    {
+    if (*power == '\0') {
         if (negate)
             notify(player, "You must specify a power to clear.");
         else
@@ -295,8 +280,7 @@ void power_set(dbref target, dbref player, char *power, int key) {
         return;
     }
     fp = find_power(target, power);
-    if (fp == NULL)
-    {
+    if (fp == NULL) {
         notify(player, "I don't understand that power.");
         return;
     }
@@ -308,8 +292,7 @@ void power_set(dbref target, dbref player, char *power, int key) {
                          fp->powerpower, negate);
     if (!result)
         notify(player, NOPERM_MESSAGE);
-    else if (!(key & SET_QUIET) && !Quiet(player))
-    {
+    else if (!(key & SET_QUIET) && !Quiet(player)) {
         notify(player, (negate ? "Cleared." : "Set."));
         s_Modified(target);
     }
@@ -336,8 +319,7 @@ int has_power(dbref player, dbref it, char *powername) {
     else
         fv = Powers(it);
 
-    if (fv & fp->powervalue)
-    {
+    if (fv & fp->powervalue) {
         if ((fp->listperm & CA_WIZARD) && !Wizard(player))
             return 0;
         if ((fp->listperm & CA_GOD) && !God(player))
@@ -374,14 +356,12 @@ char *power_description(dbref player, dbref target) {
 
     safe_mb_str((char *)"Powers:", buff, &bp);
 
-    for (fp = gen_powers; fp->powername; fp++)
-    {
+    for (fp = gen_powers; fp->powername; fp++) {
         if (fp->powerpower & POWER_EXT)
             fv = Powers2(target);
         else
             fv = Powers(target);
-        if (fv & fp->powervalue)
-        {
+        if (fv & fp->powervalue) {
             if ((fp->listperm & CA_WIZARD) && !Wizard(player))
                 continue;
             if ((fp->listperm & CA_GOD) && !God(player))
@@ -417,8 +397,7 @@ void decompile_powers(dbref player, dbref thing, char *thingname) {
     f1 = Powers(thing);
     f2 = Powers2(thing);
 
-    for (fp = gen_powers; fp->powername; fp++)
-    {
+    for (fp = gen_powers; fp->powername; fp++) {
 
         /*
          * Skip if we shouldn't decompile this power
@@ -431,13 +410,10 @@ void decompile_powers(dbref player, dbref thing, char *thingname) {
          * Skip if this power is not set
          */
 
-        if (fp->powerpower & POWER_EXT)
-        {
+        if (fp->powerpower & POWER_EXT) {
             if (!(f2 & fp->powervalue))
                 continue;
-        }
-        else
-        {
+        } else {
             if (!(f1 & fp->powervalue))
                 continue;
         }
@@ -471,13 +447,11 @@ int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd) {
     fstr = strtok_r(str, " \t=,", &tokst);
     permstr = strtok_r(NULL, " \t=,", &tokst);
 
-    if (!fstr || !*fstr)
-    {
+    if (!fstr || !*fstr) {
         return -1;
     }
 
-    if ((fp = find_power(GOD, fstr)) == NULL)
-    {
+    if ((fp = find_power(GOD, fstr)) == NULL) {
         cf_log_notfound(player, cmd, "No such power", fstr);
         return -1;
     }
@@ -491,8 +465,7 @@ int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd) {
             (fp->handler != ph_wiz) &&
             (fp->handler != ph_god) &&
             (fp->handler != ph_restrict_player) &&
-            (fp->handler != ph_privileged))
-    {
+            (fp->handler != ph_privileged)) {
 
         STARTLOG(LOG_CONFIGMODS, "CFG", "PERM")
         log_printf("Cannot change access for power: %s",
@@ -500,32 +473,19 @@ int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd) {
         ENDLOG return -1;
     }
 
-    if (!strcmp(permstr, (char *)"any"))
-    {
+    if (!strcmp(permstr, (char *)"any")) {
         fp->handler = ph_any;
-    }
-    else if (!strcmp(permstr, (char *)"royalty"))
-    {
+    } else if (!strcmp(permstr, (char *)"royalty")) {
         fp->handler = ph_wizroy;
-    }
-    else if (!strcmp(permstr, (char *)"wizard"))
-    {
+    } else if (!strcmp(permstr, (char *)"wizard")) {
         fp->handler = ph_wiz;
-    }
-    else if (!strcmp(permstr, (char *)"god"))
-    {
+    } else if (!strcmp(permstr, (char *)"god")) {
         fp->handler = ph_god;
-    }
-    else if (!strcmp(permstr, (char *)"restrict_player"))
-    {
+    } else if (!strcmp(permstr, (char *)"restrict_player")) {
         fp->handler = ph_restrict_player;
-    }
-    else if (!strcmp(permstr, (char *)"privileged"))
-    {
+    } else if (!strcmp(permstr, (char *)"privileged")) {
         fp->handler = ph_privileged;
-    }
-    else
-    {
+    } else {
         cf_log_notfound(player, cmd, "Power access", permstr);
         return -1;
     }

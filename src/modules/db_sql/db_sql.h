@@ -1,9 +1,7 @@
+#include "../../copyright.h"
+
 #ifndef __DB_SQL_H
 #define __DB_SQL_H
-
-#include "../../copyright.h"
-#include "../../api.h"
-#include "../../config.h"
 
 #ifdef HAVE_MSQL
 
@@ -61,6 +59,7 @@ static MYSQL *mysql_struct = NULL;
 #define CONNECT_STRING_SIZE 512
 
 static PGconn *pgsql_struct = NULL;
+
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -78,26 +77,7 @@ static PGconn *pgsql_struct = NULL;
 #define SQLITE_RETRY_TIMES 3
 
 static sqlite3 *sqlite3_struct = NULL;
-#endif
 
-CMD_NO_ARG(mod_db_sql_do_init);
-CMD_NO_ARG(mod_db_sql_do_connect);
-CMD_NO_ARG(mod_db_sql_do_disconnect);
-CMD_ONE_ARG(mod_db_sql_do_query);
-
-XFUNCTION(mod_db_sql_fun_init);
-XFUNCTION(mod_db_sql_fun_connect);
-XFUNCTION(mod_db_sql_fun_shutdown);
-XFUNCTION(mod_db_sql_fun_query);
-
-void sql_shutdown(dbref, dbref, char *, char **);
-int sql_init(dbref, dbref, char *, char **);
-int sql_query(dbref, char *, char *, char **, const Delim *, const Delim *);
-
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...);
-#else
-void mod_db_sql_notify(dbref player, char *buff, char **bufc, va_dlc va_alist);
 #endif
 
 typedef struct {

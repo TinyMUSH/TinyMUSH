@@ -41,16 +41,14 @@ typedef	char		Attr;
 
 typedef	unsigned int	Objname;
 
-typedef struct Aname
-{
+typedef struct Aname {
     unsigned int	object;
     unsigned int	attrnum;
 } Aname;
 
 /* In general, we want binary attributes, so we do this. */
 
-typedef struct Attrib
-{
+typedef struct Attrib {
     int	attrnum;	/* MUSH specific identifier */
     int	size;
     char	*data;
@@ -59,8 +57,7 @@ typedef struct Attrib
 /* An object is a name, an attribute count, and a vector of attributes */
 /* which Attr's are stowed in a contiguous array pointed at by atrs.   */
 
-typedef struct Obj
-{
+typedef struct Obj {
     Objname	name;
     time_t	counter;
     int	dirty;
@@ -68,8 +65,7 @@ typedef struct Obj
     Attrib	*atrs;
 } Obj;
 
-typedef struct cache
-{
+typedef struct cache {
     void *keydata;
     int keylen;
     void *data;
@@ -81,14 +77,12 @@ typedef struct cache
     struct cache *nxtfree;
 } Cache;
 
-typedef struct
-{
+typedef struct {
     Cache *head;
     Cache *tail;
 } Chain;
 
-typedef struct
-{
+typedef struct {
     void *dptr;
     int dsize;
 } DBData;
@@ -97,21 +91,21 @@ typedef struct
 
 #define CACHE_DIRTY	0x00000001
 
-extern int 	FDECL(cache_init, (int));
-extern void 	NDECL(cache_reset);
-extern int 	NDECL(cache_sync);
-extern DBData	FDECL(db_get, (DBData, unsigned int));
-extern int	FDECL(db_put, (DBData, DBData, unsigned int));
-extern int	FDECL(db_del, (DBData, unsigned int));
-extern void	NDECL(db_lock);
-extern void	NDECL(db_unlock);
-extern DBData	FDECL(cache_get, (DBData, unsigned int));
-extern int	FDECL(cache_put, (DBData, DBData, unsigned int));
-extern void	FDECL(cache_del, (DBData, unsigned int));
-extern void	NDECL(attrib_sync);
-extern char	*FDECL(pipe_get_attrib, (int, int));
-extern void	FDECL(pipe_set_attrib, (int, int, char *));
-extern void	FDECL(pipe_del_attrib, (int, int));
-extern int	FDECL(obj_siz, (Obj *));
+extern int 	cache_init(int);
+extern void 	cache_reset(void);
+extern int 	cache_sync(void);
+extern DBData	db_get(DBData, unsigned int);
+extern int	db_put(DBData, DBData, unsigned int);
+extern int	db_del(DBData, unsigned int);
+extern void	db_lock(void);
+extern void	db_unlock(void);
+extern DBData	cache_get(DBData, unsigned int);
+extern int	cache_put(DBData, DBData, unsigned int);
+extern void	cache_del(DBData, unsigned int);
+extern void	attrib_sync(void);
+extern char	*pipe_get_attrib(int, int);
+extern void	pipe_set_attrib(int, int, char *);
+extern void	pipe_del_attrib(int, int);
+extern int	obj_siz(Obj *);
 
 #endif /* __UDB_H */

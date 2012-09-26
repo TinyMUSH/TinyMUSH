@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -31,10 +32,8 @@ int helpindex_read(HASHTAB *htab, char *filename) {
     /*
      * Let's clean out our hash table, before we throw it away.
      */
-    for (p = hash_firstkey(htab); p; p = hash_nextkey(htab))
-    {
-        if (!(hashfindflags(p, htab) & HASH_ALIAS))
-        {
+    for (p = hash_firstkey(htab); p; p = hash_nextkey(htab)) {
+        if (!(hashfindflags(p, htab) & HASH_ALIAS)) {
             htab_entry = (struct help_entry *)hashfind(p, htab);
             XFREE(htab_entry, "helpindex_read.hent0");
         }
@@ -42,15 +41,13 @@ int helpindex_read(HASHTAB *htab, char *filename) {
 
     hashflush(htab, 0);
 
-    if ((fp = tf_fopen(filename, O_RDONLY)) == NULL)
-    {
+    if ((fp = tf_fopen(filename, O_RDONLY)) == NULL) {
         STARTLOG(LOG_PROBLEMS, "HLP", "RINDX")
         log_printf("Can't open %s for reading.", filename);
         ENDLOG return -1;
     }
     count = 0;
-    while ((fread((char *)&entry, sizeof(help_indx), 1, fp)) == 1)
-    {
+    while ((fread((char *)&entry, sizeof(help_indx), 1, fp)) == 1) {
 
         /*
          * Lowercase the entry and add all leftmost substrings.
@@ -66,23 +63,17 @@ int helpindex_read(HASHTAB *htab, char *filename) {
         htab_entry->pos = entry.pos;
         htab_entry->len = entry.len;
 
-        if (hashadd(entry.topic, (int *)htab_entry, htab, 0) == 0)
-        {
+        if (hashadd(entry.topic, (int *)htab_entry, htab, 0) == 0) {
             count++;
-            while (p > (entry.topic + 1))
-            {
+            while (p > (entry.topic + 1)) {
                 p--;
                 *p = '\0';
-                if (!isspace(*(p - 1)))
-                {
+                if (!isspace(*(p - 1))) {
                     if (hashadd(entry.topic,
                                 (int *)htab_entry, htab,
-                                HASH_ALIAS) == 0)
-                    {
+                                HASH_ALIAS) == 0) {
                         count++;
-                    }
-                    else
-                    {
+                    } else {
                         /*
                          * It didn't make it into the hash
                          * * table
@@ -91,9 +82,7 @@ int helpindex_read(HASHTAB *htab, char *filename) {
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             STARTLOG(LOG_ALWAYS, "HLP", "RINDX")
             log_printf("Topic already exists: %s",
                        entry.topic);
@@ -110,16 +99,14 @@ void helpindex_load(dbref player) {
 
     char buf[SBUF_SIZE + 8];
 
-    if (!mudstate.hfiletab)
-    {
+    if (!mudstate.hfiletab) {
         if ((player != NOTHING) && !Quiet(player))
             notify(player,
                    "No indexed files have been configured.");
         return;
     }
 
-    for (i = 0; i < mudstate.helpfiles; i++)
-    {
+    for (i = 0; i < mudstate.helpfiles; i++) {
         sprintf(buf, "%s.indx", mudstate.hfiletab[i]);
         helpindex_read(&mudstate.hfile_hashes[i], buf);
     }
@@ -157,22 +144,16 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
         for (p = topic; *p; p++)
             *p = tolower(*p);
     htab_entry = (struct help_entry *)hashfind(topic, htab);
-    if (htab_entry)
-    {
+    if (htab_entry) {
         entry_offset = htab_entry->pos;
         entry_length = htab_entry->len;
-    }
-    else if (strpbrk(topic, "*?\\"))
-    {
+    } else if (strpbrk(topic, "*?\\")) {
         matched = 0;
         for (result = hash_firstkey(htab); result != NULL;
-                result = hash_nextkey(htab))
-        {
+                result = hash_nextkey(htab)) {
             if (!(hashfindflags(result, htab) & HASH_ALIAS) &&
-                    quick_wild(topic, result))
-            {
-                if (matched == 0)
-                {
+                    quick_wild(topic, result)) {
+                if (matched == 0) {
                     matched = 1;
                     topic_list = alloc_lbuf("help_write");
                     buffp = topic_list;
@@ -184,8 +165,7 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
         }
         if (matched == 0)
             notify(player, tprintf("No entry for '%s'.", topic));
-        else
-        {
+        else {
             notify(player,
                    tprintf("Here are the entries which match '%s':",
                            topic));
@@ -194,22 +174,18 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
             free_lbuf(topic_list);
         }
         return;
-    }
-    else
-    {
+    } else {
         notify(player, tprintf("No entry for '%s'.", topic));
         return;
     }
-    if ((fp = tf_fopen(filename, O_RDONLY)) == NULL)
-    {
+    if ((fp = tf_fopen(filename, O_RDONLY)) == NULL) {
         notify(player,
                "Sorry, that function is temporarily unavailable.");
         STARTLOG(LOG_PROBLEMS, "HLP", "OPEN")
         log_printf("Can't open %s for reading.", filename);
         ENDLOG return;
     }
-    if (fseek(fp, entry_offset, 0) < 0L)
-    {
+    if (fseek(fp, entry_offset, 0) < 0L) {
         notify(player,
                "Sorry, that function is temporarily unavailable.");
         STARTLOG(LOG_PROBLEMS, "HLP", "SEEK")
@@ -218,12 +194,10 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
         return;
     }
     line = alloc_lbuf("help_write");
-    if (eval)
-    {
+    if (eval) {
         result = alloc_lbuf("help_write.2");
     }
-    for (;;)
-    {
+    for (;;) {
         if (fgets(line, LBUF_SIZE - 1, fp) == NULL)
             break;
         if (line[0] == '&')
@@ -231,22 +205,19 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
         for (p = line; *p != '\0'; p++)
             if (*p == '\n')
                 *p = '\0';
-        if (eval)
-        {
+        if (eval) {
             str = line;
             bp = result;
             exec(result, &bp, 0, player, player,
                  EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str,
                  (char **)NULL, 0);
             notify(player, result);
-        }
-        else
+        } else
             notify(player, line);
     }
     tf_fclose(fp);
     free_lbuf(line);
-    if (eval)
-    {
+    if (eval) {
         free_lbuf(result);
     }
 }
@@ -268,28 +239,23 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
     FILE *fp;
 
-    if (hf_num >= mudstate.helpfiles)
-    {
+    if (hf_num >= mudstate.helpfiles) {
         STARTLOG(LOG_BUGS, "BUG", "HELP")
         log_printf("Unknown help file number: %d", hf_num);
         ENDLOG safe_str((char *)"#-1 NOT FOUND", buff, bufc);
         return;
     }
 
-    if (!topic || !*topic)
-    {
+    if (!topic || !*topic) {
         strcpy(tname, (char *)"help");
-    }
-    else
-    {
+    } else {
         for (p = topic, q = tname; *p; p++, q++)
             *q = tolower(*p);
         *q = '\0';
     }
     htab_entry = (struct help_entry *)hashfind(tname,
                  &mudstate.hfile_hashes[hf_num]);
-    if (!htab_entry)
-    {
+    if (!htab_entry) {
         safe_str((char *)"#-1 NOT FOUND", buff, bufc);
         return;
     }
@@ -297,15 +263,13 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
     entry_length = htab_entry->len;
 
     sprintf(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
-    if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL)
-    {
+    if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL) {
         STARTLOG(LOG_PROBLEMS, "HLP", "OPEN")
         log_printf("Can't open %s for reading.", tbuf);
         ENDLOG safe_str((char *)"#-1 ERROR", buff, bufc);
         return;
     }
-    if (fseek(fp, entry_offset, 0) < 0L)
-    {
+    if (fseek(fp, entry_offset, 0) < 0L) {
         STARTLOG(LOG_PROBLEMS, "HLP", "SEEK")
         log_printf("Seek error in file %s.", tbuf);
         ENDLOG tf_fclose(fp);
@@ -314,13 +278,11 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
     }
 
     line = alloc_lbuf("help_helper");
-    if (eval)
-    {
+    if (eval) {
         result = alloc_lbuf("help_helper.2");
     }
     count = 0;
-    for (;;)
-    {
+    for (;;) {
         if (fgets(line, LBUF_SIZE - 1, fp) == NULL)
             break;
         if (line[0] == '&')
@@ -328,29 +290,24 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
         for (p = line; *p != '\0'; p++)
             if (*p == '\n')
                 *p = '\0';
-        if (count > 0)
-        {
+        if (count > 0) {
             safe_crlf(buff, bufc);
         }
-        if (eval)
-        {
+        if (eval) {
             str = line;
             bp = result;
             exec(result, &bp, 0, player, player,
                  EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str,
                  (char **)NULL, 0);
             safe_str(result, buff, bufc);
-        }
-        else
-        {
+        } else {
             safe_str(line, buff, bufc);
         }
         count++;
     }
     tf_fclose(fp);
     free_lbuf(line);
-    if (eval)
-    {
+    if (eval) {
         free_lbuf(result);
     }
 }
@@ -366,8 +323,7 @@ void do_help(dbref player, dbref cause, int key, char *message) {
 
     hf_num = key & ~HELP_RAWHELP;
 
-    if (hf_num >= mudstate.helpfiles)
-    {
+    if (hf_num >= mudstate.helpfiles) {
         STARTLOG(LOG_BUGS, "BUG", "HELP")
         log_printf("Unknown help file number: %d", hf_num);
         ENDLOG notify(player, "No such indexed file found.");

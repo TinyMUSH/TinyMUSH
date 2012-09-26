@@ -13,45 +13,39 @@
 typedef unsigned char Uchar;
 
 typedef struct hookentry HOOKENT;
-struct hookentry
-{
+struct hookentry {
     dbref thing;
     int atr;
 };
 
 typedef struct key_linked_list KEYLIST;
-struct key_linked_list
-{
+struct key_linked_list {
     char *name;
     int data;
     struct key_linked_list *next;
 };
 
 typedef struct str_linked_list LINKEDLIST;
-struct str_linked_list
-{
+struct str_linked_list {
     char *name;
     char *value;
     struct str_linked_list *next;
 };
 
 typedef struct named_function NAMEDFUNC;
-struct named_function
-{
+struct named_function {
     char *fn_name;
     int (*handler)(dbref);
 };
 
 typedef struct external_funcs EXTFUNCS;
-struct external_funcs
-{
+struct external_funcs {
     int num_funcs;
     NAMEDFUNC **ext_funcs;
 };
 
 typedef struct global_register_data GDATA;
-struct global_register_data
-{
+struct global_register_data {
     int q_alloc;
     char **q_regs;
     int *q_lens;
@@ -63,8 +57,7 @@ struct global_register_data
 };
 
 typedef struct bque BQUE;	/* Command queue */
-struct bque
-{
+struct bque {
     BQUE	*next;
     dbref	player;		/* player who will do command - halt is #-1 */
     dbref	cause;		/* player causing command (for %N) */
@@ -84,8 +77,7 @@ struct bque
  */
 
 typedef struct module_linked_list MODULE;
-struct module_linked_list
-{
+struct module_linked_list {
     char *modname;
     lt_dlhandle handle;
     struct module_linked_list *next;
@@ -112,16 +104,14 @@ struct module_linked_list
 };
 
 typedef struct api_function_data API_FUNCTION;
-struct api_function_data
-{
+struct api_function_data {
     const char *name;
     const char *param_fmt;
     void (*handler)(void *, void *);
 };
 
 typedef struct module_version_data MODULE_VERSION;
-struct module_version_data
-{
+struct module_version_data {
     char *version;
     char *author;
     char *description;
@@ -133,8 +123,7 @@ struct module_version_data
  */
 
 typedef struct confparm CONF;
-struct confparm
-{
+struct confparm {
     char *pname;		/* parm name */
     int (*interpreter) ();	/* routine to interp parameter */
     int flags;		/* control flags */
@@ -144,8 +133,7 @@ struct confparm
 };
 
 typedef struct confdata CONFDATA;
-struct confdata
-{
+struct confdata {
     int	cache_size;	/* Maximum size of cache */
     int	cache_width;	/* Number of cache cells */
     int	paylimit;	/* getting money gets hard over this much */
@@ -389,8 +377,7 @@ extern CONFDATA mudconf;
  */
 
 typedef struct site_data SITE;
-struct site_data
-{
+struct site_data {
     struct site_data *next;		/* Next site in chain */
     struct in_addr address;		/* Host or network address */
     struct in_addr mask;		/* Mask to apply before comparing */
@@ -398,8 +385,7 @@ struct site_data
 };
 
 typedef struct objlist_block OBLOCK;
-struct objlist_block
-{
+struct objlist_block {
     struct objlist_block *next;
     dbref	data[(LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref)];
 };
@@ -407,8 +393,7 @@ struct objlist_block
 #define OBLOCK_SIZE ((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
 
 typedef struct objlist_stack OLSTK;
-struct objlist_stack
-{
+struct objlist_stack {
     struct objlist_stack *next;	/* Next object list in stack */
     OBLOCK	*head;		/* Head of object list */
     OBLOCK	*tail;		/* Tail of object list */
@@ -418,36 +403,31 @@ struct objlist_stack
 };
 
 typedef struct markbuf MARKBUF;
-struct markbuf
-{
+struct markbuf {
     char	chunk[5000];
 };
 
 typedef struct alist ALIST;
-struct alist
-{
+struct alist {
     char	*data;
     int	len;
     struct alist *next;
 };
 
 typedef struct badname_struc BADNAME;
-struct badname_struc
-{
+struct badname_struc {
     char	*name;
     struct badname_struc	*next;
 };
 
 typedef struct forward_list FWDLIST;
-struct forward_list
-{
+struct forward_list {
     int	count;
     int	*data;
 };
 
 typedef struct propdir_list PROPDIR;
-struct propdir_list
-{
+struct propdir_list {
     int	count;
     int	*data;
 };
@@ -464,8 +444,7 @@ typedef struct {
 } versioninfo;
 
 typedef struct statedata STATEDATA;
-struct statedata
-{
+struct statedata {
     int	record_players; /* The maximum # of player logged on */
     int	db_block_size;	/* Block size of database */
     Obj	*objpipes[NUM_OBJPIPES];
@@ -608,19 +587,23 @@ extern STATEDATA mudstate;
  * Configuration parameter handler definition
  */
 
+/*
 #define CF_HAND(proc)	int proc (vp, str, extra, player, cmd) \
 			int	*vp; \
 			char	*str, *cmd; \
 			long	extra; \
 			dbref	player;
+*/
 /* This is for the DEC Alpha, which can't cast a pointer to an int. */
+/*
 #define CF_AHAND(proc)	int proc (vp, str, extra, player, cmd) \
 			long	**vp; \
 			char	*str, *cmd; \
 			long	extra; \
 			dbref	player;
 
-#define CF_HDCL(proc)	int FDECL(proc, (int *, char *, long, dbref, char *))
+#define CF_HDCL(proc)	int proc(int *, char *, long, dbref, char *)
+*/
 
 /* ---------------------------------------------------------------------------
  * Misc. constants.

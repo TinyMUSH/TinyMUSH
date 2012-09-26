@@ -83,23 +83,23 @@ struct mail_entry {
 	int count;
 };
 
-extern void	FDECL(set_player_folder, (dbref, int));
-extern struct malias *	FDECL(get_malias, (dbref, char *));
-extern void	FDECL(load_malias, (FILE *));
-extern void	FDECL(save_malias, (FILE *));
-extern void	FDECL(malias_read, (FILE *));
-extern void	FDECL(malias_write, (FILE *));
-extern void	FDECL(do_malias_chown, (dbref, char *, char *));
-extern void	FDECL(do_malias_desc, (dbref, char *, char *));
-extern void	FDECL(do_mail_quick, (dbref, char *, char *));
-extern void	FDECL(do_malias_rename, (dbref, char *, char *));
-extern void	FDECL(do_malias_adminlist, (dbref));
-extern void	FDECL(do_malias_delete, (dbref, char *));
-extern void	FDECL(do_malias_status, (dbref));
-extern void	FDECL(do_malias_create, (dbref, char *, char *));
-extern void	FDECL(do_malias_list, (dbref, char *));
-extern void	FDECL(do_malias_list_all, (dbref));
-extern void	FDECL(do_malias_add, (dbref, char *, char *));
-extern void	FDECL(do_malias_remove, (dbref, char *, char *));
+extern void	set_player_folder(dbref, int);
+extern struct malias *	get_malias(dbref, char *);
+extern void	load_malias(FILE *);
+extern void	save_malias(FILE *);
+extern void	malias_read(FILE *);
+extern void	malias_write(FILE *);
+extern void	do_malias_chown(dbref, char *, char *);
+extern void	do_malias_desc(dbref, char *, char *);
+extern void	do_mail_quick(dbref, char *, char *);
+extern void	do_malias_rename(dbref, char *, char *);
+extern void	do_malias_adminlist(dbref);
+extern void	do_malias_delete(dbref, char *);
+extern void	do_malias_status(dbref);
+extern void	do_malias_create(dbref, char *, char *);
+extern void	do_malias_list(dbref, char *);
+extern void	do_malias_list_all(dbref);
+extern void	do_malias_add(dbref, char *, char *);
+extern void	do_malias_remove(dbref, char *, char *);
 
 #endif /* __MAIL_H */

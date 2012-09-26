@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -25,17 +26,14 @@ typedef struct filecache_block_hdr FBLKHDR;
 
 typedef struct filecache_block FBLOCK;
 
-struct filecache_hdr
-{
+struct filecache_hdr {
     char **filename;
     FBLOCK *fileblock;
     const char *desc;
 };
 
-struct filecache_block
-{
-    struct filecache_block_hdr
-    {
+struct filecache_block {
+    struct filecache_block_hdr {
         struct filecache_block *nxt;
         int nchars;
     } hdr;
@@ -45,8 +43,7 @@ struct filecache_block
 #define FBLOCK_SIZE (MBUF_SIZE - sizeof(FBLKHDR))
 /* *INDENT-OFF* */
 
-FCACHE		fcache  [] =
-{
+FCACHE		fcache  [] = {
     {&mudconf.conn_file, NULL, "Conn"},
     {&mudconf.site_file, NULL, "Conn/Badsite"},
     {&mudconf.down_file, NULL, "Conn/Down"},
@@ -64,8 +61,7 @@ FCACHE		fcache  [] =
     {NULL, NULL, NULL}
 };
 
-NAMETAB		list_files[] =
-{
+NAMETAB		list_files[] = {
     {(char *)"badsite_connect", 1, CA_WIZARD, FC_CONN_SITE},
     {(char *)"connect", 2, CA_WIZARD, FC_CONN},
     {(char *)"create_register", 2, CA_WIZARD, FC_CREA_REG},
@@ -85,13 +81,11 @@ NAMETAB		list_files[] =
 
 /* *INDENT-ON* */
 
-void do_list_file(dbref player, dbref cause, int extra, char *arg)
-{
+void do_list_file(dbref player, dbref cause, int extra, char *arg) {
     int flagvalue;
 
     flagvalue = search_nametab(player, list_files, arg);
-    if (flagvalue < 0)
-    {
+    if (flagvalue < 0) {
         display_nametab(player, list_files,
                         (char *)"Unknown file.  Use one of:", 1);
         return;
@@ -99,12 +93,10 @@ void do_list_file(dbref player, dbref cause, int extra, char *arg)
     fcache_send(player, flagvalue);
 }
 
-static FBLOCK *fcache_fill(FBLOCK *fp, char ch)
-{
+static FBLOCK *fcache_fill(FBLOCK *fp, char ch) {
     FBLOCK *tfp;
 
-    if (fp->hdr.nchars >= (MBUF_SIZE - sizeof(FBLKHDR)))
-    {
+    if (fp->hdr.nchars >= (MBUF_SIZE - sizeof(FBLKHDR))) {
 
         /*
          * We filled the current buffer.  Go get a new one.
@@ -120,8 +112,7 @@ static FBLOCK *fcache_fill(FBLOCK *fp, char ch)
     return fp;
 }
 
-static int fcache_read(FBLOCK **cp, char *filename)
-{
+static int fcache_read(FBLOCK **cp, char *filename) {
     int n, nmax, tchars, fd;
 
     char *buff;
@@ -133,8 +124,7 @@ static int fcache_read(FBLOCK **cp, char *filename)
      */
 
     fp = *cp;
-    while (fp != NULL)
-    {
+    while (fp != NULL) {
         tfp = fp->hdr.nxt;
         free_mbuf(fp);
         fp = tfp;
@@ -145,8 +135,7 @@ static int fcache_read(FBLOCK **cp, char *filename)
      * Read the text file into a new chain
      */
 
-    if ((fd = tf_open(filename, O_RDONLY)) == -1)
-    {
+    if ((fd = tf_open(filename, O_RDONLY)) == -1) {
 
         /*
          * Failure: log the event
@@ -174,13 +163,10 @@ static int fcache_read(FBLOCK **cp, char *filename)
      */
 
     nmax = read(fd, buff, LBUF_SIZE);
-    while (nmax > 0)
-    {
+    while (nmax > 0) {
 
-        for (n = 0; n < nmax; n++)
-        {
-            switch (buff[n])
-            {
+        for (n = 0; n < nmax; n++) {
+            switch (buff[n]) {
             case '\n':
                 fp = fcache_fill(fp, '\r');
                 fp = fcache_fill(fp, '\n');
@@ -202,16 +188,14 @@ static int fcache_read(FBLOCK **cp, char *filename)
      * If we didn't read anything in, toss the initial buffer
      */
 
-    if (fp->hdr.nchars == 0)
-    {
+    if (fp->hdr.nchars == 0) {
         *cp = NULL;
         free_mbuf(fp);
     }
     return tchars;
 }
 
-void fcache_rawdump(int fd, int num)
-{
+void fcache_rawdump(int fd, int num) {
     int cnt, remaining;
 
     char *start;
@@ -222,12 +206,10 @@ void fcache_rawdump(int fd, int num)
         return;
     fp = fcache[num].fileblock;
 
-    while (fp != NULL)
-    {
+    while (fp != NULL) {
         start = fp->data;
         remaining = fp->hdr.nchars;
-        while (remaining > 0)
-        {
+        while (remaining > 0) {
 
             cnt = WRITE(fd, start, remaining);
             if (cnt < 0)
@@ -240,33 +222,28 @@ void fcache_rawdump(int fd, int num)
     return;
 }
 
-void fcache_dump(DESC *d, int num)
-{
+void fcache_dump(DESC *d, int num) {
     FBLOCK *fp;
 
     if ((num < 0) || (num > FC_LAST))
         return;
     fp = fcache[num].fileblock;
 
-    while (fp != NULL)
-    {
+    while (fp != NULL) {
         queue_write(d, fp->data, fp->hdr.nchars);
         fp = fp->hdr.nxt;
     }
 }
 
-void fcache_send(dbref player, int num)
-{
+void fcache_send(dbref player, int num) {
     DESC *d;
 
-    DESC_ITER_PLAYER(player, d)
-    {
+    DESC_ITER_PLAYER(player, d) {
         fcache_dump(d, num);
     }
 }
 
-void fcache_load(dbref player)
-{
+void fcache_load(dbref player) {
     FCACHE *fp;
 
     char *buff, *bufc, *sbuf;
@@ -275,11 +252,9 @@ void fcache_load(dbref player)
 
     buff = bufc = alloc_lbuf("fcache_load.lbuf");
     sbuf = alloc_sbuf("fcache_load.sbuf");
-    for (fp = fcache; fp->filename; fp++)
-    {
+    for (fp = fcache; fp->filename; fp++) {
         i = fcache_read(&fp->fileblock, *(fp->filename));
-        if ((player != NOTHING) && !Quiet(player))
-        {
+        if ((player != NOTHING) && !Quiet(player)) {
             sprintf(sbuf, "%d", i);
             if (fp == fcache)
                 safe_str((char *)"File sizes: ", buff, &bufc);
@@ -291,20 +266,17 @@ void fcache_load(dbref player)
         }
     }
     *bufc = '\0';
-    if ((player != NOTHING) && !Quiet(player))
-    {
+    if ((player != NOTHING) && !Quiet(player)) {
         notify(player, buff);
     }
     free_lbuf(buff);
     free_sbuf(sbuf);
 }
 
-void fcache_init(void)
-{
+void fcache_init(void) {
     FCACHE *fp;
 
-    for (fp = fcache; fp->filename; fp++)
-    {
+    for (fp = fcache; fp->filename; fp++) {
         fp->fileblock = NULL;
     }
     fcache_load(NOTHING);

@@ -1,5 +1,8 @@
 #include "../../copyright.h"
+#include "../../config.h"
+#include "../../system.h"
 
+#include "../../api.h"
 #include "db_sql.h"
 
 #define SQL_NONE_ERROR "NO EXTERNAL SQL DATABASE CONNECTIVITY IS CONFIGURED"

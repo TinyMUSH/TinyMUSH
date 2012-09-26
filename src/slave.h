@@ -5,8 +5,7 @@
 #ifndef __SLAVE_H
 #define __SLAVE_H
 
-enum
-{
+enum {
     SLAVE_IDENTQ = 'i',
     SLAVE_IPTONAME = 'h'
 };

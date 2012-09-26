@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -78,17 +79,13 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     VaChk_Range(0, 1);
 
-    if (fargs[0] && *fargs[0])
-    {
+    if (fargs[0] && *fargs[0]) {
         target = lookup_player(player, fargs[0], 1);
-        if (!Good_obj(target) || !Connected(target))
-        {
+        if (!Good_obj(target) || !Connected(target)) {
             return;
         }
         make_portlist(player, target, buff, bufc);
-    }
-    else
-    {
+    } else {
         make_portlist(player, NOTHING, buff, bufc);
     }
 }
@@ -106,13 +103,11 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     char *str;
 
     Find_Connection(player, fargs[0], target, port);
-    if ((port < 0) && (target == NOTHING))
-    {
+    if ((port < 0) && (target == NOTHING)) {
         return;
     }
     str = get_doing(target, port);
-    if (str)
-    {
+    if (str) {
         safe_str(str, buff, bufc);
     }
 }
@@ -128,8 +123,7 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller, dbref 
     int port;
 
     Find_Connection(player, fargs[0], target, port);
-    if ((port < 0) && (target == NOTHING))
-    {
+    if ((port < 0) && (target == NOTHING)) {
         safe_known_str((char *)"-1", 2, buff, bufc);
         return;
     }
@@ -148,8 +142,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     int port;
 
     Find_Connection(player, fargs[0], target, port);
-    if ((port < 0) && (target == NOTHING))
-    {
+    if ((port < 0) && (target == NOTHING)) {
         safe_str((char *)"-1 -1 -1", buff, bufc);
         return;
     }
@@ -166,8 +159,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     target = lookup_player(player, fargs[0], 1);
     if (!Good_obj(target) || !Connected(target) ||
-            !Examinable(player, target))
-    {
+            !Examinable(player, target)) {
         safe_nothing(buff, bufc);
         return;
     }
@@ -183,8 +175,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     char *p;
 
-    if (!fargs[0] || !*fargs[0])
-    {
+    if (!fargs[0] || !*fargs[0]) {
         safe_str((char *)"#-1 NOT FOUND", buff, bufc);
         return;
     }
@@ -192,13 +183,11 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         *p = tolower(*p);
 
     cmdp = (CMDENT *) hashfind(fargs[0], &mudstate.command_htab);
-    if (!cmdp || (cmdp->info.handler != do_help))
-    {
+    if (!cmdp || (cmdp->info.handler != do_help)) {
         safe_str((char *)"#-1 NOT FOUND", buff, bufc);
         return;
     }
-    if (!Check_Cmd_Access(player, cmdp, cargs, ncargs))
-    {
+    if (!Check_Cmd_Access(player, cmdp, cargs, ncargs)) {
         safe_noperm(buff, bufc);
         return;
     }
@@ -221,33 +210,22 @@ void fun_html_unescape(char *buff, char **bufc, dbref player, dbref caller, dbre
 
     int ret = 0;
 
-    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++)
-    {
-        switch (*msg_orig)
-        {
+    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++) {
+        switch (*msg_orig) {
         case '&':
-            if (!strncmp(msg_orig, "&quot;", 6))
-            {
+            if (!strncmp(msg_orig, "&quot;", 6)) {
                 ret = safe_chr_fn('\"', buff, bufc);
                 msg_orig += 5;
-            }
-            else if (!strncmp(msg_orig, "&lt;", 4))
-            {
+            } else if (!strncmp(msg_orig, "&lt;", 4)) {
                 ret = safe_chr_fn('<', buff, bufc);
                 msg_orig += 3;
-            }
-            else if (!strncmp(msg_orig, "&gt;", 4))
-            {
+            } else if (!strncmp(msg_orig, "&gt;", 4)) {
                 ret = safe_chr_fn('>', buff, bufc);
                 msg_orig += 3;
-            }
-            else if (!strncmp(msg_orig, "&amp;", 5))
-            {
+            } else if (!strncmp(msg_orig, "&amp;", 5)) {
                 ret = safe_chr_fn('&', buff, bufc);
                 msg_orig += 4;
-            }
-            else
-            {
+            } else {
                 ret = safe_chr_fn('&', buff, bufc);
             }
             break;
@@ -270,19 +248,13 @@ void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     char tbuf[10];
 
-    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++)
-    {
-        if (strchr(escaped_chars, *msg_orig))
-        {
+    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++) {
+        if (strchr(escaped_chars, *msg_orig)) {
             sprintf(tbuf, "%%%2x", *msg_orig);
             ret = safe_str_fn(tbuf, buff, bufc);
-        }
-        else if (*msg_orig == ' ')
-        {
+        } else if (*msg_orig == ' ') {
             ret = safe_chr_fn('+', buff, bufc);
-        }
-        else
-        {
+        } else {
             ret = safe_chr_fn(*msg_orig, buff, bufc);
         }
     }
@@ -297,10 +269,8 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 
     char tempstr[10];
 
-    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret;)
-    {
-        switch (*msg_orig)
-        {
+    for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret;) {
+        switch (*msg_orig) {
         case '+':
             ret = safe_chr_fn(' ', buff, bufc);
             msg_orig++;
@@ -309,8 +279,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
             strncpy(tempstr, msg_orig + 1, 2);
             tempstr[2] = '\0';
             if ((sscanf(tempstr, "%x", &tempchar) == 1) &&
-                    (tempchar > 0x1F) && (tempchar < 0x7F))
-            {
+                    (tempchar > 0x1F) && (tempchar < 0x7F)) {
                 ret = safe_chr_fn((char)tempchar, buff, bufc);
             }
             if (*msg_orig)

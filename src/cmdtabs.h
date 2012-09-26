@@ -11,14 +11,12 @@
  * Switch tables for the various commands.
  */
 
-NAMETAB		addcmd_sw[] =
-{
+NAMETAB		addcmd_sw[] = {
     {(char *)"preserve", 1, CA_GOD, ADDCMD_PRESERVE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		attrib_sw[] =
-{
+NAMETAB		attrib_sw[] = {
     {(char *)"access", 1, CA_GOD, ATTRIB_ACCESS},
     {(char *)"delete", 1, CA_GOD, ATTRIB_DELETE},
     {(char *)"info", 1, CA_WIZARD, ATTRIB_INFO},
@@ -26,27 +24,23 @@ NAMETAB		attrib_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		boot_sw[] =
-{
+NAMETAB		boot_sw[] = {
     {(char *)"port", 1, CA_WIZARD, BOOT_PORT | SW_MULTIPLE},
     {(char *)"quiet", 1, CA_WIZARD, BOOT_QUIET | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		chown_sw[] =
-{
+NAMETAB		chown_sw[] = {
     {(char *)"nostrip", 1, CA_WIZARD, CHOWN_NOSTRIP},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		chzone_sw[] =
-{
+NAMETAB		chzone_sw[] = {
     {(char *)"nostrip", 1, CA_WIZARD, CHZONE_NOSTRIP},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		clone_sw[] =
-{
+NAMETAB		clone_sw[] = {
     {(char *)"cost", 1, CA_PUBLIC, CLONE_SET_COST | SW_MULTIPLE},
     {(char *)"inherit", 3, CA_PUBLIC, CLONE_INHERIT | SW_MULTIPLE},
     {(char *)"inventory", 3, CA_PUBLIC, CLONE_INVENTORY},
@@ -57,27 +51,23 @@ NAMETAB		clone_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		decomp_sw[] =
-{
+NAMETAB		decomp_sw[] = {
     {(char *)"pretty", 1, CA_PUBLIC, DECOMP_PRETTY},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		destroy_sw[] =
-{
+NAMETAB		destroy_sw[] = {
     {(char *)"instant", 4, CA_PUBLIC, DEST_INSTANT | SW_MULTIPLE},
     {(char *)"override", 8, CA_PUBLIC, DEST_OVERRIDE | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		dig_sw [] =
-{
+NAMETAB		dig_sw [] = {
     {(char *)"teleport", 1, CA_PUBLIC, DIG_TELEPORT},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		doing_sw[] =
-{
+NAMETAB		doing_sw[] = {
     {(char *)"header", 1, CA_PUBLIC, DOING_HEADER | SW_MULTIPLE},
     {(char *)"message", 1, CA_PUBLIC, DOING_MESSAGE | SW_MULTIPLE},
     {(char *)"poll", 1, CA_PUBLIC, DOING_POLL},
@@ -85,8 +75,7 @@ NAMETAB		doing_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		dolist_sw[] =
-{
+NAMETAB		dolist_sw[] = {
     {(char *)"delimit", 1, CA_PUBLIC, DOLIST_DELIMIT},
     {(char *)"space", 1, CA_PUBLIC, DOLIST_SPACE},
     {(char *)"notify", 1, CA_PUBLIC, DOLIST_NOTIFY | SW_MULTIPLE},
@@ -94,14 +83,12 @@ NAMETAB		dolist_sw[] =
     {NULL, 0, 0, 0,}
 };
 
-NAMETAB		drop_sw[] =
-{
+NAMETAB		drop_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, DROP_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		dump_sw[] =
-{
+NAMETAB		dump_sw[] = {
     {(char *)"structure", 1, CA_WIZARD, DUMP_STRUCT | SW_MULTIPLE},
     {(char *)"text", 1, CA_WIZARD, DUMP_TEXT | SW_MULTIPLE},
     {(char *)"flatfile", 1, CA_WIZARD, DUMP_FLATFILE | SW_MULTIPLE},
@@ -109,8 +96,7 @@ NAMETAB		dump_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		emit_sw[] =
-{
+NAMETAB		emit_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"here", 1, CA_PUBLIC, SAY_HERE | SW_MULTIPLE},
     {(char *)"room", 1, CA_PUBLIC, SAY_ROOM | SW_MULTIPLE},
@@ -120,21 +106,18 @@ NAMETAB		emit_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		end_sw [] =
-{
+NAMETAB		end_sw [] = {
     {(char *)"assert", 1, CA_PUBLIC, ENDCMD_ASSERT},
     {(char *)"break", 1, CA_PUBLIC, ENDCMD_BREAK},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		enter_sw[] =
-{
+NAMETAB		enter_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, MOVE_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		examine_sw[] =
-{
+NAMETAB		examine_sw[] = {
     {(char *)"brief", 1, CA_PUBLIC, EXAM_BRIEF},
     {(char *)"debug", 1, CA_WIZARD, EXAM_DEBUG},
     {(char *)"full", 1, CA_PUBLIC, EXAM_LONG},
@@ -145,8 +128,7 @@ NAMETAB		examine_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		femit_sw[] =
-{
+NAMETAB		femit_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"here", 1, CA_PUBLIC, PEMIT_HERE | SW_MULTIPLE},
     {(char *)"room", 1, CA_PUBLIC, PEMIT_ROOM | SW_MULTIPLE},
@@ -154,8 +136,7 @@ NAMETAB		femit_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		fixdb_sw[] =
-{
+NAMETAB		fixdb_sw[] = {
     /* {(char *)"add_pname",1,	CA_GOD,		FIXDB_ADD_PN}, */
     {(char *)"contents", 1, CA_GOD, FIXDB_CON},
     {(char *)"exits", 1, CA_GOD, FIXDB_EXITS},
@@ -168,20 +149,17 @@ NAMETAB		fixdb_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		floaters_sw[] =
-{
+NAMETAB		floaters_sw[] = {
     {(char *)"all", 1, CA_PUBLIC, FLOATERS_ALL},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		force_sw[] =
-{
+NAMETAB		force_sw[] = {
     {(char *)"now", 1, CA_PUBLIC, FRC_NOW | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		fpose_sw[] =
-{
+NAMETAB		fpose_sw[] = {
     {(char *)"default", 1, CA_PUBLIC, 0},
     {(char *)"noeval", 3, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"nospace", 1, CA_PUBLIC, SAY_NOSPACE},
@@ -189,15 +167,13 @@ NAMETAB		fpose_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		fsay_sw[] =
-{
+NAMETAB		fsay_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"spoof", 1, CA_PUBLIC, PEMIT_SPOOF | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		function_sw[] =
-{
+NAMETAB		function_sw[] = {
     {(char *)"list", 1, CA_WIZARD, FUNCT_LIST},
     {(char *)"noeval", 1, CA_WIZARD, FUNCT_NO_EVAL | SW_MULTIPLE},
     {(char *)"privileged", 3, CA_WIZARD, FUNCT_PRIV | SW_MULTIPLE},
@@ -206,39 +182,33 @@ NAMETAB		function_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		get_sw [] =
-{
+NAMETAB		get_sw [] = {
     {(char *)"quiet", 1, CA_PUBLIC, GET_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		give_sw[] =
-{
+NAMETAB		give_sw[] = {
     {(char *)"quiet", 1, CA_WIZARD, GIVE_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		goto_sw[] =
-{
+NAMETAB		goto_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, MOVE_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		halt_sw[] =
-{
+NAMETAB		halt_sw[] = {
     {(char *)"all", 1, CA_PUBLIC, HALT_ALL},
     {(char *)"pid", 1, CA_PUBLIC, HALT_PID},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		help_sw[] =
-{
+NAMETAB		help_sw[] = {
     {(char *)"fine", 1, CA_PUBLIC, HELP_FIND},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		hook_sw[] =
-{
+NAMETAB		hook_sw[] = {
     {(char *)"before", 1, CA_GOD, HOOK_BEFORE},
     {(char *)"after", 1, CA_GOD, HOOK_AFTER},
     {(char *)"permit", 1, CA_GOD, HOOK_PERMIT},
@@ -248,20 +218,17 @@ NAMETAB		hook_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		leave_sw[] =
-{
+NAMETAB		leave_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, MOVE_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		listmotd_sw[] =
-{
+NAMETAB		listmotd_sw[] = {
     {(char *)"brief", 1, CA_WIZARD, MOTD_BRIEF},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		lock_sw[] =
-{
+NAMETAB		lock_sw[] = {
     {(char *)"chownlock", 2, CA_PUBLIC, A_LCHOWN},
     {(char *)"controllock", 2, CA_PUBLIC, A_LCONTROL},
     {(char *)"defaultlock", 1, CA_PUBLIC, A_LOCK},
@@ -288,28 +255,24 @@ NAMETAB		lock_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		look_sw[] =
-{
+NAMETAB		look_sw[] = {
     {(char *)"outside", 1, CA_PUBLIC, LOOK_OUTSIDE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		mark_sw[] =
-{
+NAMETAB		mark_sw[] = {
     {(char *)"set", 1, CA_PUBLIC, MARK_SET},
     {(char *)"clear", 1, CA_PUBLIC, MARK_CLEAR},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		markall_sw[] =
-{
+NAMETAB		markall_sw[] = {
     {(char *)"set", 1, CA_PUBLIC, MARK_SET},
     {(char *)"clear", 1, CA_PUBLIC, MARK_CLEAR},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		motd_sw[] =
-{
+NAMETAB		motd_sw[] = {
     {(char *)"brief", 1, CA_WIZARD, MOTD_BRIEF | SW_MULTIPLE},
     {(char *)"connect", 1, CA_WIZARD, MOTD_ALL},
     {(char *)"down", 1, CA_WIZARD, MOTD_DOWN},
@@ -319,29 +282,25 @@ NAMETAB		motd_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		notify_sw[] =
-{
+NAMETAB		notify_sw[] = {
     {(char *)"all", 1, CA_PUBLIC, NFY_NFYALL},
     {(char *)"first", 1, CA_PUBLIC, NFY_NFY},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		oemit_sw[] =
-{
+NAMETAB		oemit_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"speech", 1, CA_PUBLIC, PEMIT_SPEECH | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		open_sw[] =
-{
+NAMETAB		open_sw[] = {
     {(char *)"inventory", 1, CA_PUBLIC, OPEN_INVENTORY},
     {(char *)"location", 1, CA_PUBLIC, OPEN_LOCATION},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		pemit_sw[] =
-{
+NAMETAB		pemit_sw[] = {
     {(char *)"contents", 1, CA_PUBLIC, PEMIT_CONTENTS | SW_MULTIPLE},
     {(char *)"object", 1, CA_PUBLIC, 0},
     {(char *)"silent", 2, CA_PUBLIC, 0},
@@ -354,16 +313,14 @@ NAMETAB		pemit_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		pose_sw[] =
-{
+NAMETAB		pose_sw[] = {
     {(char *)"default", 1, CA_PUBLIC, 0},
     {(char *)"noeval", 3, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {(char *)"nospace", 1, CA_PUBLIC, SAY_NOSPACE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		ps_sw  [] =
-{
+NAMETAB		ps_sw  [] = {
     {(char *)"all", 1, CA_PUBLIC, PS_ALL | SW_MULTIPLE},
     {(char *)"brief", 1, CA_PUBLIC, PS_BRIEF},
     {(char *)"long", 1, CA_PUBLIC, PS_LONG},
@@ -371,8 +328,7 @@ NAMETAB		ps_sw  [] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		quota_sw[] =
-{
+NAMETAB		quota_sw[] = {
     {(char *)"all", 1, CA_GOD, QUOTA_ALL | SW_MULTIPLE},
     {(char *)"fix", 1, CA_WIZARD, QUOTA_FIX},
     {(char *)"remaining", 1, CA_WIZARD, QUOTA_REM | SW_MULTIPLE},
@@ -385,34 +341,29 @@ NAMETAB		quota_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		reference_sw[] =
-{
+NAMETAB		reference_sw[] = {
     {(char *)"list", 1, CA_PUBLIC, NREF_LIST},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		set_sw [] =
-{
+NAMETAB		set_sw [] = {
     {(char *)"quiet", 1, CA_PUBLIC, SET_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		shutdown_sw[] =
-{
+NAMETAB		shutdown_sw[] = {
     {(char *)"abort", 1, CA_WIZARD, SHUTDN_COREDUMP},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		stats_sw[] =
-{
+NAMETAB		stats_sw[] = {
     {(char *)"all", 1, CA_PUBLIC, STAT_ALL},
     {(char *)"me", 1, CA_PUBLIC, STAT_ME},
     {(char *)"player", 1, CA_PUBLIC, STAT_PLAYER},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		sweep_sw[] =
-{
+NAMETAB		sweep_sw[] = {
     {(char *)"commands", 3, CA_PUBLIC, SWEEP_COMMANDS | SW_MULTIPLE},
     {(char *)"connected", 3, CA_PUBLIC, SWEEP_CONNECT | SW_MULTIPLE},
     {(char *)"exits", 1, CA_PUBLIC, SWEEP_EXITS | SW_MULTIPLE},
@@ -423,8 +374,7 @@ NAMETAB		sweep_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		switch_sw[] =
-{
+NAMETAB		switch_sw[] = {
     {(char *)"all", 1, CA_PUBLIC, SWITCH_ANY},
     {(char *)"default", 1, CA_PUBLIC, SWITCH_DEFAULT},
     {(char *)"first", 1, CA_PUBLIC, SWITCH_ONE},
@@ -432,36 +382,31 @@ NAMETAB		switch_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		teleport_sw[] =
-{
+NAMETAB		teleport_sw[] = {
     {(char *)"loud", 1, CA_PUBLIC, TELEPORT_DEFAULT},
     {(char *)"quiet", 1, CA_PUBLIC, TELEPORT_QUIET},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		timecheck_sw[] =
-{
+NAMETAB		timecheck_sw[] = {
     {(char *)"log", 1, CA_WIZARD, TIMECHK_LOG | SW_MULTIPLE},
     {(char *)"reset", 1, CA_WIZARD, TIMECHK_RESET | SW_MULTIPLE},
     {(char *)"screen", 1, CA_WIZARD, TIMECHK_SCREEN | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		toad_sw[] =
-{
+NAMETAB		toad_sw[] = {
     {(char *)"no_chown", 1, CA_WIZARD, TOAD_NO_CHOWN | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		trig_sw[] =
-{
+NAMETAB		trig_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, TRIG_QUIET},
     {(char *)"now", 1, CA_PUBLIC, TRIG_NOW | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		verb_sw[] =
-{
+NAMETAB		verb_sw[] = {
     {(char *)"known", 1, CA_PUBLIC, VERB_PRESENT | SW_MULTIPLE},
     {(char *)"move", 1, CA_PUBLIC, VERB_MOVE | SW_MULTIPLE},
     {(char *)"now", 3, CA_PUBLIC, VERB_NOW | SW_MULTIPLE},
@@ -470,8 +415,7 @@ NAMETAB		verb_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		wall_sw[] =
-{
+NAMETAB		wall_sw[] = {
     {(char *)"emit", 1, CA_PUBLIC, SAY_WALLEMIT},
     {(char *)"no_prefix", 1, CA_PUBLIC, SAY_NOTAG | SW_MULTIPLE},
     {(char *)"pose", 1, CA_PUBLIC, SAY_WALLPOSE},
@@ -480,8 +424,7 @@ NAMETAB		wall_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		warp_sw[] =
-{
+NAMETAB		warp_sw[] = {
     {(char *)"check", 1, CA_WIZARD, TWARP_CLEAN | SW_MULTIPLE},
     {(char *)"dump", 1, CA_WIZARD, TWARP_DUMP | SW_MULTIPLE},
     {(char *)"idle", 1, CA_WIZARD, TWARP_IDLE | SW_MULTIPLE},
@@ -490,15 +433,13 @@ NAMETAB		warp_sw[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		wait_sw[] =
-{
+NAMETAB		wait_sw[] = {
     {(char *)"pid", 1, CA_PUBLIC, WAIT_PID | SW_MULTIPLE},
     {(char *)"until", 1, CA_PUBLIC, WAIT_UNTIL | SW_MULTIPLE},
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		noeval_sw[] =
-{
+NAMETAB		noeval_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL},
     {NULL, 0, 0, 0}
 };
@@ -512,8 +453,7 @@ NAMETAB		noeval_sw[] =
  * Calling Seq			Handler
  */
 
-CMDENT		command_table[] =
-{
+CMDENT		command_table[] = {
     {
         (char *)"@@", NULL, CA_PUBLIC,
         0, CS_NO_ARGS,
@@ -1239,8 +1179,7 @@ CMDENT		command_table[] =
  * Command, function, etc. access name table.
  */
 
-NAMETAB		access_nametab[] =
-{
+NAMETAB		access_nametab[] = {
     {(char *)"admin", 2, CA_WIZARD, CA_ADMIN},
     {(char *)"builder", 6, CA_WIZARD, CA_BUILDER},
     {(char *)"dark", 4, CA_GOD, CF_DARK},
@@ -1279,8 +1218,7 @@ NAMETAB		access_nametab[] =
  * Attribute access name tables.
  */
 
-NAMETAB		attraccess_nametab[] =
-{
+NAMETAB		attraccess_nametab[] = {
     {(char *)"const", 2, CA_PUBLIC, AF_CONST},
     {(char *)"dark", 2, CA_WIZARD, AF_DARK},
     {(char *)"default", 3, CA_WIZARD, AF_DEFAULT},
@@ -1299,8 +1237,7 @@ NAMETAB		attraccess_nametab[] =
     {NULL, 0, 0, 0}
 };
 
-NAMETAB		indiv_attraccess_nametab[] =
-{
+NAMETAB		indiv_attraccess_nametab[] = {
     {(char *)"case", 1, CA_PUBLIC, AF_CASE},
     {(char *)"hidden", 1, CA_WIZARD, AF_MDARK},
     {(char *)"wizard", 1, CA_WIZARD, AF_WIZARD},

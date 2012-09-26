@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -71,8 +72,7 @@ void hashinit(HASHTAB *htab, int size, int flags) {
     htab->entries = 0;
     htab->deletes = 0;
     htab->nulls = size;
-    if ((flags & HT_TYPEMASK) == HT_NUM)
-    {
+    if ((flags & HT_TYPEMASK) == HT_NUM) {
         /*
          * Numeric hashtabs implicitly store keys by reference
          */
@@ -109,20 +109,15 @@ int * hashfind_generic(HASHKEY key, HASHTAB *htab) {
     numchecks = 0;
     htab->scans++;
     htype = htab->flags & HT_TYPEMASK;
-    if (htype == HT_STR)
-    {
+    if (htype == HT_STR) {
         hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
+    } else {
         hval = (key.i & htab->mask);
     }
-    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
-    {
+    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next) {
         numchecks++;
         if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) ||
-                (htype == HT_NUM && key.i == hptr->target.i))
-        {
+                (htype == HT_NUM && key.i == hptr->target.i)) {
             htab->hits++;
             if (numchecks > htab->max_scan)
                 htab->max_scan = numchecks;
@@ -151,20 +146,15 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab) {
     numchecks = 0;
     htab->scans++;
     htype = htab->flags & HT_TYPEMASK;
-    if (htype == HT_STR)
-    {
+    if (htype == HT_STR) {
         hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
+    } else {
         hval = (key.i & htab->mask);
     }
-    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
-    {
+    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next) {
         numchecks++;
         if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) ||
-                (htype == HT_NUM && key.i == hptr->target.i))
-        {
+                (htype == HT_NUM && key.i == hptr->target.i)) {
             htab->hits++;
             if (numchecks > htab->max_scan)
                 htab->max_scan = numchecks;
@@ -199,24 +189,18 @@ int hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags) {
     if (hashfind_generic(key, htab) != NULL)
         return (-1);
     htype = htab->flags & HT_TYPEMASK;
-    if (htype == HT_STR)
-    {
+    if (htype == HT_STR) {
         hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
+    } else {
         hval = (key.i & htab->mask);
     }
     htab->entries++;
     if (htab->entry[hval] == NULL)
         htab->nulls--;
     hptr = (HASHENT *) XMALLOC(sizeof(HASHENT), "hashadd");
-    if (htab->flags & HT_KEYREF)
-    {
+    if (htab->flags & HT_KEYREF) {
         hptr->target = key;
-    }
-    else
-    {
+    } else {
         hptr->target.s = XSTRDUP(key.s, "hashadd.target");
     }
     hptr->data = hashdata;
@@ -237,27 +221,21 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab) {
     HASHENT *hptr, *last;
 
     htype = htab->flags & HT_TYPEMASK;
-    if (htype == HT_STR)
-    {
+    if (htype == HT_STR) {
         hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
+    } else {
         hval = (key.i & htab->mask);
     }
     last = NULL;
     for (hptr = htab->entry[hval];
-            hptr != NULL; last = hptr, hptr = hptr->next)
-    {
+            hptr != NULL; last = hptr, hptr = hptr->next) {
         if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) ||
-                (htype == HT_NUM && key.i == hptr->target.i))
-        {
+                (htype == HT_NUM && key.i == hptr->target.i)) {
             if (last == NULL)
                 htab->entry[hval] = hptr->next;
             else
                 last->next = hptr->next;
-            if (!(htab->flags & HT_KEYREF))
-            {
+            if (!(htab->flags & HT_KEYREF)) {
                 XFREE(hptr->target.s, "hashdelete.target");
             }
             XFREE(hptr, "hashdelete.hptr");
@@ -275,20 +253,16 @@ void hashdelall(int *old, HASHTAB *htab) {
 
     HASHENT *hptr, *prev, *nextp;
 
-    for (hval = 0; hval < htab->hashsize; hval++)
-    {
+    for (hval = 0; hval < htab->hashsize; hval++) {
         prev = NULL;
-        for (hptr = htab->entry[hval]; hptr != NULL; hptr = nextp)
-        {
+        for (hptr = htab->entry[hval]; hptr != NULL; hptr = nextp) {
             nextp = hptr->next;
-            if (hptr->data == old)
-            {
+            if (hptr->data == old) {
                 if (prev == NULL)
                     htab->entry[hval] = nextp;
                 else
                     prev->next = nextp;
-                if (!(htab->flags & HT_KEYREF))
-                {
+                if (!(htab->flags & HT_KEYREF)) {
                     XFREE(hptr->target.s,
                           "hashdelall.target");
                 }
@@ -313,15 +287,12 @@ void hashflush(HASHTAB *htab, int size) {
 
     int i;
 
-    for (i = 0; i < htab->hashsize; i++)
-    {
+    for (i = 0; i < htab->hashsize; i++) {
         hent = htab->entry[i];
-        while (hent != NULL)
-        {
+        while (hent != NULL) {
             thent = hent;
             hent = hent->next;
-            if (!(htab->flags & HT_KEYREF))
-            {
+            if (!(htab->flags & HT_KEYREF)) {
                 XFREE(thent->target.s, "hashflush.target");
             }
             XFREE(thent, "hashflush.hent");
@@ -333,13 +304,10 @@ void hashflush(HASHTAB *htab, int size) {
      * Resize if needed.  Otherwise, just zero all the stats
      */
 
-    if ((size > 0) && (size != htab->hashsize))
-    {
+    if ((size > 0) && (size != htab->hashsize)) {
         XFREE(htab->entry, "hashflush.table");
         hashinit(htab, size, htab->flags);
-    }
-    else
-    {
+    } else {
         htab->checks = 0;
         htab->scans = 0;
         htab->max_scan = 0;
@@ -361,19 +329,14 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab) {
     int htype, hval;
 
     htype = htab->flags & HT_TYPEMASK;
-    if (htype == HT_STR)
-    {
+    if (htype == HT_STR) {
         hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
+    } else {
         hval = (key.i & htab->mask);
     }
-    for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
-    {
+    for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next) {
         if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) ||
-                (htype == HT_NUM && key.i == hptr->target.i))
-        {
+                (htype == HT_NUM && key.i == hptr->target.i)) {
             hptr->data = hashdata;
             return 1;
         }
@@ -387,8 +350,7 @@ void hashreplall(int *old, int *new, HASHTAB *htab) {
     HASHENT *hptr;
 
     for (hval = 0; hval < htab->hashsize; hval++)
-        for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
-        {
+        for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next) {
             if (hptr->data == old)
                 hptr->data = new;
         }
@@ -415,8 +377,7 @@ int * hash_firstentry(HASHTAB *htab) {
     int hval;
 
     for (hval = 0; hval < htab->hashsize; hval++)
-        if (htab->entry[hval] != NULL)
-        {
+        if (htab->entry[hval] != NULL) {
             htab->last_hval = hval;
             htab->last_entry = htab->entry[hval];
             return htab->entry[hval]->data;
@@ -431,8 +392,7 @@ int * hash_nextentry(HASHTAB *htab) {
 
     hval = htab->last_hval;
     hptr = htab->last_entry;
-    if (hptr->next != NULL)  	/* We can stay in the same chain */
-    {
+    if (hptr->next != NULL) {	/* We can stay in the same chain */
         htab->last_entry = hptr->next;
         return hptr->next->data;
     }
@@ -440,10 +400,8 @@ int * hash_nextentry(HASHTAB *htab) {
      * We were at the end of the previous chain, go to the next one
      */
     hval++;
-    while (hval < htab->hashsize)
-    {
-        if (htab->entry[hval] != NULL)
-        {
+    while (hval < htab->hashsize) {
+        if (htab->entry[hval] != NULL) {
             htab->last_hval = hval;
             htab->last_entry = htab->entry[hval];
             return htab->entry[hval]->data;
@@ -459,19 +417,15 @@ HASHKEY hash_firstkey_generic(HASHTAB *htab) {
     int hval;
 
     for (hval = 0; hval < htab->hashsize; hval++)
-        if (htab->entry[hval] != NULL)
-        {
+        if (htab->entry[hval] != NULL) {
             htab->last_hval = hval;
             htab->last_entry = htab->entry[hval];
             return htab->entry[hval]->target;
         }
 
-    if ((htab->flags & HT_TYPEMASK) == HT_STR)
-    {
+    if ((htab->flags & HT_TYPEMASK) == HT_STR) {
         return (HASHKEY) ((char *)NULL);
-    }
-    else
-    {
+    } else {
         return (HASHKEY) ((int)-1);
     }
 }
@@ -483,8 +437,7 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab) {
 
     hval = htab->last_hval;
     hptr = htab->last_entry;
-    if (hptr->next != NULL)  	/* We can stay in the same chain */
-    {
+    if (hptr->next != NULL) {	/* We can stay in the same chain */
         htab->last_entry = hptr->next;
         return hptr->next->target;
     }
@@ -492,10 +445,8 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab) {
      * We were at the end of the previous chain, go to the next one
      */
     hval++;
-    while (hval < htab->hashsize)
-    {
-        if (htab->entry[hval] != NULL)
-        {
+    while (hval < htab->hashsize) {
+        if (htab->entry[hval] != NULL) {
             htab->last_hval = hval;
             htab->last_entry = htab->entry[hval];
             return htab->entry[hval]->target;
@@ -503,12 +454,9 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab) {
         hval++;
     }
 
-    if ((htab->flags & HT_TYPEMASK) == HT_STR)
-    {
+    if ((htab->flags & HT_TYPEMASK) == HT_STR) {
         return (HASHKEY) ((char *)NULL);
-    }
-    else
-    {
+    } else {
         return (HASHKEY) ((int)-1);
     }
 }
@@ -530,8 +478,7 @@ void hashresize(HASHTAB *htab, int min_size) {
     get_hashmask(&size);
     if ((size > 512) && (size > htab->entries * 1.33 * HASH_FACTOR))
         size /= 2;
-    if (size == htab->hashsize)
-    {
+    if (size == htab->hashsize) {
         /*
          * We're already at the correct size. Don't do anything.
          */
@@ -541,23 +488,18 @@ void hashresize(HASHTAB *htab, int min_size) {
     hashinit(&new_htab, size, htab->flags);
     htype = htab->flags & HT_TYPEMASK;
 
-    for (i = 0; i < htab->hashsize; i++)
-    {
+    for (i = 0; i < htab->hashsize; i++) {
         hent = htab->entry[i];
-        while (hent != NULL)
-        {
+        while (hent != NULL) {
             thent = hent;
             hent = hent->next;
 
             /*
              * don't free and reallocate entries, just copy the pointers
              */
-            if (htype == HT_STR)
-            {
+            if (htype == HT_STR) {
                 hval = hashval(thent->target.s, new_htab.mask);
-            }
-            else
-            {
+            } else {
                 hval = (thent->target.i & new_htab.mask);
             }
             if (new_htab.entry[hval] == NULL)
@@ -594,15 +536,11 @@ void hashresize(HASHTAB *htab, int min_size) {
 int search_nametab(dbref player, NAMETAB *ntab, char *flagname) {
     NAMETAB *nt;
 
-    for (nt = ntab; nt->name; nt++)
-    {
-        if (minmatch(flagname, nt->name, nt->minlen))
-        {
-            if (check_access(player, nt->perm))
-            {
+    for (nt = ntab; nt->name; nt++) {
+        if (minmatch(flagname, nt->name, nt->minlen)) {
+            if (check_access(player, nt->perm)) {
                 return nt->flag;
-            }
-            else
+            } else
                 return -2;
         }
     }
@@ -616,12 +554,9 @@ int search_nametab(dbref player, NAMETAB *ntab, char *flagname) {
 NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname) {
     NAMETAB *nt;
 
-    for (nt = ntab; nt->name; nt++)
-    {
-        if (minmatch(flagname, nt->name, nt->minlen))
-        {
-            if (check_access(player, nt->perm))
-            {
+    for (nt = ntab; nt->name; nt++) {
+        if (minmatch(flagname, nt->name, nt->minlen)) {
+            if (check_access(player, nt->perm)) {
                 return nt;
             }
         }
@@ -637,12 +572,9 @@ NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname) {
 NAMETAB * find_nametab_ent_flag(dbref player, NAMETAB *ntab, int flag) {
     NAMETAB *nt;
 
-    for (nt = ntab; nt->name; nt++)
-    {
-        if (flag == nt->flag)
-        {
-            if (check_access(player, nt->perm))
-            {
+    for (nt = ntab; nt->name; nt++) {
+        if (flag == nt->flag) {
+            if (check_access(player, nt->perm)) {
                 return nt;
             }
         }
@@ -666,10 +598,8 @@ void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none
     got_one = 0;
     for (cp = prefix; *cp; cp++)
         *bp++ = *cp;
-    for (nt = ntab; nt->name; nt++)
-    {
-        if (God(player) || check_access(player, nt->perm))
-        {
+    for (nt = ntab; nt->name; nt++) {
+        if (God(player) || check_access(player, nt->perm)) {
             *bp++ = ' ';
             for (cp = nt->name; *cp; cp++)
                 *bp++ = *cp;
@@ -696,10 +626,8 @@ void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, cha
     for (cp = prefix; *cp; cp++)
         *bp++ = *cp;
     nt = ntab;
-    while (nt->name)
-    {
-        if (God(player) || check_access(player, nt->perm))
-        {
+    while (nt->name) {
+        if (God(player) || check_access(player, nt->perm)) {
             *bp++ = ' ';
             for (cp = nt->name; *cp; cp++)
                 *bp++ = *cp;
@@ -737,11 +665,9 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, in
         *bp++ = *cp;
     nt = ntab;
     got_one = 0;
-    while (nt->name)
-    {
+    while (nt->name) {
         if (((flagword & nt->flag) != 0) &&
-                (God(player) || check_access(player, nt->perm)))
-        {
+                (God(player) || check_access(player, nt->perm))) {
             *bp++ = ' ';
             for (cp = nt->name; *cp; cp++)
                 *bp++ = *cp;
@@ -769,10 +695,8 @@ int cf_ntab_access (int *vp, char *str, long extra, dbref player, char *cmd) {
         *ap++ = '\0';
     while (*ap && isspace(*ap))
         ap++;
-    for (np = (NAMETAB *) vp; np->name; np++)
-    {
-        if (minmatch(str, np->name, np->minlen))
-        {
+    for (np = (NAMETAB *) vp; np->name; np++) {
+        if (minmatch(str, np->name, np->minlen)) {
             return cf_modify_bits(&(np->perm), ap, extra,
                                   player, cmd);
         }

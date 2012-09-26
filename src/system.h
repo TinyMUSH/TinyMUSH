@@ -13,20 +13,6 @@ typedef int	dbref;
 typedef int	FLAG;
 typedef int	POWER;
 
-#ifdef __STDC__
-#define		NDECL(f)	f(void)
-#define		FDECL(f,p)	f p
-#ifdef STDC_HEADERS
-#define		VDECL(f,p)	f p
-#else
-#define		VDECL(f,p)	f()
-#endif				/* STDC_HEADERS */
-#else
-#define 	NDECL(f)	f()
-#define 	FDECL(f,p)	f()
-#define 	VDECL(f,p)	f()
-#endif				/* __STDC */
-
 #ifdef STDC_HEADERS
 #ifdef __STDC__
 #include <stdarg.h>
@@ -37,9 +23,6 @@ typedef int	POWER;
 #include <limits.h>
 #else				/* STDC_HEADERS */
 #include <varargs.h>
-extern int	FDECL(atoi, (const char *));
-extern double	FDECL(atof, (const char *));
-extern int	FDECL(qsort, (char *, int, int, int (*) ()));
 #endif				/* STDC_HEADERS */
 
 #ifdef STDC_HEADERS

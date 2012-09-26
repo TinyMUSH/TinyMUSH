@@ -1432,11 +1432,11 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	quota.c rob.c set.c speech.c stringutil.c timer.c udb_ocache.c \
 	udb_ochunk.c udb_obj.c udb_misc.c unparse.c vattr.c version.c \
 	walkdb.c wild.c wiz.c \
-	alloc.h ansi.h attrs.h autoinclude.h bitstring.h cmdtabs.h \
-	command.h game.h copyright.h db.h externs.h file_c.h \
-	flags.h fnproto.h functions.h getpagesize.h help.h htab.h interface.h \
-	malloc.h match.h mushconf.h patchlevel.h pcre.h powers.h slave.h \
-	udb.h udb_defs.h vattr.h walkdb.h
+	alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h game.h \
+	copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h \
+	getpagesize.h help.h htab.h interface.h malloc.h match.h mushconf.h \
+	patchlevel.h pcre.h powers.h slave.h system.h udb.h udb_defs.h \
+	vattr.h walkdb.h
 
 EXTRA_netmush_SOURCES = db_sql_empty.c db_sql_msql.c db_sql_mysql.c db_sql_pgsql.c db_sql_sqlite3.c db_sql.h mcheck.c mstats.c mtrace.c
 netmush_LDFLAGS = -export-dynamic

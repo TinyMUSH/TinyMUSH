@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h"		/* required by mudconf */
 #include "alloc.h"		/* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h"		/* required by mudconf */
 #include "ltdl.h"		/* required by mudconf */
 #include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */ 
+#include "udb_defs.h"		/* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -40,10 +41,8 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable) {
 
     int succ = 0;
 
-    WALK_ALL_MODULES(mp)
-    {
-        if (!strcmp(module_name, mp->modname))
-        {
+    WALK_ALL_MODULES(mp) {
+        if (!strcmp(module_name, mp->modname)) {
             succ = 1;
             break;
         }
@@ -51,13 +50,11 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable) {
     if (!succ)		/* no such module */
         return;
 
-    for (afp = ftable; afp->name; afp++)
-    {
+    for (afp = ftable; afp->name; afp++) {
         fn_ptr =
             DLSYM(mp->handle, module_name, afp->name, (void *,
                     void *));
-        if (fn_ptr != NULL)
-        {
+        if (fn_ptr != NULL) {
             afp->handler = fn_ptr;
             hashadd(tprintf("%s_%s", api_name, afp->name),
                     (int *)afp, &mudstate.api_func_htab, 0);
@@ -83,10 +80,8 @@ void *request_api_function(char *api_name, char *fn_name) {
 void register_commands(CMDENT *cmdtab) {
     CMDENT *cp;
 
-    if (cmdtab)
-    {
-        for (cp = cmdtab; cp->cmdname; cp++)
-        {
+    if (cmdtab) {
+        for (cp = cmdtab; cp->cmdname; cp++) {
             hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab,
                     0);
             hashadd(tprintf("__%s", cp->cmdname), (int *)cp,
@@ -100,10 +95,8 @@ void register_prefix_cmds(const char *cmdchars) {
 
     char cn[2] = "x";
 
-    if (cmdchars)
-    {
-        for (cp = cmdchars; *cp; cp++)
-        {
+    if (cmdchars) {
+        for (cp = cmdchars; *cp; cp++) {
             cn[0] = *cp;
             prefix_cmds[(unsigned char)*cp] =
                 (CMDENT *) hashfind(cn, &mudstate.command_htab);
@@ -114,10 +107,8 @@ void register_prefix_cmds(const char *cmdchars) {
 void register_functions(FUN *functab) {
     FUN *fp;
 
-    if (functab)
-    {
-        for (fp = functab; fp->name; fp++)
-        {
+    if (functab) {
+        for (fp = functab; fp->name; fp++) {
             hashadd((char *)fp->name, (int *)fp,
                     &mudstate.func_htab, 0);
         }
@@ -129,18 +120,14 @@ void register_hashtables(MODHASHES *htab, MODNHASHES *ntab) {
 
     MODNHASHES *np;
 
-    if (htab)
-    {
-        for (hp = htab; hp->tabname != NULL; hp++)
-        {
+    if (htab) {
+        for (hp = htab; hp->tabname != NULL; hp++) {
             hashinit(hp->htab, hp->size_factor * HASH_FACTOR,
                      HT_STR);
         }
     }
-    if (ntab)
-    {
-        for (np = ntab; np->tabname != NULL; np++)
-        {
+    if (ntab) {
+        for (np = ntab; np->tabname != NULL; np++) {
             nhashinit(np->htab, np->size_factor * HASH_FACTOR);
         }
     }
@@ -164,8 +151,7 @@ unsigned int register_dbtype(char *modname) {
     key.dsize = strlen(modname) + 1;
     data = db_get(key, DBTYPE_MODULETYPE);
 
-    if (data.dptr)
-    {
+    if (data.dptr) {
         memcpy((void *)&type, (void *)data.dptr, sizeof(unsigned int));
         XFREE(data.dptr, "register_dbtype");
         return type;
@@ -176,8 +162,7 @@ unsigned int register_dbtype(char *modname) {
      */
 
     if ((mudstate.moduletype_top >= DBTYPE_RESERVED) &&
-            (mudstate.moduletype_top < DBTYPE_END))
-    {
+            (mudstate.moduletype_top < DBTYPE_END)) {
         /*
          * Write the entry to GDBM
          */
@@ -188,9 +173,7 @@ unsigned int register_dbtype(char *modname) {
         type = mudstate.moduletype_top;
         mudstate.moduletype_top++;
         return type;
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }

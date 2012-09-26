@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -24,25 +25,20 @@
 #define SAYS_STRING	(mudconf.comma_say ? "says," : "says")
 
 int sp_ok(dbref player) {
-    if (Gagged(player) && (!(Wizard(player))))
-    {
+    if (Gagged(player) && (!(Wizard(player)))) {
         notify(player, "Sorry. Gagged players cannot speak.");
         return 0;
     }
 
-    if (!mudconf.robot_speak)
-    {
-        if (Robot(player) && !controls(player, Location(player)))
-        {
+    if (!mudconf.robot_speak) {
+        if (Robot(player) && !controls(player, Location(player))) {
             notify(player,
                    "Sorry robots may not speak in public.");
             return 0;
         }
     }
-    if (Auditorium(Location(player)))
-    {
-        if (!could_doit(player, Location(player), A_LSPEECH))
-        {
+    if (Auditorium(Location(player))) {
+        if (!could_doit(player, Location(player), A_LSPEECH)) {
             notify(player,
                    "Sorry, you may not speak in this place.");
             return 0;
@@ -88,8 +84,7 @@ static int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thin
 
     strcpy(msgbuf, message);
 
-    switch (key)
-    {
+    switch (key) {
     case SAY_SAY:
         tokbuf[0] = '"';
         break;
@@ -114,16 +109,12 @@ static int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thin
 
     buff = master_attr(speaker, thing, A_SPEECHFMT, sargs, 2, &aflags);
 
-    if (buff)
-    {
-        if (*buff)
-        {
+    if (buff) {
+        if (*buff) {
             notify_all_from_inside_speech(loc, player, buff);
             free_lbuf(buff);
             return 1;
-        }
-        else if (aflags & AF_NONAME)
-        {
+        } else if (aflags & AF_NONAME) {
             free_lbuf(buff);
             return 1;
         }
@@ -142,22 +133,17 @@ static void format_speech(dbref player, dbref speaker, dbref loc, char *message,
             check_speechformat(player, speaker, loc, loc, message, key))
         return;
 
-    switch (key)
-    {
+    switch (key) {
     case SAY_SAY:
-        if (mudconf.you_say)
-        {
+        if (mudconf.you_say) {
             notify(speaker, tprintf("You %s \"%s\"", SAY_STRING,
                                     message));
-            if (loc != NOTHING)
-            {
+            if (loc != NOTHING) {
                 notify_except(loc, player, speaker,
                               tprintf("%s %s \"%s\"", Name(speaker),
                                       SAYS_STRING, message), MSG_SPEECH);
             }
-        }
-        else
-        {
+        } else {
             notify_all_from_inside_speech(loc, player,
                                           tprintf("%s %s \"%s\"", Name(speaker),
                                                   SAYS_STRING, message));
@@ -190,8 +176,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
      * Check for shouts. Need to have Announce power.
      */
 
-    if ((key & SAY_SHOUT) && !Announce(player))
-    {
+    if ((key & SAY_SHOUT) && !Announce(player)) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
@@ -203,15 +188,12 @@ void do_say(dbref player, dbref cause, int key, char *message) {
     say_flags = key & (SAY_NOTAG | SAY_HERE | SAY_ROOM | SAY_HTML);
     key &= ~(SAY_NOTAG | SAY_HERE | SAY_ROOM | SAY_HTML);
 
-    if (key & SAY_PREFIX)
-    {
+    if (key & SAY_PREFIX) {
         key &= ~SAY_PREFIX;
-        switch (key)
-        {
+        switch (key) {
         case SAY_POSE:
             message++;
-            if (*message == ' ')
-            {
+            if (*message == ' ') {
                 message++;
                 key = SAY_POSE_NOSPC;
             }
@@ -237,8 +219,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
      */
 
     loc = where_is(player);
-    switch (key)
-    {
+    switch (key) {
     case SAY_SAY:
     case SAY_POSE:
     case SAY_POSE_NOSPC:
@@ -253,8 +234,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
      * Send the message on its way
      */
 
-    switch (key)
-    {
+    switch (key) {
     case SAY_SAY:
         format_speech(player, player, loc, message, SAY_SAY);
         break;
@@ -266,42 +246,31 @@ void do_say(dbref player, dbref cause, int key, char *message) {
         break;
     case SAY_EMIT:
         if (!say_flags || (say_flags & SAY_HERE) ||
-                ((say_flags & SAY_HTML) && !(say_flags & SAY_ROOM)))
-        {
-            if (say_flags & SAY_HTML)
-            {
+                ((say_flags & SAY_HTML) && !(say_flags & SAY_ROOM))) {
+            if (say_flags & SAY_HTML) {
                 notify_all_from_inside_html_speech(loc, player,
                                                    message);
-            }
-            else
-            {
+            } else {
                 notify_all_from_inside_speech(loc, player,
                                               message);
             }
         }
-        if (say_flags & SAY_ROOM)
-        {
+        if (say_flags & SAY_ROOM) {
             if ((Typeof(loc) == TYPE_ROOM) &&
-                    (say_flags & SAY_HERE))
-            {
+                    (say_flags & SAY_HERE)) {
                 return;
             }
             depth = 0;
-            while ((Typeof(loc) != TYPE_ROOM) && (depth++ < 20))
-            {
+            while ((Typeof(loc) != TYPE_ROOM) && (depth++ < 20)) {
                 loc = Location(loc);
                 if ((loc == NOTHING) || (loc == Location(loc)))
                     return;
             }
-            if (Typeof(loc) == TYPE_ROOM)
-            {
-                if (say_flags & SAY_HTML)
-                {
+            if (Typeof(loc) == TYPE_ROOM) {
+                if (say_flags & SAY_HTML) {
                     notify_all_from_inside_html_speech(loc,
                                                        player, message);
-                }
-                else
-                {
+                } else {
                     notify_all_from_inside_speech(loc,
                                                   player, message);
                 }
@@ -309,8 +278,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
         }
         break;
     case SAY_SHOUT:
-        switch (*message)
-        {
+        switch (*message) {
         case ':':
             message[0] = ' ';
             say_shout(0, announce_msg, say_flags, player, message);
@@ -335,8 +303,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
         log_printf(" shouts: '%s'", strip_ansi(message));
         ENDLOG break;
     case SAY_WIZSHOUT:
-        switch (*message)
-        {
+        switch (*message) {
         case ':':
             message[0] = ' ';
             say_shout(WIZARD, broadcast_msg, say_flags, player,
@@ -364,8 +331,7 @@ void do_say(dbref player, dbref cause, int key, char *message) {
         log_printf(" broadcasts: '%s'", strip_ansi(message));
         ENDLOG break;
     case SAY_ADMINSHOUT:
-        switch (*message)
-        {
+        switch (*message) {
         case ':':
             message[0] = ' ';
             say_shout(WIZARD, admin_msg, say_flags, player,
@@ -456,15 +422,13 @@ static void page_return(dbref player, dbref target, const char *tag, int anum, c
     time_t t;
 
     str = atr_pget(target, anum, &aowner, &aflags, &alen);
-    if (*str)
-    {
+    if (*str) {
         str2 = bp = alloc_lbuf("page_return");
         buf = str;
         exec(str2, &bp, target, player, player,
              EV_FCHECK | EV_EVAL | EV_TOP | EV_NO_LOCATION, &buf,
              (char **)NULL, 0);
-        if (*str2)
-        {
+        if (*str2) {
             t = time(NULL);
             tp = localtime(&t);
             notify_with_cause(player, target,
@@ -475,27 +439,20 @@ static void page_return(dbref player, dbref target, const char *tag, int anum, c
                                       tp->tm_hour, tp->tm_min, tag, Name(player)));
         }
         free_lbuf(str2);
-    }
-    else if (dflt && *dflt)
-    {
+    } else if (dflt && *dflt) {
         notify_with_cause(player, target, dflt);
     }
     free_lbuf(str);
 }
 
 static int page_check(dbref player, dbref target) {
-    if (!payfor(player, Guest(player) ? 0 : mudconf.pagecost))
-    {
+    if (!payfor(player, Guest(player) ? 0 : mudconf.pagecost)) {
         notify(player,
                tprintf("You don't have enough %s.", mudconf.many_coins));
-    }
-    else if (!Connected(target))
-    {
+    } else if (!Connected(target)) {
         page_return(player, target, "Away", A_AWAY,
                     tprintf("Sorry, %s is not connected.", Name(target)));
-    }
-    else if (!could_doit(player, target, A_LPAGE))
-    {
+    } else if (!could_doit(player, target, A_LPAGE)) {
         if (Can_Hide(target) && Hidden(target) && !See_Hidden(player))
             page_return(player, target, "Away", A_AWAY,
                         tprintf("Sorry, %s is not connected.",
@@ -504,26 +461,19 @@ static int page_check(dbref player, dbref target) {
             page_return(player, target, "Reject", A_REJECT,
                         tprintf("Sorry, %s is not accepting pages.",
                                 Name(target)));
-    }
-    else if (!could_doit(target, player, A_LPAGE))
-    {
-        if (Wizard(player))
-        {
+    } else if (!could_doit(target, player, A_LPAGE)) {
+        if (Wizard(player)) {
             notify(player,
                    tprintf("Warning: %s can't return your page.",
                            Name(target)));
             return 1;
-        }
-        else
-        {
+        } else {
             notify(player,
                    tprintf("Sorry, %s can't return your page.",
                            Name(target)));
             return 0;
         }
-    }
-    else
-    {
+    } else {
         return 1;
     }
     return 0;
@@ -558,10 +508,8 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      * * 'page foo=' from 'page foo' -- both result in a valid tname.
      */
 
-    if (!key && !*message)
-    {
-        if (mudconf.page_req_equals)
-        {
+    if (!key && !*message) {
+        if (mudconf.page_req_equals) {
             notify(player, "No one to page.");
             return;
         }
@@ -570,8 +518,7 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
         tname = tnp;
     }
 
-    if (!tname || !*tname)  	/* no recipient list; use lastpaged */
-    {
+    if (!tname || !*tname) {	/* no recipient list; use lastpaged */
 
         /*
          * Clean junk objects out of their lastpaged dbref list
@@ -590,15 +537,11 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
          * How many words in the list of targets?
          */
 
-        if (!*dbref_list)
-        {
+        if (!*dbref_list) {
             count = 0;
-        }
-        else
-        {
+        } else {
 
-            for (n_dbrefs = 1, str = dbref_list;; n_dbrefs++)
-            {
+            for (n_dbrefs = 1, str = dbref_list;; n_dbrefs++) {
                 if ((str = strchr(str, ' ')) != NULL)
                     str++;
                 else
@@ -613,11 +556,9 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
              */
 
             for (ddp = strtok_r(dbref_list, " ", &tokst);
-                    ddp; ddp = strtok_r(NULL, " ", &tokst))
-            {
+                    ddp; ddp = strtok_r(NULL, " ", &tokst)) {
                 target = (int)strtol(ddp, (char **)NULL, 10);
-                if (!Good_obj(target) || !isPlayer(target))
-                {
+                if (!Good_obj(target) || !isPlayer(target)) {
                     notify(player,
                            tprintf("I don't recognize #%d.",
                                    target));
@@ -635,20 +576,15 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
 
         free_lbuf(dbref_list);
 
-    }
-    else  		/* normal page; build new recipient list */
-    {
+    } else {		/* normal page; build new recipient list */
 
 
-        if ((target = lookup_player(player, tname, 1)) != NOTHING)
-        {
+        if ((target = lookup_player(player, tname, 1)) != NOTHING) {
             dbrefs_array =
                 (int *)XCALLOC(1, sizeof(int), "do_page.dbrefs");
             dbrefs_array[0] = target;
             count++;
-        }
-        else
-        {
+        } else {
 
             /*
              * How many words in the list of targets? Note that we separate
@@ -656,8 +592,7 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
              */
 
             n_dbrefs = 1;
-            for (str = tname; *str; str++)
-            {
+            for (str = tname; *str; str++) {
                 if ((*str == ' ') || (*str == ','))
                     n_dbrefs++;
             }
@@ -670,17 +605,13 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
              */
 
             for (tnp = strtok_r(tname, ", ", &tokst);
-                    tnp; tnp = strtok_r(NULL, ", ", &tokst))
-            {
+                    tnp; tnp = strtok_r(NULL, ", ", &tokst)) {
                 if ((target =
                             lookup_player(player, tnp,
-                                          1)) != NOTHING)
-                {
+                                          1)) != NOTHING) {
                     dbrefs_array[count] = target;
                     count++;
-                }
-                else
-                {
+                } else {
                     notify(player,
                            tprintf("I don't recognize %s.",
                                    tnp));
@@ -696,12 +627,9 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      * * a message.
      */
 
-    if (*message)
-    {
-        for (i = 0; i < n_dbrefs; i++)
-        {
-            if (!page_check(player, dbrefs_array[i]))
-            {
+    if (*message) {
+        for (i = 0; i < n_dbrefs; i++) {
+            if (!page_check(player, dbrefs_array[i])) {
                 dbrefs_array[i] = NOTHING;
                 count--;
             }
@@ -713,10 +641,8 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      */
 
     dbref_list = ddp = alloc_lbuf("do_page.lastpage");
-    for (i = 0; i < n_dbrefs; i++)
-    {
-        if (dbrefs_array[i] != NOTHING)
-        {
+    for (i = 0; i < n_dbrefs; i++) {
+        if (dbrefs_array[i] != NOTHING) {
             if (ddp != dbref_list)
                 safe_chr(' ', dbref_list, &ddp);
             safe_ltos(dbref_list, &ddp, dbrefs_array[i]);
@@ -730,18 +656,14 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      * Check to make sure we have something.
      */
 
-    if (count == 0)
-    {
-        if (!*message)
-        {
+    if (count == 0) {
+        if (!*message) {
             if (key)
                 notify(player,
                        "You have not been paged by anyone.");
             else
                 notify(player, "You have not paged anyone.");
-        }
-        else
-        {
+        } else {
             notify(player, "No one to page.");
         }
         if (dbrefs_array)
@@ -758,10 +680,8 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
 
     dbref_list = ddp = alloc_lbuf("do_page.pagegroup");
     safe_ltos(dbref_list, &ddp, player);
-    for (i = 0; i < n_dbrefs; i++)
-    {
-        if (dbrefs_array[i] != NOTHING)
-        {
+    for (i = 0; i < n_dbrefs; i++) {
+        if (dbrefs_array[i] != NOTHING) {
             safe_chr(' ', dbref_list, &ddp);
             safe_ltos(dbref_list, &ddp, dbrefs_array[i]);
         }
@@ -778,24 +698,17 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      */
 
     clean_tname = tnp = alloc_lbuf("do_page.namelist");
-    if (count == 1)
-    {
-        for (i = 0; i < n_dbrefs; i++)
-        {
-            if (dbrefs_array[i] != NOTHING)
-            {
+    if (count == 1) {
+        for (i = 0; i < n_dbrefs; i++) {
+            if (dbrefs_array[i] != NOTHING) {
                 safe_name(dbrefs_array[i], clean_tname, &tnp);
                 break;
             }
         }
-    }
-    else
-    {
+    } else {
         safe_chr('(', clean_tname, &tnp);
-        for (i = 0; i < n_dbrefs; i++)
-        {
-            if (dbrefs_array[i] != NOTHING)
-            {
+        for (i = 0; i < n_dbrefs; i++) {
+            if (dbrefs_array[i] != NOTHING) {
                 if (tnp != clean_tname + 1)
                     safe_known_str(", ", 2, clean_tname,
                                    &tnp);
@@ -812,8 +725,7 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
 
     omessage = omp = alloc_lbuf("do_page.omessage");
     imessage = imp = alloc_lbuf("do_page.imessage");
-    switch (*message)
-    {
+    switch (*message) {
     case '\0':
         notify(player, tprintf("You last paged %s.", clean_tname));
         free_lbuf(clean_tname);
@@ -860,10 +772,8 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message) {
      * Send the message out, checking for idlers
      */
 
-    for (i = 0; i < n_dbrefs; i++)
-    {
-        if (dbrefs_array[i] != NOTHING)
-        {
+    for (i = 0; i < n_dbrefs; i++) {
+        if (dbrefs_array[i] != NOTHING) {
             notify_with_cause(dbrefs_array[i], player, omessage);
             page_return(player, dbrefs_array[i], "Idle", A_IDLE,
                         NULL);
@@ -919,8 +829,7 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
         return;
 
     n_recips = 1;
-    for (p = list; *p; ++p)
-    {
+    for (p = list; *p; ++p) {
         if (*p == ' ')
             ++n_recips;
     }
@@ -930,15 +839,13 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 
     n_recips = 0;
     for (p = strtok_r(list, " ", &tokst);
-            p != NULL; p = strtok_r(NULL, " ", &tokst))
-    {
+            p != NULL; p = strtok_r(NULL, " ", &tokst)) {
 
         init_match(player, p, TYPE_PLAYER);
         match_everything(0);
         who = match_result();
 
-        switch (who)
-        {
+        switch (who) {
         case NOTHING:
             notify(player, "Emit to whom?");
             break;
@@ -951,8 +858,7 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
             /*
              * avoid pemitting to this dbref if already done
              */
-            for (r = 0; r < n_recips; ++r)
-            {
+            for (r = 0; r < n_recips; ++r) {
                 if (recips[r] == who)
                     break;
             }
@@ -964,24 +870,20 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
             ok_to_do = mudconf.pemit_any;
             if (!ok_to_do &&
                     (Long_Fingers(player) || nearby(player, who) ||
-                     Controls(player, who)))
-            {
+                     Controls(player, who))) {
                 ok_to_do = 1;
             }
             if (!ok_to_do && (isPlayer(who))
-                    && mudconf.pemit_players)
-            {
+                    && mudconf.pemit_players) {
                 if (!page_check(player, who))
                     continue;
                 ok_to_do = 1;
             }
             if (do_contents && !mudconf.pemit_any &&
-                    !Controls(player, who))
-            {
+                    !Controls(player, who)) {
                 ok_to_do = 0;
             }
-            if (!ok_to_do)
-            {
+            if (!ok_to_do) {
                 notify(player, "You cannot do that.");
                 continue;
             }
@@ -1010,17 +912,13 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
 
     int do_contents, ok_to_do, depth, pemit_flags;
 
-    if (key & PEMIT_CONTENTS)
-    {
+    if (key & PEMIT_CONTENTS) {
         do_contents = 1;
         key &= ~PEMIT_CONTENTS;
-    }
-    else
-    {
+    } else {
         do_contents = 0;
     }
-    if (key & PEMIT_LIST)
-    {
+    if (key & PEMIT_LIST) {
         do_pemit_list(player, recipient, message, do_contents);
         return;
     }
@@ -1034,8 +932,7 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
     ok_to_do = 0;
 
 
-    switch (key)
-    {
+    switch (key) {
     case PEMIT_FSAY:
     case PEMIT_FPOSE:
     case PEMIT_FPOSE_NS:
@@ -1051,11 +948,9 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
         target = match_result();
     }
 
-    switch (target)
-    {
+    switch (target) {
     case NOTHING:
-        switch (key)
-        {
+        switch (key) {
         case PEMIT_WHISPER:
             notify(player, "Whisper to whom?");
             break;
@@ -1079,56 +974,42 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
 
         if (!ok_to_do &&
                 (nearby(player, target) || Long_Fingers(player)
-                 || Controls(player, target)))
-        {
+                 || Controls(player, target))) {
             ok_to_do = 1;
         }
         if (!ok_to_do && (key == PEMIT_PEMIT) &&
-                (Typeof(target) == TYPE_PLAYER) && mudconf.pemit_players)
-        {
+                (Typeof(target) == TYPE_PLAYER) && mudconf.pemit_players) {
             if (!page_check(player, target))
                 return;
             ok_to_do = 1;
         }
-        if (!ok_to_do && (!mudconf.pemit_any || (key != PEMIT_PEMIT)))
-        {
+        if (!ok_to_do && (!mudconf.pemit_any || (key != PEMIT_PEMIT))) {
             notify(player, "You are too far away to do that.");
             return;
         }
         if (do_contents && !Controls(player, target) &&
-                !mudconf.pemit_any)
-        {
+                !mudconf.pemit_any) {
             notify(player, NOPERM_MESSAGE);
             return;
         }
         loc = where_is(target);
 
-        switch (key)
-        {
+        switch (key) {
         case PEMIT_PEMIT:
-            if (do_contents)
-            {
-                if (Has_contents(target))
-                {
-                    if (pemit_flags & PEMIT_SPEECH)
-                    {
+            if (do_contents) {
+                if (Has_contents(target)) {
+                    if (pemit_flags & PEMIT_SPEECH) {
                         notify_all_from_inside_speech
                         (target, player, message);
-                    }
-                    else if (pemit_flags & PEMIT_MOVE)
-                    {
+                    } else if (pemit_flags & PEMIT_MOVE) {
                         notify_all_from_inside_move
                         (target, player, message);
-                    }
-                    else
-                    {
+                    } else {
                         notify_all_from_inside(target,
                                                player, message);
                     }
                 }
-            }
-            else
-            {
+            } else {
                 notify_with_cause_extra(target, player,
                                         message,
                                         ((pemit_flags & PEMIT_HTML) ? MSG_HTML : 0)
@@ -1144,14 +1025,10 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
             break;
         case PEMIT_WHISPER:
             if ((Unreal(player) && !Check_Heard(target, player)) ||
-                    (Unreal(target) && !Check_Hears(player, target)))
-            {
+                    (Unreal(target) && !Check_Hears(player, target))) {
                 notify(player, CANNOT_HEAR_MSG);
-            }
-            else
-            {
-                switch (*message)
-                {
+            } else {
+                switch (*message) {
                 case ':':
                     message[0] = ' ';
                     whisper_pose(player, target, message);
@@ -1172,11 +1049,9 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
                                               Name(player), message));
                 }
                 if ((!mudconf.quiet_whisper)
-                        && !Wizard(player))
-                {
+                        && !Wizard(player)) {
                     loc = where_is(player);
-                    if (loc != NOTHING)
-                    {
+                    if (loc != NOTHING) {
                         buf2 =
                             alloc_lbuf
                             ("do_pemit.whisper.buzz");
@@ -1216,24 +1091,20 @@ void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message
                 notify_all_from_inside_speech(loc,
                                               ((pemit_flags & PEMIT_SPOOF) ?
                                                target : player), message);
-            if (pemit_flags & PEMIT_ROOM)
-            {
+            if (pemit_flags & PEMIT_ROOM) {
                 if ((Typeof(loc) == TYPE_ROOM) &&
-                        (pemit_flags & PEMIT_HERE))
-                {
+                        (pemit_flags & PEMIT_HERE)) {
                     return;
                 }
                 depth = 0;
                 while ((Typeof(loc) != TYPE_ROOM) &&
-                        (depth++ < 20))
-                {
+                        (depth++ < 20)) {
                     loc = Location(loc);
                     if ((loc == NOTHING) ||
                             (loc == Location(loc)))
                         return;
                 }
-                if (Typeof(loc) == TYPE_ROOM)
-                {
+                if (Typeof(loc) == TYPE_ROOM) {
                     notify_all_from_inside_speech(loc,
                                                   ((pemit_flags & PEMIT_SPOOF) ?
                                                    target : player), message);

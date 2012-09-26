@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h" /* required by mudconf */
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */ 
+#include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -21,11 +22,11 @@
 #include "powers.h"		/* required by code */
 #include "bitstring.h"		/* required by code */
 
-extern void NDECL(pool_reset);
+extern void pool_reset(void);
 
-extern unsigned int FDECL(alarm, (unsigned int seconds));
+extern unsigned int alarm(unsigned int seconds);
 
-extern void NDECL(pcache_trim);
+extern void pcache_trim(void);
 
 /* ---------------------------------------------------------------------------
  * Cron-related things. This implementation is somewhat derivative of
@@ -59,8 +60,7 @@ extern void NDECL(pcache_trim);
 
 typedef struct cron_entry CRONTAB;
 
-struct cron_entry
-{
+struct cron_entry {
     dbref obj;
     int atr;
     char *cronstr;
@@ -78,9 +78,7 @@ CRONTAB *cron_head = NULL;
 #define set_cronbits(b,l,h,n) \
         if (((n) >= (l)) && ((n) <= (h))) bit_set((b), (n) - (l));
 
-static void
-NDECL(check_cron)
-{
+static void check_cron(void) {
     struct tm *ltime;
 
     int minute, hour, dom, month, dow;
@@ -111,20 +109,17 @@ NDECL(check_cron)
      * * exactly like Unix (Vixie) cron does.
      */
 
-    for (crp = cron_head; crp != NULL; crp = crp->next)
-    {
+    for (crp = cron_head; crp != NULL; crp = crp->next) {
         if (bit_test(crp->minute, minute) &&
                 bit_test(crp->hour, hour) &&
                 bit_test(crp->month, month) &&
                 (((crp->flags & DOM_STAR) || (crp->flags & DOW_STAR)) ?
                  (bit_test(crp->dow, dow) && bit_test(crp->dom, dom)) :
-                 (bit_test(crp->dow, dow) || bit_test(crp->dom, dom))))
-        {
+                 (bit_test(crp->dow, dow) || bit_test(crp->dom, dom)))) {
             cmd =
                 atr_pget(crp->obj, crp->atr, &aowner, &aflags,
                          &alen);
-            if (*cmd && Good_obj(crp->obj))
-            {
+            if (*cmd && Good_obj(crp->obj)) {
                 wait_que(crp->obj, crp->obj, 0, NOTHING, 0,
                          cmd, (char **)NULL, 0, NULL);
             }
@@ -133,16 +128,7 @@ NDECL(check_cron)
     }
 }
 
-static char *
-parse_cronlist(player, bits, low, high, bufp)
-dbref player;
-
-bitstr_t *bits;
-
-int low, high;
-
-char *bufp;
-{
+static char *parse_cronlist(dbref player, bitstr_t *bits, int low, int high, char *bufp) {
     int i, n_begin, n_end, step_size;
 
     bit_nclear(bits, 0, (high - low + 1));	/* Default is all off */
@@ -159,28 +145,21 @@ char *bufp;
      * * function.
      */
 
-    while (*bufp && !isspace(*bufp))
-    {
-        if (*bufp == '*')
-        {
+    while (*bufp && !isspace(*bufp)) {
+        if (*bufp == '*') {
             n_begin = low;
             n_end = high;
             bufp++;
-        }
-        else if (isdigit(*bufp))
-        {
+        } else if (isdigit(*bufp)) {
             n_begin = (int)strtol(bufp, (char **)NULL, 10);
             while (*bufp && isdigit(*bufp))
                 bufp++;
-            if (*bufp != '-')
-            {
+            if (*bufp != '-') {
                 /*
                  * We have a single number, not a range.
                  */
                 n_end = n_begin;
-            }
-            else
-            {
+            } else {
                 /*
                  * Eat the dash, get the range.
                  */
@@ -189,9 +168,7 @@ char *bufp;
                 while (*bufp && isdigit(*bufp))
                     bufp++;
             }
-        }
-        else
-        {
+        } else {
             notify(player, tprintf("Cron parse error at: %s",
                                    bufp));
             return NULL;
@@ -201,20 +178,16 @@ char *bufp;
          * Check for step size.
          */
 
-        if (*bufp == '/')
-        {
+        if (*bufp == '/') {
             bufp++;	/* eat the slash */
             step_size = (int)strtol(bufp, (char **)NULL, 10);
-            if (step_size < 1)
-            {
+            if (step_size < 1) {
                 notify(player, "Invalid step size.");
                 return NULL;
             }
             while (*bufp && isdigit(*bufp))
                 bufp++;
-        }
-        else
-        {
+        } else {
             step_size = 1;
         }
 
@@ -254,14 +227,7 @@ char *bufp;
     return bufp;
 }
 
-int
-call_cron(player, thing, attrib, timestr)
-dbref player, thing;
-
-int attrib;
-
-char *timestr;
-{
+int call_cron(dbref player, dbref thing, int attrib, char *timestr) {
     int errcode;
 
     CRONTAB *crp;
@@ -272,8 +238,7 @@ char *timestr;
      * Don't allow duplicate entries.
      */
 
-    for (crp = cron_head; crp != NULL; crp = crp->next)
-    {
+    for (crp = cron_head; crp != NULL; crp = crp->next) {
         if ((crp->obj == thing) && (crp->atr == attrib) &&
                 !strcmp(crp->cronstr, timestr))
             return -1;
@@ -297,20 +262,16 @@ char *timestr;
         bufp++;
     bufp = parse_cronlist(player, crp->minute,
                           FIRST_MINUTE, LAST_MINUTE, bufp);
-    if (!bufp || !*bufp)
-    {
+    if (!bufp || !*bufp) {
         errcode = 1;
-    }
-    else
-    {
+    } else {
         bufp =
             parse_cronlist(player, crp->hour, FIRST_HOUR, LAST_HOUR,
                            bufp);
         if (!bufp || !*bufp)
             errcode = 1;
     }
-    if (!errcode)
-    {
+    if (!errcode) {
         if (*bufp == '*')
             crp->flags |= DOM_STAR;
         bufp =
@@ -319,15 +280,13 @@ char *timestr;
         if (!bufp || !*bufp)
             errcode = 1;
     }
-    if (!errcode)
-    {
+    if (!errcode) {
         bufp = parse_cronlist(player, crp->month,
                               FIRST_MONTH, LAST_MONTH, bufp);
         if (!bufp || !*bufp)
             errcode = 1;
     }
-    if (!errcode)
-    {
+    if (!errcode) {
         if (*bufp == '*')
             crp->flags |= DOW_STAR;
         bufp =
@@ -344,8 +303,7 @@ char *timestr;
     if (bit_test(crp->dow, 7))
         bit_set(crp->dow, 0);
 
-    if (errcode)
-    {
+    if (errcode) {
         XFREE(crp->cronstr, "cron_entry.time");
         XFREE(crp, "cron_entry");
         return 0;
@@ -361,33 +319,23 @@ char *timestr;
     return 1;
 }
 
-void
-do_cron(player, cause, key, objstr, timestr)
-dbref player, cause;
-
-int key;
-
-char *objstr, *timestr;
-{
+void do_cron(dbref player, dbref cause, int key, char *objstr, char *timestr) {
     dbref thing;
 
     int attrib, retcode;
 
-    if (!timestr || !*timestr)
-    {
+    if (!timestr || !*timestr) {
         notify(player, "No times given.");
         return;
     }
 
     if (!parse_attrib(player, objstr, &thing, &attrib, 0) ||
-            (attrib == NOTHING) || !Good_obj(thing))
-    {
+            (attrib == NOTHING) || !Good_obj(thing)) {
         notify(player, "No match.");
         return;
     }
 
-    if (!Controls(player, thing))
-    {
+    if (!Controls(player, thing)) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
@@ -401,22 +349,15 @@ char *objstr, *timestr;
         notify(player, "Cron entry added.");
 }
 
-int
-cron_clr(thing, attr)
-dbref thing;
-
-int attr;
-{
+int cron_clr(dbref thing, int attr) {
     CRONTAB *crp, *next, *prev;
 
     int count;
 
     count = 0;
-    for (crp = cron_head, prev = NULL; crp != NULL;)
-    {
+    for (crp = cron_head, prev = NULL; crp != NULL;) {
         if ((crp->obj == thing) &&
-                ((attr == NOTHING) || (crp->atr == attr)))
-        {
+                ((attr == NOTHING) || (crp->atr == attr))) {
             count++;
             next = crp->next;
             XFREE(crp->cronstr, "cron_entry.time");
@@ -426,9 +367,7 @@ int attr;
             else
                 cron_head = next;
             crp = next;
-        }
-        else
-        {
+        } else {
             prev = crp;
             crp = crp->next;
         }
@@ -436,37 +375,26 @@ int attr;
     return count;
 }
 
-void
-do_crondel(player, cause, key, objstr)
-dbref player, cause;
-
-int key;
-
-char *objstr;
-{
+void do_crondel(dbref player, dbref cause, int key, char *objstr) {
     dbref thing;
 
     int attr, count;
 
-    if (!objstr || !*objstr)
-    {
+    if (!objstr || !*objstr) {
         notify(player, "No match.");
         return;
     }
 
     attr = NOTHING;
     if (!parse_attrib(player, objstr, &thing, &attr, 0) ||
-            (attr == NOTHING))
-    {
+            (attr == NOTHING)) {
         if ((*objstr != '#') ||
-                ((thing = parse_dbref(objstr + 1)) == NOTHING))
-        {
+                ((thing = parse_dbref(objstr + 1)) == NOTHING)) {
             notify(player, "No match.");
         }
     }
 
-    if (!Controls(player, thing))
-    {
+    if (!Controls(player, thing)) {
         notify(player, NOPERM_MESSAGE);
         return;
     }
@@ -475,14 +403,7 @@ char *objstr;
     notify(player, tprintf("Removed %d cron entries.", count));
 }
 
-void
-do_crontab(player, cause, key, objstr)
-dbref player, cause;
-
-int key;
-
-char *objstr;
-{
+void do_crontab(dbref player, dbref cause, int key, char *objstr) {
     dbref thing;
 
     int count;
@@ -493,19 +414,15 @@ char *objstr;
 
     ATTR *ap;
 
-    if (objstr && *objstr)
-    {
+    if (objstr && *objstr) {
         thing = match_thing(player, objstr);
         if (!Good_obj(thing))
             return;
-        if (!Controls(player, thing))
-        {
+        if (!Controls(player, thing)) {
             notify(player, NOPERM_MESSAGE);
             return;
         }
-    }
-    else
-    {
+    } else {
         thing = NOTHING;
     }
 
@@ -516,24 +433,19 @@ char *objstr;
      */
 
     count = 0;
-    for (crp = cron_head; crp != NULL; crp = crp->next)
-    {
+    for (crp = cron_head; crp != NULL; crp = crp->next) {
         if (((thing == NOTHING) &&
                 ((Owner(crp->obj) == player) || See_Queue(player))) ||
-                (crp->obj == thing))
-        {
+                (crp->obj == thing)) {
             count++;
             bufp = unparse_object(player, crp->obj, 0);
             ap = atr_num(crp->atr);
-            if (!ap)
-            {
+            if (!ap) {
                 notify(player,
                        tprintf
                        ("%s has a cron entry that contains bad attribute number %d.",
                         bufp, crp->atr));
-            }
-            else
-            {
+            } else {
                 notify(player, tprintf("%s/%s: %s", bufp,
                                        ap->name, crp->cronstr));
             }
@@ -549,9 +461,7 @@ char *objstr;
  * General timer things.
  */
 
-void
-NDECL(init_timer)
-{
+void  init_timer(void) {
     mudstate.now = time(NULL);
     mudstate.dump_counter = ((mudconf.dump_offset == 0) ?
                              mudconf.dump_interval : mudconf.dump_offset) + mudstate.now;
@@ -570,9 +480,7 @@ NDECL(init_timer)
     alarm(1);
 }
 
-void
-NDECL(dispatch)
-{
+void dispatch(void) {
     char *cmdsave;
 
     cmdsave = mudstate.debug_cmd;
@@ -600,8 +508,7 @@ NDECL(dispatch)
      */
 
     if ((mudconf.control_flags & CF_DBCHECK) &&
-            (mudstate.check_counter <= mudstate.now))
-    {
+            (mudstate.check_counter <= mudstate.now)) {
         mudstate.check_counter = mudconf.check_interval + mudstate.now;
         mudstate.debug_cmd = (char *)"< dbck >";
         do_dbck(NOTHING, NOTHING, 0);
@@ -615,8 +522,7 @@ NDECL(dispatch)
      */
 
     if ((mudconf.control_flags & CF_CHECKPOINT) &&
-            (mudstate.dump_counter <= mudstate.now))
-    {
+            (mudstate.dump_counter <= mudstate.now)) {
         mudstate.dump_counter = mudconf.dump_interval + mudstate.now;
         mudstate.debug_cmd = (char *)"< dump >";
         fork_and_dump(0);
@@ -627,8 +533,7 @@ NDECL(dispatch)
      */
 
     if ((mudconf.control_flags & CF_IDLECHECK) &&
-            (mudstate.idle_counter <= mudstate.now))
-    {
+            (mudstate.idle_counter <= mudstate.now)) {
         mudstate.idle_counter = mudconf.idle_interval + mudstate.now;
         mudstate.debug_cmd = (char *)"< idlecheck >";
         check_idle();
@@ -639,10 +544,8 @@ NDECL(dispatch)
      * Check for execution of attribute events
      */
 
-    if (mudconf.control_flags & CF_EVENTCHECK)
-    {
-        if (mudstate.now >= mudstate.events_counter)
-        {
+    if (mudconf.control_flags & CF_EVENTCHECK) {
+        if (mudstate.now >= mudstate.events_counter) {
             mudstate.debug_cmd = (char *)"< croncheck >";
             check_cron();
             mudstate.events_counter += 60;
@@ -654,15 +557,13 @@ NDECL(dispatch)
      * Memory use stats
      */
 
-    if (mudstate.mstats_counter <= mudstate.now)
-    {
+    if (mudstate.mstats_counter <= mudstate.now) {
 
         int curr;
 
         mudstate.mstats_counter = 15 + mudstate.now;
         curr = mudstate.mstat_curr;
-        if (mudstate.now > mudstate.mstat_secs[curr])
-        {
+        if (mudstate.now > mudstate.mstat_secs[curr]) {
 
             struct rusage usage;
 
@@ -690,14 +591,7 @@ NDECL(dispatch)
  * * do_timewarp: Adjust various internal timers.
  */
 
-void
-do_timewarp(player, cause, key, arg)
-dbref player, cause;
-
-int key;
-
-char *arg;
-{
+void do_timewarp(dbref player, dbref cause, int key, char *arg) {
     int secs;
 
     secs = (int)strtol(arg, (char **)NULL, 10);

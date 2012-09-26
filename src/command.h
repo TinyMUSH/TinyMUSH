@@ -5,20 +5,13 @@
 #ifndef __COMMAND_H
 #define __COMMAND_H
 
-#define CMD_NO_ARG(name) \
-    extern void FDECL(name, (dbref, dbref, int))
-#define CMD_ONE_ARG(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *))
-#define CMD_ONE_ARG_CMDARG(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *, char *[], int))
-#define CMD_TWO_ARG(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *, char *))
-#define CMD_TWO_ARG_CMDARG(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *, char *, char*[], int))
-#define CMD_TWO_ARG_ARGV(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *, char *[], int))
-#define CMD_TWO_ARG_ARGV_CMDARG(name) \
-    extern void FDECL(name, (dbref, dbref, int, char *, char *[], int, char*[], int))
+#define CMD_NO_ARG(name) extern void name(dbref, dbref, int)
+#define CMD_ONE_ARG(name) extern void name(dbref, dbref, int, char *)
+#define CMD_ONE_ARG_CMDARG(name) extern void name(dbref, dbref, int, char *, char *[], int)
+#define CMD_TWO_ARG(name) extern void name(dbref, dbref, int, char *, char *)
+#define CMD_TWO_ARG_CMDARG(name) extern void name(dbref, dbref, int, char *, char *, char*[], int)
+#define CMD_TWO_ARG_ARGV(name) extern void name(dbref, dbref, int, char *, char *[], int)
+#define CMD_TWO_ARG_ARGV_CMDARG(name) extern void name(dbref, dbref, int, char *, char *[], int, char*[], int)
 
 /* Command function handlers */
 
@@ -132,8 +125,7 @@ CMD_TWO_ARG(do_logwrite);	/* Write to the logfile */
 CMD_NO_ARG(do_logrotate);	/* Rotate the logfile */
 
 typedef struct addedentry ADDENT;
-struct addedentry
-{
+struct addedentry {
     dbref		thing;
     int		atr;
     char           *name;
@@ -141,8 +133,7 @@ struct addedentry
 };
 
 typedef struct cmdentry CMDENT;
-struct cmdentry
-{
+struct cmdentry {
     char           *cmdname;
     NAMETAB        *switches;
     int		perms;
@@ -152,8 +143,7 @@ struct cmdentry
     HOOKENT        *userperms;
     HOOKENT        *pre_hook;
     HOOKENT        *post_hook;
-    union
-    {
+    union {
         void            (*handler) ();
         ADDENT         *added;
     }		info;
@@ -244,7 +234,7 @@ struct cmdentry
 (check_access(p,(c)->perms) && \
  (!((c)->userperms) || check_userdef_access(p,(c)->userperms,a,n) || God(p)))
 
-extern int	FDECL(check_userdef_access, (dbref, HOOKENT *, char *[], int));
-extern char    *FDECL(process_command, (dbref, dbref, int, char *, char *[], int));
+extern int	check_userdef_access(dbref, HOOKENT *, char *[], int);
+extern char    *process_command(dbref, dbref, int, char *, char *[], int);
 
 #endif				/* __COMMAND_H */

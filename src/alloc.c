@@ -2,6 +2,7 @@
 
 #include "copyright.h"
 #include "config.h"
+#include "system.h"
 
 #include "game.h"	/* required by mudconf */
 #include "alloc.h"	/* required by mudconf */
@@ -9,7 +10,7 @@
 #include "htab.h"	/* required by mudconf */
 #include "ltdl.h"	/* required by mudconf */
 #include "udb.h"	/* required by mudconf */
-#include "udb_defs.h"	/* required by mudconf */ 
+#include "udb_defs.h"	/* required by mudconf */
 #include "mushconf.h"	/* required by code */
 #include "db.h"		/* required by externs.h */
 #include "externs.h"	/* required by code */
@@ -32,16 +33,13 @@ void pool_init(int poolnum, int poolsize) {
 }
 
 static void pool_err(const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason) {
-    if (!mudstate.logging)
-    {
+    if (!mudstate.logging) {
         STARTLOG(logflag, logsys, "ALLOC")
         log_printf("%s[%d] (tag %s) %s at %lx. (%s)",
                    action, pools[poolnum].pool_size, tag,
                    reason, (long)ph, mudstate.debug_cmd);
         ENDLOG
-    }
-    else if (logflag != LOG_ALLOCATE)
-    {
+    } else if (logflag != LOG_ALLOCATE) {
         log_printf("\n***< %s[%d] (tag %s) %s at %lx. >***",
                    action, pools[poolnum].pool_size, tag, reason, (long)ph);
     }
@@ -58,15 +56,13 @@ static void pool_vfy(int poolnum, const char *tag) {
 
     lastph = NULL;
     psize = pools[poolnum].pool_size;
-    for (ph = pools[poolnum].chain_head; ph; lastph = ph, ph = ph->next)
-    {
+    for (ph = pools[poolnum].chain_head; ph; lastph = ph, ph = ph->next) {
         h = (char *)ph;
         h += sizeof(POOLHDR);
         h += pools[poolnum].pool_size;
         pf = (POOLFTR *) h;
 
-        if (ph->magicnum != POOL_MAGICNUM)
-        {
+        if (ph->magicnum != POOL_MAGICNUM) {
             pool_err("BUG", LOG_ALWAYS, poolnum, tag, ph,
                      "Verify", "header corrupted (clearing freelist)");
 
@@ -83,14 +79,12 @@ static void pool_vfy(int poolnum, const char *tag) {
                 pools[poolnum].chain_head = NULL;
             return;	/* not safe to continue */
         }
-        if (pf->magicnum != POOL_MAGICNUM)
-        {
+        if (pf->magicnum != POOL_MAGICNUM) {
             pool_err("BUG", LOG_ALWAYS, poolnum, tag, ph,
                      "Verify", "footer corrupted");
             pf->magicnum = POOL_MAGICNUM;
         }
-        if (ph->pool_size != psize)
-        {
+        if (ph->pool_size != psize) {
             pool_err("BUG", LOG_ALWAYS, poolnum, tag, ph,
                      "Verify", "header has incorrect size");
         }
@@ -100,8 +94,7 @@ static void pool_vfy(int poolnum, const char *tag) {
 void pool_check(const char *tag) {
     int poolnum;
 
-    for (poolnum = 0; poolnum < NUM_POOLS; ++poolnum)
-    {
+    for (poolnum = 0; poolnum < NUM_POOLS; ++poolnum) {
         pool_vfy(poolnum, tag);
     }
 }
@@ -117,15 +110,12 @@ char *pool_alloc(int poolnum, const char *tag) {
 
     if (mudconf.paranoid_alloc)
         pool_check(tag);
-    do
-    {
-        if (pools[poolnum].free_head == NULL)
-        {
+    do {
+        if (pools[poolnum].free_head == NULL) {
             h = (char *)RAW_MALLOC(pools[poolnum].pool_size +
                                    sizeof(POOLHDR) + sizeof(POOLFTR),
                                    "pool_alloc.ph");
-            if (h == NULL)
-            {
+            if (h == NULL) {
                 mainlog_printf("ABORT! alloc.c, pool_alloc() failed to get memory.\n");
                 abort();
             }
@@ -142,9 +132,7 @@ char *pool_alloc(int poolnum, const char *tag) {
             *p = POOL_MAGICNUM;
             pools[poolnum].chain_head = ph;
             pools[poolnum].max_alloc++;
-        }
-        else
-        {
+        } else {
             ph = (POOLHDR *) (pools[poolnum].free_head);
             h = (char *)ph;
             h += sizeof(POOLHDR);
@@ -158,8 +146,7 @@ char *pool_alloc(int poolnum, const char *tag) {
              * freelist as the freelist pointer may be corrupt.
              */
 
-            if (ph->magicnum != POOL_MAGICNUM)
-            {
+            if (ph->magicnum != POOL_MAGICNUM) {
                 pool_err("BUG", LOG_ALWAYS, poolnum, tag, ph,
                          "Alloc", "corrupted buffer header");
 
@@ -179,15 +166,13 @@ char *pool_alloc(int poolnum, const char *tag) {
              * Check for corrupted footer, just report and fix it
              */
 
-            if (pf->magicnum != POOL_MAGICNUM)
-            {
+            if (pf->magicnum != POOL_MAGICNUM) {
                 pool_err("BUG", LOG_ALWAYS, poolnum, tag, ph,
                          "Alloc", "corrupted buffer footer");
                 pf->magicnum = POOL_MAGICNUM;
             }
         }
-    }
-    while (p == NULL);
+    } while (p == NULL);
 
     ph->buf_tag = (char *)tag;
     pools[poolnum].tot_alloc++;
@@ -199,8 +184,7 @@ char *pool_alloc(int poolnum, const char *tag) {
      * If the buffer was modified after it was last freed, log it.
      */
 
-    if ((*p != POOL_MAGICNUM) && (!mudstate.logging))
-    {
+    if ((*p != POOL_MAGICNUM) && (!mudstate.logging)) {
         pool_err("BUG", LOG_PROBLEMS, poolnum, tag, ph, "Alloc",
                  "buffer modified after free");
     }
@@ -232,8 +216,7 @@ void pool_free(int poolnum, char **buf) {
      * and throw away the buffer.
      */
 
-    if (ph->magicnum != POOL_MAGICNUM)
-    {
+    if (ph->magicnum != POOL_MAGICNUM) {
         pool_err("BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
                  "corrupted buffer header");
         pools[poolnum].num_lost++;
@@ -245,8 +228,7 @@ void pool_free(int poolnum, char **buf) {
      * Verify the buffer footer.  Don't unlink if damaged, just repair
      */
 
-    if (pf->magicnum != POOL_MAGICNUM)
-    {
+    if (pf->magicnum != POOL_MAGICNUM) {
         pool_err("BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
                  "corrupted buffer footer");
         pf->magicnum = POOL_MAGICNUM;
@@ -255,8 +237,7 @@ void pool_free(int poolnum, char **buf) {
      * Verify that we are not trying to free someone else's buffer
      */
 
-    if (ph->pool_size != pools[poolnum].pool_size)
-    {
+    if (ph->pool_size != pools[poolnum].pool_size) {
         pool_err("BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
                  "Attempt to free into a different pool.");
         return;
@@ -269,13 +250,10 @@ void pool_free(int poolnum, char **buf) {
      * log an error, otherwise update the pool header and stats
      */
 
-    if (*ibuf == POOL_MAGICNUM)
-    {
+    if (*ibuf == POOL_MAGICNUM) {
         pool_err("BUG", LOG_BUGS, poolnum, ph->buf_tag, ph, "Free",
                  "buffer already freed");
-    }
-    else
-    {
+    } else {
         *ibuf = POOL_MAGICNUM;
         ph->nxtfree = pools[poolnum].free_head;
         pools[poolnum].free_head = ph;
@@ -302,10 +280,8 @@ static void pool_trace(dbref player, int poolnum, const char *text) {
 
     numfree = 0;
     notify(player, tprintf("----- %s -----", text));
-    for (ph = pools[poolnum].chain_head; ph != NULL; ph = ph->next)
-    {
-        if (ph->magicnum != POOL_MAGICNUM)
-        {
+    for (ph = pools[poolnum].chain_head; ph != NULL; ph = ph->next) {
+        if (ph->magicnum != POOL_MAGICNUM) {
             notify(player,
                    "*** CORRUPTED BUFFER HEADER, ABORTING SCAN ***");
             notify(player,
@@ -332,8 +308,7 @@ void list_bufstats(dbref player) {
     notify(player,
            "Buffer Stats     Size    InUse    Total   Allocs     Lost");
 
-    for (i = 0; i < NUM_POOLS; i++)
-    {
+    for (i = 0; i < NUM_POOLS; i++) {
         buff = pool_stats(i, poolnames[i]);
         notify(player, buff);
         free_mbuf(buff);
@@ -355,28 +330,20 @@ void pool_reset(void) {
     char *h;
 
 
-    for (i = 0; i < NUM_POOLS; i++)
-    {
+    for (i = 0; i < NUM_POOLS; i++) {
         newchain = NULL;
-        for (ph = pools[i].chain_head; ph != NULL; ph = phnext)
-        {
+        for (ph = pools[i].chain_head; ph != NULL; ph = phnext) {
             h = (char *)ph;
             phnext = ph->next;
             h += sizeof(POOLHDR);
             ibuf = (int *)h;
-            if (*ibuf == POOL_MAGICNUM)
-            {
+            if (*ibuf == POOL_MAGICNUM) {
                 RAW_FREE(ph, "pool_reset.ph");
-            }
-            else
-            {
-                if (!newchain)
-                {
+            } else {
+                if (!newchain) {
                     newchain = ph;
                     ph->next = NULL;
-                }
-                else
-                {
+                } else {
                     ph->next = newchain;
                     newchain = ph;
                 }
@@ -413,8 +380,7 @@ void list_rawmemory(dbref player) {
     raw_notify(player,
                "Memory Tag                           Allocs      Bytes");
 
-    for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
-    {
+    for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next) {
         n_tags++;
         total += (int)tptr->alloc;
     }
@@ -423,35 +389,29 @@ void list_rawmemory(dbref player) {
                                        "list_rawmemory");
 
     for (i = 0, tptr = mudstate.raw_allocs; tptr != NULL;
-            i++, tptr = tptr->next)
-    {
+            i++, tptr = tptr->next) {
         t_array[i] = tptr;
     }
 
     qsort((void *)t_array, n_tags, sizeof(MEMTRACK *),
           (int (*)(const void *, const void *))sort_memtable);
 
-    for (i = 0; i < n_tags;)
-    {
+    for (i = 0; i < n_tags;) {
         u_tags++;
         ntmp = t_array[i]->buf_tag;
-        if ((i < n_tags - 1) && !strcmp(ntmp, t_array[i + 1]->buf_tag))
-        {
+        if ((i < n_tags - 1) && !strcmp(ntmp, t_array[i + 1]->buf_tag)) {
             c_tags = 2;
             c_total =
                 (int)t_array[i]->alloc + (int)t_array[i +
                         1]->alloc;
             for (j = i + 2;
                     (j < n_tags) && !strcmp(ntmp, t_array[j]->buf_tag);
-                    j++)
-            {
+                    j++) {
                 c_tags++;
                 c_total += (int)t_array[j]->alloc;
             }
             i = j;
-        }
-        else
-        {
+        } else {
             c_tags = 1;
             c_total = (int)t_array[i]->alloc;
             i++;
@@ -493,12 +453,9 @@ static void trace_free(const char *name, void (ptr) {
     MEMTRACK *tptr, *prev;
 
     prev = NULL;
-    for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
-    {
-        if (tptr->bptr == ptr)
-        {
-            if (strcmp(tptr->buf_tag, name))
-            {
+    for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next) {
+        if (tptr->bptr == ptr) {
+            if (strcmp(tptr->buf_tag, name)) {
                 STARTLOG(LOG_BUGS, "MEM", "TRACE")
                 log_printf
                 ("Free mismatch, tag %s allocated as %s",

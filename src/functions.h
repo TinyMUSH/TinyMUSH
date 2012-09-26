@@ -12,8 +12,7 @@
 
 #define MAX_NFARGS 30
 
-typedef struct fun
-{
+typedef struct fun {
     const char     *name;	/* Function name */
     void            (*fun) ();	/* Handler */
     int		nargs;	/* Number of args needed or expected */
@@ -22,8 +21,7 @@ typedef struct fun
     EXTFUNCS       *xperms;	/* Extended access to function */
 }		FUN;
 
-typedef struct ufun
-{
+typedef struct ufun {
     char           *name;	/* Function name */
     dbref		obj;	/* Object ID */
     int		atr;	/* Attribute ID */
@@ -32,28 +30,24 @@ typedef struct ufun
     struct ufun    *next;	/* Next ufun in chain */
 }		UFUN;
 
-typedef struct delim
-{
+typedef struct delim {
     size_t		len;
     char		str       [MAX_DELIM_LEN];
 }		Delim;
 
 typedef struct var_entry VARENT;
-struct var_entry
-{
+struct var_entry {
     char           *text;	/* variable text */
 };
 
 typedef struct component_def COMPONENT;
-struct component_def
-{
+struct component_def {
     int             (*typer_func) ();	/* type-checking handler */
     char           *def_val;/* default value */
 };
 
 typedef struct structure_def STRUCTDEF;
-struct structure_def
-{
+struct structure_def {
     char           *s_name;	/* name of the structure */
     char          **c_names;/* array of component names */
     COMPONENT     **c_array;/* array of pointers to components */
@@ -67,27 +61,23 @@ struct structure_def
 };
 
 typedef struct instance_def INSTANCE;
-struct instance_def
-{
+struct instance_def {
     STRUCTDEF      *datatype;	/* pointer to structure data type def */
 };
 
 typedef struct data_def STRUCTDATA;
-struct data_def
-{
+struct data_def {
     char           *text;
 };
 
 typedef struct object_stack OBJSTACK;
-struct object_stack
-{
+struct object_stack {
     char           *data;
     OBJSTACK       *next;
 };
 
 typedef struct object_grid OBJGRID;
-struct object_grid
-{
+struct object_grid {
     int		rows;
     int		cols;
     char         ***data;
@@ -118,27 +108,29 @@ typedef int	NVAL;
 
 extern const Delim SPACE_DELIM;
 
-extern char    *FDECL(trim_space_sep, (char *, const Delim *));
-extern char    *FDECL(next_token, (char *, const Delim *));
-extern char    *FDECL(split_token, (char **, const Delim *));
-extern char    *FDECL(next_token_ansi, (char *, const Delim *, int *));
-extern int	FDECL(countwords, (char *, const Delim *));
-extern int	FDECL(list2arr, (char ***, int, char *, const Delim *));
-extern void	FDECL(arr2list, (char **, int, char *, char **, const Delim *));
-extern int	FDECL(list2ansi, (int *, int *, int, char *, const Delim *));
-extern void FDECL(do_reverse, (char *, char *));
-extern int	FDECL(fn_range_check, (const char *, int, int, int, char *, char **));
-extern int	FDECL(delim_check, (char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int));
+extern char    *trim_space_sep(char *, const Delim *);
+extern char    *next_token(char *, const Delim *);
+extern char    *split_token(char **, const Delim *);
+extern char    *next_token_ansi(char *, const Delim *, int *);
+extern int	countwords(char *, const Delim *);
+extern int	list2arr(char ***, int, char *, const Delim *);
+extern void	arr2list(char **, int, char *, char **, const Delim *);
+extern int	list2ansi(int *, int *, int, char *, const Delim *);
+extern void do_reverse(char *, char *);
+extern int	fn_range_check(const char *, int, int, int, char *, char **);
+extern int	delim_check(char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int);
 
 /*
  * ---------------------------------------------------------------------------
  * Function prototype macro.
  */
 
+/*
 #define FUNCTION_ARGLIST buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs
+*/
 
 #define	FUNCTION(x)	\
-    void x( FUNCTION_ARGLIST ) \
+    void x( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs ) \
 	char *buff, **bufc; \
 	dbref player, caller, cause; \
 	char *fargs[], *cargs[]; \
@@ -166,7 +158,7 @@ memcpy((sep_dest), (sep_src), \
  */
 
 #define VaChk_Sep(xsep, xargnum, xflags) \
-if (!delim_check( FUNCTION_ARGLIST, xargnum, xsep, xflags)) \
+if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xargnum, xsep, xflags)) \
 	return
 
 #define VaChk_InSep(xargnum, xflags) \
@@ -227,7 +219,7 @@ if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, xminargs, xnargs, \
 
 #define VaChk_Only_InPure(xnargs) \
 VaChk_Range(xnargs-1, xnargs); \
-if (!delim_check( FUNCTION_ARGLIST, xnargs, &isep, 0)) \
+if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xnargs, &isep, 0)) \
 	return
 
 #define VaChk_Only_In(xnargs) \
@@ -240,7 +232,7 @@ VaChk_OutSep(xnargs, 0)
 
 #define VaChk_InPure(xminargs, xnargs) \
 VaChk_Range(xminargs, xnargs); \
-if (!delim_check( FUNCTION_ARGLIST, xnargs, &isep, 0)) \
+if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xnargs, &isep, 0)) \
 	return
 
 #define VaChk_In(xminargs, xnargs) \
