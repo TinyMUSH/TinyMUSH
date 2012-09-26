@@ -74,7 +74,7 @@ void do_version(dbref player, dbref cause, int extra) {
     }
 }
 
-void init_version() {
+void init_version(void) {
 
     /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Revision.Status
         Major version	: The main branch.

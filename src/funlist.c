@@ -1136,7 +1136,7 @@ static int u_comp(const void *s1, const void *s2) {
     return n;
 }
 
-static void sane_qsort(void *array[], int left, int right, int (*compare) ()) {
+static void sane_qsort(void *array[], int left, int right, int (*compare)(const void *, const void *)) {
     /*
      * Andrew Molitor's qsort, which doesn't require transitivity between
      * comparisons (essential for preventing crashes due to boneheads who

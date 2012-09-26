@@ -125,7 +125,7 @@ struct module_version_data {
 typedef struct confparm CONF;
 struct confparm {
     char *pname;		/* parm name */
-    int (*interpreter) ();	/* routine to interp parameter */
+    int (*interpreter)();	/* routine to interp parameter */
     int flags;		/* control flags */
     int rperms;		/* read permission flags */
     int *loc;		/* where to store value */

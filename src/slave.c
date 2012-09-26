@@ -32,12 +32,7 @@ volatile pid_t child_pids[MAX_CHILDREN];
 
 char *arg_for_errors;
 
-char *
-format_inet_addr(dest, addr)
-char *dest;
-
-unsigned long addr;
-{
+char *format_inet_addr(char *dest, unsigned long addr) {
     sprintf(dest, "%lu.%lu.%lu.%lu",
             (addr & 0xFF000000) >> 24,
             (addr & 0x00FF0000) >> 16,

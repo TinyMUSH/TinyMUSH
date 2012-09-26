@@ -51,9 +51,7 @@ extern void warning(char *, ...);
 
 extern void log_db_err(int, int, const char *);
 
-void
-dddb_setsync(flag)
-int flag;
+void dddb_setsync(int flag)
 {
     char *gdbm_error;
 
@@ -64,10 +62,7 @@ int flag;
     }
 }
 
-static void
-dbm_error(msg)
-char *msg;
-{
+static void dbm_error(char *msg) {
     STARTLOG(LOG_ALWAYS, "DB", "ERROR")
     log_printf("Database error: %s\n", msg);
     ENDLOG
@@ -75,16 +70,14 @@ char *msg;
 
 /* gdbm_reorganize compresses unused space in the db */
 
-int
-dddb_optimize() {
+int dddb_optimize(void) {
     int i;
 
     i = gdbm_reorganize(dbp);
     return i;
 }
 
-int
-dddb_init() {
+int dddb_init(void) {
     static char *copen = "db_init cannot open ";
 
     char tmpfile[256];
@@ -179,10 +172,7 @@ dddb_init() {
     return (0);
 }
 
-int
-dddb_setfile(fil)
-char *fil;
-{
+int dddb_setfile(char *fil) {
     char *xp;
 
     if (db_initted)
@@ -198,8 +188,7 @@ char *fil;
     return (0);
 }
 
-int
-dddb_close() {
+int dddb_close(void) {
     if (dbp != (GDBM_FILE) 0) {
         gdbm_close(dbp);
         dbp = (GDBM_FILE) 0;
@@ -212,12 +201,7 @@ dddb_close() {
  * key to guard against namespace conflicts in different MUSH subsystems.
  * It is the caller's responsibility to free the data returned by db_get */
 
-DBData
-db_get(gamekey, type)
-DBData gamekey;
-
-unsigned int type;
-{
+DBData db_get(DBData gamekey, unsigned int type) {
     DBData gamedata;
 
     char *s;
@@ -266,14 +250,7 @@ unsigned int type;
 
 /* Pass db_put a key, data and the type of entry you are storing */
 
-int
-db_put(gamekey, gamedata, type)
-DBData gamekey;
-
-DBData gamedata;
-
-unsigned int type;
-{
+int db_put(DBData gamekey, DBData gamedata, unsigned int type) {
     char *s;
 
     if (!db_initted)
@@ -311,12 +288,7 @@ unsigned int type;
 
 /* Pass db_del a key and the type of entry you are deleting */
 
-int
-db_del(gamekey, type)
-DBData gamekey;
-
-unsigned int type;
-{
+int db_del(DBData gamekey, unsigned int type) {
     char *s;
 
     if (!db_initted) {
@@ -361,8 +333,7 @@ unsigned int type;
     return (0);
 }
 
-void
-db_lock() {
+void db_lock(void) {
     /*
      * Attempt to lock the DBM file. Block until the lock is cleared,
      * then set it.
@@ -383,8 +354,7 @@ db_lock() {
     }
 }
 
-void
-db_unlock() {
+void db_unlock(void) {
     if (mudstate.dbm_fd == -1)
         return;
 

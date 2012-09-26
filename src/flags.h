@@ -120,8 +120,7 @@ typedef struct flag_entry {
     int		flagflag;	/* Ctrl flags for this flag
 					 * (recursive? :-) */
     int		listperm;	/* Who sees this flag when set */
-    int             (*handler) ();	/* Handler for setting/clearing this
-					 * flag */
+    int		(*handler)();	/* Handler for setting/clearing this flag */
 }		FLAGENT;
 
 /*
