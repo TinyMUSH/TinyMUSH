@@ -25,57 +25,57 @@
 #include "pcre.h"		/* required by code */
 //#include "ltdl.h"
 
-extern void NDECL(init_attrtab);
+extern void init_attrtab(void);
 
-extern void NDECL(init_cmdtab);
+extern void init_cmdtab(void);
 
-extern void NDECL(cf_init);
+extern void cf_init(void);
 
-extern void NDECL(pcache_init);
+extern void pcache_init(void);
 
-extern int FDECL(cf_read, (char *fn));
+extern int cf_read(char *fn);
 
-extern void NDECL(init_functab);
+extern void init_functab(void);
 
-extern void FDECL(close_sockets, (int emergency, char *message));
+extern void close_sockets(int emergency, char *message);
 
-extern void NDECL(init_version);
+extern void init_version(void);
 
-extern void NDECL(init_logout_cmdtab);
+extern void init_logout_cmdtab(void);
 
-extern void NDECL(init_timer);
+extern void init_timer(void);
 
-extern void FDECL(raw_notify_html, (dbref, char *));
+extern void raw_notify_html(dbref, char *);
 
-extern void FDECL(do_dbck, (dbref, dbref, int));
+extern void do_dbck(dbref, dbref, int);
 
-extern void FDECL(logfile_init, (char *));
+extern void logfile_init(char *);
 
-extern void FDECL(init_genrand, (unsigned long));
+extern void init_genrand(unsigned long);
 
-void FDECL(fork_and_dump, (int));
+void fork_and_dump(int);
 
-void NDECL(dump_database);
+void dump_database(void);
 
-dbref FDECL(db_read_flatfile, (FILE *, int *, int *, int *));
+dbref db_read_flatfile(FILE *, int *, int *, int *);
 
-void NDECL(pcache_sync);
+void pcache_sync(void);
 
-static void NDECL(init_rlimit);
+static void init_rlimit(void);
 
-extern int FDECL(add_helpfile, (dbref, char *, char *, int));
+extern int add_helpfile(dbref, char *, char *, int);
 
-extern void NDECL(vattr_init);
+extern void vattr_init(void);
 
-extern void NDECL(load_restart_db);
+extern void load_restart_db(void);
 
-extern void NDECL(tcache_init);
+extern void tcache_init(void);
 
-extern void FDECL(helpindex_load, (dbref));
+extern void helpindex_load(dbref);
 
-extern void NDECL(helpindex_init);
+extern void helpindex_init(void);
 
-extern int NDECL(dddb_optimize);
+extern int dddb_optimize(void);
 
 extern LOGFILETAB logfds_table[];
 
@@ -98,12 +98,7 @@ extern int optind;
  * execution
  */
 
-void
-do_dump(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_dump(dbref player, dbref cause, int key) {
     if (mudstate.dumping)
     {
         notify(player, "Dumping. Please try again later.");
@@ -118,11 +113,7 @@ int key;
  * Hashtable resize.
  */
 
-void
-do_hashresize(player, cause, key)
-dbref player, cause;
-
-int key;
+void do_hashresize(dbref player, dbref cause, int key)
 {
     MODULE *mp;
 
@@ -188,18 +179,7 @@ int key;
 
 #define PCRE_MAX_OFFSETS 99
 
-int
-regexp_match(pattern, str, case_opt, args, nargs)
-char *pattern;
-
-char *str;
-
-int case_opt;
-
-char *args[];
-
-int nargs;
-{
+int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs) {
     int i;
 
     pcre *re;
@@ -274,15 +254,7 @@ int nargs;
  * atr_match: Check attribute list for wild card matches and queue them.
  */
 
-static int
-atr_match1(thing, parent, player, type, str, raw_str, check_exclude,
-           hash_insert)
-dbref thing, parent, player;
-
-char type, *str, *raw_str;
-
-int check_exclude, hash_insert;
-{
+static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, char *raw_str, int check_exclude, int hash_insert) {
     dbref aowner;
 
     int match, attr, aflags, alen, i;
@@ -399,14 +371,7 @@ int check_exclude, hash_insert;
     return (match);
 }
 
-int
-atr_match(thing, player, type, str, raw_str, check_parents)
-dbref thing, player;
-
-char type, *str, *raw_str;
-
-int check_parents;
-{
+int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, int check_parents) {
     int match, lev, result, exclude, insert;
 
     dbref parent;
@@ -463,14 +428,7 @@ int check_parents;
  * optionally notify the contents, neighbors, and location also.
  */
 
-int
-check_filter(object, player, filter, msg)
-dbref object, player;
-
-int filter;
-
-const char *msg;
-{
+int check_filter(dbref object, dbref player, int filter, const char *msg) {
     int aflags, alen;
 
     dbref aowner;
@@ -552,14 +510,7 @@ const char *msg;
     return (1);
 }
 
-static char *
-add_prefix(object, player, prefix, msg, dflt)
-dbref object, player;
-
-int prefix;
-
-const char *msg, *dflt;
-{
+static char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const char *dflt) {
     int aflags, alen;
 
     dbref aowner;
@@ -593,10 +544,7 @@ const char *msg, *dflt;
     return (buf);
 }
 
-static char *
-dflt_from_msg(sender, sendloc)
-dbref sender, sendloc;
-{
+static char *dflt_from_msg(dbref sender, dbref sendloc) {
     char *tp, *tbuff;
 
     tp = tbuff = alloc_lbuf("notify_check.fwdlist");
@@ -621,14 +569,7 @@ dbref sender, sendloc;
  * 'dest', just pass in a 0 for 'destp'.
  */
 
-void
-html_escape(src, dest, destp)
-const char *src;
-
-char *dest;
-
-char **destp;
-{
+void html_escape(const char *src, char *dest, char **destp) {
     const char *msg_orig;
 
     char *temp;
@@ -674,14 +615,7 @@ char **destp;
 			    ((key & MSG_MOVE) && Check_Notices((p),(t))) || \
 			    ((key & MSG_PRESENCE) && Check_Knows((p),(t))))))
 
-void
-notify_check(target, sender, msg, key)
-dbref target, sender;
-
-int key;
-
-const char *msg;
-{
+void notify_check(dbref target, dbref sender, const char *msg, int key) {
     char *msg_ns, *mp, *tbuff, *tp, *buff;
 
     char *args[NUM_ENV_VARS];
@@ -1181,14 +1115,7 @@ const char *msg;
     mudstate.ntfy_nest_lev--;
 }
 
-void
-notify_except(loc, player, exception, msg, flags)
-dbref loc, player, exception;
-
-const char *msg;
-
-int flags;
-{
+void notify_except(dbref loc, dbref player, dbref exception, const char *msg, int flags) {
     dbref first;
 
     if (loc != exception)
@@ -1205,14 +1132,7 @@ int flags;
     }
 }
 
-void
-notify_except2(loc, player, exc1, exc2, msg, flags)
-dbref loc, player, exc1, exc2;
-
-const char *msg;
-
-int flags;
-{
+void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, const char *msg, int flags) {
     dbref first;
 
     if ((loc != exc1) && (loc != exc2))
@@ -1235,12 +1155,7 @@ int flags;
  */
 
 #ifndef NO_TIMECHECKING
-static void
-report_timecheck(player, yes_screen, yes_log, yes_clear)
-dbref player;
-
-int yes_screen, yes_log, yes_clear;
-{
+static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear) {
     int thing, obj_counted;
 
     long used_msecs, total_msecs;
@@ -1315,22 +1230,12 @@ int yes_screen, yes_log, yes_clear;
         mudstate.cpu_count_from = time(NULL);
 }
 #else
-static void
-report_timecheck(player, yes_screen, yes_log, yes_clear)
-dbref player;
-
-int yes_screen, yes_log, yes_clear;
-{
+static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear) {
     raw_notify(player, "Sorry, this command has been disabled.");
 }
 #endif				/* ! NO_TIMECHECKING */
 
-void
-do_timecheck(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_timecheck(dbref player, dbref cause, int key) {
     int yes_screen, yes_log, yes_clear;
 
     yes_screen = yes_log = yes_clear = 0;
@@ -1362,10 +1267,7 @@ int key;
  * Miscellaneous startup/stop routines.
  */
 
-void
-write_pidfile(fn)
-char *fn;
-{
+void write_pidfile(char *fn) {
     FILE *f;
 
     if ((f = fopen(fn, "w")) != NULL)
@@ -1381,14 +1283,7 @@ char *fn;
     }
 }
 
-void
-do_shutdown(player, cause, key, message)
-dbref player, cause;
-
-int key;
-
-char *message;
-{
+void do_shutdown(dbref player, dbref cause, int key, char *message) {
     int fd;
 
     if (key & SHUTDN_COREDUMP)
@@ -1447,10 +1342,7 @@ char *message;
     return;
 }
 
-void
-dump_database_internal(dump_type)
-int dump_type;
-{
+void dump_database_internal(int dump_type) {
     char tmpfile[256], prevfile[256], *c;
 
     FILE *f = NULL;
@@ -1577,8 +1469,7 @@ int dump_type;
     }
 }
 
-void
-NDECL(dump_database)
+void dump_database(void)
 {
     mudstate.epoch++;
     mudstate.dumping = 1;
@@ -1592,10 +1483,7 @@ NDECL(dump_database)
     ENDLOG mudstate.dumping = 0;
 }
 
-void
-fork_and_dump(key)
-int key;
-{
+void fork_and_dump(int key) {
     if (*mudconf.dump_msg)
         raw_broadcast(0, "%s", mudconf.dump_msg);
 
@@ -1671,9 +1559,7 @@ int key;
         raw_broadcast(0, "%s", mudconf.postdump_msg);
 }
 
-static int
-NDECL(load_game)
-{
+static int load_game(void) {
     FILE *f;
 
     MODULE *mp;
@@ -1720,14 +1606,7 @@ NDECL(load_game)
 
 /* match a list of things, using the no_command flag */
 
-int
-list_check(thing, player, type, str, raw_str, check_parent, stop_status)
-dbref thing, player;
-
-char type, *str, *raw_str;
-
-int check_parent, *stop_status;
-{
+int list_check(dbref thing, dbref player, char type, char *str, char *raw_str, int check_parent, int *stop_status) {
     int match;
 
     match = 0;
@@ -1757,10 +1636,7 @@ int check_parent, *stop_status;
     return match;
 }
 
-int
-Hearer(thing)
-dbref thing;
-{
+int Hearer(dbref thing) {
     char *as, *buff, *s;
 
     dbref aowner;
@@ -1817,14 +1693,7 @@ dbref thing;
  * Write message to logfile.
  */
 
-void
-do_logwrite(player, cause, key, msgtype, message)
-dbref player, cause;
-
-int key;
-
-char *msgtype, *message;
-{
+void do_logwrite(dbref player, dbref cause, int key, char *msgtype, char *message) {
     const char *mt;
 
     char *msg, *p;
@@ -1860,16 +1729,11 @@ char *msgtype, *message;
 }
 
 /*
- * ---------------------------------------------------------------------- Log
- * rotation.
+ * ----------------------------------------------------------------------
+ * Log rotation.
  */
 
-void
-do_logrotate(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_logrotate(dbref player, dbref cause, int key) {
     LOGFILETAB *lp;
 
     mudstate.mudlognum++;
@@ -1917,19 +1781,12 @@ int key;
  * Database and startup stuff.
  */
 
-void
-do_readcache(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_readcache(dbref player, dbref cause, int key) {
     helpindex_load(player);
     fcache_load(player);
 }
 
-static void
-NDECL(process_preload)
-{
+static void process_preload(void) {
     dbref thing, parent, aowner;
 
     int aflags, alen, lev, i;
@@ -2044,10 +1901,7 @@ NDECL(process_preload)
  * info: display info about the file being read or written.
  */
 
-void
-info(fmt, flags, ver)
-int fmt, flags, ver;
-{
+void info(int fmt, int flags, int ver) {
     const char *cp;
 
     switch (fmt)
@@ -2115,10 +1969,7 @@ int fmt, flags, ver;
     mainlog_printf("\n");
 }
 
-void
-usage(prog)
-char *prog;
-{
+void usage(char *prog) {
     mainlog_printf("Usage: %s [options] gdbm-file [< in-file] [> out-file]\n", prog);
     mainlog_printf("   Available flags are:\n");
     mainlog_printf("      -c <filename> - Config file     -C - Perform consistency check\n");
@@ -2136,12 +1987,7 @@ char *prog;
     mainlog_printf("      -<number> - Set output version number\n");
 }
 
-int
-dbconvert(argc, argv)
-int argc;
-
-char *argv[];
-{
+int dbconvert(int argc, char *argv[]) {
     int setflags, clrflags, ver;
 
     int db_ver, db_format, db_flags, do_check, do_write;
@@ -2400,12 +2246,7 @@ char *argv[];
     exit(0);
 }
 
-int
-main(argc, argv)
-int argc;
-
-char *argv[];
-{
+int main(int argc, char *argv[]) {
     int mindb = 0;
 
     CMDENT *cmdp;
@@ -2796,9 +2637,7 @@ char *argv[];
     exit(0);
 }
 
-static void
-NDECL(init_rlimit)
-{
+static void init_rlimit(void) {
 #if defined(HAVE_SETRLIMIT) && defined(RLIMIT_NOFILE)
     struct rlimit *rlp;
 

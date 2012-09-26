@@ -22,16 +22,11 @@
 #include "command.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-static void FDECL(show_a_desc, (dbref, dbref, const char *));
+static void show_a_desc(dbref, dbref, const char *);
 
-extern void FDECL(ufun, (char *, char *, int, int, int, dbref, dbref));
+extern void ufun(char *, char *, int, int, int, dbref, dbref);
 
-static int
-did_attr(player, thing, what)
-dbref player, thing;
-
-int what;
-{
+static int did_attr(dbref player, dbref thing, int what) {
     /*
      * If the attribute exists, get it, notify the player, return 1.
      * * If not, return 0.
@@ -49,12 +44,7 @@ int what;
     return 0;
 }
 
-static void
-look_exits(player, loc, exit_name)
-dbref player, loc;
-
-const char *exit_name;
-{
+static void look_exits(dbref player, dbref loc, const char *exit_name) {
     dbref thing, parent;
 
     char *buff, *e, *buff1, *e1;
@@ -235,14 +225,7 @@ const char *exit_name;
 #define CONTENTS_NESTED 1
 #define CONTENTS_REMOTE 2
 
-static void
-look_contents(player, loc, contents_name, style)
-dbref player, loc;
-
-const char *contents_name;
-
-int style;
-{
+static void look_contents(dbref player, dbref loc, const char *contents_name, int style) {
     dbref thing;
 
     dbref can_see_loc;
@@ -259,7 +242,7 @@ int style;
      * Check if we're formatting contents in a player-specified way.
      */
 
-    if (did_attr(player, loc, A_LCON_FMT, NULL))
+    if (did_attr(player, loc, A_LCON_FMT))
         return;
 
 #ifdef PUEBLO_SUPPORT
@@ -358,14 +341,7 @@ int style;
 #endif
 }
 
-static void
-pairs_print(player, atext, buff, bufc)
-dbref player;
-
-char *atext, *buff;
-
-char **bufc;
-{
+static void pairs_print(dbref player, char *atext, char *buff, char **bufc) {
     int pos, depth;
 
     char *str, *strbuf, *parenlist, *endp;
@@ -528,14 +504,7 @@ char **bufc;
     free_lbuf(parenlist);
 }
 
-static void
-pretty_format(dest, cp, p)
-char *dest;
-
-char **cp;
-
-char *p;
-{
+static void pretty_format(char *dest, char **cp, char *p) {
     /*
      * Pretty-print an attribute into a buffer (assumed to be an lbuf).
      */
@@ -602,10 +571,7 @@ char *p;
         safe_crlf(dest, cp);
 }
 
-static void
-pretty_print(dest, name, text)
-char *dest, *name, *text;
-{
+static void pretty_print(char *dest, char *name, char *text) {
     char *cp, *p, *word;
 
     cp = dest;
@@ -692,16 +658,7 @@ char *dest, *name, *text;
 }
 
 
-static void
-view_atr(player, thing, ap, raw_text, aowner, aflags, skip_tag, is_special)
-dbref player, thing, aowner;
-
-int aflags, skip_tag, is_special;
-
-ATTR *ap;
-
-char *raw_text;
-{
+static void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special) {
     char *text, *buf, *bp, *name_buf, *bb_p;
 
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
@@ -878,12 +835,7 @@ char *raw_text;
         free_lbuf(text);
 }
 
-static void
-look_atrs1(player, thing, othing, check_exclude, hash_insert, is_special)
-dbref player, thing, othing;
-
-int check_exclude, hash_insert, is_special;
-{
+static void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special) {
     dbref aowner;
 
     int ca, aflags, alen;
@@ -938,12 +890,7 @@ int check_exclude, hash_insert, is_special;
     XFREE(cattr, "look_atrs1");
 }
 
-static void
-look_atrs(player, thing, check_parents, is_special)
-dbref player, thing;
-
-int check_parents, is_special;
-{
+static void look_atrs(dbref player, dbref thing, int check_parents, int is_special) {
     dbref parent;
 
     int lev, check_exclude, hash_insert;
@@ -968,12 +915,7 @@ int check_parents, is_special;
     }
 }
 
-static void
-look_simple(player, thing, obey_terse)
-dbref player, thing;
-
-int obey_terse;
-{
+static void look_simple(dbref player, dbref thing, int obey_terse) {
     char *buff;
 
     /*
@@ -1012,12 +954,7 @@ int obey_terse;
 }
 
 #ifdef PUEBLO_SUPPORT
-static void
-show_a_desc(player, loc, msg)
-dbref player, loc;
-
-const char *msg;
-{
+static void show_a_desc(dbref player, dbref loc, const char *msg) {
     char *got2;
 
     dbref aowner;
@@ -1056,12 +993,7 @@ const char *msg;
 }
 #endif
 
-static void
-show_desc(player, loc, key)
-dbref player, loc;
-
-int key;
-{
+static void show_desc(dbref player, dbref loc, int key) {
     char *got;
 
     dbref aowner;
@@ -1109,12 +1041,7 @@ int key;
     }
 }
 
-void
-look_in(player, loc, key)
-dbref player, loc;
-
-int key;
-{
+void look_in(dbref player, dbref loc, int key) {
     int pattr, oattr, aattr, is_terse, showkey;
 
     char *buff;
@@ -1212,14 +1139,7 @@ int key;
         look_exits(player, loc, "Obvious exits:");
 }
 
-static void
-look_here(player, thing, key, look_key)
-dbref player, thing;
-
-int key;
-
-int look_key;
-{
+static void look_here(dbref player, dbref thing, int key, int look_key) {
     if (Good_obj(thing))
     {
         if (key & LOOK_OUTSIDE)
@@ -1236,14 +1156,7 @@ int look_key;
     }
 }
 
-void
-do_look(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_look(dbref player, dbref cause, int key, char *name) {
     dbref thing, loc, look_key;
 
     look_key = LK_SHOWATTR | LK_SHOWEXIT;
@@ -1334,10 +1247,7 @@ char *name;
 }
 
 
-static void
-debug_examine(player, thing)
-dbref player, thing;
-{
+static void debug_examine(dbref player, dbref thing) {
     dbref aowner;
 
     char *buf;
@@ -1418,12 +1328,7 @@ dbref player, thing;
     }
 }
 
-static void
-exam_wildattrs(player, thing, do_parent, is_special)
-dbref player, thing;
-
-int do_parent, is_special;
-{
+static void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special) {
     int atr, aflags, alen, got_any;
 
     char *buf;
@@ -1517,14 +1422,7 @@ int do_parent, is_special;
         notify_quiet(player, "No matching attributes found.");
 }
 
-void
-do_examine(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_examine(dbref player, dbref cause, int key, char *name) {
     dbref thing, content, exit, aowner, loc;
 
     char savec;
@@ -1907,24 +1805,14 @@ char *name;
     }
 }
 
-void
-do_score(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_score(dbref player, dbref cause, int key) {
     notify(player,
            tprintf("You have %d %s.", Pennies(player),
                    (Pennies(player) == 1) ?
                    mudconf.one_coin : mudconf.many_coins));
 }
 
-void
-do_inventory(player, cause, key)
-dbref player, cause;
-
-int key;
-{
+void do_inventory(dbref player, dbref cause, int key) {
     dbref thing;
 
     char *buff, *e;
@@ -1965,14 +1853,7 @@ int key;
     do_score(player, player, 0);
 }
 
-void
-do_entrances(player, cause, key, name)
-dbref player, cause;
-
-int key;
-
-char *name;
-{
+void do_entrances(dbref player, dbref cause, int key, char *name) {
     dbref thing, i, j;
 
     char *exit, *message;
@@ -2113,12 +1994,7 @@ char *name;
 
 /* check the current location for bugs */
 
-static void
-sweep_check(player, what, key, is_loc)
-dbref player, what;
-
-int key, is_loc;
-{
+static void sweep_check(dbref player, dbref what, int key, int is_loc) {
     dbref aowner, parent;
 
     int canhear, cancom, isplayer, ispuppet, isconnected, is_audible, attr,
@@ -2262,14 +2138,7 @@ int key, is_loc;
     }
 }
 
-void
-do_sweep(player, cause, key, where)
-dbref player, cause;
-
-int key;
-
-char *where;
-{
+void do_sweep(dbref player, dbref cause, int key, char *where) {
     dbref here, sweeploc;
 
     int where_key, what_key;
@@ -2371,14 +2240,7 @@ char *where;
 
 extern NAMETAB indiv_attraccess_nametab[];
 
-void
-do_decomp(player, cause, key, name, qual)
-dbref player, cause;
-
-int key;
-
-char *name, *qual;
-{
+void do_decomp(dbref player, dbref cause, int key, char *name, char *qual) {
     BOOLEXP *bool;
 
     char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp;
@@ -2595,10 +2457,7 @@ char *name, *qual;
 }
 
 #ifdef PUEBLO_SUPPORT
-void
-show_vrml_url(thing, loc)
-dbref thing, loc;
-{
+void show_vrml_url(dbref thing, dbref loc) {
     char *vrml_url;
 
     dbref aowner;

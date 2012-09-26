@@ -19,12 +19,7 @@
  * hashval: Compute hash value of a string for a hash table.
  */
 
-int
-hashval(str, hashmask)
-char *str;
-
-int hashmask;
-{
+int hashval(char *str, int hashmask) {
     int hash = 0;
 
     char *sp;
@@ -47,10 +42,7 @@ int hashmask;
  * get_hashmask: Get hash mask for mask-style hashing.
  */
 
-int
-get_hashmask(size)
-int *size;
-{
+int get_hashmask(int *size) {
     int tsize;
 
     /*
@@ -67,12 +59,7 @@ int *size;
  * hashinit: Initialize a new hash table.
  */
 
-void
-hashinit(htab, size, flags)
-HASHTAB *htab;
-
-int size, flags;
-{
+void hashinit(HASHTAB *htab, int size, int flags) {
     int i;
 
     htab->mask = get_hashmask(&size);
@@ -103,10 +90,7 @@ int size, flags;
  * hashreset: Reset hash table stats.
  */
 
-void
-hashreset(htab)
-HASHTAB *htab;
-{
+void hashreset(HASHTAB *htab) {
     htab->checks = 0;
     htab->scans = 0;
     htab->hits = 0;
@@ -117,12 +101,7 @@ HASHTAB *htab;
  * to its hash data. Works for both string and numeric hash tables.
  */
 
-int *
-hashfind_generic(key, htab)
-HASHKEY key;
-
-HASHTAB *htab;
-{
+int * hashfind_generic(HASHKEY key, HASHTAB *htab) {
     int htype, hval, numchecks;
 
     HASHENT *hptr, *prev;
@@ -164,12 +143,7 @@ HASHTAB *htab;
  * its flags. Works for both string and numeric hash tables.
  */
 
-int
-hashfindflags_generic(key, htab)
-HASHKEY key;
-
-HASHTAB *htab;
-{
+int hashfindflags_generic(HASHKEY key, HASHTAB *htab) {
     int htype, hval, numchecks;
 
     HASHENT *hptr, *prev;
@@ -211,16 +185,7 @@ HASHTAB *htab;
  * and numeric hashtables.
  */
 
-int
-hashadd_generic(key, hashdata, htab, flags)
-HASHKEY key;
-
-int *hashdata;
-
-HASHTAB *htab;
-
-int flags;
-{
+int hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags) {
     int htype, hval;
 
     HASHENT *hptr;
@@ -266,12 +231,7 @@ int flags;
  * string and numeric hashtables.
  */
 
-void
-hashdelete_generic(key, htab)
-HASHKEY key;
-
-HASHTAB *htab;
-{
+void hashdelete_generic(HASHKEY key, HASHTAB *htab) {
     int htype, hval;
 
     HASHENT *hptr, *last;
@@ -310,12 +270,7 @@ HASHTAB *htab;
     }
 }
 
-void
-hashdelall(old, htab)
-int *old;
-
-HASHTAB *htab;
-{
+void hashdelall(int *old, HASHTAB *htab) {
     int hval;
 
     HASHENT *hptr, *prev, *nextp;
@@ -353,12 +308,7 @@ HASHTAB *htab;
  * hashflush: free all the entries in a hashtable.
  */
 
-void
-hashflush(htab, size)
-HASHTAB *htab;
-
-int size;
-{
+void hashflush(HASHTAB *htab, int size) {
     HASHENT *hent, *thent;
 
     int i;
@@ -405,14 +355,7 @@ int size;
  * string and numeric hashtables.
  */
 
-int
-hashrepl_generic(key, hashdata, htab)
-HASHKEY key;
-
-int *hashdata;
-
-HASHTAB *htab;
-{
+int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab) {
     HASHENT *hptr;
 
     int htype, hval;
@@ -438,12 +381,7 @@ HASHTAB *htab;
     return 0;
 }
 
-void
-hashreplall(old, new, htab)
-int *old, *new;
-
-HASHTAB *htab;
-{
+void hashreplall(int *old, int *new, HASHTAB *htab) {
     int hval;
 
     HASHENT *hptr;
@@ -460,12 +398,7 @@ HASHTAB *htab;
  * hashinfo: return an mbuf with hashing stats
  */
 
-char *
-hashinfo(tab_name, htab)
-const char *tab_name;
-
-HASHTAB *htab;
-{
+char * hashinfo(const char *tab_name, HASHTAB *htab) {
     char *buff;
 
     buff = alloc_mbuf("hashinfo");
@@ -478,10 +411,7 @@ HASHTAB *htab;
 
 /* Returns the data for the first hash entry in 'htab'. */
 
-int *
-hash_firstentry(htab)
-HASHTAB *htab;
-{
+int * hash_firstentry(HASHTAB *htab) {
     int hval;
 
     for (hval = 0; hval < htab->hashsize; hval++)
@@ -494,10 +424,7 @@ HASHTAB *htab;
     return NULL;
 }
 
-int *
-hash_nextentry(htab)
-HASHTAB *htab;
-{
+int * hash_nextentry(HASHTAB *htab) {
     int hval;
 
     HASHENT *hptr;
@@ -528,10 +455,7 @@ HASHTAB *htab;
 
 /* Returns the key for the first hash entry in 'htab'. */
 
-HASHKEY
-hash_firstkey_generic(htab)
-HASHTAB *htab;
-{
+HASHKEY hash_firstkey_generic(HASHTAB *htab) {
     int hval;
 
     for (hval = 0; hval < htab->hashsize; hval++)
@@ -552,10 +476,7 @@ HASHTAB *htab;
     }
 }
 
-HASHKEY
-hash_nextkey_generic(htab)
-HASHTAB *htab;
-{
+HASHKEY hash_nextkey_generic(HASHTAB *htab) {
     int hval;
 
     HASHENT *hptr;
@@ -597,12 +518,7 @@ HASHTAB *htab;
  * a power of 2 appropriate to the number of entries in it.
  */
 
-void
-hashresize(htab, min_size)
-HASHTAB *htab;
-
-int min_size;
-{
+void hashresize(HASHTAB *htab, int min_size) {
     int size, i, htype, hval;
 
     HASHTAB new_htab;
@@ -675,14 +591,7 @@ int min_size;
  * search_nametab: Search a name table for a match and return the flag value.
  */
 
-int
-search_nametab(player, ntab, flagname)
-dbref player;
-
-NAMETAB *ntab;
-
-char *flagname;
-{
+int search_nametab(dbref player, NAMETAB *ntab, char *flagname) {
     NAMETAB *nt;
 
     for (nt = ntab; nt->name; nt++)
@@ -704,14 +613,7 @@ char *flagname;
  * find_nametab_ent: Search a name table for a match and return a pointer to it.
  */
 
-NAMETAB *
-find_nametab_ent(player, ntab, flagname)
-dbref player;
-
-NAMETAB *ntab;
-
-char *flagname;
-{
+NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname) {
     NAMETAB *nt;
 
     for (nt = ntab; nt->name; nt++)
@@ -732,14 +634,7 @@ char *flagname;
  * and return a pointer to it.
  */
 
-NAMETAB *
-find_nametab_ent_flag(player, ntab, flag)
-dbref player;
-
-NAMETAB *ntab;
-
-int flag;
-{
+NAMETAB * find_nametab_ent_flag(dbref player, NAMETAB *ntab, int flag) {
     NAMETAB *nt;
 
     for (nt = ntab; nt->name; nt++)
@@ -759,16 +654,7 @@ int flag;
  * display_nametab: Print out the names of the entries in a name table.
  */
 
-void
-display_nametab(player, ntab, prefix, list_if_none)
-dbref player;
-
-NAMETAB *ntab;
-
-char *prefix;
-
-int list_if_none;
-{
+void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none) {
     char *buf, *bp, *cp;
 
     NAMETAB *nt;
@@ -800,16 +686,7 @@ int list_if_none;
  * interp_nametab: Print values for flags defined in name table.
  */
 
-void
-interp_nametab(player, ntab, flagword, prefix, true_text, false_text)
-dbref player;
-
-NAMETAB *ntab;
-
-int flagword;
-
-char *prefix, *true_text, *false_text;
-{
+void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, char *true_text, char *false_text) {
     char *buf, *bp, *cp;
 
     NAMETAB *nt;
@@ -848,16 +725,7 @@ char *prefix, *true_text, *false_text;
  * listset_nametab: Print values for flags defined in name table.
  */
 
-void
-listset_nametab(player, ntab, flagword, prefix, list_if_none)
-dbref player;
-
-NAMETAB *ntab;
-
-int flagword, list_if_none;
-
-char *prefix;
-{
+void listset_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, int list_if_none) {
     char *buf, *bp, *cp;
 
     NAMETAB *nt;
@@ -891,8 +759,7 @@ char *prefix;
  * cf_ntab_access: Change the access on a nametab entry.
  */
 
-CF_HAND(cf_ntab_access)
-{
+int cf_ntab_access (int *vp, char *str, long extra, dbref player, char *cmd) {
     NAMETAB *np;
 
     char *ap;

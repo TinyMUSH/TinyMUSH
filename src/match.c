@@ -28,12 +28,7 @@
 
 static MSTATE md;
 
-static void
-promote_match(what, confidence)
-dbref what;
-
-int confidence;
-{
+static void promote_match(dbref what, int confidence) {
     /*
      * Check for type and locks, if requested
      */
@@ -99,10 +94,7 @@ int confidence;
  * names are being matched.  It also removes initial and terminal spaces.
  */
 
-static char *
-munge_space_for_match(name)
-const char *name;
-{
+static char * munge_space_for_match(const char *name) {
     static char buffer[LBUF_SIZE], *q;
 
     const char *p;
@@ -125,9 +117,7 @@ const char *name;
     return (buffer);
 }
 
-void
-NDECL(match_player)
-{
+void match_player(void) {
     dbref match;
 
     if (md.confidence >= CON_DBREF)
@@ -152,10 +142,7 @@ NDECL(match_player)
 
 /* returns object dbref associated with named reference, else NOTHING */
 
-static dbref
-absolute_nref(str)
-char *str;
-{
+static dbref absolute_nref(char *str) {
     char *p, *q, *buf, *bp;
 
     dbref *np, nref;
@@ -204,10 +191,7 @@ char *str;
 
 /* returns nnn if name = #nnn, else NOTHING */
 
-static dbref
-absolute_name(need_pound)
-int need_pound;
-{
+static dbref absolute_name(int need_pound) {
     dbref match;
 
     char *mname;
@@ -239,18 +223,14 @@ int need_pound;
     return NOTHING;
 }
 
-void
-NDECL(match_absolute)
-{
+void match_absolute(void){
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_obj(md.absolute_form))
         promote_match(md.absolute_form, CON_DBREF);
 }
 
-void
-NDECL(match_numeric)
-{
+void match_numeric(void){
     dbref match;
 
     if (md.confidence >= CON_DBREF)
@@ -260,9 +240,7 @@ NDECL(match_numeric)
         promote_match(match, CON_DBREF);
 }
 
-void
-NDECL(match_me)
-{
+void match_me(void){
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_obj(md.absolute_form) && (md.absolute_form == md.player))
@@ -275,9 +253,7 @@ NDECL(match_me)
     return;
 }
 
-void
-NDECL(match_home)
-{
+void match_home(void) {
     if (md.confidence >= CON_DBREF)
         return;
     if (!string_compare(md.string, "home"))
@@ -285,9 +261,7 @@ NDECL(match_home)
     return;
 }
 
-void
-NDECL(match_here)
-{
+void match_here(void) {
     dbref loc;
 
     if (md.confidence >= CON_DBREF)
@@ -314,12 +288,7 @@ NDECL(match_here)
     }
 }
 
-static void
-match_list(first, local)
-dbref first;
-
-int local;
-{
+static void match_list(dbref first, int local)  {
     char *namebuf;
 
     if (md.confidence >= CON_DBREF)
@@ -350,18 +319,14 @@ int local;
     }
 }
 
-void
-NDECL(match_possession)
-{
+void match_possession(void) {
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_loc(md.player))
         match_list(Contents(md.player), CON_LOCAL);
 }
 
-void
-NDECL(match_neighbor)
-{
+void match_neighbor(void) {
     dbref loc;
 
     if (md.confidence >= CON_DBREF)
@@ -376,12 +341,7 @@ NDECL(match_neighbor)
     }
 }
 
-static int
-match_exit_internal(loc, baseloc, local)
-dbref loc, baseloc;
-
-int local;
-{
+static int match_exit_internal(dbref loc, dbref baseloc, int local) {
     dbref exit;
 
     int result, key;
@@ -416,9 +376,7 @@ int local;
     return result;
 }
 
-void
-NDECL(match_exit)
-{
+void match_exit(void) {
     dbref loc;
 
     if (md.confidence >= CON_DBREF)
@@ -428,9 +386,7 @@ NDECL(match_exit)
         (void)match_exit_internal(loc, loc, CON_LOCAL);
 }
 
-void
-NDECL(match_exit_with_parents)
-{
+void match_exit_with_parents(void) {
     dbref loc, parent;
 
     int lev;
@@ -448,18 +404,14 @@ NDECL(match_exit_with_parents)
     }
 }
 
-void
-NDECL(match_carried_exit)
-{
+void match_carried_exit(void) {
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_obj(md.player) && Has_exits(md.player))
         (void)match_exit_internal(md.player, md.player, CON_LOCAL);
 }
 
-void
-NDECL(match_carried_exit_with_parents)
-{
+void match_carried_exit_with_parents(void) {
     dbref parent;
 
     int lev;
@@ -476,9 +428,7 @@ NDECL(match_carried_exit_with_parents)
     }
 }
 
-void
-NDECL(match_master_exit)
-{
+void match_master_exit(void) {
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_obj(md.player) && Has_exits(md.player))
@@ -486,19 +436,14 @@ NDECL(match_master_exit)
                                   mudconf.master_room, 0);
 }
 
-void
-NDECL(match_zone_exit)
-{
+void match_zone_exit(void) {
     if (md.confidence >= CON_DBREF)
         return;
     if (Good_obj(md.player) && Has_exits(md.player))
         (void)match_exit_internal(Zone(md.player), Zone(md.player), 0);
 }
 
-void
-match_everything(key)
-int key;
-{
+void match_everything(int key) {
     /*
      * Try matching me, then here, then absolute, then player FIRST, since
      * this will hit most cases. STOP if we get something, since those are
@@ -533,9 +478,7 @@ int key;
     match_possession();
 }
 
-dbref
-NDECL(match_result)
-{
+dbref match_result(void) {
     switch (md.count)
     {
     case 0:
@@ -549,16 +492,11 @@ NDECL(match_result)
 
 /* use this if you don't care about ambiguity */
 
-dbref
-NDECL(last_match_result)
-{
+dbref last_match_result(void) {
     return md.match;
 }
 
-dbref
-match_status(player, match)
-dbref player, match;
-{
+dbref match_status(dbref player, dbref match) {
     switch (match)
     {
     case NOTHING:
@@ -574,16 +512,11 @@ dbref player, match;
     return match;
 }
 
-dbref
-NDECL(noisy_match_result)
-{
+dbref noisy_match_result(void) {
     return match_status(md.player, match_result());
 }
 
-void
-save_match_state(m_state)
-MSTATE *m_state;
-{
+void save_match_state(MSTATE *m_state) {
     m_state->confidence = md.confidence;
     m_state->count = md.count;
     m_state->pref_type = md.pref_type;
@@ -595,10 +528,7 @@ MSTATE *m_state;
     strcpy(m_state->string, md.string);
 }
 
-void
-restore_match_state(m_state)
-MSTATE *m_state;
-{
+void restore_match_state(MSTATE *m_state) {
     md.confidence = m_state->confidence;
     md.count = m_state->count;
     md.pref_type = m_state->pref_type;
@@ -610,14 +540,7 @@ MSTATE *m_state;
     free_lbuf(m_state->string);
 }
 
-void
-init_match(player, name, type)
-dbref player;
-
-const char *name;
-
-int type;
-{
+void init_match(dbref player, const char *name, int type) {
     md.confidence = -1;
     md.count = md.check_keys = 0;
     md.pref_type = type;
@@ -627,14 +550,7 @@ int type;
     md.absolute_form = absolute_name(1);
 }
 
-void
-init_match_check_keys(player, name, type)
-dbref player;
-
-const char *name;
-
-int type;
-{
+void init_match_check_keys(dbref player, const char *name, int type) {
     init_match(player, name, type);
     md.check_keys = 1;
 }

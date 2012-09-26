@@ -17,12 +17,7 @@
 
 #include "help.h"		/* required by code */
 
-int
-helpindex_read(htab, filename)
-HASHTAB *htab;
-
-char *filename;
-{
+int helpindex_read(HASHTAB *htab, char *filename) {
     help_indx entry;
 
     char *p;
@@ -110,10 +105,7 @@ char *filename;
     return count;
 }
 
-void
-helpindex_load(player)
-dbref player;
-{
+void helpindex_load(dbref player) {
     int i;
 
     char buf[SBUF_SIZE + 8];
@@ -137,9 +129,7 @@ dbref player;
 }
 
 
-void
-NDECL(helpindex_init)
-{
+void helpindex_init(void) {
     /*
      * We do not need to do hashinits here, as this will already have
      * * been done by the add_helpfile() calls.
@@ -148,16 +138,7 @@ NDECL(helpindex_init)
     helpindex_load(NOTHING);
 }
 
-void
-help_write(player, topic, htab, filename, eval)
-dbref player;
-
-char *topic, *filename;
-
-HASHTAB *htab;
-
-int eval;
-{
+void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int eval) {
     FILE *fp;
 
     char *p, *line, *result, *str, *bp;
@@ -274,14 +255,7 @@ int eval;
  * help_helper: Write entry into a buffer for a function.
  */
 
-void
-help_helper(player, hf_num, eval, topic, buff, bufc)
-dbref player;
-
-int hf_num, eval;
-
-char *topic, *buff, **bufc;
-{
+void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, char **bufc) {
     char tbuf[SBUF_SIZE + 8];
 
     char tname[LBUF_SIZE];
@@ -385,14 +359,7 @@ char *topic, *buff, **bufc;
  * do_help: display information from new-format news and help files
  */
 
-void
-do_help(player, cause, key, message)
-dbref player, cause;
-
-int key;
-
-char *message;
-{
+void do_help(dbref player, dbref cause, int key, char *message) {
     char tbuf[SBUF_SIZE + 8];
 
     int hf_num;

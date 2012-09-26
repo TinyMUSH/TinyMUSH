@@ -90,10 +90,7 @@ LOGFILETAB logfds_table[] =
  * logfile_init: Initialize the main logfile.
  */
 
-void
-logfile_init(filename)
-char *filename;
-{
+void logfile_init(char *filename) {
     if (!filename)
     {
         mainlog_fp = stderr;
@@ -118,12 +115,7 @@ char *filename;
  * log entry.
  */
 
-int
-start_log(primary, secondary, key)
-const char *primary, *secondary;
-
-int key;
-{
+int start_log(const char *primary, const char *secondary, int key) {
     struct tm *tp;
 
     time_t now;
@@ -221,9 +213,7 @@ int key;
  * end_log: Finish up writing a log entry
  */
 
-void
-NDECL(end_log)
-{
+void end_log(void) {
     log_printf("\n");
     fflush(log_fp);
     mudstate.logging--;
@@ -233,10 +223,7 @@ NDECL(end_log)
  * log_perror: Write perror message to the log
  */
 
-void
-log_perror(primary, secondary, extra, failing_object)
-const char *primary, *secondary, *extra, *failing_object;
-{
+void log_perror(const char *primary, const char *secondary, const char *extra, const char *failing_object) {
     int my_errno = errno;
 
     start_log(primary, secondary, LOG_ALWAYS);
@@ -252,28 +239,12 @@ const char *primary, *secondary, *extra, *failing_object;
  * log_printf: Format text and print to the log file.
  */
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void
-log_printf(const char *format, ...)
-#else
-void
-log_printf(va_alist)
-va_dcl
-#endif
-{
+void log_printf(const char *format, ...) {
     va_list ap;
     char *s;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
 
-#else
-    char *format;
-
-    va_start(ap);
-    format = va_arg(ap, char *);
-
-#endif
     s = (char *)XMALLOC(MBUF_SIZE, "log_printf");
     vsprintf(s, format, ap);
     fputs(s, log_fp);
@@ -284,36 +255,19 @@ va_dcl
         fputs(s, stderr);
     }
     XFREE(s, "log_printf");
-#if defined(__STDC__) && defined(STDC_HEADERS)
+
     va_end(ap);
-#endif
 }
 
 /* ---------------------------------------------------------------------------
  * mainlog_printf: Format text and print to the mainlog file.
  */
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
-void
-mainlog_printf(const char *format, ...)
-#else
-void
-mainlog_printf(va_alist)
-va_dcl
-#endif
-{
+void mainlog_printf(const char *format, ...) {
     va_list ap;
     char *s;
 
-#if defined(__STDC__) && defined(STDC_HEADERS)
     va_start(ap, format);
-#else
-    char *format;
-
-    va_start(ap);
-    format = va_arg(ap, char *);
-
-#endif
     s = (char *)XMALLOC(MBUF_SIZE, "mainlog_printf");
     vsprintf(s, format, ap);
     fputs(s, mainlog_fp);
@@ -324,17 +278,11 @@ va_dcl
         fputs(s, stderr);
     }
     XFREE(s, "mainlog_printf");
-#if defined(__STDC__) && defined(STDC_HEADERS)
+
     va_end(ap);
-#endif
 }
 
-void
-log_vprintf(format, ap)
-const char *format;
-
-va_list ap;
-{
+void log_vprintf(const char *format, va_list ap) {
     vfprintf(log_fp, format, ap);
 }
 
@@ -344,10 +292,7 @@ va_list ap;
  * of the owner.
  */
 
-void
-log_name(target)
-dbref target;
-{
+void log_name(dbref target) {
     char *tp;
 
     if (mudstate.standalone)
@@ -379,10 +324,7 @@ dbref target;
  * log_name_and_loc: Log both the name and location of an object
  */
 
-void
-log_name_and_loc(player)
-dbref player;
-{
+void log_name_and_loc(dbref player) {
     log_name(player);
     if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
     {
@@ -391,10 +333,7 @@ dbref player;
     }
 }
 
-char *
-OBJTYP(thing)
-dbref thing;
-{
+char * OBJTYP(dbref thing) {
     if (!Good_dbref(thing))
     {
         return (char *)"??OUT-OF-RANGE??";
@@ -416,10 +355,7 @@ dbref thing;
     }
 }
 
-void
-log_type_and_name(thing)
-dbref thing;
-{
+void log_type_and_name(dbref thing) {
     log_printf("%s ", OBJTYP(thing));
     log_name(thing);
 }
