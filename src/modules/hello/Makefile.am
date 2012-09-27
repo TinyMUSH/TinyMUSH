@@ -1,5 +1,7 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
-AM_CPPFLAGS = $(LTDLINCL)
+ACLOCAL_AMFLAGS = -I libltdl/m4/
+AM_CPPFLAGS = $(LTDLINCL) $(API_CFLAG)
+
+SUBDIRS       = libltdl
 
 lib_LTLIBRARIES = hello.la
 hello_la_SOURCES = hello.c

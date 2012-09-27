@@ -1,8 +1,9 @@
-#include "../../copyright.h"
-#include "../../config.h"
-#include "../../system.h"
+#include <copyright.h>
+#include <config.h>
+#include <system.h>
 
-#include "../../api.h"
+#include <tinymushapi.h>
+
 #include "db_sql.h"
 
 /*

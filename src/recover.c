@@ -7,6 +7,7 @@
 #include "config.h"
 #include "system.h"
 
+#include <typedefs.h>
 #include "db.h"
 
 #include <sys/types.h>

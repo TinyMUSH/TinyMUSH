@@ -656,6 +656,7 @@ ac_func_list=
 ac_header_list=
 gl_floor_required=plain
 enable_option_checking=no
+ac_default_prefix=`pwd -P | sed 's:/[^/]*$::'`/game
 ac_subst_vars='ltdl_LTLIBOBJS
 ltdl_LIBOBJS
 am__EXEEXT_FALSE
@@ -667,8 +668,6 @@ gl_LIBOBJS
 LTLIBOBJS
 LIBOBJS
 ac_aux_dir
-WANT_MODULE_HELLO_FALSE
-WANT_MODULE_HELLO_TRUE
 WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE
 WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE
 WANT_MODULE_DB_SQL_DRIVER_PGSQL_FALSE
@@ -1805,7 +1804,6 @@ with_mysql_libs
 with_pgsql_includes
 with_pgsql_libs
 with_sqlite3
-enable_module_hello
 enable_pueblo_support
 enable_floating_point
 enable_lag_checking
@@ -2479,7 +2477,6 @@ Optional Features:
   --enable-module-comsys  Enable support for the comsys module [default=yes]
   --enable-module-mail    Enable support for the mail module [default=yes]
   --enable-module-dbsql   Enable support for the dbsql module [default=no]
-  --enable-module-hello   Enable support for the hello module [default=no]
   --enable-pueblo-support Enable support for Pueblo clients [default=yes]
   --enable-floating-point Enable support for math functions (lt, gt, add,
                           etc.) with IEEE 754 floating-point support
@@ -31760,9 +31757,12 @@ $as_echo
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking configuration prefix" >&5
 $as_echo_n "checking configuration prefix... " >&6; }
- case "$prefix" in
-  NONE) prefix=`pwd -P | sed 's:/[^/]*$::'`/game;;
- esac
+case $prefix in #(
+  NONE) :
+    with_prefix="" ;; #(
+  *) :
+    with_prefix="tinymush" ;;
+esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $prefix" >&5
 $as_echo "$prefix" >&6; }
 
@@ -32589,37 +32589,6 @@ fi
 else
   WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE='#'
   WANT_MODULE_DB_SQL_DRIVER_SQLITE_FALSE=
-fi
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the hello module is enable" >&5
-$as_echo_n "checking whether the hello module is enable... " >&6; }
-# Check whether --enable-module-hello was given.
-if test "${enable_module_hello+set}" = set; then :
-  enableval=$enable_module_hello;
-  if test "x$enableval" = "xyes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-else
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  enable_module_hello="no"
-
-
-fi
-
- if test "x$enable_module_hello" = "xyes"; then
-  WANT_MODULE_HELLO_TRUE=
-  WANT_MODULE_HELLO_FALSE='#'
-else
-  WANT_MODULE_HELLO_TRUE='#'
-  WANT_MODULE_HELLO_FALSE=
 fi
 
 
@@ -35568,10 +35537,6 @@ if test -z "${WANT_MODULE_DB_SQL_DRIVER_SQLITE_TRUE}" && test -z "${WANT_MODULE_
   as_fn_error $? "conditional \"WANT_MODULE_DB_SQL_DRIVER_SQLITE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${WANT_MODULE_HELLO_TRUE}" && test -z "${WANT_MODULE_HELLO_FALSE}"; then
-  as_fn_error $? "conditional \"WANT_MODULE_HELLO\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
@@ -37978,9 +37943,31 @@ if test -z ; then :
                            %BPath
 -------------------------------%b
          Installation directory : %B$prefix%b
-             Binaries directory : %B$with_bin_dir%b
-            Help Text directory : %B$with_txt_dir%b
-                 Data directory : %B$with_data_dir%b
+             Binaries directory : %B$prefix/bin%b
+            Help Text directory : %B$prefix/text%b
+                 Data directory : %B$prefix/data%b
+
+                         bindir : %B$bindir%b
+                        datadir : %B$datadir%b
+                    datatoordir : %B$datarootdir%b
+                         docdir : %B$docdir%b
+                         dvidir : %B$dvidir%b
+                    exec_prefix : %B$exec_prefix%b
+                        htmldir : %B$htmldir%b
+                     includedir : %B$includedir%b
+                        infodir : %B$infodir%b
+                         libdir : %B$libdir%b
+                     libexecdir : %B$libexecdir%b
+                      localedir : %B$localedir%b
+                  localstatedir : %B$localstatedir%b
+                         mandir : %B$mandir%b
+                  oldincludedir : %B$oldincludedir%b
+                         pdfdir : %B$pdfdir%b
+                         prefix : %B$prefix%b
+                          psdir : %B$psdir%b
+                        sbindir : %B$sbindir%b
+                 sharedstatedir : %B$sharedstatedir%b
+                     sysconfdir : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b
@@ -38033,9 +38020,31 @@ else
                            %BPath
 -------------------------------%b
          Installation directory : %B$prefix%b
-             Binaries directory : %B$with_bin_dir%b
-            Help Text directory : %B$with_txt_dir%b
-                 Data directory : %B$with_data_dir%b
+             Binaries directory : %B$prefix/bin%b
+            Help Text directory : %B$prefix/text%b
+                 Data directory : %B$prefix/data%b
+
+                         bindir : %B$bindir%b
+                        datadir : %B$datadir%b
+                    datatoordir : %B$datarootdir%b
+                         docdir : %B$docdir%b
+                         dvidir : %B$dvidir%b
+                    exec_prefix : %B$exec_prefix%b
+                        htmldir : %B$htmldir%b
+                     includedir : %B$includedir%b
+                        infodir : %B$infodir%b
+                         libdir : %B$libdir%b
+                     libexecdir : %B$libexecdir%b
+                      localedir : %B$localedir%b
+                  localstatedir : %B$localstatedir%b
+                         mandir : %B$mandir%b
+                  oldincludedir : %B$oldincludedir%b
+                         pdfdir : %B$pdfdir%b
+                         prefix : %B$prefix%b
+                          psdir : %B$psdir%b
+                        sbindir : %B$sbindir%b
+                 sharedstatedir : %B$sharedstatedir%b
+                     sysconfdir : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b

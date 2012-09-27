@@ -1,8 +1,19 @@
 /* hello.c - demonstration module */
 /* $Id: hello.c,v 1.19 2001/12/13 04:39:28 dpassmor Exp $ */
 
-#include "../../api.h"
-#include "../../config.h"
+#include "config.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <memory.h>
+#include <unistd.h>
+#include <time.h>
+#include <ltdl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <tinymushapi.h>
+
 
 #define MOD_HELLO_HELLO_INFORMAL	1
 #define MOD_HELLO_FOOF_SHOW		1
@@ -41,9 +52,7 @@ MOD_HELLO_OBJ *mod_hello_db = NULL;
     mod_hello_db[x].greeted = 0; \
     mod_hello_db[x].foofed = 0;
 
-void mod_hello_db_grow(newsize, newtop)
-    int newsize, newtop;
-{
+void mod_hello_db_grow(int newsize, int newtop) {
     DB_GROW_MODULE(mod_hello_db, newsize, newtop, MOD_HELLO_OBJ);
 }
 
@@ -90,12 +99,7 @@ void mod_hello_print_greeting(in_ptr, out_ptr)
  * Handlers.
  */
 
-int mod_hello_process_command(player, cause, interactive, command, args, nargs)
-	dbref player, cause;
-	int interactive;
-	char *command, *args[];
-	int nargs;
-{
+int mod_hello_process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs) {
 	/* Command intercept before normal matching */
 
 	if (!strcmp(command, "hiya")) {
@@ -105,13 +109,7 @@ int mod_hello_process_command(player, cause, interactive, command, args, nargs)
 	return 0;
 }
 
-int mod_hello_process_no_match(player, cause, interactive, 
-				lc_command, raw_command, args, nargs)
-	dbref player, cause;
-	int interactive;
-	char *lc_command, *raw_command, *args[];
-	int nargs;
-{
+int mod_hello_process_no_match(dbref player, dbref cause, int interactive, char *lc_command, char *raw_command, char *args[], int nargs) {
 	/* Command intercept before 'Huh?' */
 
 	if (!strcmp(lc_command, "heythere")) {
@@ -121,13 +119,7 @@ int mod_hello_process_no_match(player, cause, interactive,
 	return 0;
 }
 
-int mod_hello_did_it(player, thing, master, what, def, owhat, odef, awhat,
-		     now, args, nargs)
-    dbref player, thing, master;
-    int what, owhat, awhat, now, nargs;
-    const char *def, *odef;
-    char *args[];
-{
+int mod_hello_did_it(dbref player, dbref thing, dbref master, int what, const char *def, int owhat, const char *odef, int awhat, int now, char *args[], int nargs) {
     /* Demonstrate the different ways we can intercept did_it() calls.
      *
      * We intercept 'look' (by trapping A_DESC), and return a message of
@@ -172,46 +164,29 @@ int mod_hello_did_it(player, thing, master, what, def, owhat, odef, awhat,
     }
 }
 
-void mod_hello_create_obj(player, obj)
-	dbref player, obj;
-{
+void mod_hello_create_obj(dbref player, dbref obj) {
 	notify(player, tprintf("You created #%d -- hello says so.", obj));
 }
 
-void mod_hello_destroy_obj(player, obj)
-	dbref player, obj;
-{
+void mod_hello_destroy_obj(dbref player, dbref obj) {
 	notify(GOD, tprintf("Destroyed #%d -- hello says so.", obj));
 }
 
-void mod_hello_destroy_player(player, victim)
-	dbref player, victim;
-{
+void mod_hello_destroy_player(dbref player, dbref victim) {
 	notify(player, tprintf("Say goodbye to %s!", Name(victim)));
 }
 
-void mod_hello_announce_connect(player, reason, num)
-	dbref player;
-	const char *reason;
-	int num;
-{
+void mod_hello_announce_connect(dbref player, const char *reason, int num) {
 	notify(GOD, tprintf("%s(#%d) just connected -- hello says so.",
 				Name(player), player));
 }
 
-void mod_hello_announce_disconnect(player, reason, num)
-	dbref player;
-	const char *reason;
-	int num;
-{
+void mod_hello_announce_disconnect(dbref player, const char *reason, int num) {
 	notify(GOD, tprintf("%s(#%d) just disconnected -- hello says so.",
 				Name(player), player));
 }
 
-void mod_hello_examine(player, cause, thing, control, key)
-    dbref player, cause, thing;
-    int control, key;
-{
+void mod_hello_examine(dbref player, dbref cause, dbref thing, int control, int key) {
     if (control) {
 	notify(player,
 	       tprintf("Greeted: %d  Foofed: %d",
@@ -224,8 +199,10 @@ void mod_hello_examine(player, cause, thing, control, key)
  * Commands.
  */
 
-DO_CMD_NO_ARG(mod_hello_do_hello)
-{
+
+/* A command taking no arguments */
+
+void mod_hello_do_hello(dbref player, dbref cause, int key) {
     int i;
 
 
@@ -244,8 +221,9 @@ DO_CMD_NO_ARG(mod_hello_do_hello)
 			   mod_hello_db[player].greeted));
 }
 
-DO_CMD_ONE_ARG(mod_hello_do_foof)
-{
+/* A command taking one argument */
+
+void mod_hello_do_foof(dbref player, dbref cause, int key, char *arg1) {
     DBData dbkey;
     DBData data;
 
@@ -319,13 +297,11 @@ CMDENT mod_hello_cmdtable[] = {
  * Functions.
  */
 
-FUNCTION(mod_hello_fun_hello)
-{
+void mod_hello_fun_hello(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     safe_str("Hello, world!", buff, bufc);
 }
 
-FUNCTION(mod_hello_fun_hi)
-{
+void mod_hello_fun_hi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /* Normally we would not call our own API, but here's just an
      * example.
      */
@@ -379,8 +355,7 @@ MODNHASHES mod_hello_nhashtable[] = {
  * Initialization.
  */
 	
-void mod_hello_init()
-{
+void mod_hello_init(void) {
     /* Give our configuration some default values. */
 
     mod_hello_config.show_name = 0;
@@ -395,8 +370,7 @@ void mod_hello_init()
     register_api("hello", "hi", mod_hello_exports);
 }
 
-void mod_hello_cleanup_startup()
-{
+void mod_hello_cleanup_startup(void) {
     mod_hello_dbtype = register_dbtype("hello");
 }
 
@@ -404,9 +378,7 @@ void mod_hello_cleanup_startup()
  * Database routines: read and write a flatfile at db conversion time.
  */
 
-void mod_hello_db_write_flatfile(f)
-FILE *f;
-{
+void mod_hello_db_write_flatfile(FILE *f) {
 	unsigned int dbtype;
 	dbref thing;
 	DBData key;
@@ -433,9 +405,7 @@ FILE *f;
 	fputs("***END OF DUMP***\n", f);
 }
 
-void mod_hello_db_read_flatfile(f)
-FILE *f;
-{
+void mod_hello_db_read_flatfile(FILE *f) {
 	unsigned int dbtype, version;
 	char c;
 	dbref thing;

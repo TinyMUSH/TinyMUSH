@@ -86,11 +86,9 @@ LTDL_INIT([convenience])
 AX_BOX([Checks for Options])
 
 dnl XXX // This really need to be check...
-
+AC_PREFIX_DEFAULT([`pwd -P | sed 's:/[[^/]]*$::'`/game])
 AC_MSG_CHECKING([configuration prefix])
- case "$prefix" in
-  NONE) prefix=`pwd -P | sed 's:/[[^/]]*$::'`/game;;
- esac
+AS_CASE([$prefix], [NONE], [with_prefix=""], [with_prefix="tinymush"])
 AC_MSG_RESULT([$prefix])
 
 AH_TOP([#ifndef __AUTOCONF_H
@@ -210,17 +208,6 @@ AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MSQL], [test "x$with_module_dbsql" = "
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_module_dbsql" = "xmysql"])
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_module_dbsql" = "xpgsql"])
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_module_dbsql" = "xsqlite"])
-
-AC_MSG_CHECKING([whether the hello module is enable])
-AC_ARG_ENABLE([module-hello], [AS_HELP_STRING([--enable-module-hello], [Enable support for the hello module @<:@default=no@:>@])],
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [
-  AC_MSG_RESULT([no])
-  enable_module_hello="no"
- ]
-)
-AM_CONDITIONAL([WANT_MODULE_HELLO], [test "x$enable_module_hello" = "xyes"])
 
 AC_MSG_CHECKING([whether to enable pueblo support])
 AC_ARG_ENABLE([pueblo-support], [AS_HELP_STRING([--enable-pueblo-support], [Enable support for Pueblo clients @<:@default=yes@:>@])],
@@ -533,9 +520,31 @@ AX_PRINT([
                            %BPath
 -------------------------------%b
          Installation directory : %B$prefix%b
-             Binaries directory : %B$with_bin_dir%b
-            Help Text directory : %B$with_txt_dir%b
-                 Data directory : %B$with_data_dir%b
+             Binaries directory : %B$prefix/bin%b
+            Help Text directory : %B$prefix/text%b
+                 Data directory : %B$prefix/data%b
+                 
+                         bindir : %B$bindir%b
+                        datadir : %B$datadir%b
+                    datatoordir : %B$datarootdir%b
+                         docdir : %B$docdir%b
+                         dvidir : %B$dvidir%b
+                    exec_prefix : %B$exec_prefix%b
+                        htmldir : %B$htmldir%b
+                     includedir : %B$includedir%b
+                        infodir : %B$infodir%b
+                         libdir : %B$libdir%b
+                     libexecdir : %B$libexecdir%b
+                      localedir : %B$localedir%b
+                  localstatedir : %B$localstatedir%b
+                         mandir : %B$mandir%b
+                  oldincludedir : %B$oldincludedir%b
+                         pdfdir : %B$pdfdir%b
+                         prefix : %B$prefix%b
+                          psdir : %B$psdir%b
+                        sbindir : %B$sbindir%b
+                 sharedstatedir : %B$sharedstatedir%b
+                     sysconfdir : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b

@@ -4,63 +4,12 @@
 #define __API_H
 
 #include "copyright.h"
+#include "ansi.h"
+#include "command.h"
+#include "db.h"
+#include "mushconf.h"
 
 #include <ltdl.h>
-
-#include "alloc.h"
-
-#include "htab.h"
-#include "udb.h"
-#include "udb_defs.h"
-#include "flags.h"
-#include "powers.h"		/* required by code */
-#include "db.h"
-
-#include "mushconf.h"		/* required by code */
-
-
-
-
-
-#include "game.h"		/* required by code */
-#include "interface.h"		/* required by code */
-#include "command.h"		/* required by code */
-#include "match.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-
-#include "ansi.h"		/* required by code */
-#include "functions.h"		/* required by code */
-
-#include "externs.h"
-
-
-/*
- * Function prototype
- */
-
-/*
-#define	XFUNCTION(x)	extern void FDECL(x, (char *, char **, dbref, dbref, dbref, char *[], int, char *[], int))
-*/
-
-/*
- * ------------------------------------------------------------------------
- * Command handler macros.
- */
-
-/*
-#define DO_CMD_NO_ARG(name)	void name (dbref player, dbref cause, int key)
-
-#define DO_CMD_ONE_ARG(name) 	void name (dbref player, dbref cause, int key, char *arg1)
-
-#define DO_CMD_TWO_ARG(name)	void name (dbref player, dbref cause, int key, char *arg1, char *arg2)
-
-#define DO_CMD_TWO_ARG_ARGV(name)	void name (dbref player, dbref cause, int key, char *arg1, char *arg2_vector[], int vector_size)
-*/
-
-/*
- * ------------------------------------------------------------------------
- * API interface macros.
- */
 
 #define SIZE_HACK 1
 
@@ -93,6 +42,8 @@
         OBJ_INIT_MODULE(dg__i); \
     } \
 }
+
+
 
 /*
  * ------------------------------------------------------------------------

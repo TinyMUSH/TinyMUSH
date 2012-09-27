@@ -21,7 +21,8 @@ SCRIPT_DAT   = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/
 	$(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk \
 	$(SCRIPT_DIR)/netmush.conf
 EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
-CLEANFILES   = version.h buildnum.data
+CLEANFILES   = version.h buildnum.data tinymushapi.h
+API_SRC      = copyright.h typedefs.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h api.h externs.h
 
 bin_PROGRAMS = netmush mkindx slave
 
@@ -43,15 +44,15 @@ netmush_LDFLAGS        = -export-dynamic
 netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES   = $(LTDLDEPS) 
 
-  
+include_HEADERS        = tinymushapi.h
 
-nodist_include_HEADERS = version.h
+nodist_netmush_SOURCES = version.h
 
 mkindx_SOURCES         = mkindx.c
 
 slave_SOURCES          = slave.c
 
-BUILT_SOURCES          = version.h
+BUILT_SOURCES          = version.h tinymushapi.h
 
 if WANT_DBM_GDBM
  SUBDIRS         += dbm/gdbm/
@@ -79,10 +80,6 @@ if WANT_MODULE_MAIL
  SUBDIRS += modules/mail/
 endif
 
-if WANT_MODULE_HELLO
- SUBDIRS += modules/hello/
-endif
-
 if WANT_MODULE_DB_SQL
  SUBDIRS += modules/db_sql/
 endif
@@ -105,28 +102,72 @@ version.h:
 
 indent:
 	for i in `ls *.c *.h`; do \
-	astyle --style=bsd $$i; \
+	astyle -A2 $$i; \
 	done; 
 	
-autotools:
-	shtoolize -o $(ac_aux_dir)/shtool all
-	autoreconf -ivf
+testpath:
+	@echo prefix : @prefix@
+	@echo exec_prefix : @exec_prefix@
+	@echo bindir : @bindir@
+	@echo sbindir : @sbindir@
+	@echo libexecdir : @libexecdir@
+	@echo datarootdir : @datarootdir@
+	@echo datadir : @datadir@
+	@echo sysconfdir : @sysconfdir@
+	@echo sharedstatedir : @sharedstatedir@
+	@echo localstatedir : @localstatedir@
+	@echo includedir : @includedir@
+	@echo oldincludedir : @oldincludedir@
+	@echo docdir : @docdir@
+	@echo infodir : @infodir@
+	@echo htmldir : @htmldir@
+	@echo dvidir : @dvidir@
+	@echo pdfdir : @pdfdir@
+	@echo psdir : @psdir@
+	@echo libdir : @libdir@
+	@echo lispdir : @lispdir@
+	@echo localedir : @localedir@
+	@echo mandir : @mandir@
+	@echo man1dir : @man1dir@
+	@echo man2dir : @man2dir@
+	@echo manext : @manext@
+	@echo man1ext : @man1ext@
+	@echo man2ext : @man2ext@
+	@echo srcdir : @srcdir@
 	
+tinymushapi.h:
+	rm -f $(srcdir)/tinymushapi.h
+	touch $(srcdir)/tinymushapi.h
+	chmod +w $(srcdir)/tinymushapi.h
+	printf "#ifndef __TINYMUSHAPI_H\n#define __TINYMUSHAPI_H\n\n" >> tinymushapi.h
+	printf "\n\n#include <ltdl.h>\n\n#include <netinet/in.h>\n\n" >> tinymushapi.h
+	sed -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
+	sed -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
+	sed -n "/DOING_LEN/p" < config.h >> tinymushapi.h
+	sed -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
+	sed -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h
+	for i in $(API_SRC); \
+	do \
+		TMP=`echo "__$$i" | tr '.' '_' | tr '[:lower:]' '[:upper:]'`; \
+		printf "\n\n/*\n * From $$i\n */\n\n" >> tinymushapi.h; \
+		sed -n "/#ifndef $$TMP/,/\/* $$TMP *\//p" < $$i >> tinymushapi.h; \
+	done
+	printf "\n\n#endif                          /* __TINYMUSHAPI_H */\n" >> tinymushapi.h
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
 	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
-	$(mkinstalldirs) $(prefix) 
-	$(install_sh_SCRIPT) $(SCRIPT_SRC) $(prefix)
-	$(install_sh_DATA) $(SCRIPT_DAT) $(prefix)
+	$(mkinstalldirs) @prefix@ 
+	$(install_sh_SCRIPT) $(SCRIPT_SRC) @prefix@
+	$(install_sh_DATA) $(SCRIPT_DAT) @prefix@
 
 install-data-local:
-	$(mkinstalldirs) $(prefix)/text
-	$(mkinstalldirs) $(prefix)/data
-	$(mkinstalldirs) $(prefix)/backups
-	$(install_sh_DATA) $(TEXT_SRC) $(prefix)/text
+	$(mkinstalldirs) @prefix@/text
+	$(mkinstalldirs) @prefix@/data
+	$(mkinstalldirs) @prefix@/backups
+	$(install_sh_DATA) $(TEXT_SRC) @prefix@/text
 
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
@@ -134,4 +175,5 @@ uninstall-local:
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
-                            
+
+.PHONY: version.h tinymushapi.h

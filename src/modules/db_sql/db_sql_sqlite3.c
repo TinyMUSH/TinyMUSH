@@ -1,9 +1,10 @@
-#include "../../copyright.h"
-#include "../../config.h"
-#include "../../system.h"
+#include <copyright.h>
+#include <config.h>
+#include <system.h>
 
-#include "../../api.h"
-#include "db_sql.h"		/* required by code */
+#include <tinymushapi.h>
+
+#include "db_sql.h"
 
 void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     sqlite3 *sqlite;

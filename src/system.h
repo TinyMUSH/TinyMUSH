@@ -9,10 +9,6 @@
 
 /* Prototype templates for ANSI C and traditional C */
 
-typedef int	dbref;
-typedef int	FLAG;
-typedef int	POWER;
-
 #ifdef STDC_HEADERS
 #ifdef __STDC__
 #include <stdarg.h>
@@ -108,3 +104,4 @@ typedef int	POWER;
 #include <netinet/in.h>
 #endif
 
+//#include <ltdl.h>

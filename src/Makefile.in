@@ -63,12 +63,12 @@ bin_PROGRAMS = netmush$(EXEEXT) mkindx$(EXEEXT) slave$(EXEEXT) \
 @WANT_DBM_QDBM_TRUE@am__append_8 = recover
 @WANT_MODULE_COMSYS_TRUE@am__append_9 = modules/comsys/
 @WANT_MODULE_MAIL_TRUE@am__append_10 = modules/mail/
-@WANT_MODULE_HELLO_TRUE@am__append_11 = modules/hello/
-@WANT_MODULE_DB_SQL_TRUE@am__append_12 = modules/db_sql/
+@WANT_MODULE_DB_SQL_TRUE@am__append_11 = modules/db_sql/
 subdir = .
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure $(top_srcdir)/libltdl/config/compile \
+DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/config.h.in $(top_srcdir)/configure \
+	$(top_srcdir)/libltdl/config/compile \
 	$(top_srcdir)/libltdl/config/config.guess \
 	$(top_srcdir)/libltdl/config/config.sub \
 	$(top_srcdir)/libltdl/config/depcomp \
@@ -183,7 +183,8 @@ am_netmush_OBJECTS = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	udb_ochunk.$(OBJEXT) udb_obj.$(OBJEXT) udb_misc.$(OBJEXT) \
 	unparse.$(OBJEXT) vattr.$(OBJEXT) version.$(OBJEXT) \
 	walkdb.$(OBJEXT) wild.$(OBJEXT) wiz.$(OBJEXT)
-netmush_OBJECTS = $(am_netmush_OBJECTS)
+nodist_netmush_OBJECTS =
+netmush_OBJECTS = $(am_netmush_OBJECTS) $(nodist_netmush_OBJECTS)
 am__DEPENDENCIES_1 =
 netmush_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(netmush_LDFLAGS) \
@@ -225,7 +226,8 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
-	$(EXTRA_netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES)
+	$(EXTRA_netmush_SOURCES) $(nodist_netmush_SOURCES) \
+	$(recover_SOURCES) $(slave_SOURCES)
 DIST_SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
 	$(EXTRA_netmush_SOURCES) $(am__recover_SOURCES_DIST) \
 	$(slave_SOURCES)
@@ -268,7 +270,7 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-HEADERS = $(nodist_include_HEADERS)
+HEADERS = $(include_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -278,7 +280,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = libltdl lib dbm/gdbm/ dbm/qdbm/ modules/comsys/ \
-	modules/mail/ modules/hello/ modules/db_sql/
+	modules/mail/ modules/db_sql/
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -1403,7 +1405,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_6)
 SUBDIRS = libltdl lib $(am__append_1) $(am__append_5) $(am__append_9) \
-	$(am__append_10) $(am__append_11) $(am__append_12)
+	$(am__append_10) $(am__append_11)
 TEXT_DIR = $(srcdir)/text
 TEXT_SRC = $(TEXT_DIR)/badsite.txt $(TEXT_DIR)/connect.txt $(TEXT_DIR)/create_reg.txt \
 	$(TEXT_DIR)/down.txt $(TEXT_DIR)/full.txt $(TEXT_DIR)/guest.txt $(TEXT_DIR)/help.txt \
@@ -1423,7 +1425,8 @@ SCRIPT_DAT = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cv
 	$(SCRIPT_DIR)/netmush.conf
 
 EXTRA_DIST = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
-CLEANFILES = version.h buildnum.data
+CLEANFILES = version.h buildnum.data tinymushapi.h
+API_SRC = copyright.h typedefs.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h api.h externs.h
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
 	funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c \
@@ -1445,10 +1448,11 @@ netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 	$(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM) $(am__append_3) \
 	$(am__append_7)
 netmush_DEPENDENCIES = $(LTDLDEPS) 
-nodist_include_HEADERS = version.h
+include_HEADERS = tinymushapi.h
+nodist_netmush_SOURCES = version.h
 mkindx_SOURCES = mkindx.c
 slave_SOURCES = slave.c
-BUILT_SOURCES = version.h
+BUILT_SOURCES = version.h tinymushapi.h
 @WANT_DBM_GDBM_TRUE@recover_SOURCES = recover.c
 @WANT_DBM_QDBM_TRUE@recover_SOURCES = recover.c
 @WANT_DBM_GDBM_TRUE@recover_LDADD = $(srcdir)/dbm/gdbm/.libs/libtinygdbm.a $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
@@ -1667,9 +1671,9 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
-install-nodist_includeHEADERS: $(nodist_include_HEADERS)
+install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
@@ -1683,9 +1687,9 @@ install-nodist_includeHEADERS: $(nodist_include_HEADERS)
 	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
 	done
 
-uninstall-nodist_includeHEADERS:
+uninstall-includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
@@ -2071,7 +2075,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local install-nodist_includeHEADERS
+install-data-am: install-data-local install-includeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -2119,8 +2123,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-local \
-	uninstall-nodist_includeHEADERS
+uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
+	uninstall-local
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all check \
 	cscopelist-recursive ctags-recursive install install-am \
@@ -2138,15 +2142,14 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local \
 	install install-am install-binPROGRAMS install-data \
 	install-data-am install-data-local install-dvi install-dvi-am \
 	install-exec install-exec-am install-exec-local install-html \
-	install-html-am install-info install-info-am install-man \
-	install-nodist_includeHEADERS install-pdf install-pdf-am \
+	install-html-am install-includeHEADERS install-info \
+	install-info-am install-man install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-local \
-	uninstall-nodist_includeHEADERS
+	uninstall-binPROGRAMS uninstall-includeHEADERS uninstall-local
 
 
 version.h:
@@ -2167,28 +2170,72 @@ version.h:
 
 indent:
 	for i in `ls *.c *.h`; do \
-	astyle --style=bsd $$i; \
+	astyle -A2 $$i; \
 	done; 
 
-autotools:
-	shtoolize -o $(ac_aux_dir)/shtool all
-	autoreconf -ivf
+testpath:
+	@echo prefix : @prefix@
+	@echo exec_prefix : @exec_prefix@
+	@echo bindir : @bindir@
+	@echo sbindir : @sbindir@
+	@echo libexecdir : @libexecdir@
+	@echo datarootdir : @datarootdir@
+	@echo datadir : @datadir@
+	@echo sysconfdir : @sysconfdir@
+	@echo sharedstatedir : @sharedstatedir@
+	@echo localstatedir : @localstatedir@
+	@echo includedir : @includedir@
+	@echo oldincludedir : @oldincludedir@
+	@echo docdir : @docdir@
+	@echo infodir : @infodir@
+	@echo htmldir : @htmldir@
+	@echo dvidir : @dvidir@
+	@echo pdfdir : @pdfdir@
+	@echo psdir : @psdir@
+	@echo libdir : @libdir@
+	@echo lispdir : @lispdir@
+	@echo localedir : @localedir@
+	@echo mandir : @mandir@
+	@echo man1dir : @man1dir@
+	@echo man2dir : @man2dir@
+	@echo manext : @manext@
+	@echo man1ext : @man1ext@
+	@echo man2ext : @man2ext@
+	@echo srcdir : @srcdir@
 
+tinymushapi.h:
+	rm -f $(srcdir)/tinymushapi.h
+	touch $(srcdir)/tinymushapi.h
+	chmod +w $(srcdir)/tinymushapi.h
+	printf "#ifndef __TINYMUSHAPI_H\n#define __TINYMUSHAPI_H\n\n" >> tinymushapi.h
+	printf "\n\n#include <ltdl.h>\n\n#include <netinet/in.h>\n\n" >> tinymushapi.h
+	sed -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
+	sed -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
+	sed -n "/DOING_LEN/p" < config.h >> tinymushapi.h
+	sed -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
+	sed -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h
+	for i in $(API_SRC); \
+	do \
+		TMP=`echo "__$$i" | tr '.' '_' | tr '[:lower:]' '[:upper:]'`; \
+		printf "\n\n/*\n * From $$i\n */\n\n" >> tinymushapi.h; \
+		sed -n "/#ifndef $$TMP/,/\/* $$TMP *\//p" < $$i >> tinymushapi.h; \
+	done
+	printf "\n\n#endif                          /* __TINYMUSHAPI_H */\n" >> tinymushapi.h
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
 	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
-	$(mkinstalldirs) $(prefix) 
-	$(install_sh_SCRIPT) $(SCRIPT_SRC) $(prefix)
-	$(install_sh_DATA) $(SCRIPT_DAT) $(prefix)
+	$(mkinstalldirs) @prefix@ 
+	$(install_sh_SCRIPT) $(SCRIPT_SRC) @prefix@
+	$(install_sh_DATA) $(SCRIPT_DAT) @prefix@
 
 install-data-local:
-	$(mkinstalldirs) $(prefix)/text
-	$(mkinstalldirs) $(prefix)/data
-	$(mkinstalldirs) $(prefix)/backups
-	$(install_sh_DATA) $(TEXT_SRC) $(prefix)/text
+	$(mkinstalldirs) @prefix@/text
+	$(mkinstalldirs) @prefix@/data
+	$(mkinstalldirs) @prefix@/backups
+	$(install_sh_DATA) $(TEXT_SRC) @prefix@/text
 
 uninstall-local:
 	for files in $(TEXT_SRC); do rm -f $(prefix)/text/`basename $$files`; done
@@ -2196,6 +2243,8 @@ uninstall-local:
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
+
+.PHONY: version.h tinymushapi.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

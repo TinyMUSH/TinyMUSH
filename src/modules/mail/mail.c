@@ -9,11 +9,12 @@
  * -------------------------------------------------------------------
  */
 
-#include "../../copyright.h"
-#include "../../config.h"
-#include "../../system.h"
+#include <copyright.h>
+#include <config.h>
+#include <system.h>
 
-#include "../../api.h"
+#include <tinymushapi.h>
+
 #include "mail.h"
 
 /* --------------------------------------------------------------------------
@@ -136,9 +137,7 @@ struct malias **malias;
  * more than one player, we won't have to duplicate the text.
  */
 
-static void mail_db_grow(newtop)
-int newtop;
-{
+static void mail_db_grow(int newtop) {
     int newsize, i;
     MENT *newdb;
 
@@ -188,8 +187,7 @@ int newtop;
  * * database.
  */
 
-static void make_mail_freelist()
-{
+static void make_mail_freelist(void) {
     int i;
 
     for (i = 0; i < mod_mail_config.mail_db_top; i++) {
@@ -208,10 +206,7 @@ static void make_mail_freelist()
  * * a unique number for that message.
  */
 
-static int add_mail_message(player, message)
-dbref player;
-char *message;
-{
+static int add_mail_message(dbref player, char *message) {
     int number;
     char *atrstr, *execstr, *bp, *str;
     int aflags, alen;
@@ -245,9 +240,7 @@ char *message;
  * add_mail_message_nosig - used for reading in old style messages from disk
  */
 
-static int add_mail_message_nosig(message)
-const char *message;
-{
+static int add_mail_message_nosig(const char *message) {
     int number;
 
     number = mod_mail_config.mail_freelist;
@@ -265,10 +258,7 @@ const char *message;
  * * a number assigned to them.
  */
 
-static void new_mail_message(message, number)
-const char *message;
-int number;
-{
+static void new_mail_message(const char *message, int number) {
     mod_mail_config.mail_list[number].message = XSTRDUP(message, "new_mail_message");
 }
 
@@ -276,9 +266,7 @@ int number;
  * add_count - increments the reference count for any particular message
  */
 
-static void add_count(number)
-int number;
-{
+static void add_count(int number) {
     mod_mail_config.mail_list[number].count++;
 }
 
@@ -287,9 +275,7 @@ int number;
  * * deletes the message if the counter reaches 0.
  */
 
-static void delete_mail_message(number)
-int number;
-{
+static void delete_mail_message(int number) {
     mod_mail_config.mail_list[number].count--;
 
     if (mod_mail_config.mail_list[number].count < 1) {
@@ -304,9 +290,7 @@ int number;
  * should NOT be modified.
  */
 
-char *get_mail_message(number)
-int number;
-{
+char *get_mail_message(int number) {
     static char err[] = "MAIL: This mail message does not exist in the database. Please alert your admin.";
 
     if (mod_mail_config.mail_list[number].message != NULL) {
@@ -334,11 +318,7 @@ int number;
 /*
  * Change or rename a folder
  */
-void do_mail_change_folder(player, fld, newname)
-dbref player;
-char *fld;
-char *newname;
-{
+void do_mail_change_folder(dbref player, char *fld, char *newname) {
     int pfld;
     char *p;
 
@@ -387,38 +367,23 @@ char *newname;
     }
 }
 
-void do_mail_tag(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_tag(dbref player, char *msglist) {
     do_mail_flags(player, msglist, M_TAG, 0);
 }
 
-void do_mail_safe(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_safe(dbref player, char *msglist) {
     do_mail_flags(player, msglist, M_SAFE, 0);
 }
 
-void do_mail_clear(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_clear(dbref player, char *msglist) {
     do_mail_flags(player, msglist, M_CLEARED, 0);
 }
 
-void do_mail_untag(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_untag(dbref player, char *msglist) {
     do_mail_flags(player, msglist, M_TAG, 1);
 }
 
-void do_mail_unclear(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_unclear(dbref player, char *msglist) {
     do_mail_flags(player, msglist, M_CLEARED, 1);
 }
 
@@ -426,12 +391,7 @@ char *msglist;
  * adjust the flags of a set of messages
  */
 
-static void do_mail_flags(player, msglist, flag, negate)
-dbref player;
-char *msglist;
-mail_flag flag;
-int negate;			/* if 1, clear the flag */
-{
+static void do_mail_flags(dbref player, char *msglist, mail_flag flag, int negate) {
     struct mail *mp;
     struct mail_selector ms;
     int i = 0, j = 0, folder;
@@ -486,11 +446,7 @@ int negate;			/* if 1, clear the flag */
  * Change a message's folder
  */
 
-void do_mail_file(player, msglist, folder)
-dbref player;
-char *msglist;
-char *folder;
-{
+void do_mail_file(dbref player, char *msglist, char *folder) {
     struct mail *mp;
     struct mail_selector ms;
     int foldernum, origfold;
@@ -531,10 +487,7 @@ char *folder;
  * print a mail message(s)
  */
 
-void do_mail_read(player, msglist)
-dbref player;
-char *msglist;
-{
+void do_mail_read(dbref player, char *msglist) {
     struct mail *mp;
     char *tbuf1, *buff, *status, *names, *ccnames;
     struct mail_selector ms;
@@ -599,10 +552,7 @@ char *msglist;
     free_lbuf(tbuf1);
 }
 
-void do_mail_retract(player, name, msglist)
-dbref player;
-char *name, *msglist;
-{
+void do_mail_retract(dbref player, char *name, char *msglist) {
     dbref target;
     struct mail *mp, *nextp;
     struct mail_selector ms;
@@ -671,11 +621,7 @@ char *name, *msglist;
 }
 
 
-void do_mail_review(player, name, msglist)
-dbref player;
-char *name;
-char *msglist;
-{
+void do_mail_review(dbref player, char *name, char *msglist) {
     struct mail *mp;
     struct mail_selector ms;
     int i = 0, j = 0;
@@ -826,11 +772,7 @@ char *msglist;
     }
 }
 
-void do_mail_list(player, msglist, sub)
-dbref player;
-char *msglist;
-int sub;
-{
+void do_mail_list(dbref player, char *msglist, int sub) {
     struct mail *mp;
     struct mail_selector ms;
     int i = 0, folder;
@@ -879,9 +821,7 @@ int sub;
     notify(player, DASH_LINE);
 }
 
-static char *mail_list_time(the_time)
-const char *the_time;
-{
+static char *mail_list_time(const char *the_time) {
     char *new;
     char *p, *q;
     int i;
@@ -917,9 +857,7 @@ const char *the_time;
     return new;
 }
 
-void do_mail_purge(player)
-dbref player;
-{
+void do_mail_purge(dbref player) {
     struct mail *mp, *nextp;
 
     /*
@@ -972,11 +910,7 @@ dbref player;
     notify(player, "MAIL: Mailbox purged.");
 }
 
-void do_mail_fwd(player, msg, tolist)
-dbref player;
-char *msg;
-char *tolist;
-{
+void do_mail_fwd(dbref player, char *msg, char *tolist) {
     struct mail *mp;
     int num, mail_ok;
 
@@ -1010,11 +944,7 @@ char *tolist;
     }
 }
 
-void do_mail_reply(player, msg, all, key)
-dbref player;
-char *msg;
-int all, key;
-{
+void do_mail_reply(dbref player, char *msg, int all, int key) {
     struct mail *mp;
     int num, mail_ok;
     char *tolist, *ccnames, *bp, *p, *oldlist, *tokst;
@@ -1095,10 +1025,7 @@ int all, key;
 /*-------------------------------------------------------------------------*
  *   Basic mail functions
  *-------------------------------------------------------------------------*/
-struct mail *mail_fetch(player, num)
-dbref player;
-int num;
-{
+struct mail *mail_fetch(dbref player, int num) {
     struct mail *mp;
     int i = 0;
 
@@ -1118,13 +1045,7 @@ int num;
  * * ccount
  */
 
-void count_mail(player, folder, rcount, ucount, ccount)
-dbref player;
-int folder;
-int *rcount;
-int *ucount;
-int *ccount;
-{
+void count_mail(dbref player, int folder, int *rcount, int *ucount, int *ccount) {
     struct mail *mp;
     int rc, uc, cc;
 
@@ -1146,11 +1067,7 @@ int *ccount;
     *ccount = cc;
 }
 
-void urgent_mail(player, folder, ucount)
-dbref player;
-int folder;
-int *ucount;
-{
+void urgent_mail(dbref player, int folder, int *ucount) {
     struct mail *mp;
     int uc;
 
@@ -1166,13 +1083,7 @@ int *ucount;
     *ucount = uc;
 }
 
-static void send_mail(player, target, tolist, cclist, bcclist, subject,
-                      number, flags, silent)
-dbref player, target;
-const char *tolist, *cclist, *bcclist, *subject;
-int number, silent;
-mail_flag flags;
-{
+static void send_mail(dbref player, dbref target, const char *tolist, const char *cclist, const char *bcclist, const char *subject, int number, mail_flag flags, int silent) {
     struct mail *newp;
     struct mail *mp;
     time_t tt;
@@ -1246,9 +1157,7 @@ mail_flag flags;
     return;
 }
 
-void do_mail_nuke(player)
-dbref player;
-{
+void do_mail_nuke(dbref player) {
     struct mail *mp, *nextp;
     dbref thing;
 
@@ -1283,11 +1192,7 @@ dbref player;
     notify(player, "You annihilate the post office. All messages cleared.");
 }
 
-void do_mail_debug(player, action, victim)
-dbref player;
-char *action;
-char *victim;
-{
+void do_mail_debug(dbref player, char *action, char *victim) {
     dbref target, thing;
     struct mail *mp, *nextp;
 
@@ -1368,11 +1273,7 @@ char *victim;
     }
 }
 
-void do_mail_stats(player, name, full)
-dbref player;
-char *name;
-int full;
-{
+void do_mail_stats(dbref player, char *name, int full) {
     dbref target, thing;
     int fc, fr, fu, tc, tr, tu, fchars, tchars, cchars, count;
     char last[50];
@@ -1541,11 +1442,7 @@ int full;
  *   Main mail routine for @mail w/o a switch
  *-------------------------------------------------------------------------*/
 
-void do_mail_stub(player, arg1, arg2)
-dbref player;
-char *arg1;
-char *arg2;
-{
+void do_mail_stub(dbref player, char *arg1, char *arg2) {
 
     if (Typeof(player) != TYPE_PLAYER) {
         notify(player, "MAIL: Only players may send and receive mail.");
@@ -1599,12 +1496,7 @@ char *arg2;
 }
 
 
-void do_mail(player, cause, key, arg1, arg2)
-dbref player, cause;
-int key;
-char *arg1;
-char *arg2;
-{
+void do_mail(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     switch (key & ~MAIL_QUOTE) {
     case 0:
         do_mail_stub(player, arg1, arg2);
@@ -1705,9 +1597,7 @@ char *arg2;
     }
 }
 
-void mod_mail_dump_database(fp)
-FILE *fp;
-{
+void mod_mail_dump_database(FILE *fp) {
     struct mail *mp, *mptr;
     dbref thing;
     int count = 0, i;
@@ -1752,9 +1642,7 @@ FILE *fp;
     fflush(fp);
 }
 
-void mod_mail_load_database(fp)
-FILE *fp;
-{
+void mod_mail_load_database(FILE *fp) {
     char nbuf1[8];
     int mail_top = 0;
     int new = 0;
@@ -1883,10 +1771,7 @@ FILE *fp;
     load_malias(fp);
 }
 
-static int get_folder_number(player, name)
-dbref player;
-char *name;
-{
+static int get_folder_number(dbref player, char *name) {
     int aflags, alen;
     dbref aowner;
     char *atrstr;
@@ -1922,10 +1807,7 @@ char *name;
     return atoi(res);
 }
 
-static char *get_folder_name(player, fld)
-dbref player;
-int fld;
-{
+static char *get_folder_name(dbref player, int fld) {
     static char str[LBUF_SIZE];
     char *pat;
     static char *old;
@@ -1963,11 +1845,7 @@ int fld;
     }
 }
 
-void add_folder_name(player, fld, name)
-dbref player;
-int fld;
-char *name;
-{
+void add_folder_name(dbref player, int fld, char *name) {
     char *old, *res, *r, *atrstr;
     char *new, *pat, *str, *tbuf;
     int aflags, alen;
@@ -2020,9 +1898,7 @@ char *name;
     free_lbuf(res);
 }
 
-static int player_folder(player)
-dbref player;
-{
+static int player_folder(dbref player) {
     /*
      * Return the player's current folder number. If they don't have one,
      * set it to 0
@@ -2041,10 +1917,7 @@ dbref player;
     return number;
 }
 
-void set_player_folder(player, fnum)
-dbref player;
-int fnum;
-{
+void set_player_folder(dbref player, int fnum) {
     /*
      * Set a player's folder to fnum
      */
@@ -2065,10 +1938,7 @@ int fnum;
     free_lbuf(tbuf1);
 }
 
-static int parse_folder(player, folder_string)
-dbref player;
-char *folder_string;
-{
+static int parse_folder(dbref player, char *folder_string) {
     int fnum;
 
     /*
@@ -2091,11 +1961,7 @@ char *folder_string;
     return get_folder_number(player, folder_string);
 }
 
-static int mail_match(mp, ms, num)
-struct mail *mp;
-struct mail_selector ms;
-int num;
-{
+static int mail_match(struct mail *mp, struct mail_selector ms, int num) {
     mail_flag mpflag;
 
     /*
@@ -2136,11 +2002,7 @@ int num;
     return 1;
 }
 
-static int parse_msglist(msglist, ms, player)
-char *msglist;
-struct mail_selector *ms;
-dbref player;
-{
+static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player) {
     char *p, *q;
     char tbuf1[LBUF_SIZE];
 
@@ -2371,8 +2233,7 @@ dbref player;
     return 1;
 }
 
-void check_mail_expiration()
-{
+void check_mail_expiration(void) {
     struct mail *mp, *nextp;
     struct tm then_tm;
     time_t then, now = time(0);
@@ -2434,9 +2295,7 @@ void check_mail_expiration()
     }
 }
 
-static char *status_chars(mp)
-struct mail *mp;
-{
+static char *status_chars(struct mail *mp) {
     /*
      * Return a short description of message flags
      */
@@ -2456,9 +2315,7 @@ struct mail *mp;
     return res;
 }
 
-static char *status_string(mp)
-struct mail *mp;
-{
+static char *status_string(struct mail *mp) {
     /*
      * Return a longer description of message flags
      */
@@ -2485,11 +2342,7 @@ struct mail *mp;
     return tbuf1;
 }
 
-void check_mail(player, folder, silent)
-dbref player;
-int folder;
-int silent;
-{
+void check_mail(dbref player, int folder, int silent) {
 
     /*
      * Check for new @mail
@@ -2534,9 +2387,7 @@ int silent;
     return;
 }
 
-static int sign(x)
-int x;
-{
+static int sign(int x) {
     if (x == 0) {
         return 0;
     } else if (x < 0) {
@@ -2547,11 +2398,7 @@ int x;
 }
 
 
-void do_malias_switch(player, a1, a2)
-dbref player;
-char *a1;
-char *a2;
-{
+void do_malias_switch(dbref player, char *a1, char *a2) {
     if ((!a2 || !*a2) && !(!a1 || !*a1))
         do_malias_list(player, a1);
     else if ((!*a1 || !a1) && (!*a2 || !a2))
@@ -2560,12 +2407,7 @@ char *a2;
         do_malias_create(player, a1, a2);
 }
 
-void do_malias(player, cause, key, arg1, arg2)
-dbref player, cause;
-int key;
-char *arg1;
-char *arg2;
-{
+void do_malias(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     switch (key) {
     case 0:
         do_malias_switch(player, arg1, arg2);
@@ -2601,10 +2443,7 @@ char *arg2;
     }
 }
 
-struct malias *get_malias(player, alias)
-dbref player;
-char *alias;
-{
+struct malias *get_malias(dbref player, char *alias) {
     char *mal;
     struct malias *m;
     int i = 0;
@@ -2635,11 +2474,7 @@ char *alias;
     return NULL;
 }
 
-void do_malias_create(player, alias, tolist)
-dbref player;
-char *alias;
-char *tolist;
-{
+void do_malias_create(dbref player, char *alias, char *tolist) {
     char *head, *tail, spot;
     struct malias *m;
     struct malias **nm;
@@ -2759,10 +2594,7 @@ char *tolist;
     notify(player, tprintf("MAIL: Alias set '%s' defined.", alias));
 }
 
-void do_malias_list(player, alias)
-dbref player;
-char *alias;
-{
+void do_malias_list(dbref player, char *alias) {
     struct malias *m;
     int i = 0;
     char *buff, *bp;
@@ -2789,9 +2621,7 @@ char *alias;
     free_lbuf(buff);
 }
 
-void do_malias_list_all(player)
-dbref player;
-{
+void do_malias_list_all(dbref player) {
     struct malias *m;
     int i = 0;
     int notified = 0;
@@ -2813,9 +2643,7 @@ dbref player;
     notify(player, "*****  End of Mail Aliases *****");
 }
 
-void load_malias(fp)
-FILE *fp;
-{
+void load_malias(FILE *fp) {
     char buffer[200];
 
 
@@ -2830,17 +2658,13 @@ FILE *fp;
     }
 }
 
-void save_malias(fp)
-FILE *fp;
-{
+void save_malias(FILE *fp) {
 
     fprintf(fp, "*** Begin MALIAS ***\n");
     malias_write(fp);
 }
 
-void malias_read(fp)
-FILE *fp;
-{
+void malias_read(FILE *fp) {
     int i, j;
     char buffer[1000];
     struct malias *m;
@@ -2882,9 +2706,7 @@ FILE *fp;
     }
 }
 
-void malias_write(fp)
-FILE *fp;
-{
+void malias_write(FILE *fp) {
     int i, j;
     struct malias *m;
 
@@ -2900,10 +2722,7 @@ FILE *fp;
     }
 }
 
-static int do_expmail_start(player, arg, arg2, subject)
-dbref player;
-char *arg, *arg2, *subject;
-{
+static int do_expmail_start(dbref player, char *arg, char *arg2, char *subject) {
     char *tolist, *cclist, *names, *ccnames;
 
     if (!arg || !*arg) {
@@ -2952,11 +2771,7 @@ char *arg, *arg2, *subject;
     return 1;
 }
 
-static void do_mail_to(player, arg, attr)
-dbref player;
-char *arg;
-int attr;
-{
+static void do_mail_to(dbref player, char *arg, int attr) {
     char *tolist, *names, *cclist, *ccnames, *bcclist, *bccnames;
     dbref aowner;
     int aflags, alen;
@@ -3013,10 +2828,7 @@ int attr;
     free_lbuf(bcclist);
 }
 
-static char *make_namelist(player, arg)
-dbref player;
-char *arg;
-{
+static char *make_namelist(dbref player, char *arg) {
     char *names, *oldarg;
     char *bp, *p, *tokst;
 
@@ -3042,10 +2854,7 @@ char *arg;
     return names;
 }
 
-static char *make_numlist(player, arg)
-dbref player;
-char *arg;
-{
+static char *make_numlist(dbref player, char *arg) {
     char *head, *tail, spot;
     static char *numbuf;
     static char buf[MBUF_SIZE];
@@ -3134,10 +2943,7 @@ char *arg;
     }
 }
 
-void do_mail_quick(player, arg1, arg2)
-dbref player;
-char *arg1, *arg2;
-{
+void do_mail_quick(dbref player, char *arg1, char *arg2) {
     char *buf, *bp, *tolist;
 
     if (!arg1 || !*arg1) {
@@ -3172,11 +2978,7 @@ char *arg1, *arg2;
     free_lbuf(tolist);
 }
 
-void mail_to_list(player, tolist, cclist, bcclist, subject, message, flags, silent)
-dbref player;
-char *tolist, *cclist, *bcclist, *subject, *message;
-int flags, silent;
-{
+void mail_to_list(dbref player, char *tolist, char *cclist, char *bcclist, char *subject, char *message, int flags, int silent) {
     char *head, *tail, spot, *list, *bp;
     struct malias *m;
     dbref target;
@@ -3315,10 +3117,7 @@ int flags, silent;
     XFREE(recip_array, "mail_to_list.recip_array");
 }
 
-void do_expmail_stop(player, flags)
-dbref player;
-int flags;
-{
+void do_expmail_stop(dbref player, int flags) {
     char *tolist, *cclist, *bcclist, *mailsub, *mailmsg, *mailflags;
     dbref aowner;
     int aflags, alen;
@@ -3346,18 +3145,12 @@ int flags;
     Flags2(player) &= ~PLAYER_MAILS;
 }
 
-static void do_expmail_abort(player)
-dbref player;
-{
+static void do_expmail_abort(dbref player) {
     Flags2(player) &= ~PLAYER_MAILS;
     notify(player, "MAIL: Message aborted.");
 }
 
-void do_prepend(player, cause, key, text)
-dbref player, cause;
-int key;
-char *text;
-{
+void do_prepend(dbref player, dbref cause, int key, char *text) {
     char *oldmsg, *newmsg, *bp, *attr;
     dbref aowner;
     int aflags, alen;
@@ -3385,11 +3178,7 @@ char *text;
 
 }
 
-void do_postpend(player, cause, key, text)
-dbref player, cause;
-int key;
-char *text;
-{
+void do_postpend(dbref player, dbref cause, int key, char *text) {
     char *oldmsg, *newmsg, *bp, *attr;
     dbref aowner;
     int aflags, alen;
@@ -3420,11 +3209,7 @@ char *text;
     }
 }
 
-static void do_edit_msg(player, from, to)
-dbref player;
-char *from;
-char *to;
-{
+static void do_edit_msg(dbref player, char *from, char *to) {
     char *result, *msg;
     dbref aowner;
     int aflags, alen;
@@ -3441,9 +3226,7 @@ char *to;
     }
 }
 
-static void do_mail_proof(player)
-dbref player;
-{
+static void do_mail_proof(dbref player) {
     char *mailto, *names, *ccnames, *bccnames, *message;
     dbref aowner;
     int aflags, alen;
@@ -3483,11 +3266,7 @@ dbref player;
     }
 }
 
-void do_malias_desc(player, alias, desc)
-dbref player;
-char *alias;
-char *desc;
-{
+void do_malias_desc(dbref player, char *alias, char *desc) {
     struct malias *m;
 
     if (!(m = get_malias(player, alias))) {
@@ -3508,11 +3287,7 @@ char *desc;
     return;
 }
 
-void do_malias_chown(player, alias, owner)
-dbref player;
-char *alias;
-char *owner;
-{
+void do_malias_chown(dbref player, char *alias, char *owner) {
     struct malias *m;
     dbref no = NOTHING;
 
@@ -3534,11 +3309,7 @@ char *owner;
     }
 }
 
-void do_malias_add(player, alias, person)
-dbref player;
-char *alias;
-char *person;
-{
+void do_malias_add(dbref player, char *alias, char *person) {
     int i = 0;
     dbref thing;
     struct malias *m;
@@ -3586,11 +3357,7 @@ char *person;
     notify(player, tprintf("MAIL: %s added to %s", Name(thing), m->name));
 }
 
-void do_malias_remove(player, alias, person)
-dbref player;
-char *alias;
-char *person;
-{
+void do_malias_remove(dbref player, char *alias, char *person) {
     int i, ok = 0;
     dbref thing;
     struct malias *m;
@@ -3633,11 +3400,7 @@ char *person;
                            Name(thing), alias));
 }
 
-void do_malias_rename(player, alias, newname)
-dbref player;
-char *alias;
-char *newname;
-{
+void do_malias_rename(dbref player, char *alias, char *newname) {
     struct malias *m;
 
     if ((m = get_malias(player, alias)) == NULL) {
@@ -3668,10 +3431,7 @@ char *newname;
     notify(player, "MAIL: Mailing Alias renamed.");
 }
 
-void do_malias_delete(player, alias)
-dbref player;
-char *alias;
-{
+void do_malias_delete(dbref player, char *alias) {
     int i = 0;
     int done = 0;
     struct malias *m;
@@ -3702,9 +3462,7 @@ char *alias;
         ma_top--;
 }
 
-void do_malias_adminlist(player)
-dbref player;
-{
+void do_malias_adminlist(dbref player) {
     struct malias *m;
     int i;
 
@@ -3724,9 +3482,7 @@ dbref player;
     notify(player, "***** End of Mail Aliases *****");
 }
 
-void do_malias_status(player)
-dbref player;
-{
+void do_malias_status(dbref player) {
     if (!ExpMail(player))
         notify(player, "MAIL: Permission denied.");
     else {
@@ -3739,8 +3495,7 @@ dbref player;
  * Functions.
  */
 
-FUNCTION(fun_mail)
-{
+void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /* This function can take one of three formats: 1.  mail(num)  -->
      * returns message <num> for privs. 2.  mail(player)  -->
      * returns number of messages for <player>. 3.
@@ -3806,8 +3561,7 @@ FUNCTION(fun_mail)
     safe_str("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
-FUNCTION(fun_mailfrom)
-{
+void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     /* This function can take these formats: 1) mailfrom(<num>) 2)
      * mailfrom(<player>,<num>) It returns the dbref of the player the
      * mail is from
@@ -3938,39 +3692,27 @@ CMDENT mod_mail_cmdtable[] = {
  * Handlers.
  */
 
-void mod_mail_announce_connect(player, reason, num)
-dbref player;
-const char *reason;
-int num;
-{
+void mod_mail_announce_connect(dbref player, const char *reason, int num) {
     check_mail(player, 0, 0);
     if (Sending_Mail(player)) {
         notify(player, "MAIL: You have a mail message in progress.");
     }
 }
 
-void mod_mail_announce_disconnect(player, reason, num)
-dbref player;
-const char *reason;
-int num;
-{
+void mod_mail_announce_disconnect(dbref player, const char *reason, int num) {
     do_mail_purge(player);
 }
 
-void mod_mail_destroy_player(player, victim)
-dbref player, victim;
-{
+void mod_mail_destroy_player(dbref player, dbref victim) {
     do_mail_clear(victim, NULL);
     do_mail_purge(victim);
 }
 
-void mod_mail_cleanup_startup()
-{
+void mod_mail_cleanup_startup(void) {
     check_mail_expiration();
 }
 
-void mod_mail_init()
-{
+void mod_mail_init(void) {
     mod_mail_config.mail_expiration = 14;
     mod_mail_config.mail_db_top = 0;
     mod_mail_config.mail_db_size = 0;
@@ -3982,10 +3724,7 @@ void mod_mail_init()
     register_hashtables(NULL, mod_mail_nhashtable);
 }
 
-void mod_mail_version(player, cause, extra)
-	dbref player, cause;
-	int extra;
-{
+void mod_mail_version(dbref player, dbref cause, int extra) {
 	char string[MBUF_SIZE];
 	
 	sprintf(string, "Module MAIL : version %d.%d", mudstate.version.major, mudstate.version.minor);

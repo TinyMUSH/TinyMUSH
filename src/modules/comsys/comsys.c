@@ -1,11 +1,14 @@
 /* comsys.c - module implementing DarkZone-style channel system */
 /* $Id: comsys.c,v 1.81 2008/01/10 00:04:18 lwl Exp $ */
 
-#include "../../copyright.h"
-#include "../../config.h"
-#include "../../system.h"
+#include <copyright.h>
+#include <config.h>
+#include <system.h>
 
-#include "../../api.h"
+#include <tinymushapi.h>
+
+
+
 
 /* --------------------------------------------------------------------------
  * Constants.
@@ -170,10 +173,7 @@ hashdelete((n), &mod_comsys_calias_htab)
  * Basic channel utilities.
  */
 
-static int is_onchannel(player, chp)
-    dbref player;
-    CHANNEL *chp;
-{
+static int is_onchannel(dbref player, CHANNEL *chp) {
     CHANWHO *wp;
 
     for (wp = chp->who; wp != NULL; wp = wp->next) {
@@ -184,10 +184,7 @@ static int is_onchannel(player, chp)
     return 0;
 }
 
-static int is_listenchannel(player, chp)
-    dbref player;
-    CHANNEL *chp;
-{
+static int is_listenchannel(dbref player, CHANNEL *chp) {
     int i;
 
     for (i = 0; i < chp->num_connected; i++) {
@@ -199,10 +196,7 @@ static int is_listenchannel(player, chp)
 }
 
 
-static int is_listening_disconn(player, chp)
-    dbref player;
-    CHANNEL *chp;
-{
+static int is_listening_disconn(dbref player, CHANNEL *chp) {
     CHANWHO *wp;
 
     for (wp = chp->who; wp != NULL; wp = wp->next) {
@@ -214,11 +208,7 @@ static int is_listening_disconn(player, chp)
 }
 
 
-static int ok_channel_string(str, maxlen, ok_spaces, ok_ansi)
-    char *str;
-    int maxlen;
-    int ok_spaces, ok_ansi;
-{
+static int ok_channel_string(char *str, int maxlen, int ok_spaces, int ok_ansi) {
     char *p;
 
     if (!str || !*str)
@@ -237,9 +227,7 @@ static int ok_channel_string(str, maxlen, ok_spaces, ok_ansi)
     return 1;
 }
 
-static char *munge_comtitle(title)
-    char *title;
-{
+static char *munge_comtitle(char *title) {
     static char tbuf[MBUF_SIZE];
     char *tp;
 
@@ -255,12 +243,7 @@ static char *munge_comtitle(title)
     return tbuf;
 }
 
-static int ok_chanperms(player, chp, pflag, oflag, c_lock)
-    dbref player;
-    CHANNEL *chp;
-    int pflag, oflag;
-    BOOLEXP *c_lock;
-{
+static int ok_chanperms(dbref player, CHANNEL *chp, int pflag, int oflag, BOOLEXP *c_lock) {
     if (Comm_All(player))
 	return 1;
 
@@ -296,9 +279,7 @@ static int ok_chanperms(player, chp, pflag, oflag, c_lock)
  * More complex utilities.
  */
 
-static void update_comwho(chp)
-    CHANNEL *chp;
-{
+static void update_comwho(CHANNEL *chp) {
     /* We have to call this every time a channel is joined or left,
      * explicitly, as well as when players connect and disconnect.
      * This is a candidate for optimization; we should really just update
@@ -338,11 +319,7 @@ static void update_comwho(chp)
     }
 }
 
-static void com_message(chp, msg, cause)
-    CHANNEL *chp;
-    char *msg;
-    dbref cause;
-{
+static void com_message(CHANNEL *chp, char *msg, dbref cause) {
     int i;
     CHANWHO *wp;
     char *mp, msg_ns[LBUF_SIZE];
@@ -427,11 +404,7 @@ static void com_message(chp, msg, cause)
 #endif
 }
 
-static void remove_from_channel(player, chp, is_quiet)
-    dbref player;
-    CHANNEL *chp;
-    int is_quiet;
-{
+static void remove_from_channel(dbref player, CHANNEL *chp, int is_quiet) {
     /* We assume that the player's channel aliases have already been
      * removed, and that other cleanup that is not directly related to
      * the channel structure itself has been accomplished. (We also
@@ -475,16 +448,12 @@ static void remove_from_channel(player, chp, is_quiet)
 
     if (!is_quiet &&
 	(!isPlayer(player) || (Connected(player) && !Hidden(player)))) {
-	com_message(chp, tprintf("%s %s has left this channel.",
-				 chp->header, Name(player)),
-		    player);
+	com_message(chp, tprintf("%s %s has left this channel.", chp->header, Name(player)), player);
     }
 }
 
 
-static void zorch_alias_from_list(cap)
-    COMALIAS *cap;
-{
+static void zorch_alias_from_list(COMALIAS *cap) {
     COMLIST *clist, *cl_ptr, *prev;
 
     clist = lookup_clist(cap->player);
@@ -511,11 +480,7 @@ static void zorch_alias_from_list(cap)
     }
 }
 
-static void process_comsys(player, arg, cap)
-    dbref player;
-    char *arg;
-    COMALIAS *cap;
-{
+static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
     CHANWHO *wp;
     char *buff, *name_buf, tbuf[LBUF_SIZE], *tp;
     int i;
@@ -696,10 +661,7 @@ static void process_comsys(player, arg, cap)
  * Other externally-exposed utilities.
  */
 
-void join_channel(player, chan_name, alias_str, title_str)
-    dbref player;
-    char *chan_name, *alias_str, *title_str;
-{
+void join_channel(dbref player, char *chan_name, char *alias_str, char *title_str) {
     CHANNEL *chp;
     COMALIAS *cap;
     CHANWHO *wp;
@@ -801,9 +763,7 @@ void join_channel(player, chan_name, alias_str, title_str)
     }
 }
 
-void channel_clr(player)
-    dbref player;
-{
+void channel_clr(dbref player) {
     CHANNEL **ch_array;
     COMLIST *clist, *cl_ptr, *next;
     int i, found, pos;
@@ -856,11 +816,7 @@ void channel_clr(player)
     XFREE(ch_array, "channel_clr.array");
 }
 
-void mod_comsys_announce_connect(player, reason, num)
-    dbref player;
-    const char *reason;
-    int num;
-{
+void mod_comsys_announce_connect(dbref player, const char *reason, int num) {
     CHANNEL *chp;
 
     /* It's slightly easier to just go through the channels and see
@@ -882,11 +838,7 @@ void mod_comsys_announce_connect(player, reason, num)
     }
 }
 
-void mod_comsys_announce_disconnect(player, reason, num)
-    dbref player;
-    const char *reason;
-    int num;
-{
+void mod_comsys_announce_disconnect(dbref player, const char *reason, int num) {
     CHANNEL *chp;
 
     for (chp = (CHANNEL *) hash_firstentry(&mod_comsys_comsys_htab);
@@ -904,7 +856,7 @@ void mod_comsys_announce_disconnect(player, reason, num)
     }
 }
 
-void update_comwho_all()
+void update_comwho_all(void)
 {
     CHANNEL *chp;
 
@@ -915,9 +867,7 @@ void update_comwho_all()
     }
 }
 
-void comsys_chown(from_player, to_player)
-    dbref from_player, to_player;
-{
+void comsys_chown(dbref from_player, dbref to_player) {
     CHANNEL *chp;
 
     for (chp = (CHANNEL *) hash_firstentry(&mod_comsys_comsys_htab);
@@ -933,11 +883,7 @@ void comsys_chown(from_player, to_player)
  * Comsys commands: channel administration.
  */
 
-void do_ccreate(player, cause, key, name)
-    dbref player, cause;
-    int key;
-    char *name;
-{
+void do_ccreate(dbref player, dbref cause, int key, char *name) {
     CHANNEL *chp;
     char buf[LBUF_SIZE];
 
@@ -984,11 +930,7 @@ void do_ccreate(player, cause, key, name)
 }
 
 
-void do_cdestroy(player, cause, key, name)
-    dbref player, cause;
-    int key;
-    char *name;
-{
+void do_cdestroy(dbref player, dbref cause, int key, char *name) {
     CHANNEL *chp;
     COMALIAS **alias_array;
     COMALIAS *cap;
@@ -1062,11 +1004,7 @@ void do_cdestroy(player, cause, key, name)
     notify(player, tprintf("Channel %s destroyed.", name));
 }
 
-void do_channel(player, cause, key, chan_name, arg)
-    dbref player, cause;
-    int key;
-    char *chan_name, *arg;
-{
+void do_channel(dbref player, dbref cause, int key, char *chan_name, char *arg) {
     CHANNEL *chp;
     BOOLEXP *boolp;
     dbref new_owner;
@@ -1211,11 +1149,7 @@ void do_channel(player, cause, key, chan_name, arg)
 }
 
 
-void do_cboot(player, cause, key, name, objstr)
-    dbref player, cause;
-    int key;
-    char *name, *objstr;
-{
+void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr) {
     CHANNEL *chp;
     dbref thing;
     COMLIST *chead, *clist, *cl_ptr, *next, *prev;
@@ -1276,11 +1210,7 @@ void do_cboot(player, cause, key, name, objstr)
     }
 }
 
-void do_cemit(player, cause, key, chan_name, str)
-    dbref player, cause;
-    int key;
-    char *chan_name, *str;
-{
+void do_cemit(dbref player, dbref cause, int key, char *chan_name, char *str) {
     CHANNEL *chp;
 
     find_channel(player, chan_name, chp);
@@ -1293,11 +1223,7 @@ void do_cemit(player, cause, key, chan_name, str)
 		    player);
 }
 
-void do_cwho(player, cause, key, chan_name)
-    dbref player, cause;
-    int key;
-    char *chan_name;
-{
+void do_cwho(dbref player, dbref cause, int key, char *chan_name) {
     CHANNEL *chp;
     CHANWHO *wp;
     int i;
@@ -1348,13 +1274,7 @@ void do_cwho(player, cause, key, chan_name)
  * Comsys commands: player-usable.
  */
 
-void do_addcom(player, cause, key, alias_str, args, nargs)
-    dbref player, cause;
-    int key;
-    char *alias_str;
-    char *args[];
-    int nargs;
-{
+void do_addcom(dbref player, dbref cause, int key, char *alias_str, char *args[], int nargs) {
     char *chan_name, *title_str;
 
     if (nargs < 1) {
@@ -1371,11 +1291,7 @@ void do_addcom(player, cause, key, alias_str, args, nargs)
     join_channel(player, chan_name, alias_str, title_str);
 }
 
-void do_delcom(player, cause, key, alias_str)
-    dbref player, cause;
-    int key;
-    char *alias_str;
-{
+void do_delcom(dbref player, dbref cause, int key, char *alias_str) {
     COMALIAS *cap;
     CHANNEL *chp;
     COMLIST *clist, *cl_ptr;
@@ -1408,20 +1324,13 @@ void do_delcom(player, cause, key, alias_str)
     }
 }
 
-void do_clearcom(player, cause, key)
-    dbref player, cause;
-    int key;
-{
+void do_clearcom(dbref player, dbref cause, int key) {
     notify(player, "You remove yourself from all channels.");
     channel_clr(player);
 }
 
 
-void do_comtitle(player, cause, key, alias_str, title)
-    dbref player, cause;
-    int key;
-    char *alias_str, *title;
-{
+void do_comtitle(dbref player, dbref cause, int key, char *alias_str, char *title) {
     COMALIAS *cap;
 
     find_calias(player, alias_str, cap);
@@ -1441,11 +1350,7 @@ void do_comtitle(player, cause, key, alias_str, title)
 			   cap->title, cap->channel->name));
 }
 
-void do_clist(player, cause, key, chan_name)
-    dbref player, cause;
-    int key;
-    char *chan_name;
-{
+void do_clist(dbref player, dbref cause, int key, char *chan_name) {
     CHANNEL *chp;
     char *buff, tbuf[LBUF_SIZE], *tp;
     int count = 0;
@@ -1564,10 +1469,7 @@ void do_clist(player, cause, key, chan_name)
 }
 
 
-void do_comlist(player, cause, key)
-    dbref player, cause;
-    int key;
-{
+void do_comlist(dbref player, dbref cause, int key) {
     COMLIST *clist, *cl_ptr;
     int count = 0;
 
@@ -1601,11 +1503,7 @@ void do_comlist(player, cause, key)
 }
 			
 
-void do_allcom(player, cause, key, cmd)
-    dbref player, cause;
-    int key;
-    char *cmd;
-{
+void do_allcom(dbref player, dbref cause, int key, char *cmd) {
     COMLIST *clist, *cl_ptr;
 
     clist = lookup_clist(player);
@@ -1619,13 +1517,7 @@ void do_allcom(player, cause, key, cmd)
 }
 
 
-int mod_comsys_process_command(player, cause, interactive, in_cmd,
-			       args, nargs)
-    dbref player, cause;
-    int interactive;
-    char *in_cmd, *args[];
-    int nargs;
-{
+int mod_comsys_process_command(dbref player, dbref cause, int interactive, char *in_cmd, char *args[], int nargs) {
     /* Return 1 if we got something, 0 if we didn't. */
 
     char *arg;
@@ -1739,9 +1631,7 @@ CMDENT mod_comsys_cmdtable[] = {
  * Initialization, and other fun with files.
  */
 
-void mod_comsys_dump_database(fp)
-FILE *fp;
-{
+void mod_comsys_dump_database(FILE *fp) {
     CHANNEL *chp;
     COMALIAS *cap;
 
@@ -1783,9 +1673,7 @@ FILE *fp;
     fprintf(fp, "*** END OF DUMP ***\n");
 }
 
-static void comsys_flag_convert(chp)
-    CHANNEL *chp;
-{
+static void comsys_flag_convert(CHANNEL *chp) {
     /* Convert MUX-style comsys flags to the new style. */
 
     int old_flags, new_flags;
@@ -1813,10 +1701,7 @@ static void comsys_flag_convert(chp)
     chp->flags = new_flags;
 }
 
-static void comsys_data_update(chp, obj)
-    CHANNEL *chp;
-    dbref obj;
-{
+static void comsys_data_update(CHANNEL *chp, dbref obj) {
     /* Copy data from a MUX channel object to a new-style channel. */
 
     char *key;
@@ -1843,10 +1728,7 @@ static void comsys_data_update(chp, obj)
     free_lbuf(key);
 }
 
-static void read_comsys(fp, com_ver)
-    FILE *fp;
-    int com_ver;
-{
+static void read_comsys(FILE *fp, int com_ver) {
     CHANNEL *chp;
     COMALIAS *cap;
     COMLIST *clist;
@@ -2036,8 +1918,7 @@ static void read_comsys(fp, com_ver)
     }
 }
 
-static void sanitize_comsys()
-{
+static void sanitize_comsys(void) {
     /* Because we can run into situations where the comsys db and
      * regular database are not in sync (ex: restore from backup),
      * we need to sanitize the comsys data structures at load time.
@@ -2074,8 +1955,7 @@ static void sanitize_comsys()
     XFREE(ptab, "sanitize_comsys");
 }
 
-void mod_comsys_make_minimal()
-{
+void mod_comsys_make_minimal(void) {
     CHANNEL *chp;
 
     do_ccreate(GOD, GOD, 0, mod_comsys_config.public_channel);
@@ -2091,9 +1971,7 @@ void mod_comsys_make_minimal()
     }
 }
 
-void mod_comsys_load_database(fp)
-FILE *fp;
-{
+void mod_comsys_load_database(FILE *fp) {
     char buffer[2 * MBUF_SIZE + 8];	/* depends on max length of params */
 
     fgets(buffer, sizeof(buffer), fp);
@@ -2137,8 +2015,7 @@ FILE *fp;
         return; \
     }
 
-FUNCTION(fun_comlist)
-{
+void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
     char *bb_p;
     Delim osep;
@@ -2159,8 +2036,7 @@ FUNCTION(fun_comlist)
     }
 }
 
-FUNCTION(fun_cwho)
-{
+void fun_cwho(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
     char *bb_p;
     int i;
@@ -2179,8 +2055,7 @@ FUNCTION(fun_cwho)
     }
 }
 
-FUNCTION(fun_cwhoall)
-{
+void fun_cwhoall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
     CHANWHO *wp;
     char *bb_p;
@@ -2194,16 +2069,14 @@ FUNCTION(fun_cwhoall)
     }
 }
 
-FUNCTION(fun_comowner)
-{
+void fun_comowner(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
 
     Grab_Channel(player);
     safe_dbref(buff, bufc, chp->owner);
 }
 
-FUNCTION(fun_comdesc)
-{
+void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
 
     Grab_Channel(player);
@@ -2211,8 +2084,7 @@ FUNCTION(fun_comdesc)
 	safe_str(chp->descrip, buff, bufc);
 }
 
-FUNCTION(fun_comheader)
-{
+void fun_comheader(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
 
     Grab_Channel(player);
@@ -2220,8 +2092,7 @@ FUNCTION(fun_comheader)
 	safe_str(chp->header, buff, bufc);
 }
 
-FUNCTION(fun_comalias)
-{
+void fun_comalias(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
     COMLIST *clist, *cl_ptr;
     char *bb_p;
@@ -2239,8 +2110,7 @@ FUNCTION(fun_comalias)
     }
 }
 
-FUNCTION(fun_cominfo)
-{
+void fun_cominfo(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
     COMALIAS *cap;
 
@@ -2249,8 +2119,7 @@ FUNCTION(fun_cominfo)
     safe_str(cap->channel->name, buff, bufc);
 }
 
-FUNCTION(fun_comtitle)
-{
+void fun_comtitle(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     dbref target;
     COMALIAS *cap;
 
@@ -2260,8 +2129,7 @@ FUNCTION(fun_comtitle)
 	safe_str(cap->title, buff, bufc);
 }
 
-FUNCTION(fun_cemit)
-{
+void fun_cemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
     CHANNEL *chp;
 
     Grab_Channel(player);
@@ -2285,15 +2153,12 @@ FUN mod_comsys_functable[] = {
  * Initialization.
  */
 
-void mod_comsys_cleanup_startup()
+void mod_comsys_cleanup_startup(void)
 {
     update_comwho_all();
 }
 
-void mod_comsys_create_player(creator, player, isrobot, isguest)
-    dbref creator, player;
-    int isrobot, isguest;
-{
+void mod_comsys_create_player(dbref creator, dbref player, int isrobot, int isguest) {
     if (isguest && (player != 1)) {
 	if (*mod_comsys_config.guests_channel)
 	    join_channel(player, mod_comsys_config.guests_channel,
@@ -2305,20 +2170,15 @@ void mod_comsys_create_player(creator, player, isrobot, isguest)
     }
 }
 
-void mod_comsys_destroy_obj(player, obj)
-    dbref player, obj;
-{
+void mod_comsys_destroy_obj(dbref player, dbref obj) {
     channel_clr(obj);
 }
 
-void mod_comsys_destroy_player(player, victim)
-    dbref player, victim;
-{
+void mod_comsys_destroy_player(dbref player, dbref victim) {
     comsys_chown(victim, Owner(player));
 }
 
-void mod_comsys_init()
-{
+void mod_comsys_init(void) {
     mod_comsys_config.public_channel = XSTRDUP("Public", "cf_string");
     mod_comsys_config.guests_channel = XSTRDUP("Guests", "cf_string");
     mod_comsys_config.public_calias = XSTRDUP("pub", "cf_string");
@@ -2329,10 +2189,7 @@ void mod_comsys_init()
     register_functions(mod_comsys_functable);
 }
 
-void mod_comsys_version(player, cause, extra)
-	dbref player, cause;
-	int extra;
-{
+void mod_comsys_version(dbref player, dbref cause, int extra) {
 	char string[MBUF_SIZE];
 	
 	sprintf(string, "Module COMSYS : version %d.%d", mudstate.version.major, mudstate.version.minor);

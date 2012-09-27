@@ -1,4 +1,4 @@
-#include "../../copyright.h"
+#include <copyright.h>
 
 #ifndef __DB_SQL_H
 #define __DB_SQL_H

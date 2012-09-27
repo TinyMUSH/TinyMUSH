@@ -14,6 +14,7 @@
 #include "config.h"
 #include "system.h"
 
+#include <typedefs.h>
 #include  "help.h"
 
 char line[LINE_SIZE + 1];
