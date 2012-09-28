@@ -1,7 +1,199 @@
 TinyMUSH 3.3
 ------------
 
-Alpha 1 : 2012-00-19
+Alpha 2 : 2012-09-27
+--------------------
+
+commit 73cd79640a4adcfa935c4fc7eeba537d02eebc97
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 27 21:43:02 2012 -0400
+
+    - NEW : Add a version structure for modules. (@version)
+    - FIX : Finished the new module api
+    - Misc : Bump release to Alpha 2
+
+commit 8c77e63bc7325bc820916cdc4139f5b26c2b91f9
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 27 17:02:56 2012 -0400
+
+    - NEW : API for building module outside tinymush's build system. Tinymush now provide a header (tinymushapi.h) that can be used to build modules not part of the base system (see the module HELLO for how it work)
+    - Fix : Removed module HELLO from list of avalable build-in modules (It's now part of the userland modules)
+
+commit b821b2c85af8c2cdcd960c8bd8eefbe2cb6b123d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 16:07:47 2012 -0400
+
+    - FIX : Added some missing ANSI prototypes.
+
+commit dd6af13c8fc4c4d3c95cbb389dd547cf4d21ef7c
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 15:15:55 2012 -0400
+
+    - FIX : Finished ANSIfication of all functions.
+    - FIX : rename autoconfig.h to system.h and moved it out of config.h to fix a bug with GNULib.
+
+commit 61028403248d1759db4727551031cad85895024d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 11:54:20 2012 -0400
+
+    - FIX : ANSIfication of powers.c predicates.c quota.c recover.c rob.c set.c slave.c speech.h
+
+commit 9ac499c108ea569661bc9d61750ec0ec47d0c8be
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 10:52:14 2012 -0400
+
+    - FIX : ANSIfication of mkindx.c move.c netcommon.c object.c pcre.c player.c player_c.c
+
+commit 628f0ce25fa97f073097b1b4bfd62edc72d6a5a5
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 09:51:33 2012 -0400
+
+    - FIX : ANSIfication of game.c help.c htab.c log.c look.c match.c mguests.c
+
+commit cccc17b5b24f2834051de7fcb13138b9792f0ac2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 26 08:58:26 2012 -0400
+
+    - FIX : ANSIfication of fnhelper.c and fun*.c
+    - FIX : A few instances where there was too many or too few parameters in a function call.
+
+commit 85aea8d5e6cdaa634fc79f7aff5b5b525d79f43e
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 25 23:47:53 2012 -0400
+
+    - FIX : ANSIfication of eval.c file_c.c flags.c
+
+commit 8c52ea85d75980fe5279fa62d4e56187c2f63cab
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 25 23:16:02 2012 -0400
+
+    - FIX : ANSIfication of db.c and db_rw.c.
+    - FIX : atr_pget_info was lacking a "," in its call to atr_decode, using old style the compiler was unable to see the error.
+
+commit ff4bc5d044e1b38bf4f1459046f3ecc83cc87ba5
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 25 22:24:38 2012 -0400
+
+    - FIX : ANSIfication of alloc.c, api.c boolepx.c bsd.c command.c conf.c cque.c and create.c
+            Delete compat.c no longer needed since the inclusion of GNULib.
+
+commit 7598fadb4b18bb1bdae264877d3aac17353db4ff
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Sep 24 17:55:41 2012 -0400
+
+    - NEW : Use GNULib for more compatibility.
+    - NEW : Use strto* instead of ato* (more portable and safer)
+
+commit ceb3f523bba5826afee2de1c1e57eac8f5418c47
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 23 20:28:14 2012 -0400
+
+    - NEW : netmush now read most of its configuration from its config files. The only parameter it need is the shortname of the mush. Everything else will be pull from <shortname>.conf or deduced by the <shortname>
+    - FIX : modules now use <shortname>_mod_<modname>.db for their db. Allowing multilple games to run from the same /data directory.
+    - FIX : INFO was define twice in help.txt
+    - FIX : Remove non-working help aliases from aliases.conf
+
+commit 63782d47cee2d212a632864476b810cd6816ef4f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 14:10:06 2012 -0400
+
+    - Trying to force GIT to consider AUTHORS CONVERTING COPYING ChangeLog ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ INSTALL MODULES NEWS README as text files...
+
+commit d3c664f49d9445212262ab8c3b360132c30e6e39
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 14:05:51 2012 -0400
+
+    Introduce end-of-line normalization
+
+commit f271a1c67522fae9126ae63129677a8054adec34
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:57:45 2012 -0400
+
+    - Never code on Windows unless your editor properly handle cr/lf conversions (Or you tell Eclipse to do so...)
+
+commit 8d0563627c193231f6a41e0477e3f1b611282e68
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:45:29 2012 -0400
+
+    - Test of the push-receive hook.
+
+commit 455d369a4e5cdd21611a7ee70cf277311d4accc2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:43:13 2012 -0400
+
+    - Test of the post-receive hook.
+
+commit 20ed1587a0e186af5fee850903b07477bbcbd88f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:28:09 2012 -0400
+
+    - Misc: Update license to Artistic License 2.0 per OSI's recommendation.
+    - Misc: Removed $Id$ from all files since GIT isn't using them.
+
+commit caf4cbd5785c74afe4bef1bcb350505e91c6d658
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 00:22:36 2012 -0400
+
+    - NEW : db-sql module.
+    - Fix : Some cleanup to @version
+    - Misc : Update version information (about to commit to 3.3 alpha 1)
+
+commit faaa5397bb39be15bd920e68a5e4996c763994ab
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 18 23:56:51 2012 -0400
+
+    - Fix : First version of db_sql able to link itself (only with driver_none...)
+    - Change : Add a hook for modules to @version.
+
+commit 80baf0508b1310994bbab6341d368f04db03192a
+Author: Charlie Root <root@studio.home.beaupre.biz>
+Date:   Tue Sep 18 16:50:53 2012 -0400
+
+    - Update : Use gnulib for malloc/realloc/strtod/lstat instead of the depreciated autoconf check
+    - Fix : Fixed autoconf's version parser (Linux usually simlink /bin/sh to bash, FreeBSD use a real SH. So the version parser wasn't working on BSD, rewrote it in M4)
+    - Update : Some work on the module version of db_sql.
+
+commit 0ac742cec75ef43846f44342ad35234cb810e023
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Thu Apr 12 23:03:12 2012 -0400
+
+    Testing GIT.
+
+commit 4176a3da83dbbdcd3f9b0eb42e448557bbc517f8
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Mon Apr 9 23:15:48 2012 -0400
+
+    Cleanup
+    
+    Cleanup...
+
+commit d19a5fad7742691d647106800bcab79b076fdb01
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Mar 4 09:33:04 2012 -0500
+Date:   Thu Sep 20 13:57:45 2012 -0400
+
+    - Never code on Windows unless your editor properly handle cr/lf conversions (Or you tell Eclipse to do so...)
+
+commit 8d0563627c193231f6a41e0477e3f1b611282e68
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:45:29 2012 -0400
+
+    - Test of the push-receive hook.
+
+commit 455d369a4e5cdd21611a7ee70cf277311d4accc2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:43:13 2012 -0400
+
+    - Test of the post-receive hook.
+
+commit 20ed1587a0e186af5fee850903b07477bbcbd88f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Sep 20 13:28:09 2012 -0400
+
+    - Misc: Update license to Artistic License 2.0 per OSI's recommendation.
+    - Misc: Removed $Id$ from all files since GIT isn't using them.
+
+Alpha 1 : 2012-09-19
 --------------------
 
 Date:   Thu Sep 20 00:22:36 2012 -0400
