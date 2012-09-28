@@ -67,6 +67,7 @@
 #define MALIAS_LIST	8	/* Lists mail aliases */
 #define MALIAS_STATUS	9	/* Status of mail aliases */
 
+MODVER mod_mail_version;
 
 NHSHTAB mod_mail_msg_htab;
 
@@ -3713,37 +3714,45 @@ void mod_mail_cleanup_startup(void) {
 }
 
 void mod_mail_init(void) {
+    char *str;
+    
     mod_mail_config.mail_expiration = 14;
     mod_mail_config.mail_db_top = 0;
     mod_mail_config.mail_db_size = 0;
     mod_mail_config.mail_freelist = 0;
+    
+    str = XMALLOC(MBUF_SIZE, "mod_mail_init");
 
+    sprintf(str, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    switch(mudstate.version.status){
+        case 0:
+            sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+            break;
+        case 1: 
+            sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+            break;
+        case 2: 
+            sprintf(str,"%s, Release Candidate %d", str, mudstate.version.revision);
+            break;
+        default:
+            if(mudstate.version.revision > 0) {
+                sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+            } else {
+                sprintf(str, "%s, Gold Release.", str);
+            }
+    }
+
+    mod_mail_version.version=XSTRDUP(tprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_mail_init");
+    mod_mail_version.author=XSTRDUP("TinyMUSH Development Team", "mod_mail_init");
+    mod_mail_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_mail_init");
+    mod_mail_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_mail_init");
+    mod_mail_version.description=XSTRDUP("Mail system for TinyMUSH", "mod_mail_init");
+    mod_mail_version.copyright=XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_mail_init");
+    
+    XFREE(str, "mod_mail_init");
+    
     register_commands(mod_mail_cmdtable);
     register_prefix_cmds("-~");
     register_functions(mod_mail_functable);
     register_hashtables(NULL, mod_mail_nhashtable);
-}
-
-void mod_mail_version(dbref player, dbref cause, int extra) {
-	char string[MBUF_SIZE];
-	
-	sprintf(string, "Module MAIL : version %d.%d", mudstate.version.major, mudstate.version.minor);
-	switch(mudstate.version.status){
-		case 0: 
-			sprintf(string, "%s, Alpha %d", string, mudstate.version.revision);
-                	break;
-		case 1: 
-			sprintf(string, "%s, Beta %d", string, mudstate.version.revision);
-			break;
-		case 2: 
-			sprintf(string,"%s, Release Candidate %d", string, mudstate.version.revision);
-			break;
-		default:
-			if(mudstate.version.revision > 0) {
-				sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
-			} else {
-				sprintf(string, "%s, Gold Release.", string);
-			}
-	}
-	notify(player, tprintf("%s (%s)", string, PACKAGE_RELEASE_DATE));
 }

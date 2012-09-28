@@ -456,4 +456,4 @@ total length. */
 
 /* End of internal.h */
 
-#endif /* End of pcre.h */
+#endif	/* __PCRE_H */

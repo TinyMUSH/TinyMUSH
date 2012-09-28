@@ -237,4 +237,4 @@ struct cmdentry {
 extern int	check_userdef_access(dbref, HOOKENT *, char *[], int);
 extern char    *process_command(dbref, dbref, int, char *, char *[], int);
 
-#endif				/* __COMMAND_H */
+#endif	/* __COMMAND_H */

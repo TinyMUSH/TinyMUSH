@@ -31,4 +31,4 @@ typedef	char	*mall_t;
 * use by user code (modules) */
 #define DBTYPE_END		0xFFFFFFFF	/* Highest type */
 
-#endif /* __UDB_DEFS_H */
+#endif	/* __UDB_DEFS_H */

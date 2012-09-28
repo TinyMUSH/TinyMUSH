@@ -1,6 +1,7 @@
 /* typedefs.h */
 
 #include "copyright.h"
+
 #ifndef __TYPEDEFS_H
 #define __TYPEDEFS_H
 
@@ -72,4 +73,4 @@ struct bque {
     int	nargs;		/* How many args I have */
 };
 
-#endif /* __TYPEDEFS_H */
+#endif	/* __TYPEDEFS_H */

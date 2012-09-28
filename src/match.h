@@ -59,4 +59,4 @@ extern void	restore_match_state(MSTATE *);
 #define	MAT_NUMERIC		4	/* Check for un-#ified dbrefs */
 #define	MAT_HOME		8	/* Check for 'home' */
 
-#endif /* __MATCH_H */
+#endif	/* __MATCH_H */

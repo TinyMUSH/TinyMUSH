@@ -21,4 +21,4 @@ struct help_entry {
     int len;		/* Length of entry, copied from help_indx */
 };
 
-#endif /* __HELP_H */
+#endif	/* __HELP_H */

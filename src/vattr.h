@@ -27,4 +27,4 @@ extern void	vattr_delete(char *);
 extern VATTR *	vattr_first(void);
 extern VATTR *	vattr_next(VATTR *);
 
-#endif /* __VATTR_H */
+#endif	/* __VATTR_H */

@@ -186,4 +186,4 @@ extern dbref	find_connected_name(dbref, char *);
 	     d; \
 	     d=n,n=((n!=NULL) ? n->next : NULL))
 
-#endif /* __INTERFACE_H */
+#endif	/* __INTERFACE_H */

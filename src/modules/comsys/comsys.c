@@ -7,9 +7,6 @@
 
 #include <tinymushapi.h>
 
-
-
-
 /* --------------------------------------------------------------------------
  * Constants.
  */
@@ -76,6 +73,8 @@ MODHASHES mod_comsys_hashtable[] = {
 MODNHASHES mod_comsys_nhashtable[] = {
 { "Channel lists",	&mod_comsys_comlist_htab,	100,	16},
 { NULL,			NULL,				0,	0}};
+
+MODVER mod_comsys_version;
 
 /* --------------------------------------------------------------------------
  * Structure definitions.
@@ -2179,36 +2178,44 @@ void mod_comsys_destroy_player(dbref player, dbref victim) {
 }
 
 void mod_comsys_init(void) {
+    char *str;
+    
     mod_comsys_config.public_channel = XSTRDUP("Public", "cf_string");
     mod_comsys_config.guests_channel = XSTRDUP("Guests", "cf_string");
     mod_comsys_config.public_calias = XSTRDUP("pub", "cf_string");
     mod_comsys_config.guests_calias = XSTRDUP("g", "cf_string");
+    
+    str = XMALLOC(MBUF_SIZE, "mod_comsys_init");
+
+    sprintf(str, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    switch(mudstate.version.status){
+        case 0:
+            sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+            break;
+        case 1: 
+            sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+            break;
+        case 2: 
+            sprintf(str,"%s, Release Candidate %d", str, mudstate.version.revision);
+            break;
+        default:
+            if(mudstate.version.revision > 0) {
+                sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+            } else {
+                sprintf(str, "%s, Gold Release.", str);
+            }
+    }
+
+    mod_comsys_version.version=XSTRDUP(tprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_comsys_init");
+    mod_comsys_version.author=XSTRDUP("TinyMUSH Development Team", "mod_comsys_init");
+    mod_comsys_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_comsys_init");
+    mod_comsys_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_comsys_init");
+    mod_comsys_version.description=XSTRDUP("Communication system for TinyMUSH", "mod_comsys_init");
+    mod_comsys_version.copyright=XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_comsys_init");
+    
+    XFREE(str, "mod_comsys_init");
 
     register_hashtables(mod_comsys_hashtable, mod_comsys_nhashtable);
     register_commands(mod_comsys_cmdtable);
     register_functions(mod_comsys_functable);
-}
-
-void mod_comsys_version(dbref player, dbref cause, int extra) {
-	char string[MBUF_SIZE];
-	
-	sprintf(string, "Module COMSYS : version %d.%d", mudstate.version.major, mudstate.version.minor);
-	switch(mudstate.version.status){
-		case 0: 
-			sprintf(string, "%s, Alpha %d", string, mudstate.version.revision);
-                	break;
-		case 1: 
-			sprintf(string, "%s, Beta %d", string, mudstate.version.revision);
-			break;
-		case 2: 
-			sprintf(string,"%s, Release Candidate %d", string, mudstate.version.revision);
-			break;
-		default:
-			if(mudstate.version.revision > 0) {
-				sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
-			} else {
-				sprintf(string, "%s, Gold Release.", string);
-			}
-	}
-	notify(player, tprintf("%s (%s)", string, PACKAGE_RELEASE_DATE));
 }

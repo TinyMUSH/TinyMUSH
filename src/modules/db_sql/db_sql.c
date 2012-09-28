@@ -10,6 +10,8 @@
  * Conf table.
  */
 
+MODVER mod_db_sql_version;
+
 mod_db_sql_confstorage mod_db_sql_config;
 
 CONF	mod_db_sql_conftable[] = {
@@ -100,6 +102,7 @@ FUN	mod_db_sql_functable[] = {
  */
 
 void mod_db_sql_init() {
+        char *str;
 
 	mod_db_sql_config.host = XSTRDUP("127.0.0.1", "mod_db_sql_init");
 	mod_db_sql_config.db = XSTRDUP("netmush", "mod_db_sql_init");
@@ -108,36 +111,42 @@ void mod_db_sql_init() {
 	mod_db_sql_config.reconnect = 1;
 	mod_db_sql_config.port = 3306;
 	
+    str = XMALLOC(MBUF_SIZE, "mod_db_sql_init");
+
+    sprintf(str, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    switch(mudstate.version.status){
+        case 0:
+            sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+            break;
+        case 1: 
+            sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+            break;
+        case 2: 
+            sprintf(str,"%s, Release Candidate %d", str, mudstate.version.revision);
+            break;
+        default:
+            if(mudstate.version.revision > 0) {
+                sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+            } else {
+                sprintf(str, "%s, Gold Release.", str);
+        }
+    }
+
+#ifdef SQL_DRIVER
+    mod_db_sql_version.version=XSTRDUP(tprintf("%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER), "mod_db_sql_init");
+#else
+    mod_db_sql_version.version=XSTRDUP(tprintf("%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE), "mod_db_sql_init");
+#endif
+    mod_db_sql_version.author=XSTRDUP("TinyMUSH Development Team", "mod_db_sql_init");
+    mod_db_sql_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_db_sql_init");
+    mod_db_sql_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_db_sql_init");
+    mod_db_sql_version.description=XSTRDUP("SQL Database interface for TinyMUSH", "mod_db_sql_init");
+    mod_db_sql_version.copyright=XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_db_sql_init");
+    
+    XFREE(str, "mod_db_sql_init");
+	
 	register_commands(mod_db_sql_cmdtable);
 	register_functions(mod_db_sql_functable);
-}
-
-void mod_db_sql_version(dbref player, dbref cause, int extra) {
-	char string[MBUF_SIZE];
-	
-	sprintf(string, "Module DB_SQL : version %d.%d", mudstate.version.major, mudstate.version.minor);
-	switch(mudstate.version.status){
-		case 0: 
-			sprintf(string, "%s, Alpha %d", string, mudstate.version.revision);
-                	break;
-		case 1: 
-			sprintf(string, "%s, Beta %d", string, mudstate.version.revision);
-			break;
-		case 2: 
-			sprintf(string,"%s, Release Candidate %d", string, mudstate.version.revision);
-			break;
-		default:
-			if(mudstate.version.revision > 0) {
-				sprintf(string, "%s, Patch Level %d", string, mudstate.version.revision);
-			} else {
-				sprintf(string, "%s, Gold Release.", string);
-			}
-	}
-#ifdef SQL_DRIVER
-	notify(player, tprintf("%s (%s) using %s driver", string, PACKAGE_RELEASE_DATE, SQL_DRIVER));
-#else
-        notify(player, tprintf("%s (%s) using placeholder driver", string, PACKAGE_RELEASE_DATE));
-#endif
 }
 
 void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...) {

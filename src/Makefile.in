@@ -1426,7 +1426,7 @@ SCRIPT_DAT = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/cv
 
 EXTRA_DIST = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
 CLEANFILES = version.h buildnum.data tinymushapi.h
-API_SRC = copyright.h typedefs.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h api.h externs.h
+API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
 	funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c \
@@ -2224,7 +2224,6 @@ tinymushapi.h:
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
-	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) @prefix@ 
@@ -2243,8 +2242,6 @@ uninstall-local:
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
-
-.PHONY: version.h tinymushapi.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

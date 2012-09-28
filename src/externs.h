@@ -738,12 +738,9 @@ extern int	register_match(char *, char *, char *[], int);
 
 /* Syntax: DLSYM(<handler>, <module name>, <function name>, <prototype>) */
 
-#define DLSYM(h,m,x,p) \
-	(void (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_INT(h,m,x,p) \
-	(int (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_VAR(h,m,x,p) \
-	(p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
+#define DLSYM(h,m,x,p) (void (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_INT(h,m,x,p) (int (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_VAR(h,m,x,p) (p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
 
 /*
  * Syntax: CALL_ALL_MODULES(<name of function>, (<args>)) Call all modules
@@ -825,4 +822,4 @@ scl__dest[scl__len] = '\0';
 safe_chr('#',(b),(p)); \
 safe_ltos((b),(p),(n));
 
-#endif				/* __EXTERNS_H */
+#endif	/* __EXTERNS_H */

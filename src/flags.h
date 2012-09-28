@@ -588,4 +588,4 @@ extern void	decompile_flags(dbref, dbref, char *);
 #define Check_Notices(p,t)	(could_doit((p),(t),A_LMOVES))
 #define Check_Knows(p,t)	(could_doit((p),(t),A_LKNOWS))
 
-#endif				/* __FLAGS_H */
+#endif	/* __FLAGS_H */

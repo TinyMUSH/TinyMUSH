@@ -2,6 +2,8 @@
 
 #include "copyright.h"
 
+#ifndef __CMDTABS_H
+#define __CMDTABS_H
 /* Make sure that all of your command and switch names are lowercase! */
 
 /* *INDENT-OFF* */
@@ -1256,3 +1258,5 @@ NAMETAB		indiv_attraccess_nametab[] = {
 };
 
 /* *INDENT-ON* */
+
+#endif	/* __CMDTABS_H */

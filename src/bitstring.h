@@ -1,5 +1,8 @@
 /* bitstring.h */
 
+#ifndef __BITSTRING_H
+#define __BITSTRING_H
+
 /*
  * Copyright (c) 1989 The Regents of the University of California. All rights
  * reserved.
@@ -120,3 +123,5 @@ typedef unsigned char bitstr_t;
 		} \
 	*(value) = _value; \
 }
+
+#endif	/* __BITSTRING_H */

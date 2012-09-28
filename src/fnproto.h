@@ -809,4 +809,4 @@ FUN		flist      [] = {
 };
 
 
-#endif				/* __FNPROTO_H */
+#endif	/* __FNPROTO_H */

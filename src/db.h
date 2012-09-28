@@ -2,8 +2,8 @@
 
 #include "copyright.h"
 
-#ifndef	__DB_H
-#define	__DB_H
+#ifndef __DB_H
+#define __DB_H
 
 #define SYNC			cache_sync()
 #define CLOSE			{ cache_sync(); dddb_close(); }
@@ -369,4 +369,4 @@ struct numbertable {
     int		num;
 };
 
-#endif				/* __DB_H */
+#endif	/* __DB_H */

@@ -22,7 +22,7 @@ SCRIPT_DAT   = $(SCRIPT_DIR)/alias.conf $(SCRIPT_DIR)/compat.conf $(SCRIPT_DIR)/
 	$(SCRIPT_DIR)/netmush.conf
 EXTRA_DIST   = $(TEXT_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
 CLEANFILES   = version.h buildnum.data tinymushapi.h
-API_SRC      = copyright.h typedefs.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h api.h externs.h
+API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
 bin_PROGRAMS = netmush mkindx slave
 
@@ -156,7 +156,6 @@ tinymushapi.h:
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
-	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 install-exec-local:
 	$(mkinstalldirs) @prefix@ 
@@ -175,5 +174,3 @@ uninstall-local:
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool
-
-.PHONY: version.h tinymushapi.h

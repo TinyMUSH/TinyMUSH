@@ -568,4 +568,4 @@ if ((l) > 0) { \
 #define CONNINFO_IDLE	0x01	/* conninfo: idle() vs. conn() */
 #define UCALL_SANDBOX	0x01	/* ucall: sandbox() vs. ucall() */
 
-#endif				/* __FUNCTIONS_H */
+#endif	/* __FUNCTIONS_H */

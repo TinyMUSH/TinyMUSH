@@ -109,4 +109,4 @@ extern void	listset_nametab(dbref, NAMETAB *, int, char *, int);
 
 extern NAMETAB powers_nametab[];
 
-#endif /* __HTAB_H */
+#endif	/* __HTAB_H */

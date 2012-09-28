@@ -34,6 +34,8 @@ CONF mod_hello_conftable[] = {
 {(char *)"hello_times",			cf_int,		CA_GOD,		CA_PUBLIC,	(int *)&mod_hello_config.hello_times,	5},
 { NULL,					NULL,		0,		0,		NULL,				0}};
 
+MODVER mod_hello_version;
+
 /* --------------------------------------------------------------------------
  * Database.
  */
@@ -361,6 +363,15 @@ void mod_hello_init(void) {
     mod_hello_config.show_name = 0;
     mod_hello_config.hello_string = XSTRDUP("Hello, world!", "mod_hello_init");
     mod_hello_config.hello_times = 1;
+    
+    /* Fill up our version information */
+    
+    mod_hello_version.version=XSTRDUP("Version 1.0.1.1", "mod_hello_init");
+    mod_hello_version.author=XSTRDUP("TinyMUSH Development Team", "mod_hello_init");
+    mod_hello_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_hello_init");
+    mod_hello_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_hello_init");
+    mod_hello_version.description=XSTRDUP("Demonstration module to explain how to build modules for TInyMUSH 3.3", "mod_hello_init");
+    mod_hello_version.copyright=XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_hello_init");
 
     /* Register everything we have to register. */
 

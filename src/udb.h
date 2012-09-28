@@ -108,4 +108,4 @@ extern void	pipe_set_attrib(int, int, char *);
 extern void	pipe_del_attrib(int, int);
 extern int	obj_siz(Obj *);
 
-#endif /* __UDB_H */
+#endif	/* __UDB_H */

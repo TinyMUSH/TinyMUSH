@@ -175,4 +175,4 @@ extern void	list_buftrace(dbref);
 #define	safe_mb_chr(c,b,p)	safe_copy_chr((c),(b),(p),(MBUF_SIZE-1))
 #define safe_chr_fn(c,b,p)      safe_chr_real_fn((c),(b),(p),(LBUF_SIZE-1))
 
-#endif				/* __ALLOC_H */
+#endif	/* __ALLOC_H */

@@ -1,13 +1,7 @@
-/* autoinclude.h -- System-dependent configuration information part 2 */
+/* system.h */
 
-/*
- * ---------------------------------------------------------------------------
- * Setup section:
- *
- * Load system-dependent header files.
- */
-
-/* Prototype templates for ANSI C and traditional C */
+#ifndef __SYSTEM_H
+#define __SYSTEM_H
 
 #ifdef STDC_HEADERS
 #ifdef __STDC__
@@ -104,4 +98,6 @@
 #include <netinet/in.h>
 #endif
 
-//#include <ltdl.h>
+#include <ltdl.h>
+
+#endif	/* __SYSTEM_H */

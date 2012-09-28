@@ -148,4 +148,4 @@ extern void	decompile_powers(dbref, dbref, char *);
 #define Can_Cloak(c)		((Powers2(c) & POW_CLOAK) != 0)
 #define Can_Use_Module(c)	((Powers2(c) & POW_USE_MODULE) != 0)
 
-#endif /* __POWERS_H */
+#endif	/* __POWERS_H */

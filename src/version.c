@@ -25,6 +25,8 @@ void do_version(dbref player, dbref cause, int extra) {
     struct utsname bpInfo;
 #endif
 
+    MODVER *mver;
+
     char string[MBUF_SIZE], *ptr;
 
     sprintf(string, "\nTinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
@@ -46,7 +48,7 @@ void do_version(dbref player, dbref cause, int extra) {
             sprintf(string, "%s, Gold Release", string);
         }
     }
-    sprintf(string, "%s (%s).", string, PACKAGE_RELEASE_DATE);
+    sprintf(string, "%s (%s)", string, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
     notify(player, tprintf("%s\n%s\n", string, ptr));
     XFREE(ptr, "repeatchar");
@@ -59,20 +61,26 @@ void do_version(dbref player, dbref cause, int extra) {
         notify(player, tprintf("Configure Flags: %s", mudstate.configureinfo));
         notify(player, tprintf(" Compiler Flags: %s", mudstate.compilerinfo));
         notify(player, tprintf("   Linker Flags: %s", mudstate.linkerinfo));
-        notify(player, tprintf("     DBM driver: %s", mudstate.dbmdriver));
+        notify(player, tprintf("     DBM driver: %s\n", mudstate.dbmdriver));
+        
     }
     if (mudstate.modloaded[0]) {
-        MODULE *cam__mp;
-        void (*cam__ip)(dbref, dbref, int);
-        notify(player, tprintf("\nModules version\n---------------\n"));
-        WALK_ALL_MODULES(cam__mp) {
-            if ((cam__ip = DLSYM(cam__mp->handle, cam__mp->modname, "version", (dbref, dbref, int))) != NULL) {
-                (*cam__ip)(player, cause, extra);
-            } else {
-                notify(player, tprintf("module %s: no version information", cam__mp->modname));
-            }
+        MODULE *mp;
+        WALK_ALL_MODULES(mp) {
+          ptr = repeatchar(strlen(mp->modname) + 8, '-');
+          notify(player, tprintf("Module %s\n%s\n", mp->modname, ptr));
+          XFREE(ptr, "repeatchar");
+        if ((mver = DLSYM_VAR(mp->handle, mp->modname, "version", MODVER *)) != NULL) {
+          
+          notify(player, tprintf("        Version: %s", mver->version));
+          notify(player, tprintf("         Author: %s", mver->author));
+          notify(player, tprintf("          Email: %s", mver->email));
+          notify(player, tprintf("        Website: %s", mver->url));
+          notify(player, tprintf("      Copyright: %s", mver->copyright));
+          notify(player, tprintf("    Description: %s\n", mver->description));
+        } else
+          notify(player, tprintf("module %s: no version information", mp->modname));
         }
-
     }
 }
 

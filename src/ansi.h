@@ -240,4 +240,4 @@ safe_known_str((s), (p) - (s), (buff), (bufc))
 		} \
 	}
 
-#endif				/* __ANSI_H */
+#endif	/* __ANSI_H */

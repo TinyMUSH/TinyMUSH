@@ -86,4 +86,4 @@
 #define READ read
 #define WRITE write
 
-#endif /* __GAME_H */
+#endif	/* __GAME_H */

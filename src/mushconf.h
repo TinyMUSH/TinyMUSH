@@ -1,13 +1,24 @@
 /* mushconf.h */
 
+#include "copyright.h"
+
 #ifndef __MUSHCONF_H
 #define __MUSHCONF_H
 
-#include "copyright.h"
 
 /* ---------------------------------------------------------------------------
  * Modules and related things.
  */
+
+typedef struct module_version_info MODVER;
+struct module_version_info {
+    char *version;
+    char *author;
+    char *email;
+    char *url;
+    char *description;
+    char *copyright;
+};
 
 typedef struct module_linked_list MODULE;
 struct module_linked_list {
@@ -16,9 +27,7 @@ struct module_linked_list {
     struct module_linked_list *next;
     int (*process_command)(dbref, dbref, int, char *, char *[], int);
     int (*process_no_match)(dbref, dbref, int, char *, char *, char *[], int);
-    int (*did_it)(dbref, dbref, dbref,
-                  int, const char *, int, const char *, int,
-                  int, char *[], int, int);
+    int (*did_it)(dbref, dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int);
     void (*create_obj)(dbref, dbref);
     void (*destroy_obj)(dbref, dbref);
     void (*create_player)(dbref, dbref, int, int);
@@ -33,7 +42,7 @@ struct module_linked_list {
     void (*do_second)(void);
     void (*cache_put_notify)(DBData, unsigned int);
     void (*cache_del_notify)(DBData, unsigned int);
-    void (*version)(dbref, dbref, int);
+    MODVER (*version)(dbref, dbref, int);
 };
 
 typedef struct api_function_data API_FUNCTION;
@@ -41,14 +50,6 @@ struct api_function_data {
     const char *name;
     const char *param_fmt;
     void (*handler)(void *, void *);
-};
-
-typedef struct module_version_data MODULE_VERSION;
-struct module_version_data {
-    char *version;
-    char *author;
-    char *description;
-    char *parameters;
 };
 
 /* ---------------------------------------------------------------------------
@@ -593,4 +594,4 @@ extern STATEDATA mudstate;
 #define LOGOPT_OWNER		0x04	/* Report owner of obj if not obj */
 #define LOGOPT_TIMESTAMP	0x08	/* Timestamp log entries */
 
-#endif /* __MUDCONF_H */
+#endif	/* __MUDCONF_H */

@@ -42,4 +42,4 @@ extern int	search_setup(dbref, char *, SEARCH *);
 extern void	search_perform(dbref, dbref, SEARCH *);
 extern int	get_stats(dbref, dbref, STATS *);
 
-#endif /* __WALKDB_H */
+#endif	/* __WALKDB_H */

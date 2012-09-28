@@ -1,15 +1,11 @@
 /* api.h - must be included by all dynamically loaded modules */
 
-#ifndef __API_H
-#define __API_H
-
 #include "copyright.h"
-#include "ansi.h"
-#include "command.h"
-#include "db.h"
-#include "mushconf.h"
 
 #include <ltdl.h>
+
+#ifndef __API_H
+#define __API_H
 
 #define SIZE_HACK 1
 
@@ -76,4 +72,4 @@ extern	int cf_option(int *, char *, long, dbref, char *);
 extern	int cf_set_flags(int *, char *, long, dbref, char *);
 extern	int cf_string(int *, char *, long, dbref, char *);
 
-#endif				/* __API_H */
+#endif	/* __API_H */
