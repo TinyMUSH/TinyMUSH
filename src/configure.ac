@@ -83,13 +83,17 @@ LTDL_INIT([convenience])
 
 
 
-AX_BOX([Checks for Options])
+AX_BOX([$ac_default_prefix])
+
+AX_BOX([Checks for Prefix])
 
 dnl XXX // This really need to be check...
-AC_PREFIX_DEFAULT([`pwd -P | sed 's:/[[^/]]*$::'`/game])
-AC_MSG_CHECKING([configuration prefix])
-AS_CASE([$prefix], [NONE], [with_prefix=""], [with_prefix="tinymush"])
-AC_MSG_RESULT([$prefix])
+dnl AC_PREFIX_DEFAULT([`pwd -P | sed 's:/[[^/]]*$::'`/game])
+AC_MSG_CHECKING([if prefix point to $ac_default_prefix])
+AS_CASE(["$prefix"], ["NONE"], [with_default_prefix="yes"],[$ac_default_prefix], [with_default_prefix="yes"], [with_default_prefix="no"])
+AC_MSG_RESULT([$with_default_prefix])
+
+AX_BOX([Checks for Options])
 
 AH_TOP([#ifndef __AUTOCONF_H
 #define __AUTOCONF_H

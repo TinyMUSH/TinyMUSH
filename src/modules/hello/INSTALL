@@ -56,6 +56,15 @@ of `autoconf'.
      Running `configure' might take a while.  While running, it prints
      some messages telling which features it is checking for.
 
+     To build this example module for TinyMUSH 3.3, you may need to
+     specify '--prefix=<path to tinymush's base directory>' and
+     --with-api-include=<path to tinymushapi.h>. For example, if the
+     game is installed in /home/user/tinymush-3.3/ you will need to run
+     configure like this :
+
+     $ ./configure --prefix=/home/user/tinymush-3.3/game -- \
+       --with-api-include=/home/user/tinymush-3.3/game/include
+
   2. Type `make' to compile the package.
 
   3. Optionally, type `make check' to run any self-tests that come with

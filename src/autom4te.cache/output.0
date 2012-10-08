@@ -656,7 +656,6 @@ ac_func_list=
 ac_header_list=
 gl_floor_required=plain
 enable_option_checking=no
-ac_default_prefix=`pwd -P | sed 's:/[^/]*$::'`/game
 ac_subst_vars='ltdl_LTLIBOBJS
 ltdl_LIBOBJS
 am__EXEEXT_FALSE
@@ -31727,6 +31726,109 @@ elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
   as_echo_n='printf %s'
 else
   if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "$ac_default_prefix$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "X$ac_default_prefix" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=$ac_default_prefix;
+      case $arg in @%:@(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
+
+$as_echo 
+sed 'h;s/./-/g;s/^.../@%:@@%:@ /;s/...$/ @%:@@%:@/;p;x;p;x' <<_ASBOX
+@%:@@%:@ $ac_default_prefix @%:@@%:@
+_ASBOX
+$as_echo 
+
+
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+    as_echo_body='eval /usr/ucb/echo -n "Checks for Prefix$as_nl"'
+    as_echo_n='/usr/ucb/echo -n'
+  else
+    as_echo_body='eval expr "XChecks for Prefix" : "X\\(.*\\)"'
+    as_echo_n_body='eval
+      arg=Checks for Prefix;
+      case $arg in @%:@(
+      *"$as_nl"*)
+	expr "X$arg" : "X\\(.*\\)$as_nl";
+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
+      esac;
+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
+    '
+    export as_echo_n_body
+    as_echo_n='sh -c $as_echo_n_body as_echo'
+  fi
+  export as_echo_body
+  as_echo='sh -c $as_echo_body as_echo'
+fi
+
+$as_echo 
+sed 'h;s/./-/g;s/^.../@%:@@%:@ /;s/...$/ @%:@@%:@/;p;x;p;x' <<_ASBOX
+@%:@@%:@ Checks for Prefix @%:@@%:@
+_ASBOX
+$as_echo 
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if prefix point to $ac_default_prefix" >&5
+$as_echo_n "checking if prefix point to $ac_default_prefix... " >&6; }
+case "$prefix" in @%:@(
+  "NONE") :
+    with_default_prefix="yes" ;; @%:@(
+  $ac_default_prefix) :
+    with_default_prefix="yes" ;; @%:@(
+  *) :
+    with_default_prefix="no" ;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_default_prefix" >&5
+$as_echo "$with_default_prefix" >&6; }
+
+as_nl='
+'
+export as_nl
+# Printing a long string crashes Solaris 7 /usr/bin/printf.
+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
+# Prefer a ksh shell builtin over an external printf program on Solaris,
+# but without wasting forks for bash or zsh.
+if test -z "$BASH_VERSION$ZSH_VERSION" \
+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='print -r --'
+  as_echo_n='print -rn --'
+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
+  as_echo='printf %s\n'
+  as_echo_n='printf %s'
+else
+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
     as_echo_body='eval /usr/ucb/echo -n "Checks for Options$as_nl"'
     as_echo_n='/usr/ucb/echo -n'
   else
@@ -31753,18 +31855,6 @@ sed 'h;s/./-/g;s/^.../@%:@@%:@ /;s/...$/ @%:@@%:@/;p;x;p;x' <<_ASBOX
 _ASBOX
 $as_echo 
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking configuration prefix" >&5
-$as_echo_n "checking configuration prefix... " >&6; }
-case $prefix in @%:@(
-  NONE) :
-    with_prefix="" ;; @%:@(
-  *) :
-    with_prefix="tinymush" ;;
-esac
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $prefix" >&5
-$as_echo "$prefix" >&6; }
 
 
 
