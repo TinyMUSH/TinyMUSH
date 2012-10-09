@@ -1,10 +1,9 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 
-lib_LTLIBRARIES     = libtinygdbm.la
-libtinygdbm_la_SOURCES = gdbmbucket.c gdbmfalloc.c gdbmfindkey.c gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c gdbmstore.c gdbmsync.c gdbmglobal.c gdbmhash.c gdbmupdate.c gdbmversion.c gdbmextern.h gdbmconst.h gdbmdefs.h gdbmerrno.h gdbmproto.h gdbmsystems.h gdbmcopyright.h
-libtinygdbm_la_LDFLAGS = -version-info 1:0:0
-
-nodist_include_HEADERS = libtinygdbm.h
+noinst_LIBRARIES              = libtinygdbm.a
+libtinygdbm_a_SOURCES         = gdbmbucket.c gdbmfalloc.c gdbmfindkey.c gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c gdbmstore.c gdbmsync.c gdbmglobal.c gdbmhash.c gdbmupdate.c gdbmversion.c gdbmextern.h gdbmconst.h gdbmdefs.h gdbmerrno.h gdbmproto.h gdbmsystems.h gdbmcopyright.h
+nodist_libtinygdbm_a_SOURCES  = libtinygdbm.h
+BUILT_SOURCES                 = libtinygdbm.h
 
 EXTRA_DIST = libtinygdbm.head.h libtinygdbm.foot.h 
 CLEANFILES = libtinygdbm.h

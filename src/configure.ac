@@ -88,11 +88,22 @@ AX_BOX([$ac_default_prefix])
 AX_BOX([Checks for Prefix])
 
 dnl XXX // This really need to be check...
-dnl AC_PREFIX_DEFAULT([`pwd -P | sed 's:/[[^/]]*$::'`/game])
-AC_MSG_CHECKING([if prefix point to $ac_default_prefix])
-AS_CASE(["$prefix"], ["NONE"], [with_default_prefix="yes"],[$ac_default_prefix], [with_default_prefix="yes"], [with_default_prefix="no"])
-AC_MSG_RESULT([$with_default_prefix])
+AC_PREFIX_DEFAULT([`pwd -P | sed 's:/[[^/]]*$::'`/game])
+AC_MSG_CHECKING([for installation suffix])
+AC_ARG_WITH([install-suffix], 
+ [AS_HELP_STRING([--with-install-suffix@<:@=suffix@:>@], [Select an installation suffix for includes, libraries and text files, if no installation suffix is given, configure will use "tinymush" if installed in the default location, else, no prefix will be used])],
+ [AS_IF([test "x$withval" = "x"], [with_install_suffix="tinymush"], [with_install_suffix="$withval"])],
+ [AS_CASE(["$prefix"], ["NONE"], [with_install_suffix="tinymush"],[$ac_default_prefix], [with_install_suffix="tinymush"], [with_install_suffix=""])])
+with_install_suffix="/`echo "$with_install_suffix" | sed "s/\///g"`"
+AS_IF([test "x$with_install_suffix" = "x/"], [
+ with_install_suffix=""
+ AC_MSG_RESULT([none])
+], [
+AC_MSG_RESULT([$with_install_suffix])
+])
 
+AC_SUBST([with_install_suffix])
+	
 AX_BOX([Checks for Options])
 
 AH_TOP([#ifndef __AUTOCONF_H
@@ -508,6 +519,11 @@ AC_FUNC_MMAP
 
 AC_CHECK_FUNCS([alarm gethostbyaddr gethostbyname inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn])
 
+includedir=$includedir$with_install_suffix
+libdir=$libdir$with_install_suffix
+datarootdir=$datarootdir$with_install_suffix
+sysconfdir=$sysconfdir$with_install_suffix
+
 AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
 AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Release])
@@ -525,30 +541,10 @@ AX_PRINT([
 -------------------------------%b
          Installation directory : %B$prefix%b
              Binaries directory : %B$prefix/bin%b
-            Help Text directory : %B$prefix/text%b
-                 Data directory : %B$prefix/data%b
-                 
-                         bindir : %B$bindir%b
-                        datadir : %B$datadir%b
-                    datatoordir : %B$datarootdir%b
-                         docdir : %B$docdir%b
-                         dvidir : %B$dvidir%b
-                    exec_prefix : %B$exec_prefix%b
-                        htmldir : %B$htmldir%b
-                     includedir : %B$includedir%b
-                        infodir : %B$infodir%b
-                         libdir : %B$libdir%b
-                     libexecdir : %B$libexecdir%b
-                      localedir : %B$localedir%b
-                  localstatedir : %B$localstatedir%b
-                         mandir : %B$mandir%b
-                  oldincludedir : %B$oldincludedir%b
-                         pdfdir : %B$pdfdir%b
-                         prefix : %B$prefix%b
-                          psdir : %B$psdir%b
-                        sbindir : %B$sbindir%b
-                 sharedstatedir : %B$sharedstatedir%b
-                     sysconfdir : %B$sysconfdir%b
+             Includes directory : %B$includedir%b
+            Libraries directory : %B$libdir%b
+            Help Text directory : %B$datarootdir%b
+                 Data directory : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b

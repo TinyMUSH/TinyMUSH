@@ -1,10 +1,9 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 
-lib_LTLIBRARIES     = libtinyqdbm.la
-libtinyqdbm_la_SOURCES = curia.c depot.c hovel.c myconf.c curia.h depot.h hovel.h myconf.h
-libtinyqdbm_la_LDFLAGS = -version-info 1:0:0
-
-nodist_include_HEADERS = libtinyqdbm.h
+noinst_LIBRARIES             = libtinyqdbm.a
+libtinyqdbm_a_SOURCES        = curia.c depot.c hovel.c myconf.c curia.h depot.h hovel.h myconf.h
+nodist_libtinyqdbm_a_SOURCES = libtinyqdbm.h
+BUILT_SOURCES                = libtinyqdbm.h
 
 CLEANFILES = libtinyqdbm.h
 

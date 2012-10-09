@@ -656,6 +656,7 @@ ac_func_list=
 ac_header_list=
 gl_floor_required=plain
 enable_option_checking=no
+ac_default_prefix=`pwd -P | sed 's:/[^/]*$::'`/game
 ac_subst_vars='ltdl_LTLIBOBJS
 ltdl_LIBOBJS
 am__EXEEXT_FALSE
@@ -698,6 +699,7 @@ WANT_DBM_QDBM_FALSE
 WANT_DBM_QDBM_TRUE
 WANT_DBM_GDBM_FALSE
 WANT_DBM_GDBM_TRUE
+with_install_suffix
 LTDLOPEN
 LT_CONFIG_H
 subdirs
@@ -1790,6 +1792,7 @@ with_included_ltdl
 with_ltdl_include
 with_ltdl_lib
 enable_ltdl_install
+with_install_suffix
 with_dbm
 enable_disk_based
 enable_module_comsys
@@ -2507,6 +2510,12 @@ Optional Packages:
   --with-included-ltdl    use the GNU ltdl sources included here
   --with-ltdl-include=DIR use the ltdl headers installed in DIR
   --with-ltdl-lib=DIR     use the libltdl.la installed in DIR
+  --with-install-suffix[=suffix]
+                          Select an installation suffix for includes,
+                          libraries and text files, if no installation suffix
+                          is given, configure will use "tinymush" if installed
+                          in the default location, else, no prefix will be
+                          used
   --with-dbm=gdbm|qdbm    Select the DBM driver used to save game data, valid
                           values are : gdbm Use TinyMUSH-GDBM hash database
                           driver, This is the historical driver used by most
@@ -31798,18 +31807,43 @@ _ASBOX
 $as_echo
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if prefix point to $ac_default_prefix" >&5
-$as_echo_n "checking if prefix point to $ac_default_prefix... " >&6; }
-case "$prefix" in #(
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for installation suffix" >&5
+$as_echo_n "checking for installation suffix... " >&6; }
+
+# Check whether --with-install-suffix was given.
+if test "${with_install_suffix+set}" = set; then :
+  withval=$with_install_suffix; if test "x$withval" = "x"; then :
+  with_install_suffix="tinymush"
+else
+  with_install_suffix="$withval"
+fi
+else
+  case "$prefix" in #(
   "NONE") :
-    with_default_prefix="yes" ;; #(
+    with_install_suffix="tinymush" ;; #(
   $ac_default_prefix) :
-    with_default_prefix="yes" ;; #(
+    with_install_suffix="tinymush" ;; #(
   *) :
-    with_default_prefix="no" ;;
+    with_install_suffix="" ;;
 esac
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_default_prefix" >&5
-$as_echo "$with_default_prefix" >&6; }
+fi
+
+with_install_suffix="/`echo "$with_install_suffix" | sed "s/\///g"`"
+if test "x$with_install_suffix" = "x/"; then :
+
+ with_install_suffix=""
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
+$as_echo "none" >&6; }
+
+else
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_install_suffix" >&5
+$as_echo "$with_install_suffix" >&6; }
+
+fi
+
+
 
 as_nl='
 '
@@ -35255,6 +35289,11 @@ fi
 done
 
 
+includedir=$includedir$with_install_suffix
+libdir=$libdir$with_install_suffix
+datarootdir=$datarootdir$with_install_suffix
+sysconfdir=$sysconfdir$with_install_suffix
+
 
 
 cat >>confdefs.h <<_ACEOF
@@ -38034,30 +38073,10 @@ if test -z ; then :
 -------------------------------%b
          Installation directory : %B$prefix%b
              Binaries directory : %B$prefix/bin%b
-            Help Text directory : %B$prefix/text%b
-                 Data directory : %B$prefix/data%b
-
-                         bindir : %B$bindir%b
-                        datadir : %B$datadir%b
-                    datatoordir : %B$datarootdir%b
-                         docdir : %B$docdir%b
-                         dvidir : %B$dvidir%b
-                    exec_prefix : %B$exec_prefix%b
-                        htmldir : %B$htmldir%b
-                     includedir : %B$includedir%b
-                        infodir : %B$infodir%b
-                         libdir : %B$libdir%b
-                     libexecdir : %B$libexecdir%b
-                      localedir : %B$localedir%b
-                  localstatedir : %B$localstatedir%b
-                         mandir : %B$mandir%b
-                  oldincludedir : %B$oldincludedir%b
-                         pdfdir : %B$pdfdir%b
-                         prefix : %B$prefix%b
-                          psdir : %B$psdir%b
-                        sbindir : %B$sbindir%b
-                 sharedstatedir : %B$sharedstatedir%b
-                     sysconfdir : %B$sysconfdir%b
+             Includes directory : %B$includedir%b
+            Libraries directory : %B$libdir%b
+            Help Text directory : %B$datarootdir%b
+                 Data directory : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b
@@ -38111,30 +38130,10 @@ else
 -------------------------------%b
          Installation directory : %B$prefix%b
              Binaries directory : %B$prefix/bin%b
-            Help Text directory : %B$prefix/text%b
-                 Data directory : %B$prefix/data%b
-
-                         bindir : %B$bindir%b
-                        datadir : %B$datadir%b
-                    datatoordir : %B$datarootdir%b
-                         docdir : %B$docdir%b
-                         dvidir : %B$dvidir%b
-                    exec_prefix : %B$exec_prefix%b
-                        htmldir : %B$htmldir%b
-                     includedir : %B$includedir%b
-                        infodir : %B$infodir%b
-                         libdir : %B$libdir%b
-                     libexecdir : %B$libexecdir%b
-                      localedir : %B$localedir%b
-                  localstatedir : %B$localstatedir%b
-                         mandir : %B$mandir%b
-                  oldincludedir : %B$oldincludedir%b
-                         pdfdir : %B$pdfdir%b
-                         prefix : %B$prefix%b
-                          psdir : %B$psdir%b
-                        sbindir : %B$sbindir%b
-                 sharedstatedir : %B$sharedstatedir%b
-                     sysconfdir : %B$sysconfdir%b
+             Includes directory : %B$includedir%b
+            Libraries directory : %B$libdir%b
+            Help Text directory : %B$datarootdir%b
+                 Data directory : %B$sysconfdir%b
 
                       %BFilenames
 -------------------------------%b
