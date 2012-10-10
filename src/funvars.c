@@ -2027,6 +2027,8 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
      * Chop up the raw stuff according to the delimiter.
      */
 
+    isep.len = 1;
+
     if (use_def_delim)
         isep.str[0] = this_struct->delim;
     else
