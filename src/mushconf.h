@@ -114,6 +114,7 @@ struct confdata {
     char	*mudowner;	/* Email of the game owner */
     char	*modules_home;	/* Base path for modules */
     char	*game_home;	/* MUSH's working directory */
+    char	*scripts_home;	/* MUSH's scripts directory */
     int	have_pueblo;	/* Is Pueblo support compiled in? */
     int	have_zones;	/* Should zones be active? */
     int	port;		/* user port */
@@ -129,6 +130,9 @@ struct confdata {
     char    *guest_prefixes; /* Prefixes for the guest char's name */
     char    *guest_suffixes; /* Suffixes for the guest char's name */
     char	*guest_password; /* Default password for guests */
+    char	*help_users;	/* Help file for users */
+    char	*help_wizards;	/* Help file for wizards and god */
+    char	*help_quick;	/* Quick help file */
     char	*guest_file;	/* display if guest connects */
     char	*conn_file;	/* display on connect if no registration */
     char	*creg_file;	/* display on connect if registration */

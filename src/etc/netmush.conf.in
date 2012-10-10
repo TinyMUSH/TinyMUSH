@@ -10,9 +10,8 @@ config_home		@sysconfdir@
 backup_home		@localstatedir@/backups@with_install_suffix@
 binary_home		@bindir@
 database_home		@localstatedir@/db@with_install_suffix@
-include_home		@includedir@
 modules_home		@libdir@
-libexec_home		@libexecdir@@with_install_suffix@
+scripts_home		@libexecdir@@with_install_suffix@
 log_home		@localstatedir@/log@with_install_suffix@
 pid_home		@localstatedir@/run@with_install_suffix@
 text_home		@datarootdir@
@@ -30,10 +29,38 @@ mud_shortname	netmush
 mud_name	AnonyMUSH
 mud_owner	mush_admin@tinymush.net
 #
-# -- Standard text files.
+# -- Standard text files
+#
+# guest_file		guest.txt
+# connect_file		connect.txt
+# connect_reg_file	register.txt
+# register_create_file	create_reg.txt
+# motd_file		motd.txt
+# wizard_motd_file	wizmotd.txt
+# quit_file		quit.txt
+# down_file		down.txt
+# full_file		full.txt
+# badsite_file		badsite.txt
+# newuser_file		newuser.txt
+# html_connect_file	htmlconn.txt
+#
+# -- Main help files.
+#
+# help_users	help	help.txt
+# help_wizards	wizhelp	wizhelp.txt
+# help_quick	qhelp	qhelp.txt
+#
+# -- Raw help files.
 #
 raw_helpfile	news	news
 raw_helpfile	man	mushman
+#
+# -- External +help and wiznews, if desired
+#
+# helpfile	+help	plushelp
+# helpfile	wiznews	wiznews
+# access	wiznews	wizard
+#
 #
 # -- Include important aliases.
 #
@@ -48,12 +75,6 @@ include		compat.conf
 # -- Commonly-disabled commands
 #
 access		@find	disabled
-#
-# -- External +help and wiznews, if desired
-#
-# helpfile	+help	plushelp
-# helpfile	wiznews	wiznews
-# access	wiznews	wizard
 #
 # -- Frequently-changed parameters
 #

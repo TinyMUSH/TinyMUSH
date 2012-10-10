@@ -1086,7 +1086,7 @@ int db_read(void) {
     data = db_get(key, DBTYPE_DBINFO);
 
     if (!data.dptr) {
-        mainlog_printf("\nCould not open main record");
+        mainlog_printf("\n------------------------------\n- Could not open main record -\n------------------------------\n\n");
         return -1;
     }
     /*

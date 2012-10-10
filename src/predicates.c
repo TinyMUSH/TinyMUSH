@@ -1458,8 +1458,7 @@ void do_restart(dbref player, dbref cause, int key) {
 
     mudstate.restarting = 1;
 
-    raw_broadcast(0, "GAME: Restart by %s, please wait.",
-                  Name(Owner(player)));
+    raw_broadcast(0, "GAME: Restart by %s, please wait.", Name(Owner(player)));
     STARTLOG(LOG_ALWAYS, "WIZ", "RSTRT")
     log_printf("Restart by ");
     log_name(player);
@@ -1495,9 +1494,7 @@ void do_restart(dbref player, dbref cause, int key) {
     for (lp = logfds_table; lp->log_flag; lp++) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
-            rename(lp->filename,
-                   tmprintf("%s.%ld", lp->filename,
-                           (long)mudstate.now));
+            rename(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now));
         }
     }
 
@@ -1514,8 +1511,7 @@ void do_restart(dbref player, dbref cause, int key) {
         lt_dlclose(mp->handle);
     }
 
-    //execl(mudconf.exec_path, mudconf.exec_path, (char *)"-c", mudconf.config_file, NULL);
-    execl(mudconf.exec_path, (char *)"-c", mudconf.config_file, NULL);
+    execl(mudconf.exec_path, mudconf.exec_path, (char *)"-c", mudconf.config_file, NULL);
 }
 
 /* ---------------------------------------------------------------------------

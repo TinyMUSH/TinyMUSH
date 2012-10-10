@@ -2190,34 +2190,42 @@ int main(int argc, char *argv[]) {
     mudconf.pid_file = XSTRDUP(tmprintf("%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname), "main_mudconf_pid_file");    
     mudconf.db_file =  XSTRDUP(tmprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");    
 
-    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-    log_printf("Loading help file");
-    ENDLOG
-    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help"), 1);
-    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-    log_printf("Loading wizhelp file");
-    ENDLOG    
-    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("wizhelp %s/wizhelp", mudconf.txthome), "main_add_helpfile_wizhelp"), 1);
-    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-    log_printf("Loading qhelp file");
-    ENDLOG    
-    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("qhelp %s/qhelp", mudconf.txthome), "main_add_helpfile_qhelp"), 1);
-    
 
-        
-    mudconf.guest_file =   XSTRDUP(tmprintf("%s/guest.txt", mudconf.txthome), "main_mudconf_guest_file");
-    mudconf.conn_file =    XSTRDUP(tmprintf("%s/connect.txt", mudconf.txthome), "main_mudconf_conn_file");
-    mudconf.creg_file =    XSTRDUP(tmprintf("%s/register.txt", mudconf.txthome), "main_mudconf_creg_file");
-    mudconf.regf_file =    XSTRDUP(tmprintf("%s/create_reg.txt", mudconf.txthome), "main_mudconf_regf_file");
-    mudconf.motd_file =    XSTRDUP(tmprintf("%s/motd.txt", mudconf.txthome), "main_mudconf_motd_file");
-    mudconf.wizmotd_file = XSTRDUP(tmprintf("%s/wizmotd.txt", mudconf.txthome), "main_mudconf_wizmotd_file");
-    mudconf.quit_file =    XSTRDUP(tmprintf("%s/quit.txt", mudconf.txthome), "main_mudconf_quit_file");
-    mudconf.down_file =    XSTRDUP(tmprintf("%s/down.txt", mudconf.txthome), "main_mudconf_down_file");
-    mudconf.full_file =    XSTRDUP(tmprintf("%s/full.txt", mudconf.txthome), "main_mudconf_full_file");
-    mudconf.site_file =    XSTRDUP(tmprintf("%s/badsite.txt", mudconf.txthome), "main_mudconf_site_file");
-    mudconf.crea_file =    XSTRDUP(tmprintf("%s/newuser.txt", mudconf.txthome), "main_mudconf_crea_file");
+    if( mudconf.help_users == NULL)
+        mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
+    if( mudconf.help_wizards == NULL)
+        mudconf.help_wizards = XSTRDUP(tmprintf("wizhelp %s/wizhelp", mudconf.txthome), "main_add_helpfile_wizhelp");
+    if( mudconf.help_quick == NULL)
+        mudconf.help_quick = XSTRDUP(tmprintf("qhelp %s/qhelp", mudconf.txthome), "main_add_helpfile_qhelp");
+    add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_users, 1);
+    add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_wizards, 1);
+    add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_quick, 1);
+            
+    if(mudconf.guest_file == NULL) 
+        mudconf.guest_file =   XSTRDUP(tmprintf("%s/guest.txt", mudconf.txthome), "main_mudconf_guest_file");
+    if( mudconf.conn_file == NULL)
+        mudconf.conn_file =    XSTRDUP(tmprintf("%s/connect.txt", mudconf.txthome), "main_mudconf_conn_file");
+    if( mudconf.creg_file == NULL)
+        mudconf.creg_file =    XSTRDUP(tmprintf("%s/register.txt", mudconf.txthome), "main_mudconf_creg_file");
+    if( mudconf.regf_file == NULL)
+        mudconf.regf_file =    XSTRDUP(tmprintf("%s/create_reg.txt", mudconf.txthome), "main_mudconf_regf_file");
+    if( mudconf.motd_file == NULL)
+        mudconf.motd_file =    XSTRDUP(tmprintf("%s/motd.txt", mudconf.txthome), "main_mudconf_motd_file");
+    if( mudconf.wizmotd_file == NULL)
+        mudconf.wizmotd_file = XSTRDUP(tmprintf("%s/wizmotd.txt", mudconf.txthome), "main_mudconf_wizmotd_file");
+    if( mudconf.quit_file == NULL)
+        mudconf.quit_file =    XSTRDUP(tmprintf("%s/quit.txt", mudconf.txthome), "main_mudconf_quit_file");
+    if( mudconf.down_file == NULL)
+        mudconf.down_file =    XSTRDUP(tmprintf("%s/down.txt", mudconf.txthome), "main_mudconf_down_file");
+    if( mudconf.full_file == NULL)
+        mudconf.full_file =    XSTRDUP(tmprintf("%s/full.txt", mudconf.txthome), "main_mudconf_full_file");
+    if( mudconf.site_file == NULL)
+        mudconf.site_file =    XSTRDUP(tmprintf("%s/badsite.txt", mudconf.txthome), "main_mudconf_site_file");
+    if( mudconf.crea_file == NULL)
+        mudconf.crea_file =    XSTRDUP(tmprintf("%s/newuser.txt", mudconf.txthome), "main_mudconf_crea_file");
 #ifdef PUEBLO_SUPPORT
-    mudconf.htmlconn_file = XSTRDUP(tmprintf("%s/htmlconn.txt", mudconf.txthome), "main_mudconf_htmlconn_file");
+    if( mudconf.htmlconn_file == NULL)
+        mudconf.htmlconn_file = XSTRDUP(tmprintf("%s/htmlconn.txt", mudconf.txthome), "main_mudconf_htmlconn_file");
 #endif
 
     cmdp = (CMDENT *) hashfind((char *)"wizhelp", &mudstate.command_htab);

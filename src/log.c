@@ -20,7 +20,7 @@
 
 #include "ansi.h"		/* required by code */
 
-FILE *mainlog_fp;
+FILE *mainlog_fp = NULL;
 
 static FILE *log_fp = NULL;
 
@@ -257,7 +257,9 @@ void mainlog_printf(const char *format, ...) {
     va_start(ap, format);
     s = (char *)XMALLOC(MBUF_SIZE, "mainlog_printf");
     vsprintf(s, format, ap);
-    fputs(s, mainlog_fp);
+    if(mainlog_fp != NULL) {
+        fputs(s, mainlog_fp);
+    }
     /*
      * If we are starting up, log to stderr too..
      */
