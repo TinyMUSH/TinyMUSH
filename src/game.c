@@ -2038,13 +2038,15 @@ int main(int argc, char *argv[]) {
 
     int i, c;
 
-    int errflg = 0;
+    int errflg = 0, gotcfg = 0;
 
     char *s;
 
     MODULE *mp;
 
     char *bp;
+    
+    FILE *fp;
 
     MODHASHES *m_htab, *hp;
 
@@ -2085,13 +2087,23 @@ int main(int argc, char *argv[]) {
     mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
     mudconf.game_home=getcwd(NULL, 0);
 
+
     while ((c = getopt(argc, argv, "c:s")) != -1) {
         switch (c) {
-
         case 'c':
-            //XFREE(mudconf.mud_shortname, "main_mudconf_mud_shortname");
             mudconf.config_file = XSTRDUP(optarg, "main_mudconf_mud_config_file");
             mudconf.config_home = XSTRDUP(realpath(dirname(mudconf.config_file), NULL), "main_mudconf_mud_config_home");
+            /* Make sure we can read the config file */
+            
+            fp = fopen(mudconf.config_file, "r");
+            
+            if(fp != NULL) {
+                fclose(fp);
+                gotcfg = 1;
+            } else {
+                fprintf(stderr, "Unable to read configuration file %s.\n", mudconf.config_file);
+                gotcfg = 0;
+            }
             break;
         case 's':
             mindb = 1;
@@ -2102,8 +2114,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (errflg) {
-        fprintf(stderr, "Usage: %s [-s] [-c mush short name]\n", argv[0]);
+    if (errflg || gotcfg == 0) {
+        fprintf(stderr, "Usage: %s [-s] [-c config_file]\n", argv[0]);
         exit(1);
     }
 
