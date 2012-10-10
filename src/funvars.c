@@ -2000,8 +2000,7 @@ static void load_structure(dbref player, char *buff, char **bufc, char *inst_nam
     *ip = '\0';
 
     if (hashfind(ibuf, &mudstate.instance_htab)) {
-        notify_quiet(player,
-                     "That instance has already been defined.");
+        notify_quiet(player, "That instance has already been defined.");
         safe_chr('0', buff, bufc);
         return;
     }
