@@ -381,7 +381,7 @@ static void tcache_finish(dbref player) {
         xp = tcache_head;
         tcache_head = xp->next;
         notify(target,
-               tprintf("%s(#%d)} '%s' -> '%s'", Name(player), player,
+               tmprintf("%s(#%d)} '%s' -> '%s'", Name(player), player,
                        xp->orig, xp->result));
         free_lbuf(xp->orig);
         free_lbuf(xp->result);
@@ -1115,7 +1115,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
             if (!fp && !ufp) {
                 if (eval & EV_FMAND) {
                     *bufc = oldp;
-                    safe_tprintf_str(buff, bufc,
+                    safe_tmprintf_str(buff, bufc,
                                      "#-1 FUNCTION (%s) NOT FOUND",
                                      xtbuf);
                     alldone = 1;
@@ -1302,7 +1302,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
                 }
                 mudstate.func_nest_lev--;
             } else {
-                safe_tprintf_str(buff, bufc,
+                safe_tmprintf_str(buff, bufc,
                                  "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d",
                                  fp->name, fp->nargs, nfargs);
             }

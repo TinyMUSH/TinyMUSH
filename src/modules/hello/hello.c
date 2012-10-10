@@ -146,19 +146,19 @@ int mod_hello_did_it(dbref player, dbref thing, dbref master, int what, const ch
 	    f = mod_hello_db[thing].foofed;
 	    g = mod_hello_db[thing].greeted;
 	    notify(player,
-		   tprintf("%s has been greeted %d %s and foofed %d %s.",
+		   tmprintf("%s has been greeted %d %s and foofed %d %s.",
 			   Name(thing), g, ((g == 1) ? "time" : "times"),
 			   f, ((f == 1) ? "time" : "times")));
 	    return 1;
 	    break;		/* NOTREACHED */
 	case A_MOVE:
 	    notify(GOD,
-		   tprintf("%s(#%d) just moved.", Name(thing), thing));
+		   tmprintf("%s(#%d) just moved.", Name(thing), thing));
 	    return 0;
 	    break;		/* NOTREACHED */
 	case A_USE:
 	    notify(GOD,
-		   tprintf("%s(#%d) was used!", Name(thing), thing));
+		   tmprintf("%s(#%d) was used!", Name(thing), thing));
 	    return -1;
 	    break;		/* NOTREACHED */
 	default:
@@ -167,31 +167,31 @@ int mod_hello_did_it(dbref player, dbref thing, dbref master, int what, const ch
 }
 
 void mod_hello_create_obj(dbref player, dbref obj) {
-	notify(player, tprintf("You created #%d -- hello says so.", obj));
+	notify(player, tmprintf("You created #%d -- hello says so.", obj));
 }
 
 void mod_hello_destroy_obj(dbref player, dbref obj) {
-	notify(GOD, tprintf("Destroyed #%d -- hello says so.", obj));
+	notify(GOD, tmprintf("Destroyed #%d -- hello says so.", obj));
 }
 
 void mod_hello_destroy_player(dbref player, dbref victim) {
-	notify(player, tprintf("Say goodbye to %s!", Name(victim)));
+	notify(player, tmprintf("Say goodbye to %s!", Name(victim)));
 }
 
 void mod_hello_announce_connect(dbref player, const char *reason, int num) {
-	notify(GOD, tprintf("%s(#%d) just connected -- hello says so.",
+	notify(GOD, tmprintf("%s(#%d) just connected -- hello says so.",
 				Name(player), player));
 }
 
 void mod_hello_announce_disconnect(dbref player, const char *reason, int num) {
-	notify(GOD, tprintf("%s(#%d) just disconnected -- hello says so.",
+	notify(GOD, tmprintf("%s(#%d) just disconnected -- hello says so.",
 				Name(player), player));
 }
 
 void mod_hello_examine(dbref player, dbref cause, dbref thing, int control, int key) {
     if (control) {
 	notify(player,
-	       tprintf("Greeted: %d  Foofed: %d",
+	       tmprintf("Greeted: %d  Foofed: %d",
 		       mod_hello_db[thing].greeted,
 		       mod_hello_db[thing].foofed));
     }
@@ -213,13 +213,13 @@ void mod_hello_do_hello(dbref player, dbref cause, int key) {
 	    notify(player, "Hi there!");
     } else {
 	if (mod_hello_config.show_name)
-	    notify(player, tprintf("Hello, %s!", Name(player)));
+	    notify(player, tmprintf("Hello, %s!", Name(player)));
 	else
 	    notify(player, mod_hello_config.hello_string);
     }
 
     mod_hello_db[player].greeted += 1;
-    notify(player, tprintf("You have been greeted %d times.", 
+    notify(player, tmprintf("You have been greeted %d times.", 
 			   mod_hello_db[player].greeted));
 }
 
@@ -248,7 +248,7 @@ void mod_hello_do_foof(dbref player, dbref cause, int key, char *arg1) {
     if (key & MOD_HELLO_FOOF_SHOW) {
     	data = cache_get(dbkey, mod_hello_dbtype);
     	if (data.dptr) {
-    		notify(player, tprintf("You were last foofed with: %s", data.dptr));
+    		notify(player, tmprintf("You were last foofed with: %s", data.dptr));
     	} else {
     		notify(player, "You have not been foofed with a message.");
     	}
@@ -256,7 +256,7 @@ void mod_hello_do_foof(dbref player, dbref cause, int key, char *arg1) {
     }
     
     if (arg1 && *arg1) {
-    	notify(player, tprintf("Yay: \"%s\"", arg1));
+    	notify(player, tmprintf("Yay: \"%s\"", arg1));
     	
     	/* Set up data and store it in cache */
     	
@@ -272,7 +272,7 @@ void mod_hello_do_foof(dbref player, dbref cause, int key, char *arg1) {
     }
     
     mod_hello_db[player].foofed += 1;
-    notify(player, tprintf("You have been foofed %d times.", 
+    notify(player, tmprintf("You have been foofed %d times.", 
 			   mod_hello_db[player].foofed));
 }
 

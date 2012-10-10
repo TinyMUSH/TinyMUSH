@@ -58,7 +58,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable) {
                     void *));
         if (fn_ptr != NULL) {
             afp->handler = fn_ptr;
-            hashadd(tprintf("%s_%s", api_name, afp->name),
+            hashadd(tmprintf("%s_%s", api_name, afp->name),
                     (int *)afp, &mudstate.api_func_htab, 0);
         }
     }
@@ -67,7 +67,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable) {
 void *request_api_function(char *api_name, char *fn_name) {
     API_FUNCTION *afp;
 
-    afp = (API_FUNCTION *) hashfind(tprintf("%s_%s", api_name, fn_name),
+    afp = (API_FUNCTION *) hashfind(tmprintf("%s_%s", api_name, fn_name),
                                     &mudstate.api_func_htab);
     if (!afp)
         return NULL;
@@ -86,7 +86,7 @@ void register_commands(CMDENT *cmdtab) {
         for (cp = cmdtab; cp->cmdname; cp++) {
             hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab,
                     0);
-            hashadd(tprintf("__%s", cp->cmdname), (int *)cp,
+            hashadd(tmprintf("__%s", cp->cmdname), (int *)cp,
                     &mudstate.command_htab, HASH_ALIAS);
         }
     }

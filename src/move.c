@@ -89,7 +89,7 @@ static void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear,
         if ((!Dark(thing) && !Dark(loc)) ||
                 (canhear && !DarkMover(thing))) {
             notify_except2(loc, thing, thing, cause,
-                           tprintf("%s has left.", Name(thing)), MSG_MOVE);
+                           tmprintf("%s has left.", Name(thing)), MSG_MOVE);
         }
     }
 }
@@ -155,7 +155,7 @@ static void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, 
     if (!quiet && canhear &&
             !Blind(thing) && !Blind(loc) && !DarkMover(thing)) {
         notify_except2(loc, thing, thing, cause,
-                       tprintf("%s has arrived.", Name(thing)), MSG_MOVE);
+                       tmprintf("%s has arrived.", Name(thing)), MSG_MOVE);
     }
 }
 
@@ -203,7 +203,7 @@ void move_object(dbref thing, dbref dest) {
             (Pennies(thing) < mudconf.paylimit) &&
             (!Controls(thing, dest)) && (Randomize(mudconf.payfind) == 0)) {
         giveto(thing, 1);
-        notify(thing, tprintf("You found a %s!", mudconf.one_coin));
+        notify(thing, tmprintf("You found a %s!", mudconf.one_coin));
     }
 }
 
@@ -526,7 +526,7 @@ void do_move(dbref player, dbref cause, int key, char *direction) {
              */
 
             notify_except(loc, player, player,
-                          tprintf("%s goes home.", Name(player)), MSG_MOVE);
+                          tmprintf("%s goes home.", Name(player)), MSG_MOVE);
         }
         /*
          * give the player the messages
@@ -648,7 +648,7 @@ void do_get(dbref player, dbref cause, int key, char *what) {
         } else if (could_doit(player, thing, A_LOCK)) {
             if (thingloc != Location(player)) {
                 notify(thingloc,
-                       tprintf("%s was taken from you.",
+                       tmprintf("%s was taken from you.",
                                Name(thing)));
             }
             move_via_generic(thing, player, player, 0);
@@ -758,7 +758,7 @@ void do_drop(dbref player, dbref cause, int key, char *name) {
         if ((key & DROP_QUIET) && Controls(player, thing))
             quiet = 1;
         bp = buf = alloc_lbuf("do_drop.did_it");
-        safe_tprintf_str(buf, &bp, "dropped %s.", Name(thing));
+        safe_tmprintf_str(buf, &bp, "dropped %s.", Name(thing));
         oattr = quiet ? 0 : A_ODROP;
         aattr = quiet ? 0 : A_ADROP;
         did_it(player, thing, A_DROP, "Dropped.", oattr, buf,

@@ -91,46 +91,10 @@ void cf_init(void) {
     mudconf.mudowner = XSTRDUP("", "cf_string");
 
     mudconf.binhome = XSTRDUP("./bin", "cf_string");
-    mudconf.dbhome = XSTRDUP("./data", "cf_string");
-    mudconf.txthome = XSTRDUP("./text", "cf_string");
-    mudconf.bakhome = XSTRDUP("./backups", "cf_string");
+    mudconf.dbhome = XSTRDUP("./var/db/tinymush", "cf_string");
+    mudconf.txthome = XSTRDUP("./share/tinymush", "cf_string");
+    mudconf.bakhome = XSTRDUP("./var/backups/tinymush", "cf_string");
 
-    sprintf(s, "%s/guest.txt", mudconf.txthome);
-    mudconf.guest_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/connect.txt", mudconf.txthome);
-    mudconf.conn_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/register.txt", mudconf.txthome);
-    mudconf.creg_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/create_reg.txt", mudconf.txthome);
-    mudconf.regf_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/motd.txt", mudconf.txthome);
-    mudconf.motd_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/wizmotd.txt", mudconf.txthome);
-    mudconf.wizmotd_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/quit.txt", mudconf.txthome);
-    mudconf.quit_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/down.txt", mudconf.txthome);
-    mudconf.down_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/full.txt", mudconf.txthome);
-    mudconf.full_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/badsite.txt", mudconf.txthome);
-    mudconf.site_file = XSTRDUP(s, "cf_string");
-
-    sprintf(s, "%s/newuser.txt", mudconf.txthome);
-    mudconf.crea_file = XSTRDUP(s, "cf_string");
-#ifdef PUEBLO_SUPPORT
-    sprintf(s, "%s/htmlconn.txt", mudconf.txthome);
-    mudconf.htmlconn_file = XSTRDUP(s, "cf_string");
-#endif
     mudconf.motd_msg = XSTRDUP("", "cf_string");
     mudconf.wizmotd_msg = XSTRDUP("", "cf_string");
     mudconf.downmotd_msg = XSTRDUP("", "cf_string");
@@ -139,11 +103,9 @@ void cf_init(void) {
     mudconf.postdump_msg = XSTRDUP("", "cf_string");
     mudconf.fixed_home_msg = XSTRDUP("", "cf_string");
     mudconf.fixed_tel_msg = XSTRDUP("", "cf_string");
-    mudconf.huh_msg =
-        XSTRDUP("Huh?  (Type \"help\" for help.)", "cf_string");
+    mudconf.huh_msg = XSTRDUP("Huh?  (Type \"help\" for help.)", "cf_string");
 #ifdef PUEBLO_SUPPORT
-    mudconf.pueblo_msg =
-        XSTRDUP("</xch_mudtext><img xch_mode=html><tt>", "cf_string");
+    mudconf.pueblo_msg = XSTRDUP("</xch_mudtext><img xch_mode=html><tt>", "cf_string");
 #endif
     mudconf.infotext_list = NULL;
     mudconf.indent_desc = 0;
@@ -355,7 +317,6 @@ void cf_init(void) {
     mudconf.cache_width = CACHE_WIDTH;
     mudconf.cache_size = CACHE_SIZE;
 
-    mudstate.initializing = 0;
     mudstate.loading_db = 0;
     mudstate.panicking = 0;
     mudstate.standalone = 0;
@@ -451,7 +412,7 @@ void cf_log_notfound(dbref player, char *cmd, const char *thingname, char *thing
         log_printf("%s: %s %s not found", cmd, thingname, thing);
         ENDLOG
     } else {
-        notify(player, tprintf("%s %s not found", thingname, thing));
+        notify(player, tmprintf("%s %s not found", thingname, thing));
     }
 }
 
@@ -471,7 +432,51 @@ void cf_log_syntax(dbref player, char *cmd, const char *template, ...) {
         log_vprintf(template, ap);
         ENDLOG
     } else {
-        notify(player, tvprintf(template, ap));
+        notify(player, tmvprintf(template, ap));
+    }
+
+    va_end(ap);
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * cf_log_help: Log a help loader message.
+ */
+
+void cf_log_help(dbref player, char *cmd, const char *template, ...) {
+    va_list ap;
+
+    va_start(ap, template);
+
+    if (mudstate.initializing) {
+        STARTLOG(LOG_STARTUP, "HLP", "LOAD")
+        log_printf("%s: ", cmd);
+        log_vprintf(template, ap);
+        ENDLOG
+    } else {
+        notify(player, tmvprintf(template, ap));
+    }
+
+    va_end(ap);
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * cf_log_help_mkindx: Log a help indexation message.
+ */
+
+void cf_log_help_mkindx(dbref player, char *cmd, const char *template, ...) {
+    va_list ap;
+
+    va_start(ap, template);
+
+    if (mudstate.initializing) {
+        STARTLOG(LOG_STARTUP, "HLP", "LOAD")
+        log_printf("%s: ", cmd);
+        log_vprintf(template, ap);
+        ENDLOG
+    } else {
+        notify(player, tmvprintf(template, ap));
     }
 
     va_end(ap);
@@ -628,7 +633,7 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd) {
 
     MODULE *mp;
 
-    handle = lt_dlopen(tprintf("%s.la", str));
+    handle = lt_dlopen(tmprintf("%s.la", str));
 
     if (!handle) {
         STARTLOG(LOG_STARTUP, "CNF", "MOD")
@@ -1537,13 +1542,15 @@ int cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd) {
  */
 
 int add_helpfile(dbref player, char *confcmd, char *str, int is_raw) {
-    char *fcmd, *fpath, *newstr, *tokst;
+    char *fcmd, *fpath, *newstr, *tokst, *tstr;
 
     CMDENT *cmdp;
 
     char **ftab;		/* pointer to an array of filepaths */
 
     HASHTAB *hashes;
+    
+    FILE *fp;
 
     /*
      * Make a new string so we won't SEGV if given a constant string
@@ -1554,21 +1561,51 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw) {
 
     fcmd = strtok_r(newstr, " \t=,", &tokst);
     fpath = strtok_r(NULL, " \t=,", &tokst);
+    
+    cf_log_help(player, confcmd, "Loading helpfile %s", basename(fpath));
+    
     if (fpath == NULL) {
-        cf_log_syntax(player, confcmd, "Missing path for helpfile %s",
-                      fcmd);
+        cf_log_syntax(player, confcmd, "Missing path for helpfile %s", fcmd);
         free_mbuf(newstr);
         return -1;
     }
     if (fcmd[0] == '_' && fcmd[1] == '_') {
-        cf_log_syntax(player, confcmd,
-                      "Helpfile %s would cause @addcommand conflict", fcmd);
+        cf_log_syntax(player, confcmd, "Helpfile %s would cause @addcommand conflict", fcmd);
         free_mbuf(newstr);
         return -1;
     }
+    
+    /*
+     * Check if file exists in given and standard path
+     */
+    
+
+    tstr = tmprintf("%s.txt", fpath);
+    fp = fopen(tstr, "r");
+    if (fp == NULL) {
+        fpath = XSTRDUP(tmprintf("%s/%s", mudconf.txthome, fpath), "mudconf_txthome");
+        tstr = tmprintf("%s.txt", fpath);
+        fp = fopen(tstr, "r");
+        if (fp == NULL) {
+            cf_log_help(player, confcmd, "Helpfile %s not found", fcmd);
+            free_mbuf(newstr);
+            return -1;
+        }
+    }
+    fclose(fp);
+    
+    /*
+     * Rebuild Index
+     */
+     
+    if(helpmkindx(player, confcmd, fpath)) {
+        cf_log_help(player, confcmd, "Could not create index for helpfile %s, not loaded.", basename(fpath));
+        free_mbuf(newstr);
+        return -1;
+    }
+    
     if (strlen(fpath) > SBUF_SIZE) {
-        cf_log_syntax(player, confcmd, "Helpfile %s filename too long",
-                      fcmd);
+        cf_log_syntax(player, confcmd, "Helpfile %s filename too long", fcmd);
         free_mbuf(newstr);
         return -1;
     }
@@ -1588,8 +1625,8 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw) {
 
     hashdelete(cmdp->cmdname, &mudstate.command_htab);
     hashadd(cmdp->cmdname, (int *)cmdp, &mudstate.command_htab, 0);
-    hashdelete(tprintf("__%s", cmdp->cmdname), &mudstate.command_htab);
-    hashadd(tprintf("__%s", cmdp->cmdname), (int *)cmdp,
+    hashdelete(tmprintf("__%s", cmdp->cmdname), &mudstate.command_htab);
+    hashadd(tmprintf("__%s", cmdp->cmdname), (int *)cmdp,
             &mudstate.command_htab, HASH_ALIAS);
 
     /*
@@ -1626,20 +1663,19 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw) {
      */
 
     if (mudstate.hfiletab[mudstate.helpfiles] != NULL)
-        XFREE(mudstate.hfiletab[mudstate.helpfiles],
-              "add_helpfile.fpath");
-    mudstate.hfiletab[mudstate.helpfiles] =
-        XSTRDUP(fpath, "add_helpfile.fpath");
+        XFREE(mudstate.hfiletab[mudstate.helpfiles], "add_helpfile.fpath");
+    mudstate.hfiletab[mudstate.helpfiles] = XSTRDUP(fpath, "add_helpfile.fpath");
 
     /*
      * Initialize the associated hashtable.
      */
 
-    hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * HASH_FACTOR,
-             HT_STR);
+    hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * HASH_FACTOR, HT_STR);
 
     mudstate.helpfiles++;
     free_mbuf(newstr);
+    
+    cf_log_help(player, confcmd, "Successfully loaded helpfile %s", basename(fpath));
 
     return 0;
 }
@@ -1670,8 +1706,11 @@ int cf_include(int *vp, char *str, long extra, dbref player, char *cmd) {
 
     fp = fopen(str, "r");
     if (fp == NULL) {
-        cf_log_notfound(player, cmd, "Config file", str);
-        return -1;
+        fp = fopen(tmprintf("%s/%s", mudconf.config_home, str), "r");
+        if(fp == NULL) {
+            cf_log_notfound(player, cmd, "Config file", str);
+            return -1;
+        }
     }
     buf = alloc_lbuf("cf_include");
     fgets(buf, LBUF_SIZE, fp);
@@ -1750,7 +1789,7 @@ CONF		conftable [] = {
     {(char *)"attr_type", cf_attr_type, CA_GOD, CA_DISABLED, NULL, (long)attraccess_nametab},
     {(char *)"autozone", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.autozone, (long)"New objects are @chzoned to their creator's zone"},
     {(char *)"bad_name", cf_badname, CA_GOD, CA_DISABLED, NULL, 0},
-    {(char *)"badsite_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.site_file, MBUF_SIZE},
+    //{(char *)"badsite_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.site_file, MBUF_SIZE},
     {(char *)"backup_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.bakhome, MBUF_SIZE},
     {(char *)"binary_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.binhome, MBUF_SIZE},
     {(char *)"booleans_oldstyle", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.bools_oldstyle, (long)"Dbrefs #0 and #-1 are boolean false, all other\n\t\t\t\tdbrefs are boolean true"},
@@ -1768,10 +1807,11 @@ CONF		conftable [] = {
     {(char *)"compress_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.compressexe, MBUF_SIZE},
     {(char *)"concentrator_port", cf_int, CA_STATIC, CA_WIZARD, &mudconf.conc_port, 0},
     {(char *)"config_access", cf_cf_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
+    {(char *)"config_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.config_home, MBUF_SIZE},
     {(char *)"config_read_access", cf_cf_access, CA_GOD, CA_DISABLED, (int *)1, (long)access_nametab},
     {(char *)"conn_timeout", cf_int, CA_GOD, CA_WIZARD, &mudconf.conn_timeout, 0},
-    {(char *)"connect_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.conn_file, MBUF_SIZE},
-    {(char *)"connect_reg_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.creg_file, MBUF_SIZE},
+    //{(char *)"connect_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.conn_file, MBUF_SIZE},
+    //{(char *)"connect_reg_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.creg_file, MBUF_SIZE},
     {(char *)"create_max_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.createmax, 0},
     {(char *)"create_min_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.createmin, 0},
     {(char *)"dark_actions", cf_bool, CA_GOD, CA_WIZARD, &mudconf.dark_actions, (long)"Dark objects still trigger @a-actions when moving"},
@@ -1780,7 +1820,7 @@ CONF		conftable [] = {
     {(char *)"default_home", cf_dbref, CA_GOD, CA_PUBLIC, &mudconf.default_home, NOTHING},
     {(char *)"dig_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.digcost, 0},
     {(char *)"divert_log", cf_divert_log, CA_STATIC, CA_DISABLED, &mudconf.log_diversion, (long)logoptions_nametab},
-    {(char *)"down_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.down_file, MBUF_SIZE},
+    //{(char *)"down_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.down_file, MBUF_SIZE},
     {(char *)"down_motd_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.downmotd_msg, GBUF_SIZE},
     {(char *)"dump_interval", cf_int, CA_GOD, CA_WIZARD, &mudconf.dump_interval, 0},
     {(char *)"dump_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.dump_msg, MBUF_SIZE},
@@ -1807,7 +1847,7 @@ CONF		conftable [] = {
     {(char *)"fork_dump", cf_bool, CA_GOD, CA_WIZARD, &mudconf.fork_dump, (long)"Dumps are performed using a forked process"},
     {(char *)"fork_vfork", cf_bool, CA_GOD, CA_WIZARD, &mudconf.fork_vfork, (long)"Forks are done using vfork()"},
     {(char *)"forwardlist_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.fwdlist_lim, 0},
-    {(char *)"full_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.full_file, MBUF_SIZE},
+    //{(char *)"full_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.full_file, MBUF_SIZE},
     {(char *)"full_motd_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.fullmotd_msg, GBUF_SIZE},
     {(char *)"function_access", cf_func_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
     {(char *)"function_alias", cf_alias, CA_GOD, CA_DISABLED, (int *)&mudstate.func_htab, (long)"Function"},
@@ -1824,7 +1864,7 @@ CONF		conftable [] = {
     {(char *)"guest_prefixes", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.guest_prefixes, LBUF_SIZE},
     {(char *)"guest_suffixes", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.guest_suffixes, LBUF_SIZE},
     {(char *)"number_guests", cf_int, CA_STATIC, CA_WIZARD, &mudconf.number_guests, 0},
-    {(char *)"guest_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.guest_file, MBUF_SIZE},
+    //{(char *)"guest_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.guest_file, MBUF_SIZE},
     {(char *)"guest_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mudstate.access_list, H_GUEST},
     {(char *)"guest_starting_room", cf_dbref, CA_GOD, CA_WIZARD, &mudconf.guest_start_room, NOTHING},
 
@@ -1834,7 +1874,7 @@ CONF		conftable [] = {
     {(char *)"hostnames", cf_bool, CA_GOD, CA_WIZARD, &mudconf.use_hostname, (long)"DNS lookups are done on hostnames"},
 
 #ifdef PUEBLO_SUPPORT
-    {(char *)"html_connect_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.htmlconn_file, MBUF_SIZE},
+    //{(char *)"html_connect_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.htmlconn_file, MBUF_SIZE},
     {(char *)"pueblo_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.pueblo_msg, GBUF_SIZE},
 #endif
 
@@ -1860,6 +1900,7 @@ CONF		conftable [] = {
     {(char *)"local_master_parents", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.match_zone_parents, (long)"Objects in local master rooms inherit\n\t\t\t\tcommands from their parent"},
     {(char *)"lock_recursion_limit", cf_int, CA_WIZARD, CA_PUBLIC, &mudconf.lock_nest_lim, 0},
     {(char *)"log", cf_modify_bits, CA_GOD, CA_DISABLED, &mudconf.log_options, (long)logoptions_nametab},
+    {(char *)"log_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.log_home, MBUF_SIZE},
     {(char *)"log_options", cf_modify_bits, CA_GOD, CA_DISABLED, &mudconf.log_info, (long)logdata_nametab},
     {(char *)"logout_cmd_access", cf_ntab_access, CA_GOD, CA_DISABLED, (int *)logout_cmdtable, (long)access_nametab},
     {(char *)"logout_cmd_alias", cf_alias, CA_GOD, CA_DISABLED, (int *)&mudstate.logout_cmd_htab, (long)"Logged-out command"},
@@ -1871,13 +1912,13 @@ CONF		conftable [] = {
     {(char *)"module", cf_module, CA_STATIC, CA_WIZARD, NULL, 0},
     {(char *)"money_name_plural", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.many_coins, SBUF_SIZE},
     {(char *)"money_name_singular", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.one_coin, SBUF_SIZE},
-    {(char *)"motd_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.motd_file, MBUF_SIZE},
+    //{(char *)"motd_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.motd_file, MBUF_SIZE},
     {(char *)"motd_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.motd_msg, GBUF_SIZE},
     {(char *)"move_match_more", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.move_match_more, (long)"Move command checks for global and zone exits,\n\t\t\t\tresolves ambiguity"},
     {(char *)"mud_name", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.mud_name, SBUF_SIZE},
     {(char *)"mud_shortname", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.mud_shortname, SBUF_SIZE},
     {(char *)"mud_owner", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.mudowner, MBUF_SIZE},
-    {(char *)"newuser_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.crea_file, MBUF_SIZE},
+    //{(char *)"newuser_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.crea_file, MBUF_SIZE},
     {(char *)"no_ambiguous_match", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.no_ambiguous_match, (long)"Ambiguous matches resolve to the last match"},
     {(char *)"notify_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.ntfy_nest_lim, 0},
     {(char *)"objeval_requires_control", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.fascist_objeval, (long)"Control of victim required by objeval()"},
@@ -1892,6 +1933,7 @@ CONF		conftable [] = {
     {(char *)"pemit_far_players", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.pemit_players, (long)"@pemit targets can be players in other locations"},
     {(char *)"pemit_any_object", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.pemit_any, (long)"@pemit targets can be objects in other locations"},
     {(char *)"permit_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mudstate.access_list, 0},
+    {(char *)"pid_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.pid_home, MBUF_SIZE},
     {(char *)"player_aliases_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.max_player_aliases, 0},
     {(char *)"player_flags", cf_set_flags, CA_GOD, CA_DISABLED, (int *)&mudconf.player_flags, 0},
     {(char *)"player_listen", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.player_listen, (long)"@listen and ^-monitors are checked on players"},
@@ -1915,12 +1957,12 @@ CONF		conftable [] = {
     {(char *)"queue_max_size", cf_int, CA_GOD, CA_PUBLIC, &mudconf.max_qpid, 0},
     {(char *)"quiet_look", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.quiet_look, (long)"look shows public attributes in addition to @Desc"},
     {(char *)"quiet_whisper", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.quiet_whisper, (long)"whisper is quiet"},
-    {(char *)"quit_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.quit_file, MBUF_SIZE},
+    //{(char *)"quit_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.quit_file, MBUF_SIZE},
     {(char *)"quotas", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.quotas, (long)"Quotas are enforced"},
     {(char *)"raw_helpfile", cf_raw_helpfile, CA_STATIC, CA_DISABLED, NULL, 0},
     {(char *)"read_remote_desc", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.read_rem_desc, (long)"@Desc is public, even to players not nearby"},
     {(char *)"read_remote_name", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.read_rem_name, (long)"Names are public, even to players not nearby"},
-    {(char *)"register_create_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.regf_file, MBUF_SIZE},
+    //{(char *)"register_create_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.regf_file, MBUF_SIZE},
     {(char *)"register_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.register_limit, 0},
     {(char *)"register_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mudstate.access_list, H_REGISTRATION},
     {(char *)"require_cmds_flag", cf_bool, CA_GOD, CA_PUBLIC, (int *)&mudconf.req_cmds_flag, (long)"Only objects with COMMANDS flag are searched\n\t\t\t\tfor $-commands"},
@@ -1979,7 +2021,7 @@ CONF		conftable [] = {
     {(char *)"wait_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.waitcost, 0},
     {(char *)"wildcard_match_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.wild_times_lim, 0},
     {(char *)"wizard_obeys_linklock", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.wiz_obey_linklock, (long)"Check LinkLock even if player can link to anything"},
-    {(char *)"wizard_motd_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.wizmotd_file, MBUF_SIZE},
+    //{(char *)"wizard_motd_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.wizmotd_file, MBUF_SIZE},
     {(char *)"wizard_motd_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mudconf.wizmotd_msg, GBUF_SIZE},
     {(char *)"zone_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.zone_nest_lim, 0},
     {NULL, NULL, 0, 0, NULL, 0}
@@ -2099,9 +2141,7 @@ void do_admin(dbref player, dbref cause, int extra, char *kw, char *value) {
 int cf_read(char *fn) {
     int retval;
 
-    mudstate.initializing = 1;
     retval = cf_include(NULL, fn, 0, 0, (char *)"init");
-    mudstate.initializing = 0;
 
     /*
      * Fill in missing DB file names
@@ -2297,7 +2337,7 @@ void list_options(dbref player) {
                 (tp->interpreter == cf_bool)) &&
                 (check_access(player, tp->rperms))) {
 
-            raw_notify(player, tprintf("%-25s %c %s?",
+            raw_notify(player, tmprintf("%-25s %c %s?",
                                        tp->pname,
                                        (*(tp->loc) ? 'Y' : 'N'),
                                        (tp->extra ? (char *)tp->extra : "")));
@@ -2313,7 +2353,7 @@ void list_options(dbref player) {
                         (check_access(player, tp->rperms))) {
 
                     raw_notify(player,
-                               tprintf("%-25s %c %s?", tp->pname,
+                               tmprintf("%-25s %c %s?", tp->pname,
                                        (*(tp->loc) ? 'Y' : 'N'),
                                        (tp->extra ? (char *)tp->
                                         extra : "")));

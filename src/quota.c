@@ -183,19 +183,19 @@ static void show_quota(dbref player, dbref victim) {
     if (Free_Quota(victim)) {
         if (mudconf.typed_quotas)
             notify_quiet(player,
-                         tprintf
+                         tmprintf
                          ("%-16s: %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A",
                           Name(victim), dq_list[QTYPE_ALL],
                           dq_list[QTYPE_ROOM], dq_list[QTYPE_EXIT],
                           dq_list[QTYPE_THING], dq_list[QTYPE_PLAYER]));
         else
             notify_quiet(player,
-                         tprintf("%-16s: %4d - N/A", Name(victim),
+                         tmprintf("%-16s: %4d - N/A", Name(victim),
                                  dq_list[QTYPE_ALL]));
     } else {
         if (mudconf.typed_quotas)
             notify_quiet(player,
-                         tprintf
+                         tmprintf
                          ("%-16s: %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d",
                           Name(victim), dq_list[QTYPE_ALL],
                           q_list[QTYPE_ALL], dq_list[QTYPE_ROOM],
@@ -205,7 +205,7 @@ static void show_quota(dbref player, dbref victim) {
                           q_list[QTYPE_PLAYER]));
         else
             notify_quiet(player,
-                         tprintf("%-16s: %4d - %3d", Name(victim),
+                         tmprintf("%-16s: %4d - %3d", Name(victim),
                                  dq_list[QTYPE_ALL], q_list[QTYPE_ALL]));
     }
 }

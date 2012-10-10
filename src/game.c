@@ -619,24 +619,24 @@ void notify_check(dbref target, dbref sender, const char *msg, int key) {
                 (target != mudstate.curr_player)) {
             if (sender != Owner(sender)) {
                 if (sender != mudstate.curr_enactor) {
-                    safe_tprintf_str(msg_ns, &mp,
+                    safe_tmprintf_str(msg_ns, &mp,
                                      "[%s(#%d){%s}<-(#%d)] ",
                                      Name(sender), sender,
                                      Name(Owner(sender)),
                                      mudstate.curr_enactor);
                 } else {
-                    safe_tprintf_str(msg_ns, &mp,
+                    safe_tmprintf_str(msg_ns, &mp,
                                      "[%s(#%d){%s}] ",
                                      Name(sender), sender,
                                      Name(Owner(sender)));
                 }
             } else if (sender != mudstate.curr_enactor) {
-                safe_tprintf_str(msg_ns, &mp,
+                safe_tmprintf_str(msg_ns, &mp,
                                  "[%s(#%d)<-(#%d)] ",
                                  Name(sender), sender,
                                  mudstate.curr_enactor);
             } else {
-                safe_tprintf_str(msg_ns, &mp,
+                safe_tmprintf_str(msg_ns, &mp,
                                  "[%s(#%d)] ", Name(sender), sender);
             }
         }
@@ -1087,7 +1087,7 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
             if (yes_log)
                 log_printf("#%d\t%ld\n", thing, used_msecs);
             if (yes_screen)
-                raw_notify(player, tprintf("#%d\t%ld", thing,
+                raw_notify(player, tmprintf("#%d\t%ld", thing,
                                            used_msecs));
             if (yes_clear)
                 obj_time.tv_usec = obj_time.tv_sec = 0;
@@ -1097,7 +1097,7 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
 
     if (yes_screen) {
         raw_notify(player,
-                   tprintf
+                   tmprintf
                    ("Counted %d objects using %ld msecs over %d seconds.",
                     obj_counted, total_msecs,
                     (int)(time(NULL) - mudstate.cpu_count_from)));
@@ -1563,7 +1563,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
     } else {
         fclose(mainlog_fp);
         rename(mudconf.log_file,
-               tprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
+               tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
         logfile_init(mudconf.log_file);
     }
 
@@ -1579,7 +1579,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
             rename(lp->filename,
-                   tprintf("%s.%ld", lp->filename,
+                   tmprintf("%s.%ld", lp->filename,
                            (long)mudstate.now));
             lp->fileptr = fopen(lp->filename, "w");
             if (lp->fileptr)
@@ -1922,6 +1922,7 @@ int dbconvert(int argc, char *argv[]) {
     cf_init();
     mudstate.standalone = 1;
     cf_read(opt_conf);
+    mudstate.initializing = 0;
 
     /*
      * Open the gdbm file
@@ -2049,6 +2050,7 @@ int main(int argc, char *argv[]) {
 
     MODNHASHES *m_ntab, *np;
 
+    mudstate.initializing = 1;
 
     /*
      * Try to get the binary name
@@ -2080,14 +2082,15 @@ int main(int argc, char *argv[]) {
      * Parse options
      */
 
-    mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
+    mudconf.mud_shortname = XSTRDUP("tinymush", "main_mudconf_mud_shortname");
 
-    while ((c = getopt(argc, argv, "c:l:p:b:t:d:g:k:s")) != -1) {
+    while ((c = getopt(argc, argv, "c:s")) != -1) {
         switch (c) {
 
         case 'c':
-            XFREE(mudconf.mud_shortname, "main_mudconf_mud_shortname");
-            mudconf.mud_shortname = XSTRDUP(optarg, "main_mudconf_mud_shortname");
+            //XFREE(mudconf.mud_shortname, "main_mudconf_mud_shortname");
+            mudconf.config_file = XSTRDUP(optarg, "main_mudconf_mud_config_file");
+            mudconf.config_home = XSTRDUP(realpath(dirname(mudconf.config_file), NULL), "main_mudconf_mud_config_home");
             break;
         case 's':
             mindb = 1;
@@ -2103,12 +2106,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    mudconf.db_file = XSTRDUP(tprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");
-    mudconf.config_file = XSTRDUP(tprintf("%s.conf", mudconf.mud_shortname), "main_mudconf_config_file");
-    mudconf.log_file = XSTRDUP(tprintf("%s.log", mudconf.mud_shortname), "main_mudconf_log_file");
-    mudconf.pid_file = XSTRDUP(tprintf("%s.pid", mudconf.mud_shortname), "main_mudconf_pidfile");
-
-    write_pidfile(mudconf.pid_file);
+    
+    //mudconf.config_file = XSTRDUP(tmprintf("%s.conf", mudconf.mud_shortname), "main_mudconf_config_file");
+    //mudconf.log_file = XSTRDUP(tmprintf("%s.log", mudconf.mud_shortname), "main_mudconf_log_file");
+    //mudconf.pid_file = XSTRDUP(tmprintf("%s.pid", mudconf.mud_shortname), "main_mudconf_pidfile");
 
     /*
      * Abort if someone tried to set the number of global registers to
@@ -2125,7 +2126,8 @@ int main(int argc, char *argv[]) {
             qidx_chartab[122 - i] = -1;
         }
     }
-    logfile_init(mudconf.log_file);
+
+
     tf_init();
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
@@ -2141,7 +2143,7 @@ int main(int argc, char *argv[]) {
     pool_init(POOL_QENTRY, sizeof(BQUE));
     tcache_init();
     pcache_init();
-
+    
     cf_init();
 
     init_rlimit();
@@ -2168,22 +2170,43 @@ int main(int argc, char *argv[]) {
     hashinit(&mudstate.instance_htab, 15 * HASH_FACTOR, HT_STR);
     hashinit(&mudstate.instdata_htab, 25 * HASH_FACTOR, HT_STR);
     hashinit(&mudstate.api_func_htab, 5 * HASH_FACTOR, HT_STR);
-
+    
     cf_read(mudconf.config_file);
+    
+    mudconf.log_file = XSTRDUP(tmprintf("%s/%s.log", mudconf.log_home, mudconf.mud_shortname), "main_mudconf_log_file");
+    mudconf.pid_file = XSTRDUP(tmprintf("%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname), "main_mudconf_pid_file");    
+    mudconf.db_file =  XSTRDUP(tmprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");    
 
-    s = (char *)XMALLOC(MBUF_SIZE, "main_add_helpfile");
-
-    sprintf(s, "help %s/help", mudconf.txthome);
-    add_helpfile(GOD, (char *)"main:add_helpfile", s, 1);
-
-    sprintf(s, "wizhelp %s/wizhelp", mudconf.txthome);
-    add_helpfile(GOD, (char *)"main:add_helpfile", s, 1);
-
-
-    sprintf(s, "qhelp %s/qhelp", mudconf.txthome);
-    add_helpfile(GOD, (char *)"main:add_helpfile", s, 1);
-
-    XFREE(s, "main_add_helpfile");
+    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+    log_printf("Loading help file");
+    ENDLOG
+    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help"), 1);
+    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+    log_printf("Loading wizhelp file");
+    ENDLOG    
+    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("wizhelp %s/wizhelp", mudconf.txthome), "main_add_helpfile_wizhelp"), 1);
+    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+    log_printf("Loading qhelp file");
+    ENDLOG    
+    add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("qhelp %s/qhelp", mudconf.txthome), "main_add_helpfile_qhelp"), 1);
+    
+    logfile_init(mudconf.log_file);
+    write_pidfile(mudconf.pid_file);
+        
+    mudconf.guest_file =   XSTRDUP(tmprintf("%s/guest.txt", mudconf.txthome), "main_mudconf_guest_file");
+    mudconf.conn_file =    XSTRDUP(tmprintf("%s/connect.txt", mudconf.txthome), "main_mudconf_conn_file");
+    mudconf.creg_file =    XSTRDUP(tmprintf("%s/register.txt", mudconf.txthome), "main_mudconf_creg_file");
+    mudconf.regf_file =    XSTRDUP(tmprintf("%s/create_reg.txt", mudconf.txthome), "main_mudconf_regf_file");
+    mudconf.motd_file =    XSTRDUP(tmprintf("%s/motd.txt", mudconf.txthome), "main_mudconf_motd_file");
+    mudconf.wizmotd_file = XSTRDUP(tmprintf("%s/wizmotd.txt", mudconf.txthome), "main_mudconf_wizmotd_file");
+    mudconf.quit_file =    XSTRDUP(tmprintf("%s/quit.txt", mudconf.txthome), "main_mudconf_quit_file");
+    mudconf.down_file =    XSTRDUP(tmprintf("%s/down.txt", mudconf.txthome), "main_mudconf_down_file");
+    mudconf.full_file =    XSTRDUP(tmprintf("%s/full.txt", mudconf.txthome), "main_mudconf_full_file");
+    mudconf.site_file =    XSTRDUP(tmprintf("%s/badsite.txt", mudconf.txthome), "main_mudconf_site_file");
+    mudconf.crea_file =    XSTRDUP(tmprintf("%s/newuser.txt", mudconf.txthome), "main_mudconf_crea_file");
+#ifdef PUEBLO_SUPPORT
+    mudconf.htmlconn_file = XSTRDUP(tmprintf("%s/htmlconn.txt", mudconf.txthome), "main_mudconf_htmlconn_file");
+#endif
 
     cmdp = (CMDENT *) hashfind((char *)"wizhelp", &mudstate.command_htab);
     if (cmdp)
@@ -2338,6 +2361,7 @@ int main(int argc, char *argv[]) {
      * Startup is done.
      */
 
+    mudstate.initializing = 0;
     mudstate.running = 1;
 
     /*

@@ -329,7 +329,7 @@ void do_toad(dbref player, dbref cause, int key, char *toad, char *newowner) {
 
     count = boot_off(victim,
                      (char *)"You have been turned into a slimy toad!");
-    notify_quiet(player, tprintf("%d connection%s closed.",
+    notify_quiet(player, tmprintf("%d connection%s closed.",
                                  count, (count == 1 ? "" : "s")));
 }
 
@@ -366,7 +366,7 @@ void do_newpassword(dbref player, dbref cause, int key, char *name, char *passwo
     notify_quiet(player, "Password changed.");
     buf = alloc_lbuf("do_newpassword");
     bp = buf;
-    safe_tprintf_str(buf, &bp,
+    safe_tmprintf_str(buf, &bp,
                      "Your password has been changed by %s.", Name(player));
     notify_quiet(victim, buf);
     free_lbuf(buf);
@@ -416,7 +416,7 @@ void do_boot(dbref player, dbref cause, int key, char *name) {
         log_printf(" was @booted by ");
         log_name(player);
         ENDLOG
-        notify_quiet(player, tprintf("You booted %s off!",
+        notify_quiet(player, tmprintf("You booted %s off!",
                                      Name(victim)));
     }
     if (key & BOOT_QUIET) {
@@ -432,7 +432,7 @@ void do_boot(dbref player, dbref cause, int key, char *name) {
         count = boot_by_port(victim, !God(player), buf);
     else
         count = boot_off(victim, buf);
-    notify_quiet(player, tprintf("%d connection%s closed.",
+    notify_quiet(player, tmprintf("%d connection%s closed.",
                                  count, (count == 1 ? "" : "s")));
     if (buf)
         free_lbuf(buf);
@@ -545,27 +545,27 @@ void do_motd(dbref player, dbref cause, int key, char *message) {
             }
             if (mudconf.motd_msg && *mudconf.motd_msg) {
                 notify_quiet(player,
-                             tprintf("MOTD: %s", mudconf.motd_msg));
+                             tmprintf("MOTD: %s", mudconf.motd_msg));
             } else {
                 notify_quiet(player, "No MOTD.");
             }
             if (mudconf.wizmotd_msg && *mudconf.wizmotd_msg) {
                 notify_quiet(player,
-                             tprintf("Wizard MOTD: %s",
+                             tmprintf("Wizard MOTD: %s",
                                      mudconf.wizmotd_msg));
             } else {
                 notify_quiet(player, "No Wizard MOTD.");
             }
             if (mudconf.downmotd_msg && *mudconf.downmotd_msg) {
                 notify_quiet(player,
-                             tprintf("Down MOTD: %s",
+                             tmprintf("Down MOTD: %s",
                                      mudconf.downmotd_msg));
             } else {
                 notify_quiet(player, "No Down MOTD.");
             }
             if (mudconf.fullmotd_msg && *mudconf.fullmotd_msg) {
                 notify_quiet(player,
-                             tprintf("Full MOTD: %s",
+                             tmprintf("Full MOTD: %s",
                                      mudconf.fullmotd_msg));
             } else {
                 notify_quiet(player, "No Full MOTD.");

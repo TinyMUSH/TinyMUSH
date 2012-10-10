@@ -50,36 +50,36 @@ void do_version(dbref player, dbref cause, int extra) {
     }
     sprintf(string, "%s (%s)", string, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
-    notify(player, tprintf("%s\n%s\n", string, ptr));
+    notify(player, tmprintf("%s\n%s\n", string, ptr));
     XFREE(ptr, "repeatchar");
-    notify(player, tprintf("   Build number: %s (%s)", MUSH_BUILD_NUM, MUSH_BUILD_DATE));
+    notify(player, tmprintf("   Build number: %s (%s)", MUSH_BUILD_NUM, MUSH_BUILD_DATE));
     if (Wizard(player)) {
 #ifdef HAVE_SYS_UTSNAME_H
         uname(&bpInfo);
-        notify(player, tprintf(" Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine));
+        notify(player, tmprintf(" Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine));
 #endif
-        notify(player, tprintf("Configure Flags: %s", mudstate.configureinfo));
-        notify(player, tprintf(" Compiler Flags: %s", mudstate.compilerinfo));
-        notify(player, tprintf("   Linker Flags: %s", mudstate.linkerinfo));
-        notify(player, tprintf("     DBM driver: %s\n", mudstate.dbmdriver));
+        notify(player, tmprintf("Configure Flags: %s", mudstate.configureinfo));
+        notify(player, tmprintf(" Compiler Flags: %s", mudstate.compilerinfo));
+        notify(player, tmprintf("   Linker Flags: %s", mudstate.linkerinfo));
+        notify(player, tmprintf("     DBM driver: %s\n", mudstate.dbmdriver));
         
     }
     if (mudstate.modloaded[0]) {
         MODULE *mp;
         WALK_ALL_MODULES(mp) {
           ptr = repeatchar(strlen(mp->modname) + 8, '-');
-          notify(player, tprintf("Module %s\n%s\n", mp->modname, ptr));
+          notify(player, tmprintf("Module %s\n%s\n", mp->modname, ptr));
           XFREE(ptr, "repeatchar");
         if ((mver = DLSYM_VAR(mp->handle, mp->modname, "version", MODVER *)) != NULL) {
           
-          notify(player, tprintf("        Version: %s", mver->version));
-          notify(player, tprintf("         Author: %s", mver->author));
-          notify(player, tprintf("          Email: %s", mver->email));
-          notify(player, tprintf("        Website: %s", mver->url));
-          notify(player, tprintf("      Copyright: %s", mver->copyright));
-          notify(player, tprintf("    Description: %s\n", mver->description));
+          notify(player, tmprintf("        Version: %s", mver->version));
+          notify(player, tmprintf("         Author: %s", mver->author));
+          notify(player, tmprintf("          Email: %s", mver->email));
+          notify(player, tmprintf("        Website: %s", mver->url));
+          notify(player, tmprintf("      Copyright: %s", mver->copyright));
+          notify(player, tmprintf("    Description: %s\n", mver->description));
         } else
-          notify(player, tprintf("module %s: no version information", mp->modname));
+          notify(player, tmprintf("module %s: no version information", mp->modname));
         }
     }
 }
@@ -120,7 +120,7 @@ void init_version(void) {
     mudstate.compilerinfo = munge_space(MUSH_BUILD_COMPILE);
     mudstate.linkerinfo = munge_space(MUSH_BUILD_LTCOMPILE);
 
-    mudstate.dbmdriver = XSTRDUP(tprintf("%s", MUSH_DBM), "init_version");
+    mudstate.dbmdriver = XSTRDUP(tmprintf("%s", MUSH_DBM), "init_version");
     STARTLOG(LOG_ALWAYS, "INI", "START")
     log_printf("       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE);
     ENDLOG STARTLOG(LOG_ALWAYS, "INI", "START")

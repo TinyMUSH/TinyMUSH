@@ -137,7 +137,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
     num_rows = atoi(PQcmdTuples(pgres));
     if (num_rows > 0)
     {
-        notify(player, tprintf("SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows"));
+        notify(player, tmprintf("SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows"));
         PQclear(pgres);
         return 0;
     }
@@ -193,7 +193,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     if (pg_data && *pg_data)
                     {
                         notify(player,
-                               tprintf
+                               tmprintf
                                ("Row %d, Field %d: %s",
                                 i + 1, j + 1,
                                 pg_data));
@@ -201,7 +201,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     else
                     {
                         notify(player,
-                               tprintf
+                               tmprintf
                                ("Row %d, Field %d: NULL",
                                 i + 1, j + 1));
                     }
@@ -209,7 +209,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
             }
             else
             {
-                notify(player, tprintf("Row %d: NULL", i + 1));
+                notify(player, tmprintf("Row %d: NULL", i + 1));
             }
         }
     }

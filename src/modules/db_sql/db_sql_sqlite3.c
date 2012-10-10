@@ -165,14 +165,14 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     if (j > 0)
                     {
                         notify_quiet(player,
-                                     tprintf
+                                     tmprintf
                                      ("Row %d, Field %d: %s", i,
                                       j + 1, col_data));
                     }
                     if (col_data && *col_data)
                     {
                         notify_quiet(player,
-                                     tprintf
+                                     tmprintf
                                      ("Row %d, Field %d: NULL",
                                       i, j + 1));
                     }
@@ -187,7 +187,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
         if (num_rows > 0)
         {
             notify_quiet(player,
-                         tprintf("SQL query touched %d %s.", num_rows,
+                         tmprintf("SQL query touched %d %s.", num_rows,
                                  (num_rows == 1) ? "row" : "rows"));
         }
     }

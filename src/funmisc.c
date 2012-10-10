@@ -330,7 +330,7 @@ void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     if (num < 1) {
         safe_chr('0', buff, bufc);
     } else {
-        safe_tprintf_str(buff, bufc, "%ld", Randomize(num));
+        safe_tmprintf_str(buff, bufc, "%ld", Randomize(num));
     }
 }
 
@@ -780,7 +780,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
             return;
         }
     } else {
-        safe_tprintf_str(buff, bufc,
+        safe_tmprintf_str(buff, bufc,
                          "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d",
                          nfargs);
         return;
@@ -1001,11 +1001,11 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                         }
                     } else if (width > 0) {
                         if (isupper(*p)) {
-                            safe_tprintf_str(buff,
+                            safe_tmprintf_str(buff,
                                              bufc, "%0*d",
                                              width, n);
                         } else {
-                            safe_tprintf_str(buff,
+                            safe_tmprintf_str(buff,
                                              bufc, "%*d", width,
                                              n);
                         }
@@ -1050,7 +1050,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                         csecs = raw_secs;
                     }
                     if (!hidezero || (cdays != 0)) {
-                        safe_tprintf_str(buff, bufc,
+                        safe_tmprintf_str(buff, bufc,
                                          isupper(*p) ?
                                          "%0*d:%0*d:%0*d:%0*d" :
                                          "%*d:%*d:%*d:%*d",
@@ -1064,7 +1064,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                          * non-zero thing
                          */
                         if (chours != 0) {
-                            safe_tprintf_str(buff,
+                            safe_tmprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
                                              "%0*d:%0*d:%0*d" :
@@ -1073,7 +1073,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                              width, cmins,
                                              width, csecs);
                         } else if (cmins != 0) {
-                            safe_tprintf_str(buff,
+                            safe_tmprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
                                              "%0*d:%0*d" :
@@ -1081,7 +1081,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                                              cmins, width,
                                              csecs);
                         } else {
-                            safe_tprintf_str(buff,
+                            safe_tmprintf_str(buff,
                                              bufc,
                                              isupper(*p) ?
                                              "%0*d" : "%*d",
@@ -1258,14 +1258,14 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
              * Abort
              */
             notify(player,
-                   tprintf
+                   tmprintf
                    ("Limits exceeded at benchmark iteration %d.",
                     i + 1));
             times = i + 1;
         }
     }
 
-    safe_tprintf_str(buff, bufc, "%.2f %.0f %.0f",
+    safe_tmprintf_str(buff, bufc, "%.2f %.0f %.0f",
                      total / (double)times, min, max);
 }
 
@@ -1701,32 +1701,32 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
         if (qptr == NULL)
             return;
         if ((qptr->waittime > 0) && (Good_obj(qptr->sem))) {
-            safe_tprintf_str(buff, bufc, "#%d:#%d/%d %s",
+            safe_tmprintf_str(buff, bufc, "#%d:#%d/%d %s",
                              qptr->player,
                              qptr->sem, qptr->waittime - mudstate.now,
                              qptr->comm);
         } else if (qptr->waittime > 0) {
-            safe_tprintf_str(buff, bufc, "#%d:%d %s",
+            safe_tmprintf_str(buff, bufc, "#%d:%d %s",
                              qptr->player,
                              qptr->waittime - mudstate.now, qptr->comm);
         } else if (Good_obj(qptr->sem)) {
             if (qptr->attr == A_SEMAPHORE) {
-                safe_tprintf_str(buff, bufc, "#%d:#%d %s",
+                safe_tmprintf_str(buff, bufc, "#%d:#%d %s",
                                  qptr->player, qptr->sem, qptr->comm);
             } else {
                 ap = atr_num(qptr->attr);
                 if (ap && ap->name) {
-                    safe_tprintf_str(buff, bufc,
+                    safe_tmprintf_str(buff, bufc,
                                      "#%d:#%d/%s %s", qptr->player,
                                      qptr->sem, ap->name, qptr->comm);
                 } else {
-                    safe_tprintf_str(buff, bufc,
+                    safe_tmprintf_str(buff, bufc,
                                      "#%d:#%d %s", qptr->player,
                                      qptr->sem, qptr->comm);
                 }
             }
         } else {
-            safe_tprintf_str(buff, bufc, "#%d: %s", qptr->player,
+            safe_tmprintf_str(buff, bufc, "#%d: %s", qptr->player,
                              qptr->comm);
         }
         return;

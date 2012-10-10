@@ -133,9 +133,9 @@ void mod_db_sql_init() {
     }
 
 #ifdef SQL_DRIVER
-    mod_db_sql_version.version=XSTRDUP(tprintf("%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER), "mod_db_sql_init");
+    mod_db_sql_version.version=XSTRDUP(tmprintf("%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER), "mod_db_sql_init");
 #else
-    mod_db_sql_version.version=XSTRDUP(tprintf("%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE), "mod_db_sql_init");
+    mod_db_sql_version.version=XSTRDUP(tmprintf("%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE), "mod_db_sql_init");
 #endif
     mod_db_sql_version.author=XSTRDUP("TinyMUSH Development Team", "mod_db_sql_init");
     mod_db_sql_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_db_sql_init");

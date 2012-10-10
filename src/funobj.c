@@ -729,7 +729,7 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
     }
     if (!payfor(player, mudconf.searchcost)) {
-        notify(player, tprintf("You don't have enough %s.",
+        notify(player, tmprintf("You don't have enough %s.",
                                mudconf.many_coins));
         safe_nothing(buff, bufc);
         return;
@@ -1125,7 +1125,7 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     int n_elems, i, j, result;
 
     if (nfargs < 2) {
-        safe_tprintf_str(buff, bufc,
+        safe_tmprintf_str(buff, bufc,
                          "#-1 FUNCTION (HASFLAGS) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d",
                          nfargs);
         return;
@@ -1493,7 +1493,7 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if (Is_Func(GET_XARGS)) {
         if (!*fargs[0] || !*fargs[1])
             return;
-        str = tprintf("%s/%s", fargs[0], fargs[1]);
+        str = tmprintf("%s/%s", fargs[0], fargs[1]);
     } else {
         str = fargs[0];
     }
@@ -2294,7 +2294,7 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         safe_str("#-1 ERROR GETTING STATS", buff, bufc);
         return;
     }
-    safe_tprintf_str(buff, bufc, "%d %d %d %d %d %d %d %d",
+    safe_tmprintf_str(buff, bufc, "%d %d %d %d %d %d %d %d",
                      statinfo.s_total, statinfo.s_rooms,
                      statinfo.s_exits, statinfo.s_things,
                      statinfo.s_players, statinfo.s_unknown,
@@ -2612,7 +2612,7 @@ static void transform_say(dbref speaker, char *sname, char *str, int key, char *
              EV_STRIP | EV_FCHECK | EV_EVAL, &tp, tstack, 3);
         if (result && *result) {
             if ((key == SAY_SAY) && (spos == 0)) {
-                safe_tprintf_str(buff, bufc, "%s %s %s",
+                safe_tmprintf_str(buff, bufc, "%s %s %s",
                                  sname, say_str, result);
             } else {
                 safe_str(result, buff, bufc);
@@ -2794,26 +2794,26 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         switch (*fargs[1]) {
         case ':':
             if (*(fargs[1] + 1) == ' ') {
-                safe_tprintf_str(buff, bufc, "%s%s", tname,
+                safe_tmprintf_str(buff, bufc, "%s%s", tname,
                                  fargs[1] + 2);
             } else {
-                safe_tprintf_str(buff, bufc, "%s %s", tname,
+                safe_tmprintf_str(buff, bufc, "%s %s", tname,
                                  fargs[1] + 1);
             }
             break;
         case ';':
-            safe_tprintf_str(buff, bufc, "%s%s", tname,
+            safe_tmprintf_str(buff, bufc, "%s%s", tname,
                              fargs[1] + 1);
             break;
         case '|':
-            safe_tprintf_str(buff, bufc, "%s", fargs[1] + 1);
+            safe_tmprintf_str(buff, bufc, "%s", fargs[1] + 1);
             break;
         case '"':
-            safe_tprintf_str(buff, bufc, "%s %s \"%s\"",
+            safe_tmprintf_str(buff, bufc, "%s %s \"%s\"",
                              tname, say_str, fargs[1] + 1);
             break;
         default:
-            safe_tprintf_str(buff, bufc, "%s %s \"%s\"",
+            safe_tmprintf_str(buff, bufc, "%s %s \"%s\"",
                              tname, say_str, fargs[1]);
             break;
         }

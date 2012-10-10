@@ -230,7 +230,7 @@ static int add_mail_message(dbref player, char *message) {
     exec(execstr, &bp, player, player, player,
          EV_STRIP | EV_FCHECK | EV_EVAL, &str, (char **)NULL, 0);
 
-    mod_mail_config.mail_list[number].message = XSTRDUP(tprintf("%s %s", message, execstr), "add_mail_message");
+    mod_mail_config.mail_list[number].message = XSTRDUP(tmprintf("%s %s", message, execstr), "add_mail_message");
     free_lbuf(atrstr);
     free_lbuf(execstr);
     make_mail_freelist();
@@ -331,7 +331,7 @@ void do_mail_change_folder(dbref player, char *fld, char *newname) {
             check_mail(player, pfld, 1);
 
         pfld = player_folder(player);
-        notify(player, tprintf("MAIL: Current folder is %d [%s].",
+        notify(player, tmprintf("MAIL: Current folder is %d [%s].",
                                pfld, get_folder_name(player, pfld)));
 
         return;
@@ -357,13 +357,13 @@ void do_mail_change_folder(dbref player, char *fld, char *newname) {
         }
 
         add_folder_name(player, pfld, newname);
-        notify(player, tprintf("MAIL: Folder %d now named '%s'", pfld, newname));
+        notify(player, tmprintf("MAIL: Folder %d now named '%s'", pfld, newname));
     } else {
         /*
          * Set a new folder
          */
         set_player_folder(player, pfld);
-        notify(player, tprintf("MAIL: Current folder set to %d [%s].",
+        notify(player, tmprintf("MAIL: Current folder set to %d [%s].",
                                pfld, get_folder_name(player, pfld)));
     }
 }
@@ -415,20 +415,20 @@ static void do_mail_flags(dbref player, char *msglist, mail_flag flag, int negat
 
                 switch (flag) {
                 case M_TAG:
-                    notify(player, tprintf("MAIL: Msg #%d %s.", i,
+                    notify(player, tmprintf("MAIL: Msg #%d %s.", i,
                                            negate ? "untagged" : "tagged"));
                     break;
                 case M_CLEARED:
                     if (Unread(mp) && !negate) {
                         notify(player,
-                               tprintf("MAIL: Unread Msg #%d cleared! Use @mail/unclear %d to recover.", i, i));
+                               tmprintf("MAIL: Unread Msg #%d cleared! Use @mail/unclear %d to recover.", i, i));
                     } else {
-                        notify(player, tprintf("MAIL: Msg #%d %s.", i,
+                        notify(player, tmprintf("MAIL: Msg #%d %s.", i,
                                                negate ? "uncleared" : "cleared"));
                     }
                     break;
                 case M_SAFE:
-                    notify(player, tprintf("MAIL: Msg #%d marked safe.", i));
+                    notify(player, tmprintf("MAIL: Msg #%d marked safe.", i));
                     break;
                 }
             }
@@ -471,7 +471,7 @@ void do_mail_file(dbref player, char *msglist, char *folder) {
 							 * Clear the folder
 							 */
                 mp->read |= FolderBit(foldernum);
-                notify(player, tprintf("MAIL: Msg %d filed in folder %d", i, foldernum));
+                notify(player, tmprintf("MAIL: Msg %d filed in folder %d", i, foldernum));
             }
         }
     }
@@ -516,7 +516,7 @@ void do_mail_read(dbref player, char *msglist) {
                 status = status_string(mp);
                 names = make_namelist(player, (char *)mp->tolist);
                 ccnames = make_namelist(player, (char *)mp->cclist);
-                notify(player, tprintf("%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
+                notify(player, tmprintf("%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
                                        i,
                                        PLAYER_NAME_LIMIT - 6,
                                        Name(mp->from),
@@ -526,8 +526,8 @@ void do_mail_read(dbref player, char *msglist) {
                                        status,
                                        names));
                 if (*ccnames)
-                    notify(player, tprintf("Cc     : %-65s", ccnames));
-                notify(player, tprintf("Subject: %-65s", mp->subject));
+                    notify(player, tmprintf("Cc     : %-65s", ccnames));
+                notify(player, tmprintf("Subject: %-65s", mp->subject));
                 free_lbuf(names);
                 free_lbuf(ccnames);
                 free_lbuf(status);
@@ -645,7 +645,7 @@ void do_mail_review(dbref player, char *name, char *msglist) {
         /* no specific list of messages to review -- either see all to
          * one player, or all sent
          */
-        notify(player, tprintf("%.*s   MAIL: %s   %.*s",
+        notify(player, tmprintf("%.*s   MAIL: %s   %.*s",
                                (63 - strlen(Name(target))) >> 1,
                                "--------------------------------",
                                Name(target),
@@ -659,7 +659,7 @@ void do_mail_review(dbref player, char *name, char *msglist) {
                     /*
                      * list it
                      */
-                    notify(player, tprintf("[%s] %-3d (%4d) To: %-*s Sub: %.25s",
+                    notify(player, tmprintf("[%s] %-3d (%4d) To: %-*s Sub: %.25s",
                                            status_chars(mp),
                                            i,
                                            strlen(get_mail_message(mp->number)),
@@ -676,7 +676,7 @@ void do_mail_review(dbref player, char *name, char *msglist) {
                     /*
                      * list it
                      */
-                    notify(player, tprintf("[%s] %-3d (%4d) To: %-*s Sub: %.25s",
+                    notify(player, tmprintf("[%s] %-3d (%4d) To: %-*s Sub: %.25s",
                                            status_chars(mp),
                                            i,
                                            strlen(get_mail_message(mp->number)),
@@ -710,13 +710,13 @@ void do_mail_review(dbref player, char *name, char *msglist) {
                         ccnames = make_namelist(player, (char *)mp->cclist);
                         bccnames = make_namelist(player, (char *)mp->bcclist);
                         notify(player, DASH_LINE);
-                        notify(player, tprintf("%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
+                        notify(player, tmprintf("%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
                                                i, PLAYER_NAME_LIMIT - 6, Name(mp->from), mp->time, 0, status, names));
                         if (*ccnames)
-                            notify(player, tprintf("Cc     : %-65s", ccnames));
+                            notify(player, tmprintf("Cc     : %-65s", ccnames));
                         if (*bccnames)
-                            notify(player, tprintf("Bcc    : %-65s", bccnames));
-                        notify(player, tprintf("Subject: %-65s", mp->subject));
+                            notify(player, tmprintf("Bcc    : %-65s", bccnames));
+                        notify(player, tmprintf("Subject: %-65s", mp->subject));
                         free_lbuf(status);
                         free_lbuf(names);
                         free_lbuf(ccnames);
@@ -744,13 +744,13 @@ void do_mail_review(dbref player, char *name, char *msglist) {
                         ccnames = make_namelist(player, (char *)mp->cclist);
                         bccnames = make_namelist(player, (char *)mp->bcclist);
                         notify(player, DASH_LINE);
-                        notify(player, tprintf("%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
+                        notify(player, tmprintf("%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s",
                                                i, PLAYER_NAME_LIMIT - 6, Name(mp->from), mp->time, 0, status, names));
                         if (*ccnames)
-                            notify(player, tprintf("Cc     : %-65s", ccnames));
+                            notify(player, tmprintf("Cc     : %-65s", ccnames));
                         if (*bccnames)
-                            notify(player, tprintf("Bcc    : %-65s", bccnames));
-                        notify(player, tprintf("Subject: %-65s", mp->subject));
+                            notify(player, tmprintf("Bcc    : %-65s", bccnames));
+                        notify(player, tmprintf("Subject: %-65s", mp->subject));
                         free_lbuf(status);
                         free_lbuf(names);
                         free_lbuf(ccnames);
@@ -785,7 +785,7 @@ void do_mail_list(dbref player, char *msglist, int sub) {
     folder = player_folder(player);
 
     notify(player,
-           tprintf("--------------------------%s   MAIL: Folder %d   ----------------------------",
+           tmprintf("--------------------------%s   MAIL: Folder %d   ----------------------------",
                    ((folder > 9) ? "" : "-"), folder));
 
     for (mp = (struct mail *)nhashfind((int)player, &mod_mail_msg_htab);
@@ -799,7 +799,7 @@ void do_mail_list(dbref player, char *msglist, int sub) {
 
                 time = mail_list_time(mp->time);
                 if (sub)
-                    notify(player, tprintf("[%s] %-3d (%4d) From: %-*s Sub: %.25s",
+                    notify(player, tmprintf("[%s] %-3d (%4d) From: %-*s Sub: %.25s",
                                            status_chars(mp),
                                            i,
                                            strlen(get_mail_message(mp->number)),
@@ -807,7 +807,7 @@ void do_mail_list(dbref player, char *msglist, int sub) {
                                            Name(mp->from),
                                            mp->subject));
                 else
-                    notify(player, tprintf("[%s] %-3d (%4d) From: %-*s At: %s %s",
+                    notify(player, tmprintf("[%s] %-3d (%4d) From: %-*s At: %s %s",
                                            status_chars(mp),
                                            i,
                                            strlen(get_mail_message(mp->number)),
@@ -938,10 +938,10 @@ void do_mail_fwd(dbref player, char *msg, char *tolist) {
         notify(player, "MAIL: You can't forward non-existent messages.");
         return;
     }
-    mail_ok = do_expmail_start(player, tolist, NULL, tprintf("%s (fwd from %s)", mp->subject, Name(mp->from)));
+    mail_ok = do_expmail_start(player, tolist, NULL, tmprintf("%s (fwd from %s)", mp->subject, Name(mp->from)));
     if (mail_ok) {
         atr_add_raw(player, A_MAILMSG, get_mail_message(mp->number));
-        atr_add_raw(player, A_MAILFLAGS, tprintf("%d", atoi(atr_get_raw(player, A_MAILFLAGS)) | M_FORWARD));
+        atr_add_raw(player, A_MAILFLAGS, tmprintf("%d", atoi(atr_get_raw(player, A_MAILFLAGS)) | M_FORWARD));
     }
 }
 
@@ -974,7 +974,7 @@ void do_mail_reply(dbref player, char *msg, int all, int key) {
         bp = oldlist = alloc_lbuf("do_mail_reply.oldlist");
         safe_str((char *)mp->tolist, oldlist, &bp);
         if (*mp->cclist)
-            safe_tprintf_str(oldlist, &bp, " %s", mp->cclist);
+            safe_tmprintf_str(oldlist, &bp, " %s", mp->cclist);
 
         bp = ccnames = alloc_lbuf("do_mail_reply.ccnames");
         for (p = strtok_r(oldlist, " ", &tokst);
@@ -996,19 +996,19 @@ void do_mail_reply(dbref player, char *msg, int all, int key) {
     tolist = msg;
 
     if (strncmp(mp->subject, "Re:", 3)) {
-        mail_ok = do_expmail_start(player, tolist, ccnames, tprintf("Re: %s", mp->subject));
+        mail_ok = do_expmail_start(player, tolist, ccnames, tmprintf("Re: %s", mp->subject));
     } else {
-        mail_ok = do_expmail_start(player, tolist, ccnames, tprintf("%s", mp->subject));
+        mail_ok = do_expmail_start(player, tolist, ccnames, tmprintf("%s", mp->subject));
     }
     if (mail_ok) {
         if (key & MAIL_QUOTE) {
             atr_add_raw(player, A_MAILMSG,
-                        tprintf("On %s, %s wrote:\r\n\r\n%s\r\n\r\n********** End of included message from %s\r\n",
+                        tmprintf("On %s, %s wrote:\r\n\r\n%s\r\n\r\n********** End of included message from %s\r\n",
                                 mp->time, Name(mp->from),
                                 get_mail_message(mp->number), Name(mp->from)));
         }
 
-        atr_add_raw(player, A_MAILFLAGS, tprintf("%d", (atoi(atr_get_raw(player, A_MAILFLAGS)) | M_REPLY)));
+        atr_add_raw(player, A_MAILFLAGS, tmprintf("%d", (atoi(atr_get_raw(player, A_MAILFLAGS)) | M_REPLY)));
     }
     if (ccnames) {
         free_lbuf(ccnames);
@@ -1149,9 +1149,9 @@ static void send_mail(dbref player, dbref target, const char *tolist, const char
      * notify people
      */
     if (!silent)
-        notify(player, tprintf("MAIL: You sent your message to %s.", Name(target)));
+        notify(player, tmprintf("MAIL: You sent your message to %s.", Name(target)));
 
-    notify(target, tprintf("MAIL: You have a new message from %s.",
+    notify(target, tmprintf("MAIL: You have a new message from %s.",
                            Name(player)));
     did_it(player, target, A_MAIL, NULL, A_NULL, NULL, A_AMAIL, 0,
            (char **) NULL, 0, 0);
@@ -1209,26 +1209,26 @@ void do_mail_debug(dbref player, char *action, char *victim) {
             target = match_result();
         }
         if (target == NOTHING) {
-            notify(player, tprintf("%s: no such player.", victim));
+            notify(player, tmprintf("%s: no such player.", victim));
             return;
         }
         do_mail_clear(target, NULL);
         do_mail_purge(target);
-        notify(player, tprintf("Mail cleared for %s(#%d).", Name(target), target));
+        notify(player, tmprintf("Mail cleared for %s(#%d).", Name(target), target));
         return;
     } else if (string_prefix("sanity", action)) {
         MAIL_ITER_ALL(mp, thing) {
             if (!Good_obj(mp->to))
-                notify(player, tprintf("Bad object #%d has mail.", mp->to));
+                notify(player, tmprintf("Bad object #%d has mail.", mp->to));
             else if (Typeof(mp->to) != TYPE_PLAYER)
-                notify(player, tprintf("%s(#%d) has mail but is not a player.",
+                notify(player, tmprintf("%s(#%d) has mail but is not a player.",
                                        Name(mp->to), mp->to));
         }
         notify(player, "Mail sanity check completed.");
     } else if (string_prefix("fix", action)) {
         MAIL_ITER_SAFE(mp, thing, nextp) {
             if (!Good_obj(mp->to) || (Typeof(mp->to) != TYPE_PLAYER)) {
-                notify(player, tprintf("Fixing mail for #%d.", mp->to));
+                notify(player, tmprintf("Fixing mail for #%d.", mp->to));
                 /*
                  * Delete this one
                  */
@@ -1308,7 +1308,7 @@ void do_mail_stats(dbref player, char *name, int full) {
         target = match_result();
     }
     if (target == NOTHING) {
-        notify(player, tprintf("%s: No such player.", name));
+        notify(player, tmprintf("%s: No such player.", name));
         return;
     }
     if (!Wizard(player) && (target != player)) {
@@ -1320,7 +1320,7 @@ void do_mail_stats(dbref player, char *name, int full) {
      */
 
     if (!payfor(player, mudconf.searchcost)) {
-        notify(player, tprintf("Finding mail stats costs %d %s.",
+        notify(player, tmprintf("Finding mail stats costs %d %s.",
                                mudconf.searchcost,
                                (mudconf.searchcost == 1) ? mudconf.one_coin : mudconf.many_coins));
         return;
@@ -1334,7 +1334,7 @@ void do_mail_stats(dbref player, char *name, int full) {
                 count++;
             }
             notify(player,
-                   tprintf("There are %d messages in the mail spool.", count));
+                   tmprintf("There are %d messages in the mail spool.", count));
             return;
         } else if (full == 1) {
             MAIL_ITER_ALL(mp, thing) {
@@ -1346,7 +1346,7 @@ void do_mail_stats(dbref player, char *name, int full) {
                     fu++;
             }
             notify(player,
-                   tprintf("MAIL: There are %d msgs in the mail spool, %d unread, %d cleared.",
+                   tmprintf("MAIL: There are %d msgs in the mail spool, %d unread, %d cleared.",
                            fc + fr + fu, fu, fc));
             return;
         } else {
@@ -1362,9 +1362,9 @@ void do_mail_stats(dbref player, char *name, int full) {
                     tchars += strlen(get_mail_message(mp->number));
                 }
             }
-            notify(player, tprintf("MAIL: There are %d old msgs in the mail spool, totalling %d characters.", fr, fchars));
-            notify(player, tprintf("MAIL: There are %d new msgs in the mail spool, totalling %d characters.", fu, tchars));
-            notify(player, tprintf("MAIL: There are %d cleared msgs in the mail spool, totalling %d characters.", fc, cchars));
+            notify(player, tmprintf("MAIL: There are %d old msgs in the mail spool, totalling %d characters.", fr, fchars));
+            notify(player, tmprintf("MAIL: There are %d new msgs in the mail spool, totalling %d characters.", fu, tchars));
+            notify(player, tmprintf("MAIL: There are %d cleared msgs in the mail spool, totalling %d characters.", fc, cchars));
             return;
         }
     }
@@ -1382,9 +1382,9 @@ void do_mail_stats(dbref player, char *name, int full) {
             if (mp->to == target)
                 tr++;
         }
-        notify(player, tprintf("%s sent %d messages.",
+        notify(player, tmprintf("%s sent %d messages.",
                                Name(target), fr));
-        notify(player, tprintf("%s has %d messages.", Name(target), tr));
+        notify(player, tmprintf("%s has %d messages.", Name(target), tr));
         return;
     }
     /*
@@ -1417,24 +1417,24 @@ void do_mail_stats(dbref player, char *name, int full) {
         }
     }
 
-    notify(player, tprintf("Mail statistics for %s:", Name(target)));
+    notify(player, tmprintf("Mail statistics for %s:", Name(target)));
 
     if (full == 1) {
-        notify(player, tprintf("%d messages sent, %d unread, %d cleared.",
+        notify(player, tmprintf("%d messages sent, %d unread, %d cleared.",
                                fc + fr + fu, fu, fc));
-        notify(player, tprintf("%d messages received, %d unread, %d cleared.",
+        notify(player, tmprintf("%d messages received, %d unread, %d cleared.",
                                tc + tr + tu, tu, tc));
     } else {
         notify(player,
-               tprintf("%d messages sent, %d unread, %d cleared, totalling %d characters.",
+               tmprintf("%d messages sent, %d unread, %d cleared, totalling %d characters.",
                        fc + fr + fu, fu, fc, fchars));
         notify(player,
-               tprintf("%d messages received, %d unread, %d cleared, totalling %d characters.",
+               tmprintf("%d messages received, %d unread, %d cleared, totalling %d characters.",
                        tc + tr + tu, tu, tc, tchars));
     }
 
     if (tc + tr + tu > 0)
-        notify(player, tprintf("Last is dated %s", last));
+        notify(player, tmprintf("Last is dated %s", last));
     return;
 }
 
@@ -1731,7 +1731,7 @@ void mod_mail_load_database(FILE *fp) {
         if (read_tolist)
             mp->tolist = XSTRDUP(getstring_noalloc(fp, read_new_strings), "load_mail.tolist");
         else
-            mp->tolist = XSTRDUP(tprintf("%d", mp->to), "load_mail.tolist");
+            mp->tolist = XSTRDUP(tmprintf("%d", mp->to), "load_mail.tolist");
 
         if (read_cclist) {
             mp->cclist = XSTRDUP(getstring_noalloc(fp, read_new_strings), "load_mail.cclist");
@@ -1789,7 +1789,7 @@ static int get_folder_number(dbref player, char *name) {
     bp = pat = alloc_lbuf("get_folder_num_pat");
 
     strcpy(str, atrstr);
-    safe_tprintf_str(pat, &bp, ":%s:", upcasestr(name));
+    safe_tmprintf_str(pat, &bp, ":%s:", upcasestr(name));
     res = (char *)strstr(str, pat);
     if (!res) {
         free_lbuf(str);
@@ -2372,17 +2372,17 @@ void check_mail(dbref player, int folder, int silent) {
     urgent_mail(player, folder, &gc);
 #ifdef MAIL_ALL_FOLDERS
     notify(player,
-           tprintf("MAIL: %d messages in folder %d [%s] (%d unread, %d cleared).",
+           tmprintf("MAIL: %d messages in folder %d [%s] (%d unread, %d cleared).",
                    rc + uc, folder, get_folder_name(player, folder), uc, cc));
 #else
     if (rc + uc > 0)
         notify(player,
-               tprintf("MAIL: %d messages in folder %d [%s] (%d unread, %d cleared).",
+               tmprintf("MAIL: %d messages in folder %d [%s] (%d unread, %d cleared).",
                        rc + uc, folder, get_folder_name(player, folder), uc, cc));
     else if (!silent)
         notify(player, "MAIL: You have no mail.");
     if (gc > 0)
-        notify(player, tprintf("URGENT MAIL: You have %d urgent messages in folder %d [%s].",
+        notify(player, tmprintf("URGENT MAIL: You have %d urgent messages in folder %d [%s].",
                                gc, folder, get_folder_name(player, folder)));
 #endif
     return;
@@ -2502,7 +2502,7 @@ void do_malias_create(dbref player, char *alias, char *tolist) {
     m = get_malias(player, alias);
     if (m) {
         notify(player,
-               tprintf("MAIL: Mail Alias '%s' already exists.", alias));
+               tmprintf("MAIL: Mail Alias '%s' already exists.", alias));
         return;
     }
     if (!ma_size) {
@@ -2561,7 +2561,7 @@ void do_malias_create(dbref player, char *alias, char *tolist) {
         } else {
             buff = unparse_object(player, target, 0);
             notify(player,
-                   tprintf("MAIL: %s added to alias %s", buff, alias));
+                   tmprintf("MAIL: %s added to alias %s", buff, alias));
             malias[ma_top]->list[i] = target;
             i++;
             free_lbuf(buff);
@@ -2592,7 +2592,7 @@ void do_malias_create(dbref player, char *alias, char *tolist) {
     ma_top++;
 
 
-    notify(player, tprintf("MAIL: Alias set '%s' defined.", alias));
+    notify(player, tmprintf("MAIL: Alias set '%s' defined.", alias));
 }
 
 void do_malias_list(dbref player, char *alias) {
@@ -2603,7 +2603,7 @@ void do_malias_list(dbref player, char *alias) {
     m = get_malias(player, alias);
 
     if (!m) {
-        notify(player, tprintf("MAIL: Alias '%s' not found.", alias));
+        notify(player, tmprintf("MAIL: Alias '%s' not found.", alias));
         return;
     }
     if (!ExpMail(player) && (player != m->owner) && !(God(m->owner))) {
@@ -2611,7 +2611,7 @@ void do_malias_list(dbref player, char *alias) {
         return;
     }
     bp = buff = alloc_lbuf("do_malias_list");
-    safe_tprintf_str(buff, &bp, "MAIL: Alias *%s: ", m->name);
+    safe_tmprintf_str(buff, &bp, "MAIL: Alias *%s: ", m->name);
     for (i = m->numrecep - 1; i > -1; i--) {
         safe_name(m->list[i], buff, &bp);
         safe_chr(' ', buff, &bp);
@@ -2636,7 +2636,7 @@ void do_malias_list_all(dbref player) {
                 notified++;
             }
             notify(player,
-                   tprintf("%-12.12s %-35.35s %-15.15s", m->name, m->desc,
+                   tmprintf("%-12.12s %-35.35s %-15.15s", m->name, m->desc,
                            Name(m->owner)));
         }
     }
@@ -2761,9 +2761,9 @@ static int do_expmail_start(dbref player, char *arg, char *arg2, char *subject) 
     atr_clr(player, A_MAILMSG);
     Flags2(player) |= PLAYER_MAILS;
     if (ccnames && *ccnames) {
-        notify(player, tprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s'.", names, ccnames));
+        notify(player, tmprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s'.", names, ccnames));
     } else {
-        notify(player, tprintf("MAIL: You are sending mail to '%s'.", names));
+        notify(player, tmprintf("MAIL: You are sending mail to '%s'.", names));
     }
     free_lbuf(names);
     if (ccnames) {
@@ -2804,18 +2804,18 @@ static void do_mail_to(dbref player, char *arg, int attr) {
 
     if (*ccnames) {
         if (*bccnames) {
-            notify(player, tprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s', blind carbon-copied to '%s'.",
+            notify(player, tmprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s', blind carbon-copied to '%s'.",
                                    names, ccnames, bccnames));
         } else {
-            notify(player, tprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s'.",
+            notify(player, tmprintf("MAIL: You are sending mail to '%s', carbon-copied to '%s'.",
                                    names, ccnames));
         }
     } else {
         if (*bcclist) {
-            notify(player, tprintf("MAIL: You are sending mail to '%s', blind carbon-copied to '%s'.",
+            notify(player, tmprintf("MAIL: You are sending mail to '%s', blind carbon-copied to '%s'.",
                                    names, bccnames));
         } else {
-            notify(player, tprintf("MAIL: You are sending mail to '%s'.",
+            notify(player, tmprintf("MAIL: You are sending mail to '%s'.",
                                    names));
         }
     }
@@ -2907,7 +2907,7 @@ static char *make_numlist(dbref player, char *arg) {
         } else if (*head == '*') {
             m = get_malias(player, head);
             if (!m) {
-                notify(player, tprintf("MAIL: Alias '%s' does not exist.", head));
+                notify(player, tmprintf("MAIL: Alias '%s' does not exist.", head));
                 free_lbuf(numbuf);
                 return NULL;
             }
@@ -2919,7 +2919,7 @@ static char *make_numlist(dbref player, char *arg) {
                 sprintf(buf, "%d ", target);
                 safe_str(buf, numbuf, &numbp);
             } else {
-                notify(player, tprintf("MAIL: '%s' does not exist.", head));
+                notify(player, tmprintf("MAIL: '%s' does not exist.", head));
                 free_lbuf(numbuf);
                 return NULL;
             }
@@ -3055,7 +3055,7 @@ void mail_to_list(dbref player, char *tolist, char *cclist, char *bcclist, char 
                 } else {
                     send_mail(GOD, GOD, tolist, NULL, NULL, subject,
                               add_mail_message(player,
-                                               tprintf("Alias Error: Bad Player %d for %s",
+                                               tmprintf("Alias Error: Bad Player %d for %s",
                                                        m->list[i], head)),
                               flags, silent);
                 }
@@ -3171,7 +3171,7 @@ void do_prepend(dbref player, dbref cause, int key, char *text) {
 
         free_lbuf(oldmsg);
         attr = atr_get_raw(player, A_MAILMSG);
-        notify(player, tprintf("%d/%d characters prepended.",
+        notify(player, tmprintf("%d/%d characters prepended.",
                                attr ? strlen(attr) : 0, LBUF_SIZE));
     } else {
         notify(player, "MAIL: No message in progress.");
@@ -3203,7 +3203,7 @@ void do_postpend(dbref player, dbref cause, int key, char *text) {
 
         free_lbuf(oldmsg);
         attr = atr_get_raw(player, A_MAILMSG);
-        notify(player, tprintf("%d/%d characters added.",
+        notify(player, tmprintf("%d/%d characters added.",
                                attr ? strlen(attr) : 0, LBUF_SIZE));
     } else {
         notify(player, "MAIL: No message in progress.");
@@ -3244,13 +3244,13 @@ static void do_mail_proof(dbref player) {
         free_lbuf(mailto);
 
         notify(player, DASH_LINE);
-        notify(player, tprintf("From:  %-*s  Subject: %-35s\nTo: %s",
+        notify(player, tmprintf("From:  %-*s  Subject: %-35s\nTo: %s",
                                PLAYER_NAME_LIMIT - 6, Name(player),
                                atr_get_raw(player, A_MAILSUB), names));
         if (*ccnames)
-            notify(player, tprintf("Cc: %s", ccnames));
+            notify(player, tmprintf("Cc: %s", ccnames));
         if (*bccnames)
-            notify(player, tprintf("Bcc: %s", bccnames));
+            notify(player, tmprintf("Bcc: %s", bccnames));
         notify(player, DASH_LINE);
 
         if (!(message = atr_get_raw(player, A_MAILMSG))) {
@@ -3271,7 +3271,7 @@ void do_malias_desc(dbref player, char *alias, char *desc) {
     struct malias *m;
 
     if (!(m = get_malias(player, alias))) {
-        notify(player, tprintf("MAIL: Alias %s not found.", alias));
+        notify(player, tmprintf("MAIL: Alias %s not found.", alias));
         return;
     } else if ((m->owner != GOD) || ExpMail(player)) {
         XFREE(m->desc, "malias_desc");	/* free it up */
@@ -3293,7 +3293,7 @@ void do_malias_chown(dbref player, char *alias, char *owner) {
     dbref no = NOTHING;
 
     if (!(m = get_malias(player, alias))) {
-        notify(player, tprintf("MAIL: Alias %s not found.", alias));
+        notify(player, tmprintf("MAIL: Alias %s not found.", alias));
         return;
     } else {
         if (!ExpMail(player)) {
@@ -3318,7 +3318,7 @@ void do_malias_add(dbref player, char *alias, char *person) {
     thing = NOTHING;
 
     if (!(m = get_malias(player, alias))) {
-        notify(player, tprintf("MAIL: Alias %s not found.", alias));
+        notify(player, tmprintf("MAIL: Alias %s not found.", alias));
         return;
     }
     if (*person == '#') {
@@ -3355,7 +3355,7 @@ void do_malias_add(dbref player, char *alias, char *person) {
 
     m->list[m->numrecep] = thing;
     m->numrecep = m->numrecep + 1;
-    notify(player, tprintf("MAIL: %s added to %s", Name(thing), m->name));
+    notify(player, tmprintf("MAIL: %s added to %s", Name(thing), m->name));
 }
 
 void do_malias_remove(dbref player, char *alias, char *person) {
@@ -3397,7 +3397,7 @@ void do_malias_remove(dbref player, char *alias, char *person) {
     if (ok)
         m->numrecep--;
 
-    notify(player, tprintf("MAIL: %s removed from alias %s.",
+    notify(player, tmprintf("MAIL: %s removed from alias %s.",
                            Name(thing), alias));
 }
 
@@ -3476,7 +3476,7 @@ void do_malias_adminlist(dbref player) {
 
     for (i = 0; i < ma_top; i++) {
         m = malias[i];
-        notify(player, tprintf("%-4d %-10.10s %-40.40s %-11.11s",
+        notify(player, tmprintf("%-4d %-10.10s %-40.40s %-11.11s",
                                i, m->name, m->desc, Name(m->owner)));
     }
 
@@ -3487,8 +3487,8 @@ void do_malias_status(dbref player) {
     if (!ExpMail(player))
         notify(player, "MAIL: Permission denied.");
     else {
-        notify(player, tprintf("MAIL: Number of mail aliases defined: %d", ma_top));
-        notify(player, tprintf("MAIL: Allocated slots %d", ma_size));
+        notify(player, tmprintf("MAIL: Number of mail aliases defined: %d", ma_top));
+        notify(player, tmprintf("MAIL: Allocated slots %d", ma_size));
     }
 }
 
@@ -3531,7 +3531,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 return;
             } else {
                 count_mail(playerask, 0, &rc, &uc, &cc);
-                safe_tprintf_str(buff, bufc, "%d %d %d", rc, uc, cc);
+                safe_tmprintf_str(buff, bufc, "%d %d %d", rc, uc, cc);
                 return;
             }
         } else {
@@ -3742,7 +3742,7 @@ void mod_mail_init(void) {
             }
     }
 
-    mod_mail_version.version=XSTRDUP(tprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_mail_init");
+    mod_mail_version.version=XSTRDUP(tmprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_mail_init");
     mod_mail_version.author=XSTRDUP("TinyMUSH Development Team", "mod_mail_init");
     mod_mail_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_mail_init");
     mod_mail_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_mail_init");

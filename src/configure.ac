@@ -293,6 +293,8 @@ AC_ARG_WITH([global-regs], [AS_HELP_STRING([--with-global-regs=N], [use N global
 AC_MSG_RESULT([$with_global_regs])
 AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [${with_global_regs}], [How many global registers to use])
 
+
+dnl XXX Theses are going away...
 AC_MSG_CHECKING([default filename for the configuration])
 AC_ARG_WITH([conf-file], [AS_HELP_STRING([--with-conf-file=NAME], [default name of the config file @<:@default=netmush.conf@:>@])], [with_conf_file="$withval"], [with_conf_file="netmush.conf"])
 AC_MSG_RESULT([$with_conf_file])
@@ -332,6 +334,7 @@ AC_MSG_CHECKING([default name for the data directory])
 AC_ARG_WITH([data-dir], [AS_HELP_STRING([--with-data-dir=NAME], [default name of the data directory @<:@default=$localstatedir@:>@])], [with_data_dir="$withval"], [with_data_dir="$prefix/data"])
 AC_MSG_RESULT([$with_data_dir])
 AC_DEFINE_UNQUOTED([DATA_DIR], ["${with_data_dir}"], [default data dirname])
+dnl XXX
 
 AC_MSG_CHECKING([maximum length for player names])
 AC_ARG_WITH([pname-length], [AS_HELP_STRING([--with-pname-length=LENGTH], [maximum length for player names @<:@default=22@:>@])], [with_pname_length=$withval], [with_pname_length=22])

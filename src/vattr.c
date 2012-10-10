@@ -337,14 +337,14 @@ void do_dbclean(dbref player, dbref cause, int key) {
 
     if (anum_alc_top != n_oldtop) {
         notify(player,
-               tprintf
+               tmprintf
                ("Cleaned %d user attribute slots (reduced to %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched). Table size reduced from %d to %d.",
                 n_oldtotal - A_USER_START,
                 mudstate.attr_next - A_USER_START, n_deleted,
                 n_renumbered, n_objt, n_atrt, n_oldtop, anum_alc_top));
     } else {
         notify(player,
-               tprintf
+               tmprintf
                ("Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).",
                 n_oldtotal, mudstate.attr_next, n_deleted,
                 n_renumbered, n_objt, n_atrt));

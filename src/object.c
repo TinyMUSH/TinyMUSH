@@ -339,7 +339,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost) {
         }
         if (lookup_player(NOTHING, buff, 0) != NOTHING) {
             notify(player,
-                   tprintf("The name %s is already taken.", name));
+                   tmprintf("The name %s is already taken.", name));
             free_lbuf(buff);
             return NOTHING;
         }
@@ -353,7 +353,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost) {
     }
 
     if (!okname) {
-        notify(player, tprintf("That's a silly name for %s!", tname));
+        notify(player, tmprintf("That's a silly name for %s!", tname));
         return NOTHING;
     }
 
@@ -570,7 +570,7 @@ void destroy_obj(dbref player, dbref obj) {
         payfees(owner, -val, -quota, Typeof(obj));
         if (!Quiet(owner) && !Quiet(obj))
             notify(owner,
-                   tprintf
+                   tmprintf
                    ("You get back your %d %s deposit for %s(#%d).",
                     val, mudconf.one_coin, Name(obj), obj));
     }
@@ -578,13 +578,13 @@ void destroy_obj(dbref player, dbref obj) {
         if (good_owner && Owner(player) != owner) {
             if (owner == obj) {
                 notify(player,
-                       tprintf("Destroyed. %s(#%d)",
+                       tmprintf("Destroyed. %s(#%d)",
                                Name(obj), obj));
             } else {
                 tname = alloc_sbuf("destroy_obj");
                 strcpy(tname, Name(owner));
                 notify(player,
-                       tprintf("Destroyed. %s's %s(#%d)",
+                       tmprintf("Destroyed. %s's %s(#%d)",
                                tname, Name(obj), obj));
                 free_sbuf(tname);
             }
@@ -821,7 +821,7 @@ void destroy_player(dbref victim) {
     move_via_generic(victim, NOTHING, player, 0);
     CALL_ALL_MODULES(destroy_player, (player, victim));
     destroy_obj(NOTHING, victim);
-    notify_quiet(player, tprintf("(%d objects @chowned to you)", count));
+    notify_quiet(player, tmprintf("(%d objects @chowned to you)", count));
 }
 
 static void purge_going(void) {
@@ -900,7 +900,7 @@ do { \
 				if (Good_owner(owner) && \
 				    !Quiet(i) && !Quiet(owner)) { \
 					notify(owner, \
-					tprintf("%s cleared on %s(#%d)", \
+					tmprintf("%s cleared on %s(#%d)", \
 						crt__label, Name(i), i)); \
 				} \
 			} else { \

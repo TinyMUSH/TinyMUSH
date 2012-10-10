@@ -138,7 +138,7 @@ if (!(p)) { \
 }
 
 #define find_calias(d,a,p) \
-(p)=((COMALIAS *) hashfind(tprintf("%d.%s",(d),(a)), &mod_comsys_calias_htab)); \
+(p)=((COMALIAS *) hashfind(tmprintf("%d.%s",(d),(a)), &mod_comsys_calias_htab)); \
 if (!(p)) { \
     notify((d), "No such channel alias."); \
     return; \
@@ -147,7 +147,7 @@ if (!(p)) { \
 #define lookup_channel(s)  ((CHANNEL *) hashfind((s), &mod_comsys_comsys_htab))
 
 #define lookup_calias(d,s)  \
-((COMALIAS *) hashfind(tprintf("%d.%s",(d),(s)), &mod_comsys_calias_htab))
+((COMALIAS *) hashfind(tmprintf("%d.%s",(d),(s)), &mod_comsys_calias_htab))
 
 #define lookup_clist(d) \
 ((COMLIST *) nhashfind((int) (d), &mod_comsys_comlist_htab))
@@ -339,7 +339,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause) {
 		    (wp->player != mudstate.curr_enactor) &&
 		    (wp->player != mudstate.curr_player)) {
 		    if (!mp) {
-			/* Construct Nospoof buffer. Can't use tprintf
+			/* Construct Nospoof buffer. Can't use tmprintf
 			 * because we end up calling it later.
 			 */
 			mp = msg_ns;
@@ -447,7 +447,7 @@ static void remove_from_channel(dbref player, CHANNEL *chp, int is_quiet) {
 
     if (!is_quiet &&
 	(!isPlayer(player) || (Connected(player) && !Hidden(player)))) {
-	com_message(chp, tprintf("%s %s has left this channel.", chp->header, Name(player)), player);
+	com_message(chp, tmprintf("%s %s has left this channel.", chp->header, Name(player)), player);
     }
 }
 
@@ -503,7 +503,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	    return;
 	}
 	if (wp->is_listening) {
-	    notify(player, tprintf("You are already on channel %s.",
+	    notify(player, tmprintf("You are already on channel %s.",
 				   cap->channel->name));
 	    return;
 	}
@@ -514,7 +514,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	 */
 	if (!isPlayer(player) || (Connected(player) && !Hidden(player))) {
 	    com_message(cap->channel,
-			tprintf("%s %s has joined this channel.",
+			tmprintf("%s %s has joined this channel.",
 				cap->channel->header, Name(player)),
 			player);
 	}
@@ -534,19 +534,19 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	    return;
 	}
 	if (wp->is_listening == 0) {
-	    notify(player, tprintf("You are not on channel %s.",
+	    notify(player, tmprintf("You are not on channel %s.",
 				   cap->channel->name));
 	    return;
 	}
 	wp->is_listening = 0;
-	notify(player, tprintf("You leave channel %s.", cap->channel->name));
+	notify(player, tmprintf("You leave channel %s.", cap->channel->name));
 
 	/* Only tell people about it if we're an object, or we're a 
 	 * connected and non-hidden player.
 	 */
 	if (!isPlayer(player) || (Connected(player) && !Hidden(player))) {
 	    com_message(cap->channel,
-			tprintf("%s %s has left this channel.",
+			tmprintf("%s %s has left this channel.",
 				cap->channel->header, Name(player)),
 			player);
 	}
@@ -585,7 +585,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	    }
 	}
 
-	notify(player, tprintf("-- %s --", cap->channel->name));
+	notify(player, tmprintf("-- %s --", cap->channel->name));
 
 	return;
 
@@ -597,7 +597,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	}
 
 	if (!is_listenchannel(player, cap->channel)) {
-	    notify(player, tprintf("You must be on %s to do that.",
+	    notify(player, tmprintf("You must be on %s to do that.",
 				   cap->channel->name));
 	    return;
 	}
@@ -608,7 +608,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	}
 
 	if (!payfor(player, Guest(player) ? 0 : cap->channel->charge)) {
-	    notify(player, tprintf("You don't have enough %s.",
+	    notify(player, tmprintf("You don't have enough %s.",
 				   mudconf.many_coins));
 	    return;
 	}
@@ -631,21 +631,21 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 	}
 	if (*arg == ':') {
 	    com_message(cap->channel,
-			tprintf("%s %s %s",
+			tmprintf("%s %s %s",
 				cap->channel->header,
 				(name_buf) ? name_buf : Name(player),
 				arg + 1),
 			player);
 	} else if (*arg == ';') {
 	    com_message(cap->channel,
-			tprintf("%s %s%s",
+			tmprintf("%s %s%s",
 				cap->channel->header,
 				(name_buf) ? name_buf : Name(player),
 				arg + 1),
 			player);
 	} else {
 	    com_message(cap->channel,
-			tprintf("%s %s says, \"%s\"",
+			tmprintf("%s %s says, \"%s\"",
 				cap->channel->header,
 				(name_buf) ? name_buf : Name(player),
 				arg),
@@ -701,7 +701,7 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
 	cap->title = NULL;
     cap->channel = chp;
 
-    hashadd(tprintf("%d.%s", player, alias_str), (int *) cap,
+    hashadd(tmprintf("%d.%s", player, alias_str), (int *) cap,
 	    &mod_comsys_calias_htab, 0);
 
     /* Add this to the list of all aliases for the player. */
@@ -733,18 +733,18 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
 	update_comwho(chp);
 	
 	if (!isPlayer(player) || (Connected(player) && !Hidden(player))) {
-	    com_message(chp, tprintf("%s %s has joined this channel.",
+	    com_message(chp, tmprintf("%s %s has joined this channel.",
 				     chp->header, Name(player)),
 			player);
 	}
 
 	if (title_str) {
 	    notify(player,
-		  tprintf("Channel '%s' added with alias '%s' and title '%s'.",
+		  tmprintf("Channel '%s' added with alias '%s' and title '%s'.",
 			  chp->name, alias_str, cap->title));
 	} else {
 	    notify(player,
-		   tprintf("Channel '%s' added with alias '%s'.",
+		   tmprintf("Channel '%s' added with alias '%s'.",
 			   chp->name, alias_str));
 	}
 
@@ -752,11 +752,11 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
 
 	if (title_str) {
 	    notify(player,
-  	      tprintf("Alias '%s' with title '%s' added for channel '%s'.",
+  	      tmprintf("Alias '%s' with title '%s' added for channel '%s'.",
 		      alias_str, cap->title, chp->name));
 	} else {
 	    notify(player,
-		   tprintf("Alias '%s' added for channel '%s'.",
+		   tmprintf("Alias '%s' added for channel '%s'.",
 			   alias_str, chp->name));
 	}
     }
@@ -829,7 +829,7 @@ void mod_comsys_announce_connect(dbref player, const char *reason, int num) {
 	    update_comwho(chp);
 	    if ((chp->flags & CHAN_FLAG_LOUD) && !Hidden(player) &&
 		is_listenchannel(player, chp)) {
-		com_message(chp, tprintf("%s %s has connected.",
+		com_message(chp, tmprintf("%s %s has connected.",
 					 chp->header, Name(player)),
 			    player);
 	    }
@@ -846,7 +846,7 @@ void mod_comsys_announce_disconnect(dbref player, const char *reason, int num) {
 	if (is_onchannel(player, chp)) {
 	    if ((chp->flags & CHAN_FLAG_LOUD) && !Hidden(player) &&
 		is_listenchannel(player, chp)) {
-		com_message(chp, tprintf("%s %s has disconnected.",
+		com_message(chp, tmprintf("%s %s has disconnected.",
 					 chp->header, Name(player)),
 			    player);
 	    }
@@ -925,7 +925,7 @@ void do_ccreate(dbref player, dbref cause, int key, char *name) {
 
     hashadd(name, (int *) chp, &mod_comsys_comsys_htab, 0);
 
-    notify(player, tprintf("Channel %s created.", name));
+    notify(player, tmprintf("Channel %s created.", name));
 }
 
 
@@ -948,7 +948,7 @@ void do_cdestroy(dbref player, dbref cause, int key, char *name) {
      * hashtable chaining issues.
      */
 
-    com_message(chp, tprintf("Channel %s has been destroyed by %s.",
+    com_message(chp, tmprintf("Channel %s has been destroyed by %s.",
 			     chp->name, Name(player)),
 		player);
 
@@ -1000,7 +1000,7 @@ void do_cdestroy(dbref player, dbref cause, int key, char *name) {
     XFREE(chp, "cdestroy.channel");
     hashdelete(name, &mod_comsys_comsys_htab);
 
-    notify(player, tprintf("Channel %s destroyed.", name));
+    notify(player, tmprintf("Channel %s destroyed.", name));
 }
 
 void do_channel(dbref player, dbref cause, int key, char *chan_name, char *arg) {
@@ -1192,9 +1192,9 @@ void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr) {
 	    nhashrepl((int) thing, (int *) clist, &mod_comsys_comlist_htab);
     }
 
-    notify(player, tprintf("You boot %s off channel %s.",
+    notify(player, tmprintf("You boot %s off channel %s.",
 			   Name(thing), chp->name));
-    notify(thing, tprintf("%s boots you off channel %s.",
+    notify(thing, tmprintf("%s boots you off channel %s.",
 			  Name(player), chp->name));
 
     if (key & CBOOT_QUIET) {
@@ -1203,7 +1203,7 @@ void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr) {
 	remove_from_channel(thing, chp, 1);
 	t = tbuf;
 	safe_sb_str(Name(player), tbuf, &t);
-	com_message(chp, tprintf("%s %s boots %s off the channel.",
+	com_message(chp, tmprintf("%s %s boots %s off the channel.",
 				 chp->header, tbuf, Name(thing)),
 		    player);
     }
@@ -1218,7 +1218,7 @@ void do_cemit(dbref player, dbref cause, int key, char *chan_name, char *str) {
     if (key & CEMIT_NOHEADER)
 	com_message(chp, str, player);
     else
-	com_message(chp, tprintf("%s %s", chp->header, str),
+	com_message(chp, tmprintf("%s %s", chp->header, str),
 		    player);
 }
 
@@ -1237,7 +1237,7 @@ void do_cwho(dbref player, dbref cause, int key, char *chan_name) {
 
     if (key & CWHO_ALL) {
 	for (wp = chp->who; wp != NULL; wp = wp->next) {
-	    notify(player, tprintf("%s  %-25s %7s",
+	    notify(player, tmprintf("%s  %-25s %7s",
 				   (wp->is_listening) ? "[on]" : "    ",
 				   Name(wp->player),
 				   isPlayer(wp->player) ? "Yes" : "No"));
@@ -1250,7 +1250,7 @@ void do_cwho(dbref player, dbref cause, int key, char *chan_name) {
 	for (i = 0; i < chp->num_connected; i++) {
 	    wp = chp->connect_who[i];
 	    if (!Hidden(wp->player) || See_Hidden(player)) {
-		notify(player, tprintf("%s  %-25s %7s",
+		notify(player, tmprintf("%s  %-25s %7s",
 				       (wp->is_listening) ? "[on]" : "    ",
 				       Name(wp->player),
 				       isPlayer(wp->player) ? "Yes" : "No"));
@@ -1262,7 +1262,7 @@ void do_cwho(dbref player, dbref cause, int key, char *chan_name) {
 	}
     }
 
-    notify(player, tprintf("Counted %d %s and %d %s on channel %s.",
+    notify(player, tmprintf("Counted %d %s and %d %s on channel %s.",
 			   p_count, (p_count == 1) ? "player" : "players",
 			   o_count, (o_count == 1) ? "object" : "objects",
 			   chp->name));
@@ -1301,7 +1301,7 @@ void do_delcom(dbref player, dbref cause, int key, char *alias_str) {
     chp = cap->channel;		/* save this for later */
 
     zorch_alias_from_list(cap);
-    clear_chan_alias(tprintf("%d.%s", player, alias_str), cap);
+    clear_chan_alias(tmprintf("%d.%s", player, alias_str), cap);
 
     /* Check if we have any aliases left pointing to that channel. */
 
@@ -1315,10 +1315,10 @@ void do_delcom(dbref player, dbref cause, int key, char *alias_str) {
     }
 
     if (has_mult) {
-	notify(player, tprintf("You remove the alias '%s' for channel %s.",
+	notify(player, tmprintf("You remove the alias '%s' for channel %s.",
 			       alias_str, chp->name));
     } else {
-	notify(player, tprintf("You leave channel %s.", chp->name));
+	notify(player, tmprintf("You leave channel %s.", chp->name));
 	remove_from_channel(player, chp, 0);
     }
 }
@@ -1338,14 +1338,14 @@ void do_comtitle(dbref player, dbref cause, int key, char *alias_str, char *titl
 	XFREE(cap->title, "do_comtitle.title");
 
     if (!title || !*title) {
-	notify(player, tprintf("Title cleared on channel %s.",
+	notify(player, tmprintf("Title cleared on channel %s.",
 			       cap->channel->name));
 	return;
     }
 
     cap->title = XSTRDUP(munge_comtitle(title), "do_comtitle.title");
 
-    notify(player, tprintf("Title set to '%s' on channel %s.",
+    notify(player, tmprintf("Title set to '%s' on channel %s.",
 			   cap->title, cap->channel->name));
 }
 
@@ -1388,22 +1388,22 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name) {
 	    buff = unparse_boolexp(player, chp->join_lock);
 	else
 	    buff = (char *) "*UNLOCKED*";
-	notify(player, tprintf("Join Lock: %s", buff));
+	notify(player, tmprintf("Join Lock: %s", buff));
 
 	if (chp->trans_lock)
 	    buff = unparse_boolexp(player, chp->trans_lock);
 	else
 	    buff = (char *) "*UNLOCKED*";
-	notify(player, tprintf("Transmit Lock: %s", buff));
+	notify(player, tmprintf("Transmit Lock: %s", buff));
 
 	if (chp->recv_lock)
 	    buff = unparse_boolexp(player, chp->recv_lock);
 	else
 	    buff = (char *) "*UNLOCKED*";
-	notify(player, tprintf("Receive Lock: %s", buff));
+	notify(player, tmprintf("Receive Lock: %s", buff));
 
 	if (chp->descrip)
-	    notify(player, tprintf("Description: %s", chp->descrip));
+	    notify(player, tmprintf("Description: %s", chp->descrip));
 
 	return;
     }
@@ -1424,7 +1424,7 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name) {
 
 	    if (key & CLIST_FULL) {
 		notify(player,
-         tprintf("%-20s %c%c%c%c%c%c%c%c%c  %c%c%c    %6d  %7d  %5d  %8d  #%d",
+         tmprintf("%-20s %c%c%c%c%c%c%c%c%c  %c%c%c    %6d  %7d  %5d  %8d  #%d",
 		  chp->name,
 		  (chp->flags & CHAN_FLAG_PUBLIC) ? 'P' : '-',
 		  (chp->flags & CHAN_FLAG_LOUD) ? 'L' : '-',
@@ -1445,7 +1445,7 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name) {
 		  chp->owner));
 	    } else {
 		notify(player,
-		       tprintf("%-20s %-18s %-38.38s",
+		       tmprintf("%-20s %-18s %-38.38s",
 			       chp->name, Name(chp->owner),
 			       ((key & CLIST_HEADER) ? chp->header :
 				(chp->descrip ? chp->descrip : " "))));
@@ -1455,12 +1455,12 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name) {
     }
 
     if (Comm_All(player)) {
-	notify(player, tprintf("There %s %d %s.",
+	notify(player, tmprintf("There %s %d %s.",
 			       (count == 1) ? "is" : "are",
 			       count,
 			       (count == 1) ? "channel" : "channels"));
     } else {
-	notify(player, tprintf("There %s %d %s visible to you.",
+	notify(player, tmprintf("There %s %d %s visible to you.",
 			       (count == 1) ? "is" : "are",
 			       count,
 			       (count == 1) ? "channel" : "channels"));
@@ -1486,7 +1486,7 @@ void do_comlist(dbref player, dbref cause, int key) {
 	 * We need to truncate title.
 	 */
 	notify(player,
-	       tprintf("%-10s %-20s %-40.40s  %s",
+	       tmprintf("%-10s %-20s %-40.40s  %s",
 		       cl_ptr->alias_ptr->alias,
 		       cl_ptr->alias_ptr->channel->name,
 		       (cl_ptr->alias_ptr->title) ? cl_ptr->alias_ptr->title :
@@ -1496,7 +1496,7 @@ void do_comlist(dbref player, dbref cause, int key) {
 	count++;
     }
 
-    notify(player, tprintf("You have %d channel %s.",
+    notify(player, tmprintf("You have %d channel %s.",
 			   count,
 			   (count == 1) ? "alias" : "aliases"));
 }
@@ -1878,7 +1878,7 @@ static void read_comsys(FILE *fp, int com_ver) {
 	    cap->title = XSTRDUP(s, "load_comsys.title");
 	else
 	    cap->title = NULL;
-	hashadd(tprintf("%d.%s", cap->player, cap->alias), (int *) cap,
+	hashadd(tmprintf("%d.%s", cap->player, cap->alias), (int *) cap,
 		&mod_comsys_calias_htab, 0);
 	clist = (COMLIST *) XMALLOC(sizeof(COMLIST), "load_comsys.clist");
 	clist->alias_ptr = cap;
@@ -2206,7 +2206,7 @@ void mod_comsys_init(void) {
             }
     }
 
-    mod_comsys_version.version=XSTRDUP(tprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_comsys_init");
+    mod_comsys_version.version=XSTRDUP(tmprintf("%s (%s)", str, PACKAGE_RELEASE_DATE), "mod_comsys_init");
     mod_comsys_version.author=XSTRDUP("TinyMUSH Development Team", "mod_comsys_init");
     mod_comsys_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_comsys_init");
     mod_comsys_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_comsys_init");

@@ -51,8 +51,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = netmush$(EXEEXT) mkindx$(EXEEXT) slave$(EXEEXT) \
-	$(am__EXEEXT_1) $(am__EXEEXT_2)
+bin_PROGRAMS = netmush$(EXEEXT) slave$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2)
 @WANT_DBM_GDBM_TRUE@am__append_1 = dbm/gdbm/
 @WANT_DBM_GDBM_TRUE@am__append_2 = -I$(srcdir)/dbm/gdbm/
 @WANT_DBM_GDBM_TRUE@am__append_3 = $(srcdir)/dbm/gdbm/libtinygdbm.a
@@ -163,9 +163,6 @@ CONFIG_CLEAN_VPATH_FILES =
 @WANT_DBM_QDBM_TRUE@am__EXEEXT_2 = recover$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_mkindx_OBJECTS = mkindx.$(OBJEXT)
-mkindx_OBJECTS = $(am_mkindx_OBJECTS)
-mkindx_LDADD = $(LDADD)
 am_netmush_OBJECTS = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	bsd.$(OBJEXT) command.$(OBJEXT) conf.$(OBJEXT) cque.$(OBJEXT) \
 	create.$(OBJEXT) db.$(OBJEXT) db_rw.$(OBJEXT) eval.$(OBJEXT) \
@@ -225,12 +222,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
-	$(EXTRA_netmush_SOURCES) $(nodist_netmush_SOURCES) \
-	$(recover_SOURCES) $(slave_SOURCES)
-DIST_SOURCES = $(mkindx_SOURCES) $(netmush_SOURCES) \
-	$(EXTRA_netmush_SOURCES) $(am__recover_SOURCES_DIST) \
-	$(slave_SOURCES)
+SOURCES = $(netmush_SOURCES) $(EXTRA_netmush_SOURCES) \
+	$(nodist_netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES)
+DIST_SOURCES = $(netmush_SOURCES) $(EXTRA_netmush_SOURCES) \
+	$(am__recover_SOURCES_DIST) $(slave_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -1416,7 +1411,9 @@ SHARE_SRC = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/creat
 	$(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 
 ETC_DIR = $(srcdir)/etc
-ETC_SRC = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf $(ETC_DIR)/netmush.conf
+ETC_SKEL = $(ETC_DIR)/netmush.conf.in
+ETC_SRC = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
+ETC_BUILD = $(ETC_DIR)/netmush.conf
 SCRIPT_DIR = $(srcdir)/scripts
 SCRIPT_SRC = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
 	$(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash \
@@ -1426,8 +1423,8 @@ SCRIPT_SRC = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
 SCRIPT_DAT = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config \
 	$(SCRIPT_DIR)/mtrace.awk
 
-EXTRA_DIST = $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
-CLEANFILES = version.h buildnum.data tinymushapi.h
+EXTRA_DIST = $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
+CLEANFILES = version.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf
 API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
@@ -1452,13 +1449,29 @@ netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 netmush_DEPENDENCIES = $(LTDLDEPS) 
 include_HEADERS = tinymushapi.h
 nodist_netmush_SOURCES = version.h
-mkindx_SOURCES = mkindx.c
+
+#mkindx_SOURCES         = mkindx.c help.c
 slave_SOURCES = slave.c
-BUILT_SOURCES = version.h tinymushapi.h
+BUILT_SOURCES = version.h tinymushapi.h netmush.conf
 @WANT_DBM_GDBM_TRUE@recover_SOURCES = recover.c
 @WANT_DBM_QDBM_TRUE@recover_SOURCES = recover.c
 @WANT_DBM_GDBM_TRUE@recover_LDADD = $(srcdir)/dbm/gdbm/libtinygdbm.a $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 @WANT_DBM_QDBM_TRUE@recover_LDADD = $(srcdir)/dbm/qdbm/libtinyqdbm.a $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+do_subst = $(SED) \
+	-e 's|[@]prefix@|$(prefix)|g' \
+	-e 's|[@]exec_prefix@|$(exec_prefix)|g' \
+	-e 's|[@]bindir@|$(bindir)|g' \
+	-e 's|[@]datarootdir@|$(datarootdir)|g' \
+	-e 's|[@]with_install_suffix@|$(with_install_suffix)|g' \
+	-e 's|[@]with_install_suffix@|$(with_install_suffix)|g' \
+	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]localstatedir@|$(localstatedir)|g' \
+	-e 's|[@]localstatedir@|$(localstatedir)|g' \
+	-e 's|[@]libdir@|$(libdir)|g' \
+	-e 's|[@]includedir@|$(includedir)|g' \
+	-e 's|[@]libexecdir@|$(libexecdir)|g'
+
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -1559,9 +1572,6 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-mkindx$(EXEEXT): $(mkindx_OBJECTS) $(mkindx_DEPENDENCIES) $(EXTRA_mkindx_DEPENDENCIES) 
-	@rm -f mkindx$(EXEEXT)
-	$(LINK) $(mkindx_OBJECTS) $(mkindx_LDADD) $(LIBS)
 netmush$(EXEEXT): $(netmush_OBJECTS) $(netmush_DEPENDENCIES) $(EXTRA_netmush_DEPENDENCIES) 
 	@rm -f netmush$(EXEEXT)
 	$(netmush_LINK) $(netmush_OBJECTS) $(netmush_LDADD) $(LIBS)
@@ -1614,7 +1624,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mcheck.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mguests.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkindx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/move.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mstats.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtrace.Po@am__quote@
@@ -2154,6 +2163,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	uninstall-binPROGRAMS uninstall-includeHEADERS uninstall-local
 
 
+netmush.conf: $(ETC_DIR)/netmush.conf.in
+	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
+	chmod +w $(ETC_DIR)/netmush.conf
+
 version.h:
 	touch $(srcdir)/buildnum.data
 	expr 0`cat $(srcdir)/buildnum.data` + 1 > $(srcdir)/buildnum.data
@@ -2230,18 +2243,21 @@ distclean-local:
 
 install-exec-local:
 	$(mkinstalldirs) @prefix@
-	$(mkinstalldirs) @sysconfdir@
 	$(mkinstalldirs) @libexecdir@/@with_install_suffix@
-	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
 	$(install_sh_SCRIPT) $(SCRIPT_SRC) @libexecdir@/@with_install_suffix@
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
 install-data-local:
+	$(mkinstalldirs) @sysconfdir@
 	$(mkinstalldirs) @datarootdir@
 	$(mkinstalldirs) @localstatedir@/run/@with_install_suffix@
 	$(mkinstalldirs) @localstatedir@/db/@with_install_suffix@
 	$(mkinstalldirs) @localstatedir@/backups/@with_install_suffix@
+	$(mkinstalldirs) @localstatedir@/log/@with_install_suffix@
 	$(install_sh_DATA) $(SHARE_SRC) @datarootdir@
+	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
+	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
+	$(install_sh_DATA) $(ETC_BUILD) @sysconfdir@
 
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done

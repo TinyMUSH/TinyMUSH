@@ -75,12 +75,12 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target) 
 
             if (ufp) {
                 notify(player,
-                       tprintf("%s: #%d/%s",
+                       tmprintf("%s: #%d/%s",
                                ufp->name, ufp->obj,
                                ((ATTR *) atr_num(ufp->atr))->name));
             } else {
                 notify(player,
-                       tprintf
+                       tmprintf
                        ("%s not found in user function table.",
                         fname));
             }
@@ -94,7 +94,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target) 
                 ufp != NULL;
                 ufp = (UFUN *) hash_nextentry(&mudstate.ufunc_htab)) {
             notify(player,
-                   tprintf("%s: #%d/%s",
+                   tmprintf("%s: #%d/%s",
                            ufp->name, ufp->obj,
                            ((ATTR *) atr_num(ufp->atr))->name));
         }
@@ -186,7 +186,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target) 
         }
         if (hashadd(np, (int *)ufp, &mudstate.ufunc_htab, 0)) {
             notify_quiet(player,
-                         tprintf("Function %s not defined.", fname));
+                         tmprintf("Function %s not defined.", fname));
             XFREE(ufp->name, "do_function");
             XFREE(ufp, "do_function.2");
             free_sbuf(np);
@@ -208,7 +208,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target) 
 
     free_sbuf(np);
     if (!Quiet(player))
-        notify_quiet(player, tprintf("Function %s defined.", fname));
+        notify_quiet(player, tmprintf("Function %s defined.", fname));
 }
 
 /*
@@ -241,7 +241,7 @@ void list_functable(dbref player) {
         if ((modfns = DLSYM_VAR(mp->handle, mp->modname, "functable",
                                 FUN *)) != NULL) {
             bp = buf;
-            safe_tprintf_str(buf, &bp, "Module %s functions:",
+            safe_tmprintf_str(buf, &bp, "Module %s functions:",
                              mp->modname);
             for (fp = modfns; fp->name; fp++) {
                 if (Check_Func_Access(player, fp)) {

@@ -165,7 +165,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
     qres = msqlStoreResult();
     if (!qres)
     {
-        notify(player, tprintf("SQL query touched %d %s.",
+        notify(player, tmprintf("SQL query touched %d %s.",
                                got_rows, (got_rows == 1) ? "row" : "rows"));
         return 0;
     }
@@ -220,7 +220,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     if (row_p[j] && *row_p[j])
                     {
                         notify(player,
-                               tprintf
+                               tmprintf
                                ("Row %d, Field %d: %s",
                                 i + 1, j + 1,
                                 row_p[j]));
@@ -228,7 +228,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     else
                     {
                         notify(player,
-                               tprintf
+                               tmprintf
                                ("Row %d, Field %d: NULL",
                                 i + 1, j + 1));
                     }
@@ -236,7 +236,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
             }
             else
             {
-                notify(player, tprintf("Row %d: NULL", i + 1));
+                notify(player, tmprintf("Row %d: NULL", i + 1));
             }
         }
     }

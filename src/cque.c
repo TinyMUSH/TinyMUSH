@@ -303,7 +303,7 @@ static void do_halt_pid(dbref player, dbref cause, int key, char *pidstr) {
 
     giveto(victim, mudconf.waitcost);
     a_Queue(victim, -1);
-    notify_quiet(player, tprintf("Halted queue entry PID %d.", qpid));
+    notify_quiet(player, tmprintf("Halted queue entry PID %d.", qpid));
 }
 
 /*
@@ -364,7 +364,7 @@ void do_halt(dbref player, dbref cause, int key, char *target) {
         notify(Owner(player), "1 queue entries removed.");
     else
         notify(Owner(player),
-               tprintf("%d queue entries removed.", numhalted));
+               tmprintf("%d queue entries removed.", numhalted));
 }
 
 /*
@@ -825,7 +825,7 @@ static void do_wait_pid(dbref player, int key, char *pidstr, char *timestr) {
             mudstate.qwait = qptr;
     }
     notify_quiet(player,
-                 tprintf("Adjusted wait time for queue entry PID %d.", qpid));
+                 tmprintf("Adjusted wait time for queue entry PID %d.", qpid));
 }
 
 /*
@@ -1164,7 +1164,7 @@ static void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, i
                 continue;
             if (*qent == 1)
                 notify(player,
-                       tprintf("----- %s Queue -----", header));
+                       tmprintf("----- %s Queue -----", header));
             bufp = unparse_object(player, tmp->player, 0);
             if ((tmp->waittime > 0) && (Good_obj(tmp->sem))) {
                 /*
@@ -1172,39 +1172,39 @@ static void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, i
                  * timeout-wait on a non-Semaphore attribute.
                  */
                 notify(player,
-                       tprintf("[#%d/%d] %d:%s:%s",
+                       tmprintf("[#%d/%d] %d:%s:%s",
                                tmp->sem,
                                tmp->waittime - mudstate.now,
                                tmp->pid, bufp, tmp->comm));
             } else if (tmp->waittime > 0) {
                 notify(player,
-                       tprintf("[%d] %d:%s:%s",
+                       tmprintf("[%d] %d:%s:%s",
                                tmp->waittime - mudstate.now,
                                tmp->pid, bufp, tmp->comm));
             } else if (Good_obj(tmp->sem)) {
                 if (tmp->attr == A_SEMAPHORE) {
                     notify(player,
-                           tprintf("[#%d] %d:%s:%s", tmp->sem,
+                           tmprintf("[#%d] %d:%s:%s", tmp->sem,
                                    tmp->pid, bufp, tmp->comm));
                 } else {
                     ap = atr_num(tmp->attr);
                     if (ap && ap->name) {
                         notify(player,
-                               tprintf
+                               tmprintf
                                ("[#%d/%s] %d:%s:%s",
                                 tmp->sem, ap->name,
                                 tmp->pid, bufp,
                                 tmp->comm));
                     } else {
                         notify(player,
-                               tprintf("[#%d] %d:%s:%s",
+                               tmprintf("[#%d] %d:%s:%s",
                                        tmp->sem, tmp->pid,
                                        bufp, tmp->comm));
                     }
                 }
             } else {
                 notify(player,
-                       tprintf("%d:%s:%s",
+                       tmprintf("%d:%s:%s",
                                tmp->pid, bufp, tmp->comm));
             }
             bp = bufp;
@@ -1224,7 +1224,7 @@ static void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, i
                 *bp = '\0';
                 bp = unparse_object(player, tmp->cause, 0);
                 notify(player,
-                       tprintf("   Enactor: %s%s", bp, bufp));
+                       tmprintf("   Enactor: %s%s", bp, bufp));
                 free_lbuf(bp);
             }
             free_lbuf(bufp);
@@ -1344,7 +1344,7 @@ void do_queue(dbref player, dbref cause, int key, char *arg) {
             mudconf.control_flags &= ~CF_DEQUEUE;
         if (!Quiet(player))
             notify(player,
-                   tprintf("%d commands processed.", ncmds));
+                   tmprintf("%d commands processed.", ncmds));
     } else if (key == QUEUE_WARP) {
         i = (int)strtol(arg, (char **)NULL, 10);;
         if ((mudconf.control_flags & CF_DEQUEUE) == 0) {
@@ -1380,10 +1380,10 @@ void do_queue(dbref player, dbref cause, int key, char *arg) {
             return;
         if (i > 0)
             notify(player,
-                   tprintf("WaitQ timer advanced %d seconds.", i));
+                   tmprintf("WaitQ timer advanced %d seconds.", i));
         else if (i < 0)
             notify(player,
-                   tprintf("WaitQ timer set back %d seconds.", i));
+                   tmprintf("WaitQ timer set back %d seconds.", i));
         else
             notify(player,
                    "Object queue appended to player queue.");

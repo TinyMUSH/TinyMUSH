@@ -281,13 +281,13 @@ static void pool_trace(dbref player, int poolnum, const char *text) {
     char *h;
 
     numfree = 0;
-    notify(player, tprintf("----- %s -----", text));
+    notify(player, tmprintf("----- %s -----", text));
     for (ph = pools[poolnum].chain_head; ph != NULL; ph = ph->next) {
         if (ph->magicnum != POOL_MAGICNUM) {
             notify(player,
                    "*** CORRUPTED BUFFER HEADER, ABORTING SCAN ***");
             notify(player,
-                   tprintf("%d free %s (before corruption)", numfree,
+                   tmprintf("%d free %s (before corruption)", numfree,
                            text));
             return;
         }
@@ -299,7 +299,7 @@ static void pool_trace(dbref player, int poolnum, const char *text) {
         else
             numfree++;
     }
-    notify(player, tprintf("%d free %s", numfree, text));
+    notify(player, tmprintf("%d free %s", numfree, text));
 }
 
 void list_bufstats(dbref player) {
@@ -419,13 +419,13 @@ void list_rawmemory(dbref player) {
             i++;
         }
         raw_notify(player,
-                   tprintf("%-35.35s  %6d   %8d", ntmp, c_tags, c_total));
+                   tmprintf("%-35.35s  %6d   %8d", ntmp, c_tags, c_total));
     }
 
     RAW_FREE(t_array, "list_rawmemory");
 
     raw_notify(player,
-               tprintf
+               tmprintf
                ("Total: %d raw allocations in %d unique tags. %d bytes (%d K).",
                 n_tags, u_tags, total, (int)total / 1024));
 }

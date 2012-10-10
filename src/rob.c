@@ -77,7 +77,7 @@ void do_kill(dbref player, dbref cause, int key, char *what, char *costchar) {
 
             if (!payfor(player, cost)) {
                 notify(player,
-                       tprintf("You don't have enough %s.",
+                       tmprintf("You don't have enough %s.",
                                mudconf.many_coins));
                 return;
             }
@@ -96,7 +96,7 @@ void do_kill(dbref player, dbref cause, int key, char *what, char *costchar) {
             notify(player, "Your murder attempt failed.");
             buf1 = alloc_lbuf("do_kill.failed");
             bp = buf1;
-            safe_tprintf_str(buf1, &bp,
+            safe_tmprintf_str(buf1, &bp,
                              "%s tried to kill you!", Name(player));
             notify_with_cause(victim, player, buf1);
             if (Suspect(player)) {
@@ -139,9 +139,9 @@ void do_kill(dbref player, dbref cause, int key, char *what, char *costchar) {
             }
         }
         bp = buf1;
-        safe_tprintf_str(buf1, &bp, "You killed %s!", Name(victim));
+        safe_tmprintf_str(buf1, &bp, "You killed %s!", Name(victim));
         bp = buf2;
-        safe_tprintf_str(buf2, &bp, "killed %s!", Name(victim));
+        safe_tmprintf_str(buf2, &bp, "killed %s!", Name(victim));
         if (Typeof(victim) != TYPE_PLAYER)
             if (halt_que(NOTHING, victim) > 0)
                 if (!Quiet(victim))
@@ -154,7 +154,7 @@ void do_kill(dbref player, dbref cause, int key, char *what, char *costchar) {
          */
 
         bp = buf1;
-        safe_tprintf_str(buf1, &bp, "%s killed you!", Name(player));
+        safe_tmprintf_str(buf1, &bp, "%s killed you!", Name(player));
         notify_with_cause(victim, player, buf1);
 
         /*
@@ -254,10 +254,10 @@ static void give_thing(dbref giver, dbref recipient, int key, char *what) {
         str = alloc_lbuf("do_give.thing.ok");
         strcpy(str, Name(giver));
         notify_with_cause(recipient, giver,
-                          tprintf("%s gave you %s.", str, Name(thing)));
+                          tmprintf("%s gave you %s.", str, Name(thing)));
         notify(giver, "Given.");
         notify_with_cause(thing, giver,
-                          tprintf("%s gave you to %s.", str, Name(recipient)));
+                          tmprintf("%s gave you to %s.", str, Name(recipient)));
         free_lbuf(str);
     }
     did_it(giver, thing, A_DROP, NULL, A_ODROP, NULL, A_ADROP,
@@ -279,14 +279,14 @@ static void give_money(dbref giver, dbref recipient, int key, int amount) {
 
     if (amount < 0 && !Steal(giver)) {
         notify(giver,
-               tprintf
+               tmprintf
                ("You look through your pockets. Nope, no negative %s.",
                 mudconf.many_coins));
         return;
     }
     if (!amount) {
         notify(giver,
-               tprintf("You must specify a positive number of %s.",
+               tmprintf("You must specify a positive number of %s.",
                        mudconf.many_coins));
         return;
     }
@@ -294,13 +294,13 @@ static void give_money(dbref giver, dbref recipient, int key, int amount) {
         if ((Typeof(recipient) == TYPE_PLAYER) &&
                 (Pennies(recipient) + amount > mudconf.paylimit)) {
             notify(giver,
-                   tprintf("That player doesn't need that many %s!",
+                   tmprintf("That player doesn't need that many %s!",
                            mudconf.many_coins));
             return;
         }
         if (!could_doit(giver, recipient, A_LRECEIVE)) {
             notify(giver,
-                   tprintf("%s won't take your money.",
+                   tmprintf("%s won't take your money.",
                            Name(recipient)));
             return;
         }
@@ -311,7 +311,7 @@ static void give_money(dbref giver, dbref recipient, int key, int amount) {
 
     if (!payfor(giver, amount)) {
         notify(giver,
-               tprintf("You don't have that many %s to give!",
+               tmprintf("You don't have that many %s to give!",
                        mudconf.many_coins));
         return;
     }
@@ -347,17 +347,17 @@ static void give_money(dbref giver, dbref recipient, int key, int amount) {
     if (!(key & GIVE_QUIET)) {
         if (amount == 1) {
             notify(giver,
-                   tprintf("You give a %s to %s.",
+                   tmprintf("You give a %s to %s.",
                            mudconf.one_coin, Name(recipient)));
             notify_with_cause(recipient, giver,
-                              tprintf("%s gives you a %s.", Name(giver),
+                              tmprintf("%s gives you a %s.", Name(giver),
                                       mudconf.one_coin));
         } else {
             notify(giver,
-                   tprintf("You give %d %s to %s.", amount,
+                   tmprintf("You give %d %s to %s.", amount,
                            mudconf.many_coins, Name(recipient)));
             notify_with_cause(recipient, giver,
-                              tprintf("%s gives you %d %s.", Name(giver),
+                              tmprintf("%s gives you %d %s.", Name(giver),
                                       amount, mudconf.many_coins));
         }
     }
@@ -367,11 +367,11 @@ static void give_money(dbref giver, dbref recipient, int key, int amount) {
 
     if ((amount - cost) == 1) {
         notify(giver,
-               tprintf("You get 1 %s in change.", mudconf.one_coin));
+               tmprintf("You get 1 %s in change.", mudconf.one_coin));
         giveto(giver, 1);
     } else if (amount != cost) {
         notify(giver,
-               tprintf("You get %d %s in change.",
+               tmprintf("You get %d %s in change.",
                        (amount - cost), mudconf.many_coins));
         giveto(giver, (amount - cost));
     }

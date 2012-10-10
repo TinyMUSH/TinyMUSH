@@ -141,12 +141,12 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
         if (login_info.new_bad > 0) {
             notify(player, "");
             notify(player,
-                   tprintf
+                   tmprintf
                    ("**** %d failed connect%s since your last successful connect. ****",
                     login_info.new_bad,
                     (login_info.new_bad == 1 ? "" : "s")));
             notify(player,
-                   tprintf("Most recent attempt was from %s on %s.",
+                   tmprintf("Most recent attempt was from %s on %s.",
                            login_info.bad[0].host,
                            login_info.bad[0].dtm));
             notify(player, "");
@@ -155,7 +155,7 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
         if (login_info.good[0].host && *login_info.good[0].host &&
                 login_info.good[0].dtm && *login_info.good[0].dtm) {
             notify(player,
-                   tprintf("Last connect was from %s on %s.",
+                   tmprintf("Last connect was from %s on %s.",
                            login_info.good[0].host,
                            login_info.good[0].dtm));
         }
@@ -168,7 +168,7 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
         login_info.good[0].host = lhost;
         login_info.tot_good++;
         if (*lusername)
-            atr_add_raw(player, A_LASTSITE, tprintf("%s@%s",
+            atr_add_raw(player, A_LASTSITE, tmprintf("%s@%s",
                                                     lusername, lhost));
         else
             atr_add_raw(player, A_LASTSITE, lhost);
@@ -343,7 +343,7 @@ void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpas
 static void disp_from_on(dbref player, char *dtm_str, char *host_str) {
     if (dtm_str && *dtm_str && host_str && *host_str) {
         notify(player,
-               tprintf("     From: %s   On: %s", dtm_str, host_str));
+               tmprintf("     From: %s   On: %s", dtm_str, host_str));
     }
 }
 
@@ -372,13 +372,13 @@ void do_last(dbref player, dbref cause, int key, char *who) {
         atrbuf = atr_get(target, A_LOGINDATA, &aowner, &aflags, &alen);
         decrypt_logindata(atrbuf, &login_info);
 
-        notify(player, tprintf("Total successful connects: %d",
+        notify(player, tmprintf("Total successful connects: %d",
                                login_info.tot_good));
         for (i = 0; i < NUM_GOOD; i++) {
             disp_from_on(player,
                          login_info.good[i].host, login_info.good[i].dtm);
         }
-        notify(player, tprintf("Total failed connects: %d",
+        notify(player, tmprintf("Total failed connects: %d",
                                login_info.tot_bad));
         for (i = 0; i < NUM_BAD; i++) {
             disp_from_on(player,

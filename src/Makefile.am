@@ -14,7 +14,9 @@ SHARE_SRC     = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/c
 	$(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 	
 ETC_DIR	     = $(srcdir)/etc
-ETC_SRC      = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf $(ETC_DIR)/netmush.conf
+ETC_SKEL     = $(ETC_DIR)/netmush.conf.in
+ETC_SRC      = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
+ETC_BUILD    = $(ETC_DIR)/netmush.conf
 
 SCRIPT_DIR   = $(srcdir)/scripts
 SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
@@ -24,11 +26,12 @@ SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
 SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config \
 	$(SCRIPT_DIR)/mtrace.awk
 
-EXTRA_DIST   = $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
-CLEANFILES   = version.h buildnum.data tinymushapi.h
+EXTRA_DIST   = $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
+CLEANFILES   = version.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf
+
 API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
-bin_PROGRAMS = netmush mkindx slave
+bin_PROGRAMS = netmush slave
 
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c \
 	create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c \
@@ -52,11 +55,11 @@ include_HEADERS        = tinymushapi.h
 
 nodist_netmush_SOURCES = version.h
 
-mkindx_SOURCES         = mkindx.c
+#mkindx_SOURCES         = mkindx.c help.c
 
 slave_SOURCES          = slave.c
 
-BUILT_SOURCES          = version.h tinymushapi.h
+BUILT_SOURCES          = version.h tinymushapi.h netmush.conf
 
 if WANT_DBM_GDBM
  SUBDIRS         += dbm/gdbm/
@@ -88,6 +91,25 @@ if WANT_MODULE_DB_SQL
  SUBDIRS += modules/db_sql/
 endif
 
+do_subst = $(SED) \
+	-e 's|[@]prefix@|$(prefix)|g' \
+	-e 's|[@]exec_prefix@|$(exec_prefix)|g' \
+	-e 's|[@]bindir@|$(bindir)|g' \
+	-e 's|[@]datarootdir@|$(datarootdir)|g' \
+	-e 's|[@]with_install_suffix@|$(with_install_suffix)|g' \
+	-e 's|[@]with_install_suffix@|$(with_install_suffix)|g' \
+	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]sysconfdir@|$(sysconfdir)|g' \
+	-e 's|[@]localstatedir@|$(localstatedir)|g' \
+	-e 's|[@]localstatedir@|$(localstatedir)|g' \
+	-e 's|[@]libdir@|$(libdir)|g' \
+	-e 's|[@]includedir@|$(includedir)|g' \
+	-e 's|[@]libexecdir@|$(libexecdir)|g'
+	
+netmush.conf: $(ETC_DIR)/netmush.conf.in
+	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
+	chmod +w $(ETC_DIR)/netmush.conf
+	
 version.h:
 	touch $(srcdir)/buildnum.data
 	expr 0`cat $(srcdir)/buildnum.data` + 1 > $(srcdir)/buildnum.data
@@ -164,18 +186,21 @@ distclean-local:
 
 install-exec-local:
 	$(mkinstalldirs) @prefix@
-	$(mkinstalldirs) @sysconfdir@
 	$(mkinstalldirs) @libexecdir@/@with_install_suffix@
-	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
 	$(install_sh_SCRIPT) $(SCRIPT_SRC) @libexecdir@/@with_install_suffix@
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
 install-data-local:
+	$(mkinstalldirs) @sysconfdir@
 	$(mkinstalldirs) @datarootdir@
 	$(mkinstalldirs) @localstatedir@/run/@with_install_suffix@
 	$(mkinstalldirs) @localstatedir@/db/@with_install_suffix@
 	$(mkinstalldirs) @localstatedir@/backups/@with_install_suffix@
+	$(mkinstalldirs) @localstatedir@/log/@with_install_suffix@
 	$(install_sh_DATA) $(SHARE_SRC) @datarootdir@
+	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
+	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
+	$(install_sh_DATA) $(ETC_BUILD) @sysconfdir@
 
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done

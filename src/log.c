@@ -164,10 +164,7 @@ int start_log(const char *primary, const char *secondary, int key) {
             if ((mudconf.log_info & LOGOPT_TIMESTAMP) != 0) {
                 time((time_t *) (&now));
                 tp = localtime((time_t *) (&now));
-                log_printf("%02d%02d%02d.%02d%02d%02d ",
-                           (tp->tm_year % 100), tp->tm_mon + 1,
-                           tp->tm_mday, tp->tm_hour,
-                           tp->tm_min, tp->tm_sec);
+                log_printf("%02d%02d%02d.%02d%02d%02d ", (tp->tm_year % 100), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec);
             }
 
             /*
@@ -175,11 +172,9 @@ int start_log(const char *primary, const char *secondary, int key) {
              */
 
             if (secondary && *secondary)
-                log_printf("%s %3s/%-5s: ",
-                           MUDLOGNAME, primary, secondary);
+                log_printf("%s %3s/%-5s: ", MUDLOGNAME, primary, secondary);
             else
-                log_printf("%s %-9s: ",
-                           MUDLOGNAME, primary);
+                log_printf("%s %-9s: ", MUDLOGNAME, primary);
         }
 
         /*
@@ -201,7 +196,9 @@ int start_log(const char *primary, const char *secondary, int key) {
 
 void end_log(void) {
     log_printf("\n");
-    fflush(log_fp);
+    if(log_fp != NULL) {
+        fflush(log_fp);
+    }
     mudstate.logging--;
 }
 
@@ -232,7 +229,12 @@ void log_printf(const char *format, ...) {
 
     s = (char *)XMALLOC(MBUF_SIZE, "log_printf");
     vsprintf(s, format, ap);
-    fputs(s, log_fp);
+    /*
+     * Do we have a logfile to write to...
+     */
+    if(log_fp != NULL) {
+        fputs(s, log_fp);
+    }
     /*
      * If we are starting up, log to stderr too..
      */
@@ -268,7 +270,11 @@ void mainlog_printf(const char *format, ...) {
 }
 
 void log_vprintf(const char *format, va_list ap) {
-    vfprintf(log_fp, format, ap);
+    if(log_fp != NULL) {
+        vfprintf(log_fp, format, ap);
+    } else {
+        vfprintf(stderr, format, ap);
+    }
 }
 
 /* ---------------------------------------------------------------------------

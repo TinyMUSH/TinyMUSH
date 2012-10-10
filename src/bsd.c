@@ -121,7 +121,7 @@ static int get_slave_result(void) {
             if (d->player != 0) {
                 if (d->username[0]) {
                     atr_add_raw(d->player, A_LASTSITE,
-                                tprintf("%s@%s",
+                                tmprintf("%s@%s",
                                         d->username, hostname));
                 } else {
                     atr_add_raw(d->player, A_LASTSITE,
@@ -200,10 +200,10 @@ static int get_slave_result(void) {
         if (d->player != 0) {
             if (mudconf.use_hostname) {
                 atr_add_raw(d->player, A_LASTSITE,
-                            tprintf("%s@%s", userid, hostname));
+                            tmprintf("%s@%s", userid, hostname));
             } else {
                 atr_add_raw(d->player, A_LASTSITE,
-                            tprintf("%s@%s", userid, host2));
+                            tmprintf("%s@%s", userid, host2));
             }
         }
         strncpy(d->username, userid, 10);

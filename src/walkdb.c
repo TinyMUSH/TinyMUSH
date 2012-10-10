@@ -41,7 +41,7 @@ static void bind_and_queue(dbref player, dbref cause, char *action, char *argstr
 					 */
 
     command = replace_string(BOUND_VAR, argstr, action);
-    command2 = replace_string(LISTPLACE_VAR, tprintf("%d", number),
+    command2 = replace_string(LISTPLACE_VAR, tmprintf("%d", number),
                               command);
     if (now)
         process_cmdline(player, cause, command2, cargs, ncargs, NULL);
@@ -114,7 +114,7 @@ void do_find(dbref player, dbref cause, int key, char *name) {
 
     if (!payfor(player, mudconf.searchcost)) {
         notify_quiet(player,
-                     tprintf("You don't have enough %s.", mudconf.many_coins));
+                     tmprintf("You don't have enough %s.", mudconf.many_coins));
         return;
     }
     parse_range(&name, &low_bound, &high_bound);
@@ -160,7 +160,7 @@ int get_stats(dbref player, dbref who, STATS *info) {
      */
 
     if (!payfor(player, mudconf.searchcost)) {
-        notify(player, tprintf("You don't have enough %s.",
+        notify(player, tmprintf("You don't have enough %s.",
                                mudconf.many_coins));
         return 0;
     }
@@ -216,7 +216,7 @@ void do_stats(dbref player, dbref cause, int key, char *name) {
     case STAT_PLAYER:
         if (!(name && *name)) {
             notify(player,
-                   tprintf
+                   tmprintf
                    ("The universe contains %d objects (next free is #%d).",
                     mudstate.db_top,
                     ((mudstate.freelist ==
@@ -238,7 +238,7 @@ void do_stats(dbref player, dbref cause, int key, char *name) {
     if (!get_stats(player, owner, &statinfo))
         return;
     notify(player,
-           tprintf
+           tmprintf
            ("%d objects = %d rooms, %d exits, %d things, %d players. (%d unknown, %d going, %d garbage)",
             statinfo.s_total, statinfo.s_rooms, statinfo.s_exits,
             statinfo.s_things, statinfo.s_players, statinfo.s_unknown,
@@ -246,9 +246,9 @@ void do_stats(dbref player, dbref cause, int key, char *name) {
 
 #ifdef TEST_MALLOC
     if (Wizard(player))
-        notify(player, tprintf("Malloc count = %d.", malloc_count));
+        notify(player, tmprintf("Malloc count = %d.", malloc_count));
     if (Wizard(player))
-        notify(player, tprintf("Malloc bytes = %d.", malloc_bytes));
+        notify(player, tmprintf("Malloc bytes = %d.", malloc_bytes));
 #endif				/*
     * TEST_MALLOC
     */
@@ -257,14 +257,14 @@ void do_stats(dbref player, dbref cause, int key, char *name) {
         struct mstats mval;
 
         mval = mstats();
-        notify(player, tprintf("Total size of the heap: %d",
+        notify(player, tmprintf("Total size of the heap: %d",
                                mval.bytes_total));
         notify(player,
-               tprintf
+               tmprintf
                ("Chunks allocated: %d -- Total size of allocated chunks: %d",
                 mval.chunks_used, mval.bytes_used));
         notify(player,
-               tprintf("Chunks free: %d -- Total size of free chunks: %d",
+               tmprintf("Chunks free: %d -- Total size of free chunks: %d",
                        mval.chunks_free, mval.bytes_free));
     }
 #endif				/*
@@ -373,7 +373,7 @@ void do_chownall(dbref player, dbref cause, int key, char *from, char *to) {
 
     count = chown_all(victim, recipient, player, key);
     if (!Quiet(player)) {
-        notify(player, tprintf("%d objects @chowned.", count));
+        notify(player, tmprintf("%d objects @chowned.", count));
     }
 }
 
@@ -471,7 +471,7 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm) {
     }
 
     if (parm->s_rst_owner == NOTHING) {
-        notify(player, tprintf("%s: No such player", pname));
+        notify(player, tmprintf("%s: No such player", pname));
         return 0;
     }
     /*
@@ -599,7 +599,7 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm) {
                     parm->s_rst_owner = ANY_OWNER;
             } else {
                 notify(player,
-                       tprintf("%s: unknown type", searchfor));
+                       tmprintf("%s: unknown type", searchfor));
                 return 0;
             }
         } else if (string_prefix("things", searchtype)) {
@@ -668,7 +668,7 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm) {
     }
 
     if (err) {
-        notify(player, tprintf("%s: unknown class", searchtype));
+        notify(player, tmprintf("%s: unknown class", searchtype));
         return 0;
     }
     /*
@@ -688,7 +688,7 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm) {
 
     if (!payfor(player, mudconf.searchcost)) {
         notify(player,
-               tprintf
+               tmprintf
                ("You don't have enough %s to search. (You need %d)",
                 mudconf.many_coins, mudconf.searchcost));
         return 0;
@@ -865,7 +865,7 @@ static void search_mark(dbref player, int key) {
         }
     }
     notify(player,
-           tprintf("%d objects %smarked",
+           tmprintf("%d objects %smarked",
                    nchanged, ((key == SRCH_MARK) ? "" : "un")));
     return;
 }
@@ -1139,7 +1139,7 @@ void do_floaters(dbref player, dbref cause, int key, char *name) {
      */
 
     if (!payfor(player, mudconf.searchcost)) {
-        notify(player, tprintf("You don't have enough %s.",
+        notify(player, tmprintf("You don't have enough %s.",
                                mudconf.many_coins));
         return;
     }
@@ -1169,7 +1169,7 @@ void do_floaters(dbref player, dbref cause, int key, char *name) {
         }
     }
 
-    notify(player, tprintf("%d floating %s found.",
+    notify(player, tmprintf("%d floating %s found.",
                            total, (total == 1) ? "room" : "rooms"));
 }
 

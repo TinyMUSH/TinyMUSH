@@ -525,7 +525,7 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext) {
             if (fail) {
                 if (!mudstate.standalone)
                     notify(player,
-                           tprintf("Cannot forward to #%d: Permission denied.",
+                           tmprintf("Cannot forward to #%d: Permission denied.",
                                    target));
                 errors++;
             } else if (count < mudconf.fwdlist_lim) {
@@ -536,7 +536,7 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext) {
             } else {
                 if (!mudstate.standalone)
                     notify(player,
-                           tprintf("Cannot forward to #%d: Forwardlist limit exceeded.",
+                           tmprintf("Cannot forward to #%d: Forwardlist limit exceeded.",
                                    target));
                 errors++;
             }
@@ -726,7 +726,7 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext) {
             if (fail) {
                 if (!mudstate.standalone) {
                     notify(player,
-                           tprintf("Cannot parent to #%d: Permission denied.",
+                           tmprintf("Cannot parent to #%d: Permission denied.",
                                    target));
                 }
                 errors++;
@@ -738,7 +738,7 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext) {
             } else {
                 if (!mudstate.standalone) {
                     notify(player,
-                           tprintf("Cannot parent to #%d: Propdir limit exceeded.",
+                           tmprintf("Cannot parent to #%d: Propdir limit exceeded.",
                                    target));
                 }
                 errors++;
@@ -1030,7 +1030,7 @@ void do_attribute(dbref player, dbref cause, int key, char *aname, char *value) 
                 va->flags |= AF_DIRTY;
             } else {
                 notify(player,
-                       tprintf("Unknown permission: %s.", sp));
+                       tmprintf("Unknown permission: %s.", sp));
             }
 
             /* Get the next token */
@@ -1118,32 +1118,32 @@ void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2) {
     case FIXDB_OWNER:
         s_Owner(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Owner set to #%d", res));
+            notify(player, tmprintf("Owner set to #%d", res));
         break;
     case FIXDB_LOC:
         s_Location(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Location set to #%d", res));
+            notify(player, tmprintf("Location set to #%d", res));
         break;
     case FIXDB_CON:
         s_Contents(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Contents set to #%d", res));
+            notify(player, tmprintf("Contents set to #%d", res));
         break;
     case FIXDB_EXITS:
         s_Exits(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Exits set to #%d", res));
+            notify(player, tmprintf("Exits set to #%d", res));
         break;
     case FIXDB_NEXT:
         s_Next(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Next set to #%d", res));
+            notify(player, tmprintf("Next set to #%d", res));
         break;
     case FIXDB_PENNIES:
         s_Pennies(thing, res);
         if (!Quiet(player))
-            notify(player, tprintf("Pennies set to %d", res));
+            notify(player, tmprintf("Pennies set to %d", res));
         break;
     case FIXDB_NAME:
         if (Typeof(thing) == TYPE_PLAYER) {
@@ -1177,7 +1177,7 @@ void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2) {
             s_Name(thing, arg2);
         }
         if (!Quiet(player))
-            notify(player, tprintf("Name set to %s", arg2));
+            notify(player, tmprintf("Name set to %s", arg2));
         break;
     }
 }
@@ -1640,7 +1640,7 @@ static char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int at
 
     if (owner == NOTHING)
         owner = Owner(thing);
-    return tprintf("%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr);
+    return tmprintf("%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr);
 }
 
 /* ---------------------------------------------------------------------------

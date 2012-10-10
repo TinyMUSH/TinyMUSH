@@ -30,6 +30,8 @@ extern void	call_move_hook(dbref, dbref, int);
 
 /* From conf.c */
 extern void	cf_log_syntax(dbref, char *, const char *,...);
+extern void	cf_log_help(dbref, char *, const char *, ...);
+extern void	cf_log_help_mkindx(dbref, char *, const char *, ...);
 extern void	cf_log_notfound(dbref, char *, const char *, char *);
 extern int	cf_modify_bits(int *, char *, long, dbref, char *);
 
@@ -119,6 +121,9 @@ extern void	html_escape(const char *, char *, char **);
 extern void	dump_database_internal(int);
 extern void	fork_and_dump(int);
 
+/* From help.c */
+extern int	helpmkindx(dbref, char *, char *);
+
 /* From htab.c */
 extern int	cf_ntab_access(int *, char *, long, dbref, char *);
 
@@ -170,9 +175,9 @@ extern int	badname_check(char *);
 extern void	badname_list(dbref, const char *);
 
 /* From predicates.c */
-extern char    *tprintf(const char *,...);
-extern char    *tvprintf(const char *, va_list);
-extern void	safe_tprintf_str(char *, char **, const char *,...);
+extern char    *tmprintf(const char *,...);
+extern char    *tmvprintf(const char *, va_list);
+extern void	safe_tmprintf_str(char *, char **, const char *,...);
 extern dbref	insert_first(dbref, dbref);
 extern dbref	remove_first(dbref, dbref);
 extern dbref	reverse_list(dbref);
@@ -738,9 +743,9 @@ extern int	register_match(char *, char *, char *[], int);
 
 /* Syntax: DLSYM(<handler>, <module name>, <function name>, <prototype>) */
 
-#define DLSYM(h,m,x,p) (void (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_INT(h,m,x,p) (int (*)p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_VAR(h,m,x,p) (p)lt_dlsym((h), tprintf("mod_%s_%s", (m), (x)))
+#define DLSYM(h,m,x,p) (void (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_INT(h,m,x,p) (int (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_VAR(h,m,x,p) (p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
 
 /*
  * Syntax: CALL_ALL_MODULES(<name of function>, (<args>)) Call all modules

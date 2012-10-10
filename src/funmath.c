@@ -118,7 +118,7 @@ static void fval(char *buff, char **bufc, double result) {
     }
 
     buf1 = *bufc;
-    safe_tprintf_str(buff, bufc, "%.6f", result);	/* get double val into
+    safe_tmprintf_str(buff, bufc, "%.6f", result);	/* get double val into
 							 * buffer */
     **bufc = '\0';
     p = strrchr(buf1, '0');
@@ -208,7 +208,7 @@ void fun_floor(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     default:
         break;
     }
-    safe_tprintf_str(buff, bufc, "%.0f", x);
+    safe_tmprintf_str(buff, bufc, "%.0f", x);
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
@@ -238,7 +238,7 @@ void fun_ceil(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     default:
         break;
     }
-    safe_tprintf_str(buff, bufc, "%.0f", x);
+    safe_tmprintf_str(buff, bufc, "%.0f", x);
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
@@ -294,7 +294,7 @@ void fun_round(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     default:
         break;
     }
-    safe_tprintf_str(buff, bufc, (char *)fstr, x);
+    safe_tmprintf_str(buff, bufc, (char *)fstr, x);
 
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
@@ -380,7 +380,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     val = strtod(fargs[0], (char **)NULL);
     if ((flag & TRIG_ARC) && !(flag & TRIG_TAN) &&
             ((val < -1) || (val > 1))) {
-        safe_tprintf_str(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE",
+        safe_tmprintf_str(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE",
                          ((FUN *) fargs[-1])->name);
         return;
     }

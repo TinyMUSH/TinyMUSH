@@ -716,10 +716,10 @@ static void announce_connect(dbref player, DESC *d, const char *reason) {
 
     if (*mudconf.motd_msg) {
         if (mudconf.ansi_colors) {
-            raw_notify(player, tprintf("\n%sMOTD:%s %s\n",
+            raw_notify(player, tmprintf("\n%sMOTD:%s %s\n",
                                        ANSI_HILITE, ANSI_NORMAL, mudconf.motd_msg));
         } else {
-            raw_notify(player, tprintf("\nMOTD: %s\n",
+            raw_notify(player, tmprintf("\nMOTD: %s\n",
                                        mudconf.motd_msg));
         }
     }
@@ -728,12 +728,12 @@ static void announce_connect(dbref player, DESC *d, const char *reason) {
         if (*mudconf.wizmotd_msg) {
             if (mudconf.ansi_colors) {
                 raw_notify(player,
-                           tprintf("%sWIZMOTD:%s %s\n",
+                           tmprintf("%sWIZMOTD:%s %s\n",
                                    ANSI_HILITE, ANSI_NORMAL,
                                    mudconf.wizmotd_msg));
             } else {
                 raw_notify(player,
-                           tprintf("WIZMOTD: %s\n",
+                           tmprintf("WIZMOTD: %s\n",
                                    mudconf.wizmotd_msg));
             }
         }
@@ -1166,7 +1166,7 @@ static void dump_users(DESC *e, char *match, int key) {
                         flist, Location(d->player),
                         d->command_count, slist,
                         trimmed_site(((d->username[0] !=
-                                       '\0') ? tprintf("%s@%s",
+                                       '\0') ? tmprintf("%s@%s",
                                                        d->username,
                                                        d->addr) : d->addr)));
             } else if (key == CMD_SESSION) {
@@ -1207,7 +1207,7 @@ static void dump_users(DESC *e, char *match, int key) {
     sprintf(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count,
             (count == 1) ? " " : "s ", mudstate.record_players,
             (mudconf.max_players == -1) ?
-            "no" : tprintf("%d", mudconf.max_players));
+            "no" : tmprintf("%d", mudconf.max_players));
     queue_rawstring(e, buf);
 
 #ifdef PUEBLO_SUPPORT
@@ -1229,11 +1229,11 @@ static void dump_info(DESC *call_by) {
 
     queue_rawstring(call_by, "### Begin INFO 1\r\n");
 
-    queue_rawstring(call_by, tprintf("Name: %s\r\n", mudconf.mud_name));
+    queue_rawstring(call_by, tmprintf("Name: %s\r\n", mudconf.mud_name));
 
     temp = (char *)ctime(&mudstate.start_time);
     temp[strlen(temp) - 1] = '\0';
-    queue_rawstring(call_by, tprintf("Uptime: %s\r\n", temp));
+    queue_rawstring(call_by, tmprintf("Uptime: %s\r\n", temp));
 
     DESC_ITER_CONN(d) {
         if (!Hidden(d->player) ||
@@ -1241,16 +1241,16 @@ static void dump_info(DESC *call_by) {
                  && See_Hidden(call_by->player)))
             count++;
     }
-    queue_rawstring(call_by, tprintf("Connected: %d\r\n", count));
+    queue_rawstring(call_by, tmprintf("Connected: %d\r\n", count));
 
-    queue_rawstring(call_by, tprintf("Size: %d\r\n", mudstate.db_top));
-    queue_rawstring(call_by, tprintf("Version: %d.%d.%d.%d\r\n",
+    queue_rawstring(call_by, tmprintf("Size: %d\r\n", mudstate.db_top));
+    queue_rawstring(call_by, tmprintf("Version: %d.%d.%d.%d\r\n",
                                      mudstate.version.major, mudstate.version.minor,
                                      mudstate.version.status, mudstate.version.revision));
 
     for (llp = mudconf.infotext_list; llp != NULL; llp = llp->next) {
         queue_rawstring(call_by,
-                        tprintf("%s: %s\r\n", llp->name, llp->value));
+                        tmprintf("%s: %s\r\n", llp->name, llp->value));
     }
 
     queue_rawstring(call_by, "### End INFO\r\n");
@@ -1362,12 +1362,12 @@ void do_doing(dbref player, dbref cause, int key, char *arg) {
         }
         if (over) {
             notify(player,
-                   tprintf("Warning: %d characters lost.", over));
+                   tmprintf("Warning: %d characters lost.", over));
         }
         if (!Quiet(player) && !(key & DOING_QUIET))
             notify(player, "Set.");
     } else if (key & DOING_POLL) {
-        notify(player, tprintf("Poll: %s", mudstate.doing_hdr));
+        notify(player, tmprintf("Poll: %s", mudstate.doing_hdr));
     } else {
         foundany = 0;
         DESC_ITER_PLAYER(player, d) {
@@ -1377,7 +1377,7 @@ void do_doing(dbref player, dbref cause, int key, char *arg) {
         if (foundany) {
             if (over) {
                 notify(player,
-                       tprintf("Warning: %d characters lost.",
+                       tmprintf("Warning: %d characters lost.",
                                over));
             }
             if (!Quiet(player) && !(key & DOING_QUIET))
@@ -2094,7 +2094,7 @@ void make_portlist(dbref player, dbref target, char *buff, char **bufc) {
 
     DESC_ITER_CONN(d) {
         if ((target == NOTHING) || (d->player == target)) {
-            safe_str(tprintf("%d ", d->descriptor), buff, bufc);
+            safe_str(tmprintf("%d ", d->descriptor), buff, bufc);
             i = 1;
         }
     }
@@ -2114,7 +2114,7 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
     DESC_ITER_CONN(d) {
         if ((d->descriptor == port_num) || (d->player == target)) {
             if (Wizard_Who(player) || Controls(player, d->player)) {
-                safe_str(tprintf("%d %d %d", d->command_count,
+                safe_str(tmprintf("%d %d %d", d->command_count,
                                  d->input_tot, d->output_tot), buff,
                          bufc);
                 return;

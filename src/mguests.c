@@ -139,9 +139,9 @@ dbref create_guest(int num) {
      * Make sure the guest is locked.
      */
 
-    do_lock(player, player, A_LOCK, tprintf("#%d", player), "me");
-    do_lock(player, player, A_LENTER, tprintf("#%d", player), "me");
-    do_lock(player, player, A_LUSE, tprintf("#%d", player), "me");
+    do_lock(player, player, A_LOCK, tmprintf("#%d", player), "me");
+    do_lock(player, player, A_LENTER, tmprintf("#%d", player), "me");
+    do_lock(player, player, A_LUSE, tmprintf("#%d", player), "me");
 
     /*
      * Copy all attributes.
@@ -158,7 +158,7 @@ void destroy_guest(dbref guest) {
     if (!Guest(guest))
         return;
 
-    atr_add_raw(guest, A_DESTROYER, tprintf("%d", mudconf.guest_nuker));
+    atr_add_raw(guest, A_DESTROYER, tmprintf("%d", mudconf.guest_nuker));
     destroy_player(guest);
     destroy_obj(mudconf.guest_nuker, guest);
 }

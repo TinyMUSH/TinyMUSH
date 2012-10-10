@@ -99,5 +99,6 @@
 #endif
 
 #include <ltdl.h>
+#include <libgen.h>
 
 #endif	/* __SYSTEM_H */

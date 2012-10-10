@@ -104,8 +104,11 @@ struct confdata {
     char	*bakhome;	/* Backup home directory */
     char	*status_file;	/* Where to write arg to @shutdown */
     char 	*config_file;	/* MUSH's config file */
+    char	*config_home;	/* MUSH's config directory */
     char 	*log_file;	/* MUSH's log file */
+    char	*log_home;	/* MUSH's log directory */
     char 	*pid_file;	/* MUSH's pid file */
+    char	*pid_home;	/* MUSH's pid directory */
     char 	*db_file;	/* MUSH's db file */
     char	*compressexe;	/* Executable run to compress file */
     char	*mudowner;	/* Email of the game owner */

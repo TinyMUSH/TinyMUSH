@@ -297,11 +297,11 @@ int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char
         return 1;
 
     if (maxargs == (minargs + 1))
-        safe_tprintf_str(result, bufc,
+        safe_tmprintf_str(result, bufc,
                          "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d",
                          fname, minargs, maxargs, nfargs);
     else
-        safe_tprintf_str(result, bufc,
+        safe_tmprintf_str(result, bufc,
                          "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d",
                          fname, minargs, maxargs, nfargs);
     return 0;

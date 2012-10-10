@@ -365,7 +365,7 @@ void list_cached_objs(dbref player) {
     for (x = 0; x < mudstate.db_top; x++) {
         if (count_array[x] > 0) {
             raw_notify(player,
-                       tprintf("%-30.30s  #%-6d  %5d  %8d",
+                       tmprintf("%-30.30s  #%-6d  %5d  %8d",
                                strip_ansi(Name(x)), x, count_array[x],
                                size_array[x]));
             oco++;
@@ -397,7 +397,7 @@ void list_cached_objs(dbref player) {
     for (x = 0; x < mudstate.db_top; x++) {
         if (count_array[x] > 0) {
             raw_notify(player,
-                       tprintf("%-30.30s  #%-6d  %5d  %8d",
+                       tmprintf("%-30.30s  #%-6d  %5d  %8d",
                                strip_ansi(Name(x)), x, count_array[x],
                                size_array[x]));
             moco++;
@@ -405,11 +405,11 @@ void list_cached_objs(dbref player) {
     }
 
     raw_notify(player,
-               tprintf
+               tmprintf
                ("\nTotals: active %d (%d attrs), modified active %d (%d attrs), total attrs %d",
                 oco, aco, moco, maco, aco + maco));
     raw_notify(player,
-               tprintf("Size: active %d bytes, modified active %d bytes", asize,
+               tmprintf("Size: active %d bytes, modified active %d bytes", asize,
                        msize));
 
     XFREE(count_array, "list_cached_objs.count");
@@ -444,7 +444,7 @@ void list_cached_attrs(dbref player) {
                 atr =
                     atr_num(((Aname *) cp->keydata)->attrnum);
                 raw_notify(player,
-                           tprintf("%-23.23s %-31.31s #%-6d %6d",
+                           tmprintf("%-23.23s %-31.31s #%-6d %6d",
                                    PureName(((Aname *) cp->keydata)->
                                             object),
                                    (atr ? atr->name : "(Unknown)"),
@@ -469,7 +469,7 @@ void list_cached_attrs(dbref player) {
                 atr =
                     atr_num(((Aname *) cp->keydata)->attrnum);
                 raw_notify(player,
-                           tprintf("%-23.23s %-31.31s #%-6d %6d",
+                           tmprintf("%-23.23s %-31.31s #%-6d %6d",
                                    PureName(((Aname *) cp->keydata)->
                                             object),
                                    (atr ? atr->name : "(Unknown)"),
@@ -480,11 +480,11 @@ void list_cached_attrs(dbref player) {
     }
 
     raw_notify(player,
-               tprintf
+               tmprintf
                ("\nTotals: active %d, modified active %d, total attributes %d",
                 aco, maco, aco + maco));
     raw_notify(player,
-               tprintf("Size: active %d bytes, modified active %d bytes", asize,
+               tmprintf("Size: active %d bytes, modified active %d bytes", asize,
                        msize));
 }
 

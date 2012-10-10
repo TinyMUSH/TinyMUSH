@@ -171,7 +171,7 @@ static char *parse_cronlist(dbref player, bitstr_t *bits, int low, int high, cha
                     bufp++;
             }
         } else {
-            notify(player, tprintf("Cron parse error at: %s",
+            notify(player, tmprintf("Cron parse error at: %s",
                                    bufp));
             return NULL;
         }
@@ -402,7 +402,7 @@ void do_crondel(dbref player, dbref cause, int key, char *objstr) {
     }
 
     count = cron_clr(thing, attr);
-    notify(player, tprintf("Removed %d cron entries.", count));
+    notify(player, tmprintf("Removed %d cron entries.", count));
 }
 
 void do_crontab(dbref player, dbref cause, int key, char *objstr) {
@@ -444,18 +444,18 @@ void do_crontab(dbref player, dbref cause, int key, char *objstr) {
             ap = atr_num(crp->atr);
             if (!ap) {
                 notify(player,
-                       tprintf
+                       tmprintf
                        ("%s has a cron entry that contains bad attribute number %d.",
                         bufp, crp->atr));
             } else {
-                notify(player, tprintf("%s/%s: %s", bufp,
+                notify(player, tmprintf("%s/%s: %s", bufp,
                                        ap->name, crp->cronstr));
             }
             free_lbuf(bufp);
         }
     }
 
-    notify(player, tprintf("Matched %d cron %s.",
+    notify(player, tmprintf("Matched %d cron %s.",
                            count, (count == 1) ? "entry" : "entries"));
 }
 

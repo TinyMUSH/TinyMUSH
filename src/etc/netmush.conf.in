@@ -2,16 +2,23 @@
 #
 # See 'wizhelp config parameters' for more information. 
 #
-# -- Default filenames and path for the database. These are now 
-#    define in mush.config but can also be set here for backward
-#    compatibility. If you uncomment them and changed GAMENAME 
-#    BIN, TEXT or DATA in mush.config, change these as well:
+# -- Default filenames and path for the server. These are now 
+#    define in here and mush.config is simply a shell script
+#    able to read them from here:
 #
-binary_home		./bin
-database_home		./data
-text_home		./text
-backup_home		./backups
+config_home		@sysconfdir@
+backup_home		@localstatedir@/backups@with_install_suffix@
+binary_home		@bindir@
+database_home		@localstatedir@/db@with_install_suffix@
+include_home		@includedir@
+lib_home		@libdir@
+libexec_home		@libexecdir@@with_install_suffix@
+log_home		@localstatedir@/log@with_install_suffix@
+pid_home		@localstatedir@/run@with_install_suffix@
+text_home		@datarootdir@
+
 compress_util		gzip
+
 #
 # -- Enable mail and comsys modules.
 #
@@ -21,13 +28,14 @@ module		comsys
 # -- Other basic defaults
 #
 port		6250
+mud_shortname	netmush
 mud_name	AnonyMUSH
 mud_owner	mush_admin@tinymush.net
 #
 # -- Standard text files.
 #
-raw_helpfile	news	text/news
-raw_helpfile	man	text/mushman
+raw_helpfile	news	news
+raw_helpfile	man	mushman
 #
 # -- Include important aliases.
 #
@@ -45,9 +53,9 @@ access		@find	disabled
 #
 # -- External +help and wiznews, if desired
 #
-# helpfile	+help		text/plushelp
-# helpfile	wiznews		text/wiznews
-# access	wiznews		wizard
+# helpfile	+help	plushelp
+# helpfile	wiznews	wiznews
+# access	wiznews	wizard
 #
 # -- Frequently-changed parameters
 #
