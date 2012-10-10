@@ -633,7 +633,7 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd) {
 
     MODULE *mp;
 
-    handle = lt_dlopen(tmprintf("%s.la", str));
+    handle = lt_dlopen(tmprintf("%s/%s.la", mudconf.modules_home, str));
 
     if (!handle) {
         STARTLOG(LOG_STARTUP, "CNF", "MOD")
@@ -1910,6 +1910,7 @@ CONF		conftable [] = {
     {(char *)"match_own_commands", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.match_mine, (long)"Non-players can match $-commands on themselves"},
     {(char *)"max_players", cf_int, CA_GOD, CA_WIZARD, &mudconf.max_players, 0},
     {(char *)"module", cf_module, CA_STATIC, CA_WIZARD, NULL, 0},
+    {(char *)"modules_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.modules_home, MBUF_SIZE},
     {(char *)"money_name_plural", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.many_coins, SBUF_SIZE},
     {(char *)"money_name_singular", cf_string, CA_GOD, CA_PUBLIC, (int *)&mudconf.one_coin, SBUF_SIZE},
     //{(char *)"motd_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.motd_file, MBUF_SIZE},

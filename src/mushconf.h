@@ -112,6 +112,8 @@ struct confdata {
     char 	*db_file;	/* MUSH's db file */
     char	*compressexe;	/* Executable run to compress file */
     char	*mudowner;	/* Email of the game owner */
+    char	*modules_home;	/* Base path for modules */
+    char	*game_home;	/* MUSH's working directory */
     int	have_pueblo;	/* Is Pueblo support compiled in? */
     int	have_zones;	/* Should zones be active? */
     int	port;		/* user port */

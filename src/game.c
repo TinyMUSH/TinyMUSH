@@ -2082,7 +2082,8 @@ int main(int argc, char *argv[]) {
      * Parse options
      */
 
-    mudconf.mud_shortname = XSTRDUP("tinymush", "main_mudconf_mud_shortname");
+    mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
+    mudconf.game_home=getcwd(NULL, 0);
 
     while ((c = getopt(argc, argv, "c:s")) != -1) {
         switch (c) {
@@ -2190,8 +2191,7 @@ int main(int argc, char *argv[]) {
     ENDLOG    
     add_helpfile(GOD, (char *)"main:add_helpfile", XSTRDUP(tmprintf("qhelp %s/qhelp", mudconf.txthome), "main_add_helpfile_qhelp"), 1);
     
-    logfile_init(mudconf.log_file);
-    write_pidfile(mudconf.pid_file);
+
         
     mudconf.guest_file =   XSTRDUP(tmprintf("%s/guest.txt", mudconf.txthome), "main_mudconf_guest_file");
     mudconf.conn_file =    XSTRDUP(tmprintf("%s/connect.txt", mudconf.txthome), "main_mudconf_conn_file");
@@ -2337,8 +2337,8 @@ int main(int argc, char *argv[]) {
          * really bad. Moreover, stdin gets closed and its descriptor
          * reused in tf_init. A double fclose of stdin would be a
          * really bad idea.
-         */
-        fclose(stdout);
+         */ 
+        //fclose(stdout);
     }
     /*
      * We have to do an update, even though we're starting up, because
@@ -2352,10 +2352,37 @@ int main(int argc, char *argv[]) {
      * will be hosed.
      */
     process_preload();
-    STARTLOG(LOG_STARTUP, "INI", "LOAD")
 
+    if (!(getppid()==1)) {
+        int forkstatus;
+        
+        forkstatus=fork();
+        
+        if(forkstatus<0) {
+            STARTLOG(LOG_STARTUP, "INI", "FORK")
+            log_printf("Unable to fork, %s", strerror(errno));
+            ENDLOG
+        } else if(forkstatus>0) {
+            exit(0);
+        } else {
+            setsid();
+            umask(027);
+            chdir(mudconf.game_home);
+        }
+        
+    }
+
+    write_pidfile(mudconf.pid_file);
+    logfile_init(mudconf.log_file);
+
+    STARTLOG(LOG_STARTUP, "INI", "LOAD")
     log_printf("Startup processing complete. (Process ID : %d)",  getpid());
     ENDLOG
+    
+    if (!mudstate.restarting) {
+        freopen(DEV_NULL, "w", stdout);
+        freopen(DEV_NULL, "w", stderr);
+    }
 
     /*
      * Startup is done.

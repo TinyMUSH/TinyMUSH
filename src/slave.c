@@ -319,9 +319,7 @@ int main(int argc, char **argv) {
 
             struct timeval interval;
 
-            interval.tv_sec = 300;	/*
-* 5 minutes
-*/
+            interval.tv_sec = 300;	/* 5 minutes */
             interval.tv_usec = 0;
             itime.it_interval = interval;
             itime.it_value = interval;

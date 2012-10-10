@@ -11,14 +11,12 @@ backup_home		@localstatedir@/backups@with_install_suffix@
 binary_home		@bindir@
 database_home		@localstatedir@/db@with_install_suffix@
 include_home		@includedir@
-lib_home		@libdir@
+modules_home		@libdir@
 libexec_home		@libexecdir@@with_install_suffix@
 log_home		@localstatedir@/log@with_install_suffix@
 pid_home		@localstatedir@/run@with_install_suffix@
 text_home		@datarootdir@
-
 compress_util		gzip
-
 #
 # -- Enable mail and comsys modules.
 #
