@@ -2769,6 +2769,7 @@ void dump_restart_db(void) {
     FILE *f;
     DESC *d;
     int version = 0;
+    char *dbf;
 
     /* We maintain a version number for the restart database,
      * so we can restart even if the format of the restart db
@@ -2778,8 +2779,11 @@ void dump_restart_db(void) {
     version |= RS_RECORD_PLAYERS;
     version |= RS_NEW_STRINGS;
     version |= RS_COUNT_REBOOTS;
+    
+    dbf=XSTRDUP(tmprintf("%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname), "dump_restart_db");
 
-    f = fopen("restart.db", "w");
+    f = fopen(dbf, "w");
+    XFREE(dbf, "dump_restart_db");
     fprintf(f, "+V%d\n", version);
     putref(f, sock);
     putlong(f, mudstate.start_time);
@@ -2810,12 +2814,14 @@ void load_restart_db(void) {
     FILE *f;
     DESC *d;
     DESC *p;
+    char *dbf;
 
     int val, version, new_strings = 0;
     char *temp, buf[8];
     struct stat fstatbuf;
 
-    f = fopen("restart.db", "r");
+    dbf=XSTRDUP(tmprintf("%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname), "load_restart_db");
+    f = fopen(dbf, "r");
     if (!f) {
         mudstate.restarting = 0;
         return;
@@ -2940,5 +2946,7 @@ void load_restart_db(void) {
     }
 
     fclose(f);
-    remove("restart.db");
+    
+    remove(dbf);
+    XFREE(dbf, "load_restart_db");
 }

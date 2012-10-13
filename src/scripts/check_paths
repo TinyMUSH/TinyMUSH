@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# $Id: check_paths,v 1.2 2002/06/29 03:21:29 rmg Exp $
-#
 #	check_paths - Make sure mush.config paths are valid.
 #		      Assumes mush.config has already been loaded in
 #		      this shell.

@@ -19,15 +19,17 @@ ETC_SRC      = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
 ETC_BUILD    = $(ETC_DIR)/netmush.conf
 
 SCRIPT_DIR   = $(srcdir)/scripts
+SCRIPT_SKEL  = $(SCRIPT_DIR)/Startmush.in
 SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index \
 	$(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash \
-	$(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/Startmush $(SCRIPT_DIR)/check_paths \
+	$(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths \
 	$(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
 SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config \
 	$(SCRIPT_DIR)/mtrace.awk
+SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
 
-EXTRA_DIST   = $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
-CLEANFILES   = version.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf
+EXTRA_DIST   = $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h m4/gnulib-cache.m4
+CLEANFILES   = version.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
 API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
@@ -59,7 +61,7 @@ nodist_netmush_SOURCES = version.h
 
 slave_SOURCES          = slave.c
 
-BUILT_SOURCES          = version.h tinymushapi.h netmush.conf
+BUILT_SOURCES          = version.h tinymushapi.h netmush.conf Startmush
 
 if WANT_DBM_GDBM
  SUBDIRS         += dbm/gdbm/
@@ -109,6 +111,10 @@ do_subst = $(SED) \
 netmush.conf: $(ETC_DIR)/netmush.conf.in
 	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
 	chmod +w $(ETC_DIR)/netmush.conf
+	
+Startmush: $(SCRIPT_DIR)/Startmush.in
+	$(do_subst) <$(SCRIPT_DIR)/Startmush.in >$(SCRIPT_DIR)/Startmush
+	chmod +x $(SCRIPT_DIR)/Startmush
 	
 version.h:
 	touch $(srcdir)/buildnum.data
@@ -188,6 +194,7 @@ install-exec-local:
 	$(mkinstalldirs) @prefix@
 	$(mkinstalldirs) @libexecdir@/@with_install_suffix@
 	$(install_sh_SCRIPT) $(SCRIPT_SRC) @libexecdir@/@with_install_suffix@
+	$(install_sh_SCRIPT) $(SCRIPT_BUILD) @libexecdir@/@with_install_suffix@
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
 install-data-local:
