@@ -70,7 +70,6 @@ void cf_init(void) {
 
     s = XMALLOC(MBUF_SIZE, "cf_init");
 
-    mudconf.status_file = XSTRDUP("shutdown.status", "cf_string");
     mudstate.modules_list = NULL;
     mudstate.modloaded[0] = '\0';
     mudconf.port = 6250;

@@ -1162,11 +1162,11 @@ void write_pidfile(char *fn) {
 
 void do_shutdown(dbref player, dbref cause, int key, char *message) {
     int fd;
+    char *msg;
 
     if (key & SHUTDN_COREDUMP) {
         if (player != NOTHING) {
-            raw_broadcast(0, "GAME: Aborted by %s",
-                          Name(Owner(player)));
+            raw_broadcast(0, "GAME: Aborted by %s", Name(Owner(player)));
             STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
             log_printf("Abort and coredump by ");
             log_name(player);
@@ -1185,6 +1185,8 @@ void do_shutdown(dbref player, dbref cause, int key, char *message) {
         return;
     }
     do_dbck(NOTHING, NOTHING, 0);	/* dump consistent state */
+    
+    fd = tf_open(mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
 
     if (player != NOTHING) {
         raw_broadcast(0, "GAME: Shutdown by %s", Name(Owner(player)));
@@ -1192,15 +1194,22 @@ void do_shutdown(dbref player, dbref cause, int key, char *message) {
         log_printf("Shutdown by ");
         log_name(player);
         ENDLOG
+        msg=XSTRDUP(tmprintf("Shutdown by %s. ",Name(Owner(player))), "do_shutdown");
+        (void)write(fd, msg, strlen(msg));
+        XFREE(msg, "do_shutdown");
     } else {
+        
         raw_broadcast(0, "GAME: Fatal Error: %s", message);
         STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
         log_printf("Fatal error: %s", message);
         ENDLOG
+        msg=XSTRDUP("Fatal Error: ", "do_shutdown");
+        (void)write(fd, msg, strlen(msg));
+        XFREE(msg, "do_shutdown");
     }
     STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
     log_printf("Shutdown status: %s", message);
-    ENDLOG fd = tf_open(mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
+    ENDLOG
     (void)write(fd, message, strlen(message));
     (void)write(fd, (char *)"\n", 1);
     tf_close(fd);
@@ -2189,7 +2198,7 @@ int main(int argc, char *argv[]) {
     mudconf.log_file = XSTRDUP(tmprintf("%s/%s.log", mudconf.log_home, mudconf.mud_shortname), "main_mudconf_log_file");
     mudconf.pid_file = XSTRDUP(tmprintf("%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname), "main_mudconf_pid_file");    
     mudconf.db_file =  XSTRDUP(tmprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");    
-
+    mudconf.status_file = XSTRDUP(tmprintf("%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname), "main_mudconf_status_file");
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
