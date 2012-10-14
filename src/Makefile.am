@@ -18,7 +18,7 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c
 netmush_LDFLAGS        = -export-dynamic
 netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES   = $(LTDLDEPS) 
-nodist_netmush_SOURCES = version.h
+nodist_netmush_SOURCES = version.h defaults.h
 
 recover_SOURCES        = recover.c
 recover_LDADD          = $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
@@ -40,11 +40,11 @@ SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mu
 SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
 
 EXTRA_DIST   = libltdl/config//shtool $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES   = version.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+CLEANFILES   = version.h defaults.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
 API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
-BUILT_SOURCES          = version.h tinymushapi.h netmush.conf Startmush
+BUILT_SOURCES          = version.h tinymushapi.h defaults.h netmush.conf Startmush
 
 include_HEADERS        = tinymushapi.h
 
@@ -94,6 +94,10 @@ do_subst = $(SED) \
 netmush.conf: $(ETC_DIR)/netmush.conf.in
 	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
 	chmod +w $(ETC_DIR)/netmush.conf
+	
+defaults.h: defaults.h.in
+	$(do_subst) <defaults.h.in >defaults.h
+	chmod +w defaults.h
 	
 Startmush: $(SCRIPT_DIR)/Startmush.in
 	$(do_subst) <$(SCRIPT_DIR)/Startmush.in >$(SCRIPT_DIR)/Startmush

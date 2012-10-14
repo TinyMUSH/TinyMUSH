@@ -286,49 +286,6 @@ AC_ARG_WITH([global-regs], [AS_HELP_STRING([--with-global-regs=N], [use N global
 AC_MSG_RESULT([$with_global_regs])
 AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [${with_global_regs}], [How many global registers to use])
 
-
-dnl XXX Theses are going away...
-AC_MSG_CHECKING([default filename for the configuration])
-AC_ARG_WITH([conf-file], [AS_HELP_STRING([--with-conf-file=NAME], [default name of the config file @<:@default=netmush.conf@:>@])], [with_conf_file="$withval"], [with_conf_file="netmush.conf"])
-AC_MSG_RESULT([$with_conf_file])
-AC_DEFINE_UNQUOTED([CONF_FILE], ["${with_conf_file}"], [default config filename])
-
-AC_MSG_CHECKING([default filename for logs])
-AC_ARG_WITH([log-file], [AS_HELP_STRING([--with-log-file=NAME], [default name of the log file @<:@default=netmush.log@:>@])], [with_log_file="$withval"], [with_log_file="netmush.log"])
-AC_MSG_RESULT([$with_log_file])
-AC_DEFINE_UNQUOTED([LOG_FILE], ["${with_log_file}"], [default log filename])
-
-AC_MSG_CHECKING([default filename for the pid])
-AC_ARG_WITH([pid-file], [AS_HELP_STRING([--with-pid-file=NAME], [default name of the pid file @<:@default=netmush.pid@:>@])], [with_pid_file="$withval"], [with_pid_file="netmush.pid"])
-AC_MSG_RESULT([$with_pid_file])
-AC_DEFINE_UNQUOTED([PID_FILE], ["${with_pid_file}"], [default pid filename])
-
-AC_MSG_CHECKING([default filename for the db])
-AC_ARG_WITH([db-file], [AS_HELP_STRING([--with-db-file=NAME], [default name of the db file @<:@default=netmush.db@:>@])], [with_db_file="$withval"], [with_db_file="netmush.db"])
-AC_MSG_RESULT([$with_db_file])
-AC_DEFINE_UNQUOTED([DB_FILE], ["${with_db_file}"], [default db filename])
-
-AC_MSG_CHECKING([default filename for the crash db])
-AC_ARG_WITH([crash-file], [AS_HELP_STRING([--with-crash-file=NAME], [default name of the crash db file @<:@default=netmush.db.crash@:>@])], [with_crash_file="$withval"], [with_crash_file="netmush.db.crash"])
-AC_MSG_RESULT([$with_crash_file])
-AC_DEFINE_UNQUOTED([CRASH_FILE], ["${with_crash_file}"], [default crash db filename])
-
-AC_MSG_CHECKING([default name for the bin directory])
-AC_ARG_WITH([bin-dir], [AS_HELP_STRING([--with-bin-dir=NAME], [default name of the bin directory @<:@default=$bindir@:>@])], [with_bin_dir="$withval"], [with_bin_dir="$prefix/bin"])
-AC_MSG_RESULT([$with_bin_dir])
-AC_DEFINE_UNQUOTED([BIN_DIR], ["${with_bin_dir}"], [default bin dirname])
-
-AC_MSG_CHECKING([default name for the txt directory])
-AC_ARG_WITH([txt-dir], [AS_HELP_STRING([--with-txt-dir=NAME], [default name of the txt directory @<:@default=$datadir@:>@])], [with_txt_dir="$withval"], [with_txt_dir="$prefix/txt"])
-AC_MSG_RESULT([$with_txt_dir])
-AC_DEFINE_UNQUOTED([TXT_DIR], ["${with_txt_dir}"], [default txt dirname])
-
-AC_MSG_CHECKING([default name for the data directory])
-AC_ARG_WITH([data-dir], [AS_HELP_STRING([--with-data-dir=NAME], [default name of the data directory @<:@default=$localstatedir@:>@])], [with_data_dir="$withval"], [with_data_dir="$prefix/data"])
-AC_MSG_RESULT([$with_data_dir])
-AC_DEFINE_UNQUOTED([DATA_DIR], ["${with_data_dir}"], [default data dirname])
-dnl XXX
-
 AC_MSG_CHECKING([maximum length for player names])
 AC_ARG_WITH([pname-length], [AS_HELP_STRING([--with-pname-length=LENGTH], [maximum length for player names @<:@default=22@:>@])], [with_pname_length=$withval], [with_pname_length=22])
 AC_MSG_RESULT([$with_pname_length])
@@ -542,14 +499,6 @@ AX_PRINT([
             Help Text directory : %B$datarootdir%b
                  Data directory : %B$sysconfdir%b
 
-                      %BFilenames
--------------------------------%b
- default configuration filename : %B$with_conf_file%b
-           default log filename : %B$with_log_file%b
-           default pid filename : %B$with_pid_file%b
-            default db filename : %B$with_db_file%b
-         default crash filename : %B$with_crash_file%b
-         
                          %BLimits
 -------------------------------%b
         Length for player names : %B$with_pname_length%b

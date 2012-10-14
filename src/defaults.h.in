@@ -1,0 +1,22 @@
+/* defaults.h */
+
+#include "copyright.h"
+
+#ifndef __DEFAULTS_H
+#define __DEFAULTS_H
+
+#define DEFAULT_SHORTNAME "netmush"
+#define DEFAULT_COMPRESS_UTIL "gzip"
+
+#define DEFAULT_BACKUP_HOME "@localstatedir@/backups@with_install_suffix@"
+#define DEFAULT_BINARY_HOME "@bindir@"
+#define DEFAULT_CONFIG_FILE "@sysconfdir@/netmush.conf"
+#define DEFAULT_CONFIG_HOME "@sysconfdir@"
+#define DEFAULT_DATABASE_HOME "@localstatedir@/db@with_install_suffix@"
+#define DEFAULT_LOG_HOME "@localstatedir@/log@with_install_suffix@"
+#define DEFAULT_MODULES_HOME "@libdir@"
+#define DEFAULT_PID_HOME "@localstatedir@/run@with_install_suffix@"
+#define DEFAULT_SCRIPTS_HOME "@libexecdir@@with_install_suffix@"
+#define DEFAULT_TEXT_HOME "@datarootdir@"
+
+#endif	/* __DEFAULTS_H */

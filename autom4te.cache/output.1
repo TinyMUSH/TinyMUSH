@@ -1812,14 +1812,6 @@ enable_time_checking
 enable_cpu_checking
 with_malloc_wrapper
 with_global_regs
-with_conf_file
-with_log_file
-with_pid_file
-with_db_file
-with_crash_file
-with_bin_dir
-with_txt_dir
-with_data_dir
 with_pname_length
 with_env_vars
 with_max_args
@@ -2551,17 +2543,6 @@ Optional Packages:
                           number from 10 to 36. Set lower to conserve memory
                           if you don't need all the possible registers
                           @<:@default=36@:>@
-  --with-conf-file=NAME   default name of the config file
-                          @<:@default=netmush.conf@:>@
-  --with-log-file=NAME    default name of the log file @<:@default=netmush.log@:>@
-  --with-pid-file=NAME    default name of the pid file @<:@default=netmush.pid@:>@
-  --with-db-file=NAME     default name of the db file @<:@default=netmush.db@:>@
-  --with-crash-file=NAME  default name of the crash db file
-                          @<:@default=netmush.db.crash@:>@
-  --with-bin-dir=NAME     default name of the bin directory @<:@default=@S|@bindir@:>@
-  --with-txt-dir=NAME     default name of the txt directory @<:@default=@S|@datadir@:>@
-  --with-data-dir=NAME    default name of the data directory
-                          @<:@default=@S|@localstatedir@:>@
   --with-pname-length=LENGTH 
                           maximum length for player names @<:@default=22@:>@
   --with-env-vars=NUMBER  Number of env vars (%0 et al) @<:@default=10@:>@
@@ -32901,151 +32882,6 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the configuration" >&5
-$as_echo_n "checking default filename for the configuration... " >&6; }
-
-@%:@ Check whether --with-conf-file was given.
-if test "${with_conf_file+set}" = set; then :
-  withval=$with_conf_file; with_conf_file="$withval"
-else
-  with_conf_file="netmush.conf"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_conf_file" >&5
-$as_echo "$with_conf_file" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define CONF_FILE "${with_conf_file}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for logs" >&5
-$as_echo_n "checking default filename for logs... " >&6; }
-
-@%:@ Check whether --with-log-file was given.
-if test "${with_log_file+set}" = set; then :
-  withval=$with_log_file; with_log_file="$withval"
-else
-  with_log_file="netmush.log"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_log_file" >&5
-$as_echo "$with_log_file" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define LOG_FILE "${with_log_file}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the pid" >&5
-$as_echo_n "checking default filename for the pid... " >&6; }
-
-@%:@ Check whether --with-pid-file was given.
-if test "${with_pid_file+set}" = set; then :
-  withval=$with_pid_file; with_pid_file="$withval"
-else
-  with_pid_file="netmush.pid"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_pid_file" >&5
-$as_echo "$with_pid_file" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define PID_FILE "${with_pid_file}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the db" >&5
-$as_echo_n "checking default filename for the db... " >&6; }
-
-@%:@ Check whether --with-db-file was given.
-if test "${with_db_file+set}" = set; then :
-  withval=$with_db_file; with_db_file="$withval"
-else
-  with_db_file="netmush.db"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_db_file" >&5
-$as_echo "$with_db_file" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define DB_FILE "${with_db_file}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default filename for the crash db" >&5
-$as_echo_n "checking default filename for the crash db... " >&6; }
-
-@%:@ Check whether --with-crash-file was given.
-if test "${with_crash_file+set}" = set; then :
-  withval=$with_crash_file; with_crash_file="$withval"
-else
-  with_crash_file="netmush.db.crash"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_crash_file" >&5
-$as_echo "$with_crash_file" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define CRASH_FILE "${with_crash_file}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the bin directory" >&5
-$as_echo_n "checking default name for the bin directory... " >&6; }
-
-@%:@ Check whether --with-bin-dir was given.
-if test "${with_bin_dir+set}" = set; then :
-  withval=$with_bin_dir; with_bin_dir="$withval"
-else
-  with_bin_dir="$prefix/bin"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_bin_dir" >&5
-$as_echo "$with_bin_dir" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define BIN_DIR "${with_bin_dir}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the txt directory" >&5
-$as_echo_n "checking default name for the txt directory... " >&6; }
-
-@%:@ Check whether --with-txt-dir was given.
-if test "${with_txt_dir+set}" = set; then :
-  withval=$with_txt_dir; with_txt_dir="$withval"
-else
-  with_txt_dir="$prefix/txt"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_txt_dir" >&5
-$as_echo "$with_txt_dir" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define TXT_DIR "${with_txt_dir}"
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking default name for the data directory" >&5
-$as_echo_n "checking default name for the data directory... " >&6; }
-
-@%:@ Check whether --with-data-dir was given.
-if test "${with_data_dir+set}" = set; then :
-  withval=$with_data_dir; with_data_dir="$withval"
-else
-  with_data_dir="$prefix/data"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_data_dir" >&5
-$as_echo "$with_data_dir" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-@%:@define DATA_DIR "${with_data_dir}"
-_ACEOF
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum length for player names" >&5
 $as_echo_n "checking maximum length for player names... " >&6; }
 
@@ -38073,14 +37909,6 @@ if test -z ; then :
             Help Text directory : %B$datarootdir%b
                  Data directory : %B$sysconfdir%b
 
-                      %BFilenames
--------------------------------%b
- default configuration filename : %B$with_conf_file%b
-           default log filename : %B$with_log_file%b
-           default pid filename : %B$with_pid_file%b
-            default db filename : %B$with_db_file%b
-         default crash filename : %B$with_crash_file%b
-         
                          %BLimits
 -------------------------------%b
         Length for player names : %B$with_pname_length%b
@@ -38129,14 +37957,6 @@ else
             Help Text directory : %B$datarootdir%b
                  Data directory : %B$sysconfdir%b
 
-                      %BFilenames
--------------------------------%b
- default configuration filename : %B$with_conf_file%b
-           default log filename : %B$with_log_file%b
-           default pid filename : %B$with_pid_file%b
-            default db filename : %B$with_db_file%b
-         default crash filename : %B$with_crash_file%b
-         
                          %BLimits
 -------------------------------%b
         Length for player names : %B$with_pname_length%b

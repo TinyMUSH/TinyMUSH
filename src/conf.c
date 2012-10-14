@@ -14,6 +14,7 @@
 #include "udb_defs.h" /* required by mudconf */
 #include "typedefs.h"           /* required by mudconf */
 #include "mushconf.h"		/* required by code */
+#include "defaults.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
 #include "externs.h"		/* required by interface */
@@ -85,14 +86,18 @@ void cf_init(void) {
     mudconf.guest_prefixes = XSTRDUP("", "cf_string");
     mudconf.guest_suffixes = XSTRDUP("", "cf_string");
 
-    mudconf.compressexe = XSTRDUP("gzip", "cf_string");
+    mudconf.compressexe = XSTRDUP(DEFAULT_COMPRESS_UTIL, "cf_string");
 
     mudconf.mudowner = XSTRDUP("", "cf_string");
 
-    mudconf.binhome = XSTRDUP("./bin", "cf_string");
-    mudconf.dbhome = XSTRDUP("./var/db/tinymush", "cf_string");
-    mudconf.txthome = XSTRDUP("./share/tinymush", "cf_string");
-    mudconf.bakhome = XSTRDUP("./var/backups/tinymush", "cf_string");
+    mudconf.binhome = XSTRDUP(DEFAULT_BINARY_HOME, "cf_string");
+    mudconf.dbhome = XSTRDUP(DEFAULT_DATABASE_HOME, "cf_string");
+    mudconf.txthome = XSTRDUP(DEFAULT_TEXT_HOME, "cf_string");
+    mudconf.bakhome = XSTRDUP(DEFAULT_BACKUP_HOME, "cf_string");
+    mudconf.modules_home =  XSTRDUP(DEFAULT_MODULES_HOME, "cf_string");
+    mudconf.scripts_home = XSTRDUP(DEFAULT_SCRIPTS_HOME, "cf_string");
+    mudconf.log_home = XSTRDUP(DEFAULT_LOG_HOME, "cf_string");
+    mudconf.pid_home = XSTRDUP(DEFAULT_PID_HOME, "cf_string");
     
     /* 
      * We can make theses NULL because we are going to define

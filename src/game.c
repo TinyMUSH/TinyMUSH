@@ -26,7 +26,7 @@
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
 #include "pcre.h"		/* required by code */
-//#include "ltdl.h"
+#include "defaults.h"		/* required by code */
 
 extern void init_attrtab(void);
 
@@ -1804,11 +1804,11 @@ int dbconvert(int argc, char *argv[]) {
 
     int c, dbclean, errflg = 0;
 
-    char *opt_conf = (char *)CONF_FILE;
+    char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
 
-    char *opt_datadir = (char *)DATA_DIR;
+    char *opt_datadir = (char *)DEFAULT_DATABASE_HOME;
 
-    char *opt_gdbmfile = (char *)DB_FILE;
+    char *opt_gdbmfile = (char *)DEFAULT_CONFIG_FILE;
 
     FILE *f;
 
@@ -2093,26 +2093,16 @@ int main(int argc, char *argv[]) {
      * Parse options
      */
 
-    mudconf.mud_shortname = XSTRDUP("netmush", "main_mudconf_mud_shortname");
+    mudconf.mud_shortname = XSTRDUP(DEFAULT_SHORTNAME, "main_mudconf_mud_shortname");
+    mudconf.config_file = XSTRDUP(DEFAULT_CONFIG_FILE, "main_mudconf_mud_config_file");
+    mudconf.config_home = XSTRDUP(DEFAULT_CONFIG_HOME, "main_mudconf_mud_config_home");
     mudconf.game_home=getcwd(NULL, 0);
-
 
     while ((c = getopt(argc, argv, "c:s")) != -1) {
         switch (c) {
         case 'c':
             mudconf.config_file = XSTRDUP(optarg, "main_mudconf_mud_config_file");
             mudconf.config_home = XSTRDUP(realpath(dirname(mudconf.config_file), NULL), "main_mudconf_mud_config_home");
-            /* Make sure we can read the config file */
-            
-            fp = fopen(mudconf.config_file, "r");
-            
-            if(fp != NULL) {
-                fclose(fp);
-                gotcfg = 1;
-            } else {
-                fprintf(stderr, "Unable to read configuration file %s.\n", mudconf.config_file);
-                gotcfg = 0;
-            }
             break;
         case 's':
             mindb = 1;
@@ -2123,15 +2113,22 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /* Make sure we can read the config file */
+    
+    fp = fopen(mudconf.config_file, "r");
+    
+    if(fp != NULL) {
+        fclose(fp);
+        gotcfg = 1;
+    } else {
+        fprintf(stderr, "Unable to read configuration file %s.\n", mudconf.config_file);
+        gotcfg = 0;
+    }    
+
     if (errflg || gotcfg == 0) {
         fprintf(stderr, "Usage: %s [-s] [-c config_file]\n", argv[0]);
         exit(1);
     }
-
-    
-    //mudconf.config_file = XSTRDUP(tmprintf("%s.conf", mudconf.mud_shortname), "main_mudconf_config_file");
-    //mudconf.log_file = XSTRDUP(tmprintf("%s.log", mudconf.mud_shortname), "main_mudconf_log_file");
-    //mudconf.pid_file = XSTRDUP(tmprintf("%s.pid", mudconf.mud_shortname), "main_mudconf_pidfile");
 
     /*
      * Abort if someone tried to set the number of global registers to

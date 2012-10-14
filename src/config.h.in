@@ -8,9 +8,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* default bin dirname */
-#undef BIN_DIR
-
 /* Define to the number of bits in type 'ptrdiff_t'. */
 #undef BITSIZEOF_PTRDIFF_T
 
@@ -33,12 +30,6 @@
    non-IEEE-754 'long double' values. */
 #undef CHECK_PRINTF_SAFE
 
-/* default config filename */
-#undef CONF_FILE
-
-/* default crash db filename */
-#undef CRASH_FILE
-
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -46,9 +37,6 @@
 
 /* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
-
-/* default data dirname */
-#undef DATA_DIR
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'double'. */
@@ -62,9 +50,6 @@
 
 /* Define as the word index where to find the sign of 'double'. */
 #undef DBL_SIGNBIT_WORD
-
-/* default db filename */
-#undef DB_FILE
 
 /* DB_SQL use no driver driver */
 #undef DB_SQL_DRIVER
@@ -1655,9 +1640,6 @@
 /* Define as the word index where to find the sign of 'long double'. */
 #undef LDBL_SIGNBIT_WORD
 
-/* default log filename */
-#undef LOG_FILE
-
 /* Define to 1 if 'lstat' dereferences a symlink specified with a trailing
    slash. */
 #undef LSTAT_FOLLOWS_SLASHED_SYMLINK
@@ -1811,9 +1793,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* default pid filename */
-#undef PID_FILE
-
 /* Max length for player names */
 #undef PLAYER_NAME_LIMIT
 
@@ -1912,9 +1891,6 @@
 
 /* Support for cpu time checking */
 #undef TRACK_USER_TIME
-
-/* default txt dirname */
-#undef TXT_DIR
 
 /* Define if tzset clobbers localtime's static buffer. */
 #undef TZSET_CLOBBERS_LOCALTIME
