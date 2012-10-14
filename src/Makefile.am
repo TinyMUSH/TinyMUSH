@@ -16,6 +16,7 @@ netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c
 	interface.h match.h mushconf.h pcre.h powers.h slave.h system.h \
 	typedefs.h udb.h udb_defs.h vattr.h walkdb.h
 netmush_LDFLAGS        = -export-dynamic
+netmush_SKEL           = defaults.h.in
 netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES   = $(LTDLDEPS) 
 nodist_netmush_SOURCES = version.h defaults.h
@@ -39,7 +40,7 @@ SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(
 SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
 SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
 
-EXTRA_DIST   = libltdl/config//shtool $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
+EXTRA_DIST   = libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
 CLEANFILES   = version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
 API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
