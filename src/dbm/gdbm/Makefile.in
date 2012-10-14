@@ -14,6 +14,8 @@
 
 @SET_MAKE@
 
+#ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -50,9 +52,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = dbm/gdbm
+subdir = src/dbm/gdbm
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/libltdl/config/depcomp COPYING
+	$(top_srcdir)/src/libltdl/config/depcomp COPYING
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/canonicalize.m4 \
@@ -113,22 +115,22 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/warn-on-use.m4 $(top_srcdir)/m4/wchar_h.m4 \
 	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
 	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/libltdl/m4/argz.m4 \
-	$(top_srcdir)/libltdl/m4/libtool.m4 \
-	$(top_srcdir)/libltdl/m4/ltdl.m4 \
-	$(top_srcdir)/libltdl/m4/ltoptions.m4 \
-	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
-	$(top_srcdir)/libltdl/m4/ltversion.m4 \
-	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
-	$(top_srcdir)/modules/db_sql/m4/ax_check_msql.m4 \
-	$(top_srcdir)/modules/db_sql/m4/ax_check_mysql.m4 \
-	$(top_srcdir)/modules/db_sql/m4/ax_check_pgsql.m4 \
-	$(top_srcdir)/modules/db_sql/m4/ax_lib_sqlite3.m4 \
+	$(top_srcdir)/src/libltdl/m4/argz.m4 \
+	$(top_srcdir)/src/libltdl/m4/libtool.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltdl.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltoptions.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltsugar.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltversion.m4 \
+	$(top_srcdir)/src/libltdl/m4/lt~obsolete.m4 \
+	$(top_srcdir)/src/modules/db_sql/m4/ax_check_msql.m4 \
+	$(top_srcdir)/src/modules/db_sql/m4/ax_check_mysql.m4 \
+	$(top_srcdir)/src/modules/db_sql/m4/ax_check_pgsql.m4 \
+	$(top_srcdir)/src/modules/db_sql/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
@@ -144,8 +146,8 @@ am_libtinygdbm_a_OBJECTS = gdbmbucket.$(OBJEXT) gdbmfalloc.$(OBJEXT) \
 nodist_libtinygdbm_a_OBJECTS =
 libtinygdbm_a_OBJECTS = $(am_libtinygdbm_a_OBJECTS) \
 	$(nodist_libtinygdbm_a_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/libltdl/config/depcomp
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
+depcomp = $(SHELL) $(top_srcdir)/src/libltdl/config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -882,8 +884,6 @@ LIBADD_DL = @LIBADD_DL@
 LIBADD_DLD_LINK = @LIBADD_DLD_LINK@
 LIBADD_DLOPEN = @LIBADD_DLOPEN@
 LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
-LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
-LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -893,6 +893,7 @@ LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_SELECT = @LIB_SELECT@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LTALLOCA = @LTALLOCA@
 LTDLDEPS = @LTDLDEPS@
 LTDLINCL = @LTDLINCL@
 LTDLOPEN = @LTDLOPEN@
@@ -1247,7 +1248,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 with_install_suffix = @with_install_suffix@
-ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 noinst_LIBRARIES = libtinygdbm.a
 libtinygdbm_a_SOURCES = gdbmbucket.c gdbmfalloc.c gdbmfindkey.c gdbmclose.c gdbmdelete.c gdbmerrno.c gdbmexists.c gdbmfdesc.c gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c gdbmstore.c gdbmsync.c gdbmglobal.c gdbmhash.c gdbmupdate.c gdbmversion.c gdbmextern.h gdbmconst.h gdbmdefs.h gdbmerrno.h gdbmproto.h gdbmsystems.h gdbmcopyright.h
 nodist_libtinygdbm_a_SOURCES = libtinygdbm.h
@@ -1268,9 +1268,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu dbm/gdbm/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/dbm/gdbm/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu dbm/gdbm/Makefile
+	  $(AUTOMAKE) --gnu src/dbm/gdbm/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

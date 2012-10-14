@@ -1,407 +1,370 @@
-
-*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
-***                                                          ***
-*** THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE  ***
-*** FOR NOW, THE QUICK AND DIRTY INSTALL INSTRUCTIONS ARE:   ***
-***                                                          ***
-*** $ cd src                                                 ***
-*** $ ./configure --help                                     ***
-***                                                          ***
-***            READ HELP AND SELECT KNOBS YOU NEED           ***
-***                                                          ***
-*** $ ./configure <wathever knobs you need>                  ***
-*** $ make                                                   ***
-***                                                          ***
-***   THE NEXT STEP WILL OVERWRITE ANYTHING ALREADY IN THE   ***
-***                      game DIRECTORY                      ***
-***                                                          ***
-*** $ make install                                           ***
-***                                                          ***
-***  The rest is basically the same,  check the Changelog    ***
-***                                                          ***
-*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
-
-INSTALLATION
-
-TinyMUSH 3 should be straightforward to install and run.
-
-The installation process assumes that you are familiar with basic Unix
-commands. If you are not familiar with basic Unix commands, you will
-probably need the help of someone with at least some Unix familiarity,
-in order to be able to reliably run your game. Also, your local
-bookstore can probably recommend some good books for Unix beginners,
-such as "Unix for Dummies" or "Unix for the Impatient".
-
-*Please* read the FAQ file. It contains important information about
-how to configure the server, make backups of your database, report
-bugs, and the like.
-
-----------------------------------------------------------------------------
-
-TABLE OF CONTENTS
-
-- One-step installation
-- Simple custom installation
-- Step-by-step installation
-- Starting a new game
-- Upgrading from TinyMUSH 3.0
-- Converting from another MU* type
-- Compatibility
-- System Requirements
-
-----------------------------------------------------------------------------
-
-ONE-STEP INSTALLATION
-
-If you want to build the server using the standard default configuration,
-just type:
-
-./Build
-
-(You must be in the directory that this INSTALL file is in.)
-
-When the build finishes, assuming there are no errors, you are ready to
-start a new MUSH, or convert an existing MUSH to TinyMUSH 3.
-
-If the build fails for some reason, look in the section of this
-install guide titled COMPATIBILITY for help.
-
-----------------------------------------------------------------------------
-
-SIMPLE CUSTOM INSTALLATION
-
-For your convenience, the Build script accepts options to be passed to
-the configure script. For more information, type:
-
-./Build --help
-
-(You must be in the directory that this INSTALL file is in.)
-
-This will show you a long list of optional features you can enable or
-disable using configure options, including modules, and lists the
-default settings. Make a note of the options you would like to use,
-and then run the Build script with those options. For example, to
-build the mush without Pueblo client support, you'd type:
-
-./Build --disable-pueblo
-
-(You must be in the directory that this INSTALL file is in.)
-
-When the build finishes, assuming there are no errors, you are ready to
-start a new MUSH, or convert an existing MUSH to TinyMUSH 3.
-
-If the build fails for some reason, look in the section of this
-install guide titled COMPATIBILITY for help.
-
-----------------------------------------------------------------------------
-
-STEP-BY-STEP INSTALLATION
-
-If you decide not to use the one-step install, or you encounter problems
-in the one-step install, the installation process is as follows:
-
-- Go to the top-level directory (the directory where this INSTALL file
-  is normally located).
-
-- Go into the directory for GNU dbm; 'cd src/gdbm-1.8.0' should take
-  you there.
-
-- Type './configure --enable-shared=no --enable-static=yes', then type
-  'make' . This will compile the GNU dbm library, which is required by
-  TinyMUSH 3.
-
-  Please Note: TinyMUSH 3 requires gdbm-1.8.0! If gdbm is already
-  installed on your system, chances are that it's version 1.7.3 or
-  earlier -- do NOT ignore this step.
-
-- Go back to the src directory ('cd ..').
-
-- View options for the configure script, by typing './configure --help'.
-  This will show you a long list of optional features you can enable or
-  disable using configure options, including modules, and lists the
-  default settings. Make a note of the options you would like to use.
-
-- Run the configure script, by typing './configure' followed by the
-  options you've selected. This will customize autoconf.h and the
-  Makefile for your system. If you have gcc (the GNU C compiler)
-  installed on your system, it will automatically be selected as the
-  compiler of choice.
-
-- Edit the Makefile and make any changes that might be necessary (go down
-  to the line that says 'CONFIGURATION SECTION'). Note that most of the
-  options that used to be set in this section are now set with ./configure
-  options. See the notes on Compatibility, later in this file, for some
-  operating-system-specific notes and modifications that might need to be
-  made that are not handled by the configure script.
-
-- Edit config.h and select the configuration options you want. The options
-  are documented in that file.
-
-- CAUTION: You CANNOT use your system GDBM libraries. TinyMUSH's included
-  GDBM library contains modifications specific to TinyMUSH, as well as
-  bugfixes. The auto-configuration will build and link tinygdbm; do not
-  change this!
-
-- To build the program (updating the dependencies if needed, producing a
-  number of binaries, as well as modules, and linking them into the
-  appropriate place in the directory structure),
-
-  If you are a bash, ksh, pdksh, bsh, or sh shell user, type:
-
-	make 2>&1 | tee Compile.log
-
-  If you are a csh or tcsh shell user, type:
-
-	make |& tee Compile.log
-
-  If you can't get either of the above to work, type:
-
-	make | tee Compile.log
-
-  To find out what shell you're using, type 'basename $SHELL'.
-
-  The record of the compilation will be saved in a file called Compile.log
-  (If the build fails for some reason, look in the section of this install
-  guide titled COMPATIBILITY for help.)
-
-- You are now ready to start a new game, or convert an existing game to
-  TinyMUSH 3.
-
-----------------------------------------------------------------------------
-
-STARTING A NEW GAME
-
-- Go into the game directory ('cd game' or 'cd ../game' should do it).
-
-- Edit mush.config, according to the directions in that file.
-
-- If you changed GAMENAME in mush.config, you will need to rename
-  netmush.conf to the appropriate thing (i.e., if GAMENAME is foo,
-  then you should 'mv netmush.conf foo.conf').
-
-- Edit that conf file (netmush.conf, or whatever you renamed it to).
-  Put in whatever configuration parameters are appropriate.
-
-- Start the game by typing './Startmush'.
-
-- Connect to the game using telnet or a MUD client. Log in the "God"
-  character with 'connect #1 potrzebie'.
-
-- Change the password of the God character; make sure you make it something
-  that you can remember, but which can't be guessed by someone else!
-  Type '@password potrzebie = YourNewPassword', where YourNewPassword
-  is the new password that you've chosen.
-
-- You are now ready to build your game. It is strongly recommended that
-  the God character only be logged in when absolutely necessary; create
-  another character for yourself and give it the Wizard flag, for day
-  to day use.
-
-- You may want to make sure that you can back up and restore your database:
-  Type '@shutdown'. Then, from the game directory, type './Backup'. If the
-  backup finishes successfully, type './Restore FILENAME' (where FILENAME
-  is the name of the backup file). If this finishes successfully, then
-  type './Startmush' to start the game again.
-
-  If you encounter problems at this stage, you have an installation
-  problem. The most common is a problem with GNU dbm; this is likely
-  the cause if you @shutdown, type './Startmush', and find that the
-  attributes in your database are gone. If this happens to you, check
-  your configuration and rebuild the netmush binary, if necessary.
-
-----------------------------------------------------------------------------
-
-UPGRADING FROM TINYMUSH 3.0
-
-For the sake of these examples, we will assume that your TinyMUSH 3.0
-installation is in ~/3.0/ and your TinyMUSH 3.1 installation is in
-~/3.1/ -- change these pathnames to whatever they actually are.
-
-Do NOT overwrite your 3.0 installation with 3.1! Once you have upgraded
-and tested to make sure your game is running properly, you can delete
-your 3.0 installation if you want to.
-
-- Go into the game directory from your TinyMUSH 3.0 install:  cd ~/3.0/game
-
-- Make an archive (using the old 3.0 binaries!) via ./Archive
-  It will be called <your game name>-archive.<date>.tar.gz
-  The examples below call it netmush-archive.0213-1548.tar.gz -- substitute
-  the filename of your own archive. (You may want to make sure you save
-  an extra copy of this file somewhere, since it's the archive of all
-  of your files from the 3.0 installation.)
-
-- Go into the 3.1 game directory:  cd ~/3.1/game
-
-- Preserve the current mush.config file:  mv mush.config mush.config.default
-
-- Inflate the archive file:
-  gzip -dc ~/3.0/game/netmush-archive.0213-1548.tar.gz | tar -xvf -
-
-  This will write the files into your current, 3.1 directory. If you are
-  given the option to overwrite files, do so; you want to replace the
-  existing defaults.
-
-- Edit the mush.config.default file. Replace the GAMENAME and OWNER
-  values with your own game name and email address of the owner. (Look
-  at the mush.config file you got from inflating an archive, if you
-  need a reminder of what they were.)
- 
-- Overwrite your old mush.config file with the new one:
-  mv -f mush.config.default mush.config
-
-- Edit your game's conf file. It should be called GAMENAME.conf, where
-  GAMENAME is whatever you set GAMENAME to in mush.config  -- it's named
-  whatever you called it in your 3.0 installation and should have been
-  placed in your 3.1 game directory when you expanded the archive.
-
-  - If you have the following parameters set, simply remove them:
-    cache_depth
-    cache_width
-    input_database
-    output_database
-    mail_database
-    comsys_database
-    have_comsys
-    have_mailer
-    format_exits
-    format_contents
-
-  - If you were using the built-in comsys, add this line:
-    module comsys
-
-  - If you were using the built-in mailer, add this line:
-    module mail
-
-  - If you had your database files in the data directory, add this line:
-    database_home data
-    (If you have your database files in another directory, substitute that
-    in instead. Pathnames are relative to the ~/3.1/game directory.)
-
-  - If you have the gdbm_database parameter in your conf file, edit it
-    to take away any prepending path. For instance, if your conf file reads:
-    gdbm_database data/netmush.gdbm
-    change it to read:
-    gdbm_database netmush.gdbm
-
-  - If you have the crash_database parameter in your conf file, edit it
-    to take away any prepending path. For instance, if your conf file reads:
-    crash_database data/netmush.db.CRASH
-    change it to read:
-    crash_database netmush.db.CRASH
-
-- Convert your database to the new 3.1 format via the following:
-  ./Restore netmush.flat.02313-1548
-  (Substitute the name of whatever flatfile was in your archive.)
-
-- Rename your comsys and mail databases to the new 3.1 names:
-  mv comsys.db mod_comsys.db
-  mv mail.db mod_mail.db
-
-  You may need to go into your data directory ('cd data') in order to do
-  this; if you do, you should then return to the 3.1 game directory
-  ('cd ..') once you've moved the files.
-
-- Start the game by typing './Startmush'.
-
-- Connect to your game, and verify that it's running correctly.
-
-- You may want to make sure that you can back up and restore your database:
-  Type '@shutdown'. Then, from the game directory, type './Backup'. If the
-  backup finishes successfully, type './Restore FILENAME' (where FILENAME
-  is the name of the backup file; it will have a .tar.gz extension). If
-  this finishes successfully, then type './Startmush' to start the game
-  again.
-
-  If you encounter problems at this stage, you have an installation
-  problem. The most common is a problem with GNU dbm; this is likely
-  the cause if you @shutdown, type './Startmush', and find that the
-  attributes in your database are gone. If this happens to you, check
-  your configuration and rebuild the netmush binary, if necessary.
-
-----------------------------------------------------------------------------
-
-CONVERTING FROM ANOTHER MU* TYPE
-
-If you are upgrading from TinyMUSH 2.2, read the file 'CONVERT.TINY22'
-for instructions.
-
-If you are upgrading from TinyMUX 1.x, read the file 'CONVERT.MUX' for 
-instructions.
-
-There is, at present, no automated conversion from TinyMUX 2 or PennMUSH.
-
-----------------------------------------------------------------------------
-
-COMPATIBILITY
-
-TinyMUSH 3 is believed to be compatible with all major versions of
-Unix, including SunOS 4.1.x, Solaris, Irix, AIX, HP-UX, NetBSD, Linux,
-and MacOS X. There is no official native Windows NT/2000 port, at present,
-but it will work with the Cygwin or UWIN libraries.
-
-TinyMUSH 3.1 utilizes dynamically loadable modules on many platforms,
-thanks to the GNU libtool project, and will be statically linked with
-its modules on platforms that do not support dynamic loading.
-
-The frequent releases of new Linux versions, the proliferation of
-multiple Linux development paths, and the incompatibility between
-multiple versions of the C header files and GNU C library incorporated
-into most current versions of Linux, make it very difficult to
-maintain "out of the box" 100% compatibility with every version of
-Linux. If you are on a Linux system, it is possible that you will
-need to make minor tweaks to the Makefile and/or autoconf.h,
-particularly if you are running a Linux release more recent than
-the release date of this server version.
-
-The Build script (or the directions given above for step-by-step
-installation) produces a file in the src directory called Compile.log;
-if the compile fails, the developers would like to know what it failed
-on so it can be fixed in future releases (and so they can assist you
-in getting the server to work on your system), so please mail
-tinymush-bugs@lists.sourceforge.net with that file included or attached,
-as well as the output of the command 'uname -a' and any other relevant
-details about your machine's specific configuration. If you figured
-out what you needed to change in order to make the build successful,
-please include those instructions in your email, as well.
-
-----------------------------------------------------------------------------
-
-SYSTEM REQUIREMENTS
-
-The hardware requirements are minimal, by the standards of modern Unix
-servers.  You will need a machine with at least 16 MB of physical RAM,
-and at least 10 MB of available disk space for the game.
-
-The RAM requirements (actual RAM used) typically vary between 2 and 15
-MB; unless your game is huge (more than 50,000 objects), cache tuning
-should ensure that you do not consume more RAM.
-
-The network bandwidth needs are minimal; even with a very large MUSH,
-it is unlikely that you will pass more than 25 kbps. The average MUSH
-user transfers fewer bytes in an entire session, than does someone
-viewing a single typical web page.
-
-However, if you plan to run your game over an analog dialup connection
-(typically 14.4 kbps - 56 kbps), be aware that latency will affect the
-number of commands that have queued up interactively over a given
-timeslice, and that you should increase the queue_active_chunk config
-parameter.
-
-It is important that you allocate enough disk space; should you ever
-run out of it, you will end up with serious database corruption. If
-your disks are close to capacity, make sure that you do frequent
-backups.
-
-There are no significant security concerns involved in running a MUSH
-on a server, save for possibly increasing its "visibility" on the Internet
-and therefore making it the target of more attempts to breach the
-system's security. The MUSH server can run comfortably in a chroot'd
-environment, and does not provide any players with access to the
-filesystem or underlying system.
-
-Nonetheless, you should also obtain the consent of your systems
-administrator before running a MUSH on a system. Virtually all
-Internet service providers ban the running of MUDs on their shell
-machines. Therefore, you will probably need either a MUD hosting
-service or a personal server, if you plan to run a public game.
-
+Installation Instructions
+*************************
+
+Copyright (C) 1994-1996, 1999-2002, 2004-2012 Free Software Foundation,
+Inc.
+
+   Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.  This file is offered as-is,
+without warranty of any kind.
+
+Basic Installation
+==================
+
+   Briefly, the shell commands `./configure; make; make install' should
+configure, build, and install this package.  The following
+more-detailed instructions are generic; see the `README' file for
+instructions specific to this package.  Some packages provide this
+`INSTALL' file but do not implement all of the features documented
+below.  The lack of an optional feature in a given package is not
+necessarily a bug.  More recommendations for GNU packages can be found
+in *note Makefile Conventions: (standards)Makefile Conventions.
+
+   The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory of the package.
+It may also create one or more `.h' files containing system-dependent
+definitions.  Finally, it creates a shell script `config.status' that
+you can run in the future to recreate the current configuration, and a
+file `config.log' containing compiler output (useful mainly for
+debugging `configure').
+
+   It can also use an optional file (typically called `config.cache'
+and enabled with `--cache-file=config.cache' or simply `-C') that saves
+the results of its tests to speed up reconfiguring.  Caching is
+disabled by default to prevent problems with accidental use of stale
+cache files.
+
+   If you need to do unusual things to compile the package, please try
+to figure out how `configure' could check whether to do them, and mail
+diffs or instructions to the address given in the `README' so they can
+be considered for the next release.  If you are using the cache, and at
+some point `config.cache' contains results you don't want to keep, you
+may remove or edit it.
+
+   The file `configure.ac' (or `configure.in') is used to create
+`configure' by a program called `autoconf'.  You need `configure.ac' if
+you want to change it or regenerate `configure' using a newer version
+of `autoconf'.
+
+   The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and type
+     `./configure' to configure the package for your system.
+
+     Running `configure' might take a while.  While running, it prints
+     some messages telling which features it is checking for.
+
+  2. Type `make' to compile the package.
+
+  3. Optionally, type `make check' to run any self-tests that come with
+     the package, generally using the just-built uninstalled binaries.
+
+  4. Type `make install' to install the programs and any data files and
+     documentation.  When installing into a prefix owned by root, it is
+     recommended that the package be configured and built as a regular
+     user, and only the `make install' phase executed with root
+     privileges.
+
+  5. Optionally, type `make installcheck' to repeat any self-tests, but
+     this time using the binaries in their final installed location.
+     This target does not install anything.  Running this target as a
+     regular user, particularly if the prior `make install' required
+     root privileges, verifies that the installation completed
+     correctly.
+
+  6. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.  To also remove the
+     files that `configure' created (so you can compile the package for
+     a different kind of computer), type `make distclean'.  There is
+     also a `make maintainer-clean' target, but that is intended mainly
+     for the package's developers.  If you use it, you may have to get
+     all sorts of other programs in order to regenerate files that came
+     with the distribution.
+
+  7. Often, you can also type `make uninstall' to remove the installed
+     files again.  In practice, not all packages have tested that
+     uninstallation works correctly, even though it is required by the
+     GNU Coding Standards.
+
+  8. Some packages, particularly those that use Automake, provide `make
+     distcheck', which can by used by developers to test that all other
+     targets like `make install' and `make uninstall' work correctly.
+     This target is generally not run by end users.
+
+Compilers and Options
+=====================
+
+   Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  Run `./configure --help'
+for details on some of the pertinent environment variables.
+
+   You can give `configure' initial values for configuration parameters
+by setting variables in the command line or in the environment.  Here
+is an example:
+
+     ./configure CC=c99 CFLAGS=-g LIBS=-lposix
+
+   *Note Defining Variables::, for more details.
+
+Compiling For Multiple Architectures
+====================================
+
+   You can compile the package for more than one kind of computer at the
+same time, by placing the object files for each architecture in their
+own directory.  To do this, you can use GNU `make'.  `cd' to the
+directory where you want the object files and executables to go and run
+the `configure' script.  `configure' automatically checks for the
+source code in the directory that `configure' is in and in `..'.  This
+is known as a "VPATH" build.
+
+   With a non-GNU `make', it is safer to compile the package for one
+architecture at a time in the source code directory.  After you have
+installed the package for one architecture, use `make distclean' before
+reconfiguring for another architecture.
+
+   On MacOS X 10.5 and later systems, you can create libraries and
+executables that work on multiple system types--known as "fat" or
+"universal" binaries--by specifying multiple `-arch' options to the
+compiler but only a single `-arch' option to the preprocessor.  Like
+this:
+
+     ./configure CC="gcc -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+                 CXX="g++ -arch i386 -arch x86_64 -arch ppc -arch ppc64" \
+                 CPP="gcc -E" CXXCPP="g++ -E"
+
+   This is not guaranteed to produce working output in all cases, you
+may have to build one architecture at a time and combine the results
+using the `lipo' tool if you have problems.
+
+Installation Names
+==================
+
+   By default, `make install' installs the package's commands under
+`/usr/local/bin', include files under `/usr/local/include', etc.  You
+can specify an installation prefix other than `/usr/local' by giving
+`configure' the option `--prefix=PREFIX', where PREFIX must be an
+absolute file name.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+pass the option `--exec-prefix=PREFIX' to `configure', the package uses
+PREFIX as the prefix for installing programs and libraries.
+Documentation and other data files still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=DIR' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.  In general, the
+default for these options is expressed in terms of `${prefix}', so that
+specifying just `--prefix' will affect all of the other directory
+specifications that were not explicitly provided.
+
+   The most portable way to affect installation locations is to pass the
+correct locations to `configure'; however, many packages provide one or
+both of the following shortcuts of passing variable assignments to the
+`make install' command line to change installation locations without
+having to reconfigure or recompile.
+
+   The first method involves providing an override variable for each
+affected directory.  For example, `make install
+prefix=/alternate/directory' will choose an alternate location for all
+directory configuration variables that were expressed in terms of
+`${prefix}'.  Any directories that were specified during `configure',
+but not in terms of `${prefix}', must each be overridden at install
+time for the entire installation to be relocated.  The approach of
+makefile variable overrides for each directory variable is required by
+the GNU Coding Standards, and ideally causes no recompilation.
+However, some platforms have known limitations with the semantics of
+shared libraries that end up requiring recompilation when using this
+method, particularly noticeable in packages that use GNU Libtool.
+
+   The second method involves providing the `DESTDIR' variable.  For
+example, `make install DESTDIR=/alternate/directory' will prepend
+`/alternate/directory' before all installation names.  The approach of
+`DESTDIR' overrides is not required by the GNU Coding Standards, and
+does not work on platforms that have drive letters.  On the other hand,
+it does better at avoiding recompilation issues, and works well even
+when some directory options were not specified in terms of `${prefix}'
+at `configure' time.
+
+Optional Features
+=================
+
+   If the package supports it, you can cause programs to be installed
+with an extra prefix or suffix on their names by giving `configure' the
+option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+
+   Some packages pay attention to `--enable-FEATURE' options to
+`configure', where FEATURE indicates an optional part of the package.
+They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+is something like `gnu-as' or `x' (for the X Window System).  The
+`README' should mention any `--enable-' and `--with-' options that the
+package recognizes.
+
+   For packages that use the X Window System, `configure' can usually
+find the X include and library files automatically, but if it doesn't,
+you can use the `configure' options `--x-includes=DIR' and
+`--x-libraries=DIR' to specify their locations.
+
+   Some packages offer the ability to configure how verbose the
+execution of `make' will be.  For these packages, running `./configure
+--enable-silent-rules' sets the default to minimal output, which can be
+overridden with `make V=1'; while running `./configure
+--disable-silent-rules' sets the default to verbose, which can be
+overridden with `make V=0'.
+
+Particular systems
+==================
+
+   On HP-UX, the default C compiler is not ANSI C compatible.  If GNU
+CC is not installed, it is recommended to use the following options in
+order to use an ANSI C compiler:
+
+     ./configure CC="cc -Ae -D_XOPEN_SOURCE=500"
+
+and if that doesn't work, install pre-built binaries of GCC for HP-UX.
+
+   HP-UX `make' updates targets which have the same time stamps as
+their prerequisites, which makes it generally unusable when shipped
+generated files such as `configure' are involved.  Use GNU `make'
+instead.
+
+   On OSF/1 a.k.a. Tru64, some versions of the default C compiler cannot
+parse its `<wchar.h>' header file.  The option `-nodtk' can be used as
+a workaround.  If GNU CC is not installed, it is therefore recommended
+to try
+
+     ./configure CC="cc"
+
+and if that doesn't work, try
+
+     ./configure CC="cc -nodtk"
+
+   On Solaris, don't put `/usr/ucb' early in your `PATH'.  This
+directory contains several dysfunctional programs; working variants of
+these programs are available in `/usr/bin'.  So, if you need `/usr/ucb'
+in your `PATH', put it _after_ `/usr/bin'.
+
+   On Haiku, software installed for all users goes in `/boot/common',
+not `/usr/local'.  It is recommended to use the following options:
+
+     ./configure --prefix=/boot/common
+
+Specifying the System Type
+==========================
+
+   There may be some features `configure' cannot figure out
+automatically, but needs to determine by the type of machine the package
+will run on.  Usually, assuming the package is built to be run on the
+_same_ architectures, `configure' can figure that out, but if it prints
+a message saying it cannot guess the machine type, give it the
+`--build=TYPE' option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name which has the form:
+
+     CPU-COMPANY-SYSTEM
+
+where SYSTEM can have one of these forms:
+
+     OS
+     KERNEL-OS
+
+   See the file `config.sub' for the possible values of each field.  If
+`config.sub' isn't included in this package, then this package doesn't
+need to know the machine type.
+
+   If you are _building_ compiler tools for cross-compiling, you should
+use the option `--target=TYPE' to select the type of system they will
+produce code for.
+
+   If you want to _use_ a cross compiler, that generates code for a
+platform different from the build platform, you should specify the
+"host" platform (i.e., that on which the generated programs will
+eventually be run) with `--host=TYPE'.
+
+Sharing Defaults
+================
+
+   If you want to set default values for `configure' scripts to share,
+you can create a site shell script called `config.site' that gives
+default values for variables like `CC', `cache_file', and `prefix'.
+`configure' looks for `PREFIX/share/config.site' if it exists, then
+`PREFIX/etc/config.site' if it exists.  Or, you can set the
+`CONFIG_SITE' environment variable to the location of the site script.
+A warning: not all `configure' scripts look for a site script.
+
+Defining Variables
+==================
+
+   Variables not defined in a site shell script can be set in the
+environment passed to `configure'.  However, some packages may run
+configure again during the build, and the customized values of these
+variables may be lost.  In order to avoid this problem, you should set
+them in the `configure' command line, using `VAR=value'.  For example:
+
+     ./configure CC=/usr/local2/bin/gcc
+
+causes the specified `gcc' to be used as the C compiler (unless it is
+overridden in the site shell script).
+
+Unfortunately, this technique does not work for `CONFIG_SHELL' due to
+an Autoconf limitation.  Until the limitation is lifted, you can use
+this workaround:
+
+     CONFIG_SHELL=/bin/bash ./configure CONFIG_SHELL=/bin/bash
+
+`configure' Invocation
+======================
+
+   `configure' recognizes the following options to control how it
+operates.
+
+`--help'
+`-h'
+     Print a summary of all of the options to `configure', and exit.
+
+`--help=short'
+`--help=recursive'
+     Print a summary of the options unique to this package's
+     `configure', and exit.  The `short' variant lists options used
+     only in the top level, while the `recursive' variant lists options
+     also present in any nested packages.
+
+`--version'
+`-V'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`--cache-file=FILE'
+     Enable the cache: use and save the results of the tests in FILE,
+     traditionally `config.cache'.  FILE defaults to `/dev/null' to
+     disable caching.
+
+`--config-cache'
+`-C'
+     Alias for `--cache-file=config.cache'.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.  To
+     suppress all normal output, redirect it to `/dev/null' (any error
+     messages will still be shown).
+
+`--srcdir=DIR'
+     Look for the package's source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`--prefix=DIR'
+     Use DIR as the installation prefix.  *note Installation Names::
+     for more details, including other options available for fine-tuning
+     the installation locations.
+
+`--no-create'
+`-n'
+     Run the configure checks, but stop before creating any output
+     files.
+
+`configure' also accepts some other, not widely useful, options.  Run
+`configure --help' for more details.
