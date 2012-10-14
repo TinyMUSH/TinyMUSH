@@ -52,7 +52,7 @@ void do_version(dbref player, dbref cause, int extra) {
     ptr = repeatchar(strlen(string), '-');
     notify(player, tmprintf("%s\n%s\n", string, ptr));
     XFREE(ptr, "repeatchar");
-    notify(player, tmprintf("   Build number: %s (%s)", MUSH_BUILD_NUM, MUSH_BUILD_DATE));
+    notify(player, tmprintf("     Build date: %s", MUSH_BUILD_DATE));
     if (Wizard(player)) {
 #ifdef HAVE_SYS_UTSNAME_H
         uname(&bpInfo);
@@ -123,8 +123,6 @@ void init_version(void) {
     mudstate.dbmdriver = XSTRDUP(tmprintf("%s", MUSH_DBM), "init_version");
     STARTLOG(LOG_ALWAYS, "INI", "START")
     log_printf("       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE);
-    ENDLOG STARTLOG(LOG_ALWAYS, "INI", "START")
-    log_printf("   Build number: %s", MUSH_BUILD_NUM);
     ENDLOG STARTLOG(LOG_ALWAYS, "INI", "START")
     log_printf("     Build date: %s", MUSH_BUILD_DATE);
     ENDLOG STARTLOG(LOG_ALWAYS, "INI", "START")

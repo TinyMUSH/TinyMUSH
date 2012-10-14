@@ -40,7 +40,7 @@ SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mu
 SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
 
 EXTRA_DIST   = libltdl/config//shtool $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES   = version.h defaults.h buildnum.data tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+CLEANFILES   = version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
 API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
@@ -104,8 +104,6 @@ Startmush: $(SCRIPT_DIR)/Startmush.in
 	chmod +x $(SCRIPT_DIR)/Startmush
 	
 version.h:
-	touch buildnum.data
-	expr 0`cat buildnum.data` + 1 > buildnum.data
 	rm -f version.h
 	touch version.h
 	chmod +w version.h
@@ -113,7 +111,6 @@ version.h:
 	echo '#ifndef __VERSION_H' >> version.h
 	echo '#define __VERSION_H' >> version.h
 	echo "#define MUSH_BUILD_DATE \"`date`\"" >> version.h
-	echo "#define MUSH_BUILD_NUM \"`cat buildnum.data`\"" >> version.h
 	echo "#define MUSH_BUILD_COMPILE \"$(COMPILE)\"" >> version.h
 	echo "#define MUSH_BUILD_LTCOMPILE \"$(LTCOMPILE)\"" >> version.h
 	echo '#endif /* __VERSION_H */' >> version.h
