@@ -1511,7 +1511,7 @@ void do_restart(dbref player, dbref cause, int key) {
         lt_dlclose(mp->handle);
     }
 
-    execl(mudconf.exec_path, mudconf.exec_path, (char *)"-c", mudconf.config_file, NULL);
+    execl(mudconf.exec_path, mudconf.exec_path, (char *) "-r" ,(char *)"-c", mudconf.config_file, NULL);
 }
 
 /* ---------------------------------------------------------------------------

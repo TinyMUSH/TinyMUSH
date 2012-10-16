@@ -37,13 +37,10 @@ void pool_init(int poolnum, int poolsize) {
 static void pool_err(const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason) {
     if (!mudstate.logging) {
         STARTLOG(logflag, logsys, "ALLOC")
-        log_printf("%s[%d] (tag %s) %s at %lx. (%s)",
-                   action, pools[poolnum].pool_size, tag,
-                   reason, (long)ph, mudstate.debug_cmd);
+        log_printf("%s[%d] (tag %s) %s at %lx. (%s)", action, pools[poolnum].pool_size, tag, reason, (long)ph, mudstate.debug_cmd);
         ENDLOG
     } else if (logflag != LOG_ALLOCATE) {
-        log_printf("\n***< %s[%d] (tag %s) %s at %lx. >***",
-                   action, pools[poolnum].pool_size, tag, reason, (long)ph);
+        log_printf("\n***< %s[%d] (tag %s) %s at %lx. >***", action, pools[poolnum].pool_size, tag, reason, (long)ph);
     }
 }
 
@@ -459,9 +456,7 @@ static void trace_free(const char *name, void (ptr) {
         if (tptr->bptr == ptr) {
             if (strcmp(tptr->buf_tag, name)) {
                 STARTLOG(LOG_BUGS, "MEM", "TRACE")
-                log_printf
-                ("Free mismatch, tag %s allocated as %s",
-                 name, tptr->buf_tag);
+                log_printf("Free mismatch, tag %s allocated as %s", name, tptr->buf_tag);
                 ENDLOG
             }
             if (mudstate.raw_allocs == tptr)

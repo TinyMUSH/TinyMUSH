@@ -96,6 +96,79 @@ extern char *optarg;
 
 extern int optind;
 
+
+/*
+ * Used to figure out if netmush is already running. Since there's
+ * so many differences between sysctl implementation, i prefer to
+ * call pgrep. If every system would do like FreeBSD and implement
+ * PIDFILE(3), the world would be a better place!
+ */
+
+pid_t isrunning(char *pidfile) {
+    FILE *fp;
+    pid_t pid=0, rpid=0;
+    int i=0;
+    char buff[MBUF_SIZE];
+    
+    fp=fopen(pidfile, "r");
+    
+    if(fp == NULL)
+        return(0);
+    
+    fgets(buff, MBUF_SIZE, fp);
+    
+    fclose(fp);
+    
+    pid = (pid_t)strtol(buff, (char **)NULL, 10);
+    
+    fp = popen("pgrep netmush", "r");
+    
+    if( fp == NULL)
+        return(0);
+        
+    while(fgets(buff, MBUF_SIZE, fp)!=NULL) {
+        rpid=(pid_t)strtol(buff, (char **)NULL, 10);
+        if(pid == rpid) {
+            i = 1;
+            break;
+        }
+    }
+    
+    pclose(fp);
+    
+    if(i)
+        return(pid);
+    
+    return(0);    
+}
+
+/*
+ * Read the last line of a file and compare
+ * with the given key. Return 1 of they
+ * match.
+ */
+
+int tailfind(char *file, char *key) {
+    int fp;
+    char s[MBUF_SIZE];
+    off_t pos;
+    
+    fp=open(file, O_RDONLY);
+    
+    if(fp < 0) {
+        return(0);
+    }
+    
+    pos = lseek(fp, 0 - strlen(key), SEEK_END);
+    read(fp, s, strlen(key));
+    close(fp);
+    
+    if(strncmp(s, key, strlen(key))==0) 
+        return(1);
+    return(0);
+}
+
+
 /*
  * used to allocate storage for temporary stuff, cleared before command
  * execution
@@ -1587,9 +1660,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
     for (lp = logfds_table; lp->log_flag; lp++) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
-            rename(lp->filename,
-                   tmprintf("%s.%ld", lp->filename,
-                           (long)mudstate.now));
+            rename(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now));
             lp->fileptr = fopen(lp->filename, "w");
             if (lp->fileptr)
                 setbuf(lp->fileptr, NULL);
@@ -2048,6 +2119,8 @@ int main(int argc, char *argv[]) {
     int i, c;
 
     int errflg = 0, gotcfg = 0;
+    
+    pid_t pid;
 
     char *s;
 
@@ -2098,7 +2171,7 @@ int main(int argc, char *argv[]) {
     mudconf.config_home = XSTRDUP(DEFAULT_CONFIG_HOME, "main_mudconf_mud_config_home");
     mudconf.game_home=getcwd(NULL, 0);
 
-    while ((c = getopt(argc, argv, "c:s")) != -1) {
+    while ((c = getopt(argc, argv, "c:sr")) != -1) {
         switch (c) {
         case 'c':
             mudconf.config_file = XSTRDUP(optarg, "main_mudconf_mud_config_file");
@@ -2106,6 +2179,9 @@ int main(int argc, char *argv[]) {
             break;
         case 's':
             mindb = 1;
+            break;
+        case 'r':
+            mudstate.restarting = 1;
             break;
         default:
             errflg++;
@@ -2196,6 +2272,52 @@ int main(int argc, char *argv[]) {
     mudconf.pid_file = XSTRDUP(tmprintf("%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname), "main_mudconf_pid_file");    
     mudconf.db_file =  XSTRDUP(tmprintf("%s.db", mudconf.mud_shortname), "main_mudconf_db_file");    
     mudconf.status_file = XSTRDUP(tmprintf("%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname), "main_mudconf_status_file");
+    
+    pid = isrunning(mudconf.pid_file);
+    
+    if(pid) {
+        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+        log_printf("The MUSH already seems to be running at pid %ld.", (long)pid);  
+        ENDLOG exit(2);
+    }
+    
+    if(tailfind(mudconf.log_file, "GDBM panic: write error\n")) {
+	STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+	log_printf("Log indicate the last run ended with GDBM panic: write error");
+	ENDLOG
+        fprintf(stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n");
+        fprintf(stderr, "while trying to write to the database. This error normally\n");
+        fprintf(stderr, "occurs with an out-of-disk-space problem, though it might also\n");
+        fprintf(stderr, "be the result of disk-quota-exceeded, or an NFS server issue.\n");
+        fprintf(stderr, "Please check to make sure that this condition has been fixed,\n");
+        fprintf(stderr, "before restarting the MUSH.\n\n");
+        fprintf(stderr, "This error may also indicates that the issue prevented the MUSH\n");
+        fprintf(stderr, "from writing out the data it was trying to save to disk, which\n");
+        fprintf(stderr, "means that you may have suffered from some database corruption.\n");
+        fprintf(stderr, "Please type the following now, to ensure database integrity:\n\n");
+        fprintf(stderr, "    ./Reconstruct\n");
+        fprintf(stderr, "    ./Backup\n");
+        fprintf(stderr, "    mv -f %s %s.old\n\n", mudconf.log_file, mudconf.log_file);
+        fprintf(stderr, "If this is all successful, you may type ./Startmush again to\n");
+        fprintf(stderr, "restart the MUSH. If the recovery attempt fails, you will\n");
+        fprintf(stderr, "need to restore from a previous backup.\n\n");
+	exit(2);
+    }
+    
+    if(!mudstate.restarting) {
+        s = XSTRDUP(tmprintf("%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname), "test_restart_db");
+        i = open(s, O_RDONLY);
+        if(i>=0) {
+            close(i);
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("There is a restart database, %s, present. Please delete it before attempting to start the MUSH.", s);
+            ENDLOG
+            XFREE(s, "test_restart_db");
+            exit(2);
+        }
+        close(i);
+    }
+    
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
@@ -2406,6 +2528,10 @@ int main(int argc, char *argv[]) {
     ENDLOG
     
     if (!mudstate.restarting) {
+        /* Cosmetic, force a newline to stderr to clear console logs */
+        fprintf(stderr, "\n");
+        fflush(stderr);
+        fflush(stdout);
         freopen(DEV_NULL, "w", stdout);
         freopen(DEV_NULL, "w", stderr);
     }
