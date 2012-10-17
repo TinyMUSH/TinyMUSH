@@ -2464,6 +2464,9 @@ int main(int argc, char *argv[]) {
 
     handlestartupflatfiles(HANDLE_FLAT_KILL);
     handlestartupflatfiles(HANDLE_FLAT_CRASH);
+    
+
+    
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
@@ -2520,6 +2523,21 @@ int main(int argc, char *argv[]) {
 
     fcache_init();
     helpindex_init();
+    
+    /* 
+     * If after doing all that stuff, there is still no db, create a minimal one.
+     */
+     
+    s = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "test_mindb");
+    
+    if(!fileexist(s)) {
+        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+        log_printf("No database exist, creating a new database.");
+        ENDLOG
+        mindb=1;
+    }
+    
+    XFREE(s, "test_mindb");
 
     if (mindb)
         unlink(mudconf.db_file);
