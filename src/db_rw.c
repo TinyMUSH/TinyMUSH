@@ -1093,7 +1093,9 @@ int db_read(void) {
     data = db_get(key, DBTYPE_DBINFO);
 
     if (!data.dptr) {
-        mainlog_printf("\n------------------------------\n- Could not open main record -\n------------------------------\n\n");
+        STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
+        log_printf("Could not open main record");
+        ENDLOG
         return -1;
     }
     /*
@@ -1141,7 +1143,9 @@ int db_read(void) {
                     /*
                      * Houston, we have a problem
                      */
-                    mainlog_printf("\nError reading attribute number %d\n", j + ENTRY_BLOCK_STARTS(i, blksize));
+                    STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
+                    log_printf("Error reading attribute number %d", j + ENTRY_BLOCK_STARTS(i, blksize));
+                    ENDLOG
                 }
                 s++;
             }
@@ -1153,8 +1157,11 @@ int db_read(void) {
      * Load the object structures
      */
 
-    if (mudstate.standalone)
-        mainlog_printf("Reading ");
+    if (mudstate.standalone) {
+        STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
+        log_printf("Reading ");
+        ENDLOG
+        }
 
     blksize = OBJECT_BLOCK_SIZE;
 

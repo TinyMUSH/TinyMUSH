@@ -96,6 +96,8 @@ extern char *optarg;
 
 extern int optind;
 
+void recover(char *);
+
 
 /*
  * Used to figure out if netmush is already running. Since there's
@@ -158,6 +160,79 @@ int fileexist(char *file) {
     
     return(1);
 }
+#define HANDLE_FLAT_CRASH	1
+#define HANDLE_FLAT_KILL	2
+
+int handlestartupflatfiles(int flag) {
+    char *db, *flat, *db_bak, *flat_bak;
+    int i;
+    struct stat sb1, sb2;
+
+    db = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "handlestartupflatfiles");
+    flat = XSTRDUP(tmprintf("%s/%s.%s", mudconf.dbhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ), "handlestartupflatfiles");
+    db_bak = XSTRDUP(tmprintf("%s/%s.%ld", mudconf.dbhome, mudconf.db_file, time(NULL)), "handlestartupflatfiles");
+    flat_bak = XSTRDUP(tmprintf("%s/%s.%s.%ld", mudconf.dbhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ,time(NULL)), "handlestartupflatfiles");
+    
+    i = open(flat, O_RDONLY);
+    if(i>0) {
+        fstat(i,&sb1);
+        close(i);
+        stat(db,&sb2);
+        if(tailfind(flat, "***END OF DUMP***\n")) {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A non-corrupt %s file is present.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+            ENDLOG
+            if(difftime(sb1.st_mtime, sb2.st_mtime) > (double)0) { 
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("The %s file is newer than your current database.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+                ENDLOG
+                if(rename(db, db_bak) != 0) {
+                    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                    log_printf("Unable to archive previous db to : %s", db_bak);
+                    ENDLOG
+                }
+                recover(flat);
+                if(unlink(flat) != 0) {
+                    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                    log_printf("Unable to delete : %s", flat);
+                    ENDLOG
+                } 
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("Recovery successfull");
+                ENDLOG
+            } else {
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("The %s file is older than your current database.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+                ENDLOG
+                if(rename(flat, flat_bak) == 0) {
+                    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                    log_printf("Older %s file archived as : %s", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"), flat_bak);
+                    ENDLOG
+                } else {
+                    STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                    log_printf("Unable to archive %s file as : %s", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"), flat_bak);
+                    ENDLOG
+                }
+            }
+        } else {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A corrupt %s file is present.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+            ENDLOG
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            if(!rename(flat, flat_bak)) {
+                log_printf("Archived as : %s, using previous db to load", flat_bak);
+            } else {
+                log_printf("Unable to archive %s file, using previous db to load", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+            }
+            ENDLOG
+        }
+    }
+
+    XFREE(db, "handlestartupflatfiles");
+    XFREE(flat, "handlestartupflatfiles");
+    XFREE(db_bak, "handlestartupflatfiles");
+    XFREE(flat_bak, "handlestartupflatfiles");
+}
 
 /*
  * Read the last line of a file and compare
@@ -196,7 +271,7 @@ void do_dump(dbref player, dbref cause, int key) {
         notify(player, "Dumping. Please try again later.");
         return;
     }
-    notify(player, "Dumping...");
+    notify(player, "Dumping");
     fork_and_dump(player, cause, key);
 }
 
@@ -1485,7 +1560,7 @@ void fork_and_dump(dbref player, dbref cause, int key) {
         raw_broadcast(0, "%s", mudconf.postdump_msg);
         
     if (!Quiet(player) && (player != NOTHING))
-        notify(player, "Done.");
+        notify(player, "Done");
 }
 
 static int load_game(void) {
@@ -2336,13 +2411,13 @@ int main(int argc, char *argv[]) {
     pid = isrunning(mudconf.pid_file);
     
     if(pid) {
-        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+        STARTLOG(LOG_ALWAYS, "INI", "FATAL")
         log_printf("The MUSH already seems to be running at pid %ld.", (long)pid);  
         ENDLOG exit(2);
     }
     
     if(tailfind(mudconf.log_file, "GDBM panic: write error\n")) {
-	STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+	STARTLOG(LOG_ALWAYS, "INI", "FATAL")
 	log_printf("Log indicate the last run ended with GDBM panic: write error");
 	ENDLOG
         fprintf(stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n");
@@ -2370,107 +2445,25 @@ int main(int argc, char *argv[]) {
         if(i>=0) {
             close(i);
             STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("There is a restart database, %s, present. Please delete it before attempting to start the MUSH.", s);
+            log_printf("There is a restart database, %s, present.", s);
             ENDLOG
-            XFREE(s, "test_restart_db");
-            exit(2);
-        }
-        close(i);
-    }
-    
-    s = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "test_mudconf_db");
-    s1 = XSTRDUP(tmprintf("%s/%s.KILLED", mudconf.dbhome, mudconf.db_file), "test_killed_db");
-    s2 = XSTRDUP(tmprintf("%s/%s.%ld", mudconf.dbhome, mudconf.db_file, time(NULL)), "test_mudconf_db");
-    s3 = XSTRDUP(tmprintf("%s/%s.KILLED.%ld", mudconf.dbhome, mudconf.db_file, time(NULL)), "test_killed_db");
-    i = open(s1, O_RDONLY);
-    if(i>0) {
-        close(i);
-        if(tailfind(s, "***END OF DUMP***\n")) {
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("A non-corrupt %s file is present.", s1);
-            ENDLOG
-            if(rename(s, s2) != 0) {
-                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("Unable to archive previous db to : %s", s2);
-                ENDLOG
-            }
-            recover(s1);
             if(unlink(s1) != 0) {
+                STARTLOG(LOG_ALWAYS, "INI", "FATAL")
+                log_printf("Unable to delete : %s, remove it before restarting the MUSH.", s);
+                XFREE(s, "test_restart_db");
+                ENDLOG
+                exit(2);
+            } else {
                 STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("Unable to delete : %s", s2);
-                ENDLOG       
-            } 
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("Recovery successfull. Previous db archived as : %s", s2);
-            ENDLOG
+                log_printf("%s deleted.", s);
+                ENDLOG
+            }
+        }
+        XFREE(s, "test_restart_db");
+    }
 
-        } else {
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("A corrupt %s file is present.", s1);
-            ENDLOG
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            if(!rename(s1, s3)) {
-                log_printf("Archived as : %s, using previous db to load", s3);
-            } else {
-                
-                log_printf("Unable to archive the KILLED file, using previous db to load");
-            }
-            ENDLOG
-        }
-    }
-    XFREE(s1, "test_killed_db");
-    XFREE(s3, "test_killed_db");
-       
-    s1 = XSTRDUP(tmprintf("%s/%s.CRASH", mudconf.dbhome, mudconf.db_file), "test_crash_db");
-    s3 = XSTRDUP(tmprintf("%s/%s.CRASH.%ld", mudconf.dbhome, mudconf.db_file, time(NULL)), "test_crash_db");
-    stat(s, &sb2);
-    i = open(s1, O_RDONLY);
-    if(i>0) {
-        fstat(i, &sb1);
-        close(i);
-        if(tailfind(s1, "***END OF DUMP***\n")) {
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("A non-corrupt %s file is present.", s1);
-            ENDLOG
-            if(difftime(sb1.st_mtime, sb2.st_mtime) > (double)0) {	/* Crash file is newer */
-                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("The crash file is newer than your current database.");
-                ENDLOG
-                rename(s, s2);
-                recover(s1);
-                unlink(s1);
-                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("Recovery successfull. Previous db archived as : %s", s2);
-                ENDLOG
-            } else {
-                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("The crash file is older than your current database");
-                ENDLOG
-                unlink(s1);
-                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-                log_printf("%s deleted, using the previous db to load");
-                ENDLOG
-            }
-        } else {
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            log_printf("A corrupt %s file is present.", s1);
-            ENDLOG
-            mudstate.now = time(NULL);
-            s = XSTRDUP(tmprintf("%s/%s.db.%ld", mudconf.dbhome, mudconf.mud_shortname), "test_killed_db");
-            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            if(!rename(s1, s3)) {
-                log_printf("Archived as : %s, using previous db to load", s3);
-            } else {
-                log_printf("Unable to archive the CRASH file, using previous db to load");
-            }
-            ENDLOG
-        }
-    }
-    
-    XFREE(s1, "test_mudconf_db");
-    XFREE(s1, "test_crash_db");
-    XFREE(s1, "test_mudconf_db");
-    XFREE(s3, "test_crash_db");    
+    handlestartupflatfiles(HANDLE_FLAT_KILL);
+    handlestartupflatfiles(HANDLE_FLAT_CRASH);
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
@@ -2531,7 +2524,7 @@ int main(int argc, char *argv[]) {
     if (mindb)
         unlink(mudconf.db_file);
     if (init_gdbm_db(mudconf.db_file) < 0) {
-        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+        STARTLOG(LOG_ALWAYS, "INI", "FATAL")
         log_printf("Couldn't load text database: %s", mudconf.db_file);
         ENDLOG exit(2);
     }
@@ -2543,7 +2536,7 @@ int main(int argc, char *argv[]) {
         db_make_minimal();
         CALL_ALL_MODULES_NOCACHE("make_minimal", (void), ());
     } else if (load_game() < 0) {
-        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+        STARTLOG(LOG_ALWAYS, "INI", "FATAL")
         log_printf("Couldn't load objects.");
         ENDLOG exit(2);
     }

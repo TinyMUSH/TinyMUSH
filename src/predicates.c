@@ -1102,7 +1102,7 @@ void do_delcommand(dbref player, dbref cause, int key, char *name, char *command
             XFREE(old->cmdname, "delcommand.cmdname");
             XFREE(old, "delcommand.cmdp");
             reset_prefix_cmds();
-            notify(player, "Done.");
+            notify(player, "Done");
             return;
         } else {
             for (nextp = (ADDENT *) old->info.added; nextp != NULL;
@@ -1192,7 +1192,7 @@ void do_delcommand(dbref player, dbref cause, int key, char *name, char *command
                               "delcommand.addent");
                     }
                     reset_prefix_cmds();
-                    notify(player, "Done.");
+                    notify(player, "Done");
                     return;
                 }
                 prev = nextp;

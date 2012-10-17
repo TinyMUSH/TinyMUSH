@@ -2698,7 +2698,7 @@ int init_gdbm_db(char *gdbmfile) {
     dddb_setfile(gdbmfile);
     dddb_init();
     STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-    log_printf("Using gdbm file: %s", gdbmfile);
+    log_printf("Using db file: %s", gdbmfile);
     ENDLOG
     db_free();
     return (0);

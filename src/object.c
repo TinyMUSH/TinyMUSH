@@ -1640,6 +1640,6 @@ void do_dbck(dbref player, dbref cause, int key) {
     if (!mudstate.standalone && (player != NOTHING)) {
         alarm(1);
         if (!Quiet(player))
-            notify(player, "Done.");
+            notify(player, "Done");
     }
 }

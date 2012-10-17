@@ -1190,7 +1190,7 @@ void do_markall(dbref player, dbref cause, int key) {
     else if (key == MARK_CLEAR)
         Unmark_all(i);
     if (!Quiet(player))
-        notify(player, "Done.");
+        notify(player, "Done");
 }
 
 /*
@@ -1220,7 +1220,7 @@ void do_apply_marked(dbref player, dbref cause, int key, char *command, char *ca
     }
     free_sbuf(buff);
     if (!Quiet(player))
-        notify(player, "Done.");
+        notify(player, "Done");
 }
 
 /*
