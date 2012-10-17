@@ -119,7 +119,7 @@ extern void	notify_check(dbref, dbref, const char *, int);
 extern int	Hearer(dbref);
 extern void	html_escape(const char *, char *, char **);
 extern void	dump_database_internal(int);
-extern void	fork_and_dump(int);
+extern void	fork_and_dump(dbref, dbref, int);
 
 /* From help.c */
 extern int	helpmkindx(dbref, char *, char *);

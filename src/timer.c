@@ -527,7 +527,7 @@ void dispatch(void) {
             (mudstate.dump_counter <= mudstate.now)) {
         mudstate.dump_counter = mudconf.dump_interval + mudstate.now;
         mudstate.debug_cmd = (char *)"< dump >";
-        fork_and_dump(0);
+        fork_and_dump(NOTHING, NOTHING, 0);
     }
 
     /*
