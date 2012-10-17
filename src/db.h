@@ -12,14 +12,10 @@
 
 /* Macros to help deal with batch writes of attribute numbers and objects */
 
-#define ATRNUM_BLOCK_SIZE	(int) ((mudstate.db_block_size - 32) / \
-					(2 * sizeof (int) + VNAME_SIZE))
-#define ATRNUM_BLOCK_BYTES	(int) ((ATRNUM_BLOCK_SIZE) * \
-					(2 * sizeof (int) + VNAME_SIZE))
-#define OBJECT_BLOCK_SIZE	(int) ((mudstate.db_block_size - 32) / \
-					(sizeof(int) + sizeof(DUMPOBJ)))
-#define OBJECT_BLOCK_BYTES	(int) ((OBJECT_BLOCK_SIZE) * \
-					(sizeof(int) + sizeof(DUMPOBJ)))
+#define ATRNUM_BLOCK_SIZE	(int) ((mudstate.db_block_size - 32) / (2 * sizeof (int) + VNAME_SIZE))
+#define ATRNUM_BLOCK_BYTES	(int) ((ATRNUM_BLOCK_SIZE) * (2 * sizeof (int) + VNAME_SIZE))
+#define OBJECT_BLOCK_SIZE	(int) ((mudstate.db_block_size - 32) / (sizeof(int) + sizeof(DUMPOBJ)))
+#define OBJECT_BLOCK_BYTES	(int) ((OBJECT_BLOCK_SIZE) * (sizeof(int) + sizeof(DUMPOBJ)))
 #define ENTRY_NUM_BLOCKS(total, blksize)	(int) (total / blksize)
 #define ENTRY_BLOCK_STARTS(blk, blksize)	(int) (blk * blksize)
 #define ENTRY_BLOCK_ENDS(blk, blksize)	(int) (blk * blksize) + (blksize - 1)

@@ -1304,7 +1304,7 @@ void dump_database_internal(int dump_type) {
 
     switch (dump_type) {
     case DUMP_DB_CRASH:
-        sprintf(tmpfile, "%s/%s.CRASH", mudconf.dbhome, mudconf.db_file);
+        sprintf(tmpfile, "%s/%s.db.CRASH", mudconf.dbhome, mudconf.db_file);
         unlink(tmpfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
@@ -1312,8 +1312,7 @@ void dump_database_internal(int dump_type) {
                               UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
         } else {
-            log_perror("DMP", "FAIL", "Opening crash file",
-                       tmpfile);
+            log_perror("DMP", "FAIL", "Opening crash file", tmpfile);
         }
         break;
     case DUMP_DB_RESTART:
@@ -1348,7 +1347,7 @@ void dump_database_internal(int dump_type) {
         strcpy(prevfile, mudconf.db_file);
         if ((c = strchr(prevfile, '.')) != NULL)
             *c = '\0';
-        sprintf(tmpfile, "%s/%s.FLAT", mudconf.dbhome, prevfile);
+        sprintf(tmpfile, "%s/%s.db.FLAT", mudconf.dbhome, prevfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
             db_write_flatfile(f, F_TINYMUSH,
@@ -1363,7 +1362,7 @@ void dump_database_internal(int dump_type) {
         strcpy(prevfile, mudconf.db_file);
         if ((c = strchr(prevfile, '.')) != NULL)
             *c = '\0';
-        sprintf(tmpfile, "%s/%s.KILLED", mudconf.dbhome, prevfile);
+        sprintf(tmpfile, "%s/%s.db.KILLED", mudconf.dbhome, prevfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
             /*
@@ -1393,7 +1392,7 @@ void dump_database_internal(int dump_type) {
      * Call modules to write to their flat-text database
      */
 
-    WALK_ALL_MODULES(mp) {
+     WALK_ALL_MODULES(mp) {
         if (mp->dump_database) {
             f = db_module_flatfile(mp->modname, 1);
             if (f) {
@@ -1500,9 +1499,7 @@ static int load_game(void) {
      */
 
     WALK_ALL_MODULES(mp) {
-        if ((modfunc =
-                    DLSYM(mp->handle, mp->modname, "load_database",
-                          (FILE *))) != NULL) {
+        if ((modfunc = DLSYM(mp->handle, mp->modname, "load_database", (FILE *))) != NULL) {
             f = db_module_flatfile(mp->modname, 0);
             if (f) {
                 (*modfunc) (f);
@@ -1868,6 +1865,55 @@ void usage(char *prog) {
     mainlog_printf("      -<number> - Set output version number\n");
 }
 
+
+void recover(char *flat) {
+    int db_ver, db_format, db_flags, setflags, clrflags, ver;
+    MODULE *mp;
+    void (*modfunc) (FILE *);
+    FILE *f;
+
+    vattr_init();
+    if (init_gdbm_db(mudconf.db_file) < 0) {
+        mainlog_printf("Can't open GDBM file\n");
+        exit(1);
+    }
+        
+    db_lock();
+
+    f = fopen(flat, "r");
+    db_read_flatfile(f, &db_format, &db_ver, &db_flags);
+    fclose(f);
+
+    /*
+     * Call modules to load their flatfiles
+     */
+
+    WALK_ALL_MODULES(mp) {
+        if ((modfunc = DLSYM(mp->handle, mp->modname, "db_read_flatfile", (FILE *))) != NULL) {
+            f = db_module_flatfile(mp->modname, 0);
+            if (f) {
+                (*modfunc) (f);
+                tf_fclose(f);
+            }
+        }
+    }
+        
+    db_ver = OUTPUT_VERSION;
+    setflags = OUTPUT_FLAGS;
+    clrflags = 0xffffffff;
+    db_flags = (db_flags & ~clrflags) | setflags;
+    db_write();
+
+    /*
+     * Call all modules to write to GDBM
+     */
+
+    CALL_ALL_MODULES_NOCACHE("db_write", (void), ());
+        
+    db_unlock();
+    CLOSE;
+}
+
 int dbconvert(int argc, char *argv[]) {
     int setflags, clrflags, ver;
 
@@ -1897,9 +1943,7 @@ int dbconvert(int argc, char *argv[]) {
     do_write = 1;
     dbclean = V_DBCLEAN;
 
-    while ((c =
-                getopt(argc, argv,
-                       "c:d:D:CqGgZzLlNnKkPpWwXx0123456789")) != -1) {
+    while ((c = getopt(argc, argv, "c:d:D:CqGgZzLlNnKkPpWwXx0123456789")) != -1) {
         switch (c) {
         case 'c':
             opt_conf = optarg;
@@ -2009,6 +2053,8 @@ int dbconvert(int argc, char *argv[]) {
      */
 
     vattr_init();
+    
+    printf("OPTIND : %s\n", argv[optind]);
     if (init_gdbm_db(argv[optind]) < 0) {
         mainlog_printf("Can't open GDBM file\n");
         exit(1);
@@ -2043,9 +2089,7 @@ int dbconvert(int argc, char *argv[]) {
          */
 
         WALK_ALL_MODULES(mp) {
-            if ((modfunc =
-                        DLSYM(mp->handle, mp->modname,
-                              "db_read_flatfile", (FILE *))) != NULL) {
+            if ((modfunc = DLSYM(mp->handle, mp->modname, "db_read_flatfile", (FILE *))) != NULL) {
                 f = db_module_flatfile(mp->modname, 0);
                 if (f) {
                     (*modfunc) (f);
@@ -2122,14 +2166,16 @@ int main(int argc, char *argv[]) {
     
     pid_t pid;
 
-    char *s;
+    char *s, *s1, *s2;
 
     MODULE *mp;
 
     char *bp;
     
     FILE *fp;
-
+    
+    struct stat sb1, sb2;
+    
     MODHASHES *m_htab, *hp;
 
     MODNHASHES *m_ntab, *np;
@@ -2318,6 +2364,114 @@ int main(int argc, char *argv[]) {
         close(i);
     }
     
+    s = XSTRDUP(tmprintf("%s/%s.db.KILLED", mudconf.dbhome, mudconf.mud_shortname), "test_killed_db");
+    i = open(s, O_RDONLY);
+    if(i>0) {
+        close(i);
+        if(tailfind(s, "***END OF DUMP***\n")) {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A non-corrupt %s file is present.", s);
+            ENDLOG
+            mudstate.now = time(NULL);
+            s1 = XSTRDUP(tmprintf("%s/%s.db.%ld", mudconf.dbhome, mudconf.mud_shortname), "test_killed_db");
+            fprintf(stderr, "\nThis means that a flatfile was successfully saved after the reception\n");
+            fprintf(stderr, "of a SIGTERM, possibly due to a machine reboot.\n");
+            if(!rename(s, s1)) {
+                fprintf(stderr, "This file has been renamed to %s\n", s1);
+                fprintf(stderr, "Please type:  ./Restore %s\n", s1);
+                fprintf(stderr, "If this restoration is successful, you can then type ./Startmush again.\n");
+            } else {
+                fprintf(stderr, "Unable to rename to %s\n", s1);
+                fprintf(stderr, "Please check the permissions on %s are ok\n", mudconf.dbhome);
+                fprintf(stderr, "then try to restore %s.\n", s);
+            }
+            XFREE(s, "test_killed_db");
+            XFREE(s1, "test_killed_db");
+            exit(2);
+        } else {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A corrupt %s file is present.", s);
+            ENDLOG
+            mudstate.now = time(NULL);
+            s1 = XSTRDUP(tmprintf("%s/%s.db.%ld", mudconf.dbhome, mudconf.mud_shortname), "test_killed_db");
+            fprintf(stderr, "\nA corrupt %s file was present.\n", s);
+            fprintf(stderr, "This means that there was an unsuccessful attempt to save a flatfile\n");
+            fprintf(stderr, "after the reception of a SIGTERM, likely due to a machine reboot.\n");
+            if(!rename(s, s1)) {        
+                
+                fprintf(stderr, "This file has been renamed to %s\n", s1);
+                fprintf(stderr, "You may wish to check for potential problems, and run ./Backup\n");
+                fprintf(stderr, "before restarting the MUSH\n");
+            } else {
+                fprintf(stderr, "Unable to rename it to %s\n", s1);
+                fprintf(stderr, "You may wish to check for potential problems, and run ./Backup\n");
+                fprintf(stderr, "before restarting the MUSH.\n");                
+            }
+            XFREE(s, "test_killed_db");
+            XFREE(s1, "test_killed_db");
+            exit(2);
+        }
+    }
+    
+    vattr_init();
+    
+    mudstate.now = time(NULL);
+    s = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "test_crash_db");
+    s1 = XSTRDUP(tmprintf("%s/%s.db.CRASH", mudconf.dbhome, mudconf.mud_shortname), "test_crash_db");
+    s2 = XSTRDUP(tmprintf("%s/%s.db.%ld", mudconf.dbhome, mudconf.mud_shortname, mudstate.now), "test_crash_db");
+    stat(s, &sb2);
+    i = open(s1, O_RDONLY);
+    if(i>0) {
+        fstat(i, &sb1);
+        close(i);
+        if(tailfind(s1, "***END OF DUMP***\n")) {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A non-corrupt %s file is present.", s1);
+            ENDLOG
+            if(difftime(sb1.st_mtime, sb2.st_mtime) > (double)0) {	/* Crash file is newer */
+                int db_format, db_version, db_flags;
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("The crash file is newer than your current database.");
+                ENDLOG
+                rename(s, s2);
+                recover(s1);
+                unlink(s1);
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("Recovery successfull. Previous db archived as : %s", s2);
+                ENDLOG
+            } else {
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("The crash file is older than your current database");
+                ENDLOG
+                unlink(s1);
+                STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+                log_printf("%s deleted, using the previous db to load");
+                ENDLOG
+            }
+        XFREE(s, "test_crash_db"); 
+        XFREE(s1, "test_crash_db");
+        XFREE(s2, "test_crash_db");
+        } else {
+            STARTLOG(LOG_ALWAYS, "INI", "LOAD")
+            log_printf("A corrupt %s file is present.", s1);
+            ENDLOG
+            mudstate.now = time(NULL);
+            s = XSTRDUP(tmprintf("%s/%s.db.%ld", mudconf.dbhome, mudconf.mud_shortname), "test_killed_db");
+            if(!rename(s1, s)) {
+                fprintf(stderr, "This file has been rename to %s\n", s);
+                fprintf(stderr, "You may wish to check for potential problems, and run ./Backup\n");
+                fprintf(stderr, "before restarting the MUSH\n");
+            } else {
+                fprintf(stderr, "Unameble to rename it to %s\n", s);
+                fprintf(stderr, "You may wish to check for potential problems, and run ./Backup\n");
+                fprintf(stderr, "before restarting the MUSH\n");
+            }
+            XFREE(s, "test_crash_db");
+            XFREE(s1, "test_crash_db");
+            XFREE(s2, "test_crash_db");
+            exit(2);
+        }
+    }
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
@@ -2359,8 +2513,6 @@ int main(int argc, char *argv[]) {
     cmdp = (CMDENT *) hashfind((char *)"wizhelp", &mudstate.command_htab);
     if (cmdp)
         cmdp->perms |= CA_WIZARD;
-
-    vattr_init();
 
     bp = mudstate.modloaded;
     WALK_ALL_MODULES(mp) {

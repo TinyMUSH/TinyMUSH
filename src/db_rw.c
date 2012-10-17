@@ -736,11 +736,12 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
     deduce_zone = 1;
     deduce_name = 1;
     deduce_timestamps = 1;
-    mainlog_printf("Reading ");
+    if (mudstate.standalone)
+        mainlog_printf("Reading ");
     db_free();
     for (i = 0;; i++) {
 
-        if (!(i % 100)) {
+        if (mudstate.standalone && !(i % 100)) {
             mainlog_printf(".");
         }
         switch (ch = getc(f)) {
@@ -765,8 +766,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
                  */
 
                 if (header_gotten) {
-                    mainlog_printf("\nDuplicate MUSH version header entry at object %d, ignored.\n",
-                                   i);
+                    if(mudstate.standalone)
+                        mainlog_printf("\nDuplicate MUSH version header entry at object %d, ignored.\n", i);
                     tstr = getstring_noalloc(f, 0);
                     break;
                 }
@@ -826,8 +827,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
 
             case 'S':	/* SIZE */
                 if (size_gotten) {
-                    mainlog_printf("\nDuplicate size entry at object %d, ignored.\n",
-                                   i);
+                    if(mudstate.standalone)
+                        mainlog_printf("\nDuplicate size entry at object %d, ignored.\n", i);
                     tstr = getstring_noalloc(f, 0);
                 } else {
                     mudstate.min_size = getref(f);
@@ -864,7 +865,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
             case 'N':	/* NEXT ATTR TO ALLOC WHEN NO
 					 * FREELIST */
                 if (nextattr_gotten) {
-                    mainlog_printf("\nDuplicate next free vattr entry at object %d, ignored.\n", i);
+                    if(mudstate.standalone)
+                        mainlog_printf("\nDuplicate next free vattr entry at object %d, ignored.\n", i);
                     tstr = getstring_noalloc(f, 0);
                 } else {
                     mudstate.attr_next = getref(f);
@@ -872,7 +874,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
                 }
                 break;
             default:
-                mainlog_printf("\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
+                if(mudstate.standalone)
+                    mainlog_printf("\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
                 tstr = getstring_noalloc(f, 0);
             }
             break;
@@ -1028,7 +1031,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
 
             if (read_attribs) {
                 if (!get_list(f, i, read_new_strings)) {
-                    mainlog_printf("\nError reading attrs for object #%d\n", i);
+                    if(mudstate.standalone)
+                        mainlog_printf("\nError reading attrs for object #%d\n", i);
                     return -1;
                 }
             }
@@ -1043,10 +1047,12 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
         case '*':	/* EOF marker */
             tstr = getstring_noalloc(f, 0);
             if (strcmp(tstr, "**END OF DUMP***")) {
-                mainlog_printf("\nBad EOF marker at object #%d\n", i);
+                if(mudstate.standalone)
+                    mainlog_printf("\nBad EOF marker at object #%d\n", i);
                 return -1;
             } else {
-                mainlog_printf("\n");
+                if(mudstate.standalone)
+                    mainlog_printf("\n");
                 *db_version = g_version;
                 *db_format = g_format;
                 *db_flags = g_flags;
@@ -1057,7 +1063,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
                 return mudstate.db_top;
             }
         default:
-            mainlog_printf("\nIllegal character '%c' near object #%d\n", ch, i);
+            if(mudstate.standalone)
+                mainlog_printf("\nIllegal character '%c' near object #%d\n", ch, i);
             return -1;
         }
 
@@ -1592,9 +1599,7 @@ dbref db_write(void) {
         num = 0;
         s = data.dptr;
 
-        for (j = ENTRY_BLOCK_STARTS(i, blksize);
-                (j <= ENTRY_BLOCK_ENDS(i, blksize)) &&
-                (j < mudstate.attr_next); j++) {
+        for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.attr_next); j++) {
 
             if (j < A_USER_START) {
                 continue;
@@ -1644,8 +1649,7 @@ dbref db_write(void) {
                  * the current block
                  */
 
-                if ((ENTRY_BLOCK_STARTS(i,
-                                        blksize) + j) < A_USER_START) {
+                if ((ENTRY_BLOCK_STARTS(i, blksize) + j) < A_USER_START) {
                     continue;
                 }
                 vp = (VATTR *) anum_table[ENTRY_BLOCK_STARTS(i,
@@ -1696,9 +1700,7 @@ dbref db_write(void) {
         num = 0;
         s = data.dptr;
 
-        for (j = ENTRY_BLOCK_STARTS(i, blksize);
-                (j <= ENTRY_BLOCK_ENDS(i, blksize)) &&
-                (j < mudstate.db_top); j++) {
+        for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.db_top); j++) {
 
             if (mudstate.standalone && !(j % 100)) {
                 mainlog_printf(".");
@@ -1741,10 +1743,7 @@ dbref db_write(void) {
              * objects in this block
              */
 
-            for (j = 0; (j < blksize) &&
-                    ((ENTRY_BLOCK_STARTS(i,
-                                         blksize) + j) < mudstate.db_top);
-                    j++) {
+            for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.db_top); j++) {
                 /*
                  * j is an offset of object numbers into the
                  * current block
@@ -1753,11 +1752,9 @@ dbref db_write(void) {
                 k = ENTRY_BLOCK_STARTS(i, blksize) + j;
 
                 if (!Going(k)) {
-                    memcpy((void *)s, (void *)&k,
-                           sizeof(int));
+                    memcpy((void *)s, (void *)&k, sizeof(int));
                     s += sizeof(int);
-                    memcpy((void *)s, (void *)&(db[k]),
-                           sizeof(DUMPOBJ));
+                    memcpy((void *)s, (void *)&(db[k]), sizeof(DUMPOBJ));
                     s += sizeof(DUMPOBJ);
                 }
             }
