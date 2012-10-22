@@ -1177,6 +1177,8 @@ static RETSIGTYPE sighandler(int sig) {
     int i;
 
     pid_t child;
+    
+    char *s;
 
 #if defined(HAVE_UNION_WAIT) && defined(NEED_WAIT3_DCL)
     union wait stat;
@@ -1230,9 +1232,11 @@ static RETSIGTYPE sighandler(int sig) {
 #endif
         check_panicking(sig);
         log_signal(signames[sig]);
-        raw_broadcast(0, "GAME: Caught signal %s, exiting.",
-                      signames[sig]);
+        raw_broadcast(0, "GAME: Caught signal %s, exiting.", signames[sig]);
         dump_database_internal(DUMP_DB_KILLED);
+        s=XSTRDUP(tmprintf("Caught signal %s", signames[sig]), "sighandler");
+        write_status_file(NOTHING, s);
+        XFREE(s, "sighandler");
         exit(0);
         break;
     case SIGILL:		/* Panic save + restart now, or coredump now */
@@ -1255,10 +1259,7 @@ static RETSIGTYPE sighandler(int sig) {
         log_signal(signames[sig]);
         report();
         if (mudconf.sig_action != SA_EXIT) {
-
-            raw_broadcast(0,
-                          "GAME: Fatal signal %s caught, restarting with previous database.",
-                          signames[sig]);
+            raw_broadcast(0, "GAME: Fatal signal %s caught, restarting with previous database.", signames[sig]);
 
             /*
              * Don't sync first. Using older db.
@@ -1297,21 +1298,21 @@ static RETSIGTYPE sighandler(int sig) {
             }
             alarm(0);
             dump_restart_db();
-            execl(mudconf.exec_path, mudconf.exec_path,
-                  (char *)"-c", mudconf.mud_shortname, NULL);
+            execl(mudconf.exec_path, mudconf.exec_path, (char *)"-c", mudconf.mud_shortname, NULL);
             break;
         } else {
             unset_signals();
             mainlog_printf("ABORT! bsd.c, SA_EXIT requested.\n");
+            write_status_file(NOTHING, "ABORT! bsd.c, SA_EXIT requested.");
             abort();
         }
     case SIGABRT:		/* Coredump now */
         check_panicking(sig);
         log_signal(signames[sig]);
         report();
-
         unset_signals();
         mainlog_printf("ABORT! bsd.c, SIGABRT received.\n");
+        write_status_file(NOTHING, "ABORT! bsd.c, SIGABRT received.");
         abort();
     }
     signal(sig, sighandler);

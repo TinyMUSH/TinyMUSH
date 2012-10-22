@@ -164,14 +164,16 @@ int fileexist(char *file) {
 #define HANDLE_FLAT_KILL	2
 
 int handlestartupflatfiles(int flag) {
-    char *db, *flat, *db_bak, *flat_bak;
+    char *db, *flat, *db_bak, *flat_bak, *ts;
     int i;
     struct stat sb1, sb2;
 
+    ts=mktimestamp("handlestartupflatfiles");
+
     db = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "handlestartupflatfiles");
     flat = XSTRDUP(tmprintf("%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ), "handlestartupflatfiles");
-    db_bak = XSTRDUP(tmprintf("%s/%s.%ld", mudconf.bakhome, mudconf.db_file, time(NULL)), "handlestartupflatfiles");
-    flat_bak = XSTRDUP(tmprintf("%s/%s.%s.%ld", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ,time(NULL)), "handlestartupflatfiles");
+    db_bak = XSTRDUP(tmprintf("%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts), "handlestartupflatfiles");
+    flat_bak = XSTRDUP(tmprintf("%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"), ts), "handlestartupflatfiles");
     
     i = open(flat, O_RDONLY);
     if(i>0) {
@@ -228,6 +230,7 @@ int handlestartupflatfiles(int flag) {
         }
     }
 
+    XFREE(ts, "handlestartupflatfiles");
     XFREE(db, "handlestartupflatfiles");
     XFREE(flat, "handlestartupflatfiles");
     XFREE(db_bak, "handlestartupflatfiles");
@@ -1250,8 +1253,7 @@ static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_
             if (yes_log)
                 log_printf("#%d\t%ld\n", thing, used_msecs);
             if (yes_screen)
-                raw_notify(player, tmprintf("#%d\t%ld", thing,
-                                           used_msecs));
+                raw_notify(player, tmprintf("#%d\t%ld", thing, used_msecs));
             if (yes_clear)
                 obj_time.tv_usec = obj_time.tv_sec = 0;
         }
@@ -1328,11 +1330,6 @@ int backup_copy(char *src, char *dst, int flag) {
      */
     
     fn=XSTRDUP(tmprintf("%s/%s", realpath(dst, NULL), basename(src)), "backup_copy");
-
-    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
-    log_printf("Copying %s to %s", src, fn);
-    ENDLOG
-
     i = copy_file(src, fn, flag);
     XFREE(fn, "backup_copy");
 
@@ -1347,15 +1344,33 @@ char *mktimestamp(char *s) {
     ts=time(NULL);
     t = localtime(&ts);
     buff=XSTRDUP(tmprintf("%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone), s);
-    return(s);
+    return(buff);
 }
 
-int backup_mush(void) {
+void do_backup_mush(dbref player, dbref cause, int key) {
+    backup_mush(player, cause, key);
+}
+
+int backup_mush(dbref player, dbref cause, int key) {
     int i, txt_n=0, cnf_n=0, dbf_n=0;
     char **txt=NULL, **cnf=NULL, **dbf=NULL;
     char *tmpdir, *ts, *s, *buff, *tb, *cwd;
     FILE *fp;
     
+    /* 
+     * TODO : CREATE BACKUP OF MODULE'S FLAT FILE WHILE GAME IS RUNNING
+     */
+    
+    if(player != NOTHING) {
+        raw_broadcast(0, "GAME: Backup in progress. Game may freeze for a few minutes.");
+    }
+    
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Getting list of files to backup");
+    ENDLOG
+    
+    if(player != NOTHING)    
+        notify(player, "Getting list of files to backup\n");
 
     /*
      * First, get a list of all our text files
@@ -1398,6 +1413,13 @@ int backup_mush(void) {
     
     /* Finally Dump our flatfile */
     
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Making sure flatfiles are up to date");
+    ENDLOG
+
+    if(player != NOTHING)        
+        notify(player, "Making sure flatfiles are up to date\n");
+    
     dump_database_internal(DUMP_DB_FLATFILE);
     dbf = add_array(dbf, tmprintf("%s/%s.FLAT", mudconf.bakhome, mudconf.db_file), &dbf_n, "backup_mush");
     
@@ -1409,29 +1431,44 @@ int backup_mush(void) {
     cnf = add_array(cnf, NULL, &cnf_n, "backup_mush");
     dbf = add_array(dbf, NULL, &dbf_n, "backup_mush");
     
-    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
-    log_printf("Found %d text files to backup", txt_n - 4);
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Found %d text files to backup", txt_n - 1);
     ENDLOG
     
-    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
-    log_printf("Found %d config files to backup", cnf_n - 4);
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Found %d config files to backup", cnf_n - 1);
     ENDLOG
     
-    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
-    log_printf("Found %d db files to backup", dbf_n - 4);
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Found %d db files to backup", dbf_n - 1);
     ENDLOG
+
+    if(player != NOTHING)    
+        notify(player, tmprintf("Found, %d text files, %d config files and %d db files to backup\n", txt_n, cnf_n, dbf_n));
     
     /* We have everything we need to backup, create a temp directory*/
     s = XSTRDUP(tmprintf("%s/backup.XXX", mudconf.bakhome), "backup_mush");
     if((buff = mkdtemp(s)) == NULL) {
-        STARTLOG(LOG_ALWAYS, "BACK", "MKDIR")
+        STARTLOG(LOG_ALWAYS, "BCK", "MKDIR")
         log_printf("Unable to create temp directory");
         ENDLOG
+        if(player != NOTHING) {
+            notify(player, "Backup abort, Unable to create temp directory");
+            raw_broadcast(0, "GAME: Backup finished.");
+        }
+        return(-1);
     }
     
+    XFREE(s, "backup_mush");
+
     tmpdir = XSTRDUP(buff, "backup_mush");
     
-    free(buff);
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Creating backup set");
+    ENDLOG
+    
+    if(player != NOTHING)    
+        notify(player, "Creating backup set");
     
     /* Copy files to our backup directory */
     
@@ -1451,10 +1488,13 @@ int backup_mush(void) {
     s = XSTRDUP(tmprintf("%s/%s.FLAT", mudconf.bakhome, mudconf.db_file), "backup_mush");
     if( unlink(s) == -1) {
         /* Not a fatal error but keep a trace of it */
-        STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
-        log_printf("Unable to remove file ", s);
+        STARTLOG(LOG_ALWAYS, "BCK", "UNLK")
+        log_printf("Unable to remove file %s", s);
         ENDLOG
+        if(player != NOTHING)    
+            notify(player, tmprintf("Unable to remove file %s", s));
     }
+    
     XFREE(s, "backup_mush");
     
     /* Create our backup config file */
@@ -1500,25 +1540,41 @@ int backup_mush(void) {
     s = XSTRDUP(tmprintf("%s %s %s/%s_%s.%s * 2>&1",mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext), "backup_mush");
     XFREE(ts, "backup_mush");
     cwd = getcwd(NULL, MAXPATHLEN);
+
     if(cwd == NULL) {
-        STARTLOG(LOG_ALWAYS, "BACK", "GETCD")
-        log_printf("Unable to get the current working directory.");
+        STARTLOG(LOG_ALWAYS, "BCK", "GETCD")
+        log_printf("Unable to get the current working directory");
         ENDLOG
+        if(player != NOTHING) {
+            notify(player, "Unable to get the current working directory");
+            raw_broadcast(0, "GAME: Backup finished.");
+        }
         return(-1);
     }
+
     if(chdir(tmpdir) == -1) {
-        STARTLOG(LOG_ALWAYS, "BACK", "SETCD")
-        log_printf("Unable to set the working directory.");
+        STARTLOG(LOG_ALWAYS, "BCK", "SETCD")
+        log_printf("Unable to set the working directory");
+        if(player != NOTHING) {
+            notify(player, "Unable to set the working directory");
+            raw_broadcast(0, "GAME: Backup finished.");
+        }
         ENDLOG
         return(-1);
     }
+    
     buff=XMALLOC(MBUF_SIZE, "backup_mush");
-    STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+
+    STARTLOG(LOG_ALWAYS, "BCK", "RUN")
     log_printf("Executing external command %s", s);
     ENDLOG
+    
+    if(player != NOTHING)
+        notify(player, tmprintf("Executing external command %s", s));
+
     if((fp = popen(s, "r")) != NULL) {
         while(fgets(buff, MBUF_SIZE, fp)!=NULL) {
-            STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+            STARTLOG(LOG_ALWAYS, "BCK", "RUN")
             if(tb = strchr(buff, '\n'))
                 tb[0]=0x00;
             if(tb = strchr(buff, '\r'))
@@ -1527,19 +1583,25 @@ int backup_mush(void) {
             ENDLOG
         }
         pclose(fp);
-        STARTLOG(LOG_ALWAYS, "BACK", "RUN")
-        log_printf("Backup done");
-        ENDLOG
+        STARTLOG(LOG_ALWAYS, "BCK", "RUN")
+        log_printf("External command done");
+        ENDLOG        
+        if(player != NOTHING)
+            notify(player, "External command done");
     } else {
-        STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+        STARTLOG(LOG_ALWAYS, "BCK", "RUN")
         log_printf("Unable to run external command");
         ENDLOG
+        if(player != NOTHING)
+            notify(player, "Unable to run external command");
     }
 
     if(chdir(cwd) == -1) {
-        STARTLOG(LOG_ALWAYS, "BACK", "SETCD")
-        log_printf("Unable to restore the working directory.");
-        ENDLOG;
+        STARTLOG(LOG_ALWAYS, "BCK", "SETCD")
+        log_printf("Unable to restore the working directory");
+        ENDLOG
+        if(player != NOTHING)
+            notify(player, "Unable to restore the working directory");
     }
 
     free(cwd);
@@ -1547,14 +1609,24 @@ int backup_mush(void) {
     XFREE(buff, "backup_mush");
     XFREE(s, "backup_mush");
     
+    
     /* Cleanup */
+    
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Cleaning up");
+    ENDLOG
+    
+    if(player != NOTHING)
+        notify(player, "Cleaning up");
 
     for(i=0; txt[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(txt[i])), "backup_mush");
         if(unlink(s) == -1) {
-            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
-            log_printf("Unable to remove file ", s);
+            STARTLOG(LOG_ALWAYS, "BCK", "UNLK")
+            log_printf("Unable to remove file %s", s);
             ENDLOG
+            if(player != NOTHING)
+                notify(player, tmprintf("Unable to remove file %s", s));
         }
         XFREE(txt[i], "backup_mush");
         XFREE(s, "backup_mush");
@@ -1565,9 +1637,11 @@ int backup_mush(void) {
     for(i=0; cnf[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(cnf[i])), "backup_mush");
         if(unlink(s) == -1) {
-            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
-            log_printf("Unable to remove file ", s);
+            STARTLOG(LOG_ALWAYS, "BCK", "UNLK")
+            log_printf("Unable to remove file %s", s);
             ENDLOG
+            if(player != NOTHING)
+                notify(player, tmprintf("Unable to remove file %s", s));
         }
         XFREE(cnf[i], "backup_mush");
         XFREE(s, "backup_mush");
@@ -1578,9 +1652,11 @@ int backup_mush(void) {
     for(i=0; dbf[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(dbf[i])), "backup_mush");
         if(unlink(s) == -1) {
-            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
-            log_printf("Unable to remove file ", s);
+            STARTLOG(LOG_ALWAYS, "BCK", "UNLK")
+            log_printf("Unable to remove file %s", s);
             ENDLOG
+            if(player != NOTHING)
+                notify(player, tmprintf("Unable to remove file %s", s));
         }
         XFREE(dbf[i], "backup_mush");
         XFREE(s, "backup_mush");
@@ -1590,18 +1666,32 @@ int backup_mush(void) {
     
     s = XSTRDUP(tmprintf("%s/netmush.backup", tmpdir), "backup_mush");
     if(unlink(s) == -1) {
-        STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
-        log_printf("Unable to remove file ", s);
+        STARTLOG(LOG_ALWAYS, "BCK", "UNLK")
+        log_printf("Unable to remove file %s", s);
         ENDLOG
+        if(player != NOTHING)
+            notify(player, tmprintf("Unable to remove file %s", s));
     }    
     XFREE(s, "backup_mush");
     
     if(rmdir(tmpdir) == -1) {
-        STARTLOG(LOG_ALWAYS, "BACK", "RMDIR")
-        log_printf("Unable to remove directory ", tmpdir);
+        STARTLOG(LOG_ALWAYS, "BCK", "RMDIR")
+        log_printf("Unable to remove directory %s", tmpdir);
         ENDLOG
+        if(player != NOTHING)
+            notify(player, tmprintf("Unable to remove directory %s", tmpdir));
     }
+
     XFREE(tmpdir, "backup_mush");
+    
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Backup done");
+    ENDLOG
+    
+    if(player != NOTHING)
+        raw_broadcast(0, "GAME: Backup finished.");
+
+    return(0);
 }
 
 
@@ -1653,9 +1743,32 @@ void write_pidfile(char *fn) {
     }
 }
 
-void do_shutdown(dbref player, dbref cause, int key, char *message) {
+void write_status_file(dbref player, char *message) {
     int fd;
     char *msg;
+    
+    fd = tf_open(mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
+    
+    if(player != NOTHING) {
+        msg=XSTRDUP(tmprintf("Shutdown by : %s\n",Name(Owner(player))), "write_status_file");
+        
+    } else {
+        msg=XSTRDUP("Shutdown by : System\n", "write_status_file");
+    }
+    write(fd, msg, strlen(msg));
+    XFREE(msg, "write_status_file");
+    
+    if(message != NULL) {
+        msg=XSTRDUP(tmprintf("Status : %s\n", message), "write_status_file");
+        (void)write(fd, msg, strlen(msg));
+
+        XFREE(msg, "write_status_file");
+    }
+    tf_close(fd);
+}
+
+void do_shutdown(dbref player, dbref cause, int key, char *message) {
+
 
     if (key & SHUTDN_COREDUMP) {
         if (player != NOTHING) {
@@ -1665,6 +1778,8 @@ void do_shutdown(dbref player, dbref cause, int key, char *message) {
             log_name(player);
             ENDLOG
         }
+        
+        write_status_file(player, "Abort and coredump");
         /*
          * Don't bother to even shut down the network or dump.
          */
@@ -1679,33 +1794,23 @@ void do_shutdown(dbref player, dbref cause, int key, char *message) {
     }
     do_dbck(NOTHING, NOTHING, 0);	/* dump consistent state */
     
-    fd = tf_open(mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
-
     if (player != NOTHING) {
         raw_broadcast(0, "GAME: Shutdown by %s", Name(Owner(player)));
         STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
         log_printf("Shutdown by ");
         log_name(player);
         ENDLOG
-        msg=XSTRDUP(tmprintf("Shutdown by %s. ",Name(Owner(player))), "do_shutdown");
-        (void)write(fd, msg, strlen(msg));
-        XFREE(msg, "do_shutdown");
     } else {
-        
         raw_broadcast(0, "GAME: Fatal Error: %s", message);
         STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
         log_printf("Fatal error: %s", message);
         ENDLOG
-        msg=XSTRDUP("Fatal Error: ", "do_shutdown");
-        (void)write(fd, msg, strlen(msg));
-        XFREE(msg, "do_shutdown");
     }
     STARTLOG(LOG_ALWAYS, "WIZ", "SHTDN")
     log_printf("Shutdown status: %s", message);
     ENDLOG
-    (void)write(fd, message, strlen(message));
-    (void)write(fd, (char *)"\n", 1);
-    tf_close(fd);
+    
+    write_status_file(player, message);
 
     /*
      * Set up for normal shutdown
@@ -1721,6 +1826,14 @@ void dump_database_internal(int dump_type) {
     FILE *f = NULL;
 
     MODULE *mp;
+    
+    /*
+     * Call modules to write to DBM
+     */
+
+    db_lock();
+    CALL_ALL_MODULES(db_write, ());
+    db_unlock();
 
     switch (dump_type) {
     case DUMP_DB_CRASH:
@@ -1728,8 +1841,7 @@ void dump_database_internal(int dump_type) {
         unlink(tmpfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
-            db_write_flatfile(f, F_TINYMUSH,
-                              UNLOAD_VERSION | UNLOAD_OUTFLAGS);
+            db_write_flatfile(f, F_TINYMUSH, UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
         } else {
             log_perror("DMP", "FAIL", "Opening crash file", tmpfile);
@@ -1742,7 +1854,6 @@ void dump_database_internal(int dump_type) {
         /*
          * Trigger modules to write their flat-text dbs
          */
-
         WALK_ALL_MODULES(mp) {
             if (mp->db_write_flatfile) {
                 f = db_module_flatfile(mp->modname, 1);
@@ -1767,8 +1878,7 @@ void dump_database_internal(int dump_type) {
         sprintf(tmpfile, "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
-            db_write_flatfile(f, F_TINYMUSH,
-                              UNLOAD_VERSION | UNLOAD_OUTFLAGS);
+            db_write_flatfile(f, F_TINYMUSH, UNLOAD_VERSION | UNLOAD_OUTFLAGS);
             tf_fclose(f);
         } else {
             log_perror("DMP", "FAIL", "Opening flatfile", tmpfile);
@@ -1792,26 +1902,28 @@ void dump_database_internal(int dump_type) {
         break;
     default:
         db_write();
+
     }
+    
+    if(dump_type != DUMP_DB_FLATFILE) {    
+        /*
+         * Call modules to write to their flat-text database
+         */
 
-    /*
-     * Call modules to write to DBM
-     */
-
-    db_lock();
-    CALL_ALL_MODULES(db_write, ());
-    db_unlock();
-
-    /*
-     * Call modules to write to their flat-text database
-     */
-
-     WALK_ALL_MODULES(mp) {
-        if (mp->dump_database) {
-            f = db_module_flatfile(mp->modname, 1);
-            if (f) {
-                (*(mp->dump_database)) (f);
-                tf_fclose(f);
+         WALK_ALL_MODULES(mp) {
+             if (mp->db_write_flatfile) {
+                f = db_module_flatfile(mp->modname, 1);
+                if (f) {
+                    (*(mp->db_write_flatfile)) (f);
+                    tf_fclose(f);
+                }
+            }
+            if (mp->dump_database) {
+                f = db_module_flatfile(mp->modname, 1);
+                if (f) {
+                    (*(mp->dump_database)) (f);
+                    tf_fclose(f);
+                }
             }
         }
     }
@@ -2050,7 +2162,9 @@ void do_logwrite(dbref player, dbref cause, int key, char *msgtype, char *messag
 
 void do_logrotate(dbref player, dbref cause, int key) {
     LOGFILETAB *lp;
+    char *ts;
 
+    ts=mktimestamp("do_logrotate");
     mudstate.mudlognum++;
 
     if (mainlog_fp == stderr) {
@@ -2058,7 +2172,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
                "Warning: can't rotate main log when logging to stderr.");
     } else {
         fclose(mainlog_fp);
-        copy_file(mudconf.log_file, tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now), 1);
+        copy_file(mudconf.log_file, tmprintf("%s.%s", mudconf.log_file, ts), 1);
         logfile_init(mudconf.log_file);
     }
 
@@ -2073,12 +2187,14 @@ void do_logrotate(dbref player, dbref cause, int key) {
     for (lp = logfds_table; lp->log_flag; lp++) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
-            copy_file(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now), 1);
+            copy_file(lp->filename, tmprintf("%s.%s", lp->filename, ts), 1);
             lp->fileptr = fopen(lp->filename, "w");
             if (lp->fileptr)
                 setbuf(lp->fileptr, NULL);
         }
     }
+    
+    XFREE(ts, "do_logrotate");
 
 }
 
@@ -2583,7 +2699,7 @@ int main(int argc, char *argv[]) {
     
     pid_t pid;
 
-    char *s, *s1, *s2, *s3;
+    char *s, *ts;
 
     MODULE *mp;
 
@@ -2777,7 +2893,7 @@ int main(int argc, char *argv[]) {
             STARTLOG(LOG_ALWAYS, "INI", "LOAD")
             log_printf("There is a restart database, %s, present.", s);
             ENDLOG
-            if(unlink(s1) != 0) {
+            if(unlink(s) != 0) {
                 STARTLOG(LOG_ALWAYS, "INI", "FATAL")
                 log_printf("Unable to delete : %s, remove it before restarting the MUSH.", s);
                 XFREE(s, "test_restart_db");
@@ -2976,7 +3092,11 @@ int main(int argc, char *argv[]) {
          * reused in tf_init. A double fclose of stdin would be a
          * really bad idea.
          */ 
-         backup_mush();
+         if(backup_mush(NOTHING, NOTHING, 0) != 0) {
+             STARTLOG(LOG_STARTUP, "INI", "FATAL")
+            log_printf("Unable to backup");
+            ENDLOG
+         }
     }
     /*
      * We have to do an update, even though we're starting up, because
@@ -3011,6 +3131,16 @@ int main(int argc, char *argv[]) {
     }
 
     write_pidfile(mudconf.pid_file);
+    if(fileexist(mudconf.log_file)) {
+        ts=mktimestamp("cleanup_log");
+        s=XSTRDUP(tmprintf("%s.%s", mudconf.log_file, ts), "cleanup_log");
+        STARTLOG(LOG_STARTUP, "LOG", "CLN")
+        log_printf("Renaming old logfile to %s", basename(s));
+        ENDLOG
+        copy_file(mudconf.log_file, s, 1);
+        XFREE(s, "cleanup_log");
+        XFREE(ts, "cleanup_log");
+    }
     logfile_init(mudconf.log_file);
 
     STARTLOG(LOG_STARTUP, "INI", "LOAD")

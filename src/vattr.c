@@ -116,8 +116,7 @@ void do_dbclean(dbref player, dbref cause, int key) {
 
     ADDENT *addp;
 
-    raw_broadcast(0,
-                  "GAME: Cleaning database. Game may freeze for a few minutes.");
+    raw_broadcast(0, "GAME: Cleaning database. Game may freeze for a few minutes.");
 
     used_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int),
                                 "dbclean.used_table");

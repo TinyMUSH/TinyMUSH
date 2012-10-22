@@ -557,6 +557,11 @@ CMDENT		command_table[] = {
         NULL, NULL, NULL, {do_dbck}
     },
     {
+        (char *)"@backup", NULL, CA_WIZARD,
+        0, CS_NO_ARGS,
+        NULL, NULL, NULL, {do_backup_mush}
+    },
+    {
         (char *)"@decompile", decomp_sw, CA_PUBLIC,
         0, CS_TWO_ARG | CS_INTERP,
         NULL, NULL, NULL, {do_decomp}

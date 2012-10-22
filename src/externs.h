@@ -122,6 +122,9 @@ extern void	dump_database_internal(int);
 extern void	fork_and_dump(dbref, dbref, int);
 extern int	copy_file(char *,char *, int);
 extern char 	**add_array(char **, char *, int *, char *);
+extern void	write_status_file(dbref, char *);
+extern char	*mktimestamp(char *);
+extern void	do_backup_mush(dbref player, dbref cause, int key);
 
 /* From help.c */
 extern int	helpmkindx(dbref, char *, char *);

@@ -1065,8 +1065,9 @@ See also: exit_attr_defaults, player_attr_defaults, room_attr_defaults,
   This means that no more output will be written to the current log file,
   and instead, a new log file is begun. The old log file is not deleted.
  
-  A number is automatically prepended at the end of the log file name
-  (netmush.log.0, netmush.log.1, etc., incrementing with each @logrotate).
+  The date, time and timezone at the time of rotation is automatically 
+  prepended at the end of the log file name. 
+  (netmush.log.YYYYMMDD-HHMMSS_TZN)
   
 & @mark
   Command: @mark[/<switches>] [<player>] [<class>=<restriction>]
