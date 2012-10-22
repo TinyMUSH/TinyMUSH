@@ -1792,16 +1792,15 @@ dbref db_write(void) {
 
 /* Open a file pointer for a module to use when writing a flatfile */
 
-FILE *db_module_flatfile(char *modname, int wrflag) {
-    char filename[PATH_MAX];
-
+FILE *db_module_flatfile(char *filename, int wrflag) {
     FILE *f = NULL;
 
-    sprintf(filename, "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, modname);
-    
+
+    /*
     if(mudstate.initializing) {
          mudstate.mfiletab = add_array(mudstate.mfiletab, filename, &mudstate.modulefiles, "db_module_flatfile");    
     }
+    */
 
     if (wrflag) {
         f = tf_fopen(filename, O_WRONLY | O_CREAT | O_TRUNC);
