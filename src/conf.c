@@ -86,7 +86,9 @@ void cf_init(void) {
     mudconf.guest_prefixes = XSTRDUP("", "cf_string");
     mudconf.guest_suffixes = XSTRDUP("", "cf_string");
 
-    mudconf.compressexe = XSTRDUP(DEFAULT_COMPRESS_UTIL, "cf_string");
+    mudconf.tar_exec = XSTRDUP(DEFAULT_TAR_UTIL, "cf_string");
+    mudconf.tar_compress = XSTRDUP(DEFAULT_TAR_COMPRESS, "cf_string");
+    mudconf.tar_extract = XSTRDUP(DEFAULT_TAR_UNCOMPRESS, "cf_string");
 
     mudconf.mudowner = XSTRDUP("", "cf_string");
 
@@ -359,6 +361,10 @@ void cf_init(void) {
     mudstate.helpfiles = 0;
     mudstate.hfiletab = NULL;
     mudstate.hfiletab_size = 0;
+    mudstate.cfiletab = NULL;
+    mudstate.configfiles = 0;
+    mudstate.mfiletab = NULL;
+    mudstate.modulefiles = 0;
     mudstate.hfile_hashes = NULL;
     mudstate.curr_player = NOTHING;
     mudstate.curr_enactor = NOTHING;
@@ -1654,29 +1660,21 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw) {
     hashdelete(cmdp->cmdname, &mudstate.command_htab);
     hashadd(cmdp->cmdname, (int *)cmdp, &mudstate.command_htab, 0);
     hashdelete(tmprintf("__%s", cmdp->cmdname), &mudstate.command_htab);
-    hashadd(tmprintf("__%s", cmdp->cmdname), (int *)cmdp,
-            &mudstate.command_htab, HASH_ALIAS);
+    hashadd(tmprintf("__%s", cmdp->cmdname), (int *)cmdp, &mudstate.command_htab, HASH_ALIAS);
 
     /*
      * We may need to grow the helpfiles table, or create it.
      */
 
     if (!mudstate.hfiletab) {
-
-        mudstate.hfiletab =
-            (char **)XCALLOC(4, sizeof(char *), "helpfile.htab");
-        mudstate.hfile_hashes =
-            (HASHTAB *) XCALLOC(4, sizeof(HASHTAB), "helpfile.hashes");
+        mudstate.hfiletab = (char **)XCALLOC(4, sizeof(char *), "helpfile.htab");
+        mudstate.hfile_hashes = (HASHTAB *) XCALLOC(4, sizeof(HASHTAB), "helpfile.hashes");
         mudstate.hfiletab_size = 4;
 
     } else if (mudstate.helpfiles >= mudstate.hfiletab_size) {
 
-        ftab = (char **)XREALLOC(mudstate.hfiletab,
-                                 (mudstate.hfiletab_size + 4) * sizeof(char *),
-                                 "helpfile.htab");
-        hashes = (HASHTAB *) XREALLOC(mudstate.hfile_hashes,
-                                      (mudstate.hfiletab_size + 4) *
-                                      sizeof(HASHTAB), "helpfile.hashes");
+        ftab = (char **)XREALLOC(mudstate.hfiletab, (mudstate.hfiletab_size + 4) * sizeof(char *), "helpfile.htab");
+        hashes = (HASHTAB *) XREALLOC(mudstate.hfile_hashes, (mudstate.hfiletab_size + 4) * sizeof(HASHTAB), "helpfile.hashes");
         ftab[mudstate.hfiletab_size] = NULL;
         ftab[mudstate.hfiletab_size + 1] = NULL;
         ftab[mudstate.hfiletab_size + 2] = NULL;
@@ -1729,17 +1727,29 @@ int cf_include(int *vp, char *str, long extra, dbref player, char *cmd) {
     extern int cf_set(char *, char *, dbref);
 
 
+    /* XXX TODO Add stuff to fill
+     *   **cfiletab;     // Array of config files 
+     *   cfiletab_size;  // Size of the table storing config pointers 
+     */
+
     if (!mudstate.initializing)
         return -1;
-
-    fp = fopen(str, "r");
+        
+    buf = XSTRDUP(str, "cf_include");
+    fp = fopen(buf, "r");
     if (fp == NULL) {
-        fp = fopen(tmprintf("%s/%s", mudconf.config_home, str), "r");
+        XFREE(buf, "cf_include");
+        buf =  XSTRDUP(tmprintf("%s/%s", mudconf.config_home, str), "cf_include");
+        fp = fopen(buf, "r");
         if(fp == NULL) {
             cf_log_notfound(player, cmd, "Config file", str);
             return -1;
         }
     }
+    
+    mudstate.cfiletab = add_array(mudstate.cfiletab, buf, &mudstate.configfiles, "cf_include");
+    XFREE(buf, "cf_include");
+    
     buf = alloc_lbuf("cf_include");
     fgets(buf, LBUF_SIZE, fp);
     while (!feof(fp)) {
@@ -1832,7 +1842,6 @@ CONF		conftable [] = {
     {(char *)"command_quota_increment", cf_int, CA_GOD, CA_WIZARD, &mudconf.cmd_quota_incr, 0},
     {(char *)"command_quota_max", cf_int, CA_GOD, CA_WIZARD, &mudconf.cmd_quota_max, 0},
     {(char *)"command_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.cmd_nest_lim, 0},
-    {(char *)"compress_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.compressexe, MBUF_SIZE},
     {(char *)"concentrator_port", cf_int, CA_STATIC, CA_WIZARD, &mudconf.conc_port, 0},
     {(char *)"config_access", cf_cf_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
     {(char *)"config_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.config_home, MBUF_SIZE},
@@ -2034,6 +2043,9 @@ CONF		conftable [] = {
     {(char *)"suspect_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mudstate.suspect_list, H_SUSPECT},
     {(char *)"sweep_dark", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.sweep_dark, (long)"@sweep works on Dark locations"},
     {(char *)"switch_default_all", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.switch_df_all, (long)"@switch default is /all, not /first"},
+    {(char *)"tar_compress", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_compress, MBUF_SIZE},    
+    {(char *)"tar_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_exec, MBUF_SIZE},
+    {(char *)"tar_uncompress", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_extract, MBUF_SIZE},
     {(char *)"terse_shows_contents", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_contents, (long)"TERSE suppresses the contents list of a location"},
     {(char *)"terse_shows_exits", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_exits, (long)"TERSE suppresses the exit list of a location"},
     {(char *)"terse_shows_move_messages", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_movemsg, (long)"TERSE suppresses movement messages"},

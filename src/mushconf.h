@@ -110,7 +110,9 @@ struct confdata {
     char 	*pid_file;	/* MUSH's pid file */
     char	*pid_home;	/* MUSH's pid directory */
     char 	*db_file;	/* MUSH's db file */
-    char	*compressexe;	/* Executable run to compress file */
+    char	*tar_exec;	/* Executable run to tar files */
+    char	*tar_compress;	/* Flags used to compress */
+    char	*tar_extract;	/* Flags used to extract */
     char	*mudowner;	/* Email of the game owner */
     char	*modules_home;	/* Base path for modules */
     char	*game_home;	/* MUSH's working directory */
@@ -399,6 +401,10 @@ struct statedata {
     char	*linkerinfo;	/* Linker command line */
     char	*dbmdriver;	/* DBM Driver */
     char	modloaded[MBUF_SIZE];	/* Modules loaded */
+    char 	**cfiletab;	/* Array of config files */
+    int		configfiles;	/* Number of config files */
+    char	**mfiletab;	/* Array of module files */
+    int		modulefiles;	/* Number of module files */
     int	initializing;	/* Are we reading config file at startup? */
     int	loading_db;	/* Are we loading the db? */
     int	standalone;	/* Are we converting the database? */

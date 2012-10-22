@@ -78,6 +78,8 @@ if WANT_MODULE_DB_SQL
 endif
 
 do_subst = $(SED) \
+	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
+	-e 's|[@]with_compress_prog@|$(with_compress_prog)|g' \
 	-e 's|[@]prefix@|$(prefix)|g' \
 	-e 's|[@]exec_prefix@|$(exec_prefix)|g' \
 	-e 's|[@]bindir@|$(bindir)|g' \

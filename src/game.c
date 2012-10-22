@@ -169,9 +169,9 @@ int handlestartupflatfiles(int flag) {
     struct stat sb1, sb2;
 
     db = XSTRDUP(tmprintf("%s/%s", mudconf.dbhome, mudconf.db_file), "handlestartupflatfiles");
-    flat = XSTRDUP(tmprintf("%s/%s.%s", mudconf.dbhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ), "handlestartupflatfiles");
-    db_bak = XSTRDUP(tmprintf("%s/%s.%ld", mudconf.dbhome, mudconf.db_file, time(NULL)), "handlestartupflatfiles");
-    flat_bak = XSTRDUP(tmprintf("%s/%s.%s.%ld", mudconf.dbhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ,time(NULL)), "handlestartupflatfiles");
+    flat = XSTRDUP(tmprintf("%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ), "handlestartupflatfiles");
+    db_bak = XSTRDUP(tmprintf("%s/%s.%ld", mudconf.bakhome, mudconf.db_file, time(NULL)), "handlestartupflatfiles");
+    flat_bak = XSTRDUP(tmprintf("%s/%s.%s.%ld", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED") ,time(NULL)), "handlestartupflatfiles");
     
     i = open(flat, O_RDONLY);
     if(i>0) {
@@ -186,7 +186,7 @@ int handlestartupflatfiles(int flag) {
                 STARTLOG(LOG_ALWAYS, "INI", "LOAD")
                 log_printf("The %s file is newer than your current database.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
                 ENDLOG
-                if(rename(db, db_bak) != 0) {
+                if(copy_file(db, db_bak, 1) != 0) {
                     STARTLOG(LOG_ALWAYS, "INI", "LOAD")
                     log_printf("Unable to archive previous db to : %s", db_bak);
                     ENDLOG
@@ -204,7 +204,7 @@ int handlestartupflatfiles(int flag) {
                 STARTLOG(LOG_ALWAYS, "INI", "LOAD")
                 log_printf("The %s file is older than your current database.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
                 ENDLOG
-                if(rename(flat, flat_bak) == 0) {
+                if(copy_file(flat, flat_bak, 1) == 0) {
                     STARTLOG(LOG_ALWAYS, "INI", "LOAD")
                     log_printf("Older %s file archived as : %s", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"), flat_bak);
                     ENDLOG
@@ -219,7 +219,7 @@ int handlestartupflatfiles(int flag) {
             log_printf("A corrupt %s file is present.", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
             ENDLOG
             STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-            if(!rename(flat, flat_bak)) {
+            if(!copy_file(flat, flat_bak, 1)) {
                 log_printf("Archived as : %s, using previous db to load", flat_bak);
             } else {
                 log_printf("Unable to archive %s file, using previous db to load", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
@@ -312,15 +312,13 @@ void do_hashresize(dbref player, dbref cause, int key) {
     hashresize(&mudstate.api_func_htab, 8);
 
     WALK_ALL_MODULES(mp) {
-        m_htab = DLSYM_VAR(mp->handle, mp->modname,
-                           "hashtable", MODHASHES *);
+        m_htab = DLSYM_VAR(mp->handle, mp->modname, "hashtable", MODHASHES *);
         if (m_htab) {
             for (hp = m_htab; hp->tabname != NULL; hp++) {
                 hashresize(hp->htab, hp->min_size);
             }
         }
-        m_ntab = DLSYM_VAR(mp->handle, mp->modname,
-                           "nhashtable", MODNHASHES *);
+        m_ntab = DLSYM_VAR(mp->handle, mp->modname, "nhashtable", MODNHASHES *);
         if (m_ntab) {
             for (np = m_ntab; np->tabname != NULL; np++) {
                 nhashresize(np->htab, np->min_size);
@@ -1311,6 +1309,279 @@ void do_timecheck(dbref player, dbref cause, int key) {
  * ----------------------------------------------------------------------
  * Miscellaneous startup/stop routines.
  */
+ 
+char **add_array(char **b, char *s, int *i, char *d) {
+    b=(char **)XREALLOC(b, (*i + 1) * sizeof(char *), d);
+    if(s !=NULL)
+        b[*i] = XSTRDUP(s, d);
+    else
+        b[*i] = NULL;
+    *i = *i + 1;
+    return(b);
+}
+
+int backup_copy(char *src, char *dst, int flag) {
+    char *fn;
+    int i;
+    /*
+     * Copy or move a file to dst directory 
+     */
+    
+    fn=XSTRDUP(tmprintf("%s/%s", realpath(dst, NULL), basename(src)), "backup_copy");
+
+    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
+    log_printf("Copying %s to %s", src, fn);
+    ENDLOG
+
+    i = copy_file(src, fn, flag);
+    XFREE(fn, "backup_copy");
+
+    return(i);
+}
+
+char *mktimestamp(void) {
+    struct tm *t;
+    time_t ts;
+    char *s;
+
+    ts=time(NULL);
+    t = localtime(&ts);
+    s=XSTRDUP(tmprintf("%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone), "mktimestamp");
+    return(s);
+}
+
+int backup_mush(void) {
+    int i, txt_n=0, cnf_n=0, dbf_n=0;
+    char **txt=NULL, **cnf=NULL, **dbf=NULL;
+    char *tmpdir, *ts, *s, *buff, *tb;
+    char cd[MAXPATHLEN];
+    FILE *fp;
+    
+
+    /*
+     * First, get a list of all our text files
+     */
+     
+    for (i=0; i<mudstate.helpfiles; i++) {
+        txt = add_array(txt, tmprintf("%s.txt", mudstate.hfiletab[i]), &txt_n, "backup_mush");
+    }
+    
+    txt = add_array(txt, mudconf.guest_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.conn_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.creg_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.regf_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.motd_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.wizmotd_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.quit_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.down_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.full_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.site_file, &txt_n, "backup_mush");
+    txt = add_array(txt, mudconf.crea_file, &txt_n, "backup_mush");
+#ifdef PUEBLO_SUPPORT
+    txt = add_array(txt, mudconf.htmlconn_file, &txt_n, "backup_mush");
+#endif
+
+
+    /*
+     * Next, get a list of all our config files
+     */
+    for (i=0; i<mudstate.configfiles; i++) {
+        cnf = add_array(cnf, mudstate.cfiletab[i], &cnf_n, "backup_mush");
+    }
+    
+    /*
+     * Next. get a list of all our module files
+     */
+    
+    for (i=0; i<mudstate.modulefiles; i++) {
+        dbf = add_array(dbf, mudstate.mfiletab[i], &dbf_n, "backup_mush");
+    }
+    
+    /* Finally Dump our flatfile */
+    
+    dump_database_internal(DUMP_DB_FLATFILE);
+    dbf = add_array(dbf, tmprintf("%s/%s.FLAT", mudconf.bakhome, mudconf.db_file), &dbf_n, "backup_mush");
+    
+    /*
+     * End our argument list
+     */
+     
+    txt = add_array(txt, NULL, &txt_n, "backup_mush");
+    cnf = add_array(cnf, NULL, &cnf_n, "backup_mush");
+    dbf = add_array(dbf, NULL, &dbf_n, "backup_mush");
+    
+    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
+    log_printf("Found %d text files to backup", txt_n - 4);
+    ENDLOG
+    
+    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
+    log_printf("Found %d config files to backup", cnf_n - 4);
+    ENDLOG
+    
+    STARTLOG(LOG_ALWAYS, "BACK", "INFO")
+    log_printf("Found %d db files to backup", dbf_n - 4);
+    ENDLOG
+    
+    /* We have everything we need to backup, create a temp directory*/
+    
+    tmpdir = XSTRDUP(mkdtemp(tmprintf("%s/backup.XXX", mudconf.bakhome)), "backup_mush");
+    
+    /* Copy files to our backup directory */
+    
+    for(i=0; txt[i]!=NULL; i++) {
+        backup_copy(txt[i], tmpdir, 0);
+    }
+    
+    for(i=0; cnf[i]!=NULL; i++) {
+        backup_copy(cnf[i], tmpdir, 0);
+    }
+    
+    for(i=0; dbf[i]!=NULL; i++) {
+        backup_copy(dbf[i], tmpdir, 0);
+    }
+    
+    /* Create our backup config file */
+    
+    s = XSTRDUP(tmprintf("%s/backup.conf", tmpdir), "backup_mush");
+    
+    if((fp = fopen(s, "w")) !=NULL) {
+        fprintf(fp, "version\t%d\n", BACKUP_VERSION);
+        fprintf(fp, "texts\t");
+        for(i=0; txt[i]!=NULL; i++) {
+            if(txt[i+1]!=NULL) {
+                fprintf(fp, "%s ", basename(txt[i]));
+            } else {
+                fprintf(fp, "%s", basename(txt[i]));
+            }
+            
+        }
+        fprintf(fp, "\nconfigs\t");
+        for(i=0; cnf[i]!=NULL; i++) {
+            if(cnf[i+1]!=NULL) {
+                fprintf(fp, "%s ", basename(cnf[i]));
+            } else {
+                fprintf(fp, "%s", basename(cnf[i]));
+            }
+        }
+        fprintf(fp, "\ndatabases\t");
+        for(i=0; dbf[i]!=NULL; i++) {
+            if(dbf[i+1]!=NULL) {
+                fprintf(fp, "%s ", basename(dbf[i]));
+            } else {
+                fprintf(fp, "%s", basename(dbf[i]));
+            }
+        }
+        fprintf(fp, "\n");
+        fclose(fp);
+    }
+    
+    XFREE(s, "backup_mush");
+    
+    /* Call our external utility to pack everything together */
+    
+    ts = mktimestamp();
+    s = XSTRDUP(tmprintf("%s %s %s/%s_%s.tgz * 2>&1",mudconf.tar_exec, mudconf.tar_compress, mudconf.bakhome, mudconf.mud_shortname, ts), "backup_mush");
+    getcwd(cd, MAXPATHLEN);
+    chdir(tmpdir);
+    buff=XMALLOC(MBUF_SIZE, "backup_mush");
+    STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+    log_printf("Executing external command %s", s);
+    ENDLOG
+    if((fp = popen(s, "r")) != NULL) {
+        while(fgets(buff, MBUF_SIZE, fp)!=NULL) {
+            STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+            if(tb = strchr(buff, '\n'))
+                tb[0]=0x00;
+            if(tb = strchr(buff, '\r'))
+                tb[0]=0x00;
+            log_printf("%s", buff);
+            ENDLOG
+        }
+        pclose(fp);
+        STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+        log_printf("Backup done");
+        ENDLOG
+    } else {
+        STARTLOG(LOG_ALWAYS, "BACK", "RUN")
+        log_printf("Unable to run external command");
+        ENDLOG
+    }
+    chdir(cd);
+    
+    XFREE(buff, "backup_mush");
+    XFREE(s, "backup_mush");
+    
+    /* Cleanup */
+
+    for(i=0; txt[i]!=NULL; i++) {
+        s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(txt[i])), "backup_mush");
+        unlink(s);
+        XFREE(txt[i], "backup_mush");
+        XFREE(s, "backup_mush");
+    }
+    
+    XFREE(txt, "backup_mush");
+    
+    for(i=0; cnf[i]!=NULL; i++) {
+        s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(cnf[i])), "backup_mush");
+        unlink(s);
+        XFREE(cnf[i], "backup_mush");
+        XFREE(s, "backup_mush");
+    }
+    
+    XFREE(cnf, "backup_mush");
+    
+    for(i=0; dbf[i]!=NULL; i++) {
+        s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(dbf[i])), "backup_mush");
+        unlink(s);
+        XFREE(dbf[i], "backup_mush");
+        XFREE(s, "backup_mush");
+    }
+    
+    XFREE(dbf, "backup_mush");
+    
+    s = XSTRDUP(tmprintf("%s/backup.conf", tmpdir), "backup_mush");
+    unlink(s);
+    XFREE(s, "backup_mush");
+    
+    rmdir(tmpdir);    
+}
+
+
+int copy_file(char *src, char *dst, int flag) {
+    FILE *fsrc, *fdst;
+    ssize_t size;
+    char *buff;
+        
+    /*
+     * Rename could work, but only within the same filesystem.
+     * It's slower but safer. If flag is set, delete src (move file)
+     */
+
+    buff = XMALLOC(LBUF_SIZE, "copy_file");
+    if((fsrc=fopen(src, "r")) == NULL) {
+        return(-1);
+    }
+    
+    unlink(dst);
+    
+    if((fdst=fopen(dst, "w")) == NULL) {
+        return(-1);
+    }
+    
+    while((size=fread(buff, sizeof(char), LBUF_SIZE, fsrc)) > 0) {
+        fwrite(buff, sizeof(char), size, fdst);
+    }
+    
+    fclose(fsrc);
+    fclose(fdst);
+
+    XFREE(buff, "copy_file");
+    
+    if(flag)
+        unlink(src);
+    return(0);         
+}
 
 void write_pidfile(char *fn) {
     FILE *f;
@@ -1396,7 +1667,7 @@ void dump_database_internal(int dump_type) {
 
     switch (dump_type) {
     case DUMP_DB_CRASH:
-        sprintf(tmpfile, "%s/%s.CRASH", mudconf.dbhome, mudconf.db_file);
+        sprintf(tmpfile, "%s/%s.CRASH", mudconf.bakhome, mudconf.db_file);
         unlink(tmpfile);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
@@ -1436,7 +1707,7 @@ void dump_database_internal(int dump_type) {
          * Write the game's flatfile
          */
 
-        sprintf(tmpfile, "%s/%s.FLAT", mudconf.dbhome, mudconf.db_file);
+        sprintf(tmpfile, "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
             db_write_flatfile(f, F_TINYMUSH,
@@ -1448,7 +1719,7 @@ void dump_database_internal(int dump_type) {
 
         break;
     case DUMP_DB_KILLED:
-        sprintf(tmpfile, "%s/%s.KILLED", mudconf.dbhome, mudconf.db_file);
+        sprintf(tmpfile, "%s/%s.KILLED", mudconf.bakhome, mudconf.db_file);
         f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
         if (f != NULL) {
             /*
@@ -1730,8 +2001,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
                "Warning: can't rotate main log when logging to stderr.");
     } else {
         fclose(mainlog_fp);
-        rename(mudconf.log_file,
-               tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
+        copy_file(mudconf.log_file, tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now), 1);
         logfile_init(mudconf.log_file);
     }
 
@@ -1746,7 +2016,7 @@ void do_logrotate(dbref player, dbref cause, int key) {
     for (lp = logfds_table; lp->log_flag; lp++) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
-            rename(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now));
+            copy_file(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now), 1);
             lp->fileptr = fopen(lp->filename, "w");
             if (lp->fileptr)
                 setbuf(lp->fileptr, NULL);
@@ -2188,6 +2458,7 @@ int dbconvert(int argc, char *argv[]) {
         }
     }
 
+    
     mainlog_printf("Input: ");
     info(db_format, db_flags, db_ver);
 
@@ -2270,6 +2541,8 @@ int main(int argc, char *argv[]) {
     MODNHASHES *m_ntab, *np;
 
     mudstate.initializing = 1;
+
+    umask(077);		/* Keep things to us by default */
 
     /*
      * Try to get the binary name
@@ -2464,9 +2737,6 @@ int main(int argc, char *argv[]) {
 
     handlestartupflatfiles(HANDLE_FLAT_KILL);
     handlestartupflatfiles(HANDLE_FLAT_CRASH);
-    
-
-    
 
     if( mudconf.help_users == NULL)
         mudconf.help_users = XSTRDUP(tmprintf("help %s/help", mudconf.txthome), "main_add_helpfile_help");
@@ -2649,7 +2919,7 @@ int main(int argc, char *argv[]) {
          * reused in tf_init. A double fclose of stdin would be a
          * really bad idea.
          */ 
-        //fclose(stdout);
+         backup_mush();
     }
     /*
      * We have to do an update, even though we're starting up, because
@@ -2677,7 +2947,7 @@ int main(int argc, char *argv[]) {
             exit(0);
         } else {
             setsid();
-            umask(027);
+
             chdir(mudconf.game_home);
         }
         

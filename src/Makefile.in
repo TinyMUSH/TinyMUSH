@@ -1348,7 +1348,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+with_compress_prog = @with_compress_prog@
 with_install_suffix = @with_install_suffix@
+with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_6)
 SUBDIRS = libltdl $(am__append_1) $(am__append_5) $(am__append_9) \
 	$(am__append_10) $(am__append_11)
@@ -1396,6 +1398,8 @@ API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushcon
 BUILT_SOURCES = version.h tinymushapi.h defaults.h netmush.conf Startmush
 include_HEADERS = tinymushapi.h
 do_subst = $(SED) \
+	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
+	-e 's|[@]with_compress_prog@|$(with_compress_prog)|g' \
 	-e 's|[@]prefix@|$(prefix)|g' \
 	-e 's|[@]exec_prefix@|$(exec_prefix)|g' \
 	-e 's|[@]bindir@|$(bindir)|g' \

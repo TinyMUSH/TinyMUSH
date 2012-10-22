@@ -1494,14 +1494,13 @@ void do_restart(dbref player, dbref cause, int key) {
     for (lp = logfds_table; lp->log_flag; lp++) {
         if (lp->filename && lp->fileptr) {
             fclose(lp->fileptr);
-            rename(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now));
+            copy_file(lp->filename, tmprintf("%s.%ld", lp->filename, (long)mudstate.now), 1);
         }
     }
 
     if (mainlog_fp != stderr) {
         fclose(mainlog_fp);
-        rename(mudconf.log_file,
-               tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now));
+        copy_file(mudconf.log_file, tmprintf("%s.%ld", mudconf.log_file, (long)mudstate.now), 1);
     }
 
     alarm(0);

@@ -120,6 +120,8 @@ extern int	Hearer(dbref);
 extern void	html_escape(const char *, char *, char **);
 extern void	dump_database_internal(int);
 extern void	fork_and_dump(dbref, dbref, int);
+extern int	copy_file(char *,char *, int);
+extern char 	**add_array(char **, char *, int *, char *);
 
 /* From help.c */
 extern int	helpmkindx(dbref, char *, char *);

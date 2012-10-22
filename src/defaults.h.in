@@ -6,7 +6,10 @@
 #define __DEFAULTS_H
 
 #define DEFAULT_SHORTNAME "netmush"
-#define DEFAULT_COMPRESS_UTIL "gzip"
+
+#define DEFAULT_TAR_UTIL "@with_tar_prog@"
+#define DEFAULT_TAR_COMPRESS "czvf"
+#define DEFAULT_TAR_UNCOMPRESS "xzvf"
 
 #define DEFAULT_BACKUP_HOME "@localstatedir@/backups@with_install_suffix@"
 #define DEFAULT_BINARY_HOME "@bindir@"

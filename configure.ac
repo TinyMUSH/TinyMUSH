@@ -69,6 +69,9 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
+AC_PATH_PROGS([with_tar_prog], [tar], AC_MSG_ERROR([not found]))
+AC_PATH_PROGS([with_compress_prog], [gzip], AC_MSG_ERROR([not found]))
+
 AX_BOX([Initializing Automake])
 
 AM_INIT_AUTOMAKE()

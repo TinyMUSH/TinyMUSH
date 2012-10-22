@@ -98,6 +98,10 @@
 #include <netinet/in.h>
 #endif
 
+#ifdef HAVE_LIBZ
+#include <zlib.h>
+#endif
+
 #include <ltdl.h>
 #include <libgen.h>
 
