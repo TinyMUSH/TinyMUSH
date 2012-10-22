@@ -1339,22 +1339,21 @@ int backup_copy(char *src, char *dst, int flag) {
     return(i);
 }
 
-char *mktimestamp(void) {
+char *mktimestamp(char *s) {
     struct tm *t;
     time_t ts;
-    char *s;
+    char *buff;
 
     ts=time(NULL);
     t = localtime(&ts);
-    s=XSTRDUP(tmprintf("%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone), "mktimestamp");
+    buff=XSTRDUP(tmprintf("%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone), s);
     return(s);
 }
 
 int backup_mush(void) {
     int i, txt_n=0, cnf_n=0, dbf_n=0;
     char **txt=NULL, **cnf=NULL, **dbf=NULL;
-    char *tmpdir, *ts, *s, *buff, *tb;
-    char cd[MAXPATHLEN];
+    char *tmpdir, *ts, *s, *buff, *tb, *cwd;
     FILE *fp;
     
 
@@ -1423,8 +1422,16 @@ int backup_mush(void) {
     ENDLOG
     
     /* We have everything we need to backup, create a temp directory*/
+    s = XSTRDUP(tmprintf("%s/backup.XXX", mudconf.bakhome), "backup_mush");
+    if((buff = mkdtemp(s)) == NULL) {
+        STARTLOG(LOG_ALWAYS, "BACK", "MKDIR")
+        log_printf("Unable to create temp directory");
+        ENDLOG
+    }
     
-    tmpdir = XSTRDUP(mkdtemp(tmprintf("%s/backup.XXX", mudconf.bakhome)), "backup_mush");
+    tmpdir = XSTRDUP(buff, "backup_mush");
+    
+    free(buff);
     
     /* Copy files to our backup directory */
     
@@ -1440,9 +1447,19 @@ int backup_mush(void) {
         backup_copy(dbf[i], tmpdir, 0);
     }
     
+    /* We don't need the original flatfile anymore */
+    s = XSTRDUP(tmprintf("%s/%s.FLAT", mudconf.bakhome, mudconf.db_file), "backup_mush");
+    if( unlink(s) == -1) {
+        /* Not a fatal error but keep a trace of it */
+        STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
+        log_printf("Unable to remove file ", s);
+        ENDLOG
+    }
+    XFREE(s, "backup_mush");
+    
     /* Create our backup config file */
     
-    s = XSTRDUP(tmprintf("%s/backup.conf", tmpdir), "backup_mush");
+    s = XSTRDUP(tmprintf("%s/netmush.backup", tmpdir), "backup_mush");
     
     if((fp = fopen(s, "w")) !=NULL) {
         fprintf(fp, "version\t%d\n", BACKUP_VERSION);
@@ -1479,10 +1496,22 @@ int backup_mush(void) {
     
     /* Call our external utility to pack everything together */
     
-    ts = mktimestamp();
-    s = XSTRDUP(tmprintf("%s %s %s/%s_%s.tgz * 2>&1",mudconf.tar_exec, mudconf.tar_compress, mudconf.bakhome, mudconf.mud_shortname, ts), "backup_mush");
-    getcwd(cd, MAXPATHLEN);
-    chdir(tmpdir);
+    ts = mktimestamp("backup_mush");
+    s = XSTRDUP(tmprintf("%s %s %s/%s_%s.%s * 2>&1",mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext), "backup_mush");
+    XFREE(ts, "backup_mush");
+    cwd = getcwd(NULL, MAXPATHLEN);
+    if(cwd == NULL) {
+        STARTLOG(LOG_ALWAYS, "BACK", "GETCD")
+        log_printf("Unable to get the current working directory.");
+        ENDLOG
+        return(-1);
+    }
+    if(chdir(tmpdir) == -1) {
+        STARTLOG(LOG_ALWAYS, "BACK", "SETCD")
+        log_printf("Unable to set the working directory.");
+        ENDLOG
+        return(-1);
+    }
     buff=XMALLOC(MBUF_SIZE, "backup_mush");
     STARTLOG(LOG_ALWAYS, "BACK", "RUN")
     log_printf("Executing external command %s", s);
@@ -1506,7 +1535,14 @@ int backup_mush(void) {
         log_printf("Unable to run external command");
         ENDLOG
     }
-    chdir(cd);
+
+    if(chdir(cwd) == -1) {
+        STARTLOG(LOG_ALWAYS, "BACK", "SETCD")
+        log_printf("Unable to restore the working directory.");
+        ENDLOG;
+    }
+
+    free(cwd);
     
     XFREE(buff, "backup_mush");
     XFREE(s, "backup_mush");
@@ -1515,7 +1551,11 @@ int backup_mush(void) {
 
     for(i=0; txt[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(txt[i])), "backup_mush");
-        unlink(s);
+        if(unlink(s) == -1) {
+            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
+            log_printf("Unable to remove file ", s);
+            ENDLOG
+        }
         XFREE(txt[i], "backup_mush");
         XFREE(s, "backup_mush");
     }
@@ -1524,7 +1564,11 @@ int backup_mush(void) {
     
     for(i=0; cnf[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(cnf[i])), "backup_mush");
-        unlink(s);
+        if(unlink(s) == -1) {
+            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
+            log_printf("Unable to remove file ", s);
+            ENDLOG
+        }
         XFREE(cnf[i], "backup_mush");
         XFREE(s, "backup_mush");
     }
@@ -1533,18 +1577,31 @@ int backup_mush(void) {
     
     for(i=0; dbf[i]!=NULL; i++) {
         s = XSTRDUP(tmprintf("%s/%s", tmpdir, basename(dbf[i])), "backup_mush");
-        unlink(s);
+        if(unlink(s) == -1) {
+            STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
+            log_printf("Unable to remove file ", s);
+            ENDLOG
+        }
         XFREE(dbf[i], "backup_mush");
         XFREE(s, "backup_mush");
     }
     
     XFREE(dbf, "backup_mush");
     
-    s = XSTRDUP(tmprintf("%s/backup.conf", tmpdir), "backup_mush");
-    unlink(s);
+    s = XSTRDUP(tmprintf("%s/netmush.backup", tmpdir), "backup_mush");
+    if(unlink(s) == -1) {
+        STARTLOG(LOG_ALWAYS, "BACK", "UNLK")
+        log_printf("Unable to remove file ", s);
+        ENDLOG
+    }    
     XFREE(s, "backup_mush");
     
-    rmdir(tmpdir);    
+    if(rmdir(tmpdir) == -1) {
+        STARTLOG(LOG_ALWAYS, "BACK", "RMDIR")
+        log_printf("Unable to remove directory ", tmpdir);
+        ENDLOG
+    }
+    XFREE(tmpdir, "backup_mush");
 }
 
 

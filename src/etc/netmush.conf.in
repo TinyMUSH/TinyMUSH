@@ -15,9 +15,10 @@ scripts_home		@libexecdir@@with_install_suffix@
 log_home		@localstatedir@/log@with_install_suffix@
 pid_home		@localstatedir@/run@with_install_suffix@
 text_home		@datarootdir@
-tar_util		@with_tar_prog@
-tar_compress		czf
-tar_uncompress		xzf
+backup_util		@with_tar_prog@
+backup_compress		czf
+backup_extract		xzf
+backup_extension	tbz
 #
 # -- Enable mail and comsys modules.
 #

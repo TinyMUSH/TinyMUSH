@@ -7,9 +7,10 @@
 
 #define DEFAULT_SHORTNAME "netmush"
 
-#define DEFAULT_TAR_UTIL "@with_tar_prog@"
-#define DEFAULT_TAR_COMPRESS "czvf"
-#define DEFAULT_TAR_UNCOMPRESS "xzvf"
+#define DEFAULT_BACKUP_UTIL "@with_tar_prog@"
+#define DEFAULT_BACKUP_COMPRESS "czvf"
+#define DEFAULT_BACKUP_EXTRACT "xzvf"
+#define DEFAULT_BACKUP_EXT "tbz"
 
 #define DEFAULT_BACKUP_HOME "@localstatedir@/backups@with_install_suffix@"
 #define DEFAULT_BINARY_HOME "@bindir@"

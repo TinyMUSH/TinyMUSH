@@ -86,9 +86,10 @@ void cf_init(void) {
     mudconf.guest_prefixes = XSTRDUP("", "cf_string");
     mudconf.guest_suffixes = XSTRDUP("", "cf_string");
 
-    mudconf.tar_exec = XSTRDUP(DEFAULT_TAR_UTIL, "cf_string");
-    mudconf.tar_compress = XSTRDUP(DEFAULT_TAR_COMPRESS, "cf_string");
-    mudconf.tar_extract = XSTRDUP(DEFAULT_TAR_UNCOMPRESS, "cf_string");
+    mudconf.backup_exec = XSTRDUP(DEFAULT_BACKUP_UTIL, "cf_string");
+    mudconf.backup_compress = XSTRDUP(DEFAULT_BACKUP_COMPRESS, "cf_string");
+    mudconf.backup_extract = XSTRDUP(DEFAULT_BACKUP_EXTRACT, "cf_string");
+    mudconf.backup_ext = XSTRDUP(DEFAULT_BACKUP_EXT, "cf_string");
 
     mudconf.mudowner = XSTRDUP("", "cf_string");
 
@@ -1828,7 +1829,11 @@ CONF		conftable [] = {
     {(char *)"autozone", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.autozone, (long)"New objects are @chzoned to their creator's zone"},
     {(char *)"bad_name", cf_badname, CA_GOD, CA_DISABLED, NULL, 0},
     {(char *)"badsite_file", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.site_file, MBUF_SIZE},
+    {(char *)"backup_compress", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.backup_compress, MBUF_SIZE},    
+    {(char *)"backup_extension", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.backup_ext, MBUF_SIZE},
+    {(char *)"backup_extract", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.backup_extract, MBUF_SIZE},
     {(char *)"backup_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.bakhome, MBUF_SIZE},
+    {(char *)"backup_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.backup_exec, MBUF_SIZE},
     {(char *)"binary_home", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.binhome, MBUF_SIZE},
     {(char *)"booleans_oldstyle", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.bools_oldstyle, (long)"Dbrefs #0 and #-1 are boolean false, all other\n\t\t\t\tdbrefs are boolean true"},
     {(char *)"building_limit", cf_int, CA_GOD, CA_PUBLIC, (int *)&mudconf.building_limit, 0},
@@ -2043,9 +2048,7 @@ CONF		conftable [] = {
     {(char *)"suspect_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mudstate.suspect_list, H_SUSPECT},
     {(char *)"sweep_dark", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.sweep_dark, (long)"@sweep works on Dark locations"},
     {(char *)"switch_default_all", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.switch_df_all, (long)"@switch default is /all, not /first"},
-    {(char *)"tar_compress", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_compress, MBUF_SIZE},    
-    {(char *)"tar_util", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_exec, MBUF_SIZE},
-    {(char *)"tar_uncompress", cf_string, CA_STATIC, CA_GOD, (int *)&mudconf.tar_extract, MBUF_SIZE},
+
     {(char *)"terse_shows_contents", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_contents, (long)"TERSE suppresses the contents list of a location"},
     {(char *)"terse_shows_exits", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_exits, (long)"TERSE suppresses the exit list of a location"},
     {(char *)"terse_shows_move_messages", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.terse_movemsg, (long)"TERSE suppresses movement messages"},

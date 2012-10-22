@@ -110,9 +110,10 @@ struct confdata {
     char 	*pid_file;	/* MUSH's pid file */
     char	*pid_home;	/* MUSH's pid directory */
     char 	*db_file;	/* MUSH's db file */
-    char	*tar_exec;	/* Executable run to tar files */
-    char	*tar_compress;	/* Flags used to compress */
-    char	*tar_extract;	/* Flags used to extract */
+    char	*backup_exec;	/* Executable run to tar files */
+    char	*backup_compress;	/* Flags used to compress */
+    char	*backup_extract;	/* Flags used to extract */
+    char	*backup_ext;		/* Filename extension for backup */
     char	*mudowner;	/* Email of the game owner */
     char	*modules_home;	/* Base path for modules */
     char	*game_home;	/* MUSH's working directory */
