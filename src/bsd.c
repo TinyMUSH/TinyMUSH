@@ -1220,8 +1220,9 @@ static RETSIGTYPE sighandler(int sig) {
         log_signal(signames[sig]);
         mudstate.dump_counter = 0;
         break;
-    case SIGINT:		/* Log + ignore */
+    case SIGINT:		/* Force a live backup */
         log_signal(signames[sig]);
+        do_backup_mush(GOD, GOD, 0);
         break;
     case SIGQUIT:		/* Normal shutdown soon */
         mudstate.shutdown_flag = 1;

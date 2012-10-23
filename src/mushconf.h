@@ -404,8 +404,6 @@ struct statedata {
     char	modloaded[MBUF_SIZE];	/* Modules loaded */
     char 	**cfiletab;	/* Array of config files */
     int		configfiles;	/* Number of config files */
-    char	**mfiletab;	/* Array of module files */
-    int		modulefiles;	/* Number of module files */
     int	initializing;	/* Are we reading config file at startup? */
     int	loading_db;	/* Are we loading the db? */
     int	standalone;	/* Are we converting the database? */

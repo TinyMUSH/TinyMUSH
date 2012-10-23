@@ -1372,10 +1372,8 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
 
     if (mudstate.standalone && dbclean) {
 
-        used_attrs_table = (int *)XCALLOC(mudstate.attr_next,
-                                          sizeof(int), "flatfile.used_attrs_table");
-        old_attrs_table = (int *)XCALLOC(mudstate.attr_next,
-                                         sizeof(int), "flatfile.old_attrs_table");
+        used_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "flatfile.used_attrs_table");
+        old_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "flatfile.old_attrs_table");
         n_oldtotal = mudstate.attr_next;
         n_oldtop = anum_alc_top;
         n_deleted = n_renumbered = n_objt = n_atrt = 0;
@@ -1394,8 +1392,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
         atr_push();
         DO_WHOLE_DB(i) {
             for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
-                used_attrs_table[ca] = old_attrs_table[ca] =
-                                           ca;
+                used_attrs_table[ca] = old_attrs_table[ca] = ca;
         }
         atr_pop();
 
@@ -1418,16 +1415,13 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * be.
          */
 
-        for (n = A_USER_START, end = mudstate.attr_next - 1;
-                (n < mudstate.attr_next) && (n < end); n++) {
+        for (n = A_USER_START, end = mudstate.attr_next - 1; (n < mudstate.attr_next) && (n < end); n++) {
             if (used_attrs_table[n] == 0) {
-                while ((end > n)
-                        && (used_attrs_table[end] == 0))
+                while ((end > n) && (used_attrs_table[end] == 0))
                     end--;
                 if (end > n) {
                     old_attrs_table[n] = end;
-                    used_attrs_table[end] =
-                        used_attrs_table[n] = n;
+                    used_attrs_table[end] = used_attrs_table[n] = n;
                     end--;
                 }
             }
@@ -1438,8 +1432,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          */
 
         for (n = A_USER_START; n < mudstate.attr_next; n++) {
-            if ((used_attrs_table[n] != n)
-                    && (used_attrs_table[n] != 0)) {
+            if ((used_attrs_table[n] != n) && (used_attrs_table[n] != 0)) {
                 vp = (VATTR *) anum_get(n);
                 if (vp)
                     n_renumbered++;
@@ -1451,9 +1444,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * we've renumbered.
          */
 
-        for (anxt = A_USER_START;
-                ((anxt == used_attrs_table[anxt]) &&
-                 (anxt < mudstate.attr_next)); anxt++);
+        for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mudstate.attr_next)); anxt++);
 
     } else {
         used_attrs_table = NULL;
@@ -1478,8 +1469,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
             vp = (VATTR *) anum_get(old_attrs_table[i]);
             if (vp) {
                 if (!(vp->flags & AF_DELETED)) {
-                    fprintf(f, "+A%d\n\"%d:%s\"\n",
-                            i, vp->flags, vp->name);
+                    fprintf(f, "+A%d\n\"%d:%s\"\n", i, vp->flags, vp->name);
                 }
             }
         }
@@ -1487,8 +1477,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
         vp = vattr_first();
         while (vp != NULL) {
             if (!(vp->flags & AF_DELETED)) {
-                fprintf(f, "+A%d\n\"%d:%s\"\n",
-                        vp->number, vp->flags, vp->name);
+                fprintf(f, "+A%d\n\"%d:%s\"\n", vp->number, vp->flags, vp->name);
             }
             vp = vattr_next(vp);
         }
@@ -1515,14 +1504,9 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
         mainlog_printf("\n");
         if (dbclean) {
             if (n_objt) {
-                mainlog_printf(
-                    "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n",
-                    n_oldtotal, anxt, n_deleted, n_renumbered,
-                    n_objt, n_atrt);
+                mainlog_printf("Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered, n_objt, n_atrt);
             } else if (n_deleted || n_renumbered) {
-                mainlog_printf(
-                    "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n",
-                    n_oldtotal, anxt, n_deleted, n_renumbered);
+                mainlog_printf( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered);
             }
             XFREE(used_attrs_table, "flatfile.used_attrs_table");
             XFREE(old_attrs_table, "flatfile.old_attrs_table");

@@ -1400,6 +1400,14 @@ int backup_mush(dbref player, dbref cause, int key) {
         cnf = add_array(cnf, mudstate.cfiletab[i], &cnf_n, "backup_mush");
     }
 
+    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
+    log_printf("Making sure flatfiles are up to date");
+    ENDLOG
+
+    if(player != NOTHING) {
+        notify(player, "Making sure flatfiles are up to date");
+    }
+
     /*
      * Next. get a list of all our module files
      */
@@ -1430,15 +1438,10 @@ int backup_mush(dbref player, dbref cause, int key) {
     
     /* Finally Dump our flatfile */
 
-    STARTLOG(LOG_ALWAYS, "BCK", "INFO")
-    log_printf("Making sure flatfiles are up to date");
-    ENDLOG
-
-    if(player != NOTHING) {
-        notify(player, "Making sure flatfiles are up to date");
-    }
-    
     s = XSTRDUP(tmprintf("%s/%s.FLAT", mudconf.bakhome, mudconf.db_file), "backup_mush");
+    STARTLOG(LOG_ALWAYS, "DMP", "DUMP")
+    log_printf("Writing db: %s", s);
+    ENDLOG
     fp = tf_fopen(s, O_WRONLY | O_CREAT | O_TRUNC);
     if (fp != NULL) {
         dbf = add_array(dbf, s, &dbf_n, "backup_mush");
@@ -1480,7 +1483,7 @@ int backup_mush(dbref player, dbref cause, int key) {
     ENDLOG
     
     if(player != NOTHING)
-        notify(player, tmprintf("Found, %d text files, %d config files and %d db files to backup", txt_n, cnf_n, dbf_n));
+        notify(player, tmprintf("Found, %d text files, %d config files and %d db files to backup", txt_n - 1, cnf_n - 1, dbf_n - 1));
 
     /* We have everything we need to backup, create a temp directory*/
     s = XSTRDUP(tmprintf("%s/backup.XXX", mudconf.bakhome), "backup_mush");

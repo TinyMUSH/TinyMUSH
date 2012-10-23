@@ -22,15 +22,15 @@
   CD             DOING          internalgoto   slay           WHO
   wizhelp
  
-  @addcommand    @admin         @apply_marked  @attribute     @boot
-  @chownall      @cut           @dbck          @delcommand    @destroy       
-  @disable       @doing         @dump          @enable        @fixdb         
-  @freelist      @function      @hashresize    @hook          @kick          
-  @list          @listcommands  @list_file     @log           @logrotate
-  @mark          @mark_all      @motd          @newpassword   @pcreate       
-  @poor          @purge         @quota         @readcache     @restart
-  @shutdown      @sqlconnect    @sqldisconnect @timecheck     @startslave
-  @timewarp      @toad          @wall
+  @addcommand    @admin         @apply_marked  @attribute     @backup     
+  @boot          @chownall      @cut           @dbck          @delcommand
+  @destroy       @disable       @doing         @dump          @enable
+  @fixdb         @freelist      @function      @hashresize    @hook
+  @kick          @list          @listcommands  @list_file     @log
+  @logrotate     @mark          @mark_all      @motd          @newpassword
+  @pcreate       @poor          @purge         @quota         @readcache
+  @restart       @shutdown      @sqlconnect    @sqldisconnect @timecheck
+  @startslave    @timewarp      @toad          @wall
  
   @allowance     @comment       @timeout
  
@@ -275,6 +275,15 @@ Examples:
  
 See also: exit_attr_defaults, player_attr_defaults, room_attr_defaults,
           thing_attr_defaults
+ 
+& @backup
+  Command: @backup
+  Make a complete backup of text, config and databases and store it in the
+  default's backup directory. This command may freeze the game for a while
+  if you have a large database. This command is also run internally by
+  netmush everytime it start.
+
+  See also @dump.
  
 & @boot
   Command: @boot[/<switches>] <player>

@@ -364,8 +364,6 @@ void cf_init(void) {
     mudstate.hfiletab_size = 0;
     mudstate.cfiletab = NULL;
     mudstate.configfiles = 0;
-    mudstate.mfiletab = NULL;
-    mudstate.modulefiles = 0;
     mudstate.hfile_hashes = NULL;
     mudstate.curr_player = NOTHING;
     mudstate.curr_enactor = NOTHING;
