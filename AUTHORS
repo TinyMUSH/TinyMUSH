@@ -1,3 +1,13 @@
+TinyMUSH 3.3 Credits
+====================
+
+Thanks to the following people who commited patch or helped solving
+issues:
+
+- Susan Tussing, who fixed some issues with structures.
+- Stephen Dennis, who pointed out an old bug in mail.c dating from
+  TinyMUX 1.6.
+
 TinyMUSH 3.2 Credits
 ====================
 
