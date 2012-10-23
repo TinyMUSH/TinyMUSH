@@ -23,7 +23,7 @@
 
 #include "powers.h"		/* required by code */
 
-extern void db_grow(dbref);
+extern void db_grow ( dbref );
 
 extern struct object *db;
 
@@ -42,74 +42,85 @@ static int *used_attrs_table;
  * getboolexp1: Get boolean subexpression from file.
  */
 
-BOOLEXP * getboolexp1(FILE *f) {
+BOOLEXP * getboolexp1 ( FILE *f ) {
     BOOLEXP *b;
 
     char *buff, *s;
 
     int c, d, anum;
 
-    c = getc(f);
-    switch (c) {
+    c = getc ( f );
+    switch ( c ) {
     case '\n':
-        ungetc(c, f);
+        ungetc ( c, f );
         return TRUE_BOOLEXP;
         /*
          * break;
          */
     case EOF:
-        mainlog_printf("ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n");
+        mainlog_printf ( "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n" );
         abort();
         break;
     case '(':
-        b = alloc_bool("getboolexp1.openparen");
-        switch (c = getc(f)) {
+        b = alloc_bool ( "getboolexp1.openparen" );
+        switch ( c = getc ( f ) ) {
         case NOT_TOKEN:
             b->type = BOOLEXP_NOT;
-            b->sub1 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub1 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         case INDIR_TOKEN:
             b->type = BOOLEXP_INDIR;
-            b->sub1 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub1 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         case IS_TOKEN:
             b->type = BOOLEXP_IS;
-            b->sub1 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub1 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         case CARRY_TOKEN:
             b->type = BOOLEXP_CARRY;
-            b->sub1 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub1 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         case OWNER_TOKEN:
             b->type = BOOLEXP_OWNER;
-            b->sub1 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub1 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         default:
-            ungetc(c, f);
-            b->sub1 = getboolexp1(f);
-            if ((c = getc(f)) == '\n')
-                c = getc(f);
-            switch (c) {
+            ungetc ( c, f );
+            b->sub1 = getboolexp1 ( f );
+            if ( ( c = getc ( f ) ) == '\n' ) {
+                c = getc ( f );
+            }
+            switch ( c ) {
             case AND_TOKEN:
                 b->type = BOOLEXP_AND;
                 break;
@@ -119,39 +130,41 @@ BOOLEXP * getboolexp1(FILE *f) {
             default:
                 goto error;
             }
-            b->sub2 = getboolexp1(f);
-            if ((d = getc(f)) == '\n')
-                d = getc(f);
-            if (d != ')')
+            b->sub2 = getboolexp1 ( f );
+            if ( ( d = getc ( f ) ) == '\n' ) {
+                d = getc ( f );
+            }
+            if ( d != ')' ) {
                 goto error;
+            }
             return b;
         }
     case '-':		/* obsolete NOTHING key, eat it */
-        while ((c = getc(f)) != '\n') {
-            if (c == EOF) {
-                mainlog_printf("ABORT! db_rw.c, unexpected EOF in getboolexp1().\n");
+        while ( ( c = getc ( f ) ) != '\n' ) {
+            if ( c == EOF ) {
+                mainlog_printf ( "ABORT! db_rw.c, unexpected EOF in getboolexp1().\n" );
                 abort();
             }
         }
-        ungetc(c, f);
+        ungetc ( c, f );
         return TRUE_BOOLEXP;
     case '"':
-        ungetc(c, f);
-        buff = alloc_lbuf("getboolexp.quoted");
-        strcpy(buff, getstring_noalloc(f, 1));
-        c = fgetc(f);
-        if (c == EOF) {
-            free_lbuf(buff);
+        ungetc ( c, f );
+        buff = alloc_lbuf ( "getboolexp.quoted" );
+        strcpy ( buff, getstring_noalloc ( f, 1 ) );
+        c = fgetc ( f );
+        if ( c == EOF ) {
+            free_lbuf ( buff );
             return TRUE_BOOLEXP;
         }
-        b = alloc_bool("getboolexp1.quoted");
-        anum = mkattr(buff);
-        if (anum <= 0) {
-            free_bool(b);
-            free_lbuf(buff);
+        b = alloc_bool ( "getboolexp1.quoted" );
+        anum = mkattr ( buff );
+        if ( anum <= 0 ) {
+            free_bool ( b );
+            free_lbuf ( buff );
             goto error;
         }
-        free_lbuf(buff);
+        free_lbuf ( buff );
         b->thing = anum;
 
         /*
@@ -159,19 +172,20 @@ BOOLEXP * getboolexp1(FILE *f) {
          * last character of / means an eval lock
          */
 
-        if ((c == ':') || (c == '/')) {
-            if (c == '/')
+        if ( ( c == ':' ) || ( c == '/' ) ) {
+            if ( c == '/' ) {
                 b->type = BOOLEXP_EVAL;
-            else
+            } else {
                 b->type = BOOLEXP_ATR;
+            }
             b->sub1 =
-                (BOOLEXP *) XSTRDUP(getstring_noalloc(f, 1),
-                                    "getboolexp1.attr_lock");
+                ( BOOLEXP * ) XSTRDUP ( getstring_noalloc ( f, 1 ),
+                                        "getboolexp1.attr_lock" );
         }
         return b;
     default:		/* dbref or attribute */
-        ungetc(c, f);
-        b = alloc_bool("getboolexp1.default");
+        ungetc ( c, f );
+        b = alloc_bool ( "getboolexp1.default" );
         b->type = BOOLEXP_CONST;
         b->thing = 0;
 
@@ -183,18 +197,18 @@ BOOLEXP * getboolexp1(FILE *f) {
          * <nl>, |, and & terminate the string.
          */
 
-        if (isdigit(c)) {
-            while (isdigit(c = getc(f))) {
+        if ( isdigit ( c ) ) {
+            while ( isdigit ( c = getc ( f ) ) ) {
                 b->thing = b->thing * 10 + c - '0';
             }
-        } else if (isalpha(c)) {
-            buff = alloc_lbuf("getboolexp1.atr_name");
-            for (s = buff;
-                    ((c = getc(f)) != EOF) && (c != '\n') &&
-                    (c != ':') && (c != '/'); *s++ = c);
-            if (c == EOF) {
-                free_lbuf(buff);
-                free_bool(b);
+        } else if ( isalpha ( c ) ) {
+            buff = alloc_lbuf ( "getboolexp1.atr_name" );
+            for ( s = buff;
+                    ( ( c = getc ( f ) ) != EOF ) && ( c != '\n' ) &&
+                    ( c != ':' ) && ( c != '/' ); *s++ = c );
+            if ( c == EOF ) {
+                free_lbuf ( buff );
+                free_bool ( b );
                 goto error;
             }
             *s = '\0';
@@ -204,16 +218,16 @@ BOOLEXP * getboolexp1(FILE *f) {
              * create a new attribute.
              */
 
-            anum = mkattr(buff);
-            if (anum <= 0) {
-                free_bool(b);
-                free_lbuf(buff);
+            anum = mkattr ( buff );
+            if ( anum <= 0 ) {
+                free_bool ( b );
+                free_lbuf ( buff );
                 goto error;
             }
-            free_lbuf(buff);
+            free_lbuf ( buff );
             b->thing = anum;
         } else {
-            free_bool(b);
+            free_bool ( b );
             goto error;
         }
 
@@ -222,28 +236,30 @@ BOOLEXP * getboolexp1(FILE *f) {
          * last character of / means an eval lock
          */
 
-        if ((c == ':') || (c == '/')) {
-            if (c == '/')
+        if ( ( c == ':' ) || ( c == '/' ) ) {
+            if ( c == '/' ) {
                 b->type = BOOLEXP_EVAL;
-            else
+            } else {
                 b->type = BOOLEXP_ATR;
-            buff = alloc_lbuf("getboolexp1.attr_lock");
-            for (s = buff;
-                    ((c = getc(f)) != EOF) && (c != '\n') && (c != ')')
-                    && (c != OR_TOKEN) && (c != AND_TOKEN); *s++ = c);
-            if (c == EOF)
+            }
+            buff = alloc_lbuf ( "getboolexp1.attr_lock" );
+            for ( s = buff;
+                    ( ( c = getc ( f ) ) != EOF ) && ( c != '\n' ) && ( c != ')' )
+                    && ( c != OR_TOKEN ) && ( c != AND_TOKEN ); *s++ = c );
+            if ( c == EOF ) {
                 goto error;
+            }
             *s++ = 0;
             b->sub1 =
-                (BOOLEXP *) XSTRDUP(buff, "getboolexp1.attr_lock");
-            free_lbuf(buff);
+                ( BOOLEXP * ) XSTRDUP ( buff, "getboolexp1.attr_lock" );
+            free_lbuf ( buff );
         }
-        ungetc(c, f);
+        ungetc ( c, f );
         return b;
     }
 
 error:
-    mainlog_printf("ABORT! db_rw.c, reached error case in getboolexp1().\n");
+    mainlog_printf ( "ABORT! db_rw.c, reached error case in getboolexp1().\n" );
     abort();		/* bomb out */
     return TRUE_BOOLEXP;	/* NOTREACHED */
 }
@@ -253,18 +269,19 @@ error:
  * getboolexp: Read a boolean expression from the flat file.
  */
 
-static BOOLEXP *getboolexp(FILE *f) {
+static BOOLEXP *getboolexp ( FILE *f ) {
     BOOLEXP *b;
 
     char c;
 
-    b = getboolexp1(f);
-    if (getc(f) != '\n') {
-        mainlog_printf("ABORT! db_rw.c, parse error in getboolexp().\n");
+    b = getboolexp1 ( f );
+    if ( getc ( f ) != '\n' ) {
+        mainlog_printf ( "ABORT! db_rw.c, parse error in getboolexp().\n" );
         abort();	/* parse error, we lose */
     }
-    if ((c = getc(f)) != '\n')
-        ungetc(c, f);
+    if ( ( c = getc ( f ) ) != '\n' ) {
+        ungetc ( c, f );
+    }
 
     return b;
 }
@@ -274,14 +291,14 @@ static BOOLEXP *getboolexp(FILE *f) {
  * unscramble_attrnum: Fix up attribute numbers from foreign muds
  */
 
-static int unscramble_attrnum(int attrnum) {
-    switch (g_format) {
+static int unscramble_attrnum ( int attrnum ) {
+    switch ( g_format ) {
     case F_MUSH:
         /*
          * TinyMUSH 2.2:  Deal with different attribute numbers.
          */
 
-        switch (attrnum) {
+        switch ( attrnum ) {
         case 208:
             return A_NEWOBJS;
             break;
@@ -307,56 +324,57 @@ static int unscramble_attrnum(int attrnum) {
  * get_list: Read attribute list from flat file.
  */
 
-static int get_list(FILE *f, dbref i, int new_strings) {
+static int get_list ( FILE *f, dbref i, int new_strings ) {
     dbref atr;
 
     int c;
 
     char *buff;
 
-    buff = alloc_lbuf("get_list");
-    while (1) {
-        switch (c = getc(f)) {
+    buff = alloc_lbuf ( "get_list" );
+    while ( 1 ) {
+        switch ( c = getc ( f ) ) {
         case '>':	/* read # then string */
-            if (mudstate.standalone)
-                atr = unscramble_attrnum(getref(f));
-            else
-                atr = getref(f);
-            if (atr > 0) {
+            if ( mudstate.standalone ) {
+                atr = unscramble_attrnum ( getref ( f ) );
+            } else {
+                atr = getref ( f );
+            }
+            if ( atr > 0 ) {
                 /*
                  * Store the attr
                  */
 
-                atr_add_raw(i, atr,
-                            (char *)getstring_noalloc(f, new_strings));
+                atr_add_raw ( i, atr,
+                              ( char * ) getstring_noalloc ( f, new_strings ) );
             } else {
                 /*
                  * Silently discard
                  */
 
-                getstring_noalloc(f, new_strings);
+                getstring_noalloc ( f, new_strings );
             }
             break;
         case '\n':	/* ignore newlines. They're due to v(r). */
             break;
         case '<':	/* end of list */
-            free_lbuf(buff);
-            c = getc(f);
-            if (c != '\n') {
-                ungetc(c, f);
-                mainlog_printf("No line feed on object %d\n", i);
+            free_lbuf ( buff );
+            c = getc ( f );
+            if ( c != '\n' ) {
+                ungetc ( c, f );
+                mainlog_printf ( "No line feed on object %d\n", i );
                 return 1;
             }
             return 1;
         default:
-            mainlog_printf("Bad character '%c' when getting attributes on object %d\n",
-                           c, i);
+            mainlog_printf ( "Bad character '%c' when getting attributes on object %d\n",
+                             c, i );
             /*
              * We've found a bad spot.  I hope things aren't too
              * bad.
              */
 
-            (void)getstring_noalloc(f, new_strings);
+            ( void ) getstring_noalloc ( f, new_strings );
         }
     }
     return 1;		/* NOTREACHED */
@@ -366,75 +384,75 @@ static int get_list(FILE *f, dbref i, int new_strings) {
  * ---------------------------------------------------------------------------
  * putbool_subexp: Write a boolean sub-expression to the flat file.
  */
-static void putbool_subexp(FILE *f, BOOLEXP *b) {
+static void putbool_subexp ( FILE *f, BOOLEXP *b ) {
     ATTR *va;
 
-    switch (b->type) {
+    switch ( b->type ) {
     case BOOLEXP_IS:
-        putc('(', f);
-        putc(IS_TOKEN, f);
-        putbool_subexp(f, b->sub1);
-        putc(')', f);
+        putc ( '(', f );
+        putc ( IS_TOKEN, f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( ')', f );
         break;
     case BOOLEXP_CARRY:
-        putc('(', f);
-        putc(CARRY_TOKEN, f);
-        putbool_subexp(f, b->sub1);
-        putc(')', f);
+        putc ( '(', f );
+        putc ( CARRY_TOKEN, f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( ')', f );
         break;
     case BOOLEXP_INDIR:
-        putc('(', f);
-        putc(INDIR_TOKEN, f);
-        putbool_subexp(f, b->sub1);
-        putc(')', f);
+        putc ( '(', f );
+        putc ( INDIR_TOKEN, f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( ')', f );
         break;
     case BOOLEXP_OWNER:
-        putc('(', f);
-        putc(OWNER_TOKEN, f);
-        putbool_subexp(f, b->sub1);
-        putc(')', f);
+        putc ( '(', f );
+        putc ( OWNER_TOKEN, f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( ')', f );
         break;
     case BOOLEXP_AND:
-        putc('(', f);
-        putbool_subexp(f, b->sub1);
-        putc(AND_TOKEN, f);
-        putbool_subexp(f, b->sub2);
-        putc(')', f);
+        putc ( '(', f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( AND_TOKEN, f );
+        putbool_subexp ( f, b->sub2 );
+        putc ( ')', f );
         break;
     case BOOLEXP_OR:
-        putc('(', f);
-        putbool_subexp(f, b->sub1);
-        putc(OR_TOKEN, f);
-        putbool_subexp(f, b->sub2);
-        putc(')', f);
+        putc ( '(', f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( OR_TOKEN, f );
+        putbool_subexp ( f, b->sub2 );
+        putc ( ')', f );
         break;
     case BOOLEXP_NOT:
-        putc('(', f);
-        putc(NOT_TOKEN, f);
-        putbool_subexp(f, b->sub1);
-        putc(')', f);
+        putc ( '(', f );
+        putc ( NOT_TOKEN, f );
+        putbool_subexp ( f, b->sub1 );
+        putc ( ')', f );
         break;
     case BOOLEXP_CONST:
-        fprintf(f, "%d", b->thing);
+        fprintf ( f, "%d", b->thing );
         break;
     case BOOLEXP_ATR:
-        va = atr_num(b->thing);
-        if (va) {
-            fprintf(f, "%s:%s", va->name, (char *)b->sub1);
+        va = atr_num ( b->thing );
+        if ( va ) {
+            fprintf ( f, "%s:%s", va->name, ( char * ) b->sub1 );
         } else {
-            fprintf(f, "%d:%s\n", b->thing, (char *)b->sub1);
+            fprintf ( f, "%d:%s\n", b->thing, ( char * ) b->sub1 );
         }
         break;
     case BOOLEXP_EVAL:
-        va = atr_num(b->thing);
-        if (va) {
-            fprintf(f, "%s/%s\n", va->name, (char *)b->sub1);
+        va = atr_num ( b->thing );
+        if ( va ) {
+            fprintf ( f, "%s/%s\n", va->name, ( char * ) b->sub1 );
         } else {
-            fprintf(f, "%d/%s\n", b->thing, (char *)b->sub1);
+            fprintf ( f, "%d/%s\n", b->thing, ( char * ) b->sub1 );
         }
         break;
     default:
-        mainlog_printf("Unknown boolean type in putbool_subexp: %d\n", b->type);
+        mainlog_printf ( "Unknown boolean type in putbool_subexp: %d\n", b->type );
     }
 }
 
@@ -443,11 +461,11 @@ static void putbool_subexp(FILE *f, BOOLEXP *b) {
  * putboolexp: Write boolean expression to the flat file.
  */
 
-void putboolexp(FILE *f, BOOLEXP *b) {
-    if (b != TRUE_BOOLEXP) {
-        putbool_subexp(f, b);
+void putboolexp ( FILE *f, BOOLEXP *b ) {
+    if ( b != TRUE_BOOLEXP ) {
+        putbool_subexp ( f, b );
     }
-    putc('\n', f);
+    putc ( '\n', f );
 }
 
 /*
@@ -455,7 +473,7 @@ void putboolexp(FILE *f, BOOLEXP *b) {
  * upgrade_flags: Convert foreign flags to MUSH format.
  */
 
-static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version) {
+static void upgrade_flags ( FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version ) {
     FLAG f1, f2, f3, newf1, newf2, newf3;
 
     f1 = *flags1;
@@ -464,7 +482,7 @@ static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing,
     newf1 = 0;
     newf2 = 0;
     newf3 = 0;
-    if ((db_format == F_MUSH) && (db_version >= 3)) {
+    if ( ( db_format == F_MUSH ) && ( db_version >= 3 ) ) {
         newf1 = f1;
         newf2 = f2;
         newf3 = 0;
@@ -473,49 +491,49 @@ static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing,
          * Then we have to do the 2.2 to 3.0 flag conversion
          */
 
-        if (newf1 & ROYALTY) {
+        if ( newf1 & ROYALTY ) {
             newf1 &= ~ROYALTY;
             newf2 |= CONTROL_OK;
         }
-        if (newf2 & HAS_COMMANDS) {
+        if ( newf2 & HAS_COMMANDS ) {
             newf2 &= ~HAS_COMMANDS;
             newf2 |= NOBLEED;
         }
-        if (newf2 & AUDITORIUM) {
+        if ( newf2 & AUDITORIUM ) {
             newf2 &= ~AUDITORIUM;
             newf2 |= ZONE_PARENT;
         }
-        if (newf2 & ANSI) {
+        if ( newf2 & ANSI ) {
             newf2 &= ~ANSI;
             newf2 |= STOP_MATCH;
         }
-        if (newf2 & HEAD_FLAG) {
+        if ( newf2 & HEAD_FLAG ) {
             newf2 &= ~HEAD_FLAG;
             newf2 |= HAS_COMMANDS;
         }
-        if (newf2 & FIXED) {
+        if ( newf2 & FIXED ) {
             newf2 &= ~FIXED;
             newf2 |= BOUNCE;
         }
-        if (newf2 & STAFF) {
+        if ( newf2 & STAFF ) {
             newf2 &= STAFF;
             newf2 |= HTML;
         }
-        if (newf2 & HAS_DAILY) {
+        if ( newf2 & HAS_DAILY ) {
             newf2 &= ~HAS_DAILY;
             /*
              * This is the unimplemented TICKLER flag.
              */
         }
-        if (newf2 & GAGGED) {
+        if ( newf2 & GAGGED ) {
             newf2 &= ~GAGGED;
             newf2 |= ANSI;
         }
-        if (newf2 & WATCHER) {
+        if ( newf2 & WATCHER ) {
             newf2 &= ~WATCHER;
-            s_Powers(thing, Powers(thing) | POW_BUILDER);
+            s_Powers ( thing, Powers ( thing ) | POW_BUILDER );
         }
-    } else if (db_format == F_MUX) {
+    } else if ( db_format == F_MUX ) {
 
         /*
          * TinyMUX to 3.0 flag conversion
@@ -525,7 +543,7 @@ static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing,
         newf2 = f2;
         newf3 = f3;
 
-        if (newf2 & ZONE_PARENT) {
+        if ( newf2 & ZONE_PARENT ) {
             /*
              * This used to be an object set NO_COMMAND. We unset
              * the flag.
@@ -539,20 +557,20 @@ static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing,
             newf2 |= HAS_COMMANDS;
         }
 
-        if (newf2 & WATCHER) {
+        if ( newf2 & WATCHER ) {
             /*
              * This used to be the COMPRESS flag, which didn't do
              * anything.
              */
             newf2 &= ~WATCHER;
         }
-        if ((newf1 & MONITOR) && ((newf1 & TYPE_MASK) == TYPE_PLAYER)) {
+        if ( ( newf1 & MONITOR ) && ( ( newf1 & TYPE_MASK ) == TYPE_PLAYER ) ) {
             /*
              * Players set MONITOR should be set WATCHER as well.
              */
             newf2 |= WATCHER;
         }
-    } else if (db_format == F_TINYMUSH) {
+    } else if ( db_format == F_TINYMUSH ) {
         /*
          * Native TinyMUSH 3.0 database. The only thing we have to do
          * is clear the redirection flag, as nothing is ever
@@ -575,13 +593,13 @@ static void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing,
  * efo_convert: Fix things up for Exits-From-Objects
  */
 
-void efo_convert(void) {
+void efo_convert ( void ) {
     int i;
 
     dbref link;
 
-    DO_WHOLE_DB(i) {
-        switch (Typeof(i)) {
+    DO_WHOLE_DB ( i ) {
+        switch ( Typeof ( i ) ) {
         case TYPE_PLAYER:
         case TYPE_THING:
 
@@ -589,9 +607,9 @@ void efo_convert(void) {
              * swap Exits and Link
              */
 
-            link = Link(i);
-            s_Link(i, Exits(i));
-            s_Exits(i, link);
+            link = Link ( i );
+            s_Link ( i, Exits ( i ) );
+            s_Exits ( i, link );
             break;
         }
     }
@@ -602,7 +620,7 @@ void efo_convert(void) {
  * fix_mux_zones: Convert MUX-style zones to 3.0-style zones.
  */
 
-static void fix_mux_zones(void) {
+static void fix_mux_zones ( void ) {
     /*
      * For all objects in the database where Zone(thing) != NOTHING, set
      * the CONTROL_OK flag on them.
@@ -618,25 +636,25 @@ static void fix_mux_zones(void) {
 
     char *astr;
 
-    zmarks = (int *)XCALLOC(mudstate.db_top, sizeof(int), "fix_mux_zones");
+    zmarks = ( int * ) XCALLOC ( mudstate.db_top, sizeof ( int ), "fix_mux_zones" );
 
-    DO_WHOLE_DB(i) {
-        if (Zone(i) != NOTHING) {
-            s_Flags2(i, Flags2(i) | CONTROL_OK);
-            zmarks[Zone(i)] = 1;
+    DO_WHOLE_DB ( i ) {
+        if ( Zone ( i ) != NOTHING ) {
+            s_Flags2 ( i, Flags2 ( i ) | CONTROL_OK );
+            zmarks[Zone ( i )] = 1;
         }
     }
 
-    DO_WHOLE_DB(i) {
-        if (zmarks[i]) {
-            astr = atr_get_raw(i, A_LENTER);
-            if (astr) {
-                atr_add_raw(i, A_LCONTROL, astr);
+    DO_WHOLE_DB ( i ) {
+        if ( zmarks[i] ) {
+            astr = atr_get_raw ( i, A_LENTER );
+            if ( astr ) {
+                atr_add_raw ( i, A_LCONTROL, astr );
             }
         }
     }
 
-    XFREE(zmarks, "fix_mux_zones");
+    XFREE ( zmarks, "fix_mux_zones" );
 }
 
 /*
@@ -644,7 +662,7 @@ static void fix_mux_zones(void) {
  * fix_typed_quotas: Explode standard quotas into typed quotas
  */
 
-static void fix_typed_quotas(void) {
+static void fix_typed_quotas ( void ) {
     /*
      * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
      * attributes  exist. For simplicity's sake, we assume that players
@@ -661,25 +679,27 @@ static void fix_typed_quotas(void) {
 
     char *qbuf, *rqbuf;
 
-    DO_WHOLE_DB(i) {
-        if (isPlayer(i)) {
-            qbuf = atr_get_raw(i, A_QUOTA);
-            rqbuf = atr_get_raw(i, A_RQUOTA);
-            if (!qbuf || !*qbuf)
-                qbuf = (char *)"1";
-            if (!rqbuf || !*rqbuf)
-                rqbuf = (char *)"0";
-            atr_add_raw(i, A_QUOTA,
-                        tmprintf("%s %s %s %s %s",
-                                qbuf, qbuf, qbuf, qbuf, qbuf));
-            atr_add_raw(i, A_RQUOTA,
-                        tmprintf("%s %s %s %s %s",
-                                rqbuf, rqbuf, rqbuf, rqbuf, rqbuf));
+    DO_WHOLE_DB ( i ) {
+        if ( isPlayer ( i ) ) {
+            qbuf = atr_get_raw ( i, A_QUOTA );
+            rqbuf = atr_get_raw ( i, A_RQUOTA );
+            if ( !qbuf || !*qbuf ) {
+                qbuf = ( char * ) "1";
+            }
+            if ( !rqbuf || !*rqbuf ) {
+                rqbuf = ( char * ) "0";
+            }
+            atr_add_raw ( i, A_QUOTA,
+                          tmprintf ( "%s %s %s %s %s",
+                                     qbuf, qbuf, qbuf, qbuf, qbuf ) );
+            atr_add_raw ( i, A_RQUOTA,
+                          tmprintf ( "%s %s %s %s %s",
+                                     rqbuf, rqbuf, rqbuf, rqbuf, rqbuf ) );
         }
     }
 }
 
-dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) {
+dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags ) {
     dbref i, anum;
 
     char ch;
@@ -736,63 +756,65 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
     deduce_zone = 1;
     deduce_name = 1;
     deduce_timestamps = 1;
-    if (mudstate.standalone)
-        mainlog_printf("Reading ");
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "Reading " );
+    }
     db_free();
-    for (i = 0;; i++) {
+    for ( i = 0;; i++ ) {
 
-        if (mudstate.standalone && !(i % 100)) {
-            mainlog_printf(".");
+        if ( mudstate.standalone && ! ( i % 100 ) ) {
+            mainlog_printf ( "." );
         }
-        switch (ch = getc(f)) {
+        switch ( ch = getc ( f ) ) {
         case '-':	/* Misc tag */
-            switch (ch = getc(f)) {
+            switch ( ch = getc ( f ) ) {
             case 'R':	/* Record number of players */
-                mudstate.record_players = getref(f);
+                mudstate.record_players = getref ( f );
                 break;
             default:
-                (void)getstring_noalloc(f, 0);
+                ( void ) getstring_noalloc ( f, 0 );
             }
             break;
         case '+':	/* MUX and MUSH header */
 
-            ch = getc(f);	/* 2nd char selects type */
+            ch = getc ( f );	/* 2nd char selects type */
 
-            if ((ch == 'V') || (ch == 'X') || (ch == 'T')) {
+            if ( ( ch == 'V' ) || ( ch == 'X' ) || ( ch == 'T' ) ) {
 
                 /*
                  * The following things are common across
                  * 2.x, MUX, and 3.0.
                  */
 
-                if (header_gotten) {
-                    if(mudstate.standalone)
-                        mainlog_printf("\nDuplicate MUSH version header entry at object %d, ignored.\n", i);
-                    tstr = getstring_noalloc(f, 0);
+                if ( header_gotten ) {
+                    if ( mudstate.standalone ) {
+                        mainlog_printf ( "\nDuplicate MUSH version header entry at object %d, ignored.\n", i );
+                    }
+                    tstr = getstring_noalloc ( f, 0 );
                     break;
                 }
                 header_gotten = 1;
                 deduce_version = 0;
-                g_version = getref(f);
+                g_version = getref ( f );
 
                 /*
                  * Otherwise extract feature flags
                  */
 
-                if (g_version & V_GDBM) {
+                if ( g_version & V_GDBM ) {
                     read_attribs = 0;
-                    read_name = !(g_version & V_ATRNAME);
+                    read_name = ! ( g_version & V_ATRNAME );
                 }
-                read_zone = (g_version & V_ZONE);
-                read_link = (g_version & V_LINK);
-                read_key = !(g_version & V_ATRKEY);
-                read_parent = (g_version & V_PARENT);
-                read_money = !(g_version & V_ATRMONEY);
-                read_extflags = (g_version & V_XFLAGS);
-                has_typed_quotas = (g_version & V_TQUOTAS);
-                read_timestamps = (g_version & V_TIMESTAMPS);
-                has_visual_attrs = (g_version & V_VISUALATTRS);
-                read_createtime = (g_version & V_CREATETIME);
+                read_zone = ( g_version & V_ZONE );
+                read_link = ( g_version & V_LINK );
+                read_key = ! ( g_version & V_ATRKEY );
+                read_parent = ( g_version & V_PARENT );
+                read_money = ! ( g_version & V_ATRMONEY );
+                read_extflags = ( g_version & V_XFLAGS );
+                has_typed_quotas = ( g_version & V_TQUOTAS );
+                read_timestamps = ( g_version & V_TIMESTAMPS );
+                has_visual_attrs = ( g_version & V_VISUALATTRS );
+                read_createtime = ( g_version & V_CREATETIME );
                 g_flags = g_version & ~V_MASK;
 
                 deduce_name = 0;
@@ -803,12 +825,12 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
              * More generic switch.
              */
 
-            switch (ch) {
+            switch ( ch ) {
             case 'T':	/* 3.0 VERSION */
                 g_format = F_TINYMUSH;
-                read_3flags = (g_version & V_3FLAGS);
-                read_powers = (g_version & V_POWERS);
-                read_new_strings = (g_version & V_QUOTED);
+                read_3flags = ( g_version & V_3FLAGS );
+                read_powers = ( g_version & V_POWERS );
+                read_new_strings = ( g_version & V_QUOTED );
                 g_version &= V_MASK;
                 break;
 
@@ -819,110 +841,115 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
 
             case 'X':	/* MUX VERSION */
                 g_format = F_MUX;
-                read_3flags = (g_version & V_3FLAGS);
-                read_powers = (g_version & V_POWERS);
-                read_new_strings = (g_version & V_QUOTED);
+                read_3flags = ( g_version & V_3FLAGS );
+                read_powers = ( g_version & V_POWERS );
+                read_new_strings = ( g_version & V_QUOTED );
                 g_version &= V_MASK;
                 break;
 
             case 'S':	/* SIZE */
-                if (size_gotten) {
-                    if(mudstate.standalone)
-                        mainlog_printf("\nDuplicate size entry at object %d, ignored.\n", i);
-                    tstr = getstring_noalloc(f, 0);
+                if ( size_gotten ) {
+                    if ( mudstate.standalone ) {
+                        mainlog_printf ( "\nDuplicate size entry at object %d, ignored.\n", i );
+                    }
+                    tstr = getstring_noalloc ( f, 0 );
                 } else {
-                    mudstate.min_size = getref(f);
+                    mudstate.min_size = getref ( f );
                 }
                 size_gotten = 1;
                 break;
             case 'A':	/* USER-NAMED ATTRIBUTE */
-                anum = getref(f);
-                tstr = getstring_noalloc(f, read_new_strings);
-                if (isdigit(*tstr)) {
+                anum = getref ( f );
+                tstr = getstring_noalloc ( f, read_new_strings );
+                if ( isdigit ( *tstr ) ) {
                     aflags = 0;
-                    while (isdigit(*tstr))
-                        aflags = (aflags * 10) +
-                                 (*tstr++ - '0');
+                    while ( isdigit ( *tstr ) )
+                        aflags = ( aflags * 10 ) +
+                                 ( *tstr++ - '0' );
                     tstr++;	/* skip ':' */
-                    if (!has_visual_attrs) {
+                    if ( !has_visual_attrs ) {
                         /*
                          * If not AF_ODARK, is
                          * AF_VISUAL. Strip AF_ODARK.
                          */
-                        if (aflags & AF_ODARK)
+                        if ( aflags & AF_ODARK ) {
                             aflags &= ~AF_ODARK;
-                        else
+                        } else {
                             aflags |= AF_VISUAL;
+                        }
                     }
                 } else {
                     aflags = mudconf.vattr_flags;
                 }
-                vattr_define((char *)tstr, anum, aflags);
+                vattr_define ( ( char * ) tstr, anum, aflags );
                 break;
             case 'F':	/* OPEN USER ATTRIBUTE SLOT */
-                anum = getref(f);
+                anum = getref ( f );
                 break;
             case 'N':	/* NEXT ATTR TO ALLOC WHEN NO
 					 * FREELIST */
-                if (nextattr_gotten) {
-                    if(mudstate.standalone)
-                        mainlog_printf("\nDuplicate next free vattr entry at object %d, ignored.\n", i);
-                    tstr = getstring_noalloc(f, 0);
+                if ( nextattr_gotten ) {
+                    if ( mudstate.standalone ) {
+                        mainlog_printf ( "\nDuplicate next free vattr entry at object %d, ignored.\n", i );
+                    }
+                    tstr = getstring_noalloc ( f, 0 );
                 } else {
-                    mudstate.attr_next = getref(f);
+                    mudstate.attr_next = getref ( f );
                     nextattr_gotten = 1;
                 }
                 break;
             default:
-                if(mudstate.standalone)
-                    mainlog_printf("\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
-                tstr = getstring_noalloc(f, 0);
+                if ( mudstate.standalone ) {
+                    mainlog_printf ( "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i );
+                }
+                tstr = getstring_noalloc ( f, 0 );
             }
             break;
         case '!':	/* MUX entry/MUSH entry */
-            if (deduce_version) {
+            if ( deduce_version ) {
                 g_format = F_TINYMUSH;
                 g_version = 1;
                 deduce_name = 0;
                 deduce_zone = 0;
                 deduce_version = 0;
-            } else if (deduce_zone) {
+            } else if ( deduce_zone ) {
                 deduce_zone = 0;
                 read_zone = 0;
             }
-            i = getref(f);
-            db_grow(i + 1);
+            i = getref ( f );
+            db_grow ( i + 1 );
 
 #ifndef NO_TIMECHECKING
             obj_time.tv_sec = obj_time.tv_usec = 0;
-            s_Time_Used(i, obj_time);
+            s_Time_Used ( i, obj_time );
 #endif
-            s_StackCount(i, 0);
-            s_VarsCount(i, 0);
-            s_StructCount(i, 0);
-            s_InstanceCount(i, 0);
+            s_StackCount ( i, 0 );
+            s_VarsCount ( i, 0 );
+            s_StructCount ( i, 0 );
+            s_InstanceCount ( i, 0 );
 
-            if (read_name) {
-                tstr = getstring_noalloc(f, read_new_strings);
-                if (deduce_name) {
-                    if (isdigit(*tstr)) {
+            if ( read_name ) {
+                tstr = getstring_noalloc ( f, read_new_strings );
+                if ( deduce_name ) {
+                    if ( isdigit ( *tstr ) ) {
                         read_name = 0;
-                        s_Location(i, (int)strtol(tstr, (char **)NULL, 10));
+                        s_Location ( i, ( int ) strtol ( tstr, ( char ** ) NULL, 10 ) );
                     } else {
-                        s_Name(i, (char *)tstr);
-                        s_Location(i, getref(f));
+                        s_Name ( i, ( char * ) tstr );
+                        s_Location ( i, getref ( f ) );
                     }
                     deduce_name = 0;
                 } else {
-                    s_Name(i, (char *)tstr);
-                    s_Location(i, getref(f));
+                    s_Name ( i, ( char * ) tstr );
+                    s_Location ( i, getref ( f ) );
                 }
             } else {
-                s_Location(i, getref(f));
+                s_Location ( i, getref ( f ) );
             }
 
-            if (read_zone)
-                s_Zone(i, getref(f));
+            if ( read_zone ) {
+                s_Zone ( i, getref ( f ) );
+            }
             /*
              * else s_Zone(i, NOTHING);
              */
@@ -931,108 +958,112 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
              * CONTENTS and EXITS
              */
 
-            s_Contents(i, getref(f));
-            s_Exits(i, getref(f));
+            s_Contents ( i, getref ( f ) );
+            s_Exits ( i, getref ( f ) );
 
             /*
              * LINK
              */
 
-            if (read_link) {
-                s_Link(i, getref(f));
+            if ( read_link ) {
+                s_Link ( i, getref ( f ) );
             } else {
-                s_Link(i, NOTHING);
+                s_Link ( i, NOTHING );
             }
 
             /*
              * NEXT
              */
 
-            s_Next(i, getref(f));
+            s_Next ( i, getref ( f ) );
 
             /*
              * LOCK
              */
 
-            if (read_key) {
-                tempbool = getboolexp(f);
-                atr_add_raw(i, A_LOCK,
-                            unparse_boolexp_quiet(1, tempbool));
-                free_boolexp(tempbool);
+            if ( read_key ) {
+                tempbool = getboolexp ( f );
+                atr_add_raw ( i, A_LOCK,
+                              unparse_boolexp_quiet ( 1, tempbool ) );
+                free_boolexp ( tempbool );
             }
             /*
              * OWNER
              */
 
-            s_Owner(i, getref(f));
+            s_Owner ( i, getref ( f ) );
 
             /*
              * PARENT
              */
 
-            if (read_parent) {
-                s_Parent(i, getref(f));
+            if ( read_parent ) {
+                s_Parent ( i, getref ( f ) );
             } else {
-                s_Parent(i, NOTHING);
+                s_Parent ( i, NOTHING );
             }
 
             /*
              * PENNIES
              */
 
-            if (read_money)
-                s_Pennies(i, getref(f));
+            if ( read_money ) {
+                s_Pennies ( i, getref ( f ) );
+            }
 
             /*
              * FLAGS
              */
 
-            f1 = getref(f);
-            if (read_extflags)
-                f2 = getref(f);
-            else
+            f1 = getref ( f );
+            if ( read_extflags ) {
+                f2 = getref ( f );
+            } else {
                 f2 = 0;
+            }
 
-            if (read_3flags)
-                f3 = getref(f);
-            else
+            if ( read_3flags ) {
+                f3 = getref ( f );
+            } else {
                 f3 = 0;
-
-            upgrade_flags(&f1, &f2, &f3, i, g_format, g_version);
-            s_Flags(i, f1);
-            s_Flags2(i, f2);
-            s_Flags3(i, f3);
-
-            if (read_powers) {
-                f1 = getref(f);
-                f2 = getref(f);
-                s_Powers(i, f1);
-                s_Powers2(i, f2);
-            }
-            if (read_timestamps) {
-                tmptime = (time_t) getlong(f);
-                s_AccessTime(i, tmptime);
-                tmptime = (time_t) getlong(f);
-                s_ModTime(i, tmptime);
-            } else {
-                AccessTime(i) = ModTime(i) = time(NULL);
             }
 
-            if (read_createtime) {
-                tmptime = (time_t) getlong(f);
-                s_CreateTime(i, tmptime);
+            upgrade_flags ( &f1, &f2, &f3, i, g_format, g_version );
+            s_Flags ( i, f1 );
+            s_Flags2 ( i, f2 );
+            s_Flags3 ( i, f3 );
+
+            if ( read_powers ) {
+                f1 = getref ( f );
+                f2 = getref ( f );
+                s_Powers ( i, f1 );
+                s_Powers2 ( i, f2 );
+            }
+            if ( read_timestamps ) {
+                tmptime = ( time_t ) getlong ( f );
+                s_AccessTime ( i, tmptime );
+                tmptime = ( time_t ) getlong ( f );
+                s_ModTime ( i, tmptime );
             } else {
-                s_CreateTime(i, AccessTime(i));
+                AccessTime ( i ) = ModTime ( i ) = time ( NULL );
+            }
+
+            if ( read_createtime ) {
+                tmptime = ( time_t ) getlong ( f );
+                s_CreateTime ( i, tmptime );
+            } else {
+                s_CreateTime ( i, AccessTime ( i ) );
             }
 
             /*
              * ATTRIBUTES
              */
 
-            if (read_attribs) {
-                if (!get_list(f, i, read_new_strings)) {
-                    if(mudstate.standalone)
-                        mainlog_printf("\nError reading attrs for object #%d\n", i);
+            if ( read_attribs ) {
+                if ( !get_list ( f, i, read_new_strings ) ) {
+                    if ( mudstate.standalone ) {
+                        mainlog_printf ( "\nError reading attrs for object #%d\n", i );
+                    }
                     return -1;
                 }
             }
@@ -1040,31 +1071,36 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
              * check to see if it's a player
              */
 
-            if (Typeof(i) == TYPE_PLAYER) {
-                c_Connected(i);
+            if ( Typeof ( i ) == TYPE_PLAYER ) {
+                c_Connected ( i );
             }
             break;
         case '*':	/* EOF marker */
-            tstr = getstring_noalloc(f, 0);
-            if (strcmp(tstr, "**END OF DUMP***")) {
-                if(mudstate.standalone)
-                    mainlog_printf("\nBad EOF marker at object #%d\n", i);
+            tstr = getstring_noalloc ( f, 0 );
+            if ( strcmp ( tstr, "**END OF DUMP***" ) ) {
+                if ( mudstate.standalone ) {
+                    mainlog_printf ( "\nBad EOF marker at object #%d\n", i );
+                }
                 return -1;
             } else {
-                if(mudstate.standalone)
-                    mainlog_printf("\n");
+                if ( mudstate.standalone ) {
+                    mainlog_printf ( "\n" );
+                }
                 *db_version = g_version;
                 *db_format = g_format;
                 *db_flags = g_flags;
-                if (!has_typed_quotas)
+                if ( !has_typed_quotas ) {
                     fix_typed_quotas();
-                if (g_format == F_MUX)
+                }
+                if ( g_format == F_MUX ) {
                     fix_mux_zones();
+                }
                 return mudstate.db_top;
             }
         default:
-            if(mudstate.standalone)
-                mainlog_printf("\nIllegal character '%c' near object #%d\n", ch, i);
+            if ( mudstate.standalone ) {
+                mainlog_printf ( "\nIllegal character '%c' near object #%d\n", ch, i );
+            }
             return -1;
         }
 
@@ -1072,7 +1108,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags) 
     }
 }
 
-int db_read(void) {
+int db_read ( void ) {
     DBData key, data;
 
     int *c, vattr_flags, i, j, blksize, num;
@@ -1089,12 +1125,12 @@ int db_read(void) {
      */
 
     key.dptr = "TM3";
-    key.dsize = strlen("TM3") + 1;
-    data = db_get(key, DBTYPE_DBINFO);
+    key.dsize = strlen ( "TM3" ) + 1;
+    data = db_get ( key, DBTYPE_DBINFO );
 
-    if (!data.dptr) {
-        STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
-        log_printf("Could not open main record");
+    if ( !data.dptr ) {
+        STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
+        log_printf ( "Could not open main record" );
         ENDLOG
         return -1;
     }
@@ -1103,14 +1139,14 @@ int db_read(void) {
      */
 
     c = data.dptr;
-    memcpy((void *)&mudstate.min_size, (void *)c, sizeof(int));
+    memcpy ( ( void * ) &mudstate.min_size, ( void * ) c, sizeof ( int ) );
     c++;
-    memcpy((void *)&mudstate.attr_next, (void *)c, sizeof(int));
+    memcpy ( ( void * ) &mudstate.attr_next, ( void * ) c, sizeof ( int ) );
     c++;
-    memcpy((void *)&mudstate.record_players, (void *)c, sizeof(int));
+    memcpy ( ( void * ) &mudstate.record_players, ( void * ) c, sizeof ( int ) );
     c++;
-    memcpy((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
-    RAW_FREE(data.dptr, "db_get");
+    memcpy ( ( void * ) &mudstate.moduletype_top, ( void * ) c, sizeof ( int ) );
+    RAW_FREE ( data.dptr, "db_get" );
 
     /*
      * Load the attribute numbers
@@ -1118,38 +1154,38 @@ int db_read(void) {
 
     blksize = ATRNUM_BLOCK_SIZE;
 
-    for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++) {
+    for ( i = 0; i <= ENTRY_NUM_BLOCKS ( mudstate.attr_next, blksize ); i++ ) {
         key.dptr = &i;
-        key.dsize = sizeof(int);
-        data = db_get(key, DBTYPE_ATRNUM);
+        key.dsize = sizeof ( int );
+        data = db_get ( key, DBTYPE_ATRNUM );
 
-        if (data.dptr) {
+        if ( data.dptr ) {
             /*
              * Unroll the data into flags and name
              */
 
             s = data.dptr;
 
-            while ((s - (char *)data.dptr) < data.dsize) {
-                memcpy((void *)&j, (void *)s, sizeof(int));
-                s += sizeof(int);
-                memcpy((void *)&vattr_flags, (void *)s,
-                       sizeof(int));
-                s += sizeof(int);
-                vattr_define(s, j, vattr_flags);
-                s = strchr((const char *)s, '\0');
+            while ( ( s - ( char * ) data.dptr ) < data.dsize ) {
+                memcpy ( ( void * ) &j, ( void * ) s, sizeof ( int ) );
+                s += sizeof ( int );
+                memcpy ( ( void * ) &vattr_flags, ( void * ) s,
+                         sizeof ( int ) );
+                s += sizeof ( int );
+                vattr_define ( s, j, vattr_flags );
+                s = strchr ( ( const char * ) s, '\0' );
 
-                if (!s) {
+                if ( !s ) {
                     /*
                      * Houston, we have a problem
                      */
-                    STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
-                    log_printf("Error reading attribute number %d", j + ENTRY_BLOCK_STARTS(i, blksize));
+                    STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
+                    log_printf ( "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS ( i, blksize ) );
                     ENDLOG
                 }
                 s++;
             }
-            RAW_FREE(data.dptr, "db_get");
+            RAW_FREE ( data.dptr, "db_get" );
         }
     }
 
@@ -1157,50 +1193,50 @@ int db_read(void) {
      * Load the object structures
      */
 
-    if (mudstate.standalone) {
-        STARTLOG(LOG_ALWAYS, "DBR", "LOAD")
-        log_printf("Reading ");
+    if ( mudstate.standalone ) {
+        STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
+        log_printf ( "Reading " );
         ENDLOG
-        }
+    }
 
     blksize = OBJECT_BLOCK_SIZE;
 
-    for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.min_size, blksize); i++) {
+    for ( i = 0; i <= ENTRY_NUM_BLOCKS ( mudstate.min_size, blksize ); i++ ) {
         key.dptr = &i;
-        key.dsize = sizeof(int);
-        data = db_get(key, DBTYPE_OBJECT);
+        key.dsize = sizeof ( int );
+        data = db_get ( key, DBTYPE_OBJECT );
 
-        if (data.dptr) {
+        if ( data.dptr ) {
             /*
              * Unroll the data into objnum and object
              */
 
             s = data.dptr;
 
-            while ((s - (char *)data.dptr) < data.dsize) {
-                memcpy((void *)&num, (void *)s, sizeof(int));
-                s += sizeof(int);
-                db_grow(num + 1);
+            while ( ( s - ( char * ) data.dptr ) < data.dsize ) {
+                memcpy ( ( void * ) &num, ( void * ) s, sizeof ( int ) );
+                s += sizeof ( int );
+                db_grow ( num + 1 );
 
-                if (mudstate.standalone && !(num % 100)) {
-                    mainlog_printf(".");
+                if ( mudstate.standalone && ! ( num % 100 ) ) {
+                    mainlog_printf ( "." );
                 }
                 /*
                  * We read the entire object structure in and
                  * copy it into place
                  */
 
-                memcpy((void *)&(db[num]), (void *)s,
-                       sizeof(DUMPOBJ));
-                s += sizeof(DUMPOBJ);
+                memcpy ( ( void * ) & ( db[num] ), ( void * ) s,
+                         sizeof ( DUMPOBJ ) );
+                s += sizeof ( DUMPOBJ );
 #ifndef NO_TIMECHECKING
                 obj_time.tv_sec = obj_time.tv_usec = 0;
-                s_Time_Used(num, obj_time);
+                s_Time_Used ( num, obj_time );
 #endif
-                s_StackCount(num, 0);
-                s_VarsCount(num, 0);
-                s_StructCount(num, 0);
-                s_InstanceCount(num, 0);
+                s_StackCount ( num, 0 );
+                s_VarsCount ( num, 0 );
+                s_StructCount ( num, 0 );
+                s_InstanceCount ( num, 0 );
 #ifdef MEMORY_BASED
                 db[num].attrtext.at_count = 0;
                 db[num].attrtext.atrs = NULL;
@@ -1209,26 +1245,28 @@ int db_read(void) {
                  * Check to see if it's a player
                  */
 
-                if (Typeof(num) == TYPE_PLAYER) {
-                    c_Connected(num);
+                if ( Typeof ( num ) == TYPE_PLAYER ) {
+                    c_Connected ( num );
                 }
-                s_Clean(num);
+                s_Clean ( num );
             }
 
-            RAW_FREE(data.dptr, "db_get");
+            RAW_FREE ( data.dptr, "db_get" );
         }
     }
 
-    if (!mudstate.standalone)
+    if ( !mudstate.standalone ) {
         load_player_names();
+    }
 
-    if (mudstate.standalone)
-        mainlog_printf("\n");
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "\n" );
+    }
 
-    return (0);
+    return ( 0 );
 }
 
-static int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt) {
+static int db_write_object_out ( FILE *f, dbref i, int db_format, int flags, int *n_atrt ) {
     ATTR *a;
 
     char *got, *as;
@@ -1239,48 +1277,56 @@ static int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *
 
     BOOLEXP *tempbool;
 
-    if (Going(i)) {
-        return (0);
+    if ( Going ( i ) ) {
+        return ( 0 );
     }
-    fprintf(f, "!%d\n", i);
-    if (!(flags & V_ATRNAME))
-        putstring(f, Name(i));
-    putref(f, Location(i));
-    if (flags & V_ZONE)
-        putref(f, Zone(i));
-    putref(f, Contents(i));
-    putref(f, Exits(i));
-    if (flags & V_LINK)
-        putref(f, Link(i));
-    putref(f, Next(i));
-    if (!(flags & V_ATRKEY)) {
-        got = atr_get(i, A_LOCK, &aowner, &aflags, &alen);
-        tempbool = parse_boolexp(GOD, got, 1);
-        free_lbuf(got);
-        putboolexp(f, tempbool);
-        if (tempbool)
-            free_boolexp(tempbool);
+    fprintf ( f, "!%d\n", i );
+    if ( ! ( flags & V_ATRNAME ) ) {
+        putstring ( f, Name ( i ) );
     }
-    putref(f, Owner(i));
-    if (flags & V_PARENT)
-        putref(f, Parent(i));
-    if (!(flags & V_ATRMONEY))
-        putref(f, Pennies(i));
-    putref(f, Flags(i));
-    if (flags & V_XFLAGS)
-        putref(f, Flags2(i));
-    if (flags & V_3FLAGS)
-        putref(f, Flags3(i));
-    if (flags & V_POWERS) {
-        putref(f, Powers(i));
-        putref(f, Powers2(i));
+    putref ( f, Location ( i ) );
+    if ( flags & V_ZONE ) {
+        putref ( f, Zone ( i ) );
     }
-    if (flags & V_TIMESTAMPS) {
-        putlong(f, AccessTime(i));
-        putlong(f, ModTime(i));
+    putref ( f, Contents ( i ) );
+    putref ( f, Exits ( i ) );
+    if ( flags & V_LINK ) {
+        putref ( f, Link ( i ) );
     }
-    if (flags & V_CREATETIME) {
-        putlong(f, CreateTime(i));
+    putref ( f, Next ( i ) );
+    if ( ! ( flags & V_ATRKEY ) ) {
+        got = atr_get ( i, A_LOCK, &aowner, &aflags, &alen );
+        tempbool = parse_boolexp ( GOD, got, 1 );
+        free_lbuf ( got );
+        putboolexp ( f, tempbool );
+        if ( tempbool ) {
+            free_boolexp ( tempbool );
+        }
+    }
+    putref ( f, Owner ( i ) );
+    if ( flags & V_PARENT ) {
+        putref ( f, Parent ( i ) );
+    }
+    if ( ! ( flags & V_ATRMONEY ) ) {
+        putref ( f, Pennies ( i ) );
+    }
+    putref ( f, Flags ( i ) );
+    if ( flags & V_XFLAGS ) {
+        putref ( f, Flags2 ( i ) );
+    }
+    if ( flags & V_3FLAGS ) {
+        putref ( f, Flags3 ( i ) );
+    }
+    if ( flags & V_POWERS ) {
+        putref ( f, Powers ( i ) );
+        putref ( f, Powers2 ( i ) );
+    }
+    if ( flags & V_TIMESTAMPS ) {
+        putlong ( f, AccessTime ( i ) );
+        putlong ( f, ModTime ( i ) );
+    }
+    if ( flags & V_CREATETIME ) {
+        putlong ( f, CreateTime ( i ) );
     }
     /*
      * write the attribute list
@@ -1288,27 +1334,30 @@ static int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *
 
     changed = 0;
 
-    for (ca = atr_head(i, &as); ca; ca = atr_next(&as)) {
+    for ( ca = atr_head ( i, &as ); ca; ca = atr_next ( &as ) ) {
         save = 0;
-        if (!mudstate.standalone) {
-            a = atr_num(ca);
-            if (a)
+        if ( !mudstate.standalone ) {
+            a = atr_num ( ca );
+            if ( a ) {
                 j = a->number;
-            else
+            } else {
                 j = -1;
+            }
         } else {
             j = ca;
         }
 
-        if (j > 0) {
-            switch (j) {
+        if ( j > 0 ) {
+            switch ( j ) {
             case A_NAME:
-                if (flags & V_ATRNAME)
+                if ( flags & V_ATRNAME ) {
                     save = 1;
+                }
                 break;
             case A_LOCK:
-                if (flags & V_ATRKEY)
+                if ( flags & V_ATRKEY ) {
                     save = 1;
+                }
                 break;
             case A_LIST:
             case A_MONEY:
@@ -1317,25 +1366,25 @@ static int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *
                 save = 1;
             }
         }
-        if (save) {
-            got = atr_get_raw(i, j);
-            if (used_attrs_table != NULL) {
-                fprintf(f, ">%d\n", used_attrs_table[j]);
-                if (used_attrs_table[j] != j) {
+        if ( save ) {
+            got = atr_get_raw ( i, j );
+            if ( used_attrs_table != NULL ) {
+                fprintf ( f, ">%d\n", used_attrs_table[j] );
+                if ( used_attrs_table[j] != j ) {
                     changed = 1;
                     *n_atrt += 1;
                 }
             } else {
-                fprintf(f, ">%d\n", j);
+                fprintf ( f, ">%d\n", j );
             }
-            putstring(f, got);
+            putstring ( f, got );
         }
     }
-    fprintf(f, "<\n");
-    return (changed);
+    fprintf ( f, "<\n" );
+    return ( changed );
 }
 
-dbref db_write_flatfile(FILE *f, int format, int version) {
+dbref db_write_flatfile ( FILE *f, int format, int version ) {
     dbref i;
 
     int flags;
@@ -1352,28 +1401,29 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
 
     al_store();
 
-    dbclean = (version & V_DBCLEAN) ? 1 : 0;
+    dbclean = ( version & V_DBCLEAN ) ? 1 : 0;
     version &= ~V_DBCLEAN;
 
-    switch (format) {
+    switch ( format ) {
     case F_TINYMUSH:
         flags = version;
         break;
     default:
-        mainlog_printf("Can only write TinyMUSH 3 format.\n");
+        mainlog_printf ( "Can only write TinyMUSH 3 format.\n" );
         return -1;
     }
-    if (mudstate.standalone)
-        mainlog_printf("Writing ");
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "Writing " );
+    }
 
     /*
      * Attribute cleaning, if standalone.
      */
 
-    if (mudstate.standalone && dbclean) {
+    if ( mudstate.standalone && dbclean ) {
 
-        used_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "flatfile.used_attrs_table");
-        old_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "flatfile.old_attrs_table");
+        used_attrs_table = ( int * ) XCALLOC ( mudstate.attr_next, sizeof ( int ), "flatfile.used_attrs_table" );
+        old_attrs_table = ( int * ) XCALLOC ( mudstate.attr_next, sizeof ( int ), "flatfile.old_attrs_table" );
         n_oldtotal = mudstate.attr_next;
         n_oldtop = anum_alc_top;
         n_deleted = n_renumbered = n_objt = n_atrt = 0;
@@ -1382,17 +1432,19 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * Non-user defined attributes are always considered used.
          */
 
-        for (n = 0; n < A_USER_START; n++)
+        for ( n = 0; n < A_USER_START; n++ ) {
             used_attrs_table[n] = n;
+        }
 
         /*
          * Walk the database. Mark all the attribute numbers in use.
          */
 
         atr_push();
-        DO_WHOLE_DB(i) {
-            for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
+        DO_WHOLE_DB ( i ) {
+            for ( ca = atr_head ( i, &as ); ca; ca = atr_next ( &as ) ) {
                 used_attrs_table[ca] = old_attrs_table[ca] = ca;
+            }
         }
         atr_pop();
 
@@ -1401,10 +1453,11 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          */
 
         vp = vattr_first();
-        while (vp) {
-            if (used_attrs_table[vp->number] == 0)
+        while ( vp ) {
+            if ( used_attrs_table[vp->number] == 0 ) {
                 n_deleted++;
-            vp = vattr_next(vp);
+            }
+            vp = vattr_next ( vp );
         }
 
         /*
@@ -1415,11 +1468,12 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * be.
          */
 
-        for (n = A_USER_START, end = mudstate.attr_next - 1; (n < mudstate.attr_next) && (n < end); n++) {
-            if (used_attrs_table[n] == 0) {
-                while ((end > n) && (used_attrs_table[end] == 0))
+        for ( n = A_USER_START, end = mudstate.attr_next - 1; ( n < mudstate.attr_next ) && ( n < end ); n++ ) {
+            if ( used_attrs_table[n] == 0 ) {
+                while ( ( end > n ) && ( used_attrs_table[end] == 0 ) ) {
                     end--;
-                if (end > n) {
+                }
+                if ( end > n ) {
                     old_attrs_table[n] = end;
                     used_attrs_table[end] = used_attrs_table[n] = n;
                     end--;
@@ -1431,11 +1485,12 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * Count up our renumbers.
          */
 
-        for (n = A_USER_START; n < mudstate.attr_next; n++) {
-            if ((used_attrs_table[n] != n) && (used_attrs_table[n] != 0)) {
-                vp = (VATTR *) anum_get(n);
-                if (vp)
+        for ( n = A_USER_START; n < mudstate.attr_next; n++ ) {
+            if ( ( used_attrs_table[n] != n ) && ( used_attrs_table[n] != 0 ) ) {
+                vp = ( VATTR * ) anum_get ( n );
+                if ( vp ) {
                     n_renumbered++;
+                }
             }
         }
 
@@ -1444,7 +1499,7 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
          * we've renumbered.
          */
 
-        for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mudstate.attr_next)); anxt++);
+        for ( anxt = A_USER_START; ( ( anxt == used_attrs_table[anxt] ) && ( anxt < mudstate.attr_next ) ); anxt++ );
 
     } else {
         used_attrs_table = NULL;
@@ -1455,31 +1510,32 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
      * Write database information. TinyMUSH 2 wrote '+V', MUX wrote '+X',
      * 3.0 writes '+T'.
      */
-    fprintf(f, "+T%d\n+S%d\n+N%d\n", flags, mudstate.db_top, anxt);
-    fprintf(f, "-R%d\n", mudstate.record_players);
+    fprintf ( f, "+T%d\n+S%d\n+N%d\n", flags, mudstate.db_top, anxt );
+    fprintf ( f, "-R%d\n", mudstate.record_players );
 
     /*
      * Dump user-named attribute info
      */
 
-    if (mudstate.standalone && dbclean) {
-        for (i = A_USER_START; i < anxt; i++) {
-            if (used_attrs_table[i] == 0)
+    if ( mudstate.standalone && dbclean ) {
+        for ( i = A_USER_START; i < anxt; i++ ) {
+            if ( used_attrs_table[i] == 0 ) {
                 continue;
-            vp = (VATTR *) anum_get(old_attrs_table[i]);
-            if (vp) {
-                if (!(vp->flags & AF_DELETED)) {
-                    fprintf(f, "+A%d\n\"%d:%s\"\n", i, vp->flags, vp->name);
+            }
+            vp = ( VATTR * ) anum_get ( old_attrs_table[i] );
+            if ( vp ) {
+                if ( ! ( vp->flags & AF_DELETED ) ) {
+                    fprintf ( f, "+A%d\n\"%d:%s\"\n", i, vp->flags, vp->name );
                 }
             }
         }
     } else {
         vp = vattr_first();
-        while (vp != NULL) {
-            if (!(vp->flags & AF_DELETED)) {
-                fprintf(f, "+A%d\n\"%d:%s\"\n", vp->number, vp->flags, vp->name);
+        while ( vp != NULL ) {
+            if ( ! ( vp->flags & AF_DELETED ) ) {
+                fprintf ( f, "+A%d\n\"%d:%s\"\n", vp->number, vp->flags, vp->name );
             }
-            vp = vattr_next(vp);
+            vp = vattr_next ( vp );
         }
     }
 
@@ -1489,33 +1545,33 @@ dbref db_write_flatfile(FILE *f, int format, int version) {
 
     n_objt = n_atrt = 0;
 
-    DO_WHOLE_DB(i) {
+    DO_WHOLE_DB ( i ) {
 
-        if (mudstate.standalone && !(i % 100)) {
-            mainlog_printf(".");
+        if ( mudstate.standalone && ! ( i % 100 ) ) {
+            mainlog_printf ( "." );
         }
-        n_objt += db_write_object_out(f, i, format, flags, &n_atrt);
+        n_objt += db_write_object_out ( f, i, format, flags, &n_atrt );
     }
 
-    fputs("***END OF DUMP***\n", f);
-    fflush(f);
+    fputs ( "***END OF DUMP***\n", f );
+    fflush ( f );
 
-    if (mudstate.standalone) {
-        mainlog_printf("\n");
-        if (dbclean) {
-            if (n_objt) {
-                mainlog_printf("Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered, n_objt, n_atrt);
-            } else if (n_deleted || n_renumbered) {
-                mainlog_printf( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered);
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "\n" );
+        if ( dbclean ) {
+            if ( n_objt ) {
+                mainlog_printf ( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered, n_objt, n_atrt );
+            } else if ( n_deleted || n_renumbered ) {
+                mainlog_printf ( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered );
             }
-            XFREE(used_attrs_table, "flatfile.used_attrs_table");
-            XFREE(old_attrs_table, "flatfile.old_attrs_table");
+            XFREE ( used_attrs_table, "flatfile.used_attrs_table" );
+            XFREE ( old_attrs_table, "flatfile.old_attrs_table" );
         }
     }
-    return (mudstate.db_top);
+    return ( mudstate.db_top );
 }
 
-dbref db_write(void) {
+dbref db_write ( void ) {
     VATTR *vp;
 
     DBData key, data;
@@ -1526,8 +1582,9 @@ dbref db_write(void) {
 
     al_store();
 
-    if (mudstate.standalone)
-        mainlog_printf( "Writing ");
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "Writing " );
+    }
 
     /*
      * Lock the database
@@ -1546,24 +1603,24 @@ dbref db_write(void) {
      * This should be the only data record of its type
      */
 
-    c = data.dptr = (int *)XMALLOC(4 * sizeof(int), "db_write");
-    memcpy((void *)c, (void *)&mudstate.db_top, sizeof(int));
+    c = data.dptr = ( int * ) XMALLOC ( 4 * sizeof ( int ), "db_write" );
+    memcpy ( ( void * ) c, ( void * ) &mudstate.db_top, sizeof ( int ) );
     c++;
-    memcpy((void *)c, (void *)&i, sizeof(int));
+    memcpy ( ( void * ) c, ( void * ) &i, sizeof ( int ) );
     c++;
-    memcpy((void *)c, (void *)&mudstate.record_players, sizeof(int));
+    memcpy ( ( void * ) c, ( void * ) &mudstate.record_players, sizeof ( int ) );
     c++;
-    memcpy((void *)c, (void *)&mudstate.moduletype_top, sizeof(int));
+    memcpy ( ( void * ) c, ( void * ) &mudstate.moduletype_top, sizeof ( int ) );
 
     /*
      * "TM3" is our unique key
      */
 
     key.dptr = "TM3";
-    key.dsize = strlen("TM3") + 1;
-    data.dsize = 4 * sizeof(int);
-    db_put(key, data, DBTYPE_DBINFO);
-    XFREE(data.dptr, "db_write");
+    key.dsize = strlen ( "TM3" ) + 1;
+    data.dsize = 4 * sizeof ( int );
+    db_put ( key, data, DBTYPE_DBINFO );
+    XFREE ( data.dptr, "db_write" );
 
     /*
      * Dump user-named attribute info
@@ -1583,23 +1640,23 @@ dbref db_write(void) {
      * sized chunks
      */
 
-    data.dptr = (char *)XMALLOC(ATRNUM_BLOCK_BYTES, "db_write.cdata");
+    data.dptr = ( char * ) XMALLOC ( ATRNUM_BLOCK_BYTES, "db_write.cdata" );
 
-    for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++) {
+    for ( i = 0; i <= ENTRY_NUM_BLOCKS ( mudstate.attr_next, blksize ); i++ ) {
         dirty = 0;
         num = 0;
         s = data.dptr;
 
-        for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.attr_next); j++) {
+        for ( j = ENTRY_BLOCK_STARTS ( i, blksize ); ( j <= ENTRY_BLOCK_ENDS ( i, blksize ) ) && ( j < mudstate.attr_next ); j++ ) {
 
-            if (j < A_USER_START) {
+            if ( j < A_USER_START ) {
                 continue;
             }
-            vp = (VATTR *) anum_table[j];
+            vp = ( VATTR * ) anum_table[j];
 
-            if (vp && !(vp->flags & AF_DELETED)) {
-                if (!mudstate.standalone) {
-                    if (vp->flags & AF_DIRTY) {
+            if ( vp && ! ( vp->flags & AF_DELETED ) ) {
+                if ( !mudstate.standalone ) {
+                    if ( vp->flags & AF_DIRTY ) {
                         /*
                          * Only write the dirty
                          * attribute numbers and
@@ -1617,45 +1674,45 @@ dbref db_write(void) {
             }
         }
 
-        if (!num) {
+        if ( !num ) {
             /*
              * No valid attributes in this block, delete it
              */
             key.dptr = &i;
-            key.dsize = sizeof(int);
-            db_del(key, DBTYPE_ATRNUM);
+            key.dsize = sizeof ( int );
+            db_del ( key, DBTYPE_ATRNUM );
         }
-        if (dirty) {
+        if ( dirty ) {
             /*
              * Something is dirty in this block, write all of the
              * attribute numbers in this block
              */
 
-            for (j = 0; (j < blksize) &&
-                    ((ENTRY_BLOCK_STARTS(i,
-                                         blksize) + j) < mudstate.attr_next);
-                    j++) {
+            for ( j = 0; ( j < blksize ) &&
+                    ( ( ENTRY_BLOCK_STARTS ( i,
+                                             blksize ) + j ) < mudstate.attr_next );
+                    j++ ) {
                 /*
                  * j is an offset of attribute numbers into
                  * the current block
                  */
 
-                if ((ENTRY_BLOCK_STARTS(i, blksize) + j) < A_USER_START) {
+                if ( ( ENTRY_BLOCK_STARTS ( i, blksize ) + j ) < A_USER_START ) {
                     continue;
                 }
-                vp = (VATTR *) anum_table[ENTRY_BLOCK_STARTS(i,
-                                          blksize) + j];
+                vp = ( VATTR * ) anum_table[ENTRY_BLOCK_STARTS ( i,
+                                            blksize ) + j];
 
-                if (vp && !(vp->flags & AF_DELETED)) {
-                    len = strlen(vp->name) + 1;
-                    memcpy((void *)s, (void *)&vp->number,
-                           sizeof(int));
-                    s += sizeof(int);
-                    memcpy((void *)s, (void *)&vp->flags,
-                           sizeof(int));
-                    s += sizeof(int);
-                    memcpy((void *)s, (void *)vp->name,
-                           len);
+                if ( vp && ! ( vp->flags & AF_DELETED ) ) {
+                    len = strlen ( vp->name ) + 1;
+                    memcpy ( ( void * ) s, ( void * ) &vp->number,
+                             sizeof ( int ) );
+                    s += sizeof ( int );
+                    memcpy ( ( void * ) s, ( void * ) &vp->flags,
+                             sizeof ( int ) );
+                    s += sizeof ( int );
+                    memcpy ( ( void * ) s, ( void * ) vp->name,
+                             len );
                     s += len;
                 }
             }
@@ -1665,12 +1722,12 @@ dbref db_write(void) {
              */
 
             key.dptr = &i;
-            key.dsize = sizeof(int);
-            data.dsize = s - (char *)data.dptr;
-            db_put(key, data, DBTYPE_ATRNUM);
+            key.dsize = sizeof ( int );
+            data.dsize = s - ( char * ) data.dptr;
+            db_put ( key, data, DBTYPE_ATRNUM );
         }
     }
-    XFREE(data.dptr, "db_write.cdata");
+    XFREE ( data.dptr, "db_write.cdata" );
 
     /*
      * Dump object structures using the same block-based method we use to
@@ -1684,32 +1741,32 @@ dbref db_write(void) {
      * sized chunks
      */
 
-    data.dptr = (char *)XMALLOC(OBJECT_BLOCK_BYTES, "db_write.cdata");
+    data.dptr = ( char * ) XMALLOC ( OBJECT_BLOCK_BYTES, "db_write.cdata" );
 
-    for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.db_top, blksize); i++) {
+    for ( i = 0; i <= ENTRY_NUM_BLOCKS ( mudstate.db_top, blksize ); i++ ) {
         dirty = 0;
         num = 0;
         s = data.dptr;
 
-        for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.db_top); j++) {
+        for ( j = ENTRY_BLOCK_STARTS ( i, blksize ); ( j <= ENTRY_BLOCK_ENDS ( i, blksize ) ) && ( j < mudstate.db_top ); j++ ) {
 
-            if (mudstate.standalone && !(j % 100)) {
-                mainlog_printf(".");
+            if ( mudstate.standalone && ! ( j % 100 ) ) {
+                mainlog_printf ( "." );
             }
             /*
              * We assume you always do a dbck before dump, and
              * Going objects are really destroyed!
              */
 
-            if (!Going(j)) {
-                if (!mudstate.standalone) {
-                    if (Flags3(j) & DIRTY) {
+            if ( !Going ( j ) ) {
+                if ( !mudstate.standalone ) {
+                    if ( Flags3 ( j ) & DIRTY ) {
                         /*
                          * Only write the dirty
                          * objects and clear the flag
                          */
 
-                        s_Clean(j);
+                        s_Clean ( j );
                         dirty = 1;
                     }
                 } else {
@@ -1719,34 +1776,34 @@ dbref db_write(void) {
             }
         }
 
-        if (!num) {
+        if ( !num ) {
             /*
              * No valid objects in this block, delete it
              */
 
             key.dptr = &i;
-            key.dsize = sizeof(int);
-            db_del(key, DBTYPE_OBJECT);
+            key.dsize = sizeof ( int );
+            db_del ( key, DBTYPE_OBJECT );
         }
-        if (dirty) {
+        if ( dirty ) {
             /*
              * Something is dirty in this block, write all of the
              * objects in this block
              */
 
-            for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.db_top); j++) {
+            for ( j = 0; ( j < blksize ) && ( ( ENTRY_BLOCK_STARTS ( i, blksize ) + j ) < mudstate.db_top ); j++ ) {
                 /*
                  * j is an offset of object numbers into the
                  * current block
                  */
 
-                k = ENTRY_BLOCK_STARTS(i, blksize) + j;
+                k = ENTRY_BLOCK_STARTS ( i, blksize ) + j;
 
-                if (!Going(k)) {
-                    memcpy((void *)s, (void *)&k, sizeof(int));
-                    s += sizeof(int);
-                    memcpy((void *)s, (void *)&(db[k]), sizeof(DUMPOBJ));
-                    s += sizeof(DUMPOBJ);
+                if ( !Going ( k ) ) {
+                    memcpy ( ( void * ) s, ( void * ) &k, sizeof ( int ) );
+                    s += sizeof ( int );
+                    memcpy ( ( void * ) s, ( void * ) & ( db[k] ), sizeof ( DUMPOBJ ) );
+                    s += sizeof ( DUMPOBJ );
                 }
             }
 
@@ -1755,13 +1812,13 @@ dbref db_write(void) {
              */
 
             key.dptr = &i;
-            key.dsize = sizeof(int);
-            data.dsize = s - (char *)data.dptr;
-            db_put(key, data, DBTYPE_OBJECT);
+            key.dsize = sizeof ( int );
+            data.dsize = s - ( char * ) data.dptr;
+            db_put ( key, data, DBTYPE_OBJECT );
         }
     }
 
-    XFREE(data.dptr, "db_write.cdata");
+    XFREE ( data.dptr, "db_write.cdata" );
 
     /*
      * Unlock the database
@@ -1769,39 +1826,40 @@ dbref db_write(void) {
 
     db_unlock();
 
-    if (mudstate.standalone)
-        mainlog_printf( "\n");
-    return (mudstate.db_top);
+    if ( mudstate.standalone ) {
+        mainlog_printf ( "\n" );
+    }
+    return ( mudstate.db_top );
 }
 
 /* Open a file pointer for a module to use when writing a flatfile */
 
-FILE *db_module_flatfile(char *filename, int wrflag) {
+FILE *db_module_flatfile ( char *filename, int wrflag ) {
     FILE *f = NULL;
 
 
     /*
     if(mudstate.initializing) {
-         mudstate.mfiletab = add_array(mudstate.mfiletab, filename, &mudstate.modulefiles, "db_module_flatfile");    
+         mudstate.mfiletab = add_array(mudstate.mfiletab, filename, &mudstate.modulefiles, "db_module_flatfile");
     }
     */
 
-    if (wrflag) {
-        f = tf_fopen(filename, O_WRONLY | O_CREAT | O_TRUNC);
-        STARTLOG(LOG_ALWAYS, "DMP", "DUMP")
-        log_printf("Writing db: %s", filename);
+    if ( wrflag ) {
+        f = tf_fopen ( filename, O_WRONLY | O_CREAT | O_TRUNC );
+        STARTLOG ( LOG_ALWAYS, "DMP", "DUMP" )
+        log_printf ( "Writing db: %s", filename );
         ENDLOG
     } else {
-        f = tf_fopen(filename, O_RDONLY);
-        STARTLOG(LOG_ALWAYS, "INI", "LOAD")
-        log_printf("Loading db: %s", filename);
+        f = tf_fopen ( filename, O_RDONLY );
+        STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
+        log_printf ( "Loading db: %s", filename );
         ENDLOG
     }
 
-    if (f != NULL) {
+    if ( f != NULL ) {
         return f;
     } else {
-        log_perror("DMP", "FAIL", "Opening flatfile", filename);
+        log_perror ( "DMP", "FAIL", "Opening flatfile", filename );
         return NULL;
     }
 }

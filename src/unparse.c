@@ -41,16 +41,16 @@
      * only internal currently, so it's not a problem.
      */
 
-    static char *unparse_object_quiet(dbref player, dbref loc) {
+    static char *unparse_object_quiet ( dbref player, dbref loc ) {
     static char buf[SBUF_SIZE];
 
-    switch (loc) {
+    switch ( loc ) {
     case NOTHING:
-        return (char *)"-1";
+        return ( char * ) "-1";
     case HOME:
-        return (char *)"-3";
+        return ( char * ) "-3";
     default:
-        sprintf(buf, "(#%d)", loc);
+        sprintf ( buf, "(#%d)", loc );
         return buf;
     }
 }
@@ -59,65 +59,65 @@ static char boolexp_buf[LBUF_SIZE];
 
 static char *buftop;
 
-static void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format) {
+static void unparse_boolexp1 ( dbref player, BOOLEXP *b, char outer_type, int format ) {
     ATTR *ap;
 
     char sep_ch;
 
     char *buff;
 
-    if ((b == TRUE_BOOLEXP)) {
-        if (format == F_EXAMINE) {
-            safe_str((char *)"*UNLOCKED*", boolexp_buf, &buftop);
+    if ( ( b == TRUE_BOOLEXP ) ) {
+        if ( format == F_EXAMINE ) {
+            safe_str ( ( char * ) "*UNLOCKED*", boolexp_buf, &buftop );
         }
         return;
     }
-    switch (b->type) {
+    switch ( b->type ) {
     case BOOLEXP_AND:
-        if (outer_type == BOOLEXP_NOT) {
-            safe_chr('(', boolexp_buf, &buftop);
+        if ( outer_type == BOOLEXP_NOT ) {
+            safe_chr ( '(', boolexp_buf, &buftop );
         }
-        unparse_boolexp1(player, b->sub1, b->type, format);
-        safe_chr(AND_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub2, b->type, format);
-        if (outer_type == BOOLEXP_NOT) {
-            safe_chr(')', boolexp_buf, &buftop);
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
+        safe_chr ( AND_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub2, b->type, format );
+        if ( outer_type == BOOLEXP_NOT ) {
+            safe_chr ( ')', boolexp_buf, &buftop );
         }
         break;
     case BOOLEXP_OR:
-        if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND) {
-            safe_chr('(', boolexp_buf, &buftop);
+        if ( outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND ) {
+            safe_chr ( '(', boolexp_buf, &buftop );
         }
-        unparse_boolexp1(player, b->sub1, b->type, format);
-        safe_chr(OR_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub2, b->type, format);
-        if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND) {
-            safe_chr(')', boolexp_buf, &buftop);
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
+        safe_chr ( OR_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub2, b->type, format );
+        if ( outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND ) {
+            safe_chr ( ')', boolexp_buf, &buftop );
         }
         break;
     case BOOLEXP_NOT:
-        safe_chr('!', boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub1, b->type, format);
+        safe_chr ( '!', boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
         break;
     case BOOLEXP_INDIR:
-        safe_chr(INDIR_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub1, b->type, format);
+        safe_chr ( INDIR_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
         break;
     case BOOLEXP_IS:
-        safe_chr(IS_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub1, b->type, format);
+        safe_chr ( IS_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
         break;
     case BOOLEXP_CARRY:
-        safe_chr(CARRY_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub1, b->type, format);
+        safe_chr ( CARRY_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
         break;
     case BOOLEXP_OWNER:
-        safe_chr(OWNER_TOKEN, boolexp_buf, &buftop);
-        unparse_boolexp1(player, b->sub1, b->type, format);
+        safe_chr ( OWNER_TOKEN, boolexp_buf, &buftop );
+        unparse_boolexp1 ( player, b->sub1, b->type, format );
         break;
     case BOOLEXP_CONST:
-        if (!mudstate.standalone) {
-            switch (format) {
+        if ( !mudstate.standalone ) {
+            switch ( format ) {
             case F_QUIET:
 
                 /*
@@ -125,8 +125,8 @@ static void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int form
                  * Always #Num
                  */
 
-                safe_str((char *)unparse_object_quiet(player,
-                                                      b->thing), boolexp_buf, &buftop);
+                safe_str ( ( char * ) unparse_object_quiet ( player,
+                           b->thing ), boolexp_buf, &buftop );
                 break;
             case F_EXAMINE:
 
@@ -135,9 +135,9 @@ static void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int form
                  * Name(#Num) or Name
                  */
 
-                buff = unparse_object(player, b->thing, 0);
-                safe_str(buff, boolexp_buf, &buftop);
-                free_lbuf(buff);
+                buff = unparse_object ( player, b->thing, 0 );
+                safe_str ( buff, boolexp_buf, &buftop );
+                free_lbuf ( buff );
                 break;
             case F_DECOMPILE:
 
@@ -147,16 +147,16 @@ static void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int form
                  * thing, else #Num
                  */
 
-                switch (Typeof(b->thing)) {
+                switch ( Typeof ( b->thing ) ) {
                 case TYPE_PLAYER:
-                    safe_chr('*', boolexp_buf, &buftop);
+                    safe_chr ( '*', boolexp_buf, &buftop );
                 case TYPE_THING:
-                    safe_name(b->thing, boolexp_buf,
-                              &buftop);
+                    safe_name ( b->thing, boolexp_buf,
+                                &buftop );
                     break;
                 default:
-                    safe_dbref(boolexp_buf, &buftop,
-                               b->thing);
+                    safe_dbref ( boolexp_buf, &buftop,
+                                 b->thing );
                     break;
                 }
                 break;
@@ -167,69 +167,70 @@ static void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int form
                  * cmd.  *Name if player, else #Num
                  */
 
-                switch (Typeof(b->thing)) {
+                switch ( Typeof ( b->thing ) ) {
                 case TYPE_PLAYER:
-                    safe_chr('*', boolexp_buf, &buftop);
-                    safe_name(b->thing, boolexp_buf,
-                              &buftop);
+                    safe_chr ( '*', boolexp_buf, &buftop );
+                    safe_name ( b->thing, boolexp_buf,
+                                &buftop );
                     break;
                 default:
-                    safe_dbref(boolexp_buf, &buftop,
-                               b->thing);
+                    safe_dbref ( boolexp_buf, &buftop,
+                                 b->thing );
                     break;
                 }
             }
         } else {
-            safe_str((char *)unparse_object_quiet(player,
-                                                  b->thing), boolexp_buf, &buftop);
+            safe_str ( ( char * ) unparse_object_quiet ( player,
+                       b->thing ), boolexp_buf, &buftop );
         }
         break;
     case BOOLEXP_ATR:
     case BOOLEXP_EVAL:
-        if (b->type == BOOLEXP_EVAL)
+        if ( b->type == BOOLEXP_EVAL ) {
             sep_ch = '/';
-        else
-            sep_ch = ':';
-        ap = atr_num(b->thing);
-        if (ap && ap->number) {
-            safe_str((char *)ap->name, boolexp_buf, &buftop);
         } else {
-            safe_ltos(boolexp_buf, &buftop, b->thing);
+            sep_ch = ':';
         }
-        safe_chr(sep_ch, boolexp_buf, &buftop);
-        safe_str((char *)b->sub1, boolexp_buf, &buftop);
+        ap = atr_num ( b->thing );
+        if ( ap && ap->number ) {
+            safe_str ( ( char * ) ap->name, boolexp_buf, &buftop );
+        } else {
+            safe_ltos ( boolexp_buf, &buftop, b->thing );
+        }
+        safe_chr ( sep_ch, boolexp_buf, &buftop );
+        safe_str ( ( char * ) b->sub1, boolexp_buf, &buftop );
         break;
     default:
-        mainlog_printf("ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n");
+        mainlog_printf ( "ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n" );
         abort();
         break;
     }
 }
 
-char *unparse_boolexp_quiet(dbref player, BOOLEXP *b) {
+char *unparse_boolexp_quiet ( dbref player, BOOLEXP *b ) {
     buftop = boolexp_buf;
-    unparse_boolexp1(player, b, BOOLEXP_CONST, F_QUIET);
+    unparse_boolexp1 ( player, b, BOOLEXP_CONST, F_QUIET );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp(dbref player, BOOLEXP *b) {
+char *unparse_boolexp ( dbref player, BOOLEXP *b ) {
     buftop = boolexp_buf;
-    unparse_boolexp1(player, b, BOOLEXP_CONST, F_EXAMINE);
+    unparse_boolexp1 ( player, b, BOOLEXP_CONST, F_EXAMINE );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp_decompile(dbref player, BOOLEXP *b) {
+char *unparse_boolexp_decompile ( dbref player, BOOLEXP *b ) {
     buftop = boolexp_buf;
-    unparse_boolexp1(player, b, BOOLEXP_CONST, F_DECOMPILE);
+    unparse_boolexp1 ( player, b, BOOLEXP_CONST, F_DECOMPILE );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp_function(dbref player, BOOLEXP *b) {
+char *unparse_boolexp_function ( dbref player, BOOLEXP *b ) {
     buftop = boolexp_buf;
-    unparse_boolexp1(player, b, BOOLEXP_CONST, F_FUNCTION);
+    unparse_boolexp1 ( player, b, BOOLEXP_CONST, F_FUNCTION );
     *buftop = '\0';
     return boolexp_buf;
 }

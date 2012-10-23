@@ -29,34 +29,34 @@ static FILE *log_fp = NULL;
 /* *INDENT-OFF* */
 
 NAMETAB logdata_nametab[] = {
-    {(char *)"flags",		1,	0,	LOGOPT_FLAGS},
-    {(char *)"location",		1,	0,	LOGOPT_LOC},
-    {(char *)"owner",		1,	0,	LOGOPT_OWNER},
-    {(char *)"timestamp",		1,	0,	LOGOPT_TIMESTAMP},
+    { ( char * ) "flags",		1,	0,	LOGOPT_FLAGS},
+    { ( char * ) "location",		1,	0,	LOGOPT_LOC},
+    { ( char * ) "owner",		1,	0,	LOGOPT_OWNER},
+    { ( char * ) "timestamp",		1,	0,	LOGOPT_TIMESTAMP},
     { NULL,				0,	0,	0}
 };
 
 NAMETAB logoptions_nametab[] = {
-    {(char *)"accounting",		2,	0,	LOG_ACCOUNTING},
-    {(char *)"all_commands",	2,	0,	LOG_ALLCOMMANDS},
-    {(char *)"bad_commands",	2,	0,	LOG_BADCOMMANDS},
-    {(char *)"buffer_alloc",	3,	0,	LOG_ALLOCATE},
-    {(char *)"bugs",		3,	0,	LOG_BUGS},
-    {(char *)"checkpoints",		2,	0,	LOG_DBSAVES},
-    {(char *)"config_changes",	2,	0,	LOG_CONFIGMODS},
-    {(char *)"create",		2,	0,	LOG_PCREATES},
-    {(char *)"keyboard_commands",	2,	0,	LOG_KBCOMMANDS},
-    {(char *)"killing",		1,	0,	LOG_KILLS},
-    {(char *)"local",		3,	0,	LOG_LOCAL},
-    {(char *)"logins",		3,	0,	LOG_LOGIN},
-    {(char *)"network",		1,	0,	LOG_NET},
-    {(char *)"problems",		1,	0,	LOG_PROBLEMS},
-    {(char *)"security",		2,	0,	LOG_SECURITY},
-    {(char *)"shouts",		2,	0,	LOG_SHOUTS},
-    {(char *)"startup",		2,	0,	LOG_STARTUP},
-    {(char *)"suspect_commands",	2,	0,	LOG_SUSPECTCMDS},
-    {(char *)"time_usage",		1,	0,	LOG_TIMEUSE},
-    {(char *)"wizard",		1,	0,	LOG_WIZARD},
+    { ( char * ) "accounting",		2,	0,	LOG_ACCOUNTING},
+    { ( char * ) "all_commands",	2,	0,	LOG_ALLCOMMANDS},
+    { ( char * ) "bad_commands",	2,	0,	LOG_BADCOMMANDS},
+    { ( char * ) "buffer_alloc",	3,	0,	LOG_ALLOCATE},
+    { ( char * ) "bugs",		3,	0,	LOG_BUGS},
+    { ( char * ) "checkpoints",		2,	0,	LOG_DBSAVES},
+    { ( char * ) "config_changes",	2,	0,	LOG_CONFIGMODS},
+    { ( char * ) "create",		2,	0,	LOG_PCREATES},
+    { ( char * ) "keyboard_commands",	2,	0,	LOG_KBCOMMANDS},
+    { ( char * ) "killing",		1,	0,	LOG_KILLS},
+    { ( char * ) "local",		3,	0,	LOG_LOCAL},
+    { ( char * ) "logins",		3,	0,	LOG_LOGIN},
+    { ( char * ) "network",		1,	0,	LOG_NET},
+    { ( char * ) "problems",		1,	0,	LOG_PROBLEMS},
+    { ( char * ) "security",		2,	0,	LOG_SECURITY},
+    { ( char * ) "shouts",		2,	0,	LOG_SHOUTS},
+    { ( char * ) "startup",		2,	0,	LOG_STARTUP},
+    { ( char * ) "suspect_commands",	2,	0,	LOG_SUSPECTCMDS},
+    { ( char * ) "time_usage",		1,	0,	LOG_TIMEUSE},
+    { ( char * ) "wizard",		1,	0,	LOG_WIZARD},
     { NULL,				0,	0,	0}
 };
 
@@ -90,21 +90,21 @@ LOGFILETAB logfds_table[] = {
  * logfile_init: Initialize the main logfile.
  */
 
-void logfile_init(char *filename) {
-    if (!filename) {
+void logfile_init ( char *filename ) {
+    if ( !filename ) {
         mainlog_fp = stderr;
         return;
     }
 
-    mainlog_fp = fopen(filename, "w");
-    if (!mainlog_fp) {
-        fprintf(stderr, "Could not open logfile %s for writing.\n",
-                filename);
+    mainlog_fp = fopen ( filename, "w" );
+    if ( !mainlog_fp ) {
+        fprintf ( stderr, "Could not open logfile %s for writing.\n",
+                  filename );
         mainlog_fp = stderr;
         return;
     }
 
-    setbuf(mainlog_fp, NULL);	/* unbuffered */
+    setbuf ( mainlog_fp, NULL );	/* unbuffered */
 }
 
 
@@ -113,7 +113,7 @@ void logfile_init(char *filename) {
  * log entry.
  */
 
-int start_log(const char *primary, const char *secondary, int key) {
+int start_log ( const char *primary, const char *secondary, int key ) {
     struct tm *tp;
 
     time_t now;
@@ -122,26 +122,27 @@ int start_log(const char *primary, const char *secondary, int key) {
 
     static int last_key = 0;
 
-    if (!mudstate.standalone) {
-        if (mudconf.log_diversion & key) {
-            if (key != last_key) {
+    if ( !mudstate.standalone ) {
+        if ( mudconf.log_diversion & key ) {
+            if ( key != last_key ) {
                 /*
                  * Try to save ourselves some lookups
                  */
                 last_key = key;
-                for (lp = logfds_table; lp->log_flag; lp++) {
+                for ( lp = logfds_table; lp->log_flag; lp++ ) {
                     /*
                      * Though keys can be OR'd, use the first one
                      * * matched
                      */
 
-                    if (lp->log_flag & key) {
+                    if ( lp->log_flag & key ) {
                         log_fp = lp->fileptr;
                         break;
                     }
                 }
-                if (!log_fp)
+                if ( !log_fp ) {
                     log_fp = mainlog_fp;
+                }
             }
         } else {
             last_key = key;
@@ -152,38 +153,40 @@ int start_log(const char *primary, const char *secondary, int key) {
     }
 
     mudstate.logging++;
-    switch (mudstate.logging) {
+    switch ( mudstate.logging ) {
     case 1:
     case 2:
 
-        if (!mudstate.standalone) {
+        if ( !mudstate.standalone ) {
             /*
              * Format the timestamp
              */
 
-            if ((mudconf.log_info & LOGOPT_TIMESTAMP) != 0) {
-                time((time_t *) (&now));
-                tp = localtime((time_t *) (&now));
-                log_printf("%02d%02d%02d.%02d%02d%02d ", (tp->tm_year % 100), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec);
+            if ( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
+                time ( ( time_t * ) ( &now ) );
+                tp = localtime ( ( time_t * ) ( &now ) );
+                log_printf ( "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
             }
 
             /*
              * Write the header to the log
              */
 
-            if (secondary && *secondary)
-                log_printf("%s %3s/%-5s: ", MUDLOGNAME, primary, secondary);
-            else
-                log_printf("%s %-9s: ", MUDLOGNAME, primary);
+            if ( secondary && *secondary ) {
+                log_printf ( "%s %3s/%-5s: ", MUDLOGNAME, primary, secondary );
+            } else {
+                log_printf ( "%s %-9s: ", MUDLOGNAME, primary );
+            }
         }
 
         /*
          * If a recursive call, log it and return indicating no log
          */
 
-        if (mudstate.logging == 1)
+        if ( mudstate.logging == 1 ) {
             return 1;
-        mainlog_printf("Recursive logging request.\r\n");
+        }
+        mainlog_printf ( "Recursive logging request.\r\n" );
     default:
         mudstate.logging--;
     }
@@ -194,10 +197,10 @@ int start_log(const char *primary, const char *secondary, int key) {
  * end_log: Finish up writing a log entry
  */
 
-void end_log(void) {
-    log_printf("\n");
-    if(log_fp != NULL) {
-        fflush(log_fp);
+void end_log ( void ) {
+    log_printf ( "\n" );
+    if ( log_fp != NULL ) {
+        fflush ( log_fp );
     }
     mudstate.logging--;
 }
@@ -206,14 +209,14 @@ void end_log(void) {
  * log_perror: Write perror message to the log
  */
 
-void log_perror(const char *primary, const char *secondary, const char *extra, const char *failing_object) {
+void log_perror ( const char *primary, const char *secondary, const char *extra, const char *failing_object ) {
     int my_errno = errno;
 
-    start_log(primary, secondary, LOG_ALWAYS);
-    if (extra && *extra) {
-        log_printf("(%s) ", extra);
+    start_log ( primary, secondary, LOG_ALWAYS );
+    if ( extra && *extra ) {
+        log_printf ( "(%s) ", extra );
     }
-    log_printf("%s: %s", failing_object, strerror(my_errno));
+    log_printf ( "%s: %s", failing_object, strerror ( my_errno ) );
     end_log();
 }
 
@@ -221,61 +224,61 @@ void log_perror(const char *primary, const char *secondary, const char *extra, c
  * log_printf: Format text and print to the log file.
  */
 
-void log_printf(const char *format, ...) {
+void log_printf ( const char *format, ... ) {
     va_list ap;
     char *s;
 
-    va_start(ap, format);
+    va_start ( ap, format );
 
-    s = (char *)XMALLOC(MBUF_SIZE, "log_printf");
-    vsprintf(s, format, ap);
+    s = ( char * ) XMALLOC ( MBUF_SIZE, "log_printf" );
+    vsprintf ( s, format, ap );
     /*
      * Do we have a logfile to write to...
      */
-    if(log_fp != NULL) {
-        fputs(s, log_fp);
+    if ( log_fp != NULL ) {
+        fputs ( s, log_fp );
     }
     /*
      * If we are starting up, log to stderr too..
      */
-    if ( (log_fp != stderr) && (mudstate.running == 0)) {
-        fputs(s, stderr);
+    if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+        fputs ( s, stderr );
     }
-    XFREE(s, "log_printf");
+    XFREE ( s, "log_printf" );
 
-    va_end(ap);
+    va_end ( ap );
 }
 
 /* ---------------------------------------------------------------------------
  * mainlog_printf: Format text and print to the mainlog file.
  */
 
-void mainlog_printf(const char *format, ...) {
+void mainlog_printf ( const char *format, ... ) {
     va_list ap;
     char *s;
 
-    va_start(ap, format);
-    s = (char *)XMALLOC(MBUF_SIZE, "mainlog_printf");
-    vsprintf(s, format, ap);
-    if(mainlog_fp != NULL) {
-        fputs(s, mainlog_fp);
+    va_start ( ap, format );
+    s = ( char * ) XMALLOC ( MBUF_SIZE, "mainlog_printf" );
+    vsprintf ( s, format, ap );
+    if ( mainlog_fp != NULL ) {
+        fputs ( s, mainlog_fp );
     }
     /*
      * If we are starting up, log to stderr too..
      */
-    if ( (mainlog_fp != stderr) && (mudstate.running == 0)) {
-        fputs(s, stderr);
+    if ( ( mainlog_fp != stderr ) && ( mudstate.running == 0 ) ) {
+        fputs ( s, stderr );
     }
-    XFREE(s, "mainlog_printf");
+    XFREE ( s, "mainlog_printf" );
 
-    va_end(ap);
+    va_end ( ap );
 }
 
-void log_vprintf(const char *format, va_list ap) {
-    if(log_fp != NULL) {
-        vfprintf(log_fp, format, ap);
+void log_vprintf ( const char *format, va_list ap ) {
+    if ( log_fp != NULL ) {
+        vfprintf ( log_fp, format, ap );
     } else {
-        vfprintf(stderr, format, ap);
+        vfprintf ( stderr, format, ap );
     }
 }
 
@@ -285,28 +288,30 @@ void log_vprintf(const char *format, va_list ap) {
  * of the owner.
  */
 
-void log_name(dbref target) {
+void log_name ( dbref target ) {
     char *tp;
 
-    if (mudstate.standalone) {
-        fprintf(stderr, "%s(#%d)", Name(target), target);
+    if ( mudstate.standalone ) {
+        fprintf ( stderr, "%s(#%d)", Name ( target ), target );
         return;
     }
 
-    if ((mudconf.log_info & LOGOPT_FLAGS) != 0)
-        tp = unparse_object((dbref) GOD, target, 0);
-    else
-        tp = unparse_object_numonly(target);
-    log_printf("%s", strip_ansi(tp));
-    free_lbuf(tp);
-    if (((mudconf.log_info & LOGOPT_OWNER) != 0) &&
-            (target != Owner(target))) {
-        if ((mudconf.log_info & LOGOPT_FLAGS) != 0)
-            tp = unparse_object((dbref) GOD, Owner(target), 0);
-        else
-            tp = unparse_object_numonly(Owner(target));
-        log_printf("[%s]", strip_ansi(tp));
-        free_lbuf(tp);
+    if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
+        tp = unparse_object ( ( dbref ) GOD, target, 0 );
+    } else {
+        tp = unparse_object_numonly ( target );
+    }
+    log_printf ( "%s", strip_ansi ( tp ) );
+    free_lbuf ( tp );
+    if ( ( ( mudconf.log_info & LOGOPT_OWNER ) != 0 ) &&
+            ( target != Owner ( target ) ) ) {
+        if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
+            tp = unparse_object ( ( dbref ) GOD, Owner ( target ), 0 );
+        } else {
+            tp = unparse_object_numonly ( Owner ( target ) );
+        }
+        log_printf ( "[%s]", strip_ansi ( tp ) );
+        free_lbuf ( tp );
     }
     return;
 }
@@ -315,35 +320,35 @@ void log_name(dbref target) {
  * log_name_and_loc: Log both the name and location of an object
  */
 
-void log_name_and_loc(dbref player) {
-    log_name(player);
-    if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player)) {
-        log_printf(" in ");
-        log_name(Location(player));
+void log_name_and_loc ( dbref player ) {
+    log_name ( player );
+    if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+        log_printf ( " in " );
+        log_name ( Location ( player ) );
     }
 }
 
-char * OBJTYP(dbref thing) {
-    if (!Good_dbref(thing)) {
-        return (char *)"??OUT-OF-RANGE??";
+char * OBJTYP ( dbref thing ) {
+    if ( !Good_dbref ( thing ) ) {
+        return ( char * ) "??OUT-OF-RANGE??";
     }
-    switch (Typeof(thing)) {
+    switch ( Typeof ( thing ) ) {
     case TYPE_PLAYER:
-        return (char *)"PLAYER";
+        return ( char * ) "PLAYER";
     case TYPE_THING:
-        return (char *)"THING";
+        return ( char * ) "THING";
     case TYPE_ROOM:
-        return (char *)"ROOM";
+        return ( char * ) "ROOM";
     case TYPE_EXIT:
-        return (char *)"EXIT";
+        return ( char * ) "EXIT";
     case TYPE_GARBAGE:
-        return (char *)"GARBAGE";
+        return ( char * ) "GARBAGE";
     default:
-        return (char *)"??ILLEGAL??";
+        return ( char * ) "??ILLEGAL??";
     }
 }
 
-void log_type_and_name(dbref thing) {
-    log_printf("%s ", OBJTYP(thing));
-    log_name(thing);
+void log_type_and_name ( dbref thing ) {
+    log_printf ( "%s ", OBJTYP ( thing ) );
+    log_name ( thing );
 }

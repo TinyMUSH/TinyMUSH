@@ -28,20 +28,20 @@
  * Log database errors
  */
 
-void log_db_err(int obj, int attr, const char *txt) {
-    if (!mudstate.standalone) {
-        STARTLOG(LOG_ALWAYS, "DBM", "ERROR")
-        log_printf("Could not %s object #%d", txt, obj);
-        if (attr != NOTHING) {
-            log_printf(" attr #%d", attr);
+void log_db_err ( int obj, int attr, const char *txt ) {
+    if ( !mudstate.standalone ) {
+        STARTLOG ( LOG_ALWAYS, "DBM", "ERROR" )
+        log_printf ( "Could not %s object #%d", txt, obj );
+        if ( attr != NOTHING ) {
+            log_printf ( " attr #%d", attr );
         }
         ENDLOG
     } else {
-        mainlog_printf("Could not %s object #%d", txt, obj);
-        if (attr != NOTHING) {
-            mainlog_printf(" attr #%d", attr);
+        mainlog_printf ( "Could not %s object #%d", txt, obj );
+        if ( attr != NOTHING ) {
+            mainlog_printf ( " attr #%d", attr );
         }
-        mainlog_printf("\n");
+        mainlog_printf ( "\n" );
     }
 }
 
@@ -51,22 +51,24 @@ void log_db_err(int obj, int attr, const char *txt) {
 /*
  * VARARGS
  */
-void warning(char *p, ...) {
+void warning ( char *p, ... ) {
     va_list ap;
 
-    va_start(ap, p);
+    va_start ( ap, p );
 
-    while (1) {
-        if (p == (char *)0)
+    while ( 1 ) {
+        if ( p == ( char * ) 0 ) {
             break;
+        }
 
-        if (p == (char *)-1)
-            p = (char *)strerror(errno);
+        if ( p == ( char * )-1 ) {
+            p = ( char * ) strerror ( errno );
+        }
 
-        (void)mainlog_printf("%s", p);
-        p = va_arg(ap, char *);
+        ( void ) mainlog_printf ( "%s", p );
+        p = va_arg ( ap, char * );
     }
-    va_end(ap);
+    va_end ( ap );
 }
 
 /*
@@ -75,21 +77,23 @@ void warning(char *p, ...) {
 /*
  * VARARGS
  */
-void fatal(char *p, ...) {
+void fatal ( char *p, ... ) {
     va_list ap;
 
-    va_start(ap, p);
+    va_start ( ap, p );
 
-    while (1) {
-        if (p == (char *)0)
+    while ( 1 ) {
+        if ( p == ( char * ) 0 ) {
             break;
+        }
 
-        if (p == (char *)-1)
-            p = (char *)strerror(errno);
+        if ( p == ( char * )-1 ) {
+            p = ( char * ) strerror ( errno );
+        }
 
-        (void)mainlog_printf("%s", p);
-        p = va_arg(ap, char *);
+        ( void ) mainlog_printf ( "%s", p );
+        p = va_arg ( ap, char * );
     }
-    va_end(ap);
-    exit(1);
+    va_end ( ap );
+    exit ( 1 );
 }
