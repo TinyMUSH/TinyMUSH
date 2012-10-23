@@ -1,6 +1,174 @@
 TinyMUSH 3.3
 ------------
 
+
+Alpha 3 : 2012-10-22
+--------------------
+
+commit 658c50d89c4c8fea5c84d6dcb1d4cf54344d9f35
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 23:33:05 2012 -0400
+
+    - NEW: SIGINT now trigger a full backup (usefull for crontab).
+    - Misc: Added documentation for @backup
+
+commit 074f0f7463ef8cfd5978818de3168ae77eb04249
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 19:09:19 2012 -0400
+
+    - FIX: Bug where @backup wasn't able to create copies of the module's flatfile.
+
+commit 161b9058509674bf55446d67ed973706fed07ea7
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 16:03:43 2012 -0400
+
+    - NEW: Added a wizard command @backup to trigger live full backups of game.
+
+commit d255686f2a1972556a4dc4a8c3483541204b3f0e
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 12:00:08 2012 -0400
+
+    - FIX: More error checks in the backup functions.
+
+commit 98bde9440c362ac081c1304fc3f741945727ce1d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 10:29:09 2012 -0400
+
+    - NEW: netmush now do a backup of the game as part of its startup process.
+
+commit a91fb06679227d695dd3c1914f5b71010dcbcb6c
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 17 15:59:20 2012 -0400
+
+    - Fix: Create a new DB if all the startup checks there is still no db present (Same thing Startmush was doing).
+
+commit bdcd745f14a945eda350d89a8541ad8f99c5ad7c
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 17 15:43:18 2012 -0400
+
+    - Misc: Uses the same steps to deal with a CRASH and KILL database.
+    - Fix: Always create backups of anything modified by the automatic CRASH/KILL recovery.
+
+commit 1d0eb90b4be28edad0cc25ade314be00a3ba3692
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 17 11:34:04 2012 -0400
+
+    - NEW: KILLED db are handled automatically by netmush.
+    - FIX: Add a "Done." message to fork_and_dump.
+
+commit fa807e14af479f34e357744058f4685e74fe1676
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Oct 16 23:42:13 2012 -0400
+
+    - Misc: netmush will now recover a crash database automatically if it's newer than the previous db.
+
+commit 5e46ddd10bc4b416c5b446b78decec9cd14538cc
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Oct 16 00:19:56 2012 -0400
+
+    - Misc: netmush now check if it's already running before starting up.
+    - Misc: netmush now handle GDBM Panic condition from last log itself.
+    - Misc: netmush now handle the presence of an unwanted restart db by itself.
+
+commit fa716be65b9e66eb8fd4c2eead402be1c9d09d0d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Oct 14 19:11:34 2012 -0400
+
+    - FIX: There was some missing files in Makefile.am for the distribution targets.
+
+commit b40a88d86802e9d499cc0c495fb4e100b9814de5
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Oct 14 13:39:02 2012 -0400
+
+    - Misc: Remove the buildnum stuff.
+
+commit d717252cae15b02b09a4b5d7279e04170294407b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Oct 14 12:36:13 2012 -0400
+
+    - FIX: Default paths are now configured by Makefile's rules. Starting netmush without arguments will start with the config file PREFIX/etc/tinymush/netmush.conf
+
+commit ec895216a0d309a5edc9feec792a5f2106a31368
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Oct 14 11:31:33 2012 -0400
+
+    - Misc: Another reorg of the source tree to make it compatible with autoconf's packager and avoid having to switch to src to build the engine.
+
+commit c1161faec604d3f6a05e4ee8a4e01f346067f2ac
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Oct 12 22:08:09 2012 -0400
+
+    - FIX: Move shutdown.status to log_home/shortname.SHUTDOWN. Make sure it write at least who shut the game down if it can.
+
+commit 5f99a866829ad253f2c35e2b0e024ae3aae49ee7
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Oct 12 21:33:48 2012 -0400
+
+    - FIX: Make sure the restart db is created in the db directory. prefix the restart db with the short game name in case multiple games run from the same directory
+    - Misc: Start to modify the scripts for the new startup sequence.
+
+commit 1da705c6a8c023ade7a3e7ad1ead3af825deca48
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 18:28:10 2012 -0400
+
+    - FIX: Separator length was not set in function load_structure (Fixed by Susan Tussing).
+
+commit 2be318f6347f6f02eab2d9c8dd318fd5fbdab934
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 18:26:38 2012 -0400
+
+    - FIX: Separator length was not set in function load_structure.
+
+commit 9c111c2ddf0be2f232f57a3281fe27c676a582d4
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 18:09:38 2012 -0400
+
+    - Misc: Re-Enable config parameters for text files.
+    - NEW: help, wizhelp and qhelp can be configured in the configuration file.
+    - FIX: Restart issue.
+
+commit 2d87ef739b6900196635a9813c1b37353bfeded9
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 15:33:40 2012 -0400
+
+    - FIX: Refuse to start if no config file is speficied.
+
+commit e7ade38665b43e44419efbbbdb27b512db6908f2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 14:58:42 2012 -0400
+
+    - Misc: netmush now daemonize itself.
+
+commit 4c133415c27f17522d6302ebd70e84138c5d57ee
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 12:06:52 2012 -0400
+
+    - Misc: Remove unused file.
+
+commit b466d868daf9ef2e3df55679436752f80f855fcd
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 10 12:02:17 2012 -0400
+
+    - FIX : Rename tprintf/tvprintf to tmprintf/tmvprintf to avoid mixup with the standard function.
+    - NEW : mkindx is now done by the server itself while reading helpfiles.
+    - NEW : New file hierarchy, netmush's finally find most of its path via its config file.
+    - NEW : Command line is now netmush [-s] -c path_to_config_file
+
+commit 1de227bf3afc14b370ea57db83be28a3d1249b82
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 8 21:34:25 2012 -0400
+
+    - Misc : Files are now installed where they should go.
+    - Fix : *dbm only create static libraries. There's no point in building static and shared if we only use the static ones.
+
+commit 4be225c45151b574955ecec06eb7a38b9eedb245
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 8 13:22:37 2012 -0400
+
+    - Fix : A function flag is mixed with permissions in fun_destruct. Submitted and fixed by Susan Tussing.
+    - Misc : Moving files around in preparation for the new installation model.
+
+
 Alpha 2 : 2012-09-27
 --------------------
 
@@ -193,6 +361,7 @@ Date:   Thu Sep 20 13:28:09 2012 -0400
     - Misc: Update license to Artistic License 2.0 per OSI's recommendation.
     - Misc: Removed $Id$ from all files since GIT isn't using them.
 
+
 Alpha 1 : 2012-09-19
 --------------------
 
@@ -310,11 +479,12 @@ Date:   Sat Feb 18 12:23:11 2012 -0500
 
     Source Cleanup
 
+
+Alpha 0 : 2012-02-19
+--------------------
+
 commit 9edb09f8316bf727a1f347fa22225b0512177a0c
 Author: Eddy Beaupre <eddy@beaupre.biz>
 Date:   Sat Feb 18 10:36:59 2012 -0500
 
     Initial Commit
-
-Alpha 0 : 2012-02-19
---------------------
