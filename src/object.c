@@ -51,44 +51,76 @@ extern int structure_clr ( dbref );
  */
 
 static void Log_pointer_err ( dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype ) {
-    STARTLOG ( LOG_PROBLEMS, "OBJ", "DAMAG" )
-    log_type_and_name ( obj );
+    char *obj_type, *obj_name, *obj_loc;
+    char *ref_type, *ref_name;
+
+    obj_type = log_gettype ( obj, "Log_pointer_err" );
+    obj_name = log_getname ( obj, "Log_pointer_err" );
+    ref_type = log_gettype ( ref, "Log_pointer_err" );
+    ref_name = log_getname ( ref, "Log_pointer_err" );
+
     if ( loc != NOTHING ) {
-        log_printf ( " in " );
-        log_type_and_name ( loc );
+        obj_loc = log_getname ( Location ( obj ), "Log_pointer_err" );
+        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s %s", obj_type, obj_name, obj_loc, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
+        XFREE ( obj_loc, "Log_pointer_err" );
+    } else {
+        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s %s", obj_type, obj_name, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
     }
-    log_printf ( ": %s ", ( ( prior == NOTHING ) ? reftype : "Next pointer" ) );
-    log_type_and_name ( ref );
-    log_printf ( " %s", errtype );
-    ENDLOG
+
+    XFREE ( obj_type, "Log_pointer_err" );
+    XFREE ( obj_name, "Log_pointer_err" );
+    XFREE ( ref_type, "Log_pointer_err" );
+    XFREE ( ref_name, "Log_pointer_err" );
 }
 
 static void Log_header_err ( dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype ) {
-    STARTLOG ( LOG_PROBLEMS, "OBJ", "DAMAG" )
-    log_type_and_name ( obj );
+    char *obj_type, *obj_name, *obj_loc;
+    char *val_type, *val_name;
+
+    obj_type = log_gettype ( obj, "Log_header_err" );
+    obj_name = log_getname ( obj, "Log_header_err" );
+
     if ( loc != NOTHING ) {
-        log_printf ( " in " );
-        log_type_and_name ( loc );
-    }
-    log_printf ( ": %s ", valtype );
-    if ( is_object ) {
-        log_type_and_name ( val );
+        obj_loc = log_getname ( Location ( obj ), "Log_header_err" );
+        if ( is_object ) {
+            val_type = log_gettype ( val, "Log_header_err" );
+            val_name = log_getname ( val, "Log_header_err" );
+            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s", obj_type, obj_name, obj_loc, val_type, val_name, errtype );
+            XFREE ( val_type,  "Log_header_err" );
+            XFREE ( val_name,  "Log_header_err" );
+        } else {
+            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %d %s", obj_type, obj_name, obj_loc, val, errtype );
+        }
+        XFREE ( obj_loc, "Log_header_err" );
     } else {
-        log_printf ( "%d", val );
+        if ( is_object ) {
+            val_type = log_gettype ( val, "Log_header_err" );
+            val_name = log_getname ( val, "Log_header_err" );
+            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s", obj_type, obj_name, val_type, val_name, errtype );
+            XFREE ( val_type,  "Log_header_err" );
+            XFREE ( val_name,  "Log_header_err" );
+        } else {
+            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %d %s", obj_type, obj_name, val, errtype );
+        }
     }
-    log_printf ( " %s", errtype );
-    ENDLOG
+
+    XFREE ( obj_type, "Log_header_err" );
+    XFREE ( obj_name, "Log_header_err" );
 }
 
 static void Log_simple_err ( dbref obj, dbref loc, const char *errtype ) {
-    STARTLOG ( LOG_PROBLEMS, "OBJ", "DAMAG" )
-    log_type_and_name ( obj );
+    char *obj_type, *obj_name, *obj_loc;
+
+    obj_type = log_gettype ( obj, "Log_simple_err" );
+    obj_name = log_getname ( obj, "Log_simple_err" );
+
     if ( loc != NOTHING ) {
-        log_printf ( " in " );
-        log_type_and_name ( loc );
+        obj_loc = log_getname ( Location ( obj ), "Log_simple_err" );
+        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s", obj_type, obj_name, obj_loc, errtype );
+        XFREE ( obj_loc, "Log_simple_err" );
+    } else {
+        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, obj_loc, errtype );
     }
-    log_printf ( ": %s", errtype );
-    ENDLOG
 }
 
 /* ---------------------------------------------------------------------------
@@ -369,9 +401,7 @@ dbref create_obj ( dbref player, int objtype, char *name, int cost ) {
         free_lbuf ( buff );
         break;
     default:
-        STARTLOG ( LOG_BUGS, "BUG", "OTYPE" )
-        log_printf ( "Bad object type in create_obj: %d.", objtype );
-        ENDLOG
+        log_printf2 ( LOG_BUGS, "BUG", "OTYPE", "Bad object type in create_obj: %d.", objtype );
         return NOTHING;
     }
 
@@ -422,10 +452,7 @@ dbref create_obj ( dbref player, int objtype, char *name, int cost ) {
         if ( Good_dbref ( obj ) && IS_CLEAN ( obj ) ) {
             mudstate.freelist = Link ( obj );
         } else {
-            STARTLOG ( LOG_PROBLEMS, "FRL", "DAMAG" )
-            log_printf ( "Freelist damaged, bad object #%d.",
-                         obj );
-            ENDLOG
+            log_printf2 ( LOG_PROBLEMS, "FRL", "DAMAG", "Freelist damaged, bad object #%d.", obj );
             obj = NOTHING;
             mudstate.freelist = NOTHING;
         }

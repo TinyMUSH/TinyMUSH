@@ -64,9 +64,8 @@ bin_PROGRAMS = netmush$(EXEEXT) slave$(EXEEXT) recover$(EXEEXT)
 @WANT_MODULE_MAIL_TRUE@am__append_10 = modules/mail/
 @WANT_MODULE_DB_SQL_TRUE@am__append_11 = modules/db_sql/
 subdir = src
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/src/libltdl/config/depcomp
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/config.h.in $(top_srcdir)/src/libltdl/config/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
 	$(top_srcdir)/m4/alloca.m4 $(top_srcdir)/m4/canonicalize.m4 \
@@ -234,7 +233,7 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-HEADERS = $(include_HEADERS)
+HEADERS = $(nodist_include_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -985,6 +984,8 @@ LIBADD_DL = @LIBADD_DL@
 LIBADD_DLD_LINK = @LIBADD_DLD_LINK@
 LIBADD_DLOPEN = @LIBADD_DLOPEN@
 LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
+LIBGNU_LIBDEPS = @LIBGNU_LIBDEPS@
+LIBGNU_LTLIBDEPS = @LIBGNU_LTLIBDEPS@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -994,7 +995,6 @@ LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIB_SELECT = @LIB_SELECT@
 LIPO = @LIPO@
 LN_S = @LN_S@
-LTALLOCA = @LTALLOCA@
 LTDLDEPS = @LTDLDEPS@
 LTDLINCL = @LTDLINCL@
 LTDLOPEN = @LTDLOPEN@
@@ -1354,20 +1354,7 @@ with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_6)
 SUBDIRS = libltdl $(am__append_1) $(am__append_5) $(am__append_9) \
 	$(am__append_10) $(am__append_11)
-
-#-------------------------------------------------------------------------------
-netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c \
-	db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c \
-	funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c \
-	game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c \
-	object.c pcre.c player.c player_c.c powers.c predicates.c quota.c rob.c \
-	set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c \
-	udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c \
-	alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h \
-	externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h \
-	interface.h match.h mushconf.h pcre.h powers.h slave.h system.h \
-	typedefs.h udb.h udb_defs.h vattr.h walkdb.h
-
+netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c pcre.c player.c player_c.c powers.c predicates.c quota.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h pcre.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
 netmush_LDFLAGS = -export-dynamic
 netmush_SKEL = defaults.h.in
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
@@ -1396,7 +1383,7 @@ EXTRA_DIST = libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHAR
 CLEANFILES = version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 BUILT_SOURCES = version.h tinymushapi.h defaults.h netmush.conf Startmush
-include_HEADERS = tinymushapi.h
+nodist_include_HEADERS = tinymushapi.h
 do_subst = $(SED) \
 	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
 	-e 's|[@]with_compress_prog@|$(with_compress_prog)|g' \
@@ -1609,9 +1596,9 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-includeHEADERS: $(include_HEADERS)
+install-nodist_includeHEADERS: $(nodist_include_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
@@ -1625,9 +1612,9 @@ install-includeHEADERS: $(include_HEADERS)
 	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
 	done
 
-uninstall-includeHEADERS:
+uninstall-nodist_includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
@@ -1876,7 +1863,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-data-local install-includeHEADERS
+install-data-am: install-data-local install-nodist_includeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -1922,8 +1909,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
-	uninstall-local
+uninstall-am: uninstall-binPROGRAMS uninstall-local \
+	uninstall-nodist_includeHEADERS
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all check \
 	cscopelist-recursive ctags-recursive install install-am \
@@ -1938,14 +1925,15 @@ uninstall-am: uninstall-binPROGRAMS uninstall-includeHEADERS \
 	install install-am install-binPROGRAMS install-data \
 	install-data-am install-data-local install-dvi install-dvi-am \
 	install-exec install-exec-am install-exec-local install-html \
-	install-html-am install-includeHEADERS install-info \
-	install-info-am install-man install-pdf install-pdf-am \
+	install-html-am install-info install-info-am install-man \
+	install-nodist_includeHEADERS install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-includeHEADERS uninstall-local
+	uninstall-binPROGRAMS uninstall-local \
+	uninstall-nodist_includeHEADERS
 
 
 netmush.conf: $(ETC_DIR)/netmush.conf.in

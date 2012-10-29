@@ -146,7 +146,6 @@ struct object {
      */
 
     int		name_length;	/* ALL: Length of name string */
-
     int		stack_count;	/* ALL: number of things on the stack */
     int		vars_count;	/* ALL: number of variables */
     int		struct_count;	/* ALL: number of structures */

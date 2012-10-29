@@ -495,10 +495,7 @@ int cf_power_access ( int *vp, char *str, long extra, dbref player, char *cmd ) 
             ( fp->handler != ph_restrict_player ) &&
             ( fp->handler != ph_privileged ) ) {
 
-        STARTLOG ( LOG_CONFIGMODS, "CFG", "PERM" )
-        log_printf ( "Cannot change access for power: %s",
-                     fp->powername );
-        ENDLOG
+        log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for power: %s", fp->powername );
         return -1;
     }
 

@@ -203,9 +203,7 @@ int helpindex_read ( HASHTAB *htab, char *filename ) {
     hashflush ( htab, 0 );
 
     if ( ( fp = tf_fopen ( filename, O_RDONLY ) ) == NULL ) {
-        STARTLOG ( LOG_PROBLEMS, "HLP", "RINDX" )
-        log_printf ( "Can't open %s for reading.", filename );
-        ENDLOG
+        log_printf2 ( LOG_PROBLEMS, "HLP", "RINDX", "Can't open %s for reading.", filename );
         return -1;
     }
     count = 0;
@@ -246,10 +244,7 @@ int helpindex_read ( HASHTAB *htab, char *filename ) {
                 }
             }
         } else {
-            STARTLOG ( LOG_ALWAYS, "HLP", "RINDX" )
-            log_printf ( "Topic already exists: %s",
-                         entry.topic );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "HLP", "RINDX", "Topic already exists: %s", entry.topic );
             XFREE ( htab_entry, "helpindex_read.hent1" );
         }
     }
@@ -345,19 +340,13 @@ void help_write ( dbref player, char *topic, HASHTAB *htab, char *filename, int 
         return;
     }
     if ( ( fp = tf_fopen ( filename, O_RDONLY ) ) == NULL ) {
-        notify ( player,
-                 "Sorry, that function is temporarily unavailable." );
-        STARTLOG ( LOG_PROBLEMS, "HLP", "OPEN" )
-        log_printf ( "Can't open %s for reading.", filename );
-        ENDLOG
+        notify ( player, "Sorry, that function is temporarily unavailable." );
+        log_printf2 ( LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", filename );
         return;
     }
     if ( fseek ( fp, entry_offset, 0 ) < 0L ) {
-        notify ( player,
-                 "Sorry, that function is temporarily unavailable." );
-        STARTLOG ( LOG_PROBLEMS, "HLP", "SEEK" )
-        log_printf ( "Seek error in file %s.", filename );
-        ENDLOG
+        notify ( player, "Sorry, that function is temporarily unavailable." );
+        log_printf2 ( LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", filename );
         tf_fclose ( fp );
         return;
     }
@@ -412,9 +401,7 @@ void help_helper ( dbref player, int hf_num, int eval, char *topic, char *buff, 
     FILE *fp;
 
     if ( hf_num >= mudstate.helpfiles ) {
-        STARTLOG ( LOG_BUGS, "BUG", "HELP" )
-        log_printf ( "Unknown help file number: %d", hf_num );
-        ENDLOG
+        log_printf2 ( LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num );
         safe_str ( ( char * ) "#-1 NOT FOUND", buff, bufc );
         return;
     }
@@ -438,16 +425,12 @@ void help_helper ( dbref player, int hf_num, int eval, char *topic, char *buff, 
 
     sprintf ( tbuf, "%s.txt", mudstate.hfiletab[hf_num] );
     if ( ( fp = tf_fopen ( tbuf, O_RDONLY ) ) == NULL ) {
-        STARTLOG ( LOG_PROBLEMS, "HLP", "OPEN" )
-        log_printf ( "Can't open %s for reading.", tbuf );
-        ENDLOG
+        log_printf2 ( LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", tbuf );
         safe_str ( ( char * ) "#-1 ERROR", buff, bufc );
         return;
     }
     if ( fseek ( fp, entry_offset, 0 ) < 0L ) {
-        STARTLOG ( LOG_PROBLEMS, "HLP", "SEEK" )
-        log_printf ( "Seek error in file %s.", tbuf );
-        ENDLOG
+        log_printf2 ( LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", tbuf );
         tf_fclose ( fp );
         safe_str ( ( char * ) "#-1 ERROR", buff, bufc );
         return;
@@ -503,9 +486,7 @@ void do_help ( dbref player, dbref cause, int key, char *message ) {
     hf_num = key & ~HELP_RAWHELP;
 
     if ( hf_num >= mudstate.helpfiles ) {
-        STARTLOG ( LOG_BUGS, "BUG", "HELP" )
-        log_printf ( "Unknown help file number: %d", hf_num );
-        ENDLOG
+        log_printf2 ( LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num );
         notify ( player, "No such indexed file found." );
         return;
     }

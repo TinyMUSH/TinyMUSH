@@ -436,7 +436,7 @@ void call_move_hook ( dbref player, dbref cause, int state ) {
  */
 
 void process_cmdent ( CMDENT *cmdp, char *switchp, dbref player, dbref cause, int interactive, char *arg, char *unp_command, char *cargs[], int ncargs ) {
-    char *buf1, *buf2, tchar, *bp, *str, *buff, *s, *j, *new;
+    char *buf1, *buf2, tchar, *bp, *str, *buff, *s, *j, *new, *pname, *lname;
 
     char *args[MAX_ARG], *aargs[NUM_ENV_VARS];
 
@@ -722,10 +722,15 @@ void process_cmdent ( CMDENT *cmdp, char *switchp, dbref player, dbref cause, in
                      * this is a 'Huh?' situation.
                      */
                     notify ( player, mudconf.huh_msg );
-                    STARTLOG ( LOG_BADCOMMANDS, "CMD", "BAD" )
-                    log_name_and_loc ( player );
-                    log_printf ( " entered: %s", new );
-                    ENDLOG
+                    pname = log_getname ( player, "process_cmdent" );
+                    if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+                        lname = log_getname ( Location ( player ), "process_cmdent" );
+                        log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, new );
+                        XFREE ( lname, "process_cmdent" );
+                    } else {
+                        log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, new );
+                    }
+                    XFREE ( pname, "process_cmdent" );
                 }
                 free_lbuf ( new );
 
@@ -870,7 +875,7 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
 
     char *p, *q, *arg, *lcbuf, *slashp, *cmdsave, *bp, *str, *evcmd;
 
-    char *gbuf, *gc;
+    char *gbuf, *gc, *pname, *lname;
 
     int succ, aflags, alen, i, got_stop, pcount, retval = 0;
 
@@ -897,9 +902,7 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
         abort();
     }
     if ( !Good_obj ( player ) ) {
-        STARTLOG ( LOG_BUGS, "CMD", "PLYR" )
-        log_printf ( "Bad player in process_command: %d", player );
-        ENDLOG
+        log_printf2 ( LOG_BUGS, "CMD", "PLYR", "Bad player in process_command: %d", player );
         mudstate.debug_cmd = cmdsave;
         return command;
     }
@@ -916,17 +919,25 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
         mudstate.debug_cmd = cmdsave;
         return command;
     }
+    pname = log_getname ( player, "process_command" );
     if ( Suspect ( player ) ) {
-        STARTLOG ( LOG_SUSPECTCMDS, "CMD", "SUSP" )
-        log_name_and_loc ( player );
-        log_printf ( " entered: %s", command );
-        ENDLOG
+        if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+            lname = log_getname ( Location ( player ), "process_command" );
+            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s in %s entered: %s", pname, lname, command );
+            XFREE ( lname, "process_command" );
+        } else {
+            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s entered: %s", pname, command );
+        }
     } else {
-        STARTLOG ( LOG_ALLCOMMANDS, "CMD", "ALL" )
-        log_name_and_loc ( player );
-        log_printf ( " entered: %s", command );
-        ENDLOG
+        if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+            lname = log_getname ( Location ( player ), "process_command" );
+            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s in %s entered: %s", pname, lname, command );
+            XFREE ( lname, "process_command" );
+        } else {
+            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s entered: %s", pname, command );
+        }
     }
+    XFREE ( pname, "process_command" );
 
     s_Accessed ( player );
 
@@ -1500,10 +1511,15 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
 
     if ( !succ ) {
         notify ( player, mudconf.huh_msg );
-        STARTLOG ( LOG_BADCOMMANDS, "CMD", "BAD" )
-        log_name_and_loc ( player );
-        log_printf ( " entered: %s", command );
-        ENDLOG
+        pname = log_getname ( player, "process_command" );
+        if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+            lname = log_getname ( Location ( player ), "process_command" );
+            log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, command );
+            XFREE ( lname, "process_command" );
+        } else {
+            log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, command );
+        }
+        XFREE ( pname, "process_command" );
     }
     mudstate.debug_cmd = cmdsave;
     return preserve_cmd;
@@ -1518,7 +1534,7 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
 void process_cmdline ( dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent ) {
     char *cp, *cmdsave, *save_poutnew, *save_poutbufc, *save_pout;
 
-    char *log_cmdbuf;
+    char *log_cmdbuf, *pname, *lname;
 
     int save_inpipe, numpipes;
 
@@ -1636,13 +1652,15 @@ void process_cmdline ( dbref player, dbref cause, char *cmdline, char *args[], i
 #endif
             used_time = msec_diff ( end_time, begin_time );
             if ( ( used_time / 1000 ) >= mudconf.max_cmdsecs ) {
-                STARTLOG ( LOG_PROBLEMS, "CMD", "CPU" )
-                log_name_and_loc ( player );
-                log_printf
-                ( " queued command taking %.2f secs (enactor #%d): %s",
-                  ( double ) ( used_time / 1000 ),
-                  mudstate.qfirst->cause, log_cmdbuf );
-                ENDLOG
+                pname = log_getname ( player, "process_cmdline" );
+                if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+                    lname = log_getname ( Location ( player ), "process_cmdline" );
+                    log_printf2 ( LOG_PROBLEMS, "CMD", "CPU","%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
+                    XFREE ( lname, "process_cmdline" );
+                } else {
+                    log_printf2 ( LOG_PROBLEMS, "CMD", "CPU","%s queued command taking %.2f secs (enactor #%d): %s", pname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
+                }
+                XFREE ( pname, "process_cmdline" );
             }
 #ifndef NO_TIMECHECKING
             /*

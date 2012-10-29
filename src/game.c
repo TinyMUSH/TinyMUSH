@@ -185,52 +185,32 @@ int handlestartupflatfiles ( int flag ) {
         close ( i );
         stat ( db,&sb2 );
         if ( tailfind ( flat, "***END OF DUMP***\n" ) ) {
-            STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-            log_printf ( "A non-corrupt %s file is present.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "A non-corrupt %s file is present.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
             if ( difftime ( sb1.st_mtime, sb2.st_mtime ) > ( double ) 0 ) {
-                STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                log_printf ( "The %s file is newer than your current database.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
-                ENDLOG
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "The %s file is newer than your current database.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
                 if ( copy_file ( db, db_bak, 1 ) != 0 ) {
-                    STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                    log_printf ( "Unable to archive previous db to : %s", db_bak );
-                    ENDLOG
+                    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Unable to archive previous db to : %s", db_bak );
                 }
                 recover ( flat );
                 if ( unlink ( flat ) != 0 ) {
-                    STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                    log_printf ( "Unable to delete : %s", flat );
-                    ENDLOG
+                    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Unable to delete : %s", flat );
                 }
-                STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                log_printf ( "Recovery successfull" );
-                ENDLOG
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Recovery successfull" );
             } else {
-                STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                log_printf ( "The %s file is older than your current database.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
-                ENDLOG
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "The %s file is older than your current database.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
                 if ( copy_file ( flat, flat_bak, 1 ) == 0 ) {
-                    STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                    log_printf ( "Older %s file archived as : %s", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ), flat_bak );
-                    ENDLOG
+                    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Older %s file archived as : %s", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ), flat_bak );
                 } else {
-                    STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                    log_printf ( "Unable to archive %s file as : %s", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ), flat_bak );
-                    ENDLOG
+                    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Unable to archive %s file as : %s", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ), flat_bak );
                 }
             }
         } else {
-            STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-            log_printf ( "A corrupt %s file is present.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
-            ENDLOG
-            STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
+            log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "A corrupt %s file is present.", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
             if ( !copy_file ( flat, flat_bak, 1 ) ) {
-                log_printf ( "Archived as : %s, using previous db to load", flat_bak );
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Archived as : %s, using previous db to load", flat_bak );
             } else {
-                log_printf ( "Unable to archive %s file, using previous db to load", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Unable to archive %s file, using previous db to load", ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL" ) );
             }
-            ENDLOG
         }
     }
 
@@ -1242,20 +1222,16 @@ static void report_timecheck ( dbref player, int yes_screen, int yes_log, int ye
 
     struct timeval obj_time;
 
+    char *pname;
+
+    pname = log_getname ( player, "report_timecheck" );
     if ( ! ( yes_log && ( LOG_TIMEUSE & mudconf.log_options ) != 0 ) ) {
         yes_log = 0;
-        STARTLOG ( LOG_ALWAYS, "WIZ", "TIMECHECK" )
-        log_name ( player );
-        log_printf ( " checks object time use over %d seconds\n",
-                     ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "WIZ", "TIMECHECK", "%s checks object time use over %d seconds\n",pname, ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
     } else {
-        STARTLOG ( LOG_ALWAYS, "OBJ", "CPU" )
-        log_name ( player );
-        log_printf ( " checks object time use over %d seconds\n",
-                     ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "OBJ", "CPU", "%s checks object time use over %d seconds\n",pname, ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
     }
+    XFREE ( pname, "report_timecheck" );
 
     obj_counted = 0;
     total_msecs = 0;
@@ -1275,7 +1251,7 @@ static void report_timecheck ( dbref player, int yes_screen, int yes_log, int ye
                 ( obj_time.tv_usec / 1000 );
             total_msecs += used_msecs;
             if ( yes_log ) {
-                log_printf ( "#%d\t%ld\n", thing, used_msecs );
+                log_printf2 ( LOG_ALWAYS, "OBJ", "CPU", "#%d\t%ld\n", thing, used_msecs );
             }
             if ( yes_screen ) {
                 raw_notify ( player, tmprintf ( "#%d\t%ld", thing, used_msecs ) );
@@ -1295,11 +1271,7 @@ static void report_timecheck ( dbref player, int yes_screen, int yes_log, int ye
                        ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) ) );
     }
     if ( yes_log ) {
-        log_printf
-        ( "Counted %d objects using %ld msecs over %d seconds.",
-          obj_counted, total_msecs,
-          ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
-        end_log();
+        log_printf2 ( LOG_ALWAYS, "OBJ", "CPU", "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
     }
     if ( yes_clear ) {
         mudstate.cpu_count_from = time ( NULL );
@@ -1394,9 +1366,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
         raw_broadcast ( 0, "GAME: Backup in progress. Game may freeze for a few minutes." );
     }
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Getting list of files to backup" );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Getting list of files to backup" );
 
     if ( player != NOTHING ) {
         notify ( player, "Getting list of files to backup" );
@@ -1432,9 +1402,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
         cnf = add_array ( cnf, mudstate.cfiletab[i], &cnf_n, "backup_mush" );
     }
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Making sure flatfiles are up to date" );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Making sure flatfiles are up to date" );
 
     if ( player != NOTHING ) {
         notify ( player, "Making sure flatfiles are up to date" );
@@ -1471,18 +1439,16 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     /* Finally Dump our flatfile */
 
     s = XSTRDUP ( tmprintf ( "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file ), "backup_mush" );
-    STARTLOG ( LOG_ALWAYS, "DMP", "DUMP" )
-    log_printf ( "Writing db: %s", s );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", s );
+    pcache_sync();
+    SYNC;
     fp = tf_fopen ( s, O_WRONLY | O_CREAT | O_TRUNC );
     if ( fp != NULL ) {
         dbf = add_array ( dbf, s, &dbf_n, "backup_mush" );
         db_write_flatfile ( fp, F_TINYMUSH, UNLOAD_VERSION | UNLOAD_OUTFLAGS );
         tf_fclose ( fp );
     } else {
-        STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-        log_printf ( "Unable to create MUSH's flatfile" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Unable to create MUSH's flatfile" );
         if ( player != NOTHING ) {
             notify ( player, "Unable to create MUSH's flatfile" );
             raw_broadcast ( 0, "GAME: Backup finished." );
@@ -1500,19 +1466,9 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     cnf = add_array ( cnf, NULL, &cnf_n, "backup_mush" );
     dbf = add_array ( dbf, NULL, &dbf_n, "backup_mush" );
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Found %d text files to backup", txt_n - 1 );
-    ENDLOG
-
-
-
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Found %d config files to backup", cnf_n - 1 );
-    ENDLOG
-
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Found %d db files to backup", dbf_n - 1 );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Found %d text files to backup", txt_n - 1 );
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Found %d config files to backup", cnf_n - 1 );
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Found %d db files to backup", dbf_n - 1 );
 
     if ( player != NOTHING ) {
         notify ( player, tmprintf ( "Found, %d text files, %d config files and %d db files to backup", txt_n - 1, cnf_n - 1, dbf_n - 1 ) );
@@ -1521,9 +1477,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     /* We have everything we need to backup, create a temp directory*/
     s = XSTRDUP ( tmprintf ( "%s/backup.XXX", mudconf.bakhome ), "backup_mush" );
     if ( ( buff = mkdtemp ( s ) ) == NULL ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "MKDIR" )
-        log_printf ( "Unable to create temp directory" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "MKDIR", "Unable to create temp directory" );
         if ( player != NOTHING ) {
             notify ( player, "Backup abort, Unable to create temp directory" );
             raw_broadcast ( 0, "GAME: Backup finished." );
@@ -1534,9 +1488,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     tmpdir = XSTRDUP ( buff, "backup_mush" );
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Creating backup set" );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Creating backup set" );
 
     if ( player != NOTHING ) {
         notify ( player, "Creating backup set" );
@@ -1604,9 +1556,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     cwd = getcwd ( NULL, MAXPATHLEN );
 
     if ( cwd == NULL ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "GETCD" )
-        log_printf ( "Unable to get the current working directory" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "GETCD", "Unable to get the current working directory" );
         if ( player != NOTHING ) {
             notify ( player, "Unable to get the current working directory" );
             raw_broadcast ( 0, "GAME: Backup finished." );
@@ -1615,21 +1565,17 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     }
 
     if ( chdir ( tmpdir ) == -1 ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "SETCD" )
-        log_printf ( "Unable to set the working directory" );
+        log_printf2 ( LOG_ALWAYS, "BCK", "SETCD", "Unable to set the working directory" );
         if ( player != NOTHING ) {
             notify ( player, "Unable to set the working directory" );
             raw_broadcast ( 0, "GAME: Backup finished." );
         }
-        ENDLOG
         return ( -1 );
     }
 
     buff=XMALLOC ( MBUF_SIZE, "backup_mush" );
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "RUN" )
-    log_printf ( "Executing external command %s", s );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "RUN", "Executing external command %s", s );
 
     if ( player != NOTHING ) {
         notify ( player, tmprintf ( "Executing external command %s", s ) );
@@ -1637,36 +1583,28 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     if ( ( fp = popen ( s, "r" ) ) != NULL ) {
         while ( fgets ( buff, MBUF_SIZE, fp ) !=NULL ) {
-            STARTLOG ( LOG_ALWAYS, "BCK", "RUN" )
             if ( tb = strchr ( buff, '\n' ) ) {
                 tb[0]=0x00;
             }
             if ( tb = strchr ( buff, '\r' ) ) {
                 tb[0]=0x00;
             }
-            log_printf ( "%s", buff );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "BCK", "RUN", "%s", buff );
         }
         pclose ( fp );
-        STARTLOG ( LOG_ALWAYS, "BCK", "RUN" )
-        log_printf ( "External command done" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "RUN", "External command done" );
         if ( player != NOTHING ) {
             notify ( player, "External command done" );
         }
     } else {
-        STARTLOG ( LOG_ALWAYS, "BCK", "RUN" )
-        log_printf ( "Unable to run external command" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "RUN", "Unable to run external command" );
         if ( player != NOTHING ) {
             notify ( player, "Unable to run external command" );
         }
     }
 
     if ( chdir ( cwd ) == -1 ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "SETCD" )
-        log_printf ( "Unable to restore the working directory" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "SETCD", "Unable to restore the working directory" );
         if ( player != NOTHING ) {
             notify ( player, "Unable to restore the working directory" );
         }
@@ -1680,9 +1618,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     /* Cleanup */
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Cleaning up" );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Cleaning up" );
 
     if ( player != NOTHING ) {
         notify ( player, "Cleaning up" );
@@ -1691,9 +1627,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     for ( i=0; txt[i]!=NULL; i++ ) {
         s = XSTRDUP ( tmprintf ( "%s/%s", tmpdir, basename ( txt[i] ) ), "backup_mush" );
         if ( unlink ( s ) == -1 ) {
-            STARTLOG ( LOG_ALWAYS, "BCK", "UNLK" )
-            log_printf ( "Unable to remove file %s", s );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if ( player != NOTHING ) {
                 notify ( player, tmprintf ( "Unable to remove file %s", s ) );
             }
@@ -1707,9 +1641,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     for ( i=0; cnf[i]!=NULL; i++ ) {
         s = XSTRDUP ( tmprintf ( "%s/%s", tmpdir, basename ( cnf[i] ) ), "backup_mush" );
         if ( unlink ( s ) == -1 ) {
-            STARTLOG ( LOG_ALWAYS, "BCK", "UNLK" )
-            log_printf ( "Unable to remove file %s", s );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if ( player != NOTHING ) {
                 notify ( player, tmprintf ( "Unable to remove file %s", s ) );
             }
@@ -1723,9 +1655,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     for ( i=0; dbf[i]!=NULL; i++ ) {
         s = XSTRDUP ( tmprintf ( "%s/%s", tmpdir, basename ( dbf[i] ) ), "backup_mush" );
         if ( unlink ( s ) == -1 ) {
-            STARTLOG ( LOG_ALWAYS, "BCK", "UNLK" )
-            log_printf ( "Unable to remove file %s", s );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if ( player != NOTHING ) {
                 notify ( player, tmprintf ( "Unable to remove file %s", s ) );
             }
@@ -1738,9 +1668,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     s = XSTRDUP ( tmprintf ( "%s/netmush.backup", tmpdir ), "backup_mush" );
     if ( unlink ( s ) == -1 ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "UNLK" )
-        log_printf ( "Unable to remove file %s", s );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
         if ( player != NOTHING ) {
             notify ( player, tmprintf ( "Unable to remove file %s", s ) );
         }
@@ -1748,9 +1676,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
     XFREE ( s, "backup_mush" );
 
     if ( rmdir ( tmpdir ) == -1 ) {
-        STARTLOG ( LOG_ALWAYS, "BCK", "RMDIR" )
-        log_printf ( "Unable to remove directory %s", tmpdir );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "BCK", "RMDIR", "Unable to remove directory %s", tmpdir );
         if ( player != NOTHING ) {
             notify ( player, tmprintf ( "Unable to remove directory %s", tmpdir ) );
         }
@@ -1758,9 +1684,7 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     XFREE ( tmpdir, "backup_mush" );
 
-    STARTLOG ( LOG_ALWAYS, "BCK", "INFO" )
-    log_printf ( "Backup done" );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "BCK", "INFO", "Backup done" );
 
     if ( player != NOTHING ) {
         raw_broadcast ( 0, "GAME: Backup finished." );
@@ -1813,9 +1737,7 @@ void write_pidfile ( char *fn ) {
         fprintf ( f, "%d\n", getpid() );
         fclose ( f );
     } else {
-        STARTLOG ( LOG_ALWAYS, "PID", "FAIL" )
-        log_printf ( "Failed to write pidfile %s\n", fn );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "PID", "FAIL", "Failed to write pidfile %s\n", fn );
     }
 }
 
@@ -1844,15 +1766,14 @@ void write_status_file ( dbref player, char *message ) {
 }
 
 void do_shutdown ( dbref player, dbref cause, int key, char *message ) {
+    char *name;
 
+    name = log_getname ( player, "do_shutdown" );
 
     if ( key & SHUTDN_COREDUMP ) {
         if ( player != NOTHING ) {
             raw_broadcast ( 0, "GAME: Aborted by %s", Name ( Owner ( player ) ) );
-            STARTLOG ( LOG_ALWAYS, "WIZ", "SHTDN" )
-            log_printf ( "Abort and coredump by " );
-            log_name ( player );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "WIZ", "SHTDN", "Abort and coredump by %s", name );
         }
 
         write_status_file ( player, "Abort and coredump" );
@@ -1872,19 +1793,13 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message ) {
 
     if ( player != NOTHING ) {
         raw_broadcast ( 0, "GAME: Shutdown by %s", Name ( Owner ( player ) ) );
-        STARTLOG ( LOG_ALWAYS, "WIZ", "SHTDN" )
-        log_printf ( "Shutdown by " );
-        log_name ( player );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "WIZ", "SHTDN", "Shutdown by %s", name );
     } else {
         raw_broadcast ( 0, "GAME: Fatal Error: %s", message );
-        STARTLOG ( LOG_ALWAYS, "WIZ", "SHTDN" )
-        log_printf ( "Fatal error: %s", message );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "WIZ", "SHTDN", "Fatal error: %s", message );
     }
-    STARTLOG ( LOG_ALWAYS, "WIZ", "SHTDN" )
-    log_printf ( "Shutdown status: %s", message );
-    ENDLOG
+
+    log_printf2 ( LOG_ALWAYS, "WIZ", "SHTDN", "Shutdown status: %s", message );
 
     write_status_file ( player, message );
 
@@ -1893,6 +1808,7 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message ) {
      */
 
     mudstate.shutdown_flag = 1;
+    XFREE ( name, "do_shutdown" );
     return;
 }
 
@@ -2014,15 +1930,11 @@ void dump_database_internal ( int dump_type ) {
 void dump_database ( void ) {
     mudstate.epoch++;
     mudstate.dumping = 1;
-    STARTLOG ( LOG_DBSAVES, "DMP", "DUMP" )
-    log_printf ( "Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch );
-    ENDLOG
+    log_printf2 ( LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch );
     pcache_sync();
     SYNC;
     dump_database_internal ( DUMP_DB_NORMAL );
-    STARTLOG ( LOG_DBSAVES, "DMP", "DONE" )
-    log_printf ( "Dump complete: %s.#%d#", mudconf.db_file, mudstate.epoch );
-    ENDLOG
+    log_printf2 ( LOG_DBSAVES, "DMP", "DONE", "Dump complete: %s.#%d#", mudconf.db_file, mudstate.epoch );
     mudstate.dumping = 0;
 }
 
@@ -2033,31 +1945,28 @@ void fork_and_dump ( dbref player, dbref cause, int key ) {
 
     mudstate.epoch++;
     mudstate.dumping = 1;
-    STARTLOG ( LOG_DBSAVES, "DMP", "CHKPT" )
+
     if ( !key || ( key & DUMP_TEXT ) ) {
-        log_printf ( "SYNCing" );
-        if ( !key || ( key & DUMP_STRUCT ) ) {
-            log_printf ( " and " );
-        }
+        log_printf2 ( LOG_DBSAVES, "DMP", "CHKPT", "SYNCing" );
     }
+
     if ( !key || ( key & DUMP_STRUCT ) || ( key & DUMP_FLATFILE ) ) {
-        log_printf ( "Checkpointing: %s.#%d#",
-                     mudconf.db_file, mudstate.epoch );
+        log_printf2 ( LOG_DBSAVES, "DMP", "CHKPT", "Checkpointing: %s.#%d#", mudconf.db_file, mudstate.epoch );
     }
-    ENDLOG
+
     al_store();	/* Save cached modified attribute list */
+
     if ( !key || ( key & DUMP_TEXT ) ) {
         pcache_sync();
     }
 
     if ( ! ( key & DUMP_FLATFILE ) ) {
         SYNC;
-        if ( ( key & DUMP_OPTIMIZE ) ||
-                ( mudconf.dbopt_interval &&
-                  ( mudstate.epoch % mudconf.dbopt_interval == 0 ) ) ) {
+        if ( ( key & DUMP_OPTIMIZE ) || ( mudconf.dbopt_interval && ( mudstate.epoch % mudconf.dbopt_interval == 0 ) ) ) {
             OPTIMIZE;
         }
     }
+
     if ( !key || ( key & DUMP_STRUCT ) || ( key & DUMP_FLATFILE ) ) {
         if ( mudconf.fork_dump ) {
             if ( mudconf.fork_vfork ) {
@@ -2068,6 +1977,7 @@ void fork_and_dump ( dbref player, dbref cause, int key ) {
         } else {
             mudstate.dumper = 0;
         }
+
         if ( mudstate.dumper == 0 ) {
             if ( key & DUMP_FLATFILE ) {
                 dump_database_internal ( DUMP_DB_FLATFILE );
@@ -2081,6 +1991,7 @@ void fork_and_dump ( dbref player, dbref cause, int key ) {
             log_perror ( "DMP", "FORK", NULL, "fork()" );
         }
     }
+
     if ( mudstate.dumper <= 0 || kill ( mudstate.dumper, 0 ) == -1 ) {
         mudstate.dumping = 0;
         mudstate.dumper = 0;
@@ -2102,13 +2013,9 @@ static int load_game ( void ) {
     void ( *modfunc ) ( FILE * );
     char *s;
 
-    STARTLOG ( LOG_STARTUP, "INI", "LOAD" )
-    log_printf ( "Loading object structures." );
-    ENDLOG
+    log_printf2 ( LOG_STARTUP, "INI", "LOAD", "Loading object structures." );
     if ( db_read() < 0 ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-        log_printf ( "Error loading object structures." );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "FATAL", "Error loading object structures." );
         return -1;
     }
     /*
@@ -2133,9 +2040,7 @@ static int load_game ( void ) {
         }
     }
 
-    STARTLOG ( LOG_STARTUP, "INI", "LOAD" )
-    log_printf ( "Load complete." );
-    ENDLOG
+    log_printf2 ( LOG_STARTUP, "INI", "LOAD", "Load complete." );
     return ( 0 );
 }
 
@@ -2228,7 +2133,7 @@ int Hearer ( dbref thing ) {
 void do_logwrite ( dbref player, dbref cause, int key, char *msgtype, char *message ) {
     const char *mt;
 
-    char *msg, *p;
+    char *msg, *p, *pname;
 
     /*
      * If we don't have both a msgtype and a message, make msgtype LOCAL.
@@ -2253,10 +2158,9 @@ void do_logwrite ( dbref player, dbref cause, int key, char *msgtype, char *mess
      * Just dump it to the log.
      */
 
-    STARTLOG ( LOG_LOCAL, "MSG", mt )
-    log_name ( player );
-    log_printf ( ": %s", msg );
-    ENDLOG
+    pname = log_getname ( player, "do_logwrite" );
+    log_printf2 ( LOG_LOCAL, "MSG", mt, "%s: %s", pname, msg );
+    XFREE ( pname, "do_logwrite" );
     notify_quiet ( player, "Logged." );
 }
 
@@ -2267,7 +2171,7 @@ void do_logwrite ( dbref player, dbref cause, int key, char *msgtype, char *mess
 
 void do_logrotate ( dbref player, dbref cause, int key ) {
     LOGFILETAB *lp;
-    char *ts;
+    char *ts, *pname;
 
     ts=mktimestamp ( "do_logrotate" );
     mudstate.mudlognum++;
@@ -2282,10 +2186,9 @@ void do_logrotate ( dbref player, dbref cause, int key ) {
     }
 
     notify ( player, "Logs rotated." );
-    STARTLOG ( LOG_ALWAYS, "WIZ", "LOGROTATE" )
-    log_name ( player );
-    log_printf ( ": logfile rotation %d", mudstate.mudlognum );
-    ENDLOG
+    pname = log_getname ( player, "do_logrotate" );
+    log_printf2 ( LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum );
+    XFREE ( pname, "do_logrotate" );
     /*
      * Any additional special ones
      */
@@ -2980,6 +2883,8 @@ int main ( int argc, char *argv[] ) {
     hashinit ( &mudstate.instdata_htab, 25 * HASH_FACTOR, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * HASH_FACTOR, HT_STR );
 
+
+
     cf_read ( mudconf.config_file );
 
     mudconf.log_file = XSTRDUP ( tmprintf ( "%s/%s.log", mudconf.log_home, mudconf.mud_shortname ), "main_mudconf_log_file" );
@@ -2990,16 +2895,12 @@ int main ( int argc, char *argv[] ) {
     pid = isrunning ( mudconf.pid_file );
 
     if ( pid ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-        log_printf ( "The MUSH already seems to be running at pid %ld.", ( long ) pid );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "FATAL", "The MUSH already seems to be running at pid %ld.", ( long ) pid );
         exit ( 2 );
     }
 
     if ( tailfind ( mudconf.log_file, "GDBM panic: write error\n" ) ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-        log_printf ( "Log indicate the last run ended with GDBM panic: write error" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "FATAL", "Log indicate the last run ended with GDBM panic: write error" );
         fprintf ( stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n" );
         fprintf ( stderr, "while trying to write to the database. This error normally\n" );
         fprintf ( stderr, "occurs with an out-of-disk-space problem, though it might also\n" );
@@ -3024,19 +2925,13 @@ int main ( int argc, char *argv[] ) {
         i = open ( s, O_RDONLY );
         if ( i>=0 ) {
             close ( i );
-            STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-            log_printf ( "There is a restart database, %s, present.", s );
-            ENDLOG
+            log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present.", s );
             if ( unlink ( s ) != 0 ) {
-                STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-                log_printf ( "Unable to delete : %s, remove it before restarting the MUSH.", s );
+                log_printf2 ( LOG_ALWAYS, "INI", "FATAL" , "Unable to delete : %s, remove it before restarting the MUSH.", s );
                 XFREE ( s, "test_restart_db" );
-                ENDLOG
                 exit ( 2 );
             } else {
-                STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-                log_printf ( "%s deleted.", s );
-                ENDLOG
+                log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "%s deleted.", s );
             }
         }
         XFREE ( s, "test_restart_db" );
@@ -3124,9 +3019,7 @@ int main ( int argc, char *argv[] ) {
     s = XSTRDUP ( tmprintf ( "%s/%s", mudconf.dbhome, mudconf.db_file ), "test_mindb" );
 
     if ( !fileexist ( s ) ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-        log_printf ( "No database exist, creating a new database." );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "No database exist, creating a new database." );
         mindb=1;
     }
 
@@ -3136,9 +3029,7 @@ int main ( int argc, char *argv[] ) {
         unlink ( mudconf.db_file );
     }
     if ( init_gdbm_db ( mudconf.db_file ) < 0 ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-        log_printf ( "Couldn't load text database: %s", mudconf.db_file );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "FATAL", "Couldn't load text database: %s", mudconf.db_file );
         exit ( 2 );
     }
 
@@ -3149,9 +3040,7 @@ int main ( int argc, char *argv[] ) {
         db_make_minimal();
         CALL_ALL_MODULES_NOCACHE ( "make_minimal", ( void ), () );
     } else if ( load_game() < 0 ) {
-        STARTLOG ( LOG_ALWAYS, "INI", "FATAL" )
-        log_printf ( "Couldn't load objects." );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "FATAL", "Couldn't load objects." );
         exit ( 2 );
     }
     mudstate.loading_db = 0;
@@ -3164,10 +3053,7 @@ int main ( int argc, char *argv[] ) {
      */
 
     if ( !Good_obj ( GOD ) || !isPlayer ( GOD ) ) {
-        STARTLOG ( LOG_ALWAYS, "CNF", "VRFY" )
-        log_printf
-        ( "Fatal error: GOD object #%d is not a valid player.", GOD );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "CNF", "VRFY", "Fatal error: GOD object #%d is not a valid player.", GOD );
         exit ( 3 );
     }
     do_dbck ( NOTHING, NOTHING, 0 );
@@ -3248,9 +3134,7 @@ int main ( int argc, char *argv[] ) {
          * really bad idea.
          */
         if ( backup_mush ( NOTHING, NOTHING, 0 ) != 0 ) {
-            STARTLOG ( LOG_STARTUP, "INI", "FATAL" )
-            log_printf ( "Unable to backup" );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "INI", "FATAL", "Unable to backup" );
         }
     }
     /*
@@ -3266,15 +3150,14 @@ int main ( int argc, char *argv[] ) {
      */
     process_preload();
 
+
     if ( ! ( getppid() ==1 ) ) {
         int forkstatus;
 
         forkstatus=fork();
 
         if ( forkstatus<0 ) {
-            STARTLOG ( LOG_STARTUP, "INI", "FORK" )
-            log_printf ( "Unable to fork, %s", strerror ( errno ) );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror ( errno ) );
         } else if ( forkstatus>0 ) {
             exit ( 0 );
         } else {
@@ -3289,18 +3172,14 @@ int main ( int argc, char *argv[] ) {
     if ( fileexist ( mudconf.log_file ) ) {
         ts=mktimestamp ( "cleanup_log" );
         s=XSTRDUP ( tmprintf ( "%s.%s", mudconf.log_file, ts ), "cleanup_log" );
-        STARTLOG ( LOG_STARTUP, "LOG", "CLN" )
-        log_printf ( "Renaming old logfile to %s", basename ( s ) );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename ( s ) );
         copy_file ( mudconf.log_file, s, 1 );
         XFREE ( s, "cleanup_log" );
         XFREE ( ts, "cleanup_log" );
     }
     logfile_init ( mudconf.log_file );
 
-    STARTLOG ( LOG_STARTUP, "INI", "LOAD" )
-    log_printf ( "Startup processing complete. (Process ID : %d)",  getpid() );
-    ENDLOG
+    log_printf2 ( LOG_STARTUP, "INI", "LOAD", "Startup processing complete. (Process ID : %d)",  getpid() );
 
     if ( !mudstate.restarting ) {
         /* Cosmetic, force a newline to stderr to clear console logs */
@@ -3339,9 +3218,7 @@ int main ( int argc, char *argv[] ) {
      * good idea of what's actually out there.
      */
     do_hashresize ( GOD, GOD, 0 );
-    STARTLOG ( LOG_STARTUP, "INI", "LOAD" )
-    log_printf ( "Cleanup completed." );
-    ENDLOG
+    log_printf2 ( LOG_STARTUP, "INI", "LOAD", "Cleanup completed." );
     if ( mudstate.restarting ) {
         raw_broadcast ( 0, "GAME: Restart finished." );
     }
@@ -3397,3 +3274,4 @@ static void init_rlimit ( void ) {
 #endif				/* Sequent and unlimiting #define'd */
 #endif				/* HAVE_SETRLIMIT */
 }
+

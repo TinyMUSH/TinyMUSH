@@ -356,10 +356,7 @@ void do_link ( dbref player, dbref cause, int key, char *what, char *where ) {
         notify_quiet ( player, NOPERM_MESSAGE );
         break;
     default:
-        STARTLOG ( LOG_BUGS, "BUG", "OTYPE" )
-        log_printf ( "Strange object type: object #%d = %d",
-                     thing, Typeof ( thing ) );
-        ENDLOG
+        log_printf2 ( LOG_BUGS, "BUG", "OTYPE", "Strange object type: object #%d = %d", thing, Typeof ( thing ) );
     }
 }
 
@@ -757,43 +754,39 @@ void do_clone ( dbref player, dbref cause, int key, char *name, char *arg2 ) {
 
 void do_pcreate ( dbref player, dbref cause, int key, char *name, char *pass ) {
     int isrobot;
-
     dbref newplayer;
-
-    char *newname;
+    char *newname, *cname, *nname;
 
     isrobot = ( key == PCRE_ROBOT ) ? 1 : 0;
+    cname = log_getname ( player, "do_pcreate" );
     newplayer = create_player ( name, pass, player, isrobot, 0 );
     newname = munge_space ( name );
     if ( newplayer == NOTHING ) {
-        notify_quiet ( player, tmprintf ( "Failure creating '%s'",
-                                          newname ) );
+        notify_quiet ( player, tmprintf ( "Failure creating '%s'", newname ) );
+        if ( isrobot ) {
+            log_printf2 ( LOG_PCREATES, "CRE", "ROBOT", "Failure creating '%s' by %s", newname, cname );
+        } else {
+            log_printf2 ( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "Failure creating '%s' by %s", newname, cname );
+        }
+        XFREE ( cname, "do_pcreate" );
         free_lbuf ( newname );
         return;
     }
+
+    nname = log_getname ( newplayer, "do_pcreate" );
+
     if ( isrobot ) {
         move_object ( newplayer, Location ( player ) );
-        notify_quiet ( player,
-                       tmprintf ( "New robot '%s' (#%d) created with password '%s'",
-                                  newname, newplayer, pass ) );
+        notify_quiet ( player, tmprintf ( "New robot '%s' (#%d) created with password '%s'", newname, newplayer, pass ) );
         notify_quiet ( player, "Your robot has arrived." );
-        STARTLOG ( LOG_PCREATES, "CRE", "ROBOT" )
-        log_name ( newplayer );
-        log_printf ( " created by " );
-        log_name ( player );
-        ENDLOG
+        log_printf2 ( LOG_PCREATES, "CRE", "ROBOT", "%s created by %s", nname, cname );
     } else {
-        move_object ( newplayer, ( Good_loc ( mudconf.start_room ) ?
-                                   mudconf.start_room : 0 ) );
-        notify_quiet ( player,
-                       tmprintf ( "New player '%s' (#%d) created with password '%s'",
-                                  newname, newplayer, pass ) );
-        STARTLOG ( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA" )
-        log_name ( newplayer );
-        log_printf ( " created by " );
-        log_name ( player );
-        ENDLOG
+        move_object ( newplayer, ( Good_loc ( mudconf.start_room ) ? mudconf.start_room : 0 ) );
+        notify_quiet ( player, tmprintf ( "New player '%s' (#%d) created with password '%s'", newname, newplayer, pass ) );
+        log_printf2 ( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "%s created by %s", nname, cname );
     }
+    XFREE ( cname, "do_pcreate" );
+    XFREE ( nname, "do_pcreate" );
     free_lbuf ( newname );
 }
 

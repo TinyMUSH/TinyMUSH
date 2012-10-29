@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS = -I libltdl/m4 -I m4
 
 noinst_LIBRARIES             = libtinyqdbm.a
-libtinyqdbm_a_SOURCES        = curia.c depot.c hovel.c myconf.c curia.h depot.h hovel.h myconf.h
+libtinyqdbm_a_SOURCES        = curia.c depot.c hovel.c myconf.c curia.h depot.h hovel.h myconf.h copyright.h
 nodist_libtinyqdbm_a_SOURCES = libtinyqdbm.h
 BUILT_SOURCES                = libtinyqdbm.h
 

@@ -27,7 +27,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=src/libltdl/config --no-conditional-dependencies --libtool --macro-prefix=gl bcopy dup2 flock floor fsync ftruncate getdtablesize getpagesize getrusage gettimeofday lstat malloc-gnu mkdir mktime pow realloc-gnu rename rmdir select socket sqrt strdup-posix strerror strtod tzset uname vsprintf-posix
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lib --m4-base=m4 --doc-base=doc --tests-base=tests --aux-dir=src/libltdl/config --no-conditional-dependencies --no-libtool --macro-prefix=gl --no-vc-files bcopy dup2 flock floor fsync ftruncate getdtablesize getpagesize getrusage gettimeofday lstat malloc-gnu mkdir mktime pow realloc-gnu rename rmdir select socket sqrt strdup-posix strerror strtod tzset uname vsprintf-posix
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
@@ -68,7 +68,7 @@ gl_DOC_BASE([doc])
 gl_TESTS_BASE([tests])
 gl_LIB([libgnu])
 gl_MAKEFILE_NAME([])
-gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
 gl_PO_DOMAIN([])
 gl_WITNESS_C_MACRO([])
+gl_VC_FILES([false])

@@ -291,8 +291,7 @@ void cf_init ( void ) {
     mudconf.robot_flags.word2 = 0;
     mudconf.robot_flags.word3 = 0;
     mudconf.stripped_flags.word1 = IMMORTAL | INHERIT | ROYALTY | WIZARD;
-    mudconf.stripped_flags.word2 = BLIND | CONNECTED | GAGGED |
-                                   HEAD_FLAG | SLAVE | STAFF | STOP_MATCH | SUSPECT | UNINSPECTED;
+    mudconf.stripped_flags.word2 = BLIND | CONNECTED | GAGGED | HEAD_FLAG | SLAVE | STAFF | STOP_MATCH | SUSPECT | UNINSPECTED;
     mudconf.stripped_flags.word3 = 0;
     mudconf.vattr_flags = 0;
     mudconf.vattr_flag_list = NULL;
@@ -312,10 +311,7 @@ void cf_init ( void ) {
     mudconf.max_cmdsecs = 120;
     mudconf.control_flags = 0xffffffff;	/* Everything for now... */
     mudconf.control_flags &= ~CF_GODMONITOR;	/* Except for monitoring... */
-    mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY |
-                          LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS |
-                          LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD |
-                          LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL;
+    mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY | LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS | LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD | LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL;
     mudconf.log_info = LOGOPT_TIMESTAMP | LOGOPT_LOC;
     mudconf.log_diversion = 0;
     mudconf.markdata[0] = 0x01;
@@ -441,9 +437,7 @@ void cf_init ( void ) {
 
 void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thing ) {
     if ( mudstate.initializing ) {
-        STARTLOG ( LOG_STARTUP, "CNF", "NFND" )
-        log_printf ( "%s: %s %s not found", cmd, thingname, thing );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
     } else {
         notify ( player, tmprintf ( "%s %s not found", thingname, thing ) );
     }
@@ -455,20 +449,22 @@ void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thi
  */
 
 void cf_log_syntax ( dbref player, char *cmd, const char *template, ... ) {
+    char *buff;
     va_list ap;
 
+    buff = alloc_lbuf ( "cf_include" );
+
     va_start ( ap, template );
+    vsnprintf ( buff, LBUF_SIZE, template, ap );
+    va_end ( ap );
 
     if ( mudstate.initializing ) {
-        STARTLOG ( LOG_STARTUP, "CNF", "SYNTX" )
-        log_printf ( "%s: ", cmd );
-        log_vprintf ( template, ap );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmvprintf ( template, ap ) );
+        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
 
-    va_end ( ap );
+    free_lbuf ( buff );
 }
 
 /*
@@ -477,20 +473,23 @@ void cf_log_syntax ( dbref player, char *cmd, const char *template, ... ) {
  */
 
 void cf_log_help ( dbref player, char *cmd, const char *template, ... ) {
+    char *buff;
     va_list ap;
 
+    buff = alloc_lbuf ( "cf_include" );
+
     va_start ( ap, template );
+    vsnprintf ( buff, LBUF_SIZE, template, ap );
+    va_end ( ap );
 
     if ( mudstate.initializing ) {
-        STARTLOG ( LOG_STARTUP, "HLP", "LOAD" )
-        log_printf ( "%s: ", cmd );
-        log_vprintf ( template, ap );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmvprintf ( template, ap ) );
+        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
 
-    va_end ( ap );
+    free_lbuf ( buff );
+
 }
 
 /*
@@ -499,20 +498,22 @@ void cf_log_help ( dbref player, char *cmd, const char *template, ... ) {
  */
 
 void cf_log_help_mkindx ( dbref player, char *cmd, const char *template, ... ) {
+    char *buff;
     va_list ap;
 
+    buff = alloc_lbuf ( "cf_include" );
+
     va_start ( ap, template );
+    vsnprintf ( buff, LBUF_SIZE, template, ap );
+    va_end ( ap );
 
     if ( mudstate.initializing ) {
-        STARTLOG ( LOG_STARTUP, "HLP", "LOAD" )
-        log_printf ( "%s: ", cmd );
-        log_vprintf ( template, ap );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmvprintf ( template, ap ) );
+        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
 
-    va_end ( ap );
+    free_lbuf ( buff );
 }
 
 /*
@@ -537,9 +538,7 @@ int cf_status_from_succfail ( dbref player, char *cmd, int success, int failure 
 
     if ( failure == 0 ) {
         if ( mudstate.initializing ) {
-            STARTLOG ( LOG_STARTUP, "CNF", "NDATA" )
-            log_printf ( "%s: Nothing to set", cmd );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd );
         } else {
             notify ( player, "Nothing to set" );
         }
@@ -671,10 +670,7 @@ int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     handle = lt_dlopen ( tmprintf ( "%s/%s.la", mudconf.modules_home, str ) );
 
     if ( !handle ) {
-        STARTLOG ( LOG_STARTUP, "CNF", "MOD" )
-        log_printf ( "Loading of %s module failed: %s",
-                     str, lt_dlerror() );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
         return -1;
     }
     mp = ( MODULE * ) XMALLOC ( sizeof ( MODULE ), "cf_module.mp" );
@@ -724,9 +720,7 @@ int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
             ( *initptr ) ();
         }
     }
-    STARTLOG ( LOG_STARTUP, "CNF", "MOD" )
-    log_printf ( "Loaded module: %s", str );
-    ENDLOG
+    log_printf2 ( LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str );
     return 0;
 }
 
@@ -791,9 +785,7 @@ int cf_string ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     if ( strlen ( str ) >= ( unsigned int ) extra ) {
         str[extra - 1] = '\0';
         if ( mudstate.initializing ) {
-            STARTLOG ( LOG_STARTUP, "CNF", "NFND" )
-            log_printf ( "%s: String truncated", cmd );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd );
         } else {
             notify ( player, "String truncated" );
         }
@@ -974,10 +966,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     if ( tp->filename != NULL ) {
-        STARTLOG ( LOG_STARTUP, "CNF", "DIVT" )
-        log_printf ( "Log type %s already diverted: %s",
-                     type_str, tp->filename );
-        ENDLOG
+        log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Log type %s already diverted: %s", type_str, tp->filename );
         return -1;
     }
     /*
@@ -999,9 +988,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     if ( !fptr ) {
         fptr = fopen ( file_str, "w" );
         if ( !fptr ) {
-            STARTLOG ( LOG_STARTUP, "CNF", "DIVT" )
-            log_printf ( "Cannot open logfile: %s", file_str );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot open logfile: %s", file_str );
             return -1;
         }
         if ( ( fd = fileno ( fptr ) ) == -1 ) {
@@ -1009,18 +996,12 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
         }
 #ifdef FNDELAY
         if ( fcntl ( fd, F_SETFL, FNDELAY ) == -1 ) {
-            STARTLOG ( LOG_STARTUP, "CNF", "DIVT" )
-            log_printf ( "Cannot make nonblocking: %s",
-                         file_str );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #else
         if ( fcntl ( fd, F_SETFL, O_NDELAY ) == -1 ) {
-            STARTLOG ( LOG_STARTUP, "CNF", "DIVT" )
-            log_printf ( "Cannot make nonblocking: %s",
-                         file_str );
-            ENDLOG
+            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #endif
@@ -1543,17 +1524,17 @@ static int helper_cf_cf_access ( CONF *tp, dbref player, int *vp, char *ap, char
      * Cannot modify parameters set STATIC
      */
 
+    char * name;
+
     if ( tp->flags & CA_STATIC ) {
         notify ( player, NOPERM_MESSAGE );
-        STARTLOG ( LOG_CONFIGMODS, "CFG", "PERM" )
         if ( db ) {
-            log_name ( player );
+            name = log_getname ( player, "helper_cf_cf_access" );
+            log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
+            XFREE ( name, "helper_cf_cf_access" );
         } else {
-            log_printf ( "System" );
+            log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
         }
-        log_printf ( " tried to change %s access to static param: %s",
-                     ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
-        ENDLOG
         return -1;
     }
     if ( ( long ) vp ) {
@@ -2120,7 +2101,7 @@ CONF		conftable [] = {
 static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp ) {
     int i;
 
-    char *buff;
+    char *buff, *name, *status;
 
     if ( !mudstate.standalone && !mudstate.initializing
             && !check_access ( player, tp->flags ) ) {
@@ -2133,25 +2114,23 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp ) {
     }
     i = tp->interpreter ( tp->loc, ap, tp->extra, player, cp );
     if ( !mudstate.initializing ) {
-        STARTLOG ( LOG_CONFIGMODS, "CFG", "UPDAT" )
-        log_name ( player );
-        log_printf
-        ( " entered config directive: %s with args '%s'. Status: ",
-          cp, strip_ansi ( buff ) );
+        name = log_getname ( player, "helper_cf_set" );
         switch ( i ) {
         case 0:
-            log_printf ( "Success." );
+            status = XSTRDUP ( "Success.", "helper_cf_set" );
             break;
         case 1:
-            log_printf ( "Partial success." );
+            status = XSTRDUP ( "Partial success.", "helper_cf_set" );
             break;
         case -1:
-            log_printf ( "Failure." );
+            status = XSTRDUP ( "Failure.", "helper_cf_set" );
             break;
         default:
-            log_printf ( "Strange." );
+            status = XSTRDUP ( "Strange.", "helper_cf_set" );
         }
-        ENDLOG
+        log_printf2 ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi ( buff ), status );
+        XFREE ( name, "helper_cf_set" );
+        XFREE ( status, "helper_cf_set" );
         free_lbuf ( buff );
     }
     return i;
@@ -2319,9 +2298,7 @@ void list_cf_read_access ( dbref player ) {
 if ((x)->interpreter == cf_dbref) { \
     if (!((((x)->extra == NOTHING) && (*((x)->loc) == NOTHING)) || \
 	  (Good_obj(*((x)->loc)) && !Going(*((x)->loc))))) { \
-	STARTLOG(LOG_ALWAYS, "CNF", "VRFY") \
-	    log_printf("%s #%d is invalid. Reset to #%d.", (x)->pname, *((x)->loc), (x)->extra); \
-	ENDLOG \
+	    log_printf2(LOG_ALWAYS, "CNF", "VRFY", "%s #%d is invalid. Reset to #%d.", (x)->pname, *((x)->loc), (x)->extra); \
 	*((x)->loc) = (dbref) (x)->extra; \
     } \
 }

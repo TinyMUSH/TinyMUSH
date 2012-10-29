@@ -771,6 +771,8 @@ INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
 SET_MAKE
+LIBGNU_LTLIBDEPS
+LIBGNU_LIBDEPS
 gltests_WITNESS
 HAVE_WINT_T
 NEXT_AS_FIRST_DIRECTIVE_WCHAR_H
@@ -1715,7 +1717,6 @@ GL_GENERATE_ALLOCA_H_FALSE
 GL_GENERATE_ALLOCA_H_TRUE
 ALLOCA_H
 ALLOCA
-LTALLOCA
 GL_COND_LIBTOOL_FALSE
 GL_COND_LIBTOOL_TRUE
 host_os
@@ -13539,7 +13540,7 @@ Configuration aborted." "$LINENO" 5
   fi
 
 
-   if true; then
+   if false; then
   GL_COND_LIBTOOL_TRUE=
   GL_COND_LIBTOOL_FALSE='#'
 else
@@ -13547,7 +13548,9 @@ else
   GL_COND_LIBTOOL_FALSE=
 fi
 
-  gl_cond_libtool=true
+  gl_cond_libtool=false
+  gl_libdeps=
+  gl_ltlibdeps=
   gl_m4_base='m4'
 
 
@@ -13559,8 +13562,6 @@ fi
 
 
   gl_source_base='lib'
-LTALLOCA=`echo "$ALLOCA" | sed -e 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
-
 
 
   if test $ac_cv_func_alloca_works = no; then
@@ -22494,6 +22495,10 @@ done
 
 
 
+
+  LIBGNU_LIBDEPS="$gl_libdeps"
+
+  LIBGNU_LTLIBDEPS="$gl_ltlibdeps"
 
 
 ac_ext=c

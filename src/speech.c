@@ -173,7 +173,7 @@ static void format_speech ( dbref player, dbref speaker, dbref loc, char *messag
 void do_say ( dbref player, dbref cause, int key, char *message ) {
     dbref loc;
 
-    char *buf2, *bp;
+    char *buf2, *bp, *name;
 
     int say_flags, depth;
 
@@ -307,10 +307,9 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             say_shout ( 0, announce_msg, say_flags, player, buf2 );
             free_lbuf ( buf2 );
         }
-        STARTLOG ( LOG_SHOUTS, "WIZ", "SHOUT" )
-        log_name ( player );
-        log_printf ( " shouts: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s shouts: '%s'", name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_WIZSHOUT:
         switch ( *message ) {
@@ -336,10 +335,9 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
                         buf2 );
             free_lbuf ( buf2 );
         }
-        STARTLOG ( LOG_SHOUTS, "WIZ", "BCAST" )
-        log_name ( player );
-        log_printf ( " broadcasts: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s broadcasts: '%s'", name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_ADMINSHOUT:
         switch ( *message ) {
@@ -370,21 +368,18 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             say_shout ( ROYALTY, admin_msg, say_flags, player, buf2 );
             free_lbuf ( buf2 );
         }
-        STARTLOG ( LOG_SHOUTS, "WIZ", "ASHOUT" )
-        log_name ( player );
-        log_printf ( " yells: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "ASHOUT", "%s yells: '%s'", name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_WALLPOSE:
         if ( say_flags & SAY_NOTAG ) {
             raw_broadcast ( 0, "%s %s", Name ( player ), message );
         } else
-            raw_broadcast ( 0, "Announcement: %s %s", Name ( player ),
-                            message );
-        STARTLOG ( LOG_SHOUTS, "WIZ", "SHOUT" )
-        log_name ( player );
-        log_printf ( " WALLposes: '%s'", strip_ansi ( message ) );
-        ENDLOG
+            raw_broadcast ( 0, "Announcement: %s %s", Name ( player ), message );
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLposes: '%s'",name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_WIZPOSE:
         if ( say_flags & SAY_NOTAG ) {
@@ -392,10 +387,9 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
         } else
             raw_broadcast ( WIZARD, "Broadcast: %s %s", Name ( player ),
                             message );
-        STARTLOG ( LOG_SHOUTS, "WIZ", "BCAST" )
-        log_name ( player );
-        log_printf ( " WIZposes: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZposes: '%s'", name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_WALLEMIT:
         if ( say_flags & SAY_NOTAG ) {
@@ -403,10 +397,9 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
         } else {
             raw_broadcast ( 0, "Announcement: %s", message );
         }
-        STARTLOG ( LOG_SHOUTS, "WIZ", "SHOUT" )
-        log_name ( player );
-        log_printf ( " WALLemits: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLemits: '%s'", name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     case SAY_WIZEMIT:
         if ( say_flags & SAY_NOTAG ) {
@@ -414,10 +407,9 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
         } else {
             raw_broadcast ( WIZARD, "Broadcast: %s", message );
         }
-        STARTLOG ( LOG_SHOUTS, "WIZ", "BCAST" )
-        log_name ( player );
-        log_printf ( " WIZemits: '%s'", strip_ansi ( message ) );
-        ENDLOG
+        name = log_getname ( player, "do_say" );
+        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZemits: '%s'",name, strip_ansi ( message ) );
+        XFREE ( name, "do_say" );
         break;
     }
 }

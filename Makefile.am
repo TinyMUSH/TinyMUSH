@@ -3,7 +3,7 @@ AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS         = src lib
 
-EXTRA_DIST      = m4/gnulib-cache.m4 contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
+EXTRA_DIST      = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 
 indent:
 	for i in `ls src/*.c src/*.h`; do \
@@ -44,6 +44,7 @@ testpath:
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
+	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool

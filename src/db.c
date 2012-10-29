@@ -1120,6 +1120,8 @@ void do_attribute ( dbref player, dbref cause, int key, char *aname, char *value
 void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
     dbref thing, res;
 
+    char *tname;
+
     init_match ( player, arg1, NOTYPE );
     match_everything ( 0 );
     thing = noisy_match_result();
@@ -1192,22 +1194,18 @@ void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
                          "That name is already in use." );
                 return;
             }
-            STARTLOG ( LOG_SECURITY, "SEC", "CNAME" )
-            log_name ( thing ),
-                     log_printf ( " renamed to %s", strip_ansi ( arg2 ) );
-            ENDLOG
+            tname = log_getname ( thing, "do_fixdb" );
+            log_printf2 ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", tname, strip_ansi ( arg2 ) );
+            XFREE ( tname, "do_fixdb" );
             if ( Suspect ( player ) ) {
-                raw_broadcast ( WIZARD,
-                                "[Suspect] %s renamed to %s",
-                                Name ( thing ), arg2 );
+                raw_broadcast ( WIZARD, "[Suspect] %s renamed to %s", Name ( thing ), arg2 );
             }
             delete_player_name ( thing, Name ( thing ) );
             s_Name ( thing, arg2 );
             add_player_name ( thing, arg2 );
         } else {
             if ( !ok_name ( arg2 ) ) {
-                notify ( player,
-                         "Warning: That is not a reasonable name." );
+                notify ( player, "Warning: That is not a reasonable name." );
             }
             s_Name ( thing, arg2 );
         }
@@ -2412,12 +2410,9 @@ void db_grow ( dbref newtop ) {
 
     /* Grow the db array */
 
-    newdb = ( OBJ * ) XCALLOC ( newsize + SIZE_HACK, sizeof ( OBJ ),
-                                "db_grow.db" );
+    newdb = ( OBJ * ) XCALLOC ( newsize + SIZE_HACK, sizeof ( OBJ ), "db_grow.db" );
     if ( !newdb ) {
-        STARTLOG ( LOG_ALWAYS, "ALC", "DB" )
-        log_printf ( "Could not allocate space for %d item struct database.", newsize );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "ALC", "DB",  "Could not allocate space for %d item struct database.", newsize );
         abort();
     }
     if ( db ) {
@@ -2789,9 +2784,7 @@ int init_gdbm_db ( char *gdbmfile ) {
     cache_init ( mudconf.cache_width );
     dddb_setfile ( gdbmfile );
     dddb_init();
-    STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-    log_printf ( "Using db file: %s", gdbmfile );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", gdbmfile );
     db_free();
     return ( 0 );
 }
@@ -3028,9 +3021,7 @@ void load_restart_db ( void ) {
 
     DESC_ITER_ALL ( d ) {
         if ( fstat ( d->descriptor, &fstatbuf ) < 0 ) {
-            STARTLOG ( LOG_PROBLEMS, "ERR", "RESTART" )
-            log_printf ( "Bad descriptor %d", d->descriptor );
-            ENDLOG
+            log_printf2 ( LOG_PROBLEMS, "ERR", "RESTART", "Bad descriptor %d", d->descriptor );
             shutdownsock ( d, R_SOCKDIED );
         }
     }

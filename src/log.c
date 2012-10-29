@@ -98,8 +98,7 @@ void logfile_init ( char *filename ) {
 
     mainlog_fp = fopen ( filename, "w" );
     if ( !mainlog_fp ) {
-        fprintf ( stderr, "Could not open logfile %s for writing.\n",
-                  filename );
+        fprintf ( stderr, "Could not open logfile %s for writing.\n", filename );
         mainlog_fp = stderr;
         return;
     }
@@ -153,9 +152,20 @@ int start_log ( const char *primary, const char *secondary, int key ) {
     }
 
     mudstate.logging++;
-    switch ( mudstate.logging ) {
-    case 1:
-    case 2:
+    
+    if ( mudstate.logging ) {
+        if (key & LOG_FORCE) {
+            /* 
+             * Log even if we are recursing and
+             * don't complain about it. This should
+             * never happens with the new logger.
+             */
+            mudstate.logging--;
+        }
+        /*
+        case 1:
+        case 2:
+        */
 
         if ( !mudstate.standalone ) {
             /*
@@ -183,13 +193,17 @@ int start_log ( const char *primary, const char *secondary, int key ) {
          * If a recursive call, log it and return indicating no log
          */
 
-        if ( mudstate.logging == 1 ) {
-            return 1;
+        if ( mudstate.logging != 1 ) {
+            mainlog_printf ( "Recursive logging request.\n" );
         }
-        mainlog_printf ( "Recursive logging request.\r\n" );
-    default:
-        mudstate.logging--;
+        return ( 1 );
+    } else {
+        /*
+        default:
+            mudstate.logging--;
+        */
     }
+
     return 0;
 }
 
@@ -203,6 +217,10 @@ void end_log ( void ) {
         fflush ( log_fp );
     }
     mudstate.logging--;
+    if ( mudstate.logging < 0 ) {
+        mainlog_printf ( "Log was closed too many times (%d)\n", mudstate.logging );
+        mudstate.logging = 0;
+    }
 }
 
 /* ---------------------------------------------------------------------------
@@ -224,14 +242,42 @@ void log_perror ( const char *primary, const char *secondary, const char *extra,
  * log_printf: Format text and print to the log file.
  */
 
-void log_printf ( const char *format, ... ) {
+void log_printf2 ( int key, const char *primary, const char *secondary, const char *format, ... ) {
     va_list ap;
     char *s;
 
-    va_start ( ap, format );
+    if ( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log ( primary, secondary, key ) ) {
 
-    s = ( char * ) XMALLOC ( MBUF_SIZE, "log_printf" );
-    vsprintf ( s, format, ap );
+        s = ( char * ) XMALLOC ( MBUF_SIZE, "log_printf" );
+
+        va_start ( ap, format );
+        vsnprintf ( s, MBUF_SIZE, format, ap );
+        va_end ( ap );
+
+        /*
+         * Do we have a logfile to write to...
+         */
+
+        if ( ( log_fp != NULL ) ) {
+            fputs ( s, log_fp );
+        }
+
+        /*
+         * If we are starting up, log to stderr too..
+         */
+
+        if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+            fputs ( s, stderr );
+        }
+
+        XFREE ( s, "log_printf" );
+
+        end_log();
+    }
+
+}
+
+void log_print ( const char *s ) {
     /*
      * Do we have a logfile to write to...
      */
@@ -244,10 +290,35 @@ void log_printf ( const char *format, ... ) {
     if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
         fputs ( s, stderr );
     }
+
+}
+
+void log_printf ( const char *format, ... ) {
+    va_list ap;
+    char *s;
+
+    va_start ( ap, format );
+
+    s = ( char * ) XMALLOC ( MBUF_SIZE, "log_printf" );
+
+    vsprintf ( s, format, ap );
+    log_print ( s );
     XFREE ( s, "log_printf" );
 
     va_end ( ap );
 }
+
+void log_vprintf ( const char *format, va_list ap ) {
+    char *s;
+
+    s = ( char * ) XMALLOC ( MBUF_SIZE, "log_vprintf" );
+
+    vsprintf ( s, format, ap );
+    log_print ( s );
+
+    XFREE ( s, "log_vprintf" );
+}
+
 
 /* ---------------------------------------------------------------------------
  * mainlog_printf: Format text and print to the mainlog file.
@@ -274,58 +345,26 @@ void mainlog_printf ( const char *format, ... ) {
     va_end ( ap );
 }
 
-void log_vprintf ( const char *format, va_list ap ) {
-    if ( log_fp != NULL ) {
-        vfprintf ( log_fp, format, ap );
-    } else {
-        vfprintf ( stderr, format, ap );
-    }
-}
 
 /* ---------------------------------------------------------------------------
- * log_name: write the name, db number, and flags of an object to the log.
- * If the object does not own itself, append the name, db number, and flags
- * of the owner.
+ * log_getname : return the name of <target>. It is the responsibilty of
+ * the caller to XFREE the created buffer.
  */
 
-void log_name ( dbref target ) {
-    char *tp;
-
-    if ( mudstate.standalone ) {
-        fprintf ( stderr, "%s(#%d)", Name ( target ), target );
-        return;
-    }
+char *log_getname ( dbref target, char *d ) {
+    char *name, *s;
 
     if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
-        tp = unparse_object ( ( dbref ) GOD, target, 0 );
+        s = unparse_object ( ( dbref ) GOD, target, 0 );
     } else {
-        tp = unparse_object_numonly ( target );
+        s = unparse_object_numonly ( target );
     }
-    log_printf ( "%s", strip_ansi ( tp ) );
-    free_lbuf ( tp );
-    if ( ( ( mudconf.log_info & LOGOPT_OWNER ) != 0 ) &&
-            ( target != Owner ( target ) ) ) {
-        if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
-            tp = unparse_object ( ( dbref ) GOD, Owner ( target ), 0 );
-        } else {
-            tp = unparse_object_numonly ( Owner ( target ) );
-        }
-        log_printf ( "[%s]", strip_ansi ( tp ) );
-        free_lbuf ( tp );
-    }
-    return;
-}
 
-/* ---------------------------------------------------------------------------
- * log_name_and_loc: Log both the name and location of an object
- */
+    name = XSTRDUP ( strip_ansi ( s ), d );
 
-void log_name_and_loc ( dbref player ) {
-    log_name ( player );
-    if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
-        log_printf ( " in " );
-        log_name ( Location ( player ) );
-    }
+    free_lbuf ( s );
+
+    return ( name );
 }
 
 char * OBJTYP ( dbref thing ) {
@@ -347,6 +386,126 @@ char * OBJTYP ( dbref thing ) {
         return ( char * ) "??ILLEGAL??";
     }
 }
+
+char *log_gettype ( dbref target, char *d ) {
+    char *type;
+
+    type = XSTRDUP ( OBJTYP ( target ), d );
+
+    return ( type );
+}
+
+
+/* ---------------------------------------------------------------------------
+ * log_name: write the name, db number, and flags of an object to the log.
+ * If the object does not own itself, append the name, db number, and flags
+ * of the owner.
+ */
+
+void log_name_printf ( int key, const char *primary, const char *secondary, dbref target, const char *format, ... ) {
+    va_list ap;
+    char *tp, *name, *owner;
+
+    if ( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log ( primary, secondary, key ) ) {
+        va_start ( ap, format );
+
+        if ( mudstate.standalone ) {
+            fprintf ( stderr, "%s(#%d)", Name ( target ), target );
+            return;
+        }
+
+        name = log_getname ( target, "log_name_printf" );
+
+        if ( ( ( mudconf.log_info & LOGOPT_OWNER ) != 0 ) && ( target != Owner ( target ) ) ) {
+            owner = log_getname ( Owner ( target ), "log_name_printf" );
+            log_printf ( "%s[%s]", name, owner );
+            XFREE ( owner, "log_name_printf" );
+        } else {
+            log_printf ( "%s", name );
+        }
+
+        XFREE ( name, "log_name_printf" );
+
+        log_vprintf ( format, ap );
+        va_end ( ap );
+        end_log();
+    }
+
+}
+
+void log_name ( dbref target ) {
+    char *tp;
+
+    if ( mudstate.standalone ) {
+        fprintf ( stderr, "%s(#%d)", Name ( target ), target );
+        return;
+    }
+
+    if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
+        tp = unparse_object ( ( dbref ) GOD, target, 0 );
+    } else {
+        tp = unparse_object_numonly ( target );
+    }
+    log_print ( strip_ansi ( tp ) );
+    free_lbuf ( tp );
+    if ( ( ( mudconf.log_info & LOGOPT_OWNER ) != 0 ) && ( target != Owner ( target ) ) ) {
+        if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
+            tp = unparse_object ( ( dbref ) GOD, Owner ( target ), 0 );
+        } else {
+            tp = unparse_object_numonly ( Owner ( target ) );
+        }
+        log_printf ( "[%s]", strip_ansi ( tp ) );
+        free_lbuf ( tp );
+    }
+    return;
+}
+
+
+/* ---------------------------------------------------------------------------
+ * log_name_and_loc: Log both the name and location of an object
+ */
+
+void log_name_and_loc_printf ( int key, const char *primary, const char *secondary, dbref player, const char *format, ... ) {
+    va_list ap;
+    char *name, *owner, *loc;
+
+    if ( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log ( primary, secondary, key ) ) {
+        va_start ( ap, format );
+
+        name = log_getname ( player, "log_name_and_loc_printf" );
+
+        if ( ( ( mudconf.log_info & LOGOPT_OWNER ) != 0 ) && ( player != Owner ( player ) ) ) {
+            owner = log_getname ( Owner ( player ), "log_name_and_loc_printf" );
+            log_printf ( "%s[%s]", name, owner );
+            XFREE ( owner, "log_name_and_loc_printf" );
+        } else {
+            log_printf ( "%s", name );
+        }
+        XFREE ( name, "log_name_and_loc_printf" );
+
+        if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+            loc = log_getname ( Location ( player ) ,"log_name_and_loc_printf" );
+            log_printf ( " in %s ", loc );
+            XFREE ( loc, "log_name_and_loc_printf" );
+        }
+
+        log_vprintf ( format, ap );
+        va_end ( ap );
+        end_log();
+    }
+
+
+}
+
+void log_name_and_loc ( dbref player ) {
+    log_name ( player );
+    if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+        log_printf ( " in " );
+        log_name ( Location ( player ) );
+    }
+}
+
+
 
 void log_type_and_name ( dbref thing ) {
     log_printf ( "%s ", OBJTYP ( thing ) );

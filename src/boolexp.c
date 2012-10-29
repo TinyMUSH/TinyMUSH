@@ -65,7 +65,7 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
 
     int aflags, alen, c, checkit;
 
-    char *key, *buff, *buff2, *bp, *str;
+    char *key, *buff, *buff2, *bp, *str, *pname, *lname;
 
     ATTR *a;
 
@@ -93,20 +93,27 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
 
         mudstate.lock_nest_lev++;
         if ( mudstate.lock_nest_lev >= mudconf.lock_nest_lim ) {
-            STARTLOG ( LOG_BUGS, "BUG", "LOCK" )
-            log_name_and_loc ( player );
-            log_printf ( ": Lock exceeded recursion limit." );
-            ENDLOG
+            pname = log_getname ( player, "eval_boolexp" );
+            if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+                lname = log_getname ( Location ( player ), "eval_boolexp" );
+                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock exceeded recursion limit.", pname, lname );
+                XFREE ( lname, "eval_boolexp" );
+            } else {
+                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s: Lock exceeded recursion limit.", pname );
+            }
+            XFREE ( pname, "eval_boolexp" );
             notify ( player, "Sorry, broken lock!" );
             mudstate.lock_nest_lev--;
             return ( 0 );
         }
         if ( ( b->sub1->type != BOOLEXP_CONST ) || ( b->sub1->thing < 0 ) ) {
-            STARTLOG ( LOG_BUGS, "BUG", "LOCK" )
-            log_name_and_loc ( player );
-            log_printf ( ": Lock had bad indirection (%c, type %d)",
-                         INDIR_TOKEN, b->sub1->type );
-            ENDLOG
+            if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
+                lname = log_getname ( Location ( player ), "eval_boolexp" );
+                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type );
+                XFREE ( lname, "eval_boolexp" );
+            } else {
+                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type );
+            }
             notify ( player, "Sorry, broken lock!" );
             mudstate.lock_nest_lev--;
             return ( 0 );

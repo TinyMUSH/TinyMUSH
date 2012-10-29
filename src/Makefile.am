@@ -1,80 +1,68 @@
-AM_CPPFLAGS     = $(LTDLINCL)
-SUBDIRS         = libltdl
-LIBTOOL_DEPS    = @LIBTOOL_DEPS@
+AM_CPPFLAGS		= $(LTDLINCL)
+SUBDIRS			= libltdl
+LIBTOOL_DEPS		= @LIBTOOL_DEPS@
 
-#-------------------------------------------------------------------------------
+netmush_SOURCES		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c pcre.c player.c player_c.c powers.c predicates.c quota.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h pcre.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
+netmush_LDFLAGS		= -export-dynamic
+netmush_SKEL		= defaults.h.in
+netmush_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+netmush_DEPENDENCIES	= $(LTDLDEPS) 
+nodist_netmush_SOURCES	= version.h defaults.h
 
-netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c \
-	db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c \
-	funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c \
-	game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c \
-	object.c pcre.c player.c player_c.c powers.c predicates.c quota.c rob.c \
-	set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c \
-	udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c \
-	alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h \
-	externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h \
-	interface.h match.h mushconf.h pcre.h powers.h slave.h system.h \
-	typedefs.h udb.h udb_defs.h vattr.h walkdb.h
-netmush_LDFLAGS        = -export-dynamic
-netmush_SKEL           = defaults.h.in
-netmush_LDADD          = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
-netmush_DEPENDENCIES   = $(LTDLDEPS) 
-nodist_netmush_SOURCES = version.h defaults.h
+recover_SOURCES		= recover.c
+recover_LDADD		= $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 
-recover_SOURCES        = recover.c
-recover_LDADD          = $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+slave_SOURCES		= slave.c
 
-slave_SOURCES          = slave.c
-
-SHARE_DIR     = share
-SHARE_SRC     = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
+SHARE_DIR		= share
+SHARE_SRC		= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 	
-ETC_DIR	     = etc
-ETC_SKEL     = $(ETC_DIR)/netmush.conf.in
-ETC_SRC      = $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
-ETC_BUILD    = $(ETC_DIR)/netmush.conf
+ETC_DIR			= etc
+ETC_SKEL		= $(ETC_DIR)/netmush.conf.in
+ETC_SRC			= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
+ETC_BUILD		= $(ETC_DIR)/netmush.conf
 
-SCRIPT_DIR   = scripts
-SCRIPT_SKEL  = $(SCRIPT_DIR)/Startmush.in
-SCRIPT_SRC   = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
-SCRIPT_DAT   = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
-SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
+SCRIPT_DIR		= scripts
+SCRIPT_SKEL		= $(SCRIPT_DIR)/Startmush.in
+SCRIPT_SRC		= $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
+SCRIPT_DAT		= $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
+SCRIPT_BUILD		= $(SCRIPT_DIR)/Startmush
 
-EXTRA_DIST   = libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES   = version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
+CLEANFILES		= version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
-API_SRC      = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
+API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h
 
-BUILT_SOURCES          = version.h tinymushapi.h defaults.h netmush.conf Startmush
+BUILT_SOURCES		= version.h tinymushapi.h defaults.h netmush.conf Startmush
 
-include_HEADERS        = tinymushapi.h
+nodist_include_HEADERS	= tinymushapi.h
 
-bin_PROGRAMS = netmush slave recover
+bin_PROGRAMS		= netmush slave recover
 
 if WANT_DBM_GDBM
- SUBDIRS         += dbm/gdbm/
- AM_CPPFLAGS     += -I dbm/gdbm/
- netmush_LDADD   += dbm/gdbm/libtinygdbm.a
- recover_LDADD   += dbm/gdbm/libtinygdbm.a
+ SUBDIRS		+= dbm/gdbm/
+ AM_CPPFLAGS		+= -I dbm/gdbm/
+ netmush_LDADD		+= dbm/gdbm/libtinygdbm.a
+ recover_LDADD		+= dbm/gdbm/libtinygdbm.a
 endif
 
 if WANT_DBM_QDBM
- SUBDIRS         += dbm/qdbm/
- AM_CPPFLAGS     += -I dbm/qdbm/
- netmush_LDADD   += dbm/qdbm/libtinyqdbm.a
- recover_LDADD   += dbm/qdbm/libtinyqdbm.a
+ SUBDIRS		+= dbm/qdbm/
+ AM_CPPFLAGS		+= -I dbm/qdbm/
+ netmush_LDADD		+= dbm/qdbm/libtinyqdbm.a
+ recover_LDADD		+= dbm/qdbm/libtinyqdbm.a
 endif
 
 if WANT_MODULE_COMSYS
- SUBDIRS += modules/comsys/
+ SUBDIRS		+= modules/comsys/
 endif
 
 if WANT_MODULE_MAIL
- SUBDIRS += modules/mail/
+ SUBDIRS		+= modules/mail/
 endif
 
 if WANT_MODULE_DB_SQL
- SUBDIRS += modules/db_sql/
+ SUBDIRS		+= modules/db_sql/
 endif
 
 do_subst = $(SED) \

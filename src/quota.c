@@ -225,6 +225,8 @@ static void show_quota_header ( dbref player ) {
 void do_quota ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
     dbref who;
 
+    char *name, *target;
+
     register int set = 0, value = 0, i;
 
     if ( ! ( mudconf.quotas || Can_Set_Quota ( player ) ) ) {
@@ -252,10 +254,9 @@ void do_quota ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
             set = 1;
         }
         if ( set ) {
-            STARTLOG ( LOG_WIZARD, "WIZ", "QUOTA" )
-            log_name ( player );
-            log_printf ( " changed everyone's quota." );
-            ENDLOG
+            name = log_getname ( player, "do_quota" );
+            log_printf2 ( LOG_WIZARD, "WIZ", "QUOTA", "%s changed everyone's quota.", name );
+            XFREE ( name, "do_quota" );
         }
         show_quota_header ( player );
         DO_WHOLE_DB ( i ) {
@@ -308,11 +309,11 @@ void do_quota ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
         value = 0;
     }
     if ( set ) {
-        STARTLOG ( LOG_WIZARD, "WIZ", "QUOTA" )
-        log_name ( player );
-        log_printf ( " changed the quota of " );
-        log_name ( who );
-        ENDLOG
+        name = log_getname ( player, "do_quota" );
+        target = log_getname ( who, "do_quota" );
+        log_printf2 ( LOG_WIZARD, "WIZ", "QUOTA","%s changed the quota of %s", name, target );
+        XFREE ( name, "do_quota" );
+        XFREE ( target, "do_quota" );
         mung_quotas ( who, key, value );
     }
     show_quota_header ( player );

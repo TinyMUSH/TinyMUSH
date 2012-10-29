@@ -138,9 +138,14 @@ extern int	start_log(const char *, const char *, int);
 extern void	end_log(void);
 extern void	log_perror(const char *, const char *, const char *, const char  *);
 extern void	log_printf(const char *,...);
+extern void	log_printf2(int, const char *, const char *, const char *, ...);
 extern void	mainlog_printf(const char *,...);
 extern void	log_vprintf(const char *, va_list);
+extern char 	*log_getname(dbref, char *);
+extern char	*log_gettype(dbref, char *);
+extern void	log_name_printf (int, const char *, const char *, dbref, const char *, ...);
 extern void	log_name(dbref);
+extern void	log_name_and_loc_printf (int, const char *, const char *, dbref, const char *, ... );
 extern void	log_name_and_loc(dbref);
 extern void	log_type_and_name(dbref);
 

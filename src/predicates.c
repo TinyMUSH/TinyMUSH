@@ -1487,6 +1487,8 @@ void do_restart ( dbref player, dbref cause, int key ) {
 
     MODULE *mp;
 
+    char *name;
+
     if ( mudstate.dumping ) {
         notify ( player, "Dumping. Please try again later." );
         return;
@@ -1501,11 +1503,9 @@ void do_restart ( dbref player, dbref cause, int key ) {
     mudstate.restarting = 1;
 
     raw_broadcast ( 0, "GAME: Restart by %s, please wait.", Name ( Owner ( player ) ) );
-    STARTLOG ( LOG_ALWAYS, "WIZ", "RSTRT" )
-    log_printf ( "Restart by " );
-    log_name ( player );
-    ENDLOG
-
+    name = log_getname ( player, "do_restart" );
+    log_printf2 ( LOG_ALWAYS, "WIZ", "RSTRT" "Restart by %s", name );
+    XFREE ( name, "do_restart" );
     /*
      * Do a dbck first so we don't end up with an inconsistent state.
      * * Otherwise, since we don't write out GOING objects, the initial

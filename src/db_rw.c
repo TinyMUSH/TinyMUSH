@@ -1129,9 +1129,7 @@ int db_read ( void ) {
     data = db_get ( key, DBTYPE_DBINFO );
 
     if ( !data.dptr ) {
-        STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
-        log_printf ( "Could not open main record" );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Could not open main record" );
         return -1;
     }
     /*
@@ -1179,9 +1177,7 @@ int db_read ( void ) {
                     /*
                      * Houston, we have a problem
                      */
-                    STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
-                    log_printf ( "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS ( i, blksize ) );
-                    ENDLOG
+                    log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS ( i, blksize ) );
                 }
                 s++;
             }
@@ -1194,9 +1190,7 @@ int db_read ( void ) {
      */
 
     if ( mudstate.standalone ) {
-        STARTLOG ( LOG_ALWAYS, "DBR", "LOAD" )
-        log_printf ( "Reading " );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Reading " );
     }
 
     blksize = OBJECT_BLOCK_SIZE;
@@ -1846,14 +1840,10 @@ FILE *db_module_flatfile ( char *filename, int wrflag ) {
 
     if ( wrflag ) {
         f = tf_fopen ( filename, O_WRONLY | O_CREAT | O_TRUNC );
-        STARTLOG ( LOG_ALWAYS, "DMP", "DUMP" )
-        log_printf ( "Writing db: %s", filename );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", filename );
     } else {
         f = tf_fopen ( filename, O_RDONLY );
-        STARTLOG ( LOG_ALWAYS, "INI", "LOAD" )
-        log_printf ( "Loading db: %s", filename );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Loading db: %s", filename );
     }
 
     if ( f != NULL ) {

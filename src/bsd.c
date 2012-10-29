@@ -287,9 +287,7 @@ void boot_slave ( void ) {
         return;
     }
     slave_socket = sv[0];
-    STARTLOG ( LOG_ALWAYS, "NET", "SLAVE" )
-    log_printf ( "DNS lookup slave started on fd %d", slave_socket );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "NET", "SLAVE", "DNS lookup slave started on fd %d", slave_socket );
 }
 
 int make_socket ( int port ) {
@@ -374,10 +372,7 @@ void shovechars ( int port ) {
             }
 
             mudstate.dumping = 1;
-            STARTLOG ( LOG_DBSAVES, "DMP", "CHKPT" )
-            log_printf ( "Flatfiling: %s.#%d#",
-                         mudconf.db_file, mudstate.epoch );
-            ENDLOG
+            log_printf2 ( LOG_DBSAVES, "DMP", "CHKPT", "Flatfiling: %s.#%d#", mudconf.db_file, mudstate.epoch );
             dump_database_internal ( DUMP_DB_FLATFILE );
             mudstate.dumping = 0;
 
@@ -453,12 +448,7 @@ void shovechars ( int port ) {
                          * It's a player. Just toss
                          * the connection.
                          */
-                        STARTLOG ( LOG_PROBLEMS, "ERR",
-                                   "EBADF" )
-                        log_printf
-                        ( "Bad descriptor %d",
-                          d->descriptor );
-                        ENDLOG
+                        log_printf2 ( LOG_PROBLEMS, "ERR", "EBADF", "Bad descriptor %d", d->descriptor );
                         shutdownsock ( d,R_SOCKDIED );
                     }
                 }
@@ -468,11 +458,7 @@ void shovechars ( int port ) {
                      * Try to restart the slave, since it
                      * presumably died.
                      */
-                    STARTLOG ( LOG_PROBLEMS, "ERR", "EBADF" )
-                    log_printf
-                    ( "Bad slave descriptor %d",
-                      slave_socket );
-                    ENDLOG
+                    log_printf2 ( LOG_PROBLEMS, "ERR", "EBADF", "Bad slave descriptor %d", slave_socket );
                     boot_slave();
                 }
                 if ( ( sock != -1 ) &&
@@ -480,16 +466,11 @@ void shovechars ( int port ) {
                     /*
                      * That's it, game over.
                      */
-                    STARTLOG ( LOG_PROBLEMS, "ERR", "EBADF" )
-                    log_printf
-                    ( "Bad game port descriptor %d",
-                      sock );
-                    ENDLOG
+                    log_printf2 ( LOG_PROBLEMS, "ERR", "EBADF", "Bad game port descriptor %d", sock );
                     break;
                 }
             } else if ( errno != EINTR ) {
-                log_perror ( "NET", "FAIL",
-                             "checking for activity", "select" );
+                log_perror ( "NET", "FAIL", "checking for activity", "select" );
             }
             continue;
         }
@@ -622,10 +603,7 @@ DESC *new_connection ( int sock ) {
     }
 
     if ( site_check ( addr.sin_addr, mudstate.access_list ) & H_FORBIDDEN ) {
-        STARTLOG ( LOG_NET | LOG_SECURITY, "NET", "SITE" )
-        log_printf ( "[%d/%s] Connection refused.  (Remote port %d)",
-                     newsock, inet_ntoa ( addr.sin_addr ), ntohs ( addr.sin_port ) );
-        ENDLOG
+        log_printf2 ( LOG_NET | LOG_SECURITY, "NET", "SITE", "[%d/%s] Connection refused.  (Remote port %d)", newsock, inet_ntoa ( addr.sin_addr ), ntohs ( addr.sin_port ) );
         fcache_rawdump ( newsock, FC_CONN_SITE );
         shutdown ( newsock, 2 );
         close ( newsock );
@@ -650,10 +628,7 @@ DESC *new_connection ( int sock ) {
             }
         }
         free_lbuf ( buf );
-        STARTLOG ( LOG_NET, "NET", "CONN" )
-        log_printf ( "[%d/%s] Connection opened (remote port %d)",
-                     newsock, buff, ntohs ( addr.sin_port ) );
-        ENDLOG
+        log_printf2 ( LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, buff, ntohs ( addr.sin_port ) );
         d = initializesock ( newsock, &addr );
         mudstate.debug_cmd = cmdsave;
         free_mbuf ( buff );
@@ -708,7 +683,7 @@ const char *conn_messages[] = {
 };
 
 void shutdownsock ( DESC *d, int reason ) {
-    char *buff2;
+    char *buff, *buff2;
 
     time_t now;
 
@@ -716,11 +691,11 @@ void shutdownsock ( DESC *d, int reason ) {
 
     DESC *dtemp;
 
-    if ( ( reason == R_LOGOUT ) &&
-            ( site_check ( ( d->address ).sin_addr,
-                           mudstate.access_list ) & H_FORBIDDEN ) ) {
+    if ( ( reason == R_LOGOUT ) && ( site_check ( ( d->address ).sin_addr, mudstate.access_list ) & H_FORBIDDEN ) ) {
         reason = R_QUIT;
     }
+
+    buff = log_getname ( d->player, "shutdownsock" );
 
     if ( d->flags & DS_CONNECTED ) {
 
@@ -738,27 +713,9 @@ void shutdownsock ( DESC *d, int reason ) {
                  */
                 fcache_dump ( d, FC_QUIT );
             }
-            STARTLOG ( LOG_NET | LOG_LOGIN, "NET", "DISC" )
-            log_printf ( "[%d/%s] Logout by ",
-                         d->descriptor, d->addr );
-            log_name ( d->player );
-            log_printf
-            ( " <%s: %d cmds, %d bytes in, %d bytes out, %d secs>",
-              conn_reasons[reason], d->command_count,
-              d->input_tot, d->output_tot,
-              ( int ) ( time ( NULL ) - d->connected_at ) );
-            ENDLOG
+            log_printf2 ( LOG_NET | LOG_LOGIN, "NET", "DISC", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, conn_reasons[reason], d->command_count, d->input_tot, d->output_tot, ( int ) ( time ( NULL ) - d->connected_at ) );
         } else {
-            STARTLOG ( LOG_NET | LOG_LOGIN, "NET", "LOGO" )
-            log_printf ( "[%d/%s] Logout by ",
-                         d->descriptor, d->addr );
-            log_name ( d->player );
-            log_printf
-            ( " <%s: %d cmds, %d bytes in, %d bytes out, %d secs>",
-              conn_reasons[reason], d->command_count,
-              d->input_tot, d->output_tot,
-              ( int ) ( time ( NULL ) - d->connected_at ) );
-            ENDLOG
+            log_printf2 ( LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, conn_reasons[reason], d->command_count, d->input_tot, d->output_tot, ( int ) ( time ( NULL ) - d->connected_at ) );
         }
 
         /*
@@ -766,27 +723,20 @@ void shutdownsock ( DESC *d, int reason ) {
          * Plyr# Flags Cmds ConnTime Loc Money [Site] <DiscRsn> Name
          */
 
-        STARTLOG ( LOG_ACCOUNTING, "DIS", "ACCT" )
         now = mudstate.now - d->connected_at;
         buff2 = unparse_flags ( GOD, d->player );
-        log_printf ( "%d %s %d %d %d %d [%s] <%s> ",
-                     d->player, buff2, d->command_count, ( int ) now,
-                     Location ( d->player ), Pennies ( d->player ),
-                     d->addr, conn_reasons[reason] );
-        log_name ( d->player );
+        log_printf2 ( LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, ( int ) now, Location ( d->player ), Pennies ( d->player ), d->addr, conn_reasons[reason], buff );
         free_sbuf ( buff2 );
-        ENDLOG
         announce_disconnect ( d->player, d, conn_messages[reason] );
     } else {
         if ( reason == R_LOGOUT ) {
             reason = R_QUIT;
         }
-        STARTLOG ( LOG_SECURITY | LOG_NET, "NET", "DISC" )
-        log_printf
-        ( "[%d/%s] Connection closed, never connected. <Reason: %s>",
-          d->descriptor, d->addr, conn_reasons[reason] );
-        ENDLOG
+        log_printf2 ( LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, conn_reasons[reason] );
     }
+
+    XFREE ( buff, "shutdownsock" );
+
     process_output ( d );
     clearstrings ( d );
     /*
@@ -869,10 +819,7 @@ DESC *initializesock ( int s, struct sockaddr_in *a ) {
          * descriptor, our connection with the slave must have died
          * somehow. We make sure to take note appropriately.
          */
-        STARTLOG ( LOG_ALWAYS, "ERR", "SOCK" )
-        log_printf ( "Player descriptor clashes with slave fd %d",
-                     slave_socket );
-        ENDLOG
+        log_printf2 ( LOG_ALWAYS, "ERR", "SOCK", "Player descriptor clashes with slave fd %d", slave_socket );
         slave_socket = -1;
     }
     ndescriptors++;
@@ -1073,20 +1020,22 @@ void emergency_shutdown ( void ) {
  */
 
 void report ( void ) {
-    STARTLOG ( LOG_BUGS, "BUG", "INFO" )
-    log_printf ( "Command: '%s'", mudstate.debug_cmd );
-    ENDLOG
+    char *player, *enactor;
+
+    log_printf2 ( LOG_BUGS, "BUG", "INFO", "Command: '%s'", mudstate.debug_cmd );
+
     if ( Good_obj ( mudstate.curr_player ) ) {
-        STARTLOG ( LOG_BUGS, "BUG", "INFO" )
-        log_printf ( "Player: " );
-        log_name_and_loc ( mudstate.curr_player );
-        if ( ( mudstate.curr_enactor != mudstate.curr_player ) &&
-                Good_obj ( mudstate.curr_enactor ) ) {
-            log_printf ( " Enactor: " );
-            log_name_and_loc ( mudstate.curr_enactor );
+        player = log_getname ( mudstate.curr_player, "report" );
+        if ( ( mudstate.curr_enactor != mudstate.curr_player ) && Good_obj ( mudstate.curr_enactor ) ) {
+            enactor = log_getname ( mudstate.curr_enactor, "report" );
+            log_printf2 ( LOG_BUGS, "BUG", "INFO", "Player: %s Enactor: %s", player, enactor );
+            XFREE ( enactor, "report" );
+        } else {
+            log_printf2 ( LOG_BUGS, "BUG", "INFO", "Player: %s", player );
         }
-        ENDLOG
+        XFREE ( player, "report" );
     }
+
 }
 
 /*
@@ -1181,9 +1130,7 @@ static void check_panicking ( int sig ) {
 }
 
 void log_signal ( const char *signame ) {
-    STARTLOG ( LOG_PROBLEMS, "SIG", "CATCH" )
-    log_printf ( "Caught signal %s", signame );
-    ENDLOG
+    log_printf2 ( LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signame );
 }
 
 static RETSIGTYPE sighandler ( int sig ) {

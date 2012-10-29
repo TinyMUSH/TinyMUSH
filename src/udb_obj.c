@@ -510,10 +510,7 @@ Obj *get_free_objpipe ( int obj ) {
         mudstate.objpipes[j] = unroll_obj ( data.dptr );
         XFREE ( data.dptr, "get_free_objpipe.3" );
         if ( mudstate.objpipes[j] == NULL ) {
-            STARTLOG ( LOG_PROBLEMS, "ERR", "CACHE" )
-            log_printf ( "Null returned on unroll of object #%d",
-                         j );
-            ENDLOG
+            log_printf2 ( LOG_PROBLEMS, "ERR", "CACHE", "Null returned on unroll of object #%d", j );
             return ( NULL );
         }
     } else {

@@ -143,9 +143,7 @@ static int fcache_read ( FBLOCK **cp, char *filename ) {
          * Failure: log the event
          */
 
-        STARTLOG ( LOG_PROBLEMS, "FIL", "OPEN" )
-        log_printf ( "Couldn't open file '%s'.", filename );
-        ENDLOG
+        log_printf2 ( LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename );
         tf_close ( fd );
         return -1;
     }

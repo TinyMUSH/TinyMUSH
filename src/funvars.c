@@ -2652,7 +2652,7 @@ void structure_clr ( dbref thing ) {
 
     HASHENT *hptr;
 
-    char tbuf[SBUF_SIZE], ibuf[SBUF_SIZE], cbuf[SBUF_SIZE], *tp, *ip, *cp;
+    char tbuf[SBUF_SIZE], ibuf[SBUF_SIZE], cbuf[SBUF_SIZE], *tp, *ip, *cp, *tname;
 
     int i, j, len, count;
 
@@ -2779,13 +2779,9 @@ void structure_clr ( dbref thing ) {
     if ( count > 0 ) {
         for ( i = 0; i < count; i++ ) {
             if ( struct_array[i]->n_instances > 0 ) {
-                STARTLOG ( LOG_ALWAYS, "BUG", "STRUCT" )
-                log_name ( thing );
-                log_printf
-                ( " structure %s has %d allocated instances uncleared.",
-                  name_array[i],
-                  struct_array[i]->n_instances );
-                ENDLOG
+                tname = log_getname ( thing, "structure_clr" );
+                log_printf2 ( LOG_ALWAYS, "BUG", "STRUCT", "%s's structure %s has %d allocated instances uncleared.", tname, name_array[i], struct_array[i]->n_instances );
+                XFREE ( tname, "structure_clr" );
             }
             hashdelete ( name_array[i], &mudstate.structs_htab );
             ip = ibuf;
@@ -2859,6 +2855,7 @@ void stack_clr ( dbref thing ) {
 
 static int stack_set ( dbref thing, OBJSTACK *sp ) {
     OBJSTACK *xsp;
+    char *tname;
 
     int stat;
 
@@ -2874,9 +2871,9 @@ static int stack_set ( dbref thing, OBJSTACK *sp ) {
         Set_Max ( mudstate.max_stacks, mudstate.objstack_htab.entries );
     }
     if ( stat < 0 ) {		/* failure for some reason */
-        STARTLOG ( LOG_BUGS, "STK", "SET" )
-        log_name ( thing );
-        ENDLOG
+        tname = log_getname ( thing, "stack_set" );
+        log_printf2 ( LOG_BUGS, "STK", "SET", "%s, Failure", tname );
+        XFREE ( tname, "stack_set" );
         stack_clr ( thing );
         return 0;
     }
@@ -3963,7 +3960,7 @@ void fun_gridmake ( char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     int rows, cols, dimension, r, c, status, data_rows, data_elems, errs;
 
-    char *rbuf;
+    char *rbuf, *pname;
 
     char **row_text, **elem_text;
 
@@ -4006,9 +4003,9 @@ void fun_gridmake ( char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     status = nhashadd ( player, ( int * ) ogp, &mudstate.objgrid_htab );
     if ( status < 0 ) {
-        STARTLOG ( LOG_BUGS, "GRD", "MAKE" )
-        log_name ( player );
-        ENDLOG
+        pname = log_getname ( player, "fun_gridmake" );
+        log_printf2 ( LOG_BUGS, "GRD", "MAKE", "%s Failure" );
+        XFREE ( pname, "fun_gridmake" );
         grid_free ( player, ogp );
         safe_str ( "#-1 FAILURE", buff, bufc );
         return;

@@ -64,9 +64,7 @@ void dddb_setsync ( int flag ) {
 }
 
 static void dbm_error ( char *msg ) {
-    STARTLOG ( LOG_ALWAYS, "DB", "ERROR" )
-    log_printf ( "Database error: %s\n", msg );
-    ENDLOG
+    log_printf2 ( LOG_ALWAYS, "DB", "ERROR", "Database error: %s\n", msg );
 }
 
 /* gdbm_reorganize compresses unused space in the db */

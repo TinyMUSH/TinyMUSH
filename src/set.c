@@ -167,7 +167,7 @@ void do_chzone ( dbref player, dbref cause, int key, const char *name, const cha
 void do_name ( dbref player, dbref cause, int key, const char *name, char *newname ) {
     dbref thing;
 
-    char *buff;
+    char *buff, *thingname;
 
     if ( ( thing = match_controlled ( player, name ) ) == NOTHING ) {
         return;
@@ -204,9 +204,10 @@ void do_name ( dbref player, dbref cause, int key, const char *name, char *newna
         /*
          * everything ok, notify
          */
-        STARTLOG ( LOG_SECURITY, "SEC", "CNAME" )
-        log_name ( thing ), log_printf ( " renamed to %s", buff );
-        ENDLOG
+        thingname = log_getname ( thing, "do_name" );
+        log_printf2 ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", thingname, buff );
+        XFREE ( thingname, "do_name" );
+
         if ( Suspect ( thing ) ) {
             raw_broadcast ( WIZARD,
                             "[Suspect] %s renamed to %s", Name ( thing ), buff );

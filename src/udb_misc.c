@@ -30,12 +30,11 @@
 
 void log_db_err ( int obj, int attr, const char *txt ) {
     if ( !mudstate.standalone ) {
-        STARTLOG ( LOG_ALWAYS, "DBM", "ERROR" )
-        log_printf ( "Could not %s object #%d", txt, obj );
         if ( attr != NOTHING ) {
-            log_printf ( " attr #%d", attr );
+            log_printf2 ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
+        } else {
+            log_printf2 ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d", txt, obj );
         }
-        ENDLOG
     } else {
         mainlog_printf ( "Could not %s object #%d", txt, obj );
         if ( attr != NOTHING ) {
