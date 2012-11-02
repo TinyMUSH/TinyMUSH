@@ -2342,15 +2342,15 @@ static void helper_cf_display ( dbref player, char *buff, char **bufc, CONF *tp 
         safe_ltos ( buff, bufc, * ( tp->loc ) );
         return;
     }
-    if ( ( tp->interpreter == cf_string ) ) {
+    if ( tp->interpreter == cf_string ) {
         safe_str ( * ( ( char ** ) tp->loc ), buff, bufc );
         return;
     }
-    if ( ( tp->interpreter == cf_dbref ) ) {
+    if ( tp->interpreter == cf_dbref ) {
         safe_dbref ( buff, bufc, * ( tp->loc ) );
         return;
     }
-    if ( ( tp->interpreter == cf_option ) ) {
+    if ( tp->interpreter == cf_option ) {
         opt =
             find_nametab_ent_flag ( GOD, ( NAMETAB * ) tp->extra,
                                     * ( tp->loc ) );

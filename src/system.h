@@ -105,4 +105,6 @@
 #include <ltdl.h>
 #include <libgen.h>
 
+#include <inttypes.h>
+
 #endif	/* __SYSTEM_H */

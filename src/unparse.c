@@ -66,7 +66,7 @@ static void unparse_boolexp1 ( dbref player, BOOLEXP *b, char outer_type, int fo
 
     char *buff;
 
-    if ( ( b == TRUE_BOOLEXP ) ) {
+    if ( b == TRUE_BOOLEXP ) {
         if ( format == F_EXAMINE ) {
             safe_str ( ( char * ) "*UNLOCKED*", boolexp_buf, &buftop );
         }

@@ -30,6 +30,10 @@ extern unsigned int alarm ( unsigned int seconds );
 
 extern void pcache_trim ( void );
 
+extern void do_dbck ( dbref, dbref, int );
+
+extern void do_queue ( dbref, dbref, int, char * );
+
 /* ---------------------------------------------------------------------------
  * Cron-related things. This implementation is somewhat derivative of
  * Paul Vixie's cron implementation. See bitstring.h for the copyright

@@ -589,7 +589,7 @@ DESC *new_connection ( int sock ) {
 
     struct sockaddr_in addr;
 
-    int addr_len, len;
+    socklen_t addr_len, len;
 
     char *buf;
 

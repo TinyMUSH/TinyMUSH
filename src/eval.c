@@ -834,8 +834,10 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     }
                     xtp = xtbuf;
                     safe_ltos ( xtbuf, &xtp, player );
-                    safe_chr ( '.', xtbuf, &xtp );
-                    safe_chr ( ch, xtbuf, &xtp );
+                    /* safe_chr ( '.', xtbuf, &xtp ); */
+                    safe_copy_chr('.', xtbuf, &xtp, SBUF_SIZE-1);
+                    /* safe_chr ( ch, xtbuf, &xtp ); */
+                    safe_copy_chr(ch, xtbuf, &xtp, SBUF_SIZE-1);
                 } else {
                     xptr = *dstr;
                     ( *dstr ) ++;
@@ -845,7 +847,8 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     }
                     xtp = xtbuf;
                     safe_ltos ( xtbuf, &xtp, player );
-                    safe_chr ( '.', xtbuf, &xtp );
+                    /* safe_chr ( '.', xtbuf, &xtp ); */
+                    safe_copy_chr('.', xtbuf, &xtp, SBUF_SIZE-1);
                     while ( **dstr && ( **dstr != '>' ) ) {
                         /*
                          * Copy. No interpretation.

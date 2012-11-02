@@ -895,16 +895,14 @@ void do_wait ( dbref player, dbref cause, int key, char *event, char *cmd, char 
 
     if ( is_number ( event ) ) {
         if ( key & WAIT_UNTIL ) {
-            howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );
-            - time ( NULL );
+            howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 ) - time ( NULL );
             if ( howlong < 0 ) {
                 howlong = 0;
             }
         } else {
-            howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );;
+            howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );
         }
-        wait_que ( player, cause, howlong, NOTHING, 0, cmd,
-                   cargs, ncargs, mudstate.rdata );
+        wait_que ( player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mudstate.rdata );
         return;
     }
     /*
@@ -929,13 +927,12 @@ void do_wait ( dbref player, dbref cause, int key, char *event, char *cmd, char 
         if ( event && *event && is_number ( event ) ) {
             attr = A_SEMAPHORE;
             if ( key & WAIT_UNTIL ) {
-                howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );
-                - time ( NULL );
+                howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 ) - time ( NULL );
                 if ( howlong < 0 ) {
                     howlong = 0;
                 }
             } else {
-                howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );;
+                howlong = ( int ) strtol ( event, ( char ** ) NULL, 10 );
             }
         } else {
             attr = A_SEMAPHORE;

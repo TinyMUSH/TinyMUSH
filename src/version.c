@@ -103,10 +103,10 @@ void init_version ( void ) {
     string = XSTRDUP ( PACKAGE_VERSION, "init_version" );
 
     if ( string != NULL ) {
-        mudstate.version.major =    strtoimax ( strsep ( &string, "." ), ( char * ) NULL, 10 );
-        mudstate.version.minor =    strtoimax ( strsep ( &string, "." ), ( char * ) NULL, 10 );
-        mudstate.version.status =   strtoimax ( strsep ( &string, "." ), ( char * ) NULL, 10 );
-        mudstate.version.revision = strtoimax ( strsep ( &string, "." ), ( char * ) NULL, 10 );
+        mudstate.version.major =    strtoimax ( strsep ( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.minor =    strtoimax ( strsep ( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.status =   strtoimax ( strsep ( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.revision = strtoimax ( strsep ( &string, "." ), ( char **) NULL, 10 );
     } else {
         /* If we hit that, we have a serious problem... */
         mudstate.version.major = 0;

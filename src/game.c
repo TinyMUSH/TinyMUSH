@@ -98,6 +98,10 @@ extern int optind;
 
 void recover ( char * );
 
+int tailfind ( char *, char * );
+
+int backup_mush ( dbref, dbref, int );
+
 
 /*
  * Used to figure out if netmush is already running. Since there's
@@ -167,7 +171,7 @@ int fileexist ( char *file ) {
 #define HANDLE_FLAT_CRASH	1
 #define HANDLE_FLAT_KILL	2
 
-int handlestartupflatfiles ( int flag ) {
+void handlestartupflatfiles ( int flag ) {
     char *db, *flat, *db_bak, *flat_bak, *ts;
     int i;
     struct stat sb1, sb2;
@@ -1583,10 +1587,10 @@ int backup_mush ( dbref player, dbref cause, int key ) {
 
     if ( ( fp = popen ( s, "r" ) ) != NULL ) {
         while ( fgets ( buff, MBUF_SIZE, fp ) !=NULL ) {
-            if ( tb = strchr ( buff, '\n' ) ) {
+            if ( (tb = strchr ( buff, '\n' )) ) {
                 tb[0]=0x00;
             }
-            if ( tb = strchr ( buff, '\r' ) ) {
+            if ( (tb = strchr ( buff, '\r' )) ) {
                 tb[0]=0x00;
             }
             log_printf2 ( LOG_ALWAYS, "BCK", "RUN", "%s", buff );
