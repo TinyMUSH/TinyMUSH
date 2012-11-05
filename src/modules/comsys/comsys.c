@@ -496,9 +496,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 		break;
 	}
 	if (!wp) {
-	    STARTLOG(LOG_ALWAYS, "BUG", "COM")
-	      log_printf("Object #%d with alias %s is on channel %s but not on its player list.", player, cap->alias, cap->channel->name);
-	    ENDLOG
+	    log_write(LOG_ALWAYS, "BUG", "COM", "Object #%d with alias %s is on channel %s but not on its player list.", player, cap->alias, cap->channel->name);
 	    notify(player, "An unusual channel error has been detected.");
 	    return;
 	}
@@ -527,9 +525,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap) {
 		break;
 	}
 	if (!wp) {
-	    STARTLOG(LOG_ALWAYS, "BUG", "COM")
-	      log_printf("Object #%d with alias %s is on channel %s but not on its player list.", player, cap->alias, cap->channel->name);
-	    ENDLOG
+	    log_write(LOG_ALWAYS, "BUG", "COM", "Object #%d with alias %s is on channel %s but not on its player list.", player, cap->alias, cap->channel->name);
 	    notify(player, "An unusual channel error has been detected.");
 	    return;
 	}
@@ -1899,9 +1895,7 @@ static void read_comsys(FILE *fp, int com_ver) {
 
     s = (char *) getstring_noalloc(fp, 0);
     if (strcmp(s, (char *) "*** END OF DUMP ***")) {
-	STARTLOG(LOG_STARTUP, "INI", "COM")
-	    log_printf("Aborted load on unexpected line: %s", s);
-	ENDLOG
+        log_write(LOG_STARTUP, "INI", "COM", "Aborted load on unexpected line: %s", s);
     }
 }
 
@@ -1966,9 +1960,7 @@ void mod_comsys_load_database(FILE *fp) {
 	read_comsys(fp, atoi(buffer + 2));
 	sanitize_comsys();
     } else {
-	STARTLOG(LOG_STARTUP, "INI", "COM")
-	    log_printf("Unrecognized comsys format.");
-	ENDLOG
+        log_write(LOG_STARTUP, "INI", "COM", "Unrecognized comsys format.");
 	mod_comsys_make_minimal();
     }
 }

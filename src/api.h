@@ -16,9 +16,7 @@
     int dg__i; \
     dg__new_db = (proto *) XMALLOC((new_size + SIZE_HACK) * sizeof(proto), "db_grow.mod_db"); \
     if (!dg__new_db) { \
-	STARTLOG(LOG_ALWAYS, "ALC", "DB") \
-	    log_printf("Could not allocate space for %d item module struct database.", new_size); \
-	ENDLOG \
+        log_write(LOG_ALWAYS, "ALC", "DB", "Could not allocate space for %d item module struct database.", new_size); \
 	abort(); \
     } \
     if (old_db) { \

@@ -66,10 +66,10 @@ extern LOGFILETAB logfds_table[];
  * cf_init: Initialize mudconf to default values.
  */
 
-void cf_init ( void ) {
+void cf_init( void ) {
     char *s;
 
-    s = XMALLOC ( MBUF_SIZE, "cf_init" );
+    s = XMALLOC( MBUF_SIZE, "cf_init" );
 
     mudstate.modules_list = NULL;
     mudstate.modloaded[0] = '\0';
@@ -81,26 +81,26 @@ void cf_init ( void ) {
     mudconf.guest_char = NOTHING;
     mudconf.guest_nuker = GOD;
     mudconf.number_guests = 30;
-    mudconf.guest_basename = XSTRDUP ( "Guest", "cf_string" );
-    mudconf.guest_password = XSTRDUP ( "guest", "cf_string" );
-    mudconf.guest_prefixes = XSTRDUP ( "", "cf_string" );
-    mudconf.guest_suffixes = XSTRDUP ( "", "cf_string" );
+    mudconf.guest_basename = XSTRDUP( "Guest", "cf_string" );
+    mudconf.guest_password = XSTRDUP( "guest", "cf_string" );
+    mudconf.guest_prefixes = XSTRDUP( "", "cf_string" );
+    mudconf.guest_suffixes = XSTRDUP( "", "cf_string" );
 
-    mudconf.backup_exec = XSTRDUP ( DEFAULT_BACKUP_UTIL, "cf_string" );
-    mudconf.backup_compress = XSTRDUP ( DEFAULT_BACKUP_COMPRESS, "cf_string" );
-    mudconf.backup_extract = XSTRDUP ( DEFAULT_BACKUP_EXTRACT, "cf_string" );
-    mudconf.backup_ext = XSTRDUP ( DEFAULT_BACKUP_EXT, "cf_string" );
+    mudconf.backup_exec = XSTRDUP( DEFAULT_BACKUP_UTIL, "cf_string" );
+    mudconf.backup_compress = XSTRDUP( DEFAULT_BACKUP_COMPRESS, "cf_string" );
+    mudconf.backup_extract = XSTRDUP( DEFAULT_BACKUP_EXTRACT, "cf_string" );
+    mudconf.backup_ext = XSTRDUP( DEFAULT_BACKUP_EXT, "cf_string" );
 
-    mudconf.mudowner = XSTRDUP ( "", "cf_string" );
+    mudconf.mudowner = XSTRDUP( "", "cf_string" );
 
-    mudconf.binhome = XSTRDUP ( DEFAULT_BINARY_HOME, "cf_string" );
-    mudconf.dbhome = XSTRDUP ( DEFAULT_DATABASE_HOME, "cf_string" );
-    mudconf.txthome = XSTRDUP ( DEFAULT_TEXT_HOME, "cf_string" );
-    mudconf.bakhome = XSTRDUP ( DEFAULT_BACKUP_HOME, "cf_string" );
-    mudconf.modules_home =  XSTRDUP ( DEFAULT_MODULES_HOME, "cf_string" );
-    mudconf.scripts_home = XSTRDUP ( DEFAULT_SCRIPTS_HOME, "cf_string" );
-    mudconf.log_home = XSTRDUP ( DEFAULT_LOG_HOME, "cf_string" );
-    mudconf.pid_home = XSTRDUP ( DEFAULT_PID_HOME, "cf_string" );
+    mudconf.binhome = XSTRDUP( DEFAULT_BINARY_HOME, "cf_string" );
+    mudconf.dbhome = XSTRDUP( DEFAULT_DATABASE_HOME, "cf_string" );
+    mudconf.txthome = XSTRDUP( DEFAULT_TEXT_HOME, "cf_string" );
+    mudconf.bakhome = XSTRDUP( DEFAULT_BACKUP_HOME, "cf_string" );
+    mudconf.modules_home =  XSTRDUP( DEFAULT_MODULES_HOME, "cf_string" );
+    mudconf.scripts_home = XSTRDUP( DEFAULT_SCRIPTS_HOME, "cf_string" );
+    mudconf.log_home = XSTRDUP( DEFAULT_LOG_HOME, "cf_string" );
+    mudconf.pid_home = XSTRDUP( DEFAULT_PID_HOME, "cf_string" );
 
     /*
      * We can make theses NULL because we are going to define
@@ -126,17 +126,17 @@ void cf_init ( void ) {
     mudconf.htmlconn_file = NULL;
 #endif
 
-    mudconf.motd_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.wizmotd_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.downmotd_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.fullmotd_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.dump_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.postdump_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.fixed_home_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.fixed_tel_msg = XSTRDUP ( "", "cf_string" );
-    mudconf.huh_msg = XSTRDUP ( "Huh?  (Type \"help\" for help.)", "cf_string" );
+    mudconf.motd_msg = XSTRDUP( "", "cf_string" );
+    mudconf.wizmotd_msg = XSTRDUP( "", "cf_string" );
+    mudconf.downmotd_msg = XSTRDUP( "", "cf_string" );
+    mudconf.fullmotd_msg = XSTRDUP( "", "cf_string" );
+    mudconf.dump_msg = XSTRDUP( "", "cf_string" );
+    mudconf.postdump_msg = XSTRDUP( "", "cf_string" );
+    mudconf.fixed_home_msg = XSTRDUP( "", "cf_string" );
+    mudconf.fixed_tel_msg = XSTRDUP( "", "cf_string" );
+    mudconf.huh_msg = XSTRDUP( "Huh?  (Type \"help\" for help.)", "cf_string" );
 #ifdef PUEBLO_SUPPORT
-    mudconf.pueblo_msg = XSTRDUP ( "</xch_mudtext><img xch_mode=html><tt>", "cf_string" );
+    mudconf.pueblo_msg = XSTRDUP( "</xch_mudtext><img xch_mode=html><tt>", "cf_string" );
 #endif
     mudconf.infotext_list = NULL;
     mudconf.indent_desc = 0;
@@ -295,11 +295,11 @@ void cf_init ( void ) {
     mudconf.stripped_flags.word3 = 0;
     mudconf.vattr_flags = 0;
     mudconf.vattr_flag_list = NULL;
-    mudconf.mud_name = XSTRDUP ( "TinyMUSH", "cf_string" );
+    mudconf.mud_name = XSTRDUP( "TinyMUSH", "cf_string" );
     //mudconf.mud_shortname = XSTRDUP("", "cf_string");
-    mudconf.one_coin = XSTRDUP ( "penny", "cf_string" );
-    mudconf.many_coins = XSTRDUP ( "pennies", "cf_string" );
-    mudconf.struct_dstr = XSTRDUP ( "\r\n", "cf_string" );
+    mudconf.one_coin = XSTRDUP( "penny", "cf_string" );
+    mudconf.many_coins = XSTRDUP( "pennies", "cf_string" );
+    mudconf.struct_dstr = XSTRDUP( "\r\n", "cf_string" );
     mudconf.timeslice = 1000;
     mudconf.cmd_quota_max = 100;
     mudconf.cmd_quota_incr = 1;
@@ -368,7 +368,7 @@ void cf_init ( void ) {
     mudstate.flatfile_flag = 0;
     mudstate.attr_next = A_USER_START;
     mudstate.debug_cmd = ( char * ) "< init >";
-    strcpy ( mudstate.doing_hdr, "Doing" );
+    strcpy( mudstate.doing_hdr, "Doing" );
     mudstate.access_list = NULL;
     mudstate.suspect_list = NULL;
     mudstate.qfirst = NULL;
@@ -427,7 +427,7 @@ void cf_init ( void ) {
     mudstate.dbm_fd = -1;
     mudstate.rdata = NULL;
 
-    XFREE ( s, "cf_init" );
+    XFREE( s, "cf_init" );
 }
 
 /*
@@ -435,11 +435,11 @@ void cf_init ( void ) {
  * cf_log_notfound: Log a 'parameter not found' error.
  */
 
-void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thing ) {
-    if ( mudstate.initializing ) {
-        log_write ( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
+void cf_log_notfound( dbref player, char *cmd, const char *thingname, char *thing ) {
+    if( mudstate.initializing ) {
+        log_write( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
     } else {
-        notify ( player, tmprintf ( "%s %s not found", thingname, thing ) );
+        notify( player, tmprintf( "%s %s not found", thingname, thing ) );
     }
 }
 
@@ -448,23 +448,23 @@ void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thi
  * cf_log_syntax: Log a syntax error.
  */
 
-void cf_log_syntax ( dbref player, char *cmd, const char *template, ... ) {
+void cf_log_syntax( dbref player, char *cmd, const char *template, ... ) {
     char *buff;
     va_list ap;
 
-    buff = alloc_lbuf ( "cf_include" );
+    buff = alloc_lbuf( "cf_include" );
 
-    va_start ( ap, template );
-    vsnprintf ( buff, LBUF_SIZE, template, ap );
-    va_end ( ap );
+    va_start( ap, template );
+    vsnprintf( buff, LBUF_SIZE, template, ap );
+    va_end( ap );
 
-    if ( mudstate.initializing ) {
-        log_write ( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
+    if( mudstate.initializing ) {
+        log_write( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
+        notify( player, tmprintf( "%s: %s", cmd, buff ) );
     }
 
-    free_lbuf ( buff );
+    free_lbuf( buff );
 }
 
 /*
@@ -472,23 +472,23 @@ void cf_log_syntax ( dbref player, char *cmd, const char *template, ... ) {
  * cf_log_help: Log a help loader message.
  */
 
-void cf_log_help ( dbref player, char *cmd, const char *template, ... ) {
+void cf_log_help( dbref player, char *cmd, const char *template, ... ) {
     char *buff;
     va_list ap;
 
-    buff = alloc_lbuf ( "cf_include" );
+    buff = alloc_lbuf( "cf_include" );
 
-    va_start ( ap, template );
-    vsnprintf ( buff, LBUF_SIZE, template, ap );
-    va_end ( ap );
+    va_start( ap, template );
+    vsnprintf( buff, LBUF_SIZE, template, ap );
+    va_end( ap );
 
-    if ( mudstate.initializing ) {
-        log_write ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
+    if( mudstate.initializing ) {
+        log_write( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
+        notify( player, tmprintf( "%s: %s", cmd, buff ) );
     }
 
-    free_lbuf ( buff );
+    free_lbuf( buff );
 
 }
 
@@ -497,23 +497,23 @@ void cf_log_help ( dbref player, char *cmd, const char *template, ... ) {
  * cf_log_help_mkindx: Log a help indexation message.
  */
 
-void cf_log_help_mkindx ( dbref player, char *cmd, const char *template, ... ) {
+void cf_log_help_mkindx( dbref player, char *cmd, const char *template, ... ) {
     char *buff;
     va_list ap;
 
-    buff = alloc_lbuf ( "cf_include" );
+    buff = alloc_lbuf( "cf_include" );
 
-    va_start ( ap, template );
-    vsnprintf ( buff, LBUF_SIZE, template, ap );
-    va_end ( ap );
+    va_start( ap, template );
+    vsnprintf( buff, LBUF_SIZE, template, ap );
+    va_end( ap );
 
-    if ( mudstate.initializing ) {
-        log_write ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
+    if( mudstate.initializing ) {
+        log_write( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
+        notify( player, tmprintf( "%s: %s", cmd, buff ) );
     }
 
-    free_lbuf ( buff );
+    free_lbuf( buff );
 }
 
 /*
@@ -521,13 +521,13 @@ void cf_log_help_mkindx ( dbref player, char *cmd, const char *template, ... ) {
  * cf_status_from_succfail: Return command status from succ and fail info
  */
 
-int cf_status_from_succfail ( dbref player, char *cmd, int success, int failure ) {
+int cf_status_from_succfail( dbref player, char *cmd, int success, int failure ) {
     /*
      * If any successes, return SUCCESS(0) if no failures or
      * PARTIAL_SUCCESS(1) if any failures.
      */
 
-    if ( success > 0 ) {
+    if( success > 0 ) {
         return ( ( failure == 0 ) ? 0 : 1 );
     }
 
@@ -536,11 +536,11 @@ int cf_status_from_succfail ( dbref player, char *cmd, int success, int failure 
      * FAILURE(-1)
      */
 
-    if ( failure == 0 ) {
-        if ( mudstate.initializing ) {
-            log_write ( LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd );
+    if( failure == 0 ) {
+        if( mudstate.initializing ) {
+            log_write( LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd );
         } else {
-            notify ( player, "Nothing to set" );
+            notify( player, "Nothing to set" );
         }
     }
     return -1;
@@ -551,7 +551,7 @@ int cf_status_from_succfail ( dbref player, char *cmd, int success, int failure 
  * cf_const: Read-only integer or boolean parameter.
  */
 
-int cf_const ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_const( int *vp, char *str, long extra, dbref player, char *cmd ) {
     /*
      * Fail on any attempt to change the value
      */
@@ -564,16 +564,16 @@ int cf_const ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_int: Set integer parameter.
  */
 
-int cf_int ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_int( int *vp, char *str, long extra, dbref player, char *cmd ) {
     /*
      * Copy the numeric value to the parameter
      */
 
-    if ( ( extra > 0 ) && ( ( int ) strtol ( str, ( char ** ) NULL, 10 ) > extra ) ) {
-        cf_log_syntax ( player, cmd, "Value exceeds limit of %d", extra );
+    if( ( extra > 0 ) && ( ( int ) strtol( str, ( char ** ) NULL, 10 ) > extra ) ) {
+        cf_log_syntax( player, cmd, "Value exceeds limit of %d", extra );
         return -1;
     }
-    sscanf ( str, "%d", vp );
+    sscanf( str, "%d", vp );
     return 0;
 }
 
@@ -583,25 +583,25 @@ int cf_int ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cannot be set to 0)
  */
 
-int cf_int_factor ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_int_factor( int *vp, char *str, long extra, dbref player, char *cmd ) {
     int num;
 
     /*
      * Copy the numeric value to the parameter
      */
 
-    num = ( int ) strtol ( str, ( char ** ) NULL, 10 );;
+    num = ( int ) strtol( str, ( char ** ) NULL, 10 );;
 
-    if ( ( extra > 0 ) && ( num > extra ) ) {
-        cf_log_syntax ( player, cmd, "Value exceeds limit of %d", extra );
+    if( ( extra > 0 ) && ( num > extra ) ) {
+        cf_log_syntax( player, cmd, "Value exceeds limit of %d", extra );
         return -1;
     }
-    if ( num == 0 ) {
-        cf_log_syntax ( player, cmd,
-                        "Value cannot be 0.  You may want a value of 1." );
+    if( num == 0 ) {
+        cf_log_syntax( player, cmd,
+                       "Value cannot be 0.  You may want a value of 1." );
         return -1;
     }
-    sscanf ( str, "%d", vp );
+    sscanf( str, "%d", vp );
     return 0;
 }
 
@@ -610,18 +610,18 @@ int cf_int_factor ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_dbref: Set dbref parameter.
  */
 
-int cf_dbref ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_dbref( int *vp, char *str, long extra, dbref player, char *cmd ) {
     int num;
 
     /*
      * No consistency check on initialization.
      */
 
-    if ( mudstate.initializing ) {
-        if ( *str == '#' ) {
-            sscanf ( str, "#%d", vp );
+    if( mudstate.initializing ) {
+        if( *str == '#' ) {
+            sscanf( str, "#%d", vp );
         } else {
-            sscanf ( str, "%d", vp );
+            sscanf( str, "%d", vp );
         }
         return 0;
     }
@@ -630,26 +630,26 @@ int cf_dbref ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * dbref is allowed to be NOTHING.
      */
 
-    if ( *str == '#' ) {
-        num = ( int ) strtol ( str + 1, ( char ** ) NULL, 10 );
+    if( *str == '#' ) {
+        num = ( int ) strtol( str + 1, ( char ** ) NULL, 10 );
     } else {
-        num = ( int ) strtol ( str, ( char ** ) NULL, 10 );
+        num = ( int ) strtol( str, ( char ** ) NULL, 10 );
     }
 
-    if ( ( ( extra == NOTHING ) && ( num == NOTHING ) ) ||
-            ( Good_obj ( num ) && !Going ( num ) ) ) {
-        if ( *str == '#' ) {
-            sscanf ( str, "#%d", vp );
+    if( ( ( extra == NOTHING ) && ( num == NOTHING ) ) ||
+            ( Good_obj( num ) && !Going( num ) ) ) {
+        if( *str == '#' ) {
+            sscanf( str, "#%d", vp );
         } else {
-            sscanf ( str, "%d", vp );
+            sscanf( str, "%d", vp );
         }
         return 0;
     }
-    if ( extra == NOTHING ) {
-        cf_log_syntax ( player, cmd,
-                        "A valid dbref, or -1, is required." );
+    if( extra == NOTHING ) {
+        cf_log_syntax( player, cmd,
+                       "A valid dbref, or -1, is required." );
     } else {
-        cf_log_syntax ( player, cmd, "A valid dbref is required." );
+        cf_log_syntax( player, cmd, "A valid dbref is required." );
     }
     return -1;
 }
@@ -660,21 +660,21 @@ int cf_dbref ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * startup.
  */
 
-int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_module( int *vp, char *str, long extra, dbref player, char *cmd ) {
     lt_dlhandle handle;
 
-    void ( *initptr ) ( void );
+    void ( *initptr )( void );
 
     MODULE *mp;
 
-    handle = lt_dlopen ( tmprintf ( "%s/%s.la", mudconf.modules_home, str ) );
+    handle = lt_dlopen( tmprintf( "%s/%s.la", mudconf.modules_home, str ) );
 
-    if ( !handle ) {
-        log_write ( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
+    if( !handle ) {
+        log_write( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
         return -1;
     }
-    mp = ( MODULE * ) XMALLOC ( sizeof ( MODULE ), "cf_module.mp" );
-    mp->modname = XSTRDUP ( str, "cf_module.name" );
+    mp = ( MODULE * ) XMALLOC( sizeof( MODULE ), "cf_module.mp" );
+    mp->modname = XSTRDUP( str, "cf_module.name" );
     mp->handle = handle;
     mp->next = mudstate.modules_list;
     mudstate.modules_list = mp;
@@ -684,43 +684,43 @@ int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * to change from here on out.
      */
 
-    mp->process_command = DLSYM_INT ( handle, str, "process_command",
-                                      ( dbref, dbref, int, char *, char *[], int ) );
-    mp->process_no_match = DLSYM_INT ( handle, str, "process_no_match",
-                                       ( dbref, dbref, int, char *, char *, char *[], int ) );
-    mp->did_it = DLSYM_INT ( handle, str, "did_it",
-                             ( dbref, dbref, dbref,
-                               int, const char *, int, const char *, int,
-                               int, char *[], int, int ) );
-    mp->create_obj = DLSYM ( handle, str, "create_obj", ( dbref, dbref ) );
-    mp->destroy_obj = DLSYM ( handle, str, "destroy_obj", ( dbref, dbref ) );
-    mp->create_player = DLSYM ( handle, str, "create_player",
-                                ( dbref, dbref, int, int ) );
-    mp->destroy_player = DLSYM ( handle, str, "destroy_player",
-                                 ( dbref, dbref ) );
-    mp->announce_connect = DLSYM ( handle, str, "announce_connect",
-                                   ( dbref, const char *, int ) );
-    mp->announce_disconnect = DLSYM ( handle, str, "announce_disconnect",
-                                      ( dbref, const char *, int ) );
-    mp->examine = DLSYM ( handle, str, "examine",
-                          ( dbref, dbref, dbref, int, int ) );
-    mp->dump_database = DLSYM ( handle, str, "dump_database", ( FILE * ) );
-    mp->db_grow = DLSYM ( handle, str, "db_grow", ( int, int ) );
-    mp->db_write = DLSYM ( handle, str, "db_write", ( void ) );
+    mp->process_command = DLSYM_INT( handle, str, "process_command",
+                                     ( dbref, dbref, int, char *, char *[], int ) );
+    mp->process_no_match = DLSYM_INT( handle, str, "process_no_match",
+                                      ( dbref, dbref, int, char *, char *, char *[], int ) );
+    mp->did_it = DLSYM_INT( handle, str, "did_it",
+                            ( dbref, dbref, dbref,
+                              int, const char *, int, const char *, int,
+                              int, char *[], int, int ) );
+    mp->create_obj = DLSYM( handle, str, "create_obj", ( dbref, dbref ) );
+    mp->destroy_obj = DLSYM( handle, str, "destroy_obj", ( dbref, dbref ) );
+    mp->create_player = DLSYM( handle, str, "create_player",
+                               ( dbref, dbref, int, int ) );
+    mp->destroy_player = DLSYM( handle, str, "destroy_player",
+                                ( dbref, dbref ) );
+    mp->announce_connect = DLSYM( handle, str, "announce_connect",
+                                  ( dbref, const char *, int ) );
+    mp->announce_disconnect = DLSYM( handle, str, "announce_disconnect",
+                                     ( dbref, const char *, int ) );
+    mp->examine = DLSYM( handle, str, "examine",
+                         ( dbref, dbref, dbref, int, int ) );
+    mp->dump_database = DLSYM( handle, str, "dump_database", ( FILE * ) );
+    mp->db_grow = DLSYM( handle, str, "db_grow", ( int, int ) );
+    mp->db_write = DLSYM( handle, str, "db_write", ( void ) );
     mp->db_write_flatfile =
-        DLSYM ( handle, str, "db_write_flatfile", ( FILE * ) );
-    mp->do_second = DLSYM ( handle, str, "do_second", ( void ) );
+        DLSYM( handle, str, "db_write_flatfile", ( FILE * ) );
+    mp->do_second = DLSYM( handle, str, "do_second", ( void ) );
     mp->cache_put_notify =
-        DLSYM ( handle, str, "cache_put_notify", ( DBData, unsigned int ) );
+        DLSYM( handle, str, "cache_put_notify", ( DBData, unsigned int ) );
     mp->cache_del_notify =
-        DLSYM ( handle, str, "cache_del_notify", ( DBData, unsigned int ) );
+        DLSYM( handle, str, "cache_del_notify", ( DBData, unsigned int ) );
 
-    if ( !mudstate.standalone ) {
-        if ( ( initptr = DLSYM ( handle, str, "init", ( void ) ) ) != NULL ) {
-            ( *initptr ) ();
+    if( !mudstate.standalone ) {
+        if( ( initptr = DLSYM( handle, str, "init", ( void ) ) ) != NULL ) {
+            ( *initptr )();
         }
     }
-    log_write ( LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str );
+    log_write( LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str );
     return 0;
 }
 
@@ -744,9 +744,9 @@ NAMETAB		bool_names[] = {
 /* *INDENT-ON* */
 
 
-int cf_bool ( int *vp, char *str, long extra, dbref player, char *cmd ) {
-    *vp = ( int ) search_nametab ( GOD, bool_names, str );
-    if ( *vp < 0 ) {
+int cf_bool( int *vp, char *str, long extra, dbref player, char *cmd ) {
+    *vp = ( int ) search_nametab( GOD, bool_names, str );
+    if( *vp < 0 ) {
         *vp = ( long ) 0;
     }
     return 0;
@@ -757,12 +757,12 @@ int cf_bool ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_option: Select one option from many choices.
  */
 
-int cf_option ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_option( int *vp, char *str, long extra, dbref player, char *cmd ) {
     int i;
 
-    i = search_nametab ( GOD, ( NAMETAB * ) extra, str );
-    if ( i < 0 ) {
-        cf_log_notfound ( player, cmd, "Value", str );
+    i = search_nametab( GOD, ( NAMETAB * ) extra, str );
+    if( i < 0 ) {
+        cf_log_notfound( player, cmd, "Value", str );
         return -1;
     }
     *vp = i;
@@ -774,7 +774,7 @@ int cf_option ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_string: Set string parameter.
  */
 
-int cf_string ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_string( int *vp, char *str, long extra, dbref player, char *cmd ) {
     int retval;
 
     /*
@@ -782,17 +782,17 @@ int cf_string ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     retval = 0;
-    if ( strlen ( str ) >= ( unsigned int ) extra ) {
+    if( strlen( str ) >= ( unsigned int ) extra ) {
         str[extra - 1] = '\0';
-        if ( mudstate.initializing ) {
-            log_write ( LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd );
+        if( mudstate.initializing ) {
+            log_write( LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd );
         } else {
-            notify ( player, "String truncated" );
+            notify( player, "String truncated" );
         }
         retval = 1;
     }
-    XFREE ( * ( char ** ) vp, "cf_string" );
-    * ( char ** ) vp = XSTRDUP ( str, "cf_string" );
+    XFREE( * ( char ** ) vp, "cf_string" );
+    * ( char ** ) vp = XSTRDUP( str, "cf_string" );
     return retval;
 }
 
@@ -801,51 +801,51 @@ int cf_string ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_alias: define a generic hash table alias.
  */
 
-int cf_alias ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_alias( int *vp, char *str, long extra, dbref player, char *cmd ) {
     char *alias, *orig, *p, *tokst;
 
     int *cp, upcase;
 
-    alias = strtok_r ( str, " \t=,", &tokst );
-    orig = strtok_r ( NULL, " \t=,", &tokst );
-    if ( orig ) {
+    alias = strtok_r( str, " \t=,", &tokst );
+    orig = strtok_r( NULL, " \t=,", &tokst );
+    if( orig ) {
         upcase = 0;
-        for ( p = orig; *p; p++ ) {
-            *p = tolower ( *p );
+        for( p = orig; *p; p++ ) {
+            *p = tolower( *p );
         }
-        cp = hashfind ( orig, ( HASHTAB * ) vp );
-        if ( cp == NULL ) {
+        cp = hashfind( orig, ( HASHTAB * ) vp );
+        if( cp == NULL ) {
             upcase++;
-            for ( p = orig; *p; p++ ) {
-                *p = toupper ( *p );
+            for( p = orig; *p; p++ ) {
+                *p = toupper( *p );
             }
-            cp = hashfind ( orig, ( HASHTAB * ) vp );
-            if ( cp == NULL ) {
-                cf_log_notfound ( player, cmd,
-                                  ( char * ) extra, orig );
+            cp = hashfind( orig, ( HASHTAB * ) vp );
+            if( cp == NULL ) {
+                cf_log_notfound( player, cmd,
+                                 ( char * ) extra, orig );
                 return -1;
             }
         }
-        if ( upcase ) {
-            for ( p = alias; *p; p++ ) {
-                *p = toupper ( *p );
+        if( upcase ) {
+            for( p = alias; *p; p++ ) {
+                *p = toupper( *p );
             }
         } else {
-            for ( p = alias; *p; p++ ) {
-                *p = tolower ( *p );
+            for( p = alias; *p; p++ ) {
+                *p = tolower( *p );
             }
         }
-        if ( ( ( HASHTAB * ) vp )->flags & HT_KEYREF ) {
+        if( ( ( HASHTAB * ) vp )->flags & HT_KEYREF ) {
             /*
              * hashadd won't copy it, so we do that here
              */
             p = alias;
-            alias = XSTRDUP ( p, "cf_alias" );
+            alias = XSTRDUP( p, "cf_alias" );
         }
-        return hashadd ( alias, cp, ( HASHTAB * ) vp, HASH_ALIAS );
+        return hashadd( alias, cp, ( HASHTAB * ) vp, HASH_ALIAS );
     } else {
-        cf_log_syntax ( player, cmd, "Invalid original for alias %s",
-                        alias );
+        cf_log_syntax( player, cmd, "Invalid original for alias %s",
+                       alias );
         return -1;
     }
 }
@@ -855,15 +855,15 @@ int cf_alias ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_infotext: Add an arbitrary field to INFO output.
  */
 
-int cf_infotext ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_infotext( int *vp, char *str, long extra, dbref player, char *cmd ) {
     char *fname, *fvalue, *tokst;
 
     LINKEDLIST *itp, *prev;
 
-    fname = strtok_r ( str, " \t=,", &tokst );
+    fname = strtok_r( str, " \t=,", &tokst );
 
-    if ( tokst ) {
-        for ( fvalue = tokst;
+    if( tokst ) {
+        for( fvalue = tokst;
                 *fvalue && ( ( *fvalue == ' ' ) || ( *fvalue == '\t' ) );
                 fvalue++ ) {
             /*
@@ -874,18 +874,18 @@ int cf_infotext ( int *vp, char *str, long extra, dbref player, char *cmd ) {
         fvalue = NULL;
     }
 
-    if ( !fvalue || !*fvalue ) {
-        for ( itp = mudconf.infotext_list, prev = NULL;
+    if( !fvalue || !*fvalue ) {
+        for( itp = mudconf.infotext_list, prev = NULL;
                 itp != NULL; itp = itp->next ) {
-            if ( !strcasecmp ( fname, itp->name ) ) {
-                XFREE ( itp->name, "infotext.name" );
-                XFREE ( itp->value, "infotext.value" );
-                if ( prev ) {
+            if( !strcasecmp( fname, itp->name ) ) {
+                XFREE( itp->name, "infotext.name" );
+                XFREE( itp->value, "infotext.value" );
+                if( prev ) {
                     prev->next = itp->next;
                 } else {
                     mudconf.infotext_list = itp->next;
                 }
-                XFREE ( itp, "infotext.struct" );
+                XFREE( itp, "infotext.struct" );
                 return 1;
             } else {
                 prev = itp;
@@ -897,10 +897,10 @@ int cf_infotext ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * Otherwise we're setting. Replace if we had a previous value.
      */
 
-    for ( itp = mudconf.infotext_list; itp != NULL; itp = itp->next ) {
-        if ( !strcasecmp ( fname, itp->name ) ) {
-            XFREE ( itp->value, "infotext.value" );
-            itp->value = XSTRDUP ( fvalue, "infotext.value" );
+    for( itp = mudconf.infotext_list; itp != NULL; itp = itp->next ) {
+        if( !strcasecmp( fname, itp->name ) ) {
+            XFREE( itp->value, "infotext.value" );
+            itp->value = XSTRDUP( fvalue, "infotext.value" );
             return 1;
         }
     }
@@ -909,9 +909,9 @@ int cf_infotext ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * No previous value. Add a node.
      */
 
-    itp = ( LINKEDLIST * ) XMALLOC ( sizeof ( LINKEDLIST ), "infotext.struct" );
-    itp->name = XSTRDUP ( fname, "infotext.name" );
-    itp->value = XSTRDUP ( fvalue, "infotext.value" );
+    itp = ( LINKEDLIST * ) XMALLOC( sizeof( LINKEDLIST ), "infotext.struct" );
+    itp->name = XSTRDUP( fname, "infotext.name" );
+    itp->value = XSTRDUP( fvalue, "infotext.value" );
     itp->next = mudconf.infotext_list;
     mudconf.infotext_list = itp;
     return 1;
@@ -922,7 +922,7 @@ int cf_infotext ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_divert_log: Redirect a log type.
  */
 
-int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_divert_log( int *vp, char *str, long extra, dbref player, char *cmd ) {
     char *type_str, *file_str, *tokst;
 
     int f, fd;
@@ -935,38 +935,38 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * Two args, two args only
      */
 
-    type_str = strtok_r ( str, " \t", &tokst );
-    file_str = strtok_r ( NULL, " \t", &tokst );
-    if ( !type_str || !file_str ) {
-        cf_log_syntax ( player, cmd, "Missing pathname to log to.",
-                        ( char * ) "" );
+    type_str = strtok_r( str, " \t", &tokst );
+    file_str = strtok_r( NULL, " \t", &tokst );
+    if( !type_str || !file_str ) {
+        cf_log_syntax( player, cmd, "Missing pathname to log to.",
+                       ( char * ) "" );
         return -1;
     }
     /*
      * Find the log.
      */
 
-    f = search_nametab ( GOD, ( NAMETAB * ) extra, type_str );
-    if ( f <= 0 ) {
-        cf_log_notfound ( player, cmd, "Log diversion", type_str );
+    f = search_nametab( GOD, ( NAMETAB * ) extra, type_str );
+    if( f <= 0 ) {
+        cf_log_notfound( player, cmd, "Log diversion", type_str );
         return -1;
     }
-    for ( tp = logfds_table; tp->log_flag; tp++ ) {
-        if ( tp->log_flag == f ) {
+    for( tp = logfds_table; tp->log_flag; tp++ ) {
+        if( tp->log_flag == f ) {
             break;
         }
     }
-    if ( tp == NULL ) {	/* This should never happen! */
-        cf_log_notfound ( player, cmd, "Logfile table corruption",
-                          type_str );
+    if( tp == NULL ) {	/* This should never happen! */
+        cf_log_notfound( player, cmd, "Logfile table corruption",
+                         type_str );
         return -1;
     }
     /*
      * We shouldn't have a file open already.
      */
 
-    if ( tp->filename != NULL ) {
-        log_write ( LOG_STARTUP, "CNF", "DIVT", "Log type %s already diverted: %s", type_str, tp->filename );
+    if( tp->filename != NULL ) {
+        log_write( LOG_STARTUP, "CNF", "DIVT", "Log type %s already diverted: %s", type_str, tp->filename );
         return -1;
     }
     /*
@@ -974,8 +974,8 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     fptr = NULL;
-    for ( lp = logfds_table; lp->log_flag; lp++ ) {
-        if ( lp->filename && !strcmp ( file_str, lp->filename ) ) {
+    for( lp = logfds_table; lp->log_flag; lp++ ) {
+        if( lp->filename && !strcmp( file_str, lp->filename ) ) {
             fptr = lp->fileptr;
             break;
         }
@@ -985,23 +985,23 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * We don't have this filename yet. Open the logfile.
      */
 
-    if ( !fptr ) {
-        fptr = fopen ( file_str, "w" );
-        if ( !fptr ) {
-            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot open logfile: %s", file_str );
+    if( !fptr ) {
+        fptr = fopen( file_str, "w" );
+        if( !fptr ) {
+            log_write( LOG_STARTUP, "CNF", "DIVT", "Cannot open logfile: %s", file_str );
             return -1;
         }
-        if ( ( fd = fileno ( fptr ) ) == -1 ) {
+        if( ( fd = fileno( fptr ) ) == -1 ) {
             return -1;
         }
 #ifdef FNDELAY
-        if ( fcntl ( fd, F_SETFL, FNDELAY ) == -1 ) {
-            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
+        if( fcntl( fd, F_SETFL, FNDELAY ) == -1 ) {
+            log_write( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #else
-        if ( fcntl ( fd, F_SETFL, O_NDELAY ) == -1 ) {
-            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
+        if( fcntl( fd, F_SETFL, O_NDELAY ) == -1 ) {
+            log_write( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #endif
@@ -1011,7 +1011,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     tp->fileptr = fptr;
-    tp->filename = XSTRDUP ( file_str, "cf_divert_log" );
+    tp->filename = XSTRDUP( file_str, "cf_divert_log" );
     *vp |= f;
 
     return 0;
@@ -1022,7 +1022,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_modify_bits: set or clear bits in a flag word from a namelist.
  */
 
-int cf_modify_bits ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_modify_bits( int *vp, char *str, long extra, dbref player, char *cmd ) {
     char *sp, *tokst;
 
     int f, negate, success, failure;
@@ -1032,15 +1032,15 @@ int cf_modify_bits ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     success = failure = 0;
-    sp = strtok_r ( str, " \t", &tokst );
-    while ( sp != NULL ) {
+    sp = strtok_r( str, " \t", &tokst );
+    while( sp != NULL ) {
 
         /*
          * Check for negation
          */
 
         negate = 0;
-        if ( *sp == '!' ) {
+        if( *sp == '!' ) {
             negate = 1;
             sp++;
         }
@@ -1048,16 +1048,16 @@ int cf_modify_bits ( int *vp, char *str, long extra, dbref player, char *cmd ) {
          * Set or clear the appropriate bit
          */
 
-        f = search_nametab ( GOD, ( NAMETAB * ) extra, sp );
-        if ( f > 0 ) {
-            if ( negate ) {
+        f = search_nametab( GOD, ( NAMETAB * ) extra, sp );
+        if( f > 0 ) {
+            if( negate ) {
                 *vp &= ~f;
             } else {
                 *vp |= f;
             }
             success++;
         } else {
-            cf_log_notfound ( player, cmd, "Entry", sp );
+            cf_log_notfound( player, cmd, "Entry", sp );
             failure++;
         }
 
@@ -1065,9 +1065,9 @@ int cf_modify_bits ( int *vp, char *str, long extra, dbref player, char *cmd ) {
          * Get the next token
          */
 
-        sp = strtok_r ( NULL, " \t", &tokst );
+        sp = strtok_r( NULL, " \t", &tokst );
     }
-    return cf_status_from_succfail ( player, cmd, success, failure );
+    return cf_status_from_succfail( player, cmd, success, failure );
 }
 
 /*
@@ -1079,7 +1079,7 @@ static NAMEDFUNC **all_named_funcs = NULL;
 
 static int num_named_funcs = 0;
 
-static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **xfuncs, int negate ) {
+static int modify_xfuncs( char *fn_name, int ( *fn_ptr )( dbref ), EXTFUNCS **xfuncs, int negate ) {
     EXTFUNCS *xfp;
 
     NAMEDFUNC *np, **tp;
@@ -1092,12 +1092,12 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      * If we're negating, just remove it from the list of functions.
      */
 
-    if ( negate ) {
-        if ( !xfp ) {
+    if( negate ) {
+        if( !xfp ) {
             return 0;
         }
-        for ( i = 0; i < xfp->num_funcs; i++ ) {
-            if ( !strcmp ( xfp->ext_funcs[i]->fn_name, fn_name ) ) {
+        for( i = 0; i < xfp->num_funcs; i++ ) {
+            if( !strcmp( xfp->ext_funcs[i]->fn_name, fn_name ) ) {
                 xfp->ext_funcs[i] = NULL;
                 return 1;
             }
@@ -1109,8 +1109,8 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      */
 
     np = NULL;
-    for ( i = 0; i < num_named_funcs; i++ ) {
-        if ( !strcmp ( all_named_funcs[i]->fn_name, fn_name ) ) {
+    for( i = 0; i < num_named_funcs; i++ ) {
+        if( !strcmp( all_named_funcs[i]->fn_name, fn_name ) ) {
             np = all_named_funcs[i];
             break;
         }
@@ -1120,24 +1120,24 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      * If not, we need to allocate it.
      */
 
-    if ( !np ) {
-        np = ( NAMEDFUNC * ) XMALLOC ( sizeof ( NAMEDFUNC ), "nfunc" );
-        np->fn_name = ( char * ) strdup ( fn_name );
+    if( !np ) {
+        np = ( NAMEDFUNC * ) XMALLOC( sizeof( NAMEDFUNC ), "nfunc" );
+        np->fn_name = ( char * ) strdup( fn_name );
         np->handler = fn_ptr;
     }
     /*
      * Add it to the ones we know about.
      */
 
-    if ( num_named_funcs == 0 ) {
-        all_named_funcs = ( NAMEDFUNC ** ) XMALLOC ( sizeof ( NAMEDFUNC * ),
+    if( num_named_funcs == 0 ) {
+        all_named_funcs = ( NAMEDFUNC ** ) XMALLOC( sizeof( NAMEDFUNC * ),
                           "all_named_funcs" );
         num_named_funcs = 1;
         all_named_funcs[0] = np;
     } else {
-        tp = ( NAMEDFUNC ** ) XREALLOC ( all_named_funcs,
-                                         ( num_named_funcs + 1 ) * sizeof ( NAMEDFUNC * ),
-                                         "all_named_funcs" );
+        tp = ( NAMEDFUNC ** ) XREALLOC( all_named_funcs,
+                                        ( num_named_funcs + 1 ) * sizeof( NAMEDFUNC * ),
+                                        "all_named_funcs" );
         tp[num_named_funcs] = np;
         all_named_funcs = tp;
         num_named_funcs++;
@@ -1147,11 +1147,11 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      * Do we have an existing list of functions? If not, this is easy.
      */
 
-    if ( !xfp ) {
-        xfp = ( EXTFUNCS * ) XMALLOC ( sizeof ( EXTFUNCS ), "xfunc" );
+    if( !xfp ) {
+        xfp = ( EXTFUNCS * ) XMALLOC( sizeof( EXTFUNCS ), "xfunc" );
         xfp->num_funcs = 1;
         xfp->ext_funcs =
-            ( NAMEDFUNC ** ) XMALLOC ( sizeof ( NAMEDFUNC * ), "nfuncs" );
+            ( NAMEDFUNC ** ) XMALLOC( sizeof( NAMEDFUNC * ), "nfuncs" );
         xfp->ext_funcs[0] = np;
         *xfuncs = xfp;
         return 1;
@@ -1160,8 +1160,8 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      * See if we have an empty slot to insert into.
      */
 
-    for ( i = 0; i < xfp->num_funcs; i++ ) {
-        if ( !xfp->ext_funcs[i] ) {
+    for( i = 0; i < xfp->num_funcs; i++ ) {
+        if( !xfp->ext_funcs[i] ) {
             xfp->ext_funcs[i] = np;
             return 1;
         }
@@ -1171,8 +1171,8 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
      * Guess not. Tack it onto the end.
      */
 
-    tp = ( NAMEDFUNC ** ) XREALLOC ( xfp->ext_funcs,
-                                     ( xfp->num_funcs + 1 ) * sizeof ( NAMEDFUNC * ), "nfuncs" );
+    tp = ( NAMEDFUNC ** ) XREALLOC( xfp->ext_funcs,
+                                    ( xfp->num_funcs + 1 ) * sizeof( NAMEDFUNC * ), "nfuncs" );
     tp[xfp->num_funcs] = np;
     xfp->ext_funcs = tp;
     xfp->num_funcs++;
@@ -1184,29 +1184,29 @@ static int modify_xfuncs ( char *fn_name, int ( *fn_ptr ) ( dbref ), EXTFUNCS **
  * parse_ext_access: Parse an extended access list with module callouts.
  */
 
-int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd ) {
+int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd ) {
     char *sp, *tokst, *cp, *ostr;
 
     int f, negate, success, failure, got_one;
 
     MODULE *mp;
 
-    int ( *hp ) ( dbref );
+    int ( *hp )( dbref );
 
     /*
      * Walk through the tokens
      */
 
     success = failure = 0;
-    sp = strtok_r ( str, " \t", &tokst );
-    while ( sp != NULL ) {
+    sp = strtok_r( str, " \t", &tokst );
+    while( sp != NULL ) {
 
         /*
          * Check for negation
          */
 
         negate = 0;
-        if ( *sp == '!' ) {
+        if( *sp == '!' ) {
             negate = 1;
             sp++;
         }
@@ -1214,9 +1214,9 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
          * Set or clear the appropriate bit
          */
 
-        f = search_nametab ( GOD, ntab, sp );
-        if ( f > 0 ) {
-            if ( negate ) {
+        f = search_nametab( GOD, ntab, sp );
+        if( f > 0 ) {
+            if( negate ) {
                 *perms &= ~f;
             } else {
                 *perms |= f;
@@ -1230,21 +1230,21 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
 
             got_one = 0;
 
-            if ( !strncmp ( sp, "mod_", 4 ) ) {
+            if( !strncmp( sp, "mod_", 4 ) ) {
 
                 /*
                  * Split it apart, see if we have anything.
                  */
 
-                ostr = ( char * ) strdup ( sp );
-                if ( * ( sp + 4 ) != '\0' ) {
-                    cp = strchr ( sp + 4, '_' );
-                    if ( cp ) {
+                ostr = ( char * ) strdup( sp );
+                if( * ( sp + 4 ) != '\0' ) {
+                    cp = strchr( sp + 4, '_' );
+                    if( cp ) {
                         *cp++ = '\0';
-                        WALK_ALL_MODULES ( mp ) {
+                        WALK_ALL_MODULES( mp ) {
                             got_one = 1;
-                            if ( !strcmp ( sp + 4,
-                                           mp->modname ) ) {
+                            if( !strcmp( sp + 4,
+                                         mp->modname ) ) {
                                 hp = DLSYM_INT
                                      ( mp->
                                        handle,
@@ -1252,7 +1252,7 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
                                        modname,
                                        cp,
                                        ( dbref ) );
-                                if ( !hp ) {
+                                if( !hp ) {
                                     cf_log_notfound
                                     ( player,
                                       cmd,
@@ -1260,7 +1260,7 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
                                       ostr );
                                     failure++;
                                 } else {
-                                    if ( modify_xfuncs ( ostr, hp, xperms, negate ) ) {
+                                    if( modify_xfuncs( ostr, hp, xperms, negate ) ) {
                                         success++;
                                     } else {
                                         failure++;
@@ -1269,19 +1269,19 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
                                 break;
                             }
                         }
-                        if ( !got_one ) {
-                            cf_log_notfound ( player,
-                                              cmd,
-                                              "Loaded module",
-                                              sp + 4 );
+                        if( !got_one ) {
+                            cf_log_notfound( player,
+                                             cmd,
+                                             "Loaded module",
+                                             sp + 4 );
                             got_one = 1;
                         }
                     }
                 }
-                free ( ostr );
+                free( ostr );
             }
-            if ( !got_one ) {
-                cf_log_notfound ( player, cmd, "Entry", sp );
+            if( !got_one ) {
+                cf_log_notfound( player, cmd, "Entry", sp );
                 failure++;
             }
         }
@@ -1290,10 +1290,10 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
          * Get the next token
          */
 
-        sp = strtok_r ( NULL, " \t", &tokst );
+        sp = strtok_r( NULL, " \t", &tokst );
     }
 
-    return cf_status_from_succfail ( player, cmd, success, failure );
+    return cf_status_from_succfail( player, cmd, success, failure );
 }
 
 /*
@@ -1301,7 +1301,7 @@ int parse_ext_access ( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, 
  * cf_set_flags: Clear flag word and then set from a flags htab.
  */
 
-int cf_set_flags ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_set_flags( int *vp, char *str, long extra, dbref player, char *cmd ) {
     char *sp, *tokst;
 
     FLAGENT *fp;
@@ -1310,8 +1310,8 @@ int cf_set_flags ( int *vp, char *str, long extra, dbref player, char *cmd ) {
 
     int success, failure;
 
-    for ( sp = str; *sp; sp++ ) {
-        *sp = toupper ( *sp );
+    for( sp = str; *sp; sp++ ) {
+        *sp = toupper( *sp );
     }
 
     /*
@@ -1319,32 +1319,32 @@ int cf_set_flags ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     success = failure = 0;
-    sp = strtok_r ( str, " \t", &tokst );
+    sp = strtok_r( str, " \t", &tokst );
     fset = ( FLAGSET * ) vp;
 
-    while ( sp != NULL ) {
+    while( sp != NULL ) {
 
         /*
          * Set the appropriate bit
          */
 
-        fp = ( FLAGENT * ) hashfind ( sp, &mudstate.flags_htab );
-        if ( fp != NULL ) {
-            if ( success == 0 ) {
+        fp = ( FLAGENT * ) hashfind( sp, &mudstate.flags_htab );
+        if( fp != NULL ) {
+            if( success == 0 ) {
                 ( *fset ).word1 = 0;
                 ( *fset ).word2 = 0;
                 ( *fset ).word3 = 0;
             }
-            if ( fp->flagflag & FLAG_WORD3 ) {
+            if( fp->flagflag & FLAG_WORD3 ) {
                 ( *fset ).word3 |= fp->flagvalue;
-            } else if ( fp->flagflag & FLAG_WORD2 ) {
+            } else if( fp->flagflag & FLAG_WORD2 ) {
                 ( *fset ).word2 |= fp->flagvalue;
             } else {
                 ( *fset ).word1 |= fp->flagvalue;
             }
             success++;
         } else {
-            cf_log_notfound ( player, cmd, "Entry", sp );
+            cf_log_notfound( player, cmd, "Entry", sp );
             failure++;
         }
 
@@ -1352,15 +1352,15 @@ int cf_set_flags ( int *vp, char *str, long extra, dbref player, char *cmd ) {
          * Get the next token
          */
 
-        sp = strtok_r ( NULL, " \t", &tokst );
+        sp = strtok_r( NULL, " \t", &tokst );
     }
-    if ( ( success == 0 ) && ( failure == 0 ) ) {
+    if( ( success == 0 ) && ( failure == 0 ) ) {
         ( *fset ).word1 = 0;
         ( *fset ).word2 = 0;
         ( *fset ).word3 = 0;
         return 0;
     }
-    if ( success > 0 ) {
+    if( success > 0 ) {
         return ( ( failure == 0 ) ? 0 : 1 );
     }
     return -1;
@@ -1371,11 +1371,11 @@ int cf_set_flags ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_badname: Disallow use of player name/alias.
  */
 
-int cf_badname ( int *vp, char *str, long extra, dbref player, char *cmd ) {
-    if ( extra ) {
-        badname_remove ( str );
+int cf_badname( int *vp, char *str, long extra, dbref player, char *cmd ) {
+    if( extra ) {
+        badname_remove( str );
     } else {
-        badname_add ( str );
+        badname_add( str );
     }
     return 0;
 }
@@ -1388,17 +1388,17 @@ int cf_badname ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * take steps here to deal with it.
  */
 
-static unsigned long sane_inet_addr ( char *str ) {
+static unsigned long sane_inet_addr( char *str ) {
     int i;
 
     char *p;
 
     p = str;
-    for ( i = 1; ( p = strchr ( p, '.' ) ) != NULL; i++, p++ );
-    if ( i < 4 ) {
+    for( i = 1; ( p = strchr( p, '.' ) ) != NULL; i++, p++ );
+    if( i < 4 ) {
         return INADDR_NONE;
     } else {
-        return inet_addr ( str );
+        return inet_addr( str );
     }
 }
 
@@ -1408,7 +1408,7 @@ static unsigned long sane_inet_addr ( char *str ) {
  * cf_site: Update site information
  */
 
-int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd ) {
+int cf_site( long    **vp, char    *str, long extra, dbref player, char    *cmd ) {
     SITE *site, *last, *head;
 
     char *addr_txt, *mask_txt, *tokst;
@@ -1417,32 +1417,32 @@ int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd
 
     int mask_bits;
 
-    if ( ( mask_txt = strchr ( str, '/' ) ) == NULL ) {
+    if( ( mask_txt = strchr( str, '/' ) ) == NULL ) {
 
         /*
          * Standard IP range and netmask notation.
          */
 
-        addr_txt = strtok_r ( str, " \t=,", &tokst );
-        if ( addr_txt ) {
-            mask_txt = strtok_r ( NULL, " \t=,", &tokst );
+        addr_txt = strtok_r( str, " \t=,", &tokst );
+        if( addr_txt ) {
+            mask_txt = strtok_r( NULL, " \t=,", &tokst );
         }
-        if ( !addr_txt || !*addr_txt || !mask_txt || !*mask_txt ) {
-            cf_log_syntax ( player, cmd,
-                            "Missing host address or mask.", ( char * ) "" );
+        if( !addr_txt || !*addr_txt || !mask_txt || !*mask_txt ) {
+            cf_log_syntax( player, cmd,
+                           "Missing host address or mask.", ( char * ) "" );
             return -1;
         }
-        if ( ( addr_num.s_addr =
-                    sane_inet_addr ( addr_txt ) ) == INADDR_NONE ) {
-            cf_log_syntax ( player, cmd,
-                            "Malformed host address: %s", addr_txt );
+        if( ( addr_num.s_addr =
+                    sane_inet_addr( addr_txt ) ) == INADDR_NONE ) {
+            cf_log_syntax( player, cmd,
+                           "Malformed host address: %s", addr_txt );
             return -1;
         }
-        if ( ( ( mask_num.s_addr =
-                     sane_inet_addr ( mask_txt ) ) == INADDR_NONE )
-                && strcmp ( mask_txt, "255.255.255.255" ) ) {
-            cf_log_syntax ( player, cmd,
-                            "Malformed mask address: %s", mask_txt );
+        if( ( ( mask_num.s_addr =
+                    sane_inet_addr( mask_txt ) ) == INADDR_NONE )
+                && strcmp( mask_txt, "255.255.255.255" ) ) {
+            cf_log_syntax( player, cmd,
+                           "Malformed mask address: %s", mask_txt );
             return -1;
         }
     } else {
@@ -1453,23 +1453,23 @@ int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd
 
         addr_txt = str;
         *mask_txt++ = '\0';
-        mask_bits = ( int ) strtol ( mask_txt, ( char ** ) NULL, 10 );
-        if ( ( mask_bits > 32 ) || ( mask_bits < 0 ) ) {
-            cf_log_syntax ( player, cmd,
-                            "Mask bits (%d) in CIDR IP prefix out of range.",
-                            mask_bits );
+        mask_bits = ( int ) strtol( mask_txt, ( char ** ) NULL, 10 );
+        if( ( mask_bits > 32 ) || ( mask_bits < 0 ) ) {
+            cf_log_syntax( player, cmd,
+                           "Mask bits (%d) in CIDR IP prefix out of range.",
+                           mask_bits );
             return -1;
-        } else if ( mask_bits == 0 ) {
-            mask_num.s_addr = htonl ( 0 );	/* can't shift by 32 */
+        } else if( mask_bits == 0 ) {
+            mask_num.s_addr = htonl( 0 );	/* can't shift by 32 */
         } else {
             mask_num.s_addr =
-                htonl ( 0xFFFFFFFFU << ( 32 - mask_bits ) );
+                htonl( 0xFFFFFFFFU << ( 32 - mask_bits ) );
         }
 
-        if ( ( addr_num.s_addr =
-                    sane_inet_addr ( addr_txt ) ) == INADDR_NONE ) {
-            cf_log_syntax ( player, cmd,
-                            "Malformed host address: %s", addr_txt );
+        if( ( addr_num.s_addr =
+                    sane_inet_addr( addr_txt ) ) == INADDR_NONE ) {
+            cf_log_syntax( player, cmd,
+                           "Malformed host address: %s", addr_txt );
             return -1;
         }
     }
@@ -1479,7 +1479,7 @@ int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd
      * Parse the access entry and allocate space for it
      */
 
-    if ( ! ( site = ( SITE * ) XMALLOC ( sizeof ( SITE ), "cf_site" ) ) ) {
+    if( !( site = ( SITE * ) XMALLOC( sizeof( SITE ), "cf_site" ) ) ) {
         return -1;
     }
 
@@ -1498,11 +1498,11 @@ int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd
      * made while running are processed first.
      */
 
-    if ( mudstate.initializing ) {
-        if ( head == NULL ) {
+    if( mudstate.initializing ) {
+        if( head == NULL ) {
             *vp = ( long * ) site;
         } else {
-            for ( last = head; last->next; last = last->next );
+            for( last = head; last->next; last = last->next );
             last->next = site;
         }
     } else {
@@ -1519,63 +1519,63 @@ int cf_site ( long    **vp, char    *str, long extra, dbref player, char    *cmd
  * taken up with the access nametab.
  */
 
-static int helper_cf_cf_access ( CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra ) {
+static int helper_cf_cf_access( CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra ) {
     /*
      * Cannot modify parameters set STATIC
      */
 
     char * name;
 
-    if ( tp->flags & CA_STATIC ) {
-        notify ( player, NOPERM_MESSAGE );
-        if ( db ) {
-            name = log_getname ( player, "helper_cf_cf_access" );
-            log_write ( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
-            XFREE ( name, "helper_cf_cf_access" );
+    if( tp->flags & CA_STATIC ) {
+        notify( player, NOPERM_MESSAGE );
+        if( db ) {
+            name = log_getname( player, "helper_cf_cf_access" );
+            log_write( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
+            XFREE( name, "helper_cf_cf_access" );
         } else {
-            log_write ( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
+            log_write( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
         }
         return -1;
     }
-    if ( ( long ) vp ) {
-        return ( cf_modify_bits ( &tp->rperms, ap, extra, player, cmd ) );
+    if( ( long ) vp ) {
+        return ( cf_modify_bits( &tp->rperms, ap, extra, player, cmd ) );
     } else {
-        return ( cf_modify_bits ( &tp->flags, ap, extra, player, cmd ) );
+        return ( cf_modify_bits( &tp->flags, ap, extra, player, cmd ) );
     }
 }
 
-int cf_cf_access ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_cf_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
     CONF *tp, *ctab;
 
     char *ap;
 
     MODULE *mp;
 
-    for ( ap = str; *ap && !isspace ( *ap ); ap++ );
-    if ( *ap ) {
+    for( ap = str; *ap && !isspace( *ap ); ap++ );
+    if( *ap ) {
         *ap++ = '\0';
     }
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( !strcmp ( tp->pname, str ) ) {
-            return ( helper_cf_cf_access ( tp, player, vp, ap, cmd,
-                                           extra ) );
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( !strcmp( tp->pname, str ) ) {
+            return ( helper_cf_cf_access( tp, player, vp, ap, cmd,
+                                          extra ) );
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( !strcmp ( tp->pname, str ) ) {
-                    return ( helper_cf_cf_access ( tp, player,
-                                                   vp, ap, cmd, extra ) );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( !strcmp( tp->pname, str ) ) {
+                    return ( helper_cf_cf_access( tp, player,
+                                                  vp, ap, cmd, extra ) );
                 }
             }
         }
     }
 
-    cf_log_notfound ( player, cmd, "Config directive", str );
+    cf_log_notfound( player, cmd, "Config directive", str );
     return -1;
 }
 
@@ -1584,7 +1584,7 @@ int cf_cf_access ( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_helpfile: Add a help/news-style file. Only valid during startup.
  */
 
-int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw ) {
+int add_helpfile( dbref player, char *confcmd, char *str, int is_raw ) {
     char *fcmd, *fpath, *newstr, *tokst, *tstr;
 
     CMDENT *cmdp;
@@ -1599,22 +1599,22 @@ int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw ) {
      * Make a new string so we won't SEGV if given a constant string
      */
 
-    newstr = alloc_mbuf ( "add_helpfile" );
-    strcpy ( newstr, str );
+    newstr = alloc_mbuf( "add_helpfile" );
+    strcpy( newstr, str );
 
-    fcmd = strtok_r ( newstr, " \t=,", &tokst );
-    fpath = strtok_r ( NULL, " \t=,", &tokst );
+    fcmd = strtok_r( newstr, " \t=,", &tokst );
+    fpath = strtok_r( NULL, " \t=,", &tokst );
 
-    cf_log_help ( player, confcmd, "Loading helpfile %s", basename ( fpath ) );
+    cf_log_help( player, confcmd, "Loading helpfile %s", basename( fpath ) );
 
-    if ( fpath == NULL ) {
-        cf_log_syntax ( player, confcmd, "Missing path for helpfile %s", fcmd );
-        free_mbuf ( newstr );
+    if( fpath == NULL ) {
+        cf_log_syntax( player, confcmd, "Missing path for helpfile %s", fcmd );
+        free_mbuf( newstr );
         return -1;
     }
-    if ( fcmd[0] == '_' && fcmd[1] == '_' ) {
-        cf_log_syntax ( player, confcmd, "Helpfile %s would cause @addcommand conflict", fcmd );
-        free_mbuf ( newstr );
+    if( fcmd[0] == '_' && fcmd[1] == '_' ) {
+        cf_log_syntax( player, confcmd, "Helpfile %s would cause @addcommand conflict", fcmd );
+        free_mbuf( newstr );
         return -1;
     }
 
@@ -1623,37 +1623,37 @@ int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw ) {
      */
 
 
-    tstr = tmprintf ( "%s.txt", fpath );
-    fp = fopen ( tstr, "r" );
-    if ( fp == NULL ) {
-        fpath = XSTRDUP ( tmprintf ( "%s/%s", mudconf.txthome, fpath ), "mudconf_txthome" );
-        tstr = tmprintf ( "%s.txt", fpath );
-        fp = fopen ( tstr, "r" );
-        if ( fp == NULL ) {
-            cf_log_help ( player, confcmd, "Helpfile %s not found", fcmd );
-            free_mbuf ( newstr );
+    tstr = tmprintf( "%s.txt", fpath );
+    fp = fopen( tstr, "r" );
+    if( fp == NULL ) {
+        fpath = XSTRDUP( tmprintf( "%s/%s", mudconf.txthome, fpath ), "mudconf_txthome" );
+        tstr = tmprintf( "%s.txt", fpath );
+        fp = fopen( tstr, "r" );
+        if( fp == NULL ) {
+            cf_log_help( player, confcmd, "Helpfile %s not found", fcmd );
+            free_mbuf( newstr );
             return -1;
         }
     }
-    fclose ( fp );
+    fclose( fp );
 
     /*
      * Rebuild Index
      */
 
-    if ( helpmkindx ( player, confcmd, fpath ) ) {
-        cf_log_help ( player, confcmd, "Could not create index for helpfile %s, not loaded.", basename ( fpath ) );
-        free_mbuf ( newstr );
+    if( helpmkindx( player, confcmd, fpath ) ) {
+        cf_log_help( player, confcmd, "Could not create index for helpfile %s, not loaded.", basename( fpath ) );
+        free_mbuf( newstr );
         return -1;
     }
 
-    if ( strlen ( fpath ) > SBUF_SIZE ) {
-        cf_log_syntax ( player, confcmd, "Helpfile %s filename too long", fcmd );
-        free_mbuf ( newstr );
+    if( strlen( fpath ) > SBUF_SIZE ) {
+        cf_log_syntax( player, confcmd, "Helpfile %s filename too long", fcmd );
+        free_mbuf( newstr );
         return -1;
     }
-    cmdp = ( CMDENT * ) XMALLOC ( sizeof ( CMDENT ), "add_helpfile.cmdp" );
-    cmdp->cmdname = XSTRDUP ( fcmd, "add_helpfile.cmd" );
+    cmdp = ( CMDENT * ) XMALLOC( sizeof( CMDENT ), "add_helpfile.cmdp" );
+    cmdp->cmdname = XSTRDUP( fcmd, "add_helpfile.cmd" );
     cmdp->switches = NULL;
     cmdp->perms = 0;
     cmdp->pre_hook = NULL;
@@ -1663,28 +1663,28 @@ int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw ) {
     cmdp->info.handler = do_help;
 
     cmdp->extra = mudstate.helpfiles;
-    if ( is_raw ) {
+    if( is_raw ) {
         cmdp->extra |= HELP_RAWHELP;
     }
 
-    hashdelete ( cmdp->cmdname, &mudstate.command_htab );
-    hashadd ( cmdp->cmdname, ( int * ) cmdp, &mudstate.command_htab, 0 );
-    hashdelete ( tmprintf ( "__%s", cmdp->cmdname ), &mudstate.command_htab );
-    hashadd ( tmprintf ( "__%s", cmdp->cmdname ), ( int * ) cmdp, &mudstate.command_htab, HASH_ALIAS );
+    hashdelete( cmdp->cmdname, &mudstate.command_htab );
+    hashadd( cmdp->cmdname, ( int * ) cmdp, &mudstate.command_htab, 0 );
+    hashdelete( tmprintf( "__%s", cmdp->cmdname ), &mudstate.command_htab );
+    hashadd( tmprintf( "__%s", cmdp->cmdname ), ( int * ) cmdp, &mudstate.command_htab, HASH_ALIAS );
 
     /*
      * We may need to grow the helpfiles table, or create it.
      */
 
-    if ( !mudstate.hfiletab ) {
-        mudstate.hfiletab = ( char ** ) XCALLOC ( 4, sizeof ( char * ), "helpfile.htab" );
-        mudstate.hfile_hashes = ( HASHTAB * ) XCALLOC ( 4, sizeof ( HASHTAB ), "helpfile.hashes" );
+    if( !mudstate.hfiletab ) {
+        mudstate.hfiletab = ( char ** ) XCALLOC( 4, sizeof( char * ), "helpfile.htab" );
+        mudstate.hfile_hashes = ( HASHTAB * ) XCALLOC( 4, sizeof( HASHTAB ), "helpfile.hashes" );
         mudstate.hfiletab_size = 4;
 
-    } else if ( mudstate.helpfiles >= mudstate.hfiletab_size ) {
+    } else if( mudstate.helpfiles >= mudstate.hfiletab_size ) {
 
-        ftab = ( char ** ) XREALLOC ( mudstate.hfiletab, ( mudstate.hfiletab_size + 4 ) * sizeof ( char * ), "helpfile.htab" );
-        hashes = ( HASHTAB * ) XREALLOC ( mudstate.hfile_hashes, ( mudstate.hfiletab_size + 4 ) * sizeof ( HASHTAB ), "helpfile.hashes" );
+        ftab = ( char ** ) XREALLOC( mudstate.hfiletab, ( mudstate.hfiletab_size + 4 ) * sizeof( char * ), "helpfile.htab" );
+        hashes = ( HASHTAB * ) XREALLOC( mudstate.hfile_hashes, ( mudstate.hfiletab_size + 4 ) * sizeof( HASHTAB ), "helpfile.hashes" );
         ftab[mudstate.hfiletab_size] = NULL;
         ftab[mudstate.hfiletab_size + 1] = NULL;
         ftab[mudstate.hfiletab_size + 2] = NULL;
@@ -1698,31 +1698,31 @@ int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw ) {
      * Add or replace the path to the file.
      */
 
-    if ( mudstate.hfiletab[mudstate.helpfiles] != NULL ) {
-        XFREE ( mudstate.hfiletab[mudstate.helpfiles], "add_helpfile.fpath" );
+    if( mudstate.hfiletab[mudstate.helpfiles] != NULL ) {
+        XFREE( mudstate.hfiletab[mudstate.helpfiles], "add_helpfile.fpath" );
     }
-    mudstate.hfiletab[mudstate.helpfiles] = XSTRDUP ( fpath, "add_helpfile.fpath" );
+    mudstate.hfiletab[mudstate.helpfiles] = XSTRDUP( fpath, "add_helpfile.fpath" );
 
     /*
      * Initialize the associated hashtable.
      */
 
-    hashinit ( &mudstate.hfile_hashes[mudstate.helpfiles], 30 * HASH_FACTOR, HT_STR );
+    hashinit( &mudstate.hfile_hashes[mudstate.helpfiles], 30 * HASH_FACTOR, HT_STR );
 
     mudstate.helpfiles++;
-    free_mbuf ( newstr );
+    free_mbuf( newstr );
 
-    cf_log_help ( player, confcmd, "Successfully loaded helpfile %s", basename ( fpath ) );
+    cf_log_help( player, confcmd, "Successfully loaded helpfile %s", basename( fpath ) );
 
     return 0;
 }
 
-int cf_helpfile ( int *vp, char *str, long extra, dbref player, char *cmd ) {
-    return add_helpfile ( player, cmd, str, 0 );
+int cf_helpfile( int *vp, char *str, long extra, dbref player, char *cmd ) {
+    return add_helpfile( player, cmd, str, 0 );
 }
 
-int cf_raw_helpfile ( int *vp, char *str, long extra, dbref player, char *cmd ) {
-    return add_helpfile ( player, cmd, str, 1 );
+int cf_raw_helpfile( int *vp, char *str, long extra, dbref player, char *cmd ) {
+    return add_helpfile( player, cmd, str, 1 );
 }
 
 /*
@@ -1730,12 +1730,12 @@ int cf_raw_helpfile ( int *vp, char *str, long extra, dbref player, char *cmd ) 
  * cf_include: Read another config file.  Only valid during startup.
  */
 
-int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_include( int *vp, char *str, long extra, dbref player, char *cmd ) {
     FILE *fp;
 
     char *cp, *ap, *zp, *buf;
 
-    extern int cf_set ( char *, char *, dbref );
+    extern int cf_set( char *, char *, dbref );
 
 
     /* XXX TODO Add stuff to fill
@@ -1743,31 +1743,31 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      *   cfiletab_size;  // Size of the table storing config pointers
      */
 
-    if ( !mudstate.initializing ) {
+    if( !mudstate.initializing ) {
         return -1;
     }
 
-    buf = XSTRDUP ( str, "cf_include" );
-    fp = fopen ( buf, "r" );
-    if ( fp == NULL ) {
-        XFREE ( buf, "cf_include" );
-        buf =  XSTRDUP ( tmprintf ( "%s/%s", mudconf.config_home, str ), "cf_include" );
-        fp = fopen ( buf, "r" );
-        if ( fp == NULL ) {
-            cf_log_notfound ( player, cmd, "Config file", str );
+    buf = XSTRDUP( str, "cf_include" );
+    fp = fopen( buf, "r" );
+    if( fp == NULL ) {
+        XFREE( buf, "cf_include" );
+        buf =  XSTRDUP( tmprintf( "%s/%s", mudconf.config_home, str ), "cf_include" );
+        fp = fopen( buf, "r" );
+        if( fp == NULL ) {
+            cf_log_notfound( player, cmd, "Config file", str );
             return -1;
         }
     }
 
-    mudstate.cfiletab = add_array ( mudstate.cfiletab, buf, &mudstate.configfiles, "cf_include" );
-    XFREE ( buf, "cf_include" );
+    mudstate.cfiletab = add_array( mudstate.cfiletab, buf, &mudstate.configfiles, "cf_include" );
+    XFREE( buf, "cf_include" );
 
-    buf = alloc_lbuf ( "cf_include" );
-    fgets ( buf, LBUF_SIZE, fp );
-    while ( !feof ( fp ) ) {
+    buf = alloc_lbuf( "cf_include" );
+    fgets( buf, LBUF_SIZE, fp );
+    while( !feof( fp ) ) {
         cp = buf;
-        if ( *cp == '#' ) {
-            fgets ( buf, LBUF_SIZE, fp );
+        if( *cp == '#' ) {
+            fgets( buf, LBUF_SIZE, fp );
             continue;
         }
         /*
@@ -1777,50 +1777,50 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd ) {
          * the trailing comment, if any (delimited by #)
          */
 
-        for ( cp = buf; *cp && *cp != '\n'; cp++ );
+        for( cp = buf; *cp && *cp != '\n'; cp++ );
         *cp = '\0';	/* strip \n */
-        for ( cp = buf; *cp && isspace ( *cp ); cp++ );	/* strip spaces */
-        for ( ap = cp; *ap && !isspace ( *ap ); ap++ );	/* skip over command */
-        if ( *ap ) {
+        for( cp = buf; *cp && isspace( *cp ); cp++ );	/* strip spaces */
+        for( ap = cp; *ap && !isspace( *ap ); ap++ );	/* skip over command */
+        if( *ap ) {
             *ap++ = '\0';    /* trim command */
         }
-        for ( ; *ap && isspace ( *ap ); ap++ );	/* skip spaces */
-        for ( zp = ap; *zp && ( *zp != '#' ); zp++ );	/* find comment */
-        if ( *zp && ! ( isdigit ( * ( zp + 1 ) ) && isspace ( * ( zp - 1 ) ) ) ) {
+        for( ; *ap && isspace( *ap ); ap++ );	/* skip spaces */
+        for( zp = ap; *zp && ( *zp != '#' ); zp++ );	/* find comment */
+        if( *zp && !( isdigit( * ( zp + 1 ) ) && isspace( * ( zp - 1 ) ) ) ) {
             *zp = '\0';
         }	/* zap comment, but only if it's not
 					 * sitting between whitespace and a
 					 * digit, which traps a case like
 					 * 'master_room #2' */
-        for ( zp = zp - 1; zp >= ap && isspace ( *zp ); zp-- ) {
+        for( zp = zp - 1; zp >= ap && isspace( *zp ); zp-- ) {
             *zp = '\0';    /* zap trailing spaces */
         }
 
-        cf_set ( cp, ap, player );
-        fgets ( buf, LBUF_SIZE, fp );
+        cf_set( cp, ap, player );
+        fgets( buf, LBUF_SIZE, fp );
     }
-    free_lbuf ( buf );
-    fclose ( fp );
+    free_lbuf( buf );
+    fclose( fp );
     return 0;
 }
 
-extern int cf_access ( int *, char *, long, dbref, char * );
+extern int cf_access( int *, char *, long, dbref, char * );
 
-extern int cf_cmd_alias ( int *, char *, long, dbref, char * );
+extern int cf_cmd_alias( int *, char *, long, dbref, char * );
 
-extern int cf_acmd_access ( int *, char *, long, dbref, char * );
+extern int cf_acmd_access( int *, char *, long, dbref, char * );
 
-extern int cf_attr_access ( int *, char *, long, dbref, char * );
+extern int cf_attr_access( int *, char *, long, dbref, char * );
 
-extern int cf_attr_type ( int *, char *, long, dbref, char * );
+extern int cf_attr_type( int *, char *, long, dbref, char * );
 
-extern int cf_func_access ( int *, char *, long, dbref, char * );
+extern int cf_func_access( int *, char *, long, dbref, char * );
 
-extern int cf_flag_access ( int *, char *, long, dbref, char * );
+extern int cf_flag_access( int *, char *, long, dbref, char * );
 
-extern int cf_flag_name ( int *, char *, long, dbref, char * );
+extern int cf_flag_name( int *, char *, long, dbref, char * );
 
-extern int cf_power_access ( int *, char *, long, dbref, char * );
+extern int cf_power_access( int *, char *, long, dbref, char * );
 
 /* *INDENT-OFF* */
 
@@ -2098,45 +2098,45 @@ CONF		conftable [] = {
  * cf_set: Set config parameter.
  */
 
-static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp ) {
+static int helper_cf_set( char *cp, char *ap, dbref player, CONF *tp ) {
     int i;
 
     char *buff, *name, *status;
 
-    if ( !mudstate.standalone && !mudstate.initializing
-            && !check_access ( player, tp->flags ) ) {
-        notify ( player, NOPERM_MESSAGE );
+    if( !mudstate.standalone && !mudstate.initializing
+            && !check_access( player, tp->flags ) ) {
+        notify( player, NOPERM_MESSAGE );
         return ( -1 );
     }
-    if ( !mudstate.initializing ) {
-        buff = alloc_lbuf ( "cf_set" );
-        strcpy ( buff, ap );
+    if( !mudstate.initializing ) {
+        buff = alloc_lbuf( "cf_set" );
+        strcpy( buff, ap );
     }
-    i = tp->interpreter ( tp->loc, ap, tp->extra, player, cp );
-    if ( !mudstate.initializing ) {
-        name = log_getname ( player, "helper_cf_set" );
-        switch ( i ) {
+    i = tp->interpreter( tp->loc, ap, tp->extra, player, cp );
+    if( !mudstate.initializing ) {
+        name = log_getname( player, "helper_cf_set" );
+        switch( i ) {
         case 0:
-            status = XSTRDUP ( "Success.", "helper_cf_set" );
+            status = XSTRDUP( "Success.", "helper_cf_set" );
             break;
         case 1:
-            status = XSTRDUP ( "Partial success.", "helper_cf_set" );
+            status = XSTRDUP( "Partial success.", "helper_cf_set" );
             break;
         case -1:
-            status = XSTRDUP ( "Failure.", "helper_cf_set" );
+            status = XSTRDUP( "Failure.", "helper_cf_set" );
             break;
         default:
-            status = XSTRDUP ( "Strange.", "helper_cf_set" );
+            status = XSTRDUP( "Strange.", "helper_cf_set" );
         }
-        log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi ( buff ), status );
-        XFREE ( name, "helper_cf_set" );
-        XFREE ( status, "helper_cf_set" );
-        free_lbuf ( buff );
+        log_write( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi( buff ), status );
+        XFREE( name, "helper_cf_set" );
+        XFREE( status, "helper_cf_set" );
+        free_lbuf( buff );
     }
     return i;
 }
 
-int cf_set ( char *cp, char *ap, dbref player ) {
+int cf_set( char *cp, char *ap, dbref player ) {
     CONF *tp, *ctab;
 
     MODULE *mp;
@@ -2151,23 +2151,23 @@ int cf_set ( char *cp, char *ap, dbref player ) {
      * module flatfiles are loaded
      */
 
-    if ( mudstate.standalone && strcmp ( cp, "module" ) &&
-            strcmp ( cp, "database_home" ) ) {
+    if( mudstate.standalone && strcmp( cp, "module" ) &&
+            strcmp( cp, "database_home" ) ) {
         return 0;
     }
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( !strcmp ( tp->pname, cp ) ) {
-            return ( helper_cf_set ( cp, ap, player, tp ) );
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( !strcmp( tp->pname, cp ) ) {
+            return ( helper_cf_set( cp, ap, player, tp ) );
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( !strcmp ( tp->pname, cp ) )
-                    return ( helper_cf_set ( cp, ap, player,
-                                             tp ) );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( !strcmp( tp->pname, cp ) )
+                    return ( helper_cf_set( cp, ap, player,
+                                            tp ) );
             }
         }
     }
@@ -2176,8 +2176,8 @@ int cf_set ( char *cp, char *ap, dbref player ) {
      * Config directive not found.  Complain about it.
      */
 
-    if ( !mudstate.standalone ) {
-        cf_log_notfound ( player, ( char * ) "Set", "Config directive", cp );
+    if( !mudstate.standalone ) {
+        cf_log_notfound( player, ( char * ) "Set", "Config directive", cp );
     }
 
     return ( -1 );
@@ -2188,12 +2188,12 @@ int cf_set ( char *cp, char *ap, dbref player ) {
  * do_admin: Command handler to set config params at runtime
  */
 
-void do_admin ( dbref player, dbref cause, int extra, char *kw, char *value ) {
+void do_admin( dbref player, dbref cause, int extra, char *kw, char *value ) {
     int i;
 
-    i = cf_set ( kw, value, player );
-    if ( ( i >= 0 ) && !Quiet ( player ) ) {
-        notify ( player, "Set." );
+    i = cf_set( kw, value, player );
+    if( ( i >= 0 ) && !Quiet( player ) ) {
+        notify( player, "Set." );
     }
     return;
 }
@@ -2203,10 +2203,10 @@ void do_admin ( dbref player, dbref cause, int extra, char *kw, char *value ) {
  * cf_read: Read in config parameters from named file
  */
 
-int cf_read ( char *fn ) {
+int cf_read( char *fn ) {
     int retval;
 
-    retval = cf_include ( NULL, fn, 0, 0, ( char * ) "init" );
+    retval = cf_include( NULL, fn, 0, 0, ( char * ) "init" );
 
     /*
      * Fill in missing DB file names
@@ -2221,72 +2221,72 @@ int cf_read ( char *fn ) {
  * directives.
  */
 
-void list_cf_access ( dbref player ) {
+void list_cf_access( dbref player ) {
     CONF *tp, *ctab;
 
     char *buff;
 
     MODULE *mp;
 
-    buff = alloc_mbuf ( "list_cf_access" );
+    buff = alloc_mbuf( "list_cf_access" );
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( God ( player ) || check_access ( player, tp->flags ) ) {
-            sprintf ( buff, "%s:", tp->pname );
-            listset_nametab ( player, access_nametab, tp->flags,
-                              buff, 1 );
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( God( player ) || check_access( player, tp->flags ) ) {
+            sprintf( buff, "%s:", tp->pname );
+            listset_nametab( player, access_nametab, tp->flags,
+                             buff, 1 );
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( God ( player )
-                        || check_access ( player, tp->flags ) ) {
-                    sprintf ( buff, "%s:", tp->pname );
-                    listset_nametab ( player, access_nametab,
-                                      tp->flags, buff, 1 );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( God( player )
+                        || check_access( player, tp->flags ) ) {
+                    sprintf( buff, "%s:", tp->pname );
+                    listset_nametab( player, access_nametab,
+                                     tp->flags, buff, 1 );
                 }
             }
         }
     }
 
-    free_mbuf ( buff );
+    free_mbuf( buff );
 }
 
-void list_cf_read_access ( dbref player ) {
+void list_cf_read_access( dbref player ) {
     CONF *tp, *ctab;
 
     char *buff;
 
     MODULE *mp;
 
-    buff = alloc_mbuf ( "list_cf_read_access" );
+    buff = alloc_mbuf( "list_cf_read_access" );
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( God ( player ) || check_access ( player, tp->rperms ) ) {
-            sprintf ( buff, "%s:", tp->pname );
-            listset_nametab ( player, access_nametab, tp->rperms,
-                              buff, 1 );
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( God( player ) || check_access( player, tp->rperms ) ) {
+            sprintf( buff, "%s:", tp->pname );
+            listset_nametab( player, access_nametab, tp->rperms,
+                             buff, 1 );
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( God ( player )
-                        || check_access ( player, tp->rperms ) ) {
-                    sprintf ( buff, "%s:", tp->pname );
-                    listset_nametab ( player, access_nametab,
-                                      tp->rperms, buff, 1 );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( God( player )
+                        || check_access( player, tp->rperms ) ) {
+                    sprintf( buff, "%s:", tp->pname );
+                    listset_nametab( player, access_nametab,
+                                     tp->rperms, buff, 1 );
                 }
             }
         }
     }
 
-    free_mbuf ( buff );
+    free_mbuf( buff );
 }
 
 /*
@@ -2303,20 +2303,20 @@ if ((x)->interpreter == cf_dbref) { \
     } \
 }
 
-void cf_verify ( void ) {
+void cf_verify( void ) {
     CONF *tp, *ctab;
 
     MODULE *mp;
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        Check_Conf_Dbref ( tp );
+    for( tp = conftable; tp->pname; tp++ ) {
+        Check_Conf_Dbref( tp );
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                Check_Conf_Dbref ( tp );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                Check_Conf_Dbref( tp );
             }
         }
     }
@@ -2328,97 +2328,97 @@ void cf_verify ( void ) {
  * sane fashion.
  */
 
-static void helper_cf_display ( dbref player, char *buff, char **bufc, CONF *tp ) {
+static void helper_cf_display( dbref player, char *buff, char **bufc, CONF *tp ) {
     NAMETAB *opt;
 
-    if ( !check_access ( player, tp->rperms ) ) {
-        safe_noperm ( buff, bufc );
+    if( !check_access( player, tp->rperms ) ) {
+        safe_noperm( buff, bufc );
         return;
     }
-    if ( ( tp->interpreter == cf_bool ) ||
+    if( ( tp->interpreter == cf_bool ) ||
             ( tp->interpreter == cf_int ) ||
             ( tp->interpreter == cf_int_factor ) ||
             ( tp->interpreter == cf_const ) ) {
-        safe_ltos ( buff, bufc, * ( tp->loc ) );
+        safe_ltos( buff, bufc, * ( tp->loc ) );
         return;
     }
-    if ( tp->interpreter == cf_string ) {
-        safe_str ( * ( ( char ** ) tp->loc ), buff, bufc );
+    if( tp->interpreter == cf_string ) {
+        safe_str( * ( ( char ** ) tp->loc ), buff, bufc );
         return;
     }
-    if ( tp->interpreter == cf_dbref ) {
-        safe_dbref ( buff, bufc, * ( tp->loc ) );
+    if( tp->interpreter == cf_dbref ) {
+        safe_dbref( buff, bufc, * ( tp->loc ) );
         return;
     }
-    if ( tp->interpreter == cf_option ) {
+    if( tp->interpreter == cf_option ) {
         opt =
-            find_nametab_ent_flag ( GOD, ( NAMETAB * ) tp->extra,
-                                    * ( tp->loc ) );
-        safe_str ( ( opt ? opt->name : "*UNKNOWN*" ), buff, bufc );
+            find_nametab_ent_flag( GOD, ( NAMETAB * ) tp->extra,
+                                   * ( tp->loc ) );
+        safe_str( ( opt ? opt->name : "*UNKNOWN*" ), buff, bufc );
         return;
     }
-    safe_noperm ( buff, bufc );
+    safe_noperm( buff, bufc );
     return;
 }
 
-void cf_display ( dbref player, char *param_name, char *buff, char **bufc ) {
+void cf_display( dbref player, char *param_name, char *buff, char **bufc ) {
     CONF *tp, *ctab;
 
     MODULE *mp;
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( !strcasecmp ( tp->pname, param_name ) ) {
-            helper_cf_display ( player, buff, bufc, tp );
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( !strcasecmp( tp->pname, param_name ) ) {
+            helper_cf_display( player, buff, bufc, tp );
             return;
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( !strcasecmp ( tp->pname, param_name ) ) {
-                    helper_cf_display ( player, buff, bufc,
-                                        tp );
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( !strcasecmp( tp->pname, param_name ) ) {
+                    helper_cf_display( player, buff, bufc,
+                                       tp );
                     return;
                 }
             }
         }
     }
 
-    safe_nomatch ( buff, bufc );
+    safe_nomatch( buff, bufc );
 }
 
-void list_options ( dbref player ) {
+void list_options( dbref player ) {
     CONF *tp, *ctab;
 
     MODULE *mp;
 
-    for ( tp = conftable; tp->pname; tp++ ) {
-        if ( ( ( tp->interpreter == cf_const ) ||
+    for( tp = conftable; tp->pname; tp++ ) {
+        if( ( ( tp->interpreter == cf_const ) ||
                 ( tp->interpreter == cf_bool ) ) &&
-                ( check_access ( player, tp->rperms ) ) ) {
+                ( check_access( player, tp->rperms ) ) ) {
 
-            raw_notify ( player, tmprintf ( "%-25s %c %s?",
-                                            tp->pname,
-                                            ( * ( tp->loc ) ? 'Y' : 'N' ),
-                                            ( tp->extra ? ( char * ) tp->extra : "" ) ) );
+            raw_notify( player, tmprintf( "%-25s %c %s?",
+                                          tp->pname,
+                                          ( * ( tp->loc ) ? 'Y' : 'N' ),
+                                          ( tp->extra ? ( char * ) tp->extra : "" ) ) );
         }
     }
 
-    WALK_ALL_MODULES ( mp ) {
-        if ( ( ctab = DLSYM_VAR ( mp->handle, mp->modname, "conftable",
-                                  CONF * ) ) != NULL ) {
-            for ( tp = ctab; tp->pname; tp++ ) {
-                if ( ( ( tp->interpreter == cf_const ) ||
+    WALK_ALL_MODULES( mp ) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
+                                CONF * ) ) != NULL ) {
+            for( tp = ctab; tp->pname; tp++ ) {
+                if( ( ( tp->interpreter == cf_const ) ||
                         ( tp->interpreter == cf_bool ) ) &&
-                        ( check_access ( player, tp->rperms ) ) ) {
+                        ( check_access( player, tp->rperms ) ) ) {
 
-                    raw_notify ( player,
-                                 tmprintf ( "%-25s %c %s?", tp->pname,
-                                            ( * ( tp->loc ) ? 'Y' : 'N' ),
-                                            ( tp->extra ? ( char * ) tp->
-                                              extra : "" ) ) );
+                    raw_notify( player,
+                                tmprintf( "%-25s %c %s?", tp->pname,
+                                          ( * ( tp->loc ) ? 'Y' : 'N' ),
+                                          ( tp->extra ? ( char * ) tp->
+                                            extra : "" ) ) );
                 }
             }
         }

@@ -35,7 +35,7 @@ typedef union {
     unsigned int u[FP_SIZE];
 } fp_union_uint;
 
-static unsigned int fp_check_weird ( char *buff, char **bufc, double result ) {
+static unsigned int fp_check_weird( char *buff, char **bufc, double result ) {
     static fp_union_uint fp_sign_mask, fp_exp_mask, fp_mant_mask, fp_val;
 
     static const double d_zero = 0.0;
@@ -46,15 +46,15 @@ static unsigned int fp_check_weird ( char *buff, char **bufc, double result ) {
 
     int i;
 
-    if ( !fp_initted ) {
-        memset ( fp_sign_mask.u, 0, sizeof ( fp_sign_mask ) );
-        memset ( fp_exp_mask.u, 0, sizeof ( fp_exp_mask ) );
-        memset ( fp_val.u, 0, sizeof ( fp_val ) );
+    if( !fp_initted ) {
+        memset( fp_sign_mask.u, 0, sizeof( fp_sign_mask ) );
+        memset( fp_exp_mask.u, 0, sizeof( fp_exp_mask ) );
+        memset( fp_val.u, 0, sizeof( fp_val ) );
         fp_exp_mask.d = 1.0 / d_zero;
         fp_sign_mask.d = -1.0 / fp_exp_mask.d;
-        for ( i = 0; i < FP_SIZE; i++ ) {
+        for( i = 0; i < FP_SIZE; i++ ) {
             fp_mant_mask.u[i] =
-                ~ ( fp_exp_mask.u[i] | fp_sign_mask.u[i] );
+                ~( fp_exp_mask.u[i] | fp_sign_mask.u[i] );
         }
         fp_initted = 1;
     }
@@ -63,18 +63,18 @@ static unsigned int fp_check_weird ( char *buff, char **bufc, double result ) {
     fp_sign = fp_mant = 0;
     fp_exp = FP_EXP_ZERO | FP_EXP_WEIRD;
 
-    for ( i = 0; ( i < FP_SIZE ) && fp_exp; i++ ) {
-        if ( fp_exp_mask.u[i] ) {
+    for( i = 0; ( i < FP_SIZE ) && fp_exp; i++ ) {
+        if( fp_exp_mask.u[i] ) {
             unsigned int x = ( fp_exp_mask.u[i] & fp_val.u[i] );
 
-            if ( x == fp_exp_mask.u[i] ) {
+            if( x == fp_exp_mask.u[i] ) {
                 /*
                  * these bits are all set. can't be zero
                  * exponent, but could still be max (weird)
                  * exponent.
                  */
                 fp_exp &= ~FP_EXP_ZERO;
-            } else if ( x == 0 ) {
+            } else if( x == 0 ) {
                 /*
                  * none of these bits are set. can't be max
                  * exponent, but could still be zero
@@ -92,23 +92,23 @@ static unsigned int fp_check_weird ( char *buff, char **bufc, double result ) {
         fp_sign |= ( fp_sign_mask.u[i] & fp_val.u[i] );
         fp_mant |= ( fp_mant_mask.u[i] & fp_val.u[i] );
     }
-    if ( fp_exp == FP_EXP_WEIRD ) {
-        if ( fp_sign ) {
-            safe_chr ( '-', buff, bufc );
+    if( fp_exp == FP_EXP_WEIRD ) {
+        if( fp_sign ) {
+            safe_chr( '-', buff, bufc );
         }
-        if ( fp_mant ) {
-            safe_known_str ( "NaN", 3, buff, bufc );
+        if( fp_mant ) {
+            safe_known_str( "NaN", 3, buff, bufc );
         } else {
-            safe_known_str ( "Inf", 3, buff, bufc );
+            safe_known_str( "Inf", 3, buff, bufc );
         }
     }
     return fp_exp;
 }
 
-static void fval ( char *buff, char **bufc, double result ) {
+static void fval( char *buff, char **bufc, double result ) {
     char *p, *buf1;
 
-    switch ( fp_check_weird ( buff, bufc, result ) ) {
+    switch( fp_check_weird( buff, bufc, result ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
@@ -118,21 +118,21 @@ static void fval ( char *buff, char **bufc, double result ) {
     }
 
     buf1 = *bufc;
-    safe_tmprintf_str ( buff, bufc, "%.6f", result );	/* get double val into
+    safe_tmprintf_str( buff, bufc, "%.6f", result );	/* get double val into
 							 * buffer */
     **bufc = '\0';
-    p = strrchr ( buf1, '0' );
-    if ( p == NULL ) {	/* remove useless trailing 0's */
+    p = strrchr( buf1, '0' );
+    if( p == NULL ) {	/* remove useless trailing 0's */
         return;
-    } else if ( * ( p + 1 ) == '\0' ) {
-        while ( *p == '0' ) {
+    } else if( * ( p + 1 ) == '\0' ) {
+        while( *p == '0' ) {
             *p-- = '\0';
         }
         *bufc = p + 1;
     }
-    p = strrchr ( buf1, '.' );	/* take care of dangling '.' */
+    p = strrchr( buf1, '.' );	/* take care of dangling '.' */
 
-    if ( ( p != NULL ) && ( * ( p + 1 ) == '\0' ) ) {
+    if( ( p != NULL ) && ( * ( p + 1 ) == '\0' ) ) {
         *p = '\0';
         *bufc = p;
     }
@@ -140,7 +140,7 @@ static void fval ( char *buff, char **bufc, double result ) {
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
 
-    if ( !strcmp ( buf1, "-0" ) ) {
+    if( !strcmp( buf1, "-0" ) ) {
         *buf1 = '0';
         *bufc = buf1 + 1;
     }
@@ -154,12 +154,12 @@ static void fval ( char *buff, char **bufc, double result ) {
  * Constant math funcs: PI, E
  */
 
-void fun_pi ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_known_str ( "3.141592654", 11, buff, bufc );
+void fun_pi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_known_str( "3.141592654", 11, buff, bufc );
 }
 
-void fun_e ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )  {
-    safe_known_str ( "2.718281828", 11, buff, bufc );
+void fun_e( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )  {
+    safe_known_str( "2.718281828", 11, buff, bufc );
 }
 
 /*
@@ -168,39 +168,39 @@ void fun_e ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * DEC, SQRT, EXP, LN, [A][SIN,COS,TAN][D]
  */
 
-void fun_sign ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sign( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL num;
 
-    num = strtod ( fargs[0], ( char ** ) NULL );
-    if ( num < 0 ) {
-        safe_known_str ( "-1", 2, buff, bufc );
+    num = strtod( fargs[0], ( char ** ) NULL );
+    if( num < 0 ) {
+        safe_known_str( "-1", 2, buff, bufc );
     } else {
-        safe_bool ( buff, bufc, ( num > 0 ) );
+        safe_bool( buff, bufc, ( num > 0 ) );
     }
 }
 
-void fun_abs ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_abs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL num;
 
-    num = strtod ( fargs[0], ( char ** ) NULL );
-    if ( num == 0 ) {
-        safe_chr ( '0', buff, bufc );
-    } else if ( num < 0 ) {
-        fval ( buff, bufc, -num );
+    num = strtod( fargs[0], ( char ** ) NULL );
+    if( num == 0 ) {
+        safe_chr( '0', buff, bufc );
+    } else if( num < 0 ) {
+        fval( buff, bufc, -num );
     } else {
-        fval ( buff, bufc, num );
+        fval( buff, bufc, num );
     }
 }
 
-void fun_floor ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
 #ifdef FLOATING_POINTS
     char *oldp;
 
     NVAL x;
 
     oldp = *bufc;
-    x = floor ( strtod ( fargs[0], ( char ** ) NULL ) );
-    switch ( fp_check_weird ( buff, bufc, x ) ) {
+    x = floor( strtod( fargs[0], ( char ** ) NULL ) );
+    switch( fp_check_weird( buff, bufc, x ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
@@ -208,29 +208,29 @@ void fun_floor ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     default:
         break;
     }
-    safe_tmprintf_str ( buff, bufc, "%.0f", x );
+    safe_tmprintf_str( buff, bufc, "%.0f", x );
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
 
-    if ( !strcmp ( oldp, "-0" ) ) {
+    if( !strcmp( oldp, "-0" ) ) {
         *oldp = '0';
         *bufc = oldp + 1;
     }
 #else
-    fval ( buff, bufc, strtod ( fargs[0], ( char ** ) NULL ) );
+    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
 #endif
 }
 
-void fun_ceil ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
 #ifdef FLOATING_POINTS
     char *oldp;
 
     NVAL x;
 
     oldp = *bufc;
-    x = ceil ( strtod ( fargs[0], ( char ** ) NULL ) );
-    switch ( fp_check_weird ( buff, bufc, x ) ) {
+    x = ceil( strtod( fargs[0], ( char ** ) NULL ) );
+    switch( fp_check_weird( buff, bufc, x ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
@@ -238,21 +238,21 @@ void fun_ceil ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     default:
         break;
     }
-    safe_tmprintf_str ( buff, bufc, "%.0f", x );
+    safe_tmprintf_str( buff, bufc, "%.0f", x );
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
 
-    if ( !strcmp ( oldp, "-0" ) ) {
+    if( !strcmp( oldp, "-0" ) ) {
         *oldp = '0';
         *bufc = oldp + 1;
     }
 #else
-    fval ( buff, bufc, strtod ( fargs[0], ( char ** ) NULL ) );
+    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
 #endif
 }
 
-void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
 #ifdef FLOATING_POINTS
     const char *fstr;
 
@@ -262,7 +262,7 @@ void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     oldp = *bufc;
 
-    switch ( ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) ) {
+    switch( ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) ) {
     case 1:
         fstr = "%.1f";
         break;
@@ -285,8 +285,8 @@ void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
         fstr = "%.0f";
         break;
     }
-    x = strtod ( fargs[0], ( char ** ) NULL );
-    switch ( fp_check_weird ( buff, bufc, x ) ) {
+    x = strtod( fargs[0], ( char ** ) NULL );
+    switch( fp_check_weird( buff, bufc, x ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
@@ -294,28 +294,28 @@ void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     default:
         break;
     }
-    safe_tmprintf_str ( buff, bufc, ( char * ) fstr, x );
+    safe_tmprintf_str( buff, bufc, ( char * ) fstr, x );
 
     /*
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
      */
 
-    if ( !strcmp ( oldp, "-0" ) ) {
+    if( !strcmp( oldp, "-0" ) ) {
         *oldp = '0';
         *bufc = oldp + 1;
     }
 #else
-    fval ( buff, bufc, strtod ( fargs[0], ( char ** ) NULL ) );
+    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
 #endif
 }
 
-void fun_trunc ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
 #ifdef FLOATING_POINTS
     NVAL x;
 
-    x = strtod ( fargs[0], ( char ** ) NULL );
-    x = ( x >= 0 ) ? floor ( x ) : ceil ( x );
-    switch ( fp_check_weird ( buff, bufc, x ) ) {
+    x = strtod( fargs[0], ( char ** ) NULL );
+    x = ( x >= 0 ) ? floor( x ) : ceil( x );
+    switch( fp_check_weird( buff, bufc, x ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
@@ -323,79 +323,79 @@ void fun_trunc ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     default:
         break;
     }
-    fval ( buff, bufc, x );
+    fval( buff, bufc, x );
 #else
-    fval ( buff, bufc, strtod ( fargs[0], ( char ** ) NULL ) );
+    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
 #endif
 }
 
-void fun_inc ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) + 1 );
+void fun_inc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) + 1 );
 }
 
-void fun_dec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) - 1 );
+void fun_dec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) - 1 );
 }
 
-void fun_sqrt ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sqrt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL val;
 
-    val = strtod ( fargs[0], ( char ** ) NULL );
-    if ( val < 0 ) {
-        safe_str ( "#-1 SQUARE ROOT OF NEGATIVE", buff, bufc );
-    } else if ( val == 0 ) {
-        safe_chr ( '0', buff, bufc );
+    val = strtod( fargs[0], ( char ** ) NULL );
+    if( val < 0 ) {
+        safe_str( "#-1 SQUARE ROOT OF NEGATIVE", buff, bufc );
+    } else if( val == 0 ) {
+        safe_chr( '0', buff, bufc );
     } else {
-        fval ( buff, bufc, sqrt ( ( double ) val ) );
+        fval( buff, bufc, sqrt( ( double ) val ) );
     }
 }
 
-void fun_exp ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    fval ( buff, bufc, exp ( ( double ) strtod ( fargs[0], ( char ** ) NULL ) ) );
+void fun_exp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    fval( buff, bufc, exp( ( double ) strtod( fargs[0], ( char ** ) NULL ) ) );
 }
 
-void fun_ln ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ln( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL val;
 
-    val = strtod ( fargs[0], ( char ** ) NULL );
-    if ( val > 0 ) {
-        fval ( buff, bufc, log ( ( double ) val ) );
+    val = strtod( fargs[0], ( char ** ) NULL );
+    if( val > 0 ) {
+        fval( buff, bufc, log( ( double ) val ) );
     } else {
-        safe_str ( "#-1 LN OF NEGATIVE OR ZERO", buff, bufc );
+        safe_str( "#-1 LN OF NEGATIVE OR ZERO", buff, bufc );
     }
 }
 
-void handle_trig ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_trig( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL val;
 
     int oper, flag;
 
-    static double ( *const trig_funcs[8] ) ( double ) = {
+    static double( *const trig_funcs[8] )( double ) = {
         sin, cos, tan, NULL,	/* XXX no cotangent function */
         asin, acos, atan, NULL
     };
 
-    flag = Func_Flags ( fargs );
+    flag = Func_Flags( fargs );
     oper = flag & TRIG_OPER;
 
-    val = strtod ( fargs[0], ( char ** ) NULL );
-    if ( ( flag & TRIG_ARC ) && ! ( flag & TRIG_TAN ) &&
+    val = strtod( fargs[0], ( char ** ) NULL );
+    if( ( flag & TRIG_ARC ) && !( flag & TRIG_TAN ) &&
             ( ( val < -1 ) || ( val > 1 ) ) ) {
-        safe_tmprintf_str ( buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE",
-                            ( ( FUN * ) fargs[-1] )->name );
+        safe_tmprintf_str( buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE",
+                           ( ( FUN * ) fargs[-1] )->name );
         return;
     }
-    if ( ( flag & TRIG_DEG ) && ! ( flag & TRIG_ARC ) ) {
+    if( ( flag & TRIG_DEG ) && !( flag & TRIG_ARC ) ) {
         val = val * ( M_PI / 180 );
     }
 
-    val = ( trig_funcs[oper] ) ( ( double ) val );
+    val = ( trig_funcs[oper] )( ( double ) val );
 
-    if ( ( flag & TRIG_DEG ) && ( flag & TRIG_ARC ) ) {
+    if( ( flag & TRIG_DEG ) && ( flag & TRIG_ARC ) ) {
         val = ( val * 180 ) / M_PI;
     }
 
-    fval ( buff, bufc, val );
+    fval( buff, bufc, val );
 }
 
 /*
@@ -446,7 +446,7 @@ static char from_base_36[256] = {
 
 static char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_baseconv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     long n, m;
 
     int from, to, isneg;
@@ -466,21 +466,21 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      * Figure out our bases
      */
 
-    if ( !is_integer ( fargs[1] ) || !is_integer ( fargs[2] ) ) {
-        safe_known_str ( "#-1 INVALID BASE", 16, buff, bufc );
+    if( !is_integer( fargs[1] ) || !is_integer( fargs[2] ) ) {
+        safe_known_str( "#-1 INVALID BASE", 16, buff, bufc );
         return;
     }
-    from = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    to = ( int ) strtol ( fargs[2], ( char ** ) NULL, 10 );
+    from = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    to = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
 
-    if ( ( from < 2 ) || ( from > 64 ) || ( to < 2 ) || ( to > 64 ) ) {
-        safe_known_str ( "#-1 BASE OUT OF RANGE", 21, buff, bufc );
+    if( ( from < 2 ) || ( from > 64 ) || ( to < 2 ) || ( to > 64 ) ) {
+        safe_known_str( "#-1 BASE OUT OF RANGE", 21, buff, bufc );
         return;
     }
-    if ( from > 36 ) {
+    if( from > 36 ) {
         frombase = from_base_64;
     }
-    if ( to > 36 ) {
+    if( to > 36 ) {
         tobase = to_base_64;
     }
 
@@ -488,40 +488,40 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      * Parse the number to convert
      */
 
-    p = Eat_Spaces ( fargs[0] );
+    p = Eat_Spaces( fargs[0] );
     n = 0;
-    if ( p ) {
+    if( p ) {
         /*
          * If we have a leading hyphen, and we're in base 63/64,
          * always treat it as a minus sign. PennMUSH consistency.
          */
-        if ( ( from < 63 ) && ( to < 63 ) && ( *p == '-' ) ) {
+        if( ( from < 63 ) && ( to < 63 ) && ( *p == '-' ) ) {
             isneg = 1;
             p++;
         } else {
             isneg = 0;
         }
-        while ( *p ) {
+        while( *p ) {
             n *= from;
-            if ( frombase[ ( unsigned char ) *p] >= 0 ) {
-                n += frombase[ ( unsigned char ) *p];
+            if( frombase[( unsigned char ) *p] >= 0 ) {
+                n += frombase[( unsigned char ) *p];
                 p++;
             } else {
-                safe_known_str ( "#-1 MALFORMED NUMBER", 20,
-                                 buff, bufc );
+                safe_known_str( "#-1 MALFORMED NUMBER", 20,
+                                buff, bufc );
                 return;
             }
         }
-        if ( isneg ) {
-            safe_chr ( '-', buff, bufc );
+        if( isneg ) {
+            safe_chr( '-', buff, bufc );
         }
     }
     /*
      * Handle the case of 0 and less than base case.
      */
 
-    if ( n < to ) {
-        safe_chr ( tobase[ ( unsigned char ) n], buff, bufc );
+    if( n < to ) {
+        safe_chr( tobase[( unsigned char ) n], buff, bufc );
         return;
     }
     /*
@@ -529,14 +529,14 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
 
     nbp = nbuf;
-    while ( n > 0 ) {
+    while( n > 0 ) {
         m = n % to;
         n = n / to;
-        safe_chr ( tobase[ ( unsigned char ) m], nbuf, &nbp );
+        safe_chr( tobase[( unsigned char ) m], nbuf, &nbp );
     }
     nbp--;
-    while ( nbp >= nbuf ) {
-        safe_chr ( *nbp, buff, bufc );
+    while( nbp >= nbuf ) {
+        safe_chr( *nbp, buff, bufc );
         nbp--;
     }
 }
@@ -546,42 +546,42 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * Math comparison funcs: GT, GTE, LT, LTE, EQ, NEQ, NCOMP
  */
 
-void fun_gt ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) > strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_gt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) > strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_gte ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) >= strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_gte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) >= strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_lt ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) < strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_lt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) < strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_lte ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) <= strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_lte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) <= strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_eq ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) == strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_eq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) == strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_neq ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) != strtod ( fargs[1], ( char ** ) NULL ) ) );
+void fun_neq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) != strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_ncomp ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ncomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL x, y;
 
-    x = strtod ( fargs[0], ( char ** ) NULL );
-    y = strtod ( fargs[1], ( char ** ) NULL );
+    x = strtod( fargs[0], ( char ** ) NULL );
+    y = strtod( fargs[1], ( char ** ) NULL );
 
-    if ( x == y ) {
-        safe_chr ( '0', buff, bufc );
-    } else if ( x < y ) {
-        safe_str ( "-1", buff, bufc );
+    if( x == y ) {
+        safe_chr( '0', buff, bufc );
+    } else if( x < y ) {
+        safe_str( "-1", buff, bufc );
     } else {
-        safe_chr ( '1', buff, bufc );
+        safe_chr( '1', buff, bufc );
     }
 }
 
@@ -591,11 +591,11 @@ void fun_ncomp ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * POWER, LOG
  */
 
-void fun_sub ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    fval ( buff, bufc, strtod ( fargs[0], ( char ** ) NULL ) - strtod ( fargs[1], ( char ** ) NULL ) );
+void fun_sub( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) - strtod( fargs[1], ( char ** ) NULL ) );
 }
 
-void fun_div ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_div( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int top, bot;
 
     /*
@@ -603,29 +603,29 @@ void fun_div ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * operands, so we try not to give it negative operands here
      */
 
-    top = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 );
-    bot = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    if ( bot == 0 ) {
-        safe_str ( "#-1 DIVIDE BY ZERO", buff, bufc );
+    top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    bot = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    if( bot == 0 ) {
+        safe_str( "#-1 DIVIDE BY ZERO", buff, bufc );
         return;
     }
-    if ( top < 0 ) {
-        if ( bot < 0 ) {
+    if( top < 0 ) {
+        if( bot < 0 ) {
             top = ( -top ) / ( -bot );
         } else {
             top = - ( ( -top ) / bot );
         }
     } else {
-        if ( bot < 0 ) {
+        if( bot < 0 ) {
             top = - ( top / ( -bot ) );
         } else {
             top = top / bot;
         }
     }
-    safe_ltos ( buff, bufc, top );
+    safe_ltos( buff, bufc, top );
 }
 
-void fun_floordiv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_floordiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int top, bot, res;
 
     /*
@@ -633,46 +633,46 @@ void fun_floordiv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      * operands, so we try not to give it negative operands here
      */
 
-    top = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 );
-    bot = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    if ( bot == 0 ) {
-        safe_str ( "#-1 DIVIDE BY ZERO", buff, bufc );
+    top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    bot = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    if( bot == 0 ) {
+        safe_str( "#-1 DIVIDE BY ZERO", buff, bufc );
         return;
     }
-    if ( top < 0 ) {
-        if ( bot < 0 ) {
+    if( top < 0 ) {
+        if( bot < 0 ) {
             res = ( -top ) / ( -bot );
         } else {
             res = - ( ( -top ) / bot );
-            if ( top % bot ) {
+            if( top % bot ) {
                 res--;
             }
         }
     } else {
-        if ( bot < 0 ) {
+        if( bot < 0 ) {
             res = - ( top / ( -bot ) );
-            if ( top % bot ) {
+            if( top % bot ) {
                 res--;
             }
         } else {
             res = top / bot;
         }
     }
-    safe_ltos ( buff, bufc, res );
+    safe_ltos( buff, bufc, res );
 }
 
-void fun_fdiv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_fdiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL bot;
 
-    bot = strtod ( fargs[1], ( char ** ) NULL );
-    if ( bot == 0 ) {
-        safe_str ( "#-1 DIVIDE BY ZERO", buff, bufc );
+    bot = strtod( fargs[1], ( char ** ) NULL );
+    if( bot == 0 ) {
+        safe_str( "#-1 DIVIDE BY ZERO", buff, bufc );
     } else {
-        fval ( buff, bufc, ( strtod ( fargs[0], ( char ** ) NULL ) / bot ) );
+        fval( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) / bot ) );
     }
 }
 
-void fun_modulo ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_modulo( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int top, bot;
 
     /*
@@ -680,28 +680,28 @@ void fun_modulo ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * operands, so we try not to give it negative operands here
      */
 
-    top = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 );
-    bot = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    if ( bot == 0 ) {
+    top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    bot = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    if( bot == 0 ) {
         bot = 1;
     }
-    if ( top < 0 ) {
-        if ( bot < 0 ) {
+    if( top < 0 ) {
+        if( bot < 0 ) {
             top = - ( ( -top ) % ( -bot ) );
         } else {
             top = ( bot - ( ( -top ) % bot ) ) % bot;
         }
     } else {
-        if ( bot < 0 ) {
+        if( bot < 0 ) {
             top = - ( ( ( -bot ) - ( top % ( -bot ) ) ) % ( -bot ) );
         } else {
             top = top % bot;
         }
     }
-    safe_ltos ( buff, bufc, top );
+    safe_ltos( buff, bufc, top );
 }
 
-void fun_remainder ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_remainder( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int top, bot;
 
     /*
@@ -709,58 +709,58 @@ void fun_remainder ( char *buff, char **bufc, dbref player, dbref caller, dbref 
      * operands, so we try not to give it negative operands here
      */
 
-    top = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 );
-    bot = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    if ( bot == 0 ) {
+    top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    bot = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    if( bot == 0 ) {
         bot = 1;
     }
-    if ( top < 0 ) {
-        if ( bot < 0 ) {
+    if( top < 0 ) {
+        if( bot < 0 ) {
             top = - ( ( -top ) % ( -bot ) );
         } else {
             top = - ( ( -top ) % bot );
         }
     } else {
-        if ( bot < 0 ) {
+        if( bot < 0 ) {
             top = top % ( -bot );
         } else {
             top = top % bot;
         }
     }
-    safe_ltos ( buff, bufc, top );
+    safe_ltos( buff, bufc, top );
 }
 
-void fun_power ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_power( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL val1, val2;
 
-    val1 = strtod ( fargs[0], ( char ** ) NULL );
-    val2 = strtod ( fargs[1], ( char ** ) NULL );
-    if ( val1 < 0 ) {
-        safe_str ( "#-1 POWER OF NEGATIVE", buff, bufc );
+    val1 = strtod( fargs[0], ( char ** ) NULL );
+    val2 = strtod( fargs[1], ( char ** ) NULL );
+    if( val1 < 0 ) {
+        safe_str( "#-1 POWER OF NEGATIVE", buff, bufc );
     } else {
-        fval ( buff, bufc, pow ( ( double ) val1, ( double ) val2 ) );
+        fval( buff, bufc, pow( ( double ) val1, ( double ) val2 ) );
     }
 }
 
-void fun_log ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_log( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL val, base;
 
-    VaChk_Range ( 1, 2 );
+    VaChk_Range( 1, 2 );
 
-    val = strtod ( fargs[0], ( char ** ) NULL );
+    val = strtod( fargs[0], ( char ** ) NULL );
 
-    if ( nfargs == 2 ) {
-        base = strtod ( fargs[1], ( char ** ) NULL );
+    if( nfargs == 2 ) {
+        base = strtod( fargs[1], ( char ** ) NULL );
     } else {
         base = 10;
     }
 
-    if ( ( val <= 0 ) || ( base <= 0 ) ) {
-        safe_str ( "#-1 LOG OF NEGATIVE OR ZERO", buff, bufc );
-    } else if ( base == 1 ) {
-        safe_str ( "#-1 DIVISION BY ZERO", buff, bufc );
+    if( ( val <= 0 ) || ( base <= 0 ) ) {
+        safe_str( "#-1 LOG OF NEGATIVE OR ZERO", buff, bufc );
+    } else if( base == 1 ) {
+        safe_str( "#-1 DIVISION BY ZERO", buff, bufc );
     } else {
-        fval ( buff, bufc, log ( ( double ) val ) / log ( ( double ) base ) );
+        fval( buff, bufc, log( ( double ) val ) / log( ( double ) base ) );
     }
 }
 
@@ -769,24 +769,24 @@ void fun_log ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * Bitwise two-argument integer math functions: SHL, SHR, BAND, BOR, BNAND
  */
 
-void fun_shl ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) << ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+void fun_shl( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) << ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_shr ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) >> ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+void fun_shr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) >> ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_band ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+void fun_band( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) & ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_bor ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) | ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+void fun_bor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) | ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_bnand ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ~ ( ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) ) );
+void fun_bnand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) & ~( ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) ) );
 }
 
 /*
@@ -794,71 +794,71 @@ void fun_bnand ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Multi-argument math functions: ADD, MUL, MAX, MIN
  */
 
-void fun_add ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_add( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL sum;
 
     int i;
 
-    if ( nfargs < 2 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+    if( nfargs < 2 ) {
+        safe_known_str( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
     } else {
-        sum = strtod ( fargs[0], ( char ** ) NULL );
-        for ( i = 1; i < nfargs; i++ ) {
-            sum += strtod ( fargs[i], ( char ** ) NULL );
+        sum = strtod( fargs[0], ( char ** ) NULL );
+        for( i = 1; i < nfargs; i++ ) {
+            sum += strtod( fargs[i], ( char ** ) NULL );
         }
-        fval ( buff, bufc, sum );
+        fval( buff, bufc, sum );
     }
     return;
 }
 
-void fun_mul ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_mul( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL prod;
 
     int i;
 
-    if ( nfargs < 2 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+    if( nfargs < 2 ) {
+        safe_known_str( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
     } else {
-        prod = strtod ( fargs[0], ( char ** ) NULL );
-        for ( i = 1; i < nfargs; i++ ) {
-            prod *= strtod ( fargs[i], ( char ** ) NULL );
+        prod = strtod( fargs[0], ( char ** ) NULL );
+        for( i = 1; i < nfargs; i++ ) {
+            prod *= strtod( fargs[i], ( char ** ) NULL );
         }
-        fval ( buff, bufc, prod );
+        fval( buff, bufc, prod );
     }
     return;
 }
 
-void fun_max ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_max( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int i;
 
     NVAL max, val;
 
-    if ( nfargs < 1 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+    if( nfargs < 1 ) {
+        safe_known_str( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
     } else {
-        max = strtod ( fargs[0], ( char ** ) NULL );
-        for ( i = 1; i < nfargs; i++ ) {
-            val = strtod ( fargs[i], ( char ** ) NULL );
+        max = strtod( fargs[0], ( char ** ) NULL );
+        for( i = 1; i < nfargs; i++ ) {
+            val = strtod( fargs[i], ( char ** ) NULL );
             max = ( max < val ) ? val : max;
         }
-        fval ( buff, bufc, max );
+        fval( buff, bufc, max );
     }
 }
 
-void fun_min ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_min( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int i;
 
     NVAL min, val;
 
-    if ( nfargs < 1 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+    if( nfargs < 1 ) {
+        safe_known_str( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
     } else {
-        min = strtod ( fargs[0], ( char ** ) NULL );
-        for ( i = 1; i < nfargs; i++ ) {
-            val = strtod ( fargs[i], ( char ** ) NULL );
+        min = strtod( fargs[0], ( char ** ) NULL );
+        for( i = 1; i < nfargs; i++ ) {
+            val = strtod( fargs[i], ( char ** ) NULL );
             min = ( min > val ) ? val : min;
         }
-        fval ( buff, bufc, min );
+        fval( buff, bufc, min );
     }
 }
 
@@ -867,34 +867,34 @@ void fun_min ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * bound(): Force a number to conform to specified bounds.
  */
 
-void fun_bound ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_bound( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL min, max, val;
 
     char *cp;
 
-    VaChk_Range ( 1, 3 );
+    VaChk_Range( 1, 3 );
 
-    val = strtod ( fargs[0], ( char ** ) NULL );
+    val = strtod( fargs[0], ( char ** ) NULL );
 
-    if ( nfargs < 2 ) {	/* just the number; no bounds enforced */
-        fval ( buff, bufc, val );
+    if( nfargs < 2 ) {	/* just the number; no bounds enforced */
+        fval( buff, bufc, val );
         return;
     }
-    if ( nfargs > 1 ) {	/* if empty, don't check the minimum */
-        for ( cp = fargs[1]; *cp && isspace ( *cp ); cp++ );
-        if ( *cp ) {
-            min = strtod ( fargs[1], ( char ** ) NULL );
+    if( nfargs > 1 ) {	/* if empty, don't check the minimum */
+        for( cp = fargs[1]; *cp && isspace( *cp ); cp++ );
+        if( *cp ) {
+            min = strtod( fargs[1], ( char ** ) NULL );
             val = ( val < min ) ? min : val;
         }
     }
-    if ( nfargs > 2 ) {	/* if empty, don't check the maximum */
-        for ( cp = fargs[2]; *cp && isspace ( *cp ); cp++ );
-        if ( *cp ) {
-            max = strtod ( fargs[2], ( char ** ) NULL );
+    if( nfargs > 2 ) {	/* if empty, don't check the maximum */
+        for( cp = fargs[2]; *cp && isspace( *cp ); cp++ );
+        if( *cp ) {
+            max = strtod( fargs[2], ( char ** ) NULL );
             val = ( val > max ) ? max : val;
         }
     }
-    fval ( buff, bufc, val );
+    fval( buff, bufc, val );
 }
 
 /*
@@ -902,32 +902,32 @@ void fun_bound ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Integer point distance functions: DIST2D, DIST3D
  */
 
-void fun_dist2d ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_dist2d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int d;
 
     double r;
 
-    d = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[2], ( char ** ) NULL, 10 );
-    r = ( double ) ( d * d );
-    d = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[3], ( char ** ) NULL, 10 );
-    r += ( double ) ( d * d );
-    d = ( int ) ( sqrt ( r ) + 0.5 );
-    safe_ltos ( buff, bufc, d );
+    d = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) - ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    r = ( double )( d * d );
+    d = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) - ( int ) strtol( fargs[3], ( char ** ) NULL, 10 );
+    r += ( double )( d * d );
+    d = ( int )( sqrt( r ) + 0.5 );
+    safe_ltos( buff, bufc, d );
 }
 
-void fun_dist3d ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_dist3d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     int d;
 
     double r;
 
-    d = ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[3], ( char ** ) NULL, 10 );
-    r = ( double ) ( d * d );
-    d = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[4], ( char ** ) NULL, 10 );
-    r += ( double ) ( d * d );
-    d = ( int ) strtol ( fargs[2], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[5], ( char ** ) NULL, 10 );
-    r += ( double ) ( d * d );
-    d = ( int ) ( sqrt ( r ) + 0.5 );
-    safe_ltos ( buff, bufc, d );
+    d = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) - ( int ) strtol( fargs[3], ( char ** ) NULL, 10 );
+    r = ( double )( d * d );
+    d = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) - ( int ) strtol( fargs[4], ( char ** ) NULL, 10 );
+    r += ( double )( d * d );
+    d = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 ) - ( int ) strtol( fargs[5], ( char ** ) NULL, 10 );
+    r += ( double )( d * d );
+    d = ( int )( sqrt( r ) + 0.5 );
+    safe_ltos( buff, bufc, d );
 }
 
 /*
@@ -935,73 +935,73 @@ void fun_dist3d ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Math "accumulator" operations on a list: LADD, LMAX, LMIN
  */
 
-void fun_ladd ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ladd( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL sum;
 
     char *cp, *curr;
 
     Delim isep;
 
-    if ( nfargs == 0 ) {
-        safe_chr ( '0', buff, bufc );
+    if( nfargs == 0 ) {
+        safe_chr( '0', buff, bufc );
         return;
     }
-    VaChk_Only_In ( 2 );
+    VaChk_Only_In( 2 );
 
     sum = 0;
-    cp = trim_space_sep ( fargs[0], &isep );
-    while ( cp ) {
-        curr = split_token ( &cp, &isep );
-        sum += strtod ( curr, ( char ** ) NULL );
+    cp = trim_space_sep( fargs[0], &isep );
+    while( cp ) {
+        curr = split_token( &cp, &isep );
+        sum += strtod( curr, ( char ** ) NULL );
     }
-    fval ( buff, bufc, sum );
+    fval( buff, bufc, sum );
 }
 
-void fun_lmax ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lmax( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL max, val;
 
     char *cp, *curr;
 
     Delim isep;
 
-    VaChk_Only_In ( 2 );
+    VaChk_Only_In( 2 );
 
-    cp = trim_space_sep ( fargs[0], &isep );
-    if ( cp ) {
-        curr = split_token ( &cp, &isep );
-        max = strtod ( curr, ( char ** ) NULL );
-        while ( cp ) {
-            curr = split_token ( &cp, &isep );
-            val = strtod ( curr, ( char ** ) NULL );
-            if ( max < val ) {
+    cp = trim_space_sep( fargs[0], &isep );
+    if( cp ) {
+        curr = split_token( &cp, &isep );
+        max = strtod( curr, ( char ** ) NULL );
+        while( cp ) {
+            curr = split_token( &cp, &isep );
+            val = strtod( curr, ( char ** ) NULL );
+            if( max < val ) {
                 max = val;
             }
         }
-        fval ( buff, bufc, max );
+        fval( buff, bufc, max );
     }
 }
 
-void fun_lmin ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lmin( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     NVAL min, val;
 
     char *cp, *curr;
 
     Delim isep;
 
-    VaChk_Only_In ( 2 );
+    VaChk_Only_In( 2 );
 
-    cp = trim_space_sep ( fargs[0], &isep );
-    if ( cp ) {
-        curr = split_token ( &cp, &isep );
-        min = strtod ( curr, ( char ** ) NULL );
-        while ( cp ) {
-            curr = split_token ( &cp, &isep );
-            val = strtod ( curr, ( char ** ) NULL );
-            if ( min > val ) {
+    cp = trim_space_sep( fargs[0], &isep );
+    if( cp ) {
+        curr = split_token( &cp, &isep );
+        min = strtod( curr, ( char ** ) NULL );
+        while( cp ) {
+            curr = split_token( &cp, &isep );
+            val = strtod( curr, ( char ** ) NULL );
+            if( min > val ) {
                 min = val;
             }
         }
-        fval ( buff, bufc, min );
+        fval( buff, bufc, min );
     }
 }
 
@@ -1011,7 +1011,7 @@ void fun_lmin ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_words)
  */
 
-void handle_vector ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_vector( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     char **v1;
 
     int n, i, oper;
@@ -1020,55 +1020,55 @@ void handle_vector ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 
     Delim isep, osep;
 
-    oper = Func_Mask ( VEC_OPER );
+    oper = Func_Mask( VEC_OPER );
 
-    if ( oper == VEC_UNIT ) {
-        VaChk_Only_In_Out ( 3 );
+    if( oper == VEC_UNIT ) {
+        VaChk_Only_In_Out( 3 );
     } else {
-        VaChk_Only_In ( 2 );
+        VaChk_Only_In( 2 );
     }
 
     /*
      * split the list up, or return if the list is empty
      */
-    if ( !fargs[0] || !*fargs[0] ) {
+    if( !fargs[0] || !*fargs[0] ) {
         return;
     }
-    n = list2arr ( &v1, LBUF_SIZE, fargs[0], &isep );
+    n = list2arr( &v1, LBUF_SIZE, fargs[0], &isep );
 
     /*
      * calculate the magnitude
      */
-    for ( i = 0; i < n; i++ ) {
-        tmp = strtod ( v1[i], ( char ** ) NULL );
+    for( i = 0; i < n; i++ ) {
+        tmp = strtod( v1[i], ( char ** ) NULL );
         res += tmp * tmp;
     }
 
     /*
      * if we're just calculating the magnitude, return it
      */
-    if ( oper == VEC_MAG ) {
-        if ( res > 0 ) {
-            fval ( buff, bufc, sqrt ( res ) );
+    if( oper == VEC_MAG ) {
+        if( res > 0 ) {
+            fval( buff, bufc, sqrt( res ) );
         } else {
-            safe_chr ( '0', buff, bufc );
+            safe_chr( '0', buff, bufc );
         }
-        XFREE ( v1, "handle_vector.v1" );
+        XFREE( v1, "handle_vector.v1" );
         return;
     }
-    if ( res <= 0 ) {
-        safe_str ( "#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR",
-                   buff, bufc );
-        XFREE ( v1, "handle_vector.v1" );
+    if( res <= 0 ) {
+        safe_str( "#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR",
+                  buff, bufc );
+        XFREE( v1, "handle_vector.v1" );
         return;
     }
-    res = sqrt ( res );
-    fval ( buff, bufc,  strtod ( v1[0], ( char ** ) NULL ) / res );
-    for ( i = 1; i < n; i++ ) {
-        print_sep ( &osep, buff, bufc );
-        fval ( buff, bufc, strtod ( v1[i], ( char ** ) NULL ) / res );
+    res = sqrt( res );
+    fval( buff, bufc,  strtod( v1[0], ( char ** ) NULL ) / res );
+    for( i = 1; i < n; i++ ) {
+        print_sep( &osep, buff, bufc );
+        fval( buff, bufc, strtod( v1[i], ( char ** ) NULL ) / res );
     }
-    XFREE ( v1, "handle_vector.v1" );
+    XFREE( v1, "handle_vector.v1" );
 }
 
 /*
@@ -1076,7 +1076,7 @@ void handle_vector ( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * Operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR, VAND, VXOR
  */
 
-void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_vectors( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     Delim isep, osep;
 
     int oper;
@@ -1087,74 +1087,74 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
 
     int n, m, i, x, y;
 
-    oper = Func_Mask ( VEC_OPER );
+    oper = Func_Mask( VEC_OPER );
 
-    if ( oper != VEC_DOT ) {
-        VaChk_Only_In_Out ( 4 );
+    if( oper != VEC_DOT ) {
+        VaChk_Only_In_Out( 4 );
     } else {
         /*
          * dot product returns a scalar, so no output delim
          */
-        VaChk_Only_In ( 3 );
+        VaChk_Only_In( 3 );
     }
 
     /*
      * split the list up, or return if the list is empty
      */
-    if ( !fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1] ) {
+    if( !fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1] ) {
         return;
     }
-    n = list2arr ( &v1, LBUF_SIZE, fargs[0], &isep );
-    m = list2arr ( &v2, LBUF_SIZE, fargs[1], &isep );
+    n = list2arr( &v1, LBUF_SIZE, fargs[0], &isep );
+    m = list2arr( &v2, LBUF_SIZE, fargs[1], &isep );
 
     /*
      * It's okay to have vmul() be passed a scalar first or second arg,
      * but everything else has to be same-dimensional.
      */
-    if ( ( n != m ) && ! ( ( oper == VEC_MUL ) && ( ( n == 1 ) || ( m == 1 ) ) ) ) {
-        safe_str ( "#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc );
-        XFREE ( v1, "handle_vectors.v1" );
-        XFREE ( v2, "handle_vectors.v2" );
+    if( ( n != m ) && !( ( oper == VEC_MUL ) && ( ( n == 1 ) || ( m == 1 ) ) ) ) {
+        safe_str( "#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc );
+        XFREE( v1, "handle_vectors.v1" );
+        XFREE( v2, "handle_vectors.v2" );
         return;
     }
-    switch ( oper ) {
+    switch( oper ) {
     case VEC_ADD:
-        fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) + strtod ( v2[0], ( char ** ) NULL ) );
-        for ( i = 1; i < n; i++ ) {
-            print_sep ( &osep, buff, bufc );
-            fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) + strtod ( v2[0], ( char ** ) NULL ) );
+        fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) + strtod( v2[0], ( char ** ) NULL ) );
+        for( i = 1; i < n; i++ ) {
+            print_sep( &osep, buff, bufc );
+            fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) + strtod( v2[0], ( char ** ) NULL ) );
         }
         break;
     case VEC_SUB:
-        fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) - strtod ( v2[0], ( char ** ) NULL ) );
-        for ( i = 1; i < n; i++ ) {
-            print_sep ( &osep, buff, bufc );
-            fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) - strtod ( v2[0], ( char ** ) NULL ) );
+        fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) - strtod( v2[0], ( char ** ) NULL ) );
+        for( i = 1; i < n; i++ ) {
+            print_sep( &osep, buff, bufc );
+            fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) - strtod( v2[0], ( char ** ) NULL ) );
         }
         break;
     case VEC_OR:
-        safe_bool ( buff, bufc, xlate ( v1[0] ) || xlate ( v2[0] ) );
-        for ( i = 1; i < n; i++ ) {
-            print_sep ( &osep, buff, bufc );
-            safe_bool ( buff, bufc, xlate ( v1[i] ) || xlate ( v2[i] ) );
+        safe_bool( buff, bufc, xlate( v1[0] ) || xlate( v2[0] ) );
+        for( i = 1; i < n; i++ ) {
+            print_sep( &osep, buff, bufc );
+            safe_bool( buff, bufc, xlate( v1[i] ) || xlate( v2[i] ) );
         }
         break;
     case VEC_AND:
-        safe_bool ( buff, bufc, xlate ( v1[0] ) && xlate ( v2[0] ) );
-        for ( i = 1; i < n; i++ ) {
-            print_sep ( &osep, buff, bufc );
-            safe_bool ( buff, bufc, xlate ( v1[i] ) && xlate ( v2[i] ) );
+        safe_bool( buff, bufc, xlate( v1[0] ) && xlate( v2[0] ) );
+        for( i = 1; i < n; i++ ) {
+            print_sep( &osep, buff, bufc );
+            safe_bool( buff, bufc, xlate( v1[i] ) && xlate( v2[i] ) );
         }
         break;
     case VEC_XOR:
-        x = xlate ( v1[0] );
-        y = xlate ( v2[0] );
-        safe_bool ( buff, bufc, ( x && !y ) || ( !x && y ) );
-        for ( i = 1; i < n; i++ ) {
-            print_sep ( &osep, buff, bufc );
-            x = xlate ( v1[i] );
-            y = xlate ( v2[i] );
-            safe_bool ( buff, bufc, ( x && !y ) || ( !x && y ) );
+        x = xlate( v1[0] );
+        y = xlate( v2[0] );
+        safe_bool( buff, bufc, ( x && !y ) || ( !x && y ) );
+        for( i = 1; i < n; i++ ) {
+            print_sep( &osep, buff, bufc );
+            x = xlate( v1[i] );
+            y = xlate( v2[i] );
+            safe_bool( buff, bufc, ( x && !y ) || ( !x && y ) );
         }
         break;
     case VEC_MUL:
@@ -1162,19 +1162,19 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
          * if n or m is 1, this is scalar multiplication. otherwise,
          * multiply elementwise.
          */
-        if ( n == 1 ) {
-            scalar = strtod ( v1[0], ( char ** ) NULL );
-            fval ( buff, bufc, strtod ( v2[0], ( char ** ) NULL ) * scalar );
-            for ( i = 1; i < m; i++ ) {
-                print_sep ( &osep, buff, bufc );
-                fval ( buff, bufc, strtod ( v2[0], ( char ** ) NULL ) * scalar );
+        if( n == 1 ) {
+            scalar = strtod( v1[0], ( char ** ) NULL );
+            fval( buff, bufc, strtod( v2[0], ( char ** ) NULL ) * scalar );
+            for( i = 1; i < m; i++ ) {
+                print_sep( &osep, buff, bufc );
+                fval( buff, bufc, strtod( v2[0], ( char ** ) NULL ) * scalar );
             }
-        } else if ( m == 1 ) {
-            scalar = strtod ( v2[0], ( char ** ) NULL );
-            fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) * scalar );
-            for ( i = 1; i < n; i++ ) {
-                print_sep ( &osep, buff, bufc );
-                fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) * scalar );
+        } else if( m == 1 ) {
+            scalar = strtod( v2[0], ( char ** ) NULL );
+            fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) * scalar );
+            for( i = 1; i < n; i++ ) {
+                print_sep( &osep, buff, bufc );
+                fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) * scalar );
             }
         } else {
             /*
@@ -1186,10 +1186,10 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
              * but the actual behavior isn't. We implement dot
              * product separately!
              */
-            fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) * strtod ( v2[0], ( char ** ) NULL ) );
-            for ( i = 1; i < n; i++ ) {
-                print_sep ( &osep, buff, bufc );
-                fval ( buff, bufc, strtod ( v1[0], ( char ** ) NULL ) * strtod ( v2[0], ( char ** ) NULL ) );
+            fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) * strtod( v2[0], ( char ** ) NULL ) );
+            for( i = 1; i < n; i++ ) {
+                print_sep( &osep, buff, bufc );
+                fval( buff, bufc, strtod( v1[0], ( char ** ) NULL ) * strtod( v2[0], ( char ** ) NULL ) );
             }
         }
         break;
@@ -1201,20 +1201,20 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
          * (d,e,f) = (bf - ce, cd - af, ae - bd)
          */
         scalar = 0;
-        for ( i = 0; i < n; i++ ) {
-            scalar += strtod ( v1[0], ( char ** ) NULL ) * strtod ( v2[0], ( char ** ) NULL );
+        for( i = 0; i < n; i++ ) {
+            scalar += strtod( v1[0], ( char ** ) NULL ) * strtod( v2[0], ( char ** ) NULL );
         }
-        fval ( buff, bufc, scalar );
+        fval( buff, bufc, scalar );
         break;
     default:
         /*
          * If we reached this, we're in trouble.
          */
-        safe_str ( "#-1 UNIMPLEMENTED", buff, bufc );
+        safe_str( "#-1 UNIMPLEMENTED", buff, bufc );
         break;
     }
-    XFREE ( v1, "handle_vectors.v1" );
-    XFREE ( v2, "handle_vectors.v2" );
+    XFREE( v1, "handle_vectors.v1" );
+    XFREE( v2, "handle_vectors.v2" );
 }
 
 /*
@@ -1222,23 +1222,23 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
  * Simple boolean funcs: NOT, NOTBOOL, T
  */
 
-void fun_not ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, ! ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) );
+void fun_not( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, !( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) );
 }
 
-void fun_notbool ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, !xlate ( fargs[0] ) );
+void fun_notbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, !xlate( fargs[0] ) );
 }
 
-void fun_t ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_bool ( buff, bufc, xlate ( fargs[0] ) );
+void fun_t( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+    safe_bool( buff, bufc, xlate( fargs[0] ) );
 }
 
-int cvtfun ( int flag, char *str ) {
-    if ( flag & LOGIC_BOOL ) {
-        return ( xlate ( str ) );
+int cvtfun( int flag, char *str ) {
+    if( flag & LOGIC_BOOL ) {
+        return ( xlate( str ) );
     } else {
-        return ( ( int ) strtol ( str, ( char ** ) NULL, 10 ) );
+        return ( ( int ) strtol( str, ( char ** ) NULL, 10 ) );
     }
 }
 
@@ -1247,7 +1247,7 @@ int cvtfun ( int flag, char *str ) {
  * Multi-argument boolean funcs: various combinations of
  * [L,C][AND,OR,XOR][BOOL]
  */
-void handle_logic ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_logic( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     Delim isep;
 
     int flag, oper, i, val;
@@ -1255,7 +1255,7 @@ void handle_logic ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     char *str, *tbuf, *bp;
 
 
-    flag = Func_Flags ( fargs );
+    flag = Func_Flags( fargs );
     oper = ( flag & LOGIC_OPER );
 
     /*
@@ -1263,70 +1263,70 @@ void handle_logic ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
     val = 0;
 
-    if ( flag & LOGIC_LIST ) {
+    if( flag & LOGIC_LIST ) {
 
-        if ( nfargs == 0 ) {
-            safe_chr ( '0', buff, bufc );
+        if( nfargs == 0 ) {
+            safe_chr( '0', buff, bufc );
             return;
         }
         /*
          * the arguments come in a pre-evaluated list
          */
-        VaChk_Only_In ( 2 );
+        VaChk_Only_In( 2 );
 
-        bp = trim_space_sep ( fargs[0], &isep );
-        while ( bp ) {
-            tbuf = split_token ( &bp, &isep );
+        bp = trim_space_sep( fargs[0], &isep );
+        while( bp ) {
+            tbuf = split_token( &bp, &isep );
             val = ( ( oper == LOGIC_XOR )
-                    && val ) ? !cvtfun ( flag, tbuf ) : cvtfun ( flag, tbuf );
-            if ( ( ( oper == LOGIC_AND ) && !val )
+                    && val ) ? !cvtfun( flag, tbuf ) : cvtfun( flag, tbuf );
+            if( ( ( oper == LOGIC_AND ) && !val )
                     || ( ( oper == LOGIC_OR ) && val ) ) {
                 break;
             }
         }
 
-    } else if ( nfargs < 2 ) {
+    } else if( nfargs < 2 ) {
         /*
          * separate arguments, but not enough of them
          */
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_known_str( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
         return;
 
-    } else if ( flag & FN_NO_EVAL ) {
+    } else if( flag & FN_NO_EVAL ) {
         /*
          * separate, unevaluated arguments
          */
-        tbuf = alloc_lbuf ( "handle_logic" );
-        for ( i = 0; i < nfargs; i++ ) {
+        tbuf = alloc_lbuf( "handle_logic" );
+        for( i = 0; i < nfargs; i++ ) {
             str = fargs[i];
             bp = tbuf;
-            exec ( tbuf, &bp, player, caller, cause,
-                   EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs,
-                   ncargs );
+            exec( tbuf, &bp, player, caller, cause,
+                  EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs,
+                  ncargs );
             val = ( ( oper == LOGIC_XOR )
-                    && val ) ? !cvtfun ( flag, tbuf ) : cvtfun ( flag, tbuf );
-            if ( ( ( oper == LOGIC_AND ) && !val )
+                    && val ) ? !cvtfun( flag, tbuf ) : cvtfun( flag, tbuf );
+            if( ( ( oper == LOGIC_AND ) && !val )
                     || ( ( oper == LOGIC_OR ) && val ) ) {
                 break;
             }
         }
-        free_lbuf ( tbuf );
+        free_lbuf( tbuf );
 
     } else {
         /*
          * separate, pre-evaluated arguments
          */
-        for ( i = 0; i < nfargs; i++ ) {
+        for( i = 0; i < nfargs; i++ ) {
             val = ( ( oper == LOGIC_XOR )
-                    && val ) ? !cvtfun ( flag, fargs[i] ) : cvtfun ( flag, fargs[i] );
-            if ( ( ( oper == LOGIC_AND ) && !val )
+                    && val ) ? !cvtfun( flag, fargs[i] ) : cvtfun( flag, fargs[i] );
+            if( ( ( oper == LOGIC_AND ) && !val )
                     || ( ( oper == LOGIC_OR ) && val ) ) {
                 break;
             }
         }
     }
 
-    safe_bool ( buff, bufc, val );
+    safe_bool( buff, bufc, val );
 }
 
 /*
@@ -1334,35 +1334,35 @@ void handle_logic ( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * ltrue() and lfalse(): Get boolean values for an entire list.
  */
 
-void handle_listbool ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_listbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     Delim isep, osep;
 
     int flag, n;
 
     char *tbuf, *bp, *bb_p;
 
-    flag = Func_Flags ( fargs );
-    VaChk_Only_In_Out ( 3 );
+    flag = Func_Flags( fargs );
+    VaChk_Only_In_Out( 3 );
 
-    if ( !fargs[0] || !*fargs[0] ) {
+    if( !fargs[0] || !*fargs[0] ) {
         return;
     }
 
     bb_p = *bufc;
-    bp = trim_space_sep ( fargs[0], &isep );
-    while ( bp ) {
-        tbuf = split_token ( &bp, &isep );
-        if ( *bufc != bb_p ) {
-            print_sep ( &osep, buff, bufc );
+    bp = trim_space_sep( fargs[0], &isep );
+    while( bp ) {
+        tbuf = split_token( &bp, &isep );
+        if( *bufc != bb_p ) {
+            print_sep( &osep, buff, bufc );
         }
-        if ( flag & IFELSE_BOOL ) {
-            n = xlate ( tbuf );
+        if( flag & IFELSE_BOOL ) {
+            n = xlate( tbuf );
         } else {
-            n = ! ( ( int ) strtol ( tbuf, ( char ** ) NULL, 10 ) == 0 ) && is_number ( tbuf );
+            n = !( ( int ) strtol( tbuf, ( char ** ) NULL, 10 ) == 0 ) && is_number( tbuf );
         }
-        if ( flag & IFELSE_FALSE ) {
+        if( flag & IFELSE_FALSE ) {
             n = !n;
         }
-        safe_bool ( buff, bufc, n );
+        safe_bool( buff, bufc, n );
     }
 }

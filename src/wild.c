@@ -30,7 +30,7 @@
 #include "db.h"			/* required by externs */
 #include "externs.h"		/* required by code */
 
-extern int set_register ( const char *, char *, char * );	/* funvars.c */
+extern int set_register( const char *, char *, char * );	/* funvars.c */
 
 #define FIXCASE(a) (tolower(a))
 #define EQUAL(a,b) ((a == b) || (FIXCASE(a) == FIXCASE(b)))
@@ -45,7 +45,7 @@ static int numargs;		/* argument return size */
  *                 data string, or no match is possible.
  */
 
-static int check_literals ( char *tstr, char *dstr ) {
+static int check_literals( char *tstr, char *dstr ) {
     char pattern[LBUF_SIZE], data[LBUF_SIZE], *p, *dp, *ep, *xp;
 
     int len;
@@ -54,14 +54,14 @@ static int check_literals ( char *tstr, char *dstr ) {
      * Fast match the beginning of the string.
      */
 
-    while ( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
-        if ( *tstr == '\\' ) {
+    while( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
+        if( *tstr == '\\' ) {
             tstr++;
         }
-        if ( NOTEQUAL ( *dstr, *tstr ) ) {
+        if( NOTEQUAL( *dstr, *tstr ) ) {
             return 0;
         }
-        if ( !*dstr ) {
+        if( !*dstr ) {
             return 1;
         }
         tstr++;
@@ -73,8 +73,8 @@ static int check_literals ( char *tstr, char *dstr ) {
      */
 
     ep = data;
-    while ( *dstr ) {
-        *ep = FIXCASE ( *dstr );
+    while( *dstr ) {
+        *ep = FIXCASE( *dstr );
         ep++;
         dstr++;
     }
@@ -92,9 +92,9 @@ static int check_literals ( char *tstr, char *dstr ) {
      */
 
     ep--;
-    xp = tstr + strlen ( tstr ) - 1;
-    while ( ( ep >= dstr ) && ( xp >= tstr ) && ( *xp != '*' ) && ( *xp != '?' ) ) {
-        if ( ( *xp != '\\' ) && NOTEQUAL ( *ep, *xp ) ) {
+    xp = tstr + strlen( tstr ) - 1;
+    while( ( ep >= dstr ) && ( xp >= tstr ) && ( *xp != '*' ) && ( *xp != '?' ) ) {
+        if( ( *xp != '\\' ) && NOTEQUAL( *ep, *xp ) ) {
             return 0;
         }
         ep--;
@@ -109,33 +109,33 @@ static int check_literals ( char *tstr, char *dstr ) {
      */
 
     dp = data;
-    while ( *tstr && ( tstr <= xp ) ) {
-        while ( ( *tstr == '*' ) || ( *tstr == '?' ) ) {
+    while( *tstr && ( tstr <= xp ) ) {
+        while( ( *tstr == '*' ) || ( *tstr == '?' ) ) {
             tstr++;
         }
-        if ( !*tstr || ( tstr > xp ) ) {
+        if( !*tstr || ( tstr > xp ) ) {
             return 1;
         }
         p = pattern;
         len = 0;
-        while ( *tstr && ( *tstr != '*' ) && ( *tstr != '?' )
+        while( *tstr && ( *tstr != '*' ) && ( *tstr != '?' )
                 && ( tstr <= xp ) ) {
-            if ( *tstr == '\\' ) {
+            if( *tstr == '\\' ) {
                 tstr++;
             }
-            *p = FIXCASE ( *tstr );
+            *p = FIXCASE( *tstr );
             p++;
             tstr++;
             len++;
         }
         *p = '\0';
-        if ( len ) {
-            if ( ( dp = strstr ( dp, pattern ) ) == NULL ) {
+        if( len ) {
+            if( ( dp = strstr( dp, pattern ) ) == NULL ) {
                 return 0;
             }
             dp += len;
         }
-        if ( dp >= ep ) {
+        if( dp >= ep ) {
             return 1;
         }
     }
@@ -149,22 +149,22 @@ static int check_literals ( char *tstr, char *dstr ) {
  * This routine will cause crashes if fed NULLs instead of strings.
  */
 
-static int real_quick_wild ( char *tstr, char *dstr ) {
+static int real_quick_wild( char *tstr, char *dstr ) {
     int st;
 
-    if ( mudstate.wild_times_lev > mudconf.wild_times_lim ) {
+    if( mudstate.wild_times_lev > mudconf.wild_times_lim ) {
         return -1;
     }
     mudstate.wild_times_lev++;
 
-    while ( *tstr != '*' ) {
-        switch ( *tstr ) {
+    while( *tstr != '*' ) {
+        switch( *tstr ) {
         case '?':
             /*
              * Single character match.  Return false if at end
              * * of data.
              */
-            if ( !*dstr ) {
+            if( !*dstr ) {
                 return 0;
             }
             break;
@@ -182,10 +182,10 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
              * Literal character.  Check for a match. If
              * * matching end of data, return true.
              */
-            if ( NOTEQUAL ( *dstr, *tstr ) ) {
+            if( NOTEQUAL( *dstr, *tstr ) ) {
                 return 0;
             }
-            if ( !*dstr ) {
+            if( !*dstr ) {
                 return 1;
             }
         }
@@ -203,7 +203,7 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
      * Return true on trailing '*'.
      */
 
-    if ( !*tstr ) {
+    if( !*tstr ) {
         return 1;
     }
 
@@ -211,9 +211,9 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
      * Skip over wildcards.
      */
 
-    while ( ( *tstr == '?' ) || ( *tstr == '*' ) ) {
-        if ( *tstr == '?' ) {
-            if ( !*dstr ) {
+    while( ( *tstr == '?' ) || ( *tstr == '*' ) ) {
+        if( *tstr == '?' ) {
+            if( !*dstr ) {
                 return 0;
             }
             dstr++;
@@ -225,7 +225,7 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
      * Skip over a backslash in the pattern string if it is there.
      */
 
-    if ( *tstr == '\\' ) {
+    if( *tstr == '\\' ) {
         tstr++;
     }
 
@@ -233,7 +233,7 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
      * Return true on trailing '*'.
      */
 
-    if ( !*tstr ) {
+    if( !*tstr ) {
         return 1;
     }
 
@@ -241,9 +241,9 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
      * Scan for possible matches.
      */
 
-    while ( *dstr ) {
-        if ( EQUAL ( *dstr, *tstr ) ) {
-            if ( ( st = real_quick_wild ( tstr + 1, dstr + 1 ) ) != 0 ) {
+    while( *dstr ) {
+        if( EQUAL( *dstr, *tstr ) ) {
+            if( ( st = real_quick_wild( tstr + 1, dstr + 1 ) ) != 0 ) {
                 return st;
             }
         }
@@ -252,17 +252,17 @@ static int real_quick_wild ( char *tstr, char *dstr ) {
     return 0;
 }
 
-int quick_wild ( char *tstr, char *dstr ) {
+int quick_wild( char *tstr, char *dstr ) {
     int st;
 
-    if ( !check_literals ( tstr, dstr ) ) {
+    if( !check_literals( tstr, dstr ) ) {
         return 0;
     }
 
     mudstate.wild_times_lev = 0;
 
-    st = real_quick_wild ( tstr, dstr );
-    if ( ( st < 0 ) && ( mudstate.wild_times_lev > mudconf.wild_times_lim ) ) {
+    st = real_quick_wild( tstr, dstr );
+    if( ( st < 0 ) && ( mudstate.wild_times_lev > mudconf.wild_times_lim ) ) {
         return 0;
     }
     return st;
@@ -278,24 +278,24 @@ int quick_wild ( char *tstr, char *dstr ) {
  * variable.
  */
 
-static int real_wild1 ( char *tstr, char *dstr, int arg ) {
+static int real_wild1( char *tstr, char *dstr, int arg ) {
     char *datapos;
 
     int argpos, numextra, st;
 
-    if ( mudstate.wild_times_lev > mudconf.wild_times_lim ) {
+    if( mudstate.wild_times_lev > mudconf.wild_times_lim ) {
         return -1;
     }
     mudstate.wild_times_lev++;
 
-    while ( *tstr != '*' ) {
-        switch ( *tstr ) {
+    while( *tstr != '*' ) {
+        switch( *tstr ) {
         case '?':
             /*
              * Single character match.  Return false if at end
              * * of data.
              */
-            if ( !*dstr ) {
+            if( !*dstr ) {
                 return 0;
             }
             arglist[arg][0] = *dstr;
@@ -306,8 +306,8 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
              * Jump to the fast routine if we can.
              */
 
-            if ( arg >= numargs ) {
-                return real_quick_wild ( tstr + 1, dstr + 1 );
+            if( arg >= numargs ) {
+                return real_quick_wild( tstr + 1, dstr + 1 );
             }
             break;
         case '\\':
@@ -324,10 +324,10 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
              * Literal character.  Check for a match. If
              * * matching end of data, return true.
              */
-            if ( NOTEQUAL ( *dstr, *tstr ) ) {
+            if( NOTEQUAL( *dstr, *tstr ) ) {
                 return 0;
             }
-            if ( !*dstr ) {
+            if( !*dstr ) {
                 return 1;
             }
         }
@@ -339,8 +339,8 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
      * If at end of pattern, slurp the rest, and leave.
      */
 
-    if ( !tstr[1] ) {
-        strncpy ( arglist[arg], dstr, LBUF_SIZE - 1 );
+    if( !tstr[1] ) {
+        strncpy( arglist[arg], dstr, LBUF_SIZE - 1 );
         arglist[arg][LBUF_SIZE - 1] = '\0';
         return 1;
     }
@@ -356,7 +356,7 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
      */
 
     do {
-        if ( argpos < arg ) {
+        if( argpos < arg ) {
             /*
              * Fill in arguments if someone put another '*'
              * * before a fixed string.
@@ -368,15 +368,15 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
              * Jump to the fast routine if we can.
              */
 
-            if ( argpos >= numargs ) {
-                return real_quick_wild ( tstr, dstr );
+            if( argpos >= numargs ) {
+                return real_quick_wild( tstr, dstr );
             }
 
             /*
              * Fill in any intervening '?'s
              */
 
-            while ( argpos < arg ) {
+            while( argpos < arg ) {
                 arglist[argpos][0] = *datapos;
                 arglist[argpos][1] = '\0';
                 datapos++;
@@ -386,8 +386,8 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
                  * Jump to the fast routine if we can.
                  */
 
-                if ( argpos >= numargs ) {
-                    return real_quick_wild ( tstr, dstr );
+                if( argpos >= numargs ) {
+                    return real_quick_wild( tstr, dstr );
                 }
             }
         }
@@ -403,8 +403,8 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
          */
 
         numextra = 0;
-        while ( *tstr == '?' ) {
-            if ( !*dstr ) {
+        while( *tstr == '?' ) {
+            if( !*dstr ) {
                 return 0;
             }
             tstr++;
@@ -412,13 +412,13 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
             arg++;
             numextra++;
         }
-    } while ( *tstr == '*' );
+    } while( *tstr == '*' );
 
     /*
      * Skip over a backslash in the pattern string if it is there.
      */
 
-    if ( *tstr == '\\' ) {
+    if( *tstr == '\\' ) {
         tstr++;
     }
 
@@ -426,21 +426,21 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
      * Check for possible matches.  This loop terminates either at end
      * * of data (resulting in failure), or at a successful match.
      */
-    while ( 1 ) {
+    while( 1 ) {
 
         /*
          * Scan forward until first character matches.
          */
 
-        if ( *tstr )
-            while ( NOTEQUAL ( *dstr, *tstr ) ) {
-                if ( !*dstr ) {
+        if( *tstr )
+            while( NOTEQUAL( *dstr, *tstr ) ) {
+                if( !*dstr ) {
                     return 0;
                 }
                 dstr++;
             }
         else
-            while ( *dstr ) {
+            while( *dstr ) {
                 dstr++;
             }
 
@@ -449,25 +449,25 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
          * * does, using the fastest method, as usual.
          */
 
-        if ( *dstr ) {
+        if( *dstr ) {
             st = ( arg < numargs ) ?
-                 real_wild1 ( tstr + 1, dstr + 1, arg ) :
-                 real_quick_wild ( tstr + 1, dstr + 1 );
-            if ( st < 0 ) {
+                 real_wild1( tstr + 1, dstr + 1, arg ) :
+                 real_quick_wild( tstr + 1, dstr + 1 );
+            if( st < 0 ) {
                 return st;
             }
         } else {
             st = 0;
         }
-        if ( !*dstr || st ) {
+        if( !*dstr || st ) {
 
             /*
              * Found a match!  Fill in all remaining arguments.
              * * First do the '*'...
              */
-            strncpy ( arglist[argpos], datapos,
-                      ( dstr - datapos ) - numextra );
-            arglist[argpos][ ( dstr - datapos ) - numextra] = '\0';
+            strncpy( arglist[argpos], datapos,
+                     ( dstr - datapos ) - numextra );
+            arglist[argpos][( dstr - datapos ) - numextra] = '\0';
             datapos = dstr - numextra;
             argpos++;
 
@@ -475,8 +475,8 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
              * Fill in any trailing '?'s that are left.
              */
 
-            while ( numextra ) {
-                if ( argpos >= numargs ) {
+            while( numextra ) {
+                if( argpos >= numargs ) {
                     return 1;
                 }
                 arglist[argpos][0] = *datapos;
@@ -497,17 +497,17 @@ static int real_wild1 ( char *tstr, char *dstr, int arg ) {
     }
 }
 
-int wild1 ( char *tstr, char *dstr, int arg ) {
+int wild1( char *tstr, char *dstr, int arg ) {
     int st;
 
-    if ( !check_literals ( tstr, dstr ) ) {
+    if( !check_literals( tstr, dstr ) ) {
         return 0;
     }
 
     mudstate.wild_times_lev = 0;
 
-    st = real_wild1 ( tstr, dstr, arg );
-    if ( ( st < 0 ) && ( mudstate.wild_times_lev > mudconf.wild_times_lim ) ) {
+    st = real_wild1( tstr, dstr, arg );
+    if( ( st < 0 ) && ( mudstate.wild_times_lev > mudconf.wild_times_lim ) ) {
         return 0;
     }
     return st;
@@ -523,7 +523,7 @@ int wild1 ( char *tstr, char *dstr, int arg ) {
  * Side Effect: this routine modifies the 'arglist' and 'numargs'
  * static global variables.
  */
-int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
+int wild( char *tstr, char *dstr, char *args[], int nargs ) {
     int i, value;
 
     char *scan;
@@ -532,7 +532,7 @@ int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
      * Initialize the return array.
      */
 
-    for ( i = 0; i < nargs; i++ ) {
+    for( i = 0; i < nargs; i++ ) {
         args[i] = NULL;
     }
 
@@ -540,14 +540,14 @@ int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
      * Do fast match.
      */
 
-    while ( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
-        if ( *tstr == '\\' ) {
+    while( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
+        if( *tstr == '\\' ) {
             tstr++;
         }
-        if ( NOTEQUAL ( *dstr, *tstr ) ) {
+        if( NOTEQUAL( *dstr, *tstr ) ) {
             return 0;
         }
-        if ( !*dstr ) {
+        if( !*dstr ) {
             return 1;
         }
         tstr++;
@@ -560,14 +560,14 @@ int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
 
     i = 0;
     scan = tstr;
-    while ( *scan && ( i < nargs ) ) {
-        switch ( *scan ) {
+    while( *scan && ( i < nargs ) ) {
+        switch( *scan ) {
         case '?':
-            args[i] = alloc_lbuf ( "wild.?" );
+            args[i] = alloc_lbuf( "wild.?" );
             i++;
             break;
         case '*':
-            args[i] = alloc_lbuf ( "wild.*" );
+            args[i] = alloc_lbuf( "wild.*" );
             i++;
         }
         scan++;
@@ -584,15 +584,15 @@ int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
      * Do the match.
      */
 
-    value = nargs ? wild1 ( tstr, dstr, 0 ) : quick_wild ( tstr, dstr );
+    value = nargs ? wild1( tstr, dstr, 0 ) : quick_wild( tstr, dstr );
 
     /*
      * Clean out any fake match data left by wild1.
      */
 
-    for ( i = 0; i < nargs; i++ )
-        if ( ( args[i] != NULL ) && ( !*args[i] || !value ) ) {
-            free_lbuf ( args[i] );
+    for( i = 0; i < nargs; i++ )
+        if( ( args[i] != NULL ) && ( !*args[i] || !value ) ) {
+            free_lbuf( args[i] );
             args[i] = NULL;
         }
     return value;
@@ -604,25 +604,25 @@ int wild ( char *tstr, char *dstr, char *args[], int nargs ) {
  *
  * This routine will cause crashes if fed NULLs instead of strings.
  */
-int wild_match ( char *tstr, char *dstr ) {
-    switch ( *tstr ) {
+int wild_match( char *tstr, char *dstr ) {
+    switch( *tstr ) {
     case '>':
         tstr++;
-        if ( isdigit ( *tstr ) || ( *tstr == '-' ) ) {
-            return ( ( int ) strtol ( tstr, ( char ** ) NULL, 10 ) < ( int ) strtol ( dstr, ( char ** ) NULL, 10 ) );
+        if( isdigit( *tstr ) || ( *tstr == '-' ) ) {
+            return ( ( int ) strtol( tstr, ( char ** ) NULL, 10 ) < ( int ) strtol( dstr, ( char ** ) NULL, 10 ) );
         } else {
-            return ( strcmp ( tstr, dstr ) < 0 );
+            return ( strcmp( tstr, dstr ) < 0 );
         }
     case '<':
         tstr++;
-        if ( isdigit ( *tstr ) || ( *tstr == '-' ) ) {
-            return ( ( int ) strtol ( tstr, ( char ** ) NULL, 10 ) > ( int ) strtol ( dstr, ( char ** ) NULL, 10 ) );
+        if( isdigit( *tstr ) || ( *tstr == '-' ) ) {
+            return ( ( int ) strtol( tstr, ( char ** ) NULL, 10 ) > ( int ) strtol( dstr, ( char ** ) NULL, 10 ) );
         } else {
-            return ( strcmp ( tstr, dstr ) > 0 );
+            return ( strcmp( tstr, dstr ) > 0 );
         }
     }
 
-    return quick_wild ( tstr, dstr );
+    return quick_wild( tstr, dstr );
 }
 
 /* ----------------------------------------------------------------------
@@ -630,7 +630,7 @@ int wild_match ( char *tstr, char *dstr ) {
  * global registers.
  */
 
-int register_match ( char *tstr, char *dstr, char *args[], int nargs ) {
+int register_match( char *tstr, char *dstr, char *args[], int nargs ) {
     int i, value;
 
     char *buff, *scan, *p, *end, *q_names[NUM_ENV_VARS];
@@ -639,7 +639,7 @@ int register_match ( char *tstr, char *dstr, char *args[], int nargs ) {
      * Initialize return array.
      */
 
-    for ( i = 0; i < nargs; i++ ) {
+    for( i = 0; i < nargs; i++ ) {
         args[i] = q_names[i] = NULL;
     }
 
@@ -647,14 +647,14 @@ int register_match ( char *tstr, char *dstr, char *args[], int nargs ) {
      * Do fast match.
      */
 
-    while ( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
-        if ( *tstr == '\\' ) {
+    while( ( *tstr != '*' ) && ( *tstr != '?' ) ) {
+        if( *tstr == '\\' ) {
             tstr++;
         }
-        if ( NOTEQUAL ( *dstr, *tstr ) ) {
+        if( NOTEQUAL( *dstr, *tstr ) ) {
             return 0;
         }
-        if ( !*dstr ) {
+        if( !*dstr ) {
             return 1;
         }
         tstr++;
@@ -667,24 +667,24 @@ int register_match ( char *tstr, char *dstr, char *args[], int nargs ) {
 
     i = 0;
     scan = tstr;
-    buff = alloc_lbuf ( "rmatch.buff" );
+    buff = alloc_lbuf( "rmatch.buff" );
     p = buff;
-    while ( *scan ) {
+    while( *scan ) {
         *p++ = *scan;
-        switch ( *scan ) {
+        switch( *scan ) {
         case '?':
             /*
              * FALLTHRU
              */
         case '*':
-            args[i] = alloc_lbuf ( "xvars_match.wild" );
+            args[i] = alloc_lbuf( "xvars_match.wild" );
             scan++;
-            if ( *scan == '{' ) {
-                if ( ( end = strchr ( scan + 1, '}' ) ) != NULL ) {
+            if( *scan == '{' ) {
+                if( ( end = strchr( scan + 1, '}' ) ) != NULL ) {
                     *end = '\0';
-                    if ( * ( scan + 1 ) ) {
-                        q_names[i] = XSTRDUP ( scan + 1,
-                                               "rmatch.name" );
+                    if( * ( scan + 1 ) ) {
+                        q_names[i] = XSTRDUP( scan + 1,
+                                              "rmatch.name" );
                     }
                     scan = end + 1;
                 }
@@ -703,25 +703,25 @@ int register_match ( char *tstr, char *dstr, char *args[], int nargs ) {
 
     arglist = args;
     numargs = nargs;
-    value = nargs ? wild1 ( buff, dstr, 0 ) : quick_wild ( buff, dstr );
+    value = nargs ? wild1( buff, dstr, 0 ) : quick_wild( buff, dstr );
 
     /*
      * Copy things into registers. Clean fake match data from wild1().
      */
 
-    for ( i = 0; i < nargs; i++ ) {
-        if ( ( args[i] != NULL ) && ( !*args[i] || !value ) ) {
-            free_lbuf ( args[i] );
+    for( i = 0; i < nargs; i++ ) {
+        if( ( args[i] != NULL ) && ( !*args[i] || !value ) ) {
+            free_lbuf( args[i] );
             args[i] = NULL;
         }
-        if ( args[i] && q_names[i] ) {
-            set_register ( "rmatch", q_names[i], args[i] );
+        if( args[i] && q_names[i] ) {
+            set_register( "rmatch", q_names[i], args[i] );
         }
-        if ( q_names[i] ) {
-            XFREE ( q_names[i], "rmatch.name" );
+        if( q_names[i] ) {
+            XFREE( q_names[i], "rmatch.name" );
         }
     }
-    free_lbuf ( buff );
+    free_lbuf( buff );
 
     return value;
 }

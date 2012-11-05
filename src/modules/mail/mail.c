@@ -1185,10 +1185,7 @@ void do_mail_nuke(dbref player) {
         nhashdelete((int)thing, &mod_mail_msg_htab);
     }
 
-    STARTLOG(LOG_ALWAYS, "WIZ", "MNUKE")
-    log_printf("** MAIL PURGE ** done by ");
-    log_name(player);
-    ENDLOG
+    log_write(LOG_ALWAYS, "WIZ", "MNUKE", "** MAIL PURGE ** done by ");
 
     notify(player, "You annihilate the post office. All messages cleared.");
 }

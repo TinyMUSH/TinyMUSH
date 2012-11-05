@@ -612,15 +612,6 @@ extern int	register_match(char *, char *, char *[], int);
 
 #define safe_atoi(s)	((s == NULL) ? 0 : (int)strtol(s, (char **)NULL, 10))
 
-#define	STARTLOG(key,p,s) \
-	if ((((key) & mudconf.log_options) != 0) && start_log(p, s, key)) {
-#define	ENDLOG \
-	end_log(); }
-#define	LOG_SIMPLE(key,p,s,m) \
-	STARTLOG(key,p,s) \
-		log_printf("%s", m); \
-	ENDLOG
-
 #define	test_top()		((mudstate.qfirst != NULL) ? 1 : 0)
 #define	controls(p,x)		Controls(p,x)
 
