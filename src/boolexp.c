@@ -96,10 +96,10 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
             pname = log_getname ( player, "eval_boolexp" );
             if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
                 lname = log_getname ( Location ( player ), "eval_boolexp" );
-                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock exceeded recursion limit.", pname, lname );
+                log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock exceeded recursion limit.", pname, lname );
                 XFREE ( lname, "eval_boolexp" );
             } else {
-                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s: Lock exceeded recursion limit.", pname );
+                log_write ( LOG_BUGS, "BUG", "LOCK", "%s: Lock exceeded recursion limit.", pname );
             }
             XFREE ( pname, "eval_boolexp" );
             notify ( player, "Sorry, broken lock!" );
@@ -109,10 +109,10 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
         if ( ( b->sub1->type != BOOLEXP_CONST ) || ( b->sub1->thing < 0 ) ) {
             if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
                 lname = log_getname ( Location ( player ), "eval_boolexp" );
-                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type );
+                log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type );
                 XFREE ( lname, "eval_boolexp" );
             } else {
-                log_printf2 ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type );
+                log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type );
             }
             notify ( player, "Sorry, broken lock!" );
             mudstate.lock_nest_lev--;
@@ -228,7 +228,7 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
     case BOOLEXP_OWNER:
         return ( Owner ( b->sub1->thing ) == Owner ( player ) );
     default:
-        mainlog_printf ( "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n" );
+        log_write_raw ( 1, "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n" );
         abort();	/* bad type */
         return 0;	/* NOTREACHED */
     }

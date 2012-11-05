@@ -36,9 +36,9 @@ void pool_init ( int poolnum, int poolsize ) {
 
 static void pool_err ( const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason ) {
     if ( !mudstate.logging ) {
-        log_printf2 ( logflag, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx. (%s)", action, pools[poolnum].pool_size, tag, reason, ( long ) ph, mudstate.debug_cmd );
+        log_write ( logflag, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx. (%s)", action, pools[poolnum].pool_size, tag, reason, ( long ) ph, mudstate.debug_cmd );
     } else if ( logflag != LOG_ALLOCATE ) {
-        log_printf2 ( logflag | LOG_FORCE, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx", action, pools[poolnum].pool_size, tag, reason, ( long ) ph );
+        log_write ( logflag | LOG_FORCE, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx", action, pools[poolnum].pool_size, tag, reason, ( long ) ph );
     }
 }
 
@@ -111,11 +111,9 @@ char *pool_alloc ( int poolnum, const char *tag ) {
     }
     do {
         if ( pools[poolnum].free_head == NULL ) {
-            h = ( char * ) RAW_MALLOC ( pools[poolnum].pool_size +
-                                        sizeof ( POOLHDR ) + sizeof ( POOLFTR ),
-                                        "pool_alloc.ph" );
+            h = ( char * ) RAW_MALLOC ( pools[poolnum].pool_size + sizeof ( POOLHDR ) + sizeof ( POOLFTR ), "pool_alloc.ph" );
             if ( h == NULL ) {
-                mainlog_printf ( "ABORT! alloc.c, pool_alloc() failed to get memory.\n" );
+                log_write_raw ( 1, "ABORT! alloc.c, pool_alloc() failed to get memory.\n" );
                 abort();
             }
             ph = ( POOLHDR * ) h;
@@ -459,7 +457,7 @@ static void trace_free ( const char *name, void ( ptr ) {
     for ( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
         if ( tptr->bptr == ptr ) {
             if ( strcmp ( tptr->buf_tag, name ) ) {
-                log_printf2 ( LOG_BUGS, "MEM", "TRACE", "Free mismatch, tag %s allocated as %s", name, tptr->buf_tag );
+                log_write ( LOG_BUGS, "MEM", "TRACE", "Free mismatch, tag %s allocated as %s", name, tptr->buf_tag );
             }
             if ( mudstate.raw_allocs == tptr ) {
                 mudstate.raw_allocs = tptr->next;
@@ -473,7 +471,7 @@ static void trace_free ( const char *name, void ( ptr ) {
         prev = tptr;
     }
 
-    log_printf2 ( LOG_BUGS, "MEM", "TRACE", "Attempt to free unknown with tag %s", name );
+    log_write ( LOG_BUGS, "MEM", "TRACE", "Attempt to free unknown with tag %s", name );
 }
 
 void *track_malloc ( size_t amount, const char *name ) {

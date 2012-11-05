@@ -58,7 +58,7 @@ BOOLEXP * getboolexp1 ( FILE *f ) {
          * break;
          */
     case EOF:
-        mainlog_printf ( "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n" );
+        log_write_raw ( 1, "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n" );
         abort();
         break;
     case '(':
@@ -142,7 +142,7 @@ BOOLEXP * getboolexp1 ( FILE *f ) {
     case '-':		/* obsolete NOTHING key, eat it */
         while ( ( c = getc ( f ) ) != '\n' ) {
             if ( c == EOF ) {
-                mainlog_printf ( "ABORT! db_rw.c, unexpected EOF in getboolexp1().\n" );
+                log_write_raw ( 1, "ABORT! db_rw.c, unexpected EOF in getboolexp1().\n" );
                 abort();
             }
         }
@@ -259,7 +259,7 @@ BOOLEXP * getboolexp1 ( FILE *f ) {
     }
 
 error:
-    mainlog_printf ( "ABORT! db_rw.c, reached error case in getboolexp1().\n" );
+    log_write_raw ( 1, "ABORT! db_rw.c, reached error case in getboolexp1().\n" );
     abort();		/* bomb out */
     return TRUE_BOOLEXP;	/* NOTREACHED */
 }
@@ -276,7 +276,7 @@ static BOOLEXP *getboolexp ( FILE *f ) {
 
     b = getboolexp1 ( f );
     if ( getc ( f ) != '\n' ) {
-        mainlog_printf ( "ABORT! db_rw.c, parse error in getboolexp().\n" );
+        log_write_raw ( 1, "ABORT! db_rw.c, parse error in getboolexp().\n" );
         abort();	/* parse error, we lose */
     }
     if ( ( c = getc ( f ) ) != '\n' ) {
@@ -362,13 +362,12 @@ static int get_list ( FILE *f, dbref i, int new_strings ) {
             c = getc ( f );
             if ( c != '\n' ) {
                 ungetc ( c, f );
-                mainlog_printf ( "No line feed on object %d\n", i );
+                log_write_raw ( 1, "No line feed on object %d\n", i );
                 return 1;
             }
             return 1;
         default:
-            mainlog_printf ( "Bad character '%c' when getting attributes on object %d\n",
-                             c, i );
+            log_write_raw ( 1, "Bad character '%c' when getting attributes on object %d\n", c, i );
             /*
              * We've found a bad spot.  I hope things aren't too
              * bad.
@@ -452,7 +451,7 @@ static void putbool_subexp ( FILE *f, BOOLEXP *b ) {
         }
         break;
     default:
-        mainlog_printf ( "Unknown boolean type in putbool_subexp: %d\n", b->type );
+        log_write_raw ( 1, "Unknown boolean type in putbool_subexp: %d\n", b->type );
     }
 }
 
@@ -757,13 +756,13 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
     deduce_name = 1;
     deduce_timestamps = 1;
     if ( mudstate.standalone ) {
-        mainlog_printf ( "Reading " );
+        log_write_raw ( 1, "Reading " );
     }
     db_free();
     for ( i = 0;; i++ ) {
 
         if ( mudstate.standalone && ! ( i % 100 ) ) {
-            mainlog_printf ( "." );
+            log_write_raw ( 1, "." );
         }
         switch ( ch = getc ( f ) ) {
         case '-':	/* Misc tag */
@@ -788,7 +787,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
 
                 if ( header_gotten ) {
                     if ( mudstate.standalone ) {
-                        mainlog_printf ( "\nDuplicate MUSH version header entry at object %d, ignored.\n", i );
+                        log_write_raw ( 1, "\nDuplicate MUSH version header entry at object %d, ignored.\n", i );
                     }
                     tstr = getstring_noalloc ( f, 0 );
                     break;
@@ -850,7 +849,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
             case 'S':	/* SIZE */
                 if ( size_gotten ) {
                     if ( mudstate.standalone ) {
-                        mainlog_printf ( "\nDuplicate size entry at object %d, ignored.\n", i );
+                        log_write_raw ( 1, "\nDuplicate size entry at object %d, ignored.\n", i );
                     }
                     tstr = getstring_noalloc ( f, 0 );
                 } else {
@@ -890,7 +889,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
 					 * FREELIST */
                 if ( nextattr_gotten ) {
                     if ( mudstate.standalone ) {
-                        mainlog_printf ( "\nDuplicate next free vattr entry at object %d, ignored.\n", i );
+                        log_write_raw ( 1, "\nDuplicate next free vattr entry at object %d, ignored.\n", i );
                     }
                     tstr = getstring_noalloc ( f, 0 );
                 } else {
@@ -900,7 +899,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
                 break;
             default:
                 if ( mudstate.standalone ) {
-                    mainlog_printf ( "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i );
+                    log_write_raw ( 1, "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i );
                 }
                 tstr = getstring_noalloc ( f, 0 );
             }
@@ -1062,7 +1061,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
             if ( read_attribs ) {
                 if ( !get_list ( f, i, read_new_strings ) ) {
                     if ( mudstate.standalone ) {
-                        mainlog_printf ( "\nError reading attrs for object #%d\n", i );
+                        log_write_raw ( 1, "\nError reading attrs for object #%d\n", i );
                     }
                     return -1;
                 }
@@ -1079,12 +1078,12 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
             tstr = getstring_noalloc ( f, 0 );
             if ( strcmp ( tstr, "**END OF DUMP***" ) ) {
                 if ( mudstate.standalone ) {
-                    mainlog_printf ( "\nBad EOF marker at object #%d\n", i );
+                    log_write_raw ( 1, "\nBad EOF marker at object #%d\n", i );
                 }
                 return -1;
             } else {
                 if ( mudstate.standalone ) {
-                    mainlog_printf ( "\n" );
+                    log_write_raw ( 1, "\n" );
                 }
                 *db_version = g_version;
                 *db_format = g_format;
@@ -1099,7 +1098,7 @@ dbref db_read_flatfile ( FILE *f, int *db_format, int *db_version, int *db_flags
             }
         default:
             if ( mudstate.standalone ) {
-                mainlog_printf ( "\nIllegal character '%c' near object #%d\n", ch, i );
+                log_write_raw ( 1, "\nIllegal character '%c' near object #%d\n", ch, i );
             }
             return -1;
         }
@@ -1129,7 +1128,7 @@ int db_read ( void ) {
     data = db_get ( key, DBTYPE_DBINFO );
 
     if ( !data.dptr ) {
-        log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Could not open main record" );
+        log_write ( LOG_ALWAYS, "DBR", "LOAD", "Could not open main record" );
         return -1;
     }
     /*
@@ -1177,7 +1176,7 @@ int db_read ( void ) {
                     /*
                      * Houston, we have a problem
                      */
-                    log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS ( i, blksize ) );
+                    log_write ( LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS ( i, blksize ) );
                 }
                 s++;
             }
@@ -1190,7 +1189,7 @@ int db_read ( void ) {
      */
 
     if ( mudstate.standalone ) {
-        log_printf2 ( LOG_ALWAYS, "DBR", "LOAD", "Reading " );
+        log_write ( LOG_ALWAYS, "DBR", "LOAD", "Reading " );
     }
 
     blksize = OBJECT_BLOCK_SIZE;
@@ -1213,7 +1212,7 @@ int db_read ( void ) {
                 db_grow ( num + 1 );
 
                 if ( mudstate.standalone && ! ( num % 100 ) ) {
-                    mainlog_printf ( "." );
+                    log_write_raw ( 1, "." );
                 }
                 /*
                  * We read the entire object structure in and
@@ -1254,7 +1253,7 @@ int db_read ( void ) {
     }
 
     if ( mudstate.standalone ) {
-        mainlog_printf ( "\n" );
+        log_write_raw ( 1, "\n" );
     }
 
     return ( 0 );
@@ -1403,11 +1402,11 @@ dbref db_write_flatfile ( FILE *f, int format, int version ) {
         flags = version;
         break;
     default:
-        mainlog_printf ( "Can only write TinyMUSH 3 format.\n" );
+        log_write_raw ( 1, "Can only write TinyMUSH 3 format.\n" );
         return -1;
     }
     if ( mudstate.standalone ) {
-        mainlog_printf ( "Writing " );
+        log_write_raw ( 1, "Writing " );
     }
 
     /*
@@ -1542,7 +1541,7 @@ dbref db_write_flatfile ( FILE *f, int format, int version ) {
     DO_WHOLE_DB ( i ) {
 
         if ( mudstate.standalone && ! ( i % 100 ) ) {
-            mainlog_printf ( "." );
+            log_write_raw ( 1, "." );
         }
         n_objt += db_write_object_out ( f, i, format, flags, &n_atrt );
     }
@@ -1551,12 +1550,12 @@ dbref db_write_flatfile ( FILE *f, int format, int version ) {
     fflush ( f );
 
     if ( mudstate.standalone ) {
-        mainlog_printf ( "\n" );
+        log_write_raw ( 1, "\n" );
         if ( dbclean ) {
             if ( n_objt ) {
-                mainlog_printf ( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered, n_objt, n_atrt );
+                log_write_raw ( 1, "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered, n_objt, n_atrt );
             } else if ( n_deleted || n_renumbered ) {
-                mainlog_printf ( "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered );
+                log_write_raw ( 1, "Cleaned %d attributes (now %d): %d deleted, %d renumbered (no objects touched).\n", n_oldtotal, anxt, n_deleted, n_renumbered );
             }
             XFREE ( used_attrs_table, "flatfile.used_attrs_table" );
             XFREE ( old_attrs_table, "flatfile.old_attrs_table" );
@@ -1577,7 +1576,7 @@ dbref db_write ( void ) {
     al_store();
 
     if ( mudstate.standalone ) {
-        mainlog_printf ( "Writing " );
+        log_write_raw ( 1, "Writing " );
     }
 
     /*
@@ -1745,7 +1744,7 @@ dbref db_write ( void ) {
         for ( j = ENTRY_BLOCK_STARTS ( i, blksize ); ( j <= ENTRY_BLOCK_ENDS ( i, blksize ) ) && ( j < mudstate.db_top ); j++ ) {
 
             if ( mudstate.standalone && ! ( j % 100 ) ) {
-                mainlog_printf ( "." );
+                log_write_raw ( 1, "." );
             }
             /*
              * We assume you always do a dbck before dump, and
@@ -1821,7 +1820,7 @@ dbref db_write ( void ) {
     db_unlock();
 
     if ( mudstate.standalone ) {
-        mainlog_printf ( "\n" );
+        log_write_raw ( 1, "\n" );
     }
     return ( mudstate.db_top );
 }
@@ -1840,10 +1839,10 @@ FILE *db_module_flatfile ( char *filename, int wrflag ) {
 
     if ( wrflag ) {
         f = tf_fopen ( filename, O_WRONLY | O_CREAT | O_TRUNC );
-        log_printf2 ( LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", filename );
+        log_write ( LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", filename );
     } else {
         f = tf_fopen ( filename, O_RDONLY );
-        log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Loading db: %s", filename );
+        log_write ( LOG_ALWAYS, "INI", "LOAD", "Loading db: %s", filename );
     }
 
     if ( f != NULL ) {

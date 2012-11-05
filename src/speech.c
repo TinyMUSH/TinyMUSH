@@ -308,7 +308,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             free_lbuf ( buf2 );
         }
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s shouts: '%s'", name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "SHOUT", "%s shouts: '%s'", name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_WIZSHOUT:
@@ -336,7 +336,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             free_lbuf ( buf2 );
         }
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s broadcasts: '%s'", name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "BCAST", "%s broadcasts: '%s'", name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_ADMINSHOUT:
@@ -369,7 +369,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             free_lbuf ( buf2 );
         }
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "ASHOUT", "%s yells: '%s'", name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "ASHOUT", "%s yells: '%s'", name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_WALLPOSE:
@@ -378,7 +378,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
         } else
             raw_broadcast ( 0, "Announcement: %s %s", Name ( player ), message );
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLposes: '%s'",name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLposes: '%s'",name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_WIZPOSE:
@@ -388,7 +388,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             raw_broadcast ( WIZARD, "Broadcast: %s %s", Name ( player ),
                             message );
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZposes: '%s'", name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZposes: '%s'", name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_WALLEMIT:
@@ -398,7 +398,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             raw_broadcast ( 0, "Announcement: %s", message );
         }
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLemits: '%s'", name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLemits: '%s'", name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     case SAY_WIZEMIT:
@@ -408,7 +408,7 @@ void do_say ( dbref player, dbref cause, int key, char *message ) {
             raw_broadcast ( WIZARD, "Broadcast: %s", message );
         }
         name = log_getname ( player, "do_say" );
-        log_printf2 ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZemits: '%s'",name, strip_ansi ( message ) );
+        log_write ( LOG_SHOUTS, "WIZ", "BCAST", "%s WIZemits: '%s'",name, strip_ansi ( message ) );
         XFREE ( name, "do_say" );
         break;
     }

@@ -9,9 +9,7 @@
 #define SQL_NONE_ERROR "NO EXTERNAL SQL DATABASE CONNECTIVITY IS CONFIGURED"
 
 void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
-    STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf("Disconnected from SQL server (simulated).");
-    ENDLOG;
+    log_write(LOG_ALWAYS, "SQL", "DISC", "Disconnected from SQL server (simulated).");
     
     if(buff) {
         mod_db_sql_notify(player, buff, bufc, "#-1 %s", SQL_NONE_ERROR);
@@ -21,9 +19,7 @@ void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
 }
 
 int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Connected to SQL server (simulated)");
-    ENDLOG
+    log_write(LOG_ALWAYS, "SQL", "CONN", "Connected to SQL server (simulated)");
     
     if(buff) {
         mod_db_sql_notify(player, buff, bufc, "#-1 %s", SQL_NONE_ERROR);

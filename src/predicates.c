@@ -1504,7 +1504,7 @@ void do_restart ( dbref player, dbref cause, int key ) {
 
     raw_broadcast ( 0, "GAME: Restart by %s, please wait.", Name ( Owner ( player ) ) );
     name = log_getname ( player, "do_restart" );
-    log_printf2 ( LOG_ALWAYS, "WIZ", "RSTRT" "Restart by %s", name );
+    log_write ( LOG_ALWAYS, "WIZ", "RSTRT" "Restart by %s", name );
     XFREE ( name, "do_restart" );
     /*
      * Do a dbck first so we don't end up with an inconsistent state.
@@ -1533,17 +1533,7 @@ void do_restart ( dbref player, dbref cause, int key ) {
         kill ( slave_pid, SIGKILL );
     }
 
-    for ( lp = logfds_table; lp->log_flag; lp++ ) {
-        if ( lp->filename && lp->fileptr ) {
-            fclose ( lp->fileptr );
-            copy_file ( lp->filename, tmprintf ( "%s.%ld", lp->filename, ( long ) mudstate.now ), 1 );
-        }
-    }
-
-    if ( mainlog_fp != stderr ) {
-        fclose ( mainlog_fp );
-        copy_file ( mudconf.log_file, tmprintf ( "%s.%ld", mudconf.log_file, ( long ) mudstate.now ), 1 );
-    }
+    logfile_close();
 
     alarm ( 0 );
     dump_restart_db();

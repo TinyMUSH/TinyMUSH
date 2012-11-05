@@ -725,10 +725,10 @@ void process_cmdent ( CMDENT *cmdp, char *switchp, dbref player, dbref cause, in
                     pname = log_getname ( player, "process_cmdent" );
                     if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
                         lname = log_getname ( Location ( player ), "process_cmdent" );
-                        log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, new );
+                        log_write ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, new );
                         XFREE ( lname, "process_cmdent" );
                     } else {
-                        log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, new );
+                        log_write ( LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, new );
                     }
                     XFREE ( pname, "process_cmdent" );
                 }
@@ -898,11 +898,11 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
     mudstate.debug_cmd = ( char * ) "< process_command >";
 
     if ( !command ) {
-        mainlog_printf ( "ABORT! command.c, null command in process_command().\n" );
+        log_write_raw ( 1, "ABORT! command.c, null command in process_command().\n" );
         abort();
     }
     if ( !Good_obj ( player ) ) {
-        log_printf2 ( LOG_BUGS, "CMD", "PLYR", "Bad player in process_command: %d", player );
+        log_write ( LOG_BUGS, "CMD", "PLYR", "Bad player in process_command: %d", player );
         mudstate.debug_cmd = cmdsave;
         return command;
     }
@@ -923,18 +923,18 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
     if ( Suspect ( player ) ) {
         if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
             lname = log_getname ( Location ( player ), "process_command" );
-            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s in %s entered: %s", pname, lname, command );
+            log_write ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s in %s entered: %s", pname, lname, command );
             XFREE ( lname, "process_command" );
         } else {
-            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s entered: %s", pname, command );
+            log_write ( LOG_SUSPECTCMDS, "CMD", "SUSP", "%s entered: %s", pname, command );
         }
     } else {
         if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
             lname = log_getname ( Location ( player ), "process_command" );
-            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s in %s entered: %s", pname, lname, command );
+            log_write ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s in %s entered: %s", pname, lname, command );
             XFREE ( lname, "process_command" );
         } else {
-            log_printf2 ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s entered: %s", pname, command );
+            log_write ( LOG_SUSPECTCMDS, "CMD", "ALL", "%s entered: %s", pname, command );
         }
     }
     XFREE ( pname, "process_command" );
@@ -1514,10 +1514,10 @@ char *process_command ( dbref player, dbref cause, int interactive, char *comman
         pname = log_getname ( player, "process_command" );
         if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
             lname = log_getname ( Location ( player ), "process_command" );
-            log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, command );
+            log_write ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, command );
             XFREE ( lname, "process_command" );
         } else {
-            log_printf2 ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, command );
+            log_write ( LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, command );
         }
         XFREE ( pname, "process_command" );
     }
@@ -1655,10 +1655,10 @@ void process_cmdline ( dbref player, dbref cause, char *cmdline, char *args[], i
                 pname = log_getname ( player, "process_cmdline" );
                 if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
                     lname = log_getname ( Location ( player ), "process_cmdline" );
-                    log_printf2 ( LOG_PROBLEMS, "CMD", "CPU","%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
+                    log_write ( LOG_PROBLEMS, "CMD", "CPU","%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
                     XFREE ( lname, "process_cmdline" );
                 } else {
-                    log_printf2 ( LOG_PROBLEMS, "CMD", "CPU","%s queued command taking %.2f secs (enactor #%d): %s", pname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
+                    log_write ( LOG_PROBLEMS, "CMD", "CPU","%s queued command taking %.2f secs (enactor #%d): %s", pname, ( double ) ( used_time / 1000 ), mudstate.qfirst->cause, log_cmdbuf );
                 }
                 XFREE ( pname, "process_cmdline" );
             }

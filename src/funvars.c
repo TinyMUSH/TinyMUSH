@@ -2780,7 +2780,7 @@ void structure_clr ( dbref thing ) {
         for ( i = 0; i < count; i++ ) {
             if ( struct_array[i]->n_instances > 0 ) {
                 tname = log_getname ( thing, "structure_clr" );
-                log_printf2 ( LOG_ALWAYS, "BUG", "STRUCT", "%s's structure %s has %d allocated instances uncleared.", tname, name_array[i], struct_array[i]->n_instances );
+                log_write ( LOG_ALWAYS, "BUG", "STRUCT", "%s's structure %s has %d allocated instances uncleared.", tname, name_array[i], struct_array[i]->n_instances );
                 XFREE ( tname, "structure_clr" );
             }
             hashdelete ( name_array[i], &mudstate.structs_htab );
@@ -2872,7 +2872,7 @@ static int stack_set ( dbref thing, OBJSTACK *sp ) {
     }
     if ( stat < 0 ) {		/* failure for some reason */
         tname = log_getname ( thing, "stack_set" );
-        log_printf2 ( LOG_BUGS, "STK", "SET", "%s, Failure", tname );
+        log_write ( LOG_BUGS, "STK", "SET", "%s, Failure", tname );
         XFREE ( tname, "stack_set" );
         stack_clr ( thing );
         return 0;
@@ -4004,7 +4004,7 @@ void fun_gridmake ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     status = nhashadd ( player, ( int * ) ogp, &mudstate.objgrid_htab );
     if ( status < 0 ) {
         pname = log_getname ( player, "fun_gridmake" );
-        log_printf2 ( LOG_BUGS, "GRD", "MAKE", "%s Failure" );
+        log_write ( LOG_BUGS, "GRD", "MAKE", "%s Failure" );
         XFREE ( pname, "fun_gridmake" );
         grid_free ( player, ogp );
         safe_str ( "#-1 FAILURE", buff, bufc );

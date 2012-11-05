@@ -31,16 +31,16 @@
 void log_db_err ( int obj, int attr, const char *txt ) {
     if ( !mudstate.standalone ) {
         if ( attr != NOTHING ) {
-            log_printf2 ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
+            log_write ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
         } else {
-            log_printf2 ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d", txt, obj );
+            log_write ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d", txt, obj );
         }
     } else {
-        mainlog_printf ( "Could not %s object #%d", txt, obj );
+        log_write_raw ( 1, "Could not %s object #%d", txt, obj );
         if ( attr != NOTHING ) {
-            mainlog_printf ( " attr #%d", attr );
+            log_write_raw ( 1, " attr #%d", attr );
         }
-        mainlog_printf ( "\n" );
+        log_write_raw ( 1, "\n" );
     }
 }
 
@@ -64,7 +64,7 @@ void warning ( char *p, ... ) {
             p = ( char * ) strerror ( errno );
         }
 
-        ( void ) mainlog_printf ( "%s", p );
+        log_write_raw ( 1, "%s", p );
         p = va_arg ( ap, char * );
     }
     va_end ( ap );
@@ -90,7 +90,7 @@ void fatal ( char *p, ... ) {
             p = ( char * ) strerror ( errno );
         }
 
-        ( void ) mainlog_printf ( "%s", p );
+        log_write_raw ( 1, "%s", p );
         p = va_arg ( ap, char * );
     }
     va_end ( ap );

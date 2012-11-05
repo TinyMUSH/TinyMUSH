@@ -122,10 +122,10 @@ void init_version ( void ) {
     mudstate.linkerinfo = munge_space ( MUSH_BUILD_LTCOMPILE );
 
     mudstate.dbmdriver = XSTRDUP ( tmprintf ( "%s", MUSH_DBM ), "init_version" );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", "       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", "     Build date: %s", MUSH_BUILD_DATE );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo );
-    log_printf2 ( LOG_ALWAYS, "INI", "START", "     DBM driver: %s", mudstate.dbmdriver );
+    log_write ( LOG_ALWAYS, "INI", "START", "       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE );
+    log_write ( LOG_ALWAYS, "INI", "START", "     Build date: %s", MUSH_BUILD_DATE );
+    log_write ( LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo );
+    log_write ( LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo );
+    log_write ( LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo );
+    log_write ( LOG_ALWAYS, "INI", "START", "     DBM driver: %s", mudstate.dbmdriver );
 }

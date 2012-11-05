@@ -50,15 +50,11 @@ int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
         result = msqlConnect(mod_db_sql_config.host);
     if (result == -1)
     {
-        STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed connection to SQL server %s: %s",
-                   mod_db_sql_config.host, msqlErrMsg);
-        ENDLOG return -1;
+        log_write(LOG_ALWAYS, "SQL", "CONN", "Failed connection to SQL server %s: %s", mod_db_sql_config.host, msqlErrMsg);
+        return -1;
     }
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Connected to SQL server %s, socket fd %d",
-               mod_db_sql_config.host, result);
-    ENDLOG mod_db_sql_config.socket = result;
+    log_write(LOG_ALWAYS, "SQL", "CONN", "Connected to SQL server %s, socket fd %d", mod_db_sql_config.host, result);
+    mod_db_sql_config.socket = result;
 
     /*
      * Select the database we want. If we can't get it, disconnect.
@@ -66,15 +62,13 @@ int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
 
     if (msqlSelectDB(mod_db_sql_config.socket, mod_db_sql_config.db) == -1)
     {
-        STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed db select: %s", msqlErrMsg);
-        ENDLOG msqlClose(mod_db_sql_config.socket);
+        log_write(LOG_ALWAYS, "SQL", "CONN", "Failed db select: %s", msqlErrMsg);
+        msqlClose(mod_db_sql_config.socket);
         mod_db_sql_config.socket = -1;
         return -1;
     }
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("SQL database selected: %s", mod_db_sql_config.db);
-    ENDLOG return (mod_db_sql_config.socket);
+    log_write(LOG_ALWAYS, "SQL", "CONN", "SQL database selected: %s", mod_db_sql_config.db);
+    return (mod_db_sql_config.socket);
 }
 
 int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim *row_delim, const Delim *field_delim) {
@@ -134,10 +128,8 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
          * to see if waiting a little bit helps.
          */
 
-        STARTLOG(LOG_PROBLEMS, "SQL", "GONE")
-        log_printf("Connection died to SQL server on fd %d",
-                   mod_db_sql_config.socket);
-        ENDLOG retries = 0;
+        log_write(LOG_PROBLEMS, "SQL", "GONE", "Connection died to SQL server on fd %d", mod_db_sql_config.socket);
+        retries = 0;
         mod_db_sql_config.socket = -1;
 
         while ((retries < MSQL_RETRY_TIMES) &&

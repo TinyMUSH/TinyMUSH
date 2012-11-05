@@ -201,7 +201,7 @@ static void unparse_boolexp1 ( dbref player, BOOLEXP *b, char outer_type, int fo
         safe_str ( ( char * ) b->sub1, boolexp_buf, &buftop );
         break;
     default:
-        mainlog_printf ( "ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n" );
+        log_write_raw ( 1, "ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n" );
         abort();
         break;
     }

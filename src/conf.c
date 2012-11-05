@@ -437,7 +437,7 @@ void cf_init ( void ) {
 
 void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thing ) {
     if ( mudstate.initializing ) {
-        log_printf2 ( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
+        log_write ( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
     } else {
         notify ( player, tmprintf ( "%s %s not found", thingname, thing ) );
     }
@@ -459,7 +459,7 @@ void cf_log_syntax ( dbref player, char *cmd, const char *template, ... ) {
     va_end ( ap );
 
     if ( mudstate.initializing ) {
-        log_printf2 ( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
+        log_write ( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
     } else {
         notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
@@ -483,7 +483,7 @@ void cf_log_help ( dbref player, char *cmd, const char *template, ... ) {
     va_end ( ap );
 
     if ( mudstate.initializing ) {
-        log_printf2 ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
+        log_write ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
         notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
@@ -508,7 +508,7 @@ void cf_log_help_mkindx ( dbref player, char *cmd, const char *template, ... ) {
     va_end ( ap );
 
     if ( mudstate.initializing ) {
-        log_printf2 ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
+        log_write ( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
         notify ( player, tmprintf ( "%s: %s", cmd, buff ) );
     }
@@ -538,7 +538,7 @@ int cf_status_from_succfail ( dbref player, char *cmd, int success, int failure 
 
     if ( failure == 0 ) {
         if ( mudstate.initializing ) {
-            log_printf2 ( LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd );
+            log_write ( LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd );
         } else {
             notify ( player, "Nothing to set" );
         }
@@ -670,7 +670,7 @@ int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     handle = lt_dlopen ( tmprintf ( "%s/%s.la", mudconf.modules_home, str ) );
 
     if ( !handle ) {
-        log_printf2 ( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
+        log_write ( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
         return -1;
     }
     mp = ( MODULE * ) XMALLOC ( sizeof ( MODULE ), "cf_module.mp" );
@@ -720,7 +720,7 @@ int cf_module ( int *vp, char *str, long extra, dbref player, char *cmd ) {
             ( *initptr ) ();
         }
     }
-    log_printf2 ( LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str );
+    log_write ( LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str );
     return 0;
 }
 
@@ -785,7 +785,7 @@ int cf_string ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     if ( strlen ( str ) >= ( unsigned int ) extra ) {
         str[extra - 1] = '\0';
         if ( mudstate.initializing ) {
-            log_printf2 ( LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd );
+            log_write ( LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd );
         } else {
             notify ( player, "String truncated" );
         }
@@ -966,7 +966,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
      */
 
     if ( tp->filename != NULL ) {
-        log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Log type %s already diverted: %s", type_str, tp->filename );
+        log_write ( LOG_STARTUP, "CNF", "DIVT", "Log type %s already diverted: %s", type_str, tp->filename );
         return -1;
     }
     /*
@@ -988,7 +988,7 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
     if ( !fptr ) {
         fptr = fopen ( file_str, "w" );
         if ( !fptr ) {
-            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot open logfile: %s", file_str );
+            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot open logfile: %s", file_str );
             return -1;
         }
         if ( ( fd = fileno ( fptr ) ) == -1 ) {
@@ -996,12 +996,12 @@ int cf_divert_log ( int *vp, char *str, long extra, dbref player, char *cmd ) {
         }
 #ifdef FNDELAY
         if ( fcntl ( fd, F_SETFL, FNDELAY ) == -1 ) {
-            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
+            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #else
         if ( fcntl ( fd, F_SETFL, O_NDELAY ) == -1 ) {
-            log_printf2 ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
+            log_write ( LOG_STARTUP, "CNF", "DIVT", "Cannot make nonblocking: %s", file_str );
             return -1;
         }
 #endif
@@ -1530,10 +1530,10 @@ static int helper_cf_cf_access ( CONF *tp, dbref player, int *vp, char *ap, char
         notify ( player, NOPERM_MESSAGE );
         if ( db ) {
             name = log_getname ( player, "helper_cf_cf_access" );
-            log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
+            log_write ( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
             XFREE ( name, "helper_cf_cf_access" );
         } else {
-            log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
+            log_write ( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
         }
         return -1;
     }
@@ -2128,7 +2128,7 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp ) {
         default:
             status = XSTRDUP ( "Strange.", "helper_cf_set" );
         }
-        log_printf2 ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi ( buff ), status );
+        log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi ( buff ), status );
         XFREE ( name, "helper_cf_set" );
         XFREE ( status, "helper_cf_set" );
         free_lbuf ( buff );
@@ -2298,7 +2298,7 @@ void list_cf_read_access ( dbref player ) {
 if ((x)->interpreter == cf_dbref) { \
     if (!((((x)->extra == NOTHING) && (*((x)->loc) == NOTHING)) || \
 	  (Good_obj(*((x)->loc)) && !Going(*((x)->loc))))) { \
-	    log_printf2(LOG_ALWAYS, "CNF", "VRFY", "%s #%d is invalid. Reset to #%d.", (x)->pname, *((x)->loc), (x)->extra); \
+	    log_write(LOG_ALWAYS, "CNF", "VRFY", "%s #%d is invalid. Reset to #%d.", (x)->pname, *((x)->loc), (x)->extra); \
 	*((x)->loc) = (dbref) (x)->extra; \
     } \
 }

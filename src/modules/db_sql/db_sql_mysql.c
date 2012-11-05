@@ -15,9 +15,8 @@ void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
         return;
     }
     mysql = mysql_struct;
-    STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf("Disconnected from SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
-    ENDLOG mysql_close(mysql);
+    log_write(LOG_ALWAYS, "SQL", "DISC", "Disconnected from SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
+    mysql_close(mysql);
     XFREE(mysql, "mysql");
     mysql_struct = NULL;
     mod_db_sql_config.socket = -1;
@@ -52,14 +51,12 @@ int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
 
     result = mysql_real_connect(mysql,        mod_db_sql_config.host, mod_db_sql_config.username, mod_db_sql_config.password, mod_db_sql_config.db, mod_db_sql_config.port,  NULL,                    0);
     if (!result) {
-        STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed connection to SQL server %s: %s", mod_db_sql_config.host, mysql_error(mysql));
-        ENDLOG XFREE(mysql, "mysql");
+        log_write(LOG_ALWAYS, "SQL", "CONN", "Failed connection to SQL server %s: %s", mod_db_sql_config.host, mysql_error(mysql));
+        XFREE(mysql, "mysql");
         return -1;
     }
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Connected to SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
-    ENDLOG mysql_struct = mysql;
+    log_write(LOG_ALWAYS, "SQL", "CONN", "Connected to SQL server %s, SQL database selected: %s", mysql->host, mysql->db);
+    mysql_struct = mysql;
     mod_db_sql_config.socket = mysql->net.fd;
     return 1;
 }
@@ -120,9 +117,8 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
          * to see if waiting a little bit helps.
          */
 
-        STARTLOG(LOG_PROBLEMS, "SQL", "GONE")
-        log_printf("Connection died to SQL server");
-        ENDLOG retries = 0;
+        log_write(LOG_PROBLEMS, "SQL", "GONE", "Connection died to SQL server");
+        retries = 0;
         sql_shutdown(0,0,NULL,NULL);
 
         while ((retries < MYSQL_RETRY_TIMES) && (!mysql)) {

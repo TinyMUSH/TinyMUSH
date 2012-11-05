@@ -12,9 +12,8 @@ void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     if (!sqlite3_struct)
         return;
     sqlite = sqlite3_struct;
-    STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf("Closed SQLite3 database: %s", mod_db_sql_config.db);
-    ENDLOG sqlite3_close(sqlite);
+    log_write(LOG_ALWAYS, "SQL", "DISC", "Closed SQLite3 database: %s", mod_db_sql_config.db);
+    sqlite3_close(sqlite);
     sqlite3_struct = NULL;
 }
 
@@ -42,14 +41,11 @@ int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
     retval = sqlite3_open(mod_db_sql_config.db, &sqlite);
     if (retval != SQLITE_OK)
     {
-        STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed to open %s: %s",
-                   mod_db_sql_config.db, sqlite3_errmsg(sqlite));
-        ENDLOG return -1;
+        log_write(LOG_ALWAYS, "SQL", "CONN", "Failed to open %s: %s", mod_db_sql_config.db, sqlite3_errmsg(sqlite));
+        return -1;
     }
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Opened SQLite3 file %s", mod_db_sql_config.db);
-    ENDLOG sqlite3_struct = sqlite;
+    log_write(LOG_ALWAYS, "SQL", "CONN", "Opened SQLite3 file %s", mod_db_sql_config.db);
+    sqlite3_struct = sqlite;
     mod_db_sql_config.socket = -1;
     return 1;
 }

@@ -162,7 +162,7 @@ static void mail_db_grow(int newtop) {
     newdb = (MENT *) XMALLOC((newsize + 1) * sizeof(MENT), "mail_db_grow");
 
     if (!newdb) {
-        fprintf(mainlog_fp, "ABORT! mail.c, unable to malloc new db in mail_db_grow().\n");
+        log_write_raw ( 1, "ABORT! mail.c, unable to malloc new db in mail_db_grow().\n");
         abort();
     }
 
@@ -2653,7 +2653,7 @@ void load_malias(FILE *fp) {
             !strcmp(buffer, "MALIAS")) {
         malias_read(fp);
     } else {
-        fprintf(mainlog_fp, "ERROR: Couldn't find Begin MALIAS.\n");
+        log_write_raw ( 1, "ERROR: Couldn't find Begin MALIAS.\n");
         return;
 
     }

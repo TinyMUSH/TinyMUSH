@@ -1195,7 +1195,7 @@ void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
                 return;
             }
             tname = log_getname ( thing, "do_fixdb" );
-            log_printf2 ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", tname, strip_ansi ( arg2 ) );
+            log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", tname, strip_ansi ( arg2 ) );
             XFREE ( tname, "do_fixdb" );
             if ( Suspect ( player ) ) {
                 raw_broadcast ( WIZARD, "[Suspect] %s renamed to %s", Name ( thing ), arg2 );
@@ -2349,7 +2349,7 @@ void db_grow ( dbref newtop ) {
     newnames = ( NAME * ) XCALLOC ( newsize + SIZE_HACK, sizeof ( NAME ),
                                     "db_grow.names" );
     if ( !newnames ) {
-        mainlog_printf ( "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize );
+        log_write_raw ( 1, "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize );
         abort();
     }
 
@@ -2380,7 +2380,7 @@ void db_grow ( dbref newtop ) {
                                         "db_grow.purenames" );
 
     if ( !newpurenames ) {
-        mainlog_printf ( "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize );
+        log_write_raw ( 1, "ABORT! db.c, could not allocate space for %d item name cache in db_grow().\n", newsize );
         abort();
     }
     memset ( ( char * ) newpurenames, 0, ( newsize + SIZE_HACK ) * sizeof ( NAME ) );
@@ -2412,7 +2412,7 @@ void db_grow ( dbref newtop ) {
 
     newdb = ( OBJ * ) XCALLOC ( newsize + SIZE_HACK, sizeof ( OBJ ), "db_grow.db" );
     if ( !newdb ) {
-        log_printf2 ( LOG_ALWAYS, "ALC", "DB",  "Could not allocate space for %d item struct database.", newsize );
+        log_write ( LOG_ALWAYS, "ALC", "DB",  "Could not allocate space for %d item struct database.", newsize );
         abort();
     }
     if ( db ) {
@@ -2769,7 +2769,7 @@ BOOLEXP *dup_bool ( BOOLEXP *b ) {
         r->sub1 = ( BOOLEXP * ) XSTRDUP ( ( char * ) b->sub1, "dup_bool.sub1" );
         break;
     default:
-        mainlog_printf ( "bad bool type!!\n" );
+        log_write_raw ( 1, "bad bool type!!\n" );
         return ( TRUE_BOOLEXP );
     }
     return ( r );
@@ -2784,7 +2784,7 @@ int init_gdbm_db ( char *gdbmfile ) {
     cache_init ( mudconf.cache_width );
     dddb_setfile ( gdbmfile );
     dddb_init();
-    log_printf2 ( LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", gdbmfile );
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", gdbmfile );
     db_free();
     return ( 0 );
 }
@@ -3021,7 +3021,7 @@ void load_restart_db ( void ) {
 
     DESC_ITER_ALL ( d ) {
         if ( fstat ( d->descriptor, &fstatbuf ) < 0 ) {
-            log_printf2 ( LOG_PROBLEMS, "ERR", "RESTART", "Bad descriptor %d", d->descriptor );
+            log_write ( LOG_PROBLEMS, "ERR", "RESTART", "Bad descriptor %d", d->descriptor );
             shutdownsock ( d, R_SOCKDIED );
         }
     }

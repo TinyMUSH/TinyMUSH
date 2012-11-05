@@ -1068,7 +1068,7 @@ int cf_flag_access ( int *vp, char *str, long extra, dbref player, char *cmd ) {
             ( fp->handler != fh_restrict_player ) &&
             ( fp->handler != fh_privileged ) ) {
 
-        log_printf2 ( LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for flag: %s", fp->flagname );
+        log_write ( LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for flag: %s", fp->flagname );
         return -1;
     }
     if ( !strcmp ( permstr, ( char * ) "any" ) ) {

@@ -61,10 +61,10 @@ static void Log_pointer_err ( dbref prior, dbref obj, dbref loc, dbref ref, cons
 
     if ( loc != NOTHING ) {
         obj_loc = log_getname ( Location ( obj ), "Log_pointer_err" );
-        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s %s", obj_type, obj_name, obj_loc, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
+        log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s %s", obj_type, obj_name, obj_loc, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
         XFREE ( obj_loc, "Log_pointer_err" );
     } else {
-        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s %s", obj_type, obj_name, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
+        log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s %s", obj_type, obj_name, ( ( prior == NOTHING ) ? reftype : "Next pointer" ), ref_type, ref_name, errtype );
     }
 
     XFREE ( obj_type, "Log_pointer_err" );
@@ -85,22 +85,22 @@ static void Log_header_err ( dbref obj, dbref loc, dbref val, int is_object, con
         if ( is_object ) {
             val_type = log_gettype ( val, "Log_header_err" );
             val_name = log_getname ( val, "Log_header_err" );
-            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s", obj_type, obj_name, obj_loc, val_type, val_name, errtype );
+            log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s", obj_type, obj_name, obj_loc, val_type, val_name, errtype );
             XFREE ( val_type,  "Log_header_err" );
             XFREE ( val_name,  "Log_header_err" );
         } else {
-            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %d %s", obj_type, obj_name, obj_loc, val, errtype );
+            log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %d %s", obj_type, obj_name, obj_loc, val, errtype );
         }
         XFREE ( obj_loc, "Log_header_err" );
     } else {
         if ( is_object ) {
             val_type = log_gettype ( val, "Log_header_err" );
             val_name = log_getname ( val, "Log_header_err" );
-            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s", obj_type, obj_name, val_type, val_name, errtype );
+            log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s", obj_type, obj_name, val_type, val_name, errtype );
             XFREE ( val_type,  "Log_header_err" );
             XFREE ( val_name,  "Log_header_err" );
         } else {
-            log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %d %s", obj_type, obj_name, val, errtype );
+            log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %d %s", obj_type, obj_name, val, errtype );
         }
     }
 
@@ -116,10 +116,10 @@ static void Log_simple_err ( dbref obj, dbref loc, const char *errtype ) {
 
     if ( loc != NOTHING ) {
         obj_loc = log_getname ( Location ( obj ), "Log_simple_err" );
-        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s", obj_type, obj_name, obj_loc, errtype );
+        log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s", obj_type, obj_name, obj_loc, errtype );
         XFREE ( obj_loc, "Log_simple_err" );
     } else {
-        log_printf2 ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, obj_loc, errtype );
+        log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, obj_loc, errtype );
     }
 }
 
@@ -401,7 +401,7 @@ dbref create_obj ( dbref player, int objtype, char *name, int cost ) {
         free_lbuf ( buff );
         break;
     default:
-        log_printf2 ( LOG_BUGS, "BUG", "OTYPE", "Bad object type in create_obj: %d.", objtype );
+        log_write ( LOG_BUGS, "BUG", "OTYPE", "Bad object type in create_obj: %d.", objtype );
         return NOTHING;
     }
 
@@ -452,7 +452,7 @@ dbref create_obj ( dbref player, int objtype, char *name, int cost ) {
         if ( Good_dbref ( obj ) && IS_CLEAN ( obj ) ) {
             mudstate.freelist = Link ( obj );
         } else {
-            log_printf2 ( LOG_PROBLEMS, "FRL", "DAMAG", "Freelist damaged, bad object #%d.", obj );
+            log_write ( LOG_PROBLEMS, "FRL", "DAMAG", "Freelist damaged, bad object #%d.", obj );
             obj = NOTHING;
             mudstate.freelist = NOTHING;
         }

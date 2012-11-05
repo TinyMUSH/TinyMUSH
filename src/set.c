@@ -205,7 +205,7 @@ void do_name ( dbref player, dbref cause, int key, const char *name, char *newna
          * everything ok, notify
          */
         thingname = log_getname ( thing, "do_name" );
-        log_printf2 ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", thingname, buff );
+        log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", thingname, buff );
         XFREE ( thingname, "do_name" );
 
         if ( Suspect ( thing ) ) {

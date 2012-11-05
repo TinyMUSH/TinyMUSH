@@ -12,11 +12,8 @@ void sql_shutdown(dbref player, dbref cause, char *buff, char **bufc) {
     if (!pgsql_struct)
         return;
     pgsql = pgsql_struct;
-    STARTLOG(LOG_ALWAYS, "SQL", "DISC")
-    log_printf
-    ("Disconnected from SQL server %s, SQL database selected: %s",
-     PQhost(pgsql), PQdb(pgsql));
-    ENDLOG PQfinish(pgsql);
+    log_write(LOG_ALWAYS, "SQL", "DISC", "Disconnected from SQL server %s, SQL database selected: %s", PQhost(pgsql), PQdb(pgsql));
+    PQfinish(pgsql);
     pgsql_struct = NULL;
     mod_db_sql_config.socket = -1;
 }
@@ -57,15 +54,11 @@ int sql_init(dbref player, dbref cause, char *buff, char **bufc) {
 
     if (!pgsql)
     {
-        STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-        log_printf("Failed connection to SQL server %s: %s",
-                   mod_db_sql_config.host, PQerrorMessage(pgsql));
-        ENDLOG return -1;
+        log_write(LOG_ALWAYS, "SQL", "CONN", "Failed connection to SQL server %s: %s", mod_db_sql_config.host, PQerrorMessage(pgsql));
+        return -1;
     }
-    STARTLOG(LOG_ALWAYS, "SQL", "CONN")
-    log_printf("Connected to SQL server %s, SQL database selected: %s",
-               PQhost(pgsql), PQdb(pgsql));
-    ENDLOG pgsql_struct = pgsql;
+    log_write(LOG_ALWAYS, "SQL", "CONN", "Connected to SQL server %s, SQL database selected: %s", PQhost(pgsql), PQdb(pgsql));
+    pgsql_struct = pgsql;
     mod_db_sql_config.socket = PQsocket(pgsql);
     return 1;
 }

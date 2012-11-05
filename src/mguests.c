@@ -85,7 +85,7 @@ dbref create_guest ( int num ) {
     } else if ( strcasecmp ( name, base ) ) {
         if ( !badname_check ( base ) || !ok_player_name ( base ) ||
                 ( lookup_player ( GOD, base, 0 ) != NOTHING ) ) {
-            log_printf2 ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in alias check: %s", base );
+            log_write ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in alias check: %s", base );
             return NOTHING;
         }
         same_str = 0;
@@ -99,7 +99,7 @@ dbref create_guest ( int num ) {
                              mudconf.guest_nuker, 0, 1 );
 
     if ( player == NOTHING ) {
-        log_printf2 ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in create_player: %s", name );
+        log_write ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in create_player: %s", name );
         return NOTHING;
     }
 
@@ -201,7 +201,7 @@ char *make_guest ( DESC *d ) {
 
     if ( ( guest = create_guest ( i ) ) == NOTHING ) {
         queue_string ( d, "GAME: Error creating guest ID, please try again later.\n" );
-        log_printf2 ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Error creating guest ID. '%s' already exists.\n", name );
+        log_write ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Error creating guest ID. '%s' already exists.\n", name );
         return NULL;
     }
     return Name ( guest );
