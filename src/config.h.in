@@ -1806,7 +1806,7 @@
 /* Pueblo support message */
 #undef PUEBLO_SUPPORT_MSG
 
-/* Support for cpu time checking */
+/* Enable malloc wrapper tracker */
 #undef RAW_MEMTRACKING
 
 /* Define to 1 if readlink fails to recognize a trailing slash. */
@@ -1880,7 +1880,7 @@
    rusage'. */
 #undef STRUCT_RUSAGE_COMPLETE
 
-/* Support for cpu time checking */
+/* Enable malloc wrapper logger */
 #undef TEST_MALLOC
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */

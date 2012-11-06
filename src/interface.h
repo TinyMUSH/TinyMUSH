@@ -57,7 +57,7 @@ struct cmd_block_hdr {
 };
 struct cmd_block {
     CBLKHDR hdr;
-    char	cmd[LBUF_SIZE - sizeof(CBLKHDR)];
+    char	cmd[LBUF_SIZE - sizeof( CBLKHDR )];
 };
 
 typedef struct text_block TBLOCK;
@@ -70,7 +70,7 @@ struct text_block_hdr {
 };
 struct text_block {
     TBLKHDR hdr;
-    char	data[OUTPUT_BLOCK_SIZE - sizeof(TBLKHDR)];
+    char	data[OUTPUT_BLOCK_SIZE - sizeof( TBLKHDR )];
 };
 
 typedef struct prog_data PROG;
@@ -131,32 +131,32 @@ extern DESC *descriptor_list;
 
 /* from the net interface */
 
-extern void	emergency_shutdown(void);
-extern void	shutdownsock(DESC *, int);
-extern void	shovechars(int);
-extern void	set_signals(void);
+extern void	emergency_shutdown( void );
+extern void	shutdownsock( DESC *, int );
+extern void	shovechars( int );
+extern void	set_signals( void );
 
 /* from netcommon.c */
 
-extern struct timeval	timeval_sub(struct timeval, struct timeval);
-extern int	msec_diff(struct timeval now, struct timeval then);
-extern struct timeval	msec_add(struct timeval, int);
-extern struct timeval	update_quotas(struct timeval, struct timeval);
-extern void	raw_notify(dbref, char *);
-extern void	raw_notify_newline(dbref);
-extern void	clearstrings(DESC *);
-extern void	queue_write(DESC *, const char *, int);
-extern void	queue_string(DESC *, const char *);
-extern void	freeqs(DESC *);
-extern void	welcome_user(DESC *);
-extern void	save_command(DESC *, CBLK *);
-extern void	announce_disconnect(dbref, DESC *, const char *);
-extern int	boot_off(dbref, char *);
-extern int	boot_by_port(int, int, char *);
-extern void	check_idle(void);
-extern void	process_commands(void);
-extern int	site_check(struct in_addr, SITE *);
-extern dbref	find_connected_name(dbref, char *);
+extern struct timeval	timeval_sub( struct timeval, struct timeval );
+extern int	msec_diff( struct timeval now, struct timeval then );
+extern struct timeval	msec_add( struct timeval, int );
+extern struct timeval	update_quotas( struct timeval, struct timeval );
+extern void	raw_notify( dbref, char * );
+extern void	raw_notify_newline( dbref );
+extern void	clearstrings( DESC * );
+extern void	queue_write( DESC *, const char *, int );
+extern void	queue_string( DESC *, const char * );
+extern void	freeqs( DESC * );
+extern void	welcome_user( DESC * );
+extern void	save_command( DESC *, CBLK * );
+extern void	announce_disconnect( dbref, DESC *, const char * );
+extern int	boot_off( dbref, char * );
+extern int	boot_by_port( int, int, char * );
+extern void	check_idle( void );
+extern void	process_commands( void );
+extern int	site_check( struct in_addr, SITE * );
+extern dbref	find_connected_name( dbref, char * );
 
 /* From predicates.c */
 

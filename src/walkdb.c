@@ -253,9 +253,7 @@ void do_stats( dbref player, dbref cause, int key, char *name ) {
     if( Wizard( player ) ) {
         notify( player, tmprintf( "Malloc bytes = %d.", malloc_bytes ) );
     }
-#endif				/*
-    * TEST_MALLOC
-    */
+#endif	/* TEST_MALLOC */
 #ifdef MCHECK
     if( Wizard( player ) ) {
         struct mstats mval;
@@ -271,9 +269,7 @@ void do_stats( dbref player, dbref cause, int key, char *name ) {
                 tmprintf( "Chunks free: %d -- Total size of free chunks: %d",
                           mval.chunks_free, mval.bytes_free ) );
     }
-#endif				/*
-    * MCHECK
-    */
+#endif /* MCHECK */
 }
 
 int chown_all( dbref from_player, dbref to_player, dbref acting_player, int key ) {

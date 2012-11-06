@@ -61,7 +61,7 @@ typedef struct power_entry {
     int	powervalue;	/* Which bit in the object is the flag */
     int	powerpower;	/* Ctrl flags for this power (recursive? :-) */
     int	listperm;	/* Who sees this flag when set */
-    int	(*handler)();	/* Handler for setting/clearing this flag */
+    int	( *handler )();	/* Handler for setting/clearing this flag */
 } POWERENT;
 
 typedef struct powerset {
@@ -69,13 +69,13 @@ typedef struct powerset {
     POWER	word2;
 } POWERSET;
 
-extern void	init_powertab(void);
-extern void	display_powertab(dbref);
-extern void	power_set(dbref, dbref, char *, int);
-extern char *	power_description(dbref, dbref);
-extern POWERENT *find_power(dbref, char *);
-extern int	has_power(dbref, dbref, char *);
-extern void	decompile_powers(dbref, dbref, char *);
+extern void	init_powertab( void );
+extern void	display_powertab( dbref );
+extern void	power_set( dbref, dbref, char *, int );
+extern char *	power_description( dbref, dbref );
+extern POWERENT *find_power( dbref, char * );
+extern int	has_power( dbref, dbref, char * );
+extern void	decompile_powers( dbref, dbref, char * );
 
 #define s_Change_Quotas(c)	s_Powers((c), Powers(c) | POW_CHG_QUOTAS)
 #define s_Chown_Any(c)		s_Powers((c), Powers(c) | POW_CHOWN_ANY)

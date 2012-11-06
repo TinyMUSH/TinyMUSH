@@ -18,13 +18,13 @@ struct user_attribute {
     int	flags;		/* Attribute flags */
 };
 
-extern void	vattr_init(void);
-extern VATTR *	vattr_rename(char *, char *);
-extern VATTR *	vattr_find(char *);
-extern VATTR *	vattr_alloc(char *, int);
-extern VATTR *	vattr_define(char *, int, int);
-extern void	vattr_delete(char *);
-extern VATTR *	vattr_first(void);
-extern VATTR *	vattr_next(VATTR *);
+extern void	vattr_init( void );
+extern VATTR *	vattr_rename( char *, char * );
+extern VATTR *	vattr_find( char * );
+extern VATTR *	vattr_alloc( char *, int );
+extern VATTR *	vattr_define( char *, int, int );
+extern void	vattr_delete( char * );
+extern VATTR *	vattr_first( void );
+extern VATTR *	vattr_next( VATTR * );
 
 #endif	/* __VATTR_H */

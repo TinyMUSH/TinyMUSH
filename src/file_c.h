@@ -27,10 +27,10 @@
 
 /* File cache routines */
 
-extern void	fcache_rawdump(int fd, int num);
-extern void	fcache_dump(DESC * d, int num);
-extern void	fcache_send(dbref, int);
-extern void	fcache_load(dbref);
-extern void	fcache_init(void);
+extern void	fcache_rawdump( int fd, int num );
+extern void	fcache_dump( DESC * d, int num );
+extern void	fcache_send( dbref, int );
+extern void	fcache_load( dbref );
+extern void	fcache_init( void );
 
 #endif	/* __FILE_C_H */

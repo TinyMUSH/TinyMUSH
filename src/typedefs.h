@@ -36,7 +36,7 @@ struct str_linked_list {
 typedef struct named_function NAMEDFUNC;
 struct named_function {
     char *fn_name;
-    int (*handler)(dbref);
+    int ( *handler )( dbref );
 };
 
 typedef struct external_funcs EXTFUNCS;

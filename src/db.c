@@ -50,13 +50,6 @@ extern int slave_socket;
 extern pid_t slave_pid;
 extern void desc_addhash( DESC * );
 
-#ifdef TEST_MALLOC
-int malloc_count = 0;
-int malloc_bytes = 0;
-char *malloc_ptr;
-char *malloc_str;
-#endif /* TEST_MALLOC */
-
 extern VATTR *vattr_rename( char *, char * );
 
 /* ---------------------------------------------------------------------------
@@ -2634,7 +2627,7 @@ void putstring( FILE *f, const char *s ) {
     putc( '\n', f );
 }
 
-const char *getstring_noalloc( FILE *f, int new_strings ) {
+char *getstring_noalloc( FILE *f, int new_strings ) {
     static char buf[LBUF_SIZE];
     char *p;
     int c, lastc;

@@ -15,114 +15,114 @@
 
 /* Command function handlers */
 
-CMD_ONE_ARG_CMDARG(do_apply_marked);	/* Apply command to marked objects */
-CMD_TWO_ARG(do_admin);		/* Change config parameters */
-CMD_TWO_ARG(do_alias);		/* Change the alias of something */
-CMD_TWO_ARG(do_attribute);	/* Manage user-named attributes */
-CMD_ONE_ARG(do_boot);		/* Force-disconnect a player */
-CMD_TWO_ARG(do_chown);		/* Change object or attribute owner */
-CMD_TWO_ARG(do_chownall);	/* Give away all of someone's objs */
-CMD_TWO_ARG(do_chzone);		/* Change an object's zone. */
-CMD_TWO_ARG(do_clone);		/* Create a copy of an object */
-CMD_TWO_ARG(do_colormap);	/* Remap ANSI colors in output */
-CMD_NO_ARG(do_comment);		/* Ignore argument and do nothing */
-CMD_TWO_ARG_ARGV(do_cpattr);	/* Copy attributes */
-CMD_TWO_ARG(do_create);		/* Create a new object */
-CMD_TWO_ARG(do_cron);		/* Add a new cron entry */
-CMD_ONE_ARG(do_crondel);	/* Delete cron entries */
-CMD_ONE_ARG(do_crontab);	/* List out cron entries */
-CMD_ONE_ARG(do_cut);		/* Truncate contents or exits list */
-CMD_NO_ARG(do_dbck);		/* Consistency check */
-CMD_TWO_ARG(do_decomp);		/* Show commands to recreate obj */
-CMD_ONE_ARG(do_destroy);	/* Destroy an object */
-CMD_TWO_ARG_ARGV(do_dig);	/* Dig a new room */
-CMD_ONE_ARG(do_doing);		/* Set doing string in WHO report */
-CMD_TWO_ARG_CMDARG(do_dolist);	/* Iterate command on list members */
-CMD_ONE_ARG(do_drop);		/* Drop an object */
-CMD_NO_ARG(do_dump);		/* Dump the database */
-CMD_TWO_ARG_ARGV(do_edit);	/* Edit one or more attributes */
-CMD_TWO_ARG_CMDARG(do_end);	/* End action list on a conditional */
-CMD_ONE_ARG(do_enter);		/* Enter an object */
-CMD_ONE_ARG(do_entrances);	/* List exits and links to loc */
-CMD_ONE_ARG(do_eval);		/* Like @@ comment, but takes an arg */
-CMD_ONE_ARG(do_examine);	/* Examine an object */
-CMD_ONE_ARG(do_find);		/* Search for name in database */
-CMD_TWO_ARG(do_fixdb);		/* Database repair functions */
-CMD_ONE_ARG(do_floaters);	/* Display floating rooms */
-CMD_TWO_ARG_CMDARG(do_force);	/* Force someone to do something */
-CMD_ONE_ARG_CMDARG(do_force_prefixed);	/* #<num> <cmd> variant of FORCE */
-CMD_ONE_ARG(do_freelist);	/* Move obj to head of freelist */
-CMD_TWO_ARG(do_function);	/* Make user-def global function */
-CMD_ONE_ARG(do_get);		/* Get an object */
-CMD_TWO_ARG(do_give);		/* Give something away */
-CMD_ONE_ARG(do_global);		/* Enable/disable global flags */
-CMD_ONE_ARG(do_halt);		/* Remove commands from the queue */
-CMD_NO_ARG(do_hashresize);	/* Resize the hash tables */
-CMD_TWO_ARG(do_hook);		/* Command hooks */
-CMD_ONE_ARG(do_help);		/* Print info from help files */
-CMD_TWO_ARG_ARGV_CMDARG(do_include);	/* Include text of attribute */
-CMD_NO_ARG(do_inventory);	/* Print what I am carrying */
-CMD_TWO_ARG(do_prog);		/* Interactive input */
-CMD_ONE_ARG(do_quitprog);	/* Quits @prog */
-CMD_TWO_ARG(do_kill);		/* Kill something */
-CMD_ONE_ARG(do_last);		/* Get recent login info */
-CMD_NO_ARG(do_leave);		/* Leave the current object */
-CMD_TWO_ARG(do_link);		/* Set home, dropto, or dest */
-CMD_ONE_ARG(do_list);		/* List contents of internal tables */
-CMD_ONE_ARG(do_list_file);	/* List contents of message files */
-CMD_TWO_ARG(do_lock);		/* Set a lock on an object */
-CMD_ONE_ARG(do_look);		/* Look here or at something */
-CMD_NO_ARG(do_markall);		/* Mark or unmark all objects */
-CMD_ONE_ARG(do_motd);		/* Set/list MOTD messages */
-CMD_ONE_ARG(do_move);		/* Move about using exits */
-CMD_TWO_ARG_ARGV(do_mvattr);	/* Move attributes on object */
-CMD_TWO_ARG(do_name);		/* Change the name of something */
-CMD_TWO_ARG(do_newpassword);	/* Change passwords */
-CMD_TWO_ARG(do_notify);		/* Notify or drain semaphore */
-CMD_TWO_ARG_ARGV(do_open);	/* Open an exit */
-CMD_TWO_ARG(do_page);		/* Send message to faraway player */
-CMD_TWO_ARG(do_parent);		/* Set parent field */
-CMD_TWO_ARG(do_password);	/* Change my password */
-CMD_TWO_ARG(do_pcreate);	/* Create new characters */
-CMD_TWO_ARG(do_pemit);		/* Messages to specific player */
-CMD_ONE_ARG(do_poor);		/* Reduce wealth of all players */
-CMD_TWO_ARG(do_power);		/* Sets powers */
-CMD_ONE_ARG(do_ps);		/* List contents of queue */
-CMD_ONE_ARG(do_queue);		/* Force queue processing */
-CMD_TWO_ARG(do_quota);		/* Set or display quotas */
-CMD_NO_ARG(do_readcache);	/* Reread text file cache */
-CMD_TWO_ARG(do_redirect);	/* Redirect output */
-CMD_TWO_ARG(do_reference);	/* Manipulate nrefs */
-CMD_ONE_ARG(do_reply_page);	/* Reply to a page */
-CMD_NO_ARG(do_restart);		/* Restart the game. */
-CMD_ONE_ARG(do_say);		/* Messages to all */
-CMD_NO_ARG(do_score);		/* Display my wealth */
-CMD_ONE_ARG(do_search);		/* Search for objs matching criteria */
-CMD_TWO_ARG(do_set);		/* Set flags or attributes */
-CMD_TWO_ARG(do_setattr);	/* Set object attribute */
-CMD_TWO_ARG(do_setvattr);	/* Set variable attribute */
-CMD_ONE_ARG(do_shutdown);	/* Stop the game */
-CMD_ONE_ARG(do_stats);		/* Display object type breakdown */
-CMD_ONE_ARG(do_sweep);		/* Check for listeners */
-CMD_TWO_ARG_ARGV_CMDARG(do_switch);	/* Execute cmd based on match */
-CMD_TWO_ARG(do_teleport);	/* Teleport elsewhere */
-CMD_ONE_ARG(do_think);		/* Think command */
-CMD_NO_ARG(do_timecheck);	/* Check time used by objects */
-CMD_ONE_ARG(do_timewarp);	/* Warp various timers */
-CMD_TWO_ARG(do_toad);		/* Turn a tinyjerk into a tinytoad */
-CMD_TWO_ARG_ARGV(do_trigger);	/* Trigger an attribute */
-CMD_ONE_ARG(do_unlock);		/* Remove a lock from an object */
-CMD_ONE_ARG(do_unlink);		/* Unlink exit or remove dropto */
-CMD_ONE_ARG(do_use);		/* Use object */
-CMD_NO_ARG(do_version);		/* List MUSH version number */
-CMD_TWO_ARG_ARGV(do_verb);	/* Execute a user-created verb */
-CMD_TWO_ARG_CMDARG(do_wait);	/* Perform command after a wait */
-CMD_ONE_ARG(do_wipe);		/* Mass-remove attrs from obj */
-CMD_TWO_ARG(do_addcommand);	/* Add or replace a global command */
-CMD_TWO_ARG(do_delcommand);	/* Delete an added global command */
-CMD_ONE_ARG(do_listcommands);	/* List added global commands */
-CMD_TWO_ARG(do_logwrite);	/* Write to the logfile */
-CMD_NO_ARG(do_logrotate);	/* Rotate the logfile */
+CMD_ONE_ARG_CMDARG( do_apply_marked );	/* Apply command to marked objects */
+CMD_TWO_ARG( do_admin );		/* Change config parameters */
+CMD_TWO_ARG( do_alias );		/* Change the alias of something */
+CMD_TWO_ARG( do_attribute );	/* Manage user-named attributes */
+CMD_ONE_ARG( do_boot );		/* Force-disconnect a player */
+CMD_TWO_ARG( do_chown );		/* Change object or attribute owner */
+CMD_TWO_ARG( do_chownall );	/* Give away all of someone's objs */
+CMD_TWO_ARG( do_chzone );		/* Change an object's zone. */
+CMD_TWO_ARG( do_clone );		/* Create a copy of an object */
+CMD_TWO_ARG( do_colormap );	/* Remap ANSI colors in output */
+CMD_NO_ARG( do_comment );		/* Ignore argument and do nothing */
+CMD_TWO_ARG_ARGV( do_cpattr );	/* Copy attributes */
+CMD_TWO_ARG( do_create );		/* Create a new object */
+CMD_TWO_ARG( do_cron );		/* Add a new cron entry */
+CMD_ONE_ARG( do_crondel );	/* Delete cron entries */
+CMD_ONE_ARG( do_crontab );	/* List out cron entries */
+CMD_ONE_ARG( do_cut );		/* Truncate contents or exits list */
+CMD_NO_ARG( do_dbck );		/* Consistency check */
+CMD_TWO_ARG( do_decomp );		/* Show commands to recreate obj */
+CMD_ONE_ARG( do_destroy );	/* Destroy an object */
+CMD_TWO_ARG_ARGV( do_dig );	/* Dig a new room */
+CMD_ONE_ARG( do_doing );		/* Set doing string in WHO report */
+CMD_TWO_ARG_CMDARG( do_dolist );	/* Iterate command on list members */
+CMD_ONE_ARG( do_drop );		/* Drop an object */
+CMD_NO_ARG( do_dump );		/* Dump the database */
+CMD_TWO_ARG_ARGV( do_edit );	/* Edit one or more attributes */
+CMD_TWO_ARG_CMDARG( do_end );	/* End action list on a conditional */
+CMD_ONE_ARG( do_enter );		/* Enter an object */
+CMD_ONE_ARG( do_entrances );	/* List exits and links to loc */
+CMD_ONE_ARG( do_eval );		/* Like @@ comment, but takes an arg */
+CMD_ONE_ARG( do_examine );	/* Examine an object */
+CMD_ONE_ARG( do_find );		/* Search for name in database */
+CMD_TWO_ARG( do_fixdb );		/* Database repair functions */
+CMD_ONE_ARG( do_floaters );	/* Display floating rooms */
+CMD_TWO_ARG_CMDARG( do_force );	/* Force someone to do something */
+CMD_ONE_ARG_CMDARG( do_force_prefixed );	/* #<num> <cmd> variant of FORCE */
+CMD_ONE_ARG( do_freelist );	/* Move obj to head of freelist */
+CMD_TWO_ARG( do_function );	/* Make user-def global function */
+CMD_ONE_ARG( do_get );		/* Get an object */
+CMD_TWO_ARG( do_give );		/* Give something away */
+CMD_ONE_ARG( do_global );		/* Enable/disable global flags */
+CMD_ONE_ARG( do_halt );		/* Remove commands from the queue */
+CMD_NO_ARG( do_hashresize );	/* Resize the hash tables */
+CMD_TWO_ARG( do_hook );		/* Command hooks */
+CMD_ONE_ARG( do_help );		/* Print info from help files */
+CMD_TWO_ARG_ARGV_CMDARG( do_include );	/* Include text of attribute */
+CMD_NO_ARG( do_inventory );	/* Print what I am carrying */
+CMD_TWO_ARG( do_prog );		/* Interactive input */
+CMD_ONE_ARG( do_quitprog );	/* Quits @prog */
+CMD_TWO_ARG( do_kill );		/* Kill something */
+CMD_ONE_ARG( do_last );		/* Get recent login info */
+CMD_NO_ARG( do_leave );		/* Leave the current object */
+CMD_TWO_ARG( do_link );		/* Set home, dropto, or dest */
+CMD_ONE_ARG( do_list );		/* List contents of internal tables */
+CMD_ONE_ARG( do_list_file );	/* List contents of message files */
+CMD_TWO_ARG( do_lock );		/* Set a lock on an object */
+CMD_ONE_ARG( do_look );		/* Look here or at something */
+CMD_NO_ARG( do_markall );		/* Mark or unmark all objects */
+CMD_ONE_ARG( do_motd );		/* Set/list MOTD messages */
+CMD_ONE_ARG( do_move );		/* Move about using exits */
+CMD_TWO_ARG_ARGV( do_mvattr );	/* Move attributes on object */
+CMD_TWO_ARG( do_name );		/* Change the name of something */
+CMD_TWO_ARG( do_newpassword );	/* Change passwords */
+CMD_TWO_ARG( do_notify );		/* Notify or drain semaphore */
+CMD_TWO_ARG_ARGV( do_open );	/* Open an exit */
+CMD_TWO_ARG( do_page );		/* Send message to faraway player */
+CMD_TWO_ARG( do_parent );		/* Set parent field */
+CMD_TWO_ARG( do_password );	/* Change my password */
+CMD_TWO_ARG( do_pcreate );	/* Create new characters */
+CMD_TWO_ARG( do_pemit );		/* Messages to specific player */
+CMD_ONE_ARG( do_poor );		/* Reduce wealth of all players */
+CMD_TWO_ARG( do_power );		/* Sets powers */
+CMD_ONE_ARG( do_ps );		/* List contents of queue */
+CMD_ONE_ARG( do_queue );		/* Force queue processing */
+CMD_TWO_ARG( do_quota );		/* Set or display quotas */
+CMD_NO_ARG( do_readcache );	/* Reread text file cache */
+CMD_TWO_ARG( do_redirect );	/* Redirect output */
+CMD_TWO_ARG( do_reference );	/* Manipulate nrefs */
+CMD_ONE_ARG( do_reply_page );	/* Reply to a page */
+CMD_NO_ARG( do_restart );		/* Restart the game. */
+CMD_ONE_ARG( do_say );		/* Messages to all */
+CMD_NO_ARG( do_score );		/* Display my wealth */
+CMD_ONE_ARG( do_search );		/* Search for objs matching criteria */
+CMD_TWO_ARG( do_set );		/* Set flags or attributes */
+CMD_TWO_ARG( do_setattr );	/* Set object attribute */
+CMD_TWO_ARG( do_setvattr );	/* Set variable attribute */
+CMD_ONE_ARG( do_shutdown );	/* Stop the game */
+CMD_ONE_ARG( do_stats );		/* Display object type breakdown */
+CMD_ONE_ARG( do_sweep );		/* Check for listeners */
+CMD_TWO_ARG_ARGV_CMDARG( do_switch );	/* Execute cmd based on match */
+CMD_TWO_ARG( do_teleport );	/* Teleport elsewhere */
+CMD_ONE_ARG( do_think );		/* Think command */
+CMD_NO_ARG( do_timecheck );	/* Check time used by objects */
+CMD_ONE_ARG( do_timewarp );	/* Warp various timers */
+CMD_TWO_ARG( do_toad );		/* Turn a tinyjerk into a tinytoad */
+CMD_TWO_ARG_ARGV( do_trigger );	/* Trigger an attribute */
+CMD_ONE_ARG( do_unlock );		/* Remove a lock from an object */
+CMD_ONE_ARG( do_unlink );		/* Unlink exit or remove dropto */
+CMD_ONE_ARG( do_use );		/* Use object */
+CMD_NO_ARG( do_version );		/* List MUSH version number */
+CMD_TWO_ARG_ARGV( do_verb );	/* Execute a user-created verb */
+CMD_TWO_ARG_CMDARG( do_wait );	/* Perform command after a wait */
+CMD_ONE_ARG( do_wipe );		/* Mass-remove attrs from obj */
+CMD_TWO_ARG( do_addcommand );	/* Add or replace a global command */
+CMD_TWO_ARG( do_delcommand );	/* Delete an added global command */
+CMD_ONE_ARG( do_listcommands );	/* List added global commands */
+CMD_TWO_ARG( do_logwrite );	/* Write to the logfile */
+CMD_NO_ARG( do_logrotate );	/* Rotate the logfile */
 
 typedef struct addedentry ADDENT;
 struct addedentry {
@@ -144,7 +144,7 @@ struct cmdentry {
     HOOKENT        *pre_hook;
     HOOKENT        *post_hook;
     union {
-        void            (*handler) ();
+        void ( *handler )();
         ADDENT         *added;
     }		info;
 };
@@ -234,7 +234,7 @@ struct cmdentry {
 (check_access(p,(c)->perms) && \
  (!((c)->userperms) || check_userdef_access(p,(c)->userperms,a,n) || God(p)))
 
-extern int	check_userdef_access(dbref, HOOKENT *, char *[], int);
-extern char    *process_command(dbref, dbref, int, char *, char *[], int);
+extern int	check_userdef_access( dbref, HOOKENT *, char *[], int );
+extern char    *process_command( dbref, dbref, int, char *, char *[], int );
 
 #endif	/* __COMMAND_H */

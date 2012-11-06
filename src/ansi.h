@@ -113,14 +113,14 @@ extern char	ansi_lettab[I_ANSI_NUM];
 extern int	ansi_mask_bits[I_ANSI_LIM];
 extern int	ansi_bits[I_ANSI_LIM];
 
-extern char    *strip_ansi(const char *);
-extern int	strip_ansi_len(const char *);
-extern char    *normal_to_white(const char *);
-extern char    *ansi_transition_esccode(int, int);
-extern char    *ansi_transition_mushcode(int, int);
-extern char    *ansi_transition_letters(int, int);
-extern int	ansi_map_states(const char *, int **, char **);
-extern char     *remap_colors(const char *, int *);
+extern char    *strip_ansi( const char * );
+extern int	strip_ansi_len( const char * );
+extern char    *normal_to_white( const char * );
+extern char    *ansi_transition_esccode( int, int );
+extern char    *ansi_transition_mushcode( int, int );
+extern char    *ansi_transition_letters( int, int );
+extern int	ansi_map_states( const char *, int **, char ** );
+extern char     *remap_colors( const char *, int * );
 
 #define skip_esccode(s) \
 	++(s);						\

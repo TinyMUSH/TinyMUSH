@@ -91,7 +91,7 @@ CONF mod_mail_conftable[] = {
 
 static int sign(int);
 static void do_mail_flags(dbref, char *, mail_flag, int);
-static void send_mail(dbref, dbref, const char *, const char *, const char *, const char *, int, mail_flag, int);
+static void send_mail(dbref, dbref, char *, char *, char *, char *, int, mail_flag, int);
 static int player_folder(dbref);
 static int parse_msglist(char *, struct mail_selector *, dbref);
 static int mail_match(struct mail *, struct mail_selector, int);
@@ -102,7 +102,7 @@ void add_folder_name(dbref, int, char *);
 static int get_folder_number(dbref, char *);
 void check_mail(dbref, int, int);
 static char *get_folder_name(dbref, int);
-static char *mail_list_time(const char *);
+static char *mail_list_time( char *);
 static char *make_numlist(dbref, char *);
 static char *make_namelist(dbref, char *);
 static void mail_to_list(dbref, char *, char *, char *, char *, char *, int, int);
@@ -241,7 +241,7 @@ static int add_mail_message(dbref player, char *message) {
  * add_mail_message_nosig - used for reading in old style messages from disk
  */
 
-static int add_mail_message_nosig(const char *message) {
+static int add_mail_message_nosig( char *message) {
     int number;
 
     number = mod_mail_config.mail_freelist;
@@ -259,7 +259,7 @@ static int add_mail_message_nosig(const char *message) {
  * * a number assigned to them.
  */
 
-static void new_mail_message(const char *message, int number) {
+static void new_mail_message( char *message, int number) {
     mod_mail_config.mail_list[number].message = XSTRDUP(message, "new_mail_message");
 }
 
@@ -587,20 +587,14 @@ void do_mail_retract(dbref player, char *name, char *msglist) {
                         mp->next->prev = mp->prev;
 
                     nextp = mp->next;
-                    XFREE(mp->subject,
-                          "mail_retract.subject");
+                    XFREE(mp->subject, "mail_retract.subject");
                     delete_mail_message(mp->number);
-                    XFREE(mp->time,
-                          "mail_retract.time");
-                    XFREE(mp->tolist,
-                          "mail_retract.tolist");
-                    XFREE(mp->cclist,
-                          "mail_retract.cclist");
-                    XFREE(mp->bcclist,
-                          "mail_retract.bcclist");
+                    XFREE(mp->time, "mail_retract.time");
+                    XFREE(mp->tolist, "mail_retract.tolist");
+                    XFREE(mp->cclist, "mail_retract.cclist");
+                    XFREE(mp->bcclist, "mail_retract.bcclist");
                     XFREE(mp, "mail_retract");
-                    notify(player,
-                           "MAIL: Mail retracted.");
+                    notify(player, "MAIL: Mail retracted.");
                 } else {
                     notify(player, "MAIL: That message has been read.");
                     nextp = mp->next;
@@ -822,7 +816,7 @@ void do_mail_list(dbref player, char *msglist, int sub) {
     notify(player, DASH_LINE);
 }
 
-static char *mail_list_time(const char *the_time) {
+static char *mail_list_time( char *the_time) {
     char *new;
     char *p, *q;
     int i;
@@ -1084,7 +1078,7 @@ void urgent_mail(dbref player, int folder, int *ucount) {
     *ucount = uc;
 }
 
-static void send_mail(dbref player, dbref target, const char *tolist, const char *cclist, const char *bcclist, const char *subject, int number, mail_flag flags, int silent) {
+static void send_mail(dbref player, dbref target, char *tolist, char *cclist, char *bcclist, char *subject, int number, mail_flag flags, int silent) {
     struct mail *newp;
     struct mail *mp;
     time_t tt;
@@ -3690,14 +3684,14 @@ CMDENT mod_mail_cmdtable[] = {
  * Handlers.
  */
 
-void mod_mail_announce_connect(dbref player, const char *reason, int num) {
+void mod_mail_announce_connect(dbref player, char *reason, int num) {
     check_mail(player, 0, 0);
     if (Sending_Mail(player)) {
         notify(player, "MAIL: You have a mail message in progress.");
     }
 }
 
-void mod_mail_announce_disconnect(dbref player, const char *reason, int num) {
+void mod_mail_announce_disconnect(dbref player, char *reason, int num) {
     do_mail_purge(player);
 }
 

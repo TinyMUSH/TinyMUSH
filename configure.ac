@@ -277,7 +277,7 @@ AS_IF([test "x$enable_cpu_checking" = "xyes"], [AC_DEFINE([TRACK_USER_TIME],[1],
 
 AC_MSG_CHECKING([which malloc-wrapper macros to use])
 AC_ARG_WITH([malloc-wrapper], [AS_HELP_STRING([--with-malloc-wrapper=@<:@track|log@:>@], [Enable use of wrapper macros for malloc(), free(), and related functions to do one of the following, which can help identify memory leaks: track - maintain a tagged list of memory allocated for purposes other than the buffer pool. (see @list raw_memory) log - print log messages when the function are called. This is spammy; try other debugging tools first.])],
-  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[1], [Support for cpu time checking]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[1], [Support for cpu time checking]), [with_malloc_wrapper="none"])),
+  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[1], [Enable malloc wrapper tracker]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[1], [Enable malloc wrapper logger]), [with_malloc_wrapper="none"])),
   [with_malloc_wrapper="none"]
 )
 

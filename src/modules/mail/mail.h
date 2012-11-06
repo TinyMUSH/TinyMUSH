@@ -62,11 +62,11 @@ struct mail {
   dbref to;
   dbref from;
   int number;
-  const char *time;
-  const char *subject;
-  const char *tolist;
-  const char *cclist;
-  const char *bcclist;
+  char *time;
+  char *subject;
+  char *tolist;
+  char *cclist;
+  char *bcclist;
   int read;
 };
 

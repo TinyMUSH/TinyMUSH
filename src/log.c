@@ -1,4 +1,10 @@
-/* log.c - logging routines */
+/*!
+ * \file log.c
+ *
+ * \date
+ *
+ * Handle log files and log events.
+ */
 
 #include "copyright.h"
 #include "config.h"
@@ -19,13 +25,8 @@
 
 #include "ansi.h"       /* required by code */
 
-FILE *mainlog_fp = NULL;
-
-static FILE *log_fp = NULL;
-
-#define MUDLOGNAME (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name))
-
-/* *INDENT-OFF* */
+static FILE *mainlog_fp = NULL;	/*!< Pointer to the main log file */
+static FILE *log_fp = NULL;	/*!< Pointer to the facility's log file */
 
 NAMETAB logdata_nametab[] = {
     { ( char * ) "flags", 1, 0, LOGOPT_FLAGS},
@@ -56,6 +57,7 @@ NAMETAB logoptions_nametab[] = {
     { ( char * ) "suspect_commands", 2, 0, LOG_SUSPECTCMDS},
     { ( char * ) "time_usage", 1, 0, LOG_TIMEUSE},
     { ( char * ) "wizard", 1, 0, LOG_WIZARD},
+    { ( char * ) "malloc", 1, 0, LOG_MALLOC},
     { NULL, 0, 0, 0}
 };
 
@@ -80,10 +82,9 @@ LOGFILETAB logfds_table[] = {
     { LOG_SUSPECTCMDS, NULL, NULL},
     { LOG_TIMEUSE, NULL, NULL},
     { LOG_WIZARD, NULL, NULL},
+    { LOG_MALLOC, NULL, NULL},
     { 0, NULL, NULL}
 };
-
-/* *INDENT-ON* */
 
 /* ---------------------------------------------------------------------------
  * logfile_init: Initialize the main logfile.
@@ -152,6 +153,7 @@ int start_log( const char *primary, const char *secondary, int key ) {
     mudstate.logging++;
 
     if( mudstate.logging ) {
+
         if( key & LOG_FORCE ) {
             /*
              * Log even if we are recursing and
@@ -160,10 +162,6 @@ int start_log( const char *primary, const char *secondary, int key ) {
              */
             mudstate.logging--;
         }
-        /*
-        case 1:
-        case 2:
-         */
 
         if( !mudstate.standalone ) {
             /*
@@ -181,9 +179,9 @@ int start_log( const char *primary, const char *secondary, int key ) {
              */
 
             if( secondary && *secondary ) {
-                log_write_raw( 0, "%s %3s/%-5s: ", MUDLOGNAME, primary, secondary );
+                log_write_raw( 0, "%s %3s/%-5s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), primary, secondary );
             } else {
-                log_write_raw( 0, "%s %-9s: ", MUDLOGNAME, primary );
+                log_write_raw( 0, "%s %-9s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), primary );
             }
         }
 
@@ -192,15 +190,10 @@ int start_log( const char *primary, const char *secondary, int key ) {
          */
 
         if( mudstate.logging != 1 ) {
-            log_write_raw( 1, "Recursive logging request.\n" );
+            log_write_raw( 0, "Recursive logging request.\n" );
         }
         return ( 1 );
-    } else {
-        /*
-        default:
-            mudstate.logging--;
-         */
-    }
+    } 
 
     return 0;
 }
@@ -211,14 +204,18 @@ int start_log( const char *primary, const char *secondary, int key ) {
 
 void end_log( void ) {
     log_write_raw( 0, "\n" );
+
     if( log_fp != NULL ) {
         fflush( log_fp );
     }
+    
     mudstate.logging--;
+
     if( mudstate.logging < 0 ) {
         log_write_raw( 1, "Log was closed too many times (%d)\n", mudstate.logging );
         mudstate.logging = 0;
     }
+
 }
 
 /* ---------------------------------------------------------------------------
@@ -241,14 +238,18 @@ void log_perror( const char *primary, const char *secondary, const char *extra, 
 
 void log_write( int key, const char *primary, const char *secondary, const char *format, ... ) {
     va_list ap;
-    char *s;
+    char s[MBUF_SIZE];
+    
+    /*
+     * Since the malloc functions now call this, 
+     * we should avoid doing malloc stuff in
+     * the logger...
+     */
 
     if( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log( primary, secondary, key ) ) {
 
-        s = ( char * ) XMALLOC( MBUF_SIZE, "log_write" );
-
         va_start( ap, format );
-        vsnprintf( s, MBUF_SIZE, format, ap );
+        vsnprintf( s, MBUF_SIZE - 1, format, ap );
         va_end( ap );
 
         /*
@@ -267,8 +268,6 @@ void log_write( int key, const char *primary, const char *secondary, const char 
             fputs( s, stderr );
         }
 
-        XFREE( s, "log_write" );
-
         end_log();
     }
 
@@ -280,7 +279,7 @@ void log_write( int key, const char *primary, const char *secondary, const char 
 
 void log_write_raw( int key, const char *format, ... ) {
     va_list ap;
-    char *s;
+    char s[MBUF_SIZE];
 
     FILE *lfp;
 
@@ -292,9 +291,7 @@ void log_write_raw( int key, const char *format, ... ) {
 
     va_start( ap, format );
 
-    s = ( char * ) XMALLOC( MBUF_SIZE, "log_write_raw" );
-
-    vsprintf( s, format, ap );
+    vsnprintf( s, MBUF_SIZE -1, format, ap );
 
     /*
      * Do we have a logfile to write to...
@@ -311,8 +308,6 @@ void log_write_raw( int key, const char *format, ... ) {
     if( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
         fputs( s, stderr );
     }
-
-    XFREE( s, "log_write_raw" );
 
     va_end( ap );
 }
@@ -382,9 +377,11 @@ void do_logrotate( dbref player, dbref cause, int key ) {
     pname = log_getname( player, "do_logrotate" );
     log_write( LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum );
     XFREE( pname, "do_logrotate" );
+
     /*
      * Any additional special ones
      */
+
     for( lp = logfds_table; lp->log_flag; lp++ ) {
         if( lp->filename && lp->fileptr ) {
             fclose( lp->fileptr );

@@ -91,21 +91,21 @@ typedef struct {
 
 #define CACHE_DIRTY	0x00000001
 
-extern int 	cache_init(int);
-extern void 	cache_reset(void);
-extern int 	cache_sync(void);
-extern DBData	db_get(DBData, unsigned int);
-extern int	db_put(DBData, DBData, unsigned int);
-extern int	db_del(DBData, unsigned int);
-extern void	db_lock(void);
-extern void	db_unlock(void);
-extern DBData	cache_get(DBData, unsigned int);
-extern int	cache_put(DBData, DBData, unsigned int);
-extern void	cache_del(DBData, unsigned int);
-extern void	attrib_sync(void);
-extern char	*pipe_get_attrib(int, int);
-extern void	pipe_set_attrib(int, int, char *);
-extern void	pipe_del_attrib(int, int);
-extern int	obj_siz(Obj *);
+extern int 	cache_init( int );
+extern void 	cache_reset( void );
+extern int 	cache_sync( void );
+extern DBData	db_get( DBData, unsigned int );
+extern int	db_put( DBData, DBData, unsigned int );
+extern int	db_del( DBData, unsigned int );
+extern void	db_lock( void );
+extern void	db_unlock( void );
+extern DBData	cache_get( DBData, unsigned int );
+extern int	cache_put( DBData, DBData, unsigned int );
+extern void	cache_del( DBData, unsigned int );
+extern void	attrib_sync( void );
+extern char	*pipe_get_attrib( int, int );
+extern void	pipe_set_attrib( int, int, char * );
+extern void	pipe_del_attrib( int, int );
+extern int	obj_siz( Obj * );
 
 #endif	/* __UDB_H */

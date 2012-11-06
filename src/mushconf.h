@@ -25,31 +25,31 @@ struct module_linked_list {
     char *modname;
     lt_dlhandle handle;
     struct module_linked_list *next;
-    int (*process_command)(dbref, dbref, int, char *, char *[], int);
-    int (*process_no_match)(dbref, dbref, int, char *, char *, char *[], int);
-    int (*did_it)(dbref, dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int);
-    void (*create_obj)(dbref, dbref);
-    void (*destroy_obj)(dbref, dbref);
-    void (*create_player)(dbref, dbref, int, int);
-    void (*destroy_player)(dbref, dbref);
-    void (*announce_connect)(dbref, const char *, int);
-    void (*announce_disconnect)(dbref, const char *, int);
-    void (*examine)(dbref, dbref, dbref, int, int);
-    void (*dump_database)(FILE *);
-    void (*db_write)(void);
-    void (*db_grow)(int, int);
-    void (*db_write_flatfile)(FILE *);
-    void (*do_second)(void);
-    void (*cache_put_notify)(DBData, unsigned int);
-    void (*cache_del_notify)(DBData, unsigned int);
-    MODVER (*version)(dbref, dbref, int);
+    int ( *process_command )( dbref, dbref, int, char *, char *[], int );
+    int ( *process_no_match )( dbref, dbref, int, char *, char *, char *[], int );
+    int ( *did_it )( dbref, dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int );
+    void ( *create_obj )( dbref, dbref );
+    void ( *destroy_obj )( dbref, dbref );
+    void ( *create_player )( dbref, dbref, int, int );
+    void ( *destroy_player )( dbref, dbref );
+    void ( *announce_connect )( dbref, const char *, int );
+    void ( *announce_disconnect )( dbref, const char *, int );
+    void ( *examine )( dbref, dbref, dbref, int, int );
+    void ( *dump_database )( FILE * );
+    void ( *db_write )( void );
+    void ( *db_grow )( int, int );
+    void ( *db_write_flatfile )( FILE * );
+    void ( *do_second )( void );
+    void ( *cache_put_notify )( DBData, unsigned int );
+    void ( *cache_del_notify )( DBData, unsigned int );
+    MODVER( *version )( dbref, dbref, int );
 };
 
 typedef struct api_function_data API_FUNCTION;
 struct api_function_data {
     const char *name;
     const char *param_fmt;
-    void (*handler)(void *, void *);
+    void ( *handler )( void *, void * );
 };
 
 /* ---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ struct api_function_data {
 typedef struct confparm CONF;
 struct confparm {
     char *pname;		/* parm name */
-    int (*interpreter)();	/* routine to interp parameter */
+    int ( *interpreter )();	/* routine to interp parameter */
     int flags;		/* control flags */
     int rperms;		/* read permission flags */
     int *loc;		/* where to store value */
@@ -333,7 +333,7 @@ struct site_data {
 typedef struct objlist_block OBLOCK;
 struct objlist_block {
     struct objlist_block *next;
-    dbref	data[(LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref)];
+    dbref	data[( LBUF_SIZE - sizeof( OBLOCK * ) ) / sizeof( dbref )];
 };
 
 #define OBLOCK_SIZE ((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
@@ -601,6 +601,7 @@ extern STATEDATA mudstate;
 #define LOG_SUSPECTCMDS	0x00020000	/* Log SUSPECT player keyboard cmds */
 #define LOG_TIMEUSE	0x00040000	/* Log CPU time usage */
 #define LOG_LOCAL	0x00080000	/* Log user stuff via @log */
+#define LOG_MALLOC	0x00100000	/* Log malloc requests */
 #define LOG_FORCE	0x04000000	/* Ignore mudstate.logging */
 #define LOG_ALWAYS	0x80000000	/* Always log it */
 
