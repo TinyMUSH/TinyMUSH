@@ -20,6 +20,10 @@ extern BOOLEXP *parse_boolexp( dbref, const char *, int );
 
 /* From bsd.c */
 extern void	boot_slave( void );
+extern void	emergency_shutdown( void );
+extern void	shutdownsock( DESC *, int );
+extern void	shovechars( int );
+extern void	set_signals( void );
 
 /* From command.c */
 extern int	check_access( dbref, int );
@@ -115,7 +119,7 @@ extern int do_convtime( char *, struct tm * );
 /* From game.c */
 extern void	notify_except( dbref, dbref, dbref, const char  *, int );
 extern void	notify_except2( dbref, dbref, dbref, dbref, const char  *, int );
-extern void	notify_check( dbref, dbref, const char *, int );
+extern void	notify_check( dbref, dbref, int, const char *, ... );
 extern int	Hearer( dbref );
 extern void	html_escape( const char *, char *, char ** );
 extern void	dump_database_internal( int );
@@ -123,7 +127,7 @@ extern void	fork_and_dump( dbref, dbref, int );
 extern int	copy_file( char *,char *, int );
 extern char 	**add_array( char **, char *, int *, char * );
 extern void	write_status_file( dbref, char * );
-extern char	*mktimestamp( char * );
+extern char	*mktimestamp( char *, size_t );
 extern void	do_backup_mush( dbref player, dbref cause, int key );
 
 /* From help.c */
@@ -155,6 +159,26 @@ extern void	empty_obj( dbref );
 
 /* From netcommon.c */
 extern void	raw_broadcast( int, char *,... );
+extern struct timeval	timeval_sub( struct timeval, struct timeval );
+extern int	msec_diff( struct timeval now, struct timeval then );
+extern struct timeval	msec_add( struct timeval, int );
+extern struct timeval	update_quotas( struct timeval, struct timeval );
+extern void 	raw_notify_html( dbref, const char *, ... );
+extern void	raw_notify( dbref, const char *, ... );
+extern void	raw_notify_newline( dbref );
+extern void	clearstrings( DESC * );
+extern void	queue_write( DESC *, const char *, int );
+extern void	queue_string( DESC *, const char * );
+extern void	freeqs( DESC * );
+extern void	welcome_user( DESC * );
+extern void	save_command( DESC *, CBLK * );
+extern void	announce_disconnect( dbref, DESC *, const char * );
+extern int	boot_off( dbref, char * );
+extern int	boot_by_port( int, int, char * );
+extern void	check_idle( void );
+extern void	process_commands( void );
+extern int	site_check( struct in_addr, SITE * );
+extern dbref	find_connected_name( dbref, char * );
 
 /* From move.c */
 extern void	move_object( dbref, dbref );
@@ -178,6 +202,8 @@ extern int	badname_check( char * );
 extern void	badname_list( dbref, const char * );
 
 /* From predicates.c */
+extern char    *safe_snprintf(char *,  size_t, const char *, ... );
+extern char    *safe_vsnprintf(char *, size_t, const char *, va_list );
 extern char    *tmprintf( const char *,... );
 extern char    *tmvprintf( const char *, va_list );
 extern void	safe_tmprintf_str( char *, char **, const char *,... );
@@ -560,38 +586,22 @@ extern int	register_match( char *, char *, char *[], int );
  * A zillion ways to notify things.
  */
 
-#define	notify(p,m)			notify_check(p,p,m, \
-						MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN)
-#define notify_html(p,m)                notify_check(p,p,m, \
-                                              MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|MSG_HTML)
-#define	notify_quiet(p,m)		notify_check(p,p,m, \
-						MSG_PUP_ALWAYS|MSG_ME)
-#define	notify_with_cause(p,c,m)	notify_check(p,c,m, \
-						MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN)
-#define notify_with_cause_html(p,c,m)   notify_check(p,c,m, \
-                                              MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|MSG_HTML)
-#define notify_with_cause_extra(p,c,m,f) notify_check(p,c,m, \
-						MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|(f))
-#define	notify_quiet_with_cause(p,c,m)	notify_check(p,c,m, \
-						MSG_PUP_ALWAYS|MSG_ME)
-#define	notify_puppet(p,c,m)		notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_F_DOWN)
-#define	notify_quiet_puppet(p,c,m)	notify_check(p,c,m, \
-						MSG_ME)
-#define	notify_all(p,c,m)		notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_NBR_EXITS|MSG_F_UP|MSG_F_CONTENTS)
-#define	notify_all_from_inside(p,c,m)	notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE)
-#define	notify_all_from_inside_speech(p,c,m)	notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_SPEECH)
-#define	notify_all_from_inside_move(p,c,m)	notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_MOVE)
-#define notify_all_from_inside_html(p,c,m)      notify_check(p,c,m, \
-                                              MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_HTML)
-#define notify_all_from_inside_html_speech(p,c,m)      notify_check(p,c,m, \
-                                              MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_HTML|MSG_SPEECH)
-#define	notify_all_from_outside(p,c,m)	notify_check(p,c,m, \
-						MSG_ME_ALL|MSG_NBR_EXITS|MSG_F_UP|MSG_F_CONTENTS|MSG_S_OUTSIDE)
+#define	notify(p,m)					notify_check(p,p,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL,m)
+#define notify_html(p,m)				notify_check(p,p,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|MSG_HTML,NULL,m)
+#define	notify_quiet(p,m)				notify_check(p,p,MSG_PUP_ALWAYS|MSG_ME,NULL,m)
+#define	notify_with_cause(p,c,m)			notify_check(p,c,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL,m)
+#define notify_with_cause_html(p,c,m)			notify_check(p,c,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|MSG_HTML,NULL,m)
+#define notify_with_cause_extra(p,c,m,f)		notify_check(p,c,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN|(f),NULL,m)
+#define	notify_quiet_with_cause(p,c,m)			notify_check(p,c,MSG_PUP_ALWAYS|MSG_ME,NULL,m)
+#define	notify_puppet(p,c,m)				notify_check(p,c,MSG_ME_ALL|MSG_F_DOWN,NULL,m)
+#define	notify_quiet_puppet(p,c,m)			notify_check(p,c,MSG_ME,NULL,m)
+#define	notify_all(p,c,m)				notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS|MSG_F_UP|MSG_F_CONTENTS,NULL,m)
+#define	notify_all_from_inside(p,c,m)			notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE,NULL,m)
+#define	notify_all_from_inside_speech(p,c,m)		notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_SPEECH,NULL,m)
+#define	notify_all_from_inside_move(p,c,m)		notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_MOVE,NULL,m)
+#define notify_all_from_inside_html(p,c,m)		notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_HTML,NULL,m)
+#define notify_all_from_inside_html_speech(p,c,m)	notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_HTML|MSG_SPEECH,NULL,m)
+#define	notify_all_from_outside(p,c,m)			notify_check(p,c,MSG_ME_ALL|MSG_NBR_EXITS|MSG_F_UP|MSG_F_CONTENTS|MSG_S_OUTSIDE,NULL,m)
 
 #define CANNOT_HEAR_MSG  "That target cannot hear you."
 #define NOT_PRESENT_MSG  "That target is not present."

@@ -21,6 +21,7 @@
 #include "mushconf.h"   /* required by code */
 
 #include "db.h"         /* required by externs */
+#include "interface.h"
 #include "externs.h"    /* required by code */
 
 #include "ansi.h"       /* required by code */
@@ -360,9 +361,9 @@ char *log_gettype( dbref thing, char *d ) {
 
 void do_logrotate( dbref player, dbref cause, int key ) {
     LOGFILETAB *lp;
-    char *ts, *pname;
+    char ts[SBUF_SIZE], *pname;
 
-    ts=mktimestamp( "do_logrotate" );
+    mktimestamp(ts, SBUF_SIZE);
     mudstate.mudlognum++;
 
     if( mainlog_fp == stderr ) {
@@ -392,17 +393,14 @@ void do_logrotate( dbref player, dbref cause, int key ) {
             }
         }
     }
-
-    XFREE( ts, "do_logrotate" );
-
 }
 
 void logfile_close( void ) {
     LOGFILETAB *lp;
 
-    char *ts;
+    char ts[SBUF_SIZE];
 
-    ts=mktimestamp( "logfile_close" );
+    mktimestamp( ts, SBUF_SIZE);
 
     for( lp = logfds_table; lp->log_flag; lp++ ) {
         if( lp->filename && lp->fileptr ) {
@@ -415,7 +413,4 @@ void logfile_close( void ) {
         fclose( mainlog_fp );
         copy_file( mudconf.log_file, tmprintf( "%s.%s", mudconf.log_file, ts ), 1 );
     }
-
-    XFREE( ts, "logfile_close" );
-
 }

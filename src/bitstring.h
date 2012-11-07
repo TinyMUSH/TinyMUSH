@@ -1,5 +1,7 @@
 /* bitstring.h */
 
+#include "copyright.h"
+
 #ifndef __BITSTRING_H
 #define __BITSTRING_H
 

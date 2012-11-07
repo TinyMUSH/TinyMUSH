@@ -15,6 +15,7 @@
 #include "typedefs.h"	/* required by mudconf */
 #include "mushconf.h"	/* required by code */
 #include "db.h"		/* required by externs.h */
+#include "interface.h"
 #include "externs.h"	/* required by code */
 
 POOL pools[NUM_POOLS];
@@ -110,7 +111,7 @@ char *pool_alloc( int poolnum, const char *tag ) {
         if( pools[poolnum].free_head == NULL ) {
             h = ( char * ) RAW_MALLOC( pools[poolnum].pool_size + sizeof( POOLHDR ) + sizeof( POOLFTR ), "pool_alloc.ph" );
             if( h == NULL ) {
-                log_write_raw( 1, "ABORT! alloc.c, pool_alloc() failed to get memory.\n" );
+                log_write_raw( 1, "ABORT! alloc.c, pool_alloc() failed to get memory." );
                 abort();
             }
             ph = ( POOLHDR * ) h;
@@ -361,7 +362,7 @@ void *malloc_str;
 
 void *xmalloc(size_t x, const char *y) {
     
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xmalloc: %s/%d\n", y, x);  
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xmalloc: %s/%d", y, x);  
     malloc_count++;
     malloc_ptr = (void *)malloc(x + sizeof(int));
     malloc_bytes += x;
@@ -370,7 +371,7 @@ void *xmalloc(size_t x, const char *y) {
 }
 
 void *xcalloc(size_t x, size_t z, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xcalloc: %s/%d\n", y, x*z);
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xcalloc: %s/%d", y, x*z);
     malloc_count++;
     malloc_ptr = (void *)malloc(x * z  + sizeof(int) );
     malloc_bytes += x * z;
@@ -380,19 +381,21 @@ void *xcalloc(size_t x, size_t z, const char *y) {
 }
 
 void *xrealloc(void *x, size_t z, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xrealloc: %s/%d\n", y, z);
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xrealloc: %s/%d", y, z);
     malloc_ptr = (void *)malloc( z + sizeof(int));
     malloc_bytes += z;
-    malloc_bytes -= *(int *)((void *) x - sizeof(int));
-    memcpy(malloc_ptr + sizeof(int), x, *(int *)((void *) x - sizeof(int)));
-    free((void *)x - sizeof(int));
+    if(x) {
+        malloc_bytes -= *(int *)((void *) x - sizeof(int));
+        memcpy(malloc_ptr + sizeof(int), x, *(int *)((void *) x - sizeof(int)));
+        free((void *)x - sizeof(int));
+    }
     *(int *)malloc_ptr = z;
     return(malloc_ptr + sizeof(int));
 }
 
 void *xstrdup(const void *x, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrdup: %s/%d\n", y, strlen(malloc_str)+1);
-    malloc_str = (char *)x;
+    malloc_str = (char *) x;
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrdup: %s/%d", y, strlen(malloc_str) + 1 );
     malloc_count++;
     malloc_ptr = (void *)malloc(strlen(malloc_str) + 1 + sizeof(int));
     malloc_bytes += strlen(malloc_str) + 1;
@@ -402,8 +405,8 @@ void *xstrdup(const void *x, const char *y) {
 }
 
 void *xstrndup(const void *x, size_t z, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d\n", y, strlen(malloc_str)+1);
-    malloc_str = (void *)x;
+    malloc_str = (void *) x;
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
     malloc_count++;
     malloc_ptr = (void *)malloc(z + sizeof(int));
     malloc_bytes += z;
@@ -413,7 +416,7 @@ void *xstrndup(const void *x, size_t z, const char *y) {
 }
 
 void xfree(void *x, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "Free: %s/%d\n", (y), (x) ? *(int *)((void *)(x)-sizeof(int)) : 0);
+    log_write( LOG_MALLOC, "MEM", "TRACE", "Free: %s/%d", y, x ? *(int *)((void *) x - sizeof(int))  : 0);
     if(x) {
         malloc_count--;
         malloc_bytes -= *(int *)((void *) x - sizeof(int));
@@ -439,7 +442,7 @@ void list_rawmemory( dbref player ) {
 
     n_tags = total = 0;
 
-    raw_notify( player, "Memory Tag                           Allocs      Bytes" );
+    raw_notify( player, NULL, "Memory Tag                           Allocs      Bytes");
 
     for( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
         n_tags++;
@@ -470,12 +473,12 @@ void list_rawmemory( dbref player ) {
             c_total = ( int ) t_array[i]->alloc;
             i++;
         }
-        raw_notify( player,tmprintf( "%-35.35s  %6d   %8d", ntmp, c_tags, c_total ) );
+        raw_notify( player, "%-35.35s  %6d   %8d", ntmp, c_tags, c_total );
     }
 
     RAW_FREE( t_array, "list_rawmemory" );
 
-    raw_notify( player, tmprintf ( "Total: %d raw allocations in %d unique tags. %d bytes (%d K).", n_tags, u_tags, total, ( int ) total / 1024 ) );
+    raw_notify( player, "Total: %d raw allocations in %d unique tags. %d bytes (%d K).", n_tags, u_tags, total, ( int ) total / 1024 );
 }
 
 static void trace_alloc( site_t amount, const char *name, void *ptr ) {

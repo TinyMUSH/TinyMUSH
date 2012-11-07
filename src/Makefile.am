@@ -31,7 +31,7 @@ SCRIPT_BUILD		= $(SCRIPT_DIR)/Startmush
 EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
 CLEANFILES		= version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
-API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h externs.h api.h interface.h
+API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h api.h interface.h externs.h
 
 BUILT_SOURCES		= version.h tinymushapi.h defaults.h netmush.conf Startmush
 

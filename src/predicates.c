@@ -16,8 +16,9 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "match.h"		/* required by code */
 #include "command.h"		/* required by code */
@@ -49,6 +50,27 @@ static int pay_quota( dbref, int, int );
 extern void queue_rawstring( DESC *, const char * );
 
 static char tmprintf_buff[LBUF_SIZE];
+
+char *safe_snprintf(char *buff, size_t size, const char *format, ... ) {
+    va_list ap;
+
+    va_start( ap, format );
+    vsnprintf( buff, size, format, ap );
+    va_end( ap );
+
+    buff[size - 1] = '\0';
+
+    return(buff);
+}
+
+char *safe_vsnprintf(char *buff, size_t size, const char *format, va_list ap ) {
+ 
+    vsnprintf( buff, size, format, ap );
+ 
+    buff[size - 1] = '\0';
+ 
+    return(buff);
+}
 
 char *tmprintf( const char *format, ... ) {
     va_list ap;
@@ -580,12 +602,7 @@ void handle_ears( dbref thing, int could_hear, int can_hear ) {
             safe_name( thing, buff, &bp );
         }
         gender = get_gender( thing );
-        notify_check( thing, thing,
-                      tmprintf( "%s %s %s listening.",
-                                buff,
-                                ( ( gender == 4 ) ? "are" : "is" ),
-                                ( can_hear ? "now" : "no longer" ) ),
-                      ( MSG_ME | MSG_NBR | MSG_LOC | MSG_INV ) );
+        notify_check( thing, thing, ( MSG_ME | MSG_NBR | MSG_LOC | MSG_INV ), "%s %s %s listening.", buff, ( ( gender == 4 ) ? "are" : "is" ), ( can_hear ? "now" : "no longer" )  ); 
         free_lbuf( buff );
     }
 }

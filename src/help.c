@@ -16,6 +16,7 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
+#include "interface.h"
 #include "externs.h"		/* required by code */
 
 #include "help.h"		/* required by code */
@@ -328,8 +329,7 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
             notify( player, tmprintf( "No entry for '%s'.", topic ) );
         } else {
             notify( player,
-                    tmprintf( "Here are the entries which match '%s':",
-                              topic ) );
+                    tmprintf( "Here are the entries which match '%s':", topic ) );
             *buffp = '\0';
             notify( player, topic_list );
             free_lbuf( topic_list );
@@ -368,12 +368,10 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
         if( eval ) {
             str = line;
             bp = result;
-            exec( result, &bp, 0, player, player,
-                  EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str,
-                  ( char ** ) NULL, 0 );
-            notify( player, result );
+            exec( result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, ( char ** ) NULL, 0 );
+            notify_check(player , player , MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, NULL, result);
         } else {
-            notify( player, line );
+            notify_check(player , player , MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, NULL, line);
         }
     }
     tf_fclose( fp );

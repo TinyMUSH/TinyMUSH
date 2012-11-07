@@ -21,8 +21,9 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "file_c.h"		/* required by code */
 #include "command.h"		/* required by code */
@@ -108,12 +109,26 @@ struct timeval update_quotas( struct timeval last, struct timeval current ) {
 
 #ifdef PUEBLO_SUPPORT
 /* raw_notify_html() -- raw_notify() without the newline */
-void raw_notify_html( dbref player, char *msg ) {
+void raw_notify_html( dbref player, const char *format, ... ) {
     DESC *d;
-
-    if( !msg || !*msg ) {
-        return;
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
+    
+    va_start( ap, format );
+    
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
     }
+
+    va_end(ap);
+
     if( mudstate.inpipe && ( player == mudstate.poutobj ) ) {
         safe_str( msg, mudstate.poutnew, &mudstate.poutbufc );
         return;
@@ -137,13 +152,27 @@ void raw_notify_html( dbref player, char *msg ) {
  * raw_notify: write a message to a player
  */
 
-void raw_notify( dbref player, char *msg ) {
+void raw_notify( dbref player, const char *format, ... ) {
     DESC *d;
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
 
-    if( !msg || !*msg ) {
-        return;
+    va_start( ap, format );
+    
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
     }
 
+    va_end(ap);
+
+    
     if( mudstate.inpipe && ( player == mudstate.poutobj ) ) {
         safe_str( msg, mudstate.poutnew, &mudstate.poutbufc );
         safe_crlf( mudstate.poutnew, &mudstate.poutbufc );
@@ -742,39 +771,31 @@ static void announce_connect( dbref player, DESC *d, const char *reason ) {
 
     if( *mudconf.motd_msg ) {
         if( mudconf.ansi_colors ) {
-            raw_notify( player, tmprintf( "\n%sMOTD:%s %s\n",
-                                          ANSI_HILITE, ANSI_NORMAL, mudconf.motd_msg ) );
+            raw_notify( player, "\n%sMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mudconf.motd_msg );
         } else {
-            raw_notify( player, tmprintf( "\nMOTD: %s\n",
-                                          mudconf.motd_msg ) );
+            raw_notify( player, "\nMOTD: %s\n", mudconf.motd_msg );
         }
     }
 
     if( Wizard( player ) ) {
         if( *mudconf.wizmotd_msg ) {
             if( mudconf.ansi_colors ) {
-                raw_notify( player,
-                            tmprintf( "%sWIZMOTD:%s %s\n",
-                                      ANSI_HILITE, ANSI_NORMAL,
-                                      mudconf.wizmotd_msg ) );
+                raw_notify( player, "%sWIZMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mudconf.wizmotd_msg );
             } else {
-                raw_notify( player,
-                            tmprintf( "WIZMOTD: %s\n",
-                                      mudconf.wizmotd_msg ) );
+                raw_notify( player, "WIZMOTD: %s\n", mudconf.wizmotd_msg );
             }
         }
         if( !( mudconf.control_flags & CF_LOGIN ) ) {
-            raw_notify( player, "*** Logins are disabled." );
+            raw_notify( player, NULL, "*** Logins are disabled.");
         }
     }
 
     buf = atr_get( player, A_LPAGE, &aowner, &aflags, &alen );
     if( *buf ) {
-        raw_notify( player,
-                    "REMINDER: Your PAGE LOCK is set. You may be unable to receive some pages." );
+        raw_notify( player, NULL, "REMINDER: Your PAGE LOCK is set. You may be unable to receive some pages.");
     }
     if( Dark( player ) ) {
-        raw_notify( player, "REMINDER: You are set DARK." );
+        raw_notify( player, NULL, "REMINDER: You are set DARK.");
     }
     num = 0;
     DESC_ITER_PLAYER( player, dtemp ) num++;
@@ -808,7 +829,7 @@ static void announce_connect( dbref player, DESC *d, const char *reason ) {
 
     temp = mudstate.curr_enactor;
     mudstate.curr_enactor = player;
-    notify_check( player, player, buf, key );
+    notify_check( player, player, key, NULL, buf );
     free_lbuf( buf );
 
     CALL_ALL_MODULES( announce_connect, ( player, reason, num ) );
@@ -871,7 +892,7 @@ void announce_disconnect( dbref player, DESC *d, const char *reason ) {
         if( ( loc != NOTHING ) && !( Hidden( player ) && Can_Hide( player ) ) )
             key |=
                 ( MSG_NBR | MSG_NBR_EXITS | MSG_LOC | MSG_FWDLIST );
-        notify_check( player, player, buf, key );
+        notify_check( player, player, key, NULL, buf );
         free_mbuf( buf );
 
         raw_broadcast( WATCHER | FLAG_WORD2,
@@ -892,7 +913,7 @@ void announce_disconnect( dbref player, DESC *d, const char *reason ) {
         if( ( loc != NOTHING ) && !( Hidden( player ) && Can_Hide( player ) ) )
             key |=
                 ( MSG_NBR | MSG_NBR_EXITS | MSG_LOC | MSG_FWDLIST );
-        notify_check( player, player, buf, key );
+        notify_check( player, player, key, NULL, buf );
         raw_broadcast( WATCHER | FLAG_WORD2,
                        ( char * ) "GAME: %s has partially disconnected.",
                        Name( player ) );
@@ -1052,16 +1073,14 @@ void check_idle( void ) {
                        ( idletime > mudconf.idle_timeout ) &&
                        Can_Idle( d->player ) &&
                        Can_Hide( d->player ) && !Hidden( d->player ) ) {
-                raw_notify( d->player,
-                            "*** Inactivity AutoDark ***" );
+                raw_notify( d->player, NULL, "*** Inactivity AutoDark ***");
                 s_Flags( d->player, Flags( d->player ) | DARK );
                 d->flags |= DS_AUTODARK;
             }
         } else {
             idletime = mudstate.now - d->connected_at;
             if( idletime > mudconf.conn_timeout ) {
-                queue_rawstring( d,
-                                 "*** Login Timeout ***\r\n" );
+                queue_rawstring( d, "*** Login Timeout ***\r\n" );
                 shutdownsock( d, R_TIMEOUT );
             }
         }
@@ -1818,8 +1837,7 @@ void do_command( DESC *d, char *command, int first ) {
         begin_time = time( NULL );
 #endif				/* NO_LAG_CHECK */
         mudstate.cmd_invk_ctr = 0;
-        log_cmdbuf = process_command( d->player, d->player, 1,
-                                      command, ( char ** ) NULL, 0 );
+        log_cmdbuf = process_command( d->player, d->player, 1, command, ( char ** ) NULL, 0 );
 #ifndef NO_LAG_CHECK
         used_time = time( NULL ) - begin_time;
         if( used_time >= mudconf.max_cmdsecs ) {

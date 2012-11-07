@@ -16,8 +16,9 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */

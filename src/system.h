@@ -102,9 +102,15 @@
 #include <zlib.h>
 #endif
 
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+
 #include <ltdl.h>
 #include <libgen.h>
 
 #include <inttypes.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #endif	/* __SYSTEM_H */

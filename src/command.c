@@ -16,8 +16,9 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "help.h"		/* required by code */
 #include "command.h"		/* required by code */
@@ -978,8 +979,7 @@ char *process_command( dbref player, dbref cause, int interactive, char *command
      * NOTE THAT THIS WILL BREAK IF "GOD" IS NOT A DBREF.
      */
     if( mudconf.control_flags & CF_GODMONITOR ) {
-        raw_notify( GOD, tmprintf( "%s(#%d)%c %s", Name( player ), player,
-                                   ( interactive ) ? '|' : ':', command ) );
+        raw_notify( GOD, "%s(#%d)%c %s", Name( player ), player,( interactive ) ? '|' : ':', command );
     }
     /*
      * Eat leading whitespace, and space-compress if configured
@@ -1777,7 +1777,7 @@ static void list_attrtable( dbref player ) {
         }
     }
     *bp = '\0';
-    raw_notify( player, buf );
+    raw_notify( player, NULL, buf );
     free_lbuf( buf );
 }
 
@@ -2221,7 +2221,7 @@ int cf_cmd_alias( int *vp, char *str, long extra, dbref player, char *cmd ) {
  */
 
 static void list_df_flags( dbref player ) {
-    char *playerb, *roomb, *thingb, *exitb, *robotb, *stripb, *buff;
+    char *playerb, *roomb, *thingb, *exitb, *robotb, *stripb;
 
     playerb = decode_flags( player, mudconf.player_flags );
     roomb = decode_flags( player, mudconf.room_flags );
@@ -2230,12 +2230,8 @@ static void list_df_flags( dbref player ) {
     robotb = decode_flags( player, mudconf.robot_flags );
     stripb = decode_flags( player, mudconf.stripped_flags );
 
-    buff = alloc_lbuf( "list_df_flags" );
-    sprintf( buff,
-             "Default flags: Players...P%s  Rooms...R%s  Exits...E%s  Things...%s  Robots...P%s  Stripped...%s",
-             playerb, roomb, exitb, thingb, robotb, stripb );
-    raw_notify( player, buff );
-    free_lbuf( buff );
+    raw_notify( player, "Default flags: Players...P%s  Rooms...R%s  Exits...E%s  Things...%s  Robots...P%s  Stripped...%s", playerb, roomb, exitb, thingb, robotb, stripb );
+
     free_sbuf( playerb );
     free_sbuf( roomb );
     free_sbuf( exitb );
@@ -2275,16 +2271,9 @@ static void list_costs( dbref player ) {
         sprintf( buff, " and %d quota", mudconf.thing_quota );
     }
     if( mudconf.createmin == mudconf.createmax )
-        raw_notify( player,
-                    tmprintf( "Creating a new thing costs %d %s%s.",
-                              mudconf.createmin,
-                              coin_name( mudconf.createmin ), buff ) );
+        raw_notify( player, "Creating a new thing costs %d %s%s.", mudconf.createmin, coin_name( mudconf.createmin ), buff );
     else
-        raw_notify( player,
-                    tmprintf
-                    ( "Creating a new thing costs between %d and %d %s%s.",
-                      mudconf.createmin, mudconf.createmax,
-                      mudconf.many_coins, buff ) );
+        raw_notify( player, "Creating a new thing costs between %d and %d %s%s.", mudconf.createmin, mudconf.createmax, mudconf.many_coins, buff );
     if( mudconf.quotas ) {
         sprintf( buff, " and %d quota", mudconf.player_quota );
     }
@@ -2292,35 +2281,17 @@ static void list_costs( dbref player ) {
             tmprintf( "Creating a robot costs %d %s%s.",
                       mudconf.robotcost, coin_name( mudconf.robotcost ), buff ) );
     if( mudconf.killmin == mudconf.killmax ) {
-        raw_notify( player,
-                    tmprintf
-                    ( "Killing costs %d %s, with a %d%% chance of success.",
-                      mudconf.killmin, coin_name( mudconf.digcost ),
-                      ( mudconf.killmin * 100 ) / mudconf.killguarantee ) );
+        raw_notify( player, "Killing costs %d %s, with a %d%% chance of success.", mudconf.killmin, coin_name( mudconf.digcost ), ( mudconf.killmin * 100 ) / mudconf.killguarantee );
     } else {
-        raw_notify( player,
-                    tmprintf( "Killing costs between %d and %d %s.",
-                              mudconf.killmin, mudconf.killmax, mudconf.many_coins ) );
-        raw_notify( player,
-                    tmprintf( "You must spend %d %s to guarantee success.",
-                              mudconf.killguarantee,
-                              coin_name( mudconf.killguarantee ) ) );
+        raw_notify( player, "Killing costs between %d and %d %s.", mudconf.killmin, mudconf.killmax, mudconf.many_coins );
+        raw_notify( player, "You must spend %d %s to guarantee success.", mudconf.killguarantee, coin_name( mudconf.killguarantee ) );
     }
-    raw_notify( player,
-                tmprintf
-                ( "Computationally expensive commands and functions (ie: @entrances, @find, @search, @stats (with an argument or switch), search(), and stats()) cost %d %s.",
-                  mudconf.searchcost, coin_name( mudconf.searchcost ) ) );
+    raw_notify( player, "Computationally expensive commands and functions (ie: @entrances, @find, @search, @stats (with an argument or switch), search(), and stats()) cost %d %s.", mudconf.searchcost, coin_name( mudconf.searchcost ) );
     if( mudconf.machinecost > 0 )
-        raw_notify( player,
-                    tmprintf( "Each command run from the queue costs 1/%d %s.",
-                              mudconf.machinecost, mudconf.one_coin ) );
+        raw_notify( player, "Each command run from the queue costs 1/%d %s.", mudconf.machinecost, mudconf.one_coin );
     if( mudconf.waitcost > 0 ) {
-        raw_notify( player,
-                    tmprintf
-                    ( "A %d %s deposit is charged for putting a command on the queue.",
-                      mudconf.waitcost, mudconf.one_coin ) );
-        raw_notify( player,
-                    "The deposit is refunded when the command is run or canceled." );
+        raw_notify( player, "A %d %s deposit is charged for putting a command on the queue.", mudconf.waitcost, mudconf.one_coin );
+        raw_notify( player, "The deposit is refunded when the command is run or canceled." );
     }
     if( mudconf.sacfactor == 0 ) {
         sprintf( buff, "%d", mudconf.sacadjust );
@@ -2344,14 +2315,11 @@ static void list_costs( dbref player ) {
             sprintf( buff, "<create cost> / %d", mudconf.sacfactor );
         }
     }
-    raw_notify( player, tmprintf( "The value of an object is %s.", buff ) );
+    raw_notify( player, "The value of an object is %s.", buff );
     if( mudconf.clone_copy_cost )
-        raw_notify( player,
-                    "The default value of cloned objects is the value of the original object." );
+        raw_notify( player, "The default value of cloned objects is the value of the original object." );
     else
-        raw_notify( player,
-                    tmprintf( "The default value of cloned objects is %d %s.",
-                              mudconf.createmin, coin_name( mudconf.createmin ) ) );
+        raw_notify( player, "The default value of cloned objects is %d %s.", mudconf.createmin, coin_name( mudconf.createmin ) );
 
     free_mbuf( buff );
 }
@@ -2369,122 +2337,48 @@ static void list_params( dbref player ) {
 
     now = time( NULL );
 
-    raw_notify( player,
-                tmprintf
-                ( "Prototypes:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d",
-                  mudconf.room_proto, mudconf.exit_proto, mudconf.thing_proto,
-                  mudconf.player_proto ) );
+    raw_notify( player, "Prototypes:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mudconf.room_proto, mudconf.exit_proto, mudconf.thing_proto, mudconf.player_proto );
 
-    raw_notify( player,
-                tmprintf
-                ( "Attr Defaults:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d",
-                  mudconf.room_defobj, mudconf.exit_defobj, mudconf.thing_defobj,
-                  mudconf.player_defobj ) );
+    raw_notify( player, "Attr Defaults:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mudconf.room_defobj, mudconf.exit_defobj, mudconf.thing_defobj, mudconf.player_defobj );
 
-    raw_notify( player,
-                tmprintf
-                ( "Default Parents:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d",
-                  mudconf.room_parent, mudconf.exit_parent, mudconf.thing_parent,
-                  mudconf.player_parent ) );
+    raw_notify( player, "Default Parents:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mudconf.room_parent, mudconf.exit_parent, mudconf.thing_parent, mudconf.player_parent );
 
-    raw_notify( player, "Limits:" );
-    raw_notify( player,
-                tmprintf( "  Function recursion...%d  Function invocation...%d",
-                          mudconf.func_nest_lim, mudconf.func_invk_lim ) );
-    raw_notify( player,
-                tmprintf( "  Command recursion...%d  Command invocation...%d",
-                          mudconf.cmd_nest_lim, mudconf.cmd_invk_lim ) );
-    raw_notify( player,
-                tmprintf
-                ( "  Output...%d  Queue...%d  CPU...%d  Wild...%d  Aliases...%d",
-                  mudconf.output_limit, mudconf.queuemax,
-                  mudconf.func_cpu_lim_secs, mudconf.wild_times_lim,
-                  mudconf.max_player_aliases ) );
-    raw_notify( player,
-                tmprintf
-                ( "  Forwardlist...%d  Propdirs... %d  Registers...%d  Stacks...%d",
-                  mudconf.fwdlist_lim, mudconf.propdir_lim,
-                  mudconf.register_limit, mudconf.stack_lim ) );
-    raw_notify( player,
-                tmprintf( "  Variables...%d  Structures...%d  Instances...%d",
-                          mudconf.numvars_lim, mudconf.struct_lim,
-                          mudconf.instance_lim ) );
-    raw_notify( player,
-                tmprintf
-                ( "  Objects...%d  Allowance...%d  Trace levels...%d  Connect tries...%d",
-                  mudconf.building_limit, mudconf.paylimit, mudconf.trace_limit,
-                  mudconf.retry_limit ) );
+    raw_notify( player, NULL, "Limits:" );
+    raw_notify( player, "  Function recursion...%d  Function invocation...%d", mudconf.func_nest_lim, mudconf.func_invk_lim );
+    raw_notify( player, "  Command recursion...%d  Command invocation...%d", mudconf.cmd_nest_lim, mudconf.cmd_invk_lim );
+    raw_notify( player, "  Output...%d  Queue...%d  CPU...%d  Wild...%d  Aliases...%d", mudconf.output_limit, mudconf.queuemax, mudconf.func_cpu_lim_secs, mudconf.wild_times_lim, mudconf.max_player_aliases );
+    raw_notify( player, "  Forwardlist...%d  Propdirs... %d  Registers...%d  Stacks...%d", mudconf.fwdlist_lim, mudconf.propdir_lim, mudconf.register_limit, mudconf.stack_lim );
+    raw_notify( player, "  Variables...%d  Structures...%d  Instances...%d", mudconf.numvars_lim, mudconf.struct_lim, mudconf.instance_lim );
+    raw_notify( player, "  Objects...%d  Allowance...%d  Trace levels...%d  Connect tries...%d", mudconf.building_limit, mudconf.paylimit, mudconf.trace_limit, mudconf.retry_limit );
     if( mudconf.max_players >= 0 )
-        raw_notify( player, tmprintf( "  Logins...%d",
-                                      mudconf.max_players ) );
+        raw_notify( player, "  Logins...%d", mudconf.max_players );
 
-    raw_notify( player,
-                tmprintf
-                ( "Nesting:  Locks...%d  Parents...%d  Messages...%d  Zones...%d",
-                  mudconf.lock_nest_lim, mudconf.parent_nest_lim,
-                  mudconf.ntfy_nest_lim, mudconf.zone_nest_lim ) );
+    raw_notify( player, "Nesting:  Locks...%d  Parents...%d  Messages...%d  Zones...%d", mudconf.lock_nest_lim, mudconf.parent_nest_lim, mudconf.ntfy_nest_lim, mudconf.zone_nest_lim );
 
-    raw_notify( player,
-                tmprintf( "Timeouts:  Idle...%d  Connect...%d  Tries...%d  Lag...%d",
-                          mudconf.idle_timeout, mudconf.conn_timeout,
-                          mudconf.retry_limit, mudconf.max_cmdsecs ) );
+    raw_notify( player, "Timeouts:  Idle...%d  Connect...%d  Tries...%d  Lag...%d", mudconf.idle_timeout, mudconf.conn_timeout, mudconf.retry_limit, mudconf.max_cmdsecs );
 
-    raw_notify( player,
-                tmprintf( "Money:  Start...%d  Daily...%d  Singular: %s  Plural: %s",
-                          mudconf.paystart, mudconf.paycheck,
-                          mudconf.one_coin, mudconf.many_coins ) );
+    raw_notify( player, "Money:  Start...%d  Daily...%d  Singular: %s  Plural: %s", mudconf.paystart, mudconf.paycheck, mudconf.one_coin, mudconf.many_coins );
     if( mudconf.payfind > 0 )
-        raw_notify( player, tmprintf( "Chance of finding money: 1 in %d",
-                                      mudconf.payfind ) );
+        raw_notify( player, "Chance of finding money: 1 in %d", mudconf.payfind );
 
-    raw_notify( player,
-                tmprintf
-                ( "Start Quotas:  Total...%d  Rooms...%d  Exits...%d  Things...%d  Players...%d",
-                  mudconf.start_quota, mudconf.start_room_quota,
-                  mudconf.start_exit_quota, mudconf.start_thing_quota,
-                  mudconf.start_player_quota ) );
+    raw_notify( player, "Start Quotas:  Total...%d  Rooms...%d  Exits...%d  Things...%d  Players...%d", mudconf.start_quota, mudconf.start_room_quota, mudconf.start_exit_quota, mudconf.start_thing_quota, mudconf.start_player_quota );
 
-    raw_notify( player, "Dbrefs:" );
-    raw_notify( player,
-                tmprintf
-                ( "  MasterRoom...#%d  StartRoom...#%d  StartHome...#%d  DefaultHome...#%d",
-                  mudconf.master_room, mudconf.start_room, mudconf.start_home,
-                  mudconf.default_home ) );
+    raw_notify( player, NULL, "Dbrefs:" );
+    raw_notify( player, "  MasterRoom...#%d  StartRoom...#%d  StartHome...#%d  DefaultHome...#%d", mudconf.master_room, mudconf.start_room, mudconf.start_home, mudconf.default_home );
 
     if( Wizard( player ) ) {
 
-        raw_notify( player,
-                    tmprintf
-                    ( "  GuestChar...#%d  GuestStart...#%d  Freelist...#%d",
-                      mudconf.guest_char, mudconf.guest_start_room,
-                      mudstate.freelist ) );
+        raw_notify( player, "  GuestChar...#%d  GuestStart...#%d  Freelist...#%d", mudconf.guest_char, mudconf.guest_start_room, mudstate.freelist );
 
-        raw_notify( player,
-                    tmprintf
-                    ( "Queue run sizes:  No net activity... %d  Activity... %d",
-                      mudconf.queue_chunk, mudconf.active_q_chunk ) );
+        raw_notify( player, "Queue run sizes:  No net activity... %d  Activity... %d", mudconf.queue_chunk, mudconf.active_q_chunk );
 
-        raw_notify( player,
-                    tmprintf
-                    ( "Intervals:  Dump...%d  Clean...%d  Idlecheck...%d  Optimize...%d",
-                      mudconf.dump_interval, mudconf.check_interval,
-                      mudconf.idle_interval, mudconf.dbopt_interval ) );
+        raw_notify( player, "Intervals:  Dump...%d  Clean...%d  Idlecheck...%d  Optimize...%d",  mudconf.dump_interval, mudconf.check_interval, mudconf.idle_interval, mudconf.dbopt_interval );
 
-        raw_notify( player,
-                    tmprintf( "Timers:  Dump...%d  Clean...%d  Idlecheck...%d",
-                              ( int )( mudstate.dump_counter - now ),
-                              ( int )( mudstate.check_counter - now ),
-                              ( int )( mudstate.idle_counter - now ) ) );
+        raw_notify( player, "Timers:  Dump...%d  Clean...%d  Idlecheck...%d", ( int )( mudstate.dump_counter - now ), ( int )( mudstate.check_counter - now ), ( int )( mudstate.idle_counter - now ) );
 
-        raw_notify( player,
-                    tmprintf
-                    ( "Scheduling:  Timeslice...%d  Max_Quota...%d  Increment...%d",
-                      mudconf.timeslice, mudconf.cmd_quota_max,
-                      mudconf.cmd_quota_incr ) );
+        raw_notify( player, "Scheduling:  Timeslice...%d  Max_Quota...%d  Increment...%d", mudconf.timeslice, mudconf.cmd_quota_max, mudconf.cmd_quota_incr );
 
-        raw_notify( player,
-                    tmprintf( "Size of %s cache:  Width...%d  Size...%d",
-                              CACHING, mudconf.cache_width, mudconf.cache_size ) );
+        raw_notify( player, "Size of %s cache:  Width...%d  Size...%d", CACHING, mudconf.cache_width, mudconf.cache_size );
     }
 }
 
@@ -2501,17 +2395,15 @@ static void list_vattrs( dbref player ) {
     char *buff;
 
     buff = alloc_lbuf( "list_vattrs" );
-    raw_notify( player, "--- User-Defined Attributes ---" );
+    raw_notify( player, NULL, "--- User-Defined Attributes ---");
     for( va = vattr_first(), na = 0; va; va = vattr_next( va ), na++ ) {
         if( !( va->flags & AF_DELETED ) ) {
             sprintf( buff, "%s(%d):", va->name, va->number );
-            listset_nametab( player, attraccess_nametab, va->flags,
-                             buff, 1 );
+            listset_nametab( player, attraccess_nametab, va->flags, buff, 1 );
         }
     }
 
-    raw_notify( player, tmprintf( "%d attributes, next=%d",
-                                  na, mudstate.attr_next ) );
+    raw_notify( player, "%d attributes, next=%d", na, mudstate.attr_next );
     free_lbuf( buff );
 }
 
@@ -2524,7 +2416,7 @@ static void list_hashstat( dbref player, const char *tab_name, HASHTAB *htab ) {
     char *buff;
 
     buff = hashinfo( tab_name, htab );
-    raw_notify( player, buff );
+    raw_notify( player, NULL, buff);
     free_mbuf( buff );
 }
 
@@ -2532,7 +2424,7 @@ static void list_nhashstat( dbref player, const char *tab_name, NHSHTAB *htab ) 
     char *buff;
 
     buff = nhashinfo( tab_name, htab );
-    raw_notify( player, buff );
+    raw_notify( player, NULL, buff);
     free_mbuf( buff );
 }
 
@@ -2543,8 +2435,7 @@ static void list_hashstats( dbref player ) {
 
     MODNHASHES *m_ntab, *np;
 
-    raw_notify( player,
-                "Hash Stats       Size Entries Deleted   Empty Lookups    Hits  Checks Longest" );
+    raw_notify( player, NULL, "Hash Stats       Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
     list_hashstat( player, "Commands", &mudstate.command_htab );
     list_hashstat( player, "Logged-out Cmds", &mudstate.logout_cmd_htab );
     list_hashstat( player, "Functions", &mudstate.func_htab );
@@ -2591,8 +2482,7 @@ static void list_hashstats( dbref player ) {
 static void list_textfiles( dbref player ) {
     int i;
 
-    raw_notify( player,
-                "Help File        Size Entries Deleted   Empty Lookups    Hits  Checks Longest" );
+    raw_notify( player, NULL, "Help File        Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
 
     for( i = 0; i < mudstate.helpfiles; i++ )
         list_hashstat( player, mudstate.hfiletab[i],
@@ -2634,23 +2524,16 @@ extern int cs_size;		/* total cache size */
  */
 
 static void list_db_stats( dbref player ) {
-    raw_notify( player,
-                tmprintf( "DB Cache Stats   Writes       Reads  (over %d seconds)",
-                          ( int )( time( NULL ) - cs_ltime ) ) );
-    raw_notify( player, tmprintf( "Calls      %12d%12d", cs_writes,
-                                  cs_reads ) );
-    raw_notify( player, tmprintf( "Cache Hits %12d%12d", cs_whits, cs_rhits ) );
-    raw_notify( player, tmprintf( "I/O        %12d%12d",
-                                  cs_dbwrites, cs_dbreads ) );
-    raw_notify( player, tmprintf( "Failed                 %12d", cs_fails ) );
-    raw_notify( player,
-                tmprintf( "Hit ratio            %2.0f%%         %2.0f%%",
-                          ( cs_writes ? ( float ) cs_whits / cs_writes * 100 : 0.0 ),
-                          ( cs_reads ? ( float ) cs_rhits / cs_reads * 100 : 0.0 ) ) );
-    raw_notify( player, tmprintf( "\nDeletes    %12d", cs_dels ) );
-    raw_notify( player, tmprintf( "Checks     %12d", cs_checks ) );
-    raw_notify( player, tmprintf( "Syncs      %12d", cs_syncs ) );
-    raw_notify( player, tmprintf( "Cache Size %12d bytes", cs_size ) );
+    raw_notify( player, "DB Cache Stats   Writes       Reads  (over %d seconds)", ( int )( time( NULL ) - cs_ltime ) );
+    raw_notify( player, "Calls      %12d%12d", cs_writes, cs_reads );
+    raw_notify( player, "Cache Hits %12d%12d", cs_whits, cs_rhits );
+    raw_notify( player, "I/O        %12d%12d", cs_dbwrites, cs_dbreads );
+    raw_notify( player, "Failed                 %12d", cs_fails );
+    raw_notify( player, "Hit ratio            %2.0f%%         %2.0f%%", ( cs_writes ? ( float ) cs_whits / cs_writes * 100 : 0.0 ), ( cs_reads ? ( float ) cs_rhits / cs_reads * 100 : 0.0 ) );
+    raw_notify( player, "\nDeletes    %12d", cs_dels );
+    raw_notify( player, "Checks     %12d", cs_checks );
+    raw_notify( player, "Syncs      %12d", cs_syncs );
+    raw_notify( player, "Cache Size %12d bytes", cs_size );
 }
 
 /*
@@ -2703,36 +2586,20 @@ static void list_process( dbref player ) {
      * Go display everything
      */
 
-    raw_notify( player,
-                tmprintf( "Process ID:  %10d        %10d bytes per page",
-                          pid, psize ) );
+    raw_notify( player, "Process ID:  %10d        %10d bytes per page", pid, psize );
 #if defined(HAVE_GETRUSAGE) && defined(STRUCT_RUSAGE_COMPLETE)
-    raw_notify( player,
-                tmprintf( "Time used:   %10d user   %10d sys",
-                          usage.ru_utime.tv_sec, usage.ru_stime.tv_sec ) );
+    raw_notify( player, "Time used:   %10d user   %10d sys", usage.ru_utime.tv_sec, usage.ru_stime.tv_sec );
     /*
      * raw_notify(player, * tmprintf("Resident mem:%10d shared %10d
      * private%10d stack", * ixrss, idrss, isrss));
      */
-    raw_notify( player,
-                tmprintf( "Integral mem:%10d shared %10d private%10d stack",
-                          usage.ru_ixrss, usage.ru_idrss, usage.ru_isrss ) );
-    raw_notify( player,
-                tmprintf( "Max res mem: %10d pages  %10d bytes",
-                          usage.ru_maxrss, ( usage.ru_maxrss * psize ) ) );
-    raw_notify( player,
-                tmprintf( "Page faults: %10d hard   %10d soft   %10d swapouts",
-                          usage.ru_majflt, usage.ru_minflt, usage.ru_nswap ) );
-    raw_notify( player,
-                tmprintf( "Disk I/O:    %10d reads  %10d writes",
-                          usage.ru_inblock, usage.ru_oublock ) );
-    raw_notify( player,
-                tmprintf( "Network I/O: %10d in     %10d out",
-                          usage.ru_msgrcv, usage.ru_msgsnd ) );
-    raw_notify( player,
-                tmprintf( "Context swi: %10d vol    %10d forced %10d sigs",
-                          usage.ru_nvcsw, usage.ru_nivcsw, usage.ru_nsignals ) );
-    raw_notify( player, tmprintf( "Descs avail: %10d", maxfds ) );
+    raw_notify( player, "Integral mem:%10d shared %10d private%10d stack", usage.ru_ixrss, usage.ru_idrss, usage.ru_isrss );
+    raw_notify( player, "Max res mem: %10d pages  %10d bytes", usage.ru_maxrss, ( usage.ru_maxrss * psize ) );
+    raw_notify( player, "Page faults: %10d hard   %10d soft   %10d swapouts", usage.ru_majflt, usage.ru_minflt, usage.ru_nswap );
+    raw_notify( player, "Disk I/O:    %10d reads  %10d writes", usage.ru_inblock, usage.ru_oublock );
+    raw_notify( player, "Network I/O: %10d in     %10d out", usage.ru_msgrcv, usage.ru_msgsnd );
+    raw_notify( player, "Context swi: %10d vol    %10d forced %10d sigs", usage.ru_nvcsw, usage.ru_nivcsw, usage.ru_nsignals );
+    raw_notify( player, "Descs avail: %10d", maxfds );
 #endif
 }
 
@@ -2797,7 +2664,7 @@ void list_memory( dbref player ) {
      */
 
     each = mudstate.db_top * sizeof( OBJ );
-    raw_notify( player, tmprintf( "Object structures: %12.2fk", each / 1024 ) );
+    raw_notify( player, "Object structures: %12.2fk", each / 1024 );
     total += each;
 
 #ifdef MEMORY_BASED
@@ -2810,7 +2677,7 @@ void list_memory( dbref player ) {
         each -= sizeof( Obj );
     }
 
-    raw_notify( player, tmprintf( "Stored attrtext  : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Stored attrtext  : %12.2fk", each / 1024 );
     total += each;
 #endif
 
@@ -2819,7 +2686,7 @@ void list_memory( dbref player ) {
      */
 
     each = sizeof( CONFDATA ) + sizeof( STATEDATA );
-    raw_notify( player, tmprintf( "mudconf/mudstate : %12.2fk", each / 1024 ) );
+    raw_notify( player, "mudconf/mudstate : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2827,7 +2694,7 @@ void list_memory( dbref player ) {
      */
 
     each = cs_size;
-    raw_notify( player, tmprintf( "Cache data       : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Cache data       : %12.2fk", each / 1024 );
     total += each;
 
     each = sizeof( Chain ) * mudconf.cache_width;
@@ -2838,9 +2705,8 @@ void list_memory( dbref player ) {
             each2 += cp->keylen;
         }
     }
-    raw_notify( player,
-                tmprintf( "Cache keys       : %12.2fk", each2 / 1024 ) );
-    raw_notify( player, tmprintf( "Cache overhead   : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Cache keys       : %12.2fk", each2 / 1024 );
+    raw_notify( player, "Cache overhead   : %12.2fk", each / 1024 );
     total += each + each2;
 
     /*
@@ -2854,7 +2720,7 @@ void list_memory( dbref player ) {
         }
     }
 
-    raw_notify( player, tmprintf( "Object pipelines : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Object pipelines : %12.2fk", each / 1024);
     total += each;
 
     /*
@@ -2870,7 +2736,7 @@ void list_memory( dbref player ) {
             each += strlen( names[i] ) + 1;
         }
     }
-    raw_notify( player, tmprintf( "Name caches      : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Name caches      : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2882,7 +2748,7 @@ void list_memory( dbref player ) {
         each += pools[i].max_alloc * ( pools[i].pool_size +
                                        sizeof( POOLHDR ) + sizeof( POOLFTR ) );
     }
-    raw_notify( player, tmprintf( "Buffers          : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Buffers          : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2926,7 +2792,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Command table    : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Command table    : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2948,7 +2814,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Logout cmd htab  : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Logout cmd htab  : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2973,7 +2839,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Functions htab   : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Functions htab   : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -2998,7 +2864,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "U-functions htab : %12.2fk", each / 1024 ) );
+    raw_notify( player, "U-functions htab : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3023,7 +2889,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Flags htab       : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Flags htab       : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3048,7 +2914,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Powers htab      : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Powers htab      : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3072,7 +2938,7 @@ void list_memory( dbref player ) {
             }
         }
     }
-    raw_notify( player, tmprintf( "Helpfiles htabs  : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Helpfiles htabs  : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3090,7 +2956,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Vattr name htab  : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Vattr name htab  : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3120,7 +2986,7 @@ void list_memory( dbref player ) {
      */
 
     each = sizeof( ATTR * ) * anum_alc_top;
-    raw_notify( player, tmprintf( "Attr num table   : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Attr num table   : %12.2fk", each / 1024 );
     total += each;
 
     /*
@@ -3132,18 +2998,12 @@ void list_memory( dbref player ) {
      */
 
     each = 0;
-    for( stack =
-                ( OBJSTACK * ) hash_firstentry( ( HASHTAB * ) & mudstate.objstack_htab );
-            stack != NULL;
-            stack =
-                ( OBJSTACK * ) hash_nextentry( ( HASHTAB * ) & mudstate.
-                        objstack_htab ) ) {
+    for( stack = ( OBJSTACK * ) hash_firstentry( ( HASHTAB * ) & mudstate.objstack_htab ); stack != NULL; stack = ( OBJSTACK * ) hash_nextentry( ( HASHTAB * ) & mudstate.objstack_htab ) ) {
         each += sizeof( OBJSTACK );
         each += strlen( stack->data ) + 1;
     }
     if( each ) {
-        raw_notify( player,
-                    tmprintf( "Object stacks    : %12.2fk", each / 1024 ) );
+        raw_notify( player, "Object stacks    : %12.2fk", each / 1024 );
     }
     total += each;
 
@@ -3152,11 +3012,7 @@ void list_memory( dbref player ) {
      */
 
     each = 0;
-    for( grid =
-                ( OBJGRID * ) hash_firstentry( ( HASHTAB * ) & mudstate.objgrid_htab );
-            grid != NULL;
-            grid =
-                ( OBJGRID * ) hash_nextentry( ( HASHTAB * ) & mudstate.objgrid_htab ) ) {
+    for( grid = ( OBJGRID * ) hash_firstentry( ( HASHTAB * ) & mudstate.objgrid_htab ); grid != NULL; grid = ( OBJGRID * ) hash_nextentry( ( HASHTAB * ) & mudstate.objgrid_htab ) ) {
         each += sizeof( OBJGRID );
         each += sizeof( char ** ) * grid->rows * grid->cols;
         for( i = 0; i < grid->rows; i++ ) {
@@ -3168,8 +3024,7 @@ void list_memory( dbref player ) {
         }
     }
     if( each ) {
-        raw_notify( player,
-                    tmprintf( "Object grids     : %12.2fk", each / 1024 ) );
+        raw_notify( player, "Object grids     : %12.2fk", each / 1024 );
     }
     total += each;
 
@@ -3178,15 +3033,12 @@ void list_memory( dbref player ) {
      */
 
     each = 0;
-    for( xvar = ( VARENT * ) hash_firstentry( &mudstate.vars_htab );
-            xvar != NULL;
-            xvar = ( VARENT * ) hash_nextentry( &mudstate.vars_htab ) ) {
+    for( xvar = ( VARENT * ) hash_firstentry( &mudstate.vars_htab ); xvar != NULL; xvar = ( VARENT * ) hash_nextentry( &mudstate.vars_htab ) ) {
         each += sizeof( VARENT );
         each += strlen( xvar->text ) + 1;
     }
     if( each ) {
-        raw_notify( player,
-                    tmprintf( "X-Variables      : %12.2fk", each / 1024 ) );
+        raw_notify( player, "X-Variables      : %12.2fk", each / 1024 );
     }
     total += each;
 
@@ -3195,11 +3047,7 @@ void list_memory( dbref player ) {
      */
 
     each = 0;
-    for( this_struct =
-                ( STRUCTDEF * ) hash_firstentry( &mudstate.structs_htab );
-            this_struct != NULL;
-            this_struct =
-                ( STRUCTDEF * ) hash_nextentry( &mudstate.structs_htab ) ) {
+    for( this_struct = ( STRUCTDEF * ) hash_firstentry( &mudstate.structs_htab ); this_struct != NULL; this_struct = ( STRUCTDEF * ) hash_nextentry( &mudstate.structs_htab ) ) {
         each += sizeof( STRUCTDEF );
         each += strlen( this_struct->s_name ) + 1;
         for( i = 0; i < this_struct->c_count; i++ ) {
@@ -3208,14 +3056,11 @@ void list_memory( dbref player ) {
             each += strlen( this_struct->c_array[i]->def_val ) + 1;
         }
     }
-    for( inst_ptr = ( INSTANCE * ) hash_firstentry( &mudstate.instance_htab );
-            inst_ptr != NULL;
-            inst_ptr = ( INSTANCE * ) hash_nextentry( &mudstate.instance_htab ) ) {
+    for( inst_ptr = ( INSTANCE * ) hash_firstentry( &mudstate.instance_htab ); inst_ptr != NULL; inst_ptr = ( INSTANCE * ) hash_nextentry( &mudstate.instance_htab ) ) {
         each += sizeof( INSTANCE );
     }
     if( each ) {
-        raw_notify( player,
-                    tmprintf( "Struct var defs  : %12.2fk", each / 1024 ) );
+        raw_notify( player, "Struct var defs  : %12.2fk", each / 1024 );
     }
     total += each;
 
@@ -3235,8 +3080,7 @@ void list_memory( dbref player ) {
         }
     }
     if( each ) {
-        raw_notify( player,
-                    tmprintf( "Struct var data  : %12.2fk", each / 1024 ) );
+        raw_notify( player, "Struct var data  : %12.2fk", each / 1024 );
     }
     total += each;
 
@@ -3244,8 +3088,7 @@ void list_memory( dbref player ) {
      * Report end total.
      */
 
-    raw_notify( player,
-                tmprintf( "\r\nTotal            : %12.2fk", total / 1024 ) );
+    raw_notify( player, "\r\nTotal            : %12.2fk", total / 1024 );
 }
 
 /*

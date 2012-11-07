@@ -17,8 +17,9 @@
 #include "defaults.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "command.h"		/* required by code */
 #include "attrs.h"		/* required by code */
@@ -311,7 +312,7 @@ void cf_init( void ) {
     mudconf.max_cmdsecs = 120;
     mudconf.control_flags = 0xffffffff;	/* Everything for now... */
     mudconf.control_flags &= ~CF_GODMONITOR;	/* Except for monitoring... */
-    mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY | LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS | LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD | LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL;
+    mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY | LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS | LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD | LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL | LOG_MALLOC;
     mudconf.log_info = LOGOPT_TIMESTAMP | LOGOPT_LOC;
     mudconf.log_diversion = 0;
     mudconf.markdata[0] = 0x01;
@@ -2399,10 +2400,7 @@ void list_options( dbref player ) {
                 ( tp->interpreter == cf_bool ) ) &&
                 ( check_access( player, tp->rperms ) ) ) {
 
-            raw_notify( player, tmprintf( "%-25s %c %s?",
-                                          tp->pname,
-                                          ( * ( tp->loc ) ? 'Y' : 'N' ),
-                                          ( tp->extra ? ( char * ) tp->extra : "" ) ) );
+            raw_notify( player, "%-25s %c %s?", tp->pname, ( * ( tp->loc ) ? 'Y' : 'N' ), ( tp->extra ? ( char * ) tp->extra : "" ));
         }
     }
 
@@ -2414,11 +2412,7 @@ void list_options( dbref player ) {
                         ( tp->interpreter == cf_bool ) ) &&
                         ( check_access( player, tp->rperms ) ) ) {
 
-                    raw_notify( player,
-                                tmprintf( "%-25s %c %s?", tp->pname,
-                                          ( * ( tp->loc ) ? 'Y' : 'N' ),
-                                          ( tp->extra ? ( char * ) tp->
-                                            extra : "" ) ) );
+                    raw_notify( player, "%-25s %c %s?", tp->pname, ( * ( tp->loc ) ? 'Y' : 'N' ), ( tp->extra ? ( char * ) tp->extra : "" ) );
                 }
             }
         }

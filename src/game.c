@@ -18,8 +18,9 @@
 #include "db.h"			/* required by externs */
 #include "udb.h"		/* required by code */
 #include "udb_defs.h"
-#include "externs.h"		/* required by interface */
 #include "interface.h"		/* required by code */
+#include "externs.h"		/* required by interface */
+
 
 #include "file_c.h"		/* required by code */
 #include "command.h"		/* required by code */
@@ -47,8 +48,6 @@ extern void init_version( void );
 extern void init_logout_cmdtab( void );
 
 extern void init_timer( void );
-
-extern void raw_notify_html( dbref, char * );
 
 extern void do_dbck( dbref, dbref, int );
 
@@ -170,16 +169,16 @@ int fileexist( char *file ) {
 #define HANDLE_FLAT_KILL	2
 
 void handlestartupflatfiles( int flag ) {
-    char *db, *flat, *db_bak, *flat_bak, *ts;
+    char db[MAXPATHLEN], flat[MAXPATHLEN], db_bak[MAXPATHLEN], flat_bak[MAXPATHLEN], ts[SBUF_SIZE];
     int i;
     struct stat sb1, sb2;
 
-    ts=mktimestamp( "handlestartupflatfiles" );
+    mktimestamp( ts, SBUF_SIZE );
 
-    db = XSTRDUP( tmprintf( "%s/%s", mudconf.dbhome, mudconf.db_file ), "handlestartupflatfiles" );
-    flat = XSTRDUP( tmprintf( "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) ), "handlestartupflatfiles" );
-    db_bak = XSTRDUP( tmprintf( "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts ), "handlestartupflatfiles" );
-    flat_bak = XSTRDUP( tmprintf( "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts ), "handlestartupflatfiles" );
+    safe_snprintf( db, MAXPATHLEN, "%s/%s", mudconf.dbhome, mudconf.db_file );
+    safe_snprintf(flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) );
+    safe_snprintf(db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts );
+    safe_snprintf(flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts );
 
     i = open( flat, O_RDONLY );
     if( i>0 ) {
@@ -215,12 +214,6 @@ void handlestartupflatfiles( int flag ) {
             }
         }
     }
-
-    XFREE( ts, "handlestartupflatfiles" );
-    XFREE( db, "handlestartupflatfiles" );
-    XFREE( flat, "handlestartupflatfiles" );
-    XFREE( db_bak, "handlestartupflatfiles" );
-    XFREE( flat_bak, "handlestartupflatfiles" );
 }
 
 /*
@@ -595,8 +588,7 @@ int check_filter( dbref object, dbref player, int filter, const char *msg ) {
         preserve = save_global_regs( "check_filter.save" );
         nbuf = dp = alloc_lbuf( "check_filter" );
         str = buf;
-        exec( nbuf, &dp, object, player, player,
-              EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char ** ) NULL, 0 );
+        exec( nbuf, &dp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char ** ) NULL, 0 );
         dp = nbuf;
         free_lbuf( buf );
         restore_global_regs( "check_filter.restore", preserve );
@@ -736,23 +728,32 @@ void html_escape( const char *src, char *dest, char **destp ) {
 			    ((key & MSG_MOVE) && Check_Notices((p),(t))) || \
 			    ((key & MSG_PRESENCE) && Check_Knows((p),(t))))))
 
-void notify_check( dbref target, dbref sender, const char *msg, int key ) {
+void notify_check( dbref target, dbref sender, int key, const char *format, ... ) {
+    char msg[LBUF_SIZE];
     char *msg_ns, *mp, *tbuff, *tp, *buff;
-
     char *args[NUM_ENV_VARS];
-
     dbref aowner, targetloc, recip, obj;
-
     int i, nargs, aflags, alen, has_neighbors, pass_listen, herekey;
-
     int check_listens, pass_uselock, is_audible, will_send;
-
     FWDLIST *fp;
-
     NUMBERTAB *np;
-
     GDATA *preserve;
+    va_list ap;
 
+    va_start( ap, format );
+        
+    if( !format || !*format ) {
+        if( ( tbuff = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, tbuff, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
+    }
+
+    va_end( ap );
+    
     /*
      * If speaker is invalid or message is empty, just exit
      */
@@ -783,25 +784,14 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
                 ( target != mudstate.curr_player ) ) {
             if( sender != Owner( sender ) ) {
                 if( sender != mudstate.curr_enactor ) {
-                    safe_tmprintf_str( msg_ns, &mp,
-                                       "[%s(#%d){%s}<-(#%d)] ",
-                                       Name( sender ), sender,
-                                       Name( Owner( sender ) ),
-                                       mudstate.curr_enactor );
+                    safe_tmprintf_str( msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name( sender ), sender, Name( Owner( sender ) ), mudstate.curr_enactor );
                 } else {
-                    safe_tmprintf_str( msg_ns, &mp,
-                                       "[%s(#%d){%s}] ",
-                                       Name( sender ), sender,
-                                       Name( Owner( sender ) ) );
+                    safe_tmprintf_str( msg_ns, &mp,  "[%s(#%d){%s}] ", Name( sender ), sender, Name( Owner( sender ) ) );
                 }
             } else if( sender != mudstate.curr_enactor ) {
-                safe_tmprintf_str( msg_ns, &mp,
-                                   "[%s(#%d)<-(#%d)] ",
-                                   Name( sender ), sender,
-                                   mudstate.curr_enactor );
+                safe_tmprintf_str( msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name( sender ), sender, mudstate.curr_enactor );
             } else {
-                safe_tmprintf_str( msg_ns, &mp,
-                                   "[%s(#%d)] ", Name( sender ), sender );
+                safe_tmprintf_str( msg_ns, &mp, "[%s(#%d)] ", Name( sender ), sender );
             }
         }
         safe_str( ( char * ) msg, msg_ns, &mp );
@@ -823,26 +813,22 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
         if( will_send ) {
 #ifndef PUEBLO_SUPPORT
             if( key & MSG_ME ) {
-                raw_notify( target, msg_ns );
+                raw_notify( target, NULL, msg_ns);
             }
 #else
             if( key & MSG_ME ) {
                 if( key & MSG_HTML ) {
-                    raw_notify_html( target, msg_ns );
+                    raw_notify_html( target, NULL, msg_ns);
                 } else {
                     if( Html( target ) ) {
                         char *msg_ns_escaped;
 
-                        msg_ns_escaped =
-                            alloc_lbuf
-                            ( "notify_check_escape" );
-                        html_escape( msg_ns,
-                                     msg_ns_escaped, 0 );
-                        raw_notify( target,
-                                    msg_ns_escaped );
+                        msg_ns_escaped = alloc_lbuf ( "notify_check_escape" );
+                        html_escape( msg_ns, msg_ns_escaped, 0 );
+                        raw_notify( target, NULL, msg_ns_escaped);
                         free_lbuf( msg_ns_escaped );
                     } else {
-                        raw_notify( target, msg_ns );
+                        raw_notify( target, NULL, msg_ns);
                     }
                 }
             }
@@ -861,7 +847,7 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
          */
 
         if( mudstate.inpipe && !isPlayer( target ) && will_send ) {
-            raw_notify( target, msg_ns );
+            raw_notify( target, NULL, msg_ns);
         }
         /*
          * Forward puppet message if it is for me
@@ -894,10 +880,10 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
                 np = ( NUMBERTAB * ) nhashfind( target,
                                                 &mudstate.redir_htab );
                 if( np && Good_obj( np->num ) ) {
-                    raw_notify( Owner( np->num ), tbuff );
+                    raw_notify( Owner( np->num ), NULL, tbuff);
                 }
             } else {
-                raw_notify( Owner( target ), tbuff );
+                raw_notify( Owner( target ), NULL, tbuff);
             }
             free_lbuf( tbuff );
         }
@@ -1002,9 +988,7 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
                             ( recip == target ) ) {
                         continue;
                     }
-                    notify_check( recip, sender, buff,
-                                  ( MSG_ME | MSG_F_UP | MSG_F_CONTENTS
-                                    | MSG_S_INSIDE ) );
+                    notify_check( recip, sender, ( MSG_ME | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE ), NULL, buff );
                 }
             }
             free_lbuf( buff );
@@ -1024,11 +1008,7 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
                     buff =
                         add_prefix( obj, target, A_PREFIX,
                                     msg, "From a distance," );
-                    notify_check( recip, sender, buff,
-                                  MSG_ME | MSG_F_UP | MSG_F_CONTENTS
-                                  | MSG_S_INSIDE |
-                                  ( OK_To_Send( sender,
-                                                obj ) ? 0 : herekey ) );
+                    notify_check( recip, sender, MSG_ME | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | ( OK_To_Send( sender, obj ) ? 0 : herekey ), NULL, buff );
                     free_lbuf( buff );
                 }
             }
@@ -1065,14 +1045,8 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
                         ( recip != targetloc ) &&
                         ( recip != target ) &&
                         check_filter( obj, sender, A_FILTER, msg ) ) {
-                    tbuff = add_prefix( obj, target,
-                                        A_PREFIX, buff,
-                                        "From a distance," );
-                    notify_check( recip, sender, tbuff,
-                                  MSG_ME | MSG_F_UP | MSG_F_CONTENTS
-                                  | MSG_S_INSIDE |
-                                  ( OK_To_Send( sender,
-                                                obj ) ? 0 : herekey ) );
+                    tbuff = add_prefix( obj, target, A_PREFIX, buff, "From a distance," );
+                    notify_check( recip, sender, MSG_ME | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | ( OK_To_Send( sender, obj ) ? 0 : herekey ), NULL, tbuff );
                     free_lbuf( tbuff );
                 }
             }
@@ -1108,13 +1082,9 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
             DOLIST( obj, Contents( target ) ) {
                 if( obj != target ) {
 #ifdef PUEBLO_SUPPORT
-                    notify_check( obj, sender, buff,
-                                  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE
-                                  | ( key & MSG_HTML ) | herekey );
+                    notify_check( obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | ( key & MSG_HTML ) | herekey, NULL, buff );
 #else
-                    notify_check( obj, sender, buff,
-                                  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE
-                                  | herekey );
+                    notify_check( obj, sender,  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | herekey, NULL, buff );
 #endif				/* PUEBLO_SUPPORT */
                 }
             }
@@ -1138,9 +1108,7 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
             }
             DOLIST( obj, Contents( targetloc ) ) {
                 if( ( obj != target ) && ( obj != targetloc ) ) {
-                    notify_check( obj, sender, buff,
-                                  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE
-                                  | herekey );
+                    notify_check( obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | herekey, NULL, buff );
                 }
             }
             if( key & MSG_S_INSIDE ) {
@@ -1163,8 +1131,7 @@ void notify_check( dbref target, dbref sender, const char *msg, int key ) {
             } else {
                 buff = ( char * ) msg;
             }
-            notify_check( targetloc, sender, buff,
-                          MSG_ME | MSG_F_UP | MSG_S_INSIDE | herekey );
+            notify_check( targetloc, sender, MSG_ME | MSG_F_UP | MSG_S_INSIDE | herekey, NULL, buff );
             if( key & MSG_S_INSIDE ) {
                 free_lbuf( buff );
             }
@@ -1185,13 +1152,10 @@ void notify_except( dbref loc, dbref player, dbref exception, const char *msg, i
     dbref first;
 
     if( loc != exception )
-        notify_check( loc, player, msg,
-                      ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A |
-                        flags ) );
+        notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );
     DOLIST( first, Contents( loc ) ) {
         if( first != exception ) {
-            notify_check( first, player, msg,
-                          ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ) );
+            notify_check( first, player, ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ), NULL, msg );
         }
     }
 }
@@ -1200,13 +1164,10 @@ void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, const char
     dbref first;
 
     if( ( loc != exc1 ) && ( loc != exc2 ) )
-        notify_check( loc, player, msg,
-                      ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A |
-                        flags ) );
+        notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );
     DOLIST( first, Contents( loc ) ) {
         if( first != exc1 && first != exc2 ) {
-            notify_check( first, player, msg,
-                          ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ) );
+            notify_check( first, player, ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ), NULL, msg );
         }
     }
 }
@@ -1256,7 +1217,7 @@ static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes
                 log_write( LOG_ALWAYS, "OBJ", "CPU", "#%d\t%ld\n", thing, used_msecs );
             }
             if( yes_screen ) {
-                raw_notify( player, tmprintf( "#%d\t%ld", thing, used_msecs ) );
+                raw_notify( player, "#%d\t%ld", thing, used_msecs);
             }
             if( yes_clear ) {
                 obj_time.tv_usec = obj_time.tv_sec = 0;
@@ -1266,11 +1227,7 @@ static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes
     }
 
     if( yes_screen ) {
-        raw_notify( player,
-                    tmprintf
-                    ( "Counted %d objects using %ld msecs over %d seconds.",
-                      obj_counted, total_msecs,
-                      ( int )( time( NULL ) - mudstate.cpu_count_from ) ) );
+        raw_notify( player, "Counted %d objects using %ld msecs over %d seconds.",  obj_counted, total_msecs, ( int )( time( NULL ) - mudstate.cpu_count_from ) );
     }
     if( yes_log ) {
         log_write( LOG_ALWAYS, "OBJ", "CPU", "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, ( int )( time( NULL ) - mudstate.cpu_count_from ) );
@@ -1281,7 +1238,7 @@ static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes
 }
 #else
 static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes_clear ) {
-    raw_notify( player, "Sorry, this command has been disabled." );
+    raw_notify( player, NULL, "Sorry, this command has been disabled.");
 }
 #endif				/* ! NO_TIMECHECKING */
 
@@ -1342,14 +1299,13 @@ int backup_copy( char *src, char *dst, int flag ) {
     return ( i );
 }
 
-char *mktimestamp( char *s ) {
+char *mktimestamp( char *buff, size_t size ) {
     struct tm *t;
     time_t ts;
-    char *buff;
 
     ts=time( NULL );
     t = localtime( &ts );
-    buff=XSTRDUP( tmprintf( "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone ), s );
+    safe_snprintf(buff, size, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon +1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone );
     return ( buff );
 }
 
@@ -1360,7 +1316,8 @@ void do_backup_mush( dbref player, dbref cause, int key ) {
 int backup_mush( dbref player, dbref cause, int key ) {
     int i, txt_n=0, cnf_n=0, dbf_n=0;
     char **txt=NULL, **cnf=NULL, **dbf=NULL;
-    char *tmpdir, *ts, *s, *buff, *tb, *cwd;
+    char *tmpdir, *s, *buff, *tb, *cwd;
+    char ts[SBUF_SIZE];
     FILE *fp = NULL;
     MODULE *mp;
 
@@ -1552,9 +1509,9 @@ int backup_mush( dbref player, dbref cause, int key ) {
 
     /* Call our external utility to pack everything together */
 
-    ts = mktimestamp( "backup_mush" );
+    mktimestamp( ts, SBUF_SIZE);
     s = XSTRDUP( tmprintf( "%s %s %s/%s_%s.%s * 2>&1",mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext ), "backup_mush" );
-    XFREE( ts, "backup_mush" );
+
     cwd = getcwd( NULL, MAXPATHLEN );
 
     if( cwd == NULL ) {
@@ -2693,7 +2650,9 @@ int main( int argc, char *argv[] ) {
 
     pid_t pid;
 
-    char *s, *ts;
+    char *s;
+    
+    char ts[SBUF_SIZE];
 
     MODULE *mp;
 
@@ -3128,12 +3087,11 @@ int main( int argc, char *argv[] ) {
 
     write_pidfile( mudconf.pid_file );
     if( fileexist( mudconf.log_file ) ) {
-        ts=mktimestamp( "cleanup_log" );
+        mktimestamp(ts, SBUF_SIZE);
         s=XSTRDUP( tmprintf( "%s.%s", mudconf.log_file, ts ), "cleanup_log" );
         log_write( LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename( s ) );
         copy_file( mudconf.log_file, s, 1 );
         XFREE( s, "cleanup_log" );
-        XFREE( ts, "cleanup_log" );
     }
     logfile_init( mudconf.log_file );
 

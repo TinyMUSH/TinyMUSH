@@ -22,6 +22,7 @@
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
+#include "interface.h"
 #include "externs.h"		/* required by code */
 
 /*
