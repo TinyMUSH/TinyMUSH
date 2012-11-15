@@ -440,7 +440,7 @@ void cf_log_notfound( dbref player, char *cmd, const char *thingname, char *thin
     if( mudstate.initializing ) {
         log_write( LOG_STARTUP, "CNF", "NFND", "%s: %s %s not found", cmd, thingname, thing );
     } else {
-        notify( player, tmprintf( "%s %s not found", thingname, thing ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s %s not found", thingname, thing );
     }
 }
 
@@ -462,7 +462,7 @@ void cf_log_syntax( dbref player, char *cmd, const char *template, ... ) {
     if( mudstate.initializing ) {
         log_write( LOG_STARTUP, "CNF", "SYNTX", "%s: %s", cmd, buff );
     } else {
-        notify( player, tmprintf( "%s: %s", cmd, buff ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: %s", cmd, buff );
     }
 
     free_lbuf( buff );
@@ -486,7 +486,7 @@ void cf_log_help( dbref player, char *cmd, const char *template, ... ) {
     if( mudstate.initializing ) {
         log_write( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify( player, tmprintf( "%s: %s", cmd, buff ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: %s", cmd, buff );
     }
 
     free_lbuf( buff );
@@ -511,7 +511,7 @@ void cf_log_help_mkindx( dbref player, char *cmd, const char *template, ... ) {
     if( mudstate.initializing ) {
         log_write( LOG_STARTUP, "HLP", "LOAD", "%s: %s", cmd, buff );
     } else {
-        notify( player, tmprintf( "%s: %s", cmd, buff ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: %s", cmd, buff );
     }
 
     free_lbuf( buff );

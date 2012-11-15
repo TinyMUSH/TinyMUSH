@@ -160,9 +160,7 @@ void init_cmdtab( void ) {
                 /*
                  * also add the __ alias form
                  */
-                hashadd( tmprintf( "__%s", cp->cmdname ),
-                         ( int * ) cp, &mudstate.command_htab,
-                         HASH_ALIAS );
+                hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
             }
         }
     }
@@ -174,8 +172,7 @@ void init_cmdtab( void ) {
 
     for( cp = command_table; cp->cmdname; cp++ ) {
         hashadd( cp->cmdname, ( int * ) cp, &mudstate.command_htab, 0 );
-        hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp,
-                 &mudstate.command_htab, HASH_ALIAS );
+        hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
     }
 
     /*
@@ -505,18 +502,14 @@ void process_cmdent( CMDENT *cmdp, char *switchp, dbref player, dbref cause, int
             }
             xkey = search_nametab( player, cmdp->switches, switchp );
             if( xkey == -1 ) {
-                notify( player,
-                        tmprintf
-                        ( "Unrecognized switch '%s' for command '%s'.",
-                          switchp, cmdp->cmdname ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unrecognized switch '%s' for command '%s'.", switchp, cmdp->cmdname );
                 return;
             } else if( xkey == -2 ) {
                 notify( player, NOPERM_MESSAGE );
                 return;
             } else if( !( xkey & SW_MULTIPLE ) ) {
                 if( i == 1 ) {
-                    notify( player,
-                            "Illegal combination of switches." );
+                    notify( player, "Illegal combination of switches." );
                     return;
                 }
                 i = 1;
@@ -528,9 +521,7 @@ void process_cmdent( CMDENT *cmdp, char *switchp, dbref player, dbref cause, int
             hasswitch = 1;
         } while( buf1 );
     } else if( switchp && !( cmdp->callseq & CS_ADDED ) ) {
-        notify( player,
-                tmprintf( "Command %s does not take switches.",
-                          cmdp->cmdname ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Command %s does not take switches.", cmdp->cmdname );
         return;
     }
     /*
@@ -911,12 +902,8 @@ char *process_command( dbref player, dbref cause, int interactive, char *command
      * Make sure player isn't going or halted
      */
 
-    if( Going( player ) ||
-            ( Halted( player ) &&
-              !( ( Typeof( player ) == TYPE_PLAYER ) && interactive ) ) ) {
-        notify( Owner( player ),
-                tmprintf( "Attempt to execute command by halted object #%d",
-                          player ) );
+    if( Going( player ) || ( Halted( player ) && !( ( Typeof( player ) == TYPE_PLAYER ) && interactive ) ) ) {
+        notify_check( Owner( player ), Owner( player ), MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Attempt to execute command by halted object #%d", player );
         mudstate.debug_cmd = cmdsave;
         return command;
     }
@@ -957,22 +944,18 @@ char *process_command( dbref player, dbref cause, int interactive, char *command
 
     if( Verbose( player ) ) {
         if( H_Redirect( player ) ) {
-            np = ( NUMBERTAB * ) nhashfind( player,
-                                            &mudstate.redir_htab );
+            np = ( NUMBERTAB * ) nhashfind( player, &mudstate.redir_htab );
             if( np ) {
-                notify( np->num,
-                        tmprintf( "%s] %s", Name( player ), command ) );
+                notify_check( np->num, np->num, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s] %s", Name( player ), command );
             } else {
                 /*
                  * We have no pointer, we should have no
                  * flag.
                  */
-                s_Flags3( player,
-                          Flags3( player ) & ~HAS_REDIRECT );
+                s_Flags3( player, Flags3( player ) & ~HAS_REDIRECT );
             }
         } else {
-            notify( Owner( player ), tmprintf( "%s] %s", Name( player ),
-                                               command ) );
+            notify_check( Owner( player ), Owner( player ), MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s] %s", Name( player ), command );
         }
     }
     /*
@@ -1732,17 +1715,14 @@ static void list_cmdtable( dbref player ) {
     }
 
     WALK_ALL_MODULES( mp ) {
-        if( ( modcmds = DLSYM_VAR( mp->handle, mp->modname, "cmdtable",
-                                   CMDENT * ) ) != NULL ) {
+        if( ( modcmds = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
             bp = buf;
-            safe_tmprintf_str( buf, &bp, "Module %s commands:",
-                               mp->modname );
+            safe_tmprintf_str( buf, &bp, "Module %s commands:", mp->modname );
             for( cmdp = modcmds; cmdp->cmdname; cmdp++ ) {
                 if( check_access( player, cmdp->perms ) ) {
                     if( !( cmdp->perms & CF_DARK ) ) {
                         safe_chr( ' ', buf, &bp );
-                        safe_str( ( char * ) cmdp->cmdname,
-                                  buf, &bp );
+                        safe_str( ( char * ) cmdp->cmdname, buf, &bp );
                     }
                 }
             }
@@ -2255,18 +2235,12 @@ static void list_costs( dbref player ) {
     if( mudconf.quotas ) {
         sprintf( buff, " and %d quota", mudconf.room_quota );
     }
-    notify( player,
-            tmprintf( "Digging a room costs %d %s%s.",
-                      mudconf.digcost, coin_name( mudconf.digcost ), buff ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Digging a room costs %d %s%s.", mudconf.digcost, coin_name( mudconf.digcost ), buff );
     if( mudconf.quotas ) {
         sprintf( buff, " and %d quota", mudconf.exit_quota );
     }
-    notify( player,
-            tmprintf( "Opening a new exit costs %d %s%s.",
-                      mudconf.opencost, coin_name( mudconf.opencost ), buff ) );
-    notify( player,
-            tmprintf( "Linking an exit, home, or dropto costs %d %s.",
-                      mudconf.linkcost, coin_name( mudconf.linkcost ) ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,  "Opening a new exit costs %d %s%s.", mudconf.opencost, coin_name( mudconf.opencost ), buff );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Linking an exit, home, or dropto costs %d %s.", mudconf.linkcost, coin_name( mudconf.linkcost ) );
     if( mudconf.quotas ) {
         sprintf( buff, " and %d quota", mudconf.thing_quota );
     }
@@ -2277,9 +2251,7 @@ static void list_costs( dbref player ) {
     if( mudconf.quotas ) {
         sprintf( buff, " and %d quota", mudconf.player_quota );
     }
-    notify( player,
-            tmprintf( "Creating a robot costs %d %s%s.",
-                      mudconf.robotcost, coin_name( mudconf.robotcost ), buff ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Creating a robot costs %d %s%s.", mudconf.robotcost, coin_name( mudconf.robotcost ), buff );
     if( mudconf.killmin == mudconf.killmax ) {
         raw_notify( player, "Killing costs %d %s, with a %d%% chance of success.", mudconf.killmin, coin_name( mudconf.digcost ), ( mudconf.killmin * 100 ) / mudconf.killguarantee );
     } else {
@@ -2590,8 +2562,7 @@ static void list_process( dbref player ) {
 #if defined(HAVE_GETRUSAGE) && defined(STRUCT_RUSAGE_COMPLETE)
     raw_notify( player, "Time used:   %10d user   %10d sys", usage.ru_utime.tv_sec, usage.ru_stime.tv_sec );
     /*
-     * raw_notify(player, * tmprintf("Resident mem:%10d shared %10d
-     * private%10d stack", * ixrss, idrss, isrss));
+     * raw_notify(player, "Resident mem:%10d shared %10d private%10d stack", *ixrss, idrss, isrss);
      */
     raw_notify( player, "Integral mem:%10d shared %10d private%10d stack", usage.ru_ixrss, usage.ru_idrss, usage.ru_isrss );
     raw_notify( player, "Max res mem: %10d pages  %10d bytes", usage.ru_maxrss, ( usage.ru_maxrss * psize ) );
@@ -2978,7 +2949,7 @@ void list_memory( dbref player ) {
             htab = htab->next;
         }
     }
-    raw_notify( player, tmprintf( "Attr name htab   : %12.2fk", each / 1024 ) );
+    raw_notify( player, "Attr name htab   : %12.2fk", each / 1024 );
     total += each;
 
     /*

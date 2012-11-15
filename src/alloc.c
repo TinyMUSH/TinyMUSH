@@ -273,11 +273,11 @@ static void pool_trace( dbref player, int poolnum, const char *text ) {
     char *h;
 
     numfree = 0;
-    notify( player, tmprintf( "----- %s -----", text ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "----- %s -----", text );
     for( ph = pools[poolnum].chain_head; ph != NULL; ph = ph->next ) {
         if( ph->magicnum != POOL_MAGICNUM ) {
             notify( player, "*** CORRUPTED BUFFER HEADER, ABORTING SCAN ***" );
-            notify( player, tmprintf( "%d free %s (before corruption)", numfree, text ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d free %s (before corruption)", numfree, text );
             return;
         }
         h = ( char * ) ph;
@@ -289,7 +289,7 @@ static void pool_trace( dbref player, int poolnum, const char *text ) {
             numfree++;
         }
     }
-    notify( player, tmprintf( "%d free %s", numfree, text ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d free %s", numfree, text );
 }
 
 void list_bufstats( dbref player ) {

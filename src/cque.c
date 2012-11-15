@@ -323,7 +323,7 @@ static void do_halt_pid( dbref player, dbref cause, int key, char *pidstr ) {
 
     giveto( victim, mudconf.waitcost );
     a_Queue( victim, -1 );
-    notify_quiet( player, tmprintf( "Halted queue entry PID %d.", qpid ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Halted queue entry PID %d.", qpid );
 }
 
 /*
@@ -387,8 +387,7 @@ void do_halt( dbref player, dbref cause, int key, char *target ) {
     if( numhalted == 1 ) {
         notify( Owner( player ), "1 queue entries removed." );
     } else
-        notify( Owner( player ),
-                tmprintf( "%d queue entries removed.", numhalted ) );
+        notify_check( Owner( player ), Owner( player ), MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d queue entries removed.", numhalted );
 }
 
 /*
@@ -868,8 +867,7 @@ static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
             mudstate.qwait = qptr;
         }
     }
-    notify_quiet( player,
-                  tmprintf( "Adjusted wait time for queue entry PID %d.", qpid ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Adjusted wait time for queue entry PID %d.", qpid );
 }
 
 /*
@@ -1222,49 +1220,29 @@ static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, 
                 continue;
             }
             if( *qent == 1 )
-                notify( player,
-                        tmprintf( "----- %s Queue -----", header ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "----- %s Queue -----", header );
             bufp = unparse_object( player, tmp->player, 0 );
             if( ( tmp->waittime > 0 ) && ( Good_obj( tmp->sem ) ) ) {
                 /*
                  * A minor shortcut. We can never
                  * timeout-wait on a non-Semaphore attribute.
                  */
-                notify( player,
-                        tmprintf( "[#%d/%d] %d:%s:%s",
-                                  tmp->sem,
-                                  tmp->waittime - mudstate.now,
-                                  tmp->pid, bufp, tmp->comm ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[#%d/%d] %d:%s:%s", tmp->sem, tmp->waittime - mudstate.now, tmp->pid, bufp, tmp->comm );
             } else if( tmp->waittime > 0 ) {
-                notify( player,
-                        tmprintf( "[%d] %d:%s:%s",
-                                  tmp->waittime - mudstate.now,
-                                  tmp->pid, bufp, tmp->comm ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[%d] %d:%s:%s", tmp->waittime - mudstate.now, tmp->pid, bufp, tmp->comm );
             } else if( Good_obj( tmp->sem ) ) {
                 if( tmp->attr == A_SEMAPHORE ) {
-                    notify( player,
-                            tmprintf( "[#%d] %d:%s:%s", tmp->sem,
-                                      tmp->pid, bufp, tmp->comm ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm );
                 } else {
                     ap = atr_num( tmp->attr );
                     if( ap && ap->name ) {
-                        notify( player,
-                                tmprintf
-                                ( "[#%d/%s] %d:%s:%s",
-                                  tmp->sem, ap->name,
-                                  tmp->pid, bufp,
-                                  tmp->comm ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[#%d/%s] %d:%s:%s", tmp->sem, ap->name, tmp->pid, bufp, tmp->comm );
                     } else {
-                        notify( player,
-                                tmprintf( "[#%d] %d:%s:%s",
-                                          tmp->sem, tmp->pid,
-                                          bufp, tmp->comm ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm );
                     }
                 }
             } else {
-                notify( player,
-                        tmprintf( "%d:%s:%s",
-                                  tmp->pid, bufp, tmp->comm ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d:%s:%s", tmp->pid, bufp, tmp->comm );
             }
             bp = bufp;
             if( key == PS_LONG ) {
@@ -1282,8 +1260,7 @@ static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, 
                 }
                 *bp = '\0';
                 bp = unparse_object( player, tmp->cause, 0 );
-                notify( player,
-                        tmprintf( "   Enactor: %s%s", bp, bufp ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "   Enactor: %s%s", bp, bufp );
                 free_lbuf( bp );
             }
             free_lbuf( bufp );
@@ -1398,23 +1375,20 @@ void do_queue( dbref player, dbref cause, int key, char *arg ) {
         if( ( mudconf.control_flags & CF_DEQUEUE ) == 0 ) {
             was_disabled = 1;
             mudconf.control_flags |= CF_DEQUEUE;
-            notify( player,
-                    "Warning: automatic dequeueing is disabled." );
+            notify( player, "Warning: automatic dequeueing is disabled." );
         }
         ncmds = do_top( i );
         if( was_disabled ) {
             mudconf.control_flags &= ~CF_DEQUEUE;
         }
         if( !Quiet( player ) )
-            notify( player,
-                    tmprintf( "%d commands processed.", ncmds ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d commands processed.", ncmds );
     } else if( key == QUEUE_WARP ) {
         i = ( int ) strtol( arg, ( char ** ) NULL, 10 );;
         if( ( mudconf.control_flags & CF_DEQUEUE ) == 0 ) {
             was_disabled = 1;
             mudconf.control_flags |= CF_DEQUEUE;
-            notify( player,
-                    "Warning: automatic dequeueing is disabled." );
+            notify( player, "Warning: automatic dequeueing is disabled." );
         }
         /*
          * Handle the wait queue
@@ -1445,14 +1419,11 @@ void do_queue( dbref player, dbref cause, int key, char *arg ) {
             return;
         }
         if( i > 0 )
-            notify( player,
-                    tmprintf( "WaitQ timer advanced %d seconds.", i ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "WaitQ timer advanced %d seconds.", i );
         else if( i < 0 )
-            notify( player,
-                    tmprintf( "WaitQ timer set back %d seconds.", i ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "WaitQ timer set back %d seconds.", i );
         else
-            notify( player,
-                    "Object queue appended to player queue." );
+            notify( player, "Object queue appended to player queue." );
 
     }
 }
