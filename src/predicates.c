@@ -2348,34 +2348,26 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
             *bp = '\0';
             if( *buff ) {
                 if( aflags & AF_NONAME ) {
-                    notify_except2( loc, player, player,
-                                    thing, buff, msg_key );
+                    notify_except2( loc, player, player, thing, msg_key, NULL, buff);
                 } else {
-                    notify_except2( loc, player, player,
-                                    thing, tmprintf( "%s %s",
-                                                     Name( player ), buff ), msg_key );
+                    notify_except2( loc, player, player, thing, msg_key, "%s %s", Name( player ), buff );
                 }
             }
             free_lbuf( buff );
         } else if( odef ) {
             if( ctrl_flags & VERB_NONAME ) {
-                notify_except2( loc, player, player, thing,
-                                odef, msg_key );
+                notify_except2( loc, player, player, thing, msg_key, NULL, odef);
             } else {
-                notify_except2( loc, player, player, thing,
-                                tmprintf( "%s %s", Name( player ), odef ),
-                                msg_key );
+                notify_except2( loc, player, player, thing, msg_key, "%s %s", Name( player ), odef );
             }
         }
         free_lbuf( d );
     } else if( ( owhat < 0 ) && odef && Has_location( player ) &&
                Good_obj( loc = Location( player ) ) ) {
         if( ctrl_flags & VERB_NONAME ) {
-            notify_except2( loc, player, player, thing, odef,
-                            msg_key );
+            notify_except2( loc, player, player, thing, msg_key, NULL,  odef);
         } else {
-            notify_except2( loc, player, player, thing,
-                            tmprintf( "%s %s", Name( player ), odef ), msg_key );
+            notify_except2( loc, player, player, thing, msg_key, "%s %s", Name( player ), odef );
         }
     }
 

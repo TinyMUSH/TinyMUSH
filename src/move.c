@@ -91,8 +91,7 @@ static void process_leave_loc( dbref thing, dbref dest, dbref cause, int canhear
     if( !quiet && !Blind( thing ) && !Blind( loc ) ) {
         if( ( !Dark( thing ) && !Dark( loc ) ) ||
                 ( canhear && !DarkMover( thing ) ) ) {
-            notify_except2( loc, thing, thing, cause,
-                            tmprintf( "%s has left.", Name( thing ) ), MSG_MOVE );
+            notify_except2( loc, thing, thing, cause, MSG_MOVE, "%s has left.", Name( thing ) );
         }
     }
 }
@@ -158,8 +157,7 @@ static void process_enter_loc( dbref thing, dbref src, dbref cause, int canhear,
 
     if( !quiet && canhear &&
             !Blind( thing ) && !Blind( loc ) && !DarkMover( thing ) ) {
-        notify_except2( loc, thing, thing, cause,
-                        tmprintf( "%s has arrived.", Name( thing ) ), MSG_MOVE );
+        notify_except2( loc, thing, thing, cause, MSG_MOVE, "%s has arrived.", Name( thing ) );
     }
 }
 
@@ -542,8 +540,7 @@ void do_move( dbref player, dbref cause, int key, char *direction ) {
              * tell all
              */
 
-            notify_except( loc, player, player,
-                           tmprintf( "%s goes home.", Name( player ) ), MSG_MOVE );
+            notify_except( loc, player, player, MSG_MOVE, "%s goes home.", Name( player ) );
         }
         /*
          * give the player the messages

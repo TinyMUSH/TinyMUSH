@@ -1148,8 +1148,25 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     mudstate.ntfy_nest_lev--;
 }
 
-void notify_except( dbref loc, dbref player, dbref exception, const char *msg, int flags ) {
+void notify_except( dbref loc, dbref player, dbref exception, int flags, const char *format, ... ) {
     dbref first;
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
+    
+    va_start( ap, format );
+    
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
+    }
+
+    va_end(ap);
 
     if( loc != exception )
         notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );
@@ -1160,8 +1177,25 @@ void notify_except( dbref loc, dbref player, dbref exception, const char *msg, i
     }
 }
 
-void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, const char *msg, int flags ) {
+void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags, const char *format, ... ) {
     dbref first;
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
+    
+    va_start( ap, format );
+    
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
+    }
+
+    va_end(ap);
 
     if( ( loc != exc1 ) && ( loc != exc2 ) )
         notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );

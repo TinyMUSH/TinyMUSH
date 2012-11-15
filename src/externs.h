@@ -116,8 +116,8 @@ extern long	random_range( long, long );
 extern int do_convtime( char *, struct tm * );
 
 /* From game.c */
-extern void	notify_except( dbref, dbref, dbref, const char  *, int );
-extern void	notify_except2( dbref, dbref, dbref, dbref, const char  *, int );
+extern void	notify_except( dbref, dbref, dbref, int, const char  *, ... );
+extern void	notify_except2( dbref, dbref, dbref, dbref, int, const char *, ... );
 extern void	notify_check( dbref, dbref, int, const char *, ... );
 extern int	Hearer( dbref );
 extern void	html_escape( const char *, char *, char ** );

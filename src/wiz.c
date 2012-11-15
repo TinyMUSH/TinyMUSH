@@ -317,7 +317,7 @@ void do_toad( dbref player, dbref cause, int key, char *toad, char *newowner ) {
     loc = Location( victim );
     buf = alloc_mbuf( "do_toad" );
     sprintf( buf, "%s has been turned into a slimy toad!", Name( victim ) );
-    notify_except2( loc, player, victim, player, buf, 0 );
+    notify_except2( loc, player, victim, player, 0, NULL, buf);
     sprintf( buf, "You toaded %s! (%d objects @chowned)", Name( victim ),
              count + 1 );
     notify_quiet( player, buf );
