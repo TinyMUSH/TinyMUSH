@@ -22,8 +22,7 @@
    returned. */
 
 
-gdbm_file_info *
-gdbm_open(file, block_size, flags, mode, fatal_func)
+gdbm_file_info *gdbm_open(file, block_size, flags, mode, fatal_func)
 	char *file;
 	int block_size;
 	int flags;

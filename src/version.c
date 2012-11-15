@@ -51,36 +51,35 @@ void do_version( dbref player, dbref cause, int extra ) {
     }
     sprintf( string, "%s (%s)", string, PACKAGE_RELEASE_DATE );
     ptr = repeatchar( strlen( string ), '-' );
-    notify( player, tmprintf( "%s\n%s\n", string, ptr ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s\n%s\n", string, ptr );
     XFREE( ptr, "repeatchar" );
-    notify( player, tmprintf( "     Build date: %s", MUSH_BUILD_DATE ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "     Build date: %s", MUSH_BUILD_DATE );
     if( Wizard( player ) ) {
 #ifdef HAVE_SYS_UTSNAME_H
         uname( &bpInfo );
-        notify( player, tmprintf( " Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, " Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine );
 #endif
-        notify( player, tmprintf( "Configure Flags: %s", mudstate.configureinfo ) );
-        notify( player, tmprintf( " Compiler Flags: %s", mudstate.compilerinfo ) );
-        notify( player, tmprintf( "   Linker Flags: %s", mudstate.linkerinfo ) );
-        notify( player, tmprintf( "     DBM driver: %s\n", mudstate.dbmdriver ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "   Linker Flags: %s", mudstate.linkerinfo );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "     DBM driver: %s\n", mudstate.dbmdriver );
 
     }
     if( mudstate.modloaded[0] ) {
         MODULE *mp;
         WALK_ALL_MODULES( mp ) {
             ptr = repeatchar( strlen( mp->modname ) + 8, '-' );
-            notify( player, tmprintf( "Module %s\n%s\n", mp->modname, ptr ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
             XFREE( ptr, "repeatchar" );
             if( ( mver = DLSYM_VAR( mp->handle, mp->modname, "version", MODVER * ) ) != NULL ) {
-
-                notify( player, tmprintf( "        Version: %s", mver->version ) );
-                notify( player, tmprintf( "         Author: %s", mver->author ) );
-                notify( player, tmprintf( "          Email: %s", mver->email ) );
-                notify( player, tmprintf( "        Website: %s", mver->url ) );
-                notify( player, tmprintf( "      Copyright: %s", mver->copyright ) );
-                notify( player, tmprintf( "    Description: %s\n", mver->description ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "        Version: %s", mver->version );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "         Author: %s", mver->author );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "          Email: %s", mver->email );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "        Website: %s", mver->url );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "      Copyright: %s", mver->copyright );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "    Description: %s\n", mver->description );
             } else {
-                notify( player, tmprintf( "module %s: no version information", mp->modname ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "module %s: no version information", mp->modname );
             }
         }
     }

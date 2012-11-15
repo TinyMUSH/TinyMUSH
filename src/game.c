@@ -176,9 +176,9 @@ void handlestartupflatfiles( int flag ) {
     mktimestamp( ts, SBUF_SIZE );
 
     safe_snprintf( db, MAXPATHLEN, "%s/%s", mudconf.dbhome, mudconf.db_file );
-    safe_snprintf(flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) );
-    safe_snprintf(db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts );
-    safe_snprintf(flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts );
+    safe_snprintf( flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) );
+    safe_snprintf( db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts );
+    safe_snprintf( flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts );
 
     i = open( flat, O_RDONLY );
     if( i>0 ) {

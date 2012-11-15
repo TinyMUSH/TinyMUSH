@@ -180,8 +180,7 @@ static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, ch
                 }
             }
         } else {
-            notify( player, tmprintf( "Cron parse error at: %s",
-                                      bufp ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cron parse error at: %s", bufp );
             return NULL;
         }
 
@@ -427,7 +426,7 @@ void do_crondel( dbref player, dbref cause, int key, char *objstr ) {
     }
 
     count = cron_clr( thing, attr );
-    notify( player, tmprintf( "Removed %d cron entries.", count ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Removed %d cron entries.", count );
 }
 
 void do_crontab( dbref player, dbref cause, int key, char *objstr ) {
@@ -469,20 +468,14 @@ void do_crontab( dbref player, dbref cause, int key, char *objstr ) {
             bufp = unparse_object( player, crp->obj, 0 );
             ap = atr_num( crp->atr );
             if( !ap ) {
-                notify( player,
-                        tmprintf
-                        ( "%s has a cron entry that contains bad attribute number %d.",
-                          bufp, crp->atr ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s has a cron entry that contains bad attribute number %d.", bufp, crp->atr );
             } else {
-                notify( player, tmprintf( "%s/%s: %s", bufp,
-                                          ap->name, crp->cronstr ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s/%s: %s", bufp, ap->name, crp->cronstr );
             }
             free_lbuf( bufp );
         }
     }
-
-    notify( player, tmprintf( "Matched %d cron %s.",
-                              count, ( count == 1 ) ? "entry" : "entries" ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Matched %d cron %s.", count, ( count == 1 ) ? "entry" : "entries" );
 }
 
 /* ---------------------------------------------------------------------------

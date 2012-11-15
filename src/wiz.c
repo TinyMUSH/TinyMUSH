@@ -339,10 +339,8 @@ void do_toad( dbref player, dbref cause, int key, char *toad, char *newowner ) {
     delete_player_name( victim, buf );
     free_lbuf( buf );
 
-    count = boot_off( victim,
-                      ( char * ) "You have been turned into a slimy toad!" );
-    notify_quiet( player, tmprintf( "%d connection%s closed.",
-                                    count, ( count == 1 ? "" : "s" ) ) );
+    count = boot_off( victim, ( char * ) "You have been turned into a slimy toad!" );
+    notify_check( player, player , MSG_PUP_ALWAYS|MSG_ME, "%d connection%s closed.", count, ( count == 1 ? "" : "s" ) );
 }
 
 void do_newpassword( dbref player, dbref cause, int key, char *name, char *password ) {
@@ -376,12 +374,7 @@ void do_newpassword( dbref player, dbref cause, int key, char *name, char *passw
      */
     s_Pass( victim, crypt( ( const char * ) password, "XX" ) );
     notify_quiet( player, "Password changed." );
-    buf = alloc_lbuf( "do_newpassword" );
-    bp = buf;
-    safe_tmprintf_str( buf, &bp,
-                       "Your password has been changed by %s.", Name( player ) );
-    notify_quiet( victim, buf );
-    free_lbuf( buf );
+    notify_check( victim, victim, MSG_PUP_ALWAYS|MSG_ME, "Your password has been changed by %s.", Name( player ) );
 }
 
 void do_boot( dbref player, dbref cause, int key, char *name ) {
@@ -429,7 +422,7 @@ void do_boot( dbref player, dbref cause, int key, char *name ) {
         XFREE( vname, "do_boot" );
         XFREE( pname, "do_boot" );
         XFREE( lname, "do_boot" );
-        notify_quiet( player, tmprintf( "You booted %s off!", Name( victim ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME , "You booted %s off!", Name( victim ) );
     }
     if( key & BOOT_QUIET ) {
         buf = NULL;
@@ -445,8 +438,7 @@ void do_boot( dbref player, dbref cause, int key, char *name ) {
     } else {
         count = boot_off( victim, buf );
     }
-    notify_quiet( player, tmprintf( "%d connection%s closed.",
-                                    count, ( count == 1 ? "" : "s" ) ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%d connection%s closed.", count, ( count == 1 ? "" : "s" ) );
     if( buf ) {
         free_lbuf( buf );
     }
@@ -565,29 +557,22 @@ void do_motd( dbref player, dbref cause, int key, char *message ) {
                               "----- motd messages -----" );
             }
             if( mudconf.motd_msg && *mudconf.motd_msg ) {
-                notify_quiet( player,
-                              tmprintf( "MOTD: %s", mudconf.motd_msg ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME , "MOTD: %s", mudconf.motd_msg );
             } else {
                 notify_quiet( player, "No MOTD." );
             }
             if( mudconf.wizmotd_msg && *mudconf.wizmotd_msg ) {
-                notify_quiet( player,
-                              tmprintf( "Wizard MOTD: %s",
-                                        mudconf.wizmotd_msg ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Wizard MOTD: %s", mudconf.wizmotd_msg );
             } else {
                 notify_quiet( player, "No Wizard MOTD." );
             }
             if( mudconf.downmotd_msg && *mudconf.downmotd_msg ) {
-                notify_quiet( player,
-                              tmprintf( "Down MOTD: %s",
-                                        mudconf.downmotd_msg ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Down MOTD: %s", mudconf.downmotd_msg );
             } else {
                 notify_quiet( player, "No Down MOTD." );
             }
             if( mudconf.fullmotd_msg && *mudconf.fullmotd_msg ) {
-                notify_quiet( player,
-                              tmprintf( "Full MOTD: %s",
-                                        mudconf.fullmotd_msg ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Full MOTD: %s", mudconf.fullmotd_msg );
             } else {
                 notify_quiet( player, "No Full MOTD." );
             }

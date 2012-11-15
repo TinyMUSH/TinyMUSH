@@ -142,26 +142,31 @@ static void format_speech( dbref player, dbref speaker, dbref loc, char *message
     switch( key ) {
     case SAY_SAY:
         if( mudconf.you_say ) {
-            notify( speaker, tmprintf( "You %s \"%s\"", SAY_STRING,
-                                       message ) );
+            /*
+            notify( speaker, tmprintf( "You %s \"%s\"", SAY_STRING, message ) );
+            */
+            notify_check( speaker, speaker, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You %s \"%s\"", SAY_STRING, message );
             if( loc != NOTHING ) {
-                notify_except( loc, player, speaker,
-                               tmprintf( "%s %s \"%s\"", Name( speaker ),
-                                         SAYS_STRING, message ), MSG_SPEECH );
+                notify_except( loc, player, speaker, tmprintf( "%s %s \"%s\"", Name( speaker ), SAYS_STRING, message ), MSG_SPEECH );
             }
         } else {
-            notify_all_from_inside_speech( loc, player,
-                                           tmprintf( "%s %s \"%s\"", Name( speaker ),
-                                                   SAYS_STRING, message ) );
+            /*
+            notify_all_from_inside_speech( loc, player, tmprintf( "%s %s \"%s\"", Name( speaker ), SAYS_STRING, message ) );
+            */
+            notify_check( loc, player, MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_SPEECH, "%s %s \"%s\"", Name( speaker ), SAYS_STRING, message );
         }
         break;
     case SAY_POSE:
-        notify_all_from_inside_speech( loc, player,
-                                       tmprintf( "%s %s", Name( speaker ), message ) );
+        /*
+        notify_all_from_inside_speech( loc, player, tmprintf( "%s %s", Name( speaker ), message ) );
+        */
+        notify_check( loc, player, MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_SPEECH, "%s %s", Name( speaker ), message );
         break;
     case SAY_POSE_NOSPC:
-        notify_all_from_inside_speech( loc, player,
-                                       tmprintf( "%s%s", Name( speaker ), message ) );
+        /*
+        notify_all_from_inside_speech( loc, player, tmprintf( "%s%s", Name( speaker ), message ) );
+        */
+        notify_check( loc, player, MSG_ME_ALL|MSG_NBR_EXITS_A|MSG_F_UP|MSG_F_CONTENTS|MSG_S_INSIDE|MSG_SPEECH, "%s%s", Name( speaker ), message );
         break;
     default:
         /*
@@ -442,12 +447,14 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
         if( *str2 ) {
             t = time( NULL );
             tp = localtime( &t );
-            notify_with_cause( player, target,
-                               tmprintf( "%s message from %s: %s",
-                                         tag, Name( target ), str2 ) );
-            notify_with_cause( target, player,
-                               tmprintf( "[%d:%02d] %s message sent to %s.",
-                                         tp->tm_hour, tp->tm_min, tag, Name( player ) ) );
+            /*
+            notify_with_cause( player, target, tmprintf( "%s message from %s: %s", tag, Name( target ), str2 ) );
+            */
+            notify_check( player, target, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s message from %s: %s", tag, Name( target ), str2 );
+            /*
+            notify_with_cause( target, player, tmprintf( "[%d:%02d] %s message sent to %s.", tp->tm_hour, tp->tm_min, tag, Name( player ) ) );
+            */
+            notify_check( player, target, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "[%d:%02d] %s message sent to %s.", tp->tm_hour, tp->tm_min, tag, Name( player ) );
         }
         free_lbuf( str2 );
     } else if( dflt && *dflt ) {
@@ -458,30 +465,30 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
 
 static int page_check( dbref player, dbref target ) {
     if( !payfor( player, Guest( player ) ? 0 : mudconf.pagecost ) ) {
-        notify( player,
-                tmprintf( "You don't have enough %s.", mudconf.many_coins ) );
+        /*
+        notify( player, tmprintf( "You don't have enough %s.", mudconf.many_coins ) );
+        */
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins );
+        
     } else if( !Connected( target ) ) {
-        page_return( player, target, "Away", A_AWAY,
-                     tmprintf( "Sorry, %s is not connected.", Name( target ) ) );
+        page_return( player, target, "Away", A_AWAY, tmprintf( "Sorry, %s is not connected.", Name( target ) ) );
     } else if( !could_doit( player, target, A_LPAGE ) ) {
         if( Can_Hide( target ) && Hidden( target ) && !See_Hidden( player ) )
-            page_return( player, target, "Away", A_AWAY,
-                         tmprintf( "Sorry, %s is not connected.",
-                                   Name( target ) ) );
+            page_return( player, target, "Away", A_AWAY, tmprintf( "Sorry, %s is not connected.", Name( target ) ) );
         else
-            page_return( player, target, "Reject", A_REJECT,
-                         tmprintf( "Sorry, %s is not accepting pages.",
-                                   Name( target ) ) );
+            page_return( player, target, "Reject", A_REJECT, tmprintf( "Sorry, %s is not accepting pages.", Name( target ) ) );
     } else if( !could_doit( target, player, A_LPAGE ) ) {
         if( Wizard( player ) ) {
-            notify( player,
-                    tmprintf( "Warning: %s can't return your page.",
-                              Name( target ) ) );
+            /*
+            notify( player, tmprintf( "Warning: %s can't return your page.", Name( target ) ) );
+            */
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Warning: %s can't return your page.", Name( target ) );
             return 1;
         } else {
-            notify( player,
-                    tmprintf( "Sorry, %s can't return your page.",
-                              Name( target ) ) );
+            /*
+            notify( player, tmprintf( "Sorry, %s can't return your page.", Name( target ) ) );
+            */
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Sorry, %s can't return your page.", Name( target ) );
             return 0;
         }
     } else {
@@ -571,9 +578,10 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
                     ddp; ddp = strtok_r( NULL, " ", &tokst ) ) {
                 target = ( int ) strtol( ddp, ( char ** ) NULL, 10 );
                 if( !Good_obj( target ) || !isPlayer( target ) ) {
-                    notify( player,
-                            tmprintf( "I don't recognize #%d.",
-                                      target ) );
+                    /*
+                    notify( player, tmprintf( "I don't recognize #%d.", target ) );
+                    */
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "I don't recognize #%d.", target );
                     continue;
                 }
                 /*
@@ -626,9 +634,10 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
                     dbrefs_array[count] = target;
                     count++;
                 } else {
-                    notify( player,
-                            tmprintf( "I don't recognize %s.",
-                                      tnp ) );
+                    /*
+                    notify( player, tmprintf( "I don't recognize %s.", tnp ) );
+                    */
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "I don't recognize %s.", tnp);
                 }
             }
         }
@@ -745,7 +754,10 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
     imessage = imp = alloc_lbuf( "do_page.imessage" );
     switch( *message ) {
     case '\0':
+        /*
         notify( player, tmprintf( "You last paged %s.", clean_tname ) );
+        */
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You last paged %s.", clean_tname );
         free_lbuf( clean_tname );
         free_lbuf( omessage );
         free_lbuf( imessage );
@@ -755,34 +767,25 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
         message++;
         safe_str( "From afar, ", omessage, &omp );
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "to %s: ",
-                               clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s %s", Name( player ),
-                           message );
-        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s %s",
-                           clean_tname, Name( player ), message );
+            safe_tmprintf_str( omessage, &omp, "to %s: ", clean_tname );
+        safe_tmprintf_str( omessage, &omp, "%s %s", Name( player ), message );
+        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name( player ), message );
         break;
     case ';':
         message++;
         safe_str( "From afar, ", omessage, &omp );
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "to %s: ",
-                               clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s%s", Name( player ),
-                           message );
-        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s%s",
-                           clean_tname, Name( player ), message );
+            safe_tmprintf_str( omessage, &omp, "to %s: ", clean_tname );
+        safe_tmprintf_str( omessage, &omp, "%s%s", Name( player ), message );
+        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name( player ), message );
         break;
     case '"':
         message++;
     default:
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "To %s, ",
-                               clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s pages: %s", Name( player ),
-                           message );
-        safe_tmprintf_str( imessage, &imp, "You paged %s with '%s'.",
-                           clean_tname, message );
+            safe_tmprintf_str( omessage, &omp, "To %s, ", clean_tname );
+        safe_tmprintf_str( omessage, &omp, "%s pages: %s", Name( player ), message );
+        safe_tmprintf_str( imessage, &imp, "You paged %s with '%s'.", clean_tname, message );
     }
     free_lbuf( clean_tname );
 
@@ -822,10 +825,14 @@ void whisper_pose( dbref player, dbref target, char *message ) {
 
     buff = alloc_lbuf( "do_pemit.whisper.pose" );
     strcpy( buff, Name( player ) );
-    notify( player,
-            tmprintf( "%s senses \"%s%s\"", Name( target ), buff, message ) );
-    notify_with_cause( target, player,
-                       tmprintf( "You sense %s%s", buff, message ) );
+    /*
+    notify( player, tmprintf( "%s senses \"%s%s\"", Name( target ), buff, message ) );
+    */
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s senses \"%s%s\"", Name( target ), buff, message );
+    /*
+    notify_with_cause( target, player, tmprintf( "You sense %s%s", buff, message ) );
+    */
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You sense %s%s", buff, message );
     free_lbuf( buff );
 }
 
@@ -1067,31 +1074,26 @@ void do_pemit( dbref player, dbref cause, int key, char *recipient, char *messag
                 case '"':
                     message++;
                 default:
-                    notify( player,
-                            tmprintf
-                            ( "You whisper \"%s\" to %s.",
-                              message, Name( target ) ) );
-                    notify_with_cause( target, player,
-                                       tmprintf( "%s whispers \"%s\"",
-                                                 Name( player ), message ) );
+                    /*
+                    notify( player, tmprintf ( "You whisper \"%s\" to %s.", message, Name( target ) ) );
+                    */
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You whisper \"%s\" to %s.", message, Name( target ) );
+                    /*
+                    notify_with_cause( target, player, tmprintf( "%s whispers \"%s\"", Name( player ), message ) );
+                    */
+                    notify_check( target, player ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s whispers \"%s\"", Name( player ), message );
                 }
                 if( ( !mudconf.quiet_whisper )
                         && !Wizard( player ) ) {
                     loc = where_is( player );
                     if( loc != NOTHING ) {
-                        buf2 =
-                            alloc_lbuf
-                            ( "do_pemit.whisper.buzz" );
+                        buf2 = alloc_lbuf ( "do_pemit.whisper.buzz" );
                         bp = buf2;
                         safe_name( player, buf2, &bp );
-                        safe_str( ( char * )
-                                  " whispers something to ",
-                                  buf2, &bp );
+                        safe_str( ( char * ) " whispers something to ", buf2, &bp );
                         safe_name( target, buf2, &bp );
                         *bp = '\0';
-                        notify_except2( loc, player,
-                                        player, target, buf2,
-                                        MSG_SPEECH );
+                        notify_except2( loc, player, player, target, buf2, MSG_SPEECH );
                         free_lbuf( buf2 );
                     }
                 }

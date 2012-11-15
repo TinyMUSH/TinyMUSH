@@ -123,8 +123,7 @@ char *gdbm_strerror(gdbm_error gdbmerrno);
    The return value is the database handle or `NULL' if it is not successful.
    If the database already exists, whether it is one of Depot or Curia is measured
    automatically. */
-GDBM_FILE gdbm_open(char *name, int block_size, int read_write, int mode,
-                    void (*fatal_func)(void));
+GDBM_FILE gdbm_open(char *name, int block_size, int read_write, int mode, void (*fatal_func)());
 
 
 /* Get a database handle after the fashion of QDBM.

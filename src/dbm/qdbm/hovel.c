@@ -59,8 +59,7 @@ char *gdbm_strerror(gdbm_error gdbmerrno){
 
 
 /* Get a database handle after the fashion of GDBM. */
-GDBM_FILE gdbm_open(char *name, int block_size, int read_write, int mode,
-                    void (*fatal_func)(void)){
+GDBM_FILE gdbm_open(char *name, int block_size, int read_write, int mode, void (*fatal_func)()){
   GDBM_FILE dbf;
   int dpomode;
   DEPOT *depot;

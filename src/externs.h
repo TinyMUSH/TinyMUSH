@@ -115,7 +115,6 @@ extern long	random_range( long, long );
 
 extern int do_convtime( char *, struct tm * );
 
-
 /* From game.c */
 extern void	notify_except( dbref, dbref, dbref, const char  *, int );
 extern void	notify_except2( dbref, dbref, dbref, dbref, const char  *, int );
@@ -742,8 +741,7 @@ extern int	register_match( char *, char *, char *[], int );
  * Module things.
  */
 
-#define WALK_ALL_MODULES(mp) \
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+#define WALK_ALL_MODULES(mp) for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 
 /* Syntax: DLSYM(<handler>, <module name>, <function name>, <prototype>) */
 
