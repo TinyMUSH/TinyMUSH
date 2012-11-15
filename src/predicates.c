@@ -315,25 +315,18 @@ int canpayfees( dbref player, dbref who, int pennies, int quota, int objtype ) {
             !Free_Money( who ) && !Free_Money( Owner( who ) ) &&
             ( Pennies( Owner( who ) ) < pennies ) ) {
         if( player == who ) {
-            notify( player,
-                    tmprintf( "Sorry, you don't have enough %s.",
-                              mudconf.many_coins ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Sorry, you don't have enough %s.", mudconf.many_coins );
         } else {
-            notify( player,
-                    tmprintf
-                    ( "Sorry, that player doesn't have enough %s.",
-                      mudconf.many_coins ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Sorry, that player doesn't have enough %s.", mudconf.many_coins );
         }
         return 0;
     }
     if( mudconf.quotas ) {
         if( !canpayquota( player, who, quota, objtype ) ) {
             if( player == who ) {
-                notify( player,
-                        "Sorry, your building contract has run out." );
+                notify( player, "Sorry, your building contract has run out." );
             } else {
-                notify( player,
-                        "Sorry, that player's building contract has run out." );
+                notify( player, "Sorry, that player's building contract has run out." );
             }
             return 0;
         }
@@ -725,11 +718,9 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
         if( cmdp->pre_hook ) {
             ap = atr_num( cmdp->pre_hook->atr );
             if( !ap ) {
-                notify( player,
-                        "Before Hook contains bad attribute number." );
+                notify( player, "Before Hook contains bad attribute number." );
             } else {
-                notify( player, tmprintf( "Before Hook: #%d/%s",
-                                          cmdp->pre_hook->thing, ap->name ) );
+                notify_check( player, player , MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Before Hook: #%d/%s", cmdp->pre_hook->thing, ap->name );
             }
         } else {
             notify( player, "Before Hook: none" );
@@ -738,11 +729,9 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
         if( cmdp->post_hook ) {
             ap = atr_num( cmdp->post_hook->atr );
             if( !ap ) {
-                notify( player,
-                        "After Hook contains bad attribute number." );
+                notify( player, "After Hook contains bad attribute number." );
             } else {
-                notify( player, tmprintf( "After Hook: #%d/%s",
-                                          cmdp->post_hook->thing, ap->name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "After Hook: #%d/%s", cmdp->post_hook->thing, ap->name );
             }
         } else {
             notify( player, "After Hook: none" );
@@ -751,12 +740,9 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
         if( cmdp->userperms ) {
             ap = atr_num( cmdp->userperms->atr );
             if( !ap ) {
-                notify( player,
-                        "User Permissions contains bad attribute number." );
+                notify( player, "User Permissions contains bad attribute number." );
             } else {
-                notify( player,
-                        tmprintf( "User Permissions: #%d/%s",
-                                  cmdp->userperms->thing, ap->name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "User Permissions: #%d/%s", cmdp->userperms->thing, ap->name );
             }
         } else {
             notify( player, "User Permissions: none" );
@@ -934,8 +920,7 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
         for( nextp = ( ADDENT * ) old->info.added; nextp != NULL;
                 nextp = nextp->next ) {
             if( ( nextp->thing == thing ) && ( nextp->atr == atr ) ) {
-                notify( player, tmprintf( "%s already added.",
-                                          name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s already added.", name );
                 return;
             }
         }
@@ -991,12 +976,9 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
              * * the added command, while keeping the __ alias.
              */
             if( !strcmp( name, old->cmdname ) ) {
-                hashdelete( tmprintf( "__%s", old->cmdname ),
-                            &mudstate.command_htab );
-                hashreplall( ( int * ) old, ( int * ) cmd,
-                             &mudstate.command_htab );
-                hashadd( tmprintf( "__%s", old->cmdname ),
-                         ( int * ) old, &mudstate.command_htab, 0 );
+                hashdelete( tmprintf( "__%s", old->cmdname ), &mudstate.command_htab );
+                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
+                hashadd( tmprintf( "__%s", old->cmdname ), ( int * ) old, &mudstate.command_htab, 0 );
             }
         }
     }
@@ -1006,7 +988,7 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
      */
 
     reset_prefix_cmds();
-    notify( player, tmprintf( "Command %s added.", name ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Command %s added.", name );
 }
 
 void do_listcommands( dbref player, dbref cause, int key, char *name ) {
@@ -1031,20 +1013,16 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
 
         if( old && ( old->callseq & CS_ADDED ) ) {
             if( strcmp( name, old->cmdname ) ) {
-                notify( player, tmprintf( "%s: alias for %s",
-                                          name, old->cmdname ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: alias for %s", name, old->cmdname );
                 return;
             }
 
             for( nextp = ( ADDENT * ) old->info.added; nextp != NULL;
                     nextp = nextp->next ) {
-                notify( player, tmprintf( "%s: #%d/%s",
-                                          nextp->name, nextp->thing,
-                                          ( ( ATTR * ) atr_num( nextp->atr ) )->name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR * ) atr_num( nextp->atr ) )->name );
             }
         } else {
-            notify( player,
-                    tmprintf( "%s not found in command table.", name ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s not found in command table.", name );
         }
         return;
     } else {
@@ -1058,18 +1036,13 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
 
             if( old && ( old->callseq & CS_ADDED ) ) {
                 if( strcmp( keyname, old->cmdname ) ) {
-                    notify( player,
-                            tmprintf( "%s: alias for %s",
-                                      keyname, old->cmdname ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: alias for %s", keyname, old->cmdname );
                     continue;
                 }
 
                 for( nextp = ( ADDENT * ) old->info.added;
                         nextp != NULL; nextp = nextp->next ) {
-                    notify( player, tmprintf( "%s: #%d/%s",
-                                              nextp->name, nextp->thing,
-                                              ( ( ATTR * ) atr_num( nextp->
-                                                      atr ) )->name ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR * ) atr_num( nextp->atr ) )->name );
                     didit = 1;
                 }
             }
@@ -1126,10 +1099,7 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                 XFREE( prev, "delcommand.addent" );
             }
             hashdelete( name, &mudstate.command_htab );
-            if( ( cmd =
-                        ( CMDENT * ) hashfind( tmprintf( "__%s",
-                                               old->cmdname ),
-                                               &mudstate.command_htab ) ) != NULL ) {
+            if( ( cmd = ( CMDENT * ) hashfind( tmprintf( "__%s", old->cmdname ), &mudstate.command_htab ) ) != NULL ) {
                 hashadd( cmd->cmdname, ( int * ) cmd,
                          &mudstate.command_htab, 0 );
                 /*
@@ -1145,14 +1115,10 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                  * the __ alias may have been temporarily
                  * * marked as the original hash entry
                  */
-                hashdelete( tmprintf( "__%s", cmd->cmdname ),
-                            &mudstate.command_htab );
-                hashadd( tmprintf( "__%s", cmd->cmdname ),
-                         ( int * ) cmd, &mudstate.command_htab,
-                         HASH_ALIAS );
+                hashdelete( tmprintf( "__%s", cmd->cmdname ), &mudstate.command_htab );
+                hashadd( tmprintf( "__%s", cmd->cmdname ), ( int * ) cmd, &mudstate.command_htab, HASH_ALIAS );
 
-                hashreplall( ( int * ) old, ( int * ) cmd,
-                             &mudstate.command_htab );
+                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
             } else {
                 hashdelall( ( int * ) old, &mudstate.command_htab );
             }
@@ -1172,24 +1138,9 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                     XFREE( nextp->name, "delcommand.name" );
                     if( !prev ) {
                         if( !nextp->next ) {
-                            hashdelete( name,
-                                        &mudstate.
-                                        command_htab );
-                            if( ( cmd =
-                                        ( CMDENT * )
-                                        hashfind
-                                        ( tmprintf
-                                          ( "__%s",
-                                            name ),
-                                          &mudstate.
-                                          command_htab ) )
-                                    != NULL ) {
-                                hashadd( cmd->
-                                         cmdname,
-                                         ( int * ) cmd,
-                                         &mudstate.
-                                         command_htab,
-                                         0 );
+                            hashdelete( name, &mudstate. command_htab );
+                            if( ( cmd = ( CMDENT * ) hashfind ( tmprintf( "__%s", name ), &mudstate.command_htab ) ) != NULL ) {
+                                hashadd( cmd->cmdname, ( int * ) cmd, &mudstate.command_htab, 0 );
                                 /*
                                  * in case we deleted by alias
                                  */
@@ -1206,42 +1157,18 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                                  * the __ alias may have been temporarily
                                  * * marked as the original hash entry
                                  */
-                                hashdelete
-                                ( tmprintf
-                                  ( "__%s",
-                                    cmd->
-                                    cmdname ),
-                                  &mudstate.
-                                  command_htab );
-                                hashadd( tmprintf
-                                         ( "__%s",
-                                           cmd->
-                                           cmdname ),
-                                         ( int * ) cmd,
-                                         &mudstate.
-                                         command_htab,
-                                         HASH_ALIAS );
+                                hashdelete( tmprintf( "__%s", cmd->cmdname ), &mudstate.command_htab );
+                                hashadd( tmprintf( "__%s", cmd->cmdname ), ( int * ) cmd,&mudstate.command_htab, HASH_ALIAS );
 
-                                hashreplall(
-                                    ( int * ) old,
-                                    ( int * ) cmd,
-                                    &mudstate.
-                                    command_htab );
+                                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
                             } else {
-                                hashdelall( ( int
-                                              * ) old,
-                                            &mudstate.
-                                            command_htab );
+                                hashdelall( ( int * ) old, &mudstate.command_htab );
                             }
-                            XFREE( old->cmdname,
-                                   "delcommand.cmdname" );
-                            XFREE( old,
-                                   "delcommand.cmdp" );
+                            XFREE( old->cmdname, "delcommand.cmdname" );
+                            XFREE( old, "delcommand.cmdp" );
                         } else {
-                            old->info.added =
-                                nextp->next;
-                            XFREE( nextp,
-                                   "delcommand.addent" );
+                            old->info.added = nextp->next;
+                            XFREE( nextp, "delcommand.addent" );
                         }
                     } else {
                         prev->next = nextp->next;
@@ -2650,11 +2577,7 @@ void do_include( dbref player, dbref cause, int key, char *object, char *argv[],
      * Get the attribute. Default to getting it off ourselves.
      */
 
-    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 )
-             && ( attrib != NOTHING ) ) ||
-            ( parse_attrib( player, tmprintf( "me/%s", object ),
-                            &thing, &attrib, 0 )
-              && ( attrib != NOTHING ) ) ) ) {
+    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, tmprintf( "me/%s", object ), &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
         notify_quiet( player, "No match." );
         return;
     }
@@ -2741,10 +2664,7 @@ void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_
                 return;
             }
             if( np->num != player ) {
-                notify( np->num,
-                        tmprintf
-                        ( "Output from %s(#%d) is no being redirected to you.",
-                          Name( from_ref ), from_ref ) );
+                notify_check( np->num, np->num, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Output from %s(#%d) is no being redirected to you.", Name( from_ref ), from_ref );
             }
             XFREE( np, "redir_struct" );
             nhashdelete( from_ref, &mudstate.redir_htab );
@@ -2802,13 +2722,10 @@ void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_
     s_Flags3( from_ref, Flags3( from_ref ) | HAS_REDIRECT );
 
     if( from_ref != player ) {
-        notify( from_ref,
-                tmprintf( "You have been redirected to %s.", Name( to_ref ) ) );
+        notify_check( from_ref, from_ref ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You have been redirected to %s.", Name( to_ref ) );
     }
     if( to_ref != player ) {
-        notify( to_ref,
-                tmprintf( "Output from %s(#%d) has been redirected to you.",
-                          Name( from_ref ), from_ref ) );
+        notify_check( to_ref, to_ref, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Output from %s(#%d) has been redirected to you.", Name( from_ref ), from_ref );
     }
     notify( player, "Redirected." );
 }
@@ -2869,22 +2786,13 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
                 if( !strncmp( tbuf, hptr->target.s, len ) ) {
                     total++;
                     bp = outbuf;
-                    safe_tmprintf_str( outbuf, &bp, "%s:  ",
-                                       ( ( is_global ) ? hptr->target.s :
-                                         strchr( hptr->target.s,
-                                                 '.' ) + 1 ) );
-                    buff =
-                        unparse_object( player,
-                                        * ( hptr->data ), 0 );
+                    safe_tmprintf_str( outbuf, &bp, "%s:  ", ( ( is_global ) ? hptr->target.s : strchr( hptr->target.s, '.' ) + 1 ) );
+                    buff = unparse_object( player, * ( hptr->data ), 0 );
                     safe_str( buff, outbuf, &bp );
                     free_lbuf( buff );
-                    if( Owner( player ) !=
-                            Owner( * ( hptr->data ) ) ) {
-                        safe_str( ( char * ) " [owner: ",
-                                  outbuf, &bp );
-                        buff =
-                            unparse_object( player,
-                                            Owner( * ( hptr->data ) ), 0 );
+                    if( Owner( player ) != Owner( * ( hptr->data ) ) ) {
+                        safe_str( ( char * ) " [owner: ", outbuf, &bp );
+                        buff = unparse_object( player, Owner( * ( hptr->data ) ), 0 );
                         safe_str( buff, outbuf, &bp );
                         free_lbuf( buff );
                         safe_chr( ']', outbuf, &bp );
@@ -2895,7 +2803,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
             }
         }
 
-        notify( player, tmprintf( "Total references: %d", total ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Total references: %d", total );
 
         return;
     }

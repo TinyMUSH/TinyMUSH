@@ -525,9 +525,7 @@ int fwdlist_load( FWDLIST *fp, dbref player, char *atext ) {
 
             if( fail ) {
                 if( !mudstate.standalone )
-                    notify( player,
-                            tmprintf( "Cannot forward to #%d: Permission denied.",
-                                      target ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cannot forward to #%d: Permission denied.", target );
                 errors++;
             } else if( count < mudconf.fwdlist_lim ) {
                 if( fp->data ) {
@@ -537,9 +535,7 @@ int fwdlist_load( FWDLIST *fp, dbref player, char *atext ) {
                 }
             } else {
                 if( !mudstate.standalone )
-                    notify( player,
-                            tmprintf( "Cannot forward to #%d: Forwardlist limit exceeded.",
-                                      target ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cannot forward to #%d: Forwardlist limit exceeded.", target );
                 errors++;
             }
         }
@@ -735,9 +731,7 @@ int propdir_load( PROPDIR *fp, dbref player, char *atext ) {
 
             if( fail ) {
                 if( !mudstate.standalone ) {
-                    notify( player,
-                            tmprintf( "Cannot parent to #%d: Permission denied.",
-                                      target ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cannot parent to #%d: Permission denied.", target );
                 }
                 errors++;
             } else if( count < mudconf.propdir_lim ) {
@@ -748,9 +742,7 @@ int propdir_load( PROPDIR *fp, dbref player, char *atext ) {
                 }
             } else {
                 if( !mudstate.standalone ) {
-                    notify( player,
-                            tmprintf( "Cannot parent to #%d: Propdir limit exceeded.",
-                                      target ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cannot parent to #%d: Propdir limit exceeded.", target );
                 }
                 errors++;
             }
@@ -1049,8 +1041,7 @@ void do_attribute( dbref player, dbref cause, int key, char *aname, char *value 
                 /* Set the dirty bit */
                 va->flags |= AF_DIRTY;
             } else {
-                notify( player,
-                        tmprintf( "Unknown permission: %s.", sp ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unknown permission: %s.", sp );
             }
 
             /* Get the next token */
@@ -1143,49 +1134,47 @@ void do_fixdb( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
     case FIXDB_OWNER:
         s_Owner( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Owner set to #%d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,  "Owner set to #%d", res );
         }
         break;
     case FIXDB_LOC:
         s_Location( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Location set to #%d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Location set to #%d", res );
         }
         break;
     case FIXDB_CON:
         s_Contents( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Contents set to #%d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Contents set to #%d", res );
         }
         break;
     case FIXDB_EXITS:
         s_Exits( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Exits set to #%d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Exits set to #%d", res );
         }
         break;
     case FIXDB_NEXT:
         s_Next( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Next set to #%d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Exits set to #%d", res );
         }
         break;
     case FIXDB_PENNIES:
         s_Pennies( thing, res );
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Pennies set to %d", res ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Pennies set to %d", res );
         }
         break;
     case FIXDB_NAME:
         if( Typeof( thing ) == TYPE_PLAYER ) {
             if( !ok_player_name( arg2 ) ) {
-                notify( player,
-                        "That's not a good name for a player." );
+                notify( player, "That's not a good name for a player." );
                 return;
             }
             if( lookup_player( NOTHING, arg2, 0 ) != NOTHING ) {
-                notify( player,
-                        "That name is already in use." );
+                notify( player, "That name is already in use." );
                 return;
             }
             tname = log_getname( thing, "do_fixdb" );
@@ -1204,7 +1193,8 @@ void do_fixdb( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
             s_Name( thing, arg2 );
         }
         if( !Quiet( player ) ) {
-            notify( player, tmprintf( "Name set to %s", arg2 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Name set to %s", arg2 );
+            
         }
         break;
     }

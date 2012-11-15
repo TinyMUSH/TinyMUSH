@@ -186,31 +186,14 @@ static void show_quota( dbref player, dbref victim ) {
 
     if( Free_Quota( victim ) ) {
         if( mudconf.typed_quotas )
-            notify_quiet( player,
-                          tmprintf
-                          ( "%-16s: %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A",
-                            Name( victim ), dq_list[QTYPE_ALL],
-                            dq_list[QTYPE_ROOM], dq_list[QTYPE_EXIT],
-                            dq_list[QTYPE_THING], dq_list[QTYPE_PLAYER] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A", Name( victim ), dq_list[QTYPE_ALL], dq_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], dq_list[QTYPE_THING], dq_list[QTYPE_PLAYER] );
         else
-            notify_quiet( player,
-                          tmprintf( "%-16s: %4d - N/A", Name( victim ),
-                                    dq_list[QTYPE_ALL] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - N/A", Name( victim ), dq_list[QTYPE_ALL] );
     } else {
         if( mudconf.typed_quotas )
-            notify_quiet( player,
-                          tmprintf
-                          ( "%-16s: %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d",
-                            Name( victim ), dq_list[QTYPE_ALL],
-                            q_list[QTYPE_ALL], dq_list[QTYPE_ROOM],
-                            q_list[QTYPE_ROOM], dq_list[QTYPE_EXIT],
-                            q_list[QTYPE_EXIT], dq_list[QTYPE_THING],
-                            q_list[QTYPE_THING], dq_list[QTYPE_PLAYER],
-                            q_list[QTYPE_PLAYER] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d", Name( victim ), dq_list[QTYPE_ALL], q_list[QTYPE_ALL], dq_list[QTYPE_ROOM], q_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], q_list[QTYPE_EXIT], dq_list[QTYPE_THING], q_list[QTYPE_THING], dq_list[QTYPE_PLAYER], q_list[QTYPE_PLAYER] );
         else
-            notify_quiet( player,
-                          tmprintf( "%-16s: %4d - %3d", Name( victim ),
-                                    dq_list[QTYPE_ALL], q_list[QTYPE_ALL] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - %3d", Name( victim ), dq_list[QTYPE_ALL], q_list[QTYPE_ALL] );
     }
 }
 

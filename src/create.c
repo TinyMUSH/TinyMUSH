@@ -134,9 +134,7 @@ static void open_exit( dbref player, dbref loc, char *direction, char *linkto ) 
          */
 
         if( !payfor( player, mudconf.linkcost ) ) {
-            notify_quiet( player,
-                          tmprintf( "You don't have enough %s to link.",
-                                    mudconf.many_coins ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s to link.", mudconf.many_coins );
         } else {
             s_Location( exit, loc );
             notify_quiet( player, "Linked." );
@@ -174,8 +172,7 @@ void do_open( dbref player, dbref cause, int key, char *direction, char *links[]
     if( nlinks >= 2 ) {
         destnum = parse_linkable_room( player, dest );
         if( destnum != NOTHING ) {
-            open_exit( player, destnum, links[1],
-                       tmprintf( "%d", loc ) );
+            open_exit( player, destnum, links[1], tmprintf( "%d", loc ) );
         }
     }
 }
@@ -459,7 +456,7 @@ void do_dig( dbref player, dbref cause, int key, char *name, char *args[], int n
         return;
     }
 
-    notify( player, tmprintf( "%s created with room number %d.", name, room ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s created with room number %d.", name, room );
 
     buff = alloc_sbuf( "do_dig" );
     if( ( nargs >= 1 ) && args[0] && *args[0] ) {
@@ -491,8 +488,7 @@ void do_create( dbref player, dbref cause, int key, char *name, char *coststr ) 
         notify_quiet( player, "Create what?" );
         return;
     } else if( cost < 0 ) {
-        notify_quiet( player,
-                      "You can't create an object for less than nothing!" );
+        notify_quiet( player, "You can't create an object for less than nothing!" );
         return;
     }
     thing = create_obj( player, TYPE_THING, name, cost );
@@ -503,8 +499,8 @@ void do_create( dbref player, dbref cause, int key, char *name, char *coststr ) 
     move_via_generic( thing, player, NOTHING, 0 );
     s_Home( thing, new_home( player ) );
     if( !Quiet( player ) ) {
-        notify( player,
-                tmprintf( "%s created as object #%d", Name( thing ), thing ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s created as object #%d", Name( thing ), thing );
+        
     }
 }
 
@@ -559,9 +555,7 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
 
     if( !Controls( player, thing ) && !Parent_ok( thing ) &&
             ( key & CLONE_FROM_PARENT ) ) {
-        notify_quiet( player,
-                      tmprintf( "You don't control %s, ignoring /parent.",
-                                Name( thing ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "You don't control %s, ignoring /parent.", Name( thing ) );
         key &= ~CLONE_FROM_PARENT;
     }
     /*
@@ -571,10 +565,7 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
 
     new_owner = ( key & CLONE_PRESERVE ) ? Owner( thing ) : Owner( player );
     if( ( new_owner != Owner( player ) ) && !Controls( player, new_owner ) ) {
-        notify_quiet( player,
-                      tmprintf
-                      ( "You don't control the owner of %s, ignoring /preserve.",
-                        Name( thing ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "You don't control the owner of %s, ignoring /preserve.", Name( thing ) );
         new_owner = Owner( player );
     }
     /*
@@ -694,13 +685,9 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
 
     if( !Quiet( player ) ) {
         if( arg2 && *arg2 )
-            notify( player,
-                    tmprintf( "%s cloned as %s, new copy is object #%d.",
-                              Name( thing ), clone_name, clone ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s cloned as %s, new copy is object #%d.", Name( thing ), clone_name, clone );
         else
-            notify( player,
-                    tmprintf( "%s cloned, new copy is object #%d.",
-                              Name( thing ), clone ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s cloned, new copy is object #%d.", Name( thing ), clone );
     }
     /*
      * Put the new thing in its new home.  Break any dropto or link, then
@@ -763,7 +750,7 @@ void do_pcreate( dbref player, dbref cause, int key, char *name, char *pass ) {
     newplayer = create_player( name, pass, player, isrobot, 0 );
     newname = munge_space( name );
     if( newplayer == NOTHING ) {
-        notify_quiet( player, tmprintf( "Failure creating '%s'", newname ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Failure creating '%s'", newname );
         if( isrobot ) {
             log_write( LOG_PCREATES, "CRE", "ROBOT", "Failure creating '%s' by %s", newname, cname );
         } else {
@@ -778,12 +765,12 @@ void do_pcreate( dbref player, dbref cause, int key, char *name, char *pass ) {
 
     if( isrobot ) {
         move_object( newplayer, Location( player ) );
-        notify_quiet( player, tmprintf( "New robot '%s' (#%d) created with password '%s'", newname, newplayer, pass ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "New robot '%s' (#%d) created with password '%s'", newname, newplayer, pass );
         notify_quiet( player, "Your robot has arrived." );
         log_write( LOG_PCREATES, "CRE", "ROBOT", "%s created by %s", nname, cname );
     } else {
         move_object( newplayer, ( Good_loc( mudconf.start_room ) ? mudconf.start_room : 0 ) );
-        notify_quiet( player, tmprintf( "New player '%s' (#%d) created with password '%s'", newname, newplayer, pass ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "New player '%s' (#%d) created with password '%s'", newname, newplayer, pass );
         log_write( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "%s created by %s", nname, cname );
     }
     XFREE( cname, "do_pcreate" );
@@ -964,8 +951,7 @@ void do_destroy( dbref player, dbref cause, int key, char *what ) {
 
     if( Going( thing ) &&
             !( ( key & DEST_INSTANT ) && ( Typeof( thing ) != TYPE_GARBAGE ) ) ) {
-        notify_quiet( player,
-                      tmprintf( "That %s has already been destroyed.", typename ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "That %s has already been destroyed.", typename );
         return;
     }
     /*
@@ -1005,23 +991,18 @@ void do_destroy( dbref player, dbref cause, int key, char *what ) {
      */
 
     if( !isRoom( thing ) ) {
-        notify( player,
-                tmprintf( "The %s shakes and begins to crumble.", typename ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,  "The %s shakes and begins to crumble.", typename );
     } else {
-        notify_all( thing, player,
-                    "The room shakes and begins to crumble." );
+        notify_all( thing, player, "The room shakes and begins to crumble." );
     }
 
     if( !Quiet( thing ) && !Quiet( Owner( thing ) ) ) {
-        notify_quiet( Owner( thing ),
-                      tmprintf( "You will be rewarded shortly for %s(#%d).",
-                                Name( thing ), thing ) );
+        notify_check( Owner( thing ), Owner( thing ), MSG_PUP_ALWAYS|MSG_ME, "You will be rewarded shortly for %s(#%d).", Name( thing ), thing );
     }
     if( ( Owner( thing ) != player ) && !Quiet( player ) ) {
         t = tbuf = alloc_sbuf( "do_destroy.owner" );
         safe_sb_str( Name( Owner( thing ) ), tbuf, &t );
-        notify_quiet( player, tmprintf( "Destroyed. %s's %s(#%d)",
-                                        tbuf, Name( thing ), thing ) );
+        notify_check( player, player,  MSG_PUP_ALWAYS|MSG_ME, "Destroyed. %s's %s(#%d)", tbuf, Name( thing ), thing );
         free_sbuf( tbuf );
     }
     if( isPlayer( thing ) ) {

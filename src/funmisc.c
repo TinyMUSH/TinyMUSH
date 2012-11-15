@@ -795,9 +795,7 @@ void fun_timefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cau
             return;
         }
     } else {
-        safe_tmprintf_str( buff, bufc,
-                           "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d",
-                           nfargs );
+        safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs );
         return;
     }
 
@@ -1021,13 +1019,9 @@ void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                         }
                     } else if( width > 0 ) {
                         if( isupper( *p ) ) {
-                            safe_tmprintf_str( buff,
-                                               bufc, "%0*d",
-                                               width, n );
+                            safe_tmprintf_str( buff, bufc, "%0*d", width, n );
                         } else {
-                            safe_tmprintf_str( buff,
-                                               bufc, "%*d", width,
-                                               n );
+                            safe_tmprintf_str( buff, bufc, "%*d", width, n );
                         }
                         if( showsuffix ) {
                             safe_chr( timec, buff,
@@ -1070,42 +1064,18 @@ void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                         csecs = raw_secs;
                     }
                     if( !hidezero || ( cdays != 0 ) ) {
-                        safe_tmprintf_str( buff, bufc,
-                                           isupper( *p ) ?
-                                           "%0*d:%0*d:%0*d:%0*d" :
-                                           "%*d:%*d:%*d:%*d",
-                                           width, cdays,
-                                           width, chours,
-                                           width, cmins,
-                                           width, csecs );
+                        safe_tmprintf_str( buff, bufc, isupper( *p ) ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs );
                     } else {
                         /*
                          * Start from the first
                          * non-zero thing
                          */
                         if( chours != 0 ) {
-                            safe_tmprintf_str( buff,
-                                               bufc,
-                                               isupper( *p ) ?
-                                               "%0*d:%0*d:%0*d" :
-                                               "%*d:%*d:%*d",
-                                               width, chours,
-                                               width, cmins,
-                                               width, csecs );
+                            safe_tmprintf_str( buff, bufc, isupper( *p ) ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs );
                         } else if( cmins != 0 ) {
-                            safe_tmprintf_str( buff,
-                                               bufc,
-                                               isupper( *p ) ?
-                                               "%0*d:%0*d" :
-                                               "%*d:%*d", width,
-                                               cmins, width,
-                                               csecs );
+                            safe_tmprintf_str( buff, bufc, isupper( *p ) ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs );
                         } else {
-                            safe_tmprintf_str( buff,
-                                               bufc,
-                                               isupper( *p ) ?
-                                               "%0*d" : "%*d",
-                                               width, csecs );
+                            safe_tmprintf_str( buff, bufc, isupper( *p ) ? "%0*d" : "%*d", width, csecs );
                         }
                     }
                     p++;
@@ -1280,16 +1250,12 @@ void fun_benchmark( char *buff, char **bufc, dbref player, dbref caller, dbref c
             /*
              * Abort
              */
-            notify( player,
-                    tmprintf
-                    ( "Limits exceeded at benchmark iteration %d.",
-                      i + 1 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Limits exceeded at benchmark iteration %d.", i + 1 );
             times = i + 1;
         }
     }
 
-    safe_tmprintf_str( buff, bufc, "%.2f %.0f %.0f",
-                       total / ( double ) times, min, max );
+    safe_tmprintf_str( buff, bufc, "%.2f %.0f %.0f", total / ( double ) times, min, max );
 }
 
 /*
@@ -1737,33 +1703,22 @@ void fun_ps( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
             return;
         }
         if( ( qptr->waittime > 0 ) && ( Good_obj( qptr->sem ) ) ) {
-            safe_tmprintf_str( buff, bufc, "#%d:#%d/%d %s",
-                               qptr->player,
-                               qptr->sem, qptr->waittime - mudstate.now,
-                               qptr->comm );
+            safe_tmprintf_str( buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mudstate.now, qptr->comm );
         } else if( qptr->waittime > 0 ) {
-            safe_tmprintf_str( buff, bufc, "#%d:%d %s",
-                               qptr->player,
-                               qptr->waittime - mudstate.now, qptr->comm );
+            safe_tmprintf_str( buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mudstate.now, qptr->comm );
         } else if( Good_obj( qptr->sem ) ) {
             if( qptr->attr == A_SEMAPHORE ) {
-                safe_tmprintf_str( buff, bufc, "#%d:#%d %s",
-                                   qptr->player, qptr->sem, qptr->comm );
+                safe_tmprintf_str( buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm );
             } else {
                 ap = atr_num( qptr->attr );
                 if( ap && ap->name ) {
-                    safe_tmprintf_str( buff, bufc,
-                                       "#%d:#%d/%s %s", qptr->player,
-                                       qptr->sem, ap->name, qptr->comm );
+                    safe_tmprintf_str( buff, bufc, "#%d:#%d/%s %s", qptr->player, qptr->sem, ap->name, qptr->comm );
                 } else {
-                    safe_tmprintf_str( buff, bufc,
-                                       "#%d:#%d %s", qptr->player,
-                                       qptr->sem, qptr->comm );
+                    safe_tmprintf_str( buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm );
                 }
             }
         } else {
-            safe_tmprintf_str( buff, bufc, "#%d: %s", qptr->player,
-                               qptr->comm );
+            safe_tmprintf_str( buff, bufc, "#%d: %s", qptr->player, qptr->comm );
         }
         return;
     }

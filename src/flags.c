@@ -1008,8 +1008,7 @@ char *unparse_object( dbref player, dbref target, int obey_myopic ) {
              */
             fp = unparse_flags( player, target );
             bp = buf;
-            safe_tmprintf_str( buf, &bp, "%s(#%d%s)",
-                               Name( target ), target, fp );
+            safe_tmprintf_str( buf, &bp, "%s(#%d%s)", Name( target ), target, fp );
             free_sbuf( fp );
         } else {
             /*
@@ -1192,10 +1191,7 @@ int convert_flags( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type ) {
                        ( ( object_types[i].perm & CA_GOD ) &&
                          !God( player ) ) ) ) {
                 if( ( type != NOTYPE ) && ( type != i ) ) {
-                    notify( player,
-                            tmprintf
-                            ( "%c: Conflicting type specifications.",
-                              *s ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%c: Conflicting type specifications.", *s );
                     return 0;
                 }
                 type = i;
@@ -1227,10 +1223,7 @@ int convert_flags( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type ) {
         }
 
         if( !handled ) {
-            notify( player,
-                    tmprintf
-                    ( "%c: Flag unknown or not valid for specified object type",
-                      *s ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%c: Flag unknown or not valid for specified object type", *s );
             return 0;
         }
     }
@@ -1304,7 +1297,6 @@ void decompile_flags( dbref player, dbref thing, char *thingname ) {
          * We made it this far, report this flag
          */
 
-        notify( player, tmprintf( "@set %s=%s", strip_ansi( thingname ),
-                                  fp->flagname ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@set %s=%s", strip_ansi( thingname ), fp->flagname );
     }
 }

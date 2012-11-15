@@ -79,9 +79,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
              */
 
             if( !payfor( player, cost ) ) {
-                notify( player,
-                        tmprintf( "You don't have enough %s.",
-                                  mudconf.many_coins ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins );
                 return;
             }
         } else {
@@ -99,8 +97,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
             notify( player, "Your murder attempt failed." );
             buf1 = alloc_lbuf( "do_kill.failed" );
             bp = buf1;
-            safe_tmprintf_str( buf1, &bp,
-                               "%s tried to kill you!", Name( player ) );
+            safe_tmprintf_str( buf1, &bp, "%s tried to kill you!", Name( player ) );
             notify_with_cause( victim, player, buf1 );
             if( Suspect( player ) ) {
                 strcpy( buf1, Name( player ) );
@@ -257,11 +254,9 @@ static void give_thing( dbref giver, dbref recipient, int key, char *what ) {
     if( !( key & GIVE_QUIET ) ) {
         str = alloc_lbuf( "do_give.thing.ok" );
         strcpy( str, Name( giver ) );
-        notify_with_cause( recipient, giver,
-                           tmprintf( "%s gave you %s.", str, Name( thing ) ) );
+        notify_check( recipient, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,"%s gave you %s.", str, Name( thing ) );
         notify( giver, "Given." );
-        notify_with_cause( thing, giver,
-                           tmprintf( "%s gave you to %s.", str, Name( recipient ) ) );
+        notify_check( thing, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s gave you to %s.", str, Name( recipient ) );
         free_lbuf( str );
     }
     did_it( giver, thing, A_DROP, NULL, A_ODROP, NULL, A_ADROP,
@@ -282,30 +277,21 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
      */
 
     if( amount < 0 && !Steal( giver ) ) {
-        notify( giver,
-                tmprintf
-                ( "You look through your pockets. Nope, no negative %s.",
-                  mudconf.many_coins ) );
+        notify_check( giver, giver ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You look through your pockets. Nope, no negative %s.", mudconf.many_coins );
         return;
     }
     if( !amount ) {
-        notify( giver,
-                tmprintf( "You must specify a positive number of %s.",
-                          mudconf.many_coins ) );
+        notify_check( giver, giver ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You must specify a positive number of %s.", mudconf.many_coins );
         return;
     }
     if( !Wizard( giver ) ) {
         if( ( Typeof( recipient ) == TYPE_PLAYER ) &&
                 ( Pennies( recipient ) + amount > mudconf.paylimit ) ) {
-            notify( giver,
-                    tmprintf( "That player doesn't need that many %s!",
-                              mudconf.many_coins ) );
+            notify_check( giver, giver ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "That player doesn't need that many %s!", mudconf.many_coins );
             return;
         }
         if( !could_doit( giver, recipient, A_LRECEIVE ) ) {
-            notify( giver,
-                    tmprintf( "%s won't take your money.",
-                              Name( recipient ) ) );
+            notify_check( giver, giver ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s won't take your money.", Name( recipient ) );
             return;
         }
     }
@@ -314,9 +300,7 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
      */
 
     if( !payfor( giver, amount ) ) {
-        notify( giver,
-                tmprintf( "You don't have that many %s to give!",
-                          mudconf.many_coins ) );
+        notify_check( giver, giver ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have that many %s to give!", mudconf.many_coins );
         return;
     }
     /*
@@ -350,19 +334,11 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
 
     if( !( key & GIVE_QUIET ) ) {
         if( amount == 1 ) {
-            notify( giver,
-                    tmprintf( "You give a %s to %s.",
-                              mudconf.one_coin, Name( recipient ) ) );
-            notify_with_cause( recipient, giver,
-                               tmprintf( "%s gives you a %s.", Name( giver ),
-                                         mudconf.one_coin ) );
+            notify_check( giver, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You give a %s to %s.", mudconf.one_coin, Name( recipient ) );
+            notify_check( recipient, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s gives you a %s.", Name( giver ), mudconf.one_coin );
         } else {
-            notify( giver,
-                    tmprintf( "You give %d %s to %s.", amount,
-                              mudconf.many_coins, Name( recipient ) ) );
-            notify_with_cause( recipient, giver,
-                               tmprintf( "%s gives you %d %s.", Name( giver ),
-                                         amount, mudconf.many_coins ) );
+            notify_check( giver, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You give %d %s to %s.", amount, mudconf.many_coins, Name( recipient ) );
+            notify_check( recipient, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s gives you %d %s.", Name( giver ), amount, mudconf.many_coins );
         }
     }
     /*
@@ -370,13 +346,10 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
      */
 
     if( ( amount - cost ) == 1 ) {
-        notify( giver,
-                tmprintf( "You get 1 %s in change.", mudconf.one_coin ) );
+        notify_check( giver, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You get 1 %s in change.", mudconf.one_coin );
         giveto( giver, 1 );
     } else if( amount != cost ) {
-        notify( giver,
-                tmprintf( "You get %d %s in change.",
-                          ( amount - cost ), mudconf.many_coins ) );
+        notify_check( giver, giver, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You get %d %s in change.", ( amount - cost ), mudconf.many_coins );
         giveto( giver, ( amount - cost ) );
     }
     /*
@@ -384,8 +357,7 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
      */
 
     giveto( recipient, cost );
-    did_it( giver, recipient, A_PAY, NULL, A_OPAY, NULL, A_APAY,
-            0, ( char ** ) NULL, 0, MSG_PRESENCE );
+    did_it( giver, recipient, A_PAY, NULL, A_OPAY, NULL, A_APAY, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
     return;
 }
 

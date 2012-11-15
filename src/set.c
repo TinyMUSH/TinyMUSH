@@ -276,9 +276,7 @@ static void set_player_aliases( dbref player, dbref target, char *oldalias, char
      */
 
     if( n_aliases > mudconf.max_player_aliases ) {
-        notify_quiet( player,
-                      tmprintf( "You cannot have more than %d aliases.",
-                                mudconf.max_player_aliases ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "You cannot have more than %d aliases.", mudconf.max_player_aliases );
         retcode = 0;
     }
 
@@ -288,15 +286,11 @@ static void set_player_aliases( dbref player, dbref target, char *oldalias, char
 
     for( i = 0; retcode && ( i < n_aliases ); i++ ) {
         if( lookup_player( NOTHING, alias_ptrs[i], 0 ) != NOTHING ) {
-            notify_quiet( player,
-                          tmprintf( "The name '%s' is already in use.",
-                                    alias_ptrs[i] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "The name '%s' is already in use.", alias_ptrs[i] );
             retcode = 0;
         } else if( !( badname_check( alias_ptrs[i] ) &&
                       ok_player_name( alias_ptrs[i] ) ) ) {
-            notify_quiet( player,
-                          tmprintf( "You cannot use '%s' as an alias.",
-                                    alias_ptrs[i] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "You cannot use '%s' as an alias.", alias_ptrs[i] );
             retcode = 0;
         } else {
 
@@ -306,10 +300,7 @@ static void set_player_aliases( dbref player, dbref target, char *oldalias, char
 
             for( j = i + 1; retcode && ( j < n_aliases ); j++ ) {
                 if( !strcasecmp( alias_ptrs[i], alias_ptrs[j] ) ) {
-                    notify_quiet( player,
-                                  tmprintf
-                                  ( "You have duplicated '%s' in your alias list.",
-                                    alias_ptrs[i] ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "You have duplicated '%s' in your alias list.", alias_ptrs[i] );
                     retcode = 0;
                 }
             }
@@ -329,10 +320,7 @@ static void set_player_aliases( dbref player, dbref target, char *oldalias, char
         } else {
 
             retcode = 0;
-            notify_quiet( player,
-                          tmprintf
-                          ( "The alias '%s' is already in use or is illegal.",
-                            alias_ptrs[i] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "The alias '%s' is already in use or is illegal.", alias_ptrs[i] );
 
             /*
              * Ugh. Now we have to delete aliases we added up 'til now.
@@ -1074,20 +1062,13 @@ void do_cpattr( dbref player, dbref cause, int key, char *oldpair, char *newpair
     }
 
     olist_push();
-    if( parse_attrib_wild( player,
-                           ( ( strchr( oldpair, '/' ) == NULL ) ?
-                             tmprintf( "me/%s", oldpair ) : oldpair ),
-                           &oldthing, 0, 0, 1, 0 ) ) {
+    if( parse_attrib_wild( player, ( ( strchr( oldpair, '/' ) == NULL ) ? tmprintf( "me/%s", oldpair ) : oldpair ), &oldthing, 0, 0, 1, 0 ) ) {
         for( ca = olist_first(); ca != NOTHING; ca = olist_next() ) {
             oldattr = atr_num( ca );
             if( oldattr ) {
                 got = 1;
                 for( i = 0; i < nargs; i++ ) {
-                    do_set( player, cause, 0, newthings[i],
-                            tmprintf( "%s:_#%d/%s",
-                                      ( newattrs[i] ? newattrs[i] :
-                                        oldattr->name ), oldthing,
-                                      oldattr->name ) );
+                    do_set( player, cause, 0, newthings[i], tmprintf( "%s:_#%d/%s", ( newattrs[i] ? newattrs[i] : oldattr->name ), oldthing, oldattr->name ) );
                 }
             }
         }
@@ -1156,33 +1137,25 @@ void do_mvattr( dbref player, dbref cause, int key, char *what, char *args[], in
     for( i = 1; i < nargs; i++ ) {
         anum = mkattr( args[i] );
         if( anum <= 0 ) {
-            notify_quiet( player,
-                          tmprintf
-                          ( "%s: That's not a good name for an attribute.",
-                            args[i] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: That's not a good name for an attribute.", args[i] );
             continue;
         }
         out_attr = atr_num( anum );
         if( !out_attr ) {
-            notify_quiet( player,
-                          tmprintf( "%s: Permission denied.", args[i] ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Permission denied.", args[i] );
         } else if( out_attr->number == in_anum ) {
             no_delete = 1;
         } else {
             atr_get_info( thing, out_attr->number, &axowner,
                           &axflags );
             if( !Set_attr( player, thing, out_attr, axflags ) ) {
-                notify_quiet( player,
-                              tmprintf( "%s: Permission denied.",
-                                        args[i] ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Permission denied.", args[i] );
             } else {
                 atr_add( thing, out_attr->number, astr,
                          Owner( player ), aflags );
                 num_copied++;
                 if( !Quiet( player ) )
-                    notify_quiet( player,
-                                  tmprintf( "%s: Set.",
-                                            out_attr->name ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Set.", out_attr->name );
             }
         }
     }
@@ -1193,29 +1166,21 @@ void do_mvattr( dbref player, dbref cause, int key, char *what, char *args[], in
 
     if( num_copied < 1 ) {
         if( in_attr ) {
-            notify_quiet( player,
-                          tmprintf( "%s: Not copied anywhere. Not cleared.",
-                                    in_attr->name ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Not copied anywhere. Not cleared.", in_attr->name );
         } else {
-            notify_quiet( player,
-                          "Not copied anywhere. Non-existent attribute." );
+            notify_quiet( player, "Not copied anywhere. Non-existent attribute." );
         }
     } else if( ( in_anum > 0 ) && !no_delete ) {
         in_attr = atr_num( in_anum );
         if( in_attr && Set_attr( player, thing, in_attr, aflags ) ) {
             atr_clr( thing, in_attr->number );
             if( !Quiet( player ) )
-                notify_quiet( player,
-                              tmprintf( "%s: Cleared.", in_attr->name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Cleared.", in_attr->name );
         } else {
             if( in_attr ) {
-                notify_quiet( player,
-                              tmprintf
-                              ( "%s: Could not remove old attribute.  Permission denied.",
-                                in_attr->name ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: Could not remove old attribute.  Permission denied.", in_attr->name );
             } else {
-                notify_quiet( player,
-                              "Could not remove old attribute. Non-existent attribute." );
+                notify_quiet( player, "Could not remove old attribute. Non-existent attribute." );
             }
         }
     }
@@ -1415,9 +1380,7 @@ void edit_string_ansi( char *src, char **dst, char **returnstr, char *from, char
     edit_string( src, dst, from, to );
 
     if( mudconf.ansi_colors ) {
-        edit_string( src, returnstr, from,
-                     tmprintf( "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL,
-                               ANSI_NORMAL ) );
+        edit_string( src, returnstr, from, tmprintf( "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL ) );
     } else {
         *returnstr = alloc_lbuf( "edit_string_ansi" );
         strcpy( *returnstr, *dst );
@@ -1493,9 +1456,7 @@ void do_edit( dbref player, dbref cause, int key, char *it, char *args[], int na
                     atr_add( thing, ap->number, result,
                              Owner( player ), aflags );
                     if( !Quiet( player ) )
-                        notify_quiet( player,
-                                      tmprintf( "Set - %s: %s",
-                                                ap->name, returnstr ) );
+                        notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME, "Set - %s: %s", ap->name, returnstr );
                 }
                 free_lbuf( result );
                 free_lbuf( returnstr );
@@ -1505,9 +1466,7 @@ void do_edit( dbref player, dbref cause, int key, char *it, char *args[], int na
                  * No rights to change the attr
                  */
 
-                notify_quiet( player,
-                              tmprintf( "%s: Permission denied.",
-                                        ap->name ) );
+                notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME, "%s: Permission denied.", ap->name );
             }
 
         }
@@ -1590,11 +1549,7 @@ void do_trigger( dbref player, dbref cause, int key, char *object, char *argv[],
 
     int attrib;
 
-    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 )
-             && ( attrib != NOTHING ) ) ||
-            ( parse_attrib( player, tmprintf( "me/%s", object ),
-                            &thing, &attrib, 0 )
-              && ( attrib != NOTHING ) ) ) ) {
+    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, tmprintf( "me/%s", object ), &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
         notify_quiet( player, "No match." );
         return;
     }
@@ -1664,8 +1619,7 @@ void do_use( dbref player, dbref cause, int key, char *object ) {
         safe_tmprintf_str( df_use, &bp, "You use %s", Name( thing ) );
         bp = df_ouse;
         safe_tmprintf_str( df_ouse, &bp, "uses %s", Name( thing ) );
-        did_it( player, thing, A_USE, df_use, A_OUSE, df_ouse, A_AUSE,
-                1, ( char ** ) NULL, 0, MSG_PRESENCE );
+        did_it( player, thing, A_USE, df_use, A_OUSE, df_ouse, A_AUSE, 1, ( char ** ) NULL, 0, MSG_PRESENCE );
         free_lbuf( df_use );
         free_lbuf( df_ouse );
     } else {

@@ -689,12 +689,8 @@ static void fix_typed_quotas( void ) {
             if( !rqbuf || !*rqbuf ) {
                 rqbuf = ( char * ) "0";
             }
-            atr_add_raw( i, A_QUOTA,
-                         tmprintf( "%s %s %s %s %s",
-                                   qbuf, qbuf, qbuf, qbuf, qbuf ) );
-            atr_add_raw( i, A_RQUOTA,
-                         tmprintf( "%s %s %s %s %s",
-                                   rqbuf, rqbuf, rqbuf, rqbuf, rqbuf ) );
+            atr_add_raw( i, A_QUOTA, tmprintf( "%s %s %s %s %s", qbuf, qbuf, qbuf, qbuf, qbuf ) );
+            atr_add_raw( i, A_RQUOTA, tmprintf( "%s %s %s %s %s", rqbuf, rqbuf, rqbuf, rqbuf, rqbuf ) );
         }
     }
 }

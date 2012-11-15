@@ -1225,44 +1225,13 @@ static void dump_users( DESC *e, char *match, int key ) {
 
             if( ( e->flags & DS_CONNECTED ) && Wizard_Who( e->player )
                     && ( key == CMD_WHO ) ) {
-                sprintf( buf,
-                         "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n",
-                         trimmed_name( d->player ),
-                         time_format_1( mudstate.now -
-                                        d->connected_at ),
-                         time_format_2( mudstate.now - d->last_time ),
-                         flist, Location( d->player ),
-                         d->command_count, slist,
-                         trimmed_site( ( ( d->username[0] !=
-                                           '\0' ) ? tmprintf( "%s@%s",
-                                                   d->username,
-                                                   d->addr ) : d->addr ) ) );
+                sprintf( buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), flist, Location( d->player ), d->command_count, slist, trimmed_site( ( ( d->username[0] != '\0' ) ? tmprintf( "%s@%s", d->username, d->addr ) : d->addr ) ) );
             } else if( key == CMD_SESSION ) {
-                sprintf( buf,
-                         "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n",
-                         trimmed_name( d->player ),
-                         time_format_1( mudstate.now -
-                                        d->connected_at ),
-                         time_format_2( mudstate.now - d->last_time ),
-                         d->descriptor, d->input_size,
-                         d->input_lost, d->input_tot,
-                         d->output_size, d->output_lost,
-                         d->output_tot );
-            } else if( Wizard_Who( e->player )
-                       || See_Hidden( e->player ) ) {
-                sprintf( buf, "%-16s%9s %4s%-3s%s\r\n",
-                         trimmed_name( d->player ),
-                         time_format_1( mudstate.now -
-                                        d->connected_at ),
-                         time_format_2( mudstate.now - d->last_time ),
-                         flist, d->doing );
+                sprintf( buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot );
+            } else if( Wizard_Who( e->player ) || See_Hidden( e->player ) ) {
+                sprintf( buf, "%-16s%9s %4s%-3s%s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), flist, d->doing );
             } else {
-                sprintf( buf, "%-16s%9s %4s  %s\r\n",
-                         trimmed_name( d->player ),
-                         time_format_1( mudstate.now -
-                                        d->connected_at ),
-                         time_format_2( mudstate.now - d->last_time ),
-                         d->doing );
+                sprintf( buf, "%-16s%9s %4s  %s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), d->doing );
             }
             queue_string( e, buf );
         }
@@ -1272,10 +1241,7 @@ static void dump_users( DESC *e, char *match, int key ) {
      * sometimes I like the ternary operator....
      */
 
-    sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count,
-             ( count == 1 ) ? " " : "s ", mudstate.record_players,
-             ( mudconf.max_players == -1 ) ?
-             "no" : tmprintf( "%d", mudconf.max_players ) );
+    sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, ( count == 1 ) ? " " : "s ", mudstate.record_players, ( mudconf.max_players == -1 ) ? "no" : tmprintf( "%d", mudconf.max_players ) ); 
     queue_rawstring( e, buf );
 
 #ifdef PUEBLO_SUPPORT
@@ -1314,13 +1280,10 @@ static void dump_info( DESC *call_by ) {
     queue_rawstring( call_by, tmprintf( "Connected: %d\r\n", count ) );
 
     queue_rawstring( call_by, tmprintf( "Size: %d\r\n", mudstate.db_top ) );
-    queue_rawstring( call_by, tmprintf( "Version: %d.%d.%d.%d\r\n",
-                                        mudstate.version.major, mudstate.version.minor,
-                                        mudstate.version.status, mudstate.version.revision ) );
+    queue_rawstring( call_by, tmprintf( "Version: %d.%d.%d.%d\r\n", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision ) );
 
     for( llp = mudconf.infotext_list; llp != NULL; llp = llp->next ) {
-        queue_rawstring( call_by,
-                         tmprintf( "%s: %s\r\n", llp->name, llp->value ) );
+        queue_rawstring( call_by, tmprintf( "%s: %s\r\n", llp->name, llp->value ) );
     }
 
     queue_rawstring( call_by, "### End INFO\r\n" );
@@ -1433,14 +1396,13 @@ void do_doing( dbref player, dbref cause, int key, char *arg ) {
             over = sane_doing( arg, mudstate.doing_hdr );
         }
         if( over ) {
-            notify( player,
-                    tmprintf( "Warning: %d characters lost.", over ) );
+            notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Warning: %d characters lost.", over );
         }
         if( !Quiet( player ) && !( key & DOING_QUIET ) ) {
             notify( player, "Set." );
         }
     } else if( key & DOING_POLL ) {
-        notify( player, tmprintf( "Poll: %s", mudstate.doing_hdr ) );
+        notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Poll: %s", mudstate.doing_hdr );
     } else {
         foundany = 0;
         DESC_ITER_PLAYER( player, d ) {
@@ -1449,9 +1411,7 @@ void do_doing( dbref player, dbref cause, int key, char *arg ) {
         }
         if( foundany ) {
             if( over ) {
-                notify( player,
-                        tmprintf( "Warning: %d characters lost.",
-                                  over ) );
+                notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Warning: %d characters lost.", over );
             }
             if( !Quiet( player ) && !( key & DOING_QUIET ) ) {
                 notify( player, "Set." );
@@ -2186,9 +2146,7 @@ void make_sessioninfo( dbref player, dbref target, int port_num, char *buff, cha
     DESC_ITER_CONN( d ) {
         if( ( d->descriptor == port_num ) || ( d->player == target ) ) {
             if( Wizard_Who( player ) || Controls( player, d->player ) ) {
-                safe_str( tmprintf( "%d %d %d", d->command_count,
-                                    d->input_tot, d->output_tot ), buff,
-                          bufc );
+                safe_str( tmprintf( "%d %d %d", d->command_count, d->input_tot, d->output_tot ), buff, bufc );
                 return;
             } else {
                 notify_quiet( player, NOPERM_MESSAGE );

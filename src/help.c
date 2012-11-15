@@ -326,17 +326,16 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
             }
         }
         if( matched == 0 ) {
-            notify( player, tmprintf( "No entry for '%s'.", topic ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "No entry for '%s'.", topic );
         } else {
-            notify( player,
-                    tmprintf( "Here are the entries which match '%s':", topic ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Here are the entries which match '%s':", topic );
             *buffp = '\0';
             notify( player, topic_list );
             free_lbuf( topic_list );
         }
         return;
     } else {
-        notify( player, tmprintf( "No entry for '%s'.", topic ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "No entry for '%s'.", topic );
         return;
     }
     if( ( fp = tf_fopen( filename, O_RDONLY ) ) == NULL ) {

@@ -1711,8 +1711,7 @@ static void tables_helper( char *list, int *last_state, int n_cols, int col_widt
     nstates = list2ansi( states, last_state, LBUF_SIZE / 2, list, list_sep );
     nwords = list2arr( &words, LBUF_SIZE / 2, list, list_sep );
     if( nstates != nwords ) {
-        safe_tmprintf_str( buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d",
-                           nstates, nwords );
+        safe_tmprintf_str( buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d", nstates, nwords );
         XFREE( words, "tables_helper.words" );
         return;
     }

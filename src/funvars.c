@@ -349,15 +349,11 @@ void fun_setq( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     int result, count, i;
 
     if( nfargs < 2 ) {
-        safe_tmprintf_str( buff, bufc,
-                           "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d",
-                           nfargs );
+        safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs );
         return;
     }
     if( nfargs % 2 != 0 ) {
-        safe_tmprintf_str( buff, bufc,
-                           "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d",
-                           nfargs );
+        safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d", nfargs );
         return;
     }
     if( nfargs > MAX_NFARGS - 2 ) {
@@ -367,9 +363,7 @@ void fun_setq( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
          * contain the remaining args. Cut them off at the
          * fourteenth.
          */
-        safe_tmprintf_str( buff, bufc,
-                           "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d",
-                           MAX_NFARGS - 2, nfargs );
+        safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs );
         return;
     }
     if( nfargs == 2 ) {
@@ -389,8 +383,7 @@ void fun_setq( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
     }
     if( count > 0 )
-        safe_tmprintf_str( buff, bufc, "#-1 ENCOUNTERED %d ERRORS",
-                           count );
+        safe_tmprintf_str( buff, bufc, "#-1 ENCOUNTERED %d ERRORS", count );
 }
 
 void fun_setr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
@@ -1792,9 +1785,7 @@ void fun_construct( char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     VaChk_In( 2, 5 );
     if( nfargs == 3 ) {
-        safe_tmprintf_str( buff, bufc,
-                           "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d",
-                           nfargs );
+        safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d", nfargs );
         return;
     }
     /*
@@ -4032,8 +4023,7 @@ void fun_gridmake( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         data_elems =
             list2arr( &elem_text, LBUF_SIZE / 2, row_text[r], &csep );
         if( data_elems > cols ) {
-            safe_tmprintf_str( buff, bufc,
-                               "#-1 ROW %d HAS TOO MANY ELEMS", r );
+            safe_tmprintf_str( buff, bufc, "#-1 ROW %d HAS TOO MANY ELEMS", r );
             free_lbuf( rbuf );
             grid_free( player, ogp );
             return;
@@ -4052,7 +4042,7 @@ void fun_gridsize( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if( !ogp ) {
         safe_str( "0 0", buff, bufc );
     } else {
-        safe_tmprintf_str( buff, bufc, "%d %d", ogp->rows, ogp->cols );
+        safe_tmprintf_str( buff, bufc, "%d %d", ogp->rows, ogp->cols ); 
     }
 }
 
@@ -4086,8 +4076,7 @@ void fun_gridset( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         c = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) - 1;
         grid_set( ogp, r, c, fargs[2], errs );
         if( errs ) {
-            safe_tmprintf_str( buff, bufc,
-                               "#-1 GOT %d OUT OF RANGE ERRORS", errs );
+            safe_tmprintf_str( buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs );
         }
         return;
     }
@@ -4162,8 +4151,7 @@ void fun_gridset( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         free_lbuf( ylist );
     }
     if( errs ) {
-        safe_tmprintf_str( buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS",
-                           errs );
+        safe_tmprintf_str( buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs );
     }
 }
 

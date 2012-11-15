@@ -1464,7 +1464,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
     log_write( LOG_ALWAYS, "BCK", "INFO", "Found %d db files to backup", dbf_n - 1 );
 
     if( player != NOTHING ) {
-        notify( player, tmprintf( "Found, %d text files, %d config files and %d db files to backup", txt_n - 1, cnf_n - 1, dbf_n - 1 ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Found, %d text files, %d config files and %d db files to backup", txt_n - 1, cnf_n - 1, dbf_n - 1 );
     }
 
     /* We have everything we need to backup, create a temp directory*/
@@ -1571,7 +1571,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
     log_write( LOG_ALWAYS, "BCK", "RUN", "Executing external command %s", s );
 
     if( player != NOTHING ) {
-        notify( player, tmprintf( "Executing external command %s", s ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Executing external command %s", s );
     }
 
     if( ( fp = popen( s, "r" ) ) != NULL ) {
@@ -1622,7 +1622,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
         if( unlink( s ) == -1 ) {
             log_write( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if( player != NOTHING ) {
-                notify( player, tmprintf( "Unable to remove file %s", s ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove file %s", s );
             }
         }
         XFREE( txt[i], "backup_mush" );
@@ -1636,7 +1636,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
         if( unlink( s ) == -1 ) {
             log_write( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if( player != NOTHING ) {
-                notify( player, tmprintf( "Unable to remove file %s", s ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove file %s", s );
             }
         }
         XFREE( cnf[i], "backup_mush" );
@@ -1650,7 +1650,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
         if( unlink( s ) == -1 ) {
             log_write( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
             if( player != NOTHING ) {
-                notify( player, tmprintf( "Unable to remove file %s", s ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove file %s", s );
             }
         }
         XFREE( dbf[i], "backup_mush" );
@@ -1663,7 +1663,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
     if( unlink( s ) == -1 ) {
         log_write( LOG_ALWAYS, "BCK", "UNLK", "Unable to remove file %s", s );
         if( player != NOTHING ) {
-            notify( player, tmprintf( "Unable to remove file %s", s ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove file %s", s );
         }
     }
     XFREE( s, "backup_mush" );
@@ -1671,7 +1671,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
     if( rmdir( tmpdir ) == -1 ) {
         log_write( LOG_ALWAYS, "BCK", "RMDIR", "Unable to remove directory %s", tmpdir );
         if( player != NOTHING ) {
-            notify( player, tmprintf( "Unable to remove directory %s", tmpdir ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove directory %s", tmpdir );
         }
     }
 

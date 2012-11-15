@@ -393,8 +393,7 @@ dbref create_obj( dbref player, int objtype, char *name, int cost ) {
             break;
         }
         if( lookup_player( NOTHING, buff, 0 ) != NOTHING ) {
-            notify( player,
-                    tmprintf( "The name %s is already taken.", name ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "The name %s is already taken.", name );
             free_lbuf( buff );
             return NOTHING;
         }
@@ -407,7 +406,7 @@ dbref create_obj( dbref player, int objtype, char *name, int cost ) {
     }
 
     if( !okname ) {
-        notify( player, tmprintf( "That's a silly name for %s!", tname ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "That's a silly name for %s!", tname );
         return NOTHING;
     }
 
@@ -628,23 +627,16 @@ void destroy_obj( dbref player, dbref obj ) {
         }
         payfees( owner, -val, -quota, Typeof( obj ) );
         if( !Quiet( owner ) && !Quiet( obj ) )
-            notify( owner,
-                    tmprintf
-                    ( "You get back your %d %s deposit for %s(#%d).",
-                      val, mudconf.one_coin, Name( obj ), obj ) );
+            notify_check( owner, owner, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You get back your %d %s deposit for %s(#%d).", val, mudconf.one_coin, Name( obj ), obj );
     }
     if( ( player != NOTHING ) && !Quiet( player ) ) {
         if( good_owner && Owner( player ) != owner ) {
             if( owner == obj ) {
-                notify( player,
-                        tmprintf( "Destroyed. %s(#%d)",
-                                  Name( obj ), obj ) );
+                notify_check( owner, owner, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Destroyed. %s(#%d)", Name( obj ), obj );
             } else {
                 tname = alloc_sbuf( "destroy_obj" );
                 strcpy( tname, Name( owner ) );
-                notify( player,
-                        tmprintf( "Destroyed. %s's %s(#%d)",
-                                  tname, Name( obj ), obj ) );
+                notify_check( player, player,  MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Destroyed. %s's %s(#%d)", tname, Name( obj ), obj );
                 free_sbuf( tname );
             }
         } else if( !Quiet( obj ) ) {
@@ -881,7 +873,7 @@ void destroy_player( dbref victim ) {
     move_via_generic( victim, NOTHING, player, 0 );
     CALL_ALL_MODULES( destroy_player, ( player, victim ) );
     destroy_obj( NOTHING, victim );
-    notify_quiet( player, tmprintf( "(%d objects @chowned to you)", count ) );
+    notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME,  "(%d objects @chowned to you)", count );
 }
 
 static void purge_going( void ) {
@@ -961,9 +953,7 @@ do { \
 				owner = Owner(i); \
 				if (Good_owner(owner) && \
 				    !Quiet(i) && !Quiet(owner)) { \
-					notify(owner, \
-					tmprintf("%s cleared on %s(#%d)", \
-						crt__label, Name(i), i)); \
+					notify_check(owner , owner, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s cleared on %s(#%d)", crt__label, Name(i), i );\
 				} \
 			} else { \
 				Log_header_err(i, Location(i), targ, 1, \

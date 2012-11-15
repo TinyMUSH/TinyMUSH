@@ -207,7 +207,7 @@ void move_object( dbref thing, dbref dest ) {
             ( Pennies( thing ) < mudconf.paylimit ) &&
             ( !Controls( thing, dest ) ) && ( Randomize( mudconf.payfind ) == 0 ) ) {
         giveto( thing, 1 );
-        notify( thing, tmprintf( "You found a %s!", mudconf.one_coin ) );
+        notify_check( thing, thing, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You found a %s!", mudconf.one_coin );
     }
 }
 
@@ -667,9 +667,7 @@ void do_get( dbref player, dbref cause, int key, char *what ) {
             notify( player, "You cannot get yourself!" );
         } else if( could_doit( player, thing, A_LOCK ) ) {
             if( thingloc != Location( player ) ) {
-                notify( thingloc,
-                        tmprintf( "%s was taken from you.",
-                                  Name( thing ) ) );
+                notify_check( thingloc, thingloc, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s was taken from you.", Name( thing ) );
             }
             move_via_generic( thing, player, player, 0 );
             notify( thing, "Taken." );

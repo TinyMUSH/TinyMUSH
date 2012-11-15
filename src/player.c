@@ -145,24 +145,13 @@ void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lus
     if( isgood ) {
         if( login_info.new_bad > 0 ) {
             notify( player, "" );
-            notify( player,
-                    tmprintf
-                    ( "**** %d failed connect%s since your last successful connect. ****",
-                      login_info.new_bad,
-                      ( login_info.new_bad == 1 ? "" : "s" ) ) );
-            notify( player,
-                    tmprintf( "Most recent attempt was from %s on %s.",
-                              login_info.bad[0].host,
-                              login_info.bad[0].dtm ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "**** %d failed connect%s since your last successful connect. ****", login_info.new_bad, ( login_info.new_bad == 1 ? "" : "s" ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Most recent attempt was from %s on %s.", login_info.bad[0].host, login_info.bad[0].dtm );
             notify( player, "" );
             login_info.new_bad = 0;
         }
-        if( login_info.good[0].host && *login_info.good[0].host &&
-                login_info.good[0].dtm && *login_info.good[0].dtm ) {
-            notify( player,
-                    tmprintf( "Last connect was from %s on %s.",
-                              login_info.good[0].host,
-                              login_info.good[0].dtm ) );
+        if( login_info.good[0].host && *login_info.good[0].host && login_info.good[0].dtm && *login_info.good[0].dtm ) {
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Last connect was from %s on %s.", login_info.good[0].host, login_info.good[0].dtm );
         }
 
         for( i = NUM_GOOD - 1; i > 0; i-- ) {
@@ -173,8 +162,7 @@ void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lus
         login_info.good[0].host = lhost;
         login_info.tot_good++;
         if( *lusername )
-            atr_add_raw( player, A_LASTSITE, tmprintf( "%s@%s",
-                         lusername, lhost ) );
+            atr_add_raw( player, A_LASTSITE, tmprintf( "%s@%s", lusername, lhost ) );
         else {
             atr_add_raw( player, A_LASTSITE, lhost );
         }
@@ -352,8 +340,7 @@ void do_password( dbref player, dbref cause, int key, char *oldpass, char *newpa
 
 static void disp_from_on( dbref player, char *dtm_str, char *host_str ) {
     if( dtm_str && *dtm_str && host_str && *host_str ) {
-        notify( player,
-                tmprintf( "     From: %s   On: %s", dtm_str, host_str ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "     From: %s   On: %s", dtm_str, host_str );
     }
 }
 
@@ -382,17 +369,13 @@ void do_last( dbref player, dbref cause, int key, char *who ) {
         atrbuf = atr_get( target, A_LOGINDATA, &aowner, &aflags, &alen );
         decrypt_logindata( atrbuf, &login_info );
 
-        notify( player, tmprintf( "Total successful connects: %d",
-                                  login_info.tot_good ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Total successful connects: %d", login_info.tot_good );
         for( i = 0; i < NUM_GOOD; i++ ) {
-            disp_from_on( player,
-                          login_info.good[i].host, login_info.good[i].dtm );
+            disp_from_on( player, login_info.good[i].host, login_info.good[i].dtm );
         }
-        notify( player, tmprintf( "Total failed connects: %d",
-                                  login_info.tot_bad ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Total failed connects: %d", login_info.tot_bad );
         for( i = 0; i < NUM_BAD; i++ ) {
-            disp_from_on( player,
-                          login_info.bad[i].host, login_info.bad[i].dtm );
+            disp_from_on( player, login_info.bad[i].host, login_info.bad[i].dtm );
         }
         free_lbuf( atrbuf );
     }

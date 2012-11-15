@@ -109,31 +109,15 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
                     e = buff;
                     safe_exit_name( thing, buff, &e );
                     if( Location( thing ) == NOTHING ) {
-                        notify( player,
-                                tmprintf
-                                ( "%s leads nowhere.",
-                                  buff ) );
-                    } else if( Location( thing ) ==
-                               AMBIGUOUS ) {
-                        notify( player,
-                                tmprintf
-                                ( "%s leads somewhere.",
-                                  buff ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s leads nowhere.", buff );
+                    } else if( Location( thing ) == AMBIGUOUS ) {
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s leads somewhere.", buff );
                     } else if( Location( thing ) == HOME ) {
-                        notify( player,
-                                tmprintf( "%s leads home.",
-                                          buff ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s leads home.", buff );
                     } else if( Good_obj( Location( thing ) ) ) {
-                        notify( player,
-                                tmprintf( "%s leads to %s.",
-                                          buff,
-                                          Name( Location
-                                                ( thing ) ) ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s leads to %s.", buff, Name( Location ( thing ) ) );
                     } else {
-                        notify( player,
-                                tmprintf
-                                ( "%s leads elsewhere.",
-                                  buff ) );
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s leads elsewhere.", buff );
                     }
                 }
             }
@@ -653,22 +637,17 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
             notify( player, buf );
         } else {
             if( is_special == 0 ) {
-                buf = tmprintf( "%s%s:%s %s",
-                                ANSI_HILITE, ap->name, ANSI_NORMAL, text );
+                buf = tmprintf( "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
                 notify( player, buf );
             } else if( is_special == 1 ) {
                 buf = alloc_lbuf( "view_atr.pretty" );
-                pretty_print( buf,
-                              tmprintf( "%s%s:%s ",
-                                        ANSI_HILITE, ap->name, ANSI_NORMAL ),
-                              text );
+                pretty_print( buf, tmprintf( "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL ), text );
                 notify( player, buf );
                 free_lbuf( buf );
             } else {
                 buf = alloc_lbuf( "view_atr.pairs" );
                 bp = buf;
-                safe_tmprintf_str( buf, &bp, "%s%s:%s ",
-                                   ANSI_HILITE, ap->name, ANSI_NORMAL );
+                safe_tmprintf_str( buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
                 pairs_print( player, text, buf, &bp );
                 *bp = '\0';
                 notify( player, buf );
@@ -696,14 +675,11 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
 
     if( is_special == 1 ) {
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            name_buf = tmprintf( "%s%s [#%d%s]:%s ",
-                                 ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
+            name_buf = tmprintf( "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
         } else if( *fbp ) {
-            name_buf = tmprintf( "%s%s [%s]:%s ",
-                                 ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
+            name_buf = tmprintf( "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            name_buf = tmprintf( "%s%s:%s ", ANSI_HILITE, ap->name,
-                                 ANSI_NORMAL );
+            name_buf = tmprintf( "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
         } else {
             name_buf = ( char * ) "";
             buf = text;
@@ -716,14 +692,11 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
         buf = alloc_lbuf( "view_atr.pairs_print" );
         bb_p = buf;
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s [#%d%s]:%s ",
-                               ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
+            safe_tmprintf_str( buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
         } else if( *fbp ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s [%s]:%s ",
-                               ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
+            safe_tmprintf_str( buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s:%s ",
-                               ANSI_HILITE, ap->name, ANSI_NORMAL );
+            safe_tmprintf_str( buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
         } else {
             /*
              * Just fine the way it is
@@ -735,15 +708,11 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
         free_lbuf( buf );
     } else {
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            buf = tmprintf( "%s%s [#%d%s]:%s %s",
-                            ANSI_HILITE, ap->name, aowner, fbp,
-                            ANSI_NORMAL, text );
+            buf = tmprintf( "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text );
         } else if( *fbp ) {
-            buf = tmprintf( "%s%s [%s]:%s %s",
-                            ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text );
+            buf = tmprintf( "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            buf = tmprintf( "%s%s:%s %s", ANSI_HILITE, ap->name,
-                            ANSI_NORMAL, text );
+            buf = tmprintf( "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
         } else {
             buf = text;
         }
@@ -1167,30 +1136,30 @@ static void debug_examine( dbref player, dbref thing ) {
 
     char *as, *cp, nbuf[20];
 
-    notify( player, tmprintf( "Number  = %d", thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,  "Number  = %d", thing );
     if( !Good_obj( thing ) ) {
         return;
     }
 
-    notify( player, tmprintf( "Name    = %s", Name( thing ) ) );
-    notify( player, tmprintf( "Location= %d", Location( thing ) ) );
-    notify( player, tmprintf( "Contents= %d", Contents( thing ) ) );
-    notify( player, tmprintf( "Exits   = %d", Exits( thing ) ) );
-    notify( player, tmprintf( "Link    = %d", Link( thing ) ) );
-    notify( player, tmprintf( "Next    = %d", Next( thing ) ) );
-    notify( player, tmprintf( "Owner   = %d", Owner( thing ) ) );
-    notify( player, tmprintf( "Pennies = %d", Pennies( thing ) ) );
-    notify( player, tmprintf( "Zone    = %d", Zone( thing ) ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Name    = %s", Name( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Location= %d", Location( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Contents= %d", Contents( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Exits   = %d", Exits( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Link    = %d", Link( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Next    = %d", Next( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Owner   = %d", Owner( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Pennies = %d", Pennies( thing ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Zone    = %d", Zone( thing ) );
     buf = flag_description( player, thing );
-    notify( player, tmprintf( "Flags   = %s", buf ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Flags   = %s", buf );
     free_mbuf( buf );
     buf = power_description( player, thing );
-    notify( player, tmprintf( "Powers  = %s", buf ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Powers  = %s", buf );
     free_mbuf( buf );
     buf = atr_get( thing, A_LOCK, &aowner, &aflags, &alen );
     bool = parse_boolexp( player, buf, 1 );
     free_lbuf( buf );
-    notify( player, tmprintf( "Lock    = %s", unparse_boolexp( player, bool ) ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Lock    = %s", unparse_boolexp( player, bool ) );
     free_boolexp( bool );
 
     buf = alloc_lbuf( "debug_examine" );
@@ -1405,14 +1374,10 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
             if( mudconf.read_rem_name ) {
                 buf2 = alloc_lbuf( "do_examine.pub_name" );
                 strcpy( buf2, Name( thing ) );
-                notify( player,
-                        tmprintf( "%s is owned by %s",
-                                  buf2, Name( Owner( thing ) ) ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s is owned by %s", buf2, Name( Owner( thing ) ) );
                 free_lbuf( buf2 );
             } else {
-                notify( player,
-                        tmprintf( "Owned by %s",
-                                  Name( Owner( thing ) ) ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Owned by %s", Name( Owner( thing ) ) );
             }
             return;
         }
@@ -1450,23 +1415,20 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
         buf = unparse_boolexp( player, bool );
         free_boolexp( bool );
         strcpy( buf2, Name( Owner( thing ) ) );
-        notify( player,
-                tmprintf( "Owner: %s  Key: %s %s: %d", buf2, buf,
-                          mudconf.many_coins, Pennies( thing ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mudconf.many_coins, Pennies( thing ) );
         free_lbuf( buf2 );
         mudconf.many_coins[0] = savec;
 
         buf2 = ( char * ) ctime( &CreateTime( thing ) );
         buf2[strlen( buf2 ) - 1] = '\0';
-        notify( player, tmprintf( "Created: %s", buf2 ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Created: %s", buf2 );
 
         buf2 = ( char * ) ctime( &save_access_time );
         buf2[strlen( buf2 ) - 1] = '\0';
         strcpy( timebuf, buf2 );
         buf2 = ( char * ) ctime( &ModTime( thing ) );
         buf2[strlen( buf2 ) - 1] = '\0';
-        notify( player,
-                tmprintf( "Accessed: %s    Modified: %s", timebuf, buf2 ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, buf2 );
 
         /*
          * Print the zone
@@ -1474,7 +1436,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
 
         if( mudconf.have_zones ) {
             buf2 = unparse_object( player, Zone( thing ), 0 );
-            notify( player, tmprintf( "Zone: %s", buf2 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Zone: %s", buf2 );
             free_lbuf( buf2 );
         }
         /*
@@ -1484,7 +1446,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
         loc = Parent( thing );
         if( loc != NOTHING ) {
             buf2 = unparse_object( player, loc, 0 );
-            notify( player, tmprintf( "Parent: %s", buf2 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Parent: %s", buf2 );
             free_lbuf( buf2 );
         }
 
@@ -1549,11 +1511,8 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
              */
 
             if( Dropto( thing ) != NOTHING ) {
-                buf2 = unparse_object( player,
-                                       Dropto( thing ), 0 );
-                notify( player,
-                        tmprintf( "Dropped objects go to: %s",
-                                  buf2 ) );
+                buf2 = unparse_object( player, Dropto( thing ), 0 );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Dropped objects go to: %s", buf2 );
                 free_lbuf( buf2 );
             }
             break;
@@ -1581,7 +1540,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
 
             loc = Home( thing );
             buf2 = unparse_object( player, loc, 0 );
-            notify( player, tmprintf( "Home: %s", buf2 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Home: %s", buf2 );
             free_lbuf( buf2 );
 
             /*
@@ -1589,18 +1548,15 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
              */
 
             loc = Location( thing );
-            if( ( Location( thing ) != NOTHING ) &&
-                    ( Examinable( player, loc ) ||
-                      Examinable( player, thing ) ||
-                      Linkable( player, loc ) ) ) {
+            if( ( Location( thing ) != NOTHING ) && ( Examinable( player, loc ) || Examinable( player, thing ) || Linkable( player, loc ) ) ) {
                 buf2 = unparse_object( player, loc, 0 );
-                notify( player, tmprintf( "Location: %s", buf2 ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Location: %s", buf2 );
                 free_lbuf( buf2 );
             }
             break;
         case TYPE_EXIT:
             buf2 = unparse_object( player, Exits( thing ), 0 );
-            notify( player, tmprintf( "Source: %s", buf2 ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Source: %s", buf2 );
             free_lbuf( buf2 );
 
             /*
@@ -1616,10 +1572,8 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
                 notify( player, "Destination: *UNLINKED*" );
                 break;
             default:
-                buf2 = unparse_object( player,
-                                       Location( thing ), 0 );
-                notify( player,
-                        tmprintf( "Destination: %s", buf2 ) );
+                buf2 = unparse_object( player, Location( thing ), 0 );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Destination: %s", buf2 );
                 free_lbuf( buf2 );
                 break;
             }
@@ -1628,9 +1582,8 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
             break;
         }
     } else if( !Opaque( thing ) && nearby( player, thing ) ) {
-        if( Has_contents( thing ) )
-            look_contents( player, thing, "Contents:",
-                           CONTENTS_REMOTE );
+        if( Has_contents( thing ) ) 
+            look_contents( player, thing, "Contents:", CONTENTS_REMOTE );
         if( !isExit( thing ) ) {
             look_exits( player, thing, "Obvious exits:" );
         }
@@ -1641,22 +1594,17 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
         if( mudconf.read_rem_name ) {
             buf2 = alloc_lbuf( "do_examine.pub_name" );
             strcpy( buf2, Name( thing ) );
-            notify( player,
-                    tmprintf( "%s is owned by %s",
-                              buf2, Name( Owner( thing ) ) ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s is owned by %s", buf2, Name( Owner( thing ) ) );
             free_lbuf( buf2 );
         } else {
-            notify( player,
-                    tmprintf( "Owned by %s", Name( Owner( thing ) ) ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Owned by %s", Name( Owner( thing ) ) );
         }
     }
 }
 
 void do_score( dbref player, dbref cause, int key ) {
-    notify( player,
-            tmprintf( "You have %d %s.", Pennies( player ),
-                      ( Pennies( player ) == 1 ) ?
-                      mudconf.one_coin : mudconf.many_coins ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You have %d %s.", Pennies( player ), ( Pennies( player ) == 1 ) ? mudconf.one_coin : mudconf.many_coins );
+            
 }
 
 void do_inventory( dbref player, dbref cause, int key ) {
@@ -1724,8 +1672,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
     }
 
     if( !payfor( player, mudconf.searchcost ) ) {
-        notify( player,
-                tmprintf( "You don't have enough %s.", mudconf.many_coins ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins );
         return;
     }
     message = alloc_lbuf( "do_entrances" );
@@ -1736,10 +1683,8 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
             switch( Typeof( i ) ) {
             case TYPE_EXIT:
                 if( Location( i ) == thing ) {
-                    exit = unparse_object( player,
-                                           Exits( i ), 0 );
-                    notify( player,
-                            tmprintf( "%s (%s)", exit, Name( i ) ) );
+                    exit = unparse_object( player, Exits( i ), 0 );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s (%s)", exit, Name( i ) );
                     free_lbuf( exit );
                     count++;
                 }
@@ -1747,8 +1692,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
             case TYPE_ROOM:
                 if( Dropto( i ) == thing ) {
                     exit = unparse_object( player, i, 0 );
-                    notify( player,
-                            tmprintf( "%s [dropto]", exit ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s [dropto]", exit );
                     free_lbuf( exit );
                     count++;
                 }
@@ -1757,8 +1701,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
             case TYPE_PLAYER:
                 if( Home( i ) == thing ) {
                     exit = unparse_object( player, i, 0 );
-                    notify( player,
-                            tmprintf( "%s [home]", exit ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s [home]", exit );
                     free_lbuf( exit );
                     count++;
                 }
@@ -1771,7 +1714,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
 
             if( Parent( i ) == thing ) {
                 exit = unparse_object( player, i, 0 );
-                notify( player, tmprintf( "%s [parent]", exit ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s [parent]", exit );
                 free_lbuf( exit );
                 count++;
             }
@@ -1790,8 +1733,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
                         continue;
                     }
                     exit = unparse_object( player, i, 0 );
-                    notify( player,
-                            tmprintf( "%s [propdir]", exit ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s [propdir]", exit );
                     free_lbuf( exit );
                     count++;
                 }
@@ -1811,8 +1753,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
                         continue;
                     }
                     exit = unparse_object( player, i, 0 );
-                    notify( player,
-                            tmprintf( "%s [forward]", exit ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s [forward]", exit );
                     free_lbuf( exit );
                     count++;
                 }
@@ -1820,8 +1761,7 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
         }
     }
     free_lbuf( message );
-    notify( player, tmprintf( "%d entrance%s found.", count,
-                              ( count == 1 ) ? "" : "s" ) );
+    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d entrance%s found.", count, ( count == 1 ) ? "" : "s" );
 }
 
 /* check the current location for bugs */
@@ -1949,14 +1889,11 @@ static void sweep_check( dbref player, dbref what, int key, int is_loc ) {
         }
         *--bp = '\0';	/* nuke the space at the end */
         if( !isExit( what ) ) {
-            notify( player,
-                    tmprintf( "  %s is listening. [%s]",
-                              Name( what ), buf ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "  %s is listening. [%s]", Name( what ), buf );
         } else {
             bp = buf2 = alloc_lbuf( "sweep_check.name" );
             safe_exit_name( what, buf2, &bp );
-            notify( player,
-                    tmprintf( "  %s is listening. [%s]", buf2, buf ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "  %s is listening. [%s]", buf2, buf );
             free_lbuf( buf2 );
         }
         free_lbuf( buf );
@@ -2115,22 +2052,16 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
         case TYPE_THING:
             strcpy( thingname, Name( thing ) );
             val = OBJECT_DEPOSIT( Pennies( thing ) );
-            notify( player,
-                    tmprintf( "@create %s=%d",
-                              translate_string( thingname, 1 ), val ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@create %s=%d", translate_string( thingname, 1 ), val );
             break;
         case TYPE_ROOM:
             strcpy( thingname, Name( thing ) );
-            notify( player,
-                    tmprintf( "@dig/teleport %s",
-                              translate_string( thingname, 1 ) ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@dig/teleport %s", translate_string( thingname, 1 ) );
             strcpy( thingname, "here" );
             break;
         case TYPE_EXIT:
             strcpy( thingname, Name( thing ) );
-            notify( player,
-                    tmprintf( "@open %s", translate_string( thingname,
-                              1 ) ) );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@open %s", translate_string( thingname, 1 ) );
             got = thingname;
             safe_exit_name( thing, thingname, &got );
             break;
@@ -2147,9 +2078,7 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
      */
 
     if( !wild_decomp && ( bool != TRUE_BOOLEXP ) ) {
-        notify( player,
-                tmprintf( "@lock %s=%s", thingname,
-                          unparse_boolexp_decompile( player, bool ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@lock %s=%s", thingname, unparse_boolexp_decompile( player, bool ) );
     }
     free_boolexp( bool );
 
@@ -2158,9 +2087,7 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
      */
 
     buff = alloc_mbuf( "do_decomp.attr_name" );
-    for( ca = ( wild_decomp ? olist_first() : atr_head( thing, &as ) );
-            ( wild_decomp ) ? ( ca != NOTHING ) : ( ca != ( int ) 0 );
-            ca = ( wild_decomp ? olist_next() : atr_next( &as ) ) ) {
+    for( ca = ( wild_decomp ? olist_first() : atr_head( thing, &as ) ); ( wild_decomp ) ? ( ca != NOTHING ) : ( ca != ( int ) 0 ); ca = ( wild_decomp ? olist_next() : atr_next( &as ) ) ) {
         if( ( ca == A_NAME ) || ( ca == A_LOCK ) ) {
             continue;
         }
@@ -2185,44 +2112,26 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
                 ltext = unparse_boolexp_decompile( player,
                                                    bool );
                 free_boolexp( bool );
-                notify( player,
-                        tmprintf( "@lock/%s %s=%s",
-                                  attr->name, thingname, ltext ) );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@lock/%s %s=%s", attr->name, thingname, ltext );
             } else {
                 strcpy( buff, attr->name );
                 if( key & DECOMP_PRETTY ) {
                     tbuf = alloc_lbuf( "do_decomp.pretty" );
-                    pretty_print( tbuf,
-                                  tmprintf( "%c%s %s=",
-                                            ( ( ca < A_USER_START ) ?
-                                              '@' : '&' ),
-                                            buff, thingname ), got );
+                    pretty_print( tbuf, tmprintf( "%c%s %s=", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname ), got );
                     notify( player, tbuf );
                     free_lbuf( tbuf );
                 } else {
-                    notify( player,
-                            tmprintf( "%c%s %s=%s",
-                                      ( ( ca < A_USER_START ) ?
-                                        '@' : '&' ),
-                                      buff, thingname, got ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%c%s %s=%s", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname, got );
                 }
                 for( np = indiv_attraccess_nametab;
                         np->name; np++ ) {
-
-                    if( ( aflags & np->flag ) &&
-                            check_access( player, np->perm ) &&
-                            ( !( np->perm & CA_NO_DECOMP ) ) ) {
-
-                        notify( player,
-                                tmprintf( "@set %s/%s = %s",
-                                          thingname,
-                                          buff, np->name ) );
+                    if( ( aflags & np->flag ) && check_access( player, np->perm ) && ( !( np->perm & CA_NO_DECOMP ) ) ) {
+                        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@set %s/%s = %s", thingname, buff, np->name );
                     }
                 }
 
                 if( aflags & AF_LOCK ) {
-                    notify( player, tmprintf( "@lock %s/%s",
-                                              thingname, buff ) );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@lock %s/%s", thingname, buff );
                 }
             }
         }
@@ -2240,16 +2149,14 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
      */
 
     if( !wild_decomp && ( Parent( thing ) != NOTHING ) )
-        notify( player,
-                tmprintf( "@parent %s=#%d", thingname, Parent( thing ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@parent %s=#%d", thingname, Parent( thing ) );
 
     /*
      * If the object has a zone, report it
      */
 
     if( !wild_decomp && ( Zone( thing ) != NOTHING ) )
-        notify( player,
-                tmprintf( "@chzone %s=#%d", thingname, Zone( thing ) ) );
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@chzone %s=#%d", thingname, Zone( thing ) );
 
     free_lbuf( thingname );
     olist_pop();

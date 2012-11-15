@@ -382,8 +382,7 @@ void handle_trig( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     val = strtod( fargs[0], ( char ** ) NULL );
     if( ( flag & TRIG_ARC ) && !( flag & TRIG_TAN ) &&
             ( ( val < -1 ) || ( val > 1 ) ) ) {
-        safe_tmprintf_str( buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE",
-                           ( ( FUN * ) fargs[-1] )->name );
+        safe_tmprintf_str( buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE", ( ( FUN * ) fargs[-1] )->name );
         return;
     }
     if( ( flag & TRIG_DEG ) && !( flag & TRIG_ARC ) ) {
