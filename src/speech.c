@@ -413,17 +413,30 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
  * * do_page: Handle the page command.
  * * Page-pose code from shadow@prelude.cc.purdue.
  */
-
-static void page_return( dbref player, dbref target, const char *tag, int anum, const char *dflt ) {
+//static void page_return( dbref player, dbref target, const char *tag, int anum, const char *dflt )
+static void page_return( dbref player, dbref target, const char *tag, int anum, const char *format, ... ) {
     dbref aowner;
-
     int aflags, alen;
-
     char *str, *str2, *buf, *bp;
-
     struct tm *tp;
-
     time_t t;
+    char dflt[LBUF_SIZE];
+    char *s;
+    va_list ap;
+
+    va_start( ap, format );
+    
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(dflt, s, LBUF_SIZE);
+        } else {
+            dflt[0]=0x00;
+        }
+    } else {
+        vsnprintf(dflt, LBUF_SIZE, format, ap);
+    }
+
+    va_end(ap);
 
     str = atr_pget( target, anum, &aowner, &aflags, &alen );
     if( *str ) {
@@ -450,12 +463,12 @@ static int page_check( dbref player, dbref target ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins );
         
     } else if( !Connected( target ) ) {
-        page_return( player, target, "Away", A_AWAY, tmprintf( "Sorry, %s is not connected.", Name( target ) ) );
+        page_return( player, target, "Away", A_AWAY, "Sorry, %s is not connected.", Name( target ) );
     } else if( !could_doit( player, target, A_LPAGE ) ) {
         if( Can_Hide( target ) && Hidden( target ) && !See_Hidden( player ) )
-            page_return( player, target, "Away", A_AWAY, tmprintf( "Sorry, %s is not connected.", Name( target ) ) );
+            page_return( player, target, "Away", A_AWAY, "Sorry, %s is not connected.", Name( target ) );
         else
-            page_return( player, target, "Reject", A_REJECT, tmprintf( "Sorry, %s is not accepting pages.", Name( target ) ) );
+            page_return( player, target, "Reject", A_REJECT, "Sorry, %s is not accepting pages.", Name( target ) );
     } else if( !could_doit( target, player, A_LPAGE ) ) {
         if( Wizard( player ) ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Warning: %s can't return your page.", Name( target ) );
@@ -731,25 +744,25 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
         message++;
         safe_str( "From afar, ", omessage, &omp );
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "to %s: ", clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s %s", Name( player ), message );
-        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name( player ), message );
+            safe_sprintf( omessage, &omp, "to %s: ", clean_tname );
+        safe_sprintf( omessage, &omp, "%s %s", Name( player ), message );
+        safe_sprintf( imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name( player ), message );
         break;
     case ';':
         message++;
         safe_str( "From afar, ", omessage, &omp );
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "to %s: ", clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s%s", Name( player ), message );
-        safe_tmprintf_str( imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name( player ), message );
+            safe_sprintf( omessage, &omp, "to %s: ", clean_tname );
+        safe_sprintf( omessage, &omp, "%s%s", Name( player ), message );
+        safe_sprintf( imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name( player ), message );
         break;
     case '"':
         message++;
     default:
         if( count != 1 )
-            safe_tmprintf_str( omessage, &omp, "To %s, ", clean_tname );
-        safe_tmprintf_str( omessage, &omp, "%s pages: %s", Name( player ), message );
-        safe_tmprintf_str( imessage, &imp, "You paged %s with '%s'.", clean_tname, message );
+            safe_sprintf( omessage, &omp, "To %s, ", clean_tname );
+        safe_sprintf( omessage, &omp, "%s pages: %s", Name( player ), message );
+        safe_sprintf( imessage, &imp, "You paged %s with '%s'.", clean_tname, message );
     }
     free_lbuf( clean_tname );
 
@@ -760,8 +773,7 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
     for( i = 0; i < n_dbrefs; i++ ) {
         if( dbrefs_array[i] != NOTHING ) {
             notify_with_cause( dbrefs_array[i], player, omessage );
-            page_return( player, dbrefs_array[i], "Idle", A_IDLE,
-                         NULL );
+            page_return( player, dbrefs_array[i], "Idle", A_IDLE, NULL );
         }
     }
     free_lbuf( omessage );

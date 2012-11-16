@@ -1627,7 +1627,7 @@ int add_helpfile( dbref player, char *confcmd, char *str, int is_raw ) {
     tstr = tmprintf( "%s.txt", fpath );
     fp = fopen( tstr, "r" );
     if( fp == NULL ) {
-        fpath = XSTRDUP( tmprintf( "%s/%s", mudconf.txthome, fpath ), "mudconf_txthome" );
+        fpath = xstrprintf( "mudconf_txthome", "%s/%s", mudconf.txthome, fpath );
         tstr = tmprintf( "%s.txt", fpath );
         fp = fopen( tstr, "r" );
         if( fp == NULL ) {
@@ -1752,7 +1752,7 @@ int cf_include( int *vp, char *str, long extra, dbref player, char *cmd ) {
     fp = fopen( buf, "r" );
     if( fp == NULL ) {
         XFREE( buf, "cf_include" );
-        buf =  XSTRDUP( tmprintf( "%s/%s", mudconf.config_home, str ), "cf_include" );
+        buf = xstrprintf( "cf_include", "%s/%s", mudconf.config_home, str );
         fp = fopen( buf, "r" );
         if( fp == NULL ) {
             cf_log_notfound( player, cmd, "Config file", str );

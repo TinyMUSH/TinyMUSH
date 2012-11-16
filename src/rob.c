@@ -97,7 +97,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
             notify( player, "Your murder attempt failed." );
             buf1 = alloc_lbuf( "do_kill.failed" );
             bp = buf1;
-            safe_tmprintf_str( buf1, &bp, "%s tried to kill you!", Name( player ) );
+            safe_sprintf( buf1, &bp, "%s tried to kill you!", Name( player ) );
             notify_with_cause( victim, player, buf1 );
             if( Suspect( player ) ) {
                 strcpy( buf1, Name( player ) );
@@ -139,9 +139,9 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
             }
         }
         bp = buf1;
-        safe_tmprintf_str( buf1, &bp, "You killed %s!", Name( victim ) );
+        safe_sprintf( buf1, &bp, "You killed %s!", Name( victim ) );
         bp = buf2;
-        safe_tmprintf_str( buf2, &bp, "killed %s!", Name( victim ) );
+        safe_sprintf( buf2, &bp, "killed %s!", Name( victim ) );
         if( Typeof( victim ) != TYPE_PLAYER )
             if( halt_que( NOTHING, victim ) > 0 )
                 if( !Quiet( victim ) ) {
@@ -155,7 +155,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
          */
 
         bp = buf1;
-        safe_tmprintf_str( buf1, &bp, "%s killed you!", Name( player ) );
+        safe_sprintf( buf1, &bp, "%s killed you!", Name( player ) );
         notify_with_cause( victim, player, buf1 );
 
         /*

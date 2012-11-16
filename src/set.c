@@ -1616,9 +1616,9 @@ void do_use( dbref player, dbref cause, int key, char *object ) {
         df_use = alloc_lbuf( "do_use.use" );
         df_ouse = alloc_lbuf( "do_use.ouse" );
         bp = df_use;
-        safe_tmprintf_str( df_use, &bp, "You use %s", Name( thing ) );
+        safe_sprintf( df_use, &bp, "You use %s", Name( thing ) );
         bp = df_ouse;
-        safe_tmprintf_str( df_ouse, &bp, "uses %s", Name( thing ) );
+        safe_sprintf( df_ouse, &bp, "uses %s", Name( thing ) );
         did_it( player, thing, A_USE, df_use, A_OUSE, df_ouse, A_AUSE, 1, ( char ** ) NULL, 0, MSG_PRESENCE );
         free_lbuf( df_use );
         free_lbuf( df_ouse );

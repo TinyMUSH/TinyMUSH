@@ -1152,7 +1152,7 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
             if( !fp && !ufp ) {
                 if( eval & EV_FMAND ) {
                     *bufc = oldp;
-                    safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf );
+                    safe_sprintf( buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf );
                     alldone = 1;
                 } else {
                     safe_chr( '(', buff, bufc );
@@ -1343,7 +1343,7 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
                 }
                 mudstate.func_nest_lev--;
             } else {
-                safe_tmprintf_str( buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs );
+                safe_sprintf( buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs );
             }
 
             /*

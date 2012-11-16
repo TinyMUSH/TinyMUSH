@@ -13,6 +13,9 @@
 /* From external sources */
 extern char    *crypt( const char *, const char * );
 
+/* From alloc.c */
+extern void    *xstrprintf(const char *, const char *, ...);
+
 /* From boolexp.c */
 extern int	eval_boolexp( dbref, dbref, dbref, BOOLEXP * );
 extern int	eval_boolexp_atr( dbref, dbref, dbref, char * );
@@ -167,7 +170,8 @@ extern void	raw_notify( dbref, const char *, ... );
 extern void	raw_notify_newline( dbref );
 extern void	clearstrings( DESC * );
 extern void	queue_write( DESC *, const char *, int );
-extern void	queue_string( DESC *, const char * );
+extern void	queue_string( DESC *, const char *, ... );
+extern void	queue_rawstring( DESC *, const char *, ... );
 extern void	freeqs( DESC * );
 extern void	welcome_user( DESC * );
 extern void	save_command( DESC *, CBLK * );
@@ -204,8 +208,7 @@ extern void	badname_list( dbref, const char * );
 extern char    *safe_snprintf(char *,  size_t, const char *, ... );
 extern char    *safe_vsnprintf(char *, size_t, const char *, va_list );
 extern char    *tmprintf( const char *,... );
-extern char    *tmvprintf( const char *, va_list );
-extern void	safe_tmprintf_str( char *, char **, const char *,... );
+extern void	safe_sprintf( char *, char **, const char *, ... );
 extern dbref	insert_first( dbref, dbref );
 extern dbref	remove_first( dbref, dbref );
 extern dbref	reverse_list( dbref );

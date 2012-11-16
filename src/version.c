@@ -121,7 +121,7 @@ void init_version( void ) {
     mudstate.compilerinfo = munge_space( MUSH_BUILD_COMPILE );
     mudstate.linkerinfo = munge_space( MUSH_BUILD_LTCOMPILE );
 
-    mudstate.dbmdriver = XSTRDUP( tmprintf( "%s", MUSH_DBM ), "init_version" );
+    mudstate.dbmdriver = xstrprintf( "init_version", "%s", MUSH_DBM );
     log_write( LOG_ALWAYS, "INI", "START", "       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE );
     log_write( LOG_ALWAYS, "INI", "START", "     Build date: %s", MUSH_BUILD_DATE );
     log_write( LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo );

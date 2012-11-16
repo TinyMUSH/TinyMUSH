@@ -964,7 +964,7 @@ char *unparse_object_numonly( dbref target ) {
         sprintf( buf, "*ILLEGAL*(#%d)", target );
     } else {
         bp = buf;
-        safe_tmprintf_str( buf, &bp, "%s(#%d)", Name( target ), target );
+        safe_sprintf( buf, &bp, "%s(#%d)", Name( target ), target );
     }
     return buf;
 }
@@ -989,7 +989,7 @@ char *unparse_object( dbref player, dbref target, int obey_myopic ) {
     } else if( isGarbage( target ) ) {
         fp = unparse_flags( player, target );
         bp = buf;
-        safe_tmprintf_str( buf, &bp, "*GARBAGE*(#%d%s)", target, fp );
+        safe_sprintf( buf, &bp, "*GARBAGE*(#%d%s)", target, fp );
         free_sbuf( fp );
     } else if( !Good_obj( target ) ) {
         sprintf( buf, "*ILLEGAL*(#%d)", target );
@@ -1008,7 +1008,7 @@ char *unparse_object( dbref player, dbref target, int obey_myopic ) {
              */
             fp = unparse_flags( player, target );
             bp = buf;
-            safe_tmprintf_str( buf, &bp, "%s(#%d%s)", Name( target ), target, fp );
+            safe_sprintf( buf, &bp, "%s(#%d%s)", Name( target ), target, fp );
             free_sbuf( fp );
         } else {
             /*
@@ -1127,7 +1127,7 @@ int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * around arbitrarily giving your flags new names all the time.
      */
 
-    flagstr = XSTRDUP( tmprintf( "_%s", namestr ), "cf_flag_name" );
+    flagstr = xstrprintf( "cf_flag_name", "_%s", namestr );
     if( strlen( flagstr ) > 31 ) {
         cf_log_syntax( player, cmd, "Marker flag name too long: %s",
                        namestr );

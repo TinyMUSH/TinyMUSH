@@ -647,7 +647,7 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
             } else {
                 buf = alloc_lbuf( "view_atr.pairs" );
                 bp = buf;
-                safe_tmprintf_str( buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
+                safe_sprintf( buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
                 pairs_print( player, text, buf, &bp );
                 *bp = '\0';
                 notify( player, buf );
@@ -692,11 +692,11 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
         buf = alloc_lbuf( "view_atr.pairs_print" );
         bb_p = buf;
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
+            safe_sprintf( buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
         } else if( *fbp ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
+            safe_sprintf( buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            safe_tmprintf_str( buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
+            safe_sprintf( buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
         } else {
             /*
              * Just fine the way it is

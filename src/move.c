@@ -780,7 +780,7 @@ void do_drop( dbref player, dbref cause, int key, char *name ) {
             quiet = 1;
         }
         bp = buf = alloc_lbuf( "do_drop.did_it" );
-        safe_tmprintf_str( buf, &bp, "dropped %s.", Name( thing ) );
+        safe_sprintf( buf, &bp, "dropped %s.", Name( thing ) );
         oattr = quiet ? 0 : A_ODROP;
         aattr = quiet ? 0 : A_ADROP;
         did_it( player, thing, A_DROP, "Dropped.", oattr, buf,

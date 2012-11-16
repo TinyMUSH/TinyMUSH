@@ -87,8 +87,8 @@ int helpmkindx( dbref player, char *confcmd, char *helpfile ) {
 
     FILE *rfp, *wfp;
 
-    src = XSTRDUP( tmprintf( "%s.txt", helpfile ), "helpmkindx_src" );
-    dst = XSTRDUP( tmprintf( "%s.indx", helpfile ), "helpmkindx_src" );
+    src = xstrprintf( "helpmkindx_src", "%s.txt", helpfile );
+    dst = xstrprintf( "helpmkindx_src", "%s.indx", helpfile );
 
     cf_log_help_mkindx( player, confcmd, "Indexing %s", basename( src ) );
 

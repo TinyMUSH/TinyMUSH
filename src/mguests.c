@@ -195,13 +195,12 @@ char *make_guest( DESC *d ) {
     }
 
     if( i == mudconf.number_guests ) {
-        queue_string( d,
-                      "GAME: All guests are currently in use. Please try again later.\n" );
+        queue_string( d, NULL, "GAME: All guests are currently in use. Please try again later.\n" );
         return NULL;
     }
 
     if( ( guest = create_guest( i ) ) == NOTHING ) {
-        queue_string( d, "GAME: Error creating guest ID, please try again later.\n" );
+        queue_string( d, NULL, "GAME: Error creating guest ID, please try again later.\n" );
         log_write( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Error creating guest ID. '%s' already exists.\n", name );
         return NULL;
     }

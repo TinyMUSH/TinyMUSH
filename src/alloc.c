@@ -404,6 +404,8 @@ void *xstrdup(const void *x, const char *y) {
     return(malloc_ptr + sizeof(int));
 }
 
+
+
 void *xstrndup(const void *x, size_t z, const char *y) {
     malloc_str = (void *) x;
     log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
@@ -426,6 +428,20 @@ void xfree(void *x, const char *y) {
 }
 
 #endif
+
+void *xstrprintf(const char *y, const char *format, ...) {
+    char msg[LBUF_SIZE];
+    va_list ap;
+    
+    if( format || *format ) {
+        va_start( ap, format );
+        vsnprintf(msg, LBUF_SIZE, format, ap);
+        va_end( ap );
+        return( XSTRDUP( (void *) msg, y ));
+    } else {
+        return( (void *) NULL );
+    }
+}
 
 #ifdef RAW_MEMTRACKING
 

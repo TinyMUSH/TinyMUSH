@@ -47,8 +47,6 @@ static int type_quota( int );
 
 static int pay_quota( dbref, int, int );
 
-extern void queue_rawstring( DESC *, const char * );
-
 static char tmprintf_buff[LBUF_SIZE];
 
 char *safe_snprintf(char *buff, size_t size, const char *format, ... ) {
@@ -84,16 +82,7 @@ char *tmprintf( const char *format, ... ) {
     return tmprintf_buff;
 }
 
-
-char *tmvprintf( const char *format, va_list ap ) {
-    vsnprintf( tmprintf_buff, LBUF_SIZE, format, ap );
-    tmprintf_buff[LBUF_SIZE - 1] = '\0';
-    return tmprintf_buff;
-}
-
-
-void
-safe_tmprintf_str( char *str, char **bp, const char *format, ... ) {
+void safe_sprintf( char *str, char **bp, const char *format, ... ) {
     int len, n;
     va_list ap;
 
@@ -108,6 +97,7 @@ safe_tmprintf_str( char *str, char **bp, const char *format, ... ) {
         **bp = '\0';
         return;
     }
+    
     vsnprintf( *bp, n, format, ap );
     va_end( ap );
     len = strlen( *bp );
@@ -1227,7 +1217,7 @@ void handle_prog( DESC *d, char *message ) {
              */
 
             if( d->program_data != NULL ) {
-                queue_rawstring( d, ( char * ) "> \377\371" );
+                queue_rawstring( d, NULL, "> \377\371" );
             }
             return;
         }
@@ -1417,7 +1407,7 @@ void do_prog( dbref player, dbref cause, int key, char *name, char *command ) {
         /*
          * Use telnet protocol's GOAHEAD command to show prompt
          */
-        queue_rawstring( d, ( char * ) "> \377\371" );
+        queue_rawstring( d, NULL, "> \377\371" );
     }
 
 }
@@ -2786,7 +2776,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
                 if( !strncmp( tbuf, hptr->target.s, len ) ) {
                     total++;
                     bp = outbuf;
-                    safe_tmprintf_str( outbuf, &bp, "%s:  ", ( ( is_global ) ? hptr->target.s : strchr( hptr->target.s, '.' ) + 1 ) );
+                    safe_sprintf( outbuf, &bp, "%s:  ", ( ( is_global ) ? hptr->target.s : strchr( hptr->target.s, '.' ) + 1 ) );
                     buff = unparse_object( player, * ( hptr->data ), 0 );
                     safe_str( buff, outbuf, &bp );
                     free_lbuf( buff );

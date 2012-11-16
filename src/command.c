@@ -1717,7 +1717,7 @@ static void list_cmdtable( dbref player ) {
     WALK_ALL_MODULES( mp ) {
         if( ( modcmds = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
             bp = buf;
-            safe_tmprintf_str( buf, &bp, "Module %s commands:", mp->modname );
+            safe_sprintf( buf, &bp, "Module %s commands:", mp->modname );
             for( cmdp = modcmds; cmdp->cmdname; cmdp++ ) {
                 if( check_access( player, cmdp->perms ) ) {
                     if( !( cmdp->perms & CF_DARK ) ) {

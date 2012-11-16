@@ -946,9 +946,9 @@ int process_input( DESC *d ) {
             }
         } else if( ( *q == '\b' ) || ( *q == 127 ) ) {
             if( *q == 127 ) {
-                queue_string( d, "\b \b" );
+                queue_string( d, NULL, "\b \b" );
             } else {
-                queue_string( d, " \b" );
+                queue_string( d, NULL, " \b" );
             }
             in -= 2;
             if( p > d->raw_input->cmd ) {
@@ -996,7 +996,7 @@ void close_sockets( int emergency, char *message ) {
             }
             close( d->descriptor );
         } else {
-            queue_string( d, message );
+            queue_string( d, NULL, message );
             queue_write( d, "\r\n", 2 );
             shutdownsock( d, R_GOING_DOWN );
         }
@@ -1209,7 +1209,7 @@ static RETSIGTYPE sighandler( int sig ) {
         log_signal( signames[sig] );
         raw_broadcast( 0, "GAME: Caught signal %s, exiting.", signames[sig] );
         dump_database_internal( DUMP_DB_KILLED );
-        s=XSTRDUP( tmprintf( "Caught signal %s", signames[sig] ), "sighandler" );
+        s = xstrprintf( "sighandler", "Caught signal %s", signames[sig] );
         write_status_file( NOTHING, s );
         XFREE( s, "sighandler" );
         exit( 0 );

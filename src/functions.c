@@ -238,7 +238,7 @@ void list_functable( dbref player ) {
         if( ( modfns = DLSYM_VAR( mp->handle, mp->modname, "functable",
                                   FUN * ) ) != NULL ) {
             bp = buf;
-            safe_tmprintf_str( buf, &bp, "Module %s functions:", mp->modname );
+            safe_sprintf( buf, &bp, "Module %s functions:", mp->modname );
             for( fp = modfns; fp->name; fp++ ) {
                 if( Check_Func_Access( player, fp ) ) {
                     safe_chr( ' ', buf, &bp );

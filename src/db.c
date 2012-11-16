@@ -2850,7 +2850,7 @@ void dump_restart_db( void ) {
     version |= RS_NEW_STRINGS;
     version |= RS_COUNT_REBOOTS;
 
-    dbf=XSTRDUP( tmprintf( "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname ), "dump_restart_db" );
+    dbf = xstrprintf( "dump_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
 
     f = fopen( dbf, "w" );
     XFREE( dbf, "dump_restart_db" );
@@ -2890,7 +2890,7 @@ void load_restart_db( void ) {
     char *temp, buf[8];
     struct stat fstatbuf;
 
-    dbf=XSTRDUP( tmprintf( "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname ), "load_restart_db" );
+    dbf = xstrprintf( "load_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
     f = fopen( dbf, "r" );
     if( !f ) {
         mudstate.restarting = 0;

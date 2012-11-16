@@ -143,7 +143,7 @@ void raw_notify_html( dbref player, const char *format, ... ) {
     }
 
     DESC_ITER_PLAYER( player, d ) {
-        queue_string( d, msg );
+        queue_string( d, NULL, msg );
     }
 }
 #endif
@@ -184,7 +184,7 @@ void raw_notify( dbref player, const char *format, ... ) {
     }
 
     DESC_ITER_PLAYER( player, d ) {
-        queue_string( d, msg );
+        queue_string( d, NULL, msg );
         queue_write( d, "\r\n", 2 );
     }
 }
@@ -259,7 +259,7 @@ void raw_broadcast( int inflags, char *template, ... ) {
          */
 
         if( ( p_flag & test_flag ) || ( !test_flag ) ) {
-            queue_string( d, buff );
+            queue_string( d, NULL, buff );
             queue_write( d, "\r\n", 2 );
             process_output( d );
         }
@@ -380,31 +380,66 @@ void queue_write( DESC *d, const char *b, int n ) {
     } while( n > 0 );
 }
 
-void queue_string( DESC *d, const char *s ) {
+void queue_string( DESC *d, const char *format, ... ) {
     char *new;
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
+                
+    va_start( ap, format );
+                        
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
+    }
+    
+    va_end(ap);
+    
 
-    if( s ) {
+    if( msg ) {
         if( !mudconf.ansi_colors ) {
-            queue_write( d, s, strlen( s ) );
+            queue_write( d, msg, strlen( msg ) );
         } else {
             if( !Ansi( d->player ) && strchr( s, ESC_CHAR ) ) {
-                new = strip_ansi( s );
+                new = strip_ansi( msg );
             } else if( NoBleed( d->player ) ) {
-                new = normal_to_white( s );
+                new = normal_to_white( msg );
             } else if( d->colormap ) {
-                new = ( char * ) remap_colors( s, d->colormap );
+                new = ( char * ) remap_colors( msg, d->colormap );
             } else {
-                new = ( char * ) s;
+                new = ( char * ) msg;
             }
             queue_write( d, new, strlen( new ) );
         }
     }
 }
 
-void queue_rawstring( DESC *d, const char *s ) {
-    if( s ) {
-        queue_write( d, s, strlen( s ) );
+void queue_rawstring( DESC *d, const char *format, ... ) {
+    char msg[LBUF_SIZE];
+    char *s;
+    va_list ap;
+                
+    va_start( ap, format );
+                        
+    if( !format || !*format ) {
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(msg, s, LBUF_SIZE);
+        } else {
+            return;
+        }
+    } else {
+        vsnprintf(msg, LBUF_SIZE, format, ap);
     }
+    
+    va_end(ap);
+
+
+    queue_write( d, msg, strlen( msg ) );
 }
 
 void freeqs( DESC *d ) {
@@ -494,7 +529,7 @@ static void desc_delhash( DESC *d ) {
 
 void welcome_user( DESC *d ) {
 #ifdef PUEBLO_SUPPORT
-    queue_rawstring( d, PUEBLO_SUPPORT_MSG );
+    queue_rawstring( d, NULL, PUEBLO_SUPPORT_MSG );
 #endif
     if( d->host_info & H_REGISTRATION ) {
         fcache_dump( d, FC_CONN_REG );
@@ -947,7 +982,7 @@ int boot_off( dbref player, char *message ) {
     count = 0;
     DESC_SAFEITER_PLAYER( player, d, dnext ) {
         if( message && *message ) {
-            queue_rawstring( d, message );
+            queue_rawstring( d, NULL, message );
             queue_write( d, "\r\n", 2 );
         }
         shutdownsock( d, R_BOOT );
@@ -965,7 +1000,7 @@ int boot_by_port( int port, int no_god, char *message ) {
     DESC_SAFEITER_ALL( d, dnext ) {
         if( ( d->descriptor == port ) && ( !no_god || !God( d->player ) ) ) {
             if( message && *message ) {
-                queue_rawstring( d, message );
+                queue_rawstring( d, NULL, message );
                 queue_write( d, "\r\n", 2 );
             }
             shutdownsock( d, R_BOOT );
@@ -1066,8 +1101,7 @@ void check_idle( void ) {
         if( d->flags & DS_CONNECTED ) {
             idletime = mudstate.now - d->last_time;
             if( ( idletime > d->timeout ) && !Can_Idle( d->player ) ) {
-                queue_rawstring( d,
-                                 "*** Inactivity Timeout ***\r\n" );
+                queue_rawstring( d, NULL, "*** Inactivity Timeout ***\r\n" );
                 shutdownsock( d, R_TIMEOUT );
             } else if( mudconf.idle_wiz_dark &&
                        ( idletime > mudconf.idle_timeout ) &&
@@ -1080,7 +1114,7 @@ void check_idle( void ) {
         } else {
             idletime = mudstate.now - d->connected_at;
             if( idletime > mudconf.conn_timeout ) {
-                queue_rawstring( d, "*** Login Timeout ***\r\n" );
+                queue_rawstring( d, NULL, "*** Login Timeout ***\r\n" );
                 shutdownsock( d, R_TIMEOUT );
             }
         }
@@ -1128,31 +1162,29 @@ static void dump_users( DESC *e, char *match, int key ) {
 
 #ifdef PUEBLO_SUPPORT
     if( ( e->flags & DS_PUEBLOCLIENT ) && ( Html( e->player ) ) ) {
-        queue_string( e, "<pre>" );
+        queue_string( e, NULL, "<pre>" );
     }
 #endif
 
     buf = alloc_mbuf( "dump_users" );
     if( key == CMD_SESSION ) {
-        queue_rawstring( e, "                               " );
-        queue_rawstring( e,
-                         "     Characters Input----  Characters Output---\r\n" );
+        queue_rawstring( e, NULL, "                               " );
+        queue_rawstring( e, NULL, "     Characters Input----  Characters Output---\r\n" );
     }
-    queue_rawstring( e, "Player Name        On For Idle " );
+    queue_rawstring( e, NULL, "Player Name        On For Idle " );
     if( key == CMD_SESSION ) {
-        queue_rawstring( e,
-                         "Port Pend  Lost     Total  Pend  Lost     Total\r\n" );
+        queue_rawstring( e, NULL, "Port Pend  Lost     Total  Pend  Lost     Total\r\n" );
     } else if( ( e->flags & DS_CONNECTED ) && ( Wizard_Who( e->player ) ) &&
                ( key == CMD_WHO ) ) {
-        queue_rawstring( e, "  Room    Cmds   Host\r\n" );
+        queue_rawstring( e, NULL, "  Room    Cmds   Host\r\n" );
     } else {
         if( Wizard_Who( e->player ) || See_Hidden( e->player ) ) {
-            queue_string( e, "  " );
+            queue_string( e, NULL, "  " );
         } else {
-            queue_string( e, " " );
+            queue_string( e, NULL, " " );
         }
-        queue_string( e, mudstate.doing_hdr );
-        queue_string( e, "\r\n" );
+        queue_string( e, NULL, mudstate.doing_hdr );
+        queue_string( e, NULL, "\r\n" );
     }
     count = 0;
     DESC_ITER_CONN( d ) {
@@ -1233,7 +1265,7 @@ static void dump_users( DESC *e, char *match, int key ) {
             } else {
                 sprintf( buf, "%-16s%9s %4s  %s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), d->doing );
             }
-            queue_string( e, buf );
+            queue_string( e, NULL, buf );
         }
     }
 
@@ -1242,11 +1274,11 @@ static void dump_users( DESC *e, char *match, int key ) {
      */
 
     sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, ( count == 1 ) ? " " : "s ", mudstate.record_players, ( mudconf.max_players == -1 ) ? "no" : tmprintf( "%d", mudconf.max_players ) ); 
-    queue_rawstring( e, buf );
+    queue_rawstring( e, NULL, buf );
 
 #ifdef PUEBLO_SUPPORT
     if( ( e->flags & DS_PUEBLOCLIENT ) && ( Html( e->player ) ) ) {
-        queue_string( e, "</pre>" );
+        queue_string( e, NULL, "</pre>" );
     }
 #endif
 
@@ -1262,13 +1294,13 @@ static void dump_info( DESC *call_by ) {
 
     int count = 0;
 
-    queue_rawstring( call_by, "### Begin INFO 1\r\n" );
+    queue_rawstring( call_by, NULL, "### Begin INFO 1\r\n" );
 
-    queue_rawstring( call_by, tmprintf( "Name: %s\r\n", mudconf.mud_name ) );
+    queue_rawstring( call_by, "Name: %s\r\n", mudconf.mud_name );
 
     temp = ( char * ) ctime( &mudstate.start_time );
     temp[strlen( temp ) - 1] = '\0';
-    queue_rawstring( call_by, tmprintf( "Uptime: %s\r\n", temp ) );
+    queue_rawstring( call_by, "Uptime: %s\r\n", temp );
 
     DESC_ITER_CONN( d ) {
         if( !Hidden( d->player ) ||
@@ -1277,16 +1309,16 @@ static void dump_info( DESC *call_by ) {
             count++;
         }
     }
-    queue_rawstring( call_by, tmprintf( "Connected: %d\r\n", count ) );
+    queue_rawstring( call_by, "Connected: %d\r\n", count );
 
-    queue_rawstring( call_by, tmprintf( "Size: %d\r\n", mudstate.db_top ) );
-    queue_rawstring( call_by, tmprintf( "Version: %d.%d.%d.%d\r\n", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision ) );
+    queue_rawstring( call_by, "Size: %d\r\n", mudstate.db_top );
+    queue_rawstring( call_by, "Version: %d.%d.%d.%d\r\n", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision );
 
     for( llp = mudconf.infotext_list; llp != NULL; llp = llp->next ) {
-        queue_rawstring( call_by, tmprintf( "%s: %s\r\n", llp->name, llp->value ) );
+        queue_rawstring( call_by, "%s: %s\r\n", llp->name, llp->value );
     }
 
-    queue_rawstring( call_by, "### End INFO\r\n" );
+    queue_rawstring( call_by, NULL, "### End INFO\r\n" );
 }
 
 /* ---------------------------------------------------------------------------
@@ -1467,7 +1499,7 @@ static void failconn( const char *logcode, const char *logtype, const char *logr
 
     fcache_dump( d, filecache );
     if( *motd_msg ) {
-        queue_string( d, motd_msg );
+        queue_string( d, NULL, motd_msg );
         queue_write( d, "\r\n", 2 );
     }
     free_lbuf( command );
@@ -1515,7 +1547,7 @@ static int check_connect( DESC *d, char *msg ) {
     if( !strncmp( command, "co", 2 ) || !strncmp( command, "cd", 2 ) ) {
         if( ( string_prefix( user, mudconf.guest_basename ) ) && Good_obj( mudconf.guest_char ) && ( mudconf.control_flags & CF_LOGIN ) ) {
             if( ( p = make_guest( d ) ) == NULL ) {
-                queue_string( d, "All guests are tied up, please try again later.\n" );
+                queue_string( d, NULL, "All guests are tied up, please try again later.\n" );
                 free_lbuf( command );
                 free_lbuf( user );
                 free_lbuf( password );
@@ -1543,7 +1575,7 @@ static int check_connect( DESC *d, char *msg ) {
              * Not a player, or wrong password
              */
 
-            queue_rawstring( d, connect_fail );
+            queue_rawstring( d, NULL, connect_fail );
             log_write( LOG_LOGIN | LOG_SECURITY, "CON", "BAD", "[%d/%s] Failed connect to '%s'", d->descriptor, d->addr, user );
             user[3800] = '\0';
             if( -- ( d->retries_left ) <= 0 ) {
@@ -1637,7 +1669,7 @@ static int check_connect( DESC *d, char *msg ) {
              */
 
             if( d->program_data != NULL ) {
-                queue_rawstring( d, "> \377\371" );
+                queue_rawstring( d, NULL, "> \377\371" );
             }
 
         } else if( !( mudconf.control_flags & CF_LOGIN ) ) {
@@ -1696,7 +1728,7 @@ static int check_connect( DESC *d, char *msg ) {
         } else {
             player = create_player( user, password, NOTHING, 0, 0 );
             if( player == NOTHING ) {
-                queue_rawstring( d, create_fail );
+                queue_rawstring( d, NULL, create_fail );
                 log_write( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "[%d/%s] Create of '%s' failed", d->descriptor, d->addr, user );
             } else {
                 name = log_getname( player, "check_connect" );
@@ -1757,12 +1789,12 @@ static void logged_out_internal( DESC *d, int key, char *arg ) {
         if( d->flags & DS_CONNECTED ) {
             s_Html( d->player );
         }
-        queue_rawstring( d, mudconf.pueblo_msg );
+        queue_rawstring( d, NULL, mudconf.pueblo_msg );
         queue_write( d, "\r\n", 2 );
         fcache_dump( d, FC_CONN_HTML );
         log_write( LOG_LOGIN, "CON", "HTML", "[%d/%s] PuebloClient enabled.", d->descriptor, d->addr );
 #else
-        queue_rawstring( d, "Sorry. This MUSH does not have Pueblo support enabled.\r\n" );
+        queue_rawstring( d, NULL, "Sorry. This MUSH does not have Pueblo support enabled.\r\n" );
 #endif
         break;
     default:
@@ -1786,7 +1818,7 @@ void do_command( DESC *d, char *command, int first ) {
          */
         d->command_count++;
         if( d->output_prefix ) {
-            queue_string( d, d->output_prefix );
+            queue_string( d, NULL, d->output_prefix );
             queue_write( d, "\r\n", 2 );
         }
         mudstate.curr_player = d->player;
@@ -1814,7 +1846,7 @@ void do_command( DESC *d, char *command, int first ) {
 #endif				/* NO_LAG_CHECK */
         mudstate.curr_cmd = ( char * ) "";
         if( d->output_suffix ) {
-            queue_string( d, d->output_suffix );
+            queue_string( d, NULL, d->output_suffix );
             queue_write( d, "\r\n", 2 );
         }
         mudstate.debug_cmd = cmdsave;
@@ -1862,12 +1894,12 @@ void do_command( DESC *d, char *command, int first ) {
     d->command_count++;
     if( !( cp->flag & CMD_NOxFIX ) ) {
         if( d->output_prefix ) {
-            queue_string( d, d->output_prefix );
+            queue_string( d, NULL, d->output_prefix );
             queue_write( d, "\r\n", 2 );
         }
     }
     if( cp->perm != CA_PUBLIC ) {
-        queue_rawstring( d, "Permission denied.\r\n" );
+        queue_rawstring( d, NULL, "Permission denied.\r\n" );
     } else {
         mudstate.debug_cmd = cp->name;
         logged_out_internal( d, cp->flag & CMD_MASK, arg );
@@ -1880,7 +1912,7 @@ void do_command( DESC *d, char *command, int first ) {
             ( ( cp->flag & CMD_MASK ) != CMD_LOGOUT ) &&
             !( cp->flag & CMD_NOxFIX ) ) {
         if( d->output_suffix ) {
-            queue_string( d, d->output_suffix );
+            queue_string( d, NULL, d->output_suffix );
             queue_write( d, "\r\n", 2 );
         }
     }
