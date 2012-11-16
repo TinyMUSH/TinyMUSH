@@ -29,14 +29,11 @@ typedef int object_flag_type;
 
 dbref create_guest( int num ) {
     dbref player, aowner;
-
     int found, same_str, aflags;
-
     char name[LBUF_SIZE * 2];
-
     char base[PLAYER_NAME_LIMIT * 2];
-
     char prefixes[LBUF_SIZE], suffixes[LBUF_SIZE], *pp, *sp, *tokp, *toks;
+    char s[MBUF_SIZE];
 
     if( !Wizard( mudconf.guest_nuker ) || !Good_obj( mudconf.guest_nuker ) ) {
         mudconf.guest_nuker = GOD;
@@ -137,10 +134,10 @@ dbref create_guest( int num ) {
     /*
      * Make sure the guest is locked.
      */
-
-    do_lock( player, player, A_LOCK, tmprintf( "#%d", player ), "me" );
-    do_lock( player, player, A_LENTER, tmprintf( "#%d", player ), "me" );
-    do_lock( player, player, A_LUSE, tmprintf( "#%d", player ), "me" );
+    snprintf( s, MBUF_SIZE, "#%d", player );
+    do_lock( player, player, A_LOCK, s, "me" );
+    do_lock( player, player, A_LENTER, s, "me" );
+    do_lock( player, player, A_LUSE, s, "me" );
 
     /*
      * Copy all attributes.
@@ -151,6 +148,8 @@ dbref create_guest( int num ) {
 }
 
 void destroy_guest( dbref guest ) {
+    char s[MBUF_SIZE];
+    
     if( !Wizard( mudconf.guest_nuker ) || !Good_obj( mudconf.guest_nuker ) ) {
         mudconf.guest_nuker = GOD;
     }
@@ -158,8 +157,8 @@ void destroy_guest( dbref guest ) {
     if( !Guest( guest ) ) {
         return;
     }
-
-    atr_add_raw( guest, A_DESTROYER, tmprintf( "%d", mudconf.guest_nuker ) );
+    snprintf( s, MBUF_SIZE, "%d", mudconf.guest_nuker );
+    atr_add_raw( guest, A_DESTROYER, s );
     destroy_player( guest );
     destroy_obj( mudconf.guest_nuker, guest );
 }

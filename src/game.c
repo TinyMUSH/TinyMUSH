@@ -1352,6 +1352,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
     char **txt=NULL, **cnf=NULL, **dbf=NULL;
     char *tmpdir, *s, *buff, *tb, *cwd;
     char ts[SBUF_SIZE];
+    char s1[MBUF_SIZE];
     FILE *fp = NULL;
     MODULE *mp;
 
@@ -1370,7 +1371,8 @@ int backup_mush( dbref player, dbref cause, int key ) {
      */
 
     for( i=0; i<mudstate.helpfiles; i++ ) {
-        txt = add_array( txt, tmprintf( "%s.txt", mudstate.hfiletab[i] ), &txt_n, "backup_mush" );
+        snprintf( s1, MBUF_SIZE, "%s.txt", mudstate.hfiletab[i] );
+        txt = add_array( txt, s1, &txt_n, "backup_mush" );
     }
 
     txt = add_array( txt, mudconf.guest_file, &txt_n, "backup_mush" );

@@ -37,12 +37,10 @@ extern CMDENT *prefix_cmds[256];
 
 void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
     MODULE *mp;
-
     API_FUNCTION *afp;
-
     void ( *fn_ptr )( void *, void * );
-
     int succ = 0;
+    char s[MBUF_SIZE];
 
     WALK_ALL_MODULES( mp ) {
         if( !strcmp( module_name, mp->modname ) ) {
@@ -55,20 +53,21 @@ void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
     }
 
     for( afp = ftable; afp->name; afp++ ) {
-        fn_ptr =
-            DLSYM( mp->handle, module_name, afp->name, ( void *,
-                    void * ) );
+        fn_ptr = DLSYM( mp->handle, module_name, afp->name, ( void *, void * ) );
         if( fn_ptr != NULL ) {
             afp->handler = fn_ptr;
-            hashadd( tmprintf( "%s_%s", api_name, afp->name ), ( int * ) afp, &mudstate.api_func_htab, 0 );
+            snprintf( s, MBUF_SIZE, "%s_%s", api_name, afp->name );
+            hashadd( s , ( int * ) afp, &mudstate.api_func_htab, 0 );
         }
     }
 }
 
 void *request_api_function( char *api_name, char *fn_name ) {
     API_FUNCTION *afp;
+    char s[MBUF_SIZE];
 
-    afp = ( API_FUNCTION * ) hashfind( tmprintf( "%s_%s", api_name, fn_name ), &mudstate.api_func_htab );
+    snprintf(s, MBUF_SIZE, "%s_%s", api_name, fn_name );
+    afp = ( API_FUNCTION * ) hashfind( s, &mudstate.api_func_htab );
     if( !afp ) {
         return NULL;
     }
@@ -82,12 +81,13 @@ void *request_api_function( char *api_name, char *fn_name ) {
 
 void register_commands( CMDENT *cmdtab ) {
     CMDENT *cp;
+    char s[MBUF_SIZE];
 
     if( cmdtab ) {
         for( cp = cmdtab; cp->cmdname; cp++ ) {
-            hashadd( cp->cmdname, ( int * ) cp, &mudstate.command_htab,
-                     0 );
-            hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
+            hashadd( cp->cmdname, ( int * ) cp, &mudstate.command_htab, 0 );
+            snprintf(s, MBUF_SIZE, "__%s", cp->cmdname );
+            hashadd( s, ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
         }
     }
 }

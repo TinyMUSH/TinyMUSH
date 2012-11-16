@@ -1146,11 +1146,9 @@ static char *trimmed_site( char *name ) {
 
 static void dump_users( DESC *e, char *match, int key ) {
     DESC *d;
-
     int count;
-
     char *buf, *fp, *sp, flist[4], slist[4];
-
+    char s[MBUF_SIZE];
     dbref room_it;
 
     while( match && *match && isspace( *match ) ) {
@@ -1255,9 +1253,9 @@ static void dump_users( DESC *e, char *match, int key ) {
             *fp = '\0';
             *sp = '\0';
 
-            if( ( e->flags & DS_CONNECTED ) && Wizard_Who( e->player )
-                    && ( key == CMD_WHO ) ) {
-                sprintf( buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), flist, Location( d->player ), d->command_count, slist, trimmed_site( ( ( d->username[0] != '\0' ) ? tmprintf( "%s@%s", d->username, d->addr ) : d->addr ) ) );
+            if( ( e->flags & DS_CONNECTED ) && Wizard_Who( e->player ) && ( key == CMD_WHO ) ) {
+                snprintf(s , MBUF_SIZE, "%s@%s", d->username, d->addr );
+                sprintf( buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), flist, Location( d->player ), d->command_count, slist, trimmed_site( ( ( d->username[0] != '\0' ) ? s : d->addr ) ) );
             } else if( key == CMD_SESSION ) {
                 sprintf( buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trimmed_name( d->player ), time_format_1( mudstate.now - d->connected_at ), time_format_2( mudstate.now - d->last_time ), d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot );
             } else if( Wizard_Who( e->player ) || See_Hidden( e->player ) ) {
@@ -1272,8 +1270,8 @@ static void dump_users( DESC *e, char *match, int key ) {
     /*
      * sometimes I like the ternary operator....
      */
-
-    sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, ( count == 1 ) ? " " : "s ", mudstate.record_players, ( mudconf.max_players == -1 ) ? "no" : tmprintf( "%d", mudconf.max_players ) ); 
+    snprintf(s, MBUF_SIZE, "%d", mudconf.max_players);
+    sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, ( count == 1 ) ? " " : "s ", mudstate.record_players, ( mudconf.max_players == -1 ) ? "no" : s ); 
     queue_rawstring( e, NULL, buf );
 
 #ifdef PUEBLO_SUPPORT
@@ -2152,12 +2150,14 @@ void make_ulist( dbref player, char *buff, char **bufc ) {
 
 void make_portlist( dbref player, dbref target, char *buff, char **bufc ) {
     DESC *d;
+    char s[MBUF_SIZE];
 
     int i = 0;
 
     DESC_ITER_CONN( d ) {
         if( ( target == NOTHING ) || ( d->player == target ) ) {
-            safe_str( tmprintf( "%d ", d->descriptor ), buff, bufc );
+            snprintf(s, MBUF_SIZE, "%d ", d->descriptor );
+            safe_str( s, buff, bufc );
             i = 1;
         }
     }
@@ -2174,11 +2174,13 @@ void make_portlist( dbref player, dbref target, char *buff, char **bufc ) {
 
 void make_sessioninfo( dbref player, dbref target, int port_num, char *buff, char **bufc ) {
     DESC *d;
+    char s[MBUF_SIZE];
 
     DESC_ITER_CONN( d ) {
         if( ( d->descriptor == port_num ) || ( d->player == target ) ) {
             if( Wizard_Who( player ) || Controls( player, d->player ) ) {
-                safe_str( tmprintf( "%d %d %d", d->command_count, d->input_tot, d->output_tot ), buff, bufc );
+                snprintf( s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot );
+                safe_str( s, buff, bufc );
                 return;
             } else {
                 notify_quiet( player, NOPERM_MESSAGE );

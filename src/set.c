@@ -1034,12 +1034,10 @@ void do_setattr( dbref player, dbref cause, int attrnum, char *name, char *attrt
 
 void do_cpattr( dbref player, dbref cause, int key, char *oldpair, char *newpair[], int nargs ) {
     int i, ca, got = 0;
-
     dbref oldthing;
-
     char **newthings, **newattrs, *tp;
-
     ATTR *oldattr;
+    char s[MBUF_SIZE];
 
     if( !*oldpair || !**newpair || !oldpair || !*newpair ) {
         return;
@@ -1062,13 +1060,15 @@ void do_cpattr( dbref player, dbref cause, int key, char *oldpair, char *newpair
     }
 
     olist_push();
-    if( parse_attrib_wild( player, ( ( strchr( oldpair, '/' ) == NULL ) ? tmprintf( "me/%s", oldpair ) : oldpair ), &oldthing, 0, 0, 1, 0 ) ) {
+    snprintf(s, MBUF_SIZE, "me/%s", oldpair);
+    if( parse_attrib_wild( player, ( ( strchr( oldpair, '/' ) == NULL ) ? s : oldpair ), &oldthing, 0, 0, 1, 0 ) ) {
         for( ca = olist_first(); ca != NOTHING; ca = olist_next() ) {
             oldattr = atr_num( ca );
             if( oldattr ) {
                 got = 1;
                 for( i = 0; i < nargs; i++ ) {
-                    do_set( player, cause, 0, newthings[i], tmprintf( "%s:_#%d/%s", ( newattrs[i] ? newattrs[i] : oldattr->name ), oldthing, oldattr->name ) );
+                  snprintf(s, MBUF_SIZE, "%s:_#%d/%s", ( newattrs[i] ? newattrs[i] : oldattr->name ), oldthing, oldattr->name );
+                    do_set( player, cause, 0, newthings[i], s );
                 }
             }
         }
@@ -1377,10 +1377,12 @@ int parse_attrib_wild( dbref player, char *str, dbref *thing, int check_parents,
  */
 
 void edit_string_ansi( char *src, char **dst, char **returnstr, char *from, char *to ) {
+    char s[MBUF_SIZE];
     edit_string( src, dst, from, to );
 
     if( mudconf.ansi_colors ) {
-        edit_string( src, returnstr, from, tmprintf( "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL ) );
+        snprintf(s, MBUF_SIZE, "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL );
+        edit_string( src, returnstr, from, s );
     } else {
         *returnstr = alloc_lbuf( "edit_string_ansi" );
         strcpy( *returnstr, *dst );
@@ -1546,10 +1548,11 @@ void do_wipe( dbref player, dbref cause, int key, char *it ) {
 
 void do_trigger( dbref player, dbref cause, int key, char *object, char *argv[], int nargs ) {
     dbref thing;
-
     int attrib;
+    char s[MBUF_SIZE];
 
-    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, tmprintf( "me/%s", object ), &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
+    snprintf(s, MBUF_SIZE, "me/%s", object );
+    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, s, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
         notify_quiet( player, "No match." );
         return;
     }

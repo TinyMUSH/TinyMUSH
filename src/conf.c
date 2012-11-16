@@ -663,12 +663,12 @@ int cf_dbref( int *vp, char *str, long extra, dbref player, char *cmd ) {
 
 int cf_module( int *vp, char *str, long extra, dbref player, char *cmd ) {
     lt_dlhandle handle;
-
     void ( *initptr )( void );
-
     MODULE *mp;
+    char s[MBUF_SIZE];
 
-    handle = lt_dlopen( tmprintf( "%s/%s.la", mudconf.modules_home, str ) );
+    snprintf(s, MBUF_SIZE, "%s/%s.la", mudconf.modules_home, str );
+    handle = lt_dlopen( s );
 
     if( !handle ) {
         log_write( LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror() );
@@ -1586,15 +1586,12 @@ int cf_cf_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
  */
 
 int add_helpfile( dbref player, char *confcmd, char *str, int is_raw ) {
-    char *fcmd, *fpath, *newstr, *tokst, *tstr;
-
+    char *fcmd, *fpath, *newstr, *tokst;
     CMDENT *cmdp;
-
     char **ftab;		/* pointer to an array of filepaths */
-
     HASHTAB *hashes;
-
     FILE *fp;
+    char s[MAXPATHLEN];
 
     /*
      * Make a new string so we won't SEGV if given a constant string
@@ -1624,12 +1621,12 @@ int add_helpfile( dbref player, char *confcmd, char *str, int is_raw ) {
      */
 
 
-    tstr = tmprintf( "%s.txt", fpath );
-    fp = fopen( tstr, "r" );
+    snprintf(s, MAXPATHLEN, "%s.txt", fpath );
+    fp = fopen( s, "r" );
     if( fp == NULL ) {
         fpath = xstrprintf( "mudconf_txthome", "%s/%s", mudconf.txthome, fpath );
-        tstr = tmprintf( "%s.txt", fpath );
-        fp = fopen( tstr, "r" );
+        snprintf(s, MAXPATHLEN, "%s.txt", fpath );
+        fp = fopen( s, "r" );
         if( fp == NULL ) {
             cf_log_help( player, confcmd, "Helpfile %s not found", fcmd );
             free_mbuf( newstr );
@@ -1670,8 +1667,9 @@ int add_helpfile( dbref player, char *confcmd, char *str, int is_raw ) {
 
     hashdelete( cmdp->cmdname, &mudstate.command_htab );
     hashadd( cmdp->cmdname, ( int * ) cmdp, &mudstate.command_htab, 0 );
-    hashdelete( tmprintf( "__%s", cmdp->cmdname ), &mudstate.command_htab );
-    hashadd( tmprintf( "__%s", cmdp->cmdname ), ( int * ) cmdp, &mudstate.command_htab, HASH_ALIAS );
+    snprintf(s, MAXPATHLEN, "__%s", cmdp->cmdname );
+    hashdelete( s, &mudstate.command_htab );
+    hashadd( s, ( int * ) cmdp, &mudstate.command_htab, HASH_ALIAS );
 
     /*
      * We may need to grow the helpfiles table, or create it.

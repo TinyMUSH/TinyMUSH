@@ -144,8 +144,8 @@ static void open_exit( dbref player, dbref loc, char *direction, char *linkto ) 
 
 void do_open( dbref player, dbref cause, int key, char *direction, char *links[], int nlinks ) {
     dbref loc, destnum;
-
     char *dest;
+    char s[MBUF_SIZE];
 
     /*
      * Create the exit and link to the destination, if there is one
@@ -172,7 +172,8 @@ void do_open( dbref player, dbref cause, int key, char *direction, char *links[]
     if( nlinks >= 2 ) {
         destnum = parse_linkable_room( player, dest );
         if( destnum != NOTHING ) {
-            open_exit( player, destnum, links[1], tmprintf( "%d", loc ) );
+            snprintf(s, MBUF_SIZE, "%d", loc );
+            open_exit( player, destnum, links[1], s );
         }
     }
 }
@@ -849,12 +850,10 @@ static int can_destroy_player( dbref player, dbref victim ) {
 
 void do_destroy( dbref player, dbref cause, int key, char *what ) {
     dbref thing;
-
     int can_doit;
-
     const char *typename;
-
     char *t, *tbuf;
+    char s[MBUF_SIZE];
 
     /*
      * You can destroy anything you control.
@@ -969,7 +968,8 @@ void do_destroy( dbref player, dbref cause, int key, char *what ) {
             destroy_exit( thing );
             break;
         case TYPE_PLAYER:
-            atr_add_raw( thing, A_DESTROYER, tmprintf( "%d", player ) );
+            snprintf(s, MBUF_SIZE, "%d", player );
+            atr_add_raw( thing, A_DESTROYER, s );
             destroy_player( thing );
             break;
         case TYPE_ROOM:
@@ -1006,7 +1006,8 @@ void do_destroy( dbref player, dbref cause, int key, char *what ) {
         free_sbuf( tbuf );
     }
     if( isPlayer( thing ) ) {
-        atr_add_raw( thing, A_DESTROYER, tmprintf( "%d", player ) );
+        snprintf(s, MBUF_SIZE, "%d", player );
+        atr_add_raw( thing, A_DESTROYER, s );
     }
 
     s_Going( thing );

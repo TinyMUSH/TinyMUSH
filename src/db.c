@@ -1669,13 +1669,14 @@ void al_destroy( dbref thing ) {
  */
 
 static char *atr_encode( char *iattr, dbref thing, dbref owner, int flags, int atr ) {
+    static char attr[MBUF_SIZE];
 
     /* If using the default owner and flags (almost all attributes will),
      * just store the string.
      */
 
     if( ( ( owner == Owner( thing ) ) || ( owner == NOTHING ) ) && !flags ) {
-        return iattr;
+        return( iattr );
     }
 
     /* Encode owner and flags into the attribute text */
@@ -1683,7 +1684,8 @@ static char *atr_encode( char *iattr, dbref thing, dbref owner, int flags, int a
     if( owner == NOTHING ) {
         owner = Owner( thing );
     }
-    return tmprintf( "%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr );
+    snprintf(attr, MBUF_SIZE, "%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr );
+    return(attr);
 }
 
 /* ---------------------------------------------------------------------------

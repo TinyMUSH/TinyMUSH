@@ -606,12 +606,10 @@ static void pretty_print( char *dest, char *name, char *text ) {
 
 static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special ) {
     char *text, *buf, *bp, *name_buf, *bb_p;
-
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
-
     char flag_buf[32];
-
     char *xbufp, *gbufp, *fbp;
+    char s[GBUF_SIZE];
 
     BOOLEXP *bool;
 
@@ -620,8 +618,7 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
         text = unparse_boolexp( player, bool );
         free_boolexp( bool );
     } else if( aflags & AF_STRUCTURE ) {
-        text = replace_string( GENERIC_STRUCT_STRDELIM,
-                               mudconf.struct_dstr, raw_text );
+        text = replace_string( GENERIC_STRUCT_STRDELIM, mudconf.struct_dstr, raw_text );
     } else {
         text = raw_text;
     }
@@ -637,11 +634,12 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
             notify( player, buf );
         } else {
             if( is_special == 0 ) {
-                buf = tmprintf( "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
-                notify( player, buf );
+                snprintf(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
+                notify( player, s );
             } else if( is_special == 1 ) {
                 buf = alloc_lbuf( "view_atr.pretty" );
-                pretty_print( buf, tmprintf( "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL ), text );
+                snprintf(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
+                pretty_print( buf, s, text );
                 notify( player, buf );
                 free_lbuf( buf );
             } else {
@@ -675,17 +673,17 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
 
     if( is_special == 1 ) {
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            name_buf = tmprintf( "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
+            snprintf( s, GBUF_SIZE, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL );
         } else if( *fbp ) {
-            name_buf = tmprintf( "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
+            snprintf( s, GBUF_SIZE, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            name_buf = tmprintf( "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
+            snprintf( s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL );
         } else {
-            name_buf = ( char * ) "";
+            s[0]=0x00;
             buf = text;
         }
         buf = alloc_lbuf( "view_atr.pretty_print" );
-        pretty_print( buf, name_buf, text );
+        pretty_print( buf, s, text );
         notify( player, buf );
         free_lbuf( buf );
     } else if( is_special == 2 ) {
@@ -708,15 +706,15 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
         free_lbuf( buf );
     } else {
         if( ( aowner != Owner( thing ) ) && ( aowner != NOTHING ) ) {
-            buf = tmprintf( "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text );
+            snprintf(s, GBUF_SIZE, "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text );
         } else if( *fbp ) {
-            buf = tmprintf( "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text );
+            snprintf(s, GBUF_SIZE, "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text );
         } else if( !skip_tag || ( ap->number != A_DESC ) ) {
-            buf = tmprintf( "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
+            snprintf(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text );
         } else {
-            buf = text;
+            snprintf(s, GBUF_SIZE, "%s", text );
         }
-        notify( player, buf );
+        notify( player, s );
     }
 
     if( ( aflags & AF_STRUCTURE ) && text ) {
@@ -1998,16 +1996,12 @@ extern NAMETAB indiv_attraccess_nametab[];
 
 void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
     BOOLEXP *bool;
-
     char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp;
-
     dbref aowner, thing;
-
     int val, aflags, alen, ca, wild_decomp;
-
     ATTR *attr;
-
     NAMETAB *np;
+    char s[GBUF_SIZE];
 
     /*
      * Check for obj/attr first
@@ -2032,8 +2026,7 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
     }
 
     if( !Examinable( player, thing ) ) {
-        notify_quiet( player,
-                      "You can only decompile things you can examine." );
+        notify_quiet( player, "You can only decompile things you can examine." );
         olist_pop();
         return;
     }
@@ -2117,7 +2110,8 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
                 strcpy( buff, attr->name );
                 if( key & DECOMP_PRETTY ) {
                     tbuf = alloc_lbuf( "do_decomp.pretty" );
-                    pretty_print( tbuf, tmprintf( "%c%s %s=", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname ), got );
+                    snprintf(s, GBUF_SIZE, "%c%s %s=", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname );
+                    pretty_print( tbuf, s, got );
                     notify( player, tbuf );
                     free_lbuf( tbuf );
                 } else {

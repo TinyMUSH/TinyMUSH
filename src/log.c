@@ -362,6 +362,7 @@ char *log_gettype( dbref thing, char *d ) {
 void do_logrotate( dbref player, dbref cause, int key ) {
     LOGFILETAB *lp;
     char ts[SBUF_SIZE], *pname;
+    char s[MBUF_SIZE];
 
     mktimestamp(ts, SBUF_SIZE);
     mudstate.mudlognum++;
@@ -370,7 +371,8 @@ void do_logrotate( dbref player, dbref cause, int key ) {
         notify( player, "Warning: can't rotate main log when logging to stderr." );
     } else {
         fclose( mainlog_fp );
-        copy_file( mudconf.log_file, tmprintf( "%s.%s", mudconf.log_file, ts ), 1 );
+        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
+        copy_file( mudconf.log_file, s, 1 );
         logfile_init( mudconf.log_file );
     }
 
@@ -386,7 +388,8 @@ void do_logrotate( dbref player, dbref cause, int key ) {
     for( lp = logfds_table; lp->log_flag; lp++ ) {
         if( lp->filename && lp->fileptr ) {
             fclose( lp->fileptr );
-            copy_file( lp->filename, tmprintf( "%s.%s", lp->filename, ts ), 1 );
+            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts );
+            copy_file( lp->filename, s, 1 );
             lp->fileptr = fopen( lp->filename, "w" );
             if( lp->fileptr ) {
                 setbuf( lp->fileptr, NULL );
@@ -397,20 +400,21 @@ void do_logrotate( dbref player, dbref cause, int key ) {
 
 void logfile_close( void ) {
     LOGFILETAB *lp;
-
-    char ts[SBUF_SIZE];
+    char ts[SBUF_SIZE], s[MBUF_SIZE];
 
     mktimestamp( ts, SBUF_SIZE);
 
     for( lp = logfds_table; lp->log_flag; lp++ ) {
         if( lp->filename && lp->fileptr ) {
             fclose( lp->fileptr );
-            copy_file( lp->filename, tmprintf( "%s.%s", lp->filename, ts ), 1 );
+            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts );
+            copy_file( lp->filename, s, 1 );
         }
     }
 
     if( mainlog_fp != stderr ) {
         fclose( mainlog_fp );
-        copy_file( mudconf.log_file, tmprintf( "%s.%s", mudconf.log_file, ts ), 1 );
+        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
+        copy_file( mudconf.log_file, s, 1 );
     }
 }

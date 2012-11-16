@@ -36,13 +36,12 @@ extern int decode_power( dbref, char *, POWERSET * );
  */
 
 static void bind_and_queue( dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now ) {
-    char *command, *command2;	/*
-					 *
-					 * * allocated by replace_string
-					 */
+    char *command, *command2;	/* allocated by replace_string */
+    char s[SBUF_SIZE];
 
+    snprintf(s, SBUF_SIZE, "%d", number );
     command = replace_string( BOUND_VAR, argstr, action );
-    command2 = replace_string( LISTPLACE_VAR, tmprintf( "%d", number ), command );
+    command2 = replace_string( LISTPLACE_VAR, s, command );
     if( now ) {
         process_cmdline( player, cause, command2, cargs, ncargs, NULL );
     } else

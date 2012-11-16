@@ -866,14 +866,11 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
 
 void do_addcommand( dbref player, dbref cause, int key, char *name, char *command ) {
     CMDENT *old, *cmd;
-
     ADDENT *add, *nextp;
-
     dbref thing;
-
     int atr;
-
     char *s;
+    char s1[MBUF_SIZE];
 
     /*
      * Sanity-check the command name and make it case-insensitive.
@@ -966,9 +963,10 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
              * * the added command, while keeping the __ alias.
              */
             if( !strcmp( name, old->cmdname ) ) {
-                hashdelete( tmprintf( "__%s", old->cmdname ), &mudstate.command_htab );
+                snprintf(s1, MBUF_SIZE, "__%s", old->cmdname );
+                hashdelete( s1, &mudstate.command_htab );
                 hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
-                hashadd( tmprintf( "__%s", old->cmdname ), ( int * ) old, &mudstate.command_htab, 0 );
+                hashadd( s1, ( int * ) old, &mudstate.command_htab, 0 );
             }
         }
     }
@@ -1045,14 +1043,11 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
 
 void do_delcommand( dbref player, dbref cause, int key, char *name, char *command ) {
     CMDENT *old, *cmd;
-
     ADDENT *prev = NULL, *nextp;
-
     dbref thing;
-
     int atr;
-
     char *s;
+    char s1[MBUF_SIZE];
 
     if( !*name ) {
         notify( player, "Sorry." );
@@ -1089,7 +1084,8 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                 XFREE( prev, "delcommand.addent" );
             }
             hashdelete( name, &mudstate.command_htab );
-            if( ( cmd = ( CMDENT * ) hashfind( tmprintf( "__%s", old->cmdname ), &mudstate.command_htab ) ) != NULL ) {
+            snprintf(s1, MBUF_SIZE, "__%s", old->cmdname );
+            if( ( cmd = ( CMDENT * ) hashfind( s1, &mudstate.command_htab ) ) != NULL ) {
                 hashadd( cmd->cmdname, ( int * ) cmd,
                          &mudstate.command_htab, 0 );
                 /*
@@ -1105,8 +1101,9 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                  * the __ alias may have been temporarily
                  * * marked as the original hash entry
                  */
-                hashdelete( tmprintf( "__%s", cmd->cmdname ), &mudstate.command_htab );
-                hashadd( tmprintf( "__%s", cmd->cmdname ), ( int * ) cmd, &mudstate.command_htab, HASH_ALIAS );
+                snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname );
+                hashdelete( s1, &mudstate.command_htab );
+                hashadd( s1, ( int * ) cmd, &mudstate.command_htab, HASH_ALIAS );
 
                 hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
             } else {
@@ -1129,7 +1126,8 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                     if( !prev ) {
                         if( !nextp->next ) {
                             hashdelete( name, &mudstate. command_htab );
-                            if( ( cmd = ( CMDENT * ) hashfind ( tmprintf( "__%s", name ), &mudstate.command_htab ) ) != NULL ) {
+                            snprintf(s1, MBUF_SIZE, "__%s", name );
+                            if( ( cmd = ( CMDENT * ) hashfind ( s1, &mudstate.command_htab ) ) != NULL ) {
                                 hashadd( cmd->cmdname, ( int * ) cmd, &mudstate.command_htab, 0 );
                                 /*
                                  * in case we deleted by alias
@@ -1147,8 +1145,9 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                                  * the __ alias may have been temporarily
                                  * * marked as the original hash entry
                                  */
-                                hashdelete( tmprintf( "__%s", cmd->cmdname ), &mudstate.command_htab );
-                                hashadd( tmprintf( "__%s", cmd->cmdname ), ( int * ) cmd,&mudstate.command_htab, HASH_ALIAS );
+                                 snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname );
+                                hashdelete( s1, &mudstate.command_htab );
+                                hashadd( s1, ( int * ) cmd,&mudstate.command_htab, HASH_ALIAS );
 
                                 hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
                             } else {
@@ -2558,16 +2557,16 @@ void do_verb( dbref player, dbref cause, int key, char *victim_str, char *args[]
 
 void do_include( dbref player, dbref cause, int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs ) {
     dbref thing, aowner;
-
     int attrib, aflags, alen;
-
     char *act, *tp;
+    char s[MBUF_SIZE];
 
     /*
      * Get the attribute. Default to getting it off ourselves.
      */
 
-    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, tmprintf( "me/%s", object ), &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
+    snprintf( s, MBUF_SIZE,  "me/%s", object );
+    if( !( ( parse_attrib( player, object, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) || ( parse_attrib( player, s, &thing, &attrib, 0 ) && ( attrib != NOTHING ) ) ) ) {
         notify_quiet( player, "No match." );
         return;
     }

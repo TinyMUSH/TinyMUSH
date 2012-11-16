@@ -1512,23 +1512,21 @@ void fun_v( char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
 
 void perform_get( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     dbref thing, aowner;
-
     int attrib, aflags, alen, eval_it;
-
     char *atr_gotten, *str;
-
+    char s[MBUF_SIZE];
     eval_it = Is_Func( GET_EVAL );
 
     if( Is_Func( GET_XARGS ) ) {
         if( !*fargs[0] || !*fargs[1] ) {
             return;
         }
-        str = tmprintf( "%s/%s", fargs[0], fargs[1] );
+        snprintf( s, MBUF_SIZE, "%s/%s", fargs[0], fargs[1] );
     } else {
-        str = fargs[0];
+        snprintf( s, MBUF_SIZE, "%s", fargs[0] );
     }
 
-    if( !parse_attrib( player, str, &thing, &attrib, 0 ) ) {
+    if( !parse_attrib( player, s, &thing, &attrib, 0 ) ) {
         safe_nomatch( buff, bufc );
         return;
     }

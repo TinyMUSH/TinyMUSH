@@ -133,12 +133,10 @@ static void encrypt_logindata( char *atrbuf, LDATA *info ) {
 
 void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lusername ) {
     LDATA login_info;
-
     char *atrbuf;
-
     dbref aowner;
-
     int aflags, alen, i;
+    char s[MBUF_SIZE];
 
     atrbuf = atr_get( player, A_LOGINDATA, &aowner, &aflags, &alen );
     decrypt_logindata( atrbuf, &login_info );
@@ -161,9 +159,10 @@ void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lus
         login_info.good[0].dtm = ldate;
         login_info.good[0].host = lhost;
         login_info.tot_good++;
-        if( *lusername )
-            atr_add_raw( player, A_LASTSITE, tmprintf( "%s@%s", lusername, lhost ) );
-        else {
+        if( *lusername ) {
+            snprintf(s, MBUF_SIZE, "%s@%s", lusername, lhost );
+            atr_add_raw( player, A_LASTSITE, s );
+        } else {
             atr_add_raw( player, A_LASTSITE, lhost );
         }
     } else {

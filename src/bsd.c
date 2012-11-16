@@ -82,12 +82,10 @@ int process_input( DESC * );
 
 static int get_slave_result( void ) {
     char *buf, *host1, *hostname, *host2, *p, *userid;
-
     int remote_port, len;
-
     unsigned long addr;
-
     DESC *d;
+    char s[MBUF_SIZE];
 
     buf = alloc_lbuf( "slave_buf" );
 
@@ -122,7 +120,8 @@ static int get_slave_result( void ) {
             }
             if( d->player != 0 ) {
                 if( d->username[0] ) {
-                    atr_add_raw( d->player, A_LASTSITE, tmprintf( "%s@%s", d->username, hostname ) );
+                    snprintf(s, MBUF_SIZE, "%s@%s", d->username, hostname );
+                    atr_add_raw( d->player, A_LASTSITE, s );
                 } else {
                     atr_add_raw( d->player, A_LASTSITE, hostname );
                 }
@@ -200,9 +199,11 @@ static int get_slave_result( void ) {
         }
         if( d->player != 0 ) {
             if( mudconf.use_hostname ) {
-                atr_add_raw( d->player, A_LASTSITE, tmprintf( "%s@%s", userid, hostname ) );
+                snprintf(s, MBUF_SIZE, "%s@%s", userid, hostname );
+                atr_add_raw( d->player, A_LASTSITE, s );
             } else {
-                atr_add_raw( d->player, A_LASTSITE, tmprintf( "%s@%s", userid, host2 ) );
+                snprintf(s, MBUF_SIZE, "%s@%s", userid, host2 );
+                atr_add_raw( d->player, A_LASTSITE, s );
             }
         }
         strncpy( d->username, userid, 10 );

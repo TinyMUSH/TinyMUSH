@@ -115,14 +115,11 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
 
 void init_cmdtab( void ) {
     CMDENT *cp;
-
     ATTR *ap;
-
     char *p, *q;
-
     char *cbuff;
-
     int i;
+    char s[MBUF_SIZE];
 
     hashinit( &mudstate.command_htab, 250 * HASH_FACTOR, HT_STR );
 
@@ -160,7 +157,8 @@ void init_cmdtab( void ) {
                 /*
                  * also add the __ alias form
                  */
-                hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
+                snprintf(s, MBUF_SIZE, "__%s", cp->cmdname );
+                hashadd( s, ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
             }
         }
     }
@@ -172,7 +170,8 @@ void init_cmdtab( void ) {
 
     for( cp = command_table; cp->cmdname; cp++ ) {
         hashadd( cp->cmdname, ( int * ) cp, &mudstate.command_htab, 0 );
-        hashadd( tmprintf( "__%s", cp->cmdname ), ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
+        snprintf(s, MBUF_SIZE, "__%s", cp->cmdname );
+        hashadd( s, ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
     }
 
     /*
