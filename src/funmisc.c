@@ -1155,7 +1155,7 @@ void fun_mudname( char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void fun_hasmodule( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     MODULE *mp;
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( !strcasecmp( fargs[0], mp->modname ) ) {
             safe_chr( '1', buff, bufc );
             return;

@@ -1242,7 +1242,7 @@ int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, d
                     cp = strchr( sp + 4, '_' );
                     if( cp ) {
                         *cp++ = '\0';
-                        WALK_ALL_MODULES( mp ) {
+                        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
                             got_one = 1;
                             if( !strcmp( sp + 4,
                                          mp->modname ) ) {
@@ -1559,18 +1559,15 @@ int cf_cf_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
 
     for( tp = conftable; tp->pname; tp++ ) {
         if( !strcmp( tp->pname, str ) ) {
-            return ( helper_cf_cf_access( tp, player, vp, ap, cmd,
-                                          extra ) );
+            return ( helper_cf_cf_access( tp, player, vp, ap, cmd, extra ) );
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( !strcmp( tp->pname, str ) ) {
-                    return ( helper_cf_cf_access( tp, player,
-                                                  vp, ap, cmd, extra ) );
+                    return ( helper_cf_cf_access( tp, player, vp, ap, cmd, extra ) );
                 }
             }
         }
@@ -2160,13 +2157,11 @@ int cf_set( char *cp, char *ap, dbref player ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( !strcmp( tp->pname, cp ) )
-                    return ( helper_cf_set( cp, ap, player,
-                                            tp ) );
+                    return ( helper_cf_set( cp, ap, player, tp ) );
             }
         }
     }
@@ -2232,20 +2227,16 @@ void list_cf_access( dbref player ) {
     for( tp = conftable; tp->pname; tp++ ) {
         if( God( player ) || check_access( player, tp->flags ) ) {
             sprintf( buff, "%s:", tp->pname );
-            listset_nametab( player, access_nametab, tp->flags,
-                             buff, 1 );
+            listset_nametab( player, access_nametab, tp->flags, buff, 1 );
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
-                if( God( player )
-                        || check_access( player, tp->flags ) ) {
+                if( God( player ) || check_access( player, tp->flags ) ) {
                     sprintf( buff, "%s:", tp->pname );
-                    listset_nametab( player, access_nametab,
-                                     tp->flags, buff, 1 );
+                    listset_nametab( player, access_nametab, tp->flags, buff, 1 );
                 }
             }
         }
@@ -2271,15 +2262,12 @@ void list_cf_read_access( dbref player ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
-                if( God( player )
-                        || check_access( player, tp->rperms ) ) {
+                if( God( player ) || check_access( player, tp->rperms ) ) {
                     sprintf( buff, "%s:", tp->pname );
-                    listset_nametab( player, access_nametab,
-                                     tp->rperms, buff, 1 );
+                    listset_nametab( player, access_nametab, tp->rperms, buff, 1 );
                 }
             }
         }
@@ -2311,9 +2299,8 @@ void cf_verify( void ) {
         Check_Conf_Dbref( tp );
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 Check_Conf_Dbref( tp );
             }
@@ -2372,13 +2359,11 @@ void cf_display( dbref player, char *param_name, char *buff, char **bufc ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( !strcasecmp( tp->pname, param_name ) ) {
-                    helper_cf_display( player, buff, bufc,
-                                       tp );
+                    helper_cf_display( player, buff, bufc, tp );
                     return;
                 }
             }
@@ -2402,9 +2387,8 @@ void list_options( dbref player ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( ( ( tp->interpreter == cf_const ) ||
                         ( tp->interpreter == cf_bool ) ) &&

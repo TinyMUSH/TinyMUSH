@@ -234,9 +234,8 @@ void list_functable( dbref player ) {
     }
     notify( player, buf );
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( modfns = DLSYM_VAR( mp->handle, mp->modname, "functable",
-                                  FUN * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( modfns = DLSYM_VAR( mp->handle, mp->modname, "functable", FUN * ) ) != NULL ) {
             bp = buf;
             safe_sprintf( buf, &bp, "Module %s functions:", mp->modname );
             for( fp = modfns; fp->name; fp++ ) {
@@ -308,9 +307,8 @@ void list_funcaccess( dbref player ) {
     buff = alloc_sbuf( "list_funcaccess" );
     helper_list_funcaccess( player, flist, buff );
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ftab = DLSYM_VAR( mp->handle, mp->modname, "functable",
-                                FUN * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ftab = DLSYM_VAR( mp->handle, mp->modname, "functable", FUN * ) ) != NULL ) {
             helper_list_funcaccess( player, ftab, buff );
         }
     }

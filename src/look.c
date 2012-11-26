@@ -1510,7 +1510,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
 
             if( Dropto( thing ) != NOTHING ) {
                 buf2 = unparse_object( player, Dropto( thing ), 0 );
-                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Dropped objects go to: %s", buf2 );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Dropped objects go to: %s", buf2 );
                 free_lbuf( buf2 );
             }
             break;
@@ -1538,7 +1538,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
 
             loc = Home( thing );
             buf2 = unparse_object( player, loc, 0 );
-            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Home: %s", buf2 );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Home: %s", buf2 );
             free_lbuf( buf2 );
 
             /*
@@ -1548,13 +1548,13 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
             loc = Location( thing );
             if( ( Location( thing ) != NOTHING ) && ( Examinable( player, loc ) || Examinable( player, thing ) || Linkable( player, loc ) ) ) {
                 buf2 = unparse_object( player, loc, 0 );
-                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Location: %s", buf2 );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Location: %s", buf2 );
                 free_lbuf( buf2 );
             }
             break;
         case TYPE_EXIT:
             buf2 = unparse_object( player, Exits( thing ), 0 );
-            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Source: %s", buf2 );
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Source: %s", buf2 );
             free_lbuf( buf2 );
 
             /*
@@ -1571,7 +1571,7 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
                 break;
             default:
                 buf2 = unparse_object( player, Location( thing ), 0 );
-                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN,NULL, "Destination: %s", buf2 );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Destination: %s", buf2 );
                 free_lbuf( buf2 );
                 break;
             }

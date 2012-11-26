@@ -994,8 +994,7 @@ char *process_command( dbref player, dbref cause, int interactive, char *command
      * Allow modules to intercept command strings.
      */
 
-    CALL_SOME_MODULES( retval, process_command,
-                       ( player, cause, interactive, command, args, nargs ) );
+    CALL_SOME_MODULES( retval, process_command, ( player, cause, interactive, command, args, nargs ) );
     if( retval > 0 ) {
         mudstate.debug_cmd = cmdsave;
         return preserve_cmd;
@@ -1481,9 +1480,7 @@ char *process_command( dbref player, dbref cause, int interactive, char *command
      */
 
     if( !succ ) {
-        CALL_SOME_MODULES( succ, process_no_match,
-                           ( player, cause, interactive, lcbuf, preserve_cmd,
-                             args, nargs ) );
+        CALL_SOME_MODULES( succ, process_no_match, ( player, cause, interactive, lcbuf, preserve_cmd, args, nargs ) );
     }
     free_lbuf( lcbuf );
 
@@ -1713,7 +1710,7 @@ static void list_cmdtable( dbref player ) {
         notify( player, buf );
     }
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( ( modcmds = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
             bp = buf;
             safe_sprintf( buf, &bp, "Module %s commands:", mp->modname );
@@ -1809,9 +1806,8 @@ static void list_cmdaccess( dbref player ) {
     buff = alloc_sbuf( "list_cmdaccess" );
     helper_list_cmdaccess( player, command_table, buff );
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable",
-                                CMDENT * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
             helper_list_cmdaccess( player, ctab, buff );
         }
     }
@@ -1868,18 +1864,14 @@ static void list_cmdswitches( dbref player ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable",
-                                CMDENT * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
             for( cmdp = ctab; cmdp->cmdname; cmdp++ ) {
                 if( cmdp->switches ) {
                     if( check_access( player, cmdp->perms ) ) {
                         if( !( cmdp->perms & CF_DARK ) ) {
-                            sprintf( buff, "%s:",
-                                     cmdp->cmdname );
-                            display_nametab( player,
-                                             cmdp->switches,
-                                             buff, 0 );
+                            sprintf( buff, "%s:", cmdp->cmdname );
+                            display_nametab( player, cmdp->switches, buff, 0 );
                         }
                     }
                 }
@@ -2432,16 +2424,14 @@ static void list_hashstats( dbref player ) {
     list_hashstat( player, "Instance Data", &mudstate.instdata_htab );
     list_hashstat( player, "Module APIs", &mudstate.api_func_htab );
 
-    WALK_ALL_MODULES( mp ) {
-        m_htab = DLSYM_VAR( mp->handle, mp->modname,
-                            "hashtable", MODHASHES * );
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
         if( m_htab ) {
             for( hp = m_htab; hp->htab != NULL; hp++ ) {
                 list_hashstat( player, hp->tabname, hp->htab );
             }
         }
-        m_ntab = DLSYM_VAR( mp->handle, mp->modname,
-                            "nhashtable", MODNHASHES * );
+        m_ntab = DLSYM_VAR( mp->handle, mp->modname, "nhashtable", MODNHASHES * );
         if( m_ntab ) {
             for( np = m_ntab; np->tabname != NULL; np++ ) {
                 list_nhashstat( player, np->tabname, np->htab );

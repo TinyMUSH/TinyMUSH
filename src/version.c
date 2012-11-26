@@ -67,7 +67,7 @@ void do_version( dbref player, dbref cause, int extra ) {
     }
     if( mudstate.modloaded[0] ) {
         MODULE *mp;
-        WALK_ALL_MODULES( mp ) {
+          for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             ptr = repeatchar( strlen( mp->modname ) + 8, '-' );
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
             XFREE( ptr, "repeatchar" );

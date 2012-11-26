@@ -617,10 +617,7 @@ extern int	register_match( char *, char *, char *[], int );
 
 #define	Protect(f) (cmdp->perms & f)
 
-#define Invalid_Objtype(x) \
-((Protect(CA_LOCATION) && !Has_location(x)) || \
- (Protect(CA_CONTENTS) && !Has_contents(x)) || \
- (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
+#define Invalid_Objtype(x) ((Protect(CA_LOCATION) && !Has_location(x)) || (Protect(CA_CONTENTS) && !Has_contents(x)) || (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
 
 #define safe_atoi(s)	((s == NULL) ? 0 : (int)strtol(s, (char **)NULL, 10))
 
@@ -748,9 +745,9 @@ extern int	register_match( char *, char *, char *[], int );
 
 /* Syntax: DLSYM(<handler>, <module name>, <function name>, <prototype>) */
 
-#define DLSYM(h,m,x,p) (void (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_INT(h,m,x,p) (int (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_VAR(h,m,x,p) (p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
+#define DLSYM(h,m,x,p)		(void (*)p)lt_dlsym( (h), tmprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_INT(h,m,x,p)	(int (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
+#define DLSYM_VAR(h,m,x,p)	(p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
 
 /*
  * Syntax: CALL_ALL_MODULES(<name of function>, (<args>)) Call all modules
@@ -760,7 +757,7 @@ extern int	register_match( char *, char *, char *[], int );
 #define CALL_ALL_MODULES(xfn,args) \
 { \
     MODULE *cam__mp; \
-    WALK_ALL_MODULES(cam__mp) { \
+    for (cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next) { \
         if (cam__mp->xfn) { \
             (*(cam__mp->xfn))args; \
         } \
@@ -771,7 +768,7 @@ extern int	register_match( char *, char *, char *[], int );
 { \
     MODULE *cam__mp; \
     void (*cam__ip)proto; \
-    WALK_ALL_MODULES(cam__mp) { \
+    for (cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next) { \
         if ((cam__ip = DLSYM(cam__mp->handle, cam__mp->modname, xfn, proto)) != NULL) \
             (*cam__ip)args; \
     } \
@@ -785,9 +782,7 @@ extern int	register_match( char *, char *, char *[], int );
 #define CALL_SOME_MODULES(rv,xfn,args) \
 { \
     MODULE *csm__mp; \
-    for (csm__mp = mudstate.modules_list, rv = 0; \
-	 (csm__mp != NULL) && !rv; \
-	 csm__mp = csm__mp->next) { \
+    for (csm__mp = mudstate.modules_list, rv = 0; (csm__mp != NULL) && !rv; csm__mp = csm__mp->next) { \
         if (csm__mp->xfn) { \
             rv = (*(csm__mp->xfn))args; \
         } \

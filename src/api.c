@@ -42,7 +42,7 @@ void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
     int succ = 0;
     char s[MBUF_SIZE];
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( !strcmp( module_name, mp->modname ) ) {
             succ = 1;
             break;

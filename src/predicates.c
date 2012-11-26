@@ -1471,7 +1471,7 @@ void do_restart( dbref player, dbref cause, int key ) {
     alarm( 0 );
     dump_restart_db();
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         lt_dlclose( mp->handle );
     }
 
@@ -2116,10 +2116,7 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
      * *       to the end of the modules and nothing has returned non-zero.
      * * Negative: Stop calling modules. Execute normal did_it().
      */
-    CALL_SOME_MODULES( retval, did_it,
-                       ( player, thing, master,
-                         what, def, owhat, def, awhat,
-                         ctrl_flags, args, nargs, msg_key ) );
+    CALL_SOME_MODULES( retval, did_it, ( player, thing, master, what, def, owhat, def, awhat, ctrl_flags, args, nargs, msg_key ) );
     if( retval > 0 ) {
         return;
     }

@@ -294,7 +294,7 @@ void do_hashresize( dbref player, dbref cause, int key ) {
                 ( mudstate.max_vars < 16 ) ? 16 : mudstate.max_vars );
     hashresize( &mudstate.api_func_htab, 8 );
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
         if( m_htab ) {
             for( hp = m_htab; hp->tabname != NULL; hp++ ) {
@@ -1407,7 +1407,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
      * Next. get a list of all our module files
      */
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         s = xstrprintf("backup_mush", "%s/%s_mod_%s.db", mudconf.bakhome, mudconf.mud_shortname, mp->modname );
         if( mp->db_write_flatfile ) {
             fp = db_module_flatfile( s, 1 );
@@ -1842,7 +1842,7 @@ void dump_database_internal( int dump_type ) {
         /*
          * Trigger modules to write their flat-text dbs
          */
-        WALK_ALL_MODULES( mp ) {
+        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             s = xstrprintf( "dump_database_internal", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             if( mp->db_write_flatfile ) {
                 f = db_module_flatfile( s, 1 );
@@ -1900,7 +1900,7 @@ void dump_database_internal( int dump_type ) {
          * Call modules to write to their flat-text database
          */
 
-        WALK_ALL_MODULES( mp ) {
+        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             s = xstrprintf( "dump_database_internal", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             if( mp->db_write_flatfile ) {
                 f = db_module_flatfile( s, 1 );
@@ -2022,7 +2022,7 @@ static int load_game( void ) {
      * Call modules to load data from their flat-text database
      */
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( ( modfunc = DLSYM( mp->handle, mp->modname, "load_database", ( FILE * ) ) ) != NULL ) {
             s = xstrprintf( "load_game", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
@@ -2399,7 +2399,7 @@ void recover( char *flat ) {
      * Call modules to load their flatfiles
      */
 
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_read_flatfile", ( FILE * ) ) ) != NULL ) {
             s = xstrprintf( "recover", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
@@ -2603,7 +2603,7 @@ int dbconvert( int argc, char *argv[] ) {
          * Call modules to load their flatfiles
          */
 
-        WALK_ALL_MODULES( mp ) {
+        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_read_flatfile", ( FILE * ) ) ) != NULL ) {
                 s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                 f = db_module_flatfile( s, 0 );
@@ -2651,7 +2651,7 @@ int dbconvert( int argc, char *argv[] ) {
              * Call all modules to write to flatfile
              */
 
-            WALK_ALL_MODULES( mp ) {
+            for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
                 if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_write_flatfile", ( FILE * ) ) ) != NULL ) {
                     s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                     f = db_module_flatfile( s, 1 );
@@ -2952,7 +2952,7 @@ int main( int argc, char *argv[] ) {
     }
 
     bp = mudstate.modloaded;
-    WALK_ALL_MODULES( mp ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         if( bp != mudstate.modloaded ) {
             safe_mb_chr( ' ', mudstate.modloaded, &bp );
         }
@@ -3042,16 +3042,14 @@ int main( int argc, char *argv[] ) {
         hashreset( &mudstate.hfile_hashes[i] );
     }
 
-    WALK_ALL_MODULES( mp ) {
-        m_htab = DLSYM_VAR( mp->handle, mp->modname,
-                            "hashtable", MODHASHES * );
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
         if( m_htab ) {
             for( hp = m_htab; hp->tabname != NULL; hp++ ) {
                 hashreset( hp->htab );
             }
         }
-        m_ntab = DLSYM_VAR( mp->handle, mp->modname,
-                            "nhashtable", MODNHASHES * );
+        m_ntab = DLSYM_VAR( mp->handle, mp->modname, "nhashtable", MODNHASHES * );
         if( m_ntab ) {
             for( np = m_ntab; np->tabname != NULL; np++ ) {
                 nhashreset( np->htab );

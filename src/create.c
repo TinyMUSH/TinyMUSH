@@ -820,9 +820,8 @@ int destroyable( dbref victim ) {
         }
     }
 
-    WALK_ALL_MODULES( mp ) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable",
-                                CONF * ) ) != NULL ) {
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( tp->interpreter == cf_dbref &&
                         victim == * ( ( dbref * )( tp->loc ) ) ) {
