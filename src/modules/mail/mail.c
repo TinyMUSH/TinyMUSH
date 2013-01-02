@@ -968,7 +968,7 @@ void do_mail_reply(dbref player, char *msg, int all, int key) {
         bp = oldlist = alloc_lbuf("do_mail_reply.oldlist");
         safe_str((char *)mp->tolist, oldlist, &bp);
         if (*mp->cclist)
-            safe_tmprintf_str(oldlist, &bp, " %s", mp->cclist);
+            safe_sprintf( oldlist, &bp, " %s", mp->cclist);
 
         bp = ccnames = alloc_lbuf("do_mail_reply.ccnames");
         for (p = strtok_r(oldlist, " ", &tokst);
@@ -1780,7 +1780,7 @@ static int get_folder_number(dbref player, char *name) {
     bp = pat = alloc_lbuf("get_folder_num_pat");
 
     strcpy(str, atrstr);
-    safe_tmprintf_str(pat, &bp, ":%s:", upcasestr(name));
+    safe_sprintf(pat, &bp, ":%s:", upcasestr(name));
     res = (char *)strstr(str, pat);
     if (!res) {
         free_lbuf(str);
@@ -2602,7 +2602,7 @@ void do_malias_list(dbref player, char *alias) {
         return;
     }
     bp = buff = alloc_lbuf("do_malias_list");
-    safe_tmprintf_str(buff, &bp, "MAIL: Alias *%s: ", m->name);
+    safe_sprintf(buff, &bp, "MAIL: Alias *%s: ", m->name);
     for (i = m->numrecep - 1; i > -1; i--) {
         safe_name(m->list[i], buff, &bp);
         safe_chr(' ', buff, &bp);
@@ -3522,7 +3522,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 return;
             } else {
                 count_mail(playerask, 0, &rc, &uc, &cc);
-                safe_tmprintf_str(buff, bufc, "%d %d %d", rc, uc, cc);
+                safe_sprintf(buff, bufc, "%d %d %d", rc, uc, cc);
                 return;
             }
         } else {
