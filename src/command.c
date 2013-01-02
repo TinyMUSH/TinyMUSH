@@ -1683,9 +1683,7 @@ void process_cmdline( dbref player, dbref cause, char *cmdline, char *args[], in
 
 static void list_cmdtable( dbref player ) {
     CMDENT *cmdp, *modcmds;
-
-    char *buf, *bp;
-
+    char *buf, *bp, *s;
     MODULE *mp;
 
     buf = alloc_lbuf( "list_cmdtable" );
@@ -1710,8 +1708,10 @@ static void list_cmdtable( dbref player ) {
         notify( player, buf );
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( modcmds = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
+    s = alloc_mbuf("list_cmdtable");
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {    
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+        if( ( modcmds = (CMDENT *) lt_dlsym(mp->handle, s ) ) != NULL ) {
             bp = buf;
             safe_sprintf( buf, &bp, "Module %s commands:", mp->modname );
             for( cmdp = modcmds; cmdp->cmdname; cmdp++ ) {
@@ -1725,7 +1725,8 @@ static void list_cmdtable( dbref player ) {
             notify( player, buf );
         }
     }
-
+    
+    free_mbuf( s );
     free_lbuf( buf );
 }
 
@@ -1806,11 +1807,14 @@ static void list_cmdaccess( dbref player ) {
     buff = alloc_sbuf( "list_cmdaccess" );
     helper_list_cmdaccess( player, command_table, buff );
 
+    p = alloc_mbuf("list_cmdaccess");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
+        snprintf(p, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+        if( ( ctab = (CMDENT *)lt_dlsym(mp->handle, p) ) != NULL ) {
             helper_list_cmdaccess( player, ctab, buff );
         }
     }
+    free_mbuf(p);
 
     for( ap = attr; ap->name; ap++ ) {
         p = buff;
@@ -1844,7 +1848,7 @@ static void list_cmdaccess( dbref player ) {
  */
 
 static void list_cmdswitches( dbref player ) {
-    char *buff;
+    char *buff, *s;
 
     CMDENT *cmdp, *ctab;
 
@@ -1864,8 +1868,11 @@ static void list_cmdswitches( dbref player ) {
         }
     }
 
+    s = alloc_mbuf("list_cmdswitches");
+
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "cmdtable", CMDENT * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+        if( ( ctab = (CMDENT *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( cmdp = ctab; cmdp->cmdname; cmdp++ ) {
                 if( cmdp->switches ) {
                     if( check_access( player, cmdp->perms ) ) {
@@ -1878,6 +1885,8 @@ static void list_cmdswitches( dbref player ) {
             }
         }
     }
+    
+    free_mbuf( s );
 
     free_sbuf( buff );
 }
@@ -2393,10 +2402,9 @@ static void list_nhashstat( dbref player, const char *tab_name, NHSHTAB *htab ) 
 
 static void list_hashstats( dbref player ) {
     MODULE *mp;
-
     MODHASHES *m_htab, *hp;
-
     MODNHASHES *m_ntab, *np;
+    char *s;
 
     raw_notify( player, NULL, "Hash Stats       Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
     list_hashstat( player, "Commands", &mudstate.command_htab );
@@ -2424,20 +2432,25 @@ static void list_hashstats( dbref player ) {
     list_hashstat( player, "Instance Data", &mudstate.instdata_htab );
     list_hashstat( player, "Module APIs", &mudstate.api_func_htab );
 
+
+    s = alloc_mbuf("list_hashstats");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
+        m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
         if( m_htab ) {
             for( hp = m_htab; hp->htab != NULL; hp++ ) {
                 list_hashstat( player, hp->tabname, hp->htab );
             }
         }
-        m_ntab = DLSYM_VAR( mp->handle, mp->modname, "nhashtable", MODNHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
+        m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
         if( m_ntab ) {
             for( np = m_ntab; np->tabname != NULL; np++ ) {
                 list_nhashstat( player, np->tabname, np->htab );
             }
         }
     }
+    free_mbuf(s);
 }
 
 static void list_textfiles( dbref player ) {

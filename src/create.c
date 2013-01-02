@@ -806,7 +806,7 @@ static int can_destroy_exit( dbref player, dbref exit ) {
 
 int destroyable( dbref victim ) {
     CONF *tp, *ctab;
-
+    char *s;
     MODULE *mp;
 
     if( ( victim == ( dbref ) 0 ) || ( God( victim ) ) ) {
@@ -820,16 +820,19 @@ int destroyable( dbref victim ) {
         }
     }
 
+    s = alloc_mbuf("destroyable");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
-                if( tp->interpreter == cf_dbref &&
-                        victim == * ( ( dbref * )( tp->loc ) ) ) {
+                if( tp->interpreter == cf_dbref && victim == * ( ( dbref * )( tp->loc ) ) ) {
+                    free_lbuf(s);
                     return 0;
                 }
             }
         }
     }
+    free_lbuf(s);
 
     return 1;
 }

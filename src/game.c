@@ -269,6 +269,8 @@ void do_hashresize( dbref player, dbref cause, int key ) {
     MODHASHES *m_htab, *hp;
 
     MODNHASHES *m_ntab, *np;
+    
+    char *s;
 
     hashresize( &mudstate.command_htab, 512 );
     hashresize( &mudstate.player_htab, 16 );
@@ -294,20 +296,24 @@ void do_hashresize( dbref player, dbref cause, int key ) {
                 ( mudstate.max_vars < 16 ) ? 16 : mudstate.max_vars );
     hashresize( &mudstate.api_func_htab, 8 );
 
+    s = alloc_mbuf("do_hashresize");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable" );
+        m_htab =  (MODHASHES *)lt_dlsym(mp->handle, s );
         if( m_htab ) {
             for( hp = m_htab; hp->tabname != NULL; hp++ ) {
                 hashresize( hp->htab, hp->min_size );
             }
         }
-        m_ntab = DLSYM_VAR( mp->handle, mp->modname, "nhashtable", MODNHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable" );
+        m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s );
         if( m_ntab ) {
             for( np = m_ntab; np->tabname != NULL; np++ ) {
                 nhashresize( np->htab, np->min_size );
             }
         }
     }
+    free_mbuf(s);
 
     if( !mudstate.restarting ) {
         notify( player, "Resized." );
@@ -1999,13 +2005,27 @@ void fork_and_dump( dbref player, dbref cause, int key ) {
     }
 }
 
+void call_all_modules_nocache(char *xfn) {
+    MODULE *mp;
+    void (*ip)( void );
+    char *s;
+    
+    s = alloc_mbuf("call_all_modules_nocache");
+    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn );
+        if ((ip = (void (*)(void))lt_dlsym( mp->handle , s )) != NULL)
+            (*ip)();
+    }
+    free_mbuf(s);
+}
+
 static int load_game( void ) {
     FILE *f;
 
     MODULE *mp;
 
     void ( *modfunc )( FILE * );
-    char *s;
+    char *s, *s1;
 
     log_write( LOG_STARTUP, "INI", "LOAD", "Loading object structures." );
     if( db_read() < 0 ) {
@@ -2016,14 +2036,18 @@ static int load_game( void ) {
      * Call modules to load data from DBM
      */
 
-    CALL_ALL_MODULES_NOCACHE( "db_read", ( void ), () );
+    call_all_modules_nocache( "db_read");
+    
+
 
     /*
      * Call modules to load data from their flat-text database
      */
 
+    s1 = alloc_mbuf("load_game");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( modfunc = DLSYM( mp->handle, mp->modname, "load_database", ( FILE * ) ) ) != NULL ) {
+        snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "load_database" );
+        if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
             s = xstrprintf( "load_game", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
             if( f ) {
@@ -2033,6 +2057,7 @@ static int load_game( void ) {
             XFREE( s, "load_game" );
         }
     }
+    free_mbuf(s1);
 
     log_write( LOG_STARTUP, "INI", "LOAD", "Load complete." );
     return ( 0 );
@@ -2381,7 +2406,7 @@ void recover( char *flat ) {
     MODULE *mp;
     void ( *modfunc )( FILE * );
     FILE *f;
-    char *s;
+    char *s, *s1;
 
     vattr_init();
     if( init_gdbm_db( mudconf.db_file ) < 0 ) {
@@ -2399,8 +2424,10 @@ void recover( char *flat ) {
      * Call modules to load their flatfiles
      */
 
+    s1 = alloc_mbuf("recover");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_read_flatfile", ( FILE * ) ) ) != NULL ) {
+        snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
+        if( ( modfunc =  (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
             s = xstrprintf( "recover", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
             if( f ) {
@@ -2410,6 +2437,7 @@ void recover( char *flat ) {
             XFREE( s, "recover" );
         }
     }
+    free_mbuf(s1);
 
     db_ver = OUTPUT_VERSION;
     setflags = OUTPUT_FLAGS;
@@ -2421,7 +2449,7 @@ void recover( char *flat ) {
      * Call all modules to write to GDBM
      */
 
-    CALL_ALL_MODULES_NOCACHE( "db_write", ( void ), () );
+    call_all_modules_nocache( "db_write");
 
     db_unlock();
     CLOSE;
@@ -2440,7 +2468,7 @@ int dbconvert( int argc, char *argv[] ) {
 
     char *opt_gdbmfile = ( char * ) DEFAULT_CONFIG_FILE;
 
-    char *s;
+    char *s, *s1;
 
     FILE *f;
 
@@ -2591,7 +2619,7 @@ int dbconvert( int argc, char *argv[] ) {
          * Call all modules to read from GDBM
          */
 
-        CALL_ALL_MODULES_NOCACHE( "db_read", ( void ), () );
+        call_all_modules_nocache( "db_read");
 
         db_format = F_TINYMUSH;
         db_ver = OUTPUT_VERSION;
@@ -2602,9 +2630,11 @@ int dbconvert( int argc, char *argv[] ) {
         /*
          * Call modules to load their flatfiles
          */
-
+        
+        s1 = alloc_mbuf("dbconvert.modread");
         for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-            if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_read_flatfile", ( FILE * ) ) ) != NULL ) {
+            snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
+            if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
                 s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                 f = db_module_flatfile( s, 0 );
                 if( f ) {
@@ -2614,6 +2644,7 @@ int dbconvert( int argc, char *argv[] ) {
                 XFREE( s, "dbconvert" );
             }
         }
+        free_mbuf(s1);
     }
 
 
@@ -2641,7 +2672,7 @@ int dbconvert( int argc, char *argv[] ) {
              */
 
             db_lock();
-            CALL_ALL_MODULES_NOCACHE( "db_write", ( void ), () );
+            call_all_modules_nocache( "db_write");
             db_unlock();
         } else {
             db_write_flatfile( stdout, F_TINYMUSH,
@@ -2651,8 +2682,10 @@ int dbconvert( int argc, char *argv[] ) {
              * Call all modules to write to flatfile
              */
 
+            s1 = alloc_mbuf("dbconvert.modwrite");
             for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-                if( ( modfunc = DLSYM( mp->handle, mp->modname, "db_write_flatfile", ( FILE * ) ) ) != NULL ) {
+                snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile" );
+                if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
                     s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                     f = db_module_flatfile( s, 1 );
                     if( f ) {
@@ -2662,6 +2695,7 @@ int dbconvert( int argc, char *argv[] ) {
                     XFREE( s, "dbconvert" );
                 }
             }
+            free_mbuf(s1);
         }
     }
     /*
@@ -2990,7 +3024,7 @@ int main( int argc, char *argv[] ) {
     mudstate.loading_db = 1;
     if( mindb ) {
         db_make_minimal();
-        CALL_ALL_MODULES_NOCACHE( "make_minimal", ( void ), () );
+        call_all_modules_nocache( "make_minimal");
     } else if( load_game() < 0 ) {
         log_write( LOG_ALWAYS, "INI", "FATAL", "Couldn't load objects." );
         exit( 2 );
@@ -3042,20 +3076,24 @@ int main( int argc, char *argv[] ) {
         hashreset( &mudstate.hfile_hashes[i] );
     }
 
+    s = alloc_mbuf("main.modhash");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        m_htab = DLSYM_VAR( mp->handle, mp->modname, "hashtable", MODHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable" );
+        m_htab = (MODHASHES *)lt_dlsym( mp->handle, s);
         if( m_htab ) {
             for( hp = m_htab; hp->tabname != NULL; hp++ ) {
                 hashreset( hp->htab );
             }
         }
-        m_ntab = DLSYM_VAR( mp->handle, mp->modname, "nhashtable", MODNHASHES * );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable" );
+        m_ntab = ( MODNHASHES *)lt_dlsym( mp->handle, s);
         if( m_ntab ) {
             for( np = m_ntab; np->tabname != NULL; np++ ) {
                 nhashreset( np->htab );
             }
         }
     }
+    free_mbuf(s);
 
     mudstate.now = time( NULL );
 
@@ -3091,7 +3129,7 @@ int main( int argc, char *argv[] ) {
      * We have to do an update, even though we're starting up, because
      * there may be players connected from a restart, as well as objects.
      */
-    CALL_ALL_MODULES_NOCACHE( "cleanup_startup", ( void ), () );
+    call_all_modules_nocache( "cleanup_startup");
 
     /*
      * You must do your startups AFTER you load your restart database, or

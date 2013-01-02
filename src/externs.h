@@ -207,7 +207,7 @@ extern void	badname_list( dbref, const char * );
 /* From predicates.c */
 extern char    *safe_snprintf(char *,  size_t, const char *, ... );
 extern char    *safe_vsnprintf(char *, size_t, const char *, va_list );
-extern char    *tmprintf( const char *,... );
+//extern char    *tmprintf( const char *,... );
 extern void	safe_sprintf( char *, char **, const char *, ... );
 extern dbref	insert_first( dbref, dbref );
 extern dbref	remove_first( dbref, dbref );
@@ -741,14 +741,6 @@ extern int	register_match( char *, char *, char *[], int );
  * Module things.
  */
 
-#define WALK_ALL_MODULES(mp) for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
-
-/* Syntax: DLSYM(<handler>, <module name>, <function name>, <prototype>) */
-
-#define DLSYM(h,m,x,p)		(void (*)p)lt_dlsym( (h), tmprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_INT(h,m,x,p)	(int (*)p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
-#define DLSYM_VAR(h,m,x,p)	(p)lt_dlsym((h), tmprintf("mod_%s_%s", (m), (x)))
-
 /*
  * Syntax: CALL_ALL_MODULES(<name of function>, (<args>)) Call all modules
  * defined for this symbol.
@@ -761,16 +753,6 @@ extern int	register_match( char *, char *, char *[], int );
         if (cam__mp->xfn) { \
             (*(cam__mp->xfn))args; \
         } \
-    } \
-}
-
-#define CALL_ALL_MODULES_NOCACHE(xfn,proto,args) \
-{ \
-    MODULE *cam__mp; \
-    void (*cam__ip)proto; \
-    for (cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next) { \
-        if ((cam__ip = DLSYM(cam__mp->handle, cam__mp->modname, xfn, proto)) != NULL) \
-            (*cam__ip)args; \
     } \
 }
 

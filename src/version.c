@@ -71,7 +71,8 @@ void do_version( dbref player, dbref cause, int extra ) {
             ptr = repeatchar( strlen( mp->modname ) + 8, '-' );
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
             XFREE( ptr, "repeatchar" );
-            if( ( mver = DLSYM_VAR( mp->handle, mp->modname, "version", MODVER * ) ) != NULL ) {
+            snprintf(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
+            if( ( mver = (MODVER *) lt_dlsym( mp->handle, string) ) != NULL ) {
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "        Version: %s", mver->version );
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "         Author: %s", mver->author );
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "          Email: %s", mver->email );

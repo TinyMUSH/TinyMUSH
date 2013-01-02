@@ -218,7 +218,7 @@ void list_functable( dbref player ) {
 
     UFUN *ufp;
 
-    char *buf, *bp;
+    char *buf, *bp, *s;
 
     MODULE *mp;
 
@@ -234,8 +234,10 @@ void list_functable( dbref player ) {
     }
     notify( player, buf );
 
+    s = alloc_mbuf("list_functable");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( modfns = DLSYM_VAR( mp->handle, mp->modname, "functable", FUN * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable" );
+        if( ( modfns = (FUN *)lt_dlsym(mp->handle, s ) ) != NULL ) {
             bp = buf;
             safe_sprintf( buf, &bp, "Module %s functions:", mp->modname );
             for( fp = modfns; fp->name; fp++ ) {
@@ -247,6 +249,7 @@ void list_functable( dbref player ) {
             notify( player, buf );
         }
     }
+    free_mbuf(s);
 
     bp = buf;
     safe_str( ( char * ) "User-defined functions:", buf, &bp );
@@ -296,7 +299,7 @@ static void helper_list_funcaccess( dbref player, FUN *fp, char *buff ) {
 }
 
 void list_funcaccess( dbref player ) {
-    char *buff;
+    char *buff, *s;
 
     FUN *ftab;
 
@@ -307,11 +310,14 @@ void list_funcaccess( dbref player ) {
     buff = alloc_sbuf( "list_funcaccess" );
     helper_list_funcaccess( player, flist, buff );
 
+    s = alloc_mbuf("list_funcaccess");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ftab = DLSYM_VAR( mp->handle, mp->modname, "functable", FUN * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable" );
+        if( ( ftab = (FUN *)lt_dlsym(mp->handle, s ) ) != NULL ) {
             helper_list_funcaccess( player, ftab, buff );
         }
     }
+    free_mbuf(s);
 
     for( ufp = ufun_head; ufp; ufp = ufp->next ) {
         if( check_access( player, ufp->perms ) ) {

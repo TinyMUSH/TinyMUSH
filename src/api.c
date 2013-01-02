@@ -53,7 +53,8 @@ void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
     }
 
     for( afp = ftable; afp->name; afp++ ) {
-        fn_ptr = DLSYM( mp->handle, module_name, afp->name, ( void *, void * ) );
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", module_name, afp->name);
+        fn_ptr = (void (*)(void *, void *))lt_dlsym( mp->handle, s);
         if( fn_ptr != NULL ) {
             afp->handler = fn_ptr;
             snprintf( s, MBUF_SIZE, "%s_%s", api_name, afp->name );

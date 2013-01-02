@@ -685,39 +685,61 @@ int cf_module( int *vp, char *str, long extra, dbref player, char *cmd ) {
      * to change from here on out.
      */
 
-    mp->process_command = DLSYM_INT( handle, str, "process_command",
-                                     ( dbref, dbref, int, char *, char *[], int ) );
-    mp->process_no_match = DLSYM_INT( handle, str, "process_no_match",
-                                      ( dbref, dbref, int, char *, char *, char *[], int ) );
-    mp->did_it = DLSYM_INT( handle, str, "did_it",
-                            ( dbref, dbref, dbref,
-                              int, const char *, int, const char *, int,
-                              int, char *[], int, int ) );
-    mp->create_obj = DLSYM( handle, str, "create_obj", ( dbref, dbref ) );
-    mp->destroy_obj = DLSYM( handle, str, "destroy_obj", ( dbref, dbref ) );
-    mp->create_player = DLSYM( handle, str, "create_player",
-                               ( dbref, dbref, int, int ) );
-    mp->destroy_player = DLSYM( handle, str, "destroy_player",
-                                ( dbref, dbref ) );
-    mp->announce_connect = DLSYM( handle, str, "announce_connect",
-                                  ( dbref, const char *, int ) );
-    mp->announce_disconnect = DLSYM( handle, str, "announce_disconnect",
-                                     ( dbref, const char *, int ) );
-    mp->examine = DLSYM( handle, str, "examine",
-                         ( dbref, dbref, dbref, int, int ) );
-    mp->dump_database = DLSYM( handle, str, "dump_database", ( FILE * ) );
-    mp->db_grow = DLSYM( handle, str, "db_grow", ( int, int ) );
-    mp->db_write = DLSYM( handle, str, "db_write", ( void ) );
-    mp->db_write_flatfile =
-        DLSYM( handle, str, "db_write_flatfile", ( FILE * ) );
-    mp->do_second = DLSYM( handle, str, "do_second", ( void ) );
-    mp->cache_put_notify =
-        DLSYM( handle, str, "cache_put_notify", ( DBData, unsigned int ) );
-    mp->cache_del_notify =
-        DLSYM( handle, str, "cache_del_notify", ( DBData, unsigned int ) );
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "process_command");
+    mp->process_command = (int (*)( dbref, dbref, int, char *, char *[], int ))lt_dlsym(handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "process_no_match");
+    mp->process_no_match = (int (*)( dbref, dbref, int, char *, char *, char *[], int ))lt_dlsym(handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "did_it");
+    mp->did_it = (int (*)( dbref, dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int ))lt_dlsym(handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "create_obj");
+    mp->create_obj = (void (*)( dbref, dbref ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_obj");
+    mp->destroy_obj = (void (*)( dbref, dbref ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "create_player");
+    mp->create_player = (void (*)( dbref, dbref, int, int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_player");
+    mp->destroy_player = (void (*)( dbref, dbref ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "announce_connect");
+    mp->announce_connect = (void (*)( dbref, const char *, int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "announce_disconnect");
+    mp->announce_disconnect = (void (*)( dbref, const char *, int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "examine");
+    mp->examine = (void (*)( dbref, dbref, dbref, int, int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "dump_database");
+    mp->dump_database = (void (*)( FILE * ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_grow");
+    mp->db_grow = (void (*)( int, int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_write");
+    mp->db_write = (void (*)( void ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_write_flatfile");
+    mp->db_write_flatfile = (void (*)( FILE * ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "do_second");
+    mp->do_second = (void (*)( void ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "cache_put_notify");
+    mp->cache_put_notify = (void (*)( DBData, unsigned int ))lt_dlsym( handle, s);
+    
+    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "cache_del_notify");
+    mp->cache_del_notify = (void (*)( DBData, unsigned int ))lt_dlsym( handle, s);
+    
 
     if( !mudstate.standalone ) {
-        if( ( initptr = DLSYM( handle, str, "init", ( void ) ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "init");
+        if( ( initptr = (void (*)( void ))lt_dlsym( handle, s) ) != NULL ) {
             ( *initptr )();
         }
     }
@@ -1186,12 +1208,9 @@ static int modify_xfuncs( char *fn_name, int ( *fn_ptr )( dbref ), EXTFUNCS **xf
  */
 
 int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd ) {
-    char *sp, *tokst, *cp, *ostr;
-
+    char *sp, *tokst, *cp, *ostr, *s;
     int f, negate, success, failure, got_one;
-
     MODULE *mp;
-
     int ( *hp )( dbref );
 
     /*
@@ -1236,7 +1255,8 @@ int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, d
                 /*
                  * Split it apart, see if we have anything.
                  */
-
+                
+                s = alloc_mbuf("parse_ext_access");
                 ostr = ( char * ) strdup( sp );
                 if( * ( sp + 4 ) != '\0' ) {
                     cp = strchr( sp + 4, '_' );
@@ -1244,21 +1264,11 @@ int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, d
                         *cp++ = '\0';
                         for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
                             got_one = 1;
-                            if( !strcmp( sp + 4,
-                                         mp->modname ) ) {
-                                hp = DLSYM_INT
-                                     ( mp->
-                                       handle,
-                                       mp->
-                                       modname,
-                                       cp,
-                                       ( dbref ) );
+                            if( !strcmp( sp + 4,  mp->modname ) ) {
+                                snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, cp);
+                                hp = (int (*)( dbref ))lt_dlsym(mp->handle, s);
                                 if( !hp ) {
-                                    cf_log_notfound
-                                    ( player,
-                                      cmd,
-                                      "Module function",
-                                      ostr );
+                                    cf_log_notfound( player, cmd, "Module function", ostr );
                                     failure++;
                                 } else {
                                     if( modify_xfuncs( ostr, hp, xperms, negate ) ) {
@@ -1271,15 +1281,13 @@ int parse_ext_access( int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, d
                             }
                         }
                         if( !got_one ) {
-                            cf_log_notfound( player,
-                                             cmd,
-                                             "Loaded module",
-                                             sp + 4 );
+                            cf_log_notfound( player, cmd, "Loaded module", sp + 4 );
                             got_one = 1;
                         }
                     }
                 }
                 free( ostr );
+                free_mbuf( s );
             }
             if( !got_one ) {
                 cf_log_notfound( player, cmd, "Entry", sp );
@@ -1548,7 +1556,7 @@ static int helper_cf_cf_access( CONF *tp, dbref player, int *vp, char *ap, char 
 int cf_cf_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
     CONF *tp, *ctab;
 
-    char *ap;
+    char *ap, *s;
 
     MODULE *mp;
 
@@ -1563,15 +1571,19 @@ int cf_cf_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
         }
     }
 
+    s = alloc_mbuf("cf_cf_access");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( !strcmp( tp->pname, str ) ) {
+                    free_mbuf(s);
                     return ( helper_cf_cf_access( tp, player, vp, ap, cmd, extra ) );
                 }
             }
         }
     }
+    free_mbuf(s);
 
     cf_log_notfound( player, cmd, "Config directive", str );
     return -1;
@@ -2134,7 +2146,7 @@ static int helper_cf_set( char *cp, char *ap, dbref player, CONF *tp ) {
 
 int cf_set( char *cp, char *ap, dbref player ) {
     CONF *tp, *ctab;
-
+    char *s;
     MODULE *mp;
 
     /*
@@ -2157,14 +2169,19 @@ int cf_set( char *cp, char *ap, dbref player ) {
         }
     }
 
+    s = alloc_mbuf("cf_set");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
-                if( !strcmp( tp->pname, cp ) )
+                if( !strcmp( tp->pname, cp ) ) {
+                    free_mbuf(s);
                     return ( helper_cf_set( cp, ap, player, tp ) );
+                }
             }
         }
     }
+    free_mbuf(s);
 
     /*
      * Config directive not found.  Complain about it.
@@ -2218,7 +2235,7 @@ int cf_read( char *fn ) {
 void list_cf_access( dbref player ) {
     CONF *tp, *ctab;
 
-    char *buff;
+    char *buff, *s;
 
     MODULE *mp;
 
@@ -2230,9 +2247,11 @@ void list_cf_access( dbref player ) {
             listset_nametab( player, access_nametab, tp->flags, buff, 1 );
         }
     }
-
+    
+    s=alloc_mbuf("list_cf_access");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( God( player ) || check_access( player, tp->flags ) ) {
                     sprintf( buff, "%s:", tp->pname );
@@ -2241,14 +2260,14 @@ void list_cf_access( dbref player ) {
             }
         }
     }
-
+    free_mbuf( s );
     free_mbuf( buff );
 }
 
 void list_cf_read_access( dbref player ) {
     CONF *tp, *ctab;
 
-    char *buff;
+    char *buff, *s;
 
     MODULE *mp;
 
@@ -2262,8 +2281,10 @@ void list_cf_read_access( dbref player ) {
         }
     }
 
+    s=alloc_mbuf("list_cf_read_access");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( God( player ) || check_access( player, tp->rperms ) ) {
                     sprintf( buff, "%s:", tp->pname );
@@ -2273,6 +2294,7 @@ void list_cf_read_access( dbref player ) {
         }
     }
 
+    free_mbuf( s );
     free_mbuf( buff );
 }
 
@@ -2292,20 +2314,23 @@ if ((x)->interpreter == cf_dbref) { \
 
 void cf_verify( void ) {
     CONF *tp, *ctab;
-
+    char *s;
     MODULE *mp;
 
     for( tp = conftable; tp->pname; tp++ ) {
         Check_Conf_Dbref( tp );
     }
 
+    s=alloc_mbuf("cf_verify");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 Check_Conf_Dbref( tp );
             }
         }
     }
+    free_mbuf(s);
 }
 
 /*
@@ -2349,7 +2374,7 @@ static void helper_cf_display( dbref player, char *buff, char **bufc, CONF *tp )
 
 void cf_display( dbref player, char *param_name, char *buff, char **bufc ) {
     CONF *tp, *ctab;
-
+    char *s;
     MODULE *mp;
 
     for( tp = conftable; tp->pname; tp++ ) {
@@ -2359,23 +2384,27 @@ void cf_display( dbref player, char *param_name, char *buff, char **bufc ) {
         }
     }
 
+    s = alloc_mbuf("cf_display");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( !strcasecmp( tp->pname, param_name ) ) {
                     helper_cf_display( player, buff, bufc, tp );
+                    free_mbuf(s);
                     return;
                 }
             }
         }
     }
+    free_mbuf(s);
 
     safe_nomatch( buff, bufc );
 }
 
 void list_options( dbref player ) {
     CONF *tp, *ctab;
-
+    char *s;
     MODULE *mp;
 
     for( tp = conftable; tp->pname; tp++ ) {
@@ -2386,9 +2415,10 @@ void list_options( dbref player ) {
             raw_notify( player, "%-25s %c %s?", tp->pname, ( * ( tp->loc ) ? 'Y' : 'N' ), ( tp->extra ? ( char * ) tp->extra : "" ));
         }
     }
-
+    s = alloc_mbuf("list_options");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-        if( ( ctab = DLSYM_VAR( mp->handle, mp->modname, "conftable", CONF * ) ) != NULL ) {
+        snprintf(s, MBUF_SIZE, "mod_%s_%s",  mp->modname, "conftable");
+        if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
                 if( ( ( tp->interpreter == cf_const ) ||
                         ( tp->interpreter == cf_bool ) ) &&
@@ -2399,4 +2429,5 @@ void list_options( dbref player ) {
             }
         }
     }
+    free_mbuf(s);
 }

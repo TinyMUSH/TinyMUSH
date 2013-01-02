@@ -47,8 +47,6 @@ static int type_quota( int );
 
 static int pay_quota( dbref, int, int );
 
-static char tmprintf_buff[LBUF_SIZE];
-
 char *safe_snprintf(char *buff, size_t size, const char *format, ... ) {
     va_list ap;
 
@@ -68,18 +66,6 @@ char *safe_vsnprintf(char *buff, size_t size, const char *format, va_list ap ) {
     buff[size - 1] = '\0';
  
     return(buff);
-}
-
-char *tmprintf( const char *format, ... ) {
-    va_list ap;
-
-    va_start( ap, format );
-
-    vsnprintf( tmprintf_buff, LBUF_SIZE, format, ap );
-
-    va_end( ap );
-    tmprintf_buff[LBUF_SIZE - 1] = '\0';
-    return tmprintf_buff;
 }
 
 void safe_sprintf( char *str, char **bp, const char *format, ... ) {
