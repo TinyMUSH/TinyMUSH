@@ -160,17 +160,11 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                         sqlite3_column_text(stmt, j);
                     if (j > 0)
                     {
-                        notify_quiet(player,
-                                     tmprintf
-                                     ("Row %d, Field %d: %s", i,
-                                      j + 1, col_data));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: %s", i, j + 1, col_data);
                     }
                     if (col_data && *col_data)
                     {
-                        notify_quiet(player,
-                                     tmprintf
-                                     ("Row %d, Field %d: NULL",
-                                      i, j + 1));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: NULL", i, j + 1);
                     }
                 }
             }
@@ -182,9 +176,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
         num_rows = sqlite3_changes(sqlite);
         if (num_rows > 0)
         {
-            notify_quiet(player,
-                         tmprintf("SQL query touched %d %s.", num_rows,
-                                 (num_rows == 1) ? "row" : "rows"));
+            notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows");
         }
     }
     sqlite3_finalize(stmt);

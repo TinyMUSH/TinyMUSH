@@ -157,8 +157,7 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
     qres = msqlStoreResult();
     if (!qres)
     {
-        notify(player, tmprintf("SQL query touched %d %s.",
-                               got_rows, (got_rows == 1) ? "row" : "rows"));
+        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "SQL query touched %d %s.", got_rows, (got_rows == 1) ? "row" : "rows");
         return 0;
     }
     /*
@@ -211,24 +210,17 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                 {
                     if (row_p[j] && *row_p[j])
                     {
-                        notify(player,
-                               tmprintf
-                               ("Row %d, Field %d: %s",
-                                i + 1, j + 1,
-                                row_p[j]));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: %s", i + 1, j + 1, row_p[j]);
                     }
                     else
                     {
-                        notify(player,
-                               tmprintf
-                               ("Row %d, Field %d: NULL",
-                                i + 1, j + 1));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: NULL", i + 1, j + 1);
                     }
                 }
             }
             else
             {
-                notify(player, tmprintf("Row %d: NULL", i + 1));
+                notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d: NULL", i + 1);
             }
         }
     }

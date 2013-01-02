@@ -113,29 +113,31 @@ void mod_db_sql_init() {
 	
     str = XMALLOC(MBUF_SIZE, "mod_db_sql_init");
 
-    sprintf(str, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    snprintf(str, MBUF_SIZE, "version %d.%d", mudstate.version.major, mudstate.version.minor);
     switch(mudstate.version.status){
         case 0:
-            sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+            snprintf(str, MBUF_SIZE, "%s, Alpha %d", str, mudstate.version.revision);
             break;
         case 1: 
-            sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+            snprintf(str, MBUF_SIZE, "%s, Beta %d", str, mudstate.version.revision);
             break;
         case 2: 
-            sprintf(str,"%s, Release Candidate %d", str, mudstate.version.revision);
+            snprintf(str, MBUF_SIZE, "%s, Release Candidate %d", str, mudstate.version.revision);
             break;
         default:
             if(mudstate.version.revision > 0) {
-                sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+                snprintf(str, MBUF_SIZE, "%s, Patch Level %d", str, mudstate.version.revision);
             } else {
-                sprintf(str, "%s, Gold Release.", str);
+                snprintf(str, MBUF_SIZE, "%s, Gold Release.", str);
         }
     }
 
 #ifdef SQL_DRIVER
-    mod_db_sql_version.version=XSTRDUP(tmprintf("%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER), "mod_db_sql_init");
+    snprintf(str, MBUF_SIZE, "%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER);
+    mod_db_sql_version.version=XSTRDUP( str , "mod_db_sql_init");
 #else
-    mod_db_sql_version.version=XSTRDUP(tmprintf("%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE), "mod_db_sql_init");
+    snprintf(str, MBUF_SIZE, "%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE);
+    mod_db_sql_version.version=XSTRDUP(str, "mod_db_sql_init");
 #endif
     mod_db_sql_version.author=XSTRDUP("TinyMUSH Development Team", "mod_db_sql_init");
     mod_db_sql_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_db_sql_init");
@@ -145,8 +147,8 @@ void mod_db_sql_init() {
     
     XFREE(str, "mod_db_sql_init");
 	
-	register_commands(mod_db_sql_cmdtable);
-	register_functions(mod_db_sql_functable);
+    register_commands(mod_db_sql_cmdtable);
+    register_functions(mod_db_sql_functable);
 }
 
 void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...) {
@@ -156,7 +158,7 @@ void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format
     va_start(ap, format);
     
     s = (char *)XMALLOC(MBUF_SIZE, "mod_db_sql_notify");
-    vsprintf(s, format, ap);
+    vnsprintf(s, MBUF_SIZE, format, ap);
     
     if(buff) {
         safe_str(s, buff, bufc);

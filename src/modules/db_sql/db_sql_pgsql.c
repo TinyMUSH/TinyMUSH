@@ -129,8 +129,8 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
 
     num_rows = atoi(PQcmdTuples(pgres));
     if (num_rows > 0)
-    {
-        notify(player, tmprintf("SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows"));
+    {	
+        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "SQL query touched %d %s.", num_rows, (num_rows == 1) ? "row" : "rows");
         PQclear(pgres);
         return 0;
     }
@@ -185,24 +185,17 @@ int sql_query(dbref player, char *q_string, char *buff, char **bufc, const Delim
                     pg_data = PQgetvalue(pgres, i, j);
                     if (pg_data && *pg_data)
                     {
-                        notify(player,
-                               tmprintf
-                               ("Row %d, Field %d: %s",
-                                i + 1, j + 1,
-                                pg_data));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: %s", i + 1, j + 1, pg_data);
                     }
                     else
                     {
-                        notify(player,
-                               tmprintf
-                               ("Row %d, Field %d: NULL",
-                                i + 1, j + 1));
+                        notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d, Field %d: NULL", i + 1, j + 1);
                     }
                 }
             }
             else
             {
-                notify(player, tmprintf("Row %d: NULL", i + 1));
+                notify_check(player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Row %d: NULL", i + 1);
             }
         }
     }
