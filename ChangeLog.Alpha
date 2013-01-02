@@ -1,6 +1,138 @@
 TinyMUSH 3.3
 ------------
 
+Alpha 4 : 2013-01-02
+
+commit 1026b3405320de06a27daf90fd0df9d7f3dc40b0
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jan 2 15:21:05 2013 -0500
+
+    -Misc: Got rid of tmprintf.
+
+commit a67d23aa75f375b9f235a5ea037bf5ed28a3d592
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jan 2 12:17:31 2013 -0500
+
+    -Misc: Remove call to tmprintf.
+
+commit b20a05ba45629195287ee96461de0551c7068199
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jan 2 10:42:35 2013 -0500
+
+    -Fix: Ancient mail loading bug in mail.c (The bug appears in mail.c of TinyMUX 1.6) spotted by Brazil@MUX
+    -Misc: Removed call to tmprintf from mail.c
+
+commit db1f29e88316be997ad589c5eb077d9dd6db9fe1
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jan 2 08:35:34 2013 -0500
+
+    Fix: Now use safe_sprintf instead of safe_tmprintf_str.
+
+commit a9dab650b75e6ddec04c6858d7fb735ac9d0d2f3
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Nov 25 21:32:24 2012 -0500
+
+    - FIX: Location, Home and cie where not properly evaluated by notify_check.
+    - Still working on removing calls to tmprintf...
+
+commit 39c85ef543a422efda782be70f71a3637b5713fc
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Nov 15 22:44:31 2012 -0500
+
+    - Misc: Almost removed all references to tmprintf. Only need to fix api and modules.
+
+commit eb018e2b3a0c4380c79e31fdab1ae1b49ca73cf0
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Nov 15 21:17:15 2012 -0500
+
+    - Misc: Got rid of a few invocations of tmprintf.
+
+commit c579df73725cdf4c348399f1d9a84bcc58531816
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Nov 15 07:25:17 2012 -0500
+
+    - Misc: Finished removing call to tmprintf in notify calls.
+
+commit b6394e16758a5ff292a7091a5bf15793fec5ec5f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Nov 14 22:41:04 2012 -0500
+
+    - Misc: Continuing to remove invocation of tmprintf in notify functions.
+
+commit 5fe1c7fa514b63a00bf0f76e5789383587832340
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Nov 14 20:15:55 2012 -0500
+
+    - Misc: notify_except and notify_except2 now accept varargs like raw_notify.
+
+commit 9836802b81bbbdc514661668415862ce06b593e3
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Nov 14 19:07:34 2012 -0500
+
+    - Misc: Slowly getting rid of tmprintf where it's not needed.
+
+commit 39e3be95a234c62bb0329f7b31bea419c6e9b24e
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Nov 6 23:20:22 2012 -0500
+
+    - New : raw_notify, raw_notify_html and notify_check now accept varargs (printf styles) if format is not NULL. Revert to historical behavior if format is NULL.
+
+commit 4c74dc8ffe000a2483fbf84405fdb67eab37a41d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Nov 6 07:32:21 2012 -0500
+
+    - FIX: Converted TEST_MALLOC from macros to functions.
+    - FIX: Avoid using malloc in logger (more robust).
+    - FIX: Corrected some types.
+
+commit 8f0023c9a0e7d5ad1f7d3b9cf32867e1ee4f5f2b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Nov 5 07:32:01 2012 -0500
+
+    - Fix: Some files where still using the old log API.
+    - Misc: Some reformatting.
+
+commit 48be8c79c8109a2be206282bed1423dfc3669895
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Nov 4 23:12:56 2012 -0500
+
+    - New: Finished the new logger API.
+    - Fix: Converted modules to the new logger API.
+
+commit 3cf390fcdbd5ad9af26ed527f46434646e3b9112
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Nov 2 16:05:17 2012 -0400
+
+    - Fix: Tested compilation with clang instead of gcc, found a few bugs/warnings (missing prototypes, wrong buffer size, wrong type definitions).
+    
+    - Fix: Tested compilation with clang instead of gcc, found a few bugs/warnings (missing prototypes, wrong buffer size, wrong type definitions).
+
+commit c8204ca4ac3370e953bc8cbcf7e851b374e21908
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 29 14:51:13 2012 -0400
+
+    - Misc: AutoTools Cleanup.
+    - Misc: Source Cleanup.
+    - New: New unified logger to replace all the various logger functions (temporary named log_printf2).
+
+commit bb34eee96e10e10d8c93faa1fb8b78c49c2d7916
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Oct 23 19:05:29 2012 -0400
+
+    - Misc: Cleanup
+
+commit a82968448e258d1bc961e4ff7c0b3071bb540876
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Oct 23 18:56:02 2012 -0400
+
+    - FIX: GIT was ignoring a few files.
+    - Misc: Source Cleanup
+
+commit e5b7093d4f7b66a765a0e78ab65562a176a90897
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Oct 22 23:57:25 2012 -0400
+
+    - Misc: Added credits.
 
 Alpha 3 : 2012-10-22
 --------------------
