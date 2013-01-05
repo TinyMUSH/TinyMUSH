@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -61,12 +61,12 @@ char *next_token( char *str, const Delim *sep ) {
 
     if( sep->len == 1 ) {
         while( *str == ESC_CHAR ) {
-            skip_esccode( str );
+            skip_esccode( &str );
         }
         while( *str && ( *str != sep->str[0] ) ) {
             ++str;
             while( *str == ESC_CHAR ) {
-                skip_esccode( str );
+                skip_esccode( &str );
             }
         }
         if( !*str ) {
@@ -97,12 +97,12 @@ char *split_token( char **sp, const Delim *sep ) {
     }
     if( sep->len == 1 ) {
         while( *str == ESC_CHAR ) {
-            skip_esccode( str );
+            skip_esccode( &str );
         }
         while( *str && ( *str != sep->str[0] ) ) {
             ++str;
             while( *str == ESC_CHAR ) {
-                skip_esccode( str );
+                skip_esccode( &str );
             }
         }
         if( *str ) {
@@ -134,12 +134,12 @@ char *next_token_ansi( char *str, const Delim *sep, int *ansi_state_ptr ) {
 
     if( sep->len == 1 ) {
         while( *str == ESC_CHAR ) {
-            track_esccode( str, ansi_state );
+            track_esccode( &str, &ansi_state );
         }
         while( *str && ( *str != sep->str[0] ) ) {
             ++str;
             while( *str == ESC_CHAR ) {
-                track_esccode( str, ansi_state );
+                track_esccode( &str, &ansi_state );
             }
         }
         if( !*str ) {

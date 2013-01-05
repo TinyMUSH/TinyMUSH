@@ -8,7 +8,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>

@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -222,12 +222,12 @@ void fun_last( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
              * this is like next_token(), but tracking ansi
              */
             while( *s == ESC_CHAR ) {
-                track_esccode( s, ansi_state );
+                track_esccode( &s, &ansi_state );
             }
             while( *s && ( *s != isep.str[0] ) ) {
                 ++s;
                 while( *s == ESC_CHAR ) {
-                    track_esccode( s, ansi_state );
+                    track_esccode( &s, &ansi_state );
                 }
             }
             if( *s ) {
@@ -1782,7 +1782,7 @@ static void tables_helper( char *list, int *last_state, int n_cols, int col_widt
                 for( s = words[wcount], i = 0;
                         *s && ( i < col_widths[cpos] ); ) {
                     if( *s == ESC_CHAR ) {
-                        track_esccode( s, ansi_state );
+                        track_esccode( &s, &ansi_state );
                     } else {
                         s++;
                         i++;

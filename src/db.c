@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"	/* required by code */
 
 #include "db.h"		/* required by externs */
@@ -965,7 +965,7 @@ void safe_exit_name( dbref it, char *buff, char **bufc ) {
 
     while( *s && ( *s != EXIT_DELIMITER ) ) {
         if( *s == ESC_CHAR ) {
-            track_esccode( s, ansi_state );
+            track_esccode( &s, &ansi_state );
         } else {
             ++s;
         }

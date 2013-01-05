@@ -5,6 +5,7 @@
 #ifndef __FLAGS_H
 #define	__FLAGS_H
 
+#define FLAG_WORD1	0x0	/* 1st word of flags. */
 #define	FLAG_WORD2	0x1	/* 2nd word of flags. */
 #define FLAG_WORD3	0x2	/* 3rd word of flags. */
 
@@ -94,6 +95,19 @@
 #define PRESENCE	0x00000040	/* Check presence-related locks */
 #define HAS_SPEECHMOD	0x00000080	/* Check @speechmod attr */
 #define HAS_PROPDIR	0X00000100	/* Internal: has Propdir attr */
+#define COLOR256	0x00000200	/* Player support XTERM 256 colors */
+#define FLAG_RES02	0x00000400
+#define	FLAG_RES03	0x00000800
+#define FLAG_RES04	0x00001000
+#define FLAG_RES05	0x00002000
+#define FLAG_RES06	0x00004000
+#define FLAG_RES07	0x00008000
+#define FLAG_RES08	0x00010000
+#define FLAG_RES09	0x00020000
+#define FLAG_RES10	0x00040000
+#define FLAG_RES11	0x00080000
+#define FLAG_RES12	0x00100000
+#define FLAG_RES13	0x00200000
 /* FREE FREE FREE */
 #define MARK_0		0x00400000	/* User-defined flags */
 #define MARK_1		0x00800000

@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -246,340 +246,98 @@ int fh_power_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
 
 /* All flags names MUST be in uppercase! */
 
-FLAGENT		gen_flags[] = {
-    {
-        "ABODE", ABODE, 'A',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "BLIND", BLIND, 'B',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "CHOWN_OK", CHOWN_OK, 'C',
-        0, 0, fh_any
-    },
-    {
-        "DARK", DARK, 'D',
-        0, 0, fh_dark_bit
-    },
-    {
-        "FREE", NODEFAULT, 'F',
-        FLAG_WORD3, 0, fh_wiz
-    },
-    {
-        "GOING", GOING, 'G',
-        0, CA_NO_DECOMP, fh_going_bit
-    },
-    {
-        "HAVEN", HAVEN, 'H',
-        0, 0, fh_any
-    },
-    {
-        "INHERIT", INHERIT, 'I',
-        0, 0, fh_inherit
-    },
-    {
-        "JUMP_OK", JUMP_OK, 'J',
-        0, 0, fh_any
-    },
-    {
-        "KEY", KEY, 'K',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "LINK_OK", LINK_OK, 'L',
-        0, 0, fh_any
-    },
-    {
-        "MONITOR", MONITOR, 'M',
-        0, 0, fh_hear_bit
-    },
-    {
-        "NOSPOOF", NOSPOOF, 'N',
-        0, CA_WIZARD, fh_any
-    },
-    {
-        "OPAQUE", OPAQUE, 'O',
-        0, 0, fh_any
-    },
-    {
-        "QUIET", QUIET, 'Q',
-        0, 0, fh_any
-    },
-    {
-        "STICKY", STICKY, 'S',
-        0, 0, fh_any
-    },
-    {
-        "TRACE", TRACE, 'T',
-        0, 0, fh_any
-    },
-    {
-        "UNFINDABLE", UNFINDABLE, 'U',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "VISUAL", VISUAL, 'V',
-        0, 0, fh_any
-    },
-    {
-        "WIZARD", WIZARD, 'W',
-        0, 0, fh_god
-    },
-    {
-        "ANSI", ANSI, 'X',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "PARENT_OK", PARENT_OK, 'Y',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "ROYALTY", ROYALTY, 'Z',
-        0, 0, fh_wiz
-    },
-    {
-        "AUDIBLE", HEARTHRU, 'a',
-        0, 0, fh_hear_bit
-    },
-    {
-        "BOUNCE", BOUNCE, 'b',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "CONNECTED", CONNECTED, 'c',
-        FLAG_WORD2, CA_NO_DECOMP, fh_god
-    },
-    {
-        "DESTROY_OK", DESTROY_OK, 'd',
-        0, 0, fh_any
-    },
-    {
-        "ENTER_OK", ENTER_OK, 'e',
-        0, 0, fh_any
-    },
-    {
-        "FIXED", FIXED, 'f',
-        FLAG_WORD2, 0, fh_restrict_player
-    },
-    {
-        "UNINSPECTED", UNINSPECTED, 'g',
-        FLAG_WORD2, 0, fh_wizroy
-    },
-    {
-        "HALTED", HALT, 'h',
-        0, 0, fh_any
-    },
-    {
-        "IMMORTAL", IMMORTAL, 'i',
-        0, 0, fh_wiz
-    },
-    {
-        "GAGGED", GAGGED, 'j',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "CONSTANT", CONSTANT_ATTRS, 'k',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "LIGHT", LIGHT, 'l',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "MYOPIC", MYOPIC, 'm',
-        0, 0, fh_any
-    },
-    {
-        "AUDITORIUM", AUDITORIUM, 'n',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "ZONE", ZONE_PARENT, 'o',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "PUPPET", PUPPET, 'p',
-        0, 0, fh_hear_bit
-    },
-    {
-        "TERSE", TERSE, 'q',
-        0, 0, fh_any
-    },
-    {
-        "ROBOT", ROBOT, 'r',
-        0, 0, fh_player_bit
-    },
-    {
-        "SAFE", SAFE, 's',
-        0, 0, fh_any
-    },
-    {
-        "TRANSPARENT", SEETHRU, 't',
-        0, 0, fh_any
-    },
-    {
-        "SUSPECT", SUSPECT, 'u',
-        FLAG_WORD2, CA_WIZARD, fh_wiz
-    },
-    {
-        "VERBOSE", VERBOSE, 'v',
-        0, 0, fh_any
-    },
-    {
-        "STAFF", STAFF, 'w',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "SLAVE", SLAVE, 'x',
-        FLAG_WORD2, CA_WIZARD, fh_wiz
-    },
-    {
-        "ORPHAN", ORPHAN, 'y',
-        FLAG_WORD3, 0, fh_any
-    },
-    {
-        "CONTROL_OK", CONTROL_OK, 'z',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "STOP", STOP_MATCH, '!',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "COMMANDS", HAS_COMMANDS, '$',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "PRESENCE", PRESENCE, '^',
-        FLAG_WORD3, 0, fh_wiz
-    },
-    {
-        "NOBLEED", NOBLEED, '-',
-        FLAG_WORD2, 0, fh_any
-    },
-    {
-        "VACATION", VACATION, '|',
-        FLAG_WORD2, 0, fh_restrict_player
-    },
-    {
-        "HEAD", HEAD_FLAG, '?',
-        FLAG_WORD2, 0, fh_wiz
-    },
-    {
-        "WATCHER", WATCHER, '+',
-        FLAG_WORD2, 0, fh_power_bit
-    },
-    {
-        "HAS_DAILY", HAS_DAILY, '*',
-        FLAG_WORD2, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "HAS_STARTUP", HAS_STARTUP, '=',
-        0, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "HAS_FORWARDLIST", HAS_FWDLIST, '&',
-        FLAG_WORD2, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "HAS_LISTEN", HAS_LISTEN, '@',
-        FLAG_WORD2, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "HAS_PROPDIR", HAS_PROPDIR, ',',
-        FLAG_WORD3, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "PLAYER_MAILS", PLAYER_MAILS, '`',
-        FLAG_WORD2, CA_GOD | CA_NO_DECOMP, fh_god
-    },
+FLAGENT	gen_flags[] = {
+    { "ABODE",		ABODE,		'A',	FLAG_WORD2,	0,			fh_any },
+    { "BLIND",		BLIND,		'B',	FLAG_WORD2,	0,			fh_wiz },
+    { "CHOWN_OK",	CHOWN_OK,	'C',	FLAG_WORD1,	0,			fh_any },
+    { "DARK",		DARK,		'D',	FLAG_WORD1,	0,			fh_dark_bit },
+    { "FREE",		NODEFAULT,	'F',	FLAG_WORD3,	0,			fh_wiz },
+    { "GOING",		GOING,		'G',	FLAG_WORD1,	CA_NO_DECOMP,		fh_going_bit },
+    { "HAVEN",		HAVEN,		'H',	FLAG_WORD1,	0,			fh_any },
+    { "INHERIT",	INHERIT,	'I',	FLAG_WORD1,	0,			fh_inherit },
+    { "JUMP_OK",	JUMP_OK,	'J',	FLAG_WORD1,	0,			fh_any },
+    { "KEY",		KEY,		'K',	FLAG_WORD2,	0,			fh_any },
+    { "LINK_OK",	LINK_OK,	'L',	FLAG_WORD1,	0,			fh_any },
+    { "MONITOR",	MONITOR,	'M',	FLAG_WORD1,	0,			fh_hear_bit },
+    { "NOSPOOF",	NOSPOOF,	'N',	FLAG_WORD1,	CA_WIZARD,		fh_any },
+    { "OPAQUE",		OPAQUE,		'O',	FLAG_WORD1,	0,			fh_any },
+    { "QUIET",		QUIET,		'Q',	FLAG_WORD1,	0,			fh_any },
+    { "STICKY",		STICKY,		'S',	FLAG_WORD1,	0,			fh_any },
+    { "TRACE",		TRACE,		'T',	FLAG_WORD1,	0,			fh_any },
+    { "UNFINDABLE",	UNFINDABLE,	'U',	FLAG_WORD2,	0,			fh_any },
+    { "VISUAL",		VISUAL,		'V',	FLAG_WORD1,	0,			fh_any },
+    { "WIZARD",		WIZARD,		'W',	FLAG_WORD1,	0,			fh_god },
+    { "ANSI",		ANSI,		'X',	FLAG_WORD2,	0,			fh_any },
+    { "PARENT_OK",	PARENT_OK,	'Y',	FLAG_WORD2,	0,			fh_any },
+    { "ROYALTY",	ROYALTY,	'Z',	FLAG_WORD1,	0,			fh_wiz },
+    { "AUDIBLE",	HEARTHRU,	'a',	FLAG_WORD1,	0,			fh_hear_bit },
+    { "BOUNCE",		BOUNCE,		'b',	FLAG_WORD2,	0,			fh_any },
+    { "CONNECTED",	CONNECTED,	'c',	FLAG_WORD2,	CA_NO_DECOMP,		fh_god },
+    { "DESTROY_OK",	DESTROY_OK,	'd',	FLAG_WORD1,	0,			fh_any },
+    { "ENTER_OK",	ENTER_OK,	'e',	FLAG_WORD1,	0,			fh_any },
+    { "FIXED",		FIXED,		'f',	FLAG_WORD2,	0,			fh_restrict_player },
+    { "UNINSPECTED",	UNINSPECTED,	'g',	FLAG_WORD2,	0,			fh_wizroy },
+    { "HALTED",		HALT,		'h',	FLAG_WORD1,	0,			fh_any },
+    { "IMMORTAL",	IMMORTAL,	'i',	FLAG_WORD1,	0,			fh_wiz },
+    { "GAGGED",		GAGGED,		'j',	FLAG_WORD2,	0,			fh_wiz },
+    { "CONSTANT",	CONSTANT_ATTRS,	'k',	FLAG_WORD2,	0,			fh_wiz },
+    { "LIGHT",		LIGHT,		'l',	FLAG_WORD2,	0,			fh_any },
+    { "MYOPIC",		MYOPIC,		'm',	FLAG_WORD1,	0,			fh_any },
+    { "AUDITORIUM",	AUDITORIUM,	'n',	FLAG_WORD2,	0,			fh_any },
+    { "ZONE",		ZONE_PARENT,	'o',	FLAG_WORD2,	0,			fh_any },
+    { "PUPPET",		PUPPET,		'p',	FLAG_WORD1,	0,			fh_hear_bit },
+    { "TERSE",		TERSE,		'q',	FLAG_WORD1,	0,			fh_any },
+    { "ROBOT",		ROBOT,		'r',	FLAG_WORD1,	0,			fh_player_bit },
+    { "SAFE",		SAFE,		's',	FLAG_WORD1,	0,			fh_any },
+    { "TRANSPARENT",	SEETHRU,	't',	FLAG_WORD1,	0,			fh_any },
+    { "SUSPECT",	SUSPECT,	'u',	FLAG_WORD2,	CA_WIZARD,		fh_wiz },
+    { "VERBOSE",	VERBOSE,	'v',	FLAG_WORD1,	0,			fh_any },
+    { "STAFF",		STAFF,		'w',	FLAG_WORD2,	0,			fh_wiz },
+    { "SLAVE",		SLAVE,		'x',	FLAG_WORD2,	CA_WIZARD,		fh_wiz },
+    { "ORPHAN",		ORPHAN,		'y',	FLAG_WORD3,	0,			fh_any },
+    { "CONTROL_OK",	CONTROL_OK,	'z',	FLAG_WORD2,	0,			fh_any },
+    { "STOP",		STOP_MATCH,	'!',	FLAG_WORD2,	0,			fh_wiz },
+    { "COMMANDS",	HAS_COMMANDS,	'$',	FLAG_WORD2,	0,			fh_any },
+    { "PRESENCE",	PRESENCE,	'^',	FLAG_WORD3,	0,			fh_wiz },
+    { "NOBLEED",	NOBLEED,	'-',	FLAG_WORD2,	0,			fh_any },
+    { "VACATION",	VACATION,	'|',	FLAG_WORD2,	0,			fh_restrict_player },
+    { "HEAD",		HEAD_FLAG,	'?',	FLAG_WORD2,	0,			fh_wiz },
+    { "WATCHER",	WATCHER,	'+',	FLAG_WORD2,	0,			fh_power_bit },
+    { "HAS_DAILY",	HAS_DAILY,	'*',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "HAS_STARTUP",	HAS_STARTUP,	'=',	FLAG_WORD1,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "HAS_FORWARDLIST",HAS_FWDLIST,	'&',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "HAS_LISTEN",	HAS_LISTEN,	'@',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "HAS_PROPDIR",	HAS_PROPDIR,	',',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "PLAYER_MAILS",	PLAYER_MAILS,	'`',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
 #ifdef PUEBLO_SUPPORT
-    {
-        "HTML", HTML, '~',
-        FLAG_WORD2, 0, fh_any
-    },
+    { "HTML", 		HTML,		'~',	FLAG_WORD2,	0,			fh_any },
 #endif
-    {
-        "REDIR_OK", REDIR_OK, '>',
-        FLAG_WORD3, 0, fh_any
-    },
-    {
-        "HAS_REDIRECT", HAS_REDIRECT, '<',
-        FLAG_WORD3, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "HAS_DARKLOCK", HAS_DARKLOCK, '.',
-        FLAG_WORD3, CA_GOD | CA_NO_DECOMP, fh_god
-    },
-    {
-        "SPEECHMOD", HAS_SPEECHMOD, '"',
-        FLAG_WORD3, 0, fh_any
-    },
-    {
-        "MARKER0", MARK_0, '0',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER1", MARK_1, '1',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER2", MARK_2, '2',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER3", MARK_3, '3',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER4", MARK_4, '4',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER5", MARK_5, '5',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER6", MARK_6, '6',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER7", MARK_7, '7',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER8", MARK_8, '8',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        "MARKER9", MARK_9, '9',
-        FLAG_WORD3, 0, fh_god
-    },
-    {
-        NULL, 0, ' ',
-        0, 0, NULL
-    }
+    { "REDIR_OK",	REDIR_OK,	'>',	FLAG_WORD3,	0,			fh_any },
+    { "HAS_REDIRECT",	HAS_REDIRECT,	'<',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "HAS_DARKLOCK",	HAS_DARKLOCK,	'.',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },
+    { "SPEECHMOD",	HAS_SPEECHMOD,	'"',	FLAG_WORD3,	0,			fh_any },
+    { "MARKER0",	MARK_0,		'0',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER1",	MARK_1,		'1',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER2",	MARK_2,		'2',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER3",	MARK_3,		'3',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER4",	MARK_4,		'4',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER5",	MARK_5,		'5',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER6",	MARK_6,		'6',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER7",	MARK_7,		'7',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER8",	MARK_8,		'8',	FLAG_WORD3,	0,			fh_god },
+    { "MARKER9",	MARK_9,		'9',	FLAG_WORD3,	0,			fh_god },
+    { "COLOR256",	COLOR256,	':',	FLAG_WORD3,	0,			fh_any },
+    { NULL, 		0, ' ', 0, 0, NULL }
 };
 
-OBJENT		object_types[8] = {
-    {"ROOM", 'R', CA_PUBLIC, OF_CONTENTS | OF_EXITS | OF_DROPTO | OF_HOME},
-    {
-        "THING", ' ', CA_PUBLIC,
-        OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_SIBLINGS
-    },
-    {"EXIT", 'E', CA_PUBLIC, OF_SIBLINGS},
-    {
-        "PLAYER", 'P', CA_PUBLIC,
-        OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_OWNER | OF_SIBLINGS
-    },
-    {"TYPE5", '+', CA_GOD, 0},
-    {
-        "GARBAGE", '_', CA_PUBLIC,
-        OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_SIBLINGS
-    },
-    {"GARBAGE", '#', CA_GOD, 0}
+OBJENT	object_types[8] = {
+    { "ROOM",	'R',	CA_PUBLIC, OF_CONTENTS | OF_EXITS | OF_DROPTO | OF_HOME},
+    { "THING",	' ',	CA_PUBLIC, OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_SIBLINGS },
+    { "EXIT",	'E',	CA_PUBLIC, OF_SIBLINGS },
+    { "PLAYER", 'P',	CA_PUBLIC, OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_OWNER | OF_SIBLINGS },
+    { "TYPE5",	'+',	CA_GOD, 0},
+    { "GARBAGE",'_',	CA_PUBLIC, OF_CONTENTS | OF_LOCATION | OF_EXITS | OF_HOME | OF_SIBLINGS },
+    { "GARBAGE",'#',	CA_GOD, 0}
 };
 
 /* *INDENT-ON* */

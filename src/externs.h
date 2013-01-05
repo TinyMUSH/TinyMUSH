@@ -265,6 +265,21 @@ extern char    *translate_string( char *, int );
 extern int	ltos( char *, long );
 extern void safe_ltos( char *, char **, long );
 extern char    *repeatchar( int, char );
+extern char    *strip_ansi( const char * );
+extern int	strip_ansi_len( const char * );
+extern char    *normal_to_white( const char * );
+extern char    *ansi_transition_esccode( int, int );
+extern char    *ansi_transition_mushcode( int, int );
+extern char    *ansi_transition_letters( int, int );
+extern int	ansi_map_states( const char *, int **, char ** );
+extern char     *remap_colors( const char *, int * );
+extern void	track_ansi_letters(char *, int *);
+extern void	track_esccode(char **, int *);
+extern void	track_all_esccodes(char **, char **, int *);
+extern void	skip_esccode(char **);
+extern void	copy_esccode(char **, char **);
+extern void	safe_copy_esccode(char **, char *, char **);
+
 /* From timer.c */
 extern int	call_cron( dbref, dbref, int, char * );
 extern int	cron_clr( dbref, int );

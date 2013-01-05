@@ -9,8 +9,8 @@
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
-#include "typedefs.h"   /* required by mudconf */
 
+#include "typedefs.h"   /* required by mudconf */
 #include "game.h"       /* required by mudconf */
 #include "alloc.h"      /* required by mudconf */
 #include "flags.h"      /* required by mudconf */

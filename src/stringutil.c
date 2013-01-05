@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -112,23 +112,25 @@ int ansi_bits[I_ANSI_LIM] = {
 
 char *strip_ansi( const char *s ) {
     static char buf[LBUF_SIZE];
+    char *p = buf, *s1;
 
-    char *p = buf;
-
-    if( s ) {
-        while( *s == ESC_CHAR ) {
-            skip_esccode( s );
+    s1 = XSTRDUP(s, "strip_ansi");
+    
+    if( s1 ) {
+        while( *s1 == ESC_CHAR ) {
+            skip_esccode( &s1 );
         }
 
-        while( *s ) {
-            *p++ = *s++;
-            while( *s == ESC_CHAR ) {
-                skip_esccode( s );
+        while( *s1 ) {
+            *p++ = *s1++;
+            while( *s1 == ESC_CHAR ) {
+                skip_esccode( &s1 );
             }
         }
     }
 
     *p = '\0';
+    XFREE(s1, "strip_ansi");
     return buf;
 }
 
@@ -138,20 +140,24 @@ char *strip_ansi( const char *s ) {
 
 int strip_ansi_len( const char *s ) {
     int n = 0;
+    char *s1;
+    
+    s1 = XSTRDUP(s, "strip_ansi_len");
 
-    if( s ) {
-        while( *s == ESC_CHAR ) {
-            skip_esccode( s );
+    if( s1 ) {
+        while( *s1 == ESC_CHAR ) {
+            skip_esccode( &s1 );
         }
 
-        while( *s ) {
-            ++s, ++n;
-            while( *s == ESC_CHAR ) {
-                skip_esccode( s );
+        while( *s1 ) {
+            ++s1, ++n;
+            while( *s1 == ESC_CHAR ) {
+                skip_esccode( &s1 );
             }
         }
     }
 
+    XFREE(s1, "strip_ansi_len");
     return n;
 }
 
@@ -241,7 +247,7 @@ char *normal_to_white( const char *raw ) {
                                     p - just_after_csi, buf, &q );
                 }
             } else {
-                safe_copy_esccode( p, buf, &q );
+                safe_copy_esccode( &p, buf, &q );
             }
             just_after_esccode = p;
         } else {
@@ -489,20 +495,20 @@ char *ansi_transition_letters( int ansi_before, int ansi_after ) {
 
 int ansi_map_states( const char *s, int **m, char **p ) {
     static int ansi_map[LBUF_SIZE + 1];
-
     static char stripped[LBUF_SIZE + 1];
-
+    char *s1;
     int n, ansi_state;
 
     n = 0;
     ansi_state = ANST_NORMAL;
-
-    while( *s ) {
-        if( *s == ESC_CHAR ) {
-            track_esccode( s, ansi_state );
+    s1 = XSTRDUP(s, "ansi_map_states");
+    
+    while( *s1 ) {
+        if( *s1 == ESC_CHAR ) {
+            track_esccode( &s1, &ansi_state );
         } else {
             ansi_map[n] = ansi_state;
-            stripped[n++] = *s++;
+            stripped[n++] = *s1++;
         }
     }
 
@@ -511,6 +517,9 @@ int ansi_map_states( const char *s, int **m, char **p ) {
 
     *m = ansi_map;
     *p = stripped;
+    
+    XFREE(s1, "ansi_map_states");
+    
     return n;
 }
 
@@ -596,7 +605,7 @@ char *translate_string( char *str, int type ) {
             switch( *str ) {
             case ESC_CHAR:
                 while( *str == ESC_CHAR ) {
-                    track_esccode( str, ansi_state );
+                    track_esccode( &str, &ansi_state );
                 }
                 safe_str( ansi_transition_mushcode
                           ( ansi_state_prev, ansi_state ), new, &bp );
@@ -637,7 +646,7 @@ char *translate_string( char *str, int type ) {
         while( *str ) {
             switch( *str ) {
             case ESC_CHAR:
-                skip_esccode( str );
+                skip_esccode( &str );
                 continue;
             case '\r':
                 break;
@@ -928,7 +937,7 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
      * * have any embedded ANSI codes.
      */
     ansi_state = ANST_NONE;
-    track_all_esccodes( to, p, ansi_state );
+    track_all_esccodes( &to, &p, &ansi_state );
     to_ansi_set = ( ~ANST_NONE ) & ansi_state;
     to_ansi_clr = ANST_NONE & ( ~ansi_state );
     tlen = p - to;
@@ -945,7 +954,8 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
          */
 
         safe_known_str( to, tlen, *dst, &cp );
-        safe_copy_tracking( src, p, ansi_state, *dst, &cp );
+        track_all_esccodes(&src, &p, &ansi_state); 
+        safe_known_str(src, p - src, *dst, &cp);
 
     } else if( !strcmp( from, "$" ) ) {
 
@@ -954,7 +964,8 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
          */
 
         ansi_state = ANST_NONE;
-        safe_copy_tracking( src, p, ansi_state, *dst, &cp );
+        track_all_esccodes(&src, &p, &ansi_state);
+        safe_known_str(src, p - src, *dst, &cp);
 
         ansi_state |= to_ansi_set;
         ansi_state &= ~to_ansi_clr;
@@ -985,7 +996,7 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
             p = src;
             while( *src && ( *src != *from ) ) {
                 if( *src == ESC_CHAR ) {
-                    track_esccode( src, ansi_state );
+                    track_esccode( &src, &ansi_state );
                 } else {
                     ++src;
                 }
@@ -1020,7 +1031,7 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
                      */
                     if( *from == ESC_CHAR ) {
                         p = src;
-                        track_esccode( src, ansi_state );
+                        track_esccode( &src, &ansi_state );
                         safe_known_str( p, src - p,
                                         *dst, &cp );
                     } else {
@@ -1410,4 +1421,140 @@ char *repeatchar( int count, char ch ) {
     memset( str, 0, count + 1 );
     memset( str, ch, count -1 );
     return str;
+}
+
+/* The following functions used to be macros in ansi.h */
+
+void skip_esccode(char **s) {
+    ++(*s);
+ 
+    if (**s == ANSI_CSI) {
+        do {
+            ++(*s);
+        } while ((**s & 0xf0) == 0x30);
+    }
+ 
+    while ((**s & 0xf0) == 0x20) {
+        ++(*s);
+    }
+    
+    if (**s) {
+        ++(*s);
+    }
+}
+
+void copy_esccode(char **s, char **t) {
+	**t = **s;
+	++(*s);
+	++(*t);
+	if (**s == ANSI_CSI) {
+		do {
+		        
+			**t = **s;
+			++(*s);
+			++(*t);
+		} while ((**s & 0xf0) == 0x30);
+	}
+
+	while ((**s & 0xf0) == 0x20) {
+		**t = **s;
+		++(*s);
+		++(*t);
+	}
+
+	if (**s) {
+		**t = **s;
+		++(*s);
+		++(*t);
+	}
+}
+
+void safe_copy_esccode(char **s, char *buff, char **bufc) {
+	safe_chr(**s, buff, bufc);
+	++(*s);
+	if (**s == ANSI_CSI) {
+		do {
+			safe_chr(**s, buff, bufc);
+			++(*s);
+		} while ((**s & 0xf0) == 0x30);
+	}
+	while ((**s & 0xf0) == 0x20) {
+		safe_chr(**s, buff, bufc);
+		++(*s);
+	}
+	if (**s) {
+		safe_chr(**s, buff, bufc);
+		++(*s);
+	}
+	
+}
+
+void track_esccode(char **s, int *ansi_state) {
+	int ansi_mask = 0;
+	int ansi_diff = 0;
+	unsigned int param_val = 0;
+	
+	++(*s);
+
+	if (**s == ANSI_CSI) {
+		while ((*(++(*s)) & 0xf0) == 0x30) {
+			if (**s < 0x3a) {
+				param_val <<= 1;
+				param_val += (param_val << 2) + (**s & 0x0f);
+			} else {
+				if (param_val < I_ANSI_LIM) {
+					ansi_mask |= ansi_mask_bits[param_val];
+					ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+				}
+				param_val = 0;
+			}
+		}
+	}
+
+	while ((**s & 0xf0) == 0x20) {
+		++(*s);
+	}
+
+	if (**s == ANSI_END) {
+		if (param_val < I_ANSI_LIM) {
+			ansi_mask |= ansi_mask_bits[param_val];
+			ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+		}
+		*ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
+		++(*s);
+	} else if (**s) {
+		++(*s);
+	}
+}
+
+
+void track_all_esccodes(char **s, char **p, int *ansi_state) {
+        p = s;
+	while (**p) {
+		if (**p == ESC_CHAR) {
+			track_esccode(&(*p), &(*ansi_state));
+		} else {
+			++(*p);
+		}
+	}
+
+}
+
+/*
+ * Macro for turning mushcode ansi letters into a packed ansi state. s is a
+ * throwaway char *, t is the sequence of ansi letters, and ansi_state is an
+ * int that will contain the result.
+ */
+void track_ansi_letters(char *t, int *ansi_state) {
+        char *s;
+
+	s = t;
+	while (*s) {
+		if (*s == ESC_CHAR) {
+			skip_esccode(&s);
+		} else {
+			*ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char) *s]]) | ansi_bits[ansi_nchartab[(unsigned char) *s]]);
+			++s;
+		}
+	}
 }

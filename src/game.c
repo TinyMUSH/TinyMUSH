@@ -4,7 +4,7 @@
 #include "config.h"
 #include "system.h"
 
-#include <typedefs.h>
+#include "typedefs.h"           /* required by mudconf */
 #include "game.h" /* required by mudconf */
 #include "alloc.h" /* required by mudconf */
 #include "flags.h" /* required by mudconf */
@@ -12,7 +12,7 @@
 #include "ltdl.h" /* required by mudconf */
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
-#include "typedefs.h"           /* required by mudconf */
+
 #include "mushconf.h"		/* required by code */
 
 #include "db.h"			/* required by externs */
@@ -2736,6 +2736,7 @@ int main( int argc, char *argv[] ) {
     MODNHASHES *m_ntab, *np;
 
     mudstate.initializing = 1;
+    mudstate.debug = 0 ;
 
     umask( 077 );		/* Keep things to us by default */
 
@@ -2774,7 +2775,7 @@ int main( int argc, char *argv[] ) {
     mudconf.config_home = XSTRDUP( DEFAULT_CONFIG_HOME, "main_mudconf_mud_config_home" );
     mudconf.game_home=getcwd( NULL, 0 );
 
-    while( ( c = getopt( argc, argv, "c:sr" ) ) != -1 ) {
+    while( ( c = getopt( argc, argv, "c:srd" ) ) != -1 ) {
         switch( c ) {
         case 'c':
             mudconf.config_file = XSTRDUP( optarg, "main_mudconf_mud_config_file" );
@@ -2785,6 +2786,9 @@ int main( int argc, char *argv[] ) {
             break;
         case 'r':
             mudstate.restarting = 1;
+            break;
+        case 'd':
+            mudstate.debug = 1;
             break;
         default:
             errflg++;
@@ -3139,7 +3143,7 @@ int main( int argc, char *argv[] ) {
     process_preload();
 
 
-    if( !( getppid() ==1 ) ) {
+    if( !( getppid() == 1 ) && !mudstate.debug ) {
         int forkstatus;
 
         forkstatus=fork();
