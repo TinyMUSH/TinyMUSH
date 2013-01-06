@@ -266,6 +266,7 @@ extern int	ltos( char *, long );
 extern void safe_ltos( char *, char **, long );
 extern char    *repeatchar( int, char );
 extern char    *strip_ansi( const char * );
+extern char    *strip_xterm(char *);
 extern int	strip_ansi_len( const char * );
 extern char    *normal_to_white( const char * );
 extern char    *ansi_transition_esccode( int, int );

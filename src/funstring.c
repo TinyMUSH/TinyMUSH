@@ -1165,6 +1165,7 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     char *s;
 
     int ansi_state;
+    int xterm = 0;
 
     if( !mudconf.ansi_colors ) {
         safe_str( fargs[1], buff, bufc );
@@ -1179,6 +1180,69 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     track_ansi_letters(fargs[0], &ansi_state);
     
     safe_str( ansi_transition_esccode( ANST_NONE, ansi_state ), buff, bufc );
+    
+    /* Now that normal ansi has been done, time for xterm */
+    
+    s = fargs[0];
+    
+    while( *s ) {
+        if(*s == '<' || *s == '/') { /* Xterm colors */
+            int xterm_isbg = 0;
+            char xtbuf[SBUF_SIZE], *xtp;
+                    
+            if(*s == '/') { /* We are dealing with background */
+                s++;
+                        
+                if( !*s ) {
+                    break;
+                } else {
+                    xterm_isbg = 1;
+                }    
+            } else {
+                xterm_isbg = 0;	/* We are dealing with foreground */
+            }
+                    
+            if( *s == '<' ) { /* Ok we got a color to process */
+                s++;
+                            
+                if( !*s ) {
+                    break;
+                }
+                        
+                xtp = xtbuf;
+                        
+                while( *s && ( *s != '>' ) ) {
+                    safe_sb_chr( *s, xtbuf, &xtp );
+                    s++;
+                }
+                            
+                if( *s != '>' ) {
+                    break;
+                }
+                            
+                *xtp = '\0';
+                            
+                /* Now we have the color string... Time to handle it */
+                if( xterm_isbg ) {
+                    safe_str( ANSI_XTERM_BG, buff, bufc);
+                } else {
+                    safe_str( ANSI_XTERM_FG, buff, bufc);
+                }
+                            
+                safe_str( xtbuf, buff, bufc );
+                safe_chr( ANSI_END, buff, bufc );
+                xterm = 1;
+            } else {
+                break;
+            }
+            /* Shall we continue? */
+                        
+            s++;
+            if( *s != '<' && *s != '/') {
+                break;
+            }
+        }
+    }
 
     s = fargs[1];
     while( *s ) {
@@ -1191,6 +1255,10 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     safe_str( fargs[1], buff, bufc );
 
     safe_str( ansi_transition_esccode( ansi_state, ANST_NONE ), buff, bufc );
+    
+    if( xterm ) {
+        safe_ansi_normal( buff, bufc );
+    }
 }
 
 void fun_stripansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {

@@ -135,6 +135,43 @@ char *strip_ansi( const char *s ) {
 }
 
 /* ---------------------------------------------------------------------------
+ * strip_xterm -- return a new string with xterm color code removed
+ */
+ 
+char *strip_xterm(char *s) {
+    static char buf[LBUF_SIZE];
+    char *ch, *p;
+    
+    /* First we strip all foreground colors */
+    
+    if (!(ch = strstr(s, ANSI_XTERM_FG)))
+        return s;
+    
+    do {
+        p = strchr(ch + strlen(ANSI_XTERM_FG), ANSI_END) + 1;
+        strncpy(buf, s, ch - s);
+        buf[ch - s] = 0;
+        strcat(buf + (ch - s), p);
+        s = buf;
+    } while((ch = strstr(s, ANSI_XTERM_FG)));
+    
+    /* Second, we do exactly the same for background */
+    
+    if (!(ch = strstr(s, ANSI_XTERM_BG)))
+        return s;
+    
+    do {
+        p = strchr(ch + strlen(ANSI_XTERM_BG), ANSI_END) + 1;
+        strncpy(buf, s, ch - s);
+        buf[ch - s] = 0;
+        strcat(buf + (ch - s), p);
+        s = buf;
+    } while((ch = strstr(s, ANSI_XTERM_BG)));
+    
+    return(buf);
+}
+ 
+/* ---------------------------------------------------------------------------
  * strip_ansi_len -- count non-escape-code characters
  */
 
@@ -1540,21 +1577,25 @@ void track_all_esccodes(char **s, char **p, int *ansi_state) {
 
 }
 
-/*
- * Macro for turning mushcode ansi letters into a packed ansi state. s is a
- * throwaway char *, t is the sequence of ansi letters, and ansi_state is an
- * int that will contain the result.
- */
 void track_ansi_letters(char *t, int *ansi_state) {
-        char *s;
+        char *s, p;
+        int xterm_isbg = 0;
 
 	s = t;
 	while (*s) {
-		if (*s == ESC_CHAR) {
-			skip_esccode(&s);
-		} else {
-			*ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char) *s]]) | ansi_bits[ansi_nchartab[(unsigned char) *s]]);
-			++s;
+            switch(*s) {
+	        case ESC_CHAR:
+                    skip_esccode(&s);
+                    break;
+                case '<':    /* Skip xterm, we handle it elsewhere */
+                case '/':
+                    while( (*s != '>') ) {
+                        ++s;
+                    }
+                    break;
+                default:
+                    *ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char) *s]]) | ansi_bits[ansi_nchartab[(unsigned char) *s]]);
+                    ++s;
 		}
 	}
 }

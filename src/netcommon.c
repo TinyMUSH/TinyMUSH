@@ -407,6 +407,8 @@ void queue_string( DESC *d, const char *format, ... ) {
         } else {
             if( !Ansi( d->player ) && strchr( s, ESC_CHAR ) ) {
                 new = strip_ansi( msg );
+            } else if ( !Color256( d->player ) ) {
+                new = strip_xterm( msg );
             } else if( NoBleed( d->player ) ) {
                 new = normal_to_white( msg );
             } else if( d->colormap ) {

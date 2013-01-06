@@ -423,72 +423,36 @@ static void tcache_finish( dbref player ) {
  */
 
 char special_chartab[256] = {
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 1, 0, 0, 0, 0,
-    1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 1, 1, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 1, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 char token_chartab[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 char *ansi_chartab[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, ANSI_BBLUE, ANSI_BCYAN,
-    0, 0, 0, ANSI_BGREEN,
-    0, 0, 0, 0,
-    0, ANSI_BMAGENTA, 0, 0,
-    0, 0, ANSI_BRED, 0,
-    0, 0, 0, ANSI_BWHITE,
-    ANSI_BBLACK, ANSI_BYELLOW, 0, 0,
-    0, 0, 0, 0,
-    0, 0, ANSI_BLUE, ANSI_CYAN,
-    0, 0, ANSI_BLINK, ANSI_GREEN,
-    ANSI_HILITE, ANSI_INVERSE, 0, 0,
-    0, ANSI_MAGENTA, ANSI_NORMAL, 0,
-    0, 0, ANSI_RED, 0,
-    0, ANSI_UNDER, 0, ANSI_WHITE,
-    ANSI_BLACK, ANSI_YELLOW, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, ANSI_BBLUE, ANSI_BCYAN, 0, 0, 0, ANSI_BGREEN, 0, 0, 0, 0, 0, ANSI_BMAGENTA, 0, 0, 0, 0, ANSI_BRED, 0, 0, 0, 0, ANSI_BWHITE, ANSI_BBLACK, ANSI_BYELLOW, 0, 0, 0, 0, 0, 0, 
+    0, 0, ANSI_BLUE, ANSI_CYAN, 0, 0, ANSI_BLINK, ANSI_GREEN, ANSI_HILITE, ANSI_INVERSE, 0, 0, 0, ANSI_MAGENTA, ANSI_NORMAL, 0, 0, 0, ANSI_RED, 0, 0, ANSI_UNDER, 0, ANSI_WHITE, ANSI_BLACK, ANSI_YELLOW, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs ) {
@@ -732,8 +696,7 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
             case 'C':
             case 'c':
                 if( mudconf.c_cmd_subst ) {
-                    safe_str( mudstate.curr_cmd, buff,
-                              bufc );
+                    safe_str( mudstate.curr_cmd, buff, bufc );
                     break;
                 }
                 /*
@@ -763,19 +726,92 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
                     ( *dstr )--;
                     break;
                 }
+                
                 if( !mudconf.ansi_colors ) {
                     /*
                      * just skip over the characters
                      */
                     break;
                 }
+                
+                if(**dstr == '<' || **dstr == '/') { /* Xterm colors */
+                    int xterm_isbg = 0;
+                    
+                    while( 1 ) {
+
+                        if(**dstr == '/') { /* We are dealing with background */
+                            xptr = *dstr;
+                            ( *dstr ) ++;
+                        
+                            if( !**dstr ) {
+                                *dstr = xptr;
+                                break;
+                            } else {
+                                xterm_isbg = 1;
+                            }
+                            
+                        } else {
+                            xterm_isbg = 0;	/* We are dealing with foreground */
+                        }
+                    
+                        if( **dstr == '<' ) { /* Ok we got a color to process */
+                            xptr = *dstr;
+                            ( *dstr ) ++;
+                            
+                            if( !**dstr ) {
+                            *dstr = xptr;
+                            break;
+                            }
+                        
+                            xtp = xtbuf;
+                        
+                            while( **dstr && ( **dstr != '>' ) ) {
+                                safe_sb_chr( **dstr, xtbuf, &xtp );
+                                ( *dstr ) ++;
+                            }
+                            
+                            if( **dstr != '>' ) {
+                                /*
+                                 * Ran off the end. Back up.
+                                 */
+                                *dstr = xptr;
+                                break;
+                            }
+                            
+                            *xtp = '\0';
+                            
+                            /* Now we have the color string... Time to handle it */
+                            if( xterm_isbg ) {
+                                safe_str( ANSI_XTERM_BG, buff, bufc);
+                            } else {
+                                safe_str( ANSI_XTERM_FG, buff, bufc);
+                            }
+                            
+                            safe_str( xtbuf, buff, bufc );
+                            safe_chr( ANSI_END, buff, bufc );
+                            ansi = 1;
+                        } else {
+                            break;
+                        }
+                        /* Shall we continue? */
+                        
+                        xptr = *dstr;
+                        ( *dstr ) ++;
+                        if( **dstr != '<' && **dstr != '/') {
+                            *dstr = xptr;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                
                 if( !ansi_chartab[( unsigned char )**dstr] ) {
                     safe_chr( **dstr, buff, bufc );
                 } else {
-                    safe_str( ansi_chartab[( unsigned char )
-                                           **dstr], buff, bufc );
+                    safe_str( ansi_chartab[( unsigned char ) **dstr], buff, bufc );
                     ansi = ( **dstr == 'n' ) ? 0 : 1;
                 }
+                
                 break;
             case '=':	/* equivalent of generic v() attr get */
                 ( *dstr ) ++;
@@ -806,15 +842,10 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
                 if( !ap ) {
                     break;
                 }
-                atr_pget_info( player, ap->number,
-                               &aowner, &aflags );
-                if( See_attr( player, player, ap,
-                              aowner, aflags ) ) {
-                    atr_gotten =
-                        atr_pget( player, ap->number,
-                                  &aowner, &aflags, &alen );
-                    safe_known_str( atr_gotten, alen, buff,
-                                    bufc );
+                atr_pget_info( player, ap->number, &aowner, &aflags );
+                if( See_attr( player, player, ap, aowner, aflags ) ) {
+                    atr_gotten = atr_pget( player, ap->number, &aowner, &aflags, &alen );
+                    safe_known_str( atr_gotten, alen, buff, bufc );
                     free_lbuf( atr_gotten );
                 }
                 break;
