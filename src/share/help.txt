@@ -5160,7 +5160,19 @@ you kept typing 'leave' until you couldn't go any farther.
   each line of text the user sees and strip the ANSI from it. Thus, if
   a user can do it in-client, this is preferable.
  
-  See also: NOBLEED, ansi(), stripansi().
+  See also: NOBLEED, COLOR256, ansi(), stripansi().
+ 
+& COLOR256
+  Flag: COLOR256 (:)
+ 
+  When set on a player, this flag will enable the player to see XTERM
+  colors sequences.
+  
+  Not all client support this option, most client who doesn't just
+  ignore the sequences. Turning it on even if your client doesn't
+  support it save the server some processing work.
+  
+  See also: NOBLEED, ANSI, ansi(), stripansi().
 & NOBLEED
   Flag: NOBLEED (-)
  
@@ -5170,7 +5182,7 @@ you kept typing 'leave' until you couldn't go any farther.
   most terminals. This flag should not be set unless necessary; it causes
   the server to have to do some extra processing.
  
-  See also: ANSI, ansi(), stripansi().
+  See also: ANSI, COLOR256, ansi(), stripansi().
  
 & STOP
   Flag: STOP (!)
@@ -6653,7 +6665,9 @@ The list of loaded modules can be obtained via the 'version' command.
                Normally, this is a single-letter variable name, but if
                the name is enclosed in angle brackets, multi-letter variable
                names can be used. '%_<foo>' is equivalent to 'x(foo)'.
-    %x<code> = ANSI color substitution.
+    %x<code> = ANSI color substitution. If you want to use XTERM
+               codes, enclose it in angle brackets. See ANSI() for a better
+               description of the options avalable.
     %i0-%i9  = %i0 to %i9 are the iter() text for the delta level specified.
                %i0 is the same as ##. Equivalent to itext(sub(ilev(),<num>)).
     %i-<num> = %i-0 to %i-9 are equivalent to itext(0) - itext(9).
@@ -9303,7 +9317,45 @@ performed and the walk down the list stops.
   The %xn (to return to normal) is not necessary, but if it is not specified,
   the ANSI color codes will continue to the end of the string.
  
-  See also: ANSI, NOBLEED, stripansi().
+  Continued in 'help ansi3'.
+ 
+& ANSI3
+ 
+  If your client support it, XTERM color codes can also be used with this
+  function using the format <FOREGROUND>/<BACKGROUND> as the color code.
+ 
+  Foreground and Background colors can be specified in numerous ways, the
+  easiest method is to specify it in html hexadecimal format (#rrggbb), or
+  decimal format (except for values below 256, which are interpreted as
+  XTERM controle codes. Since XTERM only support 256 color, not all colors
+  are avalable and a close match will be used if the selection you made is
+  not avalable.
+  
+  Color can also be specified with their control codes. Values from 0 to
+  15 are the normal ANSI color codes, 16 to 231 are the XTERM colors and
+  232 to 255 are XTERM grayscales codes.
+  
+  Continued in 'help ansi4'.
+ 
+& ANSI4
+  
+  Percent substitution %x<foreground>/<background> can also be used instead
+  of ansi for XTERM colors too. For example, those two are equivalent:
+  
+  [ansi(<#ff0000>/<#00ff00>,Color!)]
+  
+  %x<#ff0000>/<#00ff00>Color!
+  
+  You do not need to specify both the foreground and background values, if
+  you only want to change the background, do it like this:
+  
+  [ansi(/<##ff0000>,Red Background!)]
+  
+  or
+  
+  %x/<##ff0000>Red Background!)]
+  
+  See also: ANSI, COLOR256, NOBLEED, stripansi().
  
 & STRIPANSI()
   Function: stripansi(<string>)

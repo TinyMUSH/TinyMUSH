@@ -245,6 +245,8 @@ extern dbref	match_controlled( dbref, const char * );
 extern dbref	match_affected( dbref, const char * );
 
 /* From stringutil.c */
+extern int	rgb2xterm( long );
+extern int	str2xterm( char * );
 extern char    *upcasestr( char * );
 extern char    *munge_space( char * );
 extern char    *trim_spaces( char * );

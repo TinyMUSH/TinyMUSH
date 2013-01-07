@@ -781,15 +781,18 @@ void exec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, int
                             *xtp = '\0';
                             
                             /* Now we have the color string... Time to handle it */
+                            
+                            i = str2xterm(xtbuf);
+                            
                             if( xterm_isbg ) {
-                                safe_str( ANSI_XTERM_BG, buff, bufc);
+                                snprintf( xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
                             } else {
-                                safe_str( ANSI_XTERM_FG, buff, bufc);
+                                snprintf( xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
                             }
                             
                             safe_str( xtbuf, buff, bufc );
-                            safe_chr( ANSI_END, buff, bufc );
                             ansi = 1;
+                            
                         } else {
                             break;
                         }

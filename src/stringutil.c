@@ -170,7 +170,7 @@ char *strip_xterm(char *s) {
     
     return(buf);
 }
- 
+
 /* ---------------------------------------------------------------------------
  * strip_ansi_len -- count non-escape-code characters
  */
@@ -700,6 +700,178 @@ char *translate_string( char *str, int type ) {
     *bp = '\0';
     return new;
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * rgb2xterm -- Convert an RGB value to xterm color
+ */
+ 
+int rgb2xterm(long rgb) {
+
+    int xterm, r, g, b;
+
+    /* First, handle standard colors */
+    if( rgb == 0x000000)
+        return(0);
+    if( rgb == 0x800000)
+        return(1);
+    if( rgb == 0x008000)
+        return(2);
+    if( rgb == 0x808000)
+        return(3);
+    if( rgb == 0x000080)
+        return(4);
+    if( rgb == 0x800080)
+        return(5);
+    if( rgb == 0x008080)
+        return(6);
+    if( rgb == 0xc0c0c0)
+        return(7);
+    if( rgb == 0x808080)
+        return(8);
+    if( rgb == 0xff0000)
+        return(9);
+    if( rgb == 0x00ff00)
+        return(10);
+    if( rgb == 0xffff00)
+        return(11);
+    if( rgb == 0x0000ff)
+        return(12);
+    if( rgb == 0xff00ff)
+        return(13);
+    if( rgb == 0x00ffff)
+        return(14);
+    if( rgb == 0xffffff)
+        return(15);
+
+    r = (rgb & 0xFF0000) >> 16;
+    g = (rgb & 0x00FF00) >> 8;
+    b = rgb & 0x0000FF;
+
+    /* Next, handle grayscales */
+
+    if( (r == g) && (r == b) ) {
+        if( rgb <= 0x080808)
+            return(232);
+        if( rgb <= 0x121212)
+            return(233);
+        if( rgb <= 0x1c1c1c)
+            return(234);
+        if( rgb <= 0x262626)
+            return(235);
+        if( rgb <= 0x303030)
+            return(236);
+        if( rgb <= 0x3a3a3a)
+            return(237);
+        if( rgb <= 0x444444)
+            return(238);
+        if( rgb <= 0x4e4e4e)
+            return(239);
+        if( rgb <= 0x585858)
+            return(240);
+        if( rgb <= 0x606060)
+            return(241);
+        if( rgb <= 0x666666)
+            return(242);
+        if( rgb <= 0x767676)
+            return(243);
+        if( rgb <= 0x808080)
+            return(244);
+        if( rgb <= 0x8a8a8a)
+            return(245);
+        if( rgb <= 0x949494)
+            return(246);
+        if( rgb <= 0x9e9e9e)
+            return(247);
+        if( rgb <= 0xa8a8a8)
+            return(248);
+        if( rgb <= 0xb2b2b2)
+            return(249);
+        if( rgb <= 0xbcbcbc)
+            return(250);
+        if( rgb <= 0xc6c6c6)
+            return(251);
+        if( rgb <= 0xd0d0d0)
+            return(252);
+        if( rgb <= 0xdadada)
+            return(253);
+        if( rgb <= 0xe4e4e4)
+            return(254);
+        if( rgb <= 0xeeeeee)
+            return(255);
+    }
+
+    /* It's an RGB, convert it */
+
+    xterm = ( ( ( r / 51 ) * 36 ) + ( ( g / 51 ) * 6 ) + ( b / 51 ) ) + 16;
+
+    /* Just in case... */
+
+    if(xterm < 16)
+        xterm = 16;
+        
+    if(xterm > 231)
+        xterm = 231;
+
+    return(xterm);
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * str2xterm -- Convert a value to xterm color
+ * The value can be an hex rgb value (#rrggbb), a decimal rgb value (r g b)
+ * a 24 bit decimal rgb value, or the actual xterm color value.
+ */
+
+int str2xterm(char *str) {
+
+    long rgb;
+    int xterm, r, g, b;
+    char *p, *t;
+
+    p=str;
+    if( *p == '#' ) {			/* Ok, it's a RGB in hex */
+        p++;
+        rgb = strtol(p, &t, 16);
+
+        if(p == t) {
+            return(-1);
+        } else {
+            return(rgb2xterm(rgb));
+        }
+    } else {				/* Then it must be decimal */
+        r = strtol(p, &t, 10);
+        if(p == t) {
+            return(-1);
+        } else if ( *t == 0 ) {
+            if(r < 256)	
+                return(r);		/* It's the color index */
+            return(rgb2xterm(r));	/* It's a RGB, fetch the index */
+        } else {
+            p = t;
+            while( !isdigit(*p) && (*p != 0) ) {
+                p++;
+            }
+            g = strtol(p, &t, 10);	
+            if( (p == t) || (*p == 0) ) {
+                return(-1);
+            }
+            p = t;
+            while( !isdigit(*p) && (*p != 0) ) {
+                p++;
+            }
+            b = strtol(p, &t, 10);
+            if( (p == t) || (*p == 0) ) {
+                return(-1);
+            }
+            rgb = ( r << 16) + ( g << 8) + b;            
+            return(rgb2xterm(rgb));
+        }
+    }
+    return(-1);				/* Something is terribly wrong... */
+}
+
+
 
 /*
  * capitalizes an entire string

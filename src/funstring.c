@@ -1187,7 +1187,7 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     
     while( *s ) {
         if(*s == '<' || *s == '/') { /* Xterm colors */
-            int xterm_isbg = 0;
+            int xterm_isbg = 0, i;
             char xtbuf[SBUF_SIZE], *xtp;
                     
             if(*s == '/') { /* We are dealing with background */
@@ -1223,14 +1223,15 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 *xtp = '\0';
                             
                 /* Now we have the color string... Time to handle it */
+                i = str2xterm(xtbuf);
+                
                 if( xterm_isbg ) {
-                    safe_str( ANSI_XTERM_BG, buff, bufc);
+                    snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
                 } else {
-                    safe_str( ANSI_XTERM_FG, buff, bufc);
+                    snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
                 }
                             
                 safe_str( xtbuf, buff, bufc );
-                safe_chr( ANSI_END, buff, bufc );
                 xterm = 1;
             } else {
                 break;
