@@ -114,7 +114,8 @@ char *strip_ansi( const char *s ) {
     static char buf[LBUF_SIZE];
     char *p = buf, *s1;
 
-    s1 = XSTRDUP(s, "strip_ansi");
+
+    s1 = (char *) s;
     
     if( s1 ) {
         while( *s1 == ESC_CHAR ) {
@@ -127,11 +128,11 @@ char *strip_ansi( const char *s ) {
                 skip_esccode( &s1 );
             }
         }
-    }
-
     *p = '\0';
-    XFREE(s1, "strip_ansi");
-    return buf;
+    return(buf);
+    } else {
+        return(s1);
+    }
 }
 
 /* ---------------------------------------------------------------------------

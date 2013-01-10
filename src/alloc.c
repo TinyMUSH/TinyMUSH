@@ -394,27 +394,34 @@ void *xrealloc(void *x, size_t z, const char *y) {
 }
 
 void *xstrdup(const void *x, const char *y) {
-    malloc_str = (char *) x;
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrdup: %s/%d", y, strlen(malloc_str) + 1 );
-    malloc_count++;
-    malloc_ptr = (void *)malloc(strlen(malloc_str) + 1 + sizeof(int));
-    malloc_bytes += strlen(malloc_str) + 1;
-    strcpy(malloc_ptr + sizeof(int), malloc_str);
-    *(int *)malloc_ptr = strlen(malloc_str) + 1;
-    return(malloc_ptr + sizeof(int));
+    if(x || *x) {
+        malloc_str = (char *) x;
+        log_write( LOG_MALLOC, "MEM", "TRACE", "xstrdup: %s/%d", y, strlen(malloc_str) + 1 );
+        malloc_count++;
+        malloc_ptr = (void *)malloc(strlen(malloc_str) + 1 + sizeof(int));
+        malloc_bytes += strlen(malloc_str) + 1;
+        strcpy(malloc_ptr + sizeof(int), malloc_str);
+        *(int *)malloc_ptr = strlen(malloc_str) + 1;
+        return(malloc_ptr + sizeof(int));
+    } else {
+        return(NULL);
 }
 
 
 
 void *xstrndup(const void *x, size_t z, const char *y) {
-    malloc_str = (void *) x;
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
-    malloc_count++;
-    malloc_ptr = (void *)malloc(z + sizeof(int));
-    malloc_bytes += z;
-    strncpy(malloc_ptr + sizeof(int), malloc_str, z);
-    *(int *)malloc_ptr = z;
-    return(malloc_ptr + sizeof(int));
+    if(x || *x) {
+        malloc_str = (void *) x;
+        log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
+        malloc_count++;
+        malloc_ptr = (void *)malloc(z + sizeof(int));
+        malloc_bytes += z;
+        strncpy(malloc_ptr + sizeof(int), malloc_str, z);
+        *(int *)malloc_ptr = z;
+        return(malloc_ptr + sizeof(int));
+    } else {
+        return(NULL);
+    }
 }
 
 void xfree(void *x, const char *y) {
@@ -570,10 +577,14 @@ void *track_realloc( void *ptr, size_tamount, const char *name ) {
 
 char *track_strdup( const char *str, const char *name ) {
     char *r;
-
-    r = strdup( str );
-    trace_alloc( strlen( str ) + 1, name, r );
-    return ( r );
+    
+    if(str || *str) {
+        r = strdup( str );
+        trace_alloc( strlen( str ) + 1, name, r );
+        return ( r );
+    } else {
+        return(NULL)
+    }
 }
 
 void track_free( void *ptr, const char *name ) {
