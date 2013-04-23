@@ -1243,6 +1243,9 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 break;
             }
         }
+        else {
+            s++;
+        }
     }
 
     s = fargs[1];
