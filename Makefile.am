@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I src/libltdl/m4 -I m4
+ACLOCAL_AMFLAGS = -I src/libltdl/m4
 AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS         = src

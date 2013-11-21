@@ -80,14 +80,12 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) COPYING compile \
+	$(top_srcdir)/configure $(am__configure_deps) COPYING \
 	src/libltdl/config/compile config.guess \
 	src/libltdl/config/config.guess config.sub \
-	src/libltdl/config/config.sub depcomp \
-	src/libltdl/config/depcomp install-sh \
-	src/libltdl/config/install-sh missing \
-	src/libltdl/config/missing ltmain.sh \
-	src/libltdl/config/ltmain.sh \
+	src/libltdl/config/config.sub src/libltdl/config/depcomp \
+	src/libltdl/config/install-sh src/libltdl/config/missing \
+	ltmain.sh src/libltdl/config/ltmain.sh \
 	$(top_srcdir)/src/libltdl/config/compile \
 	$(top_srcdir)/src/libltdl/config/config.guess \
 	$(top_srcdir)/src/libltdl/config/config.sub \
@@ -361,7 +359,7 @@ top_srcdir = @top_srcdir@
 with_compress_prog = @with_compress_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
-ACLOCAL_AMFLAGS = -I src/libltdl/m4 -I m4
+ACLOCAL_AMFLAGS = -I src/libltdl/m4
 AM_CPPFLAGS = $(LTDLINCL)
 SUBDIRS = src
 EXTRA_DIST = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
