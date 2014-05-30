@@ -748,7 +748,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
 
     va_start( ap, format );
         
-    if ( ( !format || !*format ) && format !=NULL ) {
+    if ( ( !format || !*format ) ) {
         if( ( tbuff = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, tbuff, LBUF_SIZE);
         } else {
@@ -1162,7 +1162,7 @@ void notify_except( dbref loc, dbref player, dbref exception, int flags, const c
     
     va_start( ap, format );
     
-    if ( ( !format || !*format ) && format !=NULL ) {
+    if ( ( !format || !*format ) ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {
@@ -1191,7 +1191,7 @@ void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags,
     
     va_start( ap, format );
     
-    if ( ( !format || !*format ) && format !=NULL ) {
+    if ( ( !format || !*format ) ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {
