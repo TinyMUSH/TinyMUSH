@@ -117,7 +117,7 @@ void raw_notify_html( dbref player, const char *format, ... ) {
     
     va_start( ap, format );
     
-    if( !format || !*format ) {
+    if ( ( !format || !*format ) && format !=NULL ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {
@@ -160,7 +160,7 @@ void raw_notify( dbref player, const char *format, ... ) {
 
     va_start( ap, format );
     
-    if( !format || !*format ) {
+    if ( ( !format || !*format ) && format !=NULL ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {
@@ -388,7 +388,7 @@ void queue_string( DESC *d, const char *format, ... ) {
                 
     va_start( ap, format );
                         
-    if( !format || !*format ) {
+    if ( ( !format || !*format ) && format !=NULL ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {
@@ -428,7 +428,7 @@ void queue_rawstring( DESC *d, const char *format, ... ) {
                 
     va_start( ap, format );
                         
-    if( !format || !*format ) {
+    if ( ( !format || !*format ) && format !=NULL ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
         } else {

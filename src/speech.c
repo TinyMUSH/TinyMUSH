@@ -426,12 +426,12 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
 
     va_start( ap, format );
     
-    if( !format || !*format ) {
-        if( ( s = va_arg(ap, char *) ) != NULL ) {
-            strncpy(dflt, s, LBUF_SIZE);
-        } else {
-            dflt[0]=0x00;
-        }
+    if ( ( !format || !*format ) && format !=NULL ) {
+      if( ( s = va_arg(ap, char *) ) != NULL ) {
+        strncpy(dflt, s, LBUF_SIZE);
+      } else {
+        dflt[0]=0x00;
+      }
     } else {
         vsnprintf(dflt, LBUF_SIZE, format, ap);
     }
