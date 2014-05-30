@@ -49,9 +49,9 @@ directly with the Copyright Holder of a given Package.  If the terms of this
 license do not permit  the full use that you propose to make of the Package,
 you should contact  the Copyright Holder  and  seek  a  different  licensing 
 arrangement.])
-AC_CONFIG_AUX_DIR([src/libltdl/config])
 AC_CONFIG_SRCDIR([src/game.c])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([src/libltdl/config])
 AC_CONFIG_MACRO_DIR([src/libltdl/m4])
 
 AX_PRINT_PACKAGE_TITLE()
@@ -83,8 +83,6 @@ LT_CONFIG_LTDL_DIR([src/libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])
-
-
 
 AX_BOX([$ac_default_prefix])
 
@@ -339,8 +337,6 @@ AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"], [Text that
 AC_MSG_RESULT([$with_pueblo_msg])
 AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["${with_pueblo_msg}"], [Pueblo support message])
 
-
-
 AX_BOX([Checks for platform])
 # Checks for platform.
 
@@ -486,7 +482,7 @@ AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Relea
 AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], TINYMUSH_COPYRIGHT, [Copyright Notice])
 
 AX_BOX([Configuring files.])
-AC_CONFIG_FILES([src/Makefile lib/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])
+AC_CONFIG_FILES([src/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])
 
 AX_BOX([Generating config.status.])
 AC_OUTPUT

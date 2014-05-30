@@ -214,7 +214,6 @@ test -x / || exit 1"
   as_lineno_2=";as_suggested=$as_suggested$LINENO;as_suggested=$as_suggested" as_lineno_2a=\$LINENO
   eval 'test \"x\$as_lineno_1'\$as_run'\" != \"x\$as_lineno_2'\$as_run'\" &&
   test \"x\`expr \$as_lineno_1'\$as_run' + 1\`\" = \"x\$as_lineno_2'\$as_run'\"' || exit 1
-test \$(( 1 + 1 )) = 2 || exit 1
 
   test -n \"\${ZSH_VERSION+set}\${BASH_VERSION+set}\" || (
     ECHO='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
@@ -222,7 +221,8 @@ test \$(( 1 + 1 )) = 2 || exit 1
     ECHO=\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO\$ECHO
     PATH=/empty FPATH=/empty; export PATH FPATH
     test \"X\`printf %s \$ECHO\`\" = \"X\$ECHO\" \\
-      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1"
+      || test \"X\`print -r -- \$ECHO\`\" = \"X\$ECHO\" ) || exit 1
+test \$(( 1 + 1 )) = 2 || exit 1"
   if (eval "$as_required") 2>/dev/null; then :
   as_have_required=yes
 else
@@ -652,19 +652,13 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_func_list=
-ac_header_list=
-gl_floor_required=plain
 enable_option_checking=no
 ac_default_prefix=`pwd -P`/game
+ac_header_list=
 ac_subst_vars='ltdl_LTLIBOBJS
 ltdl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
-gltests_LTLIBOBJS
-gltests_LIBOBJS
-gl_LTLIBOBJS
-gl_LIBOBJS
 LTLIBOBJS
 LIBOBJS
 ac_aux_dir
@@ -720,6 +714,10 @@ LTDLINCL
 LTDLDEPS
 LIBLTDL
 LIBTOOL_DEPS
+AM_BACKSLASH
+AM_DEFAULT_VERBOSITY
+AM_DEFAULT_V
+AM_V
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -735,6 +733,7 @@ am__tar
 AMTAR
 am__leading_dot
 mkdir_p
+MKDIR_P
 INSTALL_STRIP_PROGRAM
 install_sh
 MAKEINFO
@@ -755,8 +754,10 @@ NMEDIT
 DSYMUTIL
 MANIFEST_TOOL
 AWK
+RANLIB
 STRIP
 ac_ct_AR
+AR
 DLLTOOL
 OBJDUMP
 LN_S
@@ -765,960 +766,9 @@ ac_ct_DUMPBIN
 DUMPBIN
 LD
 FGREP
+EGREP
+GREP
 SED
-LIBTOOL
-INSTALL_DATA
-INSTALL_SCRIPT
-INSTALL_PROGRAM
-SET_MAKE
-LIBGNU_LTLIBDEPS
-LIBGNU_LIBDEPS
-gltests_WITNESS
-HAVE_WINT_T
-NEXT_AS_FIRST_DIRECTIVE_WCHAR_H
-NEXT_WCHAR_H
-REPLACE_WCSWIDTH
-REPLACE_WCWIDTH
-REPLACE_WCSNRTOMBS
-REPLACE_WCSRTOMBS
-REPLACE_WCRTOMB
-REPLACE_MBSNRTOWCS
-REPLACE_MBSRTOWCS
-REPLACE_MBRLEN
-REPLACE_MBRTOWC
-REPLACE_MBSINIT
-REPLACE_WCTOB
-REPLACE_BTOWC
-REPLACE_MBSTATE_T
-HAVE_DECL_WCWIDTH
-HAVE_DECL_WCTOB
-HAVE_WCSWIDTH
-HAVE_WCSTOK
-HAVE_WCSSTR
-HAVE_WCSPBRK
-HAVE_WCSSPN
-HAVE_WCSCSPN
-HAVE_WCSRCHR
-HAVE_WCSCHR
-HAVE_WCSDUP
-HAVE_WCSXFRM
-HAVE_WCSCOLL
-HAVE_WCSNCASECMP
-HAVE_WCSCASECMP
-HAVE_WCSNCMP
-HAVE_WCSCMP
-HAVE_WCSNCAT
-HAVE_WCSCAT
-HAVE_WCPNCPY
-HAVE_WCSNCPY
-HAVE_WCPCPY
-HAVE_WCSCPY
-HAVE_WCSNLEN
-HAVE_WCSLEN
-HAVE_WMEMSET
-HAVE_WMEMMOVE
-HAVE_WMEMCPY
-HAVE_WMEMCMP
-HAVE_WMEMCHR
-HAVE_WCSNRTOMBS
-HAVE_WCSRTOMBS
-HAVE_WCRTOMB
-HAVE_MBSNRTOWCS
-HAVE_MBSRTOWCS
-HAVE_MBRLEN
-HAVE_MBRTOWC
-HAVE_MBSINIT
-HAVE_BTOWC
-GNULIB_WCSWIDTH
-GNULIB_WCSTOK
-GNULIB_WCSSTR
-GNULIB_WCSPBRK
-GNULIB_WCSSPN
-GNULIB_WCSCSPN
-GNULIB_WCSRCHR
-GNULIB_WCSCHR
-GNULIB_WCSDUP
-GNULIB_WCSXFRM
-GNULIB_WCSCOLL
-GNULIB_WCSNCASECMP
-GNULIB_WCSCASECMP
-GNULIB_WCSNCMP
-GNULIB_WCSCMP
-GNULIB_WCSNCAT
-GNULIB_WCSCAT
-GNULIB_WCPNCPY
-GNULIB_WCSNCPY
-GNULIB_WCPCPY
-GNULIB_WCSCPY
-GNULIB_WCSNLEN
-GNULIB_WCSLEN
-GNULIB_WMEMSET
-GNULIB_WMEMMOVE
-GNULIB_WMEMCPY
-GNULIB_WMEMCMP
-GNULIB_WMEMCHR
-GNULIB_WCWIDTH
-GNULIB_WCSNRTOMBS
-GNULIB_WCSRTOMBS
-GNULIB_WCRTOMB
-GNULIB_MBSNRTOWCS
-GNULIB_MBSRTOWCS
-GNULIB_MBRLEN
-GNULIB_MBRTOWC
-GNULIB_MBSINIT
-GNULIB_WCTOB
-GNULIB_BTOWC
-HAVE_FEATURES_H
-HAVE_UNISTD_H
-NEXT_AS_FIRST_DIRECTIVE_UNISTD_H
-NEXT_UNISTD_H
-PTHREAD_H_DEFINES_STRUCT_TIMESPEC
-SYS_TIME_H_DEFINES_STRUCT_TIMESPEC
-TIME_H_DEFINES_STRUCT_TIMESPEC
-NEXT_AS_FIRST_DIRECTIVE_TIME_H
-NEXT_TIME_H
-HAVE_SYS_UTSNAME_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_UTSNAME_H
-NEXT_SYS_UTSNAME_H
-HAVE_STRUCT_UTSNAME
-HAVE_UNAME
-GNULIB_UNAME
-HAVE_SYS_UIO_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_UIO_H
-NEXT_SYS_UIO_H
-WINDOWS_64_BIT_OFF_T
-NEXT_AS_FIRST_DIRECTIVE_SYS_TYPES_H
-NEXT_SYS_TYPES_H
-WINDOWS_64_BIT_ST_SIZE
-NEXT_AS_FIRST_DIRECTIVE_SYS_STAT_H
-NEXT_SYS_STAT_H
-HAVE_SYS_RESOURCE_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_RESOURCE_H
-NEXT_SYS_RESOURCE_H
-MKDIR_P
-HAVE_SYS_FILE_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_FILE_H
-NEXT_SYS_FILE_H
-HAVE_STRINGS_H
-NEXT_AS_FIRST_DIRECTIVE_STRINGS_H
-NEXT_STRINGS_H
-HAVE_DECL_STRNCASECMP
-HAVE_STRCASECMP
-HAVE_FFS
-GNULIB_FFS
-NEXT_AS_FIRST_DIRECTIVE_STRING_H
-NEXT_STRING_H
-NEXT_AS_FIRST_DIRECTIVE_STDLIB_H
-NEXT_STDLIB_H
-NEXT_AS_FIRST_DIRECTIVE_STDIO_H
-NEXT_STDIO_H
-GL_GENERATE_STDINT_H_FALSE
-GL_GENERATE_STDINT_H_TRUE
-STDINT_H
-WINT_T_SUFFIX
-WCHAR_T_SUFFIX
-SIG_ATOMIC_T_SUFFIX
-SIZE_T_SUFFIX
-PTRDIFF_T_SUFFIX
-HAVE_SIGNED_WINT_T
-HAVE_SIGNED_WCHAR_T
-HAVE_SIGNED_SIG_ATOMIC_T
-BITSIZEOF_WINT_T
-BITSIZEOF_WCHAR_T
-BITSIZEOF_SIG_ATOMIC_T
-BITSIZEOF_SIZE_T
-BITSIZEOF_PTRDIFF_T
-HAVE_SYS_BITYPES_H
-HAVE_SYS_INTTYPES_H
-HAVE_STDINT_H
-NEXT_AS_FIRST_DIRECTIVE_STDINT_H
-NEXT_STDINT_H
-HAVE_SYS_TYPES_H
-HAVE_INTTYPES_H
-HAVE_WCHAR_H
-HAVE_UNSIGNED_LONG_LONG_INT
-HAVE_LONG_LONG_INT
-NEXT_AS_FIRST_DIRECTIVE_STDDEF_H
-NEXT_STDDEF_H
-GL_GENERATE_STDDEF_H_FALSE
-GL_GENERATE_STDDEF_H_TRUE
-STDDEF_H
-HAVE_WCHAR_T
-REPLACE_NULL
-HAVE__BOOL
-GL_GENERATE_STDBOOL_H_FALSE
-GL_GENERATE_STDBOOL_H_TRUE
-STDBOOL_H
-GL_GENERATE_STDALIGN_H_FALSE
-GL_GENERATE_STDALIGN_H_TRUE
-STDALIGN_H
-SQRT_LIBM
-HAVE_WS2TCPIP_H
-HAVE_SYS_SOCKET_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_SOCKET_H
-NEXT_SYS_SOCKET_H
-HAVE_ACCEPT4
-HAVE_SA_FAMILY_T
-HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY
-HAVE_STRUCT_SOCKADDR_STORAGE
-GNULIB_ACCEPT4
-GNULIB_SHUTDOWN
-GNULIB_SETSOCKOPT
-GNULIB_SENDTO
-GNULIB_RECVFROM
-GNULIB_SEND
-GNULIB_RECV
-GNULIB_LISTEN
-GNULIB_GETSOCKOPT
-GNULIB_GETSOCKNAME
-GNULIB_GETPEERNAME
-GNULIB_BIND
-GNULIB_ACCEPT
-GNULIB_CONNECT
-GNULIB_SOCKET
-NEXT_AS_FIRST_DIRECTIVE_SIGNAL_H
-NEXT_SIGNAL_H
-REPLACE_RAISE
-REPLACE_PTHREAD_SIGMASK
-HAVE_SIGHANDLER_T
-HAVE_TYPE_VOLATILE_SIG_ATOMIC_T
-HAVE_STRUCT_SIGACTION_SA_SIGACTION
-HAVE_SIGACTION
-HAVE_SIGINFO_T
-HAVE_SIGSET_T
-HAVE_RAISE
-HAVE_PTHREAD_SIGMASK
-HAVE_POSIX_SIGNALBLOCKING
-GNULIB_SIGACTION
-GNULIB_SIGPROCMASK
-GNULIB_SIGNAL_H_SIGPIPE
-GNULIB_RAISE
-GNULIB_PTHREAD_SIGMASK
-LIB_SELECT
-LIBSOCKET
-HAVE_SYS_SELECT_H
-NEXT_AS_FIRST_DIRECTIVE_SYS_SELECT_H
-NEXT_SYS_SELECT_H
-REPLACE_SELECT
-REPLACE_PSELECT
-HAVE_PSELECT
-GNULIB_SELECT
-GNULIB_PSELECT
-REPLACE_VSPRINTF
-REPLACE_VSNPRINTF
-REPLACE_VPRINTF
-REPLACE_VFPRINTF
-REPLACE_VDPRINTF
-REPLACE_VASPRINTF
-REPLACE_TMPFILE
-REPLACE_STDIO_WRITE_FUNCS
-REPLACE_STDIO_READ_FUNCS
-REPLACE_SPRINTF
-REPLACE_SNPRINTF
-REPLACE_RENAMEAT
-REPLACE_RENAME
-REPLACE_REMOVE
-REPLACE_PRINTF
-REPLACE_POPEN
-REPLACE_PERROR
-REPLACE_OBSTACK_PRINTF
-REPLACE_GETLINE
-REPLACE_GETDELIM
-REPLACE_FTELLO
-REPLACE_FTELL
-REPLACE_FSEEKO
-REPLACE_FSEEK
-REPLACE_FREOPEN
-REPLACE_FPURGE
-REPLACE_FPRINTF
-REPLACE_FOPEN
-REPLACE_FFLUSH
-REPLACE_FDOPEN
-REPLACE_FCLOSE
-REPLACE_DPRINTF
-HAVE_VDPRINTF
-HAVE_VASPRINTF
-HAVE_RENAMEAT
-HAVE_POPEN
-HAVE_PCLOSE
-HAVE_FTELLO
-HAVE_FSEEKO
-HAVE_DPRINTF
-HAVE_DECL_VSNPRINTF
-HAVE_DECL_SNPRINTF
-HAVE_DECL_OBSTACK_PRINTF
-HAVE_DECL_GETLINE
-HAVE_DECL_GETDELIM
-HAVE_DECL_FTELLO
-HAVE_DECL_FSEEKO
-HAVE_DECL_FPURGE
-GNULIB_VSPRINTF_POSIX
-GNULIB_VSNPRINTF
-GNULIB_VPRINTF_POSIX
-GNULIB_VPRINTF
-GNULIB_VFPRINTF_POSIX
-GNULIB_VFPRINTF
-GNULIB_VDPRINTF
-GNULIB_VSCANF
-GNULIB_VFSCANF
-GNULIB_VASPRINTF
-GNULIB_TMPFILE
-GNULIB_STDIO_H_SIGPIPE
-GNULIB_STDIO_H_NONBLOCKING
-GNULIB_SPRINTF_POSIX
-GNULIB_SNPRINTF
-GNULIB_SCANF
-GNULIB_RENAMEAT
-GNULIB_RENAME
-GNULIB_REMOVE
-GNULIB_PUTS
-GNULIB_PUTCHAR
-GNULIB_PUTC
-GNULIB_PRINTF_POSIX
-GNULIB_PRINTF
-GNULIB_POPEN
-GNULIB_PERROR
-GNULIB_PCLOSE
-GNULIB_OBSTACK_PRINTF_POSIX
-GNULIB_OBSTACK_PRINTF
-GNULIB_GETLINE
-GNULIB_GETDELIM
-GNULIB_GETCHAR
-GNULIB_GETC
-GNULIB_FWRITE
-GNULIB_FTELLO
-GNULIB_FTELL
-GNULIB_FSEEKO
-GNULIB_FSEEK
-GNULIB_FSCANF
-GNULIB_FREOPEN
-GNULIB_FREAD
-GNULIB_FPUTS
-GNULIB_FPUTC
-GNULIB_FPURGE
-GNULIB_FPRINTF_POSIX
-GNULIB_FPRINTF
-GNULIB_FOPEN
-GNULIB_FGETS
-GNULIB_FGETC
-GNULIB_FFLUSH
-GNULIB_FDOPEN
-GNULIB_FCLOSE
-GNULIB_DPRINTF
-POW_LIBM
-HAVE_MSVC_INVALID_PARAMETER_HANDLER
-APPLE_UNIVERSAL_BUILD
-REPLACE_TIMEGM
-REPLACE_NANOSLEEP
-REPLACE_MKTIME
-REPLACE_LOCALTIME_R
-HAVE_TIMEGM
-HAVE_STRPTIME
-HAVE_NANOSLEEP
-HAVE_DECL_LOCALTIME_R
-GNULIB_TIME_R
-GNULIB_TIMEGM
-GNULIB_STRPTIME
-GNULIB_NANOSLEEP
-GNULIB_MKTIME
-UNDEFINE_STRTOK_R
-REPLACE_STRTOK_R
-REPLACE_STRSIGNAL
-REPLACE_STRNLEN
-REPLACE_STRNDUP
-REPLACE_STRNCAT
-REPLACE_STRERROR_R
-REPLACE_STRERROR
-REPLACE_STRCHRNUL
-REPLACE_STRCASESTR
-REPLACE_STRSTR
-REPLACE_STRDUP
-REPLACE_STPNCPY
-REPLACE_MEMMEM
-REPLACE_MEMCHR
-HAVE_STRVERSCMP
-HAVE_DECL_STRSIGNAL
-HAVE_DECL_STRERROR_R
-HAVE_DECL_STRTOK_R
-HAVE_STRCASESTR
-HAVE_STRSEP
-HAVE_STRPBRK
-HAVE_DECL_STRNLEN
-HAVE_DECL_STRNDUP
-HAVE_DECL_STRDUP
-HAVE_STRCHRNUL
-HAVE_STPNCPY
-HAVE_STPCPY
-HAVE_RAWMEMCHR
-HAVE_DECL_MEMRCHR
-HAVE_MEMPCPY
-HAVE_DECL_MEMMEM
-HAVE_MEMCHR
-HAVE_FFSLL
-HAVE_FFSL
-HAVE_MBSLEN
-GNULIB_STRVERSCMP
-GNULIB_STRSIGNAL
-GNULIB_STRERROR_R
-GNULIB_STRERROR
-GNULIB_MBSTOK_R
-GNULIB_MBSSEP
-GNULIB_MBSSPN
-GNULIB_MBSPBRK
-GNULIB_MBSCSPN
-GNULIB_MBSCASESTR
-GNULIB_MBSPCASECMP
-GNULIB_MBSNCASECMP
-GNULIB_MBSCASECMP
-GNULIB_MBSSTR
-GNULIB_MBSRCHR
-GNULIB_MBSCHR
-GNULIB_MBSNLEN
-GNULIB_MBSLEN
-GNULIB_STRTOK_R
-GNULIB_STRCASESTR
-GNULIB_STRSTR
-GNULIB_STRSEP
-GNULIB_STRPBRK
-GNULIB_STRNLEN
-GNULIB_STRNDUP
-GNULIB_STRNCAT
-GNULIB_STRDUP
-GNULIB_STRCHRNUL
-GNULIB_STPNCPY
-GNULIB_STPCPY
-GNULIB_RAWMEMCHR
-GNULIB_MEMRCHR
-GNULIB_MEMPCPY
-GNULIB_MEMMEM
-GNULIB_MEMCHR
-GNULIB_FFSLL
-GNULIB_FFSL
-NEXT_AS_FIRST_DIRECTIVE_MATH_H
-NEXT_MATH_H
-REPLACE_UTIMENSAT
-REPLACE_STAT
-REPLACE_MKNOD
-REPLACE_MKFIFO
-REPLACE_MKDIR
-REPLACE_LSTAT
-REPLACE_FUTIMENS
-REPLACE_FSTATAT
-REPLACE_FSTAT
-HAVE_UTIMENSAT
-HAVE_MKNODAT
-HAVE_MKNOD
-HAVE_MKFIFOAT
-HAVE_MKFIFO
-HAVE_MKDIRAT
-HAVE_LSTAT
-HAVE_LCHMOD
-HAVE_FUTIMENS
-HAVE_FSTATAT
-HAVE_FCHMODAT
-GNULIB_UTIMENSAT
-GNULIB_STAT
-GNULIB_MKNODAT
-GNULIB_MKNOD
-GNULIB_MKFIFOAT
-GNULIB_MKFIFO
-GNULIB_MKDIRAT
-GNULIB_LSTAT
-GNULIB_LCHMOD
-GNULIB_FUTIMENS
-GNULIB_FSTATAT
-GNULIB_FSTAT
-GNULIB_FCHMODAT
-NEXT_AS_FIRST_DIRECTIVE_SYS_TIME_H
-NEXT_SYS_TIME_H
-REPLACE_STRUCT_TIMEVAL
-REPLACE_GETTIMEOFDAY
-HAVE_SYS_TIME_H
-HAVE_STRUCT_TIMEVAL
-HAVE_GETTIMEOFDAY
-GNULIB_GETTIMEOFDAY
-HAVE_GETRUSAGE
-GNULIB_GETRUSAGE
-GETHOSTNAME_LIB
-HAVE_WINSOCK2_H
-HAVE_SAME_LONG_DOUBLE_AS_DOUBLE
-FLOOR_LIBM
-REPLACE_TRUNCL
-REPLACE_TRUNCF
-REPLACE_TRUNC
-REPLACE_SQRTL
-REPLACE_SIGNBIT_USING_GCC
-REPLACE_SIGNBIT
-REPLACE_ROUNDL
-REPLACE_ROUNDF
-REPLACE_ROUND
-REPLACE_REMAINDERL
-REPLACE_REMAINDERF
-REPLACE_REMAINDER
-REPLACE_NAN
-REPLACE_MODFL
-REPLACE_MODFF
-REPLACE_MODF
-REPLACE_LOGBL
-REPLACE_LOGBF
-REPLACE_LOGB
-REPLACE_LOG2L
-REPLACE_LOG2F
-REPLACE_LOG2
-REPLACE_LOG1PL
-REPLACE_LOG1PF
-REPLACE_LOG1P
-REPLACE_LOG10L
-REPLACE_LOG10F
-REPLACE_LOG10
-REPLACE_LOGL
-REPLACE_LOGF
-REPLACE_LOG
-REPLACE_LDEXPL
-REPLACE_ISNAN
-REPLACE_ISINF
-REPLACE_ISFINITE
-REPLACE_ILOGBF
-REPLACE_ILOGB
-REPLACE_HYPOTL
-REPLACE_HYPOTF
-REPLACE_HYPOT
-REPLACE_HUGE_VAL
-REPLACE_FREXPL
-REPLACE_FREXP
-REPLACE_FREXPF
-REPLACE_FMODL
-REPLACE_FMODF
-REPLACE_FMOD
-REPLACE_FMAL
-REPLACE_FMAF
-REPLACE_FMA
-REPLACE_FLOORL
-REPLACE_FLOORF
-REPLACE_FLOOR
-REPLACE_FABSL
-REPLACE_EXP2L
-REPLACE_EXP2
-REPLACE_EXPM1F
-REPLACE_EXPM1
-REPLACE_CEILL
-REPLACE_CEILF
-REPLACE_CEIL
-REPLACE_CBRTL
-REPLACE_CBRTF
-HAVE_DECL_TRUNCL
-HAVE_DECL_TRUNCF
-HAVE_DECL_TRUNC
-HAVE_DECL_TANL
-HAVE_DECL_SQRTL
-HAVE_DECL_SINL
-HAVE_DECL_ROUNDL
-HAVE_DECL_ROUNDF
-HAVE_DECL_ROUND
-HAVE_DECL_RINTF
-HAVE_DECL_REMAINDERL
-HAVE_DECL_REMAINDER
-HAVE_DECL_LOGB
-HAVE_DECL_LOG2L
-HAVE_DECL_LOG2F
-HAVE_DECL_LOG2
-HAVE_DECL_LOG10L
-HAVE_DECL_LOGL
-HAVE_DECL_LDEXPL
-HAVE_DECL_FREXPL
-HAVE_DECL_FLOORL
-HAVE_DECL_FLOORF
-HAVE_DECL_EXPM1L
-HAVE_DECL_EXP2L
-HAVE_DECL_EXP2F
-HAVE_DECL_EXP2
-HAVE_DECL_EXPL
-HAVE_DECL_COSL
-HAVE_DECL_COPYSIGNF
-HAVE_DECL_CEILL
-HAVE_DECL_CEILF
-HAVE_DECL_CBRTL
-HAVE_DECL_CBRTF
-HAVE_DECL_ATANL
-HAVE_DECL_ASINL
-HAVE_DECL_ACOSL
-HAVE_TANHF
-HAVE_TANL
-HAVE_TANF
-HAVE_SQRTL
-HAVE_SQRTF
-HAVE_SINHF
-HAVE_SINL
-HAVE_SINF
-HAVE_RINTL
-HAVE_RINT
-HAVE_REMAINDERF
-HAVE_REMAINDER
-HAVE_POWF
-HAVE_MODFL
-HAVE_MODFF
-HAVE_LOGBL
-HAVE_LOGBF
-HAVE_LOG1PL
-HAVE_LOG1PF
-HAVE_LOG1P
-HAVE_LOG10L
-HAVE_LOG10F
-HAVE_LOGL
-HAVE_LOGF
-HAVE_LDEXPF
-HAVE_ISNANL
-HAVE_ISNAND
-HAVE_ISNANF
-HAVE_ILOGBL
-HAVE_ILOGBF
-HAVE_ILOGB
-HAVE_HYPOTL
-HAVE_HYPOTF
-HAVE_FREXPF
-HAVE_FMODL
-HAVE_FMODF
-HAVE_FMAL
-HAVE_FMAF
-HAVE_FMA
-HAVE_FABSL
-HAVE_FABSF
-HAVE_EXPM1F
-HAVE_EXPM1
-HAVE_EXPL
-HAVE_EXPF
-HAVE_COSHF
-HAVE_COSL
-HAVE_COSF
-HAVE_COPYSIGNL
-HAVE_COPYSIGN
-HAVE_CBRTL
-HAVE_CBRTF
-HAVE_CBRT
-HAVE_ATAN2F
-HAVE_ATANL
-HAVE_ATANF
-HAVE_ASINL
-HAVE_ASINF
-HAVE_ACOSL
-HAVE_ACOSF
-GNULIB_TRUNCL
-GNULIB_TRUNCF
-GNULIB_TRUNC
-GNULIB_TANHF
-GNULIB_TANL
-GNULIB_TANF
-GNULIB_SQRTL
-GNULIB_SQRTF
-GNULIB_SINHF
-GNULIB_SINL
-GNULIB_SINF
-GNULIB_SIGNBIT
-GNULIB_ROUNDL
-GNULIB_ROUNDF
-GNULIB_ROUND
-GNULIB_RINTL
-GNULIB_RINTF
-GNULIB_RINT
-GNULIB_REMAINDERL
-GNULIB_REMAINDERF
-GNULIB_REMAINDER
-GNULIB_POWF
-GNULIB_MODFL
-GNULIB_MODFF
-GNULIB_MODF
-GNULIB_LOGBL
-GNULIB_LOGBF
-GNULIB_LOGB
-GNULIB_LOG2L
-GNULIB_LOG2F
-GNULIB_LOG2
-GNULIB_LOG1PL
-GNULIB_LOG1PF
-GNULIB_LOG1P
-GNULIB_LOG10L
-GNULIB_LOG10F
-GNULIB_LOG10
-GNULIB_LOGL
-GNULIB_LOGF
-GNULIB_LOG
-GNULIB_LDEXPL
-GNULIB_LDEXPF
-GNULIB_ISNANL
-GNULIB_ISNAND
-GNULIB_ISNANF
-GNULIB_ISNAN
-GNULIB_ISINF
-GNULIB_ISFINITE
-GNULIB_ILOGBL
-GNULIB_ILOGBF
-GNULIB_ILOGB
-GNULIB_HYPOTL
-GNULIB_HYPOTF
-GNULIB_HYPOT
-GNULIB_FREXPL
-GNULIB_FREXP
-GNULIB_FREXPF
-GNULIB_FMODL
-GNULIB_FMODF
-GNULIB_FMOD
-GNULIB_FMAL
-GNULIB_FMAF
-GNULIB_FMA
-GNULIB_FLOORL
-GNULIB_FLOORF
-GNULIB_FLOOR
-GNULIB_FABSL
-GNULIB_FABSF
-GNULIB_EXPM1L
-GNULIB_EXPM1F
-GNULIB_EXPM1
-GNULIB_EXP2L
-GNULIB_EXP2F
-GNULIB_EXP2
-GNULIB_EXPL
-GNULIB_EXPF
-GNULIB_COSHF
-GNULIB_COSL
-GNULIB_COSF
-GNULIB_COPYSIGNL
-GNULIB_COPYSIGNF
-GNULIB_COPYSIGN
-GNULIB_CEILL
-GNULIB_CEILF
-GNULIB_CEIL
-GNULIB_CBRTL
-GNULIB_CBRTF
-GNULIB_CBRT
-GNULIB_ATAN2F
-GNULIB_ATANL
-GNULIB_ATANF
-GNULIB_ASINL
-GNULIB_ASINF
-GNULIB_ACOSL
-GNULIB_ACOSF
-HAVE_FLOCK
-GNULIB_FLOCK
-REPLACE_ITOLD
-GL_GENERATE_FLOAT_H_FALSE
-GL_GENERATE_FLOAT_H_TRUE
-FLOAT_H
-NEXT_AS_FIRST_DIRECTIVE_FLOAT_H
-NEXT_FLOAT_H
-EOVERFLOW_VALUE
-EOVERFLOW_HIDDEN
-ENOLINK_VALUE
-ENOLINK_HIDDEN
-EMULTIHOP_VALUE
-EMULTIHOP_HIDDEN
-GL_GENERATE_ERRNO_H_FALSE
-GL_GENERATE_ERRNO_H_TRUE
-ERRNO_H
-NEXT_AS_FIRST_DIRECTIVE_ERRNO_H
-NEXT_ERRNO_H
-PRAGMA_COLUMNS
-PRAGMA_SYSTEM_HEADER
-INCLUDE_NEXT_AS_FIRST_DIRECTIVE
-INCLUDE_NEXT
-UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS
-UNISTD_H_HAVE_WINSOCK2_H
-REPLACE_WRITE
-REPLACE_USLEEP
-REPLACE_UNLINKAT
-REPLACE_UNLINK
-REPLACE_TTYNAME_R
-REPLACE_SYMLINK
-REPLACE_SLEEP
-REPLACE_RMDIR
-REPLACE_READLINK
-REPLACE_READ
-REPLACE_PWRITE
-REPLACE_PREAD
-REPLACE_LSEEK
-REPLACE_LINKAT
-REPLACE_LINK
-REPLACE_LCHOWN
-REPLACE_ISATTY
-REPLACE_GETPAGESIZE
-REPLACE_GETGROUPS
-REPLACE_GETLOGIN_R
-REPLACE_GETDOMAINNAME
-REPLACE_GETCWD
-REPLACE_FTRUNCATE
-REPLACE_FCHOWNAT
-REPLACE_DUP2
-REPLACE_DUP
-REPLACE_CLOSE
-REPLACE_CHOWN
-HAVE_SYS_PARAM_H
-HAVE_OS_H
-HAVE_DECL_TTYNAME_R
-HAVE_DECL_SETHOSTNAME
-HAVE_DECL_GETUSERSHELL
-HAVE_DECL_GETPAGESIZE
-HAVE_DECL_GETLOGIN_R
-HAVE_DECL_GETDOMAINNAME
-HAVE_DECL_FDATASYNC
-HAVE_DECL_FCHDIR
-HAVE_DECL_ENVIRON
-HAVE_USLEEP
-HAVE_UNLINKAT
-HAVE_SYMLINKAT
-HAVE_SYMLINK
-HAVE_SLEEP
-HAVE_SETHOSTNAME
-HAVE_READLINKAT
-HAVE_READLINK
-HAVE_PWRITE
-HAVE_PREAD
-HAVE_PIPE2
-HAVE_PIPE
-HAVE_LINKAT
-HAVE_LINK
-HAVE_LCHOWN
-HAVE_GROUP_MEMBER
-HAVE_GETPAGESIZE
-HAVE_GETLOGIN
-HAVE_GETHOSTNAME
-HAVE_GETGROUPS
-HAVE_GETDTABLESIZE
-HAVE_FTRUNCATE
-HAVE_FSYNC
-HAVE_FDATASYNC
-HAVE_FCHOWNAT
-HAVE_FCHDIR
-HAVE_FACCESSAT
-HAVE_EUIDACCESS
-HAVE_DUP3
-HAVE_DUP2
-HAVE_CHOWN
-GNULIB_WRITE
-GNULIB_USLEEP
-GNULIB_UNLINKAT
-GNULIB_UNLINK
-GNULIB_UNISTD_H_SIGPIPE
-GNULIB_UNISTD_H_NONBLOCKING
-GNULIB_TTYNAME_R
-GNULIB_SYMLINKAT
-GNULIB_SYMLINK
-GNULIB_SLEEP
-GNULIB_SETHOSTNAME
-GNULIB_RMDIR
-GNULIB_READLINKAT
-GNULIB_READLINK
-GNULIB_READ
-GNULIB_PWRITE
-GNULIB_PREAD
-GNULIB_PIPE2
-GNULIB_PIPE
-GNULIB_LSEEK
-GNULIB_LINKAT
-GNULIB_LINK
-GNULIB_LCHOWN
-GNULIB_ISATTY
-GNULIB_GROUP_MEMBER
-GNULIB_GETUSERSHELL
-GNULIB_GETPAGESIZE
-GNULIB_GETLOGIN_R
-GNULIB_GETLOGIN
-GNULIB_GETHOSTNAME
-GNULIB_GETGROUPS
-GNULIB_GETDTABLESIZE
-GNULIB_GETDOMAINNAME
-GNULIB_GETCWD
-GNULIB_FTRUNCATE
-GNULIB_FSYNC
-GNULIB_FDATASYNC
-GNULIB_FCHOWNAT
-GNULIB_FCHDIR
-GNULIB_FACCESSAT
-GNULIB_EUIDACCESS
-GNULIB_ENVIRON
-GNULIB_DUP3
-GNULIB_DUP2
-GNULIB_DUP
-GNULIB_CLOSE
-GNULIB_CHOWN
-GNULIB_CHDIR
-REPLACE_WCTOMB
-REPLACE_UNSETENV
-REPLACE_STRTOD
-REPLACE_SETENV
-REPLACE_REALPATH
-REPLACE_REALLOC
-REPLACE_RANDOM_R
-REPLACE_PUTENV
-REPLACE_PTSNAME_R
-REPLACE_MKSTEMP
-REPLACE_MBTOWC
-REPLACE_MALLOC
-REPLACE_CANONICALIZE_FILE_NAME
-REPLACE_CALLOC
-HAVE_DECL_UNSETENV
-HAVE_UNLOCKPT
-HAVE_SYS_LOADAVG_H
-HAVE_STRUCT_RANDOM_DATA
-HAVE_STRTOULL
-HAVE_STRTOLL
-HAVE_STRTOD
-HAVE_DECL_SETENV
-HAVE_SETENV
-HAVE_RPMATCH
-HAVE_REALPATH
-HAVE_RANDOM_R
-HAVE_RANDOM_H
-HAVE_RANDOM
-HAVE_PTSNAME_R
-HAVE_PTSNAME
-HAVE_POSIX_OPENPT
-HAVE_MKSTEMPS
-HAVE_MKSTEMP
-HAVE_MKOSTEMPS
-HAVE_MKOSTEMP
-HAVE_MKDTEMP
-HAVE_GRANTPT
-HAVE_GETSUBOPT
-HAVE_DECL_GETLOADAVG
-HAVE_CANONICALIZE_FILE_NAME
-HAVE_ATOLL
-HAVE__EXIT
-GNULIB_WCTOMB
-GNULIB_UNSETENV
-GNULIB_UNLOCKPT
-GNULIB_SYSTEM_POSIX
-GNULIB_STRTOULL
-GNULIB_STRTOLL
-GNULIB_STRTOD
-GNULIB_SETENV
-GNULIB_RPMATCH
-GNULIB_REALPATH
-GNULIB_REALLOC_POSIX
-GNULIB_RANDOM_R
-GNULIB_RANDOM
-GNULIB_PUTENV
-GNULIB_PTSNAME_R
-GNULIB_PTSNAME
-GNULIB_POSIX_OPENPT
-GNULIB_MKSTEMPS
-GNULIB_MKSTEMP
-GNULIB_MKOSTEMPS
-GNULIB_MKOSTEMP
-GNULIB_MKDTEMP
-GNULIB_MBTOWC
-GNULIB_MALLOC_POSIX
-GNULIB_GRANTPT
-GNULIB_GETSUBOPT
-GNULIB_GETLOADAVG
-GNULIB_CANONICALIZE_FILE_NAME
-GNULIB_CALLOC_POSIX
-GNULIB_ATOLL
-GNULIB__EXIT
-GL_GENERATE_ALLOCA_H_FALSE
-GL_GENERATE_ALLOCA_H_TRUE
-ALLOCA_H
-ALLOCA
-GL_COND_LIBTOOL_FALSE
-GL_COND_LIBTOOL_TRUE
 host_os
 host_vendor
 host_cpu
@@ -1727,11 +777,11 @@ build_os
 build_vendor
 build_cpu
 build
-RANLIB
-ARFLAGS
-AR
-EGREP
-GREP
+LIBTOOL
+INSTALL_DATA
+INSTALL_SCRIPT
+INSTALL_PROGRAM
+SET_MAKE
 CPP
 OBJEXT
 EXEEXT
@@ -1781,7 +831,6 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-enable_largefile
 enable_shared
 enable_static
 with_pic
@@ -1790,6 +839,7 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 enable_dependency_tracking
+enable_silent_rules
 with_included_ltdl
 with_ltdl_include
 with_ltdl_lib
@@ -2453,7 +1503,6 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-largefile     omit support for large files
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -2463,6 +1512,8 @@ Optional Features:
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
+  --enable-silent-rules   less verbose build output (undo: "make V=1")
+  --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-ltdl-install   install libltdl
   --enable-disk-based     store the database on disk using a DBM hashfile, and
                           cache some attributes in a limited amount of memory.
@@ -2746,6 +1797,292 @@ fi
 
 } # ac_fn_c_try_cpp
 
+# ac_fn_c_try_link LINENO
+# -----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded.
+ac_fn_c_try_link ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  rm -f conftest.$ac_objext conftest$ac_exeext
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    grep -v '^ *+' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+    mv -f conftest.er1 conftest.err
+  fi
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 test -x conftest$ac_exeext
+       }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_retval=1
+fi
+  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
+  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
+  # interfere with the next link command; also delete a directory that is
+  # left behind by Apple's compiler.  We do this before executing the actions.
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_link
+
+# ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
+# -------------------------------------------------------
+# Tests whether HEADER exists and can be compiled using the include files in
+# INCLUDES, setting the cache variable VAR accordingly.
+ac_fn_c_check_header_compile ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_header_compile
+
+# ac_fn_c_try_run LINENO
+# ----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
+# that executables *can* be run.
+ac_fn_c_try_run ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: program exited with status $ac_status" >&5
+       $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+       ac_retval=$ac_status
+fi
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_run
+
+# ac_fn_c_check_func LINENO FUNC VAR
+# ----------------------------------
+# Tests whether FUNC exists, setting the cache variable VAR accordingly
+ac_fn_c_check_func ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define $2 innocuous_$2
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char $2 (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef $2
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char $2 ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined __stub_$2 || defined __stub___$2
+choke me
+#endif
+
+int
+main ()
+{
+return $2 ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_func
+
+# ac_fn_c_check_decl LINENO SYMBOL VAR INCLUDES
+# ---------------------------------------------
+# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
+# accordingly.
+ac_fn_c_check_decl ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  as_decl_name=`echo $2|sed 's/ *(.*//'`
+  as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
+$as_echo_n "checking whether $as_decl_name is declared... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+#ifndef $as_decl_name
+#ifdef __cplusplus
+  (void) $as_decl_use;
+#else
+  (void) $as_decl_name;
+#endif
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_decl
+
+# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
+# -------------------------------------------
+# Tests whether TYPE exists after having included INCLUDES, setting cache
+# variable VAR accordingly.
+ac_fn_c_check_type ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=no"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+if (sizeof ($2))
+	 return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+int
+main ()
+{
+if (sizeof (($2)))
+	    return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+else
+  eval "$3=yes"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_type
+
 # ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
 # Tests whether HEADER exists, giving a warning if it cannot be compiled using
@@ -2837,429 +2174,6 @@ fi
 
 } # ac_fn_c_check_header_mongrel
 
-# ac_fn_c_try_run LINENO
-# ----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
-# that executables *can* be run.
-ac_fn_c_try_run ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
-  { { case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: program exited with status $ac_status" >&5
-       $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-       ac_retval=$ac_status
-fi
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_run
-
-# ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
-# -------------------------------------------------------
-# Tests whether HEADER exists and can be compiled using the include files in
-# INCLUDES, setting the cache variable VAR accordingly.
-ac_fn_c_check_header_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-#include <$2>
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_header_compile
-
-# ac_fn_c_check_type LINENO TYPE VAR INCLUDES
-# -------------------------------------------
-# Tests whether TYPE exists after having included INCLUDES, setting cache
-# variable VAR accordingly.
-ac_fn_c_check_type ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  eval "$3=no"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-if (sizeof ($2))
-	 return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-if (sizeof (($2)))
-	    return 0;
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-
-else
-  eval "$3=yes"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_type
-
-# ac_fn_c_try_link LINENO
-# -----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded.
-ac_fn_c_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_link
-
-# ac_fn_c_check_func LINENO FUNC VAR
-# ----------------------------------
-# Tests whether FUNC exists, setting the cache variable VAR accordingly
-ac_fn_c_check_func ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-$as_echo_n "checking for $2... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-/* Define $2 to an innocuous variant, in case <limits.h> declares $2.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define $2 innocuous_$2
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $2 (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef $2
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char $2 ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined __stub_$2 || defined __stub___$2
-choke me
-#endif
-
-int
-main ()
-{
-return $2 ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_func
-
-# ac_fn_c_compute_int LINENO EXPR VAR INCLUDES
-# --------------------------------------------
-# Tries to find the compile-time value of EXPR in a program that includes
-# INCLUDES, setting VAR accordingly. Returns whether the value could be
-# computed
-ac_fn_c_compute_int ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if test "$cross_compiling" = yes; then
-    # Depending upon the size, compute the lo and hi bounds.
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-static int test_array [1 - 2 * !(($2) >= 0)];
-test_array [0] = 0;
-return test_array [0];
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_lo=0 ac_mid=0
-  while :; do
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-static int test_array [1 - 2 * !(($2) <= $ac_mid)];
-test_array [0] = 0;
-return test_array [0];
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_hi=$ac_mid; break
-else
-  as_fn_arith $ac_mid + 1 && ac_lo=$as_val
-			if test $ac_lo -le $ac_mid; then
-			  ac_lo= ac_hi=
-			  break
-			fi
-			as_fn_arith 2 '*' $ac_mid + 1 && ac_mid=$as_val
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  done
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-static int test_array [1 - 2 * !(($2) < 0)];
-test_array [0] = 0;
-return test_array [0];
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_hi=-1 ac_mid=-1
-  while :; do
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-static int test_array [1 - 2 * !(($2) >= $ac_mid)];
-test_array [0] = 0;
-return test_array [0];
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_lo=$ac_mid; break
-else
-  as_fn_arith '(' $ac_mid ')' - 1 && ac_hi=$as_val
-			if test $ac_mid -le $ac_hi; then
-			  ac_lo= ac_hi=
-			  break
-			fi
-			as_fn_arith 2 '*' $ac_mid && ac_mid=$as_val
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  done
-else
-  ac_lo= ac_hi=
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-# Binary search between lo and hi bounds.
-while test "x$ac_lo" != "x$ac_hi"; do
-  as_fn_arith '(' $ac_hi - $ac_lo ')' / 2 + $ac_lo && ac_mid=$as_val
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-static int test_array [1 - 2 * !(($2) <= $ac_mid)];
-test_array [0] = 0;
-return test_array [0];
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ac_hi=$ac_mid
-else
-  as_fn_arith '(' $ac_mid ')' + 1 && ac_lo=$as_val
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-done
-case $ac_lo in #((
-?*) eval "$3=\$ac_lo"; ac_retval=0 ;;
-'') ac_retval=1 ;;
-esac
-  else
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-static long int longval () { return $2; }
-static unsigned long int ulongval () { return $2; }
-#include <stdio.h>
-#include <stdlib.h>
-int
-main ()
-{
-
-  FILE *f = fopen ("conftest.val", "w");
-  if (! f)
-    return 1;
-  if (($2) < 0)
-    {
-      long int i = longval ();
-      if (i != ($2))
-	return 1;
-      fprintf (f, "%ld", i);
-    }
-  else
-    {
-      unsigned long int i = ulongval ();
-      if (i != ($2))
-	return 1;
-      fprintf (f, "%lu", i);
-    }
-  /* Do not output a trailing newline, as this causes \r\n confusion
-     on some platforms.  */
-  return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  echo >>conftest.val; read $3 <conftest.val; ac_retval=0
-else
-  ac_retval=1
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-rm -f conftest.val
-
-  fi
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_compute_int
-
 # ac_fn_c_check_member LINENO AGGR MEMBER VAR INCLUDES
 # ----------------------------------------------------
 # Tries to find if the field MEMBER exists in type AGGR, after including
@@ -3316,52 +2230,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_member
-
-# ac_fn_c_check_decl LINENO SYMBOL VAR INCLUDES
-# ---------------------------------------------
-# Tests whether SYMBOL is declared in INCLUDES, setting cache variable VAR
-# accordingly.
-ac_fn_c_check_decl ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  as_decl_name=`echo $2|sed 's/ *(.*//'`
-  as_decl_use=`echo $2|sed -e 's/(/((/' -e 's/)/) 0&/' -e 's/,/) 0& (/g'`
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $as_decl_name is declared" >&5
-$as_echo_n "checking whether $as_decl_name is declared... " >&6; }
-if eval \${$3+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-int
-main ()
-{
-#ifndef $as_decl_name
-#ifdef __cplusplus
-  (void) $as_decl_use;
-#else
-  (void) $as_decl_name;
-#endif
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$3=yes"
-else
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_c_check_decl
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -3646,45 +2514,9 @@ $as_echo "$as_me: creating cache $cache_file" >&6;}
   >$cache_file
 fi
 
-as_fn_append ac_func_list " canonicalize_file_name"
-as_fn_append ac_func_list " getcwd"
-as_fn_append ac_func_list " readlink"
-as_fn_append ac_func_list " realpath"
-as_fn_append ac_header_list " sys/param.h"
-as_fn_append ac_func_list " flock"
-as_fn_append ac_func_list " fcntl"
-as_fn_append ac_header_list " unistd.h"
-as_fn_append ac_func_list " alarm"
-as_fn_append ac_func_list " fsync"
-as_fn_append ac_func_list " ftruncate"
-as_fn_append ac_func_list " getdtablesize"
-as_fn_append ac_header_list " sys/socket.h"
-as_fn_append ac_header_list " netdb.h"
-as_fn_append ac_func_list " getrusage"
-as_fn_append ac_header_list " sys/time.h"
-as_fn_append ac_func_list " gettimeofday"
-as_fn_append ac_func_list " lstat"
-as_fn_append ac_header_list " math.h"
-as_fn_append ac_header_list " sys/mman.h"
-as_fn_append ac_func_list " mprotect"
-as_fn_append ac_func_list " _set_invalid_parameter_handler"
-gl_printf_safe=yes
-as_fn_append ac_func_list " link"
-as_fn_append ac_header_list " sys/select.h"
-as_fn_append ac_header_list " wchar.h"
-as_fn_append ac_header_list " stdint.h"
-as_fn_append ac_func_list " strdup"
-as_fn_append ac_header_list " strings.h"
-as_fn_append ac_header_list " sys/file.h"
-as_fn_append ac_header_list " sys/resource.h"
-as_fn_append ac_header_list " sys/stat.h"
-as_fn_append ac_header_list " sys/uio.h"
-as_fn_append ac_header_list " sys/utsname.h"
-as_fn_append ac_func_list " localtime_r"
-as_fn_append ac_func_list " vasnprintf"
-as_fn_append ac_header_list " features.h"
-as_fn_append ac_func_list " snprintf"
 as_fn_append ac_header_list " stdlib.h"
+as_fn_append ac_header_list " unistd.h"
+as_fn_append ac_header_list " sys/param.h"
 # Check that the precious variables saved in the cache have kept the same
 # value.
 ac_cache_corrupted=false
@@ -3836,6 +2668,9 @@ PACKAGE_COPYRIGHT="Copyright (C) 2012 TinyMUSH development team."
 with_included_ltdl="yes"
 
 
+
+ac_config_headers="$ac_config_headers src/config.h"
+
 ac_aux_dir=
 for ac_dir in src/libltdl/config "$srcdir"/src/libltdl/config; do
   if test -f "$ac_dir/install-sh"; then
@@ -3864,9 +2699,6 @@ ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
-
-
-ac_config_headers="$ac_config_headers src/config.h"
 
 
 
@@ -4667,6 +3499,7 @@ static char *f (char * (*g) (char **, int), char **p, ...)
    array size at least.  It's necessary to write '\x00'==0 to get something
    that's true only with -std.  */
 int osf4_cc_array ['\x00' == 0 ? 1 : -1];
+<<<<<<< HEAD
 
 /* IBM C 6 for AIX is almost-ANSI by default, but it replaces macro parameters
    inside strings and character constants.  */
@@ -22493,14 +21326,67 @@ done
 
 
 
+=======
+>>>>>>> c4f4e4faaaff42bb59e1c9e89b1c73e17ec49113
 
+/* IBM C 6 for AIX is almost-ANSI by default, but it replaces macro parameters
+   inside strings and character constants.  */
+#define FOO(x) 'x'
+int xlc6_cc_array[FOO(a) == 'x' ? 1 : -1];
 
+int test (int i, double x);
+struct s1 {int (*f) (int a);};
+struct s2 {int (*f) (double a);};
+int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
+int argc;
+char **argv;
+int
+main ()
+{
+return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
+  ;
+  return 0;
+}
+_ACEOF
+for ac_arg in '' -qlanglvl=extc89 -qlanglvl=ansi -std \
+	-Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_c89=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext
+  test "x$ac_cv_prog_cc_c89" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
 
-  LIBGNU_LIBDEPS="$gl_libdeps"
+fi
+# AC_CACHE_VAL
+case "x$ac_cv_prog_cc_c89" in
+  x)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;;
+  xno)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;;
+  *)
+    CC="$CC $ac_cv_prog_cc_c89"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c89" >&5
+$as_echo "$ac_cv_prog_cc_c89" >&6; } ;;
+esac
+if test "x$ac_cv_prog_cc_c89" != xno; then :
 
-  LIBGNU_LTLIBDEPS="$gl_ltlibdeps"
+fi
 
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+gl_EARLY
+gl_INIT
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -22917,6 +21803,77 @@ macro_revision='1.3337'
 
 ltmain="$ac_aux_dir/ltmain.sh"
 
+# Make sure we can run config.sub.
+$SHELL "$ac_aux_dir/config.sub" sun4 >/dev/null 2>&1 ||
+  as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking build system type" >&5
+$as_echo_n "checking build system type... " >&6; }
+if ${ac_cv_build+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_build_alias=$build_alias
+test "x$ac_build_alias" = x &&
+  ac_build_alias=`$SHELL "$ac_aux_dir/config.guess"`
+test "x$ac_build_alias" = x &&
+  as_fn_error $? "cannot guess build type; you must specify one" "$LINENO" 5
+ac_cv_build=`$SHELL "$ac_aux_dir/config.sub" $ac_build_alias` ||
+  as_fn_error $? "$SHELL $ac_aux_dir/config.sub $ac_build_alias failed" "$LINENO" 5
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_build" >&5
+$as_echo "$ac_cv_build" >&6; }
+case $ac_cv_build in
+*-*-*) ;;
+*) as_fn_error $? "invalid value of canonical build" "$LINENO" 5;;
+esac
+build=$ac_cv_build
+ac_save_IFS=$IFS; IFS='-'
+set x $ac_cv_build
+shift
+build_cpu=$1
+build_vendor=$2
+shift; shift
+# Remember, the first character of IFS is used to create $*,
+# except with old shells:
+build_os=$*
+IFS=$ac_save_IFS
+case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking host system type" >&5
+$as_echo_n "checking host system type... " >&6; }
+if ${ac_cv_host+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "x$host_alias" = x; then
+  ac_cv_host=$ac_cv_build
+else
+  ac_cv_host=`$SHELL "$ac_aux_dir/config.sub" $host_alias` ||
+    as_fn_error $? "$SHELL $ac_aux_dir/config.sub $host_alias failed" "$LINENO" 5
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_host" >&5
+$as_echo "$ac_cv_host" >&6; }
+case $ac_cv_host in
+*-*-*) ;;
+*) as_fn_error $? "invalid value of canonical host" "$LINENO" 5;;
+esac
+host=$ac_cv_host
+ac_save_IFS=$IFS; IFS='-'
+set x $ac_cv_host
+shift
+host_cpu=$1
+host_vendor=$2
+shift; shift
+# Remember, the first character of IFS is used to create $*,
+# except with old shells:
+host_os=$*
+IFS=$ac_save_IFS
+case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
+
+
 # Backslashify metacharacters that are still active within
 # double-quoted strings.
 sed_quote_subst='s/\(["`$\\]\)/\\\1/g'
@@ -23066,6 +22023,136 @@ Xsed="$SED -e 1s/^X//"
 
 
 
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
+$as_echo_n "checking for grep that handles long lines and -e... " >&6; }
+if ${ac_cv_path_GREP+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -z "$GREP"; then
+  ac_path_GREP_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_prog in grep ggrep; do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_GREP="$as_dir/$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_GREP" || continue
+# Check for GNU ac_path_GREP and select it if it is found.
+  # Check for GNU $ac_path_GREP
+case `"$ac_path_GREP" --version 2>&1` in
+*GNU*)
+  ac_cv_path_GREP="$ac_path_GREP" ac_path_GREP_found=:;;
+*)
+  ac_count=0
+  $as_echo_n 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    $as_echo 'GREP' >> "conftest.nl"
+    "$ac_path_GREP" -e 'GREP$' -e '-(cannot match)-' < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_GREP_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_GREP="$ac_path_GREP"
+      ac_path_GREP_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_GREP_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_GREP"; then
+    as_fn_error $? "no acceptable grep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+  fi
+else
+  ac_cv_path_GREP=$GREP
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_GREP" >&5
+$as_echo "$ac_cv_path_GREP" >&6; }
+ GREP="$ac_cv_path_GREP"
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for egrep" >&5
+$as_echo_n "checking for egrep... " >&6; }
+if ${ac_cv_path_EGREP+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if echo a | $GREP -E '(a|b)' >/dev/null 2>&1
+   then ac_cv_path_EGREP="$GREP -E"
+   else
+     if test -z "$EGREP"; then
+  ac_path_EGREP_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_prog in egrep; do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_EGREP="$as_dir/$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_EGREP" || continue
+# Check for GNU ac_path_EGREP and select it if it is found.
+  # Check for GNU $ac_path_EGREP
+case `"$ac_path_EGREP" --version 2>&1` in
+*GNU*)
+  ac_cv_path_EGREP="$ac_path_EGREP" ac_path_EGREP_found=:;;
+*)
+  ac_count=0
+  $as_echo_n 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    $as_echo 'EGREP' >> "conftest.nl"
+    "$ac_path_EGREP" 'EGREP$' < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_EGREP_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_EGREP="$ac_path_EGREP"
+      ac_path_EGREP_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_EGREP_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_EGREP"; then
+    as_fn_error $? "no acceptable egrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+  fi
+else
+  ac_cv_path_EGREP=$EGREP
+fi
+
+   fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_EGREP" >&5
+$as_echo "$ac_cv_path_EGREP" >&6; }
+ EGREP="$ac_cv_path_EGREP"
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fgrep" >&5
@@ -23576,7 +22663,8 @@ else
     ;;
   *)
     lt_cv_sys_max_cmd_len=`(getconf ARG_MAX) 2> /dev/null`
-    if test -n "$lt_cv_sys_max_cmd_len"; then
+    if test -n "$lt_cv_sys_max_cmd_len" && \
+	test undefined != "$lt_cv_sys_max_cmd_len"; then
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \/ 4`
       lt_cv_sys_max_cmd_len=`expr $lt_cv_sys_max_cmd_len \* 3`
     else
@@ -23977,10 +23065,6 @@ freebsd* | dragonfly*)
   fi
   ;;
 
-gnu*)
-  lt_cv_deplibs_check_method=pass_all
-  ;;
-
 haiku*)
   lt_cv_deplibs_check_method=pass_all
   ;;
@@ -24019,11 +23103,11 @@ irix5* | irix6* | nonstopux*)
   ;;
 
 # This must be glibc/ELF.
-linux* | k*bsd*-gnu | kopensolaris*-gnu)
+linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd*)
+netbsd* | netbsdelf*-gnu)
   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -24274,6 +23358,7 @@ fi
 $as_echo "$lt_cv_sharedlib_from_linklib_cmd" >&6; }
 sharedlib_from_linklib_cmd=$lt_cv_sharedlib_from_linklib_cmd
 test -z "$sharedlib_from_linklib_cmd" && sharedlib_from_linklib_cmd=$ECHO
+
 
 
 
@@ -25158,7 +24243,14 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	    LD="${LD-ld} -m elf_i386_fbsd"
 	    ;;
 	  x86_64-*linux*)
-	    LD="${LD-ld} -m elf_i386"
+	    case `/usr/bin/file conftest.o` in
+	      *x86-64*)
+		LD="${LD-ld} -m elf32_x86_64"
+		;;
+	      *)
+		LD="${LD-ld} -m elf_i386"
+		;;
+	    esac
 	    ;;
 	  ppc64-*linux*|powerpc64-*linux*)
 	    LD="${LD-ld} -m elf32ppclinux"
@@ -26026,6 +25118,136 @@ $as_echo "$lt_cv_ld_force_load" >&6; }
     ;;
   esac
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ANSI C header files" >&5
+$as_echo_n "checking for ANSI C header files... " >&6; }
+if ${ac_cv_header_stdc+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <float.h>
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_header_stdc=yes
+else
+  ac_cv_header_stdc=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+if test $ac_cv_header_stdc = yes; then
+  # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <string.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "memchr" >/dev/null 2>&1; then :
+
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+
+fi
+
+if test $ac_cv_header_stdc = yes; then
+  # ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "free" >/dev/null 2>&1; then :
+
+else
+  ac_cv_header_stdc=no
+fi
+rm -f conftest*
+
+fi
+
+if test $ac_cv_header_stdc = yes; then
+  # /bin/cc in Irix-4.0.5 gets non-ANSI ctype macros unless using -ansi.
+  if test "$cross_compiling" = yes; then :
+  :
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ctype.h>
+#include <stdlib.h>
+#if ((' ' & 0x0FF) == 0x020)
+# define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+# define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+#else
+# define ISLOWER(c) \
+		   (('a' <= (c) && (c) <= 'i') \
+		     || ('j' <= (c) && (c) <= 'r') \
+		     || ('s' <= (c) && (c) <= 'z'))
+# define TOUPPER(c) (ISLOWER(c) ? ((c) | 0x40) : (c))
+#endif
+
+#define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+int
+main ()
+{
+  int i;
+  for (i = 0; i < 256; i++)
+    if (XOR (islower (i), ISLOWER (i))
+	|| toupper (i) != TOUPPER (i))
+      return 2;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+
+else
+  ac_cv_header_stdc=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_header_stdc" >&5
+$as_echo "$ac_cv_header_stdc" >&6; }
+if test $ac_cv_header_stdc = yes; then
+
+$as_echo "#define STDC_HEADERS 1" >>confdefs.h
+
+fi
+
+# On IRIX 5.3, sys/types and inttypes.h are conflicting.
+for ac_header in sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h \
+		  inttypes.h stdint.h unistd.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default
+"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+
 for ac_header in dlfcn.h
 do :
   ac_fn_c_check_header_compile "$LINENO" "dlfcn.h" "ac_cv_header_dlfcn_h" "$ac_includes_default
@@ -26720,7 +25942,7 @@ lt_prog_compiler_static=
       lt_prog_compiler_static='-non_shared'
       ;;
 
-    linux* | k*bsd*-gnu | kopensolaris*-gnu)
+    linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
       case $cc_basename in
       # old Intel for x86_64 which still supported -KPIC.
       ecc*)
@@ -27198,6 +26420,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   openbsd*)
     with_gnu_ld=no
     ;;
+  linux* | k*bsd*-gnu | gnu*)
+    link_all_deplibs=no
+    ;;
   esac
 
   ld_shlibs=yes
@@ -27419,7 +26644,7 @@ _LT_EOF
       fi
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -27596,6 +26821,7 @@ _LT_EOF
 	if test "$aix_use_runtimelinking" = yes; then
 	  shared_flag="$shared_flag "'${wl}-G'
 	fi
+	link_all_deplibs=no
       else
 	# not using gcc
 	if test "$host_cpu" = ia64; then
@@ -28049,7 +27275,7 @@ $as_echo "$lt_cv_irix_exported_symbol" >&6; }
       link_all_deplibs=yes
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -28886,17 +28112,6 @@ freebsd* | dragonfly*)
   esac
   ;;
 
-gnu*)
-  version_type=linux # correct to gnu/linux during the next big refactor
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  ;;
-
 haiku*)
   version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
@@ -29013,7 +28228,7 @@ linux*oldld* | linux*aout* | linux*coff*)
   ;;
 
 # This must be glibc/ELF.
-linux* | k*bsd*-gnu | kopensolaris*-gnu)
+linux* | k*bsd*-gnu | kopensolaris*-gnu | gnu*)
   version_type=linux # correct to gnu/linux during the next big refactor
   need_lib_prefix=no
   need_version=no
@@ -29075,6 +28290,18 @@ fi
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -30186,7 +29413,7 @@ _ASBOX
 $as_echo
 
 
-am__api_version='1.12'
+am__api_version='1.13'
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether build environment is sane" >&5
 $as_echo_n "checking whether build environment is sane... " >&6; }
@@ -30274,8 +29501,8 @@ if test x"${MISSING+set}" != xset; then
   esac
 fi
 # Use eval to expand $SHELL
-if eval "$MISSING --run true"; then
-  am_missing_run="$MISSING --run "
+if eval "$MISSING --is-lightweight"; then
+  am_missing_run="$MISSING "
 else
   am_missing_run=
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: 'missing' script is too old or missing" >&5
@@ -30391,6 +29618,48 @@ fi
 fi
 INSTALL_STRIP_PROGRAM="\$(install_sh) -c -s"
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for a thread-safe mkdir -p" >&5
+$as_echo_n "checking for a thread-safe mkdir -p... " >&6; }
+if test -z "$MKDIR_P"; then
+  if ${ac_cv_path_mkdir+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/opt/sfw/bin
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_prog in mkdir gmkdir; do
+	 for ac_exec_ext in '' $ac_executable_extensions; do
+	   as_fn_executable_p "$as_dir/$ac_prog$ac_exec_ext" || continue
+	   case `"$as_dir/$ac_prog$ac_exec_ext" --version 2>&1` in #(
+	     'mkdir (GNU coreutils) '* | \
+	     'mkdir (coreutils) '* | \
+	     'mkdir (fileutils) '4.1*)
+	       ac_cv_path_mkdir=$as_dir/$ac_prog$ac_exec_ext
+	       break 3;;
+	   esac
+	 done
+       done
+  done
+IFS=$as_save_IFS
+
+fi
+
+  test -d ./--version && rmdir ./--version
+  if test "${ac_cv_path_mkdir+set}" = set; then
+    MKDIR_P="$ac_cv_path_mkdir -p"
+  else
+    # As a last resort, use the slow shell script.  Don't cache a
+    # value for MKDIR_P within a source directory, because that will
+    # break other packages using the cache if that directory is
+    # removed, or if the value is a relative name.
+    MKDIR_P="$ac_install_sh -d"
+  fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MKDIR_P" >&5
+$as_echo "$MKDIR_P" >&6; }
+
 rm -rf .tst 2>/dev/null
 mkdir .tst 2>/dev/null
 if test -d .tst; then
@@ -30463,6 +29732,45 @@ else
 fi
 
 
+# Check whether --enable-silent-rules was given.
+if test "${enable_silent_rules+set}" = set; then :
+  enableval=$enable_silent_rules;
+fi
+
+case $enable_silent_rules in # (((
+  yes) AM_DEFAULT_VERBOSITY=0;;
+   no) AM_DEFAULT_VERBOSITY=1;;
+    *) AM_DEFAULT_VERBOSITY=1;;
+esac
+am_make=${MAKE-make}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
+$as_echo_n "checking whether $am_make supports nested variables... " >&6; }
+if ${am_cv_make_support_nested_variables+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if $as_echo 'TRUE=$(BAR$(V))
+BAR0=false
+BAR1=true
+V=1
+am__doit:
+	@$(TRUE)
+.PHONY: am__doit' | $am_make -f - >/dev/null 2>&1; then
+  am_cv_make_support_nested_variables=yes
+else
+  am_cv_make_support_nested_variables=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_make_support_nested_variables" >&5
+$as_echo "$am_cv_make_support_nested_variables" >&6; }
+if test $am_cv_make_support_nested_variables = yes; then
+    AM_V='$(V)'
+  AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
+else
+  AM_V=$AM_DEFAULT_VERBOSITY
+  AM_DEFAULT_V=$AM_DEFAULT_VERBOSITY
+fi
+AM_BACKSLASH='\'
+
 if test "`cd $srcdir && pwd`" != "`pwd`"; then
   # Use -I$(srcdir) only when $(srcdir) != ., so that make's output
   # is not polluted with repeated "-I."
@@ -30525,7 +29833,12 @@ mkdir_p='$(MKDIR_P)'
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
 
+
+# We'll loop over all known methods to create a tar archive until one works.
+_am_tools='gnutar  pax cpio none'
+
 am__tar='$${TAR-tar} chof - "$$tardir"' am__untar='$${TAR-tar} xf -'
+
 
 
 
@@ -31325,7 +30638,7 @@ else
     # at 6.2 and later dlopen does load deplibs.
     lt_cv_sys_dlopen_deplibs=yes
     ;;
-  netbsd*)
+  netbsd* | netbsdelf*-gnu)
     lt_cv_sys_dlopen_deplibs=yes
     ;;
   openbsd*)
@@ -31788,8 +31101,6 @@ eval "LTDLOPEN=\"$libname_spec\""
 
 
 # Only expand once:
-
-
 
 
 
@@ -33160,8 +32471,6 @@ $as_echo "$with_pueblo_msg" >&6; }
 cat >>confdefs.h <<_ACEOF
 #define PUEBLO_SUPPORT_MSG "${with_pueblo_msg}"
 _ACEOF
-
-
 
 
 as_nl='
@@ -35029,6 +34338,27 @@ done
 
 
 
+  for ac_header in $ac_header_list
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default
+"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+
+
+
+
+
+
+
 for ac_func in getpagesize
 do :
   ac_fn_c_check_func "$LINENO" "getpagesize" "ac_cv_func_getpagesize"
@@ -35286,7 +34616,7 @@ sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
 _ASBOX
 $as_echo
 
-ac_config_files="$ac_config_files src/Makefile lib/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile"
+ac_config_files="$ac_config_files src/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile"
 
 
 as_nl='
@@ -35440,72 +34770,6 @@ done
 LIBOBJS=$ac_libobjs
 
 LTLIBOBJS=$ac_ltlibobjs
-
-
-if test -z "${GL_COND_LIBTOOL_TRUE}" && test -z "${GL_COND_LIBTOOL_FALSE}"; then
-  as_fn_error $? "conditional \"GL_COND_LIBTOOL\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_ALLOCA_H_TRUE}" && test -z "${GL_GENERATE_ALLOCA_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_ALLOCA_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_ERRNO_H_TRUE}" && test -z "${GL_GENERATE_ERRNO_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_ERRNO_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_FLOAT_H_TRUE}" && test -z "${GL_GENERATE_FLOAT_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_FLOAT_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-
-
-if test -z "${GL_GENERATE_STDALIGN_H_TRUE}" && test -z "${GL_GENERATE_STDALIGN_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_STDALIGN_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_STDBOOL_H_TRUE}" && test -z "${GL_GENERATE_STDBOOL_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_STDBOOL_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_STDDEF_H_TRUE}" && test -z "${GL_GENERATE_STDDEF_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_STDDEF_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${GL_GENERATE_STDINT_H_TRUE}" && test -z "${GL_GENERATE_STDINT_H_FALSE}"; then
-  as_fn_error $? "conditional \"GL_GENERATE_STDINT_H\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-
-    gl_libobjs=
-    gl_ltlibobjs=
-    if test -n "$gl_LIBOBJS"; then
-      # Remove the extension.
-      sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
-        gl_libobjs="$gl_libobjs $i.$ac_objext"
-        gl_ltlibobjs="$gl_ltlibobjs $i.lo"
-      done
-    fi
-    gl_LIBOBJS=$gl_libobjs
-
-    gl_LTLIBOBJS=$gl_ltlibobjs
-
-
-
-    gltests_libobjs=
-    gltests_ltlibobjs=
-    if test -n "$gltests_LIBOBJS"; then
-      # Remove the extension.
-      sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gltests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
-        gltests_libobjs="$gltests_libobjs $i.$ac_objext"
-        gltests_ltlibobjs="$gltests_ltlibobjs $i.lo"
-      done
-    fi
-    gltests_LIBOBJS=$gltests_libobjs
-
-    gltests_LTLIBOBJS=$gltests_ltlibobjs
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking that generated files are newer than configure" >&5
@@ -36471,7 +35735,6 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
     "src/dbm/gdbm/Makefile") CONFIG_FILES="$CONFIG_FILES src/dbm/gdbm/Makefile" ;;
     "src/dbm/qdbm/Makefile") CONFIG_FILES="$CONFIG_FILES src/dbm/qdbm/Makefile" ;;
     "src/modules/comsys/Makefile") CONFIG_FILES="$CONFIG_FILES src/modules/comsys/Makefile" ;;
@@ -37704,7 +36967,7 @@ fi
 
  ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
-  # Autoconf 2.62 quotes --file arguments for eval, but not when files
+  # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
   # if we detect the quoting.
   case $CONFIG_FILES in
@@ -37755,7 +37018,7 @@ $as_echo X"$mf" |
     DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
     test -z "$DEPDIR" && continue
     am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "am__include" && continue
+    test -z "$am__include" && continue
     am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
     # Find all dependency output files, they are included files with
     # $(DEPDIR) in their names.  We invoke sed twice because it is the
