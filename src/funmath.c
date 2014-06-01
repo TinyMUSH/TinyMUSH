@@ -596,15 +596,15 @@ void fun_sub( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 }
 
 void fun_div( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    int top, bot;
+    long top, bot;
 
     /*
      * The C / operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
      */
 
-    top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
-    bot = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    top = strtol( fargs[0], ( char ** ) NULL, 10 );
+    bot = strtol( fargs[1], ( char ** ) NULL, 10 );
     if( bot == 0 ) {
         safe_str( "#-1 DIVIDE BY ZERO", buff, bufc );
         return;

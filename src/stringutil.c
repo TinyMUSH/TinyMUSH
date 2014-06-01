@@ -1244,8 +1244,7 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
                     if( *from == ESC_CHAR ) {
                         p = src;
                         track_esccode( &src, &ansi_state );
-                        safe_known_str( p, src - p,
-                                        *dst, &cp );
+                        safe_known_str( p, src - p, *dst, &cp );
                     } else {
                         safe_chr( *src, *dst, &cp );
                         ++src;
