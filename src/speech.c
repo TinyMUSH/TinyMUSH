@@ -773,7 +773,7 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
     for( i = 0; i < n_dbrefs; i++ ) {
         if( dbrefs_array[i] != NOTHING ) {
             notify_with_cause( dbrefs_array[i], player, omessage );
-            page_return( player, dbrefs_array[i], "Idle", A_IDLE, NULL );
+            page_return( player, dbrefs_array[i], "Idle", A_IDLE, NULL);
         }
     }
     free_lbuf( omessage );

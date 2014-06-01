@@ -536,13 +536,13 @@ char *ansi_transition_letters( int ansi_before, int ansi_after ) {
 int ansi_map_states( const char *s, int **m, char **p ) {
     static int ansi_map[LBUF_SIZE + 1];
     static char stripped[LBUF_SIZE + 1];
-    char *s1;
+    char *s1, *s2;
     int n, ansi_state;
 
     n = 0;
     ansi_state = ANST_NORMAL;
     s1 = XSTRDUP(s, "ansi_map_states");
-    
+    s2 = s1;
     while( *s1 ) {
         if( *s1 == ESC_CHAR ) {
             track_esccode( &s1, &ansi_state );
@@ -558,7 +558,7 @@ int ansi_map_states( const char *s, int **m, char **p ) {
     *m = ansi_map;
     *p = stripped;
     
-    XFREE(s1, "ansi_map_states");
+    XFREE(s2, "ansi_map_states");
     
     return n;
 }
