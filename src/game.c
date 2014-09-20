@@ -119,7 +119,10 @@ pid_t isrunning( char *pidfile ) {
         return ( 0 );
     }
 
-    fgets( buff, MBUF_SIZE, fp );
+    if( fgets( buff, MBUF_SIZE, fp ) == NULL) {
+        fclose ( fp );
+        return ( 0 );
+    }
 
     fclose( fp );
 
@@ -234,12 +237,13 @@ int tailfind( char *file, char *key ) {
     }
 
     pos = lseek( fp, 0 - strlen( key ), SEEK_END );
-    read( fp, s, strlen( key ) );
-    close( fp );
-
-    if( strncmp( s, key, strlen( key ) ) ==0 ) {
-        return ( 1 );
+    if (read( fp, s, strlen( key ) ) != -1) {
+        if( strncmp( s, key, strlen( key ) ) ==0 ) {
+            close( fp );
+            return ( 1 );
+            }
     }
+    close( fp );
     return ( 0 );
 }
 
@@ -1697,7 +1701,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
 
 int copy_file( char *src, char *dst, int flag ) {
     FILE *fsrc, *fdst;
-    ssize_t size;
+    ssize_t size, wsize;
     char *buff;
 
     /*
@@ -1717,7 +1721,10 @@ int copy_file( char *src, char *dst, int flag ) {
     }
 
     while( ( size=fread( buff, sizeof( char ), LBUF_SIZE, fsrc ) ) > 0 ) {
-        fwrite( buff, sizeof( char ), size, fdst );
+        wsize = fwrite( buff, sizeof( char ), size, fdst );
+        if ( wsize != size) {
+            break;
+        }
     }
 
     fclose( fsrc );
@@ -1743,7 +1750,7 @@ void write_pidfile( char *fn ) {
 }
 
 void write_status_file( dbref player, char *message ) {
-    int fd;
+    int fd, size;
     char *msg;
 
     fd = tf_open( mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC );
@@ -1754,12 +1761,17 @@ void write_status_file( dbref player, char *message ) {
     } else {
         msg = xstrprintf( "write_status_file", "Shutdown by : System\n" );
     }
-    write( fd, msg, strlen( msg ) );
+    size = write( fd, msg, strlen( msg ) );
     XFREE( msg, "write_status_file" );
-
+    if ( size < 0 ) {
+        log_write( LOG_ALWAYS, "WIZ", "WRSTF", "Error while writing to status file");
+    }
     if( message != NULL ) {
         msg = xstrprintf( "write_status_file", "Status : %s\n", message );
-        ( void ) write( fd, msg, strlen( msg ) );
+        size = write( fd, msg, strlen( msg ) );
+        if ( size < 0 ) {
+            log_write( LOG_ALWAYS, "WIZ", "WRSTF", "Error while writing to status file");
+        }
         XFREE( msg, "write_status_file" );
     }
     tf_close( fd );
@@ -3154,8 +3166,9 @@ int main( int argc, char *argv[] ) {
             exit( 0 );
         } else {
             setsid();
-
-            chdir( mudconf.game_home );
+            if ( chdir( mudconf.game_home ) < 0 ) {
+                log_write( LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror( errno ) );
+            }
         }
 
     }
@@ -3177,8 +3190,12 @@ int main( int argc, char *argv[] ) {
         fprintf( stderr, "\n" );
         fflush( stderr );
         fflush( stdout );
-        freopen( DEV_NULL, "w", stdout );
-        freopen( DEV_NULL, "w", stderr );
+        if ( freopen( DEV_NULL, "w", stdout ) == NULL ) {
+            log_write( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
+        }
+        if ( freopen( DEV_NULL, "w", stderr ) == NULL ) {
+            log_write( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
+        }
     }
 
     /*
