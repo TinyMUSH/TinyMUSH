@@ -183,7 +183,11 @@ int query( char *ip, char *orig_arg ) {
         *p++ = '\0';
     }
     sprintf( buf3, "%s%s", buf, buf2 );
-    write( 1, buf3, strlen( buf3 ) );
+    len = strlen( buf3 );
+    if (write( 1, buf3, len ) != ( int ) len ) {
+        /* THis can't fail anyway ... */
+        return ( 0 );
+    }
     return ( 0 );
 }
 

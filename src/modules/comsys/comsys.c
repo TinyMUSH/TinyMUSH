@@ -1929,13 +1929,14 @@ void mod_comsys_make_minimal(void) {
 void mod_comsys_load_database(FILE *fp) {
     char buffer[2 * MBUF_SIZE + 8];	/* depends on max length of params */
 
-    fgets(buffer, sizeof(buffer), fp);
-    if (!strncmp(buffer, (char *) "+V", 2)) {
-	read_comsys(fp, atoi(buffer + 2));
-	sanitize_comsys();
-    } else {
-        log_write(LOG_STARTUP, "INI", "COM", "Unrecognized comsys format.");
-	mod_comsys_make_minimal();
+    if ( fgets(buffer, sizeof(buffer), fp) != NULL ) {
+        if (!strncmp(buffer, (char *) "+V", 2)) {
+	    read_comsys(fp, atoi(buffer + 2));
+	    sanitize_comsys();
+        } else {
+            log_write(LOG_STARTUP, "INI", "COM", "Unrecognized comsys format.");
+            mod_comsys_make_minimal();
+        }
     }
 }
 

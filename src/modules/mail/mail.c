@@ -1606,7 +1606,9 @@ void mod_mail_load_database(FILE *fp) {
     /*
      * Read the version number
      */
-    fgets(nbuf1, sizeof(nbuf1), fp);
+    if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+        return;
+    }
 
     if (!strncmp(nbuf1, "+V1", 3)) {
         new = 0;
@@ -1641,7 +1643,9 @@ void mod_mail_load_database(FILE *fp) {
     if (pennsub) {
         /* Toss away the number of messages */
 
-        fgets(nbuf1, sizeof(nbuf1), fp);
+        if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+            return;
+        }
     }
 
     if (read_newdb) {
@@ -1651,7 +1655,9 @@ void mod_mail_load_database(FILE *fp) {
         mail_db_grow(1);
     }
 
-    fgets(nbuf1, sizeof(nbuf1), fp);
+    if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+        return;
+    }
     
     while (strncmp(nbuf1, "*** END OF DUMP ***", 19)) {
         mp = (struct mail *) XMALLOC(sizeof(struct mail), "load_mail");
@@ -1709,16 +1715,22 @@ void mod_mail_load_database(FILE *fp) {
         else if (!pennsub)
             mp->subject = XSTRDUP("No subject", "load_mail.subj");
         mp->read = getref(fp);
-        fgets(nbuf1, sizeof(nbuf1), fp);
+        if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+            return;
+        }
     }
 
     if (read_newdb) {
-        fgets(nbuf1, sizeof(nbuf1), fp);
+        if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+            return;
+        }
 
         while (strncmp(nbuf1, "+++ END OF DUMP +++", 19)) {
             number = atoi(nbuf1);
             new_mail_message(getstring_noalloc(fp, read_new_strings), number);
-            fgets(nbuf1, sizeof(nbuf1), fp);
+            if ( fgets(nbuf1, sizeof(nbuf1), fp) == NULL ) {
+                return;
+            }
         }
     }
     load_malias(fp);
@@ -2611,7 +2623,9 @@ void malias_read(FILE *fp) {
     char buffer[1000];
     struct malias *m;
 
-    fscanf(fp, "%d\n", &ma_top);
+    if ( fscanf(fp, "%d\n", &ma_top) == EOF ) {
+        return;
+    }
 
     ma_size = ma_top;
 
@@ -2627,13 +2641,19 @@ void malias_read(FILE *fp) {
 
         m = (struct malias *)malias[i];
 
-        fscanf(fp, "%d %d\n", &(m->owner), &(m->numrecep));
+        if ( fscanf(fp, "%d %d\n", &(m->owner), &(m->numrecep)) == EOF) {
+            return;
+        }
 
-        fscanf(fp, "%[^\n]\n", buffer);
+        if ( fscanf(fp, "%[^\n]\n", buffer) == EOF ) {
+            return;
+        }
         m->name = (char *) XMALLOC(sizeof(char) * (strlen(buffer) - 1),
                                    "malias_read.name");
         StringCopy(m->name, buffer + 2);
-        fscanf(fp, "%[^\n]\n", buffer);
+        if ( fscanf(fp, "%[^\n]\n", buffer) == EOF ) {
+            return;
+        }
         m->desc = (char *) XMALLOC(sizeof(char) * (strlen(buffer) - 1),
                                    "malias_read.desc");
         StringCopy(m->desc, buffer + 2);

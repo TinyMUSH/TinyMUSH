@@ -444,6 +444,20 @@ void cf_log_notfound( dbref player, char *cmd, const char *thingname, char *thin
     }
 }
 
+
+/*
+ * ---------------------------------------------------------------------------
+ * cf_log_error: Log an error.
+ */
+
+void cf_log_error( dbref player, char *message ) {
+    if( mudstate.initializing ) {
+        log_write( LOG_STARTUP, "CNF", "ERROR", "%s", message );
+    } else {
+        notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s", message );
+    }
+}
+
 /*
  * ---------------------------------------------------------------------------
  * cf_log_syntax: Log a syntax error.
@@ -1771,11 +1785,21 @@ int cf_include( int *vp, char *str, long extra, dbref player, char *cmd ) {
     XFREE( buf, "cf_include" );
 
     buf = alloc_lbuf( "cf_include" );
-    fgets( buf, LBUF_SIZE, fp );
+    if ( fgets( buf, LBUF_SIZE, fp ) == NULL) {
+        cf_log_error( player, "Error while reading configuration file.");
+        free_lbuf( buf );
+        fclose( fp );
+        return -1;
+    }
     while( !feof( fp ) ) {
         cp = buf;
         if( *cp == '#' ) {
-            fgets( buf, LBUF_SIZE, fp );
+            if ( fgets( buf, LBUF_SIZE, fp ) == NULL) {
+                cf_log_error( player, "Error while reading configuration file.");
+                free_lbuf( buf );
+                fclose( fp );
+                return -1;
+            }
             continue;
         }
         /*
@@ -1805,7 +1829,12 @@ int cf_include( int *vp, char *str, long extra, dbref player, char *cmd ) {
         }
 
         cf_set( cp, ap, player );
-        fgets( buf, LBUF_SIZE, fp );
+        if ( fgets( buf, LBUF_SIZE, fp ) == NULL) {
+            cf_log_error( player, "Error while reading configuration file.");
+            free_lbuf( buf );
+            fclose( fp );
+            return -1;
+        }
     }
     free_lbuf( buf );
     fclose( fp );

@@ -68,7 +68,7 @@ _gdbm_end_update(dbf)
 	}
 	/* Final write of the header. */
 	if (dbf->header_changed) {
-		write_header(dbf);
+                write_header(dbf);
 		dbf->header_changed = FALSE;
 	}
 }
@@ -85,10 +85,13 @@ _gdbm_fatal(dbf, val)
 	if ((dbf != NULL) && (dbf->fatal_err != NULL))
 		(*dbf->fatal_err) (val);
 	else {
-		write(STDERR_FILENO, "gdbm fatal: ", 12);
-		if (val != NULL)
-			write(STDERR_FILENO, val, strlen(val));
-		write(STDERR_FILENO, "\n", 1);
+		if ( write(STDERR_FILENO, "gdbm fatal: ", 12) > -1) {
+        		if (val != NULL)
+                               if ( write(STDERR_FILENO, val, strlen(val)) > -1) {
+                                       if ( write(STDERR_FILENO, "\n", 1) > -1) {
+                               }
+                        }
+                }
 	}
 	exit(1);
 	/* NOTREACHED */

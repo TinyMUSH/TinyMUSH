@@ -83,8 +83,6 @@
 #define StringCopyTrunc strncpy
 
 #define DEV_NULL "/dev/null"
-#define READ read
-#define WRITE write
 
 /* This is used to define the version of our backup file */
 #define BACKUP_VERSION 1

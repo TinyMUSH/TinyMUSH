@@ -617,7 +617,7 @@ DESC *new_connection( int sock ) {
                      inet_ntoa( addr.sin_addr ), inet_ntoa( addr.sin_addr ),
                      ntohs( addr.sin_port ), mudconf.port );
             len = strlen( buf );
-            if( WRITE( slave_socket, buf, len ) < 0 ) {
+            if( write( slave_socket, buf, len ) < 0 ) {
                 close( slave_socket );
                 slave_socket = -1;
             }
@@ -878,7 +878,7 @@ int process_output( DESC *d ) {
 
     while( tb != NULL ) {
         while( tb->hdr.nchars > 0 ) {
-            cnt = WRITE( d->descriptor, tb->hdr.start,
+            cnt = write( d->descriptor, tb->hdr.start,
                          tb->hdr.nchars );
             if( cnt < 0 ) {
                 mudstate.debug_cmd = cmdsave;
@@ -917,7 +917,7 @@ int process_input( DESC *d ) {
     mudstate.debug_cmd = ( char * ) "< process_input >";
     buf = alloc_lbuf( "process_input.buf" );
 
-    got = in = READ( d->descriptor, buf, LBUF_SIZE );
+    got = in = read( d->descriptor, buf, LBUF_SIZE );
     if( got <= 0 ) {
         mudstate.debug_cmd = cmdsave;
         free_lbuf( buf );
@@ -990,8 +990,9 @@ void close_sockets( int emergency, char *message ) {
 
     DESC_SAFEITER_ALL( d, dnext ) {
         if( emergency ) {
-
-            WRITE( d->descriptor, message, strlen( message ) );
+            if ( write( d->descriptor, message, strlen( message ) ) < 0 ) {
+                log_perror( "NET", "FAIL", NULL, "shutdown" );
+            }
             if( shutdown( d->descriptor, 2 ) < 0 ) {
                 log_perror( "NET", "FAIL", NULL, "shutdown" );
             }

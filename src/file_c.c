@@ -214,7 +214,7 @@ void fcache_rawdump( int fd, int num ) {
         remaining = fp->hdr.nchars;
         while( remaining > 0 ) {
 
-            cnt = WRITE( fd, start, remaining );
+            cnt = write( fd, start, remaining );
             if( cnt < 0 ) {
                 return;
             }

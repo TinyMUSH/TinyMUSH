@@ -2687,14 +2687,21 @@ char *getstring_noalloc( FILE *f, int new_strings ) {
 
 dbref getref( FILE *f ) {
     static char buf[SBUF_SIZE];
-    fgets( buf, sizeof( buf ), f );
-    return ( ( int ) strtol( buf, ( char ** ) NULL, 10 ) );
+    if ( fgets( buf, sizeof( buf ), f ) != NULL) {
+        return ( ( int ) strtol( buf, ( char ** ) NULL, 10 ) );
+    } else {
+        return (0);
+    }
+    
 }
 
 long getlong( FILE *f ) {
     static char buf[SBUF_SIZE];
-    fgets( buf, sizeof( buf ), f );
-    return ( strtol( buf, ( char ** ) NULL, 10 ) );
+    if ( fgets( buf, sizeof( buf ), f )  != NULL) {
+        return ( strtol( buf, ( char ** ) NULL, 10 ) );
+    } else {
+        return (0);
+    }
 }
 
 void free_boolexp( BOOLEXP *b ) {
@@ -2900,10 +2907,14 @@ void load_restart_db( void ) {
     }
     mudstate.restarting = 1;
 
-    fgets( buf, 3, f );
-    if( strncmp( buf, "+V", 2 ) ) {
+    if( fgets( buf, 3, f ) != NULL ) {
+        if( strncmp( buf, "+V", 2 ) ) {
+            abort();
+        }
+    } else {
         abort();
     }
+    
     version = getref( f );
     sock = getref( f );
 
