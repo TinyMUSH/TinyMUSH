@@ -4,7 +4,7 @@ AC_PREREQ([2.69])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
-m4_define(TINYMUSH_VERSION, [3.3.0.5])
+m4_define(TINYMUSH_VERSION, [3.3.0.6])
 m4_define(TINYMUSH_RELEASE_DATE, ["2014-09-21"])
 m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2014 TinyMUSH development team.])
 
@@ -26,8 +26,8 @@ dnl PACKAGE_RELEASE_STATUS
 dnl PACKAGE_RELEASE_NAME
 dnl PACKAGE_RELEASE_REVISION
 dnl And we manually create a few other things that need to be updated from time to time.
-dnl PACKAGE_RELEASE_DATE="2013-01-02"
-dnl PACKAGE_COPYRIGHT="Copyright (C) 2012 TinyMUSH development team."
+dnl PACKAGE_RELEASE_DATE
+dnl PACKAGE_COPYRIGHT
 
 dnl Some default values
 dnl
