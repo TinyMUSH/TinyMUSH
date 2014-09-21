@@ -226,17 +226,6 @@ AC_ARG_ENABLE([pueblo-support], [AS_HELP_STRING([--enable-pueblo-support], [Enab
 )
 AS_IF([test "x$enable_pueblo_support" = "xyes"], [AC_DEFINE([PUEBLO_SUPPORT],[1], [Support for Pueblo Clients])])
 
-AC_MSG_CHECKING([whether to enable IEEE 754 floating point support])
-AC_ARG_ENABLE([floating-point], [AS_HELP_STRING([--enable-floating-point], [Enable support for math functions (lt, gt, add, etc.) with IEEE 754 floating-point support @<:@default=yes@:>@])],
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [ 
-  AC_MSG_RESULT([yes])
-  enable_floating_point="yes"
- ]
-)
-AS_IF([test "x$enable_floating_point" = "xyes"], [AC_DEFINE([FLOATING_POINTS],[1], [Support for IEEE 754 floating-point])])
-
 AC_MSG_CHECKING([whether to enable command lag detection support])
 AC_ARG_ENABLE([lag-checking], [AS_HELP_STRING([--enable-lag-checking], [Enable warnings that a certain command has exceeded a certain amount of wall-clock time to execute. Disable this if you have severe problems with computational resources on your host machine. @<:@default=yes@:>@])],
  [

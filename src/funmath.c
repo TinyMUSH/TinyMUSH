@@ -26,7 +26,6 @@
  * fval: copy the floating point value into a buffer and make it presentable
  */
 
-#ifdef FLOATING_POINTS
 #define FP_SIZE ((sizeof(double) + sizeof(unsigned int) - 1) / sizeof(unsigned int))
 #define FP_EXP_WEIRD    0x1
 #define FP_EXP_ZERO 0x2
@@ -148,9 +147,6 @@ static void fval( char *buff, char **bufc, double result )
         *bufc = buf1 + 1;
     }
 }
-#else
-#define fval(b,p,n)  safe_ltos(b,p,n)
-#endif
 
 /*
  * ---------------------------------------------------------------------------
@@ -201,7 +197,6 @@ void fun_abs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-#ifdef FLOATING_POINTS
     char *oldp;
 
     NVAL x;
@@ -225,14 +220,10 @@ void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         *oldp = '0';
         *bufc = oldp + 1;
     }
-#else
-    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
-#endif
 }
 
 void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-#ifdef FLOATING_POINTS
     char *oldp;
 
     NVAL x;
@@ -256,14 +247,10 @@ void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         *oldp = '0';
         *bufc = oldp + 1;
     }
-#else
-    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
-#endif
 }
 
 void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-#ifdef FLOATING_POINTS
     const char *fstr;
 
     char *oldp;
@@ -314,14 +301,10 @@ void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         *oldp = '0';
         *bufc = oldp + 1;
     }
-#else
-    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
-#endif
 }
 
 void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-#ifdef FLOATING_POINTS
     NVAL x;
 
     x = strtod( fargs[0], ( char ** ) NULL );
@@ -335,9 +318,6 @@ void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         break;
     }
     fval( buff, bufc, x );
-#else
-    fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) );
-#endif
 }
 
 void fun_inc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )

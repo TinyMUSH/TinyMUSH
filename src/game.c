@@ -107,7 +107,8 @@ int backup_mush( dbref, dbref, int );
  * PIDFILE(3), the world would be a better place!
  */
 
-pid_t isrunning( char *pidfile ) {
+pid_t isrunning( char *pidfile )
+{
     FILE *fp;
     pid_t pid=0, rpid=0;
     int i=0;
@@ -156,7 +157,8 @@ pid_t isrunning( char *pidfile ) {
  * CHeck if a file exist
  */
 
-int fileexist( char *file ) {
+int fileexist( char *file )
+{
     int fp;
 
     fp=open( file, O_RDONLY );
@@ -171,7 +173,8 @@ int fileexist( char *file ) {
 #define HANDLE_FLAT_CRASH	1
 #define HANDLE_FLAT_KILL	2
 
-void handlestartupflatfiles( int flag ) {
+void handlestartupflatfiles( int flag )
+{
     char db[MAXPATHLEN], flat[MAXPATHLEN], db_bak[MAXPATHLEN], flat_bak[MAXPATHLEN], ts[SBUF_SIZE];
     int i;
     struct stat sb1, sb2;
@@ -225,7 +228,8 @@ void handlestartupflatfiles( int flag ) {
  * match.
  */
 
-int tailfind( char *file, char *key ) {
+int tailfind( char *file, char *key )
+{
     int fp;
     char s[MBUF_SIZE];
     off_t pos;
@@ -241,7 +245,7 @@ int tailfind( char *file, char *key ) {
         if( strncmp( s, key, strlen( key ) ) ==0 ) {
             close( fp );
             return ( 1 );
-            }
+        }
     }
     close( fp );
     return ( 0 );
@@ -253,7 +257,8 @@ int tailfind( char *file, char *key ) {
  * execution
  */
 
-void do_dump( dbref player, dbref cause, int key ) {
+void do_dump( dbref player, dbref cause, int key )
+{
     if( mudstate.dumping ) {
         notify( player, "Dumping. Please try again later." );
         return;
@@ -267,13 +272,14 @@ void do_dump( dbref player, dbref cause, int key ) {
  * Hashtable resize.
  */
 
-void do_hashresize( dbref player, dbref cause, int key ) {
+void do_hashresize( dbref player, dbref cause, int key )
+{
     MODULE *mp;
 
     MODHASHES *m_htab, *hp;
 
     MODNHASHES *m_ntab, *np;
-    
+
     char *s;
 
     hashresize( &mudstate.command_htab, 512 );
@@ -330,7 +336,8 @@ void do_hashresize( dbref player, dbref cause, int key ) {
  * registers. PCRE modifications adapted from PennMUSH.
  */
 
-int regexp_match( char *pattern, char *str, int case_opt, char *args[], int nargs ) {
+int regexp_match( char *pattern, char *str, int case_opt, char *args[], int nargs )
+{
     int i;
 
     pcre *re;
@@ -343,8 +350,7 @@ int regexp_match( char *pattern, char *str, int case_opt, char *args[], int narg
 
     int subpatterns;
 
-    if( ( re = pcre_compile( pattern, case_opt,
-                             &errptr, &erroffset, mudstate.retabs ) ) == NULL ) {
+    if( ( re = pcre_compile( pattern, case_opt, &errptr, &erroffset, mudstate.retabs ) ) == NULL ) {
         /*
          * This is a matching error. We have an error message in
          * errptr that we can ignore, since we're doing
@@ -356,9 +362,8 @@ int regexp_match( char *pattern, char *str, int case_opt, char *args[], int narg
      * Now we try to match the pattern. The relevant fields will
      * automatically be filled in by this.
      */
-    if( ( subpatterns = pcre_exec( re, NULL, str, strlen( str ), 0, 0,
-                                   offsets, PCRE_MAX_OFFSETS ) ) < 0 ) {
-        XFREE( re, "regexp_match.re" );
+    if( ( subpatterns = pcre_exec( re, NULL, str, strlen( str ), 0, 0, offsets, PCRE_MAX_OFFSETS ) ) < 0 ) {
+        pcre_free( re );
         return 0;
     }
     /*
@@ -382,8 +387,7 @@ int regexp_match( char *pattern, char *str, int case_opt, char *args[], int narg
 
     for( i = 0; i < nargs; i++ ) {
         args[i] = alloc_lbuf( "regexp_match" );
-        if( pcre_copy_substring( str, offsets, subpatterns, i,
-                                 args[i], LBUF_SIZE ) < 0 ) {
+        if( pcre_copy_substring( str, offsets, subpatterns, i, args[i], LBUF_SIZE ) < 0 ) {
             /*
              * Match behavior of wild(): clear out null values.
              */
@@ -392,7 +396,7 @@ int regexp_match( char *pattern, char *str, int case_opt, char *args[], int narg
         }
     }
 
-    XFREE( re, "regexp_match.re" );
+    pcre_free( re );
     return 1;
 }
 
@@ -401,7 +405,8 @@ int regexp_match( char *pattern, char *str, int case_opt, char *args[], int narg
  * atr_match: Check attribute list for wild card matches and queue them.
  */
 
-static int atr_match1( dbref thing, dbref parent, dbref player, char type, char *str, char *raw_str, int check_exclude, int hash_insert ) {
+static int atr_match1( dbref thing, dbref parent, dbref player, char type, char *str, char *raw_str, int check_exclude, int hash_insert )
+{
     dbref aowner;
 
     int match, attr, aflags, alen, i;
@@ -515,7 +520,8 @@ static int atr_match1( dbref thing, dbref parent, dbref player, char type, char 
     return ( match );
 }
 
-int atr_match( dbref thing, dbref player, char type, char *str, char *raw_str, int check_parents ) {
+int atr_match( dbref thing, dbref player, char type, char *str, char *raw_str, int check_parents )
+{
     int match, lev, result, exclude, insert;
 
     dbref parent;
@@ -570,7 +576,8 @@ int atr_match( dbref thing, dbref player, char type, char *str, char *raw_str, i
  * optionally notify the contents, neighbors, and location also.
  */
 
-int check_filter( dbref object, dbref player, int filter, const char *msg ) {
+int check_filter( dbref object, dbref player, int filter, const char *msg )
+{
     int aflags, alen;
 
     dbref aowner;
@@ -618,18 +625,15 @@ int check_filter( dbref object, dbref player, int filter, const char *msg ) {
         case_opt = ( aflags & AF_CASE ) ? 0 : PCRE_CASELESS;
         do {
             cp = parse_to( &dp, ',', EV_STRIP );
-            re = pcre_compile( cp, case_opt, &errptr, &erroffset,
-                               mudstate.retabs );
+            re = pcre_compile( cp, case_opt, &errptr, &erroffset, mudstate.retabs );
             if( re != NULL ) {
-                subpatterns =
-                    pcre_exec( re, NULL, ( char * ) msg, len, 0, 0,
-                               offsets, PCRE_MAX_OFFSETS );
+                subpatterns = pcre_exec( re, NULL, ( char * ) msg, len, 0, 0, offsets, PCRE_MAX_OFFSETS );
                 if( subpatterns >= 0 ) {
-                    XFREE( re, "check_filter.re" );
+                    pcre_free( re );
                     free_lbuf( nbuf );
                     return ( 0 );
                 }
-                XFREE( re, "check_filter.re" );
+                pcre_free( re );
             }
         } while( dp != NULL );
     }
@@ -637,7 +641,8 @@ int check_filter( dbref object, dbref player, int filter, const char *msg ) {
     return ( 1 );
 }
 
-static char *add_prefix( dbref object, dbref player, int prefix, const char *msg, const char *dflt ) {
+static char *add_prefix( dbref object, dbref player, int prefix, const char *msg, const char *dflt )
+{
     int aflags, alen;
 
     dbref aowner;
@@ -667,7 +672,8 @@ static char *add_prefix( dbref object, dbref player, int prefix, const char *msg
     return ( buf );
 }
 
-static char *dflt_from_msg( dbref sender, dbref sendloc ) {
+static char *dflt_from_msg( dbref sender, dbref sendloc )
+{
     char *tp, *tbuff;
 
     tp = tbuff = alloc_lbuf( "notify_check.fwdlist" );
@@ -693,7 +699,8 @@ static char *dflt_from_msg( dbref sender, dbref sendloc ) {
  * 'dest', just pass in a 0 for 'destp'.
  */
 
-void html_escape( const char *src, char *dest, char **destp ) {
+void html_escape( const char *src, char *dest, char **destp )
+{
     const char *msg_orig;
 
     char *temp;
@@ -736,7 +743,8 @@ void html_escape( const char *src, char *dest, char **destp ) {
 			    ((key & MSG_MOVE) && Check_Notices((p),(t))) || \
 			    ((key & MSG_PRESENCE) && Check_Knows((p),(t))))))
 
-void notify_check( dbref target, dbref sender, int key, const char *format, ... ) {
+void notify_check( dbref target, dbref sender, int key, const char *format, ... )
+{
     char msg[LBUF_SIZE];
     char *msg_ns, *mp, *tbuff, *tp, *buff;
     char *args[NUM_ENV_VARS];
@@ -749,7 +757,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     va_list ap;
 
     va_start( ap, format );
-        
+
     if ( ( !format || !*format ) ) {
         if( ( tbuff = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, tbuff, LBUF_SIZE);
@@ -761,7 +769,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     }
 
     va_end( ap );
-    
+
     /*
      * If speaker is invalid or message is empty, just exit
      */
@@ -1156,14 +1164,15 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     mudstate.ntfy_nest_lev--;
 }
 
-void notify_except( dbref loc, dbref player, dbref exception, int flags, const char *format, ... ) {
+void notify_except( dbref loc, dbref player, dbref exception, int flags, const char *format, ... )
+{
     dbref first;
     char msg[LBUF_SIZE];
     char *s;
     va_list ap;
-    
+
     va_start( ap, format );
-    
+
     if ( ( !format || !*format ) ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
@@ -1185,14 +1194,15 @@ void notify_except( dbref loc, dbref player, dbref exception, int flags, const c
     }
 }
 
-void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags, const char *format, ... ) {
+void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags, const char *format, ... )
+{
     dbref first;
     char msg[LBUF_SIZE];
     char *s;
     va_list ap;
-    
+
     va_start( ap, format );
-    
+
     if ( ( !format || !*format ) ) {
         if( ( s = va_arg(ap, char *) ) != NULL ) {
             strncpy(msg, s, LBUF_SIZE);
@@ -1220,7 +1230,8 @@ void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags,
  */
 
 #ifndef NO_TIMECHECKING
-static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes_clear ) {
+static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes_clear )
+{
     int thing, obj_counted;
 
     long used_msecs, total_msecs;
@@ -1279,12 +1290,14 @@ static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes
     }
 }
 #else
-static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes_clear ) {
+static void report_timecheck( dbref player, int yes_screen, int yes_log, int yes_clear )
+{
     raw_notify( player, NULL, "Sorry, this command has been disabled.");
 }
 #endif				/* ! NO_TIMECHECKING */
 
-void do_timecheck( dbref player, dbref cause, int key ) {
+void do_timecheck( dbref player, dbref cause, int key )
+{
     int yes_screen, yes_log, yes_clear;
 
     yes_screen = yes_log = yes_clear = 0;
@@ -1316,7 +1329,8 @@ void do_timecheck( dbref player, dbref cause, int key ) {
  * Miscellaneous startup/stop routines.
  */
 
-char **add_array( char **b, char *s, int *i, char *d ) {
+char **add_array( char **b, char *s, int *i, char *d )
+{
     b= ( char ** ) XREALLOC( b, ( *i + 1 ) * sizeof( char * ), d );
     if( s !=NULL ) {
         b[*i] = XSTRDUP( s, d );
@@ -1327,7 +1341,8 @@ char **add_array( char **b, char *s, int *i, char *d ) {
     return ( b );
 }
 
-int backup_copy( char *src, char *dst, int flag ) {
+int backup_copy( char *src, char *dst, int flag )
+{
     char *fn;
     int i;
     /*
@@ -1341,7 +1356,8 @@ int backup_copy( char *src, char *dst, int flag ) {
     return ( i );
 }
 
-char *mktimestamp( char *buff, size_t size ) {
+char *mktimestamp( char *buff, size_t size )
+{
     struct tm *t;
     time_t ts;
 
@@ -1351,11 +1367,13 @@ char *mktimestamp( char *buff, size_t size ) {
     return ( buff );
 }
 
-void do_backup_mush( dbref player, dbref cause, int key ) {
+void do_backup_mush( dbref player, dbref cause, int key )
+{
     backup_mush( player, cause, key );
 }
 
-int backup_mush( dbref player, dbref cause, int key ) {
+int backup_mush( dbref player, dbref cause, int key )
+{
     int i, txt_n=0, cnf_n=0, dbf_n=0;
     char **txt=NULL, **cnf=NULL, **dbf=NULL;
     char *tmpdir, *s, *buff, *tb, *cwd;
@@ -1488,7 +1506,7 @@ int backup_mush( dbref player, dbref cause, int key ) {
         XFREE( tmpdir, "backup_mush" );
         return ( -1 );
     }
-    
+
     log_write( LOG_ALWAYS, "BCK", "INFO", "Creating backup set" );
 
     if( player != NOTHING ) {
@@ -1680,9 +1698,9 @@ int backup_mush( dbref player, dbref cause, int key ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove directory %s", tmpdir );
         }
     }
-    
+
     XFREE( tmpdir, "backup_mush" );
-    
+
     log_write( LOG_ALWAYS, "BCK", "INFO", "Backup done" );
 
     if( player != NOTHING ) {
@@ -1693,7 +1711,8 @@ int backup_mush( dbref player, dbref cause, int key ) {
 }
 
 
-int copy_file( char *src, char *dst, int flag ) {
+int copy_file( char *src, char *dst, int flag )
+{
     FILE *fsrc, *fdst;
     ssize_t size, wsize;
     char *buff;
@@ -1732,7 +1751,8 @@ int copy_file( char *src, char *dst, int flag ) {
     return ( 0 );
 }
 
-void write_pidfile( char *fn ) {
+void write_pidfile( char *fn )
+{
     FILE *f;
 
     if( ( f = fopen( fn, "w" ) ) != NULL ) {
@@ -1743,7 +1763,8 @@ void write_pidfile( char *fn ) {
     }
 }
 
-void write_status_file( dbref player, char *message ) {
+void write_status_file( dbref player, char *message )
+{
     int fd, size;
     char *msg;
 
@@ -1771,7 +1792,8 @@ void write_status_file( dbref player, char *message ) {
     tf_close( fd );
 }
 
-void do_shutdown( dbref player, dbref cause, int key, char *message ) {
+void do_shutdown( dbref player, dbref cause, int key, char *message )
+{
     char *name;
 
     name = log_getname( player, "do_shutdown" );
@@ -1818,7 +1840,8 @@ void do_shutdown( dbref player, dbref cause, int key, char *message ) {
     return;
 }
 
-void dump_database_internal( int dump_type ) {
+void dump_database_internal( int dump_type )
+{
     char tmpfile[MAXPATHLEN];
     char *s;
     /* *c; */
@@ -1933,7 +1956,8 @@ void dump_database_internal( int dump_type ) {
     }
 }
 
-void dump_database( void ) {
+void dump_database( void )
+{
     mudstate.epoch++;
     mudstate.dumping = 1;
     log_write( LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch );
@@ -1944,7 +1968,8 @@ void dump_database( void ) {
     mudstate.dumping = 0;
 }
 
-void fork_and_dump( dbref player, dbref cause, int key ) {
+void fork_and_dump( dbref player, dbref cause, int key )
+{
     if( *mudconf.dump_msg ) {
         raw_broadcast( 0, "%s", mudconf.dump_msg );
     }
@@ -2011,11 +2036,12 @@ void fork_and_dump( dbref player, dbref cause, int key ) {
     }
 }
 
-void call_all_modules_nocache(char *xfn) {
+void call_all_modules_nocache(char *xfn)
+{
     MODULE *mp;
     void (*ip)( void );
     char *s;
-    
+
     s = alloc_mbuf("call_all_modules_nocache");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn );
@@ -2025,7 +2051,8 @@ void call_all_modules_nocache(char *xfn) {
     free_mbuf(s);
 }
 
-static int load_game( void ) {
+static int load_game( void )
+{
     FILE *f;
 
     MODULE *mp;
@@ -2043,7 +2070,7 @@ static int load_game( void ) {
      */
 
     call_all_modules_nocache( "db_read");
-    
+
 
 
     /*
@@ -2071,7 +2098,8 @@ static int load_game( void ) {
 
 /* match a list of things, using the no_command flag */
 
-int list_check( dbref thing, dbref player, char type, char *str, char *raw_str, int check_parent, int *stop_status ) {
+int list_check( dbref thing, dbref player, char type, char *str, char *raw_str, int check_parent, int *stop_status )
+{
     int match;
 
     match = 0;
@@ -2095,7 +2123,8 @@ int list_check( dbref thing, dbref player, char type, char *str, char *raw_str, 
     return match;
 }
 
-int Hearer( dbref thing ) {
+int Hearer( dbref thing )
+{
     char *as, *buff, *s;
 
     dbref aowner;
@@ -2155,7 +2184,8 @@ int Hearer( dbref thing ) {
  * Write message to logfile.
  */
 
-void do_logwrite( dbref player, dbref cause, int key, char *msgtype, char *message ) {
+void do_logwrite( dbref player, dbref cause, int key, char *msgtype, char *message )
+{
     const char *mt;
 
     char *msg, *p, *pname;
@@ -2194,12 +2224,14 @@ void do_logwrite( dbref player, dbref cause, int key, char *msgtype, char *messa
  * Database and startup stuff.
  */
 
-void do_readcache( dbref player, dbref cause, int key ) {
+void do_readcache( dbref player, dbref cause, int key )
+{
     helpindex_load( player );
     fcache_load( player );
 }
 
-static void process_preload( void ) {
+static void process_preload( void )
+{
     dbref thing, parent, aowner;
 
     int aflags, alen, lev, i;
@@ -2306,7 +2338,8 @@ static void process_preload( void ) {
  * info: display info about the file being read or written.
  */
 
-void info( int fmt, int flags, int ver ) {
+void info( int fmt, int flags, int ver )
+{
     const char *cp;
 
     switch( fmt ) {
@@ -2388,7 +2421,8 @@ void info( int fmt, int flags, int ver ) {
     log_write_raw( 1, "\n" );
 }
 
-void usage( char *prog ) {
+void usage( char *prog )
+{
     log_write_raw( 1, "Usage: %s [options] gdbm-file [< in-file] [> out-file]\n", prog );
     log_write_raw( 1, "   Available flags are:\n" );
     log_write_raw( 1, "      -c <filename> - Config file     -C - Perform consistency check\n" );
@@ -2407,7 +2441,8 @@ void usage( char *prog ) {
 }
 
 
-void recover( char *flat ) {
+void recover( char *flat )
+{
     int db_ver, db_format, db_flags, setflags, clrflags, ver;
     MODULE *mp;
     void ( *modfunc )( FILE * );
@@ -2461,7 +2496,8 @@ void recover( char *flat ) {
     CLOSE;
 }
 
-int dbconvert( int argc, char *argv[] ) {
+int dbconvert( int argc, char *argv[] )
+{
     int setflags, clrflags, ver;
 
     int db_ver, db_format, db_flags, do_check, do_write;
@@ -2636,7 +2672,7 @@ int dbconvert( int argc, char *argv[] ) {
         /*
          * Call modules to load their flatfiles
          */
-        
+
         s1 = alloc_mbuf("dbconvert.modread");
         for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
@@ -2714,7 +2750,8 @@ int dbconvert( int argc, char *argv[] ) {
     exit( 0 );
 }
 
-int main( int argc, char *argv[] ) {
+int main( int argc, char *argv[] )
+{
     int mindb = 0;
 
     CMDENT *cmdp;
@@ -2726,7 +2763,7 @@ int main( int argc, char *argv[] ) {
     pid_t pid;
 
     char *s;
-    
+
     char ts[SBUF_SIZE];
 
     MODULE *mp;
@@ -3254,7 +3291,8 @@ int main( int argc, char *argv[] ) {
     exit( 0 );
 }
 
-static void init_rlimit( void ) {
+static void init_rlimit( void )
+{
 #if defined(HAVE_SETRLIMIT) && defined(RLIMIT_NOFILE)
     struct rlimit *rlp;
 

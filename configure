@@ -859,7 +859,6 @@ with_pgsql_includes
 with_pgsql_libs
 with_sqlite3
 enable_pueblo_support
-enable_floating_point
 enable_lag_checking
 enable_time_checking
 enable_cpu_checking
@@ -1525,9 +1524,6 @@ Optional Features:
   --enable-module-mail    Enable support for the mail module [default=yes]
   --enable-module-dbsql   Enable support for the dbsql module [default=no]
   --enable-pueblo-support Enable support for Pueblo clients [default=yes]
-  --enable-floating-point Enable support for math functions (lt, gt, add,
-                          etc.) with IEEE 754 floating-point support
-                          [default=yes]
   --enable-lag-checking   Enable warnings that a certain command has exceeded
                           a certain amount of wall-clock time to execute.
                           Disable this if you have severe problems with
@@ -12119,6 +12115,7 @@ END
   fi
 fi
 
+
 as_nl='
 '
 export as_nl
@@ -14273,34 +14270,6 @@ fi
 if test "x$enable_pueblo_support" = "xyes"; then :
 
 $as_echo "#define PUEBLO_SUPPORT 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable IEEE 754 floating point support" >&5
-$as_echo_n "checking whether to enable IEEE 754 floating point support... " >&6; }
-# Check whether --enable-floating-point was given.
-if test "${enable_floating_point+set}" = set; then :
-  enableval=$enable_floating_point;
-  if test "x$enableval" = "xyes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-else
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  enable_floating_point="yes"
-
-
-fi
-
-if test "x$enable_floating_point" = "xyes"; then :
-
-$as_echo "#define FLOATING_POINTS 1" >>confdefs.h
 
 fi
 

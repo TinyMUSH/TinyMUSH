@@ -74,10 +74,6 @@ void safe_sprintf( char *str, char **bp, const char *format, ... ) {
 
     va_start( ap, format );
 
-    /*
-     * Sigh, don't we wish _all_ vsprintf's returned int...
-     */
-
     n = LBUF_SIZE - ( *bp - str );
     if( n <= 0 ) {
         **bp = '\0';

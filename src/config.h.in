@@ -14,9 +14,6 @@
 /* length of the DOING field in WHO */
 #undef DOING_LEN
 
-/* Support for IEEE 754 floating-point */
-#undef FLOATING_POINTS
-
 /* How much hashing you want */
 #undef HASH_FACTOR
 

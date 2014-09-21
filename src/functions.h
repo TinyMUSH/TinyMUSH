@@ -83,13 +83,7 @@ struct object_grid {
     char         ***data;
 };
 
-#ifdef FLOATING_POINTS
 typedef double	NVAL;
-
-#else
-typedef int	NVAL;
-
-#endif				/* FLOATING_POINTS */
 
 /*
  * ---------------------------------------------------------------------------
