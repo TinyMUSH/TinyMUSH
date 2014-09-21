@@ -179,6 +179,9 @@
 /* Define to 1 if you have the `opendir' function. */
 #undef HAVE_OPENDIR
 
+/* Define to 1 if you have the <pcre.h> header file. */
+#undef HAVE_PCRE_H
+
 /* DB_SQL use the PostgreSQL driver */
 #undef HAVE_PGSQL
 

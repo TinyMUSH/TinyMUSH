@@ -330,8 +330,6 @@ void do_hashresize( dbref player, dbref cause, int key ) {
  * registers. PCRE modifications adapted from PennMUSH.
  */
 
-#define PCRE_MAX_OFFSETS 99
-
 int regexp_match( char *pattern, char *str, int case_opt, char *args[], int nargs ) {
     int i;
 

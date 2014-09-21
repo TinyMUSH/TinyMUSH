@@ -74,7 +74,7 @@ AC_PATH_PROGS([with_compress_prog], [gzip], AC_MSG_ERROR([not found]))
 
 AX_BOX([Initializing Automake])
 
-AM_INIT_AUTOMAKE()
+AM_INIT_AUTOMAKE([subdir-objects])
 
 AX_BOX([Initializing Libtools])
 
@@ -356,6 +356,7 @@ dnl AC_CHECK_LIB(m, main)
 AC_SEARCH_LIBS(sqrt, m)
 dnl AC_CHECK_LIB(dbm, main)
 dnl AC_CHECK_LIB(ndbm, main)
+AC_SEARCH_LIBS(pcre_exec, pcre)
 
 AX_BOX([Checks for header files.])
 # Checks for header files.
@@ -364,7 +365,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h])
 
 AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.

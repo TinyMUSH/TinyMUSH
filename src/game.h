@@ -86,4 +86,7 @@
 
 /* This is used to define the version of our backup file */
 #define BACKUP_VERSION 1
+
+#define PCRE_MAX_OFFSETS 99
+
 #endif	/* __GAME_H */

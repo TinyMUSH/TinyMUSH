@@ -13,13 +13,13 @@
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
 
-#include "mushconf.h"		/* required by code */
+#include "mushconf.h"       /* required by code */
 
-#include "db.h"			/* required by externs */
+#include "db.h"         /* required by externs */
 #include "interface.h"
-#include "externs.h"		/* required by code */
+#include "externs.h"        /* required by code */
 
-#include "functions.h"		/* required by code */
+#include "functions.h"      /* required by code */
 
 /*
  * ---------------------------------------------------------------------------
@@ -28,15 +28,16 @@
 
 #ifdef FLOATING_POINTS
 #define FP_SIZE ((sizeof(double) + sizeof(unsigned int) - 1) / sizeof(unsigned int))
-#define FP_EXP_WEIRD	0x1
-#define FP_EXP_ZERO	0x2
+#define FP_EXP_WEIRD    0x1
+#define FP_EXP_ZERO 0x2
 
 typedef union {
     double d;
     unsigned int u[FP_SIZE];
 } fp_union_uint;
 
-static unsigned int fp_check_weird( char *buff, char **bufc, double result ) {
+static unsigned int fp_check_weird( char *buff, char **bufc, double result )
+{
     static fp_union_uint fp_sign_mask, fp_exp_mask, fp_mant_mask, fp_val;
 
     static const double d_zero = 0.0;
@@ -106,24 +107,25 @@ static unsigned int fp_check_weird( char *buff, char **bufc, double result ) {
     return fp_exp;
 }
 
-static void fval( char *buff, char **bufc, double result ) {
+static void fval( char *buff, char **bufc, double result )
+{
     char *p, *buf1;
 
     switch( fp_check_weird( buff, bufc, result ) ) {
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
-        result = 0.0;	/* FALLTHRU */
+        result = 0.0;   /* FALLTHRU */
     default:
         break;
     }
 
     buf1 = *bufc;
-    safe_sprintf( buff, bufc, "%.6f", result );	/* get double val into
-							 * buffer */
+    safe_sprintf( buff, bufc, "%.6f", result ); /* get double val into
+                             * buffer */
     **bufc = '\0';
     p = strrchr( buf1, '0' );
-    if( p == NULL ) {	/* remove useless trailing 0's */
+    if( p == NULL ) {   /* remove useless trailing 0's */
         return;
     } else if( * ( p + 1 ) == '\0' ) {
         while( *p == '0' ) {
@@ -131,7 +133,7 @@ static void fval( char *buff, char **bufc, double result ) {
         }
         *bufc = p + 1;
     }
-    p = strrchr( buf1, '.' );	/* take care of dangling '.' */
+    p = strrchr( buf1, '.' );   /* take care of dangling '.' */
 
     if( ( p != NULL ) && ( * ( p + 1 ) == '\0' ) ) {
         *p = '\0';
@@ -155,11 +157,13 @@ static void fval( char *buff, char **bufc, double result ) {
  * Constant math funcs: PI, E
  */
 
-void fun_pi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_pi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_known_str( "3.141592654", 11, buff, bufc );
 }
 
-void fun_e( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )  {
+void fun_e( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_known_str( "2.718281828", 11, buff, bufc );
 }
 
@@ -169,7 +173,8 @@ void fun_e( char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
  * DEC, SQRT, EXP, LN, [A][SIN,COS,TAN][D]
  */
 
-void fun_sign( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sign( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL num;
 
     num = strtod( fargs[0], ( char ** ) NULL );
@@ -180,7 +185,8 @@ void fun_sign( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_abs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_abs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL num;
 
     num = strtod( fargs[0], ( char ** ) NULL );
@@ -193,7 +199,8 @@ void fun_abs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
 #ifdef FLOATING_POINTS
     char *oldp;
 
@@ -205,7 +212,7 @@ void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
-        x = 0.0;	/* FALLTHRU */
+        x = 0.0;    /* FALLTHRU */
     default:
         break;
     }
@@ -223,7 +230,8 @@ void fun_floor( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 #endif
 }
 
-void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
 #ifdef FLOATING_POINTS
     char *oldp;
 
@@ -235,7 +243,7 @@ void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
-        x = 0.0;	/* FALLTHRU */
+        x = 0.0;    /* FALLTHRU */
     default:
         break;
     }
@@ -253,7 +261,8 @@ void fun_ceil( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 #endif
 }
 
-void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
 #ifdef FLOATING_POINTS
     const char *fstr;
 
@@ -291,7 +300,7 @@ void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
-        x = 0.0;	/* FALLTHRU */
+        x = 0.0;    /* FALLTHRU */
     default:
         break;
     }
@@ -310,7 +319,8 @@ void fun_round( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 #endif
 }
 
-void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
 #ifdef FLOATING_POINTS
     NVAL x;
 
@@ -320,7 +330,7 @@ void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     case FP_EXP_WEIRD:
         return;
     case FP_EXP_ZERO:
-        x = 0.0;	/* FALLTHRU */
+        x = 0.0;    /* FALLTHRU */
     default:
         break;
     }
@@ -330,15 +340,18 @@ void fun_trunc( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 #endif
 }
 
-void fun_inc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_inc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) + 1 );
 }
 
-void fun_dec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_dec( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) - 1 );
 }
 
-void fun_sqrt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sqrt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL val;
 
     val = strtod( fargs[0], ( char ** ) NULL );
@@ -351,11 +364,13 @@ void fun_sqrt( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_exp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_exp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     fval( buff, bufc, exp( ( double ) strtod( fargs[0], ( char ** ) NULL ) ) );
 }
 
-void fun_ln( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ln( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL val;
 
     val = strtod( fargs[0], ( char ** ) NULL );
@@ -366,13 +381,14 @@ void fun_ln( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     }
 }
 
-void handle_trig( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_trig( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL val;
 
     int oper, flag;
 
     static double( *const trig_funcs[8] )( double ) = {
-        sin, cos, tan, NULL,	/* XXX no cotangent function */
+        sin, cos, tan, NULL,    /* XXX no cotangent function */
         asin, acos, atan, NULL
     };
 
@@ -446,7 +462,8 @@ static char from_base_36[256] = {
 
 static char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-void fun_baseconv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_baseconv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     long n, m;
 
     int from, to, isneg;
@@ -546,31 +563,38 @@ void fun_baseconv( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Math comparison funcs: GT, GTE, LT, LTE, EQ, NEQ, NCOMP
  */
 
-void fun_gt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_gt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) > strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_gte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_gte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) >= strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_lt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) < strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_lte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lte( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) <= strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_eq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_eq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) == strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_neq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_neq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, ( strtod( fargs[0], ( char ** ) NULL ) != strtod( fargs[1], ( char ** ) NULL ) ) );
 }
 
-void fun_ncomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ncomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL x, y;
 
     x = strtod( fargs[0], ( char ** ) NULL );
@@ -591,11 +615,13 @@ void fun_ncomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * POWER, LOG
  */
 
-void fun_sub( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sub( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     fval( buff, bufc, strtod( fargs[0], ( char ** ) NULL ) - strtod( fargs[1], ( char ** ) NULL ) );
 }
 
-void fun_div( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_div( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     long top, bot;
 
     /*
@@ -625,7 +651,8 @@ void fun_div( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     safe_ltos( buff, bufc, top );
 }
 
-void fun_floordiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_floordiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int top, bot, res;
 
     /*
@@ -661,7 +688,8 @@ void fun_floordiv( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     safe_ltos( buff, bufc, res );
 }
 
-void fun_fdiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_fdiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL bot;
 
     bot = strtod( fargs[1], ( char ** ) NULL );
@@ -672,7 +700,8 @@ void fun_fdiv( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_modulo( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_modulo( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int top, bot;
 
     /*
@@ -701,7 +730,8 @@ void fun_modulo( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     safe_ltos( buff, bufc, top );
 }
 
-void fun_remainder( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_remainder( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int top, bot;
 
     /*
@@ -730,7 +760,8 @@ void fun_remainder( char *buff, char **bufc, dbref player, dbref caller, dbref c
     safe_ltos( buff, bufc, top );
 }
 
-void fun_power( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_power( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL val1, val2;
 
     val1 = strtod( fargs[0], ( char ** ) NULL );
@@ -742,7 +773,8 @@ void fun_power( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_log( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_log( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL val, base;
 
     VaChk_Range( 1, 2 );
@@ -769,23 +801,28 @@ void fun_log( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * Bitwise two-argument integer math functions: SHL, SHR, BAND, BOR, BNAND
  */
 
-void fun_shl( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_shl( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) << ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_shr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_shr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) >> ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_band( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_band( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) & ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_bor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_bor( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) | ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) );
 }
 
-void fun_bnand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_bnand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, ( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) & ~( ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) ) );
 }
 
@@ -794,7 +831,8 @@ void fun_bnand( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * Multi-argument math functions: ADD, MUL, MAX, MIN
  */
 
-void fun_add( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_add( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL sum;
 
     int i;
@@ -811,7 +849,8 @@ void fun_add( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     return;
 }
 
-void fun_mul( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_mul( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL prod;
 
     int i;
@@ -828,7 +867,8 @@ void fun_mul( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     return;
 }
 
-void fun_max( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_max( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     NVAL max, val;
@@ -845,7 +885,8 @@ void fun_max( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_min( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_min( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     NVAL min, val;
@@ -867,7 +908,8 @@ void fun_min( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * bound(): Force a number to conform to specified bounds.
  */
 
-void fun_bound( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_bound( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL min, max, val;
 
     char *cp;
@@ -876,18 +918,18 @@ void fun_bound( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     val = strtod( fargs[0], ( char ** ) NULL );
 
-    if( nfargs < 2 ) {	/* just the number; no bounds enforced */
+    if( nfargs < 2 ) {  /* just the number; no bounds enforced */
         fval( buff, bufc, val );
         return;
     }
-    if( nfargs > 1 ) {	/* if empty, don't check the minimum */
+    if( nfargs > 1 ) {  /* if empty, don't check the minimum */
         for( cp = fargs[1]; *cp && isspace( *cp ); cp++ );
         if( *cp ) {
             min = strtod( fargs[1], ( char ** ) NULL );
             val = ( val < min ) ? min : val;
         }
     }
-    if( nfargs > 2 ) {	/* if empty, don't check the maximum */
+    if( nfargs > 2 ) {  /* if empty, don't check the maximum */
         for( cp = fargs[2]; *cp && isspace( *cp ); cp++ );
         if( *cp ) {
             max = strtod( fargs[2], ( char ** ) NULL );
@@ -902,7 +944,8 @@ void fun_bound( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * Integer point distance functions: DIST2D, DIST3D
  */
 
-void fun_dist2d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_dist2d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int d;
 
     double r;
@@ -915,7 +958,8 @@ void fun_dist2d( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     safe_ltos( buff, bufc, d );
 }
 
-void fun_dist3d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_dist3d( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int d;
 
     double r;
@@ -935,7 +979,8 @@ void fun_dist3d( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Math "accumulator" operations on a list: LADD, LMAX, LMIN
  */
 
-void fun_ladd( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ladd( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL sum;
 
     char *cp, *curr;
@@ -957,7 +1002,8 @@ void fun_ladd( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     fval( buff, bufc, sum );
 }
 
-void fun_lmax( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lmax( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL max, val;
 
     char *cp, *curr;
@@ -981,7 +1027,8 @@ void fun_lmax( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_lmin( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lmin( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     NVAL min, val;
 
     char *cp, *curr;
@@ -1011,7 +1058,8 @@ void fun_lmin( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_words)
  */
 
-void handle_vector( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_vector( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char **v1;
 
     int n, i, oper;
@@ -1076,7 +1124,8 @@ void handle_vector( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * Operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR, VAND, VXOR
  */
 
-void handle_vectors( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_vectors( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int oper;
@@ -1222,19 +1271,23 @@ void handle_vectors( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * Simple boolean funcs: NOT, NOTBOOL, T
  */
 
-void fun_not( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_not( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, !( int ) strtol( fargs[0], ( char ** ) NULL, 10 ) );
 }
 
-void fun_notbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_notbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, !xlate( fargs[0] ) );
 }
 
-void fun_t( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_t( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, xlate( fargs[0] ) );
 }
 
-int cvtfun( int flag, char *str ) {
+int cvtfun( int flag, char *str )
+{
     if( flag & LOGIC_BOOL ) {
         return ( xlate( str ) );
     } else {
@@ -1247,7 +1300,8 @@ int cvtfun( int flag, char *str ) {
  * Multi-argument boolean funcs: various combinations of
  * [L,C][AND,OR,XOR][BOOL]
  */
-void handle_logic( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_logic( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep;
 
     int flag, oper, i, val;
@@ -1334,7 +1388,8 @@ void handle_logic( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * ltrue() and lfalse(): Get boolean values for an entire list.
  */
 
-void handle_listbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_listbool( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int flag, n;
