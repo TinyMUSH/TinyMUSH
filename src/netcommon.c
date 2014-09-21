@@ -530,6 +530,7 @@ static void desc_delhash( DESC *d ) {
 void welcome_user( DESC *d ) {
     if(mudconf.have_pueblo == 1) {
     queue_rawstring( d, NULL, mudconf.pueblo_version );
+    queue_rawstring( d, NULL, "\r\n\r\n");
     }
     if( d->host_info & H_REGISTRATION ) {
         fcache_dump( d, FC_CONN_REG );

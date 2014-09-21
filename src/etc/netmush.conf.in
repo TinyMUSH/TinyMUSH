@@ -96,7 +96,7 @@ guest_char_num		16
 #
 # have_pueblo 		yes
 # pueblo_message	</xch_mudtext><img xch_mode=html><tt>
-# pueblo_version	This world is Pueblo 1.0 enhanced\r\n\r\n
+# pueblo_version	This world is Pueblo 1.0 enhanced
 #
 # -- Define other local aliases/parameters/whatnot here.
 #

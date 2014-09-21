@@ -135,7 +135,7 @@ void cf_init( void ) {
     mudconf.fixed_tel_msg = XSTRDUP( "", "cf_string" );
     mudconf.huh_msg = XSTRDUP( "Huh?  (Type \"help\" for help.)", "cf_string" );
     mudconf.pueblo_msg = XSTRDUP( "</xch_mudtext><img xch_mode=html><tt>", "cf_string" );
-    mudconf.pueblo_version = XSTRDUP( "This world is Pueblo 1.0 enhanced\r\n\r\n", "cf_string" );
+    mudconf.pueblo_version = XSTRDUP( "This world is Pueblo 1.0 enhanced", "cf_string" );
     mudconf.infotext_list = NULL;
     mudconf.indent_desc = 0;
     mudconf.name_spaces = 1;
