@@ -42,11 +42,11 @@ static void process_leave_loc( dbref thing, dbref dest, dbref cause, int canhear
         dest = Home( thing );
     }
 
-#ifdef PUEBLO_SUPPORT
+    if( mudconf.have_pueblo == 1) {
     if( Html( thing ) ) {
         notify_html( thing, "<xch_page clear=links>" );
     }
-#endif
+    }
 
     /*
      * Hook support first
@@ -111,9 +111,9 @@ static void process_enter_loc( dbref thing, dbref src, dbref cause, int canhear,
         return;
     }
 
-#ifdef PUEBLO_SUPPORT
+    if( mudconf.have_pueblo == 1) {
     show_vrml_url( thing, loc );
-#endif
+    }
 
     /*
      * Hook support first

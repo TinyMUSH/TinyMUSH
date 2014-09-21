@@ -5,13 +5,13 @@
 #include "system.h"
 
 #include "typedefs.h"           /* required by mudconf */
-#include "game.h" /* required by mudconf */
-#include "alloc.h" /* required by mudconf */
-#include "flags.h" /* required by mudconf */
-#include "htab.h" /* required by mudconf */
-#include "ltdl.h" /* required by mudconf */
-#include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
+#include "game.h" 		/* required by mudconf */
+#include "alloc.h" 		/* required by mudconf */
+#include "flags.h" 		/* required by mudconf */
+#include "htab.h" 		/* required by mudconf */
+#include "ltdl.h" 		/* required by mudconf */
+#include "udb.h" 		/* required by mudconf */
+#include "udb_defs.h"		/* required by mudconf */
 
 #include "mushconf.h"		/* required by code */
 
@@ -127,8 +127,7 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
                     if( buff != e )
                         safe_known_str( ( char * ) "  ", 2,
                                         buff, &e );
-#ifdef PUEBLO_SUPPORT
-                    if( Html( player ) ) {
+                    if( Html( player ) && (mudconf.have_pueblo == 1) ) {
                         e1 = buff1;
                         safe_exit_name( thing, buff1,
                                         &e1 );
@@ -148,21 +147,18 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
                         safe_str( ( char * ) "</a>", buff,
                                   &e );
                     } else {
-#endif
                         /*
                          * Append this exit to the list
                          */
                         safe_exit_name( thing, buff,
                                         &e );
-#ifdef PUEBLO_SUPPORT
                     }
-#endif
                 }
             }
         }
     }
 
-#ifdef PUEBLO_SUPPORT
+    if ( mudconf.have_pueblo == 1) {
     if( !( Transparent( loc ) ) ) {
         if( Html( player ) ) {
             safe_chr( '\r', buff, &e );
@@ -174,12 +170,12 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
             notify( player, buff );
         }
     }
-#else
+    } else {
     if( !( Transparent( loc ) ) ) {
         *e = '\0';
         notify( player, buff );
     }
-#endif				/* PUEBLO_SUPPORT */
+  }
 
     free_lbuf( buff );
     free_lbuf( buff1 );
@@ -196,11 +192,9 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
 
     char *buff;
 
-#ifdef PUEBLO_SUPPORT
     char *html_buff, *html_cp;
 
     char remote_num[32];
-#endif
 
     /*
      * Check if we're formatting contents in a player-specified way.
@@ -210,9 +204,9 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
         return;
     }
 
-#ifdef PUEBLO_SUPPORT
+    if(mudconf.have_pueblo == 1) {
     html_buff = html_cp = alloc_lbuf( "look_contents" );
-#endif
+    }
 
     /*
      * check to see if he can see the location
@@ -236,9 +230,8 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
                 if( Can_See( player, thing, can_see_loc ) ) {
                     buff =
                         unparse_object( player, thing, 1 );
-#ifdef PUEBLO_SUPPORT
                     html_cp = html_buff;
-                    if( Html( player ) ) {
+                    if( Html( player ) && (mudconf.have_pueblo == 1) ) {
                         safe_str( "<a xch_cmd=\"look ",
                                   html_buff, &html_cp );
                         /*
@@ -281,11 +274,8 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
                         *html_cp = 0;
                         notify_html( player, html_buff );
                     } else {
-#endif
                         notify( player, buff );
-#ifdef PUEBLO_SUPPORT
                     }
-#endif
                     free_lbuf( buff );
 
                 }
@@ -293,9 +283,9 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
             break;	/* we're done */
         }
     }
-#ifdef PUEBLO_SUPPORT
+    if(mudconf.have_pueblo == 1) {
     free_lbuf( html_buff );
-#endif
+    }
 }
 
 static void pairs_print( dbref player, char *atext, char *buff, char **bufc ) {
@@ -824,19 +814,19 @@ static void look_simple( dbref player, dbref thing, int obey_terse ) {
         did_it( player, thing, A_NULL, "You see nothing special.",
                 A_ODESC, NULL, A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
     else
-#ifndef PUEBLO_SUPPORT
+
+        if (mudconf.have_pueblo == 1) {
+        show_a_desc( player, thing, "You see nothing special." );        
+        } else {
         did_it( player, thing, A_DESC, "You see nothing special.",
                 A_ODESC, NULL, A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
-#else
-        show_a_desc( player, thing, "You see nothing special." );
-#endif
+        }
 
     if( !mudconf.quiet_look && ( !Terse( player ) || mudconf.terse_look ) ) {
         look_atrs( player, thing, 0, 0 );
     }
 }
 
-#ifdef PUEBLO_SUPPORT
 static void show_a_desc( dbref player, dbref loc, const char *msg ) {
     char *got2;
 
@@ -874,7 +864,6 @@ static void show_a_desc( dbref player, dbref loc, const char *msg ) {
         }
     }
 }
-#endif
 
 static void show_desc( dbref player, dbref loc, int key ) {
     char *got;
@@ -894,9 +883,9 @@ static void show_desc( dbref player, dbref loc, int key ) {
             did_it( player, loc, A_IDESC, NULL, A_ODESC, NULL,
                     A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
         else {
-#ifdef PUEBLO_SUPPORT
+            if( mudconf.have_pueblo == 1 ) {
             show_a_desc( player, loc, NULL );
-#else
+            } else {
             if( indent ) {
                 raw_notify_newline( player );
             }
@@ -905,13 +894,13 @@ static void show_desc( dbref player, dbref loc, int key ) {
             if( indent ) {
                 raw_notify_newline( player );
             }
-#endif
+            }
         }
         free_lbuf( got );
     } else {
-#ifdef PUEBLO_SUPPORT
+        if( mudconf.have_pueblo == 1) {
         show_a_desc( player, loc, NULL );
-#else
+        } else {
         if( indent ) {
             raw_notify_newline( player );
         }
@@ -920,7 +909,7 @@ static void show_desc( dbref player, dbref loc, int key ) {
         if( indent ) {
             raw_notify_newline( player );
         }
-#endif
+        }
     }
 }
 
@@ -939,14 +928,14 @@ void look_in( dbref player, dbref loc, int key ) {
         return;
     }
 
-#ifdef PUEBLO_SUPPORT
     /*
      * If he needs the VRML URL, send it:
      */
+    if( mudconf.have_pueblo == 1) {
     if( key & LK_SHOWVRML ) {
         show_vrml_url( player, loc );
     }
-#endif
+    }
 
     /*
      * If we can't format it in a player-specified way, then show
@@ -956,7 +945,7 @@ void look_in( dbref player, dbref loc, int key ) {
 
     if( !did_attr( player, loc, A_NAME_FMT ) ) {
         buff = unparse_object( player, loc, 1 );
-#ifdef PUEBLO_SUPPORT
+      if(mudconf.have_pueblo == 1) {
         if( Html( player ) ) {
             notify_html( player, "<center><h3>" );
             notify( player, buff );
@@ -964,9 +953,9 @@ void look_in( dbref player, dbref loc, int key ) {
         } else {
             notify( player, buff );
         }
-#else
+        } else {
         notify( player, buff );
-#endif
+        }
         free_lbuf( buff );
     }
 
@@ -2156,7 +2145,6 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
     olist_pop();
 }
 
-#ifdef PUEBLO_SUPPORT
 void show_vrml_url( dbref thing, dbref loc ) {
     char *vrml_url;
 
@@ -2188,4 +2176,3 @@ void show_vrml_url( dbref thing, dbref loc ) {
     }
     free_lbuf( vrml_url );
 }
-#endif

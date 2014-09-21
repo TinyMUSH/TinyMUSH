@@ -29,7 +29,7 @@
 #####
 
 ACLOCAL_AMFLAGS = -I m4
-AUTOMAKE_OPTIONS = foreign subdir-objects
+AUTOMAKE_OPTIONS = foreign
 AM_CPPFLAGS =
 AM_LDFLAGS =
 BUILT_SOURCES =

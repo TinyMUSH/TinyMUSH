@@ -309,9 +309,7 @@ FLAGENT	gen_flags[] = {
     { "HAS_LISTEN",	HAS_LISTEN,	'@',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
     { "HAS_PROPDIR",	HAS_PROPDIR,	',',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },
     { "PLAYER_MAILS",	PLAYER_MAILS,	'`',	FLAG_WORD2,	CA_GOD | CA_NO_DECOMP,	fh_god },
-#ifdef PUEBLO_SUPPORT
     { "HTML", 		HTML,		'~',	FLAG_WORD2,	0,			fh_any },
-#endif
     { "REDIR_OK",	REDIR_OK,	'>',	FLAG_WORD3,	0,			fh_any },
     { "HAS_REDIRECT",	HAS_REDIRECT,	'<',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },
     { "HAS_DARKLOCK",	HAS_DARKLOCK,	'.',	FLAG_WORD3,	CA_GOD | CA_NO_DECOMP,	fh_god },

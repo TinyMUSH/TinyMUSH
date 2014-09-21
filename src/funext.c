@@ -203,8 +203,6 @@ void fun_helptext( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Pueblo HTML-related functions.
  */
 
-#ifdef PUEBLO_SUPPORT
-
 void fun_html_escape( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
     html_escape( fargs[0], buff, bufc );
 }
@@ -304,5 +302,3 @@ void fun_url_unescape( char *buff, char **bufc, dbref player, dbref caller, dbre
     }
     return;
 }
-
-#endif				/* PUEBLO_SUPPORT */

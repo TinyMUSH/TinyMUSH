@@ -102,9 +102,7 @@ NAMETAB		emit_sw[] = {
     {( char * )"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
     {( char * )"here", 1, CA_PUBLIC, SAY_HERE | SW_MULTIPLE},
     {( char * )"room", 1, CA_PUBLIC, SAY_ROOM | SW_MULTIPLE},
-#ifdef PUEBLO_SUPPORT
     {( char * )"html", 1, CA_PUBLIC, SAY_HTML | SW_MULTIPLE},
-#endif
     {NULL, 0, 0, 0}
 };
 
@@ -309,9 +307,7 @@ NAMETAB		pemit_sw[] = {
     {( char * )"speech", 2, CA_PUBLIC, PEMIT_SPEECH | SW_MULTIPLE},
     {( char * )"list", 1, CA_PUBLIC, PEMIT_LIST | SW_MULTIPLE},
     {( char * )"noeval", 1, CA_PUBLIC, SW_NOEVAL | SW_MULTIPLE},
-#ifdef PUEBLO_SUPPORT
     {( char * )"html", 1, CA_PUBLIC, PEMIT_HTML | SW_MULTIPLE},
-#endif
     {NULL, 0, 0, 0}
 };
 

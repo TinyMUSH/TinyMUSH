@@ -18,12 +18,8 @@
 #define	FC_MOTD		8
 #define	FC_WIZMOTD	9
 #define	FC_QUIT		10
-#ifdef PUEBLO_SUPPORT
 #define FC_CONN_HTML    11
 #define FC_LAST         11
-#else
-#define FC_LAST         10
-#endif				/* PUEBLO_SUPPORT */
 
 /* File cache routines */
 

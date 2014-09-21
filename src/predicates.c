@@ -2161,7 +2161,8 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
                       &str, args, nargs );
             }
             *bp = '\0';
-#ifdef PUEBLO_SUPPORT
+
+            if( mudconf.have_pueblo == 1 ) {
             if( ( aflags & AF_HTML ) && Html( player ) ) {
                 char *buff_cp = buff + strlen( buff );
 
@@ -2170,9 +2171,9 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
             } else {
                 notify( player, buff );
             }
-#else
+            } else {
             notify( player, buff );
-#endif				/* PUEBLO_SUPPORT */
+            }
             free_lbuf( buff );
         } else if( def ) {
             notify( player, def );

@@ -107,7 +107,6 @@ struct timeval update_quotas( struct timeval last, struct timeval current ) {
     return msec_add( last, nslices * mudconf.timeslice );
 }
 
-#ifdef PUEBLO_SUPPORT
 /* raw_notify_html() -- raw_notify() without the newline */
 void raw_notify_html( dbref player, const char *format, ... ) {
     DESC *d;
@@ -146,7 +145,6 @@ void raw_notify_html( dbref player, const char *format, ... ) {
         queue_string( d, NULL, msg );
     }
 }
-#endif
 
 /* ---------------------------------------------------------------------------
  * raw_notify: write a message to a player
@@ -530,9 +528,9 @@ static void desc_delhash( DESC *d ) {
 }
 
 void welcome_user( DESC *d ) {
-#ifdef PUEBLO_SUPPORT
-    queue_rawstring( d, NULL, PUEBLO_SUPPORT_MSG );
-#endif
+    if(mudconf.have_pueblo == 1) {
+    queue_rawstring( d, NULL, mudconf.pueblo_version );
+    }
     if( d->host_info & H_REGISTRATION ) {
         fcache_dump( d, FC_CONN_REG );
     } else {
@@ -800,11 +798,11 @@ static void announce_connect( dbref player, DESC *d, const char *reason ) {
     loc = Location( player );
     s_Connected( player );
 
-#ifdef PUEBLO_SUPPORT
+    if(mudconf.have_pueblo == 1) {
     if( d->flags & DS_PUEBLOCLIENT ) {
         s_Html( player );
     }
-#endif
+    }
 
     if( *mudconf.motd_msg ) {
         if( mudconf.ansi_colors ) {
@@ -887,12 +885,12 @@ static void announce_connect( dbref player, DESC *d, const char *reason ) {
     time_str[strlen( time_str ) - 1] = '\0';
     record_login( player, 1, time_str, d->addr, d->username );
 
-#ifdef PUEBLO_SUPPORT
+    if(mudconf.have_pueblo == 1) {
     look_in( player, Location( player ),
              ( LK_SHOWEXIT | LK_OBEYTERSE | LK_SHOWVRML ) );
-#else
+    } else {
     look_in( player, Location( player ), ( LK_SHOWEXIT | LK_OBEYTERSE ) );
-#endif
+    }
     mudstate.curr_enactor = temp;
 }
 
@@ -940,9 +938,9 @@ void announce_disconnect( dbref player, DESC *d, const char *reason ) {
          */
 
         c_Connected( player );
-#ifdef PUEBLO_SUPPORT
+        if( mudconf.have_pueblo == 1) {
         c_Html( player );
-#endif
+        }
     } else {
         buf = alloc_mbuf( "announce_disconnect.partial" );
         sprintf( buf, "%s has partially disconnected.", Name( player ) );
@@ -1160,11 +1158,11 @@ static void dump_users( DESC *e, char *match, int key ) {
         match = NULL;
     }
 
-#ifdef PUEBLO_SUPPORT
+    if( mudconf.have_pueblo == 1) {
     if( ( e->flags & DS_PUEBLOCLIENT ) && ( Html( e->player ) ) ) {
         queue_string( e, NULL, "<pre>" );
     }
-#endif
+    }
 
     buf = alloc_mbuf( "dump_users" );
     if( key == CMD_SESSION ) {
@@ -1276,11 +1274,11 @@ static void dump_users( DESC *e, char *match, int key ) {
     sprintf( buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, ( count == 1 ) ? " " : "s ", mudstate.record_players, ( mudconf.max_players == -1 ) ? "no" : s ); 
     queue_rawstring( e, NULL, buf );
 
-#ifdef PUEBLO_SUPPORT
+    if( mudconf.have_pueblo == 1) {
     if( ( e->flags & DS_PUEBLOCLIENT ) && ( Html( e->player ) ) ) {
         queue_string( e, NULL, "</pre>" );
     }
-#endif
+    }
 
     free_mbuf( buf );
 }
@@ -1778,7 +1776,7 @@ static void logged_out_internal( DESC *d, int key, char *arg ) {
         dump_info( d );
         break;
     case CMD_PUEBLOCLIENT:
-#ifdef PUEBLO_SUPPORT
+        if( mudconf.have_pueblo == 1) {
         /*
          * Set the descriptor's flag
          */
@@ -1793,9 +1791,9 @@ static void logged_out_internal( DESC *d, int key, char *arg ) {
         queue_write( d, "\r\n", 2 );
         fcache_dump( d, FC_CONN_HTML );
         log_write( LOG_LOGIN, "CON", "HTML", "[%d/%s] PuebloClient enabled.", d->descriptor, d->addr );
-#else
+        } else {
         queue_rawstring( d, NULL, "Sorry. This MUSH does not have Pueblo support enabled.\r\n" );
-#endif
+        }
         break;
     default:
         log_write( LOG_BUGS, "BUG", "PARSE", "Logged-out command with no handler: '%s'", mudstate.debug_cmd );

@@ -687,8 +687,6 @@ static char *dflt_from_msg( dbref sender, dbref sendloc )
     return tbuff;
 }
 
-#ifdef PUEBLO_SUPPORT
-
 /*
  * Do HTML escaping, converting < to &lt;, etc.  'dest' needs to be allocated
  * & freed by the caller.
@@ -730,8 +728,6 @@ void html_escape( const char *src, char *dest, char **destp )
     }
     **destp = '\0';
 }
-
-#endif				/* PUEBLO_SUPPORT */
 
 #define OK_To_Send(p,t)  (!herekey || \
 			  ((!Unreal(p) || \
@@ -827,11 +823,11 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     switch( Typeof( target ) ) {
     case TYPE_PLAYER:
         if( will_send ) {
-#ifndef PUEBLO_SUPPORT
+            if(mudconf.have_pueblo == 1) {
             if( key & MSG_ME ) {
                 raw_notify( target, NULL, msg_ns);
             }
-#else
+            } else {
             if( key & MSG_ME ) {
                 if( key & MSG_HTML ) {
                     raw_notify_html( target, NULL, msg_ns);
@@ -848,7 +844,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                     }
                 }
             }
-#endif				/* ! PUEBLO_SUPPORT */
+            }
             if( !mudconf.player_listen ) {
                 check_listens = 0;
             }
@@ -1097,11 +1093,11 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
             }
             DOLIST( obj, Contents( target ) ) {
                 if( obj != target ) {
-#ifdef PUEBLO_SUPPORT
+                    if(mudconf.have_pueblo == 1) {
                     notify_check( obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | ( key & MSG_HTML ) | herekey, NULL, buff );
-#else
+                    } else {
                     notify_check( obj, sender,  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | herekey, NULL, buff );
-#endif				/* PUEBLO_SUPPORT */
+                    }
                 }
             }
             if( key & MSG_S_OUTSIDE ) {
@@ -1412,9 +1408,9 @@ int backup_mush( dbref player, dbref cause, int key )
     txt = add_array( txt, mudconf.full_file, &txt_n, "backup_mush" );
     txt = add_array( txt, mudconf.site_file, &txt_n, "backup_mush" );
     txt = add_array( txt, mudconf.crea_file, &txt_n, "backup_mush" );
-#ifdef PUEBLO_SUPPORT
+    if(mudconf.have_pueblo == 1) {
     txt = add_array( txt, mudconf.htmlconn_file, &txt_n, "backup_mush" );
-#endif
+    }
 
     /*
      * Next, get a list of all our config files
@@ -3019,11 +3015,11 @@ int main( int argc, char *argv[] )
     if( mudconf.crea_file == NULL ) {
         mudconf.crea_file = xstrprintf( "main_mudconf_crea_file", "%s/newuser.txt", mudconf.txthome );
     }
-#ifdef PUEBLO_SUPPORT
+    if( mudconf.have_pueblo == 1 ) {
     if( mudconf.htmlconn_file == NULL ) {
         mudconf.htmlconn_file = xstrprintf( "main_mudconf_htmlconn_file", "%s/htmlconn.txt", mudconf.txthome );
     }
-#endif
+    }
 
     vattr_init();
 

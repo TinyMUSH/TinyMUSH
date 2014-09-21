@@ -420,12 +420,6 @@
 /* Max length for player names */
 #undef PLAYER_NAME_LIMIT
 
-/* Support for Pueblo Clients */
-#undef PUEBLO_SUPPORT
-
-/* Pueblo support message */
-#undef PUEBLO_SUPPORT_MSG
-
 /* Enable malloc wrapper tracker */
 #undef RAW_MEMTRACKING
 

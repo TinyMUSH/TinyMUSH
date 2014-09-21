@@ -215,17 +215,6 @@ AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_module_dbsql" = 
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_module_dbsql" = "xpgsql"])
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_module_dbsql" = "xsqlite"])
 
-AC_MSG_CHECKING([whether to enable pueblo support])
-AC_ARG_ENABLE([pueblo-support], [AS_HELP_STRING([--enable-pueblo-support], [Enable support for Pueblo clients @<:@default=yes@:>@])],
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [ 
-  AC_MSG_RESULT([yes])
-  enable_pueblo_support="yes"
- ]
-)
-AS_IF([test "x$enable_pueblo_support" = "xyes"], [AC_DEFINE([PUEBLO_SUPPORT],[1], [Support for Pueblo Clients])])
-
 AC_MSG_CHECKING([whether to enable command lag detection support])
 AC_ARG_ENABLE([lag-checking], [AS_HELP_STRING([--enable-lag-checking], [Enable warnings that a certain command has exceeded a certain amount of wall-clock time to execute. Disable this if you have severe problems with computational resources on your host machine. @<:@default=yes@:>@])],
  [
@@ -317,11 +306,6 @@ AC_MSG_CHECKING([length of the DOING field in WHO])
 AC_ARG_WITH([doing-length], [AS_HELP_STRING([--with-doing-length=NUMBER], [length of the DOING field in WHO @<:@default=41@:>@])], [with_doing_length=$withval], [with_doing_length=41])
 AC_MSG_RESULT([$with_doing_length])
 AC_DEFINE_UNQUOTED([DOING_LEN], [${with_doing_length}], [length of the DOING field in WHO])
-
-AC_MSG_CHECKING([for Pueblo support message])
-AC_ARG_WITH([pueblo-msg], [AS_HELP_STRING([--with-pueblo-msg="TEXT"], [Text that indicate Pueblo Support @<:@default="This world is Pueblo 1.0 enhanced\r\n\r\n"@:>@])], [with_pueblo_msg="$withval"], [with_pueblo_msg="This world is Pueblo 1.0 enhanced\r\n\r\n"])
-AC_MSG_RESULT([$with_pueblo_msg])
-AC_DEFINE_UNQUOTED([PUEBLO_SUPPORT_MSG], ["${with_pueblo_msg}"], [Pueblo support message])
 
 AX_BOX([Checks for platform])
 # Checks for platform.
@@ -517,7 +501,6 @@ AX_PRINT([
                         %BMarkers
 ---------------------------------%b
      separator for marker flags : %B$with_flag_sep%b
-         Pueblo support message : %B$with_pueblo_msg%b
 
                        %BDatabase
 -------------------------------%b
@@ -531,8 +514,6 @@ AX_PRINT([
 
                            %BMisc
 -------------------------------%b
-                 Pueblo clients : %B$enable_pueblo_support%b
-IEEE 754 floating point support	: %B$enable_floating_point%b
           Command lag detection : %B$enable_lag_checking%b
  Per-object time usage tracking : %B$enable_time_checking%b
               CPU time checking : %B$enable_cpu_checking%b

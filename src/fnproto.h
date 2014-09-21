@@ -5,12 +5,10 @@
 #ifndef __FNPROTO_H
 #define __FNPROTO_H
 
-#ifdef PUEBLO_SUPPORT
 extern void fun_html_escape( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
 extern void fun_html_unescape( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
 extern void fun_url_escape( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
 extern void fun_url_unescape( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
-#endif				/* PUEBLO SUPPORT */
 
 extern void fun_config( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
 extern void fun_lwho( char *, char **, dbref, dbref, dbref, char *[], int, char *[], int );
@@ -494,10 +492,8 @@ FUN		flist      [] = {
     {"HEARS", handle_okpres, 2, PRESFN_HEARS, CA_PUBLIC, NULL},
     {"HELPTEXT", fun_helptext, 2, 0, CA_PUBLIC, NULL},
     {"HOME", fun_home, 1, 0, CA_PUBLIC, NULL},
-#ifdef PUEBLO_SUPPORT
     {"HTML_ESCAPE", fun_html_escape, -1, 0, CA_PUBLIC, NULL},
     {"HTML_UNESCAPE", fun_html_unescape, -1, 0, CA_PUBLIC, NULL},
-#endif				/* PUEBLO_SUPPORT */
     /* - I - */
     {"IBREAK", fun_ibreak, 1, 0, CA_PUBLIC, NULL},
     {"IDLE", handle_conninfo, 1, CONNINFO_IDLE, CA_PUBLIC, NULL},
@@ -755,10 +751,8 @@ FUN		flist      [] = {
     {"UNSTRUCTURE", fun_unstructure, 1, FN_VARFX, CA_PUBLIC, NULL},
     {"UNTIL", fun_until, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"UPRIVATE", do_ufun, 0, FN_VARARGS | U_PRIVATE, CA_PUBLIC, NULL},
-#ifdef PUEBLO_SUPPORT
     {"URL_ESCAPE", fun_url_escape, -1, 0, CA_PUBLIC, NULL},
     {"URL_UNESCAPE", fun_url_unescape, -1, 0, CA_PUBLIC, NULL},
-#endif				/* PUEBLO_SUPPORT */
     {"USETRUE", handle_ifelse, 0, IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"USEFALSE", handle_ifelse, 0, IFELSE_FALSE | IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     /* - V - */

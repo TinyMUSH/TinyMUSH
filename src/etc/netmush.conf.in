@@ -92,6 +92,12 @@ player_starting_home	45
 master_room		2
 guest_char_num		16
 #
+# -- Pueblo Support
+#
+# have_pueblo 		yes
+# pueblo_message	</xch_mudtext><img xch_mode=html><tt>
+# pueblo_version	This world is Pueblo 1.0 enhanced\r\n\r\n
+#
 # -- Define other local aliases/parameters/whatnot here.
 #
 #

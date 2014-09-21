@@ -156,10 +156,9 @@ struct confdata {
     char	*fixed_home_msg; /* Message displayed when going home and FIXED */
     char	*fixed_tel_msg; /* Message displayed when teleporting and FIXED */
     char	*huh_msg;	/* Message displayed when a Huh? is gotten */
-#ifdef PUEBLO_SUPPORT
     char    *pueblo_msg;	/* Message displayed to Pueblo clients */
+    char    *pueblo_version;	/* Message displayed to indicate Pueblo's capabilities */
     char	*htmlconn_file;	/* display on PUEBLOCLIENT message */
-#endif
     char	*exec_path;	/* argv[0] */
     LINKEDLIST *infotext_list; /* Linked list of INFO fields and values */
     int	indent_desc;	/* Newlines before and after descs? */

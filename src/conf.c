@@ -123,9 +123,7 @@ void cf_init( void ) {
     mudconf.full_file = NULL;
     mudconf.site_file = NULL;
     mudconf.crea_file = NULL;
-#ifdef PUEBLO_SUPPORT
     mudconf.htmlconn_file = NULL;
-#endif
 
     mudconf.motd_msg = XSTRDUP( "", "cf_string" );
     mudconf.wizmotd_msg = XSTRDUP( "", "cf_string" );
@@ -136,20 +134,15 @@ void cf_init( void ) {
     mudconf.fixed_home_msg = XSTRDUP( "", "cf_string" );
     mudconf.fixed_tel_msg = XSTRDUP( "", "cf_string" );
     mudconf.huh_msg = XSTRDUP( "Huh?  (Type \"help\" for help.)", "cf_string" );
-#ifdef PUEBLO_SUPPORT
     mudconf.pueblo_msg = XSTRDUP( "</xch_mudtext><img xch_mode=html><tt>", "cf_string" );
-#endif
+    mudconf.pueblo_version = XSTRDUP( "This world is Pueblo 1.0 enhanced\r\n\r\n", "cf_string" );
     mudconf.infotext_list = NULL;
     mudconf.indent_desc = 0;
     mudconf.name_spaces = 1;
     mudconf.fork_dump = 0;
     mudconf.fork_vfork = 0;
     mudconf.dbopt_interval = 0;
-#ifdef PUEBLO_SUPPORT
     mudconf.have_pueblo = 1;
-#else
-    mudconf.have_pueblo = 0;
-#endif
     mudconf.have_zones = 1;
     mudconf.paranoid_alloc = 0;
     mudconf.sig_action = SA_DFLT;
@@ -1961,7 +1954,7 @@ CONF		conftable [] = {
     { ( char * ) "guest_site", cf_site, CA_GOD, CA_DISABLED, ( int * )&mudstate.access_list, H_GUEST},
     { ( char * ) "guest_starting_room", cf_dbref, CA_GOD, CA_WIZARD, &mudconf.guest_start_room, NOTHING},
 
-    { ( char * ) "have_pueblo", cf_const, CA_STATIC, CA_PUBLIC, &mudconf.have_pueblo, ( long ) "Pueblo client extensions are supported"},
+    { ( char * ) "have_pueblo", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.have_pueblo, ( long ) "Pueblo client extensions are supported"},
     { ( char * ) "have_zones", cf_bool, CA_STATIC, CA_PUBLIC, &mudconf.have_zones, ( long ) "Multiple control via ControlLocks is permitted"},
 
     { ( char * ) "helpfile", cf_helpfile, CA_STATIC, CA_DISABLED, NULL, 0},
@@ -1971,10 +1964,9 @@ CONF		conftable [] = {
 
     { ( char * ) "hostnames", cf_bool, CA_GOD, CA_WIZARD, &mudconf.use_hostname, ( long ) "DNS lookups are done on hostnames"},
 
-#ifdef PUEBLO_SUPPORT
     { ( char * ) "html_connect_file", cf_string, CA_STATIC, CA_GOD, ( int * )&mudconf.htmlconn_file, MBUF_SIZE},
     { ( char * ) "pueblo_message", cf_string, CA_GOD, CA_WIZARD, ( int * )&mudconf.pueblo_msg, GBUF_SIZE},
-#endif
+    { ( char * ) "pueblo_version", cf_string, CA_GOD, CA_WIZARD, ( int * )&mudconf.pueblo_msg, GBUF_SIZE},
 
     { ( char * ) "huh_message", cf_string, CA_GOD, CA_PUBLIC, ( int * )&mudconf.huh_msg, MBUF_SIZE},
     { ( char * ) "idle_wiz_dark", cf_bool, CA_GOD, CA_WIZARD, &mudconf.idle_wiz_dark, ( long ) "Wizards who idle are set DARK"},
