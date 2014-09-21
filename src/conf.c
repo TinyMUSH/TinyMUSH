@@ -1966,7 +1966,7 @@ CONF		conftable [] = {
 
     { ( char * ) "html_connect_file", cf_string, CA_STATIC, CA_GOD, ( int * )&mudconf.htmlconn_file, MBUF_SIZE},
     { ( char * ) "pueblo_message", cf_string, CA_GOD, CA_WIZARD, ( int * )&mudconf.pueblo_msg, GBUF_SIZE},
-    { ( char * ) "pueblo_version", cf_string, CA_GOD, CA_WIZARD, ( int * )&mudconf.pueblo_msg, GBUF_SIZE},
+    { ( char * ) "pueblo_version", cf_string, CA_GOD, CA_WIZARD, ( int * )&mudconf.pueblo_version, GBUF_SIZE},
 
     { ( char * ) "huh_message", cf_string, CA_GOD, CA_PUBLIC, ( int * )&mudconf.huh_msg, MBUF_SIZE},
     { ( char * ) "idle_wiz_dark", cf_bool, CA_GOD, CA_WIZARD, &mudconf.idle_wiz_dark, ( long ) "Wizards who idle are set DARK"},
