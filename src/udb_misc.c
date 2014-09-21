@@ -1,11 +1,5 @@
 /* udb_misc.c - Misc support routines for unter style error management. */
 
-/*
- * Stolen from mjr.
- *
- * Andrew Molitor, amolitor@eagle.wesleyan.edu
- */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"

@@ -4,6 +4,7 @@
  * The philosophy is to keep this program as simple/small as possible.
  * It does normal fork()s, so the smaller it is, the faster it goes.
  */
+
 #include "copyright.h"
 #include "config.h"
 #include "system.h"

@@ -1,10 +1,4 @@
-/*!
- * \file log.c
- *
- * \date
- *
- * Handle log files and log events.
- */
+/* log.c - Handle log files and log events */
 
 #include "copyright.h"
 #include "config.h"

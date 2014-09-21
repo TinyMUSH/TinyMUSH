@@ -1,7 +1,5 @@
 /* udb_obj.c - Binary object handling gear. */
 
-/* Originally written by Andrew Molitor, amolitor@nmsu.edu 1992 */
-
 /* Why not just write the attributes individually to disk? Well, when you're
  * running on a platform that does synchronous writes with a large database,
  * thousands of I/O operations tend to be expensive. When you 'coalesce'

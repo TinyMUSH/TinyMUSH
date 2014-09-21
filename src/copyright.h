@@ -10,7 +10,7 @@ TinyMUSH 3 Copyright: The Artistic License 2.0
 
 TinyMUSH 3 Source Code:
 
-Copyright (c) 2011, 2012, TinyMUSH development team.
+Copyright (c) 2011, 2014, TinyMUSH development team.
 Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by Lydia Leong,
               David Passmore, Robby Griffin, Scott Dorr, and Eddy Beaupre.
 Copyright (c) 2001, 2002, 2003, by Lydia Leong, David Passmore,

@@ -1,9 +1,5 @@
 /* udb_ochunk.c */
 
-/*
- * Copyright (C) 1991, Marcus J. Ranum. All rights reserved.
- */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"

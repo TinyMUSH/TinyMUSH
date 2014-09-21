@@ -7,6 +7,8 @@ issues:
 - Susan Tussing, who fixed some issues with structures.
 - Stephen Dennis, who pointed out an old bug in mail.c dating from
   TinyMUX 1.6.
+- Ashen-Shugar, who's continously pointing out new bugs and throwing
+  in an idea now and then.
 
 TinyMUSH 3.2 Credits
 ====================
