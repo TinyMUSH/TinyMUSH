@@ -1480,19 +1480,17 @@ int backup_mush( dbref player, dbref cause, int key ) {
     }
 
     /* We have everything we need to backup, create a temp directory*/
-    s = xstrprintf("backup_mush", "%s/backup.XXX", mudconf.bakhome );
-    if( ( buff = mkdtemp( s ) ) == NULL ) {
+    tmpdir = xstrprintf("backup_mush", "%s/backup.XXXXXX", mudconf.bakhome );
+    if( ( mkdtemp( tmpdir ) ) == NULL ) {
         log_write( LOG_ALWAYS, "BCK", "MKDIR", "Unable to create temp directory" );
         if( player != NOTHING ) {
             notify( player, "Backup abort, Unable to create temp directory" );
             raw_broadcast( 0, "GAME: Backup finished." );
         }
+        XFREE( tmpdir, "backup_mush" );
         return ( -1 );
     }
-    XFREE( s, "backup_mush" );
-
-    tmpdir = XSTRDUP( buff, "backup_mush" );
-
+    
     log_write( LOG_ALWAYS, "BCK", "INFO", "Creating backup set" );
 
     if( player != NOTHING ) {
@@ -1513,8 +1511,6 @@ int backup_mush( dbref player, dbref cause, int key ) {
     for( i=0; dbf[i]!=NULL; i++ ) {
         backup_copy( dbf[i], tmpdir, 1 );
     }
-
-    XFREE( s, "backup_mush" );
 
     /* Create our backup config file */
 
@@ -1566,15 +1562,17 @@ int backup_mush( dbref player, dbref cause, int key ) {
             notify( player, "Unable to get the current working directory" );
             raw_broadcast( 0, "GAME: Backup finished." );
         }
+        XFREE( s, "backup_mush" );
         return ( -1 );
     }
 
     if( chdir( tmpdir ) == -1 ) {
-        log_write( LOG_ALWAYS, "BCK", "SETCD", "Unable to set the working directory" );
+        log_write( LOG_ALWAYS, "BCK", "SETCD", "Unable to set the working directory (%s)", tmpdir );
         if( player != NOTHING ) {
             notify( player, "Unable to set the working directory" );
             raw_broadcast( 0, "GAME: Backup finished." );
         }
+        XFREE( s, "backup_mush" );
         return ( -1 );
     }
 
@@ -1616,10 +1614,8 @@ int backup_mush( dbref player, dbref cause, int key ) {
     }
 
     free( cwd );
-
     XFREE( buff, "backup_mush" );
     XFREE( s, "backup_mush" );
-
 
     /* Cleanup */
 
@@ -1686,9 +1682,9 @@ int backup_mush( dbref player, dbref cause, int key ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Unable to remove directory %s", tmpdir );
         }
     }
-
+    
     XFREE( tmpdir, "backup_mush" );
-
+    
     log_write( LOG_ALWAYS, "BCK", "INFO", "Backup done" );
 
     if( player != NOTHING ) {
