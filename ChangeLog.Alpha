@@ -1,6 +1,154 @@
 TinyMUSH 3.3
 ------------
 
+Alpha 6 : 2014-09-21
+
+commit 078fc74c7e1505cfd19e10e9cc3ab99ef7aa4540
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 13:47:16 2014 -0400
+
+    TinyMUSH 3.3 Alpha 6.
+
+commit 75322b210c9fddaf8866840fb99f16a63db6751b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 13:40:21 2014 -0400
+
+    QDBM is now the default database. Fix autoconf warnings. Fix module's version.
+
+commit cd0f26c01b63e7fd1df32c111a0c540442eaf2c0
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 11:18:08 2014 -0400
+
+    Copyright Cleanup.
+
+commit 88f1fbf3a9bc0f483eae9f67c8165ab4a379a95f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 10:32:28 2014 -0400
+
+    Now use libpcre instead of the build-in pcre functions.
+
+commit 8e8a243e03cd9218dd83cf9c4666443bd224b2f9
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 20 21:53:38 2014 -0400
+
+    Fix automatic backup at startup.
+
+commit e15471506f40a909618cabfc2ee5497eb5bde5e2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 20 19:57:02 2014 -0400
+
+    Fix another batch of warnings.
+
+commit 14df241e9e380723528eb8812d18f603801e235b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 20 09:29:33 2014 -0400
+
+    Add bugcheck and fix warnings in game.c
+
+commit 3a83630db202476111883c11b9e2f2c762aa099f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Jun 1 00:29:47 2014 -0400
+
+    Fix a bug in div.
+
+commit 308c895c27c0651432a9c68e44e4d3628c447d7f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat May 31 22:00:18 2014 -0400
+
+    Fix a bug in ansi_map_states (freeing a moving pointer...)
+
+commit dbc8934a0078b87a07959c6fcf7d7a2d79cd37c1
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri May 30 19:22:17 2014 -0400
+
+    Bug Fix.
+
+commit 16bbc58481301611f16c8272e35e446b5f8444c9
+Merge: 9cd12ab c4f4e4f
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri May 30 19:08:53 2014 -0400
+
+    Merge branch 'master' of ssh://git.code.sf.net/p/tinymush/code
+    
+    Conflicts:
+    	configure
+    
+    Merging with upstream
+
+commit 9cd12abf5d5a1dbb1d875ea798b87a2429e8f9da
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri May 30 19:06:49 2014 -0400
+
+    Fix page and other crashing game...
+
+commit c4f4e4faaaff42bb59e1c9e89b1c73e17ec49113
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Nov 20 22:57:08 2013 -0500
+
+    Cleanup.
+
+commit 0b8cea6647fef70747f289cbb9b6f09bb57d2a85
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Nov 20 22:02:09 2013 -0500
+
+    Remove compatibility shim for older libc.
+
+commit 4dff16a8f0f94e3b3822dd0e1f7b62307905dd43
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Jul 20 12:57:13 2013 -0400
+
+    BugFix in strip_ansi_len. + Found bug between 32/64 bit os transition.
+    
+    strip_ansi_len wasn't freeing the good pointer. Fixed.
+    
+    Found a bug when importing a flatfile that was created on a 32 bit system to
+    a 64 bit system, since i'm leaving on vacation for a while, i don't have time
+    to fix it but there's a temporary fix, you just need to compile the game 32 bit
+    and it will work (./configure "CFLAGS=-g -m32" "CXXFLAGS=-g -m32" "LDFLAGS=-m32").
+    Of course you need to install wathever your OS need to be able to run 32 bits
+    software (FreeBSD got it out of the box, Linux generally need a few more thingies,
+    like for Ubuntu : sudo apt-get install gcc-multilib g++-multilib).
+
+commit 90975bbaf96b2fe26e6fe4a7dde4b6b5610ebd31
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Apr 23 13:43:36 2013 -0400
+
+    - Misc: Added files to .gitignore
+
+commit ad32a1976ba7e33fa8cf5558ce40455a52af0d52
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Apr 23 11:34:35 2013 -0400
+
+    - Fixed a bug in funstring.c ending up in an eternal loop...
+
+commit 47ad710ee105dd29ad98fa46296cb7f1aa4ba182
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jan 9 19:58:05 2013 -0500
+
+    -Fix : Fix a bug in strip_ansi making it crash when the string is empty (introduced in this alpha release).
+    -New : More check in XSTRDUP for empty sources.
+
+commit 245a5a4658d64f7899ea4227ac409b82f29884a9
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Jan 6 21:02:10 2013 -0500
+
+    -New: XTERM ansi now accept rgb values (in hex or decimal values) and control codes.
+    -New: Updated help to reflect new XTERM options and the new COLOR256 flag.
+
+commit 476e550f647cde90402d4157469b3311df9dc6d4
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Jan 6 00:10:02 2013 -0500
+
+    -New: xterm-256 color support. Work for %x and ansi substitution, format is %x<fg_color>/<bg_color> or ansi(<fg_color>/<bg_color>,...). Right now fg_color and bg_color are using the standard xterm definition of color. Going to make a conversion table (mux style) next so both values can be used.
+
+commit d8859d1b6fb2a992d7a6d7e33a44a4c0b71a2f1d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Jan 5 17:29:53 2013 -0500
+
+    -Fix: typedefs.h was include twices.
+    -Misc: Add flag COLOR256 in preparation for xterm support.
+    -Misc: Converted ansi macros to functions in preparation for xterm support.
+
 Alpha 4 : 2013-01-02
 
 commit 1026b3405320de06a27daf90fd0df9d7f3dc40b0
