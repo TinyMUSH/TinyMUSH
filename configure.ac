@@ -1,14 +1,14 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.68])
+AC_PREREQ([2.69])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
-m4_define(TINYMUSH_VERSION, [3.3.0.4])
-m4_define(TINYMUSH_RELEASE_DATE, ["2013-01-02"])
-m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2012 TinyMUSH development team.])
+m4_define(TINYMUSH_VERSION, [3.3.0.5])
+m4_define(TINYMUSH_RELEASE_DATE, ["2014-09-21"])
+m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2014 TinyMUSH development team.])
 
-AC_INIT([TinyMUSH], TINYMUSH_VERSION, [tinymush-bugs@lists.sourceforge.net], [tinymush], [http://tinymush.sourceforge.net])
+AC_INIT([TinyMUSH],[TINYMUSH_VERSION],[tinymush-bugs@lists.sourceforge.net],[tinymush],[http://tinymush.sourceforge.net])
 
 AX_VERSION()
 
@@ -25,10 +25,9 @@ dnl PACKAGE_VERSION_MINOR
 dnl PACKAGE_RELEASE_STATUS
 dnl PACKAGE_RELEASE_NAME
 dnl PACKAGE_RELEASE_REVISION
-dnl And we manually create a few other things tha need to be updated from time to time.
-dnl
-PACKAGE_RELEASE_DATE="2013-01-02"
-PACKAGE_COPYRIGHT="Copyright (C) 2012 TinyMUSH development team."
+dnl And we manually create a few other things that need to be updated from time to time.
+dnl PACKAGE_RELEASE_DATE="2013-01-02"
+dnl PACKAGE_COPYRIGHT="Copyright (C) 2012 TinyMUSH development team."
 
 dnl Some default values
 dnl
@@ -60,14 +59,12 @@ AX_BOX([Checks for programs])
 # Checks for programs.
 
 AC_PROG_CC
-gl_EARLY
-gl_INIT
 AC_PROG_CPP
 AC_PROG_CPP_WERROR
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL
+LT_INIT
 
 AC_PATH_PROGS([with_tar_prog], [tar], AC_MSG_ERROR([not found]))
 AC_PATH_PROGS([with_compress_prog], [gzip], AC_MSG_ERROR([not found]))
@@ -118,9 +115,9 @@ AH_BOTTOM([
 
 AC_MSG_CHECKING([dbm engine to use])
 AC_ARG_WITH([dbm],
- [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use TinyMUSH-GDBM hash database driver, This is the historical driver used by most games or qdbm : Use TinyMUSH-QDBM hash database driver. A newer implementation of the DBM engine, a compromise between gdbm and memory-based cache. @<:@default=gdbm@:>@])],
- [AS_CASE([$withval], [gdbm], [with_dbm="gdbm"], [qdbm], [with_dbm="qdbm"], [with_dbm="gdbm"])], 
- [with_dbm="gdbm"])
+ [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use the traditional GDBM hash database driver, or qdbm : Use the new QDBM hash database driver. A newer implementation of the DBM engine. @<:@default=qdbm@:>@])],
+ [AS_CASE([$withval], [gdbm], [with_dbm="gdbm"], [qdbm], [with_dbm="qdbm"], [with_dbm="qdbm"])], 
+ [with_dbm="qdbm"])
 AC_MSG_RESULT([$with_dbm])
 
 AS_IF([test "x$with_dbm" = "xqdbm"], 
@@ -130,7 +127,7 @@ AS_IF([test "x$with_dbm" = "xqdbm"],
  ], 
  [
   AC_DEFINE([MUSH_DBM], ["GDBM"], [TinyGDBM dbm used])
-  AC_DEFINE([HAVE_LIBTINYGDBM_H], [1], [Define to 1 if you have <libtinyqdbm.h>.])
+  AC_DEFINE([HAVE_LIBTINYGDBM_H], [1], [Define to 1 if you have <libtinygdbm.h>.])
  ]
 )
 
@@ -366,6 +363,7 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h])
+AS_IF([test "x$with_dbm" = "xgdbm"],[AC_CHECK_HEADERS([gdbm.h])]) 
 
 AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.
@@ -375,24 +373,34 @@ AC_C_CHAR_UNSIGNED
 AC_C_INLINE
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
-AC_TYPE_SIGNAL
+AC_DIAGNOSE([obsolete],[your code may safely assume C89 semantics that RETSIGTYPE is void.
+Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
 AC_STRUCT_TIMEZONE
-#AC_ST_BLKSIZE
 
 AC_MSG_CHECKING([for struct linger in sys/socket.h])
-AC_TRY_COMPILE([#include <sys/types.h>
-#include <sys/socket.h>] , [struct linger ling; ling.l_onoff = 1;], AC_DEFINE([HAVE_LINGER], [1], [Define if your <sys/socket.h> declares `struct linger'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/socket.h> ]], [[struct linger ling; ling.l_onoff = 1;]])],[AC_DEFINE(HAVE_LINGER, 1, Define if your <sys/socket.h> declares `struct linger'.) AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for union wait in sys/wait.h])
-AC_TRY_COMPILE([#include <sys/wait.h>],[union wait stat;], AC_DEFINE([HAVE_UNION_WAIT], [1], [Define if your <sys/wait.h> declares `union wait'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/wait.h>]], [[union wait stat;]])],[AC_DEFINE(HAVE_UNION_WAIT, 1, Define if your <sys/wait.h> declares `union wait'.) AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for struct rusage completeness in sys/resource.h])
-AC_TRY_COMPILE([#include <sys/resource.h>], [struct rusage usage; usage.ru_ixrss = 1], AC_DEFINE([STRUCT_RUSAGE_COMPLETE], [1], [Define if your <sys/resource.h> declares everything we need in `struct rusage'.]) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/resource.h>]], [[struct rusage usage; usage.ru_ixrss = 1]])],[AC_DEFINE(STRUCT_RUSAGE_COMPLETE, 1, Define if your <sys/resource.h> declares everything we need in `struct rusage'.) AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING([for signal SIGCHLD braindamage in signal.h])
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <sys/types.h>
 #include <signal.h>
 
@@ -428,10 +436,10 @@ char **argv;
     exit(1);
   }
   exit(0);
-}], AC_MSG_RESULT([no]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [1], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([yes]), AC_DEFINE([SIGNAL_SIGCHLD_BRAINDAMAGE], [1], [Define if your <sys/signal> handle signals correctly.]) AC_MSG_RESULT([unable to test... assuming yes]))
+}]])],[AC_MSG_RESULT(no)],[AC_DEFINE(SIGNAL_SIGCHLD_BRAINDAMAGE, 1, Define if your <sys/signal> handle signals correctly.) AC_MSG_RESULT(yes)],[AC_DEFINE(SIGNAL_SIGCHLD_BRAINDAMAGE, 1, Define if your <sys/signal> handle signals correctly.) AC_MSG_RESULT(unable to test... assuming yes)])
 
 AC_MSG_CHECKING([for broken small struct padding])
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -450,7 +458,7 @@ char **argv;
       dq[4] != '3' || dq[5] != '.' || dq[6] != '4' || dq[7] != '\0')
     return 1;
   return 0;
-}],AC_MSG_RESULT([no]), AC_DEFINE([BROKEN_GCC_PADDING], [1], [Define if your GCC break small struct padding]) AC_MSG_RESULT([yes]), AC_DEFINE([BROKEN_GCC_PADDING], [1], [Define if your GCC break small struct padding]) AC_MSG_RESULT([unable to test... assuming yes]))
+}]])],[AC_MSG_RESULT(no)],[AC_DEFINE(BROKEN_GCC_PADDING, 1, Define if your GCC break small struct padding) AC_MSG_RESULT(yes)],[AC_DEFINE(BROKEN_GCC_PADDING, 1, Define if your GCC break small struct padding) AC_MSG_RESULT(unable to test... assuming yes)])
     
 AC_CHECK_TYPES([ptrdiff_t])
 AC_CHECK_MEMBERS([struct stat.st_blksize])
@@ -458,7 +466,13 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 AX_BOX([Check for Declarations.])
 # Check for Declarations
 
-AC_DECL_SYS_SIGLIST
+AC_CHECK_DECLS([sys_siglist],[],[],[#include <signal.h>
+/* NetBSD declares sys_siglist in unistd.h.  */
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+])
+
 
 AC_MSG_CHECKING(for sys_signame in signal.h)
 AC_EGREP_HEADER(sys_signame,signal.h,AC_DEFINE([HAVE_SYS_SIGNAME], [1], [Define if your <signal.h> doesn't declares `sys_signame'.]) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
@@ -466,7 +480,7 @@ AC_EGREP_HEADER(sys_signame,signal.h,AC_DEFINE([HAVE_SYS_SIGNAME], [1], [Define 
 AX_BOX([Checks for library functions.])
 # Checks for library functions.
 AC_FUNC_FORK
-AC_FUNC_VFORK
+AC_FUNC_FORK
 AC_FUNC_VPRINTF
 AC_FUNC_MMAP
 

@@ -99,10 +99,10 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/src/libltdl/m4/argz.m4 \
 	$(top_srcdir)/src/libltdl/m4/libtool.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltdl.m4 \
+	$(top_srcdir)/src/libltdl/m4/lt~obsolete.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltoptions.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltsugar.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltversion.m4 \
-	$(top_srcdir)/src/libltdl/m4/lt~obsolete.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_msql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_mysql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_pgsql.m4 \
@@ -145,7 +145,8 @@ netmush_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(netmush_LDFLAGS) $(LDFLAGS) -o $@
 am_recover_OBJECTS = recover.$(OBJEXT)
 recover_OBJECTS = $(am_recover_OBJECTS)
-recover_DEPENDENCIES = $(am__append_4) $(am__append_8)
+recover_DEPENDENCIES = $(LIBOBJS) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__append_4) $(am__append_8)
 am_slave_OBJECTS = slave.$(OBJEXT)
 slave_OBJECTS = $(am_slave_OBJECTS)
 slave_LDADD = $(LDADD)
@@ -433,8 +434,7 @@ with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_6)
 SUBDIRS = libltdl $(am__append_1) $(am__append_5) $(am__append_9) \
 	$(am__append_10) $(am__append_11)
-
-#netmush_SOURCES		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c pcre.c player.c player_c.c powers.c predicates.c quota.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h pcre.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
+AUTOMAKE_OPTIONS = subdir-objects
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
 netmush_LDFLAGS = -export-dynamic
 netmush_SKEL = defaults.h.in
@@ -445,9 +445,9 @@ netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 netmush_DEPENDENCIES = $(LTDLDEPS) 
 nodist_netmush_SOURCES = version.h defaults.h
 recover_SOURCES = recover.c
-recover_LDADD = $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) \
-	$(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM) $(am__append_4) \
-	$(am__append_8)
+recover_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) $(MALLOC_O) \
+	$(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) \
+	$(POW_LIBM) $(SQRT_LIBM) $(am__append_4) $(am__append_8)
 slave_SOURCES = slave.c
 SHARE_DIR = share
 SHARE_SRC = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt

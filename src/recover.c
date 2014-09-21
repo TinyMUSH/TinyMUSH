@@ -16,7 +16,7 @@
 #include <string.h>
 
 #ifdef HAVE_LIBTINYGDBM_H
-#include "libtinygdbm.h"	/* required by code */
+#include "gdbm.h"		/* required by code */
 #else
 #ifdef HAVE_LIBTINYQDBM_H
 #include "libtinyqdbm.h"	/* required by code */

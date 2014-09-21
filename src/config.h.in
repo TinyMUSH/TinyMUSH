@@ -104,6 +104,9 @@
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
+/* Define to 1 if you have the <gdbm.h> header file. */
+#undef HAVE_GDBM_H
+
 /* Define to 1 if you have the `gethostbyaddr' function. */
 #undef HAVE_GETHOSTBYADDR
 
@@ -128,7 +131,7 @@
 /* Define if libdlloader will be built on this platform */
 #undef HAVE_LIBDLLOADER
 
-/* Define to 1 if you have <libtinyqdbm.h>. */
+/* Define to 1 if you have <libtinygdbm.h>. */
 #undef HAVE_LIBTINYGDBM_H
 
 /* Define to 1 if you have <libtinyqdbm.h>. */

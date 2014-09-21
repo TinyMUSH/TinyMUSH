@@ -88,7 +88,7 @@ void do_version( dbref player, dbref cause, int extra ) {
 
 void init_version( void ) {
 
-    /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Revision.Status
+    /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Status.Revision
         Major version	: The main branch.
         Minor version	: The minor version.
         Revision 	: Patch Level.

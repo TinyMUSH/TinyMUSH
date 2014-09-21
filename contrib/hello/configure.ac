@@ -13,7 +13,7 @@ LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])
-AM_INIT_AUTOMAKE()
+AM_INIT_AUTOMAKE([subdir-objects])
 
 # Checks for programs.
 AC_PROG_CC

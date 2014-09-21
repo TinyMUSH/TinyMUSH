@@ -2142,26 +2142,26 @@ void mod_comsys_init(void) {
     
     str = XMALLOC(MBUF_SIZE, "mod_comsys_init");
 
-    snprintf(str, MBUF_SIZE, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    sprintf(str, "%d.%d", mudstate.version.major, mudstate.version.minor);
     switch(mudstate.version.status){
         case 0:
-            snprintf(str, MBUF_SIZE, "%s, Alpha %d", str, mudstate.version.revision);
+            sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
             break;
         case 1: 
-            snprintf(str, MBUF_SIZE, "%s, Beta %d", str, mudstate.version.revision);
+            sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
             break;
         case 2: 
-            snprintf(str,MBUF_SIZE, "%s, Release Candidate %d", str, mudstate.version.revision);
+            sprintf(str, "%s, Release Candidate %d", str, mudstate.version.revision);
             break;
         default:
             if(mudstate.version.revision > 0) {
-                snprintf(str, MBUF_SIZE, "%s, Patch Level %d", str, mudstate.version.revision);
+                sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
             } else {
-                snprintf(str, MBUF_SIZE, "%s, Gold Release.", str);
+                sprintf(str, "%s, Gold Release.", str);
             }
     }
 
-    snprintf(str, MBUF_SIZE, "%s (%s)", str, PACKAGE_RELEASE_DATE );
+    sprintf(str, "%s (%s)", str, PACKAGE_RELEASE_DATE );
     mod_comsys_version.version=XSTRDUP( str, "mod_comsys_init");
     mod_comsys_version.author=XSTRDUP("TinyMUSH Development Team", "mod_comsys_init");
     mod_comsys_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_comsys_init");

@@ -86,11 +86,11 @@ access		@find	disabled
 #
 # dump_message		GAME: Database being saved.
 #
-# default_home		0
-# player_starting_room	0
-# player_starting_home	0
-# master_room		2
-# guest_char_num	3
+default_home		45
+player_starting_room	45
+player_starting_home	45
+master_room		2
+guest_char_num		16
 #
 # -- Define other local aliases/parameters/whatnot here.
 #
