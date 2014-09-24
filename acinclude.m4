@@ -38,3 +38,12 @@ AC_DEFUN([AX_PRINT_PACKAGE_TITLE], AX_PRINT([
 )
 
 AC_DEFUN([AX_ENABLE_YESNO], [AS_IF([test "x$1" = "xyes"], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])])
+
+AC_DEFUN([AX_EXPAND_DIR], [
+	$1=$2
+	$1=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""[$]$1"\"
+	)`
+])

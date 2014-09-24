@@ -19375,6 +19375,82 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
+
+
+	tm_prefix=
+	tm_prefix="$prefix"
+	tm_prefix=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_prefix"\"
+	)`
+
+	tm_prefix=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_prefix"\"
+	)`
+
+
+	tm_includedir=
+	tm_includedir="$includedir"
+	tm_includedir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_includedir"\"
+	)`
+
+	tm_includedir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_includedir"\"
+	)`
+
+
+	tm_libdir=
+	tm_libdir="$libdir"
+	tm_libdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_libdir"\"
+	)`
+
+	tm_libdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_libdir"\"
+	)`
+
+
+	tm_datarootdir=
+	tm_datarootdir="$datarootdir"
+	tm_datarootdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_datarootdir"\"
+	)`
+
+	tm_datarootdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_datarootdir"\"
+	)`
+
+
+	tm_sysconfdir=
+	tm_sysconfdir="$sysconfdir"
+	tm_sysconfdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_sysconfdir"\"
+	)`
+
+	tm_sysconfdir=`(
+		test "x$prefix" = xNONE && prefix="$ac_default_prefix"
+		test "x$exec_prefix" = xNONE && exec_prefix="${prefix}"
+		eval echo \""$tm_sysconfdir"\"
+	)`
+
 if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} ("2014-09-21")%b
@@ -19397,12 +19473,12 @@ if test -z ; then :
   ${ac_aux_dir}/shtool echo -e "
                            %BPath
 -------------------------------%b
-         Installation directory : %B$prefix%b
-             Binaries directory : %B$prefix/bin%b
-             Includes directory : %B$includedir%b
-            Libraries directory : %B$libdir%b
-            Help Text directory : %B$datarootdir%b
-                 Data directory : %B$sysconfdir%b
+         Installation directory : %B$tm_prefix%b
+             Binaries directory : %B$tm_prefix/bin%b
+             Includes directory : %B$tm_includedir%b
+            Libraries directory : %B$tm_libdir%b
+            Help Text directory : %B$tm_datarootdir%b
+                 Data directory : %B$tm_sysconfdir%b
 
                          %BLimits
 -------------------------------%b
@@ -19442,12 +19518,12 @@ else
   ${ac_aux_dir}/shtool echo -e "
                            %BPath
 -------------------------------%b
-         Installation directory : %B$prefix%b
-             Binaries directory : %B$prefix/bin%b
-             Includes directory : %B$includedir%b
-            Libraries directory : %B$libdir%b
-            Help Text directory : %B$datarootdir%b
-                 Data directory : %B$sysconfdir%b
+         Installation directory : %B$tm_prefix%b
+             Binaries directory : %B$tm_prefix/bin%b
+             Includes directory : %B$tm_includedir%b
+            Libraries directory : %B$tm_libdir%b
+            Help Text directory : %B$tm_datarootdir%b
+                 Data directory : %B$tm_sysconfdir%b
 
                          %BLimits
 -------------------------------%b

@@ -475,16 +475,23 @@ AC_CONFIG_FILES([src/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/mo
 AX_BOX([Generating config.status.])
 AC_OUTPUT
 
+dnl We need to expand the paths twices to be sure all vars are expanded.
+
+AX_EXPAND_DIR(tm_prefix,AX_EXPAND_DIR(tm_prefix, "$prefix"))
+AX_EXPAND_DIR(tm_includedir,AX_EXPAND_DIR(tm_includedir, "$includedir"))
+AX_EXPAND_DIR(tm_libdir,AX_EXPAND_DIR(tm_libdir, "$libdir"))
+AX_EXPAND_DIR(tm_datarootdir,AX_EXPAND_DIR(tm_datarootdir, "$datarootdir"))
+AX_EXPAND_DIR(tm_sysconfdir,AX_EXPAND_DIR(tm_sysconfdir, "$sysconfdir"))
 AX_PRINT_PACKAGE_TITLE()
 AX_PRINT([
                            %BPath
 -------------------------------%b
-         Installation directory : %B$prefix%b
-             Binaries directory : %B$prefix/bin%b
-             Includes directory : %B$includedir%b
-            Libraries directory : %B$libdir%b
-            Help Text directory : %B$datarootdir%b
-                 Data directory : %B$sysconfdir%b
+         Installation directory : %B$tm_prefix%b
+             Binaries directory : %B$tm_prefix/bin%b
+             Includes directory : %B$tm_includedir%b
+            Libraries directory : %B$tm_libdir%b
+            Help Text directory : %B$tm_datarootdir%b
+                 Data directory : %B$tm_sysconfdir%b
 
                          %BLimits
 -------------------------------%b
