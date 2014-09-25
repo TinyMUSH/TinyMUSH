@@ -52,7 +52,8 @@ extern dbref clone_home( dbref, dbref );
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.
  */
 
-static void decrypt_logindata( char *atrbuf, LDATA *info ) {
+static void decrypt_logindata( char *atrbuf, LDATA *info )
+{
     int i;
 
     info->tot_good = 0;
@@ -69,13 +70,13 @@ static void decrypt_logindata( char *atrbuf, LDATA *info ) {
 
     if( *atrbuf == '#' ) {
         atrbuf++;
-        info->tot_good = ( int ) strtol( grabto( &atrbuf, ';' ), ( char ** ) NULL, 10 );
+        info->tot_good = ( int ) strtol( grabto( &atrbuf, ';' ), ( char **) NULL, 10 );
         for( i = 0; i < NUM_GOOD; i++ ) {
             info->good[i].host = grabto( &atrbuf, ';' );
             info->good[i].dtm = grabto( &atrbuf, ';' );
         }
-        info->new_bad = ( int ) strtol( grabto( &atrbuf, ';' ), ( char ** ) NULL, 10 );
-        info->tot_bad = ( int ) strtol( grabto( &atrbuf, ';' ), ( char ** ) NULL, 10 );
+        info->new_bad = ( int ) strtol( grabto( &atrbuf, ';' ), ( char **) NULL, 10 );
+        info->tot_bad = ( int ) strtol( grabto( &atrbuf, ';' ), ( char **) NULL, 10 );
         for( i = 0; i < NUM_BAD; i++ ) {
             info->bad[i].host = grabto( &atrbuf, ';' );
             info->bad[i].dtm = grabto( &atrbuf, ';' );
@@ -83,7 +84,8 @@ static void decrypt_logindata( char *atrbuf, LDATA *info ) {
     }
 }
 
-static void encrypt_logindata( char *atrbuf, LDATA *info ) {
+static void encrypt_logindata( char *atrbuf, LDATA *info )
+{
     char *bp, nullc;
 
     int i;
@@ -131,7 +133,8 @@ static void encrypt_logindata( char *atrbuf, LDATA *info ) {
  * last successful login.
  */
 
-void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lusername ) {
+void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lusername )
+{
     LDATA login_info;
     char *atrbuf;
     dbref aowner;
@@ -184,7 +187,8 @@ void record_login( dbref player, int isgood, char *ldate, char *lhost, char *lus
  * check_pass: Test a password to see if it is correct.
  */
 
-int check_pass( dbref player, const char *password ) {
+int check_pass( dbref player, const char *password )
+{
     dbref aowner;
 
     int aflags, alen;
@@ -216,7 +220,8 @@ int check_pass( dbref player, const char *password ) {
  * connect_player: Try to connect to an existing player.
  */
 
-dbref connect_player( char *name, char *password, char *host, char *username, char *ip_addr ) {
+dbref connect_player( char *name, char *password, char *host, char *username, char *ip_addr )
+{
     dbref player, aowner;
 
     int aflags, alen;
@@ -255,7 +260,7 @@ dbref connect_player( char *name, char *password, char *host, char *username, ch
             if( *allowance == '\0' ) {
                 giveto( player, mudconf.paycheck );
             } else {
-                giveto( player, ( int ) strtol( allowance, ( char ** ) NULL, 10 ) );
+                giveto( player, ( int ) strtol( allowance, ( char **) NULL, 10 ) );
             }
             free_lbuf( allowance );
         }
@@ -272,7 +277,8 @@ dbref connect_player( char *name, char *password, char *host, char *username, ch
  * create_player: Create a new player.
  */
 
-dbref create_player( char *name, char *password, dbref creator, int isrobot, int isguest ) {
+dbref create_player( char *name, char *password, dbref creator, int isrobot, int isguest )
+{
     dbref player;
 
     char *pbuf;
@@ -312,7 +318,8 @@ dbref create_player( char *name, char *password, dbref creator, int isrobot, int
  * do_password: Change the password for a player
  */
 
-void do_password( dbref player, dbref cause, int key, char *oldpass, char *newpass ) {
+void do_password( dbref player, dbref cause, int key, char *oldpass, char *newpass )
+{
     dbref aowner;
 
     int aflags, alen;
@@ -337,13 +344,15 @@ void do_password( dbref player, dbref cause, int key, char *oldpass, char *newpa
  * do_last Display login history data.
  */
 
-static void disp_from_on( dbref player, char *dtm_str, char *host_str ) {
+static void disp_from_on( dbref player, char *dtm_str, char *host_str )
+{
     if( dtm_str && *dtm_str && host_str && *host_str ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "     From: %s   On: %s", dtm_str, host_str );
     }
 }
 
-void do_last( dbref player, dbref cause, int key, char *who ) {
+void do_last( dbref player, dbref cause, int key, char *who )
+{
     dbref target, aowner;
 
     LDATA login_info;
@@ -385,7 +394,8 @@ void do_last( dbref player, dbref cause, int key, char *who ) {
  * Manage playername->dbref mapping
  */
 
-int add_player_name( dbref player, char *name ) {
+int add_player_name( dbref player, char *name )
+{
     int stat;
 
     dbref *p;
@@ -402,7 +412,7 @@ int add_player_name( dbref player, char *name ) {
         *tp = tolower( *tp );
     }
 
-    p = ( int * ) hashfind( temp, &mudstate.player_htab );
+    p = ( int *) hashfind( temp, &mudstate.player_htab );
     if( p ) {
 
         /*
@@ -423,13 +433,13 @@ int add_player_name( dbref player, char *name ) {
          * It's an alias (or an incorrect entry).  Clobber it
          */
         XFREE( p, "add_player_name" );
-        p = ( dbref * ) XMALLOC( sizeof( dbref ), "add_player_name" );
+        p = ( dbref *) XMALLOC( sizeof( dbref ), "add_player_name" );
 
         *p = player;
         stat = hashrepl( temp, p, &mudstate.player_htab );
         free_lbuf( temp );
     } else {
-        p = ( dbref * ) XMALLOC( sizeof( dbref ), "add_player_name.2" );
+        p = ( dbref *) XMALLOC( sizeof( dbref ), "add_player_name.2" );
 
         *p = player;
         stat = hashadd( temp, p, &mudstate.player_htab, 0 );
@@ -439,7 +449,8 @@ int add_player_name( dbref player, char *name ) {
     return stat;
 }
 
-int delete_player_name( dbref player, char *name ) {
+int delete_player_name( dbref player, char *name )
+{
     dbref *p;
 
     char *temp, *tp;
@@ -449,7 +460,7 @@ int delete_player_name( dbref player, char *name ) {
     for( tp = temp; *tp; tp++ ) {
         *tp = tolower( *tp );
     }
-    p = ( int * ) hashfind( temp, &mudstate.player_htab );
+    p = ( int *) hashfind( temp, &mudstate.player_htab );
     if( !p || ( *p == NOTHING ) || ( ( player != NOTHING ) && ( *p != player ) ) ) {
         free_lbuf( temp );
         return 0;
@@ -460,7 +471,8 @@ int delete_player_name( dbref player, char *name ) {
     return 1;
 }
 
-dbref lookup_player( dbref doer, char *name, int check_who ) {
+dbref lookup_player( dbref doer, char *name, int check_who )
+{
     dbref *p, thing;
 
     char *temp, *tp;
@@ -480,7 +492,7 @@ dbref lookup_player( dbref doer, char *name, int check_who ) {
         if( !is_number( name ) ) {
             return NOTHING;
         }
-        thing = ( int ) strtol( name, ( char ** ) NULL, 10 );
+        thing = ( int ) strtol( name, ( char **) NULL, 10 );
         if( !Good_obj( thing ) ) {
             return NOTHING;
         }
@@ -495,7 +507,7 @@ dbref lookup_player( dbref doer, char *name, int check_who ) {
     for( tp = temp; *tp; tp++ ) {
         *tp = tolower( *tp );
     }
-    p = ( int * ) hashfind( temp, &mudstate.player_htab );
+    p = ( int *) hashfind( temp, &mudstate.player_htab );
     free_lbuf( temp );
     if( !p ) {
         if( check_who ) {
@@ -515,7 +527,8 @@ dbref lookup_player( dbref doer, char *name, int check_who ) {
     return thing;
 }
 
-void load_player_names( void ) {
+void load_player_names( void )
+{
     dbref i, aowner;
 
     int aflags, alen;
@@ -547,20 +560,22 @@ void load_player_names( void ) {
  * badname_add, badname_check, badname_list: Add/look for/display bad names.
  */
 
-void badname_add( char *bad_name ) {
+void badname_add( char *bad_name )
+{
     BADNAME *bp;
 
     /*
      * Make a new node and link it in at the top
      */
 
-    bp = ( BADNAME * ) XMALLOC( sizeof( BADNAME ), "badname.struc" );
+    bp = ( BADNAME *) XMALLOC( sizeof( BADNAME ), "badname.struc" );
     bp->name = XSTRDUP( bad_name, "badname.name" );
     bp->next = mudstate.badname_head;
     mudstate.badname_head = bp;
 }
 
-void badname_remove( char *bad_name ) {
+void badname_remove( char *bad_name )
+{
     BADNAME *bp, *backp;
 
     /*
@@ -582,7 +597,8 @@ void badname_remove( char *bad_name ) {
     }
 }
 
-int badname_check( char *bad_name ) {
+int badname_check( char *bad_name )
+{
     BADNAME *bp;
 
     /*
@@ -598,7 +614,8 @@ int badname_check( char *bad_name ) {
     return 1;
 }
 
-void badname_list( dbref player, const char *prefix ) {
+void badname_list( dbref player, const char *prefix )
+{
     BADNAME *bp;
 
     char *buff, *bufp;
@@ -608,7 +625,7 @@ void badname_list( dbref player, const char *prefix ) {
      */
 
     buff = bufp = alloc_lbuf( "badname_list" );
-    safe_str( ( char * ) prefix, buff, &bufp );
+    safe_str( ( char *) prefix, buff, &bufp );
     for( bp = mudstate.badname_head; bp; bp = bp->next ) {
         safe_chr( ' ', buff, &bufp );
         safe_str( bp->name, buff, &bufp );

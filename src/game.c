@@ -57,7 +57,7 @@ void fork_and_dump( dbref, dbref, int );
 
 void dump_database( void );
 
-dbref db_read_flatfile( FILE *, int *, int *, int * );
+dbref db_read_flatfile( FILE *, int *, int *, int *);
 
 void pcache_sync( void );
 
@@ -93,9 +93,9 @@ extern char *optarg;
 
 extern int optind;
 
-void recover( char * );
+void recover( char *);
 
-int tailfind( char *, char * );
+int tailfind( char *, char *);
 
 int backup_mush( dbref, dbref, int );
 
@@ -127,7 +127,7 @@ pid_t isrunning( char *pidfile )
 
     fclose( fp );
 
-    pid = ( pid_t ) strtol( buff, ( char ** ) NULL, 10 );
+    pid = ( pid_t ) strtol( buff, ( char **) NULL, 10 );
 
     fp = popen( "pgrep netmush", "r" );
 
@@ -136,7 +136,7 @@ pid_t isrunning( char *pidfile )
     }
 
     while( fgets( buff, MBUF_SIZE, fp ) !=NULL ) {
-        rpid= ( pid_t ) strtol( buff, ( char ** ) NULL, 10 );
+        rpid= ( pid_t ) strtol( buff, ( char **) NULL, 10 );
         if( pid == rpid ) {
             i = 1;
             break;
@@ -464,7 +464,7 @@ static int atr_match1( dbref thing, dbref parent, dbref player, char type, char 
          */
 
         if( hash_insert )
-            nhashadd( ap->number, ( int * ) &attr,
+            nhashadd( ap->number, ( int *) &attr,
                       &mudstate.parent_htab );
 
         /*
@@ -603,7 +603,7 @@ int check_filter( dbref object, dbref player, int filter, const char *msg )
         preserve = save_global_regs( "check_filter.save" );
         nbuf = dp = alloc_lbuf( "check_filter" );
         str = buf;
-        exec( nbuf, &dp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char ** ) NULL, 0 );
+        exec( nbuf, &dp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char **) NULL, 0 );
         dp = nbuf;
         free_lbuf( buf );
         restore_global_regs( "check_filter.restore", preserve );
@@ -615,7 +615,7 @@ int check_filter( dbref object, dbref player, int filter, const char *msg )
     if( !( aflags & AF_REGEXP ) ) {
         do {
             cp = parse_to( &dp, ',', EV_STRIP );
-            if( quick_wild( cp, ( char * ) msg ) ) {
+            if( quick_wild( cp, ( char *) msg ) ) {
                 free_lbuf( nbuf );
                 return ( 0 );
             }
@@ -627,7 +627,7 @@ int check_filter( dbref object, dbref player, int filter, const char *msg )
             cp = parse_to( &dp, ',', EV_STRIP );
             re = pcre_compile( cp, case_opt, &errptr, &erroffset, mudstate.retabs );
             if( re != NULL ) {
-                subpatterns = pcre_exec( re, NULL, ( char * ) msg, len, 0, 0, offsets, PCRE_MAX_OFFSETS );
+                subpatterns = pcre_exec( re, NULL, ( char *) msg, len, 0, 0, offsets, PCRE_MAX_OFFSETS );
                 if( subpatterns >= 0 ) {
                     pcre_free( re );
                     free_lbuf( nbuf );
@@ -654,13 +654,13 @@ static char *add_prefix( dbref object, dbref player, int prefix, const char *msg
     buf = atr_pget( object, prefix, &aowner, &aflags, &alen );
     if( !*buf ) {
         cp = buf;
-        safe_str( ( char * ) dflt, buf, &cp );
+        safe_str( ( char *) dflt, buf, &cp );
     } else {
         preserve = save_global_regs( "add_prefix_save" );
         nbuf = cp = alloc_lbuf( "add_prefix" );
         str = buf;
         exec( nbuf, &cp, object, player, player,
-              EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char ** ) NULL, 0 );
+              EV_FIGNORE | EV_EVAL | EV_TOP, &str, ( char **) NULL, 0 );
         free_lbuf( buf );
         restore_global_regs( "add_prefix_restore", preserve );
         buf = nbuf;
@@ -668,7 +668,7 @@ static char *add_prefix( dbref object, dbref player, int prefix, const char *msg
     if( cp != buf ) {
         safe_chr( ' ', buf, &cp );
     }
-    safe_str( ( char * ) msg, buf, &cp );
+    safe_str( ( char *) msg, buf, &cp );
     return ( buf );
 }
 
@@ -677,7 +677,7 @@ static char *dflt_from_msg( dbref sender, dbref sendloc )
     char *tp, *tbuff;
 
     tp = tbuff = alloc_lbuf( "notify_check.fwdlist" );
-    safe_known_str( ( char * ) "From ", 5, tbuff, &tp );
+    safe_known_str( ( char *) "From ", 5, tbuff, &tp );
     if( Good_obj( sendloc ) ) {
         safe_name( sendloc, tbuff, &tp );
     } else {
@@ -806,7 +806,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                 safe_sprintf( msg_ns, &mp, "[%s(#%d)] ", Name( sender ), sender );
             }
         }
-        safe_str( ( char * ) msg, msg_ns, &mp );
+        safe_str( ( char *) msg, msg_ns, &mp );
     } else {
         msg_ns = NULL;
     }
@@ -824,26 +824,26 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
     case TYPE_PLAYER:
         if( will_send ) {
             if(mudconf.have_pueblo == 1) {
-            if( key & MSG_ME ) {
-                raw_notify( target, NULL, msg_ns);
-            }
+                if( key & MSG_ME ) {
+                    raw_notify( target, NULL, msg_ns);
+                }
             } else {
-            if( key & MSG_ME ) {
-                if( key & MSG_HTML ) {
-                    raw_notify_html( target, NULL, msg_ns);
-                } else {
-                    if( Html( target ) ) {
-                        char *msg_ns_escaped;
-
-                        msg_ns_escaped = alloc_lbuf ( "notify_check_escape" );
-                        html_escape( msg_ns, msg_ns_escaped, 0 );
-                        raw_notify( target, NULL, msg_ns_escaped);
-                        free_lbuf( msg_ns_escaped );
+                if( key & MSG_ME ) {
+                    if( key & MSG_HTML ) {
+                        raw_notify_html( target, NULL, msg_ns);
                     } else {
-                        raw_notify( target, NULL, msg_ns);
+                        if( Html( target ) ) {
+                            char *msg_ns_escaped;
+
+                            msg_ns_escaped = alloc_lbuf ( "notify_check_escape" );
+                            html_escape( msg_ns, msg_ns_escaped, 0 );
+                            raw_notify( target, NULL, msg_ns_escaped);
+                            free_lbuf( msg_ns_escaped );
+                        } else {
+                            raw_notify( target, NULL, msg_ns);
+                        }
                     }
                 }
-            }
             }
             if( !mudconf.player_listen ) {
                 check_listens = 0;
@@ -878,7 +878,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
 
             tp = tbuff = alloc_lbuf( "notify_check.puppet" );
             safe_name( target, tbuff, &tp );
-            safe_known_str( ( char * ) "> ", 2, tbuff, &tp );
+            safe_known_str( ( char *) "> ", 2, tbuff, &tp );
             safe_str( msg_ns, tbuff, &tp );
 
             /*
@@ -889,8 +889,8 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
              * recursion is avoided.
              */
             if( H_Redirect( target ) ) {
-                np = ( NUMBERTAB * ) nhashfind( target,
-                                                &mudstate.redir_htab );
+                np = ( NUMBERTAB *) nhashfind( target,
+                                               &mudstate.redir_htab );
                 if( np && Good_obj( np->num ) ) {
                     raw_notify( Owner( np->num ), NULL, tbuff);
                 }
@@ -919,9 +919,9 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
             tp = atr_get( target, A_LISTEN, &aowner, &aflags,
                           &alen );
             if( *tp && ( ( !( aflags & AF_REGEXP )
-                           && wild( tp, ( char * ) msg, args,
+                           && wild( tp, ( char *) msg, args,
                                     NUM_ENV_VARS ) ) || ( ( aflags & AF_REGEXP )
-                                            && regexp_match( tp, ( char * ) msg,
+                                            && regexp_match( tp, ( char *) msg,
                                                     ( ( aflags & AF_CASE ) ? 0 :
                                                             PCRE_CASELESS ), args,
                                                     NUM_ENV_VARS ) ) ) ) {
@@ -976,7 +976,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
         if( will_send && ( key & MSG_ME ) && pass_uselock &&
                 ( sender != target ) && Monitor( target ) ) {
             ( void ) atr_match( target, sender,
-                                AMATCH_LISTEN, ( char * ) msg, ( char * ) msg, 0 );
+                                AMATCH_LISTEN, ( char *) msg, ( char *) msg, 0 );
         }
         /*
          * Deliver message to forwardlist members. No presence
@@ -1048,7 +1048,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                                    msg, tbuff );
                 free_lbuf( tbuff );
             } else {
-                buff = ( char * ) msg;
+                buff = ( char *) msg;
             }
 
             DOLIST( obj, Exits( Location( target ) ) ) {
@@ -1089,14 +1089,14 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                 buff = add_prefix( target, sender, A_INPREFIX,
                                    msg, "" );
             } else {
-                buff = ( char * ) msg;
+                buff = ( char *) msg;
             }
             DOLIST( obj, Contents( target ) ) {
                 if( obj != target ) {
                     if(mudconf.have_pueblo == 1) {
-                    notify_check( obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | ( key & MSG_HTML ) | herekey, NULL, buff );
+                        notify_check( obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | ( key & MSG_HTML ) | herekey, NULL, buff );
                     } else {
-                    notify_check( obj, sender,  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | herekey, NULL, buff );
+                        notify_check( obj, sender,  MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | herekey, NULL, buff );
                     }
                 }
             }
@@ -1116,7 +1116,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                 buff = add_prefix( target, sender, A_PREFIX,
                                    msg, "" );
             } else {
-                buff = ( char * ) msg;
+                buff = ( char *) msg;
             }
             DOLIST( obj, Contents( targetloc ) ) {
                 if( ( obj != target ) && ( obj != targetloc ) ) {
@@ -1141,7 +1141,7 @@ void notify_check( dbref target, dbref sender, int key, const char *format, ... 
                                    msg, tbuff );
                 free_lbuf( tbuff );
             } else {
-                buff = ( char * ) msg;
+                buff = ( char *) msg;
             }
             notify_check( targetloc, sender, MSG_ME | MSG_F_UP | MSG_S_INSIDE | herekey, NULL, buff );
             if( key & MSG_S_INSIDE ) {
@@ -1181,8 +1181,9 @@ void notify_except( dbref loc, dbref player, dbref exception, int flags, const c
 
     va_end(ap);
 
-    if( loc != exception )
+    if( loc != exception ) {
         notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );
+    }
     DOLIST( first, Contents( loc ) ) {
         if( first != exception ) {
             notify_check( first, player, ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ), NULL, msg );
@@ -1211,8 +1212,9 @@ void notify_except2( dbref loc, dbref player, dbref exc1, dbref exc2, int flags,
 
     va_end(ap);
 
-    if( ( loc != exc1 ) && ( loc != exc2 ) )
+    if( ( loc != exc1 ) && ( loc != exc2 ) ) {
         notify_check( loc, player, ( MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags ), NULL, msg );
+    }
     DOLIST( first, Contents( loc ) ) {
         if( first != exc1 && first != exc2 ) {
             notify_check( first, player, ( MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags ), NULL, msg );
@@ -1327,7 +1329,7 @@ void do_timecheck( dbref player, dbref cause, int key )
 
 char **add_array( char **b, char *s, int *i, char *d )
 {
-    b= ( char ** ) XREALLOC( b, ( *i + 1 ) * sizeof( char * ), d );
+    b= ( char **) XREALLOC( b, ( *i + 1 ) * sizeof( char *), d );
     if( s !=NULL ) {
         b[*i] = XSTRDUP( s, d );
     } else {
@@ -1409,7 +1411,7 @@ int backup_mush( dbref player, dbref cause, int key )
     txt = add_array( txt, mudconf.site_file, &txt_n, "backup_mush" );
     txt = add_array( txt, mudconf.crea_file, &txt_n, "backup_mush" );
     if(mudconf.have_pueblo == 1) {
-    txt = add_array( txt, mudconf.htmlconn_file, &txt_n, "backup_mush" );
+        txt = add_array( txt, mudconf.htmlconn_file, &txt_n, "backup_mush" );
     }
 
     /*
@@ -2041,8 +2043,9 @@ void call_all_modules_nocache(char *xfn)
     s = alloc_mbuf("call_all_modules_nocache");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn );
-        if ((ip = (void (*)(void))lt_dlsym( mp->handle , s )) != NULL)
+        if ((ip = (void (*)(void))lt_dlsym( mp->handle , s )) != NULL) {
             (*ip)();
+        }
     }
     free_mbuf(s);
 }
@@ -2053,7 +2056,7 @@ static int load_game( void )
 
     MODULE *mp;
 
-    void ( *modfunc )( FILE * );
+    void ( *modfunc )( FILE *);
     char *s, *s1;
 
     log_write( LOG_STARTUP, "INI", "LOAD", "Loading object structures." );
@@ -2076,7 +2079,7 @@ static int load_game( void )
     s1 = alloc_mbuf("load_game");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "load_database" );
-        if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
+        if( ( modfunc = (void (*)( FILE *))lt_dlsym( mp->handle, s1) ) != NULL ) {
             s = xstrprintf( "load_game", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
             if( f ) {
@@ -2192,7 +2195,7 @@ void do_logwrite( dbref player, dbref cause, int key, char *msgtype, char *messa
      */
 
     if( !message || !*message ) {
-        mt = ( const char * ) "LOCAL";
+        mt = ( const char *) "LOCAL";
         msg = msgtype;
     } else {
         if( strlen( msgtype ) > 5 ) {
@@ -2201,7 +2204,7 @@ void do_logwrite( dbref player, dbref cause, int key, char *msgtype, char *messa
         for( p = msgtype; *p; p++ ) {
             *p = toupper( *p );
         }
-        mt = ( const char * ) msgtype;
+        mt = ( const char *) msgtype;
         msg = message;
     }
 
@@ -2240,8 +2243,8 @@ static void process_preload( void )
 
     PROPDIR *pp;
 
-    fp = ( FWDLIST * ) XMALLOC( sizeof( FWDLIST ), "process_preload.fwdlist" );
-    pp = ( PROPDIR * ) XMALLOC( sizeof( PROPDIR ), "process_preload.propdir" );
+    fp = ( FWDLIST *) XMALLOC( sizeof( FWDLIST ), "process_preload.fwdlist" );
+    pp = ( PROPDIR *) XMALLOC( sizeof( PROPDIR ), "process_preload.propdir" );
     tstr = alloc_lbuf( "process_preload.string" );
     i = 0;
     DO_WHOLE_DB( thing ) {
@@ -2303,7 +2306,7 @@ static void process_preload( void )
             if( H_Startup( thing ) ) {
                 did_it( Owner( thing ), thing,
                         A_NULL, NULL, A_NULL, NULL,
-                        A_STARTUP, 0, ( char ** ) NULL, 0, 0 );
+                        A_STARTUP, 0, ( char **) NULL, 0, 0 );
                 /*
                  * Process queue entries as we add them
                  */
@@ -2441,7 +2444,7 @@ void recover( char *flat )
 {
     int db_ver, db_format, db_flags, setflags, clrflags, ver;
     MODULE *mp;
-    void ( *modfunc )( FILE * );
+    void ( *modfunc )( FILE *);
     FILE *f;
     char *s, *s1;
 
@@ -2464,7 +2467,7 @@ void recover( char *flat )
     s1 = alloc_mbuf("recover");
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
         snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
-        if( ( modfunc =  (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
+        if( ( modfunc =  (void (*)( FILE *))lt_dlsym( mp->handle, s1) ) != NULL ) {
             s = xstrprintf( "recover", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile( s, 0 );
             if( f ) {
@@ -2500,11 +2503,11 @@ int dbconvert( int argc, char *argv[] )
 
     int c, dbclean, errflg = 0;
 
-    char *opt_conf = ( char * ) DEFAULT_CONFIG_FILE;
+    char *opt_conf = ( char *) DEFAULT_CONFIG_FILE;
 
-    char *opt_datadir = ( char * ) DEFAULT_DATABASE_HOME;
+    char *opt_datadir = ( char *) DEFAULT_DATABASE_HOME;
 
-    char *opt_gdbmfile = ( char * ) DEFAULT_CONFIG_FILE;
+    char *opt_gdbmfile = ( char *) DEFAULT_CONFIG_FILE;
 
     char *s, *s1;
 
@@ -2512,7 +2515,7 @@ int dbconvert( int argc, char *argv[] )
 
     MODULE *mp;
 
-    void ( *modfunc )( FILE * );
+    void ( *modfunc )( FILE *);
 
     logfile_init( NULL );
 
@@ -2672,7 +2675,7 @@ int dbconvert( int argc, char *argv[] )
         s1 = alloc_mbuf("dbconvert.modread");
         for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
-            if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
+            if( ( modfunc = (void (*)( FILE *))lt_dlsym( mp->handle, s1) ) != NULL ) {
                 s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                 f = db_module_flatfile( s, 0 );
                 if( f ) {
@@ -2723,7 +2726,7 @@ int dbconvert( int argc, char *argv[] )
             s1 = alloc_mbuf("dbconvert.modwrite");
             for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
                 snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile" );
-                if( ( modfunc = (void (*)( FILE * ))lt_dlsym( mp->handle, s1) ) != NULL ) {
+                if( ( modfunc = (void (*)( FILE *))lt_dlsym( mp->handle, s1) ) != NULL ) {
                     s = xstrprintf( "dbconvert", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
                     f = db_module_flatfile( s, 1 );
                     if( f ) {
@@ -2978,9 +2981,9 @@ int main( int argc, char *argv[] )
     if( mudconf.help_quick == NULL ) {
         mudconf.help_quick = xstrprintf("main_add_helpfile_qhelp", "qhelp %s/qhelp", mudconf.txthome );
     }
-    add_helpfile( GOD, ( char * ) "main:add_helpfile", mudconf.help_users, 1 );
-    add_helpfile( GOD, ( char * ) "main:add_helpfile", mudconf.help_wizards, 1 );
-    add_helpfile( GOD, ( char * ) "main:add_helpfile", mudconf.help_quick, 1 );
+    add_helpfile( GOD, ( char *) "main:add_helpfile", mudconf.help_users, 1 );
+    add_helpfile( GOD, ( char *) "main:add_helpfile", mudconf.help_wizards, 1 );
+    add_helpfile( GOD, ( char *) "main:add_helpfile", mudconf.help_quick, 1 );
 
     if( mudconf.guest_file == NULL ) {
         mudconf.guest_file = xstrprintf("main_mudconf_guest_file", "%s/guest.txt", mudconf.txthome );
@@ -3016,14 +3019,14 @@ int main( int argc, char *argv[] )
         mudconf.crea_file = xstrprintf( "main_mudconf_crea_file", "%s/newuser.txt", mudconf.txthome );
     }
     if( mudconf.have_pueblo == 1 ) {
-    if( mudconf.htmlconn_file == NULL ) {
-        mudconf.htmlconn_file = xstrprintf( "main_mudconf_htmlconn_file", "%s/htmlconn.txt", mudconf.txthome );
-    }
+        if( mudconf.htmlconn_file == NULL ) {
+            mudconf.htmlconn_file = xstrprintf( "main_mudconf_htmlconn_file", "%s/htmlconn.txt", mudconf.txthome );
+        }
     }
 
     vattr_init();
 
-    cmdp = ( CMDENT * ) hashfind( ( char * ) "wizhelp", &mudstate.command_htab );
+    cmdp = ( CMDENT *) hashfind( ( char *) "wizhelp", &mudstate.command_htab );
     if( cmdp ) {
         cmdp->perms |= CA_WIZARD;
     }
@@ -3272,7 +3275,7 @@ int main( int argc, char *argv[] )
     muntrace();
 #endif
 
-    close_sockets( 0, ( char * ) "Going down - Bye" );
+    close_sockets( 0, ( char *) "Going down - Bye" );
     dump_database();
     CLOSE;
 
@@ -3292,7 +3295,7 @@ static void init_rlimit( void )
 #if defined(HAVE_SETRLIMIT) && defined(RLIMIT_NOFILE)
     struct rlimit *rlp;
 
-    rlp = ( struct rlimit * ) XMALLOC( sizeof( struct rlimit ), "rlimit" );
+    rlp = ( struct rlimit *) XMALLOC( sizeof( struct rlimit ), "rlimit" );
 
     if( getrlimit( RLIMIT_NOFILE, rlp ) ) {
         log_perror( "RLM", "FAIL", NULL, "getrlimit()" );

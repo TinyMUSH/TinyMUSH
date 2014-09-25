@@ -39,7 +39,8 @@
 /* Take a chunk of data which contains an object, and parse it into an
  * object structure. */
 
-Obj * unroll_obj( char *data ) {
+Obj *unroll_obj( char *data )
+{
     int i, j;
 
     Obj *o;
@@ -54,7 +55,7 @@ Obj * unroll_obj( char *data ) {
      * Get a new Obj struct
      */
 
-    if( ( o = ( Obj * ) XMALLOC( sizeof( Obj ), "unroll_obj.o" ) ) == NULL ) {
+    if( ( o = ( Obj *) XMALLOC( sizeof( Obj ), "unroll_obj.o" ) ) == NULL ) {
         return ( NULL );
     }
 
@@ -62,13 +63,13 @@ Obj * unroll_obj( char *data ) {
      * Read in the header
      */
 
-    if( memcpy( ( void * ) & ( o->name ), ( void * ) dptr, sizeof( Objname ) ) == NULL ) {
+    if( memcpy( ( void *) & ( o->name ), ( void *) dptr, sizeof( Objname ) ) == NULL ) {
         XFREE( o, "unroll_obj.o" );
         return ( NULL );
     }
     dptr += sizeof( Objname );
 
-    if( memcpy( ( void * ) &i, ( void * ) dptr, sizeof( int ) ) == NULL ) {
+    if( memcpy( ( void *) &i, ( void *) dptr, sizeof( int ) ) == NULL ) {
         XFREE( o, "unroll_obj.o" );
         return ( NULL );
     }
@@ -80,7 +81,7 @@ Obj * unroll_obj( char *data ) {
      * Now get an array of Attrs
      */
 
-    a = o->atrs = ( Attrib * ) XMALLOC( i * sizeof( Attrib ), "unroll_obj.a" );
+    a = o->atrs = ( Attrib *) XMALLOC( i * sizeof( Attrib ), "unroll_obj.a" );
     if( !o->atrs ) {
         XFREE( o, "unroll_obj.o" );
         return ( NULL );
@@ -96,7 +97,7 @@ Obj * unroll_obj( char *data ) {
          * Attribute size
          */
 
-        if( memcpy( ( void * ) & ( a[j].size ), ( void * ) dptr,
+        if( memcpy( ( void *) & ( a[j].size ), ( void *) dptr,
                     sizeof( int ) ) == NULL ) {
             goto bail;
         }
@@ -106,7 +107,7 @@ Obj * unroll_obj( char *data ) {
          * Attribute number
          */
 
-        if( memcpy( ( void * ) & ( a[j].attrnum ), ( void * ) dptr,
+        if( memcpy( ( void *) & ( a[j].attrnum ), ( void *) dptr,
                     sizeof( int ) ) == NULL ) {
             goto bail;
         }
@@ -117,7 +118,7 @@ Obj * unroll_obj( char *data ) {
          */
 
         if( ( a[j].data =
-                    ( char * ) XMALLOC( a[j].size, "unroll_obj.data" ) ) == NULL ) {
+                    ( char *) XMALLOC( a[j].size, "unroll_obj.data" ) ) == NULL ) {
             goto bail;
         }
 
@@ -132,7 +133,7 @@ Obj * unroll_obj( char *data ) {
          * Now get the data
          */
 
-        if( memcpy( ( void * ) a[j - 1].data, ( void * ) dptr,
+        if( memcpy( ( void *) a[j - 1].data, ( void *) dptr,
                     a[j - 1].size ) == NULL ) {
             goto bail;
         }
@@ -167,14 +168,15 @@ bail:
 
 /* Rollup an object structure into a single buffer for a write to disk. */
 
-char * rollup_obj( Obj *o ) {
+char *rollup_obj( Obj *o )
+{
     int i;
 
     Attrib *a;
 
     char *dptr, *data;
 
-    dptr = data = ( char * ) XMALLOC( obj_siz( o ), "rollup_obj.data" );
+    dptr = data = ( char *) XMALLOC( obj_siz( o ), "rollup_obj.data" );
 
     /*
      * Mark the object as clean
@@ -186,12 +188,12 @@ char * rollup_obj( Obj *o ) {
      * Write out the object header
      */
 
-    if( memcpy( ( void * ) dptr, ( void * ) & ( o->name ), sizeof( Objname ) ) == NULL ) {
+    if( memcpy( ( void *) dptr, ( void *) & ( o->name ), sizeof( Objname ) ) == NULL ) {
         return NULL;
     }
     dptr += sizeof( Objname );
 
-    if( memcpy( ( void * ) dptr, ( void * ) & ( o->at_count ), sizeof( int ) ) == NULL ) {
+    if( memcpy( ( void *) dptr, ( void *) & ( o->at_count ), sizeof( int ) ) == NULL ) {
         return NULL;
     }
     dptr += sizeof( int );
@@ -207,7 +209,7 @@ char * rollup_obj( Obj *o ) {
          * Attribute size.
          */
 
-        if( memcpy( ( void * ) dptr, ( void * ) & ( a[i].size ),
+        if( memcpy( ( void *) dptr, ( void *) & ( a[i].size ),
                     sizeof( int ) ) == NULL ) {
             return NULL;
         }
@@ -217,7 +219,7 @@ char * rollup_obj( Obj *o ) {
          * Attribute number
          */
 
-        if( memcpy( ( void * ) dptr, ( void * ) & ( a[i].attrnum ),
+        if( memcpy( ( void *) dptr, ( void *) & ( a[i].attrnum ),
                     sizeof( int ) ) == NULL ) {
             return NULL;
         }
@@ -228,7 +230,7 @@ char * rollup_obj( Obj *o ) {
          * Attribute data
          */
 
-        if( memcpy( ( void * ) dptr, ( void * ) a[i].data, a[i].size ) == NULL ) {
+        if( memcpy( ( void *) dptr, ( void *) a[i].data, a[i].size ) == NULL ) {
             return NULL;
         }
         dptr += a[i].size;
@@ -243,7 +245,8 @@ char * rollup_obj( Obj *o ) {
 
 /* Return the size, on disk, the thing is going to take up.*/
 
-int obj_siz( Obj *o ) {
+int obj_siz( Obj *o )
+{
     int i;
 
     int siz;
@@ -259,7 +262,8 @@ int obj_siz( Obj *o ) {
 
 /* And something to free all the goo on an Obj, as well as the Obj.*/
 
-static void objfree( Obj *o ) {
+static void objfree( Obj *o )
+{
     int i;
 
     Attrib *a;
@@ -279,7 +283,8 @@ static void objfree( Obj *o ) {
 
 /* Routines to manipulate attributes within the object structure */
 
-char *obj_get_attrib( int anam, Obj *obj ) {
+char *obj_get_attrib( int anam, Obj *obj )
+{
     int lo, mid, hi;
 
     Attrib *a;
@@ -294,7 +299,7 @@ char *obj_get_attrib( int anam, Obj *obj ) {
     while( lo <= hi ) {
         mid = ( ( hi - lo ) >> 1 ) + lo;
         if( a[mid].attrnum == anam ) {
-            return ( char * ) a[mid].data;
+            return ( char *) a[mid].data;
             break;
         } else if( a[mid].attrnum > anam ) {
             hi = mid - 1;
@@ -305,7 +310,8 @@ char *obj_get_attrib( int anam, Obj *obj ) {
     return ( NULL );
 }
 
-void obj_set_attrib( int anam, Obj *obj, char *value ) {
+void obj_set_attrib( int anam, Obj *obj, char *value )
+{
     int hi, lo, mid;
 
     Attrib *a;
@@ -316,11 +322,11 @@ void obj_set_attrib( int anam, Obj *obj, char *value ) {
      */
 
     if( obj->atrs == NULL ) {
-        a = ( Attrib * ) XMALLOC( sizeof( Attrib ), "obj_set_attrib.a" );
+        a = ( Attrib *) XMALLOC( sizeof( Attrib ), "obj_set_attrib.a" );
         obj->atrs = a;
         obj->at_count = 1;
         a[0].attrnum = anam;
-        a[0].data = ( char * ) value;
+        a[0].data = ( char *) value;
         a[0].size = strlen( value ) + 1;
         return;
     }
@@ -337,7 +343,7 @@ void obj_set_attrib( int anam, Obj *obj, char *value ) {
         mid = ( ( hi - lo ) >> 1 ) + lo;
         if( a[mid].attrnum == anam ) {
             XFREE( a[mid].data, "obj_set_attrib" );
-            a[mid].data = ( char * ) value;
+            a[mid].data = ( char *) value;
             a[mid].size = strlen( value ) + 1;
             return;
         } else if( a[mid].attrnum > anam ) {
@@ -352,15 +358,15 @@ void obj_set_attrib( int anam, Obj *obj, char *value ) {
      * * attribute should be inserted between them.
      */
 
-    a = ( Attrib * ) XREALLOC( obj->atrs,
-                               ( obj->at_count + 1 ) * sizeof( Attrib ), "obj_set_attrib.a" );
+    a = ( Attrib *) XREALLOC( obj->atrs,
+                              ( obj->at_count + 1 ) * sizeof( Attrib ), "obj_set_attrib.a" );
 
     /*
      * Move the stuff upwards one slot.
      */
 
     if( lo < obj->at_count )
-        memmove( ( void * )( a + lo + 1 ), ( void * )( a + lo ),
+        memmove( ( void *)( a + lo + 1 ), ( void *)( a + lo ),
                  ( obj->at_count - lo ) * sizeof( Attrib ) );
 
     a[lo].data = value;
@@ -370,7 +376,8 @@ void obj_set_attrib( int anam, Obj *obj, char *value ) {
     obj->atrs = a;
 }
 
-void obj_del_attrib( int anam, Obj *obj ) {
+void obj_del_attrib( int anam, Obj *obj )
+{
     int hi, lo, mid;
 
     Attrib *a;
@@ -396,8 +403,8 @@ void obj_del_attrib( int anam, Obj *obj ) {
             XFREE( a[mid].data, "obj_del_attrib.data" );
             obj->at_count--;
             if( mid != obj->at_count )
-                memcpy( ( void * )( a + mid ),
-                        ( void * )( a + mid + 1 ),
+                memcpy( ( void *)( a + mid ),
+                        ( void *)( a + mid + 1 ),
                         ( obj->at_count - mid ) * sizeof( Attrib ) );
 
             if( obj->at_count == 0 ) {
@@ -420,7 +427,8 @@ void obj_del_attrib( int anam, Obj *obj ) {
 
 /* get_free_objpipe: return an object pipeline */
 
-Obj *get_free_objpipe( int obj ) {
+Obj *get_free_objpipe( int obj )
+{
     DBData key, data;
 
     int i, j = 0;
@@ -459,8 +467,8 @@ Obj *get_free_objpipe( int obj ) {
                  * New object
                  */
                 if( ( mudstate.objpipes[i] =
-                            ( Obj * ) XMALLOC( sizeof( Obj ),
-                                               "unroll_obj.o" ) ) == NULL ) {
+                            ( Obj *) XMALLOC( sizeof( Obj ),
+                                              "unroll_obj.o" ) ) == NULL ) {
                     return ( NULL );
                 }
                 mudstate.objpipes[i]->name = obj;
@@ -516,7 +524,7 @@ Obj *get_free_objpipe( int obj ) {
         /*
          * New object
          */
-        if( ( mudstate.objpipes[j] = ( Obj * ) XMALLOC( sizeof( Obj ),
+        if( ( mudstate.objpipes[j] = ( Obj *) XMALLOC( sizeof( Obj ),
                                      "unroll_obj.o" ) ) == NULL ) {
             return ( NULL );
         }
@@ -532,7 +540,8 @@ Obj *get_free_objpipe( int obj ) {
 }
 
 
-char *pipe_get_attrib( int anum, int obj ) {
+char *pipe_get_attrib( int anum, int obj )
+{
     Obj *object;
 
     char *value, *tmp;
@@ -547,7 +556,8 @@ char *pipe_get_attrib( int anum, int obj ) {
     }
 }
 
-void pipe_set_attrib( int anum, int obj, char *value ) {
+void pipe_set_attrib( int anum, int obj, char *value )
+{
     Obj *object;
 
     char *newvalue;
@@ -563,7 +573,8 @@ void pipe_set_attrib( int anum, int obj, char *value ) {
     return;
 }
 
-void pipe_del_attrib( int anum, int obj ) {
+void pipe_del_attrib( int anum, int obj )
+{
     Obj *object;
 
     /*
@@ -576,7 +587,8 @@ void pipe_del_attrib( int anum, int obj ) {
     return;
 }
 
-void attrib_sync( void ) {
+void attrib_sync( void )
+{
     DBData key, data;
 
     int i;

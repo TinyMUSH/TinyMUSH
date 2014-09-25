@@ -31,7 +31,7 @@
 #include "interface.h"
 #include "externs.h"		/* required by code */
 
-extern int set_register( const char *, char *, char * );	/* funvars.c */
+extern int set_register( const char *, char *, char *);	/* funvars.c */
 
 #define FIXCASE(a) (tolower(a))
 #define EQUAL(a,b) ((a == b) || (FIXCASE(a) == FIXCASE(b)))
@@ -46,7 +46,8 @@ static int numargs;		/* argument return size */
  *                 data string, or no match is possible.
  */
 
-static int check_literals( char *tstr, char *dstr ) {
+static int check_literals( char *tstr, char *dstr )
+{
     char pattern[LBUF_SIZE], data[LBUF_SIZE], *p, *dp, *ep, *xp;
 
     int len;
@@ -150,7 +151,8 @@ static int check_literals( char *tstr, char *dstr ) {
  * This routine will cause crashes if fed NULLs instead of strings.
  */
 
-static int real_quick_wild( char *tstr, char *dstr ) {
+static int real_quick_wild( char *tstr, char *dstr )
+{
     int st;
 
     if( mudstate.wild_times_lev > mudconf.wild_times_lim ) {
@@ -175,9 +177,9 @@ static int real_quick_wild( char *tstr, char *dstr ) {
              * * match of next character.
              */
             tstr++;
-            /*
-             * FALL THROUGH
-             */
+        /*
+         * FALL THROUGH
+         */
         default:
             /*
              * Literal character.  Check for a match. If
@@ -253,7 +255,8 @@ static int real_quick_wild( char *tstr, char *dstr ) {
     return 0;
 }
 
-int quick_wild( char *tstr, char *dstr ) {
+int quick_wild( char *tstr, char *dstr )
+{
     int st;
 
     if( !check_literals( tstr, dstr ) ) {
@@ -279,7 +282,8 @@ int quick_wild( char *tstr, char *dstr ) {
  * variable.
  */
 
-static int real_wild1( char *tstr, char *dstr, int arg ) {
+static int real_wild1( char *tstr, char *dstr, int arg )
+{
     char *datapos;
 
     int argpos, numextra, st;
@@ -317,9 +321,9 @@ static int real_wild1( char *tstr, char *dstr, int arg ) {
              * * match of next character.
              */
             tstr++;
-            /*
-             * FALL THROUGH
-             */
+        /*
+         * FALL THROUGH
+         */
         default:
             /*
              * Literal character.  Check for a match. If
@@ -498,7 +502,8 @@ static int real_wild1( char *tstr, char *dstr, int arg ) {
     }
 }
 
-int wild1( char *tstr, char *dstr, int arg ) {
+int wild1( char *tstr, char *dstr, int arg )
+{
     int st;
 
     if( !check_literals( tstr, dstr ) ) {
@@ -524,7 +529,8 @@ int wild1( char *tstr, char *dstr, int arg ) {
  * Side Effect: this routine modifies the 'arglist' and 'numargs'
  * static global variables.
  */
-int wild( char *tstr, char *dstr, char *args[], int nargs ) {
+int wild( char *tstr, char *dstr, char *args[], int nargs )
+{
     int i, value;
 
     char *scan;
@@ -605,19 +611,20 @@ int wild( char *tstr, char *dstr, char *args[], int nargs ) {
  *
  * This routine will cause crashes if fed NULLs instead of strings.
  */
-int wild_match( char *tstr, char *dstr ) {
+int wild_match( char *tstr, char *dstr )
+{
     switch( *tstr ) {
     case '>':
         tstr++;
         if( isdigit( *tstr ) || ( *tstr == '-' ) ) {
-            return ( ( int ) strtol( tstr, ( char ** ) NULL, 10 ) < ( int ) strtol( dstr, ( char ** ) NULL, 10 ) );
+            return ( ( int ) strtol( tstr, ( char **) NULL, 10 ) < ( int ) strtol( dstr, ( char **) NULL, 10 ) );
         } else {
             return ( strcmp( tstr, dstr ) < 0 );
         }
     case '<':
         tstr++;
         if( isdigit( *tstr ) || ( *tstr == '-' ) ) {
-            return ( ( int ) strtol( tstr, ( char ** ) NULL, 10 ) > ( int ) strtol( dstr, ( char ** ) NULL, 10 ) );
+            return ( ( int ) strtol( tstr, ( char **) NULL, 10 ) > ( int ) strtol( dstr, ( char **) NULL, 10 ) );
         } else {
             return ( strcmp( tstr, dstr ) > 0 );
         }
@@ -631,7 +638,8 @@ int wild_match( char *tstr, char *dstr ) {
  * global registers.
  */
 
-int register_match( char *tstr, char *dstr, char *args[], int nargs ) {
+int register_match( char *tstr, char *dstr, char *args[], int nargs )
+{
     int i, value;
 
     char *buff, *scan, *p, *end, *q_names[NUM_ENV_VARS];
@@ -674,9 +682,9 @@ int register_match( char *tstr, char *dstr, char *args[], int nargs ) {
         *p++ = *scan;
         switch( *scan ) {
         case '?':
-            /*
-             * FALLTHRU
-             */
+        /*
+         * FALLTHRU
+         */
         case '*':
             args[i] = alloc_lbuf( "xvars_match.wild" );
             scan++;

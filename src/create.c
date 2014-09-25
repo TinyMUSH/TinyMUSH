@@ -25,7 +25,7 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-extern dbref match_controlled_quiet( dbref, const char * );
+extern dbref match_controlled_quiet( dbref, const char *);
 
 extern dbref clone_home( dbref, dbref );
 
@@ -33,14 +33,15 @@ extern int can_set_home( dbref, dbref, dbref );
 
 extern CONF conftable[];
 
-extern int cf_dbref( int *, char *, long, dbref, char * );
+extern int cf_dbref( int *, char *, long, dbref, char *);
 
 /*
  * ---------------------------------------------------------------------------
  * parse_linkable_room: Get a location to link to.
  */
 
-static dbref parse_linkable_room( dbref player, char *room_name ) {
+static dbref parse_linkable_room( dbref player, char *room_name )
+{
     dbref room;
 
     init_match( player, room_name, NOTYPE );
@@ -75,7 +76,8 @@ static dbref parse_linkable_room( dbref player, char *room_name ) {
  * open_exit, do_open: Open a new exit and optionally link it somewhere.
  */
 
-static void open_exit( dbref player, dbref loc, char *direction, char *linkto ) {
+static void open_exit( dbref player, dbref loc, char *direction, char *linkto )
+{
     dbref exit;
 
     if( !Good_obj( loc ) ) {
@@ -142,7 +144,8 @@ static void open_exit( dbref player, dbref loc, char *direction, char *linkto ) 
     }
 }
 
-void do_open( dbref player, dbref cause, int key, char *direction, char *links[], int nlinks ) {
+void do_open( dbref player, dbref cause, int key, char *direction, char *links[], int nlinks )
+{
     dbref loc, destnum;
     char *dest;
     char s[MBUF_SIZE];
@@ -184,7 +187,8 @@ void do_open( dbref player, dbref cause, int key, char *direction, char *links[]
  * home(player,thing)
  */
 
-void link_exit( dbref player, dbref exit, dbref dest ) {
+void link_exit( dbref player, dbref exit, dbref dest )
+{
     int cost, quot;
 
     /*
@@ -247,7 +251,8 @@ void link_exit( dbref player, dbref exit, dbref dest ) {
     s_Modified( exit );
 }
 
-void do_link( dbref player, dbref cause, int key, char *what, char *where ) {
+void do_link( dbref player, dbref cause, int key, char *what, char *where )
+{
     dbref thing, room;
 
     /*
@@ -364,7 +369,8 @@ void do_link( dbref player, dbref cause, int key, char *what, char *where ) {
  * do_parent: Set an object's parent field.
  */
 
-void do_parent( dbref player, dbref cause, int key, char *tname, char *pname ) {
+void do_parent( dbref player, dbref cause, int key, char *tname, char *pname )
+{
     dbref thing, parent, curr;
 
     int lev;
@@ -439,7 +445,8 @@ void do_parent( dbref player, dbref cause, int key, char *tname, char *pname ) {
  * do_dig: Create a new room.
  */
 
-void do_dig( dbref player, dbref cause, int key, char *name, char *args[], int nargs ) {
+void do_dig( dbref player, dbref cause, int key, char *name, char *args[], int nargs )
+{
     dbref room;
 
     char *buff;
@@ -479,12 +486,13 @@ void do_dig( dbref player, dbref cause, int key, char *name, char *args[], int n
  * do_create: Make a new object.
  */
 
-void do_create( dbref player, dbref cause, int key, char *name, char *coststr ) {
+void do_create( dbref player, dbref cause, int key, char *name, char *coststr )
+{
     dbref thing;
 
     int cost;
 
-    cost = ( int ) strtol( coststr, ( char ** ) NULL, 10 );
+    cost = ( int ) strtol( coststr, ( char **) NULL, 10 );
     if( !name || !*name || ( strip_ansi_len( name ) == 0 ) ) {
         notify_quiet( player, "Create what?" );
         return;
@@ -501,7 +509,7 @@ void do_create( dbref player, dbref cause, int key, char *name, char *coststr ) 
     s_Home( thing, new_home( player ) );
     if( !Quiet( player ) ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s created as object #%d", Name( thing ), thing );
-        
+
     }
 }
 
@@ -511,7 +519,8 @@ void do_create( dbref player, dbref cause, int key, char *name, char *coststr ) 
  * do_clone: Create a copy of an object.
  */
 
-void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
+void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 )
+{
     dbref clone, thing, new_owner, loc;
 
     FLAG rmv_flags;
@@ -577,7 +586,7 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
      */
 
     if( key & CLONE_SET_COST ) {
-        cost = ( int ) strtol( arg2, ( char ** ) NULL, 10 );
+        cost = ( int ) strtol( arg2, ( char **) NULL, 10 );
         arg2 = NULL;
     } else {
         cost = 0;
@@ -643,7 +652,7 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
         clone_name = Name( thing );
     }
 
-    s_Name( clone, ( char * ) clone_name );
+    s_Name( clone, ( char *) clone_name );
 
     /*
      * Reset the cost, since this also got wiped when we cleared
@@ -685,10 +694,11 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
      */
 
     if( !Quiet( player ) ) {
-        if( arg2 && *arg2 )
+        if( arg2 && *arg2 ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s cloned as %s, new copy is object #%d.", Name( thing ), clone_name, clone );
-        else
+        } else {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s cloned, new copy is object #%d.", Name( thing ), clone );
+        }
     }
     /*
      * Put the new thing in its new home.  Break any dropto or link, then
@@ -726,7 +736,7 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
             s_Parent( clone, Parent( thing ) );
         }
         did_it( player, clone, A_NULL, NULL, A_NULL, NULL, A_ACLONE, 0,
-                ( char ** ) NULL, 0, MSG_MOVE );
+                ( char **) NULL, 0, MSG_MOVE );
     } else {
         if( !( key & CLONE_FROM_PARENT ) &&
                 ( Controls( player, thing ) || Parent_ok( thing ) ) ) {
@@ -741,7 +751,8 @@ void do_clone( dbref player, dbref cause, int key, char *name, char *arg2 ) {
  * do_pcreate: Create new players and robots.
  */
 
-void do_pcreate( dbref player, dbref cause, int key, char *name, char *pass ) {
+void do_pcreate( dbref player, dbref cause, int key, char *name, char *pass )
+{
     int isrobot;
     dbref newplayer;
     char *newname, *cname, *nname;
@@ -784,7 +795,8 @@ void do_pcreate( dbref player, dbref cause, int key, char *name, char *pass ) {
  * can_destroy_exit, can_destroy_player, do_destroy: Destroy things.
  */
 
-static int can_destroy_exit( dbref player, dbref exit ) {
+static int can_destroy_exit( dbref player, dbref exit )
+{
     dbref loc;
 
     loc = Exits( exit );
@@ -804,7 +816,8 @@ static int can_destroy_exit( dbref player, dbref exit ) {
  * the database.
  */
 
-int destroyable( dbref victim ) {
+int destroyable( dbref victim )
+{
     CONF *tp, *ctab;
     char *s;
     MODULE *mp;
@@ -815,7 +828,7 @@ int destroyable( dbref victim ) {
 
     for( tp = conftable; tp->pname; tp++ ) {
         if( tp->interpreter == cf_dbref &&
-                victim == * ( ( dbref * )( tp->loc ) ) ) {
+                victim == * ( ( dbref *)( tp->loc ) ) ) {
             return 0;
         }
     }
@@ -825,7 +838,7 @@ int destroyable( dbref victim ) {
         snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
         if( ( ctab = (CONF *)lt_dlsym(mp->handle, s) ) != NULL ) {
             for( tp = ctab; tp->pname; tp++ ) {
-                if( tp->interpreter == cf_dbref && victim == * ( ( dbref * )( tp->loc ) ) ) {
+                if( tp->interpreter == cf_dbref && victim == * ( ( dbref *)( tp->loc ) ) ) {
                     free_lbuf(s);
                     return 0;
                 }
@@ -838,7 +851,8 @@ int destroyable( dbref victim ) {
 }
 
 
-static int can_destroy_player( dbref player, dbref victim ) {
+static int can_destroy_player( dbref player, dbref victim )
+{
     if( !Wizard( player ) ) {
         notify_quiet( player, "Sorry, no suicide allowed." );
         return 0;
@@ -850,7 +864,8 @@ static int can_destroy_player( dbref player, dbref victim ) {
     return 1;
 }
 
-void do_destroy( dbref player, dbref cause, int key, char *what ) {
+void do_destroy( dbref player, dbref cause, int key, char *what )
+{
     dbref thing;
     int can_doit;
     const char *typename;

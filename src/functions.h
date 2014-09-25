@@ -80,7 +80,7 @@ typedef struct object_grid OBJGRID;
 struct object_grid {
     int		rows;
     int		cols;
-    char         ***data;
+    char             ** *data;
 };
 
 typedef double	NVAL;
@@ -102,16 +102,16 @@ typedef double	NVAL;
 
 extern const Delim SPACE_DELIM;
 
-extern char    *trim_space_sep( char *, const Delim * );
-extern char    *next_token( char *, const Delim * );
-extern char    *split_token( char **, const Delim * );
-extern char    *next_token_ansi( char *, const Delim *, int * );
-extern int	countwords( char *, const Delim * );
-extern int	list2arr( char ***, int, char *, const Delim * );
-extern void	arr2list( char **, int, char *, char **, const Delim * );
-extern int	list2ansi( int *, int *, int, char *, const Delim * );
-extern void do_reverse( char *, char * );
-extern int	fn_range_check( const char *, int, int, int, char *, char ** );
+extern char    *trim_space_sep( char *, const Delim *);
+extern char    *next_token( char *, const Delim *);
+extern char    *split_token( char **, const Delim *);
+extern char    *next_token_ansi( char *, const Delim *, int *);
+extern int	countwords( char *, const Delim *);
+extern int	list2arr( char ** *, int, char *, const Delim *);
+extern void	arr2list( char **, int, char *, char **, const Delim *);
+extern int	list2ansi( int *, int *, int, char *, const Delim *);
+extern void do_reverse( char *, char *);
+extern int	fn_range_check( const char *, int, int, int, char *, char **);
 extern int	delim_check( char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int );
 
 /*

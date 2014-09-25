@@ -29,7 +29,8 @@ typedef struct _help_indx_list {
 } help_indx_list;
 
 
-int helpmkindx_dump_entries( FILE * wfp, long pos, help_indx_list * entries ) {
+int helpmkindx_dump_entries( FILE *wfp, long pos, help_indx_list *entries )
+{
     int truepos;
 
     int truelen;
@@ -72,7 +73,8 @@ int helpmkindx_dump_entries( FILE * wfp, long pos, help_indx_list * entries ) {
 }
 
 
-int helpmkindx( dbref player, char *confcmd, char *helpfile ) {
+int helpmkindx( dbref player, char *confcmd, char *helpfile )
+{
     long pos;
 
     int i, n, lineno, ntopics, actualdata;
@@ -109,7 +111,7 @@ int helpmkindx( dbref player, char *confcmd, char *helpfile ) {
     /*
      * create initial entry storage
      */
-    entries = ( help_indx_list * ) malloc( sizeof( help_indx_list ) );
+    entries = ( help_indx_list *) malloc( sizeof( help_indx_list ) );
     memset( entries, 0, sizeof( help_indx_list ) );
 
     while( fgets( line, LINE_SIZE, rfp ) != NULL ) {
@@ -141,7 +143,7 @@ int helpmkindx( dbref player, char *confcmd, char *helpfile ) {
                  */
                 ep = entries;
                 entries =
-                    ( help_indx_list * )
+                    ( help_indx_list *)
                     malloc( sizeof( help_indx_list ) );
                 memset( entries, 0, sizeof( help_indx_list ) );
                 entries->next = ep;
@@ -180,7 +182,8 @@ int helpmkindx( dbref player, char *confcmd, char *helpfile ) {
     return ( 0 );
 }
 
-int helpindex_read( HASHTAB *htab, char *filename ) {
+int helpindex_read( HASHTAB *htab, char *filename )
+{
     help_indx entry;
 
     char *p;
@@ -196,7 +199,7 @@ int helpindex_read( HASHTAB *htab, char *filename ) {
      */
     for( p = hash_firstkey( htab ); p; p = hash_nextkey( htab ) ) {
         if( !( hashfindflags( p, htab ) & HASH_ALIAS ) ) {
-            htab_entry = ( struct help_entry * ) hashfind( p, htab );
+            htab_entry = ( struct help_entry *) hashfind( p, htab );
             XFREE( htab_entry, "helpindex_read.hent0" );
         }
     }
@@ -208,7 +211,7 @@ int helpindex_read( HASHTAB *htab, char *filename ) {
         return -1;
     }
     count = 0;
-    while( ( fread( ( char * ) &entry, sizeof( help_indx ), 1, fp ) ) == 1 ) {
+    while( ( fread( ( char *) &entry, sizeof( help_indx ), 1, fp ) ) == 1 ) {
 
         /*
          * Lowercase the entry and add all leftmost substrings.
@@ -219,20 +222,20 @@ int helpindex_read( HASHTAB *htab, char *filename ) {
         }
 
         htab_entry =
-            ( struct help_entry * ) XMALLOC( sizeof( struct help_entry ),
-                                             "helpindex_read.hent1" );
+            ( struct help_entry *) XMALLOC( sizeof( struct help_entry ),
+                                            "helpindex_read.hent1" );
 
         htab_entry->pos = entry.pos;
         htab_entry->len = entry.len;
 
-        if( hashadd( entry.topic, ( int * ) htab_entry, htab, 0 ) == 0 ) {
+        if( hashadd( entry.topic, ( int *) htab_entry, htab, 0 ) == 0 ) {
             count++;
             while( p > ( entry.topic + 1 ) ) {
                 p--;
                 *p = '\0';
                 if( !isspace( * ( p - 1 ) ) ) {
                     if( hashadd( entry.topic,
-                                 ( int * ) htab_entry, htab,
+                                 ( int *) htab_entry, htab,
                                  HASH_ALIAS ) == 0 ) {
                         count++;
                     } else {
@@ -254,7 +257,8 @@ int helpindex_read( HASHTAB *htab, char *filename ) {
     return count;
 }
 
-void helpindex_load( dbref player ) {
+void helpindex_load( dbref player )
+{
     int i;
 
     char buf[SBUF_SIZE + 8];
@@ -277,7 +281,8 @@ void helpindex_load( dbref player ) {
 }
 
 
-void helpindex_init( void ) {
+void helpindex_init( void )
+{
     /*
      * We do not need to do hashinits here, as this will already have
      * * been done by the add_helpfile() calls.
@@ -286,7 +291,8 @@ void helpindex_init( void ) {
     helpindex_load( NOTHING );
 }
 
-void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int eval ) {
+void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int eval )
+{
     FILE *fp;
 
     char *p, *line, *result, *str, *bp;
@@ -300,12 +306,12 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
     char *topic_list, *buffp;
 
     if( *topic == '\0' ) {
-        topic = ( char * ) "help";
+        topic = ( char *) "help";
     } else
         for( p = topic; *p; p++ ) {
             *p = tolower( *p );
         }
-    htab_entry = ( struct help_entry * ) hashfind( topic, htab );
+    htab_entry = ( struct help_entry *) hashfind( topic, htab );
     if( htab_entry ) {
         entry_offset = htab_entry->pos;
         entry_length = htab_entry->len;
@@ -367,7 +373,7 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
         if( eval ) {
             str = line;
             bp = result;
-            exec( result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, ( char ** ) NULL, 0 );
+            exec( result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, ( char **) NULL, 0 );
             notify_check(player , player , MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, NULL, result);
         } else {
             notify_check(player , player , MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, NULL, line);
@@ -384,7 +390,8 @@ void help_write( dbref player, char *topic, HASHTAB *htab, char *filename, int e
  * help_helper: Write entry into a buffer for a function.
  */
 
-void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, char **bufc ) {
+void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, char **bufc )
+{
     char tbuf[SBUF_SIZE + 8];
 
     char tname[LBUF_SIZE];
@@ -399,22 +406,22 @@ void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, c
 
     if( hf_num >= mudstate.helpfiles ) {
         log_write( LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num );
-        safe_str( ( char * ) "#-1 NOT FOUND", buff, bufc );
+        safe_str( ( char *) "#-1 NOT FOUND", buff, bufc );
         return;
     }
 
     if( !topic || !*topic ) {
-        strcpy( tname, ( char * ) "help" );
+        strcpy( tname, ( char *) "help" );
     } else {
         for( p = topic, q = tname; *p; p++, q++ ) {
             *q = tolower( *p );
         }
         *q = '\0';
     }
-    htab_entry = ( struct help_entry * ) hashfind( tname,
+    htab_entry = ( struct help_entry *) hashfind( tname,
                  &mudstate.hfile_hashes[hf_num] );
     if( !htab_entry ) {
-        safe_str( ( char * ) "#-1 NOT FOUND", buff, bufc );
+        safe_str( ( char *) "#-1 NOT FOUND", buff, bufc );
         return;
     }
     entry_offset = htab_entry->pos;
@@ -423,13 +430,13 @@ void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, c
     sprintf( tbuf, "%s.txt", mudstate.hfiletab[hf_num] );
     if( ( fp = tf_fopen( tbuf, O_RDONLY ) ) == NULL ) {
         log_write( LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", tbuf );
-        safe_str( ( char * ) "#-1 ERROR", buff, bufc );
+        safe_str( ( char *) "#-1 ERROR", buff, bufc );
         return;
     }
     if( fseek( fp, entry_offset, 0 ) < 0L ) {
         log_write( LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", tbuf );
         tf_fclose( fp );
-        safe_str( ( char * ) "#-1 ERROR", buff, bufc );
+        safe_str( ( char *) "#-1 ERROR", buff, bufc );
         return;
     }
 
@@ -457,7 +464,7 @@ void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, c
             bp = result;
             exec( result, &bp, 0, player, player,
                   EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str,
-                  ( char ** ) NULL, 0 );
+                  ( char **) NULL, 0 );
             safe_str( result, buff, bufc );
         } else {
             safe_str( line, buff, bufc );
@@ -475,7 +482,8 @@ void help_helper( dbref player, int hf_num, int eval, char *topic, char *buff, c
  * do_help: display information from new-format news and help files
  */
 
-void do_help( dbref player, dbref cause, int key, char *message ) {
+void do_help( dbref player, dbref cause, int key, char *message )
+{
     char tbuf[SBUF_SIZE + 8];
 
     int hf_num;

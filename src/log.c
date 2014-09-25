@@ -24,35 +24,35 @@ static FILE *mainlog_fp = NULL;	/*!< Pointer to the main log file */
 static FILE *log_fp = NULL;	/*!< Pointer to the facility's log file */
 
 NAMETAB logdata_nametab[] = {
-    { ( char * ) "flags", 1, 0, LOGOPT_FLAGS},
-    { ( char * ) "location", 1, 0, LOGOPT_LOC},
-    { ( char * ) "owner", 1, 0, LOGOPT_OWNER},
-    { ( char * ) "timestamp", 1, 0, LOGOPT_TIMESTAMP},
+    { ( char *) "flags", 1, 0, LOGOPT_FLAGS},
+    { ( char *) "location", 1, 0, LOGOPT_LOC},
+    { ( char *) "owner", 1, 0, LOGOPT_OWNER},
+    { ( char *) "timestamp", 1, 0, LOGOPT_TIMESTAMP},
     { NULL, 0, 0, 0}
 };
 
 NAMETAB logoptions_nametab[] = {
-    { ( char * ) "accounting", 2, 0, LOG_ACCOUNTING},
-    { ( char * ) "all_commands", 2, 0, LOG_ALLCOMMANDS},
-    { ( char * ) "bad_commands", 2, 0, LOG_BADCOMMANDS},
-    { ( char * ) "buffer_alloc", 3, 0, LOG_ALLOCATE},
-    { ( char * ) "bugs", 3, 0, LOG_BUGS},
-    { ( char * ) "checkpoints", 2, 0, LOG_DBSAVES},
-    { ( char * ) "config_changes", 2, 0, LOG_CONFIGMODS},
-    { ( char * ) "create", 2, 0, LOG_PCREATES},
-    { ( char * ) "keyboard_commands", 2, 0, LOG_KBCOMMANDS},
-    { ( char * ) "killing", 1, 0, LOG_KILLS},
-    { ( char * ) "local", 3, 0, LOG_LOCAL},
-    { ( char * ) "logins", 3, 0, LOG_LOGIN},
-    { ( char * ) "network", 1, 0, LOG_NET},
-    { ( char * ) "problems", 1, 0, LOG_PROBLEMS},
-    { ( char * ) "security", 2, 0, LOG_SECURITY},
-    { ( char * ) "shouts", 2, 0, LOG_SHOUTS},
-    { ( char * ) "startup", 2, 0, LOG_STARTUP},
-    { ( char * ) "suspect_commands", 2, 0, LOG_SUSPECTCMDS},
-    { ( char * ) "time_usage", 1, 0, LOG_TIMEUSE},
-    { ( char * ) "wizard", 1, 0, LOG_WIZARD},
-    { ( char * ) "malloc", 1, 0, LOG_MALLOC},
+    { ( char *) "accounting", 2, 0, LOG_ACCOUNTING},
+    { ( char *) "all_commands", 2, 0, LOG_ALLCOMMANDS},
+    { ( char *) "bad_commands", 2, 0, LOG_BADCOMMANDS},
+    { ( char *) "buffer_alloc", 3, 0, LOG_ALLOCATE},
+    { ( char *) "bugs", 3, 0, LOG_BUGS},
+    { ( char *) "checkpoints", 2, 0, LOG_DBSAVES},
+    { ( char *) "config_changes", 2, 0, LOG_CONFIGMODS},
+    { ( char *) "create", 2, 0, LOG_PCREATES},
+    { ( char *) "keyboard_commands", 2, 0, LOG_KBCOMMANDS},
+    { ( char *) "killing", 1, 0, LOG_KILLS},
+    { ( char *) "local", 3, 0, LOG_LOCAL},
+    { ( char *) "logins", 3, 0, LOG_LOGIN},
+    { ( char *) "network", 1, 0, LOG_NET},
+    { ( char *) "problems", 1, 0, LOG_PROBLEMS},
+    { ( char *) "security", 2, 0, LOG_SECURITY},
+    { ( char *) "shouts", 2, 0, LOG_SHOUTS},
+    { ( char *) "startup", 2, 0, LOG_STARTUP},
+    { ( char *) "suspect_commands", 2, 0, LOG_SUSPECTCMDS},
+    { ( char *) "time_usage", 1, 0, LOG_TIMEUSE},
+    { ( char *) "wizard", 1, 0, LOG_WIZARD},
+    { ( char *) "malloc", 1, 0, LOG_MALLOC},
     { NULL, 0, 0, 0}
 };
 
@@ -85,7 +85,8 @@ LOGFILETAB logfds_table[] = {
  * logfile_init: Initialize the main logfile.
  */
 
-void logfile_init( char *filename ) {
+void logfile_init( char *filename )
+{
     if( !filename ) {
         mainlog_fp = stderr;
         return;
@@ -106,7 +107,8 @@ void logfile_init( char *filename ) {
  * log entry.
  */
 
-int start_log( const char *primary, const char *secondary, int key ) {
+int start_log( const char *primary, const char *secondary, int key )
+{
     struct tm *tp;
 
     time_t now;
@@ -164,8 +166,8 @@ int start_log( const char *primary, const char *secondary, int key ) {
              */
 
             if( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
-                time( ( time_t * )( &now ) );
-                tp = localtime( ( time_t * )( &now ) );
+                time( ( time_t *)( &now ) );
+                tp = localtime( ( time_t *)( &now ) );
                 log_write_raw( 0, "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
             }
 
@@ -188,7 +190,7 @@ int start_log( const char *primary, const char *secondary, int key ) {
             log_write_raw( 0, "Recursive logging request.\n" );
         }
         return ( 1 );
-    } 
+    }
 
     return 0;
 }
@@ -197,13 +199,14 @@ int start_log( const char *primary, const char *secondary, int key ) {
  * end_log: Finish up writing a log entry
  */
 
-void end_log( void ) {
+void end_log( void )
+{
     log_write_raw( 0, "\n" );
 
     if( log_fp != NULL ) {
         fflush( log_fp );
     }
-    
+
     mudstate.logging--;
 
     if( mudstate.logging < 0 ) {
@@ -217,7 +220,8 @@ void end_log( void ) {
  * log_perror: Write perror message to the log
  */
 
-void log_perror( const char *primary, const char *secondary, const char *extra, const char *failing_object ) {
+void log_perror( const char *primary, const char *secondary, const char *extra, const char *failing_object )
+{
     int my_errno = errno;
 
     if( extra && *extra ) {
@@ -231,12 +235,13 @@ void log_perror( const char *primary, const char *secondary, const char *extra, 
  * log_write: Format text and print to the log file.
  */
 
-void log_write( int key, const char *primary, const char *secondary, const char *format, ... ) {
+void log_write( int key, const char *primary, const char *secondary, const char *format, ... )
+{
     va_list ap;
     char s[MBUF_SIZE];
-    
+
     /*
-     * Since the malloc functions now call this, 
+     * Since the malloc functions now call this,
      * we should avoid doing malloc stuff in
      * the logger...
      */
@@ -272,7 +277,8 @@ void log_write( int key, const char *primary, const char *secondary, const char 
  * log_write_raw: Print text to the log or mainlog file.
  */
 
-void log_write_raw( int key, const char *format, ... ) {
+void log_write_raw( int key, const char *format, ... )
+{
     va_list ap;
     char s[MBUF_SIZE];
 
@@ -312,7 +318,8 @@ void log_write_raw( int key, const char *format, ... ) {
  * the caller to XFREE the created buffer.
  */
 
-char *log_getname( dbref target, char *d ) {
+char *log_getname( dbref target, char *d )
+{
     char *name, *s;
 
     if( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
@@ -328,7 +335,8 @@ char *log_getname( dbref target, char *d ) {
     return ( name );
 }
 
-char *log_gettype( dbref thing, char *d ) {
+char *log_gettype( dbref thing, char *d )
+{
     if( !Good_dbref( thing ) ) {
         return( XSTRDUP( "??OUT-OF-RANGE??",d ) );
     }
@@ -353,7 +361,8 @@ char *log_gettype( dbref thing, char *d ) {
  * Log rotation.
  */
 
-void do_logrotate( dbref player, dbref cause, int key ) {
+void do_logrotate( dbref player, dbref cause, int key )
+{
     LOGFILETAB *lp;
     char ts[SBUF_SIZE], *pname;
     char s[MBUF_SIZE];
@@ -392,7 +401,8 @@ void do_logrotate( dbref player, dbref cause, int key ) {
     }
 }
 
-void logfile_close( void ) {
+void logfile_close( void )
+{
     LOGFILETAB *lp;
     char ts[SBUF_SIZE], s[MBUF_SIZE];
 

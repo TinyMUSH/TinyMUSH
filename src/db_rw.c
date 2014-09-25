@@ -43,7 +43,8 @@ static int *used_attrs_table;
  * getboolexp1: Get boolean subexpression from file.
  */
 
-BOOLEXP * getboolexp1( FILE *f ) {
+BOOLEXP *getboolexp1( FILE *f )
+{
     BOOLEXP *b;
 
     char *buff, *s;
@@ -55,9 +56,9 @@ BOOLEXP * getboolexp1( FILE *f ) {
     case '\n':
         ungetc( c, f );
         return TRUE_BOOLEXP;
-        /*
-         * break;
-         */
+    /*
+     * break;
+     */
     case EOF:
         log_write_raw( 1, "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n" );
         abort();
@@ -180,8 +181,8 @@ BOOLEXP * getboolexp1( FILE *f ) {
                 b->type = BOOLEXP_ATR;
             }
             b->sub1 =
-                ( BOOLEXP * ) XSTRDUP( getstring_noalloc( f, 1 ),
-                                       "getboolexp1.attr_lock" );
+                ( BOOLEXP *) XSTRDUP( getstring_noalloc( f, 1 ),
+                                      "getboolexp1.attr_lock" );
         }
         return b;
     default:		/* dbref or attribute */
@@ -252,7 +253,7 @@ BOOLEXP * getboolexp1( FILE *f ) {
             }
             *s++ = 0;
             b->sub1 =
-                ( BOOLEXP * ) XSTRDUP( buff, "getboolexp1.attr_lock" );
+                ( BOOLEXP *) XSTRDUP( buff, "getboolexp1.attr_lock" );
             free_lbuf( buff );
         }
         ungetc( c, f );
@@ -270,7 +271,8 @@ error:
  * getboolexp: Read a boolean expression from the flat file.
  */
 
-static BOOLEXP *getboolexp( FILE *f ) {
+static BOOLEXP *getboolexp( FILE *f )
+{
     BOOLEXP *b;
 
     char c;
@@ -292,7 +294,8 @@ static BOOLEXP *getboolexp( FILE *f ) {
  * unscramble_attrnum: Fix up attribute numbers from foreign muds
  */
 
-static int unscramble_attrnum( int attrnum ) {
+static int unscramble_attrnum( int attrnum )
+{
     switch( g_format ) {
     case F_MUSH:
         /*
@@ -325,7 +328,8 @@ static int unscramble_attrnum( int attrnum ) {
  * get_list: Read attribute list from flat file.
  */
 
-static int get_list( FILE *f, dbref i, int new_strings ) {
+static int get_list( FILE *f, dbref i, int new_strings )
+{
     dbref atr;
 
     int c;
@@ -347,7 +351,7 @@ static int get_list( FILE *f, dbref i, int new_strings ) {
                  */
 
                 atr_add_raw( i, atr,
-                             ( char * ) getstring_noalloc( f, new_strings ) );
+                             ( char *) getstring_noalloc( f, new_strings ) );
             } else {
                 /*
                  * Silently discard
@@ -384,7 +388,8 @@ static int get_list( FILE *f, dbref i, int new_strings ) {
  * ---------------------------------------------------------------------------
  * putbool_subexp: Write a boolean sub-expression to the flat file.
  */
-static void putbool_subexp( FILE *f, BOOLEXP *b ) {
+static void putbool_subexp( FILE *f, BOOLEXP *b )
+{
     ATTR *va;
 
     switch( b->type ) {
@@ -438,17 +443,17 @@ static void putbool_subexp( FILE *f, BOOLEXP *b ) {
     case BOOLEXP_ATR:
         va = atr_num( b->thing );
         if( va ) {
-            fprintf( f, "%s:%s", va->name, ( char * ) b->sub1 );
+            fprintf( f, "%s:%s", va->name, ( char *) b->sub1 );
         } else {
-            fprintf( f, "%d:%s\n", b->thing, ( char * ) b->sub1 );
+            fprintf( f, "%d:%s\n", b->thing, ( char *) b->sub1 );
         }
         break;
     case BOOLEXP_EVAL:
         va = atr_num( b->thing );
         if( va ) {
-            fprintf( f, "%s/%s\n", va->name, ( char * ) b->sub1 );
+            fprintf( f, "%s/%s\n", va->name, ( char *) b->sub1 );
         } else {
-            fprintf( f, "%d/%s\n", b->thing, ( char * ) b->sub1 );
+            fprintf( f, "%d/%s\n", b->thing, ( char *) b->sub1 );
         }
         break;
     default:
@@ -461,7 +466,8 @@ static void putbool_subexp( FILE *f, BOOLEXP *b ) {
  * putboolexp: Write boolean expression to the flat file.
  */
 
-void putboolexp( FILE *f, BOOLEXP *b ) {
+void putboolexp( FILE *f, BOOLEXP *b )
+{
     if( b != TRUE_BOOLEXP ) {
         putbool_subexp( f, b );
     }
@@ -473,7 +479,8 @@ void putboolexp( FILE *f, BOOLEXP *b ) {
  * upgrade_flags: Convert foreign flags to MUSH format.
  */
 
-static void upgrade_flags( FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version ) {
+static void upgrade_flags( FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version )
+{
     FLAG f1, f2, f3, newf1, newf2, newf3;
 
     f1 = *flags1;
@@ -593,7 +600,8 @@ static void upgrade_flags( FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing
  * efo_convert: Fix things up for Exits-From-Objects
  */
 
-void efo_convert( void ) {
+void efo_convert( void )
+{
     int i;
 
     dbref link;
@@ -620,7 +628,8 @@ void efo_convert( void ) {
  * fix_mux_zones: Convert MUX-style zones to 3.0-style zones.
  */
 
-static void fix_mux_zones( void ) {
+static void fix_mux_zones( void )
+{
     /*
      * For all objects in the database where Zone(thing) != NOTHING, set
      * the CONTROL_OK flag on them.
@@ -636,7 +645,7 @@ static void fix_mux_zones( void ) {
 
     char *astr;
 
-    zmarks = ( int * ) XCALLOC( mudstate.db_top, sizeof( int ), "fix_mux_zones" );
+    zmarks = ( int *) XCALLOC( mudstate.db_top, sizeof( int ), "fix_mux_zones" );
 
     DO_WHOLE_DB( i ) {
         if( Zone( i ) != NOTHING ) {
@@ -662,7 +671,8 @@ static void fix_mux_zones( void ) {
  * fix_typed_quotas: Explode standard quotas into typed quotas
  */
 
-static void fix_typed_quotas( void ) {
+static void fix_typed_quotas( void )
+{
     /*
      * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
      * attributes  exist. For simplicity's sake, we assume that players
@@ -684,10 +694,10 @@ static void fix_typed_quotas( void ) {
             qbuf = atr_get_raw( i, A_QUOTA );
             rqbuf = atr_get_raw( i, A_RQUOTA );
             if( !qbuf || !*qbuf ) {
-                qbuf = ( char * ) "1";
+                qbuf = ( char *) "1";
             }
             if( !rqbuf || !*rqbuf ) {
-                rqbuf = ( char * ) "0";
+                rqbuf = ( char *) "0";
             }
             snprintf( s, LBUF_SIZE, "%s %s %s %s %s", qbuf, qbuf, qbuf, qbuf, qbuf );
             atr_add_raw( i, A_QUOTA, s );
@@ -697,7 +707,8 @@ static void fix_typed_quotas( void ) {
     }
 }
 
-dbref db_read_flatfile( FILE *f, int *db_format, int *db_version, int *db_flags ) {
+dbref db_read_flatfile( FILE *f, int *db_format, int *db_version, int *db_flags )
+{
     dbref i, anum;
 
     char ch;
@@ -879,7 +890,7 @@ dbref db_read_flatfile( FILE *f, int *db_format, int *db_version, int *db_flags 
                 } else {
                     aflags = mudconf.vattr_flags;
                 }
-                vattr_define( ( char * ) tstr, anum, aflags );
+                vattr_define( ( char *) tstr, anum, aflags );
                 break;
             case 'F':	/* OPEN USER ATTRIBUTE SLOT */
                 anum = getref( f );
@@ -931,14 +942,14 @@ dbref db_read_flatfile( FILE *f, int *db_format, int *db_version, int *db_flags 
                 if( deduce_name ) {
                     if( isdigit( *tstr ) ) {
                         read_name = 0;
-                        s_Location( i, ( int ) strtol( tstr, ( char ** ) NULL, 10 ) );
+                        s_Location( i, ( int ) strtol( tstr, ( char **) NULL, 10 ) );
                     } else {
-                        s_Name( i, ( char * ) tstr );
+                        s_Name( i, ( char *) tstr );
                         s_Location( i, getref( f ) );
                     }
                     deduce_name = 0;
                 } else {
-                    s_Name( i, ( char * ) tstr );
+                    s_Name( i, ( char *) tstr );
                     s_Location( i, getref( f ) );
                 }
             } else {
@@ -1106,7 +1117,8 @@ dbref db_read_flatfile( FILE *f, int *db_format, int *db_version, int *db_flags 
     }
 }
 
-int db_read( void ) {
+int db_read( void )
+{
     DBData key, data;
 
     int *c, vattr_flags, i, j, blksize, num;
@@ -1135,13 +1147,13 @@ int db_read( void ) {
      */
 
     c = data.dptr;
-    memcpy( ( void * ) &mudstate.min_size, ( void * ) c, sizeof( int ) );
+    memcpy( ( void *) &mudstate.min_size, ( void *) c, sizeof( int ) );
     c++;
-    memcpy( ( void * ) &mudstate.attr_next, ( void * ) c, sizeof( int ) );
+    memcpy( ( void *) &mudstate.attr_next, ( void *) c, sizeof( int ) );
     c++;
-    memcpy( ( void * ) &mudstate.record_players, ( void * ) c, sizeof( int ) );
+    memcpy( ( void *) &mudstate.record_players, ( void *) c, sizeof( int ) );
     c++;
-    memcpy( ( void * ) &mudstate.moduletype_top, ( void * ) c, sizeof( int ) );
+    memcpy( ( void *) &mudstate.moduletype_top, ( void *) c, sizeof( int ) );
     RAW_FREE( data.dptr, "db_get" );
 
     /*
@@ -1162,14 +1174,14 @@ int db_read( void ) {
 
             s = data.dptr;
 
-            while( ( s - ( char * ) data.dptr ) < data.dsize ) {
-                memcpy( ( void * ) &j, ( void * ) s, sizeof( int ) );
+            while( ( s - ( char *) data.dptr ) < data.dsize ) {
+                memcpy( ( void *) &j, ( void *) s, sizeof( int ) );
                 s += sizeof( int );
-                memcpy( ( void * ) &vattr_flags, ( void * ) s,
+                memcpy( ( void *) &vattr_flags, ( void *) s,
                         sizeof( int ) );
                 s += sizeof( int );
                 vattr_define( s, j, vattr_flags );
-                s = strchr( ( const char * ) s, '\0' );
+                s = strchr( ( const char *) s, '\0' );
 
                 if( !s ) {
                     /*
@@ -1205,8 +1217,8 @@ int db_read( void ) {
 
             s = data.dptr;
 
-            while( ( s - ( char * ) data.dptr ) < data.dsize ) {
-                memcpy( ( void * ) &num, ( void * ) s, sizeof( int ) );
+            while( ( s - ( char *) data.dptr ) < data.dsize ) {
+                memcpy( ( void *) &num, ( void *) s, sizeof( int ) );
                 s += sizeof( int );
                 db_grow( num + 1 );
 
@@ -1218,7 +1230,7 @@ int db_read( void ) {
                  * copy it into place
                  */
 
-                memcpy( ( void * ) & ( db[num] ), ( void * ) s,
+                memcpy( ( void *) & ( db[num] ), ( void *) s,
                         sizeof( DUMPOBJ ) );
                 s += sizeof( DUMPOBJ );
 #ifndef NO_TIMECHECKING
@@ -1258,7 +1270,8 @@ int db_read( void ) {
     return ( 0 );
 }
 
-static int db_write_object_out( FILE *f, dbref i, int db_format, int flags, int *n_atrt ) {
+static int db_write_object_out( FILE *f, dbref i, int db_format, int flags, int *n_atrt )
+{
     ATTR *a;
 
     char *got, *as;
@@ -1376,7 +1389,8 @@ static int db_write_object_out( FILE *f, dbref i, int db_format, int flags, int 
     return ( changed );
 }
 
-dbref db_write_flatfile( FILE *f, int format, int version ) {
+dbref db_write_flatfile( FILE *f, int format, int version )
+{
     dbref i;
 
     int flags;
@@ -1414,8 +1428,8 @@ dbref db_write_flatfile( FILE *f, int format, int version ) {
 
     if( mudstate.standalone && dbclean ) {
 
-        used_attrs_table = ( int * ) XCALLOC( mudstate.attr_next, sizeof( int ), "flatfile.used_attrs_table" );
-        old_attrs_table = ( int * ) XCALLOC( mudstate.attr_next, sizeof( int ), "flatfile.old_attrs_table" );
+        used_attrs_table = ( int *) XCALLOC( mudstate.attr_next, sizeof( int ), "flatfile.used_attrs_table" );
+        old_attrs_table = ( int *) XCALLOC( mudstate.attr_next, sizeof( int ), "flatfile.old_attrs_table" );
         n_oldtotal = mudstate.attr_next;
         n_oldtop = anum_alc_top;
         n_deleted = n_renumbered = n_objt = n_atrt = 0;
@@ -1479,7 +1493,7 @@ dbref db_write_flatfile( FILE *f, int format, int version ) {
 
         for( n = A_USER_START; n < mudstate.attr_next; n++ ) {
             if( ( used_attrs_table[n] != n ) && ( used_attrs_table[n] != 0 ) ) {
-                vp = ( VATTR * ) anum_get( n );
+                vp = ( VATTR *) anum_get( n );
                 if( vp ) {
                     n_renumbered++;
                 }
@@ -1514,7 +1528,7 @@ dbref db_write_flatfile( FILE *f, int format, int version ) {
             if( used_attrs_table[i] == 0 ) {
                 continue;
             }
-            vp = ( VATTR * ) anum_get( old_attrs_table[i] );
+            vp = ( VATTR *) anum_get( old_attrs_table[i] );
             if( vp ) {
                 if( !( vp->flags & AF_DELETED ) ) {
                     fprintf( f, "+A%d\n\"%d:%s\"\n", i, vp->flags, vp->name );
@@ -1563,7 +1577,8 @@ dbref db_write_flatfile( FILE *f, int format, int version ) {
     return ( mudstate.db_top );
 }
 
-dbref db_write( void ) {
+dbref db_write( void )
+{
     VATTR *vp;
 
     DBData key, data;
@@ -1595,14 +1610,14 @@ dbref db_write( void ) {
      * This should be the only data record of its type
      */
 
-    c = data.dptr = ( int * ) XMALLOC( 4 * sizeof( int ), "db_write" );
-    memcpy( ( void * ) c, ( void * ) &mudstate.db_top, sizeof( int ) );
+    c = data.dptr = ( int *) XMALLOC( 4 * sizeof( int ), "db_write" );
+    memcpy( ( void *) c, ( void *) &mudstate.db_top, sizeof( int ) );
     c++;
-    memcpy( ( void * ) c, ( void * ) &i, sizeof( int ) );
+    memcpy( ( void *) c, ( void *) &i, sizeof( int ) );
     c++;
-    memcpy( ( void * ) c, ( void * ) &mudstate.record_players, sizeof( int ) );
+    memcpy( ( void *) c, ( void *) &mudstate.record_players, sizeof( int ) );
     c++;
-    memcpy( ( void * ) c, ( void * ) &mudstate.moduletype_top, sizeof( int ) );
+    memcpy( ( void *) c, ( void *) &mudstate.moduletype_top, sizeof( int ) );
 
     /*
      * "TM3" is our unique key
@@ -1632,7 +1647,7 @@ dbref db_write( void ) {
      * sized chunks
      */
 
-    data.dptr = ( char * ) XMALLOC( ATRNUM_BLOCK_BYTES, "db_write.cdata" );
+    data.dptr = ( char *) XMALLOC( ATRNUM_BLOCK_BYTES, "db_write.cdata" );
 
     for( i = 0; i <= ENTRY_NUM_BLOCKS( mudstate.attr_next, blksize ); i++ ) {
         dirty = 0;
@@ -1644,7 +1659,7 @@ dbref db_write( void ) {
             if( j < A_USER_START ) {
                 continue;
             }
-            vp = ( VATTR * ) anum_table[j];
+            vp = ( VATTR *) anum_table[j];
 
             if( vp && !( vp->flags & AF_DELETED ) ) {
                 if( !mudstate.standalone ) {
@@ -1692,18 +1707,18 @@ dbref db_write( void ) {
                 if( ( ENTRY_BLOCK_STARTS( i, blksize ) + j ) < A_USER_START ) {
                     continue;
                 }
-                vp = ( VATTR * ) anum_table[ENTRY_BLOCK_STARTS( i,
-                                            blksize ) + j];
+                vp = ( VATTR *) anum_table[ENTRY_BLOCK_STARTS( i,
+                                           blksize ) + j];
 
                 if( vp && !( vp->flags & AF_DELETED ) ) {
                     len = strlen( vp->name ) + 1;
-                    memcpy( ( void * ) s, ( void * ) &vp->number,
+                    memcpy( ( void *) s, ( void *) &vp->number,
                             sizeof( int ) );
                     s += sizeof( int );
-                    memcpy( ( void * ) s, ( void * ) &vp->flags,
+                    memcpy( ( void *) s, ( void *) &vp->flags,
                             sizeof( int ) );
                     s += sizeof( int );
-                    memcpy( ( void * ) s, ( void * ) vp->name,
+                    memcpy( ( void *) s, ( void *) vp->name,
                             len );
                     s += len;
                 }
@@ -1715,7 +1730,7 @@ dbref db_write( void ) {
 
             key.dptr = &i;
             key.dsize = sizeof( int );
-            data.dsize = s - ( char * ) data.dptr;
+            data.dsize = s - ( char *) data.dptr;
             db_put( key, data, DBTYPE_ATRNUM );
         }
     }
@@ -1733,7 +1748,7 @@ dbref db_write( void ) {
      * sized chunks
      */
 
-    data.dptr = ( char * ) XMALLOC( OBJECT_BLOCK_BYTES, "db_write.cdata" );
+    data.dptr = ( char *) XMALLOC( OBJECT_BLOCK_BYTES, "db_write.cdata" );
 
     for( i = 0; i <= ENTRY_NUM_BLOCKS( mudstate.db_top, blksize ); i++ ) {
         dirty = 0;
@@ -1792,9 +1807,9 @@ dbref db_write( void ) {
                 k = ENTRY_BLOCK_STARTS( i, blksize ) + j;
 
                 if( !Going( k ) ) {
-                    memcpy( ( void * ) s, ( void * ) &k, sizeof( int ) );
+                    memcpy( ( void *) s, ( void *) &k, sizeof( int ) );
                     s += sizeof( int );
-                    memcpy( ( void * ) s, ( void * ) & ( db[k] ), sizeof( DUMPOBJ ) );
+                    memcpy( ( void *) s, ( void *) & ( db[k] ), sizeof( DUMPOBJ ) );
                     s += sizeof( DUMPOBJ );
                 }
             }
@@ -1805,7 +1820,7 @@ dbref db_write( void ) {
 
             key.dptr = &i;
             key.dsize = sizeof( int );
-            data.dsize = s - ( char * ) data.dptr;
+            data.dsize = s - ( char *) data.dptr;
             db_put( key, data, DBTYPE_OBJECT );
         }
     }
@@ -1826,7 +1841,8 @@ dbref db_write( void ) {
 
 /* Open a file pointer for a module to use when writing a flatfile */
 
-FILE *db_module_flatfile( char *filename, int wrflag ) {
+FILE *db_module_flatfile( char *filename, int wrflag )
+{
     FILE *f = NULL;
 
 

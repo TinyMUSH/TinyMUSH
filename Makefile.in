@@ -829,11 +829,6 @@ uninstall-am:
 	uninstall-am
 
 
-indent:
-	for i in `ls src/*.c src/*.h`; do \
-	astyle -A2 $$i; \
-	done; 
-
 testpath:
 	@echo prefix : @prefix@
 	@echo exec_prefix : @exec_prefix@

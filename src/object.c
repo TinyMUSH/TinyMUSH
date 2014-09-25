@@ -32,7 +32,7 @@
 
 static int check_type;
 
-extern int boot_off( dbref, char * );
+extern int boot_off( dbref, char *);
 
 extern void cf_verify( void );
 
@@ -51,7 +51,8 @@ extern int structure_clr( dbref );
  * log file.
  */
 
-static void Log_pointer_err( dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype ) {
+static void Log_pointer_err( dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype )
+{
     char *obj_type, *obj_name, *obj_loc;
     char *ref_type, *ref_name;
 
@@ -74,7 +75,8 @@ static void Log_pointer_err( dbref prior, dbref obj, dbref loc, dbref ref, const
     XFREE( ref_name, "Log_pointer_err" );
 }
 
-static void Log_header_err( dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype ) {
+static void Log_header_err( dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype )
+{
     char *obj_type, *obj_name, *obj_loc;
     char *val_type, *val_name;
 
@@ -109,7 +111,8 @@ static void Log_header_err( dbref obj, dbref loc, dbref val, int is_object, cons
     XFREE( obj_name, "Log_header_err" );
 }
 
-static void Log_simple_err( dbref obj, dbref loc, const char *errtype ) {
+static void Log_simple_err( dbref obj, dbref loc, const char *errtype )
+{
     char *obj_type, *obj_name, *obj_loc;
 
     obj_type = log_gettype( obj, "Log_simple_err" );
@@ -129,7 +132,8 @@ static void Log_simple_err( dbref obj, dbref loc, const char *errtype ) {
  * Routines for validating and determining homes.
  */
 
-int can_set_home( dbref player, dbref thing, dbref home ) {
+int can_set_home( dbref player, dbref thing, dbref home )
+{
     if( !Good_obj( player ) || !Good_obj( home ) || ( thing == home ) ) {
         return 0;
     }
@@ -149,7 +153,8 @@ int can_set_home( dbref player, dbref thing, dbref home ) {
     return 0;
 }
 
-dbref new_home( dbref player ) {
+dbref new_home( dbref player )
+{
     dbref loc;
 
     loc = Location( player );
@@ -165,7 +170,8 @@ dbref new_home( dbref player ) {
                ( Good_home( mudconf.start_room ) ? mudconf.start_room : 0 ) ) );
 }
 
-dbref clone_home( dbref player, dbref thing ) {
+dbref clone_home( dbref player, dbref thing )
+{
     dbref loc;
 
     loc = Home( thing );
@@ -179,7 +185,8 @@ dbref clone_home( dbref player, dbref thing ) {
  * update_newobjs: Update a player's most-recently-created objects.
  */
 
-static void update_newobjs( dbref player, dbref obj_num, int obj_type ) {
+static void update_newobjs( dbref player, dbref obj_num, int obj_type )
+{
     int i, aowner, aflags, alen;
 
     char *newobj_str, *p, tbuf[SBUF_SIZE], *tokst;
@@ -195,7 +202,7 @@ static void update_newobjs( dbref player, dbref obj_num, int obj_type ) {
     } else {
         for( p = strtok_r( newobj_str, " ", &tokst ), i = 0;
                 p && ( i < 4 ); p = strtok_r( NULL, " ", &tokst ), i++ ) {
-            obj_list[i] = ( int ) strtol( p, ( char ** ) NULL, 10 );
+            obj_list[i] = ( int ) strtol( p, ( char **) NULL, 10 );
         }
     }
     free_lbuf( newobj_str );
@@ -224,7 +231,8 @@ static void update_newobjs( dbref player, dbref obj_num, int obj_type ) {
  * ok_exit_name: Make sure an exit name contains no blank components.
  */
 
-static int ok_exit_name( char *name ) {
+static int ok_exit_name( char *name )
+{
     char *p, *lastp, *s;
 
     char buff[LBUF_SIZE];
@@ -266,7 +274,8 @@ static int ok_exit_name( char *name ) {
  * afford it.
  */
 
-dbref create_obj( dbref player, int objtype, char *name, int cost ) {
+dbref create_obj( dbref player, int objtype, char *name, int cost )
+{
     dbref obj, owner;
 
     dbref parent = NOTHING;
@@ -503,7 +512,7 @@ dbref create_obj( dbref player, int objtype, char *name, int cost ) {
     s_Owner( obj, ( self_owned ? obj : owner ) );
     s_Pennies( obj, value );
     Unmark( obj );
-    buff = munge_space( ( char * ) name );
+    buff = munge_space( ( char *) name );
     s_Name( obj, buff );
     free_lbuf( buff );
 
@@ -527,7 +536,7 @@ dbref create_obj( dbref player, int objtype, char *name, int cost ) {
 
     if( objtype == TYPE_PLAYER ) {
         time( &tt );
-        buff = ( char * ) ctime( &tt );
+        buff = ( char *) ctime( &tt );
         buff[strlen( buff ) - 1] = '\0';
         atr_add_raw( obj, A_LAST, buff );
 
@@ -556,7 +565,8 @@ dbref create_obj( dbref player, int objtype, char *name, int cost ) {
  * all lists and has no contents or exits.
  */
 
-void destroy_obj( dbref player, dbref obj ) {
+void destroy_obj( dbref player, dbref obj )
+{
     dbref owner;
 
     int good_owner, val, quota;
@@ -626,8 +636,9 @@ void destroy_obj( dbref player, dbref obj ) {
             quota = mudconf.player_quota;
         }
         payfees( owner, -val, -quota, Typeof( obj ) );
-        if( !Quiet( owner ) && !Quiet( obj ) )
+        if( !Quiet( owner ) && !Quiet( obj ) ) {
             notify_check( owner, owner, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You get back your %d %s deposit for %s(#%d).", val, mudconf.one_coin, Name( obj ), obj );
+        }
     }
     if( ( player != NOTHING ) && !Quiet( player ) ) {
         if( good_owner && Owner( player ) != owner ) {
@@ -666,7 +677,8 @@ void destroy_obj( dbref player, dbref obj ) {
  * do_freelist: Grab a garbage object, and move it to the top of the freelist.
  */
 
-void do_freelist( dbref player, dbref cause, int key, char *str ) {
+void do_freelist( dbref player, dbref cause, int key, char *str )
+{
     dbref i, thing;
 
     /*
@@ -682,7 +694,7 @@ void do_freelist( dbref player, dbref cause, int key, char *str ) {
         notify( player, NOMATCH_MESSAGE );
         return;
     }
-    thing = ( int ) strtol( str, ( char ** ) NULL, 10 );
+    thing = ( int ) strtol( str, ( char **) NULL, 10 );
     if( !Good_dbref( thing ) ) {
         notify( player, NOMATCH_MESSAGE );
         return;
@@ -730,7 +742,8 @@ void do_freelist( dbref player, dbref cause, int key, char *str ) {
  * make_freelist: Build a freelist
  */
 
-static void make_freelist( void ) {
+static void make_freelist( void )
+{
     dbref i;
 
     mudstate.freelist = NOTHING;
@@ -758,7 +771,8 @@ static void make_freelist( void ) {
  * divest_object: Get rid of KEY contents of object.
  */
 
-void divest_object( dbref thing ) {
+void divest_object( dbref thing )
+{
     dbref curr, temp;
 
     SAFE_DOLIST( curr, temp, Contents( thing ) ) {
@@ -772,7 +786,8 @@ void divest_object( dbref thing ) {
  * empty_obj, purge_going: Get rid of GOING objects in the db.
  */
 
-void empty_obj( dbref obj ) {
+void empty_obj( dbref obj )
+{
     dbref targ, next;
 
     /*
@@ -823,7 +838,8 @@ void empty_obj( dbref obj ) {
  * destroy_exit, destroy_thing, destroy_player
  */
 
-void destroy_exit( dbref exit ) {
+void destroy_exit( dbref exit )
+{
     dbref loc;
 
     loc = Exits( exit );
@@ -831,13 +847,15 @@ void destroy_exit( dbref exit ) {
     destroy_obj( NOTHING, exit );
 }
 
-void destroy_thing( dbref thing ) {
+void destroy_thing( dbref thing )
+{
     move_via_generic( thing, NOTHING, Owner( thing ), 0 );
     empty_obj( thing );
     destroy_obj( NOTHING, thing );
 }
 
-void destroy_player( dbref victim ) {
+void destroy_player( dbref victim )
+{
     dbref aowner, player;
 
     int count, aflags, alen;
@@ -849,7 +867,7 @@ void destroy_player( dbref victim ) {
      */
     a_dest = atr_get_raw( victim, A_DESTROYER );
     if( a_dest ) {
-        player = ( int ) strtol( a_dest, ( char ** ) NULL, 10 );
+        player = ( int ) strtol( a_dest, ( char **) NULL, 10 );
         if( !Good_owner( player ) ) {
             player = GOD;
         }
@@ -857,7 +875,7 @@ void destroy_player( dbref victim ) {
         player = GOD;
     }
 
-    boot_off( victim, ( char * ) "You have been destroyed!" );
+    boot_off( victim, ( char *) "You have been destroyed!" );
     halt_que( victim, NOTHING );
     count = chown_all( victim, player, player, 0 );
 
@@ -876,7 +894,8 @@ void destroy_player( dbref victim ) {
     notify_check( player, player ,MSG_PUP_ALWAYS|MSG_ME,  "(%d objects @chowned to you)", count );
 }
 
-static void purge_going( void ) {
+static void purge_going( void )
+{
     dbref i;
 
     DO_WHOLE_DB( i ) {
@@ -922,7 +941,8 @@ static void purge_going( void ) {
  * check_dead_refs: Look for references to GOING or illegal objects.
  */
 
-static void check_pennies( dbref thing, int limit, const char *qual ) {
+static void check_pennies( dbref thing, int limit, const char *qual )
+{
     int j;
 
     if( Going( thing ) ) {
@@ -967,7 +987,8 @@ do { \
 	} \
 } while (0)
 
-static void check_dead_refs( void ) {
+static void check_dead_refs( void )
+{
     dbref targ, owner, i, j;
 
     int aflags, dirty;
@@ -1289,7 +1310,8 @@ static void check_dead_refs( void ) {
  *      Location of member is not specified location    - reset it.
  */
 
-static void check_loc_exits( dbref loc ) {
+static void check_loc_exits( dbref loc )
+{
     dbref exit, back, temp, exitloc, dest;
 
     if( !Good_obj( loc ) ) {
@@ -1464,7 +1486,8 @@ static void check_loc_exits( dbref loc ) {
     return;
 }
 
-static void check_exit_chains( void ) {
+static void check_exit_chains( void )
+{
     dbref i;
 
     Unmark_all( i );
@@ -1497,7 +1520,8 @@ static void check_exit_chains( void ) {
 
 static void check_loc_contents( dbref );
 
-static void check_misplaced_obj( dbref *obj, dbref back, dbref loc ) {
+static void check_misplaced_obj( dbref *obj, dbref back, dbref loc )
+{
     /*
      * Object thinks it's in another place.  Check the contents list
      * * there and see if it contains this object.  If it does, then
@@ -1540,7 +1564,8 @@ static void check_misplaced_obj( dbref *obj, dbref back, dbref loc ) {
     return;
 }
 
-static void check_loc_contents( dbref loc ) {
+static void check_loc_contents( dbref loc )
+{
     dbref obj, back, temp;
 
     if( !Good_obj( loc ) ) {
@@ -1671,7 +1696,8 @@ static void check_loc_contents( dbref loc ) {
     return;
 }
 
-static void check_contents_chains( void ) {
+static void check_contents_chains( void )
+{
     dbref i;
 
     Unmark_all( i );
@@ -1689,7 +1715,8 @@ static void check_contents_chains( void ) {
  * do_dbck: Perform a database consistency check and clean up damage.
  */
 
-void do_dbck( dbref player, dbref cause, int key ) {
+void do_dbck( dbref player, dbref cause, int key )
+{
     check_type = key;
     make_freelist();
     if( !mudstate.standalone ) {

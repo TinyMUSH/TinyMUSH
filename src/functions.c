@@ -26,26 +26,28 @@
 #include "functions.h"		/* required by code */
 #include "fnproto.h"		/* required by code */
 
-extern int parse_ext_access( int *, EXTFUNCS **, char *, NAMETAB *, dbref, char * );
+extern int parse_ext_access( int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 extern NAMETAB access_nametab[];
 
 UFUN *ufun_head;
 
 const Delim SPACE_DELIM = { 1, " " };
 
-void init_functab( void ) {
+void init_functab( void )
+{
     FUN *fp;
 
     hashinit( &mudstate.func_htab, 250 * HASH_FACTOR, HT_STR | HT_KEYREF );
 
     for( fp = flist; fp->name; fp++ ) {
-        hashadd( ( char * ) fp->name, ( int * ) fp, &mudstate.func_htab, 0 );
+        hashadd( ( char *) fp->name, ( int *) fp, &mudstate.func_htab, 0 );
     }
     ufun_head = NULL;
     hashinit( &mudstate.ufunc_htab, 15 * HASH_FACTOR, HT_STR );
 }
 
-void do_function( dbref player, dbref cause, int key, char *fname, char *target ) {
+void do_function( dbref player, dbref cause, int key, char *fname, char *target )
+{
     UFUN *ufp, *ufp2;
 
     ATTR *ap;
@@ -72,10 +74,10 @@ void do_function( dbref player, dbref cause, int key, char *fname, char *target 
                 *bp = tolower( *bp );
             }
 
-            ufp = ( UFUN * ) hashfind( fname, &mudstate.ufunc_htab );
+            ufp = ( UFUN *) hashfind( fname, &mudstate.ufunc_htab );
 
             if( ufp ) {
-                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ( ( ATTR * ) atr_num( ufp->atr ) )->name );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ( ( ATTR *) atr_num( ufp->atr ) )->name );
             } else {
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s not found in user function table.", fname );
             }
@@ -85,10 +87,10 @@ void do_function( dbref player, dbref cause, int key, char *fname, char *target 
          * No name given, list them all.
          */
 
-        for( ufp = ( UFUN * ) hash_firstentry( &mudstate.ufunc_htab );
+        for( ufp = ( UFUN *) hash_firstentry( &mudstate.ufunc_htab );
                 ufp != NULL;
-                ufp = ( UFUN * ) hash_nextentry( &mudstate.ufunc_htab ) ) {
-            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ( ( ATTR * ) atr_num( ufp->atr ) )->name );
+                ufp = ( UFUN *) hash_nextentry( &mudstate.ufunc_htab ) ) {
+            notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ( ( ATTR *) atr_num( ufp->atr ) )->name );
         }
         return;
     }
@@ -160,12 +162,12 @@ void do_function( dbref player, dbref cause, int key, char *fname, char *target 
      * See if function already exists.  If so, redefine it
      */
 
-    ufp = ( UFUN * ) hashfind( np, &mudstate.ufunc_htab );
+    ufp = ( UFUN *) hashfind( np, &mudstate.ufunc_htab );
 
     if( !ufp ) {
-        ufp = ( UFUN * ) XMALLOC( sizeof( UFUN ), "do_function" );
+        ufp = ( UFUN *) XMALLOC( sizeof( UFUN ), "do_function" );
         ufp->name = XSTRDUP( np, "do_function.name" );
-        for( bp = ( char * ) ufp->name; *bp; bp++ ) {
+        for( bp = ( char *) ufp->name; *bp; bp++ ) {
             *bp = toupper( *bp );
         }
         ufp->obj = obj;
@@ -178,7 +180,7 @@ void do_function( dbref player, dbref cause, int key, char *fname, char *target 
             for( ufp2 = ufun_head; ufp2->next; ufp2 = ufp2->next );
             ufp2->next = ufp;
         }
-        if( hashadd( np, ( int * ) ufp, &mudstate.ufunc_htab, 0 ) ) {
+        if( hashadd( np, ( int *) ufp, &mudstate.ufunc_htab, 0 ) ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "Function %s not defined.", fname );
             XFREE( ufp->name, "do_function" );
             XFREE( ufp, "do_function.2" );
@@ -213,7 +215,8 @@ void do_function( dbref player, dbref cause, int key, char *fname, char *target 
  * list_functable: List available functions.
  */
 
-void list_functable( dbref player ) {
+void list_functable( dbref player )
+{
     FUN *fp, *modfns;
 
     UFUN *ufp;
@@ -225,11 +228,11 @@ void list_functable( dbref player ) {
     buf = alloc_lbuf( "list_functable" );
 
     bp = buf;
-    safe_str( ( char * ) "Built-in functions:", buf, &bp );
+    safe_str( ( char *) "Built-in functions:", buf, &bp );
     for( fp = flist; fp->name; fp++ ) {
         if( Check_Func_Access( player, fp ) ) {
             safe_chr( ' ', buf, &bp );
-            safe_str( ( char * ) fp->name, buf, &bp );
+            safe_str( ( char *) fp->name, buf, &bp );
         }
     }
     notify( player, buf );
@@ -243,7 +246,7 @@ void list_functable( dbref player ) {
             for( fp = modfns; fp->name; fp++ ) {
                 if( Check_Func_Access( player, fp ) ) {
                     safe_chr( ' ', buf, &bp );
-                    safe_str( ( char * ) fp->name, buf, &bp );
+                    safe_str( ( char *) fp->name, buf, &bp );
                 }
             }
             notify( player, buf );
@@ -252,7 +255,7 @@ void list_functable( dbref player ) {
     free_mbuf(s);
 
     bp = buf;
-    safe_str( ( char * ) "User-defined functions:", buf, &bp );
+    safe_str( ( char *) "User-defined functions:", buf, &bp );
     for( ufp = ufun_head; ufp; ufp = ufp->next ) {
         if( check_access( player, ufp->perms ) ) {
             safe_chr( ' ', buf, &bp );
@@ -269,7 +272,8 @@ void list_functable( dbref player ) {
  * list_funcaccess: List access on functions.
  */
 
-static void helper_list_funcaccess( dbref player, FUN *fp, char *buff ) {
+static void helper_list_funcaccess( dbref player, FUN *fp, char *buff )
+{
     char *bp;
 
     int i;
@@ -280,7 +284,7 @@ static void helper_list_funcaccess( dbref player, FUN *fp, char *buff ) {
                 sprintf( buff, "%s:", fp->name );
             } else {
                 bp = buff;
-                safe_str( ( char * ) fp->name, buff, &bp );
+                safe_str( ( char *) fp->name, buff, &bp );
                 safe_chr( ':', buff, &bp );
                 for( i = 0; i < fp->xperms->num_funcs; i++ ) {
                     if( fp->xperms->ext_funcs[i] ) {
@@ -298,7 +302,8 @@ static void helper_list_funcaccess( dbref player, FUN *fp, char *buff ) {
     }
 }
 
-void list_funcaccess( dbref player ) {
+void list_funcaccess( dbref player )
+{
     char *buff, *s;
 
     FUN *ftab;
@@ -336,7 +341,8 @@ void list_funcaccess( dbref player ) {
  * cf_func_access: set access on functions
  */
 
-int cf_func_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_func_access( int *vp, char *str, long extra, dbref player, char *cmd )
+{
     FUN *fp;
 
     UFUN *ufp;
@@ -351,7 +357,7 @@ int cf_func_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
     for( fp = flist; fp->name; fp++ ) {
         if( !string_compare( fp->name, str ) ) {
             return ( parse_ext_access( &fp->perms, &fp->xperms,
-                                       ap, ( NAMETAB * ) extra, player, cmd ) );
+                                       ap, ( NAMETAB *) extra, player, cmd ) );
         }
     }
     for( ufp = ufun_head; ufp; ufp = ufp->next ) {

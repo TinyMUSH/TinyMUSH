@@ -110,13 +110,14 @@ int ansi_bits[I_ANSI_LIM] = {
  * strip_ansi -- return a new string with escape codes removed
  */
 
-char *strip_ansi( const char *s ) {
+char *strip_ansi( const char *s )
+{
     static char buf[LBUF_SIZE];
     char *p = buf, *s1;
 
 
     s1 = (char *) s;
-    
+
     if( s1 ) {
         while( *s1 == ESC_CHAR ) {
             skip_esccode( &s1 );
@@ -128,8 +129,8 @@ char *strip_ansi( const char *s ) {
                 skip_esccode( &s1 );
             }
         }
-    *p = '\0';
-    return(buf);
+        *p = '\0';
+        return(buf);
     } else {
         return(s1);
     }
@@ -138,16 +139,18 @@ char *strip_ansi( const char *s ) {
 /* ---------------------------------------------------------------------------
  * strip_xterm -- return a new string with xterm color code removed
  */
- 
-char *strip_xterm(char *s) {
+
+char *strip_xterm(char *s)
+{
     static char buf[LBUF_SIZE];
     char *ch, *p;
-    
+
     /* First we strip all foreground colors */
-    
-    if (!(ch = strstr(s, ANSI_XTERM_FG)))
+
+    if (!(ch = strstr(s, ANSI_XTERM_FG))) {
         return s;
-    
+    }
+
     do {
         p = strchr(ch + strlen(ANSI_XTERM_FG), ANSI_END) + 1;
         strncpy(buf, s, ch - s);
@@ -155,12 +158,13 @@ char *strip_xterm(char *s) {
         strcat(buf + (ch - s), p);
         s = buf;
     } while((ch = strstr(s, ANSI_XTERM_FG)));
-    
+
     /* Second, we do exactly the same for background */
-    
-    if (!(ch = strstr(s, ANSI_XTERM_BG)))
+
+    if (!(ch = strstr(s, ANSI_XTERM_BG))) {
         return s;
-    
+    }
+
     do {
         p = strchr(ch + strlen(ANSI_XTERM_BG), ANSI_END) + 1;
         strncpy(buf, s, ch - s);
@@ -168,7 +172,7 @@ char *strip_xterm(char *s) {
         strcat(buf + (ch - s), p);
         s = buf;
     } while((ch = strstr(s, ANSI_XTERM_BG)));
-    
+
     return(buf);
 }
 
@@ -176,11 +180,12 @@ char *strip_xterm(char *s) {
  * strip_ansi_len -- count non-escape-code characters
  */
 
-int strip_ansi_len( const char *s ) {
+int strip_ansi_len( const char *s )
+{
     int n = 0;
     char *s1;
     char *s2;
-    
+
     s1 = XSTRDUP(s, "strip_ansi_len");
     s2 = s1;
 
@@ -197,16 +202,17 @@ int strip_ansi_len( const char *s ) {
         }
         XFREE(s2, "strip_ansi_len");
     }
-    
+
     return n;
 }
 
 /* normal_to_white -- This function implements the NOBLEED flag */
 
-char *normal_to_white( const char *raw ) {
+char *normal_to_white( const char *raw )
+{
     static char buf[LBUF_SIZE];
 
-    char *p = ( char * ) raw;
+    char *p = ( char *) raw;
 
     char *q = buf;
 
@@ -298,7 +304,8 @@ char *normal_to_white( const char *raw ) {
     return buf;
 }
 
-char *ansi_transition_esccode( int ansi_before, int ansi_after ) {
+char *ansi_transition_esccode( int ansi_before, int ansi_after )
+{
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -382,7 +389,8 @@ char *ansi_transition_esccode( int ansi_before, int ansi_after ) {
     return buffer;
 }
 
-char *ansi_transition_mushcode( int ansi_before, int ansi_after ) {
+char *ansi_transition_mushcode( int ansi_before, int ansi_after )
+{
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -461,7 +469,8 @@ char *ansi_transition_mushcode( int ansi_before, int ansi_after ) {
     return buffer;
 }
 
-char *ansi_transition_letters( int ansi_before, int ansi_after ) {
+char *ansi_transition_letters( int ansi_before, int ansi_after )
+{
     int ansi_bits_set, ansi_bits_clr;
 
     char *p;
@@ -533,7 +542,8 @@ char *ansi_transition_letters( int ansi_before, int ansi_after ) {
 
 /* ansi_map_states -- Identify ansi state of every character in a string */
 
-int ansi_map_states( const char *s, int **m, char **p ) {
+int ansi_map_states( const char *s, int **m, char **p )
+{
     static int ansi_map[LBUF_SIZE + 1];
     static char stripped[LBUF_SIZE + 1];
     char *s1, *s2;
@@ -557,15 +567,16 @@ int ansi_map_states( const char *s, int **m, char **p ) {
 
     *m = ansi_map;
     *p = stripped;
-    
+
     XFREE(s2, "ansi_map_states");
-    
+
     return n;
 }
 
 /* remap_colors -- allow a change of the color sequences */
 
-char *remap_colors( const char *s, int *cmap ) {
+char *remap_colors( const char *s, int *cmap )
+{
     static char new[LBUF_SIZE];
 
     char *bp;
@@ -573,7 +584,7 @@ char *remap_colors( const char *s, int *cmap ) {
     int n;
 
     if( !s || !*s || !cmap ) {
-        return ( char * ) s;
+        return ( char *) s;
     }
 
     bp = new;
@@ -590,7 +601,7 @@ char *remap_colors( const char *s, int *cmap ) {
                 safe_chr( *s, new, &bp );
                 s++;
                 do {
-                    n = ( int ) strtol( s, ( char ** ) NULL, 10 );
+                    n = ( int ) strtol( s, ( char **) NULL, 10 );
                     if( ( n >= I_ANSI_BLACK )
                             && ( n < I_ANSI_NUM )
                             && ( cmap[n - I_ANSI_BLACK] != 0 ) ) {
@@ -629,7 +640,8 @@ char *remap_colors( const char *s, int *cmap ) {
  * MUSH substitutions or strip them (type = 0).
  */
 
-char *translate_string( char *str, int type ) {
+char *translate_string( char *str, int type )
+{
     static char new[LBUF_SIZE];
 
     char *bp;
@@ -708,44 +720,61 @@ char *translate_string( char *str, int type ) {
  * ---------------------------------------------------------------------------
  * rgb2xterm -- Convert an RGB value to xterm color
  */
- 
-int rgb2xterm(long rgb) {
+
+int rgb2xterm(long rgb)
+{
 
     int xterm, r, g, b;
 
     /* First, handle standard colors */
-    if( rgb == 0x000000)
+    if( rgb == 0x000000) {
         return(0);
-    if( rgb == 0x800000)
+    }
+    if( rgb == 0x800000) {
         return(1);
-    if( rgb == 0x008000)
+    }
+    if( rgb == 0x008000) {
         return(2);
-    if( rgb == 0x808000)
+    }
+    if( rgb == 0x808000) {
         return(3);
-    if( rgb == 0x000080)
+    }
+    if( rgb == 0x000080) {
         return(4);
-    if( rgb == 0x800080)
+    }
+    if( rgb == 0x800080) {
         return(5);
-    if( rgb == 0x008080)
+    }
+    if( rgb == 0x008080) {
         return(6);
-    if( rgb == 0xc0c0c0)
+    }
+    if( rgb == 0xc0c0c0) {
         return(7);
-    if( rgb == 0x808080)
+    }
+    if( rgb == 0x808080) {
         return(8);
-    if( rgb == 0xff0000)
+    }
+    if( rgb == 0xff0000) {
         return(9);
-    if( rgb == 0x00ff00)
+    }
+    if( rgb == 0x00ff00) {
         return(10);
-    if( rgb == 0xffff00)
+    }
+    if( rgb == 0xffff00) {
         return(11);
-    if( rgb == 0x0000ff)
+    }
+    if( rgb == 0x0000ff) {
         return(12);
-    if( rgb == 0xff00ff)
+    }
+    if( rgb == 0xff00ff) {
         return(13);
-    if( rgb == 0x00ffff)
+    }
+    if( rgb == 0x00ffff) {
         return(14);
-    if( rgb == 0xffffff)
+    }
+    if( rgb == 0xffffff) {
         return(15);
+    }
 
     r = (rgb & 0xFF0000) >> 16;
     g = (rgb & 0x00FF00) >> 8;
@@ -754,54 +783,78 @@ int rgb2xterm(long rgb) {
     /* Next, handle grayscales */
 
     if( (r == g) && (r == b) ) {
-        if( rgb <= 0x080808)
+        if( rgb <= 0x080808) {
             return(232);
-        if( rgb <= 0x121212)
+        }
+        if( rgb <= 0x121212) {
             return(233);
-        if( rgb <= 0x1c1c1c)
+        }
+        if( rgb <= 0x1c1c1c) {
             return(234);
-        if( rgb <= 0x262626)
+        }
+        if( rgb <= 0x262626) {
             return(235);
-        if( rgb <= 0x303030)
+        }
+        if( rgb <= 0x303030) {
             return(236);
-        if( rgb <= 0x3a3a3a)
+        }
+        if( rgb <= 0x3a3a3a) {
             return(237);
-        if( rgb <= 0x444444)
+        }
+        if( rgb <= 0x444444) {
             return(238);
-        if( rgb <= 0x4e4e4e)
+        }
+        if( rgb <= 0x4e4e4e) {
             return(239);
-        if( rgb <= 0x585858)
+        }
+        if( rgb <= 0x585858) {
             return(240);
-        if( rgb <= 0x606060)
+        }
+        if( rgb <= 0x606060) {
             return(241);
-        if( rgb <= 0x666666)
+        }
+        if( rgb <= 0x666666) {
             return(242);
-        if( rgb <= 0x767676)
+        }
+        if( rgb <= 0x767676) {
             return(243);
-        if( rgb <= 0x808080)
+        }
+        if( rgb <= 0x808080) {
             return(244);
-        if( rgb <= 0x8a8a8a)
+        }
+        if( rgb <= 0x8a8a8a) {
             return(245);
-        if( rgb <= 0x949494)
+        }
+        if( rgb <= 0x949494) {
             return(246);
-        if( rgb <= 0x9e9e9e)
+        }
+        if( rgb <= 0x9e9e9e) {
             return(247);
-        if( rgb <= 0xa8a8a8)
+        }
+        if( rgb <= 0xa8a8a8) {
             return(248);
-        if( rgb <= 0xb2b2b2)
+        }
+        if( rgb <= 0xb2b2b2) {
             return(249);
-        if( rgb <= 0xbcbcbc)
+        }
+        if( rgb <= 0xbcbcbc) {
             return(250);
-        if( rgb <= 0xc6c6c6)
+        }
+        if( rgb <= 0xc6c6c6) {
             return(251);
-        if( rgb <= 0xd0d0d0)
+        }
+        if( rgb <= 0xd0d0d0) {
             return(252);
-        if( rgb <= 0xdadada)
+        }
+        if( rgb <= 0xdadada) {
             return(253);
-        if( rgb <= 0xe4e4e4)
+        }
+        if( rgb <= 0xe4e4e4) {
             return(254);
-        if( rgb <= 0xeeeeee)
+        }
+        if( rgb <= 0xeeeeee) {
             return(255);
+        }
     }
 
     /* It's an RGB, convert it */
@@ -810,11 +863,13 @@ int rgb2xterm(long rgb) {
 
     /* Just in case... */
 
-    if(xterm < 16)
+    if(xterm < 16) {
         xterm = 16;
-        
-    if(xterm > 231)
+    }
+
+    if(xterm > 231) {
         xterm = 231;
+    }
 
     return(xterm);
 }
@@ -826,7 +881,8 @@ int rgb2xterm(long rgb) {
  * a 24 bit decimal rgb value, or the actual xterm color value.
  */
 
-int str2xterm(char *str) {
+int str2xterm(char *str)
+{
 
     long rgb;
     int xterm, r, g, b;
@@ -847,15 +903,16 @@ int str2xterm(char *str) {
         if(p == t) {
             return(-1);
         } else if ( *t == 0 ) {
-            if(r < 256)	
-                return(r);		/* It's the color index */
+            if(r < 256) {
+                return(r);    /* It's the color index */
+            }
             return(rgb2xterm(r));	/* It's a RGB, fetch the index */
         } else {
             p = t;
             while( !isdigit(*p) && (*p != 0) ) {
                 p++;
             }
-            g = strtol(p, &t, 10);	
+            g = strtol(p, &t, 10);
             if( (p == t) || (*p == 0) ) {
                 return(-1);
             }
@@ -867,7 +924,7 @@ int str2xterm(char *str) {
             if( (p == t) || (*p == 0) ) {
                 return(-1);
             }
-            rgb = ( r << 16) + ( g << 8) + b;            
+            rgb = ( r << 16) + ( g << 8) + b;
             return(rgb2xterm(rgb));
         }
     }
@@ -880,7 +937,8 @@ int str2xterm(char *str) {
  * capitalizes an entire string
  */
 
-char *upcasestr( char *s ) {
+char *upcasestr( char *s )
+{
     char *p;
 
     for( p = s; p && *p; p++ ) {
@@ -895,7 +953,8 @@ char *upcasestr( char *s ) {
  * also remove leading and trailing spaces.
  */
 
-char *munge_space( char *string ) {
+char *munge_space( char *string )
+{
     char *buffer, *p, *q;
 
     buffer = alloc_lbuf( "munge_space" );
@@ -927,7 +986,8 @@ char *munge_space( char *string ) {
  * * trim_spaces: Remove leading and trailing spaces.
  */
 
-char *trim_spaces( char *string ) {
+char *trim_spaces( char *string )
+{
     char *buffer, *p, *q;
 
     buffer = alloc_lbuf( "trim_spaces" );
@@ -957,10 +1017,11 @@ char *trim_spaces( char *string ) {
  * returns a modified pointer to the string ready for another call.
  */
 
-char *grabto( char **str, char targ ) {
+char *grabto( char **str, char targ )
+{
     char *savec, *cp;
 
-    if( !str || !*str || !**str ) {
+    if( !str || !*str || ! **str ) {
         return NULL;
     }
 
@@ -975,7 +1036,8 @@ char *grabto( char **str, char targ ) {
     return savec;
 }
 
-int string_compare( const char *s1, const char *s2 ) {
+int string_compare( const char *s1, const char *s2 )
+{
     if( mudstate.standalone || mudconf.space_compress ) {
         while( isspace( *s1 ) ) {
             s1++;
@@ -1029,7 +1091,8 @@ int string_compare( const char *s1, const char *s2 ) {
     }
 }
 
-int string_prefix( const char *string, const char *prefix ) {
+int string_prefix( const char *string, const char *prefix )
+{
     int count = 0;
 
     while( *string && *prefix && tolower( *string ) == tolower( *prefix ) ) {
@@ -1046,7 +1109,8 @@ int string_prefix( const char *string, const char *prefix ) {
  * accepts only nonempty matches starting at the beginning of a word
  */
 
-const char *string_match( const char *src, const char *sub ) {
+const char *string_match( const char *src, const char *sub )
+{
     if( ( *sub != '\0' ) && ( src ) ) {
         while( *src ) {
             if( string_prefix( src, sub ) ) {
@@ -1076,7 +1140,8 @@ const char *string_match( const char *src, const char *sub ) {
  * handles special ^ and $ cases.
  */
 
-char *replace_string( const char *old, const char *new, const char *string ) {
+char *replace_string( const char *old, const char *new, const char *string )
+{
     char *result, *r, *s;
 
     int olen;
@@ -1084,7 +1149,7 @@ char *replace_string( const char *old, const char *new, const char *string ) {
     if( string == NULL ) {
         return NULL;
     }
-    s = ( char * ) string;
+    s = ( char *) string;
     olen = strlen( old );
     r = result = alloc_lbuf( "replace_string" );
     while( *s ) {
@@ -1106,7 +1171,7 @@ char *replace_string( const char *old, const char *new, const char *string ) {
 
         if( *s ) {
             if( !strncmp( old, s, olen ) ) {
-                safe_str( ( char * ) new, result, &r );
+                safe_str( ( char *) new, result, &r );
                 s += olen;
             } else {
                 safe_chr( *s, result, &r );
@@ -1118,7 +1183,8 @@ char *replace_string( const char *old, const char *new, const char *string ) {
     return result;
 }
 
-void edit_string( char *src, char **dst, char *from, char *to ) {
+void edit_string( char *src, char **dst, char *from, char *to )
+{
     char *cp, *p;
 
     int ansi_state, to_ansi_set, to_ansi_clr, tlen, flen;
@@ -1166,7 +1232,7 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
          */
 
         safe_known_str( to, tlen, *dst, &cp );
-        track_all_esccodes(&src, &p, &ansi_state); 
+        track_all_esccodes(&src, &p, &ansi_state);
         safe_known_str(src, p - src, *dst, &cp);
 
     } else if( !strcmp( from, "$" ) ) {
@@ -1257,7 +1323,8 @@ void edit_string( char *src, char **dst, char *from, char *to ) {
     safe_str( ansi_transition_esccode( ansi_state, ANST_NONE ), *dst, &cp );
 }
 
-int minmatch( char *str, char *target, int min ) {
+int minmatch( char *str, char *target, int min )
+{
     while( *str && *target && ( tolower( *str ) == tolower( *target ) ) ) {
         str++;
         target++;
@@ -1277,7 +1344,8 @@ int minmatch( char *str, char *target, int min ) {
  * watching for overflows.
  */
 
-void safe_copy_str( const char *src, char *buff,  char **bufp, int max ) {
+void safe_copy_str( const char *src, char *buff,  char **bufp, int max )
+{
     char *tp, *maxtp, *longtp;
 
     int n, len;
@@ -1316,7 +1384,8 @@ void safe_copy_str( const char *src, char *buff,  char **bufp, int max ) {
 }
 
 
-int safe_copy_str_fn( const char *src, char *buff, char **bufp, int max ) {
+int safe_copy_str_fn( const char *src, char *buff, char **bufp, int max )
+{
     char *tp, *maxtp, *longtp;
 
     int n, len;
@@ -1357,7 +1426,8 @@ int safe_copy_str_fn( const char *src, char *buff, char **bufp, int max ) {
     return ( len - n );
 }
 
-int safe_copy_long_str( char *src, char *buff, char **bufp, int max ) {
+int safe_copy_long_str( char *src, char *buff, char **bufp, int max )
+{
     int len, n;
 
     char *tp;
@@ -1387,7 +1457,8 @@ int safe_copy_long_str( char *src, char *buff, char **bufp, int max ) {
 }
 
 
-void safe_known_str( const char *src, int known, char *buff, char **bufp ) {
+void safe_known_str( const char *src, int known, char *buff, char **bufp )
+{
     int n;
 
     char *tp, *maxtp;
@@ -1427,7 +1498,8 @@ void safe_known_str( const char *src, int known, char *buff, char **bufp ) {
 }
 
 
-int safe_chr_real_fn( char src, char *buff, char **bufp, int max ) {
+int safe_chr_real_fn( char src, char *buff, char **bufp, int max )
+{
     char *tp;
 
     int retval = 0;
@@ -1449,7 +1521,8 @@ int safe_chr_real_fn( char src, char *buff, char **bufp, int max ) {
  * More utilities.
  */
 
-int matches_exit_from_list( char *str, char *pattern ) {
+int matches_exit_from_list( char *str, char *pattern )
+{
     char *s;
 
     if( *str == '\0' ) {	/* never match empty */
@@ -1496,7 +1569,8 @@ int matches_exit_from_list( char *str, char *pattern ) {
     return 0;
 }
 
-int ltos( char *s, long num ) {
+int ltos( char *s, long num )
+{
     /*
      * Mark Vasoll's long int to string converter.
      */
@@ -1545,7 +1619,8 @@ int ltos( char *s, long num ) {
     return 0;
 }
 
-void safe_ltos( char *s, char **bufc, long num ) {
+void safe_ltos( char *s, char **bufc, long num )
+{
     /*
      * Mark Vasoll's long int to string converter.
      */
@@ -1611,7 +1686,8 @@ void safe_ltos( char *s, char **bufc, long num ) {
 }
 
 
-char *repeatchar( int count, char ch ) {
+char *repeatchar( int count, char ch )
+{
     int num;
     char *str, *ptr;
 
@@ -1636,140 +1712,146 @@ char *repeatchar( int count, char ch ) {
 
 /* The following functions used to be macros in ansi.h */
 
-void skip_esccode(char **s) {
+void skip_esccode(char **s)
+{
     ++(*s);
- 
+
     if (**s == ANSI_CSI) {
         do {
             ++(*s);
         } while ((**s & 0xf0) == 0x30);
     }
- 
+
     while ((**s & 0xf0) == 0x20) {
         ++(*s);
     }
-    
+
     if (**s) {
         ++(*s);
     }
 }
 
-void copy_esccode(char **s, char **t) {
-	**t = **s;
-	++(*s);
-	++(*t);
-	if (**s == ANSI_CSI) {
-		do {
-		        
-			**t = **s;
-			++(*s);
-			++(*t);
-		} while ((**s & 0xf0) == 0x30);
-	}
+void copy_esccode(char **s, char **t)
+{
+    **t = **s;
+    ++(*s);
+    ++(*t);
+    if (**s == ANSI_CSI) {
+        do {
 
-	while ((**s & 0xf0) == 0x20) {
-		**t = **s;
-		++(*s);
-		++(*t);
-	}
+            **t = **s;
+            ++(*s);
+            ++(*t);
+        } while ((**s & 0xf0) == 0x30);
+    }
 
-	if (**s) {
-		**t = **s;
-		++(*s);
-		++(*t);
-	}
+    while ((**s & 0xf0) == 0x20) {
+        **t = **s;
+        ++(*s);
+        ++(*t);
+    }
+
+    if (**s) {
+        **t = **s;
+        ++(*s);
+        ++(*t);
+    }
 }
 
-void safe_copy_esccode(char **s, char *buff, char **bufc) {
-	safe_chr(**s, buff, bufc);
-	++(*s);
-	if (**s == ANSI_CSI) {
-		do {
-			safe_chr(**s, buff, bufc);
-			++(*s);
-		} while ((**s & 0xf0) == 0x30);
-	}
-	while ((**s & 0xf0) == 0x20) {
-		safe_chr(**s, buff, bufc);
-		++(*s);
-	}
-	if (**s) {
-		safe_chr(**s, buff, bufc);
-		++(*s);
-	}
-	
-}
-
-void track_esccode(char **s, int *ansi_state) {
-	int ansi_mask = 0;
-	int ansi_diff = 0;
-	unsigned int param_val = 0;
-	
-	++(*s);
-
-	if (**s == ANSI_CSI) {
-		while ((*(++(*s)) & 0xf0) == 0x30) {
-			if (**s < 0x3a) {
-				param_val <<= 1;
-				param_val += (param_val << 2) + (**s & 0x0f);
-			} else {
-				if (param_val < I_ANSI_LIM) {
-					ansi_mask |= ansi_mask_bits[param_val];
-					ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
-				}
-				param_val = 0;
-			}
-		}
-	}
-
-	while ((**s & 0xf0) == 0x20) {
-		++(*s);
-	}
-
-	if (**s == ANSI_END) {
-		if (param_val < I_ANSI_LIM) {
-			ansi_mask |= ansi_mask_bits[param_val];
-			ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
-		}
-		*ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
-		++(*s);
-	} else if (**s) {
-		++(*s);
-	}
-}
-
-
-void track_all_esccodes(char **s, char **p, int *ansi_state) {
-        p = s;
-	while (**p) {
-		if (**p == ESC_CHAR) {
-			track_esccode(&(*p), &(*ansi_state));
-		} else {
-			++(*p);
-		}
-	}
+void safe_copy_esccode(char **s, char *buff, char **bufc)
+{
+    safe_chr(**s, buff, bufc);
+    ++(*s);
+    if (**s == ANSI_CSI) {
+        do {
+            safe_chr(**s, buff, bufc);
+            ++(*s);
+        } while ((**s & 0xf0) == 0x30);
+    }
+    while ((**s & 0xf0) == 0x20) {
+        safe_chr(**s, buff, bufc);
+        ++(*s);
+    }
+    if (**s) {
+        safe_chr(**s, buff, bufc);
+        ++(*s);
+    }
 
 }
 
-void track_ansi_letters(char *t, int *ansi_state) {
-        char *s, p;
-        int xterm_isbg = 0;
+void track_esccode(char **s, int *ansi_state)
+{
+    int ansi_mask = 0;
+    int ansi_diff = 0;
+    unsigned int param_val = 0;
 
-	s = t;
-	while (*s) {
-            switch(*s) {
-	        case ESC_CHAR:
-                    skip_esccode(&s);
-                    break;
-                case '<':    /* Skip xterm, we handle it elsewhere */
-                case '/':
-                    while( (*s != '>') ) {
-                        ++s;
-                    }
-                    break;
-                default:
-                    *ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char) *s]]) | ansi_bits[ansi_nchartab[(unsigned char) *s]]);
-                    ++s;
-		}
-	}
+    ++(*s);
+
+    if (**s == ANSI_CSI) {
+        while ((*(++(*s)) & 0xf0) == 0x30) {
+            if (**s < 0x3a) {
+                param_val <<= 1;
+                param_val += (param_val << 2) + (**s & 0x0f);
+            } else {
+                if (param_val < I_ANSI_LIM) {
+                    ansi_mask |= ansi_mask_bits[param_val];
+                    ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+                }
+                param_val = 0;
+            }
+        }
+    }
+
+    while ((**s & 0xf0) == 0x20) {
+        ++(*s);
+    }
+
+    if (**s == ANSI_END) {
+        if (param_val < I_ANSI_LIM) {
+            ansi_mask |= ansi_mask_bits[param_val];
+            ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+        }
+        *ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
+        ++(*s);
+    } else if (**s) {
+        ++(*s);
+    }
+}
+
+
+void track_all_esccodes(char **s, char **p, int *ansi_state)
+{
+    p = s;
+    while (**p) {
+        if (**p == ESC_CHAR) {
+            track_esccode(&(*p), &(*ansi_state));
+        } else {
+            ++(*p);
+        }
+    }
+
+}
+
+void track_ansi_letters(char *t, int *ansi_state)
+{
+    char *s, p;
+    int xterm_isbg = 0;
+
+    s = t;
+    while (*s) {
+        switch(*s) {
+        case ESC_CHAR:
+            skip_esccode(&s);
+            break;
+        case '<':    /* Skip xterm, we handle it elsewhere */
+        case '/':
+            while( (*s != '>') ) {
+                ++s;
+            }
+            break;
+        default:
+            *ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char) *s]]) | ansi_bits[ansi_nchartab[(unsigned char) *s]]);
+            ++s;
+        }
+    }
 }

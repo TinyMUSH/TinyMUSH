@@ -26,7 +26,7 @@ extern void warning( char *, ... );
 
 extern void fatal( char *, ... );
 
-extern void log_db_err( int, int, const char * );
+extern void log_db_err( int, int, const char *);
 
 extern void dddb_setsync( int );
 
@@ -96,7 +96,7 @@ extern void dddb_setsync( int );
 
 static Cache *get_free_entry( int );
 
-static int cache_write( Cache * );
+static int cache_write( Cache *);
 
 /* initial settings for cache sizes */
 
@@ -142,7 +142,8 @@ int cs_syncs = 0;		/* total cache syncs */
 
 int cs_size = 0;		/* total cache size */
 
-int cachehash( void *keydata, int keylen, unsigned int type ) {
+int cachehash( void *keydata, int keylen, unsigned int type )
+{
     unsigned int hash = 0;
 
     char *sp;
@@ -150,13 +151,14 @@ int cachehash( void *keydata, int keylen, unsigned int type ) {
     if( keydata == NULL ) {
         return 0;
     }
-    for( sp = ( char * ) keydata; ( sp - ( char * ) keydata ) < keylen; sp++ ) {
+    for( sp = ( char *) keydata; ( sp - ( char *) keydata ) < keylen; sp++ ) {
         hash = ( hash << 5 ) + hash + *sp;
     }
     return ( ( hash + type ) % cwidth );
 }
 
-void cache_repl( Cache *cp, void *new, int len, unsigned int type, unsigned int flags ) {
+void cache_repl( Cache *cp, void *new, int len, unsigned int type, unsigned int flags )
+{
     cs_size -= cp->datalen;
     if( cp->data != NULL ) {
         RAW_FREE( cp->data, "cache_repl" );
@@ -168,14 +170,15 @@ void cache_repl( Cache *cp, void *new, int len, unsigned int type, unsigned int 
     cs_size += cp->datalen;
 }
 
-int cache_init( int width ) {
+int cache_init( int width )
+{
     int x;
 
     Chain *sp;
 
     static char *ncmsg = "cache_init: cannot allocate cache: ";
 
-    if( cache_initted || sys_c != ( Chain * ) 0 ) {
+    if( cache_initted || sys_c != ( Chain *) 0 ) {
         return ( 0 );
     }
 
@@ -189,29 +192,29 @@ int cache_init( int width ) {
     }
 
     sp = sys_c =
-             ( Chain * ) RAW_MALLOC( ( unsigned ) cwidth * sizeof( Chain ),
-                                     "cache_init" );
-    if( sys_c == ( Chain * ) 0 ) {
-        warning( ncmsg, ( char * )-1, "\n", ( char * ) 0 );
+             ( Chain *) RAW_MALLOC( ( unsigned ) cwidth * sizeof( Chain ),
+                                    "cache_init" );
+    if( sys_c == ( Chain *) 0 ) {
+        warning( ncmsg, ( char *)-1, "\n", ( char *) 0 );
         return ( -1 );
     }
-    freelist = ( Chain * ) RAW_MALLOC( sizeof( Chain ), "cache_init" );
+    freelist = ( Chain *) RAW_MALLOC( sizeof( Chain ), "cache_init" );
 
     /*
      * Allocate the initial cache entries
      */
 
     for( x = 0; x < cwidth; x++, sp++ ) {
-        sp->head = ( Cache * ) 0;
-        sp->tail = ( Cache * ) 0;
+        sp->head = ( Cache *) 0;
+        sp->tail = ( Cache *) 0;
     }
 
     /*
      * Init the LRU freelist
      */
 
-    freelist->head = ( Cache * ) 0;
-    freelist->tail = ( Cache * ) 0;
+    freelist->head = ( Cache *) 0;
+    freelist->tail = ( Cache *) 0;
 
     /*
      * Initialize the object pipelines
@@ -237,7 +240,8 @@ int cache_init( int width ) {
     return ( 0 );
 }
 
-void cache_reset( void ) {
+void cache_reset( void )
+{
     int x;
 
     Cache *cp, *nxt;
@@ -264,9 +268,9 @@ void cache_reset( void ) {
                 if( cp->data == NULL ) {
                     switch( cp->type ) {
                     case DBTYPE_ATTRIBUTE:
-                        pipe_del_attrib( ( ( Aname * ) cp->
+                        pipe_del_attrib( ( ( Aname *) cp->
                                            keydata )->attrnum,
-                                         ( ( Aname * ) cp->keydata )->
+                                         ( ( Aname *) cp->keydata )->
                                          object );
                         break;
                     default:
@@ -278,10 +282,10 @@ void cache_reset( void ) {
                 } else {
                     switch( cp->type ) {
                     case DBTYPE_ATTRIBUTE:
-                        pipe_set_attrib( ( ( Aname * ) cp->
+                        pipe_set_attrib( ( ( Aname *) cp->
                                            keydata )->attrnum,
-                                         ( ( Aname * ) cp->keydata )->
-                                         object, ( char * ) cp->data );
+                                         ( ( Aname *) cp->keydata )->
+                                         object, ( char *) cp->data );
                         break;
                     default:
                         key.dptr = cp->keydata;
@@ -299,11 +303,11 @@ void cache_reset( void ) {
             RAW_FREE( cp, "get_free_entry" );
         }
 
-        sp->head = ( Cache * ) 0;
-        sp->tail = ( Cache * ) 0;
+        sp->head = ( Cache *) 0;
+        sp->tail = ( Cache *) 0;
     }
-    freelist->head = ( Cache * ) 0;
-    freelist->tail = ( Cache * ) 0;
+    freelist->head = ( Cache *) 0;
+    freelist->tail = ( Cache *) 0;
 
     db_unlock();
 
@@ -328,7 +332,8 @@ void cache_reset( void ) {
 
 /* list dbrefs of objects in the cache. */
 
-void list_cached_objs( dbref player ) {
+void list_cached_objs( dbref player )
+{
     Chain *sp;
 
     Cache *cp;
@@ -341,10 +346,10 @@ void list_cached_objs( dbref player ) {
 
     aco = maco = asize = msize = oco = moco = 0;
 
-    count_array = ( int * ) XCALLOC( mudstate.db_top, sizeof( int ),
-                                     "list_cached_objs.count" );
-    size_array = ( int * ) XCALLOC( mudstate.db_top, sizeof( int ),
-                                    "list_cached_objs.size" );
+    count_array = ( int *) XCALLOC( mudstate.db_top, sizeof( int ),
+                                    "list_cached_objs.count" );
+    size_array = ( int *) XCALLOC( mudstate.db_top, sizeof( int ),
+                                   "list_cached_objs.size" );
 
     for( x = 0, sp = sys_c; x < cwidth; x++, sp++ ) {
         for( cp = sp->head; cp != NULL; cp = cp->nxt ) {
@@ -352,9 +357,9 @@ void list_cached_objs( dbref player ) {
                     !( cp->flags & CACHE_DIRTY ) ) {
                 aco++;
                 asize += cp->datalen;
-                count_array[( ( Aname * ) cp->keydata )->object] +=
+                count_array[( ( Aname *) cp->keydata )->object] +=
                     1;
-                size_array[( ( Aname * ) cp->keydata )->object] +=
+                size_array[( ( Aname *) cp->keydata )->object] +=
                     cp->datalen;
             }
         }
@@ -383,9 +388,9 @@ void list_cached_objs( dbref player ) {
                     ( cp->flags & CACHE_DIRTY ) ) {
                 maco++;
                 msize += cp->datalen;
-                count_array[( ( Aname * ) cp->keydata )->object] +=
+                count_array[( ( Aname *) cp->keydata )->object] +=
                     1;
-                size_array[( ( Aname * ) cp->keydata )->object] +=
+                size_array[( ( Aname *) cp->keydata )->object] +=
                     cp->datalen;
             }
         }
@@ -405,7 +410,8 @@ void list_cached_objs( dbref player ) {
     XFREE( size_array, "list_cached_objs.size" );
 }
 
-void list_cached_attrs( dbref player ) {
+void list_cached_attrs( dbref player )
+{
     Chain *sp;
 
     Cache *cp;
@@ -429,8 +435,8 @@ void list_cached_attrs( dbref player ) {
                 aco++;
                 asize += cp->datalen;
                 atr =
-                    atr_num( ( ( Aname * ) cp->keydata )->attrnum );
-                raw_notify( player,  "%-23.23s %-31.31s #%-6d %6d", PureName( ( ( Aname * ) cp->keydata )-> object ), ( atr ? atr->name : "(Unknown)" ), ( ( Aname * ) cp->keydata )->object, cp->datalen);
+                    atr_num( ( ( Aname *) cp->keydata )->attrnum );
+                raw_notify( player,  "%-23.23s %-31.31s #%-6d %6d", PureName( ( ( Aname *) cp->keydata )-> object ), ( atr ? atr->name : "(Unknown)" ), ( ( Aname *) cp->keydata )->object, cp->datalen);
             }
         }
     }
@@ -446,8 +452,8 @@ void list_cached_attrs( dbref player ) {
                 maco++;
                 msize += cp->datalen;
                 atr =
-                    atr_num( ( ( Aname * ) cp->keydata )->attrnum );
-                raw_notify( player, "%-23.23s %-31.31s #%-6d %6d", PureName( ( ( Aname * ) cp->keydata )-> object ), ( atr ? atr->name : "(Unknown)" ), ( ( Aname * ) cp->keydata )->object, cp->datalen );
+                    atr_num( ( ( Aname *) cp->keydata )->attrnum );
+                raw_notify( player, "%-23.23s %-31.31s #%-6d %6d", PureName( ( ( Aname *) cp->keydata )-> object ), ( atr ? atr->name : "(Unknown)" ), ( ( Aname *) cp->keydata )->object, cp->datalen );
             }
         }
     }
@@ -460,7 +466,8 @@ void list_cached_attrs( dbref player ) {
  * and length into pointers provided by the caller, if not, fetch from DB.
  * You do not need to free data returned by this call. */
 
-DBData cache_get( DBData key, unsigned int type ) {
+DBData cache_get( DBData key, unsigned int type )
+{
     Cache *cp;
 
     Chain *sp;
@@ -534,7 +541,7 @@ skipcacheget:
     switch( type ) {
     case DBTYPE_ATTRIBUTE:
 #ifdef MEMORY_BASED
-        cdata = obj_get_attrib( ( ( Aname * ) key.dptr )->attrnum, & ( db[( ( Aname * ) key.dptr )->object].attrtext ) );
+        cdata = obj_get_attrib( ( ( Aname *) key.dptr )->attrnum, & ( db[( ( Aname *) key.dptr )->object].attrtext ) );
         if( cdata ) {
             data.dptr = cdata;
             data.dsize = strlen( cdata ) + 1;
@@ -542,8 +549,8 @@ skipcacheget:
         }
 #endif
         data.dptr =
-            ( void * ) pipe_get_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                                        ( ( Aname * ) key.dptr )->object );
+            ( void *) pipe_get_attrib( ( ( Aname *) key.dptr )->attrnum,
+                                       ( ( Aname *) key.dptr )->object );
         if( data.dptr == NULL ) {
             data.dsize = 0;
         } else {
@@ -557,10 +564,10 @@ skipcacheget:
         if( data.dptr ) {
             data.dsize = strlen( data.dptr ) + 1;
             cdata = XMALLOC( data.dsize, "cache_get.membased" );
-            memcpy( ( void * ) cdata, ( void * ) data.dptr, data.dsize );
+            memcpy( ( void *) cdata, ( void *) data.dptr, data.dsize );
 
-            obj_set_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                            & ( db[( ( Aname * ) key.dptr )->object].attrtext ),
+            obj_set_attrib( ( ( Aname *) key.dptr )->attrnum,
+                            & ( db[( ( Aname *) key.dptr )->object].attrtext ),
                             cdata );
             data.dptr = cdata;
             return data;
@@ -587,7 +594,7 @@ skipcacheget:
         return data;
     }
 
-    cp->keydata = ( void * ) RAW_MALLOC( key.dsize, "cache_get" );
+    cp->keydata = ( void *) RAW_MALLOC( key.dsize, "cache_get" );
     memcpy( cp->keydata, key.dptr, key.dsize );
     cp->keylen = key.dsize;
 
@@ -651,7 +658,8 @@ skipcacheget:
  *
  */
 
-int cache_put( DBData key, DBData data, unsigned int type ) {
+int cache_put( DBData key, DBData data, unsigned int type )
+{
     Cache *cp;
 
     Chain *sp;
@@ -680,11 +688,11 @@ int cache_put( DBData key, DBData data, unsigned int type ) {
         if( data.dptr == NULL ) {
             switch( type ) {
             case DBTYPE_ATTRIBUTE:
-                pipe_del_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                                 ( ( Aname * ) key.dptr )->object );
+                pipe_del_attrib( ( ( Aname *) key.dptr )->attrnum,
+                                 ( ( Aname *) key.dptr )->object );
 #ifdef MEMORY_BASED
-                obj_del_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                                & ( db[( ( Aname * ) key.dptr )->object].
+                obj_del_attrib( ( ( Aname *) key.dptr )->attrnum,
+                                & ( db[( ( Aname *) key.dptr )->object].
                                     attrtext ) );
 #endif
                 break;
@@ -696,17 +704,17 @@ int cache_put( DBData key, DBData data, unsigned int type ) {
         } else {
             switch( type ) {
             case DBTYPE_ATTRIBUTE:
-                pipe_set_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                                 ( ( Aname * ) key.dptr )->object,
-                                 ( char * ) data.dptr );
+                pipe_set_attrib( ( ( Aname *) key.dptr )->attrnum,
+                                 ( ( Aname *) key.dptr )->object,
+                                 ( char *) data.dptr );
 #ifdef MEMORY_BASED
                 cdata =
                     XMALLOC( data.dsize, "cache_get.membased" );
-                memcpy( ( void * ) cdata, ( void * ) data.dptr,
+                memcpy( ( void *) cdata, ( void *) data.dptr,
                         data.dsize );
 
-                obj_set_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                                & ( db[( ( Aname * ) key.dptr )->object].
+                obj_set_attrib( ( ( Aname *) key.dptr )->attrnum,
+                                & ( db[( ( Aname *) key.dptr )->object].
                                     attrtext ), cdata );
 #endif
                 /*
@@ -764,7 +772,7 @@ int cache_put( DBData key, DBData data, unsigned int type ) {
         return ( 1 );
     }
 
-    cp->keydata = ( void * ) RAW_MALLOC( key.dsize, "cache_put" );
+    cp->keydata = ( void *) RAW_MALLOC( key.dsize, "cache_put" );
     memcpy( cp->keydata, key.dptr, key.dsize );
     cp->keylen = key.dsize;
 
@@ -790,7 +798,8 @@ int cache_put( DBData key, DBData data, unsigned int type ) {
     return ( 0 );
 }
 
-static Cache *get_free_entry( int atrsize ) {
+static Cache *get_free_entry( int atrsize )
+{
     DBData key, data;
 
     Chain *sp;
@@ -824,9 +833,9 @@ static Cache *get_free_entry( int atrsize ) {
             if( cp->data == NULL ) {
                 switch( cp->type ) {
                 case DBTYPE_ATTRIBUTE:
-                    pipe_del_attrib( ( ( Aname * ) cp->
+                    pipe_del_attrib( ( ( Aname *) cp->
                                        keydata )->attrnum,
-                                     ( ( Aname * ) cp->keydata )->object );
+                                     ( ( Aname *) cp->keydata )->object );
                     break;
                 default:
                     key.dptr = cp->keydata;
@@ -839,10 +848,10 @@ static Cache *get_free_entry( int atrsize ) {
             } else {
                 switch( cp->type ) {
                 case DBTYPE_ATTRIBUTE:
-                    pipe_set_attrib( ( ( Aname * ) cp->
+                    pipe_set_attrib( ( ( Aname *) cp->
                                        keydata )->attrnum,
-                                     ( ( Aname * ) cp->keydata )->object,
-                                     ( char * ) cp->data );
+                                     ( ( Aname *) cp->keydata )->object,
+                                     ( char *) cp->data );
                     break;
                 default:
                     key.dptr = cp->keydata;
@@ -896,9 +905,9 @@ static Cache *get_free_entry( int atrsize ) {
      */
 
     if( ( cp =
-                ( Cache * ) RAW_MALLOC( sizeof( Cache ), "get_free_entry" ) ) == NULL )
-        fatal( "cache get_free_entry: malloc failed", ( char * )-1,
-               ( char * ) 0 );
+                ( Cache *) RAW_MALLOC( sizeof( Cache ), "get_free_entry" ) ) == NULL )
+        fatal( "cache get_free_entry: malloc failed", ( char *)-1,
+               ( char *) 0 );
 
     cp->keydata = NULL;
     cp->keylen = 0;
@@ -909,7 +918,8 @@ static Cache *get_free_entry( int atrsize ) {
     return ( cp );
 }
 
-static int cache_write( Cache *cp ) {
+static int cache_write( Cache *cp )
+{
     DBData key, data;
 
     /*
@@ -924,8 +934,8 @@ static int cache_write( Cache *cp ) {
         if( cp->data == NULL ) {
             switch( cp->type ) {
             case DBTYPE_ATTRIBUTE:
-                pipe_del_attrib( ( ( Aname * ) cp->keydata )->
-                                 attrnum, ( ( Aname * ) cp->keydata )->object );
+                pipe_del_attrib( ( ( Aname *) cp->keydata )->
+                                 attrnum, ( ( Aname *) cp->keydata )->object );
                 break;
             default:
                 key.dptr = cp->keydata;
@@ -936,9 +946,9 @@ static int cache_write( Cache *cp ) {
         } else {
             switch( cp->type ) {
             case DBTYPE_ATTRIBUTE:
-                pipe_set_attrib( ( ( Aname * ) cp->keydata )->
-                                 attrnum, ( ( Aname * ) cp->keydata )->object,
-                                 ( char * ) cp->data );
+                pipe_set_attrib( ( ( Aname *) cp->keydata )->
+                                 attrnum, ( ( Aname *) cp->keydata )->object,
+                                 ( char *) cp->data );
                 break;
             default:
                 key.dptr = cp->keydata;
@@ -956,7 +966,8 @@ static int cache_write( Cache *cp ) {
     return ( 0 );
 }
 
-int cache_sync( void ) {
+int cache_sync( void )
+{
     int x;
 
     Chain *sp;
@@ -1011,7 +1022,8 @@ int cache_sync( void ) {
     return ( 0 );
 }
 
-void cache_del( DBData key, unsigned int type ) {
+void cache_del( DBData key, unsigned int type )
+{
     Cache *cp;
 
     Chain *sp;
@@ -1029,10 +1041,10 @@ void cache_del( DBData key, unsigned int type ) {
     CALL_ALL_MODULES( cache_del_notify, ( key, type ) )
 #ifdef MEMORY_BASED
     if( type == DBTYPE_ATTRIBUTE ) {
-        pipe_del_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                         ( ( Aname * ) key.dptr )->object );
-        obj_del_attrib( ( ( Aname * ) key.dptr )->attrnum,
-                        & ( db[( ( Aname * ) key.dptr )->object].attrtext ) );
+        pipe_del_attrib( ( ( Aname *) key.dptr )->attrnum,
+                         ( ( Aname *) key.dptr )->object );
+        obj_del_attrib( ( ( Aname *) key.dptr )->attrnum,
+                        & ( db[( ( Aname *) key.dptr )->object].attrtext ) );
         return;
     }
 #endif
@@ -1059,7 +1071,7 @@ void cache_del( DBData key, unsigned int type ) {
         return;
     }
 
-    cp->keydata = ( void * ) RAW_MALLOC( key.dsize, "cache_del" );
+    cp->keydata = ( void *) RAW_MALLOC( key.dsize, "cache_del" );
     memcpy( cp->keydata, key.dptr, key.dsize );
     cp->keylen = key.dsize;
     cp->type = type;

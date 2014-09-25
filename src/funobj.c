@@ -25,9 +25,9 @@
 #include "powers.h"		/* required by code */
 #include "walkdb.h"		/* required by code */
 
-extern char *upcasestr( char * );
+extern char *upcasestr( char *);
 
-extern dbref find_connected_ambiguous( dbref, char * );
+extern dbref find_connected_ambiguous( dbref, char *);
 
 extern NAMETAB attraccess_nametab[];
 
@@ -46,7 +46,8 @@ extern NAMETAB indiv_attraccess_nametab[];
  * fun_objid: Returns an object's objectID.
  */
 
-void fun_objid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_objid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -64,7 +65,8 @@ void fun_objid( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_con: Returns first item in contents list of object/room
  */
 
-void fun_con( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_con( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -84,7 +86,8 @@ void fun_con( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_exit: Returns first exit in exits list of room.
  */
 
-void fun_exit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_exit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, exit;
 
     int key;
@@ -114,7 +117,8 @@ void fun_exit( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_next: return next thing in contents or exits chain
  */
 
-void fun_next( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_next( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, loc, exit, ex_here;
 
     int key;
@@ -155,7 +159,8 @@ void fun_next( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * something. where(): Returns the "true" location of something
  */
 
-void handle_loc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_loc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -172,12 +177,13 @@ void handle_loc( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_rloc: Returns the recursed location of something (specifying #levels)
  */
 
-void fun_rloc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_rloc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i, levels;
 
     dbref it;
 
-    levels = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    levels = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     if( levels > mudconf.ntfy_nest_lim ) {
         levels = mudconf.ntfy_nest_lim;
     }
@@ -202,7 +208,8 @@ void fun_rloc( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_room: Find the room an object is ultimately in.
  */
 
-void fun_room( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_room( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     int count;
@@ -233,7 +240,8 @@ void fun_room( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_owner: Return the owner of an object.
  */
 
-void fun_owner( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_owner( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, aowner;
 
     int atr, aflags;
@@ -259,7 +267,8 @@ void fun_owner( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_controls: Does x control y?
  */
 
-void fun_controls( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_controls( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref x, y;
 
     x = match_thing( player, fargs[0] );
@@ -281,7 +290,8 @@ void fun_controls( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * do not exist, 0 is returned.
  */
 
-void fun_sees( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sees( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, thing;
 
     it = match_thing( player, fargs[0] );
@@ -301,7 +311,8 @@ void fun_sees( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_nearby: Return whether or not obj1 is near obj2.
  */
 
-void fun_nearby( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_nearby( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref obj1, obj2;
 
     obj1 = match_thing( player, fargs[0] );
@@ -321,7 +332,8 @@ void fun_nearby( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * <target>? moves(<object>, <mover>): Can <object> see <mover> move?
  */
 
-void handle_okpres( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_okpres( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int oper;
 
     dbref object, actor;
@@ -361,7 +373,8 @@ void handle_okpres( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * an object. fullname(): Return the fullname of an object (good for exits).
  */
 
-void handle_name( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_name( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -387,7 +400,8 @@ void handle_name( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * handle_pronoun: perform pronoun sub for object (OBJ, POSS, SUBJ, APOSS).
  */
 
-void handle_pronoun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_pronoun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     char *str;
@@ -399,7 +413,7 @@ void handle_pronoun( char *buff, char **bufc, dbref player, dbref caller, dbref 
         safe_nomatch( buff, bufc );
     } else {
         str = pronouns[Func_Flags( fargs )];
-        exec( buff, bufc, it, it, it, 0, &str, ( char ** ) NULL, 0 );
+        exec( buff, bufc, it, it, it, 0, &str, ( char **) NULL, 0 );
     }
 }
 
@@ -408,7 +422,8 @@ void handle_pronoun( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * Locks.
  */
 
-void fun_lock( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lock( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, aowner;
 
     int aflags, alen;
@@ -435,7 +450,7 @@ void fun_lock( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if( Read_attr( player, it, attr, aowner, aflags ) ) {
         bool = parse_boolexp( player, tbuf, 1 );
         free_lbuf( tbuf );
-        tbuf = ( char * ) unparse_boolexp_function( player, bool );
+        tbuf = ( char *) unparse_boolexp_function( player, bool );
         free_boolexp( bool );
         safe_str( tbuf, buff, bufc );
     } else {
@@ -443,7 +458,8 @@ void fun_lock( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_elock( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_elock( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, victim, aowner;
 
     int aflags, alen;
@@ -491,7 +507,8 @@ void fun_elock( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_elockstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_elockstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref locked_obj, actor_obj;
 
     BOOLEXP *okey;
@@ -525,7 +542,8 @@ void fun_elockstr( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * specified element in the list and copying a specified number of elements.
  */
 
-void fun_xcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_xcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, it;
 
     char *bb_p;
@@ -542,8 +560,8 @@ void fun_xcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if( Good_loc( it ) &&
             ( Examinable( player, it ) || ( Location( player ) == it ) ||
               ( it == cause ) ) ) {
-        first = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-        last = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+        first = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+        last = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
         if( ( first > 0 ) && ( last > 0 ) ) {
 
             /*
@@ -577,7 +595,8 @@ void fun_xcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_lcon: Return a list of contents.
  */
 
-void fun_lcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, it;
 
     char *bb_p;
@@ -607,7 +626,8 @@ void fun_lcon( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_lexits: Return a list of exits.
  */
 
-void fun_lexits( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lexits( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, it, parent;
 
     char *bb_p;
@@ -671,7 +691,8 @@ void fun_lexits( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * part from PennMUSH.
  */
 
-void fun_entrances( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_entrances( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, i;
 
     char *bb_p;
@@ -682,7 +703,7 @@ void fun_entrances( char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     VaChk_Range( 0, 4 );
     if( nfargs >= 3 ) {
-        low_bound = ( int ) strtol( fargs[2] + ( fargs[2][0] == NUMBER_TOKEN ), ( char ** ) NULL, 10 );
+        low_bound = ( int ) strtol( fargs[2] + ( fargs[2][0] == NUMBER_TOKEN ), ( char **) NULL, 10 );
         if( !Good_dbref( low_bound ) ) {
             low_bound = 0;
         }
@@ -690,7 +711,7 @@ void fun_entrances( char *buff, char **bufc, dbref player, dbref caller, dbref c
         low_bound = 0;
     }
     if( nfargs == 4 ) {
-        high_bound = ( int ) strtol( fargs[3] + ( fargs[3][0] == NUMBER_TOKEN ), ( char ** ) NULL, 10 );
+        high_bound = ( int ) strtol( fargs[3] + ( fargs[3][0] == NUMBER_TOKEN ), ( char **) NULL, 10 );
         if( !Good_dbref( high_bound ) ) {
             high_bound = mudstate.db_top - 1;
         }
@@ -776,7 +797,8 @@ void fun_entrances( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * fun_home: Return an object's home
  */
 
-void fun_home( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_home( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -799,7 +821,8 @@ void fun_home( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_money: Return an object's value
  */
 
-void fun_money( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_money( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -816,7 +839,8 @@ void fun_money( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  */
 
 /* Borrowed from PennMUSH 1.50 */
-void fun_findable( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_findable( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref obj = match_thing( player, fargs[0] );
 
     dbref victim = match_thing( player, fargs[1] );
@@ -839,7 +863,8 @@ void fun_findable( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  */
 
 /* Borrowed from PennMUSH 1.50 */
-void fun_visible( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_visible( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, thing, aowner;
 
     int aflags, atr;
@@ -875,7 +900,8 @@ void fun_visible( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_writable: Returns 1 if player could set <obj>/<attr>.
  */
 
-void fun_writable( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_writable( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, thing, aowner;
 
     int aflags, atr, retval;
@@ -937,7 +963,8 @@ void fun_writable( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * case-insensitive, not quite as useful as it could be.
  */
 
-void fun_flags( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_flags( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, aowner;
 
     int atr, aflags;
@@ -971,7 +998,8 @@ void fun_flags( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * andflags, orflags: Check a list of flags.
  */
 
-void handle_flaglists( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_flaglists( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     char flagletter[2];
@@ -1076,7 +1104,8 @@ void handle_flaglists( char *buff, char **bufc, dbref player, dbref caller, dbre
  * fun_hasflag:  plus auxiliary function atr_has_flag.
  */
 
-static int atr_has_flag( dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname ) {
+static int atr_has_flag( dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname )
+{
     int flagval;
 
     if( !See_attr( player, thing, attr, aowner, aflags ) ) {
@@ -1094,7 +1123,8 @@ static int atr_has_flag( dbref player, dbref thing, ATTR *attr, int aowner, int 
     return ( aflags & flagval );
 }
 
-void fun_hasflag( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_hasflag( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, aowner;
 
     int atr, aflags;
@@ -1126,7 +1156,8 @@ void fun_hasflag( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
 }
 
-void fun_haspower( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_haspower( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -1146,7 +1177,8 @@ void fun_haspower( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * hasflags(<object>, <flag list to AND>, <OR flag list to AND>, <etc.>)
  */
 
-void fun_hasflags( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_hasflags( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     char **elems;
@@ -1197,7 +1229,8 @@ void fun_hasflags( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * handle_timestamp: Get timestamps (LASTACCESS, LASTMOD, CREATION).
  */
 
-void handle_timestamp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_timestamp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it = match_thing( player, fargs[0] );
 
     if( !Good_obj( it ) || !Examinable( player, it ) ) {
@@ -1216,7 +1249,8 @@ void handle_timestamp( char *buff, char **bufc, dbref player, dbref caller, dbre
  * Parent-child relationships.
  */
 
-void fun_parent( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_parent( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -1228,7 +1262,8 @@ void fun_parent( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     return;
 }
 
-void fun_lparent( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lparent( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it, par;
 
     int i;
@@ -1259,7 +1294,8 @@ void fun_lparent( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
 }
 
-void fun_children( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_children( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref i, it;
 
     char *bb_p;
@@ -1297,7 +1333,8 @@ void fun_children( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Zones.
  */
 
-void fun_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     if( !mudconf.have_zones ) {
@@ -1312,7 +1349,8 @@ void fun_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     safe_dbref( buff, bufc, Zone( it ) );
 }
 
-void scan_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void scan_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref i, it;
 
     int type;
@@ -1351,7 +1389,8 @@ void scan_zone( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_zfun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_zfun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner;
 
     int aflags, alen;
@@ -1403,7 +1442,8 @@ void fun_zfun( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_hasattr: does object X have attribute Y.
  */
 
-void fun_hasattr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_hasattr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
 
     int aflags, alen, check_parents;
@@ -1458,7 +1498,8 @@ void fun_hasattr( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_v: Function form of %-substitution
  */
 
-void fun_v( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_v( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner;
 
     int aflags, alen;
@@ -1510,7 +1551,8 @@ void fun_v( char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
  * perform_get: Get attribute from object: GET, XGET, GET_EVAL, EVAL(obj,atr)
  */
 
-void perform_get( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void perform_get( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
     int attrib, aflags, alen, eval_it;
     char *atr_gotten, *str;
@@ -1541,14 +1583,15 @@ void perform_get( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     if( eval_it ) {
         str = atr_gotten;
         exec( buff, bufc, thing, player, player,
-              EV_FIGNORE | EV_EVAL, &str, ( char ** ) NULL, 0 );
+              EV_FIGNORE | EV_EVAL, &str, ( char **) NULL, 0 );
     } else {
         safe_known_str( atr_gotten, alen, buff, bufc );
     }
     free_lbuf( atr_gotten );
 }
 
-void fun_eval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_eval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str;
 
     VaChk_Range( 1, 2 );
@@ -1556,7 +1599,7 @@ void fun_eval( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if( nfargs == 1 ) {
         str = fargs[0];
         exec( buff, bufc, player, caller, cause, EV_EVAL | EV_FCHECK,
-              &str, ( char ** ) NULL, 0 );
+              &str, ( char **) NULL, 0 );
         return;
     }
     perform_get( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs );
@@ -1567,7 +1610,8 @@ void fun_eval( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * do_ufun: Call a user-defined function: U, ULOCAL, UPRIVATE
  */
 
-void do_ufun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void do_ufun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int is_local, is_private, aflags, alen, anum, trace_flag;
@@ -1654,7 +1698,8 @@ void do_ufun( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * specified object.
  */
 
-void fun_objcall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_objcall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref obj, aowner, thing;
 
     int aflags, alen, anum;
@@ -1700,7 +1745,8 @@ void fun_objcall( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * function string directly.
  */
 
-void fun_localize( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_localize( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str;
 
     GDATA *preserve;
@@ -1721,7 +1767,8 @@ void fun_localize( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * uprivate() but with the function string directly.
  */
 
-void fun_private( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_private( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str;
 
     GDATA *preserve;
@@ -1746,7 +1793,8 @@ void fun_private( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * are used as arguments to the u().
  */
 
-void fun_default( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_default( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
 
     int attrib, aflags, alen;
@@ -1794,7 +1842,8 @@ void fun_default( char *buff, char **bufc, dbref player, dbref caller, dbref cau
           EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs );
 }
 
-void fun_edefault( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_edefault( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
 
     int attrib, aflags, alen;
@@ -1824,7 +1873,7 @@ void fun_edefault( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                     str = atr_gotten;
                     exec( buff, bufc, thing, player,
                           player, EV_FIGNORE | EV_EVAL,
-                          &str, ( char ** ) NULL, 0 );
+                          &str, ( char **) NULL, 0 );
                     free_lbuf( atr_gotten );
                     free_lbuf( objname );
                     return;
@@ -1844,7 +1893,8 @@ void fun_edefault( char *buff, char **bufc, dbref player, dbref caller, dbref ca
           EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs );
 }
 
-void fun_udefault( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_udefault( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
 
     int aflags, alen, anum, i, j, trace_flag;
@@ -1948,7 +1998,8 @@ void fun_udefault( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Evaluate from a specific object's perspective.
  */
 
-void fun_objeval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_objeval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref obj;
 
     char *name, *bp, *str;
@@ -1985,11 +2036,13 @@ void fun_objeval( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Matching functions.
  */
 
-void fun_num( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_num( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_dbref( buff, bufc, match_thing( player, fargs[0] ) );
 }
 
-void fun_pmatch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_pmatch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *name, *temp, *tp;
 
     dbref thing;
@@ -2028,7 +2081,7 @@ void fun_pmatch( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     for( tp = temp; *tp; tp++ ) {
         *tp = tolower( *tp );
     }
-    p_ptr = ( int * ) hashfind( temp, &mudstate.player_htab );
+    p_ptr = ( int *) hashfind( temp, &mudstate.player_htab );
     free_lbuf( temp );
 
     if( p_ptr ) {
@@ -2056,7 +2109,8 @@ void fun_pmatch( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     }
 }
 
-void fun_pfind( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_pfind( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing;
 
     if( *fargs[0] == '#' ) {
@@ -2076,7 +2130,8 @@ void fun_pfind( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_locate: Search for things with the perspective of another obj.
  */
 
-void fun_locate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_locate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int pref_type, check_locks, verbose, multiple;
 
     dbref thing, what;
@@ -2198,7 +2253,8 @@ void fun_locate( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * nattr: Ditto, but just count 'em up.
  */
 
-void handle_lattr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_lattr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing;
 
     ATTR *attr;
@@ -2219,8 +2275,8 @@ void handle_lattr( char *buff, char **bufc, dbref player, dbref caller, dbref ca
          */
         if( nfargs > 2 ) {
             VaChk_Only_Out( 4 );
-            start = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-            count = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+            start = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+            count = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
             if( ( start < 1 ) || ( count < 1 ) ) {
                 safe_str( "#-1 ARGUMENT OUT OF RANGE", buff,
                           bufc );
@@ -2252,7 +2308,7 @@ void handle_lattr( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                     if( *bufc != bb_p ) {
                         print_sep( &osep, buff, bufc );
                     }
-                    safe_str( ( char * ) attr->name, buff,
+                    safe_str( ( char *) attr->name, buff,
                               bufc );
                     got++;
                 }
@@ -2276,7 +2332,8 @@ void handle_lattr( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_search: Search the db for things, returning a list of what matches
  */
 
-void fun_search( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_search( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing;
 
     char *bp, *nbuf;
@@ -2316,7 +2373,8 @@ void fun_search( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_stats: Get database size statistics.
  */
 
-void fun_stats( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_stats( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref who;
 
     STATS statinfo;
@@ -2342,7 +2400,8 @@ void fun_stats( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * Memory usage.
  */
 
-static int mem_usage( dbref thing ) {
+static int mem_usage( dbref thing )
+{
     int k;
 
     int ca;
@@ -2361,16 +2420,17 @@ static int mem_usage( dbref thing ) {
         }
         attr = atr_num( ca );
         if( attr ) {
-            str = ( char * ) attr->name;
+            str = ( char *) attr->name;
             if( str && *str ) {
-                k += strlen( ( ( ATTR * ) atr_num( ca ) )->name );
+                k += strlen( ( ( ATTR *) atr_num( ca ) )->name );
             }
         }
     }
     return k;
 }
 
-static int mem_usage_attr( dbref player, char *str ) {
+static int mem_usage_attr( dbref player, char *str )
+{
     dbref thing, aowner;
 
     int atr, aflags, alen;
@@ -2407,7 +2467,8 @@ static int mem_usage_attr( dbref player, char *str ) {
     return bytes_atext;
 }
 
-void fun_objmem( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_objmem( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing;
 
     if( strchr( fargs[0], '/' ) ) {
@@ -2422,7 +2483,8 @@ void fun_objmem( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     safe_ltos( buff, bufc, mem_usage( thing ) );
 }
 
-void fun_playmem( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_playmem( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int tot = 0;
 
     dbref thing;
@@ -2446,7 +2508,8 @@ void fun_playmem( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Type functions.
  */
 
-void fun_type( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_type( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it;
 
     it = match_thing( player, fargs[0] );
@@ -2473,7 +2536,8 @@ void fun_type( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     return;
 }
 
-void fun_hastype( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_hastype( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref it = match_thing( player, fargs[0] );
 
     if( !Good_obj( it ) ) {
@@ -2512,7 +2576,8 @@ void fun_hastype( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_lastcreate: Return the last object of type Y that X created.
  */
 
-void fun_lastcreate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lastcreate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i, aowner, aflags, alen, obj_list[4], obj_type;
 
     char *obj_str, *p, *tokst;
@@ -2554,7 +2619,7 @@ void fun_lastcreate( char *buff, char **bufc, dbref player, dbref caller, dbref 
     }
     for( p = strtok_r( obj_str, " ", &tokst ), i = 0;
             p && ( i < 4 ); p = strtok_r( NULL, " ", &tokst ), i++ ) {
-        obj_list[i] = ( int ) strtol( p, ( char ** ) NULL, 10 );
+        obj_list[i] = ( int ) strtol( p, ( char **) NULL, 10 );
     }
     free_lbuf( obj_str );
 
@@ -2587,7 +2652,8 @@ void fun_lastcreate( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * as %0, and the speech part number as %1.
  */
 
-static void transform_say( dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim *open_sep, const Delim *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc ) {
+static void transform_say( dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim *open_sep, const Delim *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc )
+{
     char *sp, *ep, *save, *tp, *bp;
 
     char *result, *tstack[3], *estack[2], tbuf[LBUF_SIZE];
@@ -2705,7 +2771,8 @@ static void transform_say( dbref speaker, char *sname, char *str, int key, char 
     }
 }
 
-void fun_speak( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_speak( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, obj1, obj2;
 
     Delim isep, osep;	/* really open and close separators */
@@ -2788,7 +2855,7 @@ void fun_speak( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if( ( nfargs >= 3 ) && fargs[2] && *fargs[2] ) {
         say_str = fargs[2];
     } else {
-        say_str = ( char * )( mudconf.comma_say ? "says," : "says" );
+        say_str = ( char *)( mudconf.comma_say ? "says," : "says" );
     }
 
     /*
@@ -2850,7 +2917,7 @@ void fun_speak( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             safe_sprintf( buff, bufc, "%s%s", tname, fargs[1] + 1 );
             break;
         case '|':
-            safe_sprintf( buff, bufc, "%s", fargs[1] + 1 ); 
+            safe_sprintf( buff, bufc, "%s", fargs[1] + 1 );
             break;
         case '"':
             safe_sprintf( buff, bufc, "%s %s \"%s\"", tname, say_str, fargs[1] + 1 );

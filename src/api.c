@@ -35,10 +35,11 @@ extern CMDENT *prefix_cmds[256];
  * Exporting a module's own API.
  */
 
-void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
+void register_api( char *module_name, char *api_name, API_FUNCTION *ftable )
+{
     MODULE *mp;
     API_FUNCTION *afp;
-    void ( *fn_ptr )( void *, void * );
+    void ( *fn_ptr )( void *, void *);
     int succ = 0;
     char s[MBUF_SIZE];
 
@@ -58,17 +59,18 @@ void register_api( char *module_name, char *api_name, API_FUNCTION *ftable ) {
         if( fn_ptr != NULL ) {
             afp->handler = fn_ptr;
             snprintf( s, MBUF_SIZE, "%s_%s", api_name, afp->name );
-            hashadd( s , ( int * ) afp, &mudstate.api_func_htab, 0 );
+            hashadd( s , ( int *) afp, &mudstate.api_func_htab, 0 );
         }
     }
 }
 
-void *request_api_function( char *api_name, char *fn_name ) {
+void *request_api_function( char *api_name, char *fn_name )
+{
     API_FUNCTION *afp;
     char s[MBUF_SIZE];
 
     snprintf(s, MBUF_SIZE, "%s_%s", api_name, fn_name );
-    afp = ( API_FUNCTION * ) hashfind( s, &mudstate.api_func_htab );
+    afp = ( API_FUNCTION *) hashfind( s, &mudstate.api_func_htab );
     if( !afp ) {
         return NULL;
     }
@@ -80,20 +82,22 @@ void *request_api_function( char *api_name, char *fn_name ) {
  * Handle tables.
  */
 
-void register_commands( CMDENT *cmdtab ) {
+void register_commands( CMDENT *cmdtab )
+{
     CMDENT *cp;
     char s[MBUF_SIZE];
 
     if( cmdtab ) {
         for( cp = cmdtab; cp->cmdname; cp++ ) {
-            hashadd( cp->cmdname, ( int * ) cp, &mudstate.command_htab, 0 );
+            hashadd( cp->cmdname, ( int *) cp, &mudstate.command_htab, 0 );
             snprintf(s, MBUF_SIZE, "__%s", cp->cmdname );
-            hashadd( s, ( int * ) cp, &mudstate.command_htab, HASH_ALIAS );
+            hashadd( s, ( int *) cp, &mudstate.command_htab, HASH_ALIAS );
         }
     }
 }
 
-void register_prefix_cmds( const char *cmdchars ) {
+void register_prefix_cmds( const char *cmdchars )
+{
     const char *cp;
 
     char cn[2] = "x";
@@ -102,23 +106,25 @@ void register_prefix_cmds( const char *cmdchars ) {
         for( cp = cmdchars; *cp; cp++ ) {
             cn[0] = *cp;
             prefix_cmds[( unsigned char ) *cp] =
-                ( CMDENT * ) hashfind( cn, &mudstate.command_htab );
+                ( CMDENT *) hashfind( cn, &mudstate.command_htab );
         }
     }
 }
 
-void register_functions( FUN *functab ) {
+void register_functions( FUN *functab )
+{
     FUN *fp;
 
     if( functab ) {
         for( fp = functab; fp->name; fp++ ) {
-            hashadd( ( char * ) fp->name, ( int * ) fp,
+            hashadd( ( char *) fp->name, ( int *) fp,
                      &mudstate.func_htab, 0 );
         }
     }
 }
 
-void register_hashtables( MODHASHES *htab, MODNHASHES *ntab ) {
+void register_hashtables( MODHASHES *htab, MODNHASHES *ntab )
+{
     MODHASHES *hp;
 
     MODNHASHES *np;
@@ -141,7 +147,8 @@ void register_hashtables( MODHASHES *htab, MODNHASHES *ntab ) {
  * Deal with additional database info.
  */
 
-unsigned int register_dbtype( char *modname ) {
+unsigned int register_dbtype( char *modname )
+{
     unsigned int type;
 
     DBData key, data;
@@ -155,7 +162,7 @@ unsigned int register_dbtype( char *modname ) {
     data = db_get( key, DBTYPE_MODULETYPE );
 
     if( data.dptr ) {
-        memcpy( ( void * ) &type, ( void * ) data.dptr, sizeof( unsigned int ) );
+        memcpy( ( void *) &type, ( void *) data.dptr, sizeof( unsigned int ) );
         XFREE( data.dptr, "register_dbtype" );
         return type;
     }

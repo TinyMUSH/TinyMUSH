@@ -30,9 +30,9 @@ extern NAMETAB indiv_attraccess_nametab[];
 
 extern void do_pemit_list( dbref, char *, const char *, int );
 
-extern void do_pemit( dbref, dbref, int, char *, char * );
+extern void do_pemit( dbref, dbref, int, char *, char *);
 
-extern void set_attr_internal( dbref, dbref, int, char *, int, char *, char ** );
+extern void set_attr_internal( dbref, dbref, int, char *, int, char *, char **);
 extern int que_want( BQUE *, dbref, dbref );
 
 /*
@@ -43,7 +43,8 @@ extern int que_want( BQUE *, dbref, dbref );
  * that their arguments have not been evaluated.
  */
 
-void fun_switchall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_switchall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i, got_one;
 
     char *mbuff, *tbuff, *bp, *str, *save_token;
@@ -105,7 +106,8 @@ void fun_switchall( char *buff, char **bufc, dbref player, dbref caller, dbref c
     mudstate.switch_token = save_token;
 }
 
-void fun_switch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_switch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     char *mbuff, *tbuff, *bp, *str, *save_token;
@@ -168,7 +170,8 @@ void fun_switch( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     mudstate.switch_token = save_token;
 }
 
-void fun_case( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_case( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     char *mbuff, *tbuff, *bp, *str;
@@ -223,7 +226,8 @@ void fun_case( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     return;
 }
 
-void handle_ifelse( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_ifelse( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * This function now assumes that its arguments have not been
      * evaluated.
@@ -263,7 +267,7 @@ void handle_ifelse( char *buff, char **bufc, dbref player, dbref caller, dbref c
         n = xlate( tbuf );
         XFREE( tbuf, "handle_ifelse.tbuf" );
     } else {
-        n = !( ( ( int ) strtol( mbuff, ( char ** ) NULL, 10 ) == 0 ) && is_number( mbuff ) );
+        n = !( ( ( int ) strtol( mbuff, ( char **) NULL, 10 ) == 0 ) && is_number( mbuff ) );
     }
     if( flag & IFELSE_FALSE ) {
         n = !n;
@@ -325,10 +329,11 @@ void handle_ifelse( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * fun_rand: Return a random number from 0 to arg1-1
  */
 
-void fun_rand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_rand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int num;
 
-    num = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    num = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     if( num < 1 ) {
         safe_chr( '0', buff, bufc );
     } else {
@@ -342,7 +347,8 @@ void fun_rand( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * top>,<times>[,<delim>]): Generate random list.
  */
 
-void fun_die( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_die( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int n, die, count;
 
     int total = 0;
@@ -351,8 +357,8 @@ void fun_die( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         safe_chr( '0', buff, bufc );
         return;
     }
-    n = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
-    die = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    n = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
+    die = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
 
     if( ( n == 0 ) || ( die <= 0 ) ) {
         safe_chr( '0', buff, bufc );
@@ -370,7 +376,8 @@ void fun_die( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 }
 
 
-void fun_lrand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lrand( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim osep;
 
     int n_times, r_bot, r_top, i;
@@ -392,15 +399,15 @@ void fun_lrand( char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * return empty, rather than returning 0.
      */
 
-    n_times = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    n_times = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
     if( n_times < 1 ) {
         return;
     }
     if( n_times > LBUF_SIZE ) {
         n_times = LBUF_SIZE;
     }
-    r_bot = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
-    r_top = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    r_bot = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
+    r_top = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
 
     if( r_top < r_bot ) {
 
@@ -449,7 +456,8 @@ void fun_lrand( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 #define Lnum_Place(x)	(((x) < 10) ? (2*(x)) : ((3*(x))-10))
 
-void fun_lnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char tbuf[12];
 
     Delim osep;
@@ -472,11 +480,11 @@ void fun_lnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     VaChk_Out( 1, 3 );
 
     if( nfargs >= 2 ) {
-        bot = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
-        top = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+        bot = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
+        top = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     } else {
         bot = 0;
-        top = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+        top = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
         if( top-- < 1 ) {	/* still want to generate if arg is 1 */
             return;
         }
@@ -488,7 +496,7 @@ void fun_lnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if( !lnum_init ) {
         strcpy( lnum_buff,
-                ( char * )
+                ( char *)
                 "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99" );
         lnum_init = 1;
     }
@@ -570,10 +578,11 @@ void fun_lnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_time: Returns nicely-formatted time.
  */
 
-void fun_time( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_time( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *temp;
 
-    temp = ( char * ) ctime( &mudstate.now );
+    temp = ( char *) ctime( &mudstate.now );
     temp[strlen( temp ) - 1] = '\0';
     safe_str( temp, buff, bufc );
 }
@@ -583,7 +592,8 @@ void fun_time( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_time: Seconds since 0:00 1/1/70
  */
 
-void fun_secs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_secs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.now );
 }
 
@@ -592,13 +602,14 @@ void fun_secs( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_convsecs: converts seconds to time string, based off 0:00 1/1/70
  */
 
-void fun_convsecs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_convsecs( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *temp;
 
     time_t tt;
 
-    tt = strtol( fargs[0], ( char ** ) NULL, 10 );
-    temp = ( char * ) ctime( &tt );
+    tt = strtol( fargs[0], ( char **) NULL, 10 );
+    temp = ( char *) ctime( &tt );
     temp[strlen( temp ) - 1] = '\0';
     safe_str( temp, buff, bufc );
 }
@@ -634,7 +645,8 @@ static const char daystab[] = {
 	} \
 }
 
-int do_convtime( char *str, struct tm *ttm ) {
+int do_convtime( char *str, struct tm *ttm )
+{
     char *buf, *p, *q;
 
     int i;
@@ -671,7 +683,7 @@ int do_convtime( char *str, struct tm *ttm ) {
     ttm->tm_mon = i;
 
     get_substr( p, q );	/* day of month */
-    if( !q || ( ttm->tm_mday = ( int ) strtol( p, ( char ** ) NULL, 10 ) ) < 1 || ttm->tm_mday > daystab[i] ) {
+    if( !q || ( ttm->tm_mday = ( int ) strtol( p, ( char **) NULL, 10 ) ) < 1 || ttm->tm_mday > daystab[i] ) {
         free_sbuf( buf );
         return 0;
     }
@@ -681,7 +693,7 @@ int do_convtime( char *str, struct tm *ttm ) {
         return 0;
     }
     *p++ = '\0';
-    if( ( ttm->tm_hour = ( int ) strtol( q, ( char ** ) NULL, 10 ) ) > 23 || ttm->tm_hour < 0 ) {
+    if( ( ttm->tm_hour = ( int ) strtol( q, ( char **) NULL, 10 ) ) > 23 || ttm->tm_hour < 0 ) {
         free_sbuf( buf );
         return 0;
     }
@@ -700,7 +712,7 @@ int do_convtime( char *str, struct tm *ttm ) {
         return 0;
     }
     *q++ = '\0';
-    if( ( ttm->tm_min = ( int ) strtol( p, ( char ** ) NULL, 10 ) ) > 59 || ttm->tm_min < 0 ) {
+    if( ( ttm->tm_min = ( int ) strtol( p, ( char **) NULL, 10 ) ) > 59 || ttm->tm_min < 0 ) {
         free_sbuf( buf );
         return 0;
     }
@@ -714,7 +726,7 @@ int do_convtime( char *str, struct tm *ttm ) {
         }
     }
     get_substr( q, p );	/* seconds */
-    if( !p || ( ttm->tm_sec = ( int ) strtol( q, ( char ** ) NULL, 10 ) ) > 59 || ttm->tm_sec < 0 ) {
+    if( !p || ( ttm->tm_sec = ( int ) strtol( q, ( char **) NULL, 10 ) ) > 59 || ttm->tm_sec < 0 ) {
         free_sbuf( buf );
         return 0;
     }
@@ -728,7 +740,7 @@ int do_convtime( char *str, struct tm *ttm ) {
         }
     }
     get_substr( p, q );	/* year */
-    if( ( ttm->tm_year = ( int ) strtol( p, ( char ** ) NULL, 10 ) ) == 0 ) {
+    if( ( ttm->tm_year = ( int ) strtol( p, ( char **) NULL, 10 ) ) == 0 ) {
         while( isspace( *p ) ) {
             p++;
         }
@@ -754,7 +766,8 @@ int do_convtime( char *str, struct tm *ttm ) {
 #undef LEAPYEAR_1900
 }
 
-void fun_convtime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_convtime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     struct tm *ttm;
 
     ttm = localtime( &mudstate.now );
@@ -770,7 +783,8 @@ void fun_convtime( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_timefmt: Interface to strftime().
  */
 
-void fun_timefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_timefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     time_t tt;
 
     struct tm *ttm;
@@ -789,7 +803,7 @@ void fun_timefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     if( nfargs == 1 ) {
         tt = mudstate.now;
     } else if( nfargs == 2 ) {
-        tt = ( time_t ) strtol( fargs[1], ( char ** ) NULL, 10 );;
+        tt = ( time_t ) strtol( fargs[1], ( char **) NULL, 10 );;
         if( tt < 0 ) {
             safe_str( "#-1 INVALID TIME", buff, bufc );
             return;
@@ -843,7 +857,8 @@ void fun_timefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_etimefmt: Format a number of seconds into a human-readable time.
  */
 
-void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p, *mark, *tp;
 
     int raw_secs;
@@ -862,7 +877,7 @@ void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Figure out time values
      */
 
-    raw_secs = secs = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    raw_secs = secs = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     if( secs < 0 ) {
         /*
          * Try to be semi-useful. Keep value of secs; zero out the
@@ -1096,10 +1111,11 @@ void fun_etimefmt( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_starttime: What time did this system last reboot?
  */
 
-void fun_starttime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_starttime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *temp;
 
-    temp = ( char * ) ctime( &mudstate.start_time );
+    temp = ( char *) ctime( &mudstate.start_time );
     temp[strlen( temp ) - 1] = '\0';
     safe_str( temp, buff, bufc );
 }
@@ -1109,7 +1125,8 @@ void fun_starttime( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * fun_restarts: How many times have we restarted?
  */
 
-void fun_restarts( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_restarts( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.reboot_nums );
 }
 
@@ -1118,10 +1135,11 @@ void fun_restarts( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_restarttime: When did we last restart?
  */
 
-void fun_restarttime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_restarttime( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *temp;
 
-    temp = ( char * ) ctime( &mudstate.restart_time );
+    temp = ( char *) ctime( &mudstate.restart_time );
     temp[strlen( temp ) - 1] = '\0';
     safe_str( temp, buff, bufc );
 }
@@ -1131,7 +1149,8 @@ void fun_restarttime( char *buff, char **bufc, dbref player, dbref caller, dbref
  * fun_version: Return the MUSH version.
  */
 
-void fun_version( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_version( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /* XXX To fix once the new version scheme is done */
     //safe_str(mudstate.version, buff, bufc);
     safe_str( "TinyMUSH", buff, bufc );
@@ -1143,7 +1162,8 @@ void fun_version( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_mudname: Return the name of the mud.
  */
 
-void fun_mudname( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_mudname( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_str( mudconf.mud_name, buff, bufc );
 }
 
@@ -1152,7 +1172,8 @@ void fun_mudname( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_hasmodule: Return 1 if a module is installed, 0 if it is not.
  */
 
-void fun_hasmodule( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_hasmodule( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     MODULE *mp;
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
@@ -1169,7 +1190,8 @@ void fun_hasmodule( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * fun_connrecord: Get max number of simultaneous connects.
  */
 
-void fun_connrecord( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_connrecord( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.record_players );
 }
 
@@ -1178,19 +1200,23 @@ void fun_connrecord( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * State of the invocation and recursion counters.
  */
 
-void fun_fcount( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_fcount( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.func_invk_ctr );
 }
 
-void fun_fdepth( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_fdepth( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.func_nest_lev );
 }
 
-void fun_ccount( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ccount( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.cmd_invk_ctr );
 }
 
-void fun_cdepth( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_cdepth( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.cmd_nest_lev );
 }
 
@@ -1199,7 +1225,8 @@ void fun_cdepth( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_benchmark: Benchmark softcode.
  */
 
-void fun_benchmark( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_benchmark( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     struct timeval bt, et;
 
     int i, times;
@@ -1216,7 +1243,7 @@ void fun_benchmark( char *buff, char **bufc, dbref player, dbref caller, dbref c
     s = fargs[1];
     exec( nstr, &tp, player, caller, cause,
           EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs );
-    times = ( int ) strtol( nstr, ( char ** ) NULL, 10 );
+    times = ( int ) strtol( nstr, ( char **) NULL, 10 );
     free_lbuf( nstr );
     if( times < 1 ) {
         safe_str( "#-1 TOO FEW TIMES", buff, bufc );
@@ -1264,7 +1291,8 @@ void fun_benchmark( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * function evaluations.
  */
 
-void fun_s( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_s( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str;
 
     str = fargs[0];
@@ -1272,23 +1300,25 @@ void fun_s( char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
           cargs, ncargs );
 }
 
-void fun_subeval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_subeval( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str;
 
     str = fargs[0];
     exec( buff, bufc, player, caller, cause,
           EV_NO_LOCATION | EV_NOFCHECK | EV_FIGNORE | EV_NO_COMPRESS,
-          &str, ( char ** ) NULL, 0 );
+          &str, ( char **) NULL, 0 );
 }
 
 /*------------------------------------------------------------------------
  * Side-effect functions.
  */
 
-static int check_command( dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs ) {
+static int check_command( dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs )
+{
     CMDENT *cmdp;
 
-    if( ( cmdp = ( CMDENT * ) hashfind( name, &mudstate.command_htab ) ) ) {
+    if( ( cmdp = ( CMDENT *) hashfind( name, &mudstate.command_htab ) ) ) {
 
         /*
          * Note that these permission checks are NOT identical to the
@@ -1313,56 +1343,64 @@ static int check_command( dbref player, char *name, char *buff, char **bufc, cha
 }
 
 
-void fun_link( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_link( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@link", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_link( player, cause, 0, fargs[0], fargs[1] );
 }
 
-void fun_tel( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_tel( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@teleport", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_teleport( player, cause, 0, fargs[0], fargs[1] );
 }
 
-void fun_wipe( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_wipe( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@wipe", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_wipe( player, cause, 0, fargs[0] );
 }
 
-void fun_pemit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_pemit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@pemit", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_pemit_list( player, fargs[0], fargs[1], 0 );
 }
 
-void fun_remit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_remit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@pemit", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_pemit_list( player, fargs[0], fargs[1], 1 );
 }
 
-void fun_oemit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_oemit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@oemit", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_pemit( player, cause, PEMIT_OEMIT, fargs[0], fargs[1] );
 }
 
-void fun_force( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_force( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( check_command( player, "@force", buff, bufc, cargs, ncargs ) ) {
         return;
     }
     do_force( player, cause, FRC_NOW, fargs[0], fargs[1], cargs, ncargs );
 }
 
-void fun_trigger( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_trigger( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     if( nfargs < 1 ) {
         safe_str( "#-1 TOO FEW ARGUMENTS", buff, bufc );
         return;
@@ -1373,11 +1411,13 @@ void fun_trigger( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     do_trigger( player, cause, TRIG_NOW, fargs[0], & ( fargs[1] ), nfargs - 1 );
 }
 
-void fun_wait( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_wait( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     do_wait( player, cause, 0, fargs[0], fargs[1], cargs, ncargs );
 }
 
-void fun_command( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_command( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     CMDENT *cmdp;
 
     char tbuf1[1], tbuf2[1];
@@ -1394,7 +1434,7 @@ void fun_command( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         *p = tolower( *p );
     }
 
-    cmdp = ( CMDENT * ) hashfind( fargs[0], &mudstate.command_htab );
+    cmdp = ( CMDENT *) hashfind( fargs[0], &mudstate.command_htab );
     if( !cmdp ) {
         notify( player, "Command not found." );
         return;
@@ -1448,7 +1488,8 @@ void fun_command( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_create: Creates a room, thing or exit
  */
 
-void fun_create( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_create( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing;
 
     int cost;
@@ -1487,7 +1528,7 @@ void fun_create( char *buff, char **bufc, dbref player, dbref caller, dbref caus
             return;
         }
         if( fargs[1] && *fargs[1] ) {
-            cost = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+            cost = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
             if( cost < mudconf.createmin
                     || cost > mudconf.createmax ) {
                 safe_str( "#-1 COST OUT OF RANGE", buff, bufc );
@@ -1510,7 +1551,8 @@ void fun_create( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_set: sets an attribute on an object
  */
 
-void fun_set( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_set( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref thing, thing2, aowner;
 
     char *p, *buff2;
@@ -1668,7 +1710,8 @@ void fun_set( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-static void list_qpids( dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p ) {
+static void list_qpids( dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p )
+{
     BQUE *tmp;
 
     for( tmp = queue; tmp; tmp = tmp->next ) {
@@ -1681,7 +1724,8 @@ static void list_qpids( dbref player, dbref player_targ, dbref obj_targ, BQUE *q
     }
 }
 
-void fun_ps( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ps( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int qpid;
 
     dbref player_targ, obj_targ;
@@ -1697,8 +1741,8 @@ void fun_ps( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
 
     if( fargs[0] && is_integer( fargs[0] ) ) {
-        qpid = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
-        qptr = ( BQUE * ) nhashfind( qpid, &mudstate.qpid_htab );
+        qpid = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
+        qptr = ( BQUE *) nhashfind( qpid, &mudstate.qpid_htab );
         if( qptr == NULL ) {
             return;
         }

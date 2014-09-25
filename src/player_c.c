@@ -41,25 +41,27 @@ PCACHE *pcache_head;
 #define	PF_MONEY_CH	0x0004
 #define	PF_QMAX_CH	0x0008
 
-void pcache_init( void ) {
+void pcache_init( void )
+{
     pool_init( POOL_PCACHE, sizeof( PCACHE ) );
     nhashinit( &pcache_htab, 15 * HASH_FACTOR );
     pcache_head = NULL;
 }
 
-static void pcache_reload1( dbref player, PCACHE *pp ) {
+static void pcache_reload1( dbref player, PCACHE *pp )
+{
     char *cp;
 
     cp = atr_get_raw( player, A_MONEY );
     if( cp && *cp ) {
-        pp->money = ( int ) strtol( cp, ( char ** ) NULL, 10 );
+        pp->money = ( int ) strtol( cp, ( char **) NULL, 10 );
     } else {
         pp->money = 0;
     }
 
     cp = atr_get_raw( player, A_QUEUEMAX );
     if( cp && *cp ) {
-        pp->qmax = ( int ) strtol( cp, ( char ** ) NULL, 10 );
+        pp->qmax = ( int ) strtol( cp, ( char **) NULL, 10 );
     } else if( !Wizard( player ) ) {
         pp->qmax = mudconf.queuemax;
     } else {
@@ -68,10 +70,11 @@ static void pcache_reload1( dbref player, PCACHE *pp ) {
 }
 
 
-PCACHE *pcache_find( dbref player ) {
+PCACHE *pcache_find( dbref player )
+{
     PCACHE *pp;
 
-    pp = ( PCACHE * ) nhashfind( player, &pcache_htab );
+    pp = ( PCACHE *) nhashfind( player, &pcache_htab );
     if( pp ) {
         pp->cflags |= PF_REF;
         return pp;
@@ -84,11 +87,12 @@ PCACHE *pcache_find( dbref player ) {
     pcache_reload1( player, pp );
     pp->next = pcache_head;
     pcache_head = pp;
-    nhashadd( player, ( int * ) pp, &pcache_htab );
+    nhashadd( player, ( int *) pp, &pcache_htab );
     return pp;
 }
 
-void pcache_reload( dbref player ) {
+void pcache_reload( dbref player )
+{
     PCACHE *pp;
 
     if( Good_owner( player ) ) {
@@ -97,7 +101,8 @@ void pcache_reload( dbref player ) {
     }
 }
 
-static void pcache_save( PCACHE *pp ) {
+static void pcache_save( PCACHE *pp )
+{
     IBUF tbuf;
 
     if( pp->cflags & PF_DEAD ) {
@@ -114,7 +119,8 @@ static void pcache_save( PCACHE *pp ) {
     pp->cflags &= ~( PF_MONEY_CH | PF_QMAX_CH );
 }
 
-void pcache_trim( void ) {
+void pcache_trim( void )
+{
     PCACHE *pp, *pplast, *ppnext;
 
     pp = pcache_head;
@@ -142,7 +148,8 @@ void pcache_trim( void ) {
     }
 }
 
-void pcache_sync( void ) {
+void pcache_sync( void )
+{
     PCACHE *pp;
 
     pp = pcache_head;
@@ -152,7 +159,8 @@ void pcache_sync( void ) {
     }
 }
 
-int a_Queue( dbref player, int adj ) {
+int a_Queue( dbref player, int adj )
+{
     PCACHE *pp;
 
     if( Good_owner( player ) ) {
@@ -164,7 +172,8 @@ int a_Queue( dbref player, int adj ) {
     }
 }
 
-void s_Queue( dbref player, int val ) {
+void s_Queue( dbref player, int val )
+{
     PCACHE *pp;
 
     if( Good_owner( player ) ) {
@@ -173,7 +182,8 @@ void s_Queue( dbref player, int val ) {
     }
 }
 
-int QueueMax( dbref player ) {
+int QueueMax( dbref player )
+{
     PCACHE *pp;
 
     int m;
@@ -193,7 +203,8 @@ int QueueMax( dbref player ) {
     return m;
 }
 
-int Pennies( dbref obj ) {
+int Pennies( dbref obj )
+{
     PCACHE *pp;
 
     char *cp;
@@ -204,10 +215,11 @@ int Pennies( dbref obj ) {
     }
 
     cp = atr_get_raw( obj, A_MONEY );
-    return ( ( int ) strtol( cp, ( char ** ) NULL, 10 ) );
+    return ( ( int ) strtol( cp, ( char **) NULL, 10 ) );
 }
 
-void s_Pennies( dbref obj, int howfew ) {
+void s_Pennies( dbref obj, int howfew )
+{
     PCACHE *pp;
 
     IBUF tbuf;

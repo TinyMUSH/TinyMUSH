@@ -34,7 +34,7 @@ struct attr {
     const char     *name;	/* This has to be first.  braindeath. */
     int		number;	/* attr number */
     int		flags;
-    int	( *check )( int, dbref, dbref, int, char * );
+    int	( *check )( int, dbref, dbref, int, char *);
 };
 
 extern ATTR    *atr_num( int anum );
@@ -296,7 +296,7 @@ extern void	tf_init( void );
 extern int	tf_open( char *, int );
 extern void	tf_close( int );
 extern FILE    *tf_fopen( char *, int );
-extern void	tf_fclose( FILE * );
+extern void	tf_fclose( FILE *);
 extern FILE    *tf_popen( char *, int );
 
 #define tf_pclose(f)	tf_fclose(f)
@@ -304,14 +304,14 @@ extern FILE    *tf_popen( char *, int );
 #define putref(pr__f,pr__ref)	fprintf(pr__f, "%d\n", (int)pr__ref)
 #define putlong(pr__f,pr__i)	fprintf(pr__f, "%ld\n", (long)pr__i)
 
-extern dbref getref( FILE * );
-extern long getlong( FILE * );
-extern BOOLEXP *dup_bool( BOOLEXP * );
-extern void	free_boolexp( BOOLEXP * );
-extern dbref	parse_dbref( const char * );
-extern dbref	parse_dbref_only( const char * );
-extern dbref	parse_objid( const char *, const char * );
-extern int	mkattr( char * );
+extern dbref getref( FILE *);
+extern long getlong( FILE *);
+extern BOOLEXP *dup_bool( BOOLEXP *);
+extern void	free_boolexp( BOOLEXP *);
+extern dbref	parse_dbref( const char *);
+extern dbref	parse_dbref_only( const char *);
+extern dbref	parse_objid( const char *, const char *);
+extern int	mkattr( char *);
 extern void	al_add( dbref, int );
 extern void	al_delete( dbref, int );
 extern void	al_destroy( dbref );
@@ -319,7 +319,7 @@ extern void	al_store( void );
 extern void	db_grow( dbref );
 extern void	db_free( void );
 extern void	db_make_minimal( void );
-extern dbref	db_convert( FILE *, int *, int *, int * );
+extern dbref	db_convert( FILE *, int *, int *, int *);
 extern dbref	db_read( void );
 extern dbref	db_write_flatfile( FILE *, int, int );
 extern dbref	db_write( void );

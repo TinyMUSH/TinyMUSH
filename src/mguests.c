@@ -23,11 +23,12 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
-extern void do_lock( dbref, dbref, int, char *, char * );
+extern void do_lock( dbref, dbref, int, char *, char *);
 
 typedef int object_flag_type;
 
-dbref create_guest( int num ) {
+dbref create_guest( int num )
+{
     dbref player, aowner;
     int found, same_str, aflags;
     char name[LBUF_SIZE * 2];
@@ -147,9 +148,10 @@ dbref create_guest( int num ) {
     return player;
 }
 
-void destroy_guest( dbref guest ) {
+void destroy_guest( dbref guest )
+{
     char s[MBUF_SIZE];
-    
+
     if( !Wizard( mudconf.guest_nuker ) || !Good_obj( mudconf.guest_nuker ) ) {
         mudconf.guest_nuker = GOD;
     }
@@ -163,7 +165,8 @@ void destroy_guest( dbref guest ) {
     destroy_obj( mudconf.guest_nuker, guest );
 }
 
-char *make_guest( DESC *d ) {
+char *make_guest( DESC *d )
+{
     int i;
 
     dbref guest;

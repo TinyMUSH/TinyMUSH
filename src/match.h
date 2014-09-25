@@ -47,8 +47,8 @@ extern dbref	match_result( void );
 extern dbref	last_match_result( void );
 extern dbref	match_status( dbref, dbref );
 extern dbref	noisy_match_result( void );
-extern void	save_match_state( MSTATE * );
-extern void	restore_match_state( MSTATE * );
+extern void	save_match_state( MSTATE *);
+extern void	restore_match_state( MSTATE *);
 
 #define NOMATCH_MESSAGE "I don't see that here."
 #define AMBIGUOUS_MESSAGE "I don't know which one you mean!"

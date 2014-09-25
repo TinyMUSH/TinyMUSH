@@ -26,11 +26,12 @@
 #include "command.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-static void show_a_desc( dbref, dbref, const char * );
+static void show_a_desc( dbref, dbref, const char *);
 
 extern void ufun( char *, char *, int, int, int, dbref, dbref );
 
-static int did_attr( dbref player, dbref thing, int what ) {
+static int did_attr( dbref player, dbref thing, int what )
+{
     /*
      * If the attribute exists, get it, notify the player, return 1.
      * * If not, return 0.
@@ -47,7 +48,8 @@ static int did_attr( dbref player, dbref thing, int what ) {
     return 0;
 }
 
-static void look_exits( dbref player, dbref loc, const char *exit_name ) {
+static void look_exits( dbref player, dbref loc, const char *exit_name )
+{
     dbref thing, parent;
 
     char *buff, *e, *buff1, *e1;
@@ -125,26 +127,26 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
             DOLIST( thing, Exits( parent ) ) {
                 if( Can_See_Exit( player, thing, isdark ) ) {
                     if( buff != e )
-                        safe_known_str( ( char * ) "  ", 2,
+                        safe_known_str( ( char *) "  ", 2,
                                         buff, &e );
                     if( Html( player ) && (mudconf.have_pueblo == 1) ) {
                         e1 = buff1;
                         safe_exit_name( thing, buff1,
                                         &e1 );
-                        safe_str( ( char * )
+                        safe_str( ( char *)
                                   "<a xch_cmd=\"", buff, &e );
                         /*
                          * XXX Just stripping ansi isn't really enough.
                          */
                         safe_str( strip_ansi( buff1 ),
                                   buff, &e );
-                        safe_str( ( char * ) "\">", buff,
+                        safe_str( ( char *) "\">", buff,
                                   &e );
                         /*
                          * XXX The exit name needs to be HTML escaped.
                          */
                         html_escape( buff1, buff, &e );
-                        safe_str( ( char * ) "</a>", buff,
+                        safe_str( ( char *) "</a>", buff,
                                   &e );
                     } else {
                         /*
@@ -159,23 +161,23 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
     }
 
     if ( mudconf.have_pueblo == 1) {
-    if( !( Transparent( loc ) ) ) {
-        if( Html( player ) ) {
-            safe_chr( '\r', buff, &e );
-            safe_chr( '\n', buff, &e );
-            *e = '\0';
-            notify_html( player, buff );
-        } else {
+        if( !( Transparent( loc ) ) ) {
+            if( Html( player ) ) {
+                safe_chr( '\r', buff, &e );
+                safe_chr( '\n', buff, &e );
+                *e = '\0';
+                notify_html( player, buff );
+            } else {
+                *e = '\0';
+                notify( player, buff );
+            }
+        }
+    } else {
+        if( !( Transparent( loc ) ) ) {
             *e = '\0';
             notify( player, buff );
         }
     }
-    } else {
-    if( !( Transparent( loc ) ) ) {
-        *e = '\0';
-        notify( player, buff );
-    }
-  }
 
     free_lbuf( buff );
     free_lbuf( buff1 );
@@ -185,7 +187,8 @@ static void look_exits( dbref player, dbref loc, const char *exit_name ) {
 #define CONTENTS_NESTED 1
 #define CONTENTS_REMOTE 2
 
-static void look_contents( dbref player, dbref loc, const char *contents_name, int style ) {
+static void look_contents( dbref player, dbref loc, const char *contents_name, int style )
+{
     dbref thing;
 
     dbref can_see_loc;
@@ -205,7 +208,7 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
     }
 
     if(mudconf.have_pueblo == 1) {
-    html_buff = html_cp = alloc_lbuf( "look_contents" );
+        html_buff = html_cp = alloc_lbuf( "look_contents" );
     }
 
     /*
@@ -284,11 +287,12 @@ static void look_contents( dbref player, dbref loc, const char *contents_name, i
         }
     }
     if(mudconf.have_pueblo == 1) {
-    free_lbuf( html_buff );
+        free_lbuf( html_buff );
     }
 }
 
-static void pairs_print( dbref player, char *atext, char *buff, char **bufc ) {
+static void pairs_print( dbref player, char *atext, char *buff, char **bufc )
+{
     int pos, depth;
 
     char *str, *strbuf, *parenlist, *endp;
@@ -436,7 +440,8 @@ static void pairs_print( dbref player, char *atext, char *buff, char **bufc ) {
     free_lbuf( parenlist );
 }
 
-static void pretty_format( char *dest, char **cp, char *p ) {
+static void pretty_format( char *dest, char **cp, char *p )
+{
     /*
      * Pretty-print an attribute into a buffer (assumed to be an lbuf).
      */
@@ -462,13 +467,13 @@ static void pretty_format( char *dest, char **cp, char *p ) {
         case '{':
             safe_crlf( dest, cp );
             for( i = 0; i < indent_lev; i++ ) {
-                safe_str( ( char * ) INDENT_STR, dest, cp );
+                safe_str( ( char *) INDENT_STR, dest, cp );
             }
             safe_chr( *p, dest, cp );
             safe_crlf( dest, cp );
             indent_lev++;
             for( i = 0; i < indent_lev; i++ ) {
-                safe_str( ( char * ) INDENT_STR, dest, cp );
+                safe_str( ( char *) INDENT_STR, dest, cp );
             }
             while( p[1] == ' ' ) {
                 p++;
@@ -480,12 +485,12 @@ static void pretty_format( char *dest, char **cp, char *p ) {
             }
             safe_crlf( dest, cp );
             for( i = 0; i < indent_lev; i++ ) {
-                safe_str( ( char * ) INDENT_STR, dest, cp );
+                safe_str( ( char *) INDENT_STR, dest, cp );
             }
             safe_chr( *p, dest, cp );
             safe_crlf( dest, cp );
             for( i = 0; i < indent_lev; i++ ) {
-                safe_str( ( char * ) INDENT_STR, dest, cp );
+                safe_str( ( char *) INDENT_STR, dest, cp );
             }
             while( p[1] == ' ' ) {
                 p++;
@@ -495,7 +500,7 @@ static void pretty_format( char *dest, char **cp, char *p ) {
             safe_chr( *p, dest, cp );
             safe_crlf( dest, cp );
             for( i = 0; i < indent_lev; i++ ) {
-                safe_str( ( char * ) INDENT_STR, dest, cp );
+                safe_str( ( char *) INDENT_STR, dest, cp );
             }
             while( p[1] == ' ' ) {
                 p++;
@@ -512,7 +517,8 @@ static void pretty_format( char *dest, char **cp, char *p ) {
     }
 }
 
-static void pretty_print( char *dest, char *name, char *text ) {
+static void pretty_print( char *dest, char *name, char *text )
+{
     char *cp, *p, *word;
 
     cp = dest;
@@ -546,9 +552,9 @@ static void pretty_print( char *dest, char *name, char *text ) {
         } else {
             return;
         }
-        /*
-         * FALLTHRU
-         */
+    /*
+     * FALLTHRU
+     */
 
     case '@':
     case '&':
@@ -594,7 +600,8 @@ static void pretty_print( char *dest, char *name, char *text ) {
 }
 
 
-static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special ) {
+static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special )
+{
     char *text, *buf, *bp, *name_buf, *bb_p;
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
     char flag_buf[32];
@@ -712,7 +719,8 @@ static void view_atr( dbref player, dbref thing, ATTR *ap, char *raw_text, dbref
     }
 }
 
-static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special ) {
+static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special )
+{
     dbref aowner;
 
     int ca, aflags, alen;
@@ -721,7 +729,7 @@ static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclu
 
     char *as, *buf;
 
-    cattr = ( ATTR * ) XMALLOC( sizeof( ATTR ), "look_atrs1" );
+    cattr = ( ATTR *) XMALLOC( sizeof( ATTR ), "look_atrs1" );
     for( ca = atr_head( thing, &as ); ca; ca = atr_next( &as ) ) {
         if( ( ca == A_DESC ) || ( ca == A_LOCK ) ) {
             continue;
@@ -731,7 +739,7 @@ static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclu
             continue;
         }
 
-        memcpy( ( char * ) cattr, ( char * ) attr, sizeof( ATTR ) );
+        memcpy( ( char *) cattr, ( char *) attr, sizeof( ATTR ) );
 
         /*
          * Should we exclude this attr?
@@ -756,7 +764,7 @@ static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclu
 
             if( !( check_exclude && ( aflags & AF_PRIVATE ) ) ) {
                 if( hash_insert )
-                    nhashadd( ca, ( int * ) cattr,
+                    nhashadd( ca, ( int *) cattr,
                               &mudstate.parent_htab );
                 view_atr( player, thing, cattr, buf,
                           aowner, aflags, 0, is_special );
@@ -767,7 +775,8 @@ static void look_atrs1( dbref player, dbref thing, dbref othing, int check_exclu
     XFREE( cattr, "look_atrs1" );
 }
 
-static void look_atrs( dbref player, dbref thing, int check_parents, int is_special ) {
+static void look_atrs( dbref player, dbref thing, int check_parents, int is_special )
+{
     dbref parent;
 
     int lev, check_exclude, hash_insert;
@@ -789,7 +798,8 @@ static void look_atrs( dbref player, dbref thing, int check_parents, int is_spec
     }
 }
 
-static void look_simple( dbref player, dbref thing, int obey_terse ) {
+static void look_simple( dbref player, dbref thing, int obey_terse )
+{
     char *buff;
 
     /*
@@ -812,14 +822,14 @@ static void look_simple( dbref player, dbref thing, int obey_terse ) {
 
     if( obey_terse && Terse( player ) )
         did_it( player, thing, A_NULL, "You see nothing special.",
-                A_ODESC, NULL, A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                A_ODESC, NULL, A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
     else
 
         if (mudconf.have_pueblo == 1) {
-        show_a_desc( player, thing, "You see nothing special." );        
+            show_a_desc( player, thing, "You see nothing special." );
         } else {
-        did_it( player, thing, A_DESC, "You see nothing special.",
-                A_ODESC, NULL, A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+            did_it( player, thing, A_DESC, "You see nothing special.",
+                    A_ODESC, NULL, A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
         }
 
     if( !mudconf.quiet_look && ( !Terse( player ) || mudconf.terse_look ) ) {
@@ -827,7 +837,8 @@ static void look_simple( dbref player, dbref thing, int obey_terse ) {
     }
 }
 
-static void show_a_desc( dbref player, dbref loc, const char *msg ) {
+static void show_a_desc( dbref player, dbref loc, const char *msg )
+{
     char *got2;
 
     dbref aowner;
@@ -841,13 +852,13 @@ static void show_a_desc( dbref player, dbref loc, const char *msg ) {
         got2 = atr_pget( loc, A_HTDESC, &aowner, &aflags, &alen );
         if( *got2 )
             did_it( player, loc, A_HTDESC, msg, A_ODESC, NULL,
-                    A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                    A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
         else {
             if( indent ) {
                 raw_notify_newline( player );
             }
             did_it( player, loc, A_DESC, msg, A_ODESC, NULL,
-                    A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                    A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
             if( indent ) {
                 raw_notify_newline( player );
             }
@@ -858,14 +869,15 @@ static void show_a_desc( dbref player, dbref loc, const char *msg ) {
             raw_notify_newline( player );
         }
         did_it( player, loc, A_DESC, msg, A_ODESC, NULL,
-                A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
         if( indent ) {
             raw_notify_newline( player );
         }
     }
 }
 
-static void show_desc( dbref player, dbref loc, int key ) {
+static void show_desc( dbref player, dbref loc, int key )
+{
     char *got;
 
     dbref aowner;
@@ -877,43 +889,44 @@ static void show_desc( dbref player, dbref loc, int key ) {
 
     if( ( key & LK_OBEYTERSE ) && Terse( player ) )
         did_it( player, loc, A_NULL, NULL, A_ODESC, NULL,
-                A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
     else if( ( Typeof( loc ) != TYPE_ROOM ) && ( key & LK_IDESC ) ) {
         if( * ( got = atr_pget( loc, A_IDESC, &aowner, &aflags, &alen ) ) )
             did_it( player, loc, A_IDESC, NULL, A_ODESC, NULL,
-                    A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                    A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
         else {
             if( mudconf.have_pueblo == 1 ) {
-            show_a_desc( player, loc, NULL );
+                show_a_desc( player, loc, NULL );
             } else {
-            if( indent ) {
-                raw_notify_newline( player );
-            }
-            did_it( player, loc, A_DESC, NULL, A_ODESC, NULL,
-                    A_ADESC, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
-            if( indent ) {
-                raw_notify_newline( player );
-            }
+                if( indent ) {
+                    raw_notify_newline( player );
+                }
+                did_it( player, loc, A_DESC, NULL, A_ODESC, NULL,
+                        A_ADESC, 0, ( char **) NULL, 0, MSG_PRESENCE );
+                if( indent ) {
+                    raw_notify_newline( player );
+                }
             }
         }
         free_lbuf( got );
     } else {
         if( mudconf.have_pueblo == 1) {
-        show_a_desc( player, loc, NULL );
+            show_a_desc( player, loc, NULL );
         } else {
-        if( indent ) {
-            raw_notify_newline( player );
-        }
-        did_it( player, loc, A_DESC, NULL, A_ODESC, NULL, A_ADESC, 0,
-                ( char ** ) NULL, 0, MSG_PRESENCE );
-        if( indent ) {
-            raw_notify_newline( player );
-        }
+            if( indent ) {
+                raw_notify_newline( player );
+            }
+            did_it( player, loc, A_DESC, NULL, A_ODESC, NULL, A_ADESC, 0,
+                    ( char **) NULL, 0, MSG_PRESENCE );
+            if( indent ) {
+                raw_notify_newline( player );
+            }
         }
     }
 }
 
-void look_in( dbref player, dbref loc, int key ) {
+void look_in( dbref player, dbref loc, int key )
+{
     int pattr, oattr, aattr, is_terse, showkey;
 
     char *buff;
@@ -932,9 +945,9 @@ void look_in( dbref player, dbref loc, int key ) {
      * If he needs the VRML URL, send it:
      */
     if( mudconf.have_pueblo == 1) {
-    if( key & LK_SHOWVRML ) {
-        show_vrml_url( player, loc );
-    }
+        if( key & LK_SHOWVRML ) {
+            show_vrml_url( player, loc );
+        }
     }
 
     /*
@@ -945,16 +958,16 @@ void look_in( dbref player, dbref loc, int key ) {
 
     if( !did_attr( player, loc, A_NAME_FMT ) ) {
         buff = unparse_object( player, loc, 1 );
-      if(mudconf.have_pueblo == 1) {
-        if( Html( player ) ) {
-            notify_html( player, "<center><h3>" );
-            notify( player, buff );
-            notify_html( player, "</h3></center>" );
+        if(mudconf.have_pueblo == 1) {
+            if( Html( player ) ) {
+                notify_html( player, "<center><h3>" );
+                notify( player, buff );
+                notify_html( player, "</h3></center>" );
+            } else {
+                notify( player, buff );
+            }
         } else {
             notify( player, buff );
-        }
-        } else {
-        notify( player, buff );
         }
         free_lbuf( buff );
     }
@@ -995,7 +1008,7 @@ void look_in( dbref player, dbref loc, int key ) {
             pattr = 0;
         }
         did_it( player, loc, pattr, NULL, oattr, NULL,
-                aattr, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+                aattr, 0, ( char **) NULL, 0, MSG_PRESENCE );
     }
     /*
      * tell him the attributes, contents and exits
@@ -1012,7 +1025,8 @@ void look_in( dbref player, dbref loc, int key ) {
     }
 }
 
-static void look_here( dbref player, dbref thing, int key, int look_key ) {
+static void look_here( dbref player, dbref thing, int key, int look_key )
+{
     if( Good_obj( thing ) ) {
         if( key & LOOK_OUTSIDE ) {
             if( ( isRoom( thing ) ) || Opaque( thing ) ) {
@@ -1026,7 +1040,8 @@ static void look_here( dbref player, dbref thing, int key, int look_key ) {
     }
 }
 
-void do_look( dbref player, dbref cause, int key, char *name ) {
+void do_look( dbref player, dbref cause, int key, char *name )
+{
     dbref thing, loc, look_key;
 
     look_key = LK_SHOWATTR | LK_SHOWEXIT;
@@ -1066,7 +1081,7 @@ void do_look( dbref player, dbref cause, int key, char *name ) {
         thing = match_status( player,
                               match_possessed( player,
                                                ( ( key & LOOK_OUTSIDE ) ? loc : player ),
-                                               ( char * ) name, thing, 0 ) );
+                                               ( char *) name, thing, 0 ) );
     }
 
     /*
@@ -1110,7 +1125,8 @@ void do_look( dbref player, dbref cause, int key, char *name ) {
 }
 
 
-static void debug_examine( dbref player, dbref thing ) {
+static void debug_examine( dbref player, dbref thing )
+{
     dbref aowner;
 
     char *buf;
@@ -1151,7 +1167,7 @@ static void debug_examine( dbref player, dbref thing ) {
 
     buf = alloc_lbuf( "debug_examine" );
     cp = buf;
-    safe_str( ( char * ) "Attr list: ", buf, &cp );
+    safe_str( ( char *) "Attr list: ", buf, &cp );
 
     for( ca = atr_head( thing, &as ); ca; ca = atr_next( &as ) ) {
         attr = atr_num( ca );
@@ -1162,7 +1178,7 @@ static void debug_examine( dbref player, dbref thing ) {
         atr_get_info( thing, ca, &aowner, &aflags );
         if( Read_attr( player, thing, attr, aowner, aflags ) ) {
             if( attr ) {	/* Valid attr. */
-                safe_str( ( char * ) attr->name, buf, &cp );
+                safe_str( ( char *) attr->name, buf, &cp );
                 safe_chr( ' ', buf, &cp );
             } else {
                 ltos( nbuf, ca );
@@ -1188,7 +1204,8 @@ static void debug_examine( dbref player, dbref thing ) {
     }
 }
 
-static void exam_wildattrs( dbref player, dbref thing, int do_parent, int is_special ) {
+static void exam_wildattrs( dbref player, dbref thing, int do_parent, int is_special )
+{
     int atr, aflags, alen, got_any;
 
     char *buf;
@@ -1265,7 +1282,8 @@ static void exam_wildattrs( dbref player, dbref thing, int do_parent, int is_spe
     }
 }
 
-void do_examine( dbref player, dbref cause, int key, char *name ) {
+void do_examine( dbref player, dbref cause, int key, char *name )
+{
     dbref thing, content, exit, aowner, loc;
 
     char savec;
@@ -1406,14 +1424,14 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
         free_lbuf( buf2 );
         mudconf.many_coins[0] = savec;
 
-        buf2 = ( char * ) ctime( &CreateTime( thing ) );
+        buf2 = ( char *) ctime( &CreateTime( thing ) );
         buf2[strlen( buf2 ) - 1] = '\0';
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Created: %s", buf2 );
 
-        buf2 = ( char * ) ctime( &save_access_time );
+        buf2 = ( char *) ctime( &save_access_time );
         buf2[strlen( buf2 ) - 1] = '\0';
         strcpy( timebuf, buf2 );
-        buf2 = ( char * ) ctime( &ModTime( thing ) );
+        buf2 = ( char *) ctime( &ModTime( thing ) );
         buf2[strlen( buf2 ) - 1] = '\0';
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, buf2 );
 
@@ -1569,8 +1587,9 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
             break;
         }
     } else if( !Opaque( thing ) && nearby( player, thing ) ) {
-        if( Has_contents( thing ) ) 
+        if( Has_contents( thing ) ) {
             look_contents( player, thing, "Contents:", CONTENTS_REMOTE );
+        }
         if( !isExit( thing ) ) {
             look_exits( player, thing, "Obvious exits:" );
         }
@@ -1589,12 +1608,14 @@ void do_examine( dbref player, dbref cause, int key, char *name ) {
     }
 }
 
-void do_score( dbref player, dbref cause, int key ) {
+void do_score( dbref player, dbref cause, int key )
+{
     notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You have %d %s.", Pennies( player ), ( Pennies( player ) == 1 ) ? mudconf.one_coin : mudconf.many_coins );
-            
+
 }
 
-void do_inventory( dbref player, dbref cause, int key ) {
+void do_inventory( dbref player, dbref cause, int key )
+{
     dbref thing;
 
     char *buff, *e;
@@ -1617,7 +1638,7 @@ void do_inventory( dbref player, dbref cause, int key ) {
         e = buff = alloc_lbuf( "look_exits" );
         DOLIST( thing, thing ) {
             if( e != buff ) {
-                safe_known_str( ( char * ) "  ", 2, buff, &e );
+                safe_known_str( ( char *) "  ", 2, buff, &e );
             }
             safe_exit_name( thing, buff, &e );
         }
@@ -1628,7 +1649,8 @@ void do_inventory( dbref player, dbref cause, int key ) {
     do_score( player, player, 0 );
 }
 
-void do_entrances( dbref player, dbref cause, int key, char *name ) {
+void do_entrances( dbref player, dbref cause, int key, char *name )
+{
     dbref thing, i, j;
 
     char *exit, *message;
@@ -1753,7 +1775,8 @@ void do_entrances( dbref player, dbref cause, int key, char *name ) {
 
 /* check the current location for bugs */
 
-static void sweep_check( dbref player, dbref what, int key, int is_loc ) {
+static void sweep_check( dbref player, dbref what, int key, int is_loc )
+{
     dbref aowner, parent;
 
     int canhear, cancom, isplayer, ispuppet, isconnected, is_audible, attr,
@@ -1852,27 +1875,27 @@ static void sweep_check( dbref player, dbref what, int key, int is_loc ) {
         bp = buf;
 
         if( cancom ) {
-            safe_str( ( char * ) "commands ", buf, &bp );
+            safe_str( ( char *) "commands ", buf, &bp );
         }
         if( canhear ) {
-            safe_str( ( char * ) "messages ", buf, &bp );
+            safe_str( ( char *) "messages ", buf, &bp );
         }
         if( is_audible ) {
-            safe_str( ( char * ) "audible ", buf, &bp );
+            safe_str( ( char *) "audible ", buf, &bp );
         }
         if( isplayer ) {
-            safe_str( ( char * ) "player ", buf, &bp );
+            safe_str( ( char *) "player ", buf, &bp );
         }
         if( ispuppet ) {
-            safe_str( ( char * ) "puppet(", buf, &bp );
+            safe_str( ( char *) "puppet(", buf, &bp );
             safe_name( Owner( what ), buf, &bp );
-            safe_str( ( char * ) ") ", buf, &bp );
+            safe_str( ( char *) ") ", buf, &bp );
         }
         if( isconnected ) {
-            safe_str( ( char * ) "connected ", buf, &bp );
+            safe_str( ( char *) "connected ", buf, &bp );
         }
         if( is_parent ) {
-            safe_str( ( char * ) "parent ", buf, &bp );
+            safe_str( ( char *) "parent ", buf, &bp );
         }
         *--bp = '\0';	/* nuke the space at the end */
         if( !isExit( what ) ) {
@@ -1887,7 +1910,8 @@ static void sweep_check( dbref player, dbref what, int key, int is_loc ) {
     }
 }
 
-void do_sweep( dbref player, dbref cause, int key, char *where ) {
+void do_sweep( dbref player, dbref cause, int key, char *where )
+{
     dbref here, sweeploc;
 
     int where_key, what_key;
@@ -1983,7 +2007,8 @@ void do_sweep( dbref player, dbref cause, int key, char *where ) {
 
 extern NAMETAB indiv_attraccess_nametab[];
 
-void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
+void do_decomp( dbref player, dbref cause, int key, char *name, char *qual )
+{
     BOOLEXP *bool;
     char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp;
     dbref aowner, thing;
@@ -2131,21 +2156,24 @@ void do_decomp( dbref player, dbref cause, int key, char *name, char *qual ) {
      * If the object has a parent, report it
      */
 
-    if( !wild_decomp && ( Parent( thing ) != NOTHING ) )
+    if( !wild_decomp && ( Parent( thing ) != NOTHING ) ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@parent %s=#%d", thingname, Parent( thing ) );
+    }
 
     /*
      * If the object has a zone, report it
      */
 
-    if( !wild_decomp && ( Zone( thing ) != NOTHING ) )
+    if( !wild_decomp && ( Zone( thing ) != NOTHING ) ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "@chzone %s=#%d", thingname, Zone( thing ) );
+    }
 
     free_lbuf( thingname );
     olist_pop();
 }
 
-void show_vrml_url( dbref thing, dbref loc ) {
+void show_vrml_url( dbref thing, dbref loc )
+{
     char *vrml_url;
 
     dbref aowner;

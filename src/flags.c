@@ -29,7 +29,8 @@
  * fh_any: set or clear indicated bit, no security checking
  */
 
-int fh_any( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_any( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     /*
      * Never let God drop his own wizbit.
      */
@@ -70,7 +71,8 @@ int fh_any( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
  * fh_god: only GOD may set or clear the bit
  */
 
-int fh_god( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_god( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( !God( player ) ) {
         return 0;
     }
@@ -82,7 +84,8 @@ int fh_god( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
  * fh_wiz: only WIZARDS (or GOD) may set or clear the bit
  */
 
-int fh_wiz( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_wiz( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( !Wizard( player ) && !God( player ) ) {
         return 0;
     }
@@ -94,7 +97,8 @@ int fh_wiz( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
  * fh_wizroy: only WIZARDS, ROYALTY, (or GOD) may set or clear the bit
  */
 
-int fh_wizroy( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_wizroy( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( !WizRoy( player ) && !God( player ) ) {
         return 0;
     }
@@ -107,7 +111,8 @@ int fh_wizroy( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
  * players can set it on other types of objects.
  */
 
-int fh_restrict_player( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_restrict_player( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( isPlayer( target ) && !Wizard( player ) && !God( player ) ) {
         return 0;
     }
@@ -121,7 +126,8 @@ int fh_restrict_player( dbref target, dbref player, FLAG flag, int fflags, int r
  * robots). Only God can set this on a player.
  */
 
-int fh_privileged( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_privileged( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     int has_it;
 
     if( !God( player ) ) {
@@ -153,7 +159,8 @@ int fh_privileged( dbref target, dbref player, FLAG flag, int fflags, int reset 
  * fh_inherit: only players may set or clear this bit.
  */
 
-int fh_inherit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_inherit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( !Inherits( player ) ) {
         return 0;
     }
@@ -165,7 +172,8 @@ int fh_inherit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
  * fh_dark_bit: manipulate the dark bit. Nonwizards may not set on players.
  */
 
-int fh_dark_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_dark_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( !reset && isPlayer( target ) && !( ( target == player ) &&
                                            Can_Hide( player ) ) && ( !Wizard( player ) && !God( player ) ) ) {
         return 0;
@@ -180,7 +188,8 @@ int fh_dark_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) 
  * destroy nondestroyable objects.
  */
 
-int fh_going_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_going_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( Going( target ) && reset && ( Typeof( target ) != TYPE_GARBAGE ) ) {
         notify( player,
                 "Your object has been spared from destruction." );
@@ -197,7 +206,8 @@ int fh_going_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_hear_bit: set or clear bits that affect hearing.
  */
 
-int fh_hear_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_hear_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     int could_hear;
 
     int result;
@@ -213,7 +223,8 @@ int fh_hear_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) 
  * fh_player_bit: Can set and reset this on everything but players.
  */
 
-int fh_player_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_player_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( isPlayer( target ) ) {
         return 0;
     }
@@ -225,7 +236,8 @@ int fh_player_bit( dbref target, dbref player, FLAG flag, int fflags, int reset 
  * fh_power_bit: Check power bit to set/reset.
  */
 
-int fh_power_bit( dbref target, dbref player, FLAG flag, int fflags, int reset ) {
+int fh_power_bit( dbref target, dbref player, FLAG flag, int fflags, int reset )
+{
     if( flag & WATCHER ) {
         /*
          * Wizards can set this on anything. Players with the Watch
@@ -349,13 +361,14 @@ OBJENT	object_types[8] = {
  * init_flagtab: initialize flag hash tables.
  */
 
-void init_flagtab( void ) {
+void init_flagtab( void )
+{
     FLAGENT *fp;
 
     hashinit( &mudstate.flags_htab, 100 * HASH_FACTOR, HT_STR | HT_KEYREF );
 
     for( fp = gen_flags; fp->flagname; fp++ ) {
-        hashadd( ( char * ) fp->flagname, ( int * ) fp, &mudstate.flags_htab,
+        hashadd( ( char *) fp->flagname, ( int *) fp, &mudstate.flags_htab,
                  0 );
     }
 }
@@ -365,13 +378,14 @@ void init_flagtab( void ) {
  * display_flags: display available flags.
  */
 
-void display_flagtab( dbref player ) {
+void display_flagtab( dbref player )
+{
     char *buf, *bp;
 
     FLAGENT *fp;
 
     bp = buf = alloc_lbuf( "display_flagtab" );
-    safe_str( ( char * ) "Flags:", buf, &bp );
+    safe_str( ( char *) "Flags:", buf, &bp );
     for( fp = gen_flags; fp->flagname; fp++ ) {
         if( ( fp->listperm & CA_WIZARD ) && !Wizard( player ) ) {
             continue;
@@ -380,7 +394,7 @@ void display_flagtab( dbref player ) {
             continue;
         }
         safe_chr( ' ', buf, &bp );
-        safe_str( ( char * ) fp->flagname, buf, &bp );
+        safe_str( ( char *) fp->flagname, buf, &bp );
         safe_chr( '(', buf, &bp );
         safe_chr( fp->flaglett, buf, &bp );
         safe_chr( ')', buf, &bp );
@@ -390,7 +404,8 @@ void display_flagtab( dbref player ) {
     free_lbuf( buf );
 }
 
-FLAGENT *find_flag( dbref thing, char *flagname ) {
+FLAGENT *find_flag( dbref thing, char *flagname )
+{
     char *cp;
 
     /*
@@ -400,7 +415,7 @@ FLAGENT *find_flag( dbref thing, char *flagname ) {
     for( cp = flagname; *cp; cp++ ) {
         *cp = toupper( *cp );
     }
-    return ( FLAGENT * ) hashfind( flagname, &mudstate.flags_htab );
+    return ( FLAGENT *) hashfind( flagname, &mudstate.flags_htab );
 }
 
 /*
@@ -408,7 +423,8 @@ FLAGENT *find_flag( dbref thing, char *flagname ) {
  * flag_set: Set or clear a specified flag on an object.
  */
 
-void flag_set( dbref target, dbref player, char *flag, int key ) {
+void flag_set( dbref target, dbref player, char *flag, int key )
+{
     FLAGENT *fp;
 
     int negate, result;
@@ -466,7 +482,8 @@ void flag_set( dbref target, dbref player, char *flag, int key ) {
  * decode_flags: converts a flag set into corresponding letters.
  */
 
-char *decode_flags( dbref player, FLAGSET flagset ) {
+char *decode_flags( dbref player, FLAGSET flagset )
+{
     char *buf, *bp, *s;
 
     FLAGENT *fp;
@@ -512,7 +529,8 @@ char *decode_flags( dbref player, FLAGSET flagset ) {
  * unparse_flags: converts a thing's flags into corresponding letters.
  */
 
-char *unparse_flags( dbref player, dbref thing ) {
+char *unparse_flags( dbref player, dbref thing )
+{
     char *buf, *bp, *s;
 
     FLAGENT *fp;
@@ -586,7 +604,8 @@ char *unparse_flags( dbref player, dbref thing ) {
  * has_flag: does object have flag visible to player?
  */
 
-int has_flag( dbref player, dbref it, char *flagname ) {
+int has_flag( dbref player, dbref it, char *flagname )
+{
     FLAGENT *fp;
 
     FLAG fv;
@@ -639,7 +658,8 @@ int has_flag( dbref player, dbref it, char *flagname ) {
  * flag_description: Return an mbuf containing the type and flags on thing.
  */
 
-char *flag_description( dbref player, dbref target ) {
+char *flag_description( dbref player, dbref target )
+{
     char *buff, *bp;
 
     FLAGENT *fp;
@@ -659,9 +679,9 @@ char *flag_description( dbref player, dbref target ) {
      * Store the header strings and object type
      */
 
-    safe_mb_str( ( char * ) "Type: ", buff, &bp );
-    safe_mb_str( ( char * ) object_types[otype].name, buff, &bp );
-    safe_mb_str( ( char * ) " Flags:", buff, &bp );
+    safe_mb_str( ( char *) "Type: ", buff, &bp );
+    safe_mb_str( ( char *) object_types[otype].name, buff, &bp );
+    safe_mb_str( ( char *) " Flags:", buff, &bp );
     if( object_types[otype].perm != CA_PUBLIC ) {
         return buff;
     }
@@ -693,7 +713,7 @@ char *flag_description( dbref player, dbref target ) {
                 continue;
             }
             safe_mb_chr( ' ', buff, &bp );
-            safe_mb_str( ( char * ) fp->flagname, buff, &bp );
+            safe_mb_str( ( char *) fp->flagname, buff, &bp );
         }
     }
 
@@ -706,7 +726,8 @@ char *flag_description( dbref player, dbref target ) {
  * Return an lbuf containing the name and number of an object
  */
 
-char *unparse_object_numonly( dbref target ) {
+char *unparse_object_numonly( dbref target )
+{
     char *buf, *bp;
 
     buf = alloc_lbuf( "unparse_object_numonly" );
@@ -730,7 +751,8 @@ char *unparse_object_numonly( dbref target ) {
  * Return an lbuf pointing to the object name and possibly the db# and flags
  */
 
-char *unparse_object( dbref player, dbref target, int obey_myopic ) {
+char *unparse_object( dbref player, dbref target, int obey_myopic )
+{
     char *buf, *fp, *bp;
 
     int exam;
@@ -782,7 +804,8 @@ char *unparse_object( dbref player, dbref target, int obey_myopic ) {
  * pointer.
  */
 
-FLAGENT *letter_to_flag( char this_letter ) {
+FLAGENT *letter_to_flag( char this_letter )
+{
     FLAGENT *fp;
 
     for( fp = gen_flags; fp->flagname; fp++ ) {
@@ -798,7 +821,8 @@ FLAGENT *letter_to_flag( char this_letter ) {
  * cf_flag_access: Modify who can set a flag.
  */
 
-int cf_flag_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_flag_access( int *vp, char *str, long extra, dbref player, char *cmd )
+{
     char *fstr, *permstr, *tokst;
 
     FLAGENT *fp;
@@ -827,17 +851,17 @@ int cf_flag_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
         log_write( LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for flag: %s", fp->flagname );
         return -1;
     }
-    if( !strcmp( permstr, ( char * ) "any" ) ) {
+    if( !strcmp( permstr, ( char *) "any" ) ) {
         fp->handler = fh_any;
-    } else if( !strcmp( permstr, ( char * ) "royalty" ) ) {
+    } else if( !strcmp( permstr, ( char *) "royalty" ) ) {
         fp->handler = fh_wizroy;
-    } else if( !strcmp( permstr, ( char * ) "wizard" ) ) {
+    } else if( !strcmp( permstr, ( char *) "wizard" ) ) {
         fp->handler = fh_wiz;
-    } else if( !strcmp( permstr, ( char * ) "god" ) ) {
+    } else if( !strcmp( permstr, ( char *) "god" ) ) {
         fp->handler = fh_god;
-    } else if( !strcmp( permstr, ( char * ) "restrict_player" ) ) {
+    } else if( !strcmp( permstr, ( char *) "restrict_player" ) ) {
         fp->handler = fh_restrict_player;
-    } else if( !strcmp( permstr, ( char * ) "privileged" ) ) {
+    } else if( !strcmp( permstr, ( char *) "privileged" ) ) {
         fp->handler = fh_privileged;
     } else {
         cf_log_notfound( player, cmd, "Flag access", permstr );
@@ -851,7 +875,8 @@ int cf_flag_access( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * cf_flag_name: Modify the name of a user-defined flag.
  */
 
-int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd ) {
+int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd )
+{
     char *numstr, *namestr, *tokst;
 
     FLAGENT *fp;
@@ -864,7 +889,7 @@ int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd ) {
     namestr = strtok_r( NULL, " \t=,", &tokst );
 
     if( numstr && ( strlen( numstr ) == 1 ) ) {
-        flagnum = ( int ) strtol( numstr, ( char ** ) NULL, 10 );
+        flagnum = ( int ) strtol( numstr, ( char **) NULL, 10 );
     }
     if( ( flagnum < 0 ) || ( flagnum > 9 ) ) {
         cf_log_notfound( player, cmd, "Not a marker flag", numstr );
@@ -909,8 +934,8 @@ int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd ) {
         *cp = toupper( *cp );
     }
 
-    fp->flagname = ( const char * ) flagstr;
-    hashadd( ( char * ) fp->flagname, ( int * ) fp, &mudstate.flags_htab, 0 );
+    fp->flagname = ( const char *) flagstr;
+    hashadd( ( char *) fp->flagname, ( int *) fp, &mudstate.flags_htab, 0 );
 
     return 0;
 }
@@ -921,7 +946,8 @@ int cf_flag_name( int *vp, char *str, long extra, dbref player, char *cmd ) {
  * set the type qualifier if specified and not already set.
  */
 
-int convert_flags( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type ) {
+int convert_flags( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type )
+{
     int i, handled;
 
     char *s;
@@ -1000,7 +1026,8 @@ int convert_flags( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type ) {
  * decompile_flags: Produce commands to set flags on target.
  */
 
-void decompile_flags( dbref player, dbref thing, char *thingname ) {
+void decompile_flags( dbref player, dbref thing, char *thingname )
+{
     FLAG f1, f2, f3;
 
     FLAGENT *fp;

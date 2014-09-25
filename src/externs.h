@@ -11,14 +11,14 @@
  */
 
 /* From external sources */
-extern char    *crypt( const char *, const char * );
+extern char    *crypt( const char *, const char *);
 
 /* From alloc.c */
 extern void    *xstrprintf(const char *, const char *, ...);
 
 /* From boolexp.c */
-extern int	eval_boolexp( dbref, dbref, dbref, BOOLEXP * );
-extern int	eval_boolexp_atr( dbref, dbref, dbref, char * );
+extern int	eval_boolexp( dbref, dbref, dbref, BOOLEXP *);
+extern int	eval_boolexp_atr( dbref, dbref, dbref, char *);
 extern BOOLEXP *parse_boolexp( dbref, const char *, int );
 
 /* From bsd.c */
@@ -30,22 +30,22 @@ extern void	set_signals( void );
 
 /* From command.c */
 extern int	check_access( dbref, int );
-extern int	check_mod_access( dbref, EXTFUNCS * );
+extern int	check_mod_access( dbref, EXTFUNCS *);
 extern void	reset_prefix_cmds( void );
-extern void	process_cmdline( dbref, dbref, char *, char *[], int, BQUE * );
+extern void	process_cmdline( dbref, dbref, char *, char *[], int, BQUE *);
 extern void	call_move_hook( dbref, dbref, int );
 
 /* From conf.c */
 extern void	cf_log_syntax( dbref, char *, const char *,... );
 extern void	cf_log_help( dbref, char *, const char *, ... );
 extern void	cf_log_help_mkindx( dbref, char *, const char *, ... );
-extern void	cf_log_notfound( dbref, char *, const char *, char * );
-extern int	cf_modify_bits( int *, char *, long, dbref, char * );
+extern void	cf_log_notfound( dbref, char *, const char *, char *);
+extern int	cf_modify_bits( int *, char *, long, dbref, char *);
 
 /* From cque.c */
 extern int	nfy_que( dbref, dbref, int, int, int );
 extern int	halt_que( dbref, dbref );
-extern void	wait_que( dbref, dbref, int, dbref, int, char *, char *[], int, GDATA * );
+extern void	wait_que( dbref, dbref, int, dbref, int, char *, char *[], int, GDATA *);
 extern int	que_next( void );
 extern int	do_top( int ncmds );
 extern void	do_second( void );
@@ -55,96 +55,96 @@ extern int	destroyable( dbref );
 
 /* From db.c */
 extern char *getstring_noalloc( FILE *, int );
-extern void	putstring( FILE *, const char * );
+extern void	putstring( FILE *, const char *);
 extern void	dump_restart_db( void );
 extern int	Commer( dbref );
-extern void	s_Pass( dbref, const char * );
-extern void s_Name( dbref, char * );
+extern void	s_Pass( dbref, const char *);
+extern void s_Name( dbref, char *);
 extern char *Name( dbref );
 extern char *PureName( dbref );
-extern void safe_name( dbref, char *, char ** );
-extern void	safe_exit_name( dbref, char *, char ** );
-extern int	fwdlist_load( FWDLIST *, dbref, char * );
-extern void	fwdlist_set( dbref, FWDLIST * );
+extern void safe_name( dbref, char *, char **);
+extern void	safe_exit_name( dbref, char *, char **);
+extern int	fwdlist_load( FWDLIST *, dbref, char *);
+extern void	fwdlist_set( dbref, FWDLIST *);
 extern void	fwdlist_clr( dbref );
-extern int	fwdlist_rewrite( FWDLIST *, char * );
+extern int	fwdlist_rewrite( FWDLIST *, char *);
 extern FWDLIST *fwdlist_get( dbref );
-extern int	propdir_load( PROPDIR *, dbref, char * );
-extern void	propdir_set( dbref, PROPDIR * );
+extern int	propdir_load( PROPDIR *, dbref, char *);
+extern void	propdir_set( dbref, PROPDIR *);
 extern void	propdir_clr( dbref );
-extern int	propdir_rewrite( PROPDIR *, char * );
+extern int	propdir_rewrite( PROPDIR *, char *);
 extern PROPDIR *propdir_get( dbref );
 extern void	atr_push( void );
 extern void	atr_pop( void );
-extern int	atr_head( dbref, char ** );
-extern int	atr_next( char ** );
-extern int	init_gdbm_db( char * );
+extern int	atr_head( dbref, char **);
+extern int	atr_next( char **);
+extern int	init_gdbm_db( char *);
 extern void	atr_cpy( dbref, dbref, dbref );
 extern void	atr_chown( dbref );
 extern void	atr_clr( dbref, int );
-extern void	atr_add_raw( dbref, int, char * );
+extern void	atr_add_raw( dbref, int, char *);
 extern void	atr_add( dbref, int, char *, dbref, int );
 extern void	atr_set_owner( dbref, int, dbref );
 extern void	atr_set_flags( dbref, int, int );
 extern char    *atr_get_raw( dbref, int );
-extern char    *atr_get( dbref, int, dbref *, int *, int * );
-extern char    *atr_pget( dbref, int, dbref *, int *, int * );
-extern char    *atr_get_str( char *, dbref, int, dbref *, int *, int * );
-extern char    *atr_pget_str( char *, dbref, int, dbref *, int *, int * );
-extern int	atr_get_info( dbref, int, dbref *, int * );
-extern int	atr_pget_info( dbref, int, dbref *, int * );
+extern char    *atr_get( dbref, int, dbref *, int *, int *);
+extern char    *atr_pget( dbref, int, dbref *, int *, int *);
+extern char    *atr_get_str( char *, dbref, int, dbref *, int *, int *);
+extern char    *atr_pget_str( char *, dbref, int, dbref *, int *, int *);
+extern int	atr_get_info( dbref, int, dbref *, int *);
+extern int	atr_pget_info( dbref, int, dbref *, int *);
 extern void	atr_free( dbref );
 extern int	check_zone( dbref, dbref );
 extern int	check_zone_for_player( dbref, dbref );
 extern void	toast_player( dbref );
 
 /* from db_rw.c */
-extern BOOLEXP *getboolexp1( FILE * );
-extern void putboolexp( FILE *, BOOLEXP * );
+extern BOOLEXP *getboolexp1( FILE *);
+extern void putboolexp( FILE *, BOOLEXP *);
 
 /* From eval.c */
 extern char    *parse_to( char **, char, int );
 extern char    *parse_arglist( dbref, dbref, dbref, char *, char, int, char *[], int, char *[], int );
 extern void	exec( char *, char **, dbref, dbref, dbref, int, char **, char *[], int );
-extern GDATA   *save_global_regs( const char * );
-extern void	restore_global_regs( const char *, GDATA * );
+extern GDATA   *save_global_regs( const char *);
+extern void	restore_global_regs( const char *, GDATA *);
 
 /* From fnhelper.c */
-extern dbref	match_thing( dbref, char * );
-extern int	xlate( char * );
+extern dbref	match_thing( dbref, char *);
+extern int	xlate( char *);
 extern long	random_range( long, long );
 
 /* From funmisc.c */
 
-extern int do_convtime( char *, struct tm * );
+extern int do_convtime( char *, struct tm *);
 
 /* From game.c */
-extern void	notify_except( dbref, dbref, dbref, int, const char  *, ... );
+extern void	notify_except( dbref, dbref, dbref, int, const char *, ... );
 extern void	notify_except2( dbref, dbref, dbref, dbref, int, const char *, ... );
 extern void	notify_check( dbref, dbref, int, const char *, ... );
 extern int	Hearer( dbref );
-extern void	html_escape( const char *, char *, char ** );
+extern void	html_escape( const char *, char *, char **);
 extern void	dump_database_internal( int );
 extern void	fork_and_dump( dbref, dbref, int );
 extern int	copy_file( char *,char *, int );
-extern char 	**add_array( char **, char *, int *, char * );
-extern void	write_status_file( dbref, char * );
+extern char	 **add_array( char **, char *, int *, char *);
+extern void	write_status_file( dbref, char *);
 extern char	*mktimestamp( char *, size_t );
 extern void	do_backup_mush( dbref player, dbref cause, int key );
 
 /* From help.c */
-extern int	helpmkindx( dbref, char *, char * );
+extern int	helpmkindx( dbref, char *, char *);
 
 /* From htab.c */
-extern int	cf_ntab_access( int *, char *, long, dbref, char * );
+extern int	cf_ntab_access( int *, char *, long, dbref, char *);
 
 /* From log.c */
-extern void	logfile_init( char * );
-extern void	log_perror( const char *, const char *, const char *, const char  * );
+extern void	logfile_init( char *);
+extern void	log_perror( const char *, const char *, const char *, const char *);
 extern void	log_write( int, const char *, const char *, const char *, ... );
 extern void	log_write_raw( int, const char *, ... );
-extern char 	*log_getname( dbref, char * );
-extern char	*log_gettype( dbref, char * );
+extern char	 *log_getname( dbref, char *);
+extern char	*log_gettype( dbref, char *);
 extern void	do_logrotate( dbref, dbref, int );
 extern void	logfile_close( void );
 
@@ -168,20 +168,20 @@ extern struct timeval	update_quotas( struct timeval, struct timeval );
 extern void 	raw_notify_html( dbref, const char *, ... );
 extern void	raw_notify( dbref, const char *, ... );
 extern void	raw_notify_newline( dbref );
-extern void	clearstrings( DESC * );
+extern void	clearstrings( DESC *);
 extern void	queue_write( DESC *, const char *, int );
 extern void	queue_string( DESC *, const char *, ... );
 extern void	queue_rawstring( DESC *, const char *, ... );
-extern void	freeqs( DESC * );
-extern void	welcome_user( DESC * );
-extern void	save_command( DESC *, CBLK * );
-extern void	announce_disconnect( dbref, DESC *, const char * );
-extern int	boot_off( dbref, char * );
-extern int	boot_by_port( int, int, char * );
+extern void	freeqs( DESC *);
+extern void	welcome_user( DESC *);
+extern void	save_command( DESC *, CBLK *);
+extern void	announce_disconnect( dbref, DESC *, const char *);
+extern int	boot_off( dbref, char *);
+extern int	boot_by_port( int, int, char *);
 extern void	check_idle( void );
 extern void	process_commands( void );
-extern int	site_check( struct in_addr, SITE * );
-extern dbref	find_connected_name( dbref, char * );
+extern int	site_check( struct in_addr, SITE *);
+extern dbref	find_connected_name( dbref, char *);
 
 /* From move.c */
 extern void	move_object( dbref, dbref );
@@ -195,14 +195,14 @@ extern void	destroy_player( dbref );
 
 /* From player.c */
 extern dbref	create_player( char *, char *, dbref, int, int );
-extern int	add_player_name( dbref, char * );
-extern int	delete_player_name( dbref, char * );
+extern int	add_player_name( dbref, char *);
+extern int	delete_player_name( dbref, char *);
 extern dbref	lookup_player( dbref, char *, int );
 extern void	load_player_names( void );
-extern void	badname_add( char * );
-extern void	badname_remove( char * );
-extern int	badname_check( char * );
-extern void	badname_list( dbref, const char * );
+extern void	badname_add( char *);
+extern void	badname_remove( char *);
+extern int	badname_check( char *);
+extern void	badname_list( dbref, const char *);
 
 /* From predicates.c */
 extern char    *safe_snprintf(char *,  size_t, const char *, ... );
@@ -213,69 +213,69 @@ extern dbref	insert_first( dbref, dbref );
 extern dbref	remove_first( dbref, dbref );
 extern dbref	reverse_list( dbref );
 extern int	member( dbref, dbref );
-extern int	is_integer( char * );
-extern int	is_number( char * );
+extern int	is_integer( char *);
+extern int	is_number( char *);
 extern int	could_doit( dbref, dbref, int );
 extern void	add_quota( dbref, int, int );
 extern int	canpayfees( dbref, dbref, int, int, int );
 extern int	payfees( dbref, int, int, int );
 extern void	giveto( dbref, int );
 extern int	payfor( dbref, int );
-extern int	ok_name( const char * );
-extern int	ok_player_name( const char * );
-extern int	ok_attr_name( const char * );
+extern int	ok_name( const char *);
+extern int	ok_player_name( const char *);
+extern int	ok_attr_name( const char *);
 extern int	ok_password( const char *, dbref );
 extern void	handle_ears( dbref, int, int );
 extern dbref	match_possessed( dbref, dbref, char *, dbref, int );
-extern void	parse_range( char **, dbref *, dbref * );
-extern int	parse_thing_slash( dbref, char *, char **, dbref * );
-extern int	get_obj_and_lock( dbref, char *, dbref *, ATTR **, char *, char ** );
+extern void	parse_range( char **, dbref *, dbref *);
+extern int	parse_thing_slash( dbref, char *, char **, dbref *);
+extern int	get_obj_and_lock( dbref, char *, dbref *, ATTR **, char *, char **);
 extern dbref	where_is( dbref );
 extern dbref	where_room( dbref );
 extern int	locatable( dbref, dbref, dbref );
 extern int	nearby( dbref, dbref );
-extern char    *master_attr( dbref, dbref, int, char **, int, int * );
-extern void	did_it( dbref, dbref, int, const char *, int, const char  *, int, int, char *[], int, int );
+extern char    *master_attr( dbref, dbref, int, char **, int, int *);
+extern void	did_it( dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int );
 
 /* From set.c */
 extern int	parse_attrib( dbref, char *, dbref *, int *, int );
 extern int	parse_attrib_wild( dbref, char *, dbref *, int, int, int, int );
-extern void	edit_string( char *, char **, char *, char * );
-extern dbref	match_controlled( dbref, const char * );
-extern dbref	match_affected( dbref, const char * );
+extern void	edit_string( char *, char **, char *, char *);
+extern dbref	match_controlled( dbref, const char *);
+extern dbref	match_affected( dbref, const char *);
 
 /* From stringutil.c */
 extern int	rgb2xterm( long );
-extern int	str2xterm( char * );
-extern char    *upcasestr( char * );
-extern char    *munge_space( char * );
-extern char    *trim_spaces( char * );
+extern int	str2xterm( char *);
+extern char    *upcasestr( char *);
+extern char    *munge_space( char *);
+extern char    *trim_spaces( char *);
 extern char    *grabto( char **, char );
-extern int	string_compare( const char *, const char * );
-extern int	string_prefix( const char *, const char * );
-extern const char *string_match( const char *, const char * );
-extern char    *replace_string( const char *, const char *, const char  * );
-extern void	edit_string( char *, char **, char *, char * );
-extern char    *skip_space( const char * );
+extern int	string_compare( const char *, const char *);
+extern int	string_prefix( const char *, const char *);
+extern const char *string_match( const char *, const char *);
+extern char    *replace_string( const char *, const char *, const char *);
+extern void	edit_string( char *, char **, char *, char *);
+extern char    *skip_space( const char *);
 extern int	minmatch( char *, char *, int );
 extern void safe_copy_str( const char *, char *, char **, int );
 extern int safe_copy_str_fn( const char *, char *, char **, int );
 extern int	safe_copy_long_str( char *, char *, char **, int );
-extern void safe_known_str( const char *, int, char *, char ** );
-extern int	matches_exit_from_list( char *, char * );
+extern void safe_known_str( const char *, int, char *, char **);
+extern int	matches_exit_from_list( char *, char *);
 extern char    *translate_string( char *, int );
 extern int	ltos( char *, long );
 extern void safe_ltos( char *, char **, long );
 extern char    *repeatchar( int, char );
-extern char    *strip_ansi( const char * );
+extern char    *strip_ansi( const char *);
 extern char    *strip_xterm(char *);
-extern int	strip_ansi_len( const char * );
-extern char    *normal_to_white( const char * );
+extern int	strip_ansi_len( const char *);
+extern char    *normal_to_white( const char *);
 extern char    *ansi_transition_esccode( int, int );
 extern char    *ansi_transition_mushcode( int, int );
 extern char    *ansi_transition_letters( int, int );
-extern int	ansi_map_states( const char *, int **, char ** );
-extern char     *remap_colors( const char *, int * );
+extern int	ansi_map_states( const char *, int **, char **);
+extern char     *remap_colors( const char *, int *);
 extern void	track_ansi_letters(char *, int *);
 extern void	track_esccode(char **, int *);
 extern void	track_all_esccodes(char **, char **, int *);
@@ -284,19 +284,19 @@ extern void	copy_esccode(char **, char **);
 extern void	safe_copy_esccode(char **, char *, char **);
 
 /* From timer.c */
-extern int	call_cron( dbref, dbref, int, char * );
+extern int	call_cron( dbref, dbref, int, char *);
 extern int	cron_clr( dbref, int );
 
 /* From udb_achunk.c */
 extern int	dddb_close( void );
-extern int	dddb_setfile( char * );
+extern int	dddb_setfile( char *);
 extern int	dddb_init( void );
 
 /* From unparse.c */
-extern char    *unparse_boolexp( dbref, BOOLEXP * );
-extern char    *unparse_boolexp_quiet( dbref, BOOLEXP * );
-extern char    *unparse_boolexp_decompile( dbref, BOOLEXP * );
-extern char    *unparse_boolexp_function( dbref, BOOLEXP * );
+extern char    *unparse_boolexp( dbref, BOOLEXP *);
+extern char    *unparse_boolexp_quiet( dbref, BOOLEXP *);
+extern char    *unparse_boolexp_decompile( dbref, BOOLEXP *);
+extern char    *unparse_boolexp_function( dbref, BOOLEXP *);
 
 /* From walkdb.c */
 extern int	chown_all( dbref, dbref, dbref, int );
@@ -308,8 +308,8 @@ extern dbref	olist_next( void );
 
 /* From wild.c */
 extern int	wild( char *, char *, char *[], int );
-extern int	wild_match( char *, char * );
-extern int	quick_wild( char *, char * );
+extern int	wild_match( char *, char *);
+extern int	quick_wild( char *, char *);
 extern int	register_match( char *, char *, char *[], int );
 
 /*

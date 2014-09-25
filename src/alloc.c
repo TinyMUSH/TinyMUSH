@@ -24,7 +24,8 @@ const char *poolnames[] =
 
 #define POOL_MAGICNUM 0xdeadbeef
 
-void pool_init( int poolnum, int poolsize ) {
+void pool_init( int poolnum, int poolsize )
+{
     pools[poolnum].pool_size = poolsize;
     pools[poolnum].free_head = NULL;
     pools[poolnum].chain_head = NULL;
@@ -35,7 +36,8 @@ void pool_init( int poolnum, int poolsize ) {
     return;
 }
 
-static void pool_err( const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason ) {
+static void pool_err( const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR *ph, const char *action, const char *reason )
+{
     if( !mudstate.logging ) {
         log_write( logflag, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx. (%s)", action, pools[poolnum].pool_size, tag, reason, ( long ) ph, mudstate.debug_cmd );
     } else if( logflag != LOG_ALLOCATE ) {
@@ -43,7 +45,8 @@ static void pool_err( const char *logsys, int logflag, int poolnum, const char *
     }
 }
 
-static void pool_vfy( int poolnum, const char *tag ) {
+static void pool_vfy( int poolnum, const char *tag )
+{
     POOLHDR *ph, *lastph;
 
     POOLFTR *pf;
@@ -55,10 +58,10 @@ static void pool_vfy( int poolnum, const char *tag ) {
     lastph = NULL;
     psize = pools[poolnum].pool_size;
     for( ph = pools[poolnum].chain_head; ph; lastph = ph, ph = ph->next ) {
-        h = ( char * ) ph;
+        h = ( char *) ph;
         h += sizeof( POOLHDR );
         h += pools[poolnum].pool_size;
-        pf = ( POOLFTR * ) h;
+        pf = ( POOLFTR *) h;
 
         if( ph->magicnum != POOL_MAGICNUM ) {
             pool_err( "BUG", LOG_ALWAYS, poolnum, tag, ph, "Verify", "header corrupted (clearing freelist)" );
@@ -87,7 +90,8 @@ static void pool_vfy( int poolnum, const char *tag ) {
     }
 }
 
-void pool_check( const char *tag ) {
+void pool_check( const char *tag )
+{
     int poolnum;
 
     for( poolnum = 0; poolnum < NUM_POOLS; ++poolnum ) {
@@ -95,7 +99,8 @@ void pool_check( const char *tag ) {
     }
 }
 
-char *pool_alloc( int poolnum, const char *tag ) {
+char *pool_alloc( int poolnum, const char *tag )
+{
     int *p;
 
     char *h;
@@ -109,16 +114,16 @@ char *pool_alloc( int poolnum, const char *tag ) {
     }
     do {
         if( pools[poolnum].free_head == NULL ) {
-            h = ( char * ) RAW_MALLOC( pools[poolnum].pool_size + sizeof( POOLHDR ) + sizeof( POOLFTR ), "pool_alloc.ph" );
+            h = ( char *) RAW_MALLOC( pools[poolnum].pool_size + sizeof( POOLHDR ) + sizeof( POOLFTR ), "pool_alloc.ph" );
             if( h == NULL ) {
                 log_write_raw( 1, "ABORT! alloc.c, pool_alloc() failed to get memory." );
                 abort();
             }
-            ph = ( POOLHDR * ) h;
+            ph = ( POOLHDR *) h;
             h += sizeof( POOLHDR );
-            p = ( int * ) h;
+            p = ( int *) h;
             h += pools[poolnum].pool_size;
-            pf = ( POOLFTR * ) h;
+            pf = ( POOLFTR *) h;
             ph->next = pools[poolnum].chain_head;
             ph->nxtfree = NULL;
             ph->magicnum = POOL_MAGICNUM;
@@ -128,12 +133,12 @@ char *pool_alloc( int poolnum, const char *tag ) {
             pools[poolnum].chain_head = ph;
             pools[poolnum].max_alloc++;
         } else {
-            ph = ( POOLHDR * )( pools[poolnum].free_head );
-            h = ( char * ) ph;
+            ph = ( POOLHDR *)( pools[poolnum].free_head );
+            h = ( char *) ph;
             h += sizeof( POOLHDR );
-            p = ( int * ) h;
+            p = ( int *) h;
             h += pools[poolnum].pool_size;
-            pf = ( POOLFTR * ) h;
+            pf = ( POOLFTR *) h;
             pools[poolnum].free_head = ph->nxtfree;
 
             /*
@@ -169,7 +174,7 @@ char *pool_alloc( int poolnum, const char *tag ) {
         }
     } while( p == NULL );
 
-    ph->buf_tag = ( char * ) tag;
+    ph->buf_tag = ( char *) tag;
     pools[poolnum].tot_alloc++;
     pools[poolnum].num_alloc++;
 
@@ -184,10 +189,11 @@ char *pool_alloc( int poolnum, const char *tag ) {
                   "buffer modified after free" );
     }
     *p = 0;
-    return ( char * ) p;
+    return ( char *) p;
 }
 
-void pool_free( int poolnum, char **buf ) {
+void pool_free( int poolnum, char **buf )
+{
     int *ibuf;
 
     char *h;
@@ -196,13 +202,13 @@ void pool_free( int poolnum, char **buf ) {
 
     POOLFTR *pf;
 
-    ibuf = ( int * ) *buf;
-    h = ( char * ) ibuf;
+    ibuf = ( int *) *buf;
+    h = ( char *) ibuf;
     h -= sizeof( POOLHDR );
-    ph = ( POOLHDR * ) h;
-    h = ( char * ) ibuf;
+    ph = ( POOLHDR *) h;
+    h = ( char *) ibuf;
     h += pools[poolnum].pool_size;
-    pf = ( POOLFTR * ) h;
+    pf = ( POOLFTR *) h;
     if( mudconf.paranoid_alloc ) {
         pool_check( ph->buf_tag );
     }
@@ -257,7 +263,8 @@ void pool_free( int poolnum, char **buf ) {
     }
 }
 
-static char *pool_stats( int poolnum, const char *text ) {
+static char *pool_stats( int poolnum, const char *text )
+{
     char *buf;
 
     buf = alloc_mbuf( "pool_stats" );
@@ -265,7 +272,8 @@ static char *pool_stats( int poolnum, const char *text ) {
     return buf;
 }
 
-static void pool_trace( dbref player, int poolnum, const char *text ) {
+static void pool_trace( dbref player, int poolnum, const char *text )
+{
     POOLHDR *ph;
 
     int numfree, *ibuf;
@@ -280,9 +288,9 @@ static void pool_trace( dbref player, int poolnum, const char *text ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d free %s (before corruption)", numfree, text );
             return;
         }
-        h = ( char * ) ph;
+        h = ( char *) ph;
         h += sizeof( POOLHDR );
-        ibuf = ( int * ) h;
+        ibuf = ( int *) h;
         if( *ibuf != POOL_MAGICNUM ) {
             notify( player, ph->buf_tag );
         } else {
@@ -292,7 +300,8 @@ static void pool_trace( dbref player, int poolnum, const char *text ) {
     notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d free %s", numfree, text );
 }
 
-void list_bufstats( dbref player ) {
+void list_bufstats( dbref player )
+{
     int i;
 
     char *buff;
@@ -306,7 +315,8 @@ void list_bufstats( dbref player ) {
     }
 }
 
-void list_buftrace( dbref player ) {
+void list_buftrace( dbref player )
+{
     int i;
 
     for( i = 0; i < NUM_POOLS; i++ ) {
@@ -314,7 +324,8 @@ void list_buftrace( dbref player ) {
     }
 }
 
-void pool_reset( void ) {
+void pool_reset( void )
+{
     POOLHDR *ph, *phnext, *newchain;
 
     int i, *ibuf;
@@ -325,10 +336,10 @@ void pool_reset( void ) {
     for( i = 0; i < NUM_POOLS; i++ ) {
         newchain = NULL;
         for( ph = pools[i].chain_head; ph != NULL; ph = phnext ) {
-            h = ( char * ) ph;
+            h = ( char *) ph;
             phnext = ph->next;
             h += sizeof( POOLHDR );
-            ibuf = ( int * ) h;
+            ibuf = ( int *) h;
             if( *ibuf == POOL_MAGICNUM ) {
                 RAW_FREE( ph, "pool_reset.ph" );
             } else {
@@ -360,9 +371,10 @@ int malloc_bytes = 0;
 void *malloc_ptr;
 void *malloc_str;
 
-void *xmalloc(size_t x, const char *y) {
-    
-    log_write( LOG_MALLOC, "MEM", "TRACE", "xmalloc: %s/%d", y, x);  
+void *xmalloc(size_t x, const char *y)
+{
+
+    log_write( LOG_MALLOC, "MEM", "TRACE", "xmalloc: %s/%d", y, x);
     malloc_count++;
     malloc_ptr = (void *)malloc(x + sizeof(int));
     malloc_bytes += x;
@@ -370,7 +382,8 @@ void *xmalloc(size_t x, const char *y) {
     return(malloc_ptr + sizeof(int));
 }
 
-void *xcalloc(size_t x, size_t z, const char *y) {
+void *xcalloc(size_t x, size_t z, const char *y)
+{
     log_write( LOG_MALLOC, "MEM", "TRACE", "xcalloc: %s/%d", y, x*z);
     malloc_count++;
     malloc_ptr = (void *)malloc(x * z  + sizeof(int) );
@@ -380,7 +393,8 @@ void *xcalloc(size_t x, size_t z, const char *y) {
     return(malloc_ptr + sizeof(int));
 }
 
-void *xrealloc(void *x, size_t z, const char *y) {
+void *xrealloc(void *x, size_t z, const char *y)
+{
     log_write( LOG_MALLOC, "MEM", "TRACE", "xrealloc: %s/%d", y, z);
     malloc_ptr = (void *)malloc( z + sizeof(int));
     malloc_bytes += z;
@@ -393,7 +407,8 @@ void *xrealloc(void *x, size_t z, const char *y) {
     return(malloc_ptr + sizeof(int));
 }
 
-void *xstrdup(const void *x, const char *y) {
+void *xstrdup(const void *x, const char *y)
+{
     if(x || *x) {
         malloc_str = (char *) x;
         log_write( LOG_MALLOC, "MEM", "TRACE", "xstrdup: %s/%d", y, strlen(malloc_str) + 1 );
@@ -405,210 +420,210 @@ void *xstrdup(const void *x, const char *y) {
         return(malloc_ptr + sizeof(int));
     } else {
         return(NULL);
-}
-
-
-
-void *xstrndup(const void *x, size_t z, const char *y) {
-    if(x || *x) {
-        malloc_str = (void *) x;
-        log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
-        malloc_count++;
-        malloc_ptr = (void *)malloc(z + sizeof(int));
-        malloc_bytes += z;
-        strncpy(malloc_ptr + sizeof(int), malloc_str, z);
-        *(int *)malloc_ptr = z;
-        return(malloc_ptr + sizeof(int));
-    } else {
-        return(NULL);
     }
-}
 
-void xfree(void *x, const char *y) {
-    log_write( LOG_MALLOC, "MEM", "TRACE", "Free: %s/%d", y, x ? *(int *)((void *) x - sizeof(int))  : 0);
-    if(x) {
-        malloc_count--;
-        malloc_bytes -= *(int *)((void *) x - sizeof(int));
-        free((void *) x - sizeof(int));
-        x=NULL;
+
+
+    void *xstrndup(const void *x, size_t z, const char *y) {
+        if(x || *x) {
+            malloc_str = (void *) x;
+            log_write( LOG_MALLOC, "MEM", "TRACE", "xstrndup: %s/%d", y, strlen(malloc_str) + 1 );
+            malloc_count++;
+            malloc_ptr = (void *)malloc(z + sizeof(int));
+            malloc_bytes += z;
+            strncpy(malloc_ptr + sizeof(int), malloc_str, z);
+            *(int *)malloc_ptr = z;
+            return(malloc_ptr + sizeof(int));
+        } else {
+            return(NULL);
+        }
     }
-}
+
+    void xfree(void *x, const char *y) {
+        log_write( LOG_MALLOC, "MEM", "TRACE", "Free: %s/%d", y, x ? *(int *)((void *) x - sizeof(int))  : 0);
+        if(x) {
+            malloc_count--;
+            malloc_bytes -= *(int *)((void *) x - sizeof(int));
+            free((void *) x - sizeof(int));
+            x=NULL;
+        }
+    }
 
 #endif
 
-void *xstrprintf(const char *y, const char *format, ...) {
-    char msg[LBUF_SIZE];
-    va_list ap;
-    
-    if( format || *format ) {
-        va_start( ap, format );
-        vsnprintf(msg, LBUF_SIZE, format, ap);
-        va_end( ap );
-        return( XSTRDUP( (void *) msg, y ));
-    } else {
-        return( (void *) NULL );
+    void *xstrprintf(const char *y, const char *format, ...) {
+        char msg[LBUF_SIZE];
+        va_list ap;
+
+        if( format || *format ) {
+            va_start( ap, format );
+            vsnprintf(msg, LBUF_SIZE, format, ap);
+            va_end( ap );
+            return( XSTRDUP( (void *) msg, y ));
+        } else {
+            return( (void *) NULL );
+        }
     }
-}
 
 #ifdef RAW_MEMTRACKING
 
-static int sort_memtable( const void *p1, const void *p2 ) {
-    return strcmp( ( * ( MEMTRACK ** ) p1 )->buf_tag, ( * ( MEMTRACK ** ) p2 )->buf_tag );
-}
-
-void list_rawmemory( dbref player ) {
-    MEMTRACK *tptr, **t_array;
-
-    int n_tags, total, c_tags, c_total, u_tags, i, j;
-
-    const char *ntmp;
-
-    n_tags = total = 0;
-
-    raw_notify( player, NULL, "Memory Tag                           Allocs      Bytes");
-
-    for( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
-        n_tags++;
-        total += ( int ) tptr->alloc;
+    static int sort_memtable( const void *p1, const void *p2 ) {
+        return strcmp( ( * ( MEMTRACK **) p1 )->buf_tag, ( * ( MEMTRACK **) p2 )->buf_tag );
     }
 
-    t_array = ( MEMTRACK ** ) RAW_CALLOC( total, sizeof( MEMTRACK * ), "list_rawmemory" );
+    void list_rawmemory( dbref player ) {
+        MEMTRACK *tptr, **t_array;
 
-    for( i = 0, tptr = mudstate.raw_allocs; tptr != NULL; i++, tptr = tptr->next ) {
-        t_array[i] = tptr;
-    }
+        int n_tags, total, c_tags, c_total, u_tags, i, j;
 
-    qsort( ( void * ) t_array, n_tags, sizeof( MEMTRACK * ), ( int ( * )( const void *, const void * ) ) sort_memtable );
+        const char *ntmp;
 
-    for( i = 0; i < n_tags; ) {
-        u_tags++;
-        ntmp = t_array[i]->buf_tag;
-        if( ( i < n_tags - 1 ) && !strcmp( ntmp, t_array[i + 1]->buf_tag ) ) {
-            c_tags = 2;
-            c_total = ( int ) t_array[i]->alloc + ( int ) t_array[i + 1]->alloc;
-            for( j = i + 2; ( j < n_tags ) && !strcmp( ntmp, t_array[j]->buf_tag ); j++ ) {
-                c_tags++;
-                c_total += ( int ) t_array[j]->alloc;
-            }
-            i = j;
-        } else {
-            c_tags = 1;
-            c_total = ( int ) t_array[i]->alloc;
-            i++;
+        n_tags = total = 0;
+
+        raw_notify( player, NULL, "Memory Tag                           Allocs      Bytes");
+
+        for( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
+            n_tags++;
+            total += ( int ) tptr->alloc;
         }
-        raw_notify( player, "%-35.35s  %6d   %8d", ntmp, c_tags, c_total );
+
+        t_array = ( MEMTRACK **) RAW_CALLOC( total, sizeof( MEMTRACK *), "list_rawmemory" );
+
+        for( i = 0, tptr = mudstate.raw_allocs; tptr != NULL; i++, tptr = tptr->next ) {
+            t_array[i] = tptr;
+        }
+
+        qsort( ( void *) t_array, n_tags, sizeof( MEMTRACK *), ( int ( *)( const void *, const void *) ) sort_memtable );
+
+        for( i = 0; i < n_tags; ) {
+            u_tags++;
+            ntmp = t_array[i]->buf_tag;
+            if( ( i < n_tags - 1 ) && !strcmp( ntmp, t_array[i + 1]->buf_tag ) ) {
+                c_tags = 2;
+                c_total = ( int ) t_array[i]->alloc + ( int ) t_array[i + 1]->alloc;
+                for( j = i + 2; ( j < n_tags ) && !strcmp( ntmp, t_array[j]->buf_tag ); j++ ) {
+                    c_tags++;
+                    c_total += ( int ) t_array[j]->alloc;
+                }
+                i = j;
+            } else {
+                c_tags = 1;
+                c_total = ( int ) t_array[i]->alloc;
+                i++;
+            }
+            raw_notify( player, "%-35.35s  %6d   %8d", ntmp, c_tags, c_total );
+        }
+
+        RAW_FREE( t_array, "list_rawmemory" );
+
+        raw_notify( player, "Total: %d raw allocations in %d unique tags. %d bytes (%d K).", n_tags, u_tags, total, ( int ) total / 1024 );
     }
 
-    RAW_FREE( t_array, "list_rawmemory" );
+    static void trace_alloc( site_t amount, const char *name, void *ptr ) {
+        /*
+         * We maintain an unsorted list, most recently-allocated things at
+         * the head, based on the belief that it's basically a stack -- when
+         * we go to free something it's usually the most recent thing that
+         * we've allocated.
+         */
 
-    raw_notify( player, "Total: %d raw allocations in %d unique tags. %d bytes (%d K).", n_tags, u_tags, total, ( int ) total / 1024 );
-}
+        MEMTRACK *tptr;
 
-static void trace_alloc( site_t amount, const char *name, void *ptr ) {
-    /*
-     * We maintain an unsorted list, most recently-allocated things at
-     * the head, based on the belief that it's basically a stack -- when
-     * we go to free something it's usually the most recent thing that
-     * we've allocated.
-     */
-
-    MEMTRACK *tptr;
-
-    tptr = ( MEMTRACK * ) RAW_MALLOC( sizeof( MEMTRACK ), "trace_alloc.tptr" );
-    if( !tptr ) {
-        return;
-    }
-
-    tptr->buf_tag = name;
-    tptr->bptr = ptr;
-    tptr->alloc = amount;
-    tptr->next = mudstate.raw_allocs;
-    mudstate.raw_allocs = tptr;
-}
-
-static void trace_free( const char *name, void *ptr ) {
-    MEMTRACK *tptr, *prev;
-
-    prev = NULL;
-    for( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
-        if( tptr->bptr == ptr ) {
-            if( strcmp( tptr->buf_tag, name ) ) {
-                log_write( LOG_BUGS, "MEM", "TRACE", "Free mismatch, tag %s allocated as %s", name, tptr->buf_tag );
-            }
-            if( mudstate.raw_allocs == tptr ) {
-                mudstate.raw_allocs = tptr->next;
-            }
-            if( prev ) {
-                prev->next = tptr->next;
-            }
-            RAW_FREE( tptr, "trace_alloc.tptr" );
+        tptr = ( MEMTRACK *) RAW_MALLOC( sizeof( MEMTRACK ), "trace_alloc.tptr" );
+        if( !tptr ) {
             return;
         }
-        prev = tptr;
+
+        tptr->buf_tag = name;
+        tptr->bptr = ptr;
+        tptr->alloc = amount;
+        tptr->next = mudstate.raw_allocs;
+        mudstate.raw_allocs = tptr;
     }
 
-    log_write( LOG_BUGS, "MEM", "TRACE", "Attempt to free unknown with tag %s", name );
-}
+    static void trace_free( const char *name, void *ptr ) {
+        MEMTRACK *tptr, *prev;
 
-void *track_malloc( size_t amount, const char *name ) {
-    void *r;
+        prev = NULL;
+        for( tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next ) {
+            if( tptr->bptr == ptr ) {
+                if( strcmp( tptr->buf_tag, name ) ) {
+                    log_write( LOG_BUGS, "MEM", "TRACE", "Free mismatch, tag %s allocated as %s", name, tptr->buf_tag );
+                }
+                if( mudstate.raw_allocs == tptr ) {
+                    mudstate.raw_allocs = tptr->next;
+                }
+                if( prev ) {
+                    prev->next = tptr->next;
+                }
+                RAW_FREE( tptr, "trace_alloc.tptr" );
+                return;
+            }
+            prev = tptr;
+        }
 
-    r = malloc( amount );
-    trace_alloc( amount, name, r );
-    return ( r );
-}
+        log_write( LOG_BUGS, "MEM", "TRACE", "Attempt to free unknown with tag %s", name );
+    }
 
-void *track_calloc( size_t elems, size_t esize, const char *name ) {
-    void *r;
+    void *track_malloc( size_t amount, const char *name ) {
+        void *r;
 
-    r = calloc( elems, esize );
-    trace_alloc( elems * esize, name, r );
-    return ( r );
-}
-
-void *track_realloc( void *ptr, size_tamount, const char *name ) {
-    void *r;
-
-    trace_free( name, r );
-    r = realloc( ptr, amount );
-    trace_alloc( amount, name, r );
-    return ( r );
-}
-
-char *track_strdup( const char *str, const char *name ) {
-    char *r;
-    
-    if(str || *str) {
-        r = strdup( str );
-        trace_alloc( strlen( str ) + 1, name, r );
+        r = malloc( amount );
+        trace_alloc( amount, name, r );
         return ( r );
-    } else {
-        return(NULL)
     }
-}
 
-void track_free( void *ptr, const char *name ) {
-    trace_free( name, ptr );
-    free( ptr );
-}
+    void *track_calloc( size_t elems, size_t esize, const char *name ) {
+        void *r;
+
+        r = calloc( elems, esize );
+        trace_alloc( elems * esize, name, r );
+        return ( r );
+    }
+
+    void *track_realloc( void *ptr, size_tamount, const char *name ) {
+        void *r;
+
+        trace_free( name, r );
+        r = realloc( ptr, amount );
+        trace_alloc( amount, name, r );
+        return ( r );
+    }
+
+    char *track_strdup( const char *str, const char *name ) {
+        char *r;
+
+        if(str || *str) {
+            r = strdup( str );
+            trace_alloc( strlen( str ) + 1, name, r );
+            return ( r );
+        } else {
+            return(NULL)
+        }
+    }
+
+    void track_free( void *ptr, const char *name ) {
+        trace_free( name, ptr );
+        free( ptr );
+    }
 
 #else
 
-void list_rawmemory( dbref player ) {
-    notify( player, "Feature not supported." );
-}
+    void list_rawmemory( dbref player ) {
+        notify( player, "Feature not supported." );
+    }
 
 #endif				/* RAW_MEMTRACKING */
 
-void safe_copy_chr(char src, char buff[], char **bufp, int max) {
-    char *tp;
-    
-    tp = *bufp;
-    if ((tp - buff) < max) {
-	*tp++ = src;
-	*bufp = tp;
-	*tp = '\0';
-    } else {
-	buff[max] = '\0';
+    void safe_copy_chr(char src, char buff[], char **bufp, int max) {
+        char *tp;
+
+        tp = *bufp;
+        if ((tp - buff) < max) {
+            *tp++ = src;
+            *bufp = tp;
+            *tp = '\0';
+        } else {
+            buff[max] = '\0';
+        }
     }
-}

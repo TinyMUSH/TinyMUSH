@@ -19,7 +19,7 @@ typedef struct pool_header {
     struct	pool_header *next;	/*!< Next pool header in chain */
     struct	pool_header *nxtfree;	/*!< Next pool header in freelist */
     char	*buf_tag;		/*!< Debugging/trace tag */
-    char	align[( 256 - ( 2 * sizeof( int ) ) - ( 3 * sizeof( char * ) ) ) & 0x7]; /*!< Padding */
+    char	align[( 256 - ( 2 * sizeof( int ) ) - ( 3 * sizeof( char *) ) ) & 0x7];  /*!< Padding */
 } POOLHDR;
 
 typedef struct pool_footer {
@@ -93,11 +93,11 @@ extern void xfree(void *, const char *);
 #define XSTRDUP(x,y) (track_strdup((x),(y)))
 #define XFREE(x,y) (track_free((void *)(x),(y)), (x) = NULL)
 
-extern void    *track_malloc( size_t, const char * );
-extern void    *track_calloc( size_t, size_t, const char * );
-extern void    *track_realloc( void *, size_t, const char * );
-extern char    *track_strdup( const char *, const char * );
-extern void	track_free( void *, const char * );
+extern void    *track_malloc( size_t, const char *);
+extern void    *track_calloc( size_t, size_t, const char *);
+extern void    *track_realloc( void *, size_t, const char *);
+extern char    *track_strdup( const char *, const char *);
+extern void	track_free( void *, const char *);
 
 typedef struct tracemem_header {
     void           *bptr;
@@ -123,8 +123,8 @@ typedef struct tracemem_header {
  */
 
 extern void	pool_init( int, int );
-extern char    *pool_alloc( int, const char * );
-extern void	pool_free( int, char ** );
+extern char    *pool_alloc( int, const char *);
+extern void	pool_free( int, char **);
 extern void	list_bufstats( dbref );
 extern void	list_buftrace( dbref );
 

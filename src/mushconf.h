@@ -35,10 +35,10 @@ struct module_linked_list {
     void ( *announce_connect )( dbref, const char *, int );
     void ( *announce_disconnect )( dbref, const char *, int );
     void ( *examine )( dbref, dbref, dbref, int, int );
-    void ( *dump_database )( FILE * );
+    void ( *dump_database )( FILE *);
     void ( *db_write )( void );
     void ( *db_grow )( int, int );
-    void ( *db_write_flatfile )( FILE * );
+    void ( *db_write_flatfile )( FILE *);
     void ( *do_second )( void );
     void ( *cache_put_notify )( DBData, unsigned int );
     void ( *cache_del_notify )( DBData, unsigned int );
@@ -49,7 +49,7 @@ typedef struct api_function_data API_FUNCTION;
 struct api_function_data {
     const char *name;
     const char *param_fmt;
-    void ( *handler )( void *, void * );
+    void ( *handler )( void *, void *);
 };
 
 /* ---------------------------------------------------------------------------
@@ -103,13 +103,13 @@ struct confdata {
     char	*binhome;	/* Binary home directory */
     char	*bakhome;	/* Backup home directory */
     char	*status_file;	/* Where to write arg to @shutdown */
-    char 	*config_file;	/* MUSH's config file */
+    char	 *config_file;	/* MUSH's config file */
     char	*config_home;	/* MUSH's config directory */
-    char 	*log_file;	/* MUSH's log file */
+    char	 *log_file;	/* MUSH's log file */
     char	*log_home;	/* MUSH's log directory */
-    char 	*pid_file;	/* MUSH's pid file */
+    char	 *pid_file;	/* MUSH's pid file */
     char	*pid_home;	/* MUSH's pid directory */
-    char 	*db_file;	/* MUSH's db file */
+    char	 *db_file;	/* MUSH's db file */
     char	*backup_exec;	/* Executable run to tar files */
     char	*backup_compress;	/* Flags used to compress */
     char	*backup_extract;	/* Flags used to extract */
@@ -332,7 +332,7 @@ struct site_data {
 typedef struct objlist_block OBLOCK;
 struct objlist_block {
     struct objlist_block *next;
-    dbref	data[( LBUF_SIZE - sizeof( OBLOCK * ) ) / sizeof( dbref )];
+    dbref	data[( LBUF_SIZE - sizeof( OBLOCK *) ) / sizeof( dbref )];
 };
 
 #define OBLOCK_SIZE ((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
@@ -401,7 +401,7 @@ struct statedata {
     char	*linkerinfo;	/* Linker command line */
     char	*dbmdriver;	/* DBM Driver */
     char	modloaded[MBUF_SIZE];	/* Modules loaded */
-    char 	**cfiletab;	/* Array of config files */
+    char	 **cfiletab;	/* Array of config files */
     int		configfiles;	/* Number of config files */
     int	initializing;	/* Are we reading config file at startup? */
     int	loading_db;	/* Are we loading the db? */

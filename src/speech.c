@@ -27,7 +27,8 @@
 #define SAY_STRING	(mudconf.comma_say ? "say," : "say")
 #define SAYS_STRING	(mudconf.comma_say ? "says," : "says")
 
-int sp_ok( dbref player ) {
+int sp_ok( dbref player )
+{
     if( Gagged( player ) && ( !( Wizard( player ) ) ) ) {
         notify( player, "Sorry. Gagged players cannot speak." );
         return 0;
@@ -50,7 +51,8 @@ int sp_ok( dbref player ) {
     return 1;
 }
 
-static void say_shout( int target, const char *prefix, int flags, dbref player, char *message ) {
+static void say_shout( int target, const char *prefix, int flags, dbref player, char *message )
+{
     if( flags & SAY_NOTAG ) {
         raw_broadcast( target, "%s%s", Name( player ), message );
     } else {
@@ -64,18 +66,20 @@ static const char *broadcast_msg = "Broadcast: ";
 
 static const char *admin_msg = "Admin: ";
 
-void do_think( dbref player, dbref cause, int key, char *message ) {
+void do_think( dbref player, dbref cause, int key, char *message )
+{
     char *str, *buf, *bp;
 
     buf = bp = alloc_lbuf( "do_think" );
     str = message;
     exec( buf, &bp, player, cause, cause,
-          EV_FCHECK | EV_EVAL | EV_TOP, &str, ( char ** ) NULL, 0 );
+          EV_FCHECK | EV_EVAL | EV_TOP, &str, ( char **) NULL, 0 );
     notify( player, buf );
     free_lbuf( buf );
 }
 
-static int check_speechformat( dbref player, dbref speaker, dbref loc, dbref thing, char *message, int key ) {
+static int check_speechformat( dbref player, dbref speaker, dbref loc, dbref thing, char *message, int key )
+{
     char *sargs[2], tokbuf[2], *buff, msgbuf[LBUF_SIZE];
 
     int aflags;
@@ -128,7 +132,8 @@ static int check_speechformat( dbref player, dbref speaker, dbref loc, dbref thi
     return 0;
 }
 
-static void format_speech( dbref player, dbref speaker, dbref loc, char *message, int key ) {
+static void format_speech( dbref player, dbref speaker, dbref loc, char *message, int key )
+{
     if( H_Speechmod( speaker ) &&
             check_speechformat( player, speaker, loc, speaker, message, key ) ) {
         return;
@@ -164,7 +169,8 @@ static void format_speech( dbref player, dbref speaker, dbref loc, char *message
     }
 }
 
-void do_say( dbref player, dbref cause, int key, char *message ) {
+void do_say( dbref player, dbref cause, int key, char *message )
+{
     dbref loc;
 
     char *buf2, *bp, *name;
@@ -295,7 +301,7 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
         default:
             buf2 = alloc_lbuf( "do_say.shout" );
             bp = buf2;
-            safe_str( ( char * ) " shouts, \"", buf2, &bp );
+            safe_str( ( char *) " shouts, \"", buf2, &bp );
             safe_str( message, buf2, &bp );
             safe_chr( '"', buf2, &bp );
             say_shout( 0, announce_msg, say_flags, player, buf2 );
@@ -322,7 +328,7 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
         default:
             buf2 = alloc_lbuf( "do_say.wizshout" );
             bp = buf2;
-            safe_str( ( char * ) " says, \"", buf2, &bp );
+            safe_str( ( char *) " says, \"", buf2, &bp );
             safe_str( message, buf2, &bp );
             safe_chr( '"', buf2, &bp );
             say_shout( WIZARD, broadcast_msg, say_flags, player,
@@ -354,7 +360,7 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
         default:
             buf2 = alloc_lbuf( "do_say.adminshout" );
             bp = buf2;
-            safe_str( ( char * ) " says, \"", buf2, &bp );
+            safe_str( ( char *) " says, \"", buf2, &bp );
             safe_str( message, buf2, &bp );
             safe_chr( '"', buf2, &bp );
             *bp = '\0';
@@ -369,8 +375,9 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
     case SAY_WALLPOSE:
         if( say_flags & SAY_NOTAG ) {
             raw_broadcast( 0, "%s %s", Name( player ), message );
-        } else
+        } else {
             raw_broadcast( 0, "Announcement: %s %s", Name( player ), message );
+        }
         name = log_getname( player, "do_say" );
         log_write( LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLposes: '%s'",name, strip_ansi( message ) );
         XFREE( name, "do_say" );
@@ -414,7 +421,8 @@ void do_say( dbref player, dbref cause, int key, char *message ) {
  * * Page-pose code from shadow@prelude.cc.purdue.
  */
 //static void page_return( dbref player, dbref target, const char *tag, int anum, const char *dflt )
-static void page_return( dbref player, dbref target, const char *tag, int anum, const char *format, ... ) {
+static void page_return( dbref player, dbref target, const char *tag, int anum, const char *format, ... )
+{
     dbref aowner;
     int aflags, alen;
     char *str, *str2, *buf, *bp;
@@ -425,13 +433,13 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
     va_list ap;
 
     va_start( ap, format );
-    
+
     if ( ( !format || !*format ) && format !=NULL ) {
-      if( ( s = va_arg(ap, char *) ) != NULL ) {
-        strncpy(dflt, s, LBUF_SIZE);
-      } else {
-        dflt[0]=0x00;
-      }
+        if( ( s = va_arg(ap, char *) ) != NULL ) {
+            strncpy(dflt, s, LBUF_SIZE);
+        } else {
+            dflt[0]=0x00;
+        }
     } else {
         vsnprintf(dflt, LBUF_SIZE, format, ap);
     }
@@ -444,7 +452,7 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
         buf = str;
         exec( str2, &bp, target, player, player,
               EV_FCHECK | EV_EVAL | EV_TOP | EV_NO_LOCATION, &buf,
-              ( char ** ) NULL, 0 );
+              ( char **) NULL, 0 );
         if( *str2 ) {
             t = time( NULL );
             tp = localtime( &t );
@@ -458,17 +466,19 @@ static void page_return( dbref player, dbref target, const char *tag, int anum, 
     free_lbuf( str );
 }
 
-static int page_check( dbref player, dbref target ) {
+static int page_check( dbref player, dbref target )
+{
     if( !payfor( player, Guest( player ) ? 0 : mudconf.pagecost ) ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins );
-        
+
     } else if( !Connected( target ) ) {
         page_return( player, target, "Away", A_AWAY, "Sorry, %s is not connected.", Name( target ) );
     } else if( !could_doit( player, target, A_LPAGE ) ) {
-        if( Can_Hide( target ) && Hidden( target ) && !See_Hidden( player ) )
+        if( Can_Hide( target ) && Hidden( target ) && !See_Hidden( player ) ) {
             page_return( player, target, "Away", A_AWAY, "Sorry, %s is not connected.", Name( target ) );
-        else
+        } else {
             page_return( player, target, "Reject", A_REJECT, "Sorry, %s is not accepting pages.", Name( target ) );
+        }
     } else if( !could_doit( target, player, A_LPAGE ) ) {
         if( Wizard( player ) ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Warning: %s can't return your page.", Name( target ) );
@@ -483,7 +493,8 @@ static int page_check( dbref player, dbref target ) {
     return 0;
 }
 
-void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
+void do_page( dbref player, dbref cause, int key, char *tname, char *message )
+{
     /* key is 1 if this is a reply page */
     char *dbref_list, *ddp;
 
@@ -553,8 +564,8 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
                 }
             }
 
-            dbrefs_array = ( int * ) XCALLOC( n_dbrefs, sizeof( int ),
-                                              "do_page.dbrefs" );
+            dbrefs_array = ( int *) XCALLOC( n_dbrefs, sizeof( int ),
+                                             "do_page.dbrefs" );
 
             /*
              * Convert the list into an array of targets. Validate.
@@ -562,7 +573,7 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
 
             for( ddp = strtok_r( dbref_list, " ", &tokst );
                     ddp; ddp = strtok_r( NULL, " ", &tokst ) ) {
-                target = ( int ) strtol( ddp, ( char ** ) NULL, 10 );
+                target = ( int ) strtol( ddp, ( char **) NULL, 10 );
                 if( !Good_obj( target ) || !isPlayer( target ) ) {
                     notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "I don't recognize #%d.", target );
                     continue;
@@ -585,7 +596,7 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
 
         if( ( target = lookup_player( player, tname, 1 ) ) != NOTHING ) {
             dbrefs_array =
-                ( int * ) XCALLOC( 1, sizeof( int ), "do_page.dbrefs" );
+                ( int *) XCALLOC( 1, sizeof( int ), "do_page.dbrefs" );
             dbrefs_array[0] = target;
             count++;
         } else {
@@ -602,8 +613,8 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
                 }
             }
             dbrefs_array =
-                ( int * ) XCALLOC( n_dbrefs, sizeof( int ),
-                                   "do_page.dbrefs" );
+                ( int *) XCALLOC( n_dbrefs, sizeof( int ),
+                                  "do_page.dbrefs" );
 
             /*
              * Go look 'em up
@@ -743,24 +754,27 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
     case ':':
         message++;
         safe_str( "From afar, ", omessage, &omp );
-        if( count != 1 )
+        if( count != 1 ) {
             safe_sprintf( omessage, &omp, "to %s: ", clean_tname );
+        }
         safe_sprintf( omessage, &omp, "%s %s", Name( player ), message );
         safe_sprintf( imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name( player ), message );
         break;
     case ';':
         message++;
         safe_str( "From afar, ", omessage, &omp );
-        if( count != 1 )
+        if( count != 1 ) {
             safe_sprintf( omessage, &omp, "to %s: ", clean_tname );
+        }
         safe_sprintf( omessage, &omp, "%s%s", Name( player ), message );
         safe_sprintf( imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name( player ), message );
         break;
     case '"':
         message++;
     default:
-        if( count != 1 )
+        if( count != 1 ) {
             safe_sprintf( omessage, &omp, "To %s, ", clean_tname );
+        }
         safe_sprintf( omessage, &omp, "%s pages: %s", Name( player ), message );
         safe_sprintf( imessage, &imp, "You paged %s with '%s'.", clean_tname, message );
     }
@@ -787,7 +801,8 @@ void do_page( dbref player, dbref cause, int key, char *tname, char *message ) {
     free_lbuf( imessage );
 }
 
-void do_reply_page( dbref player, dbref cause, int key, char *msg ) {
+void do_reply_page( dbref player, dbref cause, int key, char *msg )
+{
     do_page( player, cause, 1, NULL, msg );
 }
 
@@ -796,7 +811,8 @@ void do_reply_page( dbref player, dbref cause, int key, char *msg ) {
  * * do_pemit: Messages to specific players, or to all but specific players.
  */
 
-void whisper_pose( dbref player, dbref target, char *message ) {
+void whisper_pose( dbref player, dbref target, char *message )
+{
     char *buff;
 
     buff = alloc_lbuf( "do_pemit.whisper.pose" );
@@ -806,7 +822,8 @@ void whisper_pose( dbref player, dbref target, char *message ) {
     free_lbuf( buff );
 }
 
-void do_pemit_list( dbref player, char *list, const char *message, int do_contents ) {
+void do_pemit_list( dbref player, char *list, const char *message, int do_contents )
+{
     /*
      * Send a message to a list of dbrefs. To avoid repeated generation *
      * of the NOSPOOF string, we set it up the first time we
@@ -831,8 +848,8 @@ void do_pemit_list( dbref player, char *list, const char *message, int do_conten
         }
     }
 
-    recips = ( dbref * ) XCALLOC( n_recips, sizeof( dbref ),
-                                  "do_pemit_list.recips" );
+    recips = ( dbref *) XCALLOC( n_recips, sizeof( dbref ),
+                                 "do_pemit_list.recips" );
 
     n_recips = 0;
     for( p = strtok_r( list, " ", &tokst );
@@ -907,7 +924,8 @@ void do_pemit_list( dbref player, char *list, const char *message, int do_conten
 }
 
 
-void do_pemit( dbref player, dbref cause, int key, char *recipient, char *message ) {
+void do_pemit( dbref player, dbref cause, int key, char *recipient, char *message )
+{
     dbref target, loc;
 
     char *buf2, *bp;
@@ -1051,7 +1069,7 @@ void do_pemit( dbref player, dbref cause, int key, char *recipient, char *messag
                         buf2 = alloc_lbuf ( "do_pemit.whisper.buzz" );
                         bp = buf2;
                         safe_name( player, buf2, &bp );
-                        safe_str( ( char * ) " whispers something to ", buf2, &bp );
+                        safe_str( ( char *) " whispers something to ", buf2, &bp );
                         safe_name( target, buf2, &bp );
                         *bp = '\0';
                         notify_except2( loc, player, player, target, MSG_SPEECH, NULL, buf2);

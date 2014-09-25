@@ -32,7 +32,8 @@ static int parsing_internal = 0;
  * by the object lockobj
  */
 
-static int check_attr( dbref player, dbref lockobj, ATTR *attr, char *key ) {
+static int check_attr( dbref player, dbref lockobj, ATTR *attr, char *key )
+{
     char *buff;
 
     dbref aowner;
@@ -61,7 +62,8 @@ static int check_attr( dbref player, dbref lockobj, ATTR *attr, char *key ) {
 
 static dbref lock_originator = NOTHING;	/* grotesque hack */
 
-int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
+int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b )
+{
     dbref aowner, obj, source;
 
     int aflags, alen, c, checkit;
@@ -139,11 +141,11 @@ int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
          * First check the object itself, then its contents
          */
 
-        if( check_attr( player, from, a, ( char * ) b->sub1 ) ) {
+        if( check_attr( player, from, a, ( char *) b->sub1 ) ) {
             return 1;
         }
         DOLIST( obj, Contents( player ) ) {
-            if( check_attr( obj, from, a, ( char * ) b->sub1 ) ) {
+            if( check_attr( obj, from, a, ( char *) b->sub1 ) ) {
                 return 1;
             }
         }
@@ -176,9 +178,9 @@ int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
                   ( ( lock_originator == NOTHING ) ?
                     player : lock_originator ),
                   player, EV_FCHECK | EV_EVAL | EV_TOP,
-                  &str, ( char ** ) NULL, 0 );
+                  &str, ( char **) NULL, 0 );
             restore_global_regs( "eval_boolexp_save", preserve );
-            checkit = !string_compare( buff2, ( char * ) b->sub1 );
+            checkit = !string_compare( buff2, ( char *) b->sub1 );
             free_lbuf( buff2 );
         }
         free_lbuf( buff );
@@ -201,7 +203,7 @@ int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
         if( !a ) {
             return 0;
         }
-        return ( check_attr( player, from, a, ( char * )( b->sub1 )->sub1 ) );
+        return ( check_attr( player, from, a, ( char *)( b->sub1 )->sub1 ) );
     case BOOLEXP_CARRY:
 
         /*
@@ -221,7 +223,7 @@ int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
             return 0;
         }
         DOLIST( obj, Contents( player ) ) {
-            if( check_attr( obj, from, a, ( char * )( b->sub1 )->sub1 ) ) {
+            if( check_attr( obj, from, a, ( char *)( b->sub1 )->sub1 ) ) {
                 return 1;
             }
         }
@@ -235,7 +237,8 @@ int eval_boolexp( dbref player, dbref thing, dbref from, BOOLEXP *b ) {
     }
 }
 
-int eval_boolexp_atr( dbref player, dbref thing, dbref from, char *key ) {
+int eval_boolexp_atr( dbref player, dbref thing, dbref from, char *key )
+{
     BOOLEXP *b;
 
     int ret_value;
@@ -259,7 +262,8 @@ static char *parsebuf, *parsestore;
 
 static dbref parse_player;
 
-static void skip_whitespace( void ) {
+static void skip_whitespace( void )
+{
     while( *parsebuf && isspace( *parsebuf ) ) {
         parsebuf++;
     }
@@ -267,7 +271,8 @@ static void skip_whitespace( void ) {
 
 static BOOLEXP *parse_boolexp_E( void );	/* defined below */
 
-static BOOLEXP *test_atr( char *s ) {
+static BOOLEXP *test_atr( char *s )
+{
     ATTR *attrib;
 
     BOOLEXP *b;
@@ -281,7 +286,7 @@ static BOOLEXP *test_atr( char *s ) {
     for( s = buff; *s && ( *s != ':' ) && ( *s != '/' ); s++ );
     if( !*s ) {
         free_lbuf( buff );
-        return ( ( BOOLEXP * ) NULL );
+        return ( ( BOOLEXP *) NULL );
     }
     if( *s == '/' ) {
         locktype = BOOLEXP_EVAL;
@@ -303,18 +308,18 @@ static BOOLEXP *test_atr( char *s ) {
          */
         if( !God( parse_player ) ) {
             free_lbuf( buff );
-            return ( ( BOOLEXP * ) NULL );
+            return ( ( BOOLEXP *) NULL );
         }
         s1 = buff;
         for( s1 = buff; isdigit( *s1 ); s1++ );
         if( *s1 ) {
             free_lbuf( buff );
-            return ( ( BOOLEXP * ) NULL );
+            return ( ( BOOLEXP *) NULL );
         }
-        anum = ( int ) strtol( buff, ( char ** ) NULL, 10 );
+        anum = ( int ) strtol( buff, ( char **) NULL, 10 );
         if( anum <= 0 ) {
             free_lbuf( buff );
-            return ( ( BOOLEXP * ) NULL );
+            return ( ( BOOLEXP *) NULL );
         }
     } else {
         anum = attrib->number;
@@ -326,7 +331,7 @@ static BOOLEXP *test_atr( char *s ) {
     b = alloc_bool( "test_atr" );
     b->type = locktype;
     b->thing = ( dbref ) anum;
-    b->sub1 = ( BOOLEXP * ) XSTRDUP( s, "test_atr.sub1" );
+    b->sub1 = ( BOOLEXP *) XSTRDUP( s, "test_atr.sub1" );
     free_lbuf( buff );
     return ( b );
 }
@@ -335,7 +340,8 @@ static BOOLEXP *test_atr( char *s ) {
  * L -> (E); L -> object identifier
  */
 
-static BOOLEXP *parse_boolexp_L( void ) {
+static BOOLEXP *parse_boolexp_L( void )
+{
     BOOLEXP *b;
 
     char *p, *buf;
@@ -404,7 +410,7 @@ static BOOLEXP *parse_boolexp_L( void ) {
                     free_bool( b );
                     return TRUE_BOOLEXP;
                 }
-                b->thing = ( int ) strtol( &buf[1], ( char ** ) NULL, 10 );
+                b->thing = ( int ) strtol( &buf[1], ( char **) NULL, 10 );
                 if( !Good_obj( b->thing ) ) {
                     free_lbuf( buf );
                     free_bool( b );
@@ -436,7 +442,7 @@ static BOOLEXP *parse_boolexp_L( void ) {
                 free_bool( b );
                 return TRUE_BOOLEXP;
             }
-            b->thing = ( int ) strtol( &buf[1], ( char ** ) NULL, 10 );
+            b->thing = ( int ) strtol( &buf[1], ( char **) NULL, 10 );
             if( b->thing < 0 ) {
                 free_lbuf( buf );
                 free_bool( b );
@@ -455,7 +461,8 @@ static BOOLEXP *parse_boolexp_L( void ) {
  * The argument L must be type BOOLEXP_CONST
  */
 
-static BOOLEXP *parse_boolexp_F( void ) {
+static BOOLEXP *parse_boolexp_F( void )
+{
     BOOLEXP *b2;
 
     skip_whitespace();
@@ -537,7 +544,8 @@ static BOOLEXP *parse_boolexp_F( void ) {
  * T -> F; T -> F & T
  */
 
-static BOOLEXP *parse_boolexp_T( void ) {
+static BOOLEXP *parse_boolexp_T( void )
+{
     BOOLEXP *b, *b2;
 
     if( ( b = parse_boolexp_F() ) != TRUE_BOOLEXP ) {
@@ -562,7 +570,8 @@ static BOOLEXP *parse_boolexp_T( void ) {
  * E -> T; E -> T | E
  */
 
-static BOOLEXP *parse_boolexp_E( void ) {
+static BOOLEXP *parse_boolexp_E( void )
+{
     BOOLEXP *b, *b2;
 
     if( ( b = parse_boolexp_T() ) != TRUE_BOOLEXP ) {
@@ -583,7 +592,8 @@ static BOOLEXP *parse_boolexp_E( void ) {
     return b;
 }
 
-BOOLEXP *parse_boolexp( dbref player, const char *buf, int internal ) {
+BOOLEXP *parse_boolexp( dbref player, const char *buf, int internal )
+{
     char *p;
 
     int num_opens = 0;
@@ -595,7 +605,7 @@ BOOLEXP *parse_boolexp( dbref player, const char *buf, int internal ) {
          * Don't allow funky characters in locks. Don't allow
          * unbalanced parentheses.
          */
-        for( p = ( char * ) buf; *p; p++ ) {
+        for( p = ( char *) buf; *p; p++ ) {
             if( ( *p == '\t' ) || ( *p == '\r' ) || ( *p == '\n' ) ||
                     ( *p == ESC_CHAR ) ) {
                 return ( TRUE_BOOLEXP );

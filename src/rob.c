@@ -23,7 +23,8 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
-void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
+void do_kill( dbref player, dbref cause, int key, char *what, char *costchar )
+{
     dbref victim;
 
     char *buf1, *buf2, *bp;
@@ -65,7 +66,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
          * go for it
          */
 
-        cost = ( int ) strtol( costchar, ( char ** ) NULL, 10 );
+        cost = ( int ) strtol( costchar, ( char **) NULL, 10 );
         if( key == KILL_KILL ) {
             if( cost < mudconf.killmin ) {
                 cost = mudconf.killmin;
@@ -148,7 +149,7 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
                     notify( Owner( victim ), "Halted." );
                 }
         did_it( player, victim, A_KILL, buf1, A_OKILL, buf2, A_AKILL, 0,
-                ( char ** ) NULL, 0, MSG_PRESENCE );
+                ( char **) NULL, 0, MSG_PRESENCE );
 
         /*
          * notify victim
@@ -195,7 +196,8 @@ void do_kill( dbref player, dbref cause, int key, char *what, char *costchar ) {
  * * give_thing, give_money, do_give: Give away money or things.
  */
 
-static void give_thing( dbref giver, dbref recipient, int key, char *what ) {
+static void give_thing( dbref giver, dbref recipient, int key, char *what )
+{
     dbref thing;
 
     char *str, *sp;
@@ -226,26 +228,26 @@ static void give_thing( dbref giver, dbref recipient, int key, char *what ) {
     }
     if( !could_doit( giver, thing, A_LGIVE ) ) {
         sp = str = alloc_lbuf( "do_give.gfail" );
-        safe_str( ( char * ) "You can't give ", str, &sp );
+        safe_str( ( char *) "You can't give ", str, &sp );
         safe_name( thing, str, &sp );
-        safe_str( ( char * ) " away.", str, &sp );
+        safe_str( ( char *) " away.", str, &sp );
         *sp = '\0';
 
         did_it( giver, thing, A_GFAIL, str, A_OGFAIL, NULL,
-                A_AGFAIL, 0, ( char ** ) NULL, 0, MSG_MOVE );
+                A_AGFAIL, 0, ( char **) NULL, 0, MSG_MOVE );
         free_lbuf( str );
         return;
     }
     if( !could_doit( thing, recipient, A_LRECEIVE ) ) {
         sp = str = alloc_lbuf( "do_give.rfail" );
         safe_name( recipient, str, &sp );
-        safe_str( ( char * ) " doesn't want ", str, &sp );
+        safe_str( ( char *) " doesn't want ", str, &sp );
         safe_name( thing, str, &sp );
         safe_chr( '.', str, &sp );
         *sp = '\0';
 
         did_it( giver, recipient, A_RFAIL, str, A_ORFAIL, NULL,
-                A_ARFAIL, 0, ( char ** ) NULL, 0, MSG_MOVE );
+                A_ARFAIL, 0, ( char **) NULL, 0, MSG_MOVE );
         free_lbuf( str );
         return;
     }
@@ -260,12 +262,13 @@ static void give_thing( dbref giver, dbref recipient, int key, char *what ) {
         free_lbuf( str );
     }
     did_it( giver, thing, A_DROP, NULL, A_ODROP, NULL, A_ADROP,
-            0, ( char ** ) NULL, 0, MSG_MOVE );
+            0, ( char **) NULL, 0, MSG_MOVE );
     did_it( recipient, thing, A_SUCC, NULL, A_OSUCC, NULL, A_ASUCC,
-            0, ( char ** ) NULL, 0, MSG_MOVE );
+            0, ( char **) NULL, 0, MSG_MOVE );
 }
 
-static void give_money( dbref giver, dbref recipient, int key, int amount ) {
+static void give_money( dbref giver, dbref recipient, int key, int amount )
+{
     dbref aowner;
 
     int cost, aflags, alen;
@@ -309,7 +312,7 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
 
     if( Typeof( recipient ) == TYPE_THING ) {
         str = atr_pget( recipient, A_COST, &aowner, &aflags, &alen );
-        cost = ( int ) strtol( str, ( char ** ) NULL, 10 );
+        cost = ( int ) strtol( str, ( char **) NULL, 10 );
         free_lbuf( str );
 
         /*
@@ -357,11 +360,12 @@ static void give_money( dbref giver, dbref recipient, int key, int amount ) {
      */
 
     giveto( recipient, cost );
-    did_it( giver, recipient, A_PAY, NULL, A_OPAY, NULL, A_APAY, 0, ( char ** ) NULL, 0, MSG_PRESENCE );
+    did_it( giver, recipient, A_PAY, NULL, A_OPAY, NULL, A_APAY, 0, ( char **) NULL, 0, MSG_PRESENCE );
     return;
 }
 
-void do_give( dbref player, dbref cause, int key, char *who, char *amnt ) {
+void do_give( dbref player, dbref cause, int key, char *who, char *amnt )
+{
     dbref recipient;
 
     /*
@@ -396,7 +400,7 @@ void do_give( dbref player, dbref cause, int key, char *who, char *amnt ) {
         return;
     }
     if( is_number( amnt ) ) {
-        give_money( player, recipient, key, ( int ) strtol( amnt, ( char ** ) NULL, 10 ) );
+        give_money( player, recipient, key, ( int ) strtol( amnt, ( char **) NULL, 10 ) );
     } else {
         give_thing( player, recipient, key, amnt );
     }

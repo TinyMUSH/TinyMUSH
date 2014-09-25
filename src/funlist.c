@@ -35,7 +35,8 @@
 #define	FLOAT_LIST	4
 #define NOCASE_LIST	5
 
-static int autodetect_list( char *ptrs[], int nitems ) {
+static int autodetect_list( char *ptrs[], int nitems )
+{
     int sort_type, i;
 
     char *p;
@@ -93,7 +94,8 @@ static int autodetect_list( char *ptrs[], int nitems ) {
     return sort_type;
 }
 
-static int get_list_type( char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems ) {
+static int get_list_type( char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems )
+{
     if( nfargs >= type_pos ) {
         switch( tolower( *fargs[type_pos - 1] ) ) {
         case 'd':
@@ -113,11 +115,12 @@ static int get_list_type( char *fargs[], int nfargs, int type_pos, char *ptrs[],
     return autodetect_list( ptrs, nitems );
 }
 
-static int dbnum( char *dbr ) {
+static int dbnum( char *dbr )
+{
     if( ( *dbr != '#' ) || ( dbr[1] == '\0' ) ) {
         return 0;
     } else {
-        return ( int ) strtol( dbr + 1, ( char ** ) NULL, 10 );
+        return ( int ) strtol( dbr + 1, ( char **) NULL, 10 );
     }
 }
 
@@ -127,7 +130,8 @@ static int dbnum( char *dbr ) {
  * Philip D. Wasson
  */
 
-void fun_words( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_words( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep;
 
     if( nfargs == 0 ) {
@@ -143,7 +147,8 @@ void fun_words( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_first: Returns first word in a string
  */
 
-void fun_first( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_first( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *first;
 
     Delim isep;
@@ -168,7 +173,8 @@ void fun_first( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_rest: Returns all but the first word in a string
  */
 
-void fun_rest( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_rest( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *rest;
 
     Delim isep;
@@ -197,7 +203,8 @@ void fun_rest( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_last: Returns last word in a string
  */
 
-void fun_last( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_last( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *last;
 
     Delim isep;
@@ -279,7 +286,8 @@ void fun_last( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * match.
  */
 
-void fun_match( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_match( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int wcount;
 
     char *r, *s;
@@ -306,7 +314,8 @@ void fun_match( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     safe_chr( '0', buff, bufc );
 }
 
-void fun_matchall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_matchall( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int wcount, flag;
 
     char *r, *s, *old;
@@ -357,7 +366,8 @@ void fun_matchall( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Now takes optional separator extract(foo-bar-baz,1,2,-) returns 'foo-bar'
  */
 
-void fun_extract( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_extract( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int start, len;
 
     char *r, *s, *t;
@@ -367,8 +377,8 @@ void fun_extract( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     VaChk_Only_In_Out( 5 );
 
     s = fargs[0];
-    start = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-    len = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    start = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+    len = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
 
     if( ( start < 1 ) || ( len < 1 ) ) {
         return;
@@ -433,15 +443,16 @@ void fun_extract( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * gh | ij k, |, 2, 2) => c d e | f g h
  */
 
-void fun_index( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_index( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int start, end;
 
     char c, *s, *p;
 
     s = fargs[0];
     c = *fargs[1];
-    start = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
-    end = ( int ) strtol( fargs[3], ( char ** ) NULL, 10 );
+    start = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
+    end = ( int ) strtol( fargs[3], ( char **) NULL, 10 );
 
     if( ( start < 1 ) || ( end < 1 ) || ( *s == '\0' ) ) {
         return;
@@ -519,7 +530,8 @@ void fun_index( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 #define	IF_REPLACE	1
 #define	IF_INSERT	2
 
-static void do_itemfuns( char *buff, char **bufc, char *str, int el, char *word, const Delim *sep, int flag ) {
+static void do_itemfuns( char *buff, char **bufc, char *str, int el, char *word, const Delim *sep, int flag )
+{
     int ct, overrun;
 
     char *sptr, *iptr, *eptr;
@@ -637,40 +649,44 @@ static void do_itemfuns( char *buff, char **bufc, char *str, int el, char *word,
     }
 }
 
-void fun_ldelete( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ldelete( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * delete a word at position X of a list
      */
     Delim isep;
 
     VaChk_Only_In( 3 );
-    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ), NULL,
+    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char **) NULL, 10 ), NULL,
                  &isep, IF_DELETE );
 }
 
-void fun_replace( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_replace( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * replace a word at position X of a list
      */
     Delim isep;
 
     VaChk_Only_In( 4 );
-    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ), fargs[2],
+    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char **) NULL, 10 ), fargs[2],
                  &isep, IF_REPLACE );
 }
 
-void fun_insert( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_insert( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * insert a word at position X of a list
      */
     Delim isep;
 
     VaChk_Only_In( 4 );
-    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ), fargs[2],
+    do_itemfuns( buff, bufc, fargs[0], ( int ) strtol( fargs[1], ( char **) NULL, 10 ), fargs[2],
                  &isep, IF_INSERT );
 }
 
-void fun_lreplace( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lreplace( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep;
 
     Delim osep;
@@ -730,7 +746,7 @@ void fun_lreplace( char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
 
     for( i = 0; i < npos; i++ ) {
-        cpos = ( int ) strtol( pos_p[i], ( char ** ) NULL, 10 );
+        cpos = ( int ) strtol( pos_p[i], ( char **) NULL, 10 );
         if( ( cpos > 0 ) && ( cpos <= norig ) ) {
             orig_p[cpos - 1] = rep_p[i];
         }
@@ -750,7 +766,8 @@ void fun_lreplace( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_remove: Remove a word from a string
  */
 
-void fun_remove( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_remove( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *sp, *word, *bb_p;
 
     Delim isep;
@@ -792,7 +809,8 @@ void fun_remove( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_member: Is a word in a string
  */
 
-void fun_member( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_member( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int wcount;
 
     char *r, *s;
@@ -818,7 +836,8 @@ void fun_member( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_revwords: Reverse the order of words in a list.
  */
 
-void fun_revwords( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_revwords( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *bb_p, **elems;
 
     Delim isep;
@@ -864,7 +883,8 @@ void fun_revwords( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Compare to MERGE().
  */
 
-void fun_splice( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_splice( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p1, *p2, *q1, *q2, *bb_p;
 
     Delim isep, osep;
@@ -935,37 +955,43 @@ struct a_record {
     int pos;
 };
 
-static int a_comp( const void *s1, const void *s2 ) {
-    return strcmp( * ( char ** ) s1, * ( char ** ) s2 );
+static int a_comp( const void *s1, const void *s2 )
+{
+    return strcmp( * ( char **) s1, * ( char **) s2 );
 }
 
-static int c_comp( const void *s1, const void *s2 ) {
-    return strcasecmp( * ( char ** ) s1, * ( char ** ) s2 );
+static int c_comp( const void *s1, const void *s2 )
+{
+    return strcasecmp( * ( char **) s1, * ( char **) s2 );
 }
 
-static int arec_comp( const void *s1, const void *s2 ) {
-    return strcmp( ( ( a_rec * ) s1 )->str, ( ( a_rec * ) s2 )->str );
+static int arec_comp( const void *s1, const void *s2 )
+{
+    return strcmp( ( ( a_rec *) s1 )->str, ( ( a_rec *) s2 )->str );
 }
 
-static int crec_comp( const void *s1, const void *s2 ) {
-    return strcasecmp( ( ( a_rec * ) s1 )->str, ( ( a_rec * ) s2 )->str );
+static int crec_comp( const void *s1, const void *s2 )
+{
+    return strcasecmp( ( ( a_rec *) s1 )->str, ( ( a_rec *) s2 )->str );
 }
 
-static int f_comp( const void *s1, const void *s2 ) {
-    if( ( ( f_rec * ) s1 )->data > ( ( f_rec * ) s2 )->data ) {
+static int f_comp( const void *s1, const void *s2 )
+{
+    if( ( ( f_rec *) s1 )->data > ( ( f_rec *) s2 )->data ) {
         return 1;
     }
-    if( ( ( f_rec * ) s1 )->data < ( ( f_rec * ) s2 )->data ) {
+    if( ( ( f_rec *) s1 )->data < ( ( f_rec *) s2 )->data ) {
         return -1;
     }
     return 0;
 }
 
-static int i_comp( const void*s1, const void*s2 ) {
-    if( ( ( i_rec * ) s1 )->data > ( ( i_rec * ) s2 )->data ) {
+static int i_comp( const void *s1, const void *s2 )
+{
+    if( ( ( i_rec *) s1 )->data > ( ( i_rec *) s2 )->data ) {
         return 1;
     }
-    if( ( ( i_rec * ) s1 )->data < ( ( i_rec * ) s2 )->data ) {
+    if( ( ( i_rec *) s1 )->data < ( ( i_rec *) s2 )->data ) {
         return -1;
     }
     return 0;
@@ -975,7 +1001,8 @@ static int i_comp( const void*s1, const void*s2 ) {
     l = (int *) XCALLOC(n, sizeof(int), "do_asort.poslist"); \
     for (i = 0; i < n; i++) l[i] = p[i].pos;
 
-static int *do_asort( char *s[], int n, int sort_type, int listpos_only ) {
+static int *do_asort( char *s[], int n, int sort_type, int listpos_only )
+{
     int i;
 
     f_rec *fp = NULL;
@@ -989,45 +1016,45 @@ static int *do_asort( char *s[], int n, int sort_type, int listpos_only ) {
     switch( sort_type ) {
     case ALPHANUM_LIST:
         if( !listpos_only ) {
-            qsort( ( void * ) s, n, sizeof( char * ),
-                   ( int ( * )( const void *, const void * ) ) a_comp );
+            qsort( ( void *) s, n, sizeof( char *),
+                   ( int ( *)( const void *, const void *) ) a_comp );
         } else {
-            ap = ( a_rec * ) XCALLOC( n, sizeof( a_rec ), "do_asort" );
+            ap = ( a_rec *) XCALLOC( n, sizeof( a_rec ), "do_asort" );
             for( i = 0; i < n; i++ ) {
                 ap[i].str = s[i];
                 ap[i].pos = i + 1;
             }
-            qsort( ( void * ) ap, n, sizeof( a_rec ),
-                   ( int ( * )( const void *, const void * ) ) arec_comp );
+            qsort( ( void *) ap, n, sizeof( a_rec ),
+                   ( int ( *)( const void *, const void *) ) arec_comp );
             Get_Poslist( ap, n, poslist );
             XFREE( ap, "do_asort" );
         }
         break;
     case NOCASE_LIST:
         if( !listpos_only ) {
-            qsort( ( void * ) s, n, sizeof( char * ),
-                   ( int ( * )( const void *, const void * ) ) c_comp );
+            qsort( ( void *) s, n, sizeof( char *),
+                   ( int ( *)( const void *, const void *) ) c_comp );
         } else {
-            ap = ( a_rec * ) XCALLOC( n, sizeof( a_rec ), "do_asort" );
+            ap = ( a_rec *) XCALLOC( n, sizeof( a_rec ), "do_asort" );
             for( i = 0; i < n; i++ ) {
                 ap[i].str = s[i];
                 ap[i].pos = i + 1;
             }
-            qsort( ( void * ) ap, n, sizeof( a_rec ),
-                   ( int ( * )( const void *, const void * ) ) crec_comp );
+            qsort( ( void *) ap, n, sizeof( a_rec ),
+                   ( int ( *)( const void *, const void *) ) crec_comp );
             Get_Poslist( ap, n, poslist );
             XFREE( ap, "do_asort" );
         }
         break;
     case NUMERIC_LIST:
-        ip = ( i_rec * ) XCALLOC( n, sizeof( i_rec ), "do_asort" );
+        ip = ( i_rec *) XCALLOC( n, sizeof( i_rec ), "do_asort" );
         for( i = 0; i < n; i++ ) {
             ip[i].str = s[i];
-            ip[i].data = ( int ) strtol( s[i], ( char ** ) NULL, 10 );
+            ip[i].data = ( int ) strtol( s[i], ( char **) NULL, 10 );
             ip[i].pos = i + 1;
         }
-        qsort( ( void * ) ip, n, sizeof( i_rec ),
-               ( int ( * )( const void *, const void * ) ) i_comp );
+        qsort( ( void *) ip, n, sizeof( i_rec ),
+               ( int ( *)( const void *, const void *) ) i_comp );
         for( i = 0; i < n; i++ ) {
             s[i] = ip[i].str;
         }
@@ -1037,14 +1064,14 @@ static int *do_asort( char *s[], int n, int sort_type, int listpos_only ) {
         XFREE( ip, "do_asort" );
         break;
     case DBREF_LIST:
-        ip = ( i_rec * ) XCALLOC( n, sizeof( i_rec ), "do_asort.2" );
+        ip = ( i_rec *) XCALLOC( n, sizeof( i_rec ), "do_asort.2" );
         for( i = 0; i < n; i++ ) {
             ip[i].str = s[i];
             ip[i].data = dbnum( s[i] );
             ip[i].pos = i + 1;
         }
-        qsort( ( void * ) ip, n, sizeof( i_rec ),
-               ( int ( * )( const void *, const void * ) ) i_comp );
+        qsort( ( void *) ip, n, sizeof( i_rec ),
+               ( int ( *)( const void *, const void *) ) i_comp );
         for( i = 0; i < n; i++ ) {
             s[i] = ip[i].str;
         }
@@ -1054,14 +1081,14 @@ static int *do_asort( char *s[], int n, int sort_type, int listpos_only ) {
         XFREE( ip, "do_asort.2" );
         break;
     case FLOAT_LIST:
-        fp = ( f_rec * ) XCALLOC( n, sizeof( f_rec ), "do_asort.3" );
+        fp = ( f_rec *) XCALLOC( n, sizeof( f_rec ), "do_asort.3" );
         for( i = 0; i < n; i++ ) {
             fp[i].str = s[i];
-            fp[i].data = strtod( s[i], ( char ** ) NULL );
+            fp[i].data = strtod( s[i], ( char **) NULL );
             fp[i].pos = i + 1;
         }
-        qsort( ( void * ) fp, n, sizeof( f_rec ),
-               ( int ( * )( const void *, const void * ) ) f_comp );
+        qsort( ( void *) fp, n, sizeof( f_rec ),
+               ( int ( *)( const void *, const void *) ) f_comp );
         for( i = 0; i < n; i++ ) {
             s[i] = fp[i].str;
         }
@@ -1074,7 +1101,8 @@ static int *do_asort( char *s[], int n, int sort_type, int listpos_only ) {
     return poslist;
 }
 
-void handle_sort( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_sort( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int nitems, sort_type, oper, i;
 
     char *list, **ptrs;
@@ -1128,7 +1156,8 @@ static char ucomp_buff[LBUF_SIZE];
 
 static dbref ucomp_cause, ucomp_player, ucomp_caller;
 
-static int u_comp( const void *s1, const void *s2 ) {
+static int u_comp( const void *s1, const void *s2 )
+{
     /*
      * Note that this function is for use in conjunction with our own
      * sane_qsort routine, NOT with the standard library qsort!
@@ -1144,20 +1173,21 @@ static int u_comp( const void *s1, const void *s2 ) {
     }
 
     tbuf = alloc_lbuf( "u_comp" );
-    elems[0] = ( char * ) s1;
-    elems[1] = ( char * ) s2;
+    elems[0] = ( char *) s1;
+    elems[1] = ( char *) s2;
     strcpy( tbuf, ucomp_buff );
     result = bp = alloc_lbuf( "u_comp" );
     str = tbuf;
     exec( result, &bp, ucomp_player, ucomp_caller, ucomp_cause,
           EV_STRIP | EV_FCHECK | EV_EVAL, &str, elems, 2 );
-    n = ( int ) strtol( result, ( char ** ) NULL, 10 );
+    n = ( int ) strtol( result, ( char **) NULL, 10 );
     free_lbuf( result );
     free_lbuf( tbuf );
     return n;
 }
 
-static void sane_qsort( void *array[], int left, int right, int ( *compare )( const void *, const void * ) ) {
+static void sane_qsort( void *array[], int left, int right, int ( *compare )( const void *, const void *) )
+{
     /*
      * Andrew Molitor's qsort, which doesn't require transitivity between
      * comparisons (essential for preventing crashes due to boneheads who
@@ -1236,7 +1266,8 @@ loop:
     }
 }
 
-void fun_sortby( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_sortby( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *atext, *list, **ptrs;
 
     Delim isep, osep;
@@ -1265,7 +1296,7 @@ void fun_sortby( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     nptrs = list2arr( &ptrs, LBUF_SIZE / 2, list, &isep );
 
     if( nptrs > 1 ) {	/* pointless to sort less than 2 elements */
-        sane_qsort( ( void ** ) ptrs, 0, nptrs - 1, u_comp );
+        sane_qsort( ( void **) ptrs, 0, nptrs - 1, u_comp );
     }
 
     arr2list( ptrs, nptrs, buff, bufc, &osep );
@@ -1293,7 +1324,8 @@ void fun_sortby( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  ((s == NOCASE_LIST) ? strcasecmp(ptrs1[x1],ptrs2[x2]) : \
   ((s == FLOAT_LIST) ? NUMCMP(fp1[x1],fp2[x2]) : NUMCMP(ip1[x1],ip2[x2]))))
 
-void handle_sets( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_sets( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int oper, type_arg;
@@ -1346,17 +1378,17 @@ void handle_sets( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     fp1 = fp2 = NULL;
 
     if( sort_type == NUMERIC_LIST ) {
-        ip1 = ( int * ) XCALLOC( n1, sizeof( int ), "handle_sets.n1" );
-        ip2 = ( int * ) XCALLOC( n2, sizeof( int ), "handle_sets.n2" );
+        ip1 = ( int *) XCALLOC( n1, sizeof( int ), "handle_sets.n1" );
+        ip2 = ( int *) XCALLOC( n2, sizeof( int ), "handle_sets.n2" );
         for( val = 0; val < n1; val++ ) {
-            ip1[val] = ( int ) strtol( ptrs1[val], ( char ** ) NULL, 10 );
+            ip1[val] = ( int ) strtol( ptrs1[val], ( char **) NULL, 10 );
         }
         for( val = 0; val < n2; val++ ) {
-            ip2[val] = ( int ) strtol( ptrs2[val], ( char ** ) NULL, 10 );
+            ip2[val] = ( int ) strtol( ptrs2[val], ( char **) NULL, 10 );
         }
     } else if( sort_type == DBREF_LIST ) {
-        ip1 = ( int * ) XCALLOC( n1, sizeof( int ), "handle_sets.n1" );
-        ip2 = ( int * ) XCALLOC( n2, sizeof( int ), "handle_sets.n2" );
+        ip1 = ( int *) XCALLOC( n1, sizeof( int ), "handle_sets.n1" );
+        ip2 = ( int *) XCALLOC( n2, sizeof( int ), "handle_sets.n2" );
         for( val = 0; val < n1; val++ ) {
             ip1[val] = dbnum( ptrs1[val] );
         }
@@ -1364,13 +1396,13 @@ void handle_sets( char *buff, char **bufc, dbref player, dbref caller, dbref cau
             ip2[val] = dbnum( ptrs2[val] );
         }
     } else if( sort_type == FLOAT_LIST ) {
-        fp1 = ( double * ) XCALLOC( n1, sizeof( double ), "handle_sets.n1" );
-        fp2 = ( double * ) XCALLOC( n2, sizeof( double ), "handle_sets.n2" );
+        fp1 = ( double *) XCALLOC( n1, sizeof( double ), "handle_sets.n1" );
+        fp2 = ( double *) XCALLOC( n2, sizeof( double ), "handle_sets.n2" );
         for( val = 0; val < n1; val++ ) {
-            fp1[val] = strtod( ptrs1[val], ( char ** ) NULL );
+            fp1[val] = strtod( ptrs1[val], ( char **) NULL );
         }
         for( val = 0; val < n2; val++ ) {
-            fp2[val] = strtod( ptrs2[val], ( char ** ) NULL );
+            fp2[val] = strtod( ptrs2[val], ( char **) NULL );
         }
     }
     i1 = i2 = 0;
@@ -1560,7 +1592,8 @@ void handle_sets( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Format a list into columns.
  */
 
-void fun_columns( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_columns( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     unsigned int spaces, number, ansinumber, striplen;
 
     unsigned int count, i, indent = 0;
@@ -1574,8 +1607,8 @@ void fun_columns( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     VaChk_Range( 2, 4 );
     VaChk_InSep( 3, 0 );
 
-    number = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-    indent = ( int ) strtol( fargs[3], ( char ** ) NULL, 10 );
+    number = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+    indent = ( int ) strtol( fargs[3], ( char **) NULL, 10 );
 
     if( indent > 77 ) {	/* unsigned int, always a positive number */
         indent = 1;
@@ -1695,7 +1728,8 @@ void fun_columns( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  *     correctly, and doesn't mess up the character count.
  */
 
-static void tables_helper( char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just ) {
+static void tables_helper( char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just )
+{
     int i, nwords, nstates, cpos, wcount, over, ansi_state;
 
     int max, nleft, lead_chrs, lens[LBUF_SIZE / 2],
@@ -1852,7 +1886,8 @@ static void tables_helper( char *list, int *last_state, int n_cols, int col_widt
     XFREE( words, "tables_helper.words" );
 }
 
-static void perform_tables( dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just ) {
+static void perform_tables( dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just )
+{
     char *p, *savep, *bb_p;
 
     int ansi_state = ANST_NONE;
@@ -1882,7 +1917,8 @@ static void perform_tables( dbref player, char *list, int n_cols, int col_widths
                    trail_str, list_sep, field_sep, pad_char, buff, bufc, just );
 }
 
-void process_tables( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void process_tables( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int just;
 
     int i, num, n_columns, *col_widths;
@@ -1904,10 +1940,10 @@ void process_tables( char *buff, char **bufc, dbref player, dbref caller, dbref 
         return;
     }
     col_widths =
-        ( int * ) XCALLOC( n_columns, sizeof( int ),
-                           "process_tables.col_widths" );
+        ( int *) XCALLOC( n_columns, sizeof( int ),
+                          "process_tables.col_widths" );
     for( i = 0; i < n_columns; i++ ) {
-        num = ( int ) strtol( widths[i], ( char ** ) NULL, 10 );
+        num = ( int ) strtol( widths[i], ( char **) NULL, 10 );
         col_widths[i] = ( num < 1 ) ? 1 : num;
     }
 
@@ -1920,7 +1956,8 @@ void process_tables( char *buff, char **bufc, dbref player, dbref caller, dbref 
     XFREE( widths, "process_tables.widths" );
 }
 
-void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int line_length = 78;
 
     int field_width = 10;
@@ -1944,7 +1981,7 @@ void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause
      */
 
     if( nfargs > 2 ) {
-        line_length = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+        line_length = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
         if( line_length < 2 ) {
             line_length = 2;
         }
@@ -1965,7 +2002,7 @@ void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             p++;
             break;
         }
-        field_width = ( int ) strtol( p, ( char ** ) NULL, 10 );
+        field_width = ( int ) strtol( p, ( char **) NULL, 10 );
         if( field_width < 1 ) {
             field_width = 1;
         } else if( field_width > LBUF_SIZE - 1 ) {
@@ -1994,7 +2031,7 @@ void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     n_columns = ( int )( line_length / ( field_width + field_sep_width ) );
     col_widths =
-        ( int * ) XCALLOC( n_columns, sizeof( int ), "fun_table.widths" );
+        ( int *) XCALLOC( n_columns, sizeof( int ), "fun_table.widths" );
     for( i = 0; i < n_columns; i++ ) {
         col_widths[i] = field_width;
     }
@@ -2012,7 +2049,8 @@ void fun_table( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * a separator, but the separator only applies to the first list.
  */
 
-void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int nwords, cur, start, end, stepn;
 
     char **ptrs;
@@ -2048,7 +2086,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
              * Just a number. If negative, count back from end of
              * list.
              */
-            cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+            cur = ( int ) strtol( r, ( char **) NULL, 10 );
             if( cur < 0 ) {
                 cur += nwords;
             } else {
@@ -2085,7 +2123,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
             if( !step_p ) {
                 stepn = 1;
             } else {
-                stepn = ( int ) strtol( step_p, ( char ** ) NULL, 10 );
+                stepn = ( int ) strtol( step_p, ( char **) NULL, 10 );
             }
 
             if( stepn > 0 ) {
@@ -2095,7 +2133,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                      */
                     start = 0;
                 } else {
-                    cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( r, ( char **) NULL, 10 );
                     start =
                         ( cur <
                           0 ) ? ( nwords + cur ) : ( cur - 1 );
@@ -2106,7 +2144,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                      */
                     end = nwords;
                 } else {
-                    cur = ( int ) strtol( end_p, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( end_p, ( char **) NULL, 10 );
                     end =
                         ( cur < 0 ) ? ( nwords + cur ) : ( cur );
                 }
@@ -2135,7 +2173,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                      */
                     start = nwords - 1;
                 } else {
-                    cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( r, ( char **) NULL, 10 );
                     start =
                         ( cur <
                           0 ) ? ( nwords + cur ) : ( cur - 1 );
@@ -2146,7 +2184,7 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                      */
                     end = 0;
                 } else {
-                    cur = ( int ) strtol( end_p, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( end_p, ( char **) NULL, 10 );
                     end =
                         ( cur <
                           0 ) ? ( nwords + cur - 1 ) : ( cur -
@@ -2181,7 +2219,8 @@ void fun_elements( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_exclude: Return the elements of a list EXCEPT the numbered items.
  */
 
-void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int nwords, cur, start, end, stepn;
 
     char **ptrs;
@@ -2212,7 +2251,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * corresponding elements.
      */
 
-    mapper = ( int * ) XCALLOC( nwords, sizeof( int ), "fun_exclude.mapper" );
+    mapper = ( int *) XCALLOC( nwords, sizeof( int ), "fun_exclude.mapper" );
 
     do {
         r = split_token( &s, &SPACE_DELIM );
@@ -2221,7 +2260,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
              * Just a number. If negative, count back from end of
              * list.
              */
-            cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+            cur = ( int ) strtol( r, ( char **) NULL, 10 );
             if( cur < 0 ) {
                 cur += nwords;
             } else {
@@ -2245,7 +2284,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
             if( !step_p ) {
                 stepn = 1;
             } else {
-                stepn = ( int ) strtol( step_p, ( char ** ) NULL, 10 );
+                stepn = ( int ) strtol( step_p, ( char **) NULL, 10 );
             }
 
             if( stepn > 0 ) {
@@ -2255,7 +2294,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
                      */
                     start = 0;
                 } else {
-                    cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( r, ( char **) NULL, 10 );
                     start =
                         ( cur <
                           0 ) ? ( nwords + cur ) : ( cur - 1 );
@@ -2266,7 +2305,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
                      */
                     end = nwords;
                 } else {
-                    cur = ( int ) strtol( end_p, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( end_p, ( char **) NULL, 10 );
                     end =
                         ( cur < 0 ) ? ( nwords + cur ) : ( cur );
                 }
@@ -2287,7 +2326,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
                      */
                     start = nwords - 1;
                 } else {
-                    cur = ( int ) strtol( r, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( r, ( char **) NULL, 10 );
                     start =
                         ( cur <
                           0 ) ? ( nwords + cur ) : ( cur - 1 );
@@ -2298,7 +2337,7 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
                      */
                     end = 0;
                 } else {
-                    cur = ( int ) strtol( end_p, ( char ** ) NULL, 10 );
+                    cur = ( int ) strtol( end_p, ( char **) NULL, 10 );
                     end =
                         ( cur <
                           0 ) ? ( nwords + cur - 1 ) : ( cur -
@@ -2344,7 +2383,8 @@ void fun_exclude( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * elements that match, and we can take an output delimiter.
  */
 
-void fun_grab( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_grab( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *r, *s;
 
     Delim isep;
@@ -2365,7 +2405,8 @@ void fun_grab( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     } while( s );
 }
 
-void fun_graball( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_graball( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *r, *s, *bb_p;
 
     Delim isep, osep;
@@ -2391,7 +2432,8 @@ void fun_graball( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  */
 
 /* Borrowed from PennMUSH 1.50 */
-static void swap( char **p, char **q ) {
+static void swap( char **p, char **q )
+{
     /*
      * swaps two points to strings
      */
@@ -2403,7 +2445,8 @@ static void swap( char **p, char **q ) {
     *q = temp;
 }
 
-void fun_shuffle( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_shuffle( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char **words;
 
     int n, i, j;
@@ -2433,7 +2476,8 @@ void fun_shuffle( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * is an EXACT, not a case-insensitive or wildcarded, match.
  */
 
-void fun_ledit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ledit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     char *old_list, *new_list;
@@ -2498,7 +2542,8 @@ void fun_ledit( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_itemize: Turn a list into a punctuated list.
  */
 
-void fun_itemize( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_itemize( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int n_elems, i;
@@ -2511,7 +2556,7 @@ void fun_itemize( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
     VaChk_InSep( 2, 0 );
     if( nfargs < 3 ) {
-        conj_str = ( char * ) "and";
+        conj_str = ( char *) "and";
     } else {
         conj_str = fargs[2];
     }
@@ -2554,7 +2599,8 @@ void fun_itemize( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * items>,<list of weights>,<input delim>)
  */
 
-void fun_choose( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_choose( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep;
 
     char **elems, **weights;
@@ -2578,9 +2624,9 @@ void fun_choose( char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * Store the breakpoints, not the choose weights themselves.
      */
 
-    ip = ( int * ) XCALLOC( n_weights, sizeof( int ), "fun_choose.ip" );
+    ip = ( int *) XCALLOC( n_weights, sizeof( int ), "fun_choose.ip" );
     for( i = 0; i < n_weights; i++ ) {
-        num = ( int ) strtol( weights[i], ( char ** ) NULL, 10 );
+        num = ( int ) strtol( weights[i], ( char **) NULL, 10 );
         if( num < 0 ) {
             num = 0;
         }
@@ -2614,7 +2660,8 @@ void fun_choose( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * list to go down rather than across, for instance.
  */
 
-void fun_group( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_group( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *bb_p, **elems;
 
     Delim isep, osep, gsep;
@@ -2642,7 +2689,7 @@ void fun_group( char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Go do it, unless the group size doesn't make sense.
      */
 
-    n_groups = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    n_groups = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     n_elems = list2arr( &elems, LBUF_SIZE / 2, fargs[0], &isep );
     if( n_groups < 2 ) {
         arr2list( elems, n_elems, buff, bufc, &osep );
@@ -2678,7 +2725,8 @@ void fun_group( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * tokens(<string>[,<obj>/<attr>][,<open>][,<close>][,<sep>][,<osep>])
  */
 
-void fun_tokens( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_tokens( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *t, *bb_p, *atext, *atextbuf, *objs[1], *str;
 
     int anum, aflags, alen;

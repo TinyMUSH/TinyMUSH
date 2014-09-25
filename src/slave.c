@@ -33,7 +33,8 @@ volatile pid_t child_pids[MAX_CHILDREN];
 
 char *arg_for_errors;
 
-char *format_inet_addr( char *dest, unsigned long addr ) {
+char *format_inet_addr( char *dest, unsigned long addr )
+{
     sprintf( dest, "%lu.%lu.%lu.%lu",
              ( addr & 0xFF000000 ) >> 24,
              ( addr & 0x00FF0000 ) >> 16,
@@ -44,7 +45,8 @@ char *format_inet_addr( char *dest, unsigned long addr ) {
 /*
  * copy a string, returning pointer to the null terminator of dest
  */
-char *stpcopy( char *dest, const char *src ) {
+char *stpcopy( char *dest, const char *src )
+{
     while( ( *dest = *src ) ) {
         ++dest;
         ++src;
@@ -52,11 +54,13 @@ char *stpcopy( char *dest, const char *src ) {
     return ( dest );
 }
 
-void child_timeout_signal( int sig ) {
+void child_timeout_signal( int sig )
+{
     exit( 1 );
 }
 
-int query( char *ip, char *orig_arg ) {
+int query( char *ip, char *orig_arg )
+{
     char *comma;
 
     char *port_pair;
@@ -90,17 +94,17 @@ int query( char *ip, char *orig_arg ) {
     if( addr == INADDR_NONE ) {
         return ( -1 );
     }
-    hp = gethostbyaddr( ( char * ) &addr, sizeof( addr ), AF_INET );
+    hp = gethostbyaddr( ( char *) &addr, sizeof( addr ), AF_INET );
     sprintf( buf, "%s %s\n",
              ip, ( ( hp && strlen( hp->h_name ) < MAX_STRING ) ? hp->h_name : ip ) );
     arg_for_errors = orig_arg;
     strcpy( arg, orig_arg );
-    comma = ( char * ) strrchr( arg, ',' );
+    comma = ( char *) strrchr( arg, ',' );
     if( comma == NULL ) {
         return ( -1 );
     }
     *comma = 0;
-    port_pair = ( char * ) strrchr( arg, ',' );
+    port_pair = ( char *) strrchr( arg, ',' );
     if( port_pair == NULL ) {
         return ( -1 );
     }
@@ -124,7 +128,7 @@ int query( char *ip, char *orig_arg ) {
         strcpy( namebuf, arg );
         def.h_name = namebuf;
         def.h_addr_list = alist;
-        def.h_addr = ( char * ) &defaddr;
+        def.h_addr = ( char *) &defaddr;
         def.h_length = sizeof( struct in_addr );
 
         def.h_addrtype = AF_INET;
@@ -132,7 +136,7 @@ int query( char *ip, char *orig_arg ) {
         hp = &def;
     }
     sin.sin_family = hp->h_addrtype;
-    memcpy( ( char * ) &sin.sin_addr, hp->h_addr, hp->h_length );
+    memcpy( ( char *) &sin.sin_addr, hp->h_addr, hp->h_length );
     sin.sin_port = htons( 113 );	/*
 					 * ident port
 					 */
@@ -140,7 +144,7 @@ int query( char *ip, char *orig_arg ) {
     if( s < 0 ) {
         return ( -1 );
     }
-    if( connect( s, ( struct sockaddr * ) &sin, sizeof( sin ) ) < 0 ) {
+    if( connect( s, ( struct sockaddr *) &sin, sizeof( sin ) ) < 0 ) {
         if( errno != ECONNREFUSED
                 && errno != ETIMEDOUT
                 && errno != ENETUNREACH && errno != EHOSTUNREACH ) {
@@ -192,7 +196,8 @@ int query( char *ip, char *orig_arg ) {
     return ( 0 );
 }
 
-void child_signal( int sig ) {
+void child_signal( int sig )
+{
     pid_t child_pid;
 
     int i;
@@ -208,10 +213,11 @@ void child_signal( int sig ) {
             }
         }
     }
-    signal( SIGCHLD, ( void ( * )( int ) ) child_signal );
+    signal( SIGCHLD, ( void ( *)( int ) ) child_signal );
 }
 
-void alarm_signal( int sig ) {
+void alarm_signal( int sig )
+{
     struct itimerval itime;
 
     struct timeval interval;
@@ -219,7 +225,7 @@ void alarm_signal( int sig ) {
     if( getppid() != parent_pid ) {
         exit( 1 );
     }
-    signal( SIGALRM, ( void ( * )( int ) ) alarm_signal );
+    signal( SIGALRM, ( void ( *)( int ) ) alarm_signal );
     interval.tv_sec = 120;	/*
 				 * 2 minutes
 				 */
@@ -230,7 +236,8 @@ void alarm_signal( int sig ) {
 }
 
 
-int main( int argc, char **argv ) {
+int main( int argc, char **argv )
+{
     char arg[MAX_STRING];
 
     char *p;
@@ -247,7 +254,7 @@ int main( int argc, char **argv ) {
         child_pids[i] = -1;
     }
     alarm_signal( SIGALRM );
-    signal( SIGCHLD, ( void ( * )( int ) ) child_signal );
+    signal( SIGCHLD, ( void ( *)( int ) ) child_signal );
     signal( SIGPIPE, SIG_DFL );
 
     for( ;; ) {
@@ -335,7 +342,7 @@ int main( int argc, char **argv ) {
             itime.it_interval = interval;
             itime.it_value = interval;
             signal( SIGALRM,
-                    ( void ( * )( int ) ) child_timeout_signal );
+                    ( void ( *)( int ) ) child_timeout_signal );
             setitimer( ITIMER_REAL, &itime, 0 );
         }
         exit( query( arg, p + 1 ) != 0 );

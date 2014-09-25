@@ -21,7 +21,8 @@
 
 #include "version.h"		/* required by code */
 
-void do_version( dbref player, dbref cause, int extra ) {
+void do_version( dbref player, dbref cause, int extra )
+{
 #ifdef HAVE_SYS_UTSNAME_H
     struct utsname bpInfo;
 #endif
@@ -67,7 +68,7 @@ void do_version( dbref player, dbref cause, int extra ) {
     }
     if( mudstate.modloaded[0] ) {
         MODULE *mp;
-          for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
+        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
             ptr = repeatchar( strlen( mp->modname ) + 8, '-' );
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
             XFREE( ptr, "repeatchar" );
@@ -86,7 +87,8 @@ void do_version( dbref player, dbref cause, int extra ) {
     }
 }
 
-void init_version( void ) {
+void init_version( void )
+{
 
     /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Status.Revision
         Major version	: The main branch.
@@ -104,10 +106,10 @@ void init_version( void ) {
     string = XSTRDUP( PACKAGE_VERSION, "init_version" );
 
     if( string != NULL ) {
-        mudstate.version.major =    strtoimax( strsep( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.minor =    strtoimax( strsep( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.status =   strtoimax( strsep( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.revision = strtoimax( strsep( &string, "." ), ( char ** ) NULL, 10 );
+        mudstate.version.major =    strtoimax( strsep( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.minor =    strtoimax( strsep( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.status =   strtoimax( strsep( &string, "." ), ( char **) NULL, 10 );
+        mudstate.version.revision = strtoimax( strsep( &string, "." ), ( char **) NULL, 10 );
     } else {
         /* If we hit that, we have a serious problem... */
         mudstate.version.major = 0;

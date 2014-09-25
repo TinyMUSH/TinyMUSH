@@ -26,7 +26,8 @@
 static GDBM_FILE dbp = ( GDBM_FILE ) 0;
 //static gdbm_file_info *dbp = NULL;
 
-static void gdbm_panic( char *mesg ) {
+static void gdbm_panic( char *mesg )
+{
     fprintf( stderr, "GDBM panic: %s\n", mesg );
 }
 
@@ -34,7 +35,8 @@ extern char *optarg;
 
 extern int optind;
 
-int main( int argc, char *argv[] ) {
+int main( int argc, char *argv[] )
+{
     datum key, dat;
 
     FILE *f;
@@ -100,7 +102,7 @@ int main( int argc, char *argv[] ) {
 
     f = fopen( infile, "r" );
 
-    while( fread( ( void * ) &cp, 1, 1, f ) != 0 ) {
+    while( fread( ( void *) &cp, 1, 1, f ) != 0 ) {
         /*
          * Quick and dirty
          */
@@ -112,7 +114,7 @@ int main( int argc, char *argv[] ) {
              */
             fseek( f, -1, SEEK_CUR );
 
-            if( fread( ( void * ) &be, sizeof( bucket_element ),
+            if( fread( ( void *) &be, sizeof( bucket_element ),
                        1, f ) == 0 ) {
                 fprintf( stderr,
                          "Fatal error at file position %ld.\n",
@@ -125,8 +127,8 @@ int main( int argc, char *argv[] ) {
              * * make sure the pointer and sizes are sane
              */
 
-            if( !memcmp( ( void * )( be.start_tag ),
-                         ( void * ) "TM3S", 4 ) &&
+            if( !memcmp( ( void *)( be.start_tag ),
+                         ( void *) "TM3S", 4 ) &&
                     be.data_pointer < filesize &&
                     be.key_size < filesize &&
                     be.data_size < filesize ) {
@@ -137,12 +139,12 @@ int main( int argc, char *argv[] ) {
                  */
                 fseek( f, be.data_pointer, SEEK_SET );
 
-                key.dptr = ( char * ) malloc( be.key_size );
+                key.dptr = ( char *) malloc( be.key_size );
                 key.dsize = be.key_size;
-                dat.dptr = ( char * ) malloc( be.data_size );
+                dat.dptr = ( char *) malloc( be.data_size );
                 dat.dsize = be.data_size;
 
-                if( ( numbytes = fread( ( void * )( key.dptr ), 1,
+                if( ( numbytes = fread( ( void *)( key.dptr ), 1,
                                         key.dsize, f ) ) == 0 ) {
                     fprintf( stderr,
                              "Fatal error at file position %ld.\n",
@@ -150,7 +152,7 @@ int main( int argc, char *argv[] ) {
                     exit( 1 );
                 }
 
-                if( fread( ( void * )( dat.dptr ), dat.dsize,
+                if( fread( ( void *)( dat.dptr ), dat.dsize,
                            1, f ) == 0 ) {
                     fprintf( stderr,
                              "Fatal error at file position %ld.\n",

@@ -44,13 +44,13 @@ volatile pid_t slave_pid = 0;
 
 volatile int slave_socket = -1;
 
-DESC *initializesock( int, struct sockaddr_in * );
+DESC *initializesock( int, struct sockaddr_in *);
 
 DESC *new_connection( int );
 
-int process_output( DESC * );
+int process_output( DESC *);
 
-int process_input( DESC * );
+int process_input( DESC *);
 
 /*
  * Some systems are lame, and inet_addr() returns -1 on failure, despite the
@@ -80,7 +80,8 @@ int process_input( DESC * );
 	} \
 	++(x)
 
-static int get_slave_result( void ) {
+static int get_slave_result( void )
+{
     char *buf, *host1, *hostname, *host2, *p, *userid;
     int remote_port, len;
     unsigned long addr;
@@ -215,7 +216,8 @@ gsr_end:
     return 0;
 }
 
-void boot_slave( void ) {
+void boot_slave( void )
+{
     int sv[2];
 
     int i;
@@ -267,7 +269,7 @@ void boot_slave( void ) {
         for( i = 3; i < maxfds; ++i ) {
             close( i );
         }
-        s = ( char * ) XMALLOC( MBUF_SIZE, "boot_slave" );
+        s = ( char *) XMALLOC( MBUF_SIZE, "boot_slave" );
         sprintf( s, "%s/slave", mudconf.binhome );
         execlp( s, "slave", NULL );
         XFREE( s, "boot_slave" );
@@ -287,7 +289,8 @@ void boot_slave( void ) {
     log_write( LOG_ALWAYS, "NET", "SLAVE", "DNS lookup slave started on fd %d", slave_socket );
 }
 
-int make_socket( int port ) {
+int make_socket( int port )
+{
     int s, opt;
 
     struct sockaddr_in server;
@@ -299,14 +302,14 @@ int make_socket( int port ) {
     }
     opt = 1;
     if( setsockopt( s, SOL_SOCKET, SO_REUSEADDR,
-                    ( char * ) &opt, sizeof( opt ) ) < 0 ) {
+                    ( char *) &opt, sizeof( opt ) ) < 0 ) {
         log_perror( "NET", "FAIL", NULL, "setsockopt" );
     }
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = ( unsigned short ) htons( ( unsigned short ) port );
     if( !mudstate.restarting )
-        if( bind( s, ( struct sockaddr * ) &server, sizeof( server ) ) ) {
+        if( bind( s, ( struct sockaddr *) &server, sizeof( server ) ) ) {
             log_perror( "NET", "FAIL", NULL, "bind" );
             close( s );
             exit( 4 );
@@ -315,7 +318,8 @@ int make_socket( int port ) {
     return s;
 }
 
-void shovechars( int port ) {
+void shovechars( int port )
+{
     fd_set input_set, output_set;
 
     struct timeval last_slice, current_time, next_slice, timeout,
@@ -331,7 +335,7 @@ void shovechars( int port ) {
 #define CheckInput(x)	FD_ISSET(x, &input_set)
 #define CheckOutput(x)	FD_ISSET(x, &output_set)
 
-    mudstate.debug_cmd = ( char * ) "< shovechars >";
+    mudstate.debug_cmd = ( char *) "< shovechars >";
     if( !mudstate.restarting ) {
         sock = make_socket( port );
     }
@@ -426,7 +430,7 @@ void shovechars( int port ) {
         /*
          * Wait for something to happen
          */
-        found = select( maxd, &input_set, &output_set, ( fd_set * ) NULL,
+        found = select( maxd, &input_set, &output_set, ( fd_set *) NULL,
                         &timeout );
 
         if( found < 0 ) {
@@ -552,7 +556,8 @@ void shovechars( int port ) {
 }
 
 #ifdef BROKEN_GCC_PADDING
-char *inet_ntoa( struct in_addr in ) {
+char *inet_ntoa( struct in_addr in )
+{
     /*
      * gcc 2.8.1 does not correctly pass/return structures which are
      * smaller than 16 bytes, but are not 8 bytes. Structures get padded
@@ -575,7 +580,8 @@ char *inet_ntoa( struct in_addr in ) {
 
 #endif				/* BROKEN_GCC_PADDING */
 
-DESC *new_connection( int sock ) {
+DESC *new_connection( int sock )
+{
     int newsock;
 
     char *buff, *cmdsave;
@@ -589,10 +595,10 @@ DESC *new_connection( int sock ) {
     char *buf;
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< new_connection >";
+    mudstate.debug_cmd = ( char *) "< new_connection >";
     addr_len = sizeof( struct sockaddr );
 
-    newsock = accept( sock, ( struct sockaddr * ) &addr, &addr_len );
+    newsock = accept( sock, ( struct sockaddr *) &addr, &addr_len );
     if( newsock < 0 ) {
         return 0;
     }
@@ -677,7 +683,8 @@ const char *conn_messages[] = {
     "logout"
 };
 
-void shutdownsock( DESC *d, int reason ) {
+void shutdownsock( DESC *d, int reason )
+{
     char *buff, *buff2;
 
     time_t now;
@@ -780,7 +787,8 @@ void shutdownsock( DESC *d, int reason ) {
     }
 }
 
-void make_nonblocking( int s ) {
+void make_nonblocking( int s )
+{
 #ifdef HAVE_LINGER
     struct linger ling;
 
@@ -799,13 +807,14 @@ void make_nonblocking( int s ) {
     ling.l_onoff = 0;
     ling.l_linger = 0;
     if( setsockopt( s, SOL_SOCKET, SO_LINGER,
-                    ( char * ) &ling, sizeof( ling ) ) < 0 ) {
+                    ( char *) &ling, sizeof( ling ) ) < 0 ) {
         log_perror( "NET", "FAIL", "linger", "setsockopt" );
     }
 #endif
 }
 
-DESC *initializesock( int s, struct sockaddr_in *a ) {
+DESC *initializesock( int s, struct sockaddr_in *a )
+{
     DESC *d;
 
     if( s == slave_socket ) {
@@ -864,7 +873,8 @@ DESC *initializesock( int s, struct sockaddr_in *a ) {
     return d;
 }
 
-int process_output( DESC *d ) {
+int process_output( DESC *d )
+{
     TBLOCK *tb, *save;
 
     int cnt;
@@ -872,7 +882,7 @@ int process_output( DESC *d ) {
     char *cmdsave;
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< process_output >";
+    mudstate.debug_cmd = ( char *) "< process_output >";
 
     tb = d->output_head;
 
@@ -904,7 +914,8 @@ int process_output( DESC *d ) {
     return 1;
 }
 
-int process_input( DESC *d ) {
+int process_input( DESC *d )
+{
     char *buf;
 
     int got, in, lost;
@@ -914,7 +925,7 @@ int process_input( DESC *d ) {
     char *cmdsave;
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< process_input >";
+    mudstate.debug_cmd = ( char *) "< process_input >";
     buf = alloc_lbuf( "process_input.buf" );
 
     got = in = read( d->descriptor, buf, LBUF_SIZE );
@@ -924,7 +935,7 @@ int process_input( DESC *d ) {
         return 0;
     }
     if( !d->raw_input ) {
-        d->raw_input = ( CBLK * ) alloc_lbuf( "process_input.raw" );
+        d->raw_input = ( CBLK *) alloc_lbuf( "process_input.raw" );
         d->raw_input_at = d->raw_input->cmd;
     }
     p = d->raw_input_at;
@@ -936,7 +947,7 @@ int process_input( DESC *d ) {
             if( p > d->raw_input->cmd ) {
                 save_command( d, d->raw_input );
                 d->raw_input =
-                    ( CBLK * ) alloc_lbuf( "process_input.raw" );
+                    ( CBLK *) alloc_lbuf( "process_input.raw" );
 
                 p = d->raw_input_at = d->raw_input->cmd;
                 pend =
@@ -985,7 +996,8 @@ int process_input( DESC *d ) {
     return 1;
 }
 
-void close_sockets( int emergency, char *message ) {
+void close_sockets( int emergency, char *message )
+{
     DESC *d, *dnext;
 
     DESC_SAFEITER_ALL( d, dnext ) {
@@ -1006,8 +1018,9 @@ void close_sockets( int emergency, char *message ) {
     close( sock );
 }
 
-void emergency_shutdown( void ) {
-    close_sockets( 1, ( char * ) "Going down - Bye" );
+void emergency_shutdown( void )
+{
+    close_sockets( 1, ( char *) "Going down - Bye" );
 }
 
 /*
@@ -1015,7 +1028,8 @@ void emergency_shutdown( void ) {
  * Print out stuff into error file.
  */
 
-void report( void ) {
+void report( void )
+{
     char *player, *enactor;
 
     log_write( LOG_BUGS, "BUG", "INFO", "Command: '%s'", mudstate.debug_cmd );
@@ -1048,14 +1062,15 @@ static RETSIGTYPE sighandler( int );
 /* *INDENT-OFF* */
 
 NAMETAB		sigactions_nametab[] = {
-    { ( char * ) "exit", 3, 0, SA_EXIT},
-    { ( char * ) "default", 1, 0, SA_DFLT},
+    { ( char *) "exit", 3, 0, SA_EXIT},
+    { ( char *) "default", 1, 0, SA_DFLT},
     {NULL, 0, 0, 0}
 };
 
 /* *INDENT-ON* */
 
-void set_signals( void ) {
+void set_signals( void )
+{
     sigset_t sigs;
 
     /*
@@ -1101,7 +1116,8 @@ void set_signals( void ) {
 
 }
 
-static void unset_signals( void ) {
+static void unset_signals( void )
+{
     int i;
 
     for( i = 0; i < NSIG; i++ ) {
@@ -1109,7 +1125,8 @@ static void unset_signals( void ) {
     }
 }
 
-static void check_panicking( int sig ) {
+static void check_panicking( int sig )
+{
     int i;
 
     /*
@@ -1125,11 +1142,13 @@ static void check_panicking( int sig ) {
     mudstate.panicking = 1;
 }
 
-void log_signal( const char *signame ) {
+void log_signal( const char *signame )
+{
     log_write( LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signame );
 }
 
-static RETSIGTYPE sighandler( int sig ) {
+static RETSIGTYPE sighandler( int sig )
+{
 #ifdef HAVE_SYS_SIGNAME
 #define signames sys_signame
 #else
@@ -1276,7 +1295,7 @@ static RETSIGTYPE sighandler( int sig ) {
             }
             alarm( 0 );
             dump_restart_db();
-            execl( mudconf.exec_path, mudconf.exec_path, ( char * ) "-c", mudconf.mud_shortname, NULL );
+            execl( mudconf.exec_path, mudconf.exec_path, ( char *) "-c", mudconf.mud_shortname, NULL );
             break;
         } else {
             unset_signals();

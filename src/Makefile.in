@@ -995,6 +995,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local \
 	uninstall-local uninstall-nodist_includeHEADERS
 
 
+astyle:
+	for i in $(netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES) ; do \
+	astyle --mode=c --indent=spaces --style=kr $$i; \
+	done; 
+
 netmush.conf: $(ETC_DIR)/netmush.conf.in
 	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
 	chmod +w $(ETC_DIR)/netmush.conf

@@ -24,9 +24,9 @@
 #include "functions.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-static void fixcase( char * );
+static void fixcase( char *);
 
-static char *store_string( char * );
+static char *store_string( char *);
 
 extern int anum_alc_top;
 
@@ -40,7 +40,7 @@ extern int anum_alc_top;
  * Current block we're putting stuff in
  */
 
-static char *stringblock = ( char * ) 0;
+static char *stringblock = ( char *) 0;
 
 /*
  * High water mark.
@@ -48,16 +48,19 @@ static char *stringblock = ( char * ) 0;
 
 static int stringblock_hwm = 0;
 
-void vattr_init( void ) {
+void vattr_init( void )
+{
     hashinit( &mudstate.vattr_name_htab, VATTR_HASH_SIZE,
               HT_STR | HT_KEYREF );
 }
 
-VATTR *vattr_find( char *name ) {
-    return ( VATTR * ) hashfind( name, &mudstate.vattr_name_htab );
+VATTR *vattr_find( char *name )
+{
+    return ( VATTR *) hashfind( name, &mudstate.vattr_name_htab );
 }
 
-VATTR *vattr_alloc( char *name, int flags ) {
+VATTR *vattr_alloc( char *name, int flags )
+{
     int number;
 
     if( ( ( number = mudstate.attr_next++ ) & 0x7f ) == 0 ) {
@@ -68,7 +71,8 @@ VATTR *vattr_alloc( char *name, int flags ) {
     return ( vattr_define( name, number, flags ) );
 }
 
-VATTR *vattr_define( char *name, int number, int flags ) {
+VATTR *vattr_define( char *name, int number, int flags )
+{
     VATTR *vp;
 
     /*
@@ -88,21 +92,22 @@ VATTR *vattr_define( char *name, int number, int flags ) {
         return ( vp );
     }
 
-    vp = ( VATTR * ) XMALLOC( sizeof( VATTR ), "vattr_define" );
+    vp = ( VATTR *) XMALLOC( sizeof( VATTR ), "vattr_define" );
 
     vp->name = store_string( name );
     vp->flags = flags;
     vp->number = number;
 
-    hashadd( vp->name, ( int * ) vp, &mudstate.vattr_name_htab, 0 );
+    hashadd( vp->name, ( int *) vp, &mudstate.vattr_name_htab, 0 );
 
     anum_extend( vp->number );
-    anum_set( vp->number, ( ATTR * ) vp );
+    anum_set( vp->number, ( ATTR *) vp );
     return ( vp );
 }
 
 #ifdef NEVER
-void do_dbclean( dbref player, dbref cause, int key ) {
+void do_dbclean( dbref player, dbref cause, int key )
+{
     VATTR *vp, *vpx;
 
     dbref i, end;
@@ -123,8 +128,8 @@ void do_dbclean( dbref player, dbref cause, int key ) {
 
     raw_broadcast( 0, "GAME: Cleaning database. Game may freeze for a few minutes." );
 
-    used_table = ( int * ) XCALLOC( mudstate.attr_next, sizeof( int ),
-                                    "dbclean.used_table" );
+    used_table = ( int *) XCALLOC( mudstate.attr_next, sizeof( int ),
+                                   "dbclean.used_table" );
 
     n_oldtotal = mudstate.attr_next;
     n_oldtop = anum_alc_top;
@@ -172,15 +177,15 @@ void do_dbclean( dbref player, dbref cause, int key ) {
      * * to the *Invalid (A_TEMP) attr.
      */
 
-    for( ufp = ( UFUN * ) hash_firstentry( &mudstate.ufunc_htab );
-            ufp != NULL; ufp = ( UFUN * ) hash_nextentry( &mudstate.ufunc_htab ) ) {
+    for( ufp = ( UFUN *) hash_firstentry( &mudstate.ufunc_htab );
+            ufp != NULL; ufp = ( UFUN *) hash_nextentry( &mudstate.ufunc_htab ) ) {
         if( used_table[ufp->atr] == 0 ) {
             ufp->atr = A_TEMP;
         }
     }
-    for( cmdp = ( CMDENT * ) hash_firstentry( &mudstate.command_htab );
+    for( cmdp = ( CMDENT *) hash_firstentry( &mudstate.command_htab );
             cmdp != NULL;
-            cmdp = ( CMDENT * ) hash_nextentry( &mudstate.command_htab ) ) {
+            cmdp = ( CMDENT *) hash_nextentry( &mudstate.command_htab ) ) {
         if( cmdp->pre_hook ) {
             if( used_table[cmdp->pre_hook->atr] == 0 ) {
                 cmdp->pre_hook->atr = A_TEMP;
@@ -197,7 +202,7 @@ void do_dbclean( dbref player, dbref cause, int key ) {
             }
         }
         if( cmdp->callseq & CS_ADDED ) {
-            for( addp = ( ADDENT * ) cmdp->info.added;
+            for( addp = ( ADDENT *) cmdp->info.added;
                     addp != NULL; addp = addp->next ) {
                 if( used_table[addp->atr] == 0 ) {
                     addp->atr = A_TEMP;
@@ -231,11 +236,11 @@ void do_dbclean( dbref player, dbref cause, int key ) {
 
     for( i = A_USER_START; i < mudstate.attr_next; i++ ) {
         if( used_table[i] != i ) {
-            vp = ( VATTR * ) anum_get( i );
+            vp = ( VATTR *) anum_get( i );
             if( vp ) {
                 vp->number = used_table[i];
                 vp->flags |= AF_DIRTY;
-                anum_set( used_table[i], ( ATTR * ) vp );
+                anum_set( used_table[i], ( ATTR *) vp );
                 anum_set( i, NULL );
                 n_renumbered++;
             }
@@ -290,8 +295,8 @@ void do_dbclean( dbref player, dbref cause, int key ) {
             end = mudstate.attr_next + mudconf.init_size;
         }
         if( end < anum_alc_top ) {
-            new_table = ( ATTR ** ) XCALLOC( end + 1, sizeof( ATTR * ),
-                                             "dbclean.new_table" );
+            new_table = ( ATTR **) XCALLOC( end + 1, sizeof( ATTR *),
+                                            "dbclean.new_table" );
             for( i = 0; i < mudstate.attr_next; i++ ) {
                 new_table[i] = anum_table[i];
             }
@@ -306,15 +311,15 @@ void do_dbclean( dbref player, dbref cause, int key ) {
      * * take care of the attributes that got renumbered.
      */
 
-    for( ufp = ( UFUN * ) hash_firstentry( &mudstate.ufunc_htab );
-            ufp != NULL; ufp = ( UFUN * ) hash_nextentry( &mudstate.ufunc_htab ) ) {
+    for( ufp = ( UFUN *) hash_firstentry( &mudstate.ufunc_htab );
+            ufp != NULL; ufp = ( UFUN *) hash_nextentry( &mudstate.ufunc_htab ) ) {
         if( used_table[ufp->atr] != ufp->atr ) {
             ufp->atr = used_table[ufp->atr];
         }
     }
-    for( cmdp = ( CMDENT * ) hash_firstentry( &mudstate.command_htab );
+    for( cmdp = ( CMDENT *) hash_firstentry( &mudstate.command_htab );
             cmdp != NULL;
-            cmdp = ( CMDENT * ) hash_nextentry( &mudstate.command_htab ) ) {
+            cmdp = ( CMDENT *) hash_nextentry( &mudstate.command_htab ) ) {
         if( cmdp->pre_hook ) {
             if( used_table[cmdp->pre_hook->atr] !=
                     cmdp->pre_hook->atr )
@@ -334,7 +339,7 @@ void do_dbclean( dbref player, dbref cause, int key ) {
                     used_table[cmdp->userperms->atr];
         }
         if( cmdp->callseq & CS_ADDED ) {
-            for( addp = ( ADDENT * ) cmdp->info.added;
+            for( addp = ( ADDENT *) cmdp->info.added;
                     addp != NULL; addp = addp->next ) {
                 if( used_table[addp->atr] != addp->atr ) {
                     addp->atr = used_table[addp->atr];
@@ -353,7 +358,7 @@ void do_dbclean( dbref player, dbref cause, int key ) {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cleaned %d user attribute slots (reduced to %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched). Table size reduced from %d to %d.", n_oldtotal - A_USER_START, mudstate.attr_next - A_USER_START, n_deleted, n_renumbered, n_objt, n_atrt, n_oldtop, anum_alc_top );
     } else {
         notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).", n_oldtotal, mudstate.attr_next, n_deleted, n_renumbered, n_objt, n_atrt );
-        
+
     }
 
     raw_broadcast( 0, "GAME: Database cleaning complete." );
@@ -361,7 +366,8 @@ void do_dbclean( dbref player, dbref cause, int key ) {
 }
 #endif				/* NEVER */
 
-void vattr_delete( char *name ) {
+void vattr_delete( char *name )
+{
     VATTR *vp;
 
     int number;
@@ -373,7 +379,7 @@ void vattr_delete( char *name ) {
 
     number = 0;
 
-    vp = ( VATTR * ) hashfind( name, &mudstate.vattr_name_htab );
+    vp = ( VATTR *) hashfind( name, &mudstate.vattr_name_htab );
 
     if( vp ) {
         number = vp->number;
@@ -385,7 +391,8 @@ void vattr_delete( char *name ) {
     return;
 }
 
-VATTR *vattr_rename( char *name, char *newname ) {
+VATTR *vattr_rename( char *name, char *newname )
+{
     VATTR *vp;
 
     fixcase( name );
@@ -411,30 +418,33 @@ VATTR *vattr_rename( char *name, char *newname ) {
      * * since we are changing the data.
      */
 
-    vp = ( VATTR * ) hashfind( name, &mudstate.vattr_name_htab );
+    vp = ( VATTR *) hashfind( name, &mudstate.vattr_name_htab );
 
     if( vp ) {
         vp->name = store_string( newname );
         hashdelete( name, &mudstate.vattr_name_htab );
-        hashadd( newname, ( int * ) vp, &mudstate.vattr_name_htab, 0 );
+        hashadd( newname, ( int *) vp, &mudstate.vattr_name_htab, 0 );
     }
 
     return ( vp );
 }
 
-VATTR *vattr_first( void ) {
-    return ( VATTR * ) hash_firstentry( &mudstate.vattr_name_htab );
+VATTR *vattr_first( void )
+{
+    return ( VATTR *) hash_firstentry( &mudstate.vattr_name_htab );
 }
 
-VATTR *vattr_next( VATTR *vp ) {
+VATTR *vattr_next( VATTR *vp )
+{
     if( vp == NULL ) {
         return ( vattr_first() );
     }
 
-    return ( ( VATTR * ) hash_nextentry( &mudstate.vattr_name_htab ) );
+    return ( ( VATTR *) hash_nextentry( &mudstate.vattr_name_htab ) );
 }
 
-static void fixcase( char *name ) {
+static void fixcase( char *name )
+{
     char *cp = name;
 
     while( *cp ) {
@@ -451,7 +461,8 @@ static void fixcase( char *name ) {
  * keep forever. There is no freeing mechanism.
  */
 
-static char *store_string( char *str ) {
+static char *store_string( char *str )
+{
     int len;
 
     char *ret;
@@ -464,9 +475,9 @@ static char *store_string( char *str ) {
      */
 
     if( !stringblock || ( STRINGBLOCK - stringblock_hwm ) < ( len + 1 ) ) {
-        stringblock = ( char * ) XMALLOC( STRINGBLOCK, "store_string" );
+        stringblock = ( char *) XMALLOC( STRINGBLOCK, "store_string" );
         if( !stringblock ) {
-            return ( ( char * ) 0 );
+            return ( ( char *) 0 );
         }
         stringblock_hwm = 0;
     }

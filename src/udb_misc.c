@@ -23,7 +23,8 @@
  * Log database errors
  */
 
-void log_db_err( int obj, int attr, const char *txt ) {
+void log_db_err( int obj, int attr, const char *txt )
+{
     if( !mudstate.standalone ) {
         if( attr != NOTHING ) {
             log_write( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
@@ -45,22 +46,23 @@ void log_db_err( int obj, int attr, const char *txt ) {
 /*
  * VARARGS
  */
-void warning( char *p, ... ) {
+void warning( char *p, ... )
+{
     va_list ap;
 
     va_start( ap, p );
 
     while( 1 ) {
-        if( p == ( char * ) 0 ) {
+        if( p == ( char *) 0 ) {
             break;
         }
 
-        if( p == ( char * )-1 ) {
-            p = ( char * ) strerror( errno );
+        if( p == ( char *)-1 ) {
+            p = ( char *) strerror( errno );
         }
 
         log_write_raw( 1, "%s", p );
-        p = va_arg( ap, char * );
+        p = va_arg( ap, char *);
     }
     va_end( ap );
 }
@@ -71,22 +73,23 @@ void warning( char *p, ... ) {
 /*
  * VARARGS
  */
-void fatal( char *p, ... ) {
+void fatal( char *p, ... )
+{
     va_list ap;
 
     va_start( ap, p );
 
     while( 1 ) {
-        if( p == ( char * ) 0 ) {
+        if( p == ( char *) 0 ) {
             break;
         }
 
-        if( p == ( char * )-1 ) {
-            p = ( char * ) strerror( errno );
+        if( p == ( char *)-1 ) {
+            p = ( char *) strerror( errno );
         }
 
         log_write_raw( 1, "%s", p );
-        p = va_arg( ap, char * );
+        p = va_arg( ap, char *);
     }
     va_end( ap );
     exit( 1 );

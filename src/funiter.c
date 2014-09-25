@@ -29,7 +29,8 @@
  * notes on perform_iter for the explanation.
  */
 
-void perform_loop( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void perform_loop( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int flag;		/* 0 is parse(), 1 is loop() */
@@ -111,7 +112,8 @@ void perform_loop( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * iter2(), list2(), etc. are two-list versions of all of the above.
  */
 
-void perform_iter( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void perform_iter( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int flag;		/* 0 is iter(), 1 is list() */
@@ -289,14 +291,16 @@ void perform_iter( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * itext(), inum(), ilev(): Obtain nested iter tokens (##, #@, #!).
  */
 
-void fun_ilev( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ilev( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, mudstate.in_loop - 1 );
 }
 
-void fun_inum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_inum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int lev;
 
-    lev = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    lev = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     if( ( lev > mudstate.in_loop - 1 ) || ( lev < 0 ) ) {
         safe_chr( '0', buff, bufc );
         return;
@@ -304,10 +308,11 @@ void fun_inum( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     safe_ltos( buff, bufc, mudstate.loop_number[lev] );
 }
 
-void fun_itext( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_itext( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int lev;
 
-    lev = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    lev = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     if( ( lev > mudstate.in_loop - 1 ) || ( lev < 0 ) ) {
         return;
     }
@@ -315,10 +320,11 @@ void fun_itext( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     safe_str( mudstate.loop_token[lev], buff, bufc );
 }
 
-void fun_itext2( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_itext2( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int lev;
 
-    lev = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    lev = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     if( ( lev > mudstate.in_loop - 1 ) || ( lev < 0 ) ) {
         return;
     }
@@ -326,10 +332,11 @@ void fun_itext2( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     safe_str( mudstate.loop_token2[lev], buff, bufc );
 }
 
-void fun_ibreak( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ibreak( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int lev;
 
-    lev = mudstate.in_loop - 1 - ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+    lev = mudstate.in_loop - 1 - ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     if( ( lev > mudstate.in_loop - 1 ) || ( lev < 0 ) ) {
         return;
     }
@@ -351,7 +358,8 @@ void fun_ibreak( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * NOTE: To use added list separator, you must use base case!
  */
 
-void fun_fold( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_fold( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int aflags, alen, anum, i;
@@ -448,7 +456,8 @@ void fun_fold( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * NOTE:  If you specify a separator it is used to delimit returned list
  */
 
-void handle_filter( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void handle_filter( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     int flag;		/* 0 is filter(), 1 is filterbool() */
@@ -515,7 +524,8 @@ void handle_filter( char *buff, char **bufc, dbref player, dbref caller, dbref c
  *
  */
 
-void fun_map( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_map( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int aflags, alen, anum;
@@ -578,7 +588,8 @@ void fun_map( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * passing the elements as %0, %1, %2, etc.
  */
 
-void fun_mix( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_mix( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int aflags, alen, anum, i, lastn, nwords, wc;
@@ -670,7 +681,8 @@ void fun_mix( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * step(<attribute>,<list>,<step size>,<delim>,<outdelim>)
  */
 
-void fun_step( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_step( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     ATTR *ap;
 
     dbref aowner, thing;
@@ -685,7 +697,7 @@ void fun_step( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     VaChk_Only_In_Out( 5 );
 
-    step_size = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    step_size = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
     if( ( step_size < 1 ) || ( step_size > NUM_ENV_VARS ) ) {
         notify( player, "Illegal step size." );
         return;
@@ -724,7 +736,8 @@ void fun_step( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * delimiter is inserted between the results.
  */
 
-void fun_foreach( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_foreach( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int aflags, alen, anum, i;
@@ -818,7 +831,8 @@ void fun_foreach( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_munge: combines two lists in an arbitrary manner.
  */
 
-void fun_munge( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_munge( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     dbref aowner, thing;
 
     int aflags, alen, anum, nptrs1, nptrs2, nresults, i, j;
@@ -920,7 +934,8 @@ void fun_munge( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * match.
  */
 
-void fun_while( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_while( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim isep, osep;
 
     dbref aowner1, thing1, aowner2, thing2;

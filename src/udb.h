@@ -104,8 +104,8 @@ extern int	cache_put( DBData, DBData, unsigned int );
 extern void	cache_del( DBData, unsigned int );
 extern void	attrib_sync( void );
 extern char	*pipe_get_attrib( int, int );
-extern void	pipe_set_attrib( int, int, char * );
+extern void	pipe_set_attrib( int, int, char *);
 extern void	pipe_del_attrib( int, int );
-extern int	obj_siz( Obj * );
+extern int	obj_siz( Obj *);
 
 #endif	/* __UDB_H */

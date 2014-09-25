@@ -67,6 +67,11 @@ if WANT_MODULE_DB_SQL
  SUBDIRS		+= modules/db_sql/
 endif
 
+astyle:
+	for i in $(netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES) ; do \
+	astyle --mode=c --indent=spaces --style=kr $$i; \
+	done; 
+
 do_subst = $(SED) \
 	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
 	-e 's|[@]with_compress_prog@|$(with_compress_prog)|g' \

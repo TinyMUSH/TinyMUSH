@@ -28,14 +28,15 @@
 #include "malloc.h"
 #endif
 
-extern int decode_power( dbref, char *, POWERSET * );
+extern int decode_power( dbref, char *, POWERSET *);
 
 /*
  * Bind occurances of the universal var in ACTION to ARG, then run ACTION.
  * * Cmds run in low-prio Q after a 1 sec delay for the first one.
  */
 
-static void bind_and_queue( dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now ) {
+static void bind_and_queue( dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now )
+{
     char *command, *command2;	/* allocated by replace_string */
     char s[SBUF_SIZE];
 
@@ -59,7 +60,8 @@ static void bind_and_queue( dbref player, dbref cause, char *action, char *argst
  * * and /delimit allows specification of a delimiter.
  */
 
-void do_dolist( dbref player, dbref cause, int key, char *list, char *command, char *cargs[], int ncargs ) {
+void do_dolist( dbref player, dbref cause, int key, char *list, char *command, char *cargs[], int ncargs )
+{
     char *tbuf, *curr, *objstring, delimiter = ' ';
 
     int number = 0, now;
@@ -96,7 +98,7 @@ void do_dolist( dbref player, dbref cause, int key, char *list, char *command, c
     }
     if( key & DOLIST_NOTIFY ) {
         tbuf = alloc_lbuf( "dolist.notify_cmd" );
-        strcpy( tbuf, ( char * ) "@notify me" );
+        strcpy( tbuf, ( char *) "@notify me" );
         wait_que( player, cause, 0, NOTHING, A_SEMAPHORE, tbuf,
                   cargs, ncargs, mudstate.rdata );
         free_lbuf( tbuf );
@@ -107,7 +109,8 @@ void do_dolist( dbref player, dbref cause, int key, char *list, char *command, c
  * Regular @find command
  */
 
-void do_find( dbref player, dbref cause, int key, char *name ) {
+void do_find( dbref player, dbref cause, int key, char *name )
+{
     dbref i, low_bound, high_bound;
 
     char *buff;
@@ -134,7 +137,8 @@ void do_find( dbref player, dbref cause, int key, char *name ) {
  * * get_stats, do_stats: Get counts of items in the db.
  */
 
-int get_stats( dbref player, dbref who, STATS *info ) {
+int get_stats( dbref player, dbref who, STATS *info )
+{
     dbref i;
 
     info->s_total = 0;
@@ -193,7 +197,8 @@ int get_stats( dbref player, dbref who, STATS *info ) {
     return 1;
 }
 
-void do_stats( dbref player, dbref cause, int key, char *name ) {
+void do_stats( dbref player, dbref cause, int key, char *name )
+{
 
     /*
      * reworked by R'nice
@@ -250,7 +255,8 @@ void do_stats( dbref player, dbref cause, int key, char *name ) {
 #endif /* MCHECK */
 }
 
-int chown_all( dbref from_player, dbref to_player, dbref acting_player, int key ) {
+int chown_all( dbref from_player, dbref to_player, dbref acting_player, int key )
+{
     register int i, count = 0, q_t = 0, q_p = 0, q_r = 0, q_e = 0;
 
     int fword1, fword2, fword3, strip_powers;
@@ -329,7 +335,8 @@ int chown_all( dbref from_player, dbref to_player, dbref acting_player, int key 
     return count;
 }
 
-void do_chownall( dbref player, dbref cause, int key, char *from, char *to ) {
+void do_chownall( dbref player, dbref cause, int key, char *from, char *to )
+{
     int count;
 
     dbref victim, recipient;
@@ -362,7 +369,8 @@ void do_chownall( dbref player, dbref cause, int key, char *from, char *to ) {
 
 #define ANY_OWNER -2
 
-void er_mark_disabled( dbref player ) {
+void er_mark_disabled( dbref player )
+{
     notify( player, "The mark commands are not allowed while DB cleaning is enabled." );
     notify( player, "Use the '@disable cleaning' command to disable automatic cleaning." );
     notify( player, "Remember to '@unmark_all' before re-enabling automatic cleaning." );
@@ -375,7 +383,8 @@ void er_mark_disabled( dbref player ) {
  * * mark bits)
  */
 
-int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
+int search_setup( dbref player, char *searchfor, SEARCH *parm )
+{
     char *pname, *searchtype, *t;
 
     int err;
@@ -392,7 +401,7 @@ int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
 
     pname = parse_to( &searchfor, '=', EV_STRIP_TS );
     if( !pname || !*pname ) {
-        pname = ( char * ) "me";
+        pname = ( char *) "me";
     } else
         for( t = pname; *t; t++ ) {
             if( isupper( *t ) ) {
@@ -406,10 +415,10 @@ int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
             *searchtype++ = '\0';
         } else {
             searchtype = pname;
-            pname = ( char * ) "";
+            pname = ( char *) "";
         }
     } else {
-        searchtype = ( char * ) "";
+        searchtype = ( char *) "";
     }
 
     /*
@@ -439,7 +448,7 @@ int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
     if( !*pname ) {
         parm->s_rst_owner = parm->s_wizard ? ANY_OWNER : player;
     } else if( pname[0] == '#' ) {
-        parm->s_rst_owner = ( int ) strtol( &pname[1], ( char ** ) NULL, 10 );
+        parm->s_rst_owner = ( int ) strtol( &pname[1], ( char **) NULL, 10 );
         if( !Good_obj( parm->s_rst_owner ) ) {
             parm->s_rst_owner = NOTHING;
         } else if( Typeof( parm->s_rst_owner ) != TYPE_PLAYER ) {
@@ -588,7 +597,7 @@ int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
                 }
             } else {
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%s: unknown type", searchfor );
-                
+
                 return 0;
             }
         } else if( string_prefix( "things", searchtype ) ) {
@@ -684,7 +693,8 @@ int search_setup( dbref player, char *searchfor, SEARCH *parm ) {
     return 1;
 }
 
-void search_perform( dbref player, dbref cause, SEARCH *parm ) {
+void search_perform( dbref player, dbref cause, SEARCH *parm )
+{
     FLAG thing1flags, thing2flags, thing3flags;
 
     POWER thing1powers, thing2powers;
@@ -777,7 +787,7 @@ void search_perform( dbref player, dbref cause, SEARCH *parm ) {
          */
 
         if( parm->s_rst_name != NULL ) {
-            if( !string_prefix( ( char * ) PureName( thing ),
+            if( !string_prefix( ( char *) PureName( thing ),
                                 parm->s_rst_name ) ) {
                 continue;
             }
@@ -797,7 +807,7 @@ void search_perform( dbref player, dbref cause, SEARCH *parm ) {
             str = buff2;
             exec( result, &bp, player, cause, cause,
                   EV_FCHECK | EV_EVAL | EV_NOTRACE, &str,
-                  ( char ** ) NULL, 0 );
+                  ( char **) NULL, 0 );
             free_lbuf( buff2 );
             if( !*result || !xlate( result ) ) {
                 free_lbuf( result );
@@ -839,7 +849,8 @@ void search_perform( dbref player, dbref cause, SEARCH *parm ) {
     mudstate.func_invk_ctr = save_invk_ctr;
 }
 
-static void search_mark( dbref player, int key ) {
+static void search_mark( dbref player, int key )
+{
     dbref thing;
 
     int nchanged, is_marked;
@@ -872,7 +883,8 @@ static void search_mark( dbref player, int key ) {
     return;
 }
 
-void do_search( dbref player, dbref cause, int key, char *arg ) {
+void do_search( dbref player, dbref cause, int key, char *arg )
+{
     int flag, destitute;
 
     int rcount, ecount, tcount, pcount, gcount;
@@ -953,13 +965,13 @@ void do_search( dbref player, dbref cause, int key, char *arg ) {
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
 
-            safe_str( ( char * ) " [from ", outbuf, &bp );
+            safe_str( ( char *) " [from ", outbuf, &bp );
             buff = unparse_object( player, from, 0 );
             safe_str( ( ( from == NOTHING ) ? "NOWHERE" : buff ),
                       outbuf, &bp );
             free_lbuf( buff );
 
-            safe_str( ( char * ) " to ", outbuf, &bp );
+            safe_str( ( char *) " to ", outbuf, &bp );
             buff = unparse_object( player, to, 0 );
             safe_str( ( ( to == NOTHING ) ? "NOWHERE" : buff ),
                       outbuf, &bp );
@@ -992,7 +1004,7 @@ void do_search( dbref player, dbref cause, int key, char *arg ) {
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
 
-            safe_str( ( char * ) " [owner: ", outbuf, &bp );
+            safe_str( ( char *) " [owner: ", outbuf, &bp );
             buff = unparse_object( player, Owner( thing ), 0 );
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
@@ -1024,7 +1036,7 @@ void do_search( dbref player, dbref cause, int key, char *arg ) {
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
 
-            safe_str( ( char * ) " [owner: ", outbuf, &bp );
+            safe_str( ( char *) " [owner: ", outbuf, &bp );
             buff = unparse_object( player, Owner( thing ), 0 );
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
@@ -1056,7 +1068,7 @@ void do_search( dbref player, dbref cause, int key, char *arg ) {
             safe_str( buff, outbuf, &bp );
             free_lbuf( buff );
             if( searchparm.s_wizard ) {
-                safe_str( ( char * ) " [location: ", outbuf, &bp );
+                safe_str( ( char *) " [location: ", outbuf, &bp );
                 buff = unparse_object( player,
                                        Location( thing ), 0 );
                 safe_str( buff, outbuf, &bp );
@@ -1088,7 +1100,8 @@ void do_search( dbref player, dbref cause, int key, char *arg ) {
  * do_floaters: Report floating rooms.
  */
 
-static void mark_place( dbref loc ) {
+static void mark_place( dbref loc )
+{
     dbref exit;
 
     /*
@@ -1114,7 +1127,8 @@ static void mark_place( dbref loc ) {
     }
 }
 
-void do_floaters( dbref player, dbref cause, int key, char *name ) {
+void do_floaters( dbref player, dbref cause, int key, char *name )
+{
     dbref owner, i, total;
 
     char *buff;
@@ -1187,7 +1201,8 @@ void do_floaters( dbref player, dbref cause, int key, char *name ) {
  * * do_markall: set or clear the mark bits of all objects in the db.
  */
 
-void do_markall( dbref player, dbref cause, int key ) {
+void do_markall( dbref player, dbref cause, int key )
+{
     int i;
 
     if( mudconf.control_flags & CF_DBCHECK ) {
@@ -1209,7 +1224,8 @@ void do_markall( dbref player, dbref cause, int key ) {
  * * do_apply_marked: Perform a command for each marked obj in the db.
  */
 
-void do_apply_marked( dbref player, dbref cause, int key, char *command, char *cargs[], int ncargs ) {
+void do_apply_marked( dbref player, dbref cause, int key, char *command, char *cargs[], int ncargs )
+{
     char *buff;
 
     int i;
@@ -1245,10 +1261,11 @@ void do_apply_marked( dbref player, dbref cause, int key, char *command, char *c
  * olist_push: Create a new object list at the top of the object list stack
  */
 
-void olist_push( void ) {
+void olist_push( void )
+{
     OLSTK *ol;
 
-    ol = ( OLSTK * ) XMALLOC( sizeof( OLSTK ), "olist_push" );
+    ol = ( OLSTK *) XMALLOC( sizeof( OLSTK ), "olist_push" );
     ol->next = mudstate.olist;
     mudstate.olist = ol;
 
@@ -1263,7 +1280,8 @@ void olist_push( void ) {
  * olist_pop: Pop one entire list off the object list stack
  */
 
-void olist_pop( void ) {
+void olist_pop( void )
+{
     OLSTK *ol;
 
     OBLOCK *op, *onext;
@@ -1282,16 +1300,17 @@ void olist_pop( void ) {
  * olist_add: Add an entry to the object list
  */
 
-void olist_add( dbref item ) {
+void olist_add( dbref item )
+{
     OBLOCK *op;
 
     if( !mudstate.olist->head ) {
-        op = ( OBLOCK * ) alloc_lbuf( "olist_add.first" );
+        op = ( OBLOCK *) alloc_lbuf( "olist_add.first" );
         mudstate.olist->head = mudstate.olist->tail = op;
         mudstate.olist->count = 0;
         op->next = NULL;
     } else if( mudstate.olist->count >= OBLOCK_SIZE ) {
-        op = ( OBLOCK * ) alloc_lbuf( "olist_add.next" );
+        op = ( OBLOCK *) alloc_lbuf( "olist_add.next" );
         mudstate.olist->tail->next = op;
         mudstate.olist->tail = op;
         mudstate.olist->count = 0;
@@ -1306,7 +1325,8 @@ void olist_add( dbref item ) {
  * olist_first: Return the first entry in the object list
  */
 
-dbref olist_first( void ) {
+dbref olist_first( void )
+{
     if( !mudstate.olist->head ) {
         return NOTHING;
     }
@@ -1319,7 +1339,8 @@ dbref olist_first( void ) {
     return mudstate.olist->cblock->data[mudstate.olist->citm++];
 }
 
-dbref olist_next( void ) {
+dbref olist_next( void )
+{
     dbref thing;
 
     if( !mudstate.olist->cblock ) {

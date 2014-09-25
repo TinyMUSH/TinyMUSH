@@ -33,7 +33,7 @@ extern void pcache_trim( void );
 
 extern void do_dbck( dbref, dbref, int );
 
-extern void do_queue( dbref, dbref, int, char * );
+extern void do_queue( dbref, dbref, int, char *);
 
 /* ---------------------------------------------------------------------------
  * Cron-related things. This implementation is somewhat derivative of
@@ -85,7 +85,8 @@ CRONTAB *cron_head = NULL;
 #define set_cronbits(b,l,h,n) \
         if (((n) >= (l)) && ((n) <= (h))) bit_set((b), (n) - (l));
 
-static void check_cron( void ) {
+static void check_cron( void )
+{
     struct tm *ltime;
 
     int minute, hour, dom, month, dow;
@@ -128,14 +129,15 @@ static void check_cron( void ) {
                           &alen );
             if( *cmd && Good_obj( crp->obj ) ) {
                 wait_que( crp->obj, crp->obj, 0, NOTHING, 0,
-                          cmd, ( char ** ) NULL, 0, NULL );
+                          cmd, ( char **) NULL, 0, NULL );
             }
             free_lbuf( cmd );
         }
     }
 }
 
-static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, char *bufp ) {
+static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, char *bufp )
+{
     int i, n_begin, n_end, step_size;
 
     bit_nclear( bits, 0, ( high - low + 1 ) );	/* Default is all off */
@@ -160,7 +162,7 @@ static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, ch
             n_end = high;
             bufp++;
         } else if( isdigit( *bufp ) ) {
-            n_begin = ( int ) strtol( bufp, ( char ** ) NULL, 10 );
+            n_begin = ( int ) strtol( bufp, ( char **) NULL, 10 );
             while( *bufp && isdigit( *bufp ) ) {
                 bufp++;
             }
@@ -174,7 +176,7 @@ static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, ch
                  * Eat the dash, get the range.
                  */
                 bufp++;
-                n_end = ( int ) strtol( bufp, ( char ** ) NULL, 10 );
+                n_end = ( int ) strtol( bufp, ( char **) NULL, 10 );
                 while( *bufp && isdigit( *bufp ) ) {
                     bufp++;
                 }
@@ -190,7 +192,7 @@ static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, ch
 
         if( *bufp == '/' ) {
             bufp++;	/* eat the slash */
-            step_size = ( int ) strtol( bufp, ( char ** ) NULL, 10 );
+            step_size = ( int ) strtol( bufp, ( char **) NULL, 10 );
             if( step_size < 1 ) {
                 notify( player, "Invalid step size." );
                 return NULL;
@@ -242,7 +244,8 @@ static char *parse_cronlist( dbref player, bitstr_t *bits, int low, int high, ch
     return bufp;
 }
 
-int call_cron( dbref player, dbref thing, int attrib, char *timestr ) {
+int call_cron( dbref player, dbref thing, int attrib, char *timestr )
+{
     int errcode;
 
     CRONTAB *crp;
@@ -260,7 +263,7 @@ int call_cron( dbref player, dbref thing, int attrib, char *timestr ) {
         }
     }
 
-    crp = ( CRONTAB * ) XMALLOC( sizeof( CRONTAB ), "cron_entry" );
+    crp = ( CRONTAB *) XMALLOC( sizeof( CRONTAB ), "cron_entry" );
     crp->obj = thing;
     crp->atr = attrib;
     crp->flags = 0;
@@ -343,7 +346,8 @@ int call_cron( dbref player, dbref thing, int attrib, char *timestr ) {
     return 1;
 }
 
-void do_cron( dbref player, dbref cause, int key, char *objstr, char *timestr ) {
+void do_cron( dbref player, dbref cause, int key, char *objstr, char *timestr )
+{
     dbref thing;
 
     int attrib, retcode;
@@ -374,7 +378,8 @@ void do_cron( dbref player, dbref cause, int key, char *objstr, char *timestr ) 
     }
 }
 
-int cron_clr( dbref thing, int attr ) {
+int cron_clr( dbref thing, int attr )
+{
     CRONTAB *crp, *next, *prev;
 
     int count;
@@ -401,7 +406,8 @@ int cron_clr( dbref thing, int attr ) {
     return count;
 }
 
-void do_crondel( dbref player, dbref cause, int key, char *objstr ) {
+void do_crondel( dbref player, dbref cause, int key, char *objstr )
+{
     dbref thing;
 
     int attr, count;
@@ -429,7 +435,8 @@ void do_crondel( dbref player, dbref cause, int key, char *objstr ) {
     notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Removed %d cron entries.", count );
 }
 
-void do_crontab( dbref player, dbref cause, int key, char *objstr ) {
+void do_crontab( dbref player, dbref cause, int key, char *objstr )
+{
     dbref thing;
 
     int count;
@@ -482,7 +489,8 @@ void do_crontab( dbref player, dbref cause, int key, char *objstr ) {
  * General timer things.
  */
 
-void  init_timer( void ) {
+void  init_timer( void )
+{
     mudstate.now = time( NULL );
     mudstate.dump_counter = ( ( mudconf.dump_offset == 0 ) ?
                               mudconf.dump_interval : mudconf.dump_offset ) + mudstate.now;
@@ -501,11 +509,12 @@ void  init_timer( void ) {
     alarm( 1 );
 }
 
-void dispatch( void ) {
+void dispatch( void )
+{
     char *cmdsave;
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< dispatch >";
+    mudstate.debug_cmd = ( char *) "< dispatch >";
 
     /*
      * This routine can be used to poll from interface.c
@@ -532,7 +541,7 @@ void dispatch( void ) {
     if( ( mudconf.control_flags & CF_DBCHECK ) &&
             ( mudstate.check_counter <= mudstate.now ) ) {
         mudstate.check_counter = mudconf.check_interval + mudstate.now;
-        mudstate.debug_cmd = ( char * ) "< dbck >";
+        mudstate.debug_cmd = ( char *) "< dbck >";
         do_dbck( NOTHING, NOTHING, 0 );
         SYNC;
         pcache_trim();
@@ -546,7 +555,7 @@ void dispatch( void ) {
     if( ( mudconf.control_flags & CF_CHECKPOINT ) &&
             ( mudstate.dump_counter <= mudstate.now ) ) {
         mudstate.dump_counter = mudconf.dump_interval + mudstate.now;
-        mudstate.debug_cmd = ( char * ) "< dump >";
+        mudstate.debug_cmd = ( char *) "< dump >";
         fork_and_dump( NOTHING, NOTHING, 0 );
     }
 
@@ -557,7 +566,7 @@ void dispatch( void ) {
     if( ( mudconf.control_flags & CF_IDLECHECK ) &&
             ( mudstate.idle_counter <= mudstate.now ) ) {
         mudstate.idle_counter = mudconf.idle_interval + mudstate.now;
-        mudstate.debug_cmd = ( char * ) "< idlecheck >";
+        mudstate.debug_cmd = ( char *) "< idlecheck >";
         check_idle();
 
     }
@@ -568,7 +577,7 @@ void dispatch( void ) {
 
     if( mudconf.control_flags & CF_EVENTCHECK ) {
         if( mudstate.now >= mudstate.events_counter ) {
-            mudstate.debug_cmd = ( char * ) "< croncheck >";
+            mudstate.debug_cmd = ( char *) "< croncheck >";
             check_cron();
             mudstate.events_counter += 60;
         }
@@ -613,10 +622,11 @@ void dispatch( void ) {
  * * do_timewarp: Adjust various internal timers.
  */
 
-void do_timewarp( dbref player, dbref cause, int key, char *arg ) {
+void do_timewarp( dbref player, dbref cause, int key, char *arg )
+{
     int secs;
 
-    secs = ( int ) strtol( arg, ( char ** ) NULL, 10 );
+    secs = ( int ) strtol( arg, ( char **) NULL, 10 );
 
     if( ( key == 0 ) || ( key & TWARP_QUEUE ) )	/*
 						 * Sem/Wait queues

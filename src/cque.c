@@ -38,7 +38,8 @@ static int qpid_top = 1;
  * Delete and free a queue entry.
  */
 
-static void delete_qentry( BQUE *qptr ) {
+static void delete_qentry( BQUE *qptr )
+{
     nhashdelete( qptr->pid, &mudstate.qpid_htab );
     Free_QData( qptr );
     free_qentry( qptr );
@@ -49,7 +50,8 @@ static void delete_qentry( BQUE *qptr ) {
  * add_to: Adjust an object's queue or semaphore count.
  */
 
-static int add_to( dbref doer, dbref player, int am, int attrnum ) {
+static int add_to( dbref doer, dbref player, int am, int attrnum )
+{
     int num, aflags, alen;
 
     dbref aowner;
@@ -58,7 +60,7 @@ static int add_to( dbref doer, dbref player, int am, int attrnum ) {
 
     char *atr_gotten;
 
-    num = ( int ) strtol( atr_gotten = atr_get( player, attrnum, &aowner, &aflags, &alen ), ( char ** ) NULL, 10 );
+    num = ( int ) strtol( atr_gotten = atr_get( player, attrnum, &aowner, &aflags, &alen ), ( char **) NULL, 10 );
     free_lbuf( atr_gotten );
     num += am;
     if( num ) {
@@ -75,7 +77,8 @@ static int add_to( dbref doer, dbref player, int am, int attrnum ) {
  * give_que: Thread a queue block onto the high or low priority queue
  */
 
-static void give_que( BQUE *tmp ) {
+static void give_que( BQUE *tmp )
+{
     tmp->next = NULL;
     tmp->waittime = 0;
 
@@ -105,7 +108,8 @@ static void give_que( BQUE *tmp ) {
  * que_want: Do we want this queue entry?
  */
 
-int que_want( BQUE *entry, dbref ptarg, dbref otarg ) {
+int que_want( BQUE *entry, dbref ptarg, dbref otarg )
+{
     if( !Good_obj( entry->player ) ) {
         return 0;
     }
@@ -123,7 +127,8 @@ int que_want( BQUE *entry, dbref ptarg, dbref otarg ) {
  * halt_que: Remove all queued commands from a certain player
  */
 
-int halt_que( dbref player, dbref object ) {
+int halt_que( dbref player, dbref object )
+{
     BQUE *trail, *point, *next;
 
     int numhalted, halt_all, i;
@@ -133,8 +138,8 @@ int halt_que( dbref player, dbref object ) {
     numhalted = 0;
     halt_all = ( ( player == NOTHING ) && ( object == NOTHING ) ) ? 1 : 0;
     if( halt_all )
-        dbrefs_array = ( int * ) XCALLOC( mudstate.db_top, sizeof( int ),
-                                          "halt_que.dbrefs" );
+        dbrefs_array = ( int *) XCALLOC( mudstate.db_top, sizeof( int ),
+                                         "halt_que.dbrefs" );
 
     /*
      * Player queue
@@ -232,7 +237,8 @@ int halt_que( dbref player, dbref object ) {
  * remove_waitq: Remove an entry from the wait queue.
  */
 
-static void remove_waitq( BQUE *qptr ) {
+static void remove_waitq( BQUE *qptr )
+{
     BQUE *point, *trail;
 
     if( qptr == mudstate.qwait ) {
@@ -260,7 +266,8 @@ static void remove_waitq( BQUE *qptr ) {
  * do_halt_pid: Halt a single queue entry.
  */
 
-static void do_halt_pid( dbref player, dbref cause, int key, char *pidstr ) {
+static void do_halt_pid( dbref player, dbref cause, int key, char *pidstr )
+{
     dbref victim;
 
     int qpid;
@@ -271,12 +278,12 @@ static void do_halt_pid( dbref player, dbref cause, int key, char *pidstr ) {
         notify( player, "That is not a valid PID." );
         return;
     }
-    qpid = ( int ) strtol( pidstr, ( char ** ) NULL, 10 );
+    qpid = ( int ) strtol( pidstr, ( char **) NULL, 10 );
     if( ( qpid < 1 ) || ( qpid > mudconf.max_qpid ) ) {
         notify( player, "That is not a valid PID." );
         return;
     }
-    qptr = ( BQUE * ) nhashfind( qpid, &mudstate.qpid_htab );
+    qptr = ( BQUE *) nhashfind( qpid, &mudstate.qpid_htab );
     if( !qptr ) {
         notify( player,
                 "That PID is not associated with an active queue entry." );
@@ -331,7 +338,8 @@ static void do_halt_pid( dbref player, dbref cause, int key, char *pidstr ) {
  * do_halt: Command interface to halt_que.
  */
 
-void do_halt( dbref player, dbref cause, int key, char *target ) {
+void do_halt( dbref player, dbref cause, int key, char *target )
+{
     dbref player_targ, obj_targ;
 
     int numhalted;
@@ -386,8 +394,9 @@ void do_halt( dbref player, dbref cause, int key, char *target ) {
     }
     if( numhalted == 1 ) {
         notify( Owner( player ), "1 queue entries removed." );
-    } else
+    } else {
         notify_check( Owner( player ), Owner( player ), MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d queue entries removed.", numhalted );
+    }
 }
 
 /*
@@ -395,7 +404,8 @@ void do_halt( dbref player, dbref cause, int key, char *target ) {
  * nfy_que: Notify commands from the queue and perform or discard them.
  */
 
-int nfy_que( dbref player, dbref sem, int attr, int key, int count ) {
+int nfy_que( dbref player, dbref sem, int attr, int key, int count )
+{
     BQUE *point, *trail, *next;
 
     int num, aflags, alen;
@@ -406,7 +416,7 @@ int nfy_que( dbref player, dbref sem, int attr, int key, int count ) {
 
     if( attr ) {
         str = atr_get( sem, attr, &aowner, &aflags, &alen );
-        num = ( int ) strtol( str, ( char ** ) NULL, 10 );;
+        num = ( int ) strtol( str, ( char **) NULL, 10 );;
         free_lbuf( str );
     } else {
         num = 1;
@@ -474,7 +484,8 @@ int nfy_que( dbref player, dbref sem, int attr, int key, int count ) {
  * do_notify: Command interface to nfy_que
  */
 
-void do_notify( dbref player, dbref cause, int key, char *what, char *count ) {
+void do_notify( dbref player, dbref cause, int key, char *what, char *count )
+{
     dbref thing, aowner;
 
     int loccount, attr, aflags;
@@ -514,7 +525,7 @@ void do_notify( dbref player, dbref cause, int key, char *what, char *count ) {
         }
 
         if( count && *count ) {
-            loccount = ( int ) strtol( count, ( char ** ) NULL, 10 );
+            loccount = ( int ) strtol( count, ( char **) NULL, 10 );
         } else {
             loccount = 1;
         }
@@ -536,7 +547,8 @@ void do_notify( dbref player, dbref cause, int key, char *what, char *count ) {
  * Get the next available queue PID.
  */
 
-static int qpid_next( void ) {
+static int qpid_next( void )
+{
     int i;
 
     int qpid = qpid_top;
@@ -560,7 +572,8 @@ static int qpid_next( void ) {
  * setup_que: Set up a queue entry.
  */
 
-static BQUE *setup_que( dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs ) {
+static BQUE *setup_que( dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs )
+{
     int a, tlen, qpid;
 
     BQUE *tmp;
@@ -652,9 +665,9 @@ static BQUE *setup_que( dbref player, dbref cause, char *command, char *args[], 
      */
 
     tmp = alloc_qentry( "setup_que.qblock" );
-    if( !( tptr = tmp->text = ( char * ) XMALLOC( tlen, "setup_que" ) ) ) {
+    if( !( tptr = tmp->text = ( char *) XMALLOC( tlen, "setup_que" ) ) ) {
         free_qentry( tmp );
-        return ( BQUE * ) NULL;
+        return ( BQUE *) NULL;
     }
     /*
      * Set up registers and whatnot
@@ -708,7 +721,7 @@ static BQUE *setup_que( dbref player, dbref cause, char *command, char *args[], 
      */
 
     tmp->pid = qpid;
-    nhashadd( qpid, ( int * ) tmp, &mudstate.qpid_htab );
+    nhashadd( qpid, ( int *) tmp, &mudstate.qpid_htab );
 
     tmp->player = player;
     tmp->waittime = 0;
@@ -725,7 +738,8 @@ static BQUE *setup_que( dbref player, dbref cause, char *command, char *args[], 
  * wait_que: Add commands to the wait or semaphore queues.
  */
 
-void wait_que( dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs ) {
+void wait_que( dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs )
+{
     BQUE *tmp, *point, *trail;
 
     if( mudconf.control_flags & CF_INTERP ) {
@@ -787,7 +801,8 @@ void wait_que( dbref player, dbref cause, int wait, dbref sem, int attr, char *c
  * do_wait_pid: Adjust the wait time on an existing entry.
  */
 
-static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
+static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr )
+{
     int qpid, wsecs;
 
     BQUE *qptr, *point, *trail;
@@ -800,12 +815,12 @@ static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
         notify( player, "That is not a valid PID." );
         return;
     }
-    qpid = ( int ) strtol( pidstr, ( char ** ) NULL, 10 );
+    qpid = ( int ) strtol( pidstr, ( char **) NULL, 10 );
     if( ( qpid < 1 ) || ( qpid > mudconf.max_qpid ) ) {
         notify( player, "That is not a valid PID." );
         return;
     }
-    qptr = ( BQUE * ) nhashfind( qpid, &mudstate.qpid_htab );
+    qptr = ( BQUE *) nhashfind( qpid, &mudstate.qpid_htab );
     if( !qptr ) {
         notify( player,
                 "That PID is not associated with an active queue entry." );
@@ -824,7 +839,7 @@ static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
         return;
     }
     if( key & WAIT_UNTIL ) {
-        wsecs = ( int ) strtol( timestr, ( char ** ) NULL, 10 );
+        wsecs = ( int ) strtol( timestr, ( char **) NULL, 10 );
         if( wsecs < 0 ) {
             qptr->waittime = time( NULL );
         } else {
@@ -832,9 +847,9 @@ static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
         }
     } else {
         if( ( timestr[0] == '+' ) || ( timestr[0] == '-' ) ) {
-            qptr->waittime += ( int ) strtol( timestr, ( char ** ) NULL, 10 );
+            qptr->waittime += ( int ) strtol( timestr, ( char **) NULL, 10 );
         } else {
-            qptr->waittime = time( NULL ) + ( int ) strtol( timestr, ( char ** ) NULL, 10 );;
+            qptr->waittime = time( NULL ) + ( int ) strtol( timestr, ( char **) NULL, 10 );;
         }
         if( qptr->waittime < 0 ) {
             if( timestr[0] == '-' ) {
@@ -875,7 +890,8 @@ static void do_wait_pid( dbref player, int key, char *pidstr, char *timestr ) {
  * do_wait: Command interface to wait_que
  */
 
-void do_wait( dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs ) {
+void do_wait( dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
 
     int howlong, num, attr, aflags;
@@ -894,12 +910,12 @@ void do_wait( dbref player, dbref cause, int key, char *event, char *cmd, char *
 
     if( is_number( event ) ) {
         if( key & WAIT_UNTIL ) {
-            howlong = ( int ) strtol( event, ( char ** ) NULL, 10 ) - time( NULL );
+            howlong = ( int ) strtol( event, ( char **) NULL, 10 ) - time( NULL );
             if( howlong < 0 ) {
                 howlong = 0;
             }
         } else {
-            howlong = ( int ) strtol( event, ( char ** ) NULL, 10 );
+            howlong = ( int ) strtol( event, ( char **) NULL, 10 );
         }
         wait_que( player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mudstate.rdata );
         return;
@@ -926,12 +942,12 @@ void do_wait( dbref player, dbref cause, int key, char *event, char *cmd, char *
         if( event && *event && is_number( event ) ) {
             attr = A_SEMAPHORE;
             if( key & WAIT_UNTIL ) {
-                howlong = ( int ) strtol( event, ( char ** ) NULL, 10 ) - time( NULL );
+                howlong = ( int ) strtol( event, ( char **) NULL, 10 ) - time( NULL );
                 if( howlong < 0 ) {
                     howlong = 0;
                 }
             } else {
-                howlong = ( int ) strtol( event, ( char ** ) NULL, 10 );
+                howlong = ( int ) strtol( event, ( char **) NULL, 10 );
             }
         } else {
             attr = A_SEMAPHORE;
@@ -978,7 +994,8 @@ void do_wait( dbref player, dbref cause, int key, char *event, char *cmd, char *
  * from the queue.
  */
 
-int que_next( void ) {
+int que_next( void )
+{
     int min, this;
 
     BQUE *point;
@@ -1038,7 +1055,8 @@ int que_next( void ) {
  * do_second: Check the wait and semaphore queues for commands to remove.
  */
 
-void do_second( void ) {
+void do_second( void )
+{
     BQUE *trail, *point, *next;
 
     char *cmdsave;
@@ -1056,7 +1074,7 @@ void do_second( void ) {
     }
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< do_second >";
+    mudstate.debug_cmd = ( char *) "< do_second >";
 
     if( mudstate.qlfirst ) {
         if( mudstate.qlast ) {
@@ -1118,7 +1136,8 @@ void do_second( void ) {
  * do_top: Execute the command at the top of the queue
  */
 
-int do_top( int ncmds ) {
+int do_top( int ncmds )
+{
     BQUE *tmp;
 
     dbref player;
@@ -1132,7 +1151,7 @@ int do_top( int ncmds ) {
     }
 
     cmdsave = mudstate.debug_cmd;
-    mudstate.debug_cmd = ( char * ) "< do_top >";
+    mudstate.debug_cmd = ( char *) "< do_top >";
 
     for( count = 0; count < ncmds; count++ ) {
         if( !test_top() ) {
@@ -1200,7 +1219,8 @@ int do_top( int ncmds ) {
  * do_ps: tell player what commands they have pending in the queue
  */
 
-static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header ) {
+static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header )
+{
     BQUE *tmp;
 
     char *bp, *bufp;
@@ -1219,8 +1239,9 @@ static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, 
             if( key == PS_SUMM ) {
                 continue;
             }
-            if( *qent == 1 )
+            if( *qent == 1 ) {
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "----- %s Queue -----", header );
+            }
             bufp = unparse_object( player, tmp->player, 0 );
             if( ( tmp->waittime > 0 ) && ( Good_obj( tmp->sem ) ) ) {
                 /*
@@ -1248,10 +1269,10 @@ static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, 
             if( key == PS_LONG ) {
                 for( i = 0; i < ( tmp->nargs ); i++ ) {
                     if( tmp->env[i] != NULL ) {
-                        safe_str( ( char * ) "; Arg",
+                        safe_str( ( char *) "; Arg",
                                   bufp, &bp );
                         safe_chr( i + '0', bufp, &bp );
-                        safe_str( ( char * ) "='",
+                        safe_str( ( char *) "='",
                                   bufp, &bp );
                         safe_str( tmp->env[i],
                                   bufp, &bp );
@@ -1271,7 +1292,8 @@ static void show_que( dbref player, int key, BQUE *queue, int *qtot, int *qent, 
     return;
 }
 
-void do_ps( dbref player, dbref cause, int key, char *target ) {
+void do_ps( dbref player, dbref cause, int key, char *target )
+{
     char *bufp;
 
     dbref player_targ, obj_targ;
@@ -1364,14 +1386,15 @@ void do_ps( dbref player, dbref cause, int key, char *target ) {
  * do_queue: Queue management
  */
 
-void do_queue( dbref player, dbref cause, int key, char *arg ) {
+void do_queue( dbref player, dbref cause, int key, char *arg )
+{
     BQUE *point;
 
     int i, ncmds, was_disabled;
 
     was_disabled = 0;
     if( key == QUEUE_KICK ) {
-        i = ( int ) strtol( arg, ( char ** ) NULL, 10 );;
+        i = ( int ) strtol( arg, ( char **) NULL, 10 );;
         if( ( mudconf.control_flags & CF_DEQUEUE ) == 0 ) {
             was_disabled = 1;
             mudconf.control_flags |= CF_DEQUEUE;
@@ -1381,10 +1404,11 @@ void do_queue( dbref player, dbref cause, int key, char *arg ) {
         if( was_disabled ) {
             mudconf.control_flags &= ~CF_DEQUEUE;
         }
-        if( !Quiet( player ) )
+        if( !Quiet( player ) ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%d commands processed.", ncmds );
+        }
     } else if( key == QUEUE_WARP ) {
-        i = ( int ) strtol( arg, ( char ** ) NULL, 10 );;
+        i = ( int ) strtol( arg, ( char **) NULL, 10 );;
         if( ( mudconf.control_flags & CF_DEQUEUE ) == 0 ) {
             was_disabled = 1;
             mudconf.control_flags |= CF_DEQUEUE;
@@ -1418,12 +1442,13 @@ void do_queue( dbref player, dbref cause, int key, char *arg ) {
         if( Quiet( player ) ) {
             return;
         }
-        if( i > 0 )
+        if( i > 0 ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "WaitQ timer advanced %d seconds.", i );
-        else if( i < 0 )
+        } else if( i < 0 ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "WaitQ timer set back %d seconds.", i );
-        else
+        } else {
             notify( player, "Object queue appended to player queue." );
+        }
 
     }
 }

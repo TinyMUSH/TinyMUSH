@@ -27,7 +27,8 @@
 #include "powers.h"		/* required by code */
 
 
-void do_teleport( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
+void do_teleport( dbref player, dbref cause, int key, char *arg1, char *arg2 )
+{
     dbref victim, destination, loc, exitloc;
 
     char *to;
@@ -177,7 +178,7 @@ void do_teleport( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
             }
             did_it( victim, destination,
                     A_TFAIL, "You can't teleport there!",
-                    A_OTFAIL, NULL, A_ATFAIL, 0, ( char ** ) NULL, 0,
+                    A_OTFAIL, NULL, A_ATFAIL, 0, ( char **) NULL, 0,
                     MSG_MOVE );
             return;
         }
@@ -211,7 +212,8 @@ void do_teleport( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
  * do_force_prefixed: Interlude to do_force for the # command
  */
 
-void do_force_prefixed( dbref player, dbref cause, int key, char *command, char *args[], int nargs ) {
+void do_force_prefixed( dbref player, dbref cause, int key, char *command, char *args[], int nargs )
+{
     char *cp;
 
     cp = parse_to( &command, ' ', 0 );
@@ -231,7 +233,8 @@ void do_force_prefixed( dbref player, dbref cause, int key, char *command, char 
  * do_force: Force an object to do something.
  */
 
-void do_force( dbref player, dbref cause, int key, char *what, char *command, char *args[], int nargs ) {
+void do_force( dbref player, dbref cause, int key, char *what, char *command, char *args[], int nargs )
+{
     dbref victim;
 
     if( ( victim = match_controlled( player, what ) ) == NOTHING ) {
@@ -254,7 +257,8 @@ void do_force( dbref player, dbref cause, int key, char *what, char *command, ch
  * do_toad: Turn a player into an object.
  */
 
-void do_toad( dbref player, dbref cause, int key, char *toad, char *newowner ) {
+void do_toad( dbref player, dbref cause, int key, char *toad, char *newowner )
+{
     dbref victim, recipient, loc, aowner;
 
     char *buf, *pname, *vname;
@@ -339,11 +343,12 @@ void do_toad( dbref player, dbref cause, int key, char *toad, char *newowner ) {
     delete_player_name( victim, buf );
     free_lbuf( buf );
 
-    count = boot_off( victim, ( char * ) "You have been turned into a slimy toad!" );
+    count = boot_off( victim, ( char *) "You have been turned into a slimy toad!" );
     notify_check( player, player , MSG_PUP_ALWAYS|MSG_ME, "%d connection%s closed.", count, ( count == 1 ? "" : "s" ) );
 }
 
-void do_newpassword( dbref player, dbref cause, int key, char *name, char *password ) {
+void do_newpassword( dbref player, dbref cause, int key, char *name, char *password )
+{
     dbref victim;
 
     char *buf, *bp, *pname, *vname;
@@ -372,12 +377,13 @@ void do_newpassword( dbref player, dbref cause, int key, char *name, char *passw
     /*
      * it's ok, do it
      */
-    s_Pass( victim, crypt( ( const char * ) password, "XX" ) );
+    s_Pass( victim, crypt( ( const char *) password, "XX" ) );
     notify_quiet( player, "Password changed." );
     notify_check( victim, victim, MSG_PUP_ALWAYS|MSG_ME, "Your password has been changed by %s.", Name( player ) );
 }
 
-void do_boot( dbref player, dbref cause, int key, char *name ) {
+void do_boot( dbref player, dbref cause, int key, char *name )
+{
     dbref victim;
 
     char *buf, *bp, *pname, *vname, *lname;
@@ -390,7 +396,7 @@ void do_boot( dbref player, dbref cause, int key, char *name ) {
     }
     if( key & BOOT_PORT ) {
         if( is_number( name ) ) {
-            victim = ( int ) strtol( name, ( char ** ) NULL, 10 );
+            victim = ( int ) strtol( name, ( char **) NULL, 10 );
         } else {
             notify_quiet( player, "That's not a number!" );
             return;
@@ -429,7 +435,7 @@ void do_boot( dbref player, dbref cause, int key, char *name ) {
     } else {
         bp = buf = alloc_lbuf( "do_boot.msg" );
         safe_name( player, buf, &bp );
-        safe_str( ( char * ) " gently shows you the door.", buf, &bp );
+        safe_str( ( char *) " gently shows you the door.", buf, &bp );
         *bp = '\0';
     }
 
@@ -449,7 +455,8 @@ void do_boot( dbref player, dbref cause, int key, char *name ) {
   do_poor: Reduce the wealth of anyone over a specified amount.
  */
 
-void do_poor( dbref player, dbref cause, int key, char *arg1 ) {
+void do_poor( dbref player, dbref cause, int key, char *arg1 )
+{
     dbref a;
 
     int amt, curamt;
@@ -457,7 +464,7 @@ void do_poor( dbref player, dbref cause, int key, char *arg1 ) {
     if( !is_number( arg1 ) ) {
         return;
     }
-    amt = ( int ) strtol( arg1, ( char ** ) NULL, 10 );
+    amt = ( int ) strtol( arg1, ( char **) NULL, 10 );
     DO_WHOLE_DB( a ) {
         if( isPlayer( a ) ) {
             curamt = Pennies( a );
@@ -473,7 +480,8 @@ void do_poor( dbref player, dbref cause, int key, char *arg1 ) {
  * do_cut: Chop off a contents or exits chain after the named item.
  */
 
-void do_cut( dbref player, dbref cause, int key, char *thing ) {
+void do_cut( dbref player, dbref cause, int key, char *thing )
+{
     dbref object;
 
     object = match_controlled( player, thing );
@@ -494,7 +502,8 @@ void do_cut( dbref player, dbref cause, int key, char *thing ) {
  * do_motd: Wizard-settable message of the day (displayed on connect)
  */
 
-void do_motd( dbref player, dbref cause, int key, char *message ) {
+void do_motd( dbref player, dbref cause, int key, char *message )
+{
     int is_brief;
 
     is_brief = 0;
@@ -600,22 +609,23 @@ void do_motd( dbref player, dbref cause, int key, char *message ) {
 /* *INDENT-OFF* */
 
 NAMETAB enable_names[] = {
-    { ( char * ) "building",		1,	CA_PUBLIC,	CF_BUILD},
-    { ( char * ) "checkpointing",	2,	CA_PUBLIC,	CF_CHECKPOINT},
-    { ( char * ) "cleaning",		2,	CA_PUBLIC,	CF_DBCHECK},
-    { ( char * ) "dequeueing",		1,	CA_PUBLIC,	CF_DEQUEUE},
-    { ( char * ) "god_monitoring",	1,	CA_PUBLIC,	CF_GODMONITOR},
-    { ( char * ) "idlechecking",	2,	CA_PUBLIC,	CF_IDLECHECK},
-    { ( char * ) "interpret",		2,	CA_PUBLIC,	CF_INTERP},
-    { ( char * ) "logins",		3,	CA_PUBLIC,	CF_LOGIN},
-    { ( char * ) "eventchecking",	2,	CA_PUBLIC,	CF_EVENTCHECK},
+    { ( char *) "building",		1,	CA_PUBLIC,	CF_BUILD},
+    { ( char *) "checkpointing",	2,	CA_PUBLIC,	CF_CHECKPOINT},
+    { ( char *) "cleaning",		2,	CA_PUBLIC,	CF_DBCHECK},
+    { ( char *) "dequeueing",		1,	CA_PUBLIC,	CF_DEQUEUE},
+    { ( char *) "god_monitoring",	1,	CA_PUBLIC,	CF_GODMONITOR},
+    { ( char *) "idlechecking",	2,	CA_PUBLIC,	CF_IDLECHECK},
+    { ( char *) "interpret",		2,	CA_PUBLIC,	CF_INTERP},
+    { ( char *) "logins",		3,	CA_PUBLIC,	CF_LOGIN},
+    { ( char *) "eventchecking",	2,	CA_PUBLIC,	CF_EVENTCHECK},
     { NULL,				0,	0,		0}
 };
 
 /* *INDENT-ON* */
 
 
-void do_global( dbref player, dbref cause, int key, char *flag ) {
+void do_global( dbref player, dbref cause, int key, char *flag )
+{
     int flagvalue;
 
     char *name;

@@ -63,36 +63,38 @@ FCACHE		fcache  [] = {
 };
 
 NAMETAB		list_files[] = {
-    { ( char * ) "badsite_connect", 1, CA_WIZARD, FC_CONN_SITE},
-    { ( char * ) "connect", 2, CA_WIZARD, FC_CONN},
-    { ( char * ) "create_register", 2, CA_WIZARD, FC_CREA_REG},
-    { ( char * ) "down", 1, CA_WIZARD, FC_CONN_DOWN},
-    { ( char * ) "full", 1, CA_WIZARD, FC_CONN_FULL},
-    { ( char * ) "guest_motd", 1, CA_WIZARD, FC_CONN_GUEST},
-    { ( char * ) "html_connect", 1, CA_WIZARD, FC_CONN_HTML},
-    { ( char * ) "motd", 1, CA_WIZARD, FC_MOTD},
-    { ( char * ) "newuser", 1, CA_WIZARD, FC_CREA_NEW},
-    { ( char * ) "quit", 1, CA_WIZARD, FC_QUIT},
-    { ( char * ) "register_connect", 1, CA_WIZARD, FC_CONN_REG},
-    { ( char * ) "wizard_motd", 1, CA_WIZARD, FC_WIZMOTD},
+    { ( char *) "badsite_connect", 1, CA_WIZARD, FC_CONN_SITE},
+    { ( char *) "connect", 2, CA_WIZARD, FC_CONN},
+    { ( char *) "create_register", 2, CA_WIZARD, FC_CREA_REG},
+    { ( char *) "down", 1, CA_WIZARD, FC_CONN_DOWN},
+    { ( char *) "full", 1, CA_WIZARD, FC_CONN_FULL},
+    { ( char *) "guest_motd", 1, CA_WIZARD, FC_CONN_GUEST},
+    { ( char *) "html_connect", 1, CA_WIZARD, FC_CONN_HTML},
+    { ( char *) "motd", 1, CA_WIZARD, FC_MOTD},
+    { ( char *) "newuser", 1, CA_WIZARD, FC_CREA_NEW},
+    { ( char *) "quit", 1, CA_WIZARD, FC_QUIT},
+    { ( char *) "register_connect", 1, CA_WIZARD, FC_CONN_REG},
+    { ( char *) "wizard_motd", 1, CA_WIZARD, FC_WIZMOTD},
     {NULL, 0, 0, 0}
 };
 
 /* *INDENT-ON* */
 
-void do_list_file( dbref player, dbref cause, int extra, char *arg ) {
+void do_list_file( dbref player, dbref cause, int extra, char *arg )
+{
     int flagvalue;
 
     flagvalue = search_nametab( player, list_files, arg );
     if( flagvalue < 0 ) {
         display_nametab( player, list_files,
-                         ( char * ) "Unknown file.  Use one of:", 1 );
+                         ( char *) "Unknown file.  Use one of:", 1 );
         return;
     }
     fcache_send( player, flagvalue );
 }
 
-static FBLOCK *fcache_fill( FBLOCK *fp, char ch ) {
+static FBLOCK *fcache_fill( FBLOCK *fp, char ch )
+{
     FBLOCK *tfp;
 
     if( fp->hdr.nchars >= ( MBUF_SIZE - sizeof( FBLKHDR ) ) ) {
@@ -102,7 +104,7 @@ static FBLOCK *fcache_fill( FBLOCK *fp, char ch ) {
          */
 
         tfp = fp;
-        fp = ( FBLOCK * ) alloc_mbuf( "fcache_fill" );
+        fp = ( FBLOCK *) alloc_mbuf( "fcache_fill" );
         fp->hdr.nxt = NULL;
         fp->hdr.nchars = 0;
         tfp->hdr.nxt = fp;
@@ -111,7 +113,8 @@ static FBLOCK *fcache_fill( FBLOCK *fp, char ch ) {
     return fp;
 }
 
-static int fcache_read( FBLOCK **cp, char *filename ) {
+static int fcache_read( FBLOCK **cp, char *filename )
+{
     int n, nmax, tchars, fd;
 
     char *buff;
@@ -150,7 +153,7 @@ static int fcache_read( FBLOCK **cp, char *filename ) {
      * Set up the initial cache buffer to make things easier
      */
 
-    fp = ( FBLOCK * ) alloc_mbuf( "fcache_read.first" );
+    fp = ( FBLOCK *) alloc_mbuf( "fcache_read.first" );
     fp->hdr.nxt = NULL;
     fp->hdr.nchars = 0;
     *cp = fp;
@@ -193,7 +196,8 @@ static int fcache_read( FBLOCK **cp, char *filename ) {
     return tchars;
 }
 
-void fcache_rawdump( int fd, int num ) {
+void fcache_rawdump( int fd, int num )
+{
     int cnt, remaining;
 
     char *start;
@@ -222,7 +226,8 @@ void fcache_rawdump( int fd, int num ) {
     return;
 }
 
-void fcache_dump( DESC *d, int num ) {
+void fcache_dump( DESC *d, int num )
+{
     FBLOCK *fp;
 
     if( ( num < 0 ) || ( num > FC_LAST ) ) {
@@ -236,7 +241,8 @@ void fcache_dump( DESC *d, int num ) {
     }
 }
 
-void fcache_send( dbref player, int num ) {
+void fcache_send( dbref player, int num )
+{
     DESC *d;
 
     DESC_ITER_PLAYER( player, d ) {
@@ -244,7 +250,8 @@ void fcache_send( dbref player, int num ) {
     }
 }
 
-void fcache_load( dbref player ) {
+void fcache_load( dbref player )
+{
     FCACHE *fp;
 
     char *buff, *bufc, *sbuf;
@@ -258,12 +265,12 @@ void fcache_load( dbref player ) {
         if( ( player != NOTHING ) && !Quiet( player ) ) {
             sprintf( sbuf, "%d", i );
             if( fp == fcache ) {
-                safe_str( ( char * ) "File sizes: ", buff, &bufc );
+                safe_str( ( char *) "File sizes: ", buff, &bufc );
             } else {
-                safe_str( ( char * ) "  ", buff, &bufc );
+                safe_str( ( char *) "  ", buff, &bufc );
             }
-            safe_str( ( char * ) fp->desc, buff, &bufc );
-            safe_str( ( char * ) "...", buff, &bufc );
+            safe_str( ( char *) fp->desc, buff, &bufc );
+            safe_str( ( char *) "...", buff, &bufc );
             safe_str( sbuf, buff, &bufc );
         }
     }
@@ -275,7 +282,8 @@ void fcache_load( dbref player ) {
     free_sbuf( sbuf );
 }
 
-void fcache_init( void ) {
+void fcache_init( void )
+{
     FCACHE *fp;
 
     for( fp = fcache; fp->filename; fp++ ) {

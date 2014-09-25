@@ -36,20 +36,21 @@
 * [lock()] output
     */
 
-    /*
-     * Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this
-     * will give players object numbers of stuff they don't control, but it's
-     * only internal currently, so it's not a problem.
-     */
+/*
+ * Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this
+ * will give players object numbers of stuff they don't control, but it's
+ * only internal currently, so it's not a problem.
+ */
 
-    static char *unparse_object_quiet( dbref player, dbref loc ) {
+static char *unparse_object_quiet( dbref player, dbref loc )
+{
     static char buf[SBUF_SIZE];
 
     switch( loc ) {
     case NOTHING:
-        return ( char * ) "-1";
+        return ( char *) "-1";
     case HOME:
-        return ( char * ) "-3";
+        return ( char *) "-3";
     default:
         sprintf( buf, "(#%d)", loc );
         return buf;
@@ -60,7 +61,8 @@ static char boolexp_buf[LBUF_SIZE];
 
 static char *buftop;
 
-static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int format ) {
+static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int format )
+{
     ATTR *ap;
 
     char sep_ch;
@@ -69,7 +71,7 @@ static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int for
 
     if( b == TRUE_BOOLEXP ) {
         if( format == F_EXAMINE ) {
-            safe_str( ( char * ) "*UNLOCKED*", boolexp_buf, &buftop );
+            safe_str( ( char *) "*UNLOCKED*", boolexp_buf, &buftop );
         }
         return;
     }
@@ -126,7 +128,7 @@ static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int for
                  * Always #Num
                  */
 
-                safe_str( ( char * ) unparse_object_quiet( player,
+                safe_str( ( char *) unparse_object_quiet( player,
                           b->thing ), boolexp_buf, &buftop );
                 break;
             case F_EXAMINE:
@@ -181,7 +183,7 @@ static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int for
                 }
             }
         } else {
-            safe_str( ( char * ) unparse_object_quiet( player,
+            safe_str( ( char *) unparse_object_quiet( player,
                       b->thing ), boolexp_buf, &buftop );
         }
         break;
@@ -194,12 +196,12 @@ static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int for
         }
         ap = atr_num( b->thing );
         if( ap && ap->number ) {
-            safe_str( ( char * ) ap->name, boolexp_buf, &buftop );
+            safe_str( ( char *) ap->name, boolexp_buf, &buftop );
         } else {
             safe_ltos( boolexp_buf, &buftop, b->thing );
         }
         safe_chr( sep_ch, boolexp_buf, &buftop );
-        safe_str( ( char * ) b->sub1, boolexp_buf, &buftop );
+        safe_str( ( char *) b->sub1, boolexp_buf, &buftop );
         break;
     default:
         log_write_raw( 1, "ABORT! unparse.c, bad boolexp type in unparse_boolexp1().\n" );
@@ -208,28 +210,32 @@ static void unparse_boolexp1( dbref player, BOOLEXP *b, char outer_type, int for
     }
 }
 
-char *unparse_boolexp_quiet( dbref player, BOOLEXP *b ) {
+char *unparse_boolexp_quiet( dbref player, BOOLEXP *b )
+{
     buftop = boolexp_buf;
     unparse_boolexp1( player, b, BOOLEXP_CONST, F_QUIET );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp( dbref player, BOOLEXP *b ) {
+char *unparse_boolexp( dbref player, BOOLEXP *b )
+{
     buftop = boolexp_buf;
     unparse_boolexp1( player, b, BOOLEXP_CONST, F_EXAMINE );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp_decompile( dbref player, BOOLEXP *b ) {
+char *unparse_boolexp_decompile( dbref player, BOOLEXP *b )
+{
     buftop = boolexp_buf;
     unparse_boolexp1( player, b, BOOLEXP_CONST, F_DECOMPILE );
     *buftop = '\0';
     return boolexp_buf;
 }
 
-char *unparse_boolexp_function( dbref player, BOOLEXP *b ) {
+char *unparse_boolexp_function( dbref player, BOOLEXP *b )
+{
     buftop = boolexp_buf;
     unparse_boolexp1( player, b, BOOLEXP_CONST, F_FUNCTION );
     *buftop = '\0';

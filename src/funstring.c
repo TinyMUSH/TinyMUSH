@@ -29,7 +29,8 @@
  * character in the argument a letter or number?
  */
 
-void fun_isword( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_isword( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p;
 
     for( p = fargs[0]; *p; p++ ) {
@@ -41,7 +42,8 @@ void fun_isword( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     safe_chr( '1', buff, bufc );
 }
 
-void fun_isalnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_isalnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p;
 
     for( p = fargs[0]; *p; p++ ) {
@@ -58,7 +60,8 @@ void fun_isalnum( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * isnum: is the argument a number?
  */
 
-void fun_isnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_isnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_chr( ( is_number( fargs[0] ) ? '1' : '0' ), buff, bufc );
 }
 
@@ -67,7 +70,8 @@ void fun_isnum( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * isdbref: is the argument a valid dbref?
  */
 
-void fun_isdbref( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_isdbref( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p;
 
     dbref dbitem;
@@ -90,7 +94,8 @@ void fun_isdbref( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * isobjid: is the argument a valid objid?
  */
 
-void fun_isobjid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_isobjid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p;
 
     dbref dbitem;
@@ -116,7 +121,8 @@ void fun_isobjid( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * side-effects, and now you have bunches of spaces you need to get rid of.
  */
 
-void fun_null( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )  {
+void fun_null( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
 }
 
 /*
@@ -127,7 +133,8 @@ void fun_null( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * call trim().
  */
 
-void fun_squish( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_squish( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *tp, *bp;
 
     Delim isep;
@@ -191,7 +198,8 @@ void fun_squish( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 #define TRIM_L 0x1
 #define TRIM_R 0x2
 
-void fun_trim( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_trim( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *p, *q, *endchar, *ep;
 
     Delim isep;
@@ -283,7 +291,8 @@ void fun_trim( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * string.
  */
 
-void fun_after( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_after( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *bp, *cp, *mp, *np;
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
@@ -306,7 +315,7 @@ void fun_after( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         mp = " ";
     }
     if( !mp || !*mp ) {
-        mp = ( char * ) " ";
+        mp = ( char *) " ";
     }
     if( ( mp[0] == ' ' ) && ( mp[1] == '\0' ) ) {
         bp = Eat_Spaces( bp );
@@ -319,7 +328,7 @@ void fun_after( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     while( *mp == ESC_CHAR ) {
         track_esccode( &mp, &ansi_needle );
         if( !*mp ) {
-            mp = ( char * ) " ";
+            mp = ( char *) " ";
         }
     }
     ansi_haystack = ANST_NORMAL;
@@ -386,7 +395,8 @@ void fun_after( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     return;
 }
 
-void fun_before( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_before( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *haystack, *bp, *cp, *mp, *np;
 
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
@@ -409,7 +419,7 @@ void fun_before( char *buff, char **bufc, dbref player, dbref caller, dbref caus
         mp = " ";
     }
     if( !mp || !*mp ) {
-        mp = ( char * ) " ";
+        mp = ( char *) " ";
     }
     if( ( mp[0] == ' ' ) && ( mp[1] == '\0' ) ) {
         haystack = Eat_Spaces( haystack );
@@ -423,7 +433,7 @@ void fun_before( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     while( *mp == ESC_CHAR ) {
         track_esccode( &mp, &ansi_needle );
         if( !*mp ) {
-            mp = ( char * ) " ";
+            mp = ( char *) " ";
         }
     }
     ansi_haystack = ANST_NORMAL;
@@ -492,7 +502,8 @@ void fun_before( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_lcstr, fun_ucstr, fun_capstr: Lowercase, uppercase, or capitalize str.
  */
 
-void fun_lcstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lcstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *ap;
 
     ap = *bufc;
@@ -508,7 +519,8 @@ void fun_lcstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_ucstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ucstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *ap;
 
     ap = *bufc;
@@ -524,7 +536,8 @@ void fun_ucstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_capstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_capstr( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *ap;
 
     ap = *bufc;
@@ -542,13 +555,14 @@ void fun_capstr( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_space: Make spaces.
  */
 
-void fun_space( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_space( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int num, max;
 
     if( !fargs[0] || !( *fargs[0] ) ) {
         num = 1;
     } else {
-        num = ( int ) strtol( fargs[0], ( char ** ) NULL, 10 );
+        num = ( int ) strtol( fargs[0], ( char **) NULL, 10 );
     }
 
     if( num < 1 ) {
@@ -573,13 +587,14 @@ void fun_space( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * rjust, ljust, center: Justify or center text, specifying fill character
  */
 
-void fun_ljust( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ljust( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int spaces, max, i, slen;
 
     char *tp, *fillchars;
 
     VaChk_Range( 2, 3 );
-    spaces = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) - strip_ansi_len( fargs[0] );
+    spaces = ( int ) strtol( fargs[1], ( char **) NULL, 10 ) - strip_ansi_len( fargs[0] );
 
     safe_str( fargs[0], buff, bufc );
 
@@ -638,13 +653,14 @@ void fun_ljust( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     *bufc = tp;
 }
 
-void fun_rjust( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_rjust( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int spaces, max, i, slen;
 
     char *tp, *fillchars;
 
     VaChk_Range( 2, 3 );
-    spaces = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 ) - strip_ansi_len( fargs[0] );
+    spaces = ( int ) strtol( fargs[1], ( char **) NULL, 10 ) - strip_ansi_len( fargs[0] );
 
     /*
      * Sanitize number of spaces
@@ -705,14 +721,15 @@ void fun_rjust( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     safe_str( fargs[0], buff, bufc );
 }
 
-void fun_center( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_center( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *tp, *fillchars;
 
     int len, lead_chrs, trail_chrs, width, max, i, slen;
 
     VaChk_Range( 2, 3 );
 
-    width = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    width = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     len = strip_ansi_len( fargs[0] );
 
     width = ( width > LBUF_SIZE - 1 ) ? LBUF_SIZE - 1 : width;
@@ -726,7 +743,7 @@ void fun_center( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     lead_chrs = ( lead_chrs > max ) ? max : lead_chrs;
 
     if( fargs[2] ) {
-        fillchars = ( char * ) strip_ansi( fargs[2] );
+        fillchars = ( char *) strip_ansi( fargs[2] );
         slen = strlen( fillchars );
         slen = ( slen > lead_chrs ) ? lead_chrs : slen;
         if( slen == 0 ) {
@@ -821,7 +838,8 @@ void fun_center( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * characters in a string strtrunc: now an alias for left
  */
 
-void fun_left( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_left( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     int count, nchars;
@@ -829,7 +847,7 @@ void fun_left( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    nchars = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    nchars = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
 
     if( nchars <= 0 ) {
         return;
@@ -849,7 +867,8 @@ void fun_left( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     safe_str( ansi_transition_esccode( ansi_state, ANST_NORMAL ), buff, bufc );
 }
 
-void fun_right( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_right( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     int count, start, nchars;
@@ -857,7 +876,7 @@ void fun_right( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    nchars = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    nchars = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     start = strip_ansi_len( s ) - nchars;
 
     if( nchars <= 0 ) {
@@ -895,7 +914,8 @@ void fun_right( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_chomp: If the line ends with CRLF, CR, or LF, chop it off.
  */
 
-void fun_chomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_chomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *bb_p = *bufc;
 
     safe_str( fargs[0], buff, bufc );
@@ -913,7 +933,8 @@ void fun_chomp( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * compare. fun_strmatch: wildcard string compare.
  */
 
-void fun_comp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_comp( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int x;
 
     x = strcmp( fargs[0], fargs[1] );
@@ -926,11 +947,13 @@ void fun_comp( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_streq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_streq( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_bool( buff, bufc, !string_compare( fargs[0], fargs[1] ) );
 }
 
-void fun_strmatch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_strmatch( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * Check if we match the whole string.  If so, return 1
      */
@@ -943,7 +966,8 @@ void fun_strmatch( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_edit: Edit text.
  */
 
-void fun_edit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_edit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *tstr;
 
     edit_string( fargs[0], &tstr, fargs[1], fargs[2] );
@@ -959,7 +983,8 @@ void fun_edit( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * be of the same length.
  */
 
-void fun_merge( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_merge( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *str, *rep;
 
     char c;
@@ -1011,7 +1036,8 @@ void fun_merge( char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * only care about string evaluation, not a forced command.
  */
 
-void fun_secure( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_secure( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     s = fargs[0];
@@ -1040,7 +1066,8 @@ void fun_secure( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     }
 }
 
-void fun_escape( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_escape( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *d;
 
     s = fargs[0];
@@ -1066,9 +1093,9 @@ void fun_escape( char *buff, char **bufc, dbref player, dbref caller, dbref caus
             if( *bufc != d ) {
                 safe_chr( '\\', buff, bufc );
             }
-            /*
-             * FALLTHRU
-             */
+        /*
+         * FALLTHRU
+         */
         default:
             safe_chr( *s, buff, bufc );
         }
@@ -1076,7 +1103,8 @@ void fun_escape( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     }
 }
 
-void fun_esc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_esc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     s = fargs[0];
@@ -1093,9 +1121,9 @@ void fun_esc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         case '[':
         case ']':
             safe_chr( '\\', buff, bufc );
-            /*
-             * FALLTHRU
-             */
+        /*
+         * FALLTHRU
+         */
         default:
             safe_chr( *s, buff, bufc );
         }
@@ -1108,7 +1136,8 @@ void fun_esc( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * stripchars: Remove all of a set of characters from a string.
  */
 
-void fun_stripchars( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_stripchars( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     char stab[256] = {
@@ -1161,7 +1190,8 @@ void fun_stripchars( char *buff, char **bufc, dbref player, dbref caller, dbref 
  * ANSI handlers.
  */
 
-void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s;
 
     int ansi_state;
@@ -1171,79 +1201,78 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         safe_str( fargs[1], buff, bufc );
         return;
     }
-    
+
     if( !fargs[0] || !*fargs[0] ) {
         safe_str( fargs[1], buff, bufc );
         return;
     }
-    
+
     track_ansi_letters(fargs[0], &ansi_state);
-    
+
     safe_str( ansi_transition_esccode( ANST_NONE, ansi_state ), buff, bufc );
-    
+
     /* Now that normal ansi has been done, time for xterm */
-    
+
     s = fargs[0];
-    
+
     while( *s ) {
         if(*s == '<' || *s == '/') { /* Xterm colors */
             int xterm_isbg = 0, i;
             char xtbuf[SBUF_SIZE], *xtp;
-                    
+
             if(*s == '/') { /* We are dealing with background */
                 s++;
-                        
+
                 if( !*s ) {
                     break;
                 } else {
                     xterm_isbg = 1;
-                }    
+                }
             } else {
                 xterm_isbg = 0;	/* We are dealing with foreground */
             }
-                    
+
             if( *s == '<' ) { /* Ok we got a color to process */
                 s++;
-                            
+
                 if( !*s ) {
                     break;
                 }
-                        
+
                 xtp = xtbuf;
-                        
+
                 while( *s && ( *s != '>' ) ) {
                     safe_sb_chr( *s, xtbuf, &xtp );
                     s++;
                 }
-                            
+
                 if( *s != '>' ) {
                     break;
                 }
-                            
+
                 *xtp = '\0';
-                            
+
                 /* Now we have the color string... Time to handle it */
                 i = str2xterm(xtbuf);
-                
+
                 if( xterm_isbg ) {
                     snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
                 } else {
                     snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
                 }
-                            
+
                 safe_str( xtbuf, buff, bufc );
                 xterm = 1;
             } else {
                 break;
             }
             /* Shall we continue? */
-                        
+
             s++;
             if( *s != '<' && *s != '/') {
                 break;
             }
-        }
-        else {
+        } else {
             s++;
         }
     }
@@ -1259,14 +1288,15 @@ void fun_ansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     safe_str( fargs[1], buff, bufc );
 
     safe_str( ansi_transition_esccode( ansi_state, ANST_NONE ), buff, bufc );
-    
+
     if( xterm ) {
         safe_ansi_normal( buff, bufc );
     }
 }
 
-void fun_stripansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
-    safe_str( ( char * ) strip_ansi( fargs[0] ), buff, bufc );
+void fun_stripansi( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
+    safe_str( ( char *) strip_ansi( fargs[0] ), buff, bufc );
 }
 
 /*---------------------------------------------------------------------------
@@ -1280,7 +1310,8 @@ void fun_stripansi( char *buff, char **bufc, dbref player, dbref caller, dbref c
 #define CRYPTCODE_HI  126	/* tilde */
 #define CRYPTCODE_MOD  95	/* count of printable ascii chars */
 
-static void crunch_code( char *code ) {
+static void crunch_code( char *code )
+{
     char *in, *out;
 
     in = out = code;
@@ -1296,7 +1327,8 @@ static void crunch_code( char *code ) {
     *out = '\0';
 }
 
-static void crypt_code( char *buff, char **bufc, char *code, char *text, int type ) {
+static void crypt_code( char *buff, char **bufc, char *code, char *text, int type )
+{
     char *p, *q;
 
     if( !*text ) {
@@ -1341,11 +1373,13 @@ static void crypt_code( char *buff, char **bufc, char *code, char *text, int typ
     }
 }
 
-void fun_encrypt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_encrypt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     crypt_code( buff, bufc, fargs[1], fargs[0], 1 );
 }
 
-void fun_decrypt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_decrypt( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     crypt_code( buff, bufc, fargs[1], fargs[0], 0 );
 }
 
@@ -1355,7 +1389,8 @@ void fun_decrypt( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  */
 
 /* Borrowed from PennMUSH 1.50 */
-void fun_scramble( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_scramble( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int n, i, j, ansi_state, *ansi_map;
 
     char *stripped;
@@ -1388,7 +1423,8 @@ void fun_scramble( char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_reverse: reverse a string
  */
 
-void fun_reverse( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_reverse( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int n, *ansi_map, ansi_state;
 
     char *stripped;
@@ -1417,7 +1453,8 @@ void fun_reverse( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_mid: mid(foobar,2,3) returns oba
  */
 
-void fun_mid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_mid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *savep;
 
     int count, start, nchars;
@@ -1425,8 +1462,8 @@ void fun_mid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     int ansi_state = ANST_NORMAL;
 
     s = fargs[0];
-    start = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-    nchars = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    start = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+    nchars = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
 
     if( nchars <= 0 ) {
         return;
@@ -1478,7 +1515,8 @@ void fun_mid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * or p, they're converted to percent substitutions.
  */
 
-void fun_translate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_translate( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     VaChk_Range( 1, 2 );
 
     /*
@@ -1499,7 +1537,8 @@ void fun_translate( char *buff, char **bufc, dbref player, dbref caller, dbref c
  * fun_pos: Find a word in a string
  */
 
-void fun_pos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_pos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i = 1;
 
     char *b, *s, *t, *u;
@@ -1543,7 +1582,8 @@ void fun_pos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * lpos(a-bc-def-g,-) ==> 1 4 8
  */
 
-void fun_lpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *bb_p, *scratch_chartab;
 
     int i;
@@ -1556,7 +1596,7 @@ void fun_lpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     VaChk_Only_Out( 3 );
 
-    scratch_chartab = ( char * ) XCALLOC( 256, sizeof( char ), "lpos.chartab" );
+    scratch_chartab = ( char *) XCALLOC( 256, sizeof( char ), "lpos.chartab" );
 
     if( !fargs[1] || !*fargs[1] ) {
         scratch_chartab[( unsigned char ) ' '] = 1;
@@ -1586,7 +1626,8 @@ void fun_lpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * different.
  */
 
-void fun_diffpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_diffpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     char *s1, *s2;
@@ -1612,7 +1653,8 @@ void fun_diffpos( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * wordpos(<string>, <charpos>)
  */
 
-void fun_wordpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_wordpos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int charpos, i;
 
     char *cp, *tp, *xp;
@@ -1621,7 +1663,7 @@ void fun_wordpos( char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     VaChk_Only_In( 3 );
 
-    charpos = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    charpos = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     cp = strip_ansi( fargs[0] );
     if( ( charpos > 0 ) && ( charpos <= ( int ) strlen( cp ) ) ) {
         tp = & ( cp[charpos - 1] );
@@ -1646,7 +1688,8 @@ void fun_wordpos( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * ansipos(<string>, <charpos>[, <type>])
  */
 
-void fun_ansipos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_ansipos( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int charpos, i, ansi_state;
 
     char *s;
@@ -1654,7 +1697,7 @@ void fun_ansipos( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     VaChk_Range( 2, 3 );
 
     s = fargs[0];
-    charpos = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    charpos = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     ansi_state = ANST_NORMAL;
     i = 0;
 
@@ -1682,10 +1725,11 @@ void fun_ansipos( char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_repeat: repeats a string
  */
 
-void fun_repeat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_repeat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int times, len, i, maxtimes;
 
-    times = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    times = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     if( ( times < 1 ) || ( fargs[0] == NULL ) || ( !*fargs[0] ) ) {
         return;
     } else if( times == 1 ) {
@@ -1712,7 +1756,8 @@ void fun_repeat( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fill>[,<R margin fill>]])
  */
 
-void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int width, just;
 
     char *l_fill, *r_fill, *bb_p;
@@ -1733,7 +1778,7 @@ void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref 
         return;
     }
 
-    width = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
+    width = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
     if( width < 1 ) {
         width = 1;
     }
@@ -1771,9 +1816,9 @@ void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref 
             case '\t':
             case '\r':
                 *sw = ' ';
-                /*
-                 * FALLTHRU
-                 */
+            /*
+             * FALLTHRU
+             */
             case ' ':
                 ++sw_pos;
                 continue;
@@ -1833,9 +1878,9 @@ void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref 
                 case '\r':
                 case '\t':
                     *ew = ' ';
-                    /*
-                     * FALLTHRU
-                     */
+                /*
+                 * FALLTHRU
+                 */
                 case ' ':
                 case '\n':
                     break;
@@ -1988,7 +2033,8 @@ void perform_border( char *buff, char **bufc, dbref player, dbref caller, dbref 
  *   - ANSI states are not supported in the widths, as they are unnecessary.
  */
 
-static void perform_align( int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc ) {
+static void perform_align( int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc )
+{
     int i, n;
 
     int *col_widths, *col_justs, *col_done;
@@ -2016,8 +2062,8 @@ static void perform_align( int n_cols, char **raw_colstrs, char **data, char fil
      */
 
     col_widths =
-        ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.widths" );
-    col_justs = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.justs" );
+        ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.widths" );
+    col_justs = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.justs" );
     for( i = 0; i < n_cols; i++ ) {
         p = raw_colstrs[i];
         switch( *p ) {
@@ -2069,19 +2115,19 @@ static void perform_align( int n_cols, char **raw_colstrs, char **data, char fil
         }
     }
 
-    col_done = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.done" );
-    xsl = ( char ** ) XCALLOC( n_cols, sizeof( char * ), "perform_align.xsl" );
-    xel = ( char ** ) XCALLOC( n_cols, sizeof( char * ), "perform_align.xel" );
-    xsw = ( char ** ) XCALLOC( n_cols, sizeof( char * ), "perform_align.xsw" );
-    xew = ( char ** ) XCALLOC( n_cols, sizeof( char * ), "perform_align.xew" );
-    xsl_a = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xsl_a" );
-    xel_a = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xel_a" );
-    xsw_a = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xsw_a" );
-    xew_a = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xew_a" );
-    xsl_p = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xsl_p" );
-    xel_p = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xel_p" );
-    xsw_p = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xsw_p" );
-    xew_p = ( int * ) XCALLOC( n_cols, sizeof( int ), "perform_align.xew_p" );
+    col_done = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.done" );
+    xsl = ( char **) XCALLOC( n_cols, sizeof( char *), "perform_align.xsl" );
+    xel = ( char **) XCALLOC( n_cols, sizeof( char *), "perform_align.xel" );
+    xsw = ( char **) XCALLOC( n_cols, sizeof( char *), "perform_align.xsw" );
+    xew = ( char **) XCALLOC( n_cols, sizeof( char *), "perform_align.xew" );
+    xsl_a = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xsl_a" );
+    xel_a = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xel_a" );
+    xsw_a = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xsw_a" );
+    xew_a = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xew_a" );
+    xsl_p = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xsl_p" );
+    xel_p = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xel_p" );
+    xsw_p = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xsw_p" );
+    xew_p = ( int *) XCALLOC( n_cols, sizeof( int ), "perform_align.xew_p" );
 
     /*
      * calloc() auto-initializes things to 0, so just do the other things
@@ -2184,9 +2230,9 @@ static void perform_align( int n_cols, char **raw_colstrs, char **data, char fil
                     case '\t':
                     case '\r':
                         *sw = ' ';
-                        /*
-                         * FALLTHRU
-                         */
+                    /*
+                     * FALLTHRU
+                     */
                     case ' ':
                         ++sw_pos;
                         continue;
@@ -2314,9 +2360,9 @@ static void perform_align( int n_cols, char **raw_colstrs, char **data, char fil
                         case '\r':
                         case '\t':
                             *ew = ' ';
-                            /*
-                             * FALLTHRU
-                             */
+                        /*
+                         * FALLTHRU
+                         */
                         case ' ':
                         case '\n':
                             break;
@@ -2507,7 +2553,8 @@ static void perform_align( int n_cols, char **raw_colstrs, char **data, char fil
     XFREE( xew_p, "perform_align.xew_p" );
 }
 
-void fun_align( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_align( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char **raw_colstrs;
 
     int n_cols;
@@ -2549,7 +2596,8 @@ void fun_align( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     XFREE( raw_colstrs, "fun_align.raw_colstrs" );
 }
 
-void fun_lalign( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lalign( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char **raw_colstrs, **data;
 
     int n_cols, n_data;
@@ -2590,7 +2638,8 @@ void fun_lalign( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * String concatenation.
  */
 
-void fun_cat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_cat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     safe_str( fargs[0], buff, bufc );
@@ -2600,7 +2649,8 @@ void fun_cat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_strcat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_strcat( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     int i;
 
     safe_str( fargs[0], buff, bufc );
@@ -2609,7 +2659,8 @@ void fun_strcat( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     }
 }
 
-void fun_join( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_join( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     Delim osep;
 
     char *bb_p;
@@ -2638,11 +2689,13 @@ void fun_join( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * Misc functions.
  */
 
-void fun_strlen( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_strlen( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_ltos( buff, bufc, strip_ansi_len( fargs[0] ) );
 }
 
-void fun_delete( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_delete( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *s, *savep;
 
     int count, start, nchars;
@@ -2652,8 +2705,8 @@ void fun_delete( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     int ansi_state_r = ANST_NORMAL;
 
     s = fargs[0];
-    start = ( int ) strtol( fargs[1], ( char ** ) NULL, 10 );
-    nchars = ( int ) strtol( fargs[2], ( char ** ) NULL, 10 );
+    start = ( int ) strtol( fargs[1], ( char **) NULL, 10 );
+    nchars = ( int ) strtol( fargs[2], ( char **) NULL, 10 );
 
     if( ( nchars <= 0 ) || ( start + nchars <= 0 ) ) {
         safe_str( s, buff, bufc );
@@ -2700,14 +2753,16 @@ void fun_delete( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Misc PennMUSH-derived functions.
  */
 
-void fun_lit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_lit( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * Just returns the argument, literally
      */
     safe_str( fargs[0], buff, bufc );
 }
 
-void fun_art( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_art( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * checks a word and returns the appropriate article, "a" or "an"
      */
@@ -2732,7 +2787,8 @@ void fun_art( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_alphamax( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_alphamax( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *amax;
 
     int i = 1;
@@ -2752,7 +2808,8 @@ void fun_alphamax( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     safe_str( amax, buff, bufc );
 }
 
-void fun_alphamin( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_alphamin( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     char *amin;
 
     int i = 1;
@@ -2772,7 +2829,8 @@ void fun_alphamin( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     safe_str( amin, buff, bufc );
 }
 
-void fun_valid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_valid( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     /*
      * Checks to see if a given <something> is valid as a parameter of a
      * given type (such as an object name).
@@ -2792,6 +2850,7 @@ void fun_valid( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 }
 
-void fun_beep( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs ) {
+void fun_beep( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
     safe_chr( BEEP_CHAR, buff, bufc );
 }

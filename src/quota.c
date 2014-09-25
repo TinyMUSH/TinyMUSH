@@ -28,7 +28,8 @@
  * load_quota: Load a quota into an array. Expects A_QUOTA or A_QUOTA.
  */
 
-void load_quota( int q_list[], dbref player, int qtype ) {
+void load_quota( int q_list[], dbref player, int qtype )
+{
     int i, aowner, aflags, alen;
 
     char *quota_str, *p, *tokst;
@@ -44,7 +45,7 @@ void load_quota( int q_list[], dbref player, int qtype ) {
     }
     for( p = strtok_r( quota_str, " ", &tokst ), i = 0;
             p && ( i < 5 ); p = strtok_r( NULL, " ", &tokst ), i++ ) {
-        q_list[i] = ( int ) strtol( p, ( char ** ) NULL, 10 );
+        q_list[i] = ( int ) strtol( p, ( char **) NULL, 10 );
     }
 
     free_lbuf( quota_str );
@@ -53,7 +54,8 @@ void load_quota( int q_list[], dbref player, int qtype ) {
 /* ---------------------------------------------------------------------------
  * save_quota: turns a quota array into an attribute.
  */
-void save_quota( int q_list[], dbref player, int qtype ) {
+void save_quota( int q_list[], dbref player, int qtype )
+{
     char buf[MBUF_SIZE];
 
     sprintf( buf, "%d %d %d %d %d", q_list[0], q_list[1], q_list[2],
@@ -65,7 +67,8 @@ void save_quota( int q_list[], dbref player, int qtype ) {
  * mung_quota, show_quota, do_quota: Manage quotas.
  */
 
-static void count_objquota( dbref player, int *aq, int *rq, int *eq, int *tq, int *pq ) {
+static void count_objquota( dbref player, int *aq, int *rq, int *eq, int *tq, int *pq )
+{
     register int a, r, e, t, p, i;
 
     a = r = e = t = p = 0;
@@ -101,7 +104,8 @@ static void count_objquota( dbref player, int *aq, int *rq, int *eq, int *tq, in
 }
 
 
-static void adjust_quota( dbref player, int qtype, int value, int key ) {
+static void adjust_quota( dbref player, int qtype, int value, int key )
+{
     register int aq, rq;
 
     int q_list[5], rq_list[5];
@@ -135,7 +139,8 @@ static void adjust_quota( dbref player, int qtype, int value, int key ) {
 }
 
 
-static void mung_quotas( dbref player, int key, int value ) {
+static void mung_quotas( dbref player, int key, int value )
+{
     int xq, rooms, exits, things, players;
 
     int q_list[5], rq_list[5];
@@ -174,7 +179,8 @@ static void mung_quotas( dbref player, int key, int value ) {
     }
 }
 
-static void show_quota( dbref player, dbref victim ) {
+static void show_quota( dbref player, dbref victim )
+{
     int q_list[5], rq_list[5], dq_list[5], i;
 
     load_quota( q_list, victim, A_QUOTA );
@@ -185,19 +191,22 @@ static void show_quota( dbref player, dbref victim ) {
     }
 
     if( Free_Quota( victim ) ) {
-        if( mudconf.typed_quotas )
+        if( mudconf.typed_quotas ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A", Name( victim ), dq_list[QTYPE_ALL], dq_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], dq_list[QTYPE_THING], dq_list[QTYPE_PLAYER] );
-        else
+        } else {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - N/A", Name( victim ), dq_list[QTYPE_ALL] );
+        }
     } else {
-        if( mudconf.typed_quotas )
+        if( mudconf.typed_quotas ) {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d", Name( victim ), dq_list[QTYPE_ALL], q_list[QTYPE_ALL], dq_list[QTYPE_ROOM], q_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], q_list[QTYPE_EXIT], dq_list[QTYPE_THING], q_list[QTYPE_THING], dq_list[QTYPE_PLAYER], q_list[QTYPE_PLAYER] );
-        else
+        } else {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME, "%-16s: %4d - %3d", Name( victim ), dq_list[QTYPE_ALL], q_list[QTYPE_ALL] );
+        }
     }
 }
 
-static void show_quota_header( dbref player ) {
+static void show_quota_header( dbref player )
+{
     if( mudconf.typed_quotas )
         notify_quiet( player,
                       "Name            : Quot - Lim  Room - Lim  Exit - Lim  Thin - Lim  Play - Lim" );
@@ -206,7 +215,8 @@ static void show_quota_header( dbref player ) {
     }
 }
 
-void do_quota( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
+void do_quota( dbref player, dbref cause, int key, char *arg1, char *arg2 )
+{
     dbref who;
 
     char *name, *target;
@@ -227,7 +237,7 @@ void do_quota( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
 
     if( key & QUOTA_ALL ) {
         if( arg1 && *arg1 ) {
-            value = ( int ) strtol( arg1, ( char ** ) NULL, 10 );
+            value = ( int ) strtol( arg1, ( char **) NULL, 10 );
             set = 1;
             if( value < 0 ) {
                 notify( player, "Illegal quota value." );
@@ -283,7 +293,7 @@ void do_quota( dbref player, dbref cause, int key, char *arg1, char *arg2 ) {
     }
     if( arg2 && *arg2 ) {
         set = 1;
-        value = ( int ) strtol( arg2, ( char ** ) NULL, 10 );
+        value = ( int ) strtol( arg2, ( char **) NULL, 10 );
         if( value < 0 ) {
             notify( player, "Illegal quota value." );
             return;

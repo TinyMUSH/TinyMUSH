@@ -47,7 +47,8 @@ static int type_quota( int );
 
 static int pay_quota( dbref, int, int );
 
-char *safe_snprintf(char *buff, size_t size, const char *format, ... ) {
+char *safe_snprintf(char *buff, size_t size, const char *format, ... )
+{
     va_list ap;
 
     va_start( ap, format );
@@ -59,16 +60,18 @@ char *safe_snprintf(char *buff, size_t size, const char *format, ... ) {
     return(buff);
 }
 
-char *safe_vsnprintf(char *buff, size_t size, const char *format, va_list ap ) {
- 
+char *safe_vsnprintf(char *buff, size_t size, const char *format, va_list ap )
+{
+
     vsnprintf( buff, size, format, ap );
- 
+
     buff[size - 1] = '\0';
- 
+
     return(buff);
 }
 
-void safe_sprintf( char *str, char **bp, const char *format, ... ) {
+void safe_sprintf( char *str, char **bp, const char *format, ... )
+{
     int len, n;
     va_list ap;
 
@@ -79,7 +82,7 @@ void safe_sprintf( char *str, char **bp, const char *format, ... ) {
         **bp = '\0';
         return;
     }
-    
+
     vsnprintf( *bp, n, format, ap );
     va_end( ap );
     len = strlen( *bp );
@@ -92,12 +95,14 @@ void safe_sprintf( char *str, char **bp, const char *format, ... ) {
  * insert_first, remove_first: Insert or remove objects from lists.
  */
 
-dbref insert_first( dbref head, dbref thing ) {
+dbref insert_first( dbref head, dbref thing )
+{
     s_Next( thing, head );
     return thing;
 }
 
-dbref remove_first( dbref head, dbref thing ) {
+dbref remove_first( dbref head, dbref thing )
+{
     dbref prev;
 
     if( head == thing ) {
@@ -117,7 +122,8 @@ dbref remove_first( dbref head, dbref thing ) {
  * reverse_list: Reverse the order of members in a list.
  */
 
-dbref reverse_list( dbref list ) {
+dbref reverse_list( dbref list )
+{
     dbref newlist, rest;
 
     newlist = NOTHING;
@@ -134,7 +140,8 @@ dbref reverse_list( dbref list ) {
  * member - indicate if thing is in list
  */
 
-int member( dbref thing, dbref list ) {
+int member( dbref thing, dbref list )
+{
     DOLIST( list, list ) {
         if( list == thing ) {
             return 1;
@@ -147,7 +154,8 @@ int member( dbref thing, dbref list ) {
  * is_integer, is_number: see if string contains just a number.
  */
 
-int is_integer( char *str ) {
+int is_integer( char *str )
+{
     while( *str && isspace( *str ) ) {
         str++;    /* Leading spaces */
     }
@@ -169,7 +177,8 @@ int is_integer( char *str ) {
     return ( *str ? 0 : 1 );
 }
 
-int is_number( char *str ) {
+int is_number( char *str )
+{
     int got_one;
 
     while( *str && isspace( *str ) ) {
@@ -203,7 +212,8 @@ int is_number( char *str ) {
     return ( ( *str || !got_one ) ? 0 : 1 );
 }
 
-int could_doit( dbref player, dbref thing, int locknum ) {
+int could_doit( dbref player, dbref thing, int locknum )
+{
     char *key;
 
     dbref aowner;
@@ -227,7 +237,8 @@ int could_doit( dbref player, dbref thing, int locknum ) {
     return doit;
 }
 
-static int canpayquota( dbref player, dbref who, int cost, int objtype ) {
+static int canpayquota( dbref player, dbref who, int cost, int objtype )
+{
     register int quota;
 
     int q_list[5];
@@ -268,7 +279,8 @@ static int canpayquota( dbref player, dbref who, int cost, int objtype ) {
 }
 
 
-static int pay_quota( dbref who, int cost, int objtype ) {
+static int pay_quota( dbref who, int cost, int objtype )
+{
     /*
      * If no cost, succeed.  Negative costs /must/ be managed, however
      */
@@ -282,7 +294,8 @@ static int pay_quota( dbref who, int cost, int objtype ) {
     return 1;
 }
 
-int canpayfees( dbref player, dbref who, int pennies, int quota, int objtype ) {
+int canpayfees( dbref player, dbref who, int pennies, int quota, int objtype )
+{
     if( !Wizard( who ) && !Wizard( Owner( who ) ) &&
             !Free_Money( who ) && !Free_Money( Owner( who ) ) &&
             ( Pennies( Owner( who ) ) < pennies ) ) {
@@ -306,7 +319,8 @@ int canpayfees( dbref player, dbref who, int pennies, int quota, int objtype ) {
     return 1;
 }
 
-static int type_quota( int objtype ) {
+static int type_quota( int objtype )
+{
     int qtype;
 
     /*
@@ -329,7 +343,8 @@ static int type_quota( int objtype ) {
     return ( qtype );
 }
 
-int payfor( dbref who, dbref cost ) {
+int payfor( dbref who, dbref cost )
+{
     dbref tmp;
 
     if( Wizard( who ) || Wizard( Owner( who ) ) ||
@@ -345,7 +360,8 @@ int payfor( dbref who, dbref cost ) {
     return 0;
 }
 
-int payfees( dbref who, int pennies, int quota, int objtype ) {
+int payfees( dbref who, int pennies, int quota, int objtype )
+{
     /*
      * You /must/ have called canpayfees() first.  If not, your
      * * database will be eaten by rabid squirrels.
@@ -356,7 +372,8 @@ int payfees( dbref who, int pennies, int quota, int objtype ) {
     return payfor( who, pennies );
 }
 
-void add_quota( dbref who, int payment, int type ) {
+void add_quota( dbref who, int payment, int type )
+{
     int q_list[5];
 
     load_quota( q_list, Owner( who ), A_RQUOTA );
@@ -369,7 +386,8 @@ void add_quota( dbref who, int payment, int type ) {
     save_quota( q_list, Owner( who ), A_RQUOTA );
 }
 
-void giveto( dbref who, int pennies ) {
+void giveto( dbref who, int pennies )
+{
     if( Wizard( who ) || Wizard( Owner( who ) ) ||
             Free_Money( who ) || Free_Money( Owner( who ) ) ||
             Immortal( who ) || Immortal( Owner( who ) ) ) {
@@ -379,7 +397,8 @@ void giveto( dbref who, int pennies ) {
     s_Pennies( who, Pennies( who ) + pennies );
 }
 
-int ok_name( const char *name ) {
+int ok_name( const char *name )
+{
     const char *cp;
 
     char *purename = strip_ansi( name );
@@ -433,7 +452,8 @@ int ok_name( const char *name ) {
              string_compare( purename, "here" ) );
 }
 
-int ok_player_name( const char *name ) {
+int ok_player_name( const char *name )
+{
     const char *cp, *good_chars;
 
     /*
@@ -469,7 +489,8 @@ int ok_player_name( const char *name ) {
     return 1;
 }
 
-int ok_attr_name( const char *attrname ) {
+int ok_attr_name( const char *attrname )
+{
     const char *scan;
 
     if( !isalpha( *attrname ) && ( *attrname != '_' ) ) {
@@ -486,7 +507,8 @@ int ok_attr_name( const char *attrname ) {
     return 1;
 }
 
-int ok_password( const char *password, dbref player ) {
+int ok_password( const char *password, dbref player )
+{
     const char *scan;
 
     int num_upper = 0;
@@ -554,7 +576,8 @@ int ok_password( const char *password, dbref player ) {
  * handle_ears: Generate the 'grows ears' and 'loses ears' messages.
  */
 
-void handle_ears( dbref thing, int could_hear, int can_hear ) {
+void handle_ears( dbref thing, int could_hear, int can_hear )
+{
     char *buff, *bp;
 
     int gender;
@@ -567,14 +590,15 @@ void handle_ears( dbref thing, int could_hear, int can_hear ) {
             safe_name( thing, buff, &bp );
         }
         gender = get_gender( thing );
-        notify_check( thing, thing, ( MSG_ME | MSG_NBR | MSG_LOC | MSG_INV ), "%s %s %s listening.", buff, ( ( gender == 4 ) ? "are" : "is" ), ( can_hear ? "now" : "no longer" )  ); 
+        notify_check( thing, thing, ( MSG_ME | MSG_NBR | MSG_LOC | MSG_INV ), "%s %s %s listening.", buff, ( ( gender == 4 ) ? "are" : "is" ), ( can_hear ? "now" : "no longer" )  );
         free_lbuf( buff );
     }
 }
 
 /* for lack of better place the @switch code is here */
 
-void do_switch( dbref player, dbref cause, int key, char *expr, char *args[], int nargs, char *cargs[], int ncargs ) {
+void do_switch( dbref player, dbref cause, int key, char *expr, char *args[], int nargs, char *cargs[], int ncargs )
+{
     int a, any, now;
 
     char *buff, *tbuf, *bp, *str;
@@ -639,7 +663,8 @@ void do_switch( dbref player, dbref cause, int key, char *expr, char *args[], in
  * do_end: Stop processing an action list, based on a conditional.
  */
 
-void do_end( dbref player, dbref cause, int key, char *condstr, char *cmdstr, char *args[], int nargs ) {
+void do_end( dbref player, dbref cause, int key, char *condstr, char *cmdstr, char *args[], int nargs )
+{
     int k = key & ENDCMD_ASSERT;
 
     int n = xlate( condstr );
@@ -657,7 +682,8 @@ void do_end( dbref player, dbref cause, int key, char *condstr, char *cmdstr, ch
  * Command hooks.
  */
 
-void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) {
+void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target )
+{
     CMDENT *cmdp;
 
     char *p;
@@ -674,7 +700,7 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
         *p = tolower( *p );
     }
     if( !cmdname ||
-            ( ( cmdp = ( CMDENT * ) hashfind( cmdname,
+            ( ( cmdp = ( CMDENT *) hashfind( cmdname,
                        &mudstate.command_htab ) ) == NULL ) ||
             ( cmdp->callseq & CS_ADDED ) ) {
         notify( player, "That is not a valid built-in command." );
@@ -808,7 +834,7 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
      * All right, we have what we need. Go allocate a hook.
      */
 
-    hp = ( HOOKENT * ) XMALLOC( sizeof( HOOKENT ), "do_hook" );
+    hp = ( HOOKENT *) XMALLOC( sizeof( HOOKENT ), "do_hook" );
     hp->thing = thing;
     hp->atr = atr;
 
@@ -846,7 +872,8 @@ void do_hook( dbref player, dbref cause, int key, char *cmdname, char *target ) 
  * Command overriding and friends.
  */
 
-void do_addcommand( dbref player, dbref cause, int key, char *name, char *command ) {
+void do_addcommand( dbref player, dbref cause, int key, char *name, char *command )
+{
     CMDENT *old, *cmd;
     ADDENT *add, *nextp;
     dbref thing;
@@ -877,7 +904,7 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
         return;
     }
 
-    old = ( CMDENT * ) hashfind( name, &mudstate.command_htab );
+    old = ( CMDENT *) hashfind( name, &mudstate.command_htab );
 
     if( old && ( old->callseq & CS_ADDED ) ) {
 
@@ -886,7 +913,7 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
          * added using the same object and attribute...
          */
 
-        for( nextp = ( ADDENT * ) old->info.added; nextp != NULL;
+        for( nextp = ( ADDENT *) old->info.added; nextp != NULL;
                 nextp = nextp->next ) {
             if( ( nextp->thing == thing ) && ( nextp->atr == atr ) ) {
                 notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s already added.", name );
@@ -898,11 +925,11 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
          * else tack it on to the existing entry...
          */
 
-        add = ( ADDENT * ) XMALLOC( sizeof( ADDENT ), "addcommand.add" );
+        add = ( ADDENT *) XMALLOC( sizeof( ADDENT ), "addcommand.add" );
         add->thing = thing;
         add->atr = atr;
         add->name = XSTRDUP( name, "addcommand.addname" );
-        add->next = ( ADDENT * ) old->info.added;
+        add->next = ( ADDENT *) old->info.added;
         if( key & ADDCMD_PRESERVE ) {
             old->callseq |= CS_ACTOR;
         } else {
@@ -917,7 +944,7 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
             hashdelete( name, &mudstate.command_htab );
         }
 
-        cmd = ( CMDENT * ) XMALLOC( sizeof( CMDENT ), "addcommand.cmd" );
+        cmd = ( CMDENT *) XMALLOC( sizeof( CMDENT ), "addcommand.cmd" );
 
         cmd->cmdname = XSTRDUP( name, "addcommand.cmdname" );
         cmd->switches = NULL;
@@ -929,14 +956,14 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
         cmd->callseq = CS_ADDED | CS_ONE_ARG |
                        ( ( old && ( old->callseq & CS_LEADIN ) ) ? CS_LEADIN : 0 ) |
                        ( ( key & ADDCMD_PRESERVE ) ? CS_ACTOR : 0 );
-        add = ( ADDENT * ) XMALLOC( sizeof( ADDENT ), "addcommand.add" );
+        add = ( ADDENT *) XMALLOC( sizeof( ADDENT ), "addcommand.add" );
         add->thing = thing;
         add->atr = atr;
         add->name = XSTRDUP( name, "addcommand.addname" );
         add->next = NULL;
         cmd->info.added = add;
 
-        hashadd( cmd->cmdname, ( int * ) cmd, &mudstate.command_htab, 0 );
+        hashadd( cmd->cmdname, ( int *) cmd, &mudstate.command_htab, 0 );
 
         if( old ) {
             /*
@@ -947,8 +974,8 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
             if( !strcmp( name, old->cmdname ) ) {
                 snprintf(s1, MBUF_SIZE, "__%s", old->cmdname );
                 hashdelete( s1, &mudstate.command_htab );
-                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
-                hashadd( s1, ( int * ) old, &mudstate.command_htab, 0 );
+                hashreplall( ( int *) old, ( int *) cmd, &mudstate.command_htab );
+                hashadd( s1, ( int *) old, &mudstate.command_htab, 0 );
             }
         }
     }
@@ -961,7 +988,8 @@ void do_addcommand( dbref player, dbref cause, int key, char *name, char *comman
     notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "Command %s added.", name );
 }
 
-void do_listcommands( dbref player, dbref cause, int key, char *name ) {
+void do_listcommands( dbref player, dbref cause, int key, char *name )
+{
     CMDENT *old;
 
     ADDENT *nextp;
@@ -979,7 +1007,7 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
     }
 
     if( *name ) {
-        old = ( CMDENT * ) hashfind( name, &mudstate.command_htab );
+        old = ( CMDENT *) hashfind( name, &mudstate.command_htab );
 
         if( old && ( old->callseq & CS_ADDED ) ) {
             if( strcmp( name, old->cmdname ) ) {
@@ -987,9 +1015,9 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
                 return;
             }
 
-            for( nextp = ( ADDENT * ) old->info.added; nextp != NULL;
+            for( nextp = ( ADDENT *) old->info.added; nextp != NULL;
                     nextp = nextp->next ) {
-                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR * ) atr_num( nextp->atr ) )->name );
+                notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR *) atr_num( nextp->atr ) )->name );
             }
         } else {
             notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s not found in command table.", name );
@@ -1001,8 +1029,8 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
                 keyname = hash_nextkey( &mudstate.command_htab ) ) {
 
             old =
-                ( CMDENT * ) hashfind( keyname,
-                                       &mudstate.command_htab );
+                ( CMDENT *) hashfind( keyname,
+                                      &mudstate.command_htab );
 
             if( old && ( old->callseq & CS_ADDED ) ) {
                 if( strcmp( keyname, old->cmdname ) ) {
@@ -1010,9 +1038,9 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
                     continue;
                 }
 
-                for( nextp = ( ADDENT * ) old->info.added;
+                for( nextp = ( ADDENT *) old->info.added;
                         nextp != NULL; nextp = nextp->next ) {
-                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR * ) atr_num( nextp->atr ) )->name );
+                    notify_check( player, player, MSG_PUP_ALWAYS|MSG_ME_ALL|MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ( ( ATTR *) atr_num( nextp->atr ) )->name );
                     didit = 1;
                 }
             }
@@ -1023,7 +1051,8 @@ void do_listcommands( dbref player, dbref cause, int key, char *name ) {
     }
 }
 
-void do_delcommand( dbref player, dbref cause, int key, char *name, char *command ) {
+void do_delcommand( dbref player, dbref cause, int key, char *name, char *command )
+{
     CMDENT *old, *cmd;
     ADDENT *prev = NULL, *nextp;
     dbref thing;
@@ -1052,11 +1081,11 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
         *s = tolower( *s );
     }
 
-    old = ( CMDENT * ) hashfind( name, &mudstate.command_htab );
+    old = ( CMDENT *) hashfind( name, &mudstate.command_htab );
 
     if( old && ( old->callseq & CS_ADDED ) ) {
         if( !*command ) {
-            for( prev = ( ADDENT * ) old->info.added; prev != NULL;
+            for( prev = ( ADDENT *) old->info.added; prev != NULL;
                     prev = nextp ) {
                 nextp = prev->next;
                 /*
@@ -1067,14 +1096,14 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
             }
             hashdelete( name, &mudstate.command_htab );
             snprintf(s1, MBUF_SIZE, "__%s", old->cmdname );
-            if( ( cmd = ( CMDENT * ) hashfind( s1, &mudstate.command_htab ) ) != NULL ) {
-                hashadd( cmd->cmdname, ( int * ) cmd,
+            if( ( cmd = ( CMDENT *) hashfind( s1, &mudstate.command_htab ) ) != NULL ) {
+                hashadd( cmd->cmdname, ( int *) cmd,
                          &mudstate.command_htab, 0 );
                 /*
                  * in case we deleted by alias
                  */
                 if( strcmp( name, cmd->cmdname ) ) {
-                    hashadd( name, ( int * ) cmd,
+                    hashadd( name, ( int *) cmd,
                              &mudstate.command_htab,
                              HASH_ALIAS );
                 }
@@ -1085,11 +1114,11 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                  */
                 snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname );
                 hashdelete( s1, &mudstate.command_htab );
-                hashadd( s1, ( int * ) cmd, &mudstate.command_htab, HASH_ALIAS );
+                hashadd( s1, ( int *) cmd, &mudstate.command_htab, HASH_ALIAS );
 
-                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
+                hashreplall( ( int *) old, ( int *) cmd, &mudstate.command_htab );
             } else {
-                hashdelall( ( int * ) old, &mudstate.command_htab );
+                hashdelall( ( int *) old, &mudstate.command_htab );
             }
             XFREE( old->cmdname, "delcommand.cmdname" );
             XFREE( old, "delcommand.cmdp" );
@@ -1097,7 +1126,7 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
             notify( player, "Done" );
             return;
         } else {
-            for( nextp = ( ADDENT * ) old->info.added; nextp != NULL;
+            for( nextp = ( ADDENT *) old->info.added; nextp != NULL;
                     nextp = nextp->next ) {
                 if( ( nextp->thing == thing )
                         && ( nextp->atr == atr ) ) {
@@ -1109,8 +1138,8 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                         if( !nextp->next ) {
                             hashdelete( name, &mudstate. command_htab );
                             snprintf(s1, MBUF_SIZE, "__%s", name );
-                            if( ( cmd = ( CMDENT * ) hashfind ( s1, &mudstate.command_htab ) ) != NULL ) {
-                                hashadd( cmd->cmdname, ( int * ) cmd, &mudstate.command_htab, 0 );
+                            if( ( cmd = ( CMDENT *) hashfind ( s1, &mudstate.command_htab ) ) != NULL ) {
+                                hashadd( cmd->cmdname, ( int *) cmd, &mudstate.command_htab, 0 );
                                 /*
                                  * in case we deleted by alias
                                  */
@@ -1120,20 +1149,20 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
                                           cmdname ) ) {
                                     hashadd
                                     ( name,
-                                      ( int * ) cmd, &mudstate.command_htab, HASH_ALIAS );
+                                      ( int *) cmd, &mudstate.command_htab, HASH_ALIAS );
                                 }
 
                                 /*
                                  * the __ alias may have been temporarily
                                  * * marked as the original hash entry
                                  */
-                                 snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname );
+                                snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname );
                                 hashdelete( s1, &mudstate.command_htab );
-                                hashadd( s1, ( int * ) cmd,&mudstate.command_htab, HASH_ALIAS );
+                                hashadd( s1, ( int *) cmd,&mudstate.command_htab, HASH_ALIAS );
 
-                                hashreplall( ( int * ) old, ( int * ) cmd, &mudstate.command_htab );
+                                hashreplall( ( int *) old, ( int *) cmd, &mudstate.command_htab );
                             } else {
-                                hashdelall( ( int * ) old, &mudstate.command_htab );
+                                hashdelall( ( int *) old, &mudstate.command_htab );
                             }
                             XFREE( old->cmdname, "delcommand.cmdname" );
                             XFREE( old, "delcommand.cmdp" );
@@ -1165,7 +1194,8 @@ void do_delcommand( dbref player, dbref cause, int key, char *name, char *comman
  * will be processed normally.
  */
 
-void handle_prog( DESC *d, char *message ) {
+void handle_prog( DESC *d, char *message )
+{
     DESC *all, *dsave;
 
     char *cmd;
@@ -1205,13 +1235,13 @@ void handle_prog( DESC *d, char *message ) {
     }
     cmd = atr_get( d->player, A_PROGCMD, &aowner, &aflags, &alen );
     wait_que( d->program_data->wait_cause, d->player, 0, NOTHING, 0, cmd,
-              ( char ** ) &message, 1, d->program_data->wait_data );
+              ( char **) &message, 1, d->program_data->wait_data );
 
     /*
      * First, set 'all' to a descriptor we find for this player
      */
 
-    all = ( DESC * ) nhashfind( d->player, &mudstate.desc_htab );
+    all = ( DESC *) nhashfind( d->player, &mudstate.desc_htab );
     Free_RegData( all->program_data->wait_data );
     XFREE( all->program_data, "program_data" );
 
@@ -1226,7 +1256,8 @@ void handle_prog( DESC *d, char *message ) {
     free_lbuf( cmd );
 }
 
-static int ok_program( dbref player, dbref doer ) {
+static int ok_program( dbref player, dbref doer )
+{
     if( ( !( Prog( player ) || Prog( Owner( player ) ) ) && !Controls( player, doer ) )
             || ( God( doer ) && !God( player ) ) ) {
         notify( player, NOPERM_MESSAGE );
@@ -1243,7 +1274,8 @@ static int ok_program( dbref player, dbref doer ) {
     return 1;
 }
 
-void do_quitprog( dbref player, dbref cause, int key, char *name ) {
+void do_quitprog( dbref player, dbref cause, int key, char *name )
+{
     DESC *d;
 
     dbref doer;
@@ -1271,7 +1303,7 @@ void do_quitprog( dbref player, dbref cause, int key, char *name ) {
         return;
     }
 
-    d = ( DESC * ) nhashfind( doer, &mudstate.desc_htab );
+    d = ( DESC *) nhashfind( doer, &mudstate.desc_htab );
 
     Free_RegData( d->program_data->wait_data );
     XFREE( d->program_data, "program_data" );
@@ -1288,7 +1320,8 @@ void do_quitprog( dbref player, dbref cause, int key, char *name ) {
     notify( doer, "Your @program has been terminated." );
 }
 
-void do_prog( dbref player, dbref cause, int key, char *name, char *command ) {
+void do_prog( dbref player, dbref cause, int key, char *name, char *command )
+{
     DESC *d;
 
     PROG *program;
@@ -1367,7 +1400,7 @@ void do_prog( dbref player, dbref cause, int key, char *name, char *command ) {
         return;
     }
 
-    program = ( PROG * ) XMALLOC( sizeof( PROG ), "do_prog" );
+    program = ( PROG *) XMALLOC( sizeof( PROG ), "do_prog" );
     program->wait_cause = player;
 
     if( mudstate.rdata ) {
@@ -1397,7 +1430,8 @@ void do_prog( dbref player, dbref cause, int key, char *name, char *command ) {
  * do_restart: Restarts the game.
  */
 
-void do_restart( dbref player, dbref cause, int key ) {
+void do_restart( dbref player, dbref cause, int key )
+{
     LOGFILETAB *lp;
 
     MODULE *mp;
@@ -1457,7 +1491,7 @@ void do_restart( dbref player, dbref cause, int key ) {
         lt_dlclose( mp->handle );
     }
 
-    execl( mudconf.exec_path, mudconf.exec_path, ( char * ) "-r" , ( char * ) "-c", mudconf.config_file, NULL );
+    execl( mudconf.exec_path, mudconf.exec_path, ( char *) "-r" , ( char *) "-c", mudconf.config_file, NULL );
 }
 
 /* ---------------------------------------------------------------------------
@@ -1465,16 +1499,19 @@ void do_restart( dbref player, dbref cause, int key ) {
  * do_eval is similar, except it gets passed on arg.
  */
 
-void do_comment( dbref player, dbref cause, int key ) {
+void do_comment( dbref player, dbref cause, int key )
+{
 }
 
-void do_eval( dbref player, dbref cause, int key, char *str ) {
+void do_eval( dbref player, dbref cause, int key, char *str )
+{
 }
 
 /* ---------------------------------------------------------------------------
  */
 
-static dbref promote_dflt( dbref old, dbref new ) {
+static dbref promote_dflt( dbref old, dbref new )
+{
     switch( new ) {
     case NOPERM:
         return NOPERM;
@@ -1493,7 +1530,8 @@ static dbref promote_dflt( dbref old, dbref new ) {
     return NOTHING;
 }
 
-dbref match_possessed( dbref player, dbref thing, char *target, dbref dflt, int check_enter ) {
+dbref match_possessed( dbref player, dbref thing, char *target, dbref dflt, int check_enter )
+{
     dbref result, result1;
 
     int control;
@@ -1627,7 +1665,8 @@ dbref match_possessed( dbref player, dbref thing, char *target, dbref dflt, int 
  * parse_range: break up <what>,<low>,<high> syntax
  */
 
-void parse_range( char **name, dbref *low_bound, dbref *high_bound ) {
+void parse_range( char **name, dbref *low_bound, dbref *high_bound )
+{
     char *buff1, *buff2;
 
     buff1 = *name;
@@ -1643,7 +1682,7 @@ void parse_range( char **name, dbref *low_bound, dbref *high_bound ) {
             if( *buff1 == NUMBER_TOKEN ) {
                 buff1++;
             }
-            *high_bound = ( int ) strtol( buff1, ( char ** ) NULL, 10 );
+            *high_bound = ( int ) strtol( buff1, ( char **) NULL, 10 );
             if( *high_bound >= mudstate.db_top ) {
                 *high_bound = mudstate.db_top - 1;
             }
@@ -1656,7 +1695,7 @@ void parse_range( char **name, dbref *low_bound, dbref *high_bound ) {
         if( *buff2 == NUMBER_TOKEN ) {
             buff2++;
         }
-        *low_bound = ( int ) strtol( buff2, ( char ** ) NULL, 10 );
+        *low_bound = ( int ) strtol( buff2, ( char **) NULL, 10 );
         if( *low_bound < 0 ) {
             *low_bound = 0;
         }
@@ -1666,7 +1705,8 @@ void parse_range( char **name, dbref *low_bound, dbref *high_bound ) {
     }
 }
 
-int parse_thing_slash( dbref player, char *thing, char **after, dbref *it ) {
+int parse_thing_slash( dbref player, char *thing, char **after, dbref *it )
+{
     char *str;
 
     /*
@@ -1703,7 +1743,8 @@ int parse_thing_slash( dbref player, char *thing, char **after, dbref *it ) {
 
 extern NAMETAB lock_sw[];
 
-int get_obj_and_lock( dbref player, char *what, dbref *it, ATTR **attr, char *errmsg, char **bufc ) {
+int get_obj_and_lock( dbref player, char *what, dbref *it, ATTR **attr, char *errmsg, char **bufc )
+{
     char *str, *tbuf;
 
     int anum;
@@ -1755,7 +1796,8 @@ int get_obj_and_lock( dbref player, char *what, dbref *it, ATTR **attr, char *er
  * ie. location for players/things, source for exits, NOTHING for rooms.
  */
 
-dbref where_is( dbref what ) {
+dbref where_is( dbref what )
+{
     dbref loc;
 
     if( !Good_obj( what ) ) {
@@ -1783,7 +1825,8 @@ dbref where_is( dbref what ) {
  * recursion exceeded.  If player is a room, returns itself.
  */
 
-dbref where_room( dbref what ) {
+dbref where_room( dbref what )
+{
     int count;
 
     for( count = mudconf.ntfy_nest_lim; count > 0; count-- ) {
@@ -1801,7 +1844,8 @@ dbref where_room( dbref what ) {
     return NOTHING;
 }
 
-int locatable( dbref player, dbref it, dbref cause ) {
+int locatable( dbref player, dbref it, dbref cause )
+{
     dbref loc_it, room_it;
 
     int findable_room;
@@ -1860,7 +1904,8 @@ int locatable( dbref player, dbref it, dbref cause ) {
  * IS the room.
  */
 
-int nearby( dbref player, dbref thing ) {
+int nearby( dbref player, dbref thing )
+{
     int thing_loc, player_loc;
 
     if( !Good_obj( player ) || !Good_obj( thing ) ) {
@@ -1883,7 +1928,8 @@ int nearby( dbref player, dbref thing ) {
  *              the caller.
  */
 
-char *master_attr( dbref player, dbref thing, int what, char **sargs, int nsargs, int *f_ptr ) {
+char *master_attr( dbref player, dbref thing, int what, char **sargs, int nsargs, int *f_ptr )
+{
     /*
      * If the attribute exists, evaluate it and return pointer to lbuf.
      * * If not, return NULL.
@@ -2039,7 +2085,8 @@ char *master_attr( dbref player, dbref thing, int what, char **sargs, int nsargs
  * did_it: Have player do something to/with thing
  */
 
-void did_it( dbref player, dbref thing, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key ) {
+void did_it( dbref player, dbref thing, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key )
+{
     GDATA *preserve;
 
     char *d, *m, *buff, *act, *charges, *bp, *str;
@@ -2152,7 +2199,7 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
                 } else {
                     exec( buff, &bp, thing, player, player,
                           EV_EVAL | EV_FIGNORE | EV_TOP,
-                          &str, ( char ** ) NULL, 0 );
+                          &str, ( char **) NULL, 0 );
                 }
             } else if( *d ) {
                 str = d;
@@ -2163,16 +2210,16 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
             *bp = '\0';
 
             if( mudconf.have_pueblo == 1 ) {
-            if( ( aflags & AF_HTML ) && Html( player ) ) {
-                char *buff_cp = buff + strlen( buff );
+                if( ( aflags & AF_HTML ) && Html( player ) ) {
+                    char *buff_cp = buff + strlen( buff );
 
-                safe_crlf( buff, &buff_cp );
-                notify_html( player, buff );
+                    safe_crlf( buff, &buff_cp );
+                    notify_html( player, buff );
+                } else {
+                    notify( player, buff );
+                }
             } else {
                 notify( player, buff );
-            }
-            } else {
-            notify( player, buff );
             }
             free_lbuf( buff );
         } else if( def ) {
@@ -2229,11 +2276,11 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
                 } else if( odef ) {
                     exec( buff, &bp, thing, player, player,
                           EV_EVAL | EV_FIGNORE | EV_TOP,
-                          &str, ( char ** ) &odef, 1 );
+                          &str, ( char **) &odef, 1 );
                 } else {
                     exec( buff, &bp, thing, player, player,
                           EV_EVAL | EV_FIGNORE | EV_TOP,
-                          &str, ( char ** ) NULL, 0 );
+                          &str, ( char **) NULL, 0 );
                 }
             } else if( *d ) {
                 str = d;
@@ -2289,7 +2336,7 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
                 atr_pget( thing, A_CHARGES, &aowner, &aflags,
                           &alen );
             if( *charges ) {
-                num = ( int ) strtol( charges, ( char ** ) NULL, 10 );
+                num = ( int ) strtol( charges, ( char **) NULL, 10 );
                 if( num > 0 ) {
                     buff = alloc_sbuf( "did_it.charges" );
                     sprintf( buff, "%d", num - 1 );
@@ -2352,7 +2399,8 @@ void did_it( dbref player, dbref thing, int what, const char *def, int owhat, co
  * * do_verb: Command interface to did_it.
  */
 
-void do_verb( dbref player, dbref cause, int key, char *victim_str, char *args[], int nargs ) {
+void do_verb( dbref player, dbref cause, int key, char *victim_str, char *args[], int nargs )
+{
     dbref actor, victim, aowner;
 
     int what, owhat, awhat, nxargs, restriction, aflags, i;
@@ -2470,7 +2518,7 @@ void do_verb( dbref player, dbref cause, int key, char *victim_str, char *args[]
     if( nargs >= 7 ) {
         parse_arglist( victim, actor, actor, args[6], '\0',
                        EV_STRIP_LS | EV_STRIP_TS, xargs, NUM_ENV_VARS,
-                       ( char ** ) NULL, 0 );
+                       ( char **) NULL, 0 );
         for( nxargs = 0; ( nxargs < NUM_ENV_VARS ) && xargs[nxargs];
                 nxargs++ );
     }
@@ -2535,7 +2583,8 @@ void do_verb( dbref player, dbref cause, int key, char *victim_str, char *args[]
  * do not deplete charges.
  */
 
-void do_include( dbref player, dbref cause, int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs ) {
+void do_include( dbref player, dbref cause, int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs )
+{
     dbref thing, aowner;
     int attrib, aflags, alen;
     char *act, *tp;
@@ -2590,7 +2639,8 @@ void do_include( dbref player, dbref cause, int key, char *object, char *argv[],
  * do_redirect: Redirect PUPPET, TRACE, VERBOSE output to another player.
  */
 
-void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_name ) {
+void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_name )
+{
     dbref from_ref, to_ref;
 
     NUMBERTAB *np;
@@ -2619,7 +2669,7 @@ void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_
             notify( player, "That object is not being redirected." );
             return;
         }
-        np = ( NUMBERTAB * ) nhashfind( from_ref, &mudstate.redir_htab );
+        np = ( NUMBERTAB *) nhashfind( from_ref, &mudstate.redir_htab );
         if( np ) {
             /*
              * This should always be true -- if we have the flag the
@@ -2685,9 +2735,9 @@ void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_
      * Insert it into the hashtable.
      */
 
-    np = ( NUMBERTAB * ) XMALLOC( sizeof( NUMBERTAB ), "redir_struct" );
+    np = ( NUMBERTAB *) XMALLOC( sizeof( NUMBERTAB ), "redir_struct" );
     np->num = to_ref;
-    nhashadd( from_ref, ( int * ) np, &mudstate.redir_htab );
+    nhashadd( from_ref, ( int *) np, &mudstate.redir_htab );
     s_Flags3( from_ref, Flags3( from_ref ) | HAS_REDIRECT );
 
     if( from_ref != player ) {
@@ -2703,7 +2753,8 @@ void do_redirect( dbref player, dbref cause, int key, char *from_name, char *to_
  * do_reference: Manipulate nrefs.
  */
 
-void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj_name ) {
+void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj_name )
+{
     HASHENT *hptr;
 
     HASHTAB *htab;
@@ -2760,7 +2811,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
                     safe_str( buff, outbuf, &bp );
                     free_lbuf( buff );
                     if( Owner( player ) != Owner( * ( hptr->data ) ) ) {
-                        safe_str( ( char * ) " [owner: ", outbuf, &bp );
+                        safe_str( ( char *) " [owner: ", outbuf, &bp );
                         buff = unparse_object( player, Owner( * ( hptr->data ) ), 0 );
                         safe_str( buff, outbuf, &bp );
                         free_lbuf( buff );
@@ -2818,7 +2869,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
      * Does this reference name exist already?
      */
 
-    np = ( int * ) hashfind( tbuf, &mudstate.nref_htab );
+    np = ( int *) hashfind( tbuf, &mudstate.nref_htab );
     if( np ) {
         if( target == NOTHING ) {
             XFREE( np, "nref" );
@@ -2835,7 +2886,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
              * Replace it.
              */
             XFREE( np, "nref" );
-            np = ( dbref * ) XMALLOC( sizeof( dbref ), "nref" );
+            np = ( dbref *) XMALLOC( sizeof( dbref ), "nref" );
             *np = target;
             hashrepl( tbuf, np, &mudstate.nref_htab );
             notify( player, "Reference updated." );
@@ -2853,7 +2904,7 @@ void do_reference( dbref player, dbref cause, int key, char *ref_name, char *obj
         return;
     }
 
-    np = ( dbref * ) XMALLOC( sizeof( dbref ), "nref" );
+    np = ( dbref *) XMALLOC( sizeof( dbref ), "nref" );
     *np = target;
     hashadd( tbuf, np, &mudstate.nref_htab, 0 );
     notify( player, "Referenced." );

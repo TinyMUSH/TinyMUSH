@@ -32,7 +32,8 @@ static long genrand_int31( void );
  * Trim off leading and trailing spaces if the separator char is a space
  */
 
-char *trim_space_sep( char *str, const Delim *sep ) {
+char *trim_space_sep( char *str, const Delim *sep )
+{
     char *p;
 
     if( ( sep->len > 1 ) || ( sep->str[0] != ' ' ) || !*str ) {
@@ -56,7 +57,8 @@ char *trim_space_sep( char *str, const Delim *sep ) {
  * tell what color it is.
  */
 
-char *next_token( char *str, const Delim *sep ) {
+char *next_token( char *str, const Delim *sep )
+{
     char *p;
 
     if( sep->len == 1 ) {
@@ -87,7 +89,8 @@ char *next_token( char *str, const Delim *sep ) {
     return str;
 }
 
-char *split_token( char **sp, const Delim *sep ) {
+char *split_token( char **sp, const Delim *sep )
+{
     char *str, *save, *p;
 
     save = str = *sp;
@@ -127,7 +130,8 @@ char *split_token( char **sp, const Delim *sep ) {
     return save;
 }
 
-char *next_token_ansi( char *str, const Delim *sep, int *ansi_state_ptr ) {
+char *next_token_ansi( char *str, const Delim *sep, int *ansi_state_ptr )
+{
     int ansi_state = *ansi_state_ptr;
 
     char *p;
@@ -170,7 +174,8 @@ char *next_token_ansi( char *str, const Delim *sep, int *ansi_state_ptr ) {
  * Count the words in a delimiter-separated list.
  */
 
-int countwords( char *str, const Delim *sep ) {
+int countwords( char *str, const Delim *sep )
+{
     int n;
 
     str = trim_space_sep( str, sep );
@@ -186,7 +191,8 @@ int countwords( char *str, const Delim *sep ) {
  * list2arr, arr2list: Convert lists to arrays and vice versa.
  */
 
-int list2arr( char ***arr, int maxtok, char *list, const Delim *sep ) {
+int list2arr( char ***arr, int maxtok, char *list, const Delim *sep )
+{
     static unsigned char tok_starts[( LBUF_SIZE >> 3 ) + 1];
 
     static int initted = 0;
@@ -223,7 +229,7 @@ int list2arr( char ***arr, int maxtok, char *list, const Delim *sep ) {
      * pointers is dependent upon the original list string having not
      * been freed yet.
      */
-    *arr = ( char ** ) XCALLOC( ntok, sizeof( char * ), "list2arr" );
+    *arr = ( char **) XCALLOC( ntok, sizeof( char *), "list2arr" );
 
     tokpos >>= 3;
     ntok = 0;
@@ -249,7 +255,8 @@ int list2arr( char ***arr, int maxtok, char *list, const Delim *sep ) {
     return ntok;
 }
 
-void arr2list( char **arr, int alen, char *list, char **bufc, const Delim *sep ) {
+void arr2list( char **arr, int alen, char *list, char **bufc, const Delim *sep )
+{
     int i;
 
     if( alen ) {
@@ -268,7 +275,8 @@ void arr2list( char **arr, int alen, char *list, char **bufc, const Delim *sep )
  * takes the same maxlen and returns the same number of words.
  */
 
-int list2ansi( int *arr, int *prior_state, int maxlen, char *list, const Delim *sep ) {
+int list2ansi( int *arr, int *prior_state, int maxlen, char *list, const Delim *sep )
+{
     int i, ansi_state;
 
     if( maxlen <= 0 ) {
@@ -291,7 +299,8 @@ int list2ansi( int *arr, int *prior_state, int maxlen, char *list, const Delim *
  * Quick-matching for function purposes.
  */
 
-dbref match_thing( dbref player, char *name ) {
+dbref match_thing( dbref player, char *name )
+{
     init_match( player, name, NOTYPE );
     match_everything( MAT_EXIT_PARENTS );
     return ( noisy_match_result() );
@@ -303,15 +312,17 @@ dbref match_thing( dbref player, char *name ) {
  * for validity.
  */
 
-int fn_range_check( const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc ) {
+int fn_range_check( const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc )
+{
     if( ( nfargs >= minargs ) && ( nfargs <= maxargs ) ) {
         return 1;
     }
 
-    if( maxargs == ( minargs + 1 ) )
+    if( maxargs == ( minargs + 1 ) ) {
         safe_sprintf( result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs );
-    else
+    } else {
         safe_sprintf( result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs );
+    }
     return 0;
 }
 
@@ -320,7 +331,8 @@ int fn_range_check( const char *fname, int nfargs, int minargs, int maxargs, cha
  * delim_check: obtain delimiter
  */
 
-int delim_check( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags ) {
+int delim_check( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags )
+{
     char *tstr, *bp, *str;
 
     int tlen;
@@ -352,10 +364,10 @@ int delim_check( char *buff, char **bufc, dbref player, dbref caller, dbref caus
         sep->str[0] = *tstr;
     } else {
         if( ( dflags & DELIM_NULL ) &&
-                !strcmp( tstr, ( char * ) NULL_DELIM_VAR ) ) {
+                !strcmp( tstr, ( char *) NULL_DELIM_VAR ) ) {
             sep->str[0] = '\0';
         } else if( ( dflags & DELIM_CRLF ) &&
-                   !strcmp( tstr, ( char * ) "\r\n" ) ) {
+                   !strcmp( tstr, ( char *) "\r\n" ) ) {
             sep->str[0] = '\r';
         } else if( dflags & DELIM_STRING ) {
             if( tlen > MAX_DELIM_LEN ) {
@@ -384,14 +396,15 @@ int delim_check( char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Boolean true/false check.
  */
 
-int xlate( char *arg ) {
+int xlate( char *arg )
+{
     char *temp2;
 
     if( arg[0] == '#' ) {
         arg++;
         if( is_integer( arg ) ) {
             if( mudconf.bools_oldstyle ) {
-                switch( ( int ) strtol( arg, ( char ** ) NULL, 10 ) ) {
+                switch( ( int ) strtol( arg, ( char **) NULL, 10 ) ) {
                 case -1:
                     return 0;
                 case 0:
@@ -400,7 +413,7 @@ int xlate( char *arg ) {
                     return 1;
                 }
             } else {
-                return ( ( int ) strtol( arg, ( char ** ) NULL, 10 ) >= 0 );
+                return ( ( int ) strtol( arg, ( char **) NULL, 10 ) >= 0 );
             }
         }
         if( mudconf.bools_oldstyle ) {
@@ -418,7 +431,7 @@ int xlate( char *arg ) {
         return 0;
     }
     if( is_integer( temp2 ) ) {
-        return ( int ) strtol( temp2, ( char ** ) NULL, 10 );
+        return ( int ) strtol( temp2, ( char **) NULL, 10 );
     }
     return 1;
 }
@@ -428,7 +441,8 @@ int xlate( char *arg ) {
  * used by fun_reverse and fun_revwords to reverse things
  */
 
-void do_reverse( char *from, char *to ) {
+void do_reverse( char *from, char *to )
+{
     char *tp;
 
     tp = to + strlen( from );
@@ -444,7 +458,8 @@ void do_reverse( char *from, char *to ) {
  * based on MUX2's RandomINT32().
  */
 
-long random_range( long low, long high ) {
+long random_range( long low, long high )
+{
     unsigned long x, n, n_limit;
 
     /*
@@ -552,7 +567,8 @@ static int initf = 0;
 static unsigned long *next;
 
 /* initializes state[N] with a seed */
-void init_genrand( unsigned long s ) {
+void init_genrand( unsigned long s )
+{
     int j;
 
     state[0] = s & 0xffffffffUL;
@@ -577,7 +593,8 @@ void init_genrand( unsigned long s ) {
     initf = 1;
 }
 
-static void next_state( void ) {
+static void next_state( void )
+{
     unsigned long *p = state;
 
     int j;
@@ -607,7 +624,8 @@ static void next_state( void ) {
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
-static long genrand_int31( void ) {
+static long genrand_int31( void )
+{
     unsigned long y;
 
     if( --left == 0 ) {

@@ -4,11 +4,6 @@ AM_CPPFLAGS     = $(LTDLINCL)
 SUBDIRS         = src
 
 EXTRA_DIST      = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
-
-indent:
-	for i in `ls src/*.c src/*.h`; do \
-	astyle -A2 $$i; \
-	done; 
 	
 testpath:
 	@echo prefix : @prefix@
