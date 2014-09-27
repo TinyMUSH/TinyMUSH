@@ -1,6 +1,80 @@
 TinyMUSH 3.3
 ------------
 
+Alpha 7 : 2014-09-27
+
+commit 79f73d4a7ed28b951417700d7f74ac5de67c3bdf
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 27 19:42:06 2014 -0400
+
+    TinyMUSH 3.3 Alpha 7.
+
+commit cacf7c0134411f9b38726d2bf74bf43cbae56011
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 27 19:09:44 2014 -0400
+
+    Number of global registers, command arguments, player name length, hash factor and dbref/flags separator is now set in the config file.
+
+commit ef0443c1f41e5c996a8b81217f660ad425b367c8
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 27 15:21:59 2014 -0400
+
+    Output block size is now configurable via netmush.conf
+
+commit 15e59d326fd90ca390949593ac694be2a3e55a9b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 27 14:33:40 2014 -0400
+
+    User's doing and WHO's header is now dynamically allocated. No more fixed size.
+
+commit 4bf8f499526433d3c811e6a293a6472bcfa83021
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Sep 26 21:09:01 2014 -0400
+
+    Lag detection and malloc tracking is now configurable in netmush.
+
+commit 71ed55642419bf9080c43bd5f658a06331c87c8b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 24 21:03:52 2014 -0400
+
+    Cosmetic change, i prefer the K&R style of code. (Yeah i'm old school :) ).
+
+commit 07689294e89e742ab7e0be6b283a2ee913d770bf
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Sep 24 07:02:57 2014 -0400
+
+    Fix expansion of variables in configure script.
+
+commit ec0c52389b2a2227820fe8d3c772f4af23a4038d
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 18:41:28 2014 -0400
+
+    \r\n are escaped in config file...
+
+commit c1ec09ae5bf29f82696afcad92dcc9058d13bba2
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 18:34:09 2014 -0400
+
+    Fix name of variable pueblo_version.
+
+commit a1ea17210714667a0b2db4411400348e273c7ce1
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 18:27:26 2014 -0400
+
+    Pueblo is now configurable via the config file. No longer a build option.
+
+commit b3952dda89333a26eab8ee04542f6f959e8f09e0
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 17:28:10 2014 -0400
+
+    Made floating point support mandatory.
+
+commit e6fc259819a52c9a062bd5223ffe423af2069c37
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 21 14:04:39 2014 -0400
+
+    Update ChangeLog.Alpha
+
 Alpha 6 : 2014-09-21
 
 commit 078fc74c7e1505cfd19e10e9cc3ab99ef7aa4540
