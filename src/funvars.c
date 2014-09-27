@@ -81,7 +81,7 @@ int set_register ( const char *funcname, char *name, char *data )
          */
         regnum = qidx_chartab[ ( unsigned char ) * name];
 
-        if ( ( regnum < 0 ) || ( regnum >= MAX_GLOBAL_REGS ) ) {
+        if ( ( regnum < 0 ) || ( regnum >= mudconf.max_global_regs ) ) {
             return -1;
         }
 
@@ -117,7 +117,7 @@ int set_register ( const char *funcname, char *name, char *data )
         }
 
         if ( !mudstate.rdata->q_alloc ) {
-            a_size = ( regnum < 10 ) ? 10 : MAX_GLOBAL_REGS;
+            a_size = ( regnum < 10 ) ? 10 : mudconf.max_global_regs;
             mudstate.rdata->q_alloc = a_size;
             mudstate.rdata->q_regs =
                 xcalloc ( a_size, sizeof ( char * ), "q_regs" );
@@ -125,7 +125,7 @@ int set_register ( const char *funcname, char *name, char *data )
                 xcalloc ( a_size, sizeof ( int ), "q_lens" );
             mudstate.rdata->q_alloc = a_size;
         } else if ( regnum >= mudstate.rdata->q_alloc ) {
-            a_size = MAX_GLOBAL_REGS;
+            a_size = mudconf.max_global_regs;
             tmp_regs = xrealloc ( mudstate.rdata->q_regs,
                                   a_size * sizeof ( char * ), "q_regs" );
             tmp_lens = xrealloc ( mudstate.rdata->q_lens,
@@ -329,7 +329,7 @@ static char *get_register ( GDATA *g, char *r )
     if ( r[1] == '\0' ) {
         regnum = qidx_chartab[ ( unsigned char ) r[0]];
 
-        if ( ( regnum < 0 ) || ( regnum >= MAX_GLOBAL_REGS ) ) {
+        if ( ( regnum < 0 ) || ( regnum >= mudconf.max_global_regs ) ) {
             return NULL;
         } else if ( ( g->q_alloc > regnum ) && g->q_regs[regnum] ) {
             return g->q_regs[regnum];
@@ -433,7 +433,7 @@ static void read_register ( char *regname, char *buff, char **bufc )
     if ( regname[1] == '\0' ) {
         regnum = qidx_chartab[ ( unsigned char ) * regname];
 
-        if ( ( regnum < 0 ) || ( regnum >= MAX_GLOBAL_REGS ) ) {
+        if ( ( regnum < 0 ) || ( regnum >= mudconf.max_global_regs ) ) {
             safe_str ( "#-1 INVALID GLOBAL REGISTER", buff, bufc );
         } else {
             if ( mudstate.rdata

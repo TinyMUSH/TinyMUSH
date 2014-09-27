@@ -551,7 +551,7 @@ void do_mail_read ( dbref player, char *msglist )
                 status = status_string ( mp );
                 names = make_namelist ( player, ( char * ) mp->tolist );
                 ccnames = make_namelist ( player, ( char * ) mp->cclist );
-                notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, PLAYER_NAME_LIMIT - 6, Name ( mp->from ), mp->time, ( Connected ( mp->from ) && ( !Hidden ( mp->from ) || See_Hidden ( player ) ) ) ? " (Conn)" : "      ", folder, status, names );
+                notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name ( mp->from ), mp->time, ( Connected ( mp->from ) && ( !Hidden ( mp->from ) || See_Hidden ( player ) ) ) ? " (Conn)" : "      ", folder, status, names );
 
                 if ( *ccnames )
                     notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames );
@@ -688,7 +688,7 @@ void do_mail_review ( dbref player, char *name, char *msglist )
                     /*
                      * list it
                      */
-                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), PLAYER_NAME_LIMIT - 6, Name ( mp->to ), mp->subject );
+                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), mudconf.player_name_length - 6, Name ( mp->to ), mp->subject );
                 }
             }
         } else {
@@ -699,7 +699,7 @@ void do_mail_review ( dbref player, char *name, char *msglist )
                     /*
                      * list it
                      */
-                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), PLAYER_NAME_LIMIT - 6, Name ( mp->to ), mp->subject );
+                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), mudconf.player_name_length - 6, Name ( mp->to ), mp->subject );
                 }
             }
         }
@@ -729,7 +729,7 @@ void do_mail_review ( dbref player, char *name, char *msglist )
                         ccnames = make_namelist ( player, ( char * ) mp->cclist );
                         bccnames = make_namelist ( player, ( char * ) mp->bcclist );
                         notify ( player, DASH_LINE );
-                        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, PLAYER_NAME_LIMIT - 6, Name ( mp->from ), mp->time, 0, status, names );
+                        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name ( mp->from ), mp->time, 0, status, names );
 
                         if ( *ccnames )
                             notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames );
@@ -766,7 +766,7 @@ void do_mail_review ( dbref player, char *name, char *msglist )
                         ccnames = make_namelist ( player, ( char * ) mp->cclist );
                         bccnames = make_namelist ( player, ( char * ) mp->bcclist );
                         notify ( player, DASH_LINE );
-                        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, PLAYER_NAME_LIMIT - 6, Name ( mp->from ), mp->time, 0, status, names );
+                        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name ( mp->from ), mp->time, 0, status, names );
 
                         if ( *ccnames )
                             notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames );
@@ -823,9 +823,9 @@ void do_mail_list ( dbref player, char *msglist, int sub )
                 time = mail_list_time ( mp->time );
 
                 if ( sub )
-                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), PLAYER_NAME_LIMIT - 6, Name ( mp->from ), mp->subject );
+                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s Sub: %.25s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), mudconf.player_name_length - 6, Name ( mp->from ), mp->subject );
                 else
-                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s At: %s %s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), PLAYER_NAME_LIMIT - 6, Name ( mp->from ), time, ( ( Connected ( mp->from ) && ( !Hidden ( mp->from ) || See_Hidden ( player ) ) ) ? "Conn" : " " ) );
+                    notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s At: %s %s", status_chars ( mp ), i, strlen ( get_mail_message ( mp->number ) ), mudconf.player_name_length - 6, Name ( mp->from ), time, ( ( Connected ( mp->from ) && ( !Hidden ( mp->from ) || See_Hidden ( player ) ) ) ? "Conn" : " " ) );
 
                 free_lbuf ( time );
             }
@@ -3555,7 +3555,7 @@ static void do_mail_proof ( dbref player )
         bccnames = make_namelist ( player, mailto );
         free_lbuf ( mailto );
         notify ( player, DASH_LINE );
-        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "From:  %-*s  Subject: %-35s\nTo: %s", PLAYER_NAME_LIMIT - 6, Name ( player ), atr_get_raw ( player, A_MAILSUB ), names );
+        notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "From:  %-*s  Subject: %-35s\nTo: %s", mudconf.player_name_length - 6, Name ( player ), atr_get_raw ( player, A_MAILSUB ), names );
 
         if ( *ccnames )
             notify_check ( player , player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc: %s", ccnames );

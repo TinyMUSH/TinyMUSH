@@ -218,28 +218,10 @@ AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_module_dbsql" = 
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_module_dbsql" = "xpgsql"])
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_module_dbsql" = "xsqlite"])
 
-AC_MSG_CHECKING([how many global registers to use])
-AC_ARG_WITH([global-regs], [AS_HELP_STRING([--with-global-regs=N], [use N global registers (%q0-%q9,%qa-%qz) N must be a number from 10 to 36. Set lower to conserve memory if you don't need all the possible registers  @<:@default=36@:>@])],
-  AS_IF([ test "$withval" -lt "10" ], [with_global_regs=10], AS_IF([ test "$withval" -gt "36" ], [with_global_regs=36], [with_global_regs=$withval])),
-  [with_global_regs=36]
-)
-AC_MSG_RESULT([$with_global_regs])
-AC_DEFINE_UNQUOTED([MAX_GLOBAL_REGS], [${with_global_regs}], [How many global registers to use])
-
-AC_MSG_CHECKING([maximum length for player names])
-AC_ARG_WITH([pname-length], [AS_HELP_STRING([--with-pname-length=LENGTH], [maximum length for player names @<:@default=22@:>@])], [with_pname_length=$withval], [with_pname_length=22])
-AC_MSG_RESULT([$with_pname_length])
-AC_DEFINE_UNQUOTED([PLAYER_NAME_LIMIT], [${with_pname_length}], [Max length for player names])
-
 AC_MSG_CHECKING([number of env vars])
 AC_ARG_WITH([env-vars], [AS_HELP_STRING([--with-env-vars=NUMBER], [Number of env vars (%0 et al) @<:@default=10@:>@])], [with_env_vars=$withval], [with_env_vars=10])
 AC_MSG_RESULT([$with_env_vars])
 AC_DEFINE_UNQUOTED([NUM_ENV_VARS], [${with_env_vars}], [Number of env vars (%0 et al)])
-
-AC_MSG_CHECKING([maximum number of args for command processor])
-AC_ARG_WITH([max-args], [AS_HELP_STRING([--with-max-args=MAX], [Maximum number of args for command processor @<:@default=100@:>@])], [with_max_args=$withval], [with_max_args=100])
-AC_MSG_RESULT([$with_max_args])
-AC_DEFINE_UNQUOTED([MAX_ARG], [${with_max_args}], [max # args from command processor])
 
 AC_MSG_CHECKING([maximum number of iter levels])
 AC_ARG_WITH([max-iter], [AS_HELP_STRING([--with-max-iter=MAX], [Maximum number of iter levels @<:@default=1024@:>@])], [with_max_iter=$withval], [with_max_iter=1024])
@@ -250,16 +232,6 @@ AC_MSG_CHECKING([maximum length of a delimiter])
 AC_ARG_WITH([max-delim], [AS_HELP_STRING([--with-max-delim=MAX], [Maximum lenght of a delimiter @<:@default=128@:>@])], [with_max_delim=$withval], [with_max_delim=128])
 AC_MSG_RESULT([$with_max_delim])
 AC_DEFINE_UNQUOTED([MAX_DELIM_LEN], [${with_max_delim}], [Maximum length of a delimiter])
-
-AC_MSG_CHECKING([separator of dbref from marker flags])
-AC_ARG_WITH([flag-sep], [AS_HELP_STRING([--with-flag-sep=CHAR], [separator of dbref from marker flags @<:@default=_@:>@])], [with_flag_sep="$withval"], [with_flag_sep="_"])
-AC_MSG_RESULT([$with_flag_sep])
-AC_DEFINE_UNQUOTED([MARK_FLAG_SEP], ['${with_flag_sep}'], [sep. of dbref from marker flags])
-
-AC_MSG_CHECKING([for hash factor])
-AC_ARG_WITH([hash-factor], [AS_HELP_STRING([--with-hash-factor=NUMBER], [Hash factor @<:@default=2@:>@])], [with_hash_factor=$withval], [with_hash_factor=2])
-AC_MSG_RESULT([$with_hash_factor])
-AC_DEFINE_UNQUOTED([HASH_FACTOR], [${with_hash_factor}], [How much hashing you want])
 
 AX_BOX([Checks for platform])
 # Checks for platform.
@@ -449,18 +421,10 @@ AX_PRINT([
 
                          %BLimits
 -------------------------------%b
-        Length for player names : %B$with_pname_length%b
              Number of env vars : %B$with_env_vars%b
-         Args for cmd processor : %B$with_max_args%b
           Number of iter levels : %B$with_max_iter%b
-        global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
-                    Hash factor : %B$with_hash_factor%b
              
-                        %BMarkers
----------------------------------%b
-     separator for marker flags : %B$with_flag_sep%b
-
                        %BDatabase
 -------------------------------%b
                      DBM Engine : %B$with_dbm%b

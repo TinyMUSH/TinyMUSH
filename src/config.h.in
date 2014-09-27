@@ -11,9 +11,6 @@
 /* DB_SQL use no driver driver */
 #undef DB_SQL_DRIVER
 
-/* How much hashing you want */
-#undef HASH_FACTOR
-
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
@@ -348,17 +345,8 @@
 /* Define to the shared library suffix, say, ".dylib". */
 #undef LT_SHARED_EXT
 
-/* sep. of dbref from marker flags */
-#undef MARK_FLAG_SEP
-
-/* max # args from command processor */
-#undef MAX_ARG
-
 /* Maximum length of a delimiter */
 #undef MAX_DELIM_LEN
-
-/* How many global registers to use */
-#undef MAX_GLOBAL_REGS
 
 /* max # of iter levels */
 #undef MAX_ITER_NESTING
@@ -404,9 +392,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* Max length for player names */
-#undef PLAYER_NAME_LIMIT
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE

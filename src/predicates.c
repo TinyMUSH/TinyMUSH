@@ -478,7 +478,7 @@ int ok_player_name ( const char *name )
      */
 
     if ( !ok_name ( name ) ||
-            ( strlen ( name ) >= PLAYER_NAME_LIMIT ) ||
+            ( strlen ( name ) >= mudconf.max_command_args ) ||
             ( mudconf.player_name_min &&
               ( strlen ( name ) < mudconf.player_name_min ) ) ) {
         return 0;

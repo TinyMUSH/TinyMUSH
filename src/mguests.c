@@ -32,7 +32,7 @@ dbref create_guest ( int num )
     dbref player, aowner;
     int found, same_str, aflags;
     char name[LBUF_SIZE * 2];
-    char base[PLAYER_NAME_LIMIT * 2];
+    char base[mudconf.max_command_args * 2];
     char prefixes[LBUF_SIZE], suffixes[LBUF_SIZE], *pp, *sp, *tokp, *toks;
     char s[MBUF_SIZE];
 
@@ -84,7 +84,7 @@ dbref create_guest ( int num )
     sprintf ( base, "%s%d", mudconf.guest_basename, num + 1 );
     same_str = 1;
 
-    if ( !found || ( strlen ( name ) >= PLAYER_NAME_LIMIT ) ) {
+    if ( !found || ( strlen ( name ) >= mudconf.max_command_args ) ) {
         strcpy ( name, base );
     } else if ( strcasecmp ( name, base ) ) {
         if ( !badname_check ( base ) || !ok_player_name ( base ) ||

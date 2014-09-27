@@ -861,14 +861,9 @@ with_mysql_libs
 with_pgsql_includes
 with_pgsql_libs
 with_sqlite3
-with_global_regs
-with_pname_length
 with_env_vars
-with_max_args
 with_max_iter
 with_max_delim
-with_flag_sep
-with_hash_factor
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1558,20 +1553,9 @@ Optional Packages:
   --with-pgsql-libs       path to PostgreSQL libraries
   --with-sqlite3=[ARG]    use SQLite 3 library [default=yes], optionally
                           specify the prefix for sqlite3 library
-  --with-global-regs=N    use N global registers (%q0-%q9,%qa-%qz) N must be a
-                          number from 10 to 36. Set lower to conserve memory
-                          if you don't need all the possible registers
-                          [default=36]
-  --with-pname-length=LENGTH
-                          maximum length for player names [default=22]
   --with-env-vars=NUMBER  Number of env vars (%0 et al) [default=10]
-  --with-max-args=MAX     Maximum number of args for command processor
-                          [default=100]
   --with-max-iter=MAX     Maximum number of iter levels [default=1024]
   --with-max-delim=MAX    Maximum lenght of a delimiter [default=128]
-  --with-flag-sep=CHAR    separator of dbref from marker flags [default=_]
-  --with-hash-factor=NUMBER
-                          Hash factor [default=2]
 
 Some influential environment variables:
   CC          C compiler command
@@ -14225,51 +14209,6 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how many global registers to use" >&5
-$as_echo_n "checking how many global registers to use... " >&6; }
-
-# Check whether --with-global-regs was given.
-if test "${with_global_regs+set}" = set; then :
-  withval=$with_global_regs; if  test "$withval" -lt "10" ; then :
-  with_global_regs=10
-else
-  if  test "$withval" -gt "36" ; then :
-  with_global_regs=36
-else
-  with_global_regs=$withval
-fi
-fi
-else
-  with_global_regs=36
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_global_regs" >&5
-$as_echo "$with_global_regs" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define MAX_GLOBAL_REGS ${with_global_regs}
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum length for player names" >&5
-$as_echo_n "checking maximum length for player names... " >&6; }
-
-# Check whether --with-pname-length was given.
-if test "${with_pname_length+set}" = set; then :
-  withval=$with_pname_length; with_pname_length=$withval
-else
-  with_pname_length=22
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_pname_length" >&5
-$as_echo "$with_pname_length" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define PLAYER_NAME_LIMIT ${with_pname_length}
-_ACEOF
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking number of env vars" >&5
 $as_echo_n "checking number of env vars... " >&6; }
 
@@ -14285,24 +14224,6 @@ $as_echo "$with_env_vars" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define NUM_ENV_VARS ${with_env_vars}
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking maximum number of args for command processor" >&5
-$as_echo_n "checking maximum number of args for command processor... " >&6; }
-
-# Check whether --with-max-args was given.
-if test "${with_max_args+set}" = set; then :
-  withval=$with_max_args; with_max_args=$withval
-else
-  with_max_args=100
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_args" >&5
-$as_echo "$with_max_args" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define MAX_ARG ${with_max_args}
 _ACEOF
 
 
@@ -14339,42 +14260,6 @@ $as_echo "$with_max_delim" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define MAX_DELIM_LEN ${with_max_delim}
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking separator of dbref from marker flags" >&5
-$as_echo_n "checking separator of dbref from marker flags... " >&6; }
-
-# Check whether --with-flag-sep was given.
-if test "${with_flag_sep+set}" = set; then :
-  withval=$with_flag_sep; with_flag_sep="$withval"
-else
-  with_flag_sep="_"
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_flag_sep" >&5
-$as_echo "$with_flag_sep" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define MARK_FLAG_SEP '${with_flag_sep}'
-_ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for hash factor" >&5
-$as_echo_n "checking for hash factor... " >&6; }
-
-# Check whether --with-hash-factor was given.
-if test "${with_hash_factor+set}" = set; then :
-  withval=$with_hash_factor; with_hash_factor=$withval
-else
-  with_hash_factor=2
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_hash_factor" >&5
-$as_echo "$with_hash_factor" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define HASH_FACTOR ${with_hash_factor}
 _ACEOF
 
 
@@ -19328,17 +19213,9 @@ if test -z ; then :
 
                          %BLimits
 -------------------------------%b
-        Length for player names : %B$with_pname_length%b
              Number of env vars : %B$with_env_vars%b
-         Args for cmd processor : %B$with_max_args%b
           Number of iter levels : %B$with_max_iter%b
-        global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
-                    Hash factor : %B$with_hash_factor%b
-
-                        %BMarkers
----------------------------------%b
-     separator for marker flags : %B$with_flag_sep%b
 
                        %BDatabase
 -------------------------------%b
@@ -19364,17 +19241,9 @@ else
 
                          %BLimits
 -------------------------------%b
-        Length for player names : %B$with_pname_length%b
              Number of env vars : %B$with_env_vars%b
-         Args for cmd processor : %B$with_max_args%b
           Number of iter levels : %B$with_max_iter%b
-        global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
-                    Hash factor : %B$with_hash_factor%b
-
-                        %BMarkers
----------------------------------%b
-     separator for marker flags : %B$with_flag_sep%b
 
                        %BDatabase
 -------------------------------%b

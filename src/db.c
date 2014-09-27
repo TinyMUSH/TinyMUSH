@@ -1310,7 +1310,7 @@ void init_attrtab ( void )
 {
     ATTR *a;
     char *buff, *p, *q;
-    hashinit ( &mudstate.attr_name_htab, 100 * HASH_FACTOR, HT_STR );
+    hashinit ( &mudstate.attr_name_htab, 100 * mudconf.hash_factor, HT_STR );
     buff = alloc_sbuf ( "init_attrtab" );
 
     for ( a = attr; a->number; a++ ) {

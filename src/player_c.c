@@ -44,7 +44,7 @@ PCACHE *pcache_head;
 void pcache_init ( void )
 {
     pool_init ( POOL_PCACHE, sizeof ( PCACHE ) );
-    nhashinit ( &pcache_htab, 15 * HASH_FACTOR );
+    nhashinit ( &pcache_htab, 15 * mudconf.hash_factor );
     pcache_head = NULL;
 }
 

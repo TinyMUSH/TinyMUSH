@@ -280,6 +280,7 @@ void cf_init ( void )
     mudconf.stripped_flags.word3 = 0;
     mudconf.vattr_flags = 0;
     mudconf.vattr_flag_list = NULL;
+    mudconf.flag_sep = xstrdup ( "_", "cf_string" );
     mudconf.mud_name = xstrdup ( "TinyMUSH", "cf_string" );
     mudconf.mud_shortname = xstrdup ( "netmush", "cf_string" );
     mudconf.one_coin = xstrdup ( "penny", "cf_string" );
@@ -293,6 +294,10 @@ void cf_init ( void )
     mudconf.lag_check_cpu = 1;
     mudconf.malloc_tracker = 0;
     mudconf.malloc_logger = 0;
+    mudconf.max_global_regs = 36;
+    mudconf.max_command_args = 100;
+    mudconf.player_name_length = 22;
+    mudconf.hash_factor = 2;
     mudconf.max_cmdsecs = 120;
     mudconf.control_flags = 0xffffffff; /* Everything for now... */
     mudconf.control_flags &= ~CF_GODMONITOR;    /* Except for monitoring... */
@@ -1741,7 +1746,7 @@ int add_helpfile ( dbref player, char *confcmd, char *str, int is_raw )
     /*
      * Initialize the associated hashtable.
      */
-    hashinit ( &mudstate.hfile_hashes[mudstate.helpfiles], 30 * HASH_FACTOR, HT_STR );
+    hashinit ( &mudstate.hfile_hashes[mudstate.helpfiles], 30 * mudconf.hash_factor, HT_STR );
     mudstate.helpfiles++;
     free_mbuf ( newstr );
     cf_log_help ( player, confcmd, "Successfully loaded helpfile %s", basename ( fpath ) );
@@ -1937,6 +1942,7 @@ CONF        conftable [] = {
     { ( char * ) "dark_sleepers", cf_bool, CA_GOD, CA_WIZARD, &mudconf.dark_sleepers, ( long ) "Disconnected players not shown in room contents"},
     { ( char * ) "database_home", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.dbhome, MBUF_SIZE},
     { ( char * ) "default_home", cf_dbref, CA_GOD, CA_PUBLIC, &mudconf.default_home, NOTHING},
+    { ( char * ) "dbref_flag_sep", cf_string, CA_STATIC, CA_PUBLIC, ( int * ) &mudconf.flag_sep, 1},
     { ( char * ) "dig_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.digcost, 0},
     { ( char * ) "divert_log", cf_divert_log, CA_STATIC, CA_DISABLED, &mudconf.log_diversion, ( long ) logoptions_nametab},
     { ( char * ) "down_file", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.down_file, MBUF_SIZE},
@@ -1976,7 +1982,7 @@ CONF        conftable [] = {
     { ( char * ) "global_aconn_uselocks", cf_bool, CA_GOD, CA_WIZARD, &mudconf.global_aconn_uselocks, ( long ) "Obey UseLocks on global @Aconnect and @Adisconnect"},
     { ( char * ) "good_name", cf_badname, CA_GOD, CA_DISABLED, NULL, 1},
     { ( char * ) "gridsize_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.max_grid_size, 0},
-    { ( char * ) "guest_basename", cf_string, CA_STATIC, CA_PUBLIC, ( int * ) &mudconf.guest_basename, PLAYER_NAME_LIMIT},
+    { ( char * ) "guest_basename", cf_string, CA_STATIC, CA_PUBLIC, ( int * ) &mudconf.guest_basename, 22},
     { ( char * ) "guest_char_num", cf_dbref, CA_GOD, CA_WIZARD, &mudconf.guest_char, NOTHING},
     { ( char * ) "guest_nuker", cf_dbref, CA_GOD, CA_WIZARD, &mudconf.guest_nuker, GOD},
     { ( char * ) "guest_password", cf_string, CA_GOD, CA_GOD, ( int * ) &mudconf.guest_password, SBUF_SIZE},
@@ -1996,11 +2002,10 @@ CONF        conftable [] = {
     { ( char * ) "help_quick", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.help_quick, MBUF_SIZE},
 
     { ( char * ) "hostnames", cf_bool, CA_GOD, CA_WIZARD, &mudconf.use_hostname, ( long ) "DNS lookups are done on hostnames"},
-
     { ( char * ) "html_connect_file", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.htmlconn_file, MBUF_SIZE},
     { ( char * ) "pueblo_message", cf_string, CA_GOD, CA_WIZARD, ( int * ) &mudconf.pueblo_msg, GBUF_SIZE},
     { ( char * ) "pueblo_version", cf_string, CA_GOD, CA_WIZARD, ( int * ) &mudconf.pueblo_version, GBUF_SIZE},
-
+    { ( char * ) "hash_factor", cf_int, CA_STATIC, CA_WIZARD, &mudconf.hash_factor, ( long ) "Hash Factor"},
     { ( char * ) "huh_message", cf_string, CA_GOD, CA_PUBLIC, ( int * ) &mudconf.huh_msg, MBUF_SIZE},
     { ( char * ) "idle_wiz_dark", cf_bool, CA_GOD, CA_WIZARD, &mudconf.idle_wiz_dark, ( long ) "Wizards who idle are set DARK"},
     { ( char * ) "idle_interval", cf_int, CA_GOD, CA_WIZARD, &mudconf.idle_interval, 0},
@@ -2035,6 +2040,9 @@ CONF        conftable [] = {
     { ( char * ) "malloc_logger", cf_bool, CA_STATIC, CA_PUBLIC, &mudconf.malloc_logger, ( long ) "log allocation of memory"},
     { ( char * ) "master_room", cf_dbref, CA_GOD, CA_WIZARD, &mudconf.master_room, NOTHING},
     { ( char * ) "match_own_commands", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.match_mine, ( long ) "Non-players can match $-commands on themselves"},
+    { ( char * ) "max_command_arguments", cf_int, CA_STATIC, CA_WIZARD, &mudconf.max_command_args, ( long ) "Maximum number of arguments a command may have"},
+    { ( char * ) "max_global_registers", cf_int, CA_STATIC, CA_WIZARD, &mudconf.max_global_regs, ( long ) "Maximum length of a player name"},
+    { ( char * ) "max_player_name_length", cf_int, CA_STATIC, CA_WIZARD, &mudconf.player_name_length, ( long ) "Maximum length of a player name"},
     { ( char * ) "max_players", cf_int, CA_GOD, CA_WIZARD, &mudconf.max_players, 0},
     { ( char * ) "module", cf_module, CA_STATIC, CA_WIZARD, NULL, 0},
     { ( char * ) "modules_home", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.modules_home, MBUF_SIZE},

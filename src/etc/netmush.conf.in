@@ -113,6 +113,24 @@ guest_char_num		16
 #
 # output_block_size	16384
 #
+# -- Separator between dbref and marker flags.
+# dbref_flag_sep	_
+#
+# -- Maximum lenght of a player name.
+#
+# max_player_name_length 	22
+#
+# -- Maximum number of global registers (minimum 10, maximum 36)
+#
+# max_global_registers		36
+#
+# -- Maximum number of arguments for a command.
+#
+# max_command_arguments		100
+#
+# -- Hash factor, only play with this if you know what you're doing...
+#
+# hash_factor			2
 #
 # -- Define other local aliases/parameters/whatnot here.
 #

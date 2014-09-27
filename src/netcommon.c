@@ -1579,7 +1579,7 @@ void init_logout_cmdtab ( void )
      * * things on the first check.  Remember that the admin can add
      * * aliases.
      */
-    hashinit ( &mudstate.logout_cmd_htab, 3 * HASH_FACTOR, HT_STR );
+    hashinit ( &mudstate.logout_cmd_htab, 3 * mudconf.hash_factor, HT_STR );
 
     for ( cp = logout_cmdtable; cp->flag; cp++ ) {
         hashadd ( cp->name, ( int * ) cp, &mudstate.logout_cmd_htab, 0 );

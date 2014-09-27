@@ -36,14 +36,14 @@ const Delim SPACE_DELIM = { 1, " " };
 void init_functab ( void )
 {
     FUN *fp;
-    hashinit ( &mudstate.func_htab, 250 * HASH_FACTOR, HT_STR | HT_KEYREF );
+    hashinit ( &mudstate.func_htab, 250 * mudconf.hash_factor, HT_STR | HT_KEYREF );
 
     for ( fp = flist; fp->name; fp++ ) {
         hashadd ( ( char * ) fp->name, ( int * ) fp, &mudstate.func_htab, 0 );
     }
 
     ufun_head = NULL;
-    hashinit ( &mudstate.ufunc_htab, 15 * HASH_FACTOR, HT_STR );
+    hashinit ( &mudstate.ufunc_htab, 15 * mudconf.hash_factor, HT_STR );
 }
 
 void do_function ( dbref player, dbref cause, int key, char *fname, char *target )

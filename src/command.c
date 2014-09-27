@@ -121,7 +121,7 @@ void init_cmdtab ( void )
     char *cbuff;
     int i;
     char s[MBUF_SIZE];
-    hashinit ( &mudstate.command_htab, 250 * HASH_FACTOR, HT_STR );
+    hashinit ( &mudstate.command_htab, 250 * mudconf.hash_factor, HT_STR );
     /*
      * Load attribute-setting commands
      */
@@ -438,7 +438,7 @@ void call_move_hook ( dbref player, dbref cause, int state )
 void process_cmdent ( CMDENT *cmdp, char *switchp, dbref player, dbref cause, int interactive, char *arg, char *unp_command, char *cargs[], int ncargs )
 {
     char *buf1, *buf2, tchar, *bp, *str, *buff, *s, *j, *new, *pname, *lname;
-    char *args[MAX_ARG], *aargs[NUM_ENV_VARS];
+    char *args[mudconf.max_command_args], *aargs[NUM_ENV_VARS];
     int nargs, i, interp, key, xkey, aflags, alen;
     int hasswitch = 0;
     int cmd_matches = 0;
@@ -782,20 +782,15 @@ void process_cmdent ( CMDENT *cmdp, char *switchp, dbref player, dbref cause, in
 
         buf1 = bp = alloc_lbuf ( "process_cmdent.2" );
         str = buf2;
-        exec ( buf1, &bp, player, cause, cause,
-               EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP,
-               &str, cargs, ncargs );
+        exec ( buf1, &bp, player, cause, cause, EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs );
 
         if ( cmdp->callseq & CS_ARGV ) {
             /*
              * Arg2 is ARGV style.  Go get the args
              */
-            parse_arglist ( player, cause, cause, arg, '\0',
-                            interp | EV_STRIP_LS | EV_STRIP_TS,
-                            args, MAX_ARG, cargs, ncargs );
+            parse_arglist ( player, cause, cause, arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS, args, mudconf.max_command_args, cargs, ncargs );
 
-            for ( nargs = 0; ( nargs < MAX_ARG ) && args[nargs];
-                    nargs++ );
+            for ( nargs = 0; ( nargs < mudconf.max_command_args ) && args[nargs]; nargs++ );
 
             /*
              * Call the correct command handler

@@ -132,14 +132,14 @@ void register_hashtables ( MODHASHES *htab, MODNHASHES *ntab )
 
     if ( htab ) {
         for ( hp = htab; hp->tabname != NULL; hp++ ) {
-            hashinit ( hp->htab, hp->size_factor * HASH_FACTOR,
+            hashinit ( hp->htab, hp->size_factor * mudconf.hash_factor,
                        HT_STR );
         }
     }
 
     if ( ntab ) {
         for ( np = ntab; np->tabname != NULL; np++ ) {
-            nhashinit ( np->htab, np->size_factor * HASH_FACTOR );
+            nhashinit ( np->htab, np->size_factor * mudconf.hash_factor );
         }
     }
 }

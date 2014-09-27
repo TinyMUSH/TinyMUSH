@@ -374,7 +374,7 @@ OBJENT  object_types[8] = {
 void init_flagtab ( void )
 {
     FLAGENT *fp;
-    hashinit ( &mudstate.flags_htab, 100 * HASH_FACTOR, HT_STR | HT_KEYREF );
+    hashinit ( &mudstate.flags_htab, 100 * mudconf.hash_factor, HT_STR | HT_KEYREF );
 
     for ( fp = gen_flags; fp->flagname; fp++ ) {
         hashadd ( ( char * ) fp->flagname, ( int * ) fp, &mudstate.flags_htab,
@@ -602,7 +602,7 @@ char *unparse_flags ( dbref player, dbref thing )
              * running the dbref number into the flags.
              */
             if ( ( s == bp ) && isMarkerFlag ( fp ) ) {
-                safe_sb_chr ( MARK_FLAG_SEP, buf, &bp );
+                safe_sb_chr ( mudconf.flag_sep[0], buf, &bp );
             }
 
             safe_sb_chr ( fp->flaglett, buf, &bp );

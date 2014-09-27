@@ -272,6 +272,7 @@ struct confdata {
     FLAGSET     thing_flags;    /* Flags things start with */
     FLAGSET     robot_flags;    /* Flags robots start with */
     FLAGSET     stripped_flags; /* Flags stripped by @clone and @chown */
+    char       *flag_sep;  /* Separator of dbref from marker flags */
     char       *mud_name;  /* Name of the mud */
     char       *mud_shortname; /* Shorter name, for log */
     char       *one_coin;  /* name of one coin (ie. "penny") */
@@ -282,8 +283,12 @@ struct confdata {
     int         lag_check;      /* Is CPU usage checking compiled in? */
     int         lag_check_clk;  /* track object use time with wall-clock (need lag_check == true) */
     int         lag_check_cpu;  /* track object use time with getrusage() instead of wall-clock (need lag_check_clk == true) */
-    int     malloc_tracker; /* track allocation of memory */
-    int     malloc_logger;  /* log allocation of memory */
+    int         malloc_tracker; /* track allocation of memory */
+    int         malloc_logger;  /* log allocation of memory */
+    int         max_global_regs;  /* How many global register are avalable (min 10, max 36) */
+    int         max_command_args;  /* Maximum arguments a command may have */
+    int         player_name_length;  /* Maximum length of a player name */
+    int         hash_factor;  /* Hash factor */
     int         max_cmdsecs;    /* Threshhold for real time taken by command */
     int         control_flags;  /* Global runtime control flags */
     int         wild_times_lim; /* Max recursions in wildcard match */

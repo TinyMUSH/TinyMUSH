@@ -1024,7 +1024,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     i = qidx_chartab[ ( unsigned char )
                                       **dstr];
 
-                    if ( ( i < 0 ) || ( i >= MAX_GLOBAL_REGS ) ) {
+                    if ( ( i < 0 ) || ( i >= mudconf.max_global_regs ) ) {
                         break;
                     }
 

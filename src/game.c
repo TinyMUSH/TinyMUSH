@@ -2948,23 +2948,6 @@ int main ( int argc, char *argv[] )
         exit ( 1 );
     }
 
-    /*
-     * Abort if someone tried to set the number of global registers to
-     * something stupid. Also adjust the character table if we need to.
-     */
-    if ( ( MAX_GLOBAL_REGS < 10 ) || ( MAX_GLOBAL_REGS > 36 ) ) {
-        fprintf ( stderr,
-                  "You have compiled TinyMUSH with MAX_GLOBAL_REGS defined to be less than 10 or more than 36. Please fix this error and recompile.\n" );
-        exit ( 1 );
-    }
-
-    if ( MAX_GLOBAL_REGS < 36 ) {
-        for ( i = 0; i < 36 - MAX_GLOBAL_REGS; i++ ) {
-            qidx_chartab[90 - i] = -1;
-            qidx_chartab[122 - i] = -1;
-        }
-    }
-
     tf_init();
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
@@ -2988,23 +2971,57 @@ int main ( int argc, char *argv[] )
     init_functab();
     init_attrtab();
     init_version();
-    hashinit ( &mudstate.player_htab, 250 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.nref_htab, 5 * HASH_FACTOR, HT_STR );
-    nhashinit ( &mudstate.qpid_htab, 50 * HASH_FACTOR );
-    nhashinit ( &mudstate.fwdlist_htab, 25 * HASH_FACTOR );
-    nhashinit ( &mudstate.propdir_htab, 25 * HASH_FACTOR );
-    nhashinit ( &mudstate.redir_htab, 5 * HASH_FACTOR );
-    nhashinit ( &mudstate.objstack_htab, 50 * HASH_FACTOR );
-    nhashinit ( &mudstate.objgrid_htab, 50 * HASH_FACTOR );
-    nhashinit ( &mudstate.parent_htab, 5 * HASH_FACTOR );
-    nhashinit ( &mudstate.desc_htab, 25 * HASH_FACTOR );
-    hashinit ( &mudstate.vars_htab, 250 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.structs_htab, 15 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.cdefs_htab, 15 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.instance_htab, 15 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.instdata_htab, 25 * HASH_FACTOR, HT_STR );
-    hashinit ( &mudstate.api_func_htab, 5 * HASH_FACTOR, HT_STR );
+    
     cf_read ( mudconf.config_file );
+    
+    /*
+     * Abort if someone tried to set the number of global registers to
+     * something stupid. Also adjust the character table if we need to.
+     */
+    if ( ( mudconf.max_global_regs < 10 ) || ( mudconf.max_global_regs > 36 ) ) {
+        fprintf ( stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n" );
+        exit ( 1 );
+    }
+
+    if ( mudconf.max_global_regs < 36 ) {
+        for ( i = 0; i < 36 - mudconf.max_global_regs; i++ ) {
+            qidx_chartab[90 - i] = -1;
+            qidx_chartab[122 - i] = -1;
+        }
+    }
+    
+    if ( mudconf.hash_factor < 2 ) {
+        mudconf.hash_factor = 2;
+        fprintf ( stderr, "hash_factor increased to 2, fix your configuration to remove this warning.\n" );
+    }
+    
+    if ( mudconf.max_command_args < 10 ) {
+        mudconf.max_command_args = 10;
+        fprintf ( stderr, "max_command_arguments increased to 10, fix your configuration to remove this warning.\n" );
+    }
+    
+    if ( mudconf.player_name_length < 22 ) {
+        mudconf.player_name_length = 22;
+        fprintf ( stderr, "max_player_name_length increased to 22, fix your configuration to remove this warning.\n" );
+    }
+    
+    hashinit ( &mudstate.player_htab, 250 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.nref_htab, 5 * mudconf.hash_factor, HT_STR );
+    nhashinit ( &mudstate.qpid_htab, 50 * mudconf.hash_factor );
+    nhashinit ( &mudstate.fwdlist_htab, 25 * mudconf.hash_factor );
+    nhashinit ( &mudstate.propdir_htab, 25 * mudconf.hash_factor );
+    nhashinit ( &mudstate.redir_htab, 5 * mudconf.hash_factor );
+    nhashinit ( &mudstate.objstack_htab, 50 * mudconf.hash_factor );
+    nhashinit ( &mudstate.objgrid_htab, 50 * mudconf.hash_factor );
+    nhashinit ( &mudstate.parent_htab, 5 * mudconf.hash_factor );
+    nhashinit ( &mudstate.desc_htab, 25 * mudconf.hash_factor );
+    hashinit ( &mudstate.vars_htab, 250 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.structs_htab, 15 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.cdefs_htab, 15 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
+    hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
+    
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
     mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
     mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
