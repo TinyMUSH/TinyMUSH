@@ -51,15 +51,17 @@ struct cmd_block {
 
 typedef struct text_block TBLOCK;
 typedef struct text_block_hdr TBLKHDR;
+
 struct text_block_hdr {
     struct text_block *nxt;
     char    *start;
     char    *end;
     int nchars;
 };
+
 struct text_block {
     TBLKHDR hdr;
-    char    data[OUTPUT_BLOCK_SIZE - sizeof ( TBLKHDR )];
+    char *data;
 };
 
 typedef struct prog_data PROG;

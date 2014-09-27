@@ -76,6 +76,7 @@ void cf_init ( void )
     mudconf.port = 6250;
     mudconf.conc_port = 6251;
     mudconf.init_size = 1000;
+    mudconf.output_block_size = 16384;
     mudconf.use_global_aconn = 1;
     mudconf.global_aconn_uselocks = 0;
     mudconf.guest_char = NOTHING;
@@ -2051,6 +2052,7 @@ CONF        conftable [] = {
     { ( char * ) "objeval_requires_control", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.fascist_objeval, ( long ) "Control of victim required by objeval()"},
     { ( char * ) "open_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.opencost, 0},
     { ( char * ) "opt_frequency", cf_int, CA_GOD, CA_WIZARD, &mudconf.dbopt_interval, 0},
+    { ( char * ) "output_block_size", cf_int, CA_STATIC, CA_PUBLIC, &mudconf.output_block_size, ( long ) "block size of output buffer"},
     { ( char * ) "output_limit", cf_int, CA_GOD, CA_WIZARD, &mudconf.output_limit, 0},
     { ( char * ) "page_cost", cf_int, CA_GOD, CA_PUBLIC, &mudconf.pagecost, 0},
     { ( char * ) "page_requires_equals", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.page_req_equals, ( long ) "page command always requires an equals sign"},

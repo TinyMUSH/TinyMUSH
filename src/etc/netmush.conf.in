@@ -109,6 +109,11 @@ guest_char_num		16
 # malloc_tracker	no
 # malloc_logger		no
 #
+# -- Output options
+#
+# output_block_size	16384
+#
+#
 # -- Define other local aliases/parameters/whatnot here.
 #
 #

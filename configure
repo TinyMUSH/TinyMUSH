@@ -869,7 +869,6 @@ with_max_iter
 with_max_delim
 with_flag_sep
 with_hash_factor
-with_max_output
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1573,8 +1572,6 @@ Optional Packages:
   --with-flag-sep=CHAR    separator of dbref from marker flags [default=_]
   --with-hash-factor=NUMBER
                           Hash factor [default=2]
-  --with-max-output=NUMBER
-                          Maximum output block size [default=16384]
 
 Some influential environment variables:
   CC          C compiler command
@@ -14381,24 +14378,6 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for output block size" >&5
-$as_echo_n "checking for output block size... " >&6; }
-
-# Check whether --with-max-output was given.
-if test "${with_max_output+set}" = set; then :
-  withval=$with_max_output; with_max_output=$withval
-else
-  with_max_output=16384
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_max_output" >&5
-$as_echo "$with_max_output" >&6; }
-
-cat >>confdefs.h <<_ACEOF
-#define OUTPUT_BLOCK_SIZE ${with_max_output}
-_ACEOF
-
-
 as_nl='
 '
 export as_nl
@@ -19356,7 +19335,6 @@ if test -z ; then :
         global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
                     Hash factor : %B$with_hash_factor%b
-              Output block size : %B$with_max_output%b
 
                         %BMarkers
 ---------------------------------%b
@@ -19393,7 +19371,6 @@ else
         global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
                     Hash factor : %B$with_hash_factor%b
-              Output block size : %B$with_max_output%b
 
                         %BMarkers
 ---------------------------------%b

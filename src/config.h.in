@@ -375,9 +375,6 @@
 /* Number of env vars (%0 et al) */
 #undef NUM_ENV_VARS
 
-/* Maximum output block size */
-#undef OUTPUT_BLOCK_SIZE
-
 /* Name of package */
 #undef PACKAGE
 

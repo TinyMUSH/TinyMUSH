@@ -261,11 +261,6 @@ AC_ARG_WITH([hash-factor], [AS_HELP_STRING([--with-hash-factor=NUMBER], [Hash fa
 AC_MSG_RESULT([$with_hash_factor])
 AC_DEFINE_UNQUOTED([HASH_FACTOR], [${with_hash_factor}], [How much hashing you want])
 
-AC_MSG_CHECKING([for output block size])
-AC_ARG_WITH([max-output], [AS_HELP_STRING([--with-max-output=NUMBER], [Maximum output block size @<:@default=16384@:>@])], [with_max_output=$withval], [with_max_output=16384])
-AC_MSG_RESULT([$with_max_output])
-AC_DEFINE_UNQUOTED([OUTPUT_BLOCK_SIZE], [${with_max_output}], [Maximum output block size])
-
 AX_BOX([Checks for platform])
 # Checks for platform.
 
@@ -461,7 +456,6 @@ AX_PRINT([
         global registers to use : %B$with_global_regs%b
           Lenght of a delimiter : %B$with_max_delim%b
                     Hash factor : %B$with_hash_factor%b
-              Output block size : %B$with_max_output%b
              
                         %BMarkers
 ---------------------------------%b

@@ -123,6 +123,7 @@ struct confdata {
     int         port;       /* user port */
     int         conc_port;  /* concentrator port */
     int         init_size;  /* initial db size */
+    int         output_block_size;  /* Block size of output */
     int         use_global_aconn;     /* Do we want to use global @aconn code? */
     int         global_aconn_uselocks; /* global @aconn obeys uselocks? */
     int         have_guest; /* Do we wish to allow a GUEST character? */
@@ -491,7 +492,7 @@ struct statedata {
     int in_loop;                  /* In a loop() statement? */
     char *loop_token[MAX_ITER_NESTING];  /* Value of ## */
     char *loop_token2[MAX_ITER_NESTING]; /* Value of #? */
-    int loop_number[MAX_ITER_NESTING];   /* Value of #@ */
+    int loop_number[MAX_ITER_NESTING];   /* Value of #@ */	
     int loop_break[MAX_ITER_NESTING];    /* Kill this iter() loop? */
     int in_switch;                /* In a switch() statement? */
     char    *switch_token;        /* Value of #$ */

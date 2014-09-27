@@ -328,7 +328,8 @@ void queue_write ( DESC *d, const char *b, int n )
             if ( d->output_head == NULL ) {
                 d->output_tail = NULL;
             }
-
+            
+            xfree ( tp->data, "queue_write.tp.data" );
             xfree ( tp, "queue_write.tp" );
         }
     }
@@ -338,7 +339,8 @@ void queue_write ( DESC *d, const char *b, int n )
      */
 
     if ( d->output_head == NULL ) {
-        tp = ( TBLOCK * ) xmalloc ( OUTPUT_BLOCK_SIZE, "queue_write" );
+        tp = ( TBLOCK *) xmalloc ( sizeof ( TBLOCK ), "queue_write.tp" );
+        tp->data = xmalloc ( mudconf.output_block_size - sizeof ( TBLKHDR ), "queue_write.tp.data" );
         tp->hdr.nxt = NULL;
         tp->hdr.start = tp->data;
         tp->hdr.end = tp->data;
@@ -360,7 +362,7 @@ void queue_write ( DESC *d, const char *b, int n )
          * See if there is enough space in the buffer to hold the
          * * string.  If so, copy it and update the pointers..
          */
-        left = OUTPUT_BLOCK_SIZE - ( tp->hdr.end - ( char * ) tp + 1 );
+        left = mudconf.output_block_size - ( tp->hdr.end - ( char * ) tp + 1 );
 
         if ( n <= left ) {
             strncpy ( tp->hdr.end, b, n );
@@ -380,8 +382,8 @@ void queue_write ( DESC *d, const char *b, int n )
                 n -= left;
             }
 
-            tp = ( TBLOCK * ) xmalloc ( OUTPUT_BLOCK_SIZE,
-                                        "queue_write.2" );
+            tp = ( TBLOCK *) xmalloc ( sizeof ( TBLOCK ), "queue_write.2.tp" );
+            tp->data = xmalloc ( mudconf.output_block_size - sizeof ( TBLKHDR ), "queue_write.2.tp.data" );
             tp->hdr.nxt = NULL;
             tp->hdr.start = tp->data;
             tp->hdr.end = tp->data;
