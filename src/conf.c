@@ -351,7 +351,7 @@ void cf_init ( void )
     mudstate.flatfile_flag = 0;
     mudstate.attr_next = A_USER_START;
     mudstate.debug_cmd = ( char * ) "< init >";
-    strcpy ( mudstate.doing_hdr, "Doing" );
+    mudstate.doing_hdr = xstrdup ( "Doing", "mudstate.doing_hdr" );
     mudstate.access_list = NULL;
     mudstate.suspect_list = NULL;
     mudstate.qfirst = NULL;

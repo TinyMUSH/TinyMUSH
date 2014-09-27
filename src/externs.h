@@ -182,6 +182,7 @@ extern void check_idle ( void );
 extern void process_commands ( void );
 extern int  site_check ( struct in_addr, SITE * );
 extern dbref    find_connected_name ( dbref, char * );
+extern char *sane_doing ( char *arg, char *buff );
 
 /* From move.c */
 extern void move_object ( dbref, dbref );

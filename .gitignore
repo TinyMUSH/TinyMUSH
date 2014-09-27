@@ -58,6 +58,7 @@ stamp-h1
 /src/libltdl/argz.h
 /src/libltdl/config.h
 /src/libltdl/libtool
+debug
 
 # Eclipse
 .autotools

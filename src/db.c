@@ -3205,7 +3205,8 @@ void load_restart_db ( void )
         }
 
         strcpy ( d->addr, getstring_noalloc ( f, new_strings ) );
-        strcpy ( d->doing, getstring_noalloc ( f, new_strings ) );
+        //strcpy ( d->doing, getstring_noalloc ( f, new_strings ) );
+        d->doing = sane_doing ( getstring_noalloc ( f, new_strings ), "doing" );
         strcpy ( d->username, getstring_noalloc ( f, new_strings ) );
         d->colormap = NULL;
 

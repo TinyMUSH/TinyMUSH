@@ -113,6 +113,9 @@ AH_TOP([#ifndef __AUTOCONF_H
 AH_BOTTOM([
 #endif /* __AUTOCONF_H */])
 
+AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[enable debugging, default: no]), [case "${enableval}" in yes) with_debug=true ;; no)  with_debug=false ;; *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;; esac], [with_debug=false])
+AM_CONDITIONAL(GCC_DEBUG, test x"$with_debug" = x"true")
+
 AC_MSG_CHECKING([dbm engine to use])
 AC_ARG_WITH([dbm],
  [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use the traditional GDBM hash database driver, or qdbm : Use the new QDBM hash database driver. A newer implementation of the DBM engine. @<:@default=qdbm@:>@])],
@@ -262,11 +265,6 @@ AC_MSG_CHECKING([for output block size])
 AC_ARG_WITH([max-output], [AS_HELP_STRING([--with-max-output=NUMBER], [Maximum output block size @<:@default=16384@:>@])], [with_max_output=$withval], [with_max_output=16384])
 AC_MSG_RESULT([$with_max_output])
 AC_DEFINE_UNQUOTED([OUTPUT_BLOCK_SIZE], [${with_max_output}], [Maximum output block size])
-
-AC_MSG_CHECKING([length of the DOING field in WHO])
-AC_ARG_WITH([doing-length], [AS_HELP_STRING([--with-doing-length=NUMBER], [length of the DOING field in WHO @<:@default=41@:>@])], [with_doing_length=$withval], [with_doing_length=41])
-AC_MSG_RESULT([$with_doing_length])
-AC_DEFINE_UNQUOTED([DOING_LEN], [${with_doing_length}], [length of the DOING field in WHO])
 
 AX_BOX([Checks for platform])
 # Checks for platform.
@@ -464,7 +462,6 @@ AX_PRINT([
           Lenght of a delimiter : %B$with_max_delim%b
                     Hash factor : %B$with_hash_factor%b
               Output block size : %B$with_max_output%b
-             DOING field length : %B$with_doing_length%b
              
                         %BMarkers
 ---------------------------------%b

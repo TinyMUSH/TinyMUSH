@@ -64,12 +64,12 @@ or obtained by writing to the Free Software Foundation, Inc.,
    ridiculous implementation of data symbol exporting. */
 #ifndef LT_GLOBAL_DATA
 # if defined(__WINDOWS__) || defined(__CYGWIN__)
-#  if defined(DLL_EXPORT)   /* defined by libtool (if required) */
-#   define LT_GLOBAL_DATA   __declspec(dllexport)
+#  if defined(DLL_EXPORT)	/* defined by libtool (if required) */
+#   define LT_GLOBAL_DATA	__declspec(dllexport)
 #  endif
 # endif
 # ifndef LT_GLOBAL_DATA
-#  define LT_GLOBAL_DATA    /* static linking or !__WINDOWS__ */
+#  define LT_GLOBAL_DATA	/* static linking or !__WINDOWS__ */
 # endif
 #endif
 
@@ -90,12 +90,12 @@ LT_BEGIN_C_DECLS
 extern int errno;
 #endif
 
-LT_SCOPE void   lt__alloc_die_callback ( void );
+LT_SCOPE void	lt__alloc_die_callback (void);
 
 
 /* For readability:  */
-#define strneq(s1, s2)  (strcmp((s1), (s2)) != 0)
-#define streq(s1, s2)   (!strcmp((s1), (s2)))
+#define strneq(s1, s2)	(strcmp((s1), (s2)) != 0)
+#define streq(s1, s2)	(!strcmp((s1), (s2)))
 
 
 
@@ -103,30 +103,30 @@ LT_SCOPE void   lt__alloc_die_callback ( void );
 
 /* This type is used for the array of interface data sets in each handler. */
 typedef struct {
-    lt_dlinterface_id key;
-    void *        data;
+  lt_dlinterface_id	key;
+  void *		data;
 } lt_interface_data;
 
 struct lt__handle {
-    lt_dlhandle       next;
-    const lt_dlvtable *   vtable;     /* dlopening interface */
-    lt_dlinfo     info;       /* user visible fields */
-    int           depcount;   /* number of dependencies */
-    lt_dlhandle *     deplibs;    /* dependencies */
-    lt_module     module;     /* system module handle */
-    void *        system;     /* system specific data */
-    lt_interface_data *   interface_data; /* per caller associated data */
-    int           flags;      /* various boolean stats */
+  lt_dlhandle		next;
+  const lt_dlvtable *	vtable;		/* dlopening interface */
+  lt_dlinfo		info;		/* user visible fields */
+  int			depcount;	/* number of dependencies */
+  lt_dlhandle *		deplibs;	/* dependencies */
+  lt_module		module;		/* system module handle */
+  void *		system;		/* system specific data */
+  lt_interface_data *	interface_data;	/* per caller associated data */
+  int			flags;		/* various boolean stats */
 };
 
 struct lt__advise {
-    unsigned int  try_ext: 1; /* try system library extensions.  */
-    unsigned int  is_resident: 1; /* module can't be unloaded. */
-    unsigned int  is_symglobal: 1; /* module symbols can satisfy
-                   subsequently loaded modules.  */
-    unsigned int  is_symlocal: 1;  /* module symbols are only available
-                   locally. */
-    unsigned int  try_preload_only: 1; /* only preloaded modules will be tried. */
+  unsigned int	try_ext:1;	/* try system library extensions.  */
+  unsigned int	is_resident:1;	/* module can't be unloaded. */
+  unsigned int	is_symglobal:1;	/* module symbols can satisfy
+				   subsequently loaded modules.  */
+  unsigned int	is_symlocal:1;	/* module symbols are only available
+				   locally. */
+  unsigned int	try_preload_only:1;/* only preloaded modules will be tried. */
 };
 
 /* --- ERROR HANDLING --- */
@@ -134,15 +134,15 @@ struct lt__advise {
 /* Extract the diagnostic strings from the error table macro in the same
    order as the enumerated indices in lt_error.h. */
 
-#define LT__STRERROR(name)  lt__error_string(LT_CONC(LT_ERROR_,name))
+#define LT__STRERROR(name)	lt__error_string(LT_CONC(LT_ERROR_,name))
 
-#define LT__GETERROR(lvalue)          (lvalue) = lt__get_last_error()
+#define LT__GETERROR(lvalue)	      (lvalue) = lt__get_last_error()
 #define LT__SETERRORSTR(errormsg)     lt__set_last_error(errormsg)
-#define LT__SETERROR(errorcode)       LT__SETERRORSTR(LT__STRERROR(errorcode))
+#define LT__SETERROR(errorcode)	      LT__SETERRORSTR(LT__STRERROR(errorcode))
 
-LT_SCOPE const char *lt__error_string   ( int errorcode );
-LT_SCOPE const char *lt__get_last_error ( void );
-LT_SCOPE const char *lt__set_last_error ( const char *errormsg );
+LT_SCOPE const char *lt__error_string	(int errorcode);
+LT_SCOPE const char *lt__get_last_error	(void);
+LT_SCOPE const char *lt__set_last_error	(const char *errormsg);
 
 LT_END_C_DECLS
 

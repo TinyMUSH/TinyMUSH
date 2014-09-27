@@ -50,31 +50,33 @@ or obtained by writing to the Free Software Foundation, Inc.,
 
 #  include <windows.h>
 
-#  define D_NAMLEN(dirent)  (strlen((dirent)->d_name))
-#  define dirent        lt__dirent
-#  define DIR           lt__DIR
-#  define opendir       lt__opendir
-#  define readdir       lt__readdir
-#  define closedir      lt__closedir
+#  define D_NAMLEN(dirent)	(strlen((dirent)->d_name))
+#  define dirent		lt__dirent
+#  define DIR			lt__DIR
+#  define opendir		lt__opendir
+#  define readdir		lt__readdir
+#  define closedir		lt__closedir
 
 LT_BEGIN_C_DECLS
 
-struct dirent {
-    char d_name[LT_FILENAME_MAX];
-    int  d_namlen;
+struct dirent
+{
+  char d_name[LT_FILENAME_MAX];
+  int  d_namlen;
 };
 
-typedef struct {
-    HANDLE hSearch;
-    WIN32_FIND_DATA Win32FindData;
-    BOOL firsttime;
-    struct dirent file_info;
+typedef struct
+{
+  HANDLE hSearch;
+  WIN32_FIND_DATA Win32FindData;
+  BOOL firsttime;
+  struct dirent file_info;
 } DIR;
 
 
-LT_SCOPE DIR *      opendir     ( const char *path );
-LT_SCOPE struct dirent *readdir     ( DIR *entry );
-LT_SCOPE void       closedir    ( DIR *entry );
+LT_SCOPE DIR *		opendir		(const char *path);
+LT_SCOPE struct dirent *readdir		(DIR *entry);
+LT_SCOPE void		closedir	(DIR *entry);
 
 LT_END_C_DECLS
 

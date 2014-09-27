@@ -36,21 +36,21 @@ or obtained by writing to the Free Software Foundation, Inc.,
    collisions when the loader code is statically linked into libltdl.
    Use the "<module_name>_LTX_" prefix so that the symbol addresses can
    be fetched from the preloaded symbol list by lt_dlsym():  */
-#define get_vtable  dlopen_LTX_get_vtable
+#define get_vtable	dlopen_LTX_get_vtable
 
 LT_BEGIN_C_DECLS
-LT_SCOPE lt_dlvtable *get_vtable ( lt_user_data loader_data );
+LT_SCOPE lt_dlvtable *get_vtable (lt_user_data loader_data);
 LT_END_C_DECLS
 
 
 /* Boilerplate code to set up the vtable for hooking this loader into
    libltdl's loader list:  */
-static int   vl_exit  ( lt_user_data loader_data );
-static lt_module vm_open  ( lt_user_data loader_data, const char *filename,
-                            lt_dladvise advise );
-static int   vm_close ( lt_user_data loader_data, lt_module module );
-static void *    vm_sym   ( lt_user_data loader_data, lt_module module,
-                            const char *symbolname );
+static int	 vl_exit  (lt_user_data loader_data);
+static lt_module vm_open  (lt_user_data loader_data, const char *filename,
+                           lt_dladvise advise);
+static int	 vm_close (lt_user_data loader_data, lt_module module);
+static void *	 vm_sym   (lt_user_data loader_data, lt_module module,
+			  const char *symbolname);
 
 static lt_dlvtable *vtable = 0;
 
@@ -58,31 +58,34 @@ static lt_dlvtable *vtable = 0;
    attributes (plus the virtual function implementations, obviously)
    change between loaders.  */
 lt_dlvtable *
-get_vtable ( lt_user_data loader_data )
+get_vtable (lt_user_data loader_data)
 {
-    if ( !vtable ) {
-        vtable = ( lt_dlvtable * ) lt__zalloc ( sizeof * vtable );
+  if (!vtable)
+    {
+      vtable = (lt_dlvtable *) lt__zalloc (sizeof *vtable);
     }
 
-    if ( vtable && !vtable->name ) {
-        vtable->name      = "lt_dlopen";
+  if (vtable && !vtable->name)
+    {
+      vtable->name		= "lt_dlopen";
 #if defined(DLSYM_USCORE)
-        vtable->sym_prefix    = "_";
+      vtable->sym_prefix	= "_";
 #endif
-        vtable->module_open   = vm_open;
-        vtable->module_close  = vm_close;
-        vtable->find_sym      = vm_sym;
-        vtable->dlloader_exit = vl_exit;
-        vtable->dlloader_data = loader_data;
-        vtable->priority      = LT_DLLOADER_PREPEND;
+      vtable->module_open	= vm_open;
+      vtable->module_close	= vm_close;
+      vtable->find_sym		= vm_sym;
+      vtable->dlloader_exit	= vl_exit;
+      vtable->dlloader_data	= loader_data;
+      vtable->priority		= LT_DLLOADER_PREPEND;
     }
 
-    if ( vtable && ( vtable->dlloader_data != loader_data ) ) {
-        LT__SETERROR ( INIT_LOADER );
-        return 0;
+  if (vtable && (vtable->dlloader_data != loader_data))
+    {
+      LT__SETERROR (INIT_LOADER);
+      return 0;
     }
 
-    return vtable;
+  return vtable;
 }
 
 
@@ -103,56 +106,56 @@ get_vtable ( lt_user_data loader_data )
    find out it does not work in some platform. */
 #if !defined(LT_LAZY_OR_NOW)
 #  if defined(RTLD_LAZY)
-#    define LT_LAZY_OR_NOW  RTLD_LAZY
+#    define LT_LAZY_OR_NOW	RTLD_LAZY
 #  else
 #    if defined(DL_LAZY)
-#      define LT_LAZY_OR_NOW    DL_LAZY
+#      define LT_LAZY_OR_NOW	DL_LAZY
 #    endif
 #  endif /* !RTLD_LAZY */
 #endif
 #if !defined(LT_LAZY_OR_NOW)
 #  if defined(RTLD_NOW)
-#    define LT_LAZY_OR_NOW  RTLD_NOW
+#    define LT_LAZY_OR_NOW	RTLD_NOW
 #  else
 #    if defined(DL_NOW)
-#      define LT_LAZY_OR_NOW    DL_NOW
+#      define LT_LAZY_OR_NOW	DL_NOW
 #    endif
 #  endif /* !RTLD_NOW */
 #endif
 #if !defined(LT_LAZY_OR_NOW)
-#  define LT_LAZY_OR_NOW    0
+#  define LT_LAZY_OR_NOW	0
 #endif /* !LT_LAZY_OR_NOW */
 
 /* We only support local and global symbols from modules for loaders
    that provide such a thing, otherwise the system default is used.  */
 #if !defined(RTLD_GLOBAL)
 #  if defined(DL_GLOBAL)
-#    define RTLD_GLOBAL     DL_GLOBAL
+#    define RTLD_GLOBAL		DL_GLOBAL
 #  endif
 #endif /* !RTLD_GLOBAL */
 #if !defined(RTLD_LOCAL)
 #  if defined(DL_LOCAL)
-#    define RTLD_LOCAL      DL_LOCAL
+#    define RTLD_LOCAL		DL_LOCAL
 #  endif
 #endif /* !RTLD_LOCAL */
 
 #if defined(HAVE_DLERROR)
-#  define DLERROR(arg)  dlerror ()
+#  define DLERROR(arg)	dlerror ()
 #else
-#  define DLERROR(arg)  LT__STRERROR (arg)
+#  define DLERROR(arg)	LT__STRERROR (arg)
 #endif
 
 #define DL__SETERROR(errorcode) \
-    LT__SETERRORSTR (DLERROR (errorcode))
+	LT__SETERRORSTR (DLERROR (errorcode))
 
 
 /* A function called through the vtable when this loader is no
    longer needed by the application.  */
 static int
-vl_exit ( lt_user_data LT__UNUSED loader_data )
+vl_exit (lt_user_data LT__UNUSED loader_data)
 {
-    vtable = NULL;
-    return 0;
+  vtable = NULL;
+  return 0;
 }
 
 
@@ -160,72 +163,73 @@ vl_exit ( lt_user_data LT__UNUSED loader_data )
    loader.  Returns an opaque representation of the newly opened
    module for processing with this loader's other vtable functions.  */
 static lt_module
-vm_open ( lt_user_data LT__UNUSED loader_data, const char *filename,
-          lt_dladvise advise )
+vm_open (lt_user_data LT__UNUSED loader_data, const char *filename,
+         lt_dladvise advise)
 {
-    int       module_flags = LT_LAZY_OR_NOW;
-    lt_module module;
+  int		module_flags = LT_LAZY_OR_NOW;
+  lt_module	module;
 
-    if ( advise ) {
+  if (advise)
+    {
 #ifdef RTLD_GLOBAL
-
-        /* If there is some means of asking for global symbol resolution,
-           do so.  */
-        if ( advise->is_symglobal )
-            module_flags |= RTLD_GLOBAL;
-
+      /* If there is some means of asking for global symbol resolution,
+         do so.  */
+      if (advise->is_symglobal)
+        module_flags |= RTLD_GLOBAL;
 #else
-        /* Otherwise, reset that bit so the caller can tell it wasn't
-           acted on.  */
-        advise->is_symglobal = 0;
+      /* Otherwise, reset that bit so the caller can tell it wasn't
+         acted on.  */
+      advise->is_symglobal = 0;
 #endif
-        /* And similarly for local only symbol resolution.  */
+
+/* And similarly for local only symbol resolution.  */
 #ifdef RTLD_LOCAL
-
-        if ( advise->is_symlocal )
-            module_flags |= RTLD_LOCAL;
-
+      if (advise->is_symlocal)
+        module_flags |= RTLD_LOCAL;
 #else
-        advise->is_symlocal = 0;
+      advise->is_symlocal = 0;
 #endif
     }
 
-    module = dlopen ( filename, module_flags );
+  module = dlopen (filename, module_flags);
 
-    if ( !module ) {
-        DL__SETERROR ( CANNOT_OPEN );
+  if (!module)
+    {
+      DL__SETERROR (CANNOT_OPEN);
     }
 
-    return module;
+  return module;
 }
 
 
 /* A function called through the vtable when a particular module
    should be unloaded.  */
 static int
-vm_close ( lt_user_data LT__UNUSED loader_data, lt_module module )
+vm_close (lt_user_data LT__UNUSED loader_data, lt_module module)
 {
-    int errors = 0;
+  int errors = 0;
 
-    if ( dlclose ( module ) != 0 ) {
-        DL__SETERROR ( CANNOT_CLOSE );
-        ++errors;
+  if (dlclose (module) != 0)
+    {
+      DL__SETERROR (CANNOT_CLOSE);
+      ++errors;
     }
 
-    return errors;
+  return errors;
 }
 
 
 /* A function called through the vtable to get the address of
    a symbol loaded from a particular module.  */
 static void *
-vm_sym ( lt_user_data LT__UNUSED loader_data, lt_module module, const char *name )
+vm_sym (lt_user_data LT__UNUSED loader_data, lt_module module, const char *name)
 {
-    void *address = dlsym ( module, name );
+  void *address = dlsym (module, name);
 
-    if ( !address ) {
-        DL__SETERROR ( SYMBOL_NOT_FOUND );
+  if (!address)
+    {
+      DL__SETERROR (SYMBOL_NOT_FOUND);
     }
 
-    return address;
+  return address;
 }

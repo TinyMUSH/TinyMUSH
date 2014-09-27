@@ -78,7 +78,7 @@ struct descriptor_data {
     int host_info;
     char addr[51];
     char username[11];
-    char doing[DOING_LEN];
+    char *doing;
     dbref player;
     int *colormap;
     char *output_prefix;

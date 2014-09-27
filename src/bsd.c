@@ -775,7 +775,12 @@ void shutdownsock ( DESC *d, int reason )
         d->command_count = 0;
         d->timeout = mudconf.idle_timeout;
         d->player = 0;
-        d->doing[0] = '\0';
+
+        if ( d->doing ) {
+            xfree ( d->doing, "doing" );
+            d->doing = NULL;
+        }
+
         d->quota = mudconf.cmd_quota_max;
         d->last_time = 0;
         d->host_info = site_check ( ( d->address ).sin_addr,
@@ -851,11 +856,11 @@ DESC *initializesock ( int s, struct sockaddr_in *a )
     d->retries_left = mudconf.retry_limit;
     d->command_count = 0;
     d->timeout = mudconf.idle_timeout;
-    d->host_info = site_check ( ( *a ).sin_addr, mudstate.access_list ) |
-                   site_check ( ( *a ).sin_addr, mudstate.suspect_list );
+    d->host_info = site_check ( ( *a ).sin_addr, mudstate.access_list ) | site_check ( ( *a ).sin_addr, mudstate.suspect_list );
     d->player = 0;      /* be sure #0 isn't wizard.  Shouldn't be. */
     d->addr[0] = '\0';
-    d->doing[0] = '\0';
+    d->doing = NULL;
+    //d->doing = sane_doing("", "doing");
     d->username[0] = '\0';
     d->colormap = NULL;
     make_nonblocking ( s );

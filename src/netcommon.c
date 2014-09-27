@@ -1345,9 +1345,9 @@ static void dump_users ( DESC *e, char *match, int key )
             } else if ( key == CMD_SESSION ) {
                 sprintf ( buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trimmed_name ( d->player ), time_format_1 ( mudstate.now - d->connected_at ), time_format_2 ( mudstate.now - d->last_time ), d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot );
             } else if ( Wizard_Who ( e->player ) || See_Hidden ( e->player ) ) {
-                sprintf ( buf, "%-16s%9s %4s%-3s%s\r\n", trimmed_name ( d->player ), time_format_1 ( mudstate.now - d->connected_at ), time_format_2 ( mudstate.now - d->last_time ), flist, d->doing );
+                sprintf ( buf, "%-16s%9s %4s%-3s%s\r\n", trimmed_name ( d->player ), time_format_1 ( mudstate.now - d->connected_at ), time_format_2 ( mudstate.now - d->last_time ), flist, ( d->doing == NULL ? "" : d->doing ) );
             } else {
-                sprintf ( buf, "%-16s%9s %4s  %s\r\n", trimmed_name ( d->player ), time_format_1 ( mudstate.now - d->connected_at ), time_format_2 ( mudstate.now - d->last_time ), d->doing );
+                sprintf ( buf, "%-16s%9s %4s  %s\r\n", trimmed_name ( d->player ), time_format_1 ( mudstate.now - d->connected_at ), time_format_2 ( mudstate.now - d->last_time ), ( d->doing == NULL ? "" : d->doing ) );
             }
 
             queue_string ( e, NULL, buf );
@@ -1467,26 +1467,33 @@ void do_colormap ( dbref player, dbref cause, int key, char *fstr, char *tstr )
  * Idea from R'nice@TinyTIM.
  */
 
-static int sane_doing ( char *arg, char *buff )
+char *sane_doing ( char *arg, char *name )
 {
     char *p, *bp;
-    int over = 0;
+    int over = 0, size;
 
-    for ( p = arg; *p; p++ )
-        if ( ( *p == '\t' ) || ( *p == '\r' ) || ( *p == '\n' ) ) {
-            *p = ' ';
+    if ( arg != NULL ) {
+        for ( p = arg; *p; p++ ) {
+            if ( ( *p == '\t' ) || ( *p == '\r' ) || ( *p == '\n' ) ) {
+                *p = ' ';
+            }
         }
 
-    bp = buff;
+        size = strlen ( arg );
 
-    if ( !mudconf.ansi_colors || !strchr ( arg, ESC_CHAR ) ) {
-        over = safe_copy_str_fn ( arg, buff, &bp, DOING_LEN - 1 );
+        if ( !mudconf.ansi_colors || !strchr ( arg, ESC_CHAR ) ) {
+            bp = xstrdup ( arg, name );
+        } else {
+            size = size + strlen ( ANSI_NORMAL ) + 1 ;
+            bp = xmalloc ( size, name );
+            strcpy ( bp, arg );
+            strcat ( bp, ANSI_NORMAL );
+        }
     } else {
-        over = safe_copy_str_fn ( arg, buff, &bp, DOING_LEN - 5 );
-        strcpy ( bp, ANSI_NORMAL );
+        return ( xstrdup ( "", name ) );
     }
 
-    return over;
+    return ( bp );
 }
 
 
@@ -1502,11 +1509,14 @@ void do_doing ( dbref player, dbref cause, int key, char *arg )
             return;
         }
 
+        if ( mudstate.doing_hdr != NULL ) {
+            xfree ( mudstate.doing_hdr, "do_doing" );
+        }
+
         if ( !arg || !*arg ) {
-            strcpy ( mudstate.doing_hdr, "Doing" );
-            over = 0;
+            mudstate.doing_hdr = sane_doing ( "Doing", "mudstate.doing_hdr" );
         } else {
-            over = sane_doing ( arg, mudstate.doing_hdr );
+            mudstate.doing_hdr = sane_doing ( arg, "mudstate.doing_hdr" );
         }
 
         if ( over ) {
@@ -1521,7 +1531,11 @@ void do_doing ( dbref player, dbref cause, int key, char *arg )
     } else {
         foundany = 0;
         DESC_ITER_PLAYER ( player, d ) {
-            over = sane_doing ( arg, d->doing );
+            if ( d->doing != NULL ) {
+                xfree ( d->doing, "" );
+            }
+
+            d->doing = sane_doing ( arg, "doing" );
             foundany = 1;
         }
 

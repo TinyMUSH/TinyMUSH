@@ -122,7 +122,6 @@ tinymushapi.h:
 	printf "\n\n#include <ltdl.h>\n\n#include <netinet/in.h>\n\n" >> tinymushapi.h
 	sed -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
 	sed -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
-	sed -n "/DOING_LEN/p" < config.h >> tinymushapi.h
 	sed -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
 	sed -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h
 	for i in $(API_SRC); \

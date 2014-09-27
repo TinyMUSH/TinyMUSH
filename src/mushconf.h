@@ -428,7 +428,7 @@ struct statedata {
     int reboot_nums;              /* How many times have we restarted? */
     time_t  cpu_count_from;       /* When did we last reset CPU counters? */
     char    *debug_cmd;           /* The command we are executing (if any) */
-    char    doing_hdr[DOING_LEN]; /* Doing column header in WHO display */
+    char    *doing_hdr; /* Doing column header in WHO display */
     SITE    *access_list;         /* Access states for sites */
     SITE    *suspect_list;        /* Sites that are suspect */
     HASHTAB command_htab;         /* Commands hashtable */
