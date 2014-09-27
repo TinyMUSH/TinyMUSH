@@ -43,15 +43,15 @@ or obtained by writing to the Free Software Foundation, Inc.,
    clash with the system library if our clients use argz_*
    from there in addition to libltdl.  */
 #  undef  argz_append
-#  define argz_append		lt__argz_append
+#  define argz_append       lt__argz_append
 #  undef  argz_create_sep
-#  define argz_create_sep	lt__argz_create_sep
+#  define argz_create_sep   lt__argz_create_sep
 #  undef  argz_insert
-#  define argz_insert		lt__argz_insert
+#  define argz_insert       lt__argz_insert
 #  undef  argz_next
-#  define argz_next		lt__argz_next
+#  define argz_next     lt__argz_next
 #  undef  argz_stringify
-#  define argz_stringify	lt__argz_stringify
+#  define argz_stringify    lt__argz_stringify
 #endif
 
 #ifdef __cplusplus
@@ -64,19 +64,19 @@ extern "C" {
 }
 #endif
 
-# define slist_concat	lt__slist_concat
-# define slist_cons	lt__slist_cons
-# define slist_delete	lt__slist_delete
-# define slist_remove	lt__slist_remove
-# define slist_reverse	lt__slist_reverse
-# define slist_sort	lt__slist_sort
-# define slist_tail	lt__slist_tail
-# define slist_nth	lt__slist_nth
-# define slist_find	lt__slist_find
-# define slist_length	lt__slist_length
-# define slist_foreach	lt__slist_foreach
-# define slist_box	lt__slist_box
-# define slist_unbox	lt__slist_unbox
+# define slist_concat   lt__slist_concat
+# define slist_cons lt__slist_cons
+# define slist_delete   lt__slist_delete
+# define slist_remove   lt__slist_remove
+# define slist_reverse  lt__slist_reverse
+# define slist_sort lt__slist_sort
+# define slist_tail lt__slist_tail
+# define slist_nth  lt__slist_nth
+# define slist_find lt__slist_find
+# define slist_length   lt__slist_length
+# define slist_foreach  lt__slist_foreach
+# define slist_box  lt__slist_box
+# define slist_unbox    lt__slist_unbox
 
 #include <slist.h>
 

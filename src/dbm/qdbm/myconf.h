@@ -230,7 +230,7 @@ extern "C" {
   lstat(pathname, buf) \
   _qdbm_win32_lstat(pathname, buf)
 
-int _qdbm_win32_lstat(const char *pathname, struct stat *buf);
+int _qdbm_win32_lstat ( const char *pathname, struct stat *buf );
 
 #else
 
@@ -258,7 +258,7 @@ int _qdbm_win32_lstat(const char *pathname, struct stat *buf);
 
 #define _qdbm_ptsafe       TRUE
 
-void *_qdbm_settsd(void *ptr, int size, const void *initval);
+void *_qdbm_settsd ( void *ptr, int size, const void *initval );
 
 #else
 
@@ -342,9 +342,9 @@ void *_qdbm_settsd(void *ptr, int size, const void *initval);
   mflush(start, length, flags) \
   _qdbm_msync(start, length, flags)
 
-void *_qdbm_mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset);
-int _qdbm_munmap(void *start, size_t length);
-int _qdbm_msync(const void *start, size_t length, int flags);
+void *_qdbm_mmap ( void *start, size_t length, int prot, int flags, int fd, off_t offset );
+int _qdbm_munmap ( void *start, size_t length );
+int _qdbm_msync ( const void *start, size_t length, int flags );
 
 #else
 
@@ -362,8 +362,8 @@ int _qdbm_msync(const void *start, size_t length, int flags);
  *************************************************************************************************/
 
 
-struct tm *_qdbm_gmtime(const time_t *timep, struct tm *result);
-struct tm *_qdbm_localtime(const time_t *timep, struct tm *result);
+struct tm *_qdbm_gmtime ( const time_t *timep, struct tm *result );
+struct tm *_qdbm_localtime ( const time_t *timep, struct tm *result );
 
 
 
@@ -378,10 +378,10 @@ struct tm *_qdbm_localtime(const time_t *timep, struct tm *result);
 #undef sysconf
 
 struct tms {
-  clock_t tms_utime;
-  clock_t tms_stime;
-  clock_t tms_cutime;
-  clock_t tms_cstime;
+    clock_t tms_utime;
+    clock_t tms_stime;
+    clock_t tms_cutime;
+    clock_t tms_cstime;
 };
 
 #define \
@@ -392,7 +392,7 @@ struct tms {
   sysconf(name) \
   (CLOCKS_PER_SEC)
 
-clock_t _qdbm_times(struct tms *buf);
+clock_t _qdbm_times ( struct tms *buf );
 
 #endif
 
@@ -421,11 +421,11 @@ clock_t _qdbm_times(struct tms *buf);
 #define F_SETLKW       1
 
 struct flock {
-  int l_type;
-  int l_whence;
-  int l_start;
-  int l_len;
-  int l_pid;
+    int l_type;
+    int l_whence;
+    int l_start;
+    int l_len;
+    int l_pid;
 };
 
 #define \
@@ -448,7 +448,7 @@ struct flock {
   rename(oldpath, newpath) \
   (unlink(newpath), rename(oldpath, newpath))
 
-int _qdbm_win32_fcntl(int fd, int cmd, struct flock *lock);
+int _qdbm_win32_fcntl ( int fd, int cmd, struct flock *lock );
 
 #endif
 
@@ -465,14 +465,14 @@ int _qdbm_win32_fcntl(int fd, int cmd, struct flock *lock);
 #define S_ISREG(x)     (x & _S_IFREG)
 
 struct dirent {
-  char d_name[1024];
+    char d_name[1024];
 };
 
 typedef struct {
-  HANDLE fh;
-  WIN32_FIND_DATA data;
-  struct dirent de;
-  int first;
+    HANDLE fh;
+    WIN32_FIND_DATA data;
+    struct dirent de;
+    int first;
 } DIR;
 
 #define \
@@ -487,11 +487,11 @@ typedef struct {
   readdir(dir) \
   _qdbm_win32_readdir(dir)
 
-DIR *_qdbm_win32_opendir(const char *name);
+DIR *_qdbm_win32_opendir ( const char *name );
 
-int _qdbm_win32_closedir(DIR *dir);
+int _qdbm_win32_closedir ( DIR *dir );
 
-struct dirent *_qdbm_win32_readdir(DIR *dir);
+struct dirent *_qdbm_win32_readdir ( DIR *dir );
 
 #endif
 
@@ -502,7 +502,7 @@ struct dirent *_qdbm_win32_readdir(DIR *dir);
  *************************************************************************************************/
 
 
-int _qdbm_vmemavail(size_t size);
+int _qdbm_vmemavail ( size_t size );
 
 
 
@@ -512,17 +512,17 @@ int _qdbm_vmemavail(size_t size);
 
 
 enum {
-  _QDBM_ZMZLIB,
-  _QDBM_ZMRAW,
-  _QDBM_ZMGZIP
+    _QDBM_ZMZLIB,
+    _QDBM_ZMRAW,
+    _QDBM_ZMGZIP
 };
 
 
-extern char *(*_qdbm_deflate)(const char *, int, int *, int);
+extern char * ( *_qdbm_deflate ) ( const char *, int, int *, int );
 
-extern char *(*_qdbm_inflate)(const char *, int, int *, int);
+extern char * ( *_qdbm_inflate ) ( const char *, int, int *, int );
 
-extern unsigned int (*_qdbm_getcrc)(const char *, int);
+extern unsigned int ( *_qdbm_getcrc ) ( const char *, int );
 
 
 
@@ -531,9 +531,9 @@ extern unsigned int (*_qdbm_getcrc)(const char *, int);
  *************************************************************************************************/
 
 
-extern char *(*_qdbm_lzoencode)(const char *, int, int *);
+extern char * ( *_qdbm_lzoencode ) ( const char *, int, int * );
 
-extern char *(*_qdbm_lzodecode)(const char *, int, int *);
+extern char * ( *_qdbm_lzodecode ) ( const char *, int, int * );
 
 
 
@@ -542,9 +542,9 @@ extern char *(*_qdbm_lzodecode)(const char *, int, int *);
  *************************************************************************************************/
 
 
-extern char *(*_qdbm_bzencode)(const char *, int, int *);
+extern char * ( *_qdbm_bzencode ) ( const char *, int, int * );
 
-extern char *(*_qdbm_bzdecode)(const char *, int, int *);
+extern char * ( *_qdbm_bzdecode ) ( const char *, int, int * );
 
 
 
@@ -553,9 +553,9 @@ extern char *(*_qdbm_bzdecode)(const char *, int, int *);
  *************************************************************************************************/
 
 
-extern char *(*_qdbm_iconv)(const char *, int, const char *, const char *, int *, int *);
+extern char * ( *_qdbm_iconv ) ( const char *, int, const char *, const char *, int *, int * );
 
-extern const char *(*_qdbm_encname)(const char *, int);
+extern const char * ( *_qdbm_encname ) ( const char *, int );
 
 
 
@@ -571,7 +571,7 @@ extern const char *(*_qdbm_encname)(const char *, int);
 
 #define sizeof(a)      ((int)sizeof(a))
 
-int _qdbm_dummyfunc(void);
+int _qdbm_dummyfunc ( void );
 
 
 

@@ -6,12 +6,11 @@
    point? it doesn't alloate any memory. */
 
 int
-gdbm_exists(dbf, key)
-	gdbm_file_info *dbf;
-	datum key;
+gdbm_exists ( dbf, key )
+gdbm_file_info *dbf;
+datum key;
 {
-	char *find_data;		/* dummy */
-	int hash_val;			/* dummy */
-
-	return (_gdbm_findkey(dbf, key, &find_data, &hash_val) >= 0);
+    char *find_data;        /* dummy */
+    int hash_val;           /* dummy */
+    return ( _gdbm_findkey ( dbf, key, &find_data, &hash_val ) >= 0 );
 }

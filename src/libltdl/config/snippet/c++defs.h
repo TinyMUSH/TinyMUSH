@@ -152,12 +152,12 @@
      _GL_CXXALIAS_SYS (open, int, (const char *filename, int flags, ...));
  */
 #if defined __cplusplus && defined GNULIB_NAMESPACE
-  /* If we were to write
-       rettype (*const func) parameters = ::func;
-     like above in _GL_CXXALIAS_RPL_1, the compiler could optimize calls
-     better (remove an indirection through a 'static' pointer variable),
-     but then the _GL_CXXALIASWARN macro below would cause a warning not only
-     for uses of ::func but also for uses of GNULIB_NAMESPACE::func.  */
+/* If we were to write
+     rettype (*const func) parameters = ::func;
+   like above in _GL_CXXALIAS_RPL_1, the compiler could optimize calls
+   better (remove an indirection through a 'static' pointer variable),
+   but then the _GL_CXXALIASWARN macro below would cause a warning not only
+   for uses of ::func but also for uses of GNULIB_NAMESPACE::func.  */
 # define _GL_CXXALIAS_SYS(func,rettype,parameters) \
     namespace GNULIB_NAMESPACE                     \
     {                                              \
@@ -194,11 +194,11 @@
    are used to silence the "cannot find a match" and "invalid conversion"
    errors that would otherwise occur.  */
 #if defined __cplusplus && defined GNULIB_NAMESPACE
-  /* The outer cast must be a reinterpret_cast.
-     The inner cast: When the function is defined as a set of overloaded
-     functions, it works as a static_cast<>, choosing the designated variant.
-     When the function is defined as a single variant, it works as a
-     reinterpret_cast<>. The parenthesized cast syntax works both ways.  */
+/* The outer cast must be a reinterpret_cast.
+   The inner cast: When the function is defined as a set of overloaded
+   functions, it works as a static_cast<>, choosing the designated variant.
+   When the function is defined as a single variant, it works as a
+   reinterpret_cast<>. The parenthesized cast syntax works both ways.  */
 # define _GL_CXXALIAS_SYS_CAST2(func,rettype,parameters,rettype2,parameters2) \
     namespace GNULIB_NAMESPACE                                                \
     {                                                                         \

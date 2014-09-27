@@ -42,12 +42,12 @@ or obtained by writing to the Free Software Foundation, Inc.,
 
 #if !defined(HAVE_STRLCAT)
 #  define strlcat(dst,src,dstsize) lt_strlcat(dst,src,dstsize)
-LT_SCOPE size_t lt_strlcat(char *dst, const char *src, const size_t dstsize);
+LT_SCOPE size_t lt_strlcat ( char *dst, const char *src, const size_t dstsize );
 #endif /* !defined(HAVE_STRLCAT) */
 
 #if !defined(HAVE_STRLCPY)
 #  define strlcpy(dst,src,dstsize) lt_strlcpy(dst,src,dstsize)
-LT_SCOPE size_t lt_strlcpy(char *dst, const char *src, const size_t dstsize);
+LT_SCOPE size_t lt_strlcpy ( char *dst, const char *src, const size_t dstsize );
 #endif /* !defined(HAVE_STRLCPY) */
 
 #endif /*!defined(LT__STRL_H)*/

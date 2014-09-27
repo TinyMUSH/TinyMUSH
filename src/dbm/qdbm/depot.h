@@ -25,63 +25,63 @@ extern "C" {
 
 
 typedef struct {                         /* type of structure for a database handle */
-  char *name;                            /* name of the database file */
-  int wmode;                             /* whether to be writable */
-  int inode;                             /* inode of the database file */
-  time_t mtime;                          /* last modified time of the database */
-  int fd;                                /* file descriptor of the database file */
-  int fsiz;                              /* size of the database file */
-  char *map;                             /* pointer to the mapped memory */
-  int msiz;                              /* size of the mapped memory */
-  int *buckets;                          /* pointer to the bucket array */
-  int bnum;                              /* number of the bucket array */
-  int rnum;                              /* number of records */
-  int fatal;                             /* whether a fatal error occured */
-  int ioff;                              /* offset of the iterator */
-  int *fbpool;                           /* free block pool */
-  int fbpsiz;                            /* size of the free block pool */
-  int fbpinc;                            /* incrementor of update of the free block pool */
-  int align;                             /* basic size of alignment */
+    char *name;                            /* name of the database file */
+    int wmode;                             /* whether to be writable */
+    int inode;                             /* inode of the database file */
+    time_t mtime;                          /* last modified time of the database */
+    int fd;                                /* file descriptor of the database file */
+    int fsiz;                              /* size of the database file */
+    char *map;                             /* pointer to the mapped memory */
+    int msiz;                              /* size of the mapped memory */
+    int *buckets;                          /* pointer to the bucket array */
+    int bnum;                              /* number of the bucket array */
+    int rnum;                              /* number of records */
+    int fatal;                             /* whether a fatal error occured */
+    int ioff;                              /* offset of the iterator */
+    int *fbpool;                           /* free block pool */
+    int fbpsiz;                            /* size of the free block pool */
+    int fbpinc;                            /* incrementor of update of the free block pool */
+    int align;                             /* basic size of alignment */
 } DEPOT;
 
 enum {                                   /* enumeration for error codes */
-  DP_ENOERR,                             /* no error */
-  DP_EFATAL,                             /* with fatal error */
-  DP_EMODE,                              /* invalid mode */
-  DP_EBROKEN,                            /* broken database file */
-  DP_EKEEP,                              /* existing record */
-  DP_ENOITEM,                            /* no item found */
-  DP_EALLOC,                             /* memory allocation error */
-  DP_EMAP,                               /* memory mapping error */
-  DP_EOPEN,                              /* open error */
-  DP_ECLOSE,                             /* close error */
-  DP_ETRUNC,                             /* trunc error */
-  DP_ESYNC,                              /* sync error */
-  DP_ESTAT,                              /* stat error */
-  DP_ESEEK,                              /* seek error */
-  DP_EREAD,                              /* read error */
-  DP_EWRITE,                             /* write error */
-  DP_ELOCK,                              /* lock error */
-  DP_EUNLINK,                            /* unlink error */
-  DP_EMKDIR,                             /* mkdir error */
-  DP_ERMDIR,                             /* rmdir error */
-  DP_EMISC                               /* miscellaneous error */
+    DP_ENOERR,                             /* no error */
+    DP_EFATAL,                             /* with fatal error */
+    DP_EMODE,                              /* invalid mode */
+    DP_EBROKEN,                            /* broken database file */
+    DP_EKEEP,                              /* existing record */
+    DP_ENOITEM,                            /* no item found */
+    DP_EALLOC,                             /* memory allocation error */
+    DP_EMAP,                               /* memory mapping error */
+    DP_EOPEN,                              /* open error */
+    DP_ECLOSE,                             /* close error */
+    DP_ETRUNC,                             /* trunc error */
+    DP_ESYNC,                              /* sync error */
+    DP_ESTAT,                              /* stat error */
+    DP_ESEEK,                              /* seek error */
+    DP_EREAD,                              /* read error */
+    DP_EWRITE,                             /* write error */
+    DP_ELOCK,                              /* lock error */
+    DP_EUNLINK,                            /* unlink error */
+    DP_EMKDIR,                             /* mkdir error */
+    DP_ERMDIR,                             /* rmdir error */
+    DP_EMISC                               /* miscellaneous error */
 };
 
 enum {                                   /* enumeration for open modes */
-  DP_OREADER = 1 << 0,                   /* open as a reader */
-  DP_OWRITER = 1 << 1,                   /* open as a writer */
-  DP_OCREAT = 1 << 2,                    /* a writer creating */
-  DP_OTRUNC = 1 << 3,                    /* a writer truncating */
-  DP_ONOLCK = 1 << 4,                    /* open without locking */
-  DP_OLCKNB = 1 << 5,                    /* lock without blocking */
-  DP_OSPARSE = 1 << 6                    /* create as a sparse file */
+    DP_OREADER = 1 << 0,                   /* open as a reader */
+    DP_OWRITER = 1 << 1,                   /* open as a writer */
+    DP_OCREAT = 1 << 2,                    /* a writer creating */
+    DP_OTRUNC = 1 << 3,                    /* a writer truncating */
+    DP_ONOLCK = 1 << 4,                    /* open without locking */
+    DP_OLCKNB = 1 << 5,                    /* lock without blocking */
+    DP_OSPARSE = 1 << 6                    /* create as a sparse file */
 };
 
 enum {                                   /* enumeration for write modes */
-  DP_DOVER,                              /* overwrite an existing value */
-  DP_DKEEP,                              /* keep an existing value */
-  DP_DCAT                                /* concatenate values */
+    DP_DOVER,                              /* overwrite an existing value */
+    DP_DKEEP,                              /* keep an existing value */
+    DP_DCAT                                /* concatenate values */
 };
 
 
@@ -97,7 +97,7 @@ MYEXTERN const char *dpversion;
    `ecode' specifies an error code.
    The return value is the message string of the error code. The region of the return value
    is not writable. */
-const char *dperrmsg(int ecode);
+const char *dperrmsg ( int ecode );
 
 
 /* Get a database handle.
@@ -118,7 +118,7 @@ const char *dperrmsg(int ecode);
    While connecting as a reader, a shared lock is invoked to the database file.  The thread
    blocks until the lock is achieved.  If `DP_ONOLCK' is used, the application is responsible
    for exclusion control. */
-DEPOT *dpopen(const char *name, int omode, int bnum);
+DEPOT *dpopen ( const char *name, int omode, int bnum );
 
 
 /* Close a database handle.
@@ -127,7 +127,7 @@ DEPOT *dpopen(const char *name, int omode, int bnum);
    Because the region of a closed handle is released, it becomes impossible to use the handle.
    Updating a database is assured to be written when the handle is closed.  If a writer opens
    a database but does not close it appropriately, the database will be broken. */
-int dpclose(DEPOT *depot);
+int dpclose ( DEPOT *depot );
 
 
 /* Store a record.
@@ -143,7 +143,7 @@ int dpclose(DEPOT *depot);
    existing value is kept, `DP_DCAT', which means the specified value is concatenated at the
    end of the existing value.
    If successful, the return value is true, else, it is false. */
-int dpput(DEPOT *depot, const char *kbuf, int ksiz, const char *vbuf, int vsiz, int dmode);
+int dpput ( DEPOT *depot, const char *kbuf, int ksiz, const char *vbuf, int vsiz, int dmode );
 
 
 /* Delete a record.
@@ -153,7 +153,7 @@ int dpput(DEPOT *depot, const char *kbuf, int ksiz, const char *vbuf, int vsiz, 
    with `strlen(kbuf)'.
    If successful, the return value is true, else, it is false.  False is returned when no
    record corresponds to the specified key. */
-int dpout(DEPOT *depot, const char *kbuf, int ksiz);
+int dpout ( DEPOT *depot, const char *kbuf, int ksiz );
 
 
 /* Retrieve a record.
@@ -172,7 +172,7 @@ int dpout(DEPOT *depot, const char *kbuf, int ksiz);
    the return value can be treated as a character string.  Because the region of the return
    value is allocated with the `malloc' call, it should be released with the `free' call if it
    is no longer in use. */
-char *dpget(DEPOT *depot, const char *kbuf, int ksiz, int start, int max, int *sp);
+char *dpget ( DEPOT *depot, const char *kbuf, int ksiz, int start, int max, int *sp );
 
 
 /* Retrieve a record and write the value into a buffer.
@@ -189,7 +189,7 @@ char *dpget(DEPOT *depot, const char *kbuf, int ksiz, int start, int max, int *s
    returned when no record corresponds to the specified key or the size of the value of the
    corresponding record is less than `start'.
    Note that no additional zero code is appended at the end of the region of the writing buffer. */
-int dpgetwb(DEPOT *depot, const char *kbuf, int ksiz, int start, int max, char *vbuf);
+int dpgetwb ( DEPOT *depot, const char *kbuf, int ksiz, int start, int max, char *vbuf );
 
 
 /* Get the size of the value of a record.
@@ -200,14 +200,14 @@ int dpgetwb(DEPOT *depot, const char *kbuf, int ksiz, int start, int max, char *
    If successful, the return value is the size of the value of the corresponding record, else,
    it is -1.
    Because this function does not read the entity of a record, it is faster than `dpget'. */
-int dpvsiz(DEPOT *depot, const char *kbuf, int ksiz);
+int dpvsiz ( DEPOT *depot, const char *kbuf, int ksiz );
 
 
 /* Initialize the iterator of a database handle.
    `depot' specifies a database handle.
    If successful, the return value is true, else, it is false.
    The iterator is used in order to access the key of every record stored in a database. */
-int dpiterinit(DEPOT *depot);
+int dpiterinit ( DEPOT *depot );
 
 
 /* Get the next key of the iterator.
@@ -223,7 +223,7 @@ int dpiterinit(DEPOT *depot);
    this function.  However, it is not assured if updating the database is occurred while the
    iteration.  Besides, the order of this traversal access method is arbitrary, so it is not
    assured that the order of storing matches the one of the traversal access. */
-char *dpiternext(DEPOT *depot, int *sp);
+char *dpiternext ( DEPOT *depot, int *sp );
 
 
 /* Set alignment of a database handle.
@@ -236,7 +236,7 @@ char *dpiternext(DEPOT *depot, int *sp);
    is placed.  If alignment is negative, as `vsiz' is the size of a value, the size of padding
    is calculated with `(vsiz / pow(2, abs(align) - 1))'.  Because alignment setting is not
    saved in a database, you should specify alignment every opening a database. */
-int dpsetalign(DEPOT *depot, int align);
+int dpsetalign ( DEPOT *depot, int align );
 
 
 /* Set the size of the free block pool of a database handle.
@@ -245,14 +245,14 @@ int dpsetalign(DEPOT *depot, int align);
    If successful, the return value is true, else, it is false.
    The default size of the free block pool is 16.  If the size is greater, the space efficiency
    of overwriting values is improved with the time efficiency sacrificed. */
-int dpsetfbpsiz(DEPOT *depot, int size);
+int dpsetfbpsiz ( DEPOT *depot, int size );
 
 
 /* Synchronize updating contents with the file and the device.
    `depot' specifies a database handle connected as a writer.
    If successful, the return value is true, else, it is false.
    This function is useful when another process uses the connected database file. */
-int dpsync(DEPOT *depot);
+int dpsync ( DEPOT *depot );
 
 
 /* Optimize a database.
@@ -262,7 +262,7 @@ int dpsync(DEPOT *depot);
    If successful, the return value is true, else, it is false.
    In an alternating succession of deleting and storing with overwrite or concatenate,
    dispensable regions accumulate.  This function is useful to do away with them. */
-int dpoptimize(DEPOT *depot, int bnum);
+int dpoptimize ( DEPOT *depot, int bnum );
 
 
 /* Get the name of a database.
@@ -271,20 +271,20 @@ int dpoptimize(DEPOT *depot, int bnum);
    else, it is `NULL'.
    Because the region of the return value is allocated with the `malloc' call, it should be
    released with the `free' call if it is no longer in use. */
-char *dpname(DEPOT *depot);
+char *dpname ( DEPOT *depot );
 
 
 /* Get the size of a database file.
    `depot' specifies a database handle.
    If successful, the return value is the size of the database file, else, it is -1. */
-int dpfsiz(DEPOT *depot);
+int dpfsiz ( DEPOT *depot );
 
 
 /* Get the number of the elements of the bucket array.
    `depot' specifies a database handle.
    If successful, the return value is the number of the elements of the bucket array, else, it
    is -1. */
-int dpbnum(DEPOT *depot);
+int dpbnum ( DEPOT *depot );
 
 
 /* Get the number of the used elements of the bucket array.
@@ -292,51 +292,51 @@ int dpbnum(DEPOT *depot);
    If successful, the return value is the number of the used elements of the bucket array,
    else, it is -1.
    This function is inefficient because it accesses all elements of the bucket array. */
-int dpbusenum(DEPOT *depot);
+int dpbusenum ( DEPOT *depot );
 
 
 /* Get the number of the records stored in a database.
    `depot' specifies a database handle.
    If successful, the return value is the number of the records stored in the database, else,
    it is -1. */
-int dprnum(DEPOT *depot);
+int dprnum ( DEPOT *depot );
 
 
 /* Check whether a database handle is a writer or not.
    `depot' specifies a database handle.
    The return value is true if the handle is a writer, false if not. */
-int dpwritable(DEPOT *depot);
+int dpwritable ( DEPOT *depot );
 
 
 /* Check whether a database has a fatal error or not.
    `depot' specifies a database handle.
    The return value is true if the database has a fatal error, false if not. */
-int dpfatalerror(DEPOT *depot);
+int dpfatalerror ( DEPOT *depot );
 
 
 /* Get the inode number of a database file.
    `depot' specifies a database handle.
    The return value is the inode number of the database file. */
-int dpinode(DEPOT *depot);
+int dpinode ( DEPOT *depot );
 
 
 /* Get the last modified time of a database.
    `depot' specifies a database handle.
    The return value is the last modified time of the database. */
-time_t dpmtime(DEPOT *depot);
+time_t dpmtime ( DEPOT *depot );
 
 
 /* Get the file descriptor of a database file.
    `depot' specifies a database handle.
    The return value is the file descriptor of the database file.
    Handling the file descriptor of a database file directly is not suggested. */
-int dpfdesc(DEPOT *depot);
+int dpfdesc ( DEPOT *depot );
 
 
 /* Remove a database file.
    `name' specifies the name of a database file.
    If successful, the return value is true, else, it is false. */
-int dpremove(const char *name);
+int dpremove ( const char *name );
 
 
 /* Repair a broken database file.
@@ -344,14 +344,14 @@ int dpremove(const char *name);
    If successful, the return value is true, else, it is false.
    There is no guarantee that all records in a repaired database file correspond to the original
    or expected state. */
-int dprepair(const char *name);
+int dprepair ( const char *name );
 
 
 /* Dump all records as endian independent data.
    `depot' specifies a database handle.
    `name' specifies the name of an output file.
    If successful, the return value is true, else, it is false. */
-int dpexportdb(DEPOT *depot, const char *name);
+int dpexportdb ( DEPOT *depot, const char *name );
 
 
 /* Load all records from endian independent data.
@@ -359,7 +359,7 @@ int dpexportdb(DEPOT *depot, const char *name);
    be empty.
    `name' specifies the name of an input file.
    If successful, the return value is true, else, it is false. */
-int dpimportdb(DEPOT *depot, const char *name);
+int dpimportdb ( DEPOT *depot, const char *name );
 
 
 /* Retrieve a record directly from a database file.
@@ -377,7 +377,7 @@ int dpimportdb(DEPOT *depot, const char *name);
    value is allocated with the `malloc' call, it should be released with the `free' call if it
    is no longer in use.  Although this function can be used even while the database file is
    locked by another process, it is not assured that recent updated is reflected. */
-char *dpsnaffle(const char *name, const char *kbuf, int ksiz, int *sp);
+char *dpsnaffle ( const char *name, const char *kbuf, int ksiz, int *sp );
 
 
 /* Hash function used inside Depot.
@@ -386,7 +386,7 @@ char *dpsnaffle(const char *name, const char *kbuf, int ksiz, int *sp);
    with `strlen(kbuf)'.
    The return value is the hash value of 31 bits length computed from the key.
    This function is useful when an application calculates the state of the inside bucket array. */
-int dpinnerhash(const char *kbuf, int ksiz);
+int dpinnerhash ( const char *kbuf, int ksiz );
 
 
 /* Hash function which is independent from the hash functions used inside Depot.
@@ -395,7 +395,7 @@ int dpinnerhash(const char *kbuf, int ksiz);
    with `strlen(kbuf)'.
    The return value is the hash value of 31 bits length computed from the key.
    This function is useful when an application uses its own hash algorithm outside Depot. */
-int dpouterhash(const char *kbuf, int ksiz);
+int dpouterhash ( const char *kbuf, int ksiz );
 
 
 /* Get a natural prime number not less than a number.
@@ -403,7 +403,7 @@ int dpouterhash(const char *kbuf, int ksiz);
    The return value is a natural prime number not less than the specified number.
    This function is useful when an application determines the size of a bucket array of its
    own hash algorithm. */
-int dpprimenum(int num);
+int dpprimenum ( int num );
 
 
 
@@ -431,37 +431,37 @@ MYEXTERN const int dpisreentrant;
 /* Set the last happened error code.
    `ecode' specifies the error code.
    `line' specifies the number of the line where the error happened. */
-void dpecodeset(int ecode, const char *file, int line);
+void dpecodeset ( int ecode, const char *file, int line );
 
 
 /* Get the pointer of the variable of the last happened error code.
    The return value is the pointer of the variable. */
-int *dpecodeptr(void);
+int *dpecodeptr ( void );
 
 
 /* Synchronize updating contents on memory.
    `depot' specifies a database handle connected as a writer.
    If successful, the return value is true, else, it is false. */
-int dpmemsync(DEPOT *depot);
+int dpmemsync ( DEPOT *depot );
 
 
 /* Synchronize updating contents on memory, not physically.
    `depot' specifies a database handle connected as a writer.
    If successful, the return value is true, else, it is false. */
-int dpmemflush(DEPOT *depot);
+int dpmemflush ( DEPOT *depot );
 
 
 /* Get flags of a database.
    `depot' specifies a database handle.
    The return value is the flags of a database. */
-int dpgetflags(DEPOT *depot);
+int dpgetflags ( DEPOT *depot );
 
 
 /* Set flags of a database.
    `depot' specifies a database handle connected as a writer.
    `flags' specifies flags to set.  Least ten bits are reserved for internal use.
    If successful, the return value is true, else, it is false. */
-int dpsetflags(DEPOT *depot, int flags);
+int dpsetflags ( DEPOT *depot, int flags );
 
 
 

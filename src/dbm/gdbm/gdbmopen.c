@@ -22,345 +22,377 @@
    returned. */
 
 
-gdbm_file_info *gdbm_open(file, block_size, flags, mode, fatal_func)
-	char *file;
-	int block_size;
-	int flags;
-	int mode;
-	void (*fatal_func) ();
+gdbm_file_info *gdbm_open ( file, block_size, flags, mode, fatal_func )
+char *file;
+int block_size;
+int flags;
+int mode;
+void ( *fatal_func ) ();
 {
-	gdbm_file_info *dbf;		/* The record to return. */
-	struct stat file_stat;		/* Space for the stat information. */
-	int len;			/* Length of the file name. */
-	int num_bytes;			/* Used in reading and writing. */
-	off_t file_pos;			/* Used with seeks. */
-	int lock_val;			/* Returned by the flock call. */
-	int file_block_size;		/* Block size to use for a new file. */
-	int index;			/* Used as a loop index. */
-	char need_trunc;		/* Used with GDBM_NEWDB and locking to
-					 * avoid truncating a file from under
-					 * a reader. */
+    gdbm_file_info *dbf;        /* The record to return. */
+    struct stat file_stat;      /* Space for the stat information. */
+    int len;            /* Length of the file name. */
+    int num_bytes;          /* Used in reading and writing. */
+    off_t file_pos;         /* Used with seeks. */
+    int lock_val;           /* Returned by the flock call. */
+    int file_block_size;        /* Block size to use for a new file. */
+    int index;          /* Used as a loop index. */
+    char need_trunc;        /* Used with GDBM_NEWDB and locking to
+                     * avoid truncating a file from under
+                     * a reader. */
+    /* Initialize the gdbm_errno variable. */
+    gdbm_errno = GDBM_NO_ERROR;
+    /* Allocate new info structure. */
+    dbf = ( gdbm_file_info * ) malloc ( sizeof ( gdbm_file_info ) );
 
-	/* Initialize the gdbm_errno variable. */
-	gdbm_errno = GDBM_NO_ERROR;
+    if ( dbf == NULL ) {
+        gdbm_errno = GDBM_MALLOC_ERROR;
+        return NULL;
+    }
 
-	/* Allocate new info structure. */
-	dbf = (gdbm_file_info *) malloc(sizeof(gdbm_file_info));
-	if (dbf == NULL) {
-		gdbm_errno = GDBM_MALLOC_ERROR;
-		return NULL;
-	}
-	/*
-	 * Initialize some fields for known values.  This is done so
-	 * gdbm_close will work if called before allocating some structures.
-	 */
-	dbf->dir = NULL;
-	dbf->bucket = NULL;
-	dbf->header = NULL;
-	dbf->bucket_cache = NULL;
-	dbf->cache_size = 0;
+    /*
+     * Initialize some fields for known values.  This is done so
+     * gdbm_close will work if called before allocating some structures.
+     */
+    dbf->dir = NULL;
+    dbf->bucket = NULL;
+    dbf->header = NULL;
+    dbf->bucket_cache = NULL;
+    dbf->cache_size = 0;
+    /* Save name of file. */
+    len = strlen ( file );
+    dbf->name = ( char * ) malloc ( len + 1 );
 
-	/* Save name of file. */
-	len = strlen(file);
-	dbf->name = (char *)malloc(len + 1);
-	if (dbf->name == NULL) {
-		free(dbf);
-		gdbm_errno = GDBM_MALLOC_ERROR;
-		return NULL;
-	}
-	strcpy(dbf->name, file);
+    if ( dbf->name == NULL ) {
+        free ( dbf );
+        gdbm_errno = GDBM_MALLOC_ERROR;
+        return NULL;
+    }
 
-	/* Initialize the fatal error routine. */
-	dbf->fatal_err = fatal_func;
+    strcpy ( dbf->name, file );
+    /* Initialize the fatal error routine. */
+    dbf->fatal_err = fatal_func;
+    dbf->fast_write = TRUE;     /* Default to setting fast_write. */
+    dbf->file_locking = TRUE;   /* Default to doing file locking. */
+    dbf->central_free = FALSE;  /* Default to not using central_free. */
+    dbf->coalesce_blocks = FALSE;   /* Default to not coalescing blocks. */
 
-	dbf->fast_write = TRUE;		/* Default to setting fast_write. */
-	dbf->file_locking = TRUE;	/* Default to doing file locking. */
-	dbf->central_free = FALSE;	/* Default to not using central_free. */
-	dbf->coalesce_blocks = FALSE;	/* Default to not coalescing blocks. */
+    /* GDBM_FAST used to determine whethere or not we set fast_write. */
+    if ( flags & GDBM_SYNC ) {
+        /* If GDBM_SYNC has been requested, don't do fast_write. */
+        dbf->fast_write = FALSE;
+    }
 
-	/* GDBM_FAST used to determine whethere or not we set fast_write. */
-	if (flags & GDBM_SYNC) {
-		/* If GDBM_SYNC has been requested, don't do fast_write. */
-		dbf->fast_write = FALSE;
-	}
-	if (flags & GDBM_NOLOCK) {
-		dbf->file_locking = FALSE;
-	}
-	/* Open the file. */
-	need_trunc = FALSE;
-	switch (flags & GDBM_OPENMASK) {
-	case GDBM_READER:
-		dbf->desc = open(dbf->name, O_RDONLY, 0);
-		break;
+    if ( flags & GDBM_NOLOCK ) {
+        dbf->file_locking = FALSE;
+    }
 
-	case GDBM_WRITER:
-		dbf->desc = open(dbf->name, O_RDWR, 0);
-		break;
+    /* Open the file. */
+    need_trunc = FALSE;
 
-	case GDBM_NEWDB:
-		dbf->desc = open(dbf->name, O_RDWR | O_CREAT, mode);
-		need_trunc = TRUE;
-		break;
+    switch ( flags & GDBM_OPENMASK ) {
+    case GDBM_READER:
+        dbf->desc = open ( dbf->name, O_RDONLY, 0 );
+        break;
 
-	default:
-		dbf->desc = open(dbf->name, O_RDWR | O_CREAT, mode);
-		break;
+    case GDBM_WRITER:
+        dbf->desc = open ( dbf->name, O_RDWR, 0 );
+        break;
 
-	}
-	if (dbf->desc < 0) {
-		free(dbf->name);
-		free(dbf);
-		gdbm_errno = GDBM_FILE_OPEN_ERROR;
-		return NULL;
-	}
-	/* Get the status of the file. */
-	fstat(dbf->desc, &file_stat);
+    case GDBM_NEWDB:
+        dbf->desc = open ( dbf->name, O_RDWR | O_CREAT, mode );
+        need_trunc = TRUE;
+        break;
 
-	/* Lock the file in the approprate way. */
-	if ((flags & GDBM_OPENMASK) == GDBM_READER) {
-		if (file_stat.st_size == 0) {
-			close(dbf->desc);
-			free(dbf->name);
-			free(dbf);
-			gdbm_errno = GDBM_EMPTY_DATABASE;
-			return NULL;
-		}
-		if (dbf->file_locking) {
-			/* Sets lock_val to 0 for success.  See systems.h. */
-			READLOCK_FILE(dbf);
-		}
-	} else if (dbf->file_locking) {
-		/* Sets lock_val to 0 for success.  See systems.h. */
-		WRITELOCK_FILE(dbf);
-	}
-	if (dbf->file_locking && (lock_val != 0)) {
-		close(dbf->desc);
-		free(dbf->name);
-		free(dbf);
-		if ((flags & GDBM_OPENMASK) == GDBM_READER)
-			gdbm_errno = GDBM_CANT_BE_READER;
-		else
-			gdbm_errno = GDBM_CANT_BE_WRITER;
-		return NULL;
-	}
-	/* Record the kind of user. */
-	dbf->read_write = (flags & GDBM_OPENMASK);
+    default:
+        dbf->desc = open ( dbf->name, O_RDWR | O_CREAT, mode );
+        break;
+    }
 
-	/*
-	 * If we do have a write lock and it was a GDBM_NEWDB, it is now
-	 * time to truncate the file.
-	 */
-	if (need_trunc && file_stat.st_size != 0) {
-		TRUNCATE(dbf);
-		fstat(dbf->desc, &file_stat);
-	}
-	/* Decide if this is a new file or an old file. */
-	if (file_stat.st_size == 0) {
+    if ( dbf->desc < 0 ) {
+        free ( dbf->name );
+        free ( dbf );
+        gdbm_errno = GDBM_FILE_OPEN_ERROR;
+        return NULL;
+    }
 
-		/* This is a new file.  Create an empty database.  */
+    /* Get the status of the file. */
+    fstat ( dbf->desc, &file_stat );
 
-		/* Start with the blocksize. */
-		if (block_size < 512)
-			file_block_size = STATBLKSIZE;
-		else
-			file_block_size = block_size;
+    /* Lock the file in the approprate way. */
+    if ( ( flags & GDBM_OPENMASK ) == GDBM_READER ) {
+        if ( file_stat.st_size == 0 ) {
+            close ( dbf->desc );
+            free ( dbf->name );
+            free ( dbf );
+            gdbm_errno = GDBM_EMPTY_DATABASE;
+            return NULL;
+        }
 
-		/* Get space for the file header. */
-		dbf->header = (gdbm_file_header *) malloc(file_block_size);
-		if (dbf->header == NULL) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return NULL;
-		}
-		/* Set the magic number and the block_size. */
-		dbf->header->header_magic = 0x13579ace;
-		dbf->header->block_size = file_block_size;
+        if ( dbf->file_locking ) {
+            /* Sets lock_val to 0 for success.  See systems.h. */
+            READLOCK_FILE ( dbf );
+        }
+    } else if ( dbf->file_locking ) {
+        /* Sets lock_val to 0 for success.  See systems.h. */
+        WRITELOCK_FILE ( dbf );
+    }
 
-		/* Create the initial hash table directory.  */
-		dbf->header->dir_size = 8 * sizeof(off_t);
-		dbf->header->dir_bits = 3;
-		while (dbf->header->dir_size < dbf->header->block_size) {
-			dbf->header->dir_size <<= 1;
-			dbf->header->dir_bits += 1;
-		}
+    if ( dbf->file_locking && ( lock_val != 0 ) ) {
+        close ( dbf->desc );
+        free ( dbf->name );
+        free ( dbf );
 
-		/* Check for correct block_size. */
-		if (dbf->header->dir_size != dbf->header->block_size) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_BLOCK_SIZE_ERROR;
-			return NULL;
-		}
-		/* Allocate the space for the directory. */
-		dbf->dir = (off_t *)malloc(dbf->header->dir_size);
-		if (dbf->dir == NULL) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return NULL;
-		}
-		dbf->header->dir = dbf->header->block_size;
+        if ( ( flags & GDBM_OPENMASK ) == GDBM_READER )
+            gdbm_errno = GDBM_CANT_BE_READER;
+        else
+            gdbm_errno = GDBM_CANT_BE_WRITER;
 
-		/* Create the first and only hash bucket. */
-		dbf->header->bucket_elems =
-		    (dbf->header->block_size - sizeof(hash_bucket))
-		    / sizeof(bucket_element) + 1;
-		dbf->header->bucket_size = dbf->header->block_size;
-		dbf->bucket = (hash_bucket *) malloc(dbf->header->bucket_size);
-		if (dbf->bucket == NULL) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return NULL;
-		}
-		_gdbm_new_bucket(dbf, dbf->bucket, 0);
-		dbf->bucket->av_count = 1;
-		dbf->bucket->bucket_avail[0].av_adr = 3 * dbf->header->block_size;
-		dbf->bucket->bucket_avail[0].av_size = dbf->header->block_size;
+        return NULL;
+    }
 
-		/* Set table entries to point to hash buckets. */
-		for (index = 0; index < dbf->header->dir_size / sizeof(off_t); index++)
-			dbf->dir[index] = 2 * dbf->header->block_size;
+    /* Record the kind of user. */
+    dbf->read_write = ( flags & GDBM_OPENMASK );
 
-		/* Initialize the active avail block. */
-		dbf->header->avail.size
-		    = ((dbf->header->block_size - sizeof(gdbm_file_header))
-		    / sizeof(avail_elem)) + 1;
-		dbf->header->avail.count = 0;
-		dbf->header->avail.next_block = 0;
-		dbf->header->next_block = 4 * dbf->header->block_size;
+    /*
+     * If we do have a write lock and it was a GDBM_NEWDB, it is now
+     * time to truncate the file.
+     */
+    if ( need_trunc && file_stat.st_size != 0 ) {
+        TRUNCATE ( dbf );
+        fstat ( dbf->desc, &file_stat );
+    }
 
-		/* Write initial configuration to the file. */
-		/* Block 0 is the file header and active avail block. */
-		num_bytes = write(dbf->desc, dbf->header, dbf->header->block_size);
-		if (num_bytes != dbf->header->block_size) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_WRITE_ERROR;
-			return NULL;
-		}
-		/* Block 1 is the initial bucket directory. */
-		num_bytes = write(dbf->desc, dbf->dir, dbf->header->dir_size);
-		if (num_bytes != dbf->header->dir_size) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_WRITE_ERROR;
-			return NULL;
-		}
-		/* Block 2 is the only bucket. */
-		num_bytes = write(dbf->desc, dbf->bucket, dbf->header->bucket_size);
-		if (num_bytes != dbf->header->bucket_size) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_WRITE_ERROR;
-			return NULL;
-		}
-		/* Wait for initial configuration to be written to disk. */
-		fsync(dbf->desc);
+    /* Decide if this is a new file or an old file. */
+    if ( file_stat.st_size == 0 ) {
+        /* This is a new file.  Create an empty database.  */
 
-		free(dbf->bucket);
-	} else {
-		/*
-		 * This is an old database.  Read in the information from
-		 * the file header and initialize the hash directory.
-		 */
+        /* Start with the blocksize. */
+        if ( block_size < 512 )
+            file_block_size = STATBLKSIZE;
+        else
+            file_block_size = block_size;
 
-		gdbm_file_header partial_header;	/* For the first part of
-							 * it. */
+        /* Get space for the file header. */
+        dbf->header = ( gdbm_file_header * ) malloc ( file_block_size );
 
-		/* Read the partial file header. */
-		num_bytes = read(dbf->desc, &partial_header, sizeof(gdbm_file_header));
-		if (num_bytes != sizeof(gdbm_file_header)) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_READ_ERROR;
-			return NULL;
-		}
-		/* Is the magic number good? */
-		if (partial_header.header_magic != 0x13579ace) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_BAD_MAGIC_NUMBER;
-			return NULL;
-		}
-		/* It is a good database, read the entire header. */
-		dbf->header = (gdbm_file_header *) malloc(partial_header.block_size);
-		if (dbf->header == NULL) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return NULL;
-		}
-		bcopy(&partial_header, dbf->header, sizeof(gdbm_file_header));
-		num_bytes = read(dbf->desc, &dbf->header->avail.av_table[1],
-		    dbf->header->block_size - sizeof(gdbm_file_header));
-		if (num_bytes != dbf->header->block_size - sizeof(gdbm_file_header)) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_READ_ERROR;
-			return NULL;
-		}
-		/* Allocate space for the hash table directory.  */
-		dbf->dir = (off_t *)malloc(dbf->header->dir_size);
-		if (dbf->dir == NULL) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return NULL;
-		}
-		/* Read the hash table directory. */
-		file_pos = lseek(dbf->desc, dbf->header->dir, L_SET);
-		if (file_pos != dbf->header->dir) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_SEEK_ERROR;
-			return NULL;
-		}
-		num_bytes = read(dbf->desc, dbf->dir, dbf->header->dir_size);
-		if (num_bytes != dbf->header->dir_size) {
-			gdbm_close(dbf);
-			gdbm_errno = GDBM_FILE_READ_ERROR;
-			return NULL;
-		}
-	}
+        if ( dbf->header == NULL ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return NULL;
+        }
 
-	/* Finish initializing dbf. */
-	dbf->last_read = -1;
-	dbf->bucket = NULL;
-	dbf->bucket_dir = 0;
-	dbf->cache_entry = NULL;
-	dbf->header_changed = FALSE;
-	dbf->directory_changed = FALSE;
-	dbf->bucket_changed = FALSE;
-	dbf->second_changed = FALSE;
+        /* Set the magic number and the block_size. */
+        dbf->header->header_magic = 0x13579ace;
+        dbf->header->block_size = file_block_size;
+        /* Create the initial hash table directory.  */
+        dbf->header->dir_size = 8 * sizeof ( off_t );
+        dbf->header->dir_bits = 3;
 
-	/*
-	 * Everything is fine, return the pointer to the file information
-	 * structure.
-	 */
-	return dbf;
+        while ( dbf->header->dir_size < dbf->header->block_size ) {
+            dbf->header->dir_size <<= 1;
+            dbf->header->dir_bits += 1;
+        }
 
+        /* Check for correct block_size. */
+        if ( dbf->header->dir_size != dbf->header->block_size ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_BLOCK_SIZE_ERROR;
+            return NULL;
+        }
+
+        /* Allocate the space for the directory. */
+        dbf->dir = ( off_t * ) malloc ( dbf->header->dir_size );
+
+        if ( dbf->dir == NULL ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return NULL;
+        }
+
+        dbf->header->dir = dbf->header->block_size;
+        /* Create the first and only hash bucket. */
+        dbf->header->bucket_elems =
+            ( dbf->header->block_size - sizeof ( hash_bucket ) )
+            / sizeof ( bucket_element ) + 1;
+        dbf->header->bucket_size = dbf->header->block_size;
+        dbf->bucket = ( hash_bucket * ) malloc ( dbf->header->bucket_size );
+
+        if ( dbf->bucket == NULL ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return NULL;
+        }
+
+        _gdbm_new_bucket ( dbf, dbf->bucket, 0 );
+        dbf->bucket->av_count = 1;
+        dbf->bucket->bucket_avail[0].av_adr = 3 * dbf->header->block_size;
+        dbf->bucket->bucket_avail[0].av_size = dbf->header->block_size;
+
+        /* Set table entries to point to hash buckets. */
+        for ( index = 0; index < dbf->header->dir_size / sizeof ( off_t ); index++ )
+            dbf->dir[index] = 2 * dbf->header->block_size;
+
+        /* Initialize the active avail block. */
+        dbf->header->avail.size
+            = ( ( dbf->header->block_size - sizeof ( gdbm_file_header ) )
+                / sizeof ( avail_elem ) ) + 1;
+        dbf->header->avail.count = 0;
+        dbf->header->avail.next_block = 0;
+        dbf->header->next_block = 4 * dbf->header->block_size;
+        /* Write initial configuration to the file. */
+        /* Block 0 is the file header and active avail block. */
+        num_bytes = write ( dbf->desc, dbf->header, dbf->header->block_size );
+
+        if ( num_bytes != dbf->header->block_size ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_WRITE_ERROR;
+            return NULL;
+        }
+
+        /* Block 1 is the initial bucket directory. */
+        num_bytes = write ( dbf->desc, dbf->dir, dbf->header->dir_size );
+
+        if ( num_bytes != dbf->header->dir_size ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_WRITE_ERROR;
+            return NULL;
+        }
+
+        /* Block 2 is the only bucket. */
+        num_bytes = write ( dbf->desc, dbf->bucket, dbf->header->bucket_size );
+
+        if ( num_bytes != dbf->header->bucket_size ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_WRITE_ERROR;
+            return NULL;
+        }
+
+        /* Wait for initial configuration to be written to disk. */
+        fsync ( dbf->desc );
+        free ( dbf->bucket );
+    } else {
+        /*
+         * This is an old database.  Read in the information from
+         * the file header and initialize the hash directory.
+         */
+        gdbm_file_header partial_header;    /* For the first part of
+                             * it. */
+        /* Read the partial file header. */
+        num_bytes = read ( dbf->desc, &partial_header, sizeof ( gdbm_file_header ) );
+
+        if ( num_bytes != sizeof ( gdbm_file_header ) ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_READ_ERROR;
+            return NULL;
+        }
+
+        /* Is the magic number good? */
+        if ( partial_header.header_magic != 0x13579ace ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_BAD_MAGIC_NUMBER;
+            return NULL;
+        }
+
+        /* It is a good database, read the entire header. */
+        dbf->header = ( gdbm_file_header * ) malloc ( partial_header.block_size );
+
+        if ( dbf->header == NULL ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return NULL;
+        }
+
+        bcopy ( &partial_header, dbf->header, sizeof ( gdbm_file_header ) );
+        num_bytes = read ( dbf->desc, &dbf->header->avail.av_table[1],
+                           dbf->header->block_size - sizeof ( gdbm_file_header ) );
+
+        if ( num_bytes != dbf->header->block_size - sizeof ( gdbm_file_header ) ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_READ_ERROR;
+            return NULL;
+        }
+
+        /* Allocate space for the hash table directory.  */
+        dbf->dir = ( off_t * ) malloc ( dbf->header->dir_size );
+
+        if ( dbf->dir == NULL ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return NULL;
+        }
+
+        /* Read the hash table directory. */
+        file_pos = lseek ( dbf->desc, dbf->header->dir, L_SET );
+
+        if ( file_pos != dbf->header->dir ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_SEEK_ERROR;
+            return NULL;
+        }
+
+        num_bytes = read ( dbf->desc, dbf->dir, dbf->header->dir_size );
+
+        if ( num_bytes != dbf->header->dir_size ) {
+            gdbm_close ( dbf );
+            gdbm_errno = GDBM_FILE_READ_ERROR;
+            return NULL;
+        }
+    }
+
+    /* Finish initializing dbf. */
+    dbf->last_read = -1;
+    dbf->bucket = NULL;
+    dbf->bucket_dir = 0;
+    dbf->cache_entry = NULL;
+    dbf->header_changed = FALSE;
+    dbf->directory_changed = FALSE;
+    dbf->bucket_changed = FALSE;
+    dbf->second_changed = FALSE;
+    /*
+     * Everything is fine, return the pointer to the file information
+     * structure.
+     */
+    return dbf;
 }
 
 /* initialize the bucket cache. */
 int
-_gdbm_init_cache(dbf, size)
-	gdbm_file_info *dbf;
-	int size;
+_gdbm_init_cache ( dbf, size )
+gdbm_file_info *dbf;
+int size;
 {
-	register int index;
+    register int index;
 
-	if (dbf->bucket_cache == NULL) {
-		dbf->bucket_cache = (cache_elem *) malloc(sizeof(cache_elem) * size);
-		if (dbf->bucket_cache == NULL) {
-			gdbm_errno = GDBM_MALLOC_ERROR;
-			return (-1);
-		}
-		dbf->cache_size = size;
+    if ( dbf->bucket_cache == NULL ) {
+        dbf->bucket_cache = ( cache_elem * ) malloc ( sizeof ( cache_elem ) * size );
 
-		for (index = 0; index < size; index++) {
-			(dbf->bucket_cache[index]).ca_bucket
-			    = (hash_bucket *) malloc(dbf->header->bucket_size);
-			if ((dbf->bucket_cache[index]).ca_bucket == NULL) {
-				gdbm_errno = GDBM_MALLOC_ERROR;
-				return (-1);
-			}
-			(dbf->bucket_cache[index]).ca_adr = 0;
-			(dbf->bucket_cache[index]).ca_changed = FALSE;
-			(dbf->bucket_cache[index]).ca_data.hash_val = -1;
-			(dbf->bucket_cache[index]).ca_data.elem_loc = -1;
-			(dbf->bucket_cache[index]).ca_data.dptr = NULL;
-		}
-		dbf->bucket = dbf->bucket_cache[0].ca_bucket;
-		dbf->cache_entry = &dbf->bucket_cache[0];
-	}
-	return (0);
+        if ( dbf->bucket_cache == NULL ) {
+            gdbm_errno = GDBM_MALLOC_ERROR;
+            return ( -1 );
+        }
+
+        dbf->cache_size = size;
+
+        for ( index = 0; index < size; index++ ) {
+            ( dbf->bucket_cache[index] ).ca_bucket
+                = ( hash_bucket * ) malloc ( dbf->header->bucket_size );
+
+            if ( ( dbf->bucket_cache[index] ).ca_bucket == NULL ) {
+                gdbm_errno = GDBM_MALLOC_ERROR;
+                return ( -1 );
+            }
+
+            ( dbf->bucket_cache[index] ).ca_adr = 0;
+            ( dbf->bucket_cache[index] ).ca_changed = FALSE;
+            ( dbf->bucket_cache[index] ).ca_data.hash_val = -1;
+            ( dbf->bucket_cache[index] ).ca_data.elem_loc = -1;
+            ( dbf->bucket_cache[index] ).ca_data.dptr = NULL;
+        }
+
+        dbf->bucket = dbf->bucket_cache[0].ca_bucket;
+        dbf->cache_entry = &dbf->bucket_cache[0];
+    }
+
+    return ( 0 );
 }

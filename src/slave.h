@@ -10,4 +10,4 @@ enum {
     SLAVE_IPTONAME = 'h'
 };
 
-#endif	/* __SLAVE_H */
+#endif  /* __SLAVE_H */

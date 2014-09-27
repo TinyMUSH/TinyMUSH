@@ -69,7 +69,7 @@ endif
 
 astyle:
 	for i in $(netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES) ; do \
-	astyle --mode=c --indent=spaces --style=kr $$i; \
+	astyle --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i; \
 	done; 
 
 do_subst = $(SED) \

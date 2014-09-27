@@ -14,159 +14,163 @@ MODVER mod_db_sql_version;
 
 mod_db_sql_confstorage mod_db_sql_config;
 
-CONF	mod_db_sql_conftable[] = {
-   	{(char *)"sql_database",	cf_string,	CA_STATIC,	CA_GOD,		(int *)&mod_db_sql_config.db,		MBUF_SIZE},
-   	{(char *)"sql_host",		cf_string,	CA_STATIC,	CA_GOD,		(int *)&mod_db_sql_config.host,		MBUF_SIZE},
-   	{(char *)"sql_username",	cf_string,	CA_STATIC,	CA_GOD,		(int *)&mod_db_sql_config.username,	MBUF_SIZE},
-   	{(char *)"sql_password",	cf_string,	CA_STATIC,	CA_GOD,		(int *)&mod_db_sql_config.password,	MBUF_SIZE},
-   	{(char *)"sql_reconnect",	cf_bool,	CA_GOD,		CA_WIZARD,	&mod_db_sql_config.reconnect,		(long)"SQL queries re-initiate dropped connections"},
-   	{(char *)"sql_port",		cf_int,		CA_STATIC,	CA_GOD,		&mod_db_sql_config.port,		(long)"SQL database port"},
-   	{(char *)"sql_socket",		cf_int,		CA_STATIC,	CA_GOD,		&mod_db_sql_config.socket,		0},
-   	{NULL,				NULL,		0,              0,		NULL,				0}
+CONF    mod_db_sql_conftable[] = {
+    { ( char * ) "sql_database",    cf_string,  CA_STATIC,  CA_GOD,     ( int * )&mod_db_sql_config.db,       MBUF_SIZE},
+    { ( char * ) "sql_host",        cf_string,  CA_STATIC,  CA_GOD,     ( int * )&mod_db_sql_config.host,     MBUF_SIZE},
+    { ( char * ) "sql_username",    cf_string,  CA_STATIC,  CA_GOD,     ( int * )&mod_db_sql_config.username, MBUF_SIZE},
+    { ( char * ) "sql_password",    cf_string,  CA_STATIC,  CA_GOD,     ( int * )&mod_db_sql_config.password, MBUF_SIZE},
+    { ( char * ) "sql_reconnect",   cf_bool,    CA_GOD,     CA_WIZARD,  &mod_db_sql_config.reconnect,       ( long ) "SQL queries re-initiate dropped connections"},
+    { ( char * ) "sql_port",        cf_int,     CA_STATIC,  CA_GOD,     &mod_db_sql_config.port,        ( long ) "SQL database port"},
+    { ( char * ) "sql_socket",      cf_int,     CA_STATIC,  CA_GOD,     &mod_db_sql_config.socket,      0},
+    {NULL,              NULL,       0,              0,      NULL,               0}
 };
 
 /* --------------------------------------------------------------------------
  * Commands.
  */
 
-void mod_db_sql_do_init(dbref player, dbref cause, int key) {
-        sql_init(player, cause, NULL, NULL);
+void mod_db_sql_do_init ( dbref player, dbref cause, int key )
+{
+    sql_init ( player, cause, NULL, NULL );
 }
 
-void mod_db_sql_do_connect(dbref player, dbref cause, int key) {
-        sql_init(player, cause, NULL, NULL);
+void mod_db_sql_do_connect ( dbref player, dbref cause, int key )
+{
+    sql_init ( player, cause, NULL, NULL );
 }
 
-void mod_db_sql_do_disconnect(dbref player, dbref cause, int key) {
-        sql_shutdown(player, cause, NULL, NULL);
+void mod_db_sql_do_disconnect ( dbref player, dbref cause, int key )
+{
+    sql_shutdown ( player, cause, NULL, NULL );
 }
 
-void mod_db_sql_do_query(dbref player, dbref cause, int key, char *arg1) {
-        sql_query(player, arg1, NULL, NULL, &SPACE_DELIM, &SPACE_DELIM);
+void mod_db_sql_do_query ( dbref player, dbref cause, int key, char *arg1 )
+{
+    sql_query ( player, arg1, NULL, NULL, &SPACE_DELIM, &SPACE_DELIM );
 }
 
-CMDENT	mod_db_sql_cmdtable[] = {
-	{(char *)"@sql",		NULL,	CA_MODULE_OK,	0,	CS_ONE_ARG,	NULL,	NULL,	NULL, {mod_db_sql_do_query}},
-	{(char *)"@sqlinit",		NULL,	CA_WIZARD,	0,	CS_NO_ARGS,	NULL,	NULL,	NULL, {mod_db_sql_do_init}},
-	{(char *)"@sqlconnect",		NULL,	CA_WIZARD,	0,	CS_NO_ARGS,	NULL,	NULL,	NULL, {mod_db_sql_do_connect}},
-	{(char *)"@sqldisconnect",	NULL,	CA_WIZARD,	0,	CS_NO_ARGS,	NULL,	NULL,	NULL, {mod_db_sql_do_disconnect}},
-	{(char *)NULL,			NULL, 	0,		0, 		0,	NULL,	NULL,	NULL, {NULL}}
+CMDENT  mod_db_sql_cmdtable[] = {
+    { ( char * ) "@sql",        NULL,   CA_MODULE_OK,   0,  CS_ONE_ARG, NULL,   NULL,   NULL, {mod_db_sql_do_query}},
+    { ( char * ) "@sqlinit",        NULL,   CA_WIZARD,  0,  CS_NO_ARGS, NULL,   NULL,   NULL, {mod_db_sql_do_init}},
+    { ( char * ) "@sqlconnect",     NULL,   CA_WIZARD,  0,  CS_NO_ARGS, NULL,   NULL,   NULL, {mod_db_sql_do_connect}},
+    { ( char * ) "@sqldisconnect",  NULL,   CA_WIZARD,  0,  CS_NO_ARGS, NULL,   NULL,   NULL, {mod_db_sql_do_disconnect}},
+    { ( char * ) NULL,          NULL,   0,      0,      0,  NULL,   NULL,   NULL, {NULL}}
 };
 
 /* --------------------------------------------------------------------------
  * Functions.
  */
 
-void mod_db_sql_fun_init(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
-        sql_init(player, cause, buff, bufc);
+void mod_db_sql_fun_init ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
+    sql_init ( player, cause, buff, bufc );
 }
 
-void mod_db_sql_fun_connect(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
-        sql_init(player, cause, buff, bufc);
+void mod_db_sql_fun_connect ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
+    sql_init ( player, cause, buff, bufc );
 }
 
-void mod_db_sql_fun_shutdown(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
-        sql_init(player, cause, buff, bufc);
+void mod_db_sql_fun_shutdown ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
+    sql_init ( player, cause, buff, bufc );
 }
 
-void mod_db_sql_fun_query(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs) {
-	Delim row_delim, field_delim;
+void mod_db_sql_fun_query ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
+{
+    Delim row_delim, field_delim;
+    /*
+     * Special -- the last two arguments are output delimiters
+     */
+    VaChk_Range ( 1, 3 );
+    VaChk_Sep ( &row_delim, 2, DELIM_STRING | DELIM_NULL | DELIM_CRLF );
 
-	/* 
-	 * Special -- the last two arguments are output delimiters
-	 */
+    if ( nfargs < 3 ) {
+        Delim_Copy ( &field_delim, &row_delim );
+    } else {
+        VaChk_Sep ( &field_delim, 3,
+                    DELIM_STRING | DELIM_NULL | DELIM_CRLF );
+    }
 
-	VaChk_Range(1, 3);
-
-	VaChk_Sep(&row_delim, 2, DELIM_STRING | DELIM_NULL | DELIM_CRLF);
-	if (nfargs < 3) {
-		Delim_Copy(&field_delim, &row_delim);
-	} else {
-		VaChk_Sep(&field_delim, 3,
-		DELIM_STRING | DELIM_NULL | DELIM_CRLF);
-	}
-
-	sql_query(player, fargs[0], buff, bufc, &row_delim, &field_delim);
+    sql_query ( player, fargs[0], buff, bufc, &row_delim, &field_delim );
 }
 
-FUN	mod_db_sql_functable[] = {
-	{"SQL",			mod_db_sql_fun_query,	0,	FN_VARARGS,	CA_MODULE_OK,		NULL},
-	{"SQLINIT",		mod_db_sql_fun_init,	0,	0,		CA_WIZARD|CA_GOD,	NULL},
-	{"SQLCONNECT",		mod_db_sql_fun_connect,	0,	0,		CA_WIZARD|CA_GOD,	NULL},
-	{"SQLDISCONECT",	mod_db_sql_fun_shutdown,0,	0,		CA_WIZARD|CA_GOD,	NULL},
-	{NULL,			NULL,			0,	0,		0,			NULL}
+FUN mod_db_sql_functable[] = {
+    {"SQL",         mod_db_sql_fun_query,   0,  FN_VARARGS, CA_MODULE_OK,       NULL},
+    {"SQLINIT",     mod_db_sql_fun_init,    0,  0,      CA_WIZARD | CA_GOD,   NULL},
+    {"SQLCONNECT",      mod_db_sql_fun_connect, 0,  0,      CA_WIZARD | CA_GOD,   NULL},
+    {"SQLDISCONECT",    mod_db_sql_fun_shutdown, 0,  0,      CA_WIZARD | CA_GOD,   NULL},
+    {NULL,          NULL,           0,  0,      0,          NULL}
 };
 
 /* --------------------------------------------------------------------------
  * Initialization.
  */
 
-void mod_db_sql_init() {
-        char *str;
+void mod_db_sql_init()
+{
+    char *str;
+    mod_db_sql_config.host = xstrdup ( "127.0.0.1", "mod_db_sql_init" );
+    mod_db_sql_config.db = xstrdup ( "netmush", "mod_db_sql_init" );
+    mod_db_sql_config.username = xstrdup ( "netmush", "mod_db_sql_init" );
+    mod_db_sql_config.password = xstrdup ( "netmush", "mod_db_sql_init" );
+    mod_db_sql_config.reconnect = 1;
+    mod_db_sql_config.port = 3306;
+    str = xmalloc ( MBUF_SIZE, "mod_db_sql_init" );
+    snprintf ( str, MBUF_SIZE, "version %d.%d", mudstate.version.major, mudstate.version.minor );
 
-	mod_db_sql_config.host = XSTRDUP("127.0.0.1", "mod_db_sql_init");
-	mod_db_sql_config.db = XSTRDUP("netmush", "mod_db_sql_init");
-	mod_db_sql_config.username = XSTRDUP("netmush", "mod_db_sql_init");
-	mod_db_sql_config.password = XSTRDUP("netmush", "mod_db_sql_init");
-	mod_db_sql_config.reconnect = 1;
-	mod_db_sql_config.port = 3306;
-	
-    str = XMALLOC(MBUF_SIZE, "mod_db_sql_init");
+    switch ( mudstate.version.status ) {
+    case 0:
+        snprintf ( str, MBUF_SIZE, "%s, Alpha %d", str, mudstate.version.revision );
+        break;
 
-    snprintf(str, MBUF_SIZE, "version %d.%d", mudstate.version.major, mudstate.version.minor);
-    switch(mudstate.version.status){
-        case 0:
-            snprintf(str, MBUF_SIZE, "%s, Alpha %d", str, mudstate.version.revision);
-            break;
-        case 1: 
-            snprintf(str, MBUF_SIZE, "%s, Beta %d", str, mudstate.version.revision);
-            break;
-        case 2: 
-            snprintf(str, MBUF_SIZE, "%s, Release Candidate %d", str, mudstate.version.revision);
-            break;
-        default:
-            if(mudstate.version.revision > 0) {
-                snprintf(str, MBUF_SIZE, "%s, Patch Level %d", str, mudstate.version.revision);
-            } else {
-                snprintf(str, MBUF_SIZE, "%s, Gold Release.", str);
+    case 1:
+        snprintf ( str, MBUF_SIZE, "%s, Beta %d", str, mudstate.version.revision );
+        break;
+
+    case 2:
+        snprintf ( str, MBUF_SIZE, "%s, Release Candidate %d", str, mudstate.version.revision );
+        break;
+
+    default:
+        if ( mudstate.version.revision > 0 ) {
+            snprintf ( str, MBUF_SIZE, "%s, Patch Level %d", str, mudstate.version.revision );
+        } else {
+            snprintf ( str, MBUF_SIZE, "%s, Gold Release.", str );
         }
     }
 
 #ifdef SQL_DRIVER
-    snprintf(str, MBUF_SIZE, "%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER);
-    mod_db_sql_version.version=XSTRDUP( str , "mod_db_sql_init");
+    snprintf ( str, MBUF_SIZE, "%s (%s) using %s driver", str , PACKAGE_RELEASE_DATE, SQL_DRIVER );
+    mod_db_sql_version.version = xstrdup ( str , "mod_db_sql_init" );
 #else
-    snprintf(str, MBUF_SIZE, "%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE);
-    mod_db_sql_version.version=XSTRDUP(str, "mod_db_sql_init");
+    snprintf ( str, MBUF_SIZE, "%s (%s) using placeholder driver", str , PACKAGE_RELEASE_DATE );
+    mod_db_sql_version.version = xstrdup ( str, "mod_db_sql_init" );
 #endif
-    mod_db_sql_version.author=XSTRDUP("TinyMUSH Development Team", "mod_db_sql_init");
-    mod_db_sql_version.email=XSTRDUP("tinymush-support@list.sourceforge.net", "mod_db_sql_init");
-    mod_db_sql_version.url=XSTRDUP("http://sourceforge.net/projects/tinymush/", "mod_db_sql_init");
-    mod_db_sql_version.description=XSTRDUP("SQL Database interface for TinyMUSH", "mod_db_sql_init");
-    mod_db_sql_version.copyright=XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_db_sql_init");
-    
-    XFREE(str, "mod_db_sql_init");
-	
-    register_commands(mod_db_sql_cmdtable);
-    register_functions(mod_db_sql_functable);
+    mod_db_sql_version.author = xstrdup ( "TinyMUSH Development Team", "mod_db_sql_init" );
+    mod_db_sql_version.email = xstrdup ( "tinymush-support@list.sourceforge.net", "mod_db_sql_init" );
+    mod_db_sql_version.url = xstrdup ( "http://sourceforge.net/projects/tinymush/", "mod_db_sql_init" );
+    mod_db_sql_version.description = xstrdup ( "SQL Database interface for TinyMUSH", "mod_db_sql_init" );
+    mod_db_sql_version.copyright = xstrdup ( "Copyright (C) 2012 TinyMUSH development team.", "mod_db_sql_init" );
+    xfree ( str, "mod_db_sql_init" );
+    register_commands ( mod_db_sql_cmdtable );
+    register_functions ( mod_db_sql_functable );
 }
 
-void mod_db_sql_notify(dbref player, char *buff, char **bufc, const char *format, ...) {
+void mod_db_sql_notify ( dbref player, char *buff, char **bufc, const char *format, ... )
+{
     va_list ap;
     char *s;
+    va_start ( ap, format );
+    s = ( char * ) xmalloc ( MBUF_SIZE, "mod_db_sql_notify" );
+    vnsprintf ( s, MBUF_SIZE, format, ap );
 
-    va_start(ap, format);
-    
-    s = (char *)XMALLOC(MBUF_SIZE, "mod_db_sql_notify");
-    vnsprintf(s, MBUF_SIZE, format, ap);
-    
-    if(buff) {
-        safe_str(s, buff, bufc);
-    } else if(player){
-        notify(player, s);
+    if ( buff ) {
+        safe_str ( s, buff, bufc );
+    } else if ( player ) {
+        notify ( player, s );
     }
-    
-    XFREE(s, "mod_db_sql_notify");
 
-    va_end(ap);
+    xfree ( s, "mod_db_sql_notify" );
+    va_end ( ap );
 }

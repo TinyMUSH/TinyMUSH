@@ -25,7 +25,7 @@
  *  This libary is based on QDBM: Quick Database Manager by FAL Labs.  *
  *      More information can be found at http://fallabs.com/qdbm/      *
  *                                                                     *
- *            See COPYING for detailed licence informations.           * 
+ *            See COPYING for detailed licence informations.           *
  ***********************************************************************/
-                                                     
-#endif					/* __QDBMCOPYRIGHT_H */
+
+#endif                  /* __QDBMCOPYRIGHT_H */

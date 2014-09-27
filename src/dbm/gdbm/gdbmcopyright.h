@@ -27,5 +27,5 @@
  *                                                                     *
  *            See COPYING for detailed licence informations.           *
  ***********************************************************************/
-                                                     
-#endif					/* __GDBMCOPYRIGHT_H */
+
+#endif                  /* __GDBMCOPYRIGHT_H */

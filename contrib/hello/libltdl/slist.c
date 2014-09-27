@@ -34,35 +34,34 @@ or obtained by writing to the Free Software Foundation, Inc.,
 #include <stddef.h>
 #include <stdlib.h>
 
-static SList *	slist_sort_merge    (SList *left, SList *right,
-				     SListCompare *compare, void *userdata);
+static SList *  slist_sort_merge    ( SList *left, SList *right,
+                                      SListCompare *compare, void *userdata );
 
 
 /* Call DELETE repeatedly on each element of HEAD.
 
    CAVEAT: If you call this when HEAD is the start of a list of boxed
            items, you must remember that each item passed back to your
-	   DELETE function will be a boxed item that must be slist_unbox()ed
-	   before operating on its contents.
+       DELETE function will be a boxed item that must be slist_unbox()ed
+       before operating on its contents.
 
    e.g. void boxed_delete (void *item) { item_free (slist_unbox (item)); }
         ...
-	  slist = slist_delete (slist, boxed_delete);
-	...
+      slist = slist_delete (slist, boxed_delete);
+    ...
 */
 SList *
-slist_delete (SList *head, void (*delete_fct) (void *item))
+slist_delete ( SList *head, void ( *delete_fct ) ( void *item ) )
 {
-  assert (delete_fct);
+    assert ( delete_fct );
 
-  while (head)
-    {
-      SList *next = head->next;
-      (*delete_fct) (head);
-      head = next;
+    while ( head ) {
+        SList *next = head->next;
+        ( *delete_fct ) ( head );
+        head = next;
     }
 
-  return 0;
+    return 0;
 }
 
 /* Call FIND repeatedly with MATCHDATA and each item of *PHEAD, until
@@ -72,63 +71,60 @@ slist_delete (SList *head, void (*delete_fct) (void *item))
 
    CAVEAT: To avoid memory leaks, unless you already have the address of
            the stale item, you should probably return that from FIND if
-	   it makes a successful match.  Don't forget to slist_unbox()
-	   every item in a boxed list before operating on its contents.   */
+       it makes a successful match.  Don't forget to slist_unbox()
+       every item in a boxed list before operating on its contents.   */
 SList *
-slist_remove (SList **phead, SListCallback *find, void *matchdata)
+slist_remove ( SList **phead, SListCallback *find, void *matchdata )
 {
-  SList *stale = 0;
-  void *result = 0;
+    SList *stale = 0;
+    void *result = 0;
+    assert ( find );
 
-  assert (find);
+    if ( !phead || !*phead )
+        return 0;
 
-  if (!phead || !*phead)
-    return 0;
+    /* Does the head of the passed list match? */
+    result = ( *find ) ( *phead, matchdata );
 
-  /* Does the head of the passed list match? */
-  result = (*find) (*phead, matchdata);
-  if (result)
-    {
-      stale = *phead;
-      *phead = stale->next;
+    if ( result ) {
+        stale = *phead;
+        *phead = stale->next;
     }
-  /* what about the rest of the elements? */
-  else
-    {
-      SList *head;
-      for (head = *phead; head->next; head = head->next)
-	{
-	  result = (*find) (head->next, matchdata);
-	  if (result)
-	    {
-	      stale		= head->next;
-	      head->next	= stale->next;
-	      break;
-	    }
-	}
+    /* what about the rest of the elements? */
+    else {
+        SList *head;
+
+        for ( head = *phead; head->next; head = head->next ) {
+            result = ( *find ) ( head->next, matchdata );
+
+            if ( result ) {
+                stale     = head->next;
+                head->next    = stale->next;
+                break;
+            }
+        }
     }
 
-  return (SList *) result;
+    return ( SList * ) result;
 }
 
 /* Call FIND repeatedly with each element of SLIST and MATCHDATA, until
    FIND returns non-NULL, or the list is exhausted.  If a match is found
    the value returned by the matching call to FIND is returned. */
 void *
-slist_find (SList *slist, SListCallback *find, void *matchdata)
+slist_find ( SList *slist, SListCallback *find, void *matchdata )
 {
-  void *result = 0;
+    void *result = 0;
+    assert ( find );
 
-  assert (find);
+    for ( ; slist; slist = slist->next ) {
+        result = ( *find ) ( slist, matchdata );
 
-  for (; slist; slist = slist->next)
-    {
-      result = (*find) (slist, matchdata);
-      if (result)
-	break;
+        if ( result )
+            break;
     }
 
-  return result;
+    return result;
 }
 
 /* Return a single list, composed by destructively concatenating the
@@ -139,22 +135,21 @@ slist_find (SList *slist, SListCallback *find, void *matchdata)
 
    e.g.  slist1 = slist_concat (slist1, slist2);  */
 SList *
-slist_concat (SList *head, SList *tail)
+slist_concat ( SList *head, SList *tail )
 {
-  SList *last;
+    SList *last;
 
-  if (!head)
-    {
-      return tail;
+    if ( !head ) {
+        return tail;
     }
 
-  last = head;
-  while (last->next)
-    last = last->next;
+    last = head;
 
-  last->next = tail;
+    while ( last->next )
+        last = last->next;
 
-  return head;
+    last->next = tail;
+    return head;
 }
 
 /* Return a single list, composed by destructively appending all of
@@ -165,24 +160,22 @@ slist_concat (SList *head, SList *tail)
 
    e.g.  slist1 = slist_cons (slist_box (data), slist1);  */
 SList *
-slist_cons (SList *item, SList *slist)
+slist_cons ( SList *item, SList *slist )
 {
-  if (!item)
-    {
-      return slist;
+    if ( !item ) {
+        return slist;
     }
 
-  assert (!item->next);
-
-  item->next = slist;
-  return item;
+    assert ( !item->next );
+    item->next = slist;
+    return item;
 }
 
 /* Return a list starting at the second item of SLIST.  */
 SList *
-slist_tail (SList *slist)
+slist_tail ( SList *slist )
 {
-  return slist ? slist->next : NULL;
+    return slist ? slist->next : NULL;
 }
 
 /* Return a list starting at the Nth item of SLIST.  If SLIST is less
@@ -191,25 +184,25 @@ slist_tail (SList *slist)
 
    e.g. shared_list = slist_nth (slist, 2);  */
 SList *
-slist_nth (SList *slist, size_t n)
+slist_nth ( SList *slist, size_t n )
 {
-  for (;n > 1 && slist; n--)
-    slist = slist->next;
+    for ( ; n > 1 && slist; n-- )
+        slist = slist->next;
 
-  return slist;
+    return slist;
 }
 
 /* Return the number of items in SLIST.  We start counting from 1, so
    the length of a list with no items is 0, and so on.  */
 size_t
-slist_length (SList *slist)
+slist_length ( SList *slist )
 {
-  size_t n;
+    size_t n;
 
-  for (n = 0; slist; ++n)
-    slist = slist->next;
+    for ( n = 0; slist; ++n )
+        slist = slist->next;
 
-  return n;
+    return n;
 }
 
 /* Destructively reverse the order of items in SLIST.  The value of SLIST
@@ -220,43 +213,40 @@ slist_length (SList *slist)
 
   e.g.    slist = slist_reverse (slist);  */
 SList *
-slist_reverse (SList *slist)
+slist_reverse ( SList *slist )
 {
-  SList *result = 0;
-  SList *next;
+    SList *result = 0;
+    SList *next;
 
-  while (slist)
-    {
-      next		= slist->next;
-      slist->next	= result;
-      result		= slist;
-      slist 		= next;
+    while ( slist ) {
+        next      = slist->next;
+        slist->next   = result;
+        result        = slist;
+        slist         = next;
     }
 
-  return result;
+    return result;
 }
 
 /* Call FOREACH once for each item in SLIST, passing both the item and
    USERDATA on each call. */
 void *
-slist_foreach (SList *slist, SListCallback *foreach, void *userdata)
+slist_foreach ( SList *slist, SListCallback *foreach, void *userdata )
 {
-  void *result = 0;
+    void *result = 0;
+    assert ( foreach );
 
-  assert (foreach);
+    while ( slist ) {
+        SList *next = slist->next;
+        result = ( *foreach ) ( slist, userdata );
 
-  while (slist)
-    {
-      SList *next = slist->next;
-      result = (*foreach) (slist, userdata);
+        if ( result )
+            break;
 
-      if (result)
-	break;
-
-      slist = next;
+        slist = next;
     }
 
-  return result;
+    return result;
 }
 
 /* Destructively merge the items of two ordered lists LEFT and RIGHT,
@@ -270,30 +260,24 @@ slist_foreach (SList *slist, SListCallback *foreach, void *userdata)
    less than 0 if the head of LEFT has the lower value, greater than 0 if
    the head of RIGHT has the lower value, otherwise 0.  */
 static SList *
-slist_sort_merge (SList *left, SList *right, SListCompare *compare,
-		  void *userdata)
+slist_sort_merge ( SList *left, SList *right, SListCompare *compare,
+                   void *userdata )
 {
-  SList merged, *insert;
+    SList merged, *insert;
+    insert = &merged;
 
-  insert = &merged;
-
-  while (left && right)
-    {
-      if ((*compare) (left, right, userdata) <= 0)
-	{
-	  insert = insert->next = left;
-	  left = left->next;
-	}
-      else
-	{
-	  insert = insert->next = right;
-	  right = right->next;
-	}
+    while ( left && right ) {
+        if ( ( *compare ) ( left, right, userdata ) <= 0 ) {
+            insert = insert->next = left;
+            left = left->next;
+        } else {
+            insert = insert->next = right;
+            right = right->next;
+        }
     }
 
-  insert->next = left ? left : right;
-
-  return merged.next;
+    insert->next = left ? left : right;
+    return merged.next;
 }
 
 /* Perform a destructive quicksort on the items in SLIST, by repeatedly
@@ -304,35 +288,35 @@ slist_sort_merge (SList *left, SList *right, SListCompare *compare,
 
    e.g.  slist = slist_sort (slist, compare, 0);  */
 SList *
-slist_sort (SList *slist, SListCompare *compare, void *userdata)
+slist_sort ( SList *slist, SListCompare *compare, void *userdata )
 {
-  SList *left, *right;
+    SList *left, *right;
 
-  if (!slist)
-    return slist;
+    if ( !slist )
+        return slist;
 
-  /* Be sure that LEFT and RIGHT never contain the same item.  */
-  left = slist;
-  right = slist->next;
+    /* Be sure that LEFT and RIGHT never contain the same item.  */
+    left = slist;
+    right = slist->next;
 
-  if (!right)
-    return left;
+    if ( !right )
+        return left;
 
-  /* Skip two items with RIGHT and one with SLIST, until RIGHT falls off
-     the end.  SLIST must be about half way along.  */
-  while (right && (right = right->next))
-    {
-      if (!right || !(right = right->next))
-	break;
-      slist = slist->next;
+    /* Skip two items with RIGHT and one with SLIST, until RIGHT falls off
+       the end.  SLIST must be about half way along.  */
+    while ( right && ( right = right->next ) ) {
+        if ( !right || ! ( right = right->next ) )
+            break;
+
+        slist = slist->next;
     }
-  right = slist->next;
-  slist->next = 0;
 
-  /* Sort LEFT and RIGHT, then merge the two.  */
-  return slist_sort_merge (slist_sort (left, compare, userdata),
-			   slist_sort (right, compare, userdata),
-			   compare, userdata);
+    right = slist->next;
+    slist->next = 0;
+    /* Sort LEFT and RIGHT, then merge the two.  */
+    return slist_sort_merge ( slist_sort ( left, compare, userdata ),
+                              slist_sort ( right, compare, userdata ),
+                              compare, userdata );
 }
 
 
@@ -348,32 +332,30 @@ slist_sort (SList *slist, SListCompare *compare, void *userdata)
 /* Return a `boxed' freshly mallocated 1 element list containing
    USERDATA.  */
 SList *
-slist_box (const void *userdata)
+slist_box ( const void *userdata )
 {
-  SList *item = (SList *) malloc (sizeof *item);
+    SList *item = ( SList * ) malloc ( sizeof * item );
 
-  if (item)
-    {
-      item->next     = 0;
-      item->userdata = userdata;
+    if ( item ) {
+        item->next     = 0;
+        item->userdata = userdata;
     }
 
-  return item;
+    return item;
 }
 
 /* Return the contents of a `boxed' ITEM, recycling the box itself.  */
 void *
-slist_unbox (SList *item)
+slist_unbox ( SList *item )
 {
-  void *userdata = 0;
+    void *userdata = 0;
 
-  if (item)
-    {
-      /* Strip the const, because responsibility for this memory
-	 passes to the caller on return.  */
-      userdata = (void *) item->userdata;
-      free (item);
+    if ( item ) {
+        /* Strip the const, because responsibility for this memory
+        passes to the caller on return.  */
+        userdata = ( void * ) item->userdata;
+        free ( item );
     }
 
-  return userdata;
+    return userdata;
 }

@@ -55,7 +55,7 @@
                 Computer Science Department
                 Western Washington University
                 Bellingham, WA 98226
-       
+
 *************************************************************************/
 
 
@@ -65,14 +65,14 @@
 /* The forward definitions for this file.  See the functions for
    the definition of the function. */
 
-static avail_elem get_elem __P((int, avail_elem [], int *));
-static avail_elem get_block __P((int, gdbm_file_info *));
-static void push_avail_block __P((gdbm_file_info *));
-static void pop_avail_block __P((gdbm_file_info *));
-static void adjust_bucket_avail __P((gdbm_file_info *));
+static avail_elem get_elem __P ( ( int, avail_elem [], int * ) );
+static avail_elem get_block __P ( ( int, gdbm_file_info * ) );
+static void push_avail_block __P ( ( gdbm_file_info * ) );
+static void pop_avail_block __P ( ( gdbm_file_info * ) );
+static void adjust_bucket_avail __P ( ( gdbm_file_info * ) );
 
 /* Allocate space in the file DBF for a block NUM_BYTES in length.  Return
-   the file address of the start of the block.  
+   the file address of the start of the block.
 
    Each hash bucket has a fixed size avail table.  We first check this
    avail table to satisfy the request for space.  In most cases we can
@@ -88,47 +88,43 @@ static void adjust_bucket_avail __P((gdbm_file_info *));
    the value of 0 will be returned.  */
 
 off_t
-_gdbm_alloc (dbf, num_bytes)
-     gdbm_file_info *dbf;
-     int num_bytes;
+_gdbm_alloc ( dbf, num_bytes )
+gdbm_file_info *dbf;
+int num_bytes;
 {
-  off_t file_adr;		/* The address of the block. */
-  avail_elem av_el;		/* For temporary use. */
+    off_t file_adr;       /* The address of the block. */
+    avail_elem av_el;     /* For temporary use. */
+    /* The current bucket is the first place to look for space. */
+    av_el = get_elem ( num_bytes, dbf->bucket->bucket_avail,
+                       &dbf->bucket->av_count );
 
-  /* The current bucket is the first place to look for space. */
-  av_el = get_elem (num_bytes, dbf->bucket->bucket_avail,
-		    &dbf->bucket->av_count);
+    /* If we did not find some space, we have more work to do. */
+    if ( av_el.av_size == 0 ) {
+        /* If the header avail table is less than half full, and there's
+        something on the stack. */
+        if ( ( dbf->header->avail.count <= ( dbf->header->avail.size >> 1 ) )
+                && ( dbf->header->avail.next_block != 0 ) )
+            pop_avail_block ( dbf );
 
-  /* If we did not find some space, we have more work to do. */
-  if (av_el.av_size == 0)
-    {
-      /* If the header avail table is less than half full, and there's
-	 something on the stack. */
-      if ((dbf->header->avail.count <= (dbf->header->avail.size >> 1))
-          && (dbf->header->avail.next_block != 0))
-        pop_avail_block (dbf);
+        /* check the header avail table next */
+        av_el = get_elem ( num_bytes, dbf->header->avail.av_table,
+                           &dbf->header->avail.count );
 
-      /* check the header avail table next */
-      av_el = get_elem (num_bytes, dbf->header->avail.av_table,
-      			&dbf->header->avail.count);
-      if (av_el.av_size == 0)
-        /* Get another full block from end of file. */
-        av_el = get_block (num_bytes, dbf);
+        if ( av_el.av_size == 0 )
+            /* Get another full block from end of file. */
+            av_el = get_block ( num_bytes, dbf );
 
-      dbf->header_changed = TRUE;
+        dbf->header_changed = TRUE;
     }
 
-  /* We now have the place from which we will allocate the new space. */
-  file_adr = av_el.av_adr;
-
-  /* Put the unused space back in the avail block. */
-  av_el.av_adr += num_bytes;
-  av_el.av_size -= num_bytes;
-  _gdbm_free (dbf, av_el.av_adr, av_el.av_size);
-
-  /* Return the address. */
-  return file_adr;
-  
+    /* We now have the place from which we will allocate the new space. */
+    file_adr = av_el.av_adr;
+    /* Put the unused space back in the avail block. */
+    av_el.av_adr += num_bytes;
+    av_el.av_size -= num_bytes;
+    _gdbm_free ( dbf, av_el.av_adr, av_el.av_size );
+    /* Return the address. */
+    return file_adr;
 }
 
 
@@ -138,55 +134,51 @@ _gdbm_alloc (dbf, num_bytes)
    avail structure. */
 
 void
-_gdbm_free (dbf, file_adr, num_bytes)
-     gdbm_file_info *dbf;
-     off_t file_adr;
-     int num_bytes;
+_gdbm_free ( dbf, file_adr, num_bytes )
+gdbm_file_info *dbf;
+off_t file_adr;
+int num_bytes;
 {
-  avail_elem temp;
+    avail_elem temp;
 
-  /* Is it too small to worry about? */
-  if (num_bytes <= IGNORE_SIZE)
+    /* Is it too small to worry about? */
+    if ( num_bytes <= IGNORE_SIZE )
+        return;
+
+    /* Initialize the avail element. */
+    temp.av_size = num_bytes;
+    temp.av_adr = file_adr;
+
+    /* Is the freed space large or small? */
+    if ( ( num_bytes >= dbf->header->block_size ) || dbf->central_free ) {
+        if ( dbf->header->avail.count == dbf->header->avail.size ) {
+            push_avail_block ( dbf );
+        }
+
+        _gdbm_put_av_elem ( temp, dbf->header->avail.av_table,
+                            &dbf->header->avail.count, dbf->coalesce_blocks );
+        dbf->header_changed = TRUE;
+    } else {
+        /* Try to put into the current bucket. */
+        if ( dbf->bucket->av_count < BUCKET_AVAIL )
+            _gdbm_put_av_elem ( temp, dbf->bucket->bucket_avail,
+                                &dbf->bucket->av_count, dbf->coalesce_blocks );
+        else {
+            if ( dbf->header->avail.count == dbf->header->avail.size ) {
+                push_avail_block ( dbf );
+            }
+
+            _gdbm_put_av_elem ( temp, dbf->header->avail.av_table,
+                                &dbf->header->avail.count, dbf->coalesce_blocks );
+            dbf->header_changed = TRUE;
+        }
+    }
+
+    if ( dbf->header_changed )
+        adjust_bucket_avail ( dbf );
+
+    /* All work is done. */
     return;
-
-  /* Initialize the avail element. */
-  temp.av_size = num_bytes;
-  temp.av_adr = file_adr;
-
-  /* Is the freed space large or small? */
-  if ((num_bytes >= dbf->header->block_size) || dbf->central_free)
-    {
-      if (dbf->header->avail.count == dbf->header->avail.size)
-	{
-	  push_avail_block (dbf);
-	}
-      _gdbm_put_av_elem (temp, dbf->header->avail.av_table,
-			 &dbf->header->avail.count, dbf->coalesce_blocks);
-      dbf->header_changed = TRUE;
-    }
-  else
-    {
-      /* Try to put into the current bucket. */
-      if (dbf->bucket->av_count < BUCKET_AVAIL)
-	_gdbm_put_av_elem (temp, dbf->bucket->bucket_avail,
-			   &dbf->bucket->av_count, dbf->coalesce_blocks);
-      else
-	{
-	  if (dbf->header->avail.count == dbf->header->avail.size)
-	    {
-	      push_avail_block (dbf);
-	    }
-	  _gdbm_put_av_elem (temp, dbf->header->avail.av_table,
-			     &dbf->header->avail.count, dbf->coalesce_blocks);
-	  dbf->header_changed = TRUE;
-	}
-    }
-
-  if (dbf->header_changed)
-    adjust_bucket_avail (dbf);
-
-  /* All work is done. */
-  return;
 }
 
 
@@ -200,142 +192,142 @@ _gdbm_free (dbf, file_adr, num_bytes)
    smart about things. */
 
 static void
-pop_avail_block (dbf)
-     gdbm_file_info *dbf;
+pop_avail_block ( dbf )
+gdbm_file_info *dbf;
 {
-  int  num_bytes;		/* For use with the read system call. */
-  off_t file_pos;		/* For use with the lseek system call. */
-  avail_elem new_el;
-  avail_block *new_blk;
-  int index;
+    int  num_bytes;       /* For use with the read system call. */
+    off_t file_pos;       /* For use with the lseek system call. */
+    avail_elem new_el;
+    avail_block *new_blk;
+    int index;
 
-  if (dbf->header->avail.count == dbf->header->avail.size)
-    {
-      /* We're kind of stuck here, so we re-split the header in order to
-         avoid crashing.  Sigh. */
-      push_avail_block(dbf);
+    if ( dbf->header->avail.count == dbf->header->avail.size ) {
+        /* We're kind of stuck here, so we re-split the header in order to
+           avoid crashing.  Sigh. */
+        push_avail_block ( dbf );
     }
 
-  if (dbf->header->avail.count == dbf->header->avail.size)
-    {
-      /* We're kind of stuck here, so we re-split the header in order to
-         avoid crashing.  Sigh. */
-      push_avail_block(dbf);
+    if ( dbf->header->avail.count == dbf->header->avail.size ) {
+        /* We're kind of stuck here, so we re-split the header in order to
+           avoid crashing.  Sigh. */
+        push_avail_block ( dbf );
     }
 
-  /* Set up variables. */
-  new_el.av_adr = dbf->header->avail.next_block;
-  new_el.av_size = ( ( (dbf->header->avail.size * sizeof (avail_elem)) >> 1)
-			+ sizeof (avail_block));
+    /* Set up variables. */
+    new_el.av_adr = dbf->header->avail.next_block;
+    new_el.av_size = ( ( ( dbf->header->avail.size * sizeof ( avail_elem ) ) >> 1 )
+                       + sizeof ( avail_block ) );
+    /* Allocate space for the block. */
+    new_blk = ( avail_block * ) malloc ( new_el.av_size );
 
-  /* Allocate space for the block. */
-  new_blk = (avail_block *) malloc (new_el.av_size);
-  if (new_blk == NULL) _gdbm_fatal(dbf, "malloc failed");
+    if ( new_blk == NULL ) _gdbm_fatal ( dbf, "malloc failed" );
 
-  /* Read the block. */
-  file_pos = lseek (dbf->desc, new_el.av_adr, L_SET);
-  if (file_pos != new_el.av_adr)  _gdbm_fatal (dbf, "lseek error");
-  num_bytes = read (dbf->desc, new_blk, new_el.av_size);
-  if (num_bytes != new_el.av_size) _gdbm_fatal (dbf, "read error");
+    /* Read the block. */
+    file_pos = lseek ( dbf->desc, new_el.av_adr, L_SET );
 
-  /* Add the elements from the new block to the header. */
-  index = 0;
-  while (index < new_blk->count)
-    {
-      while(index < new_blk->count
-            && dbf->header->avail.count < dbf->header->avail.size)
-	{
-	   /* With luck, this will merge a lot of blocks! */
-	   _gdbm_put_av_elem(new_blk->av_table[index],
-			     dbf->header->avail.av_table,
-			     &dbf->header->avail.count, TRUE);
-	   index++;
-	}
-      if (dbf->header->avail.count == dbf->header->avail.size)
-        {
-          /* We're kind of stuck here, so we re-split the header in order to
-             avoid crashing.  Sigh. */
-          push_avail_block(dbf);
-	}
+    if ( file_pos != new_el.av_adr )  _gdbm_fatal ( dbf, "lseek error" );
+
+    num_bytes = read ( dbf->desc, new_blk, new_el.av_size );
+
+    if ( num_bytes != new_el.av_size ) _gdbm_fatal ( dbf, "read error" );
+
+    /* Add the elements from the new block to the header. */
+    index = 0;
+
+    while ( index < new_blk->count ) {
+        while ( index < new_blk->count
+                && dbf->header->avail.count < dbf->header->avail.size ) {
+            /* With luck, this will merge a lot of blocks! */
+            _gdbm_put_av_elem ( new_blk->av_table[index],
+                                dbf->header->avail.av_table,
+                                &dbf->header->avail.count, TRUE );
+            index++;
+        }
+
+        if ( dbf->header->avail.count == dbf->header->avail.size ) {
+            /* We're kind of stuck here, so we re-split the header in order to
+               avoid crashing.  Sigh. */
+            push_avail_block ( dbf );
+        }
     }
 
-  /* Fix next_block, as well. */
-  dbf->header->avail.next_block = new_blk->next_block;
+    /* Fix next_block, as well. */
+    dbf->header->avail.next_block = new_blk->next_block;
+    /* We changed the header. */
+    dbf->header_changed = TRUE;
 
-  /* We changed the header. */
-  dbf->header_changed = TRUE;
-
-  /* Free the previous avail block.   It is possible that the header table
-     is now FULL, which will cause us to overflow it! */
-  if (dbf->header->avail.count == dbf->header->avail.size)
-    {
-      /* We're kind of stuck here, so we re-split the header in order to
-         avoid crashing.  Sigh. */
-      push_avail_block(dbf);
+    /* Free the previous avail block.   It is possible that the header table
+       is now FULL, which will cause us to overflow it! */
+    if ( dbf->header->avail.count == dbf->header->avail.size ) {
+        /* We're kind of stuck here, so we re-split the header in order to
+           avoid crashing.  Sigh. */
+        push_avail_block ( dbf );
     }
 
-  _gdbm_put_av_elem (new_el, dbf->header->avail.av_table,
-		     &dbf->header->avail.count, TRUE);
-  free (new_blk);
+    _gdbm_put_av_elem ( new_el, dbf->header->avail.av_table,
+                        &dbf->header->avail.count, TRUE );
+    free ( new_blk );
 }
 
 
 /* Splits the header avail block and pushes half onto the avail stack. */
 
 static void
-push_avail_block (dbf)
-     gdbm_file_info *dbf;
+push_avail_block ( dbf )
+gdbm_file_info *dbf;
 {
-  int  num_bytes;
-  int  av_size;
-  off_t av_adr;
-  int  index;
-  off_t file_pos;
-  avail_block *temp;
-  avail_elem  new_loc;
- 
+    int  num_bytes;
+    int  av_size;
+    off_t av_adr;
+    int  index;
+    off_t file_pos;
+    avail_block *temp;
+    avail_elem  new_loc;
+    /* Caclulate the size of the split block. */
+    av_size = ( ( dbf->header->avail.size * sizeof ( avail_elem ) ) >> 1 )
+              + sizeof ( avail_block );
+    /* Get address in file for new av_size bytes. */
+    new_loc = get_elem ( av_size, dbf->header->avail.av_table,
+                         &dbf->header->avail.count );
 
-  /* Caclulate the size of the split block. */
-  av_size = ( (dbf->header->avail.size * sizeof (avail_elem)) >> 1)
-            + sizeof (avail_block);
+    if ( new_loc.av_size == 0 )
+        new_loc = get_block ( av_size, dbf );
 
-  /* Get address in file for new av_size bytes. */
-  new_loc = get_elem (av_size, dbf->header->avail.av_table,
-		      &dbf->header->avail.count);
-  if (new_loc.av_size == 0)
-    new_loc = get_block (av_size, dbf);
-  av_adr = new_loc.av_adr;
+    av_adr = new_loc.av_adr;
+    /* Split the header block. */
+    temp = ( avail_block * ) malloc ( av_size );
 
+    if ( temp == NULL ) _gdbm_fatal ( dbf, "malloc error" );
 
-  /* Split the header block. */
-  temp = (avail_block *) malloc (av_size);
-  if (temp == NULL) _gdbm_fatal (dbf, "malloc error");
-  /* Set the size to be correct AFTER the pop_avail_block. */
-  temp->size = dbf->header->avail.size;
-  temp->count = 0;
-  temp->next_block = dbf->header->avail.next_block;
-  dbf->header->avail.next_block = av_adr;
-  for (index = 1; index < dbf->header->avail.count; index++)
-    if ( (index & 0x1) == 1)	/* Index is odd. */
-      temp->av_table[temp->count++] = dbf->header->avail.av_table[index];
-    else
-      dbf->header->avail.av_table[index>>1]
-	= dbf->header->avail.av_table[index];
+    /* Set the size to be correct AFTER the pop_avail_block. */
+    temp->size = dbf->header->avail.size;
+    temp->count = 0;
+    temp->next_block = dbf->header->avail.next_block;
+    dbf->header->avail.next_block = av_adr;
 
-  /* Update the header avail count to previous size divided by 2. */
-  dbf->header->avail.count >>= 1;
+    for ( index = 1; index < dbf->header->avail.count; index++ )
+        if ( ( index & 0x1 ) == 1 ) /* Index is odd. */
+            temp->av_table[temp->count++] = dbf->header->avail.av_table[index];
+        else
+            dbf->header->avail.av_table[index >> 1]
+                = dbf->header->avail.av_table[index];
 
-  /* Free the unneeded space. */
-  new_loc.av_adr += av_size;
-  new_loc.av_size -= av_size;
-  _gdbm_free (dbf, new_loc.av_adr, new_loc.av_size);
+    /* Update the header avail count to previous size divided by 2. */
+    dbf->header->avail.count >>= 1;
+    /* Free the unneeded space. */
+    new_loc.av_adr += av_size;
+    new_loc.av_size -= av_size;
+    _gdbm_free ( dbf, new_loc.av_adr, new_loc.av_size );
+    /* Update the disk. */
+    file_pos = lseek ( dbf->desc, av_adr, L_SET );
 
-  /* Update the disk. */
-  file_pos = lseek (dbf->desc, av_adr, L_SET);
-  if (file_pos != av_adr) _gdbm_fatal (dbf, "lseek error");
-  num_bytes = write (dbf->desc, temp, av_size);
-  if (num_bytes != av_size) _gdbm_fatal (dbf, "write error");
-  free (temp);
+    if ( file_pos != av_adr ) _gdbm_fatal ( dbf, "lseek error" );
+
+    num_bytes = write ( dbf->desc, temp, av_size );
+
+    if ( num_bytes != av_size ) _gdbm_fatal ( dbf, "write error" );
+
+    free ( temp );
 }
 
 
@@ -343,44 +335,42 @@ push_avail_block (dbf)
 /* Get_elem returns an element in the AV_TABLE block which is
    larger than SIZE.  AV_COUNT is the number of elements in the
    AV_TABLE.  If an item is found, it extracts it from the AV_TABLE
-   and moves the other elements up to fill the space. If no block is 
+   and moves the other elements up to fill the space. If no block is
    found larger than SIZE, get_elem returns a size of zero.  This
    routine does no I/O. */
 
 static avail_elem
-get_elem (size, av_table, av_count)
-     int size;
-     avail_elem av_table[];
-     int *av_count;
+get_elem ( size, av_table, av_count )
+int size;
+avail_elem av_table[];
+int *av_count;
 {
-  int index;			/* For searching through the avail block. */
-  avail_elem val;		/* The default return value. */
+    int index;            /* For searching through the avail block. */
+    avail_elem val;       /* The default return value. */
+    /* Initialize default return value. */
+    val.av_adr = 0;
+    val.av_size = 0;
+    /* Search for element.  List is sorted by size. */
+    index = 0;
 
-  /* Initialize default return value. */
-  val.av_adr = 0;
-  val.av_size = 0;
-
-  /* Search for element.  List is sorted by size. */
-  index = 0;
-  while (index < *av_count && av_table[index].av_size < size)
-    {
-      index++;
+    while ( index < *av_count && av_table[index].av_size < size ) {
+        index++;
     }
 
-  /* Did we find one of the right size? */
-  if (index >= *av_count)
+    /* Did we find one of the right size? */
+    if ( index >= *av_count )
+        return val;
+
+    /* Ok, save that element and move all others up one. */
+    val = av_table[index];
+    *av_count -= 1;
+
+    while ( index < *av_count ) {
+        av_table[index] = av_table[index + 1];
+        index++;
+    }
+
     return val;
-
-  /* Ok, save that element and move all others up one. */
-  val = av_table[index];
-  *av_count -= 1;
-  while (index < *av_count)
-    {
-      av_table[index] = av_table[index+1];
-      index++;
-    }
-
-  return val;
 }
 
 
@@ -388,75 +378,68 @@ get_elem (size, av_table, av_count)
    This routine does no I/O. */
 
 int
-_gdbm_put_av_elem (new_el, av_table, av_count, can_merge)
-     avail_elem new_el;
-     avail_elem av_table[];
-     int *av_count;
-     int can_merge;		/* We should allow blocks to merge. */
+_gdbm_put_av_elem ( new_el, av_table, av_count, can_merge )
+avail_elem new_el;
+avail_elem av_table[];
+int *av_count;
+int can_merge;     /* We should allow blocks to merge. */
 {
-  int index;			/* For searching through the avail block. */
-  int index1;
+    int index;            /* For searching through the avail block. */
+    int index1;
 
-  /* Is it too small to deal with? */
-  if (new_el.av_size <= IGNORE_SIZE)
-    return FALSE;
+    /* Is it too small to deal with? */
+    if ( new_el.av_size <= IGNORE_SIZE )
+        return FALSE;
 
-  if (can_merge == TRUE)
-    {
-      /* Search for blocks to coalesce with this one. */
-      index = 0;
+    if ( can_merge == TRUE ) {
+        /* Search for blocks to coalesce with this one. */
+        index = 0;
 
-      while (index < *av_count)
-	{
-	  /* Can we merge with the previous block? */
-	  if ((av_table[index].av_adr
-	       + av_table[index].av_size) == new_el.av_adr)
-	    {
-	      /* Simply expand the endtry. */
-	      av_table[index].av_size += new_el.av_size;
-	    }
-	    /* Can we merge with the next block? */
-	    else if ((new_el.av_adr
-	      	      + new_el.av_size) == av_table[index].av_adr)
-	      {
-	        /* Update this entry. */
-	        av_table[index].av_adr = new_el.av_adr;
-		av_table[index].av_size += new_el.av_size;
-	      }
-	    /* Not contiguous */
-	    else
-	      {
-		index++;
-		continue;
-	      }
-	    
-	    /* If we got here, we're done. */
-	    return TRUE;
-	}
+        while ( index < *av_count ) {
+            /* Can we merge with the previous block? */
+            if ( ( av_table[index].av_adr
+                    + av_table[index].av_size ) == new_el.av_adr ) {
+                /* Simply expand the endtry. */
+                av_table[index].av_size += new_el.av_size;
+            }
+            /* Can we merge with the next block? */
+            else if ( ( new_el.av_adr
+                        + new_el.av_size ) == av_table[index].av_adr ) {
+                /* Update this entry. */
+                av_table[index].av_adr = new_el.av_adr;
+                av_table[index].av_size += new_el.av_size;
+            }
+            /* Not contiguous */
+            else {
+                index++;
+                continue;
+            }
+
+            /* If we got here, we're done. */
+            return TRUE;
+        }
     }
 
-  /* Search for place to put element.  List is sorted by size. */
-  index = 0;
-  while (index < *av_count && av_table[index].av_size < new_el.av_size)
-    {
-      index++;
+    /* Search for place to put element.  List is sorted by size. */
+    index = 0;
+
+    while ( index < *av_count && av_table[index].av_size < new_el.av_size ) {
+        index++;
     }
 
-  /* Move all others up one. */
-  index1 = *av_count-1;
-  while (index1 >= index)
-    {
-      av_table[index1+1] = av_table[index1];
-      index1--;
+    /* Move all others up one. */
+    index1 = *av_count - 1;
+
+    while ( index1 >= index ) {
+        av_table[index1 + 1] = av_table[index1];
+        index1--;
     }
 
-  /* Add the new element. */
-  av_table[index] = new_el;
-
-  /* Increment the number of elements. */
-  *av_count += 1;
-
-  return TRUE;
+    /* Add the new element. */
+    av_table[index] = new_el;
+    /* Increment the number of elements. */
+    *av_count += 1;
+    return TRUE;
 }
 
 
@@ -471,61 +454,55 @@ _gdbm_put_av_elem (new_el, av_table, av_count, can_merge)
    no I/O.  */
 
 static avail_elem
-get_block (size, dbf)
-     int size;
-     gdbm_file_info *dbf;
+get_block ( size, dbf )
+int size;
+gdbm_file_info *dbf;
 {
-  avail_elem val;
+    avail_elem val;
+    /* Need at least one block. */
+    val.av_adr  = dbf->header->next_block;
+    val.av_size = dbf->header->block_size;
 
-  /* Need at least one block. */
-  val.av_adr  = dbf->header->next_block;
-  val.av_size = dbf->header->block_size;
+    /* Get enough blocks to fit the need. */
+    while ( val.av_size < size )
+        val.av_size += dbf->header->block_size;
 
-  /* Get enough blocks to fit the need. */
-  while (val.av_size < size)
-    val.av_size += dbf->header->block_size;
-
-  /* Update the header and return. */
-  dbf->header->next_block += val.av_size;
-
-  /* We changed the header. */
-  dbf->header_changed = TRUE;
-
-  return val;
-  
+    /* Update the header and return. */
+    dbf->header->next_block += val.av_size;
+    /* We changed the header. */
+    dbf->header_changed = TRUE;
+    return val;
 }
 
 
 /*  When the header already needs writing, we can make sure the current
     bucket has its avail block as close to 1/3 full as possible. */
 static void
-adjust_bucket_avail (dbf)
-     gdbm_file_info *dbf;
+adjust_bucket_avail ( dbf )
+gdbm_file_info *dbf;
 {
-  int third = BUCKET_AVAIL / 3;
-  avail_elem av_el;
+    int third = BUCKET_AVAIL / 3;
+    avail_elem av_el;
 
-  /* Can we add more entries to the bucket? */
-  if (dbf->bucket->av_count < third)
-    {
-      if (dbf->header->avail.count > 0)
-	{
-	  dbf->header->avail.count -= 1;
-	  av_el = dbf->header->avail.av_table[dbf->header->avail.count];
-	  _gdbm_put_av_elem (av_el, dbf->bucket->bucket_avail,
-			     &dbf->bucket->av_count, dbf->coalesce_blocks);
-	  dbf->bucket_changed = TRUE;
-	}
-      return;
+    /* Can we add more entries to the bucket? */
+    if ( dbf->bucket->av_count < third ) {
+        if ( dbf->header->avail.count > 0 ) {
+            dbf->header->avail.count -= 1;
+            av_el = dbf->header->avail.av_table[dbf->header->avail.count];
+            _gdbm_put_av_elem ( av_el, dbf->bucket->bucket_avail,
+                                &dbf->bucket->av_count, dbf->coalesce_blocks );
+            dbf->bucket_changed = TRUE;
+        }
+
+        return;
     }
 
-  /* Is there too much in the bucket? */
-  while (dbf->bucket->av_count > BUCKET_AVAIL-third
-	 && dbf->header->avail.count < dbf->header->avail.size)
-    {
-      av_el = get_elem (0, dbf->bucket->bucket_avail, &dbf->bucket->av_count);
-      _gdbm_put_av_elem (av_el, dbf->header->avail.av_table,
-			 &dbf->header->avail.count, dbf->coalesce_blocks);
-      dbf->bucket_changed = TRUE;
+    /* Is there too much in the bucket? */
+    while ( dbf->bucket->av_count > BUCKET_AVAIL - third
+            && dbf->header->avail.count < dbf->header->avail.size ) {
+        av_el = get_elem ( 0, dbf->bucket->bucket_avail, &dbf->bucket->av_count );
+        _gdbm_put_av_elem ( av_el, dbf->header->avail.av_table,
+                            &dbf->header->avail.count, dbf->coalesce_blocks );
+        dbf->bucket_changed = TRUE;
     }
 }

@@ -13,30 +13,32 @@
 #include "udb.h" /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
 
-#include "mushconf.h"		/* required by code */
+#include "mushconf.h"       /* required by code */
 
-#include "db.h"			/* required by externs */
+#include "db.h"         /* required by externs */
 #include "interface.h"
-#include "externs.h"		/* required by code */
+#include "externs.h"        /* required by code */
 
 /*
  * Log database errors
  */
 
-void log_db_err( int obj, int attr, const char *txt )
+void log_db_err ( int obj, int attr, const char *txt )
 {
-    if( !mudstate.standalone ) {
-        if( attr != NOTHING ) {
-            log_write( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
+    if ( !mudstate.standalone ) {
+        if ( attr != NOTHING ) {
+            log_write ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d attr #%d", txt, obj, attr );
         } else {
-            log_write( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d", txt, obj );
+            log_write ( LOG_ALWAYS, "DBM", "ERROR", "Could not %s object #%d", txt, obj );
         }
     } else {
-        log_write_raw( 1, "Could not %s object #%d", txt, obj );
-        if( attr != NOTHING ) {
-            log_write_raw( 1, " attr #%d", attr );
+        log_write_raw ( 1, "Could not %s object #%d", txt, obj );
+
+        if ( attr != NOTHING ) {
+            log_write_raw ( 1, " attr #%d", attr );
         }
-        log_write_raw( 1, "\n" );
+
+        log_write_raw ( 1, "\n" );
     }
 }
 
@@ -46,25 +48,25 @@ void log_db_err( int obj, int attr, const char *txt )
 /*
  * VARARGS
  */
-void warning( char *p, ... )
+void warning ( char *p, ... )
 {
     va_list ap;
+    va_start ( ap, p );
 
-    va_start( ap, p );
-
-    while( 1 ) {
-        if( p == ( char *) 0 ) {
+    while ( 1 ) {
+        if ( p == ( char * ) 0 ) {
             break;
         }
 
-        if( p == ( char *)-1 ) {
-            p = ( char *) strerror( errno );
+        if ( p == ( char * ) - 1 ) {
+            p = ( char * ) strerror ( errno );
         }
 
-        log_write_raw( 1, "%s", p );
-        p = va_arg( ap, char *);
+        log_write_raw ( 1, "%s", p );
+        p = va_arg ( ap, char * );
     }
-    va_end( ap );
+
+    va_end ( ap );
 }
 
 /*
@@ -73,24 +75,24 @@ void warning( char *p, ... )
 /*
  * VARARGS
  */
-void fatal( char *p, ... )
+void fatal ( char *p, ... )
 {
     va_list ap;
+    va_start ( ap, p );
 
-    va_start( ap, p );
-
-    while( 1 ) {
-        if( p == ( char *) 0 ) {
+    while ( 1 ) {
+        if ( p == ( char * ) 0 ) {
             break;
         }
 
-        if( p == ( char *)-1 ) {
-            p = ( char *) strerror( errno );
+        if ( p == ( char * ) - 1 ) {
+            p = ( char * ) strerror ( errno );
         }
 
-        log_write_raw( 1, "%s", p );
-        p = va_arg( ap, char *);
+        log_write_raw ( 1, "%s", p );
+        p = va_arg ( ap, char * );
     }
-    va_end( ap );
-    exit( 1 );
+
+    va_end ( ap );
+    exit ( 1 );
 }

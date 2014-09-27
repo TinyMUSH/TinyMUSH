@@ -34,62 +34,62 @@ or obtained by writing to the Free Software Foundation, Inc.,
 
 #include "lt__alloc.h"
 
-static void alloc_die_default (void);
+static void alloc_die_default ( void );
 
-void (*lt__alloc_die) (void) = alloc_die_default;
+void ( *lt__alloc_die ) ( void ) = alloc_die_default;
 
 /* Unless overridden, exit on memory failure.  */
 static void
-alloc_die_default (void)
+alloc_die_default ( void )
 {
-  fprintf (stderr, "Out of memory.\n");
-  exit (EXIT_FAILURE);
+    fprintf ( stderr, "Out of memory.\n" );
+    exit ( EXIT_FAILURE );
 }
 
 void *
-lt__malloc (size_t n)
+lt__malloc ( size_t n )
 {
-  void *mem;
+    void *mem;
 
-  if (! (mem = malloc (n)))
-    (*lt__alloc_die) ();
+    if ( ! ( mem = malloc ( n ) ) )
+        ( *lt__alloc_die ) ();
 
-  return mem;
+    return mem;
 }
 
 void *
-lt__zalloc (size_t n)
+lt__zalloc ( size_t n )
 {
-  void *mem;
+    void *mem;
 
-  if ((mem = lt__malloc (n)))
-    memset (mem, 0, n);
+    if ( ( mem = lt__malloc ( n ) ) )
+        memset ( mem, 0, n );
 
-  return mem;
+    return mem;
 }
 
 void *
-lt__realloc (void *mem, size_t n)
+lt__realloc ( void *mem, size_t n )
 {
-  if (! (mem = realloc (mem, n)))
-    (*lt__alloc_die) ();
+    if ( ! ( mem = realloc ( mem, n ) ) )
+        ( *lt__alloc_die ) ();
 
-  return mem;
+    return mem;
 }
 
 void *
-lt__memdup (void const *mem, size_t n)
+lt__memdup ( void const *mem, size_t n )
 {
-  void *newmem;
+    void *newmem;
 
-  if ((newmem = lt__malloc (n)))
-    return memcpy (newmem, mem, n);
+    if ( ( newmem = lt__malloc ( n ) ) )
+        return memcpy ( newmem, mem, n );
 
-  return 0;
+    return 0;
 }
 
 char *
-lt__strdup (const char *string)
+lt__strdup ( const char *string )
 {
-  return (char *) lt__memdup (string, strlen (string) +1);
+    return ( char * ) lt__memdup ( string, strlen ( string ) + 1 );
 }

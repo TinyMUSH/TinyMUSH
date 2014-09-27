@@ -48,17 +48,17 @@ or obtained by writing to the Free Software Foundation, Inc.,
 
 
 /* Saves on those hard to debug '\0' typos....  */
-#define LT_EOS_CHAR	'\0'
+#define LT_EOS_CHAR '\0'
 
 /* LTDL_BEGIN_C_DECLS should be used at the beginning of your declarations,
    so that C++ compilers don't mangle their names.  Use LTDL_END_C_DECLS at
    the end of C declarations. */
 #if defined(__cplusplus)
-# define LT_BEGIN_C_DECLS	extern "C" {
-# define LT_END_C_DECLS		}
+# define LT_BEGIN_C_DECLS   extern "C" {
+# define LT_END_C_DECLS     }
 #else
-# define LT_BEGIN_C_DECLS	/* empty */
-# define LT_END_C_DECLS		/* empty */
+# define LT_BEGIN_C_DECLS   /* empty */
+# define LT_END_C_DECLS     /* empty */
 #endif
 
 /* LT_STMT_START/END are used to create macros which expand to a
@@ -112,26 +112,26 @@ or obtained by writing to the Free Software Foundation, Inc.,
    ridiculous implementation of data symbol exporting. */
 #if !defined(LT_SCOPE)
 #  if defined(__WINDOWS__) || defined(__CYGWIN__)
-#    if defined(DLL_EXPORT)		/* defined by libtool (if required) */
-#      define LT_SCOPE	extern __declspec(dllexport)
+#    if defined(DLL_EXPORT)     /* defined by libtool (if required) */
+#      define LT_SCOPE  extern __declspec(dllexport)
 #    endif
-#    if defined(LIBLTDL_DLL_IMPORT)	/* define if linking with this dll */
-       /* note: cygwin/mingw compilers can rely instead on auto-import */
-#      define LT_SCOPE	extern __declspec(dllimport)
+#    if defined(LIBLTDL_DLL_IMPORT) /* define if linking with this dll */
+/* note: cygwin/mingw compilers can rely instead on auto-import */
+#      define LT_SCOPE  extern __declspec(dllimport)
 #    endif
 #  endif
-#  if !defined(LT_SCOPE)		/* static linking or !__WINDOWS__ */
-#    define LT_SCOPE	extern
+#  if !defined(LT_SCOPE)        /* static linking or !__WINDOWS__ */
+#    define LT_SCOPE    extern
 #  endif
 #endif
 
 #if defined(__WINDOWS__)
 /* LT_DIRSEP_CHAR is accepted *in addition* to '/' as a directory
    separator when it is set. */
-# define LT_DIRSEP_CHAR		'\\'
-# define LT_PATHSEP_CHAR	';'
+# define LT_DIRSEP_CHAR     '\\'
+# define LT_PATHSEP_CHAR    ';'
 #else
-# define LT_PATHSEP_CHAR	':'
+# define LT_PATHSEP_CHAR    ':'
 #endif
 
 #if defined(_MSC_VER) /* Visual Studio */
@@ -139,7 +139,7 @@ or obtained by writing to the Free Software Foundation, Inc.,
 #endif
 
 /* fopen() mode flags for reading a text file */
-#undef	LT_READTEXT_MODE
+#undef  LT_READTEXT_MODE
 #if defined(__WINDOWS__) || defined(__CYGWIN__)
 #  define LT_READTEXT_MODE "rt"
 #else
@@ -150,17 +150,17 @@ or obtained by writing to the Free Software Foundation, Inc.,
    that if the arguments to LT_STR() (or LT_CONC()) are themselves macros,
    they will be expanded before being quoted.   */
 #ifndef LT_STR
-#  define LT__STR(arg)		#arg
-#  define LT_STR(arg)		LT__STR(arg)
+#  define LT__STR(arg)      #arg
+#  define LT_STR(arg)       LT__STR(arg)
 #endif
 
 #ifndef LT_CONC
-#  define LT__CONC(a, b)	a##b
-#  define LT_CONC(a, b)		LT__CONC(a, b)
+#  define LT__CONC(a, b)    a##b
+#  define LT_CONC(a, b)     LT__CONC(a, b)
 #endif
 #ifndef LT_CONC3
-#  define LT__CONC3(a, b, c)	a##b##c
-#  define LT_CONC3(a, b, c)	LT__CONC3(a, b, c)
+#  define LT__CONC3(a, b, c)    a##b##c
+#  define LT_CONC3(a, b, c) LT__CONC3(a, b, c)
 #endif
 
 #endif /*!defined(LT_SYSTEM_H)*/

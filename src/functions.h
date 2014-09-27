@@ -13,56 +13,56 @@
 #define MAX_NFARGS 30
 
 typedef struct fun {
-    const char     *name;	/* Function name */
-    void ( *fun )();	/* Handler */
-    int		nargs;	/* Number of args needed or expected */
-    unsigned int	flags;	/* Function flags */
-    int		perms;	/* Access to function */
-    EXTFUNCS       *xperms;	/* Extended access to function */
-}		FUN;
+    const char     *name;   /* Function name */
+    void ( *fun ) ();   /* Handler */
+    int     nargs;  /* Number of args needed or expected */
+    unsigned int    flags;  /* Function flags */
+    int     perms;  /* Access to function */
+    EXTFUNCS       *xperms; /* Extended access to function */
+}       FUN;
 
 typedef struct ufun {
-    char           *name;	/* Function name */
-    dbref		obj;	/* Object ID */
-    int		atr;	/* Attribute ID */
-    unsigned int	flags;	/* Function flags */
-    int		perms;	/* Access to function */
-    struct ufun    *next;	/* Next ufun in chain */
-}		UFUN;
+    char           *name;   /* Function name */
+    dbref       obj;    /* Object ID */
+    int     atr;    /* Attribute ID */
+    unsigned int    flags;  /* Function flags */
+    int     perms;  /* Access to function */
+    struct ufun    *next;   /* Next ufun in chain */
+}       UFUN;
 
 typedef struct delim {
-    size_t		len;
-    char		str       [MAX_DELIM_LEN];
-}		Delim;
+    size_t      len;
+    char        str       [MAX_DELIM_LEN];
+}       Delim;
 
 typedef struct var_entry VARENT;
 struct var_entry {
-    char           *text;	/* variable text */
+    char           *text;   /* variable text */
 };
 
 typedef struct component_def COMPONENT;
 struct component_def {
-    int ( *typer_func )();	/* type-checking handler */
+    int ( *typer_func ) (); /* type-checking handler */
     char           *def_val;/* default value */
 };
 
 typedef struct structure_def STRUCTDEF;
 struct structure_def {
-    char           *s_name;	/* name of the structure */
+    char           *s_name; /* name of the structure */
     char          **c_names;/* array of component names */
     COMPONENT     **c_array;/* array of pointers to components */
-    int		c_count;/* number of components */
-    char		delim;	/* output delimiter when unloading */
-    int		need_typecheck;	/* any components without types of
-					 * any? */
-    int		n_instances;	/* number of instances out there */
-    char           *names_base;	/* pointer for later freeing */
-    char           *defs_base;	/* pointer for later freeing */
+    int     c_count;/* number of components */
+    char        delim;  /* output delimiter when unloading */
+    int     need_typecheck; /* any components without types of
+                     * any? */
+    int     n_instances;    /* number of instances out there */
+    char           *names_base; /* pointer for later freeing */
+    char           *defs_base;  /* pointer for later freeing */
 };
 
 typedef struct instance_def INSTANCE;
 struct instance_def {
-    STRUCTDEF      *datatype;	/* pointer to structure data type def */
+    STRUCTDEF      *datatype;   /* pointer to structure data type def */
 };
 
 typedef struct data_def STRUCTDATA;
@@ -78,22 +78,22 @@ struct object_stack {
 
 typedef struct object_grid OBJGRID;
 struct object_grid {
-    int		rows;
-    int		cols;
-    char             ** *data;
+    int     rows;
+    int     cols;
+    char             ***data;
 };
 
-typedef double	NVAL;
+typedef double  NVAL;
 
 /*
  * ---------------------------------------------------------------------------
  * Constants used in delimiter macros.
  */
 
-#define DELIM_EVAL	0x001	/* Must eval delimiter. */
-#define DELIM_NULL	0x002	/* Null delimiter okay. */
-#define DELIM_CRLF	0x004	/* '%r' delimiter okay. */
-#define DELIM_STRING	0x008	/* Multi-character delimiter okay. */
+#define DELIM_EVAL  0x001   /* Must eval delimiter. */
+#define DELIM_NULL  0x002   /* Null delimiter okay. */
+#define DELIM_CRLF  0x004   /* '%r' delimiter okay. */
+#define DELIM_STRING    0x008   /* Multi-character delimiter okay. */
 
 /*
  * ---------------------------------------------------------------------------
@@ -102,17 +102,17 @@ typedef double	NVAL;
 
 extern const Delim SPACE_DELIM;
 
-extern char    *trim_space_sep( char *, const Delim *);
-extern char    *next_token( char *, const Delim *);
-extern char    *split_token( char **, const Delim *);
-extern char    *next_token_ansi( char *, const Delim *, int *);
-extern int	countwords( char *, const Delim *);
-extern int	list2arr( char ** *, int, char *, const Delim *);
-extern void	arr2list( char **, int, char *, char **, const Delim *);
-extern int	list2ansi( int *, int *, int, char *, const Delim *);
-extern void do_reverse( char *, char *);
-extern int	fn_range_check( const char *, int, int, int, char *, char **);
-extern int	delim_check( char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int );
+extern char    *trim_space_sep ( char *, const Delim * );
+extern char    *next_token ( char *, const Delim * );
+extern char    *split_token ( char **, const Delim * );
+extern char    *next_token_ansi ( char *, const Delim *, int * );
+extern int  countwords ( char *, const Delim * );
+extern int  list2arr ( char ***, int, char *, const Delim * );
+extern void arr2list ( char **, int, char *, char **, const Delim * );
+extern int  list2ansi ( int *, int *, int, char *, const Delim * );
+extern void do_reverse ( char *, char * );
+extern int  fn_range_check ( const char *, int, int, int, char *, char ** );
+extern int  delim_check ( char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int );
 
 /*
  * ---------------------------------------------------------------------------
@@ -123,12 +123,12 @@ extern int	delim_check( char *, char **, dbref, dbref, dbref, char **, int, char
 #define FUNCTION_ARGLIST buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs
 */
 
-#define	FUNCTION(x)	\
+#define FUNCTION(x) \
     void x( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs ) \
-	char *buff, **bufc; \
-	dbref player, caller, cause; \
-	char *fargs[], *cargs[]; \
-	int nfargs, ncargs;
+    char *buff, **bufc; \
+    dbref player, caller, cause; \
+    char *fargs[], *cargs[]; \
+    int nfargs, ncargs;
 
 /*
  * ---------------------------------------------------------------------------
@@ -153,14 +153,14 @@ memcpy((sep_dest), (sep_src), \
 
 #define VaChk_Sep(xsep, xargnum, xflags) \
 if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xargnum, xsep, xflags)) \
-	return
+    return
 
 #define VaChk_InSep(xargnum, xflags) \
 VaChk_Sep(&isep, xargnum, (xflags)|DELIM_STRING)
 
 #define VaChk_DefaultOut(xargnum) \
 if (nfargs < xargnum) { \
-	Delim_Copy(&osep, &isep); \
+    Delim_Copy(&osep, &isep); \
 } else
 
 #define VaChk_OutSep(xargnum, xflags) \
@@ -208,13 +208,13 @@ VaChk_Sep(&(xsep), xargnum, (xflags)|DELIM_STRING|DELIM_NULL|DELIM_CRLF)
 
 #define VaChk_Range(xminargs,xnargs) \
 if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, xminargs, xnargs, \
-		    buff, bufc)) \
-	return
+            buff, bufc)) \
+    return
 
 #define VaChk_Only_InPure(xnargs) \
 VaChk_Range(xnargs-1, xnargs); \
 if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xnargs, &isep, 0)) \
-	return
+    return
 
 #define VaChk_Only_In(xnargs) \
 VaChk_Range(xnargs-1, xnargs); \
@@ -227,7 +227,7 @@ VaChk_OutSep(xnargs, 0)
 #define VaChk_InPure(xminargs, xnargs) \
 VaChk_Range(xminargs, xnargs); \
 if (!delim_check( buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, xnargs, &isep, 0)) \
-	return
+    return
 
 #define VaChk_In(xminargs, xnargs) \
 VaChk_Range(xminargs, xnargs); \
@@ -241,14 +241,14 @@ VaChk_OutSep(xnargs, 0)
 VaChk_Range(xnargs-2, xnargs); \
 VaChk_InSep(xnargs-1, 0); \
 VaChk_DefaultOut(xnargs) { \
-	VaChk_OutSep(xnargs, 0); \
+    VaChk_OutSep(xnargs, 0); \
 }
 
 #define VaChk_In_Out(xminargs, xnargs) \
 VaChk_Range(xminargs, xnargs); \
 VaChk_InSep(xnargs-1, 0); \
 VaChk_DefaultOut(xnargs) { \
-	VaChk_OutSep(xnargs, 0); \
+    VaChk_OutSep(xnargs, 0); \
 }
 
 #define VaChk_InEval_OutEval(xminargs, xnargs) \
@@ -282,16 +282,16 @@ VaChk_InSep(xnargs, DELIM_EVAL)
 
 /* Trim spaces. */
 
-#define Eat_Spaces(x)	trim_space_sep((x), &SPACE_DELIM)
+#define Eat_Spaces(x)   trim_space_sep((x), &SPACE_DELIM)
 
 /* Special handling of separators. */
 
 #define print_sep(s,b,p) \
 if ((s)->len == 1) { \
     if ((s)->str[0] == '\r') { \
-	safe_crlf((b),(p)); \
+    safe_crlf((b),(p)); \
     } else if ((s)->str[0] != '\0') { \
-	safe_chr((s)->str[0],(b),(p)); \
+    safe_chr((s)->str[0],(b),(p)); \
     } \
 } else { \
     safe_known_str((s)->str, (s)->len, (b), (p)); \
@@ -302,15 +302,15 @@ if ((s)->len == 1) { \
  * parse, thing, attribute number, attr pointer)
  */
 
-#define Parse_Uattr(p,s,t,n,a)				\
-    if (parse_attrib((p), (s), &(t), &(n), 0)) {	\
-	if (((n) == NOTHING) || !(Good_obj(t)))		\
-	    (a) = NULL;					\
-	else						\
-	    (a) = atr_num(n);				\
-    } else {						\
-        (t) = (p);					\
-	(a) = atr_str(s);				\
+#define Parse_Uattr(p,s,t,n,a)              \
+    if (parse_attrib((p), (s), &(t), &(n), 0)) {    \
+    if (((n) == NOTHING) || !(Good_obj(t)))     \
+        (a) = NULL;                 \
+    else                        \
+        (a) = atr_num(n);               \
+    } else {                        \
+        (t) = (p);                  \
+    (a) = atr_str(s);               \
     }
 
 /*
@@ -318,14 +318,14 @@ if ((s)->len == 1) { \
  * buffer, owner, flags, length)
  */
 
-#define Get_Uattr(p,t,a,b,o,f,l)				\
-    if (!(a)) {							\
-	return;							\
-    }								\
-    (b) = atr_pget((t), (a)->number, &(o), &(f), &(l));		\
-    if (!*(b) || !(See_attr((p), (t), (a), (o), (f)))) {	\
-	free_lbuf(b);						\
-	return;							\
+#define Get_Uattr(p,t,a,b,o,f,l)                \
+    if (!(a)) {                         \
+    return;                         \
+    }                               \
+    (b) = atr_pget((t), (a)->number, &(o), &(f), &(l));     \
+    if (!*(b) || !(See_attr((p), (t), (a), (o), (f)))) {    \
+    free_lbuf(b);                       \
+    return;                         \
     }
 
 /*
@@ -333,19 +333,19 @@ if ((s)->len == 1) { \
  * Get_Ulambda(player, thing, string, anum, ap, atext, aowner, aflags, alen)
  */
 
-#define Get_Ulambda(p,t,s,n,a,b,o,f,l)				\
-    if (string_prefix((s), "#lambda/")) {			\
-	 (t) = (p);						\
-	 (n) = NOTHING;						\
-	 (a) = NULL;						\
-	 (b) = alloc_lbuf("lambda.atext");			\
-	 (l) = strlen((s) + 8);					\
-	 StrCopyKnown((b), (s) + 8, (l));			\
-	 (o) = (p);						\
-	 (f) = 0;						\
-    } else {							\
-	 Parse_Uattr((p),(s),(t),(n),(a));			\
-	 Get_Uattr((p),(t),(a),(b),(o),(f),(l));		\
+#define Get_Ulambda(p,t,s,n,a,b,o,f,l)              \
+    if (string_prefix((s), "#lambda/")) {           \
+     (t) = (p);                     \
+     (n) = NOTHING;                     \
+     (a) = NULL;                        \
+     (b) = alloc_lbuf("lambda.atext");          \
+     (l) = strlen((s) + 8);                 \
+     StrCopyKnown((b), (s) + 8, (l));           \
+     (o) = (p);                     \
+     (f) = 0;                       \
+    } else {                            \
+     Parse_Uattr((p),(s),(t),(n),(a));          \
+     Get_Uattr((p),(t),(a),(b),(o),(f),(l));        \
     }
 
 /*
@@ -432,27 +432,27 @@ if ((l) > 0) { \
  */
 
 /* from handle_sort (sort, isort): */
-#define SORT_OPER	0x0f	/* mask to select sort operation bits */
-#define SORT_ITEMS	0
-#define SORT_POS	1
+#define SORT_OPER   0x0f    /* mask to select sort operation bits */
+#define SORT_ITEMS  0
+#define SORT_POS    1
 
 /* from handle_sets (setunion, setdiff, setinter, lunion, ldiff, linter): */
-#define SET_OPER	0x0f	/* mask to select set operation bits */
-#define	SET_UNION	0
-#define	SET_INTERSECT	1
-#define	SET_DIFF	2
-#define SET_TYPE	0x10	/* set type is given, don't autodetect */
+#define SET_OPER    0x0f    /* mask to select set operation bits */
+#define SET_UNION   0
+#define SET_INTERSECT   1
+#define SET_DIFF    2
+#define SET_TYPE    0x10    /* set type is given, don't autodetect */
 
 /* from process_tables (tables, rtables, ctables): */
 /* from perform_border (border, rborder, cborder): */
 /* from perform_align (align, lalign): */
-#define JUST_TYPE	0x0f	/* mask to select justification bits */
-#define JUST_LEFT	0x01
-#define JUST_RIGHT	0x02
-#define JUST_CENTER	0x04
-#define JUST_REPEAT	0x10
-#define JUST_COALEFT	0x20
-#define JUST_COARIGHT	0x40
+#define JUST_TYPE   0x0f    /* mask to select justification bits */
+#define JUST_LEFT   0x01
+#define JUST_RIGHT  0x02
+#define JUST_CENTER 0x04
+#define JUST_REPEAT 0x10
+#define JUST_COALEFT    0x20
+#define JUST_COARIGHT   0x40
 
 /*
  * from handle_logic (and, or, andbool, orbool, land, lor, landbool, lorbool,
@@ -460,106 +460,106 @@ if ((l) > 0) { \
  */
 /* from handle_flaglists (andflags, orflags): */
 /* from handle_filter (filter, filterbool): */
-#define LOGIC_OPER	0x0f	/* mask to select boolean operation bits */
-#define LOGIC_AND	0
-#define LOGIC_OR	1
-#define LOGIC_XOR	2
-#define LOGIC_BOOL	0x10	/* interpret operands as boolean, not int */
-#define LOGIC_LIST	0x40	/* operands come in a list, not separately */
+#define LOGIC_OPER  0x0f    /* mask to select boolean operation bits */
+#define LOGIC_AND   0
+#define LOGIC_OR    1
+#define LOGIC_XOR   2
+#define LOGIC_BOOL  0x10    /* interpret operands as boolean, not int */
+#define LOGIC_LIST  0x40    /* operands come in a list, not separately */
 
 /* from handle_vectors (vadd, vsub, vmul, vdot): */
-#define VEC_OPER	0x0f	/* mask to select vector operation bits */
-#define VEC_ADD		0
-#define VEC_SUB		1
-#define VEC_MUL		2
-#define VEC_DOT		3
-/* #define VEC_CROSS	4  -- not implemented */
-#define VEC_OR		7
-#define VEC_AND		8
-#define VEC_XOR		9
+#define VEC_OPER    0x0f    /* mask to select vector operation bits */
+#define VEC_ADD     0
+#define VEC_SUB     1
+#define VEC_MUL     2
+#define VEC_DOT     3
+/* #define VEC_CROSS    4  -- not implemented */
+#define VEC_OR      7
+#define VEC_AND     8
+#define VEC_XOR     9
 
 /* from handle_vector (vmag, vunit): */
-#define VEC_MAG		5
-#define VEC_UNIT	6
+#define VEC_MAG     5
+#define VEC_UNIT    6
 
 /* from perform_loop (loop, parse): */
 /* from perform_iter (list, iter, whentrue, whenfalse, istrue, isfalse): */
-#define BOOL_COND_TYPE	0x0f	/* mask to select exit-condition bits */
-#define BOOL_COND_NONE	1	/* loop until end of list */
-#define BOOL_COND_FALSE	2	/* loop until true */
-#define BOOL_COND_TRUE	3	/* loop until false */
-#define FILT_COND_TYPE	0x0f0	/* mask to select filter bits */
-#define FILT_COND_NONE	0x010	/* show all results */
-#define FILT_COND_FALSE	0x020	/* show only false results */
-#define FILT_COND_TRUE	0x030	/* show only true results */
-#define LOOP_NOTIFY	0x100	/* send loop results directly to enactor */
-#define LOOP_TWOLISTS	0x200	/* process two lists */
+#define BOOL_COND_TYPE  0x0f    /* mask to select exit-condition bits */
+#define BOOL_COND_NONE  1   /* loop until end of list */
+#define BOOL_COND_FALSE 2   /* loop until true */
+#define BOOL_COND_TRUE  3   /* loop until false */
+#define FILT_COND_TYPE  0x0f0   /* mask to select filter bits */
+#define FILT_COND_NONE  0x010   /* show all results */
+#define FILT_COND_FALSE 0x020   /* show only false results */
+#define FILT_COND_TRUE  0x030   /* show only true results */
+#define LOOP_NOTIFY 0x100   /* send loop results directly to enactor */
+#define LOOP_TWOLISTS   0x200   /* process two lists */
 
 /* from handle_okpres (hears, moves, knows): */
-#define PRESFN_OPER	0x0f	/* Mask to select bits */
-#define PRESFN_HEARS	0x01	/* Detect hearing */
-#define PRESFN_MOVES	0x02	/* Detect movement */
-#define PRESFN_KNOWS	0x04	/* Detect knows */
+#define PRESFN_OPER 0x0f    /* Mask to select bits */
+#define PRESFN_HEARS    0x01    /* Detect hearing */
+#define PRESFN_MOVES    0x02    /* Detect movement */
+#define PRESFN_KNOWS    0x04    /* Detect knows */
 
 /* from perform_get (get, get_eval, xget, eval(a,b)): */
-#define GET_EVAL	0x01	/* evaluate the attribute */
-#define GET_XARGS	0x02	/* obj and attr are two separate args */
+#define GET_EVAL    0x01    /* evaluate the attribute */
+#define GET_XARGS   0x02    /* obj and attr are two separate args */
 
 /* from handle_pop (pop, peek, toss): */
-#define POP_PEEK	0x01	/* don't remove item from stack */
-#define POP_TOSS	0x02	/* don't display item from stack */
+#define POP_PEEK    0x01    /* don't remove item from stack */
+#define POP_TOSS    0x02    /* don't display item from stack */
 
 /* from perform_regedit (regedit, regediti, regeditall, regeditalli): */
 /* from perform_regparse (regparse, regparsei): */
 /* from perform_regrab (regrab, regrabi, regraball, regraballi): */
 /* from perform_regmatch (regmatch, regmatchi): */
 /* from perform_grep (grep, grepi, wildgrep, regrep, regrepi): */
-#define REG_CASELESS	0x01	/* XXX must equal PCRE_CASELESS */
-#define REG_MATCH_ALL	0x02	/* operate on all matches in a list */
-#define REG_TYPE	0x0c	/* mask to select grep type bits */
-#define GREP_EXACT	0
-#define GREP_WILD	4
-#define GREP_REGEXP	8
+#define REG_CASELESS    0x01    /* XXX must equal PCRE_CASELESS */
+#define REG_MATCH_ALL   0x02    /* operate on all matches in a list */
+#define REG_TYPE    0x0c    /* mask to select grep type bits */
+#define GREP_EXACT  0
+#define GREP_WILD   4
+#define GREP_REGEXP 8
 
 /*
  * from handle_trig (sin, cos, tan, asin, acos, atan, sind, cosd, tand,
  * asind, acosd, atand):
  */
-#define TRIG_OPER	0x0f	/* mask to select trig function bits */
-#define TRIG_CO		0x01	/* co-function, like cos as opposed to sin */
-#define TRIG_TAN	0x02	/* tan-function, like cot as opposed to cos */
-#define TRIG_ARC	0x04	/* arc-function, like asin as opposed to sin */
-/* #define TRIG_REC	0x08	-- reciprocal, like sec as opposed to sin */
-#define TRIG_DEG	0x10	/* angles are in degrees, not radians */
+#define TRIG_OPER   0x0f    /* mask to select trig function bits */
+#define TRIG_CO     0x01    /* co-function, like cos as opposed to sin */
+#define TRIG_TAN    0x02    /* tan-function, like cot as opposed to cos */
+#define TRIG_ARC    0x04    /* arc-function, like asin as opposed to sin */
+/* #define TRIG_REC 0x08    -- reciprocal, like sec as opposed to sin */
+#define TRIG_DEG    0x10    /* angles are in degrees, not radians */
 
 /* from handle_pronoun (obj, poss, subj, aposs): */
-#define PRONOUN_OBJ	0
-#define PRONOUN_POSS	1
-#define PRONOUN_SUBJ	2
-#define PRONOUN_APOSS	3
+#define PRONOUN_OBJ 0
+#define PRONOUN_POSS    1
+#define PRONOUN_SUBJ    2
+#define PRONOUN_APOSS   3
 
 /* from do_ufun(): */
-#define U_LOCAL		0x01	/* ulocal: preserve global registers */
-#define U_PRIVATE	0x02	/* ulocal: preserve global registers */
+#define U_LOCAL     0x01    /* ulocal: preserve global registers */
+#define U_PRIVATE   0x02    /* ulocal: preserve global registers */
 
 /* from handle_ifelse() and handle_if() */
-#define IFELSE_OPER	0x0f	/* mask */
-#define IFELSE_BOOL	0x01	/* check for boolean (defaults to nonzero) */
-#define IFELSE_FALSE	0x02	/* order false,true instead of true,false */
-#define IFELSE_DEFAULT	0x04	/* only two args, use condition as output */
-#define IFELSE_TOKEN	0x08	/* allow switch-token substitution */
+#define IFELSE_OPER 0x0f    /* mask */
+#define IFELSE_BOOL 0x01    /* check for boolean (defaults to nonzero) */
+#define IFELSE_FALSE    0x02    /* order false,true instead of true,false */
+#define IFELSE_DEFAULT  0x04    /* only two args, use condition as output */
+#define IFELSE_TOKEN    0x08    /* allow switch-token substitution */
 
 /* from handle_timestamps() */
-#define TIMESTAMP_MOD	0x01	/* lastmod() */
-#define TIMESTAMP_ACC   0X02	/* lastaccess() */
-#define TIMESTAMP_CRE   0x04	/* creation() */
+#define TIMESTAMP_MOD   0x01    /* lastmod() */
+#define TIMESTAMP_ACC   0X02    /* lastaccess() */
+#define TIMESTAMP_CRE   0x04    /* creation() */
 
 /* Miscellaneous */
-#define LATTR_COUNT	0x01	/* nattr: just return attribute count */
-#define LOCFN_WHERE	0x01	/* loc: where() vs. loc() */
-#define NAMEFN_FULLNAME 0x01	/* name: fullname() vs. name() */
-#define CHECK_PARENTS	0x01	/* hasattrp: recurse up the parent chain */
-#define CONNINFO_IDLE	0x01	/* conninfo: idle() vs. conn() */
-#define UCALL_SANDBOX	0x01	/* ucall: sandbox() vs. ucall() */
+#define LATTR_COUNT 0x01    /* nattr: just return attribute count */
+#define LOCFN_WHERE 0x01    /* loc: where() vs. loc() */
+#define NAMEFN_FULLNAME 0x01    /* name: fullname() vs. name() */
+#define CHECK_PARENTS   0x01    /* hasattrp: recurse up the parent chain */
+#define CONNINFO_IDLE   0x01    /* conninfo: idle() vs. conn() */
+#define UCALL_SANDBOX   0x01    /* ucall: sandbox() vs. ucall() */
 
-#endif	/* __FUNCTIONS_H */
+#endif  /* __FUNCTIONS_H */

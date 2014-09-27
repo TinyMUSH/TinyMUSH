@@ -859,10 +859,15 @@ testpath:
 	@echo man2ext : @man2ext@
 	@echo srcdir : @srcdir@
 
+astyle:
+	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./*.c"
+	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./*.h"
+
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done
 	for i in `find ./ -name '.depend'`; do rm $$i; done
 	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
+	for i in `find ./ -name '*.orig'`; do rm -rf $$i; done
 
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status libtool

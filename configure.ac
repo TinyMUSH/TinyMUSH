@@ -215,45 +215,6 @@ AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_MYSQL], [test "x$with_module_dbsql" = 
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_PGSQL], [test "x$with_module_dbsql" = "xpgsql"])
 AM_CONDITIONAL([WANT_MODULE_DB_SQL_DRIVER_SQLITE], [test "x$with_module_dbsql" = "xsqlite"])
 
-AC_MSG_CHECKING([whether to enable command lag detection support])
-AC_ARG_ENABLE([lag-checking], [AS_HELP_STRING([--enable-lag-checking], [Enable warnings that a certain command has exceeded a certain amount of wall-clock time to execute. Disable this if you have severe problems with computational resources on your host machine. @<:@default=yes@:>@])],
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [ 
-  AC_MSG_RESULT([yes])
-  enable_lag_checking="yes"
- ]
-)
-AS_IF([test "x$enable_lag_checking" = "xno"], [AC_DEFINE([NO_LAG_CHECK],[1], [Support for command lag detection support])])
-
-AC_MSG_CHECKING([whether to enable per-object time usage tracking])
-AC_ARG_ENABLE([time-checking], [AS_HELP_STRING([--enable-time-checking], [Enable tracking of the amount of wall-clock time that individual objects are using. Disable this if you have severe problems with computational resources on your host machine. (This is assumed to be disabled if lag-checking is disabled) @<:@default=yes@:>@])], 
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [ 
-  AC_MSG_RESULT([yes])
-  enable_time_checking="yes"
- ]
-)
-AS_IF([test "x$enable_time_checking" = "xno"], [AC_DEFINE([NO_TIMECHECKING],[1], [Support for per-object time usage tracking])])
-
-AC_MSG_CHECKING([whether to enable cpu time checking])
-AC_ARG_ENABLE([cpu-checking], [AS_HELP_STRING([--enable-cpu-checking], [Enable CPU time reported with getrusage() instead of tracking wall-clock time for lag-checking and time-checking features. This is more accurate but also more computationally expensive. @<:@default=no@:>@])],
- [
-  AX_ENABLE_YESNO([$enableval])
- ], [ 
-  AC_MSG_RESULT([no])
-  enable_cpu_checking="no"
- ]
-)
-AS_IF([test "x$enable_cpu_checking" = "xyes"], [AC_DEFINE([TRACK_USER_TIME],[1], [Support for cpu time checking])])
-
-AC_MSG_CHECKING([which malloc-wrapper macros to use])
-AC_ARG_WITH([malloc-wrapper], [AS_HELP_STRING([--with-malloc-wrapper=@<:@track|log@:>@], [Enable use of wrapper macros for malloc(), free(), and related functions to do one of the following, which can help identify memory leaks: track - maintain a tagged list of memory allocated for purposes other than the buffer pool. (see @list raw_memory) log - print log messages when the function are called. This is spammy; try other debugging tools first.])],
-  AS_IF([ test "x$withval" = "xtrack" ], AC_DEFINE([RAW_MEMTRACKING],[1], [Enable malloc wrapper tracker]), AS_IF([ test "x$withval" = "xlog" ], AC_DEFINE([TEST_MALLOC],[1], [Enable malloc wrapper logger]), [with_malloc_wrapper="none"])),
-  [with_malloc_wrapper="none"]
-)
-
 AC_MSG_CHECKING([how many global registers to use])
 AC_ARG_WITH([global-regs], [AS_HELP_STRING([--with-global-regs=N], [use N global registers (%q0-%q9,%qa-%qz) N must be a number from 10 to 36. Set lower to conserve memory if you don't need all the possible registers  @<:@default=36@:>@])],
   AS_IF([ test "$withval" -lt "10" ], [with_global_regs=10], AS_IF([ test "$withval" -gt "36" ], [with_global_regs=36], [with_global_regs=$withval])),
@@ -518,12 +479,5 @@ AX_PRINT([
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
                    Module DBSQL : %B$enable_module_dbsql%b with driver %B$with_module_dbsql%b
-
-                           %BMisc
--------------------------------%b
-          Command lag detection : %B$enable_lag_checking%b
- Per-object time usage tracking : %B$enable_time_checking%b
-              CPU time checking : %B$enable_cpu_checking%b
-                 Malloc Wrapper : %B$with_malloc_wrapper%b
 
 If everything is ok, you can now type %Bmake install%b to install the engine.])

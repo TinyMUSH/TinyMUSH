@@ -20,39 +20,39 @@
 
 #include "ansi.h"       /* required by code */
 
-static FILE *mainlog_fp = NULL;	/*!< Pointer to the main log file */
-static FILE *log_fp = NULL;	/*!< Pointer to the facility's log file */
+static FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
+static FILE *log_fp = NULL; /*!< Pointer to the facility's log file */
 
 NAMETAB logdata_nametab[] = {
-    { ( char *) "flags", 1, 0, LOGOPT_FLAGS},
-    { ( char *) "location", 1, 0, LOGOPT_LOC},
-    { ( char *) "owner", 1, 0, LOGOPT_OWNER},
-    { ( char *) "timestamp", 1, 0, LOGOPT_TIMESTAMP},
+    { ( char * ) "flags", 1, 0, LOGOPT_FLAGS},
+    { ( char * ) "location", 1, 0, LOGOPT_LOC},
+    { ( char * ) "owner", 1, 0, LOGOPT_OWNER},
+    { ( char * ) "timestamp", 1, 0, LOGOPT_TIMESTAMP},
     { NULL, 0, 0, 0}
 };
 
 NAMETAB logoptions_nametab[] = {
-    { ( char *) "accounting", 2, 0, LOG_ACCOUNTING},
-    { ( char *) "all_commands", 2, 0, LOG_ALLCOMMANDS},
-    { ( char *) "bad_commands", 2, 0, LOG_BADCOMMANDS},
-    { ( char *) "buffer_alloc", 3, 0, LOG_ALLOCATE},
-    { ( char *) "bugs", 3, 0, LOG_BUGS},
-    { ( char *) "checkpoints", 2, 0, LOG_DBSAVES},
-    { ( char *) "config_changes", 2, 0, LOG_CONFIGMODS},
-    { ( char *) "create", 2, 0, LOG_PCREATES},
-    { ( char *) "keyboard_commands", 2, 0, LOG_KBCOMMANDS},
-    { ( char *) "killing", 1, 0, LOG_KILLS},
-    { ( char *) "local", 3, 0, LOG_LOCAL},
-    { ( char *) "logins", 3, 0, LOG_LOGIN},
-    { ( char *) "network", 1, 0, LOG_NET},
-    { ( char *) "problems", 1, 0, LOG_PROBLEMS},
-    { ( char *) "security", 2, 0, LOG_SECURITY},
-    { ( char *) "shouts", 2, 0, LOG_SHOUTS},
-    { ( char *) "startup", 2, 0, LOG_STARTUP},
-    { ( char *) "suspect_commands", 2, 0, LOG_SUSPECTCMDS},
-    { ( char *) "time_usage", 1, 0, LOG_TIMEUSE},
-    { ( char *) "wizard", 1, 0, LOG_WIZARD},
-    { ( char *) "malloc", 1, 0, LOG_MALLOC},
+    { ( char * ) "accounting", 2, 0, LOG_ACCOUNTING},
+    { ( char * ) "all_commands", 2, 0, LOG_ALLCOMMANDS},
+    { ( char * ) "bad_commands", 2, 0, LOG_BADCOMMANDS},
+    { ( char * ) "buffer_alloc", 3, 0, LOG_ALLOCATE},
+    { ( char * ) "bugs", 3, 0, LOG_BUGS},
+    { ( char * ) "checkpoints", 2, 0, LOG_DBSAVES},
+    { ( char * ) "config_changes", 2, 0, LOG_CONFIGMODS},
+    { ( char * ) "create", 2, 0, LOG_PCREATES},
+    { ( char * ) "keyboard_commands", 2, 0, LOG_KBCOMMANDS},
+    { ( char * ) "killing", 1, 0, LOG_KILLS},
+    { ( char * ) "local", 3, 0, LOG_LOCAL},
+    { ( char * ) "logins", 3, 0, LOG_LOGIN},
+    { ( char * ) "network", 1, 0, LOG_NET},
+    { ( char * ) "problems", 1, 0, LOG_PROBLEMS},
+    { ( char * ) "security", 2, 0, LOG_SECURITY},
+    { ( char * ) "shouts", 2, 0, LOG_SHOUTS},
+    { ( char * ) "startup", 2, 0, LOG_STARTUP},
+    { ( char * ) "suspect_commands", 2, 0, LOG_SUSPECTCMDS},
+    { ( char * ) "time_usage", 1, 0, LOG_TIMEUSE},
+    { ( char * ) "wizard", 1, 0, LOG_WIZARD},
+    { ( char * ) "malloc", 1, 0, LOG_MALLOC},
     { NULL, 0, 0, 0}
 };
 
@@ -85,21 +85,22 @@ LOGFILETAB logfds_table[] = {
  * logfile_init: Initialize the main logfile.
  */
 
-void logfile_init( char *filename )
+void logfile_init ( char *filename )
 {
-    if( !filename ) {
+    if ( !filename ) {
         mainlog_fp = stderr;
         return;
     }
 
-    mainlog_fp = fopen( filename, "w" );
-    if( !mainlog_fp ) {
-        fprintf( stderr, "Could not open logfile %s for writing.\n", filename );
+    mainlog_fp = fopen ( filename, "w" );
+
+    if ( !mainlog_fp ) {
+        fprintf ( stderr, "Could not open logfile %s for writing.\n", filename );
         mainlog_fp = stderr;
         return;
     }
 
-    setbuf( mainlog_fp, NULL ); /* unbuffered */
+    setbuf ( mainlog_fp, NULL ); /* unbuffered */
 }
 
 /* ---------------------------------------------------------------------------
@@ -107,35 +108,33 @@ void logfile_init( char *filename )
  * log entry.
  */
 
-int start_log( const char *primary, const char *secondary, int key )
+int start_log ( const char *primary, const char *secondary, int key )
 {
     struct tm *tp;
-
     time_t now;
-
     LOGFILETAB *lp;
-
     static int last_key = 0;
 
-    if( !mudstate.standalone ) {
-        if( mudconf.log_diversion & key ) {
-            if( key != last_key ) {
+    if ( !mudstate.standalone ) {
+        if ( mudconf.log_diversion & key ) {
+            if ( key != last_key ) {
                 /*
                  * Try to save ourselves some lookups
                  */
                 last_key = key;
-                for( lp = logfds_table; lp->log_flag; lp++ ) {
+
+                for ( lp = logfds_table; lp->log_flag; lp++ ) {
                     /*
                      * Though keys can be OR'd, use the first one
                      * * matched
                      */
-
-                    if( lp->log_flag & key ) {
+                    if ( lp->log_flag & key ) {
                         log_fp = lp->fileptr;
                         break;
                     }
                 }
-                if( !log_fp ) {
+
+                if ( !log_fp ) {
                     log_fp = mainlog_fp;
                 }
             }
@@ -149,9 +148,8 @@ int start_log( const char *primary, const char *secondary, int key )
 
     mudstate.logging++;
 
-    if( mudstate.logging ) {
-
-        if( key & LOG_FORCE ) {
+    if ( mudstate.logging ) {
+        if ( key & LOG_FORCE ) {
             /*
              * Log even if we are recursing and
              * don't complain about it. This should
@@ -160,25 +158,24 @@ int start_log( const char *primary, const char *secondary, int key )
             mudstate.logging--;
         }
 
-        if( !mudstate.standalone ) {
+        if ( !mudstate.standalone ) {
             /*
              * Format the timestamp
              */
-
-            if( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
-                time( ( time_t *)( &now ) );
-                tp = localtime( ( time_t *)( &now ) );
-                log_write_raw( 0, "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
+            if ( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
+                time ( ( time_t * ) ( &now ) );
+                tp = localtime ( ( time_t * ) ( &now ) );
+                log_write_raw ( 0, "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
             }
 
             /*
              * Write the header to the log
              */
 
-            if( secondary && *secondary ) {
-                log_write_raw( 0, "%s %3s/%-5s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), primary, secondary );
+            if ( secondary && *secondary ) {
+                log_write_raw ( 0, "%s %3s/%-5s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), primary, secondary );
             } else {
-                log_write_raw( 0, "%s %-9s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), primary );
+                log_write_raw ( 0, "%s %-9s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), primary );
             }
         }
 
@@ -186,9 +183,10 @@ int start_log( const char *primary, const char *secondary, int key )
          * If a recursive call, log it and return indicating no log
          */
 
-        if( mudstate.logging != 1 ) {
-            log_write_raw( 0, "Recursive logging request.\n" );
+        if ( mudstate.logging != 1 ) {
+            log_write_raw ( 0, "Recursive logging request.\n" );
         }
+
         return ( 1 );
     }
 
@@ -199,35 +197,34 @@ int start_log( const char *primary, const char *secondary, int key )
  * end_log: Finish up writing a log entry
  */
 
-void end_log( void )
+void end_log ( void )
 {
-    log_write_raw( 0, "\n" );
+    log_write_raw ( 0, "\n" );
 
-    if( log_fp != NULL ) {
-        fflush( log_fp );
+    if ( log_fp != NULL ) {
+        fflush ( log_fp );
     }
 
     mudstate.logging--;
 
-    if( mudstate.logging < 0 ) {
-        log_write_raw( 1, "Log was closed too many times (%d)\n", mudstate.logging );
+    if ( mudstate.logging < 0 ) {
+        log_write_raw ( 1, "Log was closed too many times (%d)\n", mudstate.logging );
         mudstate.logging = 0;
     }
-
 }
 
 /* ---------------------------------------------------------------------------
  * log_perror: Write perror message to the log
  */
 
-void log_perror( const char *primary, const char *secondary, const char *extra, const char *failing_object )
+void log_perror ( const char *primary, const char *secondary, const char *extra, const char *failing_object )
 {
     int my_errno = errno;
 
-    if( extra && *extra ) {
-        log_write( LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, strerror( my_errno ) );
+    if ( extra && *extra ) {
+        log_write ( LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, strerror ( my_errno ) );
     } else {
-        log_write( LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, strerror( my_errno ) );
+        log_write ( LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, strerror ( my_errno ) );
     }
 }
 
@@ -235,7 +232,7 @@ void log_perror( const char *primary, const char *secondary, const char *extra, 
  * log_write: Format text and print to the log file.
  */
 
-void log_write( int key, const char *primary, const char *secondary, const char *format, ... )
+void log_write ( int key, const char *primary, const char *secondary, const char *format, ... )
 {
     va_list ap;
     char s[MBUF_SIZE];
@@ -246,113 +243,113 @@ void log_write( int key, const char *primary, const char *secondary, const char 
      * the logger...
      */
 
-    if( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log( primary, secondary, key ) ) {
-
-        va_start( ap, format );
-        vsnprintf( s, MBUF_SIZE - 1, format, ap );
-        va_end( ap );
+    if ( ( ( ( key ) & mudconf.log_options ) != 0 ) && start_log ( primary, secondary, key ) ) {
+        va_start ( ap, format );
+        vsnprintf ( s, MBUF_SIZE - 1, format, ap );
+        va_end ( ap );
 
         /*
          * Do we have a logfile to write to...
          */
 
-        if( ( log_fp != NULL ) ) {
-            fputs( s, log_fp );
+        if ( ( log_fp != NULL ) ) {
+            fputs ( s, log_fp );
         }
 
         /*
          * If we are starting up, log to stderr too..
          */
 
-        if( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
-            fputs( s, stderr );
+        if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+            fputs ( s, stderr );
         }
 
         end_log();
     }
-
 }
 
 /* ---------------------------------------------------------------------------
  * log_write_raw: Print text to the log or mainlog file.
  */
 
-void log_write_raw( int key, const char *format, ... )
+void log_write_raw ( int key, const char *format, ... )
 {
     va_list ap;
     char s[MBUF_SIZE];
-
     FILE *lfp;
 
-    if( key ) {
+    if ( key ) {
         lfp = mainlog_fp;
     } else {
         lfp = log_fp;
     }
 
-    va_start( ap, format );
-
-    vsnprintf( s, MBUF_SIZE -1, format, ap );
+    va_start ( ap, format );
+    vsnprintf ( s, MBUF_SIZE - 1, format, ap );
 
     /*
      * Do we have a logfile to write to...
      */
 
-    if( lfp != NULL ) {
-        fputs( s, lfp );
+    if ( lfp != NULL ) {
+        fputs ( s, lfp );
     }
 
     /*
      * If we are starting up, log to stderr too..
      */
 
-    if( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
-        fputs( s, stderr );
+    if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+        fputs ( s, stderr );
     }
 
-    va_end( ap );
+    va_end ( ap );
 }
 
 /* ---------------------------------------------------------------------------
  * log_getname : return the name of <target>. It is the responsibilty of
- * the caller to XFREE the created buffer.
+ * the caller to xfree the created buffer.
  */
 
-char *log_getname( dbref target, char *d )
+char *log_getname ( dbref target, char *d )
 {
     char *name, *s;
 
-    if( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
-        s = unparse_object( ( dbref ) GOD, target, 0 );
+    if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
+        s = unparse_object ( ( dbref ) GOD, target, 0 );
     } else {
-        s = unparse_object_numonly( target );
+        s = unparse_object_numonly ( target );
     }
 
-    name = XSTRDUP( strip_ansi( s ), d );
-
-    free_lbuf( s );
-
+    name = xstrdup ( strip_ansi ( s ), d );
+    free_lbuf ( s );
     return ( name );
 }
 
-char *log_gettype( dbref thing, char *d )
+char *log_gettype ( dbref thing, char *d )
 {
-    if( !Good_dbref( thing ) ) {
-        return( XSTRDUP( "??OUT-OF-RANGE??",d ) );
+    if ( !Good_dbref ( thing ) ) {
+        return ( xstrdup ( "??OUT-OF-RANGE??", d ) );
     }
-    switch( Typeof( thing ) ) {
+
+    switch ( Typeof ( thing ) ) {
     case TYPE_PLAYER:
-        return( XSTRDUP( "PLAYER",d ) );
+        return ( xstrdup ( "PLAYER", d ) );
+
     case TYPE_THING:
-        return( XSTRDUP( "THING",d ) );
+        return ( xstrdup ( "THING", d ) );
+
     case TYPE_ROOM:
-        return( XSTRDUP( "ROOM",d ) );
+        return ( xstrdup ( "ROOM", d ) );
+
     case TYPE_EXIT:
-        return( XSTRDUP( "EXIT",d ) );
+        return ( xstrdup ( "EXIT", d ) );
+
     case TYPE_GARBAGE:
-        return( XSTRDUP( "GARBAGE",d ) );
+        return ( xstrdup ( "GARBAGE", d ) );
+
     default:
-        return( XSTRDUP( "??ILLEGAL??",d ) );
+        return ( xstrdup ( "??ILLEGAL??", d ) );
     }
 }
 
@@ -361,64 +358,63 @@ char *log_gettype( dbref thing, char *d )
  * Log rotation.
  */
 
-void do_logrotate( dbref player, dbref cause, int key )
+void do_logrotate ( dbref player, dbref cause, int key )
 {
     LOGFILETAB *lp;
     char ts[SBUF_SIZE], *pname;
     char s[MBUF_SIZE];
-
-    mktimestamp(ts, SBUF_SIZE);
+    mktimestamp ( ts, SBUF_SIZE );
     mudstate.mudlognum++;
 
-    if( mainlog_fp == stderr ) {
-        notify( player, "Warning: can't rotate main log when logging to stderr." );
+    if ( mainlog_fp == stderr ) {
+        notify ( player, "Warning: can't rotate main log when logging to stderr." );
     } else {
-        fclose( mainlog_fp );
-        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
-        copy_file( mudconf.log_file, s, 1 );
-        logfile_init( mudconf.log_file );
+        fclose ( mainlog_fp );
+        snprintf ( s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
+        copy_file ( mudconf.log_file, s, 1 );
+        logfile_init ( mudconf.log_file );
     }
 
-    notify( player, "Logs rotated." );
-    pname = log_getname( player, "do_logrotate" );
-    log_write( LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum );
-    XFREE( pname, "do_logrotate" );
+    notify ( player, "Logs rotated." );
+    pname = log_getname ( player, "do_logrotate" );
+    log_write ( LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum );
+    xfree ( pname, "do_logrotate" );
 
     /*
      * Any additional special ones
      */
 
-    for( lp = logfds_table; lp->log_flag; lp++ ) {
-        if( lp->filename && lp->fileptr ) {
-            fclose( lp->fileptr );
-            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts );
-            copy_file( lp->filename, s, 1 );
-            lp->fileptr = fopen( lp->filename, "w" );
-            if( lp->fileptr ) {
-                setbuf( lp->fileptr, NULL );
+    for ( lp = logfds_table; lp->log_flag; lp++ ) {
+        if ( lp->filename && lp->fileptr ) {
+            fclose ( lp->fileptr );
+            snprintf ( s, MBUF_SIZE, "%s.%s", lp->filename, ts );
+            copy_file ( lp->filename, s, 1 );
+            lp->fileptr = fopen ( lp->filename, "w" );
+
+            if ( lp->fileptr ) {
+                setbuf ( lp->fileptr, NULL );
             }
         }
     }
 }
 
-void logfile_close( void )
+void logfile_close ( void )
 {
     LOGFILETAB *lp;
     char ts[SBUF_SIZE], s[MBUF_SIZE];
+    mktimestamp ( ts, SBUF_SIZE );
 
-    mktimestamp( ts, SBUF_SIZE);
-
-    for( lp = logfds_table; lp->log_flag; lp++ ) {
-        if( lp->filename && lp->fileptr ) {
-            fclose( lp->fileptr );
-            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts );
-            copy_file( lp->filename, s, 1 );
+    for ( lp = logfds_table; lp->log_flag; lp++ ) {
+        if ( lp->filename && lp->fileptr ) {
+            fclose ( lp->fileptr );
+            snprintf ( s, MBUF_SIZE, "%s.%s", lp->filename, ts );
+            copy_file ( lp->filename, s, 1 );
         }
     }
 
-    if( mainlog_fp != stderr ) {
-        fclose( mainlog_fp );
-        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
-        copy_file( mudconf.log_file, s, 1 );
+    if ( mainlog_fp != stderr ) {
+        fclose ( mainlog_fp );
+        snprintf ( s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
+        copy_file ( mudconf.log_file, s, 1 );
     }
 }

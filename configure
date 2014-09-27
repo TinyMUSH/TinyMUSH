@@ -858,10 +858,6 @@ with_mysql_libs
 with_pgsql_includes
 with_pgsql_libs
 with_sqlite3
-enable_lag_checking
-enable_time_checking
-enable_cpu_checking
-with_malloc_wrapper
 with_global_regs
 with_pname_length
 with_env_vars
@@ -1521,21 +1517,6 @@ Optional Features:
   --enable-module-comsys  Enable support for the comsys module [default=yes]
   --enable-module-mail    Enable support for the mail module [default=yes]
   --enable-module-dbsql   Enable support for the dbsql module [default=no]
-  --enable-lag-checking   Enable warnings that a certain command has exceeded
-                          a certain amount of wall-clock time to execute.
-                          Disable this if you have severe problems with
-                          computational resources on your host machine.
-                          [default=yes]
-  --enable-time-checking  Enable tracking of the amount of wall-clock time
-                          that individual objects are using. Disable this if
-                          you have severe problems with computational
-                          resources on your host machine. (This is assumed to
-                          be disabled if lag-checking is disabled)
-                          [default=yes]
-  --enable-cpu-checking   Enable CPU time reported with getrusage() instead of
-                          tracking wall-clock time for lag-checking and
-                          time-checking features. This is more accurate but
-                          also more computationally expensive. [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1575,15 +1556,6 @@ Optional Packages:
   --with-pgsql-libs       path to PostgreSQL libraries
   --with-sqlite3=[ARG]    use SQLite 3 library [default=yes], optionally
                           specify the prefix for sqlite3 library
-  --with-malloc-wrapper=[track|log]
-                          Enable use of wrapper macros for malloc(), free(),
-                          and related functions to do one of the following,
-                          which can help identify memory leaks: track -
-                          maintain a tagged list of memory allocated for
-                          purposes other than the buffer pool. (see @list
-                          raw_memory) log - print log messages when the
-                          function are called. This is spammy; try other
-                          debugging tools first.
   --with-global-regs=N    use N global registers (%q0-%q9,%qa-%qz) N must be a
                           number from 10 to 36. Set lower to conserve memory
                           if you don't need all the possible registers
@@ -14239,114 +14211,6 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable command lag detection support" >&5
-$as_echo_n "checking whether to enable command lag detection support... " >&6; }
-# Check whether --enable-lag-checking was given.
-if test "${enable_lag_checking+set}" = set; then :
-  enableval=$enable_lag_checking;
-  if test "x$enableval" = "xyes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-else
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  enable_lag_checking="yes"
-
-
-fi
-
-if test "x$enable_lag_checking" = "xno"; then :
-
-$as_echo "#define NO_LAG_CHECK 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable per-object time usage tracking" >&5
-$as_echo_n "checking whether to enable per-object time usage tracking... " >&6; }
-# Check whether --enable-time-checking was given.
-if test "${enable_time_checking+set}" = set; then :
-  enableval=$enable_time_checking;
-  if test "x$enableval" = "xyes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-else
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  enable_time_checking="yes"
-
-
-fi
-
-if test "x$enable_time_checking" = "xno"; then :
-
-$as_echo "#define NO_TIMECHECKING 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable cpu time checking" >&5
-$as_echo_n "checking whether to enable cpu time checking... " >&6; }
-# Check whether --enable-cpu-checking was given.
-if test "${enable_cpu_checking+set}" = set; then :
-  enableval=$enable_cpu_checking;
-  if test "x$enableval" = "xyes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-else
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  enable_cpu_checking="no"
-
-
-fi
-
-if test "x$enable_cpu_checking" = "xyes"; then :
-
-$as_echo "#define TRACK_USER_TIME 1" >>confdefs.h
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which malloc-wrapper macros to use" >&5
-$as_echo_n "checking which malloc-wrapper macros to use... " >&6; }
-
-# Check whether --with-malloc-wrapper was given.
-if test "${with_malloc_wrapper+set}" = set; then :
-  withval=$with_malloc_wrapper; if  test "x$withval" = "xtrack" ; then :
-
-$as_echo "#define RAW_MEMTRACKING 1" >>confdefs.h
-
-else
-  if  test "x$withval" = "xlog" ; then :
-
-$as_echo "#define TEST_MALLOC 1" >>confdefs.h
-
-else
-  with_malloc_wrapper="none"
-fi
-fi
-else
-  with_malloc_wrapper="none"
-
-fi
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking how many global registers to use" >&5
 $as_echo_n "checking how many global registers to use... " >&6; }
 
@@ -19506,13 +19370,6 @@ if test -z ; then :
                     Module Mail : %B$enable_module_mail%b
                    Module DBSQL : %B$enable_module_dbsql%b with driver %B$with_module_dbsql%b
 
-                           %BMisc
--------------------------------%b
-          Command lag detection : %B$enable_lag_checking%b
- Per-object time usage tracking : %B$enable_time_checking%b
-              CPU time checking : %B$enable_cpu_checking%b
-                 Malloc Wrapper : %B$with_malloc_wrapper%b
-
 If everything is ok, you can now type %Bmake install%b to install the engine."
 else
   ${ac_aux_dir}/shtool echo -e "
@@ -19550,13 +19407,6 @@ else
                   Module ComSYS : %B$enable_module_comsys%b
                     Module Mail : %B$enable_module_mail%b
                    Module DBSQL : %B$enable_module_dbsql%b with driver %B$with_module_dbsql%b
-
-                           %BMisc
--------------------------------%b
-          Command lag detection : %B$enable_lag_checking%b
- Per-object time usage tracking : %B$enable_time_checking%b
-              CPU time checking : %B$enable_cpu_checking%b
-                 Malloc Wrapper : %B$with_malloc_wrapper%b
 
 If everything is ok, you can now type %Bmake install%b to install the engine.: %B%b"
 fi

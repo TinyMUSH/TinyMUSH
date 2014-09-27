@@ -98,6 +98,17 @@ guest_char_num		16
 # pueblo_message	</xch_mudtext><img xch_mode=html><tt>
 # pueblo_version	This world is Pueblo 1.0 enhanced
 #
+# -- Lag and usage time settings
+#
+# lag_check		yes
+# lag_check_clk		yes
+# lag_check_cpu		yes
+#
+# -- Memory Allocation Tracking
+#
+# malloc_tracker	no
+# malloc_logger		no
+#
 # -- Define other local aliases/parameters/whatnot here.
 #
 #

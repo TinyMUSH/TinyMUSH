@@ -31,80 +31,71 @@ or obtained by writing to the Free Software Foundation, Inc.,
 #include "lt__private.h"
 #include "lt_error.h"
 
-static const char	*last_error	= 0;
-static const char	error_strings[LT_ERROR_MAX][LT_ERROR_LEN_MAX + 1] =
-  {
-#define LT_ERROR(name, diagnostic)	diagnostic,
+static const char   *last_error = 0;
+static const char   error_strings[LT_ERROR_MAX][LT_ERROR_LEN_MAX + 1] = {
+#define LT_ERROR(name, diagnostic)  diagnostic,
     lt_dlerror_table
 #undef LT_ERROR
-  };
+};
 
-static	const char    **user_error_strings	= 0;
-static	int		errorcount		= LT_ERROR_MAX;
+static  const char    **user_error_strings  = 0;
+static  int     errorcount      = LT_ERROR_MAX;
 
 int
-lt_dladderror (const char *diagnostic)
+lt_dladderror ( const char *diagnostic )
 {
-  int		errindex = 0;
-  int		result	 = -1;
-  const char  **temp     = (const char **) 0;
+    int       errindex = 0;
+    int       result   = -1;
+    const char  **temp     = ( const char ** ) 0;
+    assert ( diagnostic );
+    errindex = errorcount - LT_ERROR_MAX;
+    temp = REALLOC ( const char *, user_error_strings, 1 + errindex );
 
-  assert (diagnostic);
-
-  errindex = errorcount - LT_ERROR_MAX;
-  temp = REALLOC (const char *, user_error_strings, 1 + errindex);
-  if (temp)
-    {
-      user_error_strings		= temp;
-      user_error_strings[errindex]	= diagnostic;
-      result				= errorcount++;
+    if ( temp ) {
+        user_error_strings        = temp;
+        user_error_strings[errindex]  = diagnostic;
+        result                = errorcount++;
     }
 
-  return result;
+    return result;
 }
 
 int
-lt_dlseterror (int errindex)
+lt_dlseterror ( int errindex )
 {
-  int		errors	 = 0;
+    int       errors   = 0;
 
-  if (errindex >= errorcount || errindex < 0)
-    {
-      /* Ack!  Error setting the error message! */
-      LT__SETERROR (INVALID_ERRORCODE);
-      ++errors;
-    }
-  else if (errindex < LT_ERROR_MAX)
-    {
-      /* No error setting the error message! */
-      LT__SETERRORSTR (error_strings[errindex]);
-    }
-  else
-    {
-      /* No error setting the error message! */
-      LT__SETERRORSTR (user_error_strings[errindex - LT_ERROR_MAX]);
+    if ( errindex >= errorcount || errindex < 0 ) {
+        /* Ack!  Error setting the error message! */
+        LT__SETERROR ( INVALID_ERRORCODE );
+        ++errors;
+    } else if ( errindex < LT_ERROR_MAX ) {
+        /* No error setting the error message! */
+        LT__SETERRORSTR ( error_strings[errindex] );
+    } else {
+        /* No error setting the error message! */
+        LT__SETERRORSTR ( user_error_strings[errindex - LT_ERROR_MAX] );
     }
 
-  return errors;
+    return errors;
 }
 
 const char *
-lt__error_string (int errorcode)
+lt__error_string ( int errorcode )
 {
-  assert (errorcode >= 0);
-  assert (errorcode < LT_ERROR_MAX);
-
-  return error_strings[errorcode];
+    assert ( errorcode >= 0 );
+    assert ( errorcode < LT_ERROR_MAX );
+    return error_strings[errorcode];
 }
 
 const char *
-lt__get_last_error (void)
+lt__get_last_error ( void )
 {
-  return last_error;
+    return last_error;
 }
 
 const char *
-lt__set_last_error (const char *errormsg)
+lt__set_last_error ( const char *errormsg )
 {
-  return last_error = errormsg;
+    return last_error = errormsg;
 }

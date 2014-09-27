@@ -7,7 +7,7 @@
 
 #define SQL_DRIVER "mSQL"
 
-#include <msql.h>		/* required by code */
+#include <msql.h>       /* required by code */
 
 /* See db_sql.h for details of what each of these functions do. */
 
@@ -81,13 +81,13 @@ static sqlite3 *sqlite3_struct = NULL;
 #endif
 
 typedef struct {
-	char	*host;		/* IP address of SQL database */
-	char	*db;		/* Database to use */
-	char	*username;	/* Username for database */
-	char	*password;	/* Password for database */
-	int	reconnect;	/* Auto-reconnect if connection dropped? */
-	int	port;		/* Port of SQL database */
-	int	socket;		/* Socket fd for SQL database connection */
+    char    *host;      /* IP address of SQL database */
+    char    *db;        /* Database to use */
+    char    *username;  /* Username for database */
+    char    *password;  /* Password for database */
+    int reconnect;  /* Auto-reconnect if connection dropped? */
+    int port;       /* Port of SQL database */
+    int socket;     /* Socket fd for SQL database connection */
 } mod_db_sql_confstorage;
 
 extern mod_db_sql_confstorage mod_db_sql_config;

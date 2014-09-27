@@ -36,21 +36,21 @@ or obtained by writing to the Free Software Foundation, Inc.,
    collisions when the loader code is statically linked into libltdl.
    Use the "<module_name>_LTX_" prefix so that the symbol addresses can
    be fetched from the preloaded symbol list by lt_dlsym():  */
-#define get_vtable	shl_load_LTX_get_vtable
+#define get_vtable  shl_load_LTX_get_vtable
 
 LT_BEGIN_C_DECLS
-LT_SCOPE lt_dlvtable *get_vtable (lt_user_data loader_data);
+LT_SCOPE lt_dlvtable *get_vtable ( lt_user_data loader_data );
 LT_END_C_DECLS
 
 
 /* Boilerplate code to set up the vtable for hooking this loader into
    libltdl's loader list:  */
-static int	 vl_exit  (lt_user_data loader_data);
-static lt_module vm_open  (lt_user_data loader_data, const char *filename,
-                           lt_dladvise advise);
-static int	 vm_close (lt_user_data loader_data, lt_module module);
-static void *	 vm_sym   (lt_user_data loader_data, lt_module module,
-			  const char *symbolname);
+static int   vl_exit  ( lt_user_data loader_data );
+static lt_module vm_open  ( lt_user_data loader_data, const char *filename,
+                            lt_dladvise advise );
+static int   vm_close ( lt_user_data loader_data, lt_module module );
+static void *    vm_sym   ( lt_user_data loader_data, lt_module module,
+                            const char *symbolname );
 
 static lt_dlvtable *vtable = 0;
 
@@ -58,31 +58,28 @@ static lt_dlvtable *vtable = 0;
    attributes (plus the virtual function implementations, obviously)
    change between loaders.  */
 lt_dlvtable *
-get_vtable (lt_user_data loader_data)
+get_vtable ( lt_user_data loader_data )
 {
-  if (!vtable)
-    {
-      vtable = lt__zalloc (sizeof *vtable);
+    if ( !vtable ) {
+        vtable = lt__zalloc ( sizeof * vtable );
     }
 
-  if (vtable && !vtable->name)
-    {
-      vtable->name		= "lt_shl_load";
-      vtable->module_open	= vm_open;
-      vtable->module_close	= vm_close;
-      vtable->find_sym		= vm_sym;
-      vtable->dlloader_exit	= vl_exit;
-      vtable->dlloader_data	= loader_data;
-      vtable->priority		= LT_DLLOADER_APPEND;
+    if ( vtable && !vtable->name ) {
+        vtable->name      = "lt_shl_load";
+        vtable->module_open   = vm_open;
+        vtable->module_close  = vm_close;
+        vtable->find_sym      = vm_sym;
+        vtable->dlloader_exit = vl_exit;
+        vtable->dlloader_data = loader_data;
+        vtable->priority      = LT_DLLOADER_APPEND;
     }
 
-  if (vtable && (vtable->dlloader_data != loader_data))
-    {
-      LT__SETERROR (INIT_LOADER);
-      return 0;
+    if ( vtable && ( vtable->dlloader_data != loader_data ) ) {
+        LT__SETERROR ( INIT_LOADER );
+        return 0;
     }
 
-  return vtable;
+    return vtable;
 }
 
 
@@ -102,121 +99,111 @@ get_vtable (lt_user_data loader_data)
  * BIND_DEFERRED   - Delay code symbol resolution until actual reference.
  *
  * Optionally:
- * BIND_FIRST	   - Place the library at the head of the symbol search
- * 		     order.
+ * BIND_FIRST      - Place the library at the head of the symbol search
+ *           order.
  * BIND_NONFATAL   - The default BIND_IMMEDIATE behavior is to treat all
- * 		     unsatisfied symbols as fatal.  This flag allows
- * 		     binding of unsatisfied code symbols to be deferred
- * 		     until use.
- *		     [Perl: For certain libraries, like DCE, deferred
- *		     binding often causes run time problems. Adding
- *		     BIND_NONFATAL to BIND_IMMEDIATE still allows
- *		     unresolved references in situations like this.]
- * BIND_NOSTART	   - Do not call the initializer for the shared library
- *		     when the library is loaded, nor on a future call to
- *		     shl_unload().
- * BIND_VERBOSE	   - Print verbose messages concerning possible
- *		     unsatisfied symbols.
+ *           unsatisfied symbols as fatal.  This flag allows
+ *           binding of unsatisfied code symbols to be deferred
+ *           until use.
+ *           [Perl: For certain libraries, like DCE, deferred
+ *           binding often causes run time problems. Adding
+ *           BIND_NONFATAL to BIND_IMMEDIATE still allows
+ *           unresolved references in situations like this.]
+ * BIND_NOSTART    - Do not call the initializer for the shared library
+ *           when the library is loaded, nor on a future call to
+ *           shl_unload().
+ * BIND_VERBOSE    - Print verbose messages concerning possible
+ *           unsatisfied symbols.
  *
  * hp9000s700/hp9000s800:
  * BIND_RESTRICTED - Restrict symbols visible by the library to those
- *		     present at library load time.
- * DYNAMIC_PATH	   - Allow the loader to dynamically search for the
- *		     library specified by the path argument.
+ *           present at library load time.
+ * DYNAMIC_PATH    - Allow the loader to dynamically search for the
+ *           library specified by the path argument.
  */
 
 #if !defined(DYNAMIC_PATH)
-#  define DYNAMIC_PATH		0
+#  define DYNAMIC_PATH      0
 #endif
 #if !defined(BIND_RESTRICTED)
-#  define BIND_RESTRICTED	0
+#  define BIND_RESTRICTED   0
 #endif
 
-#define	LT_BIND_FLAGS	(BIND_IMMEDIATE | BIND_NONFATAL | DYNAMIC_PATH)
+#define LT_BIND_FLAGS   (BIND_IMMEDIATE | BIND_NONFATAL | DYNAMIC_PATH)
 
 
 /* A function called through the vtable when this loader is no
    longer needed by the application.  */
 static int
-vl_exit (lt_user_data LT__UNUSED loader_data)
+vl_exit ( lt_user_data LT__UNUSED loader_data )
 {
-  vtable = NULL;
-  return 0;
+    vtable = NULL;
+    return 0;
 }
 
 /* A function called through the vtable to open a module with this
    loader.  Returns an opaque representation of the newly opened
    module for processing with this loader's other vtable functions.  */
 static lt_module
-vm_open (lt_user_data LT__UNUSED loader_data, const char *filename,
-         lt_dladvise LT__UNUSED advise)
+vm_open ( lt_user_data LT__UNUSED loader_data, const char *filename,
+          lt_dladvise LT__UNUSED advise )
 {
-  static shl_t self = (shl_t) 0;
-  lt_module module = shl_load (filename, LT_BIND_FLAGS, 0L);
+    static shl_t self = ( shl_t ) 0;
+    lt_module module = shl_load ( filename, LT_BIND_FLAGS, 0L );
 
-  /* Since searching for a symbol against a NULL module handle will also
-     look in everything else that was already loaded and exported with
-     the -E compiler flag, we always cache a handle saved before any
-     modules are loaded.  */
-  if (!self)
-    {
-      void *address;
-      shl_findsym (&self, "main", TYPE_UNDEFINED, &address);
+    /* Since searching for a symbol against a NULL module handle will also
+       look in everything else that was already loaded and exported with
+       the -E compiler flag, we always cache a handle saved before any
+       modules are loaded.  */
+    if ( !self ) {
+        void *address;
+        shl_findsym ( &self, "main", TYPE_UNDEFINED, &address );
     }
 
-  if (!filename)
-    {
-      module = self;
-    }
-  else
-    {
-      module = shl_load (filename, LT_BIND_FLAGS, 0L);
+    if ( !filename ) {
+        module = self;
+    } else {
+        module = shl_load ( filename, LT_BIND_FLAGS, 0L );
 
-      if (!module)
-	{
-	  LT__SETERROR (CANNOT_OPEN);
-	}
+        if ( !module ) {
+            LT__SETERROR ( CANNOT_OPEN );
+        }
     }
 
-  return module;
+    return module;
 }
 
 /* A function called through the vtable when a particular module
    should be unloaded.  */
 static int
-vm_close (lt_user_data LT__UNUSED loader_data, lt_module module)
+vm_close ( lt_user_data LT__UNUSED loader_data, lt_module module )
 {
-  int errors = 0;
+    int errors = 0;
 
-  if (module && (shl_unload ((shl_t) (module)) != 0))
-    {
-      LT__SETERROR (CANNOT_CLOSE);
-      ++errors;
+    if ( module && ( shl_unload ( ( shl_t ) ( module ) ) != 0 ) ) {
+        LT__SETERROR ( CANNOT_CLOSE );
+        ++errors;
     }
 
-  return errors;
+    return errors;
 }
 
 
 /* A function called through the vtable to get the address of
    a symbol loaded from a particular module.  */
 static void *
-vm_sym (lt_user_data LT__UNUSED loader_data, lt_module module, const char *name)
+vm_sym ( lt_user_data LT__UNUSED loader_data, lt_module module, const char *name )
 {
-  void *address = 0;
+    void *address = 0;
 
-  /* sys_shl_open should never return a NULL module handle */
-  if (module == (lt_module) 0)
-  {
-    LT__SETERROR (INVALID_HANDLE);
-  }
-  else if (!shl_findsym((shl_t*) &module, name, TYPE_UNDEFINED, &address))
-    {
-      if (!address)
-	{
-	  LT__SETERROR (SYMBOL_NOT_FOUND);
-	}
+    /* sys_shl_open should never return a NULL module handle */
+    if ( module == ( lt_module ) 0 ) {
+        LT__SETERROR ( INVALID_HANDLE );
+    } else if ( !shl_findsym ( ( shl_t* ) &module, name, TYPE_UNDEFINED, &address ) ) {
+        if ( !address ) {
+            LT__SETERROR ( SYMBOL_NOT_FOUND );
+        }
     }
 
-  return address;
+    return address;
 }

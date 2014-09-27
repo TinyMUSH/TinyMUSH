@@ -2,7 +2,7 @@
 
 #include "gdbmcopyright.h"
 
-#ifndef __GDBMSYSTEM_H   
+#ifndef __GDBMSYSTEM_H
 #define __GDBMSYSTEM_H
 
 #include "../../config.h"
@@ -51,11 +51,11 @@
 #if HAVE_FLOCK
 
 #ifndef LOCK_SH
-#define LOCK_SH	1
+#define LOCK_SH 1
 #endif
 
 #ifndef LOCK_EX
-#define LOCK_EX	2
+#define LOCK_EX 2
 #endif
 
 #ifndef LOCK_NB
@@ -75,29 +75,29 @@
 /* Assume it is done like System V. */
 
 #define UNLOCK_FILE(dbf) \
-	{					\
-	  struct flock flock;			\
-	  flock.l_type = F_UNLCK;		\
-	  flock.l_whence = SEEK_SET;		\
-	  flock.l_start = flock.l_len = 0L;	\
-	  fcntl (dbf->desc, F_SETLK, &flock);	\
-	}
+    {                   \
+      struct flock flock;           \
+      flock.l_type = F_UNLCK;       \
+      flock.l_whence = SEEK_SET;        \
+      flock.l_start = flock.l_len = 0L; \
+      fcntl (dbf->desc, F_SETLK, &flock);   \
+    }
 #define READLOCK_FILE(dbf) \
-	{					\
-	  struct flock flock;			\
-	  flock.l_type = F_RDLCK;		\
-	  flock.l_whence = SEEK_SET;			\
-	  flock.l_start = flock.l_len = 0L;	\
-	  lock_val = fcntl (dbf->desc, F_SETLK, &flock);	\
-	}
+    {                   \
+      struct flock flock;           \
+      flock.l_type = F_RDLCK;       \
+      flock.l_whence = SEEK_SET;            \
+      flock.l_start = flock.l_len = 0L; \
+      lock_val = fcntl (dbf->desc, F_SETLK, &flock);    \
+    }
 #define WRITELOCK_FILE(dbf) \
-	{					\
-	  struct flock flock;			\
-	  flock.l_type = F_WRLCK;		\
-	  flock.l_whence = SEEK_SET;			\
-	  flock.l_start = flock.l_len = 0L;	\
-	  lock_val = fcntl (dbf->desc, F_SETLK, &flock);	\
-	}
+    {                   \
+      struct flock flock;           \
+      flock.l_type = F_WRLCK;       \
+      flock.l_whence = SEEK_SET;            \
+      flock.l_start = flock.l_len = 0L; \
+      lock_val = fcntl (dbf->desc, F_SETLK, &flock);    \
+    }
 #endif
 
 /* Do we have bcopy?  */
@@ -105,7 +105,7 @@
 #if HAVE_MEMORY_H
 #include <memory.h>
 #endif
-#define bcmp(d1, d2, n)	memcmp(d1, d2, n)
+#define bcmp(d1, d2, n) memcmp(d1, d2, n)
 #define bcopy(d1, d2, n) memcpy(d2, d1, n)
 #endif
 
