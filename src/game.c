@@ -1,4 +1,11 @@
-/* game.c - main program and misc functions */
+/**
+ * \file game.c
+ * \brief main program and misc functions
+ *
+ * This is where all the magic start...
+ *
+ */
+         
 
 #include "copyright.h"
 #include "config.h"
@@ -2857,6 +2864,16 @@ int dbconvert ( int argc, char *argv[] )
     exit ( 0 );
 }
 
+
+/**
+ * \fn int main ( int argc, char *argv[] )
+ * \brief main entry point for TinyMUSH
+ *
+ * \param argc Number of arguments from command line
+ * \param argv Array of arguments from command line
+ * \return 0 if everything went well, anything else indicate that an error occured.
+ */
+      
 int main ( int argc, char *argv[] )
 {
     int mindb = 0;
