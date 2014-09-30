@@ -512,7 +512,7 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             }
 
             ltos ( tbuf, bot );
-            over = safe_str_fn ( tbuf, buff, bufc );
+            over = safe_str ( tbuf, buff, bufc );
             bot++;
         }
 
@@ -567,7 +567,7 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             }
 
             ltos ( tbuf, i );
-            over = safe_str_fn ( tbuf, buff, bufc );
+            over = safe_str ( tbuf, buff, bufc );
         }
     } else {
         for ( i = bot; ( i >= top ) && !over; i-- ) {
@@ -576,7 +576,7 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             }
 
             ltos ( tbuf, i );
-            over = safe_str_fn ( tbuf, buff, bufc );
+            over = safe_str ( tbuf, buff, bufc );
         }
     }
 }

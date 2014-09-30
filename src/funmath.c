@@ -21,10 +21,7 @@
 
 #include "functions.h"      /* required by code */
 
-/*
- * ---------------------------------------------------------------------------
- * fval: copy the floating point value into a buffer and make it presentable
- */
+
 
 #define FP_SIZE ((sizeof(double) + sizeof(unsigned int) - 1) / sizeof(unsigned int))
 #define FP_EXP_WEIRD    0x1
@@ -108,6 +105,11 @@ static unsigned int fp_check_weird ( char *buff, char **bufc, double result )
     return fp_exp;
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * fval: copy the floating point value into a buffer and make it presentable
+ */
+
 static void fval ( char *buff, char **bufc, double result )
 {
     char *p, *buf1;
@@ -124,8 +126,7 @@ static void fval ( char *buff, char **bufc, double result )
     }
 
     buf1 = *bufc;
-    safe_sprintf ( buff, bufc, "%.6f", result ); /* get double val into
-                             * buffer */
+    safe_sprintf ( buff, bufc, "%.6f", result ); /* get double val into buffer */
     **bufc = '\0';
     p = strrchr ( buf1, '0' );
 
@@ -179,7 +180,7 @@ void fun_e ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 void fun_sign ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL num;
+    double num;
     num = strtod ( fargs[0], ( char ** ) NULL );
 
     if ( num < 0 ) {
@@ -191,7 +192,7 @@ void fun_sign ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_abs ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL num;
+    double num;
     num = strtod ( fargs[0], ( char ** ) NULL );
 
     if ( num == 0 ) {
@@ -206,7 +207,7 @@ void fun_abs ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_floor ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     char *oldp;
-    NVAL x;
+    double x;
     oldp = *bufc;
     x = floor ( strtod ( fargs[0], ( char ** ) NULL ) );
 
@@ -235,7 +236,7 @@ void fun_floor ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 void fun_ceil ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     char *oldp;
-    NVAL x;
+    double x;
     oldp = *bufc;
     x = ceil ( strtod ( fargs[0], ( char ** ) NULL ) );
 
@@ -265,7 +266,7 @@ void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
     const char *fstr;
     char *oldp;
-    NVAL x;
+    double x;
     oldp = *bufc;
 
     switch ( ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) ) {
@@ -325,7 +326,7 @@ void fun_round ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_trunc ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL x;
+    double x;
     x = strtod ( fargs[0], ( char ** ) NULL );
     x = ( x >= 0 ) ? floor ( x ) : ceil ( x );
 
@@ -355,7 +356,7 @@ void fun_dec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_sqrt ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL val;
+    double val;
     val = strtod ( fargs[0], ( char ** ) NULL );
 
     if ( val < 0 ) {
@@ -374,7 +375,7 @@ void fun_exp ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_ln ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL val;
+    double val;
     val = strtod ( fargs[0], ( char ** ) NULL );
 
     if ( val > 0 ) {
@@ -386,7 +387,7 @@ void fun_ln ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void handle_trig ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL val;
+    double val;
     int oper, flag;
     static double ( *const trig_funcs[8] ) ( double ) = {
         sin, cos, tan, NULL,    /* XXX no cotangent function */
@@ -601,7 +602,7 @@ void fun_neq ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_ncomp ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL x, y;
+    double x, y;
     x = strtod ( fargs[0], ( char ** ) NULL );
     y = strtod ( fargs[1], ( char ** ) NULL );
 
@@ -699,7 +700,7 @@ void fun_floordiv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 void fun_fdiv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL bot;
+    double bot;
     bot = strtod ( fargs[1], ( char ** ) NULL );
 
     if ( bot == 0 ) {
@@ -773,7 +774,7 @@ void fun_remainder ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 
 void fun_power ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL val1, val2;
+    double val1, val2;
     val1 = strtod ( fargs[0], ( char ** ) NULL );
     val2 = strtod ( fargs[1], ( char ** ) NULL );
 
@@ -786,7 +787,7 @@ void fun_power ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_log ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL val, base;
+    double val, base;
     VaChk_Range ( 1, 2 );
     val = strtod ( fargs[0], ( char ** ) NULL );
 
@@ -842,7 +843,7 @@ void fun_bnand ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_add ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL sum;
+    double sum;
     int i;
 
     if ( nfargs < 2 ) {
@@ -862,7 +863,7 @@ void fun_add ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_mul ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL prod;
+    double prod;
     int i;
 
     if ( nfargs < 2 ) {
@@ -883,7 +884,7 @@ void fun_mul ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_max ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     int i;
-    NVAL max, val;
+    double max, val;
 
     if ( nfargs < 1 ) {
         safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
@@ -902,7 +903,7 @@ void fun_max ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_min ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     int i;
-    NVAL min, val;
+    double min, val;
 
     if ( nfargs < 1 ) {
         safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
@@ -925,7 +926,7 @@ void fun_min ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_bound ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL min, max, val;
+    double min, max, val;
     char *cp;
     VaChk_Range ( 1, 3 );
     val = strtod ( fargs[0], ( char ** ) NULL );
@@ -994,7 +995,7 @@ void fun_dist3d ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_ladd ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL sum;
+    double sum;
     char *cp, *curr;
     Delim isep;
 
@@ -1017,7 +1018,7 @@ void fun_ladd ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_lmax ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL max, val;
+    double max, val;
     char *cp, *curr;
     Delim isep;
     VaChk_Only_In ( 2 );
@@ -1042,7 +1043,7 @@ void fun_lmax ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_lmin ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    NVAL min, val;
+    double min, val;
     char *cp, *curr;
     Delim isep;
     VaChk_Only_In ( 2 );
@@ -1075,7 +1076,7 @@ void handle_vector ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 {
     char **v1;
     int n, i, oper;
-    NVAL tmp, res = 0;
+    double tmp, res = 0;
     Delim isep, osep;
     oper = Func_Mask ( VEC_OPER );
 
@@ -1144,7 +1145,7 @@ void handle_vectors ( char *buff, char **bufc, dbref player, dbref caller, dbref
     Delim isep, osep;
     int oper;
     char **v1, **v2;
-    NVAL scalar;
+    double scalar;
     int n, m, i, x, y;
     oper = Func_Mask ( VEC_OPER );
 

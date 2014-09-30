@@ -2988,9 +2988,8 @@ int main ( int argc, char *argv[] )
     init_functab();
     init_attrtab();
     init_version();
-    
     cf_read ( mudconf.config_file );
-    
+
     /*
      * Abort if someone tried to set the number of global registers to
      * something stupid. Also adjust the character table if we need to.
@@ -3006,22 +3005,22 @@ int main ( int argc, char *argv[] )
             qidx_chartab[122 - i] = -1;
         }
     }
-    
+
     if ( mudconf.hash_factor < 2 ) {
         mudconf.hash_factor = 2;
         fprintf ( stderr, "hash_factor increased to 2, fix your configuration to remove this warning.\n" );
     }
-    
+
     if ( mudconf.max_command_args < 10 ) {
         mudconf.max_command_args = 10;
         fprintf ( stderr, "max_command_arguments increased to 10, fix your configuration to remove this warning.\n" );
     }
-    
+
     if ( mudconf.player_name_length < 22 ) {
         mudconf.player_name_length = 22;
         fprintf ( stderr, "max_player_name_length increased to 22, fix your configuration to remove this warning.\n" );
     }
-    
+
     hashinit ( &mudstate.player_htab, 250 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.nref_htab, 5 * mudconf.hash_factor, HT_STR );
     nhashinit ( &mudstate.qpid_htab, 50 * mudconf.hash_factor );
@@ -3038,7 +3037,6 @@ int main ( int argc, char *argv[] )
     hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
-    
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
     mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
     mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );

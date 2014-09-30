@@ -2271,14 +2271,14 @@ void fun_delimit ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     nitems = list2arr ( &ptrs, LBUF_SIZE / 2, atext, &isep );
 
     if ( nitems ) {
-        over = safe_str_fn ( ptrs[0], buff, bufc );
+        over = safe_str ( ptrs[0], buff, bufc );
     }
 
     for ( i = 1; !over && ( i < nitems ); i++ ) {
-        over = safe_str_fn ( fargs[1], buff, bufc );
+        over = safe_str ( fargs[1], buff, bufc );
 
         if ( !over ) {
-            over = safe_str_fn ( ptrs[i], buff, bufc );
+            over = safe_str ( ptrs[i], buff, bufc );
         }
     }
 
@@ -3191,7 +3191,7 @@ void fun_popn ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 print_sep ( &osep, buff, bufc );
             }
 
-            over = safe_str_fn ( tp->data, buff, bufc );
+            over = safe_str ( tp->data, buff, bufc );
         }
 
         xp = tp;
@@ -3235,7 +3235,7 @@ void fun_lstack ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
             print_sep ( &osep, buff, bufc );
         }
 
-        over = safe_str_fn ( sp->data, buff, bufc );
+        over = safe_str ( sp->data, buff, bufc );
     }
 }
 

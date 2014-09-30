@@ -328,7 +328,7 @@ void queue_write ( DESC *d, const char *b, int n )
             if ( d->output_head == NULL ) {
                 d->output_tail = NULL;
             }
-            
+
             xfree ( tp->data, "queue_write.tp.data" );
             xfree ( tp, "queue_write.tp" );
         }
@@ -339,7 +339,7 @@ void queue_write ( DESC *d, const char *b, int n )
      */
 
     if ( d->output_head == NULL ) {
-        tp = ( TBLOCK *) xmalloc ( sizeof ( TBLOCK ), "queue_write.tp" );
+        tp = ( TBLOCK * ) xmalloc ( sizeof ( TBLOCK ), "queue_write.tp" );
         tp->data = xmalloc ( mudconf.output_block_size - sizeof ( TBLKHDR ), "queue_write.tp.data" );
         tp->hdr.nxt = NULL;
         tp->hdr.start = tp->data;
@@ -382,7 +382,7 @@ void queue_write ( DESC *d, const char *b, int n )
                 n -= left;
             }
 
-            tp = ( TBLOCK *) xmalloc ( sizeof ( TBLOCK ), "queue_write.2.tp" );
+            tp = ( TBLOCK * ) xmalloc ( sizeof ( TBLOCK ), "queue_write.2.tp" );
             tp->data = xmalloc ( mudconf.output_block_size - sizeof ( TBLKHDR ), "queue_write.2.tp.data" );
             tp->hdr.nxt = NULL;
             tp->hdr.start = tp->data;

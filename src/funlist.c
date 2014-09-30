@@ -1832,7 +1832,7 @@ static void tables_helper ( char *list, int *last_state, int n_cols, int col_wid
         }
 
         if ( lead_str ) {
-            over = safe_str_fn ( lead_str, buff, bufc );
+            over = safe_str ( lead_str, buff, bufc );
         }
 
         /*
@@ -1865,7 +1865,7 @@ static void tables_helper ( char *list, int *last_state, int n_cols, int col_wid
              */
 
             if ( lens[wcount] <= col_widths[cpos] ) {
-                over = safe_str_fn ( words[wcount], buff, bufc );
+                over = safe_str ( words[wcount], buff, bufc );
                 safe_str ( ansi_transition_esccode ( states[wcount
                                                      + 1], ANST_NONE ), buff, bufc );
             } else {
@@ -1938,7 +1938,7 @@ static void tables_helper ( char *list, int *last_state, int n_cols, int col_wid
             /*
              * Write the right margin.
              */
-            over = safe_str_fn ( trail_str, buff, bufc );
+            over = safe_str ( trail_str, buff, bufc );
         }
     }
 

@@ -83,8 +83,6 @@ struct object_grid {
     char             ***data;
 };
 
-typedef double  NVAL;
-
 /*
  * ---------------------------------------------------------------------------
  * Constants used in delimiter macros.
