@@ -21,56 +21,39 @@
 
 #include "ansi.h"       /* required by code */
 
-/* ---------------------------------------------------------------------------
- * ANSI character-to-number translation table.
+/** 
+ * \brief ANSI character-to-number translation table.
  */
 
 int ansi_nchartab[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, I_ANSI_BBLUE, I_ANSI_BCYAN,
-    0, 0, 0, I_ANSI_BGREEN,
-    0, 0, 0, 0,
-    0, I_ANSI_BMAGENTA, 0, 0,
-    0, 0, I_ANSI_BRED, 0,
-    0, 0, 0, I_ANSI_BWHITE,
-    I_ANSI_BBLACK, I_ANSI_BYELLOW, 0, 0,
-    0, 0, 0, 0,
-    0, 0, I_ANSI_BLUE, I_ANSI_CYAN,
-    0, 0, I_ANSI_BLINK, I_ANSI_GREEN,
-    I_ANSI_HILITE, I_ANSI_INVERSE, 0, 0,
-    0, I_ANSI_MAGENTA, I_ANSI_NORMAL, 0,
-    0, 0, I_ANSI_RED, 0,
-    0, I_ANSI_UNDER, 0, I_ANSI_WHITE,
-    I_ANSI_BLACK, I_ANSI_YELLOW, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, I_ANSI_BBLUE, I_ANSI_BCYAN, 0, 0, 0, I_ANSI_BGREEN, 0, 0, 0, 0, 0, I_ANSI_BMAGENTA, 0, 0,
+    0, 0, I_ANSI_BRED, 0, 0, 0, 0, I_ANSI_BWHITE, I_ANSI_BBLACK, I_ANSI_BYELLOW, 0, 0, 0, 0, 0, 0,
+    0, 0, I_ANSI_BLUE, I_ANSI_CYAN, 0, 0, I_ANSI_BLINK, I_ANSI_GREEN, I_ANSI_HILITE, I_ANSI_INVERSE, 
+    0, 0, 0, I_ANSI_MAGENTA, I_ANSI_NORMAL, 0, 0, 0, I_ANSI_RED, 0, 0, I_ANSI_UNDER, 0, I_ANSI_WHITE,
+    I_ANSI_BLACK, I_ANSI_YELLOW, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* ---------------------------------------------------------------------------
- * ANSI number-to-character translation table.
+/** 
+ * \brief ANSI number-to-character translation table.
  */
 
 char ansi_lettab[I_ANSI_NUM] = {
-    '\0', 'h', '\0', '\0', 'u', 'f', '\0', 'i',
+    '\0', 'h',  '\0', '\0', 'u',  'f', '\0',  'i',
     '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
     '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-    '\0', '\0', '\0', '\0', '\0', '\0', 'x', 'r',
-    'g', 'y', 'b', 'm', 'c', 'w', '\0', '\0',
-    'X', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'
+    '\0', '\0', '\0', '\0', '\0', '\0', 'x',  'r',
+    'g',  'y',  'b',  'm',  'c',  'w',  '\0', '\0',
+    'X',  'R',  'G',  'Y',  'B',  'M',  'C',  'W'
 };
 
-/* ---------------------------------------------------------------------------
- * ANSI packed state definitions -- number-to-bitmask translation table.
+/**
+ * \brief ANSI packed state definitions -- number-to-bitmask translation table.
  *
  * The mask specifies the state bits that are altered by a particular ansi
  * code. Bits are laid out as follows:
@@ -94,8 +77,8 @@ int ansi_mask_bits[I_ANSI_LIM] = {
     0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x0000, 0x0000
 };
 
-/* ---------------------------------------------------------------------------
- * ANSI packed state definitions -- number-to-bitvalue translation table.
+/**
+ * \brief ANSI packed state definitions -- number-to-bitvalue translation table.
  */
 
 int ansi_bits[I_ANSI_LIM] = {
@@ -1575,11 +1558,6 @@ int minmatch ( char *str, char *target, int min )
     return ( ( min <= 0 ) ? 1 : 0 );
 }
 
-/* ---------------------------------------------------------------------------
- * safe_strcat, safe_strncat, safe_chr_real_fn - Copy buffers,
- * watching for overflows.
- */
- 
 /**
  * \fn int safe_strcat ( const char *src, char *buff, char **bufp, int max )
  * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string. 
@@ -1857,7 +1835,12 @@ char *repeatchar ( int count, char ch, char *what )
     return str;
 }
 
-/* The following functions used to be macros in ansi.h */
+ /**
+ * \fn void skip_esccode ( char **s )
+ * \brief Move the pointer after an ansi escape sequence.
+ *
+ * \param s Pointer that need to be modified.
+ */
 
 void skip_esccode ( char **s )
 {
@@ -1877,6 +1860,14 @@ void skip_esccode ( char **s )
         ++ ( *s );
     }
 }
+
+ /**
+ * \fn void copy_esccode ( char **s, char **t )
+ * \brief Copy the ansi sequence into another pointer
+ *
+ * \param s Pointer containing the ansi sequence.
+ * \param t Pointer who will receive the ansi sequence.
+ */
 
 void copy_esccode ( char **s, char **t )
 {
@@ -1904,6 +1895,15 @@ void copy_esccode ( char **s, char **t )
         ++ ( *t );
     }
 }
+
+ /**
+ * \fn void safe_copy_esccode ( char **s, char *buff, char **bufc )
+ * \brief Copy the ansi sequence into another pointer, moving bufc to the end of the receiving buffer and watching for overflow.
+ *
+ * \param s Pointer containing the ansi sequence.
+ * \param buff Pointer to the receiving buffer.
+ * \param bufc Pointer to where the data will be copied into the receiving buffer.
+ */
 
 void safe_copy_esccode ( char **s, char *buff, char **bufc )
 {
