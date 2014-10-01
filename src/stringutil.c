@@ -1928,6 +1928,14 @@ void safe_copy_esccode ( char **s, char *buff, char **bufc )
     }
 }
 
+ /**
+ * \fn void track_esccode ( char **s, int *ansi_state )
+ * \brief Return the ansi state of an ansi sequence.
+ *
+ * \param s Pointer containing the ansi sequence.
+ * \param ansi_state The ansi state that need to be updated.
+ */
+
 void track_esccode ( char **s, int *ansi_state )
 {
     int ansi_mask = 0;
@@ -1968,6 +1976,14 @@ void track_esccode ( char **s, int *ansi_state )
     }
 }
 
+ /**
+ * \fn void track_all_esccodes ( char **s, char **p, int *ansi_state )
+ * \brief Scan a string buffer for ansi sequence and return the final ansi state.
+ *
+ * \param s Pointer containing the ansi sequence.
+ * \param p Pointer to the position in the string.
+ * \param ansi_state The ansi state that need to be updated.
+ */
 
 void track_all_esccodes ( char **s, char **p, int *ansi_state )
 {
@@ -1982,10 +1998,17 @@ void track_all_esccodes ( char **s, char **p, int *ansi_state )
     }
 }
 
+ /**
+ * \fn void track_ansi_letters ( char *t, int *ansi_state )
+ * \brief Convert mushcode to ansi state.
+ *
+ * \param t Pointer containing the ansi sequence.
+ * \param ansi_state The ansi state that need to be updated.
+ */
+
 void track_ansi_letters ( char *t, int *ansi_state )
 {
-    char *s, p;
-    int xterm_isbg = 0;
+    char *s;
     s = t;
 
     while ( *s ) {
