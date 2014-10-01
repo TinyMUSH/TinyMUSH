@@ -2438,7 +2438,7 @@ static void helper_cf_display ( dbref player, char *buff, char **bufc, CONF *tp 
             ( tp->interpreter == cf_int ) ||
             ( tp->interpreter == cf_int_factor ) ||
             ( tp->interpreter == cf_const ) ) {
-        safe_ltos ( buff, bufc, * ( tp->loc ) );
+        safe_ltos ( buff, bufc, * ( tp->loc ), LBUF_SIZE );
         return;
     }
 

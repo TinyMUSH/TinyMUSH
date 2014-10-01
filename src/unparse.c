@@ -218,7 +218,7 @@ static void unparse_boolexp1 ( dbref player, BOOLEXP *b, char outer_type, int fo
         if ( ap && ap->number ) {
             safe_str ( ( char * ) ap->name, boolexp_buf, &buftop );
         } else {
-            safe_ltos ( boolexp_buf, &buftop, b->thing );
+            safe_ltos ( boolexp_buf, &buftop, b->thing, LBUF_SIZE );
         }
 
         safe_chr ( sep_ch, boolexp_buf, &buftop );

@@ -181,7 +181,7 @@ static dbref absolute_nref ( char *str )
         *p = '\0';
     } else {
         bp = buf;
-        safe_ltos ( buf, &bp, Owner ( md.player ) );
+        safe_ltos ( buf, &bp, Owner ( md.player ), LBUF_SIZE );
         safe_chr ( '.', buf, &bp );
 
         for ( q = str; *q; q++ ) {

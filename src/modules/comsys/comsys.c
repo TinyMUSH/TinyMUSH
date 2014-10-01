@@ -358,7 +358,7 @@ static void com_message ( CHANNEL *chp, char *msg, dbref cause )
                         safe_name ( cause, msg_ns, &mp );
                         safe_chr ( '(', msg_ns, &mp );
                         safe_chr ( '#', msg_ns, &mp );
-                        safe_ltos ( msg_ns, &mp, cause );
+                        safe_ltos ( msg_ns, &mp, cause, LBUF_SIZE );
                         safe_chr ( ')', msg_ns, &mp );
 
                         if ( cause != Owner ( cause ) ) {
@@ -369,7 +369,7 @@ static void com_message ( CHANNEL *chp, char *msg, dbref cause )
 
                         if ( cause != mudstate.curr_enactor ) {
                             safe_known_str ( ( char * ) "<-(#", 4, msg_ns, &mp );
-                            safe_ltos ( msg_ns, &mp, cause );
+                            safe_ltos ( msg_ns, &mp, cause, LBUF_SIZE );
                             safe_chr ( ')', msg_ns, &mp );
                         }
 

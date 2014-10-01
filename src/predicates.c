@@ -2881,7 +2881,7 @@ void do_reference ( dbref player, dbref cause, int key, char *ref_name, char *ob
             }
 
             tp = tbuf;
-            safe_ltos ( tbuf, &tp, player );
+            safe_ltos ( tbuf, &tp, player, LBUF_SIZE );
             safe_chr ( '.', tbuf, &tp );
             *tp = '\0';
             len = strlen ( tbuf );
@@ -2949,7 +2949,7 @@ void do_reference ( dbref player, dbref cause, int key, char *ref_name, char *ob
             return;
         }
     } else {
-        safe_ltos ( tbuf, &tp, player );
+        safe_ltos ( tbuf, &tp, player, LBUF_SIZE );
         safe_chr ( '.', tbuf, &tp );
     }
 

@@ -698,7 +698,7 @@ void do_page ( dbref player, dbref cause, int key, char *tname, char *message )
                 safe_chr ( ' ', dbref_list, &ddp );
             }
 
-            safe_ltos ( dbref_list, &ddp, dbrefs_array[i] );
+            safe_ltos ( dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE );
         }
     }
 
@@ -736,12 +736,12 @@ void do_page ( dbref player, dbref cause, int key, char *tname, char *message )
      * * eliminated when the pagegroup is used.
      */
     dbref_list = ddp = alloc_lbuf ( "do_page.pagegroup" );
-    safe_ltos ( dbref_list, &ddp, player );
+    safe_ltos ( dbref_list, &ddp, player, LBUF_SIZE );
 
     for ( i = 0; i < n_dbrefs; i++ ) {
         if ( dbrefs_array[i] != NOTHING ) {
             safe_chr ( ' ', dbref_list, &ddp );
-            safe_ltos ( dbref_list, &ddp, dbrefs_array[i] );
+            safe_ltos ( dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE );
         }
     }
 

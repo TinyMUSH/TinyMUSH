@@ -941,7 +941,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     }
 
                     xtp = xtbuf;
-                    safe_ltos ( xtbuf, &xtp, player );
+                    safe_ltos ( xtbuf, &xtp, player, LBUF_SIZE );
                     /* safe_chr ( '.', xtbuf, &xtp ); */
                     safe_copy_chr ( '.', xtbuf, &xtp, SBUF_SIZE - 1 );
                     /* safe_chr ( ch, xtbuf, &xtp ); */
@@ -956,7 +956,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     }
 
                     xtp = xtbuf;
-                    safe_ltos ( xtbuf, &xtp, player );
+                    safe_ltos ( xtbuf, &xtp, player, LBUF_SIZE );
                     /* safe_chr ( '.', xtbuf, &xtp ); */
                     safe_copy_chr ( '.', xtbuf, &xtp, SBUF_SIZE - 1 );
 
@@ -1187,7 +1187,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
             case ':':   /* Enactor's objID */
                 safe_dbref ( buff, bufc, cause );
                 safe_chr ( ':', buff, bufc );
-                safe_ltos ( buff, bufc, CreateTime ( cause ) );
+                safe_ltos ( buff, bufc, CreateTime ( cause ), LBUF_SIZE );
                 break;
 
             case 'M':
@@ -1254,7 +1254,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                 break;
 
             case '+':   /* arguments to function */
-                safe_ltos ( buff, bufc, ncargs );
+                safe_ltos ( buff, bufc, ncargs, LBUF_SIZE );
                 break;
 
             case '|':   /* piped command output */
@@ -1564,9 +1564,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     safe_str ( mudstate.loop_token[mudstate.
                                                    in_loop - 1], buff, bufc );
                 } else if ( ( **dstr == '@' ) && mudstate.in_loop ) {
-                    safe_ltos ( buff, bufc,
-                                mudstate.loop_number[mudstate.
-                                                     in_loop - 1] );
+                    safe_ltos ( buff, bufc, mudstate.loop_number[mudstate. in_loop - 1], LBUF_SIZE );
                 } else if ( ( **dstr == '+' ) && mudstate.in_loop ) {
                     safe_str ( mudstate.loop_token2[mudstate.
                                                     in_loop - 1], buff, bufc );
@@ -1580,10 +1578,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                      * precedence over switch nesting
                      * level.
                      */
-                    safe_ltos ( buff, bufc,
-                                ( ( mudstate.in_loop ) ?
-                                  ( mudstate.in_loop - 1 ) :
-                                  mudstate.in_switch ) );
+                    safe_ltos ( buff, bufc, ( ( mudstate.in_loop ) ? ( mudstate.in_loop - 1 ) : mudstate.in_switch ), LBUF_SIZE );
                 } else {
                     ( *dstr )--;
                     safe_chr ( **dstr, buff, bufc );

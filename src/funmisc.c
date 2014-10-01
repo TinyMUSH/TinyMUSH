@@ -377,7 +377,7 @@ void fun_die ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         total += ( int ) random_range ( 1, die );
     }
 
-    safe_ltos ( buff, bufc, total );
+    safe_ltos ( buff, bufc, total, LBUF_SIZE );
 }
 
 
@@ -427,7 +427,7 @@ void fun_lrand ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 print_sep ( &osep, buff, bufc );
             }
 
-            safe_ltos ( buff, bufc, r_bot );
+            safe_ltos ( buff, bufc, r_bot, LBUF_SIZE );
         }
 
         return;
@@ -445,7 +445,7 @@ void fun_lrand ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
         }
 
         tmp = ( unsigned int ) Randomize ( n_range );
-        safe_ltos ( buff, bufc, r_bot + tmp );
+        safe_ltos ( buff, bufc, r_bot + tmp, LBUF_SIZE );
     }
 }
 
@@ -558,7 +558,7 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             print_sep ( &osep, buff, bufc );
         }
 
-        safe_ltos ( buff, bufc, bot );
+        safe_ltos ( buff, bufc, bot, LBUF_SIZE );
         return;
     } else if ( top > bot ) {
         for ( i = bot; ( i <= top ) && !over; i++ ) {
@@ -601,7 +601,7 @@ void fun_time ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_secs ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.now );
+    safe_ltos ( buff, bufc, mudstate.now, LBUF_SIZE );
 }
 
 /*
@@ -807,7 +807,7 @@ void fun_convtime ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     ttm = localtime ( &mudstate.now );
 
     if ( do_convtime ( fargs[0], ttm ) ) {
-        safe_ltos ( buff, bufc, mktime ( ttm ) );
+        safe_ltos ( buff, bufc, mktime ( ttm ), LBUF_SIZE );
     } else {
         safe_strncat ( buff, bufc, "-1", 2, LBUF_SIZE );
     }
@@ -1086,7 +1086,7 @@ void fun_etimefmt ( char *buff, char **bufc, dbref player, dbref caller, dbref c
                                        bufc );
                         }
                     } else {
-                        safe_ltos ( buff, bufc, n );
+                        safe_ltos ( buff, bufc, n, LBUF_SIZE );
 
                         if ( showsuffix ) {
                             safe_chr ( timec, buff,
@@ -1175,7 +1175,7 @@ void fun_starttime ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 
 void fun_restarts ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.reboot_nums );
+    safe_ltos ( buff, bufc, mudstate.reboot_nums, LBUF_SIZE );
 }
 
 /*
@@ -1239,7 +1239,7 @@ void fun_hasmodule ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 
 void fun_connrecord ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.record_players );
+    safe_ltos ( buff, bufc, mudstate.record_players, LBUF_SIZE );
 }
 
 /*
@@ -1249,22 +1249,22 @@ void fun_connrecord ( char *buff, char **bufc, dbref player, dbref caller, dbref
 
 void fun_fcount ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.func_invk_ctr );
+    safe_ltos ( buff, bufc, mudstate.func_invk_ctr, LBUF_SIZE );
 }
 
 void fun_fdepth ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.func_nest_lev );
+    safe_ltos ( buff, bufc, mudstate.func_nest_lev, LBUF_SIZE );
 }
 
 void fun_ccount ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.cmd_invk_ctr );
+    safe_ltos ( buff, bufc, mudstate.cmd_invk_ctr, LBUF_SIZE );
 }
 
 void fun_cdepth ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, mudstate.cmd_nest_lev );
+    safe_ltos ( buff, bufc, mudstate.cmd_nest_lev, LBUF_SIZE );
 }
 
 /*
@@ -1794,7 +1794,7 @@ static void list_qpids ( dbref player, dbref player_targ, dbref obj_targ, BQUE *
                 print_sep ( &SPACE_DELIM, buff, bufc );
             }
 
-            safe_ltos ( buff, bufc, tmp->pid );
+            safe_ltos ( buff, bufc, tmp->pid, LBUF_SIZE );
         }
     }
 }

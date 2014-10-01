@@ -691,7 +691,7 @@ char *remap_colors ( const char *s, int *cmap )
                     n = ( int ) strtol ( s, ( char ** ) NULL, 10 );
 
                     if ( ( n >= I_ANSI_BLACK ) && ( n < I_ANSI_NUM ) && ( cmap[n - I_ANSI_BLACK] != 0 ) ) {
-                        safe_ltos ( new, &bp, cmap[n - I_ANSI_BLACK] );
+                        safe_ltos ( new, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE );
 
                         while ( isdigit ( *s ) ) {
                             s++;
@@ -1712,8 +1712,6 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
  * \return 0 if the character was added, 1 if the string was already full.
  */
 
-
-//int safe_chr_real_fn ( char src, char *buff, char **bufp, int max )
 int safe_strcatchr(char *dest, char **destp, char src, size_t size)
 {
     char *tp;
@@ -1730,21 +1728,27 @@ int safe_strcatchr(char *dest, char **destp, char src, size_t size)
     }
 }
 
-/* ---------------------------------------------------------------------------
- * More utilities.
+ /**
+ * \fn int matches_exit_from_list ( char *exit_list, char *pattern )
+ * \brief Find if pattern is found in the exit list.
+ *
+ * \param exit_list Pointer to the list of names of an exit
+ * \param pattern Pointer to the pattern we are searching
+ *
+ * \return 1 if the pattern is in the list, 0 if not.
  */
 
-int matches_exit_from_list ( char *str, char *pattern )
+int matches_exit_from_list ( char *exit_list, char *pattern )
 {
     char *s;
 
-    if ( *str == '\0' ) {   /* never match empty */
+    if ( *exit_list == '\0' ) {   /* never match empty */
         return 0;
     }
 
     while ( *pattern ) {
         /* check out this one */
-        for ( s = str; ( *s && ( tolower ( *s ) == tolower ( *pattern ) ) && *pattern && ( *pattern != EXIT_DELIMITER ) ); s++, pattern++ );
+        for ( s = exit_list; ( *s && ( tolower ( *s ) == tolower ( *pattern ) ) && *pattern && ( *pattern != EXIT_DELIMITER ) ); s++, pattern++ );
 
         /* Did we match it all? */
 
@@ -1773,12 +1777,23 @@ int matches_exit_from_list ( char *str, char *pattern )
     return 0;
 }
 
-int ltos ( char *s, long num )
+ /**
+ * \fn char *ltos ( char *dest, long num )
+ * \brief Convert a long signed number into string.
+ *
+ * \param dest Pointer to the receiving buffer.
+ * \param num Number to convert.
+ *
+ * \return A pointer to the resulting string.
+ */
+
+char *ltos ( char *dest, long num )
 {
     /* Mark Vasoll's long int to string converter. */
-    char buf[20], *p;
+    char buf[20], *p, *destp;
     unsigned long anum;
     p = buf;
+    destp = dest;
     /* absolute value */
     anum = ( num < 0 ) ? -num : num;
 
@@ -1790,92 +1805,64 @@ int ltos ( char *s, long num )
 
     /* put in the sign if needed */
     if ( num < 0 ) {
-        *s++ = '-';
+        *dest++ = '-';
     }
 
     /* put in the last digit, this makes very fast single digits numbers */
-    *s++ = '0' + ( char ) anum;
+    *dest++ = '0' + ( char ) anum;
 
     /* reverse the rest of the digits (if any) into the provided buf */
     while ( p-- > buf ) {
-        *s++ = *p;
+        *dest++ = *p;
     }
 
     /* terminate the resulting string */
-    *s = '\0';
-    return 0;
+    *dest = '\0';
+    return (destp);
 }
 
-void safe_ltos ( char *s, char **bufc, long num )
-{
-    /* Mark Vasoll's long int to string converter. */
-    char buf[20], *p, *tp, *endp;
-    unsigned long anum;
-    p = buf;
-    tp = *bufc;
-    /* absolute value */
-    anum = ( num < 0 ) ? -num : num;
+ /**
+ * \fn void safe_ltos ( char *dest, char **destp, long num)
+ * \brief Convert a long signed number into string. Safe version.
+ *
+ * \param dest Pointer to the receiving buffer.
+ * \param destp Pointer to where the string will be written.
+ * \param num Number to convert.
+ * \param size Size of the receiving buffer.
+ */
 
-    /* build up the digits backwards by successive division */
-    while ( anum > 9 ) {
-        *p++ = '0' + ( anum % 10 );
-        anum /= 10;
-    }
-
-    if ( tp > s + LBUF_SIZE - 21 ) {
-        endp = s + LBUF_SIZE - 1;
-
-        /* put in the sign if needed */
-        if ( num < 0 && ( tp < endp ) ) {
-            *tp++ = '-';
-        }
-
-        /* put in the last digit, this makes very fast single digits numbers */
-        if ( tp < endp ) {
-            *tp++ = '0' + ( char ) anum;
-        }
-
-        /* reverse the rest of the digits (if any) into the provided buf */
-        while ( ( p-- > buf ) && ( tp < endp ) ) {
-            *tp++ = *p;
-        }
-    } else {
-        if ( num < 0 ) {
-            *tp++ = '-';
-        }
-
-        *tp++ = '0' + ( char ) anum;
-
-        while ( p-- > buf ) {
-            *tp++ = *p;
-        }
-    }
-
-    /* terminate the resulting string */
-    *tp = '\0';
-    *bufc = tp;
+void safe_ltos ( char *dest, char **destp, long num, size_t size) {
+    char buff[20];
+    
+    safe_strcat(dest, destp, ltos(buff, num), size);
 }
 
+ /**
+ * \fn char *repeatchar ( int count, char ch, char *what )
+ * \brief Return a string with 'count' number of 'ch' characters.
+ *
+ * It is the responsibility of the caller to free the resulting
+ * buffer.
+ *
+ * \param count Length of the string to build
+ * \param ch Character used to fill the string.
+ * \param what Identifier for xmalloc.
+ *
+ * \return A Pointer to the new string.
+ */
 
-char *repeatchar ( int count, char ch )
+char *repeatchar ( int count, char ch, char *what )
 {
     int num;
     char *str, *ptr;
 
-    if ( count < 1 ) {
-        /*
-         * If negative or zero spaces return a single character, -except-
-         * allow 'repeatchar(0)' to return "" for calculated padding
-         */
-        if ( count == 0 ) {
-            return NULL;
-        }
+    if ( count <= 0 ) {
+        return NULL;
     }
 
-    str = xmalloc ( count + 1, "repeatchar" );
-    /* Yes i'm a bit paranoid here... */
-    memset ( str, 0, count + 1 );
+    str = xmalloc ( count + 1, what );
     memset ( str, ch, count - 1 );
+    str[count] = '\0';
     return str;
 }
 

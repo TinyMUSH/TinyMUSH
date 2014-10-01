@@ -153,7 +153,7 @@ void fun_words ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     }
 
     VaChk_Only_In ( 2 );
-    safe_ltos ( buff, bufc, countwords ( fargs[0], &isep ) );
+    safe_ltos ( buff, bufc, countwords ( fargs[0], &isep ), LBUF_SIZE );
 }
 
 /*
@@ -321,7 +321,7 @@ void fun_match ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
         r = split_token ( &s, &isep );
 
         if ( quick_wild ( fargs[1], r ) ) {
-            safe_ltos ( buff, bufc, wcount );
+            safe_ltos ( buff, bufc, wcount, LBUF_SIZE );
             return;
         }
 
@@ -366,7 +366,7 @@ void fun_matchall ( char *buff, char **bufc, dbref player, dbref caller, dbref c
                 print_sep ( &osep, buff, bufc );
             }
 
-            safe_ltos ( buff, bufc, wcount );
+            safe_ltos ( buff, bufc, wcount, LBUF_SIZE );
         }
 
         wcount++;
@@ -850,7 +850,7 @@ void fun_member ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         r = split_token ( &s, &isep );
 
         if ( !strcmp ( fargs[1], r ) ) {
-            safe_ltos ( buff, bufc, wcount );
+            safe_ltos ( buff, bufc, wcount, LBUF_SIZE );
             return;
         }
 
@@ -1192,7 +1192,7 @@ void handle_sort ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 print_sep ( &osep, buff, bufc );
             }
 
-            safe_ltos ( buff, bufc, poslist[i] );
+            safe_ltos ( buff, bufc, poslist[i], LBUF_SIZE );
         }
     } else {
         arr2list ( ptrs, nitems, buff, bufc, &osep );

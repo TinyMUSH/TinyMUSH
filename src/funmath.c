@@ -346,12 +346,12 @@ void fun_trunc ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_inc ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) + 1 );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) + 1, LBUF_SIZE );
 }
 
 void fun_dec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) - 1 );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) - 1, LBUF_SIZE );
 }
 
 void fun_sqrt ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -654,7 +654,7 @@ void fun_div ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
     }
 
-    safe_ltos ( buff, bufc, top );
+    safe_ltos ( buff, bufc, top, LBUF_SIZE );
 }
 
 void fun_floordiv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -694,7 +694,7 @@ void fun_floordiv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         }
     }
 
-    safe_ltos ( buff, bufc, res );
+    safe_ltos ( buff, bufc, res, LBUF_SIZE );
 }
 
 void fun_fdiv ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -737,7 +737,7 @@ void fun_modulo ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
     }
 
-    safe_ltos ( buff, bufc, top );
+    safe_ltos ( buff, bufc, top, LBUF_SIZE );
 }
 
 void fun_remainder ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -768,7 +768,7 @@ void fun_remainder ( char *buff, char **bufc, dbref player, dbref caller, dbref 
         }
     }
 
-    safe_ltos ( buff, bufc, top );
+    safe_ltos ( buff, bufc, top, LBUF_SIZE );
 }
 
 void fun_power ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -812,27 +812,27 @@ void fun_log ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_shl ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) << ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) << ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ), LBUF_SIZE );
 }
 
 void fun_shr ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) >> ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) >> ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ), LBUF_SIZE );
 }
 
 void fun_band ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ), LBUF_SIZE );
 }
 
 void fun_bor ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) | ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) | ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ), LBUF_SIZE );
 }
 
 void fun_bnand ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ~ ( ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) ) );
+    safe_ltos ( buff, bufc, ( int ) strtol ( fargs[0], ( char ** ) NULL, 10 ) & ~ ( ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) ), LBUF_SIZE );
 }
 
 /*
@@ -970,7 +970,7 @@ void fun_dist2d ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     d = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[3], ( char ** ) NULL, 10 );
     r += ( double ) ( d * d );
     d = ( int ) ( sqrt ( r ) + 0.5 );
-    safe_ltos ( buff, bufc, d );
+    safe_ltos ( buff, bufc, d, LBUF_SIZE );
 }
 
 void fun_dist3d ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -984,7 +984,7 @@ void fun_dist3d ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     d = ( int ) strtol ( fargs[2], ( char ** ) NULL, 10 ) - ( int ) strtol ( fargs[5], ( char ** ) NULL, 10 );
     r += ( double ) ( d * d );
     d = ( int ) ( sqrt ( r ) + 0.5 );
-    safe_ltos ( buff, bufc, d );
+    safe_ltos ( buff, bufc, d, LBUF_SIZE );
 }
 
 /*

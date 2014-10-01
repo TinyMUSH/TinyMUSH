@@ -2278,7 +2278,7 @@ void make_ulist ( dbref player, char *buff, char **bufc )
         }
 
         safe_chr ( '#', buff, bufc );
-        safe_ltos ( buff, bufc, d->player );
+        safe_ltos ( buff, bufc, d->player, LBUF_SIZE );
     }
 }
 

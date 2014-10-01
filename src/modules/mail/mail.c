@@ -3842,7 +3842,7 @@ void fun_mail ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     if ( ( nfargs == 0 ) || !fargs[0] || !fargs[0][0] ) {
         count_mail ( player, 0, &rc, &uc, &cc );
-        safe_ltos ( buff, bufc, rc + uc );
+        safe_ltos ( buff, bufc, rc + uc, LBUF_SIZE );
         return;
     }
 

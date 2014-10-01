@@ -54,7 +54,7 @@ void fun_objid ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if ( Good_obj ( it ) ) {
         safe_dbref ( buff, bufc, it );
         safe_chr ( ':', buff, bufc );
-        safe_ltos ( buff, bufc, CreateTime ( it ) );
+        safe_ltos ( buff, bufc, CreateTime ( it ), LBUF_SIZE );
     } else {
         safe_nothing ( buff, bufc );
     }
@@ -538,8 +538,7 @@ void fun_elockstr ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         } else if ( Pass_Locks ( actor_obj ) ) {
             safe_chr ( '1', buff, bufc );
         } else {
-            safe_ltos ( buff, bufc, eval_boolexp ( actor_obj,
-                                                   locked_obj, locked_obj, okey ) );
+            safe_ltos ( buff, bufc, eval_boolexp ( actor_obj, locked_obj, locked_obj, okey ), LBUF_SIZE );
         }
 
         free_boolexp ( okey );
@@ -850,7 +849,7 @@ void fun_money ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if ( !Good_obj ( it ) || !Examinable ( player, it ) ) {
         safe_nothing ( buff, bufc );
     } else {
-        safe_ltos ( buff, bufc, Pennies ( it ) );
+        safe_ltos ( buff, bufc, Pennies ( it ), LBUF_SIZE );
     }
 }
 
@@ -1257,11 +1256,7 @@ void handle_timestamp ( char *buff, char **bufc, dbref player, dbref caller, dbr
     if ( !Good_obj ( it ) || !Examinable ( player, it ) ) {
         safe_strncat ( buff, bufc, "-1", 2, LBUF_SIZE );
     } else {
-        safe_ltos ( buff, bufc,
-                    Is_Func ( TIMESTAMP_MOD ) ?
-                    ModTime ( it ) :
-                    ( Is_Func ( TIMESTAMP_ACC ) ? AccessTime ( it ) :
-                      CreateTime ( it ) ) );
+        safe_ltos ( buff, bufc, Is_Func ( TIMESTAMP_MOD ) ? ModTime ( it ) : ( Is_Func ( TIMESTAMP_ACC ) ? AccessTime ( it ) : CreateTime ( it ) ), LBUF_SIZE );
     }
 }
 
@@ -2352,7 +2347,7 @@ void handle_lattr ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         }
 
         if ( count_only ) {
-            safe_ltos ( buff, bufc, total );
+            safe_ltos ( buff, bufc, total, LBUF_SIZE );
         }
     } else {
         if ( !mudconf.lattr_oldstyle ) {
@@ -2514,7 +2509,7 @@ void fun_objmem ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     dbref thing;
 
     if ( strchr ( fargs[0], '/' ) ) {
-        safe_ltos ( buff, bufc, mem_usage_attr ( player, fargs[0] ) );
+        safe_ltos ( buff, bufc, mem_usage_attr ( player, fargs[0] ), LBUF_SIZE );
         return;
     }
 
@@ -2525,7 +2520,7 @@ void fun_objmem ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         return;
     }
 
-    safe_ltos ( buff, bufc, mem_usage ( thing ) );
+    safe_ltos ( buff, bufc, mem_usage ( thing ), LBUF_SIZE );
 }
 
 void fun_playmem ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
@@ -2546,7 +2541,7 @@ void fun_playmem ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         tot += mem_usage ( j );
     }
 
-    safe_ltos ( buff, bufc, tot );
+    safe_ltos ( buff, bufc, tot, LBUF_SIZE );
 }
 
 /*

@@ -264,8 +264,8 @@ extern char *safe_strncat(char *, char **, const char *, size_t , size_t );
 extern int safe_strcatchr(char *, char **, char, size_t);
 extern int  matches_exit_from_list ( char *, char * );
 extern char    *translate_string ( char *, int );
-extern int  ltos ( char *, long );
-extern void safe_ltos ( char *, char **, long );
+extern char *ltos ( char *, long );
+extern void safe_ltos ( char *, char **, long, size_t );
 extern char    *repeatchar ( int, char );
 extern char    *strip_ansi ( const char * );
 extern char    *strip_xterm ( char * );
@@ -824,7 +824,6 @@ scl__dest[scl__len] = '\0';
 #define safe_bool(b,p,n)    safe_chr(((n) ? '1' : '0'),(b),(p))
 
 #define safe_dbref(b,p,n) \
-safe_chr('#',(b),(p)); \
-safe_ltos((b),(p),(n));
+safe_chr('#',(b),(p)); safe_ltos((b),(p),(n), LBUF_SIZE);
 
 #endif  /* __EXTERNS_H */

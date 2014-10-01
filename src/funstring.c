@@ -1584,7 +1584,7 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         t = strchr ( s, *b );
 
         if ( t ) {
-            safe_ltos ( buff, bufc, ( int ) ( t - s + 1 ) );
+            safe_ltos ( buff, bufc, ( int ) ( t - s + 1 ), LBUF_SIZE );
         } else {
             safe_nothing ( buff, bufc );
         }
@@ -1601,7 +1601,7 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
 
         if ( *t == '\0' ) {
-            safe_ltos ( buff, bufc, i );
+            safe_ltos ( buff, bufc, i, LBUF_SIZE );
             return;
         }
 
@@ -1648,7 +1648,7 @@ void fun_lpos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 print_sep ( &osep, buff, bufc );
             }
 
-            safe_ltos ( buff, bufc, i );
+            safe_ltos ( buff, bufc, i, LBUF_SIZE );
         }
     }
 
@@ -1676,12 +1676,12 @@ void fun_diffpos ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
 
         if ( *s1 != *s2 ) {
-            safe_ltos ( buff, bufc, i );
+            safe_ltos ( buff, bufc, i, LBUF_SIZE );
             return;
         }
     }
 
-    safe_ltos ( buff, bufc, -1 );
+    safe_ltos ( buff, bufc, -1, LBUF_SIZE );
 }
 
 /*
@@ -1712,7 +1712,7 @@ void fun_wordpos ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
             xp = split_token ( &cp, &isep );
         }
 
-        safe_ltos ( buff, bufc, i );
+        safe_ltos ( buff, bufc, i, LBUF_SIZE );
         return;
     }
 
@@ -2762,7 +2762,7 @@ void fun_join ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_strlen ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_ltos ( buff, bufc, strip_ansi_len ( fargs[0] ) );
+    safe_ltos ( buff, bufc, strip_ansi_len ( fargs[0] ), LBUF_SIZE );
 }
 
 void fun_delete ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )

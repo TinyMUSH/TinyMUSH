@@ -52,9 +52,9 @@ void do_version ( dbref player, dbref cause, int extra )
     }
 
     sprintf ( string, "%s (%s)", string, PACKAGE_RELEASE_DATE );
-    ptr = repeatchar ( strlen ( string ), '-' );
+    ptr = repeatchar ( strlen ( string ), '-' , "do_version" );
     notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr );
-    xfree ( ptr, "repeatchar" );
+    xfree ( ptr, "do_version" );
     notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s", MUSH_BUILD_DATE );
 
     if ( Wizard ( player ) ) {
@@ -72,9 +72,9 @@ void do_version ( dbref player, dbref cause, int extra )
         MODULE *mp;
 
         for ( mp = mudstate.modules_list; mp != NULL; mp = mp->next ) {
-            ptr = repeatchar ( strlen ( mp->modname ) + 8, '-' );
+            ptr = repeatchar ( strlen ( mp->modname ) + 8, '-', "do_version" );
             notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
-            xfree ( ptr, "repeatchar" );
+            xfree ( ptr, "do_version" );
             snprintf ( string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version" );
 
             if ( ( mver = ( MODVER * ) lt_dlsym ( mp->handle, string ) ) != NULL ) {

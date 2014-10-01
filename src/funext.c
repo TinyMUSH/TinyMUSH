@@ -136,8 +136,7 @@ void handle_conninfo ( char *buff, char **bufc, dbref player, dbref caller, dbre
         return;
     }
 
-    safe_ltos ( buff, bufc, Is_Func ( CONNINFO_IDLE ) ?
-                fetch_idle ( target, port ) : fetch_connect ( target, port ) );
+    safe_ltos ( buff, bufc, Is_Func ( CONNINFO_IDLE ) ? fetch_idle ( target, port ) : fetch_connect ( target, port ), LBUF_SIZE );
 }
 
 /*
