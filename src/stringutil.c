@@ -1361,16 +1361,6 @@ const char *string_match ( const char *src, const char *sub )
     return 0;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * replace_string: Returns an lbuf containing string STRING with all occurances
- * of OLD replaced by NEW. OLD and NEW may be different lengths.
- * (mitch 1 feb 91)
- *
- * edit_string: Like replace_string, but sensitive about ANSI codes, and
- * handles special ^ and $ cases.
- */
- 
 /**
  * \fn char *replace_string ( const char *old, const char *new, const char *string )
  * \brief Replace all occurences of a substring with a new substring. 
@@ -1425,7 +1415,8 @@ char *replace_string ( const char *old, const char *new, const char *string )
 
 /**
  * \fn void edit_string ( char *src, char **dst, char *from, char *to )
- * \brief Replace all occurences of a substring with a new substring. Sensitive about ANSI codes, and handles special ^ and $ cases.
+ * \brief Replace all occurences of a substring with a new substring.
+ *        Sensitive about ANSI codes, and handles special ^ and $ cases.
  *
  * \param src Pointer to the original string.
  * \param dst Pointer to the new string.
