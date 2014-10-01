@@ -96,9 +96,9 @@ static unsigned int fp_check_weird ( char *buff, char **bufc, double result )
         }
 
         if ( fp_mant ) {
-            safe_known_str ( "NaN", 3, buff, bufc );
+            safe_strncat ( buff, bufc, "NaN", 3, LBUF_SIZE );
         } else {
-            safe_known_str ( "Inf", 3, buff, bufc );
+            safe_strncat ( buff, bufc, "Inf", 3, LBUF_SIZE );
         }
     }
 
@@ -164,12 +164,12 @@ static void fval ( char *buff, char **bufc, double result )
 
 void fun_pi ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_known_str ( "3.141592654", 11, buff, bufc );
+    safe_strncat ( buff, bufc, "3.141592654", 11, LBUF_SIZE );
 }
 
 void fun_e ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_known_str ( "2.718281828", 11, buff, bufc );
+    safe_strncat ( buff, bufc, "2.718281828", 11, LBUF_SIZE );
 }
 
 /*
@@ -184,7 +184,7 @@ void fun_sign ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     num = strtod ( fargs[0], ( char ** ) NULL );
 
     if ( num < 0 ) {
-        safe_known_str ( "-1", 2, buff, bufc );
+        safe_strncat ( buff, bufc, "-1", 2, LBUF_SIZE );
     } else {
         safe_bool ( buff, bufc, ( num > 0 ) );
     }
@@ -481,7 +481,7 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
 
     if ( !is_integer ( fargs[1] ) || !is_integer ( fargs[2] ) ) {
-        safe_known_str ( "#-1 INVALID BASE", 16, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 INVALID BASE", 16, LBUF_SIZE );
         return;
     }
 
@@ -489,7 +489,7 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     to = ( int ) strtol ( fargs[2], ( char ** ) NULL, 10 );
 
     if ( ( from < 2 ) || ( from > 64 ) || ( to < 2 ) || ( to > 64 ) ) {
-        safe_known_str ( "#-1 BASE OUT OF RANGE", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 BASE OUT OF RANGE", 21, LBUF_SIZE );
         return;
     }
 
@@ -526,8 +526,7 @@ void fun_baseconv ( char *buff, char **bufc, dbref player, dbref caller, dbref c
                 n += frombase[ ( unsigned char ) * p];
                 p++;
             } else {
-                safe_known_str ( "#-1 MALFORMED NUMBER", 20,
-                                 buff, bufc );
+                safe_strncat ( buff, bufc, "#-1 MALFORMED NUMBER", 20, LBUF_SIZE );
                 return;
             }
         }
@@ -847,7 +846,7 @@ void fun_add ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     int i;
 
     if ( nfargs < 2 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
     } else {
         sum = strtod ( fargs[0], ( char ** ) NULL );
 
@@ -867,7 +866,7 @@ void fun_mul ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     int i;
 
     if ( nfargs < 2 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
     } else {
         prod = strtod ( fargs[0], ( char ** ) NULL );
 
@@ -887,7 +886,7 @@ void fun_max ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     double max, val;
 
     if ( nfargs < 1 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
     } else {
         max = strtod ( fargs[0], ( char ** ) NULL );
 
@@ -906,7 +905,7 @@ void fun_min ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     double min, val;
 
     if ( nfargs < 1 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
     } else {
         min = strtod ( fargs[0], ( char ** ) NULL );
 
@@ -1376,7 +1375,7 @@ void handle_logic ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
          * separate arguments, but not enough of them
          */
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
         return;
     } else if ( flag & FN_NO_EVAL ) {
         /*

@@ -292,7 +292,7 @@ if ((s)->len == 1) { \
     safe_chr((s)->str[0],(b),(p)); \
     } \
 } else { \
-    safe_known_str((s)->str, (s)->len, (b), (p)); \
+    safe_strncat((b), (p), (s)->str, (s)->len, LBUF_SIZE); \
 }
 
 /*

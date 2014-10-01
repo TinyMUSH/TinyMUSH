@@ -772,8 +772,7 @@ void do_page ( dbref player, dbref cause, int key, char *tname, char *message )
         for ( i = 0; i < n_dbrefs; i++ ) {
             if ( dbrefs_array[i] != NOTHING ) {
                 if ( tnp != clean_tname + 1 )
-                    safe_known_str ( ", ", 2, clean_tname,
-                                     &tnp );
+                    safe_strncat ( clean_tname, &tnp, ", ", 2, LBUF_SIZE );
 
                 safe_name ( dbrefs_array[i], clean_tname, &tnp );
             }

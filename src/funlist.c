@@ -266,9 +266,8 @@ void fun_last ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
             }
         } while ( *s );
 
-        safe_str ( ansi_transition_esccode ( ANST_NORMAL, ansi_state ),
-                   buff, bufc );
-        safe_known_str ( last, s - last, buff, bufc );
+        safe_str ( ansi_transition_esccode ( ANST_NORMAL, ansi_state ), buff, bufc );
+        safe_strncat ( buff, bufc, last, s - last, LBUF_SIZE );
     } else {
         s = fargs[0];
 
@@ -1888,10 +1887,8 @@ static void tables_helper ( char *list, int *last_state, int n_cols, int col_wid
                     }
                 }
 
-                safe_known_str ( words[wcount],
-                                 s - words[wcount], buff, bufc );
-                safe_str ( ansi_transition_esccode ( ansi_state,
-                                                     ANST_NONE ), buff, bufc );
+                safe_strncat ( buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE );
+                safe_str ( ansi_transition_esccode ( ansi_state, ANST_NONE ), buff, bufc );
             }
 
             /*

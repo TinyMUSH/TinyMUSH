@@ -917,7 +917,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
 
                 if ( See_attr ( player, player, ap, aowner, aflags ) ) {
                     atr_gotten = atr_pget ( player, ap->number, &aowner, &aflags, &alen );
-                    safe_known_str ( atr_gotten, alen, buff, bufc );
+                    safe_strncat ( buff, bufc, atr_gotten, alen, LBUF_SIZE );
                     free_lbuf ( atr_gotten );
                 }
 
@@ -1007,7 +1007,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                 i = A_VA + ch - 'A';
                 atr_gotten = atr_pget ( player, i, &aowner,
                                         &aflags, &alen );
-                safe_known_str ( atr_gotten, alen, buff, bufc );
+                safe_strncat ( buff, bufc, atr_gotten, alen, LBUF_SIZE );
                 free_lbuf ( atr_gotten );
                 break;
 
@@ -1030,10 +1030,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
 
                     if ( mudstate.rdata &&
                             mudstate.rdata->q_alloc > i ) {
-                        safe_known_str ( mudstate.rdata->
-                                         q_regs[i],
-                                         mudstate.rdata->q_lens[i],
-                                         buff, bufc );
+                        safe_strncat ( buff, bufc, mudstate.rdata->q_regs[i], mudstate.rdata->q_lens[i], LBUF_SIZE );
                     }
 
                     if ( ! **dstr ) {
@@ -1094,10 +1091,7 @@ void exec ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, in
                     if ( mudstate.rdata->x_names[i] &&
                             !strcmp ( xtbuf,
                                       mudstate.rdata->x_names[i] ) ) {
-                        safe_known_str ( mudstate.rdata->
-                                         x_regs[i],
-                                         mudstate.rdata->x_lens[i],
-                                         buff, bufc );
+                        safe_strncat ( buff, bufc, mudstate.rdata->x_regs[i], mudstate.rdata->x_lens[i], LBUF_SIZE );
                         break;
                     }
                 }

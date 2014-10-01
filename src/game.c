@@ -690,7 +690,7 @@ static char *dflt_from_msg ( dbref sender, dbref sendloc )
 {
     char *tp, *tbuff;
     tp = tbuff = alloc_lbuf ( "notify_check.fwdlist" );
-    safe_known_str ( ( char * ) "From ", 5, tbuff, &tp );
+    safe_strncat ( tbuff, &tp, ( char * ) "From ", 5, LBUF_SIZE );
 
     if ( Good_obj ( sendloc ) ) {
         safe_name ( sendloc, tbuff, &tp );
@@ -725,19 +725,19 @@ void html_escape ( const char *src, char *dest, char **destp )
     for ( msg_orig = src; msg_orig && *msg_orig; msg_orig++ ) {
         switch ( *msg_orig ) {
         case '<':
-            safe_known_str ( "&lt;", 4, dest, destp );
+            safe_strncat ( dest, destp, "&lt;", 4, LBUF_SIZE );
             break;
 
         case '>':
-            safe_known_str ( "&gt;", 4, dest, destp );
+            safe_strncat ( dest, destp, "&gt;", 4, LBUF_SIZE );
             break;
 
         case '&':
-            safe_known_str ( "&amp;", 5, dest, destp );
+            safe_strncat ( dest, destp, "&amp;", 5, LBUF_SIZE );
             break;
 
         case '\"':
-            safe_known_str ( "&quot;", 6, dest, destp );
+            safe_strncat ( dest, destp, "&quot;", 6, LBUF_SIZE );
             break;
 
         default:
@@ -898,7 +898,7 @@ void notify_check ( dbref target, dbref sender, int key, const char *format, ...
                     ( targetloc != Owner ( target ) ) ) ) ) {
             tp = tbuff = alloc_lbuf ( "notify_check.puppet" );
             safe_name ( target, tbuff, &tp );
-            safe_known_str ( ( char * ) "> ", 2, tbuff, &tp );
+            safe_strncat (  tbuff, &tp, ( char * ) "> ", 2, LBUF_SIZE );
             safe_str ( msg_ns, tbuff, &tp );
 
             /*

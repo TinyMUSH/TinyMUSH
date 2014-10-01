@@ -883,7 +883,7 @@ void fun_left ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         }
     }
 
-    safe_known_str ( fargs[0], s - fargs[0], buff, bufc );
+    safe_strncat ( buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE );
     safe_str ( ansi_transition_esccode ( ansi_state, ANST_NORMAL ), buff, bufc );
 }
 
@@ -1537,7 +1537,7 @@ void fun_mid ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
     }
 
-    safe_known_str ( savep, s - savep, buff, bufc );
+    safe_strncat ( buff, bufc, savep, s - savep, LBUF_SIZE );
     safe_str ( ansi_transition_esccode ( ansi_state, ANST_NORMAL ), buff, bufc );
 }
 
@@ -1780,7 +1780,7 @@ void fun_repeat ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
 
         if ( times > maxtimes ) {
-            safe_known_str ( fargs[0], len, buff, bufc );
+            safe_strncat ( buff, bufc, fargs[0], len, LBUF_SIZE );
         }
     }
 }
@@ -2009,7 +2009,7 @@ void perform_border ( char *buff, char **bufc, dbref player, dbref caller, dbref
         /*
          * Print the words
          */
-        safe_known_str ( sl, el - sl, buff, bufc );
+        safe_strncat ( buff, bufc, sl, el - sl, LBUF_SIZE );
         /*
          * Back to ansi normal
          */
@@ -2498,25 +2498,22 @@ static void perform_align ( int n_cols, char **raw_colstrs, char **data, char fi
                 print_padding ( nleft, max, fillc );
             } else if ( just & JUST_CENTER ) {
                 lead_chrs =
-                    ( int ) ( ( width / 2 ) - ( ( el_pos -
-                                                  sl_pos ) / 2 ) + .5 );
+                    ( int ) ( ( width / 2 ) - ( ( el_pos - sl_pos ) / 2 ) + .5 );
                 print_padding ( lead_chrs, max, fillc );
             }
 
             /*
              * Restore previous ansi state
              */
-            safe_str ( ansi_transition_esccode ( ANST_NORMAL,
-                                                 sl_ansi_state ), buff, bufc );
+            safe_str ( ansi_transition_esccode ( ANST_NORMAL, sl_ansi_state ), buff, bufc );
             /*
              * Print the words
              */
-            safe_known_str ( sl, el - sl, buff, bufc );
+            safe_strncat ( buff, bufc, sl, el - sl, LBUF_SIZE );
             /*
              * Back to ansi normal
              */
-            safe_str ( ansi_transition_esccode ( el_ansi_state,
-                                                 ANST_NORMAL ), buff, bufc );
+            safe_str ( ansi_transition_esccode ( el_ansi_state, ANST_NORMAL ), buff, bufc );
 
             /*
              * Right space padding if needed
@@ -2795,7 +2792,7 @@ void fun_delete ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
     }
 
-    safe_known_str ( savep, s - savep, buff, bufc );
+    safe_strncat ( buff, bufc, savep, s - savep, LBUF_SIZE );
     ansi_state_r = ansi_state_l;
 
     while ( *s == ESC_CHAR ) {
@@ -2852,7 +2849,7 @@ void fun_art ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     c = tolower ( *s );
 
     if ( c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ) {
-        safe_known_str ( "an", 2, buff, bufc );
+        safe_strncat ( buff, bufc, "an", 2, LBUF_SIZE );
     } else {
         safe_chr ( 'a', buff, bufc );
     }

@@ -42,8 +42,6 @@
  * API interface functions.
  */
 
-extern void db_grow_module(old_db,new_size,new_top,proto);
-
 extern void register_api ( char *, char *, API_FUNCTION * );
 extern void    *request_api_function ( char *, char * );
 

@@ -126,8 +126,7 @@ static void look_exits ( dbref player, dbref loc, const char *exit_name )
             DOLIST ( thing, Exits ( parent ) ) {
                 if ( Can_See_Exit ( player, thing, isdark ) ) {
                     if ( buff != e )
-                        safe_known_str ( ( char * ) "  ", 2,
-                                         buff, &e );
+                        safe_strncat ( buff, &e, ( char * ) "  ", 2, LBUF_SIZE );
 
                     if ( Html ( player ) && ( mudconf.have_pueblo == 1 ) ) {
                         e1 = buff1;
@@ -1700,7 +1699,7 @@ void do_inventory ( dbref player, dbref cause, int key )
         e = buff = alloc_lbuf ( "look_exits" );
         DOLIST ( thing, thing ) {
             if ( e != buff ) {
-                safe_known_str ( ( char * ) "  ", 2, buff, &e );
+                safe_strncat ( buff, &e, ( char * ) "  ", 2, LBUF_SIZE );
             }
 
             safe_exit_name ( thing, buff, &e );

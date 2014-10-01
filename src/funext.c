@@ -132,7 +132,7 @@ void handle_conninfo ( char *buff, char **bufc, dbref player, dbref caller, dbre
     Find_Connection ( player, fargs[0], target, port );
 
     if ( ( port < 0 ) && ( target == NOTHING ) ) {
-        safe_known_str ( ( char * ) "-1", 2, buff, bufc );
+        safe_strncat ( buff, bufc, ( char * ) "-1", 2, LBUF_SIZE );
         return;
     }
 

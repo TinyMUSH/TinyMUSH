@@ -104,13 +104,12 @@ extern void list_buftrace ( dbref );
 
 extern void safe_copy_chr ( char, char [], char **, int );
 
-#define safe_str(s,b,p)     safe_copy_str((s),(b),(p),(LBUF_SIZE-1))
+#define safe_str(s,b,p)     safe_strcat((b),(p),(s),(LBUF_SIZE-1))
 #define safe_chr(c,b,p)     safe_copy_chr((c),(b),(p),(LBUF_SIZE-1))
-#define safe_long_str(s,b,p)    safe_copy_long_str((s),(b),(p),(LBUF_SIZE-1))
-#define safe_sb_str(s,b,p)  safe_copy_str((s),(b),(p),(SBUF_SIZE-1))
+#define safe_sb_str(s,b,p)  safe_strcat((b),(p),(s),(SBUF_SIZE-1))
 #define safe_sb_chr(c,b,p)  safe_copy_chr((c),(b),(p),(SBUF_SIZE-1))
-#define safe_mb_str(s,b,p)  safe_copy_str((s),(b),(p),(MBUF_SIZE-1))
+#define safe_mb_str(s,b,p)  safe_strcat((b),(p),(s),(MBUF_SIZE-1))
 #define safe_mb_chr(c,b,p)  safe_copy_chr((c),(b),(p),(MBUF_SIZE-1))
-#define safe_chr_fn(c,b,p)      safe_chr_real_fn((c),(b),(p),(LBUF_SIZE-1))
+#define safe_chr_fn(c,b,p)      safe_strcatchr((b),(p),(c),(LBUF_SIZE-1))
 
 #endif  /* __ALLOC_H */

@@ -950,7 +950,7 @@ void safe_name ( dbref thing, char *outbuf, char **bufc )
         free_lbuf ( buff );
     }
 
-    safe_known_str ( names[thing], NameLen ( thing ), outbuf, bufc );
+    safe_strncat ( outbuf, bufc, names[thing], NameLen ( thing ), LBUF_SIZE );
     s_AccessTime ( thing, save_access_time );
 }
 

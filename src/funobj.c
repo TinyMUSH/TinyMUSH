@@ -1255,7 +1255,7 @@ void handle_timestamp ( char *buff, char **bufc, dbref player, dbref caller, dbr
     dbref it = match_thing ( player, fargs[0] );
 
     if ( !Good_obj ( it ) || !Examinable ( player, it ) ) {
-        safe_known_str ( "-1", 2, buff, bufc );
+        safe_strncat ( buff, bufc, "-1", 2, LBUF_SIZE );
     } else {
         safe_ltos ( buff, bufc,
                     Is_Func ( TIMESTAMP_MOD ) ?
@@ -1554,7 +1554,7 @@ void fun_v ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         tbuf = atr_pget ( player, ap->number, &aowner, &aflags, &alen );
 
         if ( See_attr ( player, player, ap, aowner, aflags ) ) {
-            safe_known_str ( tbuf, alen, buff, bufc );
+            safe_strncat ( buff, bufc, tbuf, alen, LBUF_SIZE );
         }
 
         free_lbuf ( tbuf );
@@ -1618,7 +1618,7 @@ void perform_get ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         exec ( buff, bufc, thing, player, player,
                EV_FIGNORE | EV_EVAL, &str, ( char ** ) NULL, 0 );
     } else {
-        safe_known_str ( atr_gotten, alen, buff, bufc );
+        safe_strncat ( buff, bufc, atr_gotten, alen, LBUF_SIZE );
     }
 
     free_lbuf ( atr_gotten );
@@ -1659,7 +1659,7 @@ void do_ufun ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
 
     if ( nfargs < 1 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
         return;
     }
 
@@ -1736,7 +1736,7 @@ void fun_objcall ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     char *atext, *str;
 
     if ( nfargs < 2 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
         return;
     }
 
@@ -1836,8 +1836,7 @@ void fun_default ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
                                         &aowner, &aflags, &alen );
 
                 if ( *atr_gotten ) {
-                    safe_known_str ( atr_gotten, alen,
-                                     buff, bufc );
+                    safe_strncat ( buff, bufc, atr_gotten, alen, LBUF_SIZE );
                     free_lbuf ( atr_gotten );
                     free_lbuf ( objname );
                     return;
@@ -2124,7 +2123,7 @@ void fun_pmatch ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
     thing = find_connected_ambiguous ( player, name );
 
     if ( thing == AMBIGUOUS ) {
-        safe_known_str ( "#-2", 3, buff, bufc );
+        safe_strncat ( buff, bufc, "#-2", 3, LBUF_SIZE );
     } else if ( Good_obj ( thing ) && isPlayer ( thing ) ) {
         safe_dbref ( buff, bufc, thing );
     } else {
@@ -2567,19 +2566,19 @@ void fun_type ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     switch ( Typeof ( it ) ) {
     case TYPE_ROOM:
-        safe_known_str ( "ROOM", 4, buff, bufc );
+        safe_strncat ( buff, bufc, "ROOM", 4, LBUF_SIZE );
         break;
 
     case TYPE_EXIT:
-        safe_known_str ( "EXIT", 4, buff, bufc );
+        safe_strncat ( buff, bufc, "EXIT", 4, LBUF_SIZE );
         break;
 
     case TYPE_PLAYER:
-        safe_known_str ( "PLAYER", 6, buff, bufc );
+        safe_strncat ( buff, bufc, "PLAYER", 6, LBUF_SIZE );
         break;
 
     case TYPE_THING:
-        safe_known_str ( "THING", 5, buff, bufc );
+        safe_strncat ( buff, bufc, "THING", 5, LBUF_SIZE );
         break;
 
     default:

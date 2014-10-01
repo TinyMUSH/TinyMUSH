@@ -809,7 +809,7 @@ void fun_convtime ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     if ( do_convtime ( fargs[0], ttm ) ) {
         safe_ltos ( buff, bufc, mktime ( ttm ) );
     } else {
-        safe_known_str ( "-1", 2, buff, bufc );
+        safe_strncat ( buff, bufc, "-1", 2, LBUF_SIZE );
     }
 }
 
@@ -1038,8 +1038,7 @@ void fun_etimefmt ( char *buff, char **bufc, dbref player, dbref caller, dbref c
                         p++;
                     }
 
-                    safe_known_str ( mark, p - mark, buff,
-                                     bufc );
+                    safe_strncat ( buff, bufc, mark, p - mark, LBUF_SIZE );
                 } else if ( !clockfmt ) {
                     /*
                      * If it's 0 and we're hidezero, just
@@ -1151,7 +1150,7 @@ void fun_etimefmt ( char *buff, char **bufc, dbref player, dbref caller, dbref c
                 p++;
             }
 
-            safe_known_str ( mark, p - mark, buff, bufc );
+            safe_strncat ( buff, bufc, mark, p - mark, LBUF_SIZE );
         }
     }
 }

@@ -106,8 +106,16 @@ int ansi_bits[I_ANSI_LIM] = {
     0x0000, 0x0010, 0x0020, 0x0030, 0x0040, 0x0050, 0x0060, 0x0070, 0x0000, 0x0000
 };
 
-/* ---------------------------------------------------------------------------
- * strip_ansi -- return a new string with escape codes removed
+/**
+ * \fn char *strip_ansi ( const char *s )
+ * \brief Return a new string with ansi escape codes removed
+ *
+ * Since this function use a static buffer, be sure to copy it
+ * elsewhere or it may be overwriten by the next call.
+ *
+ * \param s Pointer to the original string
+ *
+ * \return 0 Pointer to the new string with ansi code removed.
  */
 
 char *strip_ansi ( const char *s )
@@ -136,8 +144,16 @@ char *strip_ansi ( const char *s )
     }
 }
 
-/* ---------------------------------------------------------------------------
- * strip_xterm -- return a new string with xterm color code removed
+/**
+ * \fn char *strip_xterm ( char *s )
+ * \brief Return a new string with xterm color code removed
+ *
+ * Since this function use a static buffer, be sure to copy it
+ * elsewhere or it may be overwriten by the next call.
+ *
+ * \param s Pointer to the original string
+ *
+ * \return 0 Pointer to the new string with ansi code removed.
  */
 
 char *strip_xterm ( char *s )
@@ -176,8 +192,13 @@ char *strip_xterm ( char *s )
     return ( buf );
 }
 
-/* ---------------------------------------------------------------------------
- * strip_ansi_len -- count non-escape-code characters
+/**
+ * \fn int strip_ansi_len ( const char *s )
+ * \brief Count non-escape-code characters.
+ *
+ * \param s Pointer to the string.
+ *
+ * \return An integer representing the number of character in the string.
  */
 
 int strip_ansi_len ( const char *s )
@@ -207,7 +228,17 @@ int strip_ansi_len ( const char *s )
     return n;
 }
 
-/* normal_to_white -- This function implements the NOBLEED flag */
+/**
+ * \fn char *normal_to_white ( const char *raw )
+ * \brief This function implements the NOBLEED flag.
+ *
+ * Since this function use a static buffer, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param raw Pointer to the string who need to be ansi terminated.
+ *
+ * \return A pointer to the string terminated.
+ */
 
 char *normal_to_white ( const char *raw )
 {
@@ -221,7 +252,7 @@ char *normal_to_white ( const char *raw )
 
     while ( p && *p ) {
         if ( *p == ESC_CHAR ) {
-            safe_known_str ( just_after_esccode, p - just_after_esccode, buf, &q );
+            safe_strncat ( buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE );
 
             if ( p[1] == ANSI_CSI ) {
                 safe_chr ( *p, buf, &q );
@@ -261,7 +292,7 @@ char *normal_to_white ( const char *raw )
                                 /*
                                  * ansi normal
                                  */
-                                safe_known_str ( "m\033[37m\033[", 8, buf, &q );
+                                safe_strncat ( buf, &q, "m\033[37m\033[", 8, LBUF_SIZE );
                             } else {
                                 /*
                                  * some other color
@@ -283,11 +314,11 @@ char *normal_to_white ( const char *raw )
                     ++p;
 
                     if ( param_val == 0 ) {
-                        safe_known_str ( ANSI_WHITE, 5, buf, &q );
+                        safe_strncat ( buf, &q, ANSI_WHITE, 5, LBUF_SIZE );
                     }
                 } else {
                     ++p;
-                    safe_known_str ( just_after_csi, p - just_after_csi, buf, &q );
+                    safe_strncat ( buf, &q, just_after_csi, p - just_after_csi, LBUF_SIZE );
                 }
             } else {
                 safe_copy_esccode ( &p, buf, &q );
@@ -299,9 +330,22 @@ char *normal_to_white ( const char *raw )
         }
     }
 
-    safe_known_str ( just_after_esccode, p - just_after_esccode, buf, &q );
+    safe_strncat ( buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE );
     return buf;
 }
+
+/**
+ * \fn char *ansi_transition_esccode ( int ansi_before, int ansi_after )
+ * \brief Handle the transition between two ansi sequence
+ *
+ * Since this function use a static buffer, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param ansi_before Ansi state before transition.
+ * \param ansi_after ansi state after transition.
+ *
+ * \return A pointer to an ansi sequence that will do the transition.
+ */
 
 char *ansi_transition_esccode ( int ansi_before, int ansi_after )
 {
@@ -389,6 +433,19 @@ char *ansi_transition_esccode ( int ansi_before, int ansi_after )
     return buffer;
 }
 
+/**
+ * \fn char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
+ * \brief Handle the transition between two ansi sequence of mushcode.
+ *
+ * Since this function use a static buffer, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param ansi_before Ansi state before transition.
+ * \param ansi_after ansi state after transition.
+ *
+ * \return A pointer to a mushcode sequence that will do the transition.
+ */
+
 char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
 {
     int ansi_bits_set, ansi_bits_clr;
@@ -467,6 +524,19 @@ char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
     return buffer;
 }
 
+/**
+ * \fn char *ansi_transition_letters ( int ansi_before, int ansi_after )
+ * \brief Handle the transition between two ansi sequence of mushcode.
+ *
+ * Since this function use a static buffer, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param ansi_before Ansi state before transition.
+ * \param ansi_after ansi state after transition.
+ *
+ * \return A pointer to the letters of mushcode that will do the transition.
+ */
+
 char *ansi_transition_letters ( int ansi_before, int ansi_after )
 {
     int ansi_bits_set, ansi_bits_clr;
@@ -536,7 +606,19 @@ char *ansi_transition_letters ( int ansi_before, int ansi_after )
     return buffer;
 }
 
-/* ansi_map_states -- Identify ansi state of every character in a string */
+/**
+ * \fn int ansi_map_states ( const char *s, int **m, char **p )
+ * \brief Identify ansi state of every character in a string
+ *
+ * Since this function use static buffers, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param s Pointer to the string to be mapped.
+ * \param m Pointer to the ansi map to be build.
+ * \param p Pointer to the mapped string.
+ *
+ * \return The number of items mapped.
+ */
 
 int ansi_map_states ( const char *s, int **m, char **p )
 {
@@ -566,7 +648,18 @@ int ansi_map_states ( const char *s, int **m, char **p )
     return n;
 }
 
-/* remap_colors -- allow a change of the color sequences */
+/**
+ * \fn char *remap_colors ( const char *s, int *cmap )
+ * \brief Allow a change of the color sequences
+ *
+ * Since this function use static buffers, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param s Pointer to the string to be remap.
+ * \param m Pointer to the ansi color map to use.
+ *
+ * \return Pointer to the remapped string.
+ */
 
 char *remap_colors ( const char *s, int *cmap )
 {
@@ -631,8 +724,17 @@ char *remap_colors ( const char *s, int *cmap )
 }
 
 
-/* translate_string -- Convert (type = 1) raw character sequences into
- * MUSH substitutions or strip them (type = 0).
+/**
+ * \fn char *translate_string ( char *str, int type )
+ * \brief Convert raw ansi to mushcode or strip it.
+ *
+ * Since this function use static buffers, be sure to copy its return
+ * somewhere else before calling it again.
+ *
+ * \param str Pointer to the string to be translated
+ * \param type 1 = Convert to mushcode, 0 strip ansi.
+ *
+ * \return Pointer to the translatted string.
  */
 
 char *translate_string ( char *str, int type )
@@ -658,7 +760,7 @@ char *translate_string ( char *str, int type )
 
             case ' ':
                 if ( str[1] == ' ' ) {
-                    safe_known_str ( "%b", 2, new, &bp );
+                    safe_strncat ( new, &bp, "%b", 2, LBUF_SIZE );
                 } else {
                     safe_chr ( ' ', new, &bp );
                 }
@@ -681,11 +783,11 @@ char *translate_string ( char *str, int type )
                 break;
 
             case '\n':
-                safe_known_str ( "%r", 2, new, &bp );
+                safe_strncat ( new, &bp, "%r", 2, LBUF_SIZE );
                 break;
 
             case '\t':
-                safe_known_str ( "%t", 2, new, &bp );
+                safe_strncat ( new, &bp, "%t", 2, LBUF_SIZE );
                 break;
 
             default:
@@ -724,6 +826,15 @@ char *translate_string ( char *str, int type )
 /*
  * ---------------------------------------------------------------------------
  * rgb2xterm -- Convert an RGB value to xterm color
+ */
+ 
+/**
+ * \fn int rgb2xterm ( long rgb )
+ * \brief Convert an RGB value to xterm value
+ *
+ * \param rgb Color to convert to xterm value
+ *
+ * \return The xterm value of the color.
  */
 
 int rgb2xterm ( long rgb )
@@ -915,11 +1026,15 @@ int rgb2xterm ( long rgb )
     return ( xterm );
 }
 
-/*
- * ---------------------------------------------------------------------------
- * str2xterm -- Convert a value to xterm color
- * The value can be an hex rgb value (#rrggbb), a decimal rgb value (r g b)
- * a 24 bit decimal rgb value, or the actual xterm color value.
+/**
+ * \fn int str2xterm ( char *str )
+ * \brief Convert a value to xterm color
+ *
+ * \param str A string representing the color to be convert into xterm value.
+ *            The value can be express as hex (#rrggbb), decimal (r g b). a 24
+ *            bit integer value, or the actual xterm value.
+ *
+ * \return The xterm value of the color.
  */
 
 int str2xterm ( char *str )
@@ -982,10 +1097,13 @@ int str2xterm ( char *str )
     return ( -1 );          /* Something is terribly wrong... */
 }
 
-
-
-/*
- * capitalizes an entire string
+/**
+ * \fn char *upcasestr ( char *s )
+ * \brief Capitalizes an entire string
+ *
+ * \param s The string that need to be capitalized.
+ *
+ * \return The string capitalized.
  */
 
 char *upcasestr ( char *s )
@@ -999,10 +1117,13 @@ char *upcasestr ( char *s )
     return s;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * munge_space: Compress multiple spaces to one space,
- * also remove leading and trailing spaces.
+/**
+ * \fn char *munge_space ( char *string )
+ * \brief Compress multiple spaces into one and remove leading/trailing spaces.
+ *
+ * \param s The string that need to be munge
+ *
+ * \return The string munged
  */
 
 char *munge_space ( char *string )
@@ -1037,9 +1158,13 @@ char *munge_space ( char *string )
     return ( buffer );
 }
 
-/*
- * ---------------------------------------------------------------------------
- * * trim_spaces: Remove leading and trailing spaces.
+/**
+ * \fn char *trim_spaces ( char *string )
+ * \brief Remove leading and trailing spaces.
+ *
+ * \param s The string that need to be trimmed.
+ *
+ * \return The trimmed string.
  */
 
 char *trim_spaces ( char *string )
@@ -1071,10 +1196,18 @@ char *trim_spaces ( char *string )
     return ( buffer );
 }
 
-/*
- * ---------------------------------------------------------------------------
- * grabto: Return portion of a string up to the indicated character.  Also
- * returns a modified pointer to the string ready for another call.
+/**
+ * \fn char *grabto ( char **str, char targ )
+ * \brief Return portion of a string up to the indicated character.
+ *
+ * Note that str will be move to the position following the searched
+ * character. If you need the original string, save it before calling
+ * this function.
+ *
+ * \param str The string you want to search
+ * \param targ The caracter you want to search for,
+ *
+ * \return The string up to the character you've search for.
  */
 
 char *grabto ( char **str, char targ )
@@ -1098,6 +1231,16 @@ char *grabto ( char **str, char targ )
     *str = cp;
     return savec;
 }
+
+/**
+ * \fn int string_compare ( const char *s1, const char *s2 )
+ * \brief Compare two string. Treat multiple spaces as one.
+ *
+ * \param s1 The first string to compare
+ * \param s2 The second string to compare
+ *
+ * \return 0 if the string are different.
+ */
 
 int string_compare ( const char *s1, const char *s2 )
 {
@@ -1160,6 +1303,16 @@ int string_compare ( const char *s1, const char *s2 )
     }
 }
 
+/**
+ * \fn int string_prefix ( const char *string, const char *prefix )
+ * \brief Compare a string with a prefix
+ *
+ * \param string The string you want to search
+ * \param prefix The prefix you are searching for.
+ *
+ * \return 0 if the prefix isn't found.
+ */
+
 int string_prefix ( const char *string, const char *prefix )
 {
     int count = 0;
@@ -1175,8 +1328,14 @@ int string_prefix ( const char *string, const char *prefix )
     }
 }
 
-/*
- * accepts only nonempty matches starting at the beginning of a word
+/**
+ * \fn const char *string_match ( const char *src, const char *sub )
+ * \brief Compare a string with a substring, accepts only nonempty matches starting at the beginning of a word
+ *
+ * \param src The string you want to search
+ * \param sub The search term.
+ *
+ * \return The position of the search term. 0 if not found.
  */
 
 const char *string_match ( const char *src, const char *sub )
@@ -1210,6 +1369,17 @@ const char *string_match ( const char *src, const char *sub )
  *
  * edit_string: Like replace_string, but sensitive about ANSI codes, and
  * handles special ^ and $ cases.
+ */
+ 
+/**
+ * \fn char *replace_string ( const char *old, const char *new, const char *string )
+ * \brief Replace all occurences of a substring with a new substring. 
+ *
+ * \param old The string you want to replace.
+ * \param new The string you want to replace with.
+ * \param string The string that is modified.
+ *
+ * \return A pointer to the modified string.
  */
 
 char *replace_string ( const char *old, const char *new, const char *string )
@@ -1253,6 +1423,18 @@ char *replace_string ( const char *old, const char *new, const char *string )
     return result;
 }
 
+/**
+ * \fn void edit_string ( char *src, char **dst, char *from, char *to )
+ * \brief Replace all occurences of a substring with a new substring. Sensitive about ANSI codes, and handles special ^ and $ cases.
+ *
+ * \param src Pointer to the original string.
+ * \param dst Pointer to the new string.
+ * \param from Pointer to the string to be replaced
+ * \param to Pointer to the string to be replaced with.
+ *
+ * \return None
+ */
+
 void edit_string ( char *src, char **dst, char *from, char *to )
 {
     char *cp, *p;
@@ -1294,17 +1476,17 @@ void edit_string ( char *src, char **dst, char *from, char *to )
 
     if ( !strcmp ( from, "^" ) ) {
         /* Prepend 'to' to string */
-        safe_known_str ( to, tlen, *dst, &cp );
+        safe_strncat ( *dst, &cp, to, tlen, LBUF_SIZE );
         track_all_esccodes ( &src, &p, &ansi_state );
-        safe_known_str ( src, p - src, *dst, &cp );
+        safe_strncat ( *dst, &cp, src, p - src, LBUF_SIZE );
     } else if ( !strcmp ( from, "$" ) ) {
         /* Append 'to' to string */
         ansi_state = ANST_NONE;
         track_all_esccodes ( &src, &p, &ansi_state );
-        safe_known_str ( src, p - src, *dst, &cp );
+        safe_strncat ( *dst, &cp, src, p - src, LBUF_SIZE );
         ansi_state |= to_ansi_set;
         ansi_state &= ~to_ansi_clr;
-        safe_known_str ( to, tlen, *dst, &cp );
+        safe_strncat ( *dst, &cp, to, tlen, LBUF_SIZE );
     } else {
         /*
          * Replace all occurances of 'from' with 'to'.  Handle the
@@ -1329,7 +1511,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
                 }
             }
 
-            safe_known_str ( p, src - p, *dst, &cp );
+            safe_strncat ( *dst, &cp, p, src - p, LBUF_SIZE );
 
             /*
              * If we are really at a FROM, append TO to the result
@@ -1342,7 +1524,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
                     /* Apply whatever ANSI transition happens in TO */
                     ansi_state |= to_ansi_set;
                     ansi_state &= ~to_ansi_clr;
-                    safe_known_str ( to, tlen, *dst, &cp );
+                    safe_strncat ( *dst, &cp, to, tlen, LBUF_SIZE );
                     src += flen;
                 } else {
                     /*
@@ -1356,7 +1538,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
                     if ( *from == ESC_CHAR ) {
                         p = src;
                         track_esccode ( &src, &ansi_state );
-                        safe_known_str ( p, src - p, *dst, &cp );
+                        safe_strncat ( *dst, &cp, p, src - p, LBUF_SIZE );
                     } else {
                         safe_chr ( *src, *dst, &cp );
                         ++src;
@@ -1368,6 +1550,20 @@ void edit_string ( char *src, char **dst, char *from, char *to )
 
     safe_str ( ansi_transition_esccode ( ansi_state, ANST_NONE ), *dst, &cp );
 }
+
+/**
+ * \fn int minmatch ( char *str, char *target, int min )
+ * \brief Find if a substring at the start of a string exist.
+ *
+ * At least MIN characters must match. This is how flags are 
+ * match by the command queue.
+ *
+ * \param str Pointer to the string that will be search.
+ * \param target Pointer to the string being search.
+ * \param min Minimum length of match.
+ *
+ * \return 1 if found, 0 if not.
+ */
 
 int minmatch ( char *str, char *target, int min )
 {
@@ -1389,23 +1585,34 @@ int minmatch ( char *str, char *target, int min )
 }
 
 /* ---------------------------------------------------------------------------
- * safe_copy_str, safe_copy_long_str, safe_chr_real_fn - Copy buffers,
+ * safe_strcat, safe_strncat, safe_chr_real_fn - Copy buffers,
  * watching for overflows.
  */
-
-int safe_copy_str ( const char *src, char *buff, char **bufp, int max )
+ 
+/**
+ * \fn int safe_strcat ( const char *src, char *buff, char **bufp, int max )
+ * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string. 
+ *
+ * \param src Pointer to the string that will be copied.
+ * \param buff Pointer to the buffer that will receive the string.
+ * \param bufp Pointer to where the string will be copied to.
+ * \param max Maximum length of the destination pointer.
+ *
+ * \return The number of characters that where not copied if the buffer isn't long enough to hold the result.
+ */
+int safe_strcat ( char *dest, char **destp, const char *src, size_t size )
 {
     char *tp, *maxtp, *longtp;
     int n, len;
 
-    tp = *bufp;
+    tp = *destp;
 
     if ( src == NULL ) {
         *tp = '\0';
         return 0;
     }
 
-    maxtp = buff + max;
+    maxtp = dest + size;
     longtp = tp + 7;
     maxtp = ( maxtp < longtp ) ? maxtp : longtp;
 
@@ -1415,17 +1622,17 @@ int safe_copy_str ( const char *src, char *buff, char **bufp, int max )
 
     if ( *src == '\0' ) {   /* copied whole src, and tp is at most maxtp */
         *tp = '\0';
-        *bufp = tp;
+        *destp = tp;
         return 0;
     }
 
     len = strlen ( src );
-    n = max - ( tp - buff );    /* tp is either maxtp or longtp */
+    n = size - ( tp - dest );    /* tp is either maxtp or longtp */
 
     if ( n <= 0 ) {
-        len -= ( tp - *bufp );
+        len -= ( tp - *destp );
         *tp = '\0';
-        *bufp = tp;
+        *destp = tp;
         return ( len );
     }
 
@@ -1433,73 +1640,54 @@ int safe_copy_str ( const char *src, char *buff, char **bufp, int max )
     memcpy ( tp, src, n );
     tp += n;
     *tp = '\0';
-    *bufp = tp;
+    *destp = tp;
     return ( len - n );
 }
 
-int safe_copy_long_str ( char *src, char *buff, char **bufp, int max )
+/**
+ * \fn char *safe_strncat(char *dest, char **destp, char *src, size_t n)
+ * \brief Concatenate two strings, using at most n bytes from src.
+ *
+ * \param dest Pointer to the destination buffer
+ * \param destp Pointer to where the string will be append into the destination buffer. 
+ * \param src Pointer to the string that will be append.
+ * \param n Number of characters that will be append.
+ * \param size Size of the destination buffer.
+ *
+ * \return A pointer to the resulting string.
+ */
+
+char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t size)
 {
-    int len, n;
-    char *tp;
-
-    tp = *bufp;
-
-    if ( src == NULL ) {
-        *tp = '\0';
-        return 0;
-    }
-
-    len = strlen ( src );
-    n = max - ( tp - buff );
-
-    if ( n < 0 ) {
-        n = 0;
-    }
-
-    strncpy ( tp, src, n );
-    buff[max] = '\0';
-
-    if ( len <= n ) {
-        *bufp = tp + len;
-        return ( 0 );
-    } else {
-        *bufp = tp + n;
-        return ( len - n );
-    }
-}
-
-
-void safe_known_str ( const char *src, int known, char *buff, char **bufp )
-{
-    int n;
+    int sz;
     char *tp, *maxtp;
-    tp = *bufp;
+    tp = *destp;
 
     if ( !src ) {
         *tp = '\0';
         return;
     }
 
-    maxtp = buff + LBUF_SIZE - 1;
+    maxtp = dest + size - 1;
 
-    if ( known > 7 ) {
-        n = maxtp - tp;
+    if ( n > 7 ) {
+        sz = maxtp - tp;
 
-        if ( n <= 0 ) {
+        if ( sz <= 0 ) {
             *tp = '\0';
             return;
         }
 
-        n = ( ( known < n ) ? known : n );
-        memcpy ( tp, src, n );
-        tp += n;
+        sz = ( ( n < sz ) ? n : sz );
+        memcpy ( tp, src, sz );
+        tp += sz;
         *tp = '\0';
-        *bufp = tp;
+        *destp = tp;
         return;
     }
 
-    if ( tp + known < maxtp ) {
-        maxtp = tp + known;
+    if ( tp + n < maxtp ) {
+        maxtp = tp + n;
     }
 
     while ( *src && ( tp < maxtp ) ) {
@@ -1507,26 +1695,39 @@ void safe_known_str ( const char *src, int known, char *buff, char **bufp )
     }
 
     *tp = '\0';
-    *bufp = tp;
+    *destp = tp;
+    
+    return (dest);
 }
 
+/**
+ * \fn int *safe_strcatchr(char *dest, char **destp, char *src, size_t n)
+ * \brief Add a character to a string.
+ *
+ * \param dest Pointer to the destination buffer
+ * \param destp Pointer to where the string will be append into the destination buffer. 
+ * \param src Pointer to the string that will be append.
+ * \param size Size of the destination buffer.
+ *
+ * \return 0 if the character was added, 1 if the string was already full.
+ */
 
-int safe_chr_real_fn ( char src, char *buff, char **bufp, int max )
+
+//int safe_chr_real_fn ( char src, char *buff, char **bufp, int max )
+int safe_strcatchr(char *dest, char **destp, char src, size_t size)
 {
     char *tp;
-    int retval = 0;
-    tp = *bufp;
+    tp = *destp;
 
-    if ( ( tp - buff ) < max ) {
+    if ( ( tp - dest ) < size ) {
         *tp++ = src;
-        *bufp = tp;
+        *destp = tp;
         *tp = '\0';
+        return ( 0 );
     } else {
-        buff[max] = '\0';
-        retval = 1;
+        dest[size] = '\0';
+        return ( 1 );
     }
-
-    return retval;
 }
 
 /* ---------------------------------------------------------------------------

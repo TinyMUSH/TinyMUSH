@@ -421,7 +421,7 @@ void fun_setr ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     } else if ( result == -2 ) {
         safe_str ( "#-1 REGISTER LIMIT EXCEEDED", buff, bufc );
     } else if ( result > 0 ) {
-        safe_known_str ( fargs[1], result, buff, bufc );
+        safe_strncat ( buff, bufc, fargs[1], result, LBUF_SIZE );
     }
 }
 
@@ -436,12 +436,8 @@ static void read_register ( char *regname, char *buff, char **bufc )
         if ( ( regnum < 0 ) || ( regnum >= mudconf.max_global_regs ) ) {
             safe_str ( "#-1 INVALID GLOBAL REGISTER", buff, bufc );
         } else {
-            if ( mudstate.rdata
-                    && ( mudstate.rdata->q_alloc > regnum )
-                    && mudstate.rdata->q_regs[regnum] ) {
-                safe_known_str ( mudstate.rdata->q_regs[regnum],
-                                 mudstate.rdata->q_lens[regnum], buff,
-                                 bufc );
+            if ( mudstate.rdata && ( mudstate.rdata->q_alloc > regnum ) && mudstate.rdata->q_regs[regnum] ) {
+                safe_strncat ( buff, bufc, mudstate.rdata->q_regs[regnum], mudstate.rdata->q_lens[regnum], LBUF_SIZE );
             }
         }
 
@@ -457,12 +453,9 @@ static void read_register ( char *regname, char *buff, char **bufc )
     }
 
     for ( regnum = 0; regnum < mudstate.rdata->xr_alloc; regnum++ ) {
-        if ( mudstate.rdata->x_names[regnum] &&
-                !strcmp ( regname, mudstate.rdata->x_names[regnum] ) ) {
+        if ( mudstate.rdata->x_names[regnum] && !strcmp ( regname, mudstate.rdata->x_names[regnum] ) ) {
             if ( mudstate.rdata->x_regs[regnum] ) {
-                safe_known_str ( mudstate.rdata->x_regs[regnum],
-                                 mudstate.rdata->x_lens[regnum],
-                                 buff, bufc );
+                safe_strncat ( buff, bufc, mudstate.rdata->x_regs[regnum], mudstate.rdata->x_lens[regnum], LBUF_SIZE );
                 return;
             }
         }
@@ -711,7 +704,7 @@ void fun_nofx ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     lmask = calc_limitmask ( fargs[0] );
 
     if ( lmask == -1 ) {
-        safe_known_str ( "#-1 INVALID LIMIT", 17, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE );
         return;
     }
 
@@ -769,12 +762,12 @@ void handle_ucall ( char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
 
     if ( nfargs < 3 ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
         return;
     }
 
     if ( is_sandbox && ( nfargs < 5 ) ) {
-        safe_known_str ( "#-1 TOO FEW ARGUMENTS", 21, buff, bufc );
+        safe_strncat ( buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE );
         return;
     }
 
@@ -786,7 +779,7 @@ void handle_ucall ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         lmask = calc_limitmask ( fargs[1] );
 
         if ( lmask == -1 ) {
-            safe_known_str ( "#-1 INVALID LIMIT", 17, buff, bufc );
+            safe_strncat ( buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE );
             return;
         }
 
