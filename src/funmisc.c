@@ -458,10 +458,9 @@ void fun_lrand ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    char tbuf[12];
     Delim osep;
     int bot, top, over, i;
-    char *bb_p, *startp, *endp;
+    char *bb_p, *startp, *endp, *tbuf;
     static int lnum_init = 0;
     static char lnum_buff[290];
 
@@ -511,8 +510,9 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 print_sep ( &osep, buff, bufc );
             }
 
-            ltos ( tbuf, bot );
+            tbuf = ltos ( bot );
             over = safe_str ( tbuf, buff, bufc );
+            free_sbuf ( tbuf );
             bot++;
         }
 
@@ -566,8 +566,9 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 print_sep ( &osep, buff, bufc );
             }
 
-            ltos ( tbuf, i );
+            tbuf = ltos ( i );
             over = safe_str ( tbuf, buff, bufc );
+            free_sbuf ( tbuf );
         }
     } else {
         for ( i = bot; ( i >= top ) && !over; i-- ) {
@@ -575,8 +576,9 @@ void fun_lnum ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
                 print_sep ( &osep, buff, bufc );
             }
 
-            ltos ( tbuf, i );
+            tbuf = ltos ( i );
             over = safe_str ( tbuf, buff, bufc );
+            free_sbuf ( tbuf );
         }
     }
 }

@@ -51,7 +51,7 @@ static int did_attr ( dbref player, dbref thing, int what )
 static void look_exits ( dbref player, dbref loc, const char *exit_name )
 {
     dbref thing, parent;
-    char *buff, *e, *buff1, *e1;
+    char *buff, *e, *buff1, *e1, *buf;
     int foundany, lev, isdark;
 
     /*
@@ -130,29 +130,25 @@ static void look_exits ( dbref player, dbref loc, const char *exit_name )
 
                     if ( Html ( player ) && ( mudconf.have_pueblo == 1 ) ) {
                         e1 = buff1;
-                        safe_exit_name ( thing, buff1,
-                                         &e1 );
-                        safe_str ( ( char * )
-                                   "<a xch_cmd=\"", buff, &e );
+                        safe_exit_name ( thing, buff1, &e1 );
+                        safe_str ( ( char * ) "<a xch_cmd=\"", buff, &e );
                         /*
                          * XXX Just stripping ansi isn't really enough.
                          */
-                        safe_str ( strip_ansi ( buff1 ),
-                                   buff, &e );
-                        safe_str ( ( char * ) "\">", buff,
-                                   &e );
+                        buf = strip_ansi ( buff1 );
+                        safe_str ( buf, buff, &e );
+                        free_lbuf ( buf );
+                        safe_str ( ( char * ) "\">", buff, &e );
                         /*
                          * XXX The exit name needs to be HTML escaped.
                          */
                         html_escape ( buff1, buff, &e );
-                        safe_str ( ( char * ) "</a>", buff,
-                                   &e );
+                        safe_str ( ( char * ) "</a>", buff, &e );
                     } else {
                         /*
                          * Append this exit to the list
                          */
-                        safe_exit_name ( thing, buff,
-                                         &e );
+                        safe_exit_name ( thing, buff, &e );
                     }
                 }
             }
@@ -292,12 +288,8 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
 {
     int pos, depth;
     char *str, *strbuf, *parenlist, *endp;
-    static char *colors[5] = { ANSI_MAGENTA, ANSI_GREEN, ANSI_YELLOW,
-                               ANSI_CYAN, ANSI_BLUE
-                             };
-    static char *revcolors[5] = { "m53[\033", "m23[\033", "m33[\033",
-                                  "m63[\033", "m43[\033"
-                                };
+    static char *colors[5] = { ANSI_MAGENTA, ANSI_GREEN, ANSI_YELLOW, ANSI_CYAN, ANSI_BLUE };
+    static char *revcolors[5] = { "m53[\033", "m23[\033", "m33[\033", "m63[\033", "m43[\033" };
     static char *REVERSE_NORMAL = "m0[\033";
     static char *REVERSE_HIRED = "m13[\033m1[\033";
     str = strip_ansi ( atext );
@@ -335,8 +327,7 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
              */
             if ( str[pos - 1] != '\\' ) {
                 if ( ( parenlist[depth] & 96 ) == ( str[pos] & 96 ) ) {
-                    safe_str ( colors[depth % 5], strbuf,
-                               &endp );
+                    safe_str ( colors[depth % 5], strbuf, &endp );
                     safe_chr ( str[pos], strbuf, &endp );
                     safe_ansi_normal ( strbuf, &endp );
                     depth--;
@@ -348,6 +339,7 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
                     *endp = '\0';
                     safe_str ( strbuf, buff, bufc );
                     safe_str ( str + pos + 1, buff, bufc );
+                    free_lbuf ( str );
                     free_lbuf ( strbuf );
                     free_lbuf ( parenlist );
                     return;
@@ -367,6 +359,7 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
     if ( depth == 0 ) {
         *endp = '\0';
         safe_str ( strbuf, buff, bufc );
+        free_lbuf ( str );
         free_lbuf ( strbuf );
         free_lbuf ( parenlist );
         return;
@@ -418,6 +411,7 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
                 }
 
                 **bufc = '\0';
+                free_lbuf ( str );
                 free_lbuf ( strbuf );
                 free_lbuf ( parenlist );
                 return;
@@ -440,6 +434,7 @@ static void pairs_print ( dbref player, char *atext, char *buff, char **bufc )
     }
 
     **bufc = '\0';
+    free_lbuf ( str );
     free_lbuf ( strbuf );
     free_lbuf ( parenlist );
 }
@@ -1190,7 +1185,7 @@ static void debug_examine ( dbref player, dbref thing )
     int aflags, alen, ca;
     BOOLEXP *bool;
     ATTR *attr;
-    char *as, *cp, nbuf[20];
+    char *as, *cp, *nbuf;
     notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN,  "Number  = %d", thing );
 
     if ( !Good_obj ( thing ) ) {
@@ -1235,8 +1230,9 @@ static void debug_examine ( dbref player, dbref thing )
                 safe_str ( ( char * ) attr->name, buf, &cp );
                 safe_chr ( ' ', buf, &cp );
             } else {
-                ltos ( nbuf, ca );
+                nbuf = ltos ( ca );
                 safe_str ( nbuf, buf, &cp );
+                free_sbuf ( nbuf );
                 safe_chr ( ' ', buf, &cp );
             }
         }
@@ -2108,7 +2104,7 @@ extern NAMETAB indiv_attraccess_nametab[];
 void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
 {
     BOOLEXP *bool;
-    char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp;
+    char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp, *buf;
     dbref aowner, thing;
     int val, aflags, alen, ca, wild_decomp;
     ATTR *attr;
@@ -2179,7 +2175,9 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
         }
     }
 
-    strcpy ( thingname, strip_ansi ( thingname ) );
+    buf = strip_ansi ( thingname );
+    strcpy ( thingname, buf );
+    free_lbuf ( buf );
 
     /*
      * Report the lock (if any)

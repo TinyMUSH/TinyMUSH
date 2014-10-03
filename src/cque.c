@@ -54,19 +54,20 @@ static int add_to ( dbref doer, dbref player, int am, int attrnum )
 {
     int num, aflags, alen;
     dbref aowner;
-    char buff[20];
+    char *buff;
     char *atr_gotten;
     num = ( int ) strtol ( atr_gotten = atr_get ( player, attrnum, &aowner, &aflags, &alen ), ( char ** ) NULL, 10 );
     free_lbuf ( atr_gotten );
     num += am;
 
     if ( num ) {
-        ltos ( buff, num );
+        buff = ltos ( num );
+        atr_add ( player, attrnum, buff, Owner ( doer ), aflags );
+        free_sbuf ( buff );
     } else {
-        *buff = '\0';
+        atr_add ( player, attrnum, ( char * ) '\0', Owner ( doer ), aflags );
     }
 
-    atr_add ( player, attrnum, buff, Owner ( doer ), aflags );
     return ( num );
 }
 

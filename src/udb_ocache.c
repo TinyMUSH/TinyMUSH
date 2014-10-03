@@ -333,11 +333,10 @@ void list_cached_objs ( dbref player )
     int x;
     int aco, maco, asize, msize, oco, moco;
     int *count_array, *size_array;
+    char *s;
     aco = maco = asize = msize = oco = moco = 0;
-    count_array = ( int * ) xcalloc ( mudstate.db_top, sizeof ( int ),
-                                      "list_cached_objs.count" );
-    size_array = ( int * ) xcalloc ( mudstate.db_top, sizeof ( int ),
-                                     "list_cached_objs.size" );
+    count_array = ( int * ) xcalloc ( mudstate.db_top, sizeof ( int ), "list_cached_objs.count" );
+    size_array = ( int * ) xcalloc ( mudstate.db_top, sizeof ( int ), "list_cached_objs.size" );
 
     for ( x = 0, sp = sys_c; x < cwidth; x++, sp++ ) {
         for ( cp = sp->head; cp != NULL; cp = cp->nxt ) {
@@ -359,7 +358,9 @@ void list_cached_objs ( dbref player )
 
     for ( x = 0; x < mudstate.db_top; x++ ) {
         if ( count_array[x] > 0 ) {
-            raw_notify ( player, "%-30.30s  #%-6d  %5d  %8d", strip_ansi ( Name ( x ) ), x, count_array[x], size_array[x] );
+            s = strip_ansi ( Name ( x ) );
+            raw_notify ( player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x] );
+            free_lbuf ( s );
             oco++;
             count_array[x] = 0;
             size_array[x] = 0;
@@ -386,7 +387,9 @@ void list_cached_objs ( dbref player )
 
     for ( x = 0; x < mudstate.db_top; x++ ) {
         if ( count_array[x] > 0 ) {
-            raw_notify ( player, "%-30.30s  #%-6d  %5d  %8d",  strip_ansi ( Name ( x ) ), x, count_array[x], size_array[x] );
+            s = strip_ansi ( Name ( x ) );
+            raw_notify ( player, "%-30.30s  #%-6d  %5d  %8d",  s, x, count_array[x], size_array[x] );
+            free_lbuf ( s );
             moco++;
         }
     }

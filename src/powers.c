@@ -438,6 +438,7 @@ void decompile_powers ( dbref player, dbref thing, char *thingname )
 {
     POWER f1, f2;
     POWERENT *fp;
+    char *buf;
     /*
      * Report generic powers
      */
@@ -477,7 +478,9 @@ void decompile_powers ( dbref player, dbref thing, char *thingname )
         /*
          * We made it this far, report this power
          */
-        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@power %s=%s", strip_ansi ( thingname ), fp->powername );
+        buf = strip_ansi ( thingname );
+        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@power %s=%s", buf, fp->powername );
+        free_lbuf ( buf );
     }
 }
 

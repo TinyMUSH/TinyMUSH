@@ -33,8 +33,7 @@ void perform_loop ( char *buff, char **bufc, dbref player, dbref caller, dbref c
 {
     Delim isep, osep;
     int flag;       /* 0 is parse(), 1 is loop() */
-    char *curr, *objstring, *buff2, *buff3, *cp, *dp, *str, *result, *bb_p;
-    char tbuf[8];
+    char *curr, *objstring, *buff2, *buff3, *cp, *dp, *str, *result, *bb_p, *tbuf;
     int number = 0;
     flag = Func_Mask ( LOOP_NOTIFY );
 
@@ -66,8 +65,9 @@ void perform_loop ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         number++;
         objstring = split_token ( &cp, &isep );
         buff2 = replace_string ( BOUND_VAR, objstring, fargs[1] );
-        ltos ( tbuf, number );
+        tbuf = ltos ( number );
         buff3 = replace_string ( LISTPLACE_VAR, tbuf, buff2 );
+        free_sbuf ( tbuf );
         str = buff3;
 
         if ( !flag ) {

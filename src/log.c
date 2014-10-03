@@ -313,16 +313,18 @@ void log_write_raw ( int key, const char *format, ... )
 
 char *log_getname ( dbref target, char *d )
 {
-    char *name, *s;
+    char *name, *s, *buf;;
 
     if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
         s = unparse_object ( ( dbref ) GOD, target, 0 );
     } else {
         s = unparse_object_numonly ( target );
     }
-
-    name = xstrdup ( strip_ansi ( s ), d );
+    
+    buf = strip_ansi ( s );
+    name = xstrdup ( buf, d );
     free_lbuf ( s );
+    free_lbuf ( buf );
     return ( name );
 }
 

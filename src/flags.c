@@ -1053,6 +1053,7 @@ void decompile_flags ( dbref player, dbref thing, char *thingname )
 {
     FLAG f1, f2, f3;
     FLAGENT *fp;
+    char *s;
     /*
      * Report generic flags
      */
@@ -1097,6 +1098,8 @@ void decompile_flags ( dbref player, dbref thing, char *thingname )
         /*
          * We made it this far, report this flag
          */
-        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@set %s=%s", strip_ansi ( thingname ), fp->flagname );
+        s = strip_ansi ( thingname );
+        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@set %s=%s", s, fp->flagname );
+        free_lbuf ( s );
     }
 }

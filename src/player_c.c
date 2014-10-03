@@ -30,8 +30,6 @@ typedef struct player_cache {
     struct player_cache *next;
 } PCACHE;
 
-typedef char    IBUF[16];
-
 NHSHTAB pcache_htab;
 
 PCACHE *pcache_head;
@@ -104,20 +102,23 @@ void pcache_reload ( dbref player )
 
 static void pcache_save ( PCACHE *pp )
 {
-    IBUF tbuf;
+    char *tbuf;
 
     if ( pp->cflags & PF_DEAD ) {
         return;
     }
 
     if ( pp->cflags & PF_MONEY_CH ) {
-        ltos ( tbuf, pp->money );
+        tbuf = ltos ( pp->money );
         atr_add_raw ( pp->player, A_MONEY, tbuf );
+        free_sbuf ( tbuf );
     }
 
     if ( pp->cflags & PF_QMAX_CH ) {
+        tbuf = alloc_sbuf ( "pcache_save" );
         sprintf ( tbuf, "%d", pp->qmax );
         atr_add_raw ( pp->player, A_QUEUEMAX, tbuf );
+        free_sbuf ( tbuf );
     }
 
     pp->cflags &= ~ ( PF_MONEY_CH | PF_QMAX_CH );
@@ -229,7 +230,7 @@ int Pennies ( dbref obj )
 void s_Pennies ( dbref obj, int howfew )
 {
     PCACHE *pp;
-    IBUF tbuf;
+    char * tbuf;
 
     if ( !mudstate.standalone && Good_owner ( obj ) ) {
         pp = pcache_find ( obj );
@@ -237,6 +238,7 @@ void s_Pennies ( dbref obj, int howfew )
         pp->cflags |= PF_MONEY_CH;
     }
 
-    ltos ( tbuf, howfew );
+    tbuf = ltos ( howfew );
     atr_add_raw ( obj, A_MONEY, tbuf );
+    free_sbuf ( tbuf );
 }

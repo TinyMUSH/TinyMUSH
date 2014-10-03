@@ -72,8 +72,9 @@ void do_version ( dbref player, dbref cause, int extra )
         MODULE *mp;
 
         for ( mp = mudstate.modules_list; mp != NULL; mp = mp->next ) {
-            ptr = repeatchar ( strlen ( mp->modname ) + 8, '-', "do_version" );
-            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Module %s\n%s\n", mp->modname, ptr );
+            snprintf ( string, MBUF_SIZE, "Module %s", mp->modname );
+            ptr = repeatchar ( strlen ( string ), '-', "do_version" );
+            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr );
             xfree ( ptr, "do_version" );
             snprintf ( string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version" );
 

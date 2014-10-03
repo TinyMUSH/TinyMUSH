@@ -4,24 +4,24 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h" 	/* required by mudconf */
-#include "alloc.h" 	/* required by mudconf */
-#include "flags.h" 	/* required by mudconf */
-#include "htab.h" 	/* required by mudconf */
-#include "ltdl.h" 	/* required by mudconf */
-#include "udb.h" 	/* required by mudconf */
-#include "udb_defs.h" 	/* required by mudconf */
+#include "typedefs.h"
+#include "game.h"
+#include "alloc.h"
+#include "flags.h"  /* required by mudconf */
+#include "htab.h"   /* required by mudconf */
+#include "ltdl.h"   /* required by mudconf */
+#include "udb.h"    /* required by mudconf */
+#include "udb_defs.h"   /* required by mudconf */
 
-#include "mushconf.h"	/* required by code */
+#include "mushconf.h"   /* required by code */
 
-#include "db.h"		/* required by externs */
+#include "db.h"     /* required by externs */
 #include "interface.h"
-#include "externs.h"   	/* required by code */
+#include "externs.h"    /* required by code */
 
 #include "ansi.h"       /* required by code */
 
-/** 
+/**
  * \brief ANSI character-to-number translation table.
  */
 
@@ -30,16 +30,16 @@ int ansi_nchartab[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, I_ANSI_BBLUE, I_ANSI_BCYAN, 0, 0, 0, I_ANSI_BGREEN, 0, 0, 0, 0, 0, I_ANSI_BMAGENTA, 0, 0,
     0, 0, I_ANSI_BRED, 0, 0, 0, 0, I_ANSI_BWHITE, I_ANSI_BBLACK, I_ANSI_BYELLOW, 0, 0, 0, 0, 0, 0,
-    0, 0, I_ANSI_BLUE, I_ANSI_CYAN, 0, 0, I_ANSI_BLINK, I_ANSI_GREEN, I_ANSI_HILITE, I_ANSI_INVERSE, 
+    0, 0, I_ANSI_BLUE, I_ANSI_CYAN, 0, 0, I_ANSI_BLINK, I_ANSI_GREEN, I_ANSI_HILITE, I_ANSI_INVERSE,
     0, 0, 0, I_ANSI_MAGENTA, I_ANSI_NORMAL, 0, 0, 0, I_ANSI_RED, 0, 0, I_ANSI_UNDER, 0, I_ANSI_WHITE,
-    I_ANSI_BLACK, I_ANSI_YELLOW, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    I_ANSI_BLACK, I_ANSI_YELLOW, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/** 
+/**
  * \brief ANSI number-to-character translation table.
  */
 
@@ -103,8 +103,9 @@ int ansi_bits[I_ANSI_LIM] = {
 
 char *strip_ansi ( const char *s )
 {
-    static char buf[LBUF_SIZE];
-    char *p = buf, *s1;
+    char *buf, *xbuf, *p, *s1;
+    p = buf = alloc_lbuf ( __func__ );
+    *buf = '\0';
     s1 = ( char * ) s;
 
     if ( s1 ) {
@@ -121,10 +122,9 @@ char *strip_ansi ( const char *s )
         }
 
         *p = '\0';
-        return ( buf );
-    } else {
-        return ( s1 );
     }
+
+    return ( buf );
 }
 
 /**
@@ -141,36 +141,49 @@ char *strip_ansi ( const char *s )
 
 char *strip_xterm ( char *s )
 {
-    static char buf[LBUF_SIZE];
-    char *ch, *p;
-
-    /* First we strip all foreground colors */
-
-    if ( ! ( ch = strstr ( s, ANSI_XTERM_FG ) ) ) {
-        return s;
+    char *buf, *p;
+    char *s1 = s;
+    int skip = 0;
+    
+    p = buf = alloc_lbuf ( __func__ );
+    
+    while( *s1 ) {
+        if ( strncmp(s1 , ANSI_XTERM_FG, strlen(ANSI_XTERM_FG)) == 0 ) {
+            skip = 1;
+            while ( skip ) {
+                if ( (*s1 == '\0') || ( *s1 == ANSI_END ) ) {
+                    skip = 0;
+                    if ( *s1 == ANSI_END ) {
+                        s1++;
+                    }
+                } else {
+                    s1++;
+                }
+            }
+        }
+        
+        if ( strncmp(s1 , ANSI_XTERM_BG, strlen(ANSI_XTERM_BG)) == 0 ) {
+            skip = 1;
+            while ( skip ) {
+                if ( (*s1 == '\0') || ( *s1 == ANSI_END ) ) {
+                    skip = 0;
+                    if ( *s1 == ANSI_END ) {
+                        s1++;
+                    }
+                } else {
+                    s1++;
+                }
+            }
+        }
+        
+        if ( *s1 ) {
+        *p++ = *s1++;
+        } else {
+            break;
+        }
     }
 
-    do {
-        p = strchr ( ch + strlen ( ANSI_XTERM_FG ), ANSI_END ) + 1;
-        strncpy ( buf, s, ch - s );
-        buf[ch - s] = 0;
-        strcat ( buf + ( ch - s ), p );
-        s = buf;
-    } while ( ( ch = strstr ( s, ANSI_XTERM_FG ) ) );
-
-    /* Second, we do exactly the same for background */
-
-    if ( ! ( ch = strstr ( s, ANSI_XTERM_BG ) ) ) {
-        return s;
-    }
-
-    do {
-        p = strchr ( ch + strlen ( ANSI_XTERM_BG ), ANSI_END ) + 1;
-        strncpy ( buf, s, ch - s );
-        buf[ch - s] = 0;
-        strcat ( buf + ( ch - s ), p );
-        s = buf;
-    } while ( ( ch = strstr ( s, ANSI_XTERM_BG ) ) );
+    *p = '\0';
 
     return ( buf );
 }
@@ -225,13 +238,14 @@ int strip_ansi_len ( const char *s )
 
 char *normal_to_white ( const char *raw )
 {
-    static char buf[LBUF_SIZE];
+    char *buf, *q;
     char *p = ( char * ) raw;
-    char *q = buf;
     char *just_after_csi;
     char *just_after_esccode = p;
     unsigned int param_val;
     int has_zero;
+    buf = alloc_lbuf ( __func__ );
+    q = buf;
 
     while ( p && *p ) {
         if ( *p == ESC_CHAR ) {
@@ -314,15 +328,15 @@ char *normal_to_white ( const char *raw )
     }
 
     safe_strncat ( buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE );
-    return buf;
+    return ( buf );
 }
 
 /**
  * \fn char *ansi_transition_esccode ( int ansi_before, int ansi_after )
  * \brief Handle the transition between two ansi sequence
  *
- * Since this function use a static buffer, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returning buffer
+ * with free_sbuf();
  *
  * \param ansi_before Ansi state before transition.
  * \param ansi_after ansi state after transition.
@@ -334,83 +348,83 @@ char *ansi_transition_esccode ( int ansi_before, int ansi_after )
 {
     int ansi_bits_set, ansi_bits_clr;
     char *p;
-    static char buffer[64];
+    char *buffer;
+    buffer = alloc_sbuf ( __func__ );
+    *buffer = '\0';
 
-    if ( ansi_before == ansi_after ) {
-        return "";
-    }
-
-    buffer[0] = ESC_CHAR;
-    buffer[1] = ANSI_CSI;
-    p = buffer + 2;
-    /*
-     * If they turn off any highlight bits, or they change from some color
-     * * to default color, we need to use ansi normal first.
-     */
-    ansi_bits_set = ( ~ansi_before ) & ansi_after;
-    ansi_bits_clr = ansi_before & ( ~ansi_after );
-
-    if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
-            ( ansi_bits_set & 0x088 ) ||    /* normal to color */
-            ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
-        strcpy ( p, "0;" );
-        p += 2;
-        ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
-        ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
-    }
-
-    /*
-     * Next reproduce the highlight state
-     */
-
-    if ( ansi_bits_set & 0x100 ) {
-        strcpy ( p, "1;" );
-        p += 2;
-    }
-
-    if ( ansi_bits_set & 0x200 ) {
-        strcpy ( p, "4;" );
-        p += 2;
-    }
-
-    if ( ansi_bits_set & 0x400 ) {
-        strcpy ( p, "5;" );
-        p += 2;
-    }
-
-    if ( ansi_bits_set & 0x800 ) {
-        strcpy ( p, "7;" );
-        p += 2;
-    }
-
-    /*
-     * Foreground color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
-        strcpy ( p, "30;" );
-        p += 3;
-        p[-2] |= ( ansi_after & 0x00f );
-    }
-
-    /*
-     * Background color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
-        strcpy ( p, "40;" );
-        p += 3;
-        p[-2] |= ( ( ansi_after & 0x0f0 ) >> 4 );
-    }
-
-    /*
-     * Terminate
-     */
-    if ( p > buffer + 2 ) {
-        p[-1] = ANSI_END;
+    if ( ansi_before != ansi_after ) {
+        buffer[0] = ESC_CHAR;
+        buffer[1] = ANSI_CSI;
+        p = buffer + 2;
         /*
-         * Buffer is already null-terminated by strcpy
+         * If they turn off any highlight bits, or they change from some color
+         * * to default color, we need to use ansi normal first.
          */
-    } else {
-        buffer[0] = '\0';
+        ansi_bits_set = ( ~ansi_before ) & ansi_after;
+        ansi_bits_clr = ansi_before & ( ~ansi_after );
+
+        if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
+                ( ansi_bits_set & 0x088 ) ||    /* normal to color */
+                ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
+            strcpy ( p, "0;" );
+            p += 2;
+            ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
+            ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
+        }
+
+        /*
+         * Next reproduce the highlight state
+         */
+
+        if ( ansi_bits_set & 0x100 ) {
+            strcpy ( p, "1;" );
+            p += 2;
+        }
+
+        if ( ansi_bits_set & 0x200 ) {
+            strcpy ( p, "4;" );
+            p += 2;
+        }
+
+        if ( ansi_bits_set & 0x400 ) {
+            strcpy ( p, "5;" );
+            p += 2;
+        }
+
+        if ( ansi_bits_set & 0x800 ) {
+            strcpy ( p, "7;" );
+            p += 2;
+        }
+
+        /*
+         * Foreground color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
+            strcpy ( p, "30;" );
+            p += 3;
+            p[-2] |= ( ansi_after & 0x00f );
+        }
+
+        /*
+         * Background color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
+            strcpy ( p, "40;" );
+            p += 3;
+            p[-2] |= ( ( ansi_after & 0x0f0 ) >> 4 );
+        }
+
+        /*
+         * Terminate
+         */
+        if ( p > buffer + 2 ) {
+            p[-1] = ANSI_END;
+            /*
+             * Buffer is already null-terminated by strcpy
+             */
+        } else {
+            buffer[0] = '\0';
+        }
     }
 
     return buffer;
@@ -420,8 +434,8 @@ char *ansi_transition_esccode ( int ansi_before, int ansi_after )
  * \fn char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
  * \brief Handle the transition between two ansi sequence of mushcode.
  *
- * Since this function use a static buffer, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returning buffer
+ * with free_sbuf();
  *
  * \param ansi_before Ansi state before transition.
  * \param ansi_after ansi state after transition.
@@ -433,77 +447,78 @@ char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
 {
     int ansi_bits_set, ansi_bits_clr;
     char *p;
-    static char ansi_mushcode_fg[9] = "xrgybmcw";
-    static char ansi_mushcode_bg[9] = "XRGYBMCW";
-    static char buffer[64];
+    char ansi_mushcode_fg[9] = "xrgybmcw";
+    char ansi_mushcode_bg[9] = "XRGYBMCW";
+    char *buffer;
+    buffer = alloc_sbuf ( __func__ );
+    *buffer = '\0';
 
-    if ( ansi_before == ansi_after ) {
-        return "";
+    if ( ansi_before != ansi_after ) {
+        p = buffer;
+        /*
+         * If they turn off any highlight bits, or they change from some color
+         * * to default color, we need to use ansi normal first.
+         */
+        ansi_bits_set = ( ~ansi_before ) & ansi_after;
+        ansi_bits_clr = ansi_before & ( ~ansi_after );
+
+        if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
+                ( ansi_bits_set & 0x088 ) ||    /* normal to color */
+                ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
+            strcpy ( p, "%xn" );
+            p += 3;
+            ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
+            ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
+        }
+
+        /*
+         * Next reproduce the highlight state
+         */
+
+        if ( ansi_bits_set & 0x100 ) {
+            strcpy ( p, "%xh" );
+            p += 3;
+        }
+
+        if ( ansi_bits_set & 0x200 ) {
+            strcpy ( p, "%xu" );
+            p += 3;
+        }
+
+        if ( ansi_bits_set & 0x400 ) {
+            strcpy ( p, "%xf" );
+            p += 3;
+        }
+
+        if ( ansi_bits_set & 0x800 ) {
+            strcpy ( p, "%xi" );
+            p += 3;
+        }
+
+        /*
+         * Foreground color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
+            strcpy ( p, "%xx" );
+            p += 3;
+            p[-1] = ansi_mushcode_fg[ ( ansi_after & 0x00f )];
+        }
+
+        /*
+         * Background color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
+            strcpy ( p, "%xX" );
+            p += 3;
+            p[-1] = ansi_mushcode_bg[ ( ansi_after & 0x0f0 ) >> 4];
+        }
+
+        /*
+         * Terminate
+         */
+        *p = '\0';
     }
 
-    p = buffer;
-    /*
-     * If they turn off any highlight bits, or they change from some color
-     * * to default color, we need to use ansi normal first.
-     */
-    ansi_bits_set = ( ~ansi_before ) & ansi_after;
-    ansi_bits_clr = ansi_before & ( ~ansi_after );
-
-    if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
-            ( ansi_bits_set & 0x088 ) ||    /* normal to color */
-            ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
-        strcpy ( p, "%xn" );
-        p += 3;
-        ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
-        ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
-    }
-
-    /*
-     * Next reproduce the highlight state
-     */
-
-    if ( ansi_bits_set & 0x100 ) {
-        strcpy ( p, "%xh" );
-        p += 3;
-    }
-
-    if ( ansi_bits_set & 0x200 ) {
-        strcpy ( p, "%xu" );
-        p += 3;
-    }
-
-    if ( ansi_bits_set & 0x400 ) {
-        strcpy ( p, "%xf" );
-        p += 3;
-    }
-
-    if ( ansi_bits_set & 0x800 ) {
-        strcpy ( p, "%xi" );
-        p += 3;
-    }
-
-    /*
-     * Foreground color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
-        strcpy ( p, "%xx" );
-        p += 3;
-        p[-1] = ansi_mushcode_fg[ ( ansi_after & 0x00f )];
-    }
-
-    /*
-     * Background color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
-        strcpy ( p, "%xX" );
-        p += 3;
-        p[-1] = ansi_mushcode_bg[ ( ansi_after & 0x0f0 ) >> 4];
-    }
-
-    /*
-     * Terminate
-     */
-    *p = '\0';
     return buffer;
 }
 
@@ -511,8 +526,8 @@ char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
  * \fn char *ansi_transition_letters ( int ansi_before, int ansi_after )
  * \brief Handle the transition between two ansi sequence of mushcode.
  *
- * Since this function use a static buffer, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returning buffer
+ * with free_sbuf();
  *
  * \param ansi_before Ansi state before transition.
  * \param ansi_after ansi state after transition.
@@ -524,68 +539,69 @@ char *ansi_transition_letters ( int ansi_before, int ansi_after )
 {
     int ansi_bits_set, ansi_bits_clr;
     char *p;
-    static char ansi_mushcode_fg[9] = "xrgybmcw";
+    char ansi_mushcode_fg[9] = "xrgybmcw";
     static char ansi_mushcode_bg[9] = "XRGYBMCW";
-    static char buffer[64];
+    char *buffer;
+    buffer = alloc_sbuf ( __func__ );
+    *buffer = '\0';
 
-    if ( ansi_before == ansi_after ) {
-        return "";
+    if ( ansi_before != ansi_after ) {
+        p = buffer;
+        /*
+         * If they turn off any highlight bits, or they change from some color
+         * * to default color, we need to use ansi normal first.
+         */
+        ansi_bits_set = ( ~ansi_before ) & ansi_after;
+        ansi_bits_clr = ansi_before & ( ~ansi_after );
+
+        if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
+                ( ansi_bits_set & 0x088 ) ||    /* normal to color */
+                ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
+            *p++ = 'n';
+            ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
+            ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
+        }
+
+        /*
+         * Next reproduce the highlight state
+         */
+
+        if ( ansi_bits_set & 0x100 ) {
+            *p++ = 'h';
+        }
+
+        if ( ansi_bits_set & 0x200 ) {
+            *p++ = 'u';
+        }
+
+        if ( ansi_bits_set & 0x400 ) {
+            *p++ = 'f';
+        }
+
+        if ( ansi_bits_set & 0x800 ) {
+            *p++ = 'i';
+        }
+
+        /*
+         * Foreground color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
+            *p++ = ansi_mushcode_fg[ ( ansi_after & 0x00f )];
+        }
+
+        /*
+         * Background color
+         */
+        if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
+            *p++ = ansi_mushcode_bg[ ( ansi_after & 0x0f0 ) >> 4];
+        }
+
+        /*
+         * Terminate
+         */
+        *p = '\0';
     }
 
-    p = buffer;
-    /*
-     * If they turn off any highlight bits, or they change from some color
-     * * to default color, we need to use ansi normal first.
-     */
-    ansi_bits_set = ( ~ansi_before ) & ansi_after;
-    ansi_bits_clr = ansi_before & ( ~ansi_after );
-
-    if ( ( ansi_bits_clr & 0xf00 ) ||   /* highlights off */
-            ( ansi_bits_set & 0x088 ) ||    /* normal to color */
-            ( ansi_bits_clr == 0x1000 ) ) { /* explicit normal */
-        *p++ = 'n';
-        ansi_bits_set = ( ~ansi_bits[0] ) & ansi_after;
-        ansi_bits_clr = ansi_bits[0] & ( ~ansi_after );
-    }
-
-    /*
-     * Next reproduce the highlight state
-     */
-
-    if ( ansi_bits_set & 0x100 ) {
-        *p++ = 'h';
-    }
-
-    if ( ansi_bits_set & 0x200 ) {
-        *p++ = 'u';
-    }
-
-    if ( ansi_bits_set & 0x400 ) {
-        *p++ = 'f';
-    }
-
-    if ( ansi_bits_set & 0x800 ) {
-        *p++ = 'i';
-    }
-
-    /*
-     * Foreground color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x00f ) {
-        *p++ = ansi_mushcode_fg[ ( ansi_after & 0x00f )];
-    }
-
-    /*
-     * Background color
-     */
-    if ( ( ansi_bits_set | ansi_bits_clr ) & 0x0f0 ) {
-        *p++ = ansi_mushcode_bg[ ( ansi_after & 0x0f0 ) >> 4];
-    }
-
-    /*
-     * Terminate
-     */
-    *p = '\0';
     return buffer;
 }
 
@@ -646,64 +662,67 @@ int ansi_map_states ( const char *s, int **m, char **p )
 
 char *remap_colors ( const char *s, int *cmap )
 {
-    static char new[LBUF_SIZE];
+    char *buf;
     char *bp;
     int n;
+    buf = alloc_lbuf ( __func__ );
 
     if ( !s || !*s || !cmap ) {
-        return ( char * ) s;
+        strncpy ( buf, s, LBUF_SIZE );
+        buf[LBUF_SIZE] = '\0';
+        return ( buf );
     }
 
-    bp = new;
+    bp = buf;
 
     do {
         while ( *s && ( *s != ESC_CHAR ) ) {
-            safe_chr ( *s, new, &bp );
+            safe_chr ( *s, buf, &bp );
             s++;
         }
 
         if ( *s == ESC_CHAR ) {
-            safe_chr ( *s, new, &bp );
+            safe_chr ( *s, buf, &bp );
             s++;
 
             if ( *s == ANSI_CSI ) {
-                safe_chr ( *s, new, &bp );
+                safe_chr ( *s, buf, &bp );
                 s++;
 
                 do {
                     n = ( int ) strtol ( s, ( char ** ) NULL, 10 );
 
                     if ( ( n >= I_ANSI_BLACK ) && ( n < I_ANSI_NUM ) && ( cmap[n - I_ANSI_BLACK] != 0 ) ) {
-                        safe_ltos ( new, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE );
+                        safe_ltos ( buf, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE );
 
                         while ( isdigit ( *s ) ) {
                             s++;
                         }
                     } else {
                         while ( isdigit ( *s ) ) {
-                            safe_chr ( *s, new, &bp );
+                            safe_chr ( *s, buf, &bp );
                             s++;
                         }
                     }
 
                     if ( *s == ';' ) {
-                        safe_chr ( *s, new, &bp );
+                        safe_chr ( *s, buf, &bp );
                         s++;
                     }
                 } while ( *s && ( *s != ANSI_END ) );
 
                 if ( *s == ANSI_END ) {
-                    safe_chr ( *s, new, &bp );
+                    safe_chr ( *s, buf, &bp );
                     s++;
                 }
             } else if ( *s ) {
-                safe_chr ( *s, new, &bp );
+                safe_chr ( *s, buf, &bp );
                 s++;
             }
         }
     } while ( *s );
 
-    return new;
+    return ( buf );
 }
 
 
@@ -810,7 +829,7 @@ char *translate_string ( char *str, int type )
  * ---------------------------------------------------------------------------
  * rgb2xterm -- Convert an RGB value to xterm color
  */
- 
+
 /**
  * \fn int rgb2xterm ( long rgb )
  * \brief Convert an RGB value to xterm value
@@ -1118,8 +1137,8 @@ char *munge_space ( char *string )
 
     while ( p && *p && isspace ( *p ) ) {
         p++;
-    }       
-    
+    }
+
     /* remove initial spaces */
 
     while ( p && *p ) {
@@ -1134,10 +1153,8 @@ char *munge_space ( char *string )
         }
     }
 
-    *q = '\0';      
-    
+    *q = '\0';
     /* remove terminal spaces and terminate string */
-    
     return ( buffer );
 }
 
@@ -1157,12 +1174,12 @@ char *trim_spaces ( char *string )
     p = string;
     q = buffer;
 
-    while ( p && *p && isspace ( *p ) ) { 
+    while ( p && *p && isspace ( *p ) ) {
         p++; /* remove inital spaces */
     }
 
     while ( p && *p ) {
-        while ( *p && !isspace ( *p ) ) { 
+        while ( *p && !isspace ( *p ) ) {
             *q++ = *p++; /* copy nonspace chars */
         }
 
@@ -1346,7 +1363,7 @@ const char *string_match ( const char *src, const char *sub )
 
 /**
  * \fn char *replace_string ( const char *old, const char *new, const char *string )
- * \brief Replace all occurences of a substring with a new substring. 
+ * \brief Replace all occurences of a substring with a new substring.
  *
  * \param old The string you want to replace.
  * \param new The string you want to replace with.
@@ -1443,9 +1460,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
     to_ansi_set = ( ~ANST_NONE ) & ansi_state;
     to_ansi_clr = ANST_NONE & ( ~ansi_state );
     tlen = p - to;
-
     /* Do the substitution.  Idea for prefix/suffix from R'nice@TinyTIM */
-
     cp = *dst = alloc_lbuf ( "edit_string" );
 
     if ( !strcmp ( from, "^" ) ) {
@@ -1529,7 +1544,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
  * \fn int minmatch ( char *str, char *target, int min )
  * \brief Find if a substring at the start of a string exist.
  *
- * At least MIN characters must match. This is how flags are 
+ * At least MIN characters must match. This is how flags are
  * match by the command queue.
  *
  * \param str Pointer to the string that will be search.
@@ -1560,7 +1575,7 @@ int minmatch ( char *str, char *target, int min )
 
 /**
  * \fn int safe_strcat ( const char *src, char *buff, char **bufp, int max )
- * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string. 
+ * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string.
  *
  * \param src Pointer to the string that will be copied.
  * \param buff Pointer to the buffer that will receive the string.
@@ -1573,7 +1588,6 @@ int safe_strcat ( char *dest, char **destp, const char *src, size_t size )
 {
     char *tp, *maxtp, *longtp;
     int n, len;
-
     tp = *destp;
 
     if ( src == NULL ) {
@@ -1618,7 +1632,7 @@ int safe_strcat ( char *dest, char **destp, const char *src, size_t size )
  * \brief Concatenate two strings, using at most n bytes from src.
  *
  * \param dest Pointer to the destination buffer
- * \param destp Pointer to where the string will be append into the destination buffer. 
+ * \param destp Pointer to where the string will be append into the destination buffer.
  * \param src Pointer to the string that will be append.
  * \param n Number of characters that will be append.
  * \param size Size of the destination buffer.
@@ -1626,7 +1640,7 @@ int safe_strcat ( char *dest, char **destp, const char *src, size_t size )
  * \return A pointer to the resulting string.
  */
 
-char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t size)
+char *safe_strncat ( char *dest, char **destp, const char *src, size_t n, size_t size )
 {
     int sz;
     char *tp, *maxtp;
@@ -1665,8 +1679,7 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
 
     *tp = '\0';
     *destp = tp;
-    
-    return (dest);
+    return ( dest );
 }
 
 /**
@@ -1674,14 +1687,14 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
  * \brief Add a character to a string.
  *
  * \param dest Pointer to the destination buffer
- * \param destp Pointer to where the string will be append into the destination buffer. 
+ * \param destp Pointer to where the string will be append into the destination buffer.
  * \param src Pointer to the string that will be append.
  * \param size Size of the destination buffer.
  *
  * \return 0 if the character was added, 1 if the string was already full.
  */
 
-int safe_strcatchr(char *dest, char **destp, char src, size_t size)
+int safe_strcatchr ( char *dest, char **destp, char src, size_t size )
 {
     char *tp;
     tp = *destp;
@@ -1697,15 +1710,15 @@ int safe_strcatchr(char *dest, char **destp, char src, size_t size)
     }
 }
 
- /**
- * \fn int matches_exit_from_list ( char *exit_list, char *pattern )
- * \brief Find if pattern is found in the exit list.
- *
- * \param exit_list Pointer to the list of names of an exit
- * \param pattern Pointer to the pattern we are searching
- *
- * \return 1 if the pattern is in the list, 0 if not.
- */
+/**
+* \fn int matches_exit_from_list ( char *exit_list, char *pattern )
+* \brief Find if pattern is found in the exit list.
+*
+* \param exit_list Pointer to the list of names of an exit
+* \param pattern Pointer to the pattern we are searching
+*
+* \return 1 if the pattern is in the list, 0 if not.
+*/
 
 int matches_exit_from_list ( char *exit_list, char *pattern )
 {
@@ -1746,23 +1759,25 @@ int matches_exit_from_list ( char *exit_list, char *pattern )
     return 0;
 }
 
- /**
- * \fn char *ltos ( char *dest, long num )
- * \brief Convert a long signed number into string.
- *
- * \param dest Pointer to the receiving buffer.
- * \param num Number to convert.
- *
- * \return A pointer to the resulting string.
- */
+/**
+* \fn char *ltos ( char long num )
+* \brief Convert a long signed number into string.
+*
+* It is the caller's responsibility to free the returned buffer with
+* free_sbuf();
+*
+* \param num Number to convert.
+*
+* \return A pointer to the resulting string.
+*/
 
-char *ltos ( char *dest, long num )
+char *ltos ( long num )
 {
     /* Mark Vasoll's long int to string converter. */
-    char buf[20], *p, *destp;
+    char buf[20], *p, *dest, *destp;
     unsigned long anum;
     p = buf;
-    destp = dest;
+    destp = dest = alloc_sbuf ( "ltos" );
     /* absolute value */
     anum = ( num < 0 ) ? -num : num;
 
@@ -1774,73 +1789,78 @@ char *ltos ( char *dest, long num )
 
     /* put in the sign if needed */
     if ( num < 0 ) {
-        *dest++ = '-';
+        *destp++ = '-';
     }
 
     /* put in the last digit, this makes very fast single digits numbers */
-    *dest++ = '0' + ( char ) anum;
+    *destp++ = '0' + ( char ) anum;
 
     /* reverse the rest of the digits (if any) into the provided buf */
     while ( p-- > buf ) {
-        *dest++ = *p;
+        *destp++ = *p;
     }
 
     /* terminate the resulting string */
-    *dest = '\0';
-    return (destp);
+    *destp = '\0';
+    return ( dest );
 }
 
- /**
- * \fn void safe_ltos ( char *dest, char **destp, long num)
- * \brief Convert a long signed number into string. Safe version.
- *
- * \param dest Pointer to the receiving buffer.
- * \param destp Pointer to where the string will be written.
- * \param num Number to convert.
- * \param size Size of the receiving buffer.
- */
+/**
+* \fn void safe_ltos ( char *dest, char **destp, long num)
+* \brief Convert a long signed number into string. Safe version.
+*
+* \param dest Pointer to the receiving buffer.
+* \param destp Pointer to where the string will be written.
+* \param num Number to convert.
+* \param size Size of the receiving buffer.
+*/
 
-void safe_ltos ( char *dest, char **destp, long num, size_t size) {
-    char buff[20];
-    
-    safe_strcat(dest, destp, ltos(buff, num), size);
+void safe_ltos ( char *dest, char **destp, long num, size_t size )
+{
+    char *buff;
+    buff = ltos ( num );
+    safe_strcat ( dest, destp, buff, size );
+    free_sbuf ( buff );
 }
 
- /**
- * \fn char *repeatchar ( int count, char ch, char *what )
- * \brief Return a string with 'count' number of 'ch' characters.
- *
- * It is the responsibility of the caller to free the resulting
- * buffer.
- *
- * \param count Length of the string to build
- * \param ch Character used to fill the string.
- * \param what Identifier for xmalloc.
- *
- * \return A Pointer to the new string.
- */
+/**
+* \fn char *repeatchar ( int count, char ch, char *what )
+* \brief Return a string with 'count' number of 'ch' characters.
+*
+* It is the responsibility of the caller to free the resulting
+* buffer.
+*
+* \param count Length of the string to build
+* \param ch Character used to fill the string.
+* \param what Identifier for xmalloc.
+*
+* \return A Pointer to the new string.
+*/
 
 char *repeatchar ( int count, char ch, char *what )
 {
-    int num;
     char *str, *ptr;
 
     if ( count <= 0 ) {
         return NULL;
     }
 
-    str = xmalloc ( count + 1, what );
-    memset ( str, ch, count - 1 );
-    str[count] = '\0';
-    return str;
+    ptr = str = xmalloc ( count + 1, what );
+
+    for ( ; str < ptr + count; str++ ) {
+        *str = ch;
+    }
+
+    *str = '\0';
+    return ptr;
 }
 
- /**
- * \fn void skip_esccode ( char **s )
- * \brief Move the pointer after an ansi escape sequence.
- *
- * \param s Pointer that need to be modified.
- */
+/**
+* \fn void skip_esccode ( char **s )
+* \brief Move the pointer after an ansi escape sequence.
+*
+* \param s Pointer that need to be modified.
+*/
 
 void skip_esccode ( char **s )
 {
@@ -1861,13 +1881,13 @@ void skip_esccode ( char **s )
     }
 }
 
- /**
- * \fn void copy_esccode ( char **s, char **t )
- * \brief Copy the ansi sequence into another pointer
- *
- * \param s Pointer containing the ansi sequence.
- * \param t Pointer who will receive the ansi sequence.
- */
+/**
+* \fn void copy_esccode ( char **s, char **t )
+* \brief Copy the ansi sequence into another pointer
+*
+* \param s Pointer containing the ansi sequence.
+* \param t Pointer who will receive the ansi sequence.
+*/
 
 void copy_esccode ( char **s, char **t )
 {
@@ -1896,14 +1916,14 @@ void copy_esccode ( char **s, char **t )
     }
 }
 
- /**
- * \fn void safe_copy_esccode ( char **s, char *buff, char **bufc )
- * \brief Copy the ansi sequence into another pointer, moving bufc to the end of the receiving buffer and watching for overflow.
- *
- * \param s Pointer containing the ansi sequence.
- * \param buff Pointer to the receiving buffer.
- * \param bufc Pointer to where the data will be copied into the receiving buffer.
- */
+/**
+* \fn void safe_copy_esccode ( char **s, char *buff, char **bufc )
+* \brief Copy the ansi sequence into another pointer, moving bufc to the end of the receiving buffer and watching for overflow.
+*
+* \param s Pointer containing the ansi sequence.
+* \param buff Pointer to the receiving buffer.
+* \param bufc Pointer to where the data will be copied into the receiving buffer.
+*/
 
 void safe_copy_esccode ( char **s, char *buff, char **bufc )
 {
@@ -1928,13 +1948,13 @@ void safe_copy_esccode ( char **s, char *buff, char **bufc )
     }
 }
 
- /**
- * \fn void track_esccode ( char **s, int *ansi_state )
- * \brief Return the ansi state of an ansi sequence.
- *
- * \param s Pointer containing the ansi sequence.
- * \param ansi_state The ansi state that need to be updated.
- */
+/**
+* \fn void track_esccode ( char **s, int *ansi_state )
+* \brief Return the ansi state of an ansi sequence.
+*
+* \param s Pointer containing the ansi sequence.
+* \param ansi_state The ansi state that need to be updated.
+*/
 
 void track_esccode ( char **s, int *ansi_state )
 {
@@ -1976,14 +1996,14 @@ void track_esccode ( char **s, int *ansi_state )
     }
 }
 
- /**
- * \fn void track_all_esccodes ( char **s, char **p, int *ansi_state )
- * \brief Scan a string buffer for ansi sequence and return the final ansi state.
- *
- * \param s Pointer containing the ansi sequence.
- * \param p Pointer to the position in the string.
- * \param ansi_state The ansi state that need to be updated.
- */
+/**
+* \fn void track_all_esccodes ( char **s, char **p, int *ansi_state )
+* \brief Scan a string buffer for ansi sequence and return the final ansi state.
+*
+* \param s Pointer containing the ansi sequence.
+* \param p Pointer to the position in the string.
+* \param ansi_state The ansi state that need to be updated.
+*/
 
 void track_all_esccodes ( char **s, char **p, int *ansi_state )
 {
@@ -1998,13 +2018,13 @@ void track_all_esccodes ( char **s, char **p, int *ansi_state )
     }
 }
 
- /**
- * \fn void track_ansi_letters ( char *t, int *ansi_state )
- * \brief Convert mushcode to ansi state.
- *
- * \param t Pointer containing the ansi sequence.
- * \param ansi_state The ansi state that need to be updated.
- */
+/**
+* \fn void track_ansi_letters ( char *t, int *ansi_state )
+* \brief Convert mushcode to ansi state.
+*
+* \param t Pointer containing the ansi sequence.
+* \param ansi_state The ansi state that need to be updated.
+*/
 
 void track_ansi_letters ( char *t, int *ansi_state )
 {

@@ -418,13 +418,15 @@ int ok_name ( const char *name )
 {
     const char *cp;
     char *purename = strip_ansi ( name );
+    int i;
 
     /*
      * Disallow pure ANSI names
      */
 
     if ( strlen ( purename ) == 0 ) {
-        return 0;
+        free_lbuf ( purename );
+        return ( 0 );
     }
 
     /*
@@ -432,7 +434,8 @@ int ok_name ( const char *name )
      */
 
     if ( isspace ( *purename ) ) {
-        return 0;
+        free_lbuf ( purename );
+        return ( 0 );
     }
 
     /*
@@ -441,7 +444,8 @@ int ok_name ( const char *name )
 
     for ( cp = purename; *cp; ++cp ) {
         if ( !isprint ( *cp ) ) {
-            return 0;
+            free_lbuf ( purename );
+            return ( 0 );
         }
     }
 
@@ -451,21 +455,16 @@ int ok_name ( const char *name )
     cp--;
 
     if ( isspace ( *cp ) ) {
-        return 0;
+        free_lbuf ( purename );
+        return ( 0 );
     }
 
     /*
      * Exclude names that start with or contain certain magic cookies
      */
-    return ( *purename != LOOKUP_TOKEN &&
-             *purename != NUMBER_TOKEN &&
-             *purename != NOT_TOKEN &&
-             !strchr ( name, ARG_DELIMITER ) &&
-             !strchr ( name, AND_TOKEN ) &&
-             !strchr ( name, OR_TOKEN ) &&
-             string_compare ( purename, "me" ) &&
-             string_compare ( purename, "home" ) &&
-             string_compare ( purename, "here" ) );
+    i = ( *purename != LOOKUP_TOKEN && *purename != NUMBER_TOKEN && *purename != NOT_TOKEN && !strchr ( name, ARG_DELIMITER ) && !strchr ( name, AND_TOKEN ) && !strchr ( name, OR_TOKEN ) && string_compare ( purename, "me" ) && string_compare ( purename, "home" ) && string_compare ( purename, "here" ) );
+    free_lbuf ( purename );
+    return ( i );
 }
 
 int ok_player_name ( const char *name )

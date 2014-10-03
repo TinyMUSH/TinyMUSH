@@ -5,7 +5,7 @@
  * This is where all the magic start...
  *
  */
-         
+
 
 #include "copyright.h"
 #include "config.h"
@@ -2873,7 +2873,7 @@ int dbconvert ( int argc, char *argv[] )
  * \param argv Array of arguments from command line
  * \return 0 if everything went well, anything else indicate that an error occured.
  */
-      
+
 int main ( int argc, char *argv[] )
 {
     int mindb = 0;

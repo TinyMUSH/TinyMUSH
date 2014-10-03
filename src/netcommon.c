@@ -396,11 +396,12 @@ void queue_write ( DESC *d, const char *b, int n )
 
 void queue_string ( DESC *d, const char *format, ... )
 {
-    char *new;
-    char msg[LBUF_SIZE];
+    char *buf;
+    char *msg;
     char *s;
     va_list ap;
     va_start ( ap, format );
+    msg = alloc_lbuf ( __func__ );
 
     if ( ( !format || !*format ) ) {
         if ( ( s = va_arg ( ap, char * ) ) != NULL ) {
@@ -419,20 +420,28 @@ void queue_string ( DESC *d, const char *format, ... )
             queue_write ( d, msg, strlen ( msg ) );
         } else {
             if ( !Ansi ( d->player ) && strchr ( s, ESC_CHAR ) ) {
-                new = strip_ansi ( msg );
+                buf = strip_ansi ( msg );
+                strncpy ( msg, buf, LBUF_SIZE );
+                free_lbuf ( buf );
             } else if ( !Color256 ( d->player ) ) {
-                new = strip_xterm ( msg );
+                buf = strip_xterm ( msg );
+                strncpy ( msg, buf, LBUF_SIZE );
+                free_lbuf ( buf );
             } else if ( NoBleed ( d->player ) ) {
-                new = normal_to_white ( msg );
+                buf = normal_to_white ( msg );
+                strncpy ( msg, buf, LBUF_SIZE );
+                free_lbuf ( buf );
             } else if ( d->colormap ) {
-                new = ( char * ) remap_colors ( msg, d->colormap );
-            } else {
-                new = ( char * ) msg;
+                buf = remap_colors ( msg, d->colormap );
+                strncpy ( msg, buf, LBUF_SIZE );
+                free_lbuf ( buf );
             }
 
-            queue_write ( d, new, strlen ( new ) );
+            queue_write ( d, msg, strlen ( msg ) );
         }
     }
+
+    free_lbuf ( msg );
 }
 
 void queue_rawstring ( DESC *d, const char *format, ... )

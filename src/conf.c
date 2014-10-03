@@ -2176,10 +2176,9 @@ CONF        conftable [] = {
 static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp )
 {
     int i;
-    char *buff, *name, *status;
+    char *buf, *buff, *name, *status;
 
-    if ( !mudstate.standalone && !mudstate.initializing
-            && !check_access ( player, tp->flags ) ) {
+    if ( !mudstate.standalone && !mudstate.initializing && !check_access ( player, tp->flags ) ) {
         notify ( player, NOPERM_MESSAGE );
         return ( -1 );
     }
@@ -2210,8 +2209,10 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp )
         default:
             status = xstrdup ( "Strange.", "helper_cf_set" );
         }
-
-        log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, strip_ansi ( buff ), status );
+        
+        buf = strip_ansi ( buff );
+        log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, buf, status );
+        free_lbuf ( buf );
         xfree ( name, "helper_cf_set" );
         xfree ( status, "helper_cf_set" );
         free_lbuf ( buff );

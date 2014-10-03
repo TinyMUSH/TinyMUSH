@@ -933,13 +933,15 @@ void safe_name ( dbref thing, char *outbuf, char **bufc )
     dbref aowner;
     int aflags, alen;
     time_t save_access_time;
-    char *buff;
+    char *buff, *buf;
     /* Retrieving a name never counts against an object's access time. */
     save_access_time = AccessTime ( thing );
 
     if ( !purenames[thing] ) {
         buff = atr_get ( thing, A_NAME, &aowner, &aflags, &alen );
-        set_string ( &purenames[thing], strip_ansi ( buff ) );
+        buf = strip_ansi ( buff );
+        set_string ( &purenames[thing], buf );
+        free_lbuf ( buf );
         free_lbuf ( buff );
     }
 
@@ -959,12 +961,14 @@ char *Name ( dbref thing )
     dbref aowner;
     int aflags, alen;
     time_t save_access_time;
-    char *buff;
+    char *buff, *buf;
     save_access_time = AccessTime ( thing );
 
     if ( !purenames[thing] ) {
         buff = atr_get ( thing, A_NAME, &aowner, &aflags, &alen );
-        set_string ( &purenames[thing], strip_ansi ( buff ) );
+        buf = strip_ansi ( buff );
+        set_string ( &purenames[thing], buf );
+        free_lbuf ( buf );
         free_lbuf ( buff );
     }
 
@@ -984,7 +988,7 @@ char *PureName ( dbref thing )
     dbref aowner;
     int aflags, alen;
     time_t save_access_time;
-    char *buff;
+    char *buff, *buf;
     save_access_time = AccessTime ( thing );
 
     if ( !names[thing] ) {
@@ -996,7 +1000,9 @@ char *PureName ( dbref thing )
 
     if ( !purenames[thing] ) {
         buff = atr_get ( thing, A_NAME, &aowner, &aflags, &alen );
-        set_string ( &purenames[thing], strip_ansi ( buff ) );
+        buf = strip_ansi ( buff );
+        set_string ( &purenames[thing], buf );
+        free_lbuf ( buf );
         free_lbuf ( buff );
     }
 
@@ -1007,6 +1013,7 @@ char *PureName ( dbref thing )
 void s_Name ( dbref thing, char *s )
 {
     int len;
+    char *buf;
 
     /* Truncate the name if we have to */
 
@@ -1024,7 +1031,9 @@ void s_Name ( dbref thing, char *s )
     atr_add_raw ( thing, A_NAME, ( char * ) s );
     s_NameLen ( thing, len );
     set_string ( &names[thing], ( char * ) s );
-    set_string ( &purenames[thing], strip_ansi ( ( char * ) s ) );
+    buf = strip_ansi ( s );
+    set_string ( &purenames[thing], buf );
+    free_lbuf ( buf );
 }
 
 void safe_exit_name ( dbref it, char *buff, char **bufc )
@@ -1181,7 +1190,7 @@ void do_attribute ( dbref player, dbref cause, int key, char *aname, char *value
 void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 )
 {
     dbref thing, res;
-    char *tname;
+    char *tname, *buf;
     init_match ( player, arg1, NOTYPE );
     match_everything ( 0 );
     thing = noisy_match_result();
@@ -1276,7 +1285,9 @@ void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 )
             }
 
             tname = log_getname ( thing, "do_fixdb" );
-            log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", tname, strip_ansi ( arg2 ) );
+            buf = strip_ansi ( arg2 );
+            log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", buf );
+            free_lbuf ( buf );
             xfree ( tname, "do_fixdb" );
 
             if ( Suspect ( player ) ) {

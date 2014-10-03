@@ -664,6 +664,8 @@ void fun_ljust ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 tp += i;
             }
         }
+
+        free_lbuf ( fillchars );
     } else {
         /*
          * no fill character specified
@@ -733,6 +735,8 @@ void fun_rjust ( char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 tp += i;
             }
         }
+
+        free_lbuf ( fillchars );
     } else {
         /*
          * no fill character specified
@@ -798,6 +802,8 @@ void fun_center ( char *buff, char **bufc, dbref player, dbref caller, dbref cau
                 tp += i;
             }
         }
+
+        free_lbuf ( fillchars );
     } else {
         /*
          * no fill character specified
@@ -1324,7 +1330,10 @@ void fun_ansi ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_stripansi ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    safe_str ( ( char * ) strip_ansi ( fargs[0] ), buff, bufc );
+    char *buf;
+    buf = strip_ansi ( fargs[0] );
+    safe_str ( buf, buff, bufc );
+    free_lbuf ( buf );
 }
 
 /*---------------------------------------------------------------------------
@@ -1573,12 +1582,10 @@ void fun_translate ( char *buff, char **bufc, dbref player, dbref caller, dbref 
 void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     int i = 1;
-    char *b, *s, *t, *u;
-    char tbuf[LBUF_SIZE];
+    char *b, *b1, *s, *s1, *t, *u;
     i = 1;
-    strcpy ( tbuf, strip_ansi ( fargs[0] ) ); /* copy from static buff */
-    b = tbuf;
-    s = strip_ansi ( fargs[1] );
+    b1 = b = strip_ansi ( fargs[0] );
+    s1 = s = strip_ansi ( fargs[1] );
 
     if ( *b && !* ( b + 1 ) ) { /* single character */
         t = strchr ( s, *b );
@@ -1589,6 +1596,8 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             safe_nothing ( buff, bufc );
         }
 
+        free_lbuf ( s1 );
+        free_lbuf ( b1 );
         return;
     }
 
@@ -1602,6 +1611,8 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         if ( *t == '\0' ) {
             safe_ltos ( buff, bufc, i, LBUF_SIZE );
+            free_lbuf ( s1 );
+            free_lbuf ( b1 );
             return;
         }
 
@@ -1609,6 +1620,8 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     safe_nothing ( buff, bufc );
+    free_lbuf ( s1 );
+    free_lbuf ( b1 );
     return;
 }
 
@@ -1621,7 +1634,7 @@ void fun_pos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_lpos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
-    char *s, *bb_p, *scratch_chartab;
+    char *s, *bb_p, *scratch_chartab, *buf;;
     int i;
     Delim osep;
 
@@ -1641,8 +1654,9 @@ void fun_lpos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 
     bb_p = *bufc;
+    buf = s = strip_ansi ( fargs[0] );
 
-    for ( i = 0, s = strip_ansi ( fargs[0] ); *s; i++, s++ ) {
+    for ( i = 0; *s; i++, s++ ) {
         if ( scratch_chartab[ ( unsigned char ) *s] ) {
             if ( *bufc != bb_p ) {
                 print_sep ( &osep, buff, bufc );
@@ -1652,6 +1666,7 @@ void fun_lpos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause
         }
     }
 
+    free_lbuf ( buf );
     xfree ( scratch_chartab, "lpos.chartab" );
 }
 
@@ -1693,11 +1708,11 @@ void fun_diffpos ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
 void fun_wordpos ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
     int charpos, i;
-    char *cp, *tp, *xp;
+    char *buf, *cp, *tp, *xp;
     Delim isep;
     VaChk_Only_In ( 3 );
     charpos = ( int ) strtol ( fargs[1], ( char ** ) NULL, 10 );
-    cp = strip_ansi ( fargs[0] );
+    buf = cp = strip_ansi ( fargs[0] );
 
     if ( ( charpos > 0 ) && ( charpos <= ( int ) strlen ( cp ) ) ) {
         tp = & ( cp[charpos - 1] );
@@ -1713,10 +1728,12 @@ void fun_wordpos ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
 
         safe_ltos ( buff, bufc, i, LBUF_SIZE );
+        free_lbuf ( buf );
         return;
     }
 
     safe_nothing ( buff, bufc );
+    free_lbuf ( buf );
     return;
 }
 
@@ -1744,15 +1761,19 @@ void fun_ansipos ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
     }
 
-    if ( nfargs > 2 && ( fargs[2][0] == 'e' || fargs[2][0] == '0' ) )
-        safe_str ( ansi_transition_esccode ( ANST_NONE, ansi_state ),
-                   buff, bufc );
-    else if ( nfargs > 2 && ( fargs[2][0] == 'p' || fargs[2][0] == '1' ) )
-        safe_str ( ansi_transition_mushcode ( ANST_NONE, ansi_state ),
-                   buff, bufc );
-    else
-        safe_str ( ansi_transition_letters ( ANST_NONE, ansi_state ),
-                   buff, bufc );
+    if ( nfargs > 2 && ( fargs[2][0] == 'e' || fargs[2][0] == '0' ) ) {
+        s = ansi_transition_esccode ( ANST_NONE, ansi_state );
+        safe_str ( s, buff, bufc );
+        free_sbuf ( s );
+    } else if ( nfargs > 2 && ( fargs[2][0] == 'p' || fargs[2][0] == '1' ) ) {
+        s = ansi_transition_mushcode ( ANST_NONE, ansi_state );
+        safe_str ( s, buff, bufc );
+        free_sbuf ( s );
+    } else {
+        s = ansi_transition_letters ( ANST_NONE, ansi_state );
+        safe_str ( s, buff, bufc );
+        free_sbuf ( s );
+    }
 }
 
 /*

@@ -215,8 +215,7 @@ void pool_free ( int poolnum, char **buf )
      */
 
     if ( ph->magicnum != POOL_MAGICNUM ) {
-        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
-                   "corrupted buffer header" );
+        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free", "corrupted buffer header" );
         pools[poolnum].num_lost++;
         pools[poolnum].num_alloc--;
         pools[poolnum].tot_alloc--;
@@ -228,8 +227,7 @@ void pool_free ( int poolnum, char **buf )
      */
 
     if ( pf->magicnum != POOL_MAGICNUM ) {
-        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
-                   "corrupted buffer footer" );
+        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free", "corrupted buffer footer" );
         pf->magicnum = POOL_MAGICNUM;
     }
 
@@ -238,13 +236,11 @@ void pool_free ( int poolnum, char **buf )
      */
 
     if ( ph->pool_size != pools[poolnum].pool_size ) {
-        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free",
-                   "Attempt to free into a different pool." );
+        pool_err ( "BUG", LOG_ALWAYS, poolnum, ph->buf_tag, ph, "Free", "Attempt to free into a different pool." );
         return;
     }
 
-    pool_err ( "DBG", LOG_ALLOCATE, poolnum, ph->buf_tag, ph, "Free",
-               "buffer" );
+    pool_err ( "DBG", LOG_ALLOCATE, poolnum, ph->buf_tag, ph, "Free", "buffer" );
 
     /*
      * Make sure we aren't freeing an already free buffer.  If we are,
@@ -252,8 +248,7 @@ void pool_free ( int poolnum, char **buf )
      */
 
     if ( *ibuf == POOL_MAGICNUM ) {
-        pool_err ( "BUG", LOG_BUGS, poolnum, ph->buf_tag, ph, "Free",
-                   "buffer already freed" );
+        pool_err ( "BUG", LOG_BUGS, poolnum, ph->buf_tag, ph, "Free", "buffer already freed" );
     } else {
         *ibuf = POOL_MAGICNUM;
         ph->nxtfree = pools[poolnum].free_head;
