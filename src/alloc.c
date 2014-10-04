@@ -19,8 +19,7 @@
 #include "externs.h"    /* required by code */
 
 POOL pools[NUM_POOLS];
-const char *poolnames[] =
-{ "Sbufs", "Mbufs", "Lbufs", "Bools", "Descs", "Qentries", "Pcaches" };
+const char *poolnames[] = { "Sbufs", "Mbufs", "Gbufs", "Lbufs", "Hbufs", "Bools", "Descs", "Qentries", "Pcaches" };
 
 #define POOL_MAGICNUM 0xdeadbeef
 

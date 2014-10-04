@@ -38,16 +38,19 @@ typedef struct pooldata {
 
 #define POOL_SBUF   0   /*!< Small buffer pool */
 #define POOL_MBUF   1   /*!< Standard buffer pool */
-#define POOL_LBUF   2   /*!< Large buffer pool */
-#define POOL_BOOL   3   /*!< Boolean buffer poll */
-#define POOL_DESC   4   /*!< Description buffer pool */
-#define POOL_QENTRY 5   /*!< Queue Entry buffer pool */
-#define POOL_PCACHE 6   /*!< PCache buffer pool */
-#define NUM_POOLS   7   /*!< Number of pool defined */
+#define POOL_GBUF   2   /*!< Generic buffer pool */
+#define POOL_LBUF   3   /*!< Large buffer pool */
+#define POOL_HBUF   4   /*!< Huge buffer pool */
+#define POOL_BOOL   5   /*!< Boolean buffer poll */
+#define POOL_DESC   6   /*!< Description buffer pool */
+#define POOL_QENTRY 7   /*!< Queue Entry buffer pool */
+#define POOL_PCACHE 8   /*!< PCache buffer pool */
+#define NUM_POOLS   9   /*!< Number of pool defined */
 
 
+#define HBUF_SIZE   32768   /*!< Large buffer size */
 #define LBUF_SIZE   8192    /*!< Large buffer size */
-#define GBUF_SIZE       1024    /*!< Generic buffer size */
+#define GBUF_SIZE   1024    /*!< Generic buffer size */
 #define MBUF_SIZE   512 /*!< Standard buffer size */
 #define SBUF_SIZE   64  /*!< Small buffer size */
 
@@ -83,14 +86,18 @@ typedef struct tracemem_header {
  * Pool allocation.
  */
 
-extern void pool_init ( int, int );
-extern char    *pool_alloc ( int, const char * );
-extern void pool_free ( int, char ** );
-extern void list_bufstats ( dbref );
-extern void list_buftrace ( dbref );
+extern void  pool_init ( int, int );
+extern char *pool_alloc ( int, const char * );
+extern void  pool_free ( int, char ** );
+extern void  list_bufstats ( dbref );
+extern void  list_buftrace ( dbref );
 
+#define alloc_hbuf(s)   pool_alloc(POOL_HBUF,s)
+#define free_hbuf(b)    pool_free(POOL_HBUF,((char **)&(b)))
 #define alloc_lbuf(s)   pool_alloc(POOL_LBUF,s)
 #define free_lbuf(b)    pool_free(POOL_LBUF,((char **)&(b)))
+#define alloc_gbuf(s)   pool_alloc(POOL_GBUF,s)
+#define free_gbuf(b)    pool_free(POOL_GBUF,((char **)&(b)))
 #define alloc_mbuf(s)   pool_alloc(POOL_MBUF,s)
 #define free_mbuf(b)    pool_free(POOL_MBUF,((char **)&(b)))
 #define alloc_sbuf(s)   pool_alloc(POOL_SBUF,s)

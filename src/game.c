@@ -2736,7 +2736,9 @@ int dbconvert ( int argc, char *argv[] )
 
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
+    pool_init ( POOL_HBUF, HBUF_SIZE );
     pool_init ( POOL_LBUF, LBUF_SIZE );
+    pool_init ( POOL_GBUF, GBUF_SIZE );
     pool_init ( POOL_MBUF, MBUF_SIZE );
     pool_init ( POOL_SBUF, SBUF_SIZE );
     pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
@@ -2971,7 +2973,9 @@ int main ( int argc, char *argv[] )
     time ( &mudstate.start_time );
     mudstate.restart_time = mudstate.start_time;
     time ( &mudstate.cpu_count_from );
+    pool_init ( POOL_HBUF, HBUF_SIZE );
     pool_init ( POOL_LBUF, LBUF_SIZE );
+    pool_init ( POOL_GBUF, GBUF_SIZE );
     pool_init ( POOL_MBUF, MBUF_SIZE );
     pool_init ( POOL_SBUF, SBUF_SIZE );
     pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );

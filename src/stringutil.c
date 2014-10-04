@@ -93,8 +93,8 @@ int ansi_bits[I_ANSI_LIM] = {
  * \fn char *strip_ansi ( const char *s )
  * \brief Return a new string with ansi escape codes removed
  *
- * Since this function use a static buffer, be sure to copy it
- * elsewhere or it may be overwriten by the next call.
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
  *
  * \param s Pointer to the original string
  *
@@ -131,8 +131,8 @@ char *strip_ansi ( const char *s )
  * \fn char *strip_xterm ( char *s )
  * \brief Return a new string with xterm color code removed
  *
- * Since this function use a static buffer, be sure to copy it
- * elsewhere or it may be overwriten by the next call.
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
  *
  * \param s Pointer to the original string
  *
@@ -144,15 +144,16 @@ char *strip_xterm ( char *s )
     char *buf, *p;
     char *s1 = s;
     int skip = 0;
-    
     p = buf = alloc_lbuf ( __func__ );
-    
-    while( *s1 ) {
-        if ( strncmp(s1 , ANSI_XTERM_FG, strlen(ANSI_XTERM_FG)) == 0 ) {
+
+    while ( *s1 ) {
+        if ( strncmp ( s1 , ANSI_XTERM_FG, strlen ( ANSI_XTERM_FG ) ) == 0 ) {
             skip = 1;
+
             while ( skip ) {
-                if ( (*s1 == '\0') || ( *s1 == ANSI_END ) ) {
+                if ( ( *s1 == '\0' ) || ( *s1 == ANSI_END ) ) {
                     skip = 0;
+
                     if ( *s1 == ANSI_END ) {
                         s1++;
                     }
@@ -161,12 +162,14 @@ char *strip_xterm ( char *s )
                 }
             }
         }
-        
-        if ( strncmp(s1 , ANSI_XTERM_BG, strlen(ANSI_XTERM_BG)) == 0 ) {
+
+        if ( strncmp ( s1 , ANSI_XTERM_BG, strlen ( ANSI_XTERM_BG ) ) == 0 ) {
             skip = 1;
+
             while ( skip ) {
-                if ( (*s1 == '\0') || ( *s1 == ANSI_END ) ) {
+                if ( ( *s1 == '\0' ) || ( *s1 == ANSI_END ) ) {
                     skip = 0;
+
                     if ( *s1 == ANSI_END ) {
                         s1++;
                     }
@@ -175,16 +178,15 @@ char *strip_xterm ( char *s )
                 }
             }
         }
-        
+
         if ( *s1 ) {
-        *p++ = *s1++;
+            *p++ = *s1++;
         } else {
             break;
         }
     }
 
     *p = '\0';
-
     return ( buf );
 }
 
@@ -228,8 +230,8 @@ int strip_ansi_len ( const char *s )
  * \fn char *normal_to_white ( const char *raw )
  * \brief This function implements the NOBLEED flag.
  *
- * Since this function use a static buffer, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
  *
  * \param raw Pointer to the string who need to be ansi terminated.
  *
@@ -540,7 +542,7 @@ char *ansi_transition_letters ( int ansi_before, int ansi_after )
     int ansi_bits_set, ansi_bits_clr;
     char *p;
     char ansi_mushcode_fg[9] = "xrgybmcw";
-    static char ansi_mushcode_bg[9] = "XRGYBMCW";
+    char ansi_mushcode_bg[9] = "XRGYBMCW";
     char *buffer;
     buffer = alloc_sbuf ( __func__ );
     *buffer = '\0';
@@ -609,8 +611,8 @@ char *ansi_transition_letters ( int ansi_before, int ansi_after )
  * \fn int ansi_map_states ( const char *s, int **m, char **p )
  * \brief Identify ansi state of every character in a string
  *
- * Since this function use static buffers, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free m with
+ * free_hbuf() and p with free_lbuf();
  *
  * \param s Pointer to the string to be mapped.
  * \param m Pointer to the ansi map to be build.
@@ -621,14 +623,13 @@ char *ansi_transition_letters ( int ansi_before, int ansi_after )
 
 int ansi_map_states ( const char *s, int **m, char **p )
 {
-    static int ansi_map[LBUF_SIZE + 1];
-    static char stripped[LBUF_SIZE + 1];
+    int *ansi_map;
+    char *stripped;
     char *s1, *s2;
-    int n, ansi_state;
-    n = 0;
-    ansi_state = ANST_NORMAL;
-    s1 = xstrdup ( s, "ansi_map_states" );
-    s2 = s1;
+    int n = 0, ansi_state = ANST_NORMAL;
+    ansi_map = ( int * ) alloc_hbuf ( __func__ );
+    stripped = alloc_lbuf ( __func__ );
+    s2 = s1 = xstrdup ( s, __func__ );
 
     while ( *s1 ) {
         if ( *s1 == ESC_CHAR ) {
@@ -643,7 +644,7 @@ int ansi_map_states ( const char *s, int **m, char **p )
     stripped[n] = '\0';
     *m = ansi_map;
     *p = stripped;
-    xfree ( s2, "ansi_map_states" );
+    xfree ( s2, __func__ );
     return n;
 }
 
@@ -651,8 +652,8 @@ int ansi_map_states ( const char *s, int **m, char **p )
  * \fn char *remap_colors ( const char *s, int *cmap )
  * \brief Allow a change of the color sequences
  *
- * Since this function use static buffers, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
  *
  * \param s Pointer to the string to be remap.
  * \param m Pointer to the ansi color map to use.
@@ -730,8 +731,8 @@ char *remap_colors ( const char *s, int *cmap )
  * \fn char *translate_string ( char *str, int type )
  * \brief Convert raw ansi to mushcode or strip it.
  *
- * Since this function use static buffers, be sure to copy its return
- * somewhere else before calling it again.
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
  *
  * \param str Pointer to the string to be translated
  * \param type 1 = Convert to mushcode, 0 strip ansi.
@@ -741,9 +742,8 @@ char *remap_colors ( const char *s, int *cmap )
 
 char *translate_string ( char *str, int type )
 {
-    static char new[LBUF_SIZE];
-    char *bp;
-    bp = new;
+    char *buff, *bp;
+    bp = buff = alloc_lbuf ( __func__ );
 
     if ( type ) {
         int ansi_state = ANST_NORMAL;
@@ -756,15 +756,15 @@ char *translate_string ( char *str, int type )
                     track_esccode ( &str, &ansi_state );
                 }
 
-                safe_str ( ansi_transition_mushcode ( ansi_state_prev, ansi_state ), new, &bp );
+                safe_str ( ansi_transition_mushcode ( ansi_state_prev, ansi_state ), buff, &bp );
                 ansi_state_prev = ansi_state;
                 continue;
 
             case ' ':
                 if ( str[1] == ' ' ) {
-                    safe_strncat ( new, &bp, "%b", 2, LBUF_SIZE );
+                    safe_strncat ( buff, &bp, "%b", 2, LBUF_SIZE );
                 } else {
-                    safe_chr ( ' ', new, &bp );
+                    safe_chr ( ' ', buff, &bp );
                 }
 
                 break;
@@ -777,23 +777,23 @@ char *translate_string ( char *str, int type )
             case '}':
             case '(':
             case ')':
-                safe_chr ( '%', new, &bp );
-                safe_chr ( *str, new, &bp );
+                safe_chr ( '%', buff, &bp );
+                safe_chr ( *str, buff, &bp );
                 break;
 
             case '\r':
                 break;
 
             case '\n':
-                safe_strncat ( new, &bp, "%r", 2, LBUF_SIZE );
+                safe_strncat ( buff, &bp, "%r", 2, LBUF_SIZE );
                 break;
 
             case '\t':
-                safe_strncat ( new, &bp, "%t", 2, LBUF_SIZE );
+                safe_strncat ( buff, &bp, "%t", 2, LBUF_SIZE );
                 break;
 
             default:
-                safe_chr ( *str, new, &bp );
+                safe_chr ( *str, buff, &bp );
             }
 
             str++;
@@ -810,11 +810,11 @@ char *translate_string ( char *str, int type )
 
             case '\n':
             case '\t':
-                safe_chr ( ' ', new, &bp );
+                safe_chr ( ' ', buff, &bp );
                 break;
 
             default:
-                safe_chr ( *str, new, &bp );
+                safe_chr ( *str, buff, &bp );
             }
 
             str++;
@@ -822,7 +822,7 @@ char *translate_string ( char *str, int type )
     }
 
     *bp = '\0';
-    return new;
+    return buff;
 }
 
 /*
@@ -1131,7 +1131,7 @@ char *upcasestr ( char *s )
 char *munge_space ( char *string )
 {
     char *buffer, *p, *q;
-    buffer = alloc_lbuf ( "munge_space" );
+    buffer = alloc_lbuf ( __func__ );
     p = string;
     q = buffer;
 
@@ -1170,7 +1170,7 @@ char *munge_space ( char *string )
 char *trim_spaces ( char *string )
 {
     char *buffer, *p, *q;
-    buffer = alloc_lbuf ( "trim_spaces" );
+    buffer = alloc_lbuf ( __func__ );
     p = string;
     q = buffer;
 
@@ -1376,35 +1376,33 @@ char *replace_string ( const char *old, const char *new, const char *string )
 {
     char *result, *r, *s;
     int olen;
+    r = result = alloc_lbuf ( __func__ );
 
-    if ( string == NULL ) {
-        return NULL;
-    }
+    if ( string != NULL ) {
+        s = ( char * ) string;
+        olen = strlen ( old );
 
-    s = ( char * ) string;
-    olen = strlen ( old );
-    r = result = alloc_lbuf ( "replace_string" );
-
-    while ( *s ) {
-        /* Copy up to the next occurrence of the first char of OLD */
-        while ( *s && *s != *old ) {
-            safe_chr ( *s, result, &r );
-            s++;
-        }
-
-        /*
-         * If we are really at an OLD, append NEW to the result and
-         * bump the input string past the occurrence of
-         * OLD. Otherwise, copy the char and try again.
-         */
-
-        if ( *s ) {
-            if ( !strncmp ( old, s, olen ) ) {
-                safe_str ( ( char * ) new, result, &r );
-                s += olen;
-            } else {
+        while ( *s ) {
+            /* Copy up to the next occurrence of the first char of OLD */
+            while ( *s && *s != *old ) {
                 safe_chr ( *s, result, &r );
                 s++;
+            }
+
+            /*
+             * If we are really at an OLD, append NEW to the result and
+             * bump the input string past the occurrence of
+             * OLD. Otherwise, copy the char and try again.
+             */
+
+            if ( *s ) {
+                if ( !strncmp ( old, s, olen ) ) {
+                    safe_str ( ( char * ) new, result, &r );
+                    s += olen;
+                } else {
+                    safe_chr ( *s, result, &r );
+                    s++;
+                }
             }
         }
     }
@@ -1461,7 +1459,7 @@ void edit_string ( char *src, char **dst, char *from, char *to )
     to_ansi_clr = ANST_NONE & ( ~ansi_state );
     tlen = p - to;
     /* Do the substitution.  Idea for prefix/suffix from R'nice@TinyTIM */
-    cp = *dst = alloc_lbuf ( "edit_string" );
+    cp = *dst = alloc_lbuf ( __func__ );
 
     if ( !strcmp ( from, "^" ) ) {
         /* Prepend 'to' to string */
@@ -1774,10 +1772,10 @@ int matches_exit_from_list ( char *exit_list, char *pattern )
 char *ltos ( long num )
 {
     /* Mark Vasoll's long int to string converter. */
-    char buf[20], *p, *dest, *destp;
+    char *buf, *p, *dest, *destp;
     unsigned long anum;
-    p = buf;
-    destp = dest = alloc_sbuf ( "ltos" );
+    p = buf = alloc_sbuf ( __func__ );
+    destp = dest = alloc_sbuf ( __func__ );
     /* absolute value */
     anum = ( num < 0 ) ? -num : num;
 
@@ -1802,6 +1800,7 @@ char *ltos ( long num )
 
     /* terminate the resulting string */
     *destp = '\0';
+    free_sbuf ( buf );
     return ( dest );
 }
 
@@ -1824,7 +1823,7 @@ void safe_ltos ( char *dest, char **destp, long num, size_t size )
 }
 
 /**
-* \fn char *repeatchar ( int count, char ch, char *what )
+* \fn char *repeatchar ( int count, char ch )
 * \brief Return a string with 'count' number of 'ch' characters.
 *
 * It is the responsibility of the caller to free the resulting
@@ -1832,23 +1831,19 @@ void safe_ltos ( char *dest, char **destp, long num, size_t size )
 *
 * \param count Length of the string to build
 * \param ch Character used to fill the string.
-* \param what Identifier for xmalloc.
 *
 * \return A Pointer to the new string.
 */
 
-char *repeatchar ( int count, char ch, char *what )
+char *repeatchar ( int count, char ch )
 {
     char *str, *ptr;
+    ptr = str = alloc_lbuf ( __func__ );
 
-    if ( count <= 0 ) {
-        return NULL;
-    }
-
-    ptr = str = xmalloc ( count + 1, what );
-
-    for ( ; str < ptr + count; str++ ) {
-        *str = ch;
+    if ( count > 0 ) {
+        for ( ; str < ptr + count; str++ ) {
+            *str = ch;
+        }
     }
 
     *str = '\0';

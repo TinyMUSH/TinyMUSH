@@ -266,7 +266,7 @@ extern int  matches_exit_from_list ( char *, char * );
 extern char    *translate_string ( char *, int );
 extern char *ltos ( long );
 extern void safe_ltos ( char *, char **, long, size_t );
-extern char    *repeatchar ( int, char, char * );
+extern char    *repeatchar ( int, char );
 extern char    *strip_ansi ( const char * );
 extern char    *strip_xterm ( char * );
 extern int  strip_ansi_len ( const char * );

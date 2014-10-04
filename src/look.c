@@ -2109,7 +2109,6 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
     int val, aflags, alen, ca, wild_decomp;
     ATTR *attr;
     NAMETAB *np;
-    char s[GBUF_SIZE];
     /*
      * Check for obj/attr first
      */
@@ -2153,18 +2152,24 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
         case TYPE_THING:
             strcpy ( thingname, Name ( thing ) );
             val = OBJECT_DEPOSIT ( Pennies ( thing ) );
-            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@create %s=%d", translate_string ( thingname, 1 ), val );
+            buf = translate_string ( thingname, 1 );
+            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@create %s=%d", buf, val );
+            free_lbuf ( buf );
             break;
 
         case TYPE_ROOM:
             strcpy ( thingname, Name ( thing ) );
-            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@dig/teleport %s", translate_string ( thingname, 1 ) );
+            buf = translate_string ( thingname, 1 );
+            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@dig/teleport %s", buf );
+            free_lbuf ( buf );
             strcpy ( thingname, "here" );
             break;
 
         case TYPE_EXIT:
             strcpy ( thingname, Name ( thing ) );
-            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@open %s", translate_string ( thingname, 1 ) );
+            buf = translate_string ( thingname, 1 );
+            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@open %s", buf );
+            free_lbuf ( buf );
             got = thingname;
             safe_exit_name ( thing, thingname, &got );
             break;
@@ -2211,8 +2216,7 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
         got = atr_get ( thing, ca, &aowner, &aflags, &alen );
 
         if ( aflags & AF_STRUCTURE ) {
-            tmp = replace_string ( GENERIC_STRUCT_STRDELIM,
-                                   mudconf.struct_dstr, got );
+            tmp = replace_string ( GENERIC_STRUCT_STRDELIM, mudconf.struct_dstr, got );
             free_lbuf ( got );
             got = tmp;
         }
@@ -2220,8 +2224,7 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
         if ( Read_attr_all ( player, thing, attr, aowner, aflags, 1 ) ) {
             if ( attr->flags & AF_IS_LOCK ) {
                 bool = parse_boolexp ( player, got, 1 );
-                ltext = unparse_boolexp_decompile ( player,
-                                                    bool );
+                ltext = unparse_boolexp_decompile ( player, bool );
                 free_boolexp ( bool );
                 notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@lock/%s %s=%s", attr->name, thingname, ltext );
             } else {
@@ -2229,8 +2232,10 @@ void do_decomp ( dbref player, dbref cause, int key, char *name, char *qual )
 
                 if ( key & DECOMP_PRETTY ) {
                     tbuf = alloc_lbuf ( "do_decomp.pretty" );
-                    snprintf ( s, GBUF_SIZE, "%c%s %s=", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname );
-                    pretty_print ( tbuf, s, got );
+                    buf = alloc_gbuf ( "do_decomp.pretty" );
+                    snprintf ( buf, GBUF_SIZE, "%c%s %s=", ( ( ca < A_USER_START ) ? '@' : '&' ), buff, thingname );
+                    pretty_print ( tbuf, buf, got );
+                    free_gbuf ( buf );
                     notify ( player, tbuf );
                     free_lbuf ( tbuf );
                 } else {

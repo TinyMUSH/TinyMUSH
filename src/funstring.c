@@ -1446,8 +1446,7 @@ void fun_scramble ( char *buff, char **bufc, dbref player, dbref caller, dbref c
         j = random_range ( i, n - 1 );
 
         if ( ansi_state != ansi_map[j] ) {
-            safe_str ( ansi_transition_esccode ( ansi_state,
-                                                 ansi_map[j] ), buff, bufc );
+            safe_str ( ansi_transition_esccode ( ansi_state, ansi_map[j] ), buff, bufc );
             ansi_state = ansi_map[j];
         }
 
@@ -1457,6 +1456,8 @@ void fun_scramble ( char *buff, char **bufc, dbref player, dbref caller, dbref c
     }
 
     safe_str ( ansi_transition_esccode ( ansi_state, ANST_NORMAL ), buff, bufc );
+    free_hbuf ( ansi_map );
+    free_lbuf ( stripped );
 }
 
 /*
@@ -1478,8 +1479,7 @@ void fun_reverse ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     while ( n-- ) {
         if ( ansi_state != ansi_map[n] ) {
-            safe_str ( ansi_transition_esccode ( ansi_state,
-                                                 ansi_map[n] ), buff, bufc );
+            safe_str ( ansi_transition_esccode ( ansi_state, ansi_map[n] ), buff, bufc );
             ansi_state = ansi_map[n];
         }
 
@@ -1487,6 +1487,8 @@ void fun_reverse ( char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
 
     safe_str ( ansi_transition_esccode ( ansi_state, ANST_NORMAL ), buff, bufc );
+    free_hbuf ( ansi_map );
+    free_lbuf ( ansi_map );
 }
 
 /*
@@ -1559,6 +1561,7 @@ void fun_mid ( char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_translate ( char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs )
 {
+    char *s;
     VaChk_Range ( 1, 2 );
 
     /*
@@ -1566,11 +1569,17 @@ void fun_translate ( char *buff, char **bufc, dbref player, dbref caller, dbref 
      */
 
     if ( nfargs > 1 && ( fargs[1][0] == 's' || fargs[1][0] == '0' ) ) {
-        safe_str ( translate_string ( fargs[0], 0 ), buff, bufc );
+        s = translate_string ( fargs[0], 0 );
+        safe_str ( s, buff, bufc );
+        free_lbuf ( s );
     } else if ( nfargs > 1 && fargs[1][0] == 'p' ) {
-        safe_str ( translate_string ( fargs[0], 1 ), buff, bufc );
+        s = translate_string ( fargs[0], 1 );
+        safe_str ( s, buff, bufc );
+        free_lbuf ( s );
     } else {
-        safe_str ( translate_string ( fargs[0], 1 ), buff, bufc );
+        s = translate_string ( fargs[0], 1 );
+        safe_str ( s, buff, bufc );
+        free_lbuf ( s );
     }
 }
 
