@@ -1572,6 +1572,83 @@ int minmatch ( char *str, char *target, int min )
 }
 
 /**
+ * \fn char *safe_snprintf ( char *buff, size_t size, const char *format, ... )
+ * \brief Safe version of snprintf which make sure the buffer is null terminated.
+ *
+ * \param buff Pointer to the destination buffer.
+ * \param size Size of the buffer in bytes.
+ * \param format Formatting string.
+ * \param ... Variable parameter list.
+ *
+ * \return A pointer to the destination buffer.
+ */
+
+char *safe_snprintf ( char *buff, size_t size, const char *format, ... )
+{
+    va_list ap;
+    va_start ( ap, format );
+    vsnprintf ( buff, size, format, ap );
+    va_end ( ap );
+    buff[size - 1] = '\0';
+
+    return ( buff );
+}
+
+/**
+ * \fn char *safe_vsnprintf ( char *buff, size_t size, const char *format, va_list ap )
+ * \brief Safe version of vsnprintf which make sure the buffer is null terminated.
+ *
+ * \param buff Pointer to the destination buffer.
+ * \param size Size of the buffer in bytes.
+ * \param format Formatting string.
+ * \param ap A va_list with the parameters.
+ *
+ * \return A pointer to the destination buffer.
+ */
+
+char *safe_vsnprintf ( char *buff, size_t size, const char *format, va_list ap )
+{
+    vsnprintf ( buff, size, format, ap );
+    buff[size - 1] = '\0';
+
+    return ( buff );
+}
+
+/**
+ * \fn char *safe_sprintf ( char *str, char **bp, const char *format, ... )
+ * \brief Safe version of sprintf which always operate on a LBUF and make sure the buffer is null terminated.
+ *
+ * \param buff Pointer to the destination buffer.
+ * \param bufp Pointer to where the result will be written into the buffer.
+ * \param format Formatting string.
+ * \param ... A Variable parameter list.
+ *
+ * \return A pointer to the destination buffer.
+ */
+
+char *safe_sprintf ( char *buff, char **bufp, const char *format, ... )
+{
+    int len, n;
+    va_list ap;
+    va_start ( ap, format );
+    n = LBUF_SIZE - ( *bufp - buff );
+
+    if ( n <= 0 ) {
+        **bufp = '\0';
+        return ( buff );
+    }
+
+    vsnprintf ( *bufp, n, format, ap );
+    va_end ( ap );
+    len = strlen ( *bufp );
+    n = ( ( len < n ) ? len : n );
+    *bufp += n;
+    **bufp = '\0';
+    return ( buff );
+
+}
+
+/**
  * \fn int safe_strcat ( const char *src, char *buff, char **bufp, int max )
  * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string.
  *

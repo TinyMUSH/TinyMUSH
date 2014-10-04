@@ -47,43 +47,6 @@ static int type_quota ( int );
 
 static int pay_quota ( dbref, int, int );
 
-char *safe_snprintf ( char *buff, size_t size, const char *format, ... )
-{
-    va_list ap;
-    va_start ( ap, format );
-    vsnprintf ( buff, size, format, ap );
-    va_end ( ap );
-    buff[size - 1] = '\0';
-    return ( buff );
-}
-
-char *safe_vsnprintf ( char *buff, size_t size, const char *format, va_list ap )
-{
-    vsnprintf ( buff, size, format, ap );
-    buff[size - 1] = '\0';
-    return ( buff );
-}
-
-void safe_sprintf ( char *str, char **bp, const char *format, ... )
-{
-    int len, n;
-    va_list ap;
-    va_start ( ap, format );
-    n = LBUF_SIZE - ( *bp - str );
-
-    if ( n <= 0 ) {
-        **bp = '\0';
-        return;
-    }
-
-    vsnprintf ( *bp, n, format, ap );
-    va_end ( ap );
-    len = strlen ( *bp );
-    n = ( ( len < n ) ? len : n );
-    *bp += n;
-    **bp = '\0';
-}
-
 /* ---------------------------------------------------------------------------
  * insert_first, remove_first: Insert or remove objects from lists.
  */
