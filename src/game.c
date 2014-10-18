@@ -49,7 +49,9 @@ extern void init_functab ( void );
 
 extern void close_sockets ( int emergency, char *message );
 
+extern char *version_string ( void );
 extern void init_version ( void );
+extern void log_version ( void );
 
 extern void init_logout_cmdtab ( void );
 
@@ -1874,9 +1876,10 @@ void write_status_file ( dbref player, char *message )
         log_write ( LOG_ALWAYS, "WIZ", "WRSTF", "Error while writing to status file" );
     }
 
-    if ( message != NULL ) {
+    if ( message && *message ) {
         msg = xstrprintf ( "write_status_file", "Status : %s\n", message );
         size = write ( fd, msg, strlen ( msg ) );
+        log_write ( LOG_ALWAYS, "WIZ", "WRSTF", "Shutdown status: %s", message );
 
         if ( size < 0 ) {
             log_write ( LOG_ALWAYS, "WIZ", "WRSTF", "Error while writing to status file" );
@@ -1918,14 +1921,17 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message )
     do_dbck ( NOTHING, NOTHING, 0 ); /* dump consistent state */
 
     if ( player != NOTHING ) {
-        raw_broadcast ( 0, "GAME: Shutdown by %s", Name ( Owner ( player ) ) );
+        if ( message && *message ) {
+            raw_broadcast ( 0, "GAME: Shutdown by %s: %s", Name ( Owner ( player ) ), message );
+        } else {
+            raw_broadcast ( 0, "GAME: Shutdown by %s", Name ( Owner ( player ) ) );
+        }
         log_write ( LOG_ALWAYS, "WIZ", "SHTDN", "Shutdown by %s", name );
     } else {
         raw_broadcast ( 0, "GAME: Fatal Error: %s", message );
         log_write ( LOG_ALWAYS, "WIZ", "SHTDN", "Fatal error: %s", message );
     }
 
-    log_write ( LOG_ALWAYS, "WIZ", "SHTDN", "Shutdown status: %s", message );
     write_status_file ( player, message );
     /*
      * Set up for normal shutdown
@@ -2764,12 +2770,12 @@ int dbconvert ( int argc, char *argv[] )
 
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
-    pool_init ( POOL_HBUF, HBUF_SIZE );
-    pool_init ( POOL_LBUF, LBUF_SIZE );
-    pool_init ( POOL_GBUF, GBUF_SIZE );
-    pool_init ( POOL_MBUF, MBUF_SIZE );
-    pool_init ( POOL_SBUF, SBUF_SIZE );
-    pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
+//    pool_init ( POOL_HBUF, HBUF_SIZE );
+//    pool_init ( POOL_LBUF, LBUF_SIZE );
+//    pool_init ( POOL_GBUF, GBUF_SIZE );
+//    pool_init ( POOL_MBUF, MBUF_SIZE );
+//    pool_init ( POOL_SBUF, SBUF_SIZE );
+//    pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
     mudconf.dbhome = xstrdup ( opt_datadir, "argv" );
     mudconf.db_file = xstrdup ( opt_gdbmfile, "argv" );
     cf_init();
@@ -2919,6 +2925,16 @@ int main ( int argc, char *argv[] )
     struct stat sb1, sb2;
     MODHASHES *m_htab, *hp;
     MODNHASHES *m_ntab, *np;
+    
+    int option_index = 0;
+    static struct option long_options[] = {
+            {"debug",   no_argument, 0, 'd' },
+            {"restart", no_argument, 0, 'r' },
+            {"mindb",   no_argument, 0, 'm' },
+            {"convert", no_argument, 0, 'c' },
+            {"help",    no_argument, 0, '?' },
+            {0,         0,           0,  0  }
+    };
 
     mudstate.initializing = 1;
     mudstate.debug = 0 ;
@@ -2929,23 +2945,23 @@ int main ( int argc, char *argv[] )
      */
     mudstate.raw_allocs = NULL;
 
+    pool_init ( POOL_HBUF, HBUF_SIZE );
+    pool_init ( POOL_LBUF, LBUF_SIZE );
+    pool_init ( POOL_GBUF, GBUF_SIZE );
+    pool_init ( POOL_MBUF, MBUF_SIZE );
+    pool_init ( POOL_SBUF, SBUF_SIZE );
+    pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
+    pool_init ( POOL_DESC, sizeof ( DESC ) );
+    pool_init ( POOL_QENTRY, sizeof ( BQUE ) );    
+
     umask ( 077 );      /* Keep things to us by default */
-
-    /*
-     * Try to get the binary name
-     */
-    s = strrchr ( argv[0], ( int ) '/' );
-
-    if ( s ) {
-        s++;
-    } else {
-        s = argv[0];
-    }
 
     /*
      * If we are called with the name 'dbconvert', do a DB conversion and
      * exit
      */
+     
+    s = basename ( argv[0] );
 
     if ( s && *s && !strcmp ( s, "dbconvert" ) ) {
         dbconvert ( argc, argv );
@@ -2955,14 +2971,6 @@ int main ( int argc, char *argv[] )
      * Configure the minimum default values we need to start.
      */
     mudconf.mud_shortname = xstrdup( DEFAULT_SHORTNAME, "cf_string" );
-
-    s = strdup ( DEFAULT_CONFIG_FILE );
-    mudconf.config_file = realpath( s , NULL);
-    free ( s );
-
-    s = strdup ( mudconf.config_file );
-    mudconf.config_home = strdup ( dirname ( s ) );
-    free ( s ) ;
     
     s = getcwd ( NULL, 0 );
     mudconf.game_home = realpath(s, NULL);
@@ -2970,34 +2978,29 @@ int main ( int argc, char *argv[] )
     
     mudconf.game_exec = realpath(argv[0], NULL);
     
+    init_version();
+    
     /*
      * Parse options
      */
-    while ( ( c = getopt ( argc, argv, "c:srd" ) ) != -1 ) {
+    //while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
+    while ( ( c = getopt_long ( argc, argv, "drmc?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
-        case 'c':
-            free (mudconf.config_file);
-            free (mudconf.config_home);
-            
-            s = strdup ( optarg );
-            mudconf.config_file = realpath( s , NULL);
-            free ( s );
-            
-            s = strdup ( mudconf.config_file );
-            mudconf.config_home = strdup ( dirname ( s ) );
-            free ( s ) ;
-            break;
-
-        case 's':
-            mindb = 1;
-            break;
-
-        case 'r':
+        case 'd':	/* Debug mode, do not fork */
+            mudstate.debug = 1;
+            break;        
+                        
+        case 'r':	/* Restarting */
             mudstate.restarting = 1;
             break;
-
-        case 'd':
-            mudstate.debug = 1;
+            
+        case 'm':	/* Force minimum db generation */
+            mindb = 1;
+            break;            
+            
+        case 'c':	/* dbconvert */
+            dbconvert ( argc, argv );
+            exit ( EXIT_SUCCESS );
             break;
 
         default:
@@ -3005,6 +3008,31 @@ int main ( int argc, char *argv[] )
             break;
         }
     }
+
+    if ( optind < argc ) {
+        /*
+         * The first non-option element is our config file.
+         */
+        s = strdup ( argv[optind++] );
+        mudconf.config_file = realpath( s , NULL);
+        free ( s );
+
+        s = strdup ( mudconf.config_file );
+        mudconf.config_home = strdup ( dirname ( s ) );
+        free ( s ) ;
+    } else {
+        /*
+         * If there was none, use the default value.
+         */
+        s = strdup ( DEFAULT_CONFIG_FILE );
+        mudconf.config_file = realpath( s , NULL);
+        free ( s );
+
+        s = strdup ( mudconf.config_file );
+        mudconf.config_home = strdup ( dirname ( s ) );
+        free ( s ) ;
+    }
+        
 
     /* Make sure we can read the config file */
 
@@ -3014,7 +3042,14 @@ int main ( int argc, char *argv[] )
     }
 
     if ( errflg ) {
-        fprintf ( stderr, "Usage: %s [-s] [-c config_file]\n", argv[0] );
+        fprintf ( stderr, "\n%s\n\n", mudstate.version.name);
+        fprintf ( stderr, "Usage: %s [options] [CONFIG-FILE]\n\n", basename (argv[0]) );
+        fprintf ( stderr, "Options:\n");
+        fprintf ( stderr, "  -d, --debug               debug mode, do not fork to background\n");
+        fprintf ( stderr, "  -r, --restart             restart mode, handle restart database\n");
+        fprintf ( stderr, "  -m, --mindb               delete the current databases and create a new one\n");
+        fprintf ( stderr, "  -c, --convert             dbconvert mode, handle database conversion\n\n");
+        fprintf ( stderr, "\nDefault configuration file : %s\n", DEFAULT_CONFIG_FILE );
         exit ( EXIT_FAILURE );
     }
 
@@ -3024,14 +3059,7 @@ int main ( int argc, char *argv[] )
     time ( &mudstate.start_time );
     mudstate.restart_time = mudstate.start_time;
     time ( &mudstate.cpu_count_from );
-    pool_init ( POOL_HBUF, HBUF_SIZE );
-    pool_init ( POOL_LBUF, LBUF_SIZE );
-    pool_init ( POOL_GBUF, GBUF_SIZE );
-    pool_init ( POOL_MBUF, MBUF_SIZE );
-    pool_init ( POOL_SBUF, SBUF_SIZE );
-    pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
-    pool_init ( POOL_DESC, sizeof ( DESC ) );
-    pool_init ( POOL_QENTRY, sizeof ( BQUE ) );
+
     tcache_init();
     pcache_init();
     logfile_init ( templog );
@@ -3043,7 +3071,9 @@ int main ( int argc, char *argv[] )
     init_powertab();
     init_functab();
     init_attrtab();
-    init_version();
+
+    log_version();
+    
     log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec);
     log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home);
     log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file );

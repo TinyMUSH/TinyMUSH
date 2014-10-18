@@ -27,33 +27,13 @@ void do_version ( dbref player, dbref cause, int extra )
     struct utsname bpInfo;
 #endif
     MODVER *mver;
-    char string[MBUF_SIZE], *ptr;
-    sprintf ( string, "\nTinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor );
-
-    switch ( mudstate.version.status ) {
-    case 0:
-        sprintf ( string, "%s, Alpha %d", string, mudstate.version.revision );
-        break;
-
-    case 1:
-        sprintf ( string, "%s, Beta %d", string, mudstate.version.revision );
-        break;
-
-    case 2:
-        sprintf ( string, "%s, Release Candidate %d", string, mudstate.version.revision );
-        break;
-
-    default:
-        if ( mudstate.version.revision > 0 ) {
-            sprintf ( string, "%s, Patch Level %d", string, mudstate.version.revision );
-        } else {
-            sprintf ( string, "%s, Gold Release", string );
-        }
-    }
-
-    sprintf ( string, "%s (%s)", string, PACKAGE_RELEASE_DATE );
+    char *ptr;
+    char string[MBUF_SIZE];
+    
+    snprintf ( string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE );
+    
     ptr = repeatchar ( strlen ( string ), '-' );
-    notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr );
+    notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr );
     free_lbuf ( ptr );
     notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s", MUSH_BUILD_DATE );
 
@@ -105,14 +85,14 @@ void init_version ( void )
 
         Everything is now set from the configure script. No need to edit this file anymore.
     */
-    char *string, *pc, *bc, *bl;
-    string = xstrdup ( PACKAGE_VERSION, "init_version" );
+    char *version, *bp;
+    version = strdup ( PACKAGE_VERSION );
 
-    if ( string != NULL ) {
-        mudstate.version.major =    strtoimax ( strsep ( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.minor =    strtoimax ( strsep ( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.status =   strtoimax ( strsep ( &string, "." ), ( char ** ) NULL, 10 );
-        mudstate.version.revision = strtoimax ( strsep ( &string, "." ), ( char ** ) NULL, 10 );
+    if ( version != NULL ) {
+        mudstate.version.major =    strtoimax ( strsep ( &version, "." ), ( char ** ) NULL, 10 );
+        mudstate.version.minor =    strtoimax ( strsep ( &version, "." ), ( char ** ) NULL, 10 );
+        mudstate.version.status =   strtoimax ( strsep ( &version, "." ), ( char ** ) NULL, 10 );
+        mudstate.version.revision = strtoimax ( strsep ( &version, "." ), ( char ** ) NULL, 10 );
     } else {
         /* If we hit that, we have a serious problem... */
         mudstate.version.major = 0;
@@ -121,15 +101,51 @@ void init_version ( void )
         mudstate.version.revision = 0;
     }
 
-    xfree ( string, "init_version" );
+    free ( version );
+    
     mudstate.configureinfo = munge_space ( PACKAGE_CONFIG );
     mudstate.compilerinfo = munge_space ( MUSH_BUILD_COMPILE );
     mudstate.linkerinfo = munge_space ( MUSH_BUILD_LTCOMPILE );
-    mudstate.dbmdriver = xstrprintf ( "init_version", "%s", MUSH_DBM );
-    log_write ( LOG_ALWAYS, "INI", "START", "       Starting: TinyMUSH %d.%d.%d.%d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision, PACKAGE_RELEASE_DATE );
+    mudstate.dbmdriver = strdup ( MUSH_DBM );
+    
+    bp = version = alloc_lbuf( "init_version" );
+
+    safe_sprintf ( version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor );
+  
+    switch ( mudstate.version.status ) {
+      case 0:
+        safe_sprintf ( version, &bp, ", Alpha %d", mudstate.version.revision );
+        break;
+
+      case 1:
+        safe_sprintf ( version, &bp, ", Beta %d", mudstate.version.revision );
+        break;
+
+        case 2:
+        safe_sprintf ( version, &bp, ", Release Candidate %d", mudstate.version.revision );
+        break;
+
+      default:
+        if ( mudstate.version.revision > 0 ) {
+          safe_sprintf ( version, &bp, ", Patch Level %d", mudstate.version.revision );
+        } else {
+          safe_sprintf ( version, &bp, ", Gold Release");
+        }
+        break;
+    }
+    
+  mudstate.version.name = strdup( version );
+
+  free_lbuf( version );
+}
+
+void log_version ( void )
+{
+    log_write ( LOG_ALWAYS, "INI", "START", "       Starting: %s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE );
     log_write ( LOG_ALWAYS, "INI", "START", "     Build date: %s", MUSH_BUILD_DATE );
     log_write ( LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo );
     log_write ( LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo );
     log_write ( LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo );
     log_write ( LOG_ALWAYS, "INI", "START", "     DBM driver: %s", mudstate.dbmdriver );
 }
+

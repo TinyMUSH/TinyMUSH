@@ -381,10 +381,11 @@ struct propdir_list {
 
 typedef struct {
     /* Version number is Major.Minor.Status.PatchLevel */
-    int major;    /* Major Version */
-    int minor;    /* Minor Version */
-    int status;   /* Status : 0 - Alpha, 1 - Beta, 2 - Release Candidate, 3 - Gamma */
-    int revision; /* Patch Level */
+    char *name;     /* Complete version string */
+    int   major;    /* Major Version */
+    int   minor;    /* Minor Version */
+    int   status;   /* Status : 0 - Alpha, 1 - Beta, 2 - Release Candidate, 3 - Gamma */
+    int   revision; /* Patch Level */
 } versioninfo;
 
 typedef struct statedata STATEDATA;

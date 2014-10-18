@@ -15019,7 +15019,7 @@ $as_echo "#define HAVE_SYS_WAIT_H 1" >>confdefs.h
 
 fi
 
-for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h
+for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -15032,20 +15032,6 @@ fi
 
 done
 
-if test "x$with_dbm" = "xgdbm"; then :
-  for ac_header in gdbm.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "gdbm.h" "ac_cv_header_gdbm_h" "$ac_includes_default"
-if test "x$ac_cv_header_gdbm_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_GDBM_H 1
-_ACEOF
-
-fi
-
-done
-
-fi
 
 as_nl='
 '

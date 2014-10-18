@@ -1123,6 +1123,9 @@ char *upcasestr ( char *s )
  * \fn char *munge_space ( char *string )
  * \brief Compress multiple spaces into one and remove leading/trailing spaces.
  *
+ * It is the responsibility of the caller to free the returned
+ * buffer with free_lbuf().
+ *
  * \param s The string that need to be munge
  *
  * \return The string munged

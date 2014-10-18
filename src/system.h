@@ -113,6 +113,8 @@
 #include <ltdl.h>
 #include <libgen.h>
 
+#include <getopt.h>
+
 #include <inttypes.h>
 #include <arpa/inet.h>
 #include <netdb.h>
