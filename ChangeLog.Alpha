@@ -1,6 +1,101 @@
 TinyMUSH 3.3
 ------------
 
+commit e95178bea1a5af79edf182b0150351abf3acb5c7
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 16:41:44 2014 -0400
+
+    Cleanup on the start/restart process.
+
+commit c999354bd8a923e52a8dbb2824826173a4c9abbd
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 15:41:06 2014 -0400
+
+    Fix command line parsing for dbconvert/recover, create symlinks.
+    
+    Recover is now integrated into the netmush's binary, it can be call
+    with the -e switch or by a 'recover' symlink. dbconvert can also be
+    call directly from netmush with the -c switch.
+    x
+
+commit 8b78913abfd79dd82fab16a0c9d8491a6f6943c2
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 11:51:49 2014 -0400
+
+    Fixed netmush's command line parsing. Initialize pools earlier.
+
+commit 0c76d392acf7eb053d30fb1a14da703e0c3ec744
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Fri Oct 17 22:36:18 2014 -0400
+
+    Full logging and various bugfixes.
+
+commit 9cfc7f18ac9b3e979fb027750aff01239207720b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Oct 3 21:09:15 2014 -0400
+
+    Move the safe_s*printf functions to where they belong.
+
+commit 80e67675b8994ecd5996737fbccb30452966f9dd
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Oct 3 20:43:48 2014 -0400
+
+    Remove all static buffers from stringutils.c
+
+commit 1fb0d0aadc9d8b3afa7a91fe44b6394e84e2bec1
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Thu Oct 2 22:58:10 2014 -0400
+
+    Chassing static buffers in stringutil.c
+
+commit 02ae86efed01cc21289a2ca25331c949aed6d312
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 1 07:15:08 2014 -0400
+
+    Doxified stringutil.c
+
+commit d483c2273d7d4b2baa5073294e5ddc62b791e7c4
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Oct 1 07:02:19 2014 -0400
+
+    Cleaning up stringutils.c
+
+commit 32ce3e77ff6dd77979ed62ca0528b30ea2f02f91
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 30 22:59:36 2014 -0400
+
+    Cosmetic change.
+
+commit a4f228d2ab4609a7b986eca0679e894a7378ec98
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 30 22:52:08 2014 -0400
+
+    Cleaning stringutils.c
+
+commit 2a54a4a6bd2d6b40d97b7fca8fb4f1d4c38967d4
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Sep 30 20:55:59 2014 -0400
+
+    Cleaning up stringutil.c
+
+commit 03598d02f731812290d5016a3d2d7c2037047441
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Sep 29 21:09:25 2014 -0400
+
+    Cleaning up stringutils.c
+
+commit e2268e032e22614d3b1d891727d61f3895492470
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun Sep 28 08:25:24 2014 -0400
+
+    Doxygen
+
+commit 808f9fbdaf923b8e8a6962d74daebb267430a399
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Sep 27 19:44:39 2014 -0400
+
+    Update ChangeLog.Alpha
+
 Alpha 7 : 2014-09-27
 
 commit 79f73d4a7ed28b951417700d7f74ac5de67c3bdf
