@@ -29,9 +29,7 @@ void do_version ( dbref player, dbref cause, int extra )
     MODVER *mver;
     char *ptr;
     char string[MBUF_SIZE];
-    
     snprintf ( string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE );
-    
     ptr = repeatchar ( strlen ( string ), '-' );
     notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr );
     free_lbuf ( ptr );
@@ -102,41 +100,38 @@ void init_version ( void )
     }
 
     free ( version );
-    
     mudstate.configureinfo = munge_space ( PACKAGE_CONFIG );
     mudstate.compilerinfo = munge_space ( MUSH_BUILD_COMPILE );
     mudstate.linkerinfo = munge_space ( MUSH_BUILD_LTCOMPILE );
     mudstate.dbmdriver = strdup ( MUSH_DBM );
-    
-    bp = version = alloc_lbuf( "init_version" );
-
+    bp = version = alloc_lbuf ( "init_version" );
     safe_sprintf ( version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor );
-  
+
     switch ( mudstate.version.status ) {
-      case 0:
+    case 0:
         safe_sprintf ( version, &bp, ", Alpha %d", mudstate.version.revision );
         break;
 
-      case 1:
+    case 1:
         safe_sprintf ( version, &bp, ", Beta %d", mudstate.version.revision );
         break;
 
-        case 2:
+    case 2:
         safe_sprintf ( version, &bp, ", Release Candidate %d", mudstate.version.revision );
         break;
 
-      default:
+    default:
         if ( mudstate.version.revision > 0 ) {
-          safe_sprintf ( version, &bp, ", Patch Level %d", mudstate.version.revision );
+            safe_sprintf ( version, &bp, ", Patch Level %d", mudstate.version.revision );
         } else {
-          safe_sprintf ( version, &bp, ", Gold Release");
+            safe_sprintf ( version, &bp, ", Gold Release" );
         }
+
         break;
     }
-    
-  mudstate.version.name = strdup( version );
 
-  free_lbuf( version );
+    mudstate.version.name = strdup ( version );
+    free_lbuf ( version );
 }
 
 void log_version ( void )

@@ -131,7 +131,7 @@ extern char  **add_array ( char **, char *, int *, char * );
 extern void write_status_file ( dbref, char * );
 extern char *mktimestamp ( void );
 extern void do_backup_mush ( dbref, dbref, int );
-extern FILE *fmkstemp(char *);
+extern FILE *fmkstemp ( char * );
 
 /* From help.c */
 extern int  helpmkindx ( dbref, char *, char * );
@@ -142,7 +142,7 @@ extern int  cf_ntab_access ( int *, char *, long, dbref, char * );
 /* From log.c */
 extern char *log_pos;
 extern char *logfile_init ( char * );
-extern void logfile_move ( char *, char *);
+extern void logfile_move ( char *, char * );
 extern void _log_perror ( const char *, const char *, const char *, const char * );
 extern void _log_write ( int, const char *, const char *, const char *, ... );
 extern void log_write_raw ( int, const char *, ... );
@@ -261,6 +261,9 @@ extern int  locatable ( dbref, dbref, dbref );
 extern int  nearby ( dbref, dbref );
 extern char    *master_attr ( dbref, dbref, int, char **, int, int * );
 extern void did_it ( dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int );
+
+/* From reconver.c */
+extern int do_recover ( char *, char *[] );
 
 /* From set.c */
 extern int  parse_attrib ( dbref, char *, dbref *, int *, int );

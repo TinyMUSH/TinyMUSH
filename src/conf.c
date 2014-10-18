@@ -1795,23 +1795,23 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
             cf_log_notfound ( player, cmd, "Config file", str );
             return -1;
         }
-    } 
+    }
 
     log_write ( LOG_ALWAYS, "CNF", "INFO", "Reading configuration file : %s", buf );
-
     mudstate.cfiletab = add_array ( mudstate.cfiletab, buf, &mudstate.configfiles, "cf_include" );
     xfree ( buf, "cf_include" );
     buf = alloc_lbuf ( "cf_include" );
 
     if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-        if ( !feof(fp) ) {
+        if ( !feof ( fp ) ) {
             cf_log_error ( player, "Error while reading configuration file.", line + 1 );
         }
+
         free_lbuf ( buf );
         fclose ( fp );
         return -1;
     }
-    
+
     line++;
 
     while ( !feof ( fp ) ) {
@@ -1819,13 +1819,15 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
 
         if ( *cp == '#' ) {
             if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-                if ( !feof(fp) ) {
+                if ( !feof ( fp ) ) {
                     cf_log_error ( player, "Error while reading configuration file.", line + 1 );
                 }
+
                 free_lbuf ( buf );
                 fclose ( fp );
                 return -1;
             }
+
             line++;
             continue;
         }
@@ -1868,13 +1870,15 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
         cf_set ( cp, ap, player );
 
         if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-            if ( !feof(fp) ) {
+            if ( !feof ( fp ) ) {
                 cf_log_error ( player, "Error while reading configuration file.", line + 1 );
             }
+
             free_lbuf ( buf );
             fclose ( fp );
             return -1;
         }
+
         line++;
     }
 
@@ -2219,7 +2223,7 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp )
         default:
             status = xstrdup ( "Strange.", "helper_cf_set" );
         }
-        
+
         buf = strip_ansi ( buff );
         log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, buf, status );
         free_lbuf ( buf );

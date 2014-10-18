@@ -93,12 +93,12 @@ char *logfile_init ( char *filename )
         mainlog_fp = stderr;
         return;
     }
-    
-    if( !filename ) {
+
+    if ( !filename ) {
         mainlog_fp = stderr;
-        return(NULL);
-    } else if ( strstr ( filename, "XXXXXX") != NULL ) {
-        mainlog_fp = fmkstemp(filename);
+        return ( NULL );
+    } else if ( strstr ( filename, "XXXXXX" ) != NULL ) {
+        mainlog_fp = fmkstemp ( filename );
     } else {
         mainlog_fp = fopen ( filename, "a" );
     }
@@ -110,15 +110,13 @@ char *logfile_init ( char *filename )
     }
 
     setbuf ( mainlog_fp, NULL ); /* unbuffered */
-
     return ( filename );
 }
 
-void logfile_move ( char *oldfn, char *newfn) {
+void logfile_move ( char *oldfn, char *newfn )
+{
     fclose ( mainlog_fp );
-    
     copy_file ( oldfn, newfn, 1 );
-    
     logfile_init ( newfn );
 }
 
@@ -185,7 +183,6 @@ int start_log ( const char *primary, const char *secondary, int key )
             if ( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
                 time ( ( time_t * ) ( &now ) );
                 tp = localtime ( ( time_t * ) ( &now ) );
-
                 log_write_raw ( 0, "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
             }
 
@@ -435,8 +432,8 @@ void do_logrotate ( dbref player, dbref cause, int key )
             }
         }
     }
-    
-    free_gbuf( ts );
+
+    free_gbuf ( ts );
 }
 
 void logfile_close ( void )
@@ -459,6 +456,6 @@ void logfile_close ( void )
         snprintf ( s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
         copy_file ( mudconf.log_file, s, 1 );
     }
-    
-    free_gbuf(ts);
+
+    free_gbuf ( ts );
 }

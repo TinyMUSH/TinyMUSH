@@ -97,11 +97,7 @@ extern char qidx_chartab[256];
 const lt_dlsymlist lt_preloaded_symbols[] = { {0, ( lt_ptr_t ) 0} };
 #endif
 
-extern char *optarg;
-
-extern int optind;
-
-void recover ( char * );
+void recover_flatfile ( char * );
 
 int tailfind ( char *, char * );
 
@@ -139,7 +135,6 @@ pid_t isrunning ( char *pidfile )
 
     fclose ( fp );
     pid = ( pid_t ) strtol ( buff, ( char ** ) NULL, 10 );
-
     fp = popen ( "pgrep netmush", "r" );
 
     if ( fp == NULL ) {
@@ -190,13 +185,12 @@ void handlestartupflatfiles ( int flag )
     char *ts;
     int i;
     struct stat sb1, sb2;
-
     ts = mktimestamp ();
     safe_snprintf ( db, MAXPATHLEN, "%s/%s", mudconf.dbhome, mudconf.db_file );
     safe_snprintf ( flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) );
     safe_snprintf ( db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts );
     safe_snprintf ( flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts );
-    free_gbuf(ts);
+    free_gbuf ( ts );
     i = open ( flat, O_RDONLY );
 
     if ( i > 0 ) {
@@ -214,7 +208,7 @@ void handlestartupflatfiles ( int flag )
                     log_write ( LOG_ALWAYS, "INI", "LOAD", "Unable to archive previous db to : %s", db_bak );
                 }
 
-                recover ( flat );
+                recover_flatfile ( flat );
 
                 if ( unlink ( flat ) != 0 ) {
                     log_write ( LOG_ALWAYS, "INI", "LOAD", "Unable to delete : %s", flat );
@@ -252,7 +246,6 @@ int tailfind ( char *file, char *key )
 {
     int fp;
     char s[MBUF_SIZE];
-
     off_t pos;
     fp = open ( file, O_RDONLY );
 
@@ -1419,7 +1412,7 @@ char *mktimestamp ( void )
     time_t ts;
     ts = time ( NULL );
     t = localtime ( &ts );
-    buff = alloc_gbuf(__func__);
+    buff = alloc_gbuf ( __func__ );
     safe_snprintf ( buff, GBUF_SIZE, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone );
     return ( buff );
 }
@@ -1630,7 +1623,7 @@ int backup_mush ( dbref player, dbref cause, int key )
     /* Call our external utility to pack everything together */
     ts = mktimestamp ( );
     s = xstrprintf ( "backup_mush", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext );
-    free_gbuf(ts);
+    free_gbuf ( ts );
     cwd = getcwd ( NULL, MAXPATHLEN );
 
     if ( cwd == NULL ) {
@@ -1842,19 +1835,21 @@ void write_pidfile ( char *fn )
     }
 }
 
-FILE *fmkstemp(char *template) {
+FILE *fmkstemp ( char *template )
+{
     FILE *fp;
     int fd = -1;
 
-    if ((fd = mkstemp(template)) == -1 || (fp = fdopen(fd, "w+")) == NULL) {
-        if (fd != -1) {
-            unlink(template);
-            close(fd);
+    if ( ( fd = mkstemp ( template ) ) == -1 || ( fp = fdopen ( fd, "w+" ) ) == NULL ) {
+        if ( fd != -1 ) {
+            unlink ( template );
+            close ( fd );
         }
 
-        return (NULL);
+        return ( NULL );
     }
-    return (fp);
+
+    return ( fp );
 }
 
 void write_status_file ( dbref player, char *message )
@@ -1926,6 +1921,7 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message )
         } else {
             raw_broadcast ( 0, "GAME: Shutdown by %s", Name ( Owner ( player ) ) );
         }
+
         log_write ( LOG_ALWAYS, "WIZ", "SHTDN", "Shutdown by %s", name );
     } else {
         raw_broadcast ( 0, "GAME: Fatal Error: %s", message );
@@ -2562,27 +2558,81 @@ void info ( int fmt, int flags, int ver )
     log_write_raw ( 1, "\n" );
 }
 
-void usage ( char *prog )
+void usage_dbconvert ( void )
 {
-    log_write_raw ( 1, "Usage: %s [options] gdbm-file [< in-file] [> out-file]\n", prog );
-    log_write_raw ( 1, "   Available flags are:\n" );
-    log_write_raw ( 1, "      -c <filename> - Config file     -C - Perform consistency check\n" );
-    log_write_raw ( 1, "      -d <path> - Data directory      -D <filename> - gdbm database\n" );
-    log_write_raw ( 1, "      -r <filename> - gdbm crash db\n" );
-    log_write_raw ( 1, "      -G - Write in gdbm format       -g - Write in flat file format\n" );
-    log_write_raw ( 1, "      -K - Store key as an attribute  -k - Store key in the header\n" );
-    log_write_raw ( 1, "      -L - Include link information   -l - Don't include link information\n" );
-    log_write_raw ( 1, "      -M - Store attr map if GDBM     -m - Don't store attr map if GDBM\n" );
-    log_write_raw ( 1, "      -N - Store name as an attribute -n - Store name in the header\n" );
-    log_write_raw ( 1, "      -P - Include parent information -p - Don't include parent information\n" );
-    log_write_raw ( 1, "      -W - Write the output file  b   -w - Don't write the output file.\n" );
-    log_write_raw ( 1, "      -X - Create a default GDBM db   -x - Create a default flat file db\n" );
-    log_write_raw ( 1, "      -Z - Include zone information   -z - Don't include zone information\n" );
-    log_write_raw ( 1, "      -<number> - Set output version number\n" );
+    fprintf ( stderr, "  -c, --config=<filename>   config file\n" );
+    fprintf ( stderr, "  -C, --check               perform consistency check\n" );
+    fprintf ( stderr, "  -d, --data=<path>         data directory\n" );
+    fprintf ( stderr, "  -D, --gdbmdb=<filename>   gdbm database\n" );
+    fprintf ( stderr, "  -r, --crashdb=<filename>  gdbm crash db\n" );
+    fprintf ( stderr, "  -q, --cleanattr           clean attribute table\n" );
+    fprintf ( stderr, "  -G, --gdbm                write in gdbm format\n" );
+    fprintf ( stderr, "  -g, --flat                write in flat file format\n" );
+    fprintf ( stderr, "  -K, --keyattr             store key as an attribute\n" );
+    fprintf ( stderr, "  -k, --keyhdr              store key in the header\n" );
+    fprintf ( stderr, "  -L, --links               include link information\n" );
+    fprintf ( stderr, "  -l, --nolinks             don't include link information\n" );
+    fprintf ( stderr, "  -M, --maps                store attr map if GDBM\n" );
+    fprintf ( stderr, "  -m, --nomaps              don't store attr map if GDBM\n" );
+    fprintf ( stderr, "  -N, --nameattr            store name as an attribute\n" );
+    fprintf ( stderr, "  -n, --namehdr             store name in the header\n" );
+    fprintf ( stderr, "  -P, --parents             include parent information\n" );
+    fprintf ( stderr, "  -p, --noparents           don't include parent information\n" );
+    fprintf ( stderr, "  -W, --write               write the output file\n" );
+    fprintf ( stderr, "  -w, --nowrite             don't write the output file.\n" );
+    fprintf ( stderr, "  -X, --mindb               create a default GDBM db\n" );
+    fprintf ( stderr, "  -x, --minflat             create a default flat file db\n" );
+    fprintf ( stderr, "  -Z, --zones               include zone information\n" );
+    fprintf ( stderr, "  -z, --nozones             don't include zone information\n" );
+    fprintf ( stderr, "  -o, --output=<number>     set output version number\n\n" );
+}
+
+void usage_dbrecover ( void )
+{
+    fprintf ( stderr, "  -i, --input               dbm file to recover\n" );
+    fprintf ( stderr, "  -o, --output              recovered db file\n\n" );
+}
+
+void usage ( char *prog, int which )
+{
+    fprintf ( stderr, "\n%s\n\n", mudstate.version.name );
+
+    switch ( which ) {
+    case 0:
+        fprintf ( stderr, "Usage: %s [options] [CONFIG-FILE]\n", prog );
+        fprintf ( stderr, "       %s -c DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog );
+        fprintf ( stderr, "       %s -e -i INPUT-DBM -o OUTPUT-DBM\n\n", prog );
+        fprintf ( stderr, "When call without -c or -e option, %s accept the following options:\n\n", prog );
+        fprintf ( stderr, "  CONFIG-FILE               configuration file\n" );
+        fprintf ( stderr, "  -d, --debug               debug mode, do not fork to background\n" );
+        fprintf ( stderr, "  -m, --mindb               delete the current databases and create a new one\n\n" );
+        fprintf ( stderr, "  -r, --restart             restart mode, handle restart database\n" );
+        fprintf ( stderr, "                              This mode is used internally, do not\n" );
+        fprintf ( stderr, "                              use it unless you know what you are\n" );
+        fprintf ( stderr, "                              doing.\n\n" );
+        fprintf ( stderr, "When call with the -c option, %s accept the following options:\n\n", prog );
+        usage_dbconvert();
+        fprintf ( stderr, "When call with the -e option, %s accept the following options:\n\n", prog );
+        usage_dbrecover();
+        break;
+
+    case 1:
+        fprintf ( stderr, "Usage: dbconvert [options] DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n" );
+        fprintf ( stderr, "Options:\n" );
+        usage_dbconvert();
+        break;
+
+    case 2:
+        fprintf ( stderr, "Usage: recover -i INPUT-DBM -o OUTPUT-DBM\n" );
+        usage_dbrecover();
+        break;
+    }
+
+    fprintf ( stderr, "\nDefault configuration file : %s\n\n", DEFAULT_CONFIG_FILE );
 }
 
 
-void recover ( char *flat )
+void recover_flatfile ( char *flat )
 {
     int db_ver, db_format, db_flags, setflags, clrflags, ver;
     MODULE *mp;
@@ -2603,13 +2653,13 @@ void recover ( char *flat )
     /*
      * Call modules to load their flatfiles
      */
-    s1 = alloc_mbuf ( "recover" );
+    s1 = alloc_mbuf ( "recover_flatfile" );
 
     for ( mp = mudstate.modules_list; mp != NULL; mp = mp->next ) {
         snprintf ( s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile" );
 
         if ( ( modfunc =  ( void ( * ) ( FILE * ) ) lt_dlsym ( mp->handle, s1 ) ) != NULL ) {
-            s = xstrprintf ( "recover", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
+            s = xstrprintf ( "recover_flatfile", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname );
             f = db_module_flatfile ( s, 0 );
 
             if ( f ) {
@@ -2617,7 +2667,7 @@ void recover ( char *flat )
                 tf_fclose ( f );
             }
 
-            xfree ( s, "recover" );
+            xfree ( s, "recover_flatfile" );
         }
     }
 
@@ -2647,6 +2697,37 @@ int dbconvert ( int argc, char *argv[] )
     FILE *f;
     MODULE *mp;
     void ( *modfunc ) ( FILE * );
+    int optind = 1;
+    int option_index = 0;
+    static struct option long_options[] = {
+        {"config",    required_argument, 0, 'c' },
+        {"check",     no_argument,       0, 'C' },
+        {"data",      required_argument, 0, 'd' },
+        {"gdbmdb",    required_argument, 0, 'D' },
+        {"crashdb",   required_argument, 0, 'r' },
+        {"cleanattr", no_argument,       0, 'q' },
+        {"gdbm",      no_argument,       0, 'G' },
+        {"flat",      no_argument,       0, 'g' },
+        {"keyattr",   no_argument,       0, 'K' },
+        {"keyhdr",    no_argument,       0, 'k' },
+        {"links",     no_argument,       0, 'L' },
+        {"nolinks",   no_argument,       0, 'l' },
+        {"maps",      no_argument,       0, 'M' },
+        {"nomaps",    no_argument,       0, 'm' },
+        {"nameattr",  no_argument,       0, 'N' },
+        {"namehdr",   no_argument,       0, 'n' },
+        {"parents",   no_argument,       0, 'P' },
+        {"noparents", no_argument,       0, 'p' },
+        {"write",     no_argument,       0, 'W' },
+        {"nowrite",   no_argument,       0, 'w' },
+        {"mindb",     no_argument,       0, 'X' },
+        {"minflat",   no_argument,       0, 'x' },
+        {"zones",     no_argument,       0, 'Z' },
+        {"nozones",   no_argument,       0, 'z' },
+        {"output",    required_argument, 0, 'o' },
+        {"help",      no_argument,       0, '?' },
+        {0,           0,                 0,  0  }
+    };
     logfile_init ( NULL );
     /*
      * Decide what conversions to do and how to format the output file
@@ -2655,7 +2736,7 @@ int dbconvert ( int argc, char *argv[] )
     do_write = 1;
     dbclean = V_DBCLEAN;
 
-    while ( ( c = getopt ( argc, argv, "c:d:D:CqGgZzLlNnKkPpWwXx0123456789" ) ) != -1 ) {
+    while ( ( c = getopt_long ( argc, argv, "c:Cd:D:r:qGgKkLlMmNnPpWwXxZzo?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
         case 'c':
             opt_conf = optarg;
@@ -2745,17 +2826,8 @@ int dbconvert ( int argc, char *argv[] )
             ver = UNLOAD_VERSION;
             break;
 
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            ver = ver * 10 + ( c - '0' );
+        case 'o':
+            ver = ver * 10 + atoi ( optarg );
             break;
 
         default:
@@ -2764,18 +2836,12 @@ int dbconvert ( int argc, char *argv[] )
     }
 
     if ( errflg || optind >= argc ) {
-        usage ( argv[0] );
+        usage ( basename ( argv[0] ), 1 );
         exit ( EXIT_FAILURE );
     }
 
     LTDL_SET_PRELOADED_SYMBOLS();
     lt_dlinit();
-//    pool_init ( POOL_HBUF, HBUF_SIZE );
-//    pool_init ( POOL_LBUF, LBUF_SIZE );
-//    pool_init ( POOL_GBUF, GBUF_SIZE );
-//    pool_init ( POOL_MBUF, MBUF_SIZE );
-//    pool_init ( POOL_SBUF, SBUF_SIZE );
-//    pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
     mudconf.dbhome = xstrdup ( opt_datadir, "argv" );
     mudconf.db_file = xstrdup ( opt_gdbmfile, "argv" );
     cf_init();
@@ -2865,8 +2931,7 @@ int dbconvert ( int argc, char *argv[] )
             call_all_modules_nocache ( "db_write" );
             db_unlock();
         } else {
-            db_write_flatfile ( stdout, F_TINYMUSH,
-                                db_ver | db_flags | dbclean );
+            db_write_flatfile ( stdout, F_TINYMUSH, db_ver | db_flags | dbclean );
             /*
              * Call all modules to write to flatfile
              */
@@ -2918,33 +2983,30 @@ int main ( int argc, char *argv[] )
     int errflg = 0;
     pid_t pid;
     char *s, *ts;
-    char templog[]="netmush.XXXXXX";
+    char templog[] = "netmush.XXXXXX";
     MODULE *mp;
     char *bp;
     FILE *fp;
     struct stat sb1, sb2;
     MODHASHES *m_htab, *hp;
     MODNHASHES *m_ntab, *np;
-    
     int option_index = 0;
     static struct option long_options[] = {
-            {"debug",   no_argument, 0, 'd' },
-            {"restart", no_argument, 0, 'r' },
-            {"mindb",   no_argument, 0, 'm' },
-            {"convert", no_argument, 0, 'c' },
-            {"help",    no_argument, 0, '?' },
-            {0,         0,           0,  0  }
+        {"debug",   no_argument, 0, 'd' },
+        {"restart", no_argument, 0, 'r' },
+        {"mindb",   no_argument, 0, 'm' },
+        {"convert", no_argument, 0, 'c' },
+        {"recover", no_argument, 0, 'e' },
+        {"help",    no_argument, 0, '?' },
+        {0,         0,           0,  0  }
     };
-
     mudstate.initializing = 1;
     mudstate.debug = 0 ;
     mudstate.restarting = 0;
-    
     /*
      * Do this first, before anything gets a chance to allocate memory.
      */
     mudstate.raw_allocs = NULL;
-
     pool_init ( POOL_HBUF, HBUF_SIZE );
     pool_init ( POOL_LBUF, LBUF_SIZE );
     pool_init ( POOL_GBUF, GBUF_SIZE );
@@ -2952,54 +3014,57 @@ int main ( int argc, char *argv[] )
     pool_init ( POOL_SBUF, SBUF_SIZE );
     pool_init ( POOL_BOOL, sizeof ( struct boolexp ) );
     pool_init ( POOL_DESC, sizeof ( DESC ) );
-    pool_init ( POOL_QENTRY, sizeof ( BQUE ) );    
-
+    pool_init ( POOL_QENTRY, sizeof ( BQUE ) );
     umask ( 077 );      /* Keep things to us by default */
-
+    init_version();
     /*
      * If we are called with the name 'dbconvert', do a DB conversion and
      * exit
      */
-     
     s = basename ( argv[0] );
 
     if ( s && *s && !strcmp ( s, "dbconvert" ) ) {
         dbconvert ( argc, argv );
     }
 
+    if ( s && *s && !strcmp ( s, "recover" ) ) {
+        dbrecover ( argc, argv );
+    }
+
     /*
      * Configure the minimum default values we need to start.
      */
-    mudconf.mud_shortname = xstrdup( DEFAULT_SHORTNAME, "cf_string" );
-    
+    mudconf.mud_shortname = xstrdup ( DEFAULT_SHORTNAME, "cf_string" );
     s = getcwd ( NULL, 0 );
-    mudconf.game_home = realpath(s, NULL);
-    free(s);
-    
-    mudconf.game_exec = realpath(argv[0], NULL);
-    
-    init_version();
-    
+    mudconf.game_home = realpath ( s, NULL );
+    free ( s );
+    mudconf.game_exec = realpath ( argv[0], NULL );
+
     /*
      * Parse options
      */
     //while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
-    while ( ( c = getopt_long ( argc, argv, "drmc?", long_options, &option_index ) ) != -1 ) {
+    while ( ( c = getopt_long ( argc, argv, "drmce?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
-        case 'd':	/* Debug mode, do not fork */
+        case 'd':   /* Debug mode, do not fork */
             mudstate.debug = 1;
-            break;        
-                        
-        case 'r':	/* Restarting */
+            break;
+
+        case 'r':   /* Restarting */
             mudstate.restarting = 1;
             break;
-            
-        case 'm':	/* Force minimum db generation */
+
+        case 'm':   /* Force minimum db generation */
             mindb = 1;
-            break;            
-            
-        case 'c':	/* dbconvert */
+            break;
+
+        case 'c':   /* dbconvert */
             dbconvert ( argc, argv );
+            exit ( EXIT_SUCCESS );
+            break;
+
+        case 'e':   /* recover */
+            dbrecover ( argc, argv );
             exit ( EXIT_SUCCESS );
             break;
 
@@ -3014,9 +3079,8 @@ int main ( int argc, char *argv[] )
          * The first non-option element is our config file.
          */
         s = strdup ( argv[optind++] );
-        mudconf.config_file = realpath( s , NULL);
+        mudconf.config_file = realpath ( s , NULL );
         free ( s );
-
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
@@ -3025,31 +3089,22 @@ int main ( int argc, char *argv[] )
          * If there was none, use the default value.
          */
         s = strdup ( DEFAULT_CONFIG_FILE );
-        mudconf.config_file = realpath( s , NULL);
+        mudconf.config_file = realpath ( s , NULL );
         free ( s );
-
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
     }
-        
 
     /* Make sure we can read the config file */
 
-    if ( !fileexist (mudconf.config_file) ) {
+    if ( !fileexist ( mudconf.config_file ) ) {
         fprintf ( stderr, "Unable to read configuration file %s.\n", mudconf.config_file );
         errflg++;
     }
 
     if ( errflg ) {
-        fprintf ( stderr, "\n%s\n\n", mudstate.version.name);
-        fprintf ( stderr, "Usage: %s [options] [CONFIG-FILE]\n\n", basename (argv[0]) );
-        fprintf ( stderr, "Options:\n");
-        fprintf ( stderr, "  -d, --debug               debug mode, do not fork to background\n");
-        fprintf ( stderr, "  -r, --restart             restart mode, handle restart database\n");
-        fprintf ( stderr, "  -m, --mindb               delete the current databases and create a new one\n");
-        fprintf ( stderr, "  -c, --convert             dbconvert mode, handle database conversion\n\n");
-        fprintf ( stderr, "\nDefault configuration file : %s\n", DEFAULT_CONFIG_FILE );
+        usage ( basename ( argv[0] ), 0 );
         exit ( EXIT_FAILURE );
     }
 
@@ -3059,7 +3114,6 @@ int main ( int argc, char *argv[] )
     time ( &mudstate.start_time );
     mudstate.restart_time = mudstate.start_time;
     time ( &mudstate.cpu_count_from );
-
     tcache_init();
     pcache_init();
     logfile_init ( templog );
@@ -3071,14 +3125,11 @@ int main ( int argc, char *argv[] )
     init_powertab();
     init_functab();
     init_attrtab();
-
     log_version();
-    
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec);
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home);
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec );
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home );
     log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file );
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mudconf.config_home );    
-    
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mudconf.config_home );
     cf_read ( mudconf.config_file );
 
     /*
@@ -3128,9 +3179,8 @@ int main ( int argc, char *argv[] )
     hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
-    
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
-    
+
     if ( tailfind ( mudconf.log_file, "GDBM panic: write error\n" ) ) {
         log_write ( LOG_ALWAYS, "INI", "FATAL", "Log indicate the last run ended with GDBM panic: write error" );
         fprintf ( stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n" );
@@ -3151,31 +3201,28 @@ int main ( int argc, char *argv[] )
         fprintf ( stderr, "need to restore from a previous backup.\n\n" );
         exit ( EXIT_FAILURE );
     }
-    
+
     if ( fileexist ( mudconf.log_file ) ) {
         ts = mktimestamp ( );
         s = xstrprintf ( "cleanup_log", "%s.%s", mudconf.log_file, ts );
         log_write ( LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename ( s ) );
         copy_file ( mudconf.log_file, s, 1 );
         xfree ( s, "cleanup_log" );
-        free_gbuf(ts);
+        free_gbuf ( ts );
     }
-    
-    logfile_move ( templog, mudconf.log_file);
-    
+
+    logfile_move ( templog, mudconf.log_file );
     mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
     mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
     mudconf.status_file = xstrprintf ( "main_mudconf_status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname );
-
     s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
 
-    if ( fileexist(s) ) {
+    if ( fileexist ( s ) ) {
         log_write ( LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present. Restarting", s );
         mudstate.restarting = 1;
     }
 
     xfree ( s, "test_restart_db" );
-    
     pid = isrunning ( mudconf.pid_file );
 
     if ( pid ) {
@@ -3450,7 +3497,6 @@ int main ( int argc, char *argv[] )
     }
 
     write_pidfile ( mudconf.pid_file );
-
     log_write ( LOG_STARTUP, "INI", "LOAD", "Startup processing complete. (Process ID : %d)",  getpid() );
 
     if ( !mudstate.restarting ) {
@@ -3530,7 +3576,7 @@ int main ( int argc, char *argv[] )
         s = xstrprintf ( "cleanup_log", "%s.%s", mudconf.log_file, ts );
         copy_file ( mudconf.log_file, s, 1 );
         xfree ( s, "cleanup_log" );
-        free_gbuf(ts);
+        free_gbuf ( ts );
     }
 
     exit ( EXIT_SUCCESS );

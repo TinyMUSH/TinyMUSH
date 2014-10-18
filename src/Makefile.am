@@ -4,15 +4,15 @@ LIBTOOL_DEPS		= @LIBTOOL_DEPS@
 
 AUTOMAKE_OPTIONS 	= subdir-objects
 
-netmush_SOURCES		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
+netmush_SOURCES		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
 netmush_LDFLAGS		= -export-dynamic
 netmush_SKEL		= defaults.h.in
 netmush_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES	= $(LTDLDEPS) 
 nodist_netmush_SOURCES	= version.h defaults.h
 
-recover_SOURCES		= recover.c
-recover_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+#recover_SOURCES	= recover.c
+#recover_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 
 slave_SOURCES		= slave.c
 
@@ -39,20 +39,20 @@ BUILT_SOURCES		= version.h tinymushapi.h defaults.h netmush.conf Startmush
 
 nodist_include_HEADERS	= tinymushapi.h
 
-bin_PROGRAMS		= netmush slave recover
+bin_PROGRAMS		= netmush slave
 
 if WANT_DBM_GDBM
  SUBDIRS		+= dbm/gdbm/
  AM_CPPFLAGS		+= -I dbm/gdbm/
  netmush_LDADD		+= dbm/gdbm/libtinygdbm.a
- recover_LDADD		+= dbm/gdbm/libtinygdbm.a
+# recover_LDADD		+= dbm/gdbm/libtinygdbm.a
 endif
 
 if WANT_DBM_QDBM
  SUBDIRS		+= dbm/qdbm/
  AM_CPPFLAGS		+= -I dbm/qdbm/
  netmush_LDADD		+= dbm/qdbm/libtinyqdbm.a
- recover_LDADD		+= dbm/qdbm/libtinyqdbm.a
+# recover_LDADD		+= dbm/qdbm/libtinyqdbm.a
 endif
 
 if WANT_MODULE_COMSYS
@@ -140,6 +140,9 @@ install-exec-local:
 	$(install_sh_SCRIPT) $(SCRIPT_BUILD) @libexecdir@/@with_install_suffix@
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
+install-exec-hook:
+	cd @bindir@ && $(LN_S) -f netmush dbconvert && $(LN_S) -f netmush recover
+
 install-data-local:
 	$(mkinstalldirs) @sysconfdir@
 	$(mkinstalldirs) @datarootdir@
@@ -155,4 +158,5 @@ install-data-local:
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done
 	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
-
+	rm -f @bindir@/dbconvert 
+	rm -f @bindir@/recover
