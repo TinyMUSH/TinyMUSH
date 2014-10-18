@@ -82,25 +82,25 @@ struct boolexp {
 #define F_MUX       5   /* TinyMUX format */
 #define F_TINYMUSH  6   /* TinyMUSH 3.0 format */
 
-#define V_MASK      0x000000ff  /* Database version */
-#define V_ZONE      0x00000100  /* ZONE/DOMAIN field */
-#define V_LINK      0x00000200  /* LINK field (exits from objs) */
-#define V_GDBM      0x00000400  /* attrs are in a gdbm db, not here */
-#define V_ATRNAME   0x00000800  /* NAME is an attr, not in the hdr */
-#define V_ATRKEY    0x00001000  /* KEY is an attr, not in the hdr */
-#define V_PERNKEY   0x00001000  /* PERN: Extra locks in object hdr */
-#define V_PARENT    0x00002000  /* db has the PARENT field */
-#define V_COMM      0x00004000  /* PERN: Comm status in header */
-#define V_ATRMONEY  0x00008000  /* Money is kept in an attribute */
-#define V_XFLAGS    0x00010000  /* An extra word of flags */
-#define V_POWERS        0x00020000  /* Powers? */
-#define V_3FLAGS    0x00040000  /* Adding a 3rd flag word */
-#define V_QUOTED    0x00080000  /* Quoted strings, ala PennMUSH */
-#define V_TQUOTAS       0x00100000  /* Typed quotas */
-#define V_TIMESTAMPS    0x00200000  /* Timestamps */
-#define V_VISUALATTRS   0x00400000  /* ODark-to-Visual attr flags */
-#define V_CREATETIME    0x00800000  /* Create time */
-#define V_DBCLEAN   0x80000000  /* Option to clean attr table */
+#define V_MASK        0x000000ff  /* Database version */
+#define V_ZONE        0x00000100  /* ZONE/DOMAIN field */
+#define V_LINK        0x00000200  /* LINK field (exits from objs) */
+#define V_GDBM        0x00000400  /* attrs are in a gdbm db, not here */
+#define V_ATRNAME     0x00000800  /* NAME is an attr, not in the hdr */
+#define V_ATRKEY      0x00001000  /* KEY is an attr, not in the hdr */
+#define V_PERNKEY     0x00001000  /* PERN: Extra locks in object hdr */
+#define V_PARENT      0x00002000  /* db has the PARENT field */
+#define V_COMM        0x00004000  /* PERN: Comm status in header */
+#define V_ATRMONEY    0x00008000  /* Money is kept in an attribute */
+#define V_XFLAGS      0x00010000  /* An extra word of flags */
+#define V_POWERS      0x00020000  /* Powers? */
+#define V_3FLAGS      0x00040000  /* Adding a 3rd flag word */
+#define V_QUOTED      0x00080000  /* Quoted strings, ala PennMUSH */
+#define V_TQUOTAS     0x00100000  /* Typed quotas */
+#define V_TIMESTAMPS  0x00200000  /* Timestamps */
+#define V_VISUALATTRS 0x00400000  /* ODark-to-Visual attr flags */
+#define V_CREATETIME  0x00800000  /* Create time */
+#define V_DBCLEAN     0x80000000  /* Option to clean attr table */
 
 /* special dbref's */
 #define NOTHING     (-1)    /* null dbref */

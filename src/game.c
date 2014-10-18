@@ -2565,7 +2565,7 @@ void info ( int fmt, int flags, int ver )
 
 void usage_dbconvert ( void )
 {
-    fprintf ( stderr, "  -c, --config=<filename>   config file\n" );
+    fprintf ( stderr, "  -f, --config=<filename>   config file\n" );
     fprintf ( stderr, "  -C, --check               perform consistency check\n" );
     fprintf ( stderr, "  -d, --data=<path>         data directory\n" );
     fprintf ( stderr, "  -D, --gdbmdb=<filename>   gdbm database\n" );
@@ -2697,10 +2697,9 @@ int dbconvert ( int argc, char *argv[] )
     FILE *f;
     MODULE *mp;
     void ( *modfunc ) ( FILE * );
-    int optind = 1;
     int option_index = 0;
     static struct option long_options[] = {
-        {"config",    required_argument, 0, 'c' },
+        {"config",    required_argument, 0, 'f' },
         {"check",     no_argument,       0, 'C' },
         {"data",      required_argument, 0, 'd' },
         {"gdbmdb",    required_argument, 0, 'D' },
@@ -2735,8 +2734,8 @@ int dbconvert ( int argc, char *argv[] )
     setflags = clrflags = ver = do_check = 0;
     do_write = 1;
     dbclean = V_DBCLEAN;
-
-    while ( ( c = getopt_long ( argc, argv, "c:Cd:D:r:qGgKkLlMmNnPpWwXxZzo?", long_options, &option_index ) ) != -1 ) {
+    
+    while ( ( c = getopt_long ( argc, argv, "f:Cd:D:r:qGgKkLlMmNnPpWwXxZzo:?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
         case 'c':
             opt_conf = optarg;
@@ -2759,11 +2758,15 @@ int dbconvert ( int argc, char *argv[] )
             break;
 
         case 'G':
-            setflags |= V_GDBM;
+            clrflags = 0xffffffff;
+            setflags = OUTPUT_FLAGS;
+            ver = OUTPUT_VERSION;
             break;
 
         case 'g':
-            clrflags |= V_GDBM;
+            clrflags = 0xffffffff;
+            setflags = UNLOAD_OUTFLAGS;
+            ver = UNLOAD_VERSION;
             break;
 
         case 'Z':
@@ -2827,7 +2830,7 @@ int dbconvert ( int argc, char *argv[] )
             break;
 
         case 'o':
-            ver = ver * 10 + atoi ( optarg );
+            ver = ver * 10 + ( int ) strtol(optarg, NULL, 10);
             break;
 
         default:
@@ -2848,11 +2851,11 @@ int dbconvert ( int argc, char *argv[] )
     mudstate.standalone = 1;
     cf_read ( opt_conf );
     mudstate.initializing = 0;
+    
     /*
      * Open the gdbm file
      */
     vattr_init();
-    printf ( "OPTIND : %s\n", argv[optind] );
 
     if ( init_gdbm_db ( argv[optind] ) < 0 ) {
         log_write_raw ( 1, "Can't open GDBM file\n" );
@@ -3077,6 +3080,7 @@ int main ( int argc, char *argv[] )
         s = strdup ( argv[optind++] );
         mudconf.config_file = realpath ( s , NULL );
         free ( s );
+        
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
@@ -3087,6 +3091,7 @@ int main ( int argc, char *argv[] )
         s = strdup ( DEFAULT_CONFIG_FILE );
         mudconf.config_file = realpath ( s , NULL );
         free ( s );
+        
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
