@@ -212,9 +212,9 @@ void do_name ( dbref player, dbref cause, int key, const char *name, char *newna
         /*
          * everything ok, notify
          */
-        thingname = log_getname ( thing, "do_name" );
+        thingname = log_getname ( thing );
         log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", thingname, buff );
-        xfree ( thingname, "do_name" );
+        free_lbuf ( thingname );
 
         if ( Suspect ( thing ) ) {
             raw_broadcast ( WIZARD,

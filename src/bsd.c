@@ -269,11 +269,11 @@ void boot_slave ( void )
         close ( sv[0] );
 
         if ( dup2 ( sv[1], 0 ) == -1 ) {
-            _exit ( 1 );
+            _exit ( EXIT_FAILURE );
         }
 
         if ( dup2 ( sv[1], 1 ) == -1 ) {
-            _exit ( 1 );
+            _exit ( EXIT_FAILURE );
         }
 
         for ( i = 3; i < maxfds; ++i ) {
@@ -284,7 +284,7 @@ void boot_slave ( void )
         sprintf ( s, "%s/slave", mudconf.binhome );
         execlp ( s, "slave", NULL );
         xfree ( s, "boot_slave" );
-        _exit ( 1 );
+        _exit ( EXIT_FAILURE );
     }
 
     close ( sv[1] );
@@ -311,13 +311,12 @@ int make_socket ( int port )
 
     if ( s < 0 ) {
         log_perror ( "NET", "FAIL", NULL, "creating master socket" );
-        exit ( 3 );
+        exit ( EXIT_FAILURE );
     }
 
     opt = 1;
 
-    if ( setsockopt ( s, SOL_SOCKET, SO_REUSEADDR,
-                      ( char * ) &opt, sizeof ( opt ) ) < 0 ) {
+    if ( setsockopt ( s, SOL_SOCKET, SO_REUSEADDR, ( char * ) &opt, sizeof ( opt ) ) < 0 ) {
         log_perror ( "NET", "FAIL", NULL, "setsockopt" );
     }
 
@@ -329,7 +328,7 @@ int make_socket ( int port )
         if ( bind ( s, ( struct sockaddr * ) &server, sizeof ( server ) ) ) {
             log_perror ( "NET", "FAIL", NULL, "bind" );
             close ( s );
-            exit ( 4 );
+            exit ( EXIT_FAILURE );
         }
 
     listen ( s, 5 );
@@ -704,7 +703,7 @@ void shutdownsock ( DESC *d, int reason )
         reason = R_QUIT;
     }
 
-    buff = log_getname ( d->player, "shutdownsock" );
+    buff = log_getname ( d->player );
 
     if ( d->flags & DS_CONNECTED ) {
         /*
@@ -743,7 +742,7 @@ void shutdownsock ( DESC *d, int reason )
         log_write ( LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, conn_reasons[reason] );
     }
 
-    xfree ( buff, "shutdownsock" );
+    free_lbuf ( buff );
     process_output ( d );
     clearstrings ( d );
 
@@ -1066,17 +1065,17 @@ void report ( void )
     log_write ( LOG_BUGS, "BUG", "INFO", "Command: '%s'", mudstate.debug_cmd );
 
     if ( Good_obj ( mudstate.curr_player ) ) {
-        player = log_getname ( mudstate.curr_player, "report" );
+        player = log_getname ( mudstate.curr_player );
 
         if ( ( mudstate.curr_enactor != mudstate.curr_player ) && Good_obj ( mudstate.curr_enactor ) ) {
-            enactor = log_getname ( mudstate.curr_enactor, "report" );
+            enactor = log_getname ( mudstate.curr_enactor );
             log_write ( LOG_BUGS, "BUG", "INFO", "Player: %s Enactor: %s", player, enactor );
-            xfree ( enactor, "report" );
+            free_lbuf ( enactor );
         } else {
             log_write ( LOG_BUGS, "BUG", "INFO", "Player: %s", player );
         }
 
-        xfree ( player, "report" );
+        free_lbuf ( player );
     }
 }
 
@@ -1264,7 +1263,7 @@ static RETSIGTYPE sighandler ( int sig )
         s = xstrprintf ( "sighandler", "Caught signal %s", signames[sig] );
         write_status_file ( NOTHING, s );
         xfree ( s, "sighandler" );
-        exit ( 0 );
+        exit ( EXIT_SUCCESS );
         break;
 
     case SIGILL:        /* Panic save + restart now, or coredump now */

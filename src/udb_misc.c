@@ -94,5 +94,5 @@ void fatal ( char *p, ... )
     }
 
     va_end ( ap );
-    exit ( 1 );
+    exit ( EXIT_FAILURE );
 }

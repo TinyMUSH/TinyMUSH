@@ -1590,7 +1590,6 @@ char *safe_snprintf ( char *buff, size_t size, const char *format, ... )
     vsnprintf ( buff, size, format, ap );
     va_end ( ap );
     buff[size - 1] = '\0';
-
     return ( buff );
 }
 
@@ -1610,7 +1609,6 @@ char *safe_vsnprintf ( char *buff, size_t size, const char *format, va_list ap )
 {
     vsnprintf ( buff, size, format, ap );
     buff[size - 1] = '\0';
-
     return ( buff );
 }
 
@@ -1645,7 +1643,6 @@ char *safe_sprintf ( char *buff, char **bufp, const char *format, ... )
     *bufp += n;
     **bufp = '\0';
     return ( buff );
-
 }
 
 /**

@@ -804,7 +804,7 @@ void do_pcreate ( dbref player, dbref cause, int key, char *name, char *pass )
     dbref newplayer;
     char *newname, *cname, *nname;
     isrobot = ( key == PCRE_ROBOT ) ? 1 : 0;
-    cname = log_getname ( player, "do_pcreate" );
+    cname = log_getname ( player );
     newplayer = create_player ( name, pass, player, isrobot, 0 );
     newname = munge_space ( name );
 
@@ -817,12 +817,12 @@ void do_pcreate ( dbref player, dbref cause, int key, char *name, char *pass )
             log_write ( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "Failure creating '%s' by %s", newname, cname );
         }
 
-        xfree ( cname, "do_pcreate" );
+        free_lbuf ( cname );
         free_lbuf ( newname );
         return;
     }
 
-    nname = log_getname ( newplayer, "do_pcreate" );
+    nname = log_getname ( newplayer );
 
     if ( isrobot ) {
         move_object ( newplayer, Location ( player ) );
@@ -835,8 +835,8 @@ void do_pcreate ( dbref player, dbref cause, int key, char *name, char *pass )
         log_write ( LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "%s created by %s", nname, cname );
     }
 
-    xfree ( cname, "do_pcreate" );
-    xfree ( nname, "do_pcreate" );
+    free_lbuf ( cname );
+    free_lbuf ( nname );
     free_lbuf ( newname );
 }
 

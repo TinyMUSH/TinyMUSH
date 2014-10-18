@@ -244,9 +244,9 @@ void do_quota ( dbref player, dbref cause, int key, char *arg1, char *arg2 )
         }
 
         if ( set ) {
-            name = log_getname ( player, "do_quota" );
+            name = log_getname ( player );
             log_write ( LOG_WIZARD, "WIZ", "QUOTA", "%s changed everyone's quota.", name );
-            xfree ( name, "do_quota" );
+            free_lbuf ( name );
         }
 
         show_quota_header ( player );
@@ -307,11 +307,11 @@ void do_quota ( dbref player, dbref cause, int key, char *arg1, char *arg2 )
     }
 
     if ( set ) {
-        name = log_getname ( player, "do_quota" );
-        target = log_getname ( who, "do_quota" );
+        name = log_getname ( player );
+        target = log_getname ( who );
         log_write ( LOG_WIZARD, "WIZ", "QUOTA", "%s changed the quota of %s", name, target );
-        xfree ( name, "do_quota" );
-        xfree ( target, "do_quota" );
+        free_lbuf ( name );
+        free_lbuf ( target );
         mung_quotas ( who, key, value );
     }
 

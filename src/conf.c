@@ -282,7 +282,6 @@ void cf_init ( void )
     mudconf.vattr_flag_list = NULL;
     mudconf.flag_sep = xstrdup ( "_", "cf_string" );
     mudconf.mud_name = xstrdup ( "TinyMUSH", "cf_string" );
-    mudconf.mud_shortname = xstrdup ( "netmush", "cf_string" );
     mudconf.one_coin = xstrdup ( "penny", "cf_string" );
     mudconf.many_coins = xstrdup ( "pennies", "cf_string" );
     mudconf.struct_dstr = xstrdup ( "\r\n", "cf_string" );
@@ -438,12 +437,12 @@ void cf_log_notfound ( dbref player, char *cmd, const char *thingname, char *thi
  * cf_log_error: Log an error.
  */
 
-void cf_log_error ( dbref player, char *message )
+void cf_log_error ( dbref player, char *message, int line )
 {
     if ( mudstate.initializing ) {
-        log_write ( LOG_STARTUP, "CNF", "ERROR", "%s", message );
+        log_write ( LOG_STARTUP, "CNF", "ERROR", "Line : %d - %s", line, message );
     } else {
-        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s", message );
+        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Line : %s - %s", line, message );
     }
 }
 
@@ -1568,9 +1567,9 @@ static int helper_cf_cf_access ( CONF *tp, dbref player, int *vp, char *ap, char
         notify ( player, NOPERM_MESSAGE );
 
         if ( db ) {
-            name = log_getname ( player, "helper_cf_cf_access" );
+            name = log_getname ( player );
             log_write ( LOG_CONFIGMODS, "CFG", "PERM", "%s tried to change %s access to static param: %s", name, ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
-            xfree ( name, "helper_cf_cf_access" );
+            free_lbuf ( name );
         } else {
             log_write ( LOG_CONFIGMODS, "CFG", "PERM", "System tried to change %s access to static param: %s", ( ( ( long ) vp ) ? "read" : "write" ), tp->pname );
         }
@@ -1773,6 +1772,7 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
     FILE *fp;
     char *cp, *ap, *zp, *buf;
     extern int cf_set ( char *, char *, dbref );
+    int line = 0;
 
     /* XXX TODO Add stuff to fill
      *   **cfiletab;     // Array of config files
@@ -1795,30 +1795,38 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
             cf_log_notfound ( player, cmd, "Config file", str );
             return -1;
         }
-    }
+    } 
+
+    log_write ( LOG_ALWAYS, "CNF", "INFO", "Reading configuration file : %s", buf );
 
     mudstate.cfiletab = add_array ( mudstate.cfiletab, buf, &mudstate.configfiles, "cf_include" );
     xfree ( buf, "cf_include" );
     buf = alloc_lbuf ( "cf_include" );
 
     if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-        cf_log_error ( player, "Error while reading configuration file." );
+        if ( !feof(fp) ) {
+            cf_log_error ( player, "Error while reading configuration file.", line + 1 );
+        }
         free_lbuf ( buf );
         fclose ( fp );
         return -1;
     }
+    
+    line++;
 
     while ( !feof ( fp ) ) {
         cp = buf;
 
         if ( *cp == '#' ) {
             if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-                cf_log_error ( player, "Error while reading configuration file." );
+                if ( !feof(fp) ) {
+                    cf_log_error ( player, "Error while reading configuration file.", line + 1 );
+                }
                 free_lbuf ( buf );
                 fclose ( fp );
                 return -1;
             }
-
+            line++;
             continue;
         }
 
@@ -1860,11 +1868,14 @@ int cf_include ( int *vp, char *str, long extra, dbref player, char *cmd )
         cf_set ( cp, ap, player );
 
         if ( fgets ( buf, LBUF_SIZE, fp ) == NULL ) {
-            cf_log_error ( player, "Error while reading configuration file." );
+            if ( !feof(fp) ) {
+                cf_log_error ( player, "Error while reading configuration file.", line + 1 );
+            }
             free_lbuf ( buf );
             fclose ( fp );
             return -1;
         }
+        line++;
     }
 
     free_lbuf ( buf );
@@ -1931,7 +1942,6 @@ CONF        conftable [] = {
     { ( char * ) "command_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mudconf.cmd_nest_lim, 0},
     { ( char * ) "concentrator_port", cf_int, CA_STATIC, CA_WIZARD, &mudconf.conc_port, 0},
     { ( char * ) "config_access", cf_cf_access, CA_GOD, CA_DISABLED, NULL, ( long ) access_nametab},
-    { ( char * ) "config_home", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.config_home, MBUF_SIZE},
     { ( char * ) "config_read_access", cf_cf_access, CA_GOD, CA_DISABLED, ( int * ) 1, ( long ) access_nametab},
     { ( char * ) "conn_timeout", cf_int, CA_GOD, CA_WIZARD, &mudconf.conn_timeout, 0},
     { ( char * ) "connect_file", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.conn_file, MBUF_SIZE},
@@ -2052,7 +2062,7 @@ CONF        conftable [] = {
     { ( char * ) "motd_message", cf_string, CA_GOD, CA_WIZARD, ( int * ) &mudconf.motd_msg, GBUF_SIZE},
     { ( char * ) "move_match_more", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.move_match_more, ( long ) "Move command checks for global and zone exits,\n\t\t\t\tresolves ambiguity"},
     { ( char * ) "mud_name", cf_string, CA_GOD, CA_PUBLIC, ( int * ) &mudconf.mud_name, SBUF_SIZE},
-    { ( char * ) "mud_shortname", cf_string, CA_GOD, CA_PUBLIC, ( int * ) &mudconf.mud_shortname, SBUF_SIZE},
+    { ( char * ) "mud_shortname", cf_string, CA_STATIC, CA_PUBLIC, ( int * ) &mudconf.mud_shortname, SBUF_SIZE},
     { ( char * ) "mud_owner", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.mudowner, MBUF_SIZE},
     { ( char * ) "newuser_file", cf_string, CA_STATIC, CA_GOD, ( int * ) &mudconf.crea_file, MBUF_SIZE},
     { ( char * ) "no_ambiguous_match", cf_bool, CA_GOD, CA_PUBLIC, &mudconf.no_ambiguous_match, ( long ) "Ambiguous matches resolve to the last match"},
@@ -2191,7 +2201,7 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp )
     i = tp->interpreter ( tp->loc, ap, tp->extra, player, cp );
 
     if ( !mudstate.initializing ) {
-        name = log_getname ( player, "helper_cf_set" );
+        name = log_getname ( player );
 
         switch ( i ) {
         case 0:
@@ -2213,7 +2223,7 @@ static int helper_cf_set ( char *cp, char *ap, dbref player, CONF *tp )
         buf = strip_ansi ( buff );
         log_write ( LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, buf, status );
         free_lbuf ( buf );
-        xfree ( name, "helper_cf_set" );
+        free_lbuf ( name );
         xfree ( status, "helper_cf_set" );
         free_lbuf ( buff );
     }

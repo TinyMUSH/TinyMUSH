@@ -6,7 +6,6 @@
 #    define in here and mush.config is simply a shell script
 #    able to read them from here:
 #
-config_home		@sysconfdir@
 backup_home		@localstatedir@/backups@with_install_suffix@
 binary_home		@bindir@
 database_home		@localstatedir@/db@with_install_suffix@

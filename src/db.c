@@ -1284,11 +1284,11 @@ void do_fixdb ( dbref player, dbref cause, int key, char *arg1, char *arg2 )
                 return;
             }
 
-            tname = log_getname ( thing, "do_fixdb" );
+            tname = log_getname ( thing );
             buf = strip_ansi ( arg2 );
             log_write ( LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", buf );
             free_lbuf ( buf );
-            xfree ( tname, "do_fixdb" );
+            free_lbuf ( tname );
 
             if ( Suspect ( player ) ) {
                 raw_broadcast ( WIZARD, "[Suspect] %s renamed to %s", Name ( thing ), arg2 );

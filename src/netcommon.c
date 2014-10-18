@@ -318,9 +318,9 @@ void queue_write ( DESC *d, const char *b, int n )
         if ( tp == NULL ) {
             log_write ( LOG_PROBLEMS, "QUE", "WRITE", "Flushing when output_head is null!" );
         } else {
-            name = log_getname ( d->player, "queue_write" );
+            name = log_getname ( d->player );
             log_write ( LOG_NET, "NET", "WRITE", "[%d/%s] Output buffer overflow, %d chars discarded by %s", d->descriptor, d->addr, tp->hdr.nchars, name );
-            xfree ( name, "queue_write" );
+            free_lbuf ( name );
             d->output_size -= tp->hdr.nchars;
             d->output_head = tp->hdr.nxt;
             d->output_lost += tp->hdr.nchars;
@@ -820,9 +820,9 @@ static void announce_connattr ( DESC *d, dbref player, dbref loc, const char *re
             break;
 
         default:
-            buf = log_getname ( player, "announce_connattr" );
+            buf = log_getname ( player );
             log_write ( LOG_PROBLEMS, "OBJ", "DAMAG", "Invalid zone #%d for %s has bad type %d", zone, buf, Typeof ( zone ) );
-            xfree ( buf, "announce_connattr" );
+            free_lbuf ( buf );
         }
     }
 
@@ -1600,9 +1600,9 @@ static void failconn ( const char *logcode, const char *logtype, const char *log
     char *name;
 
     if ( player != NOTHING ) {
-        name = log_getname ( player, "failconn" );
+        name = log_getname ( player );
         log_write ( LOG_LOGIN | LOG_SECURITY, logcode, "RJCT", "[%d/%s] %s rejected to %s (%s)", d->descriptor, d->addr, logtype, name, logreason );
-        xfree ( name,  "failconn" );
+        free_lbuf ( name );
     } else {
         log_write ( LOG_LOGIN | LOG_SECURITY, logcode, "RJCT", "[%d/%s] %s rejected to %s (%s)", d->descriptor, d->addr, logtype, user, logreason );
     }
@@ -1717,17 +1717,17 @@ static int check_connect ( DESC *d, char *msg )
             /*
              * Logins are enabled, or wiz or god
              */
-            pname = log_getname ( player, "check_connect" );
+            pname = log_getname ( player );
 
             if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
-                lname = log_getname ( Location ( player ), "check_connect" );
+                lname = log_getname ( Location ( player ) );
                 log_write ( LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, conn_reasons[reason], user );
-                xfree ( lname, "check_connect" );
+                free_lbuf ( lname );
             } else {
                 log_write ( LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s %s %s", d->descriptor, d->addr, pname, conn_reasons[reason], user );
             }
 
-            xfree ( pname, "check_connect" );
+            free_lbuf ( pname );
             d->flags |= DS_CONNECTED;
             d->connected_at = time ( NULL );
             d->player = player;
@@ -1838,9 +1838,9 @@ static int check_connect ( DESC *d, char *msg )
                 queue_rawstring ( d, NULL, create_fail );
                 log_write ( LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "[%d/%s] Create of '%s' failed", d->descriptor, d->addr, user );
             } else {
-                name = log_getname ( player, "check_connect" );
+                name = log_getname ( player );
                 log_write ( LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, conn_reasons[reason], name );
-                xfree ( name, "check_connect" );
+                free_lbuf ( name );
                 move_object ( player, ( Good_loc ( mudconf.start_room ) ? mudconf. start_room : 0 ) );
                 d->flags |= DS_CONNECTED;
                 d->connected_at = time ( NULL );
@@ -1955,17 +1955,17 @@ void do_command ( DESC *d, char *command, int first )
             used_time = time ( NULL ) - begin_time;
 
             if ( used_time >= mudconf.max_cmdsecs ) {
-                pname = log_getname ( d->player, "do_command" );
+                pname = log_getname ( d->player );
 
                 if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( d->player ) ) {
-                    lname = log_getname ( Location ( d->player ), "do_command" );
+                    lname = log_getname ( Location ( d->player ) );
                     log_write ( LOG_PROBLEMS, "CMD", "CPU", "%s in %s entered command taking %ld secs: %s", pname, lname, used_time, log_cmdbuf );
-                    xfree ( lname, "do_command" );
+                    free_lbuf ( lname );
                 } else {
                     log_write ( LOG_PROBLEMS, "CMD", "CPU", "%s entered command taking %ld secs: %s", pname, used_time, log_cmdbuf );
                 }
 
-                xfree ( pname, "do_command" );
+                free_lbuf ( pname );
             }
         }
 

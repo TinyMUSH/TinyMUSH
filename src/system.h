@@ -106,6 +106,10 @@
 #include <sys/select.h>
 #endif
 
+#ifdef HAVE_PCRE_H
+#include <pcre.h>
+#endif
+
 #include <ltdl.h>
 #include <libgen.h>
 

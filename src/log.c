@@ -23,6 +23,8 @@
 static FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 static FILE *log_fp = NULL; /*!< Pointer to the facility's log file */
 
+char *log_pos = NULL;
+
 NAMETAB logdata_nametab[] = {
     { ( char * ) "flags", 1, 0, LOGOPT_FLAGS},
     { ( char * ) "location", 1, 0, LOGOPT_LOC},
@@ -85,22 +87,39 @@ LOGFILETAB logfds_table[] = {
  * logfile_init: Initialize the main logfile.
  */
 
-void logfile_init ( char *filename )
+char *logfile_init ( char *filename )
 {
     if ( !filename ) {
         mainlog_fp = stderr;
         return;
     }
-
-    mainlog_fp = fopen ( filename, "w" );
+    
+    if( !filename ) {
+        mainlog_fp = stderr;
+        return(NULL);
+    } else if ( strstr ( filename, "XXXXXX") != NULL ) {
+        mainlog_fp = fmkstemp(filename);
+    } else {
+        mainlog_fp = fopen ( filename, "a" );
+    }
 
     if ( !mainlog_fp ) {
         fprintf ( stderr, "Could not open logfile %s for writing.\n", filename );
         mainlog_fp = stderr;
-        return;
+        return ( NULL );
     }
 
     setbuf ( mainlog_fp, NULL ); /* unbuffered */
+
+    return ( filename );
+}
+
+void logfile_move ( char *oldfn, char *newfn) {
+    fclose ( mainlog_fp );
+    
+    copy_file ( oldfn, newfn, 1 );
+    
+    logfile_init ( newfn );
 }
 
 /* ---------------------------------------------------------------------------
@@ -114,6 +133,7 @@ int start_log ( const char *primary, const char *secondary, int key )
     time_t now;
     LOGFILETAB *lp;
     static int last_key = 0;
+    char *pri, *sec;
 
     if ( !mudstate.standalone ) {
         if ( mudconf.log_diversion & key ) {
@@ -165,6 +185,7 @@ int start_log ( const char *primary, const char *secondary, int key )
             if ( ( mudconf.log_info & LOGOPT_TIMESTAMP ) != 0 ) {
                 time ( ( time_t * ) ( &now ) );
                 tp = localtime ( ( time_t * ) ( &now ) );
+
                 log_write_raw ( 0, "%02d%02d%02d.%02d%02d%02d ", ( tp->tm_year % 100 ), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec );
             }
 
@@ -173,9 +194,27 @@ int start_log ( const char *primary, const char *secondary, int key )
              */
 
             if ( secondary && *secondary ) {
-                log_write_raw ( 0, "%s %3s/%-5s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), primary, secondary );
+                pri = strndup ( primary, 3 );
+                sec = strndup ( secondary, 5 );
+
+                if ( log_pos == NULL ) {
+                    log_write_raw ( 0, "%s %3s/%-5s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), pri, sec );
+                } else {
+                    log_write_raw ( 0, "%s %3s/%-5s (%s): ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), pri, sec, log_pos );
+                }
+
+                free ( sec );
+                free ( pri );
             } else {
-                log_write_raw ( 0, "%s %-9s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), primary );
+                pri = strndup ( primary, 9 );
+
+                if ( log_pos == NULL ) {
+                    log_write_raw ( 0, "%s %-9s: ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), pri );
+                } else {
+                    log_write_raw ( 0, "%s %-9s (%s): ", ( * ( mudconf.mud_shortname ) ? ( mudconf.mud_shortname ) : ( mudconf.mud_name ) ), pri, log_pos );
+                }
+
+                free ( pri );
             }
         }
 
@@ -217,7 +256,7 @@ void end_log ( void )
  * log_perror: Write perror message to the log
  */
 
-void log_perror ( const char *primary, const char *secondary, const char *extra, const char *failing_object )
+void _log_perror ( const char *primary, const char *secondary, const char *extra, const char *failing_object )
 {
     int my_errno = errno;
 
@@ -232,7 +271,7 @@ void log_perror ( const char *primary, const char *secondary, const char *extra,
  * log_write: Format text and print to the log file.
  */
 
-void log_write ( int key, const char *primary, const char *secondary, const char *format, ... )
+void _log_write ( int key, const char *primary, const char *secondary, const char *format, ... )
 {
     va_list ap;
     char s[MBUF_SIZE];
@@ -308,23 +347,21 @@ void log_write_raw ( int key, const char *format, ... )
 
 /* ---------------------------------------------------------------------------
  * log_getname : return the name of <target>. It is the responsibilty of
- * the caller to xfree the created buffer.
+ * the caller to free the buffer with free_lbuf().
  */
 
-char *log_getname ( dbref target, char *d )
+char *log_getname ( dbref target )
 {
-    char *name, *s, *buf;;
+    char *name, *s;
 
     if ( ( mudconf.log_info & LOGOPT_FLAGS ) != 0 ) {
         s = unparse_object ( ( dbref ) GOD, target, 0 );
     } else {
         s = unparse_object_numonly ( target );
     }
-    
-    buf = strip_ansi ( s );
-    name = xstrdup ( buf, d );
+
+    name = strip_ansi ( s );
     free_lbuf ( s );
-    free_lbuf ( buf );
     return ( name );
 }
 
@@ -363,9 +400,9 @@ char *log_gettype ( dbref thing, char *d )
 void do_logrotate ( dbref player, dbref cause, int key )
 {
     LOGFILETAB *lp;
-    char ts[SBUF_SIZE], *pname;
+    char *ts, *pname;
     char s[MBUF_SIZE];
-    mktimestamp ( ts, SBUF_SIZE );
+    ts = mktimestamp ( );
     mudstate.mudlognum++;
 
     if ( mainlog_fp == stderr ) {
@@ -378,9 +415,9 @@ void do_logrotate ( dbref player, dbref cause, int key )
     }
 
     notify ( player, "Logs rotated." );
-    pname = log_getname ( player, "do_logrotate" );
+    pname = log_getname ( player );
     log_write ( LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum );
-    xfree ( pname, "do_logrotate" );
+    free_lbuf ( pname );
 
     /*
      * Any additional special ones
@@ -391,20 +428,23 @@ void do_logrotate ( dbref player, dbref cause, int key )
             fclose ( lp->fileptr );
             snprintf ( s, MBUF_SIZE, "%s.%s", lp->filename, ts );
             copy_file ( lp->filename, s, 1 );
-            lp->fileptr = fopen ( lp->filename, "w" );
+            lp->fileptr = fopen ( lp->filename, "a" );
 
             if ( lp->fileptr ) {
                 setbuf ( lp->fileptr, NULL );
             }
         }
     }
+    
+    free_gbuf( ts );
 }
 
 void logfile_close ( void )
 {
     LOGFILETAB *lp;
-    char ts[SBUF_SIZE], s[MBUF_SIZE];
-    mktimestamp ( ts, SBUF_SIZE );
+    char s[MBUF_SIZE];
+    char *ts;
+    ts = mktimestamp ( );
 
     for ( lp = logfds_table; lp->log_flag; lp++ ) {
         if ( lp->filename && lp->fileptr ) {
@@ -419,4 +459,6 @@ void logfile_close ( void )
         snprintf ( s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts );
         copy_file ( mudconf.log_file, s, 1 );
     }
+    
+    free_gbuf(ts);
 }

@@ -129,8 +129,9 @@ extern void fork_and_dump ( dbref, dbref, int );
 extern int  copy_file ( char *, char *, int );
 extern char  **add_array ( char **, char *, int *, char * );
 extern void write_status_file ( dbref, char * );
-extern char *mktimestamp ( char *, size_t );
-extern void do_backup_mush ( dbref player, dbref cause, int key );
+extern char *mktimestamp ( void );
+extern void do_backup_mush ( dbref, dbref, int );
+extern FILE *fmkstemp(char *);
 
 /* From help.c */
 extern int  helpmkindx ( dbref, char *, char * );
@@ -139,14 +140,40 @@ extern int  helpmkindx ( dbref, char *, char * );
 extern int  cf_ntab_access ( int *, char *, long, dbref, char * );
 
 /* From log.c */
-extern void logfile_init ( char * );
-extern void log_perror ( const char *, const char *, const char *, const char * );
-extern void log_write ( int, const char *, const char *, const char *, ... );
+extern char *log_pos;
+extern char *logfile_init ( char * );
+extern void logfile_move ( char *, char *);
+extern void _log_perror ( const char *, const char *, const char *, const char * );
+extern void _log_write ( int, const char *, const char *, const char *, ... );
 extern void log_write_raw ( int, const char *, ... );
-extern char  *log_getname ( dbref, char * );
+extern char  *log_getname ( dbref );
 extern char *log_gettype ( dbref, char * );
 extern void do_logrotate ( dbref, dbref, int );
 extern void logfile_close ( void );
+
+#define log_write( i, p, s, f, ... )    {   if (mudstate.debug) { \
+                                                    log_pos = malloc( GBUF_SIZE ); \
+                                                    safe_snprintf( log_pos, GBUF_SIZE, "%s line %d", __FILE__, __LINE__ ); \
+                                                    _log_write (i, p, s, f, ## __VA_ARGS__); \
+                                                    free (log_pos); \
+                                                    log_pos = NULL; \
+                                                } else { \
+                                                    log_pos = NULL; \
+                                                    _log_write (i, p, s, f, ## __VA_ARGS__); \
+                                                } \
+                                        }
+
+#define log_perror( p ,s ,e,o )     {   if (mudstate.debug) { \
+                                                    log_pos = malloc ( GBUF_SIZE ); \
+                                                    safe_snprintf( log_pos, GBUF_SIZE, "%s line %d", __FILE__, __LINE__ ); \
+                                                    _log_perror (p, s, e, o); \
+                                                    free (log_pos); \
+                                                    log_pos = NULL; \
+                                                } else { \
+                                                    log_pos = NULL; \
+                                                    _log_perror (p, s, e, o); \
+                                                } \
+                                        }
 
 /* From look.c */
 extern void look_in ( dbref, dbref, int );

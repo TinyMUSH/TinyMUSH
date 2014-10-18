@@ -94,17 +94,17 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b )
         mudstate.lock_nest_lev++;
 
         if ( mudstate.lock_nest_lev >= mudconf.lock_nest_lim ) {
-            pname = log_getname ( player, "eval_boolexp" );
+            pname = log_getname ( player );
 
             if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
-                lname = log_getname ( Location ( player ), "eval_boolexp" );
+                lname = log_getname ( Location ( player ) );
                 log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock exceeded recursion limit.", pname, lname );
-                xfree ( lname, "eval_boolexp" );
+                free_lbuf ( lname );
             } else {
                 log_write ( LOG_BUGS, "BUG", "LOCK", "%s: Lock exceeded recursion limit.", pname );
             }
 
-            xfree ( pname, "eval_boolexp" );
+            free_lbuf ( pname );
             notify ( player, "Sorry, broken lock!" );
             mudstate.lock_nest_lev--;
             return ( 0 );
@@ -112,9 +112,9 @@ int eval_boolexp ( dbref player, dbref thing, dbref from, BOOLEXP *b )
 
         if ( ( b->sub1->type != BOOLEXP_CONST ) || ( b->sub1->thing < 0 ) ) {
             if ( ( mudconf.log_info & LOGOPT_LOC ) && Has_location ( player ) ) {
-                lname = log_getname ( Location ( player ), "eval_boolexp" );
+                lname = log_getname ( Location ( player ) );
                 log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type );
-                xfree ( lname, "eval_boolexp" );
+                free_lbuf ( lname );
             } else {
                 log_write ( LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type );
             }

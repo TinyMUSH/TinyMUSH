@@ -57,7 +57,7 @@ char *stpcopy ( char *dest, const char *src )
 
 void child_timeout_signal ( int sig )
 {
-    exit ( 1 );
+    exit ( EXIT_FAILURE );
 }
 
 int query ( char *ip, char *orig_arg )
@@ -224,7 +224,7 @@ void alarm_signal ( int sig )
     struct timeval interval;
 
     if ( getppid() != parent_pid ) {
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     signal ( SIGALRM, ( void ( * ) ( int ) ) alarm_signal );
@@ -247,7 +247,7 @@ int main ( int argc, char **argv )
     parent_pid = getppid();
 
     if ( parent_pid == 1 ) {
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     for ( i = 0; i < MAX_CHILDREN; i++ ) {
@@ -335,7 +335,7 @@ int main ( int argc, char **argv )
 
         switch ( child_pid ) {
         case -1:
-            exit ( 1 );
+            exit ( EXIT_FAILURE );
 
         case 0: /*
                  * child
@@ -379,5 +379,5 @@ int main ( int argc, char **argv )
         }
     }
 
-    exit ( 0 );
+    exit ( EXIT_SUCCESS );
 }

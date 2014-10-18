@@ -116,6 +116,7 @@ struct confdata {
     char       *backup_ext;        /* Filename extension for backup */
     char       *mudowner;  /* Email of the game owner */
     char       *modules_home;  /* Base path for modules */
+    char       *game_exec; /* MUSH's executable full path and name */
     char       *game_home; /* MUSH's working directory */
     char       *scripts_home;  /* MUSH's scripts directory */
     int         have_pueblo;    /* Is Pueblo support compiled in? */

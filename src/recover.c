@@ -70,7 +70,7 @@ int main ( int argc, char *argv[] )
     if ( errflg || !infile || !outfile ) {
         fprintf ( stderr, "Usage: %s -i input_file -o output_file\n",
                   argv[0] );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     /*
@@ -81,13 +81,13 @@ int main ( int argc, char *argv[] )
                              gdbm_panic ) ) == NULL ) {
         fprintf ( stderr, "Fatal error in gdbm_open (%s): %s\n",
                   outfile, strerror ( errno ) );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     if ( stat ( infile, &buf ) ) {
         fprintf ( stderr, "Fatal error in stat (%s): %s\n",
                   infile, strerror ( errno ) );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     filesize = buf.st_size;
@@ -109,7 +109,7 @@ int main ( int argc, char *argv[] )
                 fprintf ( stderr,
                           "Fatal error at file position %ld.\n",
                           filepos );
-                exit ( 1 );
+                exit ( EXIT_FAILURE );
             }
 
             /*
@@ -137,7 +137,7 @@ int main ( int argc, char *argv[] )
                     fprintf ( stderr,
                               "Fatal error at file position %ld.\n",
                               filepos );
-                    exit ( 1 );
+                    exit ( EXIT_FAILURE );
                 }
 
                 if ( fread ( ( void * ) ( dat.dptr ), dat.dsize,
@@ -145,14 +145,14 @@ int main ( int argc, char *argv[] )
                     fprintf ( stderr,
                               "Fatal error at file position %ld.\n",
                               filepos );
-                    exit ( 1 );
+                    exit ( EXIT_FAILURE );
                 }
 
                 if ( gdbm_store ( dbp, key, dat, GDBM_REPLACE ) ) {
                     fprintf ( stderr,
                               "Fatal error in gdbm_store (%s): %s\n",
                               outfile, strerror ( errno ) );
-                    exit ( 1 );
+                    exit ( EXIT_FAILURE );
                 }
 
                 free ( key.dptr );
@@ -173,5 +173,5 @@ int main ( int argc, char *argv[] )
 
     fclose ( f );
     gdbm_close ( dbp );
-    exit ( 0 );
+    exit ( EXIT_SUCCESS );
 }

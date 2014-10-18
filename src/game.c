@@ -33,7 +33,6 @@
 #include "command.h"        /* required by code */
 #include "powers.h"     /* required by code */
 #include "attrs.h"      /* required by code */
-#include "pcre.h"       /* required by code */
 #include "defaults.h"       /* required by code */
 
 extern void init_attrtab ( void );
@@ -120,6 +119,11 @@ pid_t isrunning ( char *pidfile )
     pid_t pid = 0, rpid = 0;
     int i = 0;
     char buff[MBUF_SIZE];
+
+    if ( mudstate.restarting ) {
+        return ( 0 );
+    }
+
     fp = fopen ( pidfile, "r" );
 
     if ( fp == NULL ) {
@@ -133,6 +137,7 @@ pid_t isrunning ( char *pidfile )
 
     fclose ( fp );
     pid = ( pid_t ) strtol ( buff, ( char ** ) NULL, 10 );
+
     fp = popen ( "pgrep netmush", "r" );
 
     if ( fp == NULL ) {
@@ -179,14 +184,17 @@ int fileexist ( char *file )
 
 void handlestartupflatfiles ( int flag )
 {
-    char db[MAXPATHLEN], flat[MAXPATHLEN], db_bak[MAXPATHLEN], flat_bak[MAXPATHLEN], ts[SBUF_SIZE];
+    char db[MAXPATHLEN], flat[MAXPATHLEN], db_bak[MAXPATHLEN], flat_bak[MAXPATHLEN];
+    char *ts;
     int i;
     struct stat sb1, sb2;
-    mktimestamp ( ts, SBUF_SIZE );
+
+    ts = mktimestamp ();
     safe_snprintf ( db, MAXPATHLEN, "%s/%s", mudconf.dbhome, mudconf.db_file );
     safe_snprintf ( flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ) );
     safe_snprintf ( db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts );
     safe_snprintf ( flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, ( flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED" ), ts );
+    free_gbuf(ts);
     i = open ( flat, O_RDONLY );
 
     if ( i > 0 ) {
@@ -242,6 +250,7 @@ int tailfind ( char *file, char *key )
 {
     int fp;
     char s[MBUF_SIZE];
+
     off_t pos;
     fp = open ( file, O_RDONLY );
 
@@ -1279,9 +1288,10 @@ static void report_timecheck ( dbref player, int yes_screen, int yes_log, int ye
     long used_msecs, total_msecs;
     struct timeval obj_time;
     char *pname;
-    pname = log_getname ( player, "report_timecheck" );
 
     if ( mudconf.lag_check_clk ) {
+        pname = log_getname ( player );
+
         if ( ! ( yes_log && ( LOG_TIMEUSE & mudconf.log_options ) != 0 ) ) {
             yes_log = 0;
             log_write ( LOG_ALWAYS, "WIZ", "TIMECHECK", "%s checks object time use over %d seconds\n", pname, ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
@@ -1289,7 +1299,7 @@ static void report_timecheck ( dbref player, int yes_screen, int yes_log, int ye
             log_write ( LOG_ALWAYS, "OBJ", "CPU", "%s checks object time use over %d seconds\n", pname, ( int ) ( time ( NULL ) - mudstate.cpu_count_from ) );
         }
 
-        xfree ( pname, "report_timecheck" );
+        free_lbuf ( pname );
         obj_counted = 0;
         total_msecs = 0;
         /*
@@ -1400,13 +1410,15 @@ int backup_copy ( char *src, char *dst, int flag )
     return ( i );
 }
 
-char *mktimestamp ( char *buff, size_t size )
+char *mktimestamp ( void )
 {
+    char *buff;
     struct tm *t;
     time_t ts;
     ts = time ( NULL );
     t = localtime ( &ts );
-    safe_snprintf ( buff, size, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone );
+    buff = alloc_gbuf(__func__);
+    safe_snprintf ( buff, GBUF_SIZE, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone );
     return ( buff );
 }
 
@@ -1419,8 +1431,7 @@ int backup_mush ( dbref player, dbref cause, int key )
 {
     int i, txt_n = 0, cnf_n = 0, dbf_n = 0;
     char **txt = NULL, **cnf = NULL, **dbf = NULL;
-    char *tmpdir, *s, *buff, *tb, *cwd;
-    char ts[SBUF_SIZE];
+    char *tmpdir, *s, *buff, *tb, *cwd, *ts;
     char s1[MBUF_SIZE];
     FILE *fp = NULL;
     MODULE *mp;
@@ -1615,8 +1626,9 @@ int backup_mush ( dbref player, dbref cause, int key )
 
     xfree ( s, "backup_mush" );
     /* Call our external utility to pack everything together */
-    mktimestamp ( ts, SBUF_SIZE );
+    ts = mktimestamp ( );
     s = xstrprintf ( "backup_mush", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext );
+    free_gbuf(ts);
     cwd = getcwd ( NULL, MAXPATHLEN );
 
     if ( cwd == NULL ) {
@@ -1828,6 +1840,21 @@ void write_pidfile ( char *fn )
     }
 }
 
+FILE *fmkstemp(char *template) {
+    FILE *fp;
+    int fd = -1;
+
+    if ((fd = mkstemp(template)) == -1 || (fp = fdopen(fd, "w+")) == NULL) {
+        if (fd != -1) {
+            unlink(template);
+            close(fd);
+        }
+
+        return (NULL);
+    }
+    return (fp);
+}
+
 void write_status_file ( dbref player, char *message )
 {
     int fd, size;
@@ -1864,7 +1891,7 @@ void write_status_file ( dbref player, char *message )
 void do_shutdown ( dbref player, dbref cause, int key, char *message )
 {
     char *name;
-    name = log_getname ( player, "do_shutdown" );
+    name = log_getname ( player );
 
     if ( key & SHUTDN_COREDUMP ) {
         if ( player != NOTHING ) {
@@ -1884,6 +1911,7 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message )
 
     if ( mudstate.dumping ) {
         notify ( player, "Dumping. Please try again later." );
+        free_lbuf ( name );
         return;
     }
 
@@ -1903,7 +1931,7 @@ void do_shutdown ( dbref player, dbref cause, int key, char *message )
      * Set up for normal shutdown
      */
     mudstate.shutdown_flag = 1;
-    xfree ( name, "do_shutdown" );
+    free_lbuf ( name );
     return;
 }
 
@@ -2098,7 +2126,7 @@ void fork_and_dump ( dbref player, dbref cause, int key )
             }
 
             if ( mudconf.fork_dump ) {
-                _exit ( 0 );
+                _exit ( EXIT_SUCCESS );
             }
         } else if ( mudstate.dumper < 0 ) {
             log_perror ( "DMP", "FORK", NULL, "fork()" );
@@ -2301,9 +2329,9 @@ void do_logwrite ( dbref player, dbref cause, int key, char *msgtype, char *mess
     /*
      * Just dump it to the log.
      */
-    pname = log_getname ( player, "do_logwrite" );
+    pname = log_getname ( player );
     log_write ( LOG_LOCAL, "MSG", mt, "%s: %s", pname, msg );
-    xfree ( pname, "do_logwrite" );
+    free_lbuf ( pname );
     notify_quiet ( player, "Logged." );
 }
 
@@ -2559,7 +2587,7 @@ void recover ( char *flat )
 
     if ( init_gdbm_db ( mudconf.db_file ) < 0 ) {
         log_write_raw ( 1, "Can't open GDBM file\n" );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     db_lock();
@@ -2731,7 +2759,7 @@ int dbconvert ( int argc, char *argv[] )
 
     if ( errflg || optind >= argc ) {
         usage ( argv[0] );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     LTDL_SET_PRELOADED_SYMBOLS();
@@ -2756,7 +2784,7 @@ int dbconvert ( int argc, char *argv[] )
 
     if ( init_gdbm_db ( argv[optind] ) < 0 ) {
         log_write_raw ( 1, "Can't open GDBM file\n" );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     /*
@@ -2863,7 +2891,7 @@ int dbconvert ( int argc, char *argv[] )
      */
     db_unlock();
     CLOSE;
-    exit ( 0 );
+    exit ( EXIT_SUCCESS );
 }
 
 
@@ -2881,19 +2909,28 @@ int main ( int argc, char *argv[] )
     int mindb = 0;
     CMDENT *cmdp;
     int i, c;
-    int errflg = 0, gotcfg = 0;
+    int errflg = 0;
     pid_t pid;
-    char *s;
-    char ts[SBUF_SIZE];
+    char *s, *ts;
+    char templog[]="netmush.XXXXXX";
     MODULE *mp;
     char *bp;
     FILE *fp;
     struct stat sb1, sb2;
     MODHASHES *m_htab, *hp;
     MODNHASHES *m_ntab, *np;
+
     mudstate.initializing = 1;
     mudstate.debug = 0 ;
+    mudstate.restarting = 0;
+    
+    /*
+     * Do this first, before anything gets a chance to allocate memory.
+     */
+    mudstate.raw_allocs = NULL;
+
     umask ( 077 );      /* Keep things to us by default */
+
     /*
      * Try to get the binary name
      */
@@ -2915,22 +2952,40 @@ int main ( int argc, char *argv[] )
     }
 
     /*
-     * Do this first, before anything gets a chance to allocate memory.
+     * Configure the minimum default values we need to start.
      */
-    mudstate.raw_allocs = NULL;
+    mudconf.mud_shortname = xstrdup( DEFAULT_SHORTNAME, "cf_string" );
+
+    s = strdup ( DEFAULT_CONFIG_FILE );
+    mudconf.config_file = realpath( s , NULL);
+    free ( s );
+
+    s = strdup ( mudconf.config_file );
+    mudconf.config_home = strdup ( dirname ( s ) );
+    free ( s ) ;
+    
+    s = getcwd ( NULL, 0 );
+    mudconf.game_home = realpath(s, NULL);
+    free(s);
+    
+    mudconf.game_exec = realpath(argv[0], NULL);
+    
     /*
      * Parse options
      */
-    mudconf.mud_shortname = xstrdup ( DEFAULT_SHORTNAME, "main_mudconf_mud_shortname" );
-    mudconf.config_file = xstrdup ( DEFAULT_CONFIG_FILE, "main_mudconf_mud_config_file" );
-    mudconf.config_home = xstrdup ( DEFAULT_CONFIG_HOME, "main_mudconf_mud_config_home" );
-    mudconf.game_home = getcwd ( NULL, 0 );
-
     while ( ( c = getopt ( argc, argv, "c:srd" ) ) != -1 ) {
         switch ( c ) {
         case 'c':
-            mudconf.config_file = xstrdup ( optarg, "main_mudconf_mud_config_file" );
-            mudconf.config_home = xstrdup ( realpath ( dirname ( mudconf.config_file ), NULL ), "main_mudconf_mud_config_home" );
+            free (mudconf.config_file);
+            free (mudconf.config_home);
+            
+            s = strdup ( optarg );
+            mudconf.config_file = realpath( s , NULL);
+            free ( s );
+            
+            s = strdup ( mudconf.config_file );
+            mudconf.config_home = strdup ( dirname ( s ) );
+            free ( s ) ;
             break;
 
         case 's':
@@ -2952,19 +3007,15 @@ int main ( int argc, char *argv[] )
     }
 
     /* Make sure we can read the config file */
-    fp = fopen ( mudconf.config_file, "r" );
 
-    if ( fp != NULL ) {
-        fclose ( fp );
-        gotcfg = 1;
-    } else {
+    if ( !fileexist (mudconf.config_file) ) {
         fprintf ( stderr, "Unable to read configuration file %s.\n", mudconf.config_file );
-        gotcfg = 0;
+        errflg++;
     }
 
-    if ( errflg || gotcfg == 0 ) {
+    if ( errflg ) {
         fprintf ( stderr, "Usage: %s [-s] [-c config_file]\n", argv[0] );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     tf_init();
@@ -2983,6 +3034,7 @@ int main ( int argc, char *argv[] )
     pool_init ( POOL_QENTRY, sizeof ( BQUE ) );
     tcache_init();
     pcache_init();
+    logfile_init ( templog );
     cf_init();
     init_rlimit();
     init_cmdtab();
@@ -2992,6 +3044,11 @@ int main ( int argc, char *argv[] )
     init_functab();
     init_attrtab();
     init_version();
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec);
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home);
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file );
+    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mudconf.config_home );    
+    
     cf_read ( mudconf.config_file );
 
     /*
@@ -3000,7 +3057,7 @@ int main ( int argc, char *argv[] )
      */
     if ( ( mudconf.max_global_regs < 10 ) || ( mudconf.max_global_regs > 36 ) ) {
         fprintf ( stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n" );
-        exit ( 1 );
+        exit ( EXIT_FAILURE );
     }
 
     if ( mudconf.max_global_regs < 36 ) {
@@ -3041,17 +3098,9 @@ int main ( int argc, char *argv[] )
     hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
+    
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
-    mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
-    mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
-    mudconf.status_file = xstrprintf ( "main_mudconf_status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname );
-    pid = isrunning ( mudconf.pid_file );
-
-    if ( pid ) {
-        log_write ( LOG_ALWAYS, "INI", "FATAL", "The MUSH already seems to be running at pid %ld.", ( long ) pid );
-        exit ( 2 );
-    }
-
+    
     if ( tailfind ( mudconf.log_file, "GDBM panic: write error\n" ) ) {
         log_write ( LOG_ALWAYS, "INI", "FATAL", "Log indicate the last run ended with GDBM panic: write error" );
         fprintf ( stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n" );
@@ -3070,21 +3119,50 @@ int main ( int argc, char *argv[] )
         fprintf ( stderr, "If this is all successful, you may type ./Startmush again to\n" );
         fprintf ( stderr, "restart the MUSH. If the recovery attempt fails, you will\n" );
         fprintf ( stderr, "need to restore from a previous backup.\n\n" );
-        exit ( 2 );
+        exit ( EXIT_FAILURE );
+    }
+    
+    if ( fileexist ( mudconf.log_file ) ) {
+        ts = mktimestamp ( );
+        s = xstrprintf ( "cleanup_log", "%s.%s", mudconf.log_file, ts );
+        log_write ( LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename ( s ) );
+        copy_file ( mudconf.log_file, s, 1 );
+        xfree ( s, "cleanup_log" );
+        free_gbuf(ts);
+    }
+    
+    logfile_move ( templog, mudconf.log_file);
+    
+    mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
+    mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
+    mudconf.status_file = xstrprintf ( "main_mudconf_status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname );
+
+    s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
+
+    if ( fileexist(s) ) {
+        log_write ( LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present. Restarting", s );
+        mudstate.restarting = 1;
+    }
+
+    xfree ( s, "test_restart_db" );
+    
+    pid = isrunning ( mudconf.pid_file );
+
+    if ( pid ) {
+        log_write ( LOG_ALWAYS, "INI", "FATAL", "The MUSH already seems to be running at pid %ld.", ( long ) pid );
+        exit ( EXIT_FAILURE );
     }
 
     if ( !mudstate.restarting ) {
         s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
-        i = open ( s, O_RDONLY );
 
-        if ( i >= 0 ) {
-            close ( i );
+        if ( fileexist ( s ) ) {
             log_write ( LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present.", s );
 
             if ( unlink ( s ) != 0 ) {
                 log_write ( LOG_ALWAYS, "INI", "FATAL" , "Unable to delete : %s, remove it before restarting the MUSH.", s );
                 xfree ( s, "test_restart_db" );
-                exit ( 2 );
+                exit ( EXIT_FAILURE );
             } else {
                 log_write ( LOG_ALWAYS, "INI", "LOAD", "%s deleted.", s );
             }
@@ -3200,7 +3278,7 @@ int main ( int argc, char *argv[] )
 
     if ( init_gdbm_db ( mudconf.db_file ) < 0 ) {
         log_write ( LOG_ALWAYS, "INI", "FATAL", "Couldn't load text database: %s", mudconf.db_file );
-        exit ( 2 );
+        exit ( EXIT_FAILURE );
     }
 
     mudstate.record_players = 0;
@@ -3211,7 +3289,7 @@ int main ( int argc, char *argv[] )
         call_all_modules_nocache ( "make_minimal" );
     } else if ( load_game() < 0 ) {
         log_write ( LOG_ALWAYS, "INI", "FATAL", "Couldn't load objects." );
-        exit ( 2 );
+        exit ( EXIT_FAILURE );
     }
 
     mudstate.loading_db = 0;
@@ -3224,7 +3302,7 @@ int main ( int argc, char *argv[] )
 
     if ( !Good_obj ( GOD ) || !isPlayer ( GOD ) ) {
         log_write ( LOG_ALWAYS, "CNF", "VRFY", "Fatal error: GOD object #%d is not a valid player.", GOD );
-        exit ( 3 );
+        exit ( EXIT_FAILURE );
     }
 
     do_dbck ( NOTHING, NOTHING, 0 );
@@ -3322,34 +3400,27 @@ int main ( int argc, char *argv[] )
      */
     process_preload();
 
-    if ( ! ( getppid() == 1 ) && !mudstate.debug ) {
-        int forkstatus;
-        forkstatus = fork();
+    if ( !mudstate.restarting ) {
+        if ( ! ( getppid() == 1 ) && !mudstate.debug ) {
+            int forkstatus;
+            forkstatus = fork();
 
-        if ( forkstatus < 0 ) {
-            log_write ( LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror ( errno ) );
-        } else if ( forkstatus > 0 ) {
-            exit ( 0 );
-        } else {
-            setsid();
+            if ( forkstatus < 0 ) {
+                log_write ( LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror ( errno ) );
+            } else if ( forkstatus > 0 ) {
+                exit ( EXIT_SUCCESS );
+            } else {
+                setsid();
 
-            if ( chdir ( mudconf.game_home ) < 0 ) {
-                log_write ( LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror ( errno ) );
+                if ( chdir ( mudconf.game_home ) < 0 ) {
+                    log_write ( LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror ( errno ) );
+                }
             }
         }
     }
 
     write_pidfile ( mudconf.pid_file );
 
-    if ( fileexist ( mudconf.log_file ) ) {
-        mktimestamp ( ts, SBUF_SIZE );
-        s = xstrprintf ( "cleanup_log", "%s.%s", mudconf.log_file, ts );
-        log_write ( LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename ( s ) );
-        copy_file ( mudconf.log_file, s, 1 );
-        xfree ( s, "cleanup_log" );
-    }
-
-    logfile_init ( mudconf.log_file );
     log_write ( LOG_STARTUP, "INI", "LOAD", "Startup processing complete. (Process ID : %d)",  getpid() );
 
     if ( !mudstate.restarting ) {
@@ -3409,6 +3480,7 @@ int main ( int argc, char *argv[] )
 #ifdef MCHECK
     muntrace();
 #endif
+    log_write ( LOG_STARTUP, "INI", "SHDN", "Going down." );
     close_sockets ( 0, ( char * ) "Going down - Bye" );
     dump_database();
     CLOSE;
@@ -3423,7 +3495,15 @@ int main ( int argc, char *argv[] )
         kill ( slave_pid, SIGKILL );
     }
 
-    exit ( 0 );
+    if ( fileexist ( mudconf.log_file ) ) {
+        ts = mktimestamp ( );
+        s = xstrprintf ( "cleanup_log", "%s.%s", mudconf.log_file, ts );
+        copy_file ( mudconf.log_file, s, 1 );
+        xfree ( s, "cleanup_log" );
+        free_gbuf(ts);
+    }
+
+    exit ( EXIT_SUCCESS );
 }
 
 static void init_rlimit ( void )

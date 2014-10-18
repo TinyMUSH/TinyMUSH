@@ -299,11 +299,11 @@ void do_toad ( dbref player, dbref cause, int key, char *toad, char *newowner )
         recipient = player;
     }
 
-    vname = log_getname ( victim, "do_toad" );
-    pname = log_getname ( player, "do_toad" );
+    vname = log_getname ( victim );
+    pname = log_getname ( player );
     log_write ( LOG_WIZARD, "WIZ", "TOAD", "%s was @toaded by %s", vname, pname );
-    xfree ( vname, "do_toad" );
-    xfree ( pname, "do_toad" );
+    free_lbuf ( vname );
+    free_lbuf ( pname );
 
     /*
      * Clear everything out
@@ -372,11 +372,11 @@ void do_newpassword ( dbref player, dbref cause, int key, char *name, char *pass
         return;
     }
 
-    vname = log_getname ( victim, "do_newpassword" );
-    pname = log_getname ( player, "do_newpassword" );
+    vname = log_getname ( victim );
+    pname = log_getname ( player );
     log_write ( LOG_WIZARD, "WIZ", "PASS", "%s changed the password of %s", pname, vname );
-    xfree ( vname, "do_newpassword" );
-    xfree ( pname, "do_newpassword" );
+    free_lbuf ( vname );
+    free_lbuf ( pname );
     /*
      * it's ok, do it
      */
@@ -404,9 +404,9 @@ void do_boot ( dbref player, dbref cause, int key, char *name )
             return;
         }
 
-        pname = log_getname ( player, "do_boot" );
+        pname = log_getname ( player );
         log_write ( LOG_WIZARD, "WIZ", "BOOT", "Port %d was @booted by %s", victim, pname );
-        xfree ( pname, "do_boot" );
+        free_lbuf ( pname );
     } else {
         init_match ( player, name, TYPE_PLAYER );
         match_neighbor();
@@ -427,13 +427,13 @@ void do_boot ( dbref player, dbref cause, int key, char *name )
             return;
         }
 
-        vname = log_getname ( victim, "do_boot" );
-        pname = log_getname ( player, "do_boot" );
-        lname = log_getname ( Location ( player ), "do_boot" );
+        vname = log_getname ( victim );
+        pname = log_getname ( player );
+        lname = log_getname ( Location ( player ) );
         log_write ( LOG_WIZARD, "WIZ", "BOOT", "%s in %s was @booted by %s", vname, lname, pname );
-        xfree ( vname, "do_boot" );
-        xfree ( pname, "do_boot" );
-        xfree ( lname, "do_boot" );
+        free_lbuf ( vname );
+        free_lbuf ( pname );
+        free_lbuf ( lname );
         notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME , "You booted %s off!", Name ( victim ) );
     }
 
@@ -675,18 +675,18 @@ void do_global ( dbref player, dbref cause, int key, char *flag )
         notify_quiet ( player, "I don't know about that flag." );
     } else if ( key == GLOB_ENABLE ) {
         mudconf.control_flags |= flagvalue;
-        name = log_getname ( player, "do_global" );
+        name = log_getname ( player );
         log_write ( LOG_CONFIGMODS, "CFG", "GLOBAL", "%s enabled: %s", name, flag );
-        xfree ( name, "do_global" );
+        free_lbuf ( name  );
 
         if ( !Quiet ( player ) ) {
             notify_quiet ( player, "Enabled." );
         }
     } else if ( key == GLOB_DISABLE ) {
         mudconf.control_flags &= ~flagvalue;
-        name = log_getname ( player, "do_global" );
+        name = log_getname ( player );
         log_write ( LOG_CONFIGMODS, "CFG", "GLOBAL", "%s disabled: %s", name, flag );
-        xfree ( name, "do_global" );
+        free_lbuf ( name );
 
         if ( !Quiet ( player ) ) {
             notify_quiet ( player, "Disabled." );
