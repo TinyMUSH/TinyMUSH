@@ -1,6 +1,12 @@
 TinyMUSH 3.3
 ------------
 
+commit ae84ebe988e6d6afe41a48d2074f01d16826f017
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 16:53:19 2014 -0400
+
+    TinyMUSH 3.3 Alpha 8.
+
 commit e95178bea1a5af79edf182b0150351abf3acb5c7
 Author: Eddy Beaupré <eddy@beaupre.biz>
 Date:   Sat Oct 18 16:41:44 2014 -0400
