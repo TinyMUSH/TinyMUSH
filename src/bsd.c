@@ -1329,7 +1329,7 @@ static RETSIGTYPE sighandler ( int sig )
 
             alarm ( 0 );
             dump_restart_db();
-            execl ( mudconf.exec_path, mudconf.exec_path, ( char * ) "-c", mudconf.mud_shortname, NULL );
+            execl ( mudconf.game_exec, mudconf.game_exec, mudconf.config_file, ( char * ) NULL ); 
             break;
         } else {
             unset_signals();

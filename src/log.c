@@ -296,7 +296,7 @@ void _log_write ( int key, const char *primary, const char *secondary, const cha
          * If we are starting up, log to stderr too..
          */
 
-        if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+        if ( ( log_fp != stderr ) && ( mudstate.logstderr ) ) {
             fputs ( s, stderr );
         }
 
@@ -335,7 +335,7 @@ void log_write_raw ( int key, const char *format, ... )
      * If we are starting up, log to stderr too..
      */
 
-    if ( ( log_fp != stderr ) && ( mudstate.running == 0 ) ) {
+    if ( ( log_fp != stderr ) && ( mudstate.logstderr ) ) {
         fputs ( s, stderr );
     }
 

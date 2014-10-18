@@ -1444,7 +1444,6 @@ void do_restart ( dbref player, dbref cause, int key )
     raw_broadcast ( 0, "GAME: Restart by %s, please wait.", Name ( Owner ( player ) ) );
     name = log_getname ( player );
     log_write ( LOG_ALWAYS, "WIZ", "RSTRT", "Restart by %s", name );
-    log_write ( LOG_ALWAYS, "WIZ", "RSTRT", "Executing %s %s %s %s", mudconf.exec_path, ( char * ) "-r" , ( char * ) "-c", mudconf.config_file );
     free_lbuf ( name );
     /*
      * Do a dbck first so we don't end up with an inconsistent state.
@@ -1479,9 +1478,9 @@ void do_restart ( dbref player, dbref cause, int key )
     }
 
     if ( !mudstate.debug ) {
-        execl ( mudconf.exec_path, basename ( mudconf.exec_path ), ( char * ) "-r" , ( char * ) "-c", mudconf.config_file, ( char * ) NULL );
+        execl ( mudconf.game_exec, mudconf.game_exec, mudconf.config_file, ( char * ) NULL );
     } else {
-        execl ( mudconf.exec_path, basename ( mudconf.exec_path ), ( char * ) "-d" , ( char * ) "-r" , ( char * ) "-c", mudconf.config_file, ( char * ) NULL );
+        execl ( mudconf.game_exec, mudconf.game_exec, ( char * ) "-d", mudconf.config_file, ( char * ) NULL );
     }
 }
 

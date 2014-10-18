@@ -1823,16 +1823,21 @@ int copy_file ( char *src, char *dst, int flag )
     return ( 0 );
 }
 
-void write_pidfile ( char *fn )
+pid_t write_pidfile ( char *fn )
 {
     FILE *f;
-
+    pid_t pid;
+    
+    pid = getpid();
+    
     if ( ( f = fopen ( fn, "w" ) ) != NULL ) {
-        fprintf ( f, "%d\n", getpid() );
+        fprintf ( f, "%d\n", pid );
         fclose ( f );
     } else {
         log_write ( LOG_ALWAYS, "PID", "FAIL", "Failed to write pidfile %s\n", fn );
     }
+    
+    return(pid);
 }
 
 FILE *fmkstemp ( char *template )
@@ -2601,18 +2606,14 @@ void usage ( char *prog, int which )
     case 0:
         fprintf ( stderr, "Usage: %s [options] [CONFIG-FILE]\n", prog );
         fprintf ( stderr, "       %s -c DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog );
-        fprintf ( stderr, "       %s -e -i INPUT-DBM -o OUTPUT-DBM\n\n", prog );
+        fprintf ( stderr, "       %s -r -i INPUT-DBM -o OUTPUT-DBM\n\n", prog );
         fprintf ( stderr, "When call without -c or -e option, %s accept the following options:\n\n", prog );
         fprintf ( stderr, "  CONFIG-FILE               configuration file\n" );
         fprintf ( stderr, "  -d, --debug               debug mode, do not fork to background\n" );
         fprintf ( stderr, "  -m, --mindb               delete the current databases and create a new one\n\n" );
-        fprintf ( stderr, "  -r, --restart             restart mode, handle restart database\n" );
-        fprintf ( stderr, "                              This mode is used internally, do not\n" );
-        fprintf ( stderr, "                              use it unless you know what you are\n" );
-        fprintf ( stderr, "                              doing.\n\n" );
         fprintf ( stderr, "When call with the -c option, %s accept the following options:\n\n", prog );
         usage_dbconvert();
-        fprintf ( stderr, "When call with the -e option, %s accept the following options:\n\n", prog );
+        fprintf ( stderr, "When call with the -r option, %s accept the following options:\n\n", prog );
         usage_dbrecover();
         break;
 
@@ -2630,7 +2631,6 @@ void usage ( char *prog, int which )
 
     fprintf ( stderr, "\nDefault configuration file : %s\n\n", DEFAULT_CONFIG_FILE );
 }
-
 
 void recover_flatfile ( char *flat )
 {
@@ -3044,14 +3044,10 @@ int main ( int argc, char *argv[] )
      * Parse options
      */
     //while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
-    while ( ( c = getopt_long ( argc, argv, "drmce?", long_options, &option_index ) ) != -1 ) {
+    while ( ( c = getopt_long ( argc, argv, "dmcr?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
         case 'd':   /* Debug mode, do not fork */
             mudstate.debug = 1;
-            break;
-
-        case 'r':   /* Restarting */
-            mudstate.restarting = 1;
             break;
 
         case 'm':   /* Force minimum db generation */
@@ -3063,7 +3059,7 @@ int main ( int argc, char *argv[] )
             exit ( EXIT_SUCCESS );
             break;
 
-        case 'e':   /* recover */
+        case 'r':   /* recover */
             dbrecover ( argc, argv );
             exit ( EXIT_SUCCESS );
             break;
@@ -3179,6 +3175,7 @@ int main ( int argc, char *argv[] )
     hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
+
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
 
     if ( tailfind ( mudconf.log_file, "GDBM panic: write error\n" ) ) {
@@ -3215,6 +3212,7 @@ int main ( int argc, char *argv[] )
     mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
     mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
     mudconf.status_file = xstrprintf ( "main_mudconf_status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname );
+
     s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
 
     if ( fileexist ( s ) ) {
@@ -3228,24 +3226,6 @@ int main ( int argc, char *argv[] )
     if ( pid ) {
         log_write ( LOG_ALWAYS, "INI", "FATAL", "The MUSH already seems to be running at pid %ld.", ( long ) pid );
         exit ( EXIT_FAILURE );
-    }
-
-    if ( !mudstate.restarting ) {
-        s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
-
-        if ( fileexist ( s ) ) {
-            log_write ( LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present.", s );
-
-            if ( unlink ( s ) != 0 ) {
-                log_write ( LOG_ALWAYS, "INI", "FATAL" , "Unable to delete : %s, remove it before restarting the MUSH.", s );
-                xfree ( s, "test_restart_db" );
-                exit ( EXIT_FAILURE );
-            } else {
-                log_write ( LOG_ALWAYS, "INI", "LOAD", "%s deleted.", s );
-            }
-        }
-
-        xfree ( s, "test_restart_db" );
     }
 
     handlestartupflatfiles ( HANDLE_FLAT_KILL );
@@ -3447,24 +3427,6 @@ int main ( int argc, char *argv[] )
      */
     load_restart_db();
 
-    if ( !mudstate.restarting ) {
-        /*
-         * CAUTION: We do this here rather than up at the top of this
-         * function because we need to know if we're restarting. If
-         * we are, our previous process closed stdout at inception,
-         * and therefore we don't need to do so. More importantly, on
-         * a restart, the file descriptor normally allocated to
-         * stdout could have been used for a player socket
-         * descriptor. Thus, closing it like a stream is really,
-         * really bad. Moreover, stdin gets closed and its descriptor
-         * reused in tf_init. A double fclose of stdin would be a
-         * really bad idea.
-         */
-        if ( backup_mush ( NOTHING, NOTHING, 0 ) != 0 ) {
-            log_write ( LOG_STARTUP, "INI", "FATAL", "Unable to backup" );
-        }
-    }
-
     /*
      * We have to do an update, even though we're starting up, because
      * there may be players connected from a restart, as well as objects.
@@ -3477,48 +3439,10 @@ int main ( int argc, char *argv[] )
      */
     process_preload();
 
-    if ( !mudstate.restarting ) {
-        if ( ! ( getppid() == 1 ) && !mudstate.debug ) {
-            int forkstatus;
-            forkstatus = fork();
-
-            if ( forkstatus < 0 ) {
-                log_write ( LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror ( errno ) );
-            } else if ( forkstatus > 0 ) {
-                exit ( EXIT_SUCCESS );
-            } else {
-                setsid();
-
-                if ( chdir ( mudconf.game_home ) < 0 ) {
-                    log_write ( LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror ( errno ) );
-                }
-            }
-        }
-    }
-
-    write_pidfile ( mudconf.pid_file );
-    log_write ( LOG_STARTUP, "INI", "LOAD", "Startup processing complete. (Process ID : %d)",  getpid() );
-
-    if ( !mudstate.restarting ) {
-        /* Cosmetic, force a newline to stderr to clear console logs */
-        fprintf ( stderr, "\n" );
-        fflush ( stderr );
-        fflush ( stdout );
-
-        if ( freopen ( DEV_NULL, "w", stdout ) == NULL ) {
-            log_write ( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null" );
-        }
-
-        if ( freopen ( DEV_NULL, "w", stderr ) == NULL ) {
-            log_write ( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null" );
-        }
-    }
-
     /*
      * Startup is done.
      */
     mudstate.initializing = 0;
-    mudstate.running = 1;
 
     /*
      * Clear all reference flags in the cache-- what happens when the
@@ -3548,9 +3472,53 @@ int main ( int argc, char *argv[] )
 #ifdef MCHECK
     mtrace();
 #endif
+
+    if ( !mudstate.restarting ) {
+        if ( backup_mush ( NOTHING, NOTHING, 0 ) != 0 ) {
+            log_write ( LOG_STARTUP, "INI", "FATAL", "Unable to backup" );
+        }
+        if ( ! ( getppid() == 1 ) && !mudstate.debug ) {
+            int forkstatus;
+            forkstatus = fork();
+
+            if ( forkstatus < 0 ) {
+                log_write ( LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror ( errno ) );
+            } else if ( forkstatus > 0 ) {
+                exit ( EXIT_SUCCESS );
+            } else {
+                setsid();
+
+                if ( chdir ( mudconf.game_home ) < 0 ) {
+                    log_write ( LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror ( errno ) );
+                }
+            }
+        }
+    }
+    
+    log_write ( LOG_STARTUP, "INI", "RUN", "Startup processing complete. (Process ID : %d)\n", write_pidfile ( mudconf.pid_file ));
+
+    if ( !mudstate.restarting ) {
+        /*
+         * Cosmetic, force a newline to stderr to clear console logs 
+         */
+        
+        fprintf ( stderr, "\n" );
+        fflush ( stderr );
+        fflush ( stdout );
+
+        if ( freopen ( DEV_NULL, "w", stdout ) == NULL ) {
+            log_write ( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null" );
+        }
+
+        if ( freopen ( DEV_NULL, "w", stderr ) == NULL ) {
+            log_write ( LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null" );
+        }
+    }
+
     /*
      * go do it
      */
+    mudstate.logstderr = 0;
     init_timer();
     shovechars ( mudconf.port );
 #ifdef MCHECK

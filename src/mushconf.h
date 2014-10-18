@@ -408,7 +408,7 @@ struct statedata {
     int           panicking;                      /* Are we in the middle of dying horribly? */
     int           restarting;                     /* Are we restarting? */
     int           dumping;                        /* Are we dumping? */
-    int           running;                        /* Are we running? */
+    int           logstderr;                      /* Echo log to stderr too? */
     int           debug;                          /* Are we being debug? */
     pid_t         dumper;                         /* If forked-dumping, with what pid? */
     int           logging;                        /* Are we in the middle of logging? */
