@@ -1827,17 +1827,16 @@ pid_t write_pidfile ( char *fn )
 {
     FILE *f;
     pid_t pid;
-    
     pid = getpid();
-    
+
     if ( ( f = fopen ( fn, "w" ) ) != NULL ) {
         fprintf ( f, "%d\n", pid );
         fclose ( f );
     } else {
         log_write ( LOG_ALWAYS, "PID", "FAIL", "Failed to write pidfile %s\n", fn );
     }
-    
-    return(pid);
+
+    return ( pid );
 }
 
 FILE *fmkstemp ( char *template )
@@ -2609,6 +2608,7 @@ void usage ( char *prog, int which )
         fprintf ( stderr, "       %s -r -i INPUT-DBM -o OUTPUT-DBM\n\n", prog );
         fprintf ( stderr, "When call without -c or -e option, %s accept the following options:\n\n", prog );
         fprintf ( stderr, "  CONFIG-FILE               configuration file\n" );
+        fprintf ( stderr, "  -b, --backup              create a backup of the game and exit\n" );
         fprintf ( stderr, "  -d, --debug               debug mode, do not fork to background\n" );
         fprintf ( stderr, "  -m, --mindb               delete the current databases and create a new one\n\n" );
         fprintf ( stderr, "When call with the -c option, %s accept the following options:\n\n", prog );
@@ -2618,13 +2618,13 @@ void usage ( char *prog, int which )
         break;
 
     case 1:
-        fprintf ( stderr, "Usage: dbconvert [options] DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n" );
+        fprintf ( stderr, "Usage: %s [options] DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog );
         fprintf ( stderr, "Options:\n" );
         usage_dbconvert();
         break;
 
     case 2:
-        fprintf ( stderr, "Usage: recover -i INPUT-DBM -o OUTPUT-DBM\n" );
+        fprintf ( stderr, "Usage: %s -i INPUT-DBM -o OUTPUT-DBM\n", prog );
         usage_dbrecover();
         break;
     }
@@ -2734,7 +2734,7 @@ int dbconvert ( int argc, char *argv[] )
     setflags = clrflags = ver = do_check = 0;
     do_write = 1;
     dbclean = V_DBCLEAN;
-    
+
     while ( ( c = getopt_long ( argc, argv, "f:Cd:D:r:qGgKkLlMmNnPpWwXxZzo:?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
         case 'c':
@@ -2830,7 +2830,7 @@ int dbconvert ( int argc, char *argv[] )
             break;
 
         case 'o':
-            ver = ver * 10 + ( int ) strtol(optarg, NULL, 10);
+            ver = ver * 10 + ( int ) strtol ( optarg, NULL, 10 );
             break;
 
         default:
@@ -2851,7 +2851,6 @@ int dbconvert ( int argc, char *argv[] )
     mudstate.standalone = 1;
     cf_read ( opt_conf );
     mudstate.initializing = 0;
-    
     /*
      * Open the gdbm file
      */
@@ -2981,6 +2980,7 @@ int dbconvert ( int argc, char *argv[] )
 int main ( int argc, char *argv[] )
 {
     int mindb = 0;
+    int dobackup = 0;
     CMDENT *cmdp;
     int i, c;
     int errflg = 0;
@@ -2996,6 +2996,7 @@ int main ( int argc, char *argv[] )
     int option_index = 0;
     static struct option long_options[] = {
         {"debug",   no_argument, 0, 'd' },
+        {"backup",  no_argument, 0, 'b' },
         {"restart", no_argument, 0, 'r' },
         {"mindb",   no_argument, 0, 'm' },
         {"convert", no_argument, 0, 'c' },
@@ -3026,12 +3027,16 @@ int main ( int argc, char *argv[] )
      */
     s = basename ( argv[0] );
 
-    if ( s && *s && !strcmp ( s, "dbconvert" ) ) {
+    if ( s && *s && !strcmp ( s, "netmush-dbconvert" ) ) {
         dbconvert ( argc, argv );
     }
 
-    if ( s && *s && !strcmp ( s, "recover" ) ) {
+    if ( s && *s && !strcmp ( s, "netmush-recover" ) ) {
         dbrecover ( argc, argv );
+    }
+
+    if ( s && *s && !strcmp ( s, "netmush-backup" ) ) {
+        dobackup = 1;
     }
 
     /*
@@ -3047,10 +3052,14 @@ int main ( int argc, char *argv[] )
      * Parse options
      */
     //while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
-    while ( ( c = getopt_long ( argc, argv, "dmcr?", long_options, &option_index ) ) != -1 ) {
+    while ( ( c = getopt_long ( argc, argv, "bdmcr?", long_options, &option_index ) ) != -1 ) {
         switch ( c ) {
         case 'd':   /* Debug mode, do not fork */
             mudstate.debug = 1;
+            break;
+
+        case 'b':   /* Backup */
+            dobackup =  1;
             break;
 
         case 'm':   /* Force minimum db generation */
@@ -3073,6 +3082,14 @@ int main ( int argc, char *argv[] )
         }
     }
 
+    if ( dobackup ) {
+        /*
+         * Ignore other command line switches if we are doing a backup.
+         */
+        mindb = 0;
+        mudstate.debug = 0;
+    }
+
     if ( optind < argc ) {
         /*
          * The first non-option element is our config file.
@@ -3080,7 +3097,6 @@ int main ( int argc, char *argv[] )
         s = strdup ( argv[optind++] );
         mudconf.config_file = realpath ( s , NULL );
         free ( s );
-        
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
@@ -3091,7 +3107,6 @@ int main ( int argc, char *argv[] )
         s = strdup ( DEFAULT_CONFIG_FILE );
         mudconf.config_file = realpath ( s , NULL );
         free ( s );
-        
         s = strdup ( mudconf.config_file );
         mudconf.config_home = strdup ( dirname ( s ) );
         free ( s ) ;
@@ -3127,10 +3142,6 @@ int main ( int argc, char *argv[] )
     init_functab();
     init_attrtab();
     log_version();
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec );
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home );
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file );
-    log_write ( LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mudconf.config_home );
     cf_read ( mudconf.config_file );
 
     /*
@@ -3180,7 +3191,6 @@ int main ( int argc, char *argv[] )
     hashinit ( &mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR );
     hashinit ( &mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR );
-
     mudconf.log_file = xstrprintf ( "main_mudconf_log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname );
 
     if ( tailfind ( mudconf.log_file, "GDBM panic: write error\n" ) ) {
@@ -3217,7 +3227,6 @@ int main ( int argc, char *argv[] )
     mudconf.pid_file = xstrprintf ( "main_mudconf_pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname );
     mudconf.db_file = xstrprintf ( "main_mudconf_db_file", "%s.db", mudconf.mud_shortname );
     mudconf.status_file = xstrprintf ( "main_mudconf_status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname );
-
     s = xstrprintf ( "test_restart_db", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname );
 
     if ( fileexist ( s ) ) {
@@ -3431,7 +3440,6 @@ int main ( int argc, char *argv[] )
      * Go do restart things.
      */
     load_restart_db();
-
     /*
      * We have to do an update, even though we're starting up, because
      * there may be players connected from a restart, as well as objects.
@@ -3443,7 +3451,6 @@ int main ( int argc, char *argv[] )
      * will be hosed.
      */
     process_preload();
-
     /*
      * Startup is done.
      */
@@ -3481,7 +3488,14 @@ int main ( int argc, char *argv[] )
     if ( !mudstate.restarting ) {
         if ( backup_mush ( NOTHING, NOTHING, 0 ) != 0 ) {
             log_write ( LOG_STARTUP, "INI", "FATAL", "Unable to backup" );
+            exit ( EXIT_FAILURE );
         }
+
+        if ( dobackup ) {
+            log_write ( LOG_STARTUP, "INI", "RUN", "Backup processing complete. Shutting down." );
+            exit ( EXIT_SUCCESS );
+        }
+
         if ( ! ( getppid() == 1 ) && !mudstate.debug ) {
             int forkstatus;
             forkstatus = fork();
@@ -3499,14 +3513,13 @@ int main ( int argc, char *argv[] )
             }
         }
     }
-    
-    log_write ( LOG_STARTUP, "INI", "RUN", "Startup processing complete. (Process ID : %d)\n", write_pidfile ( mudconf.pid_file ));
+
+    log_write ( LOG_STARTUP, "INI", "RUN", "Startup processing complete. (Process ID : %d)\n", write_pidfile ( mudconf.pid_file ) );
 
     if ( !mudstate.restarting ) {
         /*
-         * Cosmetic, force a newline to stderr to clear console logs 
+         * Cosmetic, force a newline to stderr to clear console logs
          */
-        
         fprintf ( stderr, "\n" );
         fflush ( stderr );
         fflush ( stdout );

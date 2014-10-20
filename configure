@@ -582,7 +582,7 @@ as_tr_sh="eval sed 'y%*+%pp%;s%[^_$as_cr_alnum]%_%g'"
 
 SHELL=${CONFIG_SHELL-/bin/sh}
 
-lt_ltdl_dir='src/libltdl'
+lt_ltdl_dir='libltdl'
 
 lt_dlopen_dir="$lt_ltdl_dir"
 
@@ -874,7 +874,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='src/libltdl'
+ac_subdirs_all='libltdl'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -2612,7 +2612,7 @@ with_included_ltdl="yes"
 ac_config_headers="$ac_config_headers src/config.h"
 
 ac_aux_dir=
-for ac_dir in src/libltdl/config "$srcdir"/src/libltdl/config; do
+for ac_dir in libltdl/config "$srcdir"/libltdl/config; do
   if test -f "$ac_dir/install-sh"; then
     ac_aux_dir=$ac_dir
     ac_install_sh="$ac_aux_dir/install-sh -c"
@@ -2628,7 +2628,7 @@ for ac_dir in src/libltdl/config "$srcdir"/src/libltdl/config; do
   fi
 done
 if test -z "$ac_aux_dir"; then
-  as_fn_error $? "cannot find install-sh, install.sh, or shtool in src/libltdl/config \"$srcdir\"/src/libltdl/config" "$LINENO" 5
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in libltdl/config \"$srcdir\"/libltdl/config" "$LINENO" 5
 fi
 
 # These three variables are undocumented and unsupported,
@@ -13104,7 +13104,7 @@ fi
 
 
 
-    subdirs="$subdirs src/libltdl"
+    subdirs="$subdirs libltdl"
 
 
 

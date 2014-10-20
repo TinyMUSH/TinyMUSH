@@ -93,16 +93,16 @@ bin_PROGRAMS = netmush$(EXEEXT) slave$(EXEEXT)
 @WANT_MODULE_DB_SQL_TRUE@am__append_9 = modules/db_sql/
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(srcdir)/config.h.in $(top_srcdir)/src/libltdl/config/depcomp
+	$(srcdir)/config.h.in $(top_srcdir)/libltdl/config/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/src/libltdl/m4/argz.m4 \
-	$(top_srcdir)/src/libltdl/m4/libtool.m4 \
-	$(top_srcdir)/src/libltdl/m4/ltdl.m4 \
-	$(top_srcdir)/src/libltdl/m4/lt~obsolete.m4 \
-	$(top_srcdir)/src/libltdl/m4/ltoptions.m4 \
-	$(top_srcdir)/src/libltdl/m4/ltsugar.m4 \
-	$(top_srcdir)/src/libltdl/m4/ltversion.m4 \
+	$(top_srcdir)/libltdl/m4/argz.m4 \
+	$(top_srcdir)/libltdl/m4/libtool.m4 \
+	$(top_srcdir)/libltdl/m4/ltdl.m4 \
+	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
+	$(top_srcdir)/libltdl/m4/ltoptions.m4 \
+	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
+	$(top_srcdir)/libltdl/m4/ltversion.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_msql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_mysql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_pgsql.m4 \
@@ -159,7 +159,7 @@ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/src/libltdl/config/depcomp
+depcomp = $(SHELL) $(top_srcdir)/libltdl/config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -252,7 +252,7 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = libltdl dbm/gdbm/ dbm/qdbm/ modules/comsys/ \
+DIST_SUBDIRS = ../libltdl dbm/gdbm/ dbm/qdbm/ modules/comsys/ \
 	modules/mail/ modules/db_sql/
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -428,7 +428,7 @@ with_compress_prog = @with_compress_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_5)
-SUBDIRS = libltdl $(am__append_1) $(am__append_4) $(am__append_7) \
+SUBDIRS = ../libltdl $(am__append_1) $(am__append_4) $(am__append_7) \
 	$(am__append_8) $(am__append_9)
 AUTOMAKE_OPTIONS = subdir-objects
 netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
@@ -1045,7 +1045,7 @@ install-exec-local:
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
 install-exec-hook:
-	cd @bindir@ && $(LN_S) -f netmush dbconvert && $(LN_S) -f netmush recover
+	cd @bindir@ && $(LN_S) -f netmush netmush-dbconvert && $(LN_S) -f netmush netmush-recover && $(LN_S) -f netmush netmush-backup
 
 install-data-local:
 	$(mkinstalldirs) @sysconfdir@
@@ -1062,8 +1062,9 @@ install-data-local:
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done
 	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
-	rm -f @bindir@/dbconvert 
-	rm -f @bindir@/recover
+	rm -f @bindir@/netmush-dbconvert 
+	rm -f @bindir@/netmush-recover
+	rm -f @bindir@/netmush-backup
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

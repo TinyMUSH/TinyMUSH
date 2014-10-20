@@ -1,5 +1,5 @@
 AM_CPPFLAGS		= $(LTDLINCL)
-SUBDIRS			= libltdl
+SUBDIRS			= ../libltdl
 LIBTOOL_DEPS		= @LIBTOOL_DEPS@
 
 AUTOMAKE_OPTIONS 	= subdir-objects
@@ -141,7 +141,7 @@ install-exec-local:
 	$(install_sh_DATA) $(SCRIPT_DAT) @libexecdir@/@with_install_suffix@
 
 install-exec-hook:
-	cd @bindir@ && $(LN_S) -f netmush dbconvert && $(LN_S) -f netmush recover
+	cd @bindir@ && $(LN_S) -f netmush netmush-dbconvert && $(LN_S) -f netmush netmush-recover && $(LN_S) -f netmush netmush-backup
 
 install-data-local:
 	$(mkinstalldirs) @sysconfdir@
@@ -158,5 +158,6 @@ install-data-local:
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done
 	for files in $(SCRIPT_SRC) $(SCRIPT_DAT); do rm -f $(prefix)/`basename $$files`; done
-	rm -f @bindir@/dbconvert 
-	rm -f @bindir@/recover
+	rm -f @bindir@/netmush-dbconvert 
+	rm -f @bindir@/netmush-recover
+	rm -f @bindir@/netmush-backup

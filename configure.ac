@@ -50,8 +50,8 @@ you should contact  the Copyright Holder  and  seek  a  different  licensing
 arrangement.])
 AC_CONFIG_SRCDIR([src/game.c])
 AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_AUX_DIR([src/libltdl/config])
-AC_CONFIG_MACRO_DIR([src/libltdl/m4])
+AC_CONFIG_AUX_DIR([libltdl/config])
+AC_CONFIG_MACRO_DIR([libltdl/m4])
 
 AX_PRINT_PACKAGE_TITLE()
 
@@ -76,7 +76,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AX_BOX([Initializing Libtools])
 
 LT_PREREQ([2.4])
-LT_CONFIG_LTDL_DIR([src/libltdl])
+LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])

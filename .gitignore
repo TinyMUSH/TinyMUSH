@@ -1,23 +1,3 @@
-# http://www.gnu.org/software/automake
-
-Makefile.in
-
-# http://www.gnu.org/software/autoconf
-
-autom4te.cache
-aclocal.m4
-compile
-configure
-depcomp
-install-sh
-missing
-config.log
-config.status
-Makefile
-.deps
-.libs
-stamp-h1
-
 # Object files
 *.o
 *.lo
@@ -47,18 +27,13 @@ stamp-h1
 /src/defaults.h
 /src/etc/netmush.conf
 /game/*
-/rebuild.sh
 /src/netmush
 /src/recover
 /src/scripts/Startmush
 /src/slave
 /src/tinymushapi.h
 /src/version.h
-/libtool
-/src/libltdl/argz.h
-/src/libltdl/config.h
-/src/libltdl/libtool
-debug
+/debug
 
 # Eclipse
 .autotools
