@@ -5,10 +5,10 @@ AC_PREREQ([2.69])
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
 m4_define(TINYMUSH_VERSION, [3.3.0.8])
-m4_define(TINYMUSH_RELEASE_DATE, ["2014-10-18"])
-m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 2014 TinyMUSH development team.])
+m4_define(TINYMUSH_RELEASE_DATE, ["2015-05-30"])
+m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 1989-2015 TinyMUSH development team.])
 
-AC_INIT([TinyMUSH],[TINYMUSH_VERSION],[tinymush-bugs@lists.sourceforge.net],[tinymush],[http://tinymush.sourceforge.net])
+AC_INIT([TinyMUSH],[TINYMUSH_VERSION],[https://github.com/TinyMUSH/TinyMUSH/issues],[tinymush],[https://github.com/TinyMUSH])
 
 AX_VERSION()
 
@@ -50,8 +50,8 @@ you should contact  the Copyright Holder  and  seek  a  different  licensing
 arrangement.])
 AC_CONFIG_SRCDIR([src/game.c])
 AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_AUX_DIR([libltdl/config])
-AC_CONFIG_MACRO_DIR([libltdl/m4])
+AC_CONFIG_AUX_DIR([src/libltdl/config])
+AC_CONFIG_MACRO_DIR([src/libltdl/m4])
 
 AX_PRINT_PACKAGE_TITLE()
 
@@ -76,7 +76,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AX_BOX([Initializing Libtools])
 
 LT_PREREQ([2.4])
-LT_CONFIG_LTDL_DIR([libltdl])
+LT_CONFIG_LTDL_DIR([src/libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 LTDL_INIT([convenience])

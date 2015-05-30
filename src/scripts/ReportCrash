@@ -9,6 +9,10 @@
 #       If we get a parameter, it's the name of
 #       our config file. Else, we use the default one.
 #
+
+echo "Not working anymore, need to be redone."
+exit 1
+
 if [ -z "$1" ]; then
         GAMENAME=netmush
 else
@@ -20,7 +24,7 @@ fi
 
 # This is where we send bugs.
 
-bug_address="tinymush-bugs@lists.sourceforge.net"
+bug_address="tinymush-bugs@tinymush.net"
 
 # Check to make sure we have a core file.
 

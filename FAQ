@@ -27,8 +27,7 @@ I found a bug! What do I do?
 - Try to come up with an easily-reproducible sequence of events that
   will demonstrate the bug.
 
-- Send email to tinymush-bugs@lists.sourceforge.net with the bug report.
-  or visit http://sourceforge.net/p/tinymush/bugs/ and fill a bug report.
+- Visit https://github.com/TinyMUSH/TinyMUSH/issues and fill a bug report.
 
 - If the bug crashes the server, we really, really, want to hear about
   it. We'd like as much information as possible.

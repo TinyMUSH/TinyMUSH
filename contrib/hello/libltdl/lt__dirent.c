@@ -38,69 +38,70 @@ or obtained by writing to the Free Software Foundation, Inc.,
 #if defined(__WINDOWS__)
 
 void
-closedir ( DIR *entry )
+closedir (DIR *entry)
 {
-    assert ( entry != ( DIR * ) NULL );
-    FindClose ( entry->hSearch );
-    free ( ( void * ) entry );
+  assert (entry != (DIR *) NULL);
+  FindClose (entry->hSearch);
+  free ((void *) entry);
 }
 
 
 DIR *
-opendir ( const char *path )
+opendir (const char *path)
 {
-    char file_spec[LT_FILENAME_MAX];
-    DIR *entry;
-    assert ( path != ( char * ) 0 );
+  char file_spec[LT_FILENAME_MAX];
+  DIR *entry;
 
-    if ( lt_strlcpy ( file_spec, path, sizeof file_spec ) >= sizeof file_spec
-            || lt_strlcat ( file_spec, "\\", sizeof file_spec ) >= sizeof file_spec )
-        return ( DIR * ) 0;
+  assert (path != (char *) 0);
+  if (lt_strlcpy (file_spec, path, sizeof file_spec) >= sizeof file_spec
+      || lt_strlcat (file_spec, "\\", sizeof file_spec) >= sizeof file_spec)
+    return (DIR *) 0;
+  entry = (DIR *) malloc (sizeof(DIR));
+  if (entry != (DIR *) 0)
+    {
+      entry->firsttime = TRUE;
+      entry->hSearch = FindFirstFile (file_spec, &entry->Win32FindData);
 
-    entry = ( DIR * ) malloc ( sizeof ( DIR ) );
+      if (entry->hSearch == INVALID_HANDLE_VALUE)
+	{
+	  if (lt_strlcat (file_spec, "\\*.*", sizeof file_spec) < sizeof file_spec)
+	    {
+	      entry->hSearch = FindFirstFile (file_spec, &entry->Win32FindData);
+	    }
 
-    if ( entry != ( DIR * ) 0 ) {
-        entry->firsttime = TRUE;
-        entry->hSearch = FindFirstFile ( file_spec, &entry->Win32FindData );
-
-        if ( entry->hSearch == INVALID_HANDLE_VALUE ) {
-            if ( lt_strlcat ( file_spec, "\\*.*", sizeof file_spec ) < sizeof file_spec ) {
-                entry->hSearch = FindFirstFile ( file_spec, &entry->Win32FindData );
-            }
-
-            if ( entry->hSearch == INVALID_HANDLE_VALUE ) {
-                entry = ( free ( entry ), ( DIR * ) 0 );
-            }
-        }
+	  if (entry->hSearch == INVALID_HANDLE_VALUE)
+	    {
+	      entry = (free (entry), (DIR *) 0);
+	    }
+	}
     }
 
-    return entry;
+  return entry;
 }
 
 
 struct dirent *
-readdir ( DIR *entry )
+readdir (DIR *entry)
 {
-    int status;
+  int status;
 
-    if ( entry == ( DIR * ) 0 )
-        return ( struct dirent * ) 0;
+  if (entry == (DIR *) 0)
+    return (struct dirent *) 0;
 
-    if ( !entry->firsttime ) {
-        status = FindNextFile ( entry->hSearch, &entry->Win32FindData );
-
-        if ( status == 0 )
-            return ( struct dirent * ) 0;
+  if (!entry->firsttime)
+    {
+      status = FindNextFile (entry->hSearch, &entry->Win32FindData);
+      if (status == 0)
+        return (struct dirent *) 0;
     }
 
-    entry->firsttime = FALSE;
+  entry->firsttime = FALSE;
+  if (lt_strlcpy (entry->file_info.d_name, entry->Win32FindData.cFileName,
+	sizeof entry->file_info.d_name) >= sizeof entry->file_info.d_name)
+    return (struct dirent *) 0;
+  entry->file_info.d_namlen = strlen (entry->file_info.d_name);
 
-    if ( lt_strlcpy ( entry->file_info.d_name, entry->Win32FindData.cFileName,
-                      sizeof entry->file_info.d_name ) >= sizeof entry->file_info.d_name )
-        return ( struct dirent * ) 0;
-
-    entry->file_info.d_namlen = strlen ( entry->file_info.d_name );
-    return &entry->file_info;
+  return &entry->file_info;
 }
 
 #endif /*defined(__WINDOWS__)*/

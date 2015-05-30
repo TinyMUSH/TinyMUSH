@@ -376,8 +376,8 @@ void mod_hello_init ( void )
     /* Fill up our version information */
     mod_hello_version.version = XSTRDUP ( "Version 1.0.1.1", "mod_hello_init" );
     mod_hello_version.author = XSTRDUP ( "TinyMUSH Development Team", "mod_hello_init" );
-    mod_hello_version.email = XSTRDUP ( "tinymush-support@list.sourceforge.net", "mod_hello_init" );
-    mod_hello_version.url = XSTRDUP ( "http://sourceforge.net/projects/tinymush/", "mod_hello_init" );
+    mod_hello_version.email = XSTRDUP ( "tinymush@googlegroups.com", "mod_hello_init" );
+    mod_hello_version.url = XSTRDUP ( "https://github.com/TinyMUSH", "mod_hello_init" );
     mod_hello_version.description = XSTRDUP ( "Demonstration module to explain how to build modules for TInyMUSH 3.3", "mod_hello_init" );
     mod_hello_version.copyright = XSTRDUP ( "Copyright (C) 2012 TinyMUSH development team.", "mod_hello_init" );
     /* Register everything we have to register. */

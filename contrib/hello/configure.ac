@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([Hello : Demonstration Module for TinyMUSH 3.3], [1.1.0.1], [tinymush-support@list.sourceforge.net])
+AC_INIT([Hello : Demonstration Module for TinyMUSH 3.3], [1.1.0.1], [https://github.com/TinyMUSH/TinyMUSH/issues])
 AC_CONFIG_SRCDIR([hello.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([libltdl/config])

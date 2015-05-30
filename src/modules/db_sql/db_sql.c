@@ -148,8 +148,8 @@ void mod_db_sql_init()
     mod_db_sql_version.version = xstrdup ( str, "mod_db_sql_init" );
 #endif
     mod_db_sql_version.author = xstrdup ( "TinyMUSH Development Team", "mod_db_sql_init" );
-    mod_db_sql_version.email = xstrdup ( "tinymush-support@list.sourceforge.net", "mod_db_sql_init" );
-    mod_db_sql_version.url = xstrdup ( "http://sourceforge.net/projects/tinymush/", "mod_db_sql_init" );
+    mod_db_sql_version.email = xstrdup ( "tinymush@googlegroups.com", "mod_db_sql_init" );
+    mod_db_sql_version.url = xstrdup ( "https://github.com/TinyMUSH", "mod_db_sql_init" );
     mod_db_sql_version.description = xstrdup ( "SQL Database interface for TinyMUSH", "mod_db_sql_init" );
     mod_db_sql_version.copyright = xstrdup ( "Copyright (C) 2012 TinyMUSH development team.", "mod_db_sql_init" );
     xfree ( str, "mod_db_sql_init" );

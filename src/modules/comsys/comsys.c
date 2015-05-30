@@ -2316,8 +2316,8 @@ void mod_comsys_init ( void )
     sprintf ( str, "%s (%s)", str, PACKAGE_RELEASE_DATE );
     mod_comsys_version.version = xstrdup ( str, "mod_comsys_init" );
     mod_comsys_version.author = xstrdup ( "TinyMUSH Development Team", "mod_comsys_init" );
-    mod_comsys_version.email = xstrdup ( "tinymush-support@list.sourceforge.net", "mod_comsys_init" );
-    mod_comsys_version.url = xstrdup ( "http://sourceforge.net/projects/tinymush/", "mod_comsys_init" );
+    mod_comsys_version.email = xstrdup ( "tinymush@googlegroups.com", "mod_comsys_init" );
+    mod_comsys_version.url = xstrdup ( "https://github.com/TinyMUSH", "mod_comsys_init" );
     mod_comsys_version.description = xstrdup ( "Communication system for TinyMUSH", "mod_comsys_init" );
     mod_comsys_version.copyright = xstrdup ( "Copyright (C) 2012 TinyMUSH development team.", "mod_comsys_init" );
     xfree ( str, "mod_comsys_init" );

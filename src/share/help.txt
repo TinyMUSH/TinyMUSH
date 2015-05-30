@@ -14887,31 +14887,24 @@ traced from the caller's scope.
   
 & Mailing Lists
  
-  Support for TinyMUSH 3 is done via 'tinymush-support@lists.sourceforge.net',
+  Support for TinyMUSH 3 is done via 'tinymush@googlegroups.com',
   a mailing list. The list's home page, subscription tool, and archives
-  are at http://lists.sourceforge.net/mailman/listinfo/tinymush-support
+  are at https://groups.google.com/d/forum/tinymush
  
-  Announcements of new server versions, new games, and other information
-  of interest to the general MUSH community, is available through
-  tinymush-announce@lists.sourceforge.net, a moderated mailing list with
+  Announcements of new server versions, new games, support and other 
+  information of interest to the general MUSH community, is available 
+  through 'tinymush@googlegroups.com', a moderated mailing list with
   low traffic. We highly encourage all users to subscribe to it through
-  http://lists.sourceforge.net/mailman/listinfo/tinymush-announce
-  Archives are also available through that page.
+  'https://groups.google.com/d/forum/tinymush' Archives are also available 
+  through that page.
  
-  There is an unofficial MUSH programmer's list, 'softcode@legendary.org'.
-  Go to http://www.legendary.org/mailman/listinfo.cgi/softcode to subscribe.
- 
-  There is a mailing list for MUSH administrators, 'gods@godlike.com'.
-  Go to http://www.godlike.com/mailman/listinfo.cgi/gods to subscribe
-  or to peruse the archives.
- 
-  An informal meeting grounds for MUSH administrators, called The
-  Godlike Edge, is located at edge.godlike.com 6250. 
+  An informal meeting grounds for MUSH administrators, called TinyMUSH, 
+  is located at tinymush.net 6250. 
  
 & Support
  
   TinyMUSH 3 announcements and related support information can be found
-  at the official TinyMUSH 3 home, http://tinymush.sourceforge.net/
+  at the official TinyMUSH 3 home, https://github.com/TinyMUSH
  
   The MUSH Manual can be found at http://duh.com/discordia/mushman/ and
   other sites. It might also be accessible by typing 'man' within this MUSH.

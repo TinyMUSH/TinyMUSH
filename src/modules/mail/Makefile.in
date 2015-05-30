@@ -80,16 +80,16 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = src/modules/mail
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/libltdl/config/depcomp
+	$(top_srcdir)/src/libltdl/config/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/libltdl/m4/argz.m4 \
-	$(top_srcdir)/libltdl/m4/libtool.m4 \
-	$(top_srcdir)/libltdl/m4/ltdl.m4 \
-	$(top_srcdir)/libltdl/m4/lt~obsolete.m4 \
-	$(top_srcdir)/libltdl/m4/ltoptions.m4 \
-	$(top_srcdir)/libltdl/m4/ltsugar.m4 \
-	$(top_srcdir)/libltdl/m4/ltversion.m4 \
+	$(top_srcdir)/src/libltdl/m4/argz.m4 \
+	$(top_srcdir)/src/libltdl/m4/libtool.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltdl.m4 \
+	$(top_srcdir)/src/libltdl/m4/lt~obsolete.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltoptions.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltsugar.m4 \
+	$(top_srcdir)/src/libltdl/m4/ltversion.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_msql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_mysql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_pgsql.m4 \
@@ -153,7 +153,7 @@ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
-depcomp = $(SHELL) $(top_srcdir)/libltdl/config/depcomp
+depcomp = $(SHELL) $(top_srcdir)/src/libltdl/config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \

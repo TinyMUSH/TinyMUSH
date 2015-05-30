@@ -1,10 +1,10 @@
-ACLOCAL_AMFLAGS = -I libltdl/m4
+ACLOCAL_AMFLAGS = -I src/libltdl/m4
 
 AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS         = src
 
-EXTRA_DIST      = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
+EXTRA_DIST      = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 	
 testpath:
 	@echo prefix : @prefix@
@@ -37,10 +37,8 @@ testpath:
 	@echo srcdir : @srcdir@
 
 astyle:
-	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./src/*.c"
-	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./contrib/*.c"
-	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./src/*.h"
-	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./contrib/*.h"
+	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./*.c"
+	astyle --recursive --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i "./*.h"
 
 distclean-local:
 	for i in `find ./ -name '*~'`; do rm $$i; done

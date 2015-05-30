@@ -34,6 +34,31 @@
 /src/tinymushapi.h
 /src/version.h
 /debug
+/rebuild.sh
+/Makefile  
+/config.log
+/config.status
+/libtool
+/src/.deps/
+/src/Makefile
+/src/dbm/gdbm/.deps/
+/src/dbm/gdbm/Makefile
+/src/dbm/qdbm/.deps/  
+/src/dbm/qdbm/Makefile
+/src/libltdl/.deps/   
+/src/libltdl/Makefile 
+/src/libltdl/config.h 
+/src/libltdl/config.log
+/src/libltdl/config.status
+/src/libltdl/libtool
+/src/libltdl/stamp-h1
+/src/modules/comsys/.deps/
+/src/modules/comsys/Makefile
+/src/modules/db_sql/.deps/  
+/src/modules/db_sql/Makefile
+/src/modules/mail/.deps/
+/src/modules/mail/Makefile
+/src/stamp-h1
 
 # Eclipse
 .autotools

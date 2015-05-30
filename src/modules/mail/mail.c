@@ -4088,8 +4088,8 @@ void mod_mail_init ( void )
     sprintf ( str, "%s (%s)", str, PACKAGE_RELEASE_DATE );
     mod_mail_version.version = xstrdup ( str, "mod_mail_init" );
     mod_mail_version.author = xstrdup ( "TinyMUSH Development Team", "mod_mail_init" );
-    mod_mail_version.email = xstrdup ( "tinymush-support@list.sourceforge.net", "mod_mail_init" );
-    mod_mail_version.url = xstrdup ( "http://sourceforge.net/projects/tinymush/", "mod_mail_init" );
+    mod_mail_version.email = xstrdup ( "tinymush@googlegroups.com", "mod_mail_init" );
+    mod_mail_version.url = xstrdup ( "https://github.com/TinyMUSH", "mod_mail_init" );
     mod_mail_version.description = xstrdup ( "Mail system for TinyMUSH", "mod_mail_init" );
     mod_mail_version.copyright = xstrdup ( "Copyright (C) 2012 TinyMUSH development team.", "mod_mail_init" );
     xfree ( str, "mod_mail_init" );
