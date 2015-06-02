@@ -117,4 +117,4 @@ typedef unsigned char bitstr_t;
     *(value) = _value; \
 }
 
-#endif  /* __BITSTRING_H */
+#endif				/* __BITSTRING_H */

@@ -13,74 +13,74 @@
 #define MAX_NFARGS 30
 
 typedef struct fun {
-    const char     *name;   /* Function name */
-    void ( *fun ) ();   /* Handler */
-    int     nargs;  /* Number of args needed or expected */
-    unsigned int    flags;  /* Function flags */
-    int     perms;  /* Access to function */
-    EXTFUNCS       *xperms; /* Extended access to function */
-}       FUN;
+    const char *name;		/* Function name */
+    void (*fun) ();		/* Handler */
+    int nargs;			/* Number of args needed or expected */
+    unsigned int flags;		/* Function flags */
+    int perms;			/* Access to function */
+    EXTFUNCS *xperms;		/* Extended access to function */
+} FUN;
 
 typedef struct ufun {
-    char           *name;   /* Function name */
-    dbref       obj;    /* Object ID */
-    int     atr;    /* Attribute ID */
-    unsigned int    flags;  /* Function flags */
-    int     perms;  /* Access to function */
-    struct ufun    *next;   /* Next ufun in chain */
-}       UFUN;
+    char *name;			/* Function name */
+    dbref obj;			/* Object ID */
+    int atr;			/* Attribute ID */
+    unsigned int flags;		/* Function flags */
+    int perms;			/* Access to function */
+    struct ufun *next;		/* Next ufun in chain */
+} UFUN;
 
 typedef struct delim {
-    size_t      len;
-    char        str       [MAX_DELIM_LEN];
-}       Delim;
+    size_t len;
+    char str[MAX_DELIM_LEN];
+} Delim;
 
 typedef struct var_entry VARENT;
 struct var_entry {
-    char           *text;   /* variable text */
+    char *text;			/* variable text */
 };
 
 typedef struct component_def COMPONENT;
 struct component_def {
-    int ( *typer_func ) (); /* type-checking handler */
-    char           *def_val;/* default value */
+    int (*typer_func) ();	/* type-checking handler */
+    char *def_val;		/* default value */
 };
 
 typedef struct structure_def STRUCTDEF;
 struct structure_def {
-    char           *s_name; /* name of the structure */
-    char          **c_names;/* array of component names */
-    COMPONENT     **c_array;/* array of pointers to components */
-    int     c_count;/* number of components */
-    char        delim;  /* output delimiter when unloading */
-    int     need_typecheck; /* any components without types of
-                     * any? */
-    int     n_instances;    /* number of instances out there */
-    char           *names_base; /* pointer for later freeing */
-    char           *defs_base;  /* pointer for later freeing */
+    char *s_name;		/* name of the structure */
+    char **c_names;		/* array of component names */
+    COMPONENT **c_array;	/* array of pointers to components */
+    int c_count;		/* number of components */
+    char delim;			/* output delimiter when unloading */
+    int need_typecheck;		/* any components without types of
+				 * any? */
+    int n_instances;		/* number of instances out there */
+    char *names_base;		/* pointer for later freeing */
+    char *defs_base;		/* pointer for later freeing */
 };
 
 typedef struct instance_def INSTANCE;
 struct instance_def {
-    STRUCTDEF      *datatype;   /* pointer to structure data type def */
+    STRUCTDEF *datatype;	/* pointer to structure data type def */
 };
 
 typedef struct data_def STRUCTDATA;
 struct data_def {
-    char           *text;
+    char *text;
 };
 
 typedef struct object_stack OBJSTACK;
 struct object_stack {
-    char           *data;
-    OBJSTACK       *next;
+    char *data;
+    OBJSTACK *next;
 };
 
 typedef struct object_grid OBJGRID;
 struct object_grid {
-    int     rows;
-    int     cols;
-    char             ***data;
+    int rows;
+    int cols;
+    char ***data;
 };
 
 /*
@@ -88,10 +88,10 @@ struct object_grid {
  * Constants used in delimiter macros.
  */
 
-#define DELIM_EVAL  0x001   /* Must eval delimiter. */
-#define DELIM_NULL  0x002   /* Null delimiter okay. */
-#define DELIM_CRLF  0x004   /* '%r' delimiter okay. */
-#define DELIM_STRING    0x008   /* Multi-character delimiter okay. */
+#define DELIM_EVAL  0x001	/* Must eval delimiter. */
+#define DELIM_NULL  0x002	/* Null delimiter okay. */
+#define DELIM_CRLF  0x004	/* '%r' delimiter okay. */
+#define DELIM_STRING    0x008	/* Multi-character delimiter okay. */
 
 /*
  * ---------------------------------------------------------------------------
@@ -100,17 +100,17 @@ struct object_grid {
 
 extern const Delim SPACE_DELIM;
 
-extern char    *trim_space_sep ( char *, const Delim * );
-extern char    *next_token ( char *, const Delim * );
-extern char    *split_token ( char **, const Delim * );
-extern char    *next_token_ansi ( char *, const Delim *, int * );
-extern int  countwords ( char *, const Delim * );
-extern int  list2arr ( char ***, int, char *, const Delim * );
-extern void arr2list ( char **, int, char *, char **, const Delim * );
-extern int  list2ansi ( int *, int *, int, char *, const Delim * );
-extern void do_reverse ( char *, char * );
-extern int  fn_range_check ( const char *, int, int, int, char *, char ** );
-extern int  delim_check ( char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int );
+extern char *trim_space_sep(char *, const Delim *);
+extern char *next_token(char *, const Delim *);
+extern char *split_token(char **, const Delim *);
+extern char *next_token_ansi(char *, const Delim *, int *);
+extern int countwords(char *, const Delim *);
+extern int list2arr(char ***, int, char *, const Delim *);
+extern void arr2list(char **, int, char *, char **, const Delim *);
+extern int list2ansi(int *, int *, int, char *, const Delim *);
+extern void do_reverse(char *, char *);
+extern int fn_range_check(const char *, int, int, int, char *, char **);
+extern int delim_check(char *, char **, dbref, dbref, dbref, char **, int, char **, int, int, Delim *, int);
 
 /*
  * ---------------------------------------------------------------------------
@@ -430,21 +430,21 @@ if ((l) > 0) { \
  */
 
 /* from handle_sort (sort, isort): */
-#define SORT_OPER   0x0f    /* mask to select sort operation bits */
+#define SORT_OPER   0x0f	/* mask to select sort operation bits */
 #define SORT_ITEMS  0
 #define SORT_POS    1
 
 /* from handle_sets (setunion, setdiff, setinter, lunion, ldiff, linter): */
-#define SET_OPER    0x0f    /* mask to select set operation bits */
+#define SET_OPER    0x0f	/* mask to select set operation bits */
 #define SET_UNION   0
 #define SET_INTERSECT   1
 #define SET_DIFF    2
-#define SET_TYPE    0x10    /* set type is given, don't autodetect */
+#define SET_TYPE    0x10	/* set type is given, don't autodetect */
 
 /* from process_tables (tables, rtables, ctables): */
 /* from perform_border (border, rborder, cborder): */
 /* from perform_align (align, lalign): */
-#define JUST_TYPE   0x0f    /* mask to select justification bits */
+#define JUST_TYPE   0x0f	/* mask to select justification bits */
 #define JUST_LEFT   0x01
 #define JUST_RIGHT  0x02
 #define JUST_CENTER 0x04
@@ -458,15 +458,15 @@ if ((l) > 0) { \
  */
 /* from handle_flaglists (andflags, orflags): */
 /* from handle_filter (filter, filterbool): */
-#define LOGIC_OPER  0x0f    /* mask to select boolean operation bits */
+#define LOGIC_OPER  0x0f	/* mask to select boolean operation bits */
 #define LOGIC_AND   0
 #define LOGIC_OR    1
 #define LOGIC_XOR   2
-#define LOGIC_BOOL  0x10    /* interpret operands as boolean, not int */
-#define LOGIC_LIST  0x40    /* operands come in a list, not separately */
+#define LOGIC_BOOL  0x10	/* interpret operands as boolean, not int */
+#define LOGIC_LIST  0x40	/* operands come in a list, not separately */
 
 /* from handle_vectors (vadd, vsub, vmul, vdot): */
-#define VEC_OPER    0x0f    /* mask to select vector operation bits */
+#define VEC_OPER    0x0f	/* mask to select vector operation bits */
 #define VEC_ADD     0
 #define VEC_SUB     1
 #define VEC_MUL     2
@@ -482,39 +482,39 @@ if ((l) > 0) { \
 
 /* from perform_loop (loop, parse): */
 /* from perform_iter (list, iter, whentrue, whenfalse, istrue, isfalse): */
-#define BOOL_COND_TYPE  0x0f    /* mask to select exit-condition bits */
-#define BOOL_COND_NONE  1   /* loop until end of list */
-#define BOOL_COND_FALSE 2   /* loop until true */
-#define BOOL_COND_TRUE  3   /* loop until false */
-#define FILT_COND_TYPE  0x0f0   /* mask to select filter bits */
-#define FILT_COND_NONE  0x010   /* show all results */
-#define FILT_COND_FALSE 0x020   /* show only false results */
-#define FILT_COND_TRUE  0x030   /* show only true results */
-#define LOOP_NOTIFY 0x100   /* send loop results directly to enactor */
-#define LOOP_TWOLISTS   0x200   /* process two lists */
+#define BOOL_COND_TYPE  0x0f	/* mask to select exit-condition bits */
+#define BOOL_COND_NONE  1	/* loop until end of list */
+#define BOOL_COND_FALSE 2	/* loop until true */
+#define BOOL_COND_TRUE  3	/* loop until false */
+#define FILT_COND_TYPE  0x0f0	/* mask to select filter bits */
+#define FILT_COND_NONE  0x010	/* show all results */
+#define FILT_COND_FALSE 0x020	/* show only false results */
+#define FILT_COND_TRUE  0x030	/* show only true results */
+#define LOOP_NOTIFY 0x100	/* send loop results directly to enactor */
+#define LOOP_TWOLISTS   0x200	/* process two lists */
 
 /* from handle_okpres (hears, moves, knows): */
-#define PRESFN_OPER 0x0f    /* Mask to select bits */
-#define PRESFN_HEARS    0x01    /* Detect hearing */
-#define PRESFN_MOVES    0x02    /* Detect movement */
-#define PRESFN_KNOWS    0x04    /* Detect knows */
+#define PRESFN_OPER 0x0f	/* Mask to select bits */
+#define PRESFN_HEARS    0x01	/* Detect hearing */
+#define PRESFN_MOVES    0x02	/* Detect movement */
+#define PRESFN_KNOWS    0x04	/* Detect knows */
 
 /* from perform_get (get, get_eval, xget, eval(a,b)): */
-#define GET_EVAL    0x01    /* evaluate the attribute */
-#define GET_XARGS   0x02    /* obj and attr are two separate args */
+#define GET_EVAL    0x01	/* evaluate the attribute */
+#define GET_XARGS   0x02	/* obj and attr are two separate args */
 
 /* from handle_pop (pop, peek, toss): */
-#define POP_PEEK    0x01    /* don't remove item from stack */
-#define POP_TOSS    0x02    /* don't display item from stack */
+#define POP_PEEK    0x01	/* don't remove item from stack */
+#define POP_TOSS    0x02	/* don't display item from stack */
 
 /* from perform_regedit (regedit, regediti, regeditall, regeditalli): */
 /* from perform_regparse (regparse, regparsei): */
 /* from perform_regrab (regrab, regrabi, regraball, regraballi): */
 /* from perform_regmatch (regmatch, regmatchi): */
 /* from perform_grep (grep, grepi, wildgrep, regrep, regrepi): */
-#define REG_CASELESS    0x01    /* XXX must equal PCRE_CASELESS */
-#define REG_MATCH_ALL   0x02    /* operate on all matches in a list */
-#define REG_TYPE    0x0c    /* mask to select grep type bits */
+#define REG_CASELESS    0x01	/* XXX must equal PCRE_CASELESS */
+#define REG_MATCH_ALL   0x02	/* operate on all matches in a list */
+#define REG_TYPE    0x0c	/* mask to select grep type bits */
 #define GREP_EXACT  0
 #define GREP_WILD   4
 #define GREP_REGEXP 8
@@ -523,12 +523,12 @@ if ((l) > 0) { \
  * from handle_trig (sin, cos, tan, asin, acos, atan, sind, cosd, tand,
  * asind, acosd, atand):
  */
-#define TRIG_OPER   0x0f    /* mask to select trig function bits */
-#define TRIG_CO     0x01    /* co-function, like cos as opposed to sin */
-#define TRIG_TAN    0x02    /* tan-function, like cot as opposed to cos */
-#define TRIG_ARC    0x04    /* arc-function, like asin as opposed to sin */
+#define TRIG_OPER   0x0f	/* mask to select trig function bits */
+#define TRIG_CO     0x01	/* co-function, like cos as opposed to sin */
+#define TRIG_TAN    0x02	/* tan-function, like cot as opposed to cos */
+#define TRIG_ARC    0x04	/* arc-function, like asin as opposed to sin */
 /* #define TRIG_REC 0x08    -- reciprocal, like sec as opposed to sin */
-#define TRIG_DEG    0x10    /* angles are in degrees, not radians */
+#define TRIG_DEG    0x10	/* angles are in degrees, not radians */
 
 /* from handle_pronoun (obj, poss, subj, aposs): */
 #define PRONOUN_OBJ 0
@@ -537,27 +537,27 @@ if ((l) > 0) { \
 #define PRONOUN_APOSS   3
 
 /* from do_ufun(): */
-#define U_LOCAL     0x01    /* ulocal: preserve global registers */
-#define U_PRIVATE   0x02    /* ulocal: preserve global registers */
+#define U_LOCAL     0x01	/* ulocal: preserve global registers */
+#define U_PRIVATE   0x02	/* ulocal: preserve global registers */
 
 /* from handle_ifelse() and handle_if() */
-#define IFELSE_OPER 0x0f    /* mask */
-#define IFELSE_BOOL 0x01    /* check for boolean (defaults to nonzero) */
-#define IFELSE_FALSE    0x02    /* order false,true instead of true,false */
-#define IFELSE_DEFAULT  0x04    /* only two args, use condition as output */
-#define IFELSE_TOKEN    0x08    /* allow switch-token substitution */
+#define IFELSE_OPER 0x0f	/* mask */
+#define IFELSE_BOOL 0x01	/* check for boolean (defaults to nonzero) */
+#define IFELSE_FALSE    0x02	/* order false,true instead of true,false */
+#define IFELSE_DEFAULT  0x04	/* only two args, use condition as output */
+#define IFELSE_TOKEN    0x08	/* allow switch-token substitution */
 
 /* from handle_timestamps() */
-#define TIMESTAMP_MOD   0x01    /* lastmod() */
-#define TIMESTAMP_ACC   0X02    /* lastaccess() */
-#define TIMESTAMP_CRE   0x04    /* creation() */
+#define TIMESTAMP_MOD   0x01	/* lastmod() */
+#define TIMESTAMP_ACC   0X02	/* lastaccess() */
+#define TIMESTAMP_CRE   0x04	/* creation() */
 
 /* Miscellaneous */
-#define LATTR_COUNT 0x01    /* nattr: just return attribute count */
-#define LOCFN_WHERE 0x01    /* loc: where() vs. loc() */
-#define NAMEFN_FULLNAME 0x01    /* name: fullname() vs. name() */
-#define CHECK_PARENTS   0x01    /* hasattrp: recurse up the parent chain */
-#define CONNINFO_IDLE   0x01    /* conninfo: idle() vs. conn() */
-#define UCALL_SANDBOX   0x01    /* ucall: sandbox() vs. ucall() */
+#define LATTR_COUNT 0x01	/* nattr: just return attribute count */
+#define LOCFN_WHERE 0x01	/* loc: where() vs. loc() */
+#define NAMEFN_FULLNAME 0x01	/* name: fullname() vs. name() */
+#define CHECK_PARENTS   0x01	/* hasattrp: recurse up the parent chain */
+#define CONNINFO_IDLE   0x01	/* conninfo: idle() vs. conn() */
+#define UCALL_SANDBOX   0x01	/* ucall: sandbox() vs. ucall() */
 
-#endif  /* __FUNCTIONS_H */
+#endif				/* __FUNCTIONS_H */

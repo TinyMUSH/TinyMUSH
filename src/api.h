@@ -69,4 +69,4 @@ extern int cf_option(int *, char *, long, dbref, char *);
 extern int cf_set_flags(int *, char *, long, dbref, char *);
 extern int cf_string(int *, char *, long, dbref, char *);
 
-#endif  /* __API_H */
+#endif				/* __API_H */

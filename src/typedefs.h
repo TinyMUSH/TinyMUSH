@@ -36,7 +36,7 @@ struct str_linked_list {
 typedef struct named_function NAMEDFUNC;
 struct named_function {
     char *fn_name;
-    int ( *handler ) ( dbref );
+    int (*handler) (dbref);
 };
 
 typedef struct external_funcs EXTFUNCS;
@@ -57,20 +57,20 @@ struct global_register_data {
     int dirty;
 };
 
-typedef struct bque BQUE;   /* Command queue */
+typedef struct bque BQUE;	/* Command queue */
 struct bque {
-    BQUE    *next;
-    dbref   player;     /* player who will do command - halt is #-1 */
-    dbref   cause;      /* player causing command (for %N) */
-    int     pid;            /* internal process ID */
-    int waittime;   /* time to run command */
-    dbref   sem;        /* blocking semaphore */
-    int attr;       /* blocking attribute */
-    char    *text;      /* buffer for comm, env, and scr text */
-    char    *comm;      /* command */
-    char    *env[NUM_ENV_VARS]; /* environment vars */
-    GDATA   *gdata;     /* temp vars */
-    int nargs;      /* How many args I have */
+    BQUE *next;
+    dbref player;		/* player who will do command - halt is #-1 */
+    dbref cause;		/* player causing command (for %N) */
+    int pid;			/* internal process ID */
+    int waittime;		/* time to run command */
+    dbref sem;			/* blocking semaphore */
+    int attr;			/* blocking attribute */
+    char *text;			/* buffer for comm, env, and scr text */
+    char *comm;			/* command */
+    char *env[NUM_ENV_VARS];	/* environment vars */
+    GDATA *gdata;		/* temp vars */
+    int nargs;			/* How many args I have */
 };
 
-#endif  /* __TYPEDEFS_H */
+#endif				/* __TYPEDEFS_H */

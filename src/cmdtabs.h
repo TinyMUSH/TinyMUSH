@@ -1260,4 +1260,4 @@ NAMETAB     indiv_attraccess_nametab[] = {
 
 /* *INDENT-ON* */
 
-#endif  /* __CMDTABS_H */
+#endif				/* __CMDTABS_H */

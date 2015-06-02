@@ -324,4 +324,4 @@
     if (a & AF_WIZARD) *p++ = 'w'; \
     *p = '\0';
 
-#endif  /* __ATTRS_H */
+#endif				/* __ATTRS_H */

@@ -10,16 +10,16 @@
 typedef struct search_type SEARCH;
 struct search_type {
     int s_wizard;
-    dbref   s_owner;
-    dbref   s_rst_owner;
+    dbref s_owner;
+    dbref s_rst_owner;
     int s_rst_type;
     FLAGSET s_fset;
     POWERSET s_pset;
-    dbref   s_parent;
-    dbref   s_zone;
-    char    *s_rst_name;
-    char    *s_rst_eval;
-    char    *s_rst_ufuntxt;
+    dbref s_parent;
+    dbref s_zone;
+    char *s_rst_name;
+    char *s_rst_eval;
+    char *s_rst_ufuntxt;
     int low_bound;
     int high_bound;
 };
@@ -38,8 +38,8 @@ struct stats_type {
     int s_unknown;
 };
 
-extern int  search_setup ( dbref, char *, SEARCH * );
-extern void search_perform ( dbref, dbref, SEARCH * );
-extern int  get_stats ( dbref, dbref, STATS * );
+extern int search_setup(dbref, char *, SEARCH *);
+extern void search_perform(dbref, dbref, SEARCH *);
+extern int get_stats(dbref, dbref, STATS *);
 
-#endif  /* __WALKDB_H */
+#endif				/* __WALKDB_H */

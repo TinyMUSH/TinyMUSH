@@ -116,4 +116,4 @@ extern char ansi_lettab[I_ANSI_NUM];
 extern int ansi_mask_bits[I_ANSI_LIM];
 extern int ansi_bits[I_ANSI_LIM];
 
-#endif  /* __ANSI_H */
+#endif				/* __ANSI_H */

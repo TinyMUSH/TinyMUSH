@@ -17,16 +17,16 @@
 
 #define MANDFLAGS       (V_LINK|V_PARENT|V_XFLAGS|V_ZONE|V_POWERS|V_3FLAGS|V_QUOTED|V_TQUOTAS|V_TIMESTAMPS|V_VISUALATTRS|V_CREATETIME)
 
-#define OFLAGS1     (V_GDBM|V_ATRKEY)   /* GDBM has these */
+#define OFLAGS1     (V_GDBM|V_ATRKEY)	/* GDBM has these */
 
 #define OFLAGS2     (V_ATRNAME|V_ATRMONEY)
 
-#define OUTPUT_VERSION  1           /* Version 1 */
+#define OUTPUT_VERSION  1	/* Version 1 */
 #define OUTPUT_FLAGS    (MANDFLAGS|OFLAGS1|OFLAGS2)
 /* format for dumps */
 
-#define UNLOAD_VERSION  1           /* version for export */
-#define UNLOAD_OUTFLAGS (MANDFLAGS)     /* format for export */
+#define UNLOAD_VERSION  1	/* version for export */
+#define UNLOAD_OUTFLAGS (MANDFLAGS)	/* format for export */
 
 /* magic lock cookies */
 #define NOT_TOKEN   '!'
@@ -34,8 +34,8 @@
 #define OR_TOKEN    '|'
 #define LOOKUP_TOKEN    '*'
 #define NUMBER_TOKEN    '#'
-#define INDIR_TOKEN '@'     /* One of these two should go. */
-#define CARRY_TOKEN '+'     /* One of these two should go. */
+#define INDIR_TOKEN '@'		/* One of these two should go. */
+#define CARRY_TOKEN '+'		/* One of these two should go. */
 #define IS_TOKEN    '='
 #define OWNER_TOKEN '$'
 
@@ -69,7 +69,7 @@
 
 /* This is used as the 'null' delimiter for structures stored via write(). */
 
-#define GENERIC_STRUCT_DELIM        '\f'    /* form feed char */
+#define GENERIC_STRUCT_DELIM        '\f'	/* form feed char */
 #define GENERIC_STRUCT_STRDELIM     "\f"
 
 /* amount of object endowment, based on cost */
@@ -89,4 +89,4 @@
 
 #define PCRE_MAX_OFFSETS 99
 
-#endif  /* __GAME_H */
+#endif				/* __GAME_H */

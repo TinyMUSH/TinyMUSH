@@ -4,64 +4,63 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"           /* required by mudconf */
-#include "game.h" /* required by mudconf */
-#include "alloc.h" /* required by mudconf */
-#include "flags.h" /* required by mudconf */
-#include "htab.h" /* required by mudconf */
-#include "ltdl.h" /* required by mudconf */
-#include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
+#include "typedefs.h"		/* required by mudconf */
+#include "game.h"		/* required by mudconf */
+#include "alloc.h"		/* required by mudconf */
+#include "flags.h"		/* required by mudconf */
+#include "htab.h"		/* required by mudconf */
+#include "ltdl.h"		/* required by mudconf */
+#include "udb.h"		/* required by mudconf */
+#include "udb_defs.h"		/* required by mudconf */
 
-#include "mushconf.h"       /* required by code */
+#include "mushconf.h"		/* required by code */
 
-#include "db.h"         /* required by externs */
+#include "db.h"			/* required by externs */
 #include "interface.h"
-#include "externs.h"        /* required by code */
+#include "externs.h"		/* required by code */
 
-#include "command.h"        /* required by code */
-#include "powers.h"     /* required by code */
-#include "match.h"      /* required by code */
-#include "ansi.h"       /* required by code */
+#include "command.h"		/* required by code */
+#include "powers.h"		/* required by code */
+#include "match.h"		/* required by code */
+#include "ansi.h"		/* required by code */
 
 /*
  * ---------------------------------------------------------------------------
  * fh_any: set or clear indicated bit, no security checking
  */
 
-int fh_any ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_any(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     /*
      * Never let God drop his own wizbit.
      */
-    if ( God ( target ) && reset && ( flag == WIZARD ) &&
-            ! ( fflags & FLAG_WORD2 ) && ! ( fflags & FLAG_WORD3 ) ) {
-        notify ( player, "You cannot make God mortal." );
-        return 0;
+    if (God(target) && reset && (flag == WIZARD) && !(fflags & FLAG_WORD2) && !(fflags & FLAG_WORD3)) {
+	notify(player, "You cannot make God mortal.");
+	return 0;
     }
 
     /*
      * Otherwise we can go do it.
      */
 
-    if ( fflags & FLAG_WORD3 ) {
-        if ( reset ) {
-            s_Flags3 ( target, Flags3 ( target ) & ~flag );
-        } else {
-            s_Flags3 ( target, Flags3 ( target ) | flag );
-        }
-    } else if ( fflags & FLAG_WORD2 ) {
-        if ( reset ) {
-            s_Flags2 ( target, Flags2 ( target ) & ~flag );
-        } else {
-            s_Flags2 ( target, Flags2 ( target ) | flag );
-        }
+    if (fflags & FLAG_WORD3) {
+	if (reset) {
+	    s_Flags3(target, Flags3(target) & ~flag);
+	} else {
+	    s_Flags3(target, Flags3(target) | flag);
+	}
+    } else if (fflags & FLAG_WORD2) {
+	if (reset) {
+	    s_Flags2(target, Flags2(target) & ~flag);
+	} else {
+	    s_Flags2(target, Flags2(target) | flag);
+	}
     } else {
-        if ( reset ) {
-            s_Flags ( target, Flags ( target ) & ~flag );
-        } else {
-            s_Flags ( target, Flags ( target ) | flag );
-        }
+	if (reset) {
+	    s_Flags(target, Flags(target) & ~flag);
+	} else {
+	    s_Flags(target, Flags(target) | flag);
+	}
     }
 
     return 1;
@@ -72,13 +71,13 @@ int fh_any ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_god: only GOD may set or clear the bit
  */
 
-int fh_god ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_god(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( !God ( player ) ) {
-        return 0;
+    if (!God(player)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -86,13 +85,13 @@ int fh_god ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_wiz: only WIZARDS (or GOD) may set or clear the bit
  */
 
-int fh_wiz ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_wiz(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( !Wizard ( player ) && !God ( player ) ) {
-        return 0;
+    if (!Wizard(player) && !God(player)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -100,13 +99,13 @@ int fh_wiz ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_wizroy: only WIZARDS, ROYALTY, (or GOD) may set or clear the bit
  */
 
-int fh_wizroy ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_wizroy(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( !WizRoy ( player ) && !God ( player ) ) {
-        return 0;
+    if (!WizRoy(player) && !God(player)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -115,13 +114,13 @@ int fh_wizroy ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * players can set it on other types of objects.
  */
 
-int fh_restrict_player ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_restrict_player(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( isPlayer ( target ) && !Wizard ( player ) && !God ( player ) ) {
-        return 0;
+    if (isPlayer(target) && !Wizard(player) && !God(player)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -131,33 +130,33 @@ int fh_restrict_player ( dbref target, dbref player, FLAG flag, int fflags, int 
  * robots). Only God can set this on a player.
  */
 
-int fh_privileged ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_privileged(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     int has_it;
 
-    if ( !God ( player ) ) {
-        if ( !isPlayer ( player ) || ( player != Owner ( player ) ) ) {
-            return 0;
-        }
+    if (!God(player)) {
+	if (!isPlayer(player) || (player != Owner(player))) {
+	    return 0;
+	}
 
-        if ( isPlayer ( target ) ) {
-            return 0;
-        }
+	if (isPlayer(target)) {
+	    return 0;
+	}
 
-        if ( fflags & FLAG_WORD3 ) {
-            has_it = ( Flags3 ( player ) & flag ) ? 1 : 0;
-        } else if ( fflags & FLAG_WORD2 ) {
-            has_it = ( Flags2 ( player ) & flag ) ? 1 : 0;
-        } else {
-            has_it = ( Flags ( player ) & flag ) ? 1 : 0;
-        }
+	if (fflags & FLAG_WORD3) {
+	    has_it = (Flags3(player) & flag) ? 1 : 0;
+	} else if (fflags & FLAG_WORD2) {
+	    has_it = (Flags2(player) & flag) ? 1 : 0;
+	} else {
+	    has_it = (Flags(player) & flag) ? 1 : 0;
+	}
 
-        if ( !has_it ) {
-            return 0;
-        }
+	if (!has_it) {
+	    return 0;
+	}
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -165,13 +164,13 @@ int fh_privileged ( dbref target, dbref player, FLAG flag, int fflags, int reset
  * fh_inherit: only players may set or clear this bit.
  */
 
-int fh_inherit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_inherit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( !Inherits ( player ) ) {
-        return 0;
+    if (!Inherits(player)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -179,14 +178,13 @@ int fh_inherit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_dark_bit: manipulate the dark bit. Nonwizards may not set on players.
  */
 
-int fh_dark_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_dark_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( !reset && isPlayer ( target ) && ! ( ( target == player ) &&
-            Can_Hide ( player ) ) && ( !Wizard ( player ) && !God ( player ) ) ) {
-        return 0;
+    if (!reset && isPlayer(target) && !((target == player) && Can_Hide(player)) && (!Wizard(player) && !God(player))) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -196,19 +194,18 @@ int fh_dark_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * destroy nondestroyable objects.
  */
 
-int fh_going_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_going_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( Going ( target ) && reset && ( Typeof ( target ) != TYPE_GARBAGE ) ) {
-        notify ( player,
-                 "Your object has been spared from destruction." );
-        return ( fh_any ( target, player, flag, fflags, reset ) );
+    if (Going(target) && reset && (Typeof(target) != TYPE_GARBAGE)) {
+	notify(player, "Your object has been spared from destruction.");
+	return (fh_any(target, player, flag, fflags, reset));
     }
 
-    if ( !God ( player ) || !destroyable ( target ) ) {
-        return 0;
+    if (!God(player) || !destroyable(target)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -216,13 +213,13 @@ int fh_going_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset 
  * fh_hear_bit: set or clear bits that affect hearing.
  */
 
-int fh_hear_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_hear_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     int could_hear;
     int result;
-    could_hear = Hearer ( target );
-    result = fh_any ( target, player, flag, fflags, reset );
-    handle_ears ( target, could_hear, Hearer ( target ) );
+    could_hear = Hearer(target);
+    result = fh_any(target, player, flag, fflags, reset);
+    handle_ears(target, could_hear, Hearer(target));
     return result;
 }
 
@@ -231,13 +228,13 @@ int fh_hear_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
  * fh_player_bit: Can set and reset this on everything but players.
  */
 
-int fh_player_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_player_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( isPlayer ( target ) ) {
-        return 0;
+    if (isPlayer(target)) {
+	return 0;
     }
 
-    return ( fh_any ( target, player, flag, fflags, reset ) );
+    return (fh_any(target, player, flag, fflags, reset));
 }
 
 /*
@@ -245,19 +242,18 @@ int fh_player_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset
  * fh_power_bit: Check power bit to set/reset.
  */
 
-int fh_power_bit ( dbref target, dbref player, FLAG flag, int fflags, int reset )
+int fh_power_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
-    if ( flag & WATCHER ) {
-        /*
-         * Wizards can set this on anything. Players with the Watch
-         * power can set this on themselves.
-         */
-        if ( Wizard ( player ) ||
-                ( ( Owner ( player ) == Owner ( target ) ) && Can_Watch ( player ) ) ) {
-            return ( fh_any ( target, player, flag, fflags, reset ) );
-        } else {
-            return 0;
-        }
+    if (flag & WATCHER) {
+	/*
+	 * Wizards can set this on anything. Players with the Watch
+	 * power can set this on themselves.
+	 */
+	if (Wizard(player) || ((Owner(player) == Owner(target)) && Can_Watch(player))) {
+	    return (fh_any(target, player, flag, fflags, reset));
+	} else {
+	    return 0;
+	}
     }
 
     return 0;
@@ -371,14 +367,13 @@ OBJENT  object_types[8] = {
  * init_flagtab: initialize flag hash tables.
  */
 
-void init_flagtab ( void )
+void init_flagtab(void)
 {
     FLAGENT *fp;
-    hashinit ( &mudstate.flags_htab, 100 * mudconf.hash_factor, HT_STR | HT_KEYREF );
+    hashinit(&mudstate.flags_htab, 100 * mudconf.hash_factor, HT_STR | HT_KEYREF);
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        hashadd ( ( char * ) fp->flagname, ( int * ) fp, &mudstate.flags_htab,
-                  0 );
+    for (fp = gen_flags; fp->flagname; fp++) {
+	hashadd((char *) fp->flagname, (int *) fp, &mudstate.flags_htab, 0);
     }
 }
 
@@ -387,35 +382,35 @@ void init_flagtab ( void )
  * display_flags: display available flags.
  */
 
-void display_flagtab ( dbref player )
+void display_flagtab(dbref player)
 {
     char *buf, *bp;
     FLAGENT *fp;
-    bp = buf = alloc_lbuf ( "display_flagtab" );
-    safe_str ( ( char * ) "Flags:", buf, &bp );
+    bp = buf = alloc_lbuf("display_flagtab");
+    safe_str((char *) "Flags:", buf, &bp);
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        if ( ( fp->listperm & CA_WIZARD ) && !Wizard ( player ) ) {
-            continue;
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	if ((fp->listperm & CA_WIZARD) && !Wizard(player)) {
+	    continue;
+	}
 
-        if ( ( fp->listperm & CA_GOD ) && !God ( player ) ) {
-            continue;
-        }
+	if ((fp->listperm & CA_GOD) && !God(player)) {
+	    continue;
+	}
 
-        safe_chr ( ' ', buf, &bp );
-        safe_str ( ( char * ) fp->flagname, buf, &bp );
-        safe_chr ( '(', buf, &bp );
-        safe_chr ( fp->flaglett, buf, &bp );
-        safe_chr ( ')', buf, &bp );
+	safe_chr(' ', buf, &bp);
+	safe_str((char *) fp->flagname, buf, &bp);
+	safe_chr('(', buf, &bp);
+	safe_chr(fp->flaglett, buf, &bp);
+	safe_chr(')', buf, &bp);
     }
 
     *bp = '\0';
-    notify ( player, buf );
-    free_lbuf ( buf );
+    notify(player, buf);
+    free_lbuf(buf);
 }
 
-FLAGENT *find_flag ( dbref thing, char *flagname )
+FLAGENT *find_flag(dbref thing, char *flagname)
 {
     char *cp;
 
@@ -423,11 +418,11 @@ FLAGENT *find_flag ( dbref thing, char *flagname )
      * Make sure the flag name is valid
      */
 
-    for ( cp = flagname; *cp; cp++ ) {
-        *cp = toupper ( *cp );
+    for (cp = flagname; *cp; cp++) {
+	*cp = toupper(*cp);
     }
 
-    return ( FLAGENT * ) hashfind ( flagname, &mudstate.flags_htab );
+    return (FLAGENT *) hashfind(flagname, &mudstate.flags_htab);
 }
 
 /*
@@ -435,7 +430,7 @@ FLAGENT *find_flag ( dbref thing, char *flagname )
  * flag_set: Set or clear a specified flag on an object.
  */
 
-void flag_set ( dbref target, dbref player, char *flag, int key )
+void flag_set(dbref target, dbref player, char *flag, int key)
 {
     FLAGENT *fp;
     int negate, result;
@@ -444,51 +439,50 @@ void flag_set ( dbref target, dbref player, char *flag, int key )
      */
     negate = 0;
 
-    while ( *flag && isspace ( *flag ) ) {
-        flag++;
+    while (*flag && isspace(*flag)) {
+	flag++;
     }
 
-    if ( *flag == '!' ) {
-        negate = 1;
-        flag++;
+    if (*flag == '!') {
+	negate = 1;
+	flag++;
     }
 
-    while ( *flag && isspace ( *flag ) ) {
-        flag++;
+    while (*flag && isspace(*flag)) {
+	flag++;
     }
 
     /*
      * Make sure a flag name was specified
      */
 
-    if ( *flag == '\0' ) {
-        if ( negate ) {
-            notify ( player, "You must specify a flag to clear." );
-        } else {
-            notify ( player, "You must specify a flag to set." );
-        }
+    if (*flag == '\0') {
+	if (negate) {
+	    notify(player, "You must specify a flag to clear.");
+	} else {
+	    notify(player, "You must specify a flag to set.");
+	}
 
-        return;
+	return;
     }
 
-    fp = find_flag ( target, flag );
+    fp = find_flag(target, flag);
 
-    if ( fp == NULL ) {
-        notify ( player, "I don't understand that flag." );
-        return;
+    if (fp == NULL) {
+	notify(player, "I don't understand that flag.");
+	return;
     }
 
     /*
      * Invoke the flag handler, and print feedback
      */
-    result = fp->handler ( target, player, fp->flagvalue,
-                           fp->flagflag, negate );
+    result = fp->handler(target, player, fp->flagvalue, fp->flagflag, negate);
 
-    if ( !result ) {
-        notify ( player, NOPERM_MESSAGE );
-    } else if ( ! ( key & SET_QUIET ) && !Quiet ( player ) ) {
-        notify ( player, ( negate ? "Cleared." : "Set." ) );
-        s_Modified ( target );
+    if (!result) {
+	notify(player, NOPERM_MESSAGE);
+    } else if (!(key & SET_QUIET) && !Quiet(player)) {
+	notify(player, (negate ? "Cleared." : "Set."));
+	s_Modified(target);
     }
 
     return;
@@ -499,40 +493,40 @@ void flag_set ( dbref target, dbref player, char *flag, int key )
  * decode_flags: converts a flag set into corresponding letters.
  */
 
-char *decode_flags ( dbref player, FLAGSET flagset )
+char *decode_flags(dbref player, FLAGSET flagset)
 {
     char *buf, *bp, *s;
     FLAGENT *fp;
     int flagtype;
     FLAG fv;
-    buf = bp = s = alloc_sbuf ( "decode_flags" );
+    buf = bp = s = alloc_sbuf("decode_flags");
     *bp = '\0';
-    flagtype = ( flagset.word1 & TYPE_MASK );
+    flagtype = (flagset.word1 & TYPE_MASK);
 
-    if ( object_types[flagtype].lett != ' ' ) {
-        safe_sb_chr ( object_types[flagtype].lett, buf, &bp );
+    if (object_types[flagtype].lett != ' ') {
+	safe_sb_chr(object_types[flagtype].lett, buf, &bp);
     }
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        if ( fp->flagflag & FLAG_WORD3 ) {
-            fv = flagset.word3;
-        } else if ( fp->flagflag & FLAG_WORD2 ) {
-            fv = flagset.word2;
-        } else {
-            fv = flagset.word1;
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	if (fp->flagflag & FLAG_WORD3) {
+	    fv = flagset.word3;
+	} else if (fp->flagflag & FLAG_WORD2) {
+	    fv = flagset.word2;
+	} else {
+	    fv = flagset.word1;
+	}
 
-        if ( fv & fp->flagvalue ) {
-            if ( ( fp->listperm & CA_WIZARD ) && !Wizard ( player ) ) {
-                continue;
-            }
+	if (fv & fp->flagvalue) {
+	    if ((fp->listperm & CA_WIZARD) && !Wizard(player)) {
+		continue;
+	    }
 
-            if ( ( fp->listperm & CA_GOD ) && !God ( player ) ) {
-                continue;
-            }
+	    if ((fp->listperm & CA_GOD) && !God(player)) {
+		continue;
+	    }
 
-            safe_sb_chr ( fp->flaglett, buf, &bp );
-        }
+	    safe_sb_chr(fp->flaglett, buf, &bp);
+	}
     }
 
     *bp = '\0';
@@ -544,69 +538,67 @@ char *decode_flags ( dbref player, FLAGSET flagset )
  * unparse_flags: converts a thing's flags into corresponding letters.
  */
 
-char *unparse_flags ( dbref player, dbref thing )
+char *unparse_flags(dbref player, dbref thing)
 {
     char *buf, *bp, *s;
     FLAGENT *fp;
     int flagtype;
     FLAG fv, flagword, flag2word, flag3word;
-    buf = bp = s = alloc_sbuf ( "unparse_flags" );
+    buf = bp = s = alloc_sbuf("unparse_flags");
     *bp = '\0';
 
-    if ( !Good_obj ( player ) || !Good_obj ( thing ) ) {
-        strcpy ( buf, "#-2 ERROR" );
-        return buf;
+    if (!Good_obj(player) || !Good_obj(thing)) {
+	strcpy(buf, "#-2 ERROR");
+	return buf;
     }
 
-    flagword = Flags ( thing );
-    flag2word = Flags2 ( thing );
-    flag3word = Flags3 ( thing );
-    flagtype = ( flagword & TYPE_MASK );
+    flagword = Flags(thing);
+    flag2word = Flags2(thing);
+    flag3word = Flags3(thing);
+    flagtype = (flagword & TYPE_MASK);
 
-    if ( object_types[flagtype].lett != ' ' ) {
-        safe_sb_chr ( object_types[flagtype].lett, buf, &bp );
+    if (object_types[flagtype].lett != ' ') {
+	safe_sb_chr(object_types[flagtype].lett, buf, &bp);
     }
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        if ( fp->flagflag & FLAG_WORD3 ) {
-            fv = flag3word;
-        } else if ( fp->flagflag & FLAG_WORD2 ) {
-            fv = flag2word;
-        } else {
-            fv = flagword;
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	if (fp->flagflag & FLAG_WORD3) {
+	    fv = flag3word;
+	} else if (fp->flagflag & FLAG_WORD2) {
+	    fv = flag2word;
+	} else {
+	    fv = flagword;
+	}
 
-        if ( fv & fp->flagvalue ) {
-            if ( ( fp->listperm & CA_WIZARD ) && !Wizard ( player ) ) {
-                continue;
-            }
+	if (fv & fp->flagvalue) {
+	    if ((fp->listperm & CA_WIZARD) && !Wizard(player)) {
+		continue;
+	    }
 
-            if ( ( fp->listperm & CA_GOD ) && !God ( player ) ) {
-                continue;
-            }
+	    if ((fp->listperm & CA_GOD) && !God(player)) {
+		continue;
+	    }
 
-            /*
-             * don't show CONNECT on dark wizards to mortals
-             */
+	    /*
+	     * don't show CONNECT on dark wizards to mortals
+	     */
 
-            if ( ( flagtype == TYPE_PLAYER ) && isConnFlag ( fp ) &&
-                    Can_Hide ( thing ) && Hidden ( thing ) &&
-                    !See_Hidden ( player ) ) {
-                continue;
-            }
+	    if ((flagtype == TYPE_PLAYER) && isConnFlag(fp) && Can_Hide(thing) && Hidden(thing) && !See_Hidden(player)) {
+		continue;
+	    }
 
-            /*
-             * Check if this is a marker flag and we're at the
-             * beginning of a buffer. If so, we need to insert a
-             * separator character first so we don't end up
-             * running the dbref number into the flags.
-             */
-            if ( ( s == bp ) && isMarkerFlag ( fp ) ) {
-                safe_sb_chr ( mudconf.flag_sep[0], buf, &bp );
-            }
+	    /*
+	     * Check if this is a marker flag and we're at the
+	     * beginning of a buffer. If so, we need to insert a
+	     * separator character first so we don't end up
+	     * running the dbref number into the flags.
+	     */
+	    if ((s == bp) && isMarkerFlag(fp)) {
+		safe_sb_chr(mudconf.flag_sep[0], buf, &bp);
+	    }
 
-            safe_sb_chr ( fp->flaglett, buf, &bp );
-        }
+	    safe_sb_chr(fp->flaglett, buf, &bp);
+	}
     }
 
     *bp = '\0';
@@ -618,58 +610,57 @@ char *unparse_flags ( dbref player, dbref thing )
  * has_flag: does object have flag visible to player?
  */
 
-int has_flag ( dbref player, dbref it, char *flagname )
+int has_flag(dbref player, dbref it, char *flagname)
 {
     FLAGENT *fp;
     FLAG fv;
-    fp = find_flag ( it, flagname );
+    fp = find_flag(it, flagname);
 
-    if ( fp == NULL ) { /* find_flag() uppercases the string */
-        if ( !strcmp ( flagname, "PLAYER" ) ) {
-            return isPlayer ( it );
-        }
+    if (fp == NULL) {		/* find_flag() uppercases the string */
+	if (!strcmp(flagname, "PLAYER")) {
+	    return isPlayer(it);
+	}
 
-        if ( !strcmp ( flagname, "THING" ) ) {
-            return isThing ( it );
-        }
+	if (!strcmp(flagname, "THING")) {
+	    return isThing(it);
+	}
 
-        if ( !strcmp ( flagname, "ROOM" ) ) {
-            return isRoom ( it );
-        }
+	if (!strcmp(flagname, "ROOM")) {
+	    return isRoom(it);
+	}
 
-        if ( !strcmp ( flagname, "EXIT" ) ) {
-            return isExit ( it );
-        }
+	if (!strcmp(flagname, "EXIT")) {
+	    return isExit(it);
+	}
 
-        return 0;
+	return 0;
     }
 
-    if ( fp->flagflag & FLAG_WORD3 ) {
-        fv = Flags3 ( it );
-    } else if ( fp->flagflag & FLAG_WORD2 ) {
-        fv = Flags2 ( it );
+    if (fp->flagflag & FLAG_WORD3) {
+	fv = Flags3(it);
+    } else if (fp->flagflag & FLAG_WORD2) {
+	fv = Flags2(it);
     } else {
-        fv = Flags ( it );
+	fv = Flags(it);
     }
 
-    if ( fv & fp->flagvalue ) {
-        if ( ( fp->listperm & CA_WIZARD ) && !Wizard ( player ) ) {
-            return 0;
-        }
+    if (fv & fp->flagvalue) {
+	if ((fp->listperm & CA_WIZARD) && !Wizard(player)) {
+	    return 0;
+	}
 
-        if ( ( fp->listperm & CA_GOD ) && !God ( player ) ) {
-            return 0;
-        }
+	if ((fp->listperm & CA_GOD) && !God(player)) {
+	    return 0;
+	}
 
-        /*
-         * don't show CONNECT on dark wizards to mortals
-         */
-        if ( isPlayer ( it ) && isConnFlag ( fp ) &&
-                Can_Hide ( it ) && Hidden ( it ) && !See_Hidden ( player ) ) {
-            return 0;
-        }
+	/*
+	 * don't show CONNECT on dark wizards to mortals
+	 */
+	if (isPlayer(it) && isConnFlag(fp) && Can_Hide(it) && Hidden(it) && !See_Hidden(player)) {
+	    return 0;
+	}
 
-        return 1;
+	return 1;
     }
 
     return 0;
@@ -680,7 +671,7 @@ int has_flag ( dbref player, dbref it, char *flagname )
  * flag_description: Return an mbuf containing the type and flags on thing.
  */
 
-char *flag_description ( dbref player, dbref target )
+char *flag_description(dbref player, dbref target)
 {
     char *buff, *bp;
     FLAGENT *fp;
@@ -689,53 +680,51 @@ char *flag_description ( dbref player, dbref target )
     /*
      * Allocate the return buffer
      */
-    otype = Typeof ( target );
-    bp = buff = alloc_mbuf ( "flag_description" );
+    otype = Typeof(target);
+    bp = buff = alloc_mbuf("flag_description");
     /*
      * Store the header strings and object type
      */
-    safe_mb_str ( ( char * ) "Type: ", buff, &bp );
-    safe_mb_str ( ( char * ) object_types[otype].name, buff, &bp );
-    safe_mb_str ( ( char * ) " Flags:", buff, &bp );
+    safe_mb_str((char *) "Type: ", buff, &bp);
+    safe_mb_str((char *) object_types[otype].name, buff, &bp);
+    safe_mb_str((char *) " Flags:", buff, &bp);
 
-    if ( object_types[otype].perm != CA_PUBLIC ) {
-        return buff;
+    if (object_types[otype].perm != CA_PUBLIC) {
+	return buff;
     }
 
     /*
      * Store the type-invariant flags
      */
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        if ( fp->flagflag & FLAG_WORD3 ) {
-            fv = Flags3 ( target );
-        } else if ( fp->flagflag & FLAG_WORD2 ) {
-            fv = Flags2 ( target );
-        } else {
-            fv = Flags ( target );
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	if (fp->flagflag & FLAG_WORD3) {
+	    fv = Flags3(target);
+	} else if (fp->flagflag & FLAG_WORD2) {
+	    fv = Flags2(target);
+	} else {
+	    fv = Flags(target);
+	}
 
-        if ( fv & fp->flagvalue ) {
-            if ( ( fp->listperm & CA_WIZARD ) && !Wizard ( player ) ) {
-                continue;
-            }
+	if (fv & fp->flagvalue) {
+	    if ((fp->listperm & CA_WIZARD) && !Wizard(player)) {
+		continue;
+	    }
 
-            if ( ( fp->listperm & CA_GOD ) && !God ( player ) ) {
-                continue;
-            }
+	    if ((fp->listperm & CA_GOD) && !God(player)) {
+		continue;
+	    }
 
-            /*
-             * don't show CONNECT on dark wizards to mortals
-             */
-            if ( isPlayer ( target ) && isConnFlag ( fp ) &&
-                    Can_Hide ( target ) && Hidden ( target ) &&
-                    !See_Hidden ( player ) ) {
-                continue;
-            }
+	    /*
+	     * don't show CONNECT on dark wizards to mortals
+	     */
+	    if (isPlayer(target) && isConnFlag(fp) && Can_Hide(target) && Hidden(target) && !See_Hidden(player)) {
+		continue;
+	    }
 
-            safe_mb_chr ( ' ', buff, &bp );
-            safe_mb_str ( ( char * ) fp->flagname, buff, &bp );
-        }
+	    safe_mb_chr(' ', buff, &bp);
+	    safe_mb_str((char *) fp->flagname, buff, &bp);
+	}
     }
 
     return buff;
@@ -747,22 +736,22 @@ char *flag_description ( dbref player, dbref target )
  * Return an lbuf containing the name and number of an object
  */
 
-char *unparse_object_numonly ( dbref target )
+char *unparse_object_numonly(dbref target)
 {
     char *buf, *bp;
-    buf = alloc_lbuf ( "unparse_object_numonly" );
+    buf = alloc_lbuf("unparse_object_numonly");
 
-    if ( target == NOTHING ) {
-        strcpy ( buf, "*NOTHING*" );
-    } else if ( target == HOME ) {
-        strcpy ( buf, "*HOME*" );
-    } else if ( target == AMBIGUOUS ) {
-        strcpy ( buf, "*VARIABLE*" );
-    } else if ( !Good_obj ( target ) ) {
-        sprintf ( buf, "*ILLEGAL*(#%d)", target );
+    if (target == NOTHING) {
+	strcpy(buf, "*NOTHING*");
+    } else if (target == HOME) {
+	strcpy(buf, "*HOME*");
+    } else if (target == AMBIGUOUS) {
+	strcpy(buf, "*VARIABLE*");
+    } else if (!Good_obj(target)) {
+	sprintf(buf, "*ILLEGAL*(#%d)", target);
     } else {
-        bp = buf;
-        safe_sprintf ( buf, &bp, "%s(#%d)", Name ( target ), target );
+	bp = buf;
+	safe_sprintf(buf, &bp, "%s(#%d)", Name(target), target);
     }
 
     return buf;
@@ -773,48 +762,46 @@ char *unparse_object_numonly ( dbref target )
  * Return an lbuf pointing to the object name and possibly the db# and flags
  */
 
-char *unparse_object ( dbref player, dbref target, int obey_myopic )
+char *unparse_object(dbref player, dbref target, int obey_myopic)
 {
     char *buf, *fp, *bp;
     int exam;
-    buf = alloc_lbuf ( "unparse_object" );
+    buf = alloc_lbuf("unparse_object");
 
-    if ( target == NOTHING ) {
-        strcpy ( buf, "*NOTHING*" );
-    } else if ( target == HOME ) {
-        strcpy ( buf, "*HOME*" );
-    } else if ( target == AMBIGUOUS ) {
-        strcpy ( buf, "*VARIABLE*" );
-    } else if ( isGarbage ( target ) ) {
-        fp = unparse_flags ( player, target );
-        bp = buf;
-        safe_sprintf ( buf, &bp, "*GARBAGE*(#%d%s)", target, fp );
-        free_sbuf ( fp );
-    } else if ( !Good_obj ( target ) ) {
-        sprintf ( buf, "*ILLEGAL*(#%d)", target );
+    if (target == NOTHING) {
+	strcpy(buf, "*NOTHING*");
+    } else if (target == HOME) {
+	strcpy(buf, "*HOME*");
+    } else if (target == AMBIGUOUS) {
+	strcpy(buf, "*VARIABLE*");
+    } else if (isGarbage(target)) {
+	fp = unparse_flags(player, target);
+	bp = buf;
+	safe_sprintf(buf, &bp, "*GARBAGE*(#%d%s)", target, fp);
+	free_sbuf(fp);
+    } else if (!Good_obj(target)) {
+	sprintf(buf, "*ILLEGAL*(#%d)", target);
     } else {
-        if ( obey_myopic ) {
-            exam = MyopicExam ( player, target );
-        } else {
-            exam = Examinable ( player, target );
-        }
+	if (obey_myopic) {
+	    exam = MyopicExam(player, target);
+	} else {
+	    exam = Examinable(player, target);
+	}
 
-        if ( exam ||
-                ( Flags ( target ) & ( CHOWN_OK | JUMP_OK | LINK_OK |
-                                       DESTROY_OK ) ) || ( Flags2 ( target ) & ABODE ) ) {
-            /*
-             * show everything
-             */
-            fp = unparse_flags ( player, target );
-            bp = buf;
-            safe_sprintf ( buf, &bp, "%s(#%d%s)", Name ( target ), target, fp );
-            free_sbuf ( fp );
-        } else {
-            /*
-             * show only the name.
-             */
-            strcpy ( buf, Name ( target ) );
-        }
+	if (exam || (Flags(target) & (CHOWN_OK | JUMP_OK | LINK_OK | DESTROY_OK)) || (Flags2(target) & ABODE)) {
+	    /*
+	     * show everything
+	     */
+	    fp = unparse_flags(player, target);
+	    bp = buf;
+	    safe_sprintf(buf, &bp, "%s(#%d%s)", Name(target), target, fp);
+	    free_sbuf(fp);
+	} else {
+	    /*
+	     * show only the name.
+	     */
+	    strcpy(buf, Name(target));
+	}
     }
 
     return buf;
@@ -826,14 +813,14 @@ char *unparse_object ( dbref player, dbref target, int obey_myopic )
  * pointer.
  */
 
-FLAGENT *letter_to_flag ( char this_letter )
+FLAGENT *letter_to_flag(char this_letter)
 {
     FLAGENT *fp;
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        if ( fp->flaglett == this_letter ) {
-            return fp;
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	if (fp->flaglett == this_letter) {
+	    return fp;
+	}
     }
 
     return NULL;
@@ -844,51 +831,46 @@ FLAGENT *letter_to_flag ( char this_letter )
  * cf_flag_access: Modify who can set a flag.
  */
 
-int cf_flag_access ( int *vp, char *str, long extra, dbref player, char *cmd )
+int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     char *fstr, *permstr, *tokst;
     FLAGENT *fp;
-    fstr = strtok_r ( str, " \t=,", &tokst );
-    permstr = strtok_r ( NULL, " \t=,", &tokst );
+    fstr = strtok_r(str, " \t=,", &tokst);
+    permstr = strtok_r(NULL, " \t=,", &tokst);
 
-    if ( !fstr || !*fstr || !permstr || !*permstr ) {
-        return -1;
+    if (!fstr || !*fstr || !permstr || !*permstr) {
+	return -1;
     }
 
-    if ( ( fp = find_flag ( GOD, fstr ) ) == NULL ) {
-        cf_log_notfound ( player, cmd, "No such flag", fstr );
-        return -1;
+    if ((fp = find_flag(GOD, fstr)) == NULL) {
+	cf_log_notfound(player, cmd, "No such flag", fstr);
+	return -1;
     }
 
     /*
      * Don't change the handlers on special things.
      */
 
-    if ( ( fp->handler != fh_any ) &&
-            ( fp->handler != fh_wizroy ) &&
-            ( fp->handler != fh_wiz ) &&
-            ( fp->handler != fh_god ) &&
-            ( fp->handler != fh_restrict_player ) &&
-            ( fp->handler != fh_privileged ) ) {
-        log_write ( LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for flag: %s", fp->flagname );
-        return -1;
+    if ((fp->handler != fh_any) && (fp->handler != fh_wizroy) && (fp->handler != fh_wiz) && (fp->handler != fh_god) && (fp->handler != fh_restrict_player) && (fp->handler != fh_privileged)) {
+	log_write(LOG_CONFIGMODS, "CFG", "PERM", "Cannot change access for flag: %s", fp->flagname);
+	return -1;
     }
 
-    if ( !strcmp ( permstr, ( char * ) "any" ) ) {
-        fp->handler = fh_any;
-    } else if ( !strcmp ( permstr, ( char * ) "royalty" ) ) {
-        fp->handler = fh_wizroy;
-    } else if ( !strcmp ( permstr, ( char * ) "wizard" ) ) {
-        fp->handler = fh_wiz;
-    } else if ( !strcmp ( permstr, ( char * ) "god" ) ) {
-        fp->handler = fh_god;
-    } else if ( !strcmp ( permstr, ( char * ) "restrict_player" ) ) {
-        fp->handler = fh_restrict_player;
-    } else if ( !strcmp ( permstr, ( char * ) "privileged" ) ) {
-        fp->handler = fh_privileged;
+    if (!strcmp(permstr, (char *) "any")) {
+	fp->handler = fh_any;
+    } else if (!strcmp(permstr, (char *) "royalty")) {
+	fp->handler = fh_wizroy;
+    } else if (!strcmp(permstr, (char *) "wizard")) {
+	fp->handler = fh_wiz;
+    } else if (!strcmp(permstr, (char *) "god")) {
+	fp->handler = fh_god;
+    } else if (!strcmp(permstr, (char *) "restrict_player")) {
+	fp->handler = fh_restrict_player;
+    } else if (!strcmp(permstr, (char *) "privileged")) {
+	fp->handler = fh_privileged;
     } else {
-        cf_log_notfound ( player, cmd, "Flag access", permstr );
-        return -1;
+	cf_log_notfound(player, cmd, "Flag access", permstr);
+	return -1;
     }
 
     return 0;
@@ -899,27 +881,27 @@ int cf_flag_access ( int *vp, char *str, long extra, dbref player, char *cmd )
  * cf_flag_name: Modify the name of a user-defined flag.
  */
 
-int cf_flag_name ( int *vp, char *str, long extra, dbref player, char *cmd )
+int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     char *numstr, *namestr, *tokst;
     FLAGENT *fp;
     int flagnum = -1;
     char *flagstr, *cp;
-    numstr = strtok_r ( str, " \t=,", &tokst );
-    namestr = strtok_r ( NULL, " \t=,", &tokst );
+    numstr = strtok_r(str, " \t=,", &tokst);
+    namestr = strtok_r(NULL, " \t=,", &tokst);
 
-    if ( numstr && ( strlen ( numstr ) == 1 ) ) {
-        flagnum = ( int ) strtol ( numstr, ( char ** ) NULL, 10 );
+    if (numstr && (strlen(numstr) == 1)) {
+	flagnum = (int) strtol(numstr, (char **) NULL, 10);
     }
 
-    if ( ( flagnum < 0 ) || ( flagnum > 9 ) ) {
-        cf_log_notfound ( player, cmd, "Not a marker flag", numstr );
-        return -1;
+    if ((flagnum < 0) || (flagnum > 9)) {
+	cf_log_notfound(player, cmd, "Not a marker flag", numstr);
+	return -1;
     }
 
-    if ( ( fp = letter_to_flag ( *numstr ) ) == NULL ) {
-        cf_log_notfound ( player, cmd, "Marker flag", numstr );
-        return -1;
+    if ((fp = letter_to_flag(*numstr)) == NULL) {
+	cf_log_notfound(player, cmd, "Marker flag", numstr);
+	return -1;
     }
 
     /*
@@ -930,38 +912,35 @@ int cf_flag_name ( int *vp, char *str, long extra, dbref player, char *cmd )
      * should pretty much never happen, since you're not going to run
      * around arbitrarily giving your flags new names all the time.
      */
-    flagstr = xstrprintf ( "cf_flag_name", "_%s", namestr );
+    flagstr = xstrprintf("cf_flag_name", "_%s", namestr);
 
-    if ( strlen ( flagstr ) > 31 ) {
-        cf_log_syntax ( player, cmd, "Marker flag name too long: %s",
-                        namestr );
-        xfree ( flagstr, "cf_flag_name" );
+    if (strlen(flagstr) > 31) {
+	cf_log_syntax(player, cmd, "Marker flag name too long: %s", namestr);
+	xfree(flagstr, "cf_flag_name");
     }
 
-    for ( cp = flagstr; cp && *cp; cp++ ) {
-        if ( !isalnum ( *cp ) && ( *cp != '_' ) ) {
-            cf_log_syntax ( player, cmd,
-                            "Illegal marker flag name: %s", namestr );
-            xfree ( flagstr, "cf_flag_name" );
-            return -1;
-        }
+    for (cp = flagstr; cp && *cp; cp++) {
+	if (!isalnum(*cp) && (*cp != '_')) {
+	    cf_log_syntax(player, cmd, "Illegal marker flag name: %s", namestr);
+	    xfree(flagstr, "cf_flag_name");
+	    return -1;
+	}
 
-        *cp = tolower ( *cp );
+	*cp = tolower(*cp);
     }
 
-    if ( hashfind ( flagstr, &mudstate.flags_htab ) ) {
-        xfree ( flagstr, "cf_flag_name" );
-        cf_log_syntax ( player, cmd, "Marker flag name in use: %s",
-                        namestr );
-        return -1;
+    if (hashfind(flagstr, &mudstate.flags_htab)) {
+	xfree(flagstr, "cf_flag_name");
+	cf_log_syntax(player, cmd, "Marker flag name in use: %s", namestr);
+	return -1;
     }
 
-    for ( cp = flagstr; cp && *cp; cp++ ) {
-        *cp = toupper ( *cp );
+    for (cp = flagstr; cp && *cp; cp++) {
+	*cp = toupper(*cp);
     }
 
-    fp->flagname = ( const char * ) flagstr;
-    hashadd ( ( char * ) fp->flagname, ( int * ) fp, &mudstate.flags_htab, 0 );
+    fp->flagname = (const char *) flagstr;
+    hashadd((char *) fp->flagname, (int *) fp, &mudstate.flags_htab, 0);
     return 0;
 }
 
@@ -971,7 +950,7 @@ int cf_flag_name ( int *vp, char *str, long extra, dbref player, char *cmd )
  * set the type qualifier if specified and not already set.
  */
 
-int convert_flags ( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type )
+int convert_flags(dbref player, char *flaglist, FLAGSET * fset, FLAG * p_type)
 {
     int i, handled;
     char *s;
@@ -980,66 +959,59 @@ int convert_flags ( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type )
     flag1mask = flag2mask = flag3mask = 0;
     type = NOTYPE;
 
-    for ( s = flaglist; *s; s++ ) {
-        handled = 0;
+    for (s = flaglist; *s; s++) {
+	handled = 0;
 
-        /*
-         * Check for object type
-         */
+	/*
+	 * Check for object type
+	 */
 
-        for ( i = 0; ( i <= 7 ) && !handled; i++ ) {
-            if ( ( object_types[i].lett == *s ) &&
-                    ! ( ( ( object_types[i].perm & CA_WIZARD ) &&
-                          !Wizard ( player ) ) ||
-                        ( ( object_types[i].perm & CA_GOD ) &&
-                          !God ( player ) ) ) ) {
-                if ( ( type != NOTYPE ) && ( type != i ) ) {
-                    notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%c: Conflicting type specifications.", *s );
-                    return 0;
-                }
+	for (i = 0; (i <= 7) && !handled; i++) {
+	    if ((object_types[i].lett == *s) && !(((object_types[i].perm & CA_WIZARD) && !Wizard(player)) || ((object_types[i].perm & CA_GOD) && !God(player)))) {
+		if ((type != NOTYPE) && (type != i)) {
+		    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%c: Conflicting type specifications.", *s);
+		    return 0;
+		}
 
-                type = i;
-                handled = 1;
-            }
-        }
+		type = i;
+		handled = 1;
+	    }
+	}
 
-        /*
-         * Check generic flags
-         */
+	/*
+	 * Check generic flags
+	 */
 
-        if ( handled ) {
-            continue;
-        }
+	if (handled) {
+	    continue;
+	}
 
-        for ( fp = gen_flags; ( fp->flagname ) && !handled; fp++ ) {
-            if ( ( fp->flaglett == *s ) &&
-                    ! ( ( ( fp->listperm & CA_WIZARD ) &&
-                          !Wizard ( player ) ) ||
-                        ( ( fp->listperm & CA_GOD ) && !God ( player ) ) ) ) {
-                if ( fp->flagflag & FLAG_WORD3 ) {
-                    flag3mask |= fp->flagvalue;
-                } else if ( fp->flagflag & FLAG_WORD2 ) {
-                    flag2mask |= fp->flagvalue;
-                } else {
-                    flag1mask |= fp->flagvalue;
-                }
+	for (fp = gen_flags; (fp->flagname) && !handled; fp++) {
+	    if ((fp->flaglett == *s) && !(((fp->listperm & CA_WIZARD) && !Wizard(player)) || ((fp->listperm & CA_GOD) && !God(player)))) {
+		if (fp->flagflag & FLAG_WORD3) {
+		    flag3mask |= fp->flagvalue;
+		} else if (fp->flagflag & FLAG_WORD2) {
+		    flag2mask |= fp->flagvalue;
+		} else {
+		    flag1mask |= fp->flagvalue;
+		}
 
-                handled = 1;
-            }
-        }
+		handled = 1;
+	    }
+	}
 
-        if ( !handled ) {
-            notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%c: Flag unknown or not valid for specified object type", *s );
-            return 0;
-        }
+	if (!handled) {
+	    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%c: Flag unknown or not valid for specified object type", *s);
+	    return 0;
+	}
     }
 
     /*
      * return flags to search for and type
      */
-    ( *fset ).word1 = flag1mask;
-    ( *fset ).word2 = flag2mask;
-    ( *fset ).word3 = flag3mask;
+    (*fset).word1 = flag1mask;
+    (*fset).word2 = flag2mask;
+    (*fset).word3 = flag3mask;
     *p_type = type;
     return 1;
 }
@@ -1049,7 +1021,7 @@ int convert_flags ( dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type )
  * decompile_flags: Produce commands to set flags on target.
  */
 
-void decompile_flags ( dbref player, dbref thing, char *thingname )
+void decompile_flags(dbref player, dbref thing, char *thingname)
 {
     FLAG f1, f2, f3;
     FLAGENT *fp;
@@ -1057,49 +1029,49 @@ void decompile_flags ( dbref player, dbref thing, char *thingname )
     /*
      * Report generic flags
      */
-    f1 = Flags ( thing );
-    f2 = Flags2 ( thing );
-    f3 = Flags3 ( thing );
+    f1 = Flags(thing);
+    f2 = Flags2(thing);
+    f3 = Flags3(thing);
 
-    for ( fp = gen_flags; fp->flagname; fp++ ) {
-        /*
-         * Skip if we shouldn't decompile this flag
-         */
-        if ( fp->listperm & CA_NO_DECOMP ) {
-            continue;
-        }
+    for (fp = gen_flags; fp->flagname; fp++) {
+	/*
+	 * Skip if we shouldn't decompile this flag
+	 */
+	if (fp->listperm & CA_NO_DECOMP) {
+	    continue;
+	}
 
-        /*
-         * Skip if this flag is not set
-         */
+	/*
+	 * Skip if this flag is not set
+	 */
 
-        if ( fp->flagflag & FLAG_WORD3 ) {
-            if ( ! ( f3 & fp->flagvalue ) ) {
-                continue;
-            }
-        } else if ( fp->flagflag & FLAG_WORD2 ) {
-            if ( ! ( f2 & fp->flagvalue ) ) {
-                continue;
-            }
-        } else {
-            if ( ! ( f1 & fp->flagvalue ) ) {
-                continue;
-            }
-        }
+	if (fp->flagflag & FLAG_WORD3) {
+	    if (!(f3 & fp->flagvalue)) {
+		continue;
+	    }
+	} else if (fp->flagflag & FLAG_WORD2) {
+	    if (!(f2 & fp->flagvalue)) {
+		continue;
+	    }
+	} else {
+	    if (!(f1 & fp->flagvalue)) {
+		continue;
+	    }
+	}
 
-        /*
-         * Skip if we can't see this flag
-         */
+	/*
+	 * Skip if we can't see this flag
+	 */
 
-        if ( !check_access ( player, fp->listperm ) ) {
-            continue;
-        }
+	if (!check_access(player, fp->listperm)) {
+	    continue;
+	}
 
-        /*
-         * We made it this far, report this flag
-         */
-        s = strip_ansi ( thingname );
-        notify_check ( player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@set %s=%s", s, fp->flagname );
-        free_lbuf ( s );
+	/*
+	 * We made it this far, report this flag
+	 */
+	s = strip_ansi(thingname);
+	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@set %s=%s", s, fp->flagname);
+	free_lbuf(s);
     }
 }

@@ -5,9 +5,9 @@
 #ifndef __FLAGS_H
 #define __FLAGS_H
 
-#define FLAG_WORD1  0x0 /* 1st word of flags. */
-#define FLAG_WORD2  0x1 /* 2nd word of flags. */
-#define FLAG_WORD3  0x2 /* 3rd word of flags. */
+#define FLAG_WORD1  0x0		/* 1st word of flags. */
+#define FLAG_WORD2  0x1		/* 2nd word of flags. */
+#define FLAG_WORD3  0x2		/* 3rd word of flags. */
 
 /* Object types */
 #define TYPE_ROOM   0x0
@@ -16,86 +16,86 @@
 #define TYPE_PLAYER     0x3
 #define TYPE_ZONE       0x4
 #define TYPE_GARBAGE    0x5
-#define GOODTYPE    0x5 /* Values less than this pass Good_obj check */
+#define GOODTYPE    0x5		/* Values less than this pass Good_obj check */
 #define NOTYPE      0x7
 #define TYPE_MASK   0x7
 
 /* First word of flags */
-#define SEETHRU     0x00000008  /* Can see through to the other side */
-#define WIZARD      0x00000010  /* gets automatic control */
-#define LINK_OK     0x00000020  /* anybody can link to this room */
-#define DARK        0x00000040  /* Don't show contents or presence */
-#define JUMP_OK     0x00000080  /* Others may @tel here */
-#define STICKY      0x00000100  /* Object goes home when dropped */
-#define DESTROY_OK  0x00000200  /* Others may @destroy */
-#define HAVEN       0x00000400  /* No killing here, or no pages */
-#define QUIET       0x00000800  /* Prevent 'feelgood' messages */
-#define HALT        0x00001000  /* object cannot perform actions */
-#define TRACE       0x00002000  /* Generate evaluation trace output */
-#define GOING       0x00004000  /* object is available for recycling */
-#define MONITOR     0x00008000  /* Process ^x:action listens on obj? */
-#define MYOPIC      0x00010000  /* See things as nonowner/nonwizard */
-#define PUPPET      0x00020000  /* Relays ALL messages to owner */
-#define CHOWN_OK    0x00040000  /* Object may be @chowned freely */
-#define ENTER_OK    0x00080000  /* Object may be ENTERed */
-#define VISUAL      0x00100000  /* Everyone can see properties */
-#define IMMORTAL    0x00200000  /* Object can't be killed */
-#define HAS_STARTUP 0x00400000  /* Load some attrs at startup */
-#define OPAQUE      0x00800000  /* Can't see inside */
-#define VERBOSE     0x01000000  /* Tells owner everything it does. */
-#define INHERIT     0x02000000  /* Gets owner's privs. (i.e. Wiz) */
-#define NOSPOOF     0x04000000  /* Report originator of all actions. */
-#define ROBOT       0x08000000  /* Player is a ROBOT */
-#define SAFE        0x10000000  /* Need /override to @destroy */
-#define ROYALTY     0x20000000  /* Sees like a wiz, but ca't modify */
-#define HEARTHRU    0x40000000  /* Can hear out of this obj or exit */
-#define TERSE       0x80000000  /* Only show room name on look */
+#define SEETHRU     0x00000008	/* Can see through to the other side */
+#define WIZARD      0x00000010	/* gets automatic control */
+#define LINK_OK     0x00000020	/* anybody can link to this room */
+#define DARK        0x00000040	/* Don't show contents or presence */
+#define JUMP_OK     0x00000080	/* Others may @tel here */
+#define STICKY      0x00000100	/* Object goes home when dropped */
+#define DESTROY_OK  0x00000200	/* Others may @destroy */
+#define HAVEN       0x00000400	/* No killing here, or no pages */
+#define QUIET       0x00000800	/* Prevent 'feelgood' messages */
+#define HALT        0x00001000	/* object cannot perform actions */
+#define TRACE       0x00002000	/* Generate evaluation trace output */
+#define GOING       0x00004000	/* object is available for recycling */
+#define MONITOR     0x00008000	/* Process ^x:action listens on obj? */
+#define MYOPIC      0x00010000	/* See things as nonowner/nonwizard */
+#define PUPPET      0x00020000	/* Relays ALL messages to owner */
+#define CHOWN_OK    0x00040000	/* Object may be @chowned freely */
+#define ENTER_OK    0x00080000	/* Object may be ENTERed */
+#define VISUAL      0x00100000	/* Everyone can see properties */
+#define IMMORTAL    0x00200000	/* Object can't be killed */
+#define HAS_STARTUP 0x00400000	/* Load some attrs at startup */
+#define OPAQUE      0x00800000	/* Can't see inside */
+#define VERBOSE     0x01000000	/* Tells owner everything it does. */
+#define INHERIT     0x02000000	/* Gets owner's privs. (i.e. Wiz) */
+#define NOSPOOF     0x04000000	/* Report originator of all actions. */
+#define ROBOT       0x08000000	/* Player is a ROBOT */
+#define SAFE        0x10000000	/* Need /override to @destroy */
+#define ROYALTY     0x20000000	/* Sees like a wiz, but ca't modify */
+#define HEARTHRU    0x40000000	/* Can hear out of this obj or exit */
+#define TERSE       0x80000000	/* Only show room name on look */
 
 /* Second word of flags */
-#define KEY     0x00000001  /* No puppets */
-#define ABODE       0x00000002  /* May @set home here */
-#define FLOATING    0x00000004  /* -- Legacy -- */
-#define UNFINDABLE  0x00000008  /* Can't loc() from afar */
-#define PARENT_OK   0x00000010  /* Others may @parent to me */
-#define LIGHT       0x00000020  /* Visible in dark places */
-#define HAS_LISTEN  0x00000040  /* Internal: LISTEN attr set */
-#define HAS_FWDLIST 0x00000080  /* Internal: FORWARDLIST attr set */
-#define AUDITORIUM  0x00000100  /* Should we check the SpeechLock? */
+#define KEY     0x00000001	/* No puppets */
+#define ABODE       0x00000002	/* May @set home here */
+#define FLOATING    0x00000004	/* -- Legacy -- */
+#define UNFINDABLE  0x00000008	/* Can't loc() from afar */
+#define PARENT_OK   0x00000010	/* Others may @parent to me */
+#define LIGHT       0x00000020	/* Visible in dark places */
+#define HAS_LISTEN  0x00000040	/* Internal: LISTEN attr set */
+#define HAS_FWDLIST 0x00000080	/* Internal: FORWARDLIST attr set */
+#define AUDITORIUM  0x00000100	/* Should we check the SpeechLock? */
 #define ANSI            0x00000200
 #define HEAD_FLAG       0x00000400
 #define FIXED           0x00000800
 #define UNINSPECTED     0x00001000
-#define ZONE_PARENT 0x00002000  /* Check as local master room */
+#define ZONE_PARENT 0x00002000	/* Check as local master room */
 #define DYNAMIC         0x00004000
 #define NOBLEED         0x00008000
 #define STAFF           0x00010000
 #define HAS_DAILY   0x00020000
 #define GAGGED      0x00040000
-#define HAS_COMMANDS    0x00080000  /* Check it for $commands */
-#define STOP_MATCH  0x00100000  /* Stop matching commands if found */
-#define BOUNCE      0x00200000  /* Forward messages to contents */
-#define CONTROL_OK  0x00400000  /* ControlLk specifies who ctrls me */
-#define CONSTANT_ATTRS  0x00800000  /* Can't set attrs on this object */
+#define HAS_COMMANDS    0x00080000	/* Check it for $commands */
+#define STOP_MATCH  0x00100000	/* Stop matching commands if found */
+#define BOUNCE      0x00200000	/* Forward messages to contents */
+#define CONTROL_OK  0x00400000	/* ControlLk specifies who ctrls me */
+#define CONSTANT_ATTRS  0x00800000	/* Can't set attrs on this object */
 #define VACATION    0x01000000
-#define PLAYER_MAILS    0x02000000  /* Mail message in progress */
-#define HTML        0x04000000  /* Player supports HTML */
-#define BLIND       0x08000000  /* Suppress has arrived / left msgs */
-#define SUSPECT     0x10000000  /* Report some activities to wizards */
-#define WATCHER     0x20000000  /* Watch logins */
-#define CONNECTED   0x40000000  /* Player is connected */
-#define SLAVE       0x80000000  /* Disallow most commands */
+#define PLAYER_MAILS    0x02000000	/* Mail message in progress */
+#define HTML        0x04000000	/* Player supports HTML */
+#define BLIND       0x08000000	/* Suppress has arrived / left msgs */
+#define SUSPECT     0x10000000	/* Report some activities to wizards */
+#define WATCHER     0x20000000	/* Watch logins */
+#define CONNECTED   0x40000000	/* Player is connected */
+#define SLAVE       0x80000000	/* Disallow most commands */
 
 /* Third word of flags */
-#define REDIR_OK    0x00000001  /* Can be victim of @redirect */
-#define HAS_REDIRECT    0x00000002  /* Victim of @redirect */
-#define ORPHAN      0x00000004  /* Don't check parent chain for $cmd */
-#define HAS_DARKLOCK    0x00000008  /* Has a DarkLock */
-#define DIRTY       0x00000010  /* Temporary flag: object is dirty */
-#define NODEFAULT   0x00000020  /* Not subject to attr defaults */
-#define PRESENCE    0x00000040  /* Check presence-related locks */
-#define HAS_SPEECHMOD   0x00000080  /* Check @speechmod attr */
-#define HAS_PROPDIR 0X00000100  /* Internal: has Propdir attr */
-#define COLOR256    0x00000200  /* Player support XTERM 256 colors */
+#define REDIR_OK    0x00000001	/* Can be victim of @redirect */
+#define HAS_REDIRECT    0x00000002	/* Victim of @redirect */
+#define ORPHAN      0x00000004	/* Don't check parent chain for $cmd */
+#define HAS_DARKLOCK    0x00000008	/* Has a DarkLock */
+#define DIRTY       0x00000010	/* Temporary flag: object is dirty */
+#define NODEFAULT   0x00000020	/* Not subject to attr defaults */
+#define PRESENCE    0x00000040	/* Check presence-related locks */
+#define HAS_SPEECHMOD   0x00000080	/* Check @speechmod attr */
+#define HAS_PROPDIR 0X00000100	/* Internal: has Propdir attr */
+#define COLOR256    0x00000200	/* Player support XTERM 256 colors */
 #define FLAG_RES02  0x00000400
 #define FLAG_RES03  0x00000800
 #define FLAG_RES04  0x00001000
@@ -109,7 +109,7 @@
 #define FLAG_RES12  0x00100000
 #define FLAG_RES13  0x00200000
 /* FREE FREE FREE */
-#define MARK_0      0x00400000  /* User-defined flags */
+#define MARK_0      0x00400000	/* User-defined flags */
 #define MARK_1      0x00800000
 #define MARK_2      0x01000000
 #define MARK_3      0x02000000
@@ -119,7 +119,7 @@
 #define MARK_7      0x20000000
 #define MARK_8      0x40000000
 #define MARK_9      0x80000000
-#define MARK_FLAGS  0xffc00000  /* Bitwise-or of all marker flags */
+#define MARK_FLAGS  0xffc00000	/* Bitwise-or of all marker flags */
 
 /*
  * ---------------------------------------------------------------------------
@@ -127,15 +127,15 @@
  */
 
 typedef struct flag_entry {
-    const char     *flagname;   /* Name of the flag */
-    int     flagvalue;  /* Which bit in the object is the
-                     * flag */
-    char        flaglett;   /* Flag letter for listing */
-    int     flagflag;   /* Ctrl flags for this flag
-                     * (recursive? :-) */
-    int     listperm;   /* Who sees this flag when set */
-    int ( *handler ) (); /* Handler for setting/clearing this flag */
-}       FLAGENT;
+    const char *flagname;	/* Name of the flag */
+    int flagvalue;		/* Which bit in the object is the
+				 * flag */
+    char flaglett;		/* Flag letter for listing */
+    int flagflag;		/* Ctrl flags for this flag
+				 * (recursive? :-) */
+    int listperm;		/* Who sees this flag when set */
+    int (*handler) ();		/* Handler for setting/clearing this flag */
+} FLAGENT;
 
 /*
  * ---------------------------------------------------------------------------
@@ -143,39 +143,39 @@ typedef struct flag_entry {
  */
 
 typedef struct object_entry {
-    const char     *name;
-    char        lett;
-    int     perm;
-    int     flags;
-}       OBJENT;
-extern OBJENT   object_types[8];
+    const char *name;
+    char lett;
+    int perm;
+    int flags;
+} OBJENT;
+extern OBJENT object_types[8];
 
-#define OF_CONTENTS 0x0001  /* Object has contents: Contents() */
-#define OF_LOCATION 0x0002  /* Object has a location: Location() */
-#define OF_EXITS    0x0004  /* Object has exits: Exits() */
-#define OF_HOME     0x0008  /* Object has a home: Home() */
-#define OF_DROPTO   0x0010  /* Object has a dropto: Dropto() */
-#define OF_OWNER    0x0020  /* Object can own other objects */
-#define OF_SIBLINGS 0x0040  /* Object has siblings: Next() */
+#define OF_CONTENTS 0x0001	/* Object has contents: Contents() */
+#define OF_LOCATION 0x0002	/* Object has a location: Location() */
+#define OF_EXITS    0x0004	/* Object has exits: Exits() */
+#define OF_HOME     0x0008	/* Object has a home: Home() */
+#define OF_DROPTO   0x0010	/* Object has a dropto: Dropto() */
+#define OF_OWNER    0x0020	/* Object can own other objects */
+#define OF_SIBLINGS 0x0040	/* Object has siblings: Next() */
 
 typedef struct flagset {
-    FLAG        word1;
-    FLAG        word2;
-    FLAG        word3;
-}       FLAGSET;
+    FLAG word1;
+    FLAG word2;
+    FLAG word3;
+} FLAGSET;
 
-extern void init_flagtab ( void );
-extern void display_flagtab ( dbref );
-extern void flag_set ( dbref, dbref, char *, int );
-extern char    *flag_description ( dbref, dbref );
-extern FLAGENT *find_flag ( dbref, char * );
-extern char    *decode_flags ( dbref, FLAGSET );
-extern char    *unparse_flags ( dbref, dbref );
-extern int  has_flag ( dbref, dbref, char * );
-extern char    *unparse_object ( dbref, dbref, int );
-extern char    *unparse_object_numonly ( dbref );
-extern int  convert_flags ( dbref, char *, FLAGSET *, FLAG * );
-extern void decompile_flags ( dbref, dbref, char * );
+extern void init_flagtab(void);
+extern void display_flagtab(dbref);
+extern void flag_set(dbref, dbref, char *, int);
+extern char *flag_description(dbref, dbref);
+extern FLAGENT *find_flag(dbref, char *);
+extern char *decode_flags(dbref, FLAGSET);
+extern char *unparse_flags(dbref, dbref);
+extern int has_flag(dbref, dbref, char *);
+extern char *unparse_object(dbref, dbref, int);
+extern char *unparse_object_numonly(dbref);
+extern int convert_flags(dbref, char *, FLAGSET *, FLAG *);
+extern void decompile_flags(dbref, dbref, char *);
 
 #define GOD ((dbref) 1)
 
@@ -471,9 +471,9 @@ extern void decompile_flags ( dbref, dbref, char * );
  * if neither the location or base or exit is dark.
  */
 
-#define VE_LOC_XAM  0x01    /* Location is examinable */
-#define VE_LOC_DARK 0x02    /* Location is dark */
-#define VE_BASE_DARK    0x04    /* Base location (pre-parent) is dark */
+#define VE_LOC_XAM  0x01	/* Location is examinable */
+#define VE_LOC_DARK 0x02	/* Location is dark */
+#define VE_BASE_DARK    0x04	/* Base location (pre-parent) is dark */
 
 #define Exit_Visible(x,p,k) \
     (((k) & VE_LOC_XAM) || Examinable(p,x) || Light(x) || \
@@ -603,4 +603,4 @@ extern void decompile_flags ( dbref, dbref, char * );
 #define Check_Notices(p,t)  (could_doit((p),(t),A_LMOVES))
 #define Check_Knows(p,t)    (could_doit((p),(t),A_LKNOWS))
 
-#endif  /* __FLAGS_H */
+#endif				/* __FLAGS_H */

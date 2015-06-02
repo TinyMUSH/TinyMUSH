@@ -14,26 +14,26 @@
 /* We need to 64-bit-align the end of the pool header. */
 
 typedef struct pool_header {
-	int magicnum; /*!< Magic Number, For consistency check */
-	int pool_size; /*!< Size of the pool,  for consistency check */
-	struct pool_header *next; /*!< Next pool header in chain */
-	struct pool_header *nxtfree; /*!< Next pool header in freelist */
-	char *buf_tag; /*!< Debugging/trace tag */
-	char align[(256 - (2 * sizeof(int)) - (3 * sizeof(char *))) & 0x7]; /*!< Padding */
+    int magicnum;		/*!< Magic Number, For consistency check */
+    int pool_size;		/*!< Size of the pool,  for consistency check */
+    struct pool_header *next;	/*!< Next pool header in chain */
+    struct pool_header *nxtfree;	/*!< Next pool header in freelist */
+    char *buf_tag;		/*!< Debugging/trace tag */
+    char align[(256 - (2 * sizeof(int)) - (3 * sizeof(char *))) & 0x7];	/*!< Padding */
 } POOLHDR;
 
 typedef struct pool_footer {
-	int magicnum; /*!< Magic Number, For consistency check */
+    int magicnum;		/*!< Magic Number, For consistency check */
 } POOLFTR;
 
 typedef struct pooldata {
-	int pool_size; /*!< Size in bytes of a buffer */
-	POOLHDR *free_head; /*!< Buffer freelist head */
-	POOLHDR *chain_head; /*!< Buffer chain head */
-	int tot_alloc; /*!< Total buffers allocated */
-	int num_alloc; /*!< Number of buffers currently allocated */
-	int max_alloc; /*!< Max # buffers allocated at one time */
-	int num_lost; /*!< Buffers lost due to corruption */
+    int pool_size;		/*!< Size in bytes of a buffer */
+    POOLHDR *free_head;		/*!< Buffer freelist head */
+    POOLHDR *chain_head;	/*!< Buffer chain head */
+    int tot_alloc;		/*!< Total buffers allocated */
+    int num_alloc;		/*!< Number of buffers currently allocated */
+    int max_alloc;		/*!< Max # buffers allocated at one time */
+    int num_lost;		/*!< Buffers lost due to corruption */
 } POOL;
 
 #define POOL_SBUF	0	/*!< Small buffer pool */
@@ -50,8 +50,8 @@ typedef struct pooldata {
 #define HBUF_SIZE	32768	/*!< Huge buffer size */
 #define LBUF_SIZE	8192	/*!< Large buffer size */
 #define GBUF_SIZE	1024	/*!< Generic buffer size */
-#define MBUF_SIZE	512		/*!< Standard buffer size */
-#define SBUF_SIZE	64		/*!< Small buffer size */
+#define MBUF_SIZE	512	/*!< Standard buffer size */
+#define SBUF_SIZE	64	/*!< Small buffer size */
 
 /*
  * ---------------------------------------------------------------------------
@@ -74,10 +74,10 @@ static void trace_alloc(size_t amount, const char *name, void *ptr);
 static void trace_free(const char *name, void *ptr);
 
 typedef struct tracemem_header {
-	void *bptr;
-	const char *buf_tag;
-	size_t alloc;
-	struct tracemem_header *next;
+    void *bptr;
+    const char *buf_tag;
+    size_t alloc;
+    struct tracemem_header *next;
 } MEMTRACK;
 
 /*
@@ -118,4 +118,4 @@ extern void safe_copy_chr(char, char[], char **, int);
 #define safe_mb_chr(c,b,p)	safe_copy_chr((c),(b),(p),(MBUF_SIZE-1))
 #define safe_chr_fn(c,b,p)	safe_strcatchr((b),(p),(c),(LBUF_SIZE-1))
 
-#endif  /* __ALLOC_H */
+#endif				/* __ALLOC_H */

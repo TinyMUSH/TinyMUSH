@@ -213,4 +213,4 @@ Items That are Not Considered Part of a Modified Version
      EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#endif  /* __COPYRIGHT_H */
+#endif				/* __COPYRIGHT_H */

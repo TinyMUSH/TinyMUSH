@@ -7,20 +7,20 @@
 
 /* (Dis)connection reason codes */
 
-#define R_GUEST     1   /* Guest connection */
-#define R_CREATE    2   /* User typed 'create' */
-#define R_CONNECT   3   /* User typed 'connect' */
-#define R_DARK      4   /* User typed 'cd' */
+#define R_GUEST     1		/* Guest connection */
+#define R_CREATE    2		/* User typed 'create' */
+#define R_CONNECT   3		/* User typed 'connect' */
+#define R_DARK      4		/* User typed 'cd' */
 
-#define R_QUIT      5   /* User quit */
-#define R_TIMEOUT   6   /* Inactivity timeout */
-#define R_BOOT      7   /* Victim of @boot, @toad, or @destroy */
-#define R_SOCKDIED  8   /* Other end of socket closed it */
-#define R_GOING_DOWN    9   /* Game is going down */
-#define R_BADLOGIN  10  /* Too many failed login attempts */
-#define R_GAMEDOWN  11  /* Not admitting users now */
-#define R_LOGOUT    12  /* Logged out w/o disconnecting */
-#define R_GAMEFULL  13  /* Too many players logged in */
+#define R_QUIT      5		/* User quit */
+#define R_TIMEOUT   6		/* Inactivity timeout */
+#define R_BOOT      7		/* Victim of @boot, @toad, or @destroy */
+#define R_SOCKDIED  8		/* Other end of socket closed it */
+#define R_GOING_DOWN    9	/* Game is going down */
+#define R_BADLOGIN  10		/* Too many failed login attempts */
+#define R_GAMEDOWN  11		/* Not admitting users now */
+#define R_LOGOUT    12		/* Logged out w/o disconnecting */
+#define R_GAMEFULL  13		/* Too many players logged in */
 
 /* Logged out command table definitions */
 
@@ -46,7 +46,7 @@ struct cmd_block_hdr {
 };
 struct cmd_block {
     CBLKHDR hdr;
-    char    cmd[LBUF_SIZE - sizeof ( CBLKHDR )];
+    char cmd[LBUF_SIZE - sizeof(CBLKHDR)];
 };
 
 typedef struct text_block TBLOCK;
@@ -54,8 +54,8 @@ typedef struct text_block_hdr TBLKHDR;
 
 struct text_block_hdr {
     struct text_block *nxt;
-    char    *start;
-    char    *end;
+    char *start;
+    char *end;
     int nchars;
 };
 
@@ -101,16 +101,16 @@ struct descriptor_data {
     time_t last_time;
     int quota;
     PROG *program_data;
-    struct sockaddr_in address; /* added 3/6/90 SCG */
+    struct sockaddr_in address;	/* added 3/6/90 SCG */
     struct descriptor_data *hashnext;
     struct descriptor_data *next;
     struct descriptor_data **prev;
 };
 
 /* flags in the flag field */
-#define DS_CONNECTED    0x0001      /* player is connected */
-#define DS_AUTODARK 0x0002      /* Wizard was auto set dark. */
-#define DS_PUEBLOCLIENT 0x0004          /* Client is Pueblo-enhanced. */
+#define DS_CONNECTED    0x0001	/* player is connected */
+#define DS_AUTODARK 0x0002	/* Wizard was auto set dark. */
+#define DS_PUEBLOCLIENT 0x0004	/* Client is Pueblo-enhanced. */
 
 extern DESC *descriptor_list;
 
@@ -148,4 +148,4 @@ extern DESC *descriptor_list;
          d; \
          d=n,n=((n!=NULL) ? n->next : NULL))
 
-#endif  /* __INTERFACE_H */
+#endif				/* __INTERFACE_H */
