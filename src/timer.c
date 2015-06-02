@@ -1,19 +1,17 @@
 /* timer.c - Subroutines for (system-) timed events */
 
-/* XXX Integrate bitstring.h into this */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */
+#include "typedefs.h"		/* required by mushconf */
+#include "game.h"		/* required by mushconf */
+#include "alloc.h"		/* required by mushconf */
+#include "flags.h"		/* required by mushconf */
+#include "htab.h"		/* required by mushconf */
+#include "ltdl.h"		/* required by mushconf */
+#include "udb.h"		/* required by mushconf */
+#include "udb_defs.h"		/* required by mushconf */
 
 #include "mushconf.h"		/* required by code */
 
@@ -22,9 +20,7 @@
 #include "externs.h"		/* required by interface */
 
 #include "match.h"		/* required by code */
-//#include "command.h"      /* required by code */
 #include "powers.h"		/* required by code */
-#include "bitstring.h"		/* required by code */
 
 extern void pool_reset(void);
 
@@ -72,18 +68,17 @@ struct cron_entry {
     dbref obj;
     int atr;
     char *cronstr;
-    bitstr_t bit_decl(minute, MINUTE_COUNT);
-    bitstr_t bit_decl(hour, HOUR_COUNT);
-    bitstr_t bit_decl(dom, DOM_COUNT);
-    bitstr_t bit_decl(month, MONTH_COUNT);
-    bitstr_t bit_decl(dow, DOW_COUNT);
+
+    unsigned char minute[(((MINUTE_COUNT) - 1) >> 3) + 1];
+    unsigned char hour[(((HOUR_COUNT) - 1) >> 3) + 1];
+    unsigned char dom[(((DOM_COUNT) - 1) >> 3) + 1];
+    unsigned char month[(((MONTH_COUNT) - 1) >> 3) + 1];
+    unsigned char dow[(((DOW_COUNT) - 1) >> 3) + 1];
     int flags;
     CRONTAB *next;
 };
 
 CRONTAB *cron_head = NULL;
-
-#define set_cronbits(b,l,h,n)	if (((n) >= (l)) && ((n) <= (h))) bit_set((b), (n) - (l));
 
 static void check_cron(void)
 {
@@ -111,24 +106,32 @@ static void check_cron(void)
      */
 
     for (crp = cron_head; crp != NULL; crp = crp->next) {
-	if (bit_test(crp->minute, minute) && bit_test(crp->hour, hour)
-	    && bit_test(crp->month, month)
-	    && (((crp->flags & DOM_STAR) || (crp->flags & DOW_STAR)) ? (bit_test(crp->dow, dow) && bit_test(crp->dom, dom)) : (bit_test(crp->dow, dow) || bit_test(crp->dom, dom)))) {
+	if ((crp->minute[minute >> 3] & (1 << (minute & 0x7))) && (crp->hour[hour >> 3] & (1 << (hour & 0x7))) && (crp->month[month >> 3] & (1 << (month & 0x7))) && (((crp->flags & DOM_STAR) || (crp->flags & DOW_STAR)) ? ((crp->dow[dow >> 3] & (1 << (dow & 0x7))) && (crp->dom[dom >> 3] & (1 << (dom & 0x7)))) : ((crp->dow[dow >> 3] & (1 << (dow & 0x7))) || (crp->dom[dom >> 3] & (1 << (dom & 0x7)))))) {
 	    cmd = atr_pget(crp->obj, crp->atr, &aowner, &aflags, &alen);
-
 	    if (*cmd && Good_obj(crp->obj)) {
 		wait_que(crp->obj, crp->obj, 0, NOTHING, 0, cmd, (char **) NULL, 0, NULL);
 	    }
-
 	    free_lbuf(cmd);
 	}
     }
 }
 
-static char *parse_cronlist(dbref player, bitstr_t * bits, int low, int high, char *bufp)
+static char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char *bufp)
 {
     int i, n_begin, n_end, step_size;
-    bit_nclear(bits, 0, (high - low + 1));	/* Default is all off */
+    unsigned char *_bits = bits;	/* Default is all off */
+    int _start = 0, _stop = (high - low + 1);
+    int _startbyte = (_start >> 3);
+    int _stopbyte = (_stop >> 3);
+
+    if (_startbyte == _stopbyte) {
+	_bits[_startbyte] &= ((0xff >> (8 - (_start & 0x7))) | (0xff << ((_stop & 0x7) + 1)));
+    } else {
+	_bits[_startbyte] &= 0xff >> (8 - (_start & 0x7));
+	while (++_startbyte < _stopbyte)
+	    _bits[_startbyte] = 0;
+	_bits[_stopbyte] &= 0xff << ((_stop & 0x7) + 1);
+    }
 
     if (!bufp || !*bufp) {
 	return NULL;
@@ -202,8 +205,10 @@ static char *parse_cronlist(dbref player, bitstr_t * bits, int low, int high, ch
 	 * Go set it.
 	 */
 
+
 	for (i = n_begin; i <= n_end; i += step_size) {
-	    set_cronbits(bits, low, high, i);
+	    if ((i >= low) && (i <= high))
+		bits[i - low] |= (1 << ((i - low) & 0x7));
 	}
 
 	/*
@@ -316,12 +321,12 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
      * Sundays can be either 0 or 7.
      */
 
-    if (bit_test(crp->dow, 0)) {
-	bit_set(crp->dow, 7);
+    if (crp->dow[0] & 1) {
+	crp->dow[0] |= 128;
     }
 
-    if (bit_test(crp->dow, 7)) {
-	bit_set(crp->dow, 0);
+    if (crp->dow[0] & 128) {
+	crp->dow[0] |= 1;
     }
 
     if (errcode) {
