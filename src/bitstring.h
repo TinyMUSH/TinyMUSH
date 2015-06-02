@@ -29,38 +29,29 @@ typedef unsigned char bitstr_t;
 
 /* internal macros */
 /* byte of the bitstring bit is in */
-#define _bit_byte(bit) \
-    ((bit) >> 3)
+#define _bit_byte(bit)	((bit) >> 3)
 
 /* mask for the bit within its byte */
-#define _bit_mask(bit) \
-    (1 << ((bit)&0x7))
+#define _bit_mask(bit)	(1 << ((bit)&0x7))
 
 /* external macros */
 /* bytes in a bitstring of nbits bits */
-#define bitstr_size(nbits) \
-    ((((nbits) - 1) >> 3) + 1)
+#define bitstr_size(nbits)	((((nbits) - 1) >> 3) + 1)
 
 /* allocate a bitstring */
-#define bit_alloc(nbits) \
-    (bitstr_t *)malloc(1, \
-        (unsigned int)bitstr_size(nbits) * sizeof(bitstr_t))
+#define bit_alloc(nbits)	(bitstr_t *)malloc(1, (unsigned int)bitstr_size(nbits) * sizeof(bitstr_t))
 
 /* allocate a bitstring on the stack */
-#define bit_decl(name, nbits) \
-    (name)[bitstr_size(nbits)]
+#define bit_decl(name, nbits)	(name)[bitstr_size(nbits)]
 
 /* is bit N of bitstring name set? */
-#define bit_test(name, bit) \
-    ((name)[_bit_byte(bit)] & _bit_mask(bit))
+#define bit_test(name, bit)	((name)[_bit_byte(bit)] & _bit_mask(bit))
 
 /* set bit N of bitstring name */
-#define bit_set(name, bit) \
-    (name)[_bit_byte(bit)] |= _bit_mask(bit)
+#define bit_set(name, bit)	(name)[_bit_byte(bit)] |= _bit_mask(bit)
 
 /* clear bit N of bitstring name */
-#define bit_clear(name, bit) \
-    (name)[_bit_byte(bit)] &= ~_bit_mask(bit)
+#define bit_clear(name, bit)	(name)[_bit_byte(bit)] &= ~_bit_mask(bit)
 
 /* clear bits start ... stop in bitstring */
 #define bit_nclear(name, start, stop) { \

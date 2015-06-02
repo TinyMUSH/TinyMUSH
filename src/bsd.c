@@ -4,25 +4,25 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"           /* required by mudconf */
-#include "game.h" /* required by mudconf */
-#include "alloc.h" /* required by mudconf */
-#include "flags.h" /* required by mudconf */
-#include "htab.h" /* required by mudconf */
-#include "ltdl.h" /* required by mudconf */
-#include "udb.h" /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
+#include "typedefs.h"	/* required by mushconf */
+#include "game.h"		/* required by mushconf */
+#include "alloc.h"		/* required by mushconf */
+#include "flags.h"		/* required by mushconf */
+#include "htab.h"		/* required by mushconf */
+#include "ltdl.h"		/* required by mushconf */
+#include "udb.h"		/* required by mushconf */
+#include "udb_defs.h"	/* required by mushconf */
 
-#include "mushconf.h"       /* required by code */
+#include "mushconf.h"	/* required by code */
 
-#include "db.h"         /* required by externs.h */
-#include "interface.h"      /* required by code */
-#include "externs.h"        /* required by interface.h */
+#include "db.h"			/* required by externs.h */
+#include "interface.h"	/* required by code */
+#include "externs.h"	/* required by interface.h */
 
 
-#include "file_c.h"     /* required by code */
-#include "command.h"        /* required by code */
-#include "attrs.h"      /* required by code */
+#include "file_c.h"		/* required by code */
+#include "command.h"	/* required by code */
+#include "attrs.h"		/* required by code */
 
 #ifndef NSIG
 extern const int _sys_nsig;
@@ -344,8 +344,7 @@ void shovechars ( int port )
     DESC *d, *dnext, *newd;
     int avail_descriptors, maxfds;
     struct stat fstatbuf;
-#define CheckInput(x)   FD_ISSET(x, &input_set)
-#define CheckOutput(x)  FD_ISSET(x, &output_set)
+
     mudstate.debug_cmd = ( char * ) "< shovechars >";
 
     if ( !mudstate.restarting ) {
@@ -513,7 +512,7 @@ void shovechars ( int port )
          * Check for new connection requests
          */
 
-        if ( CheckInput ( sock ) ) {
+        if ( FD_ISSET(sock, &input_set) ) {
             newd = new_connection ( sock );
 
             if ( !newd ) {
@@ -537,14 +536,13 @@ void shovechars ( int port )
             /*
              * Process input from sockets with pending input
              */
-            if ( CheckInput ( d->descriptor ) ) {
+            if ( FD_ISSET( d->descriptor, &input_set) ) {
                 /*
                  * Undo AutoDark
                  */
                 if ( d->flags & DS_AUTODARK ) {
                     d->flags &= ~DS_AUTODARK;
-                    s_Flags ( d->player,
-                              Flags ( d->player ) & ~DARK );
+                    s_Flags ( d->player, Flags ( d->player ) & ~DARK );
                 }
 
                 /*
@@ -561,7 +559,7 @@ void shovechars ( int port )
              * Process output for sockets with pending output
              */
 
-            if ( CheckOutput ( d->descriptor ) ) {
+            if ( FD_ISSET(d->descriptor, &output_set) ) {
                 if ( !process_output ( d ) ) {
                     shutdownsock ( d, R_SOCKDIED );
                 }
@@ -570,6 +568,7 @@ void shovechars ( int port )
     }
 }
 
+/* XXX Probably not needed anymore... */
 #ifdef BROKEN_GCC_PADDING
 char *inet_ntoa ( struct in_addr in )
 {
@@ -584,9 +583,7 @@ char *inet_ntoa ( struct in_addr in )
      */
     static char buf[MBUF_SIZE];
     long a = in.s_addr;
-    sprintf ( buf, "%d.%d.%d.%d",
-              ( int ) ( ( a >> 24 ) & 0xff ),
-              ( int ) ( ( a >> 16 ) & 0xff ), ( int ) ( ( a >> 8 ) & 0xff ), ( int ) ( a & 0xff ) );
+    sprintf ( buf, "%d.%d.%d.%d", ( int ) ( ( a >> 24 ) & 0xff ), ( int ) ( ( a >> 16 ) & 0xff ), ( int ) ( ( a >> 8 ) & 0xff ), ( int ) ( a & 0xff ) );
     return buf;
 }
 
@@ -625,9 +622,7 @@ DESC *new_connection ( int sock )
          * Ask slave process for host and username
          */
         if ( ( slave_socket != -1 ) && mudconf.use_hostname ) {
-            sprintf ( buf, "%s\n%s,%d,%d\n",
-                      inet_ntoa ( addr.sin_addr ), inet_ntoa ( addr.sin_addr ),
-                      ntohs ( addr.sin_port ), mudconf.port );
+            sprintf ( buf, "%s\n%s,%d,%d\n", inet_ntoa ( addr.sin_addr ), inet_ntoa ( addr.sin_addr ), ntohs ( addr.sin_port ), mudconf.port );
             len = strlen ( buf );
 
             if ( write ( slave_socket, buf, len ) < 0 ) {
@@ -653,12 +648,10 @@ DESC *new_connection ( int sock )
 
 const char *conn_reasons[] = {
     "Unspecified",
-
     "Guest-connected to",
     "Created",
     "Connected to",
     "Dark-connected to",
-
     "Quit",
     "Inactivity Timeout",
     "Booted",
@@ -676,12 +669,10 @@ const char *conn_reasons[] = {
 
 const char *conn_messages[] = {
     "unknown",
-
     "guest",
     "create",
     "connect",
     "cd",
-
     "quit",
     "timeout",
     "boot",
@@ -906,8 +897,7 @@ int process_output ( DESC *d )
 
     while ( tb != NULL ) {
         while ( tb->hdr.nchars > 0 ) {
-            cnt = write ( d->descriptor, tb->hdr.start,
-                          tb->hdr.nchars );
+            cnt = write ( d->descriptor, tb->hdr.start, tb->hdr.nchars );
 
             if ( cnt < 0 ) {
                 mudstate.debug_cmd = cmdsave;
@@ -970,12 +960,9 @@ int process_input ( DESC *d )
 
             if ( p > d->raw_input->cmd ) {
                 save_command ( d, d->raw_input );
-                d->raw_input =
-                    ( CBLK * ) alloc_lbuf ( "process_input.raw" );
+                d->raw_input = ( CBLK * ) alloc_lbuf ( "process_input.raw" );
                 p = d->raw_input_at = d->raw_input->cmd;
-                pend =
-                    d->raw_input->cmd - sizeof ( CBLKHDR ) - 1 +
-                    LBUF_SIZE;
+                pend =  d->raw_input->cmd - sizeof ( CBLKHDR ) - 1 + LBUF_SIZE;
             } else {
                 in -= 1;    /* for newline */
             }
