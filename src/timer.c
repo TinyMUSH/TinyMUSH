@@ -4,38 +4,34 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mushconf */
+#include "typedefs.h"	/* required by mushconf */
 #include "game.h"		/* required by mushconf */
 #include "alloc.h"		/* required by mushconf */
 #include "flags.h"		/* required by mushconf */
 #include "htab.h"		/* required by mushconf */
 #include "ltdl.h"		/* required by mushconf */
 #include "udb.h"		/* required by mushconf */
-#include "udb_defs.h"		/* required by mushconf */
+#include "udb_defs.h"	/* required by mushconf */
 
-#include "mushconf.h"		/* required by code */
+#include "mushconf.h"	/* required by code */
 
 #include "db.h"			/* required by externs */
-#include "interface.h"		/* required by code */
-#include "externs.h"		/* required by interface */
+#include "interface.h"	/* required by code */
+#include "externs.h"	/* required by interface */
 
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
 extern void pool_reset(void);
-
 extern unsigned int alarm(unsigned int seconds);
-
 extern void pcache_trim(void);
-
 extern void do_dbck(dbref, dbref, int);
-
 extern void do_queue(dbref, dbref, int, char *);
 
 /* ---------------------------------------------------------------------------
  * Cron-related things. This implementation is somewhat derivative of
- * Paul Vixie's cron implementation. See bitstring.h for the copyright
- * and other details.
+ * Paul Vixie's cron implementation for Berkeley. See Copyright.h for the
+ * copyright notice.
  */
 
 #define FIRST_MINUTE    0
@@ -89,8 +85,7 @@ static void check_cron(void)
     dbref aowner;
     int aflags, alen;
     /*
-     * Convert our time to a zero basis, so the elements can be used
-     * * as indices.
+     * Convert our time to a zero basis, so the elements can be used as indices.
      */
     ltime = localtime(&mudstate.events_counter);
     minute = ltime->tm_min - FIRST_MINUTE;
@@ -101,8 +96,8 @@ static void check_cron(void)
 
     /*
      * Do it if the minute, hour, and month match, plus a day selection
-     * * matches. We handle stars and the day-of-month vs. day-of-week
-     * * exactly like Unix (Vixie) cron does.
+     * matches. We handle stars and the day-of-month vs. day-of-week
+     * exactly like Unix (Vixie) cron does.
      */
 
     for (crp = cron_head; crp != NULL; crp = crp->next) {
@@ -143,9 +138,9 @@ static char *parse_cronlist(dbref player, unsigned char *bits, int low, int high
 
     /*
      * We assume we're at the beginning of what we needed to parse.
-     * * All leading whitespace-skipping should have been taken care of
-     * * either before this function was called, or at the end of this
-     * * function.
+     * All leading whitespace-skipping should have been taken care of
+     * either before this function was called, or at the end of this
+     * function.
      */
 
     while (*bufp && !isspace(*bufp)) {
@@ -212,9 +207,9 @@ static char *parse_cronlist(dbref player, unsigned char *bits, int low, int high
 	}
 
 	/*
-	 * We've made it through one pass. If the next character isn't
-	 * * a comma, we break out of this loop.
+	 * We've made it through one pass. If the next character isn't a comma, we break out of this loop.
 	 */
+
 	if (*bufp == ',') {
 	    bufp++;
 	} else {
@@ -232,8 +227,8 @@ static char *parse_cronlist(dbref player, unsigned char *bits, int low, int high
 
     /*
      * Initially, bufp pointed to the beginning of what we parsed. We have
-     * * to return it so we know where to start the next bit of parsing.
-     * * Skip spaces as well.
+     * to return it so we know where to start the next bit of parsing.
+     * Skip spaces as well.
      */
 
     while (isspace(*bufp)) {
@@ -265,11 +260,13 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
     crp->atr = attrib;
     crp->flags = 0;
     crp->cronstr = xstrdup(timestr, "cron_entry.time");
+
     /*
      * The time string is: <min> <hour> <day of month> <month> <day of week>
-     * * Legal values also include asterisks, and <x>-<y> (for a range).
-     * * We do NOT support step size.
+     * Legal values also include asterisks, and <x>-<y> (for a range).
+     * We do NOT support step size.
      */
+
     errcode = 0;
     bufp = timestr;
 
@@ -338,6 +335,7 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
     /*
      * Relink the list, now that we know we have something good.
      */
+
     crp->next = cron_head;
     cron_head = crp;
     return 1;
@@ -456,9 +454,10 @@ void do_crontab(dbref player, dbref cause, int key, char *objstr)
 
     /*
      * List it if it's the thing we want, or, if we didn't specify a
-     * * thing, list things belonging to us (or everything, if we're
-     * * normally entitled to see the entire queue).
+     * thing, list things belonging to us (or everything, if we're
+     * normally entitled to see the entire queue).
      */
+
     count = 0;
 
     for (crp = cron_head; crp != NULL; crp = crp->next) {
@@ -492,10 +491,11 @@ void init_timer(void)
 	+ mudstate.now;
     mudstate.idle_counter = mudconf.idle_interval + mudstate.now;
     mudstate.mstats_counter = 15 + mudstate.now;
+
     /*
-     * The events counter is the next time divisible by sixty (i.e.,
-     * * that puts us at the beginning of a minute).
+     * The events counter is the next time divisible by sixty (i.e., that puts us at the beginning of a minute).
      */
+
     mudstate.events_counter = mudstate.now + (60 - (mudstate.now % 60));
     alarm(1);
 }
@@ -517,9 +517,11 @@ void dispatch(void)
     mudstate.alarm_triggered = 0;
     mudstate.now = time(NULL);
     do_second();
+
     /*
      * Module API hook
      */
+
     CALL_ALL_MODULES(do_second, ());
 
     /*
@@ -592,16 +594,18 @@ void dispatch(void)
 	}
     }
 #endif
+
     /*
      * reset alarm
      */
+
     alarm(1);
     mudstate.debug_cmd = cmdsave;
 }
 
 /*
  * ---------------------------------------------------------------------------
- * * do_timewarp: Adjust various internal timers.
+ * do_timewarp: Adjust various internal timers.
  */
 
 void do_timewarp(dbref player, dbref cause, int key, char *arg)
@@ -612,6 +616,7 @@ void do_timewarp(dbref player, dbref cause, int key, char *arg)
     /*
      * Sem Wait queues
      */
+
     if ((key == 0) || (key & TWARP_QUEUE)) {
 	do_queue(player, cause, QUEUE_WARP, arg);
     }
