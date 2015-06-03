@@ -393,9 +393,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define as the return type of signal handlers (`int' or `void'). */
-#undef RETSIGTYPE
-
 /* Define if your <sys/signal> handle signals correctly. */
 #undef SIGNAL_SIGCHLD_BRAINDAMAGE
 
