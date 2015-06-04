@@ -59,6 +59,8 @@
 /src/modules/mail/.deps/
 /src/modules/mail/Makefile
 /src/stamp-h1
+/autom4te.cache/
+/src/libltdl/autom4te.cache/
 
 # Eclipse
 .autotools

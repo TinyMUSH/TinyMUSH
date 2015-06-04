@@ -66,9 +66,14 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 LT_INIT
 
-AC_PATH_PROGS([with_cproto_prog], [cproto], AC_MSG_ERROR([not found]))
-AC_PATH_PROGS([with_tar_prog], [tar], AC_MSG_ERROR([not found]))
-AC_PATH_PROGS([with_compress_prog], [gzip], AC_MSG_ERROR([not found]))
+AC_PATH_PROGS([with_cproto_prog], [cproto], [notfound])
+AS_IF([test "x$with_cproto_prog" = "xnotfound"],[AC_MSG_ERROR([Please install CPROTO before trying again])],)
+
+AC_PATH_PROGS([with_tar_prog], [tar], [notfound])
+AS_IF([test "x$with_tar_prog" = "xnotfound"],[AC_MSG_ERROR([Please install TAR before trying again])],)
+
+AC_PATH_PROGS([with_compress_prog], [gzip], [notfound])
+AS_IF([test "x$with_compress_prog" = "xnotfound"],[AC_MSG_ERROR([Please install GZIP before trying again])],)
 
 AX_BOX([Initializing Automake])
 

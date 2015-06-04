@@ -11369,7 +11369,11 @@ fi
 
   test -n "$with_cproto_prog" && break
 done
-test -n "$with_cproto_prog" || with_cproto_prog="as_fn_error $? "not found" "$LINENO" 5"
+test -n "$with_cproto_prog" || with_cproto_prog="notfound"
+
+if test "x$with_cproto_prog" = "xnotfound"; then :
+  as_fn_error $? "Please install CPROTO before trying again" "$LINENO" 5
+fi
 
 for ac_prog in tar
 do
@@ -11415,7 +11419,11 @@ fi
 
   test -n "$with_tar_prog" && break
 done
-test -n "$with_tar_prog" || with_tar_prog="as_fn_error $? "not found" "$LINENO" 5"
+test -n "$with_tar_prog" || with_tar_prog="notfound"
+
+if test "x$with_tar_prog" = "xnotfound"; then :
+  as_fn_error $? "Please install TAR before trying again" "$LINENO" 5
+fi
 
 for ac_prog in gzip
 do
@@ -11461,8 +11469,11 @@ fi
 
   test -n "$with_compress_prog" && break
 done
-test -n "$with_compress_prog" || with_compress_prog="as_fn_error $? "not found" "$LINENO" 5"
+test -n "$with_compress_prog" || with_compress_prog="notfound"
 
+if test "x$with_compress_prog" = "xnotfound"; then :
+  as_fn_error $? "Please install GZIP before trying again" "$LINENO" 5
+fi
 
 as_nl='
 '
