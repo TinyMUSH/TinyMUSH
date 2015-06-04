@@ -131,9 +131,12 @@ Startmush: $(SCRIPT_DIR)/Startmush.in
 	$(do_subst) <$(SCRIPT_DIR)/Startmush.in >$(SCRIPT_DIR)/Startmush
 	chmod +x $(SCRIPT_DIR)/Startmush
 	
-prototypes.h: version.h defaults.h libtinydbm.h
+.PHONY:version.h
+	
+prototypes.h: defaults.h libtinydbm.h
 	rm -f prototypes.h
 	touch prototypes.h
+	if [ ! -f version.h ]; then touch version.h; fi
 	echo '#include "copyright.h"' > _prototypes.h
 	echo '#ifndef __PROTOTYPES_H' >> _prototypes.h
 	echo '#define __PROTOTYPES_H' >> _prototypes.h
@@ -152,7 +155,7 @@ prototypes.h: version.h defaults.h libtinydbm.h
 	rm prototypes.h
 	mv _prototypes.h prototypes.h
 	chmod -w prototypes.h
-	
+
 version.h:
 	rm -f version.h
 	touch version.h
