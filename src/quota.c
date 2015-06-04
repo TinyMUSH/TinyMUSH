@@ -64,7 +64,7 @@ void save_quota(int q_list[], dbref player, int qtype)
  * mung_quota, show_quota, do_quota: Manage quotas.
  */
 
-static void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
+void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
 {
     register int a, r, e, t, p, i;
     a = r = e = t = p = 0;
@@ -103,7 +103,7 @@ static void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int
 }
 
 
-static void adjust_quota(dbref player, int qtype, int value, int key)
+void adjust_quota(dbref player, int qtype, int value, int key)
 {
     register int aq, rq;
     int q_list[5], rq_list[5];
@@ -134,7 +134,7 @@ static void adjust_quota(dbref player, int qtype, int value, int key)
 }
 
 
-static void mung_quotas(dbref player, int key, int value)
+void mung_quotas(dbref player, int key, int value)
 {
     int xq, rooms, exits, things, players;
     int q_list[5], rq_list[5];
@@ -172,7 +172,7 @@ static void mung_quotas(dbref player, int key, int value)
     }
 }
 
-static void show_quota(dbref player, dbref victim)
+void show_quota(dbref player, dbref victim)
 {
     int q_list[5], rq_list[5], dq_list[5], i;
     load_quota(q_list, victim, A_QUOTA);
@@ -197,7 +197,7 @@ static void show_quota(dbref player, dbref victim)
     }
 }
 
-static void show_quota_header(dbref player)
+void show_quota_header(dbref player)
 {
     if (mudconf.typed_quotas)
 	notify_quiet(player, "Name            : Quot - Lim  Room - Lim  Exit - Lim  Thin - Lim  Play - Lim");

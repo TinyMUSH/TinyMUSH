@@ -101,10 +101,10 @@ int query(char *ip, char *orig_arg)
     hp = gethostbyname(arg);
 
     if (hp == NULL) {
-	static struct hostent def;
-	static struct in_addr defaddr;
-	static char *alist[1];
-	static char namebuf[MAX_STRING];
+	struct hostent def;
+	struct in_addr defaddr;
+	char *alist[1];
+	char namebuf[MAX_STRING];
 	defaddr.s_addr = (unsigned int) inet_addr(arg);
 
 	if (defaddr.s_addr == INADDR_NONE) {

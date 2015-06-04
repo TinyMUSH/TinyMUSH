@@ -245,7 +245,7 @@ void do_name(dbref player, dbref cause, int key, const char *name, char *newname
  * * do_alias: Make an alias for a player or object.
  */
 
-static void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, int aflags)
+void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, int aflags)
 {
     int i, j, n_aliases, retcode;
     char *p, *tokp;
@@ -1250,7 +1250,7 @@ int parse_attrib(dbref player, char *str, dbref * thing, int *atr, int ok_struct
     return 1;
 }
 
-static void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, int hash_insert, int get_locks, int ok_structs)
+void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, int hash_insert, int get_locks, int ok_structs)
 {
     ATTR *attr;
     char *as;

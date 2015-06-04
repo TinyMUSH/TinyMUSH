@@ -51,7 +51,7 @@ int sp_ok(dbref player)
     return 1;
 }
 
-static void say_shout(int target, const char *prefix, int flags, dbref player, char *message)
+void say_shout(int target, const char *prefix, int flags, dbref player, char *message)
 {
     if (flags & SAY_NOTAG) {
 	raw_broadcast(target, "%s%s", Name(player), message);
@@ -60,11 +60,11 @@ static void say_shout(int target, const char *prefix, int flags, dbref player, c
     }
 }
 
-static const char *announce_msg = "Announcement: ";
+const char *announce_msg = "Announcement: ";
 
-static const char *broadcast_msg = "Broadcast: ";
+const char *broadcast_msg = "Broadcast: ";
 
-static const char *admin_msg = "Admin: ";
+const char *admin_msg = "Admin: ";
 
 void do_think(dbref player, dbref cause, int key, char *message)
 {
@@ -76,7 +76,7 @@ void do_think(dbref player, dbref cause, int key, char *message)
     free_lbuf(buf);
 }
 
-static int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char *message, int key)
+int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char *message, int key)
 {
     char *sargs[2], tokbuf[2], *buff, msgbuf[LBUF_SIZE];
     int aflags;
@@ -129,7 +129,7 @@ static int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thin
     return 0;
 }
 
-static void format_speech(dbref player, dbref speaker, dbref loc, char *message, int key)
+void format_speech(dbref player, dbref speaker, dbref loc, char *message, int key)
 {
     if (H_Speechmod(speaker) && check_speechformat(player, speaker, loc, speaker, message, key)) {
 	return;
@@ -459,8 +459,8 @@ void do_say(dbref player, dbref cause, int key, char *message)
  * * do_page: Handle the page command.
  * * Page-pose code from shadow@prelude.cc.purdue.
  */
-//static void page_return( dbref player, dbref target, const char *tag, int anum, const char *dflt )
-static void page_return(dbref player, dbref target, const char *tag, int anum, const char *format, ...)
+// void page_return( dbref player, dbref target, const char *tag, int anum, const char *dflt )
+void page_return(dbref player, dbref target, const char *tag, int anum, const char *format, ...)
 {
     dbref aowner;
     int aflags, alen;
@@ -505,7 +505,7 @@ static void page_return(dbref player, dbref target, const char *tag, int anum, c
     free_lbuf(str);
 }
 
-static int page_check(dbref player, dbref target)
+int page_check(dbref player, dbref target)
 {
     if (!payfor(player, Guest(player) ? 0 : mudconf.pagecost)) {
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);

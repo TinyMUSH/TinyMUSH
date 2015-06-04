@@ -28,14 +28,12 @@
 #include "malloc.h"
 #endif
 
-extern int decode_power(dbref, char *, POWERSET *);
-
 /*
  * Bind occurances of the universal var in ACTION to ARG, then run ACTION.
  * * Cmds run in low-prio Q after a 1 sec delay for the first one.
  */
 
-static void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now)
+void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now)
 {
     char *command, *command2;	/* allocated by replace_string */
     char s[SBUF_SIZE];
@@ -892,7 +890,7 @@ void search_perform(dbref player, dbref cause, SEARCH * parm)
     mudstate.func_invk_ctr = save_invk_ctr;
 }
 
-static void search_mark(dbref player, int key)
+void search_mark(dbref player, int key)
 {
     dbref thing;
     int nchanged, is_marked;
@@ -1141,7 +1139,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
  * do_floaters: Report floating rooms.
  */
 
-static void mark_place(dbref loc)
+void mark_place(dbref loc)
 {
     dbref exit;
 

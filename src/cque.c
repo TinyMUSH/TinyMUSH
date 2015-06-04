@@ -31,14 +31,14 @@ extern void s_Queue(dbref, int);
 
 extern int QueueMax(dbref);
 
-static int qpid_top = 1;
+int qpid_top = 1;
 
 /*
  * ---------------------------------------------------------------------------
  * Delete and free a queue entry.
  */
 
-static void delete_qentry(BQUE * qptr)
+void delete_qentry(BQUE * qptr)
 {
     nhashdelete(qptr->pid, &mudstate.qpid_htab);
     Free_QData(qptr);
@@ -50,7 +50,7 @@ static void delete_qentry(BQUE * qptr)
  * add_to: Adjust an object's queue or semaphore count.
  */
 
-static int add_to(dbref doer, dbref player, int am, int attrnum)
+int add_to(dbref doer, dbref player, int am, int attrnum)
 {
     int num, aflags, alen;
     dbref aowner;
@@ -76,7 +76,7 @@ static int add_to(dbref doer, dbref player, int am, int attrnum)
  * give_que: Thread a queue block onto the high or low priority queue
  */
 
-static void give_que(BQUE * tmp)
+void give_que(BQUE * tmp)
 {
     tmp->next = NULL;
     tmp->waittime = 0;
@@ -253,7 +253,7 @@ int halt_que(dbref player, dbref object)
  * remove_waitq: Remove an entry from the wait queue.
  */
 
-static void remove_waitq(BQUE * qptr)
+void remove_waitq(BQUE * qptr)
 {
     BQUE *point, *trail;
 
@@ -282,7 +282,7 @@ static void remove_waitq(BQUE * qptr)
  * do_halt_pid: Halt a single queue entry.
  */
 
-static void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
+void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
     dbref victim;
     int qpid;
@@ -571,7 +571,7 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
  * Get the next available queue PID.
  */
 
-static int qpid_next(void)
+int qpid_next(void)
 {
     int i;
     int qpid = qpid_top;
@@ -597,7 +597,7 @@ static int qpid_next(void)
  * setup_que: Set up a queue entry.
  */
 
-static BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA * gargs)
+BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA * gargs)
 {
     int a, tlen, qpid;
     BQUE *tmp;
@@ -834,7 +834,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
  * do_wait_pid: Adjust the wait time on an existing entry.
  */
 
-static void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
+void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
     int qpid, wsecs;
     BQUE *qptr, *point, *trail;
@@ -1266,7 +1266,7 @@ int do_top(int ncmds)
  * do_ps: tell player what commands they have pending in the queue
  */
 
-static void show_que(dbref player, int key, BQUE * queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
+void show_que(dbref player, int key, BQUE * queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
     BQUE *tmp;
     char *bp, *bufp;

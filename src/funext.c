@@ -23,26 +23,6 @@
 #include "powers.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-extern void make_ulist(dbref, char *, char **);
-
-extern void make_portlist(dbref, dbref, char *, char **);
-
-extern int fetch_idle(dbref, int);
-
-extern int fetch_connect(dbref, int);
-
-extern char *get_doing(dbref, int);
-
-extern void make_sessioninfo(dbref, dbref, int, char *, char **);
-
-extern dbref get_programmer(dbref);
-
-extern void cf_display(dbref, char *, char *, char **);
-
-extern void help_helper(dbref, int, int, char *, char *, char **);
-
-extern int safe_chr_real_fn(char, char *, char **, int);
-
 #define Find_Connection(x,s,t,p) \
     p = t = NOTHING;    \
     if (is_integer(s)) {    \

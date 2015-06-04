@@ -29,17 +29,16 @@ extern const int _sys_nsig;
 #define NSIG _sys_nsig
 #endif
 
-extern void dispatch(void);
+/*
+ * Globals
+ */
+
 int sock;
 int ndescriptors = 0;
 int maxd = 0;
 DESC *descriptor_list = NULL;
 volatile pid_t slave_pid = 0;
 volatile int slave_socket = -1;
-DESC *initializesock(int, struct sockaddr_in *);
-DESC *new_connection(int);
-int process_output(DESC *);
-int process_input(DESC *);
 
 /*
  * Some systems are lame, and inet_addr() returns -1 on failure, despite the
@@ -54,7 +53,7 @@ int process_input(DESC *);
  * get a result from the slave
  */
 
-static int get_slave_result(void) {
+int get_slave_result(void) {
 	char *buf, *host1, *hostname, *host2, *p, *userid;
 	int remote_port, len;
 	unsigned long addr;
@@ -1057,14 +1056,14 @@ void report(void) {
 #define SIGCHLD SIGCLD
 #endif
 
-static void sighandler(int sig) {
+void sighandler(int sig) {
 #ifdef HAVE_SYS_SIGNAME
 #define signames sys_signame
 #else
 #ifdef SYS_SIGLIST_DECLARED
 #define signames sys_siglist
 #else
-	static const char *signames[] = { "SIGZERO", "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT", "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV", "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM", "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT", "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGLOST", "SIGUSR1", "SIGUSR2" };
+	const char *signames[] = { "SIGZERO", "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT", "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV", "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM", "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT", "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGLOST", "SIGUSR1", "SIGUSR2" };
 #endif				/* SYS_SIGLIST_DECLARED */
 #endif				/* HAVE_SYS_SIGNAME */
 	int i;
@@ -1266,7 +1265,7 @@ void set_signals(void) {
 #endif
 }
 
-static void unset_signals(void) {
+void unset_signals(void) {
 	int i;
 
 	for (i = 0; i < NSIG; i++) {
@@ -1274,7 +1273,7 @@ static void unset_signals(void) {
 	}
 }
 
-static void check_panicking(int sig) {
+void check_panicking(int sig) {
 	int i;
 
 	/*

@@ -21,4 +21,9 @@ struct help_entry {
     int len;			/* Length of entry, copied from help_indx */
 };
 
+typedef struct _help_indx_list {
+    help_indx entry;
+    struct _help_indx_list *next;
+} help_indx_list;
+
 #endif				/* __HELP_H */

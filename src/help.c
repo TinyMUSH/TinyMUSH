@@ -23,12 +23,6 @@
 
 /* Functions used to build indexes */
 
-typedef struct _help_indx_list {
-    help_indx entry;
-    struct _help_indx_list *next;
-} help_indx_list;
-
-
 int helpmkindx_dump_entries(FILE * wfp, long pos, help_indx_list * entries)
 {
     int truepos;

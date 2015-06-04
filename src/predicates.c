@@ -27,29 +27,12 @@
 #include "ansi.h"		/* required by code */
 #include "functions.h"		/* required by code */
 
-extern int do_command(DESC *, char *, int);
-
-extern void dump_database(void);
-
-extern LOGFILETAB logfds_table[];
-
-extern volatile int slave_pid;
-
-extern volatile int slave_socket;
-
-extern void load_quota(int *, dbref, int);
-
-extern void save_quota(int *, dbref, int);
-
-extern int get_gender(dbref);
-
-static int type_quota(int);
-
-static int pay_quota(dbref, int, int);
-
 /* ---------------------------------------------------------------------------
  * insert_first, remove_first: Insert or remove objects from lists.
  */
+ 
+extern pid_t slave_pid;
+extern int slave_socket;
 
 dbref insert_first(dbref head, dbref thing)
 {
@@ -209,7 +192,7 @@ int could_doit(dbref player, dbref thing, int locknum)
     return doit;
 }
 
-static int canpayquota(dbref player, dbref who, int cost, int objtype)
+int canpayquota(dbref player, dbref who, int cost, int objtype)
 {
     register int quota;
     int q_list[5];
@@ -248,7 +231,7 @@ static int canpayquota(dbref player, dbref who, int cost, int objtype)
 }
 
 
-static int pay_quota(dbref who, int cost, int objtype)
+int pay_quota(dbref who, int cost, int objtype)
 {
     /*
      * If no cost, succeed.  Negative costs /must/ be managed, however
@@ -288,7 +271,7 @@ int canpayfees(dbref player, dbref who, int pennies, int quota, int objtype)
     return 1;
 }
 
-static int type_quota(int objtype)
+int type_quota(int objtype)
 {
     int qtype;
 
@@ -1206,7 +1189,7 @@ void handle_prog(DESC * d, char *message)
     free_lbuf(cmd);
 }
 
-static int ok_program(dbref player, dbref doer)
+int ok_program(dbref player, dbref doer)
 {
     if ((!(Prog(player) || Prog(Owner(player))) && !Controls(player, doer))
 	|| (God(doer) && !God(player))) {
@@ -1442,7 +1425,7 @@ void do_eval(dbref player, dbref cause, int key, char *str)
 /* ---------------------------------------------------------------------------
  */
 
-static dbref promote_dflt(dbref old, dbref new)
+dbref promote_dflt(dbref old, dbref new)
 {
     switch (new) {
     case NOPERM:

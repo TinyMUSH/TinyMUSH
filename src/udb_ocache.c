@@ -22,14 +22,6 @@
 #include "udb_defs.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-extern void warning(char *, ...);
-
-extern void fatal(char *, ...);
-
-extern void log_db_err(int, int, const char *);
-
-extern void dddb_setsync(int);
-
 #define NAMECMP(a,b,c,d,e)  ((d == e) && !memcmp(a,b,c))
 
 #define DEQUEUE(q, e)   if(e->nxt == (Cache *)0) { \
@@ -94,13 +86,11 @@ extern void dddb_setsync(int);
             q->tail = e; \
             e->nxtfree = (Cache *)0;
 
-static Cache *get_free_entry(int);
-
-static int cache_write(Cache *);
+Cache *get_free_entry(int);
 
 /* initial settings for cache sizes */
 
-static int cwidth = CACHE_WIDTH;
+int cwidth = CACHE_WIDTH;
 
 /* sys_c points to all cache lists */
 
@@ -109,37 +99,23 @@ Chain *sys_c;
 /* freelist points to an alternate linked list kept in LRU order */
 
 Chain *freelist;
-
-static int cache_initted = 0;
-
-static int cache_frozen = 0;
+int cache_initted = 0;
+int cache_frozen = 0;
 
 /* cache stats */
 
 time_t cs_ltime;
-
 int cs_writes = 0;		/* total writes */
-
 int cs_reads = 0;		/* total reads */
-
 int cs_dbreads = 0;		/* total read-throughs */
-
 int cs_dbwrites = 0;		/* total write-throughs */
-
 int cs_dels = 0;		/* total deletes */
-
 int cs_checks = 0;		/* total checks */
-
 int cs_rhits = 0;		/* total reads filled from cache */
-
 int cs_ahits = 0;		/* total reads filled active cache */
-
 int cs_whits = 0;		/* total writes to dirty cache */
-
 int cs_fails = 0;		/* attempts to grab nonexistent */
-
 int cs_syncs = 0;		/* total cache syncs */
-
 int cs_size = 0;		/* total cache size */
 
 int cachehash(void *keydata, int keylen, unsigned int type)
@@ -177,7 +153,7 @@ int cache_init(int width)
 {
     int x;
     Chain *sp;
-    static char *ncmsg = "cache_init: cannot allocate cache: ";
+    char *ncmsg = "cache_init: cannot allocate cache: ";
 
     if (cache_initted || sys_c != (Chain *) 0) {
 	return (0);
@@ -734,7 +710,7 @@ int cache_put(DBData key, DBData data, unsigned int type)
     return (0);
 }
 
-static Cache *get_free_entry(int atrsize)
+Cache *get_free_entry(int atrsize)
 {
     DBData key, data;
     Chain *sp;
@@ -845,7 +821,7 @@ static Cache *get_free_entry(int atrsize)
     return (cp);
 }
 
-static int cache_write(Cache * cp)
+int cache_write(Cache * cp)
 {
     DBData key, data;
 

@@ -21,12 +21,24 @@
 #define FC_CONN_HTML    11
 #define FC_LAST         11
 
-/* File cache routines */
+typedef struct filecache_hdr FCACHE;
 
-extern void fcache_rawdump(int fd, int num);
-extern void fcache_dump(DESC * d, int num);
-extern void fcache_send(dbref, int);
-extern void fcache_load(dbref);
-extern void fcache_init(void);
+typedef struct filecache_block_hdr FBLKHDR;
+
+typedef struct filecache_block FBLOCK;
+
+struct filecache_hdr {
+    char **filename;
+    FBLOCK *fileblock;
+    const char *desc;
+};
+
+struct filecache_block {
+    struct filecache_block_hdr {
+	struct filecache_block *nxt;
+	int nchars;
+    } hdr;
+    char data[MBUF_SIZE - sizeof(FBLKHDR)];
+};
 
 #endif				/* __FILE_C_H */

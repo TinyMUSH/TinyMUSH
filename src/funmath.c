@@ -32,11 +32,11 @@ typedef union {
     unsigned int u[FP_SIZE];
 } fp_union_uint;
 
-static unsigned int fp_check_weird(char *buff, char **bufc, double result)
+unsigned int fp_check_weird(char *buff, char **bufc, double result)
 {
-    static fp_union_uint fp_sign_mask, fp_exp_mask, fp_mant_mask, fp_val;
-    static const double d_zero = 0.0;
-    static int fp_initted = 0;
+    fp_union_uint fp_sign_mask, fp_exp_mask, fp_mant_mask, fp_val;
+    const double d_zero = 0.0;
+    int fp_initted = 0;
     unsigned int fp_sign, fp_exp, fp_mant;
     int i;
 
@@ -109,7 +109,7 @@ static unsigned int fp_check_weird(char *buff, char **bufc, double result)
  * fval: copy the floating point value into a buffer and make it presentable
  */
 
-static void fval(char *buff, char **bufc, double result)
+void fval(char *buff, char **bufc, double result)
 {
     char *p, *buf1;
 
@@ -388,7 +388,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
     double val;
     int oper, flag;
-    static double (*const trig_funcs[8]) (double) = {
+    double (*const trig_funcs[8]) (double) = {
 	sin, cos, tan, NULL,	/* XXX no cotangent function */
     asin, acos, atan, NULL};
     flag = Func_Flags(fargs);
@@ -418,7 +418,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Base conversion: BASECONV
  */
 
-static char from_base_64[256] = {
+char from_base_64[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, 62, -1, 63,
@@ -437,9 +437,9 @@ static char from_base_64[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-static char to_base_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+char to_base_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
-static char from_base_36[256] = {
+char from_base_36[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -458,7 +458,7 @@ static char from_base_36[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-static char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {

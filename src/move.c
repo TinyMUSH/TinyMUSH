@@ -28,7 +28,7 @@
  * a place.
  */
 
-static void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hush)
+void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hush)
 {
     dbref loc;
     int quiet, pattr, oattr, aattr;
@@ -92,7 +92,7 @@ static void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear,
  * a place.
  */
 
-static void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hush)
+void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hush)
 {
     dbref loc;
     int quiet, pattr, oattr, aattr;
@@ -197,7 +197,7 @@ void move_object(dbref thing, dbref dest)
 
 /* send_dropto: Send an object through the dropto of a room */
 
-static void send_dropto(dbref thing, dbref player)
+void send_dropto(dbref thing, dbref player)
 {
     if (!Sticky(thing)) {
 	move_via_generic(thing, Dropto(Location(thing)), player, 0);
@@ -212,7 +212,7 @@ static void send_dropto(dbref thing, dbref player)
  * we should empty the room
  */
 
-static void process_sticky_dropto(dbref loc, dbref player)
+void process_sticky_dropto(dbref loc, dbref player)
 {
     dbref dropto, thing, next;
 
@@ -252,7 +252,7 @@ static void process_sticky_dropto(dbref loc, dbref player)
 
 /* process_dropped_dropto: Check what to do when someone drops an object. */
 
-static void process_dropped_dropto(dbref thing, dbref player)
+void process_dropped_dropto(dbref thing, dbref player)
 {
     dbref loc;
 
@@ -400,7 +400,7 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush)
  * find_var_dest: Find a variable exit destination (DESTINATION attr).
  */
 
-static dbref find_var_dest(dbref player, dbref exit)
+dbref find_var_dest(dbref player, dbref exit)
 {
     char *buf, *ebuf, *ep, *str;
     dbref aowner, dest_room;

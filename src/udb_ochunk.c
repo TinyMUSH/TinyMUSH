@@ -19,36 +19,20 @@
 #include "interface.h"
 #include "externs.h"		/* required by code */
 
-#ifdef HAVE_LIBTINYGDBM_H
-#include "libtinygdbm.h"	/* required by code */
-#else
-#ifdef HAVE_LIBTINYQDBM_H
-#include "libtinyqdbm.h"	/* required by code */
-#endif
-#endif
+#include "libtinydbm.h"		/* required by code */
 
 #include "udb.h"		/* required by code */
 #include "udb_defs.h"
 
 #define DEFAULT_DBMCHUNKFILE "mudDB"
 
-static char *dbfile = DEFAULT_DBMCHUNKFILE;
+char *dbfile = DEFAULT_DBMCHUNKFILE;
+int db_initted = 0;
+GDBM_FILE dbp = (GDBM_FILE) 0;
+datum dat;
+datum key;
 
-static int db_initted = 0;
-
-static GDBM_FILE dbp = (GDBM_FILE) 0;
-
-static datum dat;
-
-static datum key;
-
-static struct flock fl;
-
-extern void fatal(char *, ...);
-
-extern void warning(char *, ...);
-
-extern void log_db_err(int, int, const char *);
+struct flock fl;
 
 void dddb_setsync(int flag)
 {
@@ -60,7 +44,7 @@ void dddb_setsync(int flag)
     }
 }
 
-static void dbm_error(char *msg)
+void dbm_error(char *msg)
 {
     log_write(LOG_ALWAYS, "DB", "ERROR", "Database error: %s\n", msg);
 }
@@ -76,7 +60,7 @@ int dddb_optimize(void)
 
 int dddb_init(void)
 {
-    static char *copen = "db_init cannot open ";
+    char *copen = "db_init cannot open ";
     char tmpfile[256];
     char *gdbm_error;
     int i;

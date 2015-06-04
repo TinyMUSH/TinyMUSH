@@ -282,7 +282,7 @@ void list_functable(dbref player)
  * list_funcaccess: List access on functions.
  */
 
-static void helper_list_funcaccess(dbref player, FUN * fp, char *buff)
+void helper_list_funcaccess(dbref player, FUN * fp, char *buff)
 {
     char *bp;
     int i;

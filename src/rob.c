@@ -183,7 +183,7 @@ void do_kill(dbref player, dbref cause, int key, char *what, char *costchar)
  * * give_thing, give_money, do_give: Give away money or things.
  */
 
-static void give_thing(dbref giver, dbref recipient, int key, char *what)
+void give_thing(dbref giver, dbref recipient, int key, char *what)
 {
     dbref thing;
     char *str, *sp;
@@ -251,7 +251,7 @@ static void give_thing(dbref giver, dbref recipient, int key, char *what)
     did_it(recipient, thing, A_SUCC, NULL, A_OSUCC, NULL, A_ASUCC, 0, (char **) NULL, 0, MSG_MOVE);
 }
 
-static void give_money(dbref giver, dbref recipient, int key, int amount)
+void give_money(dbref giver, dbref recipient, int key, int amount)
 {
     dbref aowner;
     int cost, aflags, alen;

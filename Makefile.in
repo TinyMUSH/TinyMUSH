@@ -357,6 +357,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 with_compress_prog = @with_compress_prog@
+with_cproto_prog = @with_cproto_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
 ACLOCAL_AMFLAGS = -I src/libltdl/m4

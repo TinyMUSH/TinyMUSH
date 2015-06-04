@@ -25,12 +25,7 @@
 #include "powers.h"		/* required by code */
 #include "walkdb.h"		/* required by code */
 
-extern char *upcasestr(char *);
-
-extern dbref find_connected_ambiguous(dbref, char *);
-
 extern NAMETAB attraccess_nametab[];
-
 extern NAMETAB indiv_attraccess_nametab[];
 
 /*
@@ -1079,7 +1074,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
  * fun_hasflag:  plus auxiliary function atr_has_flag.
  */
 
-static int atr_has_flag(dbref player, dbref thing, ATTR * attr, int aowner, int aflags, char *flagname)
+int atr_has_flag(dbref player, dbref thing, ATTR * attr, int aowner, int aflags, char *flagname)
 {
     int flagval;
 
@@ -2348,7 +2343,7 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * Memory usage.
  */
 
-static int mem_usage(dbref thing)
+int mem_usage(dbref thing)
 {
     int k;
     int ca;
@@ -2378,7 +2373,7 @@ static int mem_usage(dbref thing)
     return k;
 }
 
-static int mem_usage_attr(dbref player, char *str)
+int mem_usage_attr(dbref player, char *str)
 {
     dbref thing, aowner;
     int atr, aflags, alen;
@@ -2618,7 +2613,7 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * as %0, and the speech part number as %1.
  */
 
-static void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim * open_sep, const Delim * close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc)
+void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim * open_sep, const Delim * close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc)
 {
     char *sp, *ep, *save, *tp, *bp;
     char *result, *tstack[3], *estack[2], tbuf[LBUF_SIZE];

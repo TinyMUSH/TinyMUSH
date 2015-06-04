@@ -43,23 +43,14 @@
  */
 
 CONFDATA mudconf;
-
 STATEDATA mudstate;
-
 extern NAMETAB logdata_nametab[];
-
 extern NAMETAB logoptions_nametab[];
-
 extern NAMETAB access_nametab[];
-
 extern NAMETAB attraccess_nametab[];
-
 extern NAMETAB list_names[];
-
 extern NAMETAB sigactions_nametab[];
-
 extern CONF conftable[];
-
 extern LOGFILETAB logfds_table[];
 
 /*
@@ -1103,11 +1094,11 @@ int cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd)
  * modify_xfuncs: Helper function to change xfuncs.
  */
 
-static NAMEDFUNC **all_named_funcs = NULL;
+NAMEDFUNC **all_named_funcs = NULL;
 
-static int num_named_funcs = 0;
+int num_named_funcs = 0;
 
-static int modify_xfuncs(char *fn_name, int (*fn_ptr) (dbref), EXTFUNCS ** xfuncs, int negate)
+int modify_xfuncs(char *fn_name, int (*fn_ptr) (dbref), EXTFUNCS ** xfuncs, int negate)
 {
     EXTFUNCS *xfp;
     NAMEDFUNC *np, **tp;
@@ -1406,7 +1397,7 @@ int cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
  * take steps here to deal with it.
  */
 
-static unsigned long sane_inet_addr(char *str)
+unsigned long sane_inet_addr(char *str)
 {
     int i;
     char *p;
@@ -1528,7 +1519,7 @@ int cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
  * taken up with the access nametab.
  */
 
-static int helper_cf_cf_access(CONF * tp, dbref player, int *vp, char *ap, char *cmd, long extra)
+int helper_cf_cf_access(CONF * tp, dbref player, int *vp, char *ap, char *cmd, long extra)
 {
     /*
      * Cannot modify parameters set STATIC
@@ -1743,7 +1734,6 @@ int cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     FILE *fp;
     char *cp, *ap, *zp, *buf;
-    extern int cf_set(char *, char *, dbref);
     int line = 0;
 
     /* XXX TODO Add stuff to fill
@@ -1858,24 +1848,6 @@ int cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
     fclose(fp);
     return 0;
 }
-
-extern int cf_access(int *, char *, long, dbref, char *);
-
-extern int cf_cmd_alias(int *, char *, long, dbref, char *);
-
-extern int cf_acmd_access(int *, char *, long, dbref, char *);
-
-extern int cf_attr_access(int *, char *, long, dbref, char *);
-
-extern int cf_attr_type(int *, char *, long, dbref, char *);
-
-extern int cf_func_access(int *, char *, long, dbref, char *);
-
-extern int cf_flag_access(int *, char *, long, dbref, char *);
-
-extern int cf_flag_name(int *, char *, long, dbref, char *);
-
-extern int cf_power_access(int *, char *, long, dbref, char *);
 
 /* *INDENT-OFF* */
 
@@ -2159,7 +2131,7 @@ CONF        conftable [] = {
  * cf_set: Set config parameter.
  */
 
-static int helper_cf_set(char *cp, char *ap, dbref player, CONF * tp)
+int helper_cf_set(char *cp, char *ap, dbref player, CONF * tp)
 {
     int i;
     char *buf, *buff, *name, *status;
@@ -2410,7 +2382,7 @@ void cf_verify(void)
  * sane fashion.
  */
 
-static void helper_cf_display(dbref player, char *buff, char **bufc, CONF * tp)
+void helper_cf_display(dbref player, char *buff, char **bufc, CONF * tp)
 {
     NAMETAB *opt;
 

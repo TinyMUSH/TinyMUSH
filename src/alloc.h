@@ -63,16 +63,6 @@ extern int malloc_bytes;
 extern void *malloc_str;
 extern void *malloc_ptr;
 
-extern void *xmalloc(size_t, const char *);
-extern void *xcalloc(size_t, size_t, const char *);
-extern void *xrealloc(void *, size_t, const char *);
-extern void *xstrdup(const char *, const char *);
-extern void *xstrndup(const void *, size_t, const char *);
-extern void xfree(void *, const char *);
-
-static void trace_alloc(size_t amount, const char *name, void *ptr);
-static void trace_free(const char *name, void *ptr);
-
 typedef struct tracemem_header {
     void *bptr;
     const char *buf_tag;
@@ -84,12 +74,6 @@ typedef struct tracemem_header {
  * ---------------------------------------------------------------------------
  * Pool allocation.
  */
-
-extern void pool_init(int, int);
-extern char *pool_alloc(int, const char *);
-extern void pool_free(int, char **);
-extern void list_bufstats(dbref);
-extern void list_buftrace(dbref);
 
 #define alloc_hbuf(s)	pool_alloc(POOL_HBUF,s)
 #define free_hbuf(b)	pool_free(POOL_HBUF,((char **)&(b)))
@@ -107,8 +91,6 @@ extern void list_buftrace(dbref);
 #define free_qentry(b)	pool_free(POOL_QENTRY,((char **)&(b)))
 #define alloc_pcache(s)	(PCACHE *)pool_alloc(POOL_PCACHE,s)
 #define free_pcache(b)	pool_free(POOL_PCACHE,((char **)&(b)))
-
-extern void safe_copy_chr(char, char[], char **, int);
 
 #define safe_str(s,b,p)		safe_strcat((b),(p),(s),(LBUF_SIZE-1))
 #define safe_chr(c,b,p)		safe_copy_chr((c),(b),(p),(LBUF_SIZE-1))

@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -80,17 +81,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = netmush$(EXEEXT) slave$(EXEEXT)
-@WANT_DBM_GDBM_TRUE@am__append_1 = dbm/gdbm/
-@WANT_DBM_GDBM_TRUE@am__append_2 = -I dbm/gdbm/
-@WANT_DBM_GDBM_TRUE@am__append_3 = dbm/gdbm/libtinygdbm.a
-# recover_LDADD		+= dbm/gdbm/libtinygdbm.a
-@WANT_DBM_QDBM_TRUE@am__append_4 = dbm/qdbm/
-@WANT_DBM_QDBM_TRUE@am__append_5 = -I dbm/qdbm/
-@WANT_DBM_QDBM_TRUE@am__append_6 = dbm/qdbm/libtinyqdbm.a
-# recover_LDADD		+= dbm/qdbm/libtinyqdbm.a
-@WANT_MODULE_COMSYS_TRUE@am__append_7 = modules/comsys/
-@WANT_MODULE_MAIL_TRUE@am__append_8 = modules/mail/
-@WANT_MODULE_DB_SQL_TRUE@am__append_9 = modules/db_sql/
+@WANT_MODULE_COMSYS_TRUE@am__append_1 = modules/comsys/
+@WANT_MODULE_MAIL_TRUE@am__append_2 = modules/mail/
+@WANT_MODULE_DB_SQL_TRUE@am__append_3 = modules/db_sql/
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/src/libltdl/config/depcomp
@@ -114,9 +107,60 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+ARFLAGS = cru
+AM_V_AR = $(am__v_AR_@AM_V@)
+am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
+am__v_AR_0 = @echo "  AR      " $@;
+am__v_AR_1 = 
+libtinydbm_a_AR = $(AR) $(ARFLAGS)
+libtinydbm_a_LIBADD =
+am__libtinydbm_a_SOURCES_DIST = dbm/gdbm/gdbmbucket.c \
+	dbm/gdbm/gdbmfalloc.c dbm/gdbm/gdbmfindkey.c \
+	dbm/gdbm/gdbmclose.c dbm/gdbm/gdbmdelete.c \
+	dbm/gdbm/gdbmerrno.c dbm/gdbm/gdbmexists.c \
+	dbm/gdbm/gdbmfdesc.c dbm/gdbm/gdbmfetch.c dbm/gdbm/gdbmopen.c \
+	dbm/gdbm/gdbmreorg.c dbm/gdbm/gdbmseq.c dbm/gdbm/gdbmsetopt.c \
+	dbm/gdbm/gdbmstore.c dbm/gdbm/gdbmsync.c dbm/gdbm/gdbmglobal.c \
+	dbm/gdbm/gdbmhash.c dbm/gdbm/gdbmupdate.c \
+	dbm/gdbm/gdbmversion.c dbm/gdbm/gdbmextern.h \
+	dbm/gdbm/gdbmconst.h dbm/gdbm/gdbmdefs.h dbm/gdbm/gdbmerrno.h \
+	dbm/gdbm/gdbmproto.h dbm/gdbm/gdbmsystems.h \
+	dbm/gdbm/gdbmcopyright.h dbm/qdbm/curia.c dbm/qdbm/depot.c \
+	dbm/qdbm/hovel.c dbm/qdbm/myconf.c dbm/qdbm/curia.h \
+	dbm/qdbm/depot.h dbm/qdbm/hovel.h dbm/qdbm/myconf.h \
+	dbm/qdbm/copyright.h
+am__dirstamp = $(am__leading_dot)dirstamp
+@WANT_DBM_GDBM_FALSE@@WANT_DBM_QDBM_TRUE@am_libtinydbm_a_OBJECTS = dbm/qdbm/curia.$(OBJEXT) \
+@WANT_DBM_GDBM_FALSE@@WANT_DBM_QDBM_TRUE@	dbm/qdbm/depot.$(OBJEXT) \
+@WANT_DBM_GDBM_FALSE@@WANT_DBM_QDBM_TRUE@	dbm/qdbm/hovel.$(OBJEXT) \
+@WANT_DBM_GDBM_FALSE@@WANT_DBM_QDBM_TRUE@	dbm/qdbm/myconf.$(OBJEXT)
+@WANT_DBM_GDBM_TRUE@am_libtinydbm_a_OBJECTS =  \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmbucket.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmfalloc.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmfindkey.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmclose.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmdelete.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmerrno.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmexists.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmfdesc.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmfetch.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmopen.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmreorg.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmseq.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmsetopt.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmstore.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmsync.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmglobal.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmhash.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmupdate.$(OBJEXT) \
+@WANT_DBM_GDBM_TRUE@	dbm/gdbm/gdbmversion.$(OBJEXT)
+nodist_libtinydbm_a_OBJECTS =
+libtinydbm_a_OBJECTS = $(am_libtinydbm_a_OBJECTS) \
+	$(nodist_libtinydbm_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_netmush_OBJECTS = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
+am__objects_1 = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	bsd.$(OBJEXT) command.$(OBJEXT) conf.$(OBJEXT) cque.$(OBJEXT) \
 	create.$(OBJEXT) db.$(OBJEXT) db_rw.$(OBJEXT) eval.$(OBJEXT) \
 	file_c.$(OBJEXT) flags.$(OBJEXT) fnhelper.$(OBJEXT) \
@@ -133,6 +177,8 @@ am_netmush_OBJECTS = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	udb_obj.$(OBJEXT) udb_ocache.$(OBJEXT) udb_ochunk.$(OBJEXT) \
 	unparse.$(OBJEXT) vattr.$(OBJEXT) version.$(OBJEXT) \
 	walkdb.$(OBJEXT) wild.$(OBJEXT) wiz.$(OBJEXT)
+am__objects_2 =
+am_netmush_OBJECTS = $(am__objects_1) $(am__objects_2)
 nodist_netmush_OBJECTS =
 netmush_OBJECTS = $(am_netmush_OBJECTS) $(nodist_netmush_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -143,7 +189,8 @@ am__v_lt_1 =
 netmush_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(netmush_LDFLAGS) $(LDFLAGS) -o $@
-am_slave_OBJECTS = slave.$(OBJEXT)
+am__objects_3 = slave.$(OBJEXT)
+am_slave_OBJECTS = $(am__objects_3) $(am__objects_2)
 slave_OBJECTS = $(am_slave_OBJECTS)
 slave_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -180,9 +227,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(netmush_SOURCES) $(nodist_netmush_SOURCES) \
+SOURCES = $(libtinydbm_a_SOURCES) $(nodist_libtinydbm_a_SOURCES) \
+	$(netmush_SOURCES) $(nodist_netmush_SOURCES) $(slave_SOURCES)
+DIST_SOURCES = $(am__libtinydbm_a_SOURCES_DIST) $(netmush_SOURCES) \
 	$(slave_SOURCES)
-DIST_SOURCES = $(netmush_SOURCES) $(slave_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -252,8 +300,7 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = libltdl dbm/gdbm/ dbm/qdbm/ modules/comsys/ \
-	modules/mail/ modules/db_sql/
+DIST_SUBDIRS = libltdl modules/comsys/ modules/mail/ modules/db_sql/
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -425,25 +472,25 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 with_compress_prog = @with_compress_prog@
+with_cproto_prog = @with_cproto_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
-AM_CPPFLAGS = $(LTDLINCL) $(am__append_2) $(am__append_5)
-SUBDIRS = libltdl $(am__append_1) $(am__append_4) $(am__append_7) \
-	$(am__append_8) $(am__append_9)
+AM_CPPFLAGS = $(LTDLINCL)
+SUBDIRS = libltdl $(am__append_1) $(am__append_2) $(am__append_3)
 AUTOMAKE_OPTIONS = subdir-objects
-netmush_SOURCES = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c alloc.h ansi.h attrs.h bitstring.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h slave.h system.h typedefs.h udb.h udb_defs.h vattr.h walkdb.h
+netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+netmush_H = alloc.h ansi.h api.h attrs.h bsd.h cmdtabs.h command.h config.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h powers.h system.h tinymushapi.h typedefs.h udb_defs.h udb.h vattr.h walkdb.h
+netmush_SOURCES = $(netmush_C) $(netmush_H)
 netmush_LDFLAGS = -export-dynamic
 netmush_SKEL = defaults.h.in
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self \
 	$(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) \
-	$(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM) $(am__append_3) \
-	$(am__append_6)
+	$(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM) libtinydbm.a
 netmush_DEPENDENCIES = $(LTDLDEPS) 
-nodist_netmush_SOURCES = version.h defaults.h
-
-#recover_SOURCES	= recover.c
-#recover_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
-slave_SOURCES = slave.c
+nodist_netmush_SOURCES = defaults.h prototypes.h version.h
+slave_C = slave.c
+slave_H = slave.h
+slave_SOURCES = $(slave_C) $(slave_H)
 SHARE_DIR = share
 SHARE_SRC = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 ETC_DIR = etc
@@ -456,10 +503,16 @@ SCRIPT_SRC = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SC
 SCRIPT_DAT = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
 SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
 EXTRA_DIST = libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES = version.h defaults.h tinymushapi.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+CLEANFILES = defaults.h prototypes.h libtinydbm.h tinymushapi.h version.h$(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h api.h interface.h externs.h
-BUILT_SOURCES = version.h tinymushapi.h defaults.h netmush.conf Startmush
+BUILT_SOURCES = prototypes.h version.h tinymushapi.h defaults.h \
+	netmush.conf Startmush libtinydbm.h
 nodist_include_HEADERS = tinymushapi.h
+CPROTO_INCLUDES = 
+noinst_LIBRARIES = libtinydbm.a
+nodist_libtinydbm_a_SOURCES = libtinydbm.h
+@WANT_DBM_GDBM_TRUE@libtinydbm_a_SOURCES = dbm/gdbm/gdbmbucket.c dbm/gdbm/gdbmfalloc.c dbm/gdbm/gdbmfindkey.c dbm/gdbm/gdbmclose.c dbm/gdbm/gdbmdelete.c dbm/gdbm/gdbmerrno.c dbm/gdbm/gdbmexists.c dbm/gdbm/gdbmfdesc.c dbm/gdbm/gdbmfetch.c dbm/gdbm/gdbmopen.c dbm/gdbm/gdbmreorg.c dbm/gdbm/gdbmseq.c dbm/gdbm/gdbmsetopt.c dbm/gdbm/gdbmstore.c dbm/gdbm/gdbmsync.c dbm/gdbm/gdbmglobal.c dbm/gdbm/gdbmhash.c dbm/gdbm/gdbmupdate.c dbm/gdbm/gdbmversion.c dbm/gdbm/gdbmextern.h dbm/gdbm/gdbmconst.h dbm/gdbm/gdbmdefs.h dbm/gdbm/gdbmerrno.h dbm/gdbm/gdbmproto.h dbm/gdbm/gdbmsystems.h dbm/gdbm/gdbmcopyright.h
+@WANT_DBM_QDBM_TRUE@libtinydbm_a_SOURCES = dbm/qdbm/curia.c dbm/qdbm/depot.c dbm/qdbm/hovel.c dbm/qdbm/myconf.c dbm/qdbm/curia.h dbm/qdbm/depot.h dbm/qdbm/hovel.h dbm/qdbm/myconf.h dbm/qdbm/copyright.h
 do_subst = $(SED) \
 	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
 	-e 's|[@]with_compress_prog@|$(with_compress_prog)|g' \
@@ -527,6 +580,72 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+dbm/gdbm/$(am__dirstamp):
+	@$(MKDIR_P) dbm/gdbm
+	@: > dbm/gdbm/$(am__dirstamp)
+dbm/gdbm/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) dbm/gdbm/$(DEPDIR)
+	@: > dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmbucket.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmfalloc.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmfindkey.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmclose.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmdelete.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmerrno.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmexists.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmfdesc.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmfetch.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmopen.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmreorg.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmseq.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmsetopt.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmstore.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmsync.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmglobal.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmhash.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmupdate.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/gdbm/gdbmversion.$(OBJEXT): dbm/gdbm/$(am__dirstamp) \
+	dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/qdbm/$(am__dirstamp):
+	@$(MKDIR_P) dbm/qdbm
+	@: > dbm/qdbm/$(am__dirstamp)
+dbm/qdbm/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) dbm/qdbm/$(DEPDIR)
+	@: > dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/qdbm/curia.$(OBJEXT): dbm/qdbm/$(am__dirstamp) \
+	dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/qdbm/depot.$(OBJEXT): dbm/qdbm/$(am__dirstamp) \
+	dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/qdbm/hovel.$(OBJEXT): dbm/qdbm/$(am__dirstamp) \
+	dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+dbm/qdbm/myconf.$(OBJEXT): dbm/qdbm/$(am__dirstamp) \
+	dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+
+libtinydbm.a: $(libtinydbm_a_OBJECTS) $(libtinydbm_a_DEPENDENCIES) $(EXTRA_libtinydbm_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libtinydbm.a
+	$(AM_V_AR)$(libtinydbm_a_AR) libtinydbm.a $(libtinydbm_a_OBJECTS) $(libtinydbm_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libtinydbm.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -587,6 +706,8 @@ slave$(EXEEXT): $(slave_OBJECTS) $(slave_DEPENDENCIES) $(EXTRA_slave_DEPENDENCIE
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f dbm/gdbm/*.$(OBJEXT)
+	-rm -f dbm/qdbm/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -646,6 +767,29 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walkdb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wild.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wiz.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmbucket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmclose.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmdelete.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmerrno.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmexists.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmfalloc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmfdesc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmfetch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmfindkey.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmglobal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmhash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmopen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmreorg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmseq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmsetopt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmstore.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmsync.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmupdate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/gdbm/$(DEPDIR)/gdbmversion.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/qdbm/$(DEPDIR)/curia.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/qdbm/$(DEPDIR)/depot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/qdbm/$(DEPDIR)/hovel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@dbm/qdbm/$(DEPDIR)/myconf.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -855,7 +999,7 @@ distdir: $(DISTFILES)
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-recursive
-all-am: Makefile $(PROGRAMS) $(HEADERS) config.h
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"; do \
@@ -889,6 +1033,10 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f dbm/gdbm/$(DEPDIR)/$(am__dirstamp)
+	-rm -f dbm/gdbm/$(am__dirstamp)
+	-rm -f dbm/qdbm/$(DEPDIR)/$(am__dirstamp)
+	-rm -f dbm/qdbm/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -896,10 +1044,11 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) dbm/gdbm/$(DEPDIR) dbm/qdbm/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -946,7 +1095,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) dbm/gdbm/$(DEPDIR) dbm/qdbm/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -971,12 +1120,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local \
 
 .PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
 	check-am clean clean-binPROGRAMS clean-generic clean-libtool \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
-	install-data-am install-data-local install-dvi install-dvi-am \
-	install-exec install-exec-am install-exec-hook \
+	clean-noinstLIBRARIES cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-data-local install-dvi \
+	install-dvi-am install-exec install-exec-am install-exec-hook \
 	install-exec-local install-html install-html-am install-info \
 	install-info-am install-man install-nodist_includeHEADERS \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -987,6 +1136,33 @@ uninstall-am: uninstall-binPROGRAMS uninstall-local \
 	uninstall-am uninstall-binPROGRAMS uninstall-local \
 	uninstall-nodist_includeHEADERS
 
+
+@WANT_DBM_GDBM_TRUE@libtinydbm.h: dbm/gdbm/libtinygdbm.head.h dbm/gdbm/gdbmerrno.h dbm/gdbm/gdbmconst.h dbm/gdbm/gdbmdefs.h dbm/gdbm/gdbmerrno.h dbm/gdbm/gdbmextern.h dbm/gdbm/gdbmproto.h dbm/gdbm/libtinygdbm.foot.h
+@WANT_DBM_GDBM_TRUE@	rm -f libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	touch libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	chmod +w libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	cat dbm/gdbm/libtinygdbm.head.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	sed -n '/#ifndef __GDBMCOPYRIGHT_H/,/\/* __GDBMCOPYRIGHT_H *\//p' < dbm/gdbm/gdbmcopyright.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	printf "\n/*\n * from gdbmconst.h\n */\n\n">> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	sed -n '/#ifndef __GDBMCONST_H/,/\/* __GDBMCONST_H *\//p' < dbm/gdbm/gdbmconst.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	printf "\n/*\n * from gdbmdefs.h\n */\n\n">> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	sed -n '/#ifndef __GDBMDEFS_H/,/\/* __GDBMDEFS_H *\//p' < dbm/gdbm/gdbmdefs.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	printf "\n/*\n * from gdbmerrno.h\n */\n\n">> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	sed -n '/#ifndef __GDBMERRNO_H/,/\/* __GDBMERRNO_H *\//p' < dbm/gdbm/gdbmerrno.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	printf "\n/*\n * from gdbmextern.h\n */\n\n">> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	sed -n '/#ifndef __GDBMEXTERN_H/,/\/* __GDBMEXTERN_H *\//p' < dbm/gdbm/gdbmextern.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	cat dbm/gdbm/libtinygdbm.foot.h >> libtinydbm.h
+@WANT_DBM_GDBM_TRUE@	chmod -w libtinydbm.h
+
+@WANT_DBM_QDBM_TRUE@libtinydbm.h: dbm/qdbm/copyright.h dbm/qdbm/curia.h dbm/qdbm/depot.h dbm/qdbm/hovel.h
+@WANT_DBM_QDBM_TRUE@	rm -f libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	touch libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	chmod +w libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	sed -n '/#ifndef __QDBMCOPYRIGHT_H/,/\/* __QDBMCOPYRIGHT_H *\//p' < dbm/qdbm/copyright.h >> libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	sed -n '/#ifndef __DEPOT_H/,/\/* __DEPOT_H *\//p' < dbm/qdbm/depot.h >> libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	sed -n '/#ifndef __CURIA_H/,/\/* __CURIA_H *\//p' < dbm/qdbm/curia.h >> libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	sed -n '/#ifndef __HOVEL_H/,/\/* __HOVEL_H *\//p' < dbm/qdbm/hovel.h >> libtinydbm.h
+@WANT_DBM_QDBM_TRUE@	chmod -w libtinydbm.h
 
 astyle:
 	for i in $(netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES) ; do \
@@ -1004,6 +1180,28 @@ defaults.h: defaults.h.in
 Startmush: $(SCRIPT_DIR)/Startmush.in
 	$(do_subst) <$(SCRIPT_DIR)/Startmush.in >$(SCRIPT_DIR)/Startmush
 	chmod +x $(SCRIPT_DIR)/Startmush
+
+prototypes.h: version.h defaults.h libtinydbm.h
+	rm -f prototypes.h
+	touch prototypes.h
+	echo '#include "copyright.h"' > _prototypes.h
+	echo '#ifndef __PROTOTYPES_H' >> _prototypes.h
+	echo '#define __PROTOTYPES_H' >> _prototypes.h
+	echo '#include "vattr.h"' >> _prototypes.h
+	echo '#include "help.h"' >> _prototypes.h
+	echo '#include "player_c.h"' >> _prototypes.h
+	echo '#include "powers.h"' >> _prototypes.h
+	echo '#include "walkdb.h"' >> _prototypes.h
+	echo '#include "functions.h"' >> _prototypes.h
+	echo '#include "command.h"' >> _prototypes.h
+	echo '#include "match.h"' >> _prototypes.h
+	echo '#include "file_c.h"' >> _prototypes.h
+	echo '#include "player.h"' >> _prototypes.h
+	for i in $(netmush_C); do $(with_cproto_prog) -E /usr/bin/cpp $(CPROTO_INCLUDES) -e -f 2 $$i >> _prototypes.h; done
+	echo '#endif /* __PROTOTYPES_H */' >> _prototypes.h
+	rm prototypes.h
+	mv _prototypes.h prototypes.h
+	chmod -w prototypes.h
 
 version.h:
 	rm -f version.h

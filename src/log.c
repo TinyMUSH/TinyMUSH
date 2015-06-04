@@ -20,8 +20,8 @@
 
 #include "ansi.h"		/* required by code */
 
-static FILE *mainlog_fp = NULL;	/*!< Pointer to the main log file */
-static FILE *log_fp = NULL;	/*!< Pointer to the facility's log file */
+FILE *mainlog_fp = NULL;	/*!< Pointer to the main log file */
+FILE *log_fp = NULL;	/*!< Pointer to the facility's log file */
 
 char *log_pos = NULL;
 
@@ -130,7 +130,7 @@ int start_log(const char *primary, const char *secondary, int key)
     struct tm *tp;
     time_t now;
     LOGFILETAB *lp;
-    static int last_key = 0;
+    int last_key = 0;
     char *pri, *sec;
 
     if (!mudstate.standalone) {

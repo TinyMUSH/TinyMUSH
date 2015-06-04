@@ -35,7 +35,7 @@
 #define FLOAT_LIST  4
 #define NOCASE_LIST 5
 
-static int autodetect_list(char *ptrs[], int nitems)
+int autodetect_list(char *ptrs[], int nitems)
 {
     int sort_type, i;
     char *p;
@@ -101,7 +101,7 @@ static int autodetect_list(char *ptrs[], int nitems)
     return sort_type;
 }
 
-static int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems)
+int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems)
 {
     if (nfargs >= type_pos) {
 	switch (tolower(*fargs[type_pos - 1])) {
@@ -128,7 +128,7 @@ static int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], 
     return autodetect_list(ptrs, nitems);
 }
 
-static int dbnum(char *dbr)
+int dbnum(char *dbr)
 {
     if ((*dbr != '#') || (dbr[1] == '\0')) {
 	return 0;
@@ -548,7 +548,7 @@ void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 #define IF_REPLACE  1
 #define IF_INSERT   2
 
-static void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const Delim * sep, int flag)
+void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const Delim * sep, int flag)
 {
     int ct, overrun;
     char *sptr, *iptr, *eptr;
@@ -978,27 +978,27 @@ struct a_record {
     int pos;
 };
 
-static int a_comp(const void *s1, const void *s2)
+int a_comp(const void *s1, const void *s2)
 {
     return strcmp(*(char **) s1, *(char **) s2);
 }
 
-static int c_comp(const void *s1, const void *s2)
+int c_comp(const void *s1, const void *s2)
 {
     return strcasecmp(*(char **) s1, *(char **) s2);
 }
 
-static int arec_comp(const void *s1, const void *s2)
+int arec_comp(const void *s1, const void *s2)
 {
     return strcmp(((a_rec *) s1)->str, ((a_rec *) s2)->str);
 }
 
-static int crec_comp(const void *s1, const void *s2)
+int crec_comp(const void *s1, const void *s2)
 {
     return strcasecmp(((a_rec *) s1)->str, ((a_rec *) s2)->str);
 }
 
-static int f_comp(const void *s1, const void *s2)
+int f_comp(const void *s1, const void *s2)
 {
     if (((f_rec *) s1)->data > ((f_rec *) s2)->data) {
 	return 1;
@@ -1011,7 +1011,7 @@ static int f_comp(const void *s1, const void *s2)
     return 0;
 }
 
-static int i_comp(const void *s1, const void *s2)
+int i_comp(const void *s1, const void *s2)
 {
     if (((i_rec *) s1)->data > ((i_rec *) s2)->data) {
 	return 1;
@@ -1028,7 +1028,7 @@ static int i_comp(const void *s1, const void *s2)
     l = (int *) xcalloc(n, sizeof(int), "do_asort.poslist"); \
     for (i = 0; i < n; i++) l[i] = p[i].pos;
 
-static int *do_asort(char *s[], int n, int sort_type, int listpos_only)
+int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 {
     int i;
     f_rec *fp = NULL;
@@ -1194,11 +1194,11 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * sortby: Sort using a user-defined function.
  */
 
-static char ucomp_buff[LBUF_SIZE];
+char ucomp_buff[LBUF_SIZE];
 
-static dbref ucomp_cause, ucomp_player, ucomp_caller;
+dbref ucomp_cause, ucomp_player, ucomp_caller;
 
-static int u_comp(const void *s1, const void *s2)
+int u_comp(const void *s1, const void *s2)
 {
     /*
      * Note that this function is for use in conjunction with our own
@@ -1224,7 +1224,7 @@ static int u_comp(const void *s1, const void *s2)
     return n;
 }
 
-static void sane_qsort(void *array[], int left, int right, int (*compare) (const void *, const void *))
+void sane_qsort(void *array[], int left, int right, int (*compare) (const void *, const void *))
 {
     /*
      * Andrew Molitor's qsort, which doesn't require transitivity between
@@ -1772,7 +1772,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  *     correctly, and doesn't mess up the character count.
  */
 
-static void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim * list_sep, const Delim * field_sep, const Delim * pad_char, char *buff, char **bufc, int just)
+void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim * list_sep, const Delim * field_sep, const Delim * pad_char, char *buff, char **bufc, int just)
 {
     int i, nwords, nstates, cpos, wcount, over, ansi_state;
     int max, nleft, lead_chrs, lens[LBUF_SIZE / 2], states[LBUF_SIZE / 2 + 1];
@@ -1916,7 +1916,7 @@ static void tables_helper(char *list, int *last_state, int n_cols, int col_width
     xfree(words, "tables_helper.words");
 }
 
-static void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim * list_sep, const Delim * field_sep, const Delim * pad_char, char *buff, char **bufc, int just)
+void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim * list_sep, const Delim * field_sep, const Delim * pad_char, char *buff, char **bufc, int just)
 {
     char *p, *savep, *bb_p;
     int ansi_state = ANST_NONE;
@@ -2427,7 +2427,7 @@ void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  */
 
 /* Borrowed from PennMUSH 1.50 */
-static void swap(char **p, char **q)
+void swap(char **p, char **q)
 {
     /*
      * swaps two points to strings

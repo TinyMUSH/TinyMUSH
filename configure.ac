@@ -66,6 +66,7 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 LT_INIT
 
+AC_PATH_PROGS([with_cproto_prog], [cproto], AC_MSG_ERROR([not found]))
 AC_PATH_PROGS([with_tar_prog], [tar], AC_MSG_ERROR([not found]))
 AC_PATH_PROGS([with_compress_prog], [gzip], AC_MSG_ERROR([not found]))
 
@@ -383,7 +384,7 @@ AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Relea
 AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], TINYMUSH_COPYRIGHT, [Copyright Notice])
 
 AX_BOX([Configuring files.])
-AC_CONFIG_FILES([src/Makefile src/dbm/gdbm/Makefile src/dbm/qdbm/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])
+AC_CONFIG_FILES([src/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])
 
 AX_BOX([Generating config.status.])
 AC_OUTPUT

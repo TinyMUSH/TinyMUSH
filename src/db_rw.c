@@ -21,22 +21,14 @@
 
 #include "vattr.h"		/* required by code */
 #include "attrs.h"		/* required by code */
-
 #include "powers.h"		/* required by code */
 
-extern void db_grow(dbref);
-
 extern struct object *db;
-
-static int g_version;
-
-static int g_format;
-
-static int g_flags;
-
+int g_version;
+int g_format;
+int g_flags;
 extern int anum_alc_top;
-
-static int *used_attrs_table;
+int *used_attrs_table;
 
 /*
  * ---------------------------------------------------------------------------
@@ -312,7 +304,7 @@ BOOLEXP *getboolexp1(FILE * f)
  * getboolexp: Read a boolean expression from the flat file.
  */
 
-static BOOLEXP *getboolexp(FILE * f)
+BOOLEXP *getboolexp(FILE * f)
 {
     BOOLEXP *b;
     char c;
@@ -335,7 +327,7 @@ static BOOLEXP *getboolexp(FILE * f)
  * unscramble_attrnum: Fix up attribute numbers from foreign muds
  */
 
-static int unscramble_attrnum(int attrnum)
+int unscramble_attrnum(int attrnum)
 {
     switch (g_format) {
     case F_MUSH:
@@ -374,7 +366,7 @@ static int unscramble_attrnum(int attrnum)
  * get_list: Read attribute list from flat file.
  */
 
-static int get_list(FILE * f, dbref i, int new_strings)
+int get_list(FILE * f, dbref i, int new_strings)
 {
     dbref atr;
     int c;
@@ -436,7 +428,7 @@ static int get_list(FILE * f, dbref i, int new_strings)
  * ---------------------------------------------------------------------------
  * putbool_subexp: Write a boolean sub-expression to the flat file.
  */
-static void putbool_subexp(FILE * f, BOOLEXP * b)
+void putbool_subexp(FILE * f, BOOLEXP * b)
 {
     ATTR *va;
 
@@ -542,7 +534,7 @@ void putboolexp(FILE * f, BOOLEXP * b)
  * upgrade_flags: Convert foreign flags to MUSH format.
  */
 
-static void upgrade_flags(FLAG * flags1, FLAG * flags2, FLAG * flags3, dbref thing, int db_format, int db_version)
+void upgrade_flags(FLAG * flags1, FLAG * flags2, FLAG * flags3, dbref thing, int db_format, int db_version)
 {
     FLAG f1, f2, f3, newf1, newf2, newf3;
     f1 = *flags1;
@@ -695,7 +687,7 @@ void efo_convert(void)
  * fix_mux_zones: Convert MUX-style zones to 3.0-style zones.
  */
 
-static void fix_mux_zones(void)
+void fix_mux_zones(void)
 {
     /*
      * For all objects in the database where Zone(thing) != NOTHING, set
@@ -732,7 +724,7 @@ static void fix_mux_zones(void)
  * fix_typed_quotas: Explode standard quotas into typed quotas
  */
 
-static void fix_typed_quotas(void)
+void fix_typed_quotas(void)
 {
     /*
      * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
@@ -1340,7 +1332,7 @@ int db_read(void)
     return (0);
 }
 
-static int db_write_object_out(FILE * f, dbref i, int db_format, int flags, int *n_atrt)
+int db_write_object_out(FILE * f, dbref i, int db_format, int flags, int *n_atrt)
 {
     ATTR *a;
     char *got, *as;

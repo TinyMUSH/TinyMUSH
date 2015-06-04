@@ -25,22 +25,14 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-extern dbref match_controlled_quiet(dbref, const char *);
-
-extern dbref clone_home(dbref, dbref);
-
-extern int can_set_home(dbref, dbref, dbref);
-
 extern CONF conftable[];
-
-extern int cf_dbref(int *, char *, long, dbref, char *);
 
 /*
  * ---------------------------------------------------------------------------
  * parse_linkable_room: Get a location to link to.
  */
 
-static dbref parse_linkable_room(dbref player, char *room_name)
+dbref parse_linkable_room(dbref player, char *room_name)
 {
     dbref room;
     init_match(player, room_name, NOTYPE);
@@ -75,7 +67,7 @@ static dbref parse_linkable_room(dbref player, char *room_name)
  * open_exit, do_open: Open a new exit and optionally link it somewhere.
  */
 
-static void open_exit(dbref player, dbref loc, char *direction, char *linkto)
+void open_exit(dbref player, dbref loc, char *direction, char *linkto)
 {
     dbref exit;
 
@@ -833,7 +825,7 @@ void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
  * can_destroy_exit, can_destroy_player, do_destroy: Destroy things.
  */
 
-static int can_destroy_exit(dbref player, dbref exit)
+int can_destroy_exit(dbref player, dbref exit)
 {
     dbref loc;
     loc = Exits(exit);
@@ -889,7 +881,7 @@ int destroyable(dbref victim)
 }
 
 
-static int can_destroy_player(dbref player, dbref victim)
+int can_destroy_player(dbref player, dbref victim)
 {
     if (!Wizard(player)) {
 	notify_quiet(player, "Sorry, no suicide allowed.");

@@ -36,7 +36,7 @@ extern char qidx_chartab[256];	/* from funvars.c */
  * delimiter, dstr is returned as NULL.
  */
 
-static char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
+char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
 {
     if ((mudconf.space_compress || (eval & EV_STRIP_TS)) && !(eval & EV_NO_COMPRESS) && !first && (cstr[-1] == ' ')) {
 	zstr--;
@@ -382,7 +382,7 @@ int tcache_empty(void)
     return 0;
 }
 
-static void tcache_add(char *orig, char *result)
+void tcache_add(char *orig, char *result)
 {
     char *tp;
     TCENT *xp;
@@ -406,7 +406,7 @@ static void tcache_add(char *orig, char *result)
     }
 }
 
-static void tcache_finish(dbref player)
+void tcache_finish(dbref player)
 {
     TCENT *xp;
     NUMBERTAB *np;
@@ -512,10 +512,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
     VARENT *xvar;
     ATTR *ap;
     GDATA *preserve;
-    static const char *subj[5] = { "", "it", "she", "he", "they" };
-    static const char *poss[5] = { "", "its", "her", "his", "their" };
-    static const char *obj[5] = { "", "it", "her", "him", "them" };
-    static const char *absp[5] = { "", "its", "hers", "his", "theirs" };
+    const char *subj[5] = { "", "it", "she", "he", "they" };
+    const char *poss[5] = { "", "its", "her", "his", "their" };
+    const char *obj[5] = { "", "it", "her", "him", "them" };
+    const char *absp[5] = { "", "its", "hers", "his", "theirs" };
 
     if (*dstr == NULL) {
 	**bufc = '\0';

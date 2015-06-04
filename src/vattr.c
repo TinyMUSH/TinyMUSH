@@ -24,12 +24,6 @@
 #include "functions.h"		/* required by code */
 #include "command.h"		/* required by code */
 
-static void fixcase(char *);
-
-static char *store_string(char *);
-
-extern int anum_alc_top;
-
 /*
  * Allocate space for strings in lumps this big.
  */
@@ -40,13 +34,13 @@ extern int anum_alc_top;
  * Current block we're putting stuff in
  */
 
-static char *stringblock = (char *) 0;
+char *stringblock = (char *) 0;
 
 /*
  * High water mark.
  */
 
-static int stringblock_hwm = 0;
+int stringblock_hwm = 0;
 
 void vattr_init(void)
 {
@@ -421,7 +415,7 @@ VATTR *vattr_next(VATTR * vp)
     return ((VATTR *) hash_nextentry(&mudstate.vattr_name_htab));
 }
 
-static void fixcase(char *name)
+void fixcase(char *name)
 {
     char *cp = name;
 
@@ -439,7 +433,7 @@ static void fixcase(char *name)
  * keep forever. There is no freeing mechanism.
  */
 
-static char *store_string(char *str)
+char *store_string(char *str)
 {
     int len;
     char *ret;

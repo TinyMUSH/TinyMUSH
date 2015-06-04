@@ -26,11 +26,7 @@
 #include "command.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-static void show_a_desc(dbref, dbref, const char *);
-
-extern void ufun(char *, char *, int, int, int, dbref, dbref);
-
-static int did_attr(dbref player, dbref thing, int what)
+int did_attr(dbref player, dbref thing, int what)
 {
     /*
      * If the attribute exists, get it, notify the player, return 1.
@@ -48,7 +44,7 @@ static int did_attr(dbref player, dbref thing, int what)
     return 0;
 }
 
-static void look_exits(dbref player, dbref loc, const char *exit_name)
+void look_exits(dbref player, dbref loc, const char *exit_name)
 {
     dbref thing, parent;
     char *buff, *e, *buff1, *e1, *buf;
@@ -182,7 +178,7 @@ static void look_exits(dbref player, dbref loc, const char *exit_name)
 #define CONTENTS_NESTED 1
 #define CONTENTS_REMOTE 2
 
-static void look_contents(dbref player, dbref loc, const char *contents_name, int style)
+void look_contents(dbref player, dbref loc, const char *contents_name, int style)
 {
     dbref thing;
     dbref can_see_loc;
@@ -267,14 +263,14 @@ static void look_contents(dbref player, dbref loc, const char *contents_name, in
     }
 }
 
-static void pairs_print(dbref player, char *atext, char *buff, char **bufc)
+void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 {
     int pos, depth;
     char *str, *strbuf, *parenlist, *endp;
-    static char *colors[5] = { ANSI_MAGENTA, ANSI_GREEN, ANSI_YELLOW, ANSI_CYAN, ANSI_BLUE };
-    static char *revcolors[5] = { "m53[\033", "m23[\033", "m33[\033", "m63[\033", "m43[\033" };
-    static char *REVERSE_NORMAL = "m0[\033";
-    static char *REVERSE_HIRED = "m13[\033m1[\033";
+    char *colors[5] = { ANSI_MAGENTA, ANSI_GREEN, ANSI_YELLOW, ANSI_CYAN, ANSI_BLUE };
+    char *revcolors[5] = { "m53[\033", "m23[\033", "m33[\033", "m63[\033", "m43[\033" };
+    char *REVERSE_NORMAL = "m0[\033";
+    char *REVERSE_HIRED = "m13[\033m1[\033";
     str = strip_ansi(atext);
     strbuf = alloc_lbuf("fun_parenmatch");
     parenlist = alloc_lbuf("fun_parenmatch");
@@ -422,7 +418,7 @@ static void pairs_print(dbref player, char *atext, char *buff, char **bufc)
     free_lbuf(parenlist);
 }
 
-static void pretty_format(char *dest, char **cp, char *p)
+void pretty_format(char *dest, char **cp, char *p)
 {
     /*
      * Pretty-print an attribute into a buffer (assumed to be an lbuf).
@@ -519,7 +515,7 @@ static void pretty_format(char *dest, char **cp, char *p)
     }
 }
 
-static void pretty_print(char *dest, char *name, char *text)
+void pretty_print(char *dest, char *name, char *text)
 {
     char *cp, *p, *word;
     cp = dest;
@@ -610,7 +606,7 @@ static void pretty_print(char *dest, char *name, char *text)
 }
 
 
-static void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
+void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
 {
     char *text, *buf, *bp, *name_buf, *bb_p;
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
@@ -732,7 +728,7 @@ static void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref
     }
 }
 
-static void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special)
+void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special)
 {
     dbref aowner;
     int ca, aflags, alen;
@@ -785,7 +781,7 @@ static void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclud
     xfree(cattr, "look_atrs1");
 }
 
-static void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
+void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
 {
     dbref parent;
     int lev, check_exclude, hash_insert;
@@ -807,7 +803,7 @@ static void look_atrs(dbref player, dbref thing, int check_parents, int is_speci
     }
 }
 
-static void look_simple(dbref player, dbref thing, int obey_terse)
+void look_simple(dbref player, dbref thing, int obey_terse)
 {
     char *buff;
 
@@ -842,7 +838,7 @@ static void look_simple(dbref player, dbref thing, int obey_terse)
     }
 }
 
-static void show_a_desc(dbref player, dbref loc, const char *msg)
+void show_a_desc(dbref player, dbref loc, const char *msg)
 {
     char *got2;
     dbref aowner;
@@ -880,7 +876,7 @@ static void show_a_desc(dbref player, dbref loc, const char *msg)
     }
 }
 
-static void show_desc(dbref player, dbref loc, int key)
+void show_desc(dbref player, dbref loc, int key)
 {
     char *got;
     dbref aowner;
@@ -1033,7 +1029,7 @@ void look_in(dbref player, dbref loc, int key)
     }
 }
 
-static void look_here(dbref player, dbref thing, int key, int look_key)
+void look_here(dbref player, dbref thing, int key, int look_key)
 {
     if (Good_obj(thing)) {
 	if (key & LOOK_OUTSIDE) {
@@ -1138,7 +1134,7 @@ void do_look(dbref player, dbref cause, int key, char *name)
 }
 
 
-static void debug_examine(dbref player, dbref thing)
+void debug_examine(dbref player, dbref thing)
 {
     dbref aowner;
     char *buf;
@@ -1217,7 +1213,7 @@ static void debug_examine(dbref player, dbref thing)
     }
 }
 
-static void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
+void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 {
     int atr, aflags, alen, got_any;
     char *buf;
@@ -1788,7 +1784,7 @@ void do_entrances(dbref player, dbref cause, int key, char *name)
 
 /* check the current location for bugs */
 
-static void sweep_check(dbref player, dbref what, int key, int is_loc)
+void sweep_check(dbref player, dbref what, int key, int is_loc)
 {
     dbref aowner, parent;
     int canhear, cancom, isplayer, ispuppet, isconnected, is_audible, attr, aflags, alen;

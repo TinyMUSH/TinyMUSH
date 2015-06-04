@@ -1334,7 +1334,7 @@ void fun_stripansi(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 #define CRYPTCODE_HI  126	/* tilde */
 #define CRYPTCODE_MOD  95	/* count of printable ascii chars */
 
-static void crunch_code(char *code)
+void crunch_code(char *code)
 {
     char *in, *out;
     in = out = code;
@@ -1352,7 +1352,7 @@ static void crunch_code(char *code)
     *out = '\0';
 }
 
-static void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
+void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
 {
     char *p, *q;
 
@@ -2086,7 +2086,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
  *   - ANSI states are not supported in the widths, as they are unnecessary.
  */
 
-static void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
+void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
 {
     int i, n;
     int *col_widths, *col_justs, *col_done;

@@ -28,13 +28,6 @@
 
 extern NAMETAB indiv_attraccess_nametab[];
 
-extern void do_pemit_list(dbref, char *, const char *, int);
-
-extern void do_pemit(dbref, dbref, int, char *, char *);
-
-extern void set_attr_internal(dbref, dbref, int, char *, int, char *, char **);
-extern int que_want(BQUE *, dbref, dbref);
-
 /*
  * ---------------------------------------------------------------------------
  * fun_switch: Return value based on pattern matching (ala @switch/first)
@@ -442,8 +435,8 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     Delim osep;
     int bot, top, over, i;
     char *bb_p, *startp, *endp, *tbuf;
-    static int lnum_init = 0;
-    static char lnum_buff[290];
+    int lnum_init = 0;
+    char lnum_buff[290];
 
     if (nfargs == 0) {
 	return;
@@ -607,12 +600,12 @@ void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * no ANSI standard function are available to do this.
  */
 
-static const char *monthtab[] = {
+const char *monthtab[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static const char daystab[] = {
+const char daystab[] = {
     31, 29, 31, 30, 31, 30,
     31, 31, 30, 31, 30, 31
 };
@@ -1315,7 +1308,7 @@ void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Side-effect functions.
  */
 
-static int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
+int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
 {
     CMDENT *cmdp;
 
@@ -1722,7 +1715,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-static void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE * queue, char *buff, char **bufc, char *bb_p)
+void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE * queue, char *buff, char **bufc, char *bb_p)
 {
     BQUE *tmp;
 

@@ -31,22 +31,12 @@
 #include "attrs.h"		/* required by code */
 #include "defaults.h"		/* required by code */
 
-#ifdef HAVE_LIBTINYGDBM_H
-#include "libtinygdbm.h"	/* required by code */
-#else
-#ifdef HAVE_LIBTINYQDBM_H
-#include "libtinyqdbm.h"	/* required by code */
-#endif
-#endif
+#include "libtinydbm.h"		/* required by code */
 
-static GDBM_FILE dbp = (GDBM_FILE) 0;
-
-static void gdbm_panic(char *mesg)
+void gdbm_panic(char *mesg)
 {
     fprintf(stderr, "GDBM panic: %s\n", mesg);
 }
-
-extern void usage(char *, int);
 
 int dbrecover(int argc, char *argv[])
 {
@@ -62,13 +52,14 @@ int dbrecover(int argc, char *argv[])
     int errflg = 0;
     int optind = 1;
     int option_index = 0;
-    static struct option long_options[] = {
+    struct option long_options[] = {
 	{"input", required_argument, 0, 'i'},
 	{"output", required_argument, 0, 'o'},
 	{"help", no_argument, 0, '?'},
 	{0, 0, 0, 0}
     };
     infile = outfile = NULL;
+    GDBM_FILE dbp = (GDBM_FILE) 0;
 
     while ((c = getopt_long(argc, argv, "i:o:?", long_options, &option_index)) != -1) {
 	switch (c) {

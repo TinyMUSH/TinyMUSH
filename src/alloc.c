@@ -34,7 +34,7 @@ void pool_init(int poolnum, int poolsize) {
 	return;
 }
 
-static void pool_err(const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR * ph, const char *action, const char *reason) {
+void pool_err(const char *logsys, int logflag, int poolnum, const char *tag, POOLHDR * ph, const char *action, const char *reason) {
 	if (!mudstate.logging) {
 		log_write(logflag, logsys, "ALLOC", "%s[%d] (tag %s) %s at %lx. (%s)", action, pools[poolnum].pool_size, tag, reason, (long ) ph, mudstate.debug_cmd);
 	} else if (logflag != LOG_ALLOCATE) {
@@ -42,7 +42,7 @@ static void pool_err(const char *logsys, int logflag, int poolnum, const char *t
 	}
 }
 
-static void pool_vfy(int poolnum, const char *tag) {
+void pool_vfy(int poolnum, const char *tag) {
 	POOLHDR *ph, *lastph;
 	POOLFTR *pf;
 	char *h;
@@ -244,14 +244,14 @@ void pool_free(int poolnum, char **buf) {
 	}
 }
 
-static char *pool_stats(int poolnum, const char *text) {
+char *pool_stats(int poolnum, const char *text) {
 	char *buf;
 	buf = alloc_mbuf("pool_stats");
 	sprintf(buf, "%-15s %5d%9d%9d%9d%9d", text, pools[poolnum].pool_size, pools[poolnum].num_alloc, pools[poolnum].max_alloc, pools[poolnum].tot_alloc, pools[poolnum].num_lost);
 	return buf;
 }
 
-static void pool_trace(dbref player, int poolnum, const char *text) {
+void pool_trace(dbref player, int poolnum, const char *text) {
 	POOLHDR *ph;
 	int numfree, *ibuf;
 	char *h;
@@ -473,7 +473,7 @@ void *xstrprintf(const char *y, const char *format, ...) {
 	}
 }
 
-static int sort_memtable(const void *p1, const void *p2) {
+int sort_memtable(const void *p1, const void *p2) {
 	return strcmp((*(MEMTRACK **) p1)->buf_tag, (*(MEMTRACK **) p2)->buf_tag);
 }
 
@@ -529,7 +529,7 @@ void list_rawmemory(dbref player) {
 	}
 }
 
-static void trace_alloc(size_t amount, const char *name, void *ptr) {
+void trace_alloc(size_t amount, const char *name, void *ptr) {
 	/*
 	 * We maintain an unsorted list, most recently-allocated things at
 	 * the head, based on the belief that it's basically a stack -- when
@@ -550,7 +550,7 @@ static void trace_alloc(size_t amount, const char *name, void *ptr) {
 	mudstate.raw_allocs = tptr;
 }
 
-static void trace_free(const char *name, void *ptr) {
+void trace_free(const char *name, void *ptr) {
 	MEMTRACK *tptr, *prev;
 	prev = NULL;
 

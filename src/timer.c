@@ -22,12 +22,6 @@
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
-extern void pool_reset(void);
-extern unsigned int alarm(unsigned int seconds);
-extern void pcache_trim(void);
-extern void do_dbck(dbref, dbref, int);
-extern void do_queue(dbref, dbref, int, char *);
-
 /* ---------------------------------------------------------------------------
  * Cron-related things. This implementation is somewhat derivative of
  * Paul Vixie's cron implementation for Berkeley. See Copyright.h for the
@@ -76,7 +70,7 @@ struct cron_entry {
 
 CRONTAB *cron_head = NULL;
 
-static void check_cron(void)
+void check_cron(void)
 {
     struct tm *ltime;
     int minute, hour, dom, month, dow;
@@ -111,7 +105,7 @@ static void check_cron(void)
     }
 }
 
-static char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char *bufp)
+char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char *bufp)
 {
     int i, n_begin, n_end, step_size;
     unsigned char *_bits = bits;	/* Default is all off */

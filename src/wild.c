@@ -31,22 +31,20 @@
 #include "interface.h"
 #include "externs.h"		/* required by code */
 
-extern int set_register(const char *, char *, char *);	/* funvars.c */
-
 #define FIXCASE(a) (tolower(a))
 #define EQUAL(a,b) ((a == b) || (FIXCASE(a) == FIXCASE(b)))
 #define NOTEQUAL(a,b) ((a != b) && (FIXCASE(a) != FIXCASE(b)))
 
-static char **arglist;		/* argument return space */
+char **arglist;		/* argument return space */
 
-static int numargs;		/* argument return size */
+int numargs;		/* argument return size */
 
 /* ---------------------------------------------------------------------------
  * check_literals: All literals in a wildcard pattern must appear in the
  *                 data string, or no match is possible.
  */
 
-static int check_literals(char *tstr, char *dstr)
+int check_literals(char *tstr, char *dstr)
 {
     char pattern[LBUF_SIZE], data[LBUF_SIZE], *p, *dp, *ep, *xp;
     int len;
@@ -162,7 +160,7 @@ static int check_literals(char *tstr, char *dstr)
  * This routine will cause crashes if fed NULLs instead of strings.
  */
 
-static int real_quick_wild(char *tstr, char *dstr)
+int real_quick_wild(char *tstr, char *dstr)
 {
     int st;
 
@@ -301,11 +299,11 @@ int quick_wild(char *tstr, char *dstr)
  * DO NOT CALL THIS FUNCTION DIRECTLY - DOING SO MAY RESULT IN
  * SERVER CRASHES AND IMPROPER ARGUMENT RETURN.
  *
- * Side Effect: this routine modifies the 'arglist' static global
+ * Side Effect: this routine modifies the 'arglist' global
  * variable.
  */
 
-static int real_wild1(char *tstr, char *dstr, int arg)
+int real_wild1(char *tstr, char *dstr, int arg)
 {
     char *datapos;
     int argpos, numextra, st;
@@ -555,7 +553,7 @@ int wild1(char *tstr, char *dstr, int arg)
  * This function may crash if alloc_lbuf() fails.
  *
  * Side Effect: this routine modifies the 'arglist' and 'numargs'
- * static global variables.
+ * global variables.
  */
 int wild(char *tstr, char *dstr, char *args[], int nargs)
 {

@@ -19,40 +19,16 @@
 #include "interface.h"		/* required by code */
 #include "externs.h"		/* required by interface */
 
-
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "match.h"		/* required by code */
-
-#define NUM_GOOD    4		/* # of successful logins to save data for */
-#define NUM_BAD     3		/* # of failed logins to save data for */
-
-typedef struct hostdtm HOSTDTM;
-
-struct hostdtm {
-    char *host;
-    char *dtm;
-};
-
-typedef struct logindata LDATA;
-
-struct logindata {
-    HOSTDTM good[NUM_GOOD];
-    HOSTDTM bad[NUM_BAD];
-    int tot_good;
-    int tot_bad;
-    int new_bad;
-};
-
-extern int can_set_home(dbref, dbref, dbref);
-
-extern dbref clone_home(dbref, dbref);
+#include "player.h"		/* required by code */
 
 /* ---------------------------------------------------------------------------
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.
  */
 
-static void decrypt_logindata(char *atrbuf, LDATA * info)
+void decrypt_logindata(char *atrbuf, LDATA * info)
 {
     int i;
     info->tot_good = 0;
@@ -88,7 +64,7 @@ static void decrypt_logindata(char *atrbuf, LDATA * info)
     }
 }
 
-static void encrypt_logindata(char *atrbuf, LDATA * info)
+void encrypt_logindata(char *atrbuf, LDATA * info)
 {
     char *bp, nullc;
     int i;
@@ -340,7 +316,7 @@ void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpas
  * do_last Display login history data.
  */
 
-static void disp_from_on(dbref player, char *dtm_str, char *host_str)
+void disp_from_on(dbref player, char *dtm_str, char *host_str)
 {
     if (dtm_str && *dtm_str && host_str && *host_str) {
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     From: %s   On: %s", dtm_str, host_str);

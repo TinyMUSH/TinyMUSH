@@ -49,9 +49,6 @@ extern int maxd;
 extern int slave_socket;
 
 extern pid_t slave_pid;
-extern void desc_addhash(DESC *);
-
-extern VATTR *vattr_rename(char *, char *);
 
 /* ---------------------------------------------------------------------------
  * Temp file management, used to get around static limits in some versions
@@ -66,7 +63,7 @@ int t_is_tli;
 
 #endif
 
-static void tf_xclose(FILE * fd)
+void tf_xclose(FILE * fd)
 {
     if (fd) {
 	if (t_is_pipe) {
@@ -88,7 +85,7 @@ static void tf_xclose(FILE * fd)
     t_is_pipe = 0;
 }
 
-static int tf_fiddle(int tfd)
+int tf_fiddle(int tfd)
 {
     if (tfd < 0) {
 	tfd = open(DEV_NULL, O_RDONLY, 0);
@@ -103,7 +100,7 @@ static int tf_fiddle(int tfd)
     return 0;
 }
 
-static int tf_xopen(char *fname, int mode)
+int tf_xopen(char *fname, int mode)
 {
     int fd;
     fd = open(fname, mode, 0600);
@@ -113,7 +110,7 @@ static int tf_xopen(char *fname, int mode)
 
 /* #define t_xopen(f,m) t_fiddle(open(f, m, 0600)) */
 
-static const char *mode_txt(int mode)
+const char *mode_txt(int mode)
 {
     switch (mode & O_ACCMODE) {
     case O_RDONLY:
@@ -195,11 +192,8 @@ extern unsigned int malloc_sbrk_used;	/* amount of data space used now */
 /*
  * Check routine forward declaration.
  */
-static int fwdlist_ck(int, dbref, dbref, int, char *);
-static int propdir_ck(int, dbref, dbref, int, char *);
-
-extern void pcache_reload(dbref);
-extern void desc_reload(dbref);
+int fwdlist_ck(int, dbref, dbref, int, char *);
+int propdir_ck(int, dbref, dbref, int, char *);
 
 /* *INDENT-OFF* */
 
@@ -620,7 +614,7 @@ int fwdlist_rewrite(FWDLIST * fp, char *atext)
  * fwdlist_ck:  Check a list of dbref numbers to forward to for AUDIBLE
  */
 
-static int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
+int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     FWDLIST *fp;
     int count;
@@ -659,7 +653,7 @@ FWDLIST *fwdlist_get(dbref thing)
     dbref aowner;
     int aflags, alen, errors;
     char *tp;
-    static FWDLIST *fp = NULL;
+    FWDLIST *fp = NULL;
 
     if (!mudstate.standalone) {
 	return (FWDLIST *) nhashfind((thing), &mudstate.fwdlist_htab);
@@ -838,7 +832,7 @@ int propdir_rewrite(PROPDIR * fp, char *atext)
     return count;
 }
 
-static int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
+int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     PROPDIR *fp;
     int count;
@@ -877,7 +871,7 @@ PROPDIR *propdir_get(dbref thing)
     dbref aowner;
     int aflags, alen, errors;
     char *tp;
-    static PROPDIR *fp = NULL;
+    PROPDIR *fp = NULL;
 
     if (!mudstate.standalone) {
 	return (PROPDIR *) nhashfind((thing), &mudstate.propdir_htab);
@@ -897,7 +891,7 @@ PROPDIR *propdir_get(dbref thing)
 /* ---------------------------------------------------------------------------
  */
 
-static char *set_string(char **ptr, char *new)
+char *set_string(char **ptr, char *new)
 {
     /* if pointer not null, free it */
     if (*ptr) {
@@ -1332,9 +1326,9 @@ void init_attrtab(void)
 ATTR *atr_str(char *s)
 {
     char *buff, *p, *q;
-    ATTR *a;
+    static ATTR *a;	// XXX Should return a buffer instead of a static pointer
     VATTR *va;
-    static ATTR tattr;
+    static ATTR tattr;	// XXX Should return a buffer instead of a static pointer
     /* Convert the buffer name to uppercase. Limit length of name.  */
     buff = alloc_sbuf("atr_str");
 
@@ -1450,7 +1444,7 @@ void anum_extend(int newtop)
 ATTR *atr_num(int anum)
 {
     VATTR *va;
-    static ATTR tattr;
+    static ATTR tattr;	// XXX Should return a buffer instead of a static pointer
 
     /* Look for a predefined attribute */
 
@@ -1527,7 +1521,7 @@ int mkattr(char *buff)
  * al_decode: Fetch an attribute number from an alist.
  */
 
-static int al_decode(char **app)
+int al_decode(char **app)
 {
     int atrnum = 0, anum, atrshft = 0;
     char *ap;
@@ -1557,7 +1551,7 @@ static int al_decode(char **app)
  * al_code: Store an attribute number in an alist.
  */
 
-static void al_code(char **app, int atrnum)
+void al_code(char **app, int atrnum)
 {
     char *ap;
     ap = *app;
@@ -1784,7 +1778,7 @@ void al_delete(dbref thing, int attrnum)
     return;
 }
 
-static void makekey(dbref thing, int atr, Aname * abuff)
+void makekey(dbref thing, int atr, Aname * abuff)
 {
     abuff->object = thing;
     abuff->attrnum = atr;
@@ -1808,9 +1802,9 @@ void al_destroy(dbref thing)
  * atr_encode: Encode an attribute string.
  */
 
-static char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
+char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
 {
-    static char attr[MBUF_SIZE];
+    static char attr[MBUF_SIZE];	// XXX Should return a buffer instead of a static pointer
 
     /* If using the default owner and flags (almost all attributes will),
      * just store the string.
@@ -1834,7 +1828,7 @@ static char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int at
  * atr_decode: Decode an attribute string.
  */
 
-static void atr_decode(char *iattr, char *oattr, dbref thing, dbref * owner, int *flags, int atr, int *alen)
+void atr_decode(char *iattr, char *oattr, dbref thing, dbref * owner, int *flags, int atr, int *alen)
 {
     char *cp;
     int neg;
@@ -2716,7 +2710,7 @@ dbref parse_objid(const char *s, const char *p)
     dbref it;
     time_t tt;
     const char *r;
-    static char tbuf[LBUF_SIZE];
+    char tbuf[LBUF_SIZE];
 
     /* We're passed two parameters: the start of the string, and the
      * pointer to where the ':' in the string is. If the latter is NULL,
@@ -2816,7 +2810,7 @@ void putstring(FILE * f, const char *s)
 
 char *getstring_noalloc(FILE * f, int new_strings)
 {
-    static char buf[LBUF_SIZE];
+    static char buf[LBUF_SIZE];		// XXX Should return a buffer instead of a static pointer
     char *p;
     int c, lastc;
     p = buf;
@@ -2893,7 +2887,7 @@ char *getstring_noalloc(FILE * f, int new_strings)
 
 dbref getref(FILE * f)
 {
-    static char buf[SBUF_SIZE];
+    char buf[SBUF_SIZE];
 
     if (fgets(buf, sizeof(buf), f) != NULL) {
 	return ((int) strtol(buf, (char **) NULL, 10));
@@ -2904,7 +2898,7 @@ dbref getref(FILE * f)
 
 long getlong(FILE * f)
 {
-    static char buf[SBUF_SIZE];
+    char buf[SBUF_SIZE];
 
     if (fgets(buf, sizeof(buf), f) != NULL) {
 	return (strtol(buf, (char **) NULL, 10));

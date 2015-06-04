@@ -20,15 +20,7 @@
 #include "externs.h"		/* required by code */
 
 #include "attrs.h"		/* required by code */
-
-typedef struct player_cache {
-    dbref player;
-    int money;
-    int queue;
-    int qmax;
-    int cflags;
-    struct player_cache *next;
-} PCACHE;
+#include "player_c.h"		/* required by code */
 
 NHSHTAB pcache_htab;
 
@@ -46,7 +38,7 @@ void pcache_init(void)
     pcache_head = NULL;
 }
 
-static void pcache_reload1(dbref player, PCACHE * pp)
+void pcache_reload1(dbref player, PCACHE * pp)
 {
     char *cp;
     cp = atr_get_raw(player, A_MONEY);
@@ -100,7 +92,7 @@ void pcache_reload(dbref player)
     }
 }
 
-static void pcache_save(PCACHE * pp)
+void pcache_save(PCACHE * pp)
 {
     char *tbuf;
 

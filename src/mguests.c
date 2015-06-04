@@ -23,8 +23,6 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
-extern void do_lock(dbref, dbref, int, char *, char *);
-
 typedef int object_flag_type;
 
 dbref create_guest(int num)

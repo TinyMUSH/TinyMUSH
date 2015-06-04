@@ -30,28 +30,14 @@
 
 #define ZAP_LOC(i)  { s_Location(i, NOTHING); s_Next(i, NOTHING); }
 
-static int check_type;
-
-extern int boot_off(dbref, char *);
-
-extern void cf_verify(void);
-
-extern void fwdlist_clr(dbref);
-
-extern void propdir_clr(dbref);
-
-extern void stack_clr(dbref);
-
-extern void xvars_clr(dbref);
-
-extern int structure_clr(dbref);
+int check_type;
 
 /* ---------------------------------------------------------------------------
  * Log_pointer_err, Log_header_err, Log_simple_damage: Write errors to the
  * log file.
  */
 
-static void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype)
+void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype)
 {
     char *obj_type, *obj_name, *obj_loc;
     char *ref_type, *ref_name;
@@ -74,7 +60,7 @@ static void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const 
     free_lbuf(ref_name);
 }
 
-static void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype)
+void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype)
 {
     char *obj_type, *obj_name, *obj_loc;
     char *val_type, *val_name;
@@ -111,7 +97,7 @@ static void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const
     free_lbuf(obj_name);
 }
 
-static void Log_simple_err(dbref obj, dbref loc, const char *errtype)
+void Log_simple_err(dbref obj, dbref loc, const char *errtype)
 {
     char *obj_type, *obj_name, *obj_loc;
     obj_type = log_gettype(obj, "Log_simple_err");
@@ -190,7 +176,7 @@ dbref clone_home(dbref player, dbref thing)
  * update_newobjs: Update a player's most-recently-created objects.
  */
 
-static void update_newobjs(dbref player, dbref obj_num, int obj_type)
+void update_newobjs(dbref player, dbref obj_num, int obj_type)
 {
     int i, aowner, aflags, alen;
     char *newobj_str, *p, tbuf[SBUF_SIZE], *tokst;
@@ -235,7 +221,7 @@ static void update_newobjs(dbref player, dbref obj_num, int obj_type)
  * ok_exit_name: Make sure an exit name contains no blank components.
  */
 
-static int ok_exit_name(char *name)
+int ok_exit_name(char *name)
 {
     char *p, *lastp, *s;
     char buff[LBUF_SIZE];
@@ -760,7 +746,7 @@ void do_freelist(dbref player, dbref cause, int key, char *str)
  * make_freelist: Build a freelist
  */
 
-static void make_freelist(void)
+void make_freelist(void)
 {
     dbref i;
     mudstate.freelist = NOTHING;
@@ -897,7 +883,7 @@ void destroy_player(dbref victim)
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "(%d objects @chowned to you)", count);
 }
 
-static void purge_going(void)
+void purge_going(void)
 {
     dbref i;
     DO_WHOLE_DB(i) {
@@ -943,7 +929,7 @@ static void purge_going(void)
  * check_dead_refs: Look for references to GOING or illegal objects.
  */
 
-static void check_pennies(dbref thing, int limit, const char *qual)
+void check_pennies(dbref thing, int limit, const char *qual)
 {
     int j;
 
@@ -990,7 +976,7 @@ do { \
     } \
 } while (0)
 
-static void check_dead_refs(void)
+void check_dead_refs(void)
 {
     dbref targ, owner, i, j;
     int aflags, dirty;
@@ -1284,7 +1270,7 @@ static void check_dead_refs(void)
  *      Location of member is not specified location    - reset it.
  */
 
-static void check_loc_exits(dbref loc)
+void check_loc_exits(dbref loc)
 {
     dbref exit, back, temp, exitloc, dest;
 
@@ -1442,7 +1428,7 @@ static void check_loc_exits(dbref loc)
     return;
 }
 
-static void check_exit_chains(void)
+void check_exit_chains(void)
 {
     dbref i;
     Unmark_all(i);
@@ -1472,9 +1458,9 @@ static void check_exit_chains(void)
  *      Location of member is not specified location    - reset it.
  */
 
-static void check_loc_contents(dbref);
+void check_loc_contents(dbref);
 
-static void check_misplaced_obj(dbref * obj, dbref back, dbref loc)
+void check_misplaced_obj(dbref * obj, dbref back, dbref loc)
 {
     /*
      * Object thinks it's in another place.  Check the contents list
@@ -1518,7 +1504,7 @@ static void check_misplaced_obj(dbref * obj, dbref back, dbref loc)
     return;
 }
 
-static void check_loc_contents(dbref loc)
+void check_loc_contents(dbref loc)
 {
     dbref obj, back, temp;
 
@@ -1637,7 +1623,7 @@ static void check_loc_contents(dbref loc)
     return;
 }
 
-static void check_contents_chains(void)
+void check_contents_chains(void)
 {
     dbref i;
     Unmark_all(i);

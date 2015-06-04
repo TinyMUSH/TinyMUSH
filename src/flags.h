@@ -164,19 +164,6 @@ typedef struct flagset {
     FLAG word3;
 } FLAGSET;
 
-extern void init_flagtab(void);
-extern void display_flagtab(dbref);
-extern void flag_set(dbref, dbref, char *, int);
-extern char *flag_description(dbref, dbref);
-extern FLAGENT *find_flag(dbref, char *);
-extern char *decode_flags(dbref, FLAGSET);
-extern char *unparse_flags(dbref, dbref);
-extern int has_flag(dbref, dbref, char *);
-extern char *unparse_object(dbref, dbref, int);
-extern char *unparse_object_numonly(dbref);
-extern int convert_flags(dbref, char *, FLAGSET *, FLAG *);
-extern void decompile_flags(dbref, dbref, char *);
-
 #define GOD ((dbref) 1)
 
 /* ---------------------- Object Permission/Attribute Macros */

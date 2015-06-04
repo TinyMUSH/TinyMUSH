@@ -56,7 +56,7 @@ char qidx_chartab[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
-static const char *qidx_str = "0123456789abcdefghijklmnopqrstuvwxyz";
+const char *qidx_str = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 int set_register(const char *funcname, char *name, char *data)
 {
@@ -296,7 +296,7 @@ int set_register(const char *funcname, char *name, char *data)
     return len;
 }
 
-static char *get_register(GDATA * g, char *r)
+char *get_register(GDATA * g, char *r)
 {
     /*
      * Given a pointer to a register data structure, and the name of a
@@ -409,7 +409,7 @@ void fun_setr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-static void read_register(char *regname, char *buff, char **bufc)
+void read_register(char *regname, char *buff, char **bufc)
 {
     int regnum;
     char *p;
@@ -631,7 +631,7 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_nofx: Prevent certain types of side-effects.
  */
 
-static int calc_limitmask(char *lstr)
+int calc_limitmask(char *lstr)
 {
     char *p;
     int lmask = 0;
@@ -715,7 +715,7 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * return to original values, keeping new values on <list>
  */
 
-static char is_in_array(char *word, char **list, int list_length)
+char is_in_array(char *word, char **list, int list_length)
 {
     int n;
 
@@ -975,7 +975,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 #define Set_Max(x,y)     (x) = ((y) > (x)) ? (y) : (x);
 
-static void print_htab_matches(dbref obj, HASHTAB * htab, char *buff, char **bufc)
+void print_htab_matches(dbref obj, HASHTAB * htab, char *buff, char **bufc)
 {
     /*
      * Lists out hashtable matches. Things which use this are
@@ -1104,7 +1104,7 @@ void set_xvar(dbref obj, char *name, char *data)
 }
 
 
-static void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
+void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
 {
     /*
      * Clear out an array of variable names.
@@ -1427,7 +1427,7 @@ void fun_clearvars(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * Structures.
  */
 
-static int istype_char(char *str)
+int istype_char(char *str)
 {
     if (strlen(str) == 1) {
 	return 1;
@@ -1436,7 +1436,7 @@ static int istype_char(char *str)
     }
 }
 
-static int istype_dbref(char *str)
+int istype_dbref(char *str)
 {
     dbref it;
 
@@ -1452,17 +1452,17 @@ static int istype_dbref(char *str)
     return 0;
 }
 
-static int istype_int(char *str)
+int istype_int(char *str)
 {
     return (is_integer(str));
 }
 
-static int istype_float(char *str)
+int istype_float(char *str)
 {
     return (is_number(str));
 }
 
-static int istype_string(char *str)
+int istype_string(char *str)
 {
     char *p;
 
@@ -1984,7 +1984,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 }
 
 
-static void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim)
+void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim)
 {
     char tbuf[SBUF_SIZE], *tp;
     char ibuf[SBUF_SIZE], *ip;
@@ -2344,7 +2344,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 
-static void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, char sep, int use_def_delim)
+void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, char sep, int use_def_delim)
 {
     char tbuf[SBUF_SIZE], *tp;
     char ibuf[SBUF_SIZE], *ip;
@@ -2800,7 +2800,7 @@ void stack_clr(dbref thing)
     }
 }
 
-static int stack_set(dbref thing, OBJSTACK * sp)
+int stack_set(dbref thing, OBJSTACK * sp)
 {
     OBJSTACK *xsp;
     char *tname;
@@ -3861,7 +3861,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      safe_str((gp)->data[(gr)][(gc)], buff, bufc); \
      }
 
-static void grid_free(dbref thing, OBJGRID * ogp)
+void grid_free(dbref thing, OBJGRID * ogp)
 {
     int r, c;
 

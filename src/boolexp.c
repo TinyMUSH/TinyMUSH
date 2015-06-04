@@ -24,7 +24,7 @@
 #include "ansi.h"		/* required by code */
 #include "powers.h"		/* required by code */
 
-static int parsing_internal = 0;
+int parsing_internal = 0;
 
 /*
  * ---------------------------------------------------------------------------
@@ -32,7 +32,7 @@ static int parsing_internal = 0;
  * by the object lockobj
  */
 
-static int check_attr(dbref player, dbref lockobj, ATTR * attr, char *key) {
+int check_attr(dbref player, dbref lockobj, ATTR * attr, char *key) {
 	char *buff;
 	dbref aowner;
 	int aflags, alen, checkit;
@@ -267,18 +267,18 @@ int eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key) {
  */
 
 /* XXX Theses really need to be globals? */
-static char *parsebuf, *parsestore;
-static dbref parse_player;
+char *parsebuf, *parsestore;
+dbref parse_player;
 
-static void skip_whitespace(void) {
+void skip_whitespace(void) {
 	while (*parsebuf && isspace(*parsebuf)) {
 		parsebuf++;
 	}
 }
 
-static BOOLEXP *parse_boolexp_E(void); /* defined below */
+BOOLEXP *parse_boolexp_E(void); /* defined below */
 
-static BOOLEXP *test_atr(char *s) {
+BOOLEXP *test_atr(char *s) {
 	ATTR *attrib;
 	BOOLEXP *b;
 	char *buff, *s1;
@@ -352,7 +352,7 @@ static BOOLEXP *test_atr(char *s) {
  * L -> (E); L -> object identifier
  */
 
-static BOOLEXP *parse_boolexp_L(void) {
+BOOLEXP *parse_boolexp_L(void) {
 	BOOLEXP *b;
 	char *p, *buf;
 	MSTATE mstate;
@@ -476,7 +476,7 @@ static BOOLEXP *parse_boolexp_L(void) {
  * The argument L must be type BOOLEXP_CONST
  */
 
-static BOOLEXP *parse_boolexp_F(void) {
+BOOLEXP *parse_boolexp_F(void) {
 	BOOLEXP *b2;
 	skip_whitespace();
 
@@ -566,7 +566,7 @@ static BOOLEXP *parse_boolexp_F(void) {
  * T -> F; T -> F & T
  */
 
-static BOOLEXP *parse_boolexp_T(void) {
+BOOLEXP *parse_boolexp_T(void) {
 	BOOLEXP *b, *b2;
 
 	if ((b = parse_boolexp_F()) != TRUE_BOOLEXP) {
@@ -594,7 +594,7 @@ static BOOLEXP *parse_boolexp_T(void) {
  * E -> T; E -> T | E
  */
 
-static BOOLEXP *parse_boolexp_E(void) {
+BOOLEXP *parse_boolexp_E(void) {
 	BOOLEXP *b, *b2;
 
 	if ((b = parse_boolexp_T()) != TRUE_BOOLEXP) {

@@ -241,7 +241,7 @@ int obj_siz(Obj * o)
 
 /* And something to free all the goo on an Obj, as well as the Obj.*/
 
-static void objfree(Obj * o)
+void objfree(Obj * o)
 {
     int i;
     Attrib *a;

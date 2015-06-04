@@ -25,7 +25,7 @@
 #include "powers.h"		/* required by code */
 #include "ansi.h"		/* required by code */
 
-static long genrand_int31(void);
+long genrand_int31(void);
 
 /*
  * ---------------------------------------------------------------------------
@@ -218,13 +218,13 @@ int countwords(char *str, const Delim * sep)
 
 int list2arr(char ***arr, int maxtok, char *list, const Delim * sep)
 {
-    static unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
-    static int initted = 0;
+    unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
+    int initted = 0;
     char *tok, *liststart;
     int ntok, tokpos, i, bits;
 
     /*
-     * Mark token starting points in a static 1k bitstring, then go back
+     * Mark token starting points in a 1k bitstring, then go back
      * and collect them into an array of just the right number of
      * pointers.
      */
@@ -594,13 +594,13 @@ long random_range(long low, long high)
 #define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
 #define TWIST(u,v) ((MIXBITS(u,v) >> 1) ^ ((v)&1UL ? MATRIX_A : 0UL))
 
-static unsigned long state[N];	/* the array for the state vector  */
+unsigned long state[N];	/* the array for the state vector  */
 
-static int left = 1;
+int left = 1;
 
-static int initf = 0;
+int initf = 0;
 
-static unsigned long *next;
+unsigned long *next;
 
 /* initializes state[N] with a seed */
 void init_genrand(unsigned long s)
@@ -629,7 +629,7 @@ void init_genrand(unsigned long s)
     initf = 1;
 }
 
-static void next_state(void)
+void next_state(void)
 {
     unsigned long *p = state;
     int j;
@@ -659,7 +659,7 @@ static void next_state(void)
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
-static long genrand_int31(void)
+long genrand_int31(void)
 {
     unsigned long y;
 

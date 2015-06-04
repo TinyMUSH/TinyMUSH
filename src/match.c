@@ -30,9 +30,9 @@
 #define CON_TOKEN       0x10	/* Name is a special token */
 #define CON_DBREF       0x20	/* Name is a dbref */
 
-static MSTATE md;
+MSTATE md;
 
-static void promote_match(dbref what, int confidence)
+void promote_match(dbref what, int confidence)
 {
     /*
      * Check for type and locks, if requested
@@ -101,9 +101,10 @@ static void promote_match(dbref what, int confidence)
  * names are being matched.  It also removes initial and terminal spaces.
  */
 
-static char *munge_space_for_match(const char *name)
+char *munge_space_for_match(const char *name)
 {
-    static char buffer[LBUF_SIZE], *q;
+    static char buffer[LBUF_SIZE];	// XXX Should return a buffer instead of a static pointer
+    char *q;
     const char *p;
     p = name;
     q = buffer;
@@ -155,7 +156,7 @@ void match_player(void)
 
 /* returns object dbref associated with named reference, else NOTHING */
 
-static dbref absolute_nref(char *str)
+dbref absolute_nref(char *str)
 {
     char *p, *q, *buf, *bp;
     dbref *np, nref;
@@ -205,7 +206,7 @@ static dbref absolute_nref(char *str)
 
 /* returns nnn if name = #nnn, else NOTHING */
 
-static dbref absolute_name(int need_pound)
+dbref absolute_name(int need_pound)
 {
     dbref match;
     char *mname;
@@ -314,7 +315,7 @@ void match_here(void)
     }
 }
 
-static void match_list(dbref first, int local)
+void match_list(dbref first, int local)
 {
     char *namebuf;
 
@@ -372,7 +373,7 @@ void match_neighbor(void)
     }
 }
 
-static int match_exit_internal(dbref loc, dbref baseloc, int local)
+int match_exit_internal(dbref loc, dbref baseloc, int local)
 {
     dbref exit;
     int result, key;

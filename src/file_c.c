@@ -23,26 +23,6 @@
 #include "command.h"		/* required by code */
 #include "file_c.h"		/* required by code */
 
-typedef struct filecache_hdr FCACHE;
-
-typedef struct filecache_block_hdr FBLKHDR;
-
-typedef struct filecache_block FBLOCK;
-
-struct filecache_hdr {
-    char **filename;
-    FBLOCK *fileblock;
-    const char *desc;
-};
-
-struct filecache_block {
-    struct filecache_block_hdr {
-	struct filecache_block *nxt;
-	int nchars;
-    } hdr;
-    char data[MBUF_SIZE - sizeof(FBLKHDR)];
-};
-
 #define FBLOCK_SIZE (MBUF_SIZE - sizeof(FBLKHDR))
 /* *INDENT-OFF* */
 
@@ -93,7 +73,7 @@ void do_list_file(dbref player, dbref cause, int extra, char *arg)
     fcache_send(player, flagvalue);
 }
 
-static FBLOCK *fcache_fill(FBLOCK * fp, char ch)
+FBLOCK *fcache_fill(FBLOCK * fp, char ch)
 {
     FBLOCK *tfp;
 
@@ -112,7 +92,7 @@ static FBLOCK *fcache_fill(FBLOCK * fp, char ch)
     return fp;
 }
 
-static int fcache_read(FBLOCK ** cp, char *filename)
+int fcache_read(FBLOCK ** cp, char *filename)
 {
     int n, nmax, tchars, fd;
     char *buff;

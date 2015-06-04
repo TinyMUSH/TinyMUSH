@@ -42,9 +42,9 @@
  * only internal currently, so it's not a problem.
  */
 
-static char *unparse_object_quiet(dbref player, dbref loc)
+char *unparse_object_quiet(dbref player, dbref loc)
 {
-    static char buf[SBUF_SIZE];
+    static char buf[SBUF_SIZE];	// XXX Should return a buffer instead of a static pointer
 
     switch (loc) {
     case NOTHING:
@@ -59,11 +59,11 @@ static char *unparse_object_quiet(dbref player, dbref loc)
     }
 }
 
-static char boolexp_buf[LBUF_SIZE];
+char boolexp_buf[LBUF_SIZE];
 
-static char *buftop;
+char *buftop;
 
-static void unparse_boolexp1(dbref player, BOOLEXP * b, char outer_type, int format)
+void unparse_boolexp1(dbref player, BOOLEXP * b, char outer_type, int format)
 {
     ATTR *ap;
     char sep_ch;

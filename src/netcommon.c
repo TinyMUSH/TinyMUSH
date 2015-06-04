@@ -32,20 +32,8 @@
 #include "powers.h"		/* required by code */
 #include "match.h"		/* required by code */
 
-extern int process_output(DESC * d);
-
-extern void handle_prog(DESC *, char *);
-
-extern void record_login(dbref, int, char *, char *, char *);
-
-extern dbref connect_player(char *, char *, char *, char *, char *);
-
-extern char *make_guest(DESC *);
-
 extern const char *conn_reasons[];
-
 extern const char *conn_messages[];
-
 extern int ansi_nchartab[];
 
 /* ---------------------------------------------------------------------------
@@ -521,7 +509,7 @@ void desc_addhash(DESC * d)
  * desc_delhash: Remove a net descriptor from its player hash list.
  */
 
-static void desc_delhash(DESC * d)
+void desc_delhash(DESC * d)
 {
     DESC *hdesc, *last;
     dbref player;
@@ -578,7 +566,7 @@ void save_command(DESC * d, CBLK * command)
     d->input_tail = command;
 }
 
-static void set_userstring(char **userstring, const char *command)
+void set_userstring(char **userstring, const char *command)
 {
     while (*command && isascii(*command) && isspace(*command)) {
 	command++;
@@ -598,7 +586,7 @@ static void set_userstring(char **userstring, const char *command)
     }
 }
 
-static void parse_connect(const char *msg, char *command, char *user, char *pass)
+void parse_connect(const char *msg, char *command, char *user, char *pass)
 {
     char *p;
 
@@ -669,10 +657,10 @@ static void parse_connect(const char *msg, char *command, char *user, char *pass
     *p = '\0';
 }
 
-static const char *time_format_1(time_t dt)
+const char *time_format_1(time_t dt)
 {
     register struct tm *delta;
-    static char buf[64];
+    static char buf[64];	// XXX Should return a buffer instead of a static pointer
 
     if (dt < 0) {
 	dt = 0;
@@ -689,10 +677,10 @@ static const char *time_format_1(time_t dt)
     return buf;
 }
 
-static const char *time_format_2(time_t dt)
+const char *time_format_2(time_t dt)
 {
     register struct tm *delta;
-    static char buf[64];
+    static char buf[64];	// XXX Should return a buffer instead of a static pointer
 
     if (dt < 0) {
 	dt = 0;
@@ -713,7 +701,7 @@ static const char *time_format_2(time_t dt)
     return buf;
 }
 
-static void announce_connattr(DESC * d, dbref player, dbref loc, const char *reason, int num, int attr)
+void announce_connattr(DESC * d, dbref player, dbref loc, const char *reason, int num, int attr)
 {
     dbref aowner, obj, zone;
     int aflags, alen, argn;
@@ -826,7 +814,7 @@ static void announce_connattr(DESC * d, dbref player, dbref loc, const char *rea
     }
 }
 
-static void announce_connect(dbref player, DESC * d, const char *reason)
+void announce_connect(dbref player, DESC * d, const char *reason)
 {
     dbref loc, aowner, temp;
     int aflags, alen, num, key, count;
@@ -1167,9 +1155,9 @@ void check_idle(void)
     }
 }
 
-static char *trimmed_name(dbref player)
+char *trimmed_name(dbref player)
 {
-    static char cbuff[18];
+    static char cbuff[18];	// XXX Should return a buffer instead of a static pointer
 
     if (strlen(Name(player)) <= 16) {
 	return Name(player);
@@ -1180,9 +1168,9 @@ static char *trimmed_name(dbref player)
     return cbuff;
 }
 
-static char *trimmed_site(char *name)
+char *trimmed_site(char *name)
 {
-    static char buff[MBUF_SIZE];
+    static char buff[MBUF_SIZE];	// XXX Should return a buffer instead of a static pointer
 
     if (((int) strlen(name) <= mudconf.site_chars)
 	|| (mudconf.site_chars == 0)) {
@@ -1194,7 +1182,7 @@ static char *trimmed_site(char *name)
     return buff;
 }
 
-static void dump_users(DESC * e, char *match, int key)
+void dump_users(DESC * e, char *match, int key)
 {
     DESC *d;
     int count;
@@ -1346,7 +1334,7 @@ static void dump_users(DESC * e, char *match, int key)
     free_mbuf(buf);
 }
 
-static void dump_info(DESC * call_by)
+void dump_info(DESC * call_by)
 {
     DESC *d;
     char *temp;
@@ -1554,7 +1542,7 @@ void init_logout_cmdtab(void)
     }
 }
 
-static void failconn(const char *logcode, const char *logtype, const char *logreason, DESC * d, int disconnect_reason, dbref player, int filecache, char *motd_msg, char *command, char *user, char *password, char *cmdsave)
+void failconn(const char *logcode, const char *logtype, const char *logreason, DESC * d, int disconnect_reason, dbref player, int filecache, char *motd_msg, char *command, char *user, char *password, char *cmdsave)
 {
     char *name;
 
@@ -1581,10 +1569,10 @@ static void failconn(const char *logcode, const char *logtype, const char *logre
     return;
 }
 
-static const char *connect_fail = "Either that player does not exist, or has a different password.\r\n";
-static const char *create_fail = "Either there is already a player with that name, or that name is illegal.\r\n";
+const char *connect_fail = "Either that player does not exist, or has a different password.\r\n";
+const char *create_fail = "Either there is already a player with that name, or that name is illegal.\r\n";
 
-static int check_connect(DESC * d, char *msg)
+int check_connect(DESC * d, char *msg)
 {
     char *command, *user, *password, *buff, *cmdsave, *name;
     dbref player, aowner;
@@ -1802,7 +1790,7 @@ static int check_connect(DESC * d, char *msg)
     return 1;
 }
 
-static void logged_out_internal(DESC * d, int key, char *arg)
+void logged_out_internal(DESC * d, int key, char *arg)
 {
     switch (key) {
     case CMD_QUIT:
@@ -2088,7 +2076,7 @@ int site_check(struct in_addr host, SITE * site_list)
 #define S_SUSPECT   1
 #define S_ACCESS    2
 
-static const char *stat_string(int strtype, int flag)
+const char *stat_string(int strtype, int flag)
 {
     const char *str;
 
@@ -2133,7 +2121,7 @@ static const char *stat_string(int strtype, int flag)
     return str;
 }
 
-static unsigned int mask_to_prefix(unsigned int mask_num)
+unsigned int mask_to_prefix(unsigned int mask_num)
 {
     unsigned int i, result, tmp;
 
@@ -2155,7 +2143,7 @@ static unsigned int mask_to_prefix(unsigned int mask_num)
     return result;
 }
 
-static void list_sites(dbref player, SITE * site_list, const char *header_txt, int stat_type)
+void list_sites(dbref player, SITE * site_list, const char *header_txt, int stat_type)
 {
     char *buff, *str, *maskaddr;
     SITE *this;

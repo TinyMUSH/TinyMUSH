@@ -35,74 +35,14 @@
 #include "attrs.h"		/* required by code */
 #include "defaults.h"		/* required by code */
 
-extern void init_attrtab(void);
-
-extern void init_cmdtab(void);
-
-extern void cf_init(void);
-
-extern void pcache_init(void);
-
-extern int cf_read(char *fn);
-
-extern void init_functab(void);
-
-extern void close_sockets(int emergency, char *message);
-
-extern char *version_string(void);
-extern void init_version(void);
-extern void log_version(void);
-
-extern void init_logout_cmdtab(void);
-
-extern void init_timer(void);
-
-extern void do_dbck(dbref, dbref, int);
-
-extern void init_genrand(unsigned long);
-
-void fork_and_dump(dbref, dbref, int);
-
-void dump_database(void);
-
-dbref db_read_flatfile(FILE *, int *, int *, int *);
-
-void pcache_sync(void);
-
-static void init_rlimit(void);
-
-extern int add_helpfile(dbref, char *, char *, int);
-
-extern void vattr_init(void);
-
-extern void load_restart_db(void);
-
-extern void tcache_init(void);
-
-extern void helpindex_load(dbref);
-
-extern void helpindex_init(void);
-
-extern int dddb_optimize(void);
-
 extern LOGFILETAB logfds_table[];
-
 extern volatile pid_t slave_pid;
-
 extern volatile int slave_socket;
-
 extern char qidx_chartab[256];
 
 #ifdef NEED_EMPTY_LTPLSYM
 const lt_dlsymlist lt_preloaded_symbols[] = { {0, (lt_ptr_t) 0} };
 #endif
-
-void recover_flatfile(char *);
-
-int tailfind(char *, char *);
-
-int backup_mush(dbref, dbref, int);
-
 
 /*
  * Used to figure out if netmush is already running. Since there's
@@ -414,7 +354,7 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
  * atr_match: Check attribute list for wild card matches and queue them.
  */
 
-static int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, char *raw_str, int check_exclude, int hash_insert)
+int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, char *raw_str, int check_exclude, int hash_insert)
 {
     dbref aowner;
     int match, attr, aflags, alen, i;
@@ -634,7 +574,7 @@ int check_filter(dbref object, dbref player, int filter, const char *msg)
     return (1);
 }
 
-static char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const char *dflt)
+char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const char *dflt)
 {
     int aflags, alen;
     dbref aowner;
@@ -663,7 +603,7 @@ static char *add_prefix(dbref object, dbref player, int prefix, const char *msg,
     return (buf);
 }
 
-static char *dflt_from_msg(dbref sender, dbref sendloc)
+char *dflt_from_msg(dbref sender, dbref sendloc)
 {
     char *tp, *tbuff;
     tp = tbuff = alloc_lbuf("notify_check.fwdlist");
@@ -1200,7 +1140,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
  * Reporting of CPU information.
  */
 
-static void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
+void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 {
     int thing, obj_counted;
     long used_msecs, total_msecs;
@@ -2091,7 +2031,7 @@ void call_all_modules_nocache(char *xfn)
     free_mbuf(s);
 }
 
-static int load_game(void)
+int load_game(void)
 {
     FILE *f;
     MODULE *mp;
@@ -2270,7 +2210,7 @@ void do_readcache(dbref player, dbref cause, int key)
     fcache_load(player);
 }
 
-static void process_preload(void)
+void process_preload(void)
 {
     dbref thing, parent, aowner;
     int aflags, alen, lev, i;
@@ -2608,7 +2548,7 @@ int dbconvert(int argc, char *argv[])
     MODULE *mp;
     void (*modfunc) (FILE *);
     int option_index = 0;
-    static struct option long_options[] = {
+    struct option long_options[] = {
 	{"config", required_argument, 0, 'f'},
 	{"check", no_argument, 0, 'C'},
 	{"data", required_argument, 0, 'd'},
@@ -2904,7 +2844,7 @@ int main(int argc, char *argv[])
     MODHASHES *m_htab, *hp;
     MODNHASHES *m_ntab, *np;
     int option_index = 0;
-    static struct option long_options[] = {
+    struct option long_options[] = {
 	{"debug", no_argument, 0, 'd'},
 	{"restart", no_argument, 0, 'r'},
 	{"mindb", no_argument, 0, 'm'},
@@ -3464,7 +3404,7 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 }
 
-static void init_rlimit(void)
+void init_rlimit(void)
 {
 #if defined(HAVE_SETRLIMIT) && defined(RLIMIT_NOFILE)
     struct rlimit *rlp;
