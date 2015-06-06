@@ -103,12 +103,12 @@ int ansi_bits[I_ANSI_LIM] = {
 
 char *strip_ansi(const char *s)
 {
-    char *buf, *xbuf, *p, *s1;
-    p = buf = alloc_lbuf(__func__);
+    char *buf, *p, *s1;
+    p = buf = alloc_lbuf("strip_ansi_buf");
     *buf = '\0';
     s1 = (char *) s;
 
-    if (s1) {
+    if (s1 && *s1) {
 	while (*s1 == ESC_CHAR) {
 	    skip_esccode(&s1);
 	}
@@ -144,7 +144,7 @@ char *strip_xterm(char *s)
     char *buf, *p;
     char *s1 = s;
     int skip = 0;
-    p = buf = alloc_lbuf(__func__);
+    p = buf = alloc_lbuf("strip_xterm_buf");
 
     while (*s1) {
 	if (strncmp(s1, ANSI_XTERM_FG, strlen(ANSI_XTERM_FG)) == 0) {
@@ -246,7 +246,7 @@ char *normal_to_white(const char *raw)
     char *just_after_esccode = p;
     unsigned int param_val;
     int has_zero;
-    buf = alloc_lbuf(__func__);
+    buf = alloc_lbuf("normal_to_white_buf");
     q = buf;
 
     while (p && *p) {
@@ -351,7 +351,7 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
     int ansi_bits_set, ansi_bits_clr;
     char *p;
     char *buffer;
-    buffer = alloc_sbuf(__func__);
+    buffer = alloc_sbuf("ansi_transition_esccode_buffer");
     *buffer = '\0';
 
     if (ansi_before != ansi_after) {
@@ -452,7 +452,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
     char ansi_mushcode_fg[9] = "xrgybmcw";
     char ansi_mushcode_bg[9] = "XRGYBMCW";
     char *buffer;
-    buffer = alloc_sbuf(__func__);
+    buffer = alloc_sbuf("ansi_transition_mushcode_buffer");
     *buffer = '\0';
 
     if (ansi_before != ansi_after) {
@@ -544,7 +544,7 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
     char ansi_mushcode_fg[9] = "xrgybmcw";
     char ansi_mushcode_bg[9] = "XRGYBMCW";
     char *buffer;
-    buffer = alloc_sbuf(__func__);
+    buffer = alloc_sbuf("ansi_transition_letters_buffer");
     *buffer = '\0';
 
     if (ansi_before != ansi_after) {
@@ -627,9 +627,9 @@ int ansi_map_states(const char *s, int **m, char **p)
     char *stripped;
     char *s1, *s2;
     int n = 0, ansi_state = ANST_NORMAL;
-    ansi_map = (int *) alloc_hbuf(__func__);
-    stripped = alloc_lbuf(__func__);
-    s2 = s1 = xstrdup(s, __func__);
+    ansi_map = (int *) alloc_hbuf("ansi_map_states_ansi_map");
+    stripped = alloc_lbuf("ansi_map_states_stripped");
+    s2 = s1 = xstrdup(s, "ansi_map_states_s2");
 
     while (*s1) {
 	if (*s1 == ESC_CHAR) {
@@ -644,7 +644,7 @@ int ansi_map_states(const char *s, int **m, char **p)
     stripped[n] = '\0';
     *m = ansi_map;
     *p = stripped;
-    xfree(s2, __func__);
+    xfree(s2, "ansi_map_states_s2");
     return n;
 }
 
@@ -666,7 +666,7 @@ char *remap_colors(const char *s, int *cmap)
     char *buf;
     char *bp;
     int n;
-    buf = alloc_lbuf(__func__);
+    buf = alloc_lbuf("remap_colors_buf");
 
     if (!s || !*s || !cmap) {
 	strncpy(buf, s, LBUF_SIZE);
@@ -743,7 +743,7 @@ char *remap_colors(const char *s, int *cmap)
 char *translate_string(char *str, int type)
 {
     char *buff, *bp;
-    bp = buff = alloc_lbuf(__func__);
+    bp = buff = alloc_lbuf("translate_string_buff");
 
     if (type) {
 	int ansi_state = ANST_NORMAL;
@@ -1134,7 +1134,7 @@ char *upcasestr(char *s)
 char *munge_space(char *string)
 {
     char *buffer, *p, *q;
-    buffer = alloc_lbuf(__func__);
+    buffer = alloc_lbuf("munge_space_buffer");
     p = string;
     q = buffer;
 
@@ -1173,7 +1173,7 @@ char *munge_space(char *string)
 char *trim_spaces(char *string)
 {
     char *buffer, *p, *q;
-    buffer = alloc_lbuf(__func__);
+    buffer = alloc_lbuf("trim_spaces_buffer");
     p = string;
     q = buffer;
 
@@ -1379,7 +1379,7 @@ char *replace_string(const char *old, const char *new, const char *string)
 {
     char *result, *r, *s;
     int olen;
-    r = result = alloc_lbuf(__func__);
+    r = result = alloc_lbuf("replace_string_result");
 
     if (string != NULL) {
 	s = (char *) string;
@@ -1462,7 +1462,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
     to_ansi_clr = ANST_NONE & (~ansi_state);
     tlen = p - to;
     /* Do the substitution.  Idea for prefix/suffix from R'nice@TinyTIM */
-    cp = *dst = alloc_lbuf(__func__);
+    cp = *dst = alloc_lbuf("edit_string_cp");
 
     if (!strcmp(from, "^")) {
 	/* Prepend 'to' to string */
@@ -1851,8 +1851,8 @@ char *ltos(long num)
     /* Mark Vasoll's long int to string converter. */
     char *buf, *p, *dest, *destp;
     unsigned long anum;
-    p = buf = alloc_sbuf(__func__);
-    destp = dest = alloc_sbuf(__func__);
+    p = buf = alloc_sbuf("ltos_buf");
+    destp = dest = alloc_sbuf("ltos_dest");
     /* absolute value */
     anum = (num < 0) ? -num : num;
 
@@ -1915,7 +1915,7 @@ void safe_ltos(char *dest, char **destp, long num, size_t size)
 char *repeatchar(int count, char ch)
 {
     char *str, *ptr;
-    ptr = str = alloc_lbuf(__func__);
+    ptr = str = alloc_lbuf("repeatchar_ptr");
 
     if (count > 0) {
 	for (; str < ptr + count; str++) {

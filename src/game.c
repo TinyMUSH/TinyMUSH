@@ -1273,7 +1273,7 @@ char *mktimestamp(void)
     time_t ts;
     ts = time(NULL);
     t = localtime(&ts);
-    buff = alloc_gbuf(__func__);
+    buff = alloc_gbuf("mktimestamp_buff");
     safe_snprintf(buff, GBUF_SIZE, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone);
     return (buff);
 }

@@ -832,10 +832,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 	    ch = getc(f);	/* 2nd char selects type */
 
 	    if ((ch == 'V') || (ch == 'X') || (ch == 'T')) {
-		/*
-		 * The following things are common across
-		 * 2.x, MUX, and 3.0.
-		 */
+		/* The following things are common across 2.x, MUX, and 3.0. */
 		if (header_gotten) {
 		    if (mudstate.standalone) {
 			log_write_raw(1, "\nDuplicate MUSH version header entry at object %d, ignored.\n", i);
@@ -849,9 +846,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		deduce_version = 0;
 		g_version = getref(f);
 
-		/*
-		 * Otherwise extract feature flags
-		 */
+		/* Otherwise extract feature flags */
 
 		if (g_version & V_GDBM) {
 		    read_attribs = 0;
@@ -874,9 +869,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		deduce_zone = 0;
 	    }
 
-	    /*
-	     * More generic switch.
-	     */
+	    /* More generic switch. */
 
 	    switch (ch) {
 	    case 'T':		/* 3.0 VERSION */
@@ -927,10 +920,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		    tstr++;	/* skip ':' */
 
 		    if (!has_visual_attrs) {
-			/*
-			 * If not AF_ODARK, is
-			 * AF_VISUAL. Strip AF_ODARK.
-			 */
+			/* If not AF_ODARK, is AF_VISUAL. Strip AF_ODARK. */
 			if (aflags & AF_ODARK) {
 			    aflags &= ~AF_ODARK;
 			} else {
@@ -948,8 +938,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		anum = getref(f);
 		break;
 
-	    case 'N':		/* NEXT ATTR TO ALLOC WHEN NO
-				 * FREELIST */
+	    case 'N':		/* NEXT ATTR TO ALLOC WHEN NO FREELIST */
 		if (nextattr_gotten) {
 		    if (mudstate.standalone) {
 			log_write_raw(1, "\nDuplicate next free vattr entry at object %d, ignored.\n", i);
@@ -973,7 +962,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 
 	    break;
 
-	case '!':		/* MUX entry/MUSH entry */
+	case '!':		/* MUX and MUSH entries */
 	    if (deduce_version) {
 		g_format = F_TINYMUSH;
 		g_version = 1;
@@ -1023,18 +1012,15 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		s_Zone(i, getref(f));
 	    }
 
-	    /*
-	     * else s_Zone(i, NOTHING);
-	     */
-	    /*
-	     * CONTENTS and EXITS
-	     */
+	    /* CONTENTS and EXITS */
+	    
 	    s_Contents(i, getref(f));
+	    
+	    /* EXITS */
+	    
 	    s_Exits(i, getref(f));
 
-	    /*
-	     * LINK
-	     */
+	    /* LINK */
 
 	    if (read_link) {
 		s_Link(i, getref(f));
@@ -1042,14 +1028,10 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		s_Link(i, NOTHING);
 	    }
 
-	    /*
-	     * NEXT
-	     */
+	    /* NEXT */
 	    s_Next(i, getref(f));
 
-	    /*
-	     * LOCK
-	     */
+	    /* LOCK */
 
 	    if (read_key) {
 		tempbool = getboolexp(f);
@@ -1057,14 +1039,11 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		free_boolexp(tempbool);
 	    }
 
-	    /*
-	     * OWNER
-	     */
+	    /* OWNER */
+	    
 	    s_Owner(i, getref(f));
 
-	    /*
-	     * PARENT
-	     */
+	    /* PARENT */
 
 	    if (read_parent) {
 		s_Parent(i, getref(f));
@@ -1072,17 +1051,13 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		s_Parent(i, NOTHING);
 	    }
 
-	    /*
-	     * PENNIES
-	     */
+	    /* PENNIES */
 
 	    if (read_money) {
 		s_Pennies(i, getref(f));
 	    }
 
-	    /*
-	     * FLAGS
-	     */
+	    /* FLAGS */
 	    f1 = getref(f);
 
 	    if (read_extflags) {
@@ -1125,9 +1100,8 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		s_CreateTime(i, AccessTime(i));
 	    }
 
-	    /*
-	     * ATTRIBUTES
-	     */
+
+	    /* ATTRIBUTES */
 
 	    if (read_attribs) {
 		if (!get_list(f, i, read_new_strings)) {
@@ -1139,9 +1113,7 @@ dbref db_read_flatfile(FILE * f, int *db_format, int *db_version, int *db_flags)
 		}
 	    }
 
-	    /*
-	     * check to see if it's a player
-	     */
+	    /* check to see if it's a player */
 
 	    if (Typeof(i) == TYPE_PLAYER) {
 		c_Connected(i);
@@ -1194,9 +1166,11 @@ int db_read(void)
     int *c, vattr_flags, i, j, blksize, num;
     char *s;
     struct timeval obj_time;
+    
     /*
      * Fetch the database info
      */
+    
     key.dptr = "TM3";
     key.dsize = strlen("TM3") + 1;
     data = db_get(key, DBTYPE_DBINFO);
@@ -1209,6 +1183,7 @@ int db_read(void)
     /*
      * Unroll the data returned
      */
+    
     c = data.dptr;
     memcpy((void *) &mudstate.min_size, (void *) c, sizeof(int));
     c++;
@@ -1218,9 +1193,11 @@ int db_read(void)
     c++;
     memcpy((void *) &mudstate.moduletype_top, (void *) c, sizeof(int));
     free(data.dptr);
+    
     /*
      * Load the attribute numbers
      */
+    
     blksize = ATRNUM_BLOCK_SIZE;
 
     for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++) {
@@ -1229,9 +1206,11 @@ int db_read(void)
 	data = db_get(key, DBTYPE_ATRNUM);
 
 	if (data.dptr) {
+	    
 	    /*
 	     * Unroll the data into flags and name
 	     */
+	    
 	    s = data.dptr;
 
 	    while ((s - (char *) data.dptr) < data.dsize) {
@@ -1243,9 +1222,11 @@ int db_read(void)
 		s = strchr((const char *) s, '\0');
 
 		if (!s) {
+		    
 		    /*
 		     * Houston, we have a problem
 		     */
+		    
 		    log_write(LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS(i, blksize));
 		}
 
@@ -1272,9 +1253,11 @@ int db_read(void)
 	data = db_get(key, DBTYPE_OBJECT);
 
 	if (data.dptr) {
+	    
 	    /*
 	     * Unroll the data into objnum and object
 	     */
+	    
 	    s = data.dptr;
 
 	    while ((s - (char *) data.dptr) < data.dsize) {
@@ -1290,6 +1273,7 @@ int db_read(void)
 		 * We read the entire object structure in and
 		 * copy it into place
 		 */
+		
 		memcpy((void *) &(db[num]), (void *) s, sizeof(DUMPOBJ));
 		s += sizeof(DUMPOBJ);
 

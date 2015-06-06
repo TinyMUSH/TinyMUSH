@@ -16,10 +16,11 @@
 typedef struct pool_header {
     int magicnum;		/*!< Magic Number, For consistency check */
     int pool_size;		/*!< Size of the pool,  for consistency check */
+    char state;			/*!< State of the buffe */
     struct pool_header *next;	/*!< Next pool header in chain */
-    struct pool_header *nxtfree;	/*!< Next pool header in freelist */
+    struct pool_header *nxtfree;/*!< Next pool header in freelist */
     char *buf_tag;		/*!< Debugging/trace tag */
-    char align[(256 - (2 * sizeof(int)) - (3 * sizeof(char *))) & 0x7];	/*!< Padding */
+    char align[(256 - (2 * sizeof(int)) - (3 * sizeof(char *)) - sizeof(char)) & 0x7];	/*!< Padding */
 } POOLHDR;
 
 typedef struct pool_footer {

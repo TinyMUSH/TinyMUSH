@@ -388,7 +388,7 @@ void queue_string(DESC * d, const char *format, ...)
     char *s;
     va_list ap;
     va_start(ap, format);
-    msg = alloc_lbuf(__func__);
+    msg = alloc_lbuf("queue_string_msg");
 
     if ((!format || !*format)) {
 	if ((s = va_arg(ap, char *)) != NULL) {

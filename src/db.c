@@ -1000,7 +1000,7 @@ void s_Name(dbref thing, char *s)
     char *buf;
 
     /* Truncate the name if we have to */
-
+    
     if (s) {
 	len = strlen(s);
 
@@ -1040,6 +1040,10 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
 
 void s_Pass(dbref thing, const char *s)
 {
+    if (mudstate.standalone) {
+        log_write_raw(1, "P");
+        }
+        
     atr_add_raw(thing, A_PASS, (char *) s);
 }
 

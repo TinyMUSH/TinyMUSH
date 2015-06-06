@@ -374,7 +374,7 @@ int add_player_name(dbref player, char *name)
     /*
      * Convert to all lowercase
      */
-    tp = temp = alloc_lbuf("add_player_name");
+    tp = temp = alloc_lbuf("add_player_name_temp");
     safe_str(name, temp, &tp);
 
     for (tp = temp; *tp; tp++) {
@@ -403,12 +403,12 @@ int add_player_name(dbref player, char *name)
 	 * It's an alias (or an incorrect entry).  Clobber it
 	 */
 	xfree(p, "add_player_name");
-	p = (dbref *) xmalloc(sizeof(dbref), "add_player_name");
+	p = (dbref *) xmalloc(sizeof(dbref), "add_player_name_p.1");
 	*p = player;
 	stat = hashrepl(temp, p, &mudstate.player_htab);
 	free_lbuf(temp);
     } else {
-	p = (dbref *) xmalloc(sizeof(dbref), "add_player_name.2");
+	p = (dbref *) xmalloc(sizeof(dbref), "add_player_name_p.2");
 	*p = player;
 	stat = hashadd(temp, p, &mudstate.player_htab, 0);
 	free_lbuf(temp);

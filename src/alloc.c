@@ -22,6 +22,11 @@ POOL pools[NUM_POOLS];
 const char *poolnames[] = { "Sbufs", "Mbufs", "Gbufs", "Lbufs", "Hbufs", "Bools", "Descs", "Qentries", "Pcaches" };
 
 #define POOL_MAGICNUM 0xdeadbeef
+#define POOL_NEWBUFF 0xaddebeef
+#define POOL_FREEDNUM 0xdeadbeef
+
+#define POOL_BUFFER_FREE	0x00
+#define POOL_BUFFER_USED	0x01
 
 void pool_init(int poolnum, int poolsize) {
 	pools[poolnum].pool_size = poolsize;
@@ -106,6 +111,9 @@ char *pool_alloc(int poolnum, const char *tag) {
 
 	do {
 		if (pools[poolnum].free_head == NULL) {
+			/*
+			 * No buffer free, allocate a new one
+			 */
 			h = (char *) malloc(pools[poolnum].pool_size + sizeof(POOLHDR) + sizeof(POOLFTR));
 
 			if (h == NULL) {
@@ -127,6 +135,11 @@ char *pool_alloc(int poolnum, const char *tag) {
 			pools[poolnum].chain_head = ph;
 			pools[poolnum].max_alloc++;
 		} else {
+			
+			/* 
+			 * We got a free one, use it 
+			 */
+			
 			ph = (POOLHDR *) (pools[poolnum].free_head);
 			h = (char *) ph;
 			h += sizeof(POOLHDR);
@@ -163,6 +176,7 @@ char *pool_alloc(int poolnum, const char *tag) {
 	} while (p == NULL);
 
 	ph->buf_tag = (char *) tag;
+	ph->state = POOL_BUFFER_USED;
 	pools[poolnum].tot_alloc++;
 	pools[poolnum].num_alloc++;
 	pool_err("DBG", LOG_ALLOCATE, poolnum, tag, ph, "Alloc", "buffer");
@@ -234,10 +248,12 @@ void pool_free(int poolnum, char **buf) {
 	 * log an error, otherwise update the pool header and stats
 	 */
 
-	if (*ibuf == POOL_MAGICNUM) {
+	//if (*ibuf == POOL_MAGICNUM) {
+	if (ph->state == POOL_BUFFER_FREE) {
 		pool_err("BUG", LOG_BUGS, poolnum, ph->buf_tag, ph, "Free", "buffer already freed");
 	} else {
 		*ibuf = POOL_MAGICNUM;
+		ph->state = POOL_BUFFER_FREE;
 		ph->nxtfree = pools[poolnum].free_head;
 		pools[poolnum].free_head = ph;
 		pools[poolnum].num_alloc--;
@@ -270,7 +286,8 @@ void pool_trace(dbref player, int poolnum, const char *text) {
 		h += sizeof(POOLHDR);
 		ibuf = (int *) h;
 
-		if (*ibuf != POOL_MAGICNUM) {
+		//if (*ibuf != POOL_MAGICNUM) {
+		if (ph->state != POOL_BUFFER_FREE) {
 			notify(player, ph->buf_tag);
 		} else {
 			numfree++;
@@ -314,7 +331,8 @@ void pool_reset(void) {
 			h += sizeof(POOLHDR);
 			ibuf = (int *) h;
 
-			if (*ibuf == POOL_MAGICNUM) {
+			//if (*ibuf == POOL_MAGICNUM) {
+			if (ph->state == POOL_BUFFER_FREE) {
 				free(ph);
 			} else {
 				if (!newchain) {
