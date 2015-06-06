@@ -22,8 +22,6 @@ POOL pools[NUM_POOLS];
 const char *poolnames[] = { "Sbufs", "Mbufs", "Gbufs", "Lbufs", "Hbufs", "Bools", "Descs", "Qentries", "Pcaches" };
 
 #define POOL_MAGICNUM 0xdeadbeef
-#define POOL_NEWBUFF 0xaddebeef
-#define POOL_FREEDNUM 0xdeadbeef
 
 #define POOL_BUFFER_FREE	0x00
 #define POOL_BUFFER_USED	0x01
@@ -248,7 +246,6 @@ void pool_free(int poolnum, char **buf) {
 	 * log an error, otherwise update the pool header and stats
 	 */
 
-	//if (*ibuf == POOL_MAGICNUM) {
 	if (ph->state == POOL_BUFFER_FREE) {
 		pool_err("BUG", LOG_BUGS, poolnum, ph->buf_tag, ph, "Free", "buffer already freed");
 	} else {
@@ -286,7 +283,6 @@ void pool_trace(dbref player, int poolnum, const char *text) {
 		h += sizeof(POOLHDR);
 		ibuf = (int *) h;
 
-		//if (*ibuf != POOL_MAGICNUM) {
 		if (ph->state != POOL_BUFFER_FREE) {
 			notify(player, ph->buf_tag);
 		} else {
@@ -331,7 +327,6 @@ void pool_reset(void) {
 			h += sizeof(POOLHDR);
 			ibuf = (int *) h;
 
-			//if (*ibuf == POOL_MAGICNUM) {
 			if (ph->state == POOL_BUFFER_FREE) {
 				free(ph);
 			} else {

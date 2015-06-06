@@ -1538,7 +1538,9 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	}
     }
 
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NONE), *dst, &cp);
+    p = ansi_transition_esccode(ansi_state, ANST_NONE);
+    safe_str(p, *dst, &cp);
+    free_sbuf(p);
 }
 
 /**

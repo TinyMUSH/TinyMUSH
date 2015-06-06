@@ -1023,7 +1023,9 @@ void s_Name(dbref thing, char *s)
 void safe_exit_name(dbref it, char *buff, char **bufc)
 {
     char *s = *bufc;
+    char *buf;
     int ansi_state = ANST_NORMAL;
+
     safe_name(it, buff, bufc);
 
     while (*s && (*s != EXIT_DELIMITER)) {
@@ -1035,7 +1037,9 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     }
 
     *bufc = s;
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
+    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    safe_str(buf, buff, bufc);
+    free_sbuf(buf);
 }
 
 void s_Pass(dbref thing, const char *s)

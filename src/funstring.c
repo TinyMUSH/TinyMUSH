@@ -303,7 +303,7 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *bp, *cp, *mp, *np;
+    char *bp, *cp, *mp, *np, *buf;
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
 
     if (nfargs == 0) {
@@ -387,7 +387,9 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		/*
 		 * Yup, return what follows
 		 */
-		safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_haystack2), buff, bufc);
+		buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2);
+		safe_str(buf, buff, bufc);
+		free_sbuf(buf);
 		safe_str(cp, buff, bufc);
 		return;
 	    }
@@ -409,7 +411,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *haystack, *bp, *cp, *mp, *np;
+    char *haystack, *bp, *cp, *mp, *np, *buf;
     int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
 
     if (nfargs == 0) {
@@ -491,7 +493,9 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	     */
 	    *bp = '\0';
 	    safe_str(haystack, buff, bufc);
-	    safe_str(ansi_transition_esccode(ansi_haystack, ANST_NORMAL), buff, bufc);
+	    buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 	    return;
 	}
 
@@ -880,12 +884,14 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 
     safe_strncat(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
+    s = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    safe_str(s, buff, bufc);
+    free_sbuf(s);
 }
 
 void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *s;
+    char *s, *buf;
     int count, start, nchars;
     int ansi_state = ANST_NORMAL;
     s = fargs[0];
@@ -919,7 +925,9 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     if (*s) {
-	safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state), buff, bufc);
+        buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
     }
 
     safe_str(s, buff, bufc);
@@ -1231,7 +1239,9 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 
     track_ansi_letters(fargs[0], &ansi_state);
-    safe_str(ansi_transition_esccode(ANST_NONE, ansi_state), buff, bufc);
+    s = ansi_transition_esccode(ANST_NONE, ansi_state);
+    safe_str(s, buff, bufc);
+    free_sbuf(s);
     /* Now that normal ansi has been done, time for xterm */
     s = fargs[0];
 
@@ -1308,7 +1318,9 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 
     safe_str(fargs[1], buff, bufc);
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NONE), buff, bufc);
+    s = ansi_transition_esccode(ansi_state, ANST_NONE);
+    safe_str(s, buff, bufc);
+    free_sbuf(s);
 
     if (xterm) {
 	safe_ansi_normal(buff, bufc);
@@ -1416,7 +1428,7 @@ void fun_decrypt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int n, i, j, ansi_state, *ansi_map;
-    char *stripped;
+    char *stripped, *buf;
 
     if (!fargs[0] || !*fargs[0]) {
 	return;
@@ -1429,7 +1441,9 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	j = random_range(i, n - 1);
 
 	if (ansi_state != ansi_map[j]) {
-	    safe_str(ansi_transition_esccode(ansi_state, ansi_map[j]), buff, bufc);
+	    buf = ansi_transition_esccode(ansi_state, ansi_map[j]);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 	    ansi_state = ansi_map[j];
 	}
 
@@ -1438,7 +1452,9 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	stripped[j] = stripped[i];
     }
 
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
+    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    safe_str(buf, buff, bufc);
+    free_sbuf(buf);
     free_hbuf(ansi_map);
     free_lbuf(stripped);
 }
@@ -1451,7 +1467,7 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int n, *ansi_map, ansi_state;
-    char *stripped;
+    char *stripped, *buf;
 
     if (!fargs[0] || !*fargs[0]) {
 	return;
@@ -1462,14 +1478,18 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     while (n--) {
 	if (ansi_state != ansi_map[n]) {
-	    safe_str(ansi_transition_esccode(ansi_state, ansi_map[n]), buff, bufc);
+	    buf = ansi_transition_esccode(ansi_state, ansi_map[n]);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 	    ansi_state = ansi_map[n];
 	}
 
 	safe_chr(stripped[n], buff, bufc);
     }
 
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
+    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    safe_str(buf, buff, bufc);
+    free_sbuf(buf);
     free_hbuf(ansi_map);
     free_lbuf(ansi_map);
 }
@@ -1481,7 +1501,7 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *s, *savep;
+    char *s, *savep, *buf;
     int count, start, nchars;
     int ansi_state = ANST_NORMAL;
     s = fargs[0];
@@ -1515,7 +1535,9 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     }
 
     if (*s) {
-	safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state), buff, bufc);
+        buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
     }
 
     savep = s;
@@ -1531,7 +1553,9 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     }
 
     safe_strncat(buff, bufc, savep, s - savep, LBUF_SIZE);
-    safe_str(ansi_transition_esccode(ansi_state, ANST_NORMAL), buff, bufc);
+    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    safe_str(buf, buff, bufc);
+    free_sbuf(buf);
 }
 
 /*
@@ -1808,7 +1832,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 {
     int width, just;
     char *l_fill, *r_fill, *bb_p;
-    char *sl, *el, *sw, *ew;
+    char *sl, *el, *sw, *ew, *buf;
     int sl_ansi_state, el_ansi_state, sw_ansi_state, ew_ansi_state;
     int sl_pos, el_pos, sw_pos, ew_pos;
     int nleft, max, lead_chrs;
@@ -2013,7 +2037,9 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	/*
 	 * Restore previous ansi state
 	 */
-	safe_str(ansi_transition_esccode(ANST_NORMAL, sl_ansi_state), buff, bufc);
+	buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
 	/*
 	 * Print the words
 	 */
@@ -2021,7 +2047,9 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	/*
 	 * Back to ansi normal
 	 */
-	safe_str(ansi_transition_esccode(el_ansi_state, ANST_NORMAL), buff, bufc);
+	buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
 
 	/*
 	 * Right space padding if needed
@@ -2094,7 +2122,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
     char **xsl, **xel, **xsw, **xew;
     int *xsl_a, *xel_a, *xsw_a, *xew_a;
     int *xsl_p, *xel_p, *xsw_p, *xew_p;
-    char *sl, *el, *sw, *ew;
+    char *sl, *el, *sw, *ew, *buf;
     int sl_ansi_state, el_ansi_state, sw_ansi_state, ew_ansi_state;
     int sl_pos, el_pos, sw_pos, ew_pos;
     int width, just, nleft, max, lead_chrs;
@@ -2494,7 +2522,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	    /*
 	     * Restore previous ansi state
 	     */
-	    safe_str(ansi_transition_esccode(ANST_NORMAL, sl_ansi_state), buff, bufc);
+	    buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 	    /*
 	     * Print the words
 	     */
@@ -2502,7 +2532,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	    /*
 	     * Back to ansi normal
 	     */
-	    safe_str(ansi_transition_esccode(el_ansi_state, ANST_NORMAL), buff, bufc);
+	    buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 
 	    /*
 	     * Right space padding if needed
@@ -2748,7 +2780,7 @@ void fun_strlen(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *s, *savep;
+    char *s, *savep, *buf;
     int count, start, nchars;
     int ansi_state_l = ANST_NORMAL;
     int ansi_state_r = ANST_NORMAL;
@@ -2789,10 +2821,14 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
 
     if (*s) {
-	safe_str(ansi_transition_esccode(ansi_state_l, ansi_state_r), buff, bufc);
+        buf = ansi_transition_esccode(ansi_state_l, ansi_state_r);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
 	safe_str(s, buff, bufc);
     } else {
-	safe_str(ansi_transition_esccode(ansi_state_l, ANST_NORMAL), buff, bufc);
+        buf = ansi_transition_esccode(ansi_state_l, ANST_NORMAL);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
     }
 }
 

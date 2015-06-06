@@ -207,7 +207,9 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     rest = next_token_ansi(s, &isep, &ansi_state);
 
     if (rest) {
-	safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state), buff, bufc);
+        s = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+	safe_str(s, buff, bufc);
+	free_sbuf(s);
 	safe_str(rest, buff, bufc);
     }
 }
@@ -219,7 +221,7 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *s, *last;
+    char *s, *last, *buf;
     Delim isep;
     int ansi_state = ANST_NONE;
 
@@ -265,7 +267,9 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	    }
 	} while (*s);
 
-	safe_str(ansi_transition_esccode(ANST_NORMAL, ansi_state), buff, bufc);
+	buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+	safe_str(buf, buff, bufc);
+	free_sbuf(buf);
 	safe_strncat(buff, bufc, last, s - last, LBUF_SIZE);
     } else {
 	s = fargs[0];
@@ -1776,7 +1780,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 {
     int i, nwords, nstates, cpos, wcount, over, ansi_state;
     int max, nleft, lead_chrs, lens[LBUF_SIZE / 2], states[LBUF_SIZE / 2 + 1];
-    char *s, **words;
+    char *s, **words, *buf;
     /*
      * Split apart the list. We need to find the length of each
      * de-ansified word, as well as keep track of the state of each word.
@@ -1831,7 +1835,9 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 	    /*
 	     * If we had a previous state, we have to write it.
 	     */
-	    safe_str(ansi_transition_esccode(ANST_NONE, states[wcount]), buff, bufc);
+	    buf = ansi_transition_esccode(ANST_NONE, states[wcount]);
+	    safe_str(buf, buff, bufc);
+	    free_sbuf(buf);
 
 	    /*
 	     * Copy in the word.
@@ -1839,7 +1845,9 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 
 	    if (lens[wcount] <= col_widths[cpos]) {
 		over = safe_str(words[wcount], buff, bufc);
-		safe_str(ansi_transition_esccode(states[wcount + 1], ANST_NONE), buff, bufc);
+		buf = ansi_transition_esccode(states[wcount + 1], ANST_NONE);
+		safe_str(buf, buff, bufc);
+		free_sbuf(buf);
 	    } else {
 		/*
 		 * Bleah. We have a string that's too long.
@@ -1860,7 +1868,9 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 		}
 
 		safe_strncat(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
-		safe_str(ansi_transition_esccode(ansi_state, ANST_NONE), buff, bufc);
+		buf = ansi_transition_esccode(ansi_state, ANST_NONE);
+		safe_str(buf, buff, bufc);
+		free_sbuf(buf);
 	    }
 
 	    /*

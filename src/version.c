@@ -100,10 +100,20 @@ void init_version(void)
     }
 
     free(version);
-    mudstate.configureinfo = munge_space(PACKAGE_CONFIG);
-    mudstate.compilerinfo = munge_space(MUSH_BUILD_COMPILE);
-    mudstate.linkerinfo = munge_space(MUSH_BUILD_LTCOMPILE);
-    mudstate.dbmdriver = strdup(MUSH_DBM);
+    version = munge_space(PACKAGE_CONFIG);
+    mudstate.configureinfo = xstrdup(version, "mudstate.configureinfo");
+    free_lbuf(version);
+    
+    version = munge_space(MUSH_BUILD_COMPILE);
+    mudstate.compilerinfo = xstrdup(version, "mudstate.compilerinfo");
+    free_lbuf(version);
+    
+    version = munge_space(MUSH_BUILD_LTCOMPILE);
+    mudstate.linkerinfo = xstrdup(version, "mudstate.linkerinfo");
+    free_lbuf(version);
+    
+    mudstate.dbmdriver = xstrdup(MUSH_DBM, "mudstate.dbmdriver");
+    
     bp = version = alloc_lbuf("init_version");
     safe_sprintf(version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
 
