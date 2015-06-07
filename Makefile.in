@@ -363,7 +363,7 @@ with_tar_prog = @with_tar_prog@
 ACLOCAL_AMFLAGS = -I src/libltdl/m4
 AM_CPPFLAGS = $(LTDLINCL)
 SUBDIRS = src
-EXTRA_DIST = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
+EXTRA_DIST = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 all: all-recursive
 
 .SUFFIXES:

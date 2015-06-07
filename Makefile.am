@@ -1,10 +1,11 @@
+
 ACLOCAL_AMFLAGS = -I src/libltdl/m4
 
 AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS         = src
 
-EXTRA_DIST      = m4/ contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
+EXTRA_DIST      = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 	
 testpath:
 	@echo prefix : @prefix@

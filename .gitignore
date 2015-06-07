@@ -61,6 +61,8 @@
 /src/stamp-h1
 /autom4te.cache/
 /src/libltdl/autom4te.cache/
+/Debug
+/TinyMUSH.cfg
 
 # Eclipse
 .autotools
