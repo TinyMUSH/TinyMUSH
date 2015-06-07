@@ -90,7 +90,7 @@ FUN flist[] = {
     {"DOING", fun_doing, 1, 0, CA_PUBLIC, NULL},
     {"DUP", fun_dup, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
     /* - E - */
-    {"E", fun_e, 0, 0, CA_PUBLIC, NULL},
+    {"E", fun_e, 1, 0, CA_PUBLIC, NULL},
     {"EDEFAULT", fun_edefault, 2, FN_NO_EVAL, CA_PUBLIC, NULL},
     {"EDIT", fun_edit, 3, 0, CA_PUBLIC, NULL},
     {"ELEMENTS", fun_elements, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -282,7 +282,7 @@ FUN flist[] = {
     {"PEEK", handle_pop, 0, FN_VARARGS | FN_STACKFX | POP_PEEK, CA_PUBLIC, NULL},
     {"PEMIT", fun_pemit, 2, FN_OUTFX, CA_PUBLIC, NULL},
     {"PFIND", fun_pfind, 1, 0, CA_PUBLIC, NULL},
-    {"PI", fun_pi, 0, 0, CA_PUBLIC, NULL},
+    {"PI", fun_pi, 1, 0, CA_PUBLIC, NULL},
     {"PLAYMEM", fun_playmem, 1, 0, CA_PUBLIC, NULL},
     {"PMATCH", fun_pmatch, 1, 0, CA_PUBLIC, NULL},
     {"POP", handle_pop, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},

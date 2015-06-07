@@ -163,12 +163,33 @@ void fval(char *buff, char **bufc, double result)
 
 void fun_pi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_strncat(buff, bufc, "3.141592654", 11, LBUF_SIZE);
+    char *s;
+    int i = 11;
+    
+    s = alloc_sbuf("fun_pi.s");
+    if(fargs[0] && *fargs[0]) {
+        i = atoi(fargs[0]);
+    }
+    
+    snprintf(s, SBUF_SIZE -1, "%%0.%df", i);
+    safe_sprintf(buff, bufc, s, M_PI);
+    free_sbuf(s);
 }
 
 void fun_e(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_strncat(buff, bufc, "2.718281828", 11, LBUF_SIZE);
+    char *s;
+    int i = 11;
+    
+    s = alloc_sbuf("fun_e.s");
+    if(fargs[0] && *fargs[0]) {
+        i = atoi(fargs[0]);
+    }
+    
+    snprintf(s, SBUF_SIZE -1, "%%0.%df", i);
+    safe_sprintf(buff, bufc, s, M_E);
+    free_sbuf(s);
+    //safe_strncat(buff, bufc, "2.718281828", 11, LBUF_SIZE);
 }
 
 /*
