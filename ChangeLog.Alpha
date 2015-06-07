@@ -1,6 +1,127 @@
 TinyMUSH 3.3
 ------------
 
+Alpha 9 : 2015-06-06
+--------------------
+
+commit 3ee9844754111487217d0c47407baed19d2dd1f9
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Jun 6 21:01:26 2015 -0400
+
+    TinyMUSH version 3.3 Alpha 9 (2015-06-06)
+
+commit e47130bf0d357ab7c7dda58f98b9f9be3aba5375
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sat Jun 6 08:01:28 2015 -0400
+
+    Fix leaked buffers after doing an ansi_transition_esccode,  xstrdup version info instead of keeping lbufs actives for nothing.
+
+commit 0f40a4d208d4c75fea6309197c5ce1c473e83596
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Fri Jun 5 22:32:09 2015 -0400
+
+    Fixed false positive double freed buffer in pool_free.
+      If a buffer was allocated but never used, then freed, pool_free was declaring it as an already freed buffer.
+
+commit f7f18a28bc0b51a55224251b1b3557b1ea3b8caf
+Author: Eddy Beaupré <Eddy@beaupre.biz>
+Date:   Thu Jun 4 05:36:49 2015 +0200
+
+    Force regeneration of version.h at every build.
+
+commit fb43bdf0466732c317b5cb00dbd09ab8e97fc39b
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jun 3 23:12:12 2015 -0400
+
+    Abort if cproto / gzip / tar are not found.
+
+commit 89c7e7b027fd556c947b714b28f158ebbc5f7c7a
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Wed Jun 3 22:48:24 2015 -0400
+
+    Integrated build of libtinydbm into the main makefile. Automatically generate functions prototypes. Removed a bunch of static definitions.
+      There's no point anymore in keeping tons of statics around. I can understand the need back in the old days when computers where slow and ram was short, but the compiler is making a better choice than us now in that area. Better let it do its job. Prototypes are now automatically generated for all functions (mostly because i'm lazy). Building QDBM or GDBM is now handled in a single library output with one header (Easier for modules that want to access theses functions).
+
+commit 854c3631975636df3351f71aa1ea5d08316f0c62
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Jun 2 22:32:11 2015 -0400
+
+    Source Cleanup.
+
+commit 9e2c9559c9c54ec9ff7be28970a6a81cde116db0
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Tue Jun 2 06:42:52 2015 -0400
+
+    Remove unneeded check
+
+commit 0c388b1ee583cd6d7507caf6f3d85e78bf0836bb
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Jun 1 23:06:21 2015 -0400
+
+    Add BSD two clauses to copyright.h
+      Since the portions of code that where imported from FreeBSD are now
+      covered by this licence, instead of repeating it all over the place we
+      can just put it there with our own licence and annotate areas that
+      contain that code. Making things easier to understand and follow for
+      everyone.
+
+commit bee035f2e891bcc7aaccb3fee05f566ecd9a0e18
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Jun 1 22:40:49 2015 -0400
+
+    Integrated bitstring.h into timer.c
+
+commit 7ad3a13646de62a9ed93b479b29203e04e6ad8a5
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Jun 1 21:26:47 2015 -0400
+
+    Autotools cleanup.
+
+commit 194a4288f97739dca2c5d64ddec88010d50c03bf
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Jun 1 21:23:58 2015 -0400
+
+    Source Cleanup.
+
+commit 11fbc4d6e4c2c961bf40a43d26ea074c74af986e
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Mon Jun 1 21:14:05 2015 -0400
+
+    Source Cleanup.
+
+commit 6e076c17338b1429dd4303b1acf88aa21fc1c360
+Author: Eddy Beaupre <eddy@beaupre.biz>
+Date:   Sun May 31 23:32:24 2015 -0400
+
+    Source Cleanup
+
+commit 04a8d3d65e115de0c499634b0ec9f133c2bb2248
+Author: TinyMUSH <tinymush@ns1.beaupre.biz>
+Date:   Sat May 30 14:53:25 2015 -0400
+
+    Remove references to SourceForge and include fixes not commited yet.
+
+commit 6fad1d2b35ab055f8fe05ef59a41d3d58928c3ce
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sun Oct 19 23:06:25 2014 -0400
+
+    Move libltdl outside of src directory, add -b (--backup) switch.
+
+commit 17143a59030ffdc00ad83757d3712d1caacbe54a
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 19:14:17 2014 -0400
+
+    Fix dbconvert.
+
+commit fca189779414888f19c0a60c4af1d1ea7a127d82
+Author: Eddy Beaupré <eddy@beaupre.biz>
+Date:   Sat Oct 18 16:54:08 2014 -0400
+
+    Update ChangeLog.Alpha
+
+Alpha 8 : 2014-08-18
+--------------------
+
 commit ae84ebe988e6d6afe41a48d2074f01d16826f017
 Author: Eddy Beaupré <eddy@beaupre.biz>
 Date:   Sat Oct 18 16:53:19 2014 -0400
@@ -103,6 +224,7 @@ Date:   Sat Sep 27 19:44:39 2014 -0400
     Update ChangeLog.Alpha
 
 Alpha 7 : 2014-09-27
+--------------------
 
 commit 79f73d4a7ed28b951417700d7f74ac5de67c3bdf
 Author: Eddy Beaupre <eddy@beaupre.biz>
@@ -177,6 +299,7 @@ Date:   Sun Sep 21 14:04:39 2014 -0400
     Update ChangeLog.Alpha
 
 Alpha 6 : 2014-09-21
+--------------------
 
 commit 078fc74c7e1505cfd19e10e9cc3ab99ef7aa4540
 Author: Eddy Beaupre <eddy@beaupre.biz>
@@ -325,6 +448,7 @@ Date:   Sat Jan 5 17:29:53 2013 -0500
     -Misc: Converted ansi macros to functions in preparation for xterm support.
 
 Alpha 4 : 2013-01-02
+--------------------
 
 commit 1026b3405320de06a27daf90fd0df9d7f3dc40b0
 Author: Eddy Beaupre <eddy@beaupre.biz>
