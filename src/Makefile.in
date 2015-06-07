@@ -1213,7 +1213,7 @@ version.h:
 	echo -e '#include "copyright.h"\n' >> version.h
 	echo '#ifndef __VERSION_H' >> version.h
 	echo -e '#define __VERSION_H\n' >> version.h
-	echo "#define MUSH_BUILD_DATE \"`date`\"" >> version.h
+	echo "#define MUSH_BUILD_DATE \"`date -R`\"" >> version.h
 	echo "#define MUSH_BUILD_COMPILE \"$(COMPILE)\"" >> version.h
 	echo -e "#define MUSH_BUILD_LTCOMPILE \"$(LTCOMPILE)\"\n" >> version.h
 	echo '#endif /* __VERSION_H */' >> version.h
