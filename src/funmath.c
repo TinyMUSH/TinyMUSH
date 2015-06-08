@@ -108,7 +108,6 @@ void fval(char *buff, char **bufc, long double result)
 {
     char *p, *buf1;
     
-    /*
     switch (fp_check_weird(buff, bufc, result)) {
     case FP_EXP_WEIRD:
 	return;
@@ -119,7 +118,6 @@ void fval(char *buff, char **bufc, long double result)
     default:
 	break;
     }
-    */
 
     buf1 = *bufc;
     safe_sprintf(buff, bufc, "%.*Lf", DECIMAL_DIG, result);	/* get long double val into buffer */
@@ -160,7 +158,7 @@ void fval(char *buff, char **bufc, long double result)
 
 void fun_pi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    int i = 11;
+    int i = DECIMAL_DIG;
     
     if(fargs[0] && *fargs[0]) {
         i = atoi(fargs[0]);
@@ -171,7 +169,7 @@ void fun_pi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
 
 void fun_e(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    int i = 11;
+    int i = DECIMAL_DIG;
     
     if(fargs[0] && *fargs[0]) {
         i = atoi(fargs[0]);
