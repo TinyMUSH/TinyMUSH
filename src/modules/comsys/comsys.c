@@ -231,8 +231,10 @@ static char *munge_comtitle ( char *title )
     char *tp;
     tp = tbuf;
 
+    *tbuf=0x00;
+    
     if ( strchr ( title, ESC_CHAR ) ) {
-        safe_copy_str ( title, tbuf, &tp, MBUF_SIZE - 5 );
+        safe_strcat( tbuf, &tp, title,  MBUF_SIZE - (strlen(ANSI_NORMAL) + 1) );
         safe_mb_str ( ANSI_NORMAL, tbuf, &tp );
     } else {
         safe_mb_str ( title, tbuf, &tp );
@@ -368,12 +370,14 @@ static void com_message ( CHANNEL *chp, char *msg, dbref cause )
                         }
 
                         if ( cause != mudstate.curr_enactor ) {
-                            safe_known_str ( ( char * ) "<-(#", 4, msg_ns, &mp );
+                            //safe_known_str ( ( char * ) "<-(#", 4, msg_ns, &mp );
+                            safe_strcat( msg_ns, &mp, "<-(#", LBUF_SIZE);
                             safe_ltos ( msg_ns, &mp, cause, LBUF_SIZE );
                             safe_chr ( ')', msg_ns, &mp );
                         }
 
-                        safe_known_str ( ( char * ) "] ", 2, msg_ns, &mp );
+                        //safe_known_str ( ( char * ) "] ", 2, msg_ns, &mp );
+                        safe_strcat( msg_ns, &mp, "] ", LBUF_SIZE);
                         safe_str ( msg, msg_ns, &mp );
                     }
 

@@ -40,7 +40,7 @@ QDBM_H			= dbm/qdbm/copyright.h dbm/qdbm/curia.h dbm/qdbm/depot.h dbm/qdbm/hovel
 EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
 CLEANFILES		= defaults.h prototypes.h libtinydbm.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
-API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h api.h interface.h externs.h
+API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h api.h interface.h externs.h prototypes.h
 
 BUILT_SOURCES		= prototypes.h version.h tinymushapi.h defaults.h netmush.conf Startmush
 

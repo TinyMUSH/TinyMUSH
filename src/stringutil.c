@@ -1725,7 +1725,7 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
 
     if (!src) {
 	*tp = '\0';
-	return;
+	return (dest);
     }
 
     maxtp = dest + size - 1;
@@ -1735,7 +1735,7 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
 
 	if (sz <= 0) {
 	    *tp = '\0';
-	    return;
+	    return (dest);
 	}
 
 	sz = ((n < sz) ? n : sz);
@@ -1743,7 +1743,7 @@ char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t s
 	tp += sz;
 	*tp = '\0';
 	*destp = tp;
-	return;
+	return (dest);
     }
 
     if (tp + n < maxtp) {

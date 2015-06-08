@@ -3,9 +3,6 @@
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
 
-#define _XOPEN_SOURCE 600
-#define _BSD_SOURCE
-
 #ifdef STDC_HEADERS
 #ifdef __STDC__
 #include <stdarg.h>
@@ -121,5 +118,11 @@
 #include <inttypes.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#ifdef HAVE_FLOAT_H
+#include <float.h>
+#else
+#define DECIMAL_DIG 21
+#endif
 
 #endif				/* __SYSTEM_H */

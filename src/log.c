@@ -91,11 +91,6 @@ char *logfile_init(char *filename)
 {
     if (!filename) {
 	mainlog_fp = stderr;
-	return;
-    }
-
-    if (!filename) {
-	mainlog_fp = stderr;
 	return (NULL);
     } else if (strstr(filename, "XXXXXX") != NULL) {
 	mainlog_fp = fmkstemp(filename);
