@@ -7634,7 +7634,7 @@ performed and the walk down the list stops.
  
   Example:
     > say dist3d(0,0,0,10,15,20)
-    You say, "27"
+    You say "26.925824035672520155929"
  
   See also: dist2d()
  
@@ -7772,7 +7772,7 @@ performed and the walk down the list stops.
   Obtains the smallest number out of a list of numbers (i.e., the minimum).
  
   Example:
-    > say [lmin(3, 1.1, 5)]
+    > say [lmin(3 1.1 5)]
     You say, "1.1"
  
   See also: min().

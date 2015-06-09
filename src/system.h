@@ -122,7 +122,7 @@
 #ifdef HAVE_FLOAT_H
 #include <float.h>
 #else
-#define DECIMAL_DIG 21
+#define LDBL_DIG 6
 #endif
 
 #endif				/* __SYSTEM_H */
