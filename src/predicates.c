@@ -638,7 +638,7 @@ void do_end(dbref player, dbref cause, int key, char *condstr, char *cmdstr, cha
  * Command hooks.
  */
 
-void do_hook(dbref player, dbref cause, int key, char *cmdname, char *target)
+void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *cmdname, char *target)
 {
     CMDENT *cmdp;
     char *p;
@@ -833,7 +833,7 @@ void do_hook(dbref player, dbref cause, int key, char *cmdname, char *target)
  * Command overriding and friends.
  */
 
-void do_addcommand(dbref player, dbref cause, int key, char *name, char *command)
+void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, char *name, char *command)
 {
     CMDENT *old, *cmd;
     ADDENT *add, *nextp;
@@ -942,7 +942,7 @@ void do_addcommand(dbref player, dbref cause, int key, char *name, char *command
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Command %s added.", name);
 }
 
-void do_listcommands(dbref player, dbref cause, int key, char *name)
+void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name)
 {
     CMDENT *old;
     ADDENT *nextp;
@@ -997,7 +997,7 @@ void do_listcommands(dbref player, dbref cause, int key, char *name)
     }
 }
 
-void do_delcommand(dbref player, dbref cause, int key, char *name, char *command)
+void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name, char *command)
 {
     CMDENT *old, *cmd;
     ADDENT *prev = NULL, *nextp;
@@ -1210,7 +1210,7 @@ int ok_program(dbref player, dbref doer)
     return 1;
 }
 
-void do_quitprog(dbref player, dbref cause, int key, char *name)
+void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name)
 {
     DESC *d;
     dbref doer;
@@ -1250,7 +1250,7 @@ void do_quitprog(dbref player, dbref cause, int key, char *name)
     notify(doer, "Your @program has been terminated.");
 }
 
-void do_prog(dbref player, dbref cause, int key, char *name, char *command)
+void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name, char *command)
 {
     DESC *d;
     PROG *program;
@@ -1349,7 +1349,7 @@ void do_prog(dbref player, dbref cause, int key, char *name, char *command)
  * do_restart: Restarts the game.
  */
 
-void do_restart(dbref player, dbref cause, int key)
+void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key)
 {
     MODULE *mp;
     char *name;
@@ -1413,11 +1413,11 @@ void do_restart(dbref player, dbref cause, int key)
  * do_eval is similar, except it gets passed on arg.
  */
 
-void do_comment(dbref player, dbref cause, int key)
+void do_comment(__attribute__((unused)) dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key)
 {
 }
 
-void do_eval(dbref player, dbref cause, int key, char *str)
+void do_eval(__attribute__((unused)) dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, __attribute__((unused)) char *str)
 {
 }
 
@@ -2502,7 +2502,7 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
  * do not deplete charges.
  */
 
-void do_include(dbref player, dbref cause, int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs)
+void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char *object, char *argv[], int nargs, char *cargs[], int ncargs)
 {
     dbref thing, aowner;
     int attrib, aflags, alen;
@@ -2553,7 +2553,7 @@ void do_include(dbref player, dbref cause, int key, char *object, char *argv[], 
  * do_redirect: Redirect PUPPET, TRACE, VERBOSE output to another player.
  */
 
-void do_redirect(dbref player, dbref cause, int key, char *from_name, char *to_name)
+void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *from_name, char *to_name)
 {
     dbref from_ref, to_ref;
     NUMBERTAB *np;
@@ -2673,7 +2673,7 @@ void do_redirect(dbref player, dbref cause, int key, char *from_name, char *to_n
  * do_reference: Manipulate nrefs.
  */
 
-void do_reference(dbref player, dbref cause, int key, char *ref_name, char *obj_name)
+void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, char *ref_name, char *obj_name)
 {
     HASHENT *hptr;
     HASHTAB *htab;

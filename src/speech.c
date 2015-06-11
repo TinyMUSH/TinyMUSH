@@ -66,7 +66,7 @@ const char *broadcast_msg = "Broadcast: ";
 
 const char *admin_msg = "Admin: ";
 
-void do_think(dbref player, dbref cause, int key, char *message)
+void do_think(dbref player, dbref cause, __attribute__((unused)) int key, char *message)
 {
     char *str, *buf, *bp;
     buf = bp = alloc_lbuf("do_think");
@@ -169,7 +169,7 @@ void format_speech(dbref player, dbref speaker, dbref loc, char *message, int ke
     }
 }
 
-void do_say(dbref player, dbref cause, int key, char *message)
+void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *message)
 {
     dbref loc;
     char *buf2, *bp, *name;
@@ -498,7 +498,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	}
 
 	free_lbuf(str2);
-    } else if (dflt && *dflt) {
+    } else if (*dflt) {
 	notify_with_cause(player, target, dflt);
     }
 
@@ -532,7 +532,7 @@ int page_check(dbref player, dbref target)
     return 0;
 }
 
-void do_page(dbref player, dbref cause, int key, char *tname, char *message)
+void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *tname, char *message)
 {
     /* key is 1 if this is a reply page */
     char *dbref_list, *ddp;
@@ -835,7 +835,7 @@ void do_page(dbref player, dbref cause, int key, char *tname, char *message)
     free_lbuf(imessage);
 }
 
-void do_reply_page(dbref player, dbref cause, int key, char *msg)
+void do_reply_page(dbref player, dbref cause, __attribute__((unused)) int key, char *msg)
 {
     do_page(player, cause, 1, NULL, msg);
 }
@@ -962,7 +962,7 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 }
 
 
-void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message)
+void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *recipient, char *message)
 {
     dbref target, loc;
     char *buf2, *bp;

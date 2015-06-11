@@ -42,7 +42,7 @@
  * only internal currently, so it's not a problem.
  */
 
-char *unparse_object_quiet(dbref player, dbref loc)
+char *unparse_object_quiet(__attribute__((unused)) dbref player, dbref loc)
 {
     static char buf[SBUF_SIZE];	// XXX Should return a buffer instead of a static pointer
 

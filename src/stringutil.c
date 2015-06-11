@@ -1719,7 +1719,7 @@ int safe_strcat(char *dest, char **destp, const char *src, size_t size)
 
 char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t size)
 {
-    int sz;
+    size_t sz;
     char *tp, *maxtp;
     tp = *destp;
 
@@ -1776,7 +1776,7 @@ int safe_strcatchr(char *dest, char **destp, char src, size_t size)
     char *tp;
     tp = *destp;
 
-    if ((tp - dest) < size) {
+    if ((size_t)(tp - dest) < size) {
 	*tp++ = src;
 	*destp = tp;
 	*tp = '\0';

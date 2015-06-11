@@ -335,7 +335,7 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
     return 1;
 }
 
-void do_cron(dbref player, dbref cause, int key, char *objstr, char *timestr)
+void do_cron(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *objstr, char *timestr)
 {
     dbref thing;
     int attrib, retcode;
@@ -395,7 +395,7 @@ int cron_clr(dbref thing, int attr)
     return count;
 }
 
-void do_crondel(dbref player, dbref cause, int key, char *objstr)
+void do_crondel(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *objstr)
 {
     dbref thing;
     int attr, count;
@@ -423,7 +423,7 @@ void do_crondel(dbref player, dbref cause, int key, char *objstr)
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Removed %d cron entries.", count);
 }
 
-void do_crontab(dbref player, dbref cause, int key, char *objstr)
+void do_crontab(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *objstr)
 {
     dbref thing;
     int count;
