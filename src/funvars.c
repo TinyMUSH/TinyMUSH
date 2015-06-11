@@ -3478,7 +3478,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref
     int erroffset;
     int offsets[PCRE_MAX_OFFSETS];
     int subpatterns;
-    char tbuf[LBUF_SIZE], *p;
+    char tbuf[LBUF_SIZE];
     case_option = Func_Mask(REG_CASELESS);
     VaChk_Range(2, 3);
 
@@ -4100,8 +4100,8 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
     Delim csep, rsep;
     OBJGRID *ogp;
-    char *xlist, *ylist, *bb_p;
-    int n_x, n_y, r, c, i, j, errs;
+    char *xlist, *ylist;
+    int n_x, n_y, r, c, i, j;
     char **x_elems, **y_elems;
     VaChk_Range(0, 4);
     VaChk_SepOut(csep, 3, 0);

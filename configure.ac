@@ -127,23 +127,58 @@ AM_CONDITIONAL(GCC_DEBUG, test x"$with_debug" = x"true")
 AC_MSG_CHECKING([dbm engine to use])
 AC_ARG_WITH([dbm],
  [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use the traditional GDBM hash database driver, or qdbm : Use the new QDBM hash database driver. A newer implementation of the DBM engine. @<:@default=qdbm@:>@])],
- [AS_CASE([$withval], [gdbm], [with_dbm="gdbm"], [qdbm], [with_dbm="qdbm"], [with_dbm="qdbm"])], 
- [with_dbm="qdbm"])
+ [AS_CASE([$withval], 
+  [gdbm],
+   [
+   with_dbm="gdbm"
+   AC_DEFINE([MUSH_DBM], ["gdbm"], [Type of DBM used])
+   ], 
+  [qdbm],
+   [
+   with_dbm="qdbm"
+   AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
+   ], 
+  [
+   with_dbm="qdbm"
+   AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
+  ]
+ )], 
+ [
+  with_dbm="qdbm"
+  AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
+ ])
 AC_MSG_RESULT([$with_dbm])
-
-AS_IF([test "x$with_dbm" = "xqdbm"], 
- [
-  AC_DEFINE([MUSH_DBM], ["QDBM"], [TinyQDBM dbm used])
-  AC_DEFINE([HAVE_LIBTINYQDBM_H], [1], [Define to 1 if you have <libtinyqdbm.h>.])
- ], 
- [
-  AC_DEFINE([MUSH_DBM], ["GDBM"], [TinyGDBM dbm used])
-  AC_DEFINE([HAVE_LIBTINYGDBM_H], [1], [Define to 1 if you have <libtinygdbm.h>.])
- ]
-)
 
 AM_CONDITIONAL([WANT_DBM_GDBM], [test "x$with_dbm" = "xgdbm"])
 AM_CONDITIONAL([WANT_DBM_QDBM], [test "x$with_dbm" = "xqdbm"])
+
+AC_MSG_CHECKING([whether to enable compiler warnings])
+AC_ARG_ENABLE([warnings], [AS_HELP_STRING([--enable-warnings], [enable compiler warnings (-Wall) @<:@default=no@:>@])],
+ [AS_IF([test "x$enableval" = "xyes"],
+  [
+   CFLAGS="$CFLAGS -Wall"
+   AC_MSG_RESULT([yes])
+  ],
+  [
+   AC_MSG_RESULT([no])
+  ]
+ )],
+ [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([whether to enable compiler extra warnings])
+AC_ARG_ENABLE([warnings], [AS_HELP_STRING([--enable-warnings-extra], [enable compiler extra warnings (-Wextra) @<:@default=no@:>@])],
+ [AS_IF([test "x$enableval" = "xyes"],
+  [
+   CFLAGS="$CFLAGS -Wextra"
+   AC_MSG_RESULT([yes])
+  ],
+  [
+   AC_MSG_RESULT([no])
+  ]
+ )],
+ [AC_MSG_RESULT([no])]
+)
 
 AC_MSG_CHECKING([whether to enable disk-based database])
 AC_ARG_ENABLE([disk-based], [AS_HELP_STRING([--enable-disk-based], [store the database on disk using a DBM hashfile, and cache some attributes in a limited amount of memory. The alternative is memory-based, where the database is kept in memory. Disabling the disk-based cache can improve performance if enough memory is available. @<:@default=yes@:>@])],

@@ -1351,7 +1351,6 @@ void do_prog(dbref player, dbref cause, int key, char *name, char *command)
 
 void do_restart(dbref player, dbref cause, int key)
 {
-    LOGFILETAB *lp;
     MODULE *mp;
     char *name;
 

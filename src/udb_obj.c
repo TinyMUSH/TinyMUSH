@@ -1,3 +1,4 @@
+
 /* udb_obj.c - Binary object handling gear. */
 
 /* Why not just write the attributes individually to disk? Well, when you're
@@ -403,7 +404,7 @@ void obj_del_attrib(int anam, Obj * obj)
 
 /* get_free_objpipe: return an object pipeline */
 
-Obj *get_free_objpipe(int obj)
+Obj *get_free_objpipe(unsigned int obj)
 {
     DBData key, data;
     int i, j = 0;
@@ -512,7 +513,7 @@ Obj *get_free_objpipe(int obj)
 }
 
 
-char *pipe_get_attrib(int anum, int obj)
+char *pipe_get_attrib(int anum, unsigned int obj)
 {
     Obj *object;
     char *value, *tmp;
@@ -527,7 +528,7 @@ char *pipe_get_attrib(int anum, int obj)
     }
 }
 
-void pipe_set_attrib(int anum, int obj, char *value)
+void pipe_set_attrib(int anum, unsigned int obj, char *value)
 {
     Obj *object;
     char *newvalue;
@@ -541,7 +542,7 @@ void pipe_set_attrib(int anum, int obj, char *value)
     return;
 }
 
-void pipe_del_attrib(int anum, int obj)
+void pipe_del_attrib(int anum, unsigned int obj)
 {
     Obj *object;
     /*

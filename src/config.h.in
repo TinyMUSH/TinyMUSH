@@ -125,12 +125,6 @@
 /* Define to 1 if you have the <libgen.h> header file. */
 #undef HAVE_LIBGEN_H
 
-/* Define to 1 if you have <libtinygdbm.h>. */
-#undef HAVE_LIBTINYGDBM_H
-
-/* Define to 1 if you have <libtinyqdbm.h>. */
-#undef HAVE_LIBTINYQDBM_H
-
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
@@ -357,7 +351,7 @@
 /* Enable memory-based DBM hashDB */
 #undef MEMORY_BASED
 
-/* TinyGDBM dbm used */
+/* Type of DBM used */
 #undef MUSH_DBM
 
 /* Define if dlsym() requires a leading underscore in symbol names. */

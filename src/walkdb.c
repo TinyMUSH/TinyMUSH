@@ -106,7 +106,7 @@ void do_dolist(dbref player, dbref cause, int key, char *list, char *command, ch
  * Regular @find command
  */
 
-void do_find(dbref player, dbref cause, int key, char *name)
+void do_find(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name)
 {
     dbref i, low_bound, high_bound;
     char *buff;
@@ -202,7 +202,7 @@ int get_stats(dbref player, dbref who, STATS * info)
     return 1;
 }
 
-void do_stats(dbref player, dbref cause, int key, char *name)
+void do_stats(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
 {
     /*
      * reworked by R'nice
@@ -353,7 +353,7 @@ int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)
     return count;
 }
 
-void do_chownall(dbref player, dbref cause, int key, char *from, char *to)
+void do_chownall(dbref player, __attribute__((unused)) dbref cause, int key, char *from, char *to)
 {
     int count;
     dbref victim, recipient;
@@ -1168,7 +1168,7 @@ void mark_place(dbref loc)
     }
 }
 
-void do_floaters(dbref player, dbref cause, int key, char *name)
+void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
 {
     dbref owner, i, total;
     char *buff;
@@ -1243,7 +1243,7 @@ void do_floaters(dbref player, dbref cause, int key, char *name)
  * * do_markall: set or clear the mark bits of all objects in the db.
  */
 
-void do_markall(dbref player, dbref cause, int key)
+void do_markall(dbref player, __attribute__((unused)) dbref cause, int key)
 {
     int i;
 
@@ -1268,7 +1268,7 @@ void do_markall(dbref player, dbref cause, int key)
  * * do_apply_marked: Perform a command for each marked obj in the db.
  */
 
-void do_apply_marked(dbref player, dbref cause, int key, char *command, char *cargs[], int ncargs)
+void do_apply_marked(dbref player, dbref cause, __attribute__((unused)) int key, char *command, char *cargs[], int ncargs)
 {
     char *buff;
     int i;

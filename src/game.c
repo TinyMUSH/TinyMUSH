@@ -2484,7 +2484,7 @@ void usage(char *prog, int which)
 
 void recover_flatfile(char *flat)
 {
-    int db_ver, db_format, db_flags, setflags, clrflags, ver;
+    int db_ver, db_format, db_flags, setflags, clrflags;
     MODULE *mp;
     void (*modfunc) (FILE *);
     FILE *f;
@@ -2839,8 +2839,7 @@ int main(int argc, char *argv[])
     char templog[] = "netmush.XXXXXX";
     MODULE *mp;
     char *bp;
-    FILE *fp;
-    struct stat sb1, sb2;
+    struct stat;
     MODHASHES *m_htab, *hp;
     MODNHASHES *m_ntab, *np;
     int option_index = 0;

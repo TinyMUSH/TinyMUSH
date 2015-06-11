@@ -52,7 +52,7 @@ char *stpcopy(char *dest, const char *src)
     return (dest);
 }
 
-void child_timeout_signal(int sig)
+void child_timeout_signal(__attribute__((unused)) int sig)
 {
     exit(EXIT_FAILURE);
 }
@@ -192,7 +192,7 @@ int query(char *ip, char *orig_arg)
     return (0);
 }
 
-void child_signal(int sig)
+void child_signal(__attribute__((unused)) int sig)
 {
     pid_t child_pid;
     int i;
@@ -212,7 +212,7 @@ void child_signal(int sig)
     signal(SIGCHLD, (void (*)(int)) child_signal);
 }
 
-void alarm_signal(int sig)
+void alarm_signal(__attribute__((unused)) int sig)
 {
     struct itimerval itime;
     struct timeval interval;
@@ -232,7 +232,7 @@ void alarm_signal(int sig)
 }
 
 
-int main(int argc, char **argv)
+int main( __attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 {
     char arg[MAX_STRING];
     char *p;

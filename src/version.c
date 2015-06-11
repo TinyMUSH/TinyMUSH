@@ -21,7 +21,7 @@
 
 #include "version.h"		/* required by code */
 
-void do_version(dbref player, dbref cause, int extra)
+void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int extra)
 {
 #ifdef HAVE_SYS_UTSNAME_H
     struct utsname bpInfo;

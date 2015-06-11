@@ -119,7 +119,6 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     char *ep, *savep, *dp, *result;
     int is_true, cur_lev, elen;
     char tmpbuf[1] = "";
-    char tmpbuf2[1] = "";
 
     /*
      * Enforce maximum nesting level.

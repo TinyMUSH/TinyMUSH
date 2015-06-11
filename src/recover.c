@@ -50,7 +50,6 @@ int dbrecover(int argc, char *argv[])
     char cp;
     char *infile, *outfile;
     int errflg = 0;
-    int optind = 1;
     int option_index = 0;
     struct option long_options[] = {
 	{"input", required_argument, 0, 'i'},

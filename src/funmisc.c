@@ -865,7 +865,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char *p, *mark, *tp;
+    char *p, *mark;
     int raw_secs;
     int secs, mins, hours, days;
     int csecs, cmins, chours, cdays;

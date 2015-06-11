@@ -333,7 +333,7 @@ struct objlist_block {
     dbref data[(LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref)];
 };
 
-#define OBLOCK_SIZE ((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
+#define OBLOCK_SIZE (int)((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
 
 typedef struct objlist_stack OLSTK;
 struct objlist_stack {

@@ -1042,7 +1042,7 @@ int rgb2xterm(long rgb)
 int str2xterm(char *str)
 {
     long rgb;
-    int xterm, r, g, b;
+    int r, g, b;
     char *p, *t;
     p = str;
 

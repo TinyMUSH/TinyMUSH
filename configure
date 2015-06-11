@@ -850,6 +850,7 @@ enable_ltdl_install
 with_install_suffix
 enable_debug
 with_dbm
+enable_warnings
 enable_disk_based
 enable_module_comsys
 enable_module_mail
@@ -1506,6 +1507,9 @@ Optional Features:
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-ltdl-install   install libltdl
   --enable-debug          enable debugging, default: no
+  --enable-warnings       enable compiler warnings (-Wall) [default=no]
+  --enable-warnings-extra enable compiler extra warnings (-Wextra)
+                          [default=no]
   --enable-disk-based     store the database on disk using a DBM hashfile, and
                           cache some attributes in a limited amount of memory.
                           The alternative is memory-based, where the database
@@ -13807,39 +13811,39 @@ $as_echo_n "checking dbm engine to use... " >&6; }
 if test "${with_dbm+set}" = set; then :
   withval=$with_dbm; case $withval in #(
   gdbm) :
-    with_dbm="gdbm" ;; #(
+
+   with_dbm="gdbm"
+
+$as_echo "#define MUSH_DBM \"gdbm\"" >>confdefs.h
+
+    ;; #(
   qdbm) :
-    with_dbm="qdbm" ;; #(
+
+   with_dbm="qdbm"
+
+$as_echo "#define MUSH_DBM \"qdbm\"" >>confdefs.h
+
+    ;; #(
   *) :
-    with_dbm="qdbm" ;;
+
+   with_dbm="qdbm"
+
+$as_echo "#define MUSH_DBM \"qdbm\"" >>confdefs.h
+
+
+  ;;
 esac
 else
+
   with_dbm="qdbm"
+
+$as_echo "#define MUSH_DBM \"qdbm\"" >>confdefs.h
+
+
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_dbm" >&5
 $as_echo "$with_dbm" >&6; }
-
-if test "x$with_dbm" = "xqdbm"; then :
-
-
-$as_echo "#define MUSH_DBM \"QDBM\"" >>confdefs.h
-
-
-$as_echo "#define HAVE_LIBTINYQDBM_H 1" >>confdefs.h
-
-
-else
-
-
-$as_echo "#define MUSH_DBM \"GDBM\"" >>confdefs.h
-
-
-$as_echo "#define HAVE_LIBTINYGDBM_H 1" >>confdefs.h
-
-
-
-fi
 
  if test "x$with_dbm" = "xgdbm"; then
   WANT_DBM_GDBM_TRUE=
@@ -13855,6 +13859,54 @@ fi
 else
   WANT_DBM_QDBM_TRUE='#'
   WANT_DBM_QDBM_FALSE=
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable compiler warnings" >&5
+$as_echo_n "checking whether to enable compiler warnings... " >&6; }
+# Check whether --enable-warnings was given.
+if test "${enable_warnings+set}" = set; then :
+  enableval=$enable_warnings; if test "x$enableval" = "xyes"; then :
+
+   CFLAGS="$CFLAGS -Wall"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable compiler extra warnings" >&5
+$as_echo_n "checking whether to enable compiler extra warnings... " >&6; }
+# Check whether --enable-warnings was given.
+if test "${enable_warnings+set}" = set; then :
+  enableval=$enable_warnings; if test "x$enableval" = "xyes"; then :
+
+   CFLAGS="$CFLAGS -Wextra"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
 fi
 
 

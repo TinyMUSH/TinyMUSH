@@ -608,7 +608,7 @@ void pretty_print(char *dest, char *name, char *text)
 
 void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
 {
-    char *text, *buf, *bp, *name_buf, *bb_p;
+    char *text, *buf, *bp, *bb_p;
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
     char flag_buf[32];
     char *xbufp, *gbufp, *fbp;

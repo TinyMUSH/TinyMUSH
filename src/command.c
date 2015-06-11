@@ -2395,7 +2395,6 @@ void list_memory(dbref player) {
 	CMDENT *cmd;
 	ADDENT *add;
 	NAMETAB *name;
-	VATTR *vattr;
 	ATTR *attr;
 	FUN *func;
 	UFUN *ufunc;

@@ -1428,7 +1428,7 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 char *sane_doing(char *arg, char *name)
 {
     char *p, *bp;
-    int over = 0, size;
+    int size;
 
     if (arg != NULL) {
 	for (p = arg; *p; p++) {
