@@ -1,6 +1,5 @@
 language: c
-sudo: required
-dist: trusty
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y cproto
+  - wget http://security.ubuntu.com/ubuntu/pool/universe/c/cproto/cproto_4.7j-3_amd64.deb
+  - sudo dpkg -i cproto_4.7j-3_amd64.deb
+  
