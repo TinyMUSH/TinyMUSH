@@ -1,4 +1,4 @@
 language: c
 before_install:
-  - sudo apt-get update -q
-  - sudo apt-get install cproto -y
+  - sudo apt-get update -qq
+  - sudo apt-get install -y cproto
