@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.69])
+AC_PREREQ([2.68])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
