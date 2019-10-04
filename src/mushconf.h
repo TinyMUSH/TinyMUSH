@@ -1,6 +1,8 @@
 /* mushconf.h */
 
 #include "copyright.h"
+#include "stdbool.h"
+#include "stdint.h"
 
 #ifndef __MUSHCONF_H
 #define __MUSHCONF_H
@@ -77,7 +79,7 @@ struct confdata {
     int robotcost;		/* cost of @robot command */
     int createmin;		/* default (and minimum) cost of @create cmd */
     int createmax;		/* max cost of @create command */
-    int quotas;			/* TRUE = have building quotas */
+    bool quotas;			/* TRUE = have building quotas */
     int room_quota;		/* quota needed to make a room */
     int exit_quota;		/* quota needed to make an exit */
     int thing_quota;		/* quota needed to make a thing */
@@ -119,18 +121,18 @@ struct confdata {
     char *game_exec;		/* MUSH's executable full path and name */
     char *game_home;		/* MUSH's working directory */
     char *scripts_home;		/* MUSH's scripts directory */
-    int have_pueblo;		/* Is Pueblo support compiled in? */
-    int have_zones;		/* Should zones be active? */
+    bool have_pueblo;		/* Is Pueblo support compiled in? */
+    bool have_zones;		/* Should zones be active? */
     int port;			/* user port */
     int conc_port;		/* concentrator port */
     int init_size;		/* initial db size */
     int output_block_size;	/* Block size of output */
-    int use_global_aconn;	/* Do we want to use global @aconn code? */
-    int global_aconn_uselocks;	/* global @aconn obeys uselocks? */
-    int have_guest;		/* Do we wish to allow a GUEST character? */
+    bool use_global_aconn;	/* Do we want to use global @aconn code? */
+    bool global_aconn_uselocks;	/* global @aconn obeys uselocks? */
+    bool have_guest;		/* Do we wish to allow a GUEST character? */
     int guest_char;		/* player num of prototype GUEST character */
     int guest_nuker;		/* Wiz who nukes the GUEST characters. */
-    int number_guests;		/* number of guest characters allowed */
+    uint_least8_t number_guests;		/* number of guest characters allowed */
     char *guest_basename;	/* Base name or alias for guest char */
     char *guest_prefixes;	/* Prefixes for the guest char's name */
     char *guest_suffixes;	/* Suffixes for the guest char's name */
@@ -163,13 +165,13 @@ struct confdata {
     char *htmlconn_file;	/* display on PUEBLOCLIENT message */
     char *exec_path;		/* argv[0] */
     LINKEDLIST *infotext_list;	/* Linked list of INFO fields and values */
-    int indent_desc;		/* Newlines before and after descs? */
-    int name_spaces;		/* allow player names to have spaces */
+    bool indent_desc;		/* Newlines before and after descs? */
+    bool name_spaces;		/* allow player names to have spaces */
     int site_chars;		/* where to truncate site name */
     int fork_dump;		/* perform dump in a forked process */
     int fork_vfork;		/* use vfork to fork */
     int sig_action;		/* What to do with fatal signals */
-    int paranoid_alloc;		/* Rigorous buffer integrity checks */
+    bool paranoid_alloc;		/* Rigorous buffer integrity checks */
     int max_players;		/* Max # of connected players */
     int dump_interval;		/* interval between checkpoint dumps in secs */
     int check_interval;		/* interval between db check/cleans in secs */
@@ -201,59 +203,59 @@ struct confdata {
     int active_q_chunk;		/* # cmds to run from queue when active */
     int machinecost;		/* One in mc+1 cmds costs 1 penny (POW2-1) */
     int clone_copy_cost;	/* Does @clone copy value? */
-    int use_hostname;		/* TRUE = use machine NAME rather than quad */
-    int typed_quotas;		/* TRUE = use quotas by type */
-    int ex_flags;		/* TRUE = show flags on examine */
-    int robot_speak;		/* TRUE = allow robots to speak in public */
-    int pub_flags;		/* TRUE = flags() works on anything */
-    int quiet_look;		/* TRUE = don't see attribs when looking */
-    int exam_public;		/* Does EXAM show public attrs by default? */
-    int read_rem_desc;		/* Can the DESCs of nonlocal objs be read? */
-    int read_rem_name;		/* Can the NAMEs of nonlocal objs be read? */
-    int sweep_dark;		/* Can you sweep dark places? */
-    int player_listen;		/* Are AxHEAR triggered on players? */
-    int quiet_whisper;		/* Can others tell when you whisper? */
-    int dark_sleepers;		/* Are sleeping players 'dark'? */
-    int see_own_dark;		/* Do you see your own dark stuff? */
-    int idle_wiz_dark;		/* Do idling wizards get set dark? */
-    int visible_wizzes;		/* Do dark wizards show up on contents? */
-    int pemit_players;		/* Can you @pemit to faraway players? */
-    int pemit_any;		/* Can you @pemit to ANY remote object? */
-    int addcmd_match_blindly;	/* Does @addcommand produce a Huh? if syntax issues mean no wildcard is matched? */
-    int addcmd_obey_stop;	/* Does @addcommand still multiple match on STOP objs? */
-    int addcmd_obey_uselocks;	/* Does @addcommand obey uselocks? */
-    int lattr_oldstyle;		/* Bad lattr() return empty or #-1 NO MATCH? */
-    int bools_oldstyle;		/* TinyMUSH 2.x and TinyMUX bools */
-    int match_mine;		/* Should you check yourself for $-commands? */
-    int match_mine_pl;		/* Should players check selves for $-cmds? */
-    int switch_df_all;		/* Should @switch match all by default? */
-    int fascist_objeval;	/* Does objeval() require victim control? */
-    int fascist_tport;		/* Src of teleport must be owned/JUMP_OK */
-    int terse_look;		/* Does manual look obey TERSE */
-    int terse_contents;		/* Does TERSE look show exits */
-    int terse_exits;		/* Does TERSE look show obvious exits */
-    int terse_movemsg;		/* Show move msgs (SUCC/LEAVE/etc) if TERSE? */
-    int trace_topdown;		/* Is TRACE output top-down or bottom-up? */
-    int safe_unowned;		/* Are objects not owned by you safe? */
+    bool use_hostname;		/* TRUE = use machine NAME rather than quad */
+    bool typed_quotas;		/* TRUE = use quotas by type */
+    bool ex_flags;		/* TRUE = show flags on examine */
+    bool robot_speak;		/* TRUE = allow robots to speak in public */
+    bool pub_flags;		/* TRUE = flags() works on anything */
+    bool quiet_look;		/* TRUE = don't see attribs when looking */
+    bool exam_public;		/* Does EXAM show public attrs by default? */
+    bool read_rem_desc;		/* Can the DESCs of nonlocal objs be read? */
+    bool read_rem_name;		/* Can the NAMEs of nonlocal objs be read? */
+    bool sweep_dark;		/* Can you sweep dark places? */
+    bool player_listen;		/* Are AxHEAR triggered on players? */
+    bool quiet_whisper;		/* Can others tell when you whisper? */
+    bool dark_sleepers;		/* Are sleeping players 'dark'? */
+    bool see_own_dark;		/* Do you see your own dark stuff? */
+    bool idle_wiz_dark;		/* Do idling wizards get set dark? */
+    bool visible_wizzes;		/* Do dark wizards show up on contents? */
+    bool pemit_players;		/* Can you @pemit to faraway players? */
+    bool pemit_any;		/* Can you @pemit to ANY remote object? */
+    bool addcmd_match_blindly;	/* Does @addcommand produce a Huh? if syntax issues mean no wildcard is matched? */
+    bool addcmd_obey_stop;	/* Does @addcommand still multiple match on STOP objs? */
+    bool addcmd_obey_uselocks;	/* Does @addcommand obey uselocks? */
+    bool lattr_oldstyle;		/* Bad lattr() return empty or #-1 NO MATCH? */
+    bool bools_oldstyle;		/* TinyMUSH 2.x and TinyMUX bools */
+    bool match_mine;		/* Should you check yourself for $-commands? */
+    bool match_mine_pl;		/* Should players check selves for $-cmds? */
+    bool switch_df_all;		/* Should @switch match all by default? */
+    bool fascist_objeval;	/* Does objeval() require victim control? */
+    bool fascist_tport;		/* Src of teleport must be owned/JUMP_OK */
+    bool terse_look;		/* Does manual look obey TERSE */
+    bool terse_contents;		/* Does TERSE look show exits */
+    bool terse_exits;		/* Does TERSE look show obvious exits */
+    bool terse_movemsg;		/* Show move msgs (SUCC/LEAVE/etc) if TERSE? */
+    bool trace_topdown;		/* Is TRACE output top-down or bottom-up? */
+    bool safe_unowned;		/* Are objects not owned by you safe? */
     int trace_limit;		/* Max lines of trace output if top-down */
-    int wiz_obey_linklock;	/* Do wizards obey linklocks? */
-    int local_masters;		/* Do we check Zone rooms as local masters? */
-    int match_zone_parents;	/* Objects in local master rooms inherit commands from their parents, just like normal? */
-    int req_cmds_flag;		/* COMMANDS flag required to check $-cmds? */
-    int ansi_colors;		/* allow ANSI colors? */
-    int safer_passwords;	/* enforce reasonably good password choices? */
-    int space_compress;		/* Convert multiple spaces into one space */
-    int instant_recycle;	/* Do destroy_ok objects get insta-nuke? */
-    int dark_actions;		/* Trigger @a-actions even when dark? */
-    int no_ambiguous_match;	/* match_result() -> last_match_result() */
+    bool wiz_obey_linklock;	/* Do wizards obey linklocks? */
+    bool local_masters;		/* Do we check Zone rooms as local masters? */
+    bool match_zone_parents;	/* Objects in local master rooms inherit commands from their parents, just like normal? */
+    bool req_cmds_flag;		/* COMMANDS flag required to check $-cmds? */
+    bool ansi_colors;		/* allow ANSI colors? */
+    bool safer_passwords;	/* enforce reasonably good password choices? */
+    bool space_compress;		/* Convert multiple spaces into one space */
+    bool instant_recycle;	/* Do destroy_ok objects get insta-nuke? */
+    bool dark_actions;		/* Trigger @a-actions even when dark? */
+    bool no_ambiguous_match;	/* match_result() -> last_match_result() */
     int exit_calls_move;	/* Matching an exit in the main command parser invokes the 'move' command. */
     int move_match_more;	/* Exit matches in 'move' parse like the main command parser (local, global, zone; pick random on ambiguous). */
-    int autozone;		/* New objs are zoned to creator's zone */
-    int page_req_equals;	/* page command must always contain '=' */
-    int comma_say;		/* Use grammatically-correct comma in says */
-    int you_say;		/* Show 'You say' to the player */
-    int c_cmd_subst;		/* Is %c last command or ansi? */
-    size_t player_name_min;	/* Minimum length of a player name */
+    bool autozone;		/* New objs are zoned to creator's zone */
+    bool page_req_equals;	/* page command must always contain '=' */
+    bool comma_say;		/* Use grammatically-correct comma in says */
+    bool you_say;		/* Show 'You say' to the player */
+    bool c_cmd_subst;		/* Is %c last command or ansi? */
+    uint_least8_t player_name_min;	/* Minimum length of a player name */
     dbref master_room;		/* Room containing default cmds/exits/etc */
     dbref player_proto;		/* Player prototype to clone */
     dbref room_proto;		/* Room prototype to clone */
@@ -281,14 +283,14 @@ struct confdata {
     int timeslice;		/* How often do we bump people's cmd quotas? */
     int cmd_quota_max;		/* Max commands at one time */
     int cmd_quota_incr;		/* Bump #cmds allowed by this each timeslice */
-    int lag_check;		/* Is CPU usage checking compiled in? */
-    int lag_check_clk;		/* track object use time with wall-clock (need lag_check == true) */
-    int lag_check_cpu;		/* track object use time with getrusage() instead of wall-clock (need lag_check_clk == true) */
-    int malloc_tracker;		/* track allocation of memory */
-    int malloc_logger;		/* log allocation of memory */
-    int max_global_regs;	/* How many global register are avalable (min 10, max 36) */
+    bool lag_check;		/* Is CPU usage checking compiled in? */
+    bool lag_check_clk;		/* track object use time with wall-clock (need lag_check == true) */
+    bool lag_check_cpu;		/* track object use time with getrusage() instead of wall-clock (need lag_check_clk == true) */
+    bool malloc_tracker;		/* track allocation of memory */
+    bool malloc_logger;		/* log allocation of memory */
+    uint_least8_t max_global_regs;	/* How many global register are avalable (min 10, max 36) */
     size_t max_command_args;	/* Maximum arguments a command may have */
-    int player_name_length;	/* Maximum length of a player name */
+    uint_least8_t player_name_length;	/* Maximum length of a player name */ //minimum max, 255 chars length, maximum max equal to system integer size size
     int hash_factor;		/* Hash factor */
     int max_cmdsecs;		/* Threshhold for real time taken by command */
     int control_flags;		/* Global runtime control flags */
@@ -402,16 +404,16 @@ struct statedata {
     char modloaded[MBUF_SIZE];	/* Modules loaded */
     char **cfiletab;		/* Array of config files */
     int configfiles;		/* Number of config files */
-    int initializing;		/* Are we reading config file at startup? */
-    int loading_db;		/* Are we loading the db? */
-    int standalone;		/* Are we converting the database? */
-    int panicking;		/* Are we in the middle of dying horribly? */
-    int restarting;		/* Are we restarting? */
-    int dumping;		/* Are we dumping? */
-    int logstderr;		/* Echo log to stderr too? */
-    int debug;			/* Are we being debug? */
+    bool initializing;		/* Are we reading config file at startup? */
+    bool loading_db;		/* Are we loading the db? */
+    bool standalone;		/* Are we converting the database? */
+    bool panicking;		/* Are we in the middle of dying horribly? */
+    bool restarting;		/* Are we restarting? */
+    bool dumping;		/* Are we dumping? */
+    bool logstderr;		/* Echo log to stderr too? */
+    bool debug;			/* Are we being debug? */
     pid_t dumper;		/* If forked-dumping, with what pid? */
-    int logging;		/* Are we in the middle of logging? */
+    bool logging;		/* Are we in the middle of logging? */
     int epoch;			/* Generation number for dumps */
     int generation;		/* DB global generation number */
     int mudlognum;		/* Number of logfile */
@@ -422,15 +424,15 @@ struct statedata {
     dbref curr_enactor;		/* Who initiated the current command */
     dbref curr_player;		/* Who is running the current command */
     char *curr_cmd;		/* The current command */
-    int alarm_triggered;	/* Has periodic alarm signal occurred? */
+    bool alarm_triggered;	/* Has periodic alarm signal occurred? */
     time_t now;			/* What time is it now? */
     time_t dump_counter;	/* Countdown to next db dump */
     time_t check_counter;	/* Countdown to next db check */
     time_t idle_counter;	/* Countdown to next idle check */
     time_t mstats_counter;	/* Countdown to next mstats snapshot */
     time_t events_counter;	/* Countdown to next events check */
-    int shutdown_flag;		/* Should interface be shut down? */
-    int flatfile_flag;		/* Dump a flatfile when we have the chance */
+    bool shutdown_flag;		/* Should interface be shut down? */
+    bool flatfile_flag;		/* Dump a flatfile when we have the chance */
     time_t start_time;		/* When was MUSH started */
     time_t restart_time;	/* When did we last restart? */
     int reboot_nums;		/* How many times have we restarted? */
@@ -512,9 +514,9 @@ struct statedata {
     int wild_times_lev;		/* Wildcard matching tries. */
     GDATA *rdata;		/* Global register data */
     int zone_nest_num;		/* Global current zone nest position */
-    int break_called;		/* Boolean flag for @break and @assert */
+    bool break_called;		/* Boolean flag for @break and @assert */
     int f_limitmask;		/* Flagword for limiter for functions */
-    int inpipe;			/* Boolean flag for command piping */
+    bool inpipe;			/* Boolean flag for command piping */
     char *pout;			/* The output of the pipe used in %| */
     char *poutnew;		/* The output being build by the current command */
     char *poutbufc;		/* Buffer position for poutnew */
@@ -536,22 +538,22 @@ extern STATEDATA mudstate;
 
 /* Game control flags in mudconf.control_flags */
 
-#define CF_LOGIN    0x0001	/* Allow nonwiz logins to the MUSH */
-#define CF_BUILD    0x0002	/* Allow building commands */
-#define CF_INTERP   0x0004	/* Allow object triggering */
+#define CF_LOGIN        0x0001	/* Allow nonwiz logins to the MUSH */
+#define CF_BUILD        0x0002	/* Allow building commands */
+#define CF_INTERP       0x0004	/* Allow object triggering */
 #define CF_CHECKPOINT   0x0008	/* Perform auto-checkpointing */
-#define CF_DBCHECK  0x0010	/* Periodically check/clean the DB */
+#define CF_DBCHECK      0x0010	/* Periodically check/clean the DB */
 #define CF_IDLECHECK    0x0020	/* Periodically check for idle users */
 /* empty        0x0040 */
 /* empty        0x0080 */
-#define CF_DEQUEUE  0x0100	/* Remove entries from the queue */
+#define CF_DEQUEUE      0x0100	/* Remove entries from the queue */
 #define CF_GODMONITOR   0x0200	/* Display commands to the God. */
 #define CF_EVENTCHECK   0x0400	/* Allow events checking */
 /* Host information codes */
 
 #define H_REGISTRATION  0x0001	/* Registration ALWAYS on */
-#define H_FORBIDDEN 0x0002	/* Reject all connects */
-#define H_SUSPECT   0x0004	/* Notify wizards of connects/disconnects */
+#define H_FORBIDDEN     0x0002	/* Reject all connects */
+#define H_SUSPECT       0x0004	/* Notify wizards of connects/disconnects */
 #define H_GUEST         0x0008	/* Don't permit guests from here */
 
 /* Logging options */
@@ -559,29 +561,29 @@ extern STATEDATA mudstate;
 #define LOG_ALLCOMMANDS 0x00000001	/* Log all commands */
 #define LOG_ACCOUNTING  0x00000002	/* Write accounting info on logout */
 #define LOG_BADCOMMANDS 0x00000004	/* Log bad commands */
-#define LOG_BUGS    0x00000008	/* Log program bugs found */
-#define LOG_DBSAVES 0x00000010	/* Log database dumps */
+#define LOG_BUGS        0x00000008	/* Log program bugs found */
+#define LOG_DBSAVES     0x00000010	/* Log database dumps */
 #define LOG_CONFIGMODS  0x00000020	/* Log changes to configuration */
 #define LOG_PCREATES    0x00000040	/* Log character creations */
-#define LOG_KILLS   0x00000080	/* Log KILLs */
-#define LOG_LOGIN   0x00000100	/* Log logins and logouts */
-#define LOG_NET     0x00000200	/* Log net connects and disconnects */
+#define LOG_KILLS       0x00000080	/* Log KILLs */
+#define LOG_LOGIN       0x00000100	/* Log logins and logouts */
+#define LOG_NET         0x00000200	/* Log net connects and disconnects */
 #define LOG_SECURITY    0x00000400	/* Log security-related events */
-#define LOG_SHOUTS  0x00000800	/* Log shouts */
-#define LOG_STARTUP 0x00001000	/* Log nonfatal errors in startup */
-#define LOG_WIZARD  0x00002000	/* Log dangerous things */
+#define LOG_SHOUTS      0x00000800	/* Log shouts */
+#define LOG_STARTUP     0x00001000	/* Log nonfatal errors in startup */
+#define LOG_WIZARD      0x00002000	/* Log dangerous things */
 #define LOG_ALLOCATE    0x00004000	/* Log alloc/free from buffer pools */
 #define LOG_PROBLEMS    0x00008000	/* Log runtime problems */
 #define LOG_KBCOMMANDS  0x00010000	/* Log keyboard commands */
 #define LOG_SUSPECTCMDS 0x00020000	/* Log SUSPECT player keyboard cmds */
-#define LOG_TIMEUSE 0x00040000	/* Log CPU time usage */
-#define LOG_LOCAL   0x00080000	/* Log user stuff via @log */
-#define LOG_MALLOC  0x00100000	/* Log malloc requests */
-#define LOG_FORCE   0x04000000	/* Ignore mudstate.logging */
-#define LOG_ALWAYS  0x80000000	/* Always log it */
+#define LOG_TIMEUSE     0x00040000	/* Log CPU time usage */
+#define LOG_LOCAL       0x00080000	/* Log user stuff via @log */
+#define LOG_MALLOC      0x00100000	/* Log malloc requests */
+#define LOG_FORCE       0x04000000	/* Ignore mudstate.logging */
+#define LOG_ALWAYS      0x80000000	/* Always log it */
 
 #define LOGOPT_FLAGS        0x01	/* Report flags on object */
-#define LOGOPT_LOC      0x02	/* Report loc of obj when requested */
+#define LOGOPT_LOC          0x02	/* Report loc of obj when requested */
 #define LOGOPT_OWNER        0x04	/* Report owner of obj if not obj */
 #define LOGOPT_TIMESTAMP    0x08	/* Timestamp log entries */
 
