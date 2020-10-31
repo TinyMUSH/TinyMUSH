@@ -19,7 +19,7 @@
 #include "interface.h"
 #include "externs.h"		/* required by code */
 
-#include "libtinydbm.h"		/* required by code */
+#include <gdbm.h>		/* required by code */
 
 #include "udb.h"		/* required by code */
 #include "udb_defs.h"
@@ -44,7 +44,7 @@ void dddb_setsync(int flag)
     }
 }
 
-void dbm_error(char *msg)
+void dbm_error(const char *msg)
 {
     log_write(LOG_ALWAYS, "DB", "ERROR", "Database error: %s\n", msg);
 }

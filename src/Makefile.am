@@ -38,7 +38,8 @@ QDBM_C			= dbm/qdbm/curia.c dbm/qdbm/depot.c dbm/qdbm/hovel.c dbm/qdbm/myconf.c 
 QDBM_H			= dbm/qdbm/copyright.h dbm/qdbm/curia.h dbm/qdbm/depot.h dbm/qdbm/hovel.h
 
 EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
-CLEANFILES		= defaults.h prototypes.h libtinydbm.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+
+CLEANFILES		= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
 
 API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h ansi.h command.h db.h api.h interface.h externs.h prototypes.h
 
@@ -49,47 +50,6 @@ nodist_include_HEADERS	= tinymushapi.h
 bin_PROGRAMS		= netmush slave
 
 CPROTO_INCLUDES		=
-
-noinst_LIBRARIES		= libtinydbm.a
-netmush_LDADD			+= libtinydbm.a
-nodist_libtinydbm_a_SOURCES	= libtinydbm.h
-BUILT_SOURCES			+= libtinydbm.h
-
-if WANT_DBM_GDBM
-libtinydbm_a_SOURCES		= $(GDBM_C) $(GDBM_H)
-
-libtinydbm.h: $(GDBM_H)
-	rm -f libtinydbm.h
-	touch libtinydbm.h
-	chmod +w libtinydbm.h
-	cat dbm/gdbm/libtinygdbm.head.h >> libtinydbm.h
-	sed -n '/#ifndef __GDBMCOPYRIGHT_H/,/\/* __GDBMCOPYRIGHT_H *\//p' < dbm/gdbm/gdbmcopyright.h >> libtinydbm.h
-	printf "\n/*\n * from gdbmconst.h\n */\n\n">> libtinydbm.h
-	sed -n '/#ifndef __GDBMCONST_H/,/\/* __GDBMCONST_H *\//p' < dbm/gdbm/gdbmconst.h >> libtinydbm.h
-	printf "\n/*\n * from gdbmdefs.h\n */\n\n">> libtinydbm.h
-	sed -n '/#ifndef __GDBMDEFS_H/,/\/* __GDBMDEFS_H *\//p' < dbm/gdbm/gdbmdefs.h >> libtinydbm.h
-	printf "\n/*\n * from gdbmerrno.h\n */\n\n">> libtinydbm.h
-	sed -n '/#ifndef __GDBMERRNO_H/,/\/* __GDBMERRNO_H *\//p' < dbm/gdbm/gdbmerrno.h >> libtinydbm.h
-	printf "\n/*\n * from gdbmextern.h\n */\n\n">> libtinydbm.h
-	sed -n '/#ifndef __GDBMEXTERN_H/,/\/* __GDBMEXTERN_H *\//p' < dbm/gdbm/gdbmextern.h >> libtinydbm.h
-	cat dbm/gdbm/libtinygdbm.foot.h >> libtinydbm.h
-	chmod -w libtinydbm.h
- 
-endif
-
-if WANT_DBM_QDBM
-libtinydbm_a_SOURCES		= $(QDBM_C) $(QDBM_H)
-
-libtinydbm.h: $(QDBM_H)
-	rm -f libtinydbm.h
-	touch libtinydbm.h
-	chmod +w libtinydbm.h
-	sed -n '/#ifndef __QDBMCOPYRIGHT_H/,/\/* __QDBMCOPYRIGHT_H *\//p' < dbm/qdbm/copyright.h >> libtinydbm.h
-	sed -n '/#ifndef __DEPOT_H/,/\/* __DEPOT_H *\//p' < dbm/qdbm/depot.h >> libtinydbm.h
-	sed -n '/#ifndef __CURIA_H/,/\/* __CURIA_H *\//p' < dbm/qdbm/curia.h >> libtinydbm.h
-	sed -n '/#ifndef __HOVEL_H/,/\/* __HOVEL_H *\//p' < dbm/qdbm/hovel.h >> libtinydbm.h
-	chmod -w libtinydbm.h
-endif
 
 if WANT_MODULE_COMSYS
  SUBDIRS		+= modules/comsys/
@@ -139,7 +99,7 @@ Startmush: $(SCRIPT_DIR)/Startmush.in
 	
 .PHONY:version.h
 	
-prototypes.h: defaults.h libtinydbm.h
+prototypes.h: defaults.h
 	rm -f prototypes.h
 	touch prototypes.h
 	if [ ! -f version.h ]; then touch version.h; fi
@@ -157,7 +117,7 @@ prototypes.h: defaults.h libtinydbm.h
 	echo '#include "match.h"' >> _prototypes.h
 	echo '#include "file_c.h"' >> _prototypes.h
 	echo -e '#include "player.h"\n' >> _prototypes.h
-	for i in $(netmush_C); do echo -e "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 2 $$i)\n" >> _prototypes.h; done
+	for i in $(netmush_C); do echo -e "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 3 $$i 2>/dev/null)\n" >> _prototypes.h; done
 	echo '#endif /* __PROTOTYPES_H */' >> _prototypes.h
 	rm prototypes.h
 	mv _prototypes.h prototypes.h

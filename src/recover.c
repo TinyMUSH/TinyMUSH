@@ -31,9 +31,36 @@
 #include "attrs.h"		/* required by code */
 #include "defaults.h"		/* required by code */
 
-#include "libtinydbm.h"		/* required by code */
+#ifdef HAVE_GDBM_H
+#include <gdbm.h>		/* required by code */
+#endif
 
-void gdbm_panic(char *mesg)
+#ifdef HAVE_QDBM_H
+#include <qdbm.h>		/* required by code */
+#endif
+
+/* The dbm hash bucket element contains the full 31 bit hash value, the
+   "pointer" to the key and data (stored together) with their sizes.  It also
+   has a small part of the actual key value.  It is used to verify the first
+   part of the key has the correct value without having to read the actual
+   key. */
+
+#define SMALL    4
+
+typedef struct {
+    char    start_tag[4];
+    int hash_value;     /* The complete 31 bit value. */
+    char    key_start[SMALL];   /* Up to the first SMALL bytes of the
+                     * key.  */
+    off_t   data_pointer;       /* The file address of the key record.
+                     * The data record directly follows
+                     * the key.  */
+    int key_size;       /* Size of key data in the file. */
+    int data_size;      /* Size of associated data in the
+                     * file. */
+}   bucket_element;
+
+void gdbm_panic(const char *mesg)
 {
     fprintf(stderr, "GDBM panic: %s\n", mesg);
 }

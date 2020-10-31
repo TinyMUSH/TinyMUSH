@@ -42,8 +42,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
 #endif
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s", mudstate.linkerinfo);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     DBM driver: %s\n", mudstate.dbmdriver);
+	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s\n", mudstate.linkerinfo);
     }
 
     if (mudstate.modloaded[0]) {
@@ -111,9 +110,7 @@ void init_version(void)
     version = munge_space(MUSH_BUILD_LTCOMPILE);
     mudstate.linkerinfo = xstrdup(version, "mudstate.linkerinfo");
     free_lbuf(version);
-    
-    mudstate.dbmdriver = xstrdup(MUSH_DBM, "mudstate.dbmdriver");
-    
+
     bp = version = alloc_lbuf("init_version");
     safe_sprintf(version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
 
@@ -151,5 +148,4 @@ void log_version(void)
     log_write(LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo);
     log_write(LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo);
     log_write(LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo);
-    log_write(LOG_ALWAYS, "INI", "START", "     DBM driver: %s", mudstate.dbmdriver);
 }

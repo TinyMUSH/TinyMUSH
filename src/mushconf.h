@@ -253,7 +253,7 @@ struct confdata {
     int comma_say;		/* Use grammatically-correct comma in says */
     int you_say;		/* Show 'You say' to the player */
     int c_cmd_subst;		/* Is %c last command or ansi? */
-    size_t player_name_min;	/* Minimum length of a player name */
+    int player_name_min;	/* Minimum length of a player name */
     dbref master_room;		/* Room containing default cmds/exits/etc */
     dbref player_proto;		/* Player prototype to clone */
     dbref room_proto;		/* Room prototype to clone */
@@ -287,7 +287,7 @@ struct confdata {
     int malloc_tracker;		/* track allocation of memory */
     int malloc_logger;		/* log allocation of memory */
     int max_global_regs;	/* How many global register are avalable (min 10, max 36) */
-    size_t max_command_args;	/* Maximum arguments a command may have */
+    int max_command_args;	/* Maximum arguments a command may have */
     int player_name_length;	/* Maximum length of a player name */
     int hash_factor;		/* Hash factor */
     int max_cmdsecs;		/* Threshhold for real time taken by command */
@@ -398,7 +398,6 @@ struct statedata {
     char *configureinfo;	/* Configure switches */
     char *compilerinfo;		/* Compiler command line */
     char *linkerinfo;		/* Linker command line */
-    char *dbmdriver;		/* DBM Driver */
     char modloaded[MBUF_SIZE];	/* Modules loaded */
     char **cfiletab;		/* Array of config files */
     int configfiles;		/* Number of config files */

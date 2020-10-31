@@ -98,6 +98,9 @@
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
+/* Define to 1 if you have the <gdbm.h> header file. */
+#undef HAVE_GDBM_H
+
 /* Define to 1 if you have the `gethostbyaddr' function. */
 #undef HAVE_GETHOSTBYADDR
 
@@ -335,12 +338,14 @@
    module search path. */
 #undef LT_MODULE_PATH_VAR
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Define to the shared library suffix, say, ".dylib". */
 #undef LT_SHARED_EXT
+
+/* Define to the shared archive member specification, say "(shr.o)". */
+#undef LT_SHARED_LIB_MEMBER
 
 /* Maximum length of a delimiter */
 #undef MAX_DELIM_LEN
@@ -350,9 +355,6 @@
 
 /* Enable memory-based DBM hashDB */
 #undef MEMORY_BASED
-
-/* Type of DBM used */
-#undef MUSH_DBM
 
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE
@@ -452,7 +454,7 @@
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to a type to use for `error_t' if it is not otherwise available. */
+/* Define to a type to use for 'error_t' if it is not otherwise available. */
 #undef error_t
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler

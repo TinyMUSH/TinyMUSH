@@ -69,3 +69,6 @@
 .cproject
 .project
 .settings/
+
+#Visual Studio Code
+.vscode/

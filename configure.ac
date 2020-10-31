@@ -4,9 +4,9 @@ AC_PREREQ([2.68])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
-m4_define(TINYMUSH_VERSION, [3.3.0.9])
-m4_define(TINYMUSH_RELEASE_DATE, ["2015-06-06"])
-m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 1989-2015 TinyMUSH development team.])
+m4_define(TINYMUSH_VERSION, [3.3.0.10])
+m4_define(TINYMUSH_RELEASE_DATE, ["2020-10-31"])
+m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 1989-2020 TinyMUSH development team.])
 
 AC_INIT([TinyMUSH],[TINYMUSH_VERSION],[https://github.com/TinyMUSH/TinyMUSH/issues],[tinymush],[https://github.com/TinyMUSH])
 
@@ -123,34 +123,6 @@ AH_BOTTOM([
 
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[enable debugging, default: no]), [case "${enableval}" in yes) with_debug=true ;; no)  with_debug=false ;; *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;; esac], [with_debug=false])
 AM_CONDITIONAL(GCC_DEBUG, test x"$with_debug" = x"true")
-
-AC_MSG_CHECKING([dbm engine to use])
-AC_ARG_WITH([dbm],
- [AS_HELP_STRING([--with-dbm=gdbm|qdbm], [Select the DBM driver used to save game data, valid values are : gdbm Use the traditional GDBM hash database driver, or qdbm : Use the new QDBM hash database driver. A newer implementation of the DBM engine. @<:@default=qdbm@:>@])],
- [AS_CASE([$withval], 
-  [gdbm],
-   [
-   with_dbm="gdbm"
-   AC_DEFINE([MUSH_DBM], ["gdbm"], [Type of DBM used])
-   ], 
-  [qdbm],
-   [
-   with_dbm="qdbm"
-   AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
-   ], 
-  [
-   with_dbm="qdbm"
-   AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
-  ]
- )], 
- [
-  with_dbm="qdbm"
-  AC_DEFINE([MUSH_DBM], ["qdbm"], [Type of DBM used])
- ])
-AC_MSG_RESULT([$with_dbm])
-
-AM_CONDITIONAL([WANT_DBM_GDBM], [test "x$with_dbm" = "xgdbm"])
-AM_CONDITIONAL([WANT_DBM_QDBM], [test "x$with_dbm" = "xqdbm"])
 
 AC_MSG_CHECKING([whether to enable compiler warnings])
 AC_ARG_ENABLE([warnings], [AS_HELP_STRING([--enable-warnings], [enable compiler warnings (-Wall) @<:@default=no@:>@])],
@@ -283,12 +255,14 @@ AX_BOX([Checks for libraries])
 # Checks for libraries.
 
 AC_SEARCH_LIBS([crypt], [crypt], [], [AC_MSG_FAILURE([could not find library crypt])])
-AC_SEARCH_LIBS([SSL_library_init], [ssl], [], [AC_MSG_FAILURE([could not find library openssl])])
+#AC_SEARCH_LIBS([SSL_library_init], [ssl], [], [AC_MSG_FAILURE([could not find library openssl])])
 AC_SEARCH_LIBS([herror], [resolv], [], [AC_MSG_FAILURE([could not find library resolv])])
 AC_SEARCH_LIBS([socket], [c socket], [], [AC_MSG_FAILURE([could not find libraries c or socket])])
 AC_SEARCH_LIBS([gethostbyaddr], [nsl inet], [], [AC_MSG_FAILURE([could not find libraries nls or inet])])
 AC_SEARCH_LIBS([sqrt],[m], [], [AC_MSG_FAILURE([could not find librarie m])])
 AC_SEARCH_LIBS([pcre_exec], [pcre], [], [AC_MSG_FAILURE([could not find librarie pcre])])
+AC_SEARCH_LIBS([gdbm_open], [gdbm], [], [AC_MSG_FAILURE([could not find librarie GDBM])])
+
 
 AX_BOX([Checks for header files.])
 # Checks for header files.
@@ -297,7 +271,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h])
+AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h gdbm.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h])
 
 AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.
@@ -447,10 +421,6 @@ AX_PRINT([
              Number of env vars : %B$with_env_vars%b
           Number of iter levels : %B$with_max_iter%b
           Lenght of a delimiter : %B$with_max_delim%b
-             
-                       %BDatabase
--------------------------------%b
-                     DBM Engine : %B$with_dbm%b
 
                         %BModules
 -------------------------------%b

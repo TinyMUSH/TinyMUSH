@@ -610,7 +610,7 @@ void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref aowner
 {
     char *text, *buf, *bp, *bb_p;
     char xbuf[16], gbuf[16];	/* larger than number of attr flags! */
-    char flag_buf[32];
+    char flag_buf[34];
     char *xbufp, *gbufp, *fbp;
     char s[GBUF_SIZE];
     BOOLEXP *bool;
@@ -666,10 +666,10 @@ void view_atr(dbref player, dbref thing, ATTR * ap, char *raw_text, dbref aowner
     fbp = xbuf;
 
     if (*xbuf && *gbuf) {
-	sprintf(flag_buf, "%s(%s)", xbuf, gbuf);
+	snprintf(flag_buf, 34, "%s(%s)", xbuf, gbuf);
 	fbp = flag_buf;
     } else if (*gbuf) {
-	sprintf(flag_buf, "(%s)", gbuf);
+	snprintf(flag_buf, 34, "(%s)", gbuf);
 	fbp = flag_buf;
     }
 
