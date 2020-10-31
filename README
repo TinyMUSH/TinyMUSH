@@ -14,8 +14,8 @@ COPYING			TinyMUSH and previous licences.
 AUTHORS			Credits and thanks.
 
 ChangeLog		TinyMUSH 3 general changelog.
-ChangeLog.Alpha		TinyMUSH 3.3 Alpha changelog.
-ChangeLog.Beta		TinyMUSH 3.3 Beta changelog.
+ChangeLog.Alpha		Removed - See Git's ChangeLog instead.
+ChangeLog.Beta		Removed - See Git's ChangeLog instead.
 ChangeLog.History	TinyMUX 1.0 and TinyMUSH 2.x changelog.
 
 MODULES			Developer information on creating modules.
