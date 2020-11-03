@@ -4,22 +4,19 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */
-
-#include "mushconf.h"		/* required by code */
-
-#include "db.h"			/* required by externs */
-#include "interface.h"
-#include "externs.h"		/* required by code */
-
-#include "version.h"		/* required by code */
+#include "typedefs.h"  /* required by mudconf */
+#include "game.h"      /* required by mudconf */
+#include "alloc.h"     /* required by mudconf */
+#include "flags.h"     /* required by mudconf */
+#include "htab.h"      /* required by mudconf */
+#include "ltdl.h"      /* required by mudconf */
+#include "udb.h"       /* required by mudconf */
+#include "udb_defs.h"  /* required by mudconf */
+#include "mushconf.h"  /* required by code */
+#include "db.h"        /* required by externs */
+#include "interface.h" /* required by code */
+#include "externs.h"   /* required by code */
+#include "version.h"   /* required by code */
 
 void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int extra)
 {
@@ -32,40 +29,46 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     snprintf(string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
-    free_lbuf(ptr);
+    XFREE(ptr);
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s", MUSH_BUILD_DATE);
 
-    if (Wizard(player)) {
+    if (Wizard(player))
+    {
 #ifdef HAVE_SYS_UTSNAME_H
-	uname(&bpInfo);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine);
+        uname(&bpInfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine);
 #endif
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s\n", mudstate.linkerinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s\n", mudstate.linkerinfo);
     }
 
-    if (mudstate.modloaded[0]) {
-	MODULE *mp;
+    if (mudstate.modloaded[0])
+    {
+        MODULE *mp;
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next) {
-	    snprintf(string, MBUF_SIZE, "Module %s", mp->modname);
-	    ptr = repeatchar(strlen(string), '-');
-	    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr);
-	    free_lbuf(ptr);
-	    snprintf(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
+        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+        {
+            snprintf(string, MBUF_SIZE, "Module %s", mp->modname);
+            ptr = repeatchar(strlen(string), '-');
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr);
+            XFREE(ptr);
+            snprintf(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
 
-	    if ((mver = (MODVER *) lt_dlsym(mp->handle, string)) != NULL) {
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Version: %s", mver->version);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "         Author: %s", mver->author);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "          Email: %s", mver->email);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Website: %s", mver->url);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "      Copyright: %s", mver->copyright);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Description: %s\n", mver->description);
-	    } else {
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "module %s: no version information", mp->modname);
-	    }
-	}
+            if ((mver = (MODVER *)lt_dlsym(mp->handle, string)) != NULL)
+            {
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Version: %s", mver->version);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "         Author: %s", mver->author);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "          Email: %s", mver->email);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Website: %s", mver->url);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "      Copyright: %s", mver->copyright);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Description: %s\n", mver->description);
+            }
+            else
+            {
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "module %s: no version information", mp->modname);
+            }
+        }
     }
 }
 
@@ -85,60 +88,67 @@ void init_version(void)
     char *version, *bp;
     version = strdup(PACKAGE_VERSION);
 
-    if (version != NULL) {
-	mudstate.version.major = strtoimax(strsep(&version, "."), (char **) NULL, 10);
-	mudstate.version.minor = strtoimax(strsep(&version, "."), (char **) NULL, 10);
-	mudstate.version.status = strtoimax(strsep(&version, "."), (char **) NULL, 10);
-	mudstate.version.revision = strtoimax(strsep(&version, "."), (char **) NULL, 10);
-    } else {
-	/* If we hit that, we have a serious problem... */
-	mudstate.version.major = 0;
-	mudstate.version.minor = 0;
-	mudstate.version.status = 0;
-	mudstate.version.revision = 0;
+    if (version != NULL)
+    {
+        mudstate.version.major = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mudstate.version.minor = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mudstate.version.status = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mudstate.version.revision = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+    }
+    else
+    {
+        /* If we hit that, we have a serious problem... */
+        mudstate.version.major = 0;
+        mudstate.version.minor = 0;
+        mudstate.version.status = 0;
+        mudstate.version.revision = 0;
     }
 
     free(version);
     version = munge_space(PACKAGE_CONFIG);
-    mudstate.configureinfo = xstrdup(version, "mudstate.configureinfo");
-    free_lbuf(version);
-    
-    version = munge_space(MUSH_BUILD_COMPILE);
-    mudstate.compilerinfo = xstrdup(version, "mudstate.compilerinfo");
-    free_lbuf(version);
-    
-    version = munge_space(MUSH_BUILD_LTCOMPILE);
-    mudstate.linkerinfo = xstrdup(version, "mudstate.linkerinfo");
-    free_lbuf(version);
+    mudstate.configureinfo = XSTRDUP(version, "mudstate.configureinfo");
+    XFREE(version);
 
-    bp = version = alloc_lbuf("init_version");
+    version = munge_space(MUSH_BUILD_COMPILE);
+    mudstate.compilerinfo = XSTRDUP(version, "mudstate.compilerinfo");
+    XFREE(version);
+
+    version = munge_space(MUSH_BUILD_LTCOMPILE);
+    mudstate.linkerinfo = XSTRDUP(version, "mudstate.linkerinfo");
+    XFREE(version);
+
+    bp = version = XMALLOC(LBUF_SIZE, "version");
     safe_sprintf(version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
 
-    switch (mudstate.version.status) {
+    switch (mudstate.version.status)
+    {
     case 0:
-	safe_sprintf(version, &bp, ", Alpha %d", mudstate.version.revision);
-	break;
+        safe_sprintf(version, &bp, ", Alpha %d", mudstate.version.revision);
+        break;
 
     case 1:
-	safe_sprintf(version, &bp, ", Beta %d", mudstate.version.revision);
-	break;
+        safe_sprintf(version, &bp, ", Beta %d", mudstate.version.revision);
+        break;
 
     case 2:
-	safe_sprintf(version, &bp, ", Release Candidate %d", mudstate.version.revision);
-	break;
+        safe_sprintf(version, &bp, ", Release Candidate %d", mudstate.version.revision);
+        break;
 
     default:
-	if (mudstate.version.revision > 0) {
-	    safe_sprintf(version, &bp, ", Patch Level %d", mudstate.version.revision);
-	} else {
-	    safe_sprintf(version, &bp, ", Gold Release");
-	}
+        if (mudstate.version.revision > 0)
+        {
+            safe_sprintf(version, &bp, ", Patch Level %d", mudstate.version.revision);
+        }
+        else
+        {
+            safe_sprintf(version, &bp, ", Gold Release");
+        }
 
-	break;
+        break;
     }
 
     mudstate.version.name = strdup(version);
-    free_lbuf(version);
+    XFREE(version);
 }
 
 void log_version(void)

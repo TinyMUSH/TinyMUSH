@@ -4,24 +4,22 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */
-
-#include "mushconf.h"		/* required by code */
-
-#include "db.h"			/* required by externs */
-#include "interface.h"
-#include "externs.h"		/* required by code */
-
-#include "functions.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
+#include "typedefs.h"   /* required by mudconf */
+#include "game.h"       /* required by mudconf */
+#include "alloc.h"      /* required by mudconf */
+#include "flags.h"      /* required by mudconf */
+#include "htab.h"       /* required by mudconf */
+#include "ltdl.h"       /* required by mudconf */
+#include "udb.h"        /* required by mudconf */
+#include "udb_defs.h"   /* required by mudconf */
+#include "mushconf.h"   /* required by code */
+#include "db.h"         /* required by externs */
+#include "interface.h"  /* required by code */
+#include "externs.h"    /* required by code */
+#include "functions.h"  /* required by code */
+#include "attrs.h"      /* required by code */
+#include "powers.h"     /* required by code */
+#include "stringutil.h" /* required by code */
 
 /*
  * ---------------------------------------------------------------------------
@@ -32,56 +30,65 @@
 void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    int flag;			/* 0 is parse(), 1 is loop() */
+    int flag; /* 0 is parse(), 1 is loop() */
     char *curr, *objstring, *buff2, *buff3, *cp, *dp, *str, *result, *bb_p, *tbuf;
     int number = 0;
     flag = Func_Mask(LOOP_NOTIFY);
 
-    if (flag) {
-	VaChk_Only_InEval(3);
-    } else {
-	VaChk_InEval_OutEval(2, 4);
+    if (flag)
+    {
+        VaChk_Only_InEval(3);
+    }
+    else
+    {
+        VaChk_InEval_OutEval(2, 4);
     }
 
-    dp = cp = curr = alloc_lbuf("perform_loop.1");
+    dp = cp = curr = XMALLOC(LBUF_SIZE, "curr");
     str = fargs[0];
     exec(curr, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
     cp = trim_space_sep(cp, &isep);
 
-    if (!*cp) {
-	free_lbuf(curr);
-	return;
+    if (!*cp)
+    {
+        XFREE(curr);
+        return;
     }
 
     bb_p = *bufc;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (!flag && (*bufc != bb_p)) {
-	    print_sep(&osep, buff, bufc);
-	}
+    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (!flag && (*bufc != bb_p))
+        {
+            print_sep(&osep, buff, bufc);
+        }
 
-	number++;
-	objstring = split_token(&cp, &isep);
-	buff2 = replace_string(BOUND_VAR, objstring, fargs[1]);
-	tbuf = ltos(number);
-	buff3 = replace_string(LISTPLACE_VAR, tbuf, buff2);
-	free_sbuf(tbuf);
-	str = buff3;
+        number++;
+        objstring = split_token(&cp, &isep);
+        buff2 = replace_string(BOUND_VAR, objstring, fargs[1]);
+        tbuf = ltos(number);
+        buff3 = replace_string(LISTPLACE_VAR, tbuf, buff2);
+        XFREE(tbuf);
+        str = buff3;
 
-	if (!flag) {
-	    exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	} else {
-	    dp = result = alloc_lbuf("perform_loop.2");
-	    exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	    notify(cause, result);
-	    free_lbuf(result);
-	}
+        if (!flag)
+        {
+            exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+        }
+        else
+        {
+            dp = result = XMALLOC(LBUF_SIZE, "result");
+            exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            notify(cause, result);
+            XFREE(result);
+        }
 
-	free_lbuf(buff2);
-	free_lbuf(buff3);
+        XFREE(buff2);
+        XFREE(buff3);
     }
 
-    free_lbuf(curr);
+    XFREE(curr);
 }
 
 /*
@@ -110,7 +117,7 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    int flag;			/* 0 is iter(), 1 is list() */
+    int flag; /* 0 is iter(), 1 is list() */
     int bool_flag, filt_flag, two_flag;
     int need_result, need_bool;
     char *list_str, *lp, *input_p;
@@ -124,9 +131,10 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Enforce maximum nesting level.
      */
 
-    if (mudstate.in_loop >= MAX_ITER_NESTING - 1) {
-	notify_quiet(player, "Exceeded maximum iteration nesting.");
-	return;
+    if (mudstate.in_loop >= MAX_ITER_NESTING - 1)
+    {
+        notify_quiet(player, "Exceeded maximum iteration nesting.");
+        return;
     }
 
     /*
@@ -139,28 +147,37 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     need_result = (flag || (filt_flag != FILT_COND_NONE)) ? 1 : 0;
     need_bool = ((bool_flag != BOOL_COND_NONE) || (filt_flag != FILT_COND_NONE)) ? 1 : 0;
 
-    if (!two_flag) {
-	if (flag) {
-	    VaChk_Only_InEval(3);
-	} else {
-	    VaChk_InEval_OutEval(2, 4);
-	}
+    if (!two_flag)
+    {
+        if (flag)
+        {
+            VaChk_Only_InEval(3);
+        }
+        else
+        {
+            VaChk_InEval_OutEval(2, 4);
+        }
 
-	ep = fargs[1];
-    } else {
-	if (flag) {
-	    VaChk_Only_InEval(4);
-	} else {
-	    VaChk_InEval_OutEval(3, 5);
-	}
+        ep = fargs[1];
+    }
+    else
+    {
+        if (flag)
+        {
+            VaChk_Only_InEval(4);
+        }
+        else
+        {
+            VaChk_InEval_OutEval(3, 5);
+        }
 
-	ep = fargs[2];
+        ep = fargs[2];
     }
 
     /*
      * The list argument is unevaluated. Go evaluate it.
      */
-    input_p = lp = list_str = alloc_lbuf("perform_iter.list");
+    input_p = lp = list_str = XMALLOC(LBUF_SIZE, "list_str");
     str = fargs[0];
     exec(list_str, &lp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
     input_p = trim_space_sep(input_p, &isep);
@@ -169,27 +186,32 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Same thing for the second list arg, if we have it
      */
 
-    if (two_flag) {
-	input_p2 = lp2 = list_str2 = alloc_lbuf("perform_iter.list2");
-	str = fargs[1];
-	exec(list_str2, &lp2, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	input_p2 = trim_space_sep(input_p2, &isep);
-    } else {
-	input_p2 = lp2 = list_str2 = NULL;
+    if (two_flag)
+    {
+        input_p2 = lp2 = list_str2 = XMALLOC(LBUF_SIZE, "list_str2");
+        str = fargs[1];
+        exec(list_str2, &lp2, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+        input_p2 = trim_space_sep(input_p2, &isep);
+    }
+    else
+    {
+        input_p2 = lp2 = list_str2 = NULL;
     }
 
     /*
      * If both lists are empty, we're done
      */
 
-    if (!(input_p && *input_p) && !(input_p2 && *input_p2)) {
-	free_lbuf(list_str);
+    if (!(input_p && *input_p) && !(input_p2 && *input_p2))
+    {
+        XFREE(list_str);
 
-	if (list_str2) {
-	    free_lbuf(list_str2);
-	}
+        if (list_str2)
+        {
+            XFREE(list_str2);
+        }
 
-	return;
+        return;
     }
 
     cur_lev = mudstate.in_loop++;
@@ -200,74 +222,90 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     bb_p = *bufc;
     elen = strlen(ep);
 
-    while ((input_p || input_p2) && !mudstate.loop_break[cur_lev] && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (!need_result && (*bufc != bb_p)) {
-	    print_sep(&osep, buff, bufc);
-	}
+    while ((input_p || input_p2) && !mudstate.loop_break[cur_lev] && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (!need_result && (*bufc != bb_p))
+        {
+            print_sep(&osep, buff, bufc);
+        }
 
-	if (input_p)
-	    mudstate.loop_token[cur_lev] = split_token(&input_p, &isep);
-	else {
-	    mudstate.loop_token[cur_lev] = tmpbuf;
-	}
+        if (input_p)
+            mudstate.loop_token[cur_lev] = split_token(&input_p, &isep);
+        else
+        {
+            mudstate.loop_token[cur_lev] = tmpbuf;
+        }
 
-	if (input_p2)
-	    mudstate.loop_token2[cur_lev] = split_token(&input_p2, &isep);
-	else {
-	    mudstate.loop_token2[cur_lev] = tmpbuf;
-	}
+        if (input_p2)
+            mudstate.loop_token2[cur_lev] = split_token(&input_p2, &isep);
+        else
+        {
+            mudstate.loop_token2[cur_lev] = tmpbuf;
+        }
 
-	mudstate.loop_number[cur_lev] += 1;
-	work_buf = alloc_lbuf("perform_iter.eval");
-	StrCopyKnown(work_buf, ep, elen);	/* we might nibble this */
-	str = work_buf;
-	savep = *bufc;
+        mudstate.loop_number[cur_lev] += 1;
+        work_buf = XMALLOC(LBUF_SIZE, "work_buf");
+        StrCopyKnown(work_buf, ep, elen); /* we might nibble this */
+        str = work_buf;
+        savep = *bufc;
 
-	if (!need_result) {
-	    exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+        if (!need_result)
+        {
+            exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
-	    if (need_bool) {
-		is_true = xlate(savep);
-	    }
-	} else {
-	    dp = result = alloc_lbuf("perform_iter.out");
-	    exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            if (need_bool)
+            {
+                is_true = xlate(savep);
+            }
+        }
+        else
+        {
+            dp = result = XMALLOC(LBUF_SIZE, "result");
+            exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
-	    if (need_bool) {
-		is_true = xlate(result);
-	    }
+            if (need_bool)
+            {
+                is_true = xlate(result);
+            }
 
-	    if (flag) {
-		notify(cause, result);
-	    } else if (((filt_flag == FILT_COND_TRUE) && is_true)
-		       || ((filt_flag == FILT_COND_FALSE) && !is_true)) {
-		if (*bufc != bb_p) {
-		    print_sep(&osep, buff, bufc);
-		}
+            if (flag)
+            {
+                notify(cause, result);
+            }
+            else if (((filt_flag == FILT_COND_TRUE) && is_true) || ((filt_flag == FILT_COND_FALSE) && !is_true))
+            {
+                if (*bufc != bb_p)
+                {
+                    print_sep(&osep, buff, bufc);
+                }
 
-		safe_str(mudstate.loop_token[cur_lev], buff, bufc);
-	    }
+                safe_str(mudstate.loop_token[cur_lev], buff, bufc);
+            }
 
-	    free_lbuf(result);
-	}
+            XFREE(result);
+        }
 
-	free_lbuf(work_buf);
+        XFREE(work_buf);
 
-	if (bool_flag != BOOL_COND_NONE) {
-	    if (!is_true && (bool_flag == BOOL_COND_TRUE)) {
-		break;
-	    }
+        if (bool_flag != BOOL_COND_NONE)
+        {
+            if (!is_true && (bool_flag == BOOL_COND_TRUE))
+            {
+                break;
+            }
 
-	    if (is_true && (bool_flag == BOOL_COND_FALSE)) {
-		break;
-	    }
-	}
+            if (is_true && (bool_flag == BOOL_COND_FALSE))
+            {
+                break;
+            }
+        }
     }
 
-    free_lbuf(list_str);
+    XFREE(list_str);
 
-    if (list_str2) {
-	free_lbuf(list_str2);
+    if (list_str2)
+    {
+        XFREE(list_str2);
     }
 
     mudstate.in_loop--;
@@ -286,11 +324,12 @@ void fun_ilev(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
-    lev = (int) strtol(fargs[0], (char **) NULL, 10);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0)) {
-	safe_chr('0', buff, bufc);
-	return;
+    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    {
+        safe_chr('0', buff, bufc);
+        return;
     }
 
     safe_ltos(buff, bufc, mudstate.loop_number[lev], LBUF_SIZE);
@@ -299,10 +338,11 @@ void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
-    lev = (int) strtol(fargs[0], (char **) NULL, 10);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0)) {
-	return;
+    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    {
+        return;
     }
 
     safe_str(mudstate.loop_token[lev], buff, bufc);
@@ -311,10 +351,11 @@ void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
-    lev = (int) strtol(fargs[0], (char **) NULL, 10);
+    lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0)) {
-	return;
+    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    {
+        return;
     }
 
     safe_str(mudstate.loop_token2[lev], buff, bufc);
@@ -323,10 +364,11 @@ void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 void fun_ibreak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
-    lev = mudstate.in_loop - 1 - (int) strtol(fargs[0], (char **) NULL, 10);
+    lev = mudstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0)) {
-	return;
+    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    {
+        return;
     }
 
     mudstate.loop_break[lev] = 1;
@@ -367,54 +409,58 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Evaluate it using the rest of the passed function args
      */
     cp = curr = fargs[1];
-    atextbuf = alloc_lbuf("fun_fold");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
     StrCopyKnown(atextbuf, atext, alen);
     /*
      * may as well handle first case now
      */
     i = 1;
-    clist[2] = alloc_sbuf("fun_fold.objplace");
+    clist[2] = XMALLOC(SBUF_SIZE, "clist[2]");
     op = clist[2];
     safe_ltos(clist[2], &op, i, LBUF_SIZE);
 
-    if ((nfargs >= 3) && (fargs[2])) {
-	clist[0] = fargs[2];
-	clist[1] = split_token(&cp, &isep);
-	result = bp = alloc_lbuf("fun_fold");
-	str = atextbuf;
-	exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
-	i++;
-    } else {
-	clist[0] = split_token(&cp, &isep);
-	clist[1] = split_token(&cp, &isep);
-	result = bp = alloc_lbuf("fun_fold");
-	str = atextbuf;
-	exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
-	i += 2;
+    if ((nfargs >= 3) && (fargs[2]))
+    {
+        clist[0] = fargs[2];
+        clist[1] = split_token(&cp, &isep);
+        result = bp = XMALLOC(LBUF_SIZE, "result");
+        str = atextbuf;
+        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        i++;
+    }
+    else
+    {
+        clist[0] = split_token(&cp, &isep);
+        clist[1] = split_token(&cp, &isep);
+        result = bp = XMALLOC(LBUF_SIZE, "fun_fold");
+        str = atextbuf;
+        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        i += 2;
     }
 
     rstore = result;
     result = NULL;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	clist[0] = rstore;
-	clist[1] = split_token(&cp, &isep);
-	op = clist[2];
-	safe_ltos(clist[2], &op, i, LBUF_SIZE);
-	StrCopyKnown(atextbuf, atext, alen);
-	result = bp = alloc_lbuf("fun_fold");
-	str = atextbuf;
-	exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
-	strcpy(rstore, result);
-	free_lbuf(result);
-	i++;
+    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        clist[0] = rstore;
+        clist[1] = split_token(&cp, &isep);
+        op = clist[2];
+        safe_ltos(clist[2], &op, i, LBUF_SIZE);
+        StrCopyKnown(atextbuf, atext, alen);
+        result = bp = XMALLOC(LBUF_SIZE, "bp");
+        str = atextbuf;
+        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        strcpy(rstore, result);
+        XFREE(result);
+        i++;
     }
 
     safe_str(rstore, buff, bufc);
-    free_lbuf(rstore);
-    free_lbuf(atext);
-    free_lbuf(atextbuf);
-    free_sbuf(clist[2]);
+    XFREE(rstore);
+    XFREE(atext);
+    XFREE(atextbuf);
+    XFREE(clist[2]);
 }
 
 /*
@@ -431,7 +477,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    int flag;			/* 0 is filter(), 1 is filterbool() */
+    int flag; /* 0 is filter(), 1 is filterbool() */
     dbref aowner, thing;
     int aflags, alen, anum, i;
     ATTR *ap;
@@ -447,35 +493,38 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Now iteratively eval the attrib with the argument list
      */
     cp = curr = trim_space_sep(fargs[1], &isep);
-    atextbuf = alloc_lbuf("fun_filter.atextbuf");
-    objs[1] = alloc_sbuf("fun_filter.objplace");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
+    objs[1] = XMALLOC(SBUF_SIZE, "objs[1]");
     bb_p = *bufc;
     i = 1;
 
-    while (cp) {
-	objs[0] = split_token(&cp, &isep);
-	op = objs[1];
-	safe_ltos(objs[1], &op, i, LBUF_SIZE);
-	StrCopyKnown(atextbuf, atext, alen);
-	result = bp = alloc_lbuf("fun_filter");
-	str = atextbuf;
-	exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+    while (cp)
+    {
+        objs[0] = split_token(&cp, &isep);
+        op = objs[1];
+        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        StrCopyKnown(atextbuf, atext, alen);
+        result = bp = XMALLOC(LBUF_SIZE, "bp");
+        str = atextbuf;
+        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
 
-	if ((!flag && (*result == '1')) || (flag && xlate(result))) {
-	    if (*bufc != bb_p) {
-		print_sep(&osep, buff, bufc);
-	    }
+        if ((!flag && (*result == '1')) || (flag && xlate(result)))
+        {
+            if (*bufc != bb_p)
+            {
+                print_sep(&osep, buff, bufc);
+            }
 
-	    safe_str(objs[0], buff, bufc);
-	}
+            safe_str(objs[0], buff, bufc);
+        }
 
-	free_lbuf(result);
-	i++;
+        XFREE(result);
+        i++;
     }
 
-    free_lbuf(atext);
-    free_lbuf(atextbuf);
-    free_sbuf(objs[1]);
+    XFREE(atext);
+    XFREE(atextbuf);
+    XFREE(objs[1]);
 }
 
 /*
@@ -500,8 +549,9 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     /*
      * If we don't have anything for a second arg, don't bother.
      */
-    if (!fargs[1] || !*fargs[1]) {
-	return;
+    if (!fargs[1] || !*fargs[1])
+    {
+        return;
     }
 
     /*
@@ -512,28 +562,30 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * now process the list one element at a time
      */
     cp = trim_space_sep(fargs[1], &isep);
-    atextbuf = alloc_lbuf("fun_map.atextbuf");
-    objs[1] = alloc_sbuf("fun_map.objplace");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
+    objs[1] = XMALLOC(SBUF_SIZE, "objs[1]");
     bb_p = *bufc;
     i = 1;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (*bufc != bb_p) {
-	    print_sep(&osep, buff, bufc);
-	}
+    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (*bufc != bb_p)
+        {
+            print_sep(&osep, buff, bufc);
+        }
 
-	objs[0] = split_token(&cp, &isep);
-	op = objs[1];
-	safe_ltos(objs[1], &op, i, LBUF_SIZE);
-	StrCopyKnown(atextbuf, atext, alen);
-	str = atextbuf;
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
-	i++;
+        objs[0] = split_token(&cp, &isep);
+        op = objs[1];
+        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        StrCopyKnown(atextbuf, atext, alen);
+        str = atextbuf;
+        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        i++;
     }
 
-    free_lbuf(atext);
-    free_lbuf(atextbuf);
-    free_sbuf(objs[1]);
+    XFREE(atext);
+    XFREE(atextbuf);
+    XFREE(objs[1]);
 }
 
 /*
@@ -559,14 +611,19 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
     VaChk_Range(3, 12);
 
-    if (nfargs < 4) {
-	isep.str[0] = ' ';
-	isep.len = 1;
-	lastn = nfargs - 1;
-    } else if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, nfargs, &isep, DELIM_STRING)) {
-	return;
-    } else {
-	lastn = nfargs - 2;
+    if (nfargs < 4)
+    {
+        isep.str[0] = ' ';
+        isep.len = 1;
+        lastn = nfargs - 1;
+    }
+    else if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, nfargs, &isep, DELIM_STRING))
+    {
+        return;
+    }
+    else
+    {
+        lastn = nfargs - 2;
     }
 
     /*
@@ -574,8 +631,9 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
     Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
 
-    for (i = 0; i < NUM_ENV_VARS; i++) {
-	cp[i] = NULL;
+    for (i = 0; i < NUM_ENV_VARS; i++)
+    {
+        cp[i] = NULL;
     }
 
     bb_p = *bufc;
@@ -584,39 +642,46 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
     nwords = 0;
 
-    for (i = 0; i < lastn; i++) {
-	cp[i] = trim_space_sep(fargs[i + 1], &isep);
-	count[i] = countwords(cp[i], &isep);
+    for (i = 0; i < lastn; i++)
+    {
+        cp[i] = trim_space_sep(fargs[i + 1], &isep);
+        count[i] = countwords(cp[i], &isep);
 
-	if (count[i] > nwords) {
-	    nwords = count[i];
-	}
+        if (count[i] > nwords)
+        {
+            nwords = count[i];
+        }
     }
 
-    atextbuf = alloc_lbuf("fun_mix");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
 
-    for (wc = 0; (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim)
-	 && !Too_Much_CPU(); wc++) {
-	for (i = 0; i < lastn; i++) {
-	    if (wc < count[i]) {
-		os[i] = split_token(&cp[i], &isep);
-	    } else {
-		os[i] = tmpbuf;
-	    }
-	}
+    for (wc = 0; (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU(); wc++)
+    {
+        for (i = 0; i < lastn; i++)
+        {
+            if (wc < count[i])
+            {
+                os[i] = split_token(&cp[i], &isep);
+            }
+            else
+            {
+                os[i] = tmpbuf;
+            }
+        }
 
-	StrCopyKnown(atextbuf, atext, alen);
+        StrCopyKnown(atextbuf, atext, alen);
 
-	if (*bufc != bb_p) {
-	    print_sep(&isep, buff, bufc);
-	}
+        if (*bufc != bb_p)
+        {
+            print_sep(&isep, buff, bufc);
+        }
 
-	str = atextbuf;
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, os, lastn);
+        str = atextbuf;
+        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, os, lastn);
     }
 
-    free_lbuf(atext);
-    free_lbuf(atextbuf);
+    XFREE(atext);
+    XFREE(atextbuf);
 }
 
 /*
@@ -635,11 +700,12 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     Delim isep, osep;
     int step_size, i;
     VaChk_Only_In_Out(5);
-    step_size = (int) strtol(fargs[2], (char **) NULL, 10);
+    step_size = (int)strtol(fargs[2], (char **)NULL, 10);
 
-    if ((step_size < 1) || (step_size > NUM_ENV_VARS)) {
-	notify(player, "Illegal step size.");
-	return;
+    if ((step_size < 1) || (step_size > NUM_ENV_VARS))
+    {
+        notify(player, "Illegal step size.");
+        return;
     }
 
     /*
@@ -647,25 +713,28 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
     Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
     cp = trim_space_sep(fargs[1], &isep);
-    atextbuf = alloc_lbuf("fun_step");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
     bb_p = *bufc;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (*bufc != bb_p) {
-	    print_sep(&osep, buff, bufc);
-	}
+    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (*bufc != bb_p)
+        {
+            print_sep(&osep, buff, bufc);
+        }
 
-	for (i = 0; cp && (i < step_size); i++) {
-	    os[i] = split_token(&cp, &isep);
-	}
+        for (i = 0; cp && (i < step_size); i++)
+        {
+            os[i] = split_token(&cp, &isep);
+        }
 
-	StrCopyKnown(atextbuf, atext, alen);
-	str = atextbuf;
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), i);
+        StrCopyKnown(atextbuf, atext, alen);
+        str = atextbuf;
+        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), i);
     }
 
-    free_lbuf(atext);
-    free_lbuf(atextbuf);
+    XFREE(atext);
+    XFREE(atextbuf);
 }
 
 /*
@@ -685,79 +754,87 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     int in_string = 1;
     VaChk_Range(2, 4);
     Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
-    atextbuf = alloc_lbuf("fun_foreach");
-    cbuf[0] = alloc_lbuf("fun_foreach.cbuf");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
+    cbuf[0] = XMALLOC(LBUF_SIZE, "cbuf[0]");
     cp = Eat_Spaces(fargs[1]);
     start_token = '\0';
     end_token = '\0';
 
-    if (nfargs > 2) {
-	in_string = 0;
-	start_token = *fargs[2];
+    if (nfargs > 2)
+    {
+        in_string = 0;
+        start_token = *fargs[2];
     }
 
-    if (nfargs > 3) {
-	end_token = *fargs[3];
+    if (nfargs > 3)
+    {
+        end_token = *fargs[3];
     }
 
-    i = -1;			/* first letter in string is 0, not 1 */
-    cbuf[1] = alloc_sbuf("fun_foreach.objplace");
+    i = -1; /* first letter in string is 0, not 1 */
+    cbuf[1] = XMALLOC(SBUF_SIZE, "cbuf[1]");
 
-    while (cp && *cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (!in_string) {
-	    /*
+    while (cp && *cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (!in_string)
+        {
+            /*
 	     * Look for a start token.
 	     */
-	    while (*cp && (*cp != start_token)) {
-		safe_chr(*cp, buff, bufc);
-		cp++;
-		i++;
-	    }
+            while (*cp && (*cp != start_token))
+            {
+                safe_chr(*cp, buff, bufc);
+                cp++;
+                i++;
+            }
 
-	    if (!*cp) {
-		break;
-	    }
+            if (!*cp)
+            {
+                break;
+            }
 
-	    /*
+            /*
 	     * Skip to the next character. Don't copy the start
 	     * token.
 	     */
-	    cp++;
-	    i++;
+            cp++;
+            i++;
 
-	    if (!*cp) {
-		break;
-	    }
+            if (!*cp)
+            {
+                break;
+            }
 
-	    in_string = 1;
-	}
+            in_string = 1;
+        }
 
-	if (*cp == end_token) {
-	    /*
+        if (*cp == end_token)
+        {
+            /*
 	     * We've found an end token. Skip over it. Note that
 	     * it's possible to have a start and end token next
 	     * to one another.
 	     */
-	    cp++;
-	    i++;
-	    in_string = 0;
-	    continue;
-	}
+            cp++;
+            i++;
+            in_string = 0;
+            continue;
+        }
 
-	i++;
-	cbuf[0][0] = *cp++;
-	cbuf[0][1] = '\0';
-	op = cbuf[1];
-	safe_ltos(cbuf[1], &op, i, LBUF_SIZE);
-	StrCopyKnown(atextbuf, atext, alen);
-	str = atextbuf;
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
+        i++;
+        cbuf[0][0] = *cp++;
+        cbuf[0][1] = '\0';
+        op = cbuf[1];
+        safe_ltos(cbuf[1], &op, i, LBUF_SIZE);
+        StrCopyKnown(atextbuf, atext, alen);
+        str = atextbuf;
+        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
     }
 
-    free_lbuf(atextbuf);
-    free_lbuf(atext);
-    free_lbuf(cbuf[0]);
-    free_sbuf(cbuf[1]);
+    XFREE(atextbuf);
+    XFREE(atext);
+    XFREE(cbuf[0]);
+    XFREE(cbuf[1]);
 }
 
 /*
@@ -776,8 +853,9 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     Delim isep, osep;
     oldp = *bufc;
 
-    if ((nfargs == 0) || !fargs[0] || !*fargs[0]) {
-	return;
+    if ((nfargs == 0) || !fargs[0] || !*fargs[0])
+    {
+        return;
     }
 
     VaChk_Only_In_Out(5);
@@ -788,21 +866,22 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     /*
      * Copy our lists and chop them up.
      */
-    list1 = alloc_lbuf("fun_munge.list1");
-    list2 = alloc_lbuf("fun_munge.list2");
+    list1 = XMALLOC(LBUF_SIZE, "list1");
+    list2 = XMALLOC(LBUF_SIZE, "list2");
     strcpy(list1, fargs[1]);
     strcpy(list2, fargs[2]);
     nptrs1 = list2arr(&ptrs1, LBUF_SIZE / 2, list1, &isep);
     nptrs2 = list2arr(&ptrs2, LBUF_SIZE / 2, list2, &isep);
 
-    if (nptrs1 != nptrs2) {
-	safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
-	free_lbuf(atext);
-	free_lbuf(list1);
-	free_lbuf(list2);
-	xfree(ptrs1, "fun_munge.ptrs1");
-	xfree(ptrs2, "fun_munge.ptrs2");
-	return;
+    if (nptrs1 != nptrs2)
+    {
+        safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+        XFREE(atext);
+        XFREE(list1);
+        XFREE(list2);
+        XFREE(ptrs1);
+        XFREE(ptrs2);
+        return;
     }
 
     /*
@@ -810,10 +889,10 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * separator as %1, which makes sorting, etc. easier.
      */
     st[0] = fargs[1];
-    st[1] = alloc_lbuf("fun_munge.sep");
+    st[1] = XMALLOC(LBUF_SIZE, "st[1]");
     bp = st[1];
     print_sep(&isep, st[1], &bp);
-    bp = rlist = alloc_lbuf("fun_munge.rlist");
+    bp = rlist = XMALLOC(LBUF_SIZE, "rlist");
     str = atext;
     exec(rlist, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, st, 2);
     /*
@@ -823,28 +902,32 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
     nresults = list2arr(&results, LBUF_SIZE / 2, rlist, &isep);
 
-    for (i = 0; i < nresults; i++) {
-	for (j = 0; j < nptrs1; j++) {
-	    if (!strcmp(results[i], ptrs1[j])) {
-		if (*bufc != oldp) {
-		    print_sep(&osep, buff, bufc);
-		}
+    for (i = 0; i < nresults; i++)
+    {
+        for (j = 0; j < nptrs1; j++)
+        {
+            if (!strcmp(results[i], ptrs1[j]))
+            {
+                if (*bufc != oldp)
+                {
+                    print_sep(&osep, buff, bufc);
+                }
 
-		safe_str(ptrs2[j], buff, bufc);
-		ptrs1[j][0] = '\0';
-		break;
-	    }
-	}
+                safe_str(ptrs2[j], buff, bufc);
+                ptrs1[j][0] = '\0';
+                break;
+            }
+        }
     }
 
-    free_lbuf(atext);
-    free_lbuf(list1);
-    free_lbuf(list2);
-    free_lbuf(rlist);
-    free_lbuf(st[1]);
-    xfree(ptrs1, "fun_munge.ptrs1");
-    xfree(ptrs2, "fun_munge.ptrs2");
-    xfree(results, "fun_munge.results");
+    XFREE(atext);
+    XFREE(list1);
+    XFREE(list2);
+    XFREE(rlist);
+    XFREE(st[1]);
+    XFREE(ptrs1);
+    XFREE(ptrs2);
+    XFREE(results);
 }
 
 /*
@@ -871,8 +954,9 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * If our third arg is null (empty list), don't bother.
      */
 
-    if (!fargs[2] || !*fargs[2]) {
-	return;
+    if (!fargs[2] || !*fargs[2])
+    {
+        return;
     }
 
     /*
@@ -888,9 +972,10 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     tmp_num = ap->number;
     Parse_Uattr(player, fargs[1], thing2, anum2, ap2);
 
-    if (!ap2) {
-	free_lbuf(atext1);	/* we allocated this, remember? */
-	return;
+    if (!ap2)
+    {
+        XFREE(atext1); /* we allocated this, remember? */
+        return;
     }
 
     /*
@@ -900,78 +985,92 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * text.
      */
 
-    if ((thing1 == thing2) && (tmp_num == ap2->number)) {
-	is_same = 1;
-	is_exact_same = 1;
-    } else {
-	is_exact_same = 0;
-	atext2 = atr_pget(thing2, ap2->number, &aowner2, &aflags2, &alen2);
+    if ((thing1 == thing2) && (tmp_num == ap2->number))
+    {
+        is_same = 1;
+        is_exact_same = 1;
+    }
+    else
+    {
+        is_exact_same = 0;
+        atext2 = atr_pget(thing2, ap2->number, &aowner2, &aflags2, &alen2);
 
-	if (!*atext2 || !See_attr(player, thing2, ap2, aowner2, aflags2)) {
-	    free_lbuf(atext1);
-	    free_lbuf(atext2);
-	    return;
-	}
+        if (!*atext2 || !See_attr(player, thing2, ap2, aowner2, aflags2))
+        {
+            XFREE(atext1);
+            XFREE(atext2);
+            return;
+        }
 
-	if (!strcmp(atext1, atext2)) {
-	    is_same = 1;
-	} else {
-	    is_same = 0;
-	}
+        if (!strcmp(atext1, atext2))
+        {
+            is_same = 1;
+        }
+        else
+        {
+            is_same = 0;
+        }
     }
 
     /*
      * Process the list one element at a time.
      */
     cp = trim_space_sep(fargs[2], &isep);
-    atextbuf = alloc_lbuf("fun_while.eval");
+    atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
 
-    if (!is_same) {
-	condbuf = alloc_lbuf("fun_while.cond");
+    if (!is_same)
+    {
+        condbuf = XMALLOC(LBUF_SIZE, "condbuf");
     }
 
-    objs[1] = alloc_sbuf("fun_while.objplace");
+    objs[1] = XMALLOC(SBUF_SIZE, "objs[1]");
     bb_p = *bufc;
     i = 1;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU()) {
-	if (*bufc != bb_p) {
-	    print_sep(&osep, buff, bufc);
-	}
+    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    {
+        if (*bufc != bb_p)
+        {
+            print_sep(&osep, buff, bufc);
+        }
 
-	objs[0] = split_token(&cp, &isep);
-	op = objs[1];
-	safe_ltos(objs[1], &op, i, LBUF_SIZE);
-	StrCopyKnown(atextbuf, atext1, alen1);
-	str = atextbuf;
-	savep = *bufc;
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        objs[0] = split_token(&cp, &isep);
+        op = objs[1];
+        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        StrCopyKnown(atextbuf, atext1, alen1);
+        str = atextbuf;
+        savep = *bufc;
+        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
 
-	if (!is_same) {
-	    StrCopyKnown(atextbuf, atext2, alen2);
-	    dp = savep = condbuf;
-	    str = atextbuf;
-	    exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
-	}
+        if (!is_same)
+        {
+            StrCopyKnown(atextbuf, atext2, alen2);
+            dp = savep = condbuf;
+            str = atextbuf;
+            exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        }
 
-	if (!strcmp(savep, fargs[3])) {
-	    break;
-	}
+        if (!strcmp(savep, fargs[3]))
+        {
+            break;
+        }
 
-	i++;
+        i++;
     }
 
-    free_lbuf(atext1);
+    XFREE(atext1);
 
-    if (!is_exact_same) {
-	free_lbuf(atext2);
+    if (!is_exact_same)
+    {
+        XFREE(atext2);
     }
 
-    free_lbuf(atextbuf);
+    XFREE(atextbuf);
 
-    if (!is_same) {
-	free_lbuf(condbuf);
+    if (!is_same)
+    {
+        XFREE(condbuf);
     }
 
-    free_sbuf(objs[1]);
+    XFREE(objs[1]);
 }

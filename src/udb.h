@@ -30,7 +30,7 @@
 
 /* Define the number of objects we may be reading/writing to at one time */
 
-#define NUM_OBJPIPES    64
+#define NUM_OBJPIPES 64
 
 /* For MUSH, an int works great as an object ID
  * And attributes are zero terminated strings, so we heave the size out.
@@ -41,15 +41,17 @@ typedef char Attr;
 
 typedef unsigned int Objname;
 
-typedef struct Aname {
+typedef struct Aname
+{
     unsigned int object;
     unsigned int attrnum;
 } Aname;
 
 /* In general, we want binary attributes, so we do this. */
 
-typedef struct Attrib {
-    int attrnum;		/* MUSH specific identifier */
+typedef struct Attrib
+{
+    int attrnum; /* MUSH specific identifier */
     int size;
     char *data;
 } Attrib;
@@ -57,7 +59,8 @@ typedef struct Attrib {
 /* An object is a name, an attribute count, and a vector of attributes */
 /* which Attr's are stowed in a contiguous array pointed at by atrs.   */
 
-typedef struct Obj {
+typedef struct Obj
+{
     Objname name;
     time_t counter;
     int dirty;
@@ -65,7 +68,8 @@ typedef struct Obj {
     Attrib *atrs;
 } Obj;
 
-typedef struct cache {
+typedef struct cache
+{
     void *keydata;
     int keylen;
     void *data;
@@ -77,12 +81,14 @@ typedef struct cache {
     struct cache *nxtfree;
 } Cache;
 
-typedef struct {
+typedef struct
+{
     Cache *head;
     Cache *tail;
 } Chain;
 
-typedef struct {
+typedef struct
+{
     void *dptr;
     int dsize;
 } DBData;
@@ -91,4 +97,4 @@ typedef struct {
 
 #define CACHE_DIRTY 0x00000001
 
-#endif				/* __UDB_H */
+#endif /* __UDB_H */

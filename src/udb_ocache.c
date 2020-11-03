@@ -4,87 +4,112 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */
+#include "typedefs.h"  /* required by mudconf */
+#include "game.h"      /* required by mudconf */
+#include "alloc.h"     /* required by mudconf */
+#include "flags.h"     /* required by mudconf */
+#include "htab.h"      /* required by mudconf */
+#include "ltdl.h"      /* required by mudconf */
+#include "udb.h"       /* required by mudconf */
+#include "udb_defs.h"  /* required by mudconf */
+#include "mushconf.h"  /* required by code */
+#include "db.h"        /* required by externs */
+#include "interface.h" /* required by code */
+#include "externs.h"   /* required by code */
+#include "udb.h"       /* required by code */
+#include "udb_defs.h"  /* required by code */
+#include "ansi.h"      /* required by code */
 
-#include "mushconf.h"		/* required by code */
+#define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
 
-#include "db.h"			/* required by externs */
-#include "interface.h"
-#include "externs.h"		/* required by code */
-#include "udb.h"		/* required by code */
-#include "udb_defs.h"		/* required by code */
-#include "ansi.h"		/* required by code */
+#define DEQUEUE(q, e)              \
+    if (e->nxt == (Cache *)0)      \
+    {                              \
+        if (prv != (Cache *)0)     \
+        {                          \
+            prv->nxt = (Cache *)0; \
+        }                          \
+        q->tail = prv;             \
+    }                              \
+    if (prv == (Cache *)0)         \
+    {                              \
+        q->head = e->nxt;          \
+    }                              \
+    else                           \
+        prv->nxt = e->nxt;
 
-#define NAMECMP(a,b,c,d,e)  ((d == e) && !memcmp(a,b,c))
+#define INSHEAD(q, e)          \
+    if (q->head == (Cache *)0) \
+    {                          \
+        q->tail = e;           \
+        e->nxt = (Cache *)0;   \
+    }                          \
+    else                       \
+    {                          \
+        e->nxt = q->head;      \
+    }                          \
+    q->head = e;
 
-#define DEQUEUE(q, e)   if(e->nxt == (Cache *)0) { \
-                if (prv != (Cache *)0) { \
-                    prv->nxt = (Cache *)0; \
-                } \
-                q->tail = prv; \
-            } \
-            if(prv == (Cache *)0) { \
-                q->head = e->nxt; \
-            } else \
-                prv->nxt = e->nxt;
+#define INSTAIL(q, e)          \
+    if (q->head == (Cache *)0) \
+    {                          \
+        q->head = e;           \
+    }                          \
+    else                       \
+    {                          \
+        q->tail->nxt = e;      \
+    }                          \
+    q->tail = e;               \
+    e->nxt = (Cache *)0;
 
-#define INSHEAD(q, e)   if (q->head == (Cache *)0) { \
-                q->tail = e; \
-                e->nxt = (Cache *)0; \
-            } else { \
-                e->nxt = q->head; \
-            } \
-            q->head = e;
+#define F_DEQUEUE(q, e)                       \
+    if (e->nxtfree == (Cache *)0)             \
+    {                                         \
+        if (e->prvfree != (Cache *)0)         \
+        {                                     \
+            e->prvfree->nxtfree = (Cache *)0; \
+        }                                     \
+        q->tail = e->prvfree;                 \
+    }                                         \
+    if (e->prvfree == (Cache *)0)             \
+    {                                         \
+        q->head = e->nxtfree;                 \
+        if (e->nxtfree)                       \
+            e->nxtfree->prvfree = (Cache *)0; \
+    }                                         \
+    else                                      \
+    {                                         \
+        e->prvfree->nxtfree = e->nxtfree;     \
+        if (e->nxtfree)                       \
+            e->nxtfree->prvfree = e->prvfree; \
+    }
 
-#define INSTAIL(q, e)   if (q->head == (Cache *)0) { \
-                q->head = e; \
-            } else { \
-                q->tail->nxt = e; \
-            } \
-            q->tail = e; \
-            e->nxt = (Cache *)0;
+#define F_INSHEAD(q, e)          \
+    if (q->head == (Cache *)0)   \
+    {                            \
+        q->tail = e;             \
+        e->nxtfree = (Cache *)0; \
+    }                            \
+    else                         \
+    {                            \
+        e->nxtfree = q->head;    \
+        e->nxtfree->prvfree = e; \
+    }                            \
+    e->prvfree = (Cache *)0;     \
+    q->head = e;
 
-#define F_DEQUEUE(q, e) if(e->nxtfree == (Cache *)0) { \
-                if (e->prvfree != (Cache *)0) { \
-                    e->prvfree->nxtfree = (Cache *)0; \
-                } \
-                q->tail = e->prvfree; \
-            } \
-            if(e->prvfree == (Cache *)0) { \
-                q->head = e->nxtfree; \
-                if (e->nxtfree) \
-                    e->nxtfree->prvfree = (Cache *) 0; \
-            } else { \
-                e->prvfree->nxtfree = e->nxtfree; \
-                if (e->nxtfree) \
-                    e->nxtfree->prvfree = e->prvfree; \
-            }
-
-#define F_INSHEAD(q, e) if (q->head == (Cache *)0) { \
-                q->tail = e; \
-                e->nxtfree = (Cache *)0; \
-            } else { \
-                e->nxtfree = q->head; \
-                e->nxtfree->prvfree = e; \
-            } \
-            e->prvfree = (Cache *)0; \
-            q->head = e;
-
-#define F_INSTAIL(q, e) if (q->head == (Cache *)0) { \
-                q->head = e; \
-            } else { \
-                q->tail->nxtfree = e; \
-            } \
-            e->prvfree = q->tail; \
-            q->tail = e; \
-            e->nxtfree = (Cache *)0;
+#define F_INSTAIL(q, e)        \
+    if (q->head == (Cache *)0) \
+    {                          \
+        q->head = e;           \
+    }                          \
+    else                       \
+    {                          \
+        q->tail->nxtfree = e;  \
+    }                          \
+    e->prvfree = q->tail;      \
+    q->tail = e;               \
+    e->nxtfree = (Cache *)0;
 
 Cache *get_free_entry(int);
 
@@ -105,41 +130,44 @@ int cache_frozen = 0;
 /* cache stats */
 
 time_t cs_ltime;
-int cs_writes = 0;		/* total writes */
-int cs_reads = 0;		/* total reads */
-int cs_dbreads = 0;		/* total read-throughs */
-int cs_dbwrites = 0;		/* total write-throughs */
-int cs_dels = 0;		/* total deletes */
-int cs_checks = 0;		/* total checks */
-int cs_rhits = 0;		/* total reads filled from cache */
-int cs_ahits = 0;		/* total reads filled active cache */
-int cs_whits = 0;		/* total writes to dirty cache */
-int cs_fails = 0;		/* attempts to grab nonexistent */
-int cs_syncs = 0;		/* total cache syncs */
-int cs_size = 0;		/* total cache size */
+int cs_writes = 0;   /* total writes */
+int cs_reads = 0;    /* total reads */
+int cs_dbreads = 0;  /* total read-throughs */
+int cs_dbwrites = 0; /* total write-throughs */
+int cs_dels = 0;     /* total deletes */
+int cs_checks = 0;   /* total checks */
+int cs_rhits = 0;    /* total reads filled from cache */
+int cs_ahits = 0;    /* total reads filled active cache */
+int cs_whits = 0;    /* total writes to dirty cache */
+int cs_fails = 0;    /* attempts to grab nonexistent */
+int cs_syncs = 0;    /* total cache syncs */
+int cs_size = 0;     /* total cache size */
 
 int cachehash(void *keydata, int keylen, unsigned int type)
 {
     unsigned int hash = 0;
     char *sp;
 
-    if (keydata == NULL) {
-	return 0;
+    if (keydata == NULL)
+    {
+        return 0;
     }
 
-    for (sp = (char *) keydata; (sp - (char *) keydata) < keylen; sp++) {
-	hash = (hash << 5) + hash + *sp;
+    for (sp = (char *)keydata; (sp - (char *)keydata) < keylen; sp++)
+    {
+        hash = (hash << 5) + hash + *sp;
     }
 
     return ((hash + type) % cwidth);
 }
 
-void cache_repl(Cache * cp, void *new, int len, unsigned int type, unsigned int flags)
+void cache_repl(Cache *cp, void *new, int len, unsigned int type, unsigned int flags)
 {
     cs_size -= cp->datalen;
 
-    if (cp->data != NULL) {
-	free(cp->data);
+    if (cp->data != NULL)
+    {
+        free(cp->data);
     }
 
     cp->data = new;
@@ -155,8 +183,9 @@ int cache_init(int width)
     Chain *sp;
     char *ncmsg = "cache_init: cannot allocate cache: ";
 
-    if (cache_initted || sys_c != (Chain *) 0) {
-	return (0);
+    if (cache_initted || sys_c != (Chain *)0)
+    {
+        return (0);
     }
 
     /*
@@ -164,40 +193,44 @@ int cache_init(int width)
      * * otherwise use default.
      */
 
-    if (width) {
-	cwidth = width;
+    if (width)
+    {
+        cwidth = width;
     }
 
-    sp = sys_c = (Chain *) malloc((unsigned) cwidth * sizeof(Chain));
+    sp = sys_c = (Chain *)malloc((unsigned)cwidth * sizeof(Chain));
 
-    if (sys_c == (Chain *) 0) {
-	warning(ncmsg, (char *) -1, "\n", (char *) 0);
-	return (-1);
+    if (sys_c == (Chain *)0)
+    {
+        warning(ncmsg, (char *)-1, "\n", (char *)0);
+        return (-1);
     }
 
-    freelist = (Chain *) malloc(sizeof(Chain));
+    freelist = (Chain *)malloc(sizeof(Chain));
 
     /*
      * Allocate the initial cache entries
      */
 
-    for (x = 0; x < cwidth; x++, sp++) {
-	sp->head = (Cache *) 0;
-	sp->tail = (Cache *) 0;
+    for (x = 0; x < cwidth; x++, sp++)
+    {
+        sp->head = (Cache *)0;
+        sp->tail = (Cache *)0;
     }
 
     /*
      * Init the LRU freelist
      */
-    freelist->head = (Cache *) 0;
-    freelist->tail = (Cache *) 0;
+    freelist->head = (Cache *)0;
+    freelist->tail = (Cache *)0;
 
     /*
      * Initialize the object pipelines
      */
 
-    for (x = 0; x < NUM_OBJPIPES; x++) {
-	mudstate.objpipes[x] = NULL;
+    for (x = 0; x < NUM_OBJPIPES; x++)
+    {
+        mudstate.objpipes[x] = NULL;
     }
 
     /*
@@ -223,76 +256,83 @@ void cache_reset(void)
      */
     db_lock();
 
-    for (x = 0; x < cwidth; x++, sp++) {
-	sp = &sys_c[x];
+    for (x = 0; x < cwidth; x++, sp++)
+    {
+        sp = &sys_c[x];
 
-	/*
+        /*
 	 * traverse the chain
 	 */
-	for (cp = sp->head; cp != NULL; cp = nxt) {
-	    nxt = cp->nxt;
+        for (cp = sp->head; cp != NULL; cp = nxt)
+        {
+            nxt = cp->nxt;
 
-	    if (cp->flags & CACHE_DIRTY) {
-		if (cp->data == NULL) {
-		    switch (cp->type) {
-		    case DBTYPE_ATTRIBUTE:
-			pipe_del_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object);
-			break;
+            if (cp->flags & CACHE_DIRTY)
+            {
+                if (cp->data == NULL)
+                {
+                    switch (cp->type)
+                    {
+                    case DBTYPE_ATTRIBUTE:
+                        pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                        break;
 
-		    default:
-			key.dptr = cp->keydata;
-			key.dsize = cp->keylen;
-			db_del(key, cp->type);
-		    }
+                    default:
+                        key.dptr = cp->keydata;
+                        key.dsize = cp->keylen;
+                        db_del(key, cp->type);
+                    }
 
-		    cs_dels++;
-		} else {
-		    switch (cp->type) {
-		    case DBTYPE_ATTRIBUTE:
-			pipe_set_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object, (char *) cp->data);
-			break;
+                    cs_dels++;
+                }
+                else
+                {
+                    switch (cp->type)
+                    {
+                    case DBTYPE_ATTRIBUTE:
+                        pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                        break;
 
-		    default:
-			key.dptr = cp->keydata;
-			key.dsize = cp->keylen;
-			data.dptr = cp->data;
-			data.dsize = cp->datalen;
-			db_put(key, data, cp->type);
-		    }
+                    default:
+                        key.dptr = cp->keydata;
+                        key.dsize = cp->keylen;
+                        data.dptr = cp->data;
+                        data.dsize = cp->datalen;
+                        db_put(key, data, cp->type);
+                    }
 
-		    cs_dbwrites++;
-		}
-	    }
+                    cs_dbwrites++;
+                }
+            }
 
-	    cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
-	    free(cp->keydata);
-	    free(cp);
-	}
+            cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
+            free(cp->keydata);
+            free(cp);
+        }
 
-	sp->head = (Cache *) 0;
-	sp->tail = (Cache *) 0;
+        sp->head = (Cache *)0;
+        sp->tail = (Cache *)0;
     }
 
-    freelist->head = (Cache *) 0;
-    freelist->tail = (Cache *) 0;
+    freelist->head = (Cache *)0;
+    freelist->tail = (Cache *)0;
     db_unlock();
     /*
      * Clear the counters after startup, or they'll be skewed
      */
-    cs_writes = 0;		/* total writes */
-    cs_reads = 0;		/* total reads */
-    cs_dbreads = 0;		/* total read-throughs */
-    cs_dbwrites = 0;		/* total write-throughs */
-    cs_dels = 0;		/* total deletes */
-    cs_checks = 0;		/* total checks */
-    cs_rhits = 0;		/* total reads filled from cache */
-    cs_ahits = 0;		/* total reads filled active cache */
-    cs_whits = 0;		/* total writes to dirty cache */
-    cs_fails = 0;		/* attempts to grab nonexistent */
-    cs_syncs = 0;		/* total cache syncs */
-    cs_size = 0;		/* size of cache in bytes */
+    cs_writes = 0;   /* total writes */
+    cs_reads = 0;    /* total reads */
+    cs_dbreads = 0;  /* total read-throughs */
+    cs_dbwrites = 0; /* total write-throughs */
+    cs_dels = 0;     /* total deletes */
+    cs_checks = 0;   /* total checks */
+    cs_rhits = 0;    /* total reads filled from cache */
+    cs_ahits = 0;    /* total reads filled active cache */
+    cs_whits = 0;    /* total writes to dirty cache */
+    cs_fails = 0;    /* attempts to grab nonexistent */
+    cs_syncs = 0;    /* total cache syncs */
+    cs_size = 0;     /* size of cache in bytes */
 }
-
 
 /* list dbrefs of objects in the cache. */
 
@@ -305,63 +345,73 @@ void list_cached_objs(dbref player)
     int *count_array, *size_array;
     char *s;
     aco = maco = asize = msize = oco = moco = 0;
-    count_array = (int *) xcalloc(mudstate.db_top, sizeof(int), "list_cached_objs.count");
-    size_array = (int *) xcalloc(mudstate.db_top, sizeof(int), "list_cached_objs.size");
+    count_array = (int *)XCALLOC(mudstate.db_top, sizeof(int), "count_array");
+    size_array = (int *)XCALLOC(mudstate.db_top, sizeof(int), "size_array");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
-	for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	    if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && !(cp->flags & CACHE_DIRTY)) {
-		aco++;
-		asize += cp->datalen;
-		count_array[((Aname *) cp->keydata)->object] += 1;
-		size_array[((Aname *) cp->keydata)->object] += cp->datalen;
-	    }
-	}
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
+    {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt)
+        {
+            if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && !(cp->flags & CACHE_DIRTY))
+            {
+                aco++;
+                asize += cp->datalen;
+                count_array[((Aname *)cp->keydata)->object] += 1;
+                size_array[((Aname *)cp->keydata)->object] += cp->datalen;
+            }
+        }
     }
 
     raw_notify(player, NULL, "Active Cache:");
     raw_notify(player, NULL, "Name                            Dbref    Attrs      Size");
     raw_notify(player, NULL, "========================================================");
 
-    for (x = 0; x < mudstate.db_top; x++) {
-	if (count_array[x] > 0) {
-	    s = strip_ansi(Name(x));
-	    raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
-	    free_lbuf(s);
-	    oco++;
-	    count_array[x] = 0;
-	    size_array[x] = 0;
-	}
+    for (x = 0; x < mudstate.db_top; x++)
+    {
+        if (count_array[x] > 0)
+        {
+            s = strip_ansi(Name(x));
+            raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
+            XFREE(s);
+            oco++;
+            count_array[x] = 0;
+            size_array[x] = 0;
+        }
     }
 
     raw_notify(player, NULL, "\nModified Active Cache:");
     raw_notify(player, NULL, "Name                            Dbref    Attrs      Size");
     raw_notify(player, NULL, "========================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
-	for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	    if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && (cp->flags & CACHE_DIRTY)) {
-		maco++;
-		msize += cp->datalen;
-		count_array[((Aname *) cp->keydata)->object] += 1;
-		size_array[((Aname *) cp->keydata)->object] += cp->datalen;
-	    }
-	}
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
+    {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt)
+        {
+            if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && (cp->flags & CACHE_DIRTY))
+            {
+                maco++;
+                msize += cp->datalen;
+                count_array[((Aname *)cp->keydata)->object] += 1;
+                size_array[((Aname *)cp->keydata)->object] += cp->datalen;
+            }
+        }
     }
 
-    for (x = 0; x < mudstate.db_top; x++) {
-	if (count_array[x] > 0) {
-	    s = strip_ansi(Name(x));
-	    raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
-	    free_lbuf(s);
-	    moco++;
-	}
+    for (x = 0; x < mudstate.db_top; x++)
+    {
+        if (count_array[x] > 0)
+        {
+            s = strip_ansi(Name(x));
+            raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
+            XFREE(s);
+            moco++;
+        }
     }
 
     raw_notify(player, "\nTotals: active %d (%d attrs), modified active %d (%d attrs), total attrs %d", oco, aco, moco, maco, aco + maco);
     raw_notify(player, "Size: active %d bytes, modified active %d bytes", asize, msize);
-    xfree(count_array, "list_cached_objs.count");
-    xfree(size_array, "list_cached_objs.size");
+    XFREE(count_array);
+    XFREE(size_array);
 }
 
 void list_cached_attrs(dbref player)
@@ -376,30 +426,36 @@ void list_cached_attrs(dbref player)
     raw_notify(player, NULL, "Name                    Attribute                       Dbref   Size");
     raw_notify(player, NULL, "====================================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
-	for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	    if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && !(cp->flags & CACHE_DIRTY)) {
-		aco++;
-		asize += cp->datalen;
-		atr = atr_num(((Aname *) cp->keydata)->attrnum);
-		raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *) cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *) cp->keydata)->object, cp->datalen);
-	    }
-	}
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
+    {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt)
+        {
+            if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && !(cp->flags & CACHE_DIRTY))
+            {
+                aco++;
+                asize += cp->datalen;
+                atr = atr_num(((Aname *)cp->keydata)->attrnum);
+                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *)cp->keydata)->object, cp->datalen);
+            }
+        }
     }
 
     raw_notify(player, NULL, "\nModified Active Cache:");
     raw_notify(player, NULL, "Name                    Attribute                       Dbref   Size");
     raw_notify(player, NULL, "====================================================================");
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
-	for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	    if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && (cp->flags & CACHE_DIRTY)) {
-		maco++;
-		msize += cp->datalen;
-		atr = atr_num(((Aname *) cp->keydata)->attrnum);
-		raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *) cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *) cp->keydata)->object, cp->datalen);
-	    }
-	}
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
+    {
+        for (cp = sp->head; cp != NULL; cp = cp->nxt)
+        {
+            if (cp->data && (cp->type == DBTYPE_ATTRIBUTE) && (cp->flags & CACHE_DIRTY))
+            {
+                maco++;
+                msize += cp->datalen;
+                atr = atr_num(((Aname *)cp->keydata)->attrnum);
+                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *)cp->keydata)->object, cp->datalen);
+            }
+        }
     }
 
     raw_notify(player, "\nTotals: active %d, modified active %d, total attributes %d", aco, maco, aco + maco);
@@ -420,10 +476,11 @@ DBData cache_get(DBData key, unsigned int type)
     char *cdata;
 #endif
 
-    if (!key.dptr || !cache_initted) {
-	data.dptr = NULL;
-	data.dsize = 0;
-	return data;
+    if (!key.dptr || !cache_initted)
+    {
+        data.dptr = NULL;
+        data.dsize = 0;
+        return data;
     }
 
     /*
@@ -434,36 +491,41 @@ DBData cache_get(DBData key, unsigned int type)
      */
 #ifndef MEMORY_BASED
 
-    if (!mudstate.standalone && !mudstate.dumping) {
-	cs_reads++;
+    if (!mudstate.standalone && !mudstate.dumping)
+    {
+        cs_reads++;
     }
 #endif
 #ifdef MEMORY_BASED
 
-    if (type == DBTYPE_ATTRIBUTE) {
-	goto skipcacheget;
+    if (type == DBTYPE_ATTRIBUTE)
+    {
+        goto skipcacheget;
     }
 #endif
     hv = cachehash(key.dptr, key.dsize, type);
     sp = &sys_c[hv];
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
-	    if (!mudstate.standalone && !mudstate.dumping) {
-		cs_rhits++;
-		cs_ahits++;
-	    }
+    for (cp = sp->head; cp != NULL; cp = cp->nxt)
+    {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        {
+            if (!mudstate.standalone && !mudstate.dumping)
+            {
+                cs_rhits++;
+                cs_ahits++;
+            }
 
-	    F_DEQUEUE(freelist, cp);
-	    F_INSTAIL(freelist, cp);
-	    data.dptr = cp->data;
-	    data.dsize = cp->datalen;
-	    return data;
-	}
+            F_DEQUEUE(freelist, cp);
+            F_INSTAIL(freelist, cp);
+            data.dptr = cp->data;
+            data.dsize = cp->datalen;
+            return data;
+        }
     }
 
 #ifdef MEMORY_BASED
-  skipcacheget:
+skipcacheget:
 #endif
 
     /*
@@ -474,64 +536,76 @@ DBData cache_get(DBData key, unsigned int type)
      * Grab the data from wherever
      */
 
-    switch (type) {
+    switch (type)
+    {
     case DBTYPE_ATTRIBUTE:
 #ifdef MEMORY_BASED
-	cdata = obj_get_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext));
+        cdata = obj_get_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
 
-	if (cdata) {
-	    data.dptr = cdata;
-	    data.dsize = strlen(cdata) + 1;
-	    return data;
-	}
+        if (cdata)
+        {
+            data.dptr = cdata;
+            data.dsize = strlen(cdata) + 1;
+            return data;
+        }
 #endif
-	data.dptr = (void *) pipe_get_attrib(((Aname *) key.dptr)->attrnum, ((Aname *) key.dptr)->object);
+        data.dptr = (void *)pipe_get_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
 
-	if (data.dptr == NULL) {
-	    data.dsize = 0;
-	} else {
-	    data.dsize = strlen(data.dptr) + 1;
-	}
+        if (data.dptr == NULL)
+        {
+            data.dsize = 0;
+        }
+        else
+        {
+            data.dsize = strlen(data.dptr) + 1;
+        }
 
 #ifdef MEMORY_BASED
 
-	if (!mudstate.standalone && !mudstate.dumping) {
-	    cs_dbreads++;
-	}
+        if (!mudstate.standalone && !mudstate.dumping)
+        {
+            cs_dbreads++;
+        }
 
-	if (data.dptr) {
-	    data.dsize = strlen(data.dptr) + 1;
-	    cdata = xmalloc(data.dsize, "cache_get.membased");
-	    memcpy((void *) cdata, (void *) data.dptr, data.dsize);
-	    obj_set_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext), cdata);
-	    data.dptr = cdata;
-	    return data;
-	} else {
-	    data.dptr = NULL;
-	    data.dsize = 0;
-	    return data;
-	}
+        if (data.dptr)
+        {
+            data.dsize = strlen(data.dptr) + 1;
+            cdata = XMALLOC(data.dsize, "cdata");
+            memcpy((void *)cdata, (void *)data.dptr, data.dsize);
+            obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
+            data.dptr = cdata;
+            return data;
+        }
+        else
+        {
+            data.dptr = NULL;
+            data.dsize = 0;
+            return data;
+        }
 
 #endif
-	break;
+        break;
 
     default:
-	data = db_get(key, type);
+        data = db_get(key, type);
     }
 
-    if (!mudstate.standalone && !mudstate.dumping) {
-	cs_dbreads++;
+    if (!mudstate.standalone && !mudstate.dumping)
+    {
+        cs_dbreads++;
     }
 
-    if (data.dptr == NULL) {
-	return data;
+    if (data.dptr == NULL)
+    {
+        return data;
     }
 
-    if ((cp = get_free_entry(data.dsize)) == NULL) {
-	return data;
+    if ((cp = get_free_entry(data.dsize)) == NULL)
+    {
+        return data;
     }
 
-    cp->keydata = (void *) malloc(key.dsize);
+    cp->keydata = (void *)malloc(key.dsize);
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
@@ -547,24 +621,27 @@ DBData cache_get(DBData key, unsigned int type)
      */
     cs_size += cp->datalen;
 
-    if (mudstate.dumping) {
-	/*
+    if (mudstate.dumping)
+    {
+        /*
 	 * Link at head of chain
 	 */
-	INSHEAD(sp, cp);
-	/*
+        INSHEAD(sp, cp);
+        /*
 	 * Link at head of LRU freelist
 	 */
-	F_INSHEAD(freelist, cp);
-    } else {
-	/*
+        F_INSHEAD(freelist, cp);
+    }
+    else
+    {
+        /*
 	 * Link at tail of chain
 	 */
-	INSTAIL(sp, cp);
-	/*
+        INSTAIL(sp, cp);
+        /*
 	 * Link at tail of LRU freelist
 	 */
-	F_INSTAIL(freelist, cp);
+        F_INSTAIL(freelist, cp);
     }
 
     return data;
@@ -601,8 +678,9 @@ int cache_put(DBData key, DBData data, unsigned int type)
     char *cdata;
 #endif
 
-    if (!key.dptr || !data.dptr || !cache_initted) {
-	return (1);
+    if (!key.dptr || !data.dptr || !cache_initted)
+    {
+        return (1);
     }
 
     /*
@@ -610,49 +688,55 @@ int cache_put(DBData key, DBData data, unsigned int type)
      */
     CALL_ALL_MODULES(cache_put_notify, (key, type))
 #ifndef MEMORY_BASED
-	if (mudstate.standalone) {
+    if (mudstate.standalone)
+    {
 #endif
 
-	/*
+        /*
 	 * Bypass the cache when standalone or memory based for writes
 	 */
-	if (data.dptr == NULL) {
-	    switch (type) {
-	    case DBTYPE_ATTRIBUTE:
-		pipe_del_attrib(((Aname *) key.dptr)->attrnum, ((Aname *) key.dptr)->object);
+        if (data.dptr == NULL)
+        {
+            switch (type)
+            {
+            case DBTYPE_ATTRIBUTE:
+                pipe_del_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
 #ifdef MEMORY_BASED
-		obj_del_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext));
+                obj_del_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
 #endif
-		break;
+                break;
 
-	    default:
-		db_lock();
-		db_del(key, type);
-		db_unlock();
-	    }
-	} else {
-	    switch (type) {
-	    case DBTYPE_ATTRIBUTE:
-		pipe_set_attrib(((Aname *) key.dptr)->attrnum, ((Aname *) key.dptr)->object, (char *) data.dptr);
+            default:
+                db_lock();
+                db_del(key, type);
+                db_unlock();
+            }
+        }
+        else
+        {
+            switch (type)
+            {
+            case DBTYPE_ATTRIBUTE:
+                pipe_set_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object, (char *)data.dptr);
 #ifdef MEMORY_BASED
-		cdata = xmalloc(data.dsize, "cache_get.membased");
-		memcpy((void *) cdata, (void *) data.dptr, data.dsize);
-		obj_set_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext), cdata);
+                cdata = XMALLOC(data.dsize, "cdata");
+                memcpy((void *)cdata, (void *)data.dptr, data.dsize);
+                obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
 #endif
-		/*
+                /*
 		 * Don't forget to free data.dptr when standalone
 		 */
-		xfree(data.dptr, "cache_put");
-		break;
+                XFREE(data.dptr);
+                break;
 
-	    default:
-		db_lock();
-		db_put(key, data, type);
-		db_unlock();
-	    }
-	}
+            default:
+                db_lock();
+                db_put(key, data, type);
+                db_unlock();
+            }
+        }
 
-	return (0);
+        return (0);
 #ifndef MEMORY_BASED
     }
 #endif
@@ -667,31 +751,36 @@ int cache_put(DBData key, DBData data, unsigned int type)
      * step one, search chain, and if we find the obj, dirty it
      */
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
-	    if (!mudstate.dumping) {
-		cs_whits++;
-	    }
+    for (cp = sp->head; cp != NULL; cp = cp->nxt)
+    {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        {
+            if (!mudstate.dumping)
+            {
+                cs_whits++;
+            }
 
-	    if (cp->data != data.dptr) {
-		cache_repl(cp, data.dptr, data.dsize, type, CACHE_DIRTY);
-	    }
+            if (cp->data != data.dptr)
+            {
+                cache_repl(cp, data.dptr, data.dsize, type, CACHE_DIRTY);
+            }
 
-	    F_DEQUEUE(freelist, cp);
-	    F_INSTAIL(freelist, cp);
-	    return (0);
-	}
+            F_DEQUEUE(freelist, cp);
+            F_INSTAIL(freelist, cp);
+            return (0);
+        }
     }
 
     /*
      * Add a new entry to the cache
      */
 
-    if ((cp = get_free_entry(data.dsize)) == NULL) {
-	return (1);
+    if ((cp = get_free_entry(data.dsize)) == NULL)
+    {
+        return (1);
     }
 
-    cp->keydata = (void *) malloc(key.dsize);
+    cp->keydata = (void *)malloc(key.dsize);
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
@@ -725,91 +814,103 @@ Cache *get_free_entry(int atrsize)
      * * start flushing
      */
 
-    while ((cs_size + atrsize) > (mudconf.cache_size ? mudconf.cache_size : CACHE_SIZE)) {
-	cp = freelist->head;
+    while ((cs_size + atrsize) > (mudconf.cache_size ? mudconf.cache_size : CACHE_SIZE))
+    {
+        cp = freelist->head;
 
-	if (cp) {
-	    F_DEQUEUE(freelist, cp);
-	}
+        if (cp)
+        {
+            F_DEQUEUE(freelist, cp);
+        }
 
-	if (cp && (cp->flags & CACHE_DIRTY)) {
-	    /*
+        if (cp && (cp->flags & CACHE_DIRTY))
+        {
+            /*
 	     * Flush the modified attributes to disk
 	     */
-	    if (cp->data == NULL) {
-		switch (cp->type) {
-		case DBTYPE_ATTRIBUTE:
-		    pipe_del_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object);
-		    break;
+            if (cp->data == NULL)
+            {
+                switch (cp->type)
+                {
+                case DBTYPE_ATTRIBUTE:
+                    pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                    break;
 
-		default:
-		    key.dptr = cp->keydata;
-		    key.dsize = cp->keylen;
-		    db_lock();
-		    db_del(key, cp->type);
-		    db_unlock();
-		}
+                default:
+                    key.dptr = cp->keydata;
+                    key.dsize = cp->keylen;
+                    db_lock();
+                    db_del(key, cp->type);
+                    db_unlock();
+                }
 
-		cs_dels++;
-	    } else {
-		switch (cp->type) {
-		case DBTYPE_ATTRIBUTE:
-		    pipe_set_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object, (char *) cp->data);
-		    break;
+                cs_dels++;
+            }
+            else
+            {
+                switch (cp->type)
+                {
+                case DBTYPE_ATTRIBUTE:
+                    pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                    break;
 
-		default:
-		    key.dptr = cp->keydata;
-		    key.dsize = cp->keylen;
-		    data.dptr = cp->data;
-		    data.dsize = cp->datalen;
-		    db_lock();
-		    db_put(key, data, cp->type);
-		    db_unlock();
-		}
+                default:
+                    key.dptr = cp->keydata;
+                    key.dsize = cp->keylen;
+                    data.dptr = cp->data;
+                    data.dsize = cp->datalen;
+                    db_lock();
+                    db_put(key, data, cp->type);
+                    db_unlock();
+                }
 
-		cs_dbwrites++;
-	    }
-	}
+                cs_dbwrites++;
+            }
+        }
 
-	/*
+        /*
 	 * Take the attribute off of its chain and nuke the
 	 * attribute's memory
 	 */
 
-	if (cp) {
-	    /*
+        if (cp)
+        {
+            /*
 	     * Find the cache entry inside the real cache
 	     */
-	    hv = cachehash(cp->keydata, cp->keylen, cp->type);
-	    sp = &sys_c[hv];
-	    prv = NULL;
+            hv = cachehash(cp->keydata, cp->keylen, cp->type);
+            sp = &sys_c[hv];
+            prv = NULL;
 
-	    for (p = sp->head; p != NULL; p = p->nxt) {
-		if (cp == p) {
-		    break;
-		}
+            for (p = sp->head; p != NULL; p = p->nxt)
+            {
+                if (cp == p)
+                {
+                    break;
+                }
 
-		prv = p;
-	    }
+                prv = p;
+            }
 
-	    /*
+            /*
 	     * Remove the cache entry
 	     */
-	    DEQUEUE(sp, cp);
-	    cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
-	    free(cp->keydata);
-	    free(cp);
-	}
+            DEQUEUE(sp, cp);
+            cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
+            free(cp->keydata);
+            free(cp);
+        }
 
-	cp = NULL;
+        cp = NULL;
     }
 
     /*
      * No valid cache entries to flush, allocate a new one
      */
 
-    if ((cp = (Cache *) malloc(sizeof(Cache))) == NULL) {
-	fatal("cache get_free_entry: malloc failed", (char *) -1, (char *) 0);
+    if ((cp = (Cache *)malloc(sizeof(Cache))) == NULL)
+    {
+        fatal("cache get_free_entry: malloc failed", (char *)-1, (char *)0);
     }
 
     cp->keydata = NULL;
@@ -821,7 +922,7 @@ Cache *get_free_entry(int atrsize)
     return (cp);
 }
 
-int cache_write(Cache * cp)
+int cache_write(Cache *cp)
 {
     DBData key, data;
 
@@ -829,44 +930,51 @@ int cache_write(Cache * cp)
      * Write a single cache chain to disk
      */
 
-    while (cp != NULL) {
-	if (!(cp->flags & CACHE_DIRTY)) {
-	    cp = cp->nxt;
-	    continue;
-	}
+    while (cp != NULL)
+    {
+        if (!(cp->flags & CACHE_DIRTY))
+        {
+            cp = cp->nxt;
+            continue;
+        }
 
-	if (cp->data == NULL) {
-	    switch (cp->type) {
-	    case DBTYPE_ATTRIBUTE:
-		pipe_del_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object);
-		break;
+        if (cp->data == NULL)
+        {
+            switch (cp->type)
+            {
+            case DBTYPE_ATTRIBUTE:
+                pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                break;
 
-	    default:
-		key.dptr = cp->keydata;
-		key.dsize = cp->keylen;
-		db_del(key, cp->type);
-	    }
+            default:
+                key.dptr = cp->keydata;
+                key.dsize = cp->keylen;
+                db_del(key, cp->type);
+            }
 
-	    cs_dels++;
-	} else {
-	    switch (cp->type) {
-	    case DBTYPE_ATTRIBUTE:
-		pipe_set_attrib(((Aname *) cp->keydata)->attrnum, ((Aname *) cp->keydata)->object, (char *) cp->data);
-		break;
+            cs_dels++;
+        }
+        else
+        {
+            switch (cp->type)
+            {
+            case DBTYPE_ATTRIBUTE:
+                pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                break;
 
-	    default:
-		key.dptr = cp->keydata;
-		key.dsize = cp->keylen;
-		data.dptr = cp->data;
-		data.dsize = cp->datalen;
-		db_put(key, data, cp->type);
-	    }
+            default:
+                key.dptr = cp->keydata;
+                key.dsize = cp->keylen;
+                data.dptr = cp->data;
+                data.dsize = cp->datalen;
+                db_put(key, data, cp->type);
+            }
 
-	    cs_dbwrites++;
-	}
+            cs_dbwrites++;
+        }
 
-	cp->flags = 0;
-	cp = cp->nxt;
+        cp->flags = 0;
+        cp = cp->nxt;
     }
 
     return (0);
@@ -878,20 +986,23 @@ int cache_sync(void)
     Chain *sp;
     cs_syncs++;
 
-    if (!cache_initted) {
-	return (1);
+    if (!cache_initted)
+    {
+        return (1);
     }
 
-    if (cache_frozen) {
-	return (0);
+    if (cache_frozen)
+    {
+        return (0);
     }
 
-    if (mudstate.standalone || mudstate.restarting) {
-	/*
+    if (mudstate.standalone || mudstate.restarting)
+    {
+        /*
 	 * If we're restarting or standalone, having DBM wait for
 	 * * each write is a performance no-no; run asynchronously
 	 */
-	dddb_setsync(0);
+        dddb_setsync(0);
     }
 
     /*
@@ -899,10 +1010,12 @@ int cache_sync(void)
      */
     db_lock();
 
-    for (x = 0, sp = sys_c; x < cwidth; x++, sp++) {
-	if (cache_write(sp->head)) {
-	    return (1);
-	}
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
+    {
+        if (cache_write(sp->head))
+        {
+            return (1);
+        }
     }
 
     /*
@@ -914,8 +1027,9 @@ int cache_sync(void)
      */
     db_unlock();
 
-    if (mudstate.standalone || mudstate.restarting) {
-	dddb_setsync(1);
+    if (mudstate.standalone || mudstate.restarting)
+    {
+        dddb_setsync(1);
     }
 
     return (0);
@@ -927,8 +1041,9 @@ void cache_del(DBData key, unsigned int type)
     Chain *sp;
     int hv = 0;
 
-    if (!key.dptr || !cache_initted) {
-	return;
+    if (!key.dptr || !cache_initted)
+    {
+        return;
     }
 
     /*
@@ -936,10 +1051,11 @@ void cache_del(DBData key, unsigned int type)
      */
     CALL_ALL_MODULES(cache_del_notify, (key, type))
 #ifdef MEMORY_BASED
-	if (type == DBTYPE_ATTRIBUTE) {
-	pipe_del_attrib(((Aname *) key.dptr)->attrnum, ((Aname *) key.dptr)->object);
-	obj_del_attrib(((Aname *) key.dptr)->attrnum, &(db[((Aname *) key.dptr)->object].attrtext));
-	return;
+    if (type == DBTYPE_ATTRIBUTE)
+    {
+        pipe_del_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
+        obj_del_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
+        return;
     }
 #endif
     cs_dels++;
@@ -950,20 +1066,23 @@ void cache_del(DBData key, unsigned int type)
      * mark dead in cache
      */
 
-    for (cp = sp->head; cp != NULL; cp = cp->nxt) {
-	if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type)) {
-	    F_DEQUEUE(freelist, cp);
-	    F_INSHEAD(freelist, cp);
-	    cache_repl(cp, NULL, 0, type, CACHE_DIRTY);
-	    return;
-	}
+    for (cp = sp->head; cp != NULL; cp = cp->nxt)
+    {
+        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        {
+            F_DEQUEUE(freelist, cp);
+            F_INSHEAD(freelist, cp);
+            cache_repl(cp, NULL, 0, type, CACHE_DIRTY);
+            return;
+        }
     }
 
-    if ((cp = get_free_entry(0)) == NULL) {
-	return;
+    if ((cp = get_free_entry(0)) == NULL)
+    {
+        return;
     }
 
-    cp->keydata = (void *) malloc(key.dsize);
+    cp->keydata = (void *)malloc(key.dsize);
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->type = type;

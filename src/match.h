@@ -6,15 +6,16 @@
 #define __MATCH_H
 
 typedef struct match_state MSTATE;
-struct match_state {
-    int confidence;		/* How confident are we?  CON_xx */
-    int count;			/* # of matches at this confidence */
-    int pref_type;		/* The preferred object type */
-    int check_keys;		/* Should we test locks? */
-    dbref absolute_form;	/* If #num, then the number */
-    dbref match;		/* What I've found so far */
-    dbref player;		/* Who is performing match */
-    char *string;		/* The string to search for */
+struct match_state
+{
+    int confidence;      /* How confident are we?  CON_xx */
+    int count;           /* # of matches at this confidence */
+    int pref_type;       /* The preferred object type */
+    int check_keys;      /* Should we test locks? */
+    dbref absolute_form; /* If #num, then the number */
+    dbref match;         /* What I've found so far */
+    dbref player;        /* Who is performing match */
+    char *string;        /* The string to search for */
 };
 
 /* Match functions
@@ -30,9 +31,9 @@ struct match_state {
 #define AMBIGUOUS_MESSAGE "I don't know which one you mean!"
 #define NOPERM_MESSAGE "Permission denied."
 
-#define MAT_NO_EXITS        1	/* Don't check for exits */
-#define MAT_EXIT_PARENTS    2	/* Check for exits in parents */
-#define MAT_NUMERIC     4	/* Check for un-#ified dbrefs */
-#define MAT_HOME        8	/* Check for 'home' */
+#define MAT_NO_EXITS 1     /* Don't check for exits */
+#define MAT_EXIT_PARENTS 2 /* Check for exits in parents */
+#define MAT_NUMERIC 4      /* Check for un-#ified dbrefs */
+#define MAT_HOME 8         /* Check for 'home' */
 
-#endif				/* __MATCH_H */
+#endif /* __MATCH_H */

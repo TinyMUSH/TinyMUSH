@@ -3,7 +3,8 @@
 #ifndef __PLAYER_C_H
 #define __PLAYER_C_H
 
-typedef struct player_cache {
+typedef struct player_cache
+{
     dbref player;
     int money;
     int queue;
@@ -12,4 +13,4 @@ typedef struct player_cache {
     struct player_cache *next;
 } PCACHE;
 
-#endif				/* __PLAYER_C_H */
+#endif /* __PLAYER_C_H */

@@ -4,26 +4,24 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"		/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"		/* required by mudconf */
-
-#include "mushconf.h"		/* required by code */
-
-#include "db.h"			/* required by externs */
-#include "interface.h"
-#include "externs.h"		/* required by code */
-
-#include "functions.h"		/* required by code */
-#include "match.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "ansi.h"		/* required by code */
+#include "typedefs.h"  /* required by mudconf */
+#include "game.h"	   /* required by mudconf */
+#include "alloc.h"	   /* required by mudconf */
+#include "flags.h"	   /* required by mudconf */
+#include "htab.h"	   /* required by mudconf */
+#include "ltdl.h"	   /* required by mudconf */
+#include "udb.h"	   /* required by mudconf */
+#include "udb_defs.h"  /* required by mudconf */
+#include "mushconf.h"  /* required by code */
+#include "db.h"		   /* required by externs */
+#include "interface.h" /* required by code */
+#include "externs.h"   /* required by code */
+#include "functions.h" /* required by code */
+#include "match.h"	   /* required by code */
+#include "attrs.h"	   /* required by code */
+#include "powers.h"	   /* required by code */
+#include "ansi.h"	   /* required by code */
+#include "stringutil.h" /* required by code */
 
 long genrand_int31(void);
 
@@ -32,25 +30,29 @@ long genrand_int31(void);
  * Trim off leading and trailing spaces if the separator char is a space
  */
 
-char *trim_space_sep(char *str, const Delim * sep)
+char *trim_space_sep(char *str, const Delim *sep)
 {
-    char *p;
+	char *p;
 
-    if ((sep->len > 1) || (sep->str[0] != ' ') || !*str) {
+	if ((sep->len > 1) || (sep->str[0] != ' ') || !*str)
+	{
+		return str;
+	}
+
+	while (*str == ' ')
+	{
+		str++;
+	}
+
+	for (p = str; *p; p++)
+		;
+
+	for (p--; *p == ' ' && p > str; p--)
+		;
+
+	p++;
+	*p = '\0';
 	return str;
-    }
-
-    while (*str == ' ') {
-	str++;
-    }
-
-    for (p = str; *p; p++);
-
-    for (p--; *p == ' ' && p > str; p--);
-
-    p++;
-    *p = '\0';
-    return str;
 }
 
 /*
@@ -61,135 +63,170 @@ char *trim_space_sep(char *str, const Delim * sep)
  * tell what color it is.
  */
 
-char *next_token(char *str, const Delim * sep)
+char *next_token(char *str, const Delim *sep)
 {
-    char *p;
+	char *p;
 
-    if (sep->len == 1) {
-	while (*str == ESC_CHAR) {
-	    skip_esccode(&str);
-	}
-
-	while (*str && (*str != sep->str[0])) {
-	    ++str;
-
-	    while (*str == ESC_CHAR) {
-		skip_esccode(&str);
-	    }
-	}
-
-	if (!*str) {
-	    return NULL;
-	}
-
-	++str;
-
-	if (sep->str[0] == ' ') {
-	    while (*str == ' ') {
-		++str;
-	    }
-	}
-    } else {
-	if ((p = strstr(str, sep->str)) == NULL) {
-	    return NULL;
-	}
-
-	str = p + sep->len;
-    }
-
-    return str;
-}
-
-char *split_token(char **sp, const Delim * sep)
-{
-    char *str, *save, *p;
-    save = str = *sp;
-
-    if (!str) {
-	*sp = NULL;
-	return NULL;
-    }
-
-    if (sep->len == 1) {
-	while (*str == ESC_CHAR) {
-	    skip_esccode(&str);
-	}
-
-	while (*str && (*str != sep->str[0])) {
-	    ++str;
-
-	    while (*str == ESC_CHAR) {
-		skip_esccode(&str);
-	    }
-	}
-
-	if (*str) {
-	    *str++ = '\0';
-
-	    if (sep->str[0] == ' ') {
-		while (*str == ' ') {
-		    ++str;
+	if (sep->len == 1)
+	{
+		while (*str == ESC_CHAR)
+		{
+			skip_esccode(&str);
 		}
-	    }
-	} else {
-	    str = NULL;
-	}
-    } else {
-	if ((p = strstr(str, sep->str)) != NULL) {
-	    *p = '\0';
-	    str = p + sep->len;
-	} else {
-	    str = NULL;
-	}
-    }
 
-    *sp = str;
-    return save;
+		while (*str && (*str != sep->str[0]))
+		{
+			++str;
+
+			while (*str == ESC_CHAR)
+			{
+				skip_esccode(&str);
+			}
+		}
+
+		if (!*str)
+		{
+			return NULL;
+		}
+
+		++str;
+
+		if (sep->str[0] == ' ')
+		{
+			while (*str == ' ')
+			{
+				++str;
+			}
+		}
+	}
+	else
+	{
+		if ((p = strstr(str, sep->str)) == NULL)
+		{
+			return NULL;
+		}
+
+		str = p + sep->len;
+	}
+
+	return str;
 }
 
-char *next_token_ansi(char *str, const Delim * sep, int *ansi_state_ptr)
+char *split_token(char **sp, const Delim *sep)
 {
-    int ansi_state = *ansi_state_ptr;
-    char *p;
+	char *str, *save, *p;
+	save = str = *sp;
 
-    if (sep->len == 1) {
-	while (*str == ESC_CHAR) {
-	    track_esccode(&str, &ansi_state);
+	if (!str)
+	{
+		*sp = NULL;
+		return NULL;
 	}
 
-	while (*str && (*str != sep->str[0])) {
-	    ++str;
+	if (sep->len == 1)
+	{
+		while (*str == ESC_CHAR)
+		{
+			skip_esccode(&str);
+		}
 
-	    while (*str == ESC_CHAR) {
-		track_esccode(&str, &ansi_state);
-	    }
+		while (*str && (*str != sep->str[0]))
+		{
+			++str;
+
+			while (*str == ESC_CHAR)
+			{
+				skip_esccode(&str);
+			}
+		}
+
+		if (*str)
+		{
+			*str++ = '\0';
+
+			if (sep->str[0] == ' ')
+			{
+				while (*str == ' ')
+				{
+					++str;
+				}
+			}
+		}
+		else
+		{
+			str = NULL;
+		}
+	}
+	else
+	{
+		if ((p = strstr(str, sep->str)) != NULL)
+		{
+			*p = '\0';
+			str = p + sep->len;
+		}
+		else
+		{
+			str = NULL;
+		}
 	}
 
-	if (!*str) {
-	    *ansi_state_ptr = ansi_state;
-	    return NULL;
-	}
+	*sp = str;
+	return save;
+}
 
-	++str;
+char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
+{
+	int ansi_state = *ansi_state_ptr;
+	char *p;
 
-	if (sep->str[0] == ' ') {
-	    while (*str == ' ') {
+	if (sep->len == 1)
+	{
+		while (*str == ESC_CHAR)
+		{
+			track_esccode(&str, &ansi_state);
+		}
+
+		while (*str && (*str != sep->str[0]))
+		{
+			++str;
+
+			while (*str == ESC_CHAR)
+			{
+				track_esccode(&str, &ansi_state);
+			}
+		}
+
+		if (!*str)
+		{
+			*ansi_state_ptr = ansi_state;
+			return NULL;
+		}
+
 		++str;
-	    }
+
+		if (sep->str[0] == ' ')
+		{
+			while (*str == ' ')
+			{
+				++str;
+			}
+		}
 	}
-    } else {
-	/*
+	else
+	{
+		/*
 	 * ansi tracking not supported yet in multichar delims
 	 */
-	if ((p = strstr(str, sep->str)) == NULL) {
-	    return NULL;
+		if ((p = strstr(str, sep->str)) == NULL)
+		{
+			return NULL;
+		}
+
+		str = p + sep->len;
 	}
 
-	str = p + sep->len;
-    }
-
-    *ansi_state_ptr = ansi_state;
-    return str;
+	*ansi_state_ptr = ansi_state;
+	return str;
 }
 
 /*
@@ -197,18 +234,20 @@ char *next_token_ansi(char *str, const Delim * sep, int *ansi_state_ptr)
  * Count the words in a delimiter-separated list.
  */
 
-int countwords(char *str, const Delim * sep)
+int countwords(char *str, const Delim *sep)
 {
-    int n;
-    str = trim_space_sep(str, sep);
+	int n;
+	str = trim_space_sep(str, sep);
 
-    if (!*str) {
-	return 0;
-    }
+	if (!*str)
+	{
+		return 0;
+	}
 
-    for (n = 0; str; str = next_token(str, sep), n++);
+	for (n = 0; str; str = next_token(str, sep), n++)
+		;
 
-    return n;
+	return n;
 }
 
 /*
@@ -216,85 +255,94 @@ int countwords(char *str, const Delim * sep)
  * list2arr, arr2list: Convert lists to arrays and vice versa.
  */
 
-int list2arr(char ***arr, int maxtok, char *list, const Delim * sep)
+int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
-    unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
-    int initted = 0;
-    char *tok, *liststart;
-    int ntok, tokpos, i, bits;
+	unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
+	int initted = 0;
+	char *tok, *liststart;
+	int ntok, tokpos, i, bits;
 
-    /*
+	/*
      * Mark token starting points in a 1k bitstring, then go back
      * and collect them into an array of just the right number of
      * pointers.
      */
 
-    if (!initted) {
-	memset(tok_starts, 0, sizeof(tok_starts));
-	initted = 1;
-    }
+	if (!initted)
+	{
+		memset(tok_starts, 0, sizeof(tok_starts));
+		initted = 1;
+	}
 
-    liststart = list = trim_space_sep(list, sep);
-    tok = split_token(&list, sep);
+	liststart = list = trim_space_sep(list, sep);
+	tok = split_token(&list, sep);
 
-    for (ntok = 0, tokpos = 0; tok && ntok < maxtok; ++ntok, tok = split_token(&list, sep)) {
-	tokpos = tok - liststart;
-	tok_starts[tokpos >> 3] |= (1 << (tokpos & 0x7));
-    }
+	for (ntok = 0, tokpos = 0; tok && ntok < maxtok; ++ntok, tok = split_token(&list, sep))
+	{
+		tokpos = tok - liststart;
+		tok_starts[tokpos >> 3] |= (1 << (tokpos & 0x7));
+	}
 
-    if (ntok == 0) {
-	/*
+	if (ntok == 0)
+	{
+		/*
 	 * So we don't try to malloc(0).
 	 */
-	++ntok;
-    }
+		++ntok;
+	}
 
-    /*
+	/*
      * Caller must free this array of pointers later. Validity of the
      * pointers is dependent upon the original list string having not
      * been freed yet.
      */
-    *arr = (char **) xcalloc(ntok, sizeof(char *), "list2arr");
-    tokpos >>= 3;
-    ntok = 0;
+	*arr = (char **)XCALLOC(ntok, sizeof(char *), "arr");
+	tokpos >>= 3;
+	ntok = 0;
 
-    for (i = 0; i <= tokpos; ++i) {
-	if (tok_starts[i]) {
-	    /*
+	for (i = 0; i <= tokpos; ++i)
+	{
+		if (tok_starts[i])
+		{
+			/*
 	     * There's at least one token starting in this byte
 	     * of the bitstring, so we scan the bits.
 	     */
-	    bits = tok_starts[i];
-	    tok_starts[i] = 0;
-	    tok = liststart + (i << 3);
+			bits = tok_starts[i];
+			tok_starts[i] = 0;
+			tok = liststart + (i << 3);
 
-	    do {
-		if (bits & 0x1) {
-		    (*arr)[ntok] = tok;
-		    ++ntok;
+			do
+			{
+				if (bits & 0x1)
+				{
+					(*arr)[ntok] = tok;
+					++ntok;
+				}
+
+				bits >>= 1;
+				++tok;
+			} while (bits);
 		}
-
-		bits >>= 1;
-		++tok;
-	    } while (bits);
 	}
-    }
 
-    return ntok;
+	return ntok;
 }
 
-void arr2list(char **arr, int alen, char *list, char **bufc, const Delim * sep)
+void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 {
-    int i;
+	int i;
 
-    if (alen) {
-	safe_str(arr[0], list, bufc);
-    }
+	if (alen)
+	{
+		safe_str(arr[0], list, bufc);
+	}
 
-    for (i = 1; i < alen; i++) {
-	print_sep(sep, list, bufc);
-	safe_str(arr[i], list, bufc);
-    }
+	for (i = 1; i < alen; i++)
+	{
+		print_sep(sep, list, bufc);
+		safe_str(arr[i], list, bufc);
+	}
 }
 
 /*
@@ -304,23 +352,25 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim * sep)
  * takes the same maxlen and returns the same number of words.
  */
 
-int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim * sep)
+int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep)
 {
-    int i, ansi_state;
+	int i, ansi_state;
 
-    if (maxlen <= 0) {
-	return 0;
-    }
+	if (maxlen <= 0)
+	{
+		return 0;
+	}
 
-    ansi_state = arr[0] = *prior_state;
-    list = trim_space_sep(list, sep);
+	ansi_state = arr[0] = *prior_state;
+	list = trim_space_sep(list, sep);
 
-    for (i = 1; list && i < maxlen; list = next_token_ansi(list, sep, &ansi_state), ++i) {
-	arr[i - 1] = ansi_state;
-    }
+	for (i = 1; list && i < maxlen; list = next_token_ansi(list, sep, &ansi_state), ++i)
+	{
+		arr[i - 1] = ansi_state;
+	}
 
-    arr[i] = ANST_NONE;
-    return i - 1;
+	arr[i] = ANST_NONE;
+	return i - 1;
 }
 
 /*
@@ -330,9 +380,9 @@ int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim * 
 
 dbref match_thing(dbref player, char *name)
 {
-    init_match(player, name, NOTYPE);
-    match_everything(MAT_EXIT_PARENTS);
-    return (noisy_match_result());
+	init_match(player, name, NOTYPE);
+	match_everything(MAT_EXIT_PARENTS);
+	return (noisy_match_result());
 }
 
 /*
@@ -343,17 +393,21 @@ dbref match_thing(dbref player, char *name)
 
 int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
 {
-    if ((nfargs >= minargs) && (nfargs <= maxargs)) {
-	return 1;
-    }
+	if ((nfargs >= minargs) && (nfargs <= maxargs))
+	{
+		return 1;
+	}
 
-    if (maxargs == (minargs + 1)) {
-	safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
-    } else {
-	safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
-    }
+	if (maxargs == (minargs + 1))
+	{
+		safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+	}
+	else
+	{
+		safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+	}
 
-    return 0;
+	return 0;
 }
 
 /*
@@ -361,62 +415,83 @@ int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char
  * delim_check: obtain delimiter
  */
 
-int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim * sep, int dflags)
+int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags)
 {
-    char *tstr, *bp, *str;
-    int tlen;
+	char *tstr, *bp, *str;
+	int tlen;
 
-    if (nfargs < sep_arg) {
-	sep->str[0] = ' ';
-	sep->len = 1;
-	return 1;
-    }
-
-    tlen = strlen(fargs[sep_arg - 1]);
-
-    if (tlen <= 1) {
-	dflags &= ~DELIM_EVAL;
-    }
-
-    if (dflags & DELIM_EVAL) {
-	tstr = bp = alloc_lbuf("delim_check");
-	str = fargs[sep_arg - 1];
-	exec(tstr, &bp, player, caller, cause, EV_EVAL | EV_FCHECK, &str, cargs, ncargs);
-	tlen = strlen(tstr);
-    } else {
-	tstr = fargs[sep_arg - 1];
-    }
-
-    sep->len = 1;
-
-    if (tlen == 0) {
-	sep->str[0] = ' ';
-    } else if (tlen == 1) {
-	sep->str[0] = *tstr;
-    } else {
-	if ((dflags & DELIM_NULL) && !strcmp(tstr, (char *) NULL_DELIM_VAR)) {
-	    sep->str[0] = '\0';
-	} else if ((dflags & DELIM_CRLF) && !strcmp(tstr, (char *) "\r\n")) {
-	    sep->str[0] = '\r';
-	} else if (dflags & DELIM_STRING) {
-	    if (tlen > MAX_DELIM_LEN) {
-		safe_str("#-1 SEPARATOR TOO LONG", buff, bufc);
-		sep->len = 0;
-	    } else {
-		strcpy(sep->str, tstr);
-		sep->len = tlen;
-	    }
-	} else {
-	    safe_str("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
-	    sep->len = 0;
+	if (nfargs < sep_arg)
+	{
+		sep->str[0] = ' ';
+		sep->len = 1;
+		return 1;
 	}
-    }
 
-    if (dflags & DELIM_EVAL) {
-	free_lbuf(tstr);
-    }
+	tlen = strlen(fargs[sep_arg - 1]);
 
-    return (sep->len);
+	if (tlen <= 1)
+	{
+		dflags &= ~DELIM_EVAL;
+	}
+
+	if (dflags & DELIM_EVAL)
+	{
+		tstr = bp = XMALLOC(LBUF_SIZE, "tstr");
+		str = fargs[sep_arg - 1];
+		exec(tstr, &bp, player, caller, cause, EV_EVAL | EV_FCHECK, &str, cargs, ncargs);
+		tlen = strlen(tstr);
+	}
+	else
+	{
+		tstr = fargs[sep_arg - 1];
+	}
+
+	sep->len = 1;
+
+	if (tlen == 0)
+	{
+		sep->str[0] = ' ';
+	}
+	else if (tlen == 1)
+	{
+		sep->str[0] = *tstr;
+	}
+	else
+	{
+		if ((dflags & DELIM_NULL) && !strcmp(tstr, (char *)NULL_DELIM_VAR))
+		{
+			sep->str[0] = '\0';
+		}
+		else if ((dflags & DELIM_CRLF) && !strcmp(tstr, (char *)"\r\n"))
+		{
+			sep->str[0] = '\r';
+		}
+		else if (dflags & DELIM_STRING)
+		{
+			if (tlen > MAX_DELIM_LEN)
+			{
+				safe_str("#-1 SEPARATOR TOO LONG", buff, bufc);
+				sep->len = 0;
+			}
+			else
+			{
+				strcpy(sep->str, tstr);
+				sep->len = tlen;
+			}
+		}
+		else
+		{
+			safe_str("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
+			sep->len = 0;
+		}
+	}
+
+	if (dflags & DELIM_EVAL)
+	{
+		XFREE(tstr);
+	}
+
+	return (sep->len);
 }
 
 /*
@@ -426,49 +501,60 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 int xlate(char *arg)
 {
-    char *temp2;
+	char *temp2;
 
-    if (arg[0] == '#') {
-	arg++;
+	if (arg[0] == '#')
+	{
+		arg++;
 
-	if (is_integer(arg)) {
-	    if (mudconf.bools_oldstyle) {
-		switch ((int) strtol(arg, (char **) NULL, 10)) {
-		case -1:
-		    return 0;
+		if (is_integer(arg))
+		{
+			if (mudconf.bools_oldstyle)
+			{
+				switch ((int)strtol(arg, (char **)NULL, 10))
+				{
+				case -1:
+					return 0;
 
-		case 0:
-		    return 0;
+				case 0:
+					return 0;
 
-		default:
-		    return 1;
+				default:
+					return 1;
+				}
+			}
+			else
+			{
+				return ((int)strtol(arg, (char **)NULL, 10) >= 0);
+			}
 		}
-	    } else {
-		return ((int) strtol(arg, (char **) NULL, 10) >= 0);
-	    }
-	}
 
-	if (mudconf.bools_oldstyle) {
-	    return 0;
-	} else {
-	    /*
+		if (mudconf.bools_oldstyle)
+		{
+			return 0;
+		}
+		else
+		{
+			/*
 	     * Case of '#-1 <string>'
 	     */
-	    return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' '));
+			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' '));
+		}
 	}
-    }
 
-    temp2 = Eat_Spaces(arg);
+	temp2 = Eat_Spaces(arg);
 
-    if (!*temp2) {
-	return 0;
-    }
+	if (!*temp2)
+	{
+		return 0;
+	}
 
-    if (is_integer(temp2)) {
-	return (int) strtol(temp2, (char **) NULL, 10);
-    }
+	if (is_integer(temp2))
+	{
+		return (int)strtol(temp2, (char **)NULL, 10);
+	}
 
-    return 1;
+	return 1;
 }
 
 /*
@@ -478,13 +564,14 @@ int xlate(char *arg)
 
 void do_reverse(char *from, char *to)
 {
-    char *tp;
-    tp = to + strlen(from);
-    *tp-- = '\0';
+	char *tp;
+	tp = to + strlen(from);
+	*tp-- = '\0';
 
-    while (*from) {
-	*tp-- = *from++;
-    }
+	while (*from)
+	{
+		*tp-- = *from++;
+	}
 }
 
 /*
@@ -495,26 +582,30 @@ void do_reverse(char *from, char *to)
 
 long random_range(long low, long high)
 {
-    unsigned long x, n, n_limit;
+	unsigned long x, n, n_limit;
 
-    /*
+	/*
      * Validate parameters.
      */
 
-    if (high < low) {
-	return 0;
-    } else if (high == low) {
-	return low;
-    }
+	if (high < low)
+	{
+		return 0;
+	}
+	else if (high == low)
+	{
+		return low;
+	}
 
-    x = high - low;
+	x = high - low;
 
-    if (INT_MAX < x) {
-	return -1;
-    }
+	if (INT_MAX < x)
+	{
+		return -1;
+	}
 
-    x++;
-    /*
+	x++;
+	/*
      * Look for a random number on the interval [0,x-1]. MUX2's
      * implementation states: In order to be perfectly conservative about
      * not introducing any further sources of statistical bias, we're
@@ -526,13 +617,14 @@ long random_range(long low, long high)
      * desirable x, the average number of times we will call getrand() is
      * less than 2.
      */
-    n_limit = INT_MAX - (INT_MAX % x);
+	n_limit = INT_MAX - (INT_MAX % x);
 
-    do {
-	n = genrand_int31();
-    } while (n >= n_limit);
+	do
+	{
+		n = genrand_int31();
+	} while (n >= n_limit);
 
-    return low + (n % x);
+	return low + (n % x);
 }
 
 /*
@@ -588,13 +680,13 @@ long random_range(long low, long high)
 /* Period parameters */
 #define N 624
 #define M 397
-#define MATRIX_A 0x9908b0dfUL	/* constant vector a */
-#define UMASK 0x80000000UL	/* most significant w-r bits */
-#define LMASK 0x7fffffffUL	/* least significant r bits */
-#define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
-#define TWIST(u,v) ((MIXBITS(u,v) >> 1) ^ ((v)&1UL ? MATRIX_A : 0UL))
+#define MATRIX_A 0x9908b0dfUL /* constant vector a */
+#define UMASK 0x80000000UL	  /* most significant w-r bits */
+#define LMASK 0x7fffffffUL	  /* least significant r bits */
+#define MIXBITS(u, v) (((u)&UMASK) | ((v)&LMASK))
+#define TWIST(u, v) ((MIXBITS(u, v) >> 1) ^ ((v)&1UL ? MATRIX_A : 0UL))
 
-unsigned long state[N];	/* the array for the state vector  */
+unsigned long state[N]; /* the array for the state vector  */
 
 int left = 1;
 
@@ -605,75 +697,80 @@ unsigned long *next;
 /* initializes state[N] with a seed */
 void init_genrand(unsigned long s)
 {
-    int j;
-    state[0] = s & 0xffffffffUL;
+	int j;
+	state[0] = s & 0xffffffffUL;
 
-    for (j = 1; j < N; j++) {
-	state[j] = (1812433253UL * (state[j - 1] ^ (state[j - 1] >> 30)) + j);
-	/*
+	for (j = 1; j < N; j++)
+	{
+		state[j] = (1812433253UL * (state[j - 1] ^ (state[j - 1] >> 30)) + j);
+		/*
 	 * See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
 	 */
-	/*
+		/*
 	 * In the previous versions, MSBs of the seed affect
 	 */
-	/*
+		/*
 	 * only MSBs of the array state[].
 	 */
-	/*
+		/*
 	 * 2002/01/09 modified by Makoto Matsumoto
 	 */
-	state[j] &= 0xffffffffUL;	/* for >32 bit machines */
-    }
+		state[j] &= 0xffffffffUL; /* for >32 bit machines */
+	}
 
-    left = 1;
-    initf = 1;
+	left = 1;
+	initf = 1;
 }
 
 void next_state(void)
 {
-    unsigned long *p = state;
-    int j;
+	unsigned long *p = state;
+	int j;
 
-    /*
+	/*
      * if init_genrand() has not been called,
      */
-    /*
+	/*
      * a default initial seed is used
      */
-    if (initf == 0) {
-	init_genrand(5489UL);
-    }
+	if (initf == 0)
+	{
+		init_genrand(5489UL);
+	}
 
-    left = N;
-    next = state;
+	left = N;
+	next = state;
 
-    for (j = N - M + 1; --j; p++) {
-	*p = p[M] ^ TWIST(p[0], p[1]);
-    }
+	for (j = N - M + 1; --j; p++)
+	{
+		*p = p[M] ^ TWIST(p[0], p[1]);
+	}
 
-    for (j = M; --j; p++) {
-	*p = p[M - N] ^ TWIST(p[0], p[1]);
-    }
+	for (j = M; --j; p++)
+	{
+		*p = p[M - N] ^ TWIST(p[0], p[1]);
+	}
 
-    *p = p[M - N] ^ TWIST(p[0], state[0]);
+	*p = p[M - N] ^ TWIST(p[0], state[0]);
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
 long genrand_int31(void)
 {
-    unsigned long y;
+	unsigned long y;
 
-    if (--left == 0) {
-	next_state();
-    }
+	if (--left == 0)
+	{
+		next_state();
+	}
 
-    y = *next++;
-    /*
+	y = *next++;
+	/*
      * Tempering
      */
-    y ^= (y >> 11);
-    y ^= (y << 7) & 0x9d2c5680UL;
-    y ^= (y << 15) & 0xefc60000UL;
-    y ^= (y >> 18);
-    return (long) (y >> 1);
+	y ^= (y >> 11);
+	y ^= (y << 7) & 0x9d2c5680UL;
+	y ^= (y << 15) & 0xefc60000UL;
+	y ^= (y >> 18);
+	return (long)(y >> 1);
 }

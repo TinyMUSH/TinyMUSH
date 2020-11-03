@@ -8,7 +8,8 @@
 /* Search structure, used by @search and search(). */
 
 typedef struct search_type SEARCH;
-struct search_type {
+struct search_type
+{
     int s_wizard;
     dbref s_owner;
     dbref s_rst_owner;
@@ -27,7 +28,8 @@ struct search_type {
 /* Stats structure, used by @stats and stats(). */
 
 typedef struct stats_type STATS;
-struct stats_type {
+struct stats_type
+{
     int s_total;
     int s_rooms;
     int s_exits;
@@ -38,4 +40,4 @@ struct stats_type {
     int s_unknown;
 };
 
-#endif				/* __WALKDB_H */
+#endif /* __WALKDB_H */

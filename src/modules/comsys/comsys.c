@@ -159,10 +159,10 @@ struct com_list
     ok_chanperms((d), (c), CHAN_FLAG_P_TRANS, CHAN_FLAG_O_TRANS, (c)->trans_lock)
 
 #define clear_chan_alias(n, a)                       \
-    xfree((a)->alias, "clear_chan_alias.astring");   \
+    XFREE((a)->alias);   \
     if ((a)->title)                                  \
-        xfree((a)->title, "clear_chan_alias.title"); \
-    xfree((a), "clear_chan_alias.alias");            \
+        XFREE((a)->title); \
+    XFREE((a));            \
     hashdelete((n), &mod_comsys_calias_htab)
 
 /* --------------------------------------------------------------------------
@@ -292,10 +292,10 @@ COMALIAS *lookup_calias(dbref player, char *alias_str)
 {
     char *s;
     COMALIAS *cas;
-    s = alloc_lbuf("lookup_calias");
+    s = XMALLOC(LBUF_SIZE, "s");
     snprintf(s, LBUF_SIZE, "%d.%s", player, alias_str);
     cas = (COMALIAS *)hashfind(s, &mod_comsys_calias_htab);
-    free_lbuf(s);
+    XFREE(s);
     return (cas);
 }
 
@@ -324,13 +324,13 @@ static void update_comwho(CHANNEL *chp)
     }
 
     if (chp->connect_who)
-        xfree(chp->connect_who, "update_comwho");
+        XFREE(chp->connect_who);
 
     chp->num_connected = count;
 
     if (count > 0)
     {
-        chp->connect_who = (CHANWHO **)xcalloc(count, sizeof(CHANWHO *), "update_comwho");
+        chp->connect_who = (CHANWHO **)XCALLOC(count, sizeof(CHANWHO *), "chp->connect_who");
         i = 0;
 
         for (wp = chp->who; wp != NULL; wp = wp->next)
@@ -410,7 +410,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                     {
                         if (!mh_ns)
                         {
-                            mh_ns = alloc_lbuf("com_message.html.nospoof");
+                            mh_ns = XMALLOC(LBUF_SIZE, "mh_ns");
                             html_escape(msg_ns, mh_ns, 0);
                         }
 
@@ -433,7 +433,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                     {
                         if (!mh)
                         {
-                            mh = alloc_lbuf("com_message.html");
+                            mh = XMALLOC(LBUF_SIZE, "mh");
                             html_escape(msg, mh, 0);
                         }
 
@@ -457,10 +457,10 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
 #ifdef PUEBLO_SUPPORT
 
     if (mh)
-        free_lbuf(mh);
+        XFREE(mh);
 
     if (mh_ns)
-        free_lbuf(mh_ns);
+        XFREE(mh_ns);
 
 #endif
 }
@@ -485,9 +485,9 @@ static void remove_from_channel(dbref player, CHANNEL *chp, int is_quiet)
     if (chp->num_who == 1)
     {
         chp->num_who = 0;
-        xfree(chp->who, "remove_from_channel.who");
+        XFREE(chp->who);
         chp->num_connected = 0;
-        xfree(chp->connect_who, "remove_from_channel.connect_who");
+        XFREE(chp->connect_who);
         return;
     }
 
@@ -504,7 +504,7 @@ static void remove_from_channel(dbref player, CHANNEL *chp, int is_quiet)
                 chp->who = wp->next;
             }
 
-            xfree(wp, "remove_from_channel.who");
+            XFREE(wp);
             break;
         }
         else
@@ -519,10 +519,10 @@ static void remove_from_channel(dbref player, CHANNEL *chp, int is_quiet)
     if (!is_quiet &&
         (!isPlayer(player) || (Connected(player) && !Hidden(player))))
     {
-        s = alloc_lbuf("remove_from_channel");
+        s = XMALLOC(LBUF_SIZE, "remove_from_channel.s");
         snprintf(s, LBUF_SIZE, "%s %s has left this channel.", chp->header, Name(player));
         com_message(chp, s, player);
-        free_lbuf(s);
+        XFREE(s);
     }
 }
 
@@ -553,7 +553,7 @@ static void zorch_alias_from_list(COMALIAS *cap)
                     nhashdelete((int)cap->player, &mod_comsys_comlist_htab);
             }
 
-            xfree(cl_ptr, "zorch_alias.cl_ptr");
+            XFREE(cl_ptr);
             return;
         }
 
@@ -601,10 +601,10 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
          */
         if (!isPlayer(player) || (Connected(player) && !Hidden(player)))
         {
-            s = xcalloc(LBUF_SIZE, sizeof(char), "process_comsys");
+            s = XMALLOC(LBUF_SIZE, "process_comsys.s");
             snprintf(s, LBUF_SIZE, "%s %s has joined this channel.", cap->channel->header, Name(player));
             com_message(cap->channel, s, player);
-            xfree(s, "process_comsys");
+            XFREE(s);
         }
 
         return;
@@ -638,11 +638,10 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
          */
         if (!isPlayer(player) || (Connected(player) && !Hidden(player)))
         {
-            s = xcalloc(LBUF_SIZE, sizeof(char), "process_comsys");
+            s = XMALLOC(LBUF_SIZE, "process_comsys.s");
             snprintf(s, LBUF_SIZE, "%s %s has left this channel.", cap->channel->header, Name(player));
             com_message(cap->channel, s, player);
-            xfree(s, "process_comsys");
-            free_lbuf(s);
+            XFREE(s);
         }
 
         return;
@@ -665,7 +664,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
                 {
                     buff = unparse_object(player, wp->player, 0);
                     notify(player, buff);
-                    free_lbuf(buff);
+                    XFREE(buff);
                 }
             }
         }
@@ -682,7 +681,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
                 {
                     buff = unparse_object(player, wp->player, 0);
                     notify(player, buff);
-                    free_lbuf(buff);
+                    XFREE(buff);
                 }
             }
         }
@@ -740,7 +739,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
             name_buf = NULL;
         }
         
-        s = xcalloc(LBUF_SIZE, sizeof(char) * 2, "process_comsys");
+        s = XMALLOC(LBUF_SIZE*2, "process_comsys");
         if (*arg == ':')
         {
             snprintf(s, LBUF_SIZE * 2, "%s %s %s", cap->channel->header, (name_buf) ? name_buf : Name(player), arg + 1);
@@ -754,7 +753,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
             snprintf(s, LBUF_SIZE * 2, "%s %s says, \"%s\"", cap->channel->header, (name_buf) ? name_buf : Name(player), arg);
         }
         com_message(cap->channel, s, player);
-        xfree(s, "process_comsys");
+        XFREE(s);
         return;
     }
 }
@@ -794,26 +793,25 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
     }
 
     /* Construct the alias. */
-    cap = (COMALIAS *)xmalloc(sizeof(COMALIAS), "join_channel.alias");
+    cap = (COMALIAS *)XMALLOC(sizeof(COMALIAS), "join_channel.cap");
     cap->player = player;
-    cap->alias = xstrdup(alias_str, "join_channel.alias_str");
+    cap->alias = XSTRDUP(alias_str, "join_channel.cap->alias");
 
     /* Note that even if the player is already on this channel,
      * we do not inherit the channel title from other aliases.
      */
     if (title_str && *title_str)
-        cap->title = xstrdup(munge_comtitle(title_str),
-                             "join_channel.title_str");
+        cap->title = XSTRDUP(munge_comtitle(title_str), "join_channel.cap->title");
     else
         cap->title = NULL;
 
     cap->channel = chp;
-    s = alloc_lbuf("join_channel");
+    s = XMALLOC(LBUF_SIZE, "join_channel.s");
     snprintf(s, LBUF_SIZE, "%d.%s", player, alias_str);
     hashadd(s, (int *)cap, &mod_comsys_calias_htab, 0);
-    free_lbuf(s);
+    XFREE(s);
     /* Add this to the list of all aliases for the player. */
-    clist = (COMLIST *)xmalloc(sizeof(COMLIST), "join_channel.clist");
+    clist = (COMLIST *)XMALLOC(sizeof(COMLIST), "join_channel.clist");
     clist->alias_ptr = cap;
     clist->next = lookup_clist(player);
 
@@ -826,7 +824,7 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
 
     if (!has_joined)
     {
-        wp = (CHANWHO *)xmalloc(sizeof(CHANWHO), "join_channel.who");
+        wp = (CHANWHO *)XMALLOC(sizeof(CHANWHO), "join_channel.wp");
         wp->player = player;
         wp->is_listening = 1;
 
@@ -845,10 +843,10 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
 
         if (!isPlayer(player) || (Connected(player) && !Hidden(player)))
         {
-            s = alloc_lbuf("join_channel");
+            s = XMALLOC(LBUF_SIZE, "join_channel.s");
             snprintf(s, LBUF_SIZE, "%s %s has joined this channel.", chp->header, Name(player));
             com_message(chp, s, player);
-            free_lbuf(s);
+            XFREE(s);
         }
 
         if (title_str)
@@ -888,8 +886,7 @@ void channel_clr(dbref player)
         return;
 
     /* Figure out all the channels we're on, then free up aliases. */
-    ch_array = (CHANNEL **)xcalloc(mod_comsys_comsys_htab.entries,
-                                   sizeof(CHANNEL *), "channel_clr.array");
+    ch_array = (CHANNEL **)XCALLOC(mod_comsys_comsys_htab.entries, sizeof(CHANNEL *), "ch_array");
     pos = 0;
 
     for (cl_ptr = clist; cl_ptr != NULL; cl_ptr = next)
@@ -919,7 +916,7 @@ void channel_clr(dbref player)
         sprintf(tbuf, "%d.%s", player, cl_ptr->alias_ptr->alias),
             clear_chan_alias(tbuf, cl_ptr->alias_ptr);
         next = cl_ptr->next;
-        xfree(cl_ptr, "channel_clr.cl_ptr");
+        XFREE(cl_ptr);
     }
 
     nhashdelete((int)player, &mod_comsys_comlist_htab);
@@ -929,7 +926,7 @@ void channel_clr(dbref player)
     for (i = 0; i < pos; i++)
         remove_from_channel(player, ch_array[i], 0);
 
-    xfree(ch_array, "channel_clr.array");
+    XFREE(ch_array);
 }
 
 void mod_comsys_announce_connect(dbref player, const char *reason, int num)
@@ -952,10 +949,10 @@ void mod_comsys_announce_connect(dbref player, const char *reason, int num)
             if ((chp->flags & CHAN_FLAG_LOUD) && !Hidden(player) &&
                 is_listenchannel(player, chp))
             {
-                s = alloc_lbuf("mod_comsys_announce_connect");
+                s = XMALLOC(LBUF_SIZE, "mod_comsys_announce_connect.s");
                 snprintf(s, LBUF_SIZE, "%s %s has connected.", chp->header, Name(player));
                 com_message(chp, s, player);
-                free_lbuf(s);
+                XFREE(s);
             }
         }
     }
@@ -975,10 +972,10 @@ void mod_comsys_announce_disconnect(dbref player, const char *reason, int num)
             if ((chp->flags & CHAN_FLAG_LOUD) && !Hidden(player) &&
                 is_listenchannel(player, chp))
             {
-                s = alloc_lbuf("mod_comsys_announce_disconnect");
+                s = XMALLOC(LBUF_SIZE, "mod_comsys_announce_disconnect.s");
                 snprintf(s, LBUF_SIZE, "%s %s has disconnected.", chp->header, Name(player));
                 com_message(chp, s, player);
-                free_lbuf(s);
+                XFREE(s);
             }
 
             update_comwho(chp);
@@ -1038,7 +1035,7 @@ void do_ccreate(dbref player, dbref cause, int key, char *name)
         return;
     }
 
-    chp = (CHANNEL *)xmalloc(sizeof(CHANNEL), "ccreate.channel");
+    chp = (CHANNEL *)XMALLOC(sizeof(CHANNEL), "do_ccreate.chp");
 
     if (!chp)
     {
@@ -1046,7 +1043,7 @@ void do_ccreate(dbref player, dbref cause, int key, char *name)
         return;
     }
 
-    chp->name = xstrdup(name, "ccreate.name");
+    chp->name = XSTRDUP(name, "do_ccreate.chp->name");
     chp->owner = Owner(player);
     chp->flags = CHAN_FLAG_P_JOIN | CHAN_FLAG_P_TRANS | CHAN_FLAG_P_RECV |
                  CHAN_FLAG_O_JOIN | CHAN_FLAG_O_TRANS | CHAN_FLAG_O_RECV;
@@ -1060,7 +1057,7 @@ void do_ccreate(dbref player, dbref cause, int key, char *name)
     chp->descrip = NULL;
     chp->join_lock = chp->trans_lock = chp->recv_lock = NULL;
     sprintf(buf, "[%s]", chp->name);
-    chp->header = xstrdup(buf, "ccreate.header");
+    chp->header = XSTRDUP(buf, "do_ccreate.chp->header");
     hashadd(name, (int *)chp, &mod_comsys_comsys_htab, 0);
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Channel %s created.", name);
 }
@@ -1083,15 +1080,13 @@ void do_cdestroy(dbref player, dbref cause, int key, char *name)
      * it. We have to delete the pointers one by one or we run into
      * hashtable chaining issues.
      */
-    s = alloc_lbuf("do_cdestroy");
+    s = XMALLOC(LBUF_SIZE, "do_cdestroy.s");
     snprintf(s, LBUF_SIZE, "Channel %s has been destroyed by %s.", chp->name, Name(player));
     com_message(chp, s, player);
-    free_lbuf(s);
+    XFREE(s);
     htab = &mod_comsys_calias_htab;
-    alias_array = (COMALIAS **)xcalloc(htab->entries, sizeof(COMALIAS *),
-                                       "cdestroy.alias_array");
-    name_array = (char **)xcalloc(htab->entries, sizeof(char *),
-                                  "cdestroy.name_array");
+    alias_array = (COMALIAS **)XCALLOC(htab->entries, sizeof(COMALIAS *), "alias_array");
+    name_array = (char **)XCALLOC(htab->entries, sizeof(char *), "name_array");
     count = 0;
 
     for (i = 0; i < htab->hashsize; i++)
@@ -1120,21 +1115,21 @@ void do_cdestroy(dbref player, dbref cause, int key, char *name)
         }
     }
 
-    xfree(name_array, "cdestroy.name_array");
-    xfree(alias_array, "cdestroy.alias_array");
+    XFREE(name_array);
+    XFREE(alias_array);
     /* Zap the channel itself. */
-    xfree(chp->name, "cdestroy.cname");
+    XFREE(chp->name);
 
     if (chp->who)
-        xfree(chp->who, "cdestroy.who");
+        XFREE(chp->who);
 
     if (chp->connect_who)
-        xfree(chp->connect_who, "cdestroy.connect_who");
+        XFREE(chp->connect_who);
 
     if (chp->descrip)
-        xfree(chp->descrip, "cdestroy.descrip");
+        XFREE(chp->descrip);
 
-    xfree(chp->header, "cdestroy.header");
+    XFREE(chp->header);
 
     if (chp->join_lock)
         free_boolexp(chp->join_lock);
@@ -1145,7 +1140,7 @@ void do_cdestroy(dbref player, dbref cause, int key, char *name)
     if (chp->recv_lock)
         free_boolexp(chp->recv_lock);
 
-    xfree(chp, "cdestroy.channel");
+    XFREE(chp);
     hashdelete(name, &mod_comsys_comsys_htab);
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Channel %s destroyed.", name);
 }
@@ -1326,10 +1321,10 @@ void do_channel(dbref player, dbref cause, int key, char *chan_name, char *arg)
         }
 
         if (chp->descrip)
-            xfree(chp->descrip, "do_channel.desc");
+            XFREE(chp->descrip);
 
         if (arg && *arg)
-            chp->descrip = xstrdup(arg, "do_channel.desc");
+            chp->descrip = XSTRDUP(arg, "do_channel.chp->descrip");
 
         notify(player, "Set.");
     }
@@ -1341,12 +1336,12 @@ void do_channel(dbref player, dbref cause, int key, char *chan_name, char *arg)
             return;
         }
 
-        xfree(chp->header, "do_channel.header");
+        XFREE(chp->header);
 
         if (!arg)
-            chp->header = xstrdup("", "do_channel.header");
+            chp->header = XSTRDUP("", "do_channel.chp->header");
         else
-            chp->header = xstrdup(arg, "do_channel.header");
+            chp->header = XSTRDUP(arg, "do_channel.chp->header");
 
         notify(player, "Set.");
     }
@@ -1396,7 +1391,7 @@ void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr)
 
                 sprintf(tbuf, "%d.%s", thing, cl_ptr->alias_ptr->alias);
                 clear_chan_alias(tbuf, cl_ptr->alias_ptr);
-                xfree(cl_ptr, "do_cboot.cl_ptr");
+                XFREE(cl_ptr);
             }
             else
             {
@@ -1422,10 +1417,10 @@ void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr)
         remove_from_channel(thing, chp, 1);
         t = tbuf;
         safe_sb_str(Name(player), tbuf, &t);
-        s = alloc_lbuf("do_cboot");
+        s = XMALLOC(LBUF_SIZE, "do_cboot.s");
         snprintf(s, LBUF_SIZE, "%s %s boots %s off the channel.", chp->header, tbuf, Name(thing));
         com_message(chp, s, player);
-        free_lbuf(s);
+        XFREE(s);
     }
 }
 
@@ -1440,10 +1435,10 @@ void do_cemit(dbref player, dbref cause, int key, char *chan_name, char *str)
         com_message(chp, str, player);
     else
     {
-        s = alloc_lbuf("do_cemit");
+        s = XMALLOC(LBUF_SIZE, "do_cemit.s");
         snprintf(s, LBUF_SIZE, "%s %s", chp->header, str);
         com_message(chp, s, player);
-        free_lbuf(s);
+        XFREE(s);
     }
 }
 
@@ -1526,7 +1521,7 @@ void do_delcom(dbref player, dbref cause, int key, char *alias_str)
     COMLIST *clist, *cl_ptr;
     int has_mult;
     char *s;
-    s = alloc_lbuf("do_delcom");
+    s = XMALLOC(LBUF_SIZE, "do_delcom.s");
     snprintf(s, LBUF_SIZE, "%d.%s", player, alias_str);
     cap = (COMALIAS *)hashfind(s, &mod_comsys_calias_htab);
 
@@ -1536,13 +1531,13 @@ void do_delcom(dbref player, dbref cause, int key, char *alias_str)
         return;
     }
 
-    free_lbuf(s);
+    XFREE(s);
     chp = cap->channel; /* save this for later */
     zorch_alias_from_list(cap);
-    s = alloc_lbuf("do_delcom");
+    s = XMALLOC(LBUF_SIZE, "do_delcom.s");
     snprintf(s, LBUF_SIZE, "%d.%s", player, alias_str);
     clear_chan_alias(s, cap);
-    free_lbuf(s);
+    XFREE(s);
     /* Check if we have any aliases left pointing to that channel. */
     clist = lookup_clist(player);
     has_mult = 0;
@@ -1577,10 +1572,10 @@ void do_comtitle(dbref player, dbref cause, int key, char *alias_str, char *titl
 {
     COMALIAS *cap;
     char *s;
-    s = alloc_lbuf("do_comtitle");
+    s = XMALLOC(LBUF_SIZE, "do_comtitle.s");
     snprintf(s, LBUF_SIZE, "%d.%s", player, alias_str);
     cap = (COMALIAS *)hashfind(s, &mod_comsys_calias_htab);
-    free_lbuf(s);
+    XFREE(s);
 
     if (!cap)
     {
@@ -1589,7 +1584,7 @@ void do_comtitle(dbref player, dbref cause, int key, char *alias_str, char *titl
     }
 
     if (cap->title)
-        xfree(cap->title, "do_comtitle.title");
+        XFREE(cap->title);
 
     if (!title || !*title)
     {
@@ -1597,7 +1592,7 @@ void do_comtitle(dbref player, dbref cause, int key, char *alias_str, char *titl
         return;
     }
 
-    cap->title = xstrdup(munge_comtitle(title), "do_comtitle.title");
+    cap->title = XSTRDUP(munge_comtitle(title), "do_comtitle.cap->title");
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Title set to '%s' on channel %s.", cap->title, cap->channel->name);
 }
 
@@ -1932,21 +1927,21 @@ static void comsys_data_update(CHANNEL *chp, dbref obj)
     int aflags, alen;
     key = atr_get(obj, A_LOCK, &aowner, &aflags, &alen);
     chp->join_lock = parse_boolexp(obj, key, 1);
-    free_lbuf(key);
+    XFREE(key);
     key = atr_get(obj, A_LUSE, &aowner, &aflags, &alen);
     chp->trans_lock = parse_boolexp(obj, key, 1);
-    free_lbuf(key);
+    XFREE(key);
     key = atr_get(obj, A_LENTER, &aowner, &aflags, &alen);
     chp->recv_lock = parse_boolexp(obj, key, 1);
-    free_lbuf(key);
+    XFREE(key);
     key = atr_pget(obj, A_DESC, &aowner, &aflags, &alen);
 
     if (*key)
-        chp->descrip = xstrdup(key, "comsys_data_update.desc");
+        chp->descrip = XSTRDUP(key, "comsys_data_update.chp->descrip");
     else
         chp->descrip = NULL;
 
-    free_lbuf(key);
+    XFREE(key);
 }
 
 static void read_comsys(FILE *fp, int com_ver)
@@ -1969,8 +1964,8 @@ static void read_comsys(FILE *fp, int com_ver)
 
     while (!done)
     {
-        chp = (CHANNEL *)xmalloc(sizeof(CHANNEL), "load_comsys.channel");
-        chp->name = xstrdup(getstring_noalloc(fp, 1), "load_comsys.name");
+        chp = (CHANNEL *)XMALLOC(sizeof(CHANNEL), "read_comsys.chp");
+        chp->name = XSTRDUP(getstring_noalloc(fp, 1), "read_comsys.chp->name");
         chp->owner = getref(fp);
 
         if (!Good_obj(chp->owner) || !isPlayer(chp->owner))
@@ -1995,7 +1990,7 @@ static void read_comsys(FILE *fp, int com_ver)
             s = (char *)getstring_noalloc(fp, 1);
 
             if (s && *s)
-                chp->descrip = xstrdup(s, "read_comsys.desc");
+                chp->descrip = XSTRDUP(s, "read_comsys.chp->descrip");
             else
                 chp->descrip = NULL;
 
@@ -2004,7 +1999,7 @@ static void read_comsys(FILE *fp, int com_ver)
                 s = (char *)getstring_noalloc(fp, 1);
 
                 if (s && *s)
-                    chp->header = xstrdup(s, "read_comsys.header");
+                    chp->header = XSTRDUP(s, "read_comsys.chp->header");
             }
 
             if (com_ver == 2)
@@ -2098,7 +2093,7 @@ static void read_comsys(FILE *fp, int com_ver)
         if (!chp->header)
         {
             sprintf(buf, "[%s]", chp->name);
-            chp->header = xstrdup(buf, "read_comsys.header");
+            chp->header = XSTRDUP(buf, "read_comsys.chp->header");
         }
 
         chp->who = NULL;
@@ -2128,22 +2123,22 @@ static void read_comsys(FILE *fp, int com_ver)
 
     while (!done)
     {
-        cap = (COMALIAS *)xmalloc(sizeof(COMALIAS), "load_comsys.alias");
+        cap = (COMALIAS *)XMALLOC(sizeof(COMALIAS), "read_comsys.cap");
         cap->player = getref(fp);
         cap->channel = lookup_channel((char *)getstring_noalloc(fp, 1));
-        cap->alias = xstrdup(getstring_noalloc(fp, 1), "load_comsys.alias_str");
+        cap->alias = XSTRDUP(getstring_noalloc(fp, 1), "read_comsys.cap->alias");
         s = (char *)getstring_noalloc(fp, 1);
 
         if (s && *s)
-            cap->title = xstrdup(s, "load_comsys.title");
+            cap->title = XSTRDUP(s, "read_comsys.ap->title");
         else
             cap->title = NULL;
 
-        s1 = alloc_lbuf("read_comsys");
+        s1 = XMALLOC(LBUF_SIZE, "read_comsys.s1");
         snprintf(s1, LBUF_SIZE, "%d.%s", cap->player, cap->alias);
         hashadd(s1, (int *)cap, &mod_comsys_calias_htab, 0);
-        free_lbuf(s1);
-        clist = (COMLIST *)xmalloc(sizeof(COMLIST), "load_comsys.clist");
+        XFREE(s1);
+        clist = (COMLIST *)XMALLOC(sizeof(COMLIST), "read_comsys.clist");
         clist->alias_ptr = cap;
         clist->next = lookup_clist(cap->player);
 
@@ -2155,7 +2150,7 @@ static void read_comsys(FILE *fp, int com_ver)
 
         if (!is_onchannel(cap->player, cap->channel))
         {
-            wp = (CHANWHO *)xmalloc(sizeof(CHANWHO), "load_comsys.who");
+            wp = (CHANWHO *)XMALLOC(sizeof(CHANWHO), "read_comsys.wp");
             wp->player = cap->player;
             wp->is_listening = getref(fp);
 
@@ -2208,7 +2203,7 @@ static void sanitize_comsys(void)
     int *ptab;
     count = 0;
     htab = &mod_comsys_comlist_htab;
-    ptab = (int *)xcalloc(htab->entries, sizeof(int), "sanitize_comsys");
+    ptab = (int *)XCALLOC(htab->entries, sizeof(int), "ptab");
 
     for (i = 0; i < htab->hashsize; i++)
     {
@@ -2229,7 +2224,7 @@ static void sanitize_comsys(void)
     for (i = 0; i < count; i++)
         channel_clr(ptab[i]);
 
-    xfree(ptab, "sanitize_comsys");
+    XFREE(ptab);
 }
 
 void mod_comsys_make_minimal(void)
@@ -2494,11 +2489,11 @@ void mod_comsys_destroy_player(dbref player, dbref victim)
 void mod_comsys_init(void)
 {
     char *str;
-    mod_comsys_config.public_channel = xstrdup("Public", "cf_string");
-    mod_comsys_config.guests_channel = xstrdup("Guests", "cf_string");
-    mod_comsys_config.public_calias = xstrdup("pub", "cf_string");
-    mod_comsys_config.guests_calias = xstrdup("g", "cf_string");
-    str = xmalloc(MBUF_SIZE, "mod_comsys_init");
+    mod_comsys_config.public_channel = XSTRDUP("Public", "mod_comsys_init.mod_comsys_config.public_channel");
+    mod_comsys_config.guests_channel = XSTRDUP("Guests", "mod_comsys_init.mod_comsys_config.guests_channel");
+    mod_comsys_config.public_calias = XSTRDUP("pub", "mod_comsys_init.mod_comsys_config.public_calias");
+    mod_comsys_config.guests_calias = XSTRDUP("g", "mod_comsys_init.mod_comsys_config.guests_calias");
+    str = XMALLOC(MBUF_SIZE, "mod_comsys_init.str");
     sprintf(str, "%d.%d", mudstate.version.major, mudstate.version.minor);
 
     switch (mudstate.version.status)
@@ -2527,13 +2522,13 @@ void mod_comsys_init(void)
     }
 
     sprintf(str, "%s (%s)", str, PACKAGE_RELEASE_DATE);
-    mod_comsys_version.version = xstrdup(str, "mod_comsys_init");
-    mod_comsys_version.author = xstrdup("TinyMUSH Development Team", "mod_comsys_init");
-    mod_comsys_version.email = xstrdup("tinymush@googlegroups.com", "mod_comsys_init");
-    mod_comsys_version.url = xstrdup("https://github.com/TinyMUSH", "mod_comsys_init");
-    mod_comsys_version.description = xstrdup("Communication system for TinyMUSH", "mod_comsys_init");
-    mod_comsys_version.copyright = xstrdup("Copyright (C) 2012 TinyMUSH development team.", "mod_comsys_init");
-    xfree(str, "mod_comsys_init");
+    mod_comsys_version.version = XSTRDUP(str, "mod_comsys_init.mod_comsys_version.version");
+    mod_comsys_version.author = XSTRDUP("TinyMUSH Development Team", "mod_comsys_init.mod_comsys_version.author");
+    mod_comsys_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_comsys_init.mod_comsys_version.email");
+    mod_comsys_version.url = XSTRDUP("https://github.com/TinyMUSH", "mod_comsys_init.mod_comsys_version.url");
+    mod_comsys_version.description = XSTRDUP("Communication system for TinyMUSH", "mod_comsys_init.mod_comsys_version.description");
+    mod_comsys_version.copyright = XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_comsys_init.mod_comsys_version.copyright");
+    XFREE(str);
     register_hashtables(mod_comsys_hashtable, mod_comsys_nhashtable);
     register_commands(mod_comsys_cmdtable);
     register_functions(mod_comsys_functable);

@@ -8,12 +8,12 @@
 #include <stdarg.h>
 #else
 #include <varargs.h>
-#endif				/* __STDC__ */
+#endif /* __STDC__ */
 #include <stdlib.h>
 #include <limits.h>
-#else				/* STDC_HEADERS */
+#else /* STDC_HEADERS */
 #include <varargs.h>
-#endif				/* STDC_HEADERS */
+#endif /* STDC_HEADERS */
 
 #ifdef STDC_HEADERS
 #include <string.h>
@@ -21,8 +21,8 @@
 #include <strings.h>
 #ifdef HAVE_MEMORY_H
 #include <memory.h>
-#endif				/* HAVE_MEMORY_H */
-#endif				/* STDC_HEADERS */
+#endif /* HAVE_MEMORY_H */
+#endif /* STDC_HEADERS */
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -125,4 +125,4 @@
 #define LDBL_DIG 6
 #endif
 
-#endif				/* __SYSTEM_H */
+#endif /* __SYSTEM_H */

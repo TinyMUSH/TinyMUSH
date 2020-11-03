@@ -455,8 +455,6 @@ FUN flist[] = {
     {"ZONE", fun_zone, 1, 0, CA_PUBLIC, NULL},
     {"ZWHO", scan_zone, 1, TYPE_PLAYER, CA_PUBLIC, NULL},
     /* - END - */
-    {NULL, NULL, 0, 0, 0, NULL}
-};
+    {NULL, NULL, 0, 0, 0, NULL}};
 
-
-#endif				/* __FNPROTO_H */
+#endif /* __FNPROTO_H */

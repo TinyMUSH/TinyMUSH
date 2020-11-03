@@ -105,7 +105,7 @@ guest_char_num		16
 #
 # -- Memory Allocation Tracking
 #
-# malloc_tracker	no
+# malloc_tracker	yes
 # malloc_logger		no
 #
 # -- Output options
