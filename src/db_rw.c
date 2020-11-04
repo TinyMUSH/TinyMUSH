@@ -1352,7 +1352,7 @@ int db_read(void)
 	memcpy((void *)&mudstate.record_players, (void *)c, sizeof(int));
 	c++;
 	memcpy((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
-	free(data.dptr);
+	XFREE(data.dptr);
 
 	/*
      * Load the attribute numbers
@@ -1397,7 +1397,7 @@ int db_read(void)
 				s++;
 			}
 
-			free(data.dptr);
+			XFREE(data.dptr);
 		}
 	}
 
@@ -1472,7 +1472,7 @@ int db_read(void)
 				s_Clean(num);
 			}
 
-			free(data.dptr);
+			XFREE(data.dptr);
 		}
 	}
 

@@ -2528,9 +2528,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	xsw_p = (int *)XCALLOC(n_cols, sizeof(int), "xsw_p");
 	xew_p = (int *)XCALLOC(n_cols, sizeof(int), "xew_p");
 
-	/*
-     * calloc() auto-initializes things to 0, so just do the other things
-     */
+	/* XCALLOC() auto-initializes things to 0, so just do the other things */
 
 	for (i = 0; i < n_cols; i++)
 	{

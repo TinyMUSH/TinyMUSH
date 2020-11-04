@@ -26,8 +26,8 @@
 char *dbfile = DEFAULT_DBMCHUNKFILE;
 int db_initted = 0;
 GDBM_FILE dbp = (GDBM_FILE)0;
-datum dat;
-datum key;
+//datum dat;
+//datum key;
 
 struct flock fl;
 
@@ -194,6 +194,8 @@ int dddb_close(void)
 DBData db_get(DBData gamekey, unsigned int type)
 {
     DBData gamedata;
+    datum dat;
+    datum key;
     char *s;
     char *newdat;
 
@@ -207,30 +209,15 @@ DBData db_get(DBData gamekey, unsigned int type)
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)malloc(sizeof(int) + gamekey.dsize);
+    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
     memcpy((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     memcpy((void *)s, (void *)&type, sizeof(unsigned int));
     key.dsize = sizeof(int) + gamekey.dsize;
     dat = gdbm_fetch(dbp, key);
-
-    if (mudconf.malloc_logger)
-    {
-        /*
-	 * We must XMALLOC() our own memory
-	 */
-        if (dat.dptr != NULL)
-        {
-            newdat = (char *)XMALLOC(dat.dsize, "newdat");
-            memcpy(newdat, dat.dptr, dat.dsize);
-            free(dat.dptr);
-            dat.dptr = newdat;
-        }
-    }
-
     gamedata.dptr = dat.dptr;
     gamedata.dsize = dat.dsize;
-    free(key.dptr);
+    XFREE(key.dptr);
     return gamedata;
 }
 
@@ -238,6 +225,8 @@ DBData db_get(DBData gamekey, unsigned int type)
 
 int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 {
+    datum dat;
+    datum key;    
     char *s;
 
     if (!db_initted)
@@ -248,7 +237,7 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)malloc(sizeof(int) + gamekey.dsize);
+    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
     memcpy((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     memcpy((void *)s, (void *)&type, sizeof(unsigned int));
@@ -262,12 +251,11 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
     if (gdbm_store(dbp, key, dat, GDBM_REPLACE))
     {
         warning("db_put: can't gdbm_store ", " ", (char *)-1, "\n", (char *)0);
-        free(dat.dptr);
-        free(key.dptr);
+        XFREE(key.dptr);
         return (1);
     }
 
-    free(key.dptr);
+    XFREE(key.dptr);
     return (0);
 }
 
@@ -275,6 +263,8 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 
 int db_del(DBData gamekey, unsigned int type)
 {
+    datum dat;
+    datum key;    
     char *s;
 
     if (!db_initted)
@@ -285,23 +275,21 @@ int db_del(DBData gamekey, unsigned int type)
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)malloc(sizeof(int) + gamekey.dsize);
+    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
     memcpy((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     memcpy((void *)s, (void *)&type, sizeof(unsigned int));
     key.dsize = sizeof(int) + gamekey.dsize;
     dat = gdbm_fetch(dbp, key);
 
-    /*
-     * not there?
-     */
+    /* not there? */
     if (dat.dptr == NULL)
     {
-        free(key.dptr);
+        XFREE(key.dptr);
         return (0);
     }
 
-    free(dat.dptr);
+    //XFREE(dat.dptr);
 
     /*
      * drop key from db
@@ -309,11 +297,11 @@ int db_del(DBData gamekey, unsigned int type)
     if (gdbm_delete(dbp, key))
     {
         warning("db_del: can't delete key\n", (char *)NULL);
-        free(key.dptr);
+        XFREE(key.dptr);
         return (1);
     }
 
-    free(key.dptr);
+    XFREE(key.dptr);
     return (0);
 }
 

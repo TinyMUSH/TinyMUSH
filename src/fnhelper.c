@@ -4,23 +4,23 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"	   /* required by mudconf */
-#include "alloc.h"	   /* required by mudconf */
-#include "flags.h"	   /* required by mudconf */
-#include "htab.h"	   /* required by mudconf */
-#include "ltdl.h"	   /* required by mudconf */
-#include "udb.h"	   /* required by mudconf */
-#include "udb_defs.h"  /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "functions.h" /* required by code */
-#include "match.h"	   /* required by code */
-#include "attrs.h"	   /* required by code */
-#include "powers.h"	   /* required by code */
-#include "ansi.h"	   /* required by code */
+#include "typedefs.h"	/* required by mudconf */
+#include "game.h"		/* required by mudconf */
+#include "alloc.h"		/* required by mudconf */
+#include "flags.h"		/* required by mudconf */
+#include "htab.h"		/* required by mudconf */
+#include "ltdl.h"		/* required by mudconf */
+#include "udb.h"		/* required by mudconf */
+#include "udb_defs.h"	/* required by mudconf */
+#include "mushconf.h"	/* required by code */
+#include "db.h"			/* required by externs */
+#include "interface.h"	/* required by code */
+#include "externs.h"	/* required by code */
+#include "functions.h"	/* required by code */
+#include "match.h"		/* required by code */
+#include "attrs.h"		/* required by code */
+#include "powers.h"		/* required by code */
+#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
 long genrand_int31(void);
@@ -285,10 +285,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 
 	if (ntok == 0)
 	{
-		/*
-	 * So we don't try to malloc(0).
-	 */
-		++ntok;
+		++ntok; //So we don't try to XMALLOC(0).
 	}
 
 	/*
@@ -296,7 +293,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
      * pointers is dependent upon the original list string having not
      * been freed yet.
      */
-	*arr = (char **)XCALLOC(ntok, sizeof(char *), "arr");
+	*arr = (char **)XMALLOC(ntok, "arr");
 	tokpos >>= 3;
 	ntok = 0;
 

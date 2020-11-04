@@ -72,16 +72,36 @@ BOOLEXP *alloc_boolexp(void)
 
 	return (b);
 }
+
 void free_boolexp(BOOLEXP *b)
 {
-	if (b == TRUE_BOOLEXP)
-	{
-		return;
-	}
+        if (b == TRUE_BOOLEXP)
+                return;
 
-	free_boolexp(b->sub1);
-	free_boolexp(b->sub2);
-	free_boolexp(b);
+        switch (b->type) {
+        case BOOLEXP_AND:
+        case BOOLEXP_OR:
+                XFREE(b->sub1);
+                XFREE(b->sub2);
+                XFREE(b);
+                break;
+        case BOOLEXP_NOT:
+        case BOOLEXP_CARRY:
+        case BOOLEXP_IS:
+        case BOOLEXP_OWNER:
+        case BOOLEXP_INDIR:
+                XFREE(b->sub1);
+                XFREE(b);
+                break;
+        case BOOLEXP_CONST:
+                XFREE(b);
+                break;
+        case BOOLEXP_ATR:
+        case BOOLEXP_EVAL:
+                XFREE(b->sub1);
+                XFREE(b);
+                break;
+        }
 }
 
 int eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)

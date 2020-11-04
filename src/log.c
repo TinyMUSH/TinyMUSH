@@ -214,8 +214,8 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, sec, log_pos);
                 }
 
-                free(sec);
-                free(pri);
+                XFREE(sec);
+                XFREE(pri);
             }
             else
             {
@@ -230,7 +230,7 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_write_raw(0, "%s %-9s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, log_pos);
                 }
 
-                free(pri);
+                XFREE(pri);
             }
         }
 
@@ -275,17 +275,17 @@ void end_log(void)
  * log_perror: Write perror message to the log
  */
 
-void _log_perror(const char *primary, const char *secondary, const char *extra, const char *failing_object)
+void _log_perror(const char *file, int line, const char *primary, const char *secondary, const char *extra, const char *failing_object)
 {
     int my_errno = errno;
 
     if (extra && *extra)
     {
-        log_write(LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, strerror(my_errno));
+        _log_write(file, line, LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, strerror(my_errno));
     }
     else
     {
-        log_write(LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, strerror(my_errno));
+        _log_write(file, line, LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, strerror(my_errno));
     }
 }
 
@@ -293,41 +293,76 @@ void _log_perror(const char *primary, const char *secondary, const char *extra, 
  * log_write: Format text and print to the log file.
  */
 
-void _log_write(int key, const char *primary, const char *secondary, const char *format, ...)
+void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...)
 {
-    va_list ap;
-    char s[MBUF_SIZE];
-
-    /*
-     * Since the malloc functions now call this,
-     * we should avoid doing malloc stuff in
-     * the logger...
-     */
-
     if ((((key)&mudconf.log_options) != 0) && start_log(primary, secondary, key))
     {
+        int size = 0, vsize = 0;
+        char *str = NULL, *str1 = NULL;
+        va_list ap;
+
         va_start(ap, format);
-        vsnprintf(s, MBUF_SIZE - 1, format, ap);
+        size = vsnprintf(str, size, format, ap);
         va_end(ap);
 
-        /*
-	 * Do we have a logfile to write to...
-	 */
-
-        if ((log_fp != NULL))
+        if (size < 0)
         {
-            fputs(s, log_fp);
+            return;
         }
 
-        /*
-	 * If we are starting up, log to stderr too..
-	 */
+        size++;
+        str = calloc(size, sizeof(char)); // Don't track the logger...
+
+        if (str == NULL)
+        {
+            return;
+        }
+
+        va_start(ap, format);
+        vsize = vsnprintf(str, size, format, ap);
+        va_end(ap);
+
+        if (vsize < 0)
+        {
+            XFREE(str);
+            return;
+        }
+
+        if (mudstate.debug)
+        {
+            str1 = XNSPRINTF("%s:%d %s", file, line, str);
+        }
+
+        /* Do we have a logfile to write to... */
+        if ((log_fp != NULL))
+        {
+            if (mudstate.debug)
+            {
+                fputs(str1, log_fp);
+            }
+            else
+            {
+                fputs(str, log_fp);
+            }
+        }
+
+        /* If we are starting up, log to stderr too.. */
 
         if ((log_fp != stderr) && (mudstate.logstderr))
         {
-            fputs(s, stderr);
+            if (mudstate.debug)
+            {
+                fputs(str1, stderr);
+            }
+            else
+            {
+                fputs(str, stderr);
+            }
         }
 
+        XFREE(str1);
+        XFREE(str);
+        
         end_log();
     }
 }
@@ -335,12 +370,39 @@ void _log_write(int key, const char *primary, const char *secondary, const char 
 /* ---------------------------------------------------------------------------
  * log_write_raw: Print text to the log or mainlog file.
  */
-
 void log_write_raw(int key, const char *format, ...)
 {
+    int size = 0, vsize = 0;
+    char *str = NULL;
     va_list ap;
-    char s[MBUF_SIZE];
     FILE *lfp;
+
+    va_start(ap, format);
+    size = vsnprintf(str, size, format, ap);
+    va_end(ap);
+
+    if (size < 0)
+    {
+        return;
+    }
+
+    size++;
+    str = calloc(size, sizeof(char)); // Don't track the logger...
+
+    if (str == NULL)
+    {
+        return;
+    }
+
+    va_start(ap, format);
+    vsize = vsnprintf(str, size, format, ap);
+    va_end(ap);
+
+    if (vsize < 0)
+    {
+        XFREE(str);
+        return;
+    }
 
     if (key)
     {
@@ -351,28 +413,19 @@ void log_write_raw(int key, const char *format, ...)
         lfp = log_fp;
     }
 
-    va_start(ap, format);
-    vsnprintf(s, MBUF_SIZE - 1, format, ap);
-
-    /*
-     * Do we have a logfile to write to...
-     */
-
+    /* Do we have a logfile to write to... */
     if (lfp != NULL)
     {
-        fputs(s, lfp);
+        fputs(str, lfp);
     }
 
-    /*
-     * If we are starting up, log to stderr too..
-     */
-
+    /* If we are starting up, log to stderr too.. */
     if ((log_fp != stderr) && (mudstate.logstderr))
     {
-        fputs(s, stderr);
+        fputs(str, stderr);
     }
 
-    va_end(ap);
+    XFREE(str);
 }
 
 /* ---------------------------------------------------------------------------

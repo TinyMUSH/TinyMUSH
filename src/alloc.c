@@ -153,9 +153,9 @@ void *__xrealloc(void *ptr, size_t size, const char *file, int line, const char 
  * @brief Tracked version of free().
  * 
  * The __xfree() function frees the memory space pointed to by ptr, which must have been returned
- * by a previous call to __xmalloc(), __xcalloc(), or __xrealloc().  Otherwise, or if __xfree(ptr)
- * has already been called before, undefined behavior occurs.  If ptr is NULL, no operation is
- * performed.
+ * by a previous call to malloc()/__xmalloc(), calloc()/__xcalloc(), or realloc()/__xrealloc().
+ * Otherwise, or if __xfree(ptr) has already been called before, undefined behavior occurs.
+ * If ptr is NULL, no operation is performed.
  * 
  * The wrapper macro XFREE(void *ptr) is identical to calling this function directly. Just keep
  * things more redeable.
@@ -164,9 +164,12 @@ void *__xrealloc(void *ptr, size_t size, const char *file, int line, const char 
  */
 void __xfree(void *ptr)
 {
-	__xfreetrace(ptr);
-	free(ptr);
-	ptr = NULL;
+	if (ptr != NULL)
+	{
+		__xfreetrace(ptr);
+		free(ptr);
+		ptr = NULL;
+	}
 }
 
 /******************************************************************************
@@ -189,27 +192,28 @@ void __xfree(void *ptr)
  */
 void __xalloctrace(size_t size, void *ptr, const char *file, int line, const char *function, const char *var)
 {
-	MEMTRACK *tptr;
-	tptr = (MEMTRACK *)malloc(sizeof(MEMTRACK));
-
-	if (!tptr)
+	if (var)
 	{
-		return;
-	}
+		MEMTRACK *tptr;
+		tptr = (MEMTRACK *)malloc(sizeof(MEMTRACK));
 
-	if (mudconf.malloc_logger)
-	{
-		log_write(LOG_MALLOC, "MEM", "TRACE", "Alloc: %s (%d bytes)", tptr->var, tptr->size);
-	}
+		if (tptr)
+		{
+			if (mudconf.malloc_logger)
+			{
+				log_write(LOG_MALLOC, "MEM", "TRACE", "Alloc: %s (%d bytes)", tptr->var, tptr->size);
+			}
 
-	tptr->bptr = ptr;
-	tptr->file = file;
-	tptr->line = line;
-	tptr->function = function;
-	tptr->var = var;
-	tptr->size = size;
-	tptr->next = mudstate.raw_allocs;
-	mudstate.raw_allocs = tptr;
+			tptr->bptr = ptr;
+			tptr->file = file;
+			tptr->line = line;
+			tptr->function = function;
+			tptr->var = var;
+			tptr->size = size;
+			tptr->next = mudstate.raw_allocs;
+			mudstate.raw_allocs = tptr;
+		}
+	}
 }
 
 /**
@@ -225,33 +229,34 @@ void __xfreetrace(void *ptr)
 	MEMTRACK *tptr, *prev;
 	prev = NULL;
 
-	for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
+	if (ptr != NULL)
 	{
-		if (tptr->bptr == ptr)
+		for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
 		{
-			if (mudconf.malloc_logger)
+			if (tptr->bptr == ptr)
 			{
-				log_write(LOG_MALLOC, "MEM", "TRACE", "Free: %s (%d bytes)", tptr->var, tptr->size);
+				if (mudconf.malloc_logger)
+				{
+					log_write(LOG_MALLOC, "MEM", "TRACE", "Free: %s (%d bytes)", tptr->var, tptr->size);
+				}
+
+				if (mudstate.raw_allocs == tptr)
+				{
+					mudstate.raw_allocs = tptr->next;
+				}
+
+				if (prev)
+				{
+					prev->next = tptr->next;
+				}
+
+				free(tptr);
+				return;
 			}
 
-			if (mudstate.raw_allocs == tptr)
-			{
-				mudstate.raw_allocs = tptr->next;
-			}
-
-			if (prev)
-			{
-				prev->next = tptr->next;
-			}
-
-			free(tptr);
-			return;
+			prev = tptr;
 		}
-
-		prev = tptr;
 	}
-
-	log_write(LOG_BUGS, "MEM", "TRACE", "Attempt to free unknown pointer %p", ptr);
 }
 
 /******************************************************************************
@@ -357,7 +362,6 @@ char *__xsprintf(const char *file, int line, const char *function, const char *v
  * MUSH interfaces
  */
 
-
 /**
  * @brief Helper function to sort the trace table.
  * 
@@ -372,8 +376,8 @@ int __xsorttrace(const void *p1, const void *p2)
 	char *s1, *s2;
 	int r;
 
-	s1 = __xsprintf(NULL, 0, NULL, NULL, "%s:%s", (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
-	s2 = __xsprintf(NULL, 0, NULL, NULL, "%s:%s", (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
+	s1 = XNSPRINTF("%s:%s", (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
+	s2 = XNSPRINTF("%s:%s", (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
 
 	r = strcmp(s1, s2);
 
@@ -422,8 +426,8 @@ void list_rawmemory(dbref player)
 	{
 		u_tags++;
 
-		s1 = __xsprintf(NULL, 0, NULL, NULL, "%s:%s", t_array[i]->function, t_array[i]->var);
-		s2 = __xsprintf(NULL, 0, NULL, NULL, "%s:%s", t_array[i + 1]->function, t_array[i + 1]->var);
+		s1 = XNSPRINTF("%s:%s", t_array[i]->function, t_array[i]->var);
+		s2 = XNSPRINTF("%s:%s", t_array[i + 1]->function, t_array[i + 1]->var);
 
 		if ((i < n_tags - 1) && !strcmp(s1, s2))
 		{
@@ -435,7 +439,7 @@ void list_rawmemory(dbref player)
 			for (j = i + 2; (j < n_tags); j++)
 			{
 
-				s2 = __xsprintf(NULL, 0, NULL, NULL, "%s:%s", t_array[j]->function, t_array[j]->var);
+				s2 = XNSPRINTF("%s:%s", t_array[j]->function, t_array[j]->var);
 
 				if (strcmp(s1, s2))
 				{

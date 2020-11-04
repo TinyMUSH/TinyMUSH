@@ -190,13 +190,6 @@ FILE *tf_popen(char *fname, int mode)
     return t_fd;
 }
 
-/* #define GNU_MALLOC_TEST 1 */
-
-#ifdef GNU_MALLOC_TEST
-extern unsigned int malloc_sbrk_used; /* amount of data space used now */
-
-#endif
-
 /*
  * Check routine forward declaration.
  */

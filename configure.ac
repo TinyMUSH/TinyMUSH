@@ -4,8 +4,8 @@ AC_PREREQ([2.68])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
-m4_define(TINYMUSH_VERSION, [3.3.0.10])
-m4_define(TINYMUSH_RELEASE_DATE, ["2020-10-31"])
+m4_define(TINYMUSH_VERSION, [3.3.0.11])
+m4_define(TINYMUSH_RELEASE_DATE, ["2020-11-03"])
 m4_define(TINYMUSH_COPYRIGHT, [Copyright (C) 1989-2020 TinyMUSH development team.])
 
 AC_INIT([TinyMUSH],[TINYMUSH_VERSION],[https://github.com/TinyMUSH/TinyMUSH/issues],[tinymush],[https://github.com/TinyMUSH])

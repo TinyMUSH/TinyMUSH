@@ -19,39 +19,8 @@
 
 extern char *log_pos;
 
-#define log_write(i, p, s, f, ...)                                               \
-    {                                                                            \
-        if (mudstate.debug)                                                      \
-        {                                                                        \
-            log_pos = malloc(GBUF_SIZE);                                         \
-            safe_snprintf(log_pos, GBUF_SIZE, "%s line %d", __FILE__, __LINE__); \
-            _log_write(i, p, s, f, ##__VA_ARGS__);                               \
-            free(log_pos);                                                       \
-            log_pos = NULL;                                                      \
-        }                                                                        \
-        else                                                                     \
-        {                                                                        \
-            log_pos = NULL;                                                      \
-            _log_write(i, p, s, f, ##__VA_ARGS__);                               \
-        }                                                                        \
-    }
-
-#define log_perror(p, s, e, o)                                                   \
-    {                                                                            \
-        if (mudstate.debug)                                                      \
-        {                                                                        \
-            log_pos = malloc(GBUF_SIZE);                                         \
-            safe_snprintf(log_pos, GBUF_SIZE, "%s line %d", __FILE__, __LINE__); \
-            _log_perror(p, s, e, o);                                             \
-            free(log_pos);                                                       \
-            log_pos = NULL;                                                      \
-        }                                                                        \
-        else                                                                     \
-        {                                                                        \
-            log_pos = NULL;                                                      \
-            _log_perror(p, s, e, o);                                             \
-        }                                                                        \
-    }
+#define log_write(i, p, s, f, ...) _log_write(__FILE__, __LINE__, i, p, s, f, ## __VA_ARGS__)
+#define log_perror(p, s, e, o) _log_perror(__FILE__, __LINE__, p, s, e, o)
 
 /*
  * --------------------------------------------------------------------------

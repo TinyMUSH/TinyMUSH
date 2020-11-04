@@ -1235,7 +1235,7 @@ int modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, int ne
     if (!np)
     {
         np = (NAMEDFUNC *)XMALLOC(sizeof(NAMEDFUNC), "np");
-        np->fn_name = (char *)strdup(fn_name);
+        np->fn_name = (char *)XSTRDUP(fn_name, "np->fn_name");
         np->handler = fn_ptr;
     }
 
@@ -1355,7 +1355,7 @@ int parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, db
 		 * Split it apart, see if we have anything.
 		 */
                 s = XMALLOC(MBUF_SIZE, "s");
-                ostr = (char *)strdup(sp);
+                ostr = (char *)XSTRDUP(sp, "ostr");
 
                 if (*(sp + 4) != '\0')
                 {
@@ -1403,7 +1403,7 @@ int parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, db
                     }
                 }
 
-                free(ostr);
+                XFREE(ostr);
                 XFREE(s);
             }
 

@@ -156,9 +156,9 @@ int dbrecover(int argc, char *argv[])
 		 * Seek to where the data begins
 		 */
 				fseek(f, be.data_pointer, SEEK_SET);
-				key.dptr = (char *)malloc(be.key_size);
+				key.dptr = (char *)XMALLOC(be.key_size, "key.dptr");
 				key.dsize = be.key_size;
-				dat.dptr = (char *)malloc(be.data_size);
+				dat.dptr = (char *)XMALLOC(be.data_size, "dat.dptr");
 				dat.dsize = be.data_size;
 
 				if ((numbytes = fread((void *)(key.dptr), 1, key.dsize, f)) == 0)
@@ -179,8 +179,8 @@ int dbrecover(int argc, char *argv[])
 					exit(EXIT_FAILURE);
 				}
 
-				free(key.dptr);
-				free(dat.dptr);
+				XFREE(key.dptr);
+				XFREE(dat.dptr);
 				/*
 		 * Seek back to where we left off
 		 */

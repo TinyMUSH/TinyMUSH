@@ -167,7 +167,7 @@ void cache_repl(Cache *cp, void *new, int len, unsigned int type, unsigned int f
 
     if (cp->data != NULL)
     {
-        free(cp->data);
+        XFREE(cp->data);
     }
 
     cp->data = new;
@@ -198,7 +198,7 @@ int cache_init(int width)
         cwidth = width;
     }
 
-    sp = sys_c = (Chain *)malloc((unsigned)cwidth * sizeof(Chain));
+    sp = sys_c = (Chain *)XMALLOC((unsigned)cwidth * sizeof(Chain), "sys_c");
 
     if (sys_c == (Chain *)0)
     {
@@ -206,7 +206,7 @@ int cache_init(int width)
         return (-1);
     }
 
-    freelist = (Chain *)malloc(sizeof(Chain));
+    freelist = (Chain *)XMALLOC(sizeof(Chain), "freelist");
 
     /*
      * Allocate the initial cache entries
@@ -306,8 +306,8 @@ void cache_reset(void)
             }
 
             cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
-            free(cp->keydata);
-            free(cp);
+            XFREE(cp->keydata);
+            XFREE(cp);
         }
 
         sp->head = (Cache *)0;
@@ -605,7 +605,7 @@ skipcacheget:
         return data;
     }
 
-    cp->keydata = (void *)malloc(key.dsize);
+    cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
@@ -780,7 +780,7 @@ int cache_put(DBData key, DBData data, unsigned int type)
         return (1);
     }
 
-    cp->keydata = (void *)malloc(key.dsize);
+    cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
@@ -897,8 +897,8 @@ Cache *get_free_entry(int atrsize)
 	     */
             DEQUEUE(sp, cp);
             cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
-            free(cp->keydata);
-            free(cp);
+            XFREE(cp->keydata);
+            XFREE(cp);
         }
 
         cp = NULL;
@@ -908,9 +908,9 @@ Cache *get_free_entry(int atrsize)
      * No valid cache entries to flush, allocate a new one
      */
 
-    if ((cp = (Cache *)malloc(sizeof(Cache))) == NULL)
+    if ((cp = (Cache *)XMALLOC(sizeof(Cache), "cp")) == NULL)
     {
-        fatal("cache get_free_entry: malloc failed", (char *)-1, (char *)0);
+        fatal("cache get_free_entry: XMALLOC failed", (char *)-1, (char *)0);
     }
 
     cp->keydata = NULL;
@@ -1082,7 +1082,7 @@ void cache_del(DBData key, unsigned int type)
         return;
     }
 
-    cp->keydata = (void *)malloc(key.dsize);
+    cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
     memcpy(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->type = type;

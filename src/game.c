@@ -1801,7 +1801,7 @@ int backup_mush(dbref player, dbref cause, int key)
 		}
 	}
 
-	free(cwd);
+	XFREE(cwd);
 	XFREE(buff);
 	XFREE(s);
 	/* Cleanup */
@@ -3296,7 +3296,7 @@ int main(int argc, char *argv[])
 	mudconf.mud_shortname = XSTRDUP(DEFAULT_SHORTNAME, "cf_string");
 	s = getcwd(NULL, 0);
 	mudconf.game_home = realpath(s, NULL);
-	free(s);
+	XFREE(s);
 	mudconf.game_exec = realpath(argv[0], NULL);
 
 	/*
@@ -3336,26 +3336,26 @@ int main(int argc, char *argv[])
 		/*
 	 * The first non-option element is our config file.
 	 */
-		s = strdup(argv[optind++]);
+		s = XSTRDUP(argv[optind++], "s");
 		mudconf.config_file = realpath(s, NULL);
-		free(s);
+		XFREE(s);
 
-		s = strdup(mudconf.config_file);
-		mudconf.config_home = strdup(dirname(s));
-		free(s);
+		s = XSTRDUP(mudconf.config_file, "s");
+		mudconf.config_home = XSTRDUP(dirname(s), "mudconf.config_home");
+		XFREE(s);
 	}
 	else
 	{
 		/*
 	 * If there was none, use the default value.
 	 */
-		s = strdup(DEFAULT_CONFIG_FILE);
+		s = XSTRDUP(DEFAULT_CONFIG_FILE, "s");
 		mudconf.config_file = realpath(s, NULL);
-		free(s);
+		XFREE(s);
 
-		s = strdup(mudconf.config_file);
-		mudconf.config_home = strdup(dirname(s));
-		free(s);
+		s = XSTRDUP(mudconf.config_file, "s");
+		mudconf.config_home = XSTRDUP(dirname(s), "mudconf.config_home");
+		XFREE(s);
 	}
 
 	/* Make sure we can read the config file */
@@ -3780,9 +3780,6 @@ int main(int argc, char *argv[])
 	{
 		raw_broadcast(0, "GAME: Restart finished.");
 	}
-#ifdef MCHECK
-	mtrace();
-#endif
 
 	if (!mudstate.restarting)
 	{
@@ -3844,9 +3841,6 @@ int main(int argc, char *argv[])
 	mudstate.logstderr = 0;
 	init_timer();
 	shovechars(mudconf.port);
-#ifdef MCHECK
-	muntrace();
-#endif
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");
 	close_sockets(0, (char *)"Going down - Bye");
 	dump_database();

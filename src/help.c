@@ -48,7 +48,7 @@ int helpmkindx_dump_entries(FILE *wfp, long pos, help_indx_list *entries)
 
 		if (prev_ep)
 		{
-			free(prev_ep);
+			XFREE(prev_ep);
 		}
 
 		if (depth++)
@@ -93,11 +93,9 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	lineno = 0;
 	ntopics = 0;
 	actualdata = 0;
-	/*
-     * create initial entry storage
-     */
-	entries = (help_indx_list *)malloc(sizeof(help_indx_list));
-	memset(entries, 0, sizeof(help_indx_list));
+	
+	/* create initial entry storage */
+	entries = (help_indx_list *)XMALLOC(sizeof(help_indx_list), "entries");
 
 	while (fgets(line, LINE_SIZE, rfp) != NULL)
 	{
@@ -115,10 +113,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 			if ((ntopics > 1) && actualdata)
 			{
-				/*
-		 *  we've hit the next topic, time to write the ones we've been
-		 *  building
-		 */
+				/* we've hit the next topic, time to write the ones we've been building */
 				actualdata = 0;
 
 				if (helpmkindx_dump_entries(wfp, pos, entries))
@@ -132,13 +127,9 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 			if (entries->entry.pos)
 			{
-				/*
-		 *  we're already working on an entry... time to start nesting
-		 */
+				/* we're already working on an entry... time to start nesting */
 				ep = entries;
-				entries = (help_indx_list *)
-					malloc(sizeof(help_indx_list));
-				memset(entries, 0, sizeof(help_indx_list));
+				entries = (help_indx_list *) XMALLOC(sizeof(help_indx_list), "entries");
 				entries->next = ep;
 			}
 
@@ -163,10 +154,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 		}
 		else if (n > 1)
 		{
-			/*
-	     *  a non blank line.  we can flush entries to the .indx file the next
-	     *  time we run into a topic line...
-	     */
+			/* a non blank line.  we can flush entries to the .indx file the next time we run into a topic line... */
 			actualdata = 1;
 		}
 

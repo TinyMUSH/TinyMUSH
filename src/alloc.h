@@ -12,11 +12,20 @@
 #define __ALLOC_H
 
 #define XMALLOC(s, v) __xmalloc(s, __FILE__, __LINE__, __func__, v)
+#define XNMALLOC(s) __xmalloc(s, NULL, 0, NULL, NULL)
+
 #define XCALLOC(n, s, v) __xcalloc(n, s, __FILE__, __LINE__, __func__, v)
+#define XNCALLOC(n, s) __xcalloc(n, s, NULL, 0, NULL, NULL)
+
 #define XREALLOC(p, s, v) __xrealloc(p, s, __FILE__, __LINE__, __func__, v)
-#define XSTRDUP(s, v) __xstrdup(s, __FILE__, __LINE__, __func__, v)
+#define XNREALLOC(p, s) __xrealloc(p, s, NULL, 0, NULL, NULL)
 #define XFREE(p) __xfree(p)
+
+#define XSTRDUP(s, v) __xstrdup(s, __FILE__, __LINE__, __func__, v)
+#define XNSTRDUP(s) __xstrdup(s, NULL, 0, NULL, NULL)
+
 #define XSPRINTF(v, f, ...) __xsprintf(__FILE__, __LINE__, __func__, v, f, __VA_ARGS__)
+#define XNSPRINTF(f,...) __xsprintf(NULL, 0, NULL, NULL, f, __VA_ARGS__);
 
 typedef struct tracemem_header
 {

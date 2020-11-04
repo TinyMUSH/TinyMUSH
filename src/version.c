@@ -86,7 +86,7 @@ void init_version(void)
        Everything is now set from the configure script. No need to edit this file anymore.
      */
     char *version, *bp;
-    version = strdup(PACKAGE_VERSION);
+    version = XSTRDUP(PACKAGE_VERSION, "version");
 
     if (version != NULL)
     {
@@ -104,7 +104,7 @@ void init_version(void)
         mudstate.version.revision = 0;
     }
 
-    free(version);
+    XFREE(version);
     version = munge_space(PACKAGE_CONFIG);
     mudstate.configureinfo = XSTRDUP(version, "mudstate.configureinfo");
     XFREE(version);
@@ -147,7 +147,7 @@ void init_version(void)
         break;
     }
 
-    mudstate.version.name = strdup(version);
+    mudstate.version.name = XSTRDUP(version, "mudstate.version.name");
     XFREE(version);
 }
 

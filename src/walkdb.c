@@ -22,10 +22,6 @@
 #include "attrs.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
-#ifdef MCHECK
-#include "malloc.h"
-#endif
-
 /*
  * Bind occurances of the universal var in ACTION to ARG, then run ACTION.
  * * Cmds run in low-prio Q after a 1 sec delay for the first one.
@@ -264,18 +260,6 @@ void do_stats(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%d objects = %d rooms, %d exits, %d things, %d players. (%d unknown, %d going, %d garbage)", statinfo.s_total, statinfo.s_rooms, statinfo.s_exits, statinfo.s_things, statinfo.s_players, statinfo.s_unknown, statinfo.s_going, statinfo.s_garbage);
-
-#ifdef MCHECK
-
-	if (Wizard(player))
-	{
-		struct mstats mval;
-		mval = mstats();
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Total size of the heap: %d", mval.bytes_total);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Chunks allocated: %d -- Total size of allocated chunks: %d", mval.chunks_used, mval.bytes_used);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Chunks free: %d -- Total size of free chunks: %d", mval.chunks_free, mval.bytes_free);
-	}
-#endif /* MCHECK */
 }
 
 int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)

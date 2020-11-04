@@ -132,9 +132,6 @@ extern DESC *descriptor_list;
 
 /* From predicates.c */
 
-//#define alloc_desc(s) (DESC *)pool_alloc(POOL_DESC,s)
-//#define free_desc(b) pool_free(POOL_DESC,((char **)&(b)))
-
 #define DESC_ITER_PLAYER(p, d) \
     for (d = (DESC *)nhashfind((int)p, &mudstate.desc_htab); d; d = d->hashnext)
 #define DESC_ITER_CONN(d)                         \
