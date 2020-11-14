@@ -2409,16 +2409,14 @@ void track_ansi_letters(char *t, int *ansi_state)
 		case ESC_CHAR:
 			skip_esccode(&s);
 			break;
-
-		case '<': /* Skip xterm, we handle it elsewhere */
+		case '<': // Skip xterm, we handle it elsewhere
 		case '/':
-			while ((*s != '>'))
+			while ((*s != '>') && (*s != 0))
 			{
 				++s;
 			}
 
 			break;
-
 		default:
 			*ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char)*s]]) | ansi_bits[ansi_nchartab[(unsigned char)*s]]);
 			++s;

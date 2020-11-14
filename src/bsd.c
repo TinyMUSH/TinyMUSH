@@ -1287,7 +1287,7 @@ void sighandler(int sig)
 		log_signal(signames[sig]);
 		raw_broadcast(0, "GAME: Caught signal %s, exiting.", signames[sig]);
 		dump_database_internal(DUMP_DB_KILLED);
-		s = XSPRINTF("s", "Caught signal %s", signames[sig]);
+		s = XASPRINTF("s", "Caught signal %s", signames[sig]);
 		write_status_file(NOTHING, s);
 		XFREE(s);
 		exit(EXIT_SUCCESS);

@@ -1803,7 +1803,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
 
     if (fp == NULL)
     {
-        fpath = XSPRINTF("fpath", "%s/%s", mudconf.txthome, fpath);
+        fpath = XASPRINTF("fpath", "%s/%s", mudconf.txthome, fpath);
         snprintf(s, MAXPATHLEN, "%s.txt", fpath);
         fp = fopen(s, "r");
 
@@ -1895,8 +1895,8 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
      */
     hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * mudconf.hash_factor, HT_STR);
     mudstate.helpfiles++;
-    XFREE(newstr);
     cf_log_help(player, confcmd, "Successfully loaded helpfile %s", basename(fpath));
+    XFREE(newstr);    
     return 0;
 }
 
@@ -1937,7 +1937,7 @@ int cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
     if (fp == NULL)
     {
         XFREE(buf);
-        buf = XSPRINTF("buf", "%s/%s", mudconf.config_home, str);
+        buf = XASPRINTF("buf", "%s/%s", mudconf.config_home, str);
         fp = fopen(buf, "r");
 
         if (fp == NULL)

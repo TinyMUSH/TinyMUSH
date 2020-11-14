@@ -210,9 +210,9 @@ DBData db_get(DBData gamekey, unsigned int type)
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
     s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
-    memcpy((void *)s, gamekey.dptr, gamekey.dsize);
+    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
-    memcpy((void *)s, (void *)&type, sizeof(unsigned int));
+    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
     key.dsize = sizeof(int) + gamekey.dsize;
     dat = gdbm_fetch(dbp, key);
     gamedata.dptr = dat.dptr;
@@ -238,9 +238,9 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
     s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
-    memcpy((void *)s, gamekey.dptr, gamekey.dsize);
+    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
-    memcpy((void *)s, (void *)&type, sizeof(unsigned int));
+    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
     key.dsize = sizeof(int) + gamekey.dsize;
     /*
      * make table entry
@@ -276,9 +276,9 @@ int db_del(DBData gamekey, unsigned int type)
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
     s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
-    memcpy((void *)s, gamekey.dptr, gamekey.dsize);
+    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
-    memcpy((void *)s, (void *)&type, sizeof(unsigned int));
+    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
     key.dsize = sizeof(int) + gamekey.dsize;
     dat = gdbm_fetch(dbp, key);
 
@@ -289,7 +289,7 @@ int db_del(DBData gamekey, unsigned int type)
         return (0);
     }
 
-    //XFREE(dat.dptr);
+    XFREE(dat.dptr);
 
     /*
      * drop key from db

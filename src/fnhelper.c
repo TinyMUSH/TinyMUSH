@@ -293,7 +293,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
      * pointers is dependent upon the original list string having not
      * been freed yet.
      */
-	*arr = (char **)XMALLOC(ntok, "arr");
+	*arr = (char *)XMALLOC(ntok + 1, "arr");
 	tokpos >>= 3;
 	ntok = 0;
 

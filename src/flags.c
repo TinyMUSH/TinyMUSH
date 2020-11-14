@@ -1051,7 +1051,7 @@ int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
      * should pretty much never happen, since you're not going to run
      * around arbitrarily giving your flags new names all the time.
      */
-    flagstr = XSPRINTF("flagstr", "_%s", namestr);
+    flagstr = XASPRINTF("flagstr", "_%s", namestr);
 
     if (strlen(flagstr) > 31)
     {

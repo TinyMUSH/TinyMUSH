@@ -330,7 +330,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         if (mudstate.debug)
         {
-            str1 = XNSPRINTF("%s:%d %s", file, line, str);
+            str1 = XNASPRINTF("%s:%d %s", file, line, str);
         }
 
         /* Do we have a logfile to write to... */

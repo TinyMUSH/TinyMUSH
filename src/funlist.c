@@ -1511,7 +1511,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	Delim isep, osep;
 	int oper, type_arg;
-	char *list1, *list2, *oldp, *bb_p;
+	char *list1, *plist1, *list2, *plist2, *oldp, *bb_p;
 	char **ptrs1, **ptrs2;
 	int i1, i2, n1, n2, val, sort_type;
 	int *ip1, *ip2;
@@ -1528,10 +1528,10 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		VaChk_Only_In_Out(4);
 	}
 
-	list1 = XMALLOC(LBUF_SIZE, "list1");
+	plist1 = list1 = XMALLOC(LBUF_SIZE, "list1");
 	strcpy(list1, fargs[0]);
 	n1 = list2arr(&ptrs1, LBUF_SIZE, list1, &isep);
-	list2 = XMALLOC(LBUF_SIZE, "list2");
+	plist2 = list2 = XMALLOC(LBUF_SIZE, "list2");
 	strcpy(list2, fargs[1]);
 	n2 = list2arr(&ptrs2, LBUF_SIZE, list2, &isep);
 
@@ -1829,8 +1829,8 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		}
 	}
 
-	XFREE(list1);
-	XFREE(list2);
+	//XFREE(plist1);
+	//XFREE(plist2);
 
 	if ((sort_type == NUMERIC_LIST) || (sort_type == DBREF_LIST))
 	{

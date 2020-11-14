@@ -5762,7 +5762,7 @@ See also: @link, @open.
 	w - Staff	x - Slave	y - Orphan	z - Control_OK	
 	! - Stop	$ - Commands	^ - Presence	- - NoBleed
 	~ - HTML	> - Redir_OK	? - Head	| - Vacation
-	+ - Watcher     " - SpeechMod
+	+ - Watcher     " - SpeechMod   : - Color256
   
   See 'help Marker' for help on user-defined flags (0 through 9).
  
@@ -9353,7 +9353,7 @@ performed and the walk down the list stops.
   
   or
   
-  %x/<##ff0000>Red Background!)]
+  %x/<##ff0000>Red Background!
   
   See also: ANSI, COLOR256, NOBLEED, stripansi().
  

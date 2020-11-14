@@ -1458,7 +1458,7 @@ int backup_copy(char *src, char *dst, int flag)
 	/*
      * Copy or move a file to dst directory
      */
-	fn = XSPRINTF("fn", "%s/%s", realpath(dst, NULL), basename(src));
+	fn = XASPRINTF("fn", "%s/%s", realpath(dst, NULL), basename(src));
 	i = copy_file(src, fn, flag);
 	XFREE(fn);
 	return (i);
@@ -1550,7 +1550,7 @@ int backup_mush(dbref player, dbref cause, int key)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.bakhome, mudconf.mud_shortname, mp->modname);
+		s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.bakhome, mudconf.mud_shortname, mp->modname);
 
 		if (mp->db_write_flatfile)
 		{
@@ -1580,7 +1580,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	}
 
 	/* Finally Dump our flatfile */
-	s = XSPRINTF("s", "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
+	s = XASPRINTF("s", "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
 	log_write(LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", s);
 	pcache_sync();
 	SYNC;
@@ -1620,7 +1620,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	}
 
 	/* We have everything we need to backup, create a temp directory */
-	tmpdir = XSPRINTF("tmpdir", "%s/backup.XXXXXX", mudconf.bakhome);
+	tmpdir = XASPRINTF("tmpdir", "%s/backup.XXXXXX", mudconf.bakhome);
 
 	if ((mkdtemp(tmpdir)) == NULL)
 	{
@@ -1662,7 +1662,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	}
 
 	/* Create our backup config file */
-	s = XSPRINTF("s", "%s/netmush.backup", tmpdir);
+	s = XASPRINTF("s", "%s/netmush.backup", tmpdir);
 
 	if ((fp = fopen(s, "w")) != NULL)
 	{
@@ -1716,7 +1716,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	XFREE(s);
 	/* Call our external utility to pack everything together */
 	ts = mktimestamp();
-	s = XSPRINTF("s", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext);
+	s = XASPRINTF("s", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext);
 	XFREE(ts);
 	cwd = getcwd(NULL, MAXPATHLEN);
 
@@ -1814,7 +1814,7 @@ int backup_mush(dbref player, dbref cause, int key)
 
 	for (i = 0; txt[i] != NULL; i++)
 	{
-		s = XSPRINTF("s", "%s/%s", tmpdir, basename(txt[i]));
+		s = XASPRINTF("s", "%s/%s", tmpdir, basename(txt[i]));
 
 		if (unlink(s) == -1)
 		{
@@ -1834,7 +1834,7 @@ int backup_mush(dbref player, dbref cause, int key)
 
 	for (i = 0; cnf[i] != NULL; i++)
 	{
-		s = XSPRINTF("s", "%s/%s", tmpdir, basename(cnf[i]));
+		s = XASPRINTF("s", "%s/%s", tmpdir, basename(cnf[i]));
 
 		if (unlink(s) == -1)
 		{
@@ -1854,7 +1854,7 @@ int backup_mush(dbref player, dbref cause, int key)
 
 	for (i = 0; dbf[i] != NULL; i++)
 	{
-		s = XSPRINTF("s", "%s/%s", tmpdir, basename(dbf[i]));
+		s = XASPRINTF("s", "%s/%s", tmpdir, basename(dbf[i]));
 
 		if (unlink(s) == -1)
 		{
@@ -1871,7 +1871,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	}
 
 	XFREE(dbf);
-	s = XSPRINTF("s", "%s/netmush.backup", tmpdir);
+	s = XASPRINTF("s", "%s/netmush.backup", tmpdir);
 
 	if (unlink(s) == -1)
 	{
@@ -1998,7 +1998,7 @@ void write_status_file(dbref player, char *message)
 
 	if (player != NOTHING)
 	{
-		msg = XSPRINTF("msg", "Shutdown by : %s\n", Name(Owner(player)));
+		msg = XASPRINTF("msg", "Shutdown by : %s\n", Name(Owner(player)));
 	}
 	else
 	{
@@ -2015,7 +2015,7 @@ void write_status_file(dbref player, char *message)
 
 	if (message && *message)
 	{
-		msg = XSPRINTF("msg", "Status : %s\n", message);
+		msg = XASPRINTF("msg", "Status : %s\n", message);
 		size = write(fd, msg, strlen(msg));
 		log_write(LOG_ALWAYS, "WIZ", "WRSTF", "Shutdown status: %s", message);
 
@@ -2134,7 +2134,7 @@ void dump_database_internal(int dump_type)
 	 */
 		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 		{
-			s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 
 			if (mp->db_write_flatfile)
 			{
@@ -2209,7 +2209,7 @@ void dump_database_internal(int dump_type)
 	 */
 		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 		{
-			s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 
 			if (mp->db_write_flatfile)
 			{
@@ -2393,7 +2393,7 @@ int load_game(void)
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
-			s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 			f = db_module_flatfile(s, 0);
 
 			if (f)
@@ -2903,7 +2903,7 @@ void recover_flatfile(char *flat)
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
-			s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 			f = db_module_flatfile(s, 0);
 
 			if (f)
@@ -3144,7 +3144,7 @@ int dbconvert(int argc, char *argv[])
 
 			if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 			{
-				s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+				s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 				f = db_module_flatfile(s, 0);
 
 				if (f)
@@ -3208,7 +3208,7 @@ int dbconvert(int argc, char *argv[])
 
 				if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 				{
-					s = XSPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+					s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
 					f = db_module_flatfile(s, 1);
 
 					if (f)
@@ -3450,7 +3450,7 @@ int main(int argc, char *argv[])
 	hashinit(&mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR);
 	hashinit(&mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR);
 
-	mudconf.log_file = XSPRINTF("mudconf.log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname);
+	mudconf.log_file = XASPRINTF("mudconf.log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname);
 
 	if (tailfind(mudconf.log_file, "GDBM panic: write error\n"))
 	{
@@ -3477,7 +3477,7 @@ int main(int argc, char *argv[])
 	if (fileexist(mudconf.log_file))
 	{
 		ts = mktimestamp();
-		s = XSPRINTF("s", "%s.%s", mudconf.log_file, ts);
+		s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
 		log_write(LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename(s));
 		copy_file(mudconf.log_file, s, 1);
 		XFREE(s);
@@ -3485,11 +3485,11 @@ int main(int argc, char *argv[])
 	}
 
 	logfile_move(templog, mudconf.log_file);
-	mudconf.pid_file = XSPRINTF("mudconf.pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname);
-	mudconf.db_file = XSPRINTF("mudconf.db_file", "%s.db", mudconf.mud_shortname);
-	mudconf.status_file = XSPRINTF("mudconf.status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname);
+	mudconf.pid_file = XASPRINTF("mudconf.pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname);
+	mudconf.db_file = XASPRINTF("mudconf.db_file", "%s.db", mudconf.mud_shortname);
+	mudconf.status_file = XASPRINTF("mudconf.status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname);
 
-	s = XSPRINTF("s", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+	s = XASPRINTF("s", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
 
 	if (fileexist(s))
 	{
@@ -3511,17 +3511,17 @@ int main(int argc, char *argv[])
 
 	if (mudconf.help_users == NULL)
 	{
-		mudconf.help_users = XSPRINTF("mudconf.help_users", "help %s/help", mudconf.txthome);
+		mudconf.help_users = XASPRINTF("mudconf.help_users", "help %s/help", mudconf.txthome);
 	}
 
 	if (mudconf.help_wizards == NULL)
 	{
-		mudconf.help_wizards = XSPRINTF("mudconf.help_wizards", "wizhelp %s/wizhelp", mudconf.txthome);
+		mudconf.help_wizards = XASPRINTF("mudconf.help_wizards", "wizhelp %s/wizhelp", mudconf.txthome);
 	}
 
 	if (mudconf.help_quick == NULL)
 	{
-		mudconf.help_quick = XSPRINTF("mudconf.help_quick", "qhelp %s/qhelp", mudconf.txthome);
+		mudconf.help_quick = XASPRINTF("mudconf.help_quick", "qhelp %s/qhelp", mudconf.txthome);
 	}
 
 	add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_users, 1);
@@ -3530,64 +3530,64 @@ int main(int argc, char *argv[])
 
 	if (mudconf.guest_file == NULL)
 	{
-		mudconf.guest_file = XSPRINTF("mudconf.guest_file", "%s/guest.txt", mudconf.txthome);
+		mudconf.guest_file = XASPRINTF("mudconf.guest_file", "%s/guest.txt", mudconf.txthome);
 	}
 
 	if (mudconf.conn_file == NULL)
 	{
-		mudconf.conn_file = XSPRINTF("mudconf.conn_file", "%s/connect.txt", mudconf.txthome);
+		mudconf.conn_file = XASPRINTF("mudconf.conn_file", "%s/connect.txt", mudconf.txthome);
 	}
 
 	if (mudconf.creg_file == NULL)
 	{
-		mudconf.creg_file = XSPRINTF("mudconf.creg_file", "%s/register.txt", mudconf.txthome);
+		mudconf.creg_file = XASPRINTF("mudconf.creg_file", "%s/register.txt", mudconf.txthome);
 	}
 
 	if (mudconf.regf_file == NULL)
 	{
-		mudconf.regf_file = XSPRINTF("mudconf.regf_file", "%s/create_reg.txt", mudconf.txthome);
+		mudconf.regf_file = XASPRINTF("mudconf.regf_file", "%s/create_reg.txt", mudconf.txthome);
 	}
 
 	if (mudconf.motd_file == NULL)
 	{
-		mudconf.motd_file = XSPRINTF("mudconf.motd_file", "%s/motd.txt", mudconf.txthome);
+		mudconf.motd_file = XASPRINTF("mudconf.motd_file", "%s/motd.txt", mudconf.txthome);
 	}
 
 	if (mudconf.wizmotd_file == NULL)
 	{
-		mudconf.wizmotd_file = XSPRINTF("mudconf.wizmotd_file", "%s/wizmotd.txt", mudconf.txthome);
+		mudconf.wizmotd_file = XASPRINTF("mudconf.wizmotd_file", "%s/wizmotd.txt", mudconf.txthome);
 	}
 
 	if (mudconf.quit_file == NULL)
 	{
-		mudconf.quit_file = XSPRINTF("mudconf.quit_file", "%s/quit.txt", mudconf.txthome);
+		mudconf.quit_file = XASPRINTF("mudconf.quit_file", "%s/quit.txt", mudconf.txthome);
 	}
 
 	if (mudconf.down_file == NULL)
 	{
-		mudconf.down_file = XSPRINTF("mudconf.down_file", "%s/down.txt", mudconf.txthome);
+		mudconf.down_file = XASPRINTF("mudconf.down_file", "%s/down.txt", mudconf.txthome);
 	}
 
 	if (mudconf.full_file == NULL)
 	{
-		mudconf.full_file = XSPRINTF("mudconf.full_file", "%s/full.txt", mudconf.txthome);
+		mudconf.full_file = XASPRINTF("mudconf.full_file", "%s/full.txt", mudconf.txthome);
 	}
 
 	if (mudconf.site_file == NULL)
 	{
-		mudconf.site_file = XSPRINTF("mudconf.site_file", "%s/badsite.txt", mudconf.txthome);
+		mudconf.site_file = XASPRINTF("mudconf.site_file", "%s/badsite.txt", mudconf.txthome);
 	}
 
 	if (mudconf.crea_file == NULL)
 	{
-		mudconf.crea_file = XSPRINTF("mudconf.crea_file", "%s/newuser.txt", mudconf.txthome);
+		mudconf.crea_file = XASPRINTF("mudconf.crea_file", "%s/newuser.txt", mudconf.txthome);
 	}
 
 	if (mudconf.have_pueblo == 1)
 	{
 		if (mudconf.htmlconn_file == NULL)
 		{
-			mudconf.htmlconn_file = XSPRINTF("mudconf.htmlconn_file", "%s/htmlconn.txt", mudconf.txthome);
+			mudconf.htmlconn_file = XASPRINTF("mudconf.htmlconn_file", "%s/htmlconn.txt", mudconf.txthome);
 		}
 	}
 
@@ -3617,7 +3617,7 @@ int main(int argc, char *argv[])
 	/*
      * If after doing all that stuff, there is still no db, create a minimal one.
      */
-	s = XSPRINTF("s", "%s/%s", mudconf.dbhome, mudconf.db_file);
+	s = XASPRINTF("s", "%s/%s", mudconf.dbhome, mudconf.db_file);
 
 	if (!fileexist(s))
 	{
@@ -3861,7 +3861,7 @@ int main(int argc, char *argv[])
 	if (fileexist(mudconf.log_file))
 	{
 		ts = mktimestamp();
-		s = XSPRINTF("s", "%s.%s", mudconf.log_file, ts);
+		s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
 		copy_file(mudconf.log_file, s, 1);
 		XFREE(s);
 		XFREE(ts);

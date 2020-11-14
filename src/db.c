@@ -3316,7 +3316,7 @@ void dump_restart_db(void)
     version |= RS_RECORD_PLAYERS;
     version |= RS_NEW_STRINGS;
     version |= RS_COUNT_REBOOTS;
-    dbf = XSPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
     f = fopen(dbf, "w");
     XFREE(dbf);
     fprintf(f, "+V%d\n", version);
@@ -3354,7 +3354,7 @@ void load_restart_db(void)
     int val, version, new_strings = 0;
     char *temp, buf[8];
     struct stat fstatbuf;
-    dbf = XSPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
     f = fopen(dbf, "r");
 
     if (!f)

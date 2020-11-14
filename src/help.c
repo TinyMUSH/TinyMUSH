@@ -73,8 +73,8 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	char line[LINE_SIZE + 1];
 	help_indx_list *entries, *ep;
 	FILE *rfp, *wfp;
-	src = XSPRINTF("src", "%s.txt", helpfile);
-	dst = XSPRINTF("dst", "%s.indx", helpfile);
+	src = XASPRINTF("src", "%s.txt", helpfile);
+	dst = XASPRINTF("dst", "%s.indx", helpfile);
 	cf_log_help_mkindx(player, confcmd, "Indexing %s", basename(src));
 
 	if ((rfp = fopen(src, "r")) == NULL)
