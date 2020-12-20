@@ -58,7 +58,7 @@ void load_quota(int q_list[], dbref player, int qtype)
 void save_quota(int q_list[], dbref player, int qtype)
 {
 	char buf[MBUF_SIZE];
-	sprintf(buf, "%d %d %d %d %d", q_list[0], q_list[1], q_list[2], q_list[3], q_list[4]);
+	XSPRINTF(buf, "%d %d %d %d %d", q_list[0], q_list[1], q_list[2], q_list[3], q_list[4]);
 	atr_add_raw(player, qtype, buf);
 }
 

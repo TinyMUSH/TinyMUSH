@@ -235,7 +235,7 @@ void display_powertab(dbref player)
     char *buf, *bp;
     POWERENT *fp;
     bp = buf = XMALLOC(LBUF_SIZE, "buf");
-    safe_str((char *)"Powers:", buf, &bp);
+    SAFE_LB_STR((char *)"Powers:", buf, &bp);
 
     for (fp = gen_powers; fp->powername; fp++)
     {
@@ -249,8 +249,8 @@ void display_powertab(dbref player)
             continue;
         }
 
-        safe_chr(' ', buf, &bp);
-        safe_str((char *)fp->powername, buf, &bp);
+        SAFE_LB_CHR(' ', buf, &bp);
+        SAFE_LB_STR((char *)fp->powername, buf, &bp);
     }
 
     *bp = '\0';
@@ -435,7 +435,7 @@ char *power_description(dbref player, dbref target)
     /*
      * Store the header strings and object type
      */
-    safe_mb_str((char *)"Powers:", buff, &bp);
+    SAFE_MB_STR((char *)"Powers:", buff, &bp);
 
     for (fp = gen_powers; fp->powername; fp++)
     {
@@ -460,8 +460,8 @@ char *power_description(dbref player, dbref target)
                 continue;
             }
 
-            safe_mb_chr(' ', buff, &bp);
-            safe_mb_str((char *)fp->powername, buff, &bp);
+            SAFE_MB_CHR(' ', buff, &bp);
+            SAFE_MB_STR((char *)fp->powername, buff, &bp);
         }
     }
 

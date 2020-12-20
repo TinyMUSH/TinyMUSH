@@ -200,12 +200,12 @@ dbref absolute_nref(char *str)
     else
     {
         bp = buf;
-        safe_ltos(buf, &bp, Owner(md.player), LBUF_SIZE);
-        safe_chr('.', buf, &bp);
+        SAFE_LTOS(buf, &bp, Owner(md.player), LBUF_SIZE);
+        SAFE_LB_CHR('.', buf, &bp);
 
         for (q = str; *q; q++)
         {
-            safe_chr(tolower(*q), buf, &bp);
+            SAFE_LB_CHR(tolower(*q), buf, &bp);
         }
 
         *bp = '\0';
@@ -680,7 +680,7 @@ void save_match_state(MSTATE *m_state)
     m_state->match = md.match;
     m_state->player = md.player;
     m_state->string = XMALLOC(LBUF_SIZE, "m_state->string");
-    strcpy(m_state->string, md.string);
+    XSTRCPY(m_state->string, md.string);
 }
 
 void restore_match_state(MSTATE *m_state)
@@ -692,7 +692,7 @@ void restore_match_state(MSTATE *m_state)
     md.absolute_form = m_state->absolute_form;
     md.match = m_state->match;
     md.player = m_state->player;
-    strcpy(md.string, m_state->string);
+    XSTRCPY(md.string, m_state->string);
     XFREE(m_state->string);
 }
 

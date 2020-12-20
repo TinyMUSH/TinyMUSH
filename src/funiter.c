@@ -279,7 +279,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     print_sep(&osep, buff, bufc);
                 }
 
-                safe_str(mudstate.loop_token[cur_lev], buff, bufc);
+                SAFE_LB_STR(mudstate.loop_token[cur_lev], buff, bufc);
             }
 
             XFREE(result);
@@ -318,7 +318,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_ilev(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_ltos(buff, bufc, mudstate.in_loop - 1, LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, mudstate.in_loop - 1, LBUF_SIZE);
 }
 
 void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -328,11 +328,11 @@ void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if ((lev > mudstate.in_loop - 1) || (lev < 0))
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
-    safe_ltos(buff, bufc, mudstate.loop_number[lev], LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, mudstate.loop_number[lev], LBUF_SIZE);
 }
 
 void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -345,7 +345,7 @@ void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         return;
     }
 
-    safe_str(mudstate.loop_token[lev], buff, bufc);
+    SAFE_LB_STR(mudstate.loop_token[lev], buff, bufc);
 }
 
 void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -358,7 +358,7 @@ void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         return;
     }
 
-    safe_str(mudstate.loop_token2[lev], buff, bufc);
+    SAFE_LB_STR(mudstate.loop_token2[lev], buff, bufc);
 }
 
 void fun_ibreak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -417,7 +417,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     i = 1;
     clist[2] = XMALLOC(SBUF_SIZE, "clist[2]");
     op = clist[2];
-    safe_ltos(clist[2], &op, i, LBUF_SIZE);
+    SAFE_LTOS(clist[2], &op, i, LBUF_SIZE);
 
     if ((nfargs >= 3) && (fargs[2]))
     {
@@ -446,17 +446,17 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         clist[0] = rstore;
         clist[1] = split_token(&cp, &isep);
         op = clist[2];
-        safe_ltos(clist[2], &op, i, LBUF_SIZE);
+        SAFE_LTOS(clist[2], &op, i, LBUF_SIZE);
         StrCopyKnown(atextbuf, atext, alen);
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
         exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
-        strcpy(rstore, result);
+        XSTRCPY(rstore, result);
         XFREE(result);
         i++;
     }
 
-    safe_str(rstore, buff, bufc);
+    SAFE_LB_STR(rstore, buff, bufc);
     XFREE(rstore);
     XFREE(atext);
     XFREE(atextbuf);
@@ -502,7 +502,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     {
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
         StrCopyKnown(atextbuf, atext, alen);
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
@@ -515,7 +515,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 print_sep(&osep, buff, bufc);
             }
 
-            safe_str(objs[0], buff, bufc);
+            SAFE_LB_STR(objs[0], buff, bufc);
         }
 
         XFREE(result);
@@ -576,7 +576,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
         StrCopyKnown(atextbuf, atext, alen);
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
@@ -783,7 +783,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	     */
             while (*cp && (*cp != start_token))
             {
-                safe_chr(*cp, buff, bufc);
+                SAFE_LB_CHR(*cp, buff, bufc);
                 cp++;
                 i++;
             }
@@ -825,7 +825,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         cbuf[0][0] = *cp++;
         cbuf[0][1] = '\0';
         op = cbuf[1];
-        safe_ltos(cbuf[1], &op, i, LBUF_SIZE);
+        SAFE_LTOS(cbuf[1], &op, i, LBUF_SIZE);
         StrCopyKnown(atextbuf, atext, alen);
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
@@ -868,14 +868,14 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      */
     list1 = XMALLOC(LBUF_SIZE, "list1");
     list2 = XMALLOC(LBUF_SIZE, "list2");
-    strcpy(list1, fargs[1]);
-    strcpy(list2, fargs[2]);
+    XSTRCPY(list1, fargs[1]);
+    XSTRCPY(list2, fargs[2]);
     nptrs1 = list2arr(&ptrs1, LBUF_SIZE / 2, list1, &isep);
     nptrs2 = list2arr(&ptrs2, LBUF_SIZE / 2, list2, &isep);
 
     if (nptrs1 != nptrs2)
     {
-        safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+        SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(atext);
         XFREE(list1);
         XFREE(list2);
@@ -913,7 +913,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                     print_sep(&osep, buff, bufc);
                 }
 
-                safe_str(ptrs2[j], buff, bufc);
+                SAFE_LB_STR(ptrs2[j], buff, bufc);
                 ptrs1[j][0] = '\0';
                 break;
             }
@@ -1036,7 +1036,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        safe_ltos(objs[1], &op, i, LBUF_SIZE);
+        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
         StrCopyKnown(atextbuf, atext1, alen1);
         str = atextbuf;
         savep = *bufc;

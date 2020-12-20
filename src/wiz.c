@@ -355,15 +355,15 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
      */
 	loc = Location(victim);
 	buf = XMALLOC(MBUF_SIZE, "buf");
-	sprintf(buf, "%s has been turned into a slimy toad!", Name(victim));
+	XSPRINTF(buf, "%s has been turned into a slimy toad!", Name(victim));
 	notify_except2(loc, player, victim, player, 0, NULL, buf);
-	sprintf(buf, "You toaded %s! (%d objects @chowned)", Name(victim), count + 1);
+	XSPRINTF(buf, "You toaded %s! (%d objects @chowned)", Name(victim), count + 1);
 	notify_quiet(player, buf);
 	/*
      * Zap the name from the name hash table
      */
 	delete_player_name(victim, Name(victim));
-	sprintf(buf, "a slimy toad named %s", Name(victim));
+	XSPRINTF(buf, "a slimy toad named %s", Name(victim));
 	s_Name(victim, buf);
 	XFREE(buf);
 	/*
@@ -485,7 +485,7 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 	{
 		bp = buf = XMALLOC(LBUF_SIZE, "buf");
 		safe_name(player, buf, &bp);
-		safe_str((char *)" gently shows you the door.", buf, &bp);
+		SAFE_LB_STR((char *)" gently shows you the door.", buf, &bp);
 		*bp = '\0';
 	}
 

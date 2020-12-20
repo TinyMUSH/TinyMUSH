@@ -356,7 +356,7 @@ char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char de
 		else
 		{
 			fargs[arg] = XMALLOC(LBUF_SIZE, "fargs[arg]");
-			strcpy(fargs[arg], tstr);
+			XSTRCPY(fargs[arg], tstr);
 		}
 
 		arg++;
@@ -449,7 +449,7 @@ void tcache_add(char *orig, char *result)
 		{
 			xp = (TCENT *)XMALLOC(SBUF_SIZE, "xp");
 			tp = XMALLOC(LBUF_SIZE, "tp");
-			strcpy(tp, result);
+			XSTRCPY(tp, result);
 			xp->orig = orig;
 			xp->result = tp;
 			xp->next = tcache_head;
@@ -566,7 +566,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	char *tstr, *tbuf, *savepos, *atr_gotten, *start, *oldp;
 	char savec, ch, *savestr, *str, *xptr, *mundane, *p;
 	char *realbuff = NULL, *realbp = NULL;
-	char xtbuf[SBUF_SIZE], *xtp;
+	char *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
+	char *xtp;
 	dbref aowner;
 	int at_space, nfargs, gender, i, j, alldone, aflags, alen, feval;
 	int is_trace, is_top, save_count;
@@ -584,6 +585,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	if (*dstr == NULL)
 	{
 		**bufc = '\0';
+		XFREE(xtbuf);
 		return;
 	}
 
@@ -616,7 +618,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	{
 		is_top = tcache_empty();
 		savestr = XMALLOC(LBUF_SIZE, "savestr");
-		strcpy(savestr, *dstr);
+		XSTRCPY(savestr, *dstr);
 	}
 
 	while (**dstr && !alldone)
@@ -646,7 +648,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			p = *bufc;
 			navail = LBUF_SIZE - 1 - (p - buff);
 			nchar = (nchar > navail) ? navail : nchar;
-			memcpy(p, *dstr, nchar);
+			XMEMCPY(p, *dstr, nchar);
 			*bufc = p + nchar;
 			*dstr = mundane;
 			at_space = 0;
@@ -671,7 +673,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	     */
 			if (!(mudconf.space_compress && at_space) || (eval & EV_NO_COMPRESS))
 			{
-				safe_chr(' ', buff, bufc);
+				SAFE_LB_CHR(' ', buff, bufc);
 				at_space = 1;
 			}
 
@@ -687,7 +689,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (**dstr)
 			{
-				safe_chr(**dstr, buff, bufc);
+				SAFE_LB_CHR(**dstr, buff, bufc);
 			}
 			else
 			{
@@ -707,7 +709,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (eval & EV_NOFCHECK)
 			{
-				safe_chr('[', buff, bufc);
+				SAFE_LB_CHR('[', buff, bufc);
 				*dstr = tstr;
 				break;
 			}
@@ -716,7 +718,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (*dstr == NULL)
 			{
-				safe_chr('[', buff, bufc);
+				SAFE_LB_CHR('[', buff, bufc);
 				*dstr = tstr;
 			}
 			else
@@ -740,14 +742,14 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (*dstr == NULL)
 			{
-				safe_chr('{', buff, bufc);
+				SAFE_LB_CHR('{', buff, bufc);
 				*dstr = tstr;
 			}
 			else
 			{
 				if (!(eval & EV_STRIP))
 				{
-					safe_chr('{', buff, bufc);
+					SAFE_LB_CHR('{', buff, bufc);
 				}
 
 				/*
@@ -756,7 +758,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (*tbuf == ' ')
 				{
-					safe_chr(' ', buff, bufc);
+					SAFE_LB_CHR(' ', buff, bufc);
 					tbuf++;
 				}
 
@@ -765,7 +767,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (!(eval & EV_STRIP))
 				{
-					safe_chr('}', buff, bufc);
+					SAFE_LB_CHR('}', buff, bufc);
 				}
 
 				(*dstr)--;
@@ -804,31 +806,31 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if ((i < ncargs) && (cargs[i] != NULL))
 				{
-					safe_str(cargs[i], buff, bufc);
+					SAFE_LB_STR(cargs[i], buff, bufc);
 				}
 
 				break;
 
 			case 'r': /* Carriage return */
 			case 'R':
-				safe_crlf(buff, bufc);
+				SAFE_CRLF(buff, bufc);
 				break;
 
 			case 't': /* Tab */
 			case 'T':
-				safe_chr('\t', buff, bufc);
+				SAFE_LB_CHR('\t', buff, bufc);
 				break;
 
 			case 'B': /* Blank */
 			case 'b':
-				safe_chr(' ', buff, bufc);
+				SAFE_LB_CHR(' ', buff, bufc);
 				break;
 
 			case 'C':
 			case 'c':
 				if (mudconf.c_cmd_subst)
 				{
-					safe_str(mudstate.curr_cmd, buff, bufc);
+					SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 					break;
 				}
 
@@ -911,7 +913,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 							while (**dstr && (**dstr != '>'))
 							{
-								safe_sb_chr(**dstr, xtbuf, &xtp);
+								SAFE_SB_CHR(**dstr, xtbuf, &xtp);
 								(*dstr)++;
 							}
 
@@ -937,7 +939,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 								snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
 							}
 
-							safe_str(xtbuf, buff, bufc);
+							SAFE_LB_STR(xtbuf, buff, bufc);
 							ansi = 1;
 						}
 						else
@@ -961,11 +963,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (!ansi_chartab[(unsigned char)**dstr])
 				{
-					safe_chr(**dstr, buff, bufc);
+					SAFE_LB_CHR(**dstr, buff, bufc);
 				}
 				else
 				{
-					safe_str(ansi_chartab[(unsigned char)**dstr], buff, bufc);
+					SAFE_LB_STR(ansi_chartab[(unsigned char)**dstr], buff, bufc);
 					ansi = (**dstr == 'n') ? 0 : 1;
 				}
 
@@ -993,7 +995,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				while (**dstr && (**dstr != '>'))
 				{
-					safe_sb_chr(**dstr, xtbuf, &xtp);
+					SAFE_SB_CHR(**dstr, xtbuf, &xtp);
 					(*dstr)++;
 				}
 
@@ -1019,7 +1021,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				if (See_attr(player, player, ap, aowner, aflags))
 				{
 					atr_gotten = atr_pget(player, ap->number, &aowner, &aflags, &alen);
-					safe_strncat(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+					SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 					XFREE(atr_gotten);
 				}
 
@@ -1046,11 +1048,9 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					}
 
 					xtp = xtbuf;
-					safe_ltos(xtbuf, &xtp, player, LBUF_SIZE);
-					/* safe_chr ( '.', xtbuf, &xtp ); */
-					safe_copy_chr('.', xtbuf, &xtp, SBUF_SIZE - 1);
-					/* safe_chr ( ch, xtbuf, &xtp ); */
-					safe_copy_chr(ch, xtbuf, &xtp, SBUF_SIZE - 1);
+					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
+					SAFE_COPY_CHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
+					SAFE_COPY_CHR(ch, xtbuf, &xtp, SBUF_SIZE - 1);
 				}
 				else
 				{
@@ -1064,9 +1064,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					}
 
 					xtp = xtbuf;
-					safe_ltos(xtbuf, &xtp, player, LBUF_SIZE);
-					/* safe_chr ( '.', xtbuf, &xtp ); */
-					safe_copy_chr('.', xtbuf, &xtp, SBUF_SIZE - 1);
+					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
+					SAFE_COPY_CHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
 
 					while (**dstr && (**dstr != '>'))
 					{
@@ -1074,7 +1073,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			 * Copy. No interpretation.
 			 */
 						ch = tolower(**dstr);
-						safe_sb_chr(ch, xtbuf, &xtp);
+						SAFE_SB_CHR(ch, xtbuf, &xtp);
 						(*dstr)++;
 					}
 
@@ -1095,7 +1094,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (!(mudstate.f_limitmask & FN_VARFX) && (xvar = (VARENT *)hashfind(xtbuf, &mudstate.vars_htab)))
 				{
-					safe_str(xvar->text, buff, bufc);
+					SAFE_LB_STR(xvar->text, buff, bufc);
 				}
 
 				break;
@@ -1117,7 +1116,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				i = A_VA + ch - 'A';
 				atr_gotten = atr_pget(player, i, &aowner, &aflags, &alen);
-				safe_strncat(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+				SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 				XFREE(atr_gotten);
 				break;
 
@@ -1142,7 +1141,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (mudstate.rdata && mudstate.rdata->q_alloc > i)
 					{
-						safe_strncat(buff, bufc, mudstate.rdata->q_regs[i], mudstate.rdata->q_lens[i], LBUF_SIZE);
+						SAFE_STRNCAT(buff, bufc, mudstate.rdata->q_regs[i], mudstate.rdata->q_lens[i], LBUF_SIZE);
 					}
 
 					if (!**dstr)
@@ -1189,7 +1188,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				while (**dstr && (**dstr != '>'))
 				{
-					safe_sb_chr(tolower(**dstr), xtbuf, &xtp);
+					SAFE_SB_CHR(tolower(**dstr), xtbuf, &xtp);
 					(*dstr)++;
 				}
 
@@ -1208,7 +1207,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				{
 					if (mudstate.rdata->x_names[i] && !strcmp(xtbuf, mudstate.rdata->x_names[i]))
 					{
-						safe_strncat(buff, bufc, mudstate.rdata->x_regs[i], mudstate.rdata->x_lens[i], LBUF_SIZE);
+						SAFE_STRNCAT(buff, bufc, mudstate.rdata->x_regs[i], mudstate.rdata->x_lens[i], LBUF_SIZE);
 						break;
 					}
 				}
@@ -1227,7 +1226,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					safe_name(cause, buff, bufc);
 				}
 				else
-					safe_str((char *)obj[gender], buff, bufc);
+					SAFE_LB_STR((char *)obj[gender], buff, bufc);
 
 				break;
 
@@ -1241,11 +1240,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				if (!gender)
 				{
 					safe_name(cause, buff, bufc);
-					safe_chr('s', buff, bufc);
+					SAFE_LB_CHR('s', buff, bufc);
 				}
 				else
 				{
-					safe_str((char *)poss[gender], buff, bufc);
+					SAFE_LB_STR((char *)poss[gender], buff, bufc);
 				}
 
 				break;
@@ -1262,7 +1261,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					safe_name(cause, buff, bufc);
 				}
 				else
-					safe_str((char *)subj[gender], buff, bufc);
+					SAFE_LB_STR((char *)subj[gender], buff, bufc);
 
 				break;
 
@@ -1276,11 +1275,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				if (!gender)
 				{
 					safe_name(cause, buff, bufc);
-					safe_chr('s', buff, bufc);
+					SAFE_LB_CHR('s', buff, bufc);
 				}
 				else
 				{
-					safe_str((char *)absp[gender], buff, bufc);
+					SAFE_LB_STR((char *)absp[gender], buff, bufc);
 				}
 
 				break;
@@ -1313,13 +1312,13 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			case ':': /* Enactor's objID */
 				safe_dbref(buff, bufc, cause);
-				safe_chr(':', buff, bufc);
-				safe_ltos(buff, bufc, CreateTime(cause), LBUF_SIZE);
+				SAFE_LB_CHR(':', buff, bufc);
+				SAFE_LTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
 				break;
 
 			case 'M':
 			case 'm':
-				safe_str(mudstate.curr_cmd, buff, bufc);
+				SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 				break;
 
 			case 'I': /* itext() equivalent */
@@ -1379,29 +1378,29 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if ((*xtp == 'i') || (*xtp == 'I'))
 				{
-					safe_str(mudstate.loop_token[i], buff, bufc);
+					SAFE_LB_STR(mudstate.loop_token[i], buff, bufc);
 				}
 				else
 				{
-					safe_str(mudstate.loop_token2[i], buff, bufc);
+					SAFE_LB_STR(mudstate.loop_token2[i], buff, bufc);
 				}
 
 				break;
 
 			case '+': /* arguments to function */
-				safe_ltos(buff, bufc, ncargs, LBUF_SIZE);
+				SAFE_LTOS(buff, bufc, ncargs, LBUF_SIZE);
 				break;
 
 			case '|': /* piped command output */
-				safe_str(mudstate.pout, buff, bufc);
+				SAFE_LB_STR(mudstate.pout, buff, bufc);
 				break;
 
 			case '%': /* Percent - a literal % */
-				safe_chr('%', buff, bufc);
+				SAFE_LB_CHR('%', buff, bufc);
 				break;
 
 			default: /* Just copy */
-				safe_chr(**dstr, buff, bufc);
+				SAFE_LB_CHR(**dstr, buff, bufc);
 			}
 
 			if (isupper(savec))
@@ -1420,7 +1419,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (!(eval & EV_FCHECK))
 			{
-				safe_chr('(', buff, bufc);
+				SAFE_LB_CHR('(', buff, bufc);
 				break;
 			}
 
@@ -1431,7 +1430,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	     */
 			**bufc = '\0';
 			xtp = xtbuf;
-			safe_sb_str(oldp, xtbuf, &xtp);
+			SAFE_SB_STR(oldp, xtbuf, &xtp);
 			*xtp = '\0';
 
 			if (mudconf.space_compress && (eval & EV_FMAND))
@@ -1468,12 +1467,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				if (eval & EV_FMAND)
 				{
 					*bufc = oldp;
-					safe_sprintf(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
+					SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
 					alldone = 1;
 				}
 				else
 				{
-					safe_chr('(', buff, bufc);
+					SAFE_LB_CHR('(', buff, bufc);
 				}
 
 				eval &= ~EV_FCHECK;
@@ -1519,7 +1518,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			if (!*dstr)
 			{
 				*dstr = tstr;
-				safe_chr(**dstr, buff, bufc);
+				SAFE_LB_CHR(**dstr, buff, bufc);
 
 				for (i = 0; i < nfargs; i++)
 					if (fargs[i] != NULL)
@@ -1561,23 +1560,23 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (mudstate.func_nest_lev >= mudconf.func_nest_lim)
 				{
-					safe_str("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (mudstate.func_invk_ctr >= mudconf.func_invk_lim)
 				{
-					safe_str("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Too_Much_CPU())
 				{
-					safe_str("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Going(player))
 				{
-					safe_str("#-1 BAD INVOKER", buff, bufc);
+					SAFE_LB_STR("#-1 BAD INVOKER", buff, bufc);
 				}
 				else if (!check_access(player, ufp->perms))
 				{
-					safe_noperm(buff, bufc);
+					SAFE_NOPERM(buff, bufc);
 				}
 				else
 				{
@@ -1661,15 +1660,15 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (mudstate.func_nest_lev >= mudconf.func_nest_lim)
 				{
-					safe_str("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (mudstate.func_invk_ctr >= mudconf.func_invk_lim)
 				{
-					safe_str("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Too_Much_CPU())
 				{
-					safe_str("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
+					SAFE_LB_STR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Going(player))
 				{
@@ -1679,15 +1678,15 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		     * mid-function sequence, such as
 		     * with a command()/@destroy combo...
 		     */
-					safe_str("#-1 BAD INVOKER", buff, bufc);
+					SAFE_LB_STR("#-1 BAD INVOKER", buff, bufc);
 				}
 				else if (!Check_Func_Access(player, fp))
 				{
-					safe_noperm(buff, bufc);
+					SAFE_NOPERM(buff, bufc);
 				}
 				else if (mudstate.f_limitmask & fp->flags)
 				{
-					safe_noperm(buff, bufc);
+					SAFE_NOPERM(buff, bufc);
 				}
 				else
 				{
@@ -1699,7 +1698,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			}
 			else
 			{
-				safe_sprintf(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
+				SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
 			}
 
 			/*
@@ -1726,25 +1725,25 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			if (!token_chartab[(unsigned char)**dstr])
 			{
 				(*dstr)--;
-				safe_chr(**dstr, buff, bufc);
+				SAFE_LB_CHR(**dstr, buff, bufc);
 			}
 			else
 			{
 				if ((**dstr == '#') && mudstate.in_loop)
 				{
-					safe_str(mudstate.loop_token[mudstate.in_loop - 1], buff, bufc);
+					SAFE_LB_STR(mudstate.loop_token[mudstate.in_loop - 1], buff, bufc);
 				}
 				else if ((**dstr == '@') && mudstate.in_loop)
 				{
-					safe_ltos(buff, bufc, mudstate.loop_number[mudstate.in_loop - 1], LBUF_SIZE);
+					SAFE_LTOS(buff, bufc, mudstate.loop_number[mudstate.in_loop - 1], LBUF_SIZE);
 				}
 				else if ((**dstr == '+') && mudstate.in_loop)
 				{
-					safe_str(mudstate.loop_token2[mudstate.in_loop - 1], buff, bufc);
+					SAFE_LB_STR(mudstate.loop_token2[mudstate.in_loop - 1], buff, bufc);
 				}
 				else if ((**dstr == '$') && mudstate.in_switch)
 				{
-					safe_str(mudstate.switch_token, buff, bufc);
+					SAFE_LB_STR(mudstate.switch_token, buff, bufc);
 				}
 				else if (**dstr == '!')
 				{
@@ -1753,12 +1752,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		     * precedence over switch nesting
 		     * level.
 		     */
-					safe_ltos(buff, bufc, ((mudstate.in_loop) ? (mudstate.in_loop - 1) : mudstate.in_switch), LBUF_SIZE);
+					SAFE_LTOS(buff, bufc, ((mudstate.in_loop) ? (mudstate.in_loop - 1) : mudstate.in_switch), LBUF_SIZE);
 				}
 				else
 				{
 					(*dstr)--;
-					safe_chr(**dstr, buff, bufc);
+					SAFE_LB_CHR(**dstr, buff, bufc);
 				}
 			}
 
@@ -1792,7 +1791,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 	if (ansi)
 	{
-		safe_ansi_normal(buff, bufc);
+		SAFE_ANSI_NORMAL(buff, bufc);
 	}
 
 	**bufc = '\0';
@@ -1815,7 +1814,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		if (is_top && (save_count > 0))
 		{
 			tbuf = XMALLOC(MBUF_SIZE, "tbuff");
-			sprintf(tbuf, "%d lines of trace output discarded.", save_count);
+			XSPRINTF(tbuf, "%d lines of trace output discarded.", save_count);
 			notify(player, tbuf);
 			XFREE(tbuf);
 		}
@@ -1824,11 +1823,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	if (realbuff)
 	{
 		*bufc = realbp;
-		safe_str(buff, realbuff, bufc);
+		SAFE_LB_STR(buff, realbuff, bufc);
 		**bufc = '\0';
 		XFREE(buff);
 		buff = realbuff;
 	}
+	XFREE(xtbuf);
 }
 
 /*

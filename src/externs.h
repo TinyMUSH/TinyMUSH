@@ -316,22 +316,22 @@ extern char *log_pos;
  * A zillion ways to notify things.
  */
 
-#define notify(p, m) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, m)
-#define notify_html(p, m) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | MSG_HTML, NULL, m)
-#define notify_quiet(p, m) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME, NULL, m)
-#define notify_with_cause(p, c, m) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, m)
-#define notify_with_cause_html(p, c, m) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | MSG_HTML, NULL, m)
-#define notify_with_cause_extra(p, c, m, f) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | (f), NULL, m)
-#define notify_quiet_with_cause(p, c, m) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME, NULL, m)
-#define notify_puppet(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_F_DOWN, NULL, m)
-#define notify_quiet_puppet(p, c, m) notify_check(p, c, MSG_ME, NULL, m)
-#define notify_all(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS | MSG_F_UP | MSG_F_CONTENTS, NULL, m)
-#define notify_all_from_inside(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE, NULL, m)
-#define notify_all_from_inside_speech(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, NULL, m)
-#define notify_all_from_inside_move(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_MOVE, NULL, m)
-#define notify_all_from_inside_html(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_HTML, NULL, m)
-#define notify_all_from_inside_html_speech(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_HTML | MSG_SPEECH, NULL, m)
-#define notify_all_from_outside(p, c, m) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS | MSG_F_UP | MSG_F_CONTENTS | MSG_S_OUTSIDE, NULL, m)
+#define notify(p,m,...) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, m, ##__VA_ARGS__)
+#define notify_html(p,m,...) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | MSG_HTML, NULL, m, ##__VA_ARGS__)
+#define notify_quiet(p,m,...) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME, NULL, m, ##__VA_ARGS__)
+#define notify_with_cause(p,c,m,...) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, m, ##__VA_ARGS__)
+#define notify_with_cause_html(p,c,m,...) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | MSG_HTML, NULL, m, ##__VA_ARGS__)
+#define notify_with_cause_extra(p,c,m,f,...) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | (f), NULL, m, ##__VA_ARGS__)
+#define notify_quiet_with_cause(p,c,m,...) notify_check(p, c, MSG_PUP_ALWAYS | MSG_ME, NULL, m, ##__VA_ARGS__)
+#define notify_puppet(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_F_DOWN, NULL, m, ##__VA_ARGS__)
+#define notify_quiet_puppet(p,c,m,...) notify_check(p, c, MSG_ME, NULL, m, ##__VA_ARGS__)
+#define notify_all(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS | MSG_F_UP | MSG_F_CONTENTS, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_inside(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_inside_speech(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_inside_move(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_MOVE, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_inside_html(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_HTML, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_inside_html_speech(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_HTML | MSG_SPEECH, NULL, m, ##__VA_ARGS__)
+#define notify_all_from_outside(p,c,m,...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS | MSG_F_UP | MSG_F_CONTENTS | MSG_S_OUTSIDE, NULL, m, ##__VA_ARGS__)
 
 #define CANNOT_HEAR_MSG "That target cannot hear you."
 #define NOT_PRESENT_MSG "That target is not present."
@@ -347,7 +347,7 @@ extern char *log_pos;
 
 #define Invalid_Objtype(x) ((Protect(CA_LOCATION) && !Has_location(x)) || (Protect(CA_CONTENTS) && !Has_contents(x)) || (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
 
-#define safe_atoi(s) ((s == NULL) ? 0 : (int)strtol(s, (char **)NULL, 10))
+//#define safe_atoi(s) ((s == NULL) ? 0 : (int)strtol(s, (char **)NULL, 10))
 
 #define test_top() ((mudstate.qfirst != NULL) ? 1 : 0)
 #define controls(p, x) Controls(p, x)
@@ -554,15 +554,15 @@ extern char *log_pos;
 
 /* Various macros for writing common string sequences. */
 
-#define safe_crlf(b, p) safe_strncat((b), (p), "\r\n", 2, LBUF_SIZE)
-#define safe_ansi_normal(b, p) safe_strncat((b), (p), ANSI_NORMAL, 4, LBUF_SIZE)
-#define safe_nothing(b, p) safe_strncat((b), (p), "#-1", 3, LBUF_SIZE)
-#define safe_noperm(b, p) safe_strncat((b), (p), "#-1 PERMISSION DENIED", 21, LBUF_SIZE)
-#define safe_nomatch(b, p) safe_strncat((b), (p), "#-1 NO MATCH", 12, LBUF_SIZE)
-#define safe_bool(b, p, n) safe_chr(((n) ? '1' : '0'), (b), (p))
+//#define safe_crlf(b, p) safe_strncat((b), (p), "\r\n", 2, LBUF_SIZE)
+//#define safe_ansi_normal(b, p) safe_strncat((b), (p), ANSI_NORMAL, 4, LBUF_SIZE)
+//#define safe_nothing(b, p) safe_strncat((b), (p), "#-1", 3, LBUF_SIZE)
+//#define safe_noperm(b, p) safe_strncat((b), (p), "#-1 PERMISSION DENIED", 21, LBUF_SIZE)
+//#define safe_nomatch(b, p) safe_strncat((b), (p), "#-1 NO MATCH", 12, LBUF_SIZE)
+//#define safe_bool(b, p, n) safe_chr(((n) ? '1' : '0'), (b), (p))
 
 #define safe_dbref(b, p, n)  \
-    safe_chr('#', (b), (p)); \
-    safe_ltos((b), (p), (n), LBUF_SIZE);
+    SAFE_LB_CHR('#', (b), (p)); \
+    SAFE_LTOS((b), (p), (n), LBUF_SIZE);
 
 #endif /* __EXTERNS_H */

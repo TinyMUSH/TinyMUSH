@@ -194,9 +194,8 @@ extern const Delim SPACE_DELIM;
  * and max_args as an output delimiter which must be evaluated.
  */
 
-#define VaChk_Range(xminargs, xnargs)                                       \
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, xminargs, xnargs, \
-                        buff, bufc))                                        \
+#define VaChk_Range(xminargs, xnargs)                                                    \
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, xminargs, xnargs, buff, bufc)) \
     return
 
 #define VaChk_Only_InPure(xnargs)                                                                        \
@@ -281,16 +280,16 @@ extern const Delim SPACE_DELIM;
     {                                                          \
         if ((s)->str[0] == '\r')                               \
         {                                                      \
-            safe_crlf((b), (p));                               \
+            SAFE_CRLF((b), (p));                               \
         }                                                      \
         else if ((s)->str[0] != '\0')                          \
         {                                                      \
-            safe_chr((s)->str[0], (b), (p));                   \
+            SAFE_LB_CHR((s)->str[0], (b), (p));                   \
         }                                                      \
     }                                                          \
     else                                                       \
     {                                                          \
-        safe_strncat((b), (p), (s)->str, (s)->len, LBUF_SIZE); \
+        SAFE_STRNCAT((b), (p), (s)->str, (s)->len, LBUF_SIZE); \
     }
 
 /*
@@ -362,7 +361,7 @@ extern const Delim SPACE_DELIM;
     {                                         \
         (m) = LBUF_SIZE - 1 - (*bufc - buff); \
         (l) = ((l) > (m)) ? (m) : (l);        \
-        memset(*bufc, (c), (l));              \
+        XMEMSET(*bufc, (c), (l));             \
         *bufc += (l);                         \
         **bufc = '\0';                        \
     }

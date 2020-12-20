@@ -125,15 +125,16 @@ int fileexist(char *file)
 
 void handlestartupflatfiles(int flag)
 {
-	char db[MAXPATHLEN], flat[MAXPATHLEN], db_bak[MAXPATHLEN], flat_bak[MAXPATHLEN];
+	char *db, *flat, *db_bak, *flat_bak;
 	char *ts;
 	int i;
 	struct stat sb1, sb2;
 	ts = mktimestamp();
-	safe_snprintf(db, MAXPATHLEN, "%s/%s", mudconf.dbhome, mudconf.db_file);
-	safe_snprintf(flat, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"));
-	safe_snprintf(db_bak, MAXPATHLEN, "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts);
-	safe_snprintf(flat_bak, MAXPATHLEN, "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"), ts);
+	
+	db = XASPRINTF("db", "%s/%s", mudconf.dbhome, mudconf.db_file);
+	flat = XASPRINTF("flat", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"));
+	db_bak = XASPRINTF("db_bak", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts);
+	flat_bak = XASPRINTF("flat_bak", "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"), ts);
 	XFREE(ts);
 	i = open(flat, O_RDONLY);
 
@@ -193,6 +194,11 @@ void handlestartupflatfiles(int flag)
 			}
 		}
 	}
+
+	XFREE(db);
+	XFREE(flat);
+	XFREE(db_bak);
+	XFREE(flat_bak);
 }
 
 /*
@@ -649,7 +655,7 @@ char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const 
 	if (!*buf)
 	{
 		cp = buf;
-		safe_str((char *)dflt, buf, &cp);
+		SAFE_LB_STR((char *)dflt, buf, &cp);
 	}
 	else
 	{
@@ -664,10 +670,10 @@ char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const 
 
 	if (cp != buf)
 	{
-		safe_chr(' ', buf, &cp);
+		SAFE_LB_CHR(' ', buf, &cp);
 	}
 
-	safe_str((char *)msg, buf, &cp);
+	SAFE_LB_STR((char *)msg, buf, &cp);
 	return (buf);
 }
 
@@ -675,7 +681,7 @@ char *dflt_from_msg(dbref sender, dbref sendloc)
 {
 	char *tp, *tbuff;
 	tp = tbuff = XMALLOC(LBUF_SIZE, "tbuff");
-	safe_strncat(tbuff, &tp, (char *)"From ", 5, LBUF_SIZE);
+	SAFE_STRNCAT(tbuff, &tp, (char *)"From ", 5, LBUF_SIZE);
 
 	if (Good_obj(sendloc))
 	{
@@ -686,7 +692,7 @@ char *dflt_from_msg(dbref sender, dbref sendloc)
 		safe_name(sender, tbuff, &tp);
 	}
 
-	safe_chr(',', tbuff, &tp);
+	SAFE_LB_CHR(',', tbuff, &tp);
 	return tbuff;
 }
 
@@ -716,23 +722,23 @@ void html_escape(const char *src, char *dest, char **destp)
 		switch (*msg_orig)
 		{
 		case '<':
-			safe_strncat(dest, destp, "&lt;", 4, LBUF_SIZE);
+			SAFE_STRNCAT(dest, destp, "&lt;", 4, LBUF_SIZE);
 			break;
 
 		case '>':
-			safe_strncat(dest, destp, "&gt;", 4, LBUF_SIZE);
+			SAFE_STRNCAT(dest, destp, "&gt;", 4, LBUF_SIZE);
 			break;
 
 		case '&':
-			safe_strncat(dest, destp, "&amp;", 5, LBUF_SIZE);
+			SAFE_STRNCAT(dest, destp, "&amp;", 5, LBUF_SIZE);
 			break;
 
 		case '\"':
-			safe_strncat(dest, destp, "&quot;", 6, LBUF_SIZE);
+			SAFE_STRNCAT(dest, destp, "&quot;", 6, LBUF_SIZE);
 			break;
 
 		default:
-			safe_chr(*msg_orig, dest, destp);
+			SAFE_LB_CHR(*msg_orig, dest, destp);
 			break;
 		}
 	}
@@ -752,7 +758,7 @@ void html_escape(const char *src, char *dest, char **destp)
 
 void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 {
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *msg_ns, *mp, *tbuff, *tp, *buff;
 	char *args[NUM_ENV_VARS];
 	dbref aowner, targetloc, recip, obj;
@@ -768,16 +774,17 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	{
 		if ((tbuff = va_arg(ap, char *)) != NULL)
 		{
-			strncpy(msg, tbuff, LBUF_SIZE);
+			XSTRNCPY(msg, tbuff, LBUF_SIZE);
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
 	else
 	{
-		vsnprintf(msg, LBUF_SIZE, format, ap);
+		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	}
 
 	va_end(ap);
@@ -786,8 +793,9 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
      * If speaker is invalid or message is empty, just exit
      */
 
-	if (!Good_obj(target) || !msg || !*msg)
+	if (!Good_obj(target) || !msg)
 	{
+		XFREE(msg);
 		return;
 	}
 
@@ -799,6 +807,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	if (mudstate.ntfy_nest_lev >= mudconf.ntfy_nest_lim)
 	{
 		mudstate.ntfy_nest_lev--;
+		XFREE(msg);
 		return;
 	}
 
@@ -817,24 +826,24 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			{
 				if (sender != mudstate.curr_enactor)
 				{
-					safe_sprintf(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mudstate.curr_enactor);
+					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mudstate.curr_enactor);
 				}
 				else
 				{
-					safe_sprintf(msg_ns, &mp, "[%s(#%d){%s}] ", Name(sender), sender, Name(Owner(sender)));
+					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}] ", Name(sender), sender, Name(Owner(sender)));
 				}
 			}
 			else if (sender != mudstate.curr_enactor)
 			{
-				safe_sprintf(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mudstate.curr_enactor);
+				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mudstate.curr_enactor);
 			}
 			else
 			{
-				safe_sprintf(msg_ns, &mp, "[%s(#%d)] ", Name(sender), sender);
+				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)] ", Name(sender), sender);
 			}
 		}
 
-		safe_str((char *)msg, msg_ns, &mp);
+		SAFE_LB_STR(msg, msg_ns, &mp);
 	}
 	else
 	{
@@ -917,8 +926,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		{
 			tp = tbuff = XMALLOC(LBUF_SIZE, "tbuff");
 			safe_name(target, tbuff, &tp);
-			safe_strncat(tbuff, &tp, (char *)"> ", 2, LBUF_SIZE);
-			safe_str(msg_ns, tbuff, &tp);
+			SAFE_STRNCAT(tbuff, &tp, (char *)"> ", 2, LBUF_SIZE);
+			SAFE_LB_STR(msg_ns, tbuff, &tp);
 
 			/*
 	     * Criteria for redirection of a puppet is based on
@@ -962,7 +971,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		{
 			tp = atr_get(target, A_LISTEN, &aowner, &aflags, &alen);
 
-			if (*tp && ((!(aflags & AF_REGEXP) && wild(tp, (char *)msg, args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(tp, (char *)msg, ((aflags & AF_CASE) ? 0 : PCRE_CASELESS), args, NUM_ENV_VARS))))
+			if (*tp && ((!(aflags & AF_REGEXP) && wild(tp, msg, args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(tp, msg, ((aflags & AF_CASE) ? 0 : PCRE_CASELESS), args, NUM_ENV_VARS))))
 			{
 				for (nargs = NUM_ENV_VARS; nargs && (!args[nargs - 1] || !(*args[nargs - 1])); nargs--)
 					;
@@ -1017,7 +1026,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 
 		if (will_send && (key & MSG_ME) && pass_uselock && (sender != target) && Monitor(target))
 		{
-			(void)atr_match(target, sender, AMATCH_LISTEN, (char *)msg, (char *)msg, 0);
+			(void)atr_match(target, sender, AMATCH_LISTEN, msg, msg, 0);
 		}
 
 		/*
@@ -1094,7 +1103,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			}
 			else
 			{
-				buff = (char *)msg;
+				buff = msg;
 			}
 
 			DOLIST(obj, Exits(Location(target)))
@@ -1137,7 +1146,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			}
 			else
 			{
-				buff = (char *)msg;
+				buff = msg;
 			}
 
 			DOLIST(obj, Contents(target))
@@ -1173,7 +1182,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			}
 			else
 			{
-				buff = (char *)msg;
+				buff = msg;
 			}
 
 			DOLIST(obj, Contents(targetloc))
@@ -1204,7 +1213,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			}
 			else
 			{
-				buff = (char *)msg;
+				buff = msg;
 			}
 
 			notify_check(targetloc, sender, MSG_ME | MSG_F_UP | MSG_S_INSIDE | herekey, NULL, buff);
@@ -1227,6 +1236,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		XFREE(msg_ns);
 	}
 
+	XFREE(msg);
+
 	mudstate.ntfy_nest_lev--;
 }
 
@@ -1242,7 +1253,7 @@ void notify_except(dbref loc, dbref player, dbref exception, int flags, const ch
 	{
 		if ((s = va_arg(ap, char *)) != NULL)
 		{
-			strncpy(msg, s, LBUF_SIZE);
+			XSTRNCPY(msg, s, LBUF_SIZE);
 		}
 		else
 		{
@@ -1251,7 +1262,7 @@ void notify_except(dbref loc, dbref player, dbref exception, int flags, const ch
 	}
 	else
 	{
-		vsnprintf(msg, LBUF_SIZE, format, ap);
+		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	}
 
 	va_end(ap);
@@ -1282,7 +1293,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
 	{
 		if ((s = va_arg(ap, char *)) != NULL)
 		{
-			strncpy(msg, s, LBUF_SIZE);
+			XSTRNCPY(msg, s, LBUF_SIZE);
 		}
 		else
 		{
@@ -1291,7 +1302,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
 	}
 	else
 	{
-		vsnprintf(msg, LBUF_SIZE, format, ap);
+		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	}
 
 	va_end(ap);
@@ -1466,14 +1477,11 @@ int backup_copy(char *src, char *dst, int flag)
 
 char *mktimestamp(void)
 {
-	char *buff;
 	struct tm *t;
 	time_t ts;
 	ts = time(NULL);
 	t = localtime(&ts);
-	buff = XMALLOC(GBUF_SIZE, "buff");
-	safe_snprintf(buff, GBUF_SIZE, "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone);
-	return (buff);
+	return XASPRINTF("buff", "%04d%02d%02d-%02d%02d%02d_%s", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, t->tm_zone);
 }
 
 void do_backup_mush(dbref player, dbref cause, int key)
@@ -1718,7 +1726,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	ts = mktimestamp();
 	s = XASPRINTF("s", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext);
 	XFREE(ts);
-	cwd = getcwd(NULL, MAXPATHLEN);
+	cwd = getcwd(NULL, 0);
 
 	if (cwd == NULL)
 	{
@@ -2107,7 +2115,7 @@ void dump_database_internal(int dump_type)
 	switch (dump_type)
 	{
 	case DUMP_DB_CRASH:
-		sprintf(tmpfile, "%s/%s.CRASH", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.CRASH", mudconf.bakhome, mudconf.db_file);
 		unlink(tmpfile);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
@@ -2164,7 +2172,7 @@ void dump_database_internal(int dump_type)
 		/*
 	 * Write the game's flatfile
 	 */
-		sprintf(tmpfile, "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
 		if (f != NULL)
@@ -2180,7 +2188,7 @@ void dump_database_internal(int dump_type)
 		break;
 
 	case DUMP_DB_KILLED:
-		sprintf(tmpfile, "%s/%s.KILLED", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.KILLED", mudconf.bakhome, mudconf.db_file);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
 		if (f != NULL)
@@ -2660,7 +2668,7 @@ void process_preload(void)
 		{
 			if (Flags2(thing) & HAS_DAILY)
 			{
-				sprintf(tbuf, "0 %d * * *", mudconf.events_daily_hour);
+				XSPRINTF(tbuf, "0 %d * * *", mudconf.events_daily_hour);
 				call_cron(thing, thing, A_DAILY, tbuf);
 				break;
 			}
@@ -3605,10 +3613,10 @@ int main(int argc, char *argv[])
 	{
 		if (bp != mudstate.modloaded)
 		{
-			safe_mb_chr(' ', mudstate.modloaded, &bp);
+			SAFE_MB_CHR(' ', mudstate.modloaded, &bp);
 		}
 
-		safe_mb_str(mp->modname, mudstate.modloaded, &bp);
+		SAFE_MB_STR(mp->modname, mudstate.modloaded, &bp);
 	}
 
 	mudconf.exec_path = XSTRDUP(argv[0], "argv");

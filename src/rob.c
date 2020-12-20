@@ -102,12 +102,12 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			notify(player, "Your murder attempt failed.");
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
-			safe_sprintf(buf1, &bp, "%s tried to kill you!", Name(player));
+			SAFE_SPRINTF(buf1, &bp, "%s tried to kill you!", Name(player));
 			notify_with_cause(victim, player, buf1);
 
 			if (Suspect(player))
 			{
-				strcpy(buf1, Name(player));
+				XSTRCPY(buf1, Name(player));
 
 				if (player == Owner(player))
 				{
@@ -116,7 +116,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 				else
 				{
 					buf2 = XMALLOC(LBUF_SIZE, "buf2");
-					strcpy(buf2, Name(Owner(player)));
+					XSTRCPY(buf2, Name(Owner(player)));
 					raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> tried to kill %s(#%d).", buf2, buf1, player, Name(victim), victim);
 					XFREE(buf2);
 				}
@@ -134,7 +134,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 		if (Suspect(player))
 		{
-			strcpy(buf1, Name(player));
+			XSTRCPY(buf1, Name(player));
 
 			if (player == Owner(player))
 			{
@@ -142,15 +142,15 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			}
 			else
 			{
-				strcpy(buf2, Name(Owner(player)));
+				XSTRCPY(buf2, Name(Owner(player)));
 				raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> killed %s(#%d).", buf2, buf1, player, Name(victim), victim);
 			}
 		}
 
 		bp = buf1;
-		safe_sprintf(buf1, &bp, "You killed %s!", Name(victim));
+		SAFE_SPRINTF(buf1, &bp, "You killed %s!", Name(victim));
 		bp = buf2;
-		safe_sprintf(buf2, &bp, "killed %s!", Name(victim));
+		SAFE_SPRINTF(buf2, &bp, "killed %s!", Name(victim));
 
 		if (Typeof(victim) != TYPE_PLAYER)
 			if (halt_que(NOTHING, victim) > 0)
@@ -164,7 +164,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 	 * notify victim
 	 */
 		bp = buf1;
-		safe_sprintf(buf1, &bp, "%s killed you!", Name(player));
+		SAFE_SPRINTF(buf1, &bp, "%s killed you!", Name(player));
 		notify_with_cause(victim, player, buf1);
 
 		/*
@@ -179,7 +179,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 			if (Pennies(Owner(victim)) < mudconf.paylimit)
 			{
-				sprintf(buf1, "Your insurance policy pays %d %s.", cost, mudconf.many_coins);
+				XSPRINTF(buf1, "Your insurance policy pays %d %s.", cost, mudconf.many_coins);
 				notify(victim, buf1);
 				giveto(Owner(victim), cost);
 			}
@@ -240,9 +240,9 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	if (!could_doit(giver, thing, A_LGIVE))
 	{
 		sp = str = XMALLOC(LBUF_SIZE, "str");
-		safe_str((char *)"You can't give ", str, &sp);
+		SAFE_LB_STR((char *)"You can't give ", str, &sp);
 		safe_name(thing, str, &sp);
-		safe_str((char *)" away.", str, &sp);
+		SAFE_LB_STR((char *)" away.", str, &sp);
 		*sp = '\0';
 		did_it(giver, thing, A_GFAIL, str, A_OGFAIL, NULL, A_AGFAIL, 0, (char **)NULL, 0, MSG_MOVE);
 		XFREE(str);
@@ -253,9 +253,9 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	{
 		sp = str = XMALLOC(LBUF_SIZE, "str");
 		safe_name(recipient, str, &sp);
-		safe_str((char *)" doesn't want ", str, &sp);
+		SAFE_LB_STR((char *)" doesn't want ", str, &sp);
 		safe_name(thing, str, &sp);
-		safe_chr('.', str, &sp);
+		SAFE_LB_CHR('.', str, &sp);
 		*sp = '\0';
 		did_it(giver, recipient, A_RFAIL, str, A_ORFAIL, NULL, A_ARFAIL, 0, (char **)NULL, 0, MSG_MOVE);
 		XFREE(str);
@@ -268,7 +268,7 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	if (!(key & GIVE_QUIET))
 	{
 		str = XMALLOC(LBUF_SIZE, "str");
-		strcpy(str, Name(giver));
+		XSTRCPY(str, Name(giver));
 		notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you %s.", str, Name(thing));
 		notify(giver, "Given.");
 		notify_check(thing, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you to %s.", str, Name(recipient));

@@ -168,12 +168,12 @@ void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs == 0)
 	{
-		safe_chr('0', buff, bufc);
+		SAFE_LB_CHR('0', buff, bufc);
 		return;
 	}
 
 	VaChk_Only_In(2);
-	safe_ltos(buff, bufc, countwords(fargs[0], &isep), LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, countwords(fargs[0], &isep), LBUF_SIZE);
 }
 
 /*
@@ -201,7 +201,7 @@ void fun_first(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (first)
 	{
-		safe_str(first, buff, bufc);
+		SAFE_LB_STR(first, buff, bufc);
 	}
 }
 
@@ -232,9 +232,9 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	if (rest)
 	{
 		s = ansi_transition_esccode(ANST_NORMAL, ansi_state);
-		safe_str(s, buff, bufc);
+		SAFE_LB_STR(s, buff, bufc);
 		XFREE(s);
-		safe_str(rest, buff, bufc);
+		SAFE_LB_STR(rest, buff, bufc);
 	}
 }
 
@@ -301,9 +301,9 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		} while (*s);
 
 		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
-		safe_str(buf, buff, bufc);
+		SAFE_LB_STR(buf, buff, bufc);
 		XFREE(buf);
-		safe_strncat(buff, bufc, last, s - last, LBUF_SIZE);
+		SAFE_STRNCAT(buff, bufc, last, s - last, LBUF_SIZE);
 	}
 	else
 	{
@@ -319,7 +319,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if ((last = strrchr(s, isep.str[isep.len - 1])) == NULL)
 		{
-			safe_str(s, buff, bufc);
+			SAFE_LB_STR(s, buff, bufc);
 			return;
 		}
 
@@ -327,14 +327,14 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if ((*last == isep.str[isep.len - 1]) && !strncmp(isep.str, last - isep.len + 1, isep.len))
 			{
-				safe_str(++last, buff, bufc);
+				SAFE_LB_STR(++last, buff, bufc);
 				return;
 			}
 
 			last--;
 		}
 
-		safe_str(s, buff, bufc);
+		SAFE_LB_STR(s, buff, bufc);
 	}
 }
 
@@ -363,14 +363,14 @@ void fun_match(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		if (quick_wild(fargs[1], r))
 		{
-			safe_ltos(buff, bufc, wcount, LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
 			return;
 		}
 
 		wcount++;
 	} while (s);
 
-	safe_chr('0', buff, bufc);
+	SAFE_LB_CHR('0', buff, bufc);
 }
 
 void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -411,7 +411,7 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_ltos(buff, bufc, wcount, LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
 		}
 
 		wcount++;
@@ -490,7 +490,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 			t = split_token(&s, &isep);
 		}
 
-		safe_str(r, buff, bufc);
+		SAFE_LB_STR(r, buff, bufc);
 	}
 	else
 	{
@@ -505,7 +505,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_str(t, buff, bufc);
+			SAFE_LB_STR(t, buff, bufc);
 			len--;
 		} while (len && s && *s);
 	}
@@ -583,7 +583,7 @@ void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 				} while ((*p == ' ') && (p > s));
 
 				*(++p) = '\0';
-				safe_str(s, buff, bufc);
+				SAFE_LB_STR(s, buff, bufc);
 				return;
 			}
 			else
@@ -596,7 +596,7 @@ void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	/*
      * if we've gotten this far, we've run off the end of the string
      */
-	safe_str(s, buff, bufc);
+	SAFE_LB_STR(s, buff, bufc);
 }
 
 /*
@@ -640,7 +640,7 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 
 	if (el < 1)
 	{
-		safe_str(str, buff, bufc);
+		SAFE_LB_STR(str, buff, bufc);
 		return;
 	}
 
@@ -694,7 +694,7 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 
 		if (!(eptr || ((flag == IF_INSERT) && !overrun)))
 		{
-			safe_str(str, buff, bufc);
+			SAFE_LB_STR(str, buff, bufc);
 			return;
 		}
 
@@ -717,7 +717,7 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 	case IF_DELETE: /* deletion */
 		if (sptr)
 		{
-			safe_str(sptr, buff, bufc);
+			SAFE_LB_STR(sptr, buff, bufc);
 
 			if (eptr)
 			{
@@ -727,7 +727,7 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 
 		if (eptr)
 		{
-			safe_str(eptr, buff, bufc);
+			SAFE_LB_STR(eptr, buff, bufc);
 		}
 
 		break;
@@ -735,16 +735,16 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 	case IF_REPLACE: /* replacing */
 		if (sptr)
 		{
-			safe_str(sptr, buff, bufc);
+			SAFE_LB_STR(sptr, buff, bufc);
 			print_sep(sep, buff, bufc);
 		}
 
-		safe_str(word, buff, bufc);
+		SAFE_LB_STR(word, buff, bufc);
 
 		if (eptr)
 		{
 			print_sep(sep, buff, bufc);
-			safe_str(eptr, buff, bufc);
+			SAFE_LB_STR(eptr, buff, bufc);
 		}
 
 		break;
@@ -752,22 +752,22 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 	case IF_INSERT: /* insertion */
 		if (sptr)
 		{
-			safe_str(sptr, buff, bufc);
+			SAFE_LB_STR(sptr, buff, bufc);
 			print_sep(sep, buff, bufc);
 		}
 
-		safe_str(word, buff, bufc);
+		SAFE_LB_STR(word, buff, bufc);
 
 		if (iptr)
 		{
 			print_sep(sep, buff, bufc);
-			safe_str(iptr, buff, bufc);
+			SAFE_LB_STR(iptr, buff, bufc);
 		}
 
 		if (eptr)
 		{
 			print_sep(sep, buff, bufc);
-			safe_str(eptr, buff, bufc);
+			SAFE_LB_STR(eptr, buff, bufc);
 		}
 
 		break;
@@ -824,7 +824,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if ((nfargs < 3) || !fargs[2])
 	{
-		safe_str(fargs[0], buff, bufc);
+		SAFE_LB_STR(fargs[0], buff, bufc);
 		return;
 	}
 
@@ -835,7 +835,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (!fargs[1] || (countwords(fargs[1], &isep) != countwords(fargs[2], &SPACE_DELIM)))
 	{
-		safe_str("#-1 NUMBER OF WORDS MUST BE EQUAL", buff, bufc);
+		SAFE_LB_STR("#-1 NUMBER OF WORDS MUST BE EQUAL", buff, bufc);
 		return;
 	}
 
@@ -845,9 +845,9 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	origlist = XMALLOC(LBUF_SIZE, "origlist");
 	replist = XMALLOC(LBUF_SIZE, "replist");
 	poslist = XMALLOC(LBUF_SIZE, "poslist");
-	strcpy(origlist, fargs[0]);
-	strcpy(replist, fargs[1]);
-	strcpy(poslist, fargs[2]);
+	XSTRCPY(origlist, fargs[0]);
+	XSTRCPY(replist, fargs[1]);
+	XSTRCPY(poslist, fargs[2]);
 	norig = list2arr(&orig_p, LBUF_SIZE / 2, origlist, &isep);
 	nrep = list2arr(&rep_p, LBUF_SIZE / 2, replist, &isep);
 	npos = list2arr(&pos_p, LBUF_SIZE / 2, poslist, &SPACE_DELIM);
@@ -891,7 +891,7 @@ void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (((isep.len == 1) && strchr(fargs[1], isep.str[0])) || ((isep.len > 1) && strstr(fargs[1], isep.str)))
 	{
-		safe_str("#-1 CAN ONLY DELETE ONE ELEMENT", buff, bufc);
+		SAFE_LB_STR("#-1 CAN ONLY DELETE ONE ELEMENT", buff, bufc);
 		return;
 	}
 
@@ -916,7 +916,7 @@ void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 				print_sep(&isep, buff, bufc);
 			}
 
-			safe_str(sp, buff, bufc);
+			SAFE_LB_STR(sp, buff, bufc);
 		}
 		else
 		{
@@ -945,14 +945,14 @@ void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 		if (!strcmp(fargs[1], r))
 		{
-			safe_ltos(buff, bufc, wcount, LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
 			return;
 		}
 
 		wcount++;
 	} while (s);
 
-	safe_chr('0', buff, bufc);
+	SAFE_LB_CHR('0', buff, bufc);
 }
 
 /*
@@ -999,7 +999,7 @@ void fun_revwords(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 			print_sep(&isep, buff, bufc);
 		}
 
-		safe_str(elems[i], buff, bufc);
+		SAFE_LB_STR(elems[i], buff, bufc);
 	}
 
 	XFREE(elems);
@@ -1026,7 +1026,7 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (countwords(fargs[2], &isep) > 1)
 	{
-		safe_str("#-1 TOO MANY WORDS", buff, bufc);
+		SAFE_LB_STR("#-1 TOO MANY WORDS", buff, bufc);
 		return;
 	}
 
@@ -1034,7 +1034,7 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (words != countwords(fargs[1], &isep))
 	{
-		safe_str("#-1 NUMBER OF WORDS MUST BE EQUAL", buff, bufc);
+		SAFE_LB_STR("#-1 NUMBER OF WORDS MUST BE EQUAL", buff, bufc);
 		return;
 	}
 
@@ -1057,11 +1057,11 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 		if (!strcmp(p2, fargs[2]))
 		{
-			safe_str(q2, buff, bufc); /* replace */
+			SAFE_LB_STR(q2, buff, bufc); /* replace */
 		}
 		else
 		{
-			safe_str(p2, buff, bufc); /* copy */
+			SAFE_LB_STR(p2, buff, bufc); /* copy */
 		}
 	}
 }
@@ -1307,7 +1307,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * Convert the list to an array
      */
 	list = XMALLOC(LBUF_SIZE, "list");
-	strcpy(list, fargs[0]);
+	XSTRCPY(list, fargs[0]);
 	nitems = list2arr(&ptrs, LBUF_SIZE / 2, list, &isep);
 	sort_type = get_list_type(fargs, nfargs, 2, ptrs, nitems);
 	poslist = do_asort(ptrs, nitems, sort_type, oper);
@@ -1321,7 +1321,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_ltos(buff, bufc, poslist[i], LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, poslist[i], LBUF_SIZE);
 		}
 	}
 	else
@@ -1364,7 +1364,7 @@ int u_comp(const void *s1, const void *s2)
 	tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 	elems[0] = (char *)s1;
 	elems[1] = (char *)s2;
-	strcpy(tbuf, ucomp_buff);
+	XSTRCPY(tbuf, ucomp_buff);
 	result = bp = XMALLOC(LBUF_SIZE, "result");
 	str = tbuf;
 	exec(result, &bp, ucomp_player, ucomp_caller, ucomp_cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, elems, 2);
@@ -1471,12 +1471,12 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	VaChk_Only_In_Out(4);
 	Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
-	strcpy(ucomp_buff, atext);
+	XSTRCPY(ucomp_buff, atext);
 	ucomp_player = thing;
 	ucomp_caller = player;
 	ucomp_cause = cause;
 	list = XMALLOC(LBUF_SIZE, "list");
-	strcpy(list, fargs[1]);
+	XSTRCPY(list, fargs[1]);
 	nptrs = list2arr(&ptrs, LBUF_SIZE / 2, list, &isep);
 
 	if (nptrs > 1)
@@ -1529,10 +1529,10 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	plist1 = list1 = XMALLOC(LBUF_SIZE, "list1");
-	strcpy(list1, fargs[0]);
+	XSTRCPY(list1, fargs[0]);
 	n1 = list2arr(&ptrs1, LBUF_SIZE, list1, &isep);
 	plist2 = list2 = XMALLOC(LBUF_SIZE, "list2");
-	strcpy(list2, fargs[1]);
+	XSTRCPY(list2, fargs[1]);
 	n2 = list2arr(&ptrs2, LBUF_SIZE, list2, &isep);
 
 	if (type_arg)
@@ -1619,7 +1619,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	 */
 		if ((n1 == 1) && (n2 == 1) && (!strcmp(ptrs1[0], ptrs2[0])))
 		{
-			safe_str(ptrs1[0], buff, bufc);
+			SAFE_LB_STR(ptrs1[0], buff, bufc);
 			break;
 		}
 
@@ -1660,12 +1660,12 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 				if (GENCMP(i1, i2, sort_type) < 0)
 				{
-					safe_str(ptrs1[i1], buff, bufc);
+					SAFE_LB_STR(ptrs1[i1], buff, bufc);
 					i1++;
 				}
 				else
 				{
-					safe_str(ptrs2[i2], buff, bufc);
+					SAFE_LB_STR(ptrs2[i2], buff, bufc);
 					i2++;
 				}
 
@@ -1687,7 +1687,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				}
 
 				oldp = *bufc;
-				safe_str(ptrs1[i1], buff, bufc);
+				SAFE_LB_STR(ptrs1[i1], buff, bufc);
 				**bufc = '\0';
 			}
 		}
@@ -1702,7 +1702,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				}
 
 				oldp = *bufc;
-				safe_str(ptrs2[i2], buff, bufc);
+				SAFE_LB_STR(ptrs2[i2], buff, bufc);
 				**bufc = '\0';
 			}
 		}
@@ -1725,7 +1725,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				}
 
 				oldp = *bufc;
-				safe_str(ptrs1[i1], buff, bufc);
+				SAFE_LB_STR(ptrs1[i1], buff, bufc);
 				i1++;
 				i2++;
 
@@ -1783,7 +1783,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 					print_sep(&osep, buff, bufc);
 				}
 
-				safe_str(ptrs1[i1], buff, bufc);
+				SAFE_LB_STR(ptrs1[i1], buff, bufc);
 				oldp = ptrs1[i1];
 				i1++;
 
@@ -1818,7 +1818,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_str(ptrs1[i1], buff, bufc);
+			SAFE_LB_STR(ptrs1[i1], buff, bufc);
 			oldp = ptrs1[i1];
 			i1++;
 
@@ -1875,7 +1875,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if ((number < 1) || (number > 77) || ((unsigned int)(number + indent) > 78))
 	{
-		safe_str("#-1 OUT OF RANGE", buff, bufc);
+		SAFE_LB_STR("#-1 OUT OF RANGE", buff, bufc);
 		return;
 	}
 
@@ -1888,7 +1888,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	for (i = 0; i < indent; i++)
 	{
-		safe_chr(' ', buff, bufc);
+		SAFE_LB_CHR(' ', buff, bufc);
 	}
 
 	buf = XMALLOC(LBUF_SIZE, "buf");
@@ -1941,12 +1941,12 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (isansi)
 		{
-			safe_ansi_normal(buf, &q);
+			SAFE_ANSI_NORMAL(buf, &q);
 		}
 
 		*q = '\0';
 		isansi = 0;
-		safe_str(buf, buff, bufc);
+		SAFE_LB_STR(buf, buff, bufc);
 
 		if (striplen < number)
 		{
@@ -1963,18 +1963,18 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 			for (i = 0; i < spaces; i++)
 			{
-				safe_chr(' ', buff, bufc);
+				SAFE_LB_CHR(' ', buff, bufc);
 			}
 		}
 
 		if (!(rturn % (int)((78 - indent) / number)))
 		{
-			safe_crlf(buff, bufc);
+			SAFE_CRLF(buff, bufc);
 			cr = *bufc;
 
 			for (i = 0; i < indent; i++)
 			{
-				safe_chr(' ', buff, bufc);
+				SAFE_LB_CHR(' ', buff, bufc);
 			}
 		}
 		else
@@ -1992,7 +1992,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	else
 	{
-		safe_crlf(buff, bufc);
+		SAFE_CRLF(buff, bufc);
 	}
 
 	XFREE(buf);
@@ -2032,7 +2032,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 
 	if (nstates != nwords)
 	{
-		safe_sprintf(buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d", nstates, nwords);
+		SAFE_SPRINTF(buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d", nstates, nwords);
 		XFREE(words);
 		return;
 	}
@@ -2053,12 +2053,12 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 	 */
 		if (wcount != 0)
 		{
-			safe_crlf(buff, bufc);
+			SAFE_CRLF(buff, bufc);
 		}
 
 		if (lead_str)
 		{
-			over = safe_str(lead_str, buff, bufc);
+			over = SAFE_LB_STR(lead_str, buff, bufc);
 		}
 
 		/*
@@ -2085,7 +2085,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 	     * If we had a previous state, we have to write it.
 	     */
 			buf = ansi_transition_esccode(ANST_NONE, states[wcount]);
-			safe_str(buf, buff, bufc);
+			SAFE_LB_STR(buf, buff, bufc);
 			XFREE(buf);
 
 			/*
@@ -2094,9 +2094,9 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 
 			if (lens[wcount] <= col_widths[cpos])
 			{
-				over = safe_str(words[wcount], buff, bufc);
+				over = SAFE_LB_STR(words[wcount], buff, bufc);
 				buf = ansi_transition_esccode(states[wcount + 1], ANST_NONE);
-				safe_str(buf, buff, bufc);
+				SAFE_LB_STR(buf, buff, bufc);
 				XFREE(buf);
 			}
 			else
@@ -2123,9 +2123,9 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 					}
 				}
 
-				safe_strncat(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
+				SAFE_STRNCAT(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
 				buf = ansi_transition_esccode(ansi_state, ANST_NONE);
-				safe_str(buf, buff, bufc);
+				SAFE_LB_STR(buf, buff, bufc);
 				XFREE(buf);
 			}
 
@@ -2175,7 +2175,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 			/*
 	     * Write the right margin.
 	     */
-			over = safe_str(trail_str, buff, bufc);
+			over = SAFE_LB_STR(trail_str, buff, bufc);
 		}
 	}
 
@@ -2209,7 +2209,7 @@ void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char
 
 		if (*bufc != bb_p)
 		{
-			safe_crlf(buff, bufc);
+			SAFE_CRLF(buff, bufc);
 		}
 
 		tables_helper(savep, &ansi_state, n_cols, col_widths, lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just);
@@ -2219,7 +2219,7 @@ void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char
 
 	if (*bufc != bb_p)
 	{
-		safe_crlf(buff, bufc);
+		SAFE_CRLF(buff, bufc);
 	}
 
 	tables_helper(savep, &ansi_state, n_cols, col_widths, lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just);
@@ -2377,7 +2377,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Turn the first list into an array.
      */
 	wordlist = XMALLOC(LBUF_SIZE, "wordlist");
-	strcpy(wordlist, fargs[0]);
+	XSTRCPY(wordlist, fargs[0]);
 	nwords = list2arr(&ptrs, LBUF_SIZE / 2, wordlist, &isep);
 	s = Eat_Spaces(fargs[1]);
 
@@ -2414,7 +2414,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 					print_sep(&osep, buff, bufc);
 				}
 
-				safe_str(ptrs[cur], buff, bufc);
+				SAFE_LB_STR(ptrs[cur], buff, bufc);
 			}
 		}
 		else
@@ -2490,7 +2490,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 								print_sep(&osep, buff, bufc);
 							}
 
-							safe_str(ptrs[cur], buff, bufc);
+							SAFE_LB_STR(ptrs[cur], buff, bufc);
 						}
 					}
 				}
@@ -2535,7 +2535,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 								print_sep(&osep, buff, bufc);
 							}
 
-							safe_str(ptrs[cur], buff, bufc);
+							SAFE_LB_STR(ptrs[cur], buff, bufc);
 						}
 					}
 				}
@@ -2566,7 +2566,7 @@ void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * Turn the first list into an array.
      */
 	wordlist = XMALLOC(LBUF_SIZE, "wordlist");
-	strcpy(wordlist, fargs[0]);
+	XSTRCPY(wordlist, fargs[0]);
 	nwords = list2arr(&ptrs, LBUF_SIZE / 2, wordlist, &isep);
 	s = Eat_Spaces(fargs[1]);
 	/*
@@ -2716,7 +2716,7 @@ void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_str(ptrs[cur], buff, bufc);
+			SAFE_LB_STR(ptrs[cur], buff, bufc);
 		}
 	}
 
@@ -2753,7 +2753,7 @@ void fun_grab(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if (quick_wild(fargs[1], r))
 		{
-			safe_str(r, buff, bufc);
+			SAFE_LB_STR(r, buff, bufc);
 			return;
 		}
 	} while (s);
@@ -2778,7 +2778,7 @@ void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_str(r, buff, bufc);
+			SAFE_LB_STR(r, buff, bufc);
 		}
 	} while (s);
 }
@@ -2844,8 +2844,8 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	VaChk_Only_In_Out(5);
 	old_list = XMALLOC(LBUF_SIZE, "old_list");
 	new_list = XMALLOC(LBUF_SIZE, "new_list");
-	strcpy(old_list, fargs[1]);
-	strcpy(new_list, fargs[2]);
+	XSTRCPY(old_list, fargs[1]);
+	XSTRCPY(new_list, fargs[2]);
 	nptrs_old = list2arr(&ptrs_old, LBUF_SIZE / 2, old_list, &isep);
 	nptrs_new = list2arr(&ptrs_new, LBUF_SIZE / 2, new_list, &isep);
 	/*
@@ -2876,7 +2876,7 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		     * we have new words, we assume we
 		     * want to just nullify.
 		     */
-					safe_str(ptrs_new[i], buff, bufc);
+					SAFE_LB_STR(ptrs_new[i], buff, bufc);
 				}
 
 				break;
@@ -2885,7 +2885,7 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		if (!got_it)
 		{
-			safe_str(r, buff, bufc);
+			SAFE_LB_STR(r, buff, bufc);
 		}
 	} while (s);
 
@@ -2937,37 +2937,37 @@ void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (n_elems == 1)
 	{
-		safe_str(elems[0], buff, bufc);
+		SAFE_LB_STR(elems[0], buff, bufc);
 	}
 	else if (n_elems == 2)
 	{
-		safe_str(elems[0], buff, bufc);
+		SAFE_LB_STR(elems[0], buff, bufc);
 
 		if (*conj_str)
 		{
-			safe_chr(' ', buff, bufc);
-			safe_str(conj_str, buff, bufc);
+			SAFE_LB_CHR(' ', buff, bufc);
+			SAFE_LB_STR(conj_str, buff, bufc);
 		}
 
-		safe_chr(' ', buff, bufc);
-		safe_str(elems[1], buff, bufc);
+		SAFE_LB_CHR(' ', buff, bufc);
+		SAFE_LB_STR(elems[1], buff, bufc);
 	}
 	else
 	{
 		for (i = 0; i < (n_elems - 1); i++)
 		{
-			safe_str(elems[i], buff, bufc);
+			SAFE_LB_STR(elems[i], buff, bufc);
 			print_sep(&osep, buff, bufc);
-			safe_chr(' ', buff, bufc);
+			SAFE_LB_CHR(' ', buff, bufc);
 		}
 
 		if (*conj_str)
 		{
-			safe_str(conj_str, buff, bufc);
-			safe_chr(' ', buff, bufc);
+			SAFE_LB_STR(conj_str, buff, bufc);
+			SAFE_LB_CHR(' ', buff, bufc);
 		}
 
-		safe_str(elems[i], buff, bufc);
+		SAFE_LB_STR(elems[i], buff, bufc);
 	}
 
 	XFREE(elems);
@@ -2991,7 +2991,7 @@ void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (n_elems != n_weights)
 	{
-		safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+		SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
 		XFREE(elems);
 		XFREE(weights);
 		return;
@@ -3028,7 +3028,7 @@ void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		if ((ip[i] != 0) && (num < ip[i]))
 		{
-			safe_str(elems[i], buff, bufc);
+			SAFE_LB_STR(elems[i], buff, bufc);
 			break;
 		}
 	}
@@ -3110,7 +3110,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 				}
 			}
 
-			safe_str(elems[i + j], buff, bufc);
+			SAFE_LB_STR(elems[i + j], buff, bufc);
 		}
 	}
 
@@ -3219,7 +3219,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 			if (!atextbuf)
 			{
-				safe_str(t, buff, bufc);
+				SAFE_LB_STR(t, buff, bufc);
 			}
 			else if ((mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
 			{

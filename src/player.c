@@ -104,8 +104,8 @@ void encrypt_logindata(char *atrbuf, LDATA *info)
     }
 
     bp = XMALLOC(LBUF_SIZE, "bp");
-    sprintf(bp, "#%d;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;%s;", info->tot_good, info->good[0].host, info->good[0].dtm, info->good[1].host, info->good[1].dtm, info->good[2].host, info->good[2].dtm, info->good[3].host, info->good[3].dtm, info->new_bad, info->tot_bad, info->bad[0].host, info->bad[0].dtm, info->bad[1].host, info->bad[1].dtm, info->bad[2].host, info->bad[2].dtm);
-    strcpy(atrbuf, bp);
+    XSPRINTF(bp, "#%d;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%s;%s;%s;%s;%s;%s;", info->tot_good, info->good[0].host, info->good[0].dtm, info->good[1].host, info->good[1].dtm, info->good[2].host, info->good[2].dtm, info->good[3].host, info->good[3].dtm, info->new_bad, info->tot_bad, info->bad[0].host, info->bad[0].dtm, info->bad[1].host, info->bad[1].dtm, info->bad[2].host, info->bad[2].dtm);
+    XSTRCPY(atrbuf, bp);
     XFREE(bp);
 }
 
@@ -424,7 +424,7 @@ int add_player_name(dbref player, char *name)
      * Convert to all lowercase
      */
     tp = temp = XMALLOC(LBUF_SIZE, "tp");
-    safe_str(name, temp, &tp);
+    SAFE_LB_STR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -480,7 +480,7 @@ int delete_player_name(dbref player, char *name)
     dbref *p;
     char *temp, *tp;
     tp = temp = XMALLOC(LBUF_SIZE, "temp");
-    safe_str(name, temp, &tp);
+    SAFE_LB_STR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -544,7 +544,7 @@ dbref lookup_player(dbref doer, char *name, int check_who)
     }
 
     tp = temp = XMALLOC(LBUF_SIZE, "temp");
-    safe_str(name, temp, &tp);
+    SAFE_LB_STR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -685,12 +685,12 @@ void badname_list(dbref player, const char *prefix)
      * Construct an lbuf with all the names separated by spaces
      */
     buff = bufp = XMALLOC(LBUF_SIZE, "bufp");
-    safe_str((char *)prefix, buff, &bufp);
+    SAFE_LB_STR((char *)prefix, buff, &bufp);
 
     for (bp = mudstate.badname_head; bp; bp = bp->next)
     {
-        safe_chr(' ', buff, &bufp);
-        safe_str(bp->name, buff, &bufp);
+        SAFE_LB_CHR(' ', buff, &bufp);
+        SAFE_LB_STR(bp->name, buff, &bufp);
     }
 
     /*

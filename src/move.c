@@ -833,7 +833,7 @@ void do_drop(dbref player, dbref cause, int key, char *name)
         }
 
         bp = buf = XMALLOC(LBUF_SIZE, "buf");
-        safe_sprintf(buf, &bp, "dropped %s.", Name(thing));
+        SAFE_SPRINTF(buf, &bp, "dropped %s.", Name(thing));
         oattr = quiet ? 0 : A_ODROP;
         aattr = quiet ? 0 : A_ADROP;
         did_it(player, thing, A_DROP, "Dropped.", oattr, buf, aattr, 0, (char **)NULL, 0, MSG_MOVE);

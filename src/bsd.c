@@ -119,7 +119,7 @@ int get_slave_result(void)
 				}
 			}
 
-			strncpy(d->addr, hostname, 50);
+			XSTRNCPY(d->addr, hostname, 50);
 			d->addr[50] = '\0';
 		}
 	}
@@ -261,7 +261,7 @@ int get_slave_result(void)
 			}
 		}
 
-		strncpy(d->username, userid, 10);
+		XSTRNCPY(d->username, userid, 10);
 		d->username[10] = '\0';
 		break;
 	}
@@ -338,8 +338,7 @@ void boot_slave(void)
 			close(i);
 		}
 
-		s = (char *)XMALLOC(MBUF_SIZE, "s");
-		sprintf(s, "%s/slave", mudconf.binhome);
+		s = XASPRINTF("s", "%s/slave", mudconf.binhome);
 		execlp(s, "slave", NULL);
 		XFREE(s);
 		_exit(EXIT_FAILURE);
@@ -711,17 +710,13 @@ DESC *new_connection(int sock)
 	}
 	else
 	{
-		buff = XMALLOC(MBUF_SIZE, "buff");
-		buf = XMALLOC(LBUF_SIZE, "buf");
-		strcpy(buff, inet_ntoa(addr.sin_addr));
-
 		/*
 		 * Ask slave process for host and username
 		 */
 
 		if ((slave_socket != -1) && mudconf.use_hostname)
 		{
-			sprintf(buf, "%s\n%s,%d,%d\n", inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), mudconf.port);
+			buf = XASPRINTF("buf", "%s\n%s,%d,%d\n", inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), mudconf.port);
 			len = strlen(buf);
 
 			if (write(slave_socket, buf, len) < 0)
@@ -729,13 +724,13 @@ DESC *new_connection(int sock)
 				close(slave_socket);
 				slave_socket = -1;
 			}
+			XFREE(buf);
 		}
 
-		XFREE(buf);
-		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, buff, ntohs(addr.sin_port));
+		
+		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 		d = initializesock(newsock, &addr);
 		mudstate.debug_cmd = cmdsave;
-		XFREE(buff);
 	}
 
 	mudstate.debug_cmd = cmdsave;
@@ -976,7 +971,7 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 	d->hashnext = NULL;
 	d->next = descriptor_list;
 	d->prev = &descriptor_list;
-	strncpy(d->addr, inet_ntoa(a->sin_addr), 50);
+	XSTRNCPY(d->addr, inet_ntoa(a->sin_addr), 50);
 	descriptor_list = d;
 	welcome_user(d);
 	return d;

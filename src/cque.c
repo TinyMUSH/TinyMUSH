@@ -851,7 +851,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 
 	if (command)
 	{
-		strcpy(tptr, command);
+		XSTRCPY(tptr, command);
 		tmp->comm = tptr;
 		tptr += (strlen(command) + 1);
 	}
@@ -860,7 +860,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 	{
 		if (args[a])
 		{
-			strcpy(tptr, args[a]);
+			XSTRCPY(tptr, args[a]);
 			tmp->env[a] = tptr;
 			tptr += (strlen(args[a]) + 1);
 		}
@@ -873,7 +873,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 			if (gargs->q_regs[a])
 			{
 				tmp->gdata->q_lens[a] = gargs->q_lens[a];
-				memcpy(tptr, gargs->q_regs[a], gargs->q_lens[a] + 1);
+				XMEMCPY(tptr, gargs->q_regs[a], gargs->q_lens[a] + 1);
 				tmp->gdata->q_regs[a] = tptr;
 				tptr += gargs->q_lens[a] + 1;
 			}
@@ -886,11 +886,11 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 		{
 			if (gargs->x_names[a] && gargs->x_regs[a])
 			{
-				strcpy(tptr, gargs->x_names[a]);
+				XSTRCPY(tptr, gargs->x_names[a]);
 				tmp->gdata->x_names[a] = tptr;
 				tptr += strlen(gargs->x_names[a]) + 1;
 				tmp->gdata->x_lens[a] = gargs->x_lens[a];
-				memcpy(tptr, gargs->x_regs[a], gargs->x_lens[a] + 1);
+				XMEMCPY(tptr, gargs->x_regs[a], gargs->x_lens[a] + 1);
 				tmp->gdata->x_regs[a] = tptr;
 				tptr += gargs->x_lens[a] + 1;
 			}
@@ -1595,11 +1595,11 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
 				{
 					if (tmp->env[i] != NULL)
 					{
-						safe_str((char *)"; Arg", bufp, &bp);
-						safe_chr(i + '0', bufp, &bp);
-						safe_str((char *)"='", bufp, &bp);
-						safe_str(tmp->env[i], bufp, &bp);
-						safe_chr('\'', bufp, &bp);
+						SAFE_LB_STR((char *)"; Arg", bufp, &bp);
+						SAFE_LB_CHR(i + '0', bufp, &bp);
+						SAFE_LB_STR((char *)"='", bufp, &bp);
+						SAFE_LB_STR(tmp->env[i], bufp, &bp);
+						SAFE_LB_CHR('\'', bufp, &bp);
 					}
 				}
 
@@ -1712,9 +1712,9 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 	bufp = XMALLOC(MBUF_SIZE, "bufp");
 
 	if (See_Queue(player))
-		sprintf(bufp, "Totals: Player...%d/%d[%ddel]  Object...%d/%d[%ddel]  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, pqdel, oqent, oqtot, oqdel, wqent, wqtot, sqent, sqtot);
+		XSPRINTF(bufp, "Totals: Player...%d/%d[%ddel]  Object...%d/%d[%ddel]  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, pqdel, oqent, oqtot, oqdel, wqent, wqtot, sqent, sqtot);
 	else
-		sprintf(bufp, "Totals: Player...%d/%d  Object...%d/%d  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, oqent, oqtot, wqent, wqtot, sqent, sqtot);
+		XSPRINTF(bufp, "Totals: Player...%d/%d  Object...%d/%d  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, oqent, oqtot, wqent, wqtot, sqent, sqtot);
 
 	notify(player, bufp);
 	XFREE(bufp);

@@ -362,7 +362,7 @@ BOOLEXP *test_atr(char *s)
 	char *buff, *s1;
 	int anum, locktype;
 	buff = XMALLOC(LBUF_SIZE, "buff");
-	strcpy(buff, s);
+	XSTRCPY(buff, s);
 
 	for (s = buff; *s && (*s != ':') && (*s != '/'); s++)
 		;
@@ -811,7 +811,7 @@ BOOLEXP *parse_boolexp(dbref player, const char *buf, int internal)
 	}
 
 	parsestore = parsebuf = XMALLOC(LBUF_SIZE, "parsestore");
-	strcpy(parsebuf, buf);
+	XSTRCPY(parsebuf, buf);
 	parse_player = player;
 
 	if (!mudstate.standalone)

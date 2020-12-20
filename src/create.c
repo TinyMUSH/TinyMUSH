@@ -551,13 +551,13 @@ void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int na
 
     if ((nargs >= 1) && args[0] && *args[0])
     {
-        sprintf(buff, "%d", room);
+        XSPRINTF(buff, "%d", room);
         open_exit(player, Location(player), args[0], buff);
     }
 
     if ((nargs >= 2) && args[1] && *args[1])
     {
-        sprintf(buff, "%d", Location(player));
+        XSPRINTF(buff, "%d", Location(player));
         open_exit(player, room, args[1], buff);
     }
 
@@ -1221,7 +1221,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     if ((Owner(thing) != player) && !Quiet(player))
     {
         t = tbuf = XMALLOC(SBUF_SIZE, "t");
-        safe_sb_str(Name(Owner(thing)), tbuf, &t);
+        SAFE_SB_STR(Name(Owner(thing)), tbuf, &t);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Destroyed. %s's %s(#%d)", tbuf, Name(thing), thing);
         XFREE(tbuf);
     }

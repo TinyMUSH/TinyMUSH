@@ -277,7 +277,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	 */
 		if (n)
 		{
-			safe_str(mbuff, buff, bufc);
+			SAFE_LB_STR(mbuff, buff, bufc);
 		}
 		else
 		{
@@ -343,11 +343,11 @@ void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	if (num < 1)
 	{
-		safe_chr('0', buff, bufc);
+		SAFE_LB_CHR('0', buff, bufc);
 	}
 	else
 	{
-		safe_sprintf(buff, bufc, "%ld", Randomize(num));
+		SAFE_SPRINTF(buff, bufc, "%ld", Randomize(num));
 	}
 }
 
@@ -364,7 +364,7 @@ void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	if (!fargs[0] || !fargs[1])
 	{
-		safe_chr('0', buff, bufc);
+		SAFE_LB_CHR('0', buff, bufc);
 		return;
 	}
 
@@ -373,13 +373,13 @@ void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	if ((n == 0) || (die <= 0))
 	{
-		safe_chr('0', buff, bufc);
+		SAFE_LB_CHR('0', buff, bufc);
 		return;
 	}
 
 	if ((n < 1) || (n > 100))
 	{
-		safe_str("#-1 NUMBER OUT OF RANGE", buff, bufc);
+		SAFE_LB_STR("#-1 NUMBER OUT OF RANGE", buff, bufc);
 		return;
 	}
 
@@ -388,7 +388,7 @@ void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 		total += (int)random_range(1, die);
 	}
 
-	safe_ltos(buff, bufc, total, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, total, LBUF_SIZE);
 }
 
 void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -444,7 +444,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 				print_sep(&osep, buff, bufc);
 			}
 
-			safe_ltos(buff, bufc, r_bot, LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, r_bot, LBUF_SIZE);
 		}
 
 		return;
@@ -464,7 +464,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 
 		tmp = (unsigned int)Randomize(n_range);
-		safe_ltos(buff, bufc, r_bot + tmp, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
 	}
 }
 
@@ -516,7 +516,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	if (!lnum_init)
 	{
-		strcpy(lnum_buff, (char *)"0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99");
+		XSTRCPY(lnum_buff, (char *)"0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99");
 		lnum_init = 1;
 	}
 
@@ -537,7 +537,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(bot);
-			over = safe_str(tbuf, buff, bufc);
+			over = SAFE_LB_STR(tbuf, buff, bufc);
 			XFREE(tbuf);
 			bot++;
 		}
@@ -563,13 +563,13 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if (top >= 99)
 		{
-			safe_str(startp, buff, bufc);
+			SAFE_LB_STR(startp, buff, bufc);
 		}
 		else
 		{
 			endp = lnum_buff + Lnum_Place(top + 1) - 1;
 			*endp = '\0';
-			safe_str(startp, buff, bufc);
+			SAFE_LB_STR(startp, buff, bufc);
 			*endp = ' ';
 		}
 
@@ -594,7 +594,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			print_sep(&osep, buff, bufc);
 		}
 
-		safe_ltos(buff, bufc, bot, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, bot, LBUF_SIZE);
 		return;
 	}
 	else if (top > bot)
@@ -607,7 +607,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(i);
-			over = safe_str(tbuf, buff, bufc);
+			over = SAFE_LB_STR(tbuf, buff, bufc);
 			XFREE(tbuf);
 		}
 	}
@@ -621,7 +621,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(i);
-			over = safe_str(tbuf, buff, bufc);
+			over = SAFE_LB_STR(tbuf, buff, bufc);
 			XFREE(tbuf);
 		}
 	}
@@ -637,7 +637,7 @@ void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	char *temp;
 	temp = (char *)ctime(&mudstate.now);
 	temp[strlen(temp) - 1] = '\0';
-	safe_str(temp, buff, bufc);
+	SAFE_LB_STR(temp, buff, bufc);
 }
 
 /*
@@ -647,7 +647,7 @@ void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_secs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.now, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.now, LBUF_SIZE);
 }
 
 /*
@@ -662,7 +662,7 @@ void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	tt = strtol(fargs[0], (char **)NULL, 10);
 	temp = (char *)ctime(&tt);
 	temp[strlen(temp) - 1] = '\0';
-	safe_str(temp, buff, bufc);
+	SAFE_LB_STR(temp, buff, bufc);
 }
 
 /*
@@ -713,7 +713,7 @@ int do_convtime(char *str, struct tm *ttm)
 	}
 
 	buf = p = XMALLOC(SBUF_SIZE, "p"); /* make a temp copy of arg */
-	safe_sb_str(str, buf, &p);
+	SAFE_SB_STR(str, buf, &p);
 	*p = '\0';
 	get_substr(buf, p); /* day-of-week or month */
 
@@ -883,11 +883,11 @@ void fun_convtime(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (do_convtime(fargs[0], ttm))
 	{
-		safe_ltos(buff, bufc, mktime(ttm), LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, mktime(ttm), LBUF_SIZE);
 	}
 	else
 	{
-		safe_strncat(buff, bufc, "-1", 2, LBUF_SIZE);
+		SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
 	}
 }
 
@@ -923,13 +923,13 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (tt < 0)
 		{
-			safe_str("#-1 INVALID TIME", buff, bufc);
+			SAFE_LB_STR("#-1 INVALID TIME", buff, bufc);
 			return;
 		}
 	}
 	else
 	{
-		safe_sprintf(buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs);
+		SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs);
 		return;
 	}
 
@@ -978,7 +978,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      */
 	ttm = localtime(&tt);
 	strftime(str, LBUF_SIZE - 1, tbuf, ttm);
-	safe_str(str, buff, bufc);
+	SAFE_LB_STR(str, buff, bufc);
 }
 
 /*
@@ -1033,12 +1033,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 			if (!*p)
 			{
-				safe_chr('$', buff, bufc);
+				SAFE_LB_CHR('$', buff, bufc);
 				break;
 			}
 			else if (*p == '$')
 			{
-				safe_chr('$', buff, bufc);
+				SAFE_LB_CHR('$', buff, bufc);
 				p++;
 			}
 			else
@@ -1166,7 +1166,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 						p++;
 					}
 
-					safe_strncat(buff, bufc, mark, p - mark, LBUF_SIZE);
+					SAFE_STRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
 				}
 				else if (!clockfmt)
 				{
@@ -1198,25 +1198,25 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 					{
 						if (isupper(*p))
 						{
-							safe_sprintf(buff, bufc, "%0*d", width, n);
+							SAFE_SPRINTF(buff, bufc, "%0*d", width, n);
 						}
 						else
 						{
-							safe_sprintf(buff, bufc, "%*d", width, n);
+							SAFE_SPRINTF(buff, bufc, "%*d", width, n);
 						}
 
 						if (showsuffix)
 						{
-							safe_chr(timec, buff, bufc);
+							SAFE_LB_CHR(timec, buff, bufc);
 						}
 					}
 					else
 					{
-						safe_ltos(buff, bufc, n, LBUF_SIZE);
+						SAFE_LTOS(buff, bufc, n, LBUF_SIZE);
 
 						if (showsuffix)
 						{
-							safe_chr(timec, buff, bufc);
+							SAFE_LB_CHR(timec, buff, bufc);
 						}
 					}
 
@@ -1261,7 +1261,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 					if (!hidezero || (cdays != 0))
 					{
-						safe_sprintf(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
+						SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
 					}
 					else
 					{
@@ -1271,15 +1271,15 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 			 */
 						if (chours != 0)
 						{
-							safe_sprintf(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
+							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
 						}
 						else if (cmins != 0)
 						{
-							safe_sprintf(buff, bufc, isupper(*p) ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
+							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
 						}
 						else
 						{
-							safe_sprintf(buff, bufc, isupper(*p) ? "%0*d" : "%*d", width, csecs);
+							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d" : "%*d", width, csecs);
 						}
 					}
 
@@ -1296,7 +1296,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				p++;
 			}
 
-			safe_strncat(buff, bufc, mark, p - mark, LBUF_SIZE);
+			SAFE_STRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
 		}
 	}
 }
@@ -1311,7 +1311,7 @@ void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	char *temp;
 	temp = (char *)ctime(&mudstate.start_time);
 	temp[strlen(temp) - 1] = '\0';
-	safe_str(temp, buff, bufc);
+	SAFE_LB_STR(temp, buff, bufc);
 }
 
 /*
@@ -1321,7 +1321,7 @@ void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 void fun_restarts(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.reboot_nums, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.reboot_nums, LBUF_SIZE);
 }
 
 /*
@@ -1334,7 +1334,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref 
 	char *temp;
 	temp = (char *)ctime(&mudstate.restart_time);
 	temp[strlen(temp) - 1] = '\0';
-	safe_str(temp, buff, bufc);
+	SAFE_LB_STR(temp, buff, bufc);
 }
 
 /*
@@ -1345,8 +1345,8 @@ void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref 
 void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	/* XXX To fix once the new version scheme is done */
-	//safe_str(mudstate.version, buff, bufc);
-	safe_str("TinyMUSH", buff, bufc);
+	//SAFE_LB_STR(mudstate.version, buff, bufc);
+	SAFE_LB_STR("TinyMUSH", buff, bufc);
 }
 
 /*
@@ -1356,7 +1356,7 @@ void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_mudname(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_str(mudconf.mud_name, buff, bufc);
+	SAFE_LB_STR(mudconf.mud_name, buff, bufc);
 }
 
 /*
@@ -1372,12 +1372,12 @@ void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	{
 		if (!strcasecmp(fargs[0], mp->modname))
 		{
-			safe_chr('1', buff, bufc);
+			SAFE_LB_CHR('1', buff, bufc);
 			return;
 		}
 	}
 
-	safe_chr('0', buff, bufc);
+	SAFE_LB_CHR('0', buff, bufc);
 }
 
 /*
@@ -1387,7 +1387,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.record_players, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.record_players, LBUF_SIZE);
 }
 
 /*
@@ -1397,22 +1397,22 @@ void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 void fun_fcount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.func_invk_ctr, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.func_invk_ctr, LBUF_SIZE);
 }
 
 void fun_fdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.func_nest_lev, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.func_nest_lev, LBUF_SIZE);
 }
 
 void fun_ccount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.cmd_invk_ctr, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.cmd_invk_ctr, LBUF_SIZE);
 }
 
 void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	safe_ltos(buff, bufc, mudstate.cmd_nest_lev, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mudstate.cmd_nest_lev, LBUF_SIZE);
 }
 
 /*
@@ -1437,13 +1437,13 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (times < 1)
 	{
-		safe_str("#-1 TOO FEW TIMES", buff, bufc);
+		SAFE_LB_STR("#-1 TOO FEW TIMES", buff, bufc);
 		return;
 	}
 
 	if (times > mudconf.func_invk_lim)
 	{
-		safe_str("#-1 TOO MANY TIMES", buff, bufc);
+		SAFE_LB_STR("#-1 TOO MANY TIMES", buff, bufc);
 		return;
 	}
 
@@ -1451,7 +1451,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	for (i = 0; i < times; i++)
 	{
-		strcpy(ebuf, fargs[0]);
+		XSTRCPY(ebuf, fargs[0]);
 		s = ebuf;
 		tp = tbuf;
 		get_tod(&bt);
@@ -1481,7 +1481,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		}
 	}
 
-	safe_sprintf(buff, bufc, "%.2f %.0f %.0f", total / (double)times, min, max);
+	SAFE_SPRINTF(buff, bufc, "%.2f %.0f %.0f", total / (double)times, min, max);
 }
 
 /*
@@ -1525,7 +1525,7 @@ int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs
 	 */
 		if (Invalid_Objtype(player) || !Check_Cmd_Access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
 		{
-			safe_noperm(buff, bufc);
+			SAFE_NOPERM(buff, bufc);
 			return 1;
 		}
 	}
@@ -1607,7 +1607,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	if (nfargs < 1)
 	{
-		safe_str("#-1 TOO FEW ARGUMENTS", buff, bufc);
+		SAFE_LB_STR("#-1 TOO FEW ARGUMENTS", buff, bufc);
 		return;
 	}
 
@@ -1707,7 +1707,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (!name || !*name)
 	{
-		safe_str("#-1 ILLEGAL NAME", buff, bufc);
+		SAFE_LB_STR("#-1 ILLEGAL NAME", buff, bufc);
 		return;
 	}
 
@@ -1751,7 +1751,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 			if (cost < mudconf.createmin || cost > mudconf.createmax)
 			{
-				safe_str("#-1 COST OUT OF RANGE", buff, bufc);
+				SAFE_LB_STR("#-1 COST OUT OF RANGE", buff, bufc);
 				return;
 			}
 		}
@@ -1803,7 +1803,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	     */
 			if (!fargs[1] || !*fargs[1])
 			{
-				safe_str("#-1 UNSPECIFIED PARAMETER", buff, bufc);
+				SAFE_LB_STR("#-1 UNSPECIFIED PARAMETER", buff, bufc);
 			}
 
 			/*
@@ -1825,7 +1825,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 			if (flagvalue < 0)
 			{
-				safe_str("#-1 CAN NOT SET", buff, bufc);
+				SAFE_LB_STR("#-1 CAN NOT SET", buff, bufc);
 				return;
 			}
 
@@ -1835,7 +1835,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
-				safe_str("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
+				SAFE_LB_STR("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
 				return;
 			}
 
@@ -1846,7 +1846,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 			if (!attr || !Set_attr(player, thing, attr, aflags))
 			{
-				safe_noperm(buff, bufc);
+				SAFE_NOPERM(buff, bufc);
 				return;
 			}
 
@@ -1875,7 +1875,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	if ((thing = match_controlled(player, fargs[0])) == NOTHING)
 	{
-		safe_nothing(buff, bufc);
+		SAFE_NOTHING(buff, bufc);
 		return;
 	}
 
@@ -1892,7 +1892,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 		if (atr <= 0)
 		{
-			safe_str("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
+			SAFE_LB_STR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
 			return;
 		}
 
@@ -1900,7 +1900,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 		if (!attr)
 		{
-			safe_noperm(buff, bufc);
+			SAFE_NOPERM(buff, bufc);
 			return;
 		}
 
@@ -1908,7 +1908,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 		if (!Set_attr(player, thing, attr, aflags))
 		{
-			safe_noperm(buff, bufc);
+			SAFE_NOPERM(buff, bufc);
 			return;
 		}
 
@@ -1919,12 +1919,12 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	 */
 		if (*p == '_')
 		{
-			strcpy(buff2, p + 1);
+			XSTRCPY(buff2, p + 1);
 
 			if (!parse_attrib(player, p + 1, &thing2, &atr2, 0) || (atr == NOTHING))
 			{
 				XFREE(buff2);
-				safe_nomatch(buff, bufc);
+				SAFE_NOMATCH(buff, bufc);
 				return;
 			}
 
@@ -1935,7 +1935,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 			if (!attr2 || !See_attr(player, thing2, attr2, aowner, aflags))
 			{
 				XFREE(buff2);
-				safe_noperm(buff, bufc);
+				SAFE_NOPERM(buff, bufc);
 				return;
 			}
 		}
@@ -1974,7 +1974,7 @@ void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, ch
 				print_sep(&SPACE_DELIM, buff, bufc);
 			}
 
-			safe_ltos(buff, bufc, tmp->pid, LBUF_SIZE);
+			SAFE_LTOS(buff, bufc, tmp->pid, LBUF_SIZE);
 		}
 	}
 }
@@ -2003,17 +2003,17 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
 
 		if ((qptr->waittime > 0) && (Good_obj(qptr->sem)))
 		{
-			safe_sprintf(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mudstate.now, qptr->comm);
+			SAFE_SPRINTF(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mudstate.now, qptr->comm);
 		}
 		else if (qptr->waittime > 0)
 		{
-			safe_sprintf(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mudstate.now, qptr->comm);
+			SAFE_SPRINTF(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mudstate.now, qptr->comm);
 		}
 		else if (Good_obj(qptr->sem))
 		{
 			if (qptr->attr == A_SEMAPHORE)
 			{
-				safe_sprintf(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
+				SAFE_SPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
 			}
 			else
 			{
@@ -2021,17 +2021,17 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
 
 				if (ap && ap->name)
 				{
-					safe_sprintf(buff, bufc, "#%d:#%d/%s %s", qptr->player, qptr->sem, ap->name, qptr->comm);
+					SAFE_SPRINTF(buff, bufc, "#%d:#%d/%s %s", qptr->player, qptr->sem, ap->name, qptr->comm);
 				}
 				else
 				{
-					safe_sprintf(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
+					SAFE_SPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
 				}
 			}
 		}
 		else
 		{
-			safe_sprintf(buff, bufc, "#%d: %s", qptr->player, qptr->comm);
+			SAFE_SPRINTF(buff, bufc, "#%d: %s", qptr->player, qptr->comm);
 		}
 
 		return;

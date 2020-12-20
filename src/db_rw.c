@@ -192,7 +192,7 @@ BOOLEXP *getboolexp1(FILE *f)
 	case '"':
 		ungetc(c, f);
 		buff = XMALLOC(LBUF_SIZE, "buff");
-		strcpy(buff, getstring_noalloc(f, 1));
+		XSTRCPY(buff, getstring_noalloc(f, 1));
 		c = fgetc(f);
 
 		if (c == EOF)
@@ -1345,13 +1345,13 @@ int db_read(void)
      */
 
 	c = data.dptr;
-	memcpy((void *)&mudstate.min_size, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mudstate.min_size, (void *)c, sizeof(int));
 	c++;
-	memcpy((void *)&mudstate.attr_next, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mudstate.attr_next, (void *)c, sizeof(int));
 	c++;
-	memcpy((void *)&mudstate.record_players, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mudstate.record_players, (void *)c, sizeof(int));
 	c++;
-	memcpy((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
 	XFREE(data.dptr);
 
 	/*
@@ -1377,9 +1377,9 @@ int db_read(void)
 
 			while ((s - (char *)data.dptr) < data.dsize)
 			{
-				memcpy((void *)&j, (void *)s, sizeof(int));
+				XMEMCPY((void *)&j, (void *)s, sizeof(int));
 				s += sizeof(int);
-				memcpy((void *)&vattr_flags, (void *)s, sizeof(int));
+				XMEMCPY((void *)&vattr_flags, (void *)s, sizeof(int));
 				s += sizeof(int);
 				vattr_define(s, j, vattr_flags);
 				s = strchr((const char *)s, '\0');
@@ -1429,7 +1429,7 @@ int db_read(void)
 
 			while ((s - (char *)data.dptr) < data.dsize)
 			{
-				memcpy((void *)&num, (void *)s, sizeof(int));
+				XMEMCPY((void *)&num, (void *)s, sizeof(int));
 				s += sizeof(int);
 				db_grow(num + 1);
 
@@ -1443,7 +1443,7 @@ int db_read(void)
 		 * copy it into place
 		 */
 
-				memcpy((void *)&(db[num]), (void *)s, sizeof(DUMPOBJ));
+				XMEMCPY((void *)&(db[num]), (void *)s, sizeof(DUMPOBJ));
 				s += sizeof(DUMPOBJ);
 
 				if (mudconf.lag_check_clk)
@@ -1908,13 +1908,13 @@ dbref db_write(void)
      * This should be the only data record of its type
      */
 	c = data.dptr = (int *)XMALLOC(4 * sizeof(int), "c");
-	memcpy((void *)c, (void *)&mudstate.db_top, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mudstate.db_top, sizeof(int));
 	c++;
-	memcpy((void *)c, (void *)&i, sizeof(int));
+	XMEMCPY((void *)c, (void *)&i, sizeof(int));
 	c++;
-	memcpy((void *)c, (void *)&mudstate.record_players, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mudstate.record_players, sizeof(int));
 	c++;
-	memcpy((void *)c, (void *)&mudstate.moduletype_top, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mudstate.moduletype_top, sizeof(int));
 	/*
      * "TM3" is our unique key
      */
@@ -2010,11 +2010,11 @@ dbref db_write(void)
 				if (vp && !(vp->flags & AF_DELETED))
 				{
 					len = strlen(vp->name) + 1;
-					memcpy((void *)s, (void *)&vp->number, sizeof(int));
+					XMEMCPY((void *)s, (void *)&vp->number, sizeof(int));
 					s += sizeof(int);
-					memcpy((void *)s, (void *)&vp->flags, sizeof(int));
+					XMEMCPY((void *)s, (void *)&vp->flags, sizeof(int));
 					s += sizeof(int);
-					memcpy((void *)s, (void *)vp->name, len);
+					XMEMCPY((void *)s, (void *)vp->name, len);
 					s += len;
 				}
 			}
@@ -2108,9 +2108,9 @@ dbref db_write(void)
 
 				if (!Going(k))
 				{
-					memcpy((void *)s, (void *)&k, sizeof(int));
+					XMEMCPY((void *)s, (void *)&k, sizeof(int));
 					s += sizeof(int);
-					memcpy((void *)s, (void *)&(db[k]), sizeof(DUMPOBJ));
+					XMEMCPY((void *)s, (void *)&(db[k]), sizeof(DUMPOBJ));
 					s += sizeof(DUMPOBJ);
 				}
 			}

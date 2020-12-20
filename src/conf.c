@@ -59,7 +59,7 @@ void cf_init(void)
     char *s;
     s = XMALLOC(MBUF_SIZE, "s");
     mudstate.modules_list = NULL;
-    mudstate.modloaded[0] = '\0';
+    mudstate.modloaded = XMALLOC(MBUF_SIZE, "mudstate.modloaded");
     mudconf.port = 6250;
     mudconf.conc_port = 6251;
     mudconf.init_size = 1000;
@@ -447,7 +447,7 @@ void cf_log_syntax(dbref player, char *cmd, const char *template, ...)
     va_list ap;
     buff = XMALLOC(LBUF_SIZE, "buff");
     va_start(ap, template);
-    vsnprintf(buff, LBUF_SIZE, template, ap);
+    XVSNPRINTF(buff, LBUF_SIZE, template, ap);
     va_end(ap);
 
     if (mudstate.initializing)
@@ -473,7 +473,7 @@ void cf_log_help(dbref player, char *cmd, const char *template, ...)
     va_list ap;
     buff = XMALLOC(LBUF_SIZE, "buff");
     va_start(ap, template);
-    vsnprintf(buff, LBUF_SIZE, template, ap);
+    XVSNPRINTF(buff, LBUF_SIZE, template, ap);
     va_end(ap);
 
     if (mudstate.initializing)
@@ -499,7 +499,7 @@ void cf_log_help_mkindx(dbref player, char *cmd, const char *template, ...)
     va_list ap;
     buff = XMALLOC(LBUF_SIZE, "buff");
     va_start(ap, template);
-    vsnprintf(buff, LBUF_SIZE, template, ap);
+    XVSNPRINTF(buff, LBUF_SIZE, template, ap);
     va_end(ap);
 
     if (mudstate.initializing)
@@ -1776,7 +1776,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
      * Make a new string so we won't SEGV if given a constant string
      */
     newstr = XMALLOC(MBUF_SIZE, "newstr");
-    strcpy(newstr, str);
+    XSTRCPY(newstr, str);
     fcmd = strtok_r(newstr, " \t=,", &tokst);
     fpath = strtok_r(NULL, " \t=,", &tokst);
     cf_log_help(player, confcmd, "Loading helpfile %s", basename(fpath));
@@ -2346,7 +2346,7 @@ int helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
     if (!mudstate.initializing)
     {
         buff = XMALLOC(LBUF_SIZE, "buff");
-        strcpy(buff, ap);
+        XSTRCPY(buff, ap);
     }
 
     i = tp->interpreter(tp->loc, ap, tp->extra, player, cp);
@@ -2496,7 +2496,7 @@ void list_cf_access(dbref player)
     {
         if (God(player) || check_access(player, tp->flags))
         {
-            sprintf(buff, "%s:", tp->pname);
+            XSPRINTF(buff, "%s:", tp->pname);
             listset_nametab(player, access_nametab, tp->flags, buff, 1);
         }
     }
@@ -2513,7 +2513,7 @@ void list_cf_access(dbref player)
             {
                 if (God(player) || check_access(player, tp->flags))
                 {
-                    sprintf(buff, "%s:", tp->pname);
+                    XSPRINTF(buff, "%s:", tp->pname);
                     listset_nametab(player, access_nametab, tp->flags, buff, 1);
                 }
             }
@@ -2535,7 +2535,7 @@ void list_cf_read_access(dbref player)
     {
         if (God(player) || check_access(player, tp->rperms))
         {
-            sprintf(buff, "%s:", tp->pname);
+            XSPRINTF(buff, "%s:", tp->pname);
             listset_nametab(player, access_nametab, tp->rperms, buff, 1);
         }
     }
@@ -2552,7 +2552,7 @@ void list_cf_read_access(dbref player)
             {
                 if (God(player) || check_access(player, tp->rperms))
                 {
-                    sprintf(buff, "%s:", tp->pname);
+                    XSPRINTF(buff, "%s:", tp->pname);
                     listset_nametab(player, access_nametab, tp->rperms, buff, 1);
                 }
             }
@@ -2620,19 +2620,19 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 
     if (!check_access(player, tp->rperms))
     {
-        safe_noperm(buff, bufc);
+        SAFE_NOPERM(buff, bufc);
         return;
     }
 
     if ((tp->interpreter == cf_bool) || (tp->interpreter == cf_int) || (tp->interpreter == cf_int_factor) || (tp->interpreter == cf_const))
     {
-        safe_ltos(buff, bufc, *(tp->loc), LBUF_SIZE);
+        SAFE_LTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
         return;
     }
 
     if (tp->interpreter == cf_string)
     {
-        safe_str(*((char **)tp->loc), buff, bufc);
+        SAFE_LB_STR(*((char **)tp->loc), buff, bufc);
         return;
     }
 
@@ -2645,11 +2645,11 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
     if (tp->interpreter == cf_option)
     {
         opt = find_nametab_ent_flag(GOD, (NAMETAB *)tp->extra, *(tp->loc));
-        safe_str((opt ? opt->name : "*UNKNOWN*"), buff, bufc);
+        SAFE_LB_STR((opt ? opt->name : "*UNKNOWN*"), buff, bufc);
         return;
     }
 
-    safe_noperm(buff, bufc);
+    SAFE_NOPERM(buff, bufc);
     return;
 }
 
@@ -2689,7 +2689,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
     }
 
     XFREE(s);
-    safe_nomatch(buff, bufc);
+    SAFE_NOMATCH(buff, bufc);
 }
 
 void list_options(dbref player)

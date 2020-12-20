@@ -411,7 +411,7 @@ struct statedata
     char *configureinfo;         /* Configure switches */
     char *compilerinfo;          /* Compiler command line */
     char *linkerinfo;            /* Linker command line */
-    char modloaded[MBUF_SIZE];   /* Modules loaded */
+    char *modloaded;             /* Modules loaded */
     char **cfiletab;             /* Array of config files */
     int configfiles;             /* Number of config files */
     int initializing;            /* Are we reading config file at startup? */

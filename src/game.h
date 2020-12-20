@@ -78,8 +78,8 @@
 #define OBJECT_DEPOSIT(pennies) \
     (((pennies)-mudconf.sacadjust) * mudconf.sacfactor)
 
-#define StringCopy strcpy
-#define StringCopyTrunc strncpy
+//#define StringCopy strcpy
+//#define StringCopyTrunc strncpy
 
 #define DEV_NULL "/dev/null"
 

@@ -411,7 +411,7 @@ int real_wild1(char *tstr, char *dstr, int arg)
 
 	if (!tstr[1])
 	{
-		strncpy(arglist[arg], dstr, LBUF_SIZE - 1);
+		XSTRNCPY(arglist[arg], dstr, LBUF_SIZE - 1);
 		arglist[arg][LBUF_SIZE - 1] = '\0';
 		return 1;
 	}
@@ -551,7 +551,7 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	     * Found a match!  Fill in all remaining arguments.
 	     * * First do the '*'...
 	     */
-			strncpy(arglist[argpos], datapos, (dstr - datapos) - numextra);
+			XSTRNCPY(arglist[argpos], datapos, (dstr - datapos) - numextra);
 			arglist[argpos][(dstr - datapos) - numextra] = '\0';
 			datapos = dstr - numextra;
 			argpos++;

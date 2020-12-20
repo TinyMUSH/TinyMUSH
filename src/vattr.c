@@ -515,7 +515,7 @@ char *store_string(char *str)
     }
 
     ret = stringblock + stringblock_hwm;
-    strcpy(ret, str);
+    XSTRCPY(ret, str);
     stringblock_hwm += (len + 1);
     return (ret);
 }

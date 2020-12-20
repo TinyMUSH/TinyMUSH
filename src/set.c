@@ -294,7 +294,7 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
      * * we have to eat leading and trailing spaces.
      */
 	retcode = 1;
-	strcpy(tmp_buf, list);
+	XSTRCPY(tmp_buf, list);
 
 	for (n_aliases = 0, p = strtok_r(tmp_buf, ";", &tokp); p; n_aliases++, p = strtok_r(NULL, ";", &tokp))
 	{
@@ -353,10 +353,10 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 		{
 			if (p != alias_buf)
 			{
-				safe_chr(';', alias_buf, &p);
+				SAFE_LB_CHR(';', alias_buf, &p);
 			}
 
-			safe_str(alias_ptrs[i], alias_buf, &p);
+			SAFE_LB_STR(alias_ptrs[i], alias_buf, &p);
 		}
 		else
 		{
@@ -963,7 +963,7 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 		{
 			if (buff)
 			{
-				safe_noperm(buff, bufc);
+				SAFE_NOPERM(buff, bufc);
 			}
 
 			return;
@@ -982,7 +982,7 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 	{
 		if (buff)
 		{
-			safe_noperm(buff, bufc);
+			SAFE_NOPERM(buff, bufc);
 		}
 		else
 		{
@@ -1144,7 +1144,7 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 	 */
 		if (*p == '_')
 		{
-			strcpy(buff, p + 1);
+			XSTRCPY(buff, p + 1);
 
 			if (!parse_attrib(player, p + 1, &thing2, &atr2, 0) || (atr2 == NOTHING))
 			{
@@ -1444,7 +1444,7 @@ int parse_attrib(dbref player, char *str, dbref *thing, int *atr, int ok_structs
      * Break apart string into obj and attr.  Return on failure
      */
 	buff = XMALLOC(LBUF_SIZE, "buff");
-	strcpy(buff, str);
+	XSTRCPY(buff, str);
 
 	if (!parse_thing_slash(player, buff, &str, thing))
 	{
@@ -1560,7 +1560,7 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 	}
 
 	buff = XMALLOC(LBUF_SIZE, "buff");
-	strcpy(buff, str);
+	XSTRCPY(buff, str);
 
 	/*
      * Separate name and attr portions at the first /
@@ -1640,7 +1640,7 @@ void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char 
 	else
 	{
 		*returnstr = XMALLOC(LBUF_SIZE, "returnstr");
-		strcpy(*returnstr, *dst);
+		XSTRCPY(*returnstr, *dst);
 	}
 }
 
@@ -1900,9 +1900,9 @@ void do_use(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
 		df_use = XMALLOC(LBUF_SIZE, "df_use");
 		df_ouse = XMALLOC(LBUF_SIZE, "df_ouse");
 		bp = df_use;
-		safe_sprintf(df_use, &bp, "You use %s", Name(thing));
+		SAFE_SPRINTF(df_use, &bp, "You use %s", Name(thing));
 		bp = df_ouse;
-		safe_sprintf(df_ouse, &bp, "uses %s", Name(thing));
+		SAFE_SPRINTF(df_ouse, &bp, "uses %s", Name(thing));
 		did_it(player, thing, A_USE, df_use, A_OUSE, df_ouse, A_AUSE, 1, (char **)NULL, 0, MSG_PRESENCE);
 		XFREE(df_use);
 		XFREE(df_ouse);

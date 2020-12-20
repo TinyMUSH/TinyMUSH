@@ -240,12 +240,12 @@ static char *munge_comtitle(char *title)
 
     if (strchr(title, ESC_CHAR))
     {
-        safe_strcat(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
-        safe_mb_str(ANSI_NORMAL, tbuf, &tp);
+        SAFE_STRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
+        SAFE_MB_STR(ANSI_NORMAL, tbuf, &tp);
     }
     else
     {
-        safe_mb_str(title, tbuf, &tp);
+        SAFE_MB_STR(title, tbuf, &tp);
     }
 
     return tbuf;
@@ -375,31 +375,29 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                     if (!mp)
                     {
                         mp = msg_ns;
-                        safe_chr('[', msg_ns, &mp);
+                        SAFE_LB_CHR('[', msg_ns, &mp);
                         safe_name(cause, msg_ns, &mp);
-                        safe_chr('(', msg_ns, &mp);
-                        safe_chr('#', msg_ns, &mp);
-                        safe_ltos(msg_ns, &mp, cause, LBUF_SIZE);
-                        safe_chr(')', msg_ns, &mp);
+                        SAFE_LB_CHR('(', msg_ns, &mp);
+                        SAFE_LB_CHR('#', msg_ns, &mp);
+                        SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
+                        SAFE_LB_CHR(')', msg_ns, &mp);
 
                         if (cause != Owner(cause))
                         {
-                            safe_chr('{', msg_ns, &mp);
+                            SAFE_LB_CHR('{', msg_ns, &mp);
                             safe_name(Owner(cause), msg_ns, &mp);
-                            safe_chr('}', msg_ns, &mp);
+                            SAFE_LB_CHR('}', msg_ns, &mp);
                         }
 
                         if (cause != mudstate.curr_enactor)
                         {
-                            //safe_known_str ( ( char * ) "<-(#", 4, msg_ns, &mp );
-                            safe_strcat(msg_ns, &mp, "<-(#", LBUF_SIZE);
-                            safe_ltos(msg_ns, &mp, cause, LBUF_SIZE);
-                            safe_chr(')', msg_ns, &mp);
+                            SAFE_STRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
+                            SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
+                            SAFE_LB_CHR(')', msg_ns, &mp);
                         }
 
-                        //safe_known_str ( ( char * ) "] ", 2, msg_ns, &mp );
-                        safe_strcat(msg_ns, &mp, "] ", LBUF_SIZE);
-                        safe_str(msg, msg_ns, &mp);
+                        SAFE_STRCAT(msg_ns, &mp, "] ", LBUF_SIZE);
+                        SAFE_LB_STR(msg, msg_ns, &mp);
                     }
 
 #ifndef PUEBLO_SUPPORT
@@ -727,8 +725,8 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
             else
             {
                 tp = tbuf;
-                safe_str(cap->title, tbuf, &tp);
-                safe_chr(' ', tbuf, &tp);
+                SAFE_LB_STR(cap->title, tbuf, &tp);
+                SAFE_LB_CHR(' ', tbuf, &tp);
                 safe_name(player, tbuf, &tp);
                 *tp = '\0';
                 name_buf = tbuf;
@@ -1416,7 +1414,7 @@ void do_cboot(dbref player, dbref cause, int key, char *name, char *objstr)
     {
         remove_from_channel(thing, chp, 1);
         t = tbuf;
-        safe_sb_str(Name(player), tbuf, &t);
+        SAFE_SB_STR(Name(player), tbuf, &t);
         s = XMALLOC(LBUF_SIZE, "do_cboot.s");
         snprintf(s, LBUF_SIZE, "%s %s boots %s off the channel.", chp->header, tbuf, Name(thing));
         com_message(chp, s, player);
@@ -1608,34 +1606,34 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name)
         check_owned_channel(player, chp);
         notify(player, chp->name);
         tp = tbuf;
-        safe_str("Flags:", tbuf, &tp);
+        SAFE_LB_STR("Flags:", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_PUBLIC)
-            safe_str(" Public", tbuf, &tp);
+            SAFE_LB_STR(" Public", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_LOUD)
-            safe_str(" Loud", tbuf, &tp);
+            SAFE_LB_STR(" Loud", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_SPOOF)
-            safe_str(" Spoof", tbuf, &tp);
+            SAFE_LB_STR(" Spoof", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_JOIN)
-            safe_str(" P_Join", tbuf, &tp);
+            SAFE_LB_STR(" P_Join", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_RECV)
-            safe_str(" P_Receive", tbuf, &tp);
+            SAFE_LB_STR(" P_Receive", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_TRANS)
-            safe_str(" P_Transmit", tbuf, &tp);
+            SAFE_LB_STR(" P_Transmit", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_JOIN)
-            safe_str(" O_Join", tbuf, &tp);
+            SAFE_LB_STR(" O_Join", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_RECV)
-            safe_str(" O_Receive", tbuf, &tp);
+            SAFE_LB_STR(" O_Receive", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_TRANS)
-            safe_str(" O_Transmit", tbuf, &tp);
+            SAFE_LB_STR(" O_Transmit", tbuf, &tp);
 
         *tp = '\0';
         notify(player, tbuf);
@@ -2274,12 +2272,12 @@ void mod_comsys_load_database(FILE *fp)
     chp = lookup_channel(fargs[0]);                               \
     if (!chp)                                                     \
     {                                                             \
-        safe_str((char *)"#-1 CHANNEL NOT FOUND", buff, bufc);    \
+        SAFE_LB_STR((char *)"#-1 CHANNEL NOT FOUND", buff, bufc);    \
         return;                                                   \
     }                                                             \
     if ((!Comm_All(p) && ((p) != chp->owner)))                    \
     {                                                             \
-        safe_str((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
+        SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
         return;                                                   \
     }
 
@@ -2287,7 +2285,7 @@ void mod_comsys_load_database(FILE *fp)
     t = lookup_player(p, fargs[0], 1);                            \
     if (!Good_obj(t) || (!Controls(p, t) && !Comm_All(p)))        \
     {                                                             \
-        safe_str((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
+        SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
         return;                                                   \
     }
 
@@ -2295,7 +2293,7 @@ void mod_comsys_load_database(FILE *fp)
     cap = lookup_calias(p, n);                             \
     if (!cap)                                              \
     {                                                      \
-        safe_str((char *)"#-1 NO SUCH ALIAS", buff, bufc); \
+        SAFE_LB_STR((char *)"#-1 NO SUCH ALIAS", buff, bufc); \
         return;                                            \
     }
 
@@ -2319,7 +2317,7 @@ void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 print_sep(&osep, buff, bufc);
             }
 
-            safe_str(chp->name, buff, bufc);
+            SAFE_LB_STR(chp->name, buff, bufc);
         }
     }
 }
@@ -2340,7 +2338,7 @@ void fun_cwho(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
               (!Hidden(chp->connect_who[i]->player) || See_Hidden(player)))))
         {
             if (*bufc != bb_p)
-                safe_chr(' ', buff, bufc);
+                SAFE_LB_CHR(' ', buff, bufc);
 
             safe_dbref(buff, bufc, chp->connect_who[i]->player);
         }
@@ -2358,7 +2356,7 @@ void fun_cwhoall(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     for (wp = chp->who; wp != NULL; wp = wp->next)
     {
         if (*bufc != bb_p)
-            safe_chr(' ', buff, bufc);
+            SAFE_LB_CHR(' ', buff, bufc);
 
         safe_dbref(buff, bufc, wp->player);
     }
@@ -2377,7 +2375,7 @@ void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     Grab_Channel(player);
 
     if (chp->descrip)
-        safe_str(chp->descrip, buff, bufc);
+        SAFE_LB_STR(chp->descrip, buff, bufc);
 }
 
 void fun_comheader(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2386,7 +2384,7 @@ void fun_comheader(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     Grab_Channel(player);
 
     if (chp->header)
-        safe_str(chp->header, buff, bufc);
+        SAFE_LB_STR(chp->header, buff, bufc);
 }
 
 void fun_comalias(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2405,9 +2403,9 @@ void fun_comalias(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     for (cl_ptr = clist; cl_ptr != NULL; cl_ptr = cl_ptr->next)
     {
         if (*bufc != bb_p)
-            safe_chr(' ', buff, bufc);
+            SAFE_LB_CHR(' ', buff, bufc);
 
-        safe_str(cl_ptr->alias_ptr->alias, buff, bufc);
+        SAFE_LB_STR(cl_ptr->alias_ptr->alias, buff, bufc);
     }
 }
 
@@ -2417,7 +2415,7 @@ void fun_cominfo(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     COMALIAS *cap;
     Comsys_User(player, target);
     Grab_Alias(target, fargs[1]);
-    safe_str(cap->channel->name, buff, bufc);
+    SAFE_LB_STR(cap->channel->name, buff, bufc);
 }
 
 void fun_comtitle(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2428,7 +2426,7 @@ void fun_comtitle(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     Grab_Alias(target, fargs[1]);
 
     if (cap->title)
-        safe_str(cap->title, buff, bufc);
+        SAFE_LB_STR(cap->title, buff, bufc);
 }
 
 void fun_cemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)

@@ -487,7 +487,7 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
     count = 0;
     errors = 0;
     bp = tp = XMALLOC(LBUF_SIZE, "tp");
-    strcpy(tp, atext);
+    XSTRCPY(tp, atext);
 
     do
     {
@@ -584,8 +584,8 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
         {
             if (Good_obj(fp->data[i]))
             {
-                sprintf(tp, "#%d ", fp->data[i]);
-                safe_str(tp, atext, &bp);
+                XSPRINTF(tp, "#%d ", fp->data[i]);
+                SAFE_LB_STR(tp, atext, &bp);
             }
             else
             {
@@ -759,7 +759,7 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
     count = 0;
     errors = 0;
     bp = tp = XMALLOC(LBUF_SIZE, "tp");
-    strcpy(tp, atext);
+    XSTRCPY(tp, atext);
 
     do
     {
@@ -851,8 +851,8 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
         {
             if (Good_obj(fp->data[i]))
             {
-                sprintf(tp, "#%d ", fp->data[i]);
-                safe_str(tp, atext, &bp);
+                XSPRINTF(tp, "#%d ", fp->data[i]);
+                SAFE_LB_STR(tp, atext, &bp);
             }
             else
             {
@@ -988,7 +988,7 @@ void safe_name(dbref thing, char *outbuf, char **bufc)
         XFREE(buff);
     }
 
-    safe_strncat(outbuf, bufc, names[thing], NameLen(thing), LBUF_SIZE);
+    SAFE_STRNCAT(outbuf, bufc, names[thing], NameLen(thing), LBUF_SIZE);
     s_AccessTime(thing, save_access_time);
 }
 
@@ -1102,7 +1102,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
 
     *bufc = s;
     buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
-    safe_str(buf, buff, bufc);
+    SAFE_LB_STR(buf, buff, bufc);
     XFREE(buf);
 }
 
@@ -1240,7 +1240,7 @@ void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
         if (!(va->flags & AF_DELETED))
         {
             tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-            sprintf(tbuf, "%s(%d):", va->name, va->number);
+            XSPRINTF(tbuf, "%s(%d):", va->name, va->number);
             listset_nametab(player, attraccess_nametab, va->flags, tbuf, 1);
             XFREE(tbuf);
         }
@@ -1786,7 +1786,7 @@ void al_extend(char **buffer, int *bufsiz, int len, int copy)
         {
             if (copy)
             {
-                memcpy(tbuff, *buffer, *bufsiz);
+                XMEMCPY(tbuff, *buffer, *bufsiz);
             }
 
             XFREE(*buffer);
@@ -1850,7 +1850,7 @@ char *al_fetch(dbref thing)
     {
         len = al_size(astr);
         al_extend(&mudstate.mod_alist, &mudstate.mod_size, len, 0);
-        memcpy(mudstate.mod_alist, astr, len);
+        XMEMCPY(mudstate.mod_alist, astr, len);
     }
     else
     {
@@ -2197,7 +2197,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
         return;
     }
 
-    strcpy(a, buff);
+    XSTRCPY(a, buff);
     /* Store the value in cache */
     key.dptr = &okey;
     key.dsize = sizeof(Aname);
@@ -2224,7 +2224,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
         {
             char tbuf[SBUF_SIZE];
             (void)cron_clr(thing, A_DAILY);
-            sprintf(tbuf, "0 %d * * *", mudconf.events_daily_hour);
+            XSPRINTF(tbuf, "0 %d * * *", mudconf.events_daily_hour);
             call_cron(thing, thing, A_DAILY, tbuf);
         }
 
@@ -2680,7 +2680,7 @@ int atr_head(dbref thing, char **attrp)
 
     /* Set up the list and return the first entry */
     al_extend(&mudstate.iter_alist.data, &mudstate.iter_alist.len, alen, 0);
-    memcpy(mudstate.iter_alist.data, astr, alen);
+    XMEMCPY(mudstate.iter_alist.data, astr, alen);
     *attrp = mudstate.iter_alist.data;
     return atr_next(attrp);
 }
@@ -2793,7 +2793,7 @@ void db_grow(dbref newtop)
     {
         /* An old name cache exists.  Copy it. */
         names -= SIZE_HACK;
-        memcpy((char *)newnames, (char *)names, (newtop + SIZE_HACK) * sizeof(NAME));
+        XMEMCPY((char *)newnames, (char *)names, (newtop + SIZE_HACK) * sizeof(NAME));
         cp = (char *)names;
         XFREE(cp);
     }
@@ -2820,13 +2820,13 @@ void db_grow(dbref newtop)
         abort();
     }
 
-    memset((char *)newpurenames, 0, (newsize + SIZE_HACK) * sizeof(NAME));
+    XMEMSET((char *)newpurenames, 0, (newsize + SIZE_HACK) * sizeof(NAME));
 
     if (purenames)
     {
         /* An old name cache exists.  Copy it. */
         purenames -= SIZE_HACK;
-        memcpy((char *)newpurenames, (char *)purenames, (newtop + SIZE_HACK) * sizeof(NAME));
+        XMEMCPY((char *)newpurenames, (char *)purenames, (newtop + SIZE_HACK) * sizeof(NAME));
         cp = (char *)purenames;
         XFREE(cp);
     }
@@ -2858,7 +2858,7 @@ void db_grow(dbref newtop)
     {
         /* An old struct database exists.  Copy it to the new buffer */
         db -= SIZE_HACK;
-        memcpy((char *)newdb, (char *)db, (mudstate.db_top + SIZE_HACK) * sizeof(OBJ));
+        XMEMCPY((char *)newdb, (char *)db, (mudstate.db_top + SIZE_HACK) * sizeof(OBJ));
         cp = (char *)db;
         XFREE(cp);
     }
@@ -2904,12 +2904,12 @@ void db_grow(dbref newtop)
     /* Grow the db mark buffer */
     marksize = (newsize + 7) >> 3;
     newmarkbuf = (MARKBUF *)XMALLOC(marksize, "newmarkbuf");
-    memset((char *)newmarkbuf, 0, marksize);
+    XMEMSET((char *)newmarkbuf, 0, marksize);
 
     if (mudstate.markbits)
     {
         marksize = (newtop + 7) >> 3;
-        memcpy((char *)newmarkbuf, (char *)mudstate.markbits, marksize);
+        XMEMCPY((char *)newmarkbuf, (char *)mudstate.markbits, marksize);
         cp = (char *)mudstate.markbits;
         XFREE(cp);
     }
@@ -3011,7 +3011,7 @@ dbref parse_objid(const char *s, const char *p)
      * If we match the dbref but its creation time doesn't match the
      * timestamp, we don't have a match.
      */
-    strncpy(tbuf, s, p - s);
+    XSTRNCPY(tbuf, s, p - s);
     it = parse_dbref_only(tbuf);
 
     if (Good_obj(it))
@@ -3138,7 +3138,7 @@ char *getstring_noalloc(FILE *f, int new_strings)
                 return buf;
             }
 
-            safe_chr(c, buf, &p);
+            SAFE_LB_CHR(c, buf, &p);
         }
     }
     else
@@ -3187,7 +3187,7 @@ char *getstring_noalloc(FILE *f, int new_strings)
                 return buf;
             }
 
-            safe_chr(c, buf, &p);
+            SAFE_LB_CHR(c, buf, &p);
         }
     }
 }
@@ -3393,7 +3393,7 @@ void load_restart_db(void)
         mudstate.reboot_nums = getref(f) + 1;
     }
 
-    strcpy(mudstate.doing_hdr, getstring_noalloc(f, new_strings));
+    XSTRCPY(mudstate.doing_hdr, getstring_noalloc(f, new_strings));
 
     if (version & RS_CONCENTRATE)
     {
@@ -3423,7 +3423,7 @@ void load_restart_db(void)
         if (*temp)
         {
             d->output_prefix = XMALLOC(LBUF_SIZE, "d->output_prefix");
-            strcpy(d->output_prefix, temp);
+            XSTRCPY(d->output_prefix, temp);
         }
         else
         {
@@ -3435,17 +3435,17 @@ void load_restart_db(void)
         if (*temp)
         {
             d->output_suffix = XMALLOC(LBUF_SIZE, "d->output_suffix");
-            strcpy(d->output_suffix, temp);
+            XSTRCPY(d->output_suffix, temp);
         }
         else
         {
             d->output_suffix = NULL;
         }
 
-        strcpy(d->addr, getstring_noalloc(f, new_strings));
-        //strcpy ( d->doing, getstring_noalloc ( f, new_strings ) );
+        XSTRCPY(d->addr, getstring_noalloc(f, new_strings));
+        //XSTRCPY ( d->doing, getstring_noalloc ( f, new_strings ) );
         d->doing = sane_doing(getstring_noalloc(f, new_strings), "doing");
-        strcpy(d->username, getstring_noalloc(f, new_strings));
+        XSTRCPY(d->username, getstring_noalloc(f, new_strings));
         d->colormap = NULL;
 
         if (version & RS_CONCENTRATE)

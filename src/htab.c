@@ -474,7 +474,7 @@ char *hashinfo(const char *tab_name, HASHTAB *htab)
 {
     char *buff;
     buff = XMALLOC(MBUF_SIZE, "buff");
-    sprintf(buff, "%-15s %5d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
+    XSPRINTF(buff, "%-15s %5d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
     return buff;
 }
 
@@ -753,8 +753,7 @@ void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none
     char *buf, *bp, *cp;
     NAMETAB *nt;
     int got_one;
-    buf = XMALLOC(LBUF_SIZE, "buf");
-    bp = buf;
+    bp = buf = XMALLOC(LBUF_SIZE, "buf");
     got_one = 0;
 
     for (cp = prefix; *cp; cp++)

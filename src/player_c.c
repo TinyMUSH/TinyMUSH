@@ -116,7 +116,7 @@ void pcache_save(PCACHE *pp)
     if (pp->cflags & PF_QMAX_CH)
     {
         tbuf = XMALLOC(SBUF_SIZE, "tbuf");
-        sprintf(tbuf, "%d", pp->qmax);
+        XSPRINTF(tbuf, "%d", pp->qmax);
         atr_add_raw(pp->player, A_QUEUEMAX, tbuf);
         XFREE(tbuf);
     }

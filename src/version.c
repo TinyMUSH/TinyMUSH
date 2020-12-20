@@ -118,30 +118,30 @@ void init_version(void)
     XFREE(version);
 
     bp = version = XMALLOC(LBUF_SIZE, "version");
-    safe_sprintf(version, &bp, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
+    XSPRINTFCAT(version, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
 
     switch (mudstate.version.status)
     {
     case 0:
-        safe_sprintf(version, &bp, ", Alpha %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Alpha %d", mudstate.version.revision);
         break;
 
     case 1:
-        safe_sprintf(version, &bp, ", Beta %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Beta %d", mudstate.version.revision);
         break;
 
     case 2:
-        safe_sprintf(version, &bp, ", Release Candidate %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Release Candidate %d", mudstate.version.revision);
         break;
 
     default:
         if (mudstate.version.revision > 0)
         {
-            safe_sprintf(version, &bp, ", Patch Level %d", mudstate.version.revision);
+            XSPRINTFCAT(version, ", Patch Level %d", mudstate.version.revision);
         }
         else
         {
-            safe_sprintf(version, &bp, ", Gold Release");
+            XSPRINTFCAT(version, ", Gold Release");
         }
 
         break;

@@ -103,7 +103,7 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (str)
 	{
-		safe_str(str, buff, bufc);
+		SAFE_LB_STR(str, buff, bufc);
 	}
 }
 
@@ -120,11 +120,11 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller, dbref 
 
 	if ((port < 0) && (target == NOTHING))
 	{
-		safe_strncat(buff, bufc, (char *)"-1", 2, LBUF_SIZE);
+		SAFE_STRNCAT(buff, bufc, (char *)"-1", 2, LBUF_SIZE);
 		return;
 	}
 
-	safe_ltos(buff, bufc, Is_Func(CONNINFO_IDLE) ? fetch_idle(target, port) : fetch_connect(target, port), LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, Is_Func(CONNINFO_IDLE) ? fetch_idle(target, port) : fetch_connect(target, port), LBUF_SIZE);
 }
 
 /*
@@ -140,7 +140,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if ((port < 0) && (target == NOTHING))
 	{
-		safe_str((char *)"-1 -1 -1", buff, bufc);
+		SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
 		return;
 	}
 
@@ -159,7 +159,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 	if (!Good_obj(target) || !Connected(target) || !Examinable(player, target))
 	{
-		safe_nothing(buff, bufc);
+		SAFE_NOTHING(buff, bufc);
 		return;
 	}
 
@@ -177,7 +177,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (!fargs[0] || !*fargs[0])
 	{
-		safe_str((char *)"#-1 NOT FOUND", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
@@ -190,13 +190,13 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (!cmdp || (cmdp->info.handler != do_help))
 	{
-		safe_str((char *)"#-1 NOT FOUND", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
 	if (!Check_Cmd_Access(player, cmdp, cargs, ncargs))
 	{
-		safe_noperm(buff, bufc);
+		SAFE_NOPERM(buff, bufc);
 		return;
 	}
 
@@ -224,33 +224,33 @@ void fun_html_unescape(char *buff, char **bufc, dbref player, dbref caller, dbre
 		case '&':
 			if (!strncmp(msg_orig, "&quot;", 6))
 			{
-				ret = safe_chr_fn('\"', buff, bufc);
+				ret = SAFE_LB_CHR('\"', buff, bufc);
 				msg_orig += 5;
 			}
 			else if (!strncmp(msg_orig, "&lt;", 4))
 			{
-				ret = safe_chr_fn('<', buff, bufc);
+				ret = SAFE_LB_CHR('<', buff, bufc);
 				msg_orig += 3;
 			}
 			else if (!strncmp(msg_orig, "&gt;", 4))
 			{
-				ret = safe_chr_fn('>', buff, bufc);
+				ret = SAFE_LB_CHR('>', buff, bufc);
 				msg_orig += 3;
 			}
 			else if (!strncmp(msg_orig, "&amp;", 5))
 			{
-				ret = safe_chr_fn('&', buff, bufc);
+				ret = SAFE_LB_CHR('&', buff, bufc);
 				msg_orig += 4;
 			}
 			else
 			{
-				ret = safe_chr_fn('&', buff, bufc);
+				ret = SAFE_LB_CHR('&', buff, bufc);
 			}
 
 			break;
 
 		default:
-			ret = safe_chr_fn(*msg_orig, buff, bufc);
+			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
 			break;
 		}
 	}
@@ -270,16 +270,16 @@ void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	{
 		if (strchr(escaped_chars, *msg_orig))
 		{
-			sprintf(tbuf, "%%%2x", *msg_orig);
-			ret = safe_str(tbuf, buff, bufc);
+			XSPRINTF(tbuf, "%%%2x", *msg_orig);
+			ret = SAFE_LB_STR(tbuf, buff, bufc);
 		}
 		else if (*msg_orig == ' ')
 		{
-			ret = safe_chr_fn('+', buff, bufc);
+			ret = SAFE_LB_CHR('+', buff, bufc);
 		}
 		else
 		{
-			ret = safe_chr_fn(*msg_orig, buff, bufc);
+			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
 		}
 	}
 }
@@ -296,17 +296,17 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 		switch (*msg_orig)
 		{
 		case '+':
-			ret = safe_chr_fn(' ', buff, bufc);
+			ret = SAFE_LB_CHR(' ', buff, bufc);
 			msg_orig++;
 			break;
 
 		case '%':
-			strncpy(tempstr, msg_orig + 1, 2);
+			XSTRNCPY(tempstr, msg_orig + 1, 2);
 			tempstr[2] = '\0';
 
 			if ((sscanf(tempstr, "%x", &tempchar) == 1) && (tempchar > 0x1F) && (tempchar < 0x7F))
 			{
-				ret = safe_chr_fn((char)tempchar, buff, bufc);
+				ret = SAFE_LB_CHR((char)tempchar, buff, bufc);
 			}
 
 			if (*msg_orig)
@@ -327,7 +327,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 			break;
 
 		default:
-			ret = safe_chr_fn(*msg_orig, buff, bufc);
+			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
 			msg_orig++;
 			break;
 		}

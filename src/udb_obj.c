@@ -61,7 +61,7 @@ Obj *unroll_obj(char *data)
      * Read in the header
      */
 
-    if (memcpy((void *)&(o->name), (void *)dptr, sizeof(Objname)) == NULL)
+    if (XMEMCPY((void *)&(o->name), (void *)dptr, sizeof(Objname)) == NULL)
     {
         XFREE(o);
         return (NULL);
@@ -69,7 +69,7 @@ Obj *unroll_obj(char *data)
 
     dptr += sizeof(Objname);
 
-    if (memcpy((void *)&i, (void *)dptr, sizeof(int)) == NULL)
+    if (XMEMCPY((void *)&i, (void *)dptr, sizeof(int)) == NULL)
     {
         XFREE(o);
         return (NULL);
@@ -97,7 +97,7 @@ Obj *unroll_obj(char *data)
         /*
 	 * Attribute size
 	 */
-        if (memcpy((void *)&(a[j].size), (void *)dptr, sizeof(int)) == NULL)
+        if (XMEMCPY((void *)&(a[j].size), (void *)dptr, sizeof(int)) == NULL)
         {
             goto bail;
         }
@@ -108,7 +108,7 @@ Obj *unroll_obj(char *data)
 	 * Attribute number
 	 */
 
-        if (memcpy((void *)&(a[j].attrnum), (void *)dptr, sizeof(int)) == NULL)
+        if (XMEMCPY((void *)&(a[j].attrnum), (void *)dptr, sizeof(int)) == NULL)
         {
             goto bail;
         }
@@ -134,7 +134,7 @@ Obj *unroll_obj(char *data)
 	 * Now get the data
 	 */
 
-        if (memcpy((void *)a[j - 1].data, (void *)dptr, a[j - 1].size) == NULL)
+        if (XMEMCPY((void *)a[j - 1].data, (void *)dptr, a[j - 1].size) == NULL)
         {
             goto bail;
         }
@@ -182,14 +182,14 @@ char *rollup_obj(Obj *o)
      * Write out the object header
      */
 
-    if (memcpy((void *)dptr, (void *)&(o->name), sizeof(Objname)) == NULL)
+    if (XMEMCPY((void *)dptr, (void *)&(o->name), sizeof(Objname)) == NULL)
     {
         return NULL;
     }
 
     dptr += sizeof(Objname);
 
-    if (memcpy((void *)dptr, (void *)&(o->at_count), sizeof(int)) == NULL)
+    if (XMEMCPY((void *)dptr, (void *)&(o->at_count), sizeof(int)) == NULL)
     {
         return NULL;
     }
@@ -205,7 +205,7 @@ char *rollup_obj(Obj *o)
         /*
 	 * Attribute size.
 	 */
-        if (memcpy((void *)dptr, (void *)&(a[i].size), sizeof(int)) == NULL)
+        if (XMEMCPY((void *)dptr, (void *)&(a[i].size), sizeof(int)) == NULL)
         {
             return NULL;
         }
@@ -216,7 +216,7 @@ char *rollup_obj(Obj *o)
 	 * Attribute number
 	 */
 
-        if (memcpy((void *)dptr, (void *)&(a[i].attrnum), sizeof(int)) == NULL)
+        if (XMEMCPY((void *)dptr, (void *)&(a[i].attrnum), sizeof(int)) == NULL)
         {
             return NULL;
         }
@@ -227,7 +227,7 @@ char *rollup_obj(Obj *o)
 	 * Attribute data
 	 */
 
-        if (memcpy((void *)dptr, (void *)a[i].data, a[i].size) == NULL)
+        if (XMEMCPY((void *)dptr, (void *)a[i].data, a[i].size) == NULL)
         {
             return NULL;
         }
@@ -376,7 +376,7 @@ void obj_set_attrib(int anam, Obj *obj, char *value)
      */
 
     if (lo < obj->at_count)
-        memmove((void *)(a + lo + 1), (void *)(a + lo), (obj->at_count - lo) * sizeof(Attrib));
+        XMEMMOVE((void *)(a + lo + 1), (void *)(a + lo), (obj->at_count - lo) * sizeof(Attrib));
 
     a[lo].data = value;
     a[lo].attrnum = anam;
@@ -417,7 +417,7 @@ void obj_del_attrib(int anam, Obj *obj)
             obj->at_count--;
 
             if (mid != obj->at_count)
-                memcpy((void *)(a + mid), (void *)(a + mid + 1), (obj->at_count - mid) * sizeof(Attrib));
+                XMEMCPY((void *)(a + mid), (void *)(a + mid + 1), (obj->at_count - mid) * sizeof(Attrib));
 
             if (obj->at_count == 0)
             {

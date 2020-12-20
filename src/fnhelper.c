@@ -257,11 +257,14 @@ int countwords(char *str, const Delim *sep)
 
 int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
-	unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
+	//unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
+	unsigned char *tok_starts;
 	int initted = 0;
 	char *tok, *liststart;
 	int ntok, tokpos, i, bits;
 
+	tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
+	
 	/*
      * Mark token starting points in a 1k bitstring, then go back
      * and collect them into an array of just the right number of
@@ -270,7 +273,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 
 	if (!initted)
 	{
-		memset(tok_starts, 0, sizeof(tok_starts));
+		XMEMSET(tok_starts, 0, sizeof(tok_starts));
 		initted = 1;
 	}
 
@@ -293,7 +296,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
      * pointers is dependent upon the original list string having not
      * been freed yet.
      */
-	*arr = (char *)XMALLOC(ntok + 1, "arr");
+	*(arr) = (char **)XMALLOC(ntok + 1, "arr");
 	tokpos >>= 3;
 	ntok = 0;
 
@@ -323,6 +326,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 		}
 	}
 
+	XFREE(tok_starts);
 	return ntok;
 }
 
@@ -332,13 +336,13 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 
 	if (alen)
 	{
-		safe_str(arr[0], list, bufc);
+		SAFE_LB_STR(arr[0], list, bufc);
 	}
 
 	for (i = 1; i < alen; i++)
 	{
 		print_sep(sep, list, bufc);
-		safe_str(arr[i], list, bufc);
+		SAFE_LB_STR(arr[i], list, bufc);
 	}
 }
 
@@ -397,11 +401,11 @@ int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char
 
 	if (maxargs == (minargs + 1))
 	{
-		safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+		SAFE_SPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
 	}
 	else
 	{
-		safe_sprintf(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+		SAFE_SPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
 	}
 
 	return 0;
@@ -467,18 +471,18 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		{
 			if (tlen > MAX_DELIM_LEN)
 			{
-				safe_str("#-1 SEPARATOR TOO LONG", buff, bufc);
+				SAFE_LB_STR("#-1 SEPARATOR TOO LONG", buff, bufc);
 				sep->len = 0;
 			}
 			else
 			{
-				strcpy(sep->str, tstr);
+				XSTRCPY(sep->str, tstr);
 				sep->len = tlen;
 			}
 		}
 		else
 		{
-			safe_str("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
+			SAFE_LB_STR("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
 			sep->len = 0;
 		}
 	}

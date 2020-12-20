@@ -99,7 +99,7 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
      * Make a local uppercase copy of the function name
      */
     bp = np = XMALLOC(SBUF_SIZE, "np");
-    safe_sb_str(fname, np, &bp);
+    SAFE_SB_STR(fname, np, &bp);
     *bp = '\0';
 
     for (bp = np; *bp; bp++)
@@ -245,65 +245,68 @@ void do_function(dbref player, dbref cause, int key, char *fname, char *target)
     }
 }
 
-/*
- * ---------------------------------------------------------------------------
- * list_functable: List available functions.
+/**
+ * @brief List available functions.
+ * 
+ * @param player 
  */
-
 void list_functable(dbref player)
 {
-    FUN *fp, *modfns;
-    UFUN *ufp;
-    char *buf, *bp, *s;
-    MODULE *mp;
-    buf = XMALLOC(LBUF_SIZE, "buf");
-    bp = buf;
-    safe_str((char *)"Built-in functions:", buf, &bp);
+    char *buf = XMALLOC(LBUF_SIZE, "buf");
+    //buf = XMALLOC(LBUF_SIZE, "buf");
+    XSTRCPY(buf, "Built-in functions:");
+    //SAFE_LB_STR((char *)"Built-in functions:", buf, &bp);
 
-    for (fp = flist; fp->name; fp++)
+    for (FUN *fp = flist; fp->name; fp++)
     {
         if (Check_Func_Access(player, fp))
         {
-            safe_chr(' ', buf, &bp);
-            safe_str((char *)fp->name, buf, &bp);
+            XSPRINTFCAT(buf, " %s", fp->name);
+            /*
+            SAFE_LB_CHR(' ', buf, &bp);
+            SAFE_LB_STR((char *)fp->name, buf, &bp);
+            */
         }
     }
 
     notify(player, buf);
-    s = XMALLOC(MBUF_SIZE, "list_functable");
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (MODULE *mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
+        FUN *modfns;
+        char *s = XASPRINTF("s", "mod_%s_%s", mp->modname, "functable");
 
         if ((modfns = (FUN *)lt_dlsym(mp->handle, s)) != NULL)
         {
-            bp = buf;
-            safe_sprintf(buf, &bp, "Module %s functions:", mp->modname);
-
-            for (fp = modfns; fp->name; fp++)
+            XSPRINTF(buf, "Module %s functions:", mp->modname);
+            for (FUN *fp = modfns; fp->name; fp++)
             {
                 if (Check_Func_Access(player, fp))
                 {
-                    safe_chr(' ', buf, &bp);
-                    safe_str((char *)fp->name, buf, &bp);
+                    XSPRINTFCAT(buf, " %s", fp->name);
+                    /*
+                    SAFE_LB_CHR(' ', buf, &bp);
+                    SAFE_LB_STR((char *)fp->name, buf, &bp);
+                    */
                 }
             }
 
             notify(player, buf);
         }
+        XFREE(s);
     }
+    
 
-    XFREE(s);
-    bp = buf;
-    safe_str((char *)"User-defined functions:", buf, &bp);
-
-    for (ufp = ufun_head; ufp; ufp = ufp->next)
+    XSTRCPY(buf, "User-defined functions:");
+    for (UFUN *ufp = ufun_head; ufp; ufp = ufp->next)
     {
         if (check_access(player, ufp->perms))
         {
-            safe_chr(' ', buf, &bp);
-            safe_str(ufp->name, buf, &bp);
+            XSPRINTFCAT(buf, " %s", ufp->name);
+            /*
+            SAFE_LB_CHR(' ', buf, &bp);
+            SAFE_LB_STR(ufp->name, buf, &bp);
+            */
         }
     }
 
@@ -327,20 +330,20 @@ void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
         {
             if (!fp->xperms)
             {
-                sprintf(buff, "%s:", fp->name);
+                XSPRINTF(buff, "%s:", fp->name);
             }
             else
             {
                 bp = buff;
-                safe_str((char *)fp->name, buff, &bp);
-                safe_chr(':', buff, &bp);
+                SAFE_LB_STR((char *)fp->name, buff, &bp);
+                SAFE_LB_CHR(':', buff, &bp);
 
                 for (i = 0; i < fp->xperms->num_funcs; i++)
                 {
                     if (fp->xperms->ext_funcs[i])
                     {
-                        safe_chr(' ', buff, &bp);
-                        safe_str(fp->xperms->ext_funcs[i]->fn_name, buff, &bp);
+                        SAFE_LB_CHR(' ', buff, &bp);
+                        SAFE_LB_STR(fp->xperms->ext_funcs[i]->fn_name, buff, &bp);
                     }
                 }
             }
@@ -378,7 +381,7 @@ void list_funcaccess(dbref player)
     {
         if (check_access(player, ufp->perms))
         {
-            sprintf(buff, "%s:", ufp->name);
+            XSPRINTF(buff, "%s:", ufp->name);
             listset_nametab(player, access_nametab, ufp->perms, buff, 1);
         }
     }

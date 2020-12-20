@@ -145,25 +145,25 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 				if (Can_See_Exit(player, thing, isdark))
 				{
 					if (buff != e)
-						safe_strncat(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+						SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
 
 					if (Html(player) && (mudconf.have_pueblo == 1))
 					{
 						e1 = buff1;
 						safe_exit_name(thing, buff1, &e1);
-						safe_str((char *)"<a xch_cmd=\"", buff, &e);
+						SAFE_LB_STR((char *)"<a xch_cmd=\"", buff, &e);
 						/*
 			 * XXX Just stripping ansi isn't really enough.
 			 */
 						buf = strip_ansi(buff1);
-						safe_str(buf, buff, &e);
+						SAFE_LB_STR(buf, buff, &e);
 						XFREE(buf);
-						safe_str((char *)"\">", buff, &e);
+						SAFE_LB_STR((char *)"\">", buff, &e);
 						/*
 			 * XXX The exit name needs to be HTML escaped.
 			 */
 						html_escape(buff1, buff, &e);
-						safe_str((char *)"</a>", buff, &e);
+						SAFE_LB_STR((char *)"</a>", buff, &e);
 					}
 					else
 					{
@@ -183,8 +183,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 		{
 			if (Html(player))
 			{
-				safe_chr('\r', buff, &e);
-				safe_chr('\n', buff, &e);
+				SAFE_LB_CHR('\r', buff, &e);
+				SAFE_LB_CHR('\n', buff, &e);
 				*e = '\0';
 				notify_html(player, buff);
 			}
@@ -258,7 +258,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 
 					if (Html(player) && (mudconf.have_pueblo == 1))
 					{
-						safe_str("<a xch_cmd=\"look ", html_buff, &html_cp);
+						SAFE_LB_STR("<a xch_cmd=\"look ", html_buff, &html_cp);
 
 						/*
 			 * XXX Just stripping ansi isn't enough.
@@ -266,27 +266,27 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 						switch (style)
 						{
 						case CONTENTS_LOCAL:
-							safe_str(PureName(thing), html_buff, &html_cp);
+							SAFE_LB_STR(PureName(thing), html_buff, &html_cp);
 							break;
 
 						case CONTENTS_NESTED:
-							safe_str(PureName(Location(thing)), html_buff, &html_cp);
-							safe_str("'s ", html_buff, &html_cp);
-							safe_str(PureName(thing), html_buff, &html_cp);
+							SAFE_LB_STR(PureName(Location(thing)), html_buff, &html_cp);
+							SAFE_LB_STR("'s ", html_buff, &html_cp);
+							SAFE_LB_STR(PureName(thing), html_buff, &html_cp);
 							break;
 
 						case CONTENTS_REMOTE:
-							sprintf(remote_num, "#%d", thing);
-							safe_str(remote_num, html_buff, &html_cp);
+							XSPRINTF(remote_num, "#%d", thing);
+							SAFE_LB_STR(remote_num, html_buff, &html_cp);
 							break;
 
 						default:
 							break;
 						}
 
-						safe_str("\">", html_buff, &html_cp);
+						SAFE_LB_STR("\">", html_buff, &html_cp);
 						html_escape(buff, html_buff, &html_cp);
-						safe_str("</a>\r\n", html_buff, &html_cp);
+						SAFE_LB_STR("</a>\r\n", html_buff, &html_cp);
 						*html_cp = 0;
 						notify_html(player, html_buff);
 					}
@@ -334,13 +334,13 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			{
 				depth++;
 				parenlist[depth] = str[pos];
-				safe_str(colors[depth % 5], strbuf, &endp);
-				safe_chr(str[pos], strbuf, &endp);
-				safe_ansi_normal(strbuf, &endp);
+				SAFE_LB_STR(colors[depth % 5], strbuf, &endp);
+				SAFE_LB_CHR(str[pos], strbuf, &endp);
+				SAFE_ANSI_NORMAL(strbuf, &endp);
 			}
 			else
 			{
-				safe_chr(str[pos], strbuf, &endp);
+				SAFE_LB_CHR(str[pos], strbuf, &endp);
 			}
 
 			break;
@@ -358,20 +358,20 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			{
 				if ((parenlist[depth] & 96) == (str[pos] & 96))
 				{
-					safe_str(colors[depth % 5], strbuf, &endp);
-					safe_chr(str[pos], strbuf, &endp);
-					safe_ansi_normal(strbuf, &endp);
+					SAFE_LB_STR(colors[depth % 5], strbuf, &endp);
+					SAFE_LB_CHR(str[pos], strbuf, &endp);
+					SAFE_ANSI_NORMAL(strbuf, &endp);
 					depth--;
 				}
 				else
 				{
-					safe_str(ANSI_HILITE, strbuf, &endp);
-					safe_str(ANSI_RED, strbuf, &endp);
-					safe_chr(str[pos], strbuf, &endp);
-					safe_ansi_normal(strbuf, &endp);
+					SAFE_LB_STR(ANSI_HILITE, strbuf, &endp);
+					SAFE_LB_STR(ANSI_RED, strbuf, &endp);
+					SAFE_LB_CHR(str[pos], strbuf, &endp);
+					SAFE_ANSI_NORMAL(strbuf, &endp);
 					*endp = '\0';
-					safe_str(strbuf, buff, bufc);
-					safe_str(str + pos + 1, buff, bufc);
+					SAFE_LB_STR(strbuf, buff, bufc);
+					SAFE_LB_STR(str + pos + 1, buff, bufc);
 					XFREE(str);
 					XFREE(strbuf);
 					XFREE(parenlist);
@@ -380,13 +380,13 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			}
 			else
 			{
-				safe_chr(str[pos], strbuf, &endp);
+				SAFE_LB_CHR(str[pos], strbuf, &endp);
 			}
 
 			break;
 
 		default:
-			safe_chr(str[pos], strbuf, &endp);
+			SAFE_LB_CHR(str[pos], strbuf, &endp);
 			break;
 		}
 	}
@@ -394,7 +394,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 	if (depth == 0)
 	{
 		*endp = '\0';
-		safe_str(strbuf, buff, bufc);
+		SAFE_LB_STR(strbuf, buff, bufc);
 		XFREE(str);
 		XFREE(strbuf);
 		XFREE(parenlist);
@@ -418,9 +418,9 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 		case ')':
 			depth++;
 			parenlist[depth] = str[pos];
-			safe_str(REVERSE_NORMAL, strbuf, &endp);
-			safe_chr(str[pos], strbuf, &endp);
-			safe_str(revcolors[depth % 5], strbuf, &endp);
+			SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+			SAFE_LB_CHR(str[pos], strbuf, &endp);
+			SAFE_LB_STR(revcolors[depth % 5], strbuf, &endp);
 			break;
 
 		case '(':
@@ -434,22 +434,22 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 	     */
 			if ((parenlist[depth] & 96) == (str[pos] & 96))
 			{
-				safe_str(REVERSE_NORMAL, strbuf, &endp);
-				safe_chr(str[pos], strbuf, &endp);
-				safe_str(revcolors[depth % 5], strbuf, &endp);
+				SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+				SAFE_LB_CHR(str[pos], strbuf, &endp);
+				SAFE_LB_STR(revcolors[depth % 5], strbuf, &endp);
 				depth--;
 			}
 			else
 			{
-				safe_str(REVERSE_NORMAL, strbuf, &endp);
-				safe_chr(str[pos], strbuf, &endp);
-				safe_str(REVERSE_HIRED, strbuf, &endp);
+				SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+				SAFE_LB_CHR(str[pos], strbuf, &endp);
+				SAFE_LB_STR(REVERSE_HIRED, strbuf, &endp);
 				str[pos] = '\0';
-				safe_str(str, buff, bufc);
+				SAFE_LB_STR(str, buff, bufc);
 
 				for (endp--; endp >= strbuf; endp--)
 				{
-					safe_chr(*endp, buff, bufc);
+					SAFE_LB_CHR(*endp, buff, bufc);
 				}
 
 				**bufc = '\0';
@@ -462,7 +462,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			break;
 
 		default:
-			safe_chr(str[pos], strbuf, &endp);
+			SAFE_LB_CHR(str[pos], strbuf, &endp);
 			break;
 		}
 	}
@@ -473,7 +473,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 
 	for (endp--; endp >= strbuf; endp--)
 	{
-		safe_chr(*endp, buff, bufc);
+		SAFE_LB_CHR(*endp, buff, bufc);
 	}
 
 	**bufc = '\0';
@@ -489,7 +489,7 @@ void pretty_format(char *dest, char **cp, char *p)
      */
 	int indent_lev, i;
 	indent_lev = 0;
-	safe_crlf(dest, cp);
+	SAFE_CRLF(dest, cp);
 
 	while (*p)
 	{
@@ -499,9 +499,9 @@ void pretty_format(char *dest, char **cp, char *p)
 			/*
 	     * Skip escaped chars
 	     */
-			safe_chr(*p, dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
 			p++;
-			safe_chr(*p, dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
 
 			if (!*p)
 			{
@@ -511,20 +511,20 @@ void pretty_format(char *dest, char **cp, char *p)
 			break;
 
 		case '{':
-			safe_crlf(dest, cp);
+			SAFE_CRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
-				safe_str((char *)INDENT_STR, dest, cp);
+				SAFE_LB_STR((char *)INDENT_STR, dest, cp);
 			}
 
-			safe_chr(*p, dest, cp);
-			safe_crlf(dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
+			SAFE_CRLF(dest, cp);
 			indent_lev++;
 
 			for (i = 0; i < indent_lev; i++)
 			{
-				safe_str((char *)INDENT_STR, dest, cp);
+				SAFE_LB_STR((char *)INDENT_STR, dest, cp);
 			}
 
 			while (p[1] == ' ')
@@ -540,19 +540,19 @@ void pretty_format(char *dest, char **cp, char *p)
 				indent_lev--;
 			}
 
-			safe_crlf(dest, cp);
+			SAFE_CRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
-				safe_str((char *)INDENT_STR, dest, cp);
+				SAFE_LB_STR((char *)INDENT_STR, dest, cp);
 			}
 
-			safe_chr(*p, dest, cp);
-			safe_crlf(dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
+			SAFE_CRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
-				safe_str((char *)INDENT_STR, dest, cp);
+				SAFE_LB_STR((char *)INDENT_STR, dest, cp);
 			}
 
 			while (p[1] == ' ')
@@ -563,12 +563,12 @@ void pretty_format(char *dest, char **cp, char *p)
 			break;
 
 		case ';':
-			safe_chr(*p, dest, cp);
-			safe_crlf(dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
+			SAFE_CRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
-				safe_str((char *)INDENT_STR, dest, cp);
+				SAFE_LB_STR((char *)INDENT_STR, dest, cp);
 			}
 
 			while (p[1] == ' ')
@@ -579,7 +579,7 @@ void pretty_format(char *dest, char **cp, char *p)
 			break;
 
 		default:
-			safe_chr(*p, dest, cp);
+			SAFE_LB_CHR(*p, dest, cp);
 			break;
 		}
 
@@ -588,7 +588,7 @@ void pretty_format(char *dest, char **cp, char *p)
 
 	if (*(*cp - 1) != '\n')
 	{
-		safe_crlf(dest, cp);
+		SAFE_CRLF(dest, cp);
 	}
 }
 
@@ -597,7 +597,7 @@ void pretty_print(char *dest, char *name, char *text)
 	char *cp, *p, *word;
 	cp = dest;
 	p = text;
-	safe_str(name, dest, &cp);
+	SAFE_LB_STR(name, dest, &cp);
 
 	/*
      * Pretty-print contents of text into dest.
@@ -614,7 +614,7 @@ void pretty_print(char *dest, char *name, char *text)
 	 */
 		while (*p && (*p != ':'))
 		{
-			safe_chr(*p, dest, &cp);
+			SAFE_LB_CHR(*p, dest, &cp);
 			p++;
 		}
 
@@ -623,7 +623,7 @@ void pretty_print(char *dest, char *name, char *text)
 	 */
 		if (*p == ':')
 		{
-			safe_chr(':', dest, &cp);
+			SAFE_LB_CHR(':', dest, &cp);
 
 			do
 			{
@@ -670,7 +670,7 @@ void pretty_print(char *dest, char *name, char *text)
 			/*
 	     * This is a list of dbrefs, probably. Bail.
 	     */
-			safe_str(p, dest, &cp);
+			SAFE_LB_STR(p, dest, &cp);
 			return;
 		}
 
@@ -681,15 +681,15 @@ void pretty_print(char *dest, char *name, char *text)
 		/*
 	 * Ordinary text
 	 */
-		safe_str(p, dest, &cp);
+		SAFE_LB_STR(p, dest, &cp);
 	}
 
 	if ((cp - 1) && (*(cp - 1) != '\n'))
 	{
-		safe_crlf(dest, &cp);
+		SAFE_CRLF(dest, &cp);
 	}
 
-	safe_chr('-', dest, &cp);
+	SAFE_LB_CHR('-', dest, &cp);
 }
 
 void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
@@ -747,7 +747,7 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 			{
 				buf = XMALLOC(LBUF_SIZE, "buf");
 				bp = buf;
-				safe_sprintf(buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				SAFE_SPRINTF(buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 				pairs_print(player, text, buf, &bp);
 				*bp = '\0';
 				notify(player, buf);
@@ -808,15 +808,15 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 		if ((aowner != Owner(thing)) && (aowner != NOTHING))
 		{
-			safe_sprintf(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+			SAFE_SPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
 		}
 		else if (*fbp)
 		{
-			safe_sprintf(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+			SAFE_SPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
 		}
 		else if (!skip_tag || (ap->number != A_DESC))
 		{
-			safe_sprintf(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+			SAFE_SPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 		}
 		else
 		{
@@ -880,7 +880,7 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 			continue;
 		}
 
-		memcpy((char *)cattr, (char *)attr, sizeof(ATTR));
+		XMEMCPY((char *)cattr, (char *)attr, sizeof(ATTR));
 
 		/*
 	 * Should we exclude this attr?
@@ -1372,7 +1372,7 @@ void debug_examine(dbref player, dbref thing)
 	free_boolexp(bool);
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	cp = buf;
-	safe_str((char *)"Attr list: ", buf, &cp);
+	SAFE_LB_STR((char *)"Attr list: ", buf, &cp);
 
 	for (ca = atr_head(thing, &as); ca; ca = atr_next(&as))
 	{
@@ -1389,15 +1389,15 @@ void debug_examine(dbref player, dbref thing)
 		{
 			if (attr)
 			{ /* Valid attr. */
-				safe_str((char *)attr->name, buf, &cp);
-				safe_chr(' ', buf, &cp);
+				SAFE_LB_STR((char *)attr->name, buf, &cp);
+				SAFE_LB_CHR(' ', buf, &cp);
 			}
 			else
 			{
 				nbuf = ltos(ca);
-				safe_str(nbuf, buf, &cp);
+				SAFE_LB_STR(nbuf, buf, &cp);
 				XFREE(nbuf);
-				safe_chr(' ', buf, &cp);
+				SAFE_LB_CHR(' ', buf, &cp);
 			}
 		}
 	}
@@ -1631,7 +1631,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if (mudconf.read_rem_name)
 			{
 				buf2 = XMALLOC(LBUF_SIZE, "buf2");
-				strcpy(buf2, Name(thing));
+				XSTRCPY(buf2, Name(thing));
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
 				XFREE(buf2);
 			}
@@ -1678,7 +1678,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		bool = parse_boolexp(player, buf2, 1);
 		buf = unparse_boolexp(player, bool);
 		free_boolexp(bool);
-		strcpy(buf2, Name(Owner(thing)));
+		XSTRCPY(buf2, Name(Owner(thing)));
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mudconf.many_coins, Pennies(thing));
 		XFREE(buf2);
 		mudconf.many_coins[0] = savec;
@@ -1687,7 +1687,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", buf2);
 		buf2 = (char *)ctime(&save_access_time);
 		buf2[strlen(buf2) - 1] = '\0';
-		strcpy(timebuf, buf2);
+		XSTRCPY(timebuf, buf2);
 		buf2 = (char *)ctime(&ModTime(thing));
 		buf2[strlen(buf2) - 1] = '\0';
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, buf2);
@@ -1883,7 +1883,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		if (mudconf.read_rem_name)
 		{
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
-			strcpy(buf2, Name(thing));
+			XSTRCPY(buf2, Name(thing));
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
 			XFREE(buf2);
 		}
@@ -1930,7 +1930,7 @@ void do_inventory(dbref player, dbref cause, int key)
 		{
 			if (e != buff)
 			{
-				safe_strncat(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+				SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
 			}
 
 			safe_exit_name(thing, buff, &e);
@@ -2221,39 +2221,39 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 
 		if (cancom)
 		{
-			safe_str((char *)"commands ", buf, &bp);
+			SAFE_LB_STR((char *)"commands ", buf, &bp);
 		}
 
 		if (canhear)
 		{
-			safe_str((char *)"messages ", buf, &bp);
+			SAFE_LB_STR((char *)"messages ", buf, &bp);
 		}
 
 		if (is_audible)
 		{
-			safe_str((char *)"audible ", buf, &bp);
+			SAFE_LB_STR((char *)"audible ", buf, &bp);
 		}
 
 		if (isplayer)
 		{
-			safe_str((char *)"player ", buf, &bp);
+			SAFE_LB_STR((char *)"player ", buf, &bp);
 		}
 
 		if (ispuppet)
 		{
-			safe_str((char *)"puppet(", buf, &bp);
+			SAFE_LB_STR((char *)"puppet(", buf, &bp);
 			safe_name(Owner(what), buf, &bp);
-			safe_str((char *)") ", buf, &bp);
+			SAFE_LB_STR((char *)") ", buf, &bp);
 		}
 
 		if (isconnected)
 		{
-			safe_str((char *)"connected ", buf, &bp);
+			SAFE_LB_STR((char *)"connected ", buf, &bp);
 		}
 
 		if (is_parent)
 		{
-			safe_str((char *)"parent ", buf, &bp);
+			SAFE_LB_STR((char *)"parent ", buf, &bp);
 		}
 
 		*--bp = '\0'; /* nuke the space at the end */
@@ -2445,14 +2445,14 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 
 	if (qual && *qual)
 	{
-		strcpy(thingname, qual);
+		XSTRCPY(thingname, qual);
 	}
 	else
 	{
 		switch (Typeof(thing))
 		{
 		case TYPE_THING:
-			strcpy(thingname, Name(thing));
+			XSTRCPY(thingname, Name(thing));
 			val = OBJECT_DEPOSIT(Pennies(thing));
 			buf = translate_string(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@create %s=%d", buf, val);
@@ -2460,15 +2460,15 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 			break;
 
 		case TYPE_ROOM:
-			strcpy(thingname, Name(thing));
+			XSTRCPY(thingname, Name(thing));
 			buf = translate_string(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@dig/teleport %s", buf);
 			XFREE(buf);
-			strcpy(thingname, "here");
+			XSTRCPY(thingname, "here");
 			break;
 
 		case TYPE_EXIT:
-			strcpy(thingname, Name(thing));
+			XSTRCPY(thingname, Name(thing));
 			buf = translate_string(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@open %s", buf);
 			XFREE(buf);
@@ -2477,13 +2477,13 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 			break;
 
 		case TYPE_PLAYER:
-			strcpy(thingname, "me");
+			XSTRCPY(thingname, "me");
 			break;
 		}
 	}
 
 	buf = strip_ansi(thingname);
-	strcpy(thingname, buf);
+	XSTRCPY(thingname, buf);
 	XFREE(buf);
 
 	/*
@@ -2540,7 +2540,7 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 			}
 			else
 			{
-				strcpy(buff, attr->name);
+				XSTRCPY(buff, attr->name);
 
 				if (key & DECOMP_PRETTY)
 				{
@@ -2625,9 +2625,9 @@ void show_vrml_url(dbref thing, dbref loc)
 	{
 		char *vrml_message, *vrml_cp;
 		vrml_message = vrml_cp = XMALLOC(LBUF_SIZE, "vrml_cp");
-		safe_str("<img xch_graph=load href=\"", vrml_message, &vrml_cp);
-		safe_str(vrml_url, vrml_message, &vrml_cp);
-		safe_str("\">", vrml_message, &vrml_cp);
+		SAFE_LB_STR("<img xch_graph=load href=\"", vrml_message, &vrml_cp);
+		SAFE_LB_STR(vrml_url, vrml_message, &vrml_cp);
+		SAFE_LB_STR("\">", vrml_message, &vrml_cp);
 		*vrml_cp = 0;
 		notify_html(thing, vrml_message);
 		XFREE(vrml_message);

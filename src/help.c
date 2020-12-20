@@ -122,7 +122,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 					return (-1);
 				}
 
-				memset(entries, 0, sizeof(help_indx_list));
+				XMEMSET(entries, 0, sizeof(help_indx_list));
 			}
 
 			if (entries->entry.pos)
@@ -271,7 +271,7 @@ void helpindex_load(dbref player)
 
 	for (i = 0; i < mudstate.helpfiles; i++)
 	{
-		sprintf(buf, "%s.indx", mudstate.hfiletab[i]);
+		XSPRINTF(buf, "%s.indx", mudstate.hfiletab[i]);
 		helpindex_read(&mudstate.hfile_hashes[i], buf);
 	}
 
@@ -331,9 +331,9 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 					buffp = topic_list;
 				}
 
-				safe_str(result, topic_list, &buffp);
-				safe_chr(' ', topic_list, &buffp);
-				safe_chr(' ', topic_list, &buffp);
+				SAFE_LB_STR(result, topic_list, &buffp);
+				SAFE_LB_CHR(' ', topic_list, &buffp);
+				SAFE_LB_CHR(' ', topic_list, &buffp);
 			}
 		}
 
@@ -435,13 +435,13 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	if (hf_num >= mudstate.helpfiles)
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
-		safe_str((char *)"#-1 NOT FOUND", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
 	if (!topic || !*topic)
 	{
-		strcpy(tname, (char *)"help");
+		XSTRCPY(tname, (char *)"help");
 	}
 	else
 	{
@@ -457,18 +457,18 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
 	if (!htab_entry)
 	{
-		safe_str((char *)"#-1 NOT FOUND", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
 	entry_offset = htab_entry->pos;
 	entry_length = htab_entry->len;
-	sprintf(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
+	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
 
 	if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL)
 	{
 		log_write(LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", tbuf);
-		safe_str((char *)"#-1 ERROR", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
 		return;
 	}
 
@@ -476,7 +476,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		log_write(LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", tbuf);
 		tf_fclose(fp);
-		safe_str((char *)"#-1 ERROR", buff, bufc);
+		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
 		return;
 	}
 
@@ -509,7 +509,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
 		if (count > 0)
 		{
-			safe_crlf(buff, bufc);
+			SAFE_CRLF(buff, bufc);
 		}
 
 		if (eval)
@@ -517,11 +517,11 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 			str = line;
 			bp = result;
 			exec(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
-			safe_str(result, buff, bufc);
+			SAFE_LB_STR(result, buff, bufc);
 		}
 		else
 		{
-			safe_str(line, buff, bufc);
+			SAFE_LB_STR(line, buff, bufc);
 		}
 
 		count++;
@@ -553,6 +553,6 @@ void do_help(dbref player, dbref cause, int key, char *message)
 		return;
 	}
 
-	sprintf(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
+	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
 	help_write(player, message, &mudstate.hfile_hashes[hf_num], tbuf, (key & HELP_RAWHELP) ? 0 : 1);
 }

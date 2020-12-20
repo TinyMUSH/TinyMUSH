@@ -99,7 +99,7 @@ void do_dolist(dbref player, dbref cause, int key, char *list, char *command, ch
 	if (key & DOLIST_NOTIFY)
 	{
 		tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-		strcpy(tbuf, (char *)"@notify me");
+		XSTRCPY(tbuf, (char *)"@notify me");
 		wait_que(player, cause, 0, NOTHING, A_SEMAPHORE, tbuf, cargs, ncargs, mudstate.rdata);
 		XFREE(tbuf);
 	}
@@ -980,7 +980,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 				continue;
 			}
 
-			sprintf(buff, "#%d", thing);
+			XSPRINTF(buff, "#%d", thing);
 			buff2 = replace_string(BOUND_VAR, buff, parm->s_rst_eval);
 			result = bp = XMALLOC(LBUF_SIZE, "result");
 			str = buff2;
@@ -1003,9 +1003,9 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 				continue;
 			}
 
-			sprintf(buff, "#%d", thing);
+			XSPRINTF(buff, "#%d", thing);
 			result = bp = XMALLOC(LBUF_SIZE, "result");
-			strcpy(atext, parm->s_rst_ufuntxt);
+			XSTRCPY(atext, parm->s_rst_ufuntxt);
 			str = atext;
 			exec(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, &buff, 1);
 
@@ -1168,17 +1168,17 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			to = Location(thing);
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
-			safe_str((char *)" [from ", outbuf, &bp);
+			SAFE_LB_STR((char *)" [from ", outbuf, &bp);
 			buff = unparse_object(player, from, 0);
-			safe_str(((from == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
+			SAFE_LB_STR(((from == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
 			XFREE(buff);
-			safe_str((char *)" to ", outbuf, &bp);
+			SAFE_LB_STR((char *)" to ", outbuf, &bp);
 			buff = unparse_object(player, to, 0);
-			safe_str(((to == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
+			SAFE_LB_STR(((to == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
 			XFREE(buff);
-			safe_chr(']', outbuf, &bp);
+			SAFE_LB_CHR(']', outbuf, &bp);
 			*bp = '\0';
 			notify(player, outbuf);
 			ecount++;
@@ -1208,13 +1208,13 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
-			safe_str((char *)" [owner: ", outbuf, &bp);
+			SAFE_LB_STR((char *)" [owner: ", outbuf, &bp);
 			buff = unparse_object(player, Owner(thing), 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
-			safe_chr(']', outbuf, &bp);
+			SAFE_LB_CHR(']', outbuf, &bp);
 			*bp = '\0';
 			notify(player, outbuf);
 			tcount++;
@@ -1244,13 +1244,13 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
-			safe_str((char *)" [owner: ", outbuf, &bp);
+			SAFE_LB_STR((char *)" [owner: ", outbuf, &bp);
 			buff = unparse_object(player, Owner(thing), 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
-			safe_chr(']', outbuf, &bp);
+			SAFE_LB_CHR(']', outbuf, &bp);
 			*bp = '\0';
 			notify(player, outbuf);
 			gcount++;
@@ -1280,16 +1280,16 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			safe_str(buff, outbuf, &bp);
+			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
 
 			if (searchparm.s_wizard)
 			{
-				safe_str((char *)" [location: ", outbuf, &bp);
+				SAFE_LB_STR((char *)" [location: ", outbuf, &bp);
 				buff = unparse_object(player, Location(thing), 0);
-				safe_str(buff, outbuf, &bp);
+				SAFE_LB_STR(buff, outbuf, &bp);
 				XFREE(buff);
-				safe_chr(']', outbuf, &bp);
+				SAFE_LB_CHR(']', outbuf, &bp);
 			}
 
 			*bp = '\0';
@@ -1308,7 +1308,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 	else
 	{
-		sprintf(outbuf, "\nFound:  Rooms...%d  Exits...%d  Objects...%d  Players...%d  Garbage...%d", rcount, ecount, tcount, pcount, gcount);
+		XSPRINTF(outbuf, "\nFound:  Rooms...%d  Exits...%d  Objects...%d  Players...%d  Garbage...%d", rcount, ecount, tcount, pcount, gcount);
 		notify(player, outbuf);
 	}
 
@@ -1489,7 +1489,7 @@ void do_apply_marked(dbref player, dbref cause, __attribute__((unused)) int key,
 	{
 		if (Marked(i))
 		{
-			sprintf(buff, "#%d", i);
+			XSPRINTF(buff, "#%d", i);
 			number++;
 			bind_and_queue(player, cause, command, buff, cargs, ncargs, number, 0);
 		}

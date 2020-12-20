@@ -626,17 +626,17 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, int 
 					 */
 					if (!(cmdp->callseq & CS_LEADIN))
 					{
-						safe_str(cmdp->cmdname, new, &bp);
+						SAFE_LB_STR(cmdp->cmdname, new, &bp);
 					}
 					else
 					{
-						safe_str(unp_command, new, &bp);
+						SAFE_LB_STR(unp_command, new, &bp);
 					}
 
 					if (switchp)
 					{
-						safe_chr('/', new, &bp);
-						safe_str(switchp, new, &bp);
+						SAFE_LB_CHR('/', new, &bp);
+						SAFE_LB_STR(switchp, new, &bp);
 					}
 
 					*bp = '\0';
@@ -648,20 +648,20 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, int 
 						j++;
 					}
 
-					safe_str(cmdp->cmdname, new, &bp);
+					SAFE_LB_STR(cmdp->cmdname, new, &bp);
 
 					if (switchp)
 					{
-						safe_chr('/', new, &bp);
-						safe_str(switchp, new, &bp);
+						SAFE_LB_CHR('/', new, &bp);
+						SAFE_LB_STR(switchp, new, &bp);
 					}
 
 					if (!(cmdp->callseq & CS_LEADIN))
 					{
-						safe_chr(' ', new, &bp);
+						SAFE_LB_CHR(' ', new, &bp);
 					}
 
-					safe_str(j, new, &bp);
+					SAFE_LB_STR(j, new, &bp);
 					*bp = '\0';
 				}
 
@@ -1004,7 +1004,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		command++;
 	}
 
-	strcpy(preserve_cmd, command);
+	XSTRCPY(preserve_cmd, command);
 	mudstate.debug_cmd = command;
 	mudstate.curr_cmd = preserve_cmd;
 
@@ -1117,9 +1117,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				{ /* just in case */
 					gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 					gc = gbuf;
-					safe_str(cmdp->cmdname, gbuf, &gc);
-					safe_chr(' ', gbuf, &gc);
-					safe_str(command, gbuf, &gc);
+					SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
+					SAFE_LB_CHR(' ', gbuf, &gc);
+					SAFE_LB_STR(command, gbuf, &gc);
 					*gc = '\0';
 					process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 					XFREE(gbuf);
@@ -1159,9 +1159,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				{
 					gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 					gc = gbuf;
-					safe_str(cmdp->cmdname, gbuf, &gc);
-					safe_chr(' ', gbuf, &gc);
-					safe_str(command, gbuf, &gc);
+					SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
+					SAFE_LB_CHR(' ', gbuf, &gc);
+					SAFE_LB_STR(command, gbuf, &gc);
 					*gc = '\0';
 					process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 					XFREE(gbuf);
@@ -1229,7 +1229,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			 * compression involved, so we must go back to the
 			 * preserved command.
 			 */
-			strcpy(command, preserve_cmd);
+			XSTRCPY(command, preserve_cmd);
 			arg = command;
 
 			while (*arg && !isspace(*arg))
@@ -1258,7 +1258,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * work.
 	 */
 	str = evcmd = XMALLOC(LBUF_SIZE, "evcmd");
-	strcpy(evcmd, command);
+	XSTRCPY(evcmd, command);
 	bp = lcbuf;
 	exec(lcbuf, &bp, player, cause, cause, EV_EVAL | EV_FCHECK | EV_STRIP | EV_TOP, &str, args, nargs);
 	XFREE(evcmd);
@@ -1428,9 +1428,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 							{
 								gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 								gc = gbuf;
-								safe_str(cmdp->cmdname, gbuf, &gc);
-								safe_chr(' ', gbuf, &gc);
-								safe_str(command, gbuf, &gc);
+								SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
+								SAFE_LB_CHR(' ', gbuf, &gc);
+								SAFE_LB_STR(command, gbuf, &gc);
 								*gc = '\0';
 								process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 								XFREE(gbuf);
@@ -1752,20 +1752,18 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 void list_cmdtable(dbref player)
 {
 	CMDENT *cmdp, *modcmds;
-	char *buf, *bp, *s;
+	char *buf;
 	MODULE *mp;
 	buf = XMALLOC(LBUF_SIZE, "buf");
-	bp = buf;
-	safe_str((char *)"Built-in commands:", buf, &bp);
 
+	XSPRINTF(buf, "Built-in commands:");
 	for (cmdp = command_table; cmdp->cmdname; cmdp++)
 	{
 		if (check_access(player, cmdp->perms))
 		{
 			if (!(cmdp->perms & CF_DARK))
 			{
-				safe_chr(' ', buf, &bp);
-				safe_str((char *)cmdp->cmdname, buf, &bp);
+				XSPRINTFCAT(buf, " %s", cmdp->cmdname);
 			}
 		}
 	}
@@ -1783,34 +1781,29 @@ void list_cmdtable(dbref player)
 		notify(player, buf);
 	}
 
-	s = XMALLOC(MBUF_SIZE, "s");
-
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+		char *modname = XASPRINTF("modname", "mod_%s_%s", mp->modname, "cmdtable");
 
-		if ((modcmds = (CMDENT *)lt_dlsym(mp->handle, s)) != NULL)
+		if ((modcmds = (CMDENT *)lt_dlsym(mp->handle, modname)) != NULL)
 		{
-			bp = buf;
-			safe_sprintf(buf, &bp, "Module %s commands:", mp->modname);
-
+			XSPRINTF(buf, "Module %s commands:", mp->modname);
 			for (cmdp = modcmds; cmdp->cmdname; cmdp++)
 			{
 				if (check_access(player, cmdp->perms))
 				{
 					if (!(cmdp->perms & CF_DARK))
 					{
-						safe_chr(' ', buf, &bp);
-						safe_str((char *)cmdp->cmdname, buf, &bp);
+						XSPRINTFCAT(buf, " %s", cmdp->cmdname);
 					}
 				}
 			}
-
 			notify(player, buf);
 		}
+
+		XFREE(modname);
 	}
 
-	XFREE(s);
 	XFREE(buf);
 }
 
@@ -1871,16 +1864,16 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff)
 
 					if (!ap)
 					{
-						sprintf(buff, "%s: user(#%d/?BAD?)", cmdp->cmdname, cmdp->userperms->thing);
+						XSPRINTF(buff, "%s: user(#%d/?BAD?)", cmdp->cmdname, cmdp->userperms->thing);
 					}
 					else
 					{
-						sprintf(buff, "%s: user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, ap->name);
+						XSPRINTF(buff, "%s: user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, ap->name);
 					}
 				}
 				else
 				{
-					sprintf(buff, "%s:", cmdp->cmdname);
+					XSPRINTF(buff, "%s:", cmdp->cmdname);
 				}
 
 				listset_nametab(player, access_nametab, cmdp->perms, buff, 1);
@@ -1941,7 +1934,7 @@ void list_cmdaccess(dbref player)
 
 		if (!(cmdp->perms & CF_DARK))
 		{
-			sprintf(buff, "%s:", cmdp->cmdname);
+			XSPRINTF(buff, "%s:", cmdp->cmdname);
 			listset_nametab(player, access_nametab, cmdp->perms, buff, 1);
 		}
 	}
@@ -1969,7 +1962,7 @@ void list_cmdswitches(dbref player)
 			{
 				if (!(cmdp->perms & CF_DARK))
 				{
-					sprintf(buff, "%s:", cmdp->cmdname);
+					XSPRINTF(buff, "%s:", cmdp->cmdname);
 					display_nametab(player, cmdp->switches, buff, 0);
 				}
 			}
@@ -1992,7 +1985,7 @@ void list_cmdswitches(dbref player)
 					{
 						if (!(cmdp->perms & CF_DARK))
 						{
-							sprintf(buff, "%s:", cmdp->cmdname);
+							XSPRINTF(buff, "%s:", cmdp->cmdname);
 							display_nametab(player, cmdp->switches, buff, 0);
 						}
 					}
@@ -2012,20 +2005,17 @@ void list_cmdswitches(dbref player)
 
 void list_attraccess(dbref player)
 {
-	char *buff;
 	ATTR *ap;
-	buff = XMALLOC(SBUF_SIZE, "buff");
 
 	for (ap = attr; ap->name; ap++)
 	{
 		if (Read_attr(player, player, ap, player, 0))
 		{
-			sprintf(buff, "%s:", ap->name);
+			char *buff = XASPRINTF("buff", "%s:", ap->name);
 			listset_nametab(player, attraccess_nametab, ap->flags, buff, 1);
+			XFREE(buff);
 		}
 	}
-
-	XFREE(buff);
 }
 
 /*
@@ -2035,7 +2025,6 @@ void list_attraccess(dbref player)
 
 void list_attrtypes(dbref player)
 {
-	char *buff;
 	KEYLIST *kp;
 
 	if (!mudconf.vattr_flag_list)
@@ -2044,15 +2033,12 @@ void list_attrtypes(dbref player)
 		return;
 	}
 
-	buff = XMALLOC(SBUF_SIZE, "buff");
-
 	for (kp = mudconf.vattr_flag_list; kp != NULL; kp = kp->next)
 	{
-		sprintf(buff, "%s:", kp->name);
+		char *buff = XASPRINTF("buff", "%s:", kp->name);
 		listset_nametab(player, attraccess_nametab, kp->data, buff, 1);
+		XFREE(buff);
 	}
-
-	XFREE(buff);
 }
 
 /*
@@ -2394,14 +2380,14 @@ void list_costs(dbref player)
 
 	if (mudconf.quotas)
 	{
-		sprintf(buff, " and %d quota", mudconf.room_quota);
+		XSPRINTF(buff, " and %d quota", mudconf.room_quota);
 	}
 
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Digging a room costs %d %s%s.", mudconf.digcost, coin_name(mudconf.digcost), buff);
 
 	if (mudconf.quotas)
 	{
-		sprintf(buff, " and %d quota", mudconf.exit_quota);
+		XSPRINTF(buff, " and %d quota", mudconf.exit_quota);
 	}
 
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Opening a new exit costs %d %s%s.", mudconf.opencost, coin_name(mudconf.opencost), buff);
@@ -2409,7 +2395,7 @@ void list_costs(dbref player)
 
 	if (mudconf.quotas)
 	{
-		sprintf(buff, " and %d quota", mudconf.thing_quota);
+		XSPRINTF(buff, " and %d quota", mudconf.thing_quota);
 	}
 
 	if (mudconf.createmin == mudconf.createmax)
@@ -2423,7 +2409,7 @@ void list_costs(dbref player)
 
 	if (mudconf.quotas)
 	{
-		sprintf(buff, " and %d quota", mudconf.player_quota);
+		XSPRINTF(buff, " and %d quota", mudconf.player_quota);
 	}
 
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Creating a robot costs %d %s%s.", mudconf.robotcost, coin_name(mudconf.robotcost), buff);
@@ -2453,30 +2439,30 @@ void list_costs(dbref player)
 
 	if (mudconf.sacfactor == 0)
 	{
-		sprintf(buff, "%d", mudconf.sacadjust);
+		XSPRINTF(buff, "%d", mudconf.sacadjust);
 	}
 	else if (mudconf.sacfactor == 1)
 	{
 		if (mudconf.sacadjust < 0)
-			sprintf(buff, "<create cost> - %d", -mudconf.sacadjust);
+			XSPRINTF(buff, "<create cost> - %d", -mudconf.sacadjust);
 		else if (mudconf.sacadjust > 0)
 		{
-			sprintf(buff, "<create cost> + %d", mudconf.sacadjust);
+			XSPRINTF(buff, "<create cost> + %d", mudconf.sacadjust);
 		}
 		else
 		{
-			sprintf(buff, "<create cost>");
+			XSPRINTF(buff, "<create cost>");
 		}
 	}
 	else
 	{
 		if (mudconf.sacadjust < 0)
-			sprintf(buff, "(<create cost> / %d) - %d", mudconf.sacfactor, -mudconf.sacadjust);
+			XSPRINTF(buff, "(<create cost> / %d) - %d", mudconf.sacfactor, -mudconf.sacadjust);
 		else if (mudconf.sacadjust > 0)
-			sprintf(buff, "(<create cost> / %d) + %d", mudconf.sacfactor, mudconf.sacadjust);
+			XSPRINTF(buff, "(<create cost> / %d) + %d", mudconf.sacfactor, mudconf.sacadjust);
 		else
 		{
-			sprintf(buff, "<create cost> / %d", mudconf.sacfactor);
+			XSPRINTF(buff, "<create cost> / %d", mudconf.sacfactor);
 		}
 	}
 
@@ -2553,21 +2539,20 @@ void list_vattrs(dbref player)
 {
 	VATTR *va;
 	int na;
-	char *buff;
-	buff = XMALLOC(LBUF_SIZE, "buff");
+
 	raw_notify(player, NULL, "--- User-Defined Attributes ---");
 
 	for (va = vattr_first(), na = 0; va; va = vattr_next(va), na++)
 	{
 		if (!(va->flags & AF_DELETED))
 		{
-			sprintf(buff, "%s(%d):", va->name, va->number);
+			char *buff = XASPRINTF("buff", "%s(%d):", va->name, va->number);
 			listset_nametab(player, attraccess_nametab, va->flags, buff, 1);
+			XFREE(buff);
 		}
 	}
 
 	raw_notify(player, "%d attributes, next=%d", na, mudstate.attr_next);
-	XFREE(buff);
 }
 
 /*

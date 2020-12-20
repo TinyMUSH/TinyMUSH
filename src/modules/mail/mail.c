@@ -594,7 +594,7 @@ void do_mail_read(dbref player, char *msglist)
                  */
                 j++;
                 buff = XMALLOC(LBUF_SIZE, "buff");
-                StringCopy(buff, get_mail_message(mp->number));
+                XSTRCPY(buff, get_mail_message(mp->number));
                 notify(player, DASH_LINE);
                 status = status_string(mp);
                 names = make_namelist(player, (char *)mp->tolist);
@@ -609,7 +609,7 @@ void do_mail_read(dbref player, char *msglist)
                 XFREE(ccnames);
                 XFREE(status);
                 notify(player, DASH_LINE);
-                StringCopy(tbuf1, buff);
+                XSTRCPY(tbuf1, buff);
                 notify(player, tbuf1);
                 notify(player, DASH_LINE);
                 XFREE(buff);
@@ -1123,10 +1123,10 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
     if (all)
     {
         bp = oldlist = XMALLOC(LBUF_SIZE, "oldlist");
-        safe_str((char *)mp->tolist, oldlist, &bp);
+        SAFE_LB_STR((char *)mp->tolist, oldlist, &bp);
 
         if (*mp->cclist)
-            safe_sprintf(oldlist, &bp, " %s", mp->cclist);
+            SAFE_SPRINTF(oldlist, &bp, " %s", mp->cclist);
 
         bp = ccnames = XMALLOC(LBUF_SIZE, "ccnames");
 
@@ -1136,18 +1136,18 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
         {
             if (bp != ccnames)
             {
-                safe_chr(' ', ccnames, &bp);
+                SAFE_LB_CHR(' ', ccnames, &bp);
             }
 
             if (*p == '*')
             {
-                safe_str(p, ccnames, &bp);
+                SAFE_LB_STR(p, ccnames, &bp);
             }
             else if (atoi(p) != mp->from)
             {
-                safe_chr('"', ccnames, &bp);
+                SAFE_LB_CHR('"', ccnames, &bp);
                 safe_name(atoi(p), ccnames, &bp);
-                safe_chr('"', ccnames, &bp);
+                SAFE_LB_CHR('"', ccnames, &bp);
             }
         }
 
@@ -1284,7 +1284,7 @@ static void send_mail(dbref player, dbref target, char *tolist, char *cclist, ch
     }
 
     tt = time(NULL);
-    StringCopy(tbuf1, ctime(&tt));
+    XSTRCPY(tbuf1, ctime(&tt));
     tbuf1[strlen(tbuf1) - 1] = '\0'; /*
                          * whack the newline
                          */
@@ -1657,7 +1657,7 @@ void do_mail_stats(dbref player, char *name, int full)
         {
             if (!tr && !tu)
             {
-                StringCopy(last, mp->time);
+                XSTRCPY(last, mp->time);
             }
 
             if (Cleared(mp))
@@ -2157,7 +2157,7 @@ static int get_folder_number(dbref player, char *name)
     str = XMALLOC(LBUF_SIZE, "str");
     bp = pat = XMALLOC(LBUF_SIZE, "pat");
     strcpy(str, atrstr);
-    safe_sprintf(pat, &bp, ":%s:", upcasestr(name));
+    SAFE_SPRINTF(pat, &bp, ":%s:", upcasestr(name));
     res = (char *)strstr(str, pat);
 
     if (!res)
@@ -2198,13 +2198,13 @@ static char *get_folder_name(dbref player, int fld)
 
     if (!*atrstr)
     {
-        StringCopy(str, "unnamed");
+        XSTRCPY(str, "unnamed");
         XFREE(pat);
         XFREE(atrstr);
         return str;
     }
 
-    StringCopy(str, atrstr);
+    XSTRCPY(str, atrstr);
     old = (char *)string_match(str, pat);
     XFREE(atrstr);
 
@@ -2222,7 +2222,7 @@ static char *get_folder_name(dbref player, int fld)
     }
     else
     {
-        StringCopy(str, "unnamed");
+        XSTRCPY(str, "unnamed");
         XFREE(pat);
         return str;
     }
@@ -2250,13 +2250,13 @@ void add_folder_name(dbref player, int fld, char *name)
 
     if (*atrstr)
     {
-        StringCopy(str, atrstr);
+        XSTRCPY(str, atrstr);
         old = (char *)string_match(str, pat);
     }
 
     if (old && *old)
     {
-        StringCopy(tbuf, str);
+        XSTRCPY(tbuf, str);
         r = old;
 
         while (!isspace(*r))
@@ -2270,9 +2270,9 @@ void add_folder_name(dbref player, int fld, char *name)
         r = res = XMALLOC(LBUF_SIZE, "res");
 
         if (*atrstr)
-            safe_str(str, res, &r);
+            SAFE_LB_STR(str, res, &r);
 
-        safe_str(new, res, &r);
+        SAFE_LB_STR(new, res, &r);
         *r = '\0';
     }
 
@@ -2393,7 +2393,7 @@ static int mail_match(struct mail *mp, struct mail_selector ms, int num)
          */
         time(&now);
         msgtimestr = XMALLOC(LBUF_SIZE, "msgtimestr");
-        StringCopy(msgtimestr, mp->time);
+        XSTRCPY(msgtimestr, mp->time);
 
         if (do_convtime(msgtimestr, &msgtm))
         {
@@ -2450,7 +2450,7 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
     /*
      * Don't mess with msglist itself
      */
-    StringCopyTrunc(tbuf1, msglist, LBUF_SIZE - 1);
+    XSTRNCPY(tbuf1, msglist, LBUF_SIZE - 1);
     p = tbuf1;
 
     while (p && *p && isspace(*p))
@@ -2809,7 +2809,7 @@ static char *status_chars(struct mail *mp)
      */
     static char res[10];
     char *p;
-    StringCopy(res, "");
+    XSTRCPY(res, "");
     p = res;
     *p++ = Read(mp) ? '-' : 'N';
     *p++ = M_Safe(mp) ? 'S' : '-';
@@ -2829,7 +2829,7 @@ static char *status_string(struct mail *mp)
      */
     char *tbuf1;
     tbuf1 = XMALLOC(LBUF_SIZE, "tbuf1");
-    StringCopy(tbuf1, "");
+    XSTRCPY(tbuf1, "");
 
     if (Read(mp))
         strcat(tbuf1, "Read ");
@@ -3148,9 +3148,9 @@ void do_malias_create(dbref player, char *alias, char *tolist)
     malias[ma_top]->name = (char *)XMALLOC(sizeof(char) * (strlen(na) + 1), "malias[ma_top]->name");
     malias[ma_top]->numrecep = i;
     malias[ma_top]->owner = player;
-    StringCopy(malias[ma_top]->name, na);
+    XSTRCPY(malias[ma_top]->name, na);
     malias[ma_top]->desc = (char *)XMALLOC(sizeof(char) * (strlen(na) + 1), "malias[ma_top]->desc");
-    StringCopy(malias[ma_top]->desc, na); /*
+    XSTRCPY(malias[ma_top]->desc, na); /*
                          * For now do this.
                          */
     ma_top++;
@@ -3177,12 +3177,12 @@ void do_malias_list(dbref player, char *alias)
     }
 
     bp = buff = XMALLOC(LBUF_SIZE, "bp");
-    safe_sprintf(buff, &bp, "MAIL: Alias *%s: ", m->name);
+    SAFE_SPRINTF(buff, &bp, "MAIL: Alias *%s: ", m->name);
 
     for (i = m->numrecep - 1; i > -1; i--)
     {
         safe_name(m->list[i], buff, &bp);
-        safe_chr(' ', buff, &bp);
+        SAFE_LB_CHR(' ', buff, &bp);
     }
 
     *bp = '\0';
@@ -3272,7 +3272,7 @@ void malias_read(FILE *fp)
         }
 
         m->name = (char *)XMALLOC(sizeof(char) * (strlen(buffer) - 1), "m->name");
-        StringCopy(m->name, buffer + 2);
+        XSTRCPY(m->name, buffer + 2);
 
         if (fscanf(fp, "%[^\n]\n", buffer) == EOF)
         {
@@ -3280,7 +3280,7 @@ void malias_read(FILE *fp)
         }
 
         m->desc = (char *)XMALLOC(sizeof(char) * (strlen(buffer) - 1), "m->desc");
-        StringCopy(m->desc, buffer + 2);
+        XSTRCPY(m->desc, buffer + 2);
 
         if (m->numrecep > 0)
         {
@@ -3463,7 +3463,7 @@ static char *make_namelist(dbref player, char *arg)
     oldarg = XMALLOC(LBUF_SIZE, "oldarg");
     names = XMALLOC(LBUF_SIZE, "names");
     bp = names;
-    StringCopy(oldarg, arg);
+    XSTRCPY(oldarg, arg);
 
     for (p = strtok_r(oldarg, " ", &tokst);
          p != NULL;
@@ -3471,12 +3471,12 @@ static char *make_namelist(dbref player, char *arg)
     {
         if (bp != names)
         {
-            safe_str(", ", names, &bp);
+            SAFE_LB_STR(", ", names, &bp);
         }
 
         if (*p == '*')
         {
-            safe_str(p, names, &bp);
+            SAFE_LB_STR(p, names, &bp);
         }
         else
         {
@@ -3550,7 +3550,7 @@ static char *make_numlist(dbref player, char *arg)
             }
 
             snprintf(buf, MBUF_SIZE, "%d ", temp->from);
-            safe_str(buf, numbuf, &numbp);
+            SAFE_LB_STR(buf, numbuf, &numbp);
         }
         else if (*head == '*')
         {
@@ -3563,8 +3563,8 @@ static char *make_numlist(dbref player, char *arg)
                 return NULL;
             }
 
-            safe_str(head, numbuf, &numbp);
-            safe_chr(' ', numbuf, &numbp);
+            SAFE_LB_STR(head, numbuf, &numbp);
+            SAFE_LB_CHR(' ', numbuf, &numbp);
         }
         else
         {
@@ -3573,7 +3573,7 @@ static char *make_numlist(dbref player, char *arg)
             if (target != NOTHING)
             {
                 snprintf(buf, MBUF_SIZE, "%d ", target);
-                safe_str(buf, numbuf, &numbp);
+                SAFE_LB_STR(buf, numbuf, &numbp);
             }
             else
             {
@@ -3630,7 +3630,7 @@ void do_mail_quick(dbref player, char *arg1, char *arg2)
 
     buf = XMALLOC(LBUF_SIZE, "buf");
     bp = buf;
-    StringCopy(bp, arg1);
+    XSTRCPY(bp, arg1);
     parse_to(&bp, '/', 1);
 
     if (!bp)
@@ -3664,18 +3664,18 @@ void mail_to_list(dbref player, char *tolist, char *cclist, char *bcclist, char 
     }
 
     bp = list = XMALLOC(LBUF_SIZE, "bp");
-    safe_str(tolist, list, &bp);
+    SAFE_LB_STR(tolist, list, &bp);
 
     if (cclist && *cclist)
     {
-        safe_chr(' ', list, &bp);
-        safe_str(cclist, list, &bp);
+        SAFE_LB_CHR(' ', list, &bp);
+        SAFE_LB_STR(cclist, list, &bp);
     }
 
     if (bcclist && *bcclist)
     {
-        safe_chr(' ', list, &bp);
-        safe_str(bcclist, list, &bp);
+        SAFE_LB_CHR(' ', list, &bp);
+        SAFE_LB_STR(bcclist, list, &bp);
     }
 
     number = add_mail_message(player, message);
@@ -3873,9 +3873,9 @@ void do_prepend(dbref player, dbref cause, int key, char *text)
         if (*oldmsg)
         {
             bp = newmsg = XMALLOC(LBUF_SIZE, "newmsg");
-            safe_str(text + 1, newmsg, &bp);
-            safe_chr(' ', newmsg, &bp);
-            safe_str(oldmsg, newmsg, &bp);
+            SAFE_LB_STR(text + 1, newmsg, &bp);
+            SAFE_LB_CHR(' ', newmsg, &bp);
+            SAFE_LB_STR(oldmsg, newmsg, &bp);
             *bp = '\0';
             atr_add_raw(player, A_MAILMSG, newmsg);
             XFREE(newmsg);
@@ -3912,9 +3912,9 @@ void do_postpend(dbref player, dbref cause, int key, char *text)
         if (*oldmsg)
         {
             bp = newmsg = XMALLOC(LBUF_SIZE, "newmsg");
-            safe_str(oldmsg, newmsg, &bp);
-            safe_chr(' ', newmsg, &bp);
-            safe_str(text + 1, newmsg, &bp);
+            SAFE_LB_STR(oldmsg, newmsg, &bp);
+            SAFE_LB_CHR(' ', newmsg, &bp);
+            SAFE_LB_STR(text + 1, newmsg, &bp);
             *bp = '\0';
             atr_add_raw(player, A_MAILMSG, newmsg);
             XFREE(newmsg);
@@ -4021,7 +4021,7 @@ void do_malias_desc(dbref player, char *alias, char *desc)
         }
 
         m->desc = (char *)XMALLOC(sizeof(char) * (strlen(desc) + 1), "m->desc");
-        StringCopy(m->desc, desc);
+        XSTRCPY(m->desc, desc);
         notify(player, "MAIL: Description changed.");
     }
     else
@@ -4204,7 +4204,7 @@ void do_malias_rename(dbref player, char *alias, char *newname)
 
     XFREE(m->name);
     m->name = (char *)XMALLOC(sizeof(char) * strlen(newname), "m->name");
-    StringCopy(m->name, newname + 1);
+    XSTRCPY(m->name, newname + 1);
     notify(player, "MAIL: Mailing Alias renamed.");
 }
 
@@ -4299,7 +4299,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     if ((nfargs == 0) || !fargs[0] || !fargs[0][0])
     {
         count_mail(player, 0, &rc, &uc, &cc);
-        safe_ltos(buff, bufc, rc + uc, LBUF_SIZE);
+        SAFE_LTOS(buff, bufc, rc + uc, LBUF_SIZE);
         return;
     }
 
@@ -4312,18 +4312,18 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
              */
             if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
             {
-                safe_str("#-1 NO SUCH PLAYER", buff, bufc);
+                SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
                 return;
             }
             else if ((player != playerask) && !Wizard(player))
             {
-                safe_noperm(buff, bufc);
+                SAFE_NOPERM(buff, bufc);
                 return;
             }
             else
             {
                 count_mail(playerask, 0, &rc, &uc, &cc);
-                safe_sprintf(buff, bufc, "%d %d %d", rc, uc, cc);
+                SAFE_SPRINTF(buff, bufc, "%d %d %d", rc, uc, cc);
                 return;
             }
         }
@@ -4337,12 +4337,12 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     {
         if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
         {
-            safe_str("#-1 NO SUCH PLAYER", buff, bufc);
+            SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
             return;
         }
         else if ((player != playerask) && !God(player))
         {
-            safe_noperm(buff, bufc);
+            SAFE_NOPERM(buff, bufc);
             return;
         }
 
@@ -4351,7 +4351,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if ((num < 1) || (Typeof(playerask) != TYPE_PLAYER))
     {
-        safe_str("#-1 NO SUCH MESSAGE", buff, bufc);
+        SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
         return;
     }
 
@@ -4359,12 +4359,12 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (mp != NULL)
     {
-        safe_str(get_mail_message(mp->number), buff, bufc);
+        SAFE_LB_STR(get_mail_message(mp->number), buff, bufc);
         return;
     }
 
     /* ran off the end of the list without finding anything */
-    safe_str("#-1 NO SUCH MESSAGE", buff, bufc);
+    SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
 void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -4387,12 +4387,12 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
         {
-            safe_str("#-1 NO SUCH PLAYER", buff, bufc);
+            SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
             return;
         }
         else if ((player != playerask) && !Wizard(player))
         {
-            safe_noperm(buff, bufc);
+            SAFE_NOPERM(buff, bufc);
             return;
         }
 
@@ -4401,7 +4401,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if ((num < 1) || (Typeof(playerask) != TYPE_PLAYER))
     {
-        safe_str("#-1 NO SUCH MESSAGE", buff, bufc);
+        SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
         return;
     }
 
@@ -4414,7 +4414,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
 
     /* ran off the end of the list without finding anything */
-    safe_str("#-1 NO SUCH MESSAGE", buff, bufc);
+    SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
 FUN mod_mail_functable[] = {

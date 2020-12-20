@@ -49,15 +49,15 @@ dbref create_guest(int num)
 
     if (*mudconf.guest_prefixes && *mudconf.guest_suffixes)
     {
-        strcpy(prefixes, mudconf.guest_prefixes);
+        XSTRCPY(prefixes, mudconf.guest_prefixes);
 
         for (pp = strtok_r(prefixes, " \t", &tokp); pp && !found; pp = strtok_r(NULL, " \t", &tokp))
         {
-            strcpy(suffixes, mudconf.guest_suffixes);
+            XSTRCPY(suffixes, mudconf.guest_suffixes);
 
             for (sp = strtok_r(suffixes, " \t", &toks); sp && !found; sp = strtok_r(NULL, " \t", &toks))
             {
-                sprintf(name, "%s%s", pp, sp);
+                XSPRINTF(name, "%s%s", pp, sp);
 
                 if (lookup_player(GOD, name, 0) == NOTHING)
                 {
@@ -68,24 +68,24 @@ dbref create_guest(int num)
     }
     else if (*mudconf.guest_prefixes || *mudconf.guest_suffixes)
     {
-        strcpy(prefixes, (*mudconf.guest_prefixes ? mudconf.guest_prefixes : mudconf.guest_suffixes));
+        XSTRCPY(prefixes, (*mudconf.guest_prefixes ? mudconf.guest_prefixes : mudconf.guest_suffixes));
 
         for (pp = strtok_r(prefixes, " \t", &tokp); pp && !found; pp = strtok_r(NULL, " \t", &tokp))
         {
             if (lookup_player(GOD, pp, 0) == NOTHING)
             {
-                strcpy(name, pp);
+                XSTRCPY(name, pp);
                 found = 1;
             }
         }
     }
 
-    sprintf(base, "%s%d", mudconf.guest_basename, num + 1);
+    XSPRINTF(base, "%s%d", mudconf.guest_basename, num + 1);
     same_str = 1;
 
     if (!found || (strlen(name) >= mudconf.max_command_args))
     {
-        strcpy(name, base);
+        XSTRCPY(name, base);
     }
     else if (strcasecmp(name, base))
     {
@@ -177,7 +177,7 @@ char *make_guest(DESC *d)
 
     for (i = 0; i < mudconf.number_guests; i++)
     {
-        sprintf(name, "%s%d", mudconf.guest_basename, i + 1);
+        XSPRINTF(name, "%s%d", mudconf.guest_basename, i + 1);
         guest = lookup_player(GOD, name, 0);
 
         if ((guest != NOTHING) && !Connected(guest))
@@ -192,7 +192,7 @@ char *make_guest(DESC *d)
 
     for (i = 0; i < mudconf.number_guests; i++)
     {
-        sprintf(name, "%s%d", mudconf.guest_basename, i + 1);
+        XSPRINTF(name, "%s%d", mudconf.guest_basename, i + 1);
 
         if (lookup_player(GOD, name, 0) == NOTHING)
         {

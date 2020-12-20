@@ -36,9 +36,9 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
     unsigned int fp_sign, fp_exp, fp_mant;
     int i;
 
-    memset(fp_sign_mask.u, 0, sizeof(fp_sign_mask));
-    memset(fp_exp_mask.u, 0, sizeof(fp_exp_mask));
-    memset(fp_val.u, 0, sizeof(fp_val));
+    XMEMSET(fp_sign_mask.u, 0, sizeof(fp_sign_mask));
+    XMEMSET(fp_exp_mask.u, 0, sizeof(fp_exp_mask));
+    XMEMSET(fp_val.u, 0, sizeof(fp_val));
     fp_exp_mask.d = 1.0 / d_zero;          /* = inf */
     fp_sign_mask.d = -1.0 / fp_exp_mask.d; /* = -0.0~ */
 
@@ -93,16 +93,16 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
     {
         if (fp_sign)
         {
-            safe_chr('-', buff, bufc);
+            SAFE_LB_CHR('-', buff, bufc);
         }
 
         if (fp_mant)
         {
-            safe_strncat(buff, bufc, "NaN", 3, LBUF_SIZE);
+            SAFE_STRNCAT(buff, bufc, "NaN", 3, LBUF_SIZE);
         }
         else
         {
-            safe_strncat(buff, bufc, "Inf", 3, LBUF_SIZE);
+            SAFE_STRNCAT(buff, bufc, "Inf", 3, LBUF_SIZE);
         }
     }
 
@@ -132,7 +132,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
     }
 
     buf1 = *bufc;
-    safe_sprintf(buff, bufc, "%0.*Lf", precision, result); /* get long double val into buffer */
+    SAFE_SPRINTF(buff, bufc, "%0.*Lf", precision, result); /* get long double val into buffer */
     **bufc = '\0';
 
     p = strrchr(buf1, '.');
@@ -218,11 +218,11 @@ void fun_sign(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (num < 0)
     {
-        safe_strncat(buff, bufc, "-1", 2, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
     }
     else
     {
-        safe_bool(buff, bufc, (num > 0));
+        SAFE_BOOL(buff, bufc, (num > 0));
     }
 }
 
@@ -234,7 +234,7 @@ void fun_abs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (num == 0)
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
     }
     else if (num < 0)
     {
@@ -288,11 +288,11 @@ void fun_sqrt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (val < 0)
     {
-        safe_str("#-1 SQUARE ROOT OF NEGATIVE", buff, bufc);
+        SAFE_LB_STR("#-1 SQUARE ROOT OF NEGATIVE", buff, bufc);
     }
     else if (val == 0)
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
     }
     else
     {
@@ -316,7 +316,7 @@ void fun_ln(char *buff, char **bufc, dbref player, dbref caller, dbref cause, ch
     }
     else
     {
-        safe_str("#-1 LN OF NEGATIVE OR ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 LN OF NEGATIVE OR ZERO", buff, bufc);
     }
 }
 
@@ -331,7 +331,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if ((flag & TRIG_ARC) && !(flag & TRIG_TAN) && ((val < -1) || (val > 1)))
     {
-        safe_sprintf(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE", ((FUN *)fargs[-1])->name);
+        SAFE_SPRINTF(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE", ((FUN *)fargs[-1])->name);
         return;
     }
 
@@ -413,7 +413,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!is_integer(fargs[1]) || !is_integer(fargs[2]))
     {
-        safe_strncat(buff, bufc, "#-1 INVALID BASE", 16, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 INVALID BASE", 16, LBUF_SIZE);
         return;
     }
 
@@ -422,7 +422,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if ((from < 2) || (from > 64) || (to < 2) || (to > 64))
     {
-        safe_strncat(buff, bufc, "#-1 BASE OUT OF RANGE", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 BASE OUT OF RANGE", 21, LBUF_SIZE);
         return;
     }
 
@@ -469,14 +469,14 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             }
             else
             {
-                safe_strncat(buff, bufc, "#-1 MALFORMED NUMBER", 20, LBUF_SIZE);
+                SAFE_STRNCAT(buff, bufc, "#-1 MALFORMED NUMBER", 20, LBUF_SIZE);
                 return;
             }
         }
 
         if (isneg)
         {
-            safe_chr('-', buff, bufc);
+            SAFE_LB_CHR('-', buff, bufc);
         }
     }
 
@@ -486,7 +486,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (n < to)
     {
-        safe_chr(tobase[(unsigned char)n], buff, bufc);
+        SAFE_LB_CHR(tobase[(unsigned char)n], buff, bufc);
         return;
     }
 
@@ -499,14 +499,14 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         m = n % to;
         n = n / to;
-        safe_chr(tobase[(unsigned char)m], nbuf, &nbp);
+        SAFE_LB_CHR(tobase[(unsigned char)m], nbuf, &nbp);
     }
 
     nbp--;
 
     while (nbp >= nbuf)
     {
-        safe_chr(*nbp, buff, bufc);
+        SAFE_LB_CHR(*nbp, buff, bufc);
         nbp--;
     }
 }
@@ -518,32 +518,32 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_gt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
 }
 
 void fun_gte(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
 }
 
 void fun_lt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
 }
 
 void fun_lte(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
 }
 
 void fun_eq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
 }
 
 void fun_neq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
+    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
 }
 
 void fun_ncomp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -554,15 +554,15 @@ void fun_ncomp(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (x == y)
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
     }
     else if (x < y)
     {
-        safe_str("-1", buff, bufc);
+        SAFE_LB_STR("-1", buff, bufc);
     }
     else
     {
-        safe_chr('1', buff, bufc);
+        SAFE_LB_CHR('1', buff, bufc);
     }
 }
 
@@ -589,7 +589,7 @@ void fun_div(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (bot == 0)
     {
-        safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
         return;
     }
 
@@ -631,7 +631,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (bot == 0)
     {
-        safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
         return;
     }
 
@@ -678,7 +678,7 @@ void fun_fdiv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (bot == 0)
     {
-        safe_str("#-1 DIVIDE BY ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
     }
     else
     {
@@ -776,7 +776,7 @@ void fun_power(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (val1 < 0)
     {
-        safe_str("#-1 POWER OF NEGATIVE", buff, bufc);
+        SAFE_LB_STR("#-1 POWER OF NEGATIVE", buff, bufc);
     }
     else
     {
@@ -801,11 +801,11 @@ void fun_log(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if ((val <= 0) || (base <= 0))
     {
-        safe_str("#-1 LOG OF NEGATIVE OR ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 LOG OF NEGATIVE OR ZERO", buff, bufc);
     }
     else if (base == 1)
     {
-        safe_str("#-1 DIVISION BY ZERO", buff, bufc);
+        SAFE_LB_STR("#-1 DIVISION BY ZERO", buff, bufc);
     }
     else
     {
@@ -855,7 +855,7 @@ void fun_add(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (nfargs < 2)
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -879,7 +879,7 @@ void fun_mul(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (nfargs < 2)
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -903,7 +903,7 @@ void fun_max(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (nfargs < 1)
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -926,7 +926,7 @@ void fun_min(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     if (nfargs < 1)
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -1031,7 +1031,7 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (nfargs == 0)
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1157,7 +1157,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
         else
         {
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
         }
 
         XFREE(v1);
@@ -1166,7 +1166,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (res <= 0)
     {
-        safe_str("#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR", buff, bufc);
+        SAFE_LB_STR("#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR", buff, bufc);
         XFREE(v1);
         return;
     }
@@ -1226,7 +1226,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
     if ((n != m) && !((oper == VEC_MUL) && ((n == 1) || (m == 1))))
     {
-        safe_str("#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc);
+        SAFE_LB_STR("#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc);
         XFREE(v1);
         XFREE(v2);
         return;
@@ -1257,23 +1257,23 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         break;
 
     case VEC_OR:
-        safe_bool(buff, bufc, xlate(v1[0]) || xlate(v2[0]));
+        SAFE_BOOL(buff, bufc, xlate(v1[0]) || xlate(v2[0]));
 
         for (i = 1; i < n; i++)
         {
             print_sep(&osep, buff, bufc);
-            safe_bool(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
+            SAFE_BOOL(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
         }
 
         break;
 
     case VEC_AND:
-        safe_bool(buff, bufc, xlate(v1[0]) && xlate(v2[0]));
+        SAFE_BOOL(buff, bufc, xlate(v1[0]) && xlate(v2[0]));
 
         for (i = 1; i < n; i++)
         {
             print_sep(&osep, buff, bufc);
-            safe_bool(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
+            SAFE_BOOL(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
         }
 
         break;
@@ -1281,14 +1281,14 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case VEC_XOR:
         x = xlate(v1[0]);
         y = xlate(v2[0]);
-        safe_bool(buff, bufc, (x && !y) || (!x && y));
+        SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
 
         for (i = 1; i < n; i++)
         {
             print_sep(&osep, buff, bufc);
             x = xlate(v1[i]);
             y = xlate(v2[i]);
-            safe_bool(buff, bufc, (x && !y) || (!x && y));
+            SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
         }
 
         break;
@@ -1364,7 +1364,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         /*
 	 * If we reached this, we're in trouble.
 	 */
-        safe_str("#-1 UNIMPLEMENTED", buff, bufc);
+        SAFE_LB_STR("#-1 UNIMPLEMENTED", buff, bufc);
         break;
     }
 
@@ -1379,17 +1379,17 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 void fun_not(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, !(int)strtol(fargs[0], (char **)NULL, 10));
+    SAFE_BOOL(buff, bufc, !(int)strtol(fargs[0], (char **)NULL, 10));
 }
 
 void fun_notbool(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, !xlate(fargs[0]));
+    SAFE_BOOL(buff, bufc, !xlate(fargs[0]));
 }
 
 void fun_t(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    safe_bool(buff, bufc, xlate(fargs[0]));
+    SAFE_BOOL(buff, bufc, xlate(fargs[0]));
 }
 
 long long cvtfun(int flag, char *str)
@@ -1425,7 +1425,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (nfargs == 0)
         {
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
             return;
         }
 
@@ -1451,7 +1451,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         /*
 	 * separate arguments, but not enough of them
 	 */
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
     else if (flag & FN_NO_EVAL)
@@ -1492,7 +1492,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
     }
 
-    safe_bool(buff, bufc, val);
+    SAFE_BOOL(buff, bufc, val);
 }
 
 /*
@@ -1539,6 +1539,6 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
             n = !n;
         }
 
-        safe_bool(buff, bufc, n);
+        SAFE_BOOL(buff, bufc, n);
     }
 }

@@ -242,7 +242,7 @@ void update_newobjs(dbref player, dbref obj_num, int obj_type)
 		break;
 	}
 
-	sprintf(tbuf, "%d %d %d %d", obj_list[0], obj_list[1], obj_list[2], obj_list[3]);
+	XSPRINTF(tbuf, "%d %d %d %d", obj_list[0], obj_list[1], obj_list[2], obj_list[3]);
 	atr_add_raw(player, A_NEWOBJS, tbuf);
 }
 
@@ -254,7 +254,7 @@ int ok_exit_name(char *name)
 {
 	char *p, *lastp, *s;
 	char buff[LBUF_SIZE];
-	strcpy(buff, name); /* munchable buffer */
+	XSTRCPY(buff, name); /* munchable buffer */
 
 	/*
      * walk down the string, checking lengths. skip leading spaces.
@@ -622,7 +622,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 		buff[strlen(buff) - 1] = '\0';
 		atr_add_raw(obj, A_LAST, buff);
 		buff = XMALLOC(SBUF_SIZE, "buff");
-		sprintf(buff, "%d %d %d %d %d", quota, mudconf.start_room_quota, mudconf.start_exit_quota, mudconf.start_thing_quota, mudconf.start_player_quota);
+		XSPRINTF(buff, "%d %d %d %d %d", quota, mudconf.start_room_quota, mudconf.start_exit_quota, mudconf.start_thing_quota, mudconf.start_player_quota);
 		atr_add_raw(obj, A_QUOTA, buff);
 		atr_add_raw(obj, A_RQUOTA, buff);
 		add_player_name(obj, Name(obj));
@@ -745,7 +745,7 @@ void destroy_obj(dbref player, dbref obj)
 			else
 			{
 				tname = XMALLOC(SBUF_SIZE, "tname");
-				strcpy(tname, Name(owner));
+				XSTRCPY(tname, Name(owner));
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Destroyed. %s's %s(#%d)", tname, Name(obj), obj);
 				XFREE(tname);
 			}

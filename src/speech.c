@@ -91,7 +91,7 @@ int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char
      * * pass it through later can nibble those arguments, and we may
      * * need to call this function more than once on the same message.
      */
-	strcpy(msgbuf, message);
+	XSTRCPY(msgbuf, message);
 
 	switch (key)
 	{
@@ -355,9 +355,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			safe_str((char *)" shouts, \"", buf2, &bp);
-			safe_str(message, buf2, &bp);
-			safe_chr('"', buf2, &bp);
+			SAFE_LB_STR((char *)" shouts, \"", buf2, &bp);
+			SAFE_LB_STR(message, buf2, &bp);
+			SAFE_LB_CHR('"', buf2, &bp);
 			say_shout(0, announce_msg, say_flags, player, buf2);
 			XFREE(buf2);
 		}
@@ -388,9 +388,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			safe_str((char *)" says, \"", buf2, &bp);
-			safe_str(message, buf2, &bp);
-			safe_chr('"', buf2, &bp);
+			SAFE_LB_STR((char *)" says, \"", buf2, &bp);
+			SAFE_LB_STR(message, buf2, &bp);
+			SAFE_LB_CHR('"', buf2, &bp);
 			say_shout(WIZARD, broadcast_msg, say_flags, player, buf2);
 			XFREE(buf2);
 		}
@@ -423,9 +423,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			safe_str((char *)" says, \"", buf2, &bp);
-			safe_str(message, buf2, &bp);
-			safe_chr('"', buf2, &bp);
+			SAFE_LB_STR((char *)" says, \"", buf2, &bp);
+			SAFE_LB_STR(message, buf2, &bp);
+			SAFE_LB_CHR('"', buf2, &bp);
 			*bp = '\0';
 			say_shout(WIZARD, admin_msg, say_flags, player, buf2);
 			say_shout(ROYALTY, admin_msg, say_flags, player, buf2);
@@ -529,7 +529,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	{
 		if ((s = va_arg(ap, char *)) != NULL)
 		{
-			strncpy(dflt, s, LBUF_SIZE);
+			XSTRNCPY(dflt, s, LBUF_SIZE);
 		}
 		else
 		{
@@ -538,7 +538,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	}
 	else
 	{
-		vsnprintf(dflt, LBUF_SIZE, format, ap);
+		XVSNPRINTF(dflt, LBUF_SIZE, format, ap);
 	}
 
 	va_end(ap);
@@ -784,10 +784,10 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 		{
 			if (ddp != dbref_list)
 			{
-				safe_chr(' ', dbref_list, &ddp);
+				SAFE_LB_CHR(' ', dbref_list, &ddp);
 			}
 
-			safe_ltos(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
+			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
 		}
 	}
 
@@ -830,14 +830,14 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
      * * eliminated when the pagegroup is used.
      */
 	dbref_list = ddp = XMALLOC(LBUF_SIZE, "dbref_list");
-	safe_ltos(dbref_list, &ddp, player, LBUF_SIZE);
+	SAFE_LTOS(dbref_list, &ddp, player, LBUF_SIZE);
 
 	for (i = 0; i < n_dbrefs; i++)
 	{
 		if (dbrefs_array[i] != NOTHING)
 		{
-			safe_chr(' ', dbref_list, &ddp);
-			safe_ltos(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
+			SAFE_LB_CHR(' ', dbref_list, &ddp);
+			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
 		}
 	}
 
@@ -869,20 +869,20 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	}
 	else
 	{
-		safe_chr('(', clean_tname, &tnp);
+		SAFE_LB_CHR('(', clean_tname, &tnp);
 
 		for (i = 0; i < n_dbrefs; i++)
 		{
 			if (dbrefs_array[i] != NOTHING)
 			{
 				if (tnp != clean_tname + 1)
-					safe_strncat(clean_tname, &tnp, ", ", 2, LBUF_SIZE);
+					SAFE_STRNCAT(clean_tname, &tnp, ", ", 2, LBUF_SIZE);
 
 				safe_name(dbrefs_array[i], clean_tname, &tnp);
 			}
 		}
 
-		safe_chr(')', clean_tname, &tnp);
+		SAFE_LB_CHR(')', clean_tname, &tnp);
 	}
 
 	*tnp = '\0';
@@ -904,28 +904,28 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	case ':':
 		message++;
-		safe_str("From afar, ", omessage, &omp);
+		SAFE_LB_STR("From afar, ", omessage, &omp);
 
 		if (count != 1)
 		{
-			safe_sprintf(omessage, &omp, "to %s: ", clean_tname);
+			SAFE_SPRINTF(omessage, &omp, "to %s: ", clean_tname);
 		}
 
-		safe_sprintf(omessage, &omp, "%s %s", Name(player), message);
-		safe_sprintf(imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name(player), message);
+		SAFE_SPRINTF(omessage, &omp, "%s %s", Name(player), message);
+		SAFE_SPRINTF(imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name(player), message);
 		break;
 
 	case ';':
 		message++;
-		safe_str("From afar, ", omessage, &omp);
+		SAFE_LB_STR("From afar, ", omessage, &omp);
 
 		if (count != 1)
 		{
-			safe_sprintf(omessage, &omp, "to %s: ", clean_tname);
+			SAFE_SPRINTF(omessage, &omp, "to %s: ", clean_tname);
 		}
 
-		safe_sprintf(omessage, &omp, "%s%s", Name(player), message);
-		safe_sprintf(imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name(player), message);
+		SAFE_SPRINTF(omessage, &omp, "%s%s", Name(player), message);
+		SAFE_SPRINTF(imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name(player), message);
 		break;
 
 	case '"':
@@ -934,11 +934,11 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	default:
 		if (count != 1)
 		{
-			safe_sprintf(omessage, &omp, "To %s, ", clean_tname);
+			SAFE_SPRINTF(omessage, &omp, "To %s, ", clean_tname);
 		}
 
-		safe_sprintf(omessage, &omp, "%s pages: %s", Name(player), message);
-		safe_sprintf(imessage, &imp, "You paged %s with '%s'.", clean_tname, message);
+		SAFE_SPRINTF(omessage, &omp, "%s pages: %s", Name(player), message);
+		SAFE_SPRINTF(imessage, &imp, "You paged %s with '%s'.", clean_tname, message);
 	}
 
 	XFREE(clean_tname);
@@ -979,7 +979,7 @@ void whisper_pose(dbref player, dbref target, char *message)
 {
 	char *buff;
 	buff = XMALLOC(LBUF_SIZE, "buff");
-	strcpy(buff, Name(player));
+	XSTRCPY(buff, Name(player));
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s senses \"%s%s\"", Name(target), buff, message);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You sense %s%s", buff, message);
 	XFREE(buff);
@@ -1284,7 +1284,7 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 						buf2 = XMALLOC(LBUF_SIZE, "buf2");
 						bp = buf2;
 						safe_name(player, buf2, &bp);
-						safe_str((char *)" whispers something to ", buf2, &bp);
+						SAFE_LB_STR((char *)" whispers something to ", buf2, &bp);
 						safe_name(target, buf2, &bp);
 						*bp = '\0';
 						notify_except2(loc, player, player, target, MSG_SPEECH, NULL, buf2);

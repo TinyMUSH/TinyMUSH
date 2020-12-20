@@ -254,20 +254,20 @@ void fcache_load(dbref player)
 
         if ((player != NOTHING) && !Quiet(player))
         {
-            sprintf(sbuf, "%d", i);
+            XSPRINTF(sbuf, "%d", i);
 
             if (fp == fcache)
             {
-                safe_str((char *)"File sizes: ", buff, &bufc);
+                SAFE_LB_STR((char *)"File sizes: ", buff, &bufc);
             }
             else
             {
-                safe_str((char *)"  ", buff, &bufc);
+                SAFE_LB_STR((char *)"  ", buff, &bufc);
             }
 
-            safe_str((char *)fp->desc, buff, &bufc);
-            safe_str((char *)"...", buff, &bufc);
-            safe_str(sbuf, buff, &bufc);
+            SAFE_LB_STR((char *)fp->desc, buff, &bufc);
+            SAFE_LB_STR((char *)"...", buff, &bufc);
+            SAFE_LB_STR(sbuf, buff, &bufc);
         }
     }
 

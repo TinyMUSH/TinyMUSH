@@ -271,13 +271,13 @@ char *normal_to_white(const char *raw)
 	{
 		if (*p == ESC_CHAR)
 		{
-			safe_strncat(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
+			SAFE_STRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
 
 			if (p[1] == ANSI_CSI)
 			{
-				safe_chr(*p, buf, &q);
+				SAFE_LB_CHR(*p, buf, &q);
 				++p;
-				safe_chr(*p, buf, &q);
+				SAFE_LB_CHR(*p, buf, &q);
 				++p;
 				just_after_csi = p;
 				has_zero = 0;
@@ -312,7 +312,7 @@ char *normal_to_white(const char *raw)
 						{
 							param_val <<= 1;
 							param_val += (param_val << 2) + (*p & 0x0f);
-							safe_chr(*p, buf, &q);
+							SAFE_LB_CHR(*p, buf, &q);
 						}
 						else
 						{
@@ -321,14 +321,14 @@ char *normal_to_white(const char *raw)
 								/*
 				 * ansi normal
 				 */
-								safe_strncat(buf, &q, "m\033[37m\033[", 8, LBUF_SIZE);
+								SAFE_STRNCAT(buf, &q, "m\033[37m\033[", 8, LBUF_SIZE);
 							}
 							else
 							{
 								/*
 				 * some other color
 				 */
-								safe_chr(*p, buf, &q);
+								SAFE_LB_CHR(*p, buf, &q);
 							}
 
 							param_val = 0;
@@ -342,18 +342,18 @@ char *normal_to_white(const char *raw)
 						++p;
 					}
 
-					safe_chr(*p, buf, &q);
+					SAFE_LB_CHR(*p, buf, &q);
 					++p;
 
 					if (param_val == 0)
 					{
-						safe_strncat(buf, &q, ANSI_WHITE, 5, LBUF_SIZE);
+						SAFE_STRNCAT(buf, &q, ANSI_WHITE, 5, LBUF_SIZE);
 					}
 				}
 				else
 				{
 					++p;
-					safe_strncat(buf, &q, just_after_csi, p - just_after_csi, LBUF_SIZE);
+					SAFE_STRNCAT(buf, &q, just_after_csi, p - just_after_csi, LBUF_SIZE);
 				}
 			}
 			else
@@ -369,7 +369,7 @@ char *normal_to_white(const char *raw)
 		}
 	}
 
-	safe_strncat(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
+	SAFE_STRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
 	return (buf);
 }
 
@@ -410,7 +410,7 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 			(ansi_bits_set & 0x088) || /* normal to color */
 			(ansi_bits_clr == 0x1000))
 		{ /* explicit normal */
-			strcpy(p, "0;");
+			XSTRCPY(p, "0;");
 			p += 2;
 			ansi_bits_set = (~ansi_bits[0]) & ansi_after;
 			ansi_bits_clr = ansi_bits[0] & (~ansi_after);
@@ -422,25 +422,25 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 
 		if (ansi_bits_set & 0x100)
 		{
-			strcpy(p, "1;");
+			XSTRCPY(p, "1;");
 			p += 2;
 		}
 
 		if (ansi_bits_set & 0x200)
 		{
-			strcpy(p, "4;");
+			XSTRCPY(p, "4;");
 			p += 2;
 		}
 
 		if (ansi_bits_set & 0x400)
 		{
-			strcpy(p, "5;");
+			XSTRCPY(p, "5;");
 			p += 2;
 		}
 
 		if (ansi_bits_set & 0x800)
 		{
-			strcpy(p, "7;");
+			XSTRCPY(p, "7;");
 			p += 2;
 		}
 
@@ -449,7 +449,7 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
 		{
-			strcpy(p, "30;");
+			XSTRCPY(p, "30;");
 			p += 3;
 			p[-2] |= (ansi_after & 0x00f);
 		}
@@ -459,7 +459,7 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
 		{
-			strcpy(p, "40;");
+			XSTRCPY(p, "40;");
 			p += 3;
 			p[-2] |= ((ansi_after & 0x0f0) >> 4);
 		}
@@ -471,7 +471,7 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 		{
 			p[-1] = ANSI_END;
 			/*
-	     * Buffer is already null-terminated by strcpy
+	     * Buffer is already null-terminated by XSTRCPY
 	     */
 		}
 		else
@@ -520,7 +520,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 			(ansi_bits_set & 0x088) || /* normal to color */
 			(ansi_bits_clr == 0x1000))
 		{ /* explicit normal */
-			strcpy(p, "%xn");
+			XSTRCPY(p, "%xn");
 			p += 3;
 			ansi_bits_set = (~ansi_bits[0]) & ansi_after;
 			ansi_bits_clr = ansi_bits[0] & (~ansi_after);
@@ -532,25 +532,25 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 
 		if (ansi_bits_set & 0x100)
 		{
-			strcpy(p, "%xh");
+			XSTRCPY(p, "%xh");
 			p += 3;
 		}
 
 		if (ansi_bits_set & 0x200)
 		{
-			strcpy(p, "%xu");
+			XSTRCPY(p, "%xu");
 			p += 3;
 		}
 
 		if (ansi_bits_set & 0x400)
 		{
-			strcpy(p, "%xf");
+			XSTRCPY(p, "%xf");
 			p += 3;
 		}
 
 		if (ansi_bits_set & 0x800)
 		{
-			strcpy(p, "%xi");
+			XSTRCPY(p, "%xi");
 			p += 3;
 		}
 
@@ -559,7 +559,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
 		{
-			strcpy(p, "%xx");
+			XSTRCPY(p, "%xx");
 			p += 3;
 			p[-1] = ansi_mushcode_fg[(ansi_after & 0x00f)];
 		}
@@ -569,7 +569,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
 		{
-			strcpy(p, "%xX");
+			XSTRCPY(p, "%xX");
 			p += 3;
 			p[-1] = ansi_mushcode_bg[(ansi_after & 0x0f0) >> 4];
 		}
@@ -742,7 +742,7 @@ char *remap_colors(const char *s, int *cmap)
 
 	if (!s || !*s || !cmap)
 	{
-		strncpy(buf, s, LBUF_SIZE);
+		XSTRNCPY(buf, s, LBUF_SIZE);
 		buf[LBUF_SIZE] = '\0';
 		return (buf);
 	}
@@ -753,18 +753,18 @@ char *remap_colors(const char *s, int *cmap)
 	{
 		while (*s && (*s != ESC_CHAR))
 		{
-			safe_chr(*s, buf, &bp);
+			SAFE_LB_CHR(*s, buf, &bp);
 			s++;
 		}
 
 		if (*s == ESC_CHAR)
 		{
-			safe_chr(*s, buf, &bp);
+			SAFE_LB_CHR(*s, buf, &bp);
 			s++;
 
 			if (*s == ANSI_CSI)
 			{
-				safe_chr(*s, buf, &bp);
+				SAFE_LB_CHR(*s, buf, &bp);
 				s++;
 
 				do
@@ -773,7 +773,7 @@ char *remap_colors(const char *s, int *cmap)
 
 					if ((n >= I_ANSI_BLACK) && (n < I_ANSI_NUM) && (cmap[n - I_ANSI_BLACK] != 0))
 					{
-						safe_ltos(buf, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE);
+						SAFE_LTOS(buf, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE);
 
 						while (isdigit(*s))
 						{
@@ -784,27 +784,27 @@ char *remap_colors(const char *s, int *cmap)
 					{
 						while (isdigit(*s))
 						{
-							safe_chr(*s, buf, &bp);
+							SAFE_LB_CHR(*s, buf, &bp);
 							s++;
 						}
 					}
 
 					if (*s == ';')
 					{
-						safe_chr(*s, buf, &bp);
+						SAFE_LB_CHR(*s, buf, &bp);
 						s++;
 					}
 				} while (*s && (*s != ANSI_END));
 
 				if (*s == ANSI_END)
 				{
-					safe_chr(*s, buf, &bp);
+					SAFE_LB_CHR(*s, buf, &bp);
 					s++;
 				}
 			}
 			else if (*s)
 			{
-				safe_chr(*s, buf, &bp);
+				SAFE_LB_CHR(*s, buf, &bp);
 				s++;
 			}
 		}
@@ -846,18 +846,18 @@ char *translate_string(char *str, int type)
 					track_esccode(&str, &ansi_state);
 				}
 
-				safe_str(ansi_transition_mushcode(ansi_state_prev, ansi_state), buff, &bp);
+				SAFE_LB_STR(ansi_transition_mushcode(ansi_state_prev, ansi_state), buff, &bp);
 				ansi_state_prev = ansi_state;
 				continue;
 
 			case ' ':
 				if (str[1] == ' ')
 				{
-					safe_strncat(buff, &bp, "%b", 2, LBUF_SIZE);
+					SAFE_STRNCAT(buff, &bp, "%b", 2, LBUF_SIZE);
 				}
 				else
 				{
-					safe_chr(' ', buff, &bp);
+					SAFE_LB_CHR(' ', buff, &bp);
 				}
 
 				break;
@@ -870,23 +870,23 @@ char *translate_string(char *str, int type)
 			case '}':
 			case '(':
 			case ')':
-				safe_chr('%', buff, &bp);
-				safe_chr(*str, buff, &bp);
+				SAFE_LB_CHR('%', buff, &bp);
+				SAFE_LB_CHR(*str, buff, &bp);
 				break;
 
 			case '\r':
 				break;
 
 			case '\n':
-				safe_strncat(buff, &bp, "%r", 2, LBUF_SIZE);
+				SAFE_STRNCAT(buff, &bp, "%r", 2, LBUF_SIZE);
 				break;
 
 			case '\t':
-				safe_strncat(buff, &bp, "%t", 2, LBUF_SIZE);
+				SAFE_STRNCAT(buff, &bp, "%t", 2, LBUF_SIZE);
 				break;
 
 			default:
-				safe_chr(*str, buff, &bp);
+				SAFE_LB_CHR(*str, buff, &bp);
 			}
 
 			str++;
@@ -907,11 +907,11 @@ char *translate_string(char *str, int type)
 
 			case '\n':
 			case '\t':
-				safe_chr(' ', buff, &bp);
+				SAFE_LB_CHR(' ', buff, &bp);
 				break;
 
 			default:
-				safe_chr(*str, buff, &bp);
+				SAFE_LB_CHR(*str, buff, &bp);
 			}
 
 			str++;
@@ -1588,7 +1588,7 @@ char *replace_string(const char *old, const char *new, const char *string)
 			/* Copy up to the next occurrence of the first char of OLD */
 			while (*s && *s != *old)
 			{
-				safe_chr(*s, result, &r);
+				SAFE_LB_CHR(*s, result, &r);
 				s++;
 			}
 
@@ -1602,12 +1602,12 @@ char *replace_string(const char *old, const char *new, const char *string)
 			{
 				if (!strncmp(old, s, olen))
 				{
-					safe_str((char *)new, result, &r);
+					SAFE_LB_STR((char *)new, result, &r);
 					s += olen;
 				}
 				else
 				{
-					safe_chr(*s, result, &r);
+					SAFE_LB_CHR(*s, result, &r);
 					s++;
 				}
 			}
@@ -1673,19 +1673,19 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	if (!strcmp(from, "^"))
 	{
 		/* Prepend 'to' to string */
-		safe_strncat(*dst, &cp, to, tlen, LBUF_SIZE);
+		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 		track_all_esccodes(&src, &p, &ansi_state);
-		safe_strncat(*dst, &cp, src, p - src, LBUF_SIZE);
+		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 	}
 	else if (!strcmp(from, "$"))
 	{
 		/* Append 'to' to string */
 		ansi_state = ANST_NONE;
 		track_all_esccodes(&src, &p, &ansi_state);
-		safe_strncat(*dst, &cp, src, p - src, LBUF_SIZE);
+		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 		ansi_state |= to_ansi_set;
 		ansi_state &= ~to_ansi_clr;
-		safe_strncat(*dst, &cp, to, tlen, LBUF_SIZE);
+		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 	}
 	else
 	{
@@ -1718,7 +1718,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 				}
 			}
 
-			safe_strncat(*dst, &cp, p, src - p, LBUF_SIZE);
+			SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 
 			/*
 	     * If we are really at a FROM, append TO to the result
@@ -1733,7 +1733,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					/* Apply whatever ANSI transition happens in TO */
 					ansi_state |= to_ansi_set;
 					ansi_state &= ~to_ansi_clr;
-					safe_strncat(*dst, &cp, to, tlen, LBUF_SIZE);
+					SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 					src += flen;
 				}
 				else
@@ -1750,11 +1750,11 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					{
 						p = src;
 						track_esccode(&src, &ansi_state);
-						safe_strncat(*dst, &cp, p, src - p, LBUF_SIZE);
+						SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else
 					{
-						safe_chr(*src, *dst, &cp);
+						SAFE_LB_CHR(*src, *dst, &cp);
 						++src;
 					}
 				}
@@ -1763,7 +1763,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	}
 
 	p = ansi_transition_esccode(ansi_state, ANST_NONE);
-	safe_str(p, *dst, &cp);
+	SAFE_LB_STR(p, *dst, &cp);
 	XFREE(p);
 }
 
@@ -1801,247 +1801,6 @@ int minmatch(char *str, char *target, int min)
 	}
 
 	return ((min <= 0) ? 1 : 0);
-}
-
-/**
- * \fn char *safe_snprintf ( char *buff, size_t size, const char *format, ... )
- * \brief Safe version of snprintf which make sure the buffer is null terminated.
- *
- * \param buff Pointer to the destination buffer.
- * \param size Size of the buffer in bytes.
- * \param format Formatting string.
- * \param ... Variable parameter list.
- *
- * \return A pointer to the destination buffer.
- */
-
-char *safe_snprintf(char *buff, size_t size, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	vsnprintf(buff, size, format, ap);
-	va_end(ap);
-	buff[size - 1] = '\0';
-	return (buff);
-}
-
-/**
- * \fn char *safe_vsnprintf ( char *buff, size_t size, const char *format, va_list ap )
- * \brief Safe version of vsnprintf which make sure the buffer is null terminated.
- *
- * \param buff Pointer to the destination buffer.
- * \param size Size of the buffer in bytes.
- * \param format Formatting string.
- * \param ap A va_list with the parameters.
- *
- * \return A pointer to the destination buffer.
- */
-
-char *safe_vsnprintf(char *buff, size_t size, const char *format, va_list ap)
-{
-	vsnprintf(buff, size, format, ap);
-	buff[size - 1] = '\0';
-	return (buff);
-}
-
-/**
- * \fn char *safe_sprintf ( char *str, char **bp, const char *format, ... )
- * \brief Safe version of sprintf which always operate on a LBUF and make sure the buffer is null terminated.
- *
- * \param buff Pointer to the destination buffer.
- * \param bufp Pointer to where the result will be written into the buffer.
- * \param format Formatting string.
- * \param ... A Variable parameter list.
- *
- * \return A pointer to the destination buffer.
- */
-
-char *safe_sprintf(char *buff, char **bufp, const char *format, ...)
-{
-	int len, n;
-	va_list ap;
-	va_start(ap, format);
-	n = LBUF_SIZE - (*bufp - buff);
-
-	if (n <= 0)
-	{
-		**bufp = '\0';
-		return (buff);
-	}
-
-	vsnprintf(*bufp, n, format, ap);
-	va_end(ap);
-	len = strlen(*bufp);
-	n = ((len < n) ? len : n);
-	*bufp += n;
-	**bufp = '\0';
-	return (buff);
-}
-
-void safe_copy_chr(char src, char buff[], char **bufp, int max)
-{
-	char *tp;
-	tp = *bufp;
-
-	if ((tp - buff) < max)
-	{
-		*tp++ = src;
-		*bufp = tp;
-		*tp = '\0';
-	}
-	else
-	{
-		buff[max] = '\0';
-	}
-}
-
-/**
- * \fn int safe_strcat ( const char *src, char *buff, char **bufp, int max )
- * \brief Copy a string pointer into a new one, and update the position pointer to the end of the string.
- *
- * \param src Pointer to the string that will be copied.
- * \param buff Pointer to the buffer that will receive the string.
- * \param bufp Pointer to where the string will be copied to.
- * \param max Maximum length of the destination pointer.
- *
- * \return The number of characters that where not copied if the buffer isn't long enough to hold the result.
- */
-int safe_strcat(char *dest, char **destp, const char *src, size_t size)
-{
-	char *tp, *maxtp, *longtp;
-	int n, len;
-	tp = *destp;
-
-	if (src == NULL)
-	{
-		*tp = '\0';
-		return 0;
-	}
-
-	maxtp = dest + size;
-	longtp = tp + 7;
-	maxtp = (maxtp < longtp) ? maxtp : longtp;
-
-	while (*src && (tp < maxtp))
-	{
-		*tp++ = *src++;
-	}
-
-	if (*src == '\0')
-	{ /* copied whole src, and tp is at most maxtp */
-		*tp = '\0';
-		*destp = tp;
-		return 0;
-	}
-
-	len = strlen(src);
-	n = size - (tp - dest); /* tp is either maxtp or longtp */
-
-	if (n <= 0)
-	{
-		len -= (tp - *destp);
-		*tp = '\0';
-		*destp = tp;
-		return (len);
-	}
-
-	n = ((len < n) ? len : n);
-	memcpy(tp, src, n);
-	tp += n;
-	*tp = '\0';
-	*destp = tp;
-	return (len - n);
-}
-
-/**
- * \fn char *safe_strncat(char *dest, char **destp, char *src, size_t n)
- * \brief Concatenate two strings, using at most n bytes from src.
- *
- * \param dest Pointer to the destination buffer
- * \param destp Pointer to where the string will be append into the destination buffer.
- * \param src Pointer to the string that will be append.
- * \param n Number of characters that will be append.
- * \param size Size of the destination buffer.
- *
- * \return A pointer to the resulting string.
- */
-
-char *safe_strncat(char *dest, char **destp, const char *src, size_t n, size_t size)
-{
-	size_t sz;
-	char *tp, *maxtp;
-	tp = *destp;
-
-	if (!src)
-	{
-		*tp = '\0';
-		return (dest);
-	}
-
-	maxtp = dest + size - 1;
-
-	if (n > 7)
-	{
-		sz = maxtp - tp;
-
-		if (sz <= 0)
-		{
-			*tp = '\0';
-			return (dest);
-		}
-
-		sz = ((n < sz) ? n : sz);
-		memcpy(tp, src, sz);
-		tp += sz;
-		*tp = '\0';
-		*destp = tp;
-		return (dest);
-	}
-
-	if (tp + n < maxtp)
-	{
-		maxtp = tp + n;
-	}
-
-	while (*src && (tp < maxtp))
-	{
-		*(tp)++ = *src++;
-	}
-
-	*tp = '\0';
-	*destp = tp;
-	return (dest);
-}
-
-/**
- * \fn int *safe_strcatchr(char *dest, char **destp, char *src, size_t n)
- * \brief Add a character to a string.
- *
- * \param dest Pointer to the destination buffer
- * \param destp Pointer to where the string will be append into the destination buffer.
- * \param src Pointer to the string that will be append.
- * \param size Size of the destination buffer.
- *
- * \return 0 if the character was added, 1 if the string was already full.
- */
-
-int safe_strcatchr(char *dest, char **destp, char src, size_t size)
-{
-	char *tp;
-	tp = *destp;
-
-	if ((size_t)(tp - dest) < size)
-	{
-		*tp++ = src;
-		*destp = tp;
-		*tp = '\0';
-		return (0);
-	}
-	else
-	{
-		dest[size] = '\0';
-		return (1);
-	}
 }
 
 /**
@@ -2149,24 +1908,6 @@ char *ltos(long num)
 	*destp = '\0';
 	XFREE(buf);
 	return (dest);
-}
-
-/**
-* \fn void safe_ltos ( char *dest, char **destp, long num)
-* \brief Convert a long signed number into string. Safe version.
-*
-* \param dest Pointer to the receiving buffer.
-* \param destp Pointer to where the string will be written.
-* \param num Number to convert.
-* \param size Size of the receiving buffer.
-*/
-
-void safe_ltos(char *dest, char **destp, long num, size_t size)
-{
-	char *buff;
-	buff = ltos(num);
-	safe_strcat(dest, destp, buff, size);
-	XFREE(buff);
 }
 
 /**
@@ -2279,27 +2020,27 @@ void copy_esccode(char **s, char **t)
 
 void safe_copy_esccode(char **s, char *buff, char **bufc)
 {
-	safe_chr(**s, buff, bufc);
+	SAFE_LB_CHR(**s, buff, bufc);
 	++(*s);
 
 	if (**s == ANSI_CSI)
 	{
 		do
 		{
-			safe_chr(**s, buff, bufc);
+			SAFE_LB_CHR(**s, buff, bufc);
 			++(*s);
 		} while ((**s & 0xf0) == 0x30);
 	}
 
 	while ((**s & 0xf0) == 0x20)
 	{
-		safe_chr(**s, buff, bufc);
+		SAFE_LB_CHR(**s, buff, bufc);
 		++(*s);
 	}
 
 	if (**s)
 	{
-		safe_chr(**s, buff, bufc);
+		SAFE_LB_CHR(**s, buff, bufc);
 		++(*s);
 	}
 }

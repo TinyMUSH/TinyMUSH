@@ -324,7 +324,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         if (vsize < 0)
         {
-            XFREE(str);
+            free(str);
             return;
         }
 
@@ -360,8 +360,8 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
             }
         }
 
-        XFREE(str1);
-        XFREE(str);
+        free(str1);
+        free(str);
         
         end_log();
     }

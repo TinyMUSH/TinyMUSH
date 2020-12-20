@@ -571,7 +571,7 @@ skipcacheget:
         {
             data.dsize = strlen(data.dptr) + 1;
             cdata = XMALLOC(data.dsize, "cdata");
-            memcpy((void *)cdata, (void *)data.dptr, data.dsize);
+            XMEMCPY((void *)cdata, (void *)data.dptr, data.dsize);
             obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
             data.dptr = cdata;
             return data;
@@ -606,7 +606,7 @@ skipcacheget:
     }
 
     cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
-    memcpy(cp->keydata, key.dptr, key.dsize);
+    XMEMCPY(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
     cp->datalen = data.dsize;
@@ -720,7 +720,7 @@ int cache_put(DBData key, DBData data, unsigned int type)
                 pipe_set_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object, (char *)data.dptr);
 #ifdef MEMORY_BASED
                 cdata = XMALLOC(data.dsize, "cdata");
-                memcpy((void *)cdata, (void *)data.dptr, data.dsize);
+                XMEMCPY((void *)cdata, (void *)data.dptr, data.dsize);
                 obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
 #endif
                 /*
@@ -781,7 +781,7 @@ int cache_put(DBData key, DBData data, unsigned int type)
     }
 
     cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
-    memcpy(cp->keydata, key.dptr, key.dsize);
+    XMEMCPY(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->data = data.dptr;
     cp->datalen = data.dsize;
@@ -1083,7 +1083,7 @@ void cache_del(DBData key, unsigned int type)
     }
 
     cp->keydata = (void *)XMALLOC(key.dsize, "cp->keydata");
-    memcpy(cp->keydata, key.dptr, key.dsize);
+    XMEMCPY(cp->keydata, key.dptr, key.dsize);
     cp->keylen = key.dsize;
     cp->type = type;
     cp->flags = CACHE_DIRTY;

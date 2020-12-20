@@ -1944,7 +1944,7 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 	char *str, *tbuf;
 	int anum;
 	tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-	strcpy(tbuf, what);
+	XSTRCPY(tbuf, what);
 
 	if (parse_thing_slash(player, tbuf, &str, it))
 	{
@@ -1956,7 +1956,7 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 		if (anum == -1)
 		{
 			XFREE(tbuf);
-			safe_str("#-1 LOCK NOT FOUND", errmsg, bufc);
+			SAFE_LB_STR("#-1 LOCK NOT FOUND", errmsg, bufc);
 			return 0;
 		}
 	}
@@ -1970,7 +1970,7 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 		if (!Good_obj(*it))
 		{
 			XFREE(tbuf);
-			safe_str("#-1 NOT FOUND", errmsg, bufc);
+			SAFE_LB_STR("#-1 NOT FOUND", errmsg, bufc);
 			return 0;
 		}
 
@@ -1985,7 +1985,7 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 
 	if (!(*attr))
 	{
-		safe_str("#-1 LOCK NOT FOUND", errmsg, bufc);
+		SAFE_LB_STR("#-1 LOCK NOT FOUND", errmsg, bufc);
 		return 0;
 	}
 
@@ -2256,7 +2256,7 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 				{
 					if (lp != bb_p)
 					{
-						safe_chr(' ', list, &lp);
+						SAFE_LB_CHR(' ', list, &lp);
 					}
 
 					safe_dbref(list, &lp, obj);
@@ -2277,7 +2277,7 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 			{
 				if (lp != bb_p)
 				{
-					safe_chr(' ', list, &lp);
+					SAFE_LB_CHR(' ', list, &lp);
 				}
 
 				safe_dbref(list, &lp, obj);
@@ -2479,7 +2479,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				if ((aflags & AF_HTML) && Html(player))
 				{
 					char *buff_cp = buff + strlen(buff);
-					safe_crlf(buff, &buff_cp);
+					SAFE_CRLF(buff, &buff_cp);
 					notify_html(player, buff);
 				}
 				else
@@ -2645,7 +2645,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				if (num > 0)
 				{
 					buff = XMALLOC(SBUF_SIZE, "buff");
-					sprintf(buff, "%d", num - 1);
+					XSPRINTF(buff, "%d", num - 1);
 					atr_add_raw(thing, A_CHARGES, buff);
 					XFREE(buff);
 				}
@@ -3163,8 +3163,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 			}
 
 			tp = tbuf;
-			safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-			safe_chr('.', tbuf, &tp);
+			SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+			SAFE_LB_CHR('.', tbuf, &tp);
 			*tp = '\0';
 			len = strlen(tbuf);
 		}
@@ -3179,18 +3179,18 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 				{
 					total++;
 					bp = outbuf;
-					safe_sprintf(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : strchr(hptr->target.s, '.') + 1));
+					SAFE_SPRINTF(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : strchr(hptr->target.s, '.') + 1));
 					buff = unparse_object(player, *(hptr->data), 0);
-					safe_str(buff, outbuf, &bp);
+					SAFE_LB_STR(buff, outbuf, &bp);
 					XFREE(buff);
 
 					if (Owner(player) != Owner(*(hptr->data)))
 					{
-						safe_str((char *)" [owner: ", outbuf, &bp);
+						SAFE_LB_STR((char *)" [owner: ", outbuf, &bp);
 						buff = unparse_object(player, Owner(*(hptr->data)), 0);
-						safe_str(buff, outbuf, &bp);
+						SAFE_LB_STR(buff, outbuf, &bp);
 						XFREE(buff);
-						safe_chr(']', outbuf, &bp);
+						SAFE_LB_CHR(']', outbuf, &bp);
 					}
 
 					*bp = '\0';
@@ -3243,13 +3243,13 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	}
 	else
 	{
-		safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-		safe_chr('.', tbuf, &tp);
+		SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+		SAFE_LB_CHR('.', tbuf, &tp);
 	}
 
 	for (s = ref_name; *s; s++)
 	{
-		safe_chr(tolower(*s), tbuf, &tp);
+		SAFE_LB_CHR(tolower(*s), tbuf, &tp);
 	}
 
 	*tp = '\0';

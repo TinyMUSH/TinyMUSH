@@ -131,8 +131,8 @@ int set_register(const char *funcname, char *name, char *data)
             a_size = mudconf.max_global_regs;
             tmp_regs = XREALLOC(mudstate.rdata->q_regs, a_size * sizeof(char *), "tmp_regs");
             tmp_lens = XREALLOC(mudstate.rdata->q_lens, a_size * sizeof(int), "tmp_lens");
-            memset(&tmp_regs[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(char *));
-            memset(&tmp_lens[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(int));
+            XMEMSET(&tmp_regs[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(char *));
+            XMEMSET(&tmp_lens[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(int));
             mudstate.rdata->q_regs = tmp_regs;
             mudstate.rdata->q_lens = tmp_lens;
             mudstate.rdata->q_alloc = a_size;
@@ -148,7 +148,7 @@ int set_register(const char *funcname, char *name, char *data)
         }
 
         len = strlen(data);
-        memcpy(mudstate.rdata->q_regs[regnum], data, len + 1);
+        XMEMCPY(mudstate.rdata->q_regs[regnum], data, len + 1);
         mudstate.rdata->q_lens[regnum] = len;
         mudstate.rdata->dirty++;
         return len;
@@ -243,9 +243,9 @@ int set_register(const char *funcname, char *name, char *data)
         mudstate.rdata->x_lens = XCALLOC(a_size, sizeof(int), "mudstate.rdata->x_lens");
         mudstate.rdata->xr_alloc = a_size;
         mudstate.rdata->x_names[0] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[0]");
-        strcpy(mudstate.rdata->x_names[0], name);
+        XSTRCPY(mudstate.rdata->x_names[0], name);
         mudstate.rdata->x_regs[0] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[0]");
-        memcpy(mudstate.rdata->x_regs[0], data, len + 1);
+        XMEMCPY(mudstate.rdata->x_regs[0], data, len + 1);
         mudstate.rdata->x_lens[0] = len;
         mudstate.rdata->dirty++;
         return len;
@@ -259,7 +259,7 @@ int set_register(const char *funcname, char *name, char *data)
     {
         if (mudstate.rdata->x_names[i] && !strcmp(name, mudstate.rdata->x_names[i]))
         {
-            memcpy(mudstate.rdata->x_regs[i], data, len + 1);
+            XMEMCPY(mudstate.rdata->x_regs[i], data, len + 1);
             mudstate.rdata->x_lens[i] = len;
             mudstate.rdata->dirty++;
             return len;
@@ -275,12 +275,12 @@ int set_register(const char *funcname, char *name, char *data)
         if (mudstate.rdata->x_names[i] == NULL)
         {
             mudstate.rdata->x_names[i] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[i]");
-            strcpy(mudstate.rdata->x_names[i], name);
+            XSTRCPY(mudstate.rdata->x_names[i], name);
 
             if (!mudstate.rdata->x_regs[i]) /* should never happen */
                 mudstate.rdata->x_regs[i] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[i]");
 
-            memcpy(mudstate.rdata->x_regs[i], data, len + 1);
+            XMEMCPY(mudstate.rdata->x_regs[i], data, len + 1);
             mudstate.rdata->x_lens[i] = len;
             mudstate.rdata->dirty++;
             return len;
@@ -310,17 +310,17 @@ int set_register(const char *funcname, char *name, char *data)
     mudstate.rdata->x_regs = tmp_regs;
     tmp_lens = (int *)XREALLOC(mudstate.rdata->x_lens, a_size * sizeof(int), "tmp_lens");
     mudstate.rdata->x_lens = tmp_lens;
-    memset(&mudstate.rdata->x_names[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    memset(&mudstate.rdata->x_regs[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    memset(&mudstate.rdata->x_lens[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(int));
+    XMEMSET(&mudstate.rdata->x_names[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
+    XMEMSET(&mudstate.rdata->x_regs[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
+    XMEMSET(&mudstate.rdata->x_lens[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(int));
     mudstate.rdata->xr_alloc = a_size;
     /*
      * Now we know we can insert into the first empty.
      */
     mudstate.rdata->x_names[regnum] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[regnum]");
-    strcpy(mudstate.rdata->x_names[regnum], name);
+    XSTRCPY(mudstate.rdata->x_names[regnum], name);
     mudstate.rdata->x_regs[regnum] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[regnum]");
-    memcpy(mudstate.rdata->x_regs[regnum], data, len + 1);
+    XMEMCPY(mudstate.rdata->x_regs[regnum], data, len + 1);
     mudstate.rdata->x_lens[regnum] = len;
     mudstate.rdata->dirty++;
     return len;
@@ -389,13 +389,13 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (nfargs < 2)
     {
-        safe_sprintf(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
+        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
         return;
     }
 
     if (nfargs % 2 != 0)
     {
-        safe_sprintf(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d", nfargs);
+        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d", nfargs);
         return;
     }
 
@@ -407,7 +407,7 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	 * contain the remaining args. Cut them off at the
 	 * fourteenth.
 	 */
-        safe_sprintf(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs);
+        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs);
         return;
     }
 
@@ -417,11 +417,11 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
         if (result == -1)
         {
-            safe_str("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+            SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
         }
         else if (result == -2)
         {
-            safe_str("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
+            SAFE_LB_STR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
         }
 
         return;
@@ -441,7 +441,7 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (count > 0)
     {
-        safe_sprintf(buff, bufc, "#-1 ENCOUNTERED %d ERRORS", count);
+        SAFE_SPRINTF(buff, bufc, "#-1 ENCOUNTERED %d ERRORS", count);
     }
 }
 
@@ -452,15 +452,15 @@ void fun_setr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (result == -1)
     {
-        safe_str("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+        SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
     }
     else if (result == -2)
     {
-        safe_str("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
+        SAFE_LB_STR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
     }
     else if (result > 0)
     {
-        safe_strncat(buff, bufc, fargs[1], result, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, fargs[1], result, LBUF_SIZE);
     }
 }
 
@@ -475,13 +475,13 @@ void read_register(char *regname, char *buff, char **bufc)
 
         if ((regnum < 0) || (regnum >= mudconf.max_global_regs))
         {
-            safe_str("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+            SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
         }
         else
         {
             if (mudstate.rdata && (mudstate.rdata->q_alloc > regnum) && mudstate.rdata->q_regs[regnum])
             {
-                safe_strncat(buff, bufc, mudstate.rdata->q_regs[regnum], mudstate.rdata->q_lens[regnum], LBUF_SIZE);
+                SAFE_STRNCAT(buff, bufc, mudstate.rdata->q_regs[regnum], mudstate.rdata->q_lens[regnum], LBUF_SIZE);
             }
         }
 
@@ -504,7 +504,7 @@ void read_register(char *regname, char *buff, char **bufc)
         {
             if (mudstate.rdata->x_regs[regnum])
             {
-                safe_strncat(buff, bufc, mudstate.rdata->x_regs[regnum], mudstate.rdata->x_lens[regnum], LBUF_SIZE);
+                SAFE_STRNCAT(buff, bufc, mudstate.rdata->x_regs[regnum], mudstate.rdata->x_lens[regnum], LBUF_SIZE);
                 return;
             }
         }
@@ -544,7 +544,7 @@ void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 print_sep(&SPACE_DELIM, buff, bufc);
             }
 
-            safe_chr(qidx_str[i], buff, bufc);
+            SAFE_LB_CHR(qidx_str[i], buff, bufc);
         }
     }
 
@@ -557,7 +557,7 @@ void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                 print_sep(&SPACE_DELIM, buff, bufc);
             }
 
-            safe_str(g->x_names[i], buff, bufc);
+            SAFE_LB_STR(g->x_names[i], buff, bufc);
         }
     }
 }
@@ -575,11 +575,11 @@ void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (!wild(fargs[1], fargs[0], t_args, NUM_ENV_VARS))
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
     /*
      * Parse the list of registers. Anything that we don't get is assumed
      * to be -1. Fill them in.
@@ -626,7 +626,7 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     varlist = XMALLOC(LBUF_SIZE, "varlist");
-    strcpy(varlist, fargs[0]);
+    XSTRCPY(varlist, fargs[0]);
     nqregs = list2arr(&qreg_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
     if (nqregs == 0)
@@ -637,12 +637,12 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     elemlist = XMALLOC(LBUF_SIZE, "elemlist");
-    strcpy(elemlist, fargs[1]);
+    XSTRCPY(elemlist, fargs[1]);
     n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
     if (n_elems != nqregs)
     {
-        safe_str("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+        SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(varlist);
         XFREE(elemlist);
         XFREE(qreg_names);
@@ -704,7 +704,7 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     while (nextp && ((strp = split_token(&nextp, &bdelim)) != NULL))
     {
-        safe_str(strp, buff, bufc);
+        SAFE_LB_STR(strp, buff, bufc);
 
         if (nextp)
         {
@@ -777,7 +777,7 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (lmask == -1)
     {
-        safe_strncat(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
         return;
     }
 
@@ -836,13 +836,13 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (nfargs < 3)
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
 
     if (is_sandbox && (nfargs < 5))
     {
-        safe_strncat(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
 
@@ -856,7 +856,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         if (lmask == -1)
         {
-            safe_strncat(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
+            SAFE_STRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
             return;
         }
 
@@ -898,7 +898,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 * Pass in everything EXCEPT the named registers
 	 */
         call_list = XMALLOC(LBUF_SIZE, "call_list");
-        strcpy(call_list, callp + 3);
+        XSTRCPY(call_list, callp + 3);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
 
         for (i = 0; i < ncregs; i++)
@@ -916,7 +916,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         Free_RegData(mudstate.rdata);
         mudstate.rdata = NULL;
         call_list = XMALLOC(LBUF_SIZE, "call_list");
-        strcpy(call_list, callp);
+        XSTRCPY(call_list, callp);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
 
         for (i = 0; i < ncregs; i++)
@@ -1021,7 +1021,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             mudstate.rdata = tmp;      /* this is now the original
 					 * vals */
             call_list = XMALLOC(LBUF_SIZE, "call_list");
-            strcpy(call_list, callp + 4);
+            XSTRCPY(call_list, callp + 4);
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
 
             for (i = 0; i < ncregs; i++)
@@ -1050,7 +1050,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	     * so we can do a crude, unsorted search.
 	     */
             call_list = XMALLOC(LBUF_SIZE, "call_list");
-            strcpy(call_list, callp + 3);
+            XSTRCPY(call_list, callp + 3);
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
         }
 
@@ -1090,7 +1090,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 * Restore ONLY these named registers
 	 */
         call_list = XMALLOC(LBUF_SIZE, "call_list");
-        strcpy(call_list, callp);
+        XSTRCPY(call_list, callp);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
 
         for (i = 0; i < ncregs; i++)
@@ -1125,8 +1125,8 @@ void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
     HASHENT *hptr;
     int i, len;
     tp = tbuf;
-    safe_ltos(tbuf, &tp, obj, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     bb_p = *bufc;
@@ -1139,10 +1139,10 @@ void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
             {
                 if (*bufc != bb_p)
                 {
-                    safe_chr(' ', buff, bufc);
+                    SAFE_LB_CHR(' ', buff, bufc);
                 }
 
-                safe_str(strchr(hptr->target.s, '.') + 1, buff, bufc);
+                SAFE_LB_STR(strchr(hptr->target.s, '.') + 1, buff, bufc);
             }
         }
     }
@@ -1182,15 +1182,15 @@ void set_xvar(dbref obj, char *name, char *data)
      * truncating long names.
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, obj, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(name, tbuf, &tp);
+    SAFE_SB_STR(name, tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -1214,7 +1214,7 @@ void set_xvar(dbref obj, char *name, char *data)
                 return; /* out of memory */
             }
 
-            strcpy(xvar->text, data);
+            XSTRCPY(xvar->text, data);
         }
         else
         {
@@ -1252,7 +1252,7 @@ void set_xvar(dbref obj, char *name, char *data)
                 return; /* out of memory */
             }
 
-            strcpy(xvar->text, data);
+            XSTRCPY(xvar->text, data);
             hashadd(tbuf, (int *)xvar, &mudstate.vars_htab, 0);
             s_VarsCount(obj, VarsCount(obj) + 1);
             Set_Max(mudstate.max_vars, mudstate.vars_htab.entries);
@@ -1272,8 +1272,8 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
      * Build our dbref bit first.
      */
     tp = pre;
-    safe_ltos(pre, &tp, obj, LBUF_SIZE);
-    safe_sb_chr('.', pre, &tp);
+    SAFE_LTOS(pre, &tp, obj, LBUF_SIZE);
+    SAFE_SB_CHR('.', pre, &tp);
     *tp = '\0';
 
     /*
@@ -1288,8 +1288,8 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
         }
 
         tp = tbuf;
-        safe_sb_str(pre, tbuf, &tp);
-        safe_sb_str(xvar_names[i], tbuf, &tp);
+        SAFE_SB_STR(pre, tbuf, &tp);
+        SAFE_SB_STR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
         if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
@@ -1316,8 +1316,8 @@ void xvars_clr(dbref player)
     int i, len;
     VARENT *xvar;
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     htab = &mudstate.vars_htab;
@@ -1372,20 +1372,20 @@ void fun_x(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
      * Variable string is '<dbref number minus #>.<variable name>'
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], tbuf, &tp);
+    SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
 
     if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
     {
-        safe_str(xvar->text, buff, bufc);
+        SAFE_LB_STR(xvar->text, buff, bufc);
     }
 }
 
@@ -1397,7 +1397,7 @@ void fun_setx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_store(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     set_xvar(player, fargs[0], fargs[1]);
-    safe_str(fargs[1], buff, bufc);
+    SAFE_LB_STR(fargs[1], buff, bufc);
 }
 
 void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -1409,7 +1409,7 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     Delim isep;
     VaChk_Only_In(3);
     varlist = XMALLOC(LBUF_SIZE, "varlist");
-    strcpy(varlist, fargs[0]);
+    XSTRCPY(varlist, fargs[0]);
     n_xvars = list2arr(&xvar_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
     if (n_xvars == 0)
@@ -1431,12 +1431,12 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     elemlist = XMALLOC(LBUF_SIZE, "elemlist");
-    strcpy(elemlist, fargs[1]);
+    XSTRCPY(elemlist, fargs[1]);
     n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
     if (n_elems != n_xvars)
     {
-        safe_str("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
+        SAFE_LB_STR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(varlist);
         XFREE(elemlist);
         XFREE(xvar_names);
@@ -1501,15 +1501,15 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * way is cleaner.
      */
     tp = pre;
-    safe_ltos(pre, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', pre, &tp);
+    SAFE_LTOS(pre, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', pre, &tp);
     *tp = '\0';
 
     for (i = 0; i < n_xvars; i++)
     {
         tp = tbuf;
-        safe_sb_str(pre, tbuf, &tp);
-        safe_sb_str(xvar_names[i], tbuf, &tp);
+        SAFE_SB_STR(pre, tbuf, &tp);
+        SAFE_SB_STR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
         if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
@@ -1542,7 +1542,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
         if (n_elems != n_xvars)
         {
-            safe_str("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
+            SAFE_LB_STR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
             XFREE(varlist);
             XFREE(elemlist);
 
@@ -1689,7 +1689,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if ((osep.len > 1) || (osep.str[0] == '\0') || (osep.str[0] == '\r'))
     {
         notify_quiet(player, "You cannot use that output delimiter.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1700,7 +1700,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (StructCount(player) > mudconf.struct_lim)
     {
         notify_quiet(player, "Too many structures.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1711,7 +1711,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Structure name is too long.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1722,7 +1722,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strchr(fargs[0], '.'))
     {
         notify_quiet(player, "Structure names cannot contain periods.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1730,15 +1730,15 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * The hashtable is indexed by <dbref number>.<structure name>
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], tbuf, &tp);
+    SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -1748,7 +1748,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (hashfind(tbuf, &mudstate.structs_htab))
     {
         notify_quiet(player, "Structure is already defined.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -1763,7 +1763,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (n_comps < 1)
     {
         notify_quiet(player, "There must be at least one component.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         XFREE(comp_names);
         XFREE(comp_array);
         return;
@@ -1779,7 +1779,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         if (strlen(comp_array[i]) > (SBUF_SIZE / 2) - 9)
         {
             notify_quiet(player, "Component name is too long.");
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(comp_array);
             return;
@@ -1787,7 +1787,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
 
     type_names = XMALLOC(LBUF_SIZE, "type_names");
-    strcpy(type_names, fargs[2]);
+    XSTRCPY(type_names, fargs[2]);
     n_types = list2arr(&type_array, LBUF_SIZE / 2, type_names, &SPACE_DELIM);
 
     /*
@@ -1818,7 +1818,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
         default:
             notify_quiet(player, "Invalid data type specified.");
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(comp_array);
             XFREE(type_names);
@@ -1841,7 +1841,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if ((n_comps != n_types) || (n_defs && (n_comps != n_defs)))
     {
         notify_quiet(player, "List sizes must be identical.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         XFREE(comp_names);
         XFREE(comp_array);
         XFREE(type_names);
@@ -1875,7 +1875,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Now that we're done with the base name, we can stick the joining
      * period on the end.
      */
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -1885,14 +1885,14 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     for (i = 0; i < n_comps; i++)
     {
         cp = cbuf;
-        safe_sb_str(tbuf, cbuf, &cp);
+        SAFE_SB_STR(tbuf, cbuf, &cp);
 
         for (p = comp_array[i]; *p; p++)
         {
             *p = tolower(*p);
         }
 
-        safe_sb_str(comp_array[i], cbuf, &cp);
+        SAFE_SB_STR(comp_array[i], cbuf, &cp);
         *cp = '\0';
         this_comp = (COMPONENT *)XMALLOC(sizeof(COMPONENT), "this_comp");
         this_comp->def_val = (default_vals ? def_array[i] : NULL);
@@ -1956,7 +1956,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
 
     s_StructCount(player, StructCount(player) + 1);
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
 }
 
 void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -1982,7 +1982,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (nfargs == 3)
     {
-        safe_sprintf(buff, bufc, "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d", nfargs);
+        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d", nfargs);
         return;
     }
 
@@ -1993,7 +1993,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (InstanceCount(player) > mudconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2004,7 +2004,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Instance name is too long.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2012,21 +2012,21 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Make sure this instance doesn't exist.
      */
     ip = ibuf;
-    safe_ltos(ibuf, &ip, player, LBUF_SIZE);
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], ibuf, &ip);
+    SAFE_SB_STR(fargs[0], ibuf, &ip);
     *ip = '\0';
 
     if (hashfind(ibuf, &mudstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2034,22 +2034,22 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Look up the structure.
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[1]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[1], tbuf, &tp);
+    SAFE_SB_STR(fargs[1], tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2058,22 +2058,22 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * have been given defaults. Also, make sure that the defaults are of
      * the appropriate type.
      */
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
 
     if (fargs[2] && *fargs[2] && fargs[3] && *fargs[3])
     {
         comp_names = XMALLOC(LBUF_SIZE, "comp_names");
-        strcpy(comp_names, fargs[2]);
+        XSTRCPY(comp_names, fargs[2]);
         n_comps = list2arr(&comp_array, LBUF_SIZE / 2, comp_names, &SPACE_DELIM);
         init_vals = XMALLOC(LBUF_SIZE, "init_vals");
-        strcpy(init_vals, fargs[3]);
+        XSTRCPY(init_vals, fargs[3]);
         n_vals = list2arr(&vals_array, LBUF_SIZE / 2, init_vals, &isep);
 
         if (n_comps != n_vals)
         {
             notify_quiet(player, "List sizes must be identical.");
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(init_vals);
             XFREE(comp_array);
@@ -2084,20 +2084,20 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         for (i = 0; i < n_comps; i++)
         {
             cp = cbuf;
-            safe_sb_str(tbuf, cbuf, &cp);
+            SAFE_SB_STR(tbuf, cbuf, &cp);
 
             for (p = comp_array[i]; *p; p++)
             {
                 *p = tolower(*p);
             }
 
-            safe_sb_str(comp_array[i], cbuf, &cp);
+            SAFE_SB_STR(comp_array[i], cbuf, &cp);
             c_ptr = (COMPONENT *)hashfind(cbuf, &mudstate.cdefs_htab);
 
             if (!c_ptr)
             {
                 notify_quiet(player, "Invalid component name.");
-                safe_chr('0', buff, bufc);
+                SAFE_LB_CHR('0', buff, bufc);
                 XFREE(comp_names);
                 XFREE(init_vals);
                 XFREE(comp_array);
@@ -2112,7 +2112,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 if (!retval)
                 {
                     notify_quiet(player, "Default value is of invalid type.");
-                    safe_chr('0', buff, bufc);
+                    SAFE_LB_CHR('0', buff, bufc);
                     XFREE(comp_names);
                     XFREE(init_vals);
                     XFREE(comp_array);
@@ -2134,7 +2134,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     else
     {
         notify_quiet(player, "List sizes must be identical.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2165,9 +2165,9 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
 
         tp = tbuf;
-        safe_sb_str(ibuf, tbuf, &tp);
-        safe_sb_chr('.', tbuf, &tp);
-        safe_sb_str(this_struct->c_names[i], tbuf, &tp);
+        SAFE_SB_STR(ibuf, tbuf, &tp);
+        SAFE_SB_CHR('.', tbuf, &tp);
+        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
         Set_Max(mudstate.max_instdata, mudstate.instdata_htab.entries);
@@ -2180,9 +2180,9 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     for (i = 0; i < n_comps; i++)
     {
         tp = tbuf;
-        safe_sb_str(ibuf, tbuf, &tp);
-        safe_sb_chr('.', tbuf, &tp);
-        safe_sb_str(comp_array[i], tbuf, &tp);
+        SAFE_SB_STR(ibuf, tbuf, &tp);
+        SAFE_SB_CHR('.', tbuf, &tp);
+        SAFE_SB_STR(comp_array[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
 
@@ -2216,7 +2216,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     this_struct->n_instances += 1;
     s_InstanceCount(player, InstanceCount(player) + 1);
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
 }
 
 void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char *str_name, char *raw_text, char sep, int use_def_delim)
@@ -2240,7 +2240,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     if (InstanceCount(player) > mudconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2251,7 +2251,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     if (strlen(inst_name) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Instance name is too long.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2259,21 +2259,21 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      * Make sure this instance doesn't exist.
      */
     ip = ibuf;
-    safe_ltos(ibuf, &ip, player, LBUF_SIZE);
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(inst_name, ibuf, &ip);
+    SAFE_SB_STR(inst_name, ibuf, &ip);
     *ip = '\0';
 
     if (hashfind(ibuf, &mudstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2281,22 +2281,22 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      * Look up the structure.
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = str_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(str_name, tbuf, &tp);
+    SAFE_SB_STR(str_name, tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2315,13 +2315,13 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     }
 
     val_list = XMALLOC(LBUF_SIZE, "val_list");
-    strcpy(val_list, raw_text);
+    XSTRCPY(val_list, raw_text);
     n_vals = list2arr(&val_array, LBUF_SIZE / 2, val_list, &isep);
 
     if (n_vals != this_struct->c_count)
     {
         notify_quiet(player, "Incorrect number of components.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         XFREE(val_list);
         XFREE(val_array);
         return;
@@ -2336,7 +2336,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         if (this_struct->c_array[i]->typer_func && !((*(this_struct->c_array[i]->typer_func))(val_array[i])))
         {
             notify_quiet(player, "Value is of invalid type.");
-            safe_chr('0', buff, bufc);
+            SAFE_LB_CHR('0', buff, bufc);
             XFREE(val_list);
             XFREE(val_array);
             return;
@@ -2368,9 +2368,9 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         }
 
         tp = tbuf;
-        safe_sb_str(ibuf, tbuf, &tp);
-        safe_sb_chr('.', tbuf, &tp);
-        safe_sb_str(this_struct->c_names[i], tbuf, &tp);
+        SAFE_SB_STR(ibuf, tbuf, &tp);
+        SAFE_SB_CHR('.', tbuf, &tp);
+        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
         Set_Max(mudstate.max_instdata, mudstate.instdata_htab.entries);
@@ -2380,7 +2380,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     XFREE(val_array);
     this_struct->n_instances += 1;
     s_InstanceCount(player, InstanceCount(player) + 1);
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
 }
 
 void fun_load(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2398,7 +2398,7 @@ void fun_read(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
     {
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2432,7 +2432,7 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
     {
-        safe_noperm(buff, bufc);
+        SAFE_NOPERM(buff, bufc);
         return;
     }
 
@@ -2441,16 +2441,16 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (nitems)
     {
-        over = safe_str(ptrs[0], buff, bufc);
+        over = SAFE_LB_STR(ptrs[0], buff, bufc);
     }
 
     for (i = 1; !over && (i < nitems); i++)
     {
-        over = safe_str(fargs[1], buff, bufc);
+        over = SAFE_LB_STR(fargs[1], buff, bufc);
 
         if (!over)
         {
-            over = safe_str(ptrs[i], buff, bufc);
+            over = SAFE_LB_STR(ptrs[i], buff, bufc);
         }
     }
 
@@ -2464,23 +2464,23 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
     char *p;
     STRUCTDATA *s_ptr;
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], tbuf, &tp);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_SB_STR(fargs[0], tbuf, &tp);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[1]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[1], tbuf, &tp);
+    SAFE_SB_STR(fargs[1], tbuf, &tp);
     *tp = '\0';
     s_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
 
@@ -2489,7 +2489,7 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
         return;
     }
 
-    safe_str(s_ptr->text, buff, bufc);
+    SAFE_LB_STR(s_ptr->text, buff, bufc);
 }
 
 void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2508,15 +2508,15 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Find the instance first, since this is how we get our typechecker.
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], tbuf, &tp);
+    SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
     endp = tp; /* save where we are */
     inst_ptr = (INSTANCE *)hashfind(tbuf, &mudstate.instance_htab);
@@ -2524,7 +2524,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if (!inst_ptr)
     {
         notify_quiet(player, "No such instance.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2543,17 +2543,17 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         if (inst_ptr->datatype->need_typecheck)
         {
             cp = cbuf;
-            safe_ltos(cbuf, &cp, player, LBUF_SIZE);
-            safe_sb_chr('.', cbuf, &cp);
-            safe_sb_str(inst_ptr->datatype->s_name, cbuf, &cp);
-            safe_sb_chr('.', cbuf, &cp);
+            SAFE_LTOS(cbuf, &cp, player, LBUF_SIZE);
+            SAFE_SB_CHR('.', cbuf, &cp);
+            SAFE_SB_STR(inst_ptr->datatype->s_name, cbuf, &cp);
+            SAFE_SB_CHR('.', cbuf, &cp);
 
             for (p = words[i]; *p; p++)
             {
                 *p = tolower(*p);
             }
 
-            safe_sb_str(words[i], cbuf, &cp);
+            SAFE_SB_STR(words[i], cbuf, &cp);
             *cp = '\0';
             c_ptr = (COMPONENT *)hashfind(cbuf, &mudstate.cdefs_htab);
 
@@ -2579,8 +2579,8 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	 * Now go set it.
 	 */
         tp = endp;
-        safe_sb_chr('.', tbuf, &tp);
-        safe_sb_str(words[i], tbuf, &tp);
+        SAFE_SB_CHR('.', tbuf, &tp);
+        SAFE_SB_STR(words[i], tbuf, &tp);
         *tp = '\0';
         s_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
 
@@ -2609,7 +2609,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     XFREE(words);
     XFREE(vals);
-    safe_ltos(buff, bufc, n_mod, LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, n_mod, LBUF_SIZE);
 }
 
 void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, char sep, int use_def_delim)
@@ -2625,15 +2625,15 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
      * Get the instance.
      */
     ip = ibuf;
-    safe_ltos(ibuf, &ip, player, LBUF_SIZE);
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(inst_name, ibuf, &ip);
+    SAFE_SB_STR(inst_name, ibuf, &ip);
     *ip = '\0';
     inst_ptr = (INSTANCE *)hashfind(ibuf, &mudstate.instance_htab);
 
@@ -2647,7 +2647,7 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
      * have the information we need to figure out what components are
      * associated with this, and print them appropriately.
      */
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_SB_CHR('.', ibuf, &ip);
     *ip = '\0';
     this_struct = inst_ptr->datatype;
 
@@ -2663,18 +2663,18 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
     {
         if (i != 0)
         {
-            safe_chr(sep, buff, bufc);
+            SAFE_LB_CHR(sep, buff, bufc);
         }
 
         tp = tbuf;
-        safe_sb_str(ibuf, tbuf, &tp);
-        safe_sb_str(this_struct->c_names[i], tbuf, &tp);
+        SAFE_SB_STR(ibuf, tbuf, &tp);
+        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
 
         if (d_ptr && d_ptr->text)
         {
-            safe_str(d_ptr->text, buff, bufc);
+            SAFE_LB_STR(d_ptr->text, buff, bufc);
         }
     }
 }
@@ -2695,7 +2695,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (!parse_thing_slash(player, fargs[0], &str, &it))
     {
-        safe_nomatch(buff, bufc);
+        SAFE_NOMATCH(buff, bufc);
         return;
     }
 
@@ -2709,7 +2709,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         if (atrnum <= 0)
         {
-            safe_str("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
+            SAFE_LB_STR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
             return;
         }
 
@@ -2718,7 +2718,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         if (!attr || !Set_attr(player, it, attr, aflags) || (attr->check != NULL))
         {
-            safe_noperm(buff, bufc);
+            SAFE_NOPERM(buff, bufc);
         }
         else
         {
@@ -2740,22 +2740,22 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Get the instance.
      */
     ip = ibuf;
-    safe_ltos(ibuf, &ip, player, LBUF_SIZE);
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], ibuf, &ip);
+    SAFE_SB_STR(fargs[0], ibuf, &ip);
     *ip = '\0';
     inst_ptr = (INSTANCE *)hashfind(ibuf, &mudstate.instance_htab);
 
     if (!inst_ptr)
     {
         notify_quiet(player, "No such instance.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2766,14 +2766,14 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     this_struct = inst_ptr->datatype;
     XFREE(inst_ptr);
     hashdelete(ibuf, &mudstate.instance_htab);
-    safe_sb_chr('.', ibuf, &ip);
+    SAFE_SB_CHR('.', ibuf, &ip);
     *ip = '\0';
 
     for (i = 0; i < this_struct->c_count; i++)
     {
         tp = tbuf;
-        safe_sb_str(ibuf, tbuf, &tp);
-        safe_sb_str(this_struct->c_names[i], tbuf, &tp);
+        SAFE_SB_STR(ibuf, tbuf, &tp);
+        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
 
@@ -2791,7 +2791,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     this_struct->n_instances -= 1;
     s_InstanceCount(player, InstanceCount(player) - 1);
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
 }
 
 void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2805,22 +2805,22 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
      * Find the structure
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, player, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    safe_sb_str(fargs[0], tbuf, &tp);
+    SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2831,7 +2831,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     if (this_struct->n_instances > 0)
     {
         notify_quiet(player, "This structure is in use.");
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
@@ -2842,14 +2842,14 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     /*
      * Wipe out every component definition.
      */
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
 
     for (i = 0; i < this_struct->c_count; i++)
     {
         cp = cbuf;
-        safe_sb_str(tbuf, cbuf, &cp);
-        safe_sb_str(this_struct->c_names[i], cbuf, &cp);
+        SAFE_SB_STR(tbuf, cbuf, &cp);
+        SAFE_SB_STR(this_struct->c_names[i], cbuf, &cp);
         *cp = '\0';
 
         if (this_struct->c_array[i])
@@ -2878,7 +2878,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     XFREE(this_struct->c_names);
     XFREE(this_struct);
     s_StructCount(player, StructCount(player) - 1);
-    safe_chr('1', buff, bufc);
+    SAFE_LB_CHR('1', buff, bufc);
 }
 
 void fun_lstructures(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2911,8 +2911,8 @@ void structure_clr(dbref thing)
      * The instance table is indexed as <dbref number>.<instance name>
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, thing, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     /*
@@ -2953,15 +2953,15 @@ void structure_clr(dbref thing)
             XFREE(inst_array[i]);
             hashdelete(name_array[i], &mudstate.instance_htab);
             ip = ibuf;
-            safe_sb_str(name_array[i], ibuf, &ip);
-            safe_sb_chr('.', ibuf, &ip);
+            SAFE_SB_STR(name_array[i], ibuf, &ip);
+            SAFE_SB_CHR('.', ibuf, &ip);
             *ip = '\0';
 
             for (j = 0; j < this_struct->c_count; j++)
             {
                 cp = cbuf;
-                safe_sb_str(ibuf, cbuf, &cp);
-                safe_sb_str(this_struct->c_names[j], cbuf, &cp);
+                SAFE_SB_STR(ibuf, cbuf, &cp);
+                SAFE_SB_STR(this_struct->c_names[j], cbuf, &cp);
                 *cp = '\0';
                 d_ptr = (STRUCTDATA *)hashfind(cbuf, &mudstate.instdata_htab);
 
@@ -2985,8 +2985,8 @@ void structure_clr(dbref thing)
      * The structure table is indexed as <dbref number>.<struct name>
      */
     tp = tbuf;
-    safe_ltos(tbuf, &tp, thing, LBUF_SIZE);
-    safe_sb_chr('.', tbuf, &tp);
+    SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
+    SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     /*
@@ -3029,15 +3029,15 @@ void structure_clr(dbref thing)
 
             hashdelete(name_array[i], &mudstate.structs_htab);
             ip = ibuf;
-            safe_sb_str(name_array[i], ibuf, &ip);
-            safe_sb_chr('.', ibuf, &ip);
+            SAFE_SB_STR(name_array[i], ibuf, &ip);
+            SAFE_SB_CHR('.', ibuf, &ip);
             *ip = '\0';
 
             for (j = 0; j < struct_array[i]->c_count; j++)
             {
                 cp = cbuf;
-                safe_sb_str(ibuf, cbuf, &cp);
-                safe_sb_str(struct_array[i]->c_names[j], cbuf, &cp);
+                SAFE_SB_STR(ibuf, cbuf, &cp);
+                SAFE_SB_STR(struct_array[i]->c_names[j], cbuf, &cp);
                 *cp = '\0';
 
                 if (struct_array[i]->c_array[j])
@@ -3175,7 +3175,7 @@ void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         stack_object(player, it);
     }
 
-    safe_ltos(buff, bufc, StackCount(it), LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, StackCount(it), LBUF_SIZE);
 }
 
 void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -3224,7 +3224,7 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    strcpy(sp->data, data);
+    XSTRCPY(sp->data, data);
 
     if (stack_set(it, sp))
     {
@@ -3290,7 +3290,7 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         return;
     }
 
-    strcpy(sp->data, tp->data);
+    XSTRCPY(sp->data, tp->data);
 
     if (stack_set(it, sp))
     {
@@ -3381,7 +3381,7 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     if (!toss_flag)
     {
-        safe_str(sp->data, buff, bufc);
+        SAFE_LB_STR(sp->data, buff, bufc);
     }
 
     if (!peek_flag)
@@ -3455,7 +3455,7 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 print_sep(&osep, buff, bufc);
             }
 
-            over = safe_str(tp->data, buff, bufc);
+            over = SAFE_LB_STR(tp->data, buff, bufc);
         }
 
         xp = tp;
@@ -3507,7 +3507,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
             print_sep(&osep, buff, bufc);
         }
 
-        over = safe_str(sp->data, buff, bufc);
+        over = SAFE_LB_STR(sp->data, buff, bufc);
     }
 }
 
@@ -3577,7 +3577,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
             XFREE(study);
         }
 
-        safe_str(fargs[0], buff, bufc);
+        SAFE_LB_STR(fargs[0], buff, bufc);
         return;
     }
 
@@ -3597,7 +3597,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
 	 */
         tmp = fargs[0][offsets[0]];
         fargs[0][offsets[0]] = '\0';
-        safe_str(start, buff, bufc);
+        SAFE_LB_STR(start, buff, bufc);
         fargs[0][offsets[0]] = tmp;
 
         /*
@@ -3612,7 +3612,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
 
             if (*r != '$')
             {
-                safe_chr(*r, buff, bufc);
+                SAFE_LB_CHR(*r, buff, bufc);
                 continue;
             }
 
@@ -3631,11 +3631,11 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
                 /*
 		 * Not a valid number.
 		 */
-                safe_chr('$', buff, bufc);
+                SAFE_LB_CHR('$', buff, bufc);
 
                 if (have_brace)
                 {
-                    safe_chr('{', buff, bufc);
+                    SAFE_LB_CHR('{', buff, bufc);
                 }
 
                 r--;
@@ -3651,7 +3651,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
 
             if (pcre_copy_substring(fargs[0], offsets, subpatterns, offset, tbuf, LBUF_SIZE) >= 0)
             {
-                safe_str(tbuf, buff, bufc);
+                SAFE_LB_STR(tbuf, buff, bufc);
             }
         }
 
@@ -3670,7 +3670,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
     /*
      * Copy everything after the matched bit.
      */
-    safe_str(start, buff, bufc);
+    SAFE_LB_STR(start, buff, bufc);
     XFREE(re);
 
     if (study)
@@ -3847,7 +3847,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
                 print_sep(&osep, buff, bufc);
             }
 
-            safe_str(r, buff, bufc);
+            SAFE_LB_STR(r, buff, bufc);
 
             if (!all_option)
             {
@@ -3903,12 +3903,12 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref
 	 * message.
 	 */
         notify_quiet(player, errptr);
-        safe_chr('0', buff, bufc);
+        SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
     subpatterns = pcre_exec(re, NULL, fargs[0], strlen(fargs[0]), 0, 0, offsets, PCRE_MAX_OFFSETS);
-    safe_bool(buff, bufc, (subpatterns >= 0));
+    SAFE_BOOL(buff, bufc, (subpatterns >= 0));
 
     /*
      * If we had too many subpatterns for the offsets vector, set the
@@ -4167,12 +4167,12 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!Good_obj(it))
     {
-        safe_nomatch(buff, bufc);
+        SAFE_NOMATCH(buff, bufc);
         return;
     }
     else if (!(Examinable(player, it)))
     {
-        safe_noperm(buff, bufc);
+        SAFE_NOPERM(buff, bufc);
         return;
     }
 
@@ -4182,13 +4182,13 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!fargs[1] || !*fargs[1])
     {
-        safe_str("#-1 NO SUCH ATTRIBUTE", buff, bufc);
+        SAFE_LB_STR("#-1 NO SUCH ATTRIBUTE", buff, bufc);
         return;
     }
 
     if (!fargs[2] || !*fargs[2])
     {
-        safe_str("#-1 INVALID GREP PATTERN", buff, bufc);
+        SAFE_LB_STR("#-1 INVALID GREP PATTERN", buff, bufc);
         return;
     }
 
@@ -4232,7 +4232,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     bb_p = *bufc;
     patc = patbuf = XMALLOC(LBUF_SIZE, "patbuf");
-    safe_sprintf(patbuf, &patc, "#%d/%s", it, fargs[1]);
+    SAFE_SPRINTF(patbuf, &patc, "#%d/%s", it, fargs[1]);
     olist_push();
 
     if (parse_attrib_wild(player, patbuf, &thing, 0, 0, 1, 1))
@@ -4256,7 +4256,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     print_sep(&osep, buff, bufc);
                 }
 
-                safe_str((char *)(atr_num(ca))->name, buff, bufc);
+                SAFE_LB_STR((char *)(atr_num(ca))->name, buff, bufc);
             }
 
             XFREE(attrib);
@@ -4319,7 +4319,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
           ((gr) >= (gp)->rows) || ((gc) >= (gp)->cols) || \
           ((gp)->data[(gr)][(gc)] == NULL)))              \
     {                                                     \
-        safe_str((gp)->data[(gr)][(gc)], buff, bufc);     \
+        SAFE_LB_STR((gp)->data[(gr)][(gc)], buff, bufc);     \
     }
 
 void grid_free(dbref thing, OBJGRID *ogp)
@@ -4362,7 +4362,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if ((dimension > mudconf.max_grid_size) || (dimension < 0))
     {
-        safe_str("#-1 INVALID GRID SIZE", buff, bufc);
+        SAFE_LB_STR("#-1 INVALID GRID SIZE", buff, bufc);
         return;
     }
 
@@ -4400,7 +4400,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         log_write(LOG_BUGS, "GRD", "MAKE", "%s Failure");
         XFREE(pname);
         grid_free(player, ogp);
-        safe_str("#-1 FAILURE", buff, bufc);
+        SAFE_LB_STR("#-1 FAILURE", buff, bufc);
         return;
     }
 
@@ -4414,12 +4414,12 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
 
     rbuf = XMALLOC(LBUF_SIZE, "rbuf");
-    strcpy(rbuf, fargs[2]);
+    XSTRCPY(rbuf, fargs[2]);
     data_rows = list2arr(&row_text, LBUF_SIZE / 2, rbuf, &rsep);
 
     if (data_rows > rows)
     {
-        safe_str("#-1 TOO MANY DATA ROWS", buff, bufc);
+        SAFE_LB_STR("#-1 TOO MANY DATA ROWS", buff, bufc);
         XFREE(rbuf);
         grid_free(player, ogp);
         return;
@@ -4433,7 +4433,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         if (data_elems > cols)
         {
-            safe_sprintf(buff, bufc, "#-1 ROW %d HAS TOO MANY ELEMS", r);
+            SAFE_SPRINTF(buff, bufc, "#-1 ROW %d HAS TOO MANY ELEMS", r);
             XFREE(rbuf);
             grid_free(player, ogp);
             return;
@@ -4455,11 +4455,11 @@ void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!ogp)
     {
-        safe_str("0 0", buff, bufc);
+        SAFE_LB_STR("0 0", buff, bufc);
     }
     else
     {
-        safe_sprintf(buff, bufc, "%d %d", ogp->rows, ogp->cols);
+        SAFE_SPRINTF(buff, bufc, "%d %d", ogp->rows, ogp->cols);
     }
 }
 
@@ -4475,7 +4475,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (!ogp)
     {
-        safe_str("#-1 NO GRID", buff, bufc);
+        SAFE_LB_STR("#-1 NO GRID", buff, bufc);
         return;
     }
 
@@ -4492,7 +4492,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
         if (errs)
         {
-            safe_sprintf(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
+            SAFE_SPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
         }
 
         return;
@@ -4505,7 +4505,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if (fargs[0] && *fargs[0])
     {
         ylist = XMALLOC(LBUF_SIZE, "ylist");
-        strcpy(ylist, fargs[0]);
+        XSTRCPY(ylist, fargs[0]);
         n_y = list2arr(&y_elems, LBUF_SIZE / 2, ylist, &isep);
 
         if ((n_y == 1) && !*y_elems[0])
@@ -4522,7 +4522,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     if (fargs[1] && *fargs[1])
     {
         xlist = XMALLOC(LBUF_SIZE, "xlist");
-        strcpy(xlist, fargs[1]);
+        XSTRCPY(xlist, fargs[1]);
         n_x = list2arr(&x_elems, LBUF_SIZE / 2, xlist, &isep);
 
         if ((n_x == 1) && !*x_elems[0])
@@ -4602,7 +4602,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (errs)
     {
-        safe_sprintf(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
+        SAFE_SPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
     }
 }
 
@@ -4620,7 +4620,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (!ogp)
     {
-        safe_str("#-1 NO GRID", buff, bufc);
+        SAFE_LB_STR("#-1 NO GRID", buff, bufc);
         return;
     }
 
@@ -4647,7 +4647,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     else
     {
         ylist = XMALLOC(LBUF_SIZE, "ylist");
-        strcpy(ylist, fargs[0]);
+        XSTRCPY(ylist, fargs[0]);
         n_y = list2arr(&y_elems, LBUF_SIZE / 2, ylist, &SPACE_DELIM);
 
         if ((n_y == 1) && !*y_elems[0])
@@ -4664,7 +4664,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     else
     {
         xlist = XMALLOC(LBUF_SIZE, "xlist");
-        strcpy(xlist, fargs[1]);
+        XSTRCPY(xlist, fargs[1]);
         n_x = list2arr(&x_elems, LBUF_SIZE / 2, xlist, &SPACE_DELIM);
 
         if ((n_x == 1) && !*x_elems[0])

@@ -8,14 +8,13 @@
  * @copyright Copyright (C) 1989-2020 TinyMUSH development team.
  * 
  */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
 
 #include "typedefs.h"  /* required by mushconf */
 #include "game.h"	   /* required by mushconf */
-#include "alloc.h"	   /* required by mushconf */
+#include "alloc.h"	   /* required by code */
 #include "flags.h"	   /* required by mushconf */
 #include "htab.h"	   /* required by mushconf */
 #include "ltdl.h"	   /* required by mushconf */
@@ -25,6 +24,9 @@
 #include "db.h"		   /* required by externs.h */
 #include "interface.h" /* required by code */
 #include "externs.h"   /* required by code */
+
+// Utilities
+#define XLOGALLOC(x,y,z,s,...) if(mudconf.malloc_logger){log_write(x,y,z,s,##__VA_ARGS__);}
 
 void list_bufstats(dbref player)
 {
@@ -36,7 +38,7 @@ void list_buftrace(dbref player)
 	notify(player, "This feature has been removed.");
 }
 
-/**
+/******************************************************************************
  * Allocation functions
  */
 
@@ -70,7 +72,7 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 
 			//mtrk = (MEMTRACK *)calloc(size + sizeof(MEMTRACK) + sizeof(uint64_t), sizeof(char));
 			mtrk = (MEMTRACK *)malloc(size + sizeof(MEMTRACK) + sizeof(uint64_t));
-			memset(mtrk,0,size + sizeof(MEMTRACK) + sizeof(uint64_t));
+			memset(mtrk, 0, size + sizeof(MEMTRACK) + sizeof(uint64_t));
 
 			if (mtrk)
 			{
@@ -183,7 +185,7 @@ void *__xrealloc(void *ptr, size_t size, const char *file, int line, const char 
 				{
 					memmove(nptr, ptr, size);
 				}
-			__xfree(ptr);
+				__xfree(ptr);
 			}
 			ptr = nptr;
 		}
@@ -444,6 +446,7 @@ int __xvsprintf(char *str, const char *format, va_list ap)
 
 		if (size > 0)
 		{
+			size++;
 			va_copy(vp, ap);
 			MEMTRACK *mtrk = __xfind(str);
 			if (mtrk)
@@ -531,6 +534,39 @@ int __xvsnprintf(char *str, size_t size, const char *format, va_list ap)
 	}
 
 	return size;
+}
+
+/**
+ * @brief Tracked sprintfcat
+ * 
+ * Like sprintf, but append to the buffer and make sure it does not overflow
+ * if the buffer is tracked.
+ * 
+ * @param str     Buffer where to write the resulting string.
+ * @param format  Format string.
+ * @param ...     Variables argument list for the format string.
+ * @return int    Number of byte written to the buffer.
+ */
+int __xsprintfcat(char *str, const char *format, ...)
+{
+	int size = 0;
+	va_list ap;
+
+	va_start(ap, format);
+	size = __xvsprintf(str + strlen(str), format, ap);
+	va_end(ap);
+
+	return size;
+}
+
+char *__xsafesprintf(char *buff, char **bufp, const char *format, ...)
+{
+	va_list ap;
+
+	va_start(ap, format);
+	*bufp += XVSPRINTF(*bufp, format, ap);
+	va_end(ap);
+	return (buff);
 }
 
 /**
@@ -701,6 +737,75 @@ char *__xstrncat(char *dest, const char *src, size_t n)
 		else
 		{
 			ptr = strncat(dest, src, n);
+		}
+	}
+	return ptr;
+}
+
+/**
+ * @brief Tracked strccat.
+ * 
+ * Append the character src to string dest, returning a pointer to dest. For
+ * tracked allocation, make sure that the destination buffer does not overrun.
+ * 
+ * @param dest Pointer to destination buffer.
+ * @param src Source character.
+ * @return Pointer to the end of destination string dest.
+ */
+char *__xstrccat(char *dest, const char src)
+{
+	char *ptr = NULL;
+
+	if (dest)
+	{
+		MEMTRACK *mtrk = __xfind(dest);
+		ptr = dest + strlen(dest);
+		if (mtrk)
+		{
+			size_t size = ((char *)mtrk->magic) - (dest + strlen(dest));
+			if (size < 2)
+			{
+				return ptr;
+			}
+		}
+		*(ptr++) = src;
+		*(ptr) = 0x0;
+	}
+	return ptr;
+}
+
+/**
+ * @brief Tracked strnccat.
+ * 
+ * Append the character src to string dest and limit dest lengt to n, returning
+ * a pointer to dest. For tracked allocation, make sure that the destination 
+ * buffer does not overrun.
+ * 
+ * @param dest Pointer to destination buffer.
+ * @param src Source character.
+ * @param n Maximum length of dest.
+ * @return Pointer to the end of destination string dest.
+ */
+char *__xstrnccat(char *dest, const char src, size_t n)
+{
+	char *ptr = NULL;
+
+	if (dest)
+	{
+		MEMTRACK *mtrk = __xfind(dest);
+		ptr = dest + strlen(dest);
+		if (mtrk)
+		{
+			size_t size = ((char *)mtrk->magic) - (dest + strlen(dest));
+			if (size < 2)
+			{
+				return ptr;
+			}
+		}
+		if (strlen(dest) + 1 <= n)
+		{
+			*(ptr++) = src;
+			*(ptr) = 0x0;
 		}
 	}
 	return ptr;
@@ -908,6 +1013,39 @@ void *__xmemccpy(void *dest, const void *src, int c, size_t n)
 	return ptr;
 }
 
+/**
+ * @brief Tracked memset replacement.
+ * 
+ * The __xmemset() function fills the first n bytes of the memory area pointed to by s
+ * with the constant byte c. For tracked allocation, make sure that the buffer does not
+ * overrun.
+ * 
+ * @param s Pointer to the memory area to fill.
+ * @param c Character to fill with.
+ * @param n Size of the memory area to fill.
+ * @return Pointer to the memory area.
+ */
+void *__xmemset(void *s, int c, size_t n)
+{
+	if (s)
+	{
+		MEMTRACK *mtrk = __xfind(s);
+		if (mtrk)
+		{
+			size_t size = ((char *)mtrk->magic) - (char *)s;
+			if (size < n)
+			{
+				n = size;
+			}
+		}
+		if (n > 0)
+		{
+			memset(s, c, n);
+		}
+	}
+	return (s);
+}
+
 /******************************************************************************
  * MUSH interfaces
  */
@@ -1079,3 +1217,110 @@ size_t total_rawmemory(void)
 
 	return (total_bytes);
 }
+
+/******************************************************************************
+ * Replacement for the safe_* functions.
+ */
+
+/**
+ * @brief Copy char 'c' to dest and update the position pointer to the end of
+ *        the destination buffer.
+ * 
+ * @param c Char to copy
+ * @param dest Pointer to destination buffer.
+ * @param destp Pointer tracking the desstination buffer.
+ * @param size Maximum size of the destination buffer.
+ */
+int __xsafestrcatchr(char *dest, char **destp, char c, size_t size)
+{
+	if (dest)
+	{
+		if (__xfind(dest))
+		{
+			size = XCALSIZE(XGETSIZE(dest), dest, destp);
+		}
+		else
+		{
+			size = XCALSIZE(size, dest, destp);
+		}
+		if (size > 0)
+		{
+			char *tp = *destp;
+			*tp++ = c;
+			*tp = 0;
+			*destp = tp;
+			return 0;
+		}
+	}
+	return 1;
+}
+
+/**
+ * @brief Concatenate two string with at most n character from src and update
+ * the position pointer to the end of the destination buffer.
+ * 
+ * @param dest Pointer to destination buffer.
+ * @param destp Pointer tracking the desstination buffer.
+ * @param src Pointer to the string to concatenate.
+ * @param n Maximum number of characters to concatenate.
+ * @param size Maximum size of dest buffer if untracked.
+ * @return Number of characters that where not copied if the buffer
+ *         (whichever is smaller) isn't big enough to hold the result.
+ */
+size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)
+{
+	if (dest)
+	{
+		if (__xfind(dest))
+		{
+			size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
+		}
+		else
+		{
+			size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
+		}
+
+		if (size > 0)
+		{
+			strncat(*destp, src, size);
+			*destp += strlen(*destp);
+		}
+	}
+	return ((int64_t)(strlen(src) - size)) > 0 ? ((int64_t)(strlen(src) - size)) : 0;
+}
+
+/**
+ * @brief Convert a long signed number into string.
+ * 
+ * @param dest Pointer to destination buffer.
+ * @param destp Pointer tracking the desstination buffer.
+ * @param num Number to convert.
+ * @param size Maximum size of the destination buffer.
+ */
+void __xsafeltos(char *dest, char **destp, long num, size_t size) {
+    char *buff = XLTOS(num);
+    __xsafestrncat(dest, destp, buff, strlen(buff), size);
+    __xfree(buff);
+}
+
+/**
+ * @brief Return a string with 'count' number of 'ch' characters.
+ * 
+ * It is the responsibility of the caller to free the resulting buffer.
+ * 
+ * @param size Size of the string to build. 
+ * @param c Character to fill the string with.
+ * @return Pointer to the build string.
+ */
+char *__xrepeatchar(size_t size, char c) {
+    void *ptr = (char *)XMALLOC(size + 1, "ptr");
+    
+    if(ptr) {
+        return (char *)__xmemset(ptr, c, size);
+    }
+
+    return NULL;
+    
+}
+
+

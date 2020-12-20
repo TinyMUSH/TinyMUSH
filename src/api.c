@@ -173,7 +173,7 @@ unsigned int register_dbtype(char *modname)
 
 	if (data.dptr)
 	{
-		memcpy((void *)&type, (void *)data.dptr, sizeof(unsigned int));
+		XMEMCPY((void *)&type, (void *)data.dptr, sizeof(unsigned int));
 		XFREE(data.dptr);
 		return type;
 	}
