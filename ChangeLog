@@ -1,12 +1,11 @@
 This document details changes for TinyMUSH 3 "mainline" releases, 
 as well as bugfix updates issued against those mainline releases.
 
-For changes between Alpha or Beta versions, consult the ChangeLog.Alpha or
-ChangeLog.Beta document. 
-
 =============================================================================
 			TinyMUSH 3.3 Changes
 =============================================================================
+
+TinyMUSH 3.3 is currently in alpha. See Git's log for changes.
 
 =============================================================================
 			TinyMUSH 3.2 Changes

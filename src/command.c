@@ -133,7 +133,7 @@ void init_cmdtab(void)
 				/*
 				 * also add the __ alias form
 				 */
-				snprintf(s, MBUF_SIZE, "__%s", cp->cmdname);
+				XSNPRINTF(s, MBUF_SIZE, "__%s", cp->cmdname);
 				hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
 			}
 		}
@@ -148,7 +148,7 @@ void init_cmdtab(void)
 	for (cp = command_table; cp->cmdname; cp++)
 	{
 		hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab, 0);
-		snprintf(s, MBUF_SIZE, "__%s", cp->cmdname);
+		XSNPRINTF(s, MBUF_SIZE, "__%s", cp->cmdname);
 		hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
 	}
 
@@ -1902,7 +1902,7 @@ void list_cmdaccess(dbref player)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(p, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+		XSNPRINTF(p, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
 
 		if ((ctab = (CMDENT *)lt_dlsym(mp->handle, p)) != NULL)
 		{
@@ -1981,7 +1981,7 @@ void list_cmdswitches(dbref player)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
 
 		if ((ctab = (CMDENT *)lt_dlsym(mp->handle, s)) != NULL)
 		{
@@ -2619,7 +2619,7 @@ void list_hashstats(dbref player)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_htab)
@@ -2630,7 +2630,7 @@ void list_hashstats(dbref player)
 			}
 		}
 
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
 		m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_ntab)

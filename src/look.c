@@ -767,13 +767,13 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		{
 			if (is_special == 0)
 			{
-				snprintf(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
+				XSNPRINTF(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
 				notify(player, s);
 			}
 			else if (is_special == 1)
 			{
 				buf = XMALLOC(LBUF_SIZE, "buf");
-				snprintf(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				XSNPRINTF(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 				pretty_print(buf, s, text);
 				notify(player, buf);
 				XFREE(buf);
@@ -806,12 +806,12 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 	if (*xbuf && *gbuf)
 	{
-		snprintf(flag_buf, 34, "%s(%s)", xbuf, gbuf);
+		XSNPRINTF(flag_buf, 34, "%s(%s)", xbuf, gbuf);
 		fbp = flag_buf;
 	}
 	else if (*gbuf)
 	{
-		snprintf(flag_buf, 34, "(%s)", gbuf);
+		XSNPRINTF(flag_buf, 34, "(%s)", gbuf);
 		fbp = flag_buf;
 	}
 
@@ -819,15 +819,15 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	{
 		if ((aowner != Owner(thing)) && (aowner != NOTHING))
 		{
-			snprintf(s, GBUF_SIZE, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
 		}
 		else if (*fbp)
 		{
-			snprintf(s, GBUF_SIZE, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
 		}
 		else if (!skip_tag || (ap->number != A_DESC))
 		{
-			snprintf(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 		}
 		else
 		{
@@ -873,19 +873,19 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	{
 		if ((aowner != Owner(thing)) && (aowner != NOTHING))
 		{
-			snprintf(s, GBUF_SIZE, "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text);
 		}
 		else if (*fbp)
 		{
-			snprintf(s, GBUF_SIZE, "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text);
 		}
 		else if (!skip_tag || (ap->number != A_DESC))
 		{
-			snprintf(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
+			XSNPRINTF(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
 		}
 		else
 		{
-			snprintf(s, GBUF_SIZE, "%s", text);
+			XSNPRINTF(s, GBUF_SIZE, "%s", text);
 		}
 
 		notify(player, s);
@@ -2604,7 +2604,7 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 				{
 					tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 					buf = XMALLOC(GBUF_SIZE, "buf");
-					snprintf(buf, GBUF_SIZE, "%c%s %s=", ((ca < A_USER_START) ? '@' : '&'), buff, thingname);
+					XSNPRINTF(buf, GBUF_SIZE, "%c%s %s=", ((ca < A_USER_START) ? '@' : '&'), buff, thingname);
 					pretty_print(tbuf, buf, got);
 					XFREE(buf);
 					notify(player, tbuf);

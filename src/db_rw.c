@@ -832,9 +832,9 @@ void fix_typed_quotas(void)
 				rqbuf = (char *)"0";
 			}
 
-			snprintf(s, LBUF_SIZE, "%s %s %s %s %s", qbuf, qbuf, qbuf, qbuf, qbuf);
+			XSNPRINTF(s, LBUF_SIZE, "%s %s %s %s %s", qbuf, qbuf, qbuf, qbuf, qbuf);
 			atr_add_raw(i, A_QUOTA, s);
-			snprintf(s, LBUF_SIZE, "%s %s %s %s %s", rqbuf, rqbuf, rqbuf, rqbuf, rqbuf);
+			XSNPRINTF(s, LBUF_SIZE, "%s %s %s %s %s", rqbuf, rqbuf, rqbuf, rqbuf, rqbuf);
 			atr_add_raw(i, A_RQUOTA, s);
 		}
 	}

@@ -1475,11 +1475,11 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 				if (xterm_isbg)
 				{
-					snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
+					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
 				}
 				else
 				{
-					snprintf(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
 				}
 
 				SAFE_LB_STR(xtbuf, buff, bufc);

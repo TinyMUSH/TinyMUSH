@@ -1,6 +1,6 @@
-TinyMUSH 3 is a derivation of TinyMUSH 2.2 and TinyMUX, both of which
-are derivations of TinyMUSH 2.0, which in turn is based upon TinyMUD.
-There are also portions of source code derived from PennMUSH 1.50.
+TinyMUSH 3 is a derivation of TinyMUSH 2.2 and TinyMUX, both of which are
+derivations of TinyMUSH 2.0, which in turn is based upon TinyMUD. There are
+also portions of source code derived from PennMUSH 1.50.
 
 The TinyMUD copyright follows below. PennMUSH, TinyMUSH 2.0, TinyMUSH 2.2,
 and TinyMUSH 3 follow the OSI-standard Artistic License.
@@ -10,11 +10,11 @@ TinyMUSH 3 Copyright: The Artistic License 2.0
 
 TinyMUSH 3 Source Code:
 
-Copyright (c) 2011, 2012, TinyMUSH development team.
-Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by Lydia Leong,
-              David Passmore, Robby Griffin, Scott Dorr, and Eddy Beaupre.
-Copyright (c) 2001, 2002, 2003, by Lydia Leong, David Passmore,
-                                Robby Griffin, and Scott Dorr.
+Copyright (c) 2011 - 2021, TinyMUSH development team.
+Copyright (c) 2004 - 2010, by Lydia Leong, David Passmore, Robby Griffin, 
+                              Scott Dorr, and Eddy Beaupre.
+Copyright (c) 2001 - 2003, by Lydia Leong, David Passmore,
+                              Robby Griffin, and Scott Dorr.
 Copyright (c) 2000 by Lydia Leong, David Passmore, and Robby Griffin.
 Copyright (c) 1999 by Lydia Leong and David Passmore.
 

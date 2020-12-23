@@ -26,7 +26,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     MODVER *mver;
     char *ptr;
     char string[MBUF_SIZE];
-    snprintf(string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
+    XSNPRINTF(string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
     XFREE(ptr);
@@ -49,11 +49,11 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
 
         for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
         {
-            snprintf(string, MBUF_SIZE, "Module %s", mp->modname);
+            XSNPRINTF(string, MBUF_SIZE, "Module %s", mp->modname);
             ptr = repeatchar(strlen(string), '-');
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr);
             XFREE(ptr);
-            snprintf(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
+            XSNPRINTF(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
 
             if ((mver = (MODVER *)lt_dlsym(mp->handle, string)) != NULL)
             {

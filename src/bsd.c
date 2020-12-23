@@ -112,7 +112,7 @@ int get_slave_result(void)
 			{
 				if (d->username[0])
 				{
-					snprintf(s, MBUF_SIZE, "%s@%s", d->username, hostname);
+					XSNPRINTF(s, MBUF_SIZE, "%s@%s", d->username, hostname);
 					atr_add_raw(d->player, A_LASTSITE, s);
 				}
 				else
@@ -253,12 +253,12 @@ int get_slave_result(void)
 		{
 			if (mudconf.use_hostname)
 			{
-				snprintf(s, MBUF_SIZE, "%s@%s", userid, hostname);
+				XSNPRINTF(s, MBUF_SIZE, "%s@%s", userid, hostname);
 				atr_add_raw(d->player, A_LASTSITE, s);
 			}
 			else
 			{
-				snprintf(s, MBUF_SIZE, "%s@%s", userid, host2);
+				XSNPRINTF(s, MBUF_SIZE, "%s@%s", userid, host2);
 				atr_add_raw(d->player, A_LASTSITE, s);
 			}
 		}

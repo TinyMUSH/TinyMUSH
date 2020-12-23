@@ -291,7 +291,7 @@ void do_hashresize(dbref player, dbref cause, int key)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_htab)
@@ -302,7 +302,7 @@ void do_hashresize(dbref player, dbref cause, int key)
 			}
 		}
 
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
 		m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_ntab)
@@ -1528,7 +1528,7 @@ int backup_mush(dbref player, dbref cause, int key)
 
 	for (i = 0; i < mudstate.helpfiles; i++)
 	{
-		snprintf(s1, MBUF_SIZE, "%s.txt", mudstate.hfiletab[i]);
+		XSNPRINTF(s1, MBUF_SIZE, "%s.txt", mudstate.hfiletab[i]);
 		txt = add_array(txt, s1, &txt_n);
 	}
 
@@ -2378,7 +2378,7 @@ void call_all_modules_nocache(char *xfn)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn);
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn);
 
 		if ((ip = (void (*)(void))lt_dlsym(mp->handle, s)) != NULL)
 		{
@@ -2414,7 +2414,7 @@ int load_game(void)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "load_database");
+		XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "load_database");
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
@@ -2925,7 +2925,7 @@ void recover_flatfile(char *flat)
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
+		XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
@@ -3166,7 +3166,7 @@ int dbconvert(int argc, char *argv[])
 
 		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 		{
-			snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
+			XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
 
 			if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 			{
@@ -3230,7 +3230,7 @@ int dbconvert(int argc, char *argv[])
 
 			for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 			{
-				snprintf(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile");
+				XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile");
 
 				if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 				{
@@ -3723,7 +3723,7 @@ int main(int argc, char *argv[])
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_htab)
@@ -3734,7 +3734,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
 		m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_ntab)

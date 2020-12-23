@@ -57,13 +57,13 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 
 	for (afp = ftable; afp->name; afp++)
 	{
-		snprintf(s, MBUF_SIZE, "mod_%s_%s", module_name, afp->name);
+		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", module_name, afp->name);
 		fn_ptr = (void (*)(void *, void *))lt_dlsym(mp->handle, s);
 
 		if (fn_ptr != NULL)
 		{
 			afp->handler = fn_ptr;
-			snprintf(s, MBUF_SIZE, "%s_%s", api_name, afp->name);
+			XSNPRINTF(s, MBUF_SIZE, "%s_%s", api_name, afp->name);
 			hashadd(s, (int *)afp, &mudstate.api_func_htab, 0);
 		}
 	}
@@ -74,7 +74,7 @@ void *request_api_function(char *api_name, char *fn_name)
 {
 	API_FUNCTION *afp;
 	char *s = XMALLOC(MBUF_SIZE, "s");
-	snprintf(s, MBUF_SIZE, "%s_%s", api_name, fn_name);
+	XSNPRINTF(s, MBUF_SIZE, "%s_%s", api_name, fn_name);
 	afp = (API_FUNCTION *)hashfind(s, &mudstate.api_func_htab);
 
 	if (!afp)
@@ -102,7 +102,7 @@ void register_commands(CMDENT *cmdtab)
 		for (cp = cmdtab; cp->cmdname; cp++)
 		{
 			hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab, 0);
-			snprintf(s, MBUF_SIZE, "__%s", cp->cmdname);
+			XSNPRINTF(s, MBUF_SIZE, "__%s", cp->cmdname);
 			hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
 		}
 	}

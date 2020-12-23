@@ -186,7 +186,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
 
         if (destnum != NOTHING)
         {
-            snprintf(s, MBUF_SIZE, "%d", loc);
+            XSNPRINTF(s, MBUF_SIZE, "%d", loc);
             open_exit(player, destnum, links[1], s);
         }
     }
@@ -1005,7 +1005,7 @@ int destroyable(dbref victim)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -1183,7 +1183,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
             break;
 
         case TYPE_PLAYER:
-            snprintf(s, MBUF_SIZE, "%d", player);
+            XSNPRINTF(s, MBUF_SIZE, "%d", player);
             atr_add_raw(thing, A_DESTROYER, s);
             destroy_player(thing);
             break;
@@ -1234,7 +1234,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
 
     if (isPlayer(thing))
     {
-        snprintf(s, MBUF_SIZE, "%d", player);
+        XSNPRINTF(s, MBUF_SIZE, "%d", player);
         atr_add_raw(thing, A_DESTROYER, s);
     }
 

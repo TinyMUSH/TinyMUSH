@@ -1254,7 +1254,7 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	}
 
 	olist_push();
-	snprintf(s, MBUF_SIZE, "me/%s", oldpair);
+	XSNPRINTF(s, MBUF_SIZE, "me/%s", oldpair);
 
 	if (parse_attrib_wild(player, ((strchr(oldpair, '/') == NULL) ? s : oldpair), &oldthing, 0, 0, 1, 0))
 	{
@@ -1268,7 +1268,7 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 
 				for (i = 0; i < nargs; i++)
 				{
-					snprintf(s, MBUF_SIZE, "%s:_#%d/%s", (newattrs[i] ? newattrs[i] : oldattr->name), oldthing, oldattr->name);
+					XSNPRINTF(s, MBUF_SIZE, "%s:_#%d/%s", (newattrs[i] ? newattrs[i] : oldattr->name), oldthing, oldattr->name);
 					do_set(player, cause, 0, newthings[i], s);
 				}
 			}

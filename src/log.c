@@ -1,22 +1,29 @@
-/* log.c - Handle log files and log events */
+/**
+ * @file log.c
+ * @author TinyMUSH Development team (https://github.com/TinyMUSH)
+ * @brief Handle log files and log events
+ * @version 3.3
+ * @date 2020-12-23
+ * @warning Be carefull that functions doesn't go circural when calling one of the XMALLOC functions.
+ * 
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "udb_defs.h"   /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by code */
-#include "stringutil.h" /* required by code */
+#include "typedefs.h"
+#include "alloc.h"
+#include "flags.h"
+#include "htab.h"
+#include "udb.h"
+#include "mushconf.h"
+#include "db.h"
+#include "interface.h"
+#include "externs.h"
 
 FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */
@@ -214,8 +221,8 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, sec, log_pos);
                 }
 
-                XFREE(sec);
-                XFREE(pri);
+                free(sec);
+                free(pri);
             }
             else
             {
@@ -230,7 +237,7 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_write_raw(0, "%s %-9s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, log_pos);
                 }
 
-                XFREE(pri);
+                free(pri);
             }
         }
 
@@ -400,7 +407,7 @@ void log_write_raw(int key, const char *format, ...)
 
     if (vsize < 0)
     {
-        XFREE(str);
+        free(str);
         return;
     }
 
@@ -425,7 +432,7 @@ void log_write_raw(int key, const char *format, ...)
         fputs(str, stderr);
     }
 
-    XFREE(str);
+    free(str);
 }
 
 /* ---------------------------------------------------------------------------

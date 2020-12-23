@@ -692,7 +692,7 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd)
     void (*initptr)(void);
     MODULE *mp;
     char *s = XMALLOC(MBUF_SIZE, "s");
-    snprintf(s, MBUF_SIZE, "%s/%s.la", mudconf.modules_home, str);
+    XSNPRINTF(s, MBUF_SIZE, "%s/%s.la", mudconf.modules_home, str);
     handle = lt_dlopen(s);
 
     if (!handle)
@@ -711,44 +711,44 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd)
      * Look up our symbols now, and cache the pointers. They're not going
      * to change from here on out.
      */
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "process_command");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "process_command");
     mp->process_command = (int (*)(dbref, dbref, int, char *, char *[], int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "process_no_match");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "process_no_match");
     mp->process_no_match = (int (*)(dbref, dbref, int, char *, char *, char *[], int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "did_it");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "did_it");
     mp->did_it = (int (*)(dbref, dbref, dbref, int, const char *, int, const char *, int, int, char *[], int, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "create_obj");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "create_obj");
     mp->create_obj = (void (*)(dbref, dbref))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_obj");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_obj");
     mp->destroy_obj = (void (*)(dbref, dbref))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "create_player");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "create_player");
     mp->create_player = (void (*)(dbref, dbref, int, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_player");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "destroy_player");
     mp->destroy_player = (void (*)(dbref, dbref))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "announce_connect");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "announce_connect");
     mp->announce_connect = (void (*)(dbref, const char *, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "announce_disconnect");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "announce_disconnect");
     mp->announce_disconnect = (void (*)(dbref, const char *, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "examine");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "examine");
     mp->examine = (void (*)(dbref, dbref, dbref, int, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "dump_database");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "dump_database");
     mp->dump_database = (void (*)(FILE *))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_grow");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "db_grow");
     mp->db_grow = (void (*)(int, int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_write");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "db_write");
     mp->db_write = (void (*)(void))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "db_write_flatfile");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "db_write_flatfile");
     mp->db_write_flatfile = (void (*)(FILE *))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "do_second");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "do_second");
     mp->do_second = (void (*)(void))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "cache_put_notify");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "cache_put_notify");
     mp->cache_put_notify = (void (*)(DBData, unsigned int))lt_dlsym(handle, s);
-    snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "cache_del_notify");
+    XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "cache_del_notify");
     mp->cache_del_notify = (void (*)(DBData, unsigned int))lt_dlsym(handle, s);
 
     if (!mudstate.standalone)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", str, "init");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", str, "init");
 
         if ((initptr = (void (*)(void))lt_dlsym(handle, s)) != NULL)
         {
@@ -1372,7 +1372,7 @@ int parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, db
 
                             if (!strcmp(sp + 4, mp->modname))
                             {
-                                snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, cp);
+                                XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, cp);
                                 hp = (int (*)(dbref))lt_dlsym(mp->handle, s);
 
                                 if (!hp)
@@ -1740,7 +1740,7 @@ int cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -1801,13 +1801,13 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     /*
      * Check if file exists in given and standard path
      */
-    snprintf(s, MAXPATHLEN, "%s.txt", fpath);
+    XSNPRINTF(s, MAXPATHLEN, "%s.txt", fpath);
     fp = fopen(s, "r");
 
     if (fp == NULL)
     {
         fpath = XASPRINTF("fpath", "%s/%s", mudconf.txthome, fpath);
-        snprintf(s, MAXPATHLEN, "%s.txt", fpath);
+        XSNPRINTF(s, MAXPATHLEN, "%s.txt", fpath);
         fp = fopen(s, "r");
 
         if (fp == NULL)
@@ -1859,7 +1859,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
 
     hashdelete(cmdp->cmdname, &mudstate.command_htab);
     hashadd(cmdp->cmdname, (int *)cmdp, &mudstate.command_htab, 0);
-    snprintf(s, MAXPATHLEN, "__%s", cmdp->cmdname);
+    XSNPRINTF(s, MAXPATHLEN, "__%s", cmdp->cmdname);
     hashdelete(s, &mudstate.command_htab);
     hashadd(s, (int *)cmdp, &mudstate.command_htab, HASH_ALIAS);
 
@@ -2424,7 +2424,7 @@ int cf_set(char *cp, char *ap, dbref player)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -2512,7 +2512,7 @@ void list_cf_access(dbref player)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -2551,7 +2551,7 @@ void list_cf_read_access(dbref player)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -2601,7 +2601,7 @@ void cf_verify(void)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -2679,7 +2679,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {
@@ -2717,7 +2717,7 @@ void list_options(dbref player)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "conftable");
 
         if ((ctab = (CONF *)lt_dlsym(mp->handle, s)) != NULL)
         {

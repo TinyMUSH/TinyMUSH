@@ -2000,7 +2000,7 @@ char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
         owner = Owner(thing);
     }
 
-    snprintf(attr, MBUF_SIZE, "%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr);
+    XSNPRINTF(attr, MBUF_SIZE, "%c%d:%d:%s", ATR_INFO_CHAR, owner, flags, iattr);
     return (attr);
 }
 

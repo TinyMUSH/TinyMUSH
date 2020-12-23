@@ -2676,7 +2676,7 @@ void make_portlist(dbref player, dbref target, char *buff, char **bufc)
 	{
 		if ((target == NOTHING) || (d->player == target))
 		{
-			snprintf(s, MBUF_SIZE, "%d ", d->descriptor);
+			XSNPRINTF(s, MBUF_SIZE, "%d ", d->descriptor);
 			SAFE_LB_STR(s, buff, bufc);
 			i = 1;
 		}
@@ -2706,7 +2706,7 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 		{
 			if (Wizard_Who(player) || Controls(player, d->player))
 			{
-				snprintf(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
+				XSNPRINTF(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
 				SAFE_LB_STR(s, buff, bufc);
 				XFREE(s);
 				return;

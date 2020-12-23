@@ -367,7 +367,7 @@ void list_funcaccess(dbref player)
 
     for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
     {
-        snprintf(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
+        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
 
         if ((ftab = (FUN *)lt_dlsym(mp->handle, s)) != NULL)
         {

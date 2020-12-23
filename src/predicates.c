@@ -1217,7 +1217,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 			}
 
 			hashdelete(name, &mudstate.command_htab);
-			snprintf(s1, MBUF_SIZE, "__%s", old->cmdname);
+			XSNPRINTF(s1, MBUF_SIZE, "__%s", old->cmdname);
 
 			if ((cmd = (CMDENT *)hashfind(s1, &mudstate.command_htab)) != NULL)
 			{
@@ -1235,7 +1235,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 		 * the __ alias may have been temporarily
 		 * * marked as the original hash entry
 		 */
-				snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname);
+				XSNPRINTF(s1, MBUF_SIZE, "__%s", cmd->cmdname);
 				hashdelete(s1, &mudstate.command_htab);
 				hashadd(s1, (int *)cmd, &mudstate.command_htab, HASH_ALIAS);
 				hashreplall((int *)old, (int *)cmd, &mudstate.command_htab);
@@ -1268,7 +1268,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 						if (!nextp->next)
 						{
 							hashdelete(name, &mudstate.command_htab);
-							snprintf(s1, MBUF_SIZE, "__%s", name);
+							XSNPRINTF(s1, MBUF_SIZE, "__%s", name);
 
 							if ((cmd = (CMDENT *)hashfind(s1, &mudstate.command_htab)) != NULL)
 							{
@@ -1286,7 +1286,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 				 * the __ alias may have been temporarily
 				 * * marked as the original hash entry
 				 */
-								snprintf(s1, MBUF_SIZE, "__%s", cmd->cmdname);
+								XSNPRINTF(s1, MBUF_SIZE, "__%s", cmd->cmdname);
 								hashdelete(s1, &mudstate.command_htab);
 								hashadd(s1, (int *)cmd, &mudstate.command_htab, HASH_ALIAS);
 								hashreplall((int *)old, (int *)cmd, &mudstate.command_htab);
