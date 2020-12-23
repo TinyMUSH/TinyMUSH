@@ -24,14 +24,9 @@
 #include "file_c.h"		/* required by code */
 #include "command.h"	/* required by code */
 #include "attrs.h"		/* required by code */
-#include "ansi.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "match.h"		/* required by code */
-#include "stringutil.h" /* required by code */
-
-extern const char *conn_reasons[];
-extern const char *conn_messages[];
-extern int ansi_nchartab[];
+#include "stringutil.h"         /* required by code */
 
 /* ---------------------------------------------------------------------------
  * timeval_sub: return difference between two times as a timeval
@@ -108,7 +103,7 @@ struct timeval update_quotas(struct timeval last, struct timeval current)
 void raw_notify_html(dbref player, const char *format, ...)
 {
 	DESC *d;
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -121,6 +116,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -134,16 +130,19 @@ void raw_notify_html(dbref player, const char *format, ...)
 	if (mudstate.inpipe && (player == mudstate.poutobj))
 	{
 		SAFE_LB_STR(msg, mudstate.poutnew, &mudstate.poutbufc);
+		XFREE(msg);
 		return;
 	}
 
 	if (!Connected(player))
 	{
+		XFREE(msg);
 		return;
 	}
 
 	if (!Html(player))
 	{ /* Don't splooge HTML at a non-HTML player. */
+		XFREE(msg);
 		return;
 	}
 
@@ -151,6 +150,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 	{
 		queue_string(d, NULL, msg);
 	}
+	XFREE(msg);
 }
 
 /* ---------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 void raw_notify(dbref player, const char *format, ...)
 {
 	DESC *d;
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -173,6 +173,7 @@ void raw_notify(dbref player, const char *format, ...)
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -187,11 +188,13 @@ void raw_notify(dbref player, const char *format, ...)
 	{
 		SAFE_LB_STR(msg, mudstate.poutnew, &mudstate.poutbufc);
 		SAFE_CRLF(mudstate.poutnew, &mudstate.poutbufc);
+		XFREE(msg);
 		return;
 	}
 
 	if (!Connected(player))
 	{
+		XFREE(msg);
 		return;
 	}
 
@@ -200,6 +203,7 @@ void raw_notify(dbref player, const char *format, ...)
 		queue_string(d, NULL, msg);
 		queue_write(d, "\r\n", 2);
 	}
+	XFREE(msg);
 }
 
 void raw_notify_newline(dbref player)
@@ -229,7 +233,7 @@ void raw_notify_newline(dbref player)
 
 void raw_broadcast(int inflags, char *template, ...)
 {
-	char buff[LBUF_SIZE];
+	char *buff = XMALLOC(LBUF_SIZE, "buff");
 	DESC *d;
 	int test_flag, which_flag, p_flag;
 	va_list ap;
@@ -237,6 +241,7 @@ void raw_broadcast(int inflags, char *template, ...)
 
 	if (!template || !*template)
 	{
+		XFREE(buff);
 		return;
 	}
 
@@ -293,6 +298,7 @@ void raw_broadcast(int inflags, char *template, ...)
 		}
 	}
 	va_end(ap);
+	XFREE(buff);
 }
 
 /* ---------------------------------------------------------------------------
@@ -500,7 +506,7 @@ void queue_string(DESC *d, const char *format, ...)
 
 void queue_rawstring(DESC *d, const char *format, ...)
 {
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -513,6 +519,7 @@ void queue_rawstring(DESC *d, const char *format, ...)
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -523,6 +530,7 @@ void queue_rawstring(DESC *d, const char *format, ...)
 
 	va_end(ap);
 	queue_write(d, msg, strlen(msg));
+	XFREE(msg);
 }
 
 void freeqs(DESC *d)
@@ -773,10 +781,10 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 	*p = '\0';
 }
 
-const char *time_format_1(time_t dt)
+char *time_format_1(time_t dt)
 {
 	register struct tm *delta;
-	static char buf[64]; // XXX Should return a buffer instead of a static pointer
+	char *buf = XMALLOC(MBUF_SIZE, "buf");
 
 	if (dt < 0)
 	{
@@ -797,10 +805,10 @@ const char *time_format_1(time_t dt)
 	return buf;
 }
 
-const char *time_format_2(time_t dt)
+char *time_format_2(time_t dt)
 {
 	register struct tm *delta;
-	static char buf[64]; // XXX Should return a buffer instead of a static pointer
+	char *buf = XMALLOC(MBUF_SIZE, "buf");
 
 	if (dt < 0)
 	{
@@ -1369,8 +1377,7 @@ void check_idle(void)
 
 char *trimmed_name(dbref player)
 {
-	static char cbuff[18]; // XXX Should return a buffer instead of a static pointer
-
+	char *cbuff = XMALLOC(MBUF_SIZE, "cbuff");
 	if (strlen(Name(player)) <= 16)
 	{
 		return Name(player);
@@ -1383,7 +1390,7 @@ char *trimmed_name(dbref player)
 
 char *trimmed_site(char *name)
 {
-	static char buff[MBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
+	char *buff = XMALLOC(MBUF_SIZE, buff);
 
 	if (((int)strlen(name) <= mudconf.site_chars) || (mudconf.site_chars == 0))
 	{
@@ -1399,8 +1406,10 @@ void dump_users(DESC *e, char *match, int key)
 {
 	DESC *d;
 	int count;
-	char *buf, *fp, *sp, flist[4], slist[4];
-	char s[MBUF_SIZE];
+	char *buf, *fp, *sp;
+	char *flist=XMALLOC(4, "flist");
+	char *slist=XMALLOC(4, "slist");
+	char *s;
 	dbref room_it;
 
 	while (match && *match && isspace(*match))
@@ -1557,20 +1566,49 @@ void dump_users(DESC *e, char *match, int key)
 
 			if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player) && (key == CMD_WHO))
 			{
-				snprintf(s, MBUF_SIZE, "%s@%s", d->username, d->addr);
-				XSPRINTF(buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trimmed_name(d->player), time_format_1(mudstate.now - d->connected_at), time_format_2(mudstate.now - d->last_time), flist, Location(d->player), d->command_count, slist, trimmed_site(((d->username[0] != '\0') ? s : d->addr)));
+				s =XASPRINTF("s", "%s@%s", d->username, d->addr);
+				char *trs = trimmed_site(((d->username[0] != '\0') ? s : d->addr));
+				char *trn = trimmed_name(d->player);
+				char *tf1 = time_format_1(mudstate.now - d->connected_at);
+				char *tf2 = time_format_2(mudstate.now - d->last_time);
+				XSPRINTF(buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trn, tf1, tf2, flist, Location(d->player), d->command_count, slist, trs);
+				XFREE(s);
+				XFREE(tf2);
+				XFREE(tf1);
+				XFREE(trn);
+				XFREE(trs);
+				
+				
 			}
 			else if (key == CMD_SESSION)
 			{
-				XSPRINTF(buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trimmed_name(d->player), time_format_1(mudstate.now - d->connected_at), time_format_2(mudstate.now - d->last_time), d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot);
+				char *trn = trimmed_name(d->player);
+				char *tf1 = time_format_1(mudstate.now - d->connected_at);
+				char *tf2 = time_format_2(mudstate.now - d->last_time);
+				XSPRINTF(buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trn, tf1, tf2, d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot);
+				XFREE(tf1);
+				XFREE(tf2);
+				XFREE(trn);
 			}
 			else if (Wizard_Who(e->player) || See_Hidden(e->player))
 			{
-				XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trimmed_name(d->player), time_format_1(mudstate.now - d->connected_at), time_format_2(mudstate.now - d->last_time), flist, (d->doing == NULL ? "" : d->doing));
+				char *trn = trimmed_name(d->player);
+				char *tf1 = time_format_1(mudstate.now - d->connected_at);
+				char *tf2 = time_format_2(mudstate.now - d->last_time);
+				XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
+				XFREE(tf1);
+				XFREE(tf2);
+				XFREE(trn);
 			}
 			else
 			{
-				XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trimmed_name(d->player), time_format_1(mudstate.now - d->connected_at), time_format_2(mudstate.now - d->last_time), (d->doing == NULL ? "" : d->doing));
+				char *trn = trimmed_name(d->player);
+				char *tf1 = time_format_1(mudstate.now - d->connected_at);
+				char *tf2 = time_format_2(mudstate.now - d->last_time);
+				XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
+				XFREE(tf1);
+				XFREE(tf2);
+				XFREE(trn);
 			}
 
 			queue_string(e, NULL, buf);
@@ -1579,8 +1617,9 @@ void dump_users(DESC *e, char *match, int key)
 	/*
      * sometimes I like the ternary operator....
      */
-	snprintf(s, MBUF_SIZE, "%d", mudconf.max_players);
+	s =XASPRINTF("s", "%d", mudconf.max_players);
 	XSPRINTF(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, (count == 1) ? " " : "s ", mudstate.record_players, (mudconf.max_players == -1) ? "no" : s);
+	XFREE(s);
 	queue_rawstring(e, NULL, buf);
 
 	if (mudconf.have_pueblo == 1)
@@ -1591,7 +1630,10 @@ void dump_users(DESC *e, char *match, int key)
 		}
 	}
 
+	XFREE(slist);
+	XFREE(flist);
 	XFREE(buf);
+
 }
 
 void dump_info(DESC *call_by)
@@ -1632,8 +1674,8 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 {
 	DESC *d;
 	int from_color, to_color, i, x;
-	from_color = ansi_nchartab[(unsigned char)*fstr];
-	to_color = ansi_nchartab[(unsigned char)*tstr];
+	from_color = ansiNum((unsigned char)*fstr);
+	to_color = ansiNum((unsigned char)*tstr);
 
 	if ((from_color < I_ANSI_BLACK) || (from_color >= I_ANSI_NUM))
 	{
@@ -1984,12 +2026,12 @@ int check_connect(DESC *d, char *msg)
 			if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
-				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, conn_reasons[reason], user);
+				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, connReasons(reason), user);
 				XFREE(lname);
 			}
 			else
 			{
-				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s %s %s", d->descriptor, d->addr, pname, conn_reasons[reason], user);
+				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s %s %s", d->descriptor, d->addr, pname, connReasons(reason), user);
 			}
 
 			XFREE(pname);
@@ -2041,7 +2083,7 @@ int check_connect(DESC *d, char *msg)
 				XFREE(buff);
 			}
 
-			announce_connect(player, d, conn_messages[reason]);
+			announce_connect(player, d, connMessages(reason));
 
 			/*
 	     * If stuck in an @prog, show the prompt
@@ -2117,14 +2159,14 @@ int check_connect(DESC *d, char *msg)
 			else
 			{
 				name = log_getname(player);
-				log_write(LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, conn_reasons[reason], name);
+				log_write(LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, connReasons(reason), name);
 				XFREE(name);
 				move_object(player, (Good_loc(mudconf.start_room) ? mudconf.start_room : 0));
 				d->flags |= DS_CONNECTED;
 				d->connected_at = time(NULL);
 				d->player = player;
 				fcache_dump(d, FC_CREA_NEW);
-				announce_connect(player, d, conn_messages[R_CREATE]);
+				announce_connect(player, d, connMessages(R_CREATE));
 			}
 		}
 	}
@@ -2211,7 +2253,7 @@ void do_command(DESC *d, char *command, int first)
 	NAMETAB *cp;
 	long begin_time, used_time;
 	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< do_command >";
+	mudstate.debug_cmd = XSTRDUP("< do_command >", "mudstate.debug_cmd");
 
 	if (d->flags & DS_CONNECTED)
 	{
@@ -2397,7 +2439,7 @@ void process_commands(void)
 	CBLK *t;
 	char *cmdsave;
 	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"process_commands";
+	mudstate.debug_cmd = XSTRDUP("process_commands", "mudstate.debug_cmd");
 
 	do
 	{
@@ -2628,7 +2670,7 @@ void make_ulist(dbref player, char *buff, char **bufc)
 void make_portlist(dbref player, dbref target, char *buff, char **bufc)
 {
 	DESC *d;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 	int i = 0;
 	DESC_ITER_CONN(d)
 	{
@@ -2646,6 +2688,7 @@ void make_portlist(dbref player, dbref target, char *buff, char **bufc)
 	}
 
 	**bufc = '\0';
+	XFREE(s);
 }
 
 /* ---------------------------------------------------------------------------
@@ -2656,7 +2699,7 @@ void make_portlist(dbref player, dbref target, char *buff, char **bufc)
 void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char **bufc)
 {
 	DESC *d;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 	DESC_ITER_CONN(d)
 	{
 		if ((d->descriptor == port_num) || (d->player == target))
@@ -2665,12 +2708,14 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 			{
 				snprintf(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
 				SAFE_LB_STR(s, buff, bufc);
+				XFREE(s);
 				return;
 			}
 			else
 			{
 				notify_quiet(player, NOPERM_MESSAGE);
 				SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+				XFREE(s);
 				return;
 			}
 		}
@@ -2679,6 +2724,7 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
      * Not found, return error.
      */
 	SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+	XFREE(s);
 }
 
 /* ---------------------------------------------------------------------------

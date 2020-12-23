@@ -484,7 +484,7 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	int aflags, alen;
 	char *tbuf;
 	ATTR *attr;
-	struct boolexp *bool;
+	struct boolexp *bexp;
 
 	/*
      * Parse the argument into obj + lock
@@ -502,11 +502,12 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	if (Read_attr(player, it, attr, aowner, aflags))
 	{
-		bool = parse_boolexp(player, tbuf, 1);
+		bexp = parse_boolexp(player, tbuf, 1);
 		XFREE(tbuf);
-		tbuf = (char *)unparse_boolexp_function(player, bool);
-		free_boolexp(bool);
+		tbuf = (char *)unparse_boolexp_function(player, bexp);
+		free_boolexp(bexp);
 		SAFE_LB_STR(tbuf, buff, bufc);
+		XFREE(tbuf);
 	}
 	else
 	{
@@ -520,7 +521,7 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	int aflags, alen;
 	char *tbuf;
 	ATTR *attr;
-	struct boolexp *bool;
+	struct boolexp *bexp;
 
 	/*
      * Parse lock supplier into obj + lock
@@ -556,9 +557,9 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 			}
 			else
 			{
-				bool = parse_boolexp(player, tbuf, 1);
-				SAFE_BOOL(buff, bufc, eval_boolexp(victim, it, it, bool));
-				free_boolexp(bool);
+				bexp = parse_boolexp(player, tbuf, 1);
+				SAFE_BOOL(buff, bufc, eval_boolexp(victim, it, it, bexp));
+				free_boolexp(bexp);
 			}
 		}
 		else
@@ -1118,7 +1119,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 {
 	dbref it, aowner;
 	int atr, aflags;
-	char *buff2, xbuf[16], *xbufp;
+	char *buff2, *xbuf, *xbufp;
 
 	if (parse_attrib(player, fargs[0], &it, &atr, 1))
 	{
@@ -1129,8 +1130,10 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		else
 		{
 			atr_pget_info(it, atr, &aowner, &aflags);
+			xbuf = XMALLOC(16, "xbuf");
 			Print_Attr_Flags(aflags, xbuf, xbufp);
 			SAFE_LB_STR(xbuf, buff, bufc);
+			XFREE(xbuf);
 		}
 	}
 	else
@@ -1158,7 +1161,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *s;
-	char flagletter[2];
+	char *flagletter=XMALLOC(2, "flagletter");
 	FLAGSET fset;
 	FLAG p_type;
 	int negate, temp, type;
@@ -1169,6 +1172,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
 	if (!Good_obj(it) || (!(mudconf.pub_flags || Examinable(player, it) || (it == cause))))
 	{
 		SAFE_LB_CHR('0', buff, bufc);
+		XFREE(flagletter);
 		return;
 	}
 
@@ -1191,6 +1195,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
 		if (!*s)
 		{
 			SAFE_LB_CHR('0', buff, bufc);
+			XFREE(flagletter);
 			return;
 		}
 
@@ -1208,6 +1213,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
 			if (!type)
 			{
 				SAFE_LB_CHR('0', buff, bufc);
+				XFREE(flagletter);
 				return;
 			}
 			else
@@ -1246,6 +1252,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
 		 * and do have it.
 		 */
 				SAFE_BOOL(buff, bufc, type);
+				XFREE(flagletter);
 				return;
 			}
 
@@ -1256,6 +1263,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref
 	}
 
 	SAFE_BOOL(buff, bufc, !type);
+	XFREE(flagletter);
 }
 
 /*---------------------------------------------------------------------------
@@ -1786,7 +1794,6 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	dbref thing, aowner;
 	int attrib, aflags, alen, eval_it;
 	char *atr_gotten, *str;
-	char s[MBUF_SIZE];
 	eval_it = Is_Func(GET_EVAL);
 
 	if (Is_Func(GET_XARGS))
@@ -1796,18 +1803,21 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 			return;
 		}
 
-		snprintf(s, MBUF_SIZE, "%s/%s", fargs[0], fargs[1]);
+		str = XASPRINTF("str", "%s/%s", fargs[0], fargs[1]);
 	}
 	else
 	{
-		snprintf(s, MBUF_SIZE, "%s", fargs[0]);
+		str = XASPRINTF("str", "%s", fargs[0]);
 	}
 
-	if (!parse_attrib(player, s, &thing, &attrib, 0))
+	if (!parse_attrib(player, str, &thing, &attrib, 0))
 	{
 		SAFE_NOMATCH(buff, bufc);
+		XFREE(str);
 		return;
 	}
+
+	XFREE(str);
 
 	if (attrib == NOTHING)
 	{
@@ -3010,7 +3020,8 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref c
 void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim *open_sep, const Delim *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc)
 {
 	char *sp, *ep, *save, *tp, *bp;
-	char *result, *tstack[3], *estack[2], tbuf[LBUF_SIZE];
+	char *result, *tstack[3], *estack[2];
+	char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 	int spos, trans_len, empty_len;
 	int done = 0;
 
@@ -3020,6 +3031,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 	}
 	else
 	{
+		XFREE(tbuf);
 		return; /* should never happen; caller should check */
 	}
 
@@ -3039,6 +3051,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 
 		if (!sp)
 		{
+			XFREE(tbuf);
 			return;
 		}
 
@@ -3148,6 +3161,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 	{
 		XFREE(empty_str);
 	}
+	XFREE(tbuf);
 }
 
 void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)

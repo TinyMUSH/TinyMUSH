@@ -25,10 +25,12 @@ dbref create_guest(int num)
 {
     dbref player, aowner;
     int found, same_str, aflags;
-    char name[LBUF_SIZE * 2];
-    char base[mudconf.max_command_args * 2];
-    char prefixes[LBUF_SIZE], suffixes[LBUF_SIZE], *pp, *sp, *tokp, *toks;
-    char s[MBUF_SIZE];
+    char *name = XMALLOC(LBUF_SIZE * 2, "name");
+    char *base = XMALLOC(mudconf.max_command_args * 2, "base");
+    char *prefixes = XMALLOC(LBUF_SIZE, "prefixes");
+    char *suffixes = XMALLOC(LBUF_SIZE, "suffixes");
+    char *pp, *sp, *tokp, *toks;
+    char *s;
 
     if (!Wizard(mudconf.guest_nuker) || !Good_obj(mudconf.guest_nuker))
     {
@@ -92,6 +94,10 @@ dbref create_guest(int num)
         if (!badname_check(base) || !ok_player_name(base) || (lookup_player(GOD, base, 0) != NOTHING))
         {
             log_write(LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in alias check: %s", base);
+            XFREE(suffixes);
+            XFREE(prefixes);
+            XFREE(base);
+            XFREE(name);
             return NOTHING;
         }
 
@@ -106,6 +112,10 @@ dbref create_guest(int num)
     if (player == NOTHING)
     {
         log_write(LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Guest connect failed in create_player: %s", name);
+        XFREE(suffixes);
+        XFREE(prefixes);
+        XFREE(base);
+        XFREE(name);
         return NOTHING;
     }
 
@@ -134,20 +144,26 @@ dbref create_guest(int num)
     /*
      * Make sure the guest is locked.
      */
-    snprintf(s, MBUF_SIZE, "#%d", player);
+    s = XASPRINTF("s", "#%d", player);
     do_lock(player, player, A_LOCK, s, "me");
     do_lock(player, player, A_LENTER, s, "me");
     do_lock(player, player, A_LUSE, s, "me");
+    XFREE(s);
     /*
      * Copy all attributes.
      */
     atr_cpy(GOD, player, mudconf.guest_char);
+
+    XFREE(suffixes);
+    XFREE(prefixes);
+    XFREE(base);
+    XFREE(name);
     return player;
 }
 
 void destroy_guest(dbref guest)
 {
-    char s[MBUF_SIZE];
+    char *s;
 
     if (!Wizard(mudconf.guest_nuker) || !Good_obj(mudconf.guest_nuker))
     {
@@ -159,8 +175,9 @@ void destroy_guest(dbref guest)
         return;
     }
 
-    snprintf(s, MBUF_SIZE, "%d", mudconf.guest_nuker);
+    s = XASPRINTF("s", "%d", mudconf.guest_nuker);
     atr_add_raw(guest, A_DESTROYER, s);
+    XFREE(s);
     destroy_player(guest);
     destroy_obj(mudconf.guest_nuker, guest);
 }
@@ -169,8 +186,8 @@ char *make_guest(DESC *d)
 {
     int i;
     dbref guest;
-    char name[SBUF_SIZE];
-
+    char *name = XMALLOC(SBUF_SIZE, "name");
+    
     /*
      * Nuke extra guests.
      */
@@ -203,6 +220,7 @@ char *make_guest(DESC *d)
     if (i == mudconf.number_guests)
     {
         queue_string(d, NULL, "GAME: All guests are currently in use. Please try again later.\n");
+        XFREE(name);
         return NULL;
     }
 
@@ -210,8 +228,10 @@ char *make_guest(DESC *d)
     {
         queue_string(d, NULL, "GAME: Error creating guest ID, please try again later.\n");
         log_write(LOG_SECURITY | LOG_PCREATES, "CON", "BAD", "Error creating guest ID. '%s' already exists.\n", name);
+        XFREE(name);
         return NULL;
     }
 
+    XFREE(name);
     return Name(guest);
 }

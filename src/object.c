@@ -202,7 +202,7 @@ dbref clone_home(dbref player, dbref thing)
 void update_newobjs(dbref player, dbref obj_num, int obj_type)
 {
 	int i, aowner, aflags, alen;
-	char *newobj_str, *p, tbuf[SBUF_SIZE], *tokst;
+	char *newobj_str, *p, *tbuf, *tokst;
 	int obj_list[4];
 	newobj_str = atr_get(player, A_NEWOBJS, &aowner, &aflags, &alen);
 
@@ -242,8 +242,9 @@ void update_newobjs(dbref player, dbref obj_num, int obj_type)
 		break;
 	}
 
-	XSPRINTF(tbuf, "%d %d %d %d", obj_list[0], obj_list[1], obj_list[2], obj_list[3]);
+	tbuf = XASPRINTF("tbuf", "%d %d %d %d", obj_list[0], obj_list[1], obj_list[2], obj_list[3]);
 	atr_add_raw(player, A_NEWOBJS, tbuf);
+	XFREE(tbuf);
 }
 
 /* ---------------------------------------------------------------------------
@@ -253,8 +254,7 @@ void update_newobjs(dbref player, dbref obj_num, int obj_type)
 int ok_exit_name(char *name)
 {
 	char *p, *lastp, *s;
-	char buff[LBUF_SIZE];
-	XSTRCPY(buff, name); /* munchable buffer */
+	char *buff = XSTRDUP(name, "buff"); /* munchable buffer */
 
 	/*
      * walk down the string, checking lengths. skip leading spaces.
@@ -275,6 +275,8 @@ int ok_exit_name(char *name)
 			return 0;
 		}
 	}
+	
+	XFREE(buff);
 
 	/*
      * check last component

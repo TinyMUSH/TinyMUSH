@@ -481,14 +481,14 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	int bot, top, over, i;
 	char *bb_p, *startp, *endp, *tbuf;
 	int lnum_init = 0;
-	char lnum_buff[290];
+	char *lnum_buff = XMALLOC(290, lnum_buff);
 
 	if (nfargs == 0)
 	{
+		XFREE(lnum_buff);
 		return;
 	}
-
-	/*
+	/**
      * lnum() is special, since its single delimiter is really an output
      * delimiter.
      */
@@ -505,7 +505,12 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		top = (int)strtol(fargs[0], (char **)NULL, 10);
 
 		if (top-- < 1)
-		{ /* still want to generate if arg is 1 */
+		{
+			/**
+			 * still want to generate if arg is 1
+			 * 
+			 */
+			XFREE(lnum_buff);
 			return;
 		}
 	}
@@ -544,6 +549,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if (over)
 		{
+			XFREE(lnum_buff);
 			return;
 		}
 	}
@@ -575,6 +581,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if (top < 100)
 		{
+			XFREE(lnum_buff);
 			return;
 		}
 		else
@@ -595,6 +602,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		}
 
 		SAFE_LTOS(buff, bufc, bot, LBUF_SIZE);
+		XFREE(lnum_buff);
 		return;
 	}
 	else if (top > bot)
@@ -625,6 +633,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			XFREE(tbuf);
 		}
 	}
+	XFREE(lnum_buff);
 }
 
 /*
@@ -900,15 +909,19 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	time_t tt;
 	struct tm *ttm;
-	char str[LBUF_SIZE], tbuf[LBUF_SIZE], *tp, *p;
+	char *str = XMALLOC(LBUF_SIZE, "str");
+	char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
+	char *tp, *p;
 	int len;
 
-	/*
-     * Check number of arguments.
-     */
-
+	/**
+	 * Check number of arguments.
+	 * 
+	 */
 	if ((nfargs < 1) || !fargs[0] || !*fargs[0])
 	{
+		XFREE(str);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -924,22 +937,25 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		if (tt < 0)
 		{
 			SAFE_LB_STR("#-1 INVALID TIME", buff, bufc);
+			XFREE(str);
+			XFREE(tbuf);
 			return;
 		}
 	}
 	else
 	{
 		SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs);
+		XFREE(str);
+		XFREE(tbuf);
 		return;
 	}
-
-	/*
-     * Construct the format string. We need to convert instances of '$'
-     * into percent signs for strftime(), unless we get a '$$', which we
-     * treat as a literal '$'. Step on '$n' as invalid (output literal
-     * '%n'), because some strftime()s use it to insert a newline.
-     */
-
+	/**
+	 * Construct the format string. We need to convert instances of '$'
+	 * into percent signs for strftime(), unless we get a '$$', which we
+	 * treat as a literal '$'. Step on '$n' as invalid (output literal
+	 * '%n'), because some strftime()s use it to insert a newline.
+	 * 
+	 */
 	for (tp = tbuf, p = fargs[0], len = 0; *p && (len < LBUF_SIZE - 2); tp++, p++)
 	{
 		if (*p == '%')
@@ -973,12 +989,15 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	*tp = '\0';
-	/*
-     * Get the time and format it. We do this using the local timezone.
-     */
+	/**
+	 * Get the time and format it. We do this using the local timezone.
+	 * 
+	 */
 	ttm = localtime(&tt);
 	strftime(str, LBUF_SIZE - 1, tbuf, ttm);
 	SAFE_LB_STR(str, buff, bufc);
+	XFREE(str);
+	XFREE(tbuf);
 }
 
 /*
@@ -1627,7 +1646,7 @@ void fun_wait(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	CMDENT *cmdp;
-	char tbuf1[1], tbuf2[1];
+	char *tbuf1, *tbuf2;
 	char *p;
 	int key;
 
@@ -1666,12 +1685,6 @@ void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      */
 	key = cmdp->extra;
 	key &= ~(SW_GOT_UNIQUE | SW_MULTIPLE | SW_NOEVAL);
-	/*
-     * Can't handle null args, so make sure there's something there.
-     */
-	tbuf1[0] = '\0';
-	tbuf2[0] = '\0';
-
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
 	case CS_NO_ARGS:
@@ -1679,11 +1692,17 @@ void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		break;
 
 	case CS_ONE_ARG:
+		tbuf1 = XMALLOC(1, "tbuf1");
 		(*(cmdp->info.handler))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
+		XFREE(tbuf1);
 		break;
 
 	case CS_TWO_ARG:
+		tbuf1 = XMALLOC(1, "tbuf1");
+		tbuf2 = XMALLOC(1, "tbuf2");
 		(*(cmdp->info.handler))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
+		XFREE(tbuf2);
+		XFREE(tbuf1);
 		break;
 
 	default:

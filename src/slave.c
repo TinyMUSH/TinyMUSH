@@ -71,6 +71,7 @@ int query(char *ip, char *orig_arg)
 	char buf2[MAX_STRING * 2];
 	char buf3[MAX_STRING * 4];
 	char arg[MAX_STRING];
+	char namebuf[MAX_STRING];
 	size_t len;
 	char *p;
 	unsigned int addr;
@@ -109,7 +110,6 @@ int query(char *ip, char *orig_arg)
 		struct hostent def;
 		struct in_addr defaddr;
 		char *alist[1];
-		char namebuf[MAX_STRING];
 		defaddr.s_addr = (unsigned int)inet_addr(arg);
 
 		if (defaddr.s_addr == INADDR_NONE)

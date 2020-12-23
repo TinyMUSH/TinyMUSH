@@ -19,8 +19,7 @@
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
-#include "ansi.h"		/* required by code */
-#include "stringutil.h" /* required by code */
+#include "stringutil.h"         /* required by code */
 
 #define SAY_STRING (mudconf.comma_say ? "say," : "say")
 #define SAYS_STRING (mudconf.comma_say ? "says," : "says")
@@ -84,36 +83,34 @@ void do_think(dbref player, dbref cause, __attribute__((unused)) int key, char *
 
 int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char *message, int key)
 {
-	char *sargs[2], tokbuf[2], *buff, msgbuf[LBUF_SIZE];
+	char *sargs[2], *buff;
 	int aflags;
 	/*
      * We have to make a copy of our arguments, because the exec() we
      * * pass it through later can nibble those arguments, and we may
      * * need to call this function more than once on the same message.
      */
-	XSTRCPY(msgbuf, message);
+	
+	sargs[0] = XSTRDUP(message, "sargs[0]");
 
 	switch (key)
 	{
 	case SAY_SAY:
-		tokbuf[0] = '"';
+		sargs[1] = XSTRDUP("\"", "sargs[1]");
 		break;
 
 	case SAY_POSE:
-		tokbuf[0] = ':';
+		sargs[1] = XSTRDUP(":", "sargs[1]");
 		break;
 
 	case SAY_POSE_NOSPC:
-		tokbuf[0] = ';';
+		sargs[1] = XSTRDUP(";", "sargs[1]");
 		break;
 
 	default:
-		tokbuf[0] = '|';
+		sargs[1] = XSTRDUP("|", "sargs[1]");
 	}
 
-	tokbuf[1] = '\0';
-	sargs[0] = msgbuf;
-	sargs[1] = tokbuf;
 	/*
      * Go get it. An empty evaluation is considered equivalent to no
      * * attribute, unless the attribute has a no_name flag.
@@ -126,17 +123,22 @@ int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char
 		{
 			notify_all_from_inside_speech(loc, player, buff);
 			XFREE(buff);
+			XFREE(sargs[1]);
+			XFREE(sargs[0]);
 			return 1;
 		}
 		else if (aflags & AF_NONAME)
 		{
 			XFREE(buff);
+			XFREE(sargs[1]);
+			XFREE(sargs[0]);
 			return 1;
 		}
-
 		XFREE(buff);
 	}
 
+	XFREE(sargs[1]);
+	XFREE(sargs[0]);
 	return 0;
 }
 
@@ -520,7 +522,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	char *str, *str2, *buf, *bp;
 	struct tm *tp;
 	time_t t;
-	char dflt[LBUF_SIZE];
+	char *dflt = XMALLOC(LBUF_SIZE, "dflt");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -566,6 +568,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	}
 
 	XFREE(str);
+	XFREE(dflt);
 }
 
 int page_check(dbref player, dbref target)

@@ -20,7 +20,6 @@
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
 #include "command.h"	/* required by code */
-#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
 int did_attr(dbref player, dbref thing, int what)
@@ -218,7 +217,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	dbref can_see_loc;
 	char *buff;
 	char *html_buff, *html_cp;
-	char remote_num[32];
+	char *remote_num;
 
 	/*
      * Check if we're formatting contents in a player-specified way.
@@ -260,9 +259,11 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 					{
 						SAFE_LB_STR("<a xch_cmd=\"look ", html_buff, &html_cp);
 
-						/*
-			 * XXX Just stripping ansi isn't enough.
-			 */
+						/**
+						 * @bug Just stripping ansi isn't enough.
+						 * 
+						 */
+
 						switch (style)
 						{
 						case CONTENTS_LOCAL:
@@ -276,8 +277,9 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 							break;
 
 						case CONTENTS_REMOTE:
-							XSPRINTF(remote_num, "#%d", thing);
+							remote_num = XASPRINTF("remote_num", "#%d", thing);
 							SAFE_LB_STR(remote_num, html_buff, &html_cp);
+							XFREE(remote_num);
 							break;
 
 						default:
@@ -308,14 +310,46 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	}
 }
 
+char *pairColor(int color)
+{
+	switch (color)
+	{
+	case 0:
+		return ANSI_MAGENTA;
+	case 1:
+		return ANSI_GREEN;
+	case 2:
+		return ANSI_YELLOW;
+	case 3:
+		return ANSI_CYAN;
+	case 4:
+		return ANSI_BLUE;
+	}
+	return NULL;
+}
+
+char *pairRevColor(int color)
+{
+	switch (color)
+	{
+	case 0:
+		return "m53[\033";
+	case 1:
+		return "m23[\033";
+	case 2:
+		return "m33[\033";
+	case 3:
+		return "m63[\033";
+	case 4:
+		return "m43[\033";
+	}
+	return NULL;
+}
+
 void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 {
 	int pos, depth;
 	char *str, *strbuf, *parenlist, *endp;
-	char *colors[5] = {ANSI_MAGENTA, ANSI_GREEN, ANSI_YELLOW, ANSI_CYAN, ANSI_BLUE};
-	char *revcolors[5] = {"m53[\033", "m23[\033", "m33[\033", "m63[\033", "m43[\033"};
-	char *REVERSE_NORMAL = "m0[\033";
-	char *REVERSE_HIRED = "m13[\033m1[\033";
 	str = strip_ansi(atext);
 	strbuf = XMALLOC(LBUF_SIZE, "strbuf");
 	parenlist = XMALLOC(LBUF_SIZE, "parenlist");
@@ -334,7 +368,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			{
 				depth++;
 				parenlist[depth] = str[pos];
-				SAFE_LB_STR(colors[depth % 5], strbuf, &endp);
+				SAFE_LB_STR(pairColor(depth % 5), strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
 				SAFE_ANSI_NORMAL(strbuf, &endp);
 			}
@@ -358,7 +392,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 			{
 				if ((parenlist[depth] & 96) == (str[pos] & 96))
 				{
-					SAFE_LB_STR(colors[depth % 5], strbuf, &endp);
+					SAFE_LB_STR(pairColor(depth % 5), strbuf, &endp);
 					SAFE_LB_CHR(str[pos], strbuf, &endp);
 					SAFE_ANSI_NORMAL(strbuf, &endp);
 					depth--;
@@ -418,9 +452,9 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 		case ')':
 			depth++;
 			parenlist[depth] = str[pos];
-			SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+			SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 			SAFE_LB_CHR(str[pos], strbuf, &endp);
-			SAFE_LB_STR(revcolors[depth % 5], strbuf, &endp);
+			SAFE_LB_STR(pairRevColor(depth % 5), strbuf, &endp);
 			break;
 
 		case '(':
@@ -434,16 +468,16 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 	     */
 			if ((parenlist[depth] & 96) == (str[pos] & 96))
 			{
-				SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+				SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
-				SAFE_LB_STR(revcolors[depth % 5], strbuf, &endp);
+				SAFE_LB_STR(pairRevColor(depth % 5), strbuf, &endp);
 				depth--;
 			}
 			else
 			{
-				SAFE_LB_STR(REVERSE_NORMAL, strbuf, &endp);
+				SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
-				SAFE_LB_STR(REVERSE_HIRED, strbuf, &endp);
+				SAFE_LB_STR(ANSI_REVERSE_HIRED, strbuf, &endp);
 				str[pos] = '\0';
 				SAFE_LB_STR(str, buff, bufc);
 
@@ -694,18 +728,19 @@ void pretty_print(char *dest, char *name, char *text)
 
 void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
 {
-	char *text, *buf, *bp, *bb_p;
-	char xbuf[16], gbuf[16]; /* larger than number of attr flags! */
-	char flag_buf[34];
+	char *text = NULL, *buf, *bp, *bb_p;
+	char *xbuf = XMALLOC(16, "xbuf");
+	char *gbuf = XMALLOC(16, "gbuf");
+	char *flag_buf = XMALLOC(34, "flag_buf");
 	char *xbufp, *gbufp, *fbp;
-	char s[GBUF_SIZE];
-	BOOLEXP *bool;
+	char *s = XMALLOC(GBUF_SIZE, "s");
+	BOOLEXP *bexp;
 
 	if (ap->flags & AF_IS_LOCK)
 	{
-		bool = parse_boolexp(player, raw_text, 1);
-		text = unparse_boolexp(player, bool);
-		free_boolexp(bool);
+		bexp = parse_boolexp(player, raw_text, 1);
+		text = unparse_boolexp(player, bexp);
+		free_boolexp(bexp);
 	}
 	else if (aflags & AF_STRUCTURE)
 	{
@@ -754,6 +789,10 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 				XFREE(buf);
 			}
 
+			XFREE(s);
+			XFREE(xbuf);
+			XFREE(gbuf);
+			XFREE(flag_buf);
 			return;
 		}
 	}
@@ -852,10 +891,15 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		notify(player, s);
 	}
 
-	if ((aflags & AF_STRUCTURE) && text)
+	if (((aflags & AF_STRUCTURE) || (ap->flags & AF_IS_LOCK)) && text)
 	{
 		XFREE(text);
 	}
+
+	XFREE(s);
+	XFREE(xbuf);
+	XFREE(gbuf);
+	XFREE(flag_buf);
 }
 
 void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special)
@@ -1340,7 +1384,7 @@ void debug_examine(dbref player, dbref thing)
 	dbref aowner;
 	char *buf;
 	int aflags, alen, ca;
-	BOOLEXP *bool;
+	BOOLEXP *bexp;
 	ATTR *attr;
 	char *as, *cp, *nbuf;
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Number  = %d", thing);
@@ -1366,10 +1410,12 @@ void debug_examine(dbref player, dbref thing)
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Powers  = %s", buf);
 	XFREE(buf);
 	buf = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-	bool = parse_boolexp(player, buf, 1);
+	bexp = parse_boolexp(player, buf, 1);
 	XFREE(buf);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Lock    = %s", unparse_boolexp(player, bool));
-	free_boolexp(bool);
+	buf = unparse_boolexp(player, bexp);
+	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Lock    = %s", buf);
+	XFREE(buf);
+	free_boolexp(bexp);
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	cp = buf;
 	SAFE_LB_STR((char *)"Attr list: ", buf, &cp);
@@ -1521,8 +1567,9 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 {
 	dbref thing, content, exit, aowner, loc;
 	char savec;
-	char *temp, *buf, *buf2, timebuf[32];
-	BOOLEXP *bool;
+	char *temp, *buf, *buf2;
+	char *timebuf = XMALLOC(32, "timebuf");
+	BOOLEXP *bexp;
 	int control, aflags, alen, do_parent, is_special;
 	time_t save_access_time;
 
@@ -1532,6 +1579,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 	if (!Hearer(player))
 	{
+		XFREE(timebuf);
 		return;
 	}
 
@@ -1554,6 +1602,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	{
 		if ((thing = Location(player)) == NOTHING)
 		{
+			XFREE(timebuf);
 			return;
 		}
 	}
@@ -1568,6 +1617,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		{
 			exam_wildattrs(player, thing, do_parent, is_special);
 			olist_pop();
+			XFREE(timebuf);
 			return;
 		}
 
@@ -1581,6 +1631,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 		if (!Good_obj(thing))
 		{
+			XFREE(timebuf);
 			return;
 		}
 	}
@@ -1606,6 +1657,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			debug_examine(player, thing);
 		}
 
+		XFREE(timebuf);
 		return;
 	}
 
@@ -1640,6 +1692,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owned by %s", Name(Owner(thing)));
 			}
 
+			XFREE(timebuf);
 			return;
 		}
 	}
@@ -1675,11 +1728,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		savec = mudconf.many_coins[0];
 		mudconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-		bool = parse_boolexp(player, buf2, 1);
-		buf = unparse_boolexp(player, bool);
-		free_boolexp(bool);
+		bexp = parse_boolexp(player, buf2, 1);
+		buf = unparse_boolexp(player, bexp);
+		free_boolexp(bexp);
 		XSTRCPY(buf2, Name(Owner(thing)));
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mudconf.many_coins, Pennies(thing));
+		XFREE(buf);
 		XFREE(buf2);
 		mudconf.many_coins[0] = savec;
 		buf2 = (char *)ctime(&CreateTime(thing));
@@ -1892,6 +1946,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owned by %s", Name(Owner(thing)));
 		}
 	}
+	XFREE(timebuf);
 }
 
 void do_score(dbref player, dbref cause, int key)
@@ -2396,7 +2451,7 @@ extern NAMETAB indiv_attraccess_nametab[];
 
 void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 {
-	BOOLEXP *bool;
+	BOOLEXP *bexp;
 	char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp, *buf;
 	dbref aowner, thing;
 	int val, aflags, alen, ca, wild_decomp;
@@ -2436,7 +2491,7 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 	}
 
 	thingname = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-	bool = parse_boolexp(player, thingname, 1);
+	bexp = parse_boolexp(player, thingname, 1);
 
 	/*
      * Determine the name of the thing to use in reporting and then
@@ -2490,12 +2545,14 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
      * Report the lock (if any)
      */
 
-	if (!wild_decomp && (bool != TRUE_BOOLEXP))
+	if (!wild_decomp && (bexp != TRUE_BOOLEXP))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@lock %s=%s", thingname, unparse_boolexp_decompile(player, bool));
+		buf = unparse_boolexp_decompile(player, bexp);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@lock %s=%s", thingname, buf);
+		XFREE(buf);
 	}
 
-	free_boolexp(bool);
+	free_boolexp(bexp);
 	/*
      * Report attributes
      */
@@ -2533,10 +2590,11 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 		{
 			if (attr->flags & AF_IS_LOCK)
 			{
-				bool = parse_boolexp(player, got, 1);
-				ltext = unparse_boolexp_decompile(player, bool);
-				free_boolexp(bool);
+				bexp = parse_boolexp(player, got, 1);
+				ltext = unparse_boolexp_decompile(player, bexp);
+				free_boolexp(bexp);
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@lock/%s %s=%s", attr->name, thingname, ltext);
+				XFREE(ltext);
 			}
 			else
 			{

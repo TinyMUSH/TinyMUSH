@@ -19,7 +19,6 @@
 #include "functions.h"	/* required by code */
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
-#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
 /*
@@ -1343,11 +1342,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * sortby: Sort using a user-defined function.
  */
 
-char ucomp_buff[LBUF_SIZE];
-
-dbref ucomp_cause, ucomp_player, ucomp_caller;
-
-int u_comp(const void *s1, const void *s2)
+int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref player, dbref cause)
 {
 	/*
      * Note that this function is for use in conjunction with our own
@@ -1364,17 +1359,16 @@ int u_comp(const void *s1, const void *s2)
 	tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 	elems[0] = (char *)s1;
 	elems[1] = (char *)s2;
-	XSTRCPY(tbuf, ucomp_buff);
+	XSTRCPY(tbuf, cbuff);
 	result = bp = XMALLOC(LBUF_SIZE, "result");
-	str = tbuf;
-	exec(result, &bp, ucomp_player, ucomp_caller, ucomp_cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, elems, 2);
+	exec(result, &bp, thing, player, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tbuf, elems, 2);
 	n = (int)strtol(result, (char **)NULL, 10);
 	XFREE(result);
 	XFREE(tbuf);
 	return n;
 }
 
-void sane_qsort(void *array[], int left, int right, int (*compare)(const void *, const void *))
+void sane_qsort(void *array[], int left, int right, int (*compare)(const void *, const void *, char *, dbref, dbref, dbref), char *cbuff, dbref thing, dbref player, dbref cause)
 {
 	/*
      * Andrew Molitor's qsort, which doesn't require transitivity between
@@ -1389,12 +1383,9 @@ loop:
 	{
 		return;
 	}
-
 	/*
      * Pick something at random at swap it into the leftmost slot
-     */
-	/*
-     * This is the pivot, we'll put it back in the right spot later
+	 * This is the pivot, we'll put it back in the right spot later
      */
 	i = Randomize(1 + (right - left));
 	tmp = array[left + i];
@@ -1404,13 +1395,11 @@ loop:
 
 	for (i = left + 1; i <= right; i++)
 	{
-		/*
+	/*
 	 * Walk the array, looking for stuff that's less than our
-	 */
-		/*
 	 * pivot. If it is, swap it with the next thing along
 	 */
-		if ((*compare)(array[i], array[left]) < 0)
+		if ((*compare)(array[i], array[left], cbuff, thing, player, cause) < 0)
 		{
 			last++;
 
@@ -1424,33 +1413,26 @@ loop:
 			array[i] = tmp;
 		}
 	}
-
 	/*
      * Now we put the pivot back, it's now in the right spot, we never
-     */
-	/*
-     * need to look at it again, trust me.
+	 * need to look at it again, trust me.
      */
 	tmp = array[last];
 	array[last] = array[left];
 	array[left] = tmp;
-
 	/*
      * At this point everything underneath the 'last' index is < the
+	 * entry at 'last' and everything above it is not < it.
      */
-	/*
-     * entry at 'last' and everything above it is not < it.
-     */
-
 	if ((last - left) < (right - last))
 	{
-		sane_qsort(array, left, last - 1, compare);
+		sane_qsort(array, left, last - 1, compare, cbuff, thing, player, cause);
 		left = last + 1;
 		goto loop;
 	}
 	else
 	{
-		sane_qsort(array, last + 1, right, compare);
+		sane_qsort(array, last + 1, right, compare, cbuff, thing, player, cause);
 		right = last - 1;
 		goto loop;
 	}
@@ -1458,7 +1440,8 @@ loop:
 
 void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *atext, *list, **ptrs;
+	char *atext, **ptrs;
+	char *list = XMALLOC(LBUF_SIZE, "list");
 	Delim isep, osep;
 	int nptrs, aflags, alen, anum;
 	dbref thing, aowner;
@@ -1471,17 +1454,12 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	VaChk_Only_In_Out(4);
 	Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
-	XSTRCPY(ucomp_buff, atext);
-	ucomp_player = thing;
-	ucomp_caller = player;
-	ucomp_cause = cause;
-	list = XMALLOC(LBUF_SIZE, "list");
 	XSTRCPY(list, fargs[1]);
 	nptrs = list2arr(&ptrs, LBUF_SIZE / 2, list, &isep);
 
 	if (nptrs > 1)
 	{ /* pointless to sort less than 2 elements */
-		sane_qsort((void **)ptrs, 0, nptrs - 1, u_comp);
+		sane_qsort((void **)ptrs, 0, nptrs - 1, u_comp, atext, thing, player, cause);
 	}
 
 	arr2list(ptrs, nptrs, buff, bufc, &osep);

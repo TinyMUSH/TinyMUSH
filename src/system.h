@@ -125,4 +125,28 @@
 #define LDBL_DIG 6
 #endif
 
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#else
+/* XXX Add definitions here */
+#endif
+
+#ifdef HAVE_STDBOOL_H
+#include <stdbool.h>
+#else
+#ifndef __cplusplus
+#define bool    _Bool
+#define true    1
+#define false   0
+#else
+#define _Bool   bool
+#if __cplusplus < 201103L
+#define bool    bool
+#define false   false
+#define true    true
+#endif
+#endif
+#define __bool_true_false_are_defined   1
+#endif
+
 #endif /* __SYSTEM_H */

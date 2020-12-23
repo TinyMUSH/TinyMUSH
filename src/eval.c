@@ -19,10 +19,7 @@
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
 #include "functions.h"	/* required by code */
-#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
-
-extern char qidx_chartab[256]; /* from funvars.c */
 
 /*
  * ---------------------------------------------------------------------------
@@ -83,13 +80,13 @@ char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
 
 char *parse_to(char **dstr, char delim, int eval)
 {
-#define stacklim 32
-	char stack[stacklim];
+	char *stack = XMALLOC(32, "stack");
 	char *rstr, *cstr, *zstr;
 	int sp, tp, first, bracketlev;
 
 	if ((dstr == NULL) || (*dstr == NULL))
 	{
+		XFREE(stack);
 		return NULL;
 	}
 
@@ -97,6 +94,7 @@ char *parse_to(char **dstr, char delim, int eval)
 	{
 		rstr = *dstr;
 		*dstr = NULL;
+		XFREE(stack);
 		return rstr;
 	}
 
@@ -160,6 +158,7 @@ char *parse_to(char **dstr, char delim, int eval)
 			{
 				rstr = parse_to_cleanup(eval, first, cstr, rstr, zstr);
 				*dstr = ++cstr;
+				XFREE(stack);
 				return rstr;
 			}
 
@@ -231,6 +230,7 @@ char *parse_to(char **dstr, char delim, int eval)
 			{
 				rstr = parse_to_cleanup(eval, first, cstr, rstr, zstr);
 				*dstr = ++cstr;
+				XFREE(stack);
 				return rstr;
 			}
 
@@ -253,7 +253,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				break;
 
 			case '[':
-				if (sp < stacklim)
+				if (sp < 32)
 				{
 					stack[sp++] = ']';
 				}
@@ -263,7 +263,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				break;
 
 			case '(':
-				if (sp < stacklim)
+				if (sp < 32)
 				{
 					stack[sp++] = ')';
 				}
@@ -306,6 +306,7 @@ char *parse_to(char **dstr, char delim, int eval)
 
 	rstr = parse_to_cleanup(eval, first, cstr, rstr, zstr);
 	*dstr = NULL;
+	XFREE(stack);
 	return rstr;
 }
 
@@ -509,55 +510,163 @@ void tcache_finish(dbref player)
 	tcache_count = 0;
 }
 
-/*
- * Character table for fast lookups. 0  - 31  (00 - 1F): NULL plus other
- * specials 32 - 63  (20 - 3F): space through ? (symbol characters) 64 - 95
- * (40 - 5F): @ through _ (includes upper-case letters) 96 - 127 (60 - 7F): `
- * through delete (includes lower-case letters)
- *
+/**
+ * @brief ASCII table for reference
+ * 
+ *		0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F   
+ * 0	NUL	SOH	STX	ETX	EOT	ENQ	ACK	BEL	BS	TAB	LF	VT	FF	CR	SO	SI
+ * 1	DLE	DC1	DC2	DC3	DC4	NAK	SYN	ETB	CAN	EM	SUB	ESC	FS	GS	RS	US
+ * 2	SPC	!	"	#	$	%	&	'	(	)	*	+	,	-	.	/
+ * 3	0	1	2	3	4	5	6	7	8	9	:	;	<	=	>	?
+ * 4	@	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O
+ * 5	P	Q	R	S	T	U	V	W	X	Y	Z	[	\	]	^	_
+ * 6	`	a	b	c	d	e	f	g	h	i	j	k	l	m	n	o
+ * 7	p	q	r	s	t	u	v	w	x	y	z	{	|	}	~	DEL
+ * 
+ */
+
+/**
+ * @brief Check if character is a special char.
+ * 
  * We want '', ESC, ' ', '\', '[', '{', '(', '%', and '#'.
+ * 
+ * @param ch	Character to check
+ * @return bool	True if special, false if not.
  */
+bool special_char(unsigned char ch)
+{
+	switch (ch)
+	{
+	case 0x00: // 'NUL'
+	case 0x1b: // 'ESC'
+	case ' ':
+	case '%':
+	case '(':
+	case '[':
+	case '\\':
+	case '{':
+		return true;
+	case 0x23: // ' # '
+		/**
+		 * @brief We adjust the return value in order to avoid always treating '#' 
+		 *        like a special character, as it gets used a whole heck of a lot.
+		 * 
+		 */
+		return (mudstate.in_loop || mudstate.in_switch) ? 1 : 0;
+	}
+	return false;
+}
 
-/*
- * ASCII table for reference
- *
- * NUL,SOH,STX,ETX,EOT,ENQ,ACK,BEL,   BS,TAB,LF,VT,FF,CR,SO,SI,
- * DLE,DC1,DC2,DC3,DC4,NAK,SYN,ETB,   CAN,EM,SUB,ESC,FS,GS,RS,US,
- * space,!,",#,$,%,&,',               (,),*,+,comma,-,.,/, 0,1,2,3,4,5,6,7,
- * 8,9,:,;,<,=,>,?, @,A,B,C,D,E,F,G,                   H,I,J,K,L,M,N,O,
- * P,Q,R,S,T,U,V,W,                   X,Y,Z,[,\,],^,_, `,a,b,c,d,e,f,g,
- * h,i,j,k,l,m,n,o, p,q,r,s,t,u,v,w,                   x,y,z,{,|,},~,DEL
+/**
+ * @brief Check if a character is a token.
+ * 
+ * * We want '!', '#', '$', '+', 'A'.
+ * 
+ * @param ch	Character to check
+ * @return char 1 if true, 0 if false
  */
+bool token_char(int ch)
+{
+	switch (ch)
+	{
+	case 0x21: // ' ! '
+	case 0x23: // ' # '
+	case 0x24: // ' $ '
+	case 0x2B: // ' + '
+	case 0x40: // ' A '
+		return true;
+		break;
+	}
+	return false;
+}
 
-char special_chartab[256] = {
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-	1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+/**
+ * @brief Get subject pronoun
+ * 
+ * @param subj	id of the pronoun
+ * @return char* pronoun
+ */
+char *get_subj(int subj)
+{
+	switch (subj)
+	{
+	case 1:
+		return "it";
+	case 2:
+		return "she";
+	case 3:
+		return "he";
+	case 4:
+		return "they";
+	}
+	return STRING_EMPTY;
+}
 
-char token_chartab[256] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+/**
+ * @brief Get Possessive Adjective pronoun
+ * 
+ * @param subj	id of the pronoun
+ * @return char* pronoun
+ */
+char *get_poss(int poss)
+{
+	switch (poss)
+	{
+	case 1:
+		return "its";
+	case 2:
+		return "her";
+	case 3:
+		return "his";
+	case 4:
+		return "their";
+	}
+	return STRING_EMPTY;
+}
 
-char *ansi_chartab[256] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, ANSI_BBLUE, ANSI_BCYAN, 0, 0, 0, ANSI_BGREEN, 0, 0, 0, 0, 0, ANSI_BMAGENTA, 0, 0, 0, 0, ANSI_BRED, 0, 0, 0, 0, ANSI_BWHITE, ANSI_BBLACK, ANSI_BYELLOW, 0, 0, 0, 0, 0, 0,
-	0, 0, ANSI_BLUE, ANSI_CYAN, 0, 0, ANSI_BLINK, ANSI_GREEN, ANSI_HILITE, ANSI_INVERSE, 0, 0, 0, ANSI_MAGENTA, ANSI_NORMAL, 0, 0, 0, ANSI_RED, 0, 0, ANSI_UNDER, 0, ANSI_WHITE, ANSI_BLACK, ANSI_YELLOW, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+/**
+ * @brief Get Object pronoun
+ * 
+ * @param subj	id of the pronoun
+ * @return char* pronoun
+ */
+char *get_obj(int obj)
+{
+	switch (obj)
+	{
+	case 1:
+		return "it";
+	case 2:
+		return "her";
+	case 3:
+		return "him";
+	case 4:
+		return "them";
+	}
+	return STRING_EMPTY;
+}
+
+/**
+ * @brief Get Absolute Possessive pronoun
+ * 
+ * @param subj	id of the pronoun
+ * @return char* pronoun
+ */
+char *get_absp(int absp)
+{
+	switch (absp)
+	{
+	case 1:
+		return "its";
+	case 2:
+		return "hers";
+	case 3:
+		return "his";
+	case 4:
+		return "theirs";
+	}
+	return STRING_EMPTY;
+}
 
 void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs)
 {
@@ -577,10 +686,6 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	VARENT *xvar;
 	ATTR *ap;
 	GDATA *preserve;
-	const char *subj[5] = {"", "it", "she", "he", "they"};
-	const char *poss[5] = {"", "its", "her", "his", "their"};
-	const char *obj[5] = {"", "it", "her", "him", "them"};
-	const char *absp[5] = {"", "its", "hers", "his", "theirs"};
 
 	if (*dstr == NULL)
 	{
@@ -623,14 +728,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 	while (**dstr && !alldone)
 	{
-		/*
-	 * We adjust the special table every time we go around this
-	 * loop, in order to avoid always treating '#' like a special
-	 * character, as it gets used a whole heck of a lot.
-	 */
-		special_chartab[(unsigned char)'#'] = (mudstate.in_loop || mudstate.in_switch) ? 1 : 0;
-
-		if (!special_chartab[(unsigned char)**dstr])
+		if (!special_char((unsigned char)**dstr))
 		{
 			/*
 	     * Mundane characters are the most common. There are
@@ -643,7 +741,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			do
 			{
 				nchar++;
-			} while (!special_chartab[(unsigned char)*(++mundane)]);
+			} while (!special_char((unsigned char)*(++mundane)));
 
 			p = *bufc;
 			navail = LBUF_SIZE - 1 - (p - buff);
@@ -961,13 +1059,13 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					break;
 				}
 
-				if (!ansi_chartab[(unsigned char)**dstr])
+				if (!ansiChar((unsigned char)**dstr))
 				{
 					SAFE_LB_CHR(**dstr, buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR(ansi_chartab[(unsigned char)**dstr], buff, bufc);
+					SAFE_LB_STR(ansiChar((unsigned char)**dstr), buff, bufc);
 					ansi = (**dstr == 'n') ? 0 : 1;
 				}
 
@@ -1132,7 +1230,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (**dstr != '<')
 				{
-					i = qidx_chartab[(unsigned char)**dstr];
+					i = qidx_chartab((unsigned char)**dstr);
 
 					if ((i < 0) || (i >= mudconf.max_global_regs))
 					{
@@ -1141,7 +1239,9 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (mudstate.rdata && mudstate.rdata->q_alloc > i)
 					{
-						SAFE_STRNCAT(buff, bufc, mudstate.rdata->q_regs[i], mudstate.rdata->q_lens[i], LBUF_SIZE);
+						char *qreg = mudstate.rdata->q_regs[i];
+						size_t qlen = mudstate.rdata->q_lens[i];
+						SAFE_STRNCAT(buff, bufc, qreg, qlen, LBUF_SIZE);
 					}
 
 					if (!**dstr)
@@ -1226,7 +1326,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					safe_name(cause, buff, bufc);
 				}
 				else
-					SAFE_LB_STR((char *)obj[gender], buff, bufc);
+					SAFE_LB_STR((char *)get_obj(gender), buff, bufc);
 
 				break;
 
@@ -1244,7 +1344,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 				else
 				{
-					SAFE_LB_STR((char *)poss[gender], buff, bufc);
+					SAFE_LB_STR((char *)get_poss(gender), buff, bufc);
 				}
 
 				break;
@@ -1261,7 +1361,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					safe_name(cause, buff, bufc);
 				}
 				else
-					SAFE_LB_STR((char *)subj[gender], buff, bufc);
+					SAFE_LB_STR((char *)get_subj(gender), buff, bufc);
 
 				break;
 
@@ -1279,7 +1379,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 				else
 				{
-					SAFE_LB_STR((char *)absp[gender], buff, bufc);
+					SAFE_LB_STR((char *)get_absp(gender), buff, bufc);
 				}
 
 				break;
@@ -1722,7 +1822,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			at_space = 0;
 			(*dstr)++;
 
-			if (!token_chartab[(unsigned char)**dstr])
+			if (!token_char((unsigned char)**dstr))
 			{
 				(*dstr)--;
 				SAFE_LB_CHR(**dstr, buff, bufc);

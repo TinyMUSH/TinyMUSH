@@ -19,8 +19,7 @@
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
-#include "ansi.h"		/* required by code */
-#include "stringutil.h" /* required by code */
+#include "stringutil.h"         /* required by code */
 
 extern NAMETAB indiv_attraccess_nametab[];
 
@@ -282,8 +281,9 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, int aflags)
 {
 	int i, j, n_aliases, retcode;
-	char *p, *tokp;
-	char alias_buf[LBUF_SIZE], tmp_buf[LBUF_SIZE], *alias_ptrs[LBUF_SIZE / 2];
+	char *p, *tokp, *alias_ptrs[LBUF_SIZE / 2];
+	char *alias_buf = XMALLOC(LBUF_SIZE, "alias_buf");
+	char *tmp_buf;
 	/*
      * Clear out the original alias, so we can rewrite a new alias
      * * that uses the same names, if necessary.
@@ -294,12 +294,13 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
      * * we have to eat leading and trailing spaces.
      */
 	retcode = 1;
-	XSTRCPY(tmp_buf, list);
 
+	tmp_buf = XSTRDUP(list, "tmp_buf");
 	for (n_aliases = 0, p = strtok_r(tmp_buf, ";", &tokp); p; n_aliases++, p = strtok_r(NULL, ";", &tokp))
 	{
 		alias_ptrs[n_aliases] = trim_spaces(p);
 	}
+	XFREE(tmp_buf);
 
 	/*
      * Enforce a maximum number of aliases.
@@ -499,6 +500,7 @@ void do_lock(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 	int atr, aflags;
 	ATTR *ap;
 	struct boolexp *okey;
+	char *s;
 
 	if (parse_attrib(player, name, &thing, &atr, 0))
 	{
@@ -567,7 +569,9 @@ void do_lock(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 			key = A_LOCK;
 		}
 
-		atr_add_raw(thing, key, unparse_boolexp_quiet(player, okey));
+		s = unparse_boolexp_quiet(player, okey);
+		atr_add_raw(thing, key, s);
+		XFREE(s);
 
 		if (key == A_LDARK)
 		{
@@ -1222,15 +1226,17 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	dbref oldthing;
 	char **newthings, **newattrs, *tp;
 	ATTR *oldattr;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");;
 
 	if (!*oldpair || !**newpair || !oldpair || !*newpair)
 	{
+		XFREE(s);
 		return;
 	}
 
 	if (nargs < 1)
 	{
+		XFREE(s);
 		return;
 	}
 
@@ -1275,6 +1281,7 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	}
 
 	olist_pop();
+	XFREE(s);
 	XFREE(newthings);
 	XFREE(newattrs);
 }
@@ -1629,13 +1636,14 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 
 void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to)
 {
-	char s[MBUF_SIZE];
+	char *s;
 	edit_string(src, dst, from, to);
 
 	if (mudconf.ansi_colors)
 	{
-		snprintf(s, MBUF_SIZE, "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL);
+		s = XASPRINTF("s", "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL);
 		edit_string(src, returnstr, from, s);
+		XFREE(s);
 	}
 	else
 	{
@@ -1817,14 +1825,17 @@ void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char
 {
 	dbref thing;
 	int attrib;
-	char s[MBUF_SIZE];
-	snprintf(s, MBUF_SIZE, "me/%s", object);
+	char *s;
+
+	s = XASPRINTF("s", "me/%s", object);
 
 	if (!((parse_attrib(player, object, &thing, &attrib, 0) && (attrib != NOTHING)) || (parse_attrib(player, s, &thing, &attrib, 0) && (attrib != NOTHING))))
 	{
 		notify_quiet(player, "No match.");
+		XFREE(s);
 		return;
 	}
+	XFREE(s);
 
 	if (!controls(player, thing))
 	{

@@ -255,20 +255,53 @@ void fun_html_unescape(char *buff, char **bufc, dbref player, dbref caller, dbre
 		}
 	}
 }
+/**
+ * @brief Check if a characters should be converted to %<hex>
+ * 
+ * @param ch Character to check
+ * @return true Convert to hex
+ * @return false Keep as is.
+ */
+bool escaped_chars(unsigned char ch) {
+	switch(ch) {
+		case '<':
+		case '>':
+		case '#':
+		case '%':
+		case '{':
+		case '}':
+		case '|':
+		case '\\':
+		case '^':
+		case '~':
+		case '[':
+		case ']':
+		case '\'':
+		case ';':
+		case '/':
+		case '?':
+		case ':':
+		case '@':
+		case '=':
+		case '&':
+		case '\"':
+		case '+':
+			return true;
+	}
+	return false;
+}
 
 void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	/*
-     * These are the characters which are converted to %<hex>
-     */
-	char *escaped_chars = "<>#%{}|\\^~[]';/?:@=&\"+";
+
+	//char *escaped_chars = "<>#%{}|\\^~[]';/?:@=&\"+";
 	const char *msg_orig;
 	int ret = 0;
-	char tbuf[10];
+	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
 
 	for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++)
 	{
-		if (strchr(escaped_chars, *msg_orig))
+		if (escaped_chars(*msg_orig))
 		{
 			XSPRINTF(tbuf, "%%%2x", *msg_orig);
 			ret = SAFE_LB_STR(tbuf, buff, bufc);
@@ -282,6 +315,7 @@ void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
 		}
 	}
+	XFREE(tbuf);
 }
 
 void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -289,7 +323,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 	const char *msg_orig;
 	int ret = 0;
 	unsigned int tempchar;
-	char tempstr[10];
+	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");;
 
 	for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret;)
 	{
@@ -301,10 +335,10 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 			break;
 
 		case '%':
-			XSTRNCPY(tempstr, msg_orig + 1, 2);
-			tempstr[2] = '\0';
+			XSTRNCPY(tbuf, msg_orig + 1, 2);
+			tbuf[2] = '\0';
 
-			if ((sscanf(tempstr, "%x", &tempchar) == 1) && (tempchar > 0x1F) && (tempchar < 0x7F))
+			if ((sscanf(tbuf, "%x", &tempchar) == 1) && (tempchar > 0x1F) && (tempchar < 0x7F))
 			{
 				ret = SAFE_LB_CHR((char)tempchar, buff, bufc);
 			}
@@ -333,5 +367,6 @@ void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref
 		}
 	}
 
+	XFREE(tbuf);
 	return;
 }

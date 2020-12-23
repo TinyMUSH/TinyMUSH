@@ -84,14 +84,14 @@ void init_cmdtab(void)
 	CMDENT *cp;
 	ATTR *ap;
 	char *p, *q;
-	char *cbuff;
+	char *cbuff = XMALLOC(SBUF_SIZE, "cbuff");
 	int i;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
+
 	hashinit(&mudstate.command_htab, 250 * mudconf.hash_factor, HT_STR);
 	/*
 	 * Load attribute-setting commands
 	 */
-	cbuff = XMALLOC(SBUF_SIZE, "cbuff");
 
 	for (ap = attr; ap->name; ap++)
 	{
@@ -165,12 +165,14 @@ void init_cmdtab(void)
 	enter_cmdp = (CMDENT *)hashfind("enter", &mudstate.command_htab);
 	leave_cmdp = (CMDENT *)hashfind("leave", &mudstate.command_htab);
 	internalgoto_cmdp = (CMDENT *)hashfind("internalgoto", &mudstate.command_htab);
+
+	XFREE(s);
 }
 
 void reset_prefix_cmds(void)
 {
 	int i;
-	char cn[2] = "x";
+	char *cn = XSTRDUP("x", "cn");
 
 	for (i = 0; i < 256; i++)
 	{
@@ -180,6 +182,8 @@ void reset_prefix_cmds(void)
 			prefix_cmds[i] = (CMDENT *)hashfind(cn, &mudstate.command_htab);
 		}
 	}
+
+	XFREE(cn);
 }
 
 /*
@@ -873,7 +877,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, int 
 
 char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
-	static char preserve_cmd[LBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
+	char *preserve_cmd= XMALLOC(LBUF_SIZE, "preserve_cmd");
 	char *p, *q, *arg, *lcbuf, *slashp, *cmdsave, *bp, *str, *evcmd;
 	char *gbuf, *gc, *pname, *lname;
 	int succ, aflags, alen, i, got_stop, pcount, retval = 0;
@@ -891,7 +895,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * Robustify player
 	 */
 	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< process_command >";
+	mudstate.debug_cmd = XSTRDUP("< process_command >", "mudstate.debug_cmd");
 
 	if (!command)
 	{
@@ -1569,7 +1573,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
 	char *cp, *cmdsave, *save_poutnew, *save_poutbufc, *save_pout;
-	char *log_cmdbuf, *pname, *lname;
+	char *log_cmdbuf = NULL, *pname, *lname;
 	int save_inpipe, numpipes;
 	dbref save_poutobj, save_enactor, save_player;
 	struct timeval begin_time, end_time;
@@ -1741,6 +1745,10 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 	mudstate.curr_enactor = save_enactor;
 	mudstate.curr_player = save_player;
 	mudstate.cmd_nest_lev--;
+
+	if(log_cmdbuf) {
+		XFREE(log_cmdbuf);
+	}
 }
 
 /*

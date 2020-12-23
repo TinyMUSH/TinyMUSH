@@ -21,7 +21,6 @@
 #include "match.h"      /* required by code */
 #include "powers.h"     /* required by code */
 #include "udb.h"        /* required by code */
-#include "ansi.h"       /* required by code */
 #include "stringutil.h" /* required by code */
 
 #ifndef O_ACCMODE
@@ -1983,7 +1982,7 @@ void al_destroy(dbref thing)
 
 char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
 {
-    static char attr[MBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
+    char *attr = XMALLOC(MBUF_SIZE, "attr");
 
     /* If using the default owner and flags (almost all attributes will),
      * just store the string.
@@ -2222,10 +2221,11 @@ void atr_add_raw(dbref thing, int atr, char *buff)
 
         if (!mudstate.standalone && !mudstate.loading_db)
         {
-            char tbuf[SBUF_SIZE];
+            char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
             (void)cron_clr(thing, A_DAILY);
             XSPRINTF(tbuf, "0 %d * * *", mudconf.events_daily_hour);
             call_cron(thing, thing, A_DAILY, tbuf);
+            XFREE(tbuf);
         }
 
         break;
@@ -2276,6 +2276,7 @@ void atr_add(dbref thing, int atr, char *buff, dbref owner, int flags)
     {
         tbuff = atr_encode(buff, thing, owner, flags, atr);
         atr_add_raw(thing, atr, tbuff);
+        XFREE(tbuff);
     }
 }
 
@@ -2992,7 +2993,8 @@ dbref parse_objid(const char *s, const char *p)
     dbref it;
     time_t tt;
     const char *r;
-    char tbuf[LBUF_SIZE];
+    char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
+    ;
 
     /* We're passed two parameters: the start of the string, and the
      * pointer to where the ':' in the string is. If the latter is NULL,
@@ -3003,6 +3005,7 @@ dbref parse_objid(const char *s, const char *p)
     {
         if ((p = strchr(s, ':')) == NULL)
         {
+            XFREE(tbuf);
             return parse_dbref_only(s);
         }
     }
@@ -3022,14 +3025,17 @@ dbref parse_objid(const char *s, const char *p)
         {
             if (!isdigit(*r))
             {
+                XFREE(tbuf);
                 return NOTHING;
             }
         }
 
         tt = (time_t)strtol(p, (char **)NULL, 10);
+        XFREE(tbuf);
         return ((CreateTime(it) == tt) ? it : NOTHING);
     }
 
+    XFREE(tbuf);
     return NOTHING;
 }
 
@@ -3102,9 +3108,9 @@ void putstring(FILE *f, const char *s)
     putc('\n', f);
 }
 
-char *getstring_noalloc(FILE *f, int new_strings)
+char *getstring(FILE *f, int new_strings)
 {
-    static char buf[LBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
+    char *buf = XMALLOC(LBUF_SIZE, "buf");
     char *p;
     int c, lastc;
     p = buf;
@@ -3128,9 +3134,7 @@ char *getstring_noalloc(FILE *f, int new_strings)
                 return buf;
             }
 
-            /* If a newline, return if prior char is not a cr.
-	     * Otherwise keep on truckin'
-	     */
+            /* If a newline, return if prior char is not a cr. Otherwise keep on truckin' */
 
             if ((c == '\n') && (lastc != '\r'))
             {
@@ -3194,30 +3198,30 @@ char *getstring_noalloc(FILE *f, int new_strings)
 
 dbref getref(FILE *f)
 {
-    char buf[SBUF_SIZE];
+    dbref d = 0;
+    char *buf = XMALLOC(SBUF_SIZE, "buf");
 
     if (fgets(buf, sizeof(buf), f) != NULL)
     {
-        return ((int)strtol(buf, (char **)NULL, 10));
+        d = ((int)strtol(buf, (char **)NULL, 10));
     }
-    else
-    {
-        return (0);
-    }
+
+    XFREE(buf);
+    return (d);
 }
 
 long getlong(FILE *f)
 {
-    char buf[SBUF_SIZE];
+    long d = 0;
+    char *buf = XMALLOC(SBUF_SIZE, "buf");
 
     if (fgets(buf, sizeof(buf), f) != NULL)
     {
-        return (strtol(buf, (char **)NULL, 10));
+        d = (strtol(buf, (char **)NULL, 10));
     }
-    else
-    {
-        return (0);
-    }
+
+    XFREE(buf);
+    return (d);
 }
 
 int init_gdbm_db(char *gdbmfile)
@@ -3352,7 +3356,7 @@ void load_restart_db(void)
     DESC *p;
     char *dbf;
     int val, version, new_strings = 0;
-    char *temp, buf[8];
+    char *temp, *buf = XMALLOC(SBUF_SIZE, "buf");
     struct stat fstatbuf;
     dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
     f = fopen(dbf, "r");
@@ -3393,7 +3397,7 @@ void load_restart_db(void)
         mudstate.reboot_nums = getref(f) + 1;
     }
 
-    XSTRCPY(mudstate.doing_hdr, getstring_noalloc(f, new_strings));
+    mudstate.doing_hdr = getstring(f, new_strings);
 
     if (version & RS_CONCENTRATE)
     {
@@ -3418,34 +3422,40 @@ void load_restart_db(void)
         d->host_info = getref(f);
         d->player = getref(f);
         d->last_time = (time_t)getlong(f);
-        temp = (char *)getstring_noalloc(f, new_strings);
+        temp = getstring(f, new_strings);
 
         if (*temp)
         {
-            d->output_prefix = XMALLOC(LBUF_SIZE, "d->output_prefix");
-            XSTRCPY(d->output_prefix, temp);
+            d->output_prefix = temp;
         }
         else
         {
             d->output_prefix = NULL;
         }
 
-        temp = (char *)getstring_noalloc(f, new_strings);
+        temp = getstring(f, new_strings);
 
         if (*temp)
         {
-            d->output_suffix = XMALLOC(LBUF_SIZE, "d->output_suffix");
-            XSTRCPY(d->output_suffix, temp);
+            d->output_suffix = temp;
         }
         else
         {
             d->output_suffix = NULL;
         }
 
-        XSTRCPY(d->addr, getstring_noalloc(f, new_strings));
-        //XSTRCPY ( d->doing, getstring_noalloc ( f, new_strings ) );
-        d->doing = sane_doing(getstring_noalloc(f, new_strings), "doing");
-        XSTRCPY(d->username, getstring_noalloc(f, new_strings));
+        temp = getstring(f, new_strings);
+        XSTRNCPY(d->addr, temp, 50);
+        XFREE(temp);
+
+        temp = getstring(f, new_strings);
+        d->doing = sane_doing(temp, "doing");
+        XFREE(temp);
+
+        temp = getstring(f, new_strings);
+        XSTRNCPY(d->username, temp, 10);
+        XFREE(temp);
+
         d->colormap = NULL;
 
         if (version & RS_CONCENTRATE)
@@ -3469,9 +3479,11 @@ void load_restart_db(void)
         d->quota = mudconf.cmd_quota_max;
         d->program_data = NULL;
         d->hashnext = NULL;
-        /* Note that d->address is NOT INITIALIZED, and it DOES
-	 * get used later, particularly when checking logout.
-	 */
+
+        /**
+         * @brief Note that d->address is NOT INITIALIZED, and it DOES get used later, particularly when checking logout.
+         * 
+         */
 
         if (descriptor_list)
         {
@@ -3521,4 +3533,5 @@ void load_restart_db(void)
     fclose(f);
     remove(dbf);
     XFREE(dbf);
+    XFREE(buf);
 }

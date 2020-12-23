@@ -355,6 +355,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Base conversion: BASECONV
  */
 
+/*
 char from_base_64[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -394,26 +395,88 @@ char from_base_36[256] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
 char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+*/
+
+int fromBaseX(char ch, int base)
+{
+    int i = -1;
+    if (ch == '+' || ch == '-')
+    {
+        i = base > 36 ? 62 : -1;
+    }
+    else if (ch == '/' || ch == '_')
+    {
+        i = base > 36 ? 63 : -1;
+    }
+    else if (ch >= 'A' && ch <= 'Z')
+    {
+        i = base > 36 ? ch - 65 : ch - 55;
+    }
+    else if (ch >= 'a' && ch <= 'z')
+    {
+        i = base > 36 ? ch - 71 : ch - 87;
+    }
+    else if (ch >= '0' && ch <= '9')
+    {
+        i = base > 36 ? ch + 4 : ch - 48;
+    }
+    if(i > base) {
+        i = -1;
+    }
+    return i;
+}
+
+char toBaseX(int i, int base)
+{
+    char ch = 0;
+    if (base > 36)
+    {
+        if (i == 62)
+        {
+            ch = '-';
+        }
+        else if (i == 63)
+        {
+            ch = '_';
+        }
+        else if (i >= 0 && i <= 25)
+        {
+            ch = i + 65;
+        }
+        else if (i >= 26 && i <= 51)
+        {
+            ch = i + 71;
+        }
+        else if (i >= 52 && i <= 61)
+        {
+            ch = i - 4;
+        }
+    }
+    else
+    {
+        if (i >= 0 && i <= 9)
+        {
+            ch = i + 48;
+        }
+        else if (i >= 10 && i <= 35)
+        {
+            ch = i + 55;
+        }
+    }
+
+    return ch;
+}
 
 void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long long n, m;
     int from, to, isneg;
-    char *frombase, *tobase, *p, *nbp;
-    char nbuf[LBUF_SIZE];
-    /*
-     * Use the base 36 conversion table by default
-     */
-    frombase = from_base_36;
-    tobase = to_base_36;
-
-    /*
-     * Figure out our bases
-     */
+    char *p, *nbp;
+    char *nbuf = XMALLOC(LBUF_SIZE, "nbuf");
 
     if (!is_integer(fargs[1]) || !is_integer(fargs[2]))
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 INVALID BASE", 16, LBUF_SIZE);
+        SAFE_LB_STR("#-1 INVALID BASE", buff, bufc);
         return;
     }
 
@@ -422,32 +485,23 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if ((from < 2) || (from > 64) || (to < 2) || (to > 64))
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 BASE OUT OF RANGE", 21, LBUF_SIZE);
+        SAFE_LB_STR("#-1 BASE OUT OF RANGE", buff, bufc);
         return;
     }
-
-    if (from > 36)
-    {
-        frombase = from_base_64;
-    }
-
-    if (to > 36)
-    {
-        tobase = to_base_64;
-    }
-
-    /*
+    /**
      * Parse the number to convert
+     * 
      */
     p = Eat_Spaces(fargs[0]);
     n = 0;
 
     if (p)
     {
-        /*
-	 * If we have a leading hyphen, and we're in base 63/64,
-	 * always treat it as a minus sign. PennMUSH consistency.
-	 */
+        /**
+         * If we have a leading hyphen, and we're in base 63/64,
+         * always treat it as a minus sign. PennMUSH consistency.
+         * 
+         */
         if ((from < 63) && (to < 63) && (*p == '-'))
         {
             isneg = 1;
@@ -462,14 +516,14 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         {
             n *= from;
 
-            if (frombase[(unsigned char)*p] >= 0)
+            if (fromBaseX((unsigned char)*p, from) >= 0)
             {
-                n += frombase[(unsigned char)*p];
+                n += fromBaseX((unsigned char)*p, from);
                 p++;
             }
             else
             {
-                SAFE_STRNCAT(buff, bufc, "#-1 MALFORMED NUMBER", 20, LBUF_SIZE);
+                SAFE_LB_STR("#-1 MALFORMED NUMBER", buff, bufc);
                 return;
             }
         }
@@ -479,19 +533,18 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             SAFE_LB_CHR('-', buff, bufc);
         }
     }
-
-    /*
+    /**
      * Handle the case of 0 and less than base case.
+     * 
      */
-
     if (n < to)
     {
-        SAFE_LB_CHR(tobase[(unsigned char)n], buff, bufc);
+        SAFE_LB_CHR(toBaseX((unsigned char)n, to), buff, bufc);
         return;
     }
-
-    /*
+    /**
      * Build up the number backwards, then reverse it.
+     * 
      */
     nbp = nbuf;
 
@@ -499,7 +552,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         m = n % to;
         n = n / to;
-        SAFE_LB_CHR(tobase[(unsigned char)m], nbuf, &nbp);
+        SAFE_LB_CHR(toBaseX((unsigned char)m, to), nbuf, &nbp);
     }
 
     nbp--;
@@ -509,6 +562,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         SAFE_LB_CHR(*nbp, buff, bufc);
         nbp--;
     }
+    XFREE(nbuf);
 }
 
 /*

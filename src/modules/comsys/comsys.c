@@ -1641,23 +1641,29 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name)
         if (chp->join_lock)
             buff = unparse_boolexp(player, chp->join_lock);
         else
-            buff = (char *)"*UNLOCKED*";
+            buff = XSTRDUP("*UNLOCKED*", buff);
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Join Lock: %s", buff);
+
+        XFREE(buff);
 
         if (chp->trans_lock)
             buff = unparse_boolexp(player, chp->trans_lock);
         else
-            buff = (char *)"*UNLOCKED*";
+            buff = XSTRDUP("*UNLOCKED*", buff);
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Transmit Lock: %s", buff);
+
+        XFREE(buff);
 
         if (chp->recv_lock)
             buff = unparse_boolexp(player, chp->recv_lock);
         else
-            buff = (char *)"*UNLOCKED*";
+            buff = XSTRDUP("*UNLOCKED*", buff);
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Receive Lock: %s", buff);
+
+        XFREE(buff);
 
         if (chp->descrip)
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Description: %s", chp->descrip);
@@ -1962,8 +1968,8 @@ static void read_comsys(FILE *fp, int com_ver)
 
     while (!done)
     {
-        chp = (CHANNEL *)XMALLOC(sizeof(CHANNEL), "read_comsys.chp");
-        chp->name = XSTRDUP(getstring_noalloc(fp, 1), "read_comsys.chp->name");
+        chp = (CHANNEL *)XMALLOC(sizeof(CHANNEL), "chp");
+        chp->name = getstring(fp, 1);
         chp->owner = getref(fp);
 
         if (!Good_obj(chp->owner) || !isPlayer(chp->owner))
@@ -1985,19 +1991,20 @@ static void read_comsys(FILE *fp, int com_ver)
         }
         else
         {
-            s = (char *)getstring_noalloc(fp, 1);
+            s = getstring(fp, 1);
 
             if (s && *s)
-                chp->descrip = XSTRDUP(s, "read_comsys.chp->descrip");
+                chp->descrip = s;
             else
                 chp->descrip = NULL;
 
+     
             if (com_ver > 3)
             {
-                s = (char *)getstring_noalloc(fp, 1);
+                s = (char *)getstring(fp, 1);
 
                 if (s && *s)
-                    chp->header = XSTRDUP(s, "read_comsys.chp->header");
+                    chp->header = s;
             }
 
             if (com_ver == 2)
@@ -2091,7 +2098,7 @@ static void read_comsys(FILE *fp, int com_ver)
         if (!chp->header)
         {
             sprintf(buf, "[%s]", chp->name);
-            chp->header = XSTRDUP(buf, "read_comsys.chp->header");
+            chp->header = XSTRDUP(buf, "chp->header");
         }
 
         chp->who = NULL;
@@ -2099,7 +2106,7 @@ static void read_comsys(FILE *fp, int com_ver)
         chp->connect_who = NULL;
         chp->num_connected = 0;
         hashadd(chp->name, (int *)chp, &mod_comsys_comsys_htab, 0);
-        getstring_noalloc(fp, 0); /* discard the < */
+        XFREE(getstring(fp, 0)); /* discard the < */
         c = getc(fp);
 
         if (c == '+') /* look ahead for the end of the channels */
@@ -2108,7 +2115,7 @@ static void read_comsys(FILE *fp, int com_ver)
         ungetc(c, fp);
     }
 
-    getstring_noalloc(fp, 0); /* discard the version string */
+    XFREE(getstring(fp, 0)); /* discard the version string */
     done = 0;
     c = getc(fp);
 
@@ -2121,22 +2128,24 @@ static void read_comsys(FILE *fp, int com_ver)
 
     while (!done)
     {
-        cap = (COMALIAS *)XMALLOC(sizeof(COMALIAS), "read_comsys.cap");
+        cap = (COMALIAS *)XMALLOC(sizeof(COMALIAS), "cap");
         cap->player = getref(fp);
-        cap->channel = lookup_channel((char *)getstring_noalloc(fp, 1));
-        cap->alias = XSTRDUP(getstring_noalloc(fp, 1), "read_comsys.cap->alias");
-        s = (char *)getstring_noalloc(fp, 1);
+        s = getstring(fp, 1);
+        cap->channel = lookup_channel(s);
+        XFREE(s);
+        cap->alias = getstring(fp, 1);
+        s = getstring(fp, 1);
 
         if (s && *s)
-            cap->title = XSTRDUP(s, "read_comsys.ap->title");
+            cap->title = s;
         else
             cap->title = NULL;
 
-        s1 = XMALLOC(LBUF_SIZE, "read_comsys.s1");
+        s1 = XMALLOC(LBUF_SIZE, "s1");
         snprintf(s1, LBUF_SIZE, "%d.%s", cap->player, cap->alias);
         hashadd(s1, (int *)cap, &mod_comsys_calias_htab, 0);
         XFREE(s1);
-        clist = (COMLIST *)XMALLOC(sizeof(COMLIST), "read_comsys.clist");
+        clist = (COMLIST *)XMALLOC(sizeof(COMLIST), "clist");
         clist->alias_ptr = cap;
         clist->next = lookup_clist(cap->player);
 
@@ -2148,7 +2157,7 @@ static void read_comsys(FILE *fp, int com_ver)
 
         if (!is_onchannel(cap->player, cap->channel))
         {
-            wp = (CHANWHO *)XMALLOC(sizeof(CHANWHO), "read_comsys.wp");
+            wp = (CHANWHO *)XMALLOC(sizeof(CHANWHO), "wp");
             wp->player = cap->player;
             wp->is_listening = getref(fp);
 
@@ -2169,7 +2178,7 @@ static void read_comsys(FILE *fp, int com_ver)
             getref(fp); /* toss the value */
         }
 
-        getstring_noalloc(fp, 0); /* discard the < */
+        XFREE(getstring(fp, 0)); /* discard the < */
         c = getc(fp);
 
         if (c == '*') /* look ahead for the end of the aliases */
@@ -2178,12 +2187,13 @@ static void read_comsys(FILE *fp, int com_ver)
         ungetc(c, fp);
     }
 
-    s = (char *)getstring_noalloc(fp, 0);
+    s = (char *)getstring(fp, 0);
 
     if (strcmp(s, (char *)"*** END OF DUMP ***"))
     {
         log_write(LOG_STARTUP, "INI", "COM", "Aborted load on unexpected line: %s", s);
     }
+    XFREE(s);
 }
 
 static void sanitize_comsys(void)

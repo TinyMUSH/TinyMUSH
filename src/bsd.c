@@ -56,7 +56,7 @@ int get_slave_result(void)
 	int remote_port, len;
 	unsigned long addr;
 	DESC *d;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	len = read(slave_socket, buf, LBUF_SIZE - 1);
 
@@ -65,12 +65,14 @@ int get_slave_result(void)
 		if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
 		{
 			XFREE(buf);
+			XFREE(s);
 			return (-1);
 		}
 
 		close(slave_socket);
 		slave_socket = -1;
 		XFREE(buf);
+		XFREE(s);
 		return (-1);
 	}
 	else if (len == 0)
@@ -268,6 +270,7 @@ int get_slave_result(void)
 
 gsr_end:
 	XFREE(buf);
+	XFREE(s);
 	return 0;
 }
 
@@ -690,7 +693,7 @@ DESC *new_connection(int sock)
 	socklen_t addr_len, len;
 	char *buf;
 	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< new_connection >";
+	mudstate.debug_cmd = XSTRDUP("< new_connection >", "mudstate.debug_cmd");
 	addr_len = sizeof(struct sockaddr);
 	newsock = accept(sock, (struct sockaddr *)&addr, &addr_len);
 
@@ -727,7 +730,6 @@ DESC *new_connection(int sock)
 			XFREE(buf);
 		}
 
-		
 		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 		d = initializesock(newsock, &addr);
 		mudstate.debug_cmd = cmdsave;
@@ -737,17 +739,85 @@ DESC *new_connection(int sock)
 	return (d);
 }
 
-/*
- * (Dis)connect reasons that get written to the logfile
+/**
+ * @brief (Dis)connect reasons that get written to the logfile
+ * 
+ * @param reason reason ID
+ * @return char* reason message
  */
+char *connReasons(int reason)
+{
+	switch (reason)
+	{
+	case 0:
+		return "Unspecified";
+	case 1:
+		return "Guest-connected to";
+	case 2:
+		return "Created";
+	case 3:
+		return "Connected to";
+	case 4:
+		return "Dark-connected to";
+	case 5:
+		return "Quit";
+	case 6:
+		return "Inactivity Timeout";
+	case 7:
+		return "Booted";
+	case 8:
+		return "Remote Close or Net Failure";
+	case 9:
+		return "Game Shutdown";
+	case 10:
+		return "Login Retry Limit";
+	case 11:
+		return "Logins Disabled";
+	case 12:
+		return "Logout (Connection Not Dropped)";
+	case 13:
+		return "Too Many Connected Players";
+	}
+	return NULL;
+}
 
-const char *conn_reasons[] = {"Unspecified", "Guest-connected to", "Created", "Connected to", "Dark-connected to", "Quit", "Inactivity Timeout", "Booted", "Remote Close or Net Failure", "Game Shutdown", "Login Retry Limit", "Logins Disabled", "Logout (Connection Not Dropped)", "Too Many Connected Players"};
-
-/*
- * (Dis)connect reasons that get fed to A_A(DIS)CONNECT via announce_connattr
+/**
+ * @brief (Dis)connect reasons that get fed to A_A(DIS)CONNECT via announce_connattr
+ * 
+ * @param message reason ID
+ * @return char* reason message
  */
-
-const char *conn_messages[] = {"unknown", "guest", "create", "connect", "cd", "quit", "timeout", "boot", "netdeath", "shutdown", "badlogin", "nologins", "logout"};
+char *connMessages(int reason) {
+	switch(reason) {
+		case 0:
+		return "unknown";
+		case 1:
+		return "guest";
+		case 2:
+		return "create";
+		case 3:
+		return "connect";
+		case 4:
+		return "cd";
+		case 5:
+		return "quit";
+		case 6:
+		return "timeout";
+		case 7:
+		return "boot";
+		case 8:
+		return "netdeath";
+		case 9:
+		return "shutdown";
+		case 10:
+		return "badlogin";
+		case 11:
+		return "nologins";
+		case 12:
+		return "logout";
+	}
+	return NULL;
+}
 
 void shutdownsock(DESC *d, int reason)
 {
@@ -785,11 +855,11 @@ void shutdownsock(DESC *d, int reason)
 				fcache_dump(d, FC_QUIT);
 			}
 
-			log_write(LOG_NET | LOG_LOGIN, "NET", "DISC", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, conn_reasons[reason], d->command_count, d->input_tot, d->output_tot, (int)(time(NULL) - d->connected_at));
+			log_write(LOG_NET | LOG_LOGIN, "NET", "DISC", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, connReasons(reason), d->command_count, d->input_tot, d->output_tot, (int)(time(NULL) - d->connected_at));
 		}
 		else
 		{
-			log_write(LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, conn_reasons[reason], d->command_count, d->input_tot, d->output_tot, (int)(time(NULL) - d->connected_at));
+			log_write(LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, connReasons(reason), d->command_count, d->input_tot, d->output_tot, (int)(time(NULL) - d->connected_at));
 		}
 
 		/*
@@ -799,9 +869,9 @@ void shutdownsock(DESC *d, int reason)
 
 		now = mudstate.now - d->connected_at;
 		buff2 = unparse_flags(GOD, d->player);
-		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, conn_reasons[reason], buff);
+		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, connReasons(reason), buff);
 		XFREE(buff2);
-		announce_disconnect(d->player, d, conn_messages[reason]);
+		announce_disconnect(d->player, d, connMessages(reason));
 	}
 	else
 	{
@@ -810,7 +880,7 @@ void shutdownsock(DESC *d, int reason)
 			reason = R_QUIT;
 		}
 
-		log_write(LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, conn_reasons[reason]);
+		log_write(LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, connReasons(reason));
 	}
 
 	XFREE(buff);
@@ -1032,7 +1102,7 @@ int process_input(DESC *d)
 	char *p, *pend, *q, *qend;
 	char *cmdsave;
 	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< process_input >";
+	mudstate.debug_cmd = XSTRDUP("< process_input >", mudstate.debug_cmd);
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	got = in = read(d->descriptor, buf, LBUF_SIZE);
 

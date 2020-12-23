@@ -4,19 +4,19 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"      /* required by mudconf */
-#include "alloc.h"     /* required by mudconf */
-#include "flags.h"     /* required by mudconf */
-#include "htab.h"      /* required by mudconf */
-#include "ltdl.h"      /* required by mudconf */
-#include "udb.h"       /* required by mudconf */
-#include "udb_defs.h"  /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"        /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "ansi.h"      /* required by code */
+#include "typedefs.h"   /* required by mudconf */
+#include "game.h"       /* required by mudconf */
+#include "alloc.h"      /* required by mudconf */
+#include "flags.h"      /* required by mudconf */
+#include "htab.h"       /* required by mudconf */
+#include "ltdl.h"       /* required by mudconf */
+#include "udb.h"        /* required by mudconf */
+#include "udb_defs.h"   /* required by mudconf */
+#include "mushconf.h"   /* required by code */
+#include "db.h"         /* required by externs */
+#include "interface.h"  /* required by code */
+#include "externs.h"    /* required by code */
+#include "stringutil.h" /* required by code */
 
 FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */
@@ -489,7 +489,7 @@ void do_logrotate(dbref player, dbref cause, int key)
 {
     LOGFILETAB *lp;
     char *ts, *pname;
-    char s[MBUF_SIZE];
+    char *s;
     ts = mktimestamp();
     mudstate.mudlognum++;
 
@@ -500,8 +500,9 @@ void do_logrotate(dbref player, dbref cause, int key)
     else
     {
         fclose(mainlog_fp);
-        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts);
+        s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
         copy_file(mudconf.log_file, s, 1);
+        XFREE(s);
         logfile_init(mudconf.log_file);
     }
 
@@ -536,7 +537,7 @@ void do_logrotate(dbref player, dbref cause, int key)
 void logfile_close(void)
 {
     LOGFILETAB *lp;
-    char s[MBUF_SIZE];
+    char *s;
     char *ts;
     ts = mktimestamp();
 
@@ -545,16 +546,18 @@ void logfile_close(void)
         if (lp->filename && lp->fileptr)
         {
             fclose(lp->fileptr);
-            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts);
+            s = XASPRINTF("s", "%s.%s", lp->filename, ts);
             copy_file(lp->filename, s, 1);
+            XFREE(s);
         }
     }
 
     if (mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
-        snprintf(s, MBUF_SIZE, "%s.%s", mudconf.log_file, ts);
+        s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
         copy_file(mudconf.log_file, s, 1);
+        XFREE(s);
     }
 
     XFREE(ts);

@@ -20,7 +20,6 @@
 #include "command.h"    /* required by code */
 #include "attrs.h"      /* required by code */
 #include "match.h"      /* required by code */
-#include "ansi.h"       /* required by code */
 #include "udb_defs.h"   /* required by code */
 #include "stringutil.h" /* required by code */
 /*
@@ -692,13 +691,14 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd)
     lt_dlhandle handle;
     void (*initptr)(void);
     MODULE *mp;
-    char s[MBUF_SIZE];
+    char *s = XMALLOC(MBUF_SIZE, "s");
     snprintf(s, MBUF_SIZE, "%s/%s.la", mudconf.modules_home, str);
     handle = lt_dlopen(s);
 
     if (!handle)
     {
         log_write(LOG_STARTUP, "CNF", "MOD", "Loading of %s module failed: %s", str, lt_dlerror());
+        XFREE(s);
         return -1;
     }
 
@@ -757,6 +757,7 @@ int cf_module(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     log_write(LOG_STARTUP, "CNF", "MOD", "Loaded module: %s", str);
+    XFREE(s);
     return 0;
 }
 
@@ -1771,7 +1772,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     char **ftab; /* pointer to an array of filepaths */
     HASHTAB *hashes;
     FILE *fp;
-    char s[MAXPATHLEN];
+    char *s = XMALLOC(MAXPATHLEN, "s");
     /*
      * Make a new string so we won't SEGV if given a constant string
      */
@@ -1785,6 +1786,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     {
         cf_log_syntax(player, confcmd, "Missing path for helpfile %s", fcmd);
         XFREE(newstr);
+        XFREE(s);
         return -1;
     }
 
@@ -1792,6 +1794,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     {
         cf_log_syntax(player, confcmd, "Helpfile %s would cause @addcommand conflict", fcmd);
         XFREE(newstr);
+        XFREE(s);
         return -1;
     }
 
@@ -1811,6 +1814,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
         {
             cf_log_help(player, confcmd, "Helpfile %s not found", fcmd);
             XFREE(newstr);
+            XFREE(s);
             return -1;
         }
     }
@@ -1825,6 +1829,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     {
         cf_log_help(player, confcmd, "Could not create index for helpfile %s, not loaded.", basename(fpath));
         XFREE(newstr);
+        XFREE(s);
         return -1;
     }
 
@@ -1832,6 +1837,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     {
         cf_log_syntax(player, confcmd, "Helpfile %s filename too long", fcmd);
         XFREE(newstr);
+        XFREE(s);
         return -1;
     }
 
@@ -1896,6 +1902,7 @@ int add_helpfile(dbref player, char *confcmd, char *str, int is_raw)
     hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * mudconf.hash_factor, HT_STR);
     mudstate.helpfiles++;
     cf_log_help(player, confcmd, "Successfully loaded helpfile %s", basename(fpath));
+    XFREE(s);
     XFREE(newstr);    
     return 0;
 }

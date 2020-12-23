@@ -125,7 +125,6 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     char *str, *bb_p, *work_buf;
     char *ep, *savep, *dp, *result;
     int is_true, cur_lev, elen;
-    char tmpbuf[1] = "";
 
     /*
      * Enforce maximum nesting level.
@@ -233,14 +232,14 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             mudstate.loop_token[cur_lev] = split_token(&input_p, &isep);
         else
         {
-            mudstate.loop_token[cur_lev] = tmpbuf;
+            mudstate.loop_token[cur_lev] = STRING_EMPTY;
         }
 
         if (input_p2)
             mudstate.loop_token2[cur_lev] = split_token(&input_p2, &isep);
         else
         {
-            mudstate.loop_token2[cur_lev] = tmpbuf;
+            mudstate.loop_token2[cur_lev] = STRING_EMPTY;
         }
 
         mudstate.loop_number[cur_lev] += 1;
@@ -603,7 +602,6 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     Delim isep;
     char *cp[NUM_ENV_VARS];
     int count[NUM_ENV_VARS];
-    char tmpbuf[1] = "";
     /*
      * Check to see if we have an appropriate number of arguments. If
      * there are more than three arguments, the last argument is ALWAYS
@@ -665,7 +663,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
             }
             else
             {
-                os[i] = tmpbuf;
+                os[i] = STRING_EMPTY;
             }
         }
 

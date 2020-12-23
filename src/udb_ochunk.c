@@ -59,25 +59,28 @@ int dddb_optimize(void)
 int dddb_init(void)
 {
     char *copen = "db_init cannot open ";
-    char tmpfile[256];
+    char *tmpfile;
     char *gdbm_error;
     int i;
 
     if (!mudstate.standalone)
     {
-        XSPRINTF(tmpfile, "%s/%s", mudconf.dbhome, dbfile);
+        
+        tmpfile = XASPRINTF("tmpfile", "%s/%s", mudconf.dbhome, dbfile);
     }
     else
     {
-        XSTRCPY(tmpfile, dbfile);
+        tmpfile = XSTRDUP(dbfile, "tmpfile");
     }
 
     if ((dbp = gdbm_open(tmpfile, mudstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, dbm_error)) == (GDBM_FILE)0)
     {
         gdbm_error = (char *)gdbm_strerror(gdbm_errno);
         warning(copen, tmpfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+        XFREE(tmpfile);
         return (1);
     }
+    XFREE(tmpfile);
 
     if (mudstate.standalone)
     {

@@ -70,7 +70,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	int i, n, lineno, ntopics, actualdata;
 	char *src, *dst;
 	char *s, *topic;
-	char line[LINE_SIZE + 1];
+	char *line = XMALLOC(LINE_SIZE + 1, "line");
 	help_indx_list *entries, *ep;
 	FILE *rfp, *wfp;
 	src = XASPRINTF("src", "%s.txt", helpfile);
@@ -80,20 +80,22 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	if ((rfp = fopen(src, "r")) == NULL)
 	{
 		cf_log_help_mkindx(player, confcmd, "can't open %s for reading", src);
-		return (-1);
+		XFREE(line);
+		return -1;
 	}
 
 	if ((wfp = fopen(dst, "w")) == NULL)
 	{
 		cf_log_help_mkindx(player, confcmd, "can't open %s for writing", dst);
-		return (-1);
+		XFREE(line);
+		return -1;
 	}
 
 	pos = 0L;
 	lineno = 0;
 	ntopics = 0;
 	actualdata = 0;
-	
+
 	/* create initial entry storage */
 	entries = (help_indx_list *)XMALLOC(sizeof(help_indx_list), "entries");
 
@@ -119,7 +121,8 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 				if (helpmkindx_dump_entries(wfp, pos, entries))
 				{
 					cf_log_help_mkindx(player, confcmd, "error writing %s", dst);
-					return (-1);
+					XFREE(line);
+					return -1;
 				}
 
 				XMEMSET(entries, 0, sizeof(help_indx_list));
@@ -129,7 +132,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 			{
 				/* we're already working on an entry... time to start nesting */
 				ep = entries;
-				entries = (help_indx_list *) XMALLOC(sizeof(help_indx_list), "entries");
+				entries = (help_indx_list *)XMALLOC(sizeof(help_indx_list), "entries");
 				entries->next = ep;
 			}
 
@@ -164,13 +167,15 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	if (helpmkindx_dump_entries(wfp, pos, entries))
 	{
 		cf_log_help_mkindx(player, confcmd, "error writing %s", dst);
-		return (-1);
+		XFREE(line);
+		return -1;
 	}
 
 	fclose(rfp);
 	fclose(wfp);
 	cf_log_help_mkindx(player, confcmd, "%d topics indexed", ntopics);
-	return (0);
+	XFREE(line);
+	return 0;
 }
 
 int helpindex_read(HASHTAB *htab, char *filename)
@@ -259,7 +264,7 @@ int helpindex_read(HASHTAB *htab, char *filename)
 void helpindex_load(dbref player)
 {
 	int i;
-	char buf[SBUF_SIZE + 8];
+	char *buf = XMALLOC(SBUF_SIZE + 8, "buf");
 
 	if (!mudstate.hfiletab)
 	{
@@ -279,6 +284,7 @@ void helpindex_load(dbref player)
 	{
 		notify(player, "Indexed file cache updated.");
 	}
+	XFREE(buf);
 }
 
 void helpindex_init(void)
@@ -425,8 +431,8 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 
 void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, char **bufc)
 {
-	char tbuf[SBUF_SIZE + 8];
-	char tname[LBUF_SIZE];
+	char *tbuf = XMALLOC(SBUF_SIZE + 8, "tbuf");
+	char *tname = XMALLOC(LBUF_SIZE, "tname");
 	char *p, *q, *line, *result, *str, *bp;
 	struct help_entry *htab_entry;
 	int entry_offset, entry_length, count;
@@ -436,6 +442,8 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
 		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XFREE(tname);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -458,6 +466,8 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	if (!htab_entry)
 	{
 		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XFREE(tname);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -469,6 +479,8 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		log_write(LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", tbuf);
 		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
+		XFREE(tname);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -477,6 +489,8 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 		log_write(LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", tbuf);
 		tf_fclose(fp);
 		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
+		XFREE(tname);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -534,6 +548,8 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		XFREE(result);
 	}
+	XFREE(tname);
+	XFREE(tbuf);
 }
 
 /* ---------------------------------------------------------------------------
@@ -542,7 +558,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
 void do_help(dbref player, dbref cause, int key, char *message)
 {
-	char tbuf[SBUF_SIZE + 8];
+	char *tbuf = XMALLOC(SBUF_SIZE + 8, "tbuf");
 	int hf_num;
 	hf_num = key & ~HELP_RAWHELP;
 
@@ -550,9 +566,11 @@ void do_help(dbref player, dbref cause, int key, char *message)
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
 		notify(player, "No such indexed file found.");
+		XFREE(tbuf);
 		return;
 	}
 
 	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
 	help_write(player, message, &mudstate.hfile_hashes[hf_num], tbuf, (key & HELP_RAWHELP) ? 0 : 1);
+	XFREE(tbuf);
 }

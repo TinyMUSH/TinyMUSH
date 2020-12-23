@@ -20,7 +20,6 @@
 #include "command.h"    /* required by code */
 #include "attrs.h"      /* required by code */
 #include "powers.h"     /* required by code */
-#include "ansi.h"       /* required by code */
 #include "stringutil.h" /* required by code */
 
 extern CONF conftable[];
@@ -151,7 +150,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
 {
     dbref loc, destnum;
     char *dest;
-    char s[MBUF_SIZE];
+    char *s = XMALLOC(MBUF_SIZE, "s");
 
     /*
      * Create the exit and link to the destination, if there is one
@@ -191,6 +190,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
             open_exit(player, destnum, links[1], s);
         }
     }
+    XFREE(s);
 }
 
 /*
@@ -1047,7 +1047,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     int can_doit;
     const char *typename;
     char *t, *tbuf;
-    char s[MBUF_SIZE];
+    char *s = XMALLOC(MBUF_SIZE, "s");
     /*
      * You can destroy anything you control.
      */
@@ -1086,6 +1086,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
 
     if (match_status(player, thing) == NOTHING)
     {
+        XFREE(s);
         return;
     }
 
@@ -1096,6 +1097,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     if (Safe(thing, player) && !(key & DEST_OVERRIDE) && !(isThing(thing) && Destroy_ok(thing)))
     {
         notify_quiet(player, "Sorry, that object is protected.  Use @destroy/override to destroy it.");
+        XFREE(s);
         return;
     }
 
@@ -1106,6 +1108,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     if (!destroyable(thing))
     {
         notify_quiet(player, "You can't destroy that!");
+        XFREE(s);
         return;
     }
 
@@ -1148,6 +1151,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
 
     if (!can_doit)
     {
+        XFREE(s);
         return;
     }
 
@@ -1160,6 +1164,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     if (Going(thing) && !((key & DEST_INSTANT) && (Typeof(thing) != TYPE_GARBAGE)))
     {
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "That %s has already been destroyed.", typename);
+        XFREE(s);
         return;
     }
 
@@ -1197,6 +1202,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
             break;
         }
 
+        XFREE(s);
         return;
     }
 
@@ -1233,4 +1239,5 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     }
 
     s_Going(thing);
+    XFREE(s);
 }

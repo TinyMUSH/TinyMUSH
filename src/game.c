@@ -34,7 +34,6 @@
 extern LOGFILETAB logfds_table[];
 extern volatile pid_t slave_pid;
 extern volatile int slave_socket;
-extern char qidx_chartab[256];
 
 #ifdef NEED_EMPTY_LTPLSYM
 const lt_dlsymlist lt_preloaded_symbols[] = {{0, (lt_ptr_t)0}};
@@ -52,24 +51,27 @@ pid_t isrunning(char *pidfile)
 	FILE *fp;
 	pid_t pid = 0, rpid = 0;
 	int i = 0;
-	char buff[MBUF_SIZE];
+	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
 	if (mudstate.restarting)
 	{
-		return (0);
+		XFREE(buff);
+		return 0;
 	}
 
 	fp = fopen(pidfile, "r");
 
 	if (fp == NULL)
 	{
-		return (0);
+		XFREE(buff);
+		return 0;
 	}
 
 	if (fgets(buff, MBUF_SIZE, fp) == NULL)
 	{
 		fclose(fp);
-		return (0);
+		XFREE(buff);
+		return 0;
 	}
 
 	fclose(fp);
@@ -78,7 +80,8 @@ pid_t isrunning(char *pidfile)
 
 	if (fp == NULL)
 	{
-		return (0);
+		XFREE(buff);
+		return 0;
 	}
 
 	while (fgets(buff, MBUF_SIZE, fp) != NULL)
@@ -96,10 +99,12 @@ pid_t isrunning(char *pidfile)
 
 	if (i)
 	{
-		return (pid);
+		XFREE(buff);
+		return pid;
 	}
 
-	return (0);
+	XFREE(buff);
+	return 0;
 }
 
 /*
@@ -210,13 +215,14 @@ void handlestartupflatfiles(int flag)
 int tailfind(char *file, char *key)
 {
 	int fp;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 	off_t pos;
 	fp = open(file, O_RDONLY);
 
 	if (fp < 0)
 	{
-		return (0);
+		XFREE(s);
+		return 0;
 	}
 
 	pos = lseek(fp, 0 - strlen(key), SEEK_END);
@@ -226,11 +232,13 @@ int tailfind(char *file, char *key)
 		if (strncmp(s, key, strlen(key)) == 0)
 		{
 			close(fp);
+			XFREE(s);
 			return (1);
 		}
 	}
 
 	close(fp);
+	XFREE(s);
 	return (0);
 }
 
@@ -1244,7 +1252,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 void notify_except(dbref loc, dbref player, dbref exception, int flags, const char *format, ...)
 {
 	dbref first;
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -1257,6 +1265,7 @@ void notify_except(dbref loc, dbref player, dbref exception, int flags, const ch
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -1279,12 +1288,13 @@ void notify_except(dbref loc, dbref player, dbref exception, int flags, const ch
 			notify_check(first, player, (MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags), NULL, msg);
 		}
 	}
+	XFREE(msg);
 }
 
 void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, const char *format, ...)
 {
 	dbref first;
-	char msg[LBUF_SIZE];
+	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *s;
 	va_list ap;
 	va_start(ap, format);
@@ -1297,6 +1307,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -1319,6 +1330,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
 			notify_check(first, player, (MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | flags), NULL, msg);
 		}
 	}
+	XFREE(msg);
 }
 
 /*
@@ -1494,7 +1506,7 @@ int backup_mush(dbref player, dbref cause, int key)
 	int i, txt_n = 0, cnf_n = 0, dbf_n = 0;
 	char **txt = NULL, **cnf = NULL, **dbf = NULL;
 	char *tmpdir, *s, *buff, *tb, *cwd, *ts;
-	char s1[MBUF_SIZE];
+	char *s1 = XMALLOC(MBUF_SIZE, "s1");
 	FILE *fp = NULL;
 	MODULE *mp;
 
@@ -1641,6 +1653,7 @@ int backup_mush(dbref player, dbref cause, int key)
 		}
 
 		XFREE(tmpdir);
+		XFREE(s1);
 		return (-1);
 	}
 
@@ -1739,7 +1752,8 @@ int backup_mush(dbref player, dbref cause, int key)
 		}
 
 		XFREE(s);
-		return (-1);
+		XFREE(s1);
+		return -1;
 	}
 
 	if (chdir(tmpdir) == -1)
@@ -1753,7 +1767,8 @@ int backup_mush(dbref player, dbref cause, int key)
 		}
 
 		XFREE(s);
-		return (-1);
+		XFREE(s1);
+		return -1;
 	}
 
 	buff = XMALLOC(MBUF_SIZE, "buff");
@@ -1911,7 +1926,8 @@ int backup_mush(dbref player, dbref cause, int key)
 		raw_broadcast(0, "GAME: Backup finished.");
 	}
 
-	return (0);
+	XFREE(s1);
+	return 0;
 }
 
 int copy_file(char *src, char *dst, int flag)
@@ -2100,7 +2116,7 @@ void do_shutdown(dbref player, dbref cause, int key, char *message)
 
 void dump_database_internal(int dump_type)
 {
-	char tmpfile[MAXPATHLEN];
+	char *tmpfile = XMALLOC(MAXPATHLEN, "tmpfile");
 	char *s;
 	/* *c; */
 	FILE *f = NULL;
@@ -2244,6 +2260,7 @@ void dump_database_internal(int dump_type)
 			XFREE(s);
 		}
 	}
+	XFREE(tmpfile);
 }
 
 void dump_database(void)
@@ -2579,7 +2596,7 @@ void process_preload(void)
 	dbref thing, parent, aowner;
 	int aflags, alen, lev, i;
 	char *tstr;
-	char tbuf[SBUF_SIZE];
+	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
 	FWDLIST *fp;
 	PROPDIR *pp;
 	fp = (FWDLIST *)XMALLOC(sizeof(FWDLIST), "fp");
@@ -2677,6 +2694,7 @@ void process_preload(void)
 	XFREE(fp);
 	XFREE(pp);
 	XFREE(tstr);
+	XFREE(tbuf);
 }
 
 /*
@@ -3258,7 +3276,7 @@ int main(int argc, char *argv[])
 	int errflg = 0;
 	pid_t pid;
 	char *s, *ts;
-	char templog[] = "netmush.XXXXXX";
+	char *templog;
 	MODULE *mp;
 	char *bp;
 	struct stat;
@@ -3388,6 +3406,7 @@ int main(int argc, char *argv[])
 	time(&mudstate.cpu_count_from);
 	tcache_init();
 	pcache_init();
+	templog =XSTRDUP("netmush.XXXXXX", "templog");
 	logfile_init(templog);
 	cf_init();
 	init_rlimit();
@@ -3398,6 +3417,7 @@ int main(int argc, char *argv[])
 	init_functab();
 	init_attrtab();
 	log_version();
+	init_mstate();
 	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec);
 	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home);
 	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file);
@@ -3412,15 +3432,6 @@ int main(int argc, char *argv[])
 	{
 		fprintf(stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n");
 		exit(EXIT_FAILURE);
-	}
-
-	if (mudconf.max_global_regs < 36)
-	{
-		for (i = 0; i < 36 - mudconf.max_global_regs; i++)
-		{
-			qidx_chartab[90 - i] = -1;
-			qidx_chartab[122 - i] = -1;
-		}
 	}
 
 	if (mudconf.hash_factor < 2)
@@ -3493,6 +3504,7 @@ int main(int argc, char *argv[])
 	}
 
 	logfile_move(templog, mudconf.log_file);
+	XFREE(templog);
 	mudconf.pid_file = XASPRINTF("mudconf.pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname);
 	mudconf.db_file = XASPRINTF("mudconf.db_file", "%s.db", mudconf.mud_shortname);
 	mudconf.status_file = XASPRINTF("mudconf.status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname);

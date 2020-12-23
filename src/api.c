@@ -38,7 +38,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 	API_FUNCTION *afp;
 	void (*fn_ptr)(void *, void *);
 	int succ = 0;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -51,6 +51,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 
 	if (!succ)
 	{ /* no such module */
+		XFREE(s);
 		return;
 	}
 
@@ -66,20 +67,23 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 			hashadd(s, (int *)afp, &mudstate.api_func_htab, 0);
 		}
 	}
+	XFREE(s);
 }
 
 void *request_api_function(char *api_name, char *fn_name)
 {
 	API_FUNCTION *afp;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 	snprintf(s, MBUF_SIZE, "%s_%s", api_name, fn_name);
 	afp = (API_FUNCTION *)hashfind(s, &mudstate.api_func_htab);
 
 	if (!afp)
 	{
+		XFREE(s);
 		return NULL;
 	}
 
+	XFREE(s);
 	return afp->handler;
 }
 
@@ -91,7 +95,7 @@ void *request_api_function(char *api_name, char *fn_name)
 void register_commands(CMDENT *cmdtab)
 {
 	CMDENT *cp;
-	char s[MBUF_SIZE];
+	char *s = XMALLOC(MBUF_SIZE, "s");
 
 	if (cmdtab)
 	{
@@ -102,22 +106,23 @@ void register_commands(CMDENT *cmdtab)
 			hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
 		}
 	}
+	XFREE(s);
 }
 
 void register_prefix_cmds(const char *cmdchars)
 {
 	const char *cp;
-	char cn[2] = "x";
+	char *cn = XSTRDUP("x", "cn");
 
 	if (cmdchars)
 	{
 		for (cp = cmdchars; *cp; cp++)
 		{
 			cn[0] = *cp;
-			prefix_cmds[(unsigned char)*cp] = (CMDENT *)hashfind(cn,
-																 &mudstate.command_htab);
+			prefix_cmds[(unsigned char)*cp] = (CMDENT *)hashfind(cn, &mudstate.command_htab);
 		}
 	}
+	XFREE(cn);
 }
 
 void register_functions(FUN *functab)

@@ -20,7 +20,6 @@
 #include "command.h"	/* required by code */
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
-#include "ansi.h"		/* required by code */
 #include "functions.h"	/* required by code */
 #include "stringutil.h" /* required by code */
 
@@ -979,7 +978,7 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 	dbref thing;
 	int atr;
 	char *s;
-	char s1[MBUF_SIZE];
+	char *s1;
 
 	/*
      * Sanity-check the command name and make it case-insensitive.
@@ -1081,10 +1080,11 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 	     */
 			if (!strcmp(name, old->cmdname))
 			{
-				snprintf(s1, MBUF_SIZE, "__%s", old->cmdname);
+				s1 = XASPRINTF("s1", "__%s", old->cmdname);
 				hashdelete(s1, &mudstate.command_htab);
 				hashreplall((int *)old, (int *)cmd, &mudstate.command_htab);
 				hashadd(s1, (int *)old, &mudstate.command_htab, 0);
+				XFREE(s1);
 			}
 		}
 	}
@@ -1172,11 +1172,12 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 	dbref thing;
 	int atr;
 	char *s;
-	char s1[MBUF_SIZE];
+	char *s1 = XMALLOC(MBUF_SIZE, "s1");
 
 	if (!*name)
 	{
 		notify(player, "Sorry.");
+		XFREE(s1);
 		return;
 	}
 
@@ -1185,6 +1186,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 		if (!parse_attrib(player, command, &thing, &atr, 0) || (atr == NOTHING))
 		{
 			notify(player, "No such attribute.");
+			XFREE(s1);
 			return;
 		}
 	}
@@ -1247,6 +1249,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 			XFREE(old);
 			reset_prefix_cmds();
 			notify(player, "Done");
+			XFREE(s1);
 			return;
 		}
 		else
@@ -1310,6 +1313,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 
 					reset_prefix_cmds();
 					notify(player, "Done");
+					XFREE(s1);
 					return;
 				}
 
@@ -1323,6 +1327,7 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 	{
 		notify(player, "Command not found in command table.");
 	}
+	XFREE(s1);
 }
 
 /* @program 'glues' a user's input to a command. Once executed, the first
@@ -2924,17 +2929,19 @@ void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char
 	dbref thing, aowner;
 	int attrib, aflags, alen;
 	char *act, *tp;
-	char s[MBUF_SIZE];
+	char *s;
 	/*
      * Get the attribute. Default to getting it off ourselves.
      */
-	snprintf(s, MBUF_SIZE, "me/%s", object);
+	s = XASPRINTF("s", "me/%s", object);
 
 	if (!((parse_attrib(player, object, &thing, &attrib, 0) && (attrib != NOTHING)) || (parse_attrib(player, s, &thing, &attrib, 0) && (attrib != NOTHING))))
 	{
 		notify_quiet(player, "No match.");
+		XFREE(s);
 		return;
 	}
+	XFREE(s);
 
 	if (*(act = atr_pget(thing, attrib, &aowner, &aflags, &alen)))
 	{
@@ -3120,7 +3127,9 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	HASHENT *hptr;
 	HASHTAB *htab;
 	int i, len, total, is_global;
-	char tbuf[LBUF_SIZE], outbuf[LBUF_SIZE], *tp, *bp, *buff, *s;
+	char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
+	char *outbuf = XMALLOC(LBUF_SIZE, "outbuf");
+	char *tp, *bp, *buff, *s;
 	dbref target, *np;
 
 	if (key & NREF_LIST)
@@ -3152,12 +3161,16 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 				if (target == NOTHING)
 				{
 					notify(player, "No such player.");
+					XFREE(outbuf);
+					XFREE(tbuf);
 					return;
 				}
 
 				if (!Controls(player, target))
 				{
 					notify(player, NOPERM_MESSAGE);
+					XFREE(outbuf);
+					XFREE(tbuf);
 					return;
 				}
 			}
@@ -3200,6 +3213,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 		}
 
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Total references: %d", total);
+		XFREE(outbuf);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -3213,12 +3228,16 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 
 		if (!Good_obj(target))
 		{
+			XFREE(outbuf);
+			XFREE(tbuf);
 			return;
 		}
 
 		if (!Examinable(player, target))
 		{
 			notify(player, NOPERM_MESSAGE);
+			XFREE(outbuf);
+			XFREE(tbuf);
 			return;
 		}
 	}
@@ -3238,6 +3257,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 		if (!Wizard(player))
 		{
 			notify(player, NOPERM_MESSAGE);
+			XFREE(outbuf);
+			XFREE(tbuf);
 			return;
 		}
 	}
@@ -3284,7 +3305,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 			hashrepl(tbuf, np, &mudstate.nref_htab);
 			notify(player, "Reference updated.");
 		}
-
+		XFREE(outbuf);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -3296,6 +3318,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	if (target == NOTHING)
 	{
 		notify(player, "No such reference to clear.");
+		XFREE(outbuf);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -3303,6 +3327,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	*np = target;
 	hashadd(tbuf, np, &mudstate.nref_htab, 0);
 	notify(player, "Referenced.");
+	XFREE(outbuf);
+	XFREE(tbuf);
 }
 
 /* ---------------------------------------------------------------------------

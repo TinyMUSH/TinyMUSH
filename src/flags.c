@@ -19,7 +19,6 @@
 #include "command.h"    /* required by code */
 #include "powers.h"     /* required by code */
 #include "match.h"      /* required by code */
-#include "ansi.h"       /* required by code */
 #include "stringutil.h" /* required by code */
 
 /**

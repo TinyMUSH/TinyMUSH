@@ -30,6 +30,17 @@
 
 MSTATE md;
 
+void init_mstate(void) {
+    md.confidence = 0;
+    md.count = 0;
+    md.pref_type = 0;
+    md.check_keys = 0;
+    md.absolute_form = NOTHING;
+    md.match = NOTHING;
+    md.player = NOTHING;
+    md.string = XMALLOC(LBUF_SIZE, "buffer");
+}
+
 void promote_match(dbref what, int confidence)
 {
     /*
@@ -107,13 +118,14 @@ void promote_match(dbref what, int confidence)
  * names are being matched.  It also removes initial and terminal spaces.
  */
 
-char *munge_space_for_match(const char *name)
+void munge_space_for_match(const char *name)
 {
-    static char buffer[LBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
     char *q;
     const char *p;
     p = name;
-    q = buffer;
+    q = md.string;
+    
+    XMEMSET(md.string, 0, LBUF_SIZE);
 
     while (isspace(*p))
     {
@@ -136,10 +148,7 @@ char *munge_space_for_match(const char *name)
         }
     }
 
-    *q = '\0'; /* remove terminal spaces and terminate
-				 * string
-				 */
-    return (buffer);
+    *q = '\0'; /* remove terminal spaces and terminate string */
 }
 
 void match_player(void)
@@ -703,7 +712,7 @@ void init_match(dbref player, const char *name, int type)
     md.pref_type = type;
     md.match = NOTHING;
     md.player = player;
-    md.string = munge_space_for_match((const char *)name);
+    munge_space_for_match((const char *)name);
     md.absolute_form = absolute_name(1);
 }
 

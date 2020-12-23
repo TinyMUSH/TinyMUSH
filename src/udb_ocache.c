@@ -18,7 +18,6 @@
 #include "externs.h"   /* required by code */
 #include "udb.h"       /* required by code */
 #include "udb_defs.h"  /* required by code */
-#include "ansi.h"      /* required by code */
 
 #define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
 

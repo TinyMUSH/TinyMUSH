@@ -26,7 +26,11 @@
 #include "externs.h"   /* required by code */
 
 // Utilities
-#define XLOGALLOC(x,y,z,s,...) if(mudconf.malloc_logger){log_write(x,y,z,s,##__VA_ARGS__);}
+#define XLOGALLOC(x, y, z, s, ...)            \
+	if (mudconf.malloc_logger)                \
+	{                                         \
+		log_write(x, y, z, s, ##__VA_ARGS__); \
+	}
 
 void list_bufstats(dbref player)
 {
@@ -227,7 +231,7 @@ MEMTRACK *__xfind(void *ptr)
 
 			while (curr)
 			{
-				if ((ptr >= (void *)curr->bptr) && (ptr < (void *)curr->magic))
+				if (((uintptr_t)ptr >= (uintptr_t)curr->bptr) && ((uintptr_t)ptr < (uintptr_t)curr->magic))
 				{
 					return curr;
 				}
@@ -1223,6 +1227,42 @@ size_t total_rawmemory(void)
  */
 
 /**
+ * @brief Copy a string with at most n character from src and update
+ * the position pointer to the end of the destination buffer.
+ * 
+ * @param dest Pointer to destination buffer.
+ * @param destp Pointer tracking the desstination buffer.
+ * @param src Pointer to the string to concatenate.
+ * @param n Maximum number of characters to concatenate.
+ * @param size Maximum size of dest buffer if untracked.
+ * @return Number of characters that where not copied if the buffer
+ *         (whichever is smaller) isn't big enough to hold the result.
+ */
+size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_t size)
+{
+	if (src)
+	{
+		if (dest)
+		{
+			if (__xfind(dest))
+			{
+				size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
+			}
+
+			if (size > 0)
+			{
+				strncpy(*destp, src, size);
+				*destp += size;
+				**destp = 0;
+			}
+		}
+		return ((int64_t)(strlen(src) - size)) > 0 ? ((int64_t)(strlen(src) - size)) : 0;
+	}
+	return 0;
+}
+
+
+/**
  * @brief Copy char 'c' to dest and update the position pointer to the end of
  *        the destination buffer.
  * 
@@ -1269,24 +1309,25 @@ int __xsafestrcatchr(char *dest, char **destp, char c, size_t size)
  */
 size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)
 {
-	if (dest)
+	if (src)
 	{
-		if (__xfind(dest))
+		if (dest)
 		{
-			size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
-		}
-		else
-		{
-			size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
-		}
+			if (__xfind(dest))
+			{
+				size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
+			}
 
-		if (size > 0)
-		{
-			strncat(*destp, src, size);
-			*destp += strlen(*destp);
+			if (size > 0)
+			{
+				strncat(*destp, src, size);
+				*destp += size;
+				**destp = 0;
+			}
 		}
+		return ((int64_t)(strlen(src) - size)) > 0 ? ((int64_t)(strlen(src) - size)) : 0;
 	}
-	return ((int64_t)(strlen(src) - size)) > 0 ? ((int64_t)(strlen(src) - size)) : 0;
+	return 0;
 }
 
 /**
@@ -1297,10 +1338,11 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
  * @param num Number to convert.
  * @param size Maximum size of the destination buffer.
  */
-void __xsafeltos(char *dest, char **destp, long num, size_t size) {
-    char *buff = XLTOS(num);
-    __xsafestrncat(dest, destp, buff, strlen(buff), size);
-    __xfree(buff);
+void __xsafeltos(char *dest, char **destp, long num, size_t size)
+{
+	char *buff = XLTOS(num);
+	__xsafestrncat(dest, destp, buff, strlen(buff), size);
+	__xfree(buff);
 }
 
 /**
@@ -1312,15 +1354,14 @@ void __xsafeltos(char *dest, char **destp, long num, size_t size) {
  * @param c Character to fill the string with.
  * @return Pointer to the build string.
  */
-char *__xrepeatchar(size_t size, char c) {
-    void *ptr = (char *)XMALLOC(size + 1, "ptr");
-    
-    if(ptr) {
-        return (char *)__xmemset(ptr, c, size);
-    }
+char *__xrepeatchar(size_t size, char c)
+{
+	void *ptr = (char *)XMALLOC(size + 1, "ptr");
 
-    return NULL;
-    
+	if (ptr)
+	{
+		return (char *)__xmemset(ptr, c, size);
+	}
+
+	return NULL;
 }
-
-

@@ -121,7 +121,7 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
     char *atrbuf;
     dbref aowner;
     int aflags, alen, i;
-    char s[MBUF_SIZE];
+    char *s;
     atrbuf = atr_get(player, A_LOGINDATA, &aowner, &aflags, &alen);
     decrypt_logindata(atrbuf, &login_info);
 
@@ -153,8 +153,9 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
 
         if (*lusername)
         {
-            snprintf(s, MBUF_SIZE, "%s@%s", lusername, lhost);
+            s =XASPRINTF("s", "%s@%s", lusername, lhost);
             atr_add_raw(player, A_LASTSITE, s);
+            XFREE(s);
         }
         else
         {

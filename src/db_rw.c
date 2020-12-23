@@ -13,12 +13,12 @@
 #include "udb.h"	  /* required by mudconf */
 #include "udb_defs.h" /* required by mudconf */
 #include "mushconf.h" /* required by code */
-#include "db.h" /* required by externs */
+#include "db.h"		  /* required by externs */
 #include "interface.h"
 #include "externs.h" /* required by code */
-#include "vattr.h"	/* required by code */
-#include "attrs.h"	/* required by code */
-#include "powers.h" /* required by code */
+#include "vattr.h"	 /* required by code */
+#include "attrs.h"	 /* required by code */
+#include "powers.h"	 /* required by code */
 
 extern struct object *db;
 int g_version;
@@ -191,8 +191,7 @@ BOOLEXP *getboolexp1(FILE *f)
 
 	case '"':
 		ungetc(c, f);
-		buff = XMALLOC(LBUF_SIZE, "buff");
-		XSTRCPY(buff, getstring_noalloc(f, 1));
+		buff = getstring(f, 1);
 		c = fgetc(f);
 
 		if (c == EOF)
@@ -230,7 +229,7 @@ BOOLEXP *getboolexp1(FILE *f)
 				b->type = BOOLEXP_ATR;
 			}
 
-			b->sub1 = (BOOLEXP *)XSTRDUP(getstring_noalloc(f, 1), "b->sub1");
+			b->sub1 = (BOOLEXP *)getstring(f, 1);
 		}
 
 		return b;
@@ -410,7 +409,6 @@ int get_list(FILE *f, dbref i, int new_strings)
 	dbref atr;
 	int c;
 	char *buff;
-	buff = XMALLOC(LBUF_SIZE, "buff");
 
 	while (1)
 	{
@@ -428,17 +426,15 @@ int get_list(FILE *f, dbref i, int new_strings)
 
 			if (atr > 0)
 			{
-				/*
-		 * Store the attr
-		 */
-				atr_add_raw(i, atr, (char *)getstring_noalloc(f, new_strings));
+				/* Store the attr */
+				buff = getstring(f, new_strings);
+				atr_add_raw(i, atr, buff);
+				XFREE(buff);
 			}
 			else
 			{
-				/*
-		 * Silently discard
-		 */
-				getstring_noalloc(f, new_strings);
+				/* Silently discard */
+				XFREE(getstring(f, new_strings));
 			}
 
 			break;
@@ -447,7 +443,6 @@ int get_list(FILE *f, dbref i, int new_strings)
 			break;
 
 		case '<': /* end of list */
-			XFREE(buff);
 			c = getc(f);
 
 			if (c != '\n')
@@ -461,11 +456,8 @@ int get_list(FILE *f, dbref i, int new_strings)
 
 		default:
 			log_write_raw(1, "Bad character '%c' when getting attributes on object %d\n", c, i);
-			/*
-	     * We've found a bad spot.  I hope things aren't too
-	     * bad.
-	     */
-			(void)getstring_noalloc(f, new_strings);
+			/* We've found a bad spot.  I hope things aren't too bad. */
+			XFREE(getstring(f, new_strings));
 		}
 	}
 
@@ -822,7 +814,7 @@ void fix_typed_quotas(void)
      */
 	int i;
 	char *qbuf, *rqbuf;
-	char s[LBUF_SIZE];
+	char *s = XMALLOC(LBUF_SIZE, s);
 	DO_WHOLE_DB(i)
 	{
 		if (isPlayer(i))
@@ -846,13 +838,14 @@ void fix_typed_quotas(void)
 			atr_add_raw(i, A_RQUOTA, s);
 		}
 	}
+	XFREE(s);
 }
 
 dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 {
 	dbref i, anum;
 	char ch;
-	const char *tstr;
+	char *tstr = NULL, *s = NULL;
 	int header_gotten, size_gotten, nextattr_gotten;
 	int read_attribs, read_name, read_zone, read_link, read_key, read_parent;
 	int read_extflags, read_3flags, read_money, read_timestamps, read_createtime, read_new_strings;
@@ -900,6 +893,10 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 	for (i = 0;; i++)
 	{
+		if (tstr)
+		{
+			XFREE(tstr);
+		}
 		if (mudstate.standalone && !(i % 100))
 		{
 			log_write_raw(1, ".");
@@ -915,7 +912,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				break;
 
 			default:
-				(void)getstring_noalloc(f, 0);
+				XFREE(getstring(f, 0));
 			}
 
 			break;
@@ -933,7 +930,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 						log_write_raw(1, "\nDuplicate MUSH version header entry at object %d, ignored.\n", i);
 					}
 
-					tstr = getstring_noalloc(f, 0);
+					if (tstr)
+					{
+						XFREE(tstr);
+					}
+					tstr = getstring(f, 0);
 					break;
 				}
 
@@ -998,7 +999,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 						log_write_raw(1, "\nDuplicate size entry at object %d, ignored.\n", i);
 					}
 
-					tstr = getstring_noalloc(f, 0);
+					if (tstr)
+					{
+						XFREE(tstr);
+					}
+					tstr = getstring(f, 0);
 				}
 				else
 				{
@@ -1010,7 +1015,12 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			case 'A': /* USER-NAMED ATTRIBUTE */
 				anum = getref(f);
-				tstr = getstring_noalloc(f, read_new_strings);
+
+				if (tstr)
+				{
+					XFREE(tstr);
+				}
+				tstr = getstring(f, read_new_strings);
 
 				if (isdigit(*tstr))
 				{
@@ -1054,7 +1064,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 						log_write_raw(1, "\nDuplicate next free vattr entry at object %d, ignored.\n", i);
 					}
 
-					tstr = getstring_noalloc(f, 0);
+					if (tstr)
+					{
+						XFREE(tstr);
+					}
+					tstr = getstring(f, 0);
 				}
 				else
 				{
@@ -1070,7 +1084,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 					log_write_raw(1, "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
 				}
 
-				tstr = getstring_noalloc(f, 0);
+				if (tstr)
+				{
+					XFREE(tstr);
+				}
+				tstr = getstring(f, 0);
 			}
 
 			break;
@@ -1106,7 +1124,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			if (read_name)
 			{
-				tstr = getstring_noalloc(f, read_new_strings);
+				if (tstr)
+				{
+					XFREE(tstr);
+				}
+				tstr = getstring(f, read_new_strings);
 
 				if (deduce_name)
 				{
@@ -1166,7 +1188,9 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			if (read_key)
 			{
 				tempbool = getboolexp(f);
-				atr_add_raw(i, A_LOCK, unparse_boolexp_quiet(1, tempbool));
+				s = unparse_boolexp_quiet(1, tempbool);
+				atr_add_raw(i, A_LOCK, s);
+				XFREE(s);
 				free_boolexp(tempbool);
 			}
 
@@ -1273,7 +1297,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			break;
 
 		case '*': /* EOF marker */
-			tstr = getstring_noalloc(f, 0);
+			if (tstr)
+			{
+				XFREE(tstr);
+			}
+			tstr = getstring(f, 0);
 
 			if (strcmp(tstr, "**END OF DUMP***"))
 			{
@@ -1316,6 +1344,14 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			return -1;
 		}
+		if (tstr)
+		{
+			XFREE(tstr);
+		}
+	}
+	if (tstr)
+	{
+		XFREE(tstr);
 	}
 }
 

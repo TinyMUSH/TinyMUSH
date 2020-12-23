@@ -16023,7 +16023,7 @@ $as_echo "#define HAVE_SYS_WAIT_H 1" >>confdefs.h
 
 fi
 
-for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h gdbm.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stddef.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h
+for ac_header in arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h gdbm.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stdbool.h stddef.h stdint.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -19778,7 +19778,9 @@ $as_echo X/"$am_mf" |
     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "Something went wrong bootstrapping makefile fragments
-    for automatic dependency tracking.  Try re-running configure with the
+    for automatic dependency tracking.  If GNU make was not used, consider
+    re-running the configure script with MAKE=\"gmake\" (or whatever is
+    necessary).  You can also try re-running configure with the
     '--disable-dependency-tracking' option to at least be able to build
     the package (albeit without support for automatic dependency tracking).
 See \`config.log' for more details" "$LINENO" 5; }

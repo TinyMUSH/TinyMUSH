@@ -18,52 +18,47 @@
 #include "externs.h"	/* required by code */
 #include "stringutil.h" /* required by code */
 
-/*
+/**
  * Boolexp decompile formats
  */
 
-#define F_EXAMINE 1	  /*        \
-					   * Normal \
-					   */
-#define F_QUIET 2	  /*                     \
-					   * Binary for db dumps \
-					   */
-#define F_DECOMPILE 3 /*                   \
-					   * @decompile output \
-					   */
-#define F_FUNCTION 4  /*                 \
-					   * [lock()] output \
-					   */
+#define F_EXAMINE 1	  /** Normal */
+#define F_QUIET 2	  /** Binary for db dumps */
+#define F_DECOMPILE 3 /** @decompile output */
+#define F_FUNCTION 4  /** [lock()] output */
 
-/*
- * Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this
- * will give players object numbers of stuff they don't control, but it's
- * only internal currently, so it's not a problem.
+/**
+ * @brief Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this
+ * will give players object numbers of stuff they don't control, but it's only 
+ * internal currently, so it's not a problem.
+ * 
+ * @param loc dbref of location
+ * @return char* 
  */
-
-char *unparse_object_quiet(__attribute__((unused)) dbref player, dbref loc)
+char *unparse_object_quiet(dbref loc)
 {
-	static char buf[SBUF_SIZE]; // XXX Should return a buffer instead of a static pointer
-
 	switch (loc)
 	{
 	case NOTHING:
-		return (char *)"-1";
+		return XSTRDUP("-1", "NOTHING");
 
 	case HOME:
-		return (char *)"-3";
+		return XSTRDUP("-3", "HOME");
 
 	default:
-		XSPRINTF(buf, "(#%d)", loc);
-		return buf;
+		return XASPRINTF("default", "(#%d)", loc);
 	}
 }
 
-char boolexp_buf[LBUF_SIZE];
-
-char *buftop;
-
-void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
+/**
+ * @brief 
+ * 
+ * @param player 
+ * @param b 
+ * @param outer_type 
+ * @param format 
+ */
+void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, char *boolexp_buf, char **buftop)
 {
 	ATTR *ap;
 	char sep_ch;
@@ -73,7 +68,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 	{
 		if (format == F_EXAMINE)
 		{
-			SAFE_LB_STR((char *)"*UNLOCKED*", boolexp_buf, &buftop);
+			SAFE_LB_STR("*UNLOCKED*", boolexp_buf, buftop);
 		}
 
 		return;
@@ -84,16 +79,16 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 	case BOOLEXP_AND:
 		if (outer_type == BOOLEXP_NOT)
 		{
-			SAFE_LB_CHR('(', boolexp_buf, &buftop);
+			SAFE_LB_CHR('(', boolexp_buf, buftop);
 		}
 
-		unparse_boolexp1(player, b->sub1, b->type, format);
-		SAFE_LB_CHR(AND_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub2, b->type, format);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
+		SAFE_LB_CHR(AND_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub2, b->type, format, boolexp_buf, buftop);
 
 		if (outer_type == BOOLEXP_NOT)
 		{
-			SAFE_LB_CHR(')', boolexp_buf, &buftop);
+			SAFE_LB_CHR(')', boolexp_buf, buftop);
 		}
 
 		break;
@@ -101,43 +96,43 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 	case BOOLEXP_OR:
 		if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND)
 		{
-			SAFE_LB_CHR('(', boolexp_buf, &buftop);
+			SAFE_LB_CHR('(', boolexp_buf, buftop);
 		}
 
-		unparse_boolexp1(player, b->sub1, b->type, format);
-		SAFE_LB_CHR(OR_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub2, b->type, format);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
+		SAFE_LB_CHR(OR_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub2, b->type, format, boolexp_buf, buftop);
 
 		if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND)
 		{
-			SAFE_LB_CHR(')', boolexp_buf, &buftop);
+			SAFE_LB_CHR(')', boolexp_buf, buftop);
 		}
 
 		break;
 
 	case BOOLEXP_NOT:
-		SAFE_LB_CHR('!', boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub1, b->type, format);
+		SAFE_LB_CHR('!', boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_INDIR:
-		SAFE_LB_CHR(INDIR_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub1, b->type, format);
+		SAFE_LB_CHR(INDIR_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_IS:
-		SAFE_LB_CHR(IS_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub1, b->type, format);
+		SAFE_LB_CHR(IS_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_CARRY:
-		SAFE_LB_CHR(CARRY_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub1, b->type, format);
+		SAFE_LB_CHR(CARRY_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_OWNER:
-		SAFE_LB_CHR(OWNER_TOKEN, boolexp_buf, &buftop);
-		unparse_boolexp1(player, b->sub1, b->type, format);
+		SAFE_LB_CHR(OWNER_TOKEN, boolexp_buf, buftop);
+		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_CONST:
@@ -150,7 +145,9 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 		 * Quiet output - for dumps and internal use.
 		 * Always #Num
 		 */
-				SAFE_LB_STR((char *)unparse_object_quiet(player, b->thing), boolexp_buf, &buftop);
+				buff = unparse_object_quiet(b->thing);
+				SAFE_LB_STR(buff, boolexp_buf, buftop);
+				XFREE(buff);
 				break;
 
 			case F_EXAMINE:
@@ -159,7 +156,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 		 * Name(#Num) or Name
 		 */
 				buff = unparse_object(player, b->thing, 0);
-				SAFE_LB_STR(buff, boolexp_buf, &buftop);
+				SAFE_LB_STR(buff, boolexp_buf, buftop);
 				XFREE(buff);
 				break;
 
@@ -173,14 +170,14 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 				switch (Typeof(b->thing))
 				{
 				case TYPE_PLAYER:
-					SAFE_LB_CHR('*', boolexp_buf, &buftop);
+					SAFE_LB_CHR('*', boolexp_buf, buftop);
 
 				case TYPE_THING:
-					safe_name(b->thing, boolexp_buf, &buftop);
+					safe_name(b->thing, boolexp_buf, buftop);
 					break;
 
 				default:
-					safe_dbref(boolexp_buf, &buftop, b->thing);
+					safe_dbref(boolexp_buf, buftop, b->thing);
 					break;
 				}
 
@@ -195,19 +192,21 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 				switch (Typeof(b->thing))
 				{
 				case TYPE_PLAYER:
-					SAFE_LB_CHR('*', boolexp_buf, &buftop);
-					safe_name(b->thing, boolexp_buf, &buftop);
+					SAFE_LB_CHR('*', boolexp_buf, buftop);
+					safe_name(b->thing, boolexp_buf, buftop);
 					break;
 
 				default:
-					safe_dbref(boolexp_buf, &buftop, b->thing);
+					safe_dbref(boolexp_buf, buftop, b->thing);
 					break;
 				}
 			}
 		}
 		else
 		{
-			SAFE_LB_STR((char *)unparse_object_quiet(player, b->thing), boolexp_buf, &buftop);
+			buff = unparse_object_quiet(b->thing);
+			SAFE_LB_STR(buff, boolexp_buf, buftop);
+			XFREE(buff);
 		}
 
 		break;
@@ -227,15 +226,15 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 
 		if (ap && ap->number)
 		{
-			SAFE_LB_STR((char *)ap->name, boolexp_buf, &buftop);
+			SAFE_LB_STR((char *)ap->name, boolexp_buf, buftop);
 		}
 		else
 		{
-			SAFE_LTOS(boolexp_buf, &buftop, b->thing, LBUF_SIZE);
+			SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 		}
 
-		SAFE_LB_CHR(sep_ch, boolexp_buf, &buftop);
-		SAFE_LB_STR((char *)b->sub1, boolexp_buf, &buftop);
+		SAFE_LB_CHR(sep_ch, boolexp_buf, buftop);
+		SAFE_LB_STR((char *)b->sub1, boolexp_buf, buftop);
 		break;
 
 	default:
@@ -245,34 +244,78 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format)
 	}
 }
 
+/**
+ * @brief
+ * 
+ * External
+ * 
+ * @param player 
+ * @param b 
+ * @return char* 
+ */
 char *unparse_boolexp_quiet(dbref player, BOOLEXP *b)
 {
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *buftop;
 	buftop = boolexp_buf;
-	unparse_boolexp1(player, b, BOOLEXP_CONST, F_QUIET);
+	unparse_boolexp1(player, b, BOOLEXP_CONST, F_QUIET, boolexp_buf, &buftop);
 	*buftop = '\0';
 	return boolexp_buf;
 }
 
+/**
+ * @brief 
+ * 
+ * External
+ * 
+ * @param player 
+ * @param b 
+ * @return char* 
+ */
 char *unparse_boolexp(dbref player, BOOLEXP *b)
 {
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *buftop;
 	buftop = boolexp_buf;
-	unparse_boolexp1(player, b, BOOLEXP_CONST, F_EXAMINE);
+	unparse_boolexp1(player, b, BOOLEXP_CONST, F_EXAMINE, boolexp_buf, &buftop);
 	*buftop = '\0';
 	return boolexp_buf;
 }
 
+/**
+ * @brief 
+ * 
+ * External
+ * 
+ * @param player 
+ * @param b 
+ * @return char* 
+ */
 char *unparse_boolexp_decompile(dbref player, BOOLEXP *b)
 {
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *buftop;
 	buftop = boolexp_buf;
-	unparse_boolexp1(player, b, BOOLEXP_CONST, F_DECOMPILE);
+	unparse_boolexp1(player, b, BOOLEXP_CONST, F_DECOMPILE, boolexp_buf, &buftop);
 	*buftop = '\0';
 	return boolexp_buf;
 }
 
+/**
+ * @brief 
+ * 
+ * External
+ * 
+ * @param player 
+ * @param b 
+ * @return char* 
+ */
 char *unparse_boolexp_function(dbref player, BOOLEXP *b)
 {
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *buftop;
 	buftop = boolexp_buf;
-	unparse_boolexp1(player, b, BOOLEXP_CONST, F_FUNCTION);
+	unparse_boolexp1(player, b, BOOLEXP_CONST, F_FUNCTION, boolexp_buf, &buftop);
 	*buftop = '\0';
 	return boolexp_buf;
 }

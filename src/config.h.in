@@ -203,7 +203,7 @@
 /* Define to 1 if you have the `srandom' function. */
 #undef HAVE_SRANDOM
 
-/* Define to 1 if stdbool.h conforms to C99. */
+/* Define to 1 if you have the <stdbool.h> header file. */
 #undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stddef.h> header file. */

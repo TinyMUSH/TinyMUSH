@@ -2070,7 +2070,7 @@ void mod_mail_load_database(FILE *fp)
         }
 
         if (read_tolist)
-            mp->tolist = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->tolist");
+            mp->tolist = getstring(fp, read_new_strings);
         else
         {
             s = XMALLOC(LBUF_SIZE, "s");
@@ -2081,8 +2081,8 @@ void mod_mail_load_database(FILE *fp)
 
         if (read_cclist)
         {
-            mp->cclist = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->cclist");
-            mp->bcclist = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->bcclist");
+            mp->cclist = getstring(fp, read_new_strings);
+            mp->bcclist = getstring(fp, read_new_strings);
         }
         else
         {
@@ -2090,22 +2090,24 @@ void mod_mail_load_database(FILE *fp)
             mp->bcclist = XSTRDUP("", "mp->bcclist");
         }
 
-        mp->time = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->time");
+        mp->time = getstring(fp, read_new_strings);
 
         if (pennsub)
-            mp->subject = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->subject");
+            mp->subject = getstring(fp, read_new_strings);
         else if (!new)
             mp->subject = XSTRDUP("No subject", "mp->subject");
 
         if (!read_newdb)
         {
-            number = add_mail_message_nosig(getstring_noalloc(fp, read_new_strings));
+            char *gs = getstring(fp, read_new_strings);
+            number = add_mail_message_nosig(gs);
+            XFREE(gs);
             add_count(number);
             mp->number = number;
         }
 
         if (new)
-            mp->subject = XSTRDUP(getstring_noalloc(fp, read_new_strings), "mp->subject");
+            mp->subject = getstring(fp, read_new_strings);
         else if (!pennsub)
             mp->subject = XSTRDUP("No subject", "mp->subject");
 
@@ -2126,8 +2128,10 @@ void mod_mail_load_database(FILE *fp)
 
         while (strncmp(nbuf1, "+++ END OF DUMP +++", 19))
         {
+            char *gs = getstring(fp, read_new_strings);
             number = atoi(nbuf1);
-            new_mail_message(getstring_noalloc(fp, read_new_strings), number);
+            new_mail_message(gs, number);
+            XFREE(gs);
 
             if (fgets(nbuf1, sizeof(nbuf1), fp) == NULL)
             {

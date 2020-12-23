@@ -16,37 +16,193 @@
 #include "db.h"			/* required by externs */
 #include "interface.h"	/* required by code */
 #include "externs.h"	/* required by code */
-#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
 /**
- * \brief ANSI character-to-number translation table.
+ * @brief Convert ansi character code (%x?) to ansi sequence.
+ * 
+ * @param ch Character to convert
+ * @return char* Ansi sequence
  */
-
-int ansi_nchartab[256] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, I_ANSI_BBLUE, I_ANSI_BCYAN, 0, 0, 0, I_ANSI_BGREEN, 0, 0, 0, 0, 0, I_ANSI_BMAGENTA, 0, 0,
-	0, 0, I_ANSI_BRED, 0, 0, 0, 0, I_ANSI_BWHITE, I_ANSI_BBLACK, I_ANSI_BYELLOW, 0, 0, 0, 0, 0, 0,
-	0, 0, I_ANSI_BLUE, I_ANSI_CYAN, 0, 0, I_ANSI_BLINK, I_ANSI_GREEN, I_ANSI_HILITE, I_ANSI_INVERSE,
-	0, 0, 0, I_ANSI_MAGENTA, I_ANSI_NORMAL, 0, 0, 0, I_ANSI_RED, 0, 0, I_ANSI_UNDER, 0, I_ANSI_WHITE,
-	I_ANSI_BLACK, I_ANSI_YELLOW, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+char *ansiChar(int ch)
+{
+	switch (ch)
+	{
+	case 'B':
+		return ANSI_BBLUE;
+	case 'C':
+		return ANSI_BCYAN;
+	case 'G':
+		return ANSI_BGREEN;
+	case 'M':
+		return ANSI_BMAGENTA;
+	case 'R':
+		return ANSI_BRED;
+	case 'W':
+		return ANSI_BWHITE;
+	case 'X':
+		return ANSI_BBLACK;
+	case 'Y':
+		return ANSI_BYELLOW;
+	case 'b':
+		return ANSI_BLUE;
+	case 'c':
+		return ANSI_CYAN;
+	case 'f':
+		return ANSI_BLINK;
+	case 'g':
+		return ANSI_GREEN;
+	case 'h':
+		return ANSI_HILITE;
+	case 'i':
+		return ANSI_INVERSE;
+	case 'm':
+		return ANSI_MAGENTA;
+	case 'n':
+		return ANSI_NORMAL;
+	case 'r':
+		return ANSI_RED;
+	case 'u':
+		return ANSI_UNDER;
+	case 'w':
+		return ANSI_WHITE;
+	case 'x':
+		return ANSI_BLACK;
+	case 'y':
+		return ANSI_YELLOW;
+	}
+	return STRING_EMPTY;
+}
 
 /**
- * \brief ANSI number-to-character translation table.
+ * @brief Convert ansi character code (%x?) to numeric values.
+ * 
+ * @param ch ANSI character
+ * @return int ANSI numeric values
  */
+int ansiNum(int ch)
+{
+	switch (ch)
+	{
+	case 'B':
+		return I_ANSI_BBLUE;
+	case 'C':
+		return I_ANSI_BCYAN;
+	case 'G':
+		return I_ANSI_BGREEN;
+	case 'M':
+		return I_ANSI_BMAGENTA;
+	case 'R':
+		return I_ANSI_BRED;
+	case 'W':
+		return I_ANSI_BWHITE;
+	case 'X':
+		return I_ANSI_BBLACK;
+	case 'Y':
+		return I_ANSI_BYELLOW;
+	case 'b':
+		return I_ANSI_BLUE;
+	case 'c':
+		return I_ANSI_CYAN;
+	case 'f':
+		return I_ANSI_BLINK;
+	case 'g':
+		return I_ANSI_GREEN;
+	case 'h':
+		return I_ANSI_HILITE;
+	case 'i':
+		return I_ANSI_INVERSE;
+	case 'm':
+		return I_ANSI_MAGENTA;
+	case 'n':
+		return I_ANSI_NORMAL;
+	case 'r':
+		return I_ANSI_RED;
+	case 'u':
+		return I_ANSI_UNDER;
+	case 'w':
+		return I_ANSI_WHITE;
+	case 'x':
+		return I_ANSI_BLACK;
+	case 'y':
+		return I_ANSI_YELLOW;
+	}
+	return 0;
+}
 
-char ansi_lettab[I_ANSI_NUM] = {
-	'\0', 'h', '\0', '\0', 'u', 'f', '\0', 'i',
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-	'\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0',
-	'\0', '\0', '\0', '\0', '\0', '\0', 'x', 'r',
-	'g', 'y', 'b', 'm', 'c', 'w', '\0', '\0',
-	'X', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'};
+/**
+ * @brief Convert ansi numeric values to character code (%x?).
+ * 
+ * @param num ANSI number
+ * @return char ANSI character
+ */
+char ansiLetter(int num) {
+	switch(num) {
+		case 1:
+			return 'h';
+		case 4:
+			return 'u';
+		case 5:
+			return 'f';
+		case 7:
+			return 'i';
+		case 30:
+			return 'x';
+		case 31:
+			return 'r';
+		case 32:
+			return 'g';
+		case 33:
+			return 'y';
+		case 34:
+			return 'b';
+		case 35:
+			return 'm';
+		case 36:
+			return 'c';
+		case 37:
+			return 'w';
+		case 40:
+			return 'X';
+		case 41:
+			return 'R';
+		case 42:
+			return 'G';
+		case 43:
+			return 'Y';
+		case 44:
+			return 'B';
+		case 45:
+			return 'M';
+		case 46:
+			return 'C';
+		case 47:
+			return 'W';
+	}
+	return 0;
+}
+
+char ansiMushCode(int num, bool bg) {
+	switch(num){
+		case 0:
+			return bg ? 'X': 'x';
+		case 1:
+			return bg ? 'R': 'r';
+		case 2:
+			return bg ? 'G': 'g';
+		case 3:
+			return bg ? 'Y': 'y';
+		case 4:
+			return bg ? 'B': 'b';
+		case 5:
+			return bg ? 'M': 'm';
+		case 6:
+			return bg ? 'C': 'c';
+		case 7:
+			return bg ? 'W': 'w';
+	}
+	return 0;
+}
 
 /**
  * \brief ANSI packed state definitions -- number-to-bitmask translation table.
@@ -65,23 +221,128 @@ char ansi_lettab[I_ANSI_NUM] = {
  *  0x0007 -- three bits of fg color
  */
 
+/*
 int ansi_mask_bits[I_ANSI_LIM] = {
+
 	0x1fff, 0x1100, 0x1100, 0x0000, 0x1200, 0x1400, 0x0000, 0x1800, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x1100, 0x1100, 0x0000, 0x1200, 0x1400, 0x0000, 0x1800, 0x0000, 0x0000,
 	0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x0000, 0x0000,
 	0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x0000, 0x0000};
+*/
+
+/**
+ * @brief ANSI packed state definitions -- number-to-bitmask translation
+ * 
+ * The mask specifies the state bits that are altered by a particular ansi
+ * code. Bits are laid out as follows:
+ *
+ *  0x1000 -- No ansi. Every valid ansi code clears this bit.
+ *  0x0800 -- inverse
+ *  0x0400 -- flash
+ *  0x0200 -- underline
+ *  0x0100 -- highlight
+ *  0x0080 -- "use default bg", set by ansi normal, cleared by other bg's
+ *  0x0070 -- three bits of bg color
+ *  0x0008 -- "use default fg", set by ansi normal, cleared by other fg's
+ *  0x0007 -- three bits of fg color
+ * 
+ * @param num ANSI number
+ * @return int bitmask
+ */
+int ansiBitsMask(int num) {
+	switch(num) {
+		case 0:
+			return 0x1fff;
+		case 1:
+		case 2:
+		case 21:
+		case 22:
+			return 0x1100;
+		case 4:
+		case 24:
+			return 0x1200;
+		case 5:
+		case 25:
+			return 0x1400;
+		case 7:
+		case 27:
+			return 0x1800;
+		case 30:
+		case 31:
+		case 32:
+		case 33:
+		case 34:
+		case 35:
+		case 36:
+		case 37:
+			return 0x100f;
+		case 40:
+		case 41:
+		case 42:
+		case 43:
+		case 44:
+		case 45:
+		case 46:
+		case 47:
+			return 0x10f0;
+	}
+	return 0;
+}
 
 /**
  * \brief ANSI packed state definitions -- number-to-bitvalue translation table.
  */
 
-int ansi_bits[I_ANSI_LIM] = {
-	0x0099, 0x0100, 0x0000, 0x0000, 0x0200, 0x0400, 0x0000, 0x0800, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0000, 0x0000,
-	0x0000, 0x0010, 0x0020, 0x0030, 0x0040, 0x0050, 0x0060, 0x0070, 0x0000, 0x0000};
+/**
+ * @brief ANSI packed state definitions -- number-to-bitvalue translation
+ * 
+ * @param num ANSI number
+ * @return int ANSI bitvalue.
+ */
+int ansiBits(int num){
+	switch(num) {
+		case 0:
+			return 0x0099;
+		case 1:
+			return 0x0100;
+		case 4:
+			return 0x0200;
+		case 5:
+			return 0x0400;
+		case 7:
+			return 0x0800;
+		case 31:
+			return 0x0001;
+		case 32:
+			return 0x0002;
+		case 33:
+			return 0x0003;
+		case 34:
+			return 0x0004;
+		case 35:
+			return 0x0005;
+		case 36:
+			return 0x0006;
+		case 37:
+			return 0x0007;
+		case 41:
+			return 0x0010;
+		case 42:
+			return 0x0020;
+		case 43:
+			return 0x0030;
+		case 44:
+			return 0x0040;
+		case 45:
+			return 0x0050;
+		case 46:
+			return 0x0060;
+		case 47:
+			return 0x0070;
+	}
+	return 0;
+}
 
 /**
  * \fn char *strip_ansi ( const char *s )
@@ -412,8 +673,8 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 		{ /* explicit normal */
 			XSTRCPY(p, "0;");
 			p += 2;
-			ansi_bits_set = (~ansi_bits[0]) & ansi_after;
-			ansi_bits_clr = ansi_bits[0] & (~ansi_after);
+			ansi_bits_set = (~ansiBits(0)) & ansi_after;
+			ansi_bits_clr = ansiBits(0) & (~ansi_after);
 		}
 
 		/*
@@ -500,8 +761,6 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 {
 	int ansi_bits_set, ansi_bits_clr;
 	char *p;
-	char ansi_mushcode_fg[9] = "xrgybmcw";
-	char ansi_mushcode_bg[9] = "XRGYBMCW";
 	char *buffer;
 	buffer = XMALLOC(SBUF_SIZE, "buffer");
 	*buffer = '\0';
@@ -522,8 +781,8 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 		{ /* explicit normal */
 			XSTRCPY(p, "%xn");
 			p += 3;
-			ansi_bits_set = (~ansi_bits[0]) & ansi_after;
-			ansi_bits_clr = ansi_bits[0] & (~ansi_after);
+			ansi_bits_set = (~ansiBits(0)) & ansi_after;
+			ansi_bits_clr = ansiBits(0) & (~ansi_after);
 		}
 
 		/*
@@ -561,7 +820,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 		{
 			XSTRCPY(p, "%xx");
 			p += 3;
-			p[-1] = ansi_mushcode_fg[(ansi_after & 0x00f)];
+			p[-1] = ansiMushCode(ansi_after & 0x00f, false);
 		}
 
 		/*
@@ -571,7 +830,7 @@ char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 		{
 			XSTRCPY(p, "%xX");
 			p += 3;
-			p[-1] = ansi_mushcode_bg[(ansi_after & 0x0f0) >> 4];
+			p[-1] = ansiMushCode((ansi_after & 0x0f0) >> 4, true);
 		}
 
 		/*
@@ -600,8 +859,6 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
 {
 	int ansi_bits_set, ansi_bits_clr;
 	char *p;
-	char ansi_mushcode_fg[9] = "xrgybmcw";
-	char ansi_mushcode_bg[9] = "XRGYBMCW";
 	char *buffer;
 	buffer = XMALLOC(SBUF_SIZE, "buffer");
 	*buffer = '\0';
@@ -621,8 +878,8 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
 			(ansi_bits_clr == 0x1000))
 		{ /* explicit normal */
 			*p++ = 'n';
-			ansi_bits_set = (~ansi_bits[0]) & ansi_after;
-			ansi_bits_clr = ansi_bits[0] & (~ansi_after);
+			ansi_bits_set = (~ansiBits(0)) & ansi_after;
+			ansi_bits_clr = ansiBits(0) & (~ansi_after);
 		}
 
 		/*
@@ -654,7 +911,7 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
 		{
-			*p++ = ansi_mushcode_fg[(ansi_after & 0x00f)];
+			*p++ = ansiMushCode(ansi_after & 0x00f, false);
 		}
 
 		/*
@@ -662,7 +919,7 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
 	 */
 		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
 		{
-			*p++ = ansi_mushcode_bg[(ansi_after & 0x0f0) >> 4];
+			*p++ = ansiMushCode((ansi_after & 0x0f0) >> 4, true);
 		}
 
 		/*
@@ -2073,8 +2330,8 @@ void track_esccode(char **s, int *ansi_state)
 			{
 				if (param_val < I_ANSI_LIM)
 				{
-					ansi_mask |= ansi_mask_bits[param_val];
-					ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
 				}
 
 				param_val = 0;
@@ -2091,8 +2348,8 @@ void track_esccode(char **s, int *ansi_state)
 	{
 		if (param_val < I_ANSI_LIM)
 		{
-			ansi_mask |= ansi_mask_bits[param_val];
-			ansi_diff = ((ansi_diff & ~ansi_mask_bits[param_val]) | ansi_bits[param_val]);
+			ansi_mask |= ansiBitsMask(param_val);
+			ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
 		}
 
 		*ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
@@ -2159,7 +2416,7 @@ void track_ansi_letters(char *t, int *ansi_state)
 
 			break;
 		default:
-			*ansi_state = ((*ansi_state & ~ansi_mask_bits[ansi_nchartab[(unsigned char)*s]]) | ansi_bits[ansi_nchartab[(unsigned char)*s]]);
+			*ansi_state = ((*ansi_state & ~ansiBitsMask(ansiNum((unsigned char)*s))) | ansiBits(ansiNum((unsigned char)*s)));
 			++s;
 		}
 	}

@@ -30,10 +30,10 @@
 void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now)
 {
 	char *command, *command2; /* allocated by replace_string */
-	char s[SBUF_SIZE];
-	snprintf(s, SBUF_SIZE, "%d", number);
+	char *s = XASPRINTF("s", "%d", number);
 	command = replace_string(BOUND_VAR, argstr, action);
 	command2 = replace_string(LISTPLACE_VAR, s, command);
+	XFREE(s);
 
 	if (now)
 	{

@@ -20,7 +20,6 @@
 #include "match.h"		/* required by code */
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
-#include "ansi.h"		/* required by code */
 #include "stringutil.h" /* required by code */
 
 long genrand_int31(void);
@@ -257,14 +256,11 @@ int countwords(char *str, const Delim *sep)
 
 int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
-	//unsigned char tok_starts[(LBUF_SIZE >> 3) + 1];
-	unsigned char *tok_starts;
+	unsigned char *tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
 	int initted = 0;
 	char *tok, *liststart;
 	int ntok, tokpos, i, bits;
 
-	tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
-	
 	/*
      * Mark token starting points in a 1k bitstring, then go back
      * and collect them into an array of just the right number of
