@@ -182,7 +182,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	{
 		while (*str == ESC_CHAR)
 		{
-			track_esccode(&str, &ansi_state);
+			TRACK_ESCCODES(str, ansi_state);
 		}
 
 		while (*str && (*str != sep->str[0]))
@@ -191,7 +191,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 
 			while (*str == ESC_CHAR)
 			{
-				track_esccode(&str, &ansi_state);
+				TRACK_ESCCODES(str, ansi_state);
 			}
 		}
 

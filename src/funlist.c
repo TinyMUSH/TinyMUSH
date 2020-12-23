@@ -270,7 +270,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	     */
 			while (*s == ESC_CHAR)
 			{
-				track_esccode(&s, &ansi_state);
+				TRACK_ESCCODES(s, ansi_state);
 			}
 
 			while (*s && (*s != isep.str[0]))
@@ -279,7 +279,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 				while (*s == ESC_CHAR)
 				{
-					track_esccode(&s, &ansi_state);
+					TRACK_ESCCODES(s, ansi_state);
 				}
 			}
 
@@ -2092,7 +2092,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 				{
 					if (*s == ESC_CHAR)
 					{
-						track_esccode(&s, &ansi_state);
+						TRACK_ESCCODES(s, ansi_state);
 					}
 					else
 					{

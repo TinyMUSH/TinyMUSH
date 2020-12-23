@@ -384,7 +384,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	while (*mp == ESC_CHAR)
 	{
-		track_esccode(&mp, &ansi_needle);
+		TRACK_ESCCODES(mp, ansi_needle);
 
 		if (!*mp)
 		{
@@ -402,7 +402,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	{
 		while (*bp == ESC_CHAR)
 		{
-			track_esccode(&bp, &ansi_haystack);
+			TRACK_ESCCODES(bp, ansi_haystack);
 		}
 
 		if ((*bp == *mp) && (ansi_needle == ANST_NONE || ansi_haystack == ansi_needle))
@@ -419,12 +419,12 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 			{
 				while (*cp == ESC_CHAR)
 				{
-					track_esccode(&cp, &ansi_haystack2);
+					TRACK_ESCCODES(cp, ansi_haystack2);
 				}
 
 				while (*np == ESC_CHAR)
 				{
-					track_esccode(&np, &ansi_needle2);
+					TRACK_ESCCODES(np, ansi_needle2);
 				}
 
 				if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
@@ -509,7 +509,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	while (*mp == ESC_CHAR)
 	{
-		track_esccode(&mp, &ansi_needle);
+		TRACK_ESCCODES(mp, ansi_needle);
 
 		if (!*mp)
 		{
@@ -537,12 +537,12 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		{
 			while (*cp == ESC_CHAR)
 			{
-				track_esccode(&cp, &ansi_haystack2);
+				TRACK_ESCCODES(cp, ansi_haystack2);
 			}
 
 			while (*np == ESC_CHAR)
 			{
-				track_esccode(&np, &ansi_needle2);
+				TRACK_ESCCODES(np, ansi_needle2);
 			}
 
 			if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
@@ -571,7 +571,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	 */
 		while (*bp == ESC_CHAR)
 		{
-			track_esccode(&bp, &ansi_haystack);
+			TRACK_ESCCODES(bp, ansi_haystack);
 		}
 
 		if (*bp)
@@ -1004,7 +1004,7 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	{
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 
 		if (*s)
@@ -1047,7 +1047,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	while (*s == ESC_CHAR)
 	{
-		track_esccode(&s, &ansi_state);
+		TRACK_ESCCODES(s, ansi_state);
 	}
 
 	for (count = 0; (count < start) && *s; count++)
@@ -1056,7 +1056,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 	}
 
@@ -1510,7 +1510,7 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	{
 		if (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 		else
 		{
@@ -1753,7 +1753,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	while (*s == ESC_CHAR)
 	{
-		track_esccode(&s, &ansi_state);
+		TRACK_ESCCODES(s, ansi_state);
 	}
 
 	for (count = 0; (count < start) && *s; ++count)
@@ -1762,7 +1762,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 	}
 
@@ -1779,7 +1779,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	{
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 
 		if (*s)
@@ -2036,7 +2036,7 @@ void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	{
 		if (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state);
+			TRACK_ESCCODES(s, ansi_state);
 		}
 		else
 		{
@@ -2166,7 +2166,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			switch (*sw)
 			{
 			case ESC_CHAR:
-				track_esccode(&sw, &sw_ansi_state);
+				TRACK_ESCCODES(sw, sw_ansi_state);
 				--sw;
 				continue;
 
@@ -2243,7 +2243,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 				switch (*ew)
 				{
 				case ESC_CHAR:
-					track_esccode(&ew, &ew_ansi_state);
+					TRACK_ESCCODES(ew, ew_ansi_state);
 					--ew;
 					continue;
 
@@ -2638,7 +2638,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					switch (*sw)
 					{
 					case ESC_CHAR:
-						track_esccode(&sw, &sw_ansi_state);
+						TRACK_ESCCODES(sw, sw_ansi_state);
 						--sw;
 						continue;
 
@@ -2782,7 +2782,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						switch (*ew)
 						{
 						case ESC_CHAR:
-							track_esccode(&ew, &ew_ansi_state);
+							TRACK_ESCCODES(ew, ew_ansi_state);
 							--ew;
 							continue;
 
@@ -3186,7 +3186,7 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state_l);
+			TRACK_ESCCODES(s, ansi_state_l);
 		}
 
 		if (*s)
@@ -3200,7 +3200,7 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	while (*s == ESC_CHAR)
 	{
-		track_esccode(&s, &ansi_state_r);
+		TRACK_ESCCODES(s, ansi_state_r);
 	}
 
 	for (; (count < start + nchars) && *s; ++count)
@@ -3209,7 +3209,7 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 		while (*s == ESC_CHAR)
 		{
-			track_esccode(&s, &ansi_state_r);
+			TRACK_ESCCODES(s, ansi_state_r);
 		}
 	}
 

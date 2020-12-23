@@ -1091,7 +1091,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     {
         if (*s == ESC_CHAR)
         {
-            track_esccode(&s, &ansi_state);
+            TRACK_ESCCODES(s, ansi_state);
         }
         else
         {

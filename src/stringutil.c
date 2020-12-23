@@ -136,70 +136,74 @@ int ansiNum(int ch)
  * @param num ANSI number
  * @return char ANSI character
  */
-char ansiLetter(int num) {
-	switch(num) {
-		case 1:
-			return 'h';
-		case 4:
-			return 'u';
-		case 5:
-			return 'f';
-		case 7:
-			return 'i';
-		case 30:
-			return 'x';
-		case 31:
-			return 'r';
-		case 32:
-			return 'g';
-		case 33:
-			return 'y';
-		case 34:
-			return 'b';
-		case 35:
-			return 'm';
-		case 36:
-			return 'c';
-		case 37:
-			return 'w';
-		case 40:
-			return 'X';
-		case 41:
-			return 'R';
-		case 42:
-			return 'G';
-		case 43:
-			return 'Y';
-		case 44:
-			return 'B';
-		case 45:
-			return 'M';
-		case 46:
-			return 'C';
-		case 47:
-			return 'W';
+char ansiLetter(int num)
+{
+	switch (num)
+	{
+	case 1:
+		return 'h';
+	case 4:
+		return 'u';
+	case 5:
+		return 'f';
+	case 7:
+		return 'i';
+	case 30:
+		return 'x';
+	case 31:
+		return 'r';
+	case 32:
+		return 'g';
+	case 33:
+		return 'y';
+	case 34:
+		return 'b';
+	case 35:
+		return 'm';
+	case 36:
+		return 'c';
+	case 37:
+		return 'w';
+	case 40:
+		return 'X';
+	case 41:
+		return 'R';
+	case 42:
+		return 'G';
+	case 43:
+		return 'Y';
+	case 44:
+		return 'B';
+	case 45:
+		return 'M';
+	case 46:
+		return 'C';
+	case 47:
+		return 'W';
 	}
 	return 0;
 }
 
-char ansiMushCode(int num, bool bg) {
-	switch(num){
-		case 0:
-			return bg ? 'X': 'x';
-		case 1:
-			return bg ? 'R': 'r';
-		case 2:
-			return bg ? 'G': 'g';
-		case 3:
-			return bg ? 'Y': 'y';
-		case 4:
-			return bg ? 'B': 'b';
-		case 5:
-			return bg ? 'M': 'm';
-		case 6:
-			return bg ? 'C': 'c';
-		case 7:
-			return bg ? 'W': 'w';
+char ansiMushCode(int num, bool bg)
+{
+	switch (num)
+	{
+	case 0:
+		return bg ? 'X' : 'x';
+	case 1:
+		return bg ? 'R' : 'r';
+	case 2:
+		return bg ? 'G' : 'g';
+	case 3:
+		return bg ? 'Y' : 'y';
+	case 4:
+		return bg ? 'B' : 'b';
+	case 5:
+		return bg ? 'M' : 'm';
+	case 6:
+		return bg ? 'C' : 'c';
+	case 7:
+		return bg ? 'W' : 'w';
 	}
 	return 0;
 }
@@ -250,42 +254,44 @@ int ansi_mask_bits[I_ANSI_LIM] = {
  * @param num ANSI number
  * @return int bitmask
  */
-int ansiBitsMask(int num) {
-	switch(num) {
-		case 0:
-			return 0x1fff;
-		case 1:
-		case 2:
-		case 21:
-		case 22:
-			return 0x1100;
-		case 4:
-		case 24:
-			return 0x1200;
-		case 5:
-		case 25:
-			return 0x1400;
-		case 7:
-		case 27:
-			return 0x1800;
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-			return 0x100f;
-		case 40:
-		case 41:
-		case 42:
-		case 43:
-		case 44:
-		case 45:
-		case 46:
-		case 47:
-			return 0x10f0;
+int ansiBitsMask(int num)
+{
+	switch (num)
+	{
+	case 0:
+		return 0x1fff;
+	case 1:
+	case 2:
+	case 21:
+	case 22:
+		return 0x1100;
+	case 4:
+	case 24:
+		return 0x1200;
+	case 5:
+	case 25:
+		return 0x1400;
+	case 7:
+	case 27:
+		return 0x1800;
+	case 30:
+	case 31:
+	case 32:
+	case 33:
+	case 34:
+	case 35:
+	case 36:
+	case 37:
+		return 0x100f;
+	case 40:
+	case 41:
+	case 42:
+	case 43:
+	case 44:
+	case 45:
+	case 46:
+	case 47:
+		return 0x10f0;
 	}
 	return 0;
 }
@@ -300,46 +306,48 @@ int ansiBitsMask(int num) {
  * @param num ANSI number
  * @return int ANSI bitvalue.
  */
-int ansiBits(int num){
-	switch(num) {
-		case 0:
-			return 0x0099;
-		case 1:
-			return 0x0100;
-		case 4:
-			return 0x0200;
-		case 5:
-			return 0x0400;
-		case 7:
-			return 0x0800;
-		case 31:
-			return 0x0001;
-		case 32:
-			return 0x0002;
-		case 33:
-			return 0x0003;
-		case 34:
-			return 0x0004;
-		case 35:
-			return 0x0005;
-		case 36:
-			return 0x0006;
-		case 37:
-			return 0x0007;
-		case 41:
-			return 0x0010;
-		case 42:
-			return 0x0020;
-		case 43:
-			return 0x0030;
-		case 44:
-			return 0x0040;
-		case 45:
-			return 0x0050;
-		case 46:
-			return 0x0060;
-		case 47:
-			return 0x0070;
+int ansiBits(int num)
+{
+	switch (num)
+	{
+	case 0:
+		return 0x0099;
+	case 1:
+		return 0x0100;
+	case 4:
+		return 0x0200;
+	case 5:
+		return 0x0400;
+	case 7:
+		return 0x0800;
+	case 31:
+		return 0x0001;
+	case 32:
+		return 0x0002;
+	case 33:
+		return 0x0003;
+	case 34:
+		return 0x0004;
+	case 35:
+		return 0x0005;
+	case 36:
+		return 0x0006;
+	case 37:
+		return 0x0007;
+	case 41:
+		return 0x0010;
+	case 42:
+		return 0x0020;
+	case 43:
+		return 0x0030;
+	case 44:
+		return 0x0040;
+	case 45:
+		return 0x0050;
+	case 46:
+		return 0x0060;
+	case 47:
+		return 0x0070;
 	}
 	return 0;
 }
@@ -960,7 +968,7 @@ int ansi_map_states(const char *s, int **m, char **p)
 	{
 		if (*s1 == ESC_CHAR)
 		{
-			track_esccode(&s1, &ansi_state);
+			TRACK_ESCCODES(s1, ansi_state);
 		}
 		else
 		{
@@ -1100,7 +1108,7 @@ char *translate_string(char *str, int type)
 			case ESC_CHAR:
 				while (*str == ESC_CHAR)
 				{
-					track_esccode(&str, &ansi_state);
+					TRACK_ESCCODES(str, ansi_state);
 				}
 
 				SAFE_LB_STR(ansi_transition_mushcode(ansi_state_prev, ansi_state), buff, &bp);
@@ -1920,7 +1928,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
      * have any embedded ANSI codes.
      */
 	ansi_state = ANST_NONE;
-	track_all_esccodes(&to, &p, &ansi_state);
+	TRACK_ALL_ESCCODES(to, p, ansi_state);
 	to_ansi_set = (~ANST_NONE) & ansi_state;
 	to_ansi_clr = ANST_NONE & (~ansi_state);
 	tlen = p - to;
@@ -1931,14 +1939,14 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	{
 		/* Prepend 'to' to string */
 		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
-		track_all_esccodes(&src, &p, &ansi_state);
+		TRACK_ALL_ESCCODES(src, p, ansi_state);
 		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 	}
 	else if (!strcmp(from, "$"))
 	{
 		/* Append 'to' to string */
 		ansi_state = ANST_NONE;
-		track_all_esccodes(&src, &p, &ansi_state);
+		TRACK_ALL_ESCCODES(src, p, ansi_state);
 		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 		ansi_state |= to_ansi_set;
 		ansi_state &= ~to_ansi_clr;
@@ -1967,7 +1975,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*src == ESC_CHAR)
 				{
-					track_esccode(&src, &ansi_state);
+					TRACK_ESCCODES(src, ansi_state);
 				}
 				else
 				{
@@ -2006,7 +2014,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					if (*from == ESC_CHAR)
 					{
 						p = src;
-						track_esccode(&src, &ansi_state);
+						TRACK_ESCCODES(src, ansi_state);
 						SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else
@@ -2299,91 +2307,6 @@ void safe_copy_esccode(char **s, char *buff, char **bufc)
 	{
 		SAFE_LB_CHR(**s, buff, bufc);
 		++(*s);
-	}
-}
-
-/**
-* \fn void track_esccode ( char **s, int *ansi_state )
-* \brief Return the ansi state of an ansi sequence.
-*
-* \param s Pointer containing the ansi sequence.
-* \param ansi_state The ansi state that need to be updated.
-*/
-
-void track_esccode(char **s, int *ansi_state)
-{
-	int ansi_mask = 0;
-	int ansi_diff = 0;
-	unsigned int param_val = 0;
-	++(*s);
-
-	if (**s == ANSI_CSI)
-	{
-		while ((*(++(*s)) & 0xf0) == 0x30)
-		{
-			if (**s < 0x3a)
-			{
-				param_val <<= 1;
-				param_val += (param_val << 2) + (**s & 0x0f);
-			}
-			else
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-
-				param_val = 0;
-			}
-		}
-	}
-
-	while ((**s & 0xf0) == 0x20)
-	{
-		++(*s);
-	}
-
-	if (**s == ANSI_END)
-	{
-		if (param_val < I_ANSI_LIM)
-		{
-			ansi_mask |= ansiBitsMask(param_val);
-			ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-		}
-
-		*ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
-		++(*s);
-	}
-	else if (**s)
-	{
-		++(*s);
-	}
-}
-
-/**
-* \fn void track_all_esccodes ( char **s, char **p, int *ansi_state )
-* \brief Scan a string buffer for ansi sequence and return the final ansi state.
-*
-* \param s Pointer containing the ansi sequence.
-* \param p Pointer to the position in the string.
-* \param ansi_state The ansi state that need to be updated.
-*/
-
-void track_all_esccodes(char **s, char **p, int *ansi_state)
-{
-	p = s;
-
-	while (**p)
-	{
-		if (**p == ESC_CHAR)
-		{
-			track_esccode(&(*p), &(*ansi_state));
-		}
-		else
-		{
-			++(*p);
-		}
 	}
 }
 
