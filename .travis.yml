@@ -1,6 +1,5 @@
 language: c
-before_install:
-  - autoreconf -ivf
-  - wget http://security.ubuntu.com/ubuntu/pool/universe/c/cproto/cproto_4.7j-3_amd64.deb
-  - sudo dpkg -i cproto_4.7j-3_amd64.deb
-script: ./configure && make
+compiler:
+  - gcc
+  - clang
+script: autoreconf -ivf && ./configure && make
