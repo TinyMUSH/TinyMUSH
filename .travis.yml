@@ -1,4 +1,9 @@
 language: c
+os:
+  - linux
+dist:
+  - focal
+  - groovy
 compiler:
   - gcc
   - clang
