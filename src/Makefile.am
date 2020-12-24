@@ -21,9 +21,9 @@ SHARE_DIR		= share
 SHARE_SRC		= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 	
 ETC_DIR			= etc
-ETC_SKEL		= $(ETC_DIR)/netmush.conf.in
+ETC_SKEL		= $(ETC_DIR)/netmush.conf.example.in
 ETC_SRC			= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
-ETC_BUILD		= $(ETC_DIR)/netmush.conf
+ETC_BUILD		= $(ETC_DIR)/netmush.conf.example
 
 SCRIPT_DIR		= scripts
 SCRIPT_SKEL		= $(SCRIPT_DIR)/Startmush.in
@@ -39,11 +39,11 @@ QDBM_H			= dbm/qdbm/copyright.h dbm/qdbm/curia.h dbm/qdbm/depot.h dbm/qdbm/hovel
 
 EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h
 
-CLEANFILES		= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf $(SCRIPT_DIR)/Startmush
+CLEANFILES		= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
 
 API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h db.h api.h interface.h externs.h stringutil.h prototypes.h
 
-BUILT_SOURCES		= prototypes.h version.h tinymushapi.h defaults.h netmush.conf Startmush
+BUILT_SOURCES		= prototypes.h version.h tinymushapi.h defaults.h netmush.conf.example Startmush
 
 nodist_include_HEADERS	= tinymushapi.h
 
@@ -85,9 +85,9 @@ do_subst = $(SED) \
 	-e 's|[@]includedir@|$(includedir)|g' \
 	-e 's|[@]libexecdir@|$(libexecdir)|g'
 	
-netmush.conf: $(ETC_DIR)/netmush.conf.in
-	$(do_subst) <$(ETC_DIR)/netmush.conf.in >$(ETC_DIR)/netmush.conf
-	chmod +w $(ETC_DIR)/netmush.conf
+netmush.conf.example: $(ETC_DIR)/netmush.conf.example.in
+	$(do_subst) <$(ETC_DIR)/netmush.conf.example.in >$(ETC_DIR)/netmush.conf.example
+	chmod +w $(ETC_DIR)/netmush.conf.example
 	
 defaults.h: defaults.h.in
 	$(do_subst) <defaults.h.in >defaults.h
@@ -143,16 +143,16 @@ tinymushapi.h:
 	chmod +w tinymushapi.h
 	printf "#ifndef __TINYMUSHAPI_H\n#define __TINYMUSHAPI_H\n\n" >> tinymushapi.h
 	printf "\n\n#include <ltdl.h>\n\n#include <netinet/in.h>\n\n" >> tinymushapi.h
-	sed -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
-	sed -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
-	sed -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
-	sed -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h
+	$(SED) -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
+	$(SED) -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
+	$(SED) -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
+	$(SED) -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h
 	for i in $(API_SRC); \
 	do \
-		TMP=`echo "__$$i" | sed "s/src\///g" | tr '.' '_' | tr '[:lower:]' '[:upper:]'`; \
-		TMP1=`echo "$$i" |sed "s/src\///g"`; \
+		TMP=`echo "__$$i" | $(SED) "s/src\///g" | tr '.' '_' | tr '[:lower:]' '[:upper:]'`; \
+		TMP1=`echo "$$i" | $(SED) "s/src\///g"`; \
 		printf "\n\n/*\n * From $$TMP1\n */\n\n" >> tinymushapi.h; \
-		sed -n "/#ifndef $$TMP/,/\/* $$TMP *\//p" < $$i >> tinymushapi.h; \
+		$(SED) -n "/#ifndef $$TMP/,/\/* $$TMP *\//p" < $$i >> tinymushapi.h; \
 	done
 	printf "\n\n#endif                          /* __TINYMUSHAPI_H */\n" >> tinymushapi.h
 
@@ -175,8 +175,16 @@ install-data-local:
 	$(mkinstalldirs) @localstatedir@/log/@with_install_suffix@
 	$(install_sh_DATA) $(SHARE_SRC) @datarootdir@
 	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
-	$(install_sh_DATA) $(ETC_SRC) @sysconfdir@
 	$(install_sh_DATA) $(ETC_BUILD) @sysconfdir@
+	@for i in $(ETC_BUILD); \
+	do \
+		SKEL_CONF="`$(with_basename_prog) $$i`"; \
+		USER_CONF="@sysconfdir@/`echo $$i | $(with_basename_prog) $$($(SED) s/".example"//)`"; \
+		if [ ! -f "$$USER_CONF" ]; then \
+			cp @sysconfdir@/$$SKEL_CONF $$USER_CONF; \
+			echo "No $$USER_CONF found. Default configuration file created."; \
+		fi; \
+	done
 
 uninstall-local:
 	for files in $(SHARE_SRC); do rm -f $(prefix)/text/`basename $$files`; done

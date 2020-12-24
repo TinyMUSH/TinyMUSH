@@ -77,6 +77,12 @@ AS_IF([test "x$with_tar_prog" = "xnotfound"],[AC_MSG_ERROR([Please install TAR b
 AC_PATH_PROGS([with_compress_prog], [gzip], [notfound])
 AS_IF([test "x$with_compress_prog" = "xnotfound"],[AC_MSG_ERROR([Please install GZIP before trying again])],)
 
+AC_PATH_PROGS([with_basename_prog], [basename], [notfound])
+AS_IF([test "x$with_basename_prog" = "xnotfound"],[AC_MSG_ERROR([Please install BASENAME before trying again])],)
+
+AC_PATH_PROGS([with_dirname_prog], [dirname], [notfound])
+AS_IF([test "x$with_dirname_prog" = "xnotfound"],[AC_MSG_ERROR([Please install DIRNAME before trying again])],)
+
 AX_BOX([Initializing Automake])
 
 AM_INIT_AUTOMAKE([subdir-objects])
