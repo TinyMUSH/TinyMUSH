@@ -1251,6 +1251,7 @@ size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_
 
 			if (size > 0)
 			{
+				**destp = 0;
 				strncpy(*destp, src, size);
 				*destp += size;
 				**destp = 0;
@@ -1320,6 +1321,7 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
 
 			if (size > 0)
 			{
+				**destp = 0;
 				strncat(*destp, src, size);
 				*destp += size;
 				**destp = 0;

@@ -144,7 +144,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 				if (Can_See_Exit(player, thing, isdark))
 				{
 					if (buff != e)
-						SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+						SAFE_STRCAT(buff, &e, "  ", LBUF_SIZE);
 
 					if (Html(player) && (mudconf.have_pueblo == 1))
 					{
