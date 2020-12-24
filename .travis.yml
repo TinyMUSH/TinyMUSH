@@ -1,9 +1,7 @@
 language: c
 os:
   - linux
-dist:
-  - focal
-  - groovy
+dist: focal
 compiler:
   - gcc
   - clang
