@@ -55,11 +55,11 @@
 #define SAFE_MB_CHR(c, b, p) __xsafestrcatchr(b, p, c, MBUF_SIZE - 1)
 
 #define SAFE_STRNCAT(b, p, s, n, z) __xsafestrncat(b, p, s, n, z);
-#define SAFE_STRCAT(b, p, s, n) __xsafestrncat(b, p, s, strlen(s), n)
+#define SAFE_STRCAT(b, p, s, n) (s ? __xsafestrncat(b, p, s, strlen(s), n) : 0)
 
-#define SAFE_LB_STR(s, b, p) __xsafestrncpy(b, p, s, strlen(s), LBUF_SIZE - 1)
-#define SAFE_SB_STR(s, b, p) __xsafestrncpy(b, p, s, strlen(s), SBUF_SIZE - 1)
-#define SAFE_MB_STR(s, b, p) __xsafestrncpy(b, p, s, strlen(s), MBUF_SIZE - 1)
+#define SAFE_LB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), LBUF_SIZE - 1) : 0)
+#define SAFE_SB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), SBUF_SIZE - 1) : 0)
+#define SAFE_MB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), MBUF_SIZE - 1) : 0)
 
 #define SAFE_CRLF(b, p) SAFE_STRCAT(b, p, "\r\n", LBUF_SIZE - 1)
 #define SAFE_ANSI_NORMAL(b, p) SAFE_STRCAT(b, p, ANSI_NORMAL, LBUF_SIZE - 1)

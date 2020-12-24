@@ -1424,7 +1424,7 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	while (*s)
 	{
-		XMEMSET(xtbuf, 0 , SBUF_SIZE);
+		XMEMSET(xtbuf, 0, SBUF_SIZE);
 		if (*s == '<' || *s == '/')
 		{ /* Xterm colors */
 			int xterm_isbg = 0, i;
@@ -2327,7 +2327,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		/*
 	 * Left border text
 	 */
-		SAFE_LB_STR(l_fill, buff, bufc);
+			SAFE_LB_STR(l_fill, buff, bufc);
 
 		/*
 	 * Left space padding if needed
