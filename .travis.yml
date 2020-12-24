@@ -1,4 +1,13 @@
 language: c
 compiler:
   - gcc
+  - clang
 script: autoreconf -ivf && ./configure && make
+- os: linux
+      addons:
+        apt:
+          packages:
+            - cproto
+            - libpcre3-dev
+            - libgdbm-dev
+      env:
