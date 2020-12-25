@@ -64,22 +64,42 @@
 #include "cmdtabs.h" /* required by code */
 
 /**
- * @note We never want to call hooks in the case of @addcommand'd commands (both for
- * efficiency reasons and the fact that we might NOT match an @addcommand even if
- * we've been told there is one), but we leave this to the hook-adder to prevent.
+ * @brief All available lists.
  * 
  */
-#define CALL_PRE_HOOK(x, a, na)                                                                        \
-	if (((x)->pre_hook != NULL) && !((x)->callseq & CS_ADDED))                                         \
-	{                                                                                                  \
-		process_hook((x)->pre_hook, (x)->callseq &CS_PRESERVE | CS_PRIVATE, player, cause, (a), (na)); \
-	}
-
-#define CALL_POST_HOOK(x, a, na)                                                                        \
-	if (((x)->post_hook != NULL) && !((x)->callseq & CS_ADDED))                                         \
-	{                                                                                                   \
-		process_hook((x)->post_hook, (x)->callseq &CS_PRESERVE | CS_PRIVATE, player, cause, (a), (na)); \
-	}
+NAMETAB list_names[] = {
+	{(char *)"allocations", 2, CA_WIZARD, LIST_ALLOCATOR},
+	{(char *)"attr_permissions", 6, CA_WIZARD, LIST_ATTRPERMS},
+	{(char *)"attr_types", 6, CA_PUBLIC, LIST_ATTRTYPES},
+	{(char *)"attributes", 2, CA_PUBLIC, LIST_ATTRIBUTES},
+	{(char *)"bad_names", 2, CA_WIZARD, LIST_BADNAMES},
+	{(char *)"buffers", 2, CA_WIZARD, LIST_BUFTRACE},
+	{(char *)"cache", 2, CA_WIZARD, LIST_CACHEOBJS},
+	{(char *)"cache_attrs", 6, CA_WIZARD, LIST_CACHEATTRS},
+	{(char *)"commands", 3, CA_PUBLIC, LIST_COMMANDS},
+	{(char *)"config_permissions", 8, CA_GOD, LIST_CONF_PERMS},
+	{(char *)"config_read_perms", 4, CA_PUBLIC, LIST_CF_RPERMS},
+	{(char *)"costs", 3, CA_PUBLIC, LIST_COSTS},
+	{(char *)"db_stats", 2, CA_WIZARD, LIST_DB_STATS},
+	{(char *)"default_flags", 1, CA_PUBLIC, LIST_DF_FLAGS},
+	{(char *)"flags", 2, CA_PUBLIC, LIST_FLAGS},
+	{(char *)"func_permissions", 5, CA_WIZARD, LIST_FUNCPERMS},
+	{(char *)"functions", 2, CA_PUBLIC, LIST_FUNCTIONS},
+	{(char *)"globals", 1, CA_WIZARD, LIST_GLOBALS},
+	{(char *)"hashstats", 1, CA_WIZARD, LIST_HASHSTATS},
+	{(char *)"logging", 1, CA_GOD, LIST_LOGGING},
+	{(char *)"memory", 1, CA_WIZARD, LIST_MEMORY},
+	{(char *)"options", 1, CA_PUBLIC, LIST_OPTIONS},
+	{(char *)"params", 2, CA_PUBLIC, LIST_PARAMS},
+	{(char *)"permissions", 2, CA_WIZARD, LIST_PERMS},
+	{(char *)"powers", 2, CA_WIZARD, LIST_POWERS},
+	{(char *)"process", 2, CA_WIZARD, LIST_PROCESS},
+	{(char *)"raw_memory", 1, CA_WIZARD, LIST_RAWMEM},
+	{(char *)"site_information", 2, CA_WIZARD, LIST_SITEINFO},
+	{(char *)"switches", 2, CA_PUBLIC, LIST_SWITCHES},
+	{(char *)"textfiles", 1, CA_WIZARD, LIST_TEXTFILES},
+	{(char *)"user_attributes", 1, CA_WIZARD, LIST_VATTRS},
+	{NULL, 0, 0, 0}};
 
 CMDENT *prefix_cmds[256];
 
@@ -1367,9 +1387,19 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				{
 					XFREE(lcbuf);
 					XFREE(p);
-					CALL_PRE_HOOK(leave_cmdp, args, nargs);
+
+					if ((leave_cmdp->pre_hook != NULL) && !(leave_cmdp->callseq & CS_ADDED))
+					{
+						process_hook(leave_cmdp->pre_hook, leave_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+					}
+
 					do_leave(player, player, 0);
-					CALL_POST_HOOK(leave_cmdp, args, nargs);
+
+					if ((leave_cmdp->post_hook != NULL) && !(leave_cmdp->callseq & CS_ADDED))
+					{
+						process_hook(leave_cmdp->post_hook, leave_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+					}
+
 					return preserve_cmd;
 				}
 			}
@@ -1393,9 +1423,15 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 					{
 						XFREE(lcbuf);
 						XFREE(p);
-						CALL_PRE_HOOK(enter_cmdp, args, nargs);
+						if ((enter_cmdp->pre_hook != NULL) && !(enter_cmdp->callseq & CS_ADDED))
+						{
+							process_hook(enter_cmdp->pre_hook, enter_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+						}
 						do_enter_internal(player, exit, 0);
-						CALL_POST_HOOK(enter_cmdp, args, nargs);
+						if ((enter_cmdp->post_hook != NULL) && !(enter_cmdp->callseq & CS_ADDED))
+						{
+							process_hook(enter_cmdp->post_hook, enter_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+						}
 						return preserve_cmd;
 					}
 				}
@@ -1524,9 +1560,15 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 						}
 						else
 						{
-							CALL_PRE_HOOK(goto_cmdp, args, nargs);
+							if ((goto_cmdp->pre_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
+							{
+								process_hook(goto_cmdp->pre_hook, goto_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+							}
 							move_exit(player, exit, 1, NOGO_MESSAGE, 0);
-							CALL_POST_HOOK(goto_cmdp, args, nargs);
+							if ((goto_cmdp->post_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
+							{
+								process_hook(goto_cmdp->post_hook, goto_cmdp->callseq & CS_PRESERVE | CS_PRIVATE, player, cause, args, nargs);
+							}
 						}
 
 						mudstate.debug_cmd = cmdsave;
@@ -3437,11 +3479,6 @@ void list_memory(dbref player)
 	raw_notify(player, "\r\nTotal            : %12.2fk", total / 1024);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * do_list: List information stored in internal structures.
- */
-
 /**
  * @brief List information stored in internal structures.
  * 
@@ -3453,39 +3490,6 @@ void list_memory(dbref player)
 void do_list(dbref player, dbref cause, int extra, char *arg)
 {
 	int flagvalue;
-	NAMETAB list_names[] = {
-	{(char *)"allocations", 2, CA_WIZARD, LIST_ALLOCATOR},
-	{(char *)"attr_permissions", 6, CA_WIZARD, LIST_ATTRPERMS},
-	{(char *)"attr_types", 6, CA_PUBLIC, LIST_ATTRTYPES},
-	{(char *)"attributes", 2, CA_PUBLIC, LIST_ATTRIBUTES},
-	{(char *)"bad_names", 2, CA_WIZARD, LIST_BADNAMES},
-	{(char *)"buffers", 2, CA_WIZARD, LIST_BUFTRACE},
-	{(char *)"cache", 2, CA_WIZARD, LIST_CACHEOBJS},
-	{(char *)"cache_attrs", 6, CA_WIZARD, LIST_CACHEATTRS},
-	{(char *)"commands", 3, CA_PUBLIC, LIST_COMMANDS},
-	{(char *)"config_permissions", 8, CA_GOD, LIST_CONF_PERMS},
-	{(char *)"config_read_perms", 4, CA_PUBLIC, LIST_CF_RPERMS},
-	{(char *)"costs", 3, CA_PUBLIC, LIST_COSTS},
-	{(char *)"db_stats", 2, CA_WIZARD, LIST_DB_STATS},
-	{(char *)"default_flags", 1, CA_PUBLIC, LIST_DF_FLAGS},
-	{(char *)"flags", 2, CA_PUBLIC, LIST_FLAGS},
-	{(char *)"func_permissions", 5, CA_WIZARD, LIST_FUNCPERMS},
-	{(char *)"functions", 2, CA_PUBLIC, LIST_FUNCTIONS},
-	{(char *)"globals", 1, CA_WIZARD, LIST_GLOBALS},
-	{(char *)"hashstats", 1, CA_WIZARD, LIST_HASHSTATS},
-	{(char *)"logging", 1, CA_GOD, LIST_LOGGING},
-	{(char *)"memory", 1, CA_WIZARD, LIST_MEMORY},
-	{(char *)"options", 1, CA_PUBLIC, LIST_OPTIONS},
-	{(char *)"params", 2, CA_PUBLIC, LIST_PARAMS},
-	{(char *)"permissions", 2, CA_WIZARD, LIST_PERMS},
-	{(char *)"powers", 2, CA_WIZARD, LIST_POWERS},
-	{(char *)"process", 2, CA_WIZARD, LIST_PROCESS},
-	{(char *)"raw_memory", 1, CA_WIZARD, LIST_RAWMEM},
-	{(char *)"site_information", 2, CA_WIZARD, LIST_SITEINFO},
-	{(char *)"switches", 2, CA_PUBLIC, LIST_SWITCHES},
-	{(char *)"textfiles", 1, CA_WIZARD, LIST_TEXTFILES},
-	{(char *)"user_attributes", 1, CA_WIZARD, LIST_VATTRS},
-	{NULL, 0, 0, 0}};
 
 	flagvalue = search_nametab(player, list_names, arg);
 
