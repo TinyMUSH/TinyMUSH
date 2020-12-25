@@ -1,18 +1,28 @@
-/* cmdtabs.h - command and other supporting tables */
+/**
+ * @file cmdtabs.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Command and other supporting tables
+ * @version 3.3
+ * @date 2020-12-25
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
 #ifndef __CMDTABS_H
 #define __CMDTABS_H
-/* Make sure that all of your command and switch names are lowercase! */
 
-/* *INDENT-OFF* */
-
-/*
- * ---------------------------------------------------------------------------
- * Switch tables for the various commands.
+/**
+ * @attention  Make sure that all of your command and switch names are lowercase!
+ * 
  */
 
+/**
+ * @brief Switch tables for the various commands.
+ * 
+ */
 NAMETAB addcmd_sw[] = {
     {(char *)"preserve", 1, CA_GOD, ADDCMD_PRESERVE},
     {NULL, 0, 0, 0}};
@@ -72,12 +82,7 @@ NAMETAB dolist_sw[] = {
     {(char *)"space", 1, CA_PUBLIC, DOLIST_SPACE},
     {(char *)"notify", 1, CA_PUBLIC, DOLIST_NOTIFY | SW_MULTIPLE},
     {(char *)"now", 1, CA_PUBLIC, DOLIST_NOW | SW_MULTIPLE},
-    {
-        NULL,
-        0,
-        0,
-        0,
-    }};
+    {NULL, 0, 0, 0}};
 
 NAMETAB drop_sw[] = {
     {(char *)"quiet", 1, CA_PUBLIC, DROP_QUIET},
@@ -124,7 +129,6 @@ NAMETAB femit_sw[] = {
     {NULL, 0, 0, 0}};
 
 NAMETAB fixdb_sw[] = {
-    /* {(char *)"add_pname",1,  CA_GOD,     FIXDB_ADD_PN}, */
     {(char *)"contents", 1, CA_GOD, FIXDB_CON},
     {(char *)"exits", 1, CA_GOD, FIXDB_EXITS},
     {(char *)"location", 1, CA_GOD, FIXDB_LOC},
@@ -132,7 +136,6 @@ NAMETAB fixdb_sw[] = {
     {(char *)"owner", 1, CA_GOD, FIXDB_OWNER},
     {(char *)"pennies", 1, CA_GOD, FIXDB_PENNIES},
     {(char *)"rename", 1, CA_GOD, FIXDB_NAME},
-    /* {(char *)"rm_pname", 1,  CA_GOD,     FIXDB_DEL_PN}, */
     {NULL, 0, 0, 0}};
 
 NAMETAB floaters_sw[] = {
@@ -388,15 +391,10 @@ NAMETAB noeval_sw[] = {
     {(char *)"noeval", 1, CA_PUBLIC, SW_NOEVAL},
     {NULL, 0, 0, 0}};
 
-/*
- * ---------------------------------------------------------------------------
- * Command table: Definitions for builtin commands, used to build the command
- * hash table.
- *
- * Format:  Name        Switches    Permissions Needed Key (if any)
- * Calling Seq          Handler
+/**
+ * @brief Command table: Definitions for builtin commands, used to build the command hash table.
+ * 
  */
-
 CMDENT command_table[] = {
     {(char *)"@@", NULL, CA_PUBLIC, 0, CS_NO_ARGS, NULL, NULL, NULL, {do_comment}},
     {(char *)"@addcommand", addcmd_sw, CA_GOD, 0, CS_TWO_ARG, NULL, NULL, NULL, {do_addcommand}},
@@ -421,13 +419,7 @@ CMDENT command_table[] = {
     {(char *)"@decompile", decomp_sw, CA_PUBLIC, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_decomp}},
     {(char *)"@delcommand", NULL, CA_GOD, 0, CS_TWO_ARG, NULL, NULL, NULL, {do_delcommand}},
     {(char *)"@destroy", destroy_sw, CA_NO_SLAVE | CA_NO_GUEST | CA_GBL_BUILD, DEST_ONE, CS_ONE_ARG | CS_INTERP | CS_FUNCTION, NULL, NULL, NULL, {do_destroy}},
-    /*
-     * {(char *)"@destroyall",  NULL,
-     * , DEST_ALL,  CS_ONE_ARG, NULL,       NULL,   NULL,
-     * do_destroy}},
-     */
-    {
-        (char *)"@dig", dig_sw, CA_NO_SLAVE | CA_NO_GUEST | CA_GBL_BUILD, 0, CS_TWO_ARG | CS_ARGV | CS_INTERP, NULL, NULL, NULL, {do_dig}},
+    {(char *)"@dig", dig_sw, CA_NO_SLAVE | CA_NO_GUEST | CA_GBL_BUILD, 0, CS_TWO_ARG | CS_ARGV | CS_INTERP, NULL, NULL, NULL, {do_dig}},
     {(char *)"@disable", NULL, CA_WIZARD, GLOB_DISABLE, CS_ONE_ARG, NULL, NULL, NULL, {do_global}},
     {(char *)"@doing", doing_sw, CA_PUBLIC, 0, CS_ONE_ARG, NULL, NULL, NULL, {do_doing}},
     {(char *)"@dolist", dolist_sw, CA_GBL_INTERP, 0, CS_TWO_ARG | CS_CMDARG | CS_NOINTERP | CS_STRIP_AROUND, NULL, NULL, NULL, {do_dolist}},
@@ -543,11 +535,10 @@ CMDENT command_table[] = {
     {(char *)"&", NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_TWO_ARG | CS_LEADIN, NULL, NULL, NULL, {do_setvattr}},
     {(char *)NULL, NULL, 0, 0, 0, NULL, NULL, NULL, {NULL}}};
 
-/*
- * ---------------------------------------------------------------------------
- * Command, function, etc. access name table.
+/**
+ * @brief Command, function, etc. access name table.
+ * 
  */
-
 NAMETAB access_nametab[] = {
     {(char *)"admin", 2, CA_WIZARD, CA_ADMIN},
     {(char *)"builder", 6, CA_WIZARD, CA_BUILDER},
@@ -581,11 +572,10 @@ NAMETAB access_nametab[] = {
     {(char *)"wizard", 3, CA_WIZARD, CA_WIZARD},
     {NULL, 0, 0, 0}};
 
-/*
- * ---------------------------------------------------------------------------
- * Attribute access name tables.
+/**
+ * @brief Attribute access name tables.
+ * 
  */
-
 NAMETAB attraccess_nametab[] = {
     {(char *)"const", 2, CA_PUBLIC, AF_CONST},
     {(char *)"dark", 2, CA_WIZARD, AF_DARK},
@@ -620,7 +610,5 @@ NAMETAB indiv_attraccess_nametab[] = {
     {(char *)"visual", 1, CA_PUBLIC, AF_VISUAL},
     {(char *)"html", 2, CA_PUBLIC, AF_HTML},
     {NULL, 0, 0, 0}};
-
-/* *INDENT-ON* */
 
 #endif /* __CMDTABS_H */

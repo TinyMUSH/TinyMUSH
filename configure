@@ -17457,7 +17457,7 @@ fi
 rm -f conftest.mmap conftest.txt
 
 
-for ac_func in alarm gethostbyaddr gethostbyname inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn
+for ac_func in alarm getdtablesize gethostbyaddr gethostbyname getrusage inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"

@@ -386,7 +386,7 @@ AC_FUNC_FORK
 AC_FUNC_VPRINTF
 AC_FUNC_MMAP
 
-AC_CHECK_FUNCS([alarm gethostbyaddr gethostbyname inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn])
+AC_CHECK_FUNCS([alarm getdtablesize gethostbyaddr gethostbyname getrusage inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn])
 
 includedir=$includedir$with_install_suffix
 libdir=$libdir$with_install_suffix

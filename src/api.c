@@ -1,4 +1,15 @@
-/* api.c - functions called only by modules */
+/**
+ * @file api.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief functions called only by modules
+ * @version 3.3
+ * @date 2020-12-24
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
+
+/* api.c -  */
 
 #include "copyright.h"
 #include "config.h"
@@ -27,18 +38,20 @@
 
 extern CMDENT *prefix_cmds[256];
 
-/*
- * ---------------------------------------------------------------------------
- * Exporting a module's own API.
+/**
+ * @brief Register a module
+ * 
+ * @param module_name	Module name
+ * @param api_name		API name
+ * @param ftable		Function table
  */
-
 void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 {
 	MODULE *mp;
 	API_FUNCTION *afp;
 	void (*fn_ptr)(void *, void *);
 	int succ = 0;
-	char *s = XMALLOC(MBUF_SIZE, "s");
+	char *s;
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -49,66 +62,76 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 		}
 	}
 
-	if (!succ)
-	{ /* no such module */
-		XFREE(s);
+	if (!succ)	/** no such module*/
+	{
 		return;
 	}
 
 	for (afp = ftable; afp->name; afp++)
 	{
-		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", module_name, afp->name);
+		s = XASPRINTF("s", "mod_%s_%s", module_name, afp->name);
 		fn_ptr = (void (*)(void *, void *))lt_dlsym(mp->handle, s);
+		XFREE(s);
 
 		if (fn_ptr != NULL)
 		{
 			afp->handler = fn_ptr;
-			XSNPRINTF(s, MBUF_SIZE, "%s_%s", api_name, afp->name);
+			s = XASPRINTF("s", "%s_%s", api_name, afp->name);
 			hashadd(s, (int *)afp, &mudstate.api_func_htab, 0);
+			XFREE(s);
 		}
 	}
-	XFREE(s);
 }
 
+/**
+ * @brief Return the handler of an API function
+ * 
+ * @param api_name	API name
+ * @param fn_name 	Function name
+ * @return void*	Handler of that function
+ */
 void *request_api_function(char *api_name, char *fn_name)
 {
 	API_FUNCTION *afp;
-	char *s = XMALLOC(MBUF_SIZE, "s");
-	XSNPRINTF(s, MBUF_SIZE, "%s_%s", api_name, fn_name);
+	char *s = XASPRINTF("s", "%s_%s", api_name, fn_name);
 	afp = (API_FUNCTION *)hashfind(s, &mudstate.api_func_htab);
+	XFREE(s);
 
 	if (!afp)
 	{
-		XFREE(s);
 		return NULL;
 	}
 
-	XFREE(s);
 	return afp->handler;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Handle tables.
+/**
+ * @brief Register module's commands with the main command handler
+ * 
+ * @param cmdtab Module's command table.
  */
-
 void register_commands(CMDENT *cmdtab)
 {
 	CMDENT *cp;
-	char *s = XMALLOC(MBUF_SIZE, "s");
+	char *s;
 
 	if (cmdtab)
 	{
 		for (cp = cmdtab; cp->cmdname; cp++)
 		{
 			hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab, 0);
-			XSNPRINTF(s, MBUF_SIZE, "__%s", cp->cmdname);
+			s = XASPRINTF("s", "__%s", cp->cmdname);
 			hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
+			XFREE(s);
 		}
 	}
-	XFREE(s);
 }
 
+/**
+ * @brief Register prefix commands.
+ * 
+ * @param cmdchars char array of prefixes
+ */
 void register_prefix_cmds(const char *cmdchars)
 {
 	const char *cp;
@@ -125,6 +148,11 @@ void register_prefix_cmds(const char *cmdchars)
 	XFREE(cn);
 }
 
+/**
+ * @brief Register module's functions with the main functions handler
+ * 
+ * @param functab 
+ */
 void register_functions(FUN *functab)
 {
 	FUN *fp;
@@ -138,6 +166,12 @@ void register_functions(FUN *functab)
 	}
 }
 
+/**
+ * @brief Register module's hashtables with the main hashtables handler
+ * 
+ * @param htab 
+ * @param ntab 
+ */
 void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
 {
 	MODHASHES *hp;
@@ -165,12 +199,19 @@ void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
  * Deal with additional database info.
  */
 
+/**
+ * @brief Register a module's DB type.
+ * 
+ * @param modname Module name
+ * @return unsigned int Module's DBType
+ */
 unsigned int register_dbtype(char *modname)
 {
 	unsigned int type;
 	DBData key, data;
-	/*
+	/**
 	 * Find out if the module already has a registered DB type
+	 * 
 	 */
 	key.dptr = modname;
 	key.dsize = strlen(modname) + 1;
@@ -183,9 +224,9 @@ unsigned int register_dbtype(char *modname)
 		return type;
 	}
 
-	/*
-	 * If the type is in range, return it, else return zero as an error
-	 * code
+	/**
+	 * If the type is in range, return it, else return zero as an error code
+	 * 
 	 */
 
 	if ((mudstate.moduletype_top >= DBTYPE_RESERVED) && (mudstate.moduletype_top < DBTYPE_END))

@@ -202,8 +202,10 @@ struct dump_object
 
 typedef char *NAME;
 
-extern OBJ *db;
-extern NAME *names;
+extern OBJ *db;             /*!< struct database */
+extern NAME *names;         /*!< Name buffer */
+extern NAME *purenames;     /*!< Pure Name Buffer */
+extern int anum_alc_top;    /*!< Top of attr num lookup table */
 
 #define Location(t) db[t].location
 

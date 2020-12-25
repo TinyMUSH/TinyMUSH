@@ -2303,6 +2303,7 @@ void do_command(DESC *d, char *command, int first)
 				XFREE(pname);
 			}
 		}
+		XFREE(log_cmdbuf);
 
 		mudstate.curr_cmd = (char *)"";
 

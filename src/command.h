@@ -107,6 +107,39 @@ struct cmdentry
                                   * handler */
 /* (typically via a switch alias) */
 
+#define LIST_ATTRIBUTES 1
+#define LIST_COMMANDS 2
+#define LIST_COSTS 3
+#define LIST_FLAGS 4
+#define LIST_FUNCTIONS 5
+#define LIST_GLOBALS 6
+#define LIST_ALLOCATOR 7
+#define LIST_LOGGING 8
+#define LIST_DF_FLAGS 9
+#define LIST_PERMS 10
+#define LIST_ATTRPERMS 11
+#define LIST_OPTIONS 12
+#define LIST_HASHSTATS 13
+#define LIST_BUFTRACE 14
+#define LIST_CONF_PERMS 15
+#define LIST_SITEINFO 16
+#define LIST_POWERS 17
+#define LIST_SWITCHES 18
+#define LIST_VATTRS 19
+#define LIST_DB_STATS 20 /* GAC 4/6/92 */
+#define LIST_PROCESS 21
+#define LIST_BADNAMES 22
+#define LIST_CACHEOBJS 23
+#define LIST_TEXTFILES 24
+#define LIST_PARAMS 25
+#define LIST_CF_RPERMS 26
+#define LIST_ATTRTYPES 27
+#define LIST_FUNCPERMS 28
+#define LIST_MEMORY 29
+#define LIST_CACHEATTRS 30
+#define LIST_RAWMEM 31
+
+
 /*
  * #define Check_Cmd_Access(p,c,a,n) \ (check_access(p,(c)->perms) && \
  * (!((c)->xperms) || check_mod_access(p,(c)->xperms)) && \

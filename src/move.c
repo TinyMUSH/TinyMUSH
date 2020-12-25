@@ -52,7 +52,7 @@ void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hu
     /*
      * Hook support first
      */
-    call_move_hook(thing, cause, 0);
+    call_move_hook(thing, cause, false);
     /*
      * Run the LEAVE attributes in the current room if we meet any of
      * * following criteria:
@@ -114,7 +114,7 @@ void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hus
     /*
      * Hook support first
      */
-    call_move_hook(thing, cause, 1);
+    call_move_hook(thing, cause, true);
     /*
      * Run the ENTER attributes in the current room if we meet any of
      * * following criteria:

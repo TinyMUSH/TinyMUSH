@@ -1,4 +1,13 @@
-/* api.h - must be included by all dynamically loaded modules */
+/**
+ * @file api.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Functions called only by modules - must be included by all dynamically loaded modules
+ * @version 3.3
+ * @date 2020-12-24
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
@@ -9,7 +18,10 @@
 
 #define SIZE_HACK 1
 
-/* XXX Need to be convert into a function in api.c */
+/**
+ * @bug Need to be convert into a function in api.c
+ * 
+ */
 #define DB_GROW_MODULE(old_db, new_size, new_top, proto)                                                                  \
     {                                                                                                                     \
         char *dg__cp;                                                                                                     \

@@ -496,7 +496,7 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * Boolean true/false check.
  */
 
-int xlate(char *arg)
+bool xlate(char *arg)
 {
 	char *temp2;
 
@@ -511,31 +511,31 @@ int xlate(char *arg)
 				switch ((int)strtol(arg, (char **)NULL, 10))
 				{
 				case -1:
-					return 0;
+					return false;
 
 				case 0:
-					return 0;
+					return false;
 
 				default:
-					return 1;
+					return true;
 				}
 			}
 			else
 			{
-				return ((int)strtol(arg, (char **)NULL, 10) >= 0);
+				return ((int)strtol(arg, (char **)NULL, 10) >= 0) ? true : false;
 			}
 		}
 
 		if (mudconf.bools_oldstyle)
 		{
-			return 0;
+			return false;
 		}
 		else
 		{
 			/*
 	     * Case of '#-1 <string>'
 	     */
-			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' '));
+			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' ')) ? true : false;
 		}
 	}
 
@@ -543,15 +543,15 @@ int xlate(char *arg)
 
 	if (!*temp2)
 	{
-		return 0;
+		return false;
 	}
 
 	if (is_integer(temp2))
 	{
-		return (int)strtol(temp2, (char **)NULL, 10);
+		return (int)strtol(temp2, (char **)NULL, 10) ? true : false;
 	}
 
-	return 1;
+	return true;
 }
 
 /*

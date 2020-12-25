@@ -12,38 +12,31 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"  /* required by mushconf */
-#include "game.h"	   /* required by mushconf */
-#include "alloc.h"	   /* required by code */
-#include "flags.h"	   /* required by mushconf */
-#include "htab.h"	   /* required by mushconf */
-#include "ltdl.h"	   /* required by mushconf */
-#include "udb.h"	   /* required by mushconf */
-#include "udb_defs.h"  /* required by mushconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs.h */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
+#include "typedefs.h"
+#include "game.h"
+#include "alloc.h"
+#include "flags.h"
+#include "htab.h"
+#include "udb.h"
+#include "udb_defs.h"
+#include "mushconf.h"
+#include "db.h"
+#include "interface.h"
+#include "externs.h"
 
-// Utilities
+/**
+ * Macros and utilities.
+ * 
+ */
 #define XLOGALLOC(x, y, z, s, ...)            \
 	if (mudconf.malloc_logger)                \
 	{                                         \
 		log_write(x, y, z, s, ##__VA_ARGS__); \
 	}
 
-void list_bufstats(dbref player)
-{
-	notify(player, "This feature has been removed.");
-}
-
-void list_buftrace(dbref player)
-{
-	notify(player, "This feature has been removed.");
-}
-
-/******************************************************************************
+/**
  * Allocation functions
+ * 
  */
 
 /**
@@ -343,8 +336,9 @@ int __xfree(void *ptr)
 	return overrun;
 }
 
-/******************************************************************************
+/**
  * String functions
+ * 
  */
 
 /**
@@ -563,6 +557,15 @@ int __xsprintfcat(char *str, const char *format, ...)
 	return size;
 }
 
+/**
+ * @brief tracked safe_printf replacement.
+ * 
+ * @param buff		Buffer that will receive the result
+ * @param bufp		Pointer to the location in the buffer
+ * @param format	Format string.
+ * @param ...		Variables argument list for the format string.
+ * @return char*	Pointer to buffer
+ */
 char *__xsafesprintf(char *buff, char **bufp, const char *format, ...)
 {
 	va_list ap;
@@ -1055,6 +1058,26 @@ void *__xmemset(void *s, int c, size_t n)
  */
 
 /**
+ * @brief Function placeholder. Not used for now.
+ * 
+ * @param player dbref of the player who did the command
+ */
+void list_bufstats(dbref player)
+{
+	notify(player, "This feature has been removed.");
+}
+
+/**
+ * @brief Function placeholder. Not used for now.
+ * 
+ * @param player dbref of the player who did the command
+ */
+void list_buftrace(dbref player)
+{
+	notify(player, "This feature has been removed.");
+}
+
+/**
  * @brief Helper function to sort the trace table.
  * 
  * This function is used by list_rawmemory for sorting the trace table via qsort()
@@ -1222,8 +1245,9 @@ size_t total_rawmemory(void)
 	return (total_bytes);
 }
 
-/******************************************************************************
+/**
  * Replacement for the safe_* functions.
+ * 
  */
 
 /**
@@ -1261,7 +1285,6 @@ size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_
 	}
 	return 0;
 }
-
 
 /**
  * @brief Copy char 'c' to dest and update the position pointer to the end of

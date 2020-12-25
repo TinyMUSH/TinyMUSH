@@ -35,9 +35,9 @@
 #define RS_NEW_STRINGS 0x00000008
 #define RS_COUNT_REBOOTS 0x00000010
 
-OBJ *db = NULL;
-NAME *names = NULL;
-NAME *purenames = NULL;
+OBJ *db = NULL;         /*!< struct database */
+NAME *names = NULL;     /*!< Name buffer */
+NAME *purenames = NULL; /*!< Pure Name Buffer */
 
 extern int sock;
 extern int ndescriptors;
