@@ -32,6 +32,7 @@
 #include "file_c.h"
 #include "command.h"
 #include "attrs.h"
+#include "nametabs.h"
 
 #ifndef NSIG
 extern const int _sys_nsig;
@@ -497,9 +498,12 @@ void shovechars(int port)
 		 */
 		if (mudstate.flatfile_flag && !mudstate.dumping)
 		{
-			if (*mudconf.dump_msg)
+			if (mudconf.dump_msg)
 			{
-				raw_broadcast(0, "%s", mudconf.dump_msg);
+				if(*mudconf.dump_msg) {
+					raw_broadcast(0, "%s", mudconf.dump_msg);
+				}
+				
 			}
 
 			mudstate.dumping = 1;
@@ -507,9 +511,11 @@ void shovechars(int port)
 			dump_database_internal(DUMP_DB_FLATFILE);
 			mudstate.dumping = 0;
 
-			if (*mudconf.postdump_msg)
+			if (mudconf.postdump_msg)
 			{
-				raw_broadcast(0, "%s", mudconf.postdump_msg);
+				if(*mudconf.postdump_msg) {
+					raw_broadcast(0, "%s", mudconf.postdump_msg);
+				}
 			}
 
 			mudstate.flatfile_flag = 0;
@@ -1526,8 +1532,6 @@ void sighandler(int sig)
 	mudstate.panicking = 0;
 	return;
 }
-
-NAMETAB sigactions_nametab[] = {{(char *)"exit", 3, 0, SA_EXIT}, {(char *)"default", 1, 0, SA_DFLT}, {NULL, 0, 0, 0}};
 
 /**
  * @brief Set the signals handlers

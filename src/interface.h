@@ -37,8 +37,6 @@
 #define CMD_MASK 0xff
 #define CMD_NOxFIX 0x100
 
-extern NAMETAB logout_cmdtable[];
-
 typedef struct cmd_block CBLK;
 typedef struct cmd_block_hdr CBLKHDR;
 struct cmd_block_hdr

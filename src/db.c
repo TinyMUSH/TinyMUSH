@@ -22,6 +22,7 @@
 #include "powers.h"     /* required by code */
 #include "udb.h"        /* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 #ifndef O_ACCMODE
 #define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR)
@@ -1118,8 +1119,6 @@ void s_Pass(dbref thing, const char *s)
 /* ---------------------------------------------------------------------------
  * do_attribute: Manage user-named attributes.
  */
-
-extern NAMETAB attraccess_nametab[];
 
 void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
 {

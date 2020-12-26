@@ -135,7 +135,7 @@ void handlestartupflatfiles(int flag)
 	int i;
 	struct stat sb1, sb2;
 	ts = mktimestamp();
-	
+
 	db = XASPRINTF("db", "%s/%s", mudconf.dbhome, mudconf.db_file);
 	flat = XASPRINTF("flat", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"));
 	db_bak = XASPRINTF("db_bak", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts);
@@ -2277,7 +2277,7 @@ void dump_database(void)
 
 void fork_and_dump(dbref player, dbref cause, int key)
 {
-	if (*mudconf.dump_msg)
+	if (mudconf.dump_msg)
 	{
 		raw_broadcast(0, "%s", mudconf.dump_msg);
 	}
@@ -2358,9 +2358,11 @@ void fork_and_dump(dbref player, dbref cause, int key)
 		mudstate.dumper = 0;
 	}
 
-	if (*mudconf.postdump_msg)
+	if (mudconf.postdump_msg)
 	{
-		raw_broadcast(0, "%s", mudconf.postdump_msg);
+		if(*mudconf.postdump_msg) {
+			raw_broadcast(0, "%s", mudconf.postdump_msg);
+		}
 	}
 
 	if (!Quiet(player) && (player != NOTHING))
@@ -3406,7 +3408,7 @@ int main(int argc, char *argv[])
 	time(&mudstate.cpu_count_from);
 	tcache_init();
 	pcache_init();
-	templog =XSTRDUP("netmush.XXXXXX", "templog");
+	templog = XSTRDUP("netmush.XXXXXX", "templog");
 	logfile_init(templog);
 	cf_init();
 	init_rlimit();

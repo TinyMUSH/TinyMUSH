@@ -23,11 +23,13 @@
 #include "functions.h"  /* required by code */
 #include "fnproto.h"    /* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
-extern NAMETAB access_nametab[];
 
 UFUN *ufun_head;
+
+OBJXFUNCS xfunctions;
 
 const Delim SPACE_DELIM = {1, " "};
 
@@ -43,6 +45,9 @@ void init_functab(void)
 
     ufun_head = NULL;
     hashinit(&mudstate.ufunc_htab, 15 * mudconf.hash_factor, HT_STR);
+
+    xfunctions.func = NULL;
+    xfunctions.count = 0;
 }
 
 void do_function(dbref player, dbref cause, int key, char *fname, char *target)
@@ -424,6 +429,6 @@ int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd)
         }
     }
 
-    cf_log_notfound(player, cmd, "Function", str);
+    cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Function", str);
     return -1;
 }

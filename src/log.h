@@ -13,7 +13,4 @@
 #ifndef __LOG_H
 #define __LOG_H
 
-extern NAMETAB logoptions_nametab[];
-extern NAMETAB logdata_nametab[];
-
 #endif /* __LOG_H */

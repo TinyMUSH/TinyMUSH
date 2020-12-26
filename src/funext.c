@@ -194,7 +194,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		return;
 	}
 
-	if (!Check_Cmd_Access(player, cmdp, cargs, ncargs))
+	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
 		SAFE_NOPERM(buff, bufc);
 		return;

@@ -13,6 +13,4 @@
 #ifndef __WIZ_H
 #define __WIZ_H
 
-extern NAMETAB enable_names[];
-
 #endif /* __WIZ_H */

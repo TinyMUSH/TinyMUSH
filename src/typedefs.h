@@ -80,4 +80,10 @@ struct bque
     int nargs;               /* How many args I have */
 };
 
+/**
+ * @brief Return values for cf_ functions.
+ * 
+ */
+typedef enum CF_RESULT{ CF_Failure = -1, CF_Success, CF_Partial } CF_Result;
+
 #endif /* __TYPEDEFS_H */

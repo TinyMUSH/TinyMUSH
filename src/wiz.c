@@ -22,6 +22,7 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
@@ -662,36 +663,48 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "----- motd messages -----");
 			}
 
-			if (mudconf.motd_msg && *mudconf.motd_msg)
+			if (mudconf.motd_msg)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mudconf.motd_msg);
+				if (*mudconf.motd_msg)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mudconf.motd_msg);
+				}
 			}
 			else
 			{
 				notify_quiet(player, "No MOTD.");
 			}
 
-			if (mudconf.wizmotd_msg && *mudconf.wizmotd_msg)
+			if (mudconf.wizmotd_msg)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mudconf.wizmotd_msg);
+				if (*mudconf.wizmotd_msg)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mudconf.wizmotd_msg);
+				}
 			}
 			else
 			{
 				notify_quiet(player, "No Wizard MOTD.");
 			}
 
-			if (mudconf.downmotd_msg && *mudconf.downmotd_msg)
+			if (mudconf.downmotd_msg)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mudconf.downmotd_msg);
+				if (*mudconf.downmotd_msg)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mudconf.downmotd_msg);
+				}
 			}
 			else
 			{
 				notify_quiet(player, "No Down MOTD.");
 			}
 
-			if (mudconf.fullmotd_msg && *mudconf.fullmotd_msg)
+			if (mudconf.fullmotd_msg)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mudconf.fullmotd_msg);
+				if (*mudconf.fullmotd_msg)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mudconf.fullmotd_msg);
+				}
 			}
 			else
 			{
@@ -709,9 +722,12 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				fcache_send(player, FC_MOTD);
 			}
 
-			if (mudconf.motd_msg && *mudconf.motd_msg)
+			if (mudconf.motd_msg)
 			{
-				notify_quiet(player, mudconf.motd_msg);
+				if(*mudconf.motd_msg) {
+					notify_quiet(player, mudconf.motd_msg);
+				}
+				
 			}
 			else
 			{
@@ -729,21 +745,6 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 /* ---------------------------------------------------------------------------
  * do_global: enable or disable global control flags
  */
-/* *INDENT-OFF* */
-
-NAMETAB enable_names[] = {
-	{(char *)"building", 1, CA_PUBLIC, CF_BUILD},
-	{(char *)"checkpointing", 2, CA_PUBLIC, CF_CHECKPOINT},
-	{(char *)"cleaning", 2, CA_PUBLIC, CF_DBCHECK},
-	{(char *)"dequeueing", 1, CA_PUBLIC, CF_DEQUEUE},
-	{(char *)"god_monitoring", 1, CA_PUBLIC, CF_GODMONITOR},
-	{(char *)"idlechecking", 2, CA_PUBLIC, CF_IDLECHECK},
-	{(char *)"interpret", 2, CA_PUBLIC, CF_INTERP},
-	{(char *)"logins", 3, CA_PUBLIC, CF_LOGIN},
-	{(char *)"eventchecking", 2, CA_PUBLIC, CF_EVENTCHECK},
-	{NULL, 0, 0, 0}};
-
-/* *INDENT-ON* */
 
 void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char *flag)
 {

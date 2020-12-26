@@ -149,4 +149,20 @@
 #define __bool_true_false_are_defined   1
 #endif
 
+/**
+ * @note Take care of all the assorted problems associated with getrusage().
+ * 
+ */
+
+#ifdef hpux
+#define HAVE_GETRUSAGE 1
+#include <sys/syscall.h>
+#define getrusage(x, p) syscall(SYS_GETRUSAGE, x, p)
+#endif
+
+#ifdef _SEQUENT_
+#define HAVE_GET_PROCESS_STATS 1
+#include <sys/procstats.h>
+#endif
+
 #endif /* __SYSTEM_H */

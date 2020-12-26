@@ -127,10 +127,10 @@ am__objects_1 = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	funobj.$(OBJEXT) funstring.$(OBJEXT) funvars.$(OBJEXT) \
 	game.$(OBJEXT) help.$(OBJEXT) htab.$(OBJEXT) log.$(OBJEXT) \
 	look.$(OBJEXT) match.$(OBJEXT) mguests.$(OBJEXT) \
-	move.$(OBJEXT) netcommon.$(OBJEXT) object.$(OBJEXT) \
-	player.$(OBJEXT) player_c.$(OBJEXT) powers.$(OBJEXT) \
-	predicates.$(OBJEXT) quota.$(OBJEXT) recover.$(OBJEXT) \
-	rob.$(OBJEXT) set.$(OBJEXT) speech.$(OBJEXT) \
+	move.$(OBJEXT) nametabs.$(OBJEXT) netcommon.$(OBJEXT) \
+	object.$(OBJEXT) player.$(OBJEXT) player_c.$(OBJEXT) \
+	powers.$(OBJEXT) predicates.$(OBJEXT) quota.$(OBJEXT) \
+	recover.$(OBJEXT) rob.$(OBJEXT) set.$(OBJEXT) speech.$(OBJEXT) \
 	stringutil.$(OBJEXT) timer.$(OBJEXT) udb_misc.$(OBJEXT) \
 	udb_obj.$(OBJEXT) udb_ocache.$(OBJEXT) udb_ochunk.$(OBJEXT) \
 	unparse.$(OBJEXT) vattr.$(OBJEXT) version.$(OBJEXT) \
@@ -179,11 +179,12 @@ am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/api.Po \
 	./$(DEPDIR)/game.Po ./$(DEPDIR)/help.Po ./$(DEPDIR)/htab.Po \
 	./$(DEPDIR)/log.Po ./$(DEPDIR)/look.Po ./$(DEPDIR)/match.Po \
 	./$(DEPDIR)/mguests.Po ./$(DEPDIR)/move.Po \
-	./$(DEPDIR)/netcommon.Po ./$(DEPDIR)/object.Po \
-	./$(DEPDIR)/player.Po ./$(DEPDIR)/player_c.Po \
-	./$(DEPDIR)/powers.Po ./$(DEPDIR)/predicates.Po \
-	./$(DEPDIR)/quota.Po ./$(DEPDIR)/recover.Po ./$(DEPDIR)/rob.Po \
-	./$(DEPDIR)/set.Po ./$(DEPDIR)/slave.Po ./$(DEPDIR)/speech.Po \
+	./$(DEPDIR)/nametabs.Po ./$(DEPDIR)/netcommon.Po \
+	./$(DEPDIR)/object.Po ./$(DEPDIR)/player.Po \
+	./$(DEPDIR)/player_c.Po ./$(DEPDIR)/powers.Po \
+	./$(DEPDIR)/predicates.Po ./$(DEPDIR)/quota.Po \
+	./$(DEPDIR)/recover.Po ./$(DEPDIR)/rob.Po ./$(DEPDIR)/set.Po \
+	./$(DEPDIR)/slave.Po ./$(DEPDIR)/speech.Po \
 	./$(DEPDIR)/stringutil.Po ./$(DEPDIR)/timer.Po \
 	./$(DEPDIR)/udb_misc.Po ./$(DEPDIR)/udb_obj.Po \
 	./$(DEPDIR)/udb_ocache.Po ./$(DEPDIR)/udb_ochunk.Po \
@@ -465,8 +466,8 @@ with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL)
 SUBDIRS = libltdl $(am__append_1) $(am__append_2) $(am__append_3)
 AUTOMAKE_OPTIONS = subdir-objects
-netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-netmush_H = alloc.h api.h attrs.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
+netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+netmush_H = alloc.h api.h attrs.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h nametabs.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
 netmush_SOURCES = $(netmush_C) $(netmush_H)
 netmush_LDFLAGS = -export-dynamic
 netmush_SKEL = defaults.h.in
@@ -658,6 +659,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mguests.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/move.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nametabs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netcommon.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@ # am--include-marker
@@ -975,6 +977,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/match.Po
 	-rm -f ./$(DEPDIR)/mguests.Po
 	-rm -f ./$(DEPDIR)/move.Po
+	-rm -f ./$(DEPDIR)/nametabs.Po
 	-rm -f ./$(DEPDIR)/netcommon.Po
 	-rm -f ./$(DEPDIR)/object.Po
 	-rm -f ./$(DEPDIR)/player.Po
@@ -1076,6 +1079,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/match.Po
 	-rm -f ./$(DEPDIR)/mguests.Po
 	-rm -f ./$(DEPDIR)/move.Po
+	-rm -f ./$(DEPDIR)/nametabs.Po
 	-rm -f ./$(DEPDIR)/netcommon.Po
 	-rm -f ./$(DEPDIR)/object.Po
 	-rm -f ./$(DEPDIR)/player.Po

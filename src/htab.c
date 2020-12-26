@@ -217,7 +217,7 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
  * and numeric hashtables.
  */
 
-int hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
+CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
 {
     int htype, hval;
     HASHENT *hptr;
@@ -230,7 +230,7 @@ int hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
 
     if (hashfind_generic(key, htab) != NULL)
     {
-        return (-1);
+        return CF_Failure;
     }
 
     htype = htab->flags & HT_TYPEMASK;
@@ -266,7 +266,7 @@ int hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     hptr->flags = flags;
     hptr->next = htab->entry[hval];
     htab->entry[hval] = hptr;
-    return (0);
+    return CF_Success;
 }
 
 /* ---------------------------------------------------------------------------
@@ -921,6 +921,6 @@ int cf_ntab_access(int *vp, char *str, long extra, dbref player, char *cmd)
         }
     }
 
-    cf_log_notfound(player, cmd, "Entry", str);
+    cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Entry", str);
     return -1;
 }

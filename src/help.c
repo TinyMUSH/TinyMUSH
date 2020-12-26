@@ -75,18 +75,18 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	FILE *rfp, *wfp;
 	src = XASPRINTF("src", "%s.txt", helpfile);
 	dst = XASPRINTF("dst", "%s.indx", helpfile);
-	cf_log_help_mkindx(player, confcmd, "Indexing %s", basename(src));
+	cf_log(player, "HLP", "INDX", confcmd, "Indexing %s", basename(src));
 
 	if ((rfp = fopen(src, "r")) == NULL)
 	{
-		cf_log_help_mkindx(player, confcmd, "can't open %s for reading", src);
+		cf_log(player, "HLP", "INDX", confcmd, "can't open %s for reading", src);
 		XFREE(line);
 		return -1;
 	}
 
 	if ((wfp = fopen(dst, "w")) == NULL)
 	{
-		cf_log_help_mkindx(player, confcmd, "can't open %s for writing", dst);
+		cf_log(player, "HLP", "INDX", confcmd, "can't open %s for writing", dst);
 		XFREE(line);
 		return -1;
 	}
@@ -106,7 +106,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 		if (line[n - 1] != '\n')
 		{
-			cf_log_help_mkindx(player, confcmd, "line %d: line too long", lineno);
+			cf_log(player, "HLP", "INDX", confcmd, "line %d: line too long", lineno);
 		}
 
 		if (line[0] == '&')
@@ -120,7 +120,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 				if (helpmkindx_dump_entries(wfp, pos, entries))
 				{
-					cf_log_help_mkindx(player, confcmd, "error writing %s", dst);
+					cf_log(player, "HLP", "INDX", confcmd, "error writing %s", dst);
 					XFREE(line);
 					return -1;
 				}
@@ -166,14 +166,14 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 	if (helpmkindx_dump_entries(wfp, pos, entries))
 	{
-		cf_log_help_mkindx(player, confcmd, "error writing %s", dst);
+		cf_log(player, "HLP", "INDX", confcmd, "error writing %s", dst);
 		XFREE(line);
 		return -1;
 	}
 
 	fclose(rfp);
 	fclose(wfp);
-	cf_log_help_mkindx(player, confcmd, "%d topics indexed", ntopics);
+	cf_log(player, "HLP", "INDX", confcmd, "%d topics indexed", ntopics);
 	XFREE(line);
 	return 0;
 }

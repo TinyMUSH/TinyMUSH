@@ -93,6 +93,13 @@ struct object_grid
     char ***data;
 };
 
+typedef struct object_xfuncs OBJXFUNCS;
+struct object_xfuncs
+{
+    NAMEDFUNC **func;
+    int count;
+};
+
 /*
  * ---------------------------------------------------------------------------
  * Constants used in delimiter macros.
@@ -109,6 +116,7 @@ struct object_grid
  */
 
 extern const Delim SPACE_DELIM;
+extern OBJXFUNCS xfunctions;
 
 #define FUNCTION(x)                                                                             \
     void x(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs) char *buff, **bufc; \

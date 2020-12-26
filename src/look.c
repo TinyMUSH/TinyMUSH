@@ -21,6 +21,7 @@
 #include "attrs.h"		/* required by code */
 #include "command.h"	/* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 int did_attr(dbref player, dbref thing, int what)
 {
@@ -2446,8 +2447,6 @@ void do_sweep(dbref player, dbref cause, int key, char *where)
  * object.  If you're moving things to another system, your mileage
  * will almost certainly vary.  (i.e. different flags, etc.)
  */
-
-extern NAMETAB indiv_attraccess_nametab[];
 
 void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 {

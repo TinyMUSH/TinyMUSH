@@ -22,9 +22,7 @@
 #include "powers.h"		/* required by code */
 #include "walkdb.h"		/* required by code */
 #include "stringutil.h" /* required by code */
-
-extern NAMETAB attraccess_nametab[];
-extern NAMETAB indiv_attraccess_nametab[];
+#include "nametabs.h"
 
 /*
  * ---------------------------------------------------------------------------

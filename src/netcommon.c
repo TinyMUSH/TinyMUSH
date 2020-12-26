@@ -27,6 +27,7 @@
 #include "powers.h"		/* required by code */
 #include "match.h"		/* required by code */
 #include "stringutil.h"         /* required by code */
+#include "nametabs.h"
 
 /* ---------------------------------------------------------------------------
  * timeval_sub: return difference between two times as a timeval
@@ -1000,7 +1001,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		}
 	}
 
-	if (*mudconf.motd_msg)
+	if (mudconf.motd_msg)
 	{
 		if (mudconf.ansi_colors)
 		{
@@ -1014,7 +1015,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 
 	if (Wizard(player))
 	{
-		if (*mudconf.wizmotd_msg)
+		if (mudconf.wizmotd_msg)
 		{
 			if (mudconf.ansi_colors)
 			{
@@ -1852,21 +1853,6 @@ void do_doing(dbref player, dbref cause, int key, char *arg)
 		}
 	}
 }
-/* *INDENT-OFF* */
-
-NAMETAB logout_cmdtable[] = {
-	{(char *)"DOING", 5, CA_PUBLIC, CMD_DOING},
-	{(char *)"LOGOUT", 6, CA_PUBLIC, CMD_LOGOUT},
-	{(char *)"OUTPUTPREFIX", 12, CA_PUBLIC, CMD_PREFIX | CMD_NOxFIX},
-	{(char *)"OUTPUTSUFFIX", 12, CA_PUBLIC, CMD_SUFFIX | CMD_NOxFIX},
-	{(char *)"QUIT", 4, CA_PUBLIC, CMD_QUIT},
-	{(char *)"SESSION", 7, CA_PUBLIC, CMD_SESSION},
-	{(char *)"WHO", 3, CA_PUBLIC, CMD_WHO},
-	{(char *)"PUEBLOCLIENT", 12, CA_PUBLIC, CMD_PUEBLOCLIENT},
-	{(char *)"INFO", 4, CA_PUBLIC, CMD_INFO},
-	{NULL, 0, 0, 0}};
-
-/* *INDENT-ON* */
 
 void init_logout_cmdtab(void)
 {

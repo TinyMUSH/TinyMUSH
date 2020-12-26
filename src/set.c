@@ -20,8 +20,7 @@
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
 #include "stringutil.h"         /* required by code */
-
-extern NAMETAB indiv_attraccess_nametab[];
+#include "nametabs.h"
 
 dbref match_controlled(dbref player, const char *name)
 {

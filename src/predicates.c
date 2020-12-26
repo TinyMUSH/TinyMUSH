@@ -22,6 +22,7 @@
 #include "powers.h"		/* required by code */
 #include "functions.h"	/* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 /* ---------------------------------------------------------------------------
  * insert_first, remove_first: Insert or remove objects from lists.
@@ -1941,8 +1942,6 @@ int parse_thing_slash(dbref player, char *thing, char **after, dbref *it)
      */
 	return (Good_obj(*it));
 }
-
-extern NAMETAB lock_sw[];
 
 int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *errmsg, char **bufc)
 {

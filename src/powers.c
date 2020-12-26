@@ -553,7 +553,7 @@ int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd)
 
     if ((fp = find_power(GOD, fstr)) == NULL)
     {
-        cf_log_notfound(player, cmd, "No such power", fstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "No such power", fstr);
         return -1;
     }
 
@@ -593,7 +593,7 @@ int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd)
     }
     else
     {
-        cf_log_notfound(player, cmd, "Power access", permstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Power access", permstr);
         return -1;
     }
 

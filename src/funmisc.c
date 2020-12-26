@@ -22,8 +22,7 @@
 #include "command.h"	/* required by code */
 #include "match.h"		/* required by code */
 #include "stringutil.h" /* required by code */
-
-extern NAMETAB indiv_attraccess_nametab[];
+#include "nametabs.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -1542,7 +1541,7 @@ int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs
 	 * many respects. This is also the same reason why
 	 * side-effects don't trigger hooks.
 	 */
-		if (Invalid_Objtype(player) || !Check_Cmd_Access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
+		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
 		{
 			SAFE_NOPERM(buff, bufc);
 			return 1;
@@ -1668,7 +1667,7 @@ void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		return;
 	}
 
-	if (Invalid_Objtype(player) || !Check_Cmd_Access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
+	if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;

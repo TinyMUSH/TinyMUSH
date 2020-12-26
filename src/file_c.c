@@ -19,6 +19,7 @@
 #include "command.h"    /* required by code */
 #include "file_c.h"     /* required by code */
 #include "stringutil.h" /* required by code */
+#include "nametabs.h"
 
 #define FBLOCK_SIZE (MBUF_SIZE - sizeof(FBLKHDR))
 /* *INDENT-OFF* */
@@ -38,20 +39,6 @@ FCACHE fcache[] = {
     {&mudconf.htmlconn_file, NULL, "Conn/Html"},
     {NULL, NULL, NULL}};
 
-NAMETAB list_files[] = {
-    {(char *)"badsite_connect", 1, CA_WIZARD, FC_CONN_SITE},
-    {(char *)"connect", 2, CA_WIZARD, FC_CONN},
-    {(char *)"create_register", 2, CA_WIZARD, FC_CREA_REG},
-    {(char *)"down", 1, CA_WIZARD, FC_CONN_DOWN},
-    {(char *)"full", 1, CA_WIZARD, FC_CONN_FULL},
-    {(char *)"guest_motd", 1, CA_WIZARD, FC_CONN_GUEST},
-    {(char *)"html_connect", 1, CA_WIZARD, FC_CONN_HTML},
-    {(char *)"motd", 1, CA_WIZARD, FC_MOTD},
-    {(char *)"newuser", 1, CA_WIZARD, FC_CREA_NEW},
-    {(char *)"quit", 1, CA_WIZARD, FC_QUIT},
-    {(char *)"register_connect", 1, CA_WIZARD, FC_CONN_REG},
-    {(char *)"wizard_motd", 1, CA_WIZARD, FC_WIZMOTD},
-    {NULL, 0, 0, 0}};
 
 /* *INDENT-ON* */
 

@@ -49,7 +49,7 @@ dbref create_guest(int num)
      */
     found = 0;
 
-    if (*mudconf.guest_prefixes && *mudconf.guest_suffixes)
+    if (mudconf.guest_prefixes && mudconf.guest_suffixes)
     {
         XSTRCPY(prefixes, mudconf.guest_prefixes);
 
@@ -68,9 +68,9 @@ dbref create_guest(int num)
             }
         }
     }
-    else if (*mudconf.guest_prefixes || *mudconf.guest_suffixes)
+    else if (mudconf.guest_prefixes || mudconf.guest_suffixes)
     {
-        XSTRCPY(prefixes, (*mudconf.guest_prefixes ? mudconf.guest_prefixes : mudconf.guest_suffixes));
+        XSTRCPY(prefixes, (mudconf.guest_prefixes ? mudconf.guest_prefixes : mudconf.guest_suffixes));
 
         for (pp = strtok_r(prefixes, " \t", &tokp); pp && !found; pp = strtok_r(NULL, " \t", &tokp))
         {

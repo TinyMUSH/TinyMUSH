@@ -36,70 +36,10 @@
 #include "udb_ocache.h"
 #include "log.h"
 #include "wiz.h"
+#include "nametabs.h"
 
 #define CACHING "attribute"
-
 #define NOGO_MESSAGE "You can't go that way."
-
-/**
- * @note Take care of all the assorted problems associated with getrusage().
- * 
- */
-
-#ifdef hpux
-#define HAVE_GETRUSAGE 1
-#include <sys/syscall.h>
-#define getrusage(x, p) syscall(SYS_GETRUSAGE, x, p)
-#endif
-
-#ifdef _SEQUENT_
-#define HAVE_GET_PROCESS_STATS 1
-#include <sys/procstats.h>
-#endif
-
-/**
- * @attention This must be the LAST thing we include.
- * 
- */
-#include "cmdtabs.h" /* required by code */
-
-/**
- * @brief All available lists.
- * 
- */
-NAMETAB list_names[] = {
-	{(char *)"allocations", 2, CA_WIZARD, LIST_ALLOCATOR},
-	{(char *)"attr_permissions", 6, CA_WIZARD, LIST_ATTRPERMS},
-	{(char *)"attr_types", 6, CA_PUBLIC, LIST_ATTRTYPES},
-	{(char *)"attributes", 2, CA_PUBLIC, LIST_ATTRIBUTES},
-	{(char *)"bad_names", 2, CA_WIZARD, LIST_BADNAMES},
-	{(char *)"buffers", 2, CA_WIZARD, LIST_BUFTRACE},
-	{(char *)"cache", 2, CA_WIZARD, LIST_CACHEOBJS},
-	{(char *)"cache_attrs", 6, CA_WIZARD, LIST_CACHEATTRS},
-	{(char *)"commands", 3, CA_PUBLIC, LIST_COMMANDS},
-	{(char *)"config_permissions", 8, CA_GOD, LIST_CONF_PERMS},
-	{(char *)"config_read_perms", 4, CA_PUBLIC, LIST_CF_RPERMS},
-	{(char *)"costs", 3, CA_PUBLIC, LIST_COSTS},
-	{(char *)"db_stats", 2, CA_WIZARD, LIST_DB_STATS},
-	{(char *)"default_flags", 1, CA_PUBLIC, LIST_DF_FLAGS},
-	{(char *)"flags", 2, CA_PUBLIC, LIST_FLAGS},
-	{(char *)"func_permissions", 5, CA_WIZARD, LIST_FUNCPERMS},
-	{(char *)"functions", 2, CA_PUBLIC, LIST_FUNCTIONS},
-	{(char *)"globals", 1, CA_WIZARD, LIST_GLOBALS},
-	{(char *)"hashstats", 1, CA_WIZARD, LIST_HASHSTATS},
-	{(char *)"logging", 1, CA_GOD, LIST_LOGGING},
-	{(char *)"memory", 1, CA_WIZARD, LIST_MEMORY},
-	{(char *)"options", 1, CA_PUBLIC, LIST_OPTIONS},
-	{(char *)"params", 2, CA_PUBLIC, LIST_PARAMS},
-	{(char *)"permissions", 2, CA_WIZARD, LIST_PERMS},
-	{(char *)"powers", 2, CA_WIZARD, LIST_POWERS},
-	{(char *)"process", 2, CA_WIZARD, LIST_PROCESS},
-	{(char *)"raw_memory", 1, CA_WIZARD, LIST_RAWMEM},
-	{(char *)"site_information", 2, CA_WIZARD, LIST_SITEINFO},
-	{(char *)"switches", 2, CA_PUBLIC, LIST_SWITCHES},
-	{(char *)"textfiles", 1, CA_WIZARD, LIST_TEXTFILES},
-	{(char *)"user_attributes", 1, CA_WIZARD, LIST_VATTRS},
-	{NULL, 0, 0, 0}};
 
 CMDENT *prefix_cmds[256];
 
@@ -332,7 +272,7 @@ bool check_mod_access(dbref player, EXTFUNCS *xperms)
  * @brief Check if user has access to command with user-def'd permissions.
  * 
  * @param player	Player doing the command
- * @param hookp		HYWKAR
+ * @param hookp		Hook entry point
  * @param cargs		Command argument list
  * @param ncargs	Number of arguments
  * @return bool		Permission granted or not 
@@ -462,6 +402,19 @@ void call_move_hook(dbref player, dbref cause, bool state)
 }
 
 /**
+ * @brief Check if user has access to command
+ * 
+ * @param player	DBref of playuer
+ * @param cmdp		Command entry
+ * @param cargs		Command Arguments
+ * @param ncargs	Number of arguments
+ * @return Bool		User has access or not
+ */
+bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs) {
+	return check_access(player, cmdp->perms) && (!cmdp->userperms || check_userdef_access(player, cmdp->userperms, cargs, ncargs) || God(player)) ? true : false;
+}
+
+/**
  * @brief Perform indicated command with passed args.
  * 
  * @param cmdp			Command
@@ -499,7 +452,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	 * @note Check if we have permission to execute the command
 	 * 
 	 */
-	if (!Check_Cmd_Access(player, cmdp, cargs, ncargs))
+	
+	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;
@@ -1171,7 +1125,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * @brief Only check for exits if we may use the goto command
 	 * 
 	 */
-	if (Check_Cmd_Access(player, goto_cmdp, args, nargs))
+	if (check_cmd_access(player, goto_cmdp, args, nargs))
 	{
 		/**
 		 * @brief Check for an exit name
@@ -1377,7 +1331,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		 * 'leave' command.
 		 * 
 		 */
-		if (Check_Cmd_Access(player, leave_cmdp, args, nargs))
+		if (check_cmd_access(player, leave_cmdp, args, nargs))
 		{
 			p = atr_pget(Location(player), A_LALIAS, &aowner, &aflags, &alen);
 
@@ -1411,7 +1365,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		 * @note Check for enter aliases, if we have permissions to use the
 		 * 'enter' command.
 		 */
-		if (Check_Cmd_Access(player, enter_cmdp, args, nargs))
+		if (check_cmd_access(player, enter_cmdp, args, nargs))
 		{
 			DOLIST(exit, Contents(Location(player)))
 			{
@@ -2236,7 +2190,7 @@ int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
 	}
 	else
 	{
-		cf_log_notfound(player, cmd, "Command", str);
+		cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", str);
 		return -1;
 	}
 }
@@ -2326,7 +2280,7 @@ int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd)
 	}
 	else
 	{
-		cf_log_notfound(player, cmd, "Attribute", str);
+		cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Attribute", str);
 		return -1;
 	}
 }
@@ -2420,13 +2374,13 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 		 * @note we only got one argument to @alias. Bad.
 		 * 
 		 */
-		cf_log_syntax(player, cmd, "Invalid original for alias %s", alias);
+		cf_log(player, "CNF", "SYNTX", cmd, "Invalid original for alias %s", alias);
 		return -1;
 	}
 
 	if (alias[0] == '_' && alias[1] == '_')
 	{
-		cf_log_syntax(player, cmd, "Alias %s would cause @addcommand conflict", alias);
+		cf_log(player, "CNF", "SYNTX", cmd, "Alias %s would cause @addcommand conflict", alias);
 		return -1;
 	}
 
@@ -2448,7 +2402,7 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 		if (cmdp == NULL)
 		{
-			cf_log_notfound(player, cmd, "Command", orig);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", str);
 			return -1;
 		}
 		/**
@@ -2459,7 +2413,7 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 		if (!nt)
 		{
-			cf_log_notfound(player, cmd, "Switch", ap);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Switch", str);
 			return -1;
 		}
 		/**
@@ -2510,7 +2464,7 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 		if (hp == NULL)
 		{
-			cf_log_notfound(player, cmd, "Entry", orig);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Entry", str);
 			return -1;
 		}
 

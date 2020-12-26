@@ -1055,7 +1055,7 @@ int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd)
 
     if ((fp = find_flag(GOD, fstr)) == NULL)
     {
-        cf_log_notfound(player, cmd, "No such flag", fstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "No such flag", fstr);
         return -1;
     }
 
@@ -1095,7 +1095,7 @@ int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd)
     }
     else
     {
-        cf_log_notfound(player, cmd, "Flag access", permstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Flag access", permstr);
         return -1;
     }
 
@@ -1128,13 +1128,13 @@ int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
 
     if ((flagnum < 0) || (flagnum > 9))
     {
-        cf_log_notfound(player, cmd, "Not a marker flag", numstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Not a marker flag", numstr);
         return -1;
     }
 
     if ((fp = letter_to_flag(*numstr)) == NULL)
     {
-        cf_log_notfound(player, cmd, "Marker flag", numstr);
+        cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Marker flag", numstr);
         return -1;
     }
 
@@ -1151,7 +1151,7 @@ int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
 
     if (strlen(flagstr) > 31)
     {
-        cf_log_syntax(player, cmd, "Marker flag name too long: %s", namestr);
+        cf_log(player, "CNF", "SYNTX", cmd, "Marker flag name too long: %s", namestr);
         XFREE(flagstr);
     }
 
@@ -1159,7 +1159,7 @@ int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
     {
         if (!isalnum(*cp) && (*cp != '_'))
         {
-            cf_log_syntax(player, cmd, "Illegal marker flag name: %s", namestr);
+            cf_log(player, "CNF", "SYNTX", cmd, "Illegal marker flag name: %s", namestr);
             XFREE(flagstr);
             return -1;
         }
@@ -1170,7 +1170,7 @@ int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
     if (hashfind(flagstr, &mudstate.flags_htab))
     {
         XFREE(flagstr);
-        cf_log_syntax(player, cmd, "Marker flag name in use: %s", namestr);
+        cf_log(player, "CNF", "SYNTX", cmd, "Marker flag name in use: %s", namestr);
         return -1;
     }
 

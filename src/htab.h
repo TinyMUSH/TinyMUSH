@@ -89,6 +89,4 @@ typedef struct name_table
 #define hash_nextkey(h) (hash_nextkey_generic((h)).s)
 #define nhashresize(h, sz) hashresize((h), (sz))
 
-extern NAMETAB powers_nametab[];
-
 #endif /* __HTAB_H */

@@ -24,66 +24,13 @@
 #include "db.h"
 #include "interface.h"
 #include "externs.h"
+#include "nametabs.h"
 
 FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */
 
 char *log_pos = NULL;
 
-NAMETAB logdata_nametab[] = {
-    {(char *)"flags", 1, 0, LOGOPT_FLAGS},
-    {(char *)"location", 1, 0, LOGOPT_LOC},
-    {(char *)"owner", 1, 0, LOGOPT_OWNER},
-    {(char *)"timestamp", 1, 0, LOGOPT_TIMESTAMP},
-    {NULL, 0, 0, 0}};
-
-NAMETAB logoptions_nametab[] = {
-    {(char *)"accounting", 2, 0, LOG_ACCOUNTING},
-    {(char *)"all_commands", 2, 0, LOG_ALLCOMMANDS},
-    {(char *)"bad_commands", 2, 0, LOG_BADCOMMANDS},
-    {(char *)"buffer_alloc", 3, 0, LOG_ALLOCATE},
-    {(char *)"bugs", 3, 0, LOG_BUGS},
-    {(char *)"checkpoints", 2, 0, LOG_DBSAVES},
-    {(char *)"config_changes", 2, 0, LOG_CONFIGMODS},
-    {(char *)"create", 2, 0, LOG_PCREATES},
-    {(char *)"keyboard_commands", 2, 0, LOG_KBCOMMANDS},
-    {(char *)"killing", 1, 0, LOG_KILLS},
-    {(char *)"local", 3, 0, LOG_LOCAL},
-    {(char *)"logins", 3, 0, LOG_LOGIN},
-    {(char *)"network", 1, 0, LOG_NET},
-    {(char *)"problems", 1, 0, LOG_PROBLEMS},
-    {(char *)"security", 2, 0, LOG_SECURITY},
-    {(char *)"shouts", 2, 0, LOG_SHOUTS},
-    {(char *)"startup", 2, 0, LOG_STARTUP},
-    {(char *)"suspect_commands", 2, 0, LOG_SUSPECTCMDS},
-    {(char *)"time_usage", 1, 0, LOG_TIMEUSE},
-    {(char *)"wizard", 1, 0, LOG_WIZARD},
-    {(char *)"malloc", 1, 0, LOG_MALLOC},
-    {NULL, 0, 0, 0}};
-
-LOGFILETAB logfds_table[] = {
-    {LOG_ACCOUNTING, NULL, NULL},
-    {LOG_ALLCOMMANDS, NULL, NULL},
-    {LOG_BADCOMMANDS, NULL, NULL},
-    {LOG_ALLOCATE, NULL, NULL},
-    {LOG_BUGS, NULL, NULL},
-    {LOG_DBSAVES, NULL, NULL},
-    {LOG_CONFIGMODS, NULL, NULL},
-    {LOG_PCREATES, NULL, NULL},
-    {LOG_KBCOMMANDS, NULL, NULL},
-    {LOG_KILLS, NULL, NULL},
-    {LOG_LOCAL, NULL, NULL},
-    {LOG_LOGIN, NULL, NULL},
-    {LOG_NET, NULL, NULL},
-    {LOG_PROBLEMS, NULL, NULL},
-    {LOG_SECURITY, NULL, NULL},
-    {LOG_SHOUTS, NULL, NULL},
-    {LOG_STARTUP, NULL, NULL},
-    {LOG_SUSPECTCMDS, NULL, NULL},
-    {LOG_TIMEUSE, NULL, NULL},
-    {LOG_WIZARD, NULL, NULL},
-    {LOG_MALLOC, NULL, NULL},
-    {0, NULL, NULL}};
 
 /* ---------------------------------------------------------------------------
  * logfile_init: Initialize the main logfile.
