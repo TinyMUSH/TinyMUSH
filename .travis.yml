@@ -16,7 +16,6 @@ after_success:
   - >-
     if [[ "$TRAVIS_BRANCH" = "master" && -n "$TRAVIS_BUILD_DOCS" && "$TRAVIS_PULL_REQUEST" = "false" ]] ; then
       echo $TRAVIS_BUILD_DIR
-      cd $TRAVIS_BUILD_DIR
       source .ci/setup-ssh.sh || travis_terminate 1
       .ci/generateDocumentation.sh || travis_terminate 1
     fi

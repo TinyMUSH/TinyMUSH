@@ -2,8 +2,6 @@
 # setup-ssh.sh: load the SSH key 
 
 set -ev
-echo "PWD: $(pwd)"
-ls -al
 declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/travis_temp_ssh_key_XXXX)"
 # Decrypt the file containing the private key (put the real name of the variables)
 openssl aes-256-cbc \
