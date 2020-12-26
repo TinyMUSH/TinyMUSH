@@ -3,7 +3,7 @@
 # Title         : generateDocumentation.sh
 # Date created  : 2017
 # Notes         : original script from Jeroen de Bruijn
-__AUTHOR__="Francesco Romano"
+# Author        : Francesco Romano
 # Preconditions:
 # - Packages doxygen doxygen-doc doxygen-gui graphviz
 #   must be installed.
