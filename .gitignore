@@ -74,6 +74,3 @@
 .vscode/
 *.code-workspace
 
-#Travis-CI
-.ssh/
-
