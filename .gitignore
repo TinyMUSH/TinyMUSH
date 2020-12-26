@@ -73,3 +73,7 @@
 #Visual Studio Code
 .vscode/
 *.code-workspace
+
+#Travis-CI
+.ssh/
+
