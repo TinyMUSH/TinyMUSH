@@ -10,7 +10,7 @@ before_install:
 addons:
   apt:
     update: true
-script: autoreconf -ivf && ./configure && make
+script: .ci/linux-build.sh
 after_success:
   # Generate the docs only if master, the travis_build_docs is true and we can use secure variables
   - >-

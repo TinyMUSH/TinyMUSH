@@ -326,7 +326,8 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if ((*last == isep.str[isep.len - 1]) && !strncmp(isep.str, last - isep.len + 1, isep.len))
 			{
-				SAFE_LB_STR(++last, buff, bufc);
+				++last;
+				SAFE_LB_STR(last, buff, bufc);
 				return;
 			}
 
