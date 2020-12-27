@@ -57,7 +57,9 @@ systems and provide a stable base for many more years.
 
 # Installation
 
-Since TinyMUSH 3.3 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback. Here's a quick rundown on how to build the server (Tested on Ubuntu 20.04.1 LTS).
+Since TinyMUSH 3.3 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback. Here's a quick rundown on how to build the server (Tested on Ubuntu 20.04.1 LTS and Mac OSX Big Sur).
+
+**Ubuntu / Debian:**
 
 ```sh
 # Install dependencies
@@ -71,7 +73,32 @@ $ git clone https://github.com/TinyMUSH/TinyMUSH.git
 # Build the server
 #
 $ cd TinyMUSH
-$ autoreconf -ivf
+$ ./autogen.sh
+$ ./configure
+$ make
+$ make install
+#
+# Start the server and test.
+#
+$ ./game/bin/netmush
+$ telnet localhost 6250
+```
+
+**Mac OSX:**
+
+```sh
+# Install dependencies, you need xcode command-line and brew to start.
+#
+$ brew install autoconf automake libtool cproto gdbm pcre
+#
+# Clone the repository
+#
+$ git clone https://github.com/TinyMUSH/TinyMUSH.git
+#
+# Build the server
+#
+$ cd TinyMUSH
+$ ./autogen.sh
 $ ./configure
 $ make
 $ make install
