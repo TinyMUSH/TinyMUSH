@@ -1,7 +1,7 @@
 
 ACLOCAL_AMFLAGS = -I src/libltdl/m4
 
-AM_CPPFLAGS     = $(LTDLINCL)
+#AM_CPPFLAGS     = $(LTDLINCL)
 
 SUBDIRS         = src
 
@@ -47,6 +47,5 @@ distclean-local:
 	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 	for i in `find ./ -name '*.orig'`; do rm -rf $$i; done
 
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status libtool
-
+#libtool: $(LIBTOOL_DEPS)
+#	$(SHELL) ./config.status libtool

@@ -66,7 +66,7 @@ AM_PROG_CC_C_O
 AC_GNU_SOURCE
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-LT_INIT
+dnl LT_INIT
 
 AC_PATH_PROGS([with_cproto_prog], [cproto], [notfound])
 AS_IF([test "x$with_cproto_prog" = "xnotfound"],[AC_MSG_ERROR([Please install CPROTO before trying again])],)
@@ -402,6 +402,7 @@ AX_BOX([Configuring files.])
 AC_CONFIG_FILES([src/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])
 
 AX_BOX([Generating config.status.])
+AC_CONFIG_SUBDIRS([src/libltdl/])
 AC_OUTPUT
 
 dnl We need to expand the paths twices to be sure all vars are expanded.

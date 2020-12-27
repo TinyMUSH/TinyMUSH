@@ -176,11 +176,12 @@ am__DIST_COMMON = $(srcdir)/Makefile.in \
 	$(top_srcdir)/src/libltdl/config/install-sh \
 	$(top_srcdir)/src/libltdl/config/ltmain.sh \
 	$(top_srcdir)/src/libltdl/config/missing AUTHORS COPYING \
-	ChangeLog INSTALL NEWS README config.guess config.sub \
-	ltmain.sh src/libltdl/config/compile \
-	src/libltdl/config/config.guess src/libltdl/config/config.sub \
-	src/libltdl/config/depcomp src/libltdl/config/install-sh \
-	src/libltdl/config/ltmain.sh src/libltdl/config/missing
+	ChangeLog INSTALL NEWS README compile config.guess config.sub \
+	depcomp install-sh ltmain.sh missing \
+	src/libltdl/config/compile src/libltdl/config/config.guess \
+	src/libltdl/config/config.sub src/libltdl/config/depcomp \
+	src/libltdl/config/install-sh src/libltdl/config/ltmain.sh \
+	src/libltdl/config/missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -376,7 +377,8 @@ with_dirname_prog = @with_dirname_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
 ACLOCAL_AMFLAGS = -I src/libltdl/m4
-AM_CPPFLAGS = $(LTDLINCL)
+
+#AM_CPPFLAGS     = $(LTDLINCL)
 SUBDIRS = src
 EXTRA_DIST = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 all: all-recursive
@@ -895,8 +897,8 @@ distclean-local:
 	for i in `find ./ -name 'autom4te.cache'`; do rm -rf $$i; done
 	for i in `find ./ -name '*.orig'`; do rm -rf $$i; done
 
-libtool: $(LIBTOOL_DEPS)
-	$(SHELL) ./config.status libtool
+#libtool: $(LIBTOOL_DEPS)
+#	$(SHELL) ./config.status libtool
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
