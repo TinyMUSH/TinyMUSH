@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.68])
+AC_PREREQ([2.69])
 
 dnl AC_INIT and AX_VERSION need constants to work. By defining the version here we can avoid
 dnl to have multiple places to update when
@@ -63,7 +63,7 @@ AC_PROG_CC_STDC
 AC_PROG_CPP
 AC_PROG_CPP_WERROR
 AM_PROG_CC_C_O
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 dnl LT_INIT
@@ -89,7 +89,6 @@ AM_INIT_AUTOMAKE([subdir-objects])
 
 AX_BOX([Initializing Libtools])
 
-LT_PREREQ([2.4])
 LT_CONFIG_LTDL_DIR([src/libltdl])
 LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
