@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ################################################################################
 # Title         : generateDocumentation.sh
 # Date created  : 2017
