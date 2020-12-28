@@ -30,7 +30,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     ptr = repeatchar(strlen(string), '-');
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
     XFREE(ptr);
-    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s", MUSH_BUILD_DATE);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s, %s", __DATE__, __TIME__);
 
     if (Wizard(player))
     {
@@ -154,7 +154,7 @@ void init_version(void)
 void log_version(void)
 {
     log_write(LOG_ALWAYS, "INI", "START", "       Starting: %s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
-    log_write(LOG_ALWAYS, "INI", "START", "     Build date: %s", MUSH_BUILD_DATE);
+    log_write(LOG_ALWAYS, "INI", "START", "     Build date: %s, %s", __DATE__, __TIME__);
     log_write(LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo);
     log_write(LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo);
     log_write(LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo);

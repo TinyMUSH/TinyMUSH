@@ -1,4 +1,13 @@
-/* copyright.h */
+/**
+ * @file copyright.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Copyright informations
+ * @version 3.3
+ * @date 2020-12-27
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #ifndef __COPYRIGHT_H
 #define __COPYRIGHT_H
@@ -10,13 +19,11 @@ TinyMUSH 3 Copyright: The Artistic License 2.0
 
 TinyMUSH 3 Source Code:
 
-Copyright (c) 2011, 2015, TinyMUSH development team.
-Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by Lydia Leong,
-              David Passmore, Robby Griffin, Scott Dorr, and Eddy Beaupre.
-Copyright (c) 2001, 2002, 2003, by Lydia Leong, David Passmore,
-                                Robby Griffin, and Scott Dorr.
-Copyright (c) 2000 by Lydia Leong, David Passmore, and Robby Griffin.
-Copyright (c) 1999 by Lydia Leong and David Passmore.
+Copyright (c) 2011 - 2021, TinyMUSH development team.
+Copyright (c) 2004 - 2010, by Lydia Leong, David Passmore, Robby Griffin, Scott Dorr, and Eddy Beaupre.
+Copyright (c) 2001 - 2003, by Lydia Leong, David Passmore, Robby Griffin, and Scott Dorr.
+Copyright (c) 2000, by Lydia Leong, David Passmore, and Robby Griffin.
+Copyright (c) 1999, by Lydia Leong and David Passmore.
 
 All rights reserved.
 
@@ -243,5 +250,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-#endif				/* __COPYRIGHT_H */
+#endif /* __COPYRIGHT_H */
