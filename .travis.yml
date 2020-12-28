@@ -7,10 +7,25 @@ compiler:
   - gcc
   - clang
 before_install:
-  - .ci/dependencies.sh
+  - .ci/before_install.sh
 addons:
   apt:
+    packages: 
+      - cproto
+      - libpcre3-dev
+      - libgdbm-dev
+      - doxygen
+      - graphviz
+      update: true
+  homebrew:
+    packages:
+      - autoconf
+      - automake
+      - libtool
+      - gdbm
+      - pcre
+      - cproto
     update: true
-script: .ci/build.sh
+script: .ci/script.sh
 after_success:
-  - .ci/generateDocumentation.sh || travis_terminate 1
+  - .ci/after_success.sh || travis_terminate 1
