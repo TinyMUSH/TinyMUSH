@@ -11,13 +11,13 @@ before_install:
   - .ci/before_install.sh
 addons:
   apt:
-    packages: 
+    packages:
       - cproto
       - libpcre3-dev
       - libgdbm-dev
       - doxygen
       - graphviz
-      update: true
+    update: true
   homebrew:
     packages:
       - autoconf
@@ -30,4 +30,3 @@ addons:
 script: .ci/script.sh
 after_success:
   - .ci/after_success.sh || travis_terminate 1
-  
