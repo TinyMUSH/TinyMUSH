@@ -30,3 +30,4 @@ addons:
 script: .ci/script.sh
 after_success:
   - .ci/after_success.sh || travis_terminate 1
+  
