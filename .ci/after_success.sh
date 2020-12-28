@@ -76,6 +76,7 @@ if [[ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_PULL_REQUEST" = "false" && "$TRAVI
     echo 'Generating Doxygen code documentation...'
     # Redirect both stderr and stdout to the log file AND the console.
     cd $TRAVIS_BUILD_DIR
+    rm -rf code_docs
     doxygen $DOXYFILE 2>&1 | tee code_docs/doxygen.log
     cd code_docs
 

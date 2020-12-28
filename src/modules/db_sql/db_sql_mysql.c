@@ -1,3 +1,16 @@
+/**
+ * @file db_sql_mysql.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Module for MySQL interface
+ * @version 3.3
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ * @bug This code is currently not working. Won't be fixed until we go Beta
+ * 
+ */
+
 #include <copyright.h>
 #include <config.h>
 #include <system.h>

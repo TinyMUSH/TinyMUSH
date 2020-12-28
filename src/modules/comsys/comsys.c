@@ -1,5 +1,13 @@
-/* comsys.c - module implementing DarkZone-style channel system */
-/* $Id: comsys.c,v 1.81 2008/01/10 00:04:18 lwl Exp $ */
+/**
+ * @file comsys.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Module implementing DarkZone-style channel system
+ * @version 3.3
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include <copyright.h>
 #include <config.h>

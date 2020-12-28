@@ -1,5 +1,17 @@
-/* mail.h */
-/* $Id: mail.h,v 1.14 2002/09/29 02:31:46 rmg Exp $ */
+/**
+ * @file mail.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Module for penn-based mailer system
+ * @version 3.1
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ * @note This code was taken from Kalkin's DarkZone code, which was originally
+ * taken from PennMUSH 1.50 p10, and has been heavily modified since being
+ * included in MUX (and then being imported wholesale into 3.0).
+ * 
+ */
 
 #include "../../copyright.h"
 

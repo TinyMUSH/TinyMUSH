@@ -1,12 +1,16 @@
-/* mail.c - module for penn-based mailer system */
-/* $Id: mail.c,v 1.73 2010/10/26 02:41:50 tyrspace Exp $ */
-
-/*
- * This code was taken from Kalkin's DarkZone code, which was
- * originally taken from PennMUSH 1.50 p10, and has been heavily modified
- * since being included in MUX (and then being imported wholesale into 3.0).
- *
- * -------------------------------------------------------------------
+/**
+ * @file mail.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Module for penn-based mailer system
+ * @version 3.1
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ * @note This code was taken from Kalkin's DarkZone code, which was originally
+ * taken from PennMUSH 1.50 p10, and has been heavily modified since being
+ * included in MUX (and then being imported wholesale into 3.0).
+ * 
  */
 
 #include <copyright.h>
