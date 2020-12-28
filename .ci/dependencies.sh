@@ -6,8 +6,9 @@ elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     brew install cproto
 fi
 
+cd $TRAVIS_BUILD_DIR
+autoreconf -ivf
 cd $TRAVIS_BUILD_DIR/src/libltdl
 autoreconf -ivf
 cd $TRAVIS_BUILD_DIR
-autoreconf -ivf
 ./configure && make distclean
