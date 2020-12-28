@@ -2,4 +2,12 @@
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     sudo apt-get -y install cproto libpcre3-dev libgdbm-dev doxygen graphviz
+elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    brew install cproto
 fi
+
+cd $TRAVIS_BUILD_DIR/src/libltdl
+autoreconf -ivf
+cd $TRAVIS_BUILD_DIR
+autoreconf -ivf
+./configure && make distclean
