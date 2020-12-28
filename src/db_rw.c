@@ -1,24 +1,33 @@
-/* db_rw.c - flatfile implementation */
+/**
+ * @file db_rw.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief flatfile implementation
+ * @version 3.3
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h" /* required by mudconf */
-#include "game.h"	  /* required by mudconf */
-#include "alloc.h"	  /* required by mudconf */
-#include "flags.h"	  /* required by mudconf */
-#include "htab.h"	  /* required by mudconf */
-#include "ltdl.h"	  /* required by mudconf */
-#include "udb.h"	  /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
-#include "mushconf.h" /* required by code */
-#include "db.h"		  /* required by externs */
+#include "typedefs.h"
+#include "game.h"
+#include "alloc.h"
+#include "flags.h"
+#include "htab.h"
+#include "ltdl.h"
+#include "udb.h"
+#include "udb_defs.h"
+#include "mushconf.h"
+#include "db.h"
 #include "interface.h"
-#include "externs.h" /* required by code */
-#include "vattr.h"	 /* required by code */
-#include "attrs.h"	 /* required by code */
-#include "powers.h"	 /* required by code */
+#include "externs.h"
+#include "vattr.h"
+#include "attrs.h"
+#include "powers.h"
 
 extern struct object *db;
 int g_version;
@@ -27,11 +36,12 @@ int g_flags;
 extern int anum_alc_top;
 int *used_attrs_table;
 
-/*
- * ---------------------------------------------------------------------------
- * getboolexp1: Get boolean subexpression from file.
+/**
+ * @brief Get boolean subexpression from file.
+ * 
+ * @param f			File
+ * @return BOOLEXP* 
  */
-
 BOOLEXP *getboolexp1(FILE *f)
 {
 	BOOLEXP *b;
@@ -44,138 +54,103 @@ BOOLEXP *getboolexp1(FILE *f)
 	case '\n':
 		ungetc(c, f);
 		return TRUE_BOOLEXP;
-
-	/*
-	 * break;
-	 */
 	case EOF:
 		log_write_raw(1, "ABORT! db_rw.c, unexpected EOF in boolexp in getboolexp1().\n");
 		abort();
 		break;
-
 	case '(':
 		b = alloc_boolexp();
-
 		switch (c = getc(f))
 		{
 		case NOT_TOKEN:
 			b->type = BOOLEXP_NOT;
 			b->sub1 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
-
 		case INDIR_TOKEN:
 			b->type = BOOLEXP_INDIR;
 			b->sub1 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
-
 		case IS_TOKEN:
 			b->type = BOOLEXP_IS;
 			b->sub1 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
-
 		case CARRY_TOKEN:
 			b->type = BOOLEXP_CARRY;
 			b->sub1 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
-
 		case OWNER_TOKEN:
 			b->type = BOOLEXP_OWNER;
 			b->sub1 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
-
 		default:
 			ungetc(c, f);
 			b->sub1 = getboolexp1(f);
-
 			if ((c = getc(f)) == '\n')
 			{
 				c = getc(f);
 			}
-
 			switch (c)
 			{
 			case AND_TOKEN:
 				b->type = BOOLEXP_AND;
 				break;
-
 			case OR_TOKEN:
 				b->type = BOOLEXP_OR;
 				break;
-
 			default:
 				goto error;
 			}
-
 			b->sub2 = getboolexp1(f);
-
 			if ((d = getc(f)) == '\n')
 			{
 				d = getc(f);
 			}
-
 			if (d != ')')
 			{
 				goto error;
 			}
-
 			return b;
 		}
-
 	case '-': /* obsolete NOTHING key, eat it */
 		while ((c = getc(f)) != '\n')
 		{
@@ -185,39 +160,32 @@ BOOLEXP *getboolexp1(FILE *f)
 				abort();
 			}
 		}
-
 		ungetc(c, f);
 		return TRUE_BOOLEXP;
-
 	case '"':
 		ungetc(c, f);
 		buff = getstring(f, 1);
 		c = fgetc(f);
-
 		if (c == EOF)
 		{
 			XFREE(buff);
 			return TRUE_BOOLEXP;
 		}
-
 		b = alloc_boolexp();
 		anum = mkattr(buff);
-
 		if (anum <= 0)
 		{
 			free_boolexp(b);
 			XFREE(buff);
 			goto error;
 		}
-
 		XFREE(buff);
 		b->thing = anum;
-
-		/*
-	 * if last character is : then this is an attribute lock. A
-	 * last character of / means an eval lock
-	 */
-
+		/**
+		 * if last character is : then this is an attribute lock. A
+		 * last character of / means an eval lock
+		 * 
+		 */
 		if ((c == ':') || (c == '/'))
 		{
 			if (c == '/')
@@ -228,26 +196,26 @@ BOOLEXP *getboolexp1(FILE *f)
 			{
 				b->type = BOOLEXP_ATR;
 			}
-
 			b->sub1 = (BOOLEXP *)getstring(f, 1);
 		}
-
 		return b;
-
-	default: /* dbref or attribute */
+	default:
+		/**
+		 * dbref or attribute
+		 * 
+		 */
 		ungetc(c, f);
 		b = alloc_boolexp();
 		b->type = BOOLEXP_CONST;
 		b->thing = 0;
-
-		/*
-	 * This is either an attribute, eval, or constant lock.
-	 * Constant locks are of the form <num>, while attribute and
-	 * eval locks are of the form <anam-or-anum>:<string> or
-	 * <aname-or-anum>/<string> respectively. The characters
-	 * <nl>, |, and & terminate the string.
-	 */
-
+		/**
+		 * This is either an attribute, eval, or constant lock.
+		 * Constant locks are of the form <num>, while attribute and
+		 * eval locks are of the form <anam-or-anum>:<string> or
+		 * <aname-or-anum>/<string> respectively. The characters
+		 * <nl>, |, and & terminate the string.
+		 * 
+		 */
 		if (isdigit(c))
 		{
 			while (isdigit(c = getc(f)))
@@ -258,31 +226,27 @@ BOOLEXP *getboolexp1(FILE *f)
 		else if (isalpha(c))
 		{
 			buff = XMALLOC(LBUF_SIZE, "buff");
-
 			for (s = buff; ((c = getc(f)) != EOF) && (c != '\n') && (c != ':') && (c != '/'); *s++ = c)
 				;
-
 			if (c == EOF)
 			{
 				XFREE(buff);
 				free_boolexp(b);
 				goto error;
 			}
-
 			*s = '\0';
-			/*
-	     * Look the name up as an attribute.  If not found,
-	     * create a new attribute.
-	     */
+			/**
+		     * Look the name up as an attribute.  If not found,
+		     * create a new attribute.
+			 * 
+		     */
 			anum = mkattr(buff);
-
 			if (anum <= 0)
 			{
 				free_boolexp(b);
 				XFREE(buff);
 				goto error;
 			}
-
 			XFREE(buff);
 			b->thing = anum;
 		}
@@ -291,12 +255,11 @@ BOOLEXP *getboolexp1(FILE *f)
 			free_boolexp(b);
 			goto error;
 		}
-
-		/*
-	 * if last character is : then this is an attribute lock. A
-	 * last character of / means an eval lock
-	 */
-
+		/**
+		 * if last character is : then this is an attribute lock. A
+		 * last character of / means an eval lock
+		 * 
+		 */
 		if ((c == ':') || (c == '/'))
 		{
 			if (c == '/')
@@ -307,37 +270,32 @@ BOOLEXP *getboolexp1(FILE *f)
 			{
 				b->type = BOOLEXP_ATR;
 			}
-
 			buff = XMALLOC(LBUF_SIZE, "buff");
-
 			for (s = buff; ((c = getc(f)) != EOF) && (c != '\n') && (c != ')') && (c != OR_TOKEN) && (c != AND_TOKEN); *s++ = c)
 				;
-
 			if (c == EOF)
 			{
 				goto error;
 			}
-
 			*s++ = 0;
 			b->sub1 = (BOOLEXP *)XSTRDUP(buff, "b->sub1");
 			XFREE(buff);
 		}
-
 		ungetc(c, f);
 		return b;
 	}
-
 error:
 	log_write_raw(1, "ABORT! db_rw.c, reached error case in getboolexp1().\n");
 	abort();			 /* bomb out */
 	return TRUE_BOOLEXP; /* NOTREACHED */
 }
 
-/*
- * ---------------------------------------------------------------------------
- * getboolexp: Read a boolean expression from the flat file.
+/**
+ * @brief Read a boolean expression from the flat file.
+ * 
+ * @param f			File
+ * @return BOOLEXP* 
  */
-
 BOOLEXP *getboolexp(FILE *f)
 {
 	BOOLEXP *b;
@@ -346,8 +304,12 @@ BOOLEXP *getboolexp(FILE *f)
 
 	if (getc(f) != '\n')
 	{
+		/**
+		 * parse error, we lose 
+		 * 
+		 */
 		log_write_raw(1, "ABORT! db_rw.c, parse error in getboolexp().\n");
-		abort(); /* parse error, we lose */
+		abort(); 
 	}
 
 	if ((c = getc(f)) != '\n')
@@ -358,63 +320,65 @@ BOOLEXP *getboolexp(FILE *f)
 	return b;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * unscramble_attrnum: Fix up attribute numbers from foreign muds
+/**
+ * @brief Fix up attribute numbers from foreign muds
+ * 
+ * @param attrnum	attribute numbers
+ * @return int 
  */
-
 int unscramble_attrnum(int attrnum)
 {
 	switch (g_format)
 	{
 	case F_MUSH:
-
-		/*
-	 * TinyMUSH 2.2:  Deal with different attribute numbers.
-	 */
+		/**
+		 * TinyMUSH 2.2:  Deal with different attribute numbers.
+		 */
 		switch (attrnum)
 		{
 		case 208:
 			return A_NEWOBJS;
 			break;
-
 		case 209:
 			return A_LCON_FMT;
 			break;
-
 		case 210:
 			return A_LEXITS_FMT;
 			break;
-
 		case 211:
 			return A_PROGCMD;
 			break;
-
 		default:
 			return attrnum;
 		}
-
 	default:
 		return attrnum;
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * get_list: Read attribute list from flat file.
+/**
+ * @brief Read attribute list from flat file.
+ * 
+ * @param f				File
+ * @param i				DBref
+ * @param new_strings	New string
  */
-
-int get_list(FILE *f, dbref i, int new_strings)
+void get_list(FILE *f, dbref i, int new_strings)
 {
 	dbref atr;
 	int c;
 	char *buff;
+	bool loopend = false;
 
-	while (1)
+	while (!loopend)
 	{
 		switch (c = getc(f))
 		{
-		case '>': /* read # then string */
+		case '>':
+			/**
+			 * read # then string
+			 * 
+			 */
 			if (mudstate.standalone)
 			{
 				atr = unscramble_attrnum(getref(f));
@@ -426,47 +390,63 @@ int get_list(FILE *f, dbref i, int new_strings)
 
 			if (atr > 0)
 			{
-				/* Store the attr */
+				/**
+				 * Store the attr 
+				 * 
+				 */
 				buff = getstring(f, new_strings);
 				atr_add_raw(i, atr, buff);
 				XFREE(buff);
 			}
 			else
 			{
-				/* Silently discard */
+				/**
+				 * Silently discard 
+				 * 
+				 */
 				XFREE(getstring(f, new_strings));
 			}
 
 			break;
 
-		case '\n': /* ignore newlines. They're due to v(r). */
+		case '\n':
+			/**
+			 * ignore newlines. They're due to v(r).
+			 * 
+			 */
 			break;
 
-		case '<': /* end of list */
+		case '<':
+			/**
+			 * end of list
+			 * 
+			 */
 			c = getc(f);
 
 			if (c != '\n')
 			{
 				ungetc(c, f);
 				log_write_raw(1, "No line feed on object %d\n", i);
-				return 1;
 			}
-
-			return 1;
-
+			loopend = true;
+			break;
 		default:
+			/**
+			 * We've found a bad spot.  I hope things aren't too bad.
+			 * 
+			 */
 			log_write_raw(1, "Bad character '%c' when getting attributes on object %d\n", c, i);
-			/* We've found a bad spot.  I hope things aren't too bad. */
+			
 			XFREE(getstring(f, new_strings));
 		}
 	}
-
-	return 1; /* NOTREACHED */
 }
 
-/*
- * ---------------------------------------------------------------------------
- * putbool_subexp: Write a boolean sub-expression to the flat file.
+/**
+ * @brief Write a boolean sub-expression to the flat file.
+ * 
+ * @param f File
+ * @param b Boolean sub-expression
  */
 void putbool_subexp(FILE *f, BOOLEXP *b)
 {
@@ -562,11 +542,12 @@ void putbool_subexp(FILE *f, BOOLEXP *b)
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * putboolexp: Write boolean expression to the flat file.
+/**
+ * @brief Write boolean expression to the flat file.
+ * 
+ * @param f File
+ * @param b Boolean expression
  */
-
 void putboolexp(FILE *f, BOOLEXP *b)
 {
 	if (b != TRUE_BOOLEXP)
@@ -577,11 +558,16 @@ void putboolexp(FILE *f, BOOLEXP *b)
 	putc('\n', f);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * upgrade_flags: Convert foreign flags to MUSH format.
+/**
+ * @brief Convert foreign flags to MUSH format.
+ * 
+ * @param flags1		Flag
+ * @param flags2		Flag
+ * @param flags3		Flag
+ * @param thing			DBref of thing
+ * @param db_format		DB Format
+ * @param db_version	DB Version
  */
-
 void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version)
 {
 	FLAG f1, f2, f3, newf1, newf2, newf3;
@@ -598,10 +584,10 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 		newf2 = f2;
 		newf3 = 0;
 
-		/*
-	 * Then we have to do the 2.2 to 3.0 flag conversion
-	 */
-
+		/**
+		 * TinyMUSH 2.2 to 3.0 flag conversion
+		 * 
+		 */
 		if (newf1 & ROYALTY)
 		{
 			newf1 &= ~ROYALTY;
@@ -646,10 +632,11 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 
 		if (newf2 & HAS_DAILY)
 		{
+			/**
+			 * This is the unimplemented TICKLER flag.
+			 * 
+			 */
 			newf2 &= ~HAS_DAILY;
-			/*
-	     * This is the unimplemented TICKLER flag.
-	     */
 		}
 
 		if (newf2 & GAGGED)
@@ -666,71 +653,72 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 	}
 	else if (db_format == F_MUX)
 	{
-		/*
-	 * TinyMUX to 3.0 flag conversion
-	 */
+		/**
+		 * TinyMUX to 3.0 flag conversion
+		 * 
+		 */
 		newf1 = f1;
 		newf2 = f2;
 		newf3 = f3;
 
 		if (newf2 & ZONE_PARENT)
 		{
-			/*
-	     * This used to be an object set NO_COMMAND. We unset
-	     * the flag.
-	     */
+			/**
+		     * This used to be an object set NO_COMMAND. We unset the flag.
+			 * 
+		     */
 			newf2 &= ~ZONE_PARENT;
 		}
 		else
 		{
-			/*
-	     * And if it wasn't NO_COMMAND, then it should be
-	     * COMMANDS.
-	     */
+			/**
+		     * And if it wasn't NO_COMMAND, then it should be COMMANDS.
+			 * 
+		     */
 			newf2 |= HAS_COMMANDS;
 		}
 
 		if (newf2 & WATCHER)
 		{
-			/*
-	     * This used to be the COMPRESS flag, which didn't do
-	     * anything.
-	     */
+			/**
+		     * This used to be the COMPRESS flag, which didn't do anything.
+			 * 
+		     */
 			newf2 &= ~WATCHER;
 		}
 
 		if ((newf1 & MONITOR) && ((newf1 & TYPE_MASK) == TYPE_PLAYER))
 		{
-			/*
-	     * Players set MONITOR should be set WATCHER as well.
-	     */
+			/**
+		     * Players set MONITOR should be set WATCHER as well.
+			 * 
+		     */
 			newf2 |= WATCHER;
 		}
 	}
 	else if (db_format == F_TINYMUSH)
 	{
-		/*
-	 * Native TinyMUSH 3.0 database. The only thing we have to do
-	 * is clear the redirection flag, as nothing is ever
-	 * redirected at startup.
-	 */
+		/**
+		 * Native TinyMUSH 3.0 database. The only thing we have to do is 
+		 * clear the redirection flag, as nothing is ever redirected at startup.
+		 * 
+		 */
 		newf1 = f1;
 		newf2 = f2;
 		newf3 = f3 & ~HAS_REDIRECT;
 	}
 
-	newf2 = newf2 & ~FLOATING; /* this flag is now obsolete */
+	newf2 = newf2 & ~FLOATING; /*!< this flag is now obsolete */
 	*flags1 = newf1;
 	*flags2 = newf2;
 	*flags3 = newf3;
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * efo_convert: Fix things up for Exits-From-Objects
+/**
+ * @brief Fix things up for Exits-From-Objects
+ * 
  */
-
 void efo_convert(void)
 {
 	int i;
@@ -741,9 +729,9 @@ void efo_convert(void)
 		{
 		case TYPE_PLAYER:
 		case TYPE_THING:
-			/*
-	     * swap Exits and Link
-	     */
+			/**
+		     * swap Exits and Link
+		     */
 			link = Link(i);
 			s_Link(i, Exits(i));
 			s_Exits(i, link);
@@ -752,20 +740,19 @@ void efo_convert(void)
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fix_mux_zones: Convert MUX-style zones to 3.0-style zones.
+/**
+ * @brief Convert MUX-style zones to 3.0-style zones.
+ * 
  */
-
 void fix_mux_zones(void)
 {
-	/*
+	/**
      * For all objects in the database where Zone(thing) != NOTHING, set
      * the CONTROL_OK flag on them.
      *
-     * For all objects in the database that are ZMOs (that have other
-     * objects zoned to them), copy the EnterLock of those objects to the
-     * ControlLock.
+     * For all objects in the database that are ZMOs (that have other objects 
+	 * zoned to them), copy the EnterLock of those objects to the ControlLock.
+	 * 
      */
 	int i;
 	int *zmarks;
@@ -794,23 +781,23 @@ void fix_mux_zones(void)
 	XFREE(zmarks);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fix_typed_quotas: Explode standard quotas into typed quotas
+/**
+ * @brief Explode standard quotas into typed quotas
+ * 
  */
-
 void fix_typed_quotas(void)
 {
-	/*
+	/**
      * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
-     * attributes  exist. For simplicity's sake, we assume that players
-     * will have the  same quotas for all types, equal to the current
-     * value. This is  going to produce incorrect values for RQUOTA; this
-     * is easily fixed  by a @quota/fix done from within-game.
+     * attributes  exist. For simplicity's sake, we assume that players will 
+	 * have the  same quotas for all types, equal to the current value. This 
+	 * is  going to produce incorrect values for RQUOTA; this is easily fixed  
+	 * by a @quota/fix done from within-game.
      *
      * If we have a early beta 2.2 release, we have quotas which are spread
-     * out over ten attributes. We're going to have to grab those, make
-     * the new quotas, and then delete the old attributes.
+     * out over ten attributes. We're going to have to grab those, make the 
+	 * new quotas, and then delete the old attributes.
+	 * 
      */
 	int i;
 	char *qbuf, *rqbuf;
@@ -841,6 +828,15 @@ void fix_typed_quotas(void)
 	XFREE(s);
 }
 
+/**
+ * @brief Read a flatfile
+ * 
+ * @param f				File
+ * @param db_format		DB Format
+ * @param db_version	DB Version
+ * @param db_flags		DB Flags
+ * @return dbref 
+ */
 dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 {
 	dbref i, anum;
@@ -904,10 +900,18 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 		switch (ch = getc(f))
 		{
-		case '-': /* Misc tag */
+		case '-': 
+			/**
+			 * Misc tag
+			 * 
+			 */
 			switch (ch = getc(f))
 			{
-			case 'R': /* Record number of players */
+			case 'R':
+				/**
+				 * Record number of players
+				 * 
+				 */
 				mudstate.record_players = getref(f);
 				break;
 
@@ -917,12 +921,19 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			break;
 
-		case '+':		  /* MUX and MUSH header */
-			ch = getc(f); /* 2nd char selects type */
+		case '+':		  
+			/**
+			 * MUX and MUSH header, 2nd char selects type
+			 * 
+			 */
+			ch = getc(f); 
 
 			if ((ch == 'V') || (ch == 'X') || (ch == 'T'))
 			{
-				/* The following things are common across 2.x, MUX, and 3.0. */
+				/**
+				 * The following things are common across 2.x, MUX, and 3.0.
+				 * 
+				 */
 				if (header_gotten)
 				{
 					if (mudstate.standalone)
@@ -942,8 +953,10 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				deduce_version = 0;
 				g_version = getref(f);
 
-				/* Otherwise extract feature flags */
-
+				/**
+				 * Otherwise extract feature flags
+				 * 
+				 */
 				if (g_version & V_GDBM)
 				{
 					read_attribs = 0;
@@ -966,11 +979,17 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				deduce_zone = 0;
 			}
 
-			/* More generic switch. */
-
+			/**
+			 * More generic switch.
+			 * 
+			 */
 			switch (ch)
 			{
-			case 'T': /* 3.0 VERSION */
+			case 'T': 
+				/**
+				 * 3.0 VERSION
+				 * 
+				 */
 				g_format = F_TINYMUSH;
 				read_3flags = (g_version & V_3FLAGS);
 				read_powers = (g_version & V_POWERS);
@@ -978,12 +997,20 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				g_version &= V_MASK;
 				break;
 
-			case 'V': /* 2.0 VERSION */
+			case 'V': 
+				/**
+				 * 2.0 VERSION 
+				 * 
+				 */
 				g_format = F_MUSH;
 				g_version &= V_MASK;
 				break;
 
-			case 'X': /* MUX VERSION */
+			case 'X': 
+				/**
+				 * MUX VERSION
+				 * 
+				 */
 				g_format = F_MUX;
 				read_3flags = (g_version & V_3FLAGS);
 				read_powers = (g_version & V_POWERS);
@@ -991,7 +1018,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				g_version &= V_MASK;
 				break;
 
-			case 'S': /* SIZE */
+			case 'S': 
+				/**
+				 * SIZE
+				 * 
+				 */
 				if (size_gotten)
 				{
 					if (mudstate.standalone)
@@ -1013,7 +1044,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				size_gotten = 1;
 				break;
 
-			case 'A': /* USER-NAMED ATTRIBUTE */
+			case 'A':
+				/**
+				 * USER-NAMED ATTRIBUTE
+				 * 
+				 */
 				anum = getref(f);
 
 				if (tstr)
@@ -1029,11 +1064,14 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 					while (isdigit(*tstr))
 						aflags = (aflags * 10) + (*tstr++ - '0');
 
-					tstr++; /* skip ':' */
+					tstr++; /*!< skip ':' */
 
 					if (!has_visual_attrs)
 					{
-						/* If not AF_ODARK, is AF_VISUAL. Strip AF_ODARK. */
+						/**
+						 * If not AF_ODARK, is AF_VISUAL. Strip AF_ODARK.
+						 * 
+						 */
 						if (aflags & AF_ODARK)
 						{
 							aflags &= ~AF_ODARK;
@@ -1052,11 +1090,19 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				vattr_define((char *)tstr, anum, aflags);
 				break;
 
-			case 'F': /* OPEN USER ATTRIBUTE SLOT */
+			case 'F': 
+				/**
+				 * OPEN USER ATTRIBUTE SLOT
+				 * 
+				 */
 				anum = getref(f);
 				break;
 
-			case 'N': /* NEXT ATTR TO ALLOC WHEN NO FREELIST */
+			case 'N': 
+				/**
+				 * NEXT ATTR TO ALLOC WHEN NO FREELIST
+				 * 
+				 */
 				if (nextattr_gotten)
 				{
 					if (mudstate.standalone)
@@ -1093,7 +1139,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			break;
 
-		case '!': /* MUX and MUSH entries */
+		case '!': 
+			/**
+			 * MUX and MUSH entries
+			 * 
+			 */
 			if (deduce_version)
 			{
 				g_format = F_TINYMUSH;
@@ -1161,16 +1211,22 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				s_Zone(i, getref(f));
 			}
 
-			/* CONTENTS and EXITS */
-
+			/**
+			 * CONTENTS and EXITS 
+			 * 
+			 */
 			s_Contents(i, getref(f));
 
-			/* EXITS */
-
+			/**
+			 * EXITS 
+			 * 
+			 */
 			s_Exits(i, getref(f));
 
-			/* LINK */
-
+			/**
+			 * LINK
+			 * 
+			 */
 			if (read_link)
 			{
 				s_Link(i, getref(f));
@@ -1180,11 +1236,16 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				s_Link(i, NOTHING);
 			}
 
-			/* NEXT */
+			/**
+			 * NEXT
+			 * 
+			 */
 			s_Next(i, getref(f));
 
-			/* LOCK */
-
+			/**
+			 * LOCK
+			 * 
+			 */
 			if (read_key)
 			{
 				tempbool = getboolexp(f);
@@ -1194,12 +1255,16 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				free_boolexp(tempbool);
 			}
 
-			/* OWNER */
-
+			/**
+			 * OWNER
+			 * 
+			 */
 			s_Owner(i, getref(f));
 
-			/* PARENT */
-
+			/**
+			 * PARENT
+			 * 
+			 */
 			if (read_parent)
 			{
 				s_Parent(i, getref(f));
@@ -1209,14 +1274,19 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				s_Parent(i, NOTHING);
 			}
 
-			/* PENNIES */
-
+			/**
+			 * PENNIES
+			 * 
+			 */
 			if (read_money)
 			{
 				s_Pennies(i, getref(f));
 			}
 
-			/* FLAGS */
+			/**
+			 * FLAGS
+			 * 
+			 */
 			f1 = getref(f);
 
 			if (read_extflags)
@@ -1272,23 +1342,19 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				s_CreateTime(i, AccessTime(i));
 			}
 
-			/* ATTRIBUTES */
-
+			/**
+			 * ATTRIBUTES
+			 * 
+			 */
 			if (read_attribs)
 			{
-				if (!get_list(f, i, read_new_strings))
-				{
-					if (mudstate.standalone)
-					{
-						log_write_raw(1, "\nError reading attrs for object #%d\n", i);
-					}
-
-					return -1;
-				}
+				get_list(f, i, read_new_strings);
 			}
 
-			/* check to see if it's a player */
-
+			/**
+			 * check to see if it's a player
+			 * 
+			 */
 			if (Typeof(i) == TYPE_PLAYER)
 			{
 				c_Connected(i);
@@ -1296,7 +1362,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			break;
 
-		case '*': /* EOF marker */
+		case '*':
+			/**
+			 * EOF marker
+			 * 
+			 */
 			if (tstr)
 			{
 				XFREE(tstr);
@@ -1355,6 +1425,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 	}
 }
 
+/**
+ * @brief Read a DB
+ * 
+ * @return int 
+ */
 int db_read(void)
 {
 	DBData key, data;
@@ -1362,10 +1437,10 @@ int db_read(void)
 	char *s;
 	struct timeval obj_time;
 
-	/*
+	/**
      * Fetch the database info
+	 * 
      */
-
 	key.dptr = "TM3";
 	key.dsize = strlen("TM3") + 1;
 	data = db_get(key, DBTYPE_DBINFO);
@@ -1376,10 +1451,10 @@ int db_read(void)
 		return -1;
 	}
 
-	/*
+	/**
      * Unroll the data returned
+	 * 
      */
-
 	c = data.dptr;
 	XMEMCPY((void *)&mudstate.min_size, (void *)c, sizeof(int));
 	c++;
@@ -1390,10 +1465,10 @@ int db_read(void)
 	XMEMCPY((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
 	XFREE(data.dptr);
 
-	/*
+	/**
      * Load the attribute numbers
+	 * 
      */
-
 	blksize = ATRNUM_BLOCK_SIZE;
 
 	for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++)
@@ -1404,11 +1479,10 @@ int db_read(void)
 
 		if (data.dptr)
 		{
-
-			/*
-	     * Unroll the data into flags and name
-	     */
-
+			/**
+		     * Unroll the data into flags and name
+			 * 
+		     */
 			s = data.dptr;
 
 			while ((s - (char *)data.dptr) < data.dsize)
@@ -1423,10 +1497,10 @@ int db_read(void)
 				if (!s)
 				{
 
-					/*
-		     * Houston, we have a problem
-		     */
-
+					/**
+				     * Houston, we have a problem
+					 * 
+				     */
 					log_write(LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS(i, blksize));
 				}
 
@@ -1437,10 +1511,10 @@ int db_read(void)
 		}
 	}
 
-	/*
+	/**
      * Load the object structures
+	 * 
      */
-
 	if (mudstate.standalone)
 	{
 		log_write(LOG_ALWAYS, "DBR", "LOAD", "Reading ");
@@ -1457,10 +1531,10 @@ int db_read(void)
 		if (data.dptr)
 		{
 
-			/*
-	     * Unroll the data into objnum and object
-	     */
-
+			/**
+		     * Unroll the data into objnum and object
+			 * 
+		     */
 			s = data.dptr;
 
 			while ((s - (char *)data.dptr) < data.dsize)
@@ -1474,11 +1548,10 @@ int db_read(void)
 					log_write_raw(1, ".");
 				}
 
-				/*
-		 * We read the entire object structure in and
-		 * copy it into place
-		 */
-
+				/**
+				 * We read the entire object structure in and copy it into place
+				 * 
+				 */
 				XMEMCPY((void *)&(db[num]), (void *)s, sizeof(DUMPOBJ));
 				s += sizeof(DUMPOBJ);
 
@@ -1496,10 +1569,10 @@ int db_read(void)
 				db[num].attrtext.at_count = 0;
 				db[num].attrtext.atrs = NULL;
 #endif
-				/*
-		 * Check to see if it's a player
-		 */
-
+				/**
+				 * Check to see if it's a player
+				 * 
+				 */
 				if (Typeof(num) == TYPE_PLAYER)
 				{
 					c_Connected(num);
@@ -1525,6 +1598,16 @@ int db_read(void)
 	return (0);
 }
 
+/**
+ * @brief Write an object to a DB
+ * 
+ * @param f			File
+ * @param i			DBref of object
+ * @param db_format	DB Format
+ * @param flags		Flags
+ * @param n_atrt	Number of attributes
+ * @return int 
+ */
 int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 {
 	ATTR *a;
@@ -1616,8 +1699,9 @@ int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 		putlong(f, CreateTime(i));
 	}
 
-	/*
+	/**
      * write the attribute list
+	 * 
      */
 	changed = 0;
 
@@ -1699,6 +1783,14 @@ int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 	return (changed);
 }
 
+/**
+ * @brief Write a db to Flat File
+ * 
+ * @param f			File
+ * @param format	Format of the flatfile
+ * @param version	Version of the flatfile
+ * @return dbref 
+ */
 dbref db_write_flatfile(FILE *f, int format, int version)
 {
 	dbref i;
@@ -1728,10 +1820,10 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		log_write_raw(1, "Writing ");
 	}
 
-	/*
+	/**
      * Attribute cleaning, if standalone.
+	 * 
      */
-
 	if (mudstate.standalone && dbclean)
 	{
 		used_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "used_attrs_table");
@@ -1740,18 +1832,19 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		n_oldtop = anum_alc_top;
 		n_deleted = n_renumbered = n_objt = n_atrt = 0;
 
-		/*
-	 * Non-user defined attributes are always considered used.
-	 */
-
+		/**
+		 * Non-user defined attributes are always considered used.
+		 * 
+		 */
 		for (n = 0; n < A_USER_START; n++)
 		{
 			used_attrs_table[n] = n;
 		}
 
-		/*
-	 * Walk the database. Mark all the attribute numbers in use.
-	 */
+		/**
+		 * Walk the database. Mark all the attribute numbers in use.
+		 * 
+		 */
 		atr_push();
 		DO_WHOLE_DB(i)
 		{
@@ -1761,9 +1854,11 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 			}
 		}
 		atr_pop();
-		/*
-	 * Count up how many attributes we're deleting.
-	 */
+
+		/**
+		 * Count up how many attributes we're deleting.
+		 * 
+		 */
 		vp = vattr_first();
 
 		while (vp)
@@ -1776,14 +1871,13 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 			vp = vattr_next(vp);
 		}
 
-		/*
-	 * Walk the table we've created of used statuses. When we
-	 * find free slots, walk backwards to the first used slot at
-	 * the end of the table. Write the number of the free slot
-	 * into that used slot. Keep a mapping of what things used to
-	 * be.
-	 */
-
+		/**
+		 * Walk the table we've created of used statuses. When we find
+		 * free slots, walk backwards to the first used slot at the end of the
+		 * table. Write the number of the free slot into that used slot. Keep
+		 * a mapping of what things used to be.
+		 * 
+		 */
 		for (n = A_USER_START, end = mudstate.attr_next - 1; (n < mudstate.attr_next) && (n < end); n++)
 		{
 			if (used_attrs_table[n] == 0)
@@ -1802,10 +1896,10 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 			}
 		}
 
-		/*
-	 * Count up our renumbers.
-	 */
-
+		/**
+		 * Count up our renumbers.
+		 * 
+		 */
 		for (n = A_USER_START; n < mudstate.attr_next; n++)
 		{
 			if ((used_attrs_table[n] != n) && (used_attrs_table[n] != 0))
@@ -1819,11 +1913,11 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 			}
 		}
 
-		/*
-	 * The new end of the attribute table is the first thing
-	 * we've renumbered.
-	 */
-
+		/**
+		 * The new end of the attribute table is the first thing
+		 * we've renumbered.
+		 * 
+		 */
 		for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mudstate.attr_next)); anxt++)
 			;
 	}
@@ -1833,17 +1927,18 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		anxt = mudstate.attr_next;
 	}
 
-	/*
+	/**
      * Write database information. TinyMUSH 2 wrote '+V', MUX wrote '+X',
      * 3.0 writes '+T'.
+	 * 
      */
 	fprintf(f, "+T%d\n+S%d\n+N%d\n", flags, mudstate.db_top, anxt);
 	fprintf(f, "-R%d\n", mudstate.record_players);
 
-	/*
+	/**
      * Dump user-named attribute info
+	 * 
      */
-
 	if (mudstate.standalone && dbclean)
 	{
 		for (i = A_USER_START; i < anxt; i++)
@@ -1879,8 +1974,9 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		}
 	}
 
-	/*
+	/**
      * Dump object and attribute info
+	 * 
      */
 	n_objt = n_atrt = 0;
 	DO_WHOLE_DB(i)
@@ -1918,6 +2014,11 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	return (mudstate.db_top);
 }
 
+/**
+ * @brief Write DB to file
+ * 
+ * @return dbref 
+ */
 dbref db_write(void)
 {
 	VATTR *vp;
@@ -1931,17 +2032,22 @@ dbref db_write(void)
 		log_write_raw(1, "Writing ");
 	}
 
-	/*
+	/**
      * Lock the database
+	 * 
      */
 	db_lock();
-	/*
+
+	/**
      * Write database information
+	 * 
      */
 	i = mudstate.attr_next;
-	/*
+
+	/**
      * Roll up various paramaters needed for startup into one record.
      * This should be the only data record of its type
+	 * 
      */
 	c = data.dptr = (int *)XMALLOC(4 * sizeof(int), "c");
 	XMEMCPY((void *)c, (void *)&mudstate.db_top, sizeof(int));
@@ -1951,27 +2057,32 @@ dbref db_write(void)
 	XMEMCPY((void *)c, (void *)&mudstate.record_players, sizeof(int));
 	c++;
 	XMEMCPY((void *)c, (void *)&mudstate.moduletype_top, sizeof(int));
-	/*
+
+	/**
      * "TM3" is our unique key
+	 * 
      */
 	key.dptr = "TM3";
 	key.dsize = strlen("TM3") + 1;
 	data.dsize = 4 * sizeof(int);
 	db_put(key, data, DBTYPE_DBINFO);
 	XFREE(data.dptr);
-	/*
+
+	/**
      * Dump user-named attribute info
-     */
-	/*
+	 * 
      * First, calculate the number of attribute entries we can fit in a
      * block, allowing for some minor DBM key overhead. This should not
      * change unless the size of VNAME_SIZE or LBUF_SIZE changes, in
      * which case you'd have to reload anyway
+	 * 
      */
 	blksize = ATRNUM_BLOCK_SIZE;
-	/*
+
+	/**
      * Step through the attribute number array, writing stuff in 'num'
      * sized chunks
+	 * 
      */
 	data.dptr = (char *)XMALLOC(ATRNUM_BLOCK_BYTES, "data.dptr");
 
@@ -1996,11 +2107,10 @@ dbref db_write(void)
 				{
 					if (vp->flags & AF_DIRTY)
 					{
-						/*
-			 * Only write the dirty
-			 * attribute numbers and
-			 * clear the flag
-			 */
+						/**
+						 * Only write the dirty attribute numbers and clear the flag
+						 * 
+						 */
 						vp->flags &= ~AF_DIRTY;
 						dirty = 1;
 					}
@@ -2016,9 +2126,10 @@ dbref db_write(void)
 
 		if (!num)
 		{
-			/*
-	     * No valid attributes in this block, delete it
-	     */
+			/**
+		     * No valid attributes in this block, delete it
+			 * 
+		     */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			db_del(key, DBTYPE_ATRNUM);
@@ -2026,16 +2137,18 @@ dbref db_write(void)
 
 		if (dirty)
 		{
-			/*
-	     * Something is dirty in this block, write all of the
-	     * attribute numbers in this block
-	     */
+			/**
+		     * Something is dirty in this block, write all of the
+		     * attribute numbers in this block
+			 * 
+		     */
 			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.attr_next); j++)
 			{
-				/*
-		 * j is an offset of attribute numbers into
-		 * the current block
-		 */
+				/**
+				 * j is an offset of attribute numbers into
+				 * the current block
+				 * 
+				 */
 				if ((ENTRY_BLOCK_STARTS(i, blksize) + j) < A_USER_START)
 				{
 					continue;
@@ -2055,9 +2168,10 @@ dbref db_write(void)
 				}
 			}
 
-			/*
-	     * Write the block: Block number is our key
-	     */
+			/**
+		     * Write the block: Block number is our key
+			 * 
+		     */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			data.dsize = s - (char *)data.dptr;
@@ -2066,14 +2180,18 @@ dbref db_write(void)
 	}
 
 	XFREE(data.dptr);
-	/*
+
+	/**
      * Dump object structures using the same block-based method we use to
      * dump attribute numbers
+	 * 
      */
 	blksize = OBJECT_BLOCK_SIZE;
-	/*
+
+	/**
      * Step through the object structure array, writing stuff in 'num'
      * sized chunks
+	 * 
      */
 	data.dptr = (char *)XMALLOC(OBJECT_BLOCK_BYTES, "data.dptr");
 
@@ -2090,21 +2208,21 @@ dbref db_write(void)
 				log_write_raw(1, ".");
 			}
 
-			/*
-	     * We assume you always do a dbck before dump, and
-	     * Going objects are really destroyed!
-	     */
-
+			/**
+		     * We assume you always do a dbck before dump, and
+		     * Going objects are really destroyed!
+			 * 
+		     */
 			if (!Going(j))
 			{
 				if (!mudstate.standalone)
 				{
 					if (Flags3(j) & DIRTY)
 					{
-						/*
-			 * Only write the dirty
-			 * objects and clear the flag
-			 */
+						/**
+						 * Only write the dirty objects and clear the flag
+						 * 
+						 */
 						s_Clean(j);
 						dirty = 1;
 					}
@@ -2120,9 +2238,10 @@ dbref db_write(void)
 
 		if (!num)
 		{
-			/*
-	     * No valid objects in this block, delete it
-	     */
+			/**
+		     * No valid objects in this block, delete it
+			 * 
+		     */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			db_del(key, DBTYPE_OBJECT);
@@ -2130,16 +2249,17 @@ dbref db_write(void)
 
 		if (dirty)
 		{
-			/*
-	     * Something is dirty in this block, write all of the
-	     * objects in this block
-	     */
+			/**
+		     * Something is dirty in this block, write all of the
+		     * objects in this block
+			 * 
+		     */
 			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.db_top); j++)
 			{
-				/*
-		 * j is an offset of object numbers into the
-		 * current block
-		 */
+				/**
+				 * j is an offset of object numbers into the current block
+				 * 
+				 */
 				k = ENTRY_BLOCK_STARTS(i, blksize) + j;
 
 				if (!Going(k))
@@ -2151,9 +2271,10 @@ dbref db_write(void)
 				}
 			}
 
-			/*
-	     * Write the block: Block number is our key
-	     */
+			/**
+		     * Write the block: Block number is our key
+			 * 
+		     */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			data.dsize = s - (char *)data.dptr;
@@ -2162,8 +2283,10 @@ dbref db_write(void)
 	}
 
 	XFREE(data.dptr);
-	/*
+
+	/**
      * Unlock the database
+	 * 
      */
 	db_unlock();
 
@@ -2175,17 +2298,16 @@ dbref db_write(void)
 	return (mudstate.db_top);
 }
 
-/* Open a file pointer for a module to use when writing a flatfile */
-
-FILE *db_module_flatfile(char *filename, int wrflag)
+/**
+ * @brief Open a file pointer for a module to use when writing a flatfile
+ * 
+ * @param filename	Filename
+ * @param wrflag	Open for write or read access.
+ * @return FILE* 
+ */
+FILE *db_module_flatfile(char *filename, bool wrflag)
 {
 	FILE *f = NULL;
-
-	/*
-       if(mudstate.initializing) {
-       mudstate.mfiletab = add_array(mudstate.mfiletab, filename, &mudstate.modulefiles, "db_module_flatfile");
-       }
-     */
 
 	if (wrflag)
 	{

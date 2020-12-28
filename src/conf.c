@@ -36,7 +36,7 @@
 #include "nametabs.h"
 
 /**
- * @note Some systems are lame, and inet_addr() claims to return -1 on failure,
+ * Some systems are lame, and inet_addr() claims to return -1 on failure,
  * despite the fact that it returns an unsigned long. (It's not really a -1,
  * obviously.) Better-behaved systems use INADDR_NONE.
  * 
@@ -83,7 +83,7 @@ void cf_init(void)
     mudconf.log_home = XSTRDUP(DEFAULT_LOG_HOME, "mudconf.log_home");
     mudconf.pid_home = XSTRDUP(DEFAULT_PID_HOME, "mudconf.pid_home");
     /**
-     * @note We can make theses NULL because we are going to define
+     * We can make theses NULL because we are going to define
      * default values later if they are still NULL.
      * 
      */
@@ -438,7 +438,7 @@ void cf_log(dbref player, const char *primary, const char *secondary, char *cmd,
 CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int failure)
 {
     /**
-     * @note If any successes, return SUCCESS(0) if no failures or
+     * If any successes, return SUCCESS(0) if no failures or
      * PARTIAL_SUCCESS(1) if any failures.
      * 
      */
@@ -448,7 +448,7 @@ CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int fail
     }
 
     /**
-     * @note No successes. If no failures indicate nothing done. Always return
+     * No successes. If no failures indicate nothing done. Always return
      * FAILURE(-1)
      */
 
@@ -480,17 +480,12 @@ CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int fail
 CF_Result cf_const(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     /**
-     * @note Fail on any attempt to change the value
+     * Fail on any attempt to change the value
      * 
      */
     cf_log(player, "CNF", "SYNTX", cmd, "Cannot change a constant value");
     return CF_Failure;
 }
-
-/*
- * ---------------------------------------------------------------------------
- * cf_int: Set integer parameter.
- */
 
 /**
  * @brief Set integer parameter.
@@ -505,7 +500,7 @@ CF_Result cf_const(int *vp, char *str, long extra, dbref player, char *cmd)
 CF_Result cf_int(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     /**
-     * @note Copy the numeric value to the parameter
+     * Copy the numeric value to the parameter
      * 
      */
     if ((extra > 0) && ((int)strtol(str, (char **)NULL, 10) > extra))
@@ -533,7 +528,7 @@ CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd)
     int num;
 
     /**
-     * @note Copy the numeric value to the parameter
+     * Copy the numeric value to the parameter
      * 
      */
     num = (int)strtol(str, (char **)NULL, 10);
@@ -570,7 +565,7 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
     int num;
 
     /**
-     * @note No consistency check on initialization.
+     * No consistency check on initialization.
      * 
      */
     if (mudstate.initializing)
@@ -588,7 +583,7 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Otherwise we have to validate this. If 'extra' is non-zero, the
+     * Otherwise we have to validate this. If 'extra' is non-zero, the
      * dbref is allowed to be NOTHING.
      * 
      */
@@ -658,7 +653,7 @@ CF_Result cf_module(int *vp, char *modname, long extra, dbref player, char *cmd)
     mudstate.modules_list = mp;
 
     /**
-     * @note Look up our symbols now, and cache the pointers. They're not going
+     * Look up our symbols now, and cache the pointers. They're not going
      * to change from here on out.
      * 
      */
@@ -714,11 +709,6 @@ CF_Result cf_bool(int *vp, char *str, long extra, dbref player, char *cmd)
     return CF_Success;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * cf_option: Select one option from many choices.
- */
-
 /**
  * @brief Select one option from many choices.
  * 
@@ -744,11 +734,6 @@ CF_Result cf_option(int *vp, char *str, long extra, dbref player, char *cmd)
     return CF_Success;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * cf_string: Set string parameter.
- */
-
 /**
  * @brief Set string parameter.
  * 
@@ -763,7 +748,7 @@ CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     int retval;
     /**
-     * @note Make a copy of the string if it is not too big
+     * Make a copy of the string if it is not too big
      * 
      */
     retval = CF_Success;
@@ -853,7 +838,7 @@ CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
         if (((HASHTAB *)vp)->flags & HT_KEYREF)
         {
             /**
-             * @note hashadd won't copy it, so we do that here
+             * hashadd won't copy it, so we do that here
              * 
              */
             p = alias;
@@ -868,11 +853,6 @@ CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
         return CF_Failure;
     }
 }
-
-/*
- * ---------------------------------------------------------------------------
- * cf_infotext: Add an arbitrary field to INFO output.
- */
 
 /**
  * @brief Add an arbitrary field to INFO output.
@@ -895,7 +875,7 @@ CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
         for (fvalue = tokst; *fvalue && ((*fvalue == ' ') || (*fvalue == '\t')); fvalue++)
         {
             /**
-             * @note Empty loop
+             * Empty loop
              * 
              */
         }
@@ -936,7 +916,7 @@ CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Otherwise we're setting. Replace if we had a previous value.
+     * Otherwise we're setting. Replace if we had a previous value.
      * 
      */
     for (itp = mudconf.infotext_list; itp != NULL; itp = itp->next)
@@ -950,7 +930,7 @@ CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note No previous value. Add a node.
+     * No previous value. Add a node.
      * 
      */
     itp = (LINKEDLIST *)XMALLOC(sizeof(LINKEDLIST), "itp");
@@ -978,7 +958,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     FILE *fptr;
     LOGFILETAB *tp, *lp;
     /**
-     * @note Two args, two args only
+     * Two args, two args only
      * 
      */
     type_str = strtok_r(str, " \t", &tokst);
@@ -991,7 +971,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Find the log.
+     * Find the log.
      * 
      */
     f = search_nametab(GOD, (NAMETAB *)extra, type_str);
@@ -1013,7 +993,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     if (tp == NULL)
     {
         /**
-         * @note This should never happen!
+         * This should never happen!
          * 
          */
         cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Logfile table corruption", str);
@@ -1021,7 +1001,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note We shouldn't have a file open already.
+     * We shouldn't have a file open already.
      * 
      */
     if (tp->filename != NULL)
@@ -1031,7 +1011,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Check to make sure that we don't have this filename open already.
+     * Check to make sure that we don't have this filename open already.
      * 
      */
     fptr = NULL;
@@ -1046,7 +1026,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note We don't have this filename yet. Open the logfile.
+     * We don't have this filename yet. Open the logfile.
      * 
      */
     if (!fptr)
@@ -1081,7 +1061,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Indicate that this is being diverted.
+     * Indicate that this is being diverted.
      * 
      */
     tp->fileptr = fptr;
@@ -1173,7 +1153,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     xfp = *xfuncs;
 
     /**
-     * @note If we're negating, just remove it from the list of functions.
+     * If we're negating, just remove it from the list of functions.
      * 
      */
     if (negate)
@@ -1196,7 +1176,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note Have we encountered this function before?
+     * Have we encountered this function before?
      * 
      */
     np = NULL;
@@ -1211,7 +1191,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note If not, we need to allocate it.
+     * If not, we need to allocate it.
      * 
      */
     if (!np)
@@ -1222,7 +1202,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note Add it to the ones we know about.
+     * Add it to the ones we know about.
      * 
      */
     if (xfunctions.count == 0)
@@ -1240,7 +1220,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note Do we have an existing list of functions? If not, this is easy.
+     * Do we have an existing list of functions? If not, this is easy.
      * 
      */
     if (!xfp)
@@ -1254,7 +1234,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note See if we have an empty slot to insert into.
+     * See if we have an empty slot to insert into.
      * 
      */
     for (i = 0; i < xfp->num_funcs; i++)
@@ -1267,7 +1247,7 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     }
 
     /**
-     * @note Guess not. Tack it onto the end.
+     * Guess not. Tack it onto the end.
      * 
      */
     tp = (NAMEDFUNC **)XREALLOC(xfp->ext_funcs, (xfp->num_funcs + 1) * sizeof(NAMEDFUNC *), "tp");
@@ -1276,11 +1256,6 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
     xfp->num_funcs++;
     return true;
 }
-
-/*
- * ---------------------------------------------------------------------------
- * parse_ext_access: 
- */
 
 /**
  * @brief Parse an extended access list with module callouts.
@@ -1301,7 +1276,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
     int (*hp)(dbref);
 
     /**
-     * @note Walk through the tokens
+     * Walk through the tokens
      * 
      */
     success = failure = 0;
@@ -1310,7 +1285,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
     while (sp != NULL)
     {
         /**
-         * @note Check for negation
+         * Check for negation
          * 
          */
         negate = 0;
@@ -1322,7 +1297,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
         }
 
         /**
-         * @note Set or clear the appropriate bit
+         * Set or clear the appropriate bit
          * 
          */
         f = search_nametab(GOD, ntab, sp);
@@ -1343,7 +1318,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
         else
         {
             /**
-             * @note Is this a module callout?
+             * Is this a module callout?
              * 
              */
             got_one = 0;
@@ -1351,7 +1326,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
             if (!strncmp(sp, "mod_", 4))
             {
                 /**
-                 * @note Split it apart, see if we have anything.
+                 * Split it apart, see if we have anything.
                  * 
                  */
                 s = XMALLOC(MBUF_SIZE, "s");
@@ -1415,7 +1390,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
         }
 
         /**
-         * @note Get the next token
+         * Get the next token
          * 
          */
         sp = strtok_r(NULL, " \t", &tokst);
@@ -1447,7 +1422,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Walk through the tokens
+     * Walk through the tokens
      * 
      */
     success = failure = 0;
@@ -1457,7 +1432,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
     while (sp != NULL)
     {
         /**
-         * @note Set the appropriate bit
+         * Set the appropriate bit
          * 
          */
         fp = (FLAGENT *)hashfind(sp, &mudstate.flags_htab);
@@ -1493,7 +1468,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
         }
 
         /**
-         * @note Get the next token
+         * Get the next token
          * 
          */
         sp = strtok_r(NULL, " \t", &tokst);
@@ -1538,14 +1513,6 @@ CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
 
     return CF_Success;
 }
-
-/*
- * ---------------------------------------------------------------------------
- * sane_inet_addr: inet_addr() does not necessarily do reasonable checking
- * for sane syntax. On certain operating systems, if passed less than four
- * octets, it will cause a segmentation violation. This is unfriendly. We
- * take steps here to deal with it.
- */
 
 /**
  * @brief Replacement for inet_addr()
@@ -1597,7 +1564,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     if ((mask_txt = strchr(str, '/')) == NULL)
     {
         /**
-         * @note Standard IP range and netmask notation.
+         * Standard IP range and netmask notation.
          * 
          */
         addr_txt = strtok_r(str, " \t=,", &tokst);
@@ -1628,7 +1595,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     else
     {
         /**
-         * @note RFC 1517, 1518, 1519, 1520: CIDR IP prefix notation
+         * RFC 1517, 1518, 1519, 1520: CIDR IP prefix notation
          * 
          */
         addr_txt = str;
@@ -1658,7 +1625,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 
     head = (SITE *)*vp;
     /**
-     * @note Parse the access entry and allocate space for it
+     * Parse the access entry and allocate space for it
      * 
      */
 
@@ -1668,7 +1635,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     }
 
     /**
-     * @note Initialize the site entry
+     * Initialize the site entry
      * 
      */
     site->address.s_addr = addr_num.s_addr;
@@ -1677,7 +1644,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     site->next = NULL;
 
     /**
-     * @note Link in the entry. Link it at the start if not initializing, at
+     * Link in the entry. Link it at the start if not initializing, at
      * the end if initializing. This is so that entries in the config 
      * file are processed as you would think they would be, while entries
      * made while running are processed first.
@@ -1706,13 +1673,6 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     return CF_Success;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * cf_cf_access: Set write or read access on config directives kludge: this
- * cf handler uses vp as an extra extra field since the first extra field is
- * taken up with the access nametab.
- */
-
 /**
  * @brief Set write or read access on config directives kludge
  * 
@@ -1730,7 +1690,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra)
 {
     /**
-     * @note Cannot modify parameters set STATIC
+     * Cannot modify parameters set STATIC
      * 
      */
     char *name;
@@ -1832,7 +1792,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     char *s = XMALLOC(MAXPATHLEN, "s");
 
     /**
-     * @note Make a new string so we won't SEGV if given a constant string
+     * Make a new string so we won't SEGV if given a constant string
      * 
      */
     newstr = XMALLOC(MBUF_SIZE, "newstr");
@@ -1858,7 +1818,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     }
 
     /**
-     * @note Check if file exists in given and standard path
+     * Check if file exists in given and standard path
      * 
      */
     XSNPRINTF(s, MAXPATHLEN, "%s.txt", fpath);
@@ -1882,7 +1842,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     fclose(fp);
 
     /**
-     * @note Rebuild Index
+     * Rebuild Index
      * 
      */
     if (helpmkindx(player, confcmd, fpath))
@@ -1924,7 +1884,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     hashadd(s, (int *)cmdp, &mudstate.command_htab, HASH_ALIAS);
 
     /**
-     * @note We may need to grow the helpfiles table, or create it.
+     * We may need to grow the helpfiles table, or create it.
      * 
      */
     if (!mudstate.hfiletab)
@@ -1947,7 +1907,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     }
 
     /**
-     * @note Add or replace the path to the file.
+     * Add or replace the path to the file.
      * 
      */
     if (mudstate.hfiletab[mudstate.helpfiles] != NULL)
@@ -1958,7 +1918,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     mudstate.hfiletab[mudstate.helpfiles] = XSTRDUP(fpath, "mudstate.hfiletab[mudstate.helpfiles]");
 
     /**
-     * @note Initialize the associated hashtable.
+     * Initialize the associated hashtable.
      * 
      */
     hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * mudconf.hash_factor, HT_STR);
@@ -2227,7 +2187,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
     MODULE *mp;
 
     /**
-     * @note Search the config parameter table for the command. If we find it,
+     * Search the config parameter table for the command. If we find it,
      * call the handler to parse the argument. Make sure that if we're standalone,
      * the paramaters we need to load module flatfiles are loaded
      */
@@ -2261,7 +2221,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
     }
 
     /**
-     * @note Config directive not found.  Complain about it.
+     * Config directive not found.  Complain about it.
      * 
      */
     if (!mudstate.standalone)

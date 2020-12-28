@@ -62,8 +62,12 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 		}
 	}
 
-	if (!succ)	/** no such module*/
+	if (!succ)
 	{
+		/** 
+		 * no such module
+		 * 
+		 */
 		return;
 	}
 
@@ -193,11 +197,6 @@ void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
 		}
 	}
 }
-
-/*
- * ---------------------------------------------------------------------------
- * Deal with additional database info.
- */
 
 /**
  * @brief Register a module's DB type.

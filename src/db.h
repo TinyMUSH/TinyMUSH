@@ -1,4 +1,13 @@
-/* db.h */
+/**
+ * @file db.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Attribute interface, some flatfile and object routines
+ * @version 3.3
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
@@ -14,8 +23,10 @@
 #define DBCLOSE dddb_close()
 #define OPTIMIZE (void)dddb_optimize()
 
-/* Macros to help deal with batch writes of attribute numbers and objects */
-
+/** 
+ * @brief Macros to help deal with batch writes of attribute numbers and objects
+ * 
+ */
 #define ATRNUM_BLOCK_SIZE (int)((mudstate.db_block_size - 32) / (2 * sizeof(int) + VNAME_SIZE))
 #define ATRNUM_BLOCK_BYTES (int)((ATRNUM_BLOCK_SIZE) * (2 * sizeof(int) + VNAME_SIZE))
 #define OBJECT_BLOCK_SIZE (int)((mudstate.db_block_size - 32) / (sizeof(int) + sizeof(DUMPOBJ)))
@@ -36,10 +47,10 @@ typedef char boolexp_type;
 typedef struct attr ATTR;
 struct attr
 {
-    const char *name; /* This has to be first.  braindeath. */
-    int number;       /* attr number */
-    int flags;
-    int (*check)(int, dbref, dbref, int, char *);
+    const char *name;                             /*!< This has to be first.  braindeath. */
+    int number;                                   /*!< attr number */
+    int flags;                                    /*!< attr flags */
+    int (*check)(int, dbref, dbref, int, char *); /*!< check function */
 };
 
 extern ATTR attr[];
@@ -49,9 +60,16 @@ extern ATTR **anum_table;
 #define anum_get(x) (anum_table[(x)])
 #define anum_set(x, v) anum_table[(x)] = v
 
-#define ATR_INFO_CHAR '\1' /* Leadin char for attr control data */
+/** 
+ * Leadin char for attr control data
+ * 
+ */
+#define ATR_INFO_CHAR '\1'
 
-/* Boolean expressions, for locks */
+/** 
+ * @brief Boolean expressions, for locks
+ * 
+ */
 #define BOOLEXP_AND 0
 #define BOOLEXP_OR 1
 #define BOOLEXP_NOT 2
@@ -69,143 +87,131 @@ struct boolexp
     boolexp_type type;
     BOOLEXP *sub1;
     BOOLEXP *sub2;
-    dbref thing; /* thing refers to an object */
+    dbref thing; /*!< thing refers to an object */
 };
 
 #define TRUE_BOOLEXP ((BOOLEXP *)NULL)
 
-/* Database format information */
+/** 
+ * @brief Database format information
+ * 
+ */
+#define F_UNKNOWN 0  /*!< Unknown database format */
+#define F_MUSH 1     /*!< MUSH format (many variants) */
+#define F_MUSE 2     /*!< MUSE format */
+#define F_MUD 3      /*!< Old TinyMUD format */
+#define F_MUCK 4     /*!< TinyMUCK format */
+#define F_MUX 5      /*!< TinyMUX format */
+#define F_TINYMUSH 6 /*!< TinyMUSH 3.0 format */
 
-#define F_UNKNOWN 0  /* Unknown database format */
-#define F_MUSH 1     /* MUSH format (many variants) */
-#define F_MUSE 2     /* MUSE format */
-#define F_MUD 3      /* Old TinyMUD format */
-#define F_MUCK 4     /* TinyMUCK format */
-#define F_MUX 5      /* TinyMUX format */
-#define F_TINYMUSH 6 /* TinyMUSH 3.0 format */
-
-#define V_MASK 0x000000ff        /* Database version */
-#define V_ZONE 0x00000100        /* ZONE/DOMAIN field */
-#define V_LINK 0x00000200        /* LINK field (exits from objs) */
-#define V_GDBM 0x00000400        /* attrs are in a gdbm db, not here */
-#define V_ATRNAME 0x00000800     /* NAME is an attr, not in the hdr */
-#define V_ATRKEY 0x00001000      /* KEY is an attr, not in the hdr */
-#define V_PERNKEY 0x00001000     /* PERN: Extra locks in object hdr */
-#define V_PARENT 0x00002000      /* db has the PARENT field */
-#define V_COMM 0x00004000        /* PERN: Comm status in header */
-#define V_ATRMONEY 0x00008000    /* Money is kept in an attribute */
-#define V_XFLAGS 0x00010000      /* An extra word of flags */
-#define V_POWERS 0x00020000      /* Powers? */
-#define V_3FLAGS 0x00040000      /* Adding a 3rd flag word */
-#define V_QUOTED 0x00080000      /* Quoted strings, ala PennMUSH */
-#define V_TQUOTAS 0x00100000     /* Typed quotas */
-#define V_TIMESTAMPS 0x00200000  /* Timestamps */
-#define V_VISUALATTRS 0x00400000 /* ODark-to-Visual attr flags */
-#define V_CREATETIME 0x00800000  /* Create time */
-#define V_DBCLEAN 0x80000000     /* Option to clean attr table */
+#define V_MASK 0x000000ff        /*!< Database version */
+#define V_ZONE 0x00000100        /*!< ZONE/DOMAIN field */
+#define V_LINK 0x00000200        /*!< LINK field (exits from objs) */
+#define V_GDBM 0x00000400        /*!< attrs are in a gdbm db, not here */
+#define V_ATRNAME 0x00000800     /*!< NAME is an attr, not in the hdr */
+#define V_ATRKEY 0x00001000      /*!< KEY is an attr, not in the hdr */
+#define V_PERNKEY 0x00001000     /*!< PERN: Extra locks in object hdr */
+#define V_PARENT 0x00002000      /*!< db has the PARENT field */
+#define V_COMM 0x00004000        /*!< PERN: Comm status in header */
+#define V_ATRMONEY 0x00008000    /*!< Money is kept in an attribute */
+#define V_XFLAGS 0x00010000      /*!< An extra word of flags */
+#define V_POWERS 0x00020000      /*!< Powers? */
+#define V_3FLAGS 0x00040000      /*!< Adding a 3rd flag word */
+#define V_QUOTED 0x00080000      /*!< Quoted strings, ala PennMUSH */
+#define V_TQUOTAS 0x00100000     /*!< Typed quotas */
+#define V_TIMESTAMPS 0x00200000  /*!< Timestamps */
+#define V_VISUALATTRS 0x00400000 /*!< ODark-to-Visual attr flags */
+#define V_CREATETIME 0x00800000  /*!< Create time */
+#define V_DBCLEAN 0x80000000     /*!< Option to clean attr table */
 
 /* special dbref's */
-#define NOTHING (-1)   /* null dbref */
-#define AMBIGUOUS (-2) /* multiple possibilities, for matchers */
-#define HOME (-3)      /* virtual room, represents mover's home */
-#define NOPERM (-4)    /* Error status, no permission */
+#define NOTHING (-1)   /*!< null dbref */
+#define AMBIGUOUS (-2) /*!< multiple possibilities, for matchers */
+#define HOME (-3)      /*!< virtual room, represents mover's home */
+#define NOPERM (-4)    /*!< Error status, no permission */
 
 typedef struct object OBJ;
 struct object
 {
-    dbref location; /* PLAYER, THING: where it is */
-    /* ROOM: dropto: */
-    /* EXIT: where it goes to */
-    dbref contents; /* PLAYER, THING, ROOM: head of
-				 * contentslist */
-    /* EXIT: unused */
-    dbref exits; /* PLAYER, THING, ROOM: head of exitslist */
-    /* EXIT: where it is */
-    dbref next; /* PLAYER, THING: next in contentslist */
-    /* EXIT: next in exitslist */
-    /* ROOM: unused */
-    dbref link; /* PLAYER, THING: home location */
-    /* ROOM, EXIT: unused */
-    dbref parent; /* ALL: defaults for attrs, exits, $cmds, */
-    dbref owner;  /* PLAYER: domain number + class + moreflags */
-    /* THING, ROOM, EXIT: owning player number */
-
-    dbref zone; /* Whatever the object is zoned to. */
-
-    FLAG flags;  /* ALL: Flags set on the object */
-    FLAG flags2; /* ALL: even more flags */
-    FLAG flags3; /* ALL: yet _more_ flags */
-
-    POWER powers;  /* ALL: Powers on object */
-    POWER powers2; /* ALL: even more powers */
-
-    time_t create_time; /* ALL: Time created (used in ObjID) */
-    time_t last_access; /* ALL: Time last accessed */
-    time_t last_mod;    /* ALL: Time last modified */
-
-    /*
+    dbref location;     /*!< PLAYER, THING: where it is */
+                        /*!< ROOM: dropto: */
+                        /*!< EXIT: where it goes to */
+    dbref contents;     /*!< PLAYER, THING, ROOM: head of contentslist */
+                        /*!< EXIT: unused */
+    dbref exits;        /*!< PLAYER, THING, ROOM: head of exitslist */
+                        /*!< EXIT: where it is */
+    dbref next;         /*!< PLAYER, THING: next in contentslist */
+                        /*!< EXIT: next in exitslist */
+                        /*!< ROOM: unused */
+    dbref link;         /*!< PLAYER, THING: home location */
+                        /*!< ROOM, EXIT: unused */
+    dbref parent;       /*!< ALL: defaults for attrs, exits, $cmds, */
+    dbref owner;        /*!< PLAYER: domain number + class + moreflags */
+                        /*!< THING, ROOM, EXIT: owning player number */
+    dbref zone;         /*!< Whatever the object is zoned to. */
+    FLAG flags;         /*!< ALL: Flags set on the object */
+    FLAG flags2;        /*!< ALL: even more flags */
+    FLAG flags3;        /*!< ALL: yet _more_ flags */
+    POWER powers;       /*!< ALL: Powers on object */
+    POWER powers2;      /*!< ALL: even more powers */
+    time_t create_time; /*!< ALL: Time created (used in ObjID) */
+    time_t last_access; /*!< ALL: Time last accessed */
+    time_t last_mod;    /*!< ALL: Time last modified */
+    /**
      * Make sure everything you want to write to the DBM database is in
      * the first part of the structure and included in DUMPOBJ
+     * 
      */
-
-    int name_length;    /* ALL: Length of name string */
-    int stack_count;    /* ALL: number of things on the stack */
-    int vars_count;     /* ALL: number of variables */
-    int struct_count;   /* ALL: number of structures */
-    int instance_count; /* ALL: number of struct instances */
-
-    struct timeval cpu_time_used; /* ALL: CPU time eaten */
-
+    int name_length;              /*!< ALL: Length of name string */
+    int stack_count;              /*!< ALL: number of things on the stack */
+    int vars_count;               /*!< ALL: number of variables */
+    int struct_count;             /*!< ALL: number of structures */
+    int instance_count;           /*!< ALL: number of struct instances */
+    struct timeval cpu_time_used; /*!< ALL: CPU time eaten */
 #ifdef MEMORY_BASED
-    Obj attrtext; /* Array of attribute text */
+    Obj attrtext; /*!< Array of attribute text */
 #endif
 };
 
-/*
- * The DUMPOBJ structure exists for use during database writes. It is a
+/**
+ * @brief The DUMPOBJ structure exists for use during database writes. It is a
  * duplicate of the OBJ structure except for items we don't need to write
+ * 
  */
-
 typedef struct dump_object DUMPOBJ;
 struct dump_object
 {
-    dbref location; /* PLAYER, THING: where it is */
-    /* ROOM: dropto: */
-    /* EXIT: where it goes to */
-    dbref contents; /* PLAYER, THING, ROOM: head of
-				 * contentslist */
-    /* EXIT: unused */
-    dbref exits; /* PLAYER, THING, ROOM: head of exitslist */
-    /* EXIT: where it is */
-    dbref next; /* PLAYER, THING: next in contentslist */
-    /* EXIT: next in exitslist */
-    /* ROOM: unused */
-    dbref link; /* PLAYER, THING: home location */
-    /* ROOM, EXIT: unused */
-    dbref parent; /* ALL: defaults for attrs, exits, $cmds, */
-    dbref owner;  /* PLAYER: domain number + class + moreflags */
-    /* THING, ROOM, EXIT: owning player number */
-
-    dbref zone; /* Whatever the object is zoned to. */
-
-    FLAG flags;  /* ALL: Flags set on the object */
-    FLAG flags2; /* ALL: even more flags */
-    FLAG flags3; /* ALL: yet _more_ flags */
-
-    POWER powers;  /* ALL: Powers on object */
-    POWER powers2; /* ALL: even more powers */
-
-    time_t create_time; /* ALL: Time created (used in ObjID) */
-    time_t last_access; /* ALL: Time last accessed */
-    time_t last_mod;    /* ALL: Time last modified */
+    dbref location;     /*!< PLAYER, THING: where it is */
+                        /*!< ROOM: dropto: */
+                        /*!< EXIT: where it goes to */
+    dbref contents;     /*!< PLAYER, THING, ROOM: head of contentslist */
+                        /*!< EXIT: unused */
+    dbref exits;        /*!< PLAYER, THING, ROOM: head of exitslist */
+                        /*!< EXIT: where it is */
+    dbref next;         /*!< PLAYER, THING: next in contentslist */
+                        /*!< EXIT: next in exitslist */
+                        /*!< ROOM: unused */
+    dbref link;         /*!< PLAYER, THING: home location */
+                        /*!< ROOM, EXIT: unused */
+    dbref parent;       /*!< ALL: defaults for attrs, exits, $cmds, */
+    dbref owner;        /*!< PLAYER: domain number + class + moreflags */
+                        /*!< THING, ROOM, EXIT: owning player number */
+    dbref zone;         /*!< Whatever the object is zoned to. */
+    FLAG flags;         /*!< ALL: Flags set on the object */
+    FLAG flags2;        /*!< ALL: even more flags */
+    FLAG flags3;        /*!< ALL: yet _more_ flags */
+    POWER powers;       /*!< ALL: Powers on object */
+    POWER powers2;      /*!< ALL: even more powers */
+    time_t create_time; /*!< ALL: Time created (used in ObjID) */
+    time_t last_access; /*!< ALL: Time last accessed */
+    time_t last_mod;    /*!< ALL: Time last modified */
 };
 
-typedef char *NAME;
-
-extern OBJ *db;             /*!< struct database */
-extern NAME *names;         /*!< Name buffer */
-extern NAME *purenames;     /*!< Pure Name Buffer */
-extern int anum_alc_top;    /*!< Top of attr num lookup table */
+typedef char *NAME;      /*!< Name type */
+extern OBJ *db;          /*!< struct database */
+extern NAME *names;      /*!< Name buffer */
+extern NAME *purenames;  /*!< Pure Name Buffer */
+extern int anum_alc_top; /*!< Top of attr num lookup table */
 
 #define Location(t) db[t].location
 
@@ -240,9 +246,10 @@ extern int anum_alc_top;    /*!< Top of attr num lookup table */
     db[t].cpu_time_used.tv_sec = n.tv_sec; \
     db[t].cpu_time_used.tv_usec = n.tv_usec
 
-/*
- * If we modify something on the db object that needs to be written at dump
+/**
+ * @brief If we modify something on the db object that needs to be written at dump
  * time, set the object DIRTY
+ * 
  */
 
 #define s_Location(t, n)  \
@@ -331,7 +338,10 @@ extern int anum_alc_top;    /*!< Top of attr num lookup table */
 
 #define Dropper(thing) (Connected(Owner(thing)) && Hearer(thing))
 
-/* Clear a player's aliases, given x (player dbref) and b (alias buffer). */
+/** 
+ * @brief Clear a player's aliases, given x (player dbref) and b (alias buffer).
+ * 
+ */
 #define Clear_Player_Aliases(x, b)                            \
     {                                                         \
         char *cpa__p, *cpa__tokp;                             \

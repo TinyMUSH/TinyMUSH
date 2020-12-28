@@ -136,11 +136,11 @@ void Log_simple_err(dbref obj, dbref loc, const char *errtype)
  * Routines for validating and determining homes.
  */
 
-int can_set_home(dbref player, dbref thing, dbref home)
+bool can_set_home(dbref player, dbref thing, dbref home)
 {
 	if (!Good_obj(player) || !Good_obj(home) || (thing == home))
 	{
-		return 0;
+		return false;
 	}
 
 	switch (Typeof(home))
@@ -150,16 +150,16 @@ int can_set_home(dbref player, dbref thing, dbref home)
 	case TYPE_THING:
 		if (Going(home))
 		{
-			return 0;
+			return false;
 		}
 
 		if (Controls(player, home) || Abode(home) || LinkAnyHome(player))
 		{
-			return 1;
+			return true;
 		}
 	}
 
-	return 0;
+	return false;
 }
 
 dbref new_home(dbref player)

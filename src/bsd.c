@@ -1541,7 +1541,7 @@ void set_signals(void)
 {
 	sigset_t sigs;
 	/**
-	 * @brief We have to reset our signal mask, because of the possibility that
+	 * We have to reset our signal mask, because of the possibility that
 	 * we triggered a restart on a SIGUSR1. If we did so, then the signal became
 	 * blocked, and stays blocked, since control never returns to the caller;
 	 * i.e., further attempts to send a SIGUSR1 would fail.
@@ -1604,7 +1604,7 @@ void check_panicking(int sig)
 	int i;
 
 	/**
-	 * @brief If we are panicking, turn off signal catching and resignal
+	 * If we are panicking, turn off signal catching and resignal
 	 * 
 	 */
 	if (mudstate.panicking)

@@ -32,12 +32,6 @@
 
 //int parsing_internal = 0;
 
-/*
- * ---------------------------------------------------------------------------
- * check_attr: indicate if attribute ATTR on player passes key when checked
- * by the object lockobj
- */
-
 /**
  * @brief indicate if attribute ATTR on player passes key when checked by the object lockobj
  * 
@@ -433,7 +427,7 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 
 	*s++ = '\0';
 	/**
-	 * @note See if left side is valid attribute.  Access to attr is checked
+	 * See if left side is valid attribute.  Access to attr is checked
 	 * on eval. Also allow numeric references to attributes.  It can't hurt us,
 	 * and lets us import stuff that stores attr locks by number instead of by
 	 * name.

@@ -108,4 +108,10 @@ extern CONF conftable[];
  */
 extern LOGFILETAB logfds_table[];
 
+/**
+ * @brief List of built-in attributes
+ *
+ */
+extern ATTR attr[];
+
 #endif /* __NAMETABS_H */

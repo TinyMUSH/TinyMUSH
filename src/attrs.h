@@ -15,7 +15,7 @@
 #define __ATTRS_H
 
 /**
- * @note Flags's attribute 
+ * @brief Flags's attribute 
  * 
  */
 #define AF_ODARK 0x00000001     /*!< players other than owner can't see it */
@@ -52,7 +52,7 @@
 #define AF_FREE_6 0x80000000    /*!< Reserved for futur use */
 
 /**
- * @note General's attributes.
+ * @brief General's attributes.
  * 
  */
 #define A_NULL 0          /*!< Nothing */

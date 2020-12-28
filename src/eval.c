@@ -1,37 +1,46 @@
-/* eval.c - command evaluation and cracking */
+/**
+ * @file eval.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Command evaluation and cracking
+ * @version 3.3
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "udb_defs.h"	/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "powers.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "functions.h"	/* required by code */
-#include "stringutil.h" /* required by code */
+#include "typedefs.h"
+#include "game.h"
+#include "alloc.h"
+#include "flags.h"
+#include "htab.h"
+#include "ltdl.h"
+#include "udb.h"
+#include "udb_defs.h"
+#include "mushconf.h"
+#include "db.h"
+#include "interface.h"
+#include "externs.h"
+#include "powers.h"
+#include "attrs.h"
+#include "functions.h"
+#include "stringutil.h"
 
-/*
- * ---------------------------------------------------------------------------
- * parse_to: Split a line at a character, obeying nesting.  The line is
- * destructively modified (a null is inserted where the delimiter was found)
- * dstr is modified to point to the char after the delimiter, and the
- * function return value points to the found string (space compressed if
- * specified). If we ran off the end of the string without finding the
- * delimiter, dstr is returned as NULL.
+/**
+ * @brief Helper for parse_to
+ * 
+ * @param eval		Evaluation flags
+ * @param first		Is this the first pass?
+ * @param cstr		String buffer
+ * @param rstr		String buffer
+ * @param zstr		String buffer
+ * @return char* 
  */
-
-char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
+char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
 {
 	if ((mudconf.space_compress || (eval & EV_STRIP_TS)) && !(eval & EV_NO_COMPRESS) && !first && (cstr[-1] == ' '))
 	{
@@ -64,11 +73,11 @@ char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
 	return rstr;
 }
 
-/*
+/**
  * We can't change this to just '*zstr++ = *cstr++', because of the inherent
  * problems with copying a memory location to itself.
+ * 
  */
-
 #define NEXTCHAR      \
 	if (cstr == zstr) \
 	{                 \
@@ -78,11 +87,26 @@ char *parse_to_cleanup(int eval, int first, char *cstr, char *rstr, char *zstr)
 	else              \
 		*zstr++ = *cstr++
 
+/**
+ * @brief Split a line at a character, obeying nesting.
+ * 
+ * The line is destructively modified (a null is inserted where the delimiter
+ * was found) dstr is modified to point to the char after the delimiter, and
+ * the function return value points to the found string (space compressed if
+ * specified). If we ran off the end of the string without finding the 
+ * delimiter, dstr is returned as NULL.
+ * 
+ * @param dstr	String to parse
+ * @param delim	Delimiter
+ * @param eval	Evaluation flags
+ * @return char* 
+ */
 char *parse_to(char **dstr, char delim, int eval)
 {
 	char *stack = XMALLOC(32, "stack");
 	char *rstr, *cstr, *zstr;
-	int sp, tp, first, bracketlev;
+	int sp, tp, bracketlev;
+	bool first = true;
 
 	if ((dstr == NULL) || (*dstr == NULL))
 	{
@@ -99,7 +123,6 @@ char *parse_to(char **dstr, char delim, int eval)
 	}
 
 	sp = 0;
-	first = 1;
 	rstr = *dstr;
 
 	if ((mudconf.space_compress || (eval & EV_STRIP_LS)) && !(eval & EV_NO_COMPRESS))
@@ -118,8 +141,8 @@ char *parse_to(char **dstr, char delim, int eval)
 	{
 		switch (*cstr)
 		{
-		case '\\': /* general escape */
-		case '%':  /* also escapes chars */
+		case '\\': /** general escape */
+		case '%':  /** also escapes chars */
 			if ((*cstr == '\\') && (eval & EV_STRIP_ESC))
 			{
 				cstr++;
@@ -134,7 +157,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				NEXTCHAR;
 			}
 
-			first = 0;
+			first = false;
 			break;
 
 		case ']':
@@ -142,14 +165,13 @@ char *parse_to(char **dstr, char delim, int eval)
 			for (tp = sp - 1; (tp >= 0) && (stack[tp] != *cstr); tp--)
 				;
 
-			/*
-	     * If we hit something on the stack, unwind to it
-	     * Otherwise (it's not on stack), if it's our delim
-	     * we are done, and we convert the delim to a null
-	     * and return a ptr to the char after the null. If
-	     * it's not our delimiter, skip over it normally
-	     */
-
+			/**
+		     * If we hit something on the stack, unwind to it Otherwise (it's
+			 * not on stack), if it's our delim we are done, and we convert the
+			 * delim to a null and return a ptr to the char after the null. If
+		     * it's not our delimiter, skip over it normally
+			 * 
+	    	 */
 			if (tp >= 0)
 			{
 				sp = tp;
@@ -162,7 +184,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				return rstr;
 			}
 
-			first = 0;
+			first = false;
 			NEXTCHAR;
 			break;
 
@@ -222,7 +244,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				NEXTCHAR;
 			}
 
-			first = 0;
+			first = false;
 			break;
 
 		default:
@@ -236,7 +258,7 @@ char *parse_to(char **dstr, char delim, int eval)
 
 			switch (*cstr)
 			{
-			case ' ': /* space */
+			case ' ': /** space */
 				if (mudconf.space_compress && !(eval & EV_NO_COMPRESS))
 				{
 					if (first)
@@ -259,7 +281,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				}
 
 				NEXTCHAR;
-				first = 0;
+				first = false;
 				break;
 
 			case '(':
@@ -269,7 +291,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				}
 
 				NEXTCHAR;
-				first = 0;
+				first = false;
 				break;
 
 			case ESC_CHAR:
@@ -293,11 +315,11 @@ char *parse_to(char **dstr, char delim, int eval)
 					NEXTCHAR;
 				}
 
-				first = 0;
+				first = false;
 				break;
 
 			default:
-				first = 0;
+				first = false;
 				NEXTCHAR;
 				break;
 			}
@@ -310,14 +332,25 @@ char *parse_to(char **dstr, char delim, int eval)
 	return rstr;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * parse_arglist: Parse a line into an argument list contained in lbufs. A
- * pointer is returned to whatever follows the final delimiter. If the
+/**
+ * @brief Parse a line into an argument list contained in lbufs.
+ * 
+ * A pointer is returned to whatever follows the final delimiter. If the
  * arglist is unterminated, a NULL is returned.  The original arglist is
  * destructively modified.
+ * 
+ * @param player	DBref of player
+ * @param caller	DBref of caller
+ * @param cause		DBref of cause
+ * @param dstr		Destination buffer
+ * @param delim		Delimiter
+ * @param eval		DBref of victim
+ * @param fargs		Function arguments
+ * @param nfargs	Number of function arguments
+ * @param cargs		Command arguments
+ * @param ncargs	Niimber of command arguments
+ * @return char* 
  */
-
 char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char delim, dbref eval, char *fargs[], dbref nfargs, char *cargs[], dbref ncargs)
 {
 	char *rstr, *tstr, *bp, *str;
@@ -366,12 +399,12 @@ char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char de
 	return dstr;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * exec: Process a command line, evaluating function calls and
- * %-substitutions.
+/**
+ * @brief Process a command line, evaluating function calls and %-substitutions.
+ * 
+ * @param player	DBref of player
+ * @return int 
  */
-
 int get_gender(dbref player)
 {
 	char first, *atr_gotten;
@@ -402,11 +435,6 @@ int get_gender(dbref player)
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Trace cache routines.
- */
-
 typedef struct tcache_ent TCENT;
 
 struct tcache_ent
@@ -418,6 +446,10 @@ struct tcache_ent
 
 int tcache_top, tcache_count;
 
+/**
+ * @brief Initialize trace cache
+ * 
+ */
 void tcache_init(void)
 {
 	tcache_head = NULL;
@@ -425,6 +457,11 @@ void tcache_init(void)
 	tcache_count = 0;
 }
 
+/**
+ * @brief Empty trace cache
+ * 
+ * @return int 
+ */
 int tcache_empty(void)
 {
 	if (tcache_top)
@@ -437,6 +474,12 @@ int tcache_empty(void)
 	return 0;
 }
 
+/**
+ * @brief Add to the trace cache
+ * 
+ * @param orig		Origin buffer
+ * @param result	Result buffer
+ */
 void tcache_add(char *orig, char *result)
 {
 	char *tp;
@@ -467,6 +510,11 @@ void tcache_add(char *orig, char *result)
 	}
 }
 
+/**
+ * @brief Terminate trace cache
+ * 
+ * @param player	DBref of player
+ */
 void tcache_finish(dbref player)
 {
 	TCENT *xp;
@@ -483,10 +531,10 @@ void tcache_finish(dbref player)
 		}
 		else
 		{
-			/*
-	     * Ick. If we have no pointer, we should have no
-	     * flag.
-	     */
+			/**
+		     * Ick. If we have no pointer, we should have no
+		     * flag.
+	    	 */
 			s_Flags3(player, Flags3(player) & ~HAS_REDIRECT);
 			target = Owner(player);
 		}
@@ -511,7 +559,7 @@ void tcache_finish(dbref player)
 }
 
 /**
- * @brief ASCII table for reference
+ * ASCII table for reference
  * 
  *		0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F   
  * 0	NUL	SOH	STX	ETX	EOT	ENQ	ACK	BEL	BS	TAB	LF	VT	FF	CR	SO	SI
@@ -548,8 +596,8 @@ bool special_char(unsigned char ch)
 		return true;
 	case 0x23: // ' # '
 		/**
-		 * @brief We adjust the return value in order to avoid always treating '#' 
-		 *        like a special character, as it gets used a whole heck of a lot.
+		 * We adjust the return value in order to avoid always treating '#' 
+		 * like a special character, as it gets used a whole heck of a lot.
 		 * 
 		 */
 		return (mudstate.in_loop || mudstate.in_switch) ? 1 : 0;
@@ -606,7 +654,7 @@ char *get_subj(int subj)
  * @brief Get Possessive Adjective pronoun
  * 
  * @param subj	id of the pronoun
- * @return char* pronoun
+ * @return char*
  */
 char *get_poss(int poss)
 {
@@ -628,7 +676,7 @@ char *get_poss(int poss)
  * @brief Get Object pronoun
  * 
  * @param subj	id of the pronoun
- * @return char* pronoun
+ * @return char*
  */
 char *get_obj(int obj)
 {
@@ -650,7 +698,7 @@ char *get_obj(int obj)
  * @brief Get Absolute Possessive pronoun
  * 
  * @param subj	id of the pronoun
- * @return char* pronoun
+ * @return char*
  */
 char *get_absp(int absp)
 {
@@ -668,6 +716,19 @@ char *get_absp(int absp)
 	return STRING_EMPTY;
 }
 
+/**
+ * @brief Execute commands
+ * 
+ * @param buff		Output buffer
+ * @param bufc		Output buffer tracker
+ * @param player	DBref of player
+ * @param caller	DBref of caller
+ * @param cause		DBref of cause
+ * @param eval		Evaluation flags
+ * @param dstr		Destination Buffer
+ * @param cargs		Command arguments
+ * @param ncargs	Number of command arguments
+ */
 void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs)
 {
 	char *real_fargs[MAX_NFARGS + 1];
@@ -701,10 +762,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	is_trace = Trace(player) && !(eval & EV_NOTRACE);
 	is_top = 0;
 
-	/*
+	/**
      * Extend the buffer if we need to.
+	 * 
      */
-
 	if (((*bufc) - buff) > (LBUF_SIZE - SBUF_SIZE))
 	{
 		realbuff = buff;
@@ -714,8 +775,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	}
 
 	oldp = start = *bufc;
-	/*
+
+	/**
      * If we are tracing, save a copy of the starting buffer
+	 * 
      */
 	savestr = NULL;
 
@@ -730,11 +793,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	{
 		if (!special_char((unsigned char)**dstr))
 		{
-			/*
-	     * Mundane characters are the most common. There are
-	     * usually a bunch in a row. We should just copy
-	     * them.
-	     */
+			/**
+		     * Mundane characters are the most common. There are
+		     * usually a bunch in a row. We should just copy
+		     * them.
+			 * 
+	    	 */
 			mundane = *dstr;
 			nchar = 0;
 
@@ -752,10 +816,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			at_space = 0;
 		}
 
-		/*
-	 * We must have a special character at this point.
-	 */
-
+		/**
+		 * We must have a special character at this point.
+		 * 
+		 */
 		if (**dstr == '\0')
 		{
 			break;
@@ -764,11 +828,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		switch (**dstr)
 		{
 		case ' ':
-
-			/*
-	     * A space.  Add a space if not compressing or if
-	     * previous char was not a space
-	     */
+			/**
+		     * A space.  Add a space if not compressing or if
+		     * previous char was not a space
+			 * 
+		     */
 			if (!(mudconf.space_compress && at_space) || (eval & EV_NO_COMPRESS))
 			{
 				SAFE_LB_CHR(' ', buff, bufc);
@@ -778,10 +842,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '\\':
-			/*
-	     * General escape.  Add the following char without
-	     * special processing
-	     */
+			/**
+		     * General escape.  Add the following char without
+		     * special processing
+			 * 
+		     */
 			at_space = 0;
 			(*dstr)++;
 
@@ -797,11 +862,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '[':
-			/*
-	     * Function start.  Evaluate the contents of the
-	     * square brackets as a function.  If no closing
-	     * bracket, insert the [ and continue.
-	     */
+			/**
+		     * Function start.  Evaluate the contents of the
+		     * square brackets as a function.  If no closing
+	    	 * bracket, insert the [ and continue.
+			 * 
+		     */
 			at_space = 0;
 			tstr = (*dstr)++;
 
@@ -829,11 +895,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '{':
-			/*
-	     * Literal start.  Insert everything up to the
-	     * terminating } without parsing.  If no closing
-	     * brace, insert the { and continue.
-	     */
+			/**
+		     * Literal start.  Insert everything up to the
+		     * terminating } without parsing.  If no closing
+	    	 * brace, insert the { and continue.
+			 * 
+		     */
 			at_space = 0;
 			tstr = (*dstr)++;
 			tbuf = parse_to(dstr, '}', 0);
@@ -850,10 +917,9 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					SAFE_LB_CHR('{', buff, bufc);
 				}
 
-				/*
-		 * Preserve leading spaces (Felan)
-		 */
-
+				/**
+				 * Preserve leading spaces (Felan)
+				 */
 				if (*tbuf == ' ')
 				{
 					SAFE_LB_CHR(' ', buff, bufc);
@@ -874,11 +940,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '%':
-			/*
-	     * Percent-replace start.  Evaluate the chars
-	     * following and perform the appropriate
-	     * substitution.
-	     */
+			/**
+		     * Percent-replace start.  Evaluate the chars
+		     * following and perform the appropriate
+	    	 * substitution.
+			 * 
+		     */
 			at_space = 0;
 			(*dstr)++;
 			savec = **dstr;
@@ -886,11 +953,15 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			switch (savec)
 			{
-			case '\0': /* Null - all done */
+			case '\0':
+				/** 
+				 * Null - all done 
+				 * 
+				 */
 				(*dstr)--;
 				break;
 
-			case '0': /* Command argument number N */
+			case '0':
 			case '1':
 			case '2':
 			case '3':
@@ -900,6 +971,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			case '7':
 			case '8':
 			case '9':
+				/**
+				 * Command argument number N
+				 * 
+				 */
 				i = (**dstr - '0');
 
 				if ((i < ncargs) && (cargs[i] != NULL))
@@ -909,18 +984,30 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'r': /* Carriage return */
+			case 'r':
 			case 'R':
+				/** 
+				 * Carriage return
+				 * 
+				 */
 				SAFE_CRLF(buff, bufc);
 				break;
 
-			case 't': /* Tab */
+			case 't':
 			case 'T':
+				/** 
+				 * Tab 
+				 * 
+				 */
 				SAFE_LB_CHR('\t', buff, bufc);
 				break;
 
-			case 'B': /* Blank */
+			case 'B':
 			case 'b':
+				/** 
+				 * Blank
+				 * 
+				 */
 				SAFE_LB_CHR(' ', buff, bufc);
 				break;
 
@@ -928,56 +1015,70 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			case 'c':
 				if (mudconf.c_cmd_subst)
 				{
+					/**
+					 * %c is last command executed
+					 * 
+					 */
 					SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 					break;
 				}
-
-			/*
-		 * FALLTHRU
-		 */
-			case 'x': /* ANSI color */
+			/**
+			 * %c is color
+			 * 
+			 */
+			case 'x':
 			case 'X':
+				/** 
+				 * ANSI color
+				 * 
+				 */
 				(*dstr)++;
 
 				if (!**dstr)
 				{
-					/*
-		     * Note: There is an interesting
-		     * bug/misfeature in the
-		     * implementation of %v? and %q? --
-		     * if the second character is garbage
-		     * or non-existent, it and the
-		     * leading v or q gets eaten. In the
-		     * interests of not changing the old
-		     * behavior, this is not getting
-		     * "fixed", but in this case, where
-		     * moving the pointer back without
-		     * exiting on an error condition ends
-		     * up turning things black, the
-		     * behavior must by necessity be
-		     * different. So we do  break out of
-		     * the switch.
-		     */
+					/** 
+					 * @note There is an interesting bug/misfeature in the
+					 * implementation of %v? and %q? -- if the second character
+					 * is garbage or non-existent, it and the leading v or q
+					 * gets eaten. In the interests of not changing the old
+					 * behavior, this is not getting "fixed", but in this case,
+					 * where moving the pointer back without exiting on an 
+					 * error condition ends up turning things black, the
+					 * behavior must by necessity be different. So we do break
+					 * out of the switch.
+					 * 
+				     */
 					(*dstr)--;
 					break;
 				}
 
 				if (!mudconf.ansi_colors)
 				{
-					/*
-		     * just skip over the characters
-		     */
+					/**
+				     * just skip over the characters
+				     */
 					break;
 				}
 
 				if (**dstr == '<' || **dstr == '/')
-				{ /* Xterm colors */
+				{ 
+					/**
+					 * Xterm colors
+					 * 
+					 * @todo Fix bugs and streamline implementation
+					 * 
+					 */
+
 					int xterm_isbg = 0;
 
 					while (1)
 					{
 						if (**dstr == '/')
-						{ /* We are dealing with background */
+						{ 
+							/** 
+							 * We are dealing with background 
+							 * 
+							 */
 							xptr = *dstr;
 							(*dstr)++;
 
@@ -993,11 +1094,19 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 						}
 						else
 						{
-							xterm_isbg = 0; /* We are dealing with foreground */
+							/** 
+							 * We are dealing with foreground
+							 * 
+							 */
+							xterm_isbg = 0; 
 						}
 
 						if (**dstr == '<')
-						{ /* Ok we got a color to process */
+						{ 
+							/** 
+							 * Ok we got a color to process
+							 * 
+							 */
 							xptr = *dstr;
 							(*dstr)++;
 
@@ -1017,15 +1126,19 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 							if (**dstr != '>')
 							{
-								/*
-				 * Ran off the end. Back up.
-				 */
+								/**
+								 * Ran off the end. Back up.
+								 * 
+								 */
 								*dstr = xptr;
 								break;
 							}
 
 							*xtp = '\0';
-							/* Now we have the color string... Time to handle it */
+							/** 
+							 * Now we have the color string... Time to handle it
+							 * 
+							 */
 							i = str2xterm(xtbuf);
 
 							if (xterm_isbg)
@@ -1045,7 +1158,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 							break;
 						}
 
-						/* Shall we continue? */
+						/** 
+						 * Shall we continue?
+						 * 
+						 */
 						xptr = *dstr;
 						(*dstr)++;
 
@@ -1071,7 +1187,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '=': /* equivalent of generic v() attr get */
+			case '=': 
+				/** 
+				 * Equivalent of generic v() attr get
+				 * 
+				 */
 				(*dstr)++;
 
 				if (**dstr != '<')
@@ -1099,9 +1219,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (**dstr != '>')
 				{
-					/*
-		     * Ran off the end. Back up.
-		     */
+					/** 
+					 * Ran off the end. Back up.
+					 * 
+					 */
 					*dstr = xptr;
 					break;
 				}
@@ -1125,12 +1246,17 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '_': /* x-variable */
+			case '_':
+				/** 
+				 * x-variable
+				 * 
+				 */
 				(*dstr)++;
 
-				/*
-		 * Check for %_<varname>
-		 */
+				/**
+				 * Check for %_<varname>
+				 * 
+				 */
 				if (**dstr != '<')
 				{
 					ch = tolower(**dstr);
@@ -1167,9 +1293,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					while (**dstr && (**dstr != '>'))
 					{
-						/*
-			 * Copy. No interpretation.
-			 */
+						/**
+						 * Copy. No interpretation.
+						 * 
+						 */
 						ch = tolower(**dstr);
 						SAFE_SB_CHR(ch, xtbuf, &xtp);
 						(*dstr)++;
@@ -1177,12 +1304,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (**dstr != '>')
 					{
-						/*
-			 * We ran off the end of the
-			 * string without finding a
-			 * termination condition. Go
-			 * back.
-			 */
+						/**
+						 * We ran off the end of the string without finding a
+						 * termination condition. Go back.
+						 */
 						*dstr = xptr;
 						break;
 					}
@@ -1197,7 +1322,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'V': /* Variable attribute */
+			case 'V':
+				/** 
+				 * Variable attribute
+				 * 
+				 */
 			case 'v':
 				(*dstr)++;
 				ch = toupper(**dstr);
@@ -1218,7 +1347,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				XFREE(atr_gotten);
 				break;
 
-			case 'Q': /* Local registers */
+			case 'Q':
+				/** 
+				 * Local registers
+				 * 
+				 */
 			case 'q':
 				(*dstr)++;
 
@@ -1263,10 +1396,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (!mudstate.rdata || !mudstate.rdata->xr_alloc)
 				{
-					/*
-		     * We know there's no result, so we
-		     * just advance past.
-		     */
+					/**
+					 * We know there's no result, so we just advance past.
+					 * 
+					 */
 					while (**dstr && (**dstr != '>'))
 					{
 						(*dstr)++;
@@ -1274,9 +1407,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (**dstr != '>')
 					{
-						/*
-			 * Whoops, no end. Go back.
-			 */
+						/**
+						 * Whoops, no end. Go back.
+						 * 
+						 */
 						*dstr = xptr;
 						break;
 					}
@@ -1294,9 +1428,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (**dstr != '>')
 				{
-					/*
-		     * Ran off the end. Back up.
-		     */
+					/**
+				     * Ran off the end. Back up.
+					 * 
+				     */
 					*dstr = xptr;
 					break;
 				}
@@ -1314,7 +1449,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'O': /* Objective pronoun */
+			case 'O':
+				/** 
+				 * Objective pronoun
+				 * 
+				 */
 			case 'o':
 				if (gender < 0)
 				{
@@ -1330,7 +1469,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'P': /* Personal pronoun */
+			case 'P':
+				/** 
+				 * Personal pronoun
+				 * 
+				 */
 			case 'p':
 				if (gender < 0)
 				{
@@ -1349,7 +1492,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'S': /* Subjective pronoun */
+			case 'S':
+				/** 
+				 * Subjective pronoun
+				 * 
+				 */
 			case 's':
 				if (gender < 0)
 				{
@@ -1365,8 +1512,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'A': /* Absolute possessive */
-			case 'a': /* idea from Empedocles */
+			case 'A': 
+			case 'a':
+				/** 
+				 * Absolute possessive - idea from Empedocles
+				 * 
+				 */
 				if (gender < 0)
 				{
 					gender = get_gender(cause);
@@ -1384,21 +1535,37 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '#': /* Invoker DB number */
+			case '#':
+				/** 
+				 * Invoker DB number
+				 * 
+				 */
 				safe_dbref(buff, bufc, cause);
 				break;
 
-			case '!': /* Executor DB number */
+			case '!':
+				/** 
+				 * Executor DB number
+				 * 
+				 */
 				safe_dbref(buff, bufc, player);
 				break;
 
-			case 'N': /* Invoker name */
+			case 'N':
 			case 'n':
+				/** 
+				 * Invoker name
+				 * 
+				 */
 				safe_name(cause, buff, bufc);
 				break;
 
-			case 'L': /* Invoker location db# */
+			case 'L':
 			case 'l':
+				/** 
+				 * Invoker location db#
+				 * 
+				 */
 				if (!(eval & EV_NO_LOCATION))
 				{
 					safe_dbref(buff, bufc, where_is(cause));
@@ -1406,11 +1573,19 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '@': /* Caller dbref */
+			case '@':
+				/** 
+				 * Caller dbref 
+				 * 
+				 */
 				safe_dbref(buff, bufc, caller);
 				break;
 
-			case ':': /* Enactor's objID */
+			case ':': 
+				/** 
+				 * Enactor's objID
+				 * 
+				 */
 				safe_dbref(buff, bufc, cause);
 				SAFE_LB_CHR(':', buff, bufc);
 				SAFE_LTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
@@ -1421,10 +1596,18 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 				break;
 
-			case 'I': /* itext() equivalent */
+			case 'I':
 			case 'i':
-			case 'J': /* itext2() equivalent */
+				/**
+				 * itext() equivalent
+				 * 
+				 */
+			case 'J':
 			case 'j':
+				/** 
+				 * itext2() equivalent
+				 * 
+				 */
 				xtp = *dstr;
 				(*dstr)++;
 
@@ -1435,9 +1618,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				if (**dstr == '-')
 				{
-					/*
-		     * use absolute level number
-		     */
+					/**
+				     * use absolute level number
+					 * 
+				     */
 					(*dstr)++;
 
 					if (!**dstr)
@@ -1454,10 +1638,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 				else
 				{
-					/*
-		     * use number as delta back from
-		     * current
-		     */
+					/**
+				     * use number as delta back from current
+					 * 
+				     */
 					if (!mudstate.in_loop || !isdigit(**dstr))
 					{
 						break;
@@ -1487,19 +1671,35 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '+': /* arguments to function */
+			case '+': 
+				/** 
+				 * Arguments to function 
+				 * 
+				 */
 				SAFE_LTOS(buff, bufc, ncargs, LBUF_SIZE);
 				break;
 
-			case '|': /* piped command output */
+			case '|':
+				/** 
+				 * Piped command output
+				 * 
+				 */
 				SAFE_LB_STR(mudstate.pout, buff, bufc);
 				break;
 
-			case '%': /* Percent - a literal % */
+			case '%': 
+				/** 
+				 * Percent - a literal %
+				 * 
+				 */
 				SAFE_LB_CHR('%', buff, bufc);
 				break;
 
-			default: /* Just copy */
+			default:
+				/** 
+				 * Just copy
+				 * 
+				 */
 				SAFE_LB_CHR(**dstr, buff, bufc);
 			}
 
@@ -1511,10 +1711,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '(':
-			/*
-	     * Arglist start.  See if what precedes is a
-	     * function. If so, execute it if we should.
-	     */
+			/**
+		     * Arglist start.  See if what precedes is a function. If so,
+			 * execute it if we should.
+			 * 
+		     */
 			at_space = 0;
 
 			if (!(eval & EV_FCHECK))
@@ -1523,11 +1724,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				break;
 			}
 
-			/*
-	     * Load an sbuf with an uppercase version of the func
-	     * name, and see if the func exists.  Trim trailing
-	     * spaces from the name if configured.
-	     */
+			/**
+		     * Load an sbuf with an uppercase version of the func name, and see
+			 * if the func exists.  Trim trailing spaces from the name if 
+			 * configured.
+			 * 
+		     */
 			**bufc = '\0';
 			xtp = xtbuf;
 			SAFE_SB_STR(oldp, xtbuf, &xtp);
@@ -1548,9 +1750,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			}
 
 			fp = (FUN *)hashfind(xtbuf, &mudstate.func_htab);
-			/*
-	     * If not a builtin func, check for global func
-	     */
+			/**
+		     * If not a builtin func, check for global func
+			 * 
+		     */
 			ufp = NULL;
 
 			if (fp == NULL)
@@ -1558,10 +1761,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				ufp = (UFUN *)hashfind(xtbuf, &mudstate.ufunc_htab);
 			}
 
-			/*
-	     * Do the right thing if it doesn't exist
-	     */
-
+			/**
+		     * Do the right thing if it doesn't exist
+			 * 
+		     */
 			if (!fp && !ufp)
 			{
 				if (eval & EV_FMAND)
@@ -1580,10 +1783,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			}
 
 			/*
-	     * Get the arglist and count the number of args
-	     * Negative # of args means join subsequent args
-	     */
-
+		     * Get the arglist and count the number of args Negative # of args
+			 * means join subsequent args.
+			 * 
+		     */
 			if (ufp)
 			{
 				nfargs = MAX_NFARGS;
@@ -1610,11 +1813,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			*dstr = parse_arglist(player, caller, cause, *dstr + 1, ')', feval, fargs, nfargs, cargs, ncargs);
 
-			/*
-	     * If no closing delim, just insert the '(' and
-	     * continue normally
-	     */
-
+			/**
+		     * If no closing delim, just insert the '(' and continue normally
+			 * 
+		     */
 			if (!*dstr)
 			{
 				*dstr = tstr;
@@ -1630,9 +1832,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				break;
 			}
 
-			/*
-	     * Count number of args returned
-	     */
+			/**
+		     * Count number of args returned
+			 * 
+		     */
 			(*dstr)--;
 			j = 0;
 
@@ -1643,15 +1846,17 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 
 			nfargs = j;
-			/*
-	     * We've got function(args) now, so back up over
-	     * function name in output buffer
-	     */
+			/**
+		     * We've got function(args) now, so back up over function name in
+			 * output buffer.
+			 * 
+		     */
 			*bufc = oldp;
 
-			/*
-	     * If it's a user-defined function, perform it now.
-	     */
+			/**
+		     * If it's a user-defined function, perform it now.
+			 * 
+		     */
 
 			if (ufp)
 			{
@@ -1718,9 +1923,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					XFREE(tstr);
 				}
 
-				/*
-		 * Return the space allocated for the args
-		 */
+				/**
+				 * Return the space allocated for the args
+				 * 
+				 */
 				mudstate.func_nest_lev--;
 
 				for (i = 0; i < nfargs; i++)
@@ -1733,13 +1939,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				break;
 			}
 
-			/*
-	     * If the number of args is right, perform the func.
-	     * Otherwise return an error message.  Note that
-	     * parse_arglist returns zero args as one null arg,
-	     * so we have to handle that case specially.
-	     */
-
+			/**
+		     * If the number of args is right, perform the func. Otherwise
+			 * return an error message.  Note that parse_arglist returns zero
+			 * args as one null arg, so we have to handle that case specially.
+			 * 
+	    	 */
 			if ((fp->nargs == 0) && (nfargs == 1))
 			{
 				if (!*fargs[0])
@@ -1752,9 +1957,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if ((nfargs == fp->nargs) || (nfargs == -fp->nargs) || (fp->flags & FN_VARARGS))
 			{
-				/*
-		 * Check recursion limit
-		 */
+				/**
+				 * Check recursion limit
+				 * 
+				 */
 				mudstate.func_nest_lev++;
 				mudstate.func_invk_ctr++;
 
@@ -1772,12 +1978,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 				else if (Going(player))
 				{
-					/*
-		     * Deal with the peculiar case of the
-		     * calling object being destroyed
-		     * mid-function sequence, such as
-		     * with a command()/@destroy combo...
-		     */
+					/**
+				     * Deal with the peculiar case of the calling object being destroyed
+				     * mid-function sequence, such as with a command()/@destroy combo...
+					 * 
+				     */
 					SAFE_LB_STR("#-1 BAD INVOKER", buff, bufc);
 				}
 				else if (!Check_Func_Access(player, fp))
@@ -1801,10 +2006,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
 			}
 
-			/*
-	     * Return the space allocated for the arguments
-	     */
-
+			/**
+		     * Return the space allocated for the arguments
+			 * 
+		     */
 			for (i = 0; i < nfargs; i++)
 				if (fargs[i] != NULL)
 				{
@@ -1815,10 +2020,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			break;
 
 		case '#':
-			/*
-	     * We should never reach this point unless we're in a
-	     * loop or switch, thanks to the table lookup.
-	     */
+			/**
+		     * We should never reach this point unless we're in a loop or
+			 * switch, thanks to the table lookup.
+			 * 
+		     */
 			at_space = 0;
 			(*dstr)++;
 
@@ -1847,11 +2053,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 				else if (**dstr == '!')
 				{
-					/*
-		     * Nesting level of loop takes
-		     * precedence over switch nesting
-		     * level.
-		     */
+					/**
+				     * Nesting level of loop takes precedence over switch
+					 * nesting level.
+					 * 
+				     */
 					SAFE_LTOS(buff, bufc, ((mudstate.in_loop) ? (mudstate.in_loop - 1) : mudstate.in_switch), LBUF_SIZE);
 				}
 				else
@@ -1872,23 +2078,23 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		(*dstr)++;
 	}
 
-	/*
+	/**
      * If we're eating spaces, and the last thing was a space, eat it up.
      * Complicated by the fact that at_space is initially true. So check
      * to see if we actually put something in the buffer, too.
+	 * 
      */
-
 	if (mudconf.space_compress && at_space && !(eval & EV_NO_COMPRESS) && (start != *bufc))
 	{
 		(*bufc)--;
 	}
 
-	/*
+	/**
      * The ansi() function knows how to take care of itself. However, if
      * the player used a %x sub in the string, and hasn't yet terminated
      * the color with a %xn yet, we'll have to do it for them.
+	 * 
      */
-
 	if (ansi)
 	{
 		SAFE_ANSI_NORMAL(buff, bufc);
@@ -1896,10 +2102,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 	**bufc = '\0';
 
-	/*
+	/**
      * Report trace information
+	 * 
      */
-
 	if (is_trace)
 	{
 		tcache_add(savestr, start);
@@ -1931,12 +2137,13 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	XFREE(xtbuf);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * save_global_regs, restore_global_regs:  Save and restore the global
- * registers to protect them from various sorts of munging.
+/**
+ * @brief Save the global registers to protect them from various sorts of 
+ * munging.
+ * 
+ * @param funcname	Function name
+ * @return GDATA* 
  */
-
 GDATA *save_global_regs(const char *funcname)
 {
 	GDATA *preserve;
@@ -1954,6 +2161,13 @@ GDATA *save_global_regs(const char *funcname)
 	return preserve;
 }
 
+/**
+ * @brief Restore the global registers to protect them from various sorts of
+ * munging.
+ * 
+ * @param funcname Function name
+ * @param preserve Buffer where globals have been saved to.
+ */
 void restore_global_regs(const char *funcname, GDATA *preserve)
 {
 	if (!mudstate.rdata && !preserve)
@@ -1963,18 +2177,19 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 
 	if (mudstate.rdata && preserve && (mudstate.rdata->dirty == preserve->dirty))
 	{
-		/*
-	 * No change in the values. Move along.
-	 */
+		/**
+		 * No change in the values. Move along.
+		 * 
+		 */
 		Free_RegData(preserve);
 		return;
 	}
 
-	/*
+	/**
      * Rather than doing a big free-and-copy thing, we could just handle
      * changes in the data structure size. Place for future optimization.
+	 * 
      */
-
 	if (!preserve)
 	{
 		Free_RegData(mudstate.rdata);

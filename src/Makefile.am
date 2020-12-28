@@ -1,51 +1,53 @@
-AM_CPPFLAGS		= $(LTDLINCL)
-SUBDIRS			= libltdl
-LIBTOOL_DEPS		= @LIBTOOL_DEPS@
+AM_CPPFLAGS				= $(LTDLINCL)
+SUBDIRS					= libltdl
+LIBTOOL_DEPS			= @LIBTOOL_DEPS@
 
-AUTOMAKE_OPTIONS 	= subdir-objects
+AUTOMAKE_OPTIONS 		= subdir-objects
 
-netmush_C		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-netmush_H		= alloc.h api.h attrs.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h nametabs.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
-netmush_SOURCES		= $(netmush_C) $(netmush_H)
-netmush_LDFLAGS		= -export-dynamic
-netmush_SKEL		= defaults.h.in
-netmush_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+netmush_C				= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+netmush_H				= alloc.h api.h attrs.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h nametabs.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
+netmush_SOURCES			= $(netmush_C) $(netmush_H)
+netmush_LDFLAGS			= -export-dynamic
+netmush_SKEL			= defaults.h.in
+netmush_LDADD			= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES	= $(LTDLDEPS) 
 nodist_netmush_SOURCES	= config.h defaults.h prototypes.h tinymushapi.h version.h
 
-slave_C			= slave.c
-slave_H			= slave.h
-slave_SOURCES		= $(slave_C) $(slave_H)
+slave_C					= slave.c
+slave_H					= slave.h
+slave_SOURCES			= $(slave_C) $(slave_H)
 
-SHARE_DIR		= share
-SHARE_SRC		= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
+SHARE_DIR				= share
+SHARE_SRC				= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 	
-ETC_DIR			= etc
-ETC_SKEL		= $(ETC_DIR)/netmush.conf.example.in
-ETC_SRC			= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
-ETC_BUILD		= $(ETC_DIR)/netmush.conf.example
+ETC_DIR					= etc
+ETC_SKEL				= $(ETC_DIR)/netmush.conf.example.in
+ETC_SRC					= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
+ETC_BUILD				= $(ETC_DIR)/netmush.conf.example
 
-SCRIPT_DIR		= scripts
-SCRIPT_SKEL		= $(SCRIPT_DIR)/Startmush.in
-SCRIPT_SRC		= $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
-SCRIPT_DAT		= $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
-SCRIPT_BUILD		= $(SCRIPT_DIR)/Startmush
+prototypes_SKEL			= prototypes.h.in
 
-version_SKEL		= version.h.in
+SCRIPT_DIR				= scripts
+SCRIPT_SKEL				= $(SCRIPT_DIR)/Startmush.in
+SCRIPT_SRC				= $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
+SCRIPT_DAT				= $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
+SCRIPT_BUILD			= $(SCRIPT_DIR)/Startmush
 
-EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h $(version_SKEL)
+version_SKEL			= version.h.in
 
-CLEANFILES		= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
+EXTRA_DIST				= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h $(version_SKEL) $(prototypes_SKEL)
 
-API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h db.h api.h interface.h externs.h stringutil.h prototypes.h
+CLEANFILES				= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
 
-BUILT_SOURCES		= prototypes.h version.h tinymushapi.h defaults.h netmush.conf.example Startmush
+API_SRC					= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h db.h api.h interface.h externs.h stringutil.h prototypes.h
+
+BUILT_SOURCES			= prototypes.h version.h tinymushapi.h defaults.h netmush.conf.example Startmush
 
 nodist_include_HEADERS	= tinymushapi.h
 
-bin_PROGRAMS		= netmush slave
+bin_PROGRAMS			= netmush slave
 
-CPROTO_INCLUDES		=
+CPROTO_INCLUDES			=
 
 if WANT_MODULE_COMSYS
  SUBDIRS		+= modules/comsys/
@@ -95,34 +97,12 @@ Startmush: $(SCRIPT_DIR)/Startmush.in
 	
 #.PHONY:version.h
 	
-prototypes.h: defaults.h version.h
+prototypes.h: defaults.h version.h prototypes.h.in
 	rm -f prototypes.h
 	touch prototypes.h
-	echo '/* prototypes.h : functioons prototypes */' >_prototypes.h
-	echo '' >> _prototypes.h
-	echo '/*' >> _prototypes.h
-	echo ' * Do not edit this file by hand -- Your changes will be overwritten' >> _prototypes.h
-	echo ' */' >> _prototypes.h
-	echo '' >> _prototypes.h
-	echo '#include "copyright.h"' >> _prototypes.h
-	echo '' >> _prototypes.h
-	echo '#ifndef __PROTOTYPES_H' >> _prototypes.h
-	echo '#define __PROTOTYPES_H' >> _prototypes.h
-	echo '#include "vattr.h"' >> _prototypes.h
-	echo '#include "help.h"' >> _prototypes.h
-	echo '#include "player_c.h"' >> _prototypes.h
-	echo '#include "powers.h"' >> _prototypes.h
-	echo '#include "walkdb.h"' >> _prototypes.h
-	echo '#include "functions.h"' >> _prototypes.h
-	echo '#include "command.h"' >> _prototypes.h
-	echo '#include "match.h"' >> _prototypes.h
-	echo '#include "file_c.h"' >> _prototypes.h
-	echo '#include "player.h"' >> _prototypes.h
-	echo '' >> _prototypes.h
-	for i in $(netmush_C); do echo "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 3 $$i 2>/dev/null)" >> _prototypes.h; echo '' >> _prototypes.h; done
-	echo '#endif /* __PROTOTYPES_H */' >> _prototypes.h
-	rm prototypes.h
-	mv _prototypes.h prototypes.h
+	cp prototypes.h.in prototypes.h
+	for i in $(netmush_C); do echo "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 3 $$i 2>/dev/null)" >> prototypes.h; echo '' >> prototypes.h; done
+	echo '#endif /* __PROTOTYPES_H */' >> prototypes.h
 	chmod -w prototypes.h
 
 version.h: version.h.in
