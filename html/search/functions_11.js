@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['s_5fname_1379',['s_Name',['../db_8c.html#a78ca7ee8a642ada79f8d8ef49be33f87',1,'s_Name(dbref thing, char *s):&#160;db.c'],['../prototypes_8h.html#a78ca7ee8a642ada79f8d8ef49be33f87',1,'s_Name(dbref thing, char *s):&#160;db.c']]],
+  ['s_5fpass_1380',['s_Pass',['../db_8c.html#a15e8f6c514d404a36365dd4dc51b24d4',1,'s_Pass(dbref thing, const char *s):&#160;db.c'],['../prototypes_8h.html#a15e8f6c514d404a36365dd4dc51b24d4',1,'s_Pass(dbref thing, const char *s):&#160;db.c']]],
+  ['safe_5fcopy_5fesccode_1381',['safe_copy_esccode',['../prototypes_8h.html#a93a7ad5dc247fe32daea75ae4b5b4ff3',1,'stringutil.c']]],
+  ['safe_5fexit_5fname_1382',['safe_exit_name',['../db_8c.html#a965f26a4e0de5c48f6007f93ead099be',1,'safe_exit_name(dbref it, char *buff, char **bufc):&#160;db.c'],['../prototypes_8h.html#a965f26a4e0de5c48f6007f93ead099be',1,'safe_exit_name(dbref it, char *buff, char **bufc):&#160;db.c']]],
+  ['safe_5fname_1383',['safe_name',['../db_8c.html#a8325075d7baa2cff5159cf1f6a7db075',1,'safe_name(dbref thing, char *outbuf, char **bufc):&#160;db.c'],['../prototypes_8h.html#a8325075d7baa2cff5159cf1f6a7db075',1,'safe_name(dbref thing, char *outbuf, char **bufc):&#160;db.c']]],
+  ['sane_5finet_5faddr_1384',['sane_inet_addr',['../conf_8c.html#adad360a9cec42e0191855db3094277b2',1,'sane_inet_addr(char *str):&#160;conf.c'],['../prototypes_8h.html#adad360a9cec42e0191855db3094277b2',1,'sane_inet_addr(char *str):&#160;conf.c']]],
+  ['save_5fglobal_5fregs_1385',['save_global_regs',['../eval_8c.html#ae0e4f5fa12ba15004a8af2b1430f891f',1,'save_global_regs(const char *funcname):&#160;eval.c'],['../prototypes_8h.html#ae0e4f5fa12ba15004a8af2b1430f891f',1,'save_global_regs(const char *funcname):&#160;eval.c']]],
+  ['set_5fsignals_1386',['set_signals',['../bsd_8c.html#aba9735e0f75f41b9395899fd503303ad',1,'set_signals(void):&#160;bsd.c'],['../prototypes_8h.html#aba9735e0f75f41b9395899fd503303ad',1,'set_signals(void):&#160;bsd.c']]],
+  ['setup_5fque_1387',['setup_que',['../cque_8c.html#a896f3c235d6140d04b21eb826d95d4f9',1,'setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs):&#160;cque.c'],['../prototypes_8h.html#a896f3c235d6140d04b21eb826d95d4f9',1,'setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs):&#160;cque.c']]],
+  ['shovechars_1388',['shovechars',['../bsd_8c.html#a3f32a5c57953b8fd8fcad92c45ffd8ec',1,'shovechars(int port):&#160;bsd.c'],['../prototypes_8h.html#a3f32a5c57953b8fd8fcad92c45ffd8ec',1,'shovechars(int port):&#160;bsd.c']]],
+  ['show_5fque_1389',['show_que',['../cque_8c.html#ae1fc4d917206108ebc53d0291e268aa1',1,'show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header):&#160;cque.c'],['../prototypes_8h.html#ae1fc4d917206108ebc53d0291e268aa1',1,'show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header):&#160;cque.c']]],
+  ['shutdownsock_1390',['shutdownsock',['../bsd_8c.html#aafa0cfa3f24565358451e3aff1f26642',1,'shutdownsock(DESC *d, int reason):&#160;bsd.c'],['../prototypes_8h.html#aafa0cfa3f24565358451e3aff1f26642',1,'shutdownsock(DESC *d, int reason):&#160;bsd.c']]],
+  ['sighandler_1391',['sighandler',['../bsd_8c.html#abd382ad3c8079e6bd94332234d24f5a0',1,'sighandler(int sig):&#160;bsd.c'],['../prototypes_8h.html#abd382ad3c8079e6bd94332234d24f5a0',1,'sighandler(int sig):&#160;bsd.c']]],
+  ['skip_5fesccode_1392',['skip_esccode',['../prototypes_8h.html#a0fb5ff887ca132e1e1a2b797ca59894e',1,'stringutil.c']]],
+  ['skip_5fwhitespace_1393',['skip_whitespace',['../boolexp_8c.html#a7e9803b84dcc3d1ddd6cf0eb6c4afdc9',1,'skip_whitespace(char **pBuf):&#160;boolexp.c'],['../prototypes_8h.html#a7e9803b84dcc3d1ddd6cf0eb6c4afdc9',1,'skip_whitespace(char **pBuf):&#160;boolexp.c']]],
+  ['special_5fchar_1394',['special_char',['../eval_8c.html#a387f7728c587b3851257e6fe7740b2b0',1,'special_char(unsigned char ch):&#160;eval.c'],['../prototypes_8h.html#ac9ad2c288b8dab221121507a11e2ca68',1,'special_char(unsigned char ch):&#160;eval.c']]],
+  ['str2xterm_1395',['str2xterm',['../prototypes_8h.html#af13548100dd67edeb1f53c49482d4ba3',1,'stringutil.c']]],
+  ['string_5fcompare_1396',['string_compare',['../prototypes_8h.html#afb6d7c8c2f40e28942fd60c35054915b',1,'stringutil.c']]],
+  ['string_5fmatch_1397',['string_match',['../prototypes_8h.html#a3189f6fc705ab76f9e18d2f9a1a46e1f',1,'stringutil.c']]],
+  ['string_5fprefix_1398',['string_prefix',['../prototypes_8h.html#af96d5924e7f236d5628f9ce77f8edb67',1,'stringutil.c']]],
+  ['strip_5fansi_1399',['strip_ansi',['../prototypes_8h.html#a7464d90ae1acb37dd803284f3586b795',1,'stringutil.c']]],
+  ['strip_5fansi_5flen_1400',['strip_ansi_len',['../prototypes_8h.html#aea1db255d5adf4ab375252c9144ba714',1,'stringutil.c']]],
+  ['strip_5fxterm_1401',['strip_xterm',['../prototypes_8h.html#a90ad101d06cc90f7c4a60471a6fd645f',1,'stringutil.c']]]
+];
