@@ -43,9 +43,10 @@
  */
 bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 {
-	char *buff;
-	dbref aowner;
-	int aflags, alen, checkit;
+	char *buff = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0, checkit = 0;
+
 	buff = atr_pget(player, attr->number, &aowner, &aflags, &alen);
 	checkit = false;
 
@@ -79,6 +80,7 @@ bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 BOOLEXP *alloc_boolexp(void)
 {
 	BOOLEXP *b = XMALLOC(sizeof(BOOLEXP), "b");
+
 	b->type = 0;
 	b->thing = 0;
 	b->sub1 = NULL;
@@ -135,12 +137,11 @@ void free_boolexp(BOOLEXP *b)
  */
 bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 {
-	dbref aowner, obj, source;
-	int aflags, alen, c, checkit;
-	char *key, *buff, *buff2, *bp, *str, *pname, *lname;
-	ATTR *a;
-	GDATA *preserve;
-	dbref lock_originator = NOTHING;
+	dbref aowner = NOTHING, obj = NOTHING, source = NOTHING, lock_originator = NOTHING;
+	int aflags = 0, alen = 0, c = 0, checkit = 0;
+	char *key = NULL, *buff = NULL, *buff2 = NULL, *bp = NULL, *str = NULL, *pname = NULL, *lname = NULL;
+	ATTR *a = NULL;
+	GDATA *preserve = NULL;
 
 	if (b == TRUE_BOOLEXP)
 	{
@@ -189,16 +190,20 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		if ((b->sub1->type != BOOLEXP_CONST) || (b->sub1->thing < 0))
 		{
+			pname = log_getname(player);
 			if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
+				
 				log_write(LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type);
 				XFREE(lname);
+				
 			}
 			else
 			{
 				log_write(LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type);
 			}
+			XFREE(pname);
 
 			notify(player, "Sorry, broken lock!");
 			mudstate.lock_nest_lev--;
@@ -356,8 +361,9 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
  */
 bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key)
 {
-	BOOLEXP *b;
+	BOOLEXP *b = NULL;
 	int ret_value = false;
+
 	b = parse_boolexp(player, key, 1);
 
 	if (b == NULL)
@@ -400,10 +406,11 @@ void skip_whitespace(char **pBuf)
  */
 BOOLEXP *test_atr(char *s, dbref parse_player)
 {
-	ATTR *attrib;
-	BOOLEXP *b;
-	char *buff, *s1;
-	int anum, locktype;
+	ATTR *attrib = NULL;
+	BOOLEXP *b = NULL;
+	char *buff = NULL, *s1 = NULL;
+	int anum = 0, locktype = 0;
+
 	buff = XMALLOC(LBUF_SIZE, "buff");
 	XSTRCPY(buff, s);
 
@@ -485,10 +492,11 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
  */
 BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	BOOLEXP *b;
-	char *p, *buf;
+	BOOLEXP *b = NULL;
+	char *p = NULL, *buf = NULL;
 	MSTATE mstate;
 	buf = NULL;
+
 	skip_whitespace(pBuf);
 
 	switch ((**pBuf))
@@ -619,7 +627,8 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	BOOLEXP *b2;
+	BOOLEXP *b2 = NULL;
+
 	skip_whitespace(pBuf);
 
 	switch ((**pBuf))
@@ -742,7 +751,7 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	BOOLEXP *b, *b2;
+	BOOLEXP *b = NULL, *b2 = NULL;
 
 	if ((b = parse_boolexp_F(pBuf, parse_player, parsing_internal)) != TRUE_BOOLEXP)
 	{
@@ -779,7 +788,7 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	BOOLEXP *b, *b2;
+	BOOLEXP *b = NULL, *b2 = NULL;
 
 	if ((b = parse_boolexp_T(pBuf, parse_player, parsing_internal)) != TRUE_BOOLEXP)
 	{
@@ -816,9 +825,9 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal)
 {
-	char *p, *pBuf, *pStore;
+	char *p = NULL, *pBuf = NULL, *pStore = NULL;
 	int num_opens = 0;
-	BOOLEXP *ret;
+	BOOLEXP *ret = NULL;
 	bool parsing_internal = false;
 
 	if (!internal)

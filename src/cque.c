@@ -61,10 +61,11 @@ void delete_qentry(BQUE *qptr)
  */
 int add_to(dbref doer, dbref player, int am, int attrnum)
 {
-	int num, aflags, alen;
-	dbref aowner;
-	char *buff;
-	char *atr_gotten;
+	int num = 0, aflags = 0, alen = 0;
+	dbref aowner = NOTHING;
+	char *buff = NULL;
+	char *atr_gotten = NULL;
+
 	num = (int)strtol(atr_gotten = atr_get(player, attrnum, &aowner, &aflags, &alen), (char **)NULL, 10);
 	XFREE(atr_gotten);
 	num += am;
@@ -160,9 +161,10 @@ bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
  */
 int halt_que(dbref player, dbref object)
 {
-	BQUE *trail, *point, *next;
-	int numhalted, halt_all, i;
-	int *dbrefs_array;
+	BQUE *trail = NULL, *point = NULL, *next = NULL;
+	int numhalted = 0, halt_all = 0, i = 0;
+	int *dbrefs_array  = NULL;
+
 	numhalted = 0;
 	halt_all = ((player == NOTHING) && (object == NOTHING)) ? 1 : 0;
 
@@ -312,7 +314,7 @@ int halt_que(dbref player, dbref object)
  */
 void remove_waitq(BQUE *qptr)
 {
-	BQUE *point, *trail;
+	BQUE *point = NULL, *trail = NULL;
 
 	if (qptr == mudstate.qwait)
 	{
@@ -351,9 +353,9 @@ void remove_waitq(BQUE *qptr)
  */
 void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
-	dbref victim;
-	int qpid;
-	BQUE *qptr, *last, *tmp;
+	dbref victim = NOTHING;
+	int qpid = 0;
+	BQUE *qptr = NULL, *last = NULL, *tmp = NULL;
 
 	if (!is_integer(pidstr))
 	{
@@ -446,8 +448,8 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
  */
 void do_halt(dbref player, dbref cause, int key, char *target)
 {
-	dbref player_targ, obj_targ;
-	int numhalted;
+	dbref player_targ = NOTHING, obj_targ = NOTHING;
+	int numhalted = 0;
 
 	if (key & HALT_PID)
 	{
@@ -545,10 +547,10 @@ void do_halt(dbref player, dbref cause, int key, char *target)
  */
 int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 {
-	BQUE *point, *trail, *next;
-	int num, aflags, alen;
-	dbref aowner;
-	char *str;
+	BQUE *point = NULL, *trail = NULL, *next = NULL;
+	int num = 0, aflags = 0, alen = 0;
+	dbref aowner = NOTHING;
+	char *str  = NULL;
 
 	if (attr)
 	{
@@ -646,11 +648,11 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
  */
 void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 {
-	dbref thing, aowner;
-	int loccount, attr, aflags;
-	ATTR *ap;
-	char *obj;
-	obj = parse_to(&what, '/', 0);
+	dbref thing = NOTHING, aowner = NOTHING;
+	int loccount = 0, attr = 0, aflags = 0;
+	ATTR *ap = NULL;
+	char *obj= parse_to(&what, '/', 0);
+
 	init_match(player, obj, NOTYPE);
 	match_everything(0);
 
@@ -731,10 +733,9 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
  */
 int qpid_next(void)
 {
-	int i;
 	int qpid = qpid_top;
 
-	for (i = 0; i < mudconf.max_qpid; i++)
+	for (int i = 0; i < mudconf.max_qpid; i++)
 	{
 		if (qpid > mudconf.max_qpid)
 		{
@@ -768,9 +769,9 @@ int qpid_next(void)
  */
 BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs)
 {
-	int a, tlen, qpid;
-	BQUE *tmp;
-	char *tptr;
+	int a = 0, tlen = 0, qpid = 0;
+	BQUE *tmp = NULL;
+	char *tptr = NULL;
 
 	/**
      * Can we run commands at all?
@@ -976,7 +977,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
  */
 void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
 {
-	BQUE *tmp, *point, *trail;
+	BQUE *tmp = NULL, *point = NULL, *trail = NULL;
 
 	if (mudconf.control_flags & CF_INTERP)
 	{
@@ -1066,8 +1067,8 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
  */
 void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
-	int qpid, wsecs;
-	BQUE *qptr, *point, *trail;
+	int qpid = 0, wsecs = 0;
+	BQUE *qptr = NULL, *point = NULL, *trail = NULL;
 
 	if (!is_integer(timestr))
 	{
@@ -1195,10 +1196,10 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
  */
 void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {
-	dbref thing, aowner;
-	int howlong, num, attr, aflags;
-	char *what;
-	ATTR *ap;
+	dbref thing = NOTHING, aowner = NOTHING;
+	int howlong = 0, num = 0, attr = 0, aflags = 0;
+	char *what = NULL;
+	ATTR *ap = NULL;
 
 	if (key & WAIT_PID)
 	{
@@ -1331,8 +1332,8 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
  */
 int que_next(void)
 {
-	int min, this;
-	BQUE *point;
+	int min = 0, this = 0;
+	BQUE *point = NULL;
 
 	/**
      * If there are commands in the player queue, we want to run them
@@ -1406,8 +1407,8 @@ int que_next(void)
  */
 void do_second(void)
 {
-	BQUE *trail, *point, *next;
-	char *cmdsave;
+	BQUE *trail  = NULL, *point = NULL, *next = NULL;
+	char *cmdsave = NULL;
 
 	/**
      * move contents of low priority queue onto end of normal one this
@@ -1507,10 +1508,10 @@ void do_second(void)
  */
 int do_top(int ncmds)
 {
-	BQUE *tmp;
-	dbref player;
-	int count;
-	char *cmdsave;
+	BQUE *tmp = NULL;
+	dbref player = NOTHING;
+	int count = 0;
+	char *cmdsave = NULL;
 
 	if ((mudconf.control_flags & CF_DEQUEUE) == 0)
 	{
@@ -1597,10 +1598,11 @@ int do_top(int ncmds)
  */
 void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
-	BQUE *tmp;
-	char *bp, *bufp;
-	int i;
-	ATTR *ap;
+	BQUE *tmp = NULL;
+	char *bp = NULL, *bufp = NULL;
+	int i = 0;
+	ATTR *ap = NULL;
+
 	*qtot = 0;
 	*qent = 0;
 	*qdel = 0;
@@ -1706,9 +1708,9 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  */
 void do_ps(dbref player, dbref cause, int key, char *target)
 {
-	char *bufp;
-	dbref player_targ, obj_targ;
-	int pqent, pqtot, pqdel, oqent, oqtot, oqdel, wqent, wqtot, sqent, sqtot, i;
+	char *bufp = NULL;
+	dbref player_targ = NOTHING, obj_targ = NOTHING;
+	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0, i =0;
 
 	/**
      * Figure out what to list the queue for
@@ -1816,9 +1818,8 @@ void do_ps(dbref player, dbref cause, int key, char *target)
  */
 void do_queue(dbref player, dbref cause, int key, char *arg)
 {
-	BQUE *point;
-	int i, ncmds, was_disabled;
-	was_disabled = 0;
+	BQUE *point = NULL;
+	int i = 0, ncmds = 0, was_disabled = 0;
 
 	if (key == QUEUE_KICK)
 	{

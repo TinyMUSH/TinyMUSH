@@ -58,7 +58,7 @@ extern int slave_socket;
 extern pid_t slave_pid;
 
 FILE *t_fd;
-bool t_is_pipe;
+bool t_is_pipe = false;
 
 /**
  * @brief Close file/stream
@@ -119,9 +119,10 @@ int tf_fiddle(int tfd)
  */
 int tf_xopen(char *fname, int mode)
 {
-    int fd;
-    fd = open(fname, mode, 0600);
+    int fd = open(fname, mode, 0600);
+
     fd = tf_fiddle(fd);
+
     return fd;
 }
 
@@ -167,6 +168,7 @@ void tf_init(void)
 int tf_open(char *fname, int mode)
 {
     tf_xclose(t_fd);
+
     return tf_xopen(fname, mode);
 }
 
@@ -247,8 +249,8 @@ int propdir_ck(int, dbref, dbref, int, char *);
  */
 void fwdlist_set(dbref thing, FWDLIST *ifp)
 {
-    FWDLIST *fp, *xfp;
-    int i, stat = 0;
+    FWDLIST *fp = NULL, *xfp = NULL;
+    int stat = 0;
 
     /** 
      * If fwdlist is null, clear 
@@ -267,7 +269,7 @@ void fwdlist_set(dbref thing, FWDLIST *ifp)
     fp = (FWDLIST *)XMALLOC(sizeof(FWDLIST), "fp");
     fp->data = (int *)XCALLOC(ifp->count, sizeof(int), "fp->data");
 
-    for (i = 0; i < ifp->count; i++)
+    for (int i = 0; i < ifp->count; i++)
     {
         fp->data[i] = ifp->data[i];
     }
@@ -317,7 +319,7 @@ void fwdlist_set(dbref thing, FWDLIST *ifp)
  */
 void fwdlist_clr(dbref thing)
 {
-    FWDLIST *xfp;
+    FWDLIST *xfp = NULL;
     /** 
      * If a forwardlist exists, delete it
      * 
@@ -346,14 +348,12 @@ void fwdlist_clr(dbref thing)
  */
 int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
 {
-    dbref target;
-    char *tp, *bp, *dp;
-    int i, count, errors, fail;
-    int *tmp_array;
-    tmp_array = (int *)XCALLOC((LBUF_SIZE / 2), sizeof(int), "tmp_array");
-    count = 0;
-    errors = 0;
-    bp = tp = XMALLOC(LBUF_SIZE, "tp");
+    dbref target = NOTHING;
+    int i = 0, count = 0, errors = 0, fail = 0;
+    int *tmp_array = (int *)XCALLOC((LBUF_SIZE / 2), sizeof(int), "tmp_array");
+    char *tp = XMALLOC(LBUF_SIZE, "tp");
+    char *dp = NULL, *bp = tp;
+
     XSTRCPY(tp, atext);
 
     do
@@ -440,8 +440,8 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
  */
 int fwdlist_rewrite(FWDLIST *fp, char *atext)
 {
-    char *tp, *bp;
-    int i, count;
+    char *tp = NULL, *bp = NULL;
+    int count = 0;
 
     if (fp && fp->count)
     {
@@ -449,7 +449,7 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
         tp = XMALLOC(SBUF_SIZE, "tp");
         bp = atext;
 
-        for (i = 0; i < fp->count; i++)
+        for (int i = 0; i < fp->count; i++)
         {
             if (Good_obj(fp->data[i]))
             {
@@ -486,8 +486,8 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
  */
 int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
-    FWDLIST *fp;
-    int count;
+    FWDLIST *fp = NULL;
+    int count = 0;
 
     if (mudstate.standalone)
     {
@@ -535,10 +535,10 @@ int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
  */
 FWDLIST *fwdlist_get(dbref thing)
 {
-    dbref aowner;
-    int aflags, alen, errors;
-    char *tp;
+    dbref aowner = NOTHING;
     FWDLIST *fp = NULL;
+    int aflags = 0, alen = 0, errors = 0;
+    char *tp = NULL;
 
     if (!mudstate.standalone)
     {
@@ -565,8 +565,8 @@ FWDLIST *fwdlist_get(dbref thing)
  */
 void propdir_set(dbref thing, PROPDIR *ifp)
 {
-    PROPDIR *fp, *xfp;
-    int i, stat = 0;
+    PROPDIR *fp = NULL, *xfp = NULL;
+    int i = 0, stat = 0;
 
     /** 
      * If propdir list is null, clear
@@ -635,7 +635,7 @@ void propdir_set(dbref thing, PROPDIR *ifp)
  */
 void propdir_clr(dbref thing)
 {
-    PROPDIR *xfp;
+    PROPDIR *xfp = NULL;
 
     /** 
      * If a propdir exists, delete it 
@@ -665,14 +665,12 @@ void propdir_clr(dbref thing)
  */
 int propdir_load(PROPDIR *fp, dbref player, char *atext)
 {
-    dbref target;
-    char *tp, *bp, *dp;
-    int i, count, errors, fail;
-    int *tmp_array;
-    tmp_array = (int *)XCALLOC((LBUF_SIZE / 2), sizeof(int), "tmp_array");
-    count = 0;
-    errors = 0;
-    bp = tp = XMALLOC(LBUF_SIZE, "tp");
+    dbref target = NOTHING;
+    int i = 0, count = 0, errors = 0, fail = 0;
+    int *tmp_array = (int *)XCALLOC((LBUF_SIZE / 2), sizeof(int), "tmp_array");
+    char *tp = XMALLOC(LBUF_SIZE, "tp");
+    char *bp = tp, *dp = NULL;
+
     XSTRCPY(tp, atext);
 
     do
@@ -773,8 +771,8 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
  */
 int propdir_rewrite(PROPDIR *fp, char *atext)
 {
-    char *tp, *bp;
-    int i, count;
+    char *tp = NULL, *bp = NULL;
+    int count = 0;
 
     if (fp && fp->count)
     {
@@ -782,7 +780,7 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
         tp = XMALLOC(SBUF_SIZE, "tp");
         bp = atext;
 
-        for (i = 0; i < fp->count; i++)
+        for (int i = 0; i < fp->count; i++)
         {
             if (Good_obj(fp->data[i]))
             {
@@ -819,8 +817,8 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
  */
 int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
-    PROPDIR *fp;
-    int count;
+    PROPDIR *fp = NULL;
+    int count = 0;
 
     if (mudstate.standalone)
     {
@@ -868,9 +866,9 @@ int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
  */
 PROPDIR *propdir_get(dbref thing)
 {
-    dbref aowner;
-    int aflags, alen, errors;
-    char *tp;
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0, errors = 0;
+    char *tp = NULL;
     PROPDIR *fp = NULL;
 
     if (!mudstate.standalone)
@@ -899,10 +897,10 @@ PROPDIR *propdir_get(dbref thing)
  */
 void safe_name(dbref thing, char *outbuf, char **bufc)
 {
-    dbref aowner;
-    int aflags, alen;
-    time_t save_access_time;
-    char *buff, *buf;
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0;
+    time_t save_access_time = 0L;
+    char *buff = NULL, *buf = NULL;
 
     /** 
      * Retrieving a name never counts against an object's access time.
@@ -939,11 +937,10 @@ void safe_name(dbref thing, char *outbuf, char **bufc)
  */
 char *Name(dbref thing)
 {
-    dbref aowner;
-    int aflags, alen;
-    time_t save_access_time;
-    char *buff, *buf;
-    save_access_time = AccessTime(thing);
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0;
+    char *buff = NULL, *buf = NULL;
+    time_t save_access_time = AccessTime(thing);
 
     if (!purenames[thing])
     {
@@ -974,11 +971,10 @@ char *Name(dbref thing)
  */
 char *PureName(dbref thing)
 {
-    dbref aowner;
-    int aflags, alen;
-    time_t save_access_time;
-    char *buff, *buf;
-    save_access_time = AccessTime(thing);
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0;
+    char *buff = NULL, *buf = NULL;
+    time_t save_access_time = AccessTime(thing);
 
     if (!names[thing])
     {
@@ -1009,8 +1005,8 @@ char *PureName(dbref thing)
  */
 void s_Name(dbref thing, char *s)
 {
-    int len;
-    char *buf;
+    int len = 0;
+    char *buf = NULL;
 
     /* Truncate the name if we have to */
 
@@ -1047,7 +1043,7 @@ void s_Name(dbref thing, char *s)
 void safe_exit_name(dbref it, char *buff, char **bufc)
 {
     char *s = *bufc;
-    char *buf;
+    char *buf = NULL;
     int ansi_state = ANST_NORMAL;
 
     safe_name(it, buff, bufc);
@@ -1097,10 +1093,10 @@ void s_Pass(dbref thing, const char *s)
  */
 void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
 {
-    int success, negate, f;
-    char *buff, *sp, *p, *q, *tbuf, *tokst;
-    VATTR *va;
-    ATTR *va2;
+    int success = 0, negate = 0, f = 0;
+    char *buff = NULL, *sp = NULL, *p = NULL, *q = NULL, *tbuf = NULL, *tokst = NULL;
+    VATTR *va = NULL;
+    ATTR *va2 = NULL;
 
     /** 
      * Look up the user-named attribute we want to play with.
@@ -1266,8 +1262,9 @@ void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
  */
 void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
-    dbref thing, res;
-    char *tname, *buf;
+    dbref thing = NOTHING, res = NOTHING;
+    char *tname = NULL, *buf = NULL;
+
     init_match(player, arg1, NOTYPE);
     match_everything(0);
     thing = noisy_match_result();
@@ -1413,10 +1410,10 @@ void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2)
  */
 void init_attrtab(void)
 {
-    ATTR *a;
-    char *buff, *p, *q;
+    ATTR *a = NULL;
+    char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
+
     hashinit(&mudstate.attr_name_htab, 100 * mudconf.hash_factor, HT_STR);
-    buff = XMALLOC(SBUF_SIZE, "buff");
 
     for (a = attr; a->number; a++)
     {
@@ -1443,10 +1440,10 @@ void init_attrtab(void)
  */
 ATTR *atr_str(char *s)
 {
-    char *buff, *p, *q;
-    static ATTR *a;    /** @todo Should return a buffer instead of a static pointer */
-    static ATTR tattr; /** @todo Should return a buffer instead of a static pointer */
-    VATTR *va;
+    char *buff = NULL, *p = NULL, *q = NULL;
+    static ATTR *a = NULL; /** @todo Should return a buffer instead of a static pointer */
+    static ATTR tattr;     /** @todo Should return a buffer instead of a static pointer */
+    VATTR *va = NULL;
 
     /** 
      * Convert the buffer name to uppercase. Limit length of name.
@@ -1550,8 +1547,8 @@ int anum_alc_top = 0;
  */
 void anum_extend(int newtop)
 {
-    ATTR **anum_table2;
-    int delta, i;
+    ATTR **anum_table2 = NULL;
+    int delta = 0;
 
     if (!mudstate.standalone)
     {
@@ -1580,7 +1577,7 @@ void anum_extend(int newtop)
     {
         anum_table2 = (ATTR **)XCALLOC(newtop + 1, sizeof(ATTR *), "anum_table2");
 
-        for (i = 0; i <= anum_alc_top; i++)
+        for (int i = 0; i <= anum_alc_top; i++)
         {
             anum_table2[i] = anum_table[i];
         }
@@ -1600,7 +1597,7 @@ void anum_extend(int newtop)
  */
 ATTR *atr_num(int anum)
 {
-    VATTR *va;
+    VATTR *va = NULL;
     static ATTR tattr; /** @todo Should return a buffer instead of a static pointer */
 
     /** 
@@ -1647,10 +1644,10 @@ ATTR *atr_num(int anum)
  */
 int mkattr(char *buff)
 {
-    ATTR *ap;
-    VATTR *va;
-    int vflags;
-    KEYLIST *kp;
+    ATTR *ap = NULL;
+    VATTR *va = NULL;
+    int vflags = 0;
+    KEYLIST *kp = NULL;
 
     if (!(ap = atr_str(buff)))
     {
@@ -1705,8 +1702,8 @@ int mkattr(char *buff)
 int al_decode(char **app)
 {
     int atrnum = 0, anum, atrshft = 0;
-    char *ap;
-    ap = *app;
+    char *ap = NULL;
+    ap = *app = NULL;
     bool found = false;
 
     while (!found)
@@ -1742,8 +1739,7 @@ int al_decode(char **app)
  */
 void al_code(char **app, int atrnum)
 {
-    char *ap;
-    ap = *app;
+    char *ap = *app;
     bool found = false;
 
     while (!found)
@@ -1769,10 +1765,10 @@ void al_code(char **app, int atrnum)
  */
 bool Commer(dbref thing)
 {
-    char *s, *as;
-    int attr, aflags, alen;
-    dbref aowner;
-    ATTR *ap;
+    char *s = NULL, *as = NULL;
+    int attr = 0, aflags = 0, alen = 0;
+    dbref aowner = NOTHING;
+    ATTR *ap = NULL;
 
     if ((!Has_Commands(thing) && mudconf.req_cmds_flag) || Halted(thing))
     {
@@ -1816,8 +1812,8 @@ bool Commer(dbref thing)
  */
 void al_extend(char **buffer, int *bufsiz, int len, bool copy)
 {
-    char *tbuff;
-    int newsize;
+    char *tbuff = NULL;
+    int newsize = 0;
 
     if (len > *bufsiz)
     {
@@ -1884,8 +1880,8 @@ void al_store(void)
  */
 char *al_fetch(dbref thing)
 {
-    char *astr;
-    int len;
+    char *astr = NULL;
+    int len = 0;
 
     /** 
      * We only need fetch if we change things
@@ -1927,8 +1923,8 @@ char *al_fetch(dbref thing)
  */
 void al_add(dbref thing, int attrnum)
 {
-    char *abuf, *cp;
-    int anum;
+    char *abuf = NULL, *cp = NULL;
+    int anum = 0;
 
     /** 
      * If trying to modify List attrib, return.  Otherwise, get the
@@ -1993,8 +1989,8 @@ void al_add(dbref thing, int attrnum)
  */
 void al_delete(dbref thing, int attrnum)
 {
-    int anum;
-    char *abuf, *cp, *dp;
+    int anum = 0;
+    char *abuf = NULL, *cp = NULL, *dp = NULL;
 
     /** 
      * If trying to modify List attrib, return.  Otherwise, get the attribute list.
@@ -2119,8 +2115,8 @@ char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
  */
 void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr, int *alen)
 {
-    char *cp;
-    int neg;
+    char *cp = NULL;
+    int neg = 0;
 
     /** 
      * See if the first char of the attribute is the special character
@@ -2314,9 +2310,10 @@ void atr_clr(dbref thing, int atr)
  */
 void atr_add_raw(dbref thing, int atr, char *buff)
 {
-    Attr *a;
+    Attr *a = NULL;
     Aname okey;
     DBData key, data;
+
     makekey(thing, atr, &okey);
 
     if (!buff || !*buff)
@@ -2419,7 +2416,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
  */
 void atr_add(dbref thing, int atr, char *buff, dbref owner, int flags)
 {
-    char *tbuff;
+    char *tbuff = NULL;
 
     if (!buff || !*buff)
     {
@@ -2442,11 +2439,12 @@ void atr_add(dbref thing, int atr, char *buff, dbref owner, int flags)
  */
 void atr_set_owner(dbref thing, int atr, dbref owner)
 {
-    dbref aowner;
-    int aflags, alen;
-    char *buff;
-    buff = atr_get(thing, atr, &aowner, &aflags, &alen);
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0;
+    char *buff = atr_get(thing, atr, &aowner, &aflags, &alen);
+
     atr_add(thing, atr, buff, owner, aflags);
+
     XFREE(buff);
 }
 
@@ -2459,11 +2457,12 @@ void atr_set_owner(dbref thing, int atr, dbref owner)
  */
 void atr_set_flags(dbref thing, int atr, dbref flags)
 {
-    dbref aowner;
-    int aflags, alen;
-    char *buff;
-    buff = atr_get(thing, atr, &aowner, &aflags, &alen);
+    dbref aowner = NOTHING;
+    int aflags = 0, alen = 0;
+    char *buff = atr_get(thing, atr, &aowner, &aflags, &alen);
+
     atr_add(thing, atr, buff, aowner, flags);
+
     XFREE(buff);
 }
 
@@ -2513,8 +2512,7 @@ char *atr_get_raw(dbref thing, int atr)
  */
 char *atr_get_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
-    char *buff;
-    buff = atr_get_raw(thing, atr);
+    char *buff = atr_get_raw(thing, atr);
 
     if (!buff)
     {
@@ -2543,8 +2541,8 @@ char *atr_get_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *
  */
 char *atr_get(dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
-    char *buff;
-    buff = XMALLOC(LBUF_SIZE, "buff");
+    char *buff = XMALLOC(LBUF_SIZE, "buff");
+
     return atr_get_str(buff, thing, atr, owner, flags, alen);
 }
 
@@ -2559,9 +2557,8 @@ char *atr_get(dbref thing, int atr, dbref *owner, int *flags, int *alen)
  */
 bool atr_get_info(dbref thing, int atr, dbref *owner, int *flags)
 {
-    int alen;
-    char *buff;
-    buff = atr_get_raw(thing, atr);
+    int alen = 0;
+    char *buff = atr_get_raw(thing, atr);
 
     if (!buff)
     {
@@ -2587,11 +2584,12 @@ bool atr_get_info(dbref thing, int atr, dbref *owner, int *flags)
  */
 char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
-    char *buff;
-    dbref parent;
-    int lev;
-    ATTR *ap;
-    PROPDIR *pp;
+    char *buff = NULL;
+    dbref parent = NOTHING;
+    int lev = 0;
+    ATTR *ap = NULL;
+    PROPDIR *pp = NULL;
+
     ITER_PARENTS(thing, parent, lev)
     {
         buff = atr_get_raw(parent, atr);
@@ -2659,8 +2657,8 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
  */
 char *atr_pget(dbref thing, int atr, dbref *owner, int *flags, int *alen)
 {
-    char *buff;
-    buff = XMALLOC(LBUF_SIZE, "buff");
+    char *buff = XMALLOC(LBUF_SIZE, "buff");
+
     return atr_pget_str(buff, thing, atr, owner, flags, alen);
 }
 
@@ -2675,11 +2673,12 @@ char *atr_pget(dbref thing, int atr, dbref *owner, int *flags, int *alen)
  */
 int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
 {
-    char *buff;
-    dbref parent;
-    int lev, alen;
-    ATTR *ap;
-    PROPDIR *pp;
+    char *buff = NULL;
+    dbref parent = NOTHING;
+    int lev = 0, alen = 0;
+    ATTR *ap = NULL;
+    PROPDIR *pp = NULL;
+
     ITER_PARENTS(thing, parent, lev)
     {
         buff = atr_get_raw(parent, atr);
@@ -2740,8 +2739,9 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
  */
 void atr_free(dbref thing)
 {
-    int attr;
-    char *as;
+    int attr = 0;
+    char *as = NULL;
+
     atr_push();
 
     for (attr = atr_head(thing, &as); attr; attr = atr_next(&as))
@@ -2768,12 +2768,11 @@ void atr_free(dbref thing)
  */
 void atr_cpy(dbref player, dbref dest, dbref source)
 {
-    int attr, aflags, alen;
-    dbref owner, aowner;
-    char *as, *buf;
-    ATTR *at;
-    owner = Owner(dest);
-    buf = XMALLOC(LBUF_SIZE, "buf");
+    int attr = 0, aflags = 0, alen = 0;
+    ATTR *at = NULL;
+    dbref aowner = NOTHING, owner = Owner(dest);
+    char *as = NULL, *buf = XMALLOC(LBUF_SIZE, "buf");
+
     atr_push();
 
     for (attr = atr_head(source, &as); attr; attr = atr_next(&as))
@@ -2816,11 +2815,10 @@ void atr_cpy(dbref player, dbref dest, dbref source)
  */
 void atr_chown(dbref obj)
 {
-    int attr, aflags, alen;
-    dbref owner, aowner;
-    char *as, *buf;
-    owner = Owner(obj);
-    buf = XMALLOC(LBUF_SIZE, "buf");
+    int attr = 0, aflags = 0, alen = 0;
+    dbref aowner = NOTHING, owner = Owner(obj);
+    char *as, *buf = XMALLOC(LBUF_SIZE, "buf");
+
     atr_push();
 
     for (attr = atr_head(obj, &as); attr; attr = atr_next(&as))
@@ -2861,14 +2859,15 @@ int atr_next(char **attrp)
  */
 void atr_push(void)
 {
-    ALIST *new_alist;
-    new_alist = (ALIST *)XMALLOC(SBUF_SIZE, "new_alist");
+    ALIST *new_alist = (ALIST *)XMALLOC(SBUF_SIZE, "new_alist");
+
     new_alist->data = mudstate.iter_alist.data;
     new_alist->len = mudstate.iter_alist.len;
     new_alist->next = mudstate.iter_alist.next;
     mudstate.iter_alist.data = NULL;
     mudstate.iter_alist.len = 0;
     mudstate.iter_alist.next = new_alist;
+
     return;
 }
 
@@ -2878,9 +2877,7 @@ void atr_push(void)
  */
 void atr_pop(void)
 {
-    ALIST *old_alist;
-    char *cp;
-    old_alist = mudstate.iter_alist.next;
+    ALIST *old_alist = mudstate.iter_alist.next;
 
     if (mudstate.iter_alist.data)
     {
@@ -2892,8 +2889,7 @@ void atr_pop(void)
         mudstate.iter_alist.data = old_alist->data;
         mudstate.iter_alist.len = old_alist->len;
         mudstate.iter_alist.next = old_alist->next;
-        cp = (char *)old_alist;
-        XFREE(cp);
+        XFREE((char *)old_alist);
     }
     else
     {
@@ -2914,8 +2910,8 @@ void atr_pop(void)
  */
 int atr_head(dbref thing, char **attrp)
 {
-    char *astr;
-    int alen;
+    char *astr = NULL;
+    int alen = 0;
 
     /** 
      * Get attribute list. Save a read if it is in the modify atr list
@@ -2961,7 +2957,7 @@ int atr_head(dbref thing, char **attrp)
  */
 void initialize_objects(dbref first, dbref last)
 {
-    dbref thing;
+    dbref thing = NOTHING;
 
     for (thing = first; thing < last; thing++)
     {
@@ -2990,11 +2986,11 @@ void initialize_objects(dbref first, dbref last)
  */
 void db_grow(dbref newtop)
 {
-    int newsize, marksize, delta, i;
-    MARKBUF *newmarkbuf;
-    OBJ *newdb;
-    NAME *newnames, *newpurenames;
-    char *cp;
+    int newsize = 0, marksize = 0, delta = 0;
+    MARKBUF *newmarkbuf = NULL;
+    OBJ *newdb = NULL;
+    NAME *newnames = NULL, *newpurenames = NULL;
+    char *cp = NULL;
 
     if (!mudstate.standalone)
     {
@@ -3028,7 +3024,7 @@ void db_grow(dbref newtop)
      */
     if (newtop <= mudstate.db_size)
     {
-        for (i = mudstate.db_top; i < newtop; i++)
+        for (int i = mudstate.db_top; i < newtop; i++)
         {
             names[i] = NULL;
             purenames[i] = NULL;
@@ -3095,7 +3091,7 @@ void db_grow(dbref newtop)
     	 */
         names = newnames;
 
-        for (i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < SIZE_HACK; i++)
         {
             names[i] = NULL;
         }
@@ -3133,7 +3129,7 @@ void db_grow(dbref newtop)
     	 */
         purenames = newpurenames;
 
-        for (i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < SIZE_HACK; i++)
         {
             purenames[i] = NULL;
         }
@@ -3173,7 +3169,7 @@ void db_grow(dbref newtop)
     	 */
         db = newdb;
 
-        for (i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < SIZE_HACK; i++)
         {
             s_Owner(i, GOD);
             s_Flags(i, (TYPE_GARBAGE | GOING));
@@ -3199,7 +3195,7 @@ void db_grow(dbref newtop)
      */
     CALL_ALL_MODULES(db_grow, (newsize, newtop));
 
-    for (i = mudstate.db_top; i < newtop; i++)
+    for (int i = mudstate.db_top; i < newtop; i++)
     {
         names[i] = NULL;
         purenames[i] = NULL;
@@ -3233,13 +3229,10 @@ void db_grow(dbref newtop)
  */
 void db_free(void)
 {
-    char *cp;
-
     if (db != NULL)
     {
         db -= SIZE_HACK;
-        cp = (char *)db;
-        XFREE(cp);
+        XFREE((char *)db);
         db = NULL;
     }
 
@@ -3254,7 +3247,8 @@ void db_free(void)
  */
 void db_make_minimal(void)
 {
-    dbref obj;
+    dbref obj = NOTHING;
+
     db_free();
     db_grow(1);
     s_Name(0, "Limbo");
@@ -3300,10 +3294,9 @@ void db_make_minimal(void)
  */
 dbref parse_dbref_only(const char *s)
 {
-    const char *p;
     int x;
 
-    for (p = s; *p; p++)
+    for (const char *p = s; *p; p++)
     {
         if (!isdigit(*p))
         {
@@ -3324,9 +3317,9 @@ dbref parse_dbref_only(const char *s)
  */
 dbref parse_objid(const char *s, const char *p)
 {
-    dbref it;
-    time_t tt;
-    const char *r;
+    dbref it = NOTHING;
+    time_t tt = 0L;
+    const char *r = NULL;
     char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
     ;
 
@@ -3384,12 +3377,11 @@ dbref parse_objid(const char *s, const char *p)
  */
 dbref parse_dbref(const char *s)
 {
-    const char *p;
     int x;
 
     /* Either pure dbrefs or objids are okay */
 
-    for (p = s; *p; p++)
+    for (const char *p = s; *p; p++)
     {
         if (!isdigit(*p))
         {
@@ -3467,10 +3459,8 @@ void putstring(FILE *f, const char *s)
 char *getstring(FILE *f, bool new_strings)
 {
     char *buf = XMALLOC(LBUF_SIZE, "buf");
-    char *p;
-    int c, lastc;
-    p = buf;
-    c = fgetc(f);
+    char *p = buf;
+    int lastc = 0, c = fgetc(f);
 
     if (!new_strings || (c != '"'))
     {
@@ -3564,7 +3554,7 @@ char *getstring(FILE *f, bool new_strings)
  */
 dbref getref(FILE *f)
 {
-    dbref d = 0;
+    dbref d = NOTHING;
     char *buf = XMALLOC(SBUF_SIZE, "buf");
 
     if (fgets(buf, sizeof(buf), f) != NULL)
@@ -3700,10 +3690,11 @@ bool check_zone_for_player(dbref player, dbref thing)
  */
 void dump_restart_db(void)
 {
-    FILE *f;
-    DESC *d;
+    FILE *f = NULL;
+    DESC *d = NULL;
     int version = 0;
-    char *dbf;
+    char *dbf = NULL;
+
     /** 
      * We maintain a version number for the restart database,
      * so we can restart even if the format of the restart db
@@ -3748,15 +3739,13 @@ void dump_restart_db(void)
  */
 void load_restart_db(void)
 {
-    FILE *f;
-    DESC *d;
-    DESC *p;
-    char *dbf;
-    int val, version, new_strings = 0;
-    char *temp, *buf = XMALLOC(SBUF_SIZE, "buf");
+    DESC *d = NULL;
+    DESC *p = NULL;
     struct stat fstatbuf;
-    dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
-    f = fopen(dbf, "r");
+    int val = 0, version = 0, new_strings = 0;
+    char *temp = NULL, *buf = XMALLOC(SBUF_SIZE, "buf");
+    char *dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    FILE *f = fopen(dbf, "r");
 
     if (!f)
     {

@@ -43,7 +43,8 @@
  */
 dbref parse_linkable_room(dbref player, char *room_name)
 {
-    dbref room;
+    dbref room = NOTHING;
+
     init_match(player, room_name, NOTYPE);
     match_everything(MAT_NO_EXITS | MAT_NUMERIC | MAT_HOME);
     room = match_result();
@@ -87,7 +88,7 @@ dbref parse_linkable_room(dbref player, char *room_name)
  */
 void open_exit(dbref player, dbref loc, char *direction, char *linkto)
 {
-    dbref exit;
+    dbref exit = NOTHING;
 
     if (!Good_obj(loc))
     {
@@ -177,9 +178,8 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
  */
 void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
 {
-    dbref loc, destnum;
-    char *dest;
-    char *s;
+    dbref loc = NOTHING, destnum = NOTHING;
+    char *dest = NULL, *s = NULL;
 
     /**
      * Create the exit and link to the destination, if there is one
@@ -231,7 +231,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
  */
 void link_exit(dbref player, dbref exit, dbref dest)
 {
-    int cost, quot;
+    int cost = 0, quot = 0;
 
     /**
      * Make sure we can link there: Our destination is HOME Our
@@ -317,7 +317,7 @@ void link_exit(dbref player, dbref exit, dbref dest)
  */
 void do_link(dbref player, dbref cause, int key, char *what, char *where)
 {
-    dbref thing, room;
+    dbref thing = NOTHING, room = NOTHING;
 
     /**
      * Find the thing to link
@@ -487,8 +487,8 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
  */
 void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
 {
-    dbref thing, parent, curr;
-    int lev;
+    dbref thing = NOTHING, parent = NOTHING, curr = NOTHING;
+    int lev = 0;
 
     /**
      * get victim
@@ -584,8 +584,8 @@ void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
  */
 void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs)
 {
-    dbref room;
-    char *s;
+    dbref room = NOTHING;
+    char *s = NULL;
 
     /**
      * we don't need to know player's location!  hooray!
@@ -637,8 +637,9 @@ void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int na
  */
 void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
 {
-    dbref thing;
-    int cost;
+    dbref thing = NOTHING;
+    int cost = 0;
+
     cost = (int)strtol(coststr, (char **)NULL, 10);
 
     if (!name || !*name || (strip_ansi_len(name) == 0))
@@ -679,10 +680,10 @@ void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
  */
 void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 {
-    dbref clone, thing, new_owner, loc;
-    FLAG rmv_flags;
-    int cost;
-    const char *clone_name;
+    dbref clone = NOTHING, thing = NOTHING, new_owner = NOTHING, loc = NOTHING;
+    FLAG rmv_flags = 0;
+    int cost = 0;
+    const char *clone_name = NULL;
 
     if ((key & CLONE_INVENTORY) || !Has_location(player))
     {
@@ -979,9 +980,10 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
  */
 void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
 {
-    int isrobot;
-    dbref newplayer;
-    char *newname, *cname, *nname;
+    int isrobot = 0;
+    dbref newplayer = NOTHING;
+    char *newname = NULL, *cname = NULL, *nname = NULL;
+
     isrobot = (key == PCRE_ROBOT) ? 1 : 0;
     cname = log_getname(player);
     newplayer = create_player(name, pass, player, isrobot, 0);
@@ -1035,8 +1037,7 @@ void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
  */
 bool can_destroy_exit(dbref player, dbref exit)
 {
-    dbref loc;
-    loc = Exits(exit);
+    dbref loc = Exits(exit);
 
     if (!((Has_location(player) && (loc == Location(player))) || (player == loc) || (player == exit) || Wizard(player)))
     {
@@ -1055,8 +1056,8 @@ bool can_destroy_exit(dbref player, dbref exit)
  */
 bool destroyable(dbref victim)
 {
-    CONF *tp, *ctab;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
 
     if ((victim == (dbref)0) || (God(victim)))
     {
@@ -1085,7 +1086,6 @@ bool destroyable(dbref victim)
         }
     }
 
-    
     return true;
 }
 
@@ -1123,11 +1123,10 @@ bool can_destroy_player(dbref player, dbref victim)
  */
 void do_destroy(dbref player, dbref cause, int key, char *what)
 {
-    dbref thing;
-    bool can_doit;
-    const char *typename;
-    char *t, *tbuf;
-    char *s;
+    dbref thing = NOTHING;
+    bool can_doit = false;
+    const char *typename = NULL;
+    char *t = NULL, *tbuf = NULL, *s = NULL;
 
     /**
      * You can destroy anything you control.

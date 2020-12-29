@@ -200,7 +200,6 @@ DBData db_get(DBData gamekey, unsigned int type)
     datum dat;
     datum key;
     char *s;
-    char *newdat;
 
     if (!db_initted)
     {

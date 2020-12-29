@@ -44,10 +44,9 @@ int *used_attrs_table;
  */
 BOOLEXP *getboolexp1(FILE *f)
 {
-	BOOLEXP *b;
-	char *buff, *s;
-	int c, d, anum;
-	c = getc(f);
+	BOOLEXP *b = NULL;
+	char *buff = NULL, *s = NULL;
+	int d = 0, anum = 0, c = getc(f);
 
 	switch (c)
 	{
@@ -298,9 +297,8 @@ error:
  */
 BOOLEXP *getboolexp(FILE *f)
 {
-	BOOLEXP *b;
-	char c;
-	b = getboolexp1(f);
+	char c = 0;
+	BOOLEXP *b = getboolexp1(f);
 
 	if (getc(f) != '\n')
 	{
@@ -309,7 +307,7 @@ BOOLEXP *getboolexp(FILE *f)
 		 * 
 		 */
 		log_write_raw(1, "ABORT! db_rw.c, parse error in getboolexp().\n");
-		abort(); 
+		abort();
 	}
 
 	if ((c = getc(f)) != '\n')
@@ -365,9 +363,9 @@ int unscramble_attrnum(int attrnum)
  */
 void get_list(FILE *f, dbref i, int new_strings)
 {
-	dbref atr;
-	int c;
-	char *buff;
+	dbref atr = NOTHING;
+	int c = 0;
+	char *buff = NULL;
 	bool loopend = false;
 
 	while (!loopend)
@@ -436,7 +434,7 @@ void get_list(FILE *f, dbref i, int new_strings)
 			 * 
 			 */
 			log_write_raw(1, "Bad character '%c' when getting attributes on object %d\n", c, i);
-			
+
 			XFREE(getstring(f, new_strings));
 		}
 	}
@@ -450,7 +448,7 @@ void get_list(FILE *f, dbref i, int new_strings)
  */
 void putbool_subexp(FILE *f, BOOLEXP *b)
 {
-	ATTR *va;
+	ATTR *va = NULL;
 
 	switch (b->type)
 	{
@@ -570,13 +568,8 @@ void putboolexp(FILE *f, BOOLEXP *b)
  */
 void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db_format, int db_version)
 {
-	FLAG f1, f2, f3, newf1, newf2, newf3;
-	f1 = *flags1;
-	f2 = *flags2;
-	f3 = *flags3;
-	newf1 = 0;
-	newf2 = 0;
-	newf3 = 0;
+	FLAG f1 = *flags1, f2 = *flags2, f3 = *flags3;
+	FLAG newf1 = 0, newf2 = 0, newf3 = 0;
 
 	if ((db_format == F_MUSH) && (db_version >= 3))
 	{
@@ -721,8 +714,9 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
  */
 void efo_convert(void)
 {
-	int i;
-	dbref link;
+	int i = 0;
+	dbref link = NOTHING;
+
 	DO_WHOLE_DB(i)
 	{
 		switch (Typeof(i))
@@ -799,9 +793,10 @@ void fix_typed_quotas(void)
 	 * new quotas, and then delete the old attributes.
 	 * 
      */
-	int i;
-	char *qbuf, *rqbuf;
-	char *s = XMALLOC(LBUF_SIZE, s);
+	int i = 0;
+	char *qbuf = NULL, *rqbuf = NULL;
+	char *s = XMALLOC(LBUF_SIZE, "s");
+
 	DO_WHOLE_DB(i)
 	{
 		if (isPlayer(i))
@@ -839,46 +834,23 @@ void fix_typed_quotas(void)
  */
 dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 {
-	dbref i, anum;
-	char ch;
+	dbref i = NOTHING, anum = NOTHING;
+	char ch = 0;
 	char *tstr = NULL, *s = NULL;
-	int header_gotten, size_gotten, nextattr_gotten;
-	int read_attribs, read_name, read_zone, read_link, read_key, read_parent;
-	int read_extflags, read_3flags, read_money, read_timestamps, read_createtime, read_new_strings;
-	int read_powers, read_powers_player, read_powers_any;
-	int has_typed_quotas, has_visual_attrs;
-	int deduce_version, deduce_name, deduce_zone, deduce_timestamps;
-	int aflags, f1, f2, f3;
-	BOOLEXP *tempbool;
-	time_t tmptime;
+	int header_gotten = 0, size_gotten = 0, nextattr_gotten = 0;
+	int read_attribs = 1, read_name = 1, read_zone = 0, read_link = 0, read_key = 1, read_parent = 0;
+	int read_extflags = 0, read_3flags = 0, read_money = 1, read_timestamps = 0, read_createtime = 0, read_new_strings = 0;
+	int read_powers = 0, read_powers_player = 0, read_powers_any = 0;
+	int has_typed_quotas = 0, has_visual_attrs = 0;
+	int deduce_version = 1, deduce_name = 1, deduce_zone = 1, deduce_timestamps = 1;
+	int aflags = 0, f1 = 0, f2 = 0, f3 = 0;
+	BOOLEXP *tempbool = NULL;
+	time_t tmptime = 0L;
 	struct timeval obj_time;
-	header_gotten = 0;
-	size_gotten = 0;
-	nextattr_gotten = 0;
+
 	g_format = F_UNKNOWN;
 	g_version = 0;
 	g_flags = 0;
-	read_attribs = 1;
-	read_name = 1;
-	read_zone = 0;
-	read_link = 0;
-	read_key = 1;
-	read_parent = 0;
-	read_money = 1;
-	read_extflags = 0;
-	read_3flags = 0;
-	has_typed_quotas = 0;
-	has_visual_attrs = 0;
-	read_timestamps = 0;
-	read_createtime = 0;
-	read_new_strings = 0;
-	read_powers = 0;
-	read_powers_player = 0;
-	read_powers_any = 0;
-	deduce_version = 1;
-	deduce_zone = 1;
-	deduce_name = 1;
-	deduce_timestamps = 1;
 
 	if (mudstate.standalone)
 	{
@@ -900,7 +872,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 		switch (ch = getc(f))
 		{
-		case '-': 
+		case '-':
 			/**
 			 * Misc tag
 			 * 
@@ -921,12 +893,12 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			break;
 
-		case '+':		  
+		case '+':
 			/**
 			 * MUX and MUSH header, 2nd char selects type
 			 * 
 			 */
-			ch = getc(f); 
+			ch = getc(f);
 
 			if ((ch == 'V') || (ch == 'X') || (ch == 'T'))
 			{
@@ -985,7 +957,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			 */
 			switch (ch)
 			{
-			case 'T': 
+			case 'T':
 				/**
 				 * 3.0 VERSION
 				 * 
@@ -997,7 +969,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				g_version &= V_MASK;
 				break;
 
-			case 'V': 
+			case 'V':
 				/**
 				 * 2.0 VERSION 
 				 * 
@@ -1006,7 +978,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				g_version &= V_MASK;
 				break;
 
-			case 'X': 
+			case 'X':
 				/**
 				 * MUX VERSION
 				 * 
@@ -1018,7 +990,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				g_version &= V_MASK;
 				break;
 
-			case 'S': 
+			case 'S':
 				/**
 				 * SIZE
 				 * 
@@ -1090,7 +1062,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				vattr_define((char *)tstr, anum, aflags);
 				break;
 
-			case 'F': 
+			case 'F':
 				/**
 				 * OPEN USER ATTRIBUTE SLOT
 				 * 
@@ -1098,7 +1070,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				anum = getref(f);
 				break;
 
-			case 'N': 
+			case 'N':
 				/**
 				 * NEXT ATTR TO ALLOC WHEN NO FREELIST
 				 * 
@@ -1139,7 +1111,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			break;
 
-		case '!': 
+		case '!':
 			/**
 			 * MUX and MUSH entries
 			 * 
@@ -1433,8 +1405,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 int db_read(void)
 {
 	DBData key, data;
-	int *c, vattr_flags, i, j, blksize, num;
-	char *s;
+	int *c = NULL, vattr_flags = 0, i = 0, j = 0, blksize = 0, num = 0;
+	char *s = NULL;
 	struct timeval obj_time;
 
 	/**
@@ -1610,11 +1582,11 @@ int db_read(void)
  */
 int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 {
-	ATTR *a;
-	char *got, *as;
-	dbref aowner;
-	int ca, aflags, alen, save, j, changed;
-	BOOLEXP *tempbool;
+	ATTR *a = NULL;
+	char *got = NULL, *as = NULL;
+	dbref aowner = NOTHING;
+	int ca = 0, aflags = 0, alen = 0, save = 0, j = 0, changed = 0;
+	BOOLEXP *tempbool = NULL;
 
 	if (Going(i))
 	{
@@ -1793,15 +1765,15 @@ int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
  */
 dbref db_write_flatfile(FILE *f, int format, int version)
 {
-	dbref i;
-	int flags;
-	VATTR *vp;
-	int n, end, ca, n_oldtotal, n_oldtop, n_deleted, n_renumbered;
-	int n_objt, n_atrt, anxt, dbclean;
-	int *old_attrs_table;
-	char *as;
+	dbref i = NOTHING;
+	int flags = 0;
+	VATTR *vp = NULL;
+	int n = 0, end = 0, ca = 0, n_oldtotal = 0, n_oldtop = 0, n_deleted = 0, n_renumbered = 0;
+	int n_objt = 0, n_atrt = 0, anxt = 0, dbclean = (version & V_DBCLEAN) ? 1 : 0;
+	int *old_attrs_table = NULL;
+	char *as = NULL;
+
 	al_store();
-	dbclean = (version & V_DBCLEAN) ? 1 : 0;
 	version &= ~V_DBCLEAN;
 
 	switch (format)
@@ -2021,10 +1993,11 @@ dbref db_write_flatfile(FILE *f, int format, int version)
  */
 dbref db_write(void)
 {
-	VATTR *vp;
+	VATTR *vp = NULL;
 	DBData key, data;
-	int *c, blksize, num, i, j, k, dirty, len;
-	char *s;
+	int *c = NULL, blksize = 0, num = 0, i = 0, j = 0, k = 0, dirty = 0, len = 0;
+	char *s = NULL;
+
 	al_store();
 
 	if (mudstate.standalone)

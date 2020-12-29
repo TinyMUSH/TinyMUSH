@@ -43,7 +43,7 @@ extern const int _sys_nsig;
  * @attention Since this is the core of the whole show, better keep theses globals.
  * 
  */
-int sock;						/*!< Game socket */
+int sock = 0;						/*!< Game socket */
 int ndescriptors = 0;			/*!< New Descriptor */
 int maxd = 0;					/*!< Max Descriptors */
 DESC *descriptor_list = NULL;	/*!< Descriptor list */
@@ -65,11 +65,11 @@ volatile int slave_socket = -1; /*!< Socket of the slave */
  */
 int get_slave_result(void)
 {
-	char *host1, *hostname, *host2, *p, *userid, *s;
+	char *host1 = NULL, *hostname = NULL, *host2 = NULL, *p = NULL, *userid = NULL, *s = NULL;
 	char *buf = XMALLOC(LBUF_SIZE, "buf");
-	int remote_port, len;
-	unsigned long addr;
-	DESC *d;
+	int remote_port = 0, len = 0;
+	unsigned long addr = 0L;
+	DESC *d = NULL;
 
 	len = read(slave_socket, buf, LBUF_SIZE - 1);
 
@@ -317,9 +317,9 @@ gsr_end:
 void boot_slave(void)
 {
 	int sv[2];
-	int i;
-	int maxfds;
-	char *s;
+	int i = 0;
+	int maxfds = 0;
+	char *s = NULL;
 
 #ifdef HAVE_GETDTABLESIZE
 	maxfds = getdtablesize();
@@ -411,8 +411,9 @@ void boot_slave(void)
  */
 int make_socket(int port)
 {
-	int s, opt;
+	int s = 0, opt = 0;
 	struct sockaddr_in server;
+
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (s < 0)
@@ -452,10 +453,10 @@ int make_socket(int port)
 void shovechars(int port)
 {
 	fd_set input_set, output_set;
-	struct timeval last_slice, current_time, next_slice, timeout, slice_timeout;
-	int found, check;
-	DESC *d, *dnext, *newd;
-	int avail_descriptors, maxfds;
+	struct timeval last_slice, current_time, next_slice, timeout;
+	int found = 0, check = 0;
+	DESC *d = NULL, *dnext = NULL, *newd = NULL;
+	int avail_descriptors = 0, maxfds = 0;
 	struct stat fstatbuf;
 
 	mudstate.debug_cmd = (char *)"< shovechars >";
@@ -532,7 +533,7 @@ void shovechars(int port)
 		timeout.tv_sec = que_next();
 		timeout.tv_usec = 0;
 		next_slice = msec_add(last_slice, mudconf.timeslice);
-		slice_timeout = timeval_sub(next_slice, current_time);
+		timeval_sub(next_slice, current_time);
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
 		/**
@@ -730,12 +731,13 @@ void shovechars(int port)
  */
 DESC *new_connection(int sock)
 {
-	int newsock;
-	char *buff, *cmdsave;
-	DESC *d;
+	int newsock = 0;
+	char *cmdsave = NULL;
+	DESC *d = NULL;
 	struct sockaddr_in addr;
 	socklen_t addr_len, len;
-	char *buf;
+	char *buf = NULL;
+
 	cmdsave = mudstate.debug_cmd;
 	mudstate.debug_cmd = XSTRDUP("< new_connection >", "mudstate.debug_cmd");
 	addr_len = sizeof(struct sockaddr);
@@ -873,10 +875,10 @@ char *connMessages(int reason)
  */
 void shutdownsock(DESC *d, int reason)
 {
-	char *buff, *buff2;
-	time_t now;
-	int ncon;
-	DESC *dtemp;
+	char *buff = NULL, *buff2 = NULL;
+	time_t now = 0L;
+	int ncon = 0;
+	DESC *dtemp  = NULL;
 
 	if ((reason == R_LOGOUT) && (site_check((d->address).sin_addr, mudstate.access_list) & H_FORBIDDEN))
 	{
@@ -1044,7 +1046,7 @@ void make_nonblocking(int s)
  */
 DESC *initializesock(int s, struct sockaddr_in *a)
 {
-	DESC *d;
+	DESC *d = NULL;
 
 	if (s == slave_socket)
 	{
@@ -1115,9 +1117,10 @@ DESC *initializesock(int s, struct sockaddr_in *a)
  */
 int process_output(DESC *d)
 {
-	TBLOCK *tb, *save;
-	int cnt;
-	char *cmdsave;
+	TBLOCK *tb = NULL, *save = NULL;
+	int cnt = 0;
+	char *cmdsave = NULL;
+
 	cmdsave = mudstate.debug_cmd;
 	mudstate.debug_cmd = (char *)"< process_output >";
 	tb = d->output_head;
@@ -1169,10 +1172,10 @@ int process_output(DESC *d)
  */
 int process_input(DESC *d)
 {
-	char *buf;
-	int got, in, lost;
-	char *p, *pend, *q, *qend;
-	char *cmdsave;
+	char *buf = NULL;
+	int got = 0, in = 0, lost = 0;
+	char *p = NULL, *pend = NULL, *q = NULL, *qend = NULL, *cmdsave = NULL;
+
 	cmdsave = mudstate.debug_cmd;
 	mudstate.debug_cmd = XSTRDUP("< process_input >", mudstate.debug_cmd);
 	buf = XMALLOC(LBUF_SIZE, "buf");
@@ -1283,7 +1286,8 @@ int process_input(DESC *d)
  */
 void close_sockets(int emergency, char *message)
 {
-	DESC *d, *dnext;
+	DESC *d = NULL, *dnext = NULL;
+
 	DESC_SAFEITER_ALL(d, dnext)
 	{
 		if (emergency)
@@ -1325,7 +1329,8 @@ void emergency_shutdown(void)
  */
 void report(void)
 {
-	char *player, *enactor;
+	char *player = NULL, *enactor = NULL;
+
 	log_write(LOG_BUGS, "BUG", "INFO", "Command: '%s'", mudstate.debug_cmd);
 
 	if (Good_obj(mudstate.curr_player))
@@ -1366,13 +1371,13 @@ void sighandler(int sig)
 	const char *signames[] = {"SIGZERO", "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT", "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV", "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM", "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT", "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGLOST", "SIGUSR1", "SIGUSR2"};
 #endif /* SYS_SIGLIST_DECLARED */
 #endif /* HAVE_SYS_SIGNAME */
-	int i;
-	pid_t child;
-	char *s;
+	int i = 0;
+	pid_t child = 0;
+	char *s = NULL;
 #if defined(HAVE_UNION_WAIT) && defined(NEED_WAIT3_DCL)
 	union wait stat;
 #else
-	int stat;
+	int stat = 0;
 #endif
 
 	switch (sig)
@@ -1586,9 +1591,7 @@ void set_signals(void)
  */
 void unset_signals(void)
 {
-	int i;
-
-	for (i = 0; i < NSIG; i++)
+	for (int i = 0; i < NSIG; i++)
 	{
 		signal(i, SIG_DFL);
 	}
@@ -1601,15 +1604,13 @@ void unset_signals(void)
  */
 void check_panicking(int sig)
 {
-	int i;
-
 	/**
 	 * If we are panicking, turn off signal catching and resignal
 	 * 
 	 */
 	if (mudstate.panicking)
 	{
-		for (i = 0; i < NSIG; i++)
+		for (int i = 0; i < NSIG; i++)
 		{
 			signal(i, SIG_DFL);
 		}

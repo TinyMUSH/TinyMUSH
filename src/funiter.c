@@ -244,7 +244,13 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         mudstate.loop_number[cur_lev] += 1;
         work_buf = XMALLOC(LBUF_SIZE, "work_buf");
-        StrCopyKnown(work_buf, ep, elen); /* we might nibble this */
+
+        /**
+         * we might nibble this 
+         * 
+         */
+        XMEMCPY(work_buf, ep, elen);
+        work_buf[elen] = '\0';
         str = work_buf;
         savep = *bufc;
 
@@ -409,7 +415,8 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      */
     cp = curr = fargs[1];
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
-    StrCopyKnown(atextbuf, atext, alen);
+    XMEMCPY(atextbuf, atext, alen); 
+    atextbuf[alen] = '\0';
     /*
      * may as well handle first case now
      */
@@ -446,7 +453,8 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         clist[1] = split_token(&cp, &isep);
         op = clist[2];
         SAFE_LTOS(clist[2], &op, i, LBUF_SIZE);
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen);
+        atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
         exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
@@ -502,7 +510,8 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
         SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen);
+        atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
         exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
@@ -576,7 +585,8 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
         SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen);
+        atextbuf[alen] = '\0';
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
         i++;
@@ -667,7 +677,8 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
             }
         }
 
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen); 
+        atextbuf[alen] = '\0';
 
         if (*bufc != bb_p)
         {
@@ -726,7 +737,8 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             os[i] = split_token(&cp, &isep);
         }
 
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen);
+        atextbuf[alen] = '\0';
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), i);
     }
@@ -824,7 +836,8 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         cbuf[0][1] = '\0';
         op = cbuf[1];
         SAFE_LTOS(cbuf[1], &op, i, LBUF_SIZE);
-        StrCopyKnown(atextbuf, atext, alen);
+        XMEMCPY(atextbuf, atext, alen); 
+        atextbuf[alen] = '\0';
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
     }
@@ -1035,14 +1048,16 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
         SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
-        StrCopyKnown(atextbuf, atext1, alen1);
+        XMEMCPY(atextbuf, atext1, alen1);
+        atextbuf[alen1] = '\0';
         str = atextbuf;
         savep = *bufc;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
 
         if (!is_same)
         {
-            StrCopyKnown(atextbuf, atext2, alen2);
+            XMEMCPY(atextbuf, atext2, alen2);
+            atextbuf[alen2] = '\0';
             dp = savep = condbuf;
             str = atextbuf;
             exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);

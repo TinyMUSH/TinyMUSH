@@ -1349,7 +1349,7 @@ int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref playe
      * Note that this function is for use in conjunction with our own
      * sane_qsort routine, NOT with the standard library qsort!
      */
-	char *result, *tbuf, *elems[2], *bp, *str;
+	char *result, *tbuf, *elems[2], *bp;
 	int n;
 
 	if ((mudstate.func_invk_ctr > mudconf.func_invk_lim) || (mudstate.func_nest_lev > mudconf.func_nest_lim) || Too_Much_CPU())
@@ -3203,7 +3203,8 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			else if ((mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
 			{
 				objs[0] = t;
-				StrCopyKnown(atextbuf, atext, alen);
+				XMEMCPY(atextbuf, atext, alen);
+				atextbuf[alen] = '\0';
 				str = atextbuf;
 				exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 1);
 			}

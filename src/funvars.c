@@ -3893,7 +3893,7 @@ void perform_regparse(char *buff, char **bufc, dbref player, dbref caller, dbref
     int offsets[PCRE_MAX_OFFSETS];
     int subpatterns;
     case_option = Func_Mask(REG_CASELESS);
-    
+
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
     {
         /*
@@ -4249,7 +4249,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             }
             else
             {
-                os[i - 2] = '\0';
+                os[i - 2] = 0;
             }
         }
 
@@ -4258,14 +4258,16 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             print_sep(&osep, buff, bufc);
         }
 
-        StrCopyKnown(atextbuf, atext1, alen1);
+        XMEMCPY(atextbuf, atext1, alen1);
+        atextbuf[alen1] = 0;
         str = atextbuf;
         savep = *bufc;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
 
         if (!is_same)
         {
-            StrCopyKnown(atextbuf, atext2, alen2);
+            XMEMCPY(atextbuf, atext2, alen2);
+            atextbuf[alen2] = '\0';
             dp = savep = condbuf;
             str = atextbuf;
             exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
@@ -4621,7 +4623,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
     OBJGRID *ogp;
     char *xlist, *ylist;
-    int n_x, n_y, r, c, i, j, errs;
+    int n_x, n_y, r, c, i, j, errs=0;
     char **x_elems, **y_elems;
     Delim isep;
     VaChk_Only_In(4);

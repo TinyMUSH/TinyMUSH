@@ -349,7 +349,8 @@ extern OBJXFUNCS xfunctions;
         (a) = NULL;                                   \
         (b) = XMALLOC(LBUF_SIZE, "lambda.atext");     \
         (l) = strlen((s) + 8);                        \
-        StrCopyKnown((b), (s) + 8, (l));              \
+        __xstrcpy((b), (s) + 8);                      \
+        b[(l)] = '\0';                                \
         (o) = (p);                                    \
         (f) = 0;                                      \
     }                                                 \

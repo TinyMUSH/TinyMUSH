@@ -411,8 +411,8 @@ char *__xasprintf(const char *file, int line, const char *function, const char *
 int __xsprintf(char *str, const char *format, ...)
 {
 	int size = 0;
-
 	va_list ap;
+
 	va_start(ap, format);
 	size = __xvsprintf(str, format, ap);
 	va_end(ap);
@@ -510,6 +510,7 @@ int __xvsnprintf(char *str, size_t size, const char *format, va_list ap)
 	if ((size > 0) && str)
 	{
 		va_list vp;
+
 		va_copy(vp, ap);
 		MEMTRACK *mtrk = __xfind(str);
 		if (mtrk)
@@ -1088,8 +1089,8 @@ void list_buftrace(dbref player)
  */
 int __xsorttrace(const void *p1, const void *p2)
 {
-	char *s1, *s2;
-	int r;
+	char *s1 = NULL, *s2 = NULL;
+	int r = 0;
 
 	s1 = XNASPRINTF("%s:%s", (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
 	s2 = XNASPRINTF("%s:%s", (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
@@ -1114,7 +1115,7 @@ int __xsorttrace(const void *p1, const void *p2)
 void list_rawmemory(dbref player)
 {
 	MEMTRACK *tptr = NULL, **t_array = NULL;
-	size_t n_tags = 0, total = 0, c_tags = 0, c_total = 0, u_tags = 0, l1 = 0, l2 = 0;
+	size_t n_tags = 0, total = 0, c_tags = 0, c_total = 0, u_tags = 0;
 	int i = 0, j = 0;
 	char *s1 = NULL, *s2 = NULL;
 
@@ -1366,6 +1367,7 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
 void __xsafeltos(char *dest, char **destp, long num, size_t size)
 {
 	char *buff = XLTOS(num);
+	
 	__xsafestrncat(dest, destp, buff, strlen(buff), size);
 	__xfree(buff);
 }

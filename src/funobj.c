@@ -3085,7 +3085,8 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 		tstack[0] = sp;
 		XSPRINTF(tstack[1], "#%d", speaker);
 		XSPRINTF(tstack[2], "%d", spos);
-		StrCopyKnown(tbuf, trans_str, trans_len);
+		XMEMCPY(tbuf, trans_str, trans_len);
+		tbuf[trans_len] = '\0';
 		tp = tbuf;
 		bp = result;
 		exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, tstack, 3);
@@ -3105,7 +3106,9 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 		{
 			XSPRINTF(estack[0], "#%d", speaker);
 			XSPRINTF(estack[1], "%d", spos);
-			StrCopyKnown(tbuf, empty_str, empty_len);
+			XMEMCPY(tbuf, empty_str, empty_len);
+			tbuf[empty_len] = '\0';
+			
 			tp = tbuf;
 			bp = result;
 			exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, estack, 2);

@@ -124,7 +124,7 @@ void Log_simple_err(dbref obj, dbref loc, const char *errtype)
 	}
 	else
 	{
-		log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, obj_loc, errtype);
+		log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, errtype);
 	}
 
 	XFREE(obj_name);

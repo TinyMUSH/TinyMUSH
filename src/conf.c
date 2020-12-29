@@ -407,9 +407,9 @@ void cf_init(void)
  */
 void cf_log(dbref player, const char *primary, const char *secondary, char *cmd, const char *format, ...)
 {
-    char *buff;
     va_list ap;
-    buff = XMALLOC(LBUF_SIZE, "buff");
+    char *buff = XMALLOC(LBUF_SIZE, "buff");
+
     va_start(ap, format);
     XVSNPRINTF(buff, LBUF_SIZE, format, ap);
     va_end(ap);
@@ -525,14 +525,7 @@ CF_Result cf_int(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int num;
-
-    /**
-     * Copy the numeric value to the parameter
-     * 
-     */
-    num = (int)strtol(str, (char **)NULL, 10);
-    ;
+    int num = (int)strtol(str, (char **)NULL, 10);
 
     if ((extra > 0) && (num > extra))
     {
@@ -562,7 +555,7 @@ CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int num;
+    int num = 0;
 
     /**
      * No consistency check on initialization.
@@ -635,8 +628,8 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
 CF_Result cf_module(int *vp, char *modname, long extra, dbref player, char *cmd)
 {
     lt_dlhandle handle;
-    void (*initptr)(void);
-    MODULE *mp;
+    void (*initptr)(void) = NULL;
+    MODULE *mp = NULL;
 
     handle = lt_dlopen_format("%s/%s.la", mudconf.modules_home, modname);
 
@@ -721,8 +714,7 @@ CF_Result cf_bool(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_option(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int i;
-    i = search_nametab(GOD, (NAMETAB *)extra, str);
+    int i = search_nametab(GOD, (NAMETAB *)extra, str);
 
     if (i < 0)
     {
@@ -746,12 +738,11 @@ CF_Result cf_option(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int retval;
+    int retval = CF_Success;
     /**
      * Make a copy of the string if it is not too big
      * 
      */
-    retval = CF_Success;
 
     if (strlen(str) >= (unsigned int)extra)
     {
@@ -786,10 +777,10 @@ CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    char *alias, *orig, *p, *tokst;
-    int *cp, upcase;
-    alias = strtok_r(str, " \t=,", &tokst);
-    orig = strtok_r(NULL, " \t=,", &tokst);
+    int *cp = NULL, upcase = 0;
+    char *p = NULL, *tokst = NULL;
+    char *alias = strtok_r(str, " \t=,", &tokst);
+    char *orig = strtok_r(NULL, " \t=,", &tokst);
 
     if (orig)
     {
@@ -866,9 +857,9 @@ CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    char *fname, *fvalue, *tokst;
     LINKEDLIST *itp, *prev;
-    fname = strtok_r(str, " \t=,", &tokst);
+    char *fvalue = NULL, *tokst = NULL;
+    char *fname = strtok_r(str, " \t=,", &tokst);
 
     if (tokst)
     {
@@ -953,10 +944,11 @@ CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    char *type_str, *file_str, *tokst;
-    int f, fd;
-    FILE *fptr;
-    LOGFILETAB *tp, *lp;
+    char *type_str = NULL, *file_str = NULL, *tokst = NULL;
+    int f = 0, fd = 0;
+    FILE *fptr = NULL;
+    LOGFILETAB *tp = NULL, *lp = NULL;
+
     /**
      * Two args, two args only
      * 
@@ -1082,8 +1074,8 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    char *sp, *tokst;
-    int f, negate, success, failure;
+    char *sp = NULL, *tokst = NULL;
+    int f = 0, negate = 0, success = 0, failure = 0;
     /*
      * Walk through the tokens
      */
@@ -1147,10 +1139,9 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
  */
 bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool negate)
 {
-    EXTFUNCS *xfp;
-    NAMEDFUNC *np, **tp;
-    int i;
-    xfp = *xfuncs;
+    NAMEDFUNC *np = NULL, **tp = NULL;
+    int i = 0;
+    EXTFUNCS *xfp = *xfuncs;
 
     /**
      * If we're negating, just remove it from the list of functions.
@@ -1270,10 +1261,10 @@ bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool 
  */
 CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd)
 {
-    char *sp, *tokst, *cp, *ostr, *s;
-    int f, negate, success, failure, got_one;
-    MODULE *mp;
-    int (*hp)(dbref);
+    char *sp = NULL, *tokst = NULL, *cp = NULL, *ostr = NULL, *s = NULL;
+    int f = 0, negate = 0, success = 0, failure = 0, got_one = 0;
+    MODULE *mp  = NULL;
+    int (*hp)(dbref) = NULL;
 
     /**
      * Walk through the tokens
@@ -1411,10 +1402,10 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
  */
 CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    char *sp, *tokst;
-    FLAGENT *fp;
-    FLAGSET *fset;
-    int success, failure;
+    char *sp = NULL, *tokst = NULL;
+    FLAGENT *fp = NULL;
+    FLAGSET *fset = NULL;
+    int success = 0, failure = 0;
 
     for (sp = str; *sp; sp++)
     {
@@ -1527,9 +1518,8 @@ CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 in_addr_t sane_inet_addr(char *str)
 {
-    int i;
-    char *p;
-    p = str;
+    int i = 0;
+    char *p = str;
 
     for (i = 1; (p = strchr(p, '.')) != NULL; i++, p++)
         ;
@@ -1556,10 +1546,10 @@ in_addr_t sane_inet_addr(char *str)
  */
 CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 {
-    SITE *site, *last, *head;
-    char *addr_txt, *mask_txt, *tokst;
+    SITE *site = NULL, *last = NULL, *head = NULL;
+    char *addr_txt = NULL, *mask_txt = NULL, *tokst = NULL;
     struct in_addr addr_num, mask_num;
-    int mask_bits;
+    int mask_bits = 0;
 
     if ((mask_txt = strchr(str, '/')) == NULL)
     {
@@ -1693,7 +1683,7 @@ CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *c
      * Cannot modify parameters set STATIC
      * 
      */
-    char *name;
+    char *name  = NULL;
 
     if (tp->flags & CA_STATIC)
     {
@@ -1735,9 +1725,9 @@ CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *c
  */
 CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    CONF *tp, *ctab;
-    char *ap;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
+    char *ap = NULL;
 
     for (ap = str; *ap && !isspace(*ap); ap++)
         ;
@@ -1784,11 +1774,12 @@ CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
 {
-    char *fcmd, *fpath, *newstr, *tokst;
-    CMDENT *cmdp;
-    char **ftab;
-    HASHTAB *hashes;
-    FILE *fp;
+    
+    CMDENT *cmdp = NULL;
+    HASHTAB *hashes = NULL;
+    FILE *fp = NULL;
+    char *fcmd = NULL, *fpath = NULL, *newstr = NULL, *tokst = NULL;
+    char **ftab = NULL;
     char *s = XMALLOC(MAXPATHLEN, "s");
 
     /**
@@ -1969,8 +1960,8 @@ CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cm
  */
 CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    FILE *fp;
-    char *cp, *ap, *zp, *buf;
+    FILE *fp = NULL;
+    char *cp = NULL, *ap = NULL, *zp = NULL, *buf = NULL;
     int line = 0;
 
     /**
@@ -2118,8 +2109,8 @@ CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
 {
-    int i, r = CF_Failure;
-    char *buf, *buff, *name, *status;
+    int i = 0, r = CF_Failure;
+    char *buf = NULL, *buff = NULL, *name = NULL, *status = NULL;
 
     if (!mudstate.standalone && !mudstate.initializing && !check_access(player, tp->flags))
     {
@@ -2182,9 +2173,8 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
  */
 CF_Result cf_set(char *cp, char *ap, dbref player)
 {
-    CONF *tp, *ctab;
-    char *s;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
 
     /**
      * Search the config parameter table for the command. If we find it,
@@ -2213,7 +2203,6 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
             {
                 if (!strcmp(tp->pname, cp))
                 {
-                    XFREE(s);
                     return (helper_cf_set(cp, ap, player, tp));
                 }
             }
@@ -2243,8 +2232,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
  */
 void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
 {
-    int i;
-    i = cf_set(kw, value, player);
+    int i = cf_set(kw, value, player);
 
     if ((i >= 0) && !Quiet(player))
     {
@@ -2262,8 +2250,8 @@ void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
  */
 CF_Result cf_read(char *fn)
 {
-    int retval;
-    retval = cf_include(NULL, fn, 0, 0, (char *)"init");
+    int retval = cf_include(NULL, fn, 0, 0, (char *)"init");
+
     return retval;
 }
 
@@ -2274,9 +2262,9 @@ CF_Result cf_read(char *fn)
  */
 void list_cf_access(dbref player)
 {
-    CONF *tp, *ctab;
-    char *buff;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
+    char *buff = NULL;
 
     for (tp = conftable; tp->pname; tp++)
     {
@@ -2312,9 +2300,9 @@ void list_cf_access(dbref player)
  */
 void list_cf_read_access(dbref player)
 {
-    CONF *tp, *ctab;
-    char *buff;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
+    char *buff = NULL;
 
     for (tp = conftable; tp->pname; tp++)
     {
@@ -2349,8 +2337,8 @@ void list_cf_read_access(dbref player)
  */
 void cf_verify(void)
 {
-    CONF *tp, *ctab;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
 
     for (tp = conftable; tp->pname; tp++)
     {
@@ -2393,7 +2381,7 @@ void cf_verify(void)
  */
 void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 {
-    NAMETAB *opt;
+    NAMETAB *opt = NULL;
 
     if (!check_access(player, tp->rperms))
     {
@@ -2440,8 +2428,8 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
  */
 void cf_display(dbref player, char *param_name, char *buff, char **bufc)
 {
-    CONF *tp, *ctab;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
 
     for (tp = conftable; tp->pname; tp++)
     {
@@ -2477,8 +2465,8 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
  */
 void list_options(dbref player)
 {
-    CONF *tp, *ctab;
-    MODULE *mp;
+    CONF *tp = NULL, *ctab = NULL;
+    MODULE *mp = NULL;
 
     for (tp = conftable; tp->pname; tp++)
     {

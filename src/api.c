@@ -47,11 +47,12 @@ extern CMDENT *prefix_cmds[256];
  */
 void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 {
-	MODULE *mp;
-	API_FUNCTION *afp;
-	void (*fn_ptr)(void *, void *);
+	MODULE *mp = NULL;
+	API_FUNCTION *afp = NULL;
+
+	void (*fn_ptr)(void *, void *) = NULL;
 	int succ = 0;
-	char *s;
+	char *s = NULL;
 
 	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -96,7 +97,8 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
  */
 void *request_api_function(char *api_name, char *fn_name)
 {
-	API_FUNCTION *afp;
+	API_FUNCTION *afp = NULL;
+
 	char *s = XASPRINTF("s", "%s_%s", api_name, fn_name);
 	afp = (API_FUNCTION *)hashfind(s, &mudstate.api_func_htab);
 	XFREE(s);
@@ -116,8 +118,8 @@ void *request_api_function(char *api_name, char *fn_name)
  */
 void register_commands(CMDENT *cmdtab)
 {
-	CMDENT *cp;
-	char *s;
+	CMDENT *cp = NULL;
+	char *s = NULL;
 
 	if (cmdtab)
 	{
@@ -138,7 +140,7 @@ void register_commands(CMDENT *cmdtab)
  */
 void register_prefix_cmds(const char *cmdchars)
 {
-	const char *cp;
+	const char *cp = NULL ;
 	char *cn = XSTRDUP("x", "cn");
 
 	if (cmdchars)
@@ -159,7 +161,7 @@ void register_prefix_cmds(const char *cmdchars)
  */
 void register_functions(FUN *functab)
 {
-	FUN *fp;
+	FUN *fp = NULL;
 
 	if (functab)
 	{
@@ -178,8 +180,8 @@ void register_functions(FUN *functab)
  */
 void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
 {
-	MODHASHES *hp;
-	MODNHASHES *np;
+	MODHASHES *hp = NULL;
+	MODNHASHES *np = NULL;
 
 	if (htab)
 	{
@@ -206,7 +208,7 @@ void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
  */
 unsigned int register_dbtype(char *modname)
 {
-	unsigned int type;
+	unsigned int type = 0;
 	DBData key, data;
 	/**
 	 * Find out if the module already has a registered DB type

@@ -1,3 +1,14 @@
+/**
+ * @file externs.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2020-12-28
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
+
 /* externs.h - Prototypes for externs not defined elsewhere */
 
 #include "copyright.h"
@@ -551,15 +562,6 @@ extern char *log_pos;
 #define StrCopyKnown(scl__dest, scl__src, scl__len) \
     memcpy(scl__dest, scl__src, scl__len);          \
     scl__dest[scl__len] = '\0';
-
-/* Various macros for writing common string sequences. */
-
-//#define safe_crlf(b, p) safe_strncat((b), (p), "\r\n", 2, LBUF_SIZE)
-//#define safe_ansi_normal(b, p) safe_strncat((b), (p), ANSI_NORMAL, 4, LBUF_SIZE)
-//#define safe_nothing(b, p) safe_strncat((b), (p), "#-1", 3, LBUF_SIZE)
-//#define safe_noperm(b, p) safe_strncat((b), (p), "#-1 PERMISSION DENIED", 21, LBUF_SIZE)
-//#define safe_nomatch(b, p) safe_strncat((b), (p), "#-1 NO MATCH", 12, LBUF_SIZE)
-//#define safe_bool(b, p, n) safe_chr(((n) ? '1' : '0'), (b), (p))
 
 #define safe_dbref(b, p, n)  \
     SAFE_LB_CHR('#', (b), (p)); \

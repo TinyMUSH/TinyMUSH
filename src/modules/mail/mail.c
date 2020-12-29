@@ -2182,7 +2182,7 @@ static int get_folder_number(dbref player, char *name)
     while (!isspace(*p))
         p++;
 
-    p = '\0';
+    p = 0;
     XFREE(atrstr);
     XFREE(str);
     XFREE(pat);
