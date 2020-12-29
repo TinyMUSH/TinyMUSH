@@ -1,9 +1,12 @@
 language: c
 os:
   - linux
+  - osx
 dist: focal
+osx_image: xcode12.2
 compiler:
   - gcc
+  - clang
 before_install:
   - .ci/before_install.sh
 addons:
@@ -14,6 +17,15 @@ addons:
       - libgdbm-dev
       - doxygen
       - graphviz
+    update: true
+  homebrew:
+    packages:
+      - autoconf
+      - automake
+      - libtool
+      - gdbm
+      - pcre
+      - cproto
     update: true
 script: .ci/script.sh
 after_success:
