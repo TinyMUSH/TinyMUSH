@@ -537,7 +537,7 @@ FWDLIST *fwdlist_get(dbref thing)
 {
     dbref aowner = NOTHING;
     FWDLIST *fp = NULL;
-    int aflags = 0, alen = 0, errors = 0;
+    int aflags = 0, alen = 0;
     char *tp = NULL;
 
     if (!mudstate.standalone)
@@ -552,7 +552,7 @@ FWDLIST *fwdlist_get(dbref thing)
     }
 
     tp = atr_get(thing, A_FORWARDLIST, &aowner, &aflags, &alen);
-    errors = fwdlist_load(fp, GOD, tp);
+    fwdlist_load(fp, GOD, tp);
     XFREE(tp);
     return fp;
 }
@@ -867,7 +867,7 @@ int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
 PROPDIR *propdir_get(dbref thing)
 {
     dbref aowner = NOTHING;
-    int aflags = 0, alen = 0, errors = 0;
+    int aflags = 0, alen = 0;
     char *tp = NULL;
     PROPDIR *fp = NULL;
 
@@ -883,7 +883,7 @@ PROPDIR *propdir_get(dbref thing)
     }
 
     tp = atr_get(thing, A_PROPDIR, &aowner, &aflags, &alen);
-    errors = propdir_load(fp, GOD, tp);
+    propdir_load(fp, GOD, tp);
     XFREE(tp);
     return fp;
 }
@@ -1702,11 +1702,10 @@ int mkattr(char *buff)
 int al_decode(char **app)
 {
     int atrnum = 0, anum, atrshft = 0;
-    char *ap = NULL;
-    ap = *app = NULL;
-    bool found = false;
+    char *ap;
+    ap = *app;
 
-    while (!found)
+    while (true)
     {
         anum = ((*ap) & 0x7f);
 
@@ -1722,13 +1721,11 @@ int al_decode(char **app)
         if (!(*ap++ & 0x80))
         {
             *app = ap;
-            found = true;
+            return atrnum;
         }
 
         atrshft += 7;
     }
-
-    return atrnum;
 }
 
 /**
@@ -1739,10 +1736,10 @@ int al_decode(char **app)
  */
 void al_code(char **app, int atrnum)
 {
-    char *ap = *app;
-    bool found = false;
+    char *ap;
+    ap = *app;
 
-    while (!found)
+    while (true)
     {
         *ap = atrnum & 0x7f;
         atrnum = atrnum >> 7;
@@ -1750,7 +1747,7 @@ void al_code(char **app, int atrnum)
         if (!atrnum)
         {
             *app = ++ap;
-            found = true;
+            return;
         }
 
         *ap++ |= 0x80;
@@ -3437,9 +3434,11 @@ void putstring(FILE *f, const char *s)
         case '\\':
         case '"':
             putc('\\', f);
-
+            putc(*s, f);
+            break;
         default:
             putc(*s, f);
+            break;
         }
 
         s++;

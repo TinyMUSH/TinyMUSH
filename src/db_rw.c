@@ -840,9 +840,9 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 	int header_gotten = 0, size_gotten = 0, nextattr_gotten = 0;
 	int read_attribs = 1, read_name = 1, read_zone = 0, read_link = 0, read_key = 1, read_parent = 0;
 	int read_extflags = 0, read_3flags = 0, read_money = 1, read_timestamps = 0, read_createtime = 0, read_new_strings = 0;
-	int read_powers = 0, read_powers_player = 0, read_powers_any = 0;
+	int read_powers = 0;
 	int has_typed_quotas = 0, has_visual_attrs = 0;
-	int deduce_version = 1, deduce_name = 1, deduce_zone = 1, deduce_timestamps = 1;
+	int deduce_version = 1, deduce_name = 1, deduce_zone = 1;
 	int aflags = 0, f1 = 0, f2 = 0, f3 = 0;
 	BOOLEXP *tempbool = NULL;
 	time_t tmptime = 0L;
@@ -1768,7 +1768,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	dbref i = NOTHING;
 	int flags = 0;
 	VATTR *vp = NULL;
-	int n = 0, end = 0, ca = 0, n_oldtotal = 0, n_oldtop = 0, n_deleted = 0, n_renumbered = 0;
+	int n = 0, end = 0, ca = 0, n_oldtotal = 0, n_deleted = 0, n_renumbered = 0;
 	int n_objt = 0, n_atrt = 0, anxt = 0, dbclean = (version & V_DBCLEAN) ? 1 : 0;
 	int *old_attrs_table = NULL;
 	char *as = NULL;
@@ -1801,7 +1801,6 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		used_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "used_attrs_table");
 		old_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "old_attrs_table");
 		n_oldtotal = mudstate.attr_next;
-		n_oldtop = anum_alc_top;
 		n_deleted = n_renumbered = n_objt = n_atrt = 0;
 
 		/**

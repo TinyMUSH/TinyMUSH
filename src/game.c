@@ -216,7 +216,6 @@ int tailfind(char *file, char *key)
 {
 	int fp;
 	char *s = XMALLOC(MBUF_SIZE, "s");
-	off_t pos;
 	fp = open(file, O_RDONLY);
 
 	if (fp < 0)
@@ -225,7 +224,7 @@ int tailfind(char *file, char *key)
 		return 0;
 	}
 
-	pos = lseek(fp, 0 - strlen(key), SEEK_END);
+	lseek(fp, 0 - strlen(key), SEEK_END);
 
 	if (read(fp, s, strlen(key)) != -1)
 	{
@@ -2596,7 +2595,7 @@ void do_readcache(dbref player, dbref cause, int key)
 void process_preload(void)
 {
 	dbref thing, parent, aowner;
-	int aflags, alen, lev, i;
+	int aflags, alen, lev;
 	char *tstr;
 	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
 	FWDLIST *fp;
@@ -2604,7 +2603,6 @@ void process_preload(void)
 	fp = (FWDLIST *)XMALLOC(sizeof(FWDLIST), "fp");
 	pp = (PROPDIR *)XMALLOC(sizeof(PROPDIR), "pp");
 	tstr = XMALLOC(LBUF_SIZE, "tstr");
-	i = 0;
 	DO_WHOLE_DB(thing)
 	{
 		/*

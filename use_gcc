@@ -1,0 +1,3 @@
+#!/bin/bash
+
+CC="gcc" ./configure --enable-warnings --enable-debug

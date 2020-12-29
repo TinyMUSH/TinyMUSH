@@ -1391,7 +1391,7 @@ char *trimmed_name(dbref player)
 
 char *trimmed_site(char *name)
 {
-	char *buff = XMALLOC(MBUF_SIZE, buff);
+	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
 	if (((int)strlen(name) <= mudconf.site_chars) || (mudconf.site_chars == 0))
 	{
@@ -1748,7 +1748,6 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 char *sane_doing(char *arg, char *name)
 {
 	char *p, *bp;
-	int size;
 
 	if (arg != NULL)
 	{
@@ -1759,8 +1758,6 @@ char *sane_doing(char *arg, char *name)
 				*p = ' ';
 			}
 		}
-
-		size = strlen(arg);
 
 		if (!mudconf.ansi_colors || !strchr(arg, ESC_CHAR))
 		{

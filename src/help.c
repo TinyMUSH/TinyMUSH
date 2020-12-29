@@ -300,7 +300,7 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 {
 	FILE *fp;
 	char *p, *line, *result, *str, *bp;
-	int entry_offset, entry_length;
+	int entry_offset;
 	struct help_entry *htab_entry;
 	char matched;
 	char *topic_list, *buffp;
@@ -320,7 +320,6 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 	if (htab_entry)
 	{
 		entry_offset = htab_entry->pos;
-		entry_length = htab_entry->len;
 	}
 	else if (strpbrk(topic, "*?\\"))
 	{
@@ -435,7 +434,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	char *tname = XMALLOC(LBUF_SIZE, "tname");
 	char *p, *q, *line, *result, *str, *bp;
 	struct help_entry *htab_entry;
-	int entry_offset, entry_length, count;
+	int entry_offset, count;
 	FILE *fp;
 
 	if (hf_num >= mudstate.helpfiles)
@@ -472,7 +471,6 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	}
 
 	entry_offset = htab_entry->pos;
-	entry_length = htab_entry->len;
 	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
 
 	if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL)

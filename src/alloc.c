@@ -1116,7 +1116,7 @@ void list_rawmemory(dbref player)
 {
 	MEMTRACK *tptr = NULL, **t_array = NULL;
 	size_t n_tags = 0, total = 0, c_tags = 0, c_total = 0, u_tags = 0;
-	int i = 0, j = 0;
+	size_t i = 0, j = 0;
 	char *s1 = NULL, *s2 = NULL;
 
 	notify(player, "Memory Tag                                                       Allocs Bytes   ");

@@ -118,7 +118,7 @@ void hashreset(HASHTAB *htab)
 int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 {
     int htype, hval, numchecks;
-    HASHENT *hptr, *prev;
+    HASHENT *hptr;
     numchecks = 0;
     htab->scans++;
     htype = htab->flags & HT_TYPEMASK;
@@ -132,7 +132,7 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
         hval = (key.i & htab->mask);
     }
 
-    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
+    for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         numchecks++;
 
@@ -148,8 +148,6 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
             htab->checks += numchecks;
             return hptr->data;
         }
-
-        prev = hptr;
     }
 
     if (numchecks > htab->max_scan)
@@ -169,7 +167,7 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
 {
     int htype, hval, numchecks;
-    HASHENT *hptr, *prev;
+    HASHENT *hptr;
     numchecks = 0;
     htab->scans++;
     htype = htab->flags & HT_TYPEMASK;
@@ -183,7 +181,7 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
         hval = (key.i & htab->mask);
     }
 
-    for (prev = hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
+    for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         numchecks++;
 
@@ -199,8 +197,6 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
             htab->checks += numchecks;
             return hptr->flags;
         }
-
-        prev = hptr;
     }
 
     if (numchecks > htab->max_scan)

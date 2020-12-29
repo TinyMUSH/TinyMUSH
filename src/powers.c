@@ -424,12 +424,10 @@ char *power_description(dbref player, dbref target)
 {
     char *buff, *bp;
     POWERENT *fp;
-    int otype;
     POWER fv;
     /*
      * Allocate the return buffer
      */
-    otype = Typeof(target);
     bp = buff = XMALLOC(MBUF_SIZE, "buff");
     /*
      * Store the header strings and object type

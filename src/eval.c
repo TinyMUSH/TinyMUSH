@@ -733,20 +733,20 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 {
 	char *real_fargs[MAX_NFARGS + 1];
 	char **fargs = real_fargs + 1;
-	char *tstr, *tbuf, *savepos, *atr_gotten, *start, *oldp;
-	char savec, ch, *savestr, *str, *xptr, *mundane, *p;
+	char *tstr = NULL, *tbuf = NULL, *savepos = NULL, *atr_gotten = NULL, *start = NULL, *oldp = NULL;
+	char *savestr = NULL, *str = NULL, *xptr = NULL, *mundane = NULL, *p = NULL, *xtp = NULL;
+	char savec = 0, ch = 0;
 	char *realbuff = NULL, *realbp = NULL;
 	char *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
-	char *xtp;
-	dbref aowner;
-	int at_space, nfargs, gender, i, j, alldone, aflags, alen, feval;
-	int is_trace, is_top, save_count;
-	int ansi, nchar, navail;
-	FUN *fp;
-	UFUN *ufp;
-	VARENT *xvar;
-	ATTR *ap;
-	GDATA *preserve;
+	dbref aowner = NOTHING;
+	int at_space = 1, nfargs = 0, gender = -1, i = 0, j = 0, alldone = 0, aflags = 0, alen = 0, feval = 0;
+	int is_trace = Trace(player) && !(eval & EV_NOTRACE), is_top = 0, save_count = 0;
+	int ansi = 0, nchar = 0, navail = 0;
+	FUN *fp = NULL;
+	UFUN *ufp = NULL;
+	VARENT *xvar = NULL;
+	ATTR *ap = NULL;
+	GDATA *preserve = NULL;
 
 	if (*dstr == NULL)
 	{
@@ -755,12 +755,6 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		return;
 	}
 
-	at_space = 1;
-	gender = -1;
-	alldone = 0;
-	ansi = 0;
-	is_trace = Trace(player) && !(eval & EV_NOTRACE);
-	is_top = 0;
 
 	/**
      * Extend the buffer if we need to.
@@ -1022,6 +1016,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 					break;
 				}
+				[[fallthrough]];
 			/**
 			 * %c is color
 			 * 

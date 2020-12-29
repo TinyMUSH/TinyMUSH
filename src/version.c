@@ -85,7 +85,7 @@ void init_version(void)
 
        Everything is now set from the configure script. No need to edit this file anymore.
      */
-    char *version, *bp;
+    char *version;
     version = XSTRDUP(PACKAGE_VERSION, "version");
 
     if (version != NULL)
@@ -117,7 +117,7 @@ void init_version(void)
     mudstate.linkerinfo = XSTRDUP(version, "mudstate.linkerinfo");
     XFREE(version);
 
-    bp = version = XMALLOC(LBUF_SIZE, "version");
+    version = XMALLOC(LBUF_SIZE, "version");
     XSPRINTFCAT(version, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
 
     switch (mudstate.version.status)

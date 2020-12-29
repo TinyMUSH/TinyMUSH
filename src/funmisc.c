@@ -480,7 +480,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	int bot, top, over, i;
 	char *bb_p, *startp, *endp, *tbuf;
 	int lnum_init = 0;
-	char *lnum_buff = XMALLOC(290, lnum_buff);
+	char *lnum_buff = XMALLOC(290, "lnum_buff");
 
 	if (nfargs == 0)
 	{
@@ -1800,7 +1800,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 {
 	dbref thing, thing2, aowner;
 	char *p, *buff2;
-	int atr, atr2, aflags, alen, clear, flagvalue, could_hear;
+	int atr, atr2, aflags, alen, clear, flagvalue;
 	ATTR *attr, *attr2;
 
 	/*
@@ -1881,7 +1881,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 				aflags |= flagvalue;
 			}
 
-			could_hear = Hearer(thing);
+			Hearer(thing);
 			atr_set_flags(thing, atr, aflags);
 			return;
 		}

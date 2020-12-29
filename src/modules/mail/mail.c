@@ -3500,7 +3500,7 @@ static char *make_numlist(dbref player, char *arg)
 {
     char *head, *tail, spot;
     static char *numbuf;
-    static char buf[MBUF_SIZE];
+    char *buf;
     char *numbp;
     struct malias *m;
     struct mail *temp;
@@ -3557,8 +3557,9 @@ static char *make_numlist(dbref player, char *arg)
                 return NULL;
             }
 
-            snprintf(buf, MBUF_SIZE, "%d ", temp->from);
+            buf = XASPRINTF("buf", "%d ", temp->from);
             SAFE_LB_STR(buf, numbuf, &numbp);
+            XFREE(buf);
         }
         else if (*head == '*')
         {
@@ -3580,8 +3581,9 @@ static char *make_numlist(dbref player, char *arg)
 
             if (target != NOTHING)
             {
-                snprintf(buf, MBUF_SIZE, "%d ", target);
+                buf = XASPRINTF("buf", "%d ", target);
                 SAFE_LB_STR(buf, numbuf, &numbp);
+                XFREE(buf);
             }
             else
             {
@@ -4531,29 +4533,28 @@ void mod_mail_init(void)
     switch (mudstate.version.status)
     {
     case 0:
-        sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 1:
-        sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 2:
-        sprintf(str, "%s, Release Candidate %d", str, mudstate.version.revision);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     default:
         if (mudstate.version.revision > 0)
         {
-            sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         }
         else
         {
-            sprintf(str, "%s, Gold Release.", str);
+            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mudstate.version.major, mudstate.version.minor, PACKAGE_RELEASE_DATE);
         }
     }
 
-    sprintf(str, "%s (%s)", str, PACKAGE_RELEASE_DATE);
     mod_mail_version.version = XSTRDUP(str, "mod_mail_version.version");
     mod_mail_version.author = XSTRDUP("TinyMUSH Development Team", "mod_mail_version.author");
     mod_mail_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_mail_version.email");

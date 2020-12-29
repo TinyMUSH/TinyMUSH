@@ -255,11 +255,13 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
  */
 char *unparse_boolexp_quiet(dbref player, BOOLEXP *b)
 {
-	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, "boolexp_buf");
 	char *buftop;
+
 	buftop = boolexp_buf;
 	unparse_boolexp1(player, b, BOOLEXP_CONST, F_QUIET, boolexp_buf, &buftop);
 	*buftop = '\0';
+
 	return boolexp_buf;
 }
 
@@ -274,11 +276,13 @@ char *unparse_boolexp_quiet(dbref player, BOOLEXP *b)
  */
 char *unparse_boolexp(dbref player, BOOLEXP *b)
 {
-	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, "boolexp_buf");
 	char *buftop;
+
 	buftop = boolexp_buf;
 	unparse_boolexp1(player, b, BOOLEXP_CONST, F_EXAMINE, boolexp_buf, &buftop);
 	*buftop = '\0';
+
 	return boolexp_buf;
 }
 
@@ -293,11 +297,13 @@ char *unparse_boolexp(dbref player, BOOLEXP *b)
  */
 char *unparse_boolexp_decompile(dbref player, BOOLEXP *b)
 {
-	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, "boolexp_buf");
 	char *buftop;
+
 	buftop = boolexp_buf;
 	unparse_boolexp1(player, b, BOOLEXP_CONST, F_DECOMPILE, boolexp_buf, &buftop);
 	*buftop = '\0';
+
 	return boolexp_buf;
 }
 
@@ -312,10 +318,12 @@ char *unparse_boolexp_decompile(dbref player, BOOLEXP *b)
  */
 char *unparse_boolexp_function(dbref player, BOOLEXP *b)
 {
-	char *boolexp_buf = XMALLOC(LBUF_SIZE, boolexp_buf);
+	char *boolexp_buf = XMALLOC(LBUF_SIZE, "boolexp_buf");
 	char *buftop;
+
 	buftop = boolexp_buf;
 	unparse_boolexp1(player, b, BOOLEXP_CONST, F_FUNCTION, boolexp_buf, &buftop);
 	*buftop = '\0';
+	
 	return boolexp_buf;
 }

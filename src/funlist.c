@@ -622,7 +622,6 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 {
 	int ct, overrun;
 	char *sptr, *iptr, *eptr;
-	char nullb;
 
 	/*
      * If passed a null string return an empty string, except that we are
@@ -648,7 +647,6 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
      * Split the list up into 'before', 'target', and 'after' chunks
      * pointed to by sptr, iptr, and eptr respectively.
      */
-	nullb = '\0';
 
 	if (el == 1)
 	{
@@ -810,7 +808,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	Delim osep;
 	char *origlist, *replist, *poslist;
 	char **orig_p, **rep_p, **pos_p;
-	int norig, nrep, npos, i, cpos;
+	int norig, npos, i, cpos;
 	/*
      * We're generous with the argument checking, in case the replacement
      * list is blank, and/or the position list is blank.
@@ -849,7 +847,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	XSTRCPY(replist, fargs[1]);
 	XSTRCPY(poslist, fargs[2]);
 	norig = list2arr(&orig_p, LBUF_SIZE / 2, origlist, &isep);
-	nrep = list2arr(&rep_p, LBUF_SIZE / 2, replist, &isep);
+	list2arr(&rep_p, LBUF_SIZE / 2, replist, &isep);
 	npos = list2arr(&pos_p, LBUF_SIZE / 2, poslist, &SPACE_DELIM);
 
 	/*
@@ -1490,7 +1488,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	Delim isep, osep;
 	int oper, type_arg;
-	char *list1, *plist1, *list2, *plist2, *oldp, *bb_p;
+	char *list1, *list2, *oldp, *bb_p;
 	char **ptrs1, **ptrs2;
 	int i1, i2, n1, n2, val, sort_type;
 	int *ip1, *ip2;
@@ -1507,10 +1505,10 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		VaChk_Only_In_Out(4);
 	}
 
-	plist1 = list1 = XMALLOC(LBUF_SIZE, "list1");
+	list1 = XMALLOC(LBUF_SIZE, "list1");
 	XSTRCPY(list1, fargs[0]);
 	n1 = list2arr(&ptrs1, LBUF_SIZE, list1, &isep);
-	plist2 = list2 = XMALLOC(LBUF_SIZE, "list2");
+	list2 = XMALLOC(LBUF_SIZE, "list2");
 	XSTRCPY(list2, fargs[1]);
 	n2 = list2arr(&ptrs2, LBUF_SIZE, list2, &isep);
 

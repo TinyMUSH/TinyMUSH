@@ -166,11 +166,11 @@ struct com_list
 #define ok_sendchannel(d, c) \
     ok_chanperms((d), (c), CHAN_FLAG_P_TRANS, CHAN_FLAG_O_TRANS, (c)->trans_lock)
 
-#define clear_chan_alias(n, a)                       \
-    XFREE((a)->alias);   \
-    if ((a)->title)                                  \
-        XFREE((a)->title); \
-    XFREE((a));            \
+#define clear_chan_alias(n, a) \
+    XFREE((a)->alias);         \
+    if ((a)->title)            \
+        XFREE((a)->title);     \
+    XFREE((a));                \
     hashdelete((n), &mod_comsys_calias_htab)
 
 /* --------------------------------------------------------------------------
@@ -744,8 +744,8 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
         {
             name_buf = NULL;
         }
-        
-        s = XMALLOC(LBUF_SIZE*2, "process_comsys");
+
+        s = XMALLOC(LBUF_SIZE * 2, "process_comsys");
         if (*arg == ':')
         {
             snprintf(s, LBUF_SIZE * 2, "%s %s %s", cap->channel->header, (name_buf) ? name_buf : Name(player), arg + 1);
@@ -1649,7 +1649,7 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name)
         if (chp->join_lock)
             buff = unparse_boolexp(player, chp->join_lock);
         else
-            buff = XSTRDUP("*UNLOCKED*", buff);
+            buff = XSTRDUP("*UNLOCKED*", "buff");
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Join Lock: %s", buff);
 
@@ -1658,7 +1658,7 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name)
         if (chp->trans_lock)
             buff = unparse_boolexp(player, chp->trans_lock);
         else
-            buff = XSTRDUP("*UNLOCKED*", buff);
+            buff = XSTRDUP("*UNLOCKED*", "buff");
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Transmit Lock: %s", buff);
 
@@ -1667,7 +1667,7 @@ void do_clist(dbref player, dbref cause, int key, char *chan_name)
         if (chp->recv_lock)
             buff = unparse_boolexp(player, chp->recv_lock);
         else
-            buff = XSTRDUP("*UNLOCKED*", buff);
+            buff = XSTRDUP("*UNLOCKED*", "buff");
 
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Receive Lock: %s", buff);
 
@@ -2006,7 +2006,6 @@ static void read_comsys(FILE *fp, int com_ver)
             else
                 chp->descrip = NULL;
 
-     
             if (com_ver > 3)
             {
                 s = (char *)getstring(fp, 1);
@@ -2286,33 +2285,33 @@ void mod_comsys_load_database(FILE *fp)
  * User functions.
  */
 
-#define Grab_Channel(p)                                           \
-    chp = lookup_channel(fargs[0]);                               \
-    if (!chp)                                                     \
-    {                                                             \
+#define Grab_Channel(p)                                              \
+    chp = lookup_channel(fargs[0]);                                  \
+    if (!chp)                                                        \
+    {                                                                \
         SAFE_LB_STR((char *)"#-1 CHANNEL NOT FOUND", buff, bufc);    \
-        return;                                                   \
-    }                                                             \
-    if ((!Comm_All(p) && ((p) != chp->owner)))                    \
-    {                                                             \
+        return;                                                      \
+    }                                                                \
+    if ((!Comm_All(p) && ((p) != chp->owner)))                       \
+    {                                                                \
         SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
-        return;                                                   \
+        return;                                                      \
     }
 
-#define Comsys_User(p, t)                                         \
-    t = lookup_player(p, fargs[0], 1);                            \
-    if (!Good_obj(t) || (!Controls(p, t) && !Comm_All(p)))        \
-    {                                                             \
+#define Comsys_User(p, t)                                            \
+    t = lookup_player(p, fargs[0], 1);                               \
+    if (!Good_obj(t) || (!Controls(p, t) && !Comm_All(p)))           \
+    {                                                                \
         SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
-        return;                                                   \
+        return;                                                      \
     }
 
-#define Grab_Alias(p, n)                                   \
-    cap = lookup_calias(p, n);                             \
-    if (!cap)                                              \
-    {                                                      \
+#define Grab_Alias(p, n)                                      \
+    cap = lookup_calias(p, n);                                \
+    if (!cap)                                                 \
+    {                                                         \
         SAFE_LB_STR((char *)"#-1 NO SUCH ALIAS", buff, bufc); \
-        return;                                            \
+        return;                                               \
     }
 
 void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -2515,30 +2514,28 @@ void mod_comsys_init(void)
     switch (mudstate.version.status)
     {
     case 0:
-        sprintf(str, "%s, Alpha %d", str, mudstate.version.revision);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 1:
-        sprintf(str, "%s, Beta %d", str, mudstate.version.revision);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 2:
-        sprintf(str, "%s, Release Candidate %d", str, mudstate.version.revision);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     default:
         if (mudstate.version.revision > 0)
         {
-            sprintf(str, "%s, Patch Level %d", str, mudstate.version.revision);
+            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
         }
         else
         {
-            sprintf(str, "%s, Gold Release.", str);
+            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mudstate.version.major, mudstate.version.minor, PACKAGE_RELEASE_DATE);
         }
     }
 
-    sprintf(str, "%s (%s)", str, PACKAGE_RELEASE_DATE);
-    mod_comsys_version.version = XSTRDUP(str, "mod_comsys_init.mod_comsys_version.version");
     mod_comsys_version.author = XSTRDUP("TinyMUSH Development Team", "mod_comsys_init.mod_comsys_version.author");
     mod_comsys_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_comsys_init.mod_comsys_version.email");
     mod_comsys_version.url = XSTRDUP("https://github.com/TinyMUSH", "mod_comsys_init.mod_comsys_version.url");

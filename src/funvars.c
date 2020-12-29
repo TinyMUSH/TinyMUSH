@@ -3638,7 +3638,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     Delim osep;
     dbref it;
     OBJSTACK *sp;
-    char *bp, *bb_p;
+    char *bb_p;
     int over = 0;
     VaChk_Out(0, 2);
 
@@ -3651,7 +3651,6 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         stack_object(player, it);
     }
 
-    bp = buff;
     bb_p = *bufc;
 
     for (sp = stack_get(it); (sp != NULL) && !over; sp = sp->next)
@@ -3679,8 +3678,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
     int case_option, all_option;
     int erroffset, subpatterns, len;
     int offsets[PCRE_MAX_OFFSETS];
-    char *r, *start;
-    char tbuf[LBUF_SIZE];
+    char *r, *start, *tbuf;
     char tmp;
     int match_offset = 0;
     case_option = Func_Mask(REG_CASELESS);
@@ -3803,10 +3801,12 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
                 r++;
             }
 
+            tbuf = XMALLOC(LBUF_SIZE, "tbuf");
             if (pcre_copy_substring(fargs[0], offsets, subpatterns, offset, tbuf, LBUF_SIZE) >= 0)
             {
                 SAFE_LB_STR(tbuf, buff, bufc);
             }
+            XFREE(tbuf);
         }
 
         start = fargs[0] + offsets[1];
@@ -4505,7 +4505,7 @@ void grid_free(dbref thing, OBJGRID *ogp)
 void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     OBJGRID *ogp;
-    int rows, cols, dimension, r, c, status, data_rows, data_elems, errs;
+    int rows, cols, dimension, r, c, status, data_rows, data_elems;
     char *rbuf, *pname;
     char **row_text, **elem_text;
     Delim csep, rsep;
@@ -4580,8 +4580,6 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         grid_free(player, ogp);
         return;
     }
-
-    errs = 0;
 
     for (r = 0; r < data_rows; r++)
     {
