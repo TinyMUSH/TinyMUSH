@@ -21,22 +21,6 @@
 
 #define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
 
-#define DEQUEUE(q, e)              \
-    if (e->nxt == (Cache *)0)      \
-    {                              \
-        if (prv != (Cache *)0)     \
-        {                          \
-            prv->nxt = (Cache *)0; \
-        }                          \
-        q->tail = prv;             \
-    }                              \
-    if (prv == (Cache *)0)         \
-    {                              \
-        q->head = e->nxt;          \
-    }                              \
-    else                           \
-        prv->nxt = e->nxt;
-
 #define INSHEAD(q, e)          \
     if (q->head == (Cache *)0) \
     {                          \
@@ -180,7 +164,6 @@ int cache_init(int width)
 {
     int x;
     Chain *sp;
-    char *ncmsg = "cache_init: cannot allocate cache: ";
 
     if (cache_initted || sys_c != (Chain *)0)
     {
@@ -201,7 +184,7 @@ int cache_init(int width)
 
     if (sys_c == (Chain *)0)
     {
-        warning(ncmsg, (char *)-1, "\n", (char *)0);
+        warning("cache_init: cannot allocate cache: ", (char *)-1, "\n", (char *)0);
         return (-1);
     }
 
@@ -894,7 +877,22 @@ Cache *get_free_entry(int atrsize)
             /*
 	     * Remove the cache entry
 	     */
-            DEQUEUE(sp, cp);
+            if (cp->nxt == (Cache *)0)
+            {
+                if (prv != (Cache *)0)
+                {
+                    prv->nxt = (Cache *)0;
+                }
+                sp->tail = prv;
+            }
+            if (prv == (Cache *)0)
+            {
+                sp->head = cp->nxt;
+            }
+            else {
+                prv->nxt = cp->nxt;
+            }
+                
             cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
             XFREE(cp->keydata);
             XFREE(cp);

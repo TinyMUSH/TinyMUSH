@@ -85,11 +85,11 @@ access		@find	disabled
 #
 # dump_message		GAME: Database being saved.
 #
-default_home		45
-player_starting_room	45
-player_starting_home	45
-master_room		2
-guest_char_num		16
+# default_home		45
+# player_starting_room	45
+# player_starting_home	45
+# master_room		2
+# guest_char_num	16
 #
 # -- Pueblo Support
 #

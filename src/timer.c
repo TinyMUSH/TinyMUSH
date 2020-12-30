@@ -598,7 +598,7 @@ void dispatch(void)
         mudstate.check_counter = mudconf.check_interval + mudstate.now;
         mudstate.debug_cmd = (char *)"< dbck >";
         do_dbck(NOTHING, NOTHING, 0);
-        SYNC;
+        cache_sync();
         pcache_trim();
     }
 

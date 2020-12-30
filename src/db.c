@@ -3412,29 +3412,24 @@ void putstring(FILE *f, const char *s)
         switch (*s)
         {
         case '\n':
-            putc('\\', f);
-            putc('n', f);
+            fprintf(f, "\\n");
             break;
 
         case '\r':
-            putc('\\', f);
-            putc('r', f);
+            fprintf(f, "\\r");
             break;
 
         case '\t':
-            putc('\\', f);
-            putc('t', f);
+            fprintf(f, "\\t");
             break;
 
         case ESC_CHAR:
-            putc('\\', f);
-            putc('e', f);
+            fprintf(f, "\\e");
             break;
-
         case '\\':
         case '"':
+            fprintf(f, "\\%c", *s);
             putc('\\', f);
-            putc(*s, f);
             break;
         default:
             putc(*s, f);
@@ -3444,8 +3439,7 @@ void putstring(FILE *f, const char *s)
         s++;
     }
 
-    putc('"', f);
-    putc('\n', f);
+    fprintf(f, "\"\n");
 }
 
 /**
@@ -3458,7 +3452,7 @@ void putstring(FILE *f, const char *s)
 char *getstring(FILE *f, bool new_strings)
 {
     char *buf = XMALLOC(LBUF_SIZE, "buf");
-    char *p = buf;
+    char *p = buf, *ret = NULL;
     int lastc = 0, c = fgetc(f);
 
     if (!new_strings || (c != '"'))
@@ -3478,7 +3472,9 @@ char *getstring(FILE *f, bool new_strings)
             if (!c || (c == EOF))
             {
                 *p = '\0';
-                return buf;
+                ret = XSTRDUP(buf, "getstring");
+                XFREE(buf);
+                return ret;
             }
 
             /** 
@@ -3488,7 +3484,9 @@ char *getstring(FILE *f, bool new_strings)
             if ((c == '\n') && (lastc != '\r'))
             {
                 *p = '\0';
-                return buf;
+                ret = XSTRDUP(buf, "getstring");
+                XFREE(buf);
+                return ret;
             }
 
             SAFE_LB_CHR(c, buf, &p);
@@ -3508,7 +3506,9 @@ char *getstring(FILE *f, bool new_strings)
                 }
 
                 *p = '\0';
-                return buf;
+                ret = XSTRDUP(buf, "getstring");
+                XFREE(buf);
+                return ret;
             }
             else if (c == '\\')
             {
@@ -3537,7 +3537,9 @@ char *getstring(FILE *f, bool new_strings)
             if ((c == '\0') || (c == EOF))
             {
                 *p = '\0';
-                return buf;
+                ret = XSTRDUP(buf, "getstring");
+                XFREE(buf);
+                return ret;
             }
 
             SAFE_LB_CHR(c, buf, &p);
@@ -3556,7 +3558,7 @@ dbref getref(FILE *f)
     dbref d = NOTHING;
     char *buf = XMALLOC(SBUF_SIZE, "buf");
 
-    if (fgets(buf, sizeof(buf), f) != NULL)
+    if (fgets(buf, SBUF_SIZE, f) != NULL)
     {
         d = ((int)strtol(buf, (char **)NULL, 10));
     }
@@ -3576,7 +3578,7 @@ long getlong(FILE *f)
     long d = 0;
     char *buf = XMALLOC(SBUF_SIZE, "buf");
 
-    if (fgets(buf, sizeof(buf), f) != NULL)
+    if (fgets(buf, SBUF_SIZE, f) != NULL)
     {
         d = (strtol(buf, (char **)NULL, 10));
     }
@@ -3704,31 +3706,32 @@ void dump_restart_db(void)
     version |= RS_NEW_STRINGS;
     version |= RS_COUNT_REBOOTS;
     dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Restart DB: %s", dbf);
     f = fopen(dbf, "w");
     XFREE(dbf);
     fprintf(f, "+V%d\n", version);
-    putref(f, sock);
-    putlong(f, mudstate.start_time);
-    putref(f, mudstate.reboot_nums);
+    fprintf(f, "%d\n", (int)sock);
+    fprintf(f, "%ld\n", (long)mudstate.start_time);
+    fprintf(f, "%d\n", (int)mudstate.reboot_nums);
     putstring(f, mudstate.doing_hdr);
-    putref(f, mudstate.record_players);
-    DESC_ITER_ALL(d)
+    fprintf(f, "%d\n", (int)mudstate.record_players);
+    for (d = descriptor_list; (d); d = (d)->next)
     {
-        putref(f, d->descriptor);
-        putref(f, d->flags);
-        putlong(f, d->connected_at);
-        putref(f, d->command_count);
-        putref(f, d->timeout);
-        putref(f, d->host_info);
-        putref(f, d->player);
-        putlong(f, d->last_time);
+        fprintf(f, "%d\n", d->descriptor);
+        fprintf(f, "%d\n", d->flags);
+        fprintf(f, "%ld\n", d->connected_at);
+        fprintf(f, "%d\n", d->command_count);
+        fprintf(f, "%d\n", d->timeout);
+        fprintf(f, "%d\n", d->host_info);
+        fprintf(f, "%d\n", d->player);
+        fprintf(f, "%ld\n", d->last_time);
         putstring(f, d->output_prefix);
         putstring(f, d->output_suffix);
         putstring(f, d->addr);
         putstring(f, d->doing);
         putstring(f, d->username);
     }
-    putref(f, 0);
+    fprintf(f, "0\n");
     fclose(f);
 }
 
@@ -3748,25 +3751,36 @@ void load_restart_db(void)
 
     if (!f)
     {
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Can't open restart DB %s", dbf);
         mudstate.restarting = 0;
+        XFREE(temp);
+        XFREE(dbf);
         return;
     }
 
-    mudstate.restarting = 1;
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Reading restart DB %s", dbf);
 
     if (fgets(buf, 3, f) != NULL)
     {
         if (strncmp(buf, "+V", 2))
         {
+            log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Invalid restart DB: Version marker not found.");
             abort();
         }
     }
     else
     {
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Invalid restart DB: Cannot read.");
         abort();
     }
 
     version = getref(f);
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Restart DB version %d.", version);
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "RS_NEW_STRINGS: %s", version & RS_NEW_STRINGS ? "true" : "false");
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "RS_COUNT_REBOOTS: %s", version & RS_COUNT_REBOOTS ? "true" : "false");
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "RS_CONCENTRATE: %s", version & RS_CONCENTRATE ? "true" : "false");
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "RS_RECORD_PLAYERS: %s", version & RS_RECORD_PLAYERS ? "true" : "false");
+
     sock = getref(f);
 
     if (version & RS_NEW_STRINGS)
@@ -3776,10 +3790,12 @@ void load_restart_db(void)
 
     maxd = sock + 1;
     mudstate.start_time = (time_t)getlong(f);
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Start time: %ld", mudstate.start_time);
 
     if (version & RS_COUNT_REBOOTS)
     {
         mudstate.reboot_nums = getref(f) + 1;
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Reboot count: %d", mudstate.reboot_nums);
     }
 
     mudstate.doing_hdr = getstring(f, new_strings);
@@ -3792,6 +3808,7 @@ void load_restart_db(void)
     if (version & RS_RECORD_PLAYERS)
     {
         mudstate.record_players = getref(f);
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Record Player: %d", mudstate.record_players);
     }
 
     while ((val = getref(f)) != 0)
@@ -3807,8 +3824,8 @@ void load_restart_db(void)
         d->host_info = getref(f);
         d->player = getref(f);
         d->last_time = (time_t)getlong(f);
-        temp = getstring(f, new_strings);
 
+        temp = getstring(f, new_strings);
         if (*temp)
         {
             d->output_prefix = temp;
@@ -3819,7 +3836,6 @@ void load_restart_db(void)
         }
 
         temp = getstring(f, new_strings);
-
         if (*temp)
         {
             d->output_suffix = temp;
@@ -3827,18 +3843,28 @@ void load_restart_db(void)
         else
         {
             d->output_suffix = NULL;
+            XFREE(temp);
         }
 
         temp = getstring(f, new_strings);
-        XSTRNCPY(d->addr, temp, 50);
+        if (*temp)
+        {
+            XSTRNCPY(d->addr, temp, 50);
+        }
         XFREE(temp);
 
         temp = getstring(f, new_strings);
-        d->doing = sane_doing(temp, "doing");
+        if (*temp)
+        {
+            d->doing = sane_doing(temp, "doing");
+        }
         XFREE(temp);
 
         temp = getstring(f, new_strings);
-        XSTRNCPY(d->username, temp, 10);
+        if (*temp)
+        {
+            XSTRNCPY(d->username, temp, 10);
+        }
         XFREE(temp);
 
         d->colormap = NULL;
@@ -3903,7 +3929,7 @@ void load_restart_db(void)
      * In case we've had anything bizarre happen...
      * 
      */
-    DESC_ITER_ALL(d)
+    for (d = descriptor_list; (d); d = (d)->next)
     {
         if (fstat(d->descriptor, &fstatbuf) < 0)
         {
@@ -3911,13 +3937,18 @@ void load_restart_db(void)
             shutdownsock(d, R_SOCKDIED);
         }
     }
-    DESC_ITER_CONN(d)
-    {
-        if (!isPlayer(d->player))
+
+    for (d = descriptor_list; (d); d = (d)->next)
+        if ((d)->flags & DS_CONNECTED)
         {
-            shutdownsock(d, R_QUIT);
+            if (!isPlayer(d->player))
+            {
+                shutdownsock(d, R_QUIT);
+            }
         }
-    }
+
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Restart DB read successfully.");
+
     fclose(f);
     remove(dbf);
     XFREE(dbf);

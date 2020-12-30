@@ -1472,7 +1472,8 @@ void sighandler(int sig)
 			 * 
 			 */
 			dump_database_internal(DUMP_DB_CRASH);
-			CLOSE;
+			cache_sync();
+        	dddb_close();
 
 			if (slave_socket != -1)
 			{

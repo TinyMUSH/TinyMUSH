@@ -21,7 +21,7 @@
 #include "udb_defs.h"   /* required by code */
 #include "stringutil.h" /* required by code */
 
-#define DEFAULT_DBMCHUNKFILE "mudDB"
+#define DEFAULT_DBMCHUNKFILE "netmush"
 
 char *dbfile = DEFAULT_DBMCHUNKFILE;
 int db_initted = 0;
@@ -33,12 +33,13 @@ struct flock fl;
 
 void dddb_setsync(int flag)
 {
-    char *gdbm_error;
-
     if (gdbm_setopt(dbp, GDBM_SYNCMODE, &flag, sizeof(int)) == -1)
     {
-        gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-        warning("setsync: cannot toggle sync flag", dbfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+        warning("dddb_setsync: cannot set GDBM_SYNCMODE to %d on %s. GDBM Error %s", flag, dbfile, gdbm_strerror(gdbm_errno));
+    }
+    else
+    {
+        log_write(LOG_ALWAYS, "DB", "INFO", "set GDBM_SYNCMODE to %d on %s.", flag, dbfile);
     }
 }
 
@@ -51,21 +52,19 @@ void dbm_error(const char *msg)
 
 int dddb_optimize(void)
 {
-    int i;
-    i = gdbm_reorganize(dbp);
-    return i;
+    log_write(LOG_ALWAYS, "DB", "INFO", "Optimizing %s", dbfile);
+
+    return gdbm_reorganize(dbp);
 }
 
 int dddb_init(void)
 {
-    char *copen = "db_init cannot open ";
     char *tmpfile;
-    char *gdbm_error;
     int i;
 
     if (!mudstate.standalone)
     {
-        
+
         tmpfile = XASPRINTF("tmpfile", "%s/%s", mudconf.dbhome, dbfile);
     }
     else
@@ -73,10 +72,11 @@ int dddb_init(void)
         tmpfile = XSTRDUP(dbfile, "tmpfile");
     }
 
+    log_write(LOG_ALWAYS, "DB", "INFO", "Opening %s", tmpfile);
+
     if ((dbp = gdbm_open(tmpfile, mudstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, dbm_error)) == (GDBM_FILE)0)
     {
-        gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-        warning(copen, tmpfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+        warning("dddb_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
         XFREE(tmpfile);
         return (1);
     }
@@ -91,8 +91,7 @@ int dddb_init(void)
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
         {
-            gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-            warning(copen, dbfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+            warning("dddb_init: cannot set cache size to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
             return (1);
         }
     }
@@ -107,8 +106,7 @@ int dddb_init(void)
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
         {
-            gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-            warning(copen, dbfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+            warning("dddb_init: cannot set GDBM_CACHESIZE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
             return (1);
         }
     }
@@ -120,8 +118,7 @@ int dddb_init(void)
 
     if (gdbm_setopt(dbp, GDBM_CENTFREE, &i, sizeof(int)) == -1)
     {
-        gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-        warning(copen, dbfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+        warning("dddb_init: cannot set GDBM_CENTFREE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -132,8 +129,7 @@ int dddb_init(void)
 
     if (gdbm_setopt(dbp, GDBM_COALESCEBLKS, &i, sizeof(int)) == -1)
     {
-        gdbm_error = (char *)gdbm_strerror(gdbm_errno);
-        warning(copen, dbfile, " ", (char *)-1, "\n", gdbm_error, "\n", (char *)0);
+        warning("dddb_init: cannot set GDBM_COALESCEBLKS to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -178,16 +174,27 @@ int dddb_setfile(char *fil)
     return (0);
 }
 
-int dddb_close(void)
+bool dddb_close(void)
 {
+    log_write(LOG_ALWAYS, "DB", "INFO", "closing %s", dbfile);
+
     if (dbp != (GDBM_FILE)0)
     {
-        gdbm_close(dbp);
+        if (gdbm_sync(dbp) == -1)
+        {
+            warning("dddb_close: gdbm_sync error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
+            return false;
+        }
+        if (gdbm_close(dbp) == -1)
+        {
+            warning("dddb_close: gdbm_close error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
+            return false;
+        }
         dbp = (GDBM_FILE)0;
     }
 
     db_initted = 0;
-    return (0);
+    return true;
 }
 
 /* Pass db_get a key, and it returns data. Type is used as part of the GDBM
@@ -228,7 +235,7 @@ DBData db_get(DBData gamekey, unsigned int type)
 int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 {
     datum dat;
-    datum key;    
+    datum key;
     char *s;
 
     if (!db_initted)
@@ -252,7 +259,7 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 
     if (gdbm_store(dbp, key, dat, GDBM_REPLACE))
     {
-        warning("db_put: can't gdbm_store ", " ", (char *)-1, "\n", (char *)0);
+        warning("db_put: gdbm_store failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }
@@ -266,7 +273,7 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 int db_del(DBData gamekey, unsigned int type)
 {
     datum dat;
-    datum key;    
+    datum key;
     char *s;
 
     if (!db_initted)
@@ -298,7 +305,7 @@ int db_del(DBData gamekey, unsigned int type)
      */
     if (gdbm_delete(dbp, key))
     {
-        warning("db_del: can't delete key\n", (char *)NULL);
+        warning("db_del: gdbm_delete failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }

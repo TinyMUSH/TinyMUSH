@@ -19,30 +19,30 @@
 #define XNMALLOC(s) __xmalloc(s, NULL, 0, NULL, NULL)
 #define XCALLOC(n, s, v) __xcalloc(n, s, __FILE__, __LINE__, __func__, v)
 #define XNCALLOC(n, s) __xcalloc(n, s, NULL, 0, NULL, NULL)
-#define XREALLOC(p, s, v) __xrealloc(p, s, __FILE__, __LINE__, __func__, v)
-#define XNREALLOC(p, s) __xrealloc(p, s, NULL, 0, NULL, NULL)
-#define XFREE(p) __xfree(p)
-#define XHEADER(p) (MEMTRACK *)((char *)p - sizeof(MEMTRACK));
+#define XREALLOC(p, s, v) __xrealloc((void *)(p), s, __FILE__, __LINE__, __func__, v)
+#define XNREALLOC(p, s) __xrealloc((void *)(p), s, NULL, 0, NULL, NULL)
+#define XFREE(p) __xfree((void *)(p))
+#define XHEADER(p) (MEMTRACK *)((char *)(p) - sizeof(MEMTRACK));
 
 // String Functions
-#define XASPRINTF(v, f, ...) __xasprintf(__FILE__, __LINE__, __func__, v, f, ##__VA_ARGS__)
-#define XNASPRINTF(f, ...) __xasprintf(NULL, 0, NULL, NULL, f, ##__VA_ARGS__);
-#define XSPRINTF(s, f, ...) __xsprintf(s, f, ##__VA_ARGS__)
-#define XSPRINTFCAT(s, f, ...) __xsprintfcat(s, f, ##__VA_ARGS__)
-#define XVSPRINTF(s, f, a) __xvsprintf(s, f, a)
-#define XSNPRINTF(s, n, f, ...) __xsnprintf(s, n, f, ##__VA_ARGS__)
-#define XVSNPRINTF(s, n, f, a) __xvsnprintf(s, n, f, a)
-#define XSTRDUP(s, v) __xstrdup(s, __FILE__, __LINE__, __func__, v)
-#define XNSTRDUP(s) __xstrdup(s, NULL, 0, NULL, NULL)
-#define XSTRCAT(d, s) __xstrcat(d, s)
-#define XSTRNCAT(d, s, n) __xstrncat(d, s, n)
-#define XSTRCCAT(d, s) __xstrccat(d, s)
-#define XSTRNCCAT(d, s, n) __xstrnccat(d, s, n)
-#define XSTRCPY(d, s) __xstrcpy(d, s)
-#define XSTRNCPY(d, s, n) __xstrncpy(d, s, n)
-#define XMEMMOVE(d, s, n) __xmemmove(d, s, n)
-#define XMEMCPY(d, s, n) __xmemmove(d, s, n)
-#define XMEMSET(s, c, n) __xmemset(s, c, n)
+#define XASPRINTF(v, f, ...) __xasprintf(__FILE__, __LINE__, __func__, v, (const char *)(f), ##__VA_ARGS__)
+#define XNASPRINTF(f, ...) __xasprintf(NULL, 0, NULL, NULL, (const char *)(f), ##__VA_ARGS__);
+#define XSPRINTF(s, f, ...) __xsprintf((char *)(s), (const char *)(f), ##__VA_ARGS__)
+#define XSPRINTFCAT(s, f, ...) __xsprintfcat((char *)(s), (const char *)(f), ##__VA_ARGS__)
+#define XVSPRINTF(s, f, a) __xvsprintf((char *)(s), (const char *)(f), a)
+#define XSNPRINTF(s, n, f, ...) __xsnprintf((char *)(s), n, (const char *)(f), ##__VA_ARGS__)
+#define XVSNPRINTF(s, n, f, a) __xvsnprintf((char *)(s), n, (const char *)(f), a)
+#define XSTRDUP(s, v) __xstrdup((const char *)(s), __FILE__, __LINE__, __func__, v)
+#define XNSTRDUP(s) __xstrdup((const char *)(s), NULL, 0, NULL, NULL)
+#define XSTRCAT(d, s) __xstrcat((char *)(d), (const char *)(s))
+#define XSTRNCAT(d, s, n) __xstrncat((char *)(d), (const char *)(s), n)
+#define XSTRCCAT(d, c) __xstrccat((char *)(d), (const char)(c))
+#define XSTRNCCAT(d, c, n) __xstrnccat((char *)(d), (const char)(c), n)
+#define XSTRCPY(d, s) __xstrcpy((char *)(d), (const char *)(s))
+#define XSTRNCPY(d, s, n) __xstrncpy((char *)(d), (const char *)(s), n)
+#define XMEMMOVE(d, s, n) __xmemmove((void *)(d), (void *)(s), n)
+#define XMEMCPY(d, s, n) __xmemmove((void *)(d), (void *)(s), n)
+#define XMEMSET(s, c, n) __xmemset((void *)(s), c, n)
 
 // Replacement for the safe_* functions.
 #define SAFE_SPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__);

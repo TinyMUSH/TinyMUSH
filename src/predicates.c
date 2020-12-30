@@ -1582,8 +1582,9 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key)
 {
-	MODULE *mp;
-	char *name;
+	MODULE *mp = NULL;
+	char *name = NULL;
+	int err = 0;
 
 	if (mudstate.dumping)
 	{
@@ -1612,8 +1613,9 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
      * Dump databases, etc.
      */
 	dump_database_internal(DUMP_DB_RESTART);
-	SYNC;
-	CLOSE;
+
+	cache_sync(); 
+	dddb_close();
 
 	if (slave_socket != -1)
 	{
@@ -1636,13 +1638,10 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 		lt_dlclose(mp->handle);
 	}
 
-	if (!mudstate.debug)
-	{
-		execl(mudconf.game_exec, mudconf.game_exec, mudconf.config_file, (char *)NULL);
-	}
-	else
-	{
-		execl(mudconf.game_exec, mudconf.game_exec, (char *)"-d", mudconf.config_file, (char *)NULL);
+	err = execl(mudconf.game_exec, mudconf.game_exec, mudconf.config_file, (char *)NULL);
+
+	if(err) {
+		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", strerror(err));
 	}
 }
 

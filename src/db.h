@@ -14,15 +14,6 @@
 #ifndef __DB_H
 #define __DB_H
 
-#define SYNC cache_sync()
-#define CLOSE         \
-    {                 \
-        cache_sync(); \
-        dddb_close(); \
-    }
-#define DBCLOSE dddb_close()
-#define OPTIMIZE (void)dddb_optimize()
-
 /** 
  * @brief Macros to help deal with batch writes of attribute numbers and objects
  * 

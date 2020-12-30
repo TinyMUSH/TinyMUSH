@@ -1603,7 +1603,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	s = XASPRINTF("s", "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
 	log_write(LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", s);
 	pcache_sync();
-	SYNC;
+	cache_sync();
 	fp = tf_fopen(s, O_WRONLY | O_CREAT | O_TRUNC);
 
 	if (fp != NULL)
@@ -2269,7 +2269,7 @@ void dump_database(void)
 	mudstate.dumping = 1;
 	log_write(LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch);
 	pcache_sync();
-	SYNC;
+	cache_sync();
 	dump_database_internal(DUMP_DB_NORMAL);
 	log_write(LOG_DBSAVES, "DMP", "DONE", "Dump complete: %s.#%d#", mudconf.db_file, mudstate.epoch);
 	mudstate.dumping = 0;
@@ -2304,11 +2304,11 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 	if (!(key & DUMP_FLATFILE))
 	{
-		SYNC;
+		cache_sync();
 
 		if ((key & DUMP_OPTIMIZE) || (mudconf.dbopt_interval && (mudstate.epoch % mudconf.dbopt_interval == 0)))
 		{
-			OPTIMIZE;
+			dddb_optimize();
 		}
 	}
 
@@ -2360,7 +2360,8 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 	if (mudconf.postdump_msg)
 	{
-		if(*mudconf.postdump_msg) {
+		if (*mudconf.postdump_msg)
+		{
 			raw_broadcast(0, "%s", mudconf.postdump_msg);
 		}
 	}
@@ -2954,7 +2955,8 @@ void recover_flatfile(char *flat)
      */
 	call_all_modules_nocache("db_write");
 	db_unlock();
-	CLOSE;
+	cache_sync();
+	dddb_close();
 }
 
 int dbconvert(int argc, char *argv[])
@@ -3256,7 +3258,8 @@ int dbconvert(int argc, char *argv[])
      * Unlock the database
      */
 	db_unlock();
-	CLOSE;
+	cache_sync();
+	dddb_close();
 	exit(EXIT_SUCCESS);
 }
 
@@ -3286,10 +3289,9 @@ int main(int argc, char *argv[])
 	int option_index = 0;
 	struct option long_options[] = {
 		{"debug", no_argument, 0, 'd'},
-		{"restart", no_argument, 0, 'r'},
 		{"mindb", no_argument, 0, 'm'},
 		{"convert", no_argument, 0, 'c'},
-		{"recover", no_argument, 0, 'e'},
+		{"recover", no_argument, 0, 'r'},
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
 	mudstate.initializing = 1;
@@ -3756,7 +3758,10 @@ int main(int argc, char *argv[])
 	/*
      * Go do restart things.
      */
-	load_restart_db();
+	if (mudstate.restarting)
+	{
+		load_restart_db();
+	}
 
 	/*
      * We have to do an update, even though we're starting up, because
@@ -3808,27 +3813,28 @@ int main(int argc, char *argv[])
 		{
 			log_write(LOG_STARTUP, "INI", "FATAL", "Unable to backup");
 		}
-		if (!(getppid() == 1) && !mudstate.debug)
+	}
+
+	if (!(getppid() == 1) && !mudstate.debug)
+	{
+		int forkstatus;
+		forkstatus = fork();
+
+		if (forkstatus < 0)
 		{
-			int forkstatus;
-			forkstatus = fork();
+			log_write(LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror(errno));
+		}
+		else if (forkstatus > 0)
+		{
+			exit(EXIT_SUCCESS);
+		}
+		else
+		{
+			setsid();
 
-			if (forkstatus < 0)
+			if (chdir(mudconf.game_home) < 0)
 			{
-				log_write(LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror(errno));
-			}
-			else if (forkstatus > 0)
-			{
-				exit(EXIT_SUCCESS);
-			}
-			else
-			{
-				setsid();
-
-				if (chdir(mudconf.game_home) < 0)
-				{
-					log_write(LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror(errno));
-				}
+				log_write(LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror(errno));
 			}
 		}
 	}
@@ -3841,31 +3847,38 @@ int main(int argc, char *argv[])
 	 * Cosmetic, force a newline to stderr to clear console logs 
 	 */
 
-		fprintf(stderr, "\n");
 		fflush(stderr);
 		fflush(stdout);
+		fprintf(stderr, "\n");
 
-		if (freopen(DEV_NULL, "w", stdout) == NULL)
+		if (!mudstate.debug)
 		{
-			log_write(LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
-		}
+			if (freopen(DEV_NULL, "w", stdout) == NULL)
+			{
+				log_write(LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
+			}
 
-		if (freopen(DEV_NULL, "w", stderr) == NULL)
-		{
-			log_write(LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
+			if (freopen(DEV_NULL, "w", stderr) == NULL)
+			{
+				log_write(LOG_STARTUP, "INI", "LOAD", "Cannot redirect stdout to /dev/null");
+			}
 		}
 	}
 
 	/*
      * go do it
      */
-	mudstate.logstderr = 0;
+	if (!mudstate.debug) {
+		mudstate.logstderr = 0;
+	}
+	
 	init_timer();
 	shovechars(mudconf.port);
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");
 	close_sockets(0, (char *)"Going down - Bye");
 	dump_database();
-	CLOSE;
+	cache_sync();
+	dddb_close();
 
 	if (slave_socket != -1)
 	{
