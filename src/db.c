@@ -177,7 +177,7 @@ int tf_open(char *fname, int mode)
  * 
  * @param fdes  File descriptor
  */
-void tf_close(int fdes)
+void tf_close(int fdes __attribute__((unused)))
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);
@@ -208,7 +208,7 @@ FILE *tf_fopen(char *fname, int mode)
  * 
  * @param fd File descriptor
  */
-void tf_fclose(FILE *fd)
+void tf_fclose(FILE *fd __attribute__((unused)))
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);
@@ -484,7 +484,7 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
  * @param atext     Attribute text
  * @return int 
  */
-int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
+int fwdlist_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext)
 {
     FWDLIST *fp = NULL;
     int count = 0;
@@ -815,7 +815,7 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
  * @param atext     Attribute text
  * @return int 
  */
-int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
+int propdir_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext)
 {
     PROPDIR *fp = NULL;
     int count = 0;
@@ -1091,7 +1091,7 @@ void s_Pass(dbref thing, const char *s)
  * @param aname     Attribute name
  * @param value     Value
  */
-void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
+void do_attribute(dbref player, dbref cause __attribute__((unused)), int key, char *aname, char *value)
 {
     int success = 0, negate = 0, f = 0;
     char *buff = NULL, *sp = NULL, *p = NULL, *q = NULL, *tbuf = NULL, *tokst = NULL;
@@ -1260,7 +1260,7 @@ void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
  * @param arg1      Argument 1
  * @param arg2      Argument 2
  */
-void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2)
+void do_fixdb(dbref player, dbref cause __attribute__((unused)), int key, char *arg1, char *arg2)
 {
     dbref thing = NOTHING, res = NOTHING;
     char *tname = NULL, *buf = NULL;
@@ -2072,7 +2072,7 @@ void al_destroy(dbref thing)
  * @param atr   Attribute numbrer
  * @return char* 
  */
-char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
+char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr __attribute__((unused)))
 {
     char *attr = XMALLOC(MBUF_SIZE, "attr");
 
@@ -2110,7 +2110,7 @@ char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
  * @param atr   Attribute number
  * @param alen  Attribute len
  */
-void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr, int *alen)
+void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr __attribute__((unused)), int *alen)
 {
     char *cp = NULL;
     int neg = 0;
@@ -2763,7 +2763,7 @@ void atr_free(dbref thing)
  * @param dest      DBref of source
  * @param source    DBref of destination
  */
-void atr_cpy(dbref player, dbref dest, dbref source)
+void atr_cpy(dbref player __attribute__((unused)), dbref dest, dbref source)
 {
     int attr = 0, aflags = 0, alen = 0;
     ATTR *at = NULL;

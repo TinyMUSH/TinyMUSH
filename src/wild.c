@@ -206,10 +206,8 @@ int real_quick_wild(char *tstr, char *dstr)
 	     * * match of next character.
 	     */
 			tstr++;
-
-			/*
-	     * FALL THROUGH
-	     */
+			//[[fallthrough]];
+			__attribute__((fallthrough));
 		default:
 
 			/*
@@ -380,7 +378,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	     * * match of next character.
 	     */
 			tstr++;
-
+			//[[fallthrough]];
+			__attribute__((fallthrough));
 			/*
 	     * FALL THROUGH
 	     */

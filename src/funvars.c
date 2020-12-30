@@ -413,7 +413,7 @@ char *get_register(GDATA *g, char *r)
     return NULL;
 }
 
-void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int result, count, i;
 
@@ -475,7 +475,7 @@ void fun_setq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_setr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_setr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int result;
     result = set_register("fun_setr", fargs[0], fargs[1]);
@@ -541,7 +541,7 @@ void read_register(char *regname, char *buff, char **bufc)
     }
 }
 
-void fun_r(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_r(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     read_register(fargs[0], buff, bufc);
 }
@@ -551,7 +551,7 @@ void fun_r(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
  * lregs: List all the non-empty q-registers.
  */
 
-void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int i;
     GDATA *g;
@@ -598,7 +598,7 @@ void fun_lregs(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * wildmatch(<string>,<wildcard pattern>,<register list>)
  */
 
-void fun_wildmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_wildmatch(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int i, nqregs;
     char *t_args[NUM_ENV_VARS], **qregs; /* %0-%9 is limiting */
@@ -799,7 +799,7 @@ int calc_limitmask(char *lstr)
     return lmask;
 }
 
-void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
     int save_state, lmask;
     char *str;
@@ -848,17 +848,14 @@ char is_in_array(char *word, char **list, int list_length)
     return 0;
 }
 
-void handle_ucall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    dbref aowner, thing, obj;
-    int aflags, alen, anum, trace_flag, i, ncregs;
-    int is_sandbox, lmask, save_state;
-    ATTR *ap;
-    char *atext, *str, *callp, *call_list, *cbuf;
-    char **cregs;
-    //char cbuf[2];
-    GDATA *preserve, *tmp;
-    is_sandbox = Is_Func(UCALL_SANDBOX);
+    dbref aowner = NOTHING, thing = NOTHING, obj = NOTHING;
+    ATTR *ap = NULL;
+    GDATA *preserve = NULL, *tmp = NULL;
+    char *atext = NULL, *str = NULL, *callp = NULL, *call_list = NULL, *cbuf = NULL, **cregs = NULL;
+    int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0;;
+    int is_sandbox = is_sandbox = Is_Func(UCALL_SANDBOX);
 
     /*
      * Three arguments to ucall(), five to sandbox()
@@ -1411,7 +1408,7 @@ void xvars_clr(dbref player)
     XFREE(tbuf);
 }
 
-void fun_x(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_x(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     VARENT *xvar;
     char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
@@ -1438,12 +1435,12 @@ void fun_x(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
     XFREE(tbuf);
 }
 
-void fun_setx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_setx(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     set_xvar(player, fargs[0], fargs[1]);
 }
 
-void fun_store(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_store(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     set_xvar(player, fargs[0], fargs[1]);
     SAFE_LB_STR(fargs[1], buff, bufc);
@@ -1651,12 +1648,12 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     XFREE(pre);
 }
 
-void fun_lvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_lvars(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     print_htab_matches(player, &mudstate.vars_htab, buff, bufc);
 }
 
-void fun_clearvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_clearvars(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     /*
      * This is computationally expensive. Necessary, but its use should
@@ -2518,7 +2515,7 @@ void fun_load(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     load_structure(player, buff, bufc, fargs[0], fargs[1], fargs[2], isep.str[0], (nfargs != 4) ? 1 : 0);
 }
 
-void fun_read(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_read(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it, aowner;
     int atr, aflags, alen;
@@ -2586,7 +2583,7 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     XFREE(ptrs);
 }
 
-void fun_z(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_z(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
     char *p, *tp;
@@ -2824,7 +2821,7 @@ void fun_unload(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     unload_structure(player, buff, bufc, fargs[0], isep.str[0], (nfargs != 2) ? 1 : 0);
 }
 
-void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_write(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it, aowner;
     int atrnum, aflags;
@@ -2865,7 +2862,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 }
 
-void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
     char *ibuf = XMALLOC(SBUF_SIZE, "ibuf");
@@ -2936,7 +2933,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     XFREE(tbuf);
 }
 
-void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
     char *cbuf = XMALLOC(SBUF_SIZE, "cbuf");
@@ -3029,12 +3026,12 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller, dbref 
     XFREE(tbuf);
 }
 
-void fun_lstructures(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_lstructures(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     print_htab_matches(player, &mudstate.structs_htab, buff, bufc);
 }
 
-void fun_linstances(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_linstances(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     print_htab_matches(player, &mudstate.instance_htab, buff, bufc);
 }
@@ -3299,7 +3296,7 @@ int stack_set(dbref thing, OBJSTACK *sp)
     return 1;
 }
 
-void fun_empty(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_empty(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
     VaChk_Range(0, 1);
@@ -3316,7 +3313,7 @@ void fun_empty(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     stack_clr(it);
 }
 
-void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_items(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
 
@@ -3332,7 +3329,7 @@ void fun_items(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     SAFE_LTOS(buff, bufc, StackCount(it), LBUF_SIZE);
 }
 
-void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
     char *data;
@@ -3386,7 +3383,7 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 }
 
-void fun_dup(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
     OBJSTACK *hp; /* head of stack */
@@ -3452,7 +3449,7 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     }
 }
 
-void fun_swap(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_swap(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
     OBJSTACK *sp, *tp;
@@ -3481,7 +3478,7 @@ void fun_swap(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     stack_set(it, tp);
 }
 
-void handle_pop(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
     int pos, count = 0, peek_flag, toss_flag;
@@ -3670,7 +3667,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * regedit(<string>,<regexp>,<replacement>) Derived from the PennMUSH code.
  */
 
-void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     pcre *re;
     pcre_extra *study = NULL;
@@ -3839,7 +3836,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller, dbref 
  * wildparse(<string>,<pattern>,<list of variable names>)
  */
 
-void fun_wildparse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_wildparse(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int i, nqregs;
     char *t_args[NUM_ENV_VARS], **qregs;
@@ -3881,7 +3878,7 @@ void fun_wildparse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * regparse(string, pattern, named vars)
  */
 
-void perform_regparse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int i, nqregs;
     int case_option;
@@ -4037,7 +4034,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
  *
  */
 
-void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int case_option;
     int i, nqregs;
@@ -4602,7 +4599,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     XFREE(rbuf);
 }
 
-void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     OBJGRID *ogp;
     ogp = grid_get(player);

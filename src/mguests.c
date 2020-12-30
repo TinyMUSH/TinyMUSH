@@ -85,7 +85,7 @@ dbref create_guest(int num)
     XSPRINTF(base, "%s%d", mudconf.guest_basename, num + 1);
     same_str = 1;
 
-    if (!found || (strlen(name) >= mudconf.max_command_args))
+    if (!found || (strlen(name) >= (size_t)mudconf.max_command_args))
     {
         XSTRCPY(name, base);
     }

@@ -124,7 +124,8 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     char *list_str2, *lp2, *input_p2;
     char *str, *bb_p, *work_buf;
     char *ep, *savep, *dp, *result;
-    int is_true, cur_lev, elen;
+    int cur_lev, elen;
+    bool is_true = false;
 
     /*
      * Enforce maximum nesting level.
@@ -321,12 +322,12 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * itext(), inum(), ilev(): Obtain nested iter tokens (##, #@, #!).
  */
 
-void fun_ilev(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_LTOS(buff, bufc, mudstate.in_loop - 1, LBUF_SIZE);
 }
 
-void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -340,7 +341,7 @@ void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     SAFE_LTOS(buff, bufc, mudstate.loop_number[lev], LBUF_SIZE);
 }
 
-void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -353,7 +354,7 @@ void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     SAFE_LB_STR(mudstate.loop_token[lev], buff, bufc);
 }
 
-void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -366,7 +367,7 @@ void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     SAFE_LB_STR(mudstate.loop_token2[lev], buff, bufc);
 }
 
-void fun_ibreak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_ibreak(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int lev;
     lev = mudstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
@@ -754,7 +755,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * delimiter is inserted between the results.
  */
 
-void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref aowner, thing;
     int aflags, alen, anum, i;

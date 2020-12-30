@@ -477,7 +477,7 @@ CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int fail
  * @param cmd       Command
  * @return CF_Result 
  */
-CF_Result cf_const(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_const(int *vp __attribute__((unused)), char *str __attribute__((unused)), long extra __attribute__((unused)), dbref player, char *cmd)
 {
     /**
      * Fail on any attempt to change the value
@@ -625,7 +625,7 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-CF_Result cf_module(int *vp, char *modname, long extra, dbref player, char *cmd)
+CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
 {
     lt_dlhandle handle;
     void (*initptr)(void) = NULL;
@@ -690,7 +690,7 @@ CF_Result cf_module(int *vp, char *modname, long extra, dbref player, char *cmd)
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_bool(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_bool(int *vp, char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
 {
     *vp = (int)search_nametab(GOD, bool_names, str);
 
@@ -855,7 +855,7 @@ CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd       Command
  * @return CF_Result 
  */
-CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
 {
     LINKEDLIST *itp, *prev;
     char *fvalue = NULL, *tokst = NULL;
@@ -1400,7 +1400,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
  * @param cmd       Command
  * @return CF_Result 
  */
-CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_set_flags(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     char *sp = NULL, *tokst = NULL;
     FLAGENT *fp = NULL;
@@ -1491,7 +1491,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_badname(int *vp __attribute__((unused)), char *str, long extra, dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
 {
     if (extra)
     {
@@ -1929,7 +1929,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
  * @param is_raw        Raw textfile?
  * @return CF_Result 
  */
-CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     return add_helpfile(player, cmd, str, 0);
 }
@@ -1943,7 +1943,7 @@ CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param is_raw        Raw textfile?
  * @return CF_Result 
  */
-CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_raw_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     return add_helpfile(player, cmd, str, 1);
 }
@@ -1958,7 +1958,7 @@ CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cm
  * @param cmd       Command
  * @return CF_Result 
  */
-CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     FILE *fp = NULL;
     char *cp = NULL, *ap = NULL, *zp = NULL, *buf = NULL;
@@ -2230,7 +2230,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
  * @param kw        Keyword
  * @param value     Value
  */
-void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
+void do_admin(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *kw, char *value)
 {
     int i = cf_set(kw, value, player);
 

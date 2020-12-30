@@ -214,11 +214,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 
 void look_contents(dbref player, dbref loc, const char *contents_name, int style)
 {
-	dbref thing;
-	dbref can_see_loc;
-	char *buff;
-	char *html_buff, *html_cp;
-	char *remote_num;
+	dbref thing = NOTHING, can_see_loc = NOTHING;
+	char *buff = NULL, *html_buff = NULL, *html_cp = NULL, *remote_num = NULL;
 
 	/*
      * Check if we're formatting contents in a player-specified way.
@@ -347,7 +344,7 @@ char *pairRevColor(int color)
 	return NULL;
 }
 
-void pairs_print(dbref player, char *atext, char *buff, char **bufc)
+void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, char **bufc)
 {
 	int pos, depth;
 	char *str, *strbuf, *parenlist, *endp;
@@ -642,7 +639,6 @@ void pretty_print(char *dest, char *name, char *text)
 	{
 	case '$':
 	case '^':
-
 		/*
 	 * Do:  $command:<text to format>
 	 * * Nibble up the first bit then fall through to format the rest.
@@ -669,11 +665,8 @@ void pretty_print(char *dest, char *name, char *text)
 		{
 			return;
 		}
-
-		/*
-	 * FALLTHRU
-	 */
-
+		//[[fallthrough]];
+		__attribute__((fallthrough));
 	case '@':
 	case '&':
 		/*
@@ -1283,7 +1276,7 @@ void look_here(dbref player, dbref thing, int key, int look_key)
 	}
 }
 
-void do_look(dbref player, dbref cause, int key, char *name)
+void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *name)
 {
 	dbref thing, loc, look_key;
 	look_key = LK_SHOWATTR | LK_SHOWEXIT;
@@ -1376,6 +1369,7 @@ void do_look(dbref player, dbref cause, int key, char *name)
 
 		default:
 			look_simple(player, thing, !mudconf.terse_look);
+			break;
 		}
 	}
 }
@@ -1950,12 +1944,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	XFREE(timebuf);
 }
 
-void do_score(dbref player, dbref cause, int key)
+void do_score(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You have %d %s.", Pennies(player), (Pennies(player) == 1) ? mudconf.one_coin : mudconf.many_coins);
 }
 
-void do_inventory(dbref player, dbref cause, int key)
+void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
 	dbref thing;
 	char *buff, *e;
@@ -1999,7 +1993,7 @@ void do_inventory(dbref player, dbref cause, int key)
 	do_score(player, player, 0);
 }
 
-void do_entrances(dbref player, dbref cause, int key, char *name)
+void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *name)
 {
 	dbref thing, i, j;
 	char *exit, *message;
@@ -2330,7 +2324,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 	}
 }
 
-void do_sweep(dbref player, dbref cause, int key, char *where)
+void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *where)
 {
 	dbref here, sweeploc;
 	int where_key, what_key;
@@ -2448,7 +2442,7 @@ void do_sweep(dbref player, dbref cause, int key, char *where)
  * will almost certainly vary.  (i.e. different flags, etc.)
  */
 
-void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
+void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char *name, char *qual)
 {
 	BOOLEXP *bexp;
 	char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp, *buf;

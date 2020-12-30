@@ -290,7 +290,7 @@ struct confdata
     int lag_check_cpu;         /* track object use time with getrusage() instead of wall-clock (need lag_check_clk == true) */
     int malloc_logger;         /* log allocation of memory */
     int max_global_regs;       /* How many global register are avalable (min 10, max 36) */
-    int max_command_args;      /* Maximum arguments a command may have */
+    int max_command_args;   /* Maximum arguments a command may have */
     int player_name_length;    /* Maximum length of a player name */
     int hash_factor;           /* Hash factor */
     int max_cmdsecs;           /* Threshhold for real time taken by command */

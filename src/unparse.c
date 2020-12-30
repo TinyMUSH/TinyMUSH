@@ -171,7 +171,8 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 				{
 				case TYPE_PLAYER:
 					SAFE_LB_CHR('*', boolexp_buf, buftop);
-
+					//[[fallthrough]];
+					__attribute__((fallthrough));
 				case TYPE_THING:
 					safe_name(b->thing, boolexp_buf, buftop);
 					break;

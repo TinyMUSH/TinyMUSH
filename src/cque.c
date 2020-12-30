@@ -351,7 +351,7 @@ void remove_waitq(BQUE *qptr)
  * @param key    Key
  * @param pidstr Pîd of the queue
  */
-void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
+void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *pidstr)
 {
 	dbref victim = NOTHING;
 	int qpid = 0;
@@ -646,7 +646,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
  * @param what   Command
  * @param count  Counter
  */
-void do_notify(dbref player, dbref cause, int key, char *what, char *count)
+void do_notify(dbref player, dbref cause __attribute__((unused)), int key, char *what, char *count)
 {
 	dbref thing = NOTHING, aowner = NOTHING;
 	int loccount = 0, attr = 0, aflags = 0;
@@ -1706,7 +1706,7 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  * @param key    Key
  * @param target Target
  */
-void do_ps(dbref player, dbref cause, int key, char *target)
+void do_ps(dbref player, dbref cause __attribute__((unused)), int key, char *target)
 {
 	char *bufp = NULL;
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
@@ -1816,7 +1816,7 @@ void do_ps(dbref player, dbref cause, int key, char *target)
  * @param key    Key
  * @param arg    Arguments
  */
-void do_queue(dbref player, dbref cause, int key, char *arg)
+void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
 {
 	BQUE *point = NULL;
 	int i = 0, ncmds = 0, was_disabled = 0;

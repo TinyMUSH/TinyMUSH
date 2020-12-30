@@ -323,7 +323,7 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
  * do_password: Change the password for a player
  */
 
-void do_password(dbref player, dbref cause, int key, char *oldpass, char *newpass)
+void do_password(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *oldpass, char *newpass)
 {
     dbref aowner;
     int aflags, alen;
@@ -361,7 +361,7 @@ void disp_from_on(dbref player, char *dtm_str, char *host_str)
     }
 }
 
-void do_last(dbref player, dbref cause, int key, char *who)
+void do_last(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *who)
 {
     dbref target, aowner;
     LDATA login_info;

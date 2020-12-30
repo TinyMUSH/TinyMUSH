@@ -1769,7 +1769,7 @@ void do_mail_stub(dbref player, char *arg1, char *arg2)
     }
 }
 
-void do_mail(dbref player, dbref cause, int key, char *arg1, char *arg2)
+void do_mail(dbref player, dbref cause __attribute__((unused)), int key, char *arg1, char *arg2)
 {
     switch (key & ~MAIL_QUOTE)
     {
@@ -2933,7 +2933,7 @@ void do_malias_switch(dbref player, char *a1, char *a2)
         do_malias_create(player, a1, a2);
 }
 
-void do_malias(dbref player, dbref cause, int key, char *arg1, char *arg2)
+void do_malias(dbref player, dbref cause __attribute__((unused)), int key, char *arg1, char *arg2)
 {
     switch (key)
     {
@@ -3464,7 +3464,7 @@ static void do_mail_to(dbref player, char *arg, int attr)
     XFREE(bcclist);
 }
 
-static char *make_namelist(dbref player, char *arg)
+static char *make_namelist(dbref player __attribute__((unused)), char *arg)
 {
     char *names, *oldarg;
     char *bp, *p, *tokst;
@@ -3870,7 +3870,7 @@ static void do_expmail_abort(dbref player)
     notify(player, "MAIL: Message aborted.");
 }
 
-void do_prepend(dbref player, dbref cause, int key, char *text)
+void do_prepend(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *text)
 {
     char *oldmsg, *newmsg, *bp, *attr;
     dbref aowner;
@@ -3903,7 +3903,7 @@ void do_prepend(dbref player, dbref cause, int key, char *text)
     }
 }
 
-void do_postpend(dbref player, dbref cause, int key, char *text)
+void do_postpend(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *text)
 {
     char *oldmsg, *newmsg, *bp, *attr;
     dbref aowner;
@@ -4290,7 +4290,7 @@ void do_malias_status(dbref player)
  * Functions.
  */
 
-void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     /* This function can take one of three formats: 1.  mail(num)  -->
      * returns message <num> for privs. 2.  mail(player)  -->
@@ -4377,7 +4377,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
-void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     /* This function can take these formats: 1) mailfrom(<num>) 2)
      * mailfrom(<player>,<num>) It returns the dbref of the player the
@@ -4484,9 +4484,9 @@ NAMETAB malias_sw[] = {
     {NULL, 0, 0, 0}};
 
 CMDENT mod_mail_cmdtable[] = {
-    {(char *)"@mail", mail_sw, CA_NO_SLAVE | CA_NO_GUEST, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_mail}},
-    {(char *)"@malias", malias_sw, CA_NO_SLAVE | CA_NO_GUEST, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_malias}},
-    {(char *)"-", NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_postpend}},
+    {(char *)"@mail",   mail_sw,    CA_NO_SLAVE | CA_NO_GUEST,  0,  CS_TWO_ARG | CS_INTERP, NULL,   NULL,   NULL,   {do_mail}},
+    {(char *)"@malias", malias_sw,  CA_NO_SLAVE | CA_NO_GUEST,  0,  CS_TWO_ARG | CS_INTERP, NULL,   NULL,   NULL,   {do_malias}},
+    {(char *)"-",NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_postpend}},
     {(char *)"~", NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_prepend}},
     {(char *)NULL, NULL, 0, 0, 0, NULL, NULL, NULL, {NULL}}};
 
@@ -4494,7 +4494,7 @@ CMDENT mod_mail_cmdtable[] = {
  * Handlers.
  */
 
-void mod_mail_announce_connect(dbref player, char *reason, int num)
+void mod_mail_announce_connect(dbref player, char *reason __attribute__((unused)), int num __attribute__((unused)))
 {
     check_mail(player, 0, 0);
 
@@ -4504,12 +4504,12 @@ void mod_mail_announce_connect(dbref player, char *reason, int num)
     }
 }
 
-void mod_mail_announce_disconnect(dbref player, char *reason, int num)
+void mod_mail_announce_disconnect(dbref player, char *reason __attribute__((unused)), int num __attribute__((unused)))
 {
     do_mail_purge(player);
 }
 
-void mod_mail_destroy_player(dbref player, dbref victim)
+void mod_mail_destroy_player(dbref player __attribute__((unused)), dbref victim)
 {
     do_mail_clear(victim, NULL);
     do_mail_purge(victim);
@@ -4522,13 +4522,10 @@ void mod_mail_cleanup_startup(void)
 
 void mod_mail_init(void)
 {
-    char *str;
     mod_mail_config.mail_expiration = 14;
     mod_mail_config.mail_db_top = 0;
     mod_mail_config.mail_db_size = 0;
     mod_mail_config.mail_freelist = 0;
-    str = XMALLOC(MBUF_SIZE, "str");
-    sprintf(str, "%d.%d", mudstate.version.major, mudstate.version.minor);
 
     switch (mudstate.version.status)
     {
@@ -4555,13 +4552,11 @@ void mod_mail_init(void)
         }
     }
 
-    mod_mail_version.version = XSTRDUP(str, "mod_mail_version.version");
     mod_mail_version.author = XSTRDUP("TinyMUSH Development Team", "mod_mail_version.author");
     mod_mail_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_mail_version.email");
     mod_mail_version.url = XSTRDUP("https://github.com/TinyMUSH", "mod_mail_version.url");
     mod_mail_version.description = XSTRDUP("Mail system for TinyMUSH", "mod_mail_version.description");
-    mod_mail_version.copyright = XSTRDUP("Copyright (C) 2012 TinyMUSH development team.", "mod_mail_version.copyright");
-    XFREE(str);
+    mod_mail_version.copyright = XSTRDUP("Copyright (C) TinyMUSH development team.", "mod_mail_version.copyright");
     register_commands(mod_mail_cmdtable);
     register_prefix_cmds("-~");
     register_functions(mod_mail_functable);

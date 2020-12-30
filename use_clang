@@ -1,3 +1,4 @@
 #!/bin/bash
 
-CC="clang" ./configure --enable-warnings --enable-debug
+CC="clang" ./configure --enable-warnings --enable-warnings-extra
+

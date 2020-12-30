@@ -459,7 +459,7 @@ int ok_player_name(const char *name)
      * * minimum player name length, or we're sufficiently long.
      */
 
-	if (!ok_name(name) || (strlen(name) >= mudconf.max_command_args) || (mudconf.player_name_min && (strlen(name) < mudconf.player_name_min)))
+	if (!ok_name(name) || (strlen(name) >= (size_t)mudconf.max_command_args) || (mudconf.player_name_min && (strlen(name) < (size_t)mudconf.player_name_min)))
 	{
 		return 0;
 	}
@@ -2349,14 +2349,13 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 
 void did_it(dbref player, dbref thing, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key)
 {
-	GDATA *preserve;
-	char *d, *m, *buff, *act, *charges, *bp, *str;
-	char *tbuf, *tp, *sp;
-	dbref loc, aowner;
-	int t, num, aflags, alen, need_pres;
-	dbref master;
-	ATTR *ap;
-	int retval = 0;
+	GDATA *preserve = NULL;
+	dbref loc = NOTHING, aowner = NOTHING, master = NOTHING;
+	ATTR *ap = NULL;
+	char *d = NULL, *m = NULL, *buff = NULL, *act = NULL, *charges = NULL, *bp = NULL, *str = NULL;
+	char *tbuf = NULL, *tp = NULL, *sp = NULL;
+	int t = 0, num = 0, aflags = 0, alen = 0, need_pres = 0, retval = 0;
+	
 	/*
      * If we need to call exec() from within this function, we first save
      * * the state of the global registers, in order to avoid munging them

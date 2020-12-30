@@ -1016,7 +1016,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
 					break;
 				}
-				[[fallthrough]];
+				//[[fallthrough]];
+				__attribute__((fallthrough));
 			/**
 			 * %c is color
 			 * 

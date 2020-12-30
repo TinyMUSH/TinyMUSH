@@ -37,7 +37,7 @@
  * fun_objid: Returns an object's objectID.
  */
 
-void fun_objid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_objid(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -59,7 +59,7 @@ void fun_objid(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_con: Returns first item in contents list of object/room
  */
 
-void fun_con(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_con(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -79,7 +79,7 @@ void fun_con(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * fun_exit: Returns first exit in exits list of room.
  */
 
-void fun_exit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, exit;
 	int key;
@@ -118,7 +118,7 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_next: return next thing in contents or exits chain
  */
 
-void fun_next(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, loc, exit, ex_here;
 	int key;
@@ -172,7 +172,7 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * something. where(): Returns the "true" location of something
  */
 
-void handle_loc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -192,7 +192,7 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_rloc: Returns the recursed location of something (specifying #levels)
  */
 
-void fun_rloc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_rloc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int i, levels;
 	dbref it;
@@ -231,7 +231,7 @@ void fun_rloc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_room: Find the room an object is ultimately in.
  */
 
-void fun_room(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	int count;
@@ -274,7 +274,7 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_owner: Return the owner of an object.
  */
 
-void fun_owner(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_owner(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, aowner;
 	int atr, aflags;
@@ -309,7 +309,7 @@ void fun_owner(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_controls: Does x control y?
  */
 
-void fun_controls(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_controls(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref x, y;
 	x = match_thing(player, fargs[0]);
@@ -337,7 +337,7 @@ void fun_controls(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * do not exist, 0 is returned.
  */
 
-void fun_sees(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, thing;
 	it = match_thing(player, fargs[0]);
@@ -357,7 +357,7 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_nearby: Return whether or not obj1 is near obj2.
  */
 
-void fun_nearby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref obj1, obj2;
 	obj1 = match_thing(player, fargs[0]);
@@ -380,7 +380,7 @@ void fun_nearby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * <target>? moves(<object>, <mover>): Can <object> see <mover> move?
  */
 
-void handle_okpres(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_okpres(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int oper;
 	dbref object, actor;
@@ -419,7 +419,7 @@ void handle_okpres(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * an object. fullname(): Return the fullname of an object (good for exits).
  */
 
-void handle_name(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_name(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -453,7 +453,7 @@ void handle_name(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * handle_pronoun: perform pronoun sub for object (OBJ, POSS, SUBJ, APOSS).
  */
 
-void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	char *str;
@@ -476,7 +476,7 @@ void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * Locks.
  */
 
-void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_lock(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, aowner;
 	int aflags, alen;
@@ -513,7 +513,7 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 }
 
-void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, victim, aowner;
 	int aflags, alen;
@@ -569,7 +569,7 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 }
 
-void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref locked_obj, actor_obj;
 	BOOLEXP *okey;
@@ -771,7 +771,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * part from PennMUSH.
  */
 
-void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing, i;
 	char *bb_p;
@@ -914,7 +914,7 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_home: Return an object's home
  */
 
-void fun_home(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -948,7 +948,7 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_money: Return an object's value
  */
 
-void fun_money(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_money(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -969,7 +969,7 @@ void fun_money(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  */
 
 /* Borrowed from PennMUSH 1.50 */
-void fun_findable(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_findable(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref obj = match_thing(player, fargs[0]);
 	dbref victim = match_thing(player, fargs[1]);
@@ -997,7 +997,7 @@ void fun_findable(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  */
 
 /* Borrowed from PennMUSH 1.50 */
-void fun_visible(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, thing, aowner;
 	int aflags, atr;
@@ -1040,7 +1040,7 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_writable: Returns 1 if player could set <obj>/<attr>.
  */
 
-void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, thing, aowner;
 	int aflags, atr, retval;
@@ -1113,7 +1113,7 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * case-insensitive, not quite as useful as it could be.
  */
 
-void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, aowner;
 	int atr, aflags;
@@ -1156,7 +1156,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * andflags, orflags: Check a list of flags.
  */
 
-void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *s;
 	char *flagletter=XMALLOC(2, "flagletter");
@@ -1292,7 +1292,7 @@ int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, 
 	return (aflags & flagval);
 }
 
-void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, aowner;
 	int atr, aflags;
@@ -1332,7 +1332,7 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 }
 
-void fun_haspower(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -1358,7 +1358,7 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * hasflags(<object>, <flag list to AND>, <OR flag list to AND>, <etc.>)
  */
 
-void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	char **elems;
@@ -1414,7 +1414,7 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * handle_timestamp: Get timestamps (LASTACCESS, LASTMOD, CREATION).
  */
 
-void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it = match_thing(player, fargs[0]);
 
@@ -1433,7 +1433,7 @@ void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller, dbref
  * Parent-child relationships.
  */
 
-void fun_parent(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -1531,7 +1531,7 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Zones.
  */
 
-void fun_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 
@@ -1552,7 +1552,7 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	safe_dbref(buff, bufc, Zone(it));
 }
 
-void scan_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref i, it;
 	int type;
@@ -1604,7 +1604,7 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 }
 
-void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref aowner;
 	int aflags, alen;
@@ -1663,7 +1663,7 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_hasattr: does object X have attribute Y.
  */
 
-void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing, aowner;
 	int aflags, alen, check_parents;
@@ -1733,7 +1733,7 @@ void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_v: Function form of %-substitution
  */
 
-void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref aowner;
 	int aflags, alen;
@@ -1787,7 +1787,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
  * perform_get: Get attribute from object: GET, XGET, GET_EVAL, EVAL(obj,atr)
  */
 
-void perform_get(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing, aowner;
 	int attrib, aflags, alen, eval_it;
@@ -1861,7 +1861,7 @@ void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * do_ufun: Call a user-defined function: U, ULOCAL, UPRIVATE
  */
 
-void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref aowner, thing;
 	int is_local, is_private, aflags, alen, anum, trace_flag;
@@ -1954,7 +1954,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * specified object.
  */
 
-void fun_objcall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref obj, aowner, thing;
 	int aflags, alen, anum;
@@ -1996,7 +1996,7 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * function string directly.
  */
 
-void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	char *str;
 	GDATA *preserve;
@@ -2013,7 +2013,7 @@ void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * uprivate() but with the function string directly.
  */
 
-void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	char *str;
 	GDATA *preserve;
@@ -2034,7 +2034,7 @@ void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * are used as arguments to the u().
  */
 
-void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref thing, aowner;
 	int attrib, aflags, alen;
@@ -2082,7 +2082,7 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
-void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref thing, aowner;
 	int attrib, aflags, alen;
@@ -2238,7 +2238,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * Evaluate from a specific object's perspective.
  */
 
-void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref obj;
 	char *name, *bp, *str;
@@ -2276,12 +2276,12 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Matching functions.
  */
 
-void fun_num(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_num(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	safe_dbref(buff, bufc, match_thing(player, fargs[0]));
 }
 
-void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *name, *temp, *tp;
 	dbref thing;
@@ -2370,7 +2370,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 }
 
-void fun_pfind(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_pfind(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing;
 
@@ -2396,7 +2396,7 @@ void fun_pfind(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * fun_locate: Search for things with the perspective of another obj.
  */
 
-void fun_locate(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int pref_type, check_locks, verbose, multiple;
 	dbref thing, what;
@@ -2552,7 +2552,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	dbref thing;
 	ATTR *attr;
 	char *bb_p;
-	int ca, total = 0, count_only, start, count, i, got;
+	int ca = 0, total = 0, count_only = 0, start = 0, count = 0, i = 0, got = 0;
 	Delim osep;
 	count_only = Is_Func(LATTR_COUNT);
 
@@ -2642,7 +2642,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_search: Search the db for things, returning a list of what matches
  */
 
-void fun_search(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing;
 	char *bp, *nbuf;
@@ -2689,7 +2689,7 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_stats: Get database size statistics.
  */
 
-void fun_stats(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_stats(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref who;
 	STATS statinfo;
@@ -2796,7 +2796,7 @@ int mem_usage_attr(dbref player, char *str)
 	return bytes_atext;
 }
 
-void fun_objmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing;
 
@@ -2817,7 +2817,7 @@ void fun_objmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	SAFE_LTOS(buff, bufc, mem_usage(thing), LBUF_SIZE);
 }
 
-void fun_playmem(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int tot = 0;
 	dbref thing;
@@ -2845,7 +2845,7 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Type functions.
  */
 
-void fun_type(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_type(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
 	it = match_thing(player, fargs[0]);
@@ -2881,7 +2881,7 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	return;
 }
 
-void fun_hastype(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_hastype(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it = match_thing(player, fargs[0]);
 
@@ -2930,7 +2930,7 @@ void fun_hastype(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_lastcreate: Return the last object of type Y that X created.
  */
 
-void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int i, aowner, aflags, alen, obj_list[4], obj_type;
 	char *obj_str, *p, *tokst;

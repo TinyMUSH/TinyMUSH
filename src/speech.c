@@ -353,7 +353,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 
 		case '"':
 			message++;
-
+			//[[fallthrough]];
+			__attribute__((fallthrough));
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
@@ -386,7 +387,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 
 		case '"':
 			message++;
-
+			//[[fallthrough]];
+			__attribute__((fallthrough));
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
@@ -421,7 +423,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 
 		case '"':
 			message++;
-
+			//[[fallthrough]];
+			__attribute__((fallthrough));
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
@@ -933,7 +936,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	case '"':
 		message++;
-
+		//[[fallthrough]];
+		__attribute__((fallthrough));
 	default:
 		if (count != 1)
 		{
@@ -1272,7 +1276,8 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 
 				case '"':
 					message++;
-
+					//[[fallthrough]];
+					__attribute__((fallthrough));
 				default:
 					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You whisper \"%s\" to %s.", message, Name(target));
 					notify_check(target, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s whispers \"%s\"", Name(player), message);

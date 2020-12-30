@@ -502,7 +502,7 @@ void display_flagtab(dbref player)
  * @param flagname 
  * @return FLAGENT* 
  */
-FLAGENT *find_flag(dbref thing, char *flagname)
+FLAGENT *find_flag(dbref thing __attribute__((unused)), char *flagname)
 {
     char *cp;
 
@@ -1041,7 +1041,7 @@ FLAGENT *letter_to_flag(char this_letter)
  * @param cmd 
  * @return int 
  */
-int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_flag_access(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     char *fstr, *permstr, *tokst;
     FLAGENT *fp;
@@ -1112,7 +1112,7 @@ int cf_flag_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-int cf_flag_name(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
     char *numstr, *namestr, *tokst;
     FLAGENT *fp;

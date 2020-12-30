@@ -327,7 +327,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
  * @param cargs			Command arguments
  * @param ncargs		Number of arguments
  */
-void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause, char *cargs[], int ncargs)
+void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attribute__((unused)), char *cargs[], int ncargs)
 {
 	char *buf, *bp, *tstr, *str;
 	int aflags, alen;
@@ -2140,7 +2140,7 @@ void list_attrtypes(dbref player)
  * @param cmd 
  * @return int 
  */
-int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
 	CMDENT *cmdp;
 	char *ap;
@@ -2195,7 +2195,7 @@ int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-int cf_acmd_access(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
 	CMDENT *cmdp;
 	ATTR *ap;
@@ -2243,7 +2243,7 @@ int cf_acmd_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
 	ATTR *ap;
 	char *sp;
@@ -2285,7 +2285,7 @@ int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-int cf_attr_type(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
 	char *privs;
 	KEYLIST *kp;
@@ -2348,7 +2348,7 @@ int cf_attr_type(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd 
  * @return int 
  */
-int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
 
 	CMDENT *cmdp, *cmd2;
@@ -3395,7 +3395,7 @@ void list_memory(dbref player)
  * @param extra		Not used.
  * @param arg		Arguments
  */
-void do_list(dbref player, dbref cause, int extra, char *arg)
+void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
 {
 	int flagvalue = search_nametab(player, list_names, arg);
 

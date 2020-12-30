@@ -42,7 +42,7 @@ FCACHE fcache[] = {
 
 /* *INDENT-ON* */
 
-void do_list_file(dbref player, dbref cause, int extra, char *arg)
+void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
 {
     int flagvalue;
     flagvalue = search_nametab(player, list_files, arg);
@@ -60,7 +60,7 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
 {
     FBLOCK *tfp;
 
-    if (fp->hdr.nchars >= (MBUF_SIZE - sizeof(FBLKHDR)))
+    if (fp->hdr.nchars >= (int)(MBUF_SIZE - sizeof(FBLKHDR)))
     {
         /*
 	 * We filled the current buffer.  Go get a new one.

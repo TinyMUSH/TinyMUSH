@@ -518,7 +518,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * gh | ij k, |, 2, 2) => c d e | f g h
  */
 
-void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_index(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int start, end;
 	char c, *s, *p;
@@ -1995,9 +1995,9 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
-	int i, nwords, nstates, cpos, wcount, over, ansi_state;
-	int max, nleft, lead_chrs, lens[LBUF_SIZE / 2], states[LBUF_SIZE / 2 + 1];
-	char *s, **words, *buf;
+	int i = 0, nwords = 0, nstates = 0, cpos = 0, wcount = 0, over = 0, ansi_state = 0;
+	int max = 0, nleft = 0, lead_chrs = 0, lens[LBUF_SIZE / 2], states[LBUF_SIZE / 2 + 1];
+	char *s = NULL, **words = NULL, *buf = NULL;
 	/*
      * Split apart the list. We need to find the length of each
      * de-ansified word, as well as keep track of the state of each word.
@@ -2166,7 +2166,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 	XFREE(words);
 }
 
-void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
+void perform_tables(dbref player __attribute__((unused)), char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
 	char *p, *savep, *bb_p;
 	int ansi_state = ANST_NONE;

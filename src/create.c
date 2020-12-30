@@ -176,7 +176,7 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
  * @param links     Links
  * @param nlinks    Number of links
  */
-void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
+void do_open(dbref player, dbref cause __attribute__((unused)), int key, char *direction, char *links[], int nlinks)
 {
     dbref loc = NOTHING, destnum = NOTHING;
     char *dest = NULL, *s = NULL;
@@ -485,7 +485,7 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
  * @param tname     Thing name
  * @param pname     Parent name
  */
-void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
+void do_parent(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *tname, char *pname)
 {
     dbref thing = NOTHING, parent = NOTHING, curr = NOTHING;
     int lev = 0;
@@ -635,7 +635,7 @@ void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int na
  * @param name      Name of object
  * @param coststr   Cost of object
  */
-void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
+void do_create(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *name, char *coststr)
 {
     dbref thing = NOTHING;
     int cost = 0;
@@ -678,7 +678,7 @@ void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
  * @param name      Name of the object
  * @param arg2      Arguments
  */
-void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
+void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *name, char *arg2)
 {
     dbref clone = NOTHING, thing = NOTHING, new_owner = NOTHING, loc = NOTHING;
     FLAG rmv_flags = 0;
@@ -978,7 +978,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
  * @param name      Name
  * @param pass      Password
  */
-void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
+void do_pcreate(dbref player, dbref cause __attribute__((unused)), int key, char *name, char *pass)
 {
     int isrobot = 0;
     dbref newplayer = NOTHING;
@@ -1121,7 +1121,7 @@ bool can_destroy_player(dbref player, dbref victim)
  * @param key       Key
  * @param what      What to destroy
  */
-void do_destroy(dbref player, dbref cause, int key, char *what)
+void do_destroy(dbref player, dbref cause __attribute__((unused)), int key, char *what)
 {
     dbref thing = NOTHING;
     bool can_doit = false;

@@ -440,12 +440,10 @@ void queue_write(DESC *d, const char *b, int n)
 
 void queue_string(DESC *d, const char *format, ...)
 {
-	char *buf;
-	char *msg;
-	char *s;
 	va_list ap;
+	char *buf = NULL, *s = NULL, *msg = XMALLOC(LBUF_SIZE, "msg");
+
 	va_start(ap, format);
-	msg = XMALLOC(LBUF_SIZE, "msg");
 
 	if ((!format || !*format))
 	{
@@ -1671,7 +1669,7 @@ void dump_info(DESC *call_by)
  * do_colormap: Remap ANSI colors in output.
  */
 
-void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
+void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *fstr, char *tstr)
 {
 	DESC *d;
 	int from_color, to_color, i, x;
@@ -1745,7 +1743,7 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
  * Idea from R'nice@TinyTIM.
  */
 
-char *sane_doing(char *arg, char *name)
+char *sane_doing(char *arg, char *name __attribute__((unused)))
 {
 	char *p, *bp;
 
@@ -1776,7 +1774,7 @@ char *sane_doing(char *arg, char *name)
 	return (bp);
 }
 
-void do_doing(dbref player, dbref cause, int key, char *arg)
+void do_doing(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
 {
 	DESC *d;
 	int foundany, over;
@@ -2230,11 +2228,12 @@ void logged_out_internal(DESC *d, int key, char *arg)
 	}
 }
 
-void do_command(DESC *d, char *command, int first)
+void do_command(DESC *d, char *command, int first __attribute__((unused)))
 {
-	char *arg, *cmdsave, *log_cmdbuf, *pname, *lname;
-	NAMETAB *cp;
-	long begin_time, used_time;
+	NAMETAB *cp = NULL;
+	long begin_time = 0L, used_time = 0L;
+	char *arg = NULL, *cmdsave = NULL, *log_cmdbuf = NULL, *pname = NULL, *lname = NULL;
+
 	cmdsave = mudstate.debug_cmd;
 	mudstate.debug_cmd = XSTRDUP("< do_command >", "mudstate.debug_cmd");
 
@@ -2380,7 +2379,7 @@ void do_command(DESC *d, char *command, int first)
 	mudstate.debug_cmd = cmdsave;
 }
 
-void logged_out(dbref player, dbref cause, int key, char *arg)
+void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
 {
 	DESC *d, *dlast;
 
@@ -2651,7 +2650,7 @@ void make_ulist(dbref player, char *buff, char **bufc)
  * make_portlist: Make a list of ports for PORTS().
  */
 
-void make_portlist(dbref player, dbref target, char *buff, char **bufc)
+void make_portlist(dbref player __attribute__((unused)), dbref target, char *buff, char **bufc)
 {
 	DESC *d;
 	char *s = XMALLOC(MBUF_SIZE, "s");

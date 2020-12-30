@@ -335,7 +335,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_rand: Return a random number from 0 to arg1-1
  */
 
-void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int num;
 	num = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -356,7 +356,7 @@ void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * top>,<times>[,<delim>]): Generate random list.
  */
 
-void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int n, die, count;
 	int total = 0;
@@ -640,7 +640,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_time: Returns nicely-formatted time.
  */
 
-void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
 	temp = (char *)ctime(&mudstate.now);
@@ -653,7 +653,7 @@ void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_time: Seconds since 0:00 1/1/70
  */
 
-void fun_secs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.now, LBUF_SIZE);
 }
@@ -663,7 +663,7 @@ void fun_secs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * fun_convsecs: converts seconds to time string, based off 0:00 1/1/70
  */
 
-void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
 	time_t tt;
@@ -884,7 +884,7 @@ int do_convtime(char *str, struct tm *ttm)
 #undef LEAPYEAR_1900
 }
 
-void fun_convtime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	struct tm *ttm;
 	ttm = localtime(&mudstate.now);
@@ -904,7 +904,7 @@ void fun_convtime(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_timefmt: Interface to strftime().
  */
 
-void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	time_t tt;
 	struct tm *ttm;
@@ -1004,7 +1004,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_etimefmt: Format a number of seconds into a human-readable time.
  */
 
-void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *p, *mark;
 	int raw_secs;
@@ -1324,7 +1324,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_starttime: What time did this system last reboot?
  */
 
-void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
 	temp = (char *)ctime(&mudstate.start_time);
@@ -1337,7 +1337,7 @@ void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_restarts: How many times have we restarted?
  */
 
-void fun_restarts(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.reboot_nums, LBUF_SIZE);
 }
@@ -1347,7 +1347,7 @@ void fun_restarts(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * fun_restarttime: When did we last restart?
  */
 
-void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
 	temp = (char *)ctime(&mudstate.restart_time);
@@ -1360,7 +1360,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref 
  * fun_version: Return the MUSH version.
  */
 
-void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/* XXX To fix once the new version scheme is done */
 	//SAFE_LB_STR(mudstate.version, buff, bufc);
@@ -1372,7 +1372,7 @@ void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_mudname: Return the name of the mud.
  */
 
-void fun_mudname(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_mudname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LB_STR(mudconf.mud_name, buff, bufc);
 }
@@ -1382,7 +1382,7 @@ void fun_mudname(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * fun_hasmodule: Return 1 if a module is installed, 0 if it is not.
  */
 
-void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	MODULE *mp;
 
@@ -1403,7 +1403,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * fun_connrecord: Get max number of simultaneous connects.
  */
 
-void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.record_players, LBUF_SIZE);
 }
@@ -1413,22 +1413,22 @@ void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * State of the invocation and recursion counters.
  */
 
-void fun_fcount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.func_invk_ctr, LBUF_SIZE);
 }
 
-void fun_fdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.func_nest_lev, LBUF_SIZE);
 }
 
-void fun_ccount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.cmd_invk_ctr, LBUF_SIZE);
 }
 
-void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mudstate.cmd_nest_lev, LBUF_SIZE);
 }
@@ -1438,7 +1438,7 @@ void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_benchmark: Benchmark softcode.
  */
 
-void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	struct timeval bt, et;
 	int i, times;
@@ -1508,14 +1508,14 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * function evaluations.
  */
 
-void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	char *str;
 	str = fargs[0];
 	exec(buff, bufc, player, caller, cause, EV_FIGNORE | EV_EVAL, &str, cargs, ncargs);
 }
 
-void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *str;
 	str = fargs[0];
@@ -1551,7 +1551,7 @@ int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs
 	return 0;
 }
 
-void fun_link(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@link", buff, bufc, cargs, ncargs))
 	{
@@ -1561,7 +1561,7 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	do_link(player, cause, 0, fargs[0], fargs[1]);
 }
 
-void fun_tel(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@teleport", buff, bufc, cargs, ncargs))
 	{
@@ -1571,7 +1571,7 @@ void fun_tel(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	do_teleport(player, cause, 0, fargs[0], fargs[1]);
 }
 
-void fun_wipe(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@wipe", buff, bufc, cargs, ncargs))
 	{
@@ -1581,7 +1581,7 @@ void fun_wipe(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	do_wipe(player, cause, 0, fargs[0]);
 }
 
-void fun_pemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
@@ -1591,7 +1591,7 @@ void fun_pemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	do_pemit_list(player, fargs[0], fargs[1], 0);
 }
 
-void fun_remit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
@@ -1601,7 +1601,7 @@ void fun_remit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	do_pemit_list(player, fargs[0], fargs[1], 1);
 }
 
-void fun_oemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@oemit", buff, bufc, cargs, ncargs))
 	{
@@ -1611,7 +1611,7 @@ void fun_oemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	do_pemit(player, cause, PEMIT_OEMIT, fargs[0], fargs[1]);
 }
 
-void fun_force(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	if (check_command(player, "@force", buff, bufc, cargs, ncargs))
 	{
@@ -1621,7 +1621,7 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	do_force(player, cause, FRC_NOW, fargs[0], fargs[1], cargs, ncargs);
 }
 
-void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (nfargs < 1)
 	{
@@ -1637,12 +1637,12 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	do_trigger(player, cause, TRIG_NOW, fargs[0], &(fargs[1]), nfargs - 1);
 }
 
-void fun_wait(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
 }
 
-void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	CMDENT *cmdp;
 	char *tbuf1, *tbuf2;
@@ -1796,7 +1796,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * fun_set: sets an attribute on an object
  */
 
-void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref thing, thing2, aowner;
 	char *p, *buff2;
@@ -1979,7 +1979,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
+void list_qpids(dbref player __attribute__((unused)), dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
 {
 	BQUE *tmp;
 
@@ -1997,7 +1997,7 @@ void list_qpids(dbref player, dbref player_targ, dbref obj_targ, BQUE *queue, ch
 	}
 }
 
-void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int qpid;
 	dbref player_targ, obj_targ;

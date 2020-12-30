@@ -50,7 +50,7 @@ void init_functab(void)
     xfunctions.count = 0;
 }
 
-void do_function(dbref player, dbref cause, int key, char *fname, char *target)
+void do_function(dbref player, dbref cause __attribute__((unused)), int key, char *fname, char *target)
 {
     UFUN *ufp, *ufp2;
     ATTR *ap;
@@ -399,7 +399,7 @@ void list_funcaccess(dbref player)
  * cf_func_access: set access on functions
  */
 
-int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd)
+int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
     FUN *fp;
     UFUN *ufp;
