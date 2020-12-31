@@ -26,10 +26,12 @@
 #define ENTRY_BLOCK_STARTS(blk, blksize) (int)(blk * blksize)
 #define ENTRY_BLOCK_ENDS(blk, blksize) (int)(blk * blksize) + (blksize - 1)
 
+/*
 #define ITER_PARENTS(t, p, l) for ((l) = 0, (p) = (t);                \
                                    (Good_obj(p) &&                    \
                                     ((l) < mudconf.parent_nest_lim)); \
                                    (p) = Parent(p), (l)++)
+*/
 
 #define Hasprivs(x) (Royalty(x) || Wizard(x))
 
@@ -233,9 +235,6 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define InstanceCount(t) db[t].instance_count
 
 #define Time_Used(t) db[t].cpu_time_used
-#define s_Time_Used(t, n)                  \
-    db[t].cpu_time_used.tv_sec = n.tv_sec; \
-    db[t].cpu_time_used.tv_usec = n.tv_usec
 
 /**
  * @brief If we modify something on the db object that needs to be written at dump

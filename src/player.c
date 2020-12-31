@@ -153,7 +153,7 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
 
         if (*lusername)
         {
-            s =XASPRINTF("s", "%s@%s", lusername, lhost);
+            s = XASPRINTF("s", "%s@%s", lusername, lhost);
             atr_add_raw(player, A_LASTSITE, s);
             XFREE(s);
         }
@@ -312,7 +312,15 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
     /*
      * initialize everything
      */
-    CALL_ALL_MODULES(create_player, (creator, player, isrobot, isguest));
+
+        for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+        {
+            if (cam__mp->create_player)
+            {
+                (*(cam__mp->create_player))(creator, player, isrobot, isguest);
+            }
+        }
+
     s_Pass(player, crypt(pbuf, "XX"));
     s_Home(player, (Good_home(mudconf.start_home) ? mudconf.start_home : (Good_home(mudconf.start_room) ? mudconf.start_room : 0)));
     XFREE(pbuf);

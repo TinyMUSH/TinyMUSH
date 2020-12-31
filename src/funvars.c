@@ -145,7 +145,11 @@ int set_register(const char *funcname, char *name, char *data)
 
         if (!mudstate.rdata)
         {
-            Init_RegData(funcname, mudstate.rdata);
+            mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), funcname);
+            mudstate.rdata->q_alloc = mudstate.rdata->xr_alloc = 0;
+            mudstate.rdata->q_regs = mudstate.rdata->x_names = mudstate.rdata->x_regs = NULL;
+            mudstate.rdata->q_lens = mudstate.rdata->x_lens = NULL;
+            mudstate.rdata->dirty = 0;
         }
 
         if (!mudstate.rdata->q_alloc)
@@ -262,7 +266,11 @@ int set_register(const char *funcname, char *name, char *data)
 
     if (!mudstate.rdata)
     {
-        Init_RegData(funcname, mudstate.rdata);
+        mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
+        mudstate.rdata->q_alloc = mudstate.rdata->xr_alloc = 0;
+        mudstate.rdata->q_regs = mudstate.rdata->x_names = mudstate.rdata->x_regs = NULL;
+        mudstate.rdata->q_lens = mudstate.rdata->x_lens = NULL;
+        mudstate.rdata->dirty = 0;
     }
 
     if (!mudstate.rdata->xr_alloc)
@@ -854,7 +862,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     ATTR *ap = NULL;
     GDATA *preserve = NULL, *tmp = NULL;
     char *atext = NULL, *str = NULL, *callp = NULL, *call_list = NULL, *cbuf = NULL, **cregs = NULL;
-    int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0;;
+    int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0;
+    ;
     int is_sandbox = is_sandbox = Is_Func(UCALL_SANDBOX);
 
     /*
@@ -907,7 +916,51 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (!*callp)
     {
-        Free_RegData(mudstate.rdata);
+        if (mudstate.rdata)
+        {
+            for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+            {
+                if (mudstate.rdata->q_regs[z])
+                    XFREE(mudstate.rdata->q_regs[z]);
+            }
+
+            for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+            {
+                if (mudstate.rdata->x_names[z])
+                    XFREE(mudstate.rdata->x_names[z]);
+
+                if (mudstate.rdata->x_regs[z])
+                    XFREE(mudstate.rdata->x_regs[z]);
+            }
+
+            if (mudstate.rdata->q_regs)
+            {
+                XFREE(mudstate.rdata->q_regs);
+            }
+
+            if (mudstate.rdata->q_lens)
+            {
+                XFREE(mudstate.rdata->q_lens);
+            }
+
+            if (mudstate.rdata->x_names)
+            {
+                XFREE(mudstate.rdata->x_names);
+            }
+
+            if (mudstate.rdata->x_regs)
+            {
+                XFREE(mudstate.rdata->x_regs);
+            }
+
+            if (mudstate.rdata->x_lens)
+            {
+                XFREE(mudstate.rdata->x_lens);
+            }
+
+            XFREE(mudstate.rdata);
+        }
+
         mudstate.rdata = NULL;
     }
     else if (!strcmp(callp, "@_"))
@@ -940,7 +993,50 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         /*
 	 * Pass in ONLY the named registers
 	 */
-        Free_RegData(mudstate.rdata);
+        if (mudstate.rdata)
+        {
+            for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+            {
+                if (mudstate.rdata->q_regs[z])
+                    XFREE(mudstate.rdata->q_regs[z]);
+            }
+
+            for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+            {
+                if (mudstate.rdata->x_names[z])
+                    XFREE(mudstate.rdata->x_names[z]);
+
+                if (mudstate.rdata->x_regs[z])
+                    XFREE(mudstate.rdata->x_regs[z]);
+            }
+
+            if (mudstate.rdata->q_regs)
+            {
+                XFREE(mudstate.rdata->q_regs);
+            }
+
+            if (mudstate.rdata->q_lens)
+            {
+                XFREE(mudstate.rdata->q_lens);
+            }
+
+            if (mudstate.rdata->x_names)
+            {
+                XFREE(mudstate.rdata->x_names);
+            }
+
+            if (mudstate.rdata->x_regs)
+            {
+                XFREE(mudstate.rdata->x_regs);
+            }
+
+            if (mudstate.rdata->x_lens)
+            {
+                XFREE(mudstate.rdata->x_lens);
+            }
+
+            XFREE(mudstate.rdata);
+        }
         mudstate.rdata = NULL;
         call_list = XMALLOC(LBUF_SIZE, "call_list");
         XSTRCPY(call_list, callp);
@@ -1025,7 +1121,50 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         /*
 	 * Restore nothing, so we keep our data as-is.
 	 */
-        Free_RegData(preserve);
+        if (preserve)
+        {
+            for (int z = 0; z < preserve->q_alloc; z++)
+            {
+                if (preserve->q_regs[z])
+                    XFREE(preserve->q_regs[z]);
+            }
+
+            for (int z = 0; z < preserve->xr_alloc; z++)
+            {
+                if (preserve->x_names[z])
+                    XFREE(preserve->x_names[z]);
+
+                if (preserve->x_regs[z])
+                    XFREE(preserve->x_regs[z]);
+            }
+
+            if (preserve->q_regs)
+            {
+                XFREE(preserve->q_regs);
+            }
+
+            if (preserve->q_lens)
+            {
+                XFREE(preserve->q_lens);
+            }
+
+            if (preserve->x_names)
+            {
+                XFREE(preserve->x_names);
+            }
+
+            if (preserve->x_regs)
+            {
+                XFREE(preserve->x_regs);
+            }
+
+            if (preserve->x_lens)
+            {
+                XFREE(preserve->x_lens);
+            }
+
+            XFREE(preserve);
+        }
     }
     else if (!strncmp(callp, "@_!", 3) && ((callp[3] == '\0') || (callp[3] == ' ')))
     {
@@ -1057,7 +1196,51 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
             }
 
             XFREE(call_list);
-            Free_RegData(preserve);
+
+            if (preserve)
+            {
+                for (int z = 0; z < preserve->q_alloc; z++)
+                {
+                    if (preserve->q_regs[z])
+                        XFREE(preserve->q_regs[z]);
+                }
+
+                for (int z = 0; z < preserve->xr_alloc; z++)
+                {
+                    if (preserve->x_names[z])
+                        XFREE(preserve->x_names[z]);
+
+                    if (preserve->x_regs[z])
+                        XFREE(preserve->x_regs[z]);
+                }
+
+                if (preserve->q_regs)
+                {
+                    XFREE(preserve->q_regs);
+                }
+
+                if (preserve->q_lens)
+                {
+                    XFREE(preserve->q_lens);
+                }
+
+                if (preserve->x_names)
+                {
+                    XFREE(preserve->x_names);
+                }
+
+                if (preserve->x_regs)
+                {
+                    XFREE(preserve->x_regs);
+                }
+
+                if (preserve->x_lens)
+                {
+                    XFREE(preserve->x_lens);
+                }
+
+                XFREE(preserve);
+            }
         }
     }
     else if (!strncmp(callp, "@_", 2) && ((callp[2] == '\0') || (callp[2] == ' ')))
@@ -1111,7 +1294,50 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
             XFREE(call_list);
         }
 
-        Free_RegData(preserve);
+        if (preserve)
+        {
+            for (int z = 0; z < preserve->q_alloc; z++)
+            {
+                if (preserve->q_regs[z])
+                    XFREE(preserve->q_regs[z]);
+            }
+
+            for (int z = 0; z < preserve->xr_alloc; z++)
+            {
+                if (preserve->x_names[z])
+                    XFREE(preserve->x_names[z]);
+
+                if (preserve->x_regs[z])
+                    XFREE(preserve->x_regs[z]);
+            }
+
+            if (preserve->q_regs)
+            {
+                XFREE(preserve->q_regs);
+            }
+
+            if (preserve->q_lens)
+            {
+                XFREE(preserve->q_lens);
+            }
+
+            if (preserve->x_names)
+            {
+                XFREE(preserve->x_names);
+            }
+
+            if (preserve->x_regs)
+            {
+                XFREE(preserve->x_regs);
+            }
+
+            if (preserve->x_lens)
+            {
+                XFREE(preserve->x_lens);
+            }
+
+            XFREE(preserve);
+        }
     }
     else
     {
@@ -1128,7 +1354,51 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         }
 
         XFREE(call_list);
-        Free_RegData(preserve);
+
+        if (preserve)
+        {
+            for (int z = 0; z < preserve->q_alloc; z++)
+            {
+                if (preserve->q_regs[z])
+                    XFREE(preserve->q_regs[z]);
+            }
+
+            for (int z = 0; z < preserve->xr_alloc; z++)
+            {
+                if (preserve->x_names[z])
+                    XFREE(preserve->x_names[z]);
+
+                if (preserve->x_regs[z])
+                    XFREE(preserve->x_regs[z]);
+            }
+
+            if (preserve->q_regs)
+            {
+                XFREE(preserve->q_regs);
+            }
+
+            if (preserve->q_lens)
+            {
+                XFREE(preserve->q_lens);
+            }
+
+            if (preserve->x_names)
+            {
+                XFREE(preserve->x_names);
+            }
+
+            if (preserve->x_regs)
+            {
+                XFREE(preserve->x_regs);
+            }
+
+            if (preserve->x_lens)
+            {
+                XFREE(preserve->x_lens);
+            }
+
+            XFREE(preserve);
+        }
     }
 
     if (is_sandbox)
@@ -4618,7 +4888,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
     OBJGRID *ogp;
     char *xlist, *ylist;
-    int n_x, n_y, r, c, i, j, errs=0;
+    int n_x, n_y, r, c, i, j, errs = 0;
     char **x_elems, **y_elems;
     Delim isep;
     VaChk_Only_In(4);

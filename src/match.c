@@ -517,7 +517,7 @@ void match_exit_with_parents(void)
     if (Good_obj(md.player) && Has_location(md.player))
     {
         loc = Location(md.player);
-        ITER_PARENTS(loc, parent, lev)
+        for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
         {
             if (match_exit_internal(parent, loc, CON_LOCAL))
             {
@@ -552,7 +552,7 @@ void match_carried_exit_with_parents(void)
 
     if (Good_obj(md.player) && Has_exits(md.player))
     {
-        ITER_PARENTS(md.player, parent, lev)
+        for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
         {
             if (match_exit_internal(parent, md.player, CON_LOCAL))
             {

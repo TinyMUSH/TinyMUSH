@@ -249,9 +249,7 @@ bool check_access(dbref player, int mask)
  */
 bool check_mod_access(dbref player, EXTFUNCS *xperms)
 {
-	int i = 0;
-
-	for (i = 0; i < xperms->num_funcs; i++)
+	for (int i = 0; i < xperms->num_funcs; i++)
 	{
 		if (!xperms->ext_funcs[i])
 		{
@@ -329,10 +327,12 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
  */
 void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attribute__((unused)), char *cargs[], int ncargs)
 {
-	char *buf, *bp, *tstr, *str;
-	int aflags, alen;
-	dbref aowner;
-	GDATA *preserve;
+	char *buf = NULL, *bp = NULL, *tstr = NULL, *str = NULL;
+	int aflags = 0, alen = 0;
+	dbref aowner = NOTHING;
+	GDATA *preserve = NULL;
+
+	str = tstr = atr_get(hp->thing, hp->atr, &aowner, &aflags, &alen);
 
 	/**
 	 * We know we have a non-null hook. We want to evaluate the obj/attr
@@ -340,9 +340,6 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 	 * the command that caused this hook to be called.
 	 * 
 	 */
-	tstr = atr_get(hp->thing, hp->atr, &aowner, &aflags, &alen);
-	str = tstr;
-
 	if (save_globs & CS_PRESERVE)
 	{
 		preserve = save_global_regs("process_hook");
@@ -363,7 +360,50 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 	}
 	else if (save_globs & CS_PRIVATE)
 	{
-		Free_RegData(mudstate.rdata);
+		if (mudstate.rdata)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z])
+					XFREE(mudstate.rdata->q_regs[z]);
+			}
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z])
+					XFREE(mudstate.rdata->x_names[z]);
+
+				if (mudstate.rdata->x_regs[z])
+					XFREE(mudstate.rdata->x_regs[z]);
+			}
+
+			if (mudstate.rdata->q_regs)
+			{
+				XFREE(mudstate.rdata->q_regs);
+			}
+
+			if (mudstate.rdata->q_lens)
+			{
+				XFREE(mudstate.rdata->q_lens);
+			}
+
+			if (mudstate.rdata->x_names)
+			{
+				XFREE(mudstate.rdata->x_names);
+			}
+
+			if (mudstate.rdata->x_regs)
+			{
+				XFREE(mudstate.rdata->x_regs);
+			}
+
+			if (mudstate.rdata->x_lens)
+			{
+				XFREE(mudstate.rdata->x_lens);
+			}
+			
+			XFREE(mudstate.rdata);
+		}
+
 		mudstate.rdata = preserve;
 	}
 
@@ -429,13 +469,13 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 {
 	int nargs = 0, i = 0, interp = 0, key = 0, xkey = 0, aflags = 0, alen = 0;
 	int cmd_matches = 0;
-	char *buf1, *buf2, *bp, *str, *buff;
-	char *s, *j, *new, *pname, *lname;
+	char *buf1 = NULL, *buf2 = NULL, *bp = NULL, *str = NULL, *buff = NULL;
+	char *s = NULL, *j = NULL, *new = NULL, *pname = NULL, *lname = NULL;
 	char *args[mudconf.max_command_args], *aargs[NUM_ENV_VARS];
 	char tchar = 0;
 	dbref aowner = NOTHING;
-	ADDENT *add;
-	GDATA *preserve;
+	ADDENT *add = NULL;
+	GDATA *preserve = NULL;
 
 	/**
 	 * Perform object type checks.
@@ -905,12 +945,12 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 {
 
 	dbref exit = NOTHING, aowner = NOTHING, parent = NOTHING;
-	CMDENT *cmdp;
-	MODULE *csm__mp;
-	NUMBERTAB *np;
+	CMDENT *cmdp = NULL;
+	MODULE *csm__mp = NULL;
+	NUMBERTAB *np = NULL;
 	int succ = 0, aflags = 0, alen = 0, i = 0, got_stop = 0, pcount = 0, retval = 0;
-	char *p, *q, *arg, *lcbuf, *slashp, *cmdsave, *bp;
-	char *str, *evcmd, *gbuf, *gc, *pname, *lname;
+	char *p = NULL, *q = NULL, *arg = NULL, *lcbuf = NULL, *slashp = NULL, *cmdsave = NULL, *bp = NULL;
+	char *str = NULL, *evcmd = NULL, *gbuf = NULL, *gc = NULL, *pname = NULL, *lname = NULL;
 	char *preserve_cmd = XMALLOC(LBUF_SIZE, "preserve_cmd");
 
 	if (mudstate.cmd_invk_ctr == mudconf.cmd_invk_lim)
@@ -1811,7 +1851,8 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 						obj_time.tv_usec = obj_time.tv_usec % 1000000;
 					}
 
-					s_Time_Used(player, obj_time);
+					db[player].cpu_time_used.tv_sec = obj_time.tv_sec;
+					db[player].cpu_time_used.tv_usec = obj_time.tv_usec;
 				}
 			}
 		}
@@ -1836,8 +1877,8 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
  */
 void list_cmdtable(dbref player)
 {
-	CMDENT *cmdp, *modcmds;
-	MODULE *mp;
+	CMDENT *cmdp = NULL, *modcmds = NULL;
+	MODULE *mp = NULL;
 	char *buf = XMALLOC(LBUF_SIZE, "buf");
 
 	XSPRINTF(buf, "Built-in commands:");
@@ -1898,8 +1939,8 @@ void list_cmdtable(dbref player)
  */
 void list_attrtable(dbref player)
 {
-	ATTR *ap;
-	char *cp, *bp, *buf;
+	ATTR *ap = NULL;
+	char *cp = NULL, *bp = NULL, *buf = NULL;
 
 	bp = buf = XMALLOC(LBUF_SIZE, "buf");
 
@@ -1935,8 +1976,8 @@ void list_attrtable(dbref player)
  */
 void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff)
 {
-	CMDENT *cmdp;
-	ATTR *ap;
+	CMDENT *cmdp = NULL;
+	ATTR *ap = NULL;
 
 	for (cmdp = ctab; cmdp->cmdname; cmdp++)
 	{
@@ -1975,11 +2016,10 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff)
  */
 void list_cmdaccess(dbref player)
 {
-	CMDENT *cmdp, *ctab;
-	ATTR *ap;
-	MODULE *mp;
-	char *p, *q;
-	char *buff = XMALLOC(SBUF_SIZE, "buff");
+	CMDENT *cmdp = NULL, *ctab = NULL;
+	ATTR *ap = NULL;
+	MODULE *mp = NULL;
+	char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
 	helper_list_cmdaccess(player, command_table, buff);
 
@@ -2039,9 +2079,9 @@ void list_cmdaccess(dbref player)
  */
 void list_cmdswitches(dbref player)
 {
-	CMDENT *cmdp, *ctab;
-	MODULE *mp;
-	char *s, *buff = XMALLOC(SBUF_SIZE, "buff");
+	CMDENT *cmdp = NULL, *ctab = NULL;
+	MODULE *mp = NULL;
+	char *s = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
 	for (cmdp = command_table; cmdp->cmdname; cmdp++)
 	{
@@ -2094,7 +2134,7 @@ void list_cmdswitches(dbref player)
  */
 void list_attraccess(dbref player)
 {
-	ATTR *ap;
+	ATTR *ap = NULL;
 
 	for (ap = attr; ap->name; ap++)
 	{
@@ -2114,7 +2154,7 @@ void list_attraccess(dbref player)
  */
 void list_attrtypes(dbref player)
 {
-	KEYLIST *kp;
+	KEYLIST *kp = NULL;
 
 	if (!mudconf.vattr_flag_list)
 	{
@@ -2142,8 +2182,8 @@ void list_attrtypes(dbref player)
  */
 int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
-	CMDENT *cmdp;
-	char *ap;
+	CMDENT *cmdp = NULL;
+	char *ap = NULL;
 	int set_switch = 0;
 
 	for (ap = str; *ap && !isspace(*ap) && (*ap != '/'); ap++)
@@ -2197,10 +2237,10 @@ int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref play
  */
 int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
-	CMDENT *cmdp;
-	ATTR *ap;
+	CMDENT *cmdp = NULL;
+	ATTR *ap = NULL;
 	int failure = 0, save = 0;
-	char *p, *q, *buff = XMALLOC(SBUF_SIZE, "buff");
+	char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
 	for (ap = attr; ap->name; ap++)
 	{
@@ -2245,8 +2285,8 @@ int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref
  */
 int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
-	ATTR *ap;
-	char *sp;
+	ATTR *ap = NULL;
+	char *sp = NULL;
 
 	for (sp = str; *sp && !isspace(*sp); sp++)
 		;
@@ -2287,8 +2327,8 @@ int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref
  */
 int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
-	char *privs;
-	KEYLIST *kp;
+	char *privs = NULL;
+	KEYLIST *kp = NULL;
 	int succ = 0;
 
 	/**
@@ -2351,10 +2391,10 @@ int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref p
 int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
 
-	CMDENT *cmdp, *cmd2;
-	NAMETAB *nt;
-	int *hp;
-	char *ap, *tokst;
+	CMDENT *cmdp = NULL, *cmd2 = NULL;
+	NAMETAB *nt = NULL;
+	int *hp = NULL;
+	char *ap = NULL, *tokst = NULL;
 	char *alias = strtok_r(str, " \t=,", &tokst);
 	char *orig = strtok_r(NULL, " \t=,", &tokst);
 
@@ -2653,7 +2693,7 @@ void list_params(dbref player)
  */
 void list_vattrs(dbref player)
 {
-	VATTR *va;
+	VATTR *va = NULL;
 	int na = 0;
 
 	raw_notify(player, NULL, "--- User-Defined Attributes ---");
@@ -2710,9 +2750,9 @@ void list_nhashstat(dbref player, const char *tab_name, NHSHTAB *htab)
  */
 void list_hashstats(dbref player)
 {
-	MODULE *mp;
-	MODHASHES *m_htab, *hp, *m_ntab, *np;
-	char *s;
+	MODULE *mp = NULL;
+	MODHASHES *m_htab = NULL, *hp = NULL, *m_ntab = NULL, *np = NULL;
+	char *s = NULL;
 
 	raw_notify(player, NULL, "Hash Stats       Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
 	list_hashstat(player, "Commands", &mudstate.command_htab);
@@ -2847,20 +2887,20 @@ void list_memory(dbref player)
 {
 	double total = 0, each = 0, each2 = 0;
 	int i = 0, j = 0;
-	CMDENT *cmd;
-	ADDENT *add;
-	NAMETAB *name;
-	ATTR *attr;
-	UFUN *ufunc;
-	Cache *cp;
-	Chain *sp;
-	HASHENT *htab;
-	OBJSTACK *stack;
-	OBJGRID *grid;
-	VARENT *xvar;
-	STRUCTDEF *this_struct;
-	INSTANCE *inst_ptr;
-	STRUCTDATA *data_ptr;
+	CMDENT *cmd = NULL;
+	ADDENT *add = NULL;
+	NAMETAB *name = NULL;
+	ATTR *attr = NULL;
+	UFUN *ufunc = NULL;
+	Cache *cp = NULL;
+	Chain *sp = NULL;
+	HASHENT *htab = NULL;
+	OBJSTACK *stack = NULL;
+	OBJGRID *grid = NULL;
+	VARENT *xvar = NULL;
+	STRUCTDEF *this_struct = NULL;
+	INSTANCE *inst_ptr = NULL;
+	STRUCTDATA *data_ptr = NULL;
 
 	/**
 	 * Calculate size of object structures

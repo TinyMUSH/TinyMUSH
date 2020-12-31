@@ -2357,7 +2357,8 @@ void fun_cwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
             if (*bufc != bb_p)
                 SAFE_LB_CHR(' ', buff, bufc);
 
-            safe_dbref(buff, bufc, chp->connect_who[i]->player);
+            SAFE_LB_CHR('#', buff, bufc);
+            SAFE_LTOS(buff, bufc, chp->connect_who[i]->player, LBUF_SIZE);
         }
     }
 }
@@ -2375,7 +2376,8 @@ void fun_cwhoall(char *buff, char **bufc, dbref player, dbref caller __attribute
         if (*bufc != bb_p)
             SAFE_LB_CHR(' ', buff, bufc);
 
-        safe_dbref(buff, bufc, wp->player);
+        SAFE_LB_CHR('#', buff, bufc);
+        SAFE_LTOS(buff, bufc, wp->player, LBUF_SIZE);
     }
 }
 
@@ -2383,7 +2385,7 @@ void fun_comowner(char *buff, char **bufc, dbref player, dbref caller __attribut
 {
     CHANNEL *chp;
     Grab_Channel(player);
-    safe_dbref(buff, bufc, chp->owner);
+    SAFE_LB_CHR('#', buff, bufc); SAFE_LTOS(buff, bufc, chp->owner, LBUF_SIZE);
 }
 
 void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

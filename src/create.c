@@ -9,8 +9,6 @@
  * 
  */
 
-/* create.c -  */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
@@ -542,7 +540,7 @@ void do_parent(dbref player, dbref cause __attribute__((unused)), int key __attr
     	 * Verify no recursive reference
          * 
     	 */
-        ITER_PARENTS(parent, curr, lev)
+        for (lev = 0, curr = parent; (Good_obj(curr) && (lev < mudconf.parent_nest_lim)); curr = Parent(curr), lev++)
         {
             if (curr == thing)
             {

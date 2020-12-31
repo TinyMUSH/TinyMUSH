@@ -43,7 +43,7 @@ extern const int _sys_nsig;
  * @attention Since this is the core of the whole show, better keep theses globals.
  * 
  */
-int sock = 0;						/*!< Game socket */
+int sock = 0;					/*!< Game socket */
 int ndescriptors = 0;			/*!< New Descriptor */
 int maxd = 0;					/*!< Max Descriptors */
 DESC *descriptor_list = NULL;	/*!< Descriptor list */
@@ -156,7 +156,7 @@ int get_slave_result(void)
 		goto gsr_end;
 	}
 	/**
-	 * @note now we're into the RFC 1413 ident reply
+	 * now we're into the RFC 1413 ident reply
 	 * 
 	 */
 	while (isspace(*p))
@@ -190,7 +190,7 @@ int get_slave_result(void)
 		++p;
 	}
 	/**
-	 * @note Skip the local port, making sure it consists of digits
+	 * Skip the local port, making sure it consists of digits
 	 * 
 	 */
 	while (isdigit(*p))
@@ -215,7 +215,7 @@ int get_slave_result(void)
 		++p;
 	}
 	/**
-	 * @note Identify the reply type
+	 * Identify the reply type
 	 * 
 	 */
 	if (strncmp(p, "USERID", 6))
@@ -255,7 +255,7 @@ int get_slave_result(void)
 	++userid;
 	userid[-1] = '\0';
 	/**
-	 * @note go back and skip over the "OS [, charset] : " field
+	 * go back and skip over the "OS [, charset] : " field
 	 * 
 	 */
 	userid = strchr(p, ':');
@@ -311,7 +311,7 @@ gsr_end:
 
 /**
  * @brief Bootstrap the slave process
- * @todo Slave should be a completly separated exec... We end up with two netmush in memory like it is now!
+ * @todo Slave should be a completly separated exec (or a thread?)... We end up with two netmush in memory like it is now!
  * 
  */
 void boot_slave(void)
@@ -338,7 +338,7 @@ void boot_slave(void)
 		return;
 	}
 	/**
-	 * @note set to nonblocking
+	 * set to nonblocking
 	 * 
 	 */
 #ifdef FNDELAY
@@ -362,7 +362,11 @@ void boot_slave(void)
 		close(sv[1]);
 		return;
 
-	case 0: /* child */
+	case 0:
+		/** 
+		 * child 
+		 * 
+		 */
 		close(sv[0]);
 
 		if (dup2(sv[1], 0) == -1)
@@ -494,17 +498,17 @@ void shovechars(int port)
 			break;
 		}
 		/**
-		 * @note We've gotten a signal to dump flatfiles
+		 * We've gotten a signal to dump flatfiles
 		 * 
 		 */
 		if (mudstate.flatfile_flag && !mudstate.dumping)
 		{
 			if (mudconf.dump_msg)
 			{
-				if(*mudconf.dump_msg) {
+				if (*mudconf.dump_msg)
+				{
 					raw_broadcast(0, "%s", mudconf.dump_msg);
 				}
-				
 			}
 
 			mudstate.dumping = 1;
@@ -514,7 +518,8 @@ void shovechars(int port)
 
 			if (mudconf.postdump_msg)
 			{
-				if(*mudconf.postdump_msg) {
+				if (*mudconf.postdump_msg)
+				{
 					raw_broadcast(0, "%s", mudconf.postdump_msg);
 				}
 			}
@@ -522,12 +527,12 @@ void shovechars(int port)
 			mudstate.flatfile_flag = 0;
 		}
 		/**
-		 * @note test for events
+		 * test for events
 		 * 
 		 */
 		dispatch();
 		/**
-		 * @note any queued robot commands waiting?
+		 * any queued robot commands waiting?
 		 * 
 		 */
 		timeout.tv_sec = que_next();
@@ -537,7 +542,7 @@ void shovechars(int port)
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
 		/**
-		 * @note Listen for new connections if there are free descriptors
+		 * Listen for new connections if there are free descriptors
 		 * 
 		 */
 		if (ndescriptors < avail_descriptors)
@@ -545,7 +550,7 @@ void shovechars(int port)
 			FD_SET(sock, &input_set);
 		}
 		/**
-		 * @note Listen for replies from the slave socket
+		 * Listen for replies from the slave socket
 		 * 
 		 */
 		if (slave_socket != -1)
@@ -553,7 +558,7 @@ void shovechars(int port)
 			FD_SET(slave_socket, &input_set);
 		}
 		/**
-		 * @note Mark sockets that we want to test for change in status
+		 * Mark sockets that we want to test for change in status
 		 * 
 		 */
 		DESC_ITER_ALL(d)
@@ -569,7 +574,7 @@ void shovechars(int port)
 			}
 		}
 		/**
-		 * @note Wait for something to happen
+		 * Wait for something to happen
 		 * 
 		 */
 		found = select(maxd, &input_set, &output_set, (fd_set *)NULL, &timeout);
@@ -579,7 +584,7 @@ void shovechars(int port)
 			if (errno == EBADF)
 			{
 				/**
-				 * @note This one is bad, as it results in a spiral
+				 * This one is bad, as it results in a spiral
 				 * of doom, unless we can figure out what the bad file 
 				 * descriptor is and get rid of it.
 				 * 
@@ -590,7 +595,7 @@ void shovechars(int port)
 					if (fstat(d->descriptor, &fstatbuf) < 0)
 					{
 						/**
-						 * @note It's a player. Just toss the connection.
+						 * It's a player. Just toss the connection.
 						 * 
 						 */
 						log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad descriptor %d", d->descriptor);
@@ -601,7 +606,7 @@ void shovechars(int port)
 				if ((slave_socket == -1) || (fstat(slave_socket, &fstatbuf) < 0))
 				{
 					/**
-					 * @note It's the slave. Try to restart it, since it
+					 * It's the slave. Try to restart it, since it
 					 * presumably died.
 					 * 
 					 */
@@ -612,7 +617,7 @@ void shovechars(int port)
 				if ((sock != -1) && (fstat(sock, &fstatbuf) < 0))
 				{
 					/**
-					 * @note We didn't figured it out, well that's it, game over.
+					 * We didn't figured it out, well that's it, game over.
 					 * 
 					 */
 					log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad game port descriptor %d", sock);
@@ -627,7 +632,7 @@ void shovechars(int port)
 			continue;
 		}
 		/**
-		 * @note if !found then time for robot commands
+		 * if !found then time for robot commands
 		 * 
 		 */
 		if (!found)
@@ -644,7 +649,7 @@ void shovechars(int port)
 			do_top(mudconf.active_q_chunk);
 		}
 		/**
-		 * @note Get usernames and hostnames
+		 * Get usernames and hostnames
 		 * 
 		 */
 		if (slave_socket != -1 && FD_ISSET(slave_socket, &input_set))
@@ -653,7 +658,7 @@ void shovechars(int port)
 				;
 		}
 		/**
-		 * @note Check for new connection requests
+		 * Check for new connection requests
 		 * 
 		 */
 		if (FD_ISSET(sock, &input_set))
@@ -678,19 +683,19 @@ void shovechars(int port)
 			}
 		}
 		/**
-		 * @note Check for activity on user sockets
+		 * Check for activity on user sockets
 		 * 
 		 */
 		DESC_SAFEITER_ALL(d, dnext)
 		{
 			/**
-			 * @note Process input from sockets with pending input
+			 * Process input from sockets with pending input
 			 * 
 		 	 */
 			if (FD_ISSET(d->descriptor, &input_set))
 			{
 				/**
-				 * @note Undo AutoDark
+				 * Undo AutoDark
 				 * 
 		 		 */
 				if (d->flags & DS_AUTODARK)
@@ -699,7 +704,7 @@ void shovechars(int port)
 					s_Flags(d->player, Flags(d->player) & ~DARK);
 				}
 				/**
-				 * @note Process received data
+				 * Process received data
 				 * 
 		 		 */
 				if (!process_input(d))
@@ -709,7 +714,7 @@ void shovechars(int port)
 				}
 			}
 			/**
-			 * @note Process output for sockets with pending output
+			 * Process output for sockets with pending output
 			 * 
 	 		 */
 			if (FD_ISSET(d->descriptor, &output_set))
@@ -760,7 +765,7 @@ DESC *new_connection(int sock)
 	else
 	{
 		/**
-		 * @note Ask slave process for host and username
+		 * Ask slave process for host and username
 		 * 
  		 */
 		if ((slave_socket != -1) && mudconf.use_hostname)
@@ -878,7 +883,7 @@ void shutdownsock(DESC *d, int reason)
 	char *buff = NULL, *buff2 = NULL;
 	time_t now = 0L;
 	int ncon = 0;
-	DESC *dtemp  = NULL;
+	DESC *dtemp = NULL;
 
 	if ((reason == R_LOGOUT) && (site_check((d->address).sin_addr, mudstate.access_list) & H_FORBIDDEN))
 	{
@@ -890,7 +895,7 @@ void shutdownsock(DESC *d, int reason)
 	if (d->flags & DS_CONNECTED)
 	{
 		/**
-		 * @note Do the disconnect stuff if we aren't doing a LOGOUT (which
+		 * Do the disconnect stuff if we aren't doing a LOGOUT (which
 		 * keeps the connection open so the player can connect to a different
 		 * character).
  		 */
@@ -899,7 +904,7 @@ void shutdownsock(DESC *d, int reason)
 			if (reason != R_SOCKDIED)
 			{
 				/**
-				 * @note If the socket died, there's no reason to
+				 * If the socket died, there's no reason to
 				 * display the quit file.
 				 * 
  				 */
@@ -913,7 +918,7 @@ void shutdownsock(DESC *d, int reason)
 			log_write(LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, connReasons(reason), d->command_count, d->input_tot, d->output_tot, (int)(time(NULL) - d->connected_at));
 		}
 		/**
-		 * @note If requested, write an accounting record of the form:
+		 * If requested, write an accounting record of the form:
 		 * Plyr# Flags Cmds ConnTime Loc Money [Site] <DiscRsn> Name
 		 * 
  		 */
@@ -938,7 +943,7 @@ void shutdownsock(DESC *d, int reason)
 	clearstrings(d);
 
 	/**
-	 * @note If this was our only connection, get out of interactive mode.
+	 * If this was our only connection, get out of interactive mode.
 	 * 
 	 * 
 	 */
@@ -950,7 +955,59 @@ void shutdownsock(DESC *d, int reason)
 
 		if (ncon == 0)
 		{
-			Free_RegData(d->program_data->wait_data);
+			/** 
+			 * Free_RegData 
+			 * 
+			 */
+			if (d->program_data->wait_data)
+			{
+				for (int z = 0; z < d->program_data->wait_data->q_alloc; z++)
+				{
+					if (d->program_data->wait_data->q_regs[z])
+						XFREE(d->program_data->wait_data->q_regs[z]);
+				}
+
+				for (int z = 0; z < d->program_data->wait_data->xr_alloc; z++)
+				{
+					if (d->program_data->wait_data->x_names[z])
+						XFREE(d->program_data->wait_data->x_names[z]);
+						
+					if (d->program_data->wait_data->x_regs[z])
+						XFREE(d->program_data->wait_data->x_regs[z]);
+				}
+
+				/** 
+				 * Free_RegDataStruct
+				 * 
+				 */
+				if (d->program_data->wait_data->q_regs)
+				{
+					XFREE(d->program_data->wait_data->q_regs);
+				}
+
+				if (d->program_data->wait_data->q_lens)
+				{
+					XFREE(d->program_data->wait_data->q_lens);
+				}
+
+				if (d->program_data->wait_data->x_names)
+				{
+					XFREE(d->program_data->wait_data->x_names);
+				}
+
+				if (d->program_data->wait_data->x_regs)
+				{
+					XFREE(d->program_data->wait_data->x_regs);
+				}
+
+				if (d->program_data->wait_data->x_lens)
+				{
+					XFREE(d->program_data->wait_data->x_lens);
+				}
+
+				XFREE(d->program_data->wait_data);
+			}
+
 			XFREE(d->program_data);
 			atr_clr(d->player, A_PROGCMD);
 		}
@@ -1051,7 +1108,7 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 	if (s == slave_socket)
 	{
 		/**
-		 * @note Whoa. We shouldn't be allocating this. If we got this
+		 * Whoa. We shouldn't be allocating this. If we got this
 		 * descriptor, our connection with the slave must have died somehow.
 		 * We make sure to take note appropriately.
 		 * 
@@ -1468,12 +1525,12 @@ void sighandler(int sig)
 		{
 			raw_broadcast(0, "GAME: Fatal signal %s caught, restarting with previous database.", signames[sig]);
 			/**
-			 * @note Not good, Don't sync, restart using older db.
+			 * Not good, Don't sync, restart using older db.
 			 * 
 			 */
 			dump_database_internal(DUMP_DB_CRASH);
 			cache_sync();
-        	dddb_close();
+			dddb_close();
 
 			if (slave_socket != -1)
 			{
@@ -1487,7 +1544,7 @@ void sighandler(int sig)
 				kill(slave_pid, SIGKILL);
 			}
 			/**
-			 * @note Try our best to dump a usable core by generating a
+			 * Try our best to dump a usable core by generating a
 			 * second signal with the SIG_DFL action.
 			 * 
 			 */
@@ -1495,7 +1552,7 @@ void sighandler(int sig)
 			{
 				unset_signals();
 				/**
-				 * @note In the parent process (easier to follow
+				 * In the parent process (easier to follow
 				 * with gdb), we're about to return from this
 				 * signal handler and hope that a second
 				 * signal is delivered. Meanwhile let's close

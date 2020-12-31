@@ -4419,7 +4419,8 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (mp != NULL)
     {
-        safe_dbref(buff, bufc, mp->from);
+        SAFE_LB_CHR('#', buff, bufc);
+        SAFE_LTOS(buff, bufc, mp->from, LBUF_SIZE);
         return;
     }
 

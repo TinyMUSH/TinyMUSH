@@ -57,8 +57,8 @@ extern int slave_socket;
 
 extern pid_t slave_pid;
 
-FILE *t_fd;
-bool t_is_pipe = false;
+FILE *t_fd;             /*!< Main BD file descriptor */
+bool t_is_pipe = false; /*!< Are we piping from stdin? */
 
 /**
  * @brief Close file/stream
@@ -359,14 +359,28 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
     do
     {
         for (; *bp && isspace(*bp); bp++)
-            ; /* skip spaces */
+        {
+            /** 
+             * skip spaces 
+             * 
+             */
+        }
 
         for (dp = bp; *bp && !isspace(*bp); bp++)
-            ; /* remember string */
+        {
+            /** 
+             * remember string 
+             * 
+             */
+        }
 
         if (*bp)
         {
-            *bp++ = '\0'; /* terminate string */
+            /** 
+             * terminate string 
+             * 
+             */
+            *bp++ = '\0';
         }
 
         if ((*dp++ == '#') && isdigit(*dp))
@@ -1008,8 +1022,10 @@ void s_Name(dbref thing, char *s)
     int len = 0;
     char *buf = NULL;
 
-    /* Truncate the name if we have to */
-
+    /** 
+     * Truncate the name if we have to 
+     * 
+     */
     if (s)
     {
         len = strlen(s);
@@ -1993,7 +2009,6 @@ void al_delete(dbref thing, int attrnum)
      * If trying to modify List attrib, return.  Otherwise, get the attribute list.
      * 
      */
-
     if (attrnum == A_LIST)
     {
         return;
@@ -2160,7 +2175,8 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
 
             if (oattr)
             {
-                StrCopyLen(oattr, iattr, alen);
+                *alen = strlen(iattr); 
+                XMEMCPY(oattr, iattr, (size_t)(*alen) + 1);
             }
 
             return;
@@ -2188,7 +2204,8 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
 
             if (oattr)
             {
-                StrCopyLen(oattr, iattr, alen);
+                *alen = strlen(iattr);
+                XMEMCPY(oattr, iattr, (size_t)(*alen) + 1);
             }
         }
 
@@ -2198,7 +2215,8 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
          */
         if (oattr)
         {
-            StrCopyLen(oattr, cp, alen);
+            *alen = strlen(cp); 
+            XMEMCPY(oattr, cp, (size_t)(*alen) + 1);
         }
 
         if (*owner == NOTHING)
@@ -2217,7 +2235,8 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
 
         if (oattr)
         {
-            StrCopyLen(oattr, iattr, alen);
+            *alen = strlen(iattr);
+            XMEMCPY(oattr, iattr, (size_t)(*alen) + 1);
         }
     }
 }
@@ -2587,7 +2606,7 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
     ATTR *ap = NULL;
     PROPDIR *pp = NULL;
 
-    ITER_PARENTS(thing, parent, lev)
+    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
     {
         buff = atr_get_raw(parent, atr);
 
@@ -2676,7 +2695,7 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
     ATTR *ap = NULL;
     PROPDIR *pp = NULL;
 
-    ITER_PARENTS(thing, parent, lev)
+    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
     {
         buff = atr_get_raw(parent, atr);
 
@@ -3036,7 +3055,6 @@ void db_grow(dbref newtop)
      * Grow by a minimum of delta objects
      * 
      */
-
     if (newtop <= mudstate.db_size + delta)
     {
         newsize = mudstate.db_size + delta;
@@ -3050,7 +3068,6 @@ void db_grow(dbref newtop)
      * Enforce minimum database size
      * 
      */
-
     if (newsize < mudstate.min_size)
     {
         newsize = mudstate.min_size + delta;
@@ -3190,7 +3207,18 @@ void db_grow(dbref newtop)
      * Go do the rest of the things
      * 
      */
-    CALL_ALL_MODULES(db_grow, (newsize, newtop));
+
+    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    {
+        /**
+         * Call all modules
+         * 
+         */
+        if (cam__mp->db_grow)
+        {
+            (*(cam__mp->db_grow))(newsize, newtop);
+        }
+    }
 
     for (int i = mudstate.db_top; i < newtop; i++)
     {
@@ -3274,6 +3302,7 @@ void db_make_minimal(void)
     s_Powers(obj, 0);
     s_Powers2(obj, 0);
     s_Pennies(obj, 1000);
+
     /** 
      * Manually link to Limbo, just in case
      */
@@ -3326,7 +3355,6 @@ dbref parse_objid(const char *s, const char *p)
      * go find it.
      * 
      */
-
     if (p == NULL)
     {
         if ((p = strchr(s, ':')) == NULL)
@@ -3376,8 +3404,10 @@ dbref parse_dbref(const char *s)
 {
     int x;
 
-    /* Either pure dbrefs or objids are okay */
-
+    /** 
+     * Either pure dbrefs or objids are okay 
+     * 
+     */
     for (const char *p = s; *p; p++)
     {
         if (!isdigit(*p))
@@ -3460,7 +3490,7 @@ char *getstring(FILE *f, bool new_strings)
         ungetc(c, f);
         c = '\0';
 
-        for (;;)
+        while (true)
         {
             lastc = c;
             c = fgetc(f);
@@ -3494,7 +3524,7 @@ char *getstring(FILE *f, bool new_strings)
     }
     else
     {
-        for (;;)
+        while (true)
         {
             c = fgetc(f);
 
@@ -3895,7 +3925,6 @@ void load_restart_db(void)
          * Note that d->address is NOT INITIALIZED, and it DOES get used later, particularly when checking logout.
          * 
          */
-
         if (descriptor_list)
         {
             for (p = descriptor_list; p->next; p = p->next)

@@ -545,7 +545,7 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
 	exclude = 0;
 	insert = 1;
 	nhashflush(&mudstate.parent_htab, 0);
-	ITER_PARENTS(thing, parent, lev)
+	for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (!Good_obj(Parent(parent)))
 		{
@@ -1235,7 +1235,52 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		/*
 	 * mudstate.rdata should be empty, but empty it just in case
 	 */
-		Free_RegData(mudstate.rdata);
+
+		if (mudstate.rdata)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z])
+					XFREE(mudstate.rdata->q_regs[z]);
+			}
+
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z])
+					XFREE(mudstate.rdata->x_names[z]);
+
+				if (mudstate.rdata->x_regs[z])
+					XFREE(mudstate.rdata->x_regs[z]);
+			}
+
+			if (mudstate.rdata->q_regs)
+			{
+				XFREE(mudstate.rdata->q_regs);
+			}
+
+			if (mudstate.rdata->q_lens)
+			{
+				XFREE(mudstate.rdata->q_lens);
+			}
+
+			if (mudstate.rdata->x_names)
+			{
+				XFREE(mudstate.rdata->x_names);
+			}
+
+			if (mudstate.rdata->x_regs)
+			{
+				XFREE(mudstate.rdata->x_regs);
+			}
+
+			if (mudstate.rdata->x_lens)
+			{
+				XFREE(mudstate.rdata->x_lens);
+			}
+
+			XFREE(mudstate.rdata);
+		}
+
 		mudstate.rdata = preserve;
 	}
 
@@ -1393,7 +1438,8 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 				}
 			}
 
-			s_Time_Used(thing, obj_time);
+			db[thing].cpu_time_used.tv_sec = obj_time.tv_sec;
+			db[thing].cpu_time_used.tv_usec = obj_time.tv_usec;
 		}
 
 		if (yes_screen)
@@ -2125,7 +2171,15 @@ void dump_database_internal(int dump_type)
      * Call modules to write to DBM
      */
 	db_lock();
-	CALL_ALL_MODULES(db_write, ());
+
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->db_write)
+		{
+			(*(cam__mp->db_write))();
+		}
+	}
+
 	db_unlock();
 
 	switch (dump_type)
@@ -2670,7 +2724,7 @@ void process_preload(void)
 		/*
 	 * Look for STARTUP and DAILY attributes on parents.
 	 */
-		ITER_PARENTS(thing, parent, lev)
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (H_Startup(thing))
 			{
@@ -2683,7 +2737,8 @@ void process_preload(void)
 				break;
 			}
 		}
-		ITER_PARENTS(thing, parent, lev)
+
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (Flags2(thing) & HAS_DAILY)
 			{
@@ -3868,10 +3923,11 @@ int main(int argc, char *argv[])
 	/*
      * go do it
      */
-	if (!mudstate.debug) {
+	if (!mudstate.debug)
+	{
 		mudstate.logstderr = 0;
 	}
-	
+
 	init_timer();
 	shovechars(mudconf.port);
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");

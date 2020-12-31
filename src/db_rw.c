@@ -150,7 +150,11 @@ BOOLEXP *getboolexp1(FILE *f)
 			}
 			return b;
 		}
-	case '-': /* obsolete NOTHING key, eat it */
+	case '-':
+		/** 
+		 * obsolete NOTHING key, eat it 
+		 * 
+		 */
 		while ((c = getc(f)) != '\n')
 		{
 			if (c == EOF)
@@ -285,8 +289,12 @@ BOOLEXP *getboolexp1(FILE *f)
 	}
 error:
 	log_write_raw(1, "ABORT! db_rw.c, reached error case in getboolexp1().\n");
-	abort();			 /* bomb out */
-	return TRUE_BOOLEXP; /* NOTREACHED */
+	/** 
+	 * bomb out 
+	 *
+	 */
+	abort();
+	return TRUE_BOOLEXP;
 }
 
 /**
@@ -331,6 +339,7 @@ int unscramble_attrnum(int attrnum)
 	case F_MUSH:
 		/**
 		 * TinyMUSH 2.2:  Deal with different attribute numbers.
+		 * 
 		 */
 		switch (attrnum)
 		{
@@ -725,6 +734,7 @@ void efo_convert(void)
 		case TYPE_THING:
 			/**
 		     * swap Exits and Link
+			 * 
 		     */
 			link = Link(i);
 			s_Link(i, Exits(i));
@@ -1136,7 +1146,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			if (mudconf.lag_check_clk)
 			{
 				obj_time.tv_sec = obj_time.tv_usec = 0;
-				s_Time_Used(i, obj_time);
+				db[i].cpu_time_used.tv_sec = obj_time.tv_sec;
+				db[i].cpu_time_used.tv_usec = obj_time.tv_usec;
 			}
 
 			s_StackCount(i, 0);
@@ -1530,7 +1541,8 @@ int db_read(void)
 				if (mudconf.lag_check_clk)
 				{
 					obj_time.tv_sec = obj_time.tv_usec = 0;
-					s_Time_Used(num, obj_time);
+					db[num].cpu_time_used.tv_sec = obj_time.tv_sec;
+					db[num].cpu_time_used.tv_usec = obj_time.tv_usec;
 				}
 
 				s_StackCount(num, 0);

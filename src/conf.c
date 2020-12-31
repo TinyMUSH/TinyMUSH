@@ -8,7 +8,6 @@
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  * 
  */
-/* conf.c -  */
 
 #include "copyright.h"
 #include "config.h"
@@ -857,7 +856,7 @@ CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
 {
-    LINKEDLIST *itp, *prev;
+    LINKEDLIST *itp = NULL, *prev = NULL;
     char *fvalue = NULL, *tokst = NULL;
     char *fname = strtok_r(str, " \t=,", &tokst);
 
@@ -1076,17 +1075,19 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
 {
     char *sp = NULL, *tokst = NULL;
     int f = 0, negate = 0, success = 0, failure = 0;
-    /*
+    /**
      * Walk through the tokens
+     * 
      */
     success = failure = 0;
     sp = strtok_r(str, " \t", &tokst);
 
     while (sp != NULL)
     {
-        /*
-	 * Check for negation
-	 */
+        /**
+    	 * Check for negation
+         * 
+    	 */
         negate = 0;
 
         if (*sp == '!')
@@ -1095,9 +1096,10 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
             sp++;
         }
 
-        /*
-	 * Set or clear the appropriate bit
-	 */
+        /**
+    	 * Set or clear the appropriate bit
+         * 
+    	 */
         f = search_nametab(GOD, (NAMETAB *)extra, sp);
 
         if (f > 0)
@@ -1119,9 +1121,10 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
             failure++;
         }
 
-        /*
-	 * Get the next token
-	 */
+        /**
+    	 * Get the next token
+         * 
+    	 */
         sp = strtok_r(NULL, " \t", &tokst);
     }
 
@@ -1598,8 +1601,12 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
             return CF_Failure;
         }
         else if (mask_bits == 0)
-        {
-            mask_num.s_addr = htonl(0); /* can't shift by 32 */
+        {  
+            /** 
+             * can't shift by 32 
+             * 
+             */
+            mask_num.s_addr = htonl(0);
         }
         else
         {
@@ -1614,11 +1621,11 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
     }
 
     head = (SITE *)*vp;
+
     /**
      * Parse the access entry and allocate space for it
      * 
      */
-
     if (!(site = (SITE *)XMALLOC(sizeof(SITE), "site")))
     {
         return CF_Failure;
@@ -2033,47 +2040,75 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
             continue;
         }
 
-        /*
-	 * Not a comment line.  Strip off the NL and any characters
-	 * following it.  Then, split the line into the command and
-	 * argument portions (separated by a space).  Also, trim off
-	 * the trailing comment, if any (delimited by #)
-	 */
+        /**
+    	 * Not a comment line.  Strip off the NL and any characters
+    	 * following it.  Then, split the line into the command and
+    	 * argument portions (separated by a space).  Also, trim off
+    	 * the trailing comment, if any (delimited by #)
+    	 */
 
         for (cp = buf; *cp && *cp != '\n'; cp++)
             ;
 
-        *cp = '\0'; /* strip \n */
+        /** 
+         * strip \n 
+         * 
+         */
+        *cp = '\0'; 
 
         for (cp = buf; *cp && isspace(*cp); cp++)
-            ; /* strip spaces */
-
+            ; 
+            
+        /** 
+         * strip spaces 
+         * 
+         */
         for (ap = cp; *ap && !isspace(*ap); ap++)
-            ; /* skip over command */
-
+            ; 
+        
+        /** 
+         * skip over command 
+         * 
+         */
         if (*ap)
         {
-            *ap++ = '\0'; /* trim command */
+            /** 
+             * trim command 
+             * 
+             */
+            *ap++ = '\0';
         }
 
         for (; *ap && isspace(*ap); ap++)
-            ; /* skip spaces */
-
+            ; 
+        
+        /** 
+         * skip spaces 
+         * 
+         */
         for (zp = ap; *zp && (*zp != '#'); zp++)
-            ; /* find comment */
-
+            ;
+            
+        /** 
+         * find comment 
+         * 
+         */
         if (*zp && !(isdigit(*(zp + 1)) && isspace(*(zp - 1))))
         {
             *zp = '\0';
         }
-        /* zap comment, but only if it's not
 
-	 * sitting between whitespace and a
-	 * digit, which traps a case like
-	 * 'master_room #2' */
+        /** zap comment, but only if it's not sitting between whitespace and a 
+         * digit, which traps a case like 'master_room #2'
+         * 
+         */
         for (zp = zp - 1; zp >= ap && isspace(*zp); zp--)
         {
-            *zp = '\0'; /* zap trailing spaces */
+            /** 
+             * zap trailing spaces 
+             * 
+             */
+            *zp = '\0';
         }
 
         cf_set(cp, ap, player);
@@ -2403,7 +2438,8 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 
     if (tp->interpreter == cf_dbref)
     {
-        safe_dbref(buff, bufc, *(tp->loc));
+        SAFE_LB_CHR('#', buff, bufc);
+        SAFE_LTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
         return;
     }
 

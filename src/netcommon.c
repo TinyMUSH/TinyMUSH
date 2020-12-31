@@ -26,7 +26,7 @@
 #include "attrs.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "match.h"		/* required by code */
-#include "stringutil.h"         /* required by code */
+#include "stringutil.h" /* required by code */
 #include "nametabs.h"
 
 /* ---------------------------------------------------------------------------
@@ -1081,7 +1081,14 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	mudstate.curr_enactor = player;
 	notify_check(player, player, key, NULL, buf);
 	XFREE(buf);
-	CALL_ALL_MODULES(announce_connect, (player, reason, num));
+
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->announce_connect)
+		{
+			(*(cam__mp->announce_connect))(player, reason, num);
+		}
+	}
 
 	if (Suspect(player))
 	{
@@ -1170,7 +1177,14 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 		XFREE(buf);
 	}
 
-	CALL_ALL_MODULES(announce_disconnect, (player, reason, num));
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->announce_disconnect)
+		{
+			(*(cam__mp->announce_disconnect))(player, reason, num);
+		}
+	}
+
 	announce_connattr(d, player, loc, reason, num, A_ADISCONNECT);
 
 	if (num < 1)
@@ -1406,8 +1420,8 @@ void dump_users(DESC *e, char *match, int key)
 	DESC *d;
 	int count;
 	char *buf, *fp, *sp;
-	char *flist=XMALLOC(4, "flist");
-	char *slist=XMALLOC(4, "slist");
+	char *flist = XMALLOC(4, "flist");
+	char *slist = XMALLOC(4, "slist");
 	char *s;
 	dbref room_it;
 
@@ -1565,7 +1579,7 @@ void dump_users(DESC *e, char *match, int key)
 
 			if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player) && (key == CMD_WHO))
 			{
-				s =XASPRINTF("s", "%s@%s", d->username, d->addr);
+				s = XASPRINTF("s", "%s@%s", d->username, d->addr);
 				char *trs = trimmed_site(((d->username[0] != '\0') ? s : d->addr));
 				char *trn = trimmed_name(d->player);
 				char *tf1 = time_format_1(mudstate.now - d->connected_at);
@@ -1576,8 +1590,6 @@ void dump_users(DESC *e, char *match, int key)
 				XFREE(tf1);
 				XFREE(trn);
 				XFREE(trs);
-				
-				
 			}
 			else if (key == CMD_SESSION)
 			{
@@ -1616,7 +1628,7 @@ void dump_users(DESC *e, char *match, int key)
 	/*
      * sometimes I like the ternary operator....
      */
-	s =XASPRINTF("s", "%d", mudconf.max_players);
+	s = XASPRINTF("s", "%d", mudconf.max_players);
 	XSPRINTF(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, (count == 1) ? " " : "s ", mudstate.record_players, (mudconf.max_players == -1) ? "no" : s);
 	XFREE(s);
 	queue_rawstring(e, NULL, buf);
@@ -1632,7 +1644,6 @@ void dump_users(DESC *e, char *match, int key)
 	XFREE(slist);
 	XFREE(flist);
 	XFREE(buf);
-
 }
 
 void dump_info(DESC *call_by)
@@ -2252,7 +2263,52 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 
 		mudstate.curr_player = d->player;
 		mudstate.curr_enactor = d->player;
-		Free_RegData(mudstate.rdata);
+
+		if (mudstate.rdata)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z])
+					XFREE(mudstate.rdata->q_regs[z]);
+			}
+
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z])
+					XFREE(mudstate.rdata->x_names[z]);
+
+				if (mudstate.rdata->x_regs[z])
+					XFREE(mudstate.rdata->x_regs[z]);
+			}
+
+			if (mudstate.rdata->q_regs)
+			{
+				XFREE(mudstate.rdata->q_regs);
+			}
+
+			if (mudstate.rdata->q_lens)
+			{
+				XFREE(mudstate.rdata->q_lens);
+			}
+
+			if (mudstate.rdata->x_names)
+			{
+				XFREE(mudstate.rdata->x_names);
+			}
+
+			if (mudstate.rdata->x_regs)
+			{
+				XFREE(mudstate.rdata->x_regs);
+			}
+
+			if (mudstate.rdata->x_lens)
+			{
+				XFREE(mudstate.rdata->x_lens);
+			}
+
+			XFREE(mudstate.rdata);
+		}
+
 		mudstate.rdata = NULL;
 
 		if (mudconf.lag_check)

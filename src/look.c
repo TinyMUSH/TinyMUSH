@@ -71,7 +71,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
      */
 	foundany = 0;
 	isdark = Darkened(player, loc);
-	ITER_PARENTS(loc, parent, lev)
+
+	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (!Has_exits(parent))
 		{
@@ -104,7 +105,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	notify(player, exit_name);
 	e = buff = XMALLOC(LBUF_SIZE, "buff");
 	e1 = buff1 = XMALLOC(LBUF_SIZE, "buff1");
-	ITER_PARENTS(loc, parent, lev)
+
+	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (Transparent(loc))
 		{
@@ -969,7 +971,8 @@ void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
 		hash_insert = 1;
 		check_exclude = 0;
 		nhashflush(&mudstate.parent_htab, 0);
-		ITER_PARENTS(thing, parent, lev)
+
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Good_obj(Parent(parent)))
 			{
@@ -1772,7 +1775,13 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		XFREE(buf2);
 	}
 
-	CALL_ALL_MODULES(examine, (player, cause, thing, control, key));
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->examine)
+		{
+			(*(cam__mp->examine))(player, cause, thing, control, key);
+		}
+	}
 
 	if (!((key & EXAM_OWNER) || (key & EXAM_BRIEF)))
 	{
@@ -2228,7 +2237,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 		/*
 	 * Look for commands on the object and parents too
 	 */
-		ITER_PARENTS(what, parent, lev)
+		for (lev = 0, parent = what; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (Commer(parent))
 			{

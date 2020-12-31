@@ -163,7 +163,8 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 		return;
 	}
 
-	safe_dbref(buff, bufc, get_programmer(target));
+	SAFE_LB_CHR('#', buff, bufc);
+	SAFE_LTOS(buff, bufc, get_programmer(target), LBUF_SIZE);
 }
 
 /*---------------------------------------------------------------------------

@@ -178,7 +178,8 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 					break;
 
 				default:
-					safe_dbref(boolexp_buf, buftop, b->thing);
+					SAFE_LB_CHR('#', boolexp_buf, buftop);
+					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
 
@@ -198,7 +199,8 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 					break;
 
 				default:
-					safe_dbref(boolexp_buf, buftop, b->thing);
+					SAFE_LB_CHR('#', boolexp_buf, buftop);
+					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
 			}

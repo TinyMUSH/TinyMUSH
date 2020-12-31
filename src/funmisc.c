@@ -1789,7 +1789,8 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		break;
 	}
 
-	safe_dbref(buff, bufc, thing);
+	SAFE_LB_CHR('#', buff, bufc);
+	SAFE_LTOS(buff, bufc, thing, LBUF_SIZE);
 }
 
 /*---------------------------------------------------------------------------

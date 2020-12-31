@@ -74,20 +74,6 @@ char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
 }
 
 /**
- * We can't change this to just '*zstr++ = *cstr++', because of the inherent
- * problems with copying a memory location to itself.
- * 
- */
-#define NEXTCHAR      \
-	if (cstr == zstr) \
-	{                 \
-		cstr++;       \
-		zstr++;       \
-	}                 \
-	else              \
-		*zstr++ = *cstr++
-
-/**
  * @brief Split a line at a character, obeying nesting.
  * 
  * The line is destructively modified (a null is inserted where the delimiter
@@ -103,9 +89,8 @@ char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
  */
 char *parse_to(char **dstr, char delim, int eval)
 {
-	char *stack = XMALLOC(32, "stack");
-	char *rstr, *cstr, *zstr;
-	int sp, tp, bracketlev;
+	int sp = 0, tp = 0, bracketlev = 0;
+	char *rstr = NULL, *cstr = NULL, *zstr = NULL, *stack = XMALLOC(32, "stack");
 	bool first = true;
 
 	if ((dstr == NULL) || (*dstr == NULL))
@@ -149,12 +134,28 @@ char *parse_to(char **dstr, char delim, int eval)
 			}
 			else
 			{
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 			}
 
 			if (*cstr)
 			{
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 			}
 
 			first = false;
@@ -185,7 +186,15 @@ char *parse_to(char **dstr, char delim, int eval)
 			}
 
 			first = false;
-			NEXTCHAR;
+			if (cstr == zstr)
+			{
+				cstr++;
+				zstr++;
+			}
+			else
+			{
+				*zstr++ = *cstr++;
+			}
 			break;
 
 		case '{':
@@ -197,7 +206,15 @@ char *parse_to(char **dstr, char delim, int eval)
 			}
 			else
 			{
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 			}
 
 			while (*cstr && (bracketlev > 0))
@@ -214,7 +231,15 @@ char *parse_to(char **dstr, char delim, int eval)
 						}
 						else
 						{
-							NEXTCHAR;
+							if (cstr == zstr)
+							{
+								cstr++;
+								zstr++;
+							}
+							else
+							{
+								*zstr++ = *cstr++;
+							}
 						}
 					}
 
@@ -231,7 +256,15 @@ char *parse_to(char **dstr, char delim, int eval)
 
 				if (bracketlev > 0)
 				{
-					NEXTCHAR;
+					if (cstr == zstr)
+					{
+						cstr++;
+						zstr++;
+					}
+					else
+					{
+						*zstr++ = *cstr++;
+					}
 				}
 			}
 
@@ -241,7 +274,15 @@ char *parse_to(char **dstr, char delim, int eval)
 			}
 			else if (bracketlev == 0)
 			{
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 			}
 
 			first = false;
@@ -271,7 +312,15 @@ char *parse_to(char **dstr, char delim, int eval)
 					}
 				}
 
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 				break;
 
 			case '[':
@@ -280,7 +329,15 @@ char *parse_to(char **dstr, char delim, int eval)
 					stack[sp++] = ']';
 				}
 
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 				first = false;
 				break;
 
@@ -290,29 +347,69 @@ char *parse_to(char **dstr, char delim, int eval)
 					stack[sp++] = ')';
 				}
 
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 				first = false;
 				break;
 
 			case ESC_CHAR:
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 
 				if (*cstr == ANSI_CSI)
 				{
 					do
 					{
-						NEXTCHAR;
+						if (cstr == zstr)
+						{
+							cstr++;
+							zstr++;
+						}
+						else
+						{
+							*zstr++ = *cstr++;
+						}
 					} while ((*cstr & 0xf0) == 0x30);
 				}
 
 				while ((*cstr & 0xf0) == 0x20)
 				{
-					NEXTCHAR;
+					if (cstr == zstr)
+					{
+						cstr++;
+						zstr++;
+					}
+					else
+					{
+						*zstr++ = *cstr++;
+					}
 				}
 
 				if (*cstr)
 				{
-					NEXTCHAR;
+					if (cstr == zstr)
+					{
+						cstr++;
+						zstr++;
+					}
+					else
+					{
+						*zstr++ = *cstr++;
+					}
 				}
 
 				first = false;
@@ -320,7 +417,15 @@ char *parse_to(char **dstr, char delim, int eval)
 
 			default:
 				first = false;
-				NEXTCHAR;
+				if (cstr == zstr)
+				{
+					cstr++;
+					zstr++;
+				}
+				else
+				{
+					*zstr++ = *cstr++;
+				}
 				break;
 			}
 		}
@@ -353,8 +458,8 @@ char *parse_to(char **dstr, char delim, int eval)
  */
 char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char delim, dbref eval, char *fargs[], dbref nfargs, char *cargs[], dbref ncargs)
 {
-	char *rstr, *tstr, *bp, *str;
-	int arg, peval;
+	char *rstr = NULL, *tstr = NULL, *bp = NULL, *str = NULL;
+	int arg = 0, peval = 0;
 
 	for (arg = 0; arg < nfargs; arg++)
 	{
@@ -407,10 +512,10 @@ char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char de
  */
 int get_gender(dbref player)
 {
-	char first, *atr_gotten;
-	dbref aowner;
-	int aflags, alen;
-	atr_gotten = atr_pget(player, A_SEX, &aowner, &aflags, &alen);
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0;
+	char first = 0, *atr_gotten = atr_pget(player, A_SEX, &aowner, &aflags, &alen);
+
 	first = *atr_gotten;
 	XFREE(atr_gotten);
 
@@ -482,8 +587,8 @@ int tcache_empty(void)
  */
 void tcache_add(char *orig, char *result)
 {
-	char *tp;
-	TCENT *xp;
+	char *tp = NULL;
+	TCENT *xp = NULL;
 
 	if (strcmp(orig, result))
 	{
@@ -517,9 +622,9 @@ void tcache_add(char *orig, char *result)
  */
 void tcache_finish(dbref player)
 {
-	TCENT *xp;
-	NUMBERTAB *np;
-	dbref target;
+	TCENT *xp = NULL;
+	NUMBERTAB *np = NULL;
+	dbref target = NOTHING;
 
 	if (H_Redirect(player))
 	{
@@ -754,7 +859,6 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		XFREE(xtbuf);
 		return;
 	}
-
 
 	/**
      * Extend the buffer if we need to.
@@ -1057,7 +1161,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 
 				if (**dstr == '<' || **dstr == '/')
-				{ 
+				{
 					/**
 					 * Xterm colors
 					 * 
@@ -1070,7 +1174,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					while (1)
 					{
 						if (**dstr == '/')
-						{ 
+						{
 							/** 
 							 * We are dealing with background 
 							 * 
@@ -1094,11 +1198,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 							 * We are dealing with foreground
 							 * 
 							 */
-							xterm_isbg = 0; 
+							xterm_isbg = 0;
 						}
 
 						if (**dstr == '<')
-						{ 
+						{
 							/** 
 							 * Ok we got a color to process
 							 * 
@@ -1183,7 +1287,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '=': 
+			case '=':
 				/** 
 				 * Equivalent of generic v() attr get
 				 * 
@@ -1508,7 +1612,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case 'A': 
+			case 'A':
 			case 'a':
 				/** 
 				 * Absolute possessive - idea from Empedocles
@@ -1536,7 +1640,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Invoker DB number
 				 * 
 				 */
-				safe_dbref(buff, bufc, cause);
+				SAFE_LB_CHR('#', buff, bufc);
+				SAFE_LTOS(buff, bufc, cause, LBUF_SIZE);
 				break;
 
 			case '!':
@@ -1544,7 +1649,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Executor DB number
 				 * 
 				 */
-				safe_dbref(buff, bufc, player);
+				SAFE_LB_CHR('#', buff, bufc);
+				SAFE_LTOS(buff, bufc, player, LBUF_SIZE);
 				break;
 
 			case 'N':
@@ -1564,7 +1670,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 */
 				if (!(eval & EV_NO_LOCATION))
 				{
-					safe_dbref(buff, bufc, where_is(cause));
+					SAFE_LB_CHR('#', buff, bufc);
+					SAFE_LTOS(buff, bufc, where_is(cause), LBUF_SIZE);
 				}
 
 				break;
@@ -1574,15 +1681,15 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Caller dbref 
 				 * 
 				 */
-				safe_dbref(buff, bufc, caller);
+				SAFE_LB_CHR('#', buff, bufc);
+				SAFE_LTOS(buff, bufc, caller, LBUF_SIZE);
 				break;
 
-			case ':': 
+			case ':':
 				/** 
 				 * Enactor's objID
 				 * 
 				 */
-				safe_dbref(buff, bufc, cause);
 				SAFE_LB_CHR(':', buff, bufc);
 				SAFE_LTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
 				break;
@@ -1667,7 +1774,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				break;
 
-			case '+': 
+			case '+':
 				/** 
 				 * Arguments to function 
 				 * 
@@ -1683,7 +1790,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				SAFE_LB_STR(mudstate.pout, buff, bufc);
 				break;
 
-			case '%': 
+			case '%':
 				/** 
 				 * Percent - a literal %
 				 * 
@@ -1908,7 +2015,44 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (ufp->flags & FN_NOREGS)
 					{
-						Free_RegData(mudstate.rdata);
+						if (mudstate.rdata)
+						{
+							for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+							{
+								if (mudstate.rdata->q_regs[z])
+									XFREE(mudstate.rdata->q_regs[z]);
+							}
+							for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+							{
+								if (mudstate.rdata->x_names[z])
+									XFREE(mudstate.rdata->x_names[z]);
+								if (mudstate.rdata->x_regs[z])
+									XFREE(mudstate.rdata->x_regs[z]);
+							}
+
+							if (mudstate.rdata->q_regs)
+							{
+								XFREE(mudstate.rdata->q_regs);
+							}
+							if (mudstate.rdata->q_lens)
+							{
+								XFREE(mudstate.rdata->q_lens);
+							}
+							if (mudstate.rdata->x_names)
+							{
+								XFREE(mudstate.rdata->x_names);
+							}
+							if (mudstate.rdata->x_regs)
+							{
+								XFREE(mudstate.rdata->x_regs);
+							}
+							if (mudstate.rdata->x_lens)
+							{
+								XFREE(mudstate.rdata->x_lens);
+							}
+							XFREE(mudstate.rdata);
+						}
+
 						mudstate.rdata = preserve;
 					}
 					else if (ufp->flags & FN_PRES)
@@ -2142,16 +2286,79 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
  */
 GDATA *save_global_regs(const char *funcname)
 {
-	GDATA *preserve;
+	GDATA *preserve = NULL;
 
 	if (mudstate.rdata)
 	{
-		Alloc_RegData(funcname, mudstate.rdata, preserve);
-		Copy_RegData(funcname, mudstate.rdata, preserve);
-	}
-	else
-	{
-		preserve = NULL;
+		if (mudstate.rdata && (mudstate.rdata->q_alloc || mudstate.rdata->xr_alloc))
+		{
+			preserve = (GDATA *)XMALLOC(sizeof(GDATA), funcname);
+			preserve->q_alloc = mudstate.rdata->q_alloc;
+			if (mudstate.rdata->q_alloc)
+			{
+				preserve->q_regs = XCALLOC(mudstate.rdata->q_alloc, sizeof(char *), "q_regs");
+				preserve->q_lens = XCALLOC(mudstate.rdata->q_alloc, sizeof(int), "q_lens");
+			}
+			else
+			{
+				preserve->q_regs = NULL;
+				preserve->q_lens = NULL;
+			}
+			preserve->xr_alloc = mudstate.rdata->xr_alloc;
+			if (mudstate.rdata->xr_alloc)
+			{
+				preserve->x_names = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_names");
+				preserve->x_regs = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_regs");
+				preserve->x_lens = XCALLOC(mudstate.rdata->xr_alloc, sizeof(int), "x_lens");
+			}
+			else
+			{
+				preserve->x_names = NULL;
+				preserve->x_regs = NULL;
+				preserve->x_lens = NULL;
+			}
+			preserve->dirty = 0;
+		}
+		else
+		{
+			preserve = NULL;
+		}
+
+		if (mudstate.rdata && mudstate.rdata->q_alloc)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z] && *(mudstate.rdata->q_regs[z]))
+				{
+					preserve->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
+					memcpy(preserve->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
+					preserve->q_lens[z] = mudstate.rdata->q_lens[z];
+				}
+			}
+		}
+		if (mudstate.rdata && mudstate.rdata->xr_alloc)
+		{
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z] && *(mudstate.rdata->x_names[z]) && mudstate.rdata->x_regs[z] && *(mudstate.rdata->x_regs[z]))
+				{
+					preserve->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+					strcpy(preserve->x_names[z], mudstate.rdata->x_names[z]);
+					preserve->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+					memcpy(preserve->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
+					preserve->x_lens[z] = mudstate.rdata->x_lens[z];
+				}
+			}
+		}
+		if (mudstate.rdata)
+		{
+			preserve->dirty = mudstate.rdata->dirty;
+		}
+
+		else
+		{
+			preserve->dirty = 0;
+		}
 	}
 
 	return preserve;
@@ -2177,7 +2384,44 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 		 * No change in the values. Move along.
 		 * 
 		 */
-		Free_RegData(preserve);
+
+		if (preserve)
+		{
+			for (int z = 0; z < preserve->q_alloc; z++)
+			{
+				if (preserve->q_regs[z])
+					XFREE(preserve->q_regs[z]);
+			}
+			for (int z = 0; z < preserve->xr_alloc; z++)
+			{
+				if (preserve->x_names[z])
+					XFREE(preserve->x_names[z]);
+				if (preserve->x_regs[z])
+					XFREE(preserve->x_regs[z]);
+			}
+
+			if (preserve->q_regs)
+			{
+				XFREE(preserve->q_regs);
+			}
+			if (preserve->q_lens)
+			{
+				XFREE(preserve->q_lens);
+			}
+			if (preserve->x_names)
+			{
+				XFREE(preserve->x_names);
+			}
+			if (preserve->x_regs)
+			{
+				XFREE(preserve->x_regs);
+			}
+			if (preserve->x_lens)
+			{
+				XFREE(preserve->x_lens);
+			}
+			XFREE(preserve);
+		}
 		return;
 	}
 
@@ -2188,18 +2432,195 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
      */
 	if (!preserve)
 	{
-		Free_RegData(mudstate.rdata);
+		if (mudstate.rdata)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z])
+					XFREE(mudstate.rdata->q_regs[z]);
+			}
+
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z])
+					XFREE(mudstate.rdata->x_names[z]);
+				if (mudstate.rdata->x_regs[z])
+					XFREE(mudstate.rdata->x_regs[z]);
+			}
+
+			if (mudstate.rdata->q_regs)
+			{
+				XFREE(mudstate.rdata->q_regs);
+			}
+			if (mudstate.rdata->q_lens)
+			{
+				XFREE(mudstate.rdata->q_lens);
+			}
+			if (mudstate.rdata->x_names)
+			{
+				XFREE(mudstate.rdata->x_names);
+			}
+			if (mudstate.rdata->x_regs)
+			{
+				XFREE(mudstate.rdata->x_regs);
+			}
+			if (mudstate.rdata->x_lens)
+			{
+				XFREE(mudstate.rdata->x_lens);
+			}
+			XFREE(mudstate.rdata);
+		}
+
 		mudstate.rdata = NULL;
 	}
 	else
 	{
 		if (mudstate.rdata)
 		{
-			Free_RegData(mudstate.rdata);
+			if (mudstate.rdata)
+			{
+				for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+				{
+					if (mudstate.rdata->q_regs[z])
+						XFREE(mudstate.rdata->q_regs[z]);
+				}
+
+				for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+				{
+					if (mudstate.rdata->x_names[z])
+						XFREE(mudstate.rdata->x_names[z]);
+					if (mudstate.rdata->x_regs[z])
+						XFREE(mudstate.rdata->x_regs[z]);
+				}
+
+				if (mudstate.rdata->q_regs)
+				{
+					XFREE(mudstate.rdata->q_regs);
+				}
+				if (mudstate.rdata->q_lens)
+				{
+					XFREE(mudstate.rdata->q_lens);
+				}
+				if (mudstate.rdata->x_names)
+				{
+					XFREE(mudstate.rdata->x_names);
+				}
+				if (mudstate.rdata->x_regs)
+				{
+					XFREE(mudstate.rdata->x_regs);
+				}
+				if (mudstate.rdata->x_lens)
+				{
+					XFREE(mudstate.rdata->x_lens);
+				}
+				XFREE(mudstate.rdata);
+			}
 		}
 
-		Alloc_RegData(funcname, preserve, mudstate.rdata);
-		Copy_RegData(funcname, preserve, mudstate.rdata);
-		Free_RegData(preserve);
+		if (preserve && (preserve->q_alloc || preserve->xr_alloc))
+		{
+			mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
+			mudstate.rdata->q_alloc = preserve->q_alloc;
+			if (preserve->q_alloc)
+			{
+				mudstate.rdata->q_regs = XCALLOC(preserve->q_alloc, sizeof(char *), "q_regs");
+				mudstate.rdata->q_lens = XCALLOC(preserve->q_alloc, sizeof(int), "q_lens");
+			}
+			else
+			{
+				mudstate.rdata->q_regs = NULL;
+				mudstate.rdata->q_lens = NULL;
+			}
+			mudstate.rdata->xr_alloc = preserve->xr_alloc;
+			if (preserve->xr_alloc)
+			{
+				mudstate.rdata->x_names = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_names");
+				mudstate.rdata->x_regs = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_regs");
+				mudstate.rdata->x_lens = XCALLOC(preserve->xr_alloc, sizeof(int), "x_lens");
+			}
+			else
+			{
+				mudstate.rdata->x_names = NULL;
+				mudstate.rdata->x_regs = NULL;
+				mudstate.rdata->x_lens = NULL;
+			}
+			mudstate.rdata->dirty = 0;
+		}
+		else
+		{
+			mudstate.rdata = NULL;
+		}
+
+		if (preserve && preserve->q_alloc)
+		{
+			for (int z = 0; z < preserve->q_alloc; z++)
+			{
+				if (preserve->q_regs[z] && *(preserve->q_regs[z]))
+				{
+					mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
+					memcpy(mudstate.rdata->q_regs[z], preserve->q_regs[z], preserve->q_lens[z] + 1);
+					mudstate.rdata->q_lens[z] = preserve->q_lens[z];
+				}
+			}
+		}
+
+		if (preserve && preserve->xr_alloc)
+		{
+			for (int z = 0; z < preserve->xr_alloc; z++)
+			{
+				if (preserve->x_names[z] && *(preserve->x_names[z]) && preserve->x_regs[z] && *(preserve->x_regs[z]))
+				{
+					mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+					strcpy(mudstate.rdata->x_names[z], preserve->x_names[z]);
+					mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+					memcpy(mudstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
+					mudstate.rdata->x_lens[z] = preserve->x_lens[z];
+				}
+			}
+		}
+
+		if (preserve)
+		{
+			mudstate.rdata->dirty = preserve->dirty;
+
+			for (int z = 0; z < preserve->q_alloc; z++)
+			{
+				if (preserve->q_regs[z])
+					XFREE(preserve->q_regs[z]);
+			}
+			for (int z = 0; z < preserve->xr_alloc; z++)
+			{
+				if (preserve->x_names[z])
+					XFREE(preserve->x_names[z]);
+				if (preserve->x_regs[z])
+					XFREE(preserve->x_regs[z]);
+			}
+
+			if (preserve->q_regs)
+			{
+				XFREE(preserve->q_regs);
+			}
+			if (preserve->q_lens)
+			{
+				XFREE(preserve->q_lens);
+			}
+			if (preserve->x_names)
+			{
+				XFREE(preserve->x_names);
+			}
+			if (preserve->x_regs)
+			{
+				XFREE(preserve->x_regs);
+			}
+			if (preserve->x_lens)
+			{
+				XFREE(preserve->x_lens);
+			}
+			XFREE(preserve);
+		}
+		else
+		{
+			mudstate.rdata->dirty = 0;
+		}
 	}
 }

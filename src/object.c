@@ -275,7 +275,7 @@ int ok_exit_name(char *name)
 			return 0;
 		}
 	}
-	
+
 	XFREE(buff);
 
 	/*
@@ -601,7 +601,8 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	if (mudconf.lag_check_clk)
 	{
 		obj_time.tv_sec = obj_time.tv_usec = 0;
-		s_Time_Used(obj, obj_time);
+		db[obj].cpu_time_used.tv_sec = obj_time.tv_sec;
+		db[obj].cpu_time_used.tv_usec = obj_time.tv_usec;
 	}
 
 	s_Created(obj);
@@ -641,7 +642,14 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 		update_newobjs(player, obj, objtype);
 	}
 
-	CALL_ALL_MODULES(create_obj, (player, obj));
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->create_obj)
+		{
+			(*(cam__mp->create_obj))(player, obj);
+		}
+	}
+
 	return obj;
 }
 
@@ -689,7 +697,15 @@ void destroy_obj(dbref player, dbref obj)
 	stack_clr(obj);
 	xvars_clr(obj);
 	structure_clr(obj);
-	CALL_ALL_MODULES(destroy_obj, (player, obj));
+
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->destroy_obj)
+		{
+			(*(cam__mp->destroy_obj))(player, obj);
+		}
+	}
+
 	/*
      * Compensate the owner for the object
      */
@@ -1015,7 +1031,15 @@ void destroy_player(dbref victim)
 	Clear_Player_Aliases(victim, buf);
 	XFREE(buf);
 	move_via_generic(victim, NOTHING, player, 0);
-	CALL_ALL_MODULES(destroy_player, (player, victim));
+
+	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	{
+		if (cam__mp->destroy_player)
+		{
+			(*(cam__mp->destroy_player))(player, victim);
+		}
+	}
+
 	destroy_obj(NOTHING, victim);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "(%d objects @chowned to you)", count);
 }

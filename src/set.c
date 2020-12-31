@@ -1608,7 +1608,8 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 		check_exclude = 0;
 		hash_insert = check_parents;
 		nhashflush(&mudstate.parent_htab, 0);
-		ITER_PARENTS(*thing, parent, lev)
+		
+		for (lev = 0, parent = (*thing); (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Good_obj(Parent(parent)))
 			{

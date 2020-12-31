@@ -668,7 +668,15 @@ int cache_put(DBData key, DBData data, unsigned int type)
     /*
      * Call module API hook
      */
-    CALL_ALL_MODULES(cache_put_notify, (key, type))
+
+    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    {
+        if (cam__mp->cache_put_notify)
+        {
+            (*(cam__mp->cache_put_notify))(key, type);
+        }
+    }
+
 #ifndef MEMORY_BASED
     if (mudstate.standalone)
     {
@@ -889,10 +897,11 @@ Cache *get_free_entry(int atrsize)
             {
                 sp->head = cp->nxt;
             }
-            else {
+            else
+            {
                 prv->nxt = cp->nxt;
             }
-                
+
             cache_repl(cp, NULL, 0, DBTYPE_EMPTY, 0);
             XFREE(cp->keydata);
             XFREE(cp);
@@ -1046,7 +1055,15 @@ void cache_del(DBData key, unsigned int type)
     /*
      * Call module API hook
      */
-    CALL_ALL_MODULES(cache_del_notify, (key, type))
+
+    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    {
+        if (cam__mp->cache_del_notify)
+        {
+            (*(cam__mp->cache_del_notify))(key, type);
+        }
+    }
+
 #ifdef MEMORY_BASED
     if (type == DBTYPE_ATTRIBUTE)
     {

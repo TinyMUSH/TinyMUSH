@@ -1381,7 +1381,52 @@ void handle_prog(DESC *d, char *message)
      * First, set 'all' to a descriptor we find for this player
      */
 	all = (DESC *)nhashfind(d->player, &mudstate.desc_htab);
-	Free_RegData(all->program_data->wait_data);
+
+	if (all->program_data->wait_data)
+	{
+		for (int z = 0; z < all->program_data->wait_data->q_alloc; z++)
+		{
+			if (all->program_data->wait_data->q_regs[z])
+				XFREE(all->program_data->wait_data->q_regs[z]);
+		}
+
+		for (int z = 0; z < all->program_data->wait_data->xr_alloc; z++)
+		{
+			if (all->program_data->wait_data->x_names[z])
+				XFREE(all->program_data->wait_data->x_names[z]);
+
+			if (all->program_data->wait_data->x_regs[z])
+				XFREE(all->program_data->wait_data->x_regs[z]);
+		}
+
+		if (all->program_data->wait_data->q_regs)
+		{
+			XFREE(all->program_data->wait_data->q_regs);
+		}
+
+		if (all->program_data->wait_data->q_lens)
+		{
+			XFREE(all->program_data->wait_data->q_lens);
+		}
+
+		if (all->program_data->wait_data->x_names)
+		{
+			XFREE(all->program_data->wait_data->x_names);
+		}
+
+		if (all->program_data->wait_data->x_regs)
+		{
+			XFREE(all->program_data->wait_data->x_regs);
+		}
+
+		if (all->program_data->wait_data->x_lens)
+		{
+			XFREE(all->program_data->wait_data->x_lens);
+		}
+
+		XFREE(all->program_data->wait_data);
+	}
+
 	XFREE(all->program_data);
 	/*
      * Set info for all player descriptors to NULL
@@ -1450,7 +1495,47 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	d = (DESC *)nhashfind(doer, &mudstate.desc_htab);
-	Free_RegData(d->program_data->wait_data);
+
+	if (d->program_data->wait_data)
+	{
+		for (int z = 0; z < d->program_data->wait_data->q_alloc; z++)
+		{
+			if (d->program_data->wait_data->q_regs[z])
+				XFREE(d->program_data->wait_data->q_regs[z]);
+		}
+
+		for (int z = 0; z < d->program_data->wait_data->xr_alloc; z++)
+		{
+			if (d->program_data->wait_data->x_names[z])
+				XFREE(d->program_data->wait_data->x_names[z]);
+
+			if (d->program_data->wait_data->x_regs[z])
+				XFREE(d->program_data->wait_data->x_regs[z]);
+		}
+
+		if (d->program_data->wait_data->q_regs)
+		{
+			XFREE(d->program_data->wait_data->q_regs);
+		}
+		if (d->program_data->wait_data->q_lens)
+		{
+			XFREE(d->program_data->wait_data->q_lens);
+		}
+		if (d->program_data->wait_data->x_names)
+		{
+			XFREE(d->program_data->wait_data->x_names);
+		}
+		if (d->program_data->wait_data->x_regs)
+		{
+			XFREE(d->program_data->wait_data->x_regs);
+		}
+		if (d->program_data->wait_data->x_lens)
+		{
+			XFREE(d->program_data->wait_data->x_lens);
+		}
+		XFREE(d->program_data->wait_data);
+	}
+
 	XFREE(d->program_data);
 	/*
      * Set info for all player descriptors to NULL
@@ -1508,7 +1593,8 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	 * * parent chain, somewhere.
 	 */
 		found = 0;
-		ITER_PARENTS(thing, parent, lev)
+
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (atr_get_info(parent, atr, &aowner, &aflags))
 			{
@@ -1555,8 +1641,88 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 	if (mudstate.rdata)
 	{
-		Alloc_RegData("do_prog.gdata", mudstate.rdata, program->wait_data);
-		Copy_RegData("do_prog.regs", mudstate.rdata, program->wait_data);
+		/** 
+		 * Alloc_RegData 
+		 * 
+		 */
+		if (mudstate.rdata && (mudstate.rdata->q_alloc || mudstate.rdata->xr_alloc))
+		{
+			program->wait_data = (GDATA *)XMALLOC(sizeof(GDATA), "do_prog.gdata");
+			program->wait_data->q_alloc = mudstate.rdata->q_alloc;
+
+			if (mudstate.rdata->q_alloc)
+			{
+				program->wait_data->q_regs = XCALLOC(mudstate.rdata->q_alloc, sizeof(char *), "q_regs");
+				program->wait_data->q_lens = XCALLOC(mudstate.rdata->q_alloc, sizeof(int), "q_lens");
+			}
+			else
+			{
+				program->wait_data->q_regs = NULL;
+				program->wait_data->q_lens = NULL;
+			}
+
+			program->wait_data->xr_alloc = mudstate.rdata->xr_alloc;
+
+			if (mudstate.rdata->xr_alloc)
+			{
+				program->wait_data->x_names = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_names");
+				program->wait_data->x_regs = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_regs");
+				program->wait_data->x_lens = XCALLOC(mudstate.rdata->xr_alloc, sizeof(int), "x_lens");
+			}
+			else
+			{
+				program->wait_data->x_names = NULL;
+				program->wait_data->x_regs = NULL;
+				program->wait_data->x_lens = NULL;
+			}
+
+			program->wait_data->dirty = 0;
+		}
+		else
+		{
+			program->wait_data = NULL;
+		}
+
+		/** 
+		 * Copy_RegData 
+		 * 
+		 */
+		if (mudstate.rdata && mudstate.rdata->q_alloc)
+		{
+			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			{
+				if (mudstate.rdata->q_regs[z] && *(mudstate.rdata->q_regs[z]))
+				{
+					program->wait_data->q_regs[z] = XMALLOC(LBUF_SIZE, "do_prog.regs");
+					memcpy(program->wait_data->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
+					program->wait_data->q_lens[z] = mudstate.rdata->q_lens[z];
+				}
+			}
+		}
+
+		if (mudstate.rdata && mudstate.rdata->xr_alloc)
+		{
+			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			{
+				if (mudstate.rdata->x_names[z] && *(mudstate.rdata->x_names[z]) && mudstate.rdata->x_regs[z] && *(mudstate.rdata->x_regs[z]))
+				{
+					program->wait_data->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+					strcpy(program->wait_data->x_names[z], mudstate.rdata->x_names[z]);
+					program->wait_data->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+					memcpy(program->wait_data->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
+					program->wait_data->x_lens[z] = mudstate.rdata->x_lens[z];
+				}
+			}
+		}
+
+		if (mudstate.rdata)
+		{
+			program->wait_data->dirty = mudstate.rdata->dirty;
+		}
+		else
+		{
+			program->wait_data->dirty = 0;
+		}
 	}
 	else
 	{
@@ -1614,7 +1780,7 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
      */
 	dump_database_internal(DUMP_DB_RESTART);
 
-	cache_sync(); 
+	cache_sync();
 	dddb_close();
 
 	if (slave_socket != -1)
@@ -1640,7 +1806,8 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 
 	err = execl(mudconf.game_exec, mudconf.game_exec, mudconf.config_file, (char *)NULL);
 
-	if(err) {
+	if (err)
+	{
 		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", strerror(err));
 	}
 }
@@ -2246,7 +2413,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 		list = XMALLOC(LBUF_SIZE, "list");
 		bb_p = lp = list;
 		is_ok = Darkened(player, thing);
-		ITER_PARENTS(thing, parent, lev)
+
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Has_exits(parent))
 			{
@@ -2262,7 +2430,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 						SAFE_LB_CHR(' ', list, &lp);
 					}
 
-					safe_dbref(list, &lp, obj);
+					SAFE_LB_CHR('#', list, &lp);
+					SAFE_LTOS(list, &lp, obj, LBUF_SIZE);
 				}
 			}
 		}
@@ -2283,7 +2452,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 					SAFE_LB_CHR(' ', list, &lp);
 				}
 
-				safe_dbref(list, &lp, obj);
+				SAFE_LB_CHR('#', list, &lp);
+				SAFE_LTOS(list, &lp, obj, LBUF_SIZE);
 			}
 		}
 		*lp = '\0';
@@ -2354,7 +2524,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	char *d = NULL, *m = NULL, *buff = NULL, *act = NULL, *charges = NULL, *bp = NULL, *str = NULL;
 	char *tbuf = NULL, *tp = NULL, *sp = NULL;
 	int t = 0, num = 0, aflags = 0, alen = 0, need_pres = 0, retval = 0;
-	
+
 	/*
      * If we need to call exec() from within this function, we first save
      * * the state of the global registers, in order to avoid munging them
@@ -2405,7 +2575,15 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
      * *       to the end of the modules and nothing has returned non-zero.
      * * Negative: Stop calling modules. Execute normal did_it().
      */
-	CALL_SOME_MODULES(retval, did_it, (player, thing, master, what, def, owhat, def, awhat, ctrl_flags, args, nargs, msg_key));
+
+	retval = 0;
+	for (MODULE *csm__mp = mudstate.modules_list; (csm__mp != NULL) && !retval; csm__mp = csm__mp->next)
+	{
+		if (csm__mp->did_it)
+		{
+			retval = (*(csm__mp->did_it))(player, thing, master, what, def, owhat, def, awhat, ctrl_flags, args, nargs, msg_key);
+		}
+	}
 
 	if (retval > 0)
 	{

@@ -9,8 +9,6 @@
  * 
  */
 
-/* cque.c -  */
-
 #include "copyright.h"
 #include "config.h"
 #include "system.h"
@@ -46,7 +44,34 @@ int qpid_top = 1;
 void delete_qentry(BQUE *qptr)
 {
 	nhashdelete(qptr->pid, &mudstate.qpid_htab);
-	Free_QData(qptr);
+
+	XFREE(qptr->text);
+
+	if (qptr->gdata)
+	{
+		if ((qptr->gdata)->q_regs)
+		{
+			XFREE((qptr->gdata)->q_regs);
+		}
+		if ((qptr->gdata)->q_lens)
+		{
+			XFREE((qptr->gdata)->q_lens);
+		}
+		if ((qptr->gdata)->x_names)
+		{
+			XFREE((qptr->gdata)->x_names);
+		}
+		if ((qptr->gdata)->x_regs)
+		{
+			XFREE((qptr->gdata)->x_regs);
+		}
+		if ((qptr->gdata)->x_lens)
+		{
+			XFREE((qptr->gdata)->x_lens);
+		}
+		XFREE(qptr->gdata);
+	}
+
 	XFREE(qptr);
 }
 
@@ -163,7 +188,7 @@ int halt_que(dbref player, dbref object)
 {
 	BQUE *trail = NULL, *point = NULL, *next = NULL;
 	int numhalted = 0, halt_all = 0, i = 0;
-	int *dbrefs_array  = NULL;
+	int *dbrefs_array = NULL;
 
 	numhalted = 0;
 	halt_all = ((player == NOTHING) && (object == NOTHING)) ? 1 : 0;
@@ -550,7 +575,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 	BQUE *point = NULL, *trail = NULL, *next = NULL;
 	int num = 0, aflags = 0, alen = 0;
 	dbref aowner = NOTHING;
-	char *str  = NULL;
+	char *str = NULL;
 
 	if (attr)
 	{
@@ -651,7 +676,7 @@ void do_notify(dbref player, dbref cause __attribute__((unused)), int key, char 
 	dbref thing = NOTHING, aowner = NOTHING;
 	int loccount = 0, attr = 0, aflags = 0;
 	ATTR *ap = NULL;
-	char *obj= parse_to(&what, '/', 0);
+	char *obj = parse_to(&what, '/', 0);
 
 	init_match(player, obj, NOTYPE);
 	match_everything(0);
@@ -896,7 +921,39 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 		tmp->env[a] = NULL;
 	}
 
-	Alloc_RegData("setup_que", gargs, tmp->gdata);
+	if (gargs && (gargs->q_alloc || gargs->xr_alloc))
+	{
+		tmp->gdata = (GDATA *)XMALLOC(sizeof(GDATA), "setup_que");
+		tmp->gdata->q_alloc = gargs->q_alloc;
+		if (gargs->q_alloc)
+		{
+			tmp->gdata->q_regs = XCALLOC(gargs->q_alloc, sizeof(char *), "q_regs");
+			tmp->gdata->q_lens = XCALLOC(gargs->q_alloc, sizeof(int), "q_lens");
+		}
+		else
+		{
+			tmp->gdata->q_regs = NULL;
+			tmp->gdata->q_lens = NULL;
+		}
+		tmp->gdata->xr_alloc = gargs->xr_alloc;
+		if (gargs->xr_alloc)
+		{
+			tmp->gdata->x_names = XCALLOC(gargs->xr_alloc, sizeof(char *), "x_names");
+			tmp->gdata->x_regs = XCALLOC(gargs->xr_alloc, sizeof(char *), "x_regs");
+			tmp->gdata->x_lens = XCALLOC(gargs->xr_alloc, sizeof(int), "x_lens");
+		}
+		else
+		{
+			tmp->gdata->x_names = NULL;
+			tmp->gdata->x_regs = NULL;
+			tmp->gdata->x_lens = NULL;
+		}
+		tmp->gdata->dirty = 0;
+	}
+	else
+	{
+		tmp->gdata = NULL;
+	}
 
 	if (command)
 	{
@@ -1382,7 +1439,7 @@ int que_next(void)
 	{
 		if (point->waittime == 0)
 		{
-			continue;	/*!< Skip if no timeout */
+			continue; /*!< Skip if no timeout */
 		}
 
 		this = point->waittime - mudstate.now;
@@ -1407,7 +1464,7 @@ int que_next(void)
  */
 void do_second(void)
 {
-	BQUE *trail  = NULL, *point = NULL, *next = NULL;
+	BQUE *trail = NULL, *point = NULL, *next = NULL;
 	char *cmdsave = NULL;
 
 	/**
@@ -1417,7 +1474,6 @@ void do_second(void)
      * allow @halt to be type before getting blown away  by scrolling text
 	 * 
      */
-
 	if ((mudconf.control_flags & CF_DEQUEUE) == 0)
 	{
 		return;
@@ -1526,7 +1582,52 @@ int do_top(int ncmds)
 		if (!test_top())
 		{
 			mudstate.debug_cmd = cmdsave;
-			Free_RegData(mudstate.rdata);
+
+			if (mudstate.rdata)
+			{
+				for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+				{
+					if (mudstate.rdata->q_regs[z])
+						XFREE(mudstate.rdata->q_regs[z]);
+				}
+
+				for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+				{
+					if (mudstate.rdata->x_names[z])
+						XFREE(mudstate.rdata->x_names[z]);
+
+					if (mudstate.rdata->x_regs[z])
+						XFREE(mudstate.rdata->x_regs[z]);
+				}
+
+				if (mudstate.rdata->q_regs)
+				{
+					XFREE(mudstate.rdata->q_regs);
+				}
+
+				if (mudstate.rdata->q_lens)
+				{
+					XFREE(mudstate.rdata->q_lens);
+				}
+
+				if (mudstate.rdata->x_names)
+				{
+					XFREE(mudstate.rdata->x_names);
+				}
+
+				if (mudstate.rdata->x_regs)
+				{
+					XFREE(mudstate.rdata->x_regs);
+				}
+
+				if (mudstate.rdata->x_lens)
+				{
+					XFREE(mudstate.rdata->x_lens);
+				}
+
+				XFREE(mudstate.rdata);
+			}
+
 			mudstate.rdata = NULL;
 			return count;
 		}
@@ -1549,13 +1650,154 @@ int do_top(int ncmds)
 				 */
 				if (mudstate.qfirst->gdata)
 				{
-					Free_RegData(mudstate.rdata);
-					Alloc_RegData("do_top", mudstate.qfirst->gdata, mudstate.rdata);
-					Copy_RegData("do_top", mudstate.qfirst->gdata, mudstate.rdata);
+					if (mudstate.rdata)
+					{
+						for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+						{
+							if (mudstate.rdata->q_regs[z])
+								XFREE(mudstate.rdata->q_regs[z]);
+						}
+						for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+						{
+							if (mudstate.rdata->x_names[z])
+								XFREE(mudstate.rdata->x_names[z]);
+							if (mudstate.rdata->x_regs[z])
+								XFREE(mudstate.rdata->x_regs[z]);
+						}
+
+						if (mudstate.rdata->q_regs)
+						{
+							XFREE(mudstate.rdata->q_regs);
+						}
+						if (mudstate.rdata->q_lens)
+						{
+							XFREE(mudstate.rdata->q_lens);
+						}
+						if (mudstate.rdata->x_names)
+						{
+							XFREE(mudstate.rdata->x_names);
+						}
+						if (mudstate.rdata->x_regs)
+						{
+							XFREE(mudstate.rdata->x_regs);
+						}
+						if (mudstate.rdata->x_lens)
+						{
+							XFREE(mudstate.rdata->x_lens);
+						}
+						XFREE(mudstate.rdata);
+					}
+
+					if (mudstate.qfirst->gdata && (mudstate.qfirst->gdata->q_alloc || mudstate.qfirst->gdata->xr_alloc))
+					{
+						mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), "do_top");
+						mudstate.rdata->q_alloc = mudstate.qfirst->gdata->q_alloc;
+						if (mudstate.qfirst->gdata->q_alloc)
+						{
+							mudstate.rdata->q_regs = XCALLOC(mudstate.qfirst->gdata->q_alloc, sizeof(char *), "q_regs");
+							mudstate.rdata->q_lens = XCALLOC(mudstate.qfirst->gdata->q_alloc, sizeof(int), "q_lens");
+						}
+						else
+						{
+							mudstate.rdata->q_regs = NULL;
+							mudstate.rdata->q_lens = NULL;
+						}
+						mudstate.rdata->xr_alloc = mudstate.qfirst->gdata->xr_alloc;
+						if (mudstate.qfirst->gdata->xr_alloc)
+						{
+							mudstate.rdata->x_names = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_names");
+							mudstate.rdata->x_regs = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_regs");
+							mudstate.rdata->x_lens = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(int), "x_lens");
+						}
+						else
+						{
+							mudstate.rdata->x_names = NULL;
+							mudstate.rdata->x_regs = NULL;
+							mudstate.rdata->x_lens = NULL;
+						}
+						mudstate.rdata->dirty = 0;
+					}
+					else
+					{
+						mudstate.rdata = NULL;
+					}
+
+					if (mudstate.qfirst->gdata && mudstate.qfirst->gdata->q_alloc)
+					{
+						for (int z = 0; z < mudstate.qfirst->gdata->q_alloc; z++)
+						{
+							if (mudstate.qfirst->gdata->q_regs[z] && *(mudstate.qfirst->gdata->q_regs[z]))
+							{
+								mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, "do_top");
+								memcpy(mudstate.rdata->q_regs[z], mudstate.qfirst->gdata->q_regs[z], mudstate.qfirst->gdata->q_lens[z] + 1);
+								mudstate.rdata->q_lens[z] = mudstate.qfirst->gdata->q_lens[z];
+							}
+						}
+					}
+
+					if (mudstate.qfirst->gdata && mudstate.qfirst->gdata->xr_alloc)
+					{
+						for (int z = 0; z < mudstate.qfirst->gdata->xr_alloc; z++)
+						{
+							if (mudstate.qfirst->gdata->x_names[z] && *(mudstate.qfirst->gdata->x_names[z]) && mudstate.qfirst->gdata->x_regs[z] && *(mudstate.qfirst->gdata->x_regs[z]))
+							{
+								mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+								strcpy(mudstate.rdata->x_names[z], mudstate.qfirst->gdata->x_names[z]);
+								mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+								memcpy(mudstate.rdata->x_regs[z], mudstate.qfirst->gdata->x_regs[z], mudstate.qfirst->gdata->x_lens[z] + 1);
+								mudstate.rdata->x_lens[z] = mudstate.qfirst->gdata->x_lens[z];
+							}
+						}
+					}
+
+					if (mudstate.qfirst->gdata)
+					{
+						mudstate.rdata->dirty = mudstate.qfirst->gdata->dirty;
+					}
+					else
+					{
+						mudstate.rdata->dirty = 0;
+					}
 				}
 				else
 				{
-					Free_RegData(mudstate.rdata);
+					if (mudstate.rdata)
+					{
+						for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+						{
+							if (mudstate.rdata->q_regs[z])
+								XFREE(mudstate.rdata->q_regs[z]);
+						}
+						for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+						{
+							if (mudstate.rdata->x_names[z])
+								XFREE(mudstate.rdata->x_names[z]);
+							if (mudstate.rdata->x_regs[z])
+								XFREE(mudstate.rdata->x_regs[z]);
+						}
+
+						if (mudstate.rdata->q_regs)
+						{
+							XFREE(mudstate.rdata->q_regs);
+						}
+						if (mudstate.rdata->q_lens)
+						{
+							XFREE(mudstate.rdata->q_lens);
+						}
+						if (mudstate.rdata->x_names)
+						{
+							XFREE(mudstate.rdata->x_names);
+						}
+						if (mudstate.rdata->x_regs)
+						{
+							XFREE(mudstate.rdata->x_regs);
+						}
+						if (mudstate.rdata->x_lens)
+						{
+							XFREE(mudstate.rdata->x_lens);
+						}
+						XFREE(mudstate.rdata);
+					}
 					mudstate.rdata = NULL;
 				}
 
@@ -1573,11 +1815,55 @@ int do_top(int ncmds)
 
 		if (!mudstate.qfirst)
 		{
-			mudstate.qlast = NULL;	/*!< gotta check this, as the value's * changed */
+			mudstate.qlast = NULL; /*!< gotta check this, as the value's * changed */
 		}
 	}
 
-	Free_RegData(mudstate.rdata);
+	if (mudstate.rdata)
+	{
+		for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+		{
+			if (mudstate.rdata->q_regs[z])
+				XFREE(mudstate.rdata->q_regs[z]);
+		}
+
+		for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+		{
+			if (mudstate.rdata->x_names[z])
+				XFREE(mudstate.rdata->x_names[z]);
+
+			if (mudstate.rdata->x_regs[z])
+				XFREE(mudstate.rdata->x_regs[z]);
+		}
+
+		if (mudstate.rdata->q_regs)
+		{
+			XFREE(mudstate.rdata->q_regs);
+		}
+
+		if (mudstate.rdata->q_lens)
+		{
+			XFREE(mudstate.rdata->q_lens);
+		}
+
+		if (mudstate.rdata->x_names)
+		{
+			XFREE(mudstate.rdata->x_names);
+		}
+
+		if (mudstate.rdata->x_regs)
+		{
+			XFREE(mudstate.rdata->x_regs);
+		}
+
+		if (mudstate.rdata->x_lens)
+		{
+			XFREE(mudstate.rdata->x_lens);
+		}
+
+		XFREE(mudstate.rdata);
+	}
+
 	mudstate.rdata = NULL;
 	mudstate.debug_cmd = cmdsave;
 	return count;
@@ -1710,7 +1996,7 @@ void do_ps(dbref player, dbref cause __attribute__((unused)), int key, char *tar
 {
 	char *bufp = NULL;
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
-	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0, i =0;
+	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0, i = 0;
 
 	/**
      * Figure out what to list the queue for

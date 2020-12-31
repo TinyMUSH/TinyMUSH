@@ -13,24 +13,22 @@
 #include "config.h"
 #include "system.h"
 
-#include "typedefs.h"	/* required by mushconf */
-#include "game.h"		/* required by mushconf */
-#include "alloc.h"		/* required by mushconf */
-#include "flags.h"		/* required by mushconf */
-#include "htab.h"		/* required by mushconf */
-#include "ltdl.h"		/* required by mushconf */
-#include "udb.h"		/* required by mushconf */
-#include "udb_defs.h"	/* required by mushconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs.h */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "attrs.h"		/* required by code */
-#include "match.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "stringutil.h" /* required by code */
-
-//int parsing_internal = 0;
+#include "typedefs.h"
+#include "game.h"
+#include "alloc.h"
+#include "flags.h"
+#include "htab.h"
+#include "ltdl.h"
+#include "udb.h"
+#include "udb_defs.h"
+#include "mushconf.h"
+#include "db.h"
+#include "interface.h"
+#include "externs.h"
+#include "attrs.h"
+#include "match.h"
+#include "powers.h"
+#include "stringutil.h"
 
 /**
  * @brief indicate if attribute ATTR on player passes key when checked by the object lockobj
@@ -52,7 +50,11 @@ bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 
 	if (attr->number == A_LCONTROL)
 	{
-		checkit = true; /* We can see control locks... else we'd break zones */
+		/** 
+		 * We can see control locks... else we'd break zones 
+		 * 
+		 */
+		checkit = true;
 	}
 	else if (See_attr(lockobj, player, attr, aowner, aflags))
 	{
@@ -160,10 +162,11 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		return !eval_boolexp(player, thing, from, b->sub1);
 
 	case BOOLEXP_INDIR:
-		/*
+		/**
 		 * BOOLEXP_INDIR (i.e. @) is a unary operation which is
 		 * replaced at evaluation time by the lock of the object
 		 * whose number is the argument of the operation.
+		 * 
 		 */
 		mudstate.lock_nest_lev++;
 
@@ -226,11 +229,16 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		if (!a)
 		{
-			return false; /* no such attribute */
+			/**
+			 * no such attribute 
+			 * 
+			 */
+			return false;
 		}
 
 		/**
 		 * First check the object itself, then its contents
+		 * 
 		 */
 		if (check_attr(player, from, a, (char *)b->sub1))
 		{
@@ -251,7 +259,11 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		if (!a)
 		{
-			return false; /* no such attribute */
+			/** 
+			 * no such attribute 
+			 * 
+			 */
+			return false; 
 		}
 
 		source = from;
@@ -291,16 +303,18 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 	case BOOLEXP_IS:
 
-		/*
+		/**
 		 * If an object check, do that
+		 * 
 		 */
 		if (b->sub1->type == BOOLEXP_CONST)
 		{
 			return (b->sub1->thing == player);
 		}
 
-		/*
+		/**
 		 * Nope, do an attribute check
+		 * 
 		 */
 		a = atr_num(b->sub1->thing);
 
@@ -313,16 +327,18 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 	case BOOLEXP_CARRY:
 
-		/*
+		/**
 		 * If an object check, do that
+		 * 
 		 */
 		if (b->sub1->type == BOOLEXP_CONST)
 		{
 			return (member(b->sub1->thing, Contents(player)));
 		}
 
-		/*
+		/**
 		 * Nope, do an attribute check
+		 * 
 		 */
 		a = atr_num(b->sub1->thing);
 
@@ -345,9 +361,12 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 	default:
 		log_write_raw(1, "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n");
-		abort();	  /* bad type */
-		return false; /* NOTREACHED */
+		/** 
+		 * bad type 
+		 */
+		abort();	  
 	}
+	return false;
 }
 
 /**
@@ -442,7 +461,10 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 	 */
 	if (!(attrib = atr_str(buff)))
 	{
-		/** Only #1 can lock on numbers */
+		/** 
+		 * Only #1 can lock on numbers 
+		 * 
+		 */
 		if (!God(parse_player))
 		{
 			XFREE(buff);
@@ -473,7 +495,10 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 		anum = attrib->number;
 	}
 
-	/** made it now make the parse tree node */
+	/** 
+	 * made it now make the parse tree node 
+	 * 
+	 */
 	b = alloc_boolexp();
 	b->type = locktype;
 	b->thing = (dbref)anum;
@@ -514,7 +539,10 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 
 		break;
 	default:
-		/** must have hit an object ref.  Load the name into our buffer */
+		/** 
+		 * must have hit an object ref.  Load the name into our buffer 
+		 * 
+		 */
 		buf = XMALLOC(LBUF_SIZE, "buf");
 		p = buf;
 
@@ -529,7 +557,10 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 			*p-- = '\0';
 		}
 
-		/** check for an attribute */
+		/** 
+		 * check for an attribute 
+		 * 
+		 */
 		if ((b = test_atr(buf, parse_player)) != NULL)
 		{
 			XFREE(buf);
@@ -543,8 +574,8 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 * Do the match. If we are parsing a boolexp that was a
 		 * stored lock then we know that object refs are all dbrefs,
 		 * so we skip the expensive match code.
+		 * 
 		 */
-
 		if (!mudstate.standalone)
 		{
 			if (parsing_internal)

@@ -587,7 +587,13 @@ void dispatch(void)
      * Module API hook
      */
 
-    CALL_ALL_MODULES(do_second, ());
+    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    {
+        if (cam__mp->do_second)
+        {
+            (*(cam__mp->do_second))();
+        }
+    }
 
     /*
      * Free list reconstruction
