@@ -39,7 +39,6 @@ FCACHE fcache[] = {
     {&mudconf.htmlconn_file, NULL, "Conn/Html"},
     {NULL, NULL, NULL}};
 
-
 /* *INDENT-ON* */
 
 void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
@@ -78,13 +77,14 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
 
 int fcache_read(FBLOCK **cp, char *filename)
 {
-    int n, nmax, tchars, fd;
-    char *buff;
-    FBLOCK *fp, *tfp;
-    /*
+    int n = 0, nmax = 0, tchars = 0, fd = 0;
+    char *buff = NULL;
+    FBLOCK *fp = *cp, *tfp = NULL;
+
+    /**
      * Free a prior buffer chain
+     * 
      */
-    fp = *cp;
 
     while (fp != NULL)
     {
@@ -95,65 +95,73 @@ int fcache_read(FBLOCK **cp, char *filename)
 
     *cp = NULL;
 
-    /*
-     * Read the text file into a new chain
-     */
-
-    if ((fd = tf_open(filename, O_RDONLY)) == -1)
-    {
-        /*
-	 * Failure: log the event
-	 */
-        log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
-        tf_close(fd);
-        return -1;
-    }
-
-    buff = XMALLOC(LBUF_SIZE, "buff");
-    /*
+    /**
      * Set up the initial cache buffer to make things easier
+     * 
      */
     fp = (FBLOCK *)XMALLOC(MBUF_SIZE, "fp");
     fp->hdr.nxt = NULL;
     fp->hdr.nchars = 0;
     *cp = fp;
     tchars = 0;
-    /*
-     * Process the file, one lbuf at a time
-     */
-    nmax = read(fd, buff, LBUF_SIZE);
 
-    while (nmax > 0)
+    if (*filename)
     {
-        for (n = 0; n < nmax; n++)
+        /**
+         * Read the text file into a new chain
+         * 
+         */
+        if ((fd = tf_open(filename, O_RDONLY)) == -1)
         {
-            switch (buff[n])
-            {
-            case '\n':
-                fp = fcache_fill(fp, '\r');
-                fp = fcache_fill(fp, '\n');
-                tchars += 2;
-
-            case '\0':
-            case '\r':
-                break;
-
-            default:
-                fp = fcache_fill(fp, buff[n]);
-                tchars++;
-            }
+            /**
+        	 * Failure: log the event
+             * 
+        	 */
+            log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
+            tf_close(fd);
+            return -1;
         }
 
+        buff = XMALLOC(LBUF_SIZE, "buff");
+
+        /**
+         * Process the file, one lbuf at a time
+         * 
+         */
         nmax = read(fd, buff, LBUF_SIZE);
+
+        while (nmax > 0)
+        {
+            for (n = 0; n < nmax; n++)
+            {
+                switch (buff[n])
+                {
+                case '\n':
+                    fp = fcache_fill(fp, '\r');
+                    fp = fcache_fill(fp, '\n');
+                    tchars += 2;
+                    break;
+                case '\0':
+                case '\r':
+                    break;
+                default:
+                    fp = fcache_fill(fp, buff[n]);
+                    tchars++;
+                    break;
+                }
+            }
+
+            nmax = read(fd, buff, LBUF_SIZE);
+        }
+
+        XFREE(buff);
+        tf_close(fd);
     }
 
-    XFREE(buff);
-    tf_close(fd);
-
-    /*
+    /**
      * If we didn't read anything in, toss the initial buffer
+     * 
      */
-
     if (fp->hdr.nchars == 0)
     {
         *cp = NULL;
