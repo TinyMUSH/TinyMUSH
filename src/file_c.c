@@ -105,57 +105,60 @@ int fcache_read(FBLOCK **cp, char *filename)
     *cp = fp;
     tchars = 0;
 
-    if (*filename)
+    if (filename)
     {
-        /**
-         * Read the text file into a new chain
-         * 
-         */
-        if ((fd = tf_open(filename, O_RDONLY)) == -1)
+        if (*filename)
         {
             /**
-        	 * Failure: log the event
+             * Read the text file into a new chain
              * 
-        	 */
-            log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
-            tf_close(fd);
-            return -1;
-        }
-
-        buff = XMALLOC(LBUF_SIZE, "buff");
-
-        /**
-         * Process the file, one lbuf at a time
-         * 
-         */
-        nmax = read(fd, buff, LBUF_SIZE);
-
-        while (nmax > 0)
-        {
-            for (n = 0; n < nmax; n++)
+             */
+            if ((fd = tf_open(filename, O_RDONLY)) == -1)
             {
-                switch (buff[n])
-                {
-                case '\n':
-                    fp = fcache_fill(fp, '\r');
-                    fp = fcache_fill(fp, '\n');
-                    tchars += 2;
-                    break;
-                case '\0':
-                case '\r':
-                    break;
-                default:
-                    fp = fcache_fill(fp, buff[n]);
-                    tchars++;
-                    break;
-                }
+                /**
+            	 * Failure: log the event
+                 * 
+            	 */
+                log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
+                tf_close(fd);
+                return -1;
             }
 
-            nmax = read(fd, buff, LBUF_SIZE);
-        }
+            buff = XMALLOC(LBUF_SIZE, "buff");
 
-        XFREE(buff);
-        tf_close(fd);
+            /**
+             * Process the file, one lbuf at a time
+             * 
+             */
+            nmax = read(fd, buff, LBUF_SIZE);
+
+            while (nmax > 0)
+            {
+                for (n = 0; n < nmax; n++)
+                {
+                    switch (buff[n])
+                    {
+                    case '\n':
+                        fp = fcache_fill(fp, '\r');
+                        fp = fcache_fill(fp, '\n');
+                        tchars += 2;
+                        break;
+                    case '\0':
+                    case '\r':
+                        break;
+                    default:
+                        fp = fcache_fill(fp, buff[n]);
+                        tchars++;
+                        break;
+                    }
+                }
+
+                nmax = read(fd, buff, LBUF_SIZE);
+            }
+
+            XFREE(buff);
+            tf_close(fd);
+        }
     }
 
     /**
