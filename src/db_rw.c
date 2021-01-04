@@ -1414,7 +1414,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
  */
 int db_read(void)
 {
-	DBData key, data;
+	UDB_DATA key, data;
 	int *c = NULL, vattr_flags = 0, i = 0, j = 0, blksize = 0, num = 0;
 	char *s = NULL;
 	struct timeval obj_time;
@@ -2004,7 +2004,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 dbref db_write(void)
 {
 	VATTR *vp = NULL;
-	DBData key, data;
+	UDB_DATA key, data;
 	int *c = NULL, blksize = 0, num = 0, i = 0, j = 0, k = 0, dirty = 0, len = 0;
 	char *s = NULL;
 

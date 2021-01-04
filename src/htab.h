@@ -1,4 +1,13 @@
-/* htab.h - Structures and declarations needed for table hashing */
+/**
+ * @file htab.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Structures and declarations needed for table hashing
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
@@ -11,18 +20,15 @@ typedef union
     int i;
 } HASHKEY;
 
-typedef struct hashentry HASHENT;
-struct hashentry
+typedef struct hashentry
 {
     HASHKEY target;
     int *data;
     int flags;
     struct hashentry *next;
-};
-#define NHSHENT HASHENT
+} HASHENT;
 
-typedef struct hashtable HASHTAB;
-struct hashtable
+typedef struct hashtable
 {
     int hashsize;
     int mask;
@@ -35,23 +41,21 @@ struct hashtable
     int nulls;
     int flags;
     HASHENT **entry;
-    int last_hval;       /* Used for hashfirst & hashnext. */
-    HASHENT *last_entry; /* like last_hval */
-};
-#define NHSHTAB HASHTAB
+    int last_hval;       /*!< Used for hashfirst & hashnext. */
+    HASHENT *last_entry; /*!< like last_hval */
+} HASHTAB;
 
-typedef struct mod_hashes MODHASHES;
-struct mod_hashes
+typedef struct mod_hashes
 {
     char *tabname;
     HASHTAB *htab;
     int size_factor;
     int min_size;
-};
-#define MODNHASHES MODHASHES
+} MODHASHES;
 
 /**
  * Definititon of a name table
+ * 
  */
 typedef struct name_table
 {
@@ -61,17 +65,25 @@ typedef struct name_table
     int flag;   //!< Flags
 } NAMETAB;
 
-/* Hash entry flags */
+/** 
+ * Hash entry flags 
+ * 
+ */
+#define HASH_ALIAS 0x00000001 /*!< This entry is just a copy */
 
-#define HASH_ALIAS 0x00000001 /* This entry is just a copy */
+/** 
+ * Hash table flags 
+ * 
+ */
+#define HT_STR 0x00000000      /*!< String-keyed hashtable */
+#define HT_NUM 0x00000001      /*!< Numeric-keyed hashtable */
+#define HT_TYPEMASK 0x0000000f /*!< Reserve up to 16 key types */
+#define HT_KEYREF 0x00000010   /*!< Store keys by reference not copy */
 
-/* Hash table flags */
-
-#define HT_STR 0x00000000      /* String-keyed hashtable */
-#define HT_NUM 0x00000001      /* Numeric-keyed hashtable */
-#define HT_TYPEMASK 0x0000000f /* Reserve up to 16 key types */
-#define HT_KEYREF 0x00000010   /* Store keys by reference not copy */
-
+/**
+ * Macros
+ * 
+ */
 #define nhashinit(h, sz) hashinit((h), (sz), HT_NUM)
 #define nhashreset(h) hashreset((h))
 #define hashfind(s, h) hashfind_generic((HASHKEY)(s), (h))

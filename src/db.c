@@ -1068,7 +1068,51 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     {
         if (*s == ESC_CHAR)
         {
-            TRACK_ESCCODES(s, ansi_state);
+            do
+            {
+                int ansi_mask = 0;
+                int ansi_diff = 0;
+                unsigned int param_val = 0;
+                ++(s);
+                if (*(s) == ANSI_CSI)
+                {
+                    while ((*(++(s)) & 0xf0) == 0x30)
+                    {
+                        if (*(s) < 0x3a)
+                        {
+                            param_val <<= 1;
+                            param_val += (param_val << 2) + (*(s)&0x0f);
+                        }
+                        else
+                        {
+                            if (param_val < I_ANSI_LIM)
+                            {
+                                ansi_mask |= ansiBitsMask(param_val);
+                                ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+                            }
+                            param_val = 0;
+                        }
+                    }
+                }
+                while ((*(s)&0xf0) == 0x20)
+                {
+                    ++(s);
+                }
+                if (*(s) == ANSI_END)
+                {
+                    if (param_val < I_ANSI_LIM)
+                    {
+                        ansi_mask |= ansiBitsMask(param_val);
+                        ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+                    }
+                    ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+                    ++(s);
+                }
+                else if (*(s))
+                {
+                    ++(s);
+                }
+            } while (0);
         }
         else
         {
@@ -2051,7 +2095,7 @@ void al_delete(dbref thing, int attrnum)
  * @param atr   Attribute number
  * @param abuff Attribute buffer
  */
-void makekey(dbref thing, int atr, Aname *abuff)
+void makekey(dbref thing, int atr, UDB_ANAME *abuff)
 {
     abuff->object = thing;
     abuff->attrnum = atr;
@@ -2175,7 +2219,7 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
 
             if (oattr)
             {
-                *alen = strlen(iattr); 
+                *alen = strlen(iattr);
                 XMEMCPY(oattr, iattr, (size_t)(*alen) + 1);
             }
 
@@ -2215,7 +2259,7 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
          */
         if (oattr)
         {
-            *alen = strlen(cp); 
+            *alen = strlen(cp);
             XMEMCPY(oattr, cp, (size_t)(*alen) + 1);
         }
 
@@ -2249,8 +2293,8 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
  */
 void atr_clr(dbref thing, int atr)
 {
-    Aname okey;
-    DBData key;
+    UDB_ANAME okey;
+    UDB_DATA key;
 
     /** 
      * Delete the entry from cache 
@@ -2258,7 +2302,7 @@ void atr_clr(dbref thing, int atr)
      */
     makekey(thing, atr, &okey);
     key.dptr = &okey;
-    key.dsize = sizeof(Aname);
+    key.dsize = sizeof(UDB_ANAME);
     cache_del(key, DBTYPE_ATTRIBUTE);
     al_delete(thing, atr);
 
@@ -2326,9 +2370,9 @@ void atr_clr(dbref thing, int atr)
  */
 void atr_add_raw(dbref thing, int atr, char *buff)
 {
-    Attr *a = NULL;
-    Aname okey;
-    DBData key, data;
+    char *a = NULL;
+    UDB_ANAME okey;
+    UDB_DATA key, data;
 
     makekey(thing, atr, &okey);
 
@@ -2339,13 +2383,13 @@ void atr_add_raw(dbref thing, int atr, char *buff)
          * 
          */
         key.dptr = &okey;
-        key.dsize = sizeof(Aname);
+        key.dsize = sizeof(UDB_ANAME);
         cache_del(key, DBTYPE_ATTRIBUTE);
         al_delete(thing, atr);
         return;
     }
 
-    if ((a = (Attr *)XMALLOC(strlen(buff) + 1, "a")) == (char *)0)
+    if ((a = (char *)XMALLOC(strlen(buff) + 1, "a")) == (char *)0)
     {
         return;
     }
@@ -2356,7 +2400,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
      * 
      */
     key.dptr = &okey;
-    key.dsize = sizeof(Aname);
+    key.dsize = sizeof(UDB_ANAME);
     data.dptr = a;
     data.dsize = strlen(a) + 1;
     cache_put(key, data, DBTYPE_ATTRIBUTE);
@@ -2491,8 +2535,8 @@ void atr_set_flags(dbref thing, int atr, dbref flags)
  */
 char *atr_get_raw(dbref thing, int atr)
 {
-    DBData key, data;
-    Aname okey;
+    UDB_DATA key, data;
+    UDB_ANAME okey;
 
     if (Typeof(thing) == TYPE_GARBAGE)
     {
@@ -2510,7 +2554,7 @@ char *atr_get_raw(dbref thing, int atr)
      * 
      */
     key.dptr = &okey;
-    key.dsize = sizeof(Aname);
+    key.dsize = sizeof(UDB_ANAME);
     data = cache_get(key, DBTYPE_ATTRIBUTE);
     return data.dptr;
 }

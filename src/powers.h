@@ -5,72 +5,78 @@
 #ifndef __POWERS_H
 #define __POWERS_H
 
-#define POWER_EXT 0x1 /* Lives in extended powers word */
-
-/* First word of powers */
-#define POW_CHG_QUOTAS 0x00000001  /* May change and see quotas */
-#define POW_CHOWN_ANY 0x00000002   /* Can @chown anything or to anyone */
-#define POW_ANNOUNCE 0x00000004    /* May use @wall */
-#define POW_BOOT 0x00000008        /* May use @boot */
-#define POW_HALT 0x00000010        /* May @halt on other's objects */
-#define POW_CONTROL_ALL 0x00000020 /* I control everything */
-#define POW_WIZARD_WHO 0x00000040  /* See extra WHO information */
-#define POW_EXAM_ALL 0x00000080    /* I can examine everything */
-#define POW_FIND_UNFIND 0x00000100 /* Can find unfindable players */
-#define POW_FREE_MONEY 0x00000200  /* I have infinite money */
-#define POW_FREE_QUOTA 0x00000400  /* I have infinite quota */
-#define POW_HIDE 0x00000800        /* Can set themselves DARK */
-#define POW_IDLE 0x00001000        /* No idle limit */
-#define POW_SEARCH 0x00002000      /* Can @search anyone */
-#define POW_LONGFINGERS 0x00004000 /* Can get/whisper/etc from a distance */
-#define POW_PROG 0x00008000        /* Can use the @prog command */
-#define POW_MDARK_ATTR 0x00010000  /* Can read AF_MDARK attrs */
-#define POW_WIZ_ATTR 0x00020000    /* Can write AF_WIZARD attrs */
-
-/* FREE FREE FREE FREE */
-
-#define POW_COMM_ALL 0x00080000   /* Channel wiz */
-#define POW_SEE_QUEUE 0x00100000  /* Player can see the entire queue */
-#define POW_SEE_HIDDEN 0x00200000 /* Player can see hidden players on WHO list */
-#define POW_WATCH 0x00400000      /* Player can set or clear WATCHER */
-#define POW_POLL 0x00800000       /* Player can set the doing poll */
-#define POW_NO_DESTROY 0x01000000 /* Cannot be destroyed */
-#define POW_GUEST 0x02000000      /* Player is a guest */
-#define POW_PASS_LOCKS 0x04000000 /* Player can pass any lock */
-#define POW_STAT_ANY 0x08000000   /* Can @stat anyone */
-#define POW_STEAL 0x10000000      /* Can give negative money */
-#define POW_TEL_ANYWHR 0x20000000 /* Teleport anywhere */
-#define POW_TEL_UNRST 0x40000000  /* Teleport anything */
-#define POW_UNKILLABLE 0x80000000 /* Can't be killed */
-
-/* Second word of powers */
-#define POW_BUILDER 0x00000001    /* Can build */
-#define POW_LINKVAR 0x00000002    /* Can link an exit to "variable" */
-#define POW_LINKTOANY 0x00000004  /* Can link to any object */
-#define POW_OPENANYLOC 0x00000008 /* Can open from anywhere */
-#define POW_USE_MODULE 0x00000010 /* Can use MODULE queries directly */
-#define POW_LINKHOME 0x00000020   /* Can link object to any home */
-#define POW_CLOAK 0x00000040      /* Can vanish from sight via DARK */
-
-/* ---------------------------------------------------------------------------
- * POWERENT: Information about object powers.
+#define POWER_EXT 0x1 /*!< Lives in extended powers word */
+/** 
+ * First word of powers
+ * 
  */
+#define POW_CHG_QUOTAS 0x00000001  /*!< May change and see quotas */
+#define POW_CHOWN_ANY 0x00000002   /*!< Can @chown anything or to anyone */
+#define POW_ANNOUNCE 0x00000004    /*!< May use @wall */
+#define POW_BOOT 0x00000008        /*!< May use @boot */
+#define POW_HALT 0x00000010        /*!< May @halt on other's objects */
+#define POW_CONTROL_ALL 0x00000020 /*!< I control everything */
+#define POW_WIZARD_WHO 0x00000040  /*!< See extra WHO information */
+#define POW_EXAM_ALL 0x00000080    /*!< I can examine everything */
+#define POW_FIND_UNFIND 0x00000100 /*!< Can find unfindable players */
+#define POW_FREE_MONEY 0x00000200  /*!< I have infinite money */
+#define POW_FREE_QUOTA 0x00000400  /*!< I have infinite quota */
+#define POW_HIDE 0x00000800        /*!< Can set themselves DARK */
+#define POW_IDLE 0x00001000        /*!< No idle limit */
+#define POW_SEARCH 0x00002000      /*!< Can @search anyone */
+#define POW_LONGFINGERS 0x00004000 /*!< Can get/whisper/etc from a distance */
+#define POW_PROG 0x00008000        /*!< Can use the @prog command */
+#define POW_MDARK_ATTR 0x00010000  /*!< Can read AF_MDARK attrs */
+#define POW_WIZ_ATTR 0x00020000    /*!< Can write AF_WIZARD attrs */
+#define POW_FREE_ATTR 0x00040000   /*!< Not used - Available */
+#define POW_COMM_ALL 0x00080000    /*!< Channel wiz */
+#define POW_SEE_QUEUE 0x00100000   /*!< Player can see the entire queue */
+#define POW_SEE_HIDDEN 0x00200000  /*!< Player can see hidden players on WHO list */
+#define POW_WATCH 0x00400000       /*!< Player can set or clear WATCHER */
+#define POW_POLL 0x00800000        /*!< Player can set the doing poll */
+#define POW_NO_DESTROY 0x01000000  /*!< Cannot be destroyed */
+#define POW_GUEST 0x02000000       /*!< Player is a guest */
+#define POW_PASS_LOCKS 0x04000000  /*!< Player can pass any lock */
+#define POW_STAT_ANY 0x08000000    /*!< Can @stat anyone */
+#define POW_STEAL 0x10000000       /*!< Can give negative money */
+#define POW_TEL_ANYWHR 0x20000000  /*!< Teleport anywhere */
+#define POW_TEL_UNRST 0x40000000   /*!< Teleport anything */
+#define POW_UNKILLABLE 0x80000000  /*!< Can't be killed */
+/** 
+ * Second word of powers 
+ * 
+ */
+#define POW_BUILDER 0x00000001    /*!< Can build */
+#define POW_LINKVAR 0x00000002    /*!< Can link an exit to "variable" */
+#define POW_LINKTOANY 0x00000004  /*!< Can link to any object */
+#define POW_OPENANYLOC 0x00000008 /*!< Can open from anywhere */
+#define POW_USE_MODULE 0x00000010 /*!< Can use MODULE queries directly */
+#define POW_LINKHOME 0x00000020   /*!< Can link object to any home */
+#define POW_CLOAK 0x00000040      /*!< Can vanish from sight via DARK */
 
+/**
+ * Information about object powers.
+ * 
+ */
 typedef struct power_entry
 {
-    const char *powername; /* Name of the flag */
-    int powervalue;        /* Which bit in the object is the flag */
-    int powerpower;        /* Ctrl flags for this power (recursive? :-) */
-    int listperm;          /* Who sees this flag when set */
-    int (*handler)();      /* Handler for setting/clearing this flag */
+    const char *powername; /*!< Name of the flag */
+    int powervalue;        /*!< Which bit in the object is the flag */
+    int powerpower;        /*!< Ctrl flags for this power (recursive? :-) */
+    int listperm;          /*!< Who sees this flag when set */
+    int (*handler)();      /*!< Handler for setting/clearing this flag */
 } POWERENT;
 
 typedef struct powerset
 {
-    POWER word1;
-    POWER word2;
+    POWER word1; /*!< First word for power */
+    POWER word2; /*!< Second word for power */
 } POWERSET;
 
+/**
+ * Macros
+ * 
+ */
 #define s_Change_Quotas(c) s_Powers((c), Powers(c) | POW_CHG_QUOTAS)
 #define s_Chown_Any(c) s_Powers((c), Powers(c) | POW_CHOWN_ANY)
 #define s_Announce(c) s_Powers((c), Powers(c) | POW_ANNOUNCE)

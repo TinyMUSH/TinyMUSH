@@ -86,7 +86,7 @@ struct timeval update_quotas(struct timeval last, struct timeval current)
 
 	if (nslices > 0)
 	{
-		DESC_ITER_ALL(d)
+		for (d = descriptor_list; (d); d = (d)->next)
 		{
 			d->quota += mudconf.cmd_quota_incr * nslices;
 
@@ -147,7 +147,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 		return;
 	}
 
-	DESC_ITER_PLAYER(player, d)
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_string(d, NULL, msg);
 	}
@@ -199,7 +199,7 @@ void raw_notify(dbref player, const char *format, ...)
 		return;
 	}
 
-	DESC_ITER_PLAYER(player, d)
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_string(d, NULL, msg);
 		queue_write(d, "\r\n", 2);
@@ -222,7 +222,7 @@ void raw_notify_newline(dbref player)
 		return;
 	}
 
-	DESC_ITER_PLAYER(player, d)
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_write(d, "\r\n", 2);
 	}
@@ -267,37 +267,38 @@ void raw_broadcast(int inflags, char *template, ...)
 		which_flag = 1;
 	}
 
-	DESC_ITER_CONN(d)
-	{
-		switch (which_flag)
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-		case 1:
-			p_flag = Flags(d->player);
-			break;
+			switch (which_flag)
+			{
+			case 1:
+				p_flag = Flags(d->player);
+				break;
 
-		case 2:
-			p_flag = Flags2(d->player);
-			break;
+			case 2:
+				p_flag = Flags2(d->player);
+				break;
 
-		case 3:
-			p_flag = Flags3(d->player);
-			break;
+			case 3:
+				p_flag = Flags3(d->player);
+				break;
 
-		default:
-			p_flag = Flags(d->player);
-		}
+			default:
+				p_flag = Flags(d->player);
+			}
 
-		/*
+			/*
 	 * If inflags is 0, broadcast to everyone
 	 */
 
-		if ((p_flag & test_flag) || (!test_flag))
-		{
-			queue_string(d, NULL, buff);
-			queue_write(d, "\r\n", 2);
-			process_output(d);
+			if ((p_flag & test_flag) || (!test_flag))
+			{
+				queue_string(d, NULL, buff);
+				queue_write(d, "\r\n", 2);
+				process_output(d);
+			}
 		}
-	}
 	va_end(ap);
 	XFREE(buff);
 }
@@ -965,14 +966,17 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 void announce_connect(dbref player, DESC *d, const char *reason)
 {
-	dbref loc, aowner, temp;
-	int aflags, alen, num, key, count;
-	char *buf, *time_str;
-	DESC *dtemp;
+	dbref loc = NOTHING, aowner = NOTHING, temp = NOTHING;
+	int aflags = 0, alen = 0, num = 0, key = 0, count = 0;
+	char *buf = NULL, *time_str = NULL;
+	DESC *dtemp = NULL;
 	desc_addhash(d);
-	count = 0;
-	DESC_ITER_CONN(dtemp)
-	count++;
+
+	for (dtemp = descriptor_list; dtemp; dtemp = dtemp->next)
+		if (dtemp->flags & DS_CONNECTED)
+		{
+			count++;
+		}
 
 	if (mudstate.record_players < count)
 	{
@@ -1044,8 +1048,10 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	}
 
 	num = 0;
-	DESC_ITER_PLAYER(player, dtemp)
-	num++;
+	for (dtemp = (DESC *)nhashfind((int)player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+	{
+		num++;
+	}
 	/*
      * Reset vacation flag
      */
@@ -1136,8 +1142,10 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 
 	loc = Location(player);
 	num = -1;
-	DESC_ITER_PLAYER(player, dtemp)
-	num++;
+	for (dtemp = (DESC *)nhashfind((int)player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+	{
+		num++;
+	}
 	temp = mudstate.curr_enactor;
 	mudstate.curr_enactor = player;
 
@@ -1207,10 +1215,10 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 
 int boot_off(dbref player, char *message)
 {
-	DESC *d, *dnext;
-	int count;
-	count = 0;
-	DESC_SAFEITER_PLAYER(player, d, dnext)
+	DESC *d = NULL, *dnext = NULL;
+	int count = 0;
+
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab), dnext = ((d != NULL) ? d->hashnext : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->hashnext : NULL))
 	{
 		if (message && *message)
 		{
@@ -1229,7 +1237,8 @@ int boot_by_port(int port, int no_god, char *message)
 	DESC *d, *dnext;
 	int count;
 	count = 0;
-	DESC_SAFEITER_ALL(d, dnext)
+
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 	{
 		if ((d->descriptor == port) && (!no_god || !God(d->player)))
 		{
@@ -1256,7 +1265,8 @@ void desc_reload(dbref player)
 	char *buf;
 	dbref aowner;
 	int aflags, alen;
-	DESC_ITER_PLAYER(player, d)
+
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
 		d->timeout = (int)strtol(buf, (char **)NULL, 10);
@@ -1283,7 +1293,7 @@ int fetch_idle(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		DESC_ITER_PLAYER(target, d)
+		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			idletime = (mudstate.now - d->last_time);
 
@@ -1295,20 +1305,21 @@ int fetch_idle(dbref target, int port_num)
 	}
 	else
 	{
-		DESC_ITER_CONN(d)
-		{
-			if (d->descriptor == port_num)
+		for (d = descriptor_list; d; d = d->next)
+			if (d->flags & DS_CONNECTED)
 			{
-				idletime = (mudstate.now - d->last_time);
-
-				if ((result == -1) || (idletime < result))
+				if (d->descriptor == port_num)
 				{
-					result = idletime;
-				}
+					idletime = (mudstate.now - d->last_time);
 
-				return result;
+					if ((result == -1) || (idletime < result))
+					{
+						result = idletime;
+					}
+
+					return result;
+				}
 			}
-		}
 	}
 
 	return result;
@@ -1322,7 +1333,7 @@ int fetch_connect(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		DESC_ITER_PLAYER(target, d)
+		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			conntime = (mudstate.now - d->connected_at);
 
@@ -1334,20 +1345,21 @@ int fetch_connect(dbref target, int port_num)
 	}
 	else
 	{
-		DESC_ITER_CONN(d)
-		{
-			if (d->descriptor == port_num)
+		for (d = descriptor_list; d; d = d->next)
+			if (d->flags & DS_CONNECTED)
 			{
-				conntime = (mudstate.now - d->connected_at);
-
-				if (conntime > result)
+				if (d->descriptor == port_num)
 				{
-					result = conntime;
-				}
+					conntime = (mudstate.now - d->connected_at);
 
-				return result;
+					if (conntime > result)
+					{
+						result = conntime;
+					}
+
+					return result;
+				}
 			}
-		}
 	}
 
 	return result;
@@ -1357,7 +1369,8 @@ void check_idle(void)
 {
 	DESC *d, *dnext;
 	time_t idletime;
-	DESC_SAFEITER_ALL(d, dnext)
+
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 	{
 		if (d->flags & DS_CONNECTED)
 		{
@@ -1477,154 +1490,156 @@ void dump_users(DESC *e, char *match, int key)
 	}
 
 	count = 0;
-	DESC_ITER_CONN(d)
-	{
-		if (!Hidden(d->player) || ((e->flags & DS_CONNECTED) && See_Hidden(e->player)))
+
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			count++;
-
-			if (match && !(string_prefix(Name(d->player), match)))
+			if (!Hidden(d->player) || ((e->flags & DS_CONNECTED) && See_Hidden(e->player)))
 			{
-				continue;
-			}
+				count++;
 
-			if ((key == CMD_SESSION) && !(Wizard_Who(e->player) && (e->flags & DS_CONNECTED)) && (d->player != e->player))
-			{
-				continue;
-			}
+				if (match && !(string_prefix(Name(d->player), match)))
+				{
+					continue;
+				}
 
-			/*
+				if ((key == CMD_SESSION) && !(Wizard_Who(e->player) && (e->flags & DS_CONNECTED)) && (d->player != e->player))
+				{
+					continue;
+				}
+
+				/*
 	     * Get choice flags for wizards
 	     */
-			fp = flist;
-			sp = slist;
+				fp = flist;
+				sp = slist;
 
-			if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player))
-			{
-				if (Hidden(d->player))
+				if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player))
 				{
-					if (d->flags & DS_AUTODARK)
+					if (Hidden(d->player))
 					{
-						*fp++ = 'd';
+						if (d->flags & DS_AUTODARK)
+						{
+							*fp++ = 'd';
+						}
+						else
+						{
+							*fp++ = 'D';
+						}
+					}
+
+					if (!Findable(d->player))
+					{
+						*fp++ = 'U';
 					}
 					else
 					{
-						*fp++ = 'D';
-					}
-				}
+						room_it = where_room(d->player);
 
-				if (!Findable(d->player))
-				{
-					*fp++ = 'U';
-				}
-				else
-				{
-					room_it = where_room(d->player);
-
-					if (Good_obj(room_it))
-					{
-						if (Hideout(room_it))
+						if (Good_obj(room_it))
+						{
+							if (Hideout(room_it))
+							{
+								*fp++ = 'u';
+							}
+						}
+						else
 						{
 							*fp++ = 'u';
 						}
 					}
-					else
+
+					if (Suspect(d->player))
 					{
-						*fp++ = 'u';
+						*fp++ = '+';
+					}
+
+					if (d->host_info & H_FORBIDDEN)
+					{
+						*sp++ = 'F';
+					}
+
+					if (d->host_info & H_REGISTRATION)
+					{
+						*sp++ = 'R';
+					}
+
+					if (d->host_info & H_SUSPECT)
+					{
+						*sp++ = '+';
+					}
+
+					if (d->host_info & H_GUEST)
+					{
+						*sp++ = 'G';
+					}
+				}
+				else if ((e->flags & DS_CONNECTED) && See_Hidden(e->player))
+				{
+					if (Hidden(d->player))
+					{
+						if (d->flags & DS_AUTODARK)
+						{
+							*fp++ = 'd';
+						}
+						else
+						{
+							*fp++ = 'D';
+						}
 					}
 				}
 
-				if (Suspect(d->player))
+				*fp = '\0';
+				*sp = '\0';
+
+				if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player) && (key == CMD_WHO))
 				{
-					*fp++ = '+';
+					s = XASPRINTF("s", "%s@%s", d->username, d->addr);
+					char *trs = trimmed_site(((d->username[0] != '\0') ? s : d->addr));
+					char *trn = trimmed_name(d->player);
+					char *tf1 = time_format_1(mudstate.now - d->connected_at);
+					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					XSPRINTF(buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trn, tf1, tf2, flist, Location(d->player), d->command_count, slist, trs);
+					XFREE(s);
+					XFREE(tf2);
+					XFREE(tf1);
+					XFREE(trn);
+					XFREE(trs);
+				}
+				else if (key == CMD_SESSION)
+				{
+					char *trn = trimmed_name(d->player);
+					char *tf1 = time_format_1(mudstate.now - d->connected_at);
+					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					XSPRINTF(buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trn, tf1, tf2, d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot);
+					XFREE(tf1);
+					XFREE(tf2);
+					XFREE(trn);
+				}
+				else if (Wizard_Who(e->player) || See_Hidden(e->player))
+				{
+					char *trn = trimmed_name(d->player);
+					char *tf1 = time_format_1(mudstate.now - d->connected_at);
+					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
+					XFREE(tf1);
+					XFREE(tf2);
+					XFREE(trn);
+				}
+				else
+				{
+					char *trn = trimmed_name(d->player);
+					char *tf1 = time_format_1(mudstate.now - d->connected_at);
+					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
+					XFREE(tf1);
+					XFREE(tf2);
+					XFREE(trn);
 				}
 
-				if (d->host_info & H_FORBIDDEN)
-				{
-					*sp++ = 'F';
-				}
-
-				if (d->host_info & H_REGISTRATION)
-				{
-					*sp++ = 'R';
-				}
-
-				if (d->host_info & H_SUSPECT)
-				{
-					*sp++ = '+';
-				}
-
-				if (d->host_info & H_GUEST)
-				{
-					*sp++ = 'G';
-				}
+				queue_string(e, NULL, buf);
 			}
-			else if ((e->flags & DS_CONNECTED) && See_Hidden(e->player))
-			{
-				if (Hidden(d->player))
-				{
-					if (d->flags & DS_AUTODARK)
-					{
-						*fp++ = 'd';
-					}
-					else
-					{
-						*fp++ = 'D';
-					}
-				}
-			}
-
-			*fp = '\0';
-			*sp = '\0';
-
-			if ((e->flags & DS_CONNECTED) && Wizard_Who(e->player) && (key == CMD_WHO))
-			{
-				s = XASPRINTF("s", "%s@%s", d->username, d->addr);
-				char *trs = trimmed_site(((d->username[0] != '\0') ? s : d->addr));
-				char *trn = trimmed_name(d->player);
-				char *tf1 = time_format_1(mudstate.now - d->connected_at);
-				char *tf2 = time_format_2(mudstate.now - d->last_time);
-				XSPRINTF(buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trn, tf1, tf2, flist, Location(d->player), d->command_count, slist, trs);
-				XFREE(s);
-				XFREE(tf2);
-				XFREE(tf1);
-				XFREE(trn);
-				XFREE(trs);
-			}
-			else if (key == CMD_SESSION)
-			{
-				char *trn = trimmed_name(d->player);
-				char *tf1 = time_format_1(mudstate.now - d->connected_at);
-				char *tf2 = time_format_2(mudstate.now - d->last_time);
-				XSPRINTF(buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trn, tf1, tf2, d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot);
-				XFREE(tf1);
-				XFREE(tf2);
-				XFREE(trn);
-			}
-			else if (Wizard_Who(e->player) || See_Hidden(e->player))
-			{
-				char *trn = trimmed_name(d->player);
-				char *tf1 = time_format_1(mudstate.now - d->connected_at);
-				char *tf2 = time_format_2(mudstate.now - d->last_time);
-				XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
-				XFREE(tf1);
-				XFREE(tf2);
-				XFREE(trn);
-			}
-			else
-			{
-				char *trn = trimmed_name(d->player);
-				char *tf1 = time_format_1(mudstate.now - d->connected_at);
-				char *tf2 = time_format_2(mudstate.now - d->last_time);
-				XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
-				XFREE(tf1);
-				XFREE(tf2);
-				XFREE(trn);
-			}
-
-			queue_string(e, NULL, buf);
 		}
-	}
 	/*
      * sometimes I like the ternary operator....
      */
@@ -1657,13 +1672,15 @@ void dump_info(DESC *call_by)
 	temp = (char *)ctime(&mudstate.start_time);
 	temp[strlen(temp) - 1] = '\0';
 	queue_rawstring(call_by, "Uptime: %s\r\n", temp);
-	DESC_ITER_CONN(d)
-	{
-		if (!Hidden(d->player) || ((call_by->flags & DS_CONNECTED) && See_Hidden(call_by->player)))
+
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			count++;
+			if (!Hidden(d->player) || ((call_by->flags & DS_CONNECTED) && See_Hidden(call_by->player)))
+			{
+				count++;
+			}
 		}
-	}
 	queue_rawstring(call_by, "Connected: %d\r\n", count);
 	queue_rawstring(call_by, "Size: %d\r\n", mudstate.db_top);
 	queue_rawstring(call_by, "Version: %d.%d.%d.%d\r\n", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision);
@@ -1699,7 +1716,7 @@ void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __at
 		return;
 	}
 
-	DESC_ITER_PLAYER(player, d)
+	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		if (d->colormap)
 		{
@@ -1830,7 +1847,7 @@ void do_doing(dbref player, dbref cause __attribute__((unused)), int key, char *
 	else
 	{
 		foundany = 0;
-		DESC_ITER_PLAYER(player, d)
+		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			if (d->doing != NULL)
 			{
@@ -1959,8 +1976,10 @@ int check_connect(DESC *d, char *msg)
 		else
 		{
 			nplayers = 0;
-			DESC_ITER_CONN(d2)
-			nplayers++;
+
+			for (d2 = descriptor_list; d2; d2 = d2->next)
+				if (d2->flags & DS_CONNECTED)
+					nplayers++;
 		}
 
 		player = connect_player(user, password, d->addr, d->username, inet_ntoa((d->address).sin_addr));
@@ -2035,7 +2054,7 @@ int check_connect(DESC *d, char *msg)
 	     * * an @program. If so, drop the new descriptor into
 	     * * it.
 	     */
-			DESC_ITER_PLAYER(player, d2)
+			for (d2 = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d2; d2 = d2->hashnext)
 			{
 				if (d2->program_data != NULL)
 				{
@@ -2122,8 +2141,10 @@ int check_connect(DESC *d, char *msg)
 		else
 		{
 			nplayers = 0;
-			DESC_ITER_CONN(d2)
-			nplayers++;
+
+			for (d2 = descriptor_list; d2; d2 = d2->next)
+				if (d2->flags & DS_CONNECTED)
+					nplayers++;
 		}
 
 		if (nplayers > mudconf.max_players)
@@ -2444,7 +2465,7 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 		/*
 	 * PUEBLOCLIENT affects all the player's connections.
 	 */
-		DESC_ITER_PLAYER(player, d)
+		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			logged_out_internal(d, key, arg);
 		}
@@ -2456,7 +2477,7 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 	 * * most recently used connection.
 	 */
 		dlast = NULL;
-		DESC_ITER_PLAYER(player, d)
+		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			if (dlast == NULL || d->last_time > dlast->last_time)
 			{
@@ -2483,7 +2504,7 @@ void process_commands(void)
 	do
 	{
 		nprocessed = 0;
-		DESC_SAFEITER_ALL(d, dnext)
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		{
 			if (d->quota > 0 && (t = d->input_head))
 			{
@@ -2685,21 +2706,23 @@ void make_ulist(dbref player, char *buff, char **bufc)
 	char *cp;
 	DESC *d;
 	cp = *bufc;
-	DESC_ITER_CONN(d)
-	{
-		if (!See_Hidden(player) && Hidden(d->player))
-		{
-			continue;
-		}
 
-		if (cp != *bufc)
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			SAFE_LB_CHR(' ', buff, bufc);
-		}
+			if (!See_Hidden(player) && Hidden(d->player))
+			{
+				continue;
+			}
 
-		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, d->player, LBUF_SIZE);
-	}
+			if (cp != *bufc)
+			{
+				SAFE_LB_CHR(' ', buff, bufc);
+			}
+
+			SAFE_LB_CHR('#', buff, bufc);
+			SAFE_LTOS(buff, bufc, d->player, LBUF_SIZE);
+		}
 }
 
 /* ---------------------------------------------------------------------------
@@ -2711,15 +2734,17 @@ void make_portlist(dbref player __attribute__((unused)), dbref target, char *buf
 	DESC *d;
 	char *s = XMALLOC(MBUF_SIZE, "s");
 	int i = 0;
-	DESC_ITER_CONN(d)
-	{
-		if ((target == NOTHING) || (d->player == target))
+
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			XSNPRINTF(s, MBUF_SIZE, "%d ", d->descriptor);
-			SAFE_LB_STR(s, buff, bufc);
-			i = 1;
+			if ((target == NOTHING) || (d->player == target))
+			{
+				XSNPRINTF(s, MBUF_SIZE, "%d ", d->descriptor);
+				SAFE_LB_STR(s, buff, bufc);
+				i = 1;
+			}
 		}
-	}
 
 	if (i)
 	{
@@ -2739,26 +2764,28 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 {
 	DESC *d;
 	char *s = XMALLOC(MBUF_SIZE, "s");
-	DESC_ITER_CONN(d)
-	{
-		if ((d->descriptor == port_num) || (d->player == target))
+
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			if (Wizard_Who(player) || Controls(player, d->player))
+			if ((d->descriptor == port_num) || (d->player == target))
 			{
-				XSNPRINTF(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
-				SAFE_LB_STR(s, buff, bufc);
-				XFREE(s);
-				return;
-			}
-			else
-			{
-				notify_quiet(player, NOPERM_MESSAGE);
-				SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
-				XFREE(s);
-				return;
+				if (Wizard_Who(player) || Controls(player, d->player))
+				{
+					XSNPRINTF(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
+					SAFE_LB_STR(s, buff, bufc);
+					XFREE(s);
+					return;
+				}
+				else
+				{
+					notify_quiet(player, NOPERM_MESSAGE);
+					SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+					XFREE(s);
+					return;
+				}
 			}
 		}
-	}
 	/*
      * Not found, return error.
      */
@@ -2776,20 +2803,21 @@ char *get_doing(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		DESC_ITER_PLAYER(target, d)
+		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
 		{
 			return d->doing;
 		}
 	}
 	else
 	{
-		DESC_ITER_CONN(d)
-		{
-			if (d->descriptor == port_num)
+		for (d = descriptor_list; d; d = d->next)
+			if (d->flags & DS_CONNECTED)
 			{
-				return d->doing;
+				if (d->descriptor == port_num)
+				{
+					return d->doing;
+				}
 			}
-		}
 	}
 
 	return NULL;
@@ -2802,13 +2830,15 @@ char *get_doing(dbref target, int port_num)
 dbref get_programmer(dbref target)
 {
 	DESC *d;
-	DESC_ITER_CONN(d)
-	{
-		if ((d->player == target) && (d->program_data != NULL))
+
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			return (d->program_data->wait_cause);
+			if ((d->player == target) && (d->program_data != NULL))
+			{
+				return (d->program_data->wait_cause);
+			}
 		}
-	}
 	return NOTHING;
 }
 
@@ -2823,25 +2853,27 @@ dbref find_connected_name(dbref player, char *name)
 	DESC *d;
 	dbref found;
 	found = NOTHING;
-	DESC_ITER_CONN(d)
-	{
-		if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
-		{
-			continue;
-		}
 
-		if (!string_prefix(Name(d->player), name))
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			continue;
-		}
+			if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
+			{
+				continue;
+			}
 
-		if ((found != NOTHING) && (found != d->player))
-		{
-			return NOTHING;
-		}
+			if (!string_prefix(Name(d->player), name))
+			{
+				continue;
+			}
 
-		found = d->player;
-	}
+			if ((found != NOTHING) && (found != d->player))
+			{
+				return NOTHING;
+			}
+
+			found = d->player;
+		}
 	return found;
 }
 
@@ -2857,24 +2889,26 @@ dbref find_connected_ambiguous(dbref player, char *name)
 	DESC *d;
 	dbref found;
 	found = NOTHING;
-	DESC_ITER_CONN(d)
-	{
-		if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
-		{
-			continue;
-		}
 
-		if (!string_prefix(Name(d->player), name))
+	for (d = descriptor_list; d; d = d->next)
+		if (d->flags & DS_CONNECTED)
 		{
-			continue;
-		}
+			if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
+			{
+				continue;
+			}
 
-		if ((found != NOTHING) && (found != d->player))
-		{
-			return AMBIGUOUS;
-		}
+			if (!string_prefix(Name(d->player), name))
+			{
+				continue;
+			}
 
-		found = d->player;
-	}
+			if ((found != NOTHING) && (found != d->player))
+			{
+				return AMBIGUOUS;
+			}
+
+			found = d->player;
+		}
 	return found;
 }

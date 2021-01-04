@@ -201,9 +201,9 @@ bool dddb_close(void)
  * key to guard against namespace conflicts in different MUSH subsystems.
  * It is the caller's responsibility to free the data returned by db_get */
 
-DBData db_get(DBData gamekey, unsigned int type)
+UDB_DATA db_get(UDB_DATA gamekey, unsigned int type)
 {
-    DBData gamedata;
+    UDB_DATA gamedata;
     datum dat;
     datum key;
     char *s;
@@ -232,7 +232,7 @@ DBData db_get(DBData gamekey, unsigned int type)
 
 /* Pass db_put a key, data and the type of entry you are storing */
 
-int db_put(DBData gamekey, DBData gamedata, unsigned int type)
+int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 {
     datum dat;
     datum key;
@@ -270,7 +270,7 @@ int db_put(DBData gamekey, DBData gamedata, unsigned int type)
 
 /* Pass db_del a key and the type of entry you are deleting */
 
-int db_del(DBData gamekey, unsigned int type)
+int db_del(UDB_DATA gamekey, unsigned int type)
 {
     datum dat;
     datum key;

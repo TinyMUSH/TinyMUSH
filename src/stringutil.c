@@ -968,7 +968,51 @@ int ansi_map_states(const char *s, int **m, char **p)
 	{
 		if (*s1 == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s1, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s1);
+				if (*(s1) == ANSI_CSI)
+				{
+					while ((*(++(s1)) & 0xf0) == 0x30)
+					{
+						if (*(s1) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s1)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s1)&0xf0) == 0x20)
+				{
+					++(s1);
+				}
+				if (*(s1) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s1);
+				}
+				else if (*(s1))
+				{
+					++(s1);
+				}
+			} while (0);
 		}
 		else
 		{
@@ -1108,7 +1152,51 @@ char *translate_string(char *str, int type)
 			case ESC_CHAR:
 				while (*str == ESC_CHAR)
 				{
-					TRACK_ESCCODES(str, ansi_state);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(str);
+						if (*(str) == ANSI_CSI)
+						{
+							while ((*(++(str)) & 0xf0) == 0x30)
+							{
+								if (*(str) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(str)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(str)&0xf0) == 0x20)
+						{
+							++(str);
+						}
+						if (*(str) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+							++(str);
+						}
+						else if (*(str))
+						{
+							++(str);
+						}
+					} while (0);
 				}
 
 				SAFE_LB_STR(ansi_transition_mushcode(ansi_state_prev, ansi_state), buff, &bp);
@@ -1928,7 +2016,67 @@ void edit_string(char *src, char **dst, char *from, char *to)
      * have any embedded ANSI codes.
      */
 	ansi_state = ANST_NONE;
-	TRACK_ALL_ESCCODES(to, p, ansi_state);
+
+	do
+	{
+		p = to;
+		while (*p)
+		{
+			if (*p == ESC_CHAR)
+			{
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++p;
+					if (*p == ANSI_CSI)
+					{
+						while ((*(++p) & 0xf0) == 0x30)
+						{
+							if (*p < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*p & 0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*p & 0xf0) == 0x20)
+					{
+						++p;
+					}
+					if (*p == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+						++p;
+					}
+					else if (*p)
+					{
+						++p;
+					}
+				} while (0);
+			}
+			else
+			{
+				++p;
+			}
+		}
+	} while (0);
+
 	to_ansi_set = (~ANST_NONE) & ansi_state;
 	to_ansi_clr = ANST_NONE & (~ansi_state);
 	tlen = p - to;
@@ -1939,14 +2087,134 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	{
 		/* Prepend 'to' to string */
 		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
-		TRACK_ALL_ESCCODES(src, p, ansi_state);
+
+		do
+		{
+			p = src;
+			while (*p)
+			{
+				if (*p == ESC_CHAR)
+				{
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++p;
+						if (*p == ANSI_CSI)
+						{
+							while ((*(++p) & 0xf0) == 0x30)
+							{
+								if (*p < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*p & 0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*p & 0xf0) == 0x20)
+						{
+							++p;
+						}
+						if (*p == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+							++p;
+						}
+						else if (*p)
+						{
+							++p;
+						}
+					} while (0);
+				}
+				else
+				{
+					++p;
+				}
+			}
+		} while (0);
+
 		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 	}
 	else if (!strcmp(from, "$"))
 	{
 		/* Append 'to' to string */
 		ansi_state = ANST_NONE;
-		TRACK_ALL_ESCCODES(src, p, ansi_state);
+
+		do
+		{
+			p = src;
+			while (*p)
+			{
+				if (*p == ESC_CHAR)
+				{
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++p;
+						if (*p == ANSI_CSI)
+						{
+							while ((*(++p) & 0xf0) == 0x30)
+							{
+								if (*p < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*p & 0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*p & 0xf0) == 0x20)
+						{
+							++p;
+						}
+						if (*p == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+							++p;
+						}
+						else if (*p)
+						{
+							++p;
+						}
+					} while (0);
+				}
+				else
+				{
+					++p;
+				}
+			}
+		} while (0);
+
 		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 		ansi_state |= to_ansi_set;
 		ansi_state &= ~to_ansi_clr;
@@ -1975,7 +2243,51 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*src == ESC_CHAR)
 				{
-					TRACK_ESCCODES(src, ansi_state);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(src);
+						if (*(src) == ANSI_CSI)
+						{
+							while ((*(++(src)) & 0xf0) == 0x30)
+							{
+								if (*(src) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(src)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(src)&0xf0) == 0x20)
+						{
+							++(src);
+						}
+						if (*(src) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+							++(src);
+						}
+						else if (*(src))
+						{
+							++(src);
+						}
+					} while (0);
 				}
 				else
 				{
@@ -2014,7 +2326,51 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					if (*from == ESC_CHAR)
 					{
 						p = src;
-						TRACK_ESCCODES(src, ansi_state);
+						do
+						{
+							int ansi_mask = 0;
+							int ansi_diff = 0;
+							unsigned int param_val = 0;
+							++(src);
+							if (*(src) == ANSI_CSI)
+							{
+								while ((*(++(src)) & 0xf0) == 0x30)
+								{
+									if (*(src) < 0x3a)
+									{
+										param_val <<= 1;
+										param_val += (param_val << 2) + (*(src)&0x0f);
+									}
+									else
+									{
+										if (param_val < I_ANSI_LIM)
+										{
+											ansi_mask |= ansiBitsMask(param_val);
+											ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+										}
+										param_val = 0;
+									}
+								}
+							}
+							while ((*(src)&0xf0) == 0x20)
+							{
+								++(src);
+							}
+							if (*(src) == ANSI_END)
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+								++(src);
+							}
+							else if (*(src))
+							{
+								++(src);
+							}
+						} while (0);
 						SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else

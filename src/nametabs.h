@@ -17,7 +17,6 @@
  * @brief Name Tables
  * 
  */
-
 extern NAMETAB addcmd_sw[];
 extern NAMETAB attrib_sw[];
 extern NAMETAB boot_sw[];

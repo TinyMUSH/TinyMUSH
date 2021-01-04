@@ -1431,8 +1431,10 @@ void handle_prog(DESC *d, char *message)
 	/*
      * Set info for all player descriptors to NULL
      */
-	DESC_ITER_PLAYER(d->player, all)
-	all->program_data = NULL;
+	for (all = (DESC *)nhashfind((int)d->player, &mudstate.desc_htab); all; all = all->hashnext)
+	{
+		all->program_data = NULL;
+	}
 	atr_clr(d->player, A_PROGCMD);
 	XFREE(cmd);
 }
@@ -1480,7 +1482,7 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 		return;
 	}
 
-	DESC_ITER_PLAYER(doer, d)
+	for (d = (DESC *)nhashfind((int)doer, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		if (d->program_data != NULL)
 		{
@@ -1540,8 +1542,10 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	/*
      * Set info for all player descriptors to NULL
      */
-	DESC_ITER_PLAYER(doer, d)
-	d->program_data = NULL;
+	for (d = (DESC *)nhashfind((int)doer, &mudstate.desc_htab); d; d = d->hashnext)
+	{
+		d->program_data = NULL;
+	}
 	atr_clr(doer, A_PROGCMD);
 	notify(player, "@program cleared.");
 	notify(doer, "Your @program has been terminated.");
@@ -1614,7 +1618,7 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			/*
 	     * Check if cause already has an @prog input pending
 	     */
-			DESC_ITER_PLAYER(doer, d)
+			for (d = (DESC *)nhashfind((int)doer, &mudstate.desc_htab); d; d = d->hashnext)
 			{
 				if (d->program_data != NULL)
 				{
@@ -1732,7 +1736,7 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	/*
      * Now, start waiting.
      */
-	DESC_ITER_PLAYER(doer, d)
+	for (d = (DESC *)nhashfind((int)doer, &mudstate.desc_htab); d; d = d->hashnext)
 	{
 		d->program_data = program;
 		/*

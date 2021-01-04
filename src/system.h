@@ -1,3 +1,14 @@
+/**
+ * @file system.h
+ * @author TinyMUSH (https://github.com/TinyMUSH)
+ * @brief Global headers and system compatibility
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
+
 /* system.h */
 
 #ifndef __SYSTEM_H

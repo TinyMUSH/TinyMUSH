@@ -72,14 +72,14 @@ CONF mod_comsys_conftable[] = {
 
 HASHTAB mod_comsys_comsys_htab;
 HASHTAB mod_comsys_calias_htab;
-NHSHTAB mod_comsys_comlist_htab;
+HASHTAB mod_comsys_comlist_htab;
 
 MODHASHES mod_comsys_hashtable[] = {
     {"Channels", &mod_comsys_comsys_htab, 15, 8},
     {"Channel aliases", &mod_comsys_calias_htab, 500, 16},
     {NULL, NULL, 0, 0}};
 
-MODNHASHES mod_comsys_nhashtable[] = {
+MODHASHES mod_comsys_nhashtable[] = {
     {"Channel lists", &mod_comsys_comlist_htab, 100, 16},
     {NULL, NULL, 0, 0}};
 
@@ -2213,8 +2213,8 @@ static void sanitize_comsys(void)
      * accordingly.
      */
     int i, count;
-    NHSHTAB *htab;
-    NHSHENT *hptr;
+    HASHTAB *htab;
+    HASHENT *hptr;
     int *ptab;
     count = 0;
     htab = &mod_comsys_comlist_htab;

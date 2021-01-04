@@ -2,10 +2,10 @@
  * @file mail.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Module for penn-based mailer system
- * @version 3.1
+ * @version 3.3
  * @date 2020-12-28
  * 
- * @copyright Copyright (c) 2020
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  * 
  * @note This code was taken from Kalkin's DarkZone code, which was originally
  * taken from PennMUSH 1.50 p10, and has been heavily modified since being
@@ -73,9 +73,9 @@
 
 MODVER mod_mail_version;
 
-NHSHTAB mod_mail_msg_htab;
+HASHTAB mod_mail_msg_htab;
 
-MODNHASHES mod_mail_nhashtable[] = {
+MODHASHES mod_mail_nhashtable[] = {
     {"Mail messages", &mod_mail_msg_htab, 50, 8},
     {NULL, NULL, 0, 0}};
 

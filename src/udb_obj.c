@@ -34,17 +34,17 @@
 
 /* Sizes, on disk, of Object and (within the object) Attribute headers */
 
-#define OBJ_HEADER_SIZE (sizeof(Objname) + sizeof(int))
+#define OBJ_HEADER_SIZE (sizeof(unsigned int) + sizeof(int))
 #define ATTR_HEADER_SIZE (sizeof(int) * 2)
 
 /* Take a chunk of data which contains an object, and parse it into an
  * object structure. */
 
-Obj *unroll_obj(char *data)
+UDB_OBJECT *unroll_obj(char *data)
 {
     int i, j;
-    Obj *o;
-    Attrib *a;
+    UDB_OBJECT *o;
+    UDB_ATTRIB *a;
     char *dptr;
     dptr = data;
 
@@ -52,7 +52,7 @@ Obj *unroll_obj(char *data)
      * Get a new Obj struct
      */
 
-    if ((o = (Obj *)XMALLOC(sizeof(Obj), "o")) == NULL)
+    if ((o = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "o")) == NULL)
     {
         return (NULL);
     }
@@ -61,13 +61,13 @@ Obj *unroll_obj(char *data)
      * Read in the header
      */
 
-    if (XMEMCPY((void *)&(o->name), (void *)dptr, sizeof(Objname)) == NULL)
+    if (XMEMCPY((void *)&(o->name), (void *)dptr, sizeof(unsigned int)) == NULL)
     {
         XFREE(o);
         return (NULL);
     }
 
-    dptr += sizeof(Objname);
+    dptr += sizeof(unsigned int);
 
     if (XMEMCPY((void *)&i, (void *)dptr, sizeof(int)) == NULL)
     {
@@ -80,7 +80,7 @@ Obj *unroll_obj(char *data)
     /*
      * Now get an array of Attrs
      */
-    a = o->atrs = (Attrib *)XMALLOC(i * sizeof(Attrib), "o->atrs");
+    a = o->atrs = (UDB_ATTRIB *)XMALLOC(i * sizeof(UDB_ATTRIB), "o->atrs");
 
     if (!o->atrs)
     {
@@ -167,10 +167,10 @@ bail:
 
 /* Rollup an object structure into a single buffer for a write to disk. */
 
-char *rollup_obj(Obj *o)
+char *rollup_obj(UDB_OBJECT *o)
 {
     int i;
-    Attrib *a;
+    UDB_ATTRIB *a;
     char *dptr, *data;
     dptr = data = (char *)XMALLOC(obj_siz(o), "data");
     /*
@@ -182,12 +182,12 @@ char *rollup_obj(Obj *o)
      * Write out the object header
      */
 
-    if (XMEMCPY((void *)dptr, (void *)&(o->name), sizeof(Objname)) == NULL)
+    if (XMEMCPY((void *)dptr, (void *)&(o->name), sizeof(unsigned int)) == NULL)
     {
         return NULL;
     }
 
-    dptr += sizeof(Objname);
+    dptr += sizeof(unsigned int);
 
     if (XMEMCPY((void *)dptr, (void *)&(o->at_count), sizeof(int)) == NULL)
     {
@@ -243,7 +243,7 @@ char *rollup_obj(Obj *o)
 
 /* Return the size, on disk, the thing is going to take up.*/
 
-int obj_siz(Obj *o)
+int obj_siz(UDB_OBJECT *o)
 {
     int i;
     int siz;
@@ -259,10 +259,10 @@ int obj_siz(Obj *o)
 
 /* And something to free all the goo on an Obj, as well as the Obj.*/
 
-void objfree(Obj *o)
+void objfree(UDB_OBJECT *o)
 {
     int i;
-    Attrib *a;
+    UDB_ATTRIB *a;
 
     if (!o->atrs)
     {
@@ -283,10 +283,10 @@ void objfree(Obj *o)
 
 /* Routines to manipulate attributes within the object structure */
 
-char *obj_get_attrib(int anam, Obj *obj)
+char *obj_get_attrib(int anam, UDB_OBJECT *obj)
 {
     int lo, mid, hi;
-    Attrib *a;
+    UDB_ATTRIB *a;
     /*
      * Binary search for the attribute
      */
@@ -316,10 +316,10 @@ char *obj_get_attrib(int anam, Obj *obj)
     return (NULL);
 }
 
-void obj_set_attrib(int anam, Obj *obj, char *value)
+void obj_set_attrib(int anam, UDB_OBJECT *obj, char *value)
 {
     int hi, lo, mid;
-    Attrib *a;
+    UDB_ATTRIB *a;
 
     /*
      * Demands made elsewhere insist that we cope with the case of an
@@ -328,7 +328,7 @@ void obj_set_attrib(int anam, Obj *obj, char *value)
 
     if (obj->atrs == NULL)
     {
-        a = (Attrib *)XMALLOC(sizeof(Attrib), "a");
+        a = (UDB_ATTRIB *)XMALLOC(sizeof(UDB_ATTRIB), "a");
         obj->atrs = a;
         obj->at_count = 1;
         a[0].attrnum = anam;
@@ -369,14 +369,14 @@ void obj_set_attrib(int anam, Obj *obj, char *value)
      * If we got here, we didn't find it, so lo = hi + 1, and the
      * * attribute should be inserted between them.
      */
-    a = (Attrib *)XREALLOC(obj->atrs, (obj->at_count + 1) * sizeof(Attrib), "a");
+    a = (UDB_ATTRIB *)XREALLOC(obj->atrs, (obj->at_count + 1) * sizeof(UDB_ATTRIB), "a");
 
     /*
      * Move the stuff upwards one slot.
      */
 
     if (lo < obj->at_count)
-        XMEMMOVE((void *)(a + lo + 1), (void *)(a + lo), (obj->at_count - lo) * sizeof(Attrib));
+        XMEMMOVE((void *)(a + lo + 1), (void *)(a + lo), (obj->at_count - lo) * sizeof(UDB_ATTRIB));
 
     a[lo].data = value;
     a[lo].attrnum = anam;
@@ -385,10 +385,10 @@ void obj_set_attrib(int anam, Obj *obj, char *value)
     obj->atrs = a;
 }
 
-void obj_del_attrib(int anam, Obj *obj)
+void obj_del_attrib(int anam, UDB_OBJECT *obj)
 {
     int hi, lo, mid;
-    Attrib *a;
+    UDB_ATTRIB *a;
 
     if (!obj->at_count || !obj->atrs)
     {
@@ -417,7 +417,7 @@ void obj_del_attrib(int anam, Obj *obj)
             obj->at_count--;
 
             if (mid != obj->at_count)
-                XMEMCPY((void *)(a + mid), (void *)(a + mid + 1), (obj->at_count - mid) * sizeof(Attrib));
+                XMEMCPY((void *)(a + mid), (void *)(a + mid + 1), (obj->at_count - mid) * sizeof(UDB_ATTRIB));
 
             if (obj->at_count == 0)
             {
@@ -445,9 +445,9 @@ void obj_del_attrib(int anam, Obj *obj)
 
 /* get_free_objpipe: return an object pipeline */
 
-Obj *get_free_objpipe(unsigned int obj)
+UDB_OBJECT *get_free_objpipe(unsigned int obj)
 {
-    DBData key, data;
+    UDB_DATA key, data;
     int i, j = 0;
 
     /*
@@ -489,7 +489,7 @@ Obj *get_free_objpipe(unsigned int obj)
                 /*
 		 * New object
 		 */
-                if ((mudstate.objpipes[i] = (Obj *)XMALLOC(sizeof(Obj), "mudstate.objpipes[i]")) == NULL)
+                if ((mudstate.objpipes[i] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mudstate.objpipes[i]")) == NULL)
                 {
                     return (NULL);
                 }
@@ -552,7 +552,7 @@ Obj *get_free_objpipe(unsigned int obj)
         /*
 	 * New object
 	 */
-        if ((mudstate.objpipes[j] = (Obj *)XMALLOC(sizeof(Obj), "mudstate.objpipes[j]")) == NULL)
+        if ((mudstate.objpipes[j] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mudstate.objpipes[j]")) == NULL)
         {
             return (NULL);
         }
@@ -570,7 +570,7 @@ Obj *get_free_objpipe(unsigned int obj)
 
 char *pipe_get_attrib(int anum, unsigned int obj)
 {
-    Obj *object;
+    UDB_OBJECT *object;
     char *value, *tmp;
     object = get_free_objpipe(obj);
     value = obj_get_attrib(anum, object);
@@ -588,7 +588,7 @@ char *pipe_get_attrib(int anum, unsigned int obj)
 
 void pipe_set_attrib(int anum, unsigned int obj, char *value)
 {
-    Obj *object;
+    UDB_OBJECT *object;
     char *newvalue;
     /*
      * Write the damn thing
@@ -602,7 +602,7 @@ void pipe_set_attrib(int anum, unsigned int obj, char *value)
 
 void pipe_del_attrib(int anum, unsigned int obj)
 {
-    Obj *object;
+    UDB_OBJECT *object;
     /*
      * Write the damn thing
      */
@@ -614,7 +614,7 @@ void pipe_del_attrib(int anum, unsigned int obj)
 
 void attrib_sync(void)
 {
-    DBData key, data;
+    UDB_DATA key, data;
     int i;
 
     /*

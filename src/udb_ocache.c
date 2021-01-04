@@ -22,10 +22,10 @@
 #define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
 
 #define INSHEAD(q, e)          \
-    if (q->head == (Cache *)0) \
+    if (q->head == (UDB_CACHE *)0) \
     {                          \
         q->tail = e;           \
-        e->nxt = (Cache *)0;   \
+        e->nxt = (UDB_CACHE *)0;   \
     }                          \
     else                       \
     {                          \
@@ -34,7 +34,7 @@
     q->head = e;
 
 #define INSTAIL(q, e)          \
-    if (q->head == (Cache *)0) \
+    if (q->head == (UDB_CACHE *)0) \
     {                          \
         q->head = e;           \
     }                          \
@@ -43,22 +43,22 @@
         q->tail->nxt = e;      \
     }                          \
     q->tail = e;               \
-    e->nxt = (Cache *)0;
+    e->nxt = (UDB_CACHE *)0;
 
 #define F_DEQUEUE(q, e)                       \
-    if (e->nxtfree == (Cache *)0)             \
+    if (e->nxtfree == (UDB_CACHE *)0)             \
     {                                         \
-        if (e->prvfree != (Cache *)0)         \
+        if (e->prvfree != (UDB_CACHE *)0)         \
         {                                     \
-            e->prvfree->nxtfree = (Cache *)0; \
+            e->prvfree->nxtfree = (UDB_CACHE *)0; \
         }                                     \
         q->tail = e->prvfree;                 \
     }                                         \
-    if (e->prvfree == (Cache *)0)             \
+    if (e->prvfree == (UDB_CACHE *)0)             \
     {                                         \
         q->head = e->nxtfree;                 \
         if (e->nxtfree)                       \
-            e->nxtfree->prvfree = (Cache *)0; \
+            e->nxtfree->prvfree = (UDB_CACHE *)0; \
     }                                         \
     else                                      \
     {                                         \
@@ -68,21 +68,21 @@
     }
 
 #define F_INSHEAD(q, e)          \
-    if (q->head == (Cache *)0)   \
+    if (q->head == (UDB_CACHE *)0)   \
     {                            \
         q->tail = e;             \
-        e->nxtfree = (Cache *)0; \
+        e->nxtfree = (UDB_CACHE *)0; \
     }                            \
     else                         \
     {                            \
         e->nxtfree = q->head;    \
         e->nxtfree->prvfree = e; \
     }                            \
-    e->prvfree = (Cache *)0;     \
+    e->prvfree = (UDB_CACHE *)0;     \
     q->head = e;
 
 #define F_INSTAIL(q, e)        \
-    if (q->head == (Cache *)0) \
+    if (q->head == (UDB_CACHE *)0) \
     {                          \
         q->head = e;           \
     }                          \
@@ -92,9 +92,9 @@
     }                          \
     e->prvfree = q->tail;      \
     q->tail = e;               \
-    e->nxtfree = (Cache *)0;
+    e->nxtfree = (UDB_CACHE *)0;
 
-Cache *get_free_entry(int);
+UDB_CACHE *get_free_entry(int);
 
 /* initial settings for cache sizes */
 
@@ -102,11 +102,11 @@ int cwidth = CACHE_WIDTH;
 
 /* sys_c points to all cache lists */
 
-Chain *sys_c;
+UDB_CHAIN *sys_c;
 
 /* freelist points to an alternate linked list kept in LRU order */
 
-Chain *freelist;
+UDB_CHAIN *freelist;
 int cache_initted = 0;
 int cache_frozen = 0;
 
@@ -144,7 +144,7 @@ int cachehash(void *keydata, int keylen, unsigned int type)
     return ((hash + type) % cwidth);
 }
 
-void cache_repl(Cache *cp, void *new, int len, unsigned int type, unsigned int flags)
+void cache_repl(UDB_CACHE *cp, void *new, int len, unsigned int type, unsigned int flags)
 {
     cs_size -= cp->datalen;
 
@@ -163,9 +163,9 @@ void cache_repl(Cache *cp, void *new, int len, unsigned int type, unsigned int f
 int cache_init(int width)
 {
     int x;
-    Chain *sp;
+    UDB_CHAIN *sp;
 
-    if (cache_initted || sys_c != (Chain *)0)
+    if (cache_initted || sys_c != (UDB_CHAIN *)0)
     {
         return (0);
     }
@@ -180,15 +180,15 @@ int cache_init(int width)
         cwidth = width;
     }
 
-    sp = sys_c = (Chain *)XMALLOC((unsigned)cwidth * sizeof(Chain), "sys_c");
+    sp = sys_c = (UDB_CHAIN *)XMALLOC((unsigned)cwidth * sizeof(UDB_CHAIN), "sys_c");
 
-    if (sys_c == (Chain *)0)
+    if (sys_c == (UDB_CHAIN *)0)
     {
         warning("cache_init: cannot allocate cache: ", (char *)-1, "\n", (char *)0);
         return (-1);
     }
 
-    freelist = (Chain *)XMALLOC(sizeof(Chain), "freelist");
+    freelist = (UDB_CHAIN *)XMALLOC(sizeof(UDB_CHAIN), "freelist");
 
     /*
      * Allocate the initial cache entries
@@ -196,15 +196,15 @@ int cache_init(int width)
 
     for (x = 0; x < cwidth; x++, sp++)
     {
-        sp->head = (Cache *)0;
-        sp->tail = (Cache *)0;
+        sp->head = (UDB_CACHE *)0;
+        sp->tail = (UDB_CACHE *)0;
     }
 
     /*
      * Init the LRU freelist
      */
-    freelist->head = (Cache *)0;
-    freelist->tail = (Cache *)0;
+    freelist->head = (UDB_CACHE *)0;
+    freelist->tail = (UDB_CACHE *)0;
 
     /*
      * Initialize the object pipelines
@@ -230,9 +230,9 @@ int cache_init(int width)
 void cache_reset(void)
 {
     int x;
-    Cache *cp, *nxt;
-    Chain *sp;
-    DBData key, data;
+    UDB_CACHE *cp, *nxt;
+    UDB_CHAIN *sp;
+    UDB_DATA key, data;
     /*
      * Clear the cache after startup and reset stats
      */
@@ -256,7 +256,7 @@ void cache_reset(void)
                     switch (cp->type)
                     {
                     case DBTYPE_ATTRIBUTE:
-                        pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                        pipe_del_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object);
                         break;
 
                     default:
@@ -272,7 +272,7 @@ void cache_reset(void)
                     switch (cp->type)
                     {
                     case DBTYPE_ATTRIBUTE:
-                        pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                        pipe_set_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object, (char *)cp->data);
                         break;
 
                     default:
@@ -292,12 +292,12 @@ void cache_reset(void)
             XFREE(cp);
         }
 
-        sp->head = (Cache *)0;
-        sp->tail = (Cache *)0;
+        sp->head = (UDB_CACHE *)0;
+        sp->tail = (UDB_CACHE *)0;
     }
 
-    freelist->head = (Cache *)0;
-    freelist->tail = (Cache *)0;
+    freelist->head = (UDB_CACHE *)0;
+    freelist->tail = (UDB_CACHE *)0;
     db_unlock();
     /*
      * Clear the counters after startup, or they'll be skewed
@@ -320,8 +320,8 @@ void cache_reset(void)
 
 void list_cached_objs(dbref player)
 {
-    Chain *sp;
-    Cache *cp;
+    UDB_CHAIN *sp;
+    UDB_CACHE *cp;
     int x;
     int aco, maco, asize, msize, oco, moco;
     int *count_array, *size_array;
@@ -338,8 +338,8 @@ void list_cached_objs(dbref player)
             {
                 aco++;
                 asize += cp->datalen;
-                count_array[((Aname *)cp->keydata)->object] += 1;
-                size_array[((Aname *)cp->keydata)->object] += cp->datalen;
+                count_array[((UDB_ANAME *)cp->keydata)->object] += 1;
+                size_array[((UDB_ANAME *)cp->keydata)->object] += cp->datalen;
             }
         }
     }
@@ -373,8 +373,8 @@ void list_cached_objs(dbref player)
             {
                 maco++;
                 msize += cp->datalen;
-                count_array[((Aname *)cp->keydata)->object] += 1;
-                size_array[((Aname *)cp->keydata)->object] += cp->datalen;
+                count_array[((UDB_ANAME *)cp->keydata)->object] += 1;
+                size_array[((UDB_ANAME *)cp->keydata)->object] += cp->datalen;
             }
         }
     }
@@ -398,8 +398,8 @@ void list_cached_objs(dbref player)
 
 void list_cached_attrs(dbref player)
 {
-    Chain *sp;
-    Cache *cp;
+    UDB_CHAIN *sp;
+    UDB_CACHE *cp;
     int x;
     int aco, maco, asize, msize;
     ATTR *atr;
@@ -416,8 +416,8 @@ void list_cached_attrs(dbref player)
             {
                 aco++;
                 asize += cp->datalen;
-                atr = atr_num(((Aname *)cp->keydata)->attrnum);
-                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *)cp->keydata)->object, cp->datalen);
+                atr = atr_num(((UDB_ANAME *)cp->keydata)->attrnum);
+                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
             }
         }
     }
@@ -434,8 +434,8 @@ void list_cached_attrs(dbref player)
             {
                 maco++;
                 msize += cp->datalen;
-                atr = atr_num(((Aname *)cp->keydata)->attrnum);
-                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((Aname *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((Aname *)cp->keydata)->object, cp->datalen);
+                atr = atr_num(((UDB_ANAME *)cp->keydata)->attrnum);
+                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
             }
         }
     }
@@ -448,12 +448,12 @@ void list_cached_attrs(dbref player)
  * and length into pointers provided by the caller, if not, fetch from DB.
  * You do not need to free data returned by this call. */
 
-DBData cache_get(DBData key, unsigned int type)
+UDB_DATA cache_get(UDB_DATA key, unsigned int type)
 {
-    Cache *cp;
-    Chain *sp;
+    UDB_CACHE *cp;
+    UDB_CHAIN *sp;
     int hv = 0;
-    DBData data;
+    UDB_DATA data;
 #ifdef MEMORY_BASED
     char *cdata;
 #endif
@@ -522,7 +522,7 @@ skipcacheget:
     {
     case DBTYPE_ATTRIBUTE:
 #ifdef MEMORY_BASED
-        cdata = obj_get_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
+        cdata = obj_get_attrib(((UDB_ANAME *)key.dptr)->attrnum, &(db[((UDB_ANAME *)key.dptr)->object].attrtext));
 
         if (cdata)
         {
@@ -531,7 +531,7 @@ skipcacheget:
             return data;
         }
 #endif
-        data.dptr = (void *)pipe_get_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
+        data.dptr = (void *)pipe_get_attrib(((UDB_ANAME *)key.dptr)->attrnum, ((UDB_ANAME *)key.dptr)->object);
 
         if (data.dptr == NULL)
         {
@@ -554,7 +554,7 @@ skipcacheget:
             data.dsize = strlen(data.dptr) + 1;
             cdata = XMALLOC(data.dsize, "cdata");
             XMEMCPY((void *)cdata, (void *)data.dptr, data.dsize);
-            obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
+            obj_set_attrib(((UDB_ANAME *)key.dptr)->attrnum, &(db[((UDB_ANAME *)key.dptr)->object].attrtext), cdata);
             data.dptr = cdata;
             return data;
         }
@@ -651,10 +651,10 @@ skipcacheget:
  *
  */
 
-int cache_put(DBData key, DBData data, unsigned int type)
+int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
 {
-    Cache *cp;
-    Chain *sp;
+    UDB_CACHE *cp;
+    UDB_CHAIN *sp;
     int hv = 0;
 #ifdef MEMORY_BASED
     char *cdata;
@@ -690,9 +690,9 @@ int cache_put(DBData key, DBData data, unsigned int type)
             switch (type)
             {
             case DBTYPE_ATTRIBUTE:
-                pipe_del_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
+                pipe_del_attrib(((UDB_ANAME *)key.dptr)->attrnum, ((UDB_ANAME *)key.dptr)->object);
 #ifdef MEMORY_BASED
-                obj_del_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
+                obj_del_attrib(((UDB_ANAME *)key.dptr)->attrnum, &(db[((UDB_ANAME *)key.dptr)->object].attrtext));
 #endif
                 break;
 
@@ -707,11 +707,11 @@ int cache_put(DBData key, DBData data, unsigned int type)
             switch (type)
             {
             case DBTYPE_ATTRIBUTE:
-                pipe_set_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object, (char *)data.dptr);
+                pipe_set_attrib(((UDB_ANAME *)key.dptr)->attrnum, ((UDB_ANAME *)key.dptr)->object, (char *)data.dptr);
 #ifdef MEMORY_BASED
                 cdata = XMALLOC(data.dsize, "cdata");
                 XMEMCPY((void *)cdata, (void *)data.dptr, data.dsize);
-                obj_set_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext), cdata);
+                obj_set_attrib(((UDB_ANAME *)key.dptr)->attrnum, &(db[((UDB_ANAME *)key.dptr)->object].attrtext), cdata);
 #endif
                 /*
 		 * Don't forget to free data.dptr when standalone
@@ -789,11 +789,11 @@ int cache_put(DBData key, DBData data, unsigned int type)
     return (0);
 }
 
-Cache *get_free_entry(int atrsize)
+UDB_CACHE *get_free_entry(int atrsize)
 {
-    DBData key, data;
-    Chain *sp;
-    Cache *cp, *p, *prv;
+    UDB_DATA key, data;
+    UDB_CHAIN *sp;
+    UDB_CACHE *cp, *p, *prv;
     int hv;
 
     /*
@@ -823,7 +823,7 @@ Cache *get_free_entry(int atrsize)
                 switch (cp->type)
                 {
                 case DBTYPE_ATTRIBUTE:
-                    pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                    pipe_del_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object);
                     break;
 
                 default:
@@ -841,7 +841,7 @@ Cache *get_free_entry(int atrsize)
                 switch (cp->type)
                 {
                 case DBTYPE_ATTRIBUTE:
-                    pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                    pipe_set_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object, (char *)cp->data);
                     break;
 
                 default:
@@ -885,15 +885,15 @@ Cache *get_free_entry(int atrsize)
             /*
 	     * Remove the cache entry
 	     */
-            if (cp->nxt == (Cache *)0)
+            if (cp->nxt == (UDB_CACHE *)0)
             {
-                if (prv != (Cache *)0)
+                if (prv != (UDB_CACHE *)0)
                 {
-                    prv->nxt = (Cache *)0;
+                    prv->nxt = (UDB_CACHE *)0;
                 }
                 sp->tail = prv;
             }
-            if (prv == (Cache *)0)
+            if (prv == (UDB_CACHE *)0)
             {
                 sp->head = cp->nxt;
             }
@@ -914,7 +914,7 @@ Cache *get_free_entry(int atrsize)
      * No valid cache entries to flush, allocate a new one
      */
 
-    if ((cp = (Cache *)XMALLOC(sizeof(Cache), "cp")) == NULL)
+    if ((cp = (UDB_CACHE *)XMALLOC(sizeof(UDB_CACHE), "cp")) == NULL)
     {
         fatal("cache get_free_entry: XMALLOC failed", (char *)-1, (char *)0);
     }
@@ -928,9 +928,9 @@ Cache *get_free_entry(int atrsize)
     return (cp);
 }
 
-int cache_write(Cache *cp)
+int cache_write(UDB_CACHE *cp)
 {
-    DBData key, data;
+    UDB_DATA key, data;
 
     /*
      * Write a single cache chain to disk
@@ -949,7 +949,7 @@ int cache_write(Cache *cp)
             switch (cp->type)
             {
             case DBTYPE_ATTRIBUTE:
-                pipe_del_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object);
+                pipe_del_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object);
                 break;
 
             default:
@@ -965,7 +965,7 @@ int cache_write(Cache *cp)
             switch (cp->type)
             {
             case DBTYPE_ATTRIBUTE:
-                pipe_set_attrib(((Aname *)cp->keydata)->attrnum, ((Aname *)cp->keydata)->object, (char *)cp->data);
+                pipe_set_attrib(((UDB_ANAME *)cp->keydata)->attrnum, ((UDB_ANAME *)cp->keydata)->object, (char *)cp->data);
                 break;
 
             default:
@@ -989,7 +989,7 @@ int cache_write(Cache *cp)
 int cache_sync(void)
 {
     int x;
-    Chain *sp;
+    UDB_CHAIN *sp;
     cs_syncs++;
 
     if (!cache_initted)
@@ -1041,10 +1041,10 @@ int cache_sync(void)
     return (0);
 }
 
-void cache_del(DBData key, unsigned int type)
+void cache_del(UDB_DATA key, unsigned int type)
 {
-    Cache *cp;
-    Chain *sp;
+    UDB_CACHE *cp;
+    UDB_CHAIN *sp;
     int hv = 0;
 
     if (!key.dptr || !cache_initted)
@@ -1067,8 +1067,8 @@ void cache_del(DBData key, unsigned int type)
 #ifdef MEMORY_BASED
     if (type == DBTYPE_ATTRIBUTE)
     {
-        pipe_del_attrib(((Aname *)key.dptr)->attrnum, ((Aname *)key.dptr)->object);
-        obj_del_attrib(((Aname *)key.dptr)->attrnum, &(db[((Aname *)key.dptr)->object].attrtext));
+        pipe_del_attrib(((UDB_ANAME *)key.dptr)->attrnum, ((UDB_ANAME *)key.dptr)->object);
+        obj_del_attrib(((UDB_ANAME *)key.dptr)->attrnum, &(db[((UDB_ANAME *)key.dptr)->object].attrtext));
         return;
     }
 #endif

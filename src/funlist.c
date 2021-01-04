@@ -305,7 +305,51 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	     */
 			while (*s == ESC_CHAR)
 			{
-				TRACK_ESCCODES(s, ansi_state);
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++(s);
+					if (*(s) == ANSI_CSI)
+					{
+						while ((*(++(s)) & 0xf0) == 0x30)
+						{
+							if (*(s) < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*(s)&0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*(s)&0xf0) == 0x20)
+					{
+						++(s);
+					}
+					if (*(s) == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+						++(s);
+					}
+					else if (*(s))
+					{
+						++(s);
+					}
+				} while (0);
 			}
 
 			while (*s && (*s != isep.str[0]))
@@ -314,7 +358,51 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 				while (*s == ESC_CHAR)
 				{
-					TRACK_ESCCODES(s, ansi_state);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(s);
+						if (*(s) == ANSI_CSI)
+						{
+							while ((*(++(s)) & 0xf0) == 0x30)
+							{
+								if (*(s) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(s)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(s)&0xf0) == 0x20)
+						{
+							++(s);
+						}
+						if (*(s) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+							++(s);
+						}
+						else if (*(s))
+						{
+							++(s);
+						}
+					} while (0);
 				}
 			}
 
@@ -2406,7 +2494,51 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 				{
 					if (*s == ESC_CHAR)
 					{
-						TRACK_ESCCODES(s, ansi_state);
+						do
+						{
+							int ansi_mask = 0;
+							int ansi_diff = 0;
+							unsigned int param_val = 0;
+							++(s);
+							if (*(s) == ANSI_CSI)
+							{
+								while ((*(++(s)) & 0xf0) == 0x30)
+								{
+									if (*(s) < 0x3a)
+									{
+										param_val <<= 1;
+										param_val += (param_val << 2) + (*(s)&0x0f);
+									}
+									else
+									{
+										if (param_val < I_ANSI_LIM)
+										{
+											ansi_mask |= ansiBitsMask(param_val);
+											ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+										}
+										param_val = 0;
+									}
+								}
+							}
+							while ((*(s)&0xf0) == 0x20)
+							{
+								++(s);
+							}
+							if (*(s) == ANSI_END)
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+								++(s);
+							}
+							else if (*(s))
+							{
+								++(s);
+							}
+						} while (0);
 					}
 					else
 					{

@@ -229,7 +229,8 @@ void fcache_dump(DESC *d, int num)
 void fcache_send(dbref player, int num)
 {
     DESC *d;
-    DESC_ITER_PLAYER(player, d)
+
+    for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
     {
         fcache_dump(d, num);
     }

@@ -5,7 +5,7 @@
  * @version 3.3
  * @date 2020-12-21
  * 
- * @copyright Copyright (c) 2020
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  * 
  */
 
@@ -17,10 +17,9 @@
 #define STRING_EMPTY ""
 
 /**
- * @brief ANSI control codes for various neat-o terminal effects.
+ * ANSI control codes for various neat-o terminal effects.
  * 
  */
-
 #define BEEP_CHAR '\07'
 #define ESC_CHAR '\033'
 
@@ -43,10 +42,9 @@
 #define ANSI_INV_BLINK_HILITE "\033[1;5;7m"
 
 /**
- * @brief Foreground colors
+ * Foreground colors
  * 
  */
-
 #define ANSI_BLACK "\033[30m"
 #define ANSI_RED "\033[31m"
 #define ANSI_GREEN "\033[32m"
@@ -56,13 +54,10 @@
 #define ANSI_CYAN "\033[36m"
 #define ANSI_WHITE "\033[37m"
 
-#define ANSI_XTERM_FG "\033[38;5;"
-
 /**
- * @brief Background colors
+ * Background colors
  * 
  */
-
 #define ANSI_BBLACK "\033[40m"
 #define ANSI_BRED "\033[41m"
 #define ANSI_BGREEN "\033[42m"
@@ -72,13 +67,17 @@
 #define ANSI_BCYAN "\033[46m"
 #define ANSI_BWHITE "\033[47m"
 
+/**
+ * XTERM ansi codes
+ * 
+ */
+#define ANSI_XTERM_FG "\033[38;5;"
 #define ANSI_XTERM_BG "\033[48;5;"
 
 /**
- * @brief Numeric-only definitions
+ * Numeric-only definitions
  * 
  */
-
 #define N_ANSI_NORMAL "0"
 #define N_ANSI_HILITE "1"
 #define N_ANSI_INVERSE "7"
@@ -106,10 +105,9 @@
 #define N_ANSI_NORMAL "0"
 
 /**
- * @brief Integers
+ * Integers
  * 
  */
-
 #define I_ANSI_NORMAL 0
 
 #define I_ANSI_HILITE 1
@@ -140,78 +138,5 @@
 
 #define ANST_NORMAL 0x0099
 #define ANST_NONE 0x1099
-
-/**
- * Macros and utilities
- * 
- */
-
-#define TRACK_ESCCODES(s, ansi_state)                                         \
-	do                                                                        \
-	{                                                                         \
-		int ansi_mask = 0;                                                    \
-		int ansi_diff = 0;                                                    \
-		unsigned int param_val = 0;                                           \
-                                                                              \
-		++(s);                                                                \
-		if (*(s) == ANSI_CSI)                                                 \
-		{                                                                     \
-			while ((*(++(s)) & 0xf0) == 0x30)                                 \
-			{                                                                 \
-				if (*(s) < 0x3a)                                              \
-				{                                                             \
-					param_val <<= 1;                                          \
-					param_val += (param_val << 2) + (*(s)&0x0f);              \
-				}                                                             \
-				else                                                          \
-				{                                                             \
-					if (param_val < I_ANSI_LIM)                               \
-					{                                                         \
-						ansi_mask |= ansiBitsMask(param_val);                 \
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | \
-									 ansiBits(param_val));                    \
-					}                                                         \
-					param_val = 0;                                            \
-				}                                                             \
-			}                                                                 \
-		}                                                                     \
-		while ((*(s)&0xf0) == 0x20)                                           \
-		{                                                                     \
-			++(s);                                                            \
-		}                                                                     \
-		if (*(s) == ANSI_END)                                                 \
-		{                                                                     \
-			if (param_val < I_ANSI_LIM)                                       \
-			{                                                                 \
-				ansi_mask |= ansiBitsMask(param_val);                         \
-				ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) |         \
-							 ansiBits(param_val));                            \
-			}                                                                 \
-			ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;               \
-			++(s);                                                            \
-		}                                                                     \
-		else if (*(s))                                                        \
-		{                                                                     \
-			++(s);                                                            \
-		}                                                                     \
-	} while (0)
-
-#define TRACK_ALL_ESCCODES(s, p, ansi_state)       \
-	do                                             \
-	{                                              \
-		(p) = (s);                                 \
-		while (*(p))                               \
-		{                                          \
-			if (*(p) == ESC_CHAR)                  \
-			{                                      \
-				TRACK_ESCCODES((p), (ansi_state)); \
-			}                                      \
-			else                                   \
-			{                                      \
-				++(p);                             \
-			}                                      \
-		}                                          \
-	} while (0)
-
 
 #endif /* __STRINGUTIL_H */

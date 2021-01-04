@@ -400,7 +400,7 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 			{
 				XFREE(mudstate.rdata->x_lens);
 			}
-			
+
 			XFREE(mudstate.rdata);
 		}
 
@@ -1775,7 +1775,12 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 			if (mudconf.lag_check)
 			{
-				get_tod(&begin_time);
+#ifndef HAVE_GETTIMEOFDAY
+				(&begin_time)->tv_sec = time(NULL);
+				(&begin_time)->tv_usec = 0;
+#else
+				gettimeofday(&begin_time, NULL)
+#endif
 
 				if (mudconf.lag_check_cpu)
 				{
@@ -1795,7 +1800,12 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 			if (mudconf.lag_check)
 			{
-				get_tod(&end_time);
+#ifndef HAVE_GETTIMEOFDAY
+				(&end_time)->tv_sec = time(NULL);
+				(&end_time)->tv_usec = 0;
+#else
+				gettimeofday(&end_time, NULL)
+#endif
 
 				if (mudconf.lag_check_cpu)
 				{
@@ -2734,7 +2744,7 @@ void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
  * @param tab_name	NHash table name
  * @param htab		NHash table
  */
-void list_nhashstat(dbref player, const char *tab_name, NHSHTAB *htab)
+void list_nhashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
 	char *buff = nhashinfo(tab_name, htab);
 
@@ -2892,8 +2902,8 @@ void list_memory(dbref player)
 	NAMETAB *name = NULL;
 	ATTR *attr = NULL;
 	UFUN *ufunc = NULL;
-	Cache *cp = NULL;
-	Chain *sp = NULL;
+	UDB_CACHE *cp = NULL;
+	UDB_CHAIN *sp = NULL;
 	HASHENT *htab = NULL;
 	OBJSTACK *stack = NULL;
 	OBJGRID *grid = NULL;
@@ -2936,7 +2946,7 @@ void list_memory(dbref player)
 	each = cs_size;
 	raw_notify(player, "Cache data       : %12.2fk", each / 1024);
 	total += each;
-	each = sizeof(Chain) * mudconf.cache_width;
+	each = sizeof(UDB_CHAIN) * mudconf.cache_width;
 
 	for (i = 0; i < mudconf.cache_width; i++)
 	{
@@ -2944,7 +2954,7 @@ void list_memory(dbref player)
 
 		for (cp = sp->head; cp != NULL; cp = cp->nxt)
 		{
-			each += sizeof(Cache);
+			each += sizeof(UDB_CACHE);
 			each2 += cp->keylen;
 		}
 	}

@@ -1571,7 +1571,7 @@ void olist_add(dbref item)
 		mudstate.olist->count = 0;
 		op->next = NULL;
 	}
-	else if (mudstate.olist->count >= OBLOCK_SIZE)
+	else if ((size_t)mudstate.olist->count >= OBLOCK_SIZE)
 	{
 		op = (OBLOCK *)XMALLOC(LBUF_SIZE, "op");
 		mudstate.olist->tail->next = op;

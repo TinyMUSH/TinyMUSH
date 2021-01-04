@@ -182,7 +182,51 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	{
 		while (*str == ESC_CHAR)
 		{
-			TRACK_ESCCODES(str, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(str);
+				if (*(str) == ANSI_CSI)
+				{
+					while ((*(++(str)) & 0xf0) == 0x30)
+					{
+						if (*(str) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(str)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(str)&0xf0) == 0x20)
+				{
+					++(str);
+				}
+				if (*(str) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(str);
+				}
+				else if (*(str))
+				{
+					++(str);
+				}
+			} while (0);
 		}
 
 		while (*str && (*str != sep->str[0]))
@@ -191,7 +235,51 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 
 			while (*str == ESC_CHAR)
 			{
-				TRACK_ESCCODES(str, ansi_state);
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++(str);
+					if (*(str) == ANSI_CSI)
+					{
+						while ((*(++(str)) & 0xf0) == 0x30)
+						{
+							if (*(str) < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*(str)&0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*(str)&0xf0) == 0x20)
+					{
+						++(str);
+					}
+					if (*(str) == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+						++(str);
+					}
+					else if (*(str))
+					{
+						++(str);
+					}
+				} while (0);
 			}
 		}
 

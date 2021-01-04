@@ -1510,9 +1510,23 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		XSTRCPY(ebuf, fargs[0]);
 		s = ebuf;
 		tp = tbuf;
-		get_tod(&bt);
+
+#ifndef HAVE_GETTIMEOFDAY
+		(&bt)->tv_sec = time(NULL);
+		(&bt)->tv_usec = 0;
+#else
+		gettimeofday(&bt, NULL)
+#endif
+
 		exec(tbuf, &tp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &s, cargs, ncargs);
-		get_tod(&et);
+
+#ifndef HAVE_GETTIMEOFDAY
+		(&et)->tv_sec = time(NULL);
+		(&et)->tv_usec = 0;
+#else
+		gettimeofday(&et, NULL)
+#endif
+		
 		ut = ((et.tv_sec - bt.tv_sec) * 1000000) + (et.tv_usec - bt.tv_usec);
 
 		if ((ut < min) || (min == 0))

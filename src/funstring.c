@@ -405,7 +405,51 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	while (*mp == ESC_CHAR)
 	{
-		TRACK_ESCCODES(mp, ansi_needle);
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(mp);
+			if (*(mp) == ANSI_CSI)
+			{
+				while ((*(++(mp)) & 0xf0) == 0x30)
+				{
+					if (*(mp) < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (*(mp)&0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((*(mp)&0xf0) == 0x20)
+			{
+				++(mp);
+			}
+			if (*(mp) == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				ansi_needle = (ansi_needle & ~ansi_mask) | ansi_diff;
+				++(mp);
+			}
+			else if (*(mp))
+			{
+				++(mp);
+			}
+		} while (0);
 
 		if (!*mp)
 		{
@@ -423,7 +467,51 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	{
 		while (*bp == ESC_CHAR)
 		{
-			TRACK_ESCCODES(bp, ansi_haystack);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(bp);
+				if (*(bp) == ANSI_CSI)
+				{
+					while ((*(++(bp)) & 0xf0) == 0x30)
+					{
+						if (*(bp) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(bp)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(bp)&0xf0) == 0x20)
+				{
+					++(bp);
+				}
+				if (*(bp) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_haystack = (ansi_haystack & ~ansi_mask) | ansi_diff;
+					++(bp);
+				}
+				else if (*(bp))
+				{
+					++(bp);
+				}
+			} while (0);
 		}
 
 		if ((*bp == *mp) && (ansi_needle == ANST_NONE || ansi_haystack == ansi_needle))
@@ -440,12 +528,100 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 			{
 				while (*cp == ESC_CHAR)
 				{
-					TRACK_ESCCODES(cp, ansi_haystack2);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(cp);
+						if (*(cp) == ANSI_CSI)
+						{
+							while ((*(++(cp)) & 0xf0) == 0x30)
+							{
+								if (*(cp) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(cp)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(cp)&0xf0) == 0x20)
+						{
+							++(cp);
+						}
+						if (*(cp) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_haystack2 = (ansi_haystack2 & ~ansi_mask) | ansi_diff;
+							++(cp);
+						}
+						else if (*(cp))
+						{
+							++(cp);
+						}
+					} while (0);
 				}
 
 				while (*np == ESC_CHAR)
 				{
-					TRACK_ESCCODES(np, ansi_needle2);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(np);
+						if (*(np) == ANSI_CSI)
+						{
+							while ((*(++(np)) & 0xf0) == 0x30)
+							{
+								if (*(np) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(np)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(np)&0xf0) == 0x20)
+						{
+							++(np);
+						}
+						if (*(np) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ansi_needle2 = (ansi_needle2 & ~ansi_mask) | ansi_diff;
+							++(np);
+						}
+						else if (*(np))
+						{
+							++(np);
+						}
+					} while (0);
 				}
 
 				if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
@@ -534,7 +710,51 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 	while (*mp == ESC_CHAR)
 	{
-		TRACK_ESCCODES(mp, ansi_needle);
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(mp);
+			if (*(mp) == ANSI_CSI)
+			{
+				while ((*(++(mp)) & 0xf0) == 0x30)
+				{
+					if (*(mp) < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (*(mp)&0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((*(mp)&0xf0) == 0x20)
+			{
+				++(mp);
+			}
+			if (*(mp) == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				ansi_needle = (ansi_needle & ~ansi_mask) | ansi_diff;
+				++(mp);
+			}
+			else if (*(mp))
+			{
+				++(mp);
+			}
+		} while (0);
 
 		if (!*mp)
 		{
@@ -562,12 +782,100 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		{
 			while (*cp == ESC_CHAR)
 			{
-				TRACK_ESCCODES(cp, ansi_haystack2);
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++(cp);
+					if (*(cp) == ANSI_CSI)
+					{
+						while ((*(++(cp)) & 0xf0) == 0x30)
+						{
+							if (*(cp) < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*(cp)&0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*(cp)&0xf0) == 0x20)
+					{
+						++(cp);
+					}
+					if (*(cp) == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						ansi_haystack2 = (ansi_haystack2 & ~ansi_mask) | ansi_diff;
+						++(cp);
+					}
+					else if (*(cp))
+					{
+						++(cp);
+					}
+				} while (0);
 			}
 
 			while (*np == ESC_CHAR)
 			{
-				TRACK_ESCCODES(np, ansi_needle2);
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++(np);
+					if (*(np) == ANSI_CSI)
+					{
+						while ((*(++(np)) & 0xf0) == 0x30)
+						{
+							if (*(np) < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*(np)&0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*(np)&0xf0) == 0x20)
+					{
+						++(np);
+					}
+					if (*(np) == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						ansi_needle2 = (ansi_needle2 & ~ansi_mask) | ansi_diff;
+						++(np);
+					}
+					else if (*(np))
+					{
+						++(np);
+					}
+				} while (0);
 			}
 
 			if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
@@ -596,7 +904,51 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	 */
 		while (*bp == ESC_CHAR)
 		{
-			TRACK_ESCCODES(bp, ansi_haystack);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(bp);
+				if (*(bp) == ANSI_CSI)
+				{
+					while ((*(++(bp)) & 0xf0) == 0x30)
+					{
+						if (*(bp) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(bp)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(bp)&0xf0) == 0x20)
+				{
+					++(bp);
+				}
+				if (*(bp) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_haystack = (ansi_haystack & ~ansi_mask) | ansi_diff;
+					++(bp);
+				}
+				else if (*(bp))
+				{
+					++(bp);
+				}
+			} while (0);
 		}
 
 		if (*bp)
@@ -1044,7 +1396,51 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	{
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 
 		if (*s)
@@ -1087,7 +1483,51 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	while (*s == ESC_CHAR)
 	{
-		TRACK_ESCCODES(s, ansi_state);
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(s);
+			if (*(s) == ANSI_CSI)
+			{
+				while ((*(++(s)) & 0xf0) == 0x30)
+				{
+					if (*(s) < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (*(s)&0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((*(s)&0xf0) == 0x20)
+			{
+				++(s);
+			}
+			if (*(s) == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+				++(s);
+			}
+			else if (*(s))
+			{
+				++(s);
+			}
+		} while (0);
 	}
 
 	for (count = 0; (count < start) && *s; count++)
@@ -1096,7 +1536,51 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 	}
 
@@ -1557,7 +2041,51 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	{
 		if (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 		else
 		{
@@ -1800,7 +2328,51 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 	while (*s == ESC_CHAR)
 	{
-		TRACK_ESCCODES(s, ansi_state);
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(s);
+			if (*(s) == ANSI_CSI)
+			{
+				while ((*(++(s)) & 0xf0) == 0x30)
+				{
+					if (*(s) < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (*(s)&0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((*(s)&0xf0) == 0x20)
+			{
+				++(s);
+			}
+			if (*(s) == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+				++(s);
+			}
+			else if (*(s))
+			{
+				++(s);
+			}
+		} while (0);
 	}
 
 	for (count = 0; (count < start) && *s; ++count)
@@ -1809,7 +2381,51 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 	}
 
@@ -1826,7 +2442,51 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 	{
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 
 		if (*s)
@@ -2110,7 +2770,51 @@ void fun_ansipos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	{
 		if (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 		else
 		{
@@ -2242,7 +2946,51 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 			switch (*sw)
 			{
 			case ESC_CHAR:
-				TRACK_ESCCODES(sw, sw_ansi_state);
+				do
+				{
+					int ansi_mask = 0;
+					int ansi_diff = 0;
+					unsigned int param_val = 0;
+					++(sw);
+					if (*(sw) == ANSI_CSI)
+					{
+						while ((*(++(sw)) & 0xf0) == 0x30)
+						{
+							if (*(sw) < 0x3a)
+							{
+								param_val <<= 1;
+								param_val += (param_val << 2) + (*(sw)&0x0f);
+							}
+							else
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								param_val = 0;
+							}
+						}
+					}
+					while ((*(sw)&0xf0) == 0x20)
+					{
+						++(sw);
+					}
+					if (*(sw) == ANSI_END)
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						sw_ansi_state = (sw_ansi_state & ~ansi_mask) | ansi_diff;
+						++(sw);
+					}
+					else if (*(sw))
+					{
+						++(sw);
+					}
+				} while (0);
 				--sw;
 				continue;
 
@@ -2315,7 +3063,51 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 				switch (*ew)
 				{
 				case ESC_CHAR:
-					TRACK_ESCCODES(ew, ew_ansi_state);
+					do
+					{
+						int ansi_mask = 0;
+						int ansi_diff = 0;
+						unsigned int param_val = 0;
+						++(ew);
+						if (*(ew) == ANSI_CSI)
+						{
+							while ((*(++(ew)) & 0xf0) == 0x30)
+							{
+								if (*(ew) < 0x3a)
+								{
+									param_val <<= 1;
+									param_val += (param_val << 2) + (*(ew)&0x0f);
+								}
+								else
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									param_val = 0;
+								}
+							}
+						}
+						while ((*(ew)&0xf0) == 0x20)
+						{
+							++(ew);
+						}
+						if (*(ew) == ANSI_END)
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							ew_ansi_state = (ew_ansi_state & ~ansi_mask) | ansi_diff;
+							++(ew);
+						}
+						else if (*(ew))
+						{
+							++(ew);
+						}
+					} while (0);
 					--ew;
 					continue;
 
@@ -2748,7 +3540,51 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					switch (*sw)
 					{
 					case ESC_CHAR:
-						TRACK_ESCCODES(sw, sw_ansi_state);
+						do
+						{
+							int ansi_mask = 0;
+							int ansi_diff = 0;
+							unsigned int param_val = 0;
+							++(sw);
+							if (*(sw) == ANSI_CSI)
+							{
+								while ((*(++(sw)) & 0xf0) == 0x30)
+								{
+									if (*(sw) < 0x3a)
+									{
+										param_val <<= 1;
+										param_val += (param_val << 2) + (*(sw)&0x0f);
+									}
+									else
+									{
+										if (param_val < I_ANSI_LIM)
+										{
+											ansi_mask |= ansiBitsMask(param_val);
+											ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+										}
+										param_val = 0;
+									}
+								}
+							}
+							while ((*(sw)&0xf0) == 0x20)
+							{
+								++(sw);
+							}
+							if (*(sw) == ANSI_END)
+							{
+								if (param_val < I_ANSI_LIM)
+								{
+									ansi_mask |= ansiBitsMask(param_val);
+									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+								}
+								sw_ansi_state = (sw_ansi_state & ~ansi_mask) | ansi_diff;
+								++(sw);
+							}
+							else if (*(sw))
+							{
+								++(sw);
+							}
+						} while (0);
 						--sw;
 						continue;
 
@@ -2890,7 +3726,51 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						switch (*ew)
 						{
 						case ESC_CHAR:
-							TRACK_ESCCODES(ew, ew_ansi_state);
+							do
+							{
+								int ansi_mask = 0;
+								int ansi_diff = 0;
+								unsigned int param_val = 0;
+								++(ew);
+								if (*(ew) == ANSI_CSI)
+								{
+									while ((*(++(ew)) & 0xf0) == 0x30)
+									{
+										if (*(ew) < 0x3a)
+										{
+											param_val <<= 1;
+											param_val += (param_val << 2) + (*(ew)&0x0f);
+										}
+										else
+										{
+											if (param_val < I_ANSI_LIM)
+											{
+												ansi_mask |= ansiBitsMask(param_val);
+												ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+											}
+											param_val = 0;
+										}
+									}
+								}
+								while ((*(ew)&0xf0) == 0x20)
+								{
+									++(ew);
+								}
+								if (*(ew) == ANSI_END)
+								{
+									if (param_val < I_ANSI_LIM)
+									{
+										ansi_mask |= ansiBitsMask(param_val);
+										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+									}
+									ew_ansi_state = (ew_ansi_state & ~ansi_mask) | ansi_diff;
+									++(ew);
+								}
+								else if (*(ew))
+								{
+									++(ew);
+								}
+							} while (0);
 							--ew;
 							continue;
 
@@ -3359,7 +4239,51 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	{
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state_l);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state_l = (ansi_state_l & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 
 		if (*s)
@@ -3373,7 +4297,51 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 	while (*s == ESC_CHAR)
 	{
-		TRACK_ESCCODES(s, ansi_state_r);
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(s);
+			if (*(s) == ANSI_CSI)
+			{
+				while ((*(++(s)) & 0xf0) == 0x30)
+				{
+					if (*(s) < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (*(s)&0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((*(s)&0xf0) == 0x20)
+			{
+				++(s);
+			}
+			if (*(s) == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				ansi_state_r = (ansi_state_r & ~ansi_mask) | ansi_diff;
+				++(s);
+			}
+			else if (*(s))
+			{
+				++(s);
+			}
+		} while (0);
 	}
 
 	for (; (count < start + nchars) && *s; ++count)
@@ -3382,7 +4350,51 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 		while (*s == ESC_CHAR)
 		{
-			TRACK_ESCCODES(s, ansi_state_r);
+			do
+			{
+				int ansi_mask = 0;
+				int ansi_diff = 0;
+				unsigned int param_val = 0;
+				++(s);
+				if (*(s) == ANSI_CSI)
+				{
+					while ((*(++(s)) & 0xf0) == 0x30)
+					{
+						if (*(s) < 0x3a)
+						{
+							param_val <<= 1;
+							param_val += (param_val << 2) + (*(s)&0x0f);
+						}
+						else
+						{
+							if (param_val < I_ANSI_LIM)
+							{
+								ansi_mask |= ansiBitsMask(param_val);
+								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+							}
+							param_val = 0;
+						}
+					}
+				}
+				while ((*(s)&0xf0) == 0x20)
+				{
+					++(s);
+				}
+				if (*(s) == ANSI_END)
+				{
+					if (param_val < I_ANSI_LIM)
+					{
+						ansi_mask |= ansiBitsMask(param_val);
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+					}
+					ansi_state_r = (ansi_state_r & ~ansi_mask) | ansi_diff;
+					++(s);
+				}
+				else if (*(s))
+				{
+					++(s);
+				}
+			} while (0);
 		}
 	}
 

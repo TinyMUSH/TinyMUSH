@@ -178,10 +178,10 @@ void register_functions(FUN *functab)
  * @param htab 
  * @param ntab 
  */
-void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
+void register_hashtables(MODHASHES *htab, MODHASHES *ntab)
 {
 	MODHASHES *hp = NULL;
-	MODNHASHES *np = NULL;
+	MODHASHES *np = NULL;
 
 	if (htab)
 	{
@@ -209,7 +209,7 @@ void register_hashtables(MODHASHES *htab, MODNHASHES *ntab)
 unsigned int register_dbtype(char *modname)
 {
 	unsigned int type = 0;
-	DBData key, data;
+	UDB_DATA key, data;
 	/**
 	 * Find out if the module already has a registered DB type
 	 * 

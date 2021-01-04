@@ -475,11 +475,17 @@ void shovechars(int port)
 		maxd = sock + 1;
 	}
 
-	get_tod(&last_slice);
+#ifndef HAVE_GETTIMEOFDAY
+	(&last_slice)->tv_sec = time(NULL);
+	(&last_slice)->tv_usec = 0;
+#else
+	gettimeofday(&last_slice, NULL)
+#endif
+
 #ifdef HAVE_GETDTABLESIZE
 	maxfds = getdtablesize();
 #else
-	maxfds = sysconf(_SC_OPEN_MAX);
+		maxfds = sysconf(_SC_OPEN_MAX);
 #endif
 	avail_descriptors = maxfds - 7;
 
@@ -489,7 +495,13 @@ void shovechars(int port)
 	 */
 	while (mudstate.shutdown_flag == 0)
 	{
-		get_tod(&current_time);
+#ifndef HAVE_GETTIMEOFDAY
+		(&current_time)->tv_sec = time(NULL);
+		(&current_time)->tv_usec = 0;
+#else
+		gettimeofday(&current_time, NULL)
+#endif
+
 		last_slice = update_quotas(last_slice, current_time);
 		process_commands();
 
@@ -561,7 +573,7 @@ void shovechars(int port)
 		 * Mark sockets that we want to test for change in status
 		 * 
 		 */
-		DESC_ITER_ALL(d)
+		for (d = descriptor_list; (d); d = (d)->next)
 		{
 			if (!d->input_head)
 			{
@@ -590,7 +602,8 @@ void shovechars(int port)
 				 * 
 				 */
 				log_perror("NET", "FAIL", "checking for activity", "select");
-				DESC_ITER_ALL(d)
+
+				for (d = descriptor_list; (d); d = (d)->next)
 				{
 					if (fstat(d->descriptor, &fstatbuf) < 0)
 					{
@@ -686,7 +699,7 @@ void shovechars(int port)
 		 * Check for activity on user sockets
 		 * 
 		 */
-		DESC_SAFEITER_ALL(d, dnext)
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		{
 			/**
 			 * Process input from sockets with pending input
@@ -950,8 +963,11 @@ void shutdownsock(DESC *d, int reason)
 	if (d->program_data)
 	{
 		ncon = 0;
-		DESC_ITER_PLAYER(d->player, dtemp)
-		ncon++;
+
+		for (dtemp = (DESC *)nhashfind((int)d->player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+		{
+			ncon++;
+		}
 
 		if (ncon == 0)
 		{
@@ -971,7 +987,7 @@ void shutdownsock(DESC *d, int reason)
 				{
 					if (d->program_data->wait_data->x_names[z])
 						XFREE(d->program_data->wait_data->x_names[z]);
-						
+
 					if (d->program_data->wait_data->x_regs[z])
 						XFREE(d->program_data->wait_data->x_regs[z]);
 				}
@@ -1345,7 +1361,7 @@ void close_sockets(int emergency, char *message)
 {
 	DESC *d = NULL, *dnext = NULL;
 
-	DESC_SAFEITER_ALL(d, dnext)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 	{
 		if (emergency)
 		{

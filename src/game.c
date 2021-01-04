@@ -267,7 +267,7 @@ void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __
 {
 	MODULE *mp;
 	MODHASHES *m_htab, *hp;
-	MODNHASHES *m_ntab, *np;
+	MODHASHES *m_ntab, *np;
 	char *s;
 	hashresize(&mudstate.command_htab, 512);
 	hashresize(&mudstate.player_htab, 16);
@@ -302,7 +302,7 @@ void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __
 		}
 
 		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
-		m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
+		m_ntab = (MODHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_ntab)
 		{
@@ -3341,7 +3341,7 @@ int main(int argc, char *argv[])
 	char *bp;
 	struct stat;
 	MODHASHES *m_htab, *hp;
-	MODNHASHES *m_ntab, *np;
+	MODHASHES *m_ntab, *np;
 	int option_index = 0;
 	struct option long_options[] = {
 		{"debug", no_argument, 0, 'd'},
@@ -3794,7 +3794,7 @@ int main(int argc, char *argv[])
 		}
 
 		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "nhashtable");
-		m_ntab = (MODNHASHES *)lt_dlsym(mp->handle, s);
+		m_ntab = (MODHASHES *)lt_dlsym(mp->handle, s);
 
 		if (m_ntab)
 		{

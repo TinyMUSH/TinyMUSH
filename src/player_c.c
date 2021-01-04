@@ -19,7 +19,7 @@
 #include "attrs.h"     /* required by code */
 #include "player_c.h"  /* required by code */
 
-NHSHTAB pcache_htab;
+HASHTAB pcache_htab;
 
 PCACHE *pcache_head;
 

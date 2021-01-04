@@ -664,8 +664,8 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
     mp->db_write = (void (*)(void))lt_dlsym_format(handle, "mod_%s_%s", modname, "db_write");
     mp->db_write_flatfile = (void (*)(FILE *))lt_dlsym_format(handle, "mod_%s_%s", modname, "db_write_flatfile");
     mp->do_second = (void (*)(void))lt_dlsym_format(handle, "mod_%s_%s", modname, "do_second");
-    mp->cache_put_notify = (void (*)(DBData, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_put_notify");
-    mp->cache_del_notify = (void (*)(DBData, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_del_notify");
+    mp->cache_put_notify = (void (*)(UDB_DATA, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_put_notify");
+    mp->cache_del_notify = (void (*)(UDB_DATA, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_del_notify");
 
     if (!mudstate.standalone)
     {

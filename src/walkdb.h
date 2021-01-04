@@ -1,14 +1,24 @@
-/* walkdb.h - structures used in commands that walk the entire db */
+/**
+ * @file walkdb.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Structures used in commands that walk the entire db
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
 #ifndef __WALKDB_H
 #define __WALKDB_H
 
-/* Search structure, used by @search and search(). */
-
-typedef struct search_type SEARCH;
-struct search_type
+/** 
+ * Search structure, used by @search and search(). 
+ * 
+ */
+typedef struct search_type
 {
     int s_wizard;
     dbref s_owner;
@@ -23,12 +33,13 @@ struct search_type
     char *s_rst_ufuntxt;
     int low_bound;
     int high_bound;
-};
+} SEARCH;
 
-/* Stats structure, used by @stats and stats(). */
-
-typedef struct stats_type STATS;
-struct stats_type
+/** 
+ * Stats structure, used by @stats and stats(). 
+ * 
+ */
+typedef struct stats_type
 {
     int s_total;
     int s_rooms;
@@ -38,6 +49,6 @@ struct stats_type
     int s_going;
     int s_garbage;
     int s_unknown;
-};
+} STATS;
 
 #endif /* __WALKDB_H */
