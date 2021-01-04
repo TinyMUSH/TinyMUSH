@@ -229,11 +229,17 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (flag & IFELSE_DEFAULT)
 	{
-		VaChk_Range(1, 2);
+		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+		{
+			return;
+		}
 	}
 	else
 	{
-		VaChk_Range(2, 3);
+		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+		{
+			return;
+		}
 	}
 
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
@@ -400,7 +406,15 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	/*
      * Special: the delim is really an output delim.
      */
-	VaChk_Only_Out(4);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 	/*
      * If we're generating no numbers, since this is a list function, we
      * return empty, rather than returning 0.
@@ -440,7 +454,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			SAFE_LTOS(buff, bufc, r_bot, LBUF_SIZE);
@@ -459,7 +473,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	{
 		if (*bufc != bb_p)
 		{
-			print_sep(&osep, buff, bufc);
+			print_separator(&osep, buff, bufc);
 		}
 
 		tmp = (unsigned int)Randomize(n_range);
@@ -491,7 +505,16 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * lnum() is special, since its single delimiter is really an output
      * delimiter.
      */
-	VaChk_Out(1, 3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 
 	if (nfargs >= 2)
 	{
@@ -537,7 +560,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			tbuf = ltos(bot);
@@ -561,7 +584,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	{
 		if (*bufc != bb_p)
 		{
-			print_sep(&osep, buff, bufc);
+			print_separator(&osep, buff, bufc);
 		}
 
 		startp = lnum_buff + Lnum_Place(bot);
@@ -597,7 +620,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	{
 		if (*bufc != bb_p)
 		{
-			print_sep(&osep, buff, bufc);
+			print_separator(&osep, buff, bufc);
 		}
 
 		SAFE_LTOS(buff, bufc, bot, LBUF_SIZE);
@@ -610,7 +633,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			tbuf = ltos(i);
@@ -624,7 +647,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			tbuf = ltos(i);
@@ -1204,11 +1227,26 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 							if (showsuffix)
 							{
 								x = width + 1;
-								print_padding(x, max, padc);
+
+								if (x > 0)
+								{
+									max = LBUF_SIZE - 1 - (*bufc - buff);
+									x = (x > max) ? max : x;
+									XMEMSET(*bufc, padc, x);
+									*bufc += x;
+									**bufc = '\0';
+								}
 							}
 							else
 							{
-								print_padding(width, max, padc);
+								if (width > 0)
+								{
+									max = LBUF_SIZE - 1 - (*bufc - buff);
+									width = (width > max) ? max : width;
+									XMEMSET(*bufc, padc, width);
+									*bufc += width;
+									**bufc = '\0';
+								}
 							}
 						}
 					}
@@ -1720,7 +1758,17 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	int cost;
 	char *name;
 	Delim isep;
-	VaChk_Only_InPure(3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, 0))
+	{
+		return;
+	}
+
 	name = fargs[0];
 
 	if (!name || !*name)
@@ -1990,7 +2038,7 @@ void list_qpids(dbref player __attribute__((unused)), dbref player_targ, dbref o
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&SPACE_DELIM, buff, bufc);
+				print_separator(&SPACE_DELIM, buff, bufc);
 			}
 
 			SAFE_LTOS(buff, bufc, tmp->pid, LBUF_SIZE);

@@ -2331,7 +2331,7 @@ GDATA *save_global_regs(const char *funcname)
 				if (mudstate.rdata->q_regs[z] && *(mudstate.rdata->q_regs[z]))
 				{
 					preserve->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
-					memcpy(preserve->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
+					XMEMCPY(preserve->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
 					preserve->q_lens[z] = mudstate.rdata->q_lens[z];
 				}
 			}
@@ -2345,7 +2345,7 @@ GDATA *save_global_regs(const char *funcname)
 					preserve->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
 					strcpy(preserve->x_names[z], mudstate.rdata->x_names[z]);
 					preserve->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-					memcpy(preserve->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
+					XMEMCPY(preserve->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
 					preserve->x_lens[z] = mudstate.rdata->x_lens[z];
 				}
 			}
@@ -2558,7 +2558,7 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 				if (preserve->q_regs[z] && *(preserve->q_regs[z]))
 				{
 					mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
-					memcpy(mudstate.rdata->q_regs[z], preserve->q_regs[z], preserve->q_lens[z] + 1);
+					XMEMCPY(mudstate.rdata->q_regs[z], preserve->q_regs[z], preserve->q_lens[z] + 1);
 					mudstate.rdata->q_lens[z] = preserve->q_lens[z];
 				}
 			}
@@ -2573,7 +2573,7 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 					mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
 					strcpy(mudstate.rdata->x_names[z], preserve->x_names[z]);
 					mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-					memcpy(mudstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
+					XMEMCPY(mudstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
 					mudstate.rdata->x_lens[z] = preserve->x_lens[z];
 				}
 			}

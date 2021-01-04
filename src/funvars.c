@@ -579,7 +579,7 @@ void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), db
         {
             if (*bufc != bb_p)
             {
-                print_sep(&SPACE_DELIM, buff, bufc);
+                print_separator(&SPACE_DELIM, buff, bufc);
             }
 
             SAFE_LB_CHR(qidx_str(i), buff, bufc);
@@ -592,7 +592,7 @@ void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), db
         {
             if (*bufc != bb_p)
             {
-                print_sep(&SPACE_DELIM, buff, bufc);
+                print_separator(&SPACE_DELIM, buff, bufc);
             }
 
             SAFE_LB_STR(g->x_names[i], buff, bufc);
@@ -656,7 +656,16 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     char **qreg_names, **elems;
     char *varlist, *elemlist;
     Delim isep;
-    VaChk_Only_In(3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+    {
+        return;
+    }
 
     if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1])
     {
@@ -708,7 +717,11 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
     char *nextp, *strp;
     Delim bdelim, edelim;
-    VaChk_Range(0, 3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 3, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[0] || !*fargs[0])
     {
@@ -1053,7 +1066,43 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     /*
      * What to call: <obj>/<attr> or <attr> or #lambda/<code>
      */
-    Get_Ulambda(player, thing, (is_sandbox) ? fargs[4] : fargs[2], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix((is_sandbox) ? fargs[4] : fargs[2], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen(((is_sandbox) ? fargs[4] : fargs[2]) + 8);
+        __xstrcpy(atext, (is_sandbox) ? fargs[4] : fargs[2] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, (is_sandbox) ? fargs[4] : fargs[2], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str((is_sandbox) ? fargs[4] : fargs[2]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
 
     /*
      * Find our perspective
@@ -1723,7 +1772,17 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     char *varlist, *elemlist;
     int i;
     Delim isep;
-    VaChk_Only_In(3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     varlist = XMALLOC(LBUF_SIZE, "varlist");
     XSTRCPY(varlist, fargs[0]);
     n_xvars = list2arr(&xvar_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
@@ -1778,13 +1837,21 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     int n_xvars, n_elems;
     char *varlist, *elemlist;
     char *str, *bp, *p, *tp;
-    ;
     char *pre = XMALLOC(SBUF_SIZE, "pre");
     char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
     VARENT *xvar;
     int i;
     Delim isep;
-    VaChk_Only_In(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
 
     if (!fargs[0] || !*fargs[0])
     {
@@ -2006,7 +2073,28 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     STRUCTDEF *this_struct;
     COMPONENT *this_comp;
     int check_type = 0;
-    VaChk_Only_In_Out(6);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 4, 6, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6 - 1, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 6)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
+    }
 
     /*
      * Prevent null delimiters and line delimiters.
@@ -2324,7 +2412,15 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     /*
      * This one is complicated: We need two, four, or five args.
      */
-    VaChk_In(2, 5);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 5, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &isep, DELIM_STRING))
+    {
+        return;
+    }
 
     if (nfargs == 3)
     {
@@ -2781,7 +2877,17 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
 void fun_load(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep;
-    VaChk_Only_InPure(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, 0))
+    {
+        return;
+    }
+
     load_structure(player, buff, bufc, fargs[0], fargs[1], fargs[2], isep.str[0], (nfargs != 4) ? 1 : 0);
 }
 
@@ -2818,7 +2924,15 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
      * transforming any delim-separated list to a list whose elements are
      * separated by arbitrary strings.)
      */
-    VaChk_Only_InPure(3);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, 0))
+    {
+        return;
+    }
 
     if (nfargs != 3)
     {
@@ -2900,7 +3014,17 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     char **words, **vals;
     int retval, nwords, nvals, i, n_mod;
     Delim isep;
-    VaChk_Only_In(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     /*
      * Find the instance first, since this is how we get our typechecker.
      */
@@ -3087,7 +3211,17 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
 void fun_unload(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep;
-    VaChk_Only_InPure(2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, 0))
+    {
+        return;
+    }
+
     unload_structure(player, buff, bufc, fargs[0], isep.str[0], (nfargs != 2) ? 1 : 0);
 }
 
@@ -3569,7 +3703,11 @@ int stack_set(dbref thing, OBJSTACK *sp)
 void fun_empty(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref it;
-    VaChk_Range(0, 1);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 1, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[0])
     {
@@ -3604,7 +3742,11 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     dbref it;
     char *data;
     OBJSTACK *sp;
-    VaChk_Range(0, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 2, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[1])
     {
@@ -3660,7 +3802,11 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((
     OBJSTACK *tp; /* temporary stack pointer */
     OBJSTACK *sp; /* new stack element */
     int pos, count = 0;
-    VaChk_Range(0, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 2, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[0])
     {
@@ -3723,7 +3869,11 @@ void fun_swap(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 {
     dbref it;
     OBJSTACK *sp, *tp;
-    VaChk_Range(0, 1);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 1, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[0])
     {
@@ -3756,7 +3906,11 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute_
     OBJSTACK *prev = NULL;
     peek_flag = Is_Func(POP_PEEK);
     toss_flag = Is_Func(POP_TOSS);
-    VaChk_Range(0, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 2, buff, bufc))
+    {
+        return;
+    }
 
     if (!fargs[0])
     {
@@ -3830,7 +3984,17 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     OBJSTACK *prev = NULL;
     Delim osep;
     char *bb_p;
-    VaChk_Only_Out(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
     stack_object(player, it);
     pos = (int)strtol(fargs[1], (char **)NULL, 10);
     nitems = (int)strtol(fargs[2], (char **)NULL, 10);
@@ -3873,7 +4037,7 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	     */
             if (*bufc != bb_p)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
             }
 
             over = SAFE_LB_STR(tp->data, buff, bufc);
@@ -3907,7 +4071,16 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     OBJSTACK *sp;
     char *bb_p;
     int over = 0;
-    VaChk_Out(0, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 2, buff, bufc))
+    {
+        return;
+    };
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
 
     if (!fargs[0])
     {
@@ -3924,7 +4097,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     {
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         over = SAFE_LB_STR(sp->data, buff, bufc);
@@ -4225,11 +4398,39 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     if (all_option)
     {
-        VaChk_Only_In_Out(4);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        {
+            return;
+        }
+
+        if (nfargs < 4)
+        {
+            XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+        }
+        else
+        {
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+            {
+                return;
+            }
+        }
     }
     else
     {
-        VaChk_Only_In(3);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        {
+            return;
+        }
     }
 
     s = trim_space_sep(fargs[0], &isep);
@@ -4267,7 +4468,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		 * if true, all_option also
 		 * * true
 		 */
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
             }
 
             SAFE_LB_STR(r, buff, bufc);
@@ -4316,7 +4517,11 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
     int subpatterns;
     char tbuf[LBUF_SIZE];
     case_option = Func_Mask(REG_CASELESS);
-    VaChk_Range(2, 3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+    {
+        return;
+    }
 
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
     {
@@ -4403,9 +4608,21 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     /*
      * We need at least 6 arguments. The last 2 args must be delimiters.
      */
-    VaChk_Range(6, 12);
-    VaChk_InSep(nfargs - 1, 0);
-    VaChk_OutSep(nfargs, 0);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 6, 12, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, nfargs - 1, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, nfargs, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
     lastn = nfargs - 4;
 
     /*
@@ -4429,9 +4646,42 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * a static, and that therefore we have to be careful about what
      * we're doing.
      */
-    Parse_Uattr(player, fargs[0], thing1, anum1, ap);
-    Get_Uattr(player, thing1, ap, atext1, aowner1, aflags1, alen1);
-    Parse_Uattr(player, fargs[1], thing2, anum2, ap2);
+    if (parse_attrib(player, fargs[0], &thing1, &anum1, 0))
+    {
+        if ((anum1 == NOTHING) || !(Good_obj(thing1)))
+            ap = NULL;
+        else
+            ap = atr_num(anum1);
+    }
+    else
+    {
+        thing1 = player;
+        ap = atr_str(fargs[0]);
+    }
+
+    if (!ap)
+    {
+        return;
+    }
+    atext1 = atr_pget(thing1, ap->number, &aowner1, &aflags1, &alen1);
+    if (!*atext1 || !(See_attr(player, thing1, ap, aowner1, aflags1)))
+    {
+        XFREE(atext1);
+        return;
+    }
+
+    if (parse_attrib(player, fargs[1], &thing2, &anum2, 0))
+    {
+        if ((anum2 == NOTHING) || !(Good_obj(thing2)))
+            ap2 = NULL;
+        else
+            ap2 = atr_num(anum2);
+    }
+    else
+    {
+        thing2 = player;
+        ap2 = atr_str(fargs[1]);
+    }
 
     if (!ap2)
     {
@@ -4522,7 +4772,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         XMEMCPY(atextbuf, atext1, alen1);
@@ -4583,7 +4833,17 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     int ca, aflags, alen;
     dbref thing, aowner, it;
     Delim osep;
-    VaChk_Only_Out(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    };
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
     grep_type = Func_Mask(REG_TYPE);
     caseless = Func_Mask(REG_CASELESS);
     it = match_thing(player, fargs[0]);
@@ -4676,7 +4936,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             {
                 if (*bufc != bb_p)
                 {
-                    print_sep(&osep, buff, bufc);
+                    print_separator(&osep, buff, bufc);
                 }
 
                 SAFE_LB_STR((char *)(atr_num(ca))->name, buff, bufc);
@@ -4702,9 +4962,10 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /*
  * ---------------------------------------------------------------------------
- * Grids. gridmake(<rows>, <columns>[,<grid text>][,<col odelim>][,<row
- * odelim>]) gridload(<grid text>[,<odelim for row elems>][,<odelim between
- * rows>]) gridset(<y range>,<x range>,<value>[,<input sep for ranges>])
+ * Grids. 
+ * gridmake(<rows>, <columns>[,<grid text>][,<col odelim>][,<row odelim>]) 
+ * gridload(<grid text>[,<odelim for row elems>][,<odelim between rows>])
+ * gridset(<y range>,<x range>,<value>[,<input sep for ranges>])
  * gridsize() - returns rows cols grid( , [,<odelim for row elems>][,<odelim
  * between rows>]) - whole grid grid(<y>,<x>) - show particular coordinate
  * grid(<y range>,<x range>[,<odelim for row elems>][,<odelim between rows>])
@@ -4736,7 +4997,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 #define grid_print(gp, gr, gc, gn, gsep)                  \
     if (gn)                                               \
     {                                                     \
-        print_sep(&(gsep), buff, bufc);                   \
+        print_separator(&(gsep), buff, bufc);             \
     }                                                     \
     if (!(((gr) < 0) || ((gc) < 0) ||                     \
           ((gr) >= (gp)->rows) || ((gc) >= (gp)->cols) || \
@@ -4776,9 +5037,22 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     char *rbuf, *pname;
     char **row_text, **elem_text;
     Delim csep, rsep;
-    VaChk_Range(2, 5);
-    VaChk_SepIn(csep, 4, 0);
-    VaChk_SepIn(rsep, 5, 0);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 5, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &(csep), DELIM_STRING))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &(rsep), DELIM_STRING))
+    {
+        return;
+    }
+
     rows = (int)strtol(fargs[0], (char **)NULL, 10);
     cols = (int)strtol(fargs[1], (char **)NULL, 10);
     dimension = rows * cols;
@@ -4891,7 +5165,17 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     int n_x, n_y, r, c, i, j, errs = 0;
     char **x_elems, **y_elems;
     Delim isep;
-    VaChk_Only_In(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     ogp = grid_get(player);
 
     if (!ogp)
@@ -5034,9 +5318,22 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     char *xlist, *ylist;
     int n_x, n_y, r, c, i, j;
     char **x_elems, **y_elems;
-    VaChk_Range(0, 4);
-    VaChk_SepOut(csep, 3, 0);
-    VaChk_SepOut(rsep, 4, 0);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &(csep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &(rsep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
     ogp = grid_get(player);
 
     if (!ogp)
@@ -5101,7 +5398,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         {
             if (r != 0)
             {
-                print_sep(&rsep, buff, bufc);
+                print_separator(&rsep, buff, bufc);
             }
 
             if (n_x == -1)
@@ -5127,7 +5424,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         {
             if (j != 0)
             {
-                print_sep(&rsep, buff, bufc);
+                print_separator(&rsep, buff, bufc);
             }
 
             r = (int)strtol(y_elems[j], (char **)NULL, 10) - 1;

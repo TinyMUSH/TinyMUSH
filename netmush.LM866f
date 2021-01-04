@@ -1,0 +1,29 @@
+210104.085811 netmush INI/START: version.c:156        Starting: TinyMUSH version 3.3, Alpha 12 (2020-12-29)
+210104.085811 netmush INI/START: version.c:157      Build date: Jan  4 2021, 08:53:10
+210104.085811 netmush INI/START: version.c:158 Configure Flags: '--enable-debug' '--enable-warnings' '--enable-warnings-extra' --enable-ltdl-convenience
+210104.085811 netmush INI/START: version.c:159  Compiler Flags: gcc -DHAVE_CONFIG_H -I. -I../src/libltdl -g -O2 -Wall -Wextra
+210104.085811 netmush INI/START: version.c:160    Linker Flags: /bin/bash ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H -I. -I../src/libltdl -g -O2 -Wall -Wextra
+210104.085811 netmush INI/LOAD : game.c:3480 Full path and name of netmush : /home/tuh/src/TinyMUSH/game/bin/netmush
+210104.085811 netmush INI/LOAD : game.c:3481 Full path of work directory : /home/tuh/src/TinyMUSH
+210104.085811 netmush INI/LOAD : game.c:3482 Configuration file : /home/tuh/src/TinyMUSH/game/etc/tinymush/netmush.conf
+210104.085811 netmush INI/LOAD : game.c:3483 Configuration home : /home/tuh/src/TinyMUSH/game/etc/tinymush
+210104.085811 netmush CNF/INFO : conf.c:2002 Reading configuration file : /home/tuh/src/TinyMUSH/game/etc/tinymush/netmush.conf
+210104.085811 netmush CNF/MOD  : conf.c:637 Loading of mail module failed: file not found
+210104.085811 netmush CNF/MOD  : conf.c:637 Loading of comsys module failed: file not found
+210104.085811 netmush HLP/LOAD : conf.c:418 raw_helpfile: Loading helpfile news
+210104.085811 netmush HLP/LOAD : conf.c:418 raw_helpfile: Helpfile news not found
+210104.085811 netmush HLP/LOAD : conf.c:418 raw_helpfile: Loading helpfile mushman
+210104.085811 netmush HLP/LOAD : conf.c:418 raw_helpfile: Helpfile man not found
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Loading helpfile plushelp
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Helpfile +help not found
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Loading helpfile wiznews
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Helpfile wiznews not found
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Loading helpfile bbhelp
+210104.085811 netmush HLP/LOAD : conf.c:418 helpfile: Helpfile +bbhelp not found
+210104.085811 netmush CNF/NFND : conf.c:418 access: Command wiznews not found
+210104.085811 netmush CNF/INFO : conf.c:2002 Reading configuration file : /home/tuh/src/TinyMUSH/game/etc/tinymush/alias.conf
+210104.085811 netmush CNF/NFND : conf.c:418 alias: Command @cc not found
+210104.085811 netmush CNF/NFND : conf.c:418 alias: Command @proof not found
+210104.085811 netmush CNF/NFND : conf.c:418 alias: Command @qmail not found
+210104.085811 netmush CNF/NFND : conf.c:418 alias: Command @send not found
+210104.085811 netmush CNF/INFO : conf.c:2002 Reading configuration file : /home/tuh/src/TinyMUSH/game/etc/tinymush/compat.conf

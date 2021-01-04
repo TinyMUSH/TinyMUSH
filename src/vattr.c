@@ -132,7 +132,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * Walk the database. Mark all the attribute numbers in use.
      */
     atr_push();
-    DO_WHOLE_DB(i)
+    for (i = 0; i < mudstate.db_top; i++)
     {
         for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
         {
@@ -261,7 +261,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * at that slot), we delete the old attribute and add the new one.
      */
     atr_push();
-    DO_WHOLE_DB(i)
+    for (i = 0; i < mudstate.db_top; i++)
     {
         got = 0;
 

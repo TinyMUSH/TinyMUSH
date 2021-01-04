@@ -222,8 +222,8 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define Powers(t) db[t].powers
 #define Powers2(t) db[t].powers2
 #define NameLen(t) db[t].name_length
-#define Home(t) Link(t)
-#define Dropto(t) Location(t)
+#define Home(t) db[t].link
+#define Dropto(t) db[t].location
 
 #define AccessTime(t) db[t].last_access
 #define ModTime(t) db[t].last_mod
@@ -299,6 +299,7 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define s_Created(t)                  \
     db[t].create_time = mudstate.now; \
     db[t].flags3 |= DIRTY
+
 #define s_Clean(t) db[t].flags3 = db[t].flags3 & ~DIRTY
 #define s_NameLen(t, n) db[t].name_length = (n)
 #define s_Home(t, n) s_Link(t, n)
@@ -313,34 +314,7 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define putref(pr__f, pr__ref) fprintf(pr__f, "%d\n", (int)pr__ref)
 #define putlong(pr__f, pr__i) fprintf(pr__f, "%ld\n", (long)pr__i)
 
-#define DOLIST(thing, list)                                \
-    for ((thing) = (list);                                 \
-         ((thing) != NOTHING) && (Next(thing) != (thing)); \
-         (thing) = Next(thing))
-#define SAFE_DOLIST(thing, next, list)                                            \
-    for ((thing) = (list), (next) = ((thing) == NOTHING ? NOTHING : Next(thing)); \
-         (thing) != NOTHING && (Next(thing) != (thing));                          \
-         (thing) = (next), (next) = Next(next))
-#define DO_WHOLE_DB(thing) \
-    for ((thing) = 0; (thing) < mudstate.db_top; (thing)++)
-#define DO_WHOLE_DB_BACKWARDS(thing) \
-    for ((thing) = mudstate.db_top - 1; (thing) >= 0; (thing)--)
-
 #define Dropper(thing) (Connected(Owner(thing)) && Hearer(thing))
-
-/** 
- * @brief Clear a player's aliases, given x (player dbref) and b (alias buffer).
- * 
- */
-#define Clear_Player_Aliases(x, b)                            \
-    {                                                         \
-        char *cpa__p, *cpa__tokp;                             \
-        for (cpa__p = strtok_r((b), ";", &cpa__tokp); cpa__p; \
-             cpa__p = strtok_r(NULL, ";", &cpa__tokp))        \
-        {                                                     \
-            delete_player_name((x), cpa__p);                  \
-        }                                                     \
-    }
 
 typedef struct logfiletable LOGFILETAB;
 struct logfiletable

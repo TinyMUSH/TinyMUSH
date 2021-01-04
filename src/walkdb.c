@@ -172,7 +172,7 @@ int get_stats(dbref player, dbref who, STATS *info)
 		return 0;
 	}
 
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if ((who == NOTHING) || (who == Owner(i)))
 		{
@@ -307,7 +307,7 @@ int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)
 		fword3 = mudconf.stripped_flags.word3;
 	}
 
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if ((Owner(i) == from_player) && (Owner(i) != i))
 		{
@@ -1409,7 +1409,10 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 	/*
      * Mark everyplace you can get to via exits from the starting room
      */
-	Unmark_all(i);
+	for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+	{
+		mudstate.markbits->chunk[i] = (char)0x0;
+	}
 
 	if (Good_loc(mudconf.guest_start_room))
 	{
@@ -1421,7 +1424,8 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
      * Report rooms that aren't marked
      */
 	total = 0;
-	DO_WHOLE_DB(i)
+
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (isRoom(i) && !Going(i) && !Marked(i))
 		{
@@ -1454,11 +1458,17 @@ void do_markall(dbref player, __attribute__((unused)) dbref cause, int key)
 
 	if (key == MARK_SET)
 	{
-		Mark_all(i);
+		for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+		{
+			mudstate.markbits->chunk[i] = (char)0xff;
+		}
 	}
 	else if (key == MARK_CLEAR)
 	{
-		Unmark_all(i);
+		for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+		{
+			mudstate.markbits->chunk[i] = (char)0x0;
+		}
 	}
 
 	if (!Quiet(player))
@@ -1485,7 +1495,8 @@ void do_apply_marked(dbref player, dbref cause, __attribute__((unused)) int key,
 	}
 
 	buff = XMALLOC(SBUF_SIZE, "buff");
-	DO_WHOLE_DB(i)
+
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (Marked(i))
 		{

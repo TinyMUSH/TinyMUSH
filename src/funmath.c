@@ -419,7 +419,8 @@ int fromBaseX(char ch, int base)
     {
         i = base > 36 ? ch + 4 : ch - 48;
     }
-    if(i > base) {
+    if (i > base)
+    {
         i = -1;
     }
     return i;
@@ -840,7 +841,12 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
 void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double val, base;
-    VaChk_Range(1, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
+
     val = strtold(fargs[0], (char **)NULL);
 
     if (nfargs == 2)
@@ -1004,7 +1010,11 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
 {
     long double min, max, val;
     char *cp;
-    VaChk_Range(1, 3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+    {
+        return;
+    }
     val = strtold(fargs[0], (char **)NULL);
 
     if (nfargs < 2)
@@ -1088,7 +1098,16 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    VaChk_Only_In(2);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     sum = 0.0;
     cp = trim_space_sep(fargs[0], &isep);
 
@@ -1106,7 +1125,17 @@ void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     long double max, val;
     char *cp, *curr;
     Delim isep;
-    VaChk_Only_In(2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     cp = trim_space_sep(fargs[0], &isep);
 
     if (cp)
@@ -1134,7 +1163,17 @@ void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     long double min, val;
     char *cp, *curr;
     Delim isep;
-    VaChk_Only_In(2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     cp = trim_space_sep(fargs[0], &isep);
 
     if (cp)
@@ -1173,11 +1212,37 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (oper == VEC_UNIT)
     {
-        VaChk_Only_In_Out(3);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+        {
+            return;
+        }
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        {
+            return;
+        }
+        if (nfargs < 3)
+        {
+            XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+        }
+        else
+        {
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+            {
+                return;
+            }
+        }
     }
     else
     {
-        VaChk_Only_In(2);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        {
+            return;
+        }
     }
 
     /*
@@ -1229,7 +1294,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     for (i = 1; i < n; i++)
     {
-        print_sep(&osep, buff, bufc);
+        print_separator(&osep, buff, bufc);
         fval(buff, bufc, strtold(v1[i], (char **)NULL) / res, LDBL_DIG);
     }
 
@@ -1252,14 +1317,40 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     if (oper != VEC_DOT)
     {
-        VaChk_Only_In_Out(4);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+        {
+            return;
+        }
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        {
+            return;
+        }
+        if (nfargs < 4)
+        {
+            XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+        }
+        else
+        {
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+            {
+                return;
+            }
+        }
     }
     else
     {
         /*
 	 * dot product returns a scalar, so no output delim
 	 */
-        VaChk_Only_In(3);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        {
+            return;
+        }
     }
 
     /*
@@ -1292,7 +1383,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (i = 1; i < n; i++)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
             fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), LDBL_DIG);
         }
 
@@ -1303,7 +1394,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (i = 1; i < n; i++)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
             fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), LDBL_DIG);
         }
 
@@ -1314,7 +1405,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (i = 1; i < n; i++)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
             SAFE_BOOL(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
         }
 
@@ -1325,7 +1416,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (i = 1; i < n; i++)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
             SAFE_BOOL(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
         }
 
@@ -1338,7 +1429,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (i = 1; i < n; i++)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
             x = xlate(v1[i]);
             y = xlate(v2[i]);
             SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
@@ -1359,7 +1450,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
             for (i = 1; i < m; i++)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
                 fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, LDBL_DIG);
             }
         }
@@ -1370,7 +1461,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
             for (i = 1; i < n; i++)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
                 fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, LDBL_DIG);
             }
         }
@@ -1389,7 +1480,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
             for (i = 1; i < n; i++)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
                 fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), LDBL_DIG);
             }
         }
@@ -1485,7 +1576,16 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         /*
 	 * the arguments come in a pre-evaluated list
 	 */
-        VaChk_Only_In(2);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        {
+            return;
+        }
+
         bp = trim_space_sep(fargs[0], &isep);
 
         while (bp)
@@ -1559,7 +1659,26 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
     int flag, n;
     char *tbuf, *bp, *bb_p;
     flag = Func_Flags(fargs);
-    VaChk_Only_In_Out(3);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+    {
+        return;
+    }
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    {
+        return;
+    }
+    if (nfargs < 3)
+    {
+        XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
+    }
 
     if (!fargs[0] || !*fargs[0])
     {
@@ -1575,7 +1694,7 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
 
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         if (flag & IFELSE_BOOL)

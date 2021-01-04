@@ -892,7 +892,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 			wait_que(mudconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 
 		XFREE(buf);
-		DOLIST(obj, Contents(mudconf.master_room))
+		for (obj = Contents(mudconf.master_room); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
 			if (!mudconf.global_aconn_uselocks || could_doit(player, obj, A_LUSE))
 			{
@@ -931,7 +931,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	     * check every object in the room for a (dis)connect
 	     * * action
 	     */
-			DOLIST(obj, Contents(zone))
+			for (obj = Contents(zone); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				buf = atr_pget(obj, attr, &aowner, &aflags, &alen);
 

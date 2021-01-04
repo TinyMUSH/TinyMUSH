@@ -22,7 +22,6 @@
 #include "nametabs.h"
 
 #define FBLOCK_SIZE (MBUF_SIZE - sizeof(FBLKHDR))
-/* *INDENT-OFF* */
 
 FCACHE fcache[] = {
     {&mudconf.conn_file, NULL, "Conn"},
@@ -38,8 +37,6 @@ FCACHE fcache[] = {
     {&mudconf.quit_file, NULL, "Quit"},
     {&mudconf.htmlconn_file, NULL, "Conn/Html"},
     {NULL, NULL, NULL}};
-
-/* *INDENT-ON* */
 
 void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
 {

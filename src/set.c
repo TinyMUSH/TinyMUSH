@@ -19,7 +19,7 @@
 #include "match.h"		/* required by code */
 #include "powers.h"		/* required by code */
 #include "attrs.h"		/* required by code */
-#include "stringutil.h"         /* required by code */
+#include "stringutil.h" /* required by code */
 #include "nametabs.h"
 
 dbref match_controlled(dbref player, const char *name)
@@ -280,14 +280,18 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, int aflags)
 {
 	int i, j, n_aliases, retcode;
-	char *p, *tokp, *alias_ptrs[LBUF_SIZE / 2];
+	char *tmp_buf, *cpa__p, *cpa__tokp, *p, *tokp, *alias_ptrs[LBUF_SIZE / 2];
 	char *alias_buf = XMALLOC(LBUF_SIZE, "alias_buf");
-	char *tmp_buf;
 	/*
      * Clear out the original alias, so we can rewrite a new alias
      * * that uses the same names, if necessary.
      */
-	Clear_Player_Aliases(target, oldalias);
+
+	for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
+	{
+		delete_player_name((target), cpa__p);
+	}
+
 	/*
      * Don't nibble the original buffer. Copy it all into an array, because
      * * we have to eat leading and trailing spaces.
@@ -410,7 +414,7 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 	dbref thing, aowner;
 	int aflags, alen;
 	ATTR *ap;
-	char *oldalias, *trimalias;
+	char *oldalias, *trimalias, *cpa__p, *cpa__tokp;
 
 	if ((thing = match_controlled(player, name)) == NOTHING)
 	{
@@ -445,7 +449,12 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 			/*
 	     * New alias is null, just clear it
 	     */
-			Clear_Player_Aliases(thing, oldalias);
+
+			for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
+			{
+				delete_player_name((thing), cpa__p);
+			}
+
 			atr_clr(thing, A_ALIAS);
 
 			if (!Quiet(player))
@@ -1225,7 +1234,8 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	dbref oldthing;
 	char **newthings, **newattrs, *tp;
 	ATTR *oldattr;
-	char *s = XMALLOC(MBUF_SIZE, "s");;
+	char *s = XMALLOC(MBUF_SIZE, "s");
+	;
 
 	if (!*oldpair || !**newpair || !oldpair || !*newpair)
 	{
@@ -1608,7 +1618,7 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 		check_exclude = 0;
 		hash_insert = check_parents;
 		nhashflush(&mudstate.parent_htab, 0);
-		
+
 		for (lev = 0, parent = (*thing); (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Good_obj(Parent(parent)))

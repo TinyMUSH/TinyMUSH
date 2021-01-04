@@ -844,7 +844,7 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 	 * We've got to find this thing's predecessor so we avoid
 	 * * circular chaining.
 	 */
-		DO_WHOLE_DB(i)
+		for (i = 0; i < mudstate.db_top; i++)
 		{
 			if (Link(i) == thing)
 			{
@@ -876,9 +876,9 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 
 void make_freelist(void)
 {
-	dbref i;
 	mudstate.freelist = NOTHING;
-	DO_WHOLE_DB_BACKWARDS(i)
+
+	for (dbref i = mudstate.db_top - 1; i >= 0; i--)
 	{
 		if (IS_CLEAN(i))
 		{
@@ -894,7 +894,8 @@ void make_freelist(void)
 			break;
 		}
 	}
-	DO_WHOLE_DB_BACKWARDS(i)
+
+	for (dbref i = mudstate.db_top - 1; i >= 0; i--)
 	{
 		if (IS_CLEAN(i))
 		{
@@ -911,7 +912,8 @@ void make_freelist(void)
 void divest_object(dbref thing)
 {
 	dbref curr, temp;
-	SAFE_DOLIST(curr, temp, Contents(thing))
+
+	for (curr = Contents(thing), temp = (curr == NOTHING ? NOTHING : Next(curr)); (curr != NOTHING) && (Next(curr) != curr); curr = temp, temp = Next(temp))
 	{
 		if (!Controls(thing, curr) && Has_location(curr) && Key(curr))
 		{
@@ -930,7 +932,7 @@ void empty_obj(dbref obj)
 	/*
      * Send the contents home
      */
-	SAFE_DOLIST(targ, next, Contents(obj))
+	for (targ = Contents(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
 	{
 		if (!Has_location(targ))
 		{
@@ -958,7 +960,7 @@ void empty_obj(dbref obj)
 	/*
      * Destroy the exits
      */
-	SAFE_DOLIST(targ, next, Exits(obj))
+	for (targ = Exits(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
 	{
 		if (!isExit(targ))
 		{
@@ -1000,7 +1002,7 @@ void destroy_player(dbref victim)
 {
 	dbref aowner, player;
 	int count, aflags, alen;
-	char *buf, *a_dest;
+	char *buf, *a_dest, *cpa__p, *cpa__tokp;
 	/*
      * Bye bye...
      */
@@ -1028,7 +1030,12 @@ void destroy_player(dbref victim)
      */
 	delete_player_name(victim, Name(victim));
 	buf = atr_pget(victim, A_ALIAS, &aowner, &aflags, &alen);
-	Clear_Player_Aliases(victim, buf);
+
+	for (cpa__p = strtok_r((buf), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
+	{
+		delete_player_name((victim), cpa__p);
+	}
+
 	XFREE(buf);
 	move_via_generic(victim, NOTHING, player, 0);
 
@@ -1047,7 +1054,7 @@ void destroy_player(dbref victim)
 void purge_going(void)
 {
 	dbref i;
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (!Going(i))
 		{
@@ -1165,7 +1172,7 @@ void check_dead_refs(void)
 	char *str;
 	FWDLIST *fp;
 	PROPDIR *pp;
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		/*
 	 * Check the parent
@@ -1701,11 +1708,17 @@ void check_loc_exits(dbref loc)
 
 void check_exit_chains(void)
 {
-	dbref i;
-	Unmark_all(i);
-	DO_WHOLE_DB(i)
-	check_loc_exits(i);
-	DO_WHOLE_DB(i)
+	for (dbref i = 0; i < ((mudstate.db_top + 7) >> 3); i++)
+	{
+		mudstate.markbits->chunk[i] = (char)0x0;
+	}
+
+	for (dbref i = 0; i < mudstate.db_top; i++)
+	{
+		check_loc_exits(i);
+	}
+
+	for (dbref i = 0; i < mudstate.db_top; i++)
 	{
 		if (isExit(i) && !Marked(i))
 		{
@@ -1935,17 +1948,24 @@ void check_loc_contents(dbref loc)
 
 void check_contents_chains(void)
 {
-	dbref i;
-	Unmark_all(i);
-	DO_WHOLE_DB(i)
-	check_loc_contents(i);
-	DO_WHOLE_DB(i)
-
-	if (!Going(i) && !Marked(i) && Has_location(i))
+	for (dbref i = 0; i < ((mudstate.db_top + 7) >> 3); i++)
 	{
-		Log_simple_err(i, Location(i), "Orphaned object, moved home.");
-		ZAP_LOC(i);
-		move_via_generic(i, HOME, NOTHING, 0);
+		mudstate.markbits->chunk[i] = (char)0x0;
+	}
+
+	for (dbref i = 0; i < mudstate.db_top; i++)
+	{
+		check_loc_contents(i);
+	}
+
+	for (dbref i = 0; i < mudstate.db_top; i++)
+	{
+		if (!Going(i) && !Marked(i) && Has_location(i))
+		{
+			Log_simple_err(i, Location(i), "Orphaned object, moved home.");
+			ZAP_LOC(i);
+			move_via_generic(i, HOME, NOTHING, 0);
+		}
 	}
 }
 

@@ -1406,7 +1406,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		 */
 		if (check_cmd_access(player, enter_cmdp, args, nargs))
 		{
-			DOLIST(exit, Contents(Location(player)))
+			for (exit = Contents(Location(player)); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 			{
 				p = atr_pget(exit, A_EALIAS, &aowner, &aflags, &alen);
 
@@ -2914,7 +2914,7 @@ void list_memory(dbref player)
 	/*
 	 * Calculate size of stored attribute text
 	 */
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		each += obj_siz(&(db[i].attrtext));
 		each -= sizeof(Obj);

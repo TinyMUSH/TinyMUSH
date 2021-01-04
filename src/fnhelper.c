@@ -326,6 +326,25 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	return ntok;
 }
 
+void print_separator(const Delim *sep, char *list, char **bufc)
+{
+	if (sep->len == 1)
+	{
+		if (sep->str[0] == '\r')
+		{
+			SAFE_CRLF(list, bufc);
+		}
+		else if (sep->str[0] != '\0')
+		{
+			SAFE_LB_CHR(sep->str[0], list, bufc);
+		}
+	}
+	else
+	{
+		SAFE_STRNCAT(list, bufc, sep->str, sep->len, LBUF_SIZE);
+	}
+}
+
 void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 {
 	int i;
@@ -337,7 +356,8 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 
 	for (i = 1; i < alen; i++)
 	{
-		print_sep(sep, list, bufc);
+		print_separator(sep, list, bufc);
+
 		SAFE_LB_STR(arr[i], list, bufc);
 	}
 }

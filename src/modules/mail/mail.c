@@ -1372,7 +1372,7 @@ void do_mail_nuke(dbref player)
     /*
      * walk the list
      */
-    DO_WHOLE_DB(thing)
+    for (thing = 0; thing < mudstate.db_top; thing++)
     {
         for (mp = (struct mail *)nhashfind((int)thing,
                                            &mod_mail_msg_htab);
@@ -1911,7 +1911,7 @@ void mod_mail_dump_database(FILE *fp)
     /* Write out version number */
     fprintf(fp, "+V6\n");
     putref(fp, mod_mail_config.mail_db_top);
-    DO_WHOLE_DB(thing)
+    for (thing = 0; thing < mudstate.db_top; thing++)
     {
         if (isPlayer(thing))
         {
@@ -4304,7 +4304,11 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     struct mail *mp;
     dbref playerask;
     int num, rc, uc, cc;
-    VaChk_Range(0, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 2, buff, bufc))
+    {
+        return;
+    }
 
     if ((nfargs == 0) || !fargs[0] || !fargs[0][0])
     {
@@ -4386,7 +4390,8 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
     struct mail *mp;
     dbref playerask;
     int num;
-    VaChk_Range(1, 2);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc)) { return; }
 
     if (nfargs == 1)
     {
@@ -4485,9 +4490,9 @@ NAMETAB malias_sw[] = {
     {NULL, 0, 0, 0}};
 
 CMDENT mod_mail_cmdtable[] = {
-    {(char *)"@mail",   mail_sw,    CA_NO_SLAVE | CA_NO_GUEST,  0,  CS_TWO_ARG | CS_INTERP, NULL,   NULL,   NULL,   {do_mail}},
-    {(char *)"@malias", malias_sw,  CA_NO_SLAVE | CA_NO_GUEST,  0,  CS_TWO_ARG | CS_INTERP, NULL,   NULL,   NULL,   {do_malias}},
-    {(char *)"-",NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_postpend}},
+    {(char *)"@mail", mail_sw, CA_NO_SLAVE | CA_NO_GUEST, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_mail}},
+    {(char *)"@malias", malias_sw, CA_NO_SLAVE | CA_NO_GUEST, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_malias}},
+    {(char *)"-", NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_postpend}},
     {(char *)"~", NULL, CA_NO_GUEST | CA_NO_SLAVE | CF_DARK, 0, CS_ONE_ARG | CS_INTERP | CS_LEADIN, NULL, NULL, NULL, {do_prepend}},
     {(char *)NULL, NULL, 0, 0, 0, NULL, NULL, NULL, {NULL}}};
 

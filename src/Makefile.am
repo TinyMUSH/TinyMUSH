@@ -39,7 +39,7 @@ EXTRA_DIST				= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(S
 
 CLEANFILES				= defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
 
-API_SRC					= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h db.h api.h interface.h externs.h stringutil.h prototypes.h
+API_SRC					= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h api.h interface.h externs.h stringutil.h prototypes.h
 
 BUILT_SOURCES			= prototypes.h version.h tinymushapi.h defaults.h netmush.conf.example Startmush
 
@@ -112,7 +112,7 @@ version.h: version.h.in
 	touch version.h
 	chmod -w version.h
 
-tinymushapi.h:
+tinymushapi.h: $(API_SRC)
 	rm -f tinymushapi.h
 	touch tinymushapi.h
 	chmod +w tinymushapi.h

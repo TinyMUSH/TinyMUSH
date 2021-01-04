@@ -1729,7 +1729,7 @@ int do_top(int ncmds)
 							if (mudstate.qfirst->gdata->q_regs[z] && *(mudstate.qfirst->gdata->q_regs[z]))
 							{
 								mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, "do_top");
-								memcpy(mudstate.rdata->q_regs[z], mudstate.qfirst->gdata->q_regs[z], mudstate.qfirst->gdata->q_lens[z] + 1);
+								XMEMCPY(mudstate.rdata->q_regs[z], mudstate.qfirst->gdata->q_regs[z], mudstate.qfirst->gdata->q_lens[z] + 1);
 								mudstate.rdata->q_lens[z] = mudstate.qfirst->gdata->q_lens[z];
 							}
 						}
@@ -1744,7 +1744,7 @@ int do_top(int ncmds)
 								mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
 								strcpy(mudstate.rdata->x_names[z], mudstate.qfirst->gdata->x_names[z]);
 								mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-								memcpy(mudstate.rdata->x_regs[z], mudstate.qfirst->gdata->x_regs[z], mudstate.qfirst->gdata->x_lens[z] + 1);
+								XMEMCPY(mudstate.rdata->x_regs[z], mudstate.qfirst->gdata->x_regs[z], mudstate.qfirst->gdata->x_lens[z] + 1);
 								mudstate.rdata->x_lens[z] = mudstate.qfirst->gdata->x_lens[z];
 							}
 						}

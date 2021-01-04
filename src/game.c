@@ -1076,7 +1076,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 
 		if (will_send && (key & MSG_INV_EXITS))
 		{
-			DOLIST(obj, Exits(target))
+			for (obj = Exits(target); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				recip = Location(obj);
 
@@ -1114,7 +1114,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 				buff = msg;
 			}
 
-			DOLIST(obj, Exits(Location(target)))
+			for (obj = Exits(Location(target)); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				recip = Location(obj);
 
@@ -1157,7 +1157,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 				buff = msg;
 			}
 
-			DOLIST(obj, Contents(target))
+			for (obj = Contents(target); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				if (obj != target)
 				{
@@ -1193,7 +1193,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 				buff = msg;
 			}
 
-			DOLIST(obj, Contents(targetloc))
+			for (obj = Contents(targetloc); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				if ((obj != target) && (obj != targetloc))
 				{
@@ -1326,7 +1326,7 @@ void notify_except(dbref loc, dbref player, dbref exception, int flags, const ch
 		notify_check(loc, player, (MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags), NULL, msg);
 	}
 
-	DOLIST(first, Contents(loc))
+	for (first = Contents(loc); (first != NOTHING) && (Next(first) != first); first = Next(first))
 	{
 		if (first != exception)
 		{
@@ -1368,7 +1368,7 @@ void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, 
 		notify_check(loc, player, (MSG_ME_ALL | MSG_F_UP | MSG_S_INSIDE | MSG_NBR_EXITS_A | flags), NULL, msg);
 	}
 
-	DOLIST(first, Contents(loc))
+	for (first = Contents(loc); (first != NOTHING) && (Next(first) != first); first = Next(first))
 	{
 		if (first != exc1 && first != exc2)
 		{
@@ -1412,7 +1412,7 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 	 * And yes, we violate several rules of good programming practice by
 	 * failing to abstract our log calls. Oh well.
 	 */
-		DO_WHOLE_DB(thing)
+		for (thing = 0; thing < mudstate.db_top; thing++)
 		{
 			obj_time = Time_Used(thing);
 
@@ -2659,7 +2659,8 @@ void process_preload(void)
 	fp = (FWDLIST *)XMALLOC(sizeof(FWDLIST), "fp");
 	pp = (PROPDIR *)XMALLOC(sizeof(PROPDIR), "pp");
 	tstr = XMALLOC(LBUF_SIZE, "tstr");
-	DO_WHOLE_DB(thing)
+	
+	for (thing = 0; thing < mudstate.db_top; thing++)
 	{
 		/*
 	 * Ignore GOING objects

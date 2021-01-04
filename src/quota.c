@@ -68,9 +68,9 @@ void save_quota(int q_list[], dbref player, int qtype)
 
 void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
 {
-	register int a, r, e, t, p, i;
-	a = r = e = t = p = 0;
-	DO_WHOLE_DB(i)
+	int a = 0, r = 0, e = 0, t = 0, p = 0;
+	
+	for (dbref i = 0; i < mudstate.db_top; i++)
 	{
 		if ((Owner(i) != player) || (Going(i) && !isRoom(i)))
 		{
@@ -239,9 +239,9 @@ void show_quota_header(dbref player)
 
 void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *arg1, char *arg2)
 {
-	dbref who;
-	char *name, *target;
-	register int set = 0, value = 0, i;
+	dbref who = NOTHING, i = NOTHING;
+	char *name = NULL, *target = NULL;
+	int set = 0, value = 0;
 
 	if (!(mudconf.quotas || Can_Set_Quota(player)))
 	{
@@ -286,7 +286,8 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 		}
 
 		show_quota_header(player);
-		DO_WHOLE_DB(i)
+
+		for (i = 0; i < mudstate.db_top; i++)
 		{
 			if (isPlayer(i))
 			{

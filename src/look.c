@@ -79,7 +79,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 			continue;
 		}
 
-		DOLIST(thing, Exits(parent))
+		for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			if (Can_See_Exit(player, thing, isdark))
 			{
@@ -110,7 +110,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	{
 		if (Transparent(loc))
 		{
-			DOLIST(thing, Exits(parent))
+			for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
 				if (Can_See_Exit(player, thing, isdark))
 				{
@@ -142,7 +142,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 		}
 		else
 		{
-			DOLIST(thing, Exits(parent))
+			for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
 				if (Can_See_Exit(player, thing, isdark))
 				{
@@ -240,7 +240,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	/*
      * check to see if there is anything there
      */
-	DOLIST(thing, Contents(loc))
+	for (thing = Contents(loc); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 	{
 		if (Can_See(player, thing, can_see_loc))
 		{
@@ -248,7 +248,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	     * something exists!  show him everything
 	     */
 			notify(player, contents_name);
-			DOLIST(thing, Contents(loc))
+			for (thing = Contents(loc); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
 				if (Can_See(player, thing, can_see_loc))
 				{
@@ -796,8 +796,93 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	/*
      * Generate flags
      */
-	Print_Attr_Flags(aflags, xbuf, xbufp);
-	Print_Attr_Flags(ap->flags, gbuf, gbufp);
+
+	xbufp = xbuf;
+	if (aflags & AF_LOCK)
+		*xbufp++ = '+';
+	if (aflags & AF_NOPROG)
+		*xbufp++ = '$';
+	if (aflags & AF_CASE)
+		*xbufp++ = 'C';
+	if (aflags & AF_DEFAULT)
+		*xbufp++ = 'D';
+	if (aflags & AF_HTML)
+		*xbufp++ = 'H';
+	if (aflags & AF_PRIVATE)
+		*xbufp++ = 'I';
+	if (aflags & AF_RMATCH)
+		*xbufp++ = 'M';
+	if (aflags & AF_NONAME)
+		*xbufp++ = 'N';
+	if (aflags & AF_NOPARSE)
+		*xbufp++ = 'P';
+	if (aflags & AF_NOW)
+		*xbufp++ = 'Q';
+	if (aflags & AF_REGEXP)
+		*xbufp++ = 'R';
+	if (aflags & AF_STRUCTURE)
+		*xbufp++ = 'S';
+	if (aflags & AF_TRACE)
+		*xbufp++ = 'T';
+	if (aflags & AF_VISUAL)
+		*xbufp++ = 'V';
+	if (aflags & AF_NOCLONE)
+		*xbufp++ = 'c';
+	if (aflags & AF_DARK)
+		*xbufp++ = 'd';
+	if (aflags & AF_GOD)
+		*xbufp++ = 'g';
+	if (aflags & AF_CONST)
+		*xbufp++ = 'k';
+	if (aflags & AF_MDARK)
+		*xbufp++ = 'm';
+	if (aflags & AF_WIZARD)
+		*xbufp++ = 'w';
+	*xbufp = '\0';
+
+	gbufp = gbuf;
+	if (ap->flags & AF_LOCK)
+		*gbufp++ = '+';
+	if (ap->flags & AF_NOPROG)
+		*gbufp++ = '$';
+	if (ap->flags & AF_CASE)
+		*gbufp++ = 'C';
+	if (ap->flags & AF_DEFAULT)
+		*gbufp++ = 'D';
+	if (ap->flags & AF_HTML)
+		*gbufp++ = 'H';
+	if (ap->flags & AF_PRIVATE)
+		*gbufp++ = 'I';
+	if (ap->flags & AF_RMATCH)
+		*gbufp++ = 'M';
+	if (ap->flags & AF_NONAME)
+		*gbufp++ = 'N';
+	if (ap->flags & AF_NOPARSE)
+		*gbufp++ = 'P';
+	if (ap->flags & AF_NOW)
+		*gbufp++ = 'Q';
+	if (ap->flags & AF_REGEXP)
+		*gbufp++ = 'R';
+	if (ap->flags & AF_STRUCTURE)
+		*gbufp++ = 'S';
+	if (ap->flags & AF_TRACE)
+		*gbufp++ = 'T';
+	if (ap->flags & AF_VISUAL)
+		*gbufp++ = 'V';
+	if (ap->flags & AF_NOCLONE)
+		*gbufp++ = 'c';
+	if (ap->flags & AF_DARK)
+		*gbufp++ = 'd';
+	if (ap->flags & AF_GOD)
+		*gbufp++ = 'g';
+	if (ap->flags & AF_CONST)
+		*gbufp++ = 'k';
+	if (ap->flags & AF_MDARK)
+		*gbufp++ = 'm';
+	if (ap->flags & AF_WIZARD)
+		*gbufp++ = 'w';
+	*gbufp = '\0';
+
 	fbp = xbuf;
 
 	if (*xbuf && *gbuf)
@@ -1800,7 +1885,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		if (Contents(thing) != NOTHING)
 		{
 			notify(player, "Contents:");
-			DOLIST(content, Contents(thing))
+			for (content = Contents(thing); (content != NOTHING) && (Next(content) != content); content = Next(content))
 			{
 				buf2 = unparse_object(player, content, 0);
 				notify(player, buf2);
@@ -1822,7 +1907,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if (Exits(thing) != NOTHING)
 			{
 				notify(player, "Exits:");
-				DOLIST(exit, Exits(thing))
+				for (exit = Exits(thing); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
 					buf2 = unparse_object(player, exit, 0);
 					notify(player, buf2);
@@ -1856,7 +1941,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if (Exits(thing) != NOTHING)
 			{
 				notify(player, "Exits:");
-				DOLIST(exit, Exits(thing))
+				for (exit = Exits(thing); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
 					buf2 = unparse_object(player, exit, 0);
 					notify(player, buf2);
@@ -1971,7 +2056,7 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 	else
 	{
 		notify(player, "You are carrying:");
-		DOLIST(thing, thing)
+		for (thing = thing; (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			buff = unparse_object(player, thing, 1);
 			notify(player, buff);
@@ -1985,7 +2070,7 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 	{
 		notify(player, "Exits:");
 		e = buff = XMALLOC(LBUF_SIZE, "e");
-		DOLIST(thing, thing)
+		for (thing = thing; (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			if (e != buff)
 			{

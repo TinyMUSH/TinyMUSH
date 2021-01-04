@@ -1,12 +1,23 @@
-/* file_c.h -- File cache header file */
+/**
+ * @file file_c.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief File cache header file
+ * @version 3.3
+ * @date 2021-01-03
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
 #ifndef __FILE_C_H
 #define __FILE_C_H
 
-/* File caches.  These _must_ track the fcache array in file_c.c */
-
+/** 
+ * File caches.  These _must_ track the fcache array in file_c.c 
+ * 
+ */
 #define FC_CONN 0
 #define FC_CONN_SITE 1
 #define FC_CONN_DOWN 2
@@ -22,9 +33,7 @@
 #define FC_LAST 11
 
 typedef struct filecache_hdr FCACHE;
-
 typedef struct filecache_block_hdr FBLKHDR;
-
 typedef struct filecache_block FBLOCK;
 
 struct filecache_hdr

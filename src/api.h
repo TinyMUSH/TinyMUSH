@@ -19,7 +19,7 @@
 #define SIZE_HACK 1
 
 /**
- * @bug Need to be convert into a function in api.c
+ * @bug Need to be convert into a function in api.c.
  * 
  */
 #define DB_GROW_MODULE(old_db, new_size, new_top, proto)                                                                  \

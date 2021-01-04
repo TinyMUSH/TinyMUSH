@@ -69,7 +69,7 @@ void fun_con(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	if (Good_loc(it) && (Examinable(player, it) || (where_is(player) == it) || (it == cause)))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, db[it].contents, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, Contents(it), LBUF_SIZE);
 		return;
 	}
 
@@ -102,7 +102,7 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 			key |= VE_LOC_DARK;
 		}
 
-		DOLIST(exit, Exits(it))
+		for (exit = Exits(it); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 		{
 			if (Exit_Visible(exit, player, key))
 			{
@@ -138,7 +138,7 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 			if (!isExit(it))
 			{
 				SAFE_LB_CHR('#', buff, bufc);
-				SAFE_LTOS(buff, bufc, db[it].next, LBUF_SIZE);
+				SAFE_LTOS(buff, bufc, Next(it), LBUF_SIZE);
 				return;
 			}
 			else
@@ -155,7 +155,7 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 					key |= VE_LOC_DARK;
 				}
 
-				DOLIST(exit, it)
+				for (exit = it; (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
 					if ((exit != it) && Exit_Visible(exit, player, key))
 					{
@@ -186,7 +186,7 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	if (locatable(player, it, cause))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, ((FUN *)fargs[-1])->flags & (0x01) ? where_is(it) : db[it].location, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, ((FUN *)fargs[-1])->flags & (0x01) ? where_is(it) : Location(it), LBUF_SIZE);
 	}
 	else
 	{
@@ -632,7 +632,17 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	char *bb_p;
 	int i, first, last;
 	Delim osep;
-	VaChk_Only_Out(4);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	it = match_thing(player, fargs[0]);
 	bb_p = *bufc;
 
@@ -656,7 +666,7 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			{
 				if (*bufc != bb_p)
 				{
-					print_sep(&osep, buff, bufc);
+					print_separator(&osep, buff, bufc);
 				}
 
 				SAFE_LB_CHR('#', buff, bufc);
@@ -680,17 +690,27 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	dbref thing, it;
 	char *bb_p;
 	Delim osep;
-	VaChk_Only_Out(2);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	it = match_thing(player, fargs[0]);
 	bb_p = *bufc;
 
 	if (Good_loc(it) && (Examinable(player, it) || (Location(player) == it) || (it == cause)))
 	{
-		DOLIST(thing, Contents(it))
+		for (thing = Contents(it); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			SAFE_LB_CHR('#', buff, bufc);
@@ -714,7 +734,17 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char *bb_p;
 	int exam, lev, key;
 	Delim osep;
-	VaChk_Only_Out(2);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	it = match_thing(player, fargs[0]);
 
 	if (!Good_obj(it) || !Has_exits(it))
@@ -762,13 +792,13 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			key |= VE_BASE_DARK;
 		}
 
-		DOLIST(thing, Exits(parent))
+		for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			if (Exit_Visible(thing, player, key))
 			{
 				if (*bufc != bb_p)
 				{
-					print_sep(&osep, buff, bufc);
+					print_separator(&osep, buff, bufc);
 				}
 
 				SAFE_LB_CHR('#', buff, bufc);
@@ -791,7 +821,11 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 	char *bb_p;
 	int low_bound, high_bound, control_thing;
 	int find_ex, find_th, find_pl, find_rm;
-	VaChk_Range(0, 4);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 4, buff, bufc))
+	{
+		return;
+	}
 
 	if (nfargs >= 3)
 	{
@@ -941,12 +975,12 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	else if (Has_home(it))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, db[it].link, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, Link(it), LBUF_SIZE);
 	}
 	else if (Has_dropto(it))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, db[it].location, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, Location(it), LBUF_SIZE);
 	}
 	else if (isExit(it))
 	{
@@ -1147,7 +1181,50 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 		{
 			atr_pget_info(it, atr, &aowner, &aflags);
 			xbuf = XMALLOC(16, "xbuf");
-			Print_Attr_Flags(aflags, xbuf, xbufp);
+
+			xbufp = xbuf;
+			if (aflags & AF_LOCK)
+				*xbufp++ = '+';
+			if (aflags & AF_NOPROG)
+				*xbufp++ = '$';
+			if (aflags & AF_CASE)
+				*xbufp++ = 'C';
+			if (aflags & AF_DEFAULT)
+				*xbufp++ = 'D';
+			if (aflags & AF_HTML)
+				*xbufp++ = 'H';
+			if (aflags & AF_PRIVATE)
+				*xbufp++ = 'I';
+			if (aflags & AF_RMATCH)
+				*xbufp++ = 'M';
+			if (aflags & AF_NONAME)
+				*xbufp++ = 'N';
+			if (aflags & AF_NOPARSE)
+				*xbufp++ = 'P';
+			if (aflags & AF_NOW)
+				*xbufp++ = 'Q';
+			if (aflags & AF_REGEXP)
+				*xbufp++ = 'R';
+			if (aflags & AF_STRUCTURE)
+				*xbufp++ = 'S';
+			if (aflags & AF_TRACE)
+				*xbufp++ = 'T';
+			if (aflags & AF_VISUAL)
+				*xbufp++ = 'V';
+			if (aflags & AF_NOCLONE)
+				*xbufp++ = 'c';
+			if (aflags & AF_DARK)
+				*xbufp++ = 'd';
+			if (aflags & AF_GOD)
+				*xbufp++ = 'g';
+			if (aflags & AF_CONST)
+				*xbufp++ = 'k';
+			if (aflags & AF_MDARK)
+				*xbufp++ = 'm';
+			if (aflags & AF_WIZARD)
+				*xbufp++ = 'w';
+			*xbufp = '\0';
+
 			SAFE_LB_STR(xbuf, buff, bufc);
 			XFREE(xbuf);
 		}
@@ -1459,7 +1536,7 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	if (Good_obj(it) && (Examinable(player, it) || (it == cause)))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
-		SAFE_LTOS(buff, bufc, db[it].parent, LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, Parent(it), LBUF_SIZE);
 	}
 	else
 	{
@@ -1474,7 +1551,17 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	dbref it, par;
 	int i;
 	Delim osep;
-	VaChk_Only_Out(2);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	};
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	it = match_thing(player, fargs[0]);
 
 	if (!Good_obj(it))
@@ -1496,7 +1583,7 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	while (Good_obj(par) && Examinable(player, it) && (i < mudconf.parent_nest_lim))
 	{
-		print_sep(&osep, buff, bufc);
+		print_separator(&osep, buff, bufc);
 		SAFE_LB_CHR('#', buff, bufc);
 		SAFE_LTOS(buff, bufc, par, LBUF_SIZE);
 		it = par;
@@ -1510,7 +1597,16 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	dbref i, it;
 	char *bb_p;
 	Delim osep;
-	VaChk_Only_Out(2);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 
 	if (!strcmp(fargs[0], "#-1"))
 	{
@@ -1534,13 +1630,13 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 
 	bb_p = *bufc;
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (Parent(i) == it)
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			SAFE_LB_CHR('#', buff, bufc);
@@ -1573,7 +1669,7 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	}
 
 	SAFE_LB_CHR('#', buff, bufc);
-	SAFE_LTOS(buff, bufc, db[it].zone, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, Zone(it), LBUF_SIZE);
 }
 
 void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -1611,7 +1707,7 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 
 	bb_p = *bufc;
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (Typeof(i) == type)
 		{
@@ -1868,12 +1964,14 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *str;
-	VaChk_Range(1, 2);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
 
 	if (nfargs == 1)
 	{
-		str = fargs[0];
+		char *str = fargs[0];
 		exec(buff, bufc, player, caller, cause, EV_EVAL | EV_FCHECK, &str, (char **)NULL, 0);
 		return;
 	}
@@ -1909,7 +2007,43 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	/*
      * First arg: <obj>/<attr> or <attr> or #lambda/<code>
      */
-	Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+	if (string_prefix(fargs[0], "#lambda/"))
+	{
+		thing = player;
+		anum = NOTHING;
+		ap = NULL;
+		atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+		alen = strlen((fargs[0]) + 8);
+		__xstrcpy(atext, fargs[0] + 8);
+		atext[alen] = '\0';
+		aowner = player;
+		aflags = 0;
+	}
+	else
+	{
+		if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+		{
+			if ((anum == NOTHING) || !(Good_obj(thing)))
+				ap = NULL;
+			else
+				ap = atr_num(anum);
+		}
+		else
+		{
+			thing = player;
+			ap = atr_str(fargs[0]);
+		}
+		if (!ap)
+		{
+			return;
+		}
+		atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+		if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+		{
+			XFREE(atext);
+			return;
+		}
+	}
 
 	/*
      * If we're evaluating locally, preserve the global registers. If
@@ -2039,7 +2173,43 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 	/*
      * First arg: <obj>/<attr> or <attr> or #lambda/<code>
      */
-	Get_Ulambda(player, thing, fargs[1], anum, ap, atext, aowner, aflags, alen);
+	if (string_prefix(fargs[1], "#lambda/"))
+	{
+		thing = player;
+		anum = NOTHING;
+		ap = NULL;
+		atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+		alen = strlen((fargs[1]) + 8);
+		__xstrcpy(atext, fargs[1] + 8);
+		atext[alen] = '\0';
+		aowner = player;
+		aflags = 0;
+	}
+	else
+	{
+		if (parse_attrib(player, fargs[1], &thing, &anum, 0))
+		{
+			if ((anum == NOTHING) || !(Good_obj(thing)))
+				ap = NULL;
+			else
+				ap = atr_num(anum);
+		}
+		else
+		{
+			thing = player;
+			ap = atr_str(fargs[1]);
+		}
+		if (!ap)
+		{
+			return;
+		}
+		atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+		if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+		{
+			XFREE(atext);
+			return;
+		}
+	}
 	/*
      * Find our perspective.
      */
@@ -2268,7 +2438,18 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (objname != NULL)
 	{
-		Parse_Uattr(player, objname, thing, anum, ap);
+		if (parse_attrib(player, objname, &thing, &anum, 0))
+		{
+			if ((anum == NOTHING) || !(Good_obj(thing)))
+				ap = NULL;
+			else
+				ap = atr_num(anum);
+		}
+		else
+		{
+			thing = player;
+			ap = atr_str(objname);
+		}
 
 		if (ap)
 		{
@@ -2686,7 +2867,16 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 */
 		if (nfargs > 2)
 		{
-			VaChk_Only_Out(4);
+			if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+			{
+				return;
+			}
+
+			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+			{
+				return;
+			}
+
 			start = (int)strtol(fargs[1], (char **)NULL, 10);
 			count = (int)strtol(fargs[2], (char **)NULL, 10);
 
@@ -2698,7 +2888,16 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		}
 		else
 		{
-			VaChk_Only_Out(2);
+			if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+			{
+				return;
+			}
+
+			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+			{
+				return;
+			}
+
 			start = 1;
 			count = 0;
 		}
@@ -2729,7 +2928,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				{
 					if (*bufc != bb_p)
 					{
-						print_sep(&osep, buff, bufc);
+						print_separator(&osep, buff, bufc);
 					}
 
 					SAFE_LB_STR((char *)attr->name, buff, bufc);
@@ -2951,11 +3150,12 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	DO_WHOLE_DB(j)
-
-	if (Owner(j) == thing)
+	for (j = 0; j < mudstate.db_top; j++)
 	{
-		tot += mem_usage(j);
+		if (Owner(j) == thing)
+		{
+			tot += mem_usage(j);
+		}
 	}
 
 	SAFE_LTOS(buff, bufc, tot, LBUF_SIZE);
@@ -3301,8 +3501,16 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * stuff to make sure that a space delimiter is really an intended
      * space, not delim_check() defaulting.
      */
-	VaChk_Range(2, 7);
-	VaChk_InSep(6, 0);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 7, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &isep, DELIM_STRING))
+	{
+		return;
+	}
 
 	if ((isep.len == 1) && (isep.str[0] == ' '))
 	{
@@ -3312,9 +3520,16 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	}
 
-	VaChk_DefaultOut(7)
+	if (nfargs < 7)
 	{
-		VaChk_OutSep(7, 0);
+		XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 7, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+		{
+			return;
+		}
 	}
 
 	/*
@@ -3395,7 +3610,18 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs >= 4)
 	{
-		Parse_Uattr(player, fargs[3], obj1, anum1, ap1);
+		if (parse_attrib(player, fargs[3], &obj1, &anum1, 0))
+		{
+			if ((anum1 == NOTHING) || !(Good_obj(obj1)))
+				ap1 = NULL;
+			else
+				ap1 = atr_num(anum1);
+		}
+		else
+		{
+			obj1 = player;
+			ap1 = atr_str(fargs[3]);
+		}
 
 		if (ap1)
 		{
@@ -3423,7 +3649,18 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs >= 5)
 	{
-		Parse_Uattr(player, fargs[4], obj2, anum2, ap2);
+		if (parse_attrib(player, fargs[4], &obj2, &anum2, 0))
+		{
+			if ((anum2 == NOTHING) || !(Good_obj(obj2)))
+				ap2 = NULL;
+			else
+				ap2 = atr_num(anum2);
+		}
+		else
+		{
+			obj2 = player;
+			ap2 = atr_str(fargs[4]);
+		}
 
 		if (ap2)
 		{

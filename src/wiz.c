@@ -523,7 +523,8 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 	}
 
 	amt = (int)strtol(arg1, (char **)NULL, 10);
-	DO_WHOLE_DB(a)
+	
+	for (a = 0; a < mudstate.db_top; a++)
 	{
 		if (isPlayer(a))
 		{

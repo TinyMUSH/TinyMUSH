@@ -2319,7 +2319,17 @@ void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     CHANNEL *chp;
     char *bb_p;
     Delim osep;
-    VaChk_Only_Out(1);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1 - 1, 1, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+    {
+        return;
+    }
+
     bb_p = *bufc;
 
     for (chp = (CHANNEL *)hash_firstentry(&mod_comsys_comsys_htab);
@@ -2331,7 +2341,7 @@ void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         {
             if (*bufc != bb_p)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
             }
 
             SAFE_LB_STR(chp->name, buff, bufc);
@@ -2385,7 +2395,8 @@ void fun_comowner(char *buff, char **bufc, dbref player, dbref caller __attribut
 {
     CHANNEL *chp;
     Grab_Channel(player);
-    SAFE_LB_CHR('#', buff, bufc); SAFE_LTOS(buff, bufc, chp->owner, LBUF_SIZE);
+    SAFE_LB_CHR('#', buff, bufc);
+    SAFE_LTOS(buff, bufc, chp->owner, LBUF_SIZE);
 }
 
 void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

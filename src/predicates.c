@@ -46,7 +46,7 @@ dbref remove_first(dbref head, dbref thing)
 		return (Next(thing));
 	}
 
-	DOLIST(prev, head)
+	for (prev = head; (prev != NOTHING) && (Next(prev) != prev); prev = Next(prev))
 	{
 		if (Next(prev) == thing)
 		{
@@ -83,7 +83,7 @@ dbref reverse_list(dbref list)
 
 int member(dbref thing, dbref list)
 {
-	DOLIST(list, list)
+	for (list = list; (list != NOTHING) && (Next(list) != list); list = Next(list))
 	{
 		if (list == thing)
 		{
@@ -1694,7 +1694,7 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 				if (mudstate.rdata->q_regs[z] && *(mudstate.rdata->q_regs[z]))
 				{
 					program->wait_data->q_regs[z] = XMALLOC(LBUF_SIZE, "do_prog.regs");
-					memcpy(program->wait_data->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
+					XMEMCPY(program->wait_data->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
 					program->wait_data->q_lens[z] = mudstate.rdata->q_lens[z];
 				}
 			}
@@ -1709,7 +1709,7 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 					program->wait_data->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
 					strcpy(program->wait_data->x_names[z], mudstate.rdata->x_names[z]);
 					program->wait_data->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-					memcpy(program->wait_data->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
+					XMEMCPY(program->wait_data->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
 					program->wait_data->x_lens[z] = mudstate.rdata->x_lens[z];
 				}
 			}
@@ -2421,7 +2421,7 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 				continue;
 			}
 
-			DOLIST(obj, Exits(parent))
+			for (obj = Exits(parent); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				if (Can_See_Exit(player, obj, is_ok))
 				{
@@ -2443,7 +2443,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 		list = XMALLOC(LBUF_SIZE, "list");
 		bb_p = lp = list;
 		is_ok = Sees_Always(player, thing);
-		DOLIST(obj, Contents(thing))
+
+		for (obj = Contents(thing); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
 			if (Can_See(player, obj, is_ok))
 			{

@@ -593,18 +593,21 @@ dbref lookup_player(dbref doer, char *name, int check_who)
 
 void load_player_names(void)
 {
-    dbref i, aowner;
+    dbref aowner;
     int aflags, alen;
     char *alias, *p, *tokp;
-    DO_WHOLE_DB(i)
+
+    for (dbref i = 0; i < mudstate.db_top; i++)
     {
         if (Typeof(i) == TYPE_PLAYER)
         {
             add_player_name(i, Name(i));
         }
     }
+
     alias = XMALLOC(LBUF_SIZE, "alias");
-    DO_WHOLE_DB(i)
+
+    for (dbref i = 0; i < mudstate.db_top; i++)
     {
         if (Typeof(i) == TYPE_PLAYER)
         {

@@ -253,7 +253,7 @@ void process_sticky_dropto(dbref loc, dbref player)
     /*
      * Make sure no players hanging out
      */
-    DOLIST(thing, Contents(loc))
+    for (thing = Contents(loc); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
     {
         if (Dropper(thing))
         {
@@ -264,7 +264,8 @@ void process_sticky_dropto(dbref loc, dbref player)
      * Send everything through the dropto
      */
     s_Contents(loc, reverse_list(Contents(loc)));
-    SAFE_DOLIST(thing, next, Contents(loc))
+
+    for (thing = Contents(loc), next = (thing == NOTHING ? NOTHING : Next(thing)); (thing != NOTHING) && (Next(thing) != thing); thing = next, next = Next(next))
     {
         send_dropto(thing, player);
     }

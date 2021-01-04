@@ -37,11 +37,32 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (flag)
     {
-        VaChk_Only_InEval(3);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_EVAL | DELIM_STRING))
+        {
+            return;
+        }
     }
     else
     {
-        VaChk_InEval_OutEval(2, 4);
+        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+        {
+            return;
+        };
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_EVAL | DELIM_STRING))
+        {
+            return;
+        }
+
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_EVAL | DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
     }
 
     dp = cp = curr = XMALLOC(LBUF_SIZE, "curr");
@@ -61,7 +82,7 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (!flag && (*bufc != bb_p))
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         number++;
@@ -151,11 +172,32 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (flag)
         {
-            VaChk_Only_InEval(3);
+            if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+            {
+                return;
+            }
+
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_EVAL | DELIM_STRING))
+            {
+                return;
+            }
         }
         else
         {
-            VaChk_InEval_OutEval(2, 4);
+            if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+            {
+                return;
+            }
+
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_EVAL | DELIM_STRING))
+            {
+                return;
+            }
+
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_EVAL | DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+            {
+                return;
+            }
         }
 
         ep = fargs[1];
@@ -164,11 +206,30 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (flag)
         {
-            VaChk_Only_InEval(4);
+            if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
+            {
+                return;
+            }
+
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_EVAL | DELIM_STRING))
+            {
+                return;
+            }
         }
         else
         {
-            VaChk_InEval_OutEval(3, 5);
+            if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 5, buff, bufc))
+            {
+                return;
+            }
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_EVAL | DELIM_STRING))
+            {
+                return;
+            }
+            if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &osep, DELIM_EVAL | DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+            {
+                return;
+            }
         }
 
         ep = fargs[2];
@@ -226,7 +287,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (!need_result && (*bufc != bb_p))
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         if (input_p)
@@ -282,7 +343,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             {
                 if (*bufc != bb_p)
                 {
-                    print_sep(&osep, buff, bufc);
+                    print_separator(&osep, buff, bufc);
                 }
 
                 SAFE_LB_STR(mudstate.loop_token[cur_lev], buff, bufc);
@@ -406,17 +467,62 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     /*
      * We need two to four arguments only
      */
-    VaChk_In(2, 4);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+    {
+        return;
+    };
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
     /*
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
     /*
      * Evaluate it using the rest of the passed function args
      */
     cp = curr = fargs[1];
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
-    XMEMCPY(atextbuf, atext, alen); 
+    XMEMCPY(atextbuf, atext, alen);
     atextbuf[alen] = '\0';
     /*
      * may as well handle first case now
@@ -492,11 +598,91 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     char *atext, *result, *curr, *objs[2], *bp, *str, *cp, *op, *atextbuf;
     char *bb_p;
     flag = Func_Mask(LOGIC_BOOL);
-    VaChk_Only_In_Out(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 4)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        };
+    }
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 4)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        };
+    }
+
     /*
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
     /*
      * Now iteratively eval the attrib with the argument list
      */
@@ -521,7 +707,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         {
             if (*bufc != bb_p)
             {
-                print_sep(&osep, buff, bufc);
+                print_separator(&osep, buff, bufc);
             }
 
             SAFE_LB_STR(objs[0], buff, bufc);
@@ -553,7 +739,28 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     char *atext, *objs[2], *str, *cp, *atextbuf, *bb_p, *op;
     Delim isep, osep;
     int i;
-    VaChk_Only_In_Out(4);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 4)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        };
+    }
 
     /*
      * If we don't have anything for a second arg, don't bother.
@@ -566,7 +773,43 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     /*
      * Two possibilities for the second arg: <obj>/<attr> and <attr>.
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
     /*
      * now process the list one element at a time
      */
@@ -580,7 +823,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     {
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         objs[0] = split_token(&cp, &isep);
@@ -618,7 +861,10 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * there are more than three arguments, the last argument is ALWAYS
      * assumed to be a delimiter.
      */
-    VaChk_Range(3, 12);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 12, buff, bufc))
+    {
+        return;
+    }
 
     if (nfargs < 4)
     {
@@ -638,7 +884,43 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     /*
      * Get the attribute, check the permissions.
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
 
     for (i = 0; i < NUM_ENV_VARS; i++)
     {
@@ -678,12 +960,12 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
             }
         }
 
-        XMEMCPY(atextbuf, atext, alen); 
+        XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
 
         if (*bufc != bb_p)
         {
-            print_sep(&isep, buff, bufc);
+            print_separator(&isep, buff, bufc);
         }
 
         str = atextbuf;
@@ -709,7 +991,29 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     char *atext, *str, *cp, *atextbuf, *bb_p, *os[NUM_ENV_VARS];
     Delim isep, osep;
     int step_size, i;
-    VaChk_Only_In_Out(5);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 5, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 5)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
+    }
+
     step_size = (int)strtol(fargs[2], (char **)NULL, 10);
 
     if ((step_size < 1) || (step_size > NUM_ENV_VARS))
@@ -721,7 +1025,44 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     /*
      * Get attribute. Check permissions.
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
+
     cp = trim_space_sep(fargs[1], &isep);
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
     bb_p = *bufc;
@@ -730,7 +1071,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     {
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         for (i = 0; cp && (i < step_size); i++)
@@ -763,8 +1104,50 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     char *str, *atext, *atextbuf, *cp, *cbuf[2], *op;
     char start_token, end_token;
     int in_string = 1;
-    VaChk_Range(2, 4);
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+    {
+        return;
+    }
+
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
+
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
     cbuf[0] = XMALLOC(LBUF_SIZE, "cbuf[0]");
     cp = Eat_Spaces(fargs[1]);
@@ -837,7 +1220,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         cbuf[0][1] = '\0';
         op = cbuf[1];
         SAFE_LTOS(cbuf[1], &op, i, LBUF_SIZE);
-        XMEMCPY(atextbuf, atext, alen); 
+        XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
         exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
@@ -870,11 +1253,68 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         return;
     }
 
-    VaChk_Only_In_Out(5);
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 5, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 5)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
+    }
+
     /*
      * Find our object and attribute
      */
-    Get_Ulambda(player, thing, fargs[0], anum, ap, atext, aowner, aflags, alen);
+    if (string_prefix(fargs[0], "#lambda/"))
+    {
+        thing = player;
+        anum = NOTHING;
+        ap = NULL;
+        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        alen = strlen((fargs[0]) + 8);
+        __xstrcpy(atext, fargs[0] + 8);
+        atext[alen] = '\0';
+        aowner = player;
+        aflags = 0;
+    }
+    else
+    {
+        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
+        {
+            if ((anum == NOTHING) || !(Good_obj(thing)))
+                ap = NULL;
+            else
+                ap = atr_num(anum);
+        }
+        else
+        {
+            thing = player;
+            ap = atr_str(fargs[0]);
+        }
+        if (!ap)
+        {
+            return;
+        }
+        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+        {
+            XFREE(atext);
+            return;
+        }
+    }
     /*
      * Copy our lists and chop them up.
      */
@@ -903,7 +1343,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     st[0] = fargs[1];
     st[1] = XMALLOC(LBUF_SIZE, "st[1]");
     bp = st[1];
-    print_sep(&isep, st[1], &bp);
+    print_separator(&isep, st[1], &bp);
     bp = rlist = XMALLOC(LBUF_SIZE, "rlist");
     str = atext;
     exec(rlist, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, st, 2);
@@ -922,7 +1362,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             {
                 if (*bufc != oldp)
                 {
-                    print_sep(&osep, buff, bufc);
+                    print_separator(&osep, buff, bufc);
                 }
 
                 SAFE_LB_STR(ptrs2[j], buff, bufc);
@@ -960,7 +1400,28 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     ATTR *ap, *ap2;
     char *atext1, *atext2, *atextbuf, *condbuf;
     char *objs[2], *cp, *str, *dp, *savep, *bb_p, *op;
-    VaChk_Only_In_Out(6);
+
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 4, 6, buff, bufc))
+    {
+        return;
+    }
+
+    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &isep, DELIM_STRING))
+    {
+        return;
+    }
+
+    if (nfargs < 6)
+    {
+        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+    }
+    else
+    {
+        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+        {
+            return;
+        }
+    }
 
     /*
      * If our third arg is null (empty list), don't bother.
@@ -979,10 +1440,46 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * a static, and that therefore we have to be careful about what
      * we're doing.
      */
-    Parse_Uattr(player, fargs[0], thing1, anum1, ap);
-    Get_Uattr(player, thing1, ap, atext1, aowner1, aflags1, alen1);
+    if (parse_attrib(player, fargs[0], &thing1, &anum1, 0))
+    {
+        if ((anum1 == NOTHING) || !(Good_obj(thing1)))
+            ap = NULL;
+        else
+            ap = atr_num(anum1);
+    }
+    else
+    {
+        thing1 = player;
+        ap = atr_str(fargs[0]);
+    }
+
+    if (!ap)
+    {
+        return;
+    }
+
+    atext1 = atr_pget(thing1, ap->number, &aowner1, &aflags1, &alen1);
+
+    if (!*atext1 || !(See_attr(player, thing1, ap, aowner1, aflags1)))
+    {
+        XFREE(atext1);
+        return;
+    }
+
     tmp_num = ap->number;
-    Parse_Uattr(player, fargs[1], thing2, anum2, ap2);
+
+    if (parse_attrib(player, fargs[1], &thing2, &anum2, 0))
+    {
+        if ((anum2 == NOTHING) || !(Good_obj(thing2)))
+            ap2 = NULL;
+        else
+            ap2 = atr_num(anum2);
+    }
+    else
+    {
+        thing2 = player;
+        ap2 = atr_str(fargs[1]);
+    }
 
     if (!ap2)
     {
@@ -1043,7 +1540,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     {
         if (*bufc != bb_p)
         {
-            print_sep(&osep, buff, bufc);
+            print_separator(&osep, buff, bufc);
         }
 
         objs[0] = split_token(&cp, &isep);

@@ -1,18 +1,27 @@
-/* fnproto.h - function prototypes from funmath.c, etc. */
+/**
+ * @file fnproto.h
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief MUSHCode function prototypes
+ * @version 3.3
+ * @date 2021-01-03
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * 
+ */
 
 #include "copyright.h"
 
 #ifndef __FNPROTO_H
 #define __FNPROTO_H
 
-/*
- * ---------------------------------------------------------------------------
- * flist: List of existing functions in alphabetical order. */
-
+/**
+ * @brief List of existing MUSHCode functions in alphabetical order.
+ * 
+ */
 FUN flist[] = {
-    /* - @ - */
+    /** - @ - */
     {"@@", fun_null, 1, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /* - A - */
+    /** - A - */
     {"ABS", fun_abs, 1, 0, CA_PUBLIC, NULL},
     {"ACOS", handle_trig, 1, TRIG_ARC | TRIG_CO, CA_PUBLIC, NULL},
     {"ACOSD", handle_trig, 1, TRIG_ARC | TRIG_CO | TRIG_DEG, CA_PUBLIC, NULL},
@@ -32,7 +41,7 @@ FUN flist[] = {
     {"ASIND", handle_trig, 1, TRIG_ARC | TRIG_DEG, CA_PUBLIC, NULL},
     {"ATAN", handle_trig, 1, TRIG_ARC | TRIG_TAN, CA_PUBLIC, NULL},
     {"ATAND", handle_trig, 1, TRIG_ARC | TRIG_TAN | TRIG_DEG, CA_PUBLIC, NULL},
-    /* - B - */
+    /** - B - */
     {"BAND", fun_band, 2, 0, CA_PUBLIC, NULL},
     {"BASECONV", fun_baseconv, 3, 0, CA_PUBLIC, NULL},
     {"BEEP", fun_beep, 0, 0, CA_WIZARD, NULL},
@@ -42,7 +51,7 @@ FUN flist[] = {
     {"BOUND", fun_bound, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"BOR", fun_bor, 2, 0, CA_PUBLIC, NULL},
     {"BORDER", perform_border, 0, FN_VARARGS | JUST_LEFT, CA_PUBLIC, NULL},
-    /* - C - */
+    /** - C - */
     {"CANDBOOL", handle_logic, 0, FN_VARARGS | FN_NO_EVAL | LOGIC_AND | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"CAND", handle_logic, 0, FN_VARARGS | FN_NO_EVAL | LOGIC_AND, CA_PUBLIC, NULL},
     {"CAPSTR", fun_capstr, -1, 0, CA_PUBLIC, NULL},
@@ -75,7 +84,7 @@ FUN flist[] = {
     {"CREATE", fun_create, 0, FN_VARARGS | FN_DBFX, CA_PUBLIC, NULL},
     {"CREATION", handle_timestamp, 1, TIMESTAMP_CRE, CA_PUBLIC, NULL},
     {"CTABLES", process_tables, 0, FN_VARARGS | JUST_CENTER, CA_PUBLIC, NULL},
-    /* - D - */
+    /** - D - */
     {"DEC", fun_dec, 1, 0, CA_PUBLIC, NULL},
     {"DECRYPT", fun_decrypt, 2, 0, CA_PUBLIC, NULL},
     {"DEFAULT", fun_default, 2, FN_NO_EVAL, CA_PUBLIC, NULL},
@@ -89,7 +98,7 @@ FUN flist[] = {
     {"DIV", fun_div, 2, 0, CA_PUBLIC, NULL},
     {"DOING", fun_doing, 1, 0, CA_PUBLIC, NULL},
     {"DUP", fun_dup, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
-    /* - E - */
+    /** - E - */
     {"E", fun_e, 1, 0, CA_PUBLIC, NULL},
     {"EDEFAULT", fun_edefault, 2, FN_NO_EVAL, CA_PUBLIC, NULL},
     {"EDIT", fun_edit, 3, 0, CA_PUBLIC, NULL},
@@ -108,7 +117,7 @@ FUN flist[] = {
     {"EXP", fun_exp, 1, 0, CA_PUBLIC, NULL},
     {"EXTRACT", fun_extract, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"EVAL", fun_eval, 0, FN_VARARGS | GET_EVAL | GET_XARGS, CA_PUBLIC, NULL},
-    /* - F - */
+    /** - F - */
     {"FCOUNT", fun_fcount, 0, 0, CA_PUBLIC, NULL},
     {"FDEPTH", fun_fdepth, 0, 0, CA_PUBLIC, NULL},
     {"FDIV", fun_fdiv, 2, 0, CA_PUBLIC, NULL},
@@ -123,7 +132,7 @@ FUN flist[] = {
     {"FORCE", fun_force, 2, FN_QFX, CA_PUBLIC, NULL},
     {"FOREACH", fun_foreach, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"FULLNAME", handle_name, 1, NAMEFN_FULLNAME, CA_PUBLIC, NULL},
-    /* - G - */
+    /** - G - */
     {"GET", perform_get, 1, 0, CA_PUBLIC, NULL},
     {"GET_EVAL", perform_get, 1, GET_EVAL, CA_PUBLIC, NULL},
     {"GRAB", fun_grab, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -137,7 +146,7 @@ FUN flist[] = {
     {"GROUP", fun_group, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"GT", fun_gt, 2, 0, CA_PUBLIC, NULL},
     {"GTE", fun_gte, 2, 0, CA_PUBLIC, NULL},
-    /* - H - */
+    /** - H - */
     {"HASATTR", fun_hasattr, 2, 0, CA_PUBLIC, NULL},
     {"HASATTRP", fun_hasattr, 2, CHECK_PARENTS, CA_PUBLIC, NULL},
     {"HASFLAG", fun_hasflag, 2, 0, CA_PUBLIC, NULL},
@@ -150,7 +159,7 @@ FUN flist[] = {
     {"HOME", fun_home, 1, 0, CA_PUBLIC, NULL},
     {"HTML_ESCAPE", fun_html_escape, -1, 0, CA_PUBLIC, NULL},
     {"HTML_UNESCAPE", fun_html_unescape, -1, 0, CA_PUBLIC, NULL},
-    /* - I - */
+    /** - I - */
     {"IBREAK", fun_ibreak, 1, 0, CA_PUBLIC, NULL},
     {"IDLE", handle_conninfo, 1, CONNINFO_IDLE, CA_PUBLIC, NULL},
     {"IFELSE", handle_ifelse, 0, IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
@@ -177,11 +186,11 @@ FUN flist[] = {
     {"ISTRUE", perform_iter, 0, FN_VARARGS | FN_NO_EVAL | BOOL_COND_NONE | FILT_COND_TRUE, CA_PUBLIC, NULL},
     {"ITEXT", fun_itext, 1, 0, CA_PUBLIC, NULL},
     {"ITEXT2", fun_itext2, 1, 0, CA_PUBLIC, NULL},
-    /* - J - */
+    /** - J - */
     {"JOIN", fun_join, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /* - K - */
+    /** - K - */
     {"KNOWS", handle_okpres, 2, PRESFN_KNOWS, CA_PUBLIC, NULL},
-    /* - L - */
+    /** - L - */
     {"LADD", fun_ladd, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"LALIGN", fun_lalign, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"LAND", handle_logic, 0, FN_VARARGS | LOGIC_LIST | LOGIC_AND, CA_PUBLIC, NULL},
@@ -233,7 +242,7 @@ FUN flist[] = {
     {"LUNION", handle_sets, 0, FN_VARARGS | SET_TYPE | SET_UNION, CA_PUBLIC, NULL},
     {"LVARS", fun_lvars, 0, FN_VARFX, CA_PUBLIC, NULL},
     {"LWHO", fun_lwho, 0, 0, CA_PUBLIC, NULL},
-    /* - M - */
+    /** - M - */
     {"MAP", fun_map, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MATCH", fun_match, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MATCHALL", fun_matchall, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -250,7 +259,7 @@ FUN flist[] = {
     {"MUDNAME", fun_mudname, 0, 0, CA_PUBLIC, NULL},
     {"MUL", fun_mul, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MUNGE", fun_munge, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /* - N - */
+    /** - N - */
     {"NAME", handle_name, 1, 0, CA_PUBLIC, NULL},
     {"NATTR", handle_lattr, 1, LATTR_COUNT, CA_PUBLIC, NULL},
     {"NCOMP", fun_ncomp, 2, 0, CA_PUBLIC, NULL},
@@ -265,7 +274,7 @@ FUN flist[] = {
     {"NSECURE", fun_secure, -1, FN_NO_EVAL, CA_PUBLIC, NULL},
     {"NULL", fun_null, 1, 0, CA_PUBLIC, NULL},
     {"NUM", fun_num, 1, 0, CA_PUBLIC, NULL},
-    /* - O - */
+    /** - O - */
     {"OBJ", handle_pronoun, 1, PRONOUN_OBJ, CA_PUBLIC, NULL},
     {"OBJCALL", fun_objcall, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"OBJEVAL", fun_objeval, 2, FN_NO_EVAL, CA_PUBLIC, NULL},
@@ -276,7 +285,7 @@ FUN flist[] = {
     {"ORBOOL", handle_logic, 0, FN_VARARGS | LOGIC_OR | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"ORFLAGS", handle_flaglists, 2, LOGIC_OR, CA_PUBLIC, NULL},
     {"OWNER", fun_owner, 1, 0, CA_PUBLIC, NULL},
-    /* - P - */
+    /** - P - */
     {"PARENT", fun_parent, 1, 0, CA_PUBLIC, NULL},
     {"PARSE", perform_loop, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"PEEK", handle_pop, 0, FN_VARARGS | FN_STACKFX | POP_PEEK, CA_PUBLIC, NULL},
@@ -295,10 +304,10 @@ FUN flist[] = {
     {"PROGRAMMER", fun_programmer, 1, 0, CA_PUBLIC, NULL},
     {"PS", fun_ps, 1, 0, CA_PUBLIC, NULL},
     {"PUSH", fun_push, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
-    /* - Q - */
+    /** - Q - */
     {"QSUB", fun_qsub, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"QVARS", fun_qvars, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /* - R - */
+    /** - R - */
     {"R", fun_r, 1, 0, CA_PUBLIC, NULL},
     {"RAND", fun_rand, 1, 0, CA_PUBLIC, NULL},
     {"RBORDER", perform_border, 0, FN_VARARGS | JUST_RIGHT, CA_PUBLIC, NULL},
@@ -333,7 +342,7 @@ FUN flist[] = {
     {"ROOM", fun_room, 1, 0, CA_PUBLIC, NULL},
     {"ROUND", fun_round, 2, 0, CA_PUBLIC, NULL},
     {"RTABLES", process_tables, 0, FN_VARARGS | JUST_RIGHT, CA_PUBLIC, NULL},
-    /* - S - */
+    /** - S - */
     {"S", fun_s, -1, 0, CA_PUBLIC, NULL},
     {"SANDBOX", handle_ucall, 0, FN_VARARGS | UCALL_SANDBOX, CA_PUBLIC, NULL},
     {"SCRAMBLE", fun_scramble, 1, 0, CA_PUBLIC, NULL},
@@ -380,7 +389,7 @@ FUN flist[] = {
     {"SWAP", fun_swap, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
     {"SWITCH", fun_switch, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"SWITCHALL", fun_switchall, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /* - T - */
+    /** - T - */
     {"T", fun_t, 1, 0, CA_PUBLIC, NULL},
     {"TABLE", fun_table, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"TABLES", process_tables, 0, FN_VARARGS | JUST_LEFT, CA_PUBLIC, NULL},
@@ -396,7 +405,7 @@ FUN flist[] = {
     {"TRIM", fun_trim, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"TRUNC", fun_trunc, 1, 0, CA_PUBLIC, NULL},
     {"TYPE", fun_type, 1, 0, CA_PUBLIC, NULL},
-    /* - U - */
+    /** - U - */
     {"U", do_ufun, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"UCALL", handle_ucall, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"UCSTR", fun_ucstr, -1, 0, CA_PUBLIC, NULL},
@@ -411,7 +420,7 @@ FUN flist[] = {
     {"URL_UNESCAPE", fun_url_unescape, -1, 0, CA_PUBLIC, NULL},
     {"USETRUE", handle_ifelse, 0, IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"USEFALSE", handle_ifelse, 0, IFELSE_FALSE | IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /* - V - */
+    /** - V - */
     {"V", fun_v, 1, 0, CA_PUBLIC, NULL},
     {"VADD", handle_vectors, 0, FN_VARARGS | VEC_ADD, CA_PUBLIC, NULL},
     {"VAND", handle_vectors, 0, FN_VARARGS | VEC_AND, CA_PUBLIC, NULL},
@@ -426,7 +435,7 @@ FUN flist[] = {
     {"VSUB", handle_vectors, 0, FN_VARARGS | VEC_SUB, CA_PUBLIC, NULL},
     {"VUNIT", handle_vector, 0, FN_VARARGS | VEC_UNIT, CA_PUBLIC, NULL},
     {"VXOR", handle_vectors, 0, FN_VARARGS | VEC_XOR, CA_PUBLIC, NULL},
-    /* - W - */
+    /** - W - */
     {"WAIT", fun_wait, 2, FN_QFX, CA_PUBLIC, NULL},
     {"WHENFALSE", perform_iter, 0, FN_VARARGS | FN_NO_EVAL | BOOL_COND_FALSE | FILT_COND_NONE, CA_PUBLIC, NULL},
     {"WHENTRUE", perform_iter, 0, FN_VARARGS | FN_NO_EVAL | BOOL_COND_TRUE | FILT_COND_NONE, CA_PUBLIC, NULL},
@@ -442,19 +451,19 @@ FUN flist[] = {
     {"WORDS", fun_words, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"WRITABLE", fun_writable, 2, 0, CA_PUBLIC, NULL},
     {"WRITE", fun_write, 2, FN_VARFX, CA_PUBLIC, NULL},
-    /* - X - */
+    /** - X - */
     {"X", fun_x, 1, FN_VARFX, CA_PUBLIC, NULL},
     {"XCON", fun_xcon, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"XGET", perform_get, 2, GET_XARGS, CA_PUBLIC, NULL},
     {"XOR", handle_logic, 0, FN_VARARGS | LOGIC_XOR, CA_PUBLIC, NULL},
     {"XORBOOL", handle_logic, 0, FN_VARARGS | LOGIC_XOR | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"XVARS", fun_xvars, 0, FN_VARARGS | FN_VARFX, CA_PUBLIC, NULL},
-    /* - Z - */
+    /** - Z - */
     {"Z", fun_z, 2, FN_VARFX, CA_PUBLIC, NULL},
     {"ZFUN", fun_zfun, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"ZONE", fun_zone, 1, 0, CA_PUBLIC, NULL},
     {"ZWHO", scan_zone, 1, TYPE_PLAYER, CA_PUBLIC, NULL},
-    /* - END - */
+    /** - END - */
     {NULL, NULL, 0, 0, 0, NULL}};
 
 #endif /* __FNPROTO_H */

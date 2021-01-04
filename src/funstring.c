@@ -154,7 +154,16 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		return;
 	}
 
-	VaChk_Only_InPure(2);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, 0))
+	{
+		return;
+	}
+
 	bp = tp = fargs[0];
 
 	while (*tp)
@@ -223,7 +232,15 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	VaChk_In(1, 3);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	{
+		return;
+	}
 
 	if (nfargs >= 2)
 	{
@@ -349,7 +366,11 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		return;
 	}
 
-	VaChk_Range(1, 2);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
 	bp = fargs[0]; /* haystack */
 	mp = fargs[1]; /* needle */
 
@@ -473,7 +494,11 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		return;
 	}
 
-	VaChk_Range(1, 2);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
+
 	haystack = fargs[0]; /* haystack */
 	mp = fargs[1];		 /* needle */
 
@@ -692,7 +717,12 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 {
 	int spaces, max, i, slen;
 	char *tp, *fillchars;
-	VaChk_Range(2, 3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
 	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
@@ -770,7 +800,12 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 {
 	int spaces, max, i, slen;
 	char *tp, *fillchars;
-	VaChk_Range(2, 3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
 	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 
 	/*
@@ -853,7 +888,11 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	char *tp = NULL, *fillchars = NULL;
 	int len = 0, lead_chrs = 0, trail_chrs = 0, width = 0, max = 0, i = 0, slen = 0;
 
-	VaChk_Range(2, 3);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
 	width = (int)strtol(fargs[1], (char **)NULL, 10);
 	len = strip_ansi_len(fargs[0]);
 	width = (width > LBUF_SIZE - 1) ? LBUF_SIZE - 1 : width;
@@ -1364,7 +1403,15 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	/*
      * Output delimiter should default to null, not a space
      */
-	VaChk_Only_Out(3);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 
 	if (nfargs < 3)
 	{
@@ -1384,7 +1431,7 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		}
 		else if (nfargs > 2)
 		{
-			print_sep(&osep, buff, bufc);
+			print_separator(&osep, buff, bufc);
 		}
 	}
 	XFREE(stab);
@@ -1803,8 +1850,11 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 void fun_translate(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s;
-	VaChk_Range(1, 2);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+	{
+		return;
+	}
 
 	/*
      * Strictly speaking, we're just checking the first char
@@ -1812,19 +1862,19 @@ void fun_translate(char *buff, char **bufc, dbref player __attribute__((unused))
 
 	if (nfargs > 1 && (fargs[1][0] == 's' || fargs[1][0] == '0'))
 	{
-		s = translate_string(fargs[0], 0);
+		char *s = translate_string(fargs[0], 0);
 		SAFE_LB_STR(s, buff, bufc);
 		XFREE(s);
 	}
 	else if (nfargs > 1 && fargs[1][0] == 'p')
 	{
-		s = translate_string(fargs[0], 1);
+		char *s = translate_string(fargs[0], 1);
 		SAFE_LB_STR(s, buff, bufc);
 		XFREE(s);
 	}
 	else
 	{
-		s = translate_string(fargs[0], 1);
+		char *s = translate_string(fargs[0], 1);
 		SAFE_LB_STR(s, buff, bufc);
 		XFREE(s);
 	}
@@ -1907,7 +1957,16 @@ void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	VaChk_Only_Out(3);
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	scratch_chartab = (char *)XCALLOC(256, sizeof(char), "scratch_chartab");
 
 	if (!fargs[1] || !*fargs[1])
@@ -1931,7 +1990,7 @@ void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
@@ -1986,7 +2045,17 @@ void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	int charpos, i;
 	char *buf, *cp, *tp, *xp;
 	Delim isep;
-	VaChk_Only_In(3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
 	charpos = (int)strtol(fargs[1], (char **)NULL, 10);
 	buf = cp = strip_ansi(fargs[0]);
 
@@ -2026,7 +2095,12 @@ void fun_ansipos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 {
 	int charpos, i, ansi_state;
 	char *s;
-	VaChk_Range(2, 3);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	}
+
 	s = fargs[0];
 	charpos = (int)strtol(fargs[1], (char **)NULL, 10);
 	ansi_state = ANST_NORMAL;
@@ -2115,7 +2189,11 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 	int el_pos = 0, sw_pos = 0, ew_pos = 0, width = 0, just = 0, nleft = 0, max = 0, lead_chrs = 0;
 
 	just = Func_Mask(JUST_TYPE);
-	VaChk_Range(2, 4);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+	{
+		return;
+	}
 
 	if (!fargs[0] || !*fargs[0])
 	{
@@ -2321,7 +2399,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		/*
 	 * Left border text
 	 */
-			SAFE_LB_STR(l_fill, buff, bufc);
+		SAFE_LB_STR(l_fill, buff, bufc);
 
 		/*
 	 * Left space padding if needed
@@ -2329,12 +2407,28 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		if (just == JUST_RIGHT)
 		{
 			nleft = width - el_pos + sl_pos;
-			print_padding(nleft, max, ' ');
+
+			if (nleft > 0)
+			{
+				max = LBUF_SIZE - 1 - (*bufc - buff);
+				nleft = (nleft > max) ? max : nleft;
+				XMEMSET(*bufc, ' ', nleft);
+				*bufc += nleft;
+				**bufc = '\0';
+			}
 		}
 		else if (just == JUST_CENTER)
 		{
 			lead_chrs = (int)((width / 2) - ((el_pos - sl_pos) / 2) + .5);
-			print_padding(lead_chrs, max, ' ');
+
+			if (lead_chrs > 0)
+			{
+				max = LBUF_SIZE - 1 - (*bufc - buff);
+				lead_chrs = (lead_chrs > max) ? max : lead_chrs;
+				XMEMSET(*bufc, ' ', lead_chrs);
+				*bufc += lead_chrs;
+				**bufc = '\0';
+			}
 		}
 
 		/*
@@ -2360,12 +2454,28 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		if (just == JUST_LEFT)
 		{
 			nleft = width - el_pos + sl_pos;
-			print_padding(nleft, max, ' ');
+
+			if (nleft > 0)
+			{
+				max = LBUF_SIZE - 1 - (*bufc - buff);
+				nleft = (nleft > max) ? max : nleft;
+				XMEMSET(*bufc, ' ', nleft);
+				*bufc += nleft;
+				**bufc = '\0';
+			}
 		}
 		else if (just == JUST_CENTER)
 		{
 			nleft = width - lead_chrs - el_pos + sl_pos;
-			print_padding(nleft, max, ' ');
+
+			if (nleft > 0)
+			{
+				max = LBUF_SIZE - 1 - (*bufc - buff);
+				nleft = (nleft > max) ? max : nleft;
+				XMEMSET(*bufc, ' ', nleft);
+				*bufc += nleft;
+				**bufc = '\0';
+			}
 		}
 
 		/*
@@ -2429,7 +2539,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 
 void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
 {
-	char *bb_p = NULL, *l_p = NULL, **xsl = NULL, **xel = NULL, **xsw = NULL,  **xew = NULL;
+	char *bb_p = NULL, *l_p = NULL, **xsl = NULL, **xel = NULL, **xsw = NULL, **xew = NULL;
 	char *p = NULL, *sl = NULL, *el = NULL, *sw = NULL, *ew = NULL, *buf = NULL;
 	int *xsl_a = NULL, *xel_a = NULL, *xsw_a = NULL, *xew_a = NULL;
 	int *xsl_p = NULL, *xel_p = NULL, *xsw_p = NULL, *xew_p = NULL;
@@ -2547,7 +2657,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	     */
 			if ((i == 0) && (*bufc != bb_p))
 			{
-				print_sep(&row_sep, buff, bufc);
+				print_separator(&row_sep, buff, bufc);
 				l_p = *bufc;
 			}
 
@@ -2566,7 +2676,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	     */
 			if (*bufc != l_p)
 			{
-				print_sep(&col_sep, buff, bufc);
+				print_separator(&col_sep, buff, bufc);
 			}
 
 			/*
@@ -2599,7 +2709,15 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 
 			if (col_done[i] && !(col_justs[i] & JUST_REPEAT))
 			{
-				print_padding(width, max, fillc);
+				if (width > 0)
+				{
+					max = LBUF_SIZE - 1 - (*bufc - buff);
+					width = (width > max) ? max : width;
+					XMEMSET(*bufc, fillc, width);
+					*bufc += width;
+					**bufc = '\0';
+				}
+
 				continue;
 			}
 
@@ -2857,12 +2975,28 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			if (just & JUST_RIGHT)
 			{
 				nleft = width - el_pos + sl_pos;
-				print_padding(nleft, max, fillc);
+
+				if (nleft > 0)
+				{
+					max = LBUF_SIZE - 1 - (*bufc - buff);
+					nleft = (nleft > max) ? max : nleft;
+					XMEMSET(*bufc, fillc, nleft);
+					*bufc += nleft;
+					**bufc = '\0';
+				}
 			}
 			else if (just & JUST_CENTER)
 			{
 				lead_chrs = (int)((width / 2) - ((el_pos - sl_pos) / 2) + .5);
-				print_padding(lead_chrs, max, fillc);
+
+				if (lead_chrs > 0)
+				{
+					max = LBUF_SIZE - 1 - (*bufc - buff);
+					lead_chrs = (lead_chrs > max) ? max : lead_chrs;
+					XMEMSET(*bufc, fillc, lead_chrs);
+					*bufc += lead_chrs;
+					**bufc = '\0';
+				}
 			}
 
 			/*
@@ -2888,12 +3022,28 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			if (just & JUST_LEFT)
 			{
 				nleft = width - el_pos + sl_pos;
-				print_padding(nleft, max, fillc);
+
+				if (nleft > 0)
+				{
+					max = LBUF_SIZE - 1 - (*bufc - buff);
+					nleft = (nleft > max) ? max : nleft;
+					XMEMSET(*bufc, fillc, nleft);
+					*bufc += nleft;
+					**bufc = '\0';
+				}
 			}
 			else if (just & JUST_CENTER)
 			{
 				nleft = width - lead_chrs - el_pos + sl_pos;
-				print_padding(nleft, max, fillc);
+
+				if (nleft > 0)
+				{
+					max = LBUF_SIZE - 1 - (*bufc - buff);
+					nleft = (nleft > max) ? max : nleft;
+					XMEMSET(*bufc, fillc, nleft);
+					*bufc += nleft;
+					**bufc = '\0';
+				}
 			}
 
 			/*
@@ -3032,12 +3182,20 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	/*
-     * Note that the VaChk macros number arguments from 1.
-     */
-	VaChk_Sep(&filler, n_cols + 2, 0);
-	VaChk_SepOut(col_sep, n_cols + 3, 0);
-	VaChk_SepOut(row_sep, n_cols + 4, 0);
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, n_cols + 2, &filler, 0))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, n_cols + 3, &(col_sep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, n_cols + 4, &(row_sep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 
 	if (nfargs < n_cols + 4)
 	{
@@ -3053,9 +3211,19 @@ void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char **raw_colstrs, **data;
 	int n_cols, n_data;
 	Delim isep, filler, col_sep, row_sep;
-	VaChk_Range(2, 6);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 6, buff, bufc))
+	{
+		return;
+	}
+
 	n_cols = list2arr(&raw_colstrs, LBUF_SIZE / 2, fargs[0], &SPACE_DELIM);
-	VaChk_InSep(3, 0);
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
 	n_data = list2arr(&data, LBUF_SIZE / 2, fargs[1], &isep);
 
 	if (n_cols > n_data)
@@ -3074,9 +3242,20 @@ void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		return;
 	}
 
-	VaChk_Sep(&filler, 4, 0);
-	VaChk_SepOut(col_sep, 5, 0);
-	VaChk_SepOut(row_sep, 6, 0);
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &filler, 0))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &(col_sep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &(row_sep), DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
 
 	if (nfargs < 6)
 	{
@@ -3127,7 +3306,11 @@ void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	VaChk_OutSep(1, 0);
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return;
+	}
+
 	bb_p = *bufc;
 
 	for (i = 1; i < nfargs; i++)
@@ -3136,7 +3319,7 @@ void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			if (*bufc != bb_p)
 			{
-				print_sep(&osep, buff, bufc);
+				print_separator(&osep, buff, bufc);
 			}
 
 			SAFE_LB_STR(fargs[i], buff, bufc);

@@ -379,7 +379,7 @@ void match_list(dbref first, int local)
         return;
     }
 
-    DOLIST(first, first)
+    for (first = first; (first != NOTHING) && (Next(first) != first); first = Next(first))
     {
         if (first == md.absolute_form)
         {
@@ -450,7 +450,7 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
     }
 
     result = 0;
-    DOLIST(exit, Exits(loc))
+    for (exit = Exits(loc); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
     {
         if (exit == md.absolute_form)
         {

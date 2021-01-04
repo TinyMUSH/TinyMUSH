@@ -63,7 +63,11 @@ void fun_lwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref target;
-	VaChk_Range(0, 1);
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 1, buff, bufc))
+	{
+		return;
+	}
 
 	if (fargs[0] && *fargs[0])
 	{
@@ -263,31 +267,33 @@ void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unus
  * @return true Convert to hex
  * @return false Keep as is.
  */
-bool escaped_chars(unsigned char ch) {
-	switch(ch) {
-		case '<':
-		case '>':
-		case '#':
-		case '%':
-		case '{':
-		case '}':
-		case '|':
-		case '\\':
-		case '^':
-		case '~':
-		case '[':
-		case ']':
-		case '\'':
-		case ';':
-		case '/':
-		case '?':
-		case ':':
-		case '@':
-		case '=':
-		case '&':
-		case '\"':
-		case '+':
-			return true;
+bool escaped_chars(unsigned char ch)
+{
+	switch (ch)
+	{
+	case '<':
+	case '>':
+	case '#':
+	case '%':
+	case '{':
+	case '}':
+	case '|':
+	case '\\':
+	case '^':
+	case '~':
+	case '[':
+	case ']':
+	case '\'':
+	case ';':
+	case '/':
+	case '?':
+	case ':':
+	case '@':
+	case '=':
+	case '&':
+	case '\"':
+	case '+':
+		return true;
 	}
 	return false;
 }
@@ -324,7 +330,8 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 	const char *msg_orig;
 	int ret = 0;
 	unsigned int tempchar;
-	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");;
+	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
+	;
 
 	for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret;)
 	{

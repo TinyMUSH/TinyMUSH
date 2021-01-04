@@ -245,7 +245,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			return true;
 		}
 
-		DOLIST(obj, Contents(player))
+		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
 			if (check_attr(obj, from, a, (char *)b->sub1))
 			{
@@ -347,7 +347,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			return false;
 		}
 
-		DOLIST(obj, Contents(player))
+		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
 			if (check_attr(obj, from, a, (char *)(b->sub1)->sub1))
 			{

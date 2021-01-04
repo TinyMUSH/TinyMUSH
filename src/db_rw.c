@@ -726,7 +726,7 @@ void efo_convert(void)
 	int i = 0;
 	dbref link = NOTHING;
 
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		switch (Typeof(i))
 		{
@@ -758,11 +758,10 @@ void fix_mux_zones(void)
 	 * zoned to them), copy the EnterLock of those objects to the ControlLock.
 	 * 
      */
-	int i;
 	int *zmarks;
 	char *astr;
 	zmarks = (int *)XCALLOC(mudstate.db_top, sizeof(int), "zmarks");
-	DO_WHOLE_DB(i)
+	for (int i = 0; i < mudstate.db_top; i++)
 	{
 		if (Zone(i) != NOTHING)
 		{
@@ -770,7 +769,8 @@ void fix_mux_zones(void)
 			zmarks[Zone(i)] = 1;
 		}
 	}
-	DO_WHOLE_DB(i)
+
+	for (int i = 0; i < mudstate.db_top; i++)
 	{
 		if (zmarks[i])
 		{
@@ -803,11 +803,10 @@ void fix_typed_quotas(void)
 	 * new quotas, and then delete the old attributes.
 	 * 
      */
-	int i = 0;
 	char *qbuf = NULL, *rqbuf = NULL;
 	char *s = XMALLOC(LBUF_SIZE, "s");
 
-	DO_WHOLE_DB(i)
+	for (int i = 0; i < mudstate.db_top; i++)
 	{
 		if (isPlayer(i))
 		{
@@ -1829,7 +1828,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * 
 		 */
 		atr_push();
-		DO_WHOLE_DB(i)
+		for (i = 0; i < mudstate.db_top; i++)
 		{
 			for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
 			{
@@ -1962,7 +1961,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	 * 
      */
 	n_objt = n_atrt = 0;
-	DO_WHOLE_DB(i)
+	for (i = 0; i < mudstate.db_top; i++)
 	{
 		if (mudstate.standalone && !(i % 100))
 		{
