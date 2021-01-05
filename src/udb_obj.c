@@ -36,7 +36,6 @@
 #include "htab.h"     /* required by mudconf */
 #include "ltdl.h"     /* required by mudconf */
 #include "udb.h"      /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
 
 #include "mushconf.h" /* required by code */
 
@@ -45,7 +44,6 @@
 #include "externs.h" /* required by code */
 
 #include "udb.h" /* required by code */
-#include "udb_defs.h"
 
 /* Sizes, on disk, of Object and (within the object) Attribute headers */
 

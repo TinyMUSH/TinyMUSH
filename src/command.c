@@ -20,7 +20,6 @@
 #include "htab.h"
 #include "ltdl.h"
 #include "udb.h"
-#include "udb_defs.h"
 #include "mushconf.h"
 #include "db.h"
 #include "interface.h"
@@ -33,9 +32,6 @@
 #include "powers.h"
 #include "vattr.h"
 #include "stringutil.h"
-#include "udb_ocache.h"
-#include "log.h"
-#include "wiz.h"
 #include "nametabs.h"
 
 #define CACHING "attribute"

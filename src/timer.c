@@ -20,7 +20,6 @@
 #include "htab.h"      /* required by mushconf */
 #include "ltdl.h"      /* required by mushconf */
 #include "udb.h"       /* required by mushconf */
-#include "udb_defs.h"  /* required by mushconf */
 #include "mushconf.h"  /* required by code */
 #include "db.h"        /* required by externs */
 #include "interface.h" /* required by code */

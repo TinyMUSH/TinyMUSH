@@ -21,8 +21,14 @@
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <signal.h>
-#include "slave.h"
 #include <arpa/inet.h>
+
+
+enum
+{
+    SLAVE_IDENTQ = 'i',
+    SLAVE_IPTONAME = 'h'
+};
 
 /* Some systems are lame, and inet_addr() returns -1 on failure, despite
  * the fact that it returns an unsigned long.

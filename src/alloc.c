@@ -19,7 +19,6 @@
 #include "flags.h"
 #include "htab.h"
 #include "udb.h"
-#include "udb_defs.h"
 #include "mushconf.h"
 #include "db.h"
 #include "interface.h"

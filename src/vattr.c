@@ -20,7 +20,6 @@
 #include "htab.h"     /* required by mudconf */
 #include "ltdl.h"     /* required by mudconf */
 #include "udb.h"      /* required by mudconf */
-#include "udb_defs.h" /* required by mudconf */
 
 #include "mushconf.h" /* required by code */
 

@@ -20,13 +20,11 @@
 #include "htab.h"      /* required by mudconf */
 #include "ltdl.h"      /* required by mudconf */
 #include "udb.h"       /* required by mudconf */
-#include "udb_defs.h"  /* required by mudconf */
 #include "mushconf.h"  /* required by code */
 #include "db.h"        /* required by externs */
 #include "interface.h" /* required by code */
 #include "externs.h"   /* required by code */
 #include "udb.h"       /* required by code */
-#include "udb_defs.h"  /* required by code */
 
 #define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
 

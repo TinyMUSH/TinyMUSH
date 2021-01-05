@@ -22,7 +22,6 @@
 #include "htab.h"
 #include "ltdl.h"
 #include "udb.h"
-#include "udb_defs.h"
 #include "mushconf.h"
 #include "db.h"
 #include "interface.h"

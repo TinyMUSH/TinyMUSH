@@ -16,7 +16,6 @@
 
 #include "vattr.h"
 #include "help.h"
-#include "player_c.h"
 #include "powers.h"
 #include "walkdb.h"
 #include "functions.h"

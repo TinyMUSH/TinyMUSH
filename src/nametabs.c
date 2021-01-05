@@ -20,7 +20,6 @@
 #include "htab.h"
 #include "ltdl.h"
 #include "udb.h"
-#include "udb_defs.h"
 #include "mushconf.h"
 #include "attrs.h"
 #include "command.h"
