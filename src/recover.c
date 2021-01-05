@@ -1,10 +1,17 @@
-/*
- * A tool to traverse a corrupted GDBM database, look for special tags, and
- * rebuild a consistent database
+/**
+ * @file recover.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Tool to traverse a corrupted GDBM database, look for special
+ *        tags, and rebuild a consistent database.
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
  */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"  /* required by mudconf */

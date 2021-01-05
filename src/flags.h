@@ -2,14 +2,14 @@
  * @file flags.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Object flags
- * @version 0.1
+ * @version 3.3
  * @date 2021-01-03
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-
-#include "copyright.h"
 
 #ifndef __FLAGS_H
 #define __FLAGS_H

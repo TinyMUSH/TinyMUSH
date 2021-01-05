@@ -6,15 +6,13 @@
  * @date 2020-12-25
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  * @note Why should I care what color the bikeshed is? :)
  * 
  */
 
-/* bsd.c - BSD-style network and signal routines */
-
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"
@@ -321,11 +319,7 @@ void boot_slave(void)
 	int maxfds = 0;
 	char *s = NULL;
 
-#ifdef HAVE_GETDTABLESIZE
 	maxfds = getdtablesize();
-#else
-	maxfds = sysconf(_SC_OPEN_MAX);
-#endif
 
 	if (slave_socket != -1)
 	{
@@ -475,18 +469,10 @@ void shovechars(int port)
 		maxd = sock + 1;
 	}
 
-#ifndef HAVE_GETTIMEOFDAY
-	(&last_slice)->tv_sec = time(NULL);
-	(&last_slice)->tv_usec = 0;
-#else
-	gettimeofday(&last_slice, NULL)
-#endif
+	gettimeofday(&last_slice, NULL);
 
-#ifdef HAVE_GETDTABLESIZE
 	maxfds = getdtablesize();
-#else
-		maxfds = sysconf(_SC_OPEN_MAX);
-#endif
+
 	avail_descriptors = maxfds - 7;
 
 	/**
@@ -495,12 +481,7 @@ void shovechars(int port)
 	 */
 	while (mudstate.shutdown_flag == 0)
 	{
-#ifndef HAVE_GETTIMEOFDAY
-		(&current_time)->tv_sec = time(NULL);
-		(&current_time)->tv_usec = 0;
-#else
-		gettimeofday(&current_time, NULL)
-#endif
+		gettimeofday(&current_time, NULL);
 
 		last_slice = update_quotas(last_slice, current_time);
 		process_commands();

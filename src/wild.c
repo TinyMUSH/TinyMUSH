@@ -1,19 +1,19 @@
-/* wild.c - wildcard routines */
-
-/*
- * Written by T. Alexander Popiel, 24 June 1993
- * Last modified by T. Alexander Popiel, 19 August 1993
- *
- * Thanks go to Andrew Molitor for debugging
- * Thanks also go to Rich $alz for code to benchmark against
- *
- * Copyright (c) 1993 by T. Alexander Popiel
- * This code is hereby placed under GNU copyleft,
- * see copyright.h for details.
+/**
+ * @file wild.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Wildcard routines
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * @copyright Copyright (c) 1993 by T. Alexander Popiel
+ *            This code is hereby placed under GNU copyleft,
+ *            as specified in the COPYING file.
+ * 
  */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"  /* required by mudconf */

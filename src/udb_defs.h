@@ -1,15 +1,15 @@
 /**
  * @file udb_defs.h
- * @author TinyMUSH (https://github.com/TinyMUSH)
- * @brief Header file for the UnterMud DB layer
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief UnterMud DB layer definitions
  * @version 3.3
  * @date 2021-01-04
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-
-#include "copyright.h"
 
 #ifndef __UDB_DEFS_H
 #define __UDB_DEFS_H

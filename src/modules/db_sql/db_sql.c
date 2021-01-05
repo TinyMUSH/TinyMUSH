@@ -6,15 +6,14 @@
  * @date 2020-12-28
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  * @bug This code is currently not working. Won't be fixed until we go Beta
  * 
  */
 
-#include <copyright.h>
-#include <config.h>
 #include <system.h>
-
 #include <tinymushapi.h>
 
 #include "db_sql.h"

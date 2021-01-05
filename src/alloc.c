@@ -5,11 +5,12 @@
  * @version 3.3
  * @date 2020-11-14
  * 
- * @copyright Copyright (C) 1989-2020 TinyMUSH development team.
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-#include "copyright.h"
-#include "config.h"
+
 #include "system.h"
 
 #include "typedefs.h"

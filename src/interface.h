@@ -6,12 +6,10 @@
  * @date 2021-01-04
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-
-/* interface.h -- Network-related definitions */
-
-#include "copyright.h"
 
 #ifndef __INTERFACE_H
 #define __INTERFACE_H

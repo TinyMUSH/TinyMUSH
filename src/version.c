@@ -1,7 +1,16 @@
-/* version.c - version information */
+/**
+ * @file version.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Version information
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"  /* required by mudconf */
@@ -16,7 +25,7 @@
 #include "db.h"        /* required by externs */
 #include "interface.h" /* required by code */
 #include "externs.h"   /* required by code */
-#include "version.h"   /* required by code */
+#include "defaults.h"
 
 void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int extra)
 {
@@ -36,7 +45,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     {
 #ifdef HAVE_SYS_UTSNAME_H
         uname(&bpInfo);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build platform: %s %s %s", bpInfo.sysname, bpInfo.release, bpInfo.machine);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build platform: %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
 #endif
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo);

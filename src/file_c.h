@@ -6,10 +6,10 @@
  * @date 2021-01-03
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-
-#include "copyright.h"
 
 #ifndef __FILE_C_H
 #define __FILE_C_H

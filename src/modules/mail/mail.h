@@ -5,15 +5,15 @@
  * @version 3.1
  * @date 2020-12-28
  * 
- * @copyright Copyright (c) 2020
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  * @note This code was taken from Kalkin's DarkZone code, which was originally
  * taken from PennMUSH 1.50 p10, and has been heavily modified since being
  * included in MUX (and then being imported wholesale into 3.0).
  * 
  */
-
-#include "../../copyright.h"
 
 #ifndef __MAIL_H
 #define __MAIL_H

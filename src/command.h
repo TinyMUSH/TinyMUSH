@@ -6,25 +6,23 @@
  * @date 2020-12-25
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-
-#include "copyright.h"
 
 #ifndef __COMMAND_H
 #define __COMMAND_H
 
-typedef struct addedentry ADDENT;
-struct addedentry
+typedef struct addedentry
 {
     dbref thing;
     int atr;
     char *name;
     struct addedentry *next;
-};
+} ADDENT;
 
-typedef struct cmdentry CMDENT;
-struct cmdentry
+typedef struct cmdentry
 {
     char *cmdname;
     NAMETAB *switches;
@@ -39,10 +37,12 @@ struct cmdentry
         void (*handler)();
         ADDENT *added;
     } info;
-};
+} CMDENT;
 
-/* Command handler call conventions */
-
+/** 
+ * @brief Command handler call conventions
+ * 
+ */
 #define CS_NO_ARGS 0x00000      /*!< No arguments */
 #define CS_ONE_ARG 0x00001      /*!< One argument */
 #define CS_TWO_ARG 0x00002      /*!< Two arguments */
@@ -63,8 +63,10 @@ struct cmdentry
 #define CS_ACTOR 0x10000        /*!< @addcommand executed by player, not obj */
 #define CS_PRIVATE 0x20000      /*!< For hooks, use private global registers */
 
-/* Command permission flags */
-
+/** 
+ * @brief Command permission flags 
+ * 
+ */
 #define CA_PUBLIC 0x00000000    /*!< No access restrictions */
 #define CA_GOD 0x00000001       /*!< GOD only... */
 #define CA_WIZARD 0x00000002    /*!< Wizards only */

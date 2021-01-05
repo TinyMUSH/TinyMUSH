@@ -1,18 +1,20 @@
 /**
  * @file system.h
- * @author TinyMUSH (https://github.com/TinyMUSH)
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Global headers and system compatibility
  * @version 3.3
  * @date 2021-01-04
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
 
-/* system.h */
-
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
+
+#include "config.h"
 
 #ifdef STDC_HEADERS
 #ifdef __STDC__
@@ -174,6 +176,14 @@
 #ifdef _SEQUENT_
 #define HAVE_GET_PROCESS_STATS 1
 #include <sys/procstats.h>
+#endif
+
+#ifndef HAVE_GETTIMEOFDAY
+#define gettimeofday(t,n) (t)->tv_sec = time(n);(t)->tv_usec = 0;
+#endif
+
+#ifndef HAVE_GETDTABLESIZE
+#define getdtablesize() sysconf(_SC_OPEN_MAX);
 #endif
 
 #endif /* __SYSTEM_H */

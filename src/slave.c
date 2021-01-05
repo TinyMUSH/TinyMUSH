@@ -1,12 +1,19 @@
-/* slave.c - does iptoname conversions, and identquery lookups */
-
-/*
- * The philosophy is to keep this program as simple/small as possible.
- * It does normal fork()s, so the smaller it is, the faster it goes.
+/**
+ * @file slave.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Does iptoname conversions, and identquery lookups
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ * @note The philosophy is to keep this program as simple/small as possible.
+ *       It does normal fork()s, so the smaller it is, the faster it goes.
+ * 
  */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"

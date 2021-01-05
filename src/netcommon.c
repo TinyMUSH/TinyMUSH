@@ -1,12 +1,19 @@
-/* netcommon.c */
-
-/* This file contains routines used by the networking code that do not
+/**
+ * @file netcommon.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Routines used by the networking code that do not depend on the implementation
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ * @note This file contains routines used by the networking code that do not
  * depend on the implementation of the networking code.  The network-specific
  * portions of the descriptor data structure are not used.
  */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"	/* required by mudconf */

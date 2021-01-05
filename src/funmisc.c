@@ -1,7 +1,16 @@
-/* funmisc.c - misc functions */
+/**
+ * @file funmisc.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Misc functions
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"	/* required by mudconf */
@@ -1511,21 +1520,11 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		s = ebuf;
 		tp = tbuf;
 
-#ifndef HAVE_GETTIMEOFDAY
-		(&bt)->tv_sec = time(NULL);
-		(&bt)->tv_usec = 0;
-#else
-		gettimeofday(&bt, NULL)
-#endif
+		gettimeofday(&bt, NULL);
 
 		exec(tbuf, &tp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &s, cargs, ncargs);
 
-#ifndef HAVE_GETTIMEOFDAY
-		(&et)->tv_sec = time(NULL);
-		(&et)->tv_usec = 0;
-#else
-		gettimeofday(&et, NULL)
-#endif
+		gettimeofday(&et, NULL);
 		
 		ut = ((et.tv_sec - bt.tv_sec) * 1000000) + (et.tv_usec - bt.tv_usec);
 

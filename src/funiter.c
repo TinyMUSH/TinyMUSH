@@ -1,7 +1,16 @@
-/* funiter.c - functions for user-defined iterations over lists */
+/**
+ * @file funiter.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Functions for user-defined iterations over lists
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"   /* required by mudconf */

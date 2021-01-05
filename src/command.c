@@ -6,11 +6,11 @@
  * @date 2020-12-25
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"
@@ -1775,12 +1775,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 			if (mudconf.lag_check)
 			{
-#ifndef HAVE_GETTIMEOFDAY
-				(&begin_time)->tv_sec = time(NULL);
-				(&begin_time)->tv_usec = 0;
-#else
-				gettimeofday(&begin_time, NULL)
-#endif
+				gettimeofday(&begin_time, NULL);
 
 				if (mudconf.lag_check_cpu)
 				{
@@ -1800,12 +1795,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 			if (mudconf.lag_check)
 			{
-#ifndef HAVE_GETTIMEOFDAY
-				(&end_time)->tv_sec = time(NULL);
-				(&end_time)->tv_usec = 0;
-#else
-				gettimeofday(&end_time, NULL)
-#endif
+				gettimeofday(&end_time, NULL);
 
 				if (mudconf.lag_check_cpu)
 				{
@@ -2864,11 +2854,7 @@ void list_process(dbref player)
 
 	getrusage(RUSAGE_SELF, &usage);
 #endif
-#ifdef HAVE_GETDTABLESIZE
 	maxfds = getdtablesize();
-#else
-	maxfds = sysconf(_SC_OPEN_MAX);
-#endif
 	pid = getpid();
 	psize = getpagesize();
 	/**

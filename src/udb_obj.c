@@ -1,17 +1,32 @@
 
-/* udb_obj.c - Binary object handling gear. */
+/**
+ * @file udb_obj.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Binary object handling gear.
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ * @note Why not just write the attributes individually to disk? Well, when 
+ *       you're running on a platform that does synchronous writes with a large
+ *       database, thousands of I/O operations tend to be expensive. When you
+ *       'coalesce' many attribute writes onto a single object and do only one
+ *       I/O operation, you can get an order of magnitude speed difference,
+ *       especially on loading/unloading to flatfile. It also has the side
+ *       effect of pre-fetching on reads, since you often have sequential
+ *       attribute reads off of the same object.
+ * 
+ *       Wile all of this is extremely true, keep in mind that text was written
+ *       over 25 years ago. Even if we didn't optimized our read/write sequence
+ *       you woudn't see the difference.
+ * 
+ *       If you really want to see the difference, it's time to get youself into
+ *       the retro-computing scene :)
+ */
 
-/* Why not just write the attributes individually to disk? Well, when you're
- * running on a platform that does synchronous writes with a large database,
- * thousands of I/O operations tend to be expensive. When you 'coalesce'
- * many attribute writes onto a single object and do only one I/O operation,
- * you can get an order of magnitude speed difference, especially on
- * loading/unloading to flatfile. It also has the side effect of
- * pre-fetching on reads, since you often have sequential attribute reads
- * off of the same object. */
-
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h" /* required by mudconf */

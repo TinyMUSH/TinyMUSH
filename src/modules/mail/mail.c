@@ -6,6 +6,8 @@
  * @date 2020-12-28
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  * @note This code was taken from Kalkin's DarkZone code, which was originally
  * taken from PennMUSH 1.50 p10, and has been heavily modified since being
@@ -13,10 +15,7 @@
  * 
  */
 
-#include <copyright.h>
-#include <config.h>
 #include <system.h>
-
 #include <tinymushapi.h>
 
 #include "mail.h"

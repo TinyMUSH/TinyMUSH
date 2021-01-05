@@ -467,13 +467,13 @@ AM_CPPFLAGS = $(LTDLINCL)
 SUBDIRS = libltdl $(am__append_1) $(am__append_2) $(am__append_3)
 AUTOMAKE_OPTIONS = subdir-objects
 netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-netmush_H = alloc.h api.h attrs.h cmdtabs.h command.h copyright.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h nametabs.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
+netmush_H = alloc.h api.h attrs.h cmdtabs.h command.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h log.h match.h mushconf.h nametabs.h player.h player_c.h powers.h stringutil.h system.h typedefs.h udb_defs.h udb.h udb_ocache.h vattr.h walkdb.h wiz.h
 netmush_SOURCES = $(netmush_C) $(netmush_H)
 netmush_LDFLAGS = -export-dynamic
 netmush_SKEL = defaults.h.in
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES = $(LTDLDEPS) 
-nodist_netmush_SOURCES = config.h defaults.h prototypes.h tinymushapi.h version.h
+nodist_netmush_SOURCES = config.h defaults.h prototypes.h tinymushapi.h
 slave_C = slave.c
 slave_H = slave.h
 slave_SOURCES = $(slave_C) $(slave_H)
@@ -489,11 +489,10 @@ SCRIPT_SKEL = $(SCRIPT_DIR)/Startmush.in
 SCRIPT_SRC = $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
 SCRIPT_DAT = $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
 SCRIPT_BUILD = $(SCRIPT_DIR)/Startmush
-version_SKEL = version.h.in
 EXTRA_DIST = libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h $(version_SKEL) $(prototypes_SKEL)
-CLEANFILES = defaults.h prototypes.h tinymushapi.h version.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
+CLEANFILES = defaults.h prototypes.h tinymushapi.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
 API_SRC = typedefs.h db.h game.h alloc.h flags.h htab.h udb.h udb_defs.h mushconf.h functions.h powers.h attrs.h match.h command.h api.h interface.h externs.h stringutil.h prototypes.h
-BUILT_SOURCES = prototypes.h version.h tinymushapi.h defaults.h netmush.conf.example Startmush
+BUILT_SOURCES = prototypes.h tinymushapi.h defaults.h netmush.conf.example Startmush
 nodist_include_HEADERS = tinymushapi.h
 CPROTO_INCLUDES = 
 do_subst = $(SED) \
@@ -511,7 +510,9 @@ do_subst = $(SED) \
 	-e 's|[@]localstatedir@|$(localstatedir)|g' \
 	-e 's|[@]libdir@|$(libdir)|g' \
 	-e 's|[@]includedir@|$(includedir)|g' \
-	-e 's|[@]libexecdir@|$(libexecdir)|g'
+	-e 's|[@]libexecdir@|$(libexecdir)|g' \
+	-e 's|[@]compile@|$(COMPILE)|g' \
+	-e 's|[@]ltcompile@|$(LTCOMPILE)|g'
 
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -1162,22 +1163,15 @@ Startmush: $(SCRIPT_DIR)/Startmush.in
 	$(do_subst) <$(SCRIPT_DIR)/Startmush.in >$(SCRIPT_DIR)/Startmush
 	chmod +x $(SCRIPT_DIR)/Startmush
 
-#.PHONY:version.h
-
-prototypes.h: defaults.h version.h prototypes.h.in
+prototypes.h: defaults.h prototypes.h.in
 	rm -f prototypes.h
 	touch prototypes.h
-	cp prototypes.h.in prototypes.h
-	for i in $(netmush_C); do echo "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 3 $$i 2>/dev/null)" >> prototypes.h; echo '' >> prototypes.h; done
-	echo '#endif /* __PROTOTYPES_H */' >> prototypes.h
+	cp prototypes.h.in __prototypes.h
+	for i in $(netmush_C); do echo "$$($(with_cproto_prog) $(CPROTO_INCLUDES) -e -f 3 $$i 2>/dev/null)" >> __prototypes.h; echo '' >> __prototypes.h; done
+	echo '#endif /* __PROTOTYPES_H */' >> __prototypes.h
+	rm -f prototypes.h
+	mv __prototypes.h prototypes.h
 	chmod -w prototypes.h
-
-version.h: version.h.in
-	rm -f version.h
-	$(SED) -e 's|[@]COMPILE@|$(COMPILE)|g' \
-	       -e's|[@]LTCOMPILE@|$(LTCOMPILE)|g' < version.h.in > version.h
-	touch version.h
-	chmod -w version.h
 
 tinymushapi.h: $(API_SRC)
 	rm -f tinymushapi.h
@@ -1185,7 +1179,6 @@ tinymushapi.h: $(API_SRC)
 	chmod +w tinymushapi.h
 	printf "#ifndef __TINYMUSHAPI_H\n#define __TINYMUSHAPI_H\n\n" >> tinymushapi.h
 	printf "\n\n#include <ltdl.h>\n\n#include <netinet/in.h>\n\n" >> tinymushapi.h
-	$(SED) -n "/#ifndef __COPYRIGHT_H/,/\/* __COPYRIGHT_H *\//p" < copyright.h >> tinymushapi.h
 	$(SED) -n "/NUM_ENV_VARS/p" < config.h >> tinymushapi.h
 	$(SED) -n "/MAX_ITER_NESTING/p" < config.h >> tinymushapi.h
 	$(SED) -n "/MAX_DELIM_LEN/p" < config.h >> tinymushapi.h

@@ -3,12 +3,13 @@
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Nametables definitions
  * @version 3.3
- * @date 2020-12-25
+ * @date 2021-01-04
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
  * 
  */
-#include "copyright.h"
 
 #ifndef __NAMETABS_H
 #define __NAMETABS_H

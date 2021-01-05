@@ -1,7 +1,16 @@
-/* udb_ochunk.c */
+/**
+ * @file udb_ochunk.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief Database handling functions
+ * @version 3.3
+ * @date 2021-01-04
+ * 
+ * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ * 
+ */
 
-#include "copyright.h"
-#include "config.h"
 #include "system.h"
 
 #include "typedefs.h"   /* required by mudconf */
@@ -26,8 +35,6 @@
 char *dbfile = DEFAULT_DBMCHUNKFILE;
 int db_initted = 0;
 GDBM_FILE dbp = (GDBM_FILE)0;
-//datum dat;
-//datum key;
 
 struct flock fl;
 
