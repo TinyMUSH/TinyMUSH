@@ -50,6 +50,7 @@ typedef struct cmd_block_hdr
 {
     struct cmd_block *nxt;
 } CBLKHDR;
+
 typedef struct cmd_block
 {
     CBLKHDR hdr;

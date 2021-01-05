@@ -47,21 +47,18 @@ typedef struct delim
     char str[MAX_DELIM_LEN];
 } Delim;
 
-typedef struct var_entry VARENT;
-struct var_entry
+typedef struct var_entry
 {
     char *text; /*!< variable text */
-};
+} VARENT;
 
-typedef struct component_def COMPONENT;
-struct component_def
+typedef struct component_def
 {
     int (*typer_func)(); /*!< type-checking handler */
     char *def_val;       /*!< default value */
-};
+} COMPONENT;
 
-typedef struct structure_def STRUCTDEF;
-struct structure_def
+typedef struct structure_def
 {
     char *s_name;        /*!< name of the structure */
     char **c_names;      /*!< array of component names */
@@ -72,19 +69,17 @@ struct structure_def
     int n_instances;     /*!< number of instances out there */
     char *names_base;    /*!< pointer for later freeing */
     char *defs_base;     /*!< pointer for later freeing */
-};
+} STRUCTDEF;
 
-typedef struct instance_def INSTANCE;
-struct instance_def
+typedef struct instance_def
 {
     STRUCTDEF *datatype; /*!< pointer to structure data type def */
-};
+} INSTANCE;
 
-typedef struct data_def STRUCTDATA;
-struct data_def
+typedef struct data_def
 {
     char *text;
-};
+} STRUCTDATA;
 
 typedef struct object_stack OBJSTACK;
 struct object_stack
@@ -93,20 +88,18 @@ struct object_stack
     OBJSTACK *next;
 };
 
-typedef struct object_grid OBJGRID;
-struct object_grid
+typedef struct object_grid
 {
     int rows;
     int cols;
     char ***data;
-};
+} OBJGRID;
 
-typedef struct object_xfuncs OBJXFUNCS;
-struct object_xfuncs
+typedef struct object_xfuncs
 {
     NAMEDFUNC **func;
     int count;
-};
+} OBJXFUNCS;
 
 /**
  * @brief Constants used in delimiter macros.
@@ -116,93 +109,6 @@ struct object_xfuncs
 #define DELIM_NULL 0x002   /*!< Null delimiter okay. */
 #define DELIM_CRLF 0x004   /*!< '%r' delimiter okay. */
 #define DELIM_STRING 0x008 /*!< Multi-character delimiter okay. */
-
-/**
- * @brief Global declarations.
- * 
- */
-extern const Delim SPACE_DELIM;
-extern OBJXFUNCS xfunctions;
-
-/**
- * @brief Miscellaneous macros.
- * 
- * Get function flags. Note that Is_Func() and Func_Mask() are identical;
- * they are given specific names for code clarity.
- * 
- */
-#define Func_Flags(x) (((FUN *)(x)[-1])->flags)
-#define Is_Func(x) (((FUN *)fargs[-1])->flags & (x))
-#define Func_Mask(x) (((FUN *)fargs[-1])->flags & (x))
-/** 
- * Check access to built-in function. 
- * 
- */
-#define Check_Func_Access(p, f) (check_access(p, (f)->perms) && (!((f)->xperms) || check_mod_access(p, (f)->xperms)))
-/** 
- * Trim spaces. 
- * 
- */
-#define Eat_Spaces(x) trim_space_sep((x), &SPACE_DELIM)
-/**
- * @brief Handling CPU time checking.
- * 
- * @note CPU time "clock()" compatibility notes:
- *
- * Linux clock() doesn't necessarily start at 0. BSD clock() does appear to
- * always start at 0.
- *
- * Linux sets CLOCKS_PER_SEC to 1000000, citing POSIX, so its clock() will wrap
- * around from (32-bit) INT_MAX to INT_MIN every 72 cpu-minutes or so. The
- * actual clock resolution is low enough that, for example, it probably never
- * returns odd numbers.
- *
- * BSD sets CLOCKS_PER_SEC to 100, so theoretically I could hose a cpu for 250
- * days and see what it does when it hits INT_MAX. Any bets? Any possible
- * reason to care?
- *
- * NetBSD clock() can occasionally decrease as the scheduler's estimate of how
- * much cpu the mush will use during the current timeslice is revised, so we
- * can't use subtraction.
- *
- * BSD clock() returns -1 if there is an error.
- * 
- * @note CPU time logic notes:
- *
- * B = mudstate.cputime_base L = mudstate.cputime_base + mudconf.func_cpu_lim N = mudstate.cputime_now
- *
- * Assuming B != -1 and N != -1 to catch errors on BSD, the possible
- * combinations of these values are as follows (note >> means "much greater
- * than", not right shift):
- *
- * 1. B <  L  normal    -- limit should be checked, and is not wrapped yet
- * 2. B == L  disabled  -- limit should not be checked
- * 3. B >  L  strange   -- probably misconfigured
- * 4. B >> L  wrapped   -- limit should be checked, and note L wrapped
- *
- * 1.  normal: 
- *  1a. N << B          -- too much, N wrapped 
- *  1b. N <  B          -- fine, NetBSD counted backwards
- *  1c. N >= B, N <= L  -- fine
- *  1d. N >  L          -- too much
- *
- * 2.  disabled:
- *  2a. always          -- fine, not checking
- *
- * 3.  strange:
- *  3a. always          -- fine, I guess we shouldn't check
- *
- * 4.  wrapped:
- *  4a. N <= L          -- fine, N wrapped but not over limit yet
- *  4b. N >  L, N << B  -- too much, N wrapped
- *  4c. N <  B          -- fine, NetBSD counted backwards
- *  4d. N >= B          -- fine
- *
- * Note that 1a, 1d, and 4b are the cases where we can be certain that too much
- * cpu has been used. The code below only checks for 1d. The other two are
- * corner cases that require some distinction between "x > y" and "x >> y".
- */
-#define Too_Much_CPU() ((mudstate.cputime_now = clock()), ((mudstate.cputime_now > mudstate.cputime_base + mudconf.func_cpu_lim) && (mudstate.cputime_base + mudconf.func_cpu_lim > mudstate.cputime_base) && (mudstate.cputime_base != -1) && (mudstate.cputime_now != -1)))
 /**
  * @brief Function-specific flags used in the function table.
  * 
@@ -365,5 +271,93 @@ extern OBJXFUNCS xfunctions;
 #define CHECK_PARENTS 0x01   /*!< hasattrp: recurse up the parent chain */
 #define CONNINFO_IDLE 0x01   /*!< conninfo: idle() vs. conn() */
 #define UCALL_SANDBOX 0x01   /*!< ucall: sandbox() vs. ucall() */
+
+/**
+ * @brief Miscellaneous macros.
+ * 
+ * Get function flags. Note that Is_Func() and Func_Mask() are identical;
+ * they are given specific names for code clarity.
+ * 
+ */
+#define Func_Flags(x) (((FUN *)(x)[-1])->flags)
+#define Is_Func(x) (((FUN *)fargs[-1])->flags & (x))
+#define Func_Mask(x) (((FUN *)fargs[-1])->flags & (x))
+/** 
+ * Check access to built-in function. 
+ * 
+ */
+#define Check_Func_Access(p, f) (check_access(p, (f)->perms) && (!((f)->xperms) || check_mod_access(p, (f)->xperms)))
+/** 
+ * Trim spaces. 
+ * 
+ */
+#define Eat_Spaces(x) trim_space_sep((x), &SPACE_DELIM)
+/**
+ * @brief Handling CPU time checking.
+ * 
+ * @note CPU time "clock()" compatibility notes:
+ *
+ * Linux clock() doesn't necessarily start at 0. BSD clock() does appear to
+ * always start at 0.
+ *
+ * Linux sets CLOCKS_PER_SEC to 1000000, citing POSIX, so its clock() will wrap
+ * around from (32-bit) INT_MAX to INT_MIN every 72 cpu-minutes or so. The
+ * actual clock resolution is low enough that, for example, it probably never
+ * returns odd numbers.
+ *
+ * BSD sets CLOCKS_PER_SEC to 100, so theoretically I could hose a cpu for 250
+ * days and see what it does when it hits INT_MAX. Any bets? Any possible
+ * reason to care?
+ *
+ * NetBSD clock() can occasionally decrease as the scheduler's estimate of how
+ * much cpu the mush will use during the current timeslice is revised, so we
+ * can't use subtraction.
+ *
+ * BSD clock() returns -1 if there is an error.
+ * 
+ * @note CPU time logic notes:
+ *
+ * B = mudstate.cputime_base L = mudstate.cputime_base + mudconf.func_cpu_lim N = mudstate.cputime_now
+ *
+ * Assuming B != -1 and N != -1 to catch errors on BSD, the possible
+ * combinations of these values are as follows (note >> means "much greater
+ * than", not right shift):
+ *
+ * 1. B <  L  normal    -- limit should be checked, and is not wrapped yet
+ * 2. B == L  disabled  -- limit should not be checked
+ * 3. B >  L  strange   -- probably misconfigured
+ * 4. B >> L  wrapped   -- limit should be checked, and note L wrapped
+ *
+ * 1.  normal: 
+ *  1a. N << B          -- too much, N wrapped 
+ *  1b. N <  B          -- fine, NetBSD counted backwards
+ *  1c. N >= B, N <= L  -- fine
+ *  1d. N >  L          -- too much
+ *
+ * 2.  disabled:
+ *  2a. always          -- fine, not checking
+ *
+ * 3.  strange:
+ *  3a. always          -- fine, I guess we shouldn't check
+ *
+ * 4.  wrapped:
+ *  4a. N <= L          -- fine, N wrapped but not over limit yet
+ *  4b. N >  L, N << B  -- too much, N wrapped
+ *  4c. N <  B          -- fine, NetBSD counted backwards
+ *  4d. N >= B          -- fine
+ *
+ * Note that 1a, 1d, and 4b are the cases where we can be certain that too much
+ * cpu has been used. The code below only checks for 1d. The other two are
+ * corner cases that require some distinction between "x > y" and "x >> y".
+ */
+#define Too_Much_CPU() ((mudstate.cputime_now = clock()), ((mudstate.cputime_now > mudstate.cputime_base + mudconf.func_cpu_lim) && (mudstate.cputime_base + mudconf.func_cpu_lim > mudstate.cputime_base) && (mudstate.cputime_base != -1) && (mudstate.cputime_now != -1)))
+
+/**
+ * @brief Global declarations.
+ * 
+ */
+extern const Delim SPACE_DELIM;
+extern OBJXFUNCS xfunctions;
+extern FUN flist[];
 
 #endif /* __FUNCTIONS_H */

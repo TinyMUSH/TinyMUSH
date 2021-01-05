@@ -3515,6 +3515,14 @@ void putstring(FILE *f, const char *s)
     fprintf(f, "\"\n");
 }
 
+void putref(FILE *f, int d) {
+    fprintf(f, "%d\n", d);
+}
+
+void putlong(FILE *f, long l) {
+    fprintf(f, "%ld\n", l);
+}
+
 /**
  * @brief Read a trring from file, unescaping char as needed
  * 

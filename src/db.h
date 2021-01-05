@@ -26,13 +26,6 @@
 #define ENTRY_BLOCK_STARTS(blk, blksize) (int)(blk * blksize)
 #define ENTRY_BLOCK_ENDS(blk, blksize) (int)(blk * blksize) + (blksize - 1)
 
-/*
-#define ITER_PARENTS(t, p, l) for ((l) = 0, (p) = (t);                \
-                                   (Good_obj(p) &&                    \
-                                    ((l) < mudconf.parent_nest_lim)); \
-                                   (p) = Parent(p), (l)++)
-*/
-
 #define Hasprivs(x) (Royalty(x) || Wizard(x))
 
 typedef char boolexp_type;
@@ -123,8 +116,8 @@ struct boolexp
 #define HOME (-3)      /*!< virtual room, represents mover's home */
 #define NOPERM (-4)    /*!< Error status, no permission */
 
-typedef struct object OBJ;
-struct object
+//typedef struct object OBJ;
+typedef struct object
 {
     dbref location;     /*!< PLAYER, THING: where it is */
                         /*!< ROOM: dropto: */
@@ -164,15 +157,15 @@ struct object
 #ifdef MEMORY_BASED
     Obj attrtext; /*!< Array of attribute text */
 #endif
-};
+} OBJ;
 
 /**
  * @brief The DUMPOBJ structure exists for use during database writes. It is a
  * duplicate of the OBJ structure except for items we don't need to write
  * 
  */
-typedef struct dump_object DUMPOBJ;
-struct dump_object
+//typedef struct dump_object DUMPOBJ;
+typedef struct dump_object
 {
     dbref location;     /*!< PLAYER, THING: where it is */
                         /*!< ROOM: dropto: */
@@ -198,7 +191,7 @@ struct dump_object
     time_t create_time; /*!< ALL: Time created (used in ObjID) */
     time_t last_access; /*!< ALL: Time last accessed */
     time_t last_mod;    /*!< ALL: Time last modified */
-};
+} DUMPOBJ;
 
 typedef char *NAME;      /*!< Name type */
 extern OBJ *db;          /*!< struct database */
@@ -207,9 +200,7 @@ extern NAME *purenames;  /*!< Pure Name Buffer */
 extern int anum_alc_top; /*!< Top of attr num lookup table */
 
 #define Location(t) db[t].location
-
 #define Zone(t) db[t].zone
-
 #define Contents(t) db[t].contents
 #define Exits(t) db[t].exits
 #define Next(t) db[t].next
@@ -224,16 +215,13 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define NameLen(t) db[t].name_length
 #define Home(t) db[t].link
 #define Dropto(t) db[t].location
-
 #define AccessTime(t) db[t].last_access
 #define ModTime(t) db[t].last_mod
 #define CreateTime(t) db[t].create_time
-
 #define VarsCount(t) db[t].vars_count
 #define StackCount(t) db[t].stack_count
 #define StructCount(t) db[t].struct_count
 #define InstanceCount(t) db[t].instance_count
-
 #define Time_Used(t) db[t].cpu_time_used
 
 /**
@@ -241,7 +229,6 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
  * time, set the object DIRTY
  * 
  */
-
 #define s_Location(t, n)  \
     db[t].location = (n); \
     db[t].flags3 |= DIRTY
@@ -309,25 +296,18 @@ extern int anum_alc_top; /*!< Top of attr num lookup table */
 #define s_StructCount(t, n) db[t].struct_count = n;
 #define s_InstanceCount(t, n) db[t].instance_count = n;
 
-#define tf_pclose(f) tf_fclose(f)
-
-#define putref(pr__f, pr__ref) fprintf(pr__f, "%d\n", (int)pr__ref)
-#define putlong(pr__f, pr__i) fprintf(pr__f, "%ld\n", (long)pr__i)
-
 #define Dropper(thing) (Connected(Owner(thing)) && Hearer(thing))
 
-typedef struct logfiletable LOGFILETAB;
-struct logfiletable
+typedef struct logfiletable
 {
     int log_flag;
     FILE *fileptr;
     char *filename;
-};
+} LOGFILETAB;
 
-typedef struct numbertable NUMBERTAB;
-struct numbertable
+typedef struct numbertable
 {
     int num;
-};
+} NUMBERTAB;
 
 #endif /* __DB_H */

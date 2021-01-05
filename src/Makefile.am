@@ -5,7 +5,7 @@ LIBTOOL_DEPS		= @LIBTOOL_DEPS@
 AUTOMAKE_OPTIONS	= subdir-objects
 
 netmush_C		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-netmush_H		= alloc.h api.h attrs.h cmdtabs.h command.h db.h externs.h file_c.h flags.h fnproto.h functions.h game.h help.h htab.h interface.h match.h mushconf.h nametabs.h player.h powers.h stringutil.h system.h typedefs.h udb.h vattr.h walkdb.h
+netmush_H		= alloc.h api.h attrs.h cmdtabs.h command.h db.h externs.h file_c.h flags.h functions.h game.h help.h htab.h interface.h match.h mushconf.h nametabs.h player.h powers.h stringutil.h system.h typedefs.h udb.h vattr.h walkdb.h
 netmush_SOURCES		= $(netmush_C) $(netmush_H)
 netmush_LDFLAGS		= -export-dynamic
 netmush_SKEL		= defaults.h.in
