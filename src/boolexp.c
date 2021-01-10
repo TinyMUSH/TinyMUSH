@@ -13,21 +13,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "attrs.h"
-#include "match.h"
-#include "powers.h"
-#include "stringutil.h"
+#include "prototypes.h"
 
 /**
  * @brief indicate if attribute ATTR on player passes key when checked by the object lockobj

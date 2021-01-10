@@ -29,26 +29,12 @@
 
 #include "system.h"
 
-#include "typedefs.h" /* required by mudconf */
-#include "game.h"     /* required by mudconf */
-#include "alloc.h"    /* required by mudconf */
-#include "flags.h"    /* required by mudconf */
-#include "htab.h"     /* required by mudconf */
-#include "ltdl.h"     /* required by mudconf */
-#include "udb.h"      /* required by mudconf */
-
-#include "mushconf.h" /* required by code */
-
-#include "db.h" /* required by externs */
-#include "interface.h"
-#include "externs.h" /* required by code */
-
-#include "udb.h" /* required by code */
-
-/* Sizes, on disk, of Object and (within the object) Attribute headers */
-
-#define OBJ_HEADER_SIZE (sizeof(unsigned int) + sizeof(int))
-#define ATTR_HEADER_SIZE (sizeof(int) * 2)
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /* Take a chunk of data which contains an object, and parse it into an
  * object structure. */

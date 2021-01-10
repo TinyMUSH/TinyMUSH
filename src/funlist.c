@@ -13,32 +13,17 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "functions.h"	/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
  * List management utilities.
  */
-
-#define ALPHANUM_LIST 1
-#define NUMERIC_LIST 2
-#define DBREF_LIST 3
-#define FLOAT_LIST 4
-#define NOCASE_LIST 5
 
 int autodetect_list(char *ptrs[], int nitems)
 {
@@ -795,10 +780,6 @@ void fun_index(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * lreplace(<list>,<replacement words>,<positions>[,<isep>,<osep>])
  */
 
-#define IF_DELETE 0
-#define IF_REPLACE 1
-#define IF_INSERT 2
-
 void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const Delim *sep, int flag)
 {
 	int ct, overrun;
@@ -1420,11 +1401,6 @@ int i_comp(const void *s1, const void *s2)
 	return 0;
 }
 
-#define Get_Poslist(p, n, l)                 \
-	l = (int *)XCALLOC(n, sizeof(int), "l"); \
-	for (i = 0; i < n; i++)                  \
-		l[i] = p[i].pos;
-
 int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 {
 	int i;
@@ -1451,7 +1427,13 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 			}
 
 			qsort((void *)ap, n, sizeof(a_rec), (int (*)(const void *, const void *))arec_comp);
-			Get_Poslist(ap, n, poslist);
+
+			poslist = (int *)XCALLOC(n, sizeof(int), "l");
+			for (i = 0; i < n; i++)
+			{
+				poslist[i] = ap[i].pos;
+			}
+
 			XFREE(ap);
 		}
 
@@ -1473,7 +1455,13 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 			}
 
 			qsort((void *)ap, n, sizeof(a_rec), (int (*)(const void *, const void *))crec_comp);
-			Get_Poslist(ap, n, poslist);
+
+			poslist = (int *)XCALLOC(n, sizeof(int), "l");
+			for (i = 0; i < n; i++)
+			{
+				poslist[i] = ap[i].pos;
+			}
+
 			XFREE(ap);
 		}
 
@@ -1498,7 +1486,11 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 
 		if (listpos_only)
 		{
-			Get_Poslist(ip, n, poslist);
+			poslist = (int *)XCALLOC(n, sizeof(int), "l");
+			for (i = 0; i < n; i++)
+			{
+				poslist[i] = ip[i].pos;
+			}
 		}
 
 		XFREE(ip);
@@ -1523,7 +1515,11 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 
 		if (listpos_only)
 		{
-			Get_Poslist(ip, n, poslist);
+			poslist = (int *)XCALLOC(n, sizeof(int), "l");
+			for (i = 0; i < n; i++)
+			{
+				poslist[i] = ip[i].pos;
+			}
 		}
 
 		XFREE(ip);
@@ -1548,7 +1544,11 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 
 		if (listpos_only)
 		{
-			Get_Poslist(fp, n, poslist);
+			poslist = (int *)XCALLOC(n, sizeof(int), "l");
+			for (i = 0; i < n; i++)
+			{
+				poslist[i] = fp[i].pos;
+			}
 		}
 
 		XFREE(fp);
@@ -1680,7 +1680,7 @@ loop:
      * Pick something at random at swap it into the leftmost slot
 	 * This is the pivot, we'll put it back in the right spot later
      */
-	i = Randomize(1 + (right - left));
+	i = random_range(0, (1 + (right - left))-1);
 	tmp = array[left + i];
 	array[left + i] = array[left];
 	array[left] = tmp;
@@ -1827,12 +1827,6 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * would be confusing, since the last two args are, by convention,
  * delimiters. So we add new funcs.
  */
-
-#define NUMCMP(f1, f2) \
-	((f1 > f2) ? 1 : ((f1 < f2) ? -1 : 0))
-
-#define GENCMP(x1, x2, s) \
-	((s == ALPHANUM_LIST) ? strcmp(ptrs1[x1], ptrs2[x2]) : ((s == NOCASE_LIST) ? strcasecmp(ptrs1[x1], ptrs2[x2]) : ((s == FLOAT_LIST) ? NUMCMP(fp1[x1], fp2[x2]) : NUMCMP(ip1[x1], ip2[x2]))))
 
 void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -2021,7 +2015,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 				oldp = *bufc;
 
-				if (GENCMP(i1, i2, sort_type) < 0)
+				if (((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0))))) < 0)
 				{
 					SAFE_LB_STR(ptrs1[i1], buff, bufc);
 					i1++;
@@ -2075,7 +2069,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	case SET_INTERSECT: /* Copy elements not in both lists */
 		while ((i1 < n1) && (i2 < n2))
 		{
-			val = GENCMP(i1, i2, sort_type);
+			val = ((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0)))));
 
 			if (!val)
 			{
@@ -2117,7 +2111,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	case SET_DIFF: /* Copy elements unique to list1 */
 		while ((i1 < n1) && (i2 < n2))
 		{
-			val = GENCMP(i1, i2, sort_type);
+			val = ((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0)))));
 
 			if (!val)
 			{
@@ -3642,7 +3636,7 @@ void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		}
 	}
 
-	num = (int)Randomize(sum);
+	num = (int)random_range(0, (sum)-1);
 
 	for (i = 0; i < n_weights; i++)
 	{

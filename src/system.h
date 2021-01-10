@@ -138,6 +138,10 @@
 #define LDBL_DIG 6
 #endif
 
+#ifdef HAVE_GDBM_H
+#include <gdbm.h>
+#endif
+
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #else
@@ -185,5 +189,25 @@
 #ifndef HAVE_GETDTABLESIZE
 #define getdtablesize() sysconf(_SC_OPEN_MAX);
 #endif
+
+#ifndef NSIG
+extern const int _sys_nsig;
+#define NSIG _sys_nsig
+#endif
+
+/**
+ * Some systems are lame, and inet_addr() claims to return -1 on failure,
+ * despite the fact that it returns an unsigned long. (It's not really a -1,
+ * obviously.) Better-behaved systems use INADDR_NONE.
+ * 
+ */
+#ifndef INADDR_NONE
+#define INADDR_NONE -1
+#endif
+
+#ifndef SIGCHLD
+#define SIGCHLD SIGCLD
+#endif
+
 
 #endif /* __SYSTEM_H */

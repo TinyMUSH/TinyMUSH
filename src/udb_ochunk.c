@@ -13,22 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by code */
-#include <gdbm.h>       /* required by code */
-#include "udb.h"        /* required by code */
-#include "stringutil.h" /* required by code */
-
-#define DEFAULT_DBMCHUNKFILE "netmush"
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 char *dbfile = DEFAULT_DBMCHUNKFILE;
 int db_initted = 0;

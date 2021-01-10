@@ -15,16 +15,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "nametabs.h"
+#include "prototypes.h"
 
 FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */

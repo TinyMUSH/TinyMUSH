@@ -14,13 +14,4 @@
 #ifndef __PROTOTYPES_H
 #define __PROTOTYPES_H
 
-#include "vattr.h"
-#include "help.h"
-#include "powers.h"
-#include "walkdb.h"
-#include "functions.h"
-#include "command.h"
-#include "match.h"
-#include "file_c.h"
-#include "player.h"
 

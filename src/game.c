@@ -13,24 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "udb.h"		/* required by code */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by interface */
-#include "file_c.h"		/* required by code */
-#include "command.h"	/* required by code */
-#include "powers.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "defaults.h"	/* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 extern LOGFILETAB logfds_table[];
 extern volatile pid_t slave_pid;
@@ -125,9 +113,6 @@ int fileexist(char *file)
 	close(fp);
 	return (1);
 }
-
-#define HANDLE_FLAT_CRASH 1
-#define HANDLE_FLAT_KILL 2
 
 void handlestartupflatfiles(int flag)
 {
@@ -753,16 +738,6 @@ void html_escape(const char *src, char *dest, char **destp)
 
 	**destp = '\0';
 }
-
-#define OK_To_Send(p, t) (!herekey ||                                           \
-						  ((!Unreal(p) ||                                       \
-							((key & MSG_SPEECH) && Check_Heard((t), (p))) ||    \
-							((key & MSG_MOVE) && Check_Noticed((t), (p))) ||    \
-							((key & MSG_PRESENCE) && Check_Known((t), (p)))) && \
-						   (!Unreal(t) ||                                       \
-							((key & MSG_SPEECH) && Check_Hears((p), (t))) ||    \
-							((key & MSG_MOVE) && Check_Notices((p), (t))) ||    \
-							((key & MSG_PRESENCE) && Check_Knows((p), (t))))))
 
 void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 {
@@ -2660,7 +2635,7 @@ void process_preload(void)
 	fp = (FWDLIST *)XMALLOC(sizeof(FWDLIST), "fp");
 	pp = (PROPDIR *)XMALLOC(sizeof(PROPDIR), "pp");
 	tstr = XMALLOC(LBUF_SIZE, "tstr");
-	
+
 	for (thing = 0; thing < mudstate.db_top; thing++)
 	{
 		/*
@@ -3733,7 +3708,6 @@ int main(int argc, char *argv[])
 	}
 
 	mudstate.loading_db = 0;
-	init_genrand(getpid() | (time(NULL) << 16));
 	set_signals();
 
 	/*

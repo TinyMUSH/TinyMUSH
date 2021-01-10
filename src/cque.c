@@ -13,22 +13,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "match.h"
-#include "attrs.h"
-#include "powers.h"
-#include "command.h"
-#include "stringutil.h"
+#include "prototypes.h"
 
 extern int a_Queue(dbref, int);
 extern void s_Queue(dbref, int);
@@ -812,7 +802,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
      */
 	a = mudconf.waitcost;
 
-	if (a && mudconf.machinecost && (Randomize(mudconf.machinecost) == 0))
+	if (a && mudconf.machinecost && (random_range(0, (mudconf.machinecost)-1) == 0))
 	{
 		a++;
 	}

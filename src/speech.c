@@ -13,24 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "match.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "stringutil.h"         /* required by code */
-
-#define SAY_STRING (mudconf.comma_say ? "say," : "say")
-#define SAYS_STRING (mudconf.comma_say ? "says," : "says")
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 int sp_ok(dbref player)
 {
@@ -167,16 +155,16 @@ void format_speech(dbref player, dbref speaker, dbref loc, char *message, int ke
 	case SAY_SAY:
 		if (mudconf.you_say)
 		{
-			notify_check(speaker, speaker, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You %s \"%s\"", SAY_STRING, message);
+			notify_check(speaker, speaker, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You %s \"%s\"", mudconf.comma_say ? "say," : "say", message);
 
 			if (loc != NOTHING)
 			{
-				notify_except(loc, player, speaker, MSG_SPEECH, "%s %s \"%s\"", Name(speaker), SAYS_STRING, message);
+				notify_except(loc, player, speaker, MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mudconf.comma_say ? "says," : "says", message);
 			}
 		}
 		else
 		{
-			notify_check(loc, player, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, "%s %s \"%s\"", Name(speaker), SAYS_STRING, message);
+			notify_check(loc, player, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mudconf.comma_say ? "says," : "says", message);
 		}
 
 		break;

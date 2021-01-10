@@ -13,19 +13,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "attrs.h"
-#include "command.h"
-#include "interface.h"
-#include "db.h"
+#include "macros.h"
 #include "externs.h"
+#include "prototypes.h"
 
 /**
  * @brief Switch tables for the various commands.

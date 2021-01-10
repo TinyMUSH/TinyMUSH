@@ -13,37 +13,17 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "attrs.h"
-#include "vattr.h"
-#include "match.h"
-#include "powers.h"
-#include "udb.h"
-#include "stringutil.h"
-#include "nametabs.h"
-
-#ifndef O_ACCMODE
-#define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR)
-#endif
+#include "prototypes.h"
 
 /**
  * Restart definitions
  * 
  */
-#define RS_CONCENTRATE 0x00000002
-#define RS_RECORD_PLAYERS 0x00000004
-#define RS_NEW_STRINGS 0x00000008
-#define RS_COUNT_REBOOTS 0x00000010
 
 OBJ *db = NULL;         /*!< struct database */
 NAME *names = NULL;     /*!< Name buffer */
@@ -133,7 +113,7 @@ int tf_xopen(char *fname, int mode)
  */
 const char *mode_txt(int mode)
 {
-    switch (mode & O_ACCMODE)
+    switch (mode & (O_RDONLY | O_WRONLY | O_RDWR))
     {
     case O_RDONLY:
         return "r";
@@ -3006,8 +2986,6 @@ int atr_head(dbref thing, char **attrp)
     return atr_next(attrp);
 }
 
-#define SIZE_HACK 1 /* So mistaken refs to #-1 won't die. */
-
 /**
  * @brief Initialize an object
  * 
@@ -3120,7 +3098,7 @@ void db_grow(dbref newtop)
      * Grow the name tables
      * 
      */
-    newnames = (NAME *)XCALLOC(newsize + SIZE_HACK, sizeof(NAME), "newnames");
+    newnames = (NAME *)XCALLOC(newsize + 1, sizeof(NAME), "newnames");
 
     if (!newnames)
     {
@@ -3134,8 +3112,8 @@ void db_grow(dbref newtop)
          * An old name cache exists.  Copy it. 
          * 
          */
-        names -= SIZE_HACK;
-        XMEMCPY((char *)newnames, (char *)names, (newtop + SIZE_HACK) * sizeof(NAME));
+        names -= 1;
+        XMEMCPY((char *)newnames, (char *)names, (newtop + 1) * sizeof(NAME));
         cp = (char *)names;
         XFREE(cp);
     }
@@ -3148,15 +3126,15 @@ void db_grow(dbref newtop)
     	 */
         names = newnames;
 
-        for (int i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < 1; i++)
         {
             names[i] = NULL;
         }
     }
 
-    names = newnames + SIZE_HACK;
+    names = newnames + 1;
     newnames = NULL;
-    newpurenames = (NAME *)XCALLOC(newsize + SIZE_HACK, sizeof(NAME), "newpurenames");
+    newpurenames = (NAME *)XCALLOC(newsize + 1, sizeof(NAME), "newpurenames");
 
     if (!newpurenames)
     {
@@ -3164,7 +3142,7 @@ void db_grow(dbref newtop)
         abort();
     }
 
-    XMEMSET((char *)newpurenames, 0, (newsize + SIZE_HACK) * sizeof(NAME));
+    XMEMSET((char *)newpurenames, 0, (newsize + 1) * sizeof(NAME));
 
     if (purenames)
     {
@@ -3172,8 +3150,8 @@ void db_grow(dbref newtop)
          * An old name cache exists.  Copy it.
          * 
          */
-        purenames -= SIZE_HACK;
-        XMEMCPY((char *)newpurenames, (char *)purenames, (newtop + SIZE_HACK) * sizeof(NAME));
+        purenames -= 1;
+        XMEMCPY((char *)newpurenames, (char *)purenames, (newtop + 1) * sizeof(NAME));
         cp = (char *)purenames;
         XFREE(cp);
     }
@@ -3186,19 +3164,19 @@ void db_grow(dbref newtop)
     	 */
         purenames = newpurenames;
 
-        for (int i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < 1; i++)
         {
             purenames[i] = NULL;
         }
     }
 
-    purenames = newpurenames + SIZE_HACK;
+    purenames = newpurenames + 1;
     newpurenames = NULL;
     /** 
      * Grow the db array
      * 
      */
-    newdb = (OBJ *)XCALLOC(newsize + SIZE_HACK, sizeof(OBJ), "newdb");
+    newdb = (OBJ *)XCALLOC(newsize + 1, sizeof(OBJ), "newdb");
 
     if (!newdb)
     {
@@ -3212,8 +3190,8 @@ void db_grow(dbref newtop)
          * An old struct database exists.  Copy it to the new buffer
          * 
          */
-        db -= SIZE_HACK;
-        XMEMCPY((char *)newdb, (char *)db, (mudstate.db_top + SIZE_HACK) * sizeof(OBJ));
+        db -= 1;
+        XMEMCPY((char *)newdb, (char *)db, (mudstate.db_top + 1) * sizeof(OBJ));
         cp = (char *)db;
         XFREE(cp);
     }
@@ -3226,7 +3204,7 @@ void db_grow(dbref newtop)
     	 */
         db = newdb;
 
-        for (int i = 0; i < SIZE_HACK; i++)
+        for (int i = 0; i < 1; i++)
         {
             s_Owner(i, GOD);
             s_Flags(i, (TYPE_GARBAGE | GOING));
@@ -3244,7 +3222,7 @@ void db_grow(dbref newtop)
         }
     }
 
-    db = newdb + SIZE_HACK;
+    db = newdb + 1;
     newdb = NULL;
     /** 
      * Go do the rest of the things
@@ -3299,7 +3277,7 @@ void db_free(void)
 {
     if (db != NULL)
     {
-        db -= SIZE_HACK;
+        db -= 1;
         XFREE((char *)db);
         db = NULL;
     }

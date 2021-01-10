@@ -13,30 +13,13 @@
 
 #include "system.h"
 
-#include "typedefs.h" /* required by mudconf */
-#include "game.h"     /* required by mudconf */
-#include "alloc.h"    /* required by mudconf */
-#include "flags.h"    /* required by mudconf */
-#include "htab.h"     /* required by mudconf */
-#include "ltdl.h"     /* required by mudconf */
-#include "udb.h"      /* required by mudconf */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
-#include "mushconf.h" /* required by code */
-
-#include "db.h" /* required by externs */
-#include "interface.h"
-#include "externs.h" /* required by code */
-
-#include "vattr.h"     /* required by code */
-#include "attrs.h"     /* required by code */
-#include "functions.h" /* required by code */
-#include "command.h"   /* required by code */
-
-/*
- * Allocate space for strings in lumps this big.
- */
-
-#define STRINGBLOCK 1000
 
 /*
  * Current block we're putting stuff in

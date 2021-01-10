@@ -16,13 +16,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <signal.h>
-#include <arpa/inet.h>
-
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 enum
 {
@@ -30,19 +29,9 @@ enum
     SLAVE_IPTONAME = 'h'
 };
 
-/* Some systems are lame, and inet_addr() returns -1 on failure, despite
- * the fact that it returns an unsigned long.
- */
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
-
-#define MAX_STRING 1000
-#define MAX_CHILDREN 20
-
 pid_t parent_pid;
 
-volatile pid_t child_pids[MAX_CHILDREN];
+volatile pid_t child_pids[SLAVE_MAX_CHILDREN];
 
 char *arg_for_errors;
 
@@ -79,12 +68,12 @@ int query(char *ip, char *orig_arg)
 	struct sockaddr_in sin;
 	int s;
 	FILE *f;
-	char result[MAX_STRING];
-	char buf[MAX_STRING * 2];
-	char buf2[MAX_STRING * 2];
-	char buf3[MAX_STRING * 4];
-	char arg[MAX_STRING];
-	char namebuf[MAX_STRING];
+	char result[SLAVE_MAX_STRING];
+	char buf[SLAVE_MAX_STRING * 2];
+	char buf2[SLAVE_MAX_STRING * 2];
+	char buf3[SLAVE_MAX_STRING * 4];
+	char arg[SLAVE_MAX_STRING];
+	char namebuf[SLAVE_MAX_STRING];
 	size_t len;
 	char *p;
 	unsigned int addr;
@@ -96,7 +85,7 @@ int query(char *ip, char *orig_arg)
 	}
 
 	hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
-	sprintf(buf, "%s %s\n", ip, ((hp && strlen(hp->h_name) < MAX_STRING) ? hp->h_name : ip));
+	sprintf(buf, "%s %s\n", ip, ((hp && strlen(hp->h_name) < SLAVE_MAX_STRING) ? hp->h_name : ip));
 	arg_for_errors = orig_arg;
 	strcpy(arg, orig_arg);
 	comma = (char *)strrchr(arg, ',');
@@ -194,7 +183,7 @@ int query(char *ip, char *orig_arg)
 				{
 					*p++ = c;
 
-					if (p - result == MAX_STRING - 1)
+					if (p - result == SLAVE_MAX_STRING - 1)
 					{
 						break;
 					}
@@ -233,7 +222,7 @@ void child_signal(__attribute__((unused)) int sig)
      */
 	while ((child_pid = waitpid(0, NULL, WNOHANG)) > 0)
 	{
-		for (i = 0; i < MAX_CHILDREN; i++)
+		for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 		{
 			if (child_pids[i] == child_pid)
 			{
@@ -268,7 +257,7 @@ void alarm_signal(__attribute__((unused)) int sig)
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 {
-	char arg[MAX_STRING];
+	char arg[SLAVE_MAX_STRING];
 	char *p;
 	int i, len;
 	pid_t child_pid;
@@ -279,7 +268,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < MAX_CHILDREN; i++)
+	for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 	{
 		child_pids[i] = -1;
 	}
@@ -302,7 +291,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 	     */
 			while ((child_pid = waitpid(0, NULL, WNOHANG)) > 0)
 			{
-				for (i = 0; i < MAX_CHILDREN; i++)
+				for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 				{
 					if (child_pids[i] == child_pid)
 					{
@@ -315,7 +304,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 			/*
 	     * look for an available child process slot
 	     */
-			for (i = 0; i < MAX_CHILDREN; i++)
+			for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 			{
 				child_pid = child_pids[i];
 
@@ -325,7 +314,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 				}
 			}
 
-			if (i < MAX_CHILDREN)
+			if (i < SLAVE_MAX_CHILDREN)
 			{
 				break;
 			}
@@ -335,7 +324,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 	     */
 			child_pid = waitpid(0, NULL, 0);
 
-			for (i = 0; i < MAX_CHILDREN; i++)
+			for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 			{
 				if (child_pids[i] == child_pid)
 				{
@@ -343,13 +332,13 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 					break;
 				}
 			}
-		} while (i == MAX_CHILDREN);
+		} while (i == SLAVE_MAX_CHILDREN);
 
 		/*
 	 * ok, now read a request (blocking if no request is waiting,
 	 * * and stopping when interrupted by a signal)
 	 */
-		len = read(0, arg, MAX_STRING - 1);
+		len = read(0, arg, SLAVE_MAX_STRING - 1);
 
 		if (len == 0)
 		{
@@ -413,7 +402,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv)
 	/*
      * wait for any remaining children
      */
-	for (i = 0; i < MAX_CHILDREN; i++)
+	for (i = 0; i < SLAVE_MAX_CHILDREN; i++)
 	{
 		child_pid = child_pids[i];
 

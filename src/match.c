@@ -13,28 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"      /* required by mudconf */
-#include "alloc.h"     /* required by mudconf */
-#include "flags.h"     /* required by mudconf */
-#include "htab.h"      /* required by mudconf */
-#include "ltdl.h"      /* required by mudconf */
-#include "udb.h"       /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"        /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "match.h"     /* required by code */
-#include "attrs.h"     /* required by code */
-#include "powers.h"    /* required by code */
-#include "stringutil.h" /* required by code */
-
-#define CON_LOCAL 0x01    /* Match is near me */
-#define CON_TYPE 0x02     /* Match is of requested type */
-#define CON_LOCK 0x04     /* I pass the lock on match */
-#define CON_COMPLETE 0x08 /* Name given is the full name */
-#define CON_TOKEN 0x10    /* Name is a special token */
-#define CON_DBREF 0x20    /* Name is a dbref */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 MSTATE md;
 
@@ -113,7 +97,7 @@ void promote_match(dbref what, int confidence)
      */
     md.count++;
 
-    if (Randomize(md.count) == 0)
+    if (random_range(0, (md.count)-1) == 0)
     {
         md.match = what;
     }

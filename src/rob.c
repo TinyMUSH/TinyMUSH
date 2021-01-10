@@ -13,21 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "match.h"		/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *what, char *costchar)
 {
@@ -102,7 +93,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			cost = 0;
 		}
 
-		if (!((mudconf.killguarantee && (Randomize(mudconf.killguarantee) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
+		if (!((mudconf.killguarantee && (random_range(0, (mudconf.killguarantee)-1) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
 		{
 			/*
 	     * Failure: notify player and victim only

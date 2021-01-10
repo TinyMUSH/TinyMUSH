@@ -16,24 +16,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by interface */
-#include "file_c.h"		/* required by code */
-#include "command.h"	/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "match.h"		/* required by code */
-#include "stringutil.h" /* required by code */
-#include "nametabs.h"
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /* ---------------------------------------------------------------------------
  * timeval_sub: return difference between two times as a timeval
@@ -2574,9 +2562,6 @@ int site_check(struct in_addr host, SITE *site_list)
 /* --------------------------------------------------------------------------
  * list_sites: Display information in a site list
  */
-
-#define S_SUSPECT 1
-#define S_ACCESS 2
 
 const char *stat_string(int strtype, int flag)
 {

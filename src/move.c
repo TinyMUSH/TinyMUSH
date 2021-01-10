@@ -13,20 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"      /* required by mudconf */
-#include "alloc.h"     /* required by mudconf */
-#include "flags.h"     /* required by mudconf */
-#include "htab.h"      /* required by mudconf */
-#include "ltdl.h"      /* required by mudconf */
-#include "udb.h"       /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"        /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "match.h"     /* required by code */
-#include "attrs.h"     /* required by code */
-#include "powers.h"    /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /* ---------------------------------------------------------------------------
  * process_leave_loc: Generate messages and actions resulting from leaving
@@ -203,7 +195,7 @@ void move_object(dbref thing, dbref dest)
      */
     look_in(thing, dest, (LK_SHOWEXIT | LK_OBEYTERSE));
 
-    if (isPlayer(thing) && (mudconf.payfind > 0) && (Pennies(thing) < mudconf.paylimit) && (!Controls(thing, dest)) && (Randomize(mudconf.payfind) == 0))
+    if (isPlayer(thing) && (mudconf.payfind > 0) && (Pennies(thing) < mudconf.paylimit) && (!Controls(thing, dest)) && (random_range(0, (mudconf.payfind)-1) == 0))
     {
         giveto(thing, 1);
         notify_check(thing, thing, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You found a %s!", mudconf.one_coin);

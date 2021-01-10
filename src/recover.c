@@ -14,23 +14,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"	   /* required by mudconf */
-#include "alloc.h"	   /* required by mudconf */
-#include "flags.h"	   /* required by mudconf */
-#include "htab.h"	   /* required by mudconf */
-#include "ltdl.h"	   /* required by mudconf */
-#include "udb.h"	   /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs */
-#include "udb.h"	   /* required by code */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by interface */
-#include "file_c.h"	   /* required by code */
-#include "command.h"   /* required by code */
-#include "powers.h"	   /* required by code */
-#include "attrs.h"	   /* required by code */
-#include "defaults.h"  /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 #ifdef HAVE_GDBM_H
 #include <gdbm.h> /* required by code */

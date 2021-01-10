@@ -16,21 +16,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"	   /* required by mudconf */
-#include "alloc.h"	   /* required by mudconf */
-#include "flags.h"	   /* required by mudconf */
-#include "htab.h"	   /* required by mudconf */
-#include "ltdl.h"	   /* required by mudconf */
-#include "udb.h"	   /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-
-#define FIXCASE(a) (tolower(a))
-#define EQUAL(a, b) ((a == b) || (FIXCASE(a) == FIXCASE(b)))
-#define NOTEQUAL(a, b) ((a != b) && (FIXCASE(a) != FIXCASE(b)))
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 char **arglist; /* argument return space */
 
@@ -57,7 +48,7 @@ int check_literals(char *tstr, char *dstr)
 			tstr++;
 		}
 
-		if (NOTEQUAL(*dstr, *tstr))
+		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 		{
 			return 0;
 		}
@@ -78,7 +69,7 @@ int check_literals(char *tstr, char *dstr)
 
 	while (*dstr)
 	{
-		*ep = FIXCASE(*dstr);
+		*ep = tolower(*dstr);
 		ep++;
 		dstr++;
 	}
@@ -99,7 +90,7 @@ int check_literals(char *tstr, char *dstr)
 
 	while ((ep >= dstr) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
 	{
-		if ((*xp != '\\') && NOTEQUAL(*ep, *xp))
+		if ((*xp != '\\') && ((*ep != *xp) && (tolower(*ep) != tolower(*xp))))
 		{
 			return 0;
 		}
@@ -138,7 +129,7 @@ int check_literals(char *tstr, char *dstr)
 				tstr++;
 			}
 
-			*p = FIXCASE(*tstr);
+			*p = tolower(*tstr);
 			p++;
 			tstr++;
 			len++;
@@ -213,7 +204,7 @@ int real_quick_wild(char *tstr, char *dstr)
 	     * Literal character.  Check for a match. If
 	     * * matching end of data, return true.
 	     */
-			if (NOTEQUAL(*dstr, *tstr))
+			if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
 				return 0;
 			}
@@ -285,7 +276,7 @@ int real_quick_wild(char *tstr, char *dstr)
 
 	while (*dstr)
 	{
-		if (EQUAL(*dstr, *tstr))
+		if ((*dstr == *tstr) || (tolower(*dstr) == tolower(*tstr)))
 		{
 			if ((st = real_quick_wild(tstr + 1, dstr + 1)) != 0)
 			{
@@ -388,7 +379,7 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	     * Literal character.  Check for a match. If
 	     * * matching end of data, return true.
 	     */
-			if (NOTEQUAL(*dstr, *tstr))
+			if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
 				return 0;
 			}
@@ -509,7 +500,7 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	 * Scan forward until first character matches.
 	 */
 		if (*tstr)
-			while (NOTEQUAL(*dstr, *tstr))
+			while ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
 				if (!*dstr)
 				{
@@ -639,7 +630,7 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 			tstr++;
 		}
 
-		if (NOTEQUAL(*dstr, *tstr))
+		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 		{
 			return 0;
 		}
@@ -768,7 +759,7 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 			tstr++;
 		}
 
-		if (NOTEQUAL(*dstr, *tstr))
+		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 		{
 			return 0;
 		}

@@ -13,33 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
 #include "defaults.h"
-#include "db.h"
-#include "interface.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
 #include "externs.h"
-#include "command.h"
-#include "attrs.h"
-#include "match.h"
-#include "stringutil.h"
-#include "nametabs.h"
-
-/**
- * Some systems are lame, and inet_addr() claims to return -1 on failure,
- * despite the fact that it returns an unsigned long. (It's not really a -1,
- * obviously.) Better-behaved systems use INADDR_NONE.
- * 
- */
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
+#include "prototypes.h"
 
 CONFDATA mudconf;
 STATEDATA mudstate;

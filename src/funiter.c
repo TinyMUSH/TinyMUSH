@@ -13,21 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by code */
-#include "functions.h"  /* required by code */
-#include "attrs.h"      /* required by code */
-#include "powers.h"     /* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -1402,12 +1393,12 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    dbref aowner1, thing1, aowner2, thing2;
-    int aflags1, aflags2, anum1, anum2, alen1, alen2, i, tmp_num;
-    int is_same, is_exact_same;
-    ATTR *ap, *ap2;
-    char *atext1, *atext2, *atextbuf, *condbuf;
-    char *objs[2], *cp, *str, *dp, *savep, *bb_p, *op;
+    dbref aowner1 = NOTHING, thing1 = NOTHING, aowner2 = NOTHING, thing2 = NOTHING;
+    int aflags1 = 0, aflags2 = 0, anum1 = 0, anum2 = 0, alen1 = 0, alen2 = 0, i = 0, tmp_num = 0;
+    int is_same = 0, is_exact_same = 0;
+    ATTR *ap = NULL, *ap2 = NULL;
+    char *atext1 = NULL, *atext2 = NULL, *atextbuf = NULL, *condbuf = NULL;
+    char *objs[2], *cp = NULL, *str = NULL, *dp = NULL, *savep = NULL, *bb_p = NULL, *op = NULL;
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 4, 6, buff, bufc))
     {

@@ -15,26 +15,12 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "file_c.h"
-#include "command.h"
-#include "attrs.h"
-#include "nametabs.h"
-
-#ifndef NSIG
-extern const int _sys_nsig;
-#define NSIG _sys_nsig
-#endif
+#include "prototypes.h"
 
 /**
  * @attention Since this is the core of the whole show, better keep theses globals.
@@ -46,14 +32,6 @@ int maxd = 0;					/*!< Max Descriptors */
 DESC *descriptor_list = NULL;	/*!< Descriptor list */
 volatile pid_t slave_pid = 0;	/*!< PID of the slace */
 volatile int slave_socket = -1; /*!< Socket of the slave */
-
-/**
- * @note Some systems are lame, and inet_addr() returns -1 on failure, despite the
- * fact that it returns an unsigned long.
- */
-#ifndef INADDR_NONE
-#define INADDR_NONE -1
-#endif
 
 /**
  * @brief Get the slave's result
@@ -1403,10 +1381,6 @@ void report(void)
 		XFREE(player);
 	}
 }
-
-#ifndef SIGCHLD
-#define SIGCHLD SIGCLD
-#endif
 
 /**
  * @brief Handle system signals

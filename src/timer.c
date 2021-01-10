@@ -13,49 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mushconf */
-#include "game.h"      /* required by mushconf */
-#include "alloc.h"     /* required by mushconf */
-#include "flags.h"     /* required by mushconf */
-#include "htab.h"      /* required by mushconf */
-#include "ltdl.h"      /* required by mushconf */
-#include "udb.h"       /* required by mushconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"        /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by interface */
-#include "match.h"     /* required by code */
-#include "powers.h"    /* required by code */
-
-/* ---------------------------------------------------------------------------
- * Cron-related things. This implementation is somewhat derivative of
- * Paul Vixie's cron implementation for Berkeley. See Copyright.h for the
- * copyright notice.
- */
-
-#define FIRST_MINUTE 0
-#define LAST_MINUTE 59
-#define MINUTE_COUNT (LAST_MINUTE - FIRST_MINUTE + 1)
-
-#define FIRST_HOUR 0
-#define LAST_HOUR 23
-#define HOUR_COUNT (LAST_HOUR - FIRST_HOUR + 1)
-
-#define FIRST_DOM 1
-#define LAST_DOM 31
-#define DOM_COUNT (LAST_DOM - FIRST_DOM + 1)
-
-#define FIRST_MONTH 1
-#define LAST_MONTH 12
-#define MONTH_COUNT (LAST_MONTH - FIRST_MONTH + 1)
-
-/* Note on DOW: 0 and 7 are both Sunday, for compatibility reasons. */
-#define FIRST_DOW 0
-#define LAST_DOW 7
-#define DOW_COUNT (LAST_DOW - FIRST_DOW + 1)
-
-#define DOM_STAR 0x01
-#define DOW_STAR 0x02
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 typedef struct cron_entry CRONTAB;
 

@@ -15,24 +15,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mushconf */
-#include "game.h"	   /* required by mushconf */
-#include "alloc.h"	   /* required by mushconf */
-#include "flags.h"	   /* required by mushconf */
-#include "htab.h"	   /* required by mushconf */
-#include "ltdl.h"	   /* required by mushconf */
-#include "udb.h"	   /* required by mushconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by interface */
-#include "command.h"   /* required by code */
-#include "match.h"	   /* required by code */
-#include "vattr.h"	   /* required by code */
-#include "attrs.h"	   /* required by code */
-#include "powers.h"	   /* required by code */
-#include "functions.h" /* required by code */
-#include "udb.h"	   /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 extern CMDENT *prefix_cmds[256];
 

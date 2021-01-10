@@ -13,22 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by code */
-#include "functions.h"  /* required by code */
-#include "match.h"      /* required by code */
-#include "attrs.h"      /* required by code */
-#include "powers.h"     /* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -1469,8 +1459,6 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
  * Auxiliary stuff for structures and variables.
  */
 
-#define Set_Max(x, y) (x) = ((y) > (x)) ? (y) : (x);
-
 void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
 {
     /*
@@ -1619,7 +1607,7 @@ void set_xvar(dbref obj, char *name, char *data)
             XSTRCPY(xvar->text, data);
             hashadd(tbuf, (int *)xvar, &mudstate.vars_htab, 0);
             s_VarsCount(obj, VarsCount(obj) + 1);
-            Set_Max(mudstate.max_vars, mudstate.vars_htab.entries);
+            mudstate.max_vars = mudstate.vars_htab.entries > mudstate.max_vars ? mudstate.vars_htab.entries : mudstate.max_vars;
         }
     }
     XFREE(tbuf);
@@ -2310,7 +2298,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     this_struct->names_base = comp_names;
     this_struct->defs_base = default_vals;
     hashadd(tbuf, (int *)this_struct, &mudstate.structs_htab, 0);
-    Set_Max(mudstate.max_structs, mudstate.structs_htab.entries);
+    mudstate.max_structs = mudstate.structs_htab.entries > mudstate.max_structs ? mudstate.structs_htab.entries : mudstate.max_structs;
     /*
      * Now that we're done with the base name, we can stick the joining
      * period on the end.
@@ -2384,7 +2372,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         this_struct->need_typecheck = check_type;
         this_struct->c_array[i] = this_comp;
         hashadd(cbuf, (int *)this_comp, &mudstate.cdefs_htab, 0);
-        Set_Max(mudstate.max_cdefs, mudstate.cdefs_htab.entries);
+        mudstate.max_cdefs = mudstate.cdefs_htab.entries > mudstate.max_cdefs ? mudstate.cdefs_htab.entries : mudstate.max_cdefs;
     }
 
     XFREE(type_names);
@@ -2622,7 +2610,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     inst_ptr = (INSTANCE *)XMALLOC(sizeof(INSTANCE), "inst_ptr");
     inst_ptr->datatype = this_struct;
     hashadd(ibuf, (int *)inst_ptr, &mudstate.instance_htab, 0);
-    Set_Max(mudstate.max_instance, mudstate.instance_htab.entries);
+    mudstate.max_instance = mudstate.instance_htab.entries > mudstate.max_instance ? mudstate.instance_htab.entries : mudstate.max_instance;
 
     /*
      * Populate with default values.
@@ -2647,7 +2635,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
-        Set_Max(mudstate.max_instdata, mudstate.instdata_htab.entries);
+        mudstate.max_instdata = mudstate.instdata_htab.entries > mudstate.max_instdata ? mudstate.instdata_htab.entries : mudstate.max_instdata;
     }
 
     /*
@@ -2847,7 +2835,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     inst_ptr = (INSTANCE *)XMALLOC(sizeof(INSTANCE), "inst_ptr");
     inst_ptr->datatype = this_struct;
     hashadd(ibuf, (int *)inst_ptr, &mudstate.instance_htab, 0);
-    Set_Max(mudstate.max_instance, mudstate.instance_htab.entries);
+    mudstate.max_instance = mudstate.instance_htab.entries > mudstate.max_instance ? mudstate.instance_htab.entries : mudstate.max_instance;
 
     /*
      * Stuff data into memory.
@@ -2870,7 +2858,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
-        Set_Max(mudstate.max_instdata, mudstate.instdata_htab.entries);
+        mudstate.max_instdata = mudstate.instdata_htab.entries > mudstate.max_instdata ? mudstate.instdata_htab.entries : mudstate.max_instdata;
     }
 
     XFREE(val_list);
@@ -3633,20 +3621,6 @@ void structure_clr(dbref thing)
  * Auxiliary functions for stacks.
  */
 
-#define stack_get(x) ((OBJSTACK *)nhashfind(x, &mudstate.objstack_htab))
-
-#define stack_object(p, x)               \
-    x = match_thing(p, fargs[0]);        \
-    if (!Good_obj(x))                    \
-    {                                    \
-        return;                          \
-    }                                    \
-    if (!Controls(p, x))                 \
-    {                                    \
-        notify_quiet(p, NOPERM_MESSAGE); \
-        return;                          \
-    }
-
 /*
  * ---------------------------------------------------------------------------
  * Object stack functions.
@@ -3655,7 +3629,7 @@ void structure_clr(dbref thing)
 void stack_clr(dbref thing)
 {
     OBJSTACK *sp, *tp, *xp;
-    sp = stack_get(thing);
+    sp = ((OBJSTACK *)nhashfind(thing, &mudstate.objstack_htab));
 
     if (sp)
     {
@@ -3684,7 +3658,7 @@ int stack_set(dbref thing, OBJSTACK *sp)
         return 1;
     }
 
-    xsp = stack_get(thing);
+    xsp = ((OBJSTACK *)nhashfind(thing, &mudstate.objstack_htab));
 
     if (xsp)
     {
@@ -3693,7 +3667,7 @@ int stack_set(dbref thing, OBJSTACK *sp)
     else
     {
         stat = nhashadd(thing, (int *)sp, &mudstate.objstack_htab);
-        Set_Max(mudstate.max_stacks, mudstate.objstack_htab.entries);
+        mudstate.max_stacks = mudstate.objstack_htab.entries > mudstate.max_stacks ? mudstate.objstack_htab.entries : mudstate.max_stacks;
     }
 
     if (stat < 0)
@@ -3723,7 +3697,16 @@ void fun_empty(char *buff, char **bufc, dbref player, dbref caller __attribute__
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
     stack_clr(it);
@@ -3739,7 +3722,16 @@ void fun_items(char *buff, char **bufc, dbref player, dbref caller __attribute__
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
     SAFE_LTOS(buff, bufc, StackCount(it), LBUF_SIZE);
@@ -3771,7 +3763,16 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
         data = fargs[1];
     }
 
@@ -3787,7 +3788,7 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__(
         return;
     }
 
-    sp->next = stack_get(it);
+    sp->next = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
     sp->data = (char *)XMALLOC(sizeof(char) * (strlen(data) + 1), "sp->data");
 
     if (!sp->data)
@@ -3822,7 +3823,16 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
     if (StackCount(it) + 1 > mudconf.stack_lim)
@@ -3839,7 +3849,7 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
-    hp = stack_get(it);
+    hp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
 
     for (tp = hp; (count != pos) && (tp != NULL); count++, tp = tp->next)
         ;
@@ -3889,10 +3899,19 @@ void fun_swap(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
-    sp = stack_get(it);
+    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
 
     if (!sp || (sp->next == NULL))
     {
@@ -3926,7 +3945,16 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute_
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
     if (!fargs[1] || !*fargs[1])
@@ -3938,7 +3966,7 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute_
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
-    sp = stack_get(it);
+    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
 
     if (!sp)
     {
@@ -4003,10 +4031,19 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    stack_object(player, it);
+    it = match_thing(player, fargs[0]);
+    if (!Good_obj(it))
+    {
+        return;
+    }
+    if (!Controls(player, it))
+    {
+        notify_quiet(player, NOPERM_MESSAGE);
+        return;
+    }
     pos = (int)strtol(fargs[1], (char **)NULL, 10);
     nitems = (int)strtol(fargs[2], (char **)NULL, 10);
-    sp = stack_get(it);
+    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
 
     if (!sp)
     {
@@ -4096,12 +4133,21 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     }
     else
     {
-        stack_object(player, it);
+        it = match_thing(player, fargs[0]);
+        if (!Good_obj(it))
+        {
+            return;
+        }
+        if (!Controls(player, it))
+        {
+            notify_quiet(player, NOPERM_MESSAGE);
+            return;
+        }
     }
 
     bb_p = *bufc;
 
-    for (sp = stack_get(it); (sp != NULL) && !over; sp = sp->next)
+    for (sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab)); (sp != NULL) && !over; sp = sp->next)
     {
         if (*bufc != bb_p)
         {
@@ -4600,19 +4646,19 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
 void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    dbref aowner1, thing1, aowner2, thing2;
-    int aflags1, aflags2, anum1, anum2, alen1, alen2;
-    ATTR *ap, *ap2;
-    char *atext1, *atext2, *atextbuf, *condbuf;
+    dbref aowner1 = NOTHING, thing1 = NOTHING, aowner2 = NOTHING, thing2 = NOTHING;
+    int aflags1 = 0, aflags2 = 0, anum1 = 0, anum2 = 0, alen1 = 0, alen2 = 0;
+    ATTR *ap = NULL, *ap2 = NULL;
+    char *atext1 = NULL, *atext2 = NULL, *atextbuf = NULL, *condbuf = NULL;
     char *cp[NUM_ENV_VARS], *os[NUM_ENV_VARS];
     int count[LBUF_SIZE / 2];
-    int i, is_exact_same, is_same, nwords, lastn, wc;
-    char *str, *dp, *savep, *bb_p;
-    pcre *re;
-    const char *errptr;
-    int erroffset;
+    int i = 0, is_exact_same = 0, is_same = 0, nwords = 0, lastn = 0, wc = 0;
+    char *str = NULL, *dp = NULL, *savep = NULL, *bb_p = NULL;
+    pcre *re = NULL;
+    const char *errptr = NULL;
+    int erroffset = 0;
     int offsets[PCRE_MAX_OFFSETS];
-    int subpatterns;
+    int subpatterns = 0;
     /*
      * We need at least 6 arguments. The last 2 args must be delimiters.
      */
@@ -4979,41 +5025,6 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * grid(<y range>,<x range>[,<odelim for row elems>][,<odelim between rows>])
  */
 
-#define grid_get(x) ((OBJGRID *)nhashfind(x, &mudstate.objgrid_htab))
-
-#define grid_raw_set(gp, gr, gc, gv)                                      \
-    if ((gp)->data[(gr)][(gc)] != NULL)                                   \
-    {                                                                     \
-        XFREE((gp)->data[(gr)][(gc)]);                                    \
-    }                                                                     \
-    if (*(gv))                                                            \
-    {                                                                     \
-        (gp)->data[(gr)][(gc)] = XSTRDUP((gv), "(gp)->data[(gr)][(gc)]"); \
-    }
-
-#define grid_set(gp, gr, gc, gv, ge)                  \
-    if (((gr) < 0) || ((gc) < 0) ||                   \
-        ((gr) >= (gp)->rows) || ((gc) >= (gp)->cols)) \
-    {                                                 \
-        (ge)++;                                       \
-    }                                                 \
-    else                                              \
-    {                                                 \
-        grid_raw_set((gp), (gr), (gc), (gv));         \
-    }
-
-#define grid_print(gp, gr, gc, gn, gsep)                  \
-    if (gn)                                               \
-    {                                                     \
-        print_separator(&(gsep), buff, bufc);             \
-    }                                                     \
-    if (!(((gr) < 0) || ((gc) < 0) ||                     \
-          ((gr) >= (gp)->rows) || ((gc) >= (gp)->cols) || \
-          ((gp)->data[(gr)][(gc)] == NULL)))              \
-    {                                                     \
-        SAFE_LB_STR((gp)->data[(gr)][(gc)], buff, bufc);  \
-    }
-
 void grid_free(dbref thing, OBJGRID *ogp)
 {
     int r, c;
@@ -5071,7 +5082,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         return;
     }
 
-    ogp = grid_get(player);
+    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
 
     if (ogp)
     {
@@ -5144,7 +5155,14 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         for (c = 0; c < data_elems; c++)
         {
-            grid_raw_set(ogp, r, c, elem_text[c]);
+            if (ogp->data[r][c] != NULL)
+            {
+                XFREE(ogp->data[r][c]);
+            }
+            if (*elem_text[c])
+            {
+                ogp->data[r][c] = XSTRDUP(elem_text[c], "gp->data[gr][gc]");
+            }
         }
     }
 
@@ -5153,8 +5171,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    OBJGRID *ogp;
-    ogp = grid_get(player);
+    OBJGRID *ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
 
     if (!ogp)
     {
@@ -5184,7 +5201,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         return;
     }
 
-    ogp = grid_get(player);
+    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
 
     if (!ogp)
     {
@@ -5201,7 +5218,22 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     {
         r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
         c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
-        grid_set(ogp, r, c, fargs[2], errs);
+
+        if ((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols))
+        {
+            errs++;
+        }
+        else
+        {
+            if (ogp->data[r][c] != NULL)
+            {
+                XFREE(ogp->data[r][c]);
+            }
+            if (*fargs[2])
+            {
+                ogp->data[r][c] = XSTRDUP(fargs[2], "gp->data[gr][gc]");
+            }
+        }
 
         if (errs)
         {
@@ -5259,7 +5291,14 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
             {
                 for (c = 0; c < ogp->cols; c++)
                 {
-                    grid_raw_set(ogp, r, c, fargs[2]);
+                    if (ogp->data[r][c] != NULL)
+                    {
+                        XFREE(ogp->data[r][c]);
+                    }
+                    if (*fargs[2])
+                    {
+                        ogp->data[r][c] = XSTRDUP(fargs[2], "gp->data[gr][gc]");
+                    }
                 }
             }
             else
@@ -5267,7 +5306,21 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 for (i = 0; i < n_x; i++)
                 {
                     c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
-                    grid_set(ogp, r, c, fargs[2], errs);
+                    if ((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols))
+                    {
+                        errs++;
+                    }
+                    else
+                    {
+                        if (ogp->data[r][c] != NULL)
+                        {
+                            XFREE(ogp->data[r][c]);
+                        }
+                        if (*fargs[2])
+                        {
+                            ogp->data[r][c] = XSTRDUP(fargs[2], "gp->data[gr][gc]");
+                        }
+                    }
                 }
             }
         }
@@ -5288,7 +5341,21 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 {
                     for (c = 0; c < ogp->cols; c++)
                     {
-                        grid_set(ogp, r, c, fargs[2], errs);
+                        if ((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols))
+                        {
+                            errs++;
+                        }
+                        else
+                        {
+                            if (ogp->data[r][c] != NULL)
+                            {
+                                XFREE(ogp->data[r][c]);
+                            }
+                            if (*fargs[2])
+                            {
+                                ogp->data[r][c] = XSTRDUP(fargs[2], "gp->data[gr][gc]");
+                            }
+                        }
                     }
                 }
                 else
@@ -5296,7 +5363,21 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                     for (i = 0; i < n_x; i++)
                     {
                         c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
-                        grid_set(ogp, r, c, fargs[2], errs);
+                        if ((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols))
+                        {
+                            errs++;
+                        }
+                        else
+                        {
+                            if (ogp->data[r][c] != NULL)
+                            {
+                                XFREE(ogp->data[r][c]);
+                            }
+                            if (*fargs[2])
+                            {
+                                ogp->data[r][c] = XSTRDUP(fargs[2], "gp->data[gr][gc]");
+                            }
+                        }
                     }
                 }
             }
@@ -5342,7 +5423,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    ogp = grid_get(player);
+    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
 
     if (!ogp)
     {
@@ -5358,7 +5439,12 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     {
         r = (int)strtol(fargs[0], (char **)NULL, 10) - 1;
         c = (int)strtol(fargs[1], (char **)NULL, 10) - 1;
-        grid_print(ogp, r, c, 0, csep);
+
+        if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
+        {
+            SAFE_LB_STR((ogp)->data[(r)][(c)], buff, bufc);
+        }
+
         return;
     }
 
@@ -5413,7 +5499,14 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             {
                 for (c = 0; c < ogp->cols; c++)
                 {
-                    grid_print(ogp, r, c, (c != 0), csep);
+                    if (c != 0)
+                    {
+                        print_separator(&csep, buff, bufc);
+                    }
+                    if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
+                    {
+                        SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                    }
                 }
             }
             else
@@ -5421,7 +5514,14 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 for (i = 0; i < n_x; i++)
                 {
                     c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
-                    grid_print(ogp, r, c, (i != 0), csep);
+                    if (i != 0)
+                    {
+                        print_separator(&csep, buff, bufc);
+                    }
+                    if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
+                    {
+                        SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                    }
                 }
             }
         }
@@ -5443,7 +5543,14 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 {
                     for (c = 0; c < ogp->cols; c++)
                     {
-                        grid_print(ogp, r, c, (c != 0), csep);
+                        if (c != 0)
+                        {
+                            print_separator(&csep, buff, bufc);
+                        }
+                        if (!((r < 0) || (c < 0) || (r >= ogp->rows) || ((c) >= ogp->cols) || (ogp->data[r][c] == NULL)))
+                        {
+                            SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                        }
                     }
                 }
                 else
@@ -5451,7 +5558,14 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                     for (i = 0; i < n_x; i++)
                     {
                         c = (int)strtol(x_elems[i], (char **)NULL, 10) - 1;
-                        grid_print(ogp, r, c, (i != 0), csep);
+                        if (i != 0)
+                        {
+                            print_separator(&csep, buff, bufc);
+                        }
+                        if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
+                        {
+                            SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                        }
                     }
                 }
             }

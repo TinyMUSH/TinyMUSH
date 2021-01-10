@@ -13,20 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "functions.h"	/* required by code */
-#include "powers.h"		/* required by code */
-#include "stringutil.h" /* required by code */
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -226,8 +218,6 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * ---------------------------------------------------------------------------
  * trim: trim off unwanted white space.
  */
-#define TRIM_L 0x1
-#define TRIM_R 0x2
 
 void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -2124,12 +2114,6 @@ void fun_stripansi(char *buff, char **bufc, dbref player __attribute__((unused))
  * encrypt() and decrypt(): From DarkZone.
  */
 
-/*
- * Copy over only alphanumeric chars
- */
-#define CRYPTCODE_LO 32	 /* space */
-#define CRYPTCODE_HI 126 /* tilde */
-#define CRYPTCODE_MOD 95 /* count of printable ascii chars */
 
 void crunch_code(char *code)
 {

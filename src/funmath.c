@@ -13,29 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by code */
-#include "functions.h"  /* required by code */
-#include "stringutil.h" /* required by code */
-
-#define FP_SIZE ((sizeof(long double) + sizeof(unsigned int) - 1) / sizeof(unsigned int))
-#define FP_EXP_WEIRD 0x1
-#define FP_EXP_ZERO 0x2
-
-typedef union
-{
-    long double d;
-    unsigned int u[FP_SIZE];
-} fp_union_uint;
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 unsigned int fp_check_weird(char *buff, char **bufc, long double result)
 {

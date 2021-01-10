@@ -13,95 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"      /* required by mudconf */
-#include "alloc.h"     /* required by mudconf */
-#include "flags.h"     /* required by mudconf */
-#include "htab.h"      /* required by mudconf */
-#include "ltdl.h"      /* required by mudconf */
-#include "udb.h"       /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"        /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "udb.h"       /* required by code */
-
-#define NAMECMP(a, b, c, d, e) ((d == e) && !memcmp(a, b, c))
-
-#define INSHEAD(q, e)          \
-    if (q->head == (UDB_CACHE *)0) \
-    {                          \
-        q->tail = e;           \
-        e->nxt = (UDB_CACHE *)0;   \
-    }                          \
-    else                       \
-    {                          \
-        e->nxt = q->head;      \
-    }                          \
-    q->head = e;
-
-#define INSTAIL(q, e)          \
-    if (q->head == (UDB_CACHE *)0) \
-    {                          \
-        q->head = e;           \
-    }                          \
-    else                       \
-    {                          \
-        q->tail->nxt = e;      \
-    }                          \
-    q->tail = e;               \
-    e->nxt = (UDB_CACHE *)0;
-
-#define F_DEQUEUE(q, e)                       \
-    if (e->nxtfree == (UDB_CACHE *)0)             \
-    {                                         \
-        if (e->prvfree != (UDB_CACHE *)0)         \
-        {                                     \
-            e->prvfree->nxtfree = (UDB_CACHE *)0; \
-        }                                     \
-        q->tail = e->prvfree;                 \
-    }                                         \
-    if (e->prvfree == (UDB_CACHE *)0)             \
-    {                                         \
-        q->head = e->nxtfree;                 \
-        if (e->nxtfree)                       \
-            e->nxtfree->prvfree = (UDB_CACHE *)0; \
-    }                                         \
-    else                                      \
-    {                                         \
-        e->prvfree->nxtfree = e->nxtfree;     \
-        if (e->nxtfree)                       \
-            e->nxtfree->prvfree = e->prvfree; \
-    }
-
-#define F_INSHEAD(q, e)          \
-    if (q->head == (UDB_CACHE *)0)   \
-    {                            \
-        q->tail = e;             \
-        e->nxtfree = (UDB_CACHE *)0; \
-    }                            \
-    else                         \
-    {                            \
-        e->nxtfree = q->head;    \
-        e->nxtfree->prvfree = e; \
-    }                            \
-    e->prvfree = (UDB_CACHE *)0;     \
-    q->head = e;
-
-#define F_INSTAIL(q, e)        \
-    if (q->head == (UDB_CACHE *)0) \
-    {                          \
-        q->head = e;           \
-    }                          \
-    else                       \
-    {                          \
-        q->tail->nxtfree = e;  \
-    }                          \
-    e->prvfree = q->tail;      \
-    q->tail = e;               \
-    e->nxtfree = (UDB_CACHE *)0;
-
-UDB_CACHE *get_free_entry(int);
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /* initial settings for cache sizes */
 
@@ -497,7 +414,7 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
             if (!mudstate.standalone && !mudstate.dumping)
             {
@@ -505,8 +422,37 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
                 cs_ahits++;
             }
 
-            F_DEQUEUE(freelist, cp);
-            F_INSTAIL(freelist, cp);
+            if (cp->nxtfree == (UDB_CACHE *)0)
+            {
+                if (cp->prvfree != (UDB_CACHE *)0)
+                {
+                    cp->prvfree->nxtfree = (UDB_CACHE *)0;
+                }
+                freelist->tail = cp->prvfree;
+            }
+            if (cp->prvfree == (UDB_CACHE *)0)
+            {
+                freelist->head = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = (UDB_CACHE *)0;
+            }
+            else
+            {
+                cp->prvfree->nxtfree = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = cp->prvfree;
+            }
+            if (freelist->head == (UDB_CACHE *)0)
+            {
+                freelist->head = cp;
+            }
+            else
+            {
+                freelist->tail->nxtfree = cp;
+            }
+            cp->prvfree = freelist->tail;
+            freelist->tail = cp;
+            cp->nxtfree = (UDB_CACHE *)0;
             data.dptr = cp->data;
             data.dsize = cp->datalen;
             return data;
@@ -615,22 +561,61 @@ skipcacheget:
         /*
 	 * Link at head of chain
 	 */
-        INSHEAD(sp, cp);
+        if (sp->head == (UDB_CACHE *)0)
+        {
+            sp->tail = cp;
+            cp->nxt = (UDB_CACHE *)0;
+        }
+        else
+        {
+            cp->nxt = sp->head;
+        }
+        sp->head = cp;
         /*
 	 * Link at head of LRU freelist
 	 */
-        F_INSHEAD(freelist, cp);
+        if (freelist->head == (UDB_CACHE *)0)
+        {
+            freelist->tail = cp;
+            cp->nxtfree = (UDB_CACHE *)0;
+        }
+        else
+        {
+            cp->nxtfree = freelist->head;
+            cp->nxtfree->prvfree = cp;
+        }
+        cp->prvfree = (UDB_CACHE *)0;
+        freelist->head = cp;
     }
     else
     {
         /*
 	 * Link at tail of chain
 	 */
-        INSTAIL(sp, cp);
+        if (sp->head == (UDB_CACHE *)0)
+        {
+            sp->head = cp;
+        }
+        else
+        {
+            sp->tail->nxt = cp;
+        }
+        sp->tail = cp;
+        cp->nxt = (UDB_CACHE *)0;
         /*
 	 * Link at tail of LRU freelist
 	 */
-        F_INSTAIL(freelist, cp);
+        if (freelist->head == (UDB_CACHE *)0)
+        {
+            freelist->head = cp;
+        }
+        else
+        {
+            freelist->tail->nxtfree = cp;
+        }
+        cp->prvfree = freelist->tail;
+        freelist->tail = cp;
+        cp->nxtfree = (UDB_CACHE *)0;
     }
 
     return data;
@@ -750,7 +735,7 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
             if (!mudstate.dumping)
             {
@@ -762,8 +747,37 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
                 cache_repl(cp, data.dptr, data.dsize, type, CACHE_DIRTY);
             }
 
-            F_DEQUEUE(freelist, cp);
-            F_INSTAIL(freelist, cp);
+            if (cp->nxtfree == (UDB_CACHE *)0)
+            {
+                if (cp->prvfree != (UDB_CACHE *)0)
+                {
+                    cp->prvfree->nxtfree = (UDB_CACHE *)0;
+                }
+                freelist->tail = cp->prvfree;
+            }
+            if (cp->prvfree == (UDB_CACHE *)0)
+            {
+                freelist->head = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = (UDB_CACHE *)0;
+            }
+            else
+            {
+                cp->prvfree->nxtfree = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = cp->prvfree;
+            }
+            if (freelist->head == (UDB_CACHE *)0)
+            {
+                freelist->head = cp;
+            }
+            else
+            {
+                freelist->tail->nxtfree = cp;
+            }
+            cp->prvfree = freelist->tail;
+            freelist->tail = cp;
+            cp->nxtfree = (UDB_CACHE *)0;
             return (0);
         }
     }
@@ -788,11 +802,30 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
     /*
      * link at tail of chain
      */
-    INSTAIL(sp, cp);
+    if (sp->head == (UDB_CACHE *)0)
+    {
+        sp->head = cp;
+    }
+    else
+    {
+        sp->tail->nxt = cp;
+    }
+    sp->tail = cp;
+    cp->nxt = (UDB_CACHE *)0;
     /*
      * link at tail of LRU freelist
      */
-    F_INSTAIL(freelist, cp);
+    if (freelist->head == (UDB_CACHE *)0)
+    {
+        freelist->head = cp;
+    }
+    else
+    {
+        freelist->tail->nxtfree = cp;
+    }
+    cp->prvfree = freelist->tail;
+    freelist->tail = cp;
+    cp->nxtfree = (UDB_CACHE *)0;
     return (0);
 }
 
@@ -817,7 +850,26 @@ UDB_CACHE *get_free_entry(int atrsize)
 
         if (cp)
         {
-            F_DEQUEUE(freelist, cp);
+            if (cp->nxtfree == (UDB_CACHE *)0)
+            {
+                if (cp->prvfree != (UDB_CACHE *)0)
+                {
+                    cp->prvfree->nxtfree = (UDB_CACHE *)0;
+                }
+                freelist->tail = cp->prvfree;
+            }
+            if (cp->prvfree == (UDB_CACHE *)0)
+            {
+                freelist->head = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = (UDB_CACHE *)0;
+            }
+            else
+            {
+                cp->prvfree->nxtfree = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = cp->prvfree;
+            }
         }
 
         if (cp && (cp->flags & CACHE_DIRTY))
@@ -1089,10 +1141,41 @@ void cache_del(UDB_DATA key, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if (NAMECMP(key.dptr, cp->keydata, key.dsize, type, cp->type))
+        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
-            F_DEQUEUE(freelist, cp);
-            F_INSHEAD(freelist, cp);
+            if (cp->nxtfree == (UDB_CACHE *)0)
+            {
+                if (cp->prvfree != (UDB_CACHE *)0)
+                {
+                    cp->prvfree->nxtfree = (UDB_CACHE *)0;
+                }
+                freelist->tail = cp->prvfree;
+            }
+            if (cp->prvfree == (UDB_CACHE *)0)
+            {
+                freelist->head = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = (UDB_CACHE *)0;
+            }
+            else
+            {
+                cp->prvfree->nxtfree = cp->nxtfree;
+                if (cp->nxtfree)
+                    cp->nxtfree->prvfree = cp->prvfree;
+            }
+
+            if (freelist->head == (UDB_CACHE *)0)
+            {
+                freelist->tail = cp;
+                cp->nxtfree = (UDB_CACHE *)0;
+            }
+            else
+            {
+                cp->nxtfree = freelist->head;
+                cp->nxtfree->prvfree = cp;
+            }
+            cp->prvfree = (UDB_CACHE *)0;
+            freelist->head = cp;
             cache_repl(cp, NULL, 0, type, CACHE_DIRTY);
             return;
         }
@@ -1108,7 +1191,27 @@ void cache_del(UDB_DATA key, unsigned int type)
     cp->keylen = key.dsize;
     cp->type = type;
     cp->flags = CACHE_DIRTY;
-    INSHEAD(sp, cp);
-    F_INSHEAD(freelist, cp);
+    if (sp->head == (UDB_CACHE *)0)
+    {
+        sp->tail = cp;
+        cp->nxt = (UDB_CACHE *)0;
+    }
+    else
+    {
+        cp->nxt = sp->head;
+    }
+    sp->head = cp;
+    if (freelist->head == (UDB_CACHE *)0)
+    {
+        freelist->tail = cp;
+        cp->nxtfree = (UDB_CACHE *)0;
+    }
+    else
+    {
+        cp->nxtfree = freelist->head;
+        cp->nxtfree->prvfree = cp;
+    }
+    cp->prvfree = (UDB_CACHE *)0;
+    freelist->head = cp;
     return;
 }

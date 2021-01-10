@@ -13,35 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "functions.h"	/* required by code */
-#include "powers.h"		/* required by code */
-#include "command.h"	/* required by code */
-#include "stringutil.h" /* required by code */
-
-#define Find_Connection(x, s, t, p)                    \
-	p = t = NOTHING;                                   \
-	if (is_integer(s))                                 \
-	{                                                  \
-		p = (int)strtol(s, (char **)NULL, 10);         \
-	}                                                  \
-	else                                               \
-	{                                                  \
-		t = lookup_player(x, s, 1);                    \
-		if (Good_obj(t) && Can_Hide(t) && Hidden(t) && \
-			!See_Hidden(x))                            \
-			t = NOTHING;                               \
-	}
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -101,10 +78,20 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target;
-	int port;
+	dbref target = NOTHING;
+	int port = NOTHING;
 	char *str;
-	Find_Connection(player, fargs[0], target, port);
+
+	if (is_integer(fargs[0]))
+	{
+		port = (int)strtol(fargs[0], (char **)NULL, 10);
+	}
+	else
+	{
+		target = lookup_player(player, fargs[0], 1);
+		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
+			target = NOTHING;
+	}
 
 	if ((port < 0) && (target == NOTHING))
 	{
@@ -126,9 +113,19 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target;
-	int port;
-	Find_Connection(player, fargs[0], target, port);
+	dbref target = NOTHING;
+	int port = NOTHING;
+
+	if (is_integer(fargs[0]))
+	{
+		port = (int)strtol(fargs[0], (char **)NULL, 10);
+	}
+	else
+	{
+		target = lookup_player(player, fargs[0], 1);
+		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
+			target = NOTHING;
+	}
 
 	if ((port < 0) && (target == NOTHING))
 	{
@@ -146,9 +143,19 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
 
 void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target;
-	int port;
-	Find_Connection(player, fargs[0], target, port);
+	dbref target = NOTHING;
+	int port = NOTHING;
+
+	if (is_integer(fargs[0]))
+	{
+		port = (int)strtol(fargs[0], (char **)NULL, 10);
+	}
+	else
+	{
+		target = lookup_player(player, fargs[0], 1);
+		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
+			target = NOTHING;
+	}
 
 	if ((port < 0) && (target == NOTHING))
 	{

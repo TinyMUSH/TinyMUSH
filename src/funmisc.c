@@ -13,24 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"	/* required by mudconf */
-#include "game.h"		/* required by mudconf */
-#include "alloc.h"		/* required by mudconf */
-#include "flags.h"		/* required by mudconf */
-#include "htab.h"		/* required by mudconf */
-#include "ltdl.h"		/* required by mudconf */
-#include "udb.h"		/* required by mudconf */
-#include "mushconf.h"	/* required by code */
-#include "db.h"			/* required by externs */
-#include "interface.h"	/* required by code */
-#include "externs.h"	/* required by code */
-#include "functions.h"	/* required by code */
-#include "attrs.h"		/* required by code */
-#include "powers.h"		/* required by code */
-#include "command.h"	/* required by code */
-#include "match.h"		/* required by code */
-#include "stringutil.h" /* required by code */
-#include "nametabs.h"
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 /*
  * ---------------------------------------------------------------------------
@@ -360,7 +348,8 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	}
 	else
 	{
-		SAFE_SPRINTF(buff, bufc, "%ld", Randomize(num));
+		SAFE_SPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
+		
 	}
 }
 
@@ -484,7 +473,8 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 			print_separator(&osep, buff, bufc);
 		}
 
-		tmp = (unsigned int)Randomize(n_range);
+		tmp = (unsigned int)random_range(0, (n_range)-1);
+		
 		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
 	}
 }
@@ -493,8 +483,6 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * ---------------------------------------------------------------------------
  * fun_lnum: Return a list of numbers.
  */
-
-#define Lnum_Place(x) (((x) < 10) ? (2 * (x)) : ((3 * (x)) - 10))
 
 void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -595,7 +583,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			print_separator(&osep, buff, bufc);
 		}
 
-		startp = lnum_buff + Lnum_Place(bot);
+		startp = lnum_buff + (bot < 10 ? 2 * bot : (3 * bot) - 10);
 
 		if (top >= 99)
 		{
@@ -603,7 +591,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		}
 		else
 		{
-			endp = lnum_buff + Lnum_Place(top + 1) - 1;
+			endp = lnum_buff + (top + 1 < 10 ? 2 * top + 1 : (3 * top + 1) - 10) - 1;
 			*endp = '\0';
 			SAFE_LB_STR(startp, buff, bufc);
 			*endp = ' ';
@@ -725,17 +713,6 @@ const char daystab[] = {
  * YYYY
  */
 
-#define get_substr(buf, p)    \
-	{                         \
-		p = strchr(buf, ' '); \
-		if (p)                \
-		{                     \
-			*p++ = '\0';      \
-			while (*p == ' ') \
-				p++;          \
-		}                     \
-	}
-
 int do_convtime(char *str, struct tm *ttm)
 {
 	char *buf, *p, *q;
@@ -754,7 +731,15 @@ int do_convtime(char *str, struct tm *ttm)
 	buf = p = XMALLOC(SBUF_SIZE, "p"); /* make a temp copy of arg */
 	SAFE_SB_STR(str, buf, &p);
 	*p = '\0';
-	get_substr(buf, p); /* day-of-week or month */
+
+	/** day-of-week or month */
+	p = strchr(buf, ' ');
+	if (p)
+	{
+		*p++ = '\0';
+		while (*p == ' ')
+			p++;
+	}
 
 	if (!p || strlen(buf) != 3)
 	{
@@ -767,7 +752,14 @@ int do_convtime(char *str, struct tm *ttm)
 
 	if (i == 12)
 	{
-		get_substr(p, q); /* month */
+		/** month */
+		q = strchr(p, ' ');
+		if (q)
+		{
+			*q++ = '\0';
+			while (*q == ' ')
+				q++;
+		}
 
 		if (!q || strlen(p) != 3)
 		{
@@ -788,7 +780,15 @@ int do_convtime(char *str, struct tm *ttm)
 	}
 
 	ttm->tm_mon = i;
-	get_substr(p, q); /* day of month */
+
+	/** day of month */
+	q = strchr(p, ' ');
+	if (q)
+	{
+		*q++ = '\0';
+		while (*q == ' ')
+			q++;
+	}
 
 	if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > daystab[i])
 	{
@@ -856,7 +856,14 @@ int do_convtime(char *str, struct tm *ttm)
 		}
 	}
 
-	get_substr(q, p); /* seconds */
+	/** seconds */
+	p = strchr(q, ' ');
+	if (p)
+	{
+		*p++ = '\0';
+		while (*p == ' ')
+			p++;
+	}
 
 	if (!p || (ttm->tm_sec = (int)strtol(q, (char **)NULL, 10)) > 59 || ttm->tm_sec < 0)
 	{
@@ -878,7 +885,14 @@ int do_convtime(char *str, struct tm *ttm)
 		}
 	}
 
-	get_substr(p, q); /* year */
+	/** year */
+	q = strchr(p, ' ');
+	if (q)
+	{
+		*q++ = '\0';
+		while (*q == ' ')
+			q++;
+	}
 
 	if ((ttm->tm_year = (int)strtol(p, (char **)NULL, 10)) == 0)
 	{
@@ -910,9 +924,7 @@ int do_convtime(char *str, struct tm *ttm)
      * We don't whether or not it's daylight savings time.
      */
 	ttm->tm_isdst = -1;
-#define LEAPYEAR_1900(yr) ((yr) % 400 == 100 || ((yr) % 100 != 0 && (yr) % 4 == 0))
-	return (ttm->tm_mday != 29 || i != 1 || LEAPYEAR_1900(ttm->tm_year));
-#undef LEAPYEAR_1900
+	return (ttm->tm_mday != 29 || i != 1 || ((ttm->tm_year) % 400 == 100 || ((ttm->tm_year) % 100 != 0 && (ttm->tm_year) % 4 == 0)));
 }
 
 void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -1524,7 +1536,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		exec(tbuf, &tp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &s, cargs, ncargs);
 
 		gettimeofday(&et, NULL);
-		
+
 		ut = ((et.tv_sec - bt.tv_sec) * 1000000) + (et.tv_usec - bt.tv_usec);
 
 		if ((ut < min) || (min == 0))

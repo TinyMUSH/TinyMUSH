@@ -13,31 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"  /* required by mudconf */
-#include "game.h"	   /* required by mudconf */
-#include "alloc.h"	   /* required by mudconf */
-#include "flags.h"	   /* required by mudconf */
-#include "htab.h"	   /* required by mudconf */
-#include "ltdl.h"	   /* required by mudconf */
-#include "udb.h"	   /* required by mudconf */
-#include "mushconf.h"  /* required by code */
-#include "db.h"		   /* required by externs */
-#include "interface.h" /* required by code */
-#include "externs.h"   /* required by code */
-#include "powers.h"	   /* required by code */
-#include "attrs.h"	   /* required by code */
-#include "match.h"	   /* required by code */
-
-#define IS_CLEAN(i) (IS(i, TYPE_GARBAGE, GOING) &&                        \
-					 (Location(i) == NOTHING) &&                          \
-					 (Contents(i) == NOTHING) && (Exits(i) == NOTHING) && \
-					 (Next(i) == NOTHING) && (Owner(i) == GOD))
-
-#define ZAP_LOC(i)              \
-	{                           \
-		s_Location(i, NOTHING); \
-		s_Next(i, NOTHING);     \
-	}
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 int check_type;
 
@@ -954,7 +935,8 @@ void empty_obj(dbref obj)
 		}
 		else
 		{
-			ZAP_LOC(targ);
+			s_Location(targ, NOTHING);
+			s_Next(targ, NOTHING);
 
 			if (Home(targ) == obj)
 			{
@@ -1141,38 +1123,6 @@ void check_pennies(dbref thing, int limit, const char *qual)
 	}
 }
 
-#define check_ref_targ(crt__label, crt__setref, crt__newref)                                                                                   \
-	do                                                                                                                                         \
-	{                                                                                                                                          \
-		if (Good_obj(targ))                                                                                                                    \
-		{                                                                                                                                      \
-			if (Going(targ))                                                                                                                   \
-			{                                                                                                                                  \
-				crt__setref(i, crt__newref);                                                                                                   \
-				if (!mudstate.standalone)                                                                                                      \
-				{                                                                                                                              \
-					owner = Owner(i);                                                                                                          \
-					if (Good_owner(owner) &&                                                                                                   \
-						!Quiet(i) && !Quiet(owner))                                                                                            \
-					{                                                                                                                          \
-						notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s cleared on %s(#%d)", crt__label, Name(i), i); \
-					}                                                                                                                          \
-				}                                                                                                                              \
-				else                                                                                                                           \
-				{                                                                                                                              \
-					Log_header_err(i, Location(i), targ, 1,                                                                                    \
-								   crt__label, "is invalid.  Cleared.");                                                                       \
-				}                                                                                                                              \
-			}                                                                                                                                  \
-		}                                                                                                                                      \
-		else if (targ != NOTHING)                                                                                                              \
-		{                                                                                                                                      \
-			Log_header_err(i, Location(i), targ, 1,                                                                                            \
-						   crt__label, "is invalid.  Cleared.");                                                                               \
-			crt__setref(i, crt__newref);                                                                                                       \
-		}                                                                                                                                      \
-	} while (0)
-
 void check_dead_refs(void)
 {
 	dbref targ, owner, i, j;
@@ -1186,12 +1136,64 @@ void check_dead_refs(void)
 	 * Check the parent
 	 */
 		targ = Parent(i);
-		check_ref_targ("Parent", s_Parent, NOTHING);
+		do
+		{
+			if (Good_obj(targ))
+			{
+				if (Going(targ))
+				{
+					s_Parent(i, (-1));
+					if (!mudstate.standalone)
+					{
+						owner = Owner(i);
+						if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
+						{
+							notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s cleared on %s(#%d)", "Parent", Name(i), i);
+						}
+					}
+					else
+					{
+						Log_header_err(i, Location(i), targ, 1, "Parent", "is invalid.  Cleared.");
+					}
+				}
+			}
+			else if (targ != NOTHING)
+			{
+				Log_header_err(i, Location(i), targ, 1, "Parent", "is invalid.  Cleared.");
+				s_Parent(i, (-1));
+			}
+		} while (0);
 		/*
 	 * Check the zone
 	 */
 		targ = Zone(i);
-		check_ref_targ("Zone", s_Zone, NOTHING);
+		do
+		{
+			if (Good_obj(targ))
+			{
+				if (Going(targ))
+				{
+					s_Zone(i, (-1));
+					if (!mudstate.standalone)
+					{
+						owner = Owner(i);
+						if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
+						{
+							notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s cleared on %s(#%d)", "Zone", Name(i), i);
+						}
+					}
+					else
+					{
+						Log_header_err(i, Location(i), targ, 1, "Zone", "is invalid.  Cleared.");
+					}
+				}
+			}
+			else if (targ != NOTHING)
+			{
+				Log_header_err(i, Location(i), targ, 1, "Zone", "is invalid.  Cleared.");
+				s_Zone(i, (-1));
+			}
+		} while (0);
 
 		switch (Typeof(i))
 		{
@@ -1206,7 +1208,33 @@ void check_dead_refs(void)
 	     * Check the home
 	     */
 			targ = Home(i);
-			check_ref_targ("Home", s_Home, new_home(i));
+			do
+			{
+				if (Good_obj(targ))
+				{
+					if (Going(targ))
+					{
+						s_Home(i, new_home(i));
+						if (!mudstate.standalone)
+						{
+							owner = Owner(i);
+							if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
+							{
+								notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s cleared on %s(#%d)", "Home", Name(i), i);
+							}
+						}
+						else
+						{
+							Log_header_err(i, Location(i), targ, 1, "Home", "is invalid.  Cleared.");
+						}
+					}
+				}
+				else if (targ != NOTHING)
+				{
+					Log_header_err(i, Location(i), targ, 1, "Home", "is invalid.  Cleared.");
+					s_Home(i, new_home(i));
+				}
+			} while (0);
 			/*
 	     * Check the location
 	     */
@@ -1215,7 +1243,8 @@ void check_dead_refs(void)
 			if (!Good_obj(targ))
 			{
 				Log_pointer_err(NOTHING, i, NOTHING, targ, "Location", "is invalid.  Moved to home.");
-				ZAP_LOC(i);
+				s_Location(i, NOTHING);
+				s_Next(i, NOTHING);
 				move_object(i, HOME);
 			}
 
@@ -1257,7 +1286,33 @@ void check_dead_refs(void)
 
 			if (targ != HOME)
 			{
-				check_ref_targ("Dropto", s_Dropto, NOTHING);
+				do
+				{
+					if (Good_obj(targ))
+					{
+						if (Going(targ))
+						{
+							s_Dropto(i, (-1));
+							if (!mudstate.standalone)
+							{
+								owner = Owner(i);
+								if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
+								{
+									notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s cleared on %s(#%d)", "Dropto", Name(i), i);
+								}
+							}
+							else
+							{
+								Log_header_err(i, Location(i), targ, 1, "Dropto", "is invalid.  Cleared.");
+							}
+						}
+					}
+					else if (targ != NOTHING)
+					{
+						Log_header_err(i, Location(i), targ, 1, "Dropto", "is invalid.  Cleared.");
+						s_Dropto(i, (-1));
+					}
+				} while (0);
 			}
 
 			if (check_type & DBCK_FULL)
@@ -1971,7 +2026,8 @@ void check_contents_chains(void)
 		if (!Going(i) && !Marked(i) && Has_location(i))
 		{
 			Log_simple_err(i, Location(i), "Orphaned object, moved home.");
-			ZAP_LOC(i);
+			s_Location(i, NOTHING);
+			s_Next(i, NOTHING);
 			move_via_generic(i, HOME, NOTHING, 0);
 		}
 	}

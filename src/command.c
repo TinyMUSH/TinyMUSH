@@ -13,32 +13,14 @@
 
 #include "system.h"
 
+#include "defaults.h"
+#include "constants.h"
 #include "typedefs.h"
-#include "game.h"
-#include "alloc.h"
-#include "flags.h"
-#include "htab.h"
-#include "ltdl.h"
-#include "udb.h"
-#include "mushconf.h"
-#include "db.h"
-#include "interface.h"
+#include "macros.h"
 #include "externs.h"
-#include "help.h"
-#include "command.h"
-#include "functions.h"
-#include "match.h"
-#include "attrs.h"
-#include "powers.h"
-#include "vattr.h"
-#include "stringutil.h"
-#include "nametabs.h"
-
-#define CACHING "attribute"
-#define NOGO_MESSAGE "You can't go that way."
+#include "prototypes.h"
 
 CMDENT *prefix_cmds[256];
-
 CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
 
 /**
@@ -2678,7 +2660,7 @@ void list_params(dbref player)
 		raw_notify(player, "Intervals:  Dump...%d  Clean...%d  Idlecheck...%d  Optimize...%d", mudconf.dump_interval, mudconf.check_interval, mudconf.idle_interval, mudconf.dbopt_interval);
 		raw_notify(player, "Timers:  Dump...%d  Clean...%d  Idlecheck...%d", (int)(mudstate.dump_counter - now), (int)(mudstate.check_counter - now), (int)(mudstate.idle_counter - now));
 		raw_notify(player, "Scheduling:  Timeslice...%d  Max_Quota...%d  Increment...%d", mudconf.timeslice, mudconf.cmd_quota_max, mudconf.cmd_quota_incr);
-		raw_notify(player, "Size of %s cache:  Width...%d  Size...%d", CACHING, mudconf.cache_width, mudconf.cache_size);
+		raw_notify(player, "Size of attribute cache:  Width...%d  Size...%d", mudconf.cache_width, mudconf.cache_size);
 	}
 }
 

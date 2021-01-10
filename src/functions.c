@@ -13,24 +13,12 @@
 
 #include "system.h"
 
-#include "typedefs.h"   /* required by mudconf */
-#include "game.h"       /* required by mudconf */
-#include "alloc.h"      /* required by mudconf */
-#include "flags.h"      /* required by mudconf */
-#include "htab.h"       /* required by mudconf */
-#include "ltdl.h"       /* required by mudconf */
-#include "udb.h"        /* required by mudconf */
-#include "mushconf.h"   /* required by code */
-#include "db.h"         /* required by externs */
-#include "interface.h"  /* required by code */
-#include "externs.h"    /* required by interface */
-#include "command.h"    /* required by code */
-#include "match.h"      /* required by code */
-#include "attrs.h"      /* required by code */
-#include "powers.h"     /* required by code */
-#include "functions.h"  /* required by code */
-#include "stringutil.h" /* required by code */
-#include "nametabs.h"
+#include "defaults.h"
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
 
 extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 

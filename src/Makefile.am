@@ -1,68 +1,63 @@
-AM_CPPFLAGS		= $(LTDLINCL)
-SUBDIRS			= libltdl
-LIBTOOL_DEPS		= @LIBTOOL_DEPS@
+AM_CPPFLAGS				= $(LTDLINCL)
+SUBDIRS					= libltdl
+LIBTOOL_DEPS			= @LIBTOOL_DEPS@
 
-AUTOMAKE_OPTIONS	= subdir-objects
+AUTOMAKE_OPTIONS		= subdir-objects
 
-netmush_C		= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-netmush_H		= alloc.h api.h attrs.h cmdtabs.h command.h db.h externs.h file_c.h flags.h functions.h game.h help.h htab.h interface.h match.h mushconf.h nametabs.h player.h powers.h stringutil.h system.h typedefs.h udb.h vattr.h walkdb.h
-netmush_SOURCES		= $(netmush_C) $(netmush_H)
-netmush_LDFLAGS		= -export-dynamic
-netmush_SKEL		= defaults.h.in
-netmush_LDADD		= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
+netmush_C				= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+netmush_H				= api.h externs.h macros.h system.h typedefs.h
+netmush_SOURCES			= $(netmush_C) $(netmush_H)
+netmush_LDFLAGS			= -export-dynamic
+netmush_SKEL			= defaults.h.in
+netmush_LDADD			= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES	= $(LTDLDEPS) 
 nodist_netmush_SOURCES	= config.h defaults.h prototypes.h tinymushapi.h
 
-slave_C			= slave.c
-slave_H			= 
-slave_SOURCES		= $(slave_C) $(slave_H)
+slave_C					= slave.c
+slave_H					= 
+slave_SOURCES			= $(slave_C) $(slave_H)
 
-SHARE_DIR		= share
-SHARE_SRC		= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
+SHARE_DIR				= share
+SHARE_SRC				= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 
-ETC_DIR			= etc
-ETC_SKEL		= $(ETC_DIR)/netmush.conf.example.in
-ETC_SRC			= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
-ETC_BUILD		= $(ETC_DIR)/netmush.conf.example
+ETC_DIR					= etc
+ETC_SKEL				= $(ETC_DIR)/netmush.conf.example.in
+ETC_SRC					= $(ETC_DIR)/alias.conf $(ETC_DIR)/compat.conf
+ETC_BUILD				= $(ETC_DIR)/netmush.conf.example
 
-prototypes_SKEL		= prototypes.h.in
+prototypes_SKEL			= prototypes.h.in
 
-SCRIPT_DIR		= scripts
-SCRIPT_SKEL		= $(SCRIPT_DIR)/Startmush.in
-SCRIPT_SRC		= $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
-SCRIPT_DAT		= $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
-SCRIPT_BUILD		= $(SCRIPT_DIR)/Startmush
+SCRIPT_DIR				= scripts
+SCRIPT_SKEL				= $(SCRIPT_DIR)/Startmush.in
+SCRIPT_SRC				= $(SCRIPT_DIR)/Archive $(SCRIPT_DIR)/Backup $(SCRIPT_DIR)/Index $(SCRIPT_DIR)/Logclean $(SCRIPT_DIR)/Reconstruct $(SCRIPT_DIR)/ReportCrash $(SCRIPT_DIR)/Restore $(SCRIPT_DIR)/check_paths $(SCRIPT_DIR)/convert_comsys.pl $(SCRIPT_DIR)/cvt22.pl $(SCRIPT_DIR)/cvtmux.pl
+SCRIPT_DAT				= $(SCRIPT_DIR)/cvt22.sed $(SCRIPT_DIR)/cvtmux.sed $(SCRIPT_DIR)/mush.config $(SCRIPT_DIR)/mtrace.awk
+SCRIPT_BUILD			= $(SCRIPT_DIR)/Startmush
 
-EXTRA_DIST		= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h $(version_SKEL) $(prototypes_SKEL)
+EXTRA_DIST				= libltdl/config/shtool $(netmush_SKEL) $(ETC_SKEL) $(ETC_SRC) $(SHARE_SRC) $(SCRIPT_SKEL) $(SCRIPT_SRC) $(SCRIPT_DAT) api.h $(version_SKEL) $(prototypes_SKEL)
 
-CLEANFILES		= defaults.h prototypes.h tinymushapi.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
+CLEANFILES				= defaults.h prototypes.h tinymushapi.h $(ETC_DIR)/netmush.conf.example $(SCRIPT_DIR)/Startmush
 
-API_SRC			= typedefs.h db.h game.h alloc.h flags.h htab.h udb.h mushconf.h functions.h powers.h attrs.h match.h command.h api.h interface.h externs.h stringutil.h prototypes.h
+API_SRC					= defaults.h constants.h typedefs.h macros.h externs.h prototypes.h
 
-BUILT_SOURCES		= prototypes.h tinymushapi.h defaults.h netmush.conf.example Startmush
+BUILT_SOURCES			= prototypes.h tinymushapi.h defaults.h netmush.conf.example Startmush
 
 nodist_include_HEADERS	= tinymushapi.h
 
-bin_PROGRAMS		= netmush slave
+bin_PROGRAMS			= netmush slave
 
-CPROTO_INCLUDES		=
+CPROTO_INCLUDES			=
 
 if WANT_MODULE_COMSYS
- SUBDIRS		+= modules/comsys/
+ SUBDIRS				+= modules/comsys/
 endif
 
 if WANT_MODULE_MAIL
- SUBDIRS		+= modules/mail/
+ SUBDIRS				+= modules/mail/
 endif
 
 if WANT_MODULE_DB_SQL
- SUBDIRS		+= modules/db_sql/
+ SUBDIRS				+= modules/db_sql/
 endif
-
-astyle:
-	for i in $(netmush_SOURCES) $(recover_SOURCES) $(slave_SOURCES) ; do \
-	astyle --mode=c --delete-empty-lines --break-blocks --pad-oper --pad-paren --convert-tabs --indent=spaces --style=kr $$i; \
-	done; 
 
 do_subst = $(SED) \
 	-e 's|[@]with_tar_prog@|$(with_tar_prog)|g' \
