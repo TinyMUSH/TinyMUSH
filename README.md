@@ -57,7 +57,7 @@ systems and provide a stable base for many more years.
 
 # Installation
 
-Since TinyMUSH 3.3 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback. Here's a quick rundown on how to build the server (Tested on Ubuntu 20.04.1 LTS and Mac OSX Big Sur).
+Since TinyMUSH 3.3 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback. Here's a quick rundown on how to build the server (Tested on Ubuntu 20.04.1 LTS, Mac OSX Big Sur and FreeBSD 12.2).
 
 **Ubuntu / Debian:**
 
