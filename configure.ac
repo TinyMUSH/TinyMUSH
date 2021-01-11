@@ -68,6 +68,10 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 dnl LT_INIT
 
+CFLAGS="$CFLAGS -I/usr/local/include/"
+CPPFLAGS="$CPPFLAGS -I/usr/local/include/"
+LDFLAGS="$LDFLAGS -L/usr/local/lib/"
+
 AC_PATH_PROGS([with_cproto_prog], [cproto], [notfound])
 AS_IF([test "x$with_cproto_prog" = "xnotfound"],[AC_MSG_ERROR([Please install CPROTO before trying again])],)
 

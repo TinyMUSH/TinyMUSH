@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Just a quick hack for now. Need to be fixed eventually
 

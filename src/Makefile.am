@@ -45,7 +45,7 @@ nodist_include_HEADERS	= tinymushapi.h
 
 bin_PROGRAMS			= netmush slave
 
-CPROTO_INCLUDES			=
+CPROTO_INCLUDES			= $(LTDLINCL) $(CPPFLAGS)
 
 if WANT_MODULE_COMSYS
  SUBDIRS				+= modules/comsys/
