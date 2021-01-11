@@ -109,6 +109,30 @@ $ ./game/bin/netmush
 $ telnet localhost 6250
 ```
 
+**FreeBSD:**
+```sh
+# Install dependencies
+#
+su -m root -c 'pkg install git autoconf automake libtools cproto gdbm pcre'
+#
+# Clone the repository
+#
+$ git clone https://github.com/TinyMUSH/TinyMUSH.git
+#
+# Build the server
+#
+$ cd TinyMUSH
+$ ./autogen.sh
+$ ./configure
+$ make
+$ make install
+#
+# Start the server and test.
+#
+$ ./game/bin/netmush
+$ telnet localhost 6250
+```
+
 # Full documentation
 
 Please look at the following files for details on specific aspects of TinyMUSH 3.
