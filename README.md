@@ -113,7 +113,7 @@ $ telnet localhost 6250
 ```sh
 # Install dependencies
 #
-$ su -m root -c 'pkg install git autoconf automake libtools cproto gdbm pcre'
+$ su -m root -c 'pkg install git autoconf automake libtool cproto gdbm pcre'
 #
 # Clone the repository
 #
