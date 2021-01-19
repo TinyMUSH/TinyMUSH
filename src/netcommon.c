@@ -1887,7 +1887,7 @@ void init_logout_cmdtab(void)
 	}
 }
 
-void failconn(const char *logcode, const char *logtype, const char *logreason, DESC *d, int disconnect_reason, dbref player, int filecache, char *motd_msg, char *command, char *user, char *password, char *cmdsave)
+void failconn(const char *logcode, const char *logtype, const char *logreason, DESC *d, int disconnect_reason, dbref player, int filecache, char *motd_msg, char *command, char *user, char *password)
 {
 	char *name;
 
@@ -1914,8 +1914,6 @@ void failconn(const char *logcode, const char *logtype, const char *logreason, D
 	XFREE(user);
 	XFREE(password);
 	shutdownsock(d, disconnect_reason);
-	mudstate.debug_cmd = cmdsave;
-	return;
 }
 
 const char *connect_fail = "Either that player does not exist, or has a different password.\r\n";
@@ -1952,6 +1950,8 @@ int check_connect(DESC *d, char *msg)
 				XFREE(command);
 				XFREE(user);
 				XFREE(password);
+				XFREE(mudstate.debug_cmd);
+				mudstate.debug_cmd = cmdsave;
 				return 0;
 			}
 
@@ -1993,6 +1993,7 @@ int check_connect(DESC *d, char *msg)
 				XFREE(user);
 				XFREE(password);
 				shutdownsock(d, R_BADLOGIN);
+				XFREE(mudstate.debug_cmd);
 				mudstate.debug_cmd = cmdsave;
 				return 0;
 			}
@@ -2019,7 +2020,9 @@ int check_connect(DESC *d, char *msg)
 
 			if (Guest(player) && (d->host_info & H_GUEST))
 			{
-				failconn("CON", "Connect", "Guest Site Forbidden", d, R_GAMEDOWN, player, FC_CONN_SITE, mudconf.downmotd_msg, command, user, password, cmdsave);
+				failconn("CON", "Connect", "Guest Site Forbidden", d, R_GAMEDOWN, player, FC_CONN_SITE, mudconf.downmotd_msg, command, user, password);
+				XFREE(mudstate.debug_cmd);
+				mudstate.debug_cmd = cmdsave;
 				return 0;
 			}
 
@@ -2101,12 +2104,16 @@ int check_connect(DESC *d, char *msg)
 		}
 		else if (!(mudconf.control_flags & CF_LOGIN))
 		{
-			failconn("CON", "Connect", "Logins Disabled", d, R_GAMEDOWN, player, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password, cmdsave);
+			failconn("CON", "Connect", "Logins Disabled", d, R_GAMEDOWN, player, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password);
+			XFREE(mudstate.debug_cmd);
+			mudstate.debug_cmd = cmdsave;
 			return 0;
 		}
 		else
 		{
-			failconn("CON", "Connect", "Game Full", d, R_GAMEFULL, player, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password, cmdsave);
+			failconn("CON", "Connect", "Game Full", d, R_GAMEFULL, player, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password);
+			XFREE(mudstate.debug_cmd);
+			mudstate.debug_cmd = cmdsave;
 			return 0;
 		}
 	}
@@ -2120,7 +2127,9 @@ int check_connect(DESC *d, char *msg)
 
 		if (!(mudconf.control_flags & CF_LOGIN))
 		{
-			failconn("CRE", "Create", "Logins Disabled", d, R_GAMEDOWN, NOTHING, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password, cmdsave);
+			failconn("CRE", "Create", "Logins Disabled", d, R_GAMEDOWN, NOTHING, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password);
+			XFREE(mudstate.debug_cmd);
+			mudstate.debug_cmd = cmdsave;
 			return 0;
 		}
 
@@ -2146,7 +2155,9 @@ int check_connect(DESC *d, char *msg)
 			/*
 	     * Too many players on, reject the attempt
 	     */
-			failconn("CRE", "Create", "Game Full", d, R_GAMEFULL, NOTHING, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password, cmdsave);
+			failconn("CRE", "Create", "Game Full", d, R_GAMEFULL, NOTHING, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password);
+			XFREE(mudstate.debug_cmd);
+			mudstate.debug_cmd = cmdsave;
 			return 0;
 		}
 
@@ -2187,6 +2198,7 @@ int check_connect(DESC *d, char *msg)
 	XFREE(command);
 	XFREE(user);
 	XFREE(password);
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 	return 1;
 }
@@ -2366,6 +2378,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 			queue_write(d, "\r\n", 2);
 		}
 
+		XFREE(mudstate.debug_cmd);
 		mudstate.debug_cmd = cmdsave;
 		return;
 	}
@@ -2404,6 +2417,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 			*--arg = ' '; /* restore nullified space */
 		}
 
+		XFREE(mudstate.debug_cmd);
 		mudstate.debug_cmd = cmdsave;
 		check_connect(d, command);
 		return;
@@ -2430,6 +2444,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 	else
 	{
+		XFREE(mudstate.debug_cmd);
 		mudstate.debug_cmd = cp->name;
 		logged_out_internal(d, cp->flag & CMD_MASK, arg);
 	}
@@ -2447,6 +2462,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 		}
 	}
 
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 }
 
@@ -2536,6 +2552,7 @@ void process_commands(void)
 		}
 	} while (nprocessed > 0);
 
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 }
 

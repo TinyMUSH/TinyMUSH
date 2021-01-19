@@ -1092,8 +1092,8 @@ int __xsorttrace(const void *p1, const void *p2)
 	char *s1 = NULL, *s2 = NULL;
 	int r = 0;
 
-	s1 = XNASPRINTF("%s:%s", (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
-	s2 = XNASPRINTF("%s:%s", (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
+	s1 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p1)->file, (*(MEMTRACK **)p1)->line, (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
+	s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p2)->file, (*(MEMTRACK **)p2)->line, (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
 
 	r = strcmp(s1, s2);
 
@@ -1119,8 +1119,8 @@ void list_rawmemory(dbref player)
 	size_t i = 0, j = 0;
 	char *s1 = NULL, *s2 = NULL;
 
-	notify(player, "Memory Tag                                                       Allocs Bytes   ");
-	notify(player, "---------------------------------------------------------------- ------ --------");
+	notify(player, "File             Line   Function            Variable             Allocs Bytes   ");
+	notify(player, "---------------- ------ ------------------- -------------------- ------ --------");
 
 	if (mudstate.raw_allocs != NULL)
 	{
@@ -1145,10 +1145,10 @@ void list_rawmemory(dbref player)
 			{
 				u_tags++;
 
-				s1 = XNASPRINTF("%s:%s", t_array[i]->function, t_array[i]->var);
+				s1 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[i]->file, t_array[i]->line, t_array[i]->function, t_array[i]->var);
 				if (t_array[i + 1] != NULL)
 				{
-					s2 = XNASPRINTF("%s:%s", t_array[i + 1]->function, t_array[i + 1]->var);
+					s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[i + 1]->file, t_array[i + 1]->line, t_array[i + 1]->function, t_array[i + 1]->var);
 				}
 				else
 				{
@@ -1164,7 +1164,7 @@ void list_rawmemory(dbref player)
 					for (j = i + 2; (j < n_tags); j++)
 					{
 
-						s2 = XNASPRINTF("%s:%s", t_array[j]->function, t_array[j]->var);
+						s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[j]->file, t_array[j]->line, t_array[j]->function, t_array[j]->var);
 
 						if (strcmp(s1, s2))
 						{
