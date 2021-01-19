@@ -13,10 +13,6 @@ netmush_LDADD			= $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(
 netmush_DEPENDENCIES	= $(LTDLDEPS) 
 nodist_netmush_SOURCES	= config.h defaults.h prototypes.h tinymushapi.h
 
-#slave_C					= slave.c
-#slave_H					= 
-#slave_SOURCES			= $(slave_C) $(slave_H)
-
 SHARE_DIR				= share
 SHARE_SRC				= $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 
@@ -43,7 +39,6 @@ BUILT_SOURCES			= prototypes.h tinymushapi.h defaults.h netmush.conf.example Sta
 
 nodist_include_HEADERS	= tinymushapi.h
 
-#bin_PROGRAMS			= netmush slave
 bin_PROGRAMS			= netmush
 
 CPROTO_INCLUDES			= $(LTDLINCL) $(CPPFLAGS)
