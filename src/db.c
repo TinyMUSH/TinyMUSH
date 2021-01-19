@@ -32,9 +32,6 @@ NAME *purenames = NULL; /*!< Pure Name Buffer */
 extern int sock;
 extern int ndescriptors;
 extern int maxd;
-extern int slave_socket;
-
-extern pid_t slave_pid;
 
 FILE *t_fd;             /*!< Main BD file descriptor */
 bool t_is_pipe = false; /*!< Are we piping from stdin? */

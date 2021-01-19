@@ -148,6 +148,18 @@
 /* XXX Add definitions here */
 #endif
 
+#ifdef HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+
+#ifdef HAVE_SYS_IPC_H
+#include <sys/ipc.h>
+#endif
+
+#ifdef HAVE_SYS_MSG_H
+#include <sys/msg.h>
+#endif
+
 #ifdef HAVE_STDBOOL_H
 #include <stdbool.h>
 #else

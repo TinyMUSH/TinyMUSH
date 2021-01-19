@@ -89,7 +89,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = netmush$(EXEEXT) slave$(EXEEXT)
+bin_PROGRAMS = netmush$(EXEEXT)
 @WANT_MODULE_COMSYS_TRUE@am__append_1 = modules/comsys/
 @WANT_MODULE_MAIL_TRUE@am__append_2 = modules/mail/
 @WANT_MODULE_DB_SQL_TRUE@am__append_3 = modules/db_sql/
@@ -104,6 +104,7 @@ am__aclocal_m4_deps = $(top_srcdir)/src/libltdl/m4/ltargz.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltoptions.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltsugar.m4 \
 	$(top_srcdir)/src/libltdl/m4/ltversion.m4 \
+	$(top_srcdir)/src/libltdl/m4/ax_pthread.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_msql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_mysql.m4 \
 	$(top_srcdir)/src/modules/db_sql/m4/ax_check_pgsql.m4 \
@@ -147,10 +148,6 @@ am__v_lt_1 =
 netmush_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(netmush_LDFLAGS) $(LDFLAGS) -o $@
-am__objects_3 = slave.$(OBJEXT)
-am_slave_OBJECTS = $(am__objects_3) $(am__objects_2)
-slave_OBJECTS = $(am_slave_OBJECTS)
-slave_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -184,13 +181,12 @@ am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/api.Po \
 	./$(DEPDIR)/player_c.Po ./$(DEPDIR)/powers.Po \
 	./$(DEPDIR)/predicates.Po ./$(DEPDIR)/quota.Po \
 	./$(DEPDIR)/recover.Po ./$(DEPDIR)/rob.Po ./$(DEPDIR)/set.Po \
-	./$(DEPDIR)/slave.Po ./$(DEPDIR)/speech.Po \
-	./$(DEPDIR)/stringutil.Po ./$(DEPDIR)/timer.Po \
-	./$(DEPDIR)/udb_misc.Po ./$(DEPDIR)/udb_obj.Po \
-	./$(DEPDIR)/udb_ocache.Po ./$(DEPDIR)/udb_ochunk.Po \
-	./$(DEPDIR)/unparse.Po ./$(DEPDIR)/vattr.Po \
-	./$(DEPDIR)/version.Po ./$(DEPDIR)/walkdb.Po \
-	./$(DEPDIR)/wild.Po ./$(DEPDIR)/wiz.Po
+	./$(DEPDIR)/speech.Po ./$(DEPDIR)/stringutil.Po \
+	./$(DEPDIR)/timer.Po ./$(DEPDIR)/udb_misc.Po \
+	./$(DEPDIR)/udb_obj.Po ./$(DEPDIR)/udb_ocache.Po \
+	./$(DEPDIR)/udb_ochunk.Po ./$(DEPDIR)/unparse.Po \
+	./$(DEPDIR)/vattr.Po ./$(DEPDIR)/version.Po \
+	./$(DEPDIR)/walkdb.Po ./$(DEPDIR)/wild.Po ./$(DEPDIR)/wiz.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -210,9 +206,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(netmush_SOURCES) $(nodist_netmush_SOURCES) \
-	$(slave_SOURCES)
-DIST_SOURCES = $(netmush_SOURCES) $(slave_SOURCES)
+SOURCES = $(netmush_SOURCES) $(nodist_netmush_SOURCES)
+DIST_SOURCES = $(netmush_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -388,6 +383,9 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PGSQL_CFLAGS = @PGSQL_CFLAGS@
 PGSQL_LIBS = @PGSQL_LIBS@
+PTHREAD_CC = @PTHREAD_CC@
+PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
+PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -410,6 +408,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+ax_pthread_config = @ax_pthread_config@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -474,9 +473,10 @@ netmush_SKEL = defaults.h.in
 netmush_LDADD = $(LIBOBJS) $(LIBLTDL) $(LIBADD_DL) -dlopen self $(MALLOC_O) $(FLOOR_LIBM) $(GETHOSTNAME_LIB) $(LIBSOCKET) $(LIB_SELECT) $(POW_LIBM) $(SQRT_LIBM)
 netmush_DEPENDENCIES = $(LTDLDEPS) 
 nodist_netmush_SOURCES = config.h defaults.h prototypes.h tinymushapi.h
-slave_C = slave.c
-slave_H = 
-slave_SOURCES = $(slave_C) $(slave_H)
+
+#slave_C					= slave.c
+#slave_H					= 
+#slave_SOURCES			= $(slave_C) $(slave_H)
 SHARE_DIR = share
 SHARE_SRC = $(SHARE_DIR)/badsite.txt $(SHARE_DIR)/connect.txt $(SHARE_DIR)/create_reg.txt $(SHARE_DIR)/down.txt $(SHARE_DIR)/full.txt $(SHARE_DIR)/guest.txt $(SHARE_DIR)/help.txt $(SHARE_DIR)/htmlconn.txt $(SHARE_DIR)/motd.txt $(SHARE_DIR)/mushman.txt $(SHARE_DIR)/news.txt $(SHARE_DIR)/newuser.txt $(SHARE_DIR)/plushelp.txt $(SHARE_DIR)/qhelp.txt $(SHARE_DIR)/quit.txt $(SHARE_DIR)/register.txt $(SHARE_DIR)/wizhelp.txt $(SHARE_DIR)/wizmotd.txt $(SHARE_DIR)/wiznews.txt
 ETC_DIR = etc
@@ -617,10 +617,6 @@ netmush$(EXEEXT): $(netmush_OBJECTS) $(netmush_DEPENDENCIES) $(EXTRA_netmush_DEP
 	@rm -f netmush$(EXEEXT)
 	$(AM_V_CCLD)$(netmush_LINK) $(netmush_OBJECTS) $(netmush_LDADD) $(LIBS)
 
-slave$(EXEEXT): $(slave_OBJECTS) $(slave_DEPENDENCIES) $(EXTRA_slave_DEPENDENCIES) 
-	@rm -f slave$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(slave_OBJECTS) $(slave_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -669,7 +665,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/recover.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rob.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/set.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slave.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/speech.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stringutil.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@ # am--include-marker
@@ -987,7 +982,6 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/recover.Po
 	-rm -f ./$(DEPDIR)/rob.Po
 	-rm -f ./$(DEPDIR)/set.Po
-	-rm -f ./$(DEPDIR)/slave.Po
 	-rm -f ./$(DEPDIR)/speech.Po
 	-rm -f ./$(DEPDIR)/stringutil.Po
 	-rm -f ./$(DEPDIR)/timer.Po
@@ -1089,7 +1083,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/recover.Po
 	-rm -f ./$(DEPDIR)/rob.Po
 	-rm -f ./$(DEPDIR)/set.Po
-	-rm -f ./$(DEPDIR)/slave.Po
 	-rm -f ./$(DEPDIR)/speech.Po
 	-rm -f ./$(DEPDIR)/stringutil.Po
 	-rm -f ./$(DEPDIR)/timer.Po

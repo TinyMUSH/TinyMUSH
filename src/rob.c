@@ -93,7 +93,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			cost = 0;
 		}
 
-		if (!((mudconf.killguarantee && (random_range(0, (mudconf.killguarantee)-1) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
+		if (!((mudconf.killguarantee && ((int)(random_range(0, (mudconf.killguarantee)-1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
 		{
 			/*
 	     * Failure: notify player and victim only

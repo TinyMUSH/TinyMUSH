@@ -1717,13 +1717,6 @@
 #define VNAME_SIZE 32
 
 /**
- * @brief Slave constants
- * 
- */
-#define SLAVE_MAX_STRING 1000
-#define SLAVE_MAX_CHILDREN 20
-
-/**
  * @brief Cron constants
  * 
  */

@@ -293,7 +293,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h gdbm.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h signal.h stdbool.h stddef.h stdint.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h pcre.h libgen.h])
+AC_CHECK_HEADERS([arpa/inet.h ctype.h dlfcn.h dl.h dld.h errno.h fcntl.h float.h gdbm.h libgen.h limits.h math.h malloc.h memory.h netdb.h netinet/in.h pcre.h pthread.h signal.h stdbool.h stddef.h stdint.h stdlib.h stdio.h string.h strings.h sys/file.h sys/ioctl.h sys/ipc.h sys/msg.h sys/param.h sys/select.h sys/socket.h sys/stat.h sys/time.h sys/types.h sys/utsname.h unistd.h])
 
 AX_BOX([Checks for typedefs, structures, and compiler characteristics.])
 # Checks for typedefs, structures, and compiler characteristics.
@@ -402,6 +402,9 @@ AC_FUNC_FORK
 AC_FUNC_VPRINTF
 AC_FUNC_MMAP
 
+# Check for libpthread
+AX_PTHREAD(,[AC_MSG_ERROR([Could not find Pthreads support])])
+
 AC_CHECK_FUNCS([alarm getdtablesize gethostbyaddr gethostbyname getrusage gettimeofday inet_ntoa isascii localtime_r munmap setrlimit srandom strcasecmp strchr strrchr strspn])
 
 includedir=$includedir$with_install_suffix
@@ -413,6 +416,10 @@ AC_SUBST([ac_aux_dir])
 AC_DEFINE_UNQUOTED([PACKAGE_CONFIG], ["$ac_configure_args"], [Switches used with ./configure])
 AC_DEFINE_UNQUOTED([PACKAGE_RELEASE_DATE], TINYMUSH_RELEASE_DATE, [Date of Release])
 AC_DEFINE_UNQUOTED([PACKAGE_COPYRIGHT], TINYMUSH_COPYRIGHT, [Copyright Notice])
+
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
 
 AX_BOX([Configuring files.])
 AC_CONFIG_FILES([src/Makefile src/modules/comsys/Makefile src/modules/mail/Makefile src/modules/db_sql/Makefile Makefile])

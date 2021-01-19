@@ -26,9 +26,6 @@
  * insert_first, remove_first: Insert or remove objects from lists.
  */
 
-extern pid_t slave_pid;
-extern int slave_socket;
-
 dbref insert_first(dbref head, dbref thing)
 {
 	s_Next(thing, head);
@@ -1784,18 +1781,6 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 
 	cache_sync();
 	dddb_close();
-
-	if (slave_socket != -1)
-	{
-		shutdown(slave_socket, 2);
-		close(slave_socket);
-		slave_socket = -1;
-	}
-
-	if (slave_pid != 0)
-	{
-		kill(slave_pid, SIGKILL);
-	}
 
 	logfile_close();
 	alarm(0);

@@ -1277,4 +1277,35 @@ typedef struct pcg_state_setseq_64
                     /*!< selected. Must *always* be odd. */
 } pcg32_random_t;
 
+/**
+ * @brief Message queue related typedefs
+ * 
+ */
+
+/**
+ * @brief Type of messages for the task handler
+ * 
+ */
+typedef enum msgq_destination
+{
+    MSGQ_DEST_DNSRESOLVER = 1L, /*!< DNS Resolver */
+    MSGQ_DEST_REPLY = __LONG_MAX__
+} MSGQ_DESTINATION;
+
+typedef struct msgq_dnsresolver
+{
+    long destination;
+    struct
+    {
+        union
+        {
+            struct in_addr v4;
+            struct in6_addr v6;
+        } ip;
+        int addrf;
+        in_port_t port;
+        char *hostname;
+    } payload;
+} MSGQ_DNSRESOLVER;
+
 #endif /* __TYPEDEFS_H */

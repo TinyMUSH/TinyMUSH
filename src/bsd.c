@@ -26,358 +26,131 @@
  * @attention Since this is the core of the whole show, better keep theses globals.
  * 
  */
-int sock = 0;					/*!< Game socket */
-int ndescriptors = 0;			/*!< New Descriptor */
-int maxd = 0;					/*!< Max Descriptors */
-DESC *descriptor_list = NULL;	/*!< Descriptor list */
-volatile pid_t slave_pid = 0;	/*!< PID of the slace */
-volatile int slave_socket = -1; /*!< Socket of the slave */
+int sock = 0;				  /*!< Game socket */
+int ndescriptors = 0;		  /*!< New Descriptor */
+int maxd = 0;				  /*!< Max Descriptors */
+DESC *descriptor_list = NULL; /*!< Descriptor list */
 
 /**
- * @brief Get the slave's result
+ * @brief Message queue related
  * 
- * @return int 
  */
-int get_slave_result(void)
+
+key_t msgq_Key = 0; /*!< Message Queue Key */
+
+/**
+ * @brief Convert a text ip address to binary format for the message queue.
+ *        Not used for now.
+ * 
+ * @param addr IP address
+ * @return MSGQ_DNSRESOLVER 
+ */
+MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr)
 {
-	char *host1 = NULL, *hostname = NULL, *host2 = NULL, *p = NULL, *userid = NULL, *s = NULL;
-	char *buf = XMALLOC(LBUF_SIZE, "buf");
-	int remote_port = 0, len = 0;
-	unsigned long addr = 0L;
-	DESC *d = NULL;
+	MSGQ_DNSRESOLVER h;
+	memset(&h, 0, sizeof(h));
+	h.destination = MSGQ_DEST_DNSRESOLVER;
+	h.payload.addrf = AF_UNSPEC;
 
-	len = read(slave_socket, buf, LBUF_SIZE - 1);
-
-	if (len < 0)
+	if (addr)
 	{
-		if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
+
+		struct addrinfo hint, *res = NULL;
+
+		memset(&hint, 0, sizeof(hint));
+
+		hint.ai_family = PF_UNSPEC;
+		hint.ai_flags = AI_NUMERICHOST;
+
+		if (!getaddrinfo(addr, NULL, &hint, &res))
 		{
-			XFREE(buf);
-			return -1;
-		}
-
-		close(slave_socket);
-		slave_socket = -1;
-		XFREE(buf);
-		return -1;
-	}
-	else if (len == 0)
-	{
-		XFREE(buf);
-		return -1;
-	}
-
-	buf[len] = '\0';
-	host1 = buf;
-	hostname = strchr(host1, ' ');
-
-	if (!hostname)
-	{
-		goto gsr_end;
-	}
-
-	++hostname;
-	hostname[-1] = '\0';
-	host2 = strchr(hostname, '\n');
-
-	if (!host2)
-	{
-		goto gsr_end;
-	}
-	++host2;
-
-	host2[-1] = '\0';
-
-	if (mudconf.use_hostname)
-	{
-		for (d = descriptor_list; d; d = d->next)
-		{
-			if (strcmp(d->addr, host1))
+			switch (res->ai_family)
 			{
-				continue;
-			}
-
-			if (d->player != 0)
-			{
-				if (d->username[0])
-				{
-					s = XASPRINTF("s", "%s@%s", d->username, hostname);
-					atr_add_raw(d->player, A_LASTSITE, s);
-					XFREE(s);
-				}
-				else
-				{
-					atr_add_raw(d->player, A_LASTSITE, hostname);
-				}
-			}
-
-			XSTRNCPY(d->addr, hostname, 50);
-			d->addr[50] = '\0';
-		}
-	}
-
-	p = strchr(host2, ' ');
-	if (!p)
-	{
-		goto gsr_end;
-	}
-
-	++p;
-	p[-1] = '\0';
-	addr = inet_addr(host2);
-
-	if (addr == INADDR_NONE)
-	{
-		goto gsr_end;
-	}
-	/**
-	 * now we're into the RFC 1413 ident reply
-	 * 
-	 */
-	while (isspace(*p))
-	{
-		++p;
-	}
-
-	remote_port = 0;
-
-	while (isdigit(*p))
-	{
-		remote_port <<= 1;
-		remote_port += (remote_port << 2) + (*p & 0x0f);
-		++p;
-	}
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-
-	if (*p != ',')
-	{
-		goto gsr_end;
-	}
-
-	++p;
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-	/**
-	 * Skip the local port, making sure it consists of digits
-	 * 
-	 */
-	while (isdigit(*p))
-	{
-		++p;
-	}
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-
-	if (*p != ':')
-	{
-		goto gsr_end;
-	}
-
-	++p;
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-	/**
-	 * Identify the reply type
-	 * 
-	 */
-	if (strncmp(p, "USERID", 6))
-	{
-		goto gsr_end; /** the other standard possibility here is "ERROR" */
-	}
-
-	p += 6;
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-
-	if (*p != ':')
-	{
-		goto gsr_end;
-	}
-
-	++p;
-
-	while (isspace(*p))
-	{
-		++p;
-	}
-
-	/*
-	 * don't include the trailing linefeed in the userid
-	 */
-
-	userid = strchr(p, '\n');
-	if (!userid)
-	{
-		goto gsr_end;
-	}
-
-	++userid;
-	userid[-1] = '\0';
-	/**
-	 * go back and skip over the "OS [, charset] : " field
-	 * 
-	 */
-	userid = strchr(p, ':');
-	if (!userid)
-	{
-		goto gsr_end;
-	}
-
-	++userid;
-
-	while (isspace(*userid))
-	{
-		++userid;
-	}
-
-	for (d = descriptor_list; d; d = d->next)
-	{
-		if (ntohs((d->address).sin_port) != remote_port)
-		{
-			continue;
-		}
-
-		if ((d->address).sin_addr.s_addr != addr)
-		{
-			continue;
-		}
-
-		if (d->player != 0)
-		{
-			if (mudconf.use_hostname)
-			{
-				s = XASPRINTF("s", "%s@%s", userid, hostname);
-				atr_add_raw(d->player, A_LASTSITE, s);
-				XFREE(s);
-			}
-			else
-			{
-				s = XASPRINTF("s", "%s@%s", userid, host2);
-				atr_add_raw(d->player, A_LASTSITE, s);
-				XFREE(s);
+			case AF_INET:
+				inet_pton(AF_INET, addr, &(h.payload.ip.v4));
+				h.payload.addrf = res->ai_family;
+				break;
+			case AF_INET6:
+				inet_pton(AF_INET6, addr, &(h.payload.ip.v6));
+				h.payload.addrf = res->ai_family;
+				break;
 			}
 		}
-
-		XSTRNCPY(d->username, userid, 10);
-		d->username[10] = '\0';
-		break;
 	}
-
-gsr_end:
-	XFREE(buf);
-	return 0;
+	return h;
 }
 
 /**
- * @brief Bootstrap the slave process
- * @todo Slave should be a completly separated exec (or a thread?)... We end up with two netmush in memory like it is now!
+ * @brief DNS Resolver thread
  * 
+ * @param args Message queue key
+ * @return void* Always null. Not used.
  */
-void boot_slave(void)
+void *dnsResolver(void *args)
 {
-	int sv[2];
-	int i = 0;
-	int maxfds = 0;
-	char *s = NULL;
+	MSGQ_DNSRESOLVER msgData;
+	int msgQID = msgget(*((key_t *)args), 0666 | IPC_CREAT);
 
-	maxfds = getdtablesize();
-
-	if (slave_socket != -1)
+	do
 	{
-		close(slave_socket);
-		slave_socket = -1;
-	}
+		memset(&msgData, 0, sizeof(msgData));
+		msgrcv(msgQID, &msgData, sizeof(msgData.payload), MSGQ_DEST_DNSRESOLVER, 0);
 
-	if (socketpair(AF_UNIX, SOCK_DGRAM, 0, sv) < 0)
-	{
-		return;
-	}
+		if ((msgData.payload.addrf == AF_INET) || (msgData.payload.addrf == AF_INET6))
+		{
+			MSGQ_DNSRESOLVER clbData = msgData;
+			struct hostent *hostEnt = NULL;
+			clbData.destination = MSGQ_DEST_REPLY - MSGQ_DEST_DNSRESOLVER;
+			clbData.payload.hostname = NULL;
+
+			switch (msgData.payload.addrf)
+			{
+			case AF_INET:
+				hostEnt = gethostbyaddr(&(msgData.payload.ip.v4), sizeof(msgData.payload.ip.v4), AF_INET);
+				if (hostEnt)
+				{
+					if (hostEnt->h_name)
+					{
+						clbData.payload.hostname = strdup(hostEnt->h_name);
+					}
+				}
+				break;
+			case AF_INET6:
+				hostEnt = gethostbyaddr(&(msgData.payload.ip.v6), sizeof(msgData.payload.ip.v6), AF_INET6);
+				if (hostEnt)
+				{
+					if (hostEnt->h_name)
+					{
+						clbData.payload.hostname = strdup(hostEnt->h_name);
+					}
+				}
+				break;
+			}
+			if (clbData.payload.hostname)
+			{
+				msgsnd(msgQID, &clbData, sizeof(clbData.payload), 0);
+			}
+		}
+	} while ((msgData.payload.addrf == AF_INET) || (msgData.payload.addrf == AF_INET6));
+
+	msgctl(msgQID, IPC_RMID, NULL);
+
+	printf("Thread exiting.\n");
+
+	return NULL;
+}
+
+void check_dnsResolver_status(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key)
+{
 	/**
-	 * set to nonblocking
+	 * @todo Just a placeholder for now. Call by @startslave
+	 * that should also be rename to something better suiting
+	 * once i sort out what this should do.
 	 * 
 	 */
-#ifdef FNDELAY
-	if (fcntl(sv[0], F_SETFL, FNDELAY) == -1)
-	{
-#else
-	if (fcntl(sv[0], F_SETFL, O_NDELAY) == -1)
-	{
-#endif
-		close(sv[0]);
-		close(sv[1]);
-		return;
-	}
-
-	slave_pid = vfork();
-
-	switch (slave_pid)
-	{
-	case -1:
-		close(sv[0]);
-		close(sv[1]);
-		return;
-
-	case 0:
-		/** 
-		 * child 
-		 * 
-		 */
-		close(sv[0]);
-
-		if (dup2(sv[1], 0) == -1)
-		{
-			_exit(EXIT_FAILURE);
-		}
-
-		if (dup2(sv[1], 1) == -1)
-		{
-			_exit(EXIT_FAILURE);
-		}
-
-		for (i = 3; i < maxfds; ++i)
-		{
-			close(i);
-		}
-
-		s = XASPRINTF("s", "%s/slave", mudconf.binhome);
-		execlp(s, "slave", NULL);
-		XFREE(s);
-		_exit(EXIT_FAILURE);
-	}
-
-	close(sv[1]);
-#ifdef FNDELAY
-
-	if (fcntl(sv[0], F_SETFL, FNDELAY) == -1)
-	{
-#else
-
-	if (fcntl(sv[0], F_SETFL, O_NDELAY) == -1)
-	{
-#endif
-		close(sv[0]);
-		return;
-	}
-
-	slave_socket = sv[0];
-	log_write(LOG_ALWAYS, "NET", "SLAVE", "DNS lookup slave started on fd %d", slave_socket);
+	notify(player, "This feature is being rework.");
 }
+
 /**
  * @brief Create a socket
  * 
@@ -433,6 +206,10 @@ void shovechars(int port)
 	DESC *d = NULL, *dnext = NULL, *newd = NULL;
 	int avail_descriptors = 0, maxfds = 0;
 	struct stat fstatbuf;
+	pthread_t thread_Dns = 0;
+	int msgq_Id = 0;
+	char *msgq_Path = NULL;
+	MSGQ_DNSRESOLVER msgq_Dns;
 
 	mudstate.debug_cmd = (char *)"< shovechars >";
 
@@ -451,6 +228,22 @@ void shovechars(int port)
 	maxfds = getdtablesize();
 
 	avail_descriptors = maxfds - 7;
+
+	/**
+	 * @brief Start the message queue.
+	 * 
+	 */
+
+	msgq_Path = mkdtemp(XASPRINTF("s", "%s/%sXXXXXX", mudconf.pid_home, mudconf.mud_shortname));
+	msgq_Key = ftok(msgq_Path, 0x32);
+	msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
+	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
+
+	/**
+	 * @brief Start the DNS resolver thread
+	 * 
+	 */
+	pthread_create(&thread_Dns, NULL, dnsResolver, &msgq_Key);
 
 	/**
 	 * @attention This is the main loop of the MUSH, everything derive from here... 
@@ -511,6 +304,7 @@ void shovechars(int port)
 		timeval_sub(next_slice, current_time);
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
+
 		/**
 		 * Listen for new connections if there are free descriptors
 		 * 
@@ -519,14 +313,7 @@ void shovechars(int port)
 		{
 			FD_SET(sock, &input_set);
 		}
-		/**
-		 * Listen for replies from the slave socket
-		 * 
-		 */
-		if (slave_socket != -1)
-		{
-			FD_SET(slave_socket, &input_set);
-		}
+
 		/**
 		 * Mark sockets that we want to test for change in status
 		 * 
@@ -574,17 +361,6 @@ void shovechars(int port)
 					}
 				}
 
-				if ((slave_socket == -1) || (fstat(slave_socket, &fstatbuf) < 0))
-				{
-					/**
-					 * It's the slave. Try to restart it, since it
-					 * presumably died.
-					 * 
-					 */
-					log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad slave descriptor %d", slave_socket);
-					boot_slave();
-				}
-
 				if ((sock != -1) && (fstat(sock, &fstatbuf) < 0))
 				{
 					/**
@@ -619,15 +395,45 @@ void shovechars(int port)
 		{
 			do_top(mudconf.active_q_chunk);
 		}
+
 		/**
-		 * Get usernames and hostnames
+		 * @brief Check if we have something from the DNS Resolver.
 		 * 
 		 */
-		if (slave_socket != -1 && FD_ISSET(slave_socket, &input_set))
+
+		if (msgrcv(msgq_Id, &msgq_Dns, sizeof(msgq_Dns.payload), MSGQ_DEST_REPLY - MSGQ_DEST_DNSRESOLVER, IPC_NOWAIT) > 0)
 		{
-			while (get_slave_result() == 0)
-				;
+			if (mudconf.use_hostname)
+			{
+				for (DESC *d = descriptor_list; d; d = d->next)
+				{
+					struct in_addr daddr;
+					inet_pton(AF_INET, d->addr, &daddr);
+					if (msgq_Dns.payload.ip.v4.s_addr != daddr.s_addr)
+					{
+						continue;
+					}
+
+					if (d->player != 0)
+					{
+						if (d->username[0])
+						{
+							char *s = XASPRINTF("s", "%s@%s", d->username, msgq_Dns.payload.hostname);
+							atr_add_raw(d->player, A_LASTSITE, s);
+							XFREE(s);
+						}
+						else
+						{
+							atr_add_raw(d->player, A_LASTSITE, msgq_Dns.payload.hostname);
+						}
+					}
+
+					XSTRNCPY(d->addr, msgq_Dns.payload.hostname, 50);
+					d->addr[50] = '\0';
+				}
+			}
 		}
+
 		/**
 		 * Check for new connection requests
 		 * 
@@ -697,6 +503,24 @@ void shovechars(int port)
 			}
 		}
 	}
+
+	/**
+	 * @brief Stop the DNS message queue.
+	 * 
+	 */
+	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
+	msgq_Dns.destination = MSGQ_DEST_DNSRESOLVER;
+	msgq_Dns.payload.addrf = AF_UNSPEC;
+	msgsnd(msgq_Id, &msgq_Dns, sizeof(msgq_Dns.payload), 0);
+
+	/**
+	 * @brief Wait for the thread to end.
+	 * 
+	 */
+	pthread_join(thread_Dns, NULL);
+
+	rmdir(msgq_Path);
+	XFREE(msgq_Path);
 }
 
 /**
@@ -711,8 +535,9 @@ DESC *new_connection(int sock)
 	char *cmdsave = NULL;
 	DESC *d = NULL;
 	struct sockaddr_in addr;
-	socklen_t addr_len, len;
-	char *buf = NULL;
+	socklen_t addr_len;
+	MSGQ_DNSRESOLVER msgData;
+	int msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
 
 	cmdsave = mudstate.debug_cmd;
 	mudstate.debug_cmd = XSTRDUP("< new_connection >", "mudstate.debug_cmd");
@@ -736,27 +561,20 @@ DESC *new_connection(int sock)
 	else
 	{
 		/**
-		 * Ask slave process for host and username
+		 * @brief Ask DNS Resolver for hostname
 		 * 
- 		 */
-		if ((slave_socket != -1) && mudconf.use_hostname)
-		{
-			buf = XASPRINTF("buf", "%s\n%s,%d,%d\n", inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), mudconf.port);
-			len = strlen(buf);
-
-			if (write(slave_socket, buf, len) < 0)
-			{
-				close(slave_socket);
-				slave_socket = -1;
-			}
-			XFREE(buf);
-		}
+		 */
+		memset(&msgData, 0, sizeof(msgData));
+		msgData.destination = MSGQ_DEST_DNSRESOLVER;
+		msgData.payload.ip.v4 = addr.sin_addr;
+		msgData.payload.addrf = AF_INET;
+		msgsnd(msgq_Id, &msgData, sizeof(msgData.payload), 0);
 
 		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 		d = initializesock(newsock, &addr);
-		mudstate.debug_cmd = cmdsave;
 	}
 
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 	return d;
 }
@@ -1079,19 +897,6 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 {
 	DESC *d = NULL;
 
-	if (s == slave_socket)
-	{
-		/**
-		 * Whoa. We shouldn't be allocating this. If we got this
-		 * descriptor, our connection with the slave must have died somehow.
-		 * We make sure to take note appropriately.
-		 * 
-		 * 
-		 */
-		log_write(LOG_ALWAYS, "ERR", "SOCK", "Player descriptor clashes with slave fd %d", slave_socket);
-		slave_socket = -1;
-	}
-
 	ndescriptors++;
 	d = XMALLOC(sizeof(DESC), "d");
 	d->descriptor = s;
@@ -1164,6 +969,7 @@ int process_output(DESC *d)
 
 			if (cnt < 0)
 			{
+				XFREE(mudstate.debug_cmd);
 				mudstate.debug_cmd = cmdsave;
 
 				if (errno == EWOULDBLOCK)
@@ -1190,7 +996,8 @@ int process_output(DESC *d)
 			d->output_tail = NULL;
 		}
 	}
-
+	
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 	return 1;
 }
@@ -1214,6 +1021,7 @@ int process_input(DESC *d)
 
 	if (got <= 0)
 	{
+		XFREE(mudstate.debug_cmd);
 		mudstate.debug_cmd = cmdsave;
 		XFREE(buf);
 		return 0;
@@ -1305,6 +1113,7 @@ int process_input(DESC *d)
 	d->input_size += in;
 	d->input_lost += lost;
 	XFREE(buf);
+	XFREE(mudstate.debug_cmd);
 	mudstate.debug_cmd = cmdsave;
 	return 1;
 }
@@ -1434,11 +1243,6 @@ void sighandler(int sig)
 				mudstate.dumping = 0;
 				mudstate.dumper = 0;
 			}
-			else if (child == slave_pid && (WIFEXITED(stat) || WIFSIGNALED(stat)))
-			{
-				slave_pid = 0;
-				slave_socket = -1;
-			}
 		}
 
 		break;
@@ -1502,17 +1306,6 @@ void sighandler(int sig)
 			cache_sync();
 			dddb_close();
 
-			if (slave_socket != -1)
-			{
-				shutdown(slave_socket, 2);
-				close(slave_socket);
-				slave_socket = -1;
-			}
-
-			if (slave_pid != 0)
-			{
-				kill(slave_pid, SIGKILL);
-			}
 			/**
 			 * Try our best to dump a usable core by generating a
 			 * second signal with the SIG_DFL action.

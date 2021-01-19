@@ -21,8 +21,6 @@
 #include "prototypes.h"
 
 extern LOGFILETAB logfds_table[];
-extern volatile pid_t slave_pid;
-extern volatile int slave_socket;
 
 #ifdef NEED_EMPTY_LTPLSYM
 const lt_dlsymlist lt_preloaded_symbols[] = {{0, (lt_ptr_t)0}};
@@ -3823,10 +3821,6 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-     * Start the DNS and identd lookup slave process
-     */
-	boot_slave();
-	/*
      * This must happen after startups are run, in order to get a really
      * good idea of what's actually out there.
      */
@@ -3911,18 +3905,6 @@ int main(int argc, char *argv[])
 	dump_database();
 	cache_sync();
 	dddb_close();
-
-	if (slave_socket != -1)
-	{
-		shutdown(slave_socket, 2);
-		close(slave_socket);
-		slave_socket = -1;
-	}
-
-	if (slave_pid != 0)
-	{
-		kill(slave_pid, SIGKILL);
-	}
 
 	if (fileexist(mudconf.log_file))
 	{

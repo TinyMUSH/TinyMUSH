@@ -864,26 +864,30 @@ char *__xstrncpy(char *dest, const char *src, size_t n)
 {
 	char *ptr = NULL;
 
-	if (dest)
+	if (src)
 	{
-		MEMTRACK *mtrk = __xfind(dest);
-		if (mtrk)
+		if (dest)
 		{
-			size_t size = ((char *)mtrk->magic) - dest;
-			if (n < size)
+			MEMTRACK *mtrk = __xfind(dest);
+			if (mtrk)
 			{
-				size = n;
+				size_t size = ((char *)mtrk->magic) - dest;
+				if (n < size)
+				{
+					size = n;
+				}
+				if (size > 0)
+				{
+					ptr = strncpy(dest, src, size);
+				}
 			}
-			if (size > 0)
+			else
 			{
-				ptr = strncpy(dest, src, size);
+				ptr = strncpy(dest, src, n);
 			}
-		}
-		else
-		{
-			ptr = strncpy(dest, src, n);
 		}
 	}
+
 	return ptr;
 }
 
@@ -1363,7 +1367,7 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
 void __xsafeltos(char *dest, char **destp, long num, size_t size)
 {
 	char *buff = XLTOS(num);
-	
+
 	__xsafestrncat(dest, destp, buff, strlen(buff), size);
 	__xfree(buff);
 }
