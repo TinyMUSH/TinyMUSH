@@ -1290,12 +1290,12 @@
  * amount of object endowment, based on cost 
  * 
  */
-#define OBJECT_ENDOWMENT(cost) (((cost) / mudconf.sacfactor) + mudconf.sacadjust)
+#define OBJECT_ENDOWMENT(cost) (((cost) / mushconf.sacfactor) + mushconf.sacadjust)
 /** 
  * !!! added for recycling, return value of object 
  * 
  */
-#define OBJECT_DEPOSIT(pennies) (((pennies)-mudconf.sacadjust) * mudconf.sacfactor)
+#define OBJECT_DEPOSIT(pennies) (((pennies)-mushconf.sacadjust) * mushconf.sacfactor)
 /**
  * Always nice to have a trash can.
  * 
@@ -1410,7 +1410,7 @@
  */
 
 /** 
- * Game control flags in mudconf.control_flags 
+ * Game control flags in mushconf.control_flags 
  * 
  */
 #define CF_LOGIN 0x0001      /*!< Allow nonwiz logins to the MUSH */
@@ -1457,7 +1457,7 @@
 #define LOG_TIMEUSE 0x00040000     /*!< Log CPU time usage */
 #define LOG_LOCAL 0x00080000       /*!< Log user stuff via @log */
 #define LOG_MALLOC 0x00100000      /*!< Log malloc requests */
-#define LOG_FORCE 0x04000000       /*!< Ignore mudstate.logging */
+#define LOG_FORCE 0x04000000       /*!< Ignore mushstate.logging */
 #define LOG_ALWAYS 0x80000000      /*!< Always log it */
 
 #define LOGOPT_FLAGS 0x01     /*!< Report flags on object */

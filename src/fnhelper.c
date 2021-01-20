@@ -615,7 +615,7 @@ bool xlate(char *arg)
 
 		if (is_integer(arg))
 		{
-			if (mudconf.bools_oldstyle)
+			if (mushconf.bools_oldstyle)
 			{
 				switch ((int)strtol(arg, (char **)NULL, 10))
 				{
@@ -635,7 +635,7 @@ bool xlate(char *arg)
 			}
 		}
 
-		if (mudconf.bools_oldstyle)
+		if (mushconf.bools_oldstyle)
 		{
 			return false;
 		}

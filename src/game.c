@@ -40,7 +40,7 @@ pid_t isrunning(char *pidfile)
 	int i = 0;
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
-	if (mudstate.restarting)
+	if (mushstate.restarting)
 	{
 		XFREE(buff);
 		return 0;
@@ -120,10 +120,10 @@ void handlestartupflatfiles(int flag)
 	struct stat sb1, sb2;
 	ts = mktimestamp();
 
-	db = XASPRINTF("db", "%s/%s", mudconf.dbhome, mudconf.db_file);
-	flat = XASPRINTF("flat", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"));
-	db_bak = XASPRINTF("db_bak", "%s/%s.%s", mudconf.bakhome, mudconf.db_file, ts);
-	flat_bak = XASPRINTF("flat_bak", "%s/%s.%s.%s", mudconf.bakhome, mudconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"), ts);
+	db = XASPRINTF("db", "%s/%s", mushconf.dbhome, mushconf.db_file);
+	flat = XASPRINTF("flat", "%s/%s.%s", mushconf.bakhome, mushconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"));
+	db_bak = XASPRINTF("db_bak", "%s/%s.%s", mushconf.bakhome, mushconf.db_file, ts);
+	flat_bak = XASPRINTF("flat_bak", "%s/%s.%s.%s", mushconf.bakhome, mushconf.db_file, (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILLED"), ts);
 	XFREE(ts);
 	i = open(flat, O_RDONLY);
 
@@ -232,7 +232,7 @@ int tailfind(char *file, char *key)
 
 void do_dump(dbref player, dbref cause, int key)
 {
-	if (mudstate.dumping)
+	if (mushstate.dumping)
 	{
 		notify(player, "Dumping. Please try again later.");
 		return;
@@ -253,26 +253,26 @@ void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __
 	MODHASHES *m_htab, *hp;
 	MODHASHES *m_ntab, *np;
 	char *s;
-	hashresize(&mudstate.command_htab, 512);
-	hashresize(&mudstate.player_htab, 16);
-	hashresize(&mudstate.nref_htab, 8);
-	hashresize(&mudstate.vattr_name_htab, 256);
-	nhashresize(&mudstate.qpid_htab, 256);
-	nhashresize(&mudstate.fwdlist_htab, 8);
-	nhashresize(&mudstate.propdir_htab, 8);
-	nhashresize(&mudstate.redir_htab, 8);
-	hashresize(&mudstate.ufunc_htab, 8);
-	hashresize(&mudstate.structs_htab, (mudstate.max_structs < 16) ? 16 : mudstate.max_structs);
-	hashresize(&mudstate.cdefs_htab, (mudstate.max_cdefs < 16) ? 16 : mudstate.max_cdefs);
-	hashresize(&mudstate.instance_htab, (mudstate.max_instance < 16) ? 16 : mudstate.max_instance);
-	hashresize(&mudstate.instdata_htab, (mudstate.max_instdata < 16) ? 16 : mudstate.max_instdata);
-	nhashresize(&mudstate.objstack_htab, (mudstate.max_stacks < 16) ? 16 : mudstate.max_stacks);
-	nhashresize(&mudstate.objgrid_htab, 16);
-	hashresize(&mudstate.vars_htab, (mudstate.max_vars < 16) ? 16 : mudstate.max_vars);
-	hashresize(&mudstate.api_func_htab, 8);
+	hashresize(&mushstate.command_htab, 512);
+	hashresize(&mushstate.player_htab, 16);
+	hashresize(&mushstate.nref_htab, 8);
+	hashresize(&mushstate.vattr_name_htab, 256);
+	nhashresize(&mushstate.qpid_htab, 256);
+	nhashresize(&mushstate.fwdlist_htab, 8);
+	nhashresize(&mushstate.propdir_htab, 8);
+	nhashresize(&mushstate.redir_htab, 8);
+	hashresize(&mushstate.ufunc_htab, 8);
+	hashresize(&mushstate.structs_htab, (mushstate.max_structs < 16) ? 16 : mushstate.max_structs);
+	hashresize(&mushstate.cdefs_htab, (mushstate.max_cdefs < 16) ? 16 : mushstate.max_cdefs);
+	hashresize(&mushstate.instance_htab, (mushstate.max_instance < 16) ? 16 : mushstate.max_instance);
+	hashresize(&mushstate.instdata_htab, (mushstate.max_instdata < 16) ? 16 : mushstate.max_instdata);
+	nhashresize(&mushstate.objstack_htab, (mushstate.max_stacks < 16) ? 16 : mushstate.max_stacks);
+	nhashresize(&mushstate.objgrid_htab, 16);
+	hashresize(&mushstate.vars_htab, (mushstate.max_vars < 16) ? 16 : mushstate.max_vars);
+	hashresize(&mushstate.api_func_htab, 8);
 	s = XMALLOC(MBUF_SIZE, "s");
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
@@ -299,7 +299,7 @@ void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __
 
 	XFREE(s);
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 	{
 		notify(player, "Resized.");
 	}
@@ -320,7 +320,7 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 	int offsets[PCRE_MAX_OFFSETS];
 	int subpatterns;
 
-	if ((re = pcre_compile(pattern, case_opt, &errptr, &erroffset, mudstate.retabs)) == NULL)
+	if ((re = pcre_compile(pattern, case_opt, &errptr, &erroffset, mushstate.retabs)) == NULL)
 	{
 		/*
 	 * This is a matching error. We have an error message in
@@ -423,7 +423,7 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 	 * before.  Also exclude it if the attribute type is PRIVATE.
 	 */
 
-		if (check_exclude && ((ap->flags & AF_PRIVATE) || nhashfind(ap->number, &mudstate.parent_htab)))
+		if (check_exclude && ((ap->flags & AF_PRIVATE) || nhashfind(ap->number, &mushstate.parent_htab)))
 		{
 			continue;
 		}
@@ -445,7 +445,7 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 	 */
 
 		if (hash_insert)
-			nhashadd(ap->number, (int *)&attr, &mudstate.parent_htab);
+			nhashadd(ap->number, (int *)&attr, &mushstate.parent_htab);
 
 		/*
 	 * Check for the leadin character after excluding the attrib
@@ -482,7 +482,7 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 			}
 			else
 			{
-				wait_que(thing, player, 0, NOTHING, 0, s, args, NUM_ENV_VARS, mudstate.rdata);
+				wait_que(thing, player, 0, NOTHING, 0, s, args, NUM_ENV_VARS, mushstate.rdata);
 			}
 
 			for (i = 0; i < NUM_ENV_VARS; i++)
@@ -510,7 +510,7 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
      * we're doing a $-match, don't check it.
      */
 
-	if (((type == AMATCH_CMD) && !Has_Commands(thing) && mudconf.req_cmds_flag) || Halted(thing))
+	if (((type == AMATCH_CMD) && !Has_Commands(thing) && mushconf.req_cmds_flag) || Halted(thing))
 	{
 		return 0;
 	}
@@ -528,8 +528,8 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
      */
 	exclude = 0;
 	insert = 1;
-	nhashflush(&mudstate.parent_htab, 0);
-	for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+	nhashflush(&mushstate.parent_htab, 0);
+	for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (!Good_obj(Parent(parent)))
 		{
@@ -613,7 +613,7 @@ int check_filter(dbref object, dbref player, int filter, const char *msg)
 		do
 		{
 			cp = parse_to(&dp, ',', EV_STRIP);
-			re = pcre_compile(cp, case_opt, &errptr, &erroffset, mudstate.retabs);
+			re = pcre_compile(cp, case_opt, &errptr, &erroffset, mushstate.retabs);
 
 			if (re != NULL)
 			{
@@ -783,11 +783,11 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	/*
      * Enforce a recursion limit
      */
-	mudstate.ntfy_nest_lev++;
+	mushstate.ntfy_nest_lev++;
 
-	if (mudstate.ntfy_nest_lev >= mudconf.ntfy_nest_lim)
+	if (mushstate.ntfy_nest_lev >= mushconf.ntfy_nest_lim)
 	{
-		mudstate.ntfy_nest_lev--;
+		mushstate.ntfy_nest_lev--;
 		XFREE(msg);
 		return;
 	}
@@ -801,22 +801,22 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	{
 		mp = msg_ns = XMALLOC(LBUF_SIZE, "msg_ns");
 
-		if (Nospoof(target) && (target != sender) && (target != mudstate.curr_enactor) && (target != mudstate.curr_player))
+		if (Nospoof(target) && (target != sender) && (target != mushstate.curr_enactor) && (target != mushstate.curr_player))
 		{
 			if (sender != Owner(sender))
 			{
-				if (sender != mudstate.curr_enactor)
+				if (sender != mushstate.curr_enactor)
 				{
-					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mudstate.curr_enactor);
+					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mushstate.curr_enactor);
 				}
 				else
 				{
 					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}] ", Name(sender), sender, Name(Owner(sender)));
 				}
 			}
-			else if (sender != mudstate.curr_enactor)
+			else if (sender != mushstate.curr_enactor)
 			{
-				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mudstate.curr_enactor);
+				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mushstate.curr_enactor);
 			}
 			else
 			{
@@ -844,7 +844,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	case TYPE_PLAYER:
 		if (will_send)
 		{
-			if (mudconf.have_pueblo == 1)
+			if (mushconf.have_pueblo == 1)
 			{
 				if (key & MSG_ME)
 				{
@@ -877,7 +877,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 				}
 			}
 
-			if (!mudconf.player_listen)
+			if (!mushconf.player_listen)
 			{
 				check_listens = 0;
 			}
@@ -892,7 +892,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	 * they're not a player (players were already notified
 	 * above).
 	 */
-		if (mudstate.inpipe && !isPlayer(target) && will_send)
+		if (mushstate.inpipe && !isPlayer(target) && will_send)
 		{
 			raw_notify(target, NULL, msg_ns);
 		}
@@ -920,7 +920,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	     */
 			if (H_Redirect(target))
 			{
-				np = (NUMBERTAB *)nhashfind(target, &mudstate.redir_htab);
+				np = (NUMBERTAB *)nhashfind(target, &mushstate.redir_htab);
 
 				if (np && Good_obj(np->num))
 				{
@@ -941,8 +941,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	 * specifically not calling a save, since that doesn't empty
 	 * the registers.
 	 */
-		preserve = mudstate.rdata;
-		mudstate.rdata = NULL;
+		preserve = mushstate.rdata;
+		mushstate.rdata = NULL;
 		/*
 	 * Check for @Listen match if it will be useful
 	 */
@@ -1135,7 +1135,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			{
 				if (obj != target)
 				{
-					if (mudconf.have_pueblo == 1)
+					if (mushconf.have_pueblo == 1)
 					{
 						notify_check(obj, sender, MSG_ME | MSG_F_DOWN | MSG_S_OUTSIDE | (key & MSG_HTML) | herekey, NULL, buff);
 					}
@@ -1207,55 +1207,55 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * mudstate.rdata should be empty, but empty it just in case
+	 * mushstate.rdata should be empty, but empty it just in case
 	 */
 
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 			{
-				if (mudstate.rdata->q_regs[z])
-					XFREE(mudstate.rdata->q_regs[z]);
+				if (mushstate.rdata->q_regs[z])
+					XFREE(mushstate.rdata->q_regs[z]);
 			}
 
-			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
-				if (mudstate.rdata->x_names[z])
-					XFREE(mudstate.rdata->x_names[z]);
+				if (mushstate.rdata->x_names[z])
+					XFREE(mushstate.rdata->x_names[z]);
 
-				if (mudstate.rdata->x_regs[z])
-					XFREE(mudstate.rdata->x_regs[z]);
+				if (mushstate.rdata->x_regs[z])
+					XFREE(mushstate.rdata->x_regs[z]);
 			}
 
-			if (mudstate.rdata->q_regs)
+			if (mushstate.rdata->q_regs)
 			{
-				XFREE(mudstate.rdata->q_regs);
+				XFREE(mushstate.rdata->q_regs);
 			}
 
-			if (mudstate.rdata->q_lens)
+			if (mushstate.rdata->q_lens)
 			{
-				XFREE(mudstate.rdata->q_lens);
+				XFREE(mushstate.rdata->q_lens);
 			}
 
-			if (mudstate.rdata->x_names)
+			if (mushstate.rdata->x_names)
 			{
-				XFREE(mudstate.rdata->x_names);
+				XFREE(mushstate.rdata->x_names);
 			}
 
-			if (mudstate.rdata->x_regs)
+			if (mushstate.rdata->x_regs)
 			{
-				XFREE(mudstate.rdata->x_regs);
+				XFREE(mushstate.rdata->x_regs);
 			}
 
-			if (mudstate.rdata->x_lens)
+			if (mushstate.rdata->x_lens)
 			{
-				XFREE(mudstate.rdata->x_lens);
+				XFREE(mushstate.rdata->x_lens);
 			}
 
-			XFREE(mudstate.rdata);
+			XFREE(mushstate.rdata);
 		}
 
-		mudstate.rdata = preserve;
+		mushstate.rdata = preserve;
 	}
 
 	if (msg_ns)
@@ -1265,7 +1265,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 
 	XFREE(msg);
 
-	mudstate.ntfy_nest_lev--;
+	mushstate.ntfy_nest_lev--;
 }
 
 void notify_except(dbref loc, dbref player, dbref exception, int flags, const char *format, ...)
@@ -1364,18 +1364,18 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 	struct timeval obj_time;
 	char *pname;
 
-	if (mudconf.lag_check_clk)
+	if (mushconf.lag_check_clk)
 	{
 		pname = log_getname(player);
 
-		if (!(yes_log && (LOG_TIMEUSE & mudconf.log_options) != 0))
+		if (!(yes_log && (LOG_TIMEUSE & mushconf.log_options) != 0))
 		{
 			yes_log = 0;
-			log_write(LOG_ALWAYS, "WIZ", "TIMECHECK", "%s checks object time use over %d seconds\n", pname, (int)(time(NULL) - mudstate.cpu_count_from));
+			log_write(LOG_ALWAYS, "WIZ", "TIMECHECK", "%s checks object time use over %d seconds\n", pname, (int)(time(NULL) - mushstate.cpu_count_from));
 		}
 		else
 		{
-			log_write(LOG_ALWAYS, "OBJ", "CPU", "%s checks object time use over %d seconds\n", pname, (int)(time(NULL) - mudstate.cpu_count_from));
+			log_write(LOG_ALWAYS, "OBJ", "CPU", "%s checks object time use over %d seconds\n", pname, (int)(time(NULL) - mushstate.cpu_count_from));
 		}
 
 		XFREE(pname);
@@ -1386,7 +1386,7 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 	 * And yes, we violate several rules of good programming practice by
 	 * failing to abstract our log calls. Oh well.
 	 */
-		for (thing = 0; thing < mudstate.db_top; thing++)
+		for (thing = 0; thing < mushstate.db_top; thing++)
 		{
 			obj_time = Time_Used(thing);
 
@@ -1418,17 +1418,17 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 
 		if (yes_screen)
 		{
-			raw_notify(player, "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, (int)(time(NULL) - mudstate.cpu_count_from));
+			raw_notify(player, "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, (int)(time(NULL) - mushstate.cpu_count_from));
 		}
 
 		if (yes_log)
 		{
-			log_write(LOG_ALWAYS, "OBJ", "CPU", "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, (int)(time(NULL) - mudstate.cpu_count_from));
+			log_write(LOG_ALWAYS, "OBJ", "CPU", "Counted %d objects using %ld msecs over %d seconds.", obj_counted, total_msecs, (int)(time(NULL) - mushstate.cpu_count_from));
 		}
 
 		if (yes_clear)
 		{
-			mudstate.cpu_count_from = time(NULL);
+			mushstate.cpu_count_from = time(NULL);
 		}
 	}
 	else
@@ -1546,35 +1546,35 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
      * First, get a list of all our text files
      */
 
-	for (i = 0; i < mudstate.helpfiles; i++)
+	for (i = 0; i < mushstate.helpfiles; i++)
 	{
-		XSNPRINTF(s1, MBUF_SIZE, "%s.txt", mudstate.hfiletab[i]);
+		XSNPRINTF(s1, MBUF_SIZE, "%s.txt", mushstate.hfiletab[i]);
 		txt = add_array(txt, s1, &txt_n);
 	}
 
-	txt = add_array(txt, mudconf.guest_file, &txt_n);
-	txt = add_array(txt, mudconf.conn_file, &txt_n);
-	txt = add_array(txt, mudconf.creg_file, &txt_n);
-	txt = add_array(txt, mudconf.regf_file, &txt_n);
-	txt = add_array(txt, mudconf.motd_file, &txt_n);
-	txt = add_array(txt, mudconf.wizmotd_file, &txt_n);
-	txt = add_array(txt, mudconf.quit_file, &txt_n);
-	txt = add_array(txt, mudconf.down_file, &txt_n);
-	txt = add_array(txt, mudconf.full_file, &txt_n);
-	txt = add_array(txt, mudconf.site_file, &txt_n);
-	txt = add_array(txt, mudconf.crea_file, &txt_n);
+	txt = add_array(txt, mushconf.guest_file, &txt_n);
+	txt = add_array(txt, mushconf.conn_file, &txt_n);
+	txt = add_array(txt, mushconf.creg_file, &txt_n);
+	txt = add_array(txt, mushconf.regf_file, &txt_n);
+	txt = add_array(txt, mushconf.motd_file, &txt_n);
+	txt = add_array(txt, mushconf.wizmotd_file, &txt_n);
+	txt = add_array(txt, mushconf.quit_file, &txt_n);
+	txt = add_array(txt, mushconf.down_file, &txt_n);
+	txt = add_array(txt, mushconf.full_file, &txt_n);
+	txt = add_array(txt, mushconf.site_file, &txt_n);
+	txt = add_array(txt, mushconf.crea_file, &txt_n);
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
-		txt = add_array(txt, mudconf.htmlconn_file, &txt_n);
+		txt = add_array(txt, mushconf.htmlconn_file, &txt_n);
 	}
 
 	/*
      * Next, get a list of all our config files
      */
-	for (i = 0; i < mudstate.configfiles; i++)
+	for (i = 0; i < mushstate.configfiles; i++)
 	{
-		cnf = add_array(cnf, mudstate.cfiletab[i], &cnf_n);
+		cnf = add_array(cnf, mushstate.cfiletab[i], &cnf_n);
 	}
 
 	log_write(LOG_ALWAYS, "BCK", "INFO", "Making sure flatfiles are up to date");
@@ -1588,9 +1588,9 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
      * Next. get a list of all our module files
      */
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.bakhome, mudconf.mud_shortname, mp->modname);
+		s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.bakhome, mushconf.mush_shortname, mp->modname);
 
 		if (mp->db_write_flatfile)
 		{
@@ -1620,7 +1620,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	}
 
 	/* Finally Dump our flatfile */
-	s = XASPRINTF("s", "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
+	s = XASPRINTF("s", "%s/%s.FLAT", mushconf.bakhome, mushconf.db_file);
 	log_write(LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", s);
 	pcache_sync();
 	cache_sync();
@@ -1660,7 +1660,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	}
 
 	/* We have everything we need to backup, create a temp directory */
-	tmpdir = XASPRINTF("tmpdir", "%s/backup.XXXXXX", mudconf.bakhome);
+	tmpdir = XASPRINTF("tmpdir", "%s/backup.XXXXXX", mushconf.bakhome);
 
 	if ((mkdtemp(tmpdir)) == NULL)
 	{
@@ -1757,7 +1757,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	XFREE(s);
 	/* Call our external utility to pack everything together */
 	ts = mktimestamp();
-	s = XASPRINTF("s", "%s %s %s/%s_%s.%s * 2>&1", mudconf.backup_exec, mudconf.backup_compress, mudconf.bakhome, mudconf.mud_shortname, ts, mudconf.backup_ext);
+	s = XASPRINTF("s", "%s %s %s/%s_%s.%s * 2>&1", mushconf.backup_exec, mushconf.backup_compress, mushconf.bakhome, mushconf.mush_shortname, ts, mushconf.backup_ext);
 	XFREE(ts);
 	cwd = getcwd(NULL, 0);
 
@@ -2038,7 +2038,7 @@ void write_status_file(dbref player, char *message)
 {
 	int fd, size;
 	char *msg;
-	fd = tf_open(mudconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
+	fd = tf_open(mushconf.status_file, O_RDWR | O_CREAT | O_TRUNC);
 
 	if (player != NOTHING)
 	{
@@ -2097,7 +2097,7 @@ void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, cha
 		abort();
 	}
 
-	if (mudstate.dumping)
+	if (mushstate.dumping)
 	{
 		notify(player, "Dumping. Please try again later.");
 		XFREE(name);
@@ -2129,7 +2129,7 @@ void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, cha
 	/*
      * Set up for normal shutdown
      */
-	mudstate.shutdown_flag = 1;
+	mushstate.shutdown_flag = 1;
 	XFREE(name);
 	return;
 }
@@ -2146,7 +2146,7 @@ void dump_database_internal(int dump_type)
      */
 	db_lock();
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->db_write)
 		{
@@ -2159,7 +2159,7 @@ void dump_database_internal(int dump_type)
 	switch (dump_type)
 	{
 	case DUMP_DB_CRASH:
-		XSPRINTF(tmpfile, "%s/%s.CRASH", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.CRASH", mushconf.bakhome, mushconf.db_file);
 		unlink(tmpfile);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
@@ -2184,9 +2184,9 @@ void dump_database_internal(int dump_type)
 		/*
 	 * Trigger modules to write their flat-text dbs
 	 */
-		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 		{
-			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 
 			if (mp->db_write_flatfile)
 			{
@@ -2216,7 +2216,7 @@ void dump_database_internal(int dump_type)
 		/*
 	 * Write the game's flatfile
 	 */
-		XSPRINTF(tmpfile, "%s/%s.FLAT", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.FLAT", mushconf.bakhome, mushconf.db_file);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
 		if (f != NULL)
@@ -2232,7 +2232,7 @@ void dump_database_internal(int dump_type)
 		break;
 
 	case DUMP_DB_KILLED:
-		XSPRINTF(tmpfile, "%s/%s.KILLED", mudconf.bakhome, mudconf.db_file);
+		XSPRINTF(tmpfile, "%s/%s.KILLED", mushconf.bakhome, mushconf.db_file);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
 		if (f != NULL)
@@ -2259,9 +2259,9 @@ void dump_database_internal(int dump_type)
 		/*
 	 * Call modules to write to their flat-text database
 	 */
-		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 		{
-			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 
 			if (mp->db_write_flatfile)
 			{
@@ -2293,25 +2293,25 @@ void dump_database_internal(int dump_type)
 
 void dump_database(void)
 {
-	mudstate.epoch++;
-	mudstate.dumping = 1;
-	log_write(LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mudconf.db_file, mudstate.epoch);
+	mushstate.epoch++;
+	mushstate.dumping = 1;
+	log_write(LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mushconf.db_file, mushstate.epoch);
 	pcache_sync();
 	cache_sync();
 	dump_database_internal(DUMP_DB_NORMAL);
-	log_write(LOG_DBSAVES, "DMP", "DONE", "Dump complete: %s.#%d#", mudconf.db_file, mudstate.epoch);
-	mudstate.dumping = 0;
+	log_write(LOG_DBSAVES, "DMP", "DONE", "Dump complete: %s.#%d#", mushconf.db_file, mushstate.epoch);
+	mushstate.dumping = 0;
 }
 
 void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 {
-	if (mudconf.dump_msg)
+	if (mushconf.dump_msg)
 	{
-		raw_broadcast(0, "%s", mudconf.dump_msg);
+		raw_broadcast(0, "%s", mushconf.dump_msg);
 	}
 
-	mudstate.epoch++;
-	mudstate.dumping = 1;
+	mushstate.epoch++;
+	mushstate.dumping = 1;
 
 	if (!key || (key & DUMP_TEXT))
 	{
@@ -2320,7 +2320,7 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 	if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE))
 	{
-		log_write(LOG_DBSAVES, "DMP", "CHKPT", "Checkpointing: %s.#%d#", mudconf.db_file, mudstate.epoch);
+		log_write(LOG_DBSAVES, "DMP", "CHKPT", "Checkpointing: %s.#%d#", mushconf.db_file, mushstate.epoch);
 	}
 
 	al_store(); /* Save cached modified attribute list */
@@ -2334,7 +2334,7 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 	{
 		cache_sync();
 
-		if ((key & DUMP_OPTIMIZE) || (mudconf.dbopt_interval && (mudstate.epoch % mudconf.dbopt_interval == 0)))
+		if ((key & DUMP_OPTIMIZE) || (mushconf.dbopt_interval && (mushstate.epoch % mushconf.dbopt_interval == 0)))
 		{
 			dddb_optimize();
 		}
@@ -2342,23 +2342,23 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 	if (!key || (key & DUMP_STRUCT) || (key & DUMP_FLATFILE))
 	{
-		if (mudconf.fork_dump)
+		if (mushconf.fork_dump)
 		{
-			if (mudconf.fork_vfork)
+			if (mushconf.fork_vfork)
 			{
-				mudstate.dumper = vfork();
+				mushstate.dumper = vfork();
 			}
 			else
 			{
-				mudstate.dumper = fork();
+				mushstate.dumper = fork();
 			}
 		}
 		else
 		{
-			mudstate.dumper = 0;
+			mushstate.dumper = 0;
 		}
 
-		if (mudstate.dumper == 0)
+		if (mushstate.dumper == 0)
 		{
 			if (key & DUMP_FLATFILE)
 			{
@@ -2369,28 +2369,28 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 				dump_database_internal(DUMP_DB_NORMAL);
 			}
 
-			if (mudconf.fork_dump)
+			if (mushconf.fork_dump)
 			{
 				_exit(EXIT_SUCCESS);
 			}
 		}
-		else if (mudstate.dumper < 0)
+		else if (mushstate.dumper < 0)
 		{
 			log_perror("DMP", "FORK", NULL, "fork()");
 		}
 	}
 
-	if (mudstate.dumper <= 0 || kill(mudstate.dumper, 0) == -1)
+	if (mushstate.dumper <= 0 || kill(mushstate.dumper, 0) == -1)
 	{
-		mudstate.dumping = 0;
-		mudstate.dumper = 0;
+		mushstate.dumping = 0;
+		mushstate.dumper = 0;
 	}
 
-	if (mudconf.postdump_msg)
+	if (mushconf.postdump_msg)
 	{
-		if (*mudconf.postdump_msg)
+		if (*mushconf.postdump_msg)
 		{
-			raw_broadcast(0, "%s", mudconf.postdump_msg);
+			raw_broadcast(0, "%s", mushconf.postdump_msg);
 		}
 	}
 
@@ -2407,7 +2407,7 @@ void call_all_modules_nocache(char *xfn)
 	char *s;
 	s = XMALLOC(MBUF_SIZE, "s");
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, xfn);
 
@@ -2443,13 +2443,13 @@ int load_game(void)
      */
 	s1 = XMALLOC(MBUF_SIZE, "s1");
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "load_database");
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
-			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 			f = db_module_flatfile(s, 0);
 
 			if (f)
@@ -2508,7 +2508,7 @@ int Hearer(dbref thing)
 	int attr, aflags, alen;
 	ATTR *ap;
 
-	if (mudstate.inpipe && (thing == mudstate.poutobj))
+	if (mushstate.inpipe && (thing == mushstate.poutobj))
 	{
 		return 1;
 	}
@@ -2634,7 +2634,7 @@ void process_preload(void)
 	pp = (PROPDIR *)XMALLOC(sizeof(PROPDIR), "pp");
 	tstr = XMALLOC(LBUF_SIZE, "tstr");
 
-	for (thing = 0; thing < mudstate.db_top; thing++)
+	for (thing = 0; thing < mushstate.db_top; thing++)
 	{
 		/*
 	 * Ignore GOING objects
@@ -2699,7 +2699,7 @@ void process_preload(void)
 		/*
 	 * Look for STARTUP and DAILY attributes on parents.
 	 */
-		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (H_Startup(thing))
 			{
@@ -2713,11 +2713,11 @@ void process_preload(void)
 			}
 		}
 
-		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (Flags2(thing) & HAS_DAILY)
 			{
-				XSPRINTF(tbuf, "0 %d * * *", mudconf.events_daily_hour);
+				XSPRINTF(tbuf, "0 %d * * *", mushconf.events_daily_hour);
 				call_cron(thing, thing, A_DAILY, tbuf);
 				break;
 			}
@@ -2898,7 +2898,7 @@ void usage_dbrecover(void)
 
 void usage(char *prog, int which)
 {
-	fprintf(stderr, "\n%s\n\n", mudstate.version.name);
+	fprintf(stderr, "\n%s\n\n", mushstate.version.name);
 
 	switch (which)
 	{
@@ -2940,7 +2940,7 @@ void recover_flatfile(char *flat)
 	char *s, *s1;
 	vattr_init();
 
-	if (init_gdbm_db(mudconf.db_file) < 0)
+	if (init_gdbm_db(mushconf.db_file) < 0)
 	{
 		log_write_raw(1, "Can't open GDBM file\n");
 		exit(EXIT_FAILURE);
@@ -2955,13 +2955,13 @@ void recover_flatfile(char *flat)
      */
 	s1 = XMALLOC(MBUF_SIZE, "s1");
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
 
 		if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 		{
-			s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 			f = db_module_flatfile(s, 0);
 
 			if (f)
@@ -3151,12 +3151,12 @@ int dbconvert(int argc, char *argv[])
 
 	LTDL_SET_PRELOADED_SYMBOLS();
 	lt_dlinit();
-	mudconf.dbhome = XSTRDUP(opt_datadir, "argv");
-	mudconf.db_file = XSTRDUP(opt_gdbmfile, "argv");
+	mushconf.dbhome = XSTRDUP(opt_datadir, "argv");
+	mushconf.db_file = XSTRDUP(opt_gdbmfile, "argv");
 	cf_init();
-	mudstate.standalone = 1;
+	mushstate.standalone = 1;
 	cf_read(opt_conf);
-	mudstate.initializing = 0;
+	mushstate.initializing = 0;
 
 	/*
      * Open the gdbm file
@@ -3197,13 +3197,13 @@ int dbconvert(int argc, char *argv[])
 	 */
 		s1 = XMALLOC(MBUF_SIZE, "s1");
 
-		for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 		{
 			XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_read_flatfile");
 
 			if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 			{
-				s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+				s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 				f = db_module_flatfile(s, 0);
 
 				if (f)
@@ -3261,13 +3261,13 @@ int dbconvert(int argc, char *argv[])
 	     */
 			s1 = XMALLOC(MBUF_SIZE, "s1");
 
-			for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+			for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 			{
 				XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile");
 
 				if ((modfunc = (void (*)(FILE *))lt_dlsym(mp->handle, s1)) != NULL)
 				{
-					s = XASPRINTF("s", "%s/%s_mod_%s.db", mudconf.dbhome, mudconf.mud_shortname, mp->modname);
+					s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
 					f = db_module_flatfile(s, 1);
 
 					if (f)
@@ -3324,13 +3324,13 @@ int main(int argc, char *argv[])
 		{"recover", no_argument, 0, 'r'},
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
-	mudstate.initializing = 1;
-	mudstate.debug = 0;
-	mudstate.restarting = 0;
+	mushstate.initializing = 1;
+	mushstate.debug = 0;
+	mushstate.restarting = 0;
 	/*
      * Do this first, before anything gets a chance to allocate memory.
      */
-	mudstate.raw_allocs = NULL;
+	mushstate.raw_allocs = NULL;
 	umask(077); /* Keep things to us by default */
 	init_version();
 	/*
@@ -3352,11 +3352,11 @@ int main(int argc, char *argv[])
 	/*
      * Configure the minimum default values we need to start.
      */
-	mudconf.mud_shortname = XSTRDUP(DEFAULT_SHORTNAME, "cf_string");
+	mushconf.mush_shortname = XSTRDUP(DEFAULT_SHORTNAME, "cf_string");
 	s = getcwd(NULL, 0);
-	mudconf.game_home = realpath(s, NULL);
+	mushconf.game_home = realpath(s, NULL);
 	XFREE(s);
-	mudconf.game_exec = realpath(argv[0], NULL);
+	mushconf.game_exec = realpath(argv[0], NULL);
 
 	/*
      * Parse options
@@ -3367,7 +3367,7 @@ int main(int argc, char *argv[])
 		switch (c)
 		{
 		case 'd': /* Debug mode, do not fork */
-			mudstate.debug = 1;
+			mushstate.debug = 1;
 			break;
 
 		case 'm': /* Force minimum db generation */
@@ -3396,11 +3396,11 @@ int main(int argc, char *argv[])
 	 * The first non-option element is our config file.
 	 */
 		s = XSTRDUP(argv[optind++], "s");
-		mudconf.config_file = realpath(s, NULL);
+		mushconf.config_file = realpath(s, NULL);
 		XFREE(s);
 
-		s = XSTRDUP(mudconf.config_file, "s");
-		mudconf.config_home = XSTRDUP(dirname(s), "mudconf.config_home");
+		s = XSTRDUP(mushconf.config_file, "s");
+		mushconf.config_home = XSTRDUP(dirname(s), "mushconf.config_home");
 		XFREE(s);
 	}
 	else
@@ -3409,19 +3409,19 @@ int main(int argc, char *argv[])
 	 * If there was none, use the default value.
 	 */
 		s = XSTRDUP(DEFAULT_CONFIG_FILE, "s");
-		mudconf.config_file = realpath(s, NULL);
+		mushconf.config_file = realpath(s, NULL);
 		XFREE(s);
 
-		s = XSTRDUP(mudconf.config_file, "s");
-		mudconf.config_home = XSTRDUP(dirname(s), "mudconf.config_home");
+		s = XSTRDUP(mushconf.config_file, "s");
+		mushconf.config_home = XSTRDUP(dirname(s), "mushconf.config_home");
 		XFREE(s);
 	}
 
 	/* Make sure we can read the config file */
 
-	if (!fileexist(mudconf.config_file))
+	if (!fileexist(mushconf.config_file))
 	{
-		fprintf(stderr, "Unable to read configuration file %s.\n", mudconf.config_file);
+		fprintf(stderr, "Unable to read configuration file %s.\n", mushconf.config_file);
 		errflg++;
 	}
 
@@ -3434,9 +3434,9 @@ int main(int argc, char *argv[])
 	tf_init();
 	LTDL_SET_PRELOADED_SYMBOLS();
 	lt_dlinit();
-	time(&mudstate.start_time);
-	mudstate.restart_time = mudstate.start_time;
-	time(&mudstate.cpu_count_from);
+	time(&mushstate.start_time);
+	mushstate.restart_time = mushstate.start_time;
+	time(&mushstate.cpu_count_from);
 	tcache_init();
 	pcache_init();
 	templog = XSTRDUP("netmush.XXXXXX", "templog");
@@ -3451,60 +3451,60 @@ int main(int argc, char *argv[])
 	init_attrtab();
 	log_version();
 	init_mstate();
-	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mudconf.game_exec);
-	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mudconf.game_home);
-	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mudconf.config_file);
-	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mudconf.config_home);
-	cf_read(mudconf.config_file);
+	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path and name of netmush : %s", mushconf.game_exec);
+	log_write(LOG_ALWAYS, "INI", "LOAD", "Full path of work directory : %s", mushconf.game_home);
+	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mushconf.config_file);
+	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mushconf.config_home);
+	cf_read(mushconf.config_file);
 
 	/*
      * Abort if someone tried to set the number of global registers to
      * something stupid. Also adjust the character table if we need to.
      */
-	if ((mudconf.max_global_regs < 10) || (mudconf.max_global_regs > 36))
+	if ((mushconf.max_global_regs < 10) || (mushconf.max_global_regs > 36))
 	{
 		fprintf(stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (mudconf.hash_factor < 2)
+	if (mushconf.hash_factor < 2)
 	{
-		mudconf.hash_factor = 2;
+		mushconf.hash_factor = 2;
 		fprintf(stderr, "hash_factor increased to 2, fix your configuration to remove this warning.\n");
 	}
 
-	if (mudconf.max_command_args < 10)
+	if (mushconf.max_command_args < 10)
 	{
-		mudconf.max_command_args = 10;
+		mushconf.max_command_args = 10;
 		fprintf(stderr, "max_command_arguments increased to 10, fix your configuration to remove this warning.\n");
 	}
 
-	if (mudconf.player_name_length < 22)
+	if (mushconf.player_name_length < 22)
 	{
-		mudconf.player_name_length = 22;
+		mushconf.player_name_length = 22;
 		fprintf(stderr, "max_player_name_length increased to 22, fix your configuration to remove this warning.\n");
 	}
 
-	hashinit(&mudstate.player_htab, 250 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.nref_htab, 5 * mudconf.hash_factor, HT_STR);
-	nhashinit(&mudstate.qpid_htab, 50 * mudconf.hash_factor);
-	nhashinit(&mudstate.fwdlist_htab, 25 * mudconf.hash_factor);
-	nhashinit(&mudstate.propdir_htab, 25 * mudconf.hash_factor);
-	nhashinit(&mudstate.redir_htab, 5 * mudconf.hash_factor);
-	nhashinit(&mudstate.objstack_htab, 50 * mudconf.hash_factor);
-	nhashinit(&mudstate.objgrid_htab, 50 * mudconf.hash_factor);
-	nhashinit(&mudstate.parent_htab, 5 * mudconf.hash_factor);
-	nhashinit(&mudstate.desc_htab, 25 * mudconf.hash_factor);
-	hashinit(&mudstate.vars_htab, 250 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.structs_htab, 15 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.cdefs_htab, 15 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.instance_htab, 15 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.instdata_htab, 25 * mudconf.hash_factor, HT_STR);
-	hashinit(&mudstate.api_func_htab, 5 * mudconf.hash_factor, HT_STR);
+	hashinit(&mushstate.player_htab, 250 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.nref_htab, 5 * mushconf.hash_factor, HT_STR);
+	nhashinit(&mushstate.qpid_htab, 50 * mushconf.hash_factor);
+	nhashinit(&mushstate.fwdlist_htab, 25 * mushconf.hash_factor);
+	nhashinit(&mushstate.propdir_htab, 25 * mushconf.hash_factor);
+	nhashinit(&mushstate.redir_htab, 5 * mushconf.hash_factor);
+	nhashinit(&mushstate.objstack_htab, 50 * mushconf.hash_factor);
+	nhashinit(&mushstate.objgrid_htab, 50 * mushconf.hash_factor);
+	nhashinit(&mushstate.parent_htab, 5 * mushconf.hash_factor);
+	nhashinit(&mushstate.desc_htab, 25 * mushconf.hash_factor);
+	hashinit(&mushstate.vars_htab, 250 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.structs_htab, 15 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.cdefs_htab, 15 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.instance_htab, 15 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.instdata_htab, 25 * mushconf.hash_factor, HT_STR);
+	hashinit(&mushstate.api_func_htab, 5 * mushconf.hash_factor, HT_STR);
 
-	mudconf.log_file = XASPRINTF("mudconf.log_file", "%s/%s.log", mudconf.log_home, mudconf.mud_shortname);
+	mushconf.log_file = XASPRINTF("mushconf.log_file", "%s/%s.log", mushconf.log_home, mushconf.mush_shortname);
 
-	if (tailfind(mudconf.log_file, "GDBM panic: write error\n"))
+	if (tailfind(mushconf.log_file, "GDBM panic: write error\n"))
 	{
 		log_write(LOG_ALWAYS, "INI", "FATAL", "Log indicate the last run ended with GDBM panic: write error");
 		fprintf(stderr, "\nYour log file indicates that the MUSH went down on a GDBM panic\n");
@@ -3519,39 +3519,39 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Please type the following now, to ensure database integrity:\n\n");
 		fprintf(stderr, "    ./Reconstruct\n");
 		fprintf(stderr, "    ./Backup\n");
-		fprintf(stderr, "    mv -f %s %s.old\n\n", mudconf.log_file, mudconf.log_file);
+		fprintf(stderr, "    mv -f %s %s.old\n\n", mushconf.log_file, mushconf.log_file);
 		fprintf(stderr, "If this is all successful, you may type ./Startmush again to\n");
 		fprintf(stderr, "restart the MUSH. If the recovery attempt fails, you will\n");
 		fprintf(stderr, "need to restore from a previous backup.\n\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (fileexist(mudconf.log_file))
+	if (fileexist(mushconf.log_file))
 	{
 		ts = mktimestamp();
-		s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
+		s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
 		log_write(LOG_STARTUP, "LOG", "CLN", "Renaming old logfile to %s", basename(s));
-		copy_file(mudconf.log_file, s, 1);
+		copy_file(mushconf.log_file, s, 1);
 		XFREE(s);
 		XFREE(ts);
 	}
 
-	logfile_move(templog, mudconf.log_file);
+	logfile_move(templog, mushconf.log_file);
 	XFREE(templog);
-	mudconf.pid_file = XASPRINTF("mudconf.pid_file", "%s/%s.pid", mudconf.pid_home, mudconf.mud_shortname);
-	mudconf.db_file = XASPRINTF("mudconf.db_file", "%s.db", mudconf.mud_shortname);
-	mudconf.status_file = XASPRINTF("mudconf.status_file", "%s/%s.SHUTDOWN", mudconf.log_home, mudconf.mud_shortname);
+	mushconf.pid_file = XASPRINTF("mushconf.pid_file", "%s/%s.pid", mushconf.pid_home, mushconf.mush_shortname);
+	mushconf.db_file = XASPRINTF("mushconf.db_file", "%s.db", mushconf.mush_shortname);
+	mushconf.status_file = XASPRINTF("mushconf.status_file", "%s/%s.SHUTDOWN", mushconf.log_home, mushconf.mush_shortname);
 
-	s = XASPRINTF("s", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+	s = XASPRINTF("s", "%s/%s.db.RESTART", mushconf.dbhome, mushconf.mush_shortname);
 
 	if (fileexist(s))
 	{
 		log_write(LOG_ALWAYS, "INI", "LOAD", "There is a restart database, %s, present. Restarting", s);
-		mudstate.restarting = 1;
+		mushstate.restarting = 1;
 	}
 
 	XFREE(s);
-	pid = isrunning(mudconf.pid_file);
+	pid = isrunning(mushconf.pid_file);
 
 	if (pid)
 	{
@@ -3562,115 +3562,115 @@ int main(int argc, char *argv[])
 	handlestartupflatfiles(HANDLE_FLAT_KILL);
 	handlestartupflatfiles(HANDLE_FLAT_CRASH);
 
-	if (mudconf.help_users == NULL)
+	if (mushconf.help_users == NULL)
 	{
-		mudconf.help_users = XASPRINTF("mudconf.help_users", "help %s/help", mudconf.txthome);
+		mushconf.help_users = XASPRINTF("mushconf.help_users", "help %s/help", mushconf.txthome);
 	}
 
-	if (mudconf.help_wizards == NULL)
+	if (mushconf.help_wizards == NULL)
 	{
-		mudconf.help_wizards = XASPRINTF("mudconf.help_wizards", "wizhelp %s/wizhelp", mudconf.txthome);
+		mushconf.help_wizards = XASPRINTF("mushconf.help_wizards", "wizhelp %s/wizhelp", mushconf.txthome);
 	}
 
-	if (mudconf.help_quick == NULL)
+	if (mushconf.help_quick == NULL)
 	{
-		mudconf.help_quick = XASPRINTF("mudconf.help_quick", "qhelp %s/qhelp", mudconf.txthome);
+		mushconf.help_quick = XASPRINTF("mushconf.help_quick", "qhelp %s/qhelp", mushconf.txthome);
 	}
 
-	add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_users, 1);
-	add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_wizards, 1);
-	add_helpfile(GOD, (char *)"main:add_helpfile", mudconf.help_quick, 1);
+	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_users, 1);
+	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_wizards, 1);
+	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_quick, 1);
 
-	if (mudconf.guest_file == NULL)
+	if (mushconf.guest_file == NULL)
 	{
-		mudconf.guest_file = XASPRINTF("mudconf.guest_file", "%s/guest.txt", mudconf.txthome);
+		mushconf.guest_file = XASPRINTF("mushconf.guest_file", "%s/guest.txt", mushconf.txthome);
 	}
 
-	if (mudconf.conn_file == NULL)
+	if (mushconf.conn_file == NULL)
 	{
-		mudconf.conn_file = XASPRINTF("mudconf.conn_file", "%s/connect.txt", mudconf.txthome);
+		mushconf.conn_file = XASPRINTF("mushconf.conn_file", "%s/connect.txt", mushconf.txthome);
 	}
 
-	if (mudconf.creg_file == NULL)
+	if (mushconf.creg_file == NULL)
 	{
-		mudconf.creg_file = XASPRINTF("mudconf.creg_file", "%s/register.txt", mudconf.txthome);
+		mushconf.creg_file = XASPRINTF("mushconf.creg_file", "%s/register.txt", mushconf.txthome);
 	}
 
-	if (mudconf.regf_file == NULL)
+	if (mushconf.regf_file == NULL)
 	{
-		mudconf.regf_file = XASPRINTF("mudconf.regf_file", "%s/create_reg.txt", mudconf.txthome);
+		mushconf.regf_file = XASPRINTF("mushconf.regf_file", "%s/create_reg.txt", mushconf.txthome);
 	}
 
-	if (mudconf.motd_file == NULL)
+	if (mushconf.motd_file == NULL)
 	{
-		mudconf.motd_file = XASPRINTF("mudconf.motd_file", "%s/motd.txt", mudconf.txthome);
+		mushconf.motd_file = XASPRINTF("mushconf.motd_file", "%s/motd.txt", mushconf.txthome);
 	}
 
-	if (mudconf.wizmotd_file == NULL)
+	if (mushconf.wizmotd_file == NULL)
 	{
-		mudconf.wizmotd_file = XASPRINTF("mudconf.wizmotd_file", "%s/wizmotd.txt", mudconf.txthome);
+		mushconf.wizmotd_file = XASPRINTF("mushconf.wizmotd_file", "%s/wizmotd.txt", mushconf.txthome);
 	}
 
-	if (mudconf.quit_file == NULL)
+	if (mushconf.quit_file == NULL)
 	{
-		mudconf.quit_file = XASPRINTF("mudconf.quit_file", "%s/quit.txt", mudconf.txthome);
+		mushconf.quit_file = XASPRINTF("mushconf.quit_file", "%s/quit.txt", mushconf.txthome);
 	}
 
-	if (mudconf.down_file == NULL)
+	if (mushconf.down_file == NULL)
 	{
-		mudconf.down_file = XASPRINTF("mudconf.down_file", "%s/down.txt", mudconf.txthome);
+		mushconf.down_file = XASPRINTF("mushconf.down_file", "%s/down.txt", mushconf.txthome);
 	}
 
-	if (mudconf.full_file == NULL)
+	if (mushconf.full_file == NULL)
 	{
-		mudconf.full_file = XASPRINTF("mudconf.full_file", "%s/full.txt", mudconf.txthome);
+		mushconf.full_file = XASPRINTF("mushconf.full_file", "%s/full.txt", mushconf.txthome);
 	}
 
-	if (mudconf.site_file == NULL)
+	if (mushconf.site_file == NULL)
 	{
-		mudconf.site_file = XASPRINTF("mudconf.site_file", "%s/badsite.txt", mudconf.txthome);
+		mushconf.site_file = XASPRINTF("mushconf.site_file", "%s/badsite.txt", mushconf.txthome);
 	}
 
-	if (mudconf.crea_file == NULL)
+	if (mushconf.crea_file == NULL)
 	{
-		mudconf.crea_file = XASPRINTF("mudconf.crea_file", "%s/newuser.txt", mudconf.txthome);
+		mushconf.crea_file = XASPRINTF("mushconf.crea_file", "%s/newuser.txt", mushconf.txthome);
 	}
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
-		if (mudconf.htmlconn_file == NULL)
+		if (mushconf.htmlconn_file == NULL)
 		{
-			mudconf.htmlconn_file = XASPRINTF("mudconf.htmlconn_file", "%s/htmlconn.txt", mudconf.txthome);
+			mushconf.htmlconn_file = XASPRINTF("mushconf.htmlconn_file", "%s/htmlconn.txt", mushconf.txthome);
 		}
 	}
 
 	vattr_init();
-	cmdp = (CMDENT *)hashfind((char *)"wizhelp", &mudstate.command_htab);
+	cmdp = (CMDENT *)hashfind((char *)"wizhelp", &mushstate.command_htab);
 
 	if (cmdp)
 	{
 		cmdp->perms |= CA_WIZARD;
 	}
 
-	bp = mudstate.modloaded;
+	bp = mushstate.modloaded;
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		if (bp != mudstate.modloaded)
+		if (bp != mushstate.modloaded)
 		{
-			SAFE_MB_CHR(' ', mudstate.modloaded, &bp);
+			SAFE_MB_CHR(' ', mushstate.modloaded, &bp);
 		}
 
-		SAFE_MB_STR(mp->modname, mudstate.modloaded, &bp);
+		SAFE_MB_STR(mp->modname, mushstate.modloaded, &bp);
 	}
 
-	mudconf.exec_path = XSTRDUP(argv[0], "argv");
+	mushconf.exec_path = XSTRDUP(argv[0], "argv");
 	fcache_init();
 	helpindex_init();
 	/*
      * If after doing all that stuff, there is still no db, create a minimal one.
      */
-	s = XASPRINTF("s", "%s/%s", mudconf.dbhome, mudconf.db_file);
+	s = XASPRINTF("s", "%s/%s", mushconf.dbhome, mushconf.db_file);
 
 	if (!fileexist(s))
 	{
@@ -3682,17 +3682,17 @@ int main(int argc, char *argv[])
 
 	if (mindb)
 	{
-		unlink(mudconf.db_file);
+		unlink(mushconf.db_file);
 	}
 
-	if (init_gdbm_db(mudconf.db_file) < 0)
+	if (init_gdbm_db(mushconf.db_file) < 0)
 	{
-		log_write(LOG_ALWAYS, "INI", "FATAL", "Couldn't load text database: %s", mudconf.db_file);
+		log_write(LOG_ALWAYS, "INI", "FATAL", "Couldn't load text database: %s", mushconf.db_file);
 		exit(EXIT_FAILURE);
 	}
 
-	mudstate.record_players = 0;
-	mudstate.loading_db = 1;
+	mushstate.record_players = 0;
+	mushstate.loading_db = 1;
 
 	if (mindb)
 	{
@@ -3705,7 +3705,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	mudstate.loading_db = 0;
+	mushstate.loading_db = 0;
 	set_signals();
 
 	/*
@@ -3722,38 +3722,38 @@ int main(int argc, char *argv[])
 	/*
      * Reset all the hash stats
      */
-	hashreset(&mudstate.command_htab);
-	hashreset(&mudstate.logout_cmd_htab);
-	hashreset(&mudstate.func_htab);
-	hashreset(&mudstate.ufunc_htab);
-	hashreset(&mudstate.powers_htab);
-	hashreset(&mudstate.flags_htab);
-	hashreset(&mudstate.attr_name_htab);
-	hashreset(&mudstate.vattr_name_htab);
-	hashreset(&mudstate.player_htab);
-	hashreset(&mudstate.nref_htab);
-	nhashreset(&mudstate.desc_htab);
-	nhashreset(&mudstate.qpid_htab);
-	nhashreset(&mudstate.fwdlist_htab);
-	nhashreset(&mudstate.propdir_htab);
-	nhashreset(&mudstate.objstack_htab);
-	nhashreset(&mudstate.objgrid_htab);
-	nhashreset(&mudstate.parent_htab);
-	hashreset(&mudstate.vars_htab);
-	hashreset(&mudstate.structs_htab);
-	hashreset(&mudstate.cdefs_htab);
-	hashreset(&mudstate.instance_htab);
-	hashreset(&mudstate.instdata_htab);
-	hashreset(&mudstate.api_func_htab);
+	hashreset(&mushstate.command_htab);
+	hashreset(&mushstate.logout_cmd_htab);
+	hashreset(&mushstate.func_htab);
+	hashreset(&mushstate.ufunc_htab);
+	hashreset(&mushstate.powers_htab);
+	hashreset(&mushstate.flags_htab);
+	hashreset(&mushstate.attr_name_htab);
+	hashreset(&mushstate.vattr_name_htab);
+	hashreset(&mushstate.player_htab);
+	hashreset(&mushstate.nref_htab);
+	nhashreset(&mushstate.desc_htab);
+	nhashreset(&mushstate.qpid_htab);
+	nhashreset(&mushstate.fwdlist_htab);
+	nhashreset(&mushstate.propdir_htab);
+	nhashreset(&mushstate.objstack_htab);
+	nhashreset(&mushstate.objgrid_htab);
+	nhashreset(&mushstate.parent_htab);
+	hashreset(&mushstate.vars_htab);
+	hashreset(&mushstate.structs_htab);
+	hashreset(&mushstate.cdefs_htab);
+	hashreset(&mushstate.instance_htab);
+	hashreset(&mushstate.instdata_htab);
+	hashreset(&mushstate.api_func_htab);
 
-	for (i = 0; i < mudstate.helpfiles; i++)
+	for (i = 0; i < mushstate.helpfiles; i++)
 	{
-		hashreset(&mudstate.hfile_hashes[i]);
+		hashreset(&mushstate.hfile_hashes[i]);
 	}
 
 	s = XMALLOC(MBUF_SIZE, "s");
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)lt_dlsym(mp->handle, s);
@@ -3779,15 +3779,15 @@ int main(int argc, char *argv[])
 	}
 
 	XFREE(s);
-	mudstate.now = time(NULL);
+	mushstate.now = time(NULL);
 	/*
      * Initialize PCRE tables for locale.
      */
-	mudstate.retabs = pcre_maketables();
+	mushstate.retabs = pcre_maketables();
 	/*
      * Go do restart things.
      */
-	if (mudstate.restarting)
+	if (mushstate.restarting)
 	{
 		load_restart_db();
 	}
@@ -3807,7 +3807,7 @@ int main(int argc, char *argv[])
 	/*
      * Startup is done.
      */
-	mudstate.initializing = 0;
+	mushstate.initializing = 0;
 
 	/*
      * Clear all reference flags in the cache-- what happens when the
@@ -3827,12 +3827,12 @@ int main(int argc, char *argv[])
 	do_hashresize(GOD, GOD, 0);
 	log_write(LOG_STARTUP, "INI", "LOAD", "Cleanup completed.");
 
-	if (mudstate.restarting)
+	if (mushstate.restarting)
 	{
 		raw_broadcast(0, "GAME: Restart finished.");
 	}
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 	{
 		if (backup_mush(NOTHING, NOTHING, 0) != 0)
 		{
@@ -3840,7 +3840,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (!(getppid() == 1) && !mudstate.debug)
+	if (!(getppid() == 1) && !mushstate.debug)
 	{
 		int forkstatus;
 		forkstatus = fork();
@@ -3857,16 +3857,16 @@ int main(int argc, char *argv[])
 		{
 			setsid();
 
-			if (chdir(mudconf.game_home) < 0)
+			if (chdir(mushconf.game_home) < 0)
 			{
 				log_write(LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror(errno));
 			}
 		}
 	}
 
-	log_write(LOG_STARTUP, "INI", "RUN", "Startup processing complete. (Process ID : %d)\n", write_pidfile(mudconf.pid_file));
+	log_write(LOG_STARTUP, "INI", "RUN", "Startup processing complete. (Process ID : %d)\n", write_pidfile(mushconf.pid_file));
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 	{
 		/*
 	 * Cosmetic, force a newline to stderr to clear console logs 
@@ -3876,7 +3876,7 @@ int main(int argc, char *argv[])
 		fflush(stdout);
 		fprintf(stderr, "\n");
 
-		if (!mudstate.debug)
+		if (!mushstate.debug)
 		{
 			if (freopen(DEV_NULL, "w", stdout) == NULL)
 			{
@@ -3893,24 +3893,24 @@ int main(int argc, char *argv[])
 	/*
      * go do it
      */
-	if (!mudstate.debug)
+	if (!mushstate.debug)
 	{
-		mudstate.logstderr = 0;
+		mushstate.logstderr = 0;
 	}
 
 	init_timer();
-	shovechars(mudconf.port);
+	shovechars(mushconf.port);
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");
 	close_sockets(0, (char *)"Going down - Bye");
 	dump_database();
 	cache_sync();
 	dddb_close();
 
-	if (fileexist(mudconf.log_file))
+	if (fileexist(mushconf.log_file))
 	{
 		ts = mktimestamp();
-		s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
-		copy_file(mudconf.log_file, s, 1);
+		s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
+		copy_file(mushconf.log_file, s, 1);
 		XFREE(s);
 		XFREE(ts);
 	}

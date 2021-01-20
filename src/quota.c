@@ -67,7 +67,7 @@ void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
 {
 	int a = 0, r = 0, e = 0, t = 0, p = 0;
 	
-	for (dbref i = 0; i < mudstate.db_top; i++)
+	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		if ((Owner(i) != player) || (Going(i) && !isRoom(i)))
 		{
@@ -77,22 +77,22 @@ void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
 		switch (Typeof(i))
 		{
 		case TYPE_ROOM:
-			a += mudconf.room_quota;
+			a += mushconf.room_quota;
 			r++;
 			break;
 
 		case TYPE_EXIT:
-			a += mudconf.exit_quota;
+			a += mushconf.exit_quota;
 			e++;
 			break;
 
 		case TYPE_THING:
-			a += mudconf.thing_quota;
+			a += mushconf.thing_quota;
 			t++;
 			break;
 
 		case TYPE_PLAYER:
-			a += mudconf.player_quota;
+			a += mushconf.player_quota;
 			p++;
 			break;
 		}
@@ -202,7 +202,7 @@ void show_quota(dbref player, dbref victim)
 
 	if (Free_Quota(victim))
 	{
-		if (mudconf.typed_quotas)
+		if (mushconf.typed_quotas)
 		{
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%-16s: %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A  %4d - N/A", Name(victim), dq_list[QTYPE_ALL], dq_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], dq_list[QTYPE_THING], dq_list[QTYPE_PLAYER]);
 		}
@@ -213,7 +213,7 @@ void show_quota(dbref player, dbref victim)
 	}
 	else
 	{
-		if (mudconf.typed_quotas)
+		if (mushconf.typed_quotas)
 		{
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%-16s: %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d  %4d - %3d", Name(victim), dq_list[QTYPE_ALL], q_list[QTYPE_ALL], dq_list[QTYPE_ROOM], q_list[QTYPE_ROOM], dq_list[QTYPE_EXIT], q_list[QTYPE_EXIT], dq_list[QTYPE_THING], q_list[QTYPE_THING], dq_list[QTYPE_PLAYER], q_list[QTYPE_PLAYER]);
 		}
@@ -226,7 +226,7 @@ void show_quota(dbref player, dbref victim)
 
 void show_quota_header(dbref player)
 {
-	if (mudconf.typed_quotas)
+	if (mushconf.typed_quotas)
 		notify_quiet(player, "Name            : Quot - Lim  Room - Lim  Exit - Lim  Thin - Lim  Play - Lim");
 	else
 	{
@@ -240,7 +240,7 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	char *name = NULL, *target = NULL;
 	int set = 0, value = 0;
 
-	if (!(mudconf.quotas || Can_Set_Quota(player)))
+	if (!(mushconf.quotas || Can_Set_Quota(player)))
 	{
 		notify_quiet(player, "Quotas are not enabled.");
 		return;
@@ -284,7 +284,7 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 
 		show_quota_header(player);
 
-		for (i = 0; i < mudstate.db_top; i++)
+		for (i = 0; i < mushstate.db_top; i++)
 		{
 			if (isPlayer(i))
 			{

@@ -136,13 +136,13 @@ int cache_init(int width)
 
     for (x = 0; x < NUM_OBJPIPES; x++)
     {
-        mudstate.objpipes[x] = NULL;
+        mushstate.objpipes[x] = NULL;
     }
 
     /*
      * Initialize the object access counter
      */
-    mudstate.objc = 0;
+    mushstate.objc = 0;
     /*
      * mark caching system live
      */
@@ -251,8 +251,8 @@ void list_cached_objs(dbref player)
     int *count_array, *size_array;
     char *s;
     aco = maco = asize = msize = oco = moco = 0;
-    count_array = (int *)XCALLOC(mudstate.db_top, sizeof(int), "count_array");
-    size_array = (int *)XCALLOC(mudstate.db_top, sizeof(int), "size_array");
+    count_array = (int *)XCALLOC(mushstate.db_top, sizeof(int), "count_array");
+    size_array = (int *)XCALLOC(mushstate.db_top, sizeof(int), "size_array");
 
     for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
     {
@@ -272,7 +272,7 @@ void list_cached_objs(dbref player)
     raw_notify(player, NULL, "Name                            Dbref    Attrs      Size");
     raw_notify(player, NULL, "========================================================");
 
-    for (x = 0; x < mudstate.db_top; x++)
+    for (x = 0; x < mushstate.db_top; x++)
     {
         if (count_array[x] > 0)
         {
@@ -303,7 +303,7 @@ void list_cached_objs(dbref player)
         }
     }
 
-    for (x = 0; x < mudstate.db_top; x++)
+    for (x = 0; x < mushstate.db_top; x++)
     {
         if (count_array[x] > 0)
         {
@@ -397,7 +397,7 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
      */
 #ifndef MEMORY_BASED
 
-    if (!mudstate.standalone && !mudstate.dumping)
+    if (!mushstate.standalone && !mushstate.dumping)
     {
         cs_reads++;
     }
@@ -416,7 +416,7 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
     {
         if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
-            if (!mudstate.standalone && !mudstate.dumping)
+            if (!mushstate.standalone && !mushstate.dumping)
             {
                 cs_rhits++;
                 cs_ahits++;
@@ -497,7 +497,7 @@ skipcacheget:
 
 #ifdef MEMORY_BASED
 
-        if (!mudstate.standalone && !mudstate.dumping)
+        if (!mushstate.standalone && !mushstate.dumping)
         {
             cs_dbreads++;
         }
@@ -525,7 +525,7 @@ skipcacheget:
         data = db_get(key, type);
     }
 
-    if (!mudstate.standalone && !mudstate.dumping)
+    if (!mushstate.standalone && !mushstate.dumping)
     {
         cs_dbreads++;
     }
@@ -556,7 +556,7 @@ skipcacheget:
      */
     cs_size += cp->datalen;
 
-    if (mudstate.dumping)
+    if (mushstate.dumping)
     {
         /*
 	 * Link at head of chain
@@ -661,7 +661,7 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
      * Call module API hook
      */
 
-    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
     {
         if (cam__mp->cache_put_notify)
         {
@@ -670,7 +670,7 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
     }
 
 #ifndef MEMORY_BASED
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
 #endif
 
@@ -737,7 +737,7 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
     {
         if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
-            if (!mudstate.dumping)
+            if (!mushstate.dumping)
             {
                 cs_whits++;
             }
@@ -844,7 +844,7 @@ UDB_CACHE *get_free_entry(int atrsize)
      * * start flushing
      */
 
-    while ((cs_size + atrsize) > (mudconf.cache_size ? mudconf.cache_size : CACHE_SIZE))
+    while ((cs_size + atrsize) > (mushconf.cache_size ? mushconf.cache_size : CACHE_SIZE))
     {
         cp = freelist->head;
 
@@ -1061,7 +1061,7 @@ int cache_sync(void)
         return (0);
     }
 
-    if (mudstate.standalone || mudstate.restarting)
+    if (mushstate.standalone || mushstate.restarting)
     {
         /*
 	 * If we're restarting or standalone, having DBM wait for
@@ -1092,7 +1092,7 @@ int cache_sync(void)
      */
     db_unlock();
 
-    if (mudstate.standalone || mudstate.restarting)
+    if (mushstate.standalone || mushstate.restarting)
     {
         dddb_setsync(1);
     }
@@ -1115,7 +1115,7 @@ void cache_del(UDB_DATA key, unsigned int type)
      * Call module API hook
      */
 
-    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
     {
         if (cam__mp->cache_del_notify)
         {

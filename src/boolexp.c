@@ -158,13 +158,13 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		 * whose number is the argument of the operation.
 		 * 
 		 */
-		mudstate.lock_nest_lev++;
+		mushstate.lock_nest_lev++;
 
-		if (mudstate.lock_nest_lev >= mudconf.lock_nest_lim)
+		if (mushstate.lock_nest_lev >= mushconf.lock_nest_lim)
 		{
 			pname = log_getname(player);
 
-			if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
+			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
 				log_write(LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock exceeded recursion limit.", pname, lname);
@@ -177,14 +177,14 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 			XFREE(pname);
 			notify(player, "Sorry, broken lock!");
-			mudstate.lock_nest_lev--;
+			mushstate.lock_nest_lev--;
 			return false;
 		}
 
 		if ((b->sub1->type != BOOLEXP_CONST) || (b->sub1->thing < 0))
 		{
 			pname = log_getname(player);
-			if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
+			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
 				
@@ -199,7 +199,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			XFREE(pname);
 
 			notify(player, "Sorry, broken lock!");
-			mudstate.lock_nest_lev--;
+			mushstate.lock_nest_lev--;
 			return false;
 		}
 
@@ -208,7 +208,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		c = eval_boolexp_atr(player, b->sub1->thing, from, key);
 		lock_originator = NOTHING;
 		XFREE(key);
-		mudstate.lock_nest_lev--;
+		mushstate.lock_nest_lev--;
 		return (c);
 
 	case BOOLEXP_CONST:
@@ -566,7 +566,7 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 * so we skip the expensive match code.
 		 * 
 		 */
-		if (!mudstate.standalone)
+		if (!mushstate.standalone)
 		{
 			if (parsing_internal)
 			{
@@ -895,7 +895,7 @@ BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal)
 	pStore = pBuf = XMALLOC(LBUF_SIZE, "parsestore");
 	XSTRCPY(pBuf, buf);
 
-	if (!mudstate.standalone)
+	if (!mushstate.standalone)
 	{
 		parsing_internal = internal;
 	}

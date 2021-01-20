@@ -168,7 +168,7 @@ dbref new_home(dbref player)
 		return loc;
 	}
 
-	return (Good_home(mudconf.default_home) ? mudconf.default_home : (Good_home(mudconf.start_home) ? mudconf.start_home : (Good_home(mudconf.start_room) ? mudconf.start_room : 0)));
+	return (Good_home(mushconf.default_home) ? mushconf.default_home : (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
 }
 
 dbref clone_home(dbref player, dbref thing)
@@ -307,7 +307,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
      * * freelist, or we have to be under the limit).
      */
 
-	if ((mudstate.db_top + 1 >= mudconf.building_limit) && (mudstate.freelist == NOTHING))
+	if ((mushstate.db_top + 1 >= mushconf.building_limit) && (mushstate.freelist == NOTHING))
 	{
 		notify(player, "The database building limit has been reached.");
 		return NOTHING;
@@ -321,74 +321,74 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	switch (objtype)
 	{
 	case TYPE_ROOM:
-		cost = mudconf.digcost;
-		quota = mudconf.room_quota;
-		f1 = mudconf.room_flags.word1;
-		f2 = mudconf.room_flags.word2;
-		f3 = mudconf.room_flags.word3;
+		cost = mushconf.digcost;
+		quota = mushconf.room_quota;
+		f1 = mushconf.room_flags.word1;
+		f2 = mushconf.room_flags.word2;
+		f3 = mushconf.room_flags.word3;
 		okname = ok_name(name);
 		tname = "a room";
 
-		if (Good_obj(mudconf.room_parent))
+		if (Good_obj(mushconf.room_parent))
 		{
-			parent = mudconf.room_parent;
+			parent = mushconf.room_parent;
 		}
 
-		if (Good_obj(mudconf.room_proto))
+		if (Good_obj(mushconf.room_proto))
 		{
-			proto = mudconf.room_proto;
+			proto = mushconf.room_proto;
 		}
 
 		break;
 
 	case TYPE_THING:
-		if (cost < mudconf.createmin)
+		if (cost < mushconf.createmin)
 		{
-			cost = mudconf.createmin;
+			cost = mushconf.createmin;
 		}
 
-		if (cost > mudconf.createmax)
+		if (cost > mushconf.createmax)
 		{
-			cost = mudconf.createmax;
+			cost = mushconf.createmax;
 		}
 
-		quota = mudconf.thing_quota;
-		f1 = mudconf.thing_flags.word1;
-		f2 = mudconf.thing_flags.word2;
-		f3 = mudconf.thing_flags.word3;
+		quota = mushconf.thing_quota;
+		f1 = mushconf.thing_flags.word1;
+		f2 = mushconf.thing_flags.word2;
+		f3 = mushconf.thing_flags.word3;
 		value = OBJECT_ENDOWMENT(cost);
 		okname = ok_name(name);
 		tname = "a thing";
 
-		if (Good_obj(mudconf.thing_parent))
+		if (Good_obj(mushconf.thing_parent))
 		{
-			parent = mudconf.thing_parent;
+			parent = mushconf.thing_parent;
 		}
 
-		if (Good_obj(mudconf.thing_proto))
+		if (Good_obj(mushconf.thing_proto))
 		{
-			proto = mudconf.thing_proto;
+			proto = mushconf.thing_proto;
 		}
 
 		break;
 
 	case TYPE_EXIT:
-		cost = mudconf.opencost;
-		quota = mudconf.exit_quota;
-		f1 = mudconf.exit_flags.word1;
-		f2 = mudconf.exit_flags.word2;
-		f3 = mudconf.exit_flags.word3;
+		cost = mushconf.opencost;
+		quota = mushconf.exit_quota;
+		f1 = mushconf.exit_flags.word1;
+		f2 = mushconf.exit_flags.word2;
+		f3 = mushconf.exit_flags.word3;
 		okname = ok_name(name) && ok_exit_name(name);
 		tname = "an exit";
 
-		if (Good_obj(mudconf.exit_parent))
+		if (Good_obj(mushconf.exit_parent))
 		{
-			parent = mudconf.exit_parent;
+			parent = mushconf.exit_parent;
 		}
 
-		if (Good_obj(mudconf.exit_proto))
+		if (Good_obj(mushconf.exit_proto))
 		{
-			proto = mudconf.exit_proto;
+			proto = mushconf.exit_proto;
 		}
 
 		break;
@@ -396,11 +396,11 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	case TYPE_PLAYER:
 		if (cost)
 		{
-			cost = mudconf.robotcost;
-			quota = mudconf.player_quota;
-			f1 = mudconf.robot_flags.word1;
-			f2 = mudconf.robot_flags.word2;
-			f3 = mudconf.robot_flags.word3;
+			cost = mushconf.robotcost;
+			quota = mushconf.player_quota;
+			f1 = mushconf.robot_flags.word1;
+			f2 = mushconf.robot_flags.word2;
+			f3 = mushconf.robot_flags.word3;
 			value = 0;
 			tname = "a robot";
 			require_inherit = 1;
@@ -409,23 +409,23 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 		{
 			cost = 0;
 			quota = 0;
-			f1 = mudconf.player_flags.word1;
-			f2 = mudconf.player_flags.word2;
-			f3 = mudconf.player_flags.word3;
-			value = mudconf.paystart;
-			quota = mudconf.start_quota;
+			f1 = mushconf.player_flags.word1;
+			f2 = mushconf.player_flags.word2;
+			f3 = mushconf.player_flags.word3;
+			value = mushconf.paystart;
+			quota = mushconf.start_quota;
 			self_owned = 1;
 			tname = "a player";
 		}
 
-		if (Good_obj(mudconf.player_parent))
+		if (Good_obj(mushconf.player_parent))
 		{
-			parent = mudconf.player_parent;
+			parent = mushconf.player_parent;
 		}
 
-		if (Good_obj(mudconf.player_proto))
+		if (Good_obj(mushconf.player_proto))
 		{
-			proto = mudconf.player_proto;
+			proto = mushconf.player_proto;
 		}
 
 		buff = munge_space(name);
@@ -513,26 +513,26 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
      */
 	obj = NOTHING;
 
-	if (mudstate.freelist != NOTHING)
+	if (mushstate.freelist != NOTHING)
 	{
-		obj = mudstate.freelist;
+		obj = mushstate.freelist;
 
 		if (Good_dbref(obj) && IS_CLEAN(obj))
 		{
-			mudstate.freelist = Link(obj);
+			mushstate.freelist = Link(obj);
 		}
 		else
 		{
 			log_write(LOG_PROBLEMS, "FRL", "DAMAG", "Freelist damaged, bad object #%d.", obj);
 			obj = NOTHING;
-			mudstate.freelist = NOTHING;
+			mushstate.freelist = NOTHING;
 		}
 	}
 
 	if (obj == NOTHING)
 	{
-		obj = mudstate.db_top;
-		db_grow(mudstate.db_top + 1);
+		obj = mushstate.db_top;
+		db_grow(mushstate.db_top + 1);
 	}
 
 	atr_free(obj); /* just in case... */
@@ -549,7 +549,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
      * We do not autozone players to their creators.
      */
 
-	if (mudconf.autozone && (player != NOTHING) && (objtype != TYPE_PLAYER))
+	if (mushconf.autozone && (player != NOTHING) && (objtype != TYPE_PLAYER))
 	{
 		s_Zone(obj, Zone(player));
 	}
@@ -587,7 +587,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	s_Name(obj, buff);
 	XFREE(buff);
 
-	if (mudconf.lag_check_clk)
+	if (mushconf.lag_check_clk)
 	{
 		obj_time.tv_sec = obj_time.tv_usec = 0;
 		db[obj].cpu_time_used.tv_sec = obj_time.tv_sec;
@@ -614,7 +614,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 		buff[strlen(buff) - 1] = '\0';
 		atr_add_raw(obj, A_LAST, buff);
 		buff = XMALLOC(SBUF_SIZE, "buff");
-		XSPRINTF(buff, "%d %d %d %d %d", quota, mudconf.start_room_quota, mudconf.start_exit_quota, mudconf.start_thing_quota, mudconf.start_player_quota);
+		XSPRINTF(buff, "%d %d %d %d %d", quota, mushconf.start_room_quota, mushconf.start_exit_quota, mushconf.start_thing_quota, mushconf.start_player_quota);
 		atr_add_raw(obj, A_QUOTA, buff);
 		atr_add_raw(obj, A_RQUOTA, buff);
 		add_player_name(obj, Name(obj));
@@ -622,7 +622,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 
 		if (!cost)
 		{
-			payfees(obj, 0, mudconf.player_quota, TYPE_PLAYER);
+			payfees(obj, 0, mushconf.player_quota, TYPE_PLAYER);
 		}
 	}
 
@@ -631,7 +631,7 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 		update_newobjs(player, obj, objtype);
 	}
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->create_obj)
 		{
@@ -687,7 +687,7 @@ void destroy_obj(dbref player, dbref obj)
 	xvars_clr(obj);
 	structure_clr(obj);
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->destroy_obj)
 		{
@@ -706,38 +706,38 @@ void destroy_obj(dbref player, dbref obj)
 		switch (Typeof(obj))
 		{
 		case TYPE_ROOM:
-			val = mudconf.digcost;
-			quota = mudconf.room_quota;
+			val = mushconf.digcost;
+			quota = mushconf.room_quota;
 			break;
 
 		case TYPE_THING:
 			val = OBJECT_DEPOSIT(Pennies(obj));
-			quota = mudconf.thing_quota;
+			quota = mushconf.thing_quota;
 			break;
 
 		case TYPE_EXIT:
-			val = mudconf.opencost;
-			quota = mudconf.exit_quota;
+			val = mushconf.opencost;
+			quota = mushconf.exit_quota;
 			break;
 
 		case TYPE_PLAYER:
 			if (Robot(obj))
 			{
-				val = mudconf.robotcost;
+				val = mushconf.robotcost;
 			}
 			else
 			{
 				val = 0;
 			}
 
-			quota = mudconf.player_quota;
+			quota = mushconf.player_quota;
 		}
 
 		payfees(owner, -val, -quota, Typeof(obj));
 
 		if (!Quiet(owner) && !Quiet(obj))
 		{
-			notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get back your %d %s deposit for %s(#%d).", val, mudconf.one_coin, Name(obj), obj);
+			notify_check(owner, owner, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get back your %d %s deposit for %s(#%d).", val, mushconf.one_coin, Name(obj), obj);
 		}
 	}
 
@@ -823,7 +823,7 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 
 	if (IS_CLEAN(thing))
 	{
-		if (mudstate.freelist == thing)
+		if (mushstate.freelist == thing)
 		{
 			notify(player, "That object is already at the head of the freelist.");
 			return;
@@ -833,7 +833,7 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 	 * We've got to find this thing's predecessor so we avoid
 	 * * circular chaining.
 	 */
-		for (i = 0; i < mudstate.db_top; i++)
+		for (i = 0; i < mushstate.db_top; i++)
 		{
 			if (Link(i) == thing)
 			{
@@ -849,8 +849,8 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 				}
 			}
 		}
-		s_Link(thing, mudstate.freelist);
-		mudstate.freelist = thing;
+		s_Link(thing, mushstate.freelist);
+		mushstate.freelist = thing;
 		notify(player, "Object placed at the head of the freelist.");
 	}
 	else
@@ -865,9 +865,9 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 
 void make_freelist(void)
 {
-	mudstate.freelist = NOTHING;
+	mushstate.freelist = NOTHING;
 
-	for (dbref i = mudstate.db_top - 1; i >= 0; i--)
+	for (dbref i = mushstate.db_top - 1; i >= 0; i--)
 	{
 		if (IS_CLEAN(i))
 		{
@@ -876,7 +876,7 @@ void make_freelist(void)
 	     * * trim it off. Memory will be reused if new objects are
 	     * * needed, but can be eliminated by restarting.
 	     */
-			mudstate.db_top--;
+			mushstate.db_top--;
 		}
 		else
 		{
@@ -884,12 +884,12 @@ void make_freelist(void)
 		}
 	}
 
-	for (dbref i = mudstate.db_top - 1; i >= 0; i--)
+	for (dbref i = mushstate.db_top - 1; i >= 0; i--)
 	{
 		if (IS_CLEAN(i))
 		{
-			s_Link(i, mudstate.freelist);
-			mudstate.freelist = i;
+			s_Link(i, mushstate.freelist);
+			mushstate.freelist = i;
 		}
 	}
 }
@@ -1029,7 +1029,7 @@ void destroy_player(dbref victim)
 	XFREE(buf);
 	move_via_generic(victim, NOTHING, player, 0);
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->destroy_player)
 		{
@@ -1044,7 +1044,7 @@ void destroy_player(dbref victim)
 void purge_going(void)
 {
 	dbref i;
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if (!Going(i))
 		{
@@ -1130,7 +1130,7 @@ void check_dead_refs(void)
 	char *str;
 	FWDLIST *fp;
 	PROPDIR *pp;
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		/*
 	 * Check the parent
@@ -1143,7 +1143,7 @@ void check_dead_refs(void)
 				if (Going(targ))
 				{
 					s_Parent(i, (-1));
-					if (!mudstate.standalone)
+					if (!mushstate.standalone)
 					{
 						owner = Owner(i);
 						if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
@@ -1174,7 +1174,7 @@ void check_dead_refs(void)
 				if (Going(targ))
 				{
 					s_Zone(i, (-1));
-					if (!mudstate.standalone)
+					if (!mushstate.standalone)
 					{
 						owner = Owner(i);
 						if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
@@ -1215,7 +1215,7 @@ void check_dead_refs(void)
 					if (Going(targ))
 					{
 						s_Home(i, new_home(i));
-						if (!mudstate.standalone)
+						if (!mushstate.standalone)
 						{
 							owner = Owner(i);
 							if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
@@ -1263,11 +1263,11 @@ void check_dead_refs(void)
 				/*
 		 * Check wealth or value
 		 */
-				targ = OBJECT_ENDOWMENT(mudconf.createmax);
+				targ = OBJECT_ENDOWMENT(mushconf.createmax);
 
 				if (OwnsOthers(i))
 				{
-					targ += mudconf.paylimit;
+					targ += mushconf.paylimit;
 					check_pennies(i, targ, "Wealth");
 				}
 				else
@@ -1293,7 +1293,7 @@ void check_dead_refs(void)
 						if (Going(targ))
 						{
 							s_Dropto(i, (-1));
-							if (!mudstate.standalone)
+							if (!mushstate.standalone)
 							{
 								owner = Owner(i);
 								if (Good_owner(owner) && !Quiet(i) && !Quiet(owner))
@@ -1504,7 +1504,7 @@ void check_dead_refs(void)
 			owner = GOD;
 			s_Owner(i, owner);
 
-			if (!mudstate.standalone)
+			if (!mushstate.standalone)
 			{
 				halt_que(NOTHING, i);
 			}
@@ -1518,7 +1518,7 @@ void check_dead_refs(void)
 				Log_header_err(i, NOTHING, owner, 1, "Owner", "is set GOING.  Set to GOD.");
 				s_Owner(i, owner);
 
-				if (!mudstate.standalone)
+				if (!mushstate.standalone)
 				{
 					halt_que(NOTHING, i);
 				}
@@ -1771,17 +1771,17 @@ void check_loc_exits(dbref loc)
 
 void check_exit_chains(void)
 {
-	for (dbref i = 0; i < ((mudstate.db_top + 7) >> 3); i++)
+	for (dbref i = 0; i < ((mushstate.db_top + 7) >> 3); i++)
 	{
-		mudstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits->chunk[i] = (char)0x0;
 	}
 
-	for (dbref i = 0; i < mudstate.db_top; i++)
+	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		check_loc_exits(i);
 	}
 
-	for (dbref i = 0; i < mudstate.db_top; i++)
+	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		if (isExit(i) && !Marked(i))
 		{
@@ -2011,17 +2011,17 @@ void check_loc_contents(dbref loc)
 
 void check_contents_chains(void)
 {
-	for (dbref i = 0; i < ((mudstate.db_top + 7) >> 3); i++)
+	for (dbref i = 0; i < ((mushstate.db_top + 7) >> 3); i++)
 	{
-		mudstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits->chunk[i] = (char)0x0;
 	}
 
-	for (dbref i = 0; i < mudstate.db_top; i++)
+	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		check_loc_contents(i);
 	}
 
-	for (dbref i = 0; i < mudstate.db_top; i++)
+	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		if (!Going(i) && !Marked(i) && Has_location(i))
 		{
@@ -2042,7 +2042,7 @@ void do_dbck(dbref player, dbref cause __attribute__((unused)), int key)
 	check_type = key;
 	make_freelist();
 
-	if (!mudstate.standalone)
+	if (!mushstate.standalone)
 	{
 		cf_verify();
 	}
@@ -2052,7 +2052,7 @@ void do_dbck(dbref player, dbref cause __attribute__((unused)), int key)
 	check_contents_chains();
 	purge_going();
 
-	if (!mudstate.standalone && (player != NOTHING))
+	if (!mushstate.standalone && (player != NOTHING))
 	{
 		alarm(1);
 

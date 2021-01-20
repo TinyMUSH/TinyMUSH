@@ -132,26 +132,26 @@ void mod_db_sql_init()
     mod_db_sql_config.reconnect = 1;
     mod_db_sql_config.port = 3306;
     str = xmalloc(MBUF_SIZE, "mod_db_sql_init");
-    snprintf(str, MBUF_SIZE, "version %d.%d", mudstate.version.major, mudstate.version.minor);
+    snprintf(str, MBUF_SIZE, "version %d.%d", mushstate.version.major, mushstate.version.minor);
 
-    switch (mudstate.version.status)
+    switch (mushstate.version.status)
     {
     case 0:
-        snprintf(str, MBUF_SIZE, "%s, Alpha %d", str, mudstate.version.revision);
+        snprintf(str, MBUF_SIZE, "%s, Alpha %d", str, mushstate.version.revision);
         break;
 
     case 1:
-        snprintf(str, MBUF_SIZE, "%s, Beta %d", str, mudstate.version.revision);
+        snprintf(str, MBUF_SIZE, "%s, Beta %d", str, mushstate.version.revision);
         break;
 
     case 2:
-        snprintf(str, MBUF_SIZE, "%s, Release Candidate %d", str, mudstate.version.revision);
+        snprintf(str, MBUF_SIZE, "%s, Release Candidate %d", str, mushstate.version.revision);
         break;
 
     default:
-        if (mudstate.version.revision > 0)
+        if (mushstate.version.revision > 0)
         {
-            snprintf(str, MBUF_SIZE, "%s, Patch Level %d", str, mudstate.version.revision);
+            snprintf(str, MBUF_SIZE, "%s, Patch Level %d", str, mushstate.version.revision);
         }
         else
         {

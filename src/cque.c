@@ -32,7 +32,7 @@ int qpid_top = 1;
  */
 void delete_qentry(BQUE *qptr)
 {
-	nhashdelete(qptr->pid, &mudstate.qpid_htab);
+	nhashdelete(qptr->pid, &mushstate.qpid_htab);
 
 	XFREE(qptr->text);
 
@@ -114,26 +114,26 @@ void give_que(BQUE *tmp)
 
 	if (Typeof(tmp->cause) == TYPE_PLAYER)
 	{
-		if (mudstate.qlast != NULL)
+		if (mushstate.qlast != NULL)
 		{
-			mudstate.qlast->next = tmp;
-			mudstate.qlast = tmp;
+			mushstate.qlast->next = tmp;
+			mushstate.qlast = tmp;
 		}
 		else
 		{
-			mudstate.qlast = mudstate.qfirst = tmp;
+			mushstate.qlast = mushstate.qfirst = tmp;
 		}
 	}
 	else
 	{
-		if (mudstate.qllast)
+		if (mushstate.qllast)
 		{
-			mudstate.qllast->next = tmp;
-			mudstate.qllast = tmp;
+			mushstate.qllast->next = tmp;
+			mushstate.qllast = tmp;
 		}
 		else
 		{
-			mudstate.qllast = mudstate.qlfirst = tmp;
+			mushstate.qllast = mushstate.qlfirst = tmp;
 		}
 	}
 }
@@ -184,14 +184,14 @@ int halt_que(dbref player, dbref object)
 
 	if (halt_all)
 	{
-		dbrefs_array = (int *)XCALLOC(mudstate.db_top, sizeof(int), "dbrefs_array");
+		dbrefs_array = (int *)XCALLOC(mushstate.db_top, sizeof(int), "dbrefs_array");
 	}
 
 	/**
      * Player queue
 	 * 
      */
-	for (point = mudstate.qfirst; point; point = point->next)
+	for (point = mushstate.qfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
 			numhalted++;
@@ -208,7 +208,7 @@ int halt_que(dbref player, dbref object)
      * Object queue
 	 * 
      */
-	for (point = mudstate.qlfirst; point; point = point->next)
+	for (point = mushstate.qlfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
 			numhalted++;
@@ -225,7 +225,7 @@ int halt_que(dbref player, dbref object)
      * Wait queue
 	 * 
      */
-	for (point = mudstate.qwait, trail = NULL; point; point = next)
+	for (point = mushstate.qwait, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
 			numhalted++;
@@ -241,7 +241,7 @@ int halt_que(dbref player, dbref object)
 			}
 			else
 			{
-				mudstate.qwait = next = point->next;
+				mushstate.qwait = next = point->next;
 			}
 
 			delete_qentry(point);
@@ -255,7 +255,7 @@ int halt_que(dbref player, dbref object)
      * Semaphore queue
 	 * 
      */
-	for (point = mudstate.qsemfirst, trail = NULL; point; point = next)
+	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
 			numhalted++;
@@ -271,12 +271,12 @@ int halt_que(dbref player, dbref object)
 			}
 			else
 			{
-				mudstate.qsemfirst = next = point->next;
+				mushstate.qsemfirst = next = point->next;
 			}
 
-			if (point == mudstate.qsemlast)
+			if (point == mushstate.qsemlast)
 			{
-				mudstate.qsemlast = trail;
+				mushstate.qsemlast = trail;
 			}
 
 			add_to(player, point->sem, -1, point->attr);
@@ -289,11 +289,11 @@ int halt_que(dbref player, dbref object)
 
 	if (halt_all)
 	{
-		for (i = 0; i < mudstate.db_top; i++)
+		for (i = 0; i < mushstate.db_top; i++)
 		{
 			if (dbrefs_array[i])
 			{
-				giveto(i, (mudconf.waitcost * dbrefs_array[i]));
+				giveto(i, (mushconf.waitcost * dbrefs_array[i]));
 				s_Queue(i, 0);
 			}
 		}
@@ -307,7 +307,7 @@ int halt_que(dbref player, dbref object)
 		player = Owner(object);
 	}
 
-	giveto(player, (mudconf.waitcost * numhalted));
+	giveto(player, (mushconf.waitcost * numhalted));
 
 	if (object == NOTHING)
 	{
@@ -330,13 +330,13 @@ void remove_waitq(BQUE *qptr)
 {
 	BQUE *point = NULL, *trail = NULL;
 
-	if (qptr == mudstate.qwait)
+	if (qptr == mushstate.qwait)
 	{
 		/**
 		 * Head of the queue. Just remove it and relink.
 		 * 
 		 */
-		mudstate.qwait = qptr->next;
+		mushstate.qwait = qptr->next;
 	}
 	else
 	{
@@ -344,7 +344,7 @@ void remove_waitq(BQUE *qptr)
 		 * Go find it somewhere in the queue and take it out.
 		 * 
 		 */
-		for (point = mudstate.qwait, trail = NULL; point != NULL; point = point->next)
+		for (point = mushstate.qwait, trail = NULL; point != NULL; point = point->next)
 		{
 			if (qptr == point)
 			{
@@ -379,13 +379,13 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 
 	qpid = (int)strtol(pidstr, (char **)NULL, 10);
 
-	if ((qpid < 1) || (qpid > mudconf.max_qpid))
+	if ((qpid < 1) || (qpid > mushconf.max_qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;
 	}
 
-	qptr = (BQUE *)nhashfind(qpid, &mudstate.qpid_htab);
+	qptr = (BQUE *)nhashfind(qpid, &mushstate.qpid_htab);
 
 	if (!qptr)
 	{
@@ -421,7 +421,7 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 	}
 	else
 	{
-		for (tmp = mudstate.qsemfirst, last = NULL; tmp != NULL; last = tmp, tmp = tmp->next)
+		for (tmp = mushstate.qsemfirst, last = NULL; tmp != NULL; last = tmp, tmp = tmp->next)
 		{
 			if (tmp == qptr)
 			{
@@ -431,12 +431,12 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 				}
 				else
 				{
-					mudstate.qsemfirst = tmp->next;
+					mushstate.qsemfirst = tmp->next;
 				}
 
-				if (mudstate.qsemlast == tmp)
+				if (mushstate.qsemlast == tmp)
 				{
-					mudstate.qsemlast = last;
+					mushstate.qsemlast = last;
 				}
 
 				break;
@@ -447,7 +447,7 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 		delete_qentry(qptr);
 	}
 
-	giveto(victim, mudconf.waitcost);
+	giveto(victim, mushconf.waitcost);
 	a_Queue(victim, -1);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Halted queue entry PID %d.", qpid);
 }
@@ -582,7 +582,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 	{
 		num = 0;
 
-		for (point = mudstate.qsemfirst, trail = NULL; point; point = next)
+		for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 		{
 			if ((point->sem == sem) && ((point->attr == attr) || !attr))
 			{
@@ -593,11 +593,11 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 					trail->next = next = point->next;
 				}
 				else
-					mudstate.qsemfirst = next = point->next;
+					mushstate.qsemfirst = next = point->next;
 
-				if (point == mudstate.qsemlast)
+				if (point == mushstate.qsemlast)
 				{
-					mudstate.qsemlast = trail;
+					mushstate.qsemlast = trail;
 				}
 
 				/**
@@ -610,7 +610,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 				}
 				else
 				{
-					giveto(point->player, mudconf.waitcost);
+					giveto(point->player, mushconf.waitcost);
 					a_Queue(Owner(point->player), -1);
 					delete_qentry(point);
 				}
@@ -749,14 +749,14 @@ int qpid_next(void)
 {
 	int qpid = qpid_top;
 
-	for (int i = 0; i < mudconf.max_qpid; i++)
+	for (int i = 0; i < mushconf.max_qpid; i++)
 	{
-		if (qpid > mudconf.max_qpid)
+		if (qpid > mushconf.max_qpid)
 		{
 			qpid = 1;
 		}
 
-		if (nhashfind(qpid, &mudstate.qpid_htab) != NULL)
+		if (nhashfind(qpid, &mushstate.qpid_htab) != NULL)
 		{
 			qpid++;
 		}
@@ -800,9 +800,9 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
      * make sure player can afford to do it
 	 * 
      */
-	a = mudconf.waitcost;
+	a = mushconf.waitcost;
 
-	if (a && mudconf.machinecost && (random_range(0, (mudconf.machinecost)-1) == 0))
+	if (a && mushconf.machinecost && (random_range(0, (mushconf.machinecost)-1) == 0))
 	{
 		a++;
 	}
@@ -997,7 +997,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 	 * 
      */
 	tmp->pid = qpid;
-	nhashadd(qpid, (int *)tmp, &mudstate.qpid_htab);
+	nhashadd(qpid, (int *)tmp, &mushstate.qpid_htab);
 	tmp->player = player;
 	tmp->waittime = 0;
 	tmp->next = NULL;
@@ -1025,7 +1025,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 {
 	BQUE *tmp = NULL, *point = NULL, *trail = NULL;
 
-	if (mudconf.control_flags & CF_INTERP)
+	if (mushconf.control_flags & CF_INTERP)
 	{
 		tmp = setup_que(player, cause, command, args, nargs, gargs);
 	}
@@ -1069,7 +1069,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 		}
 		else
 		{
-			for (point = mudstate.qwait, trail = NULL; point && point->waittime <= tmp->waittime; point = point->next)
+			for (point = mushstate.qwait, trail = NULL; point && point->waittime <= tmp->waittime; point = point->next)
 			{
 				trail = point;
 			}
@@ -1082,7 +1082,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 			}
 			else
 			{
-				mudstate.qwait = tmp;
+				mushstate.qwait = tmp;
 			}
 		}
 	}
@@ -1090,16 +1090,16 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 	{
 		tmp->next = NULL;
 
-		if (mudstate.qsemlast != NULL)
+		if (mushstate.qsemlast != NULL)
 		{
-			mudstate.qsemlast->next = tmp;
+			mushstate.qsemlast->next = tmp;
 		}
 		else
 		{
-			mudstate.qsemfirst = tmp;
+			mushstate.qsemfirst = tmp;
 		}
 
-		mudstate.qsemlast = tmp;
+		mushstate.qsemlast = tmp;
 	}
 }
 
@@ -1130,13 +1130,13 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 
 	qpid = (int)strtol(pidstr, (char **)NULL, 10);
 
-	if ((qpid < 1) || (qpid > mudconf.max_qpid))
+	if ((qpid < 1) || (qpid > mushconf.max_qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;
 	}
 
-	qptr = (BQUE *)nhashfind(qpid, &mudstate.qpid_htab);
+	qptr = (BQUE *)nhashfind(qpid, &mushstate.qpid_htab);
 
 	if (!qptr)
 	{
@@ -1209,7 +1209,7 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 	{
 		remove_waitq(qptr);
 
-		for (point = mudstate.qwait, trail = NULL; point && point->waittime <= qptr->waittime; point = point->next)
+		for (point = mushstate.qwait, trail = NULL; point && point->waittime <= qptr->waittime; point = point->next)
 		{
 			trail = point;
 		}
@@ -1222,7 +1222,7 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 		}
 		else
 		{
-			mudstate.qwait = qptr;
+			mushstate.qwait = qptr;
 		}
 	}
 
@@ -1273,7 +1273,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 			howlong = (int)strtol(event, (char **)NULL, 10);
 		}
 
-		wait_que(player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mudstate.rdata);
+		wait_que(player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mushstate.rdata);
 		return;
 	}
 
@@ -1367,7 +1367,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 			howlong = 0;
 		}
 
-		wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mudstate.rdata);
+		wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mushstate.rdata);
 	}
 }
 
@@ -1396,7 +1396,7 @@ int que_next(void)
      * after a one-second pause.
 	 * 
      */
-	if (mudstate.qlfirst != NULL)
+	if (mushstate.qlfirst != NULL)
 	{
 		return 1;
 	}
@@ -1409,9 +1409,9 @@ int que_next(void)
      */
 	min = 1000;
 
-	for (point = mudstate.qwait; point; point = point->next)
+	for (point = mushstate.qwait; point; point = point->next)
 	{
-		this = point->waittime - mudstate.now;
+		this = point->waittime - mushstate.now;
 
 		if (this <= 2)
 		{
@@ -1424,14 +1424,14 @@ int que_next(void)
 		}
 	}
 
-	for (point = mudstate.qsemfirst; point; point = point->next)
+	for (point = mushstate.qsemfirst; point; point = point->next)
 	{
 		if (point->waittime == 0)
 		{
 			continue; /*!< Skip if no timeout */
 		}
 
-		this = point->waittime - mudstate.now;
+		this = point->waittime - mushstate.now;
 
 		if (this <= 2)
 		{
@@ -1463,27 +1463,27 @@ void do_second(void)
      * allow @halt to be type before getting blown away  by scrolling text
 	 * 
      */
-	if ((mudconf.control_flags & CF_DEQUEUE) == 0)
+	if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 	{
 		return;
 	}
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< do_second >";
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = (char *)"< do_second >";
 
-	if (mudstate.qlfirst)
+	if (mushstate.qlfirst)
 	{
-		if (mudstate.qlast)
+		if (mushstate.qlast)
 		{
-			mudstate.qlast->next = mudstate.qlfirst;
+			mushstate.qlast->next = mushstate.qlfirst;
 		}
 		else
 		{
-			mudstate.qfirst = mudstate.qlfirst;
+			mushstate.qfirst = mushstate.qlfirst;
 		}
 
-		mudstate.qlast = mudstate.qllast;
-		mudstate.qllast = mudstate.qlfirst = NULL;
+		mushstate.qlast = mushstate.qllast;
+		mushstate.qllast = mushstate.qlfirst = NULL;
 	}
 
 	/**
@@ -1492,14 +1492,14 @@ void do_second(void)
      * anyway
 	 * 
      */
-	while (mudstate.qwait && mudstate.qwait->waittime <= mudstate.now)
+	while (mushstate.qwait && mushstate.qwait->waittime <= mushstate.now)
 	{
 		/**
 		 * Do the wait queue
 		 * 
 		 */
-		point = mudstate.qwait;
-		mudstate.qwait = point->next;
+		point = mushstate.qwait;
+		mushstate.qwait = point->next;
 		give_que(point);
 	}
 
@@ -1507,7 +1507,7 @@ void do_second(void)
      * Check the semaphore queue for expired timed-waits
 	 * 
      */
-	for (point = mudstate.qsemfirst, trail = NULL; point; point = next)
+	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 	{
 		if (point->waittime == 0)
 		{
@@ -1515,7 +1515,7 @@ void do_second(void)
 			continue; /*!< Skip if not timed-wait */
 		}
 
-		if (point->waittime <= mudstate.now)
+		if (point->waittime <= mushstate.now)
 		{
 			if (trail != NULL)
 			{
@@ -1523,12 +1523,12 @@ void do_second(void)
 			}
 			else
 			{
-				mudstate.qsemfirst = next = point->next;
+				mushstate.qsemfirst = next = point->next;
 			}
 
-			if (point == mudstate.qsemlast)
+			if (point == mushstate.qsemlast)
 			{
-				mudstate.qsemlast = trail;
+				mushstate.qsemlast = trail;
 			}
 
 			add_to(point->player, point->sem, -1, (point->attr ? point->attr : A_SEMAPHORE));
@@ -1541,7 +1541,7 @@ void do_second(void)
 		}
 	}
 
-	mudstate.debug_cmd = cmdsave;
+	mushstate.debug_cmd = cmdsave;
 	return;
 }
 
@@ -1558,78 +1558,78 @@ int do_top(int ncmds)
 	int count = 0;
 	char *cmdsave = NULL;
 
-	if ((mudconf.control_flags & CF_DEQUEUE) == 0)
+	if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 	{
 		return 0;
 	}
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< do_top >";
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = (char *)"< do_top >";
 
 	for (count = 0; count < ncmds; count++)
 	{
 		if (!test_top())
 		{
-			mudstate.debug_cmd = cmdsave;
+			mushstate.debug_cmd = cmdsave;
 
-			if (mudstate.rdata)
+			if (mushstate.rdata)
 			{
-				for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+				for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 				{
-					if (mudstate.rdata->q_regs[z])
-						XFREE(mudstate.rdata->q_regs[z]);
+					if (mushstate.rdata->q_regs[z])
+						XFREE(mushstate.rdata->q_regs[z]);
 				}
 
-				for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+				for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 				{
-					if (mudstate.rdata->x_names[z])
-						XFREE(mudstate.rdata->x_names[z]);
+					if (mushstate.rdata->x_names[z])
+						XFREE(mushstate.rdata->x_names[z]);
 
-					if (mudstate.rdata->x_regs[z])
-						XFREE(mudstate.rdata->x_regs[z]);
+					if (mushstate.rdata->x_regs[z])
+						XFREE(mushstate.rdata->x_regs[z]);
 				}
 
-				if (mudstate.rdata->q_regs)
+				if (mushstate.rdata->q_regs)
 				{
-					XFREE(mudstate.rdata->q_regs);
+					XFREE(mushstate.rdata->q_regs);
 				}
 
-				if (mudstate.rdata->q_lens)
+				if (mushstate.rdata->q_lens)
 				{
-					XFREE(mudstate.rdata->q_lens);
+					XFREE(mushstate.rdata->q_lens);
 				}
 
-				if (mudstate.rdata->x_names)
+				if (mushstate.rdata->x_names)
 				{
-					XFREE(mudstate.rdata->x_names);
+					XFREE(mushstate.rdata->x_names);
 				}
 
-				if (mudstate.rdata->x_regs)
+				if (mushstate.rdata->x_regs)
 				{
-					XFREE(mudstate.rdata->x_regs);
+					XFREE(mushstate.rdata->x_regs);
 				}
 
-				if (mudstate.rdata->x_lens)
+				if (mushstate.rdata->x_lens)
 				{
-					XFREE(mudstate.rdata->x_lens);
+					XFREE(mushstate.rdata->x_lens);
 				}
 
-				XFREE(mudstate.rdata);
+				XFREE(mushstate.rdata);
 			}
 
-			mudstate.rdata = NULL;
+			mushstate.rdata = NULL;
 			return count;
 		}
 
-		player = mudstate.qfirst->player;
+		player = mushstate.qfirst->player;
 
 		if ((player >= 0) && !Going(player))
 		{
-			giveto(player, mudconf.waitcost);
-			mudstate.curr_enactor = mudstate.qfirst->cause;
-			mudstate.curr_player = player;
+			giveto(player, mushconf.waitcost);
+			mushstate.curr_enactor = mushstate.qfirst->cause;
+			mushstate.curr_player = player;
 			a_Queue(Owner(player), -1);
-			mudstate.qfirst->player = NOTHING;
+			mushstate.qfirst->player = NOTHING;
 
 			if (!Halted(player))
 			{
@@ -1637,224 +1637,224 @@ int do_top(int ncmds)
 				 * Load scratch args
 				 * 
 				 */
-				if (mudstate.qfirst->gdata)
+				if (mushstate.qfirst->gdata)
 				{
-					if (mudstate.rdata)
+					if (mushstate.rdata)
 					{
-						for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+						for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 						{
-							if (mudstate.rdata->q_regs[z])
-								XFREE(mudstate.rdata->q_regs[z]);
+							if (mushstate.rdata->q_regs[z])
+								XFREE(mushstate.rdata->q_regs[z]);
 						}
-						for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+						for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 						{
-							if (mudstate.rdata->x_names[z])
-								XFREE(mudstate.rdata->x_names[z]);
-							if (mudstate.rdata->x_regs[z])
-								XFREE(mudstate.rdata->x_regs[z]);
+							if (mushstate.rdata->x_names[z])
+								XFREE(mushstate.rdata->x_names[z]);
+							if (mushstate.rdata->x_regs[z])
+								XFREE(mushstate.rdata->x_regs[z]);
 						}
 
-						if (mudstate.rdata->q_regs)
+						if (mushstate.rdata->q_regs)
 						{
-							XFREE(mudstate.rdata->q_regs);
+							XFREE(mushstate.rdata->q_regs);
 						}
-						if (mudstate.rdata->q_lens)
+						if (mushstate.rdata->q_lens)
 						{
-							XFREE(mudstate.rdata->q_lens);
+							XFREE(mushstate.rdata->q_lens);
 						}
-						if (mudstate.rdata->x_names)
+						if (mushstate.rdata->x_names)
 						{
-							XFREE(mudstate.rdata->x_names);
+							XFREE(mushstate.rdata->x_names);
 						}
-						if (mudstate.rdata->x_regs)
+						if (mushstate.rdata->x_regs)
 						{
-							XFREE(mudstate.rdata->x_regs);
+							XFREE(mushstate.rdata->x_regs);
 						}
-						if (mudstate.rdata->x_lens)
+						if (mushstate.rdata->x_lens)
 						{
-							XFREE(mudstate.rdata->x_lens);
+							XFREE(mushstate.rdata->x_lens);
 						}
-						XFREE(mudstate.rdata);
+						XFREE(mushstate.rdata);
 					}
 
-					if (mudstate.qfirst->gdata && (mudstate.qfirst->gdata->q_alloc || mudstate.qfirst->gdata->xr_alloc))
+					if (mushstate.qfirst->gdata && (mushstate.qfirst->gdata->q_alloc || mushstate.qfirst->gdata->xr_alloc))
 					{
-						mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), "do_top");
-						mudstate.rdata->q_alloc = mudstate.qfirst->gdata->q_alloc;
-						if (mudstate.qfirst->gdata->q_alloc)
+						mushstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), "do_top");
+						mushstate.rdata->q_alloc = mushstate.qfirst->gdata->q_alloc;
+						if (mushstate.qfirst->gdata->q_alloc)
 						{
-							mudstate.rdata->q_regs = XCALLOC(mudstate.qfirst->gdata->q_alloc, sizeof(char *), "q_regs");
-							mudstate.rdata->q_lens = XCALLOC(mudstate.qfirst->gdata->q_alloc, sizeof(int), "q_lens");
+							mushstate.rdata->q_regs = XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(char *), "q_regs");
+							mushstate.rdata->q_lens = XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(int), "q_lens");
 						}
 						else
 						{
-							mudstate.rdata->q_regs = NULL;
-							mudstate.rdata->q_lens = NULL;
+							mushstate.rdata->q_regs = NULL;
+							mushstate.rdata->q_lens = NULL;
 						}
-						mudstate.rdata->xr_alloc = mudstate.qfirst->gdata->xr_alloc;
-						if (mudstate.qfirst->gdata->xr_alloc)
+						mushstate.rdata->xr_alloc = mushstate.qfirst->gdata->xr_alloc;
+						if (mushstate.qfirst->gdata->xr_alloc)
 						{
-							mudstate.rdata->x_names = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_names");
-							mudstate.rdata->x_regs = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_regs");
-							mudstate.rdata->x_lens = XCALLOC(mudstate.qfirst->gdata->xr_alloc, sizeof(int), "x_lens");
+							mushstate.rdata->x_names = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_names");
+							mushstate.rdata->x_regs = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_regs");
+							mushstate.rdata->x_lens = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(int), "x_lens");
 						}
 						else
 						{
-							mudstate.rdata->x_names = NULL;
-							mudstate.rdata->x_regs = NULL;
-							mudstate.rdata->x_lens = NULL;
+							mushstate.rdata->x_names = NULL;
+							mushstate.rdata->x_regs = NULL;
+							mushstate.rdata->x_lens = NULL;
 						}
-						mudstate.rdata->dirty = 0;
+						mushstate.rdata->dirty = 0;
 					}
 					else
 					{
-						mudstate.rdata = NULL;
+						mushstate.rdata = NULL;
 					}
 
-					if (mudstate.qfirst->gdata && mudstate.qfirst->gdata->q_alloc)
+					if (mushstate.qfirst->gdata && mushstate.qfirst->gdata->q_alloc)
 					{
-						for (int z = 0; z < mudstate.qfirst->gdata->q_alloc; z++)
+						for (int z = 0; z < mushstate.qfirst->gdata->q_alloc; z++)
 						{
-							if (mudstate.qfirst->gdata->q_regs[z] && *(mudstate.qfirst->gdata->q_regs[z]))
+							if (mushstate.qfirst->gdata->q_regs[z] && *(mushstate.qfirst->gdata->q_regs[z]))
 							{
-								mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, "do_top");
-								XMEMCPY(mudstate.rdata->q_regs[z], mudstate.qfirst->gdata->q_regs[z], mudstate.qfirst->gdata->q_lens[z] + 1);
-								mudstate.rdata->q_lens[z] = mudstate.qfirst->gdata->q_lens[z];
+								mushstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, "do_top");
+								XMEMCPY(mushstate.rdata->q_regs[z], mushstate.qfirst->gdata->q_regs[z], mushstate.qfirst->gdata->q_lens[z] + 1);
+								mushstate.rdata->q_lens[z] = mushstate.qfirst->gdata->q_lens[z];
 							}
 						}
 					}
 
-					if (mudstate.qfirst->gdata && mudstate.qfirst->gdata->xr_alloc)
+					if (mushstate.qfirst->gdata && mushstate.qfirst->gdata->xr_alloc)
 					{
-						for (int z = 0; z < mudstate.qfirst->gdata->xr_alloc; z++)
+						for (int z = 0; z < mushstate.qfirst->gdata->xr_alloc; z++)
 						{
-							if (mudstate.qfirst->gdata->x_names[z] && *(mudstate.qfirst->gdata->x_names[z]) && mudstate.qfirst->gdata->x_regs[z] && *(mudstate.qfirst->gdata->x_regs[z]))
+							if (mushstate.qfirst->gdata->x_names[z] && *(mushstate.qfirst->gdata->x_names[z]) && mushstate.qfirst->gdata->x_regs[z] && *(mushstate.qfirst->gdata->x_regs[z]))
 							{
-								mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-								strcpy(mudstate.rdata->x_names[z], mudstate.qfirst->gdata->x_names[z]);
-								mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-								XMEMCPY(mudstate.rdata->x_regs[z], mudstate.qfirst->gdata->x_regs[z], mudstate.qfirst->gdata->x_lens[z] + 1);
-								mudstate.rdata->x_lens[z] = mudstate.qfirst->gdata->x_lens[z];
+								mushstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+								strcpy(mushstate.rdata->x_names[z], mushstate.qfirst->gdata->x_names[z]);
+								mushstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+								XMEMCPY(mushstate.rdata->x_regs[z], mushstate.qfirst->gdata->x_regs[z], mushstate.qfirst->gdata->x_lens[z] + 1);
+								mushstate.rdata->x_lens[z] = mushstate.qfirst->gdata->x_lens[z];
 							}
 						}
 					}
 
-					if (mudstate.qfirst->gdata)
+					if (mushstate.qfirst->gdata)
 					{
-						mudstate.rdata->dirty = mudstate.qfirst->gdata->dirty;
+						mushstate.rdata->dirty = mushstate.qfirst->gdata->dirty;
 					}
 					else
 					{
-						mudstate.rdata->dirty = 0;
+						mushstate.rdata->dirty = 0;
 					}
 				}
 				else
 				{
-					if (mudstate.rdata)
+					if (mushstate.rdata)
 					{
-						for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+						for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 						{
-							if (mudstate.rdata->q_regs[z])
-								XFREE(mudstate.rdata->q_regs[z]);
+							if (mushstate.rdata->q_regs[z])
+								XFREE(mushstate.rdata->q_regs[z]);
 						}
-						for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+						for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 						{
-							if (mudstate.rdata->x_names[z])
-								XFREE(mudstate.rdata->x_names[z]);
-							if (mudstate.rdata->x_regs[z])
-								XFREE(mudstate.rdata->x_regs[z]);
+							if (mushstate.rdata->x_names[z])
+								XFREE(mushstate.rdata->x_names[z]);
+							if (mushstate.rdata->x_regs[z])
+								XFREE(mushstate.rdata->x_regs[z]);
 						}
 
-						if (mudstate.rdata->q_regs)
+						if (mushstate.rdata->q_regs)
 						{
-							XFREE(mudstate.rdata->q_regs);
+							XFREE(mushstate.rdata->q_regs);
 						}
-						if (mudstate.rdata->q_lens)
+						if (mushstate.rdata->q_lens)
 						{
-							XFREE(mudstate.rdata->q_lens);
+							XFREE(mushstate.rdata->q_lens);
 						}
-						if (mudstate.rdata->x_names)
+						if (mushstate.rdata->x_names)
 						{
-							XFREE(mudstate.rdata->x_names);
+							XFREE(mushstate.rdata->x_names);
 						}
-						if (mudstate.rdata->x_regs)
+						if (mushstate.rdata->x_regs)
 						{
-							XFREE(mudstate.rdata->x_regs);
+							XFREE(mushstate.rdata->x_regs);
 						}
-						if (mudstate.rdata->x_lens)
+						if (mushstate.rdata->x_lens)
 						{
-							XFREE(mudstate.rdata->x_lens);
+							XFREE(mushstate.rdata->x_lens);
 						}
-						XFREE(mudstate.rdata);
+						XFREE(mushstate.rdata);
 					}
-					mudstate.rdata = NULL;
+					mushstate.rdata = NULL;
 				}
 
-				mudstate.cmd_invk_ctr = 0;
-				process_cmdline(player, mudstate.qfirst->cause, mudstate.qfirst->comm, mudstate.qfirst->env, mudstate.qfirst->nargs, mudstate.qfirst);
+				mushstate.cmd_invk_ctr = 0;
+				process_cmdline(player, mushstate.qfirst->cause, mushstate.qfirst->comm, mushstate.qfirst->env, mushstate.qfirst->nargs, mushstate.qfirst);
 			}
 		}
 
-		if (mudstate.qfirst)
+		if (mushstate.qfirst)
 		{
-			tmp = mudstate.qfirst;
-			mudstate.qfirst = mudstate.qfirst->next;
+			tmp = mushstate.qfirst;
+			mushstate.qfirst = mushstate.qfirst->next;
 			delete_qentry(tmp);
 		}
 
-		if (!mudstate.qfirst)
+		if (!mushstate.qfirst)
 		{
-			mudstate.qlast = NULL; /*!< gotta check this, as the value's * changed */
+			mushstate.qlast = NULL; /*!< gotta check this, as the value's * changed */
 		}
 	}
 
-	if (mudstate.rdata)
+	if (mushstate.rdata)
 	{
-		for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+		for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 		{
-			if (mudstate.rdata->q_regs[z])
-				XFREE(mudstate.rdata->q_regs[z]);
+			if (mushstate.rdata->q_regs[z])
+				XFREE(mushstate.rdata->q_regs[z]);
 		}
 
-		for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+		for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 		{
-			if (mudstate.rdata->x_names[z])
-				XFREE(mudstate.rdata->x_names[z]);
+			if (mushstate.rdata->x_names[z])
+				XFREE(mushstate.rdata->x_names[z]);
 
-			if (mudstate.rdata->x_regs[z])
-				XFREE(mudstate.rdata->x_regs[z]);
+			if (mushstate.rdata->x_regs[z])
+				XFREE(mushstate.rdata->x_regs[z]);
 		}
 
-		if (mudstate.rdata->q_regs)
+		if (mushstate.rdata->q_regs)
 		{
-			XFREE(mudstate.rdata->q_regs);
+			XFREE(mushstate.rdata->q_regs);
 		}
 
-		if (mudstate.rdata->q_lens)
+		if (mushstate.rdata->q_lens)
 		{
-			XFREE(mudstate.rdata->q_lens);
+			XFREE(mushstate.rdata->q_lens);
 		}
 
-		if (mudstate.rdata->x_names)
+		if (mushstate.rdata->x_names)
 		{
-			XFREE(mudstate.rdata->x_names);
+			XFREE(mushstate.rdata->x_names);
 		}
 
-		if (mudstate.rdata->x_regs)
+		if (mushstate.rdata->x_regs)
 		{
-			XFREE(mudstate.rdata->x_regs);
+			XFREE(mushstate.rdata->x_regs);
 		}
 
-		if (mudstate.rdata->x_lens)
+		if (mushstate.rdata->x_lens)
 		{
-			XFREE(mudstate.rdata->x_lens);
+			XFREE(mushstate.rdata->x_lens);
 		}
 
-		XFREE(mudstate.rdata);
+		XFREE(mushstate.rdata);
 	}
 
-	mudstate.rdata = NULL;
-	mudstate.debug_cmd = cmdsave;
+	mushstate.rdata = NULL;
+	mushstate.debug_cmd = cmdsave;
 	return count;
 }
 
@@ -1909,11 +1909,11 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
 				 * timeout-wait on a non-Semaphore attribute.
 				 * 
 				 */
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d/%d] %d:%s:%s", tmp->sem, tmp->waittime - mudstate.now, tmp->pid, bufp, tmp->comm);
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d/%d] %d:%s:%s", tmp->sem, tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
 			}
 			else if (tmp->waittime > 0)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%d] %d:%s:%s", tmp->waittime - mudstate.now, tmp->pid, bufp, tmp->comm);
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%d] %d:%s:%s", tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
 			}
 			else if (Good_obj(tmp->sem))
 			{
@@ -2064,10 +2064,10 @@ void do_ps(dbref player, dbref cause __attribute__((unused)), int key, char *tar
      * Go do it
 	 * 
      */
-	show_que(player, key, mudstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
-	show_que(player, key, mudstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
-	show_que(player, key, mudstate.qwait, &wqtot, &wqent, &i, player_targ, obj_targ, "Wait");
-	show_que(player, key, mudstate.qsemfirst, &sqtot, &sqent, &i, player_targ, obj_targ, "Semaphore");
+	show_que(player, key, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
+	show_que(player, key, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
+	show_que(player, key, mushstate.qwait, &wqtot, &wqent, &i, player_targ, obj_targ, "Wait");
+	show_que(player, key, mushstate.qsemfirst, &sqtot, &sqent, &i, player_targ, obj_targ, "Semaphore");
 	/**
      * Display stats
 	 * 
@@ -2101,10 +2101,10 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 		i = (int)strtol(arg, (char **)NULL, 10);
 		;
 
-		if ((mudconf.control_flags & CF_DEQUEUE) == 0)
+		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 		{
 			was_disabled = 1;
-			mudconf.control_flags |= CF_DEQUEUE;
+			mushconf.control_flags |= CF_DEQUEUE;
 			notify(player, "Warning: automatic dequeueing is disabled.");
 		}
 
@@ -2112,7 +2112,7 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 
 		if (was_disabled)
 		{
-			mudconf.control_flags &= ~CF_DEQUEUE;
+			mushconf.control_flags &= ~CF_DEQUEUE;
 		}
 
 		if (!Quiet(player))
@@ -2125,10 +2125,10 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 		i = (int)strtol(arg, (char **)NULL, 10);
 		;
 
-		if ((mudconf.control_flags & CF_DEQUEUE) == 0)
+		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 		{
 			was_disabled = 1;
-			mudconf.control_flags |= CF_DEQUEUE;
+			mushconf.control_flags |= CF_DEQUEUE;
 			notify(player, "Warning: automatic dequeueing is disabled.");
 		}
 
@@ -2136,7 +2136,7 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 		 * Handle the wait queue
 		 * 
 		 */
-		for (point = mudstate.qwait; point; point = point->next)
+		for (point = mushstate.qwait; point; point = point->next)
 		{
 			point->waittime = -i;
 		}
@@ -2145,7 +2145,7 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 		 * Handle the semaphore queue
 		 * 
 		 */
-		for (point = mudstate.qsemfirst; point; point = point->next)
+		for (point = mushstate.qsemfirst; point; point = point->next)
 		{
 			if (point->waittime > 0)
 			{
@@ -2162,7 +2162,7 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 
 		if (was_disabled)
 		{
-			mudconf.control_flags &= ~CF_DEQUEUE;
+			mushconf.control_flags &= ~CF_DEQUEUE;
 		}
 
 		if (Quiet(player))

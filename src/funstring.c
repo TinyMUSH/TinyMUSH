@@ -1932,7 +1932,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	char *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
 	char *xtp;
 
-	if (!mudconf.ansi_colors)
+	if (!mushconf.ansi_colors)
 	{
 		SAFE_LB_STR(fargs[1], buff, bufc);
 		return;

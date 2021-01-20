@@ -27,9 +27,9 @@ module		comsys
 # -- Other basic defaults
 #
 port		6250
-mud_shortname	netmush
-mud_name	AnonyMUSH
-mud_owner	mush_admin@tinymush.net
+mush_shortname	netmush
+mush_name	AnonyMUSH
+mush_owner	mush_admin@tinymush.net
 #
 # -- Standard text files
 #

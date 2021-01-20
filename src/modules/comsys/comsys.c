@@ -376,8 +376,8 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
             if (isPlayer(wp->player))
             {
                 if (Nospoof(wp->player) && (wp->player != cause) &&
-                    (wp->player != mudstate.curr_enactor) &&
-                    (wp->player != mudstate.curr_player))
+                    (wp->player != mushstate.curr_enactor) &&
+                    (wp->player != mushstate.curr_player))
                 {
                     if (!mp)
                     {
@@ -396,7 +396,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                             SAFE_LB_CHR('}', msg_ns, &mp);
                         }
 
-                        if (cause != mudstate.curr_enactor)
+                        if (cause != mushstate.curr_enactor)
                         {
                             SAFE_STRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
                             SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
@@ -716,7 +716,7 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
 
         if (!payfor(player, Guest(player) ? 0 : cap->channel->charge))
         {
-            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
             return;
         }
 
@@ -2520,28 +2520,28 @@ void mod_comsys_init(void)
     mod_comsys_config.public_calias = XSTRDUP("pub", "mod_comsys_init.mod_comsys_config.public_calias");
     mod_comsys_config.guests_calias = XSTRDUP("g", "mod_comsys_init.mod_comsys_config.guests_calias");
 
-    switch (mudstate.version.status)
+    switch (mushstate.version.status)
     {
     case 0:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 1:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 2:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     default:
-        if (mudstate.version.revision > 0)
+        if (mushstate.version.revision > 0)
         {
-            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         }
         else
         {
-            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mudstate.version.major, mudstate.version.minor, PACKAGE_RELEASE_DATE);
+            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mushstate.version.major, mushstate.version.minor, PACKAGE_RELEASE_DATE);
         }
     }
 

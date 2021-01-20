@@ -33,7 +33,7 @@
  */
 char qidx_chartab(int ch)
 {
-    if (ch > (86 + mudconf.max_global_regs))
+    if (ch > (86 + mushconf.max_global_regs))
     { // > z
         return -1;
     }
@@ -41,7 +41,7 @@ char qidx_chartab(int ch)
     { // >= a
         return ch - 87;
     }
-    else if (ch > (54 + mudconf.max_global_regs))
+    else if (ch > (54 + mushconf.max_global_regs))
     { // > Z
         return -1;
     }
@@ -107,7 +107,7 @@ int set_register(const char *funcname, char *name, char *data)
 	 */
         regnum = qidx_chartab((unsigned char)*name);
 
-        if ((regnum < 0) || (regnum >= mudconf.max_global_regs))
+        if ((regnum < 0) || (regnum >= mushconf.max_global_regs))
         {
             return -1;
         }
@@ -120,17 +120,17 @@ int set_register(const char *funcname, char *name, char *data)
 
         if (!data || !*data)
         {
-            if (!mudstate.rdata || !mudstate.rdata->q_alloc || (regnum >= mudstate.rdata->q_alloc))
+            if (!mushstate.rdata || !mushstate.rdata->q_alloc || (regnum >= mushstate.rdata->q_alloc))
             {
                 return 0;
             }
 
-            if (mudstate.rdata->q_regs[regnum])
+            if (mushstate.rdata->q_regs[regnum])
             {
-                XFREE(mudstate.rdata->q_regs[regnum]);
-                mudstate.rdata->q_regs[regnum] = NULL;
-                mudstate.rdata->q_lens[regnum] = 0;
-                mudstate.rdata->dirty++;
+                XFREE(mushstate.rdata->q_regs[regnum]);
+                mushstate.rdata->q_regs[regnum] = NULL;
+                mushstate.rdata->q_lens[regnum] = 0;
+                mushstate.rdata->dirty++;
             }
 
             return 0;
@@ -141,48 +141,48 @@ int set_register(const char *funcname, char *name, char *data)
 	 * space first.
 	 */
 
-        if (!mudstate.rdata)
+        if (!mushstate.rdata)
         {
-            mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), funcname);
-            mudstate.rdata->q_alloc = mudstate.rdata->xr_alloc = 0;
-            mudstate.rdata->q_regs = mudstate.rdata->x_names = mudstate.rdata->x_regs = NULL;
-            mudstate.rdata->q_lens = mudstate.rdata->x_lens = NULL;
-            mudstate.rdata->dirty = 0;
+            mushstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), funcname);
+            mushstate.rdata->q_alloc = mushstate.rdata->xr_alloc = 0;
+            mushstate.rdata->q_regs = mushstate.rdata->x_names = mushstate.rdata->x_regs = NULL;
+            mushstate.rdata->q_lens = mushstate.rdata->x_lens = NULL;
+            mushstate.rdata->dirty = 0;
         }
 
-        if (!mudstate.rdata->q_alloc)
+        if (!mushstate.rdata->q_alloc)
         {
-            a_size = (regnum < 10) ? 10 : mudconf.max_global_regs;
-            mudstate.rdata->q_alloc = a_size;
-            mudstate.rdata->q_regs = XCALLOC(a_size, sizeof(char *), "mudstate.rdata->q_regs");
-            mudstate.rdata->q_lens = XCALLOC(a_size, sizeof(int), "mudstate.rdata->q_lens");
-            mudstate.rdata->q_alloc = a_size;
+            a_size = (regnum < 10) ? 10 : mushconf.max_global_regs;
+            mushstate.rdata->q_alloc = a_size;
+            mushstate.rdata->q_regs = XCALLOC(a_size, sizeof(char *), "mushstate.rdata->q_regs");
+            mushstate.rdata->q_lens = XCALLOC(a_size, sizeof(int), "mushstate.rdata->q_lens");
+            mushstate.rdata->q_alloc = a_size;
         }
-        else if (regnum >= mudstate.rdata->q_alloc)
+        else if (regnum >= mushstate.rdata->q_alloc)
         {
-            a_size = mudconf.max_global_regs;
-            tmp_regs = XREALLOC(mudstate.rdata->q_regs, a_size * sizeof(char *), "tmp_regs");
-            tmp_lens = XREALLOC(mudstate.rdata->q_lens, a_size * sizeof(int), "tmp_lens");
-            XMEMSET(&tmp_regs[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(char *));
-            XMEMSET(&tmp_lens[mudstate.rdata->q_alloc], (int)0, (a_size - mudstate.rdata->q_alloc) * sizeof(int));
-            mudstate.rdata->q_regs = tmp_regs;
-            mudstate.rdata->q_lens = tmp_lens;
-            mudstate.rdata->q_alloc = a_size;
+            a_size = mushconf.max_global_regs;
+            tmp_regs = XREALLOC(mushstate.rdata->q_regs, a_size * sizeof(char *), "tmp_regs");
+            tmp_lens = XREALLOC(mushstate.rdata->q_lens, a_size * sizeof(int), "tmp_lens");
+            XMEMSET(&tmp_regs[mushstate.rdata->q_alloc], (int)0, (a_size - mushstate.rdata->q_alloc) * sizeof(char *));
+            XMEMSET(&tmp_lens[mushstate.rdata->q_alloc], (int)0, (a_size - mushstate.rdata->q_alloc) * sizeof(int));
+            mushstate.rdata->q_regs = tmp_regs;
+            mushstate.rdata->q_lens = tmp_lens;
+            mushstate.rdata->q_alloc = a_size;
         }
 
         /*
 	 * Set it.
 	 */
 
-        if (!mudstate.rdata->q_regs[regnum])
+        if (!mushstate.rdata->q_regs[regnum])
         {
-            mudstate.rdata->q_regs[regnum] = XMALLOC(LBUF_SIZE, "mudstate.rdata->q_regs[regnum]");
+            mushstate.rdata->q_regs[regnum] = XMALLOC(LBUF_SIZE, "mushstate.rdata->q_regs[regnum]");
         }
 
         len = strlen(data);
-        XMEMCPY(mudstate.rdata->q_regs[regnum], data, len + 1);
-        mudstate.rdata->q_lens[regnum] = len;
-        mudstate.rdata->dirty++;
+        XMEMCPY(mushstate.rdata->q_regs[regnum], data, len + 1);
+        mushstate.rdata->q_lens[regnum] = len;
+        mushstate.rdata->dirty++;
         return len;
     }
 
@@ -193,7 +193,7 @@ int set_register(const char *funcname, char *name, char *data)
 
     if (!data || !*data)
     {
-        if (!mudstate.rdata || !mudstate.rdata->xr_alloc)
+        if (!mushstate.rdata || !mushstate.rdata->xr_alloc)
         {
             return 0;
         }
@@ -203,18 +203,18 @@ int set_register(const char *funcname, char *name, char *data)
             *p = tolower(*p);
         }
 
-        for (i = 0; i < mudstate.rdata->xr_alloc; i++)
+        for (i = 0; i < mushstate.rdata->xr_alloc; i++)
         {
-            if (mudstate.rdata->x_names[i] && !strcmp(name, mudstate.rdata->x_names[i]))
+            if (mushstate.rdata->x_names[i] && !strcmp(name, mushstate.rdata->x_names[i]))
             {
-                if (mudstate.rdata->x_regs[i])
+                if (mushstate.rdata->x_regs[i])
                 {
-                    XFREE(mudstate.rdata->x_names[i]);
-                    mudstate.rdata->x_names[i] = NULL;
-                    XFREE(mudstate.rdata->x_regs[i]);
-                    mudstate.rdata->x_regs[i] = NULL;
-                    mudstate.rdata->x_lens[i] = 0;
-                    mudstate.rdata->dirty++;
+                    XFREE(mushstate.rdata->x_names[i]);
+                    mushstate.rdata->x_names[i] = NULL;
+                    XFREE(mushstate.rdata->x_regs[i]);
+                    mushstate.rdata->x_regs[i] = NULL;
+                    mushstate.rdata->x_lens[i] = 0;
+                    mushstate.rdata->dirty++;
                     return 0;
                 }
                 else
@@ -262,28 +262,28 @@ int set_register(const char *funcname, char *name, char *data)
      * If we have no existing data, life is easy; just set it.
      */
 
-    if (!mudstate.rdata)
+    if (!mushstate.rdata)
     {
-        mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
-        mudstate.rdata->q_alloc = mudstate.rdata->xr_alloc = 0;
-        mudstate.rdata->q_regs = mudstate.rdata->x_names = mudstate.rdata->x_regs = NULL;
-        mudstate.rdata->q_lens = mudstate.rdata->x_lens = NULL;
-        mudstate.rdata->dirty = 0;
+        mushstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
+        mushstate.rdata->q_alloc = mushstate.rdata->xr_alloc = 0;
+        mushstate.rdata->q_regs = mushstate.rdata->x_names = mushstate.rdata->x_regs = NULL;
+        mushstate.rdata->q_lens = mushstate.rdata->x_lens = NULL;
+        mushstate.rdata->dirty = 0;
     }
 
-    if (!mudstate.rdata->xr_alloc)
+    if (!mushstate.rdata->xr_alloc)
     {
         a_size = NUM_ENV_VARS;
-        mudstate.rdata->x_names = XCALLOC(a_size, sizeof(char *), "mudstate.rdata->x_names");
-        mudstate.rdata->x_regs = XCALLOC(a_size, sizeof(char *), "mudstate.rdata->x_regs");
-        mudstate.rdata->x_lens = XCALLOC(a_size, sizeof(int), "mudstate.rdata->x_lens");
-        mudstate.rdata->xr_alloc = a_size;
-        mudstate.rdata->x_names[0] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[0]");
-        XSTRCPY(mudstate.rdata->x_names[0], name);
-        mudstate.rdata->x_regs[0] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[0]");
-        XMEMCPY(mudstate.rdata->x_regs[0], data, len + 1);
-        mudstate.rdata->x_lens[0] = len;
-        mudstate.rdata->dirty++;
+        mushstate.rdata->x_names = XCALLOC(a_size, sizeof(char *), "mushstate.rdata->x_names");
+        mushstate.rdata->x_regs = XCALLOC(a_size, sizeof(char *), "mushstate.rdata->x_regs");
+        mushstate.rdata->x_lens = XCALLOC(a_size, sizeof(int), "mushstate.rdata->x_lens");
+        mushstate.rdata->xr_alloc = a_size;
+        mushstate.rdata->x_names[0] = XMALLOC(SBUF_SIZE, "mushstate.rdata->x_names[0]");
+        XSTRCPY(mushstate.rdata->x_names[0], name);
+        mushstate.rdata->x_regs[0] = XMALLOC(LBUF_SIZE, "mushstate.rdata->x_regs[0]");
+        XMEMCPY(mushstate.rdata->x_regs[0], data, len + 1);
+        mushstate.rdata->x_lens[0] = len;
+        mushstate.rdata->dirty++;
         return len;
     }
 
@@ -291,13 +291,13 @@ int set_register(const char *funcname, char *name, char *data)
      * Search for an existing entry to replace.
      */
 
-    for (i = 0; i < mudstate.rdata->xr_alloc; i++)
+    for (i = 0; i < mushstate.rdata->xr_alloc; i++)
     {
-        if (mudstate.rdata->x_names[i] && !strcmp(name, mudstate.rdata->x_names[i]))
+        if (mushstate.rdata->x_names[i] && !strcmp(name, mushstate.rdata->x_names[i]))
         {
-            XMEMCPY(mudstate.rdata->x_regs[i], data, len + 1);
-            mudstate.rdata->x_lens[i] = len;
-            mudstate.rdata->dirty++;
+            XMEMCPY(mushstate.rdata->x_regs[i], data, len + 1);
+            mushstate.rdata->x_lens[i] = len;
+            mushstate.rdata->dirty++;
             return len;
         }
     }
@@ -306,19 +306,19 @@ int set_register(const char *funcname, char *name, char *data)
      * Check for an empty cell to insert into.
      */
 
-    for (i = 0; i < mudstate.rdata->xr_alloc; i++)
+    for (i = 0; i < mushstate.rdata->xr_alloc; i++)
     {
-        if (mudstate.rdata->x_names[i] == NULL)
+        if (mushstate.rdata->x_names[i] == NULL)
         {
-            mudstate.rdata->x_names[i] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[i]");
-            XSTRCPY(mudstate.rdata->x_names[i], name);
+            mushstate.rdata->x_names[i] = XMALLOC(SBUF_SIZE, "mushstate.rdata->x_names[i]");
+            XSTRCPY(mushstate.rdata->x_names[i], name);
 
-            if (!mudstate.rdata->x_regs[i]) /* should never happen */
-                mudstate.rdata->x_regs[i] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[i]");
+            if (!mushstate.rdata->x_regs[i]) /* should never happen */
+                mushstate.rdata->x_regs[i] = XMALLOC(LBUF_SIZE, "mushstate.rdata->x_regs[i]");
 
-            XMEMCPY(mudstate.rdata->x_regs[i], data, len + 1);
-            mudstate.rdata->x_lens[i] = len;
-            mudstate.rdata->dirty++;
+            XMEMCPY(mushstate.rdata->x_regs[i], data, len + 1);
+            mushstate.rdata->x_lens[i] = len;
+            mushstate.rdata->dirty++;
             return len;
         }
     }
@@ -327,12 +327,12 @@ int set_register(const char *funcname, char *name, char *data)
      * Oops. We're out of room in our existing array. Go allocate more
      * space, unless we're at our limit.
      */
-    regnum = mudstate.rdata->xr_alloc;
+    regnum = mushstate.rdata->xr_alloc;
     a_size = regnum + NUM_ENV_VARS;
 
-    if (a_size > mudconf.register_limit)
+    if (a_size > mushconf.register_limit)
     {
-        a_size = mudconf.register_limit;
+        a_size = mushconf.register_limit;
 
         if (a_size <= regnum)
         {
@@ -340,25 +340,25 @@ int set_register(const char *funcname, char *name, char *data)
         }
     }
 
-    tmp_regs = (char **)XREALLOC(mudstate.rdata->x_names, a_size * sizeof(char *), "tmp_regs");
-    mudstate.rdata->x_names = tmp_regs;
-    tmp_regs = (char **)XREALLOC(mudstate.rdata->x_regs, a_size * sizeof(char *), "tmp_regs");
-    mudstate.rdata->x_regs = tmp_regs;
-    tmp_lens = (int *)XREALLOC(mudstate.rdata->x_lens, a_size * sizeof(int), "tmp_lens");
-    mudstate.rdata->x_lens = tmp_lens;
-    XMEMSET(&mudstate.rdata->x_names[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    XMEMSET(&mudstate.rdata->x_regs[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(char *));
-    XMEMSET(&mudstate.rdata->x_lens[mudstate.rdata->xr_alloc], (int)0, (a_size - mudstate.rdata->xr_alloc) * sizeof(int));
-    mudstate.rdata->xr_alloc = a_size;
+    tmp_regs = (char **)XREALLOC(mushstate.rdata->x_names, a_size * sizeof(char *), "tmp_regs");
+    mushstate.rdata->x_names = tmp_regs;
+    tmp_regs = (char **)XREALLOC(mushstate.rdata->x_regs, a_size * sizeof(char *), "tmp_regs");
+    mushstate.rdata->x_regs = tmp_regs;
+    tmp_lens = (int *)XREALLOC(mushstate.rdata->x_lens, a_size * sizeof(int), "tmp_lens");
+    mushstate.rdata->x_lens = tmp_lens;
+    XMEMSET(&mushstate.rdata->x_names[mushstate.rdata->xr_alloc], (int)0, (a_size - mushstate.rdata->xr_alloc) * sizeof(char *));
+    XMEMSET(&mushstate.rdata->x_regs[mushstate.rdata->xr_alloc], (int)0, (a_size - mushstate.rdata->xr_alloc) * sizeof(char *));
+    XMEMSET(&mushstate.rdata->x_lens[mushstate.rdata->xr_alloc], (int)0, (a_size - mushstate.rdata->xr_alloc) * sizeof(int));
+    mushstate.rdata->xr_alloc = a_size;
     /*
      * Now we know we can insert into the first empty.
      */
-    mudstate.rdata->x_names[regnum] = XMALLOC(SBUF_SIZE, "mudstate.rdata->x_names[regnum]");
-    XSTRCPY(mudstate.rdata->x_names[regnum], name);
-    mudstate.rdata->x_regs[regnum] = XMALLOC(LBUF_SIZE, "mudstate.rdata->x_regs[regnum]");
-    XMEMCPY(mudstate.rdata->x_regs[regnum], data, len + 1);
-    mudstate.rdata->x_lens[regnum] = len;
-    mudstate.rdata->dirty++;
+    mushstate.rdata->x_names[regnum] = XMALLOC(SBUF_SIZE, "mushstate.rdata->x_names[regnum]");
+    XSTRCPY(mushstate.rdata->x_names[regnum], name);
+    mushstate.rdata->x_regs[regnum] = XMALLOC(LBUF_SIZE, "mushstate.rdata->x_regs[regnum]");
+    XMEMCPY(mushstate.rdata->x_regs[regnum], data, len + 1);
+    mushstate.rdata->x_lens[regnum] = len;
+    mushstate.rdata->dirty++;
     return len;
 }
 
@@ -381,7 +381,7 @@ char *get_register(GDATA *g, char *r)
     {
         regnum = qidx_chartab((unsigned char)r[0]);
 
-        if ((regnum < 0) || (regnum >= mudconf.max_global_regs))
+        if ((regnum < 0) || (regnum >= mushconf.max_global_regs))
         {
             return NULL;
         }
@@ -509,22 +509,22 @@ void read_register(char *regname, char *buff, char **bufc)
     {
         regnum = qidx_chartab((unsigned char)*regname);
 
-        if ((regnum < 0) || (regnum >= mudconf.max_global_regs))
+        if ((regnum < 0) || (regnum >= mushconf.max_global_regs))
         {
             SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
         }
         else
         {
-            if (mudstate.rdata && (mudstate.rdata->q_alloc > regnum) && mudstate.rdata->q_regs[regnum])
+            if (mushstate.rdata && (mushstate.rdata->q_alloc > regnum) && mushstate.rdata->q_regs[regnum])
             {
-                SAFE_STRNCAT(buff, bufc, mudstate.rdata->q_regs[regnum], mudstate.rdata->q_lens[regnum], LBUF_SIZE);
+                SAFE_STRNCAT(buff, bufc, mushstate.rdata->q_regs[regnum], mushstate.rdata->q_lens[regnum], LBUF_SIZE);
             }
         }
 
         return;
     }
 
-    if (!mudstate.rdata || !mudstate.rdata->xr_alloc)
+    if (!mushstate.rdata || !mushstate.rdata->xr_alloc)
     {
         return;
     }
@@ -534,13 +534,13 @@ void read_register(char *regname, char *buff, char **bufc)
         *p = tolower(*p);
     }
 
-    for (regnum = 0; regnum < mudstate.rdata->xr_alloc; regnum++)
+    for (regnum = 0; regnum < mushstate.rdata->xr_alloc; regnum++)
     {
-        if (mudstate.rdata->x_names[regnum] && !strcmp(regname, mudstate.rdata->x_names[regnum]))
+        if (mushstate.rdata->x_names[regnum] && !strcmp(regname, mushstate.rdata->x_names[regnum]))
         {
-            if (mudstate.rdata->x_regs[regnum])
+            if (mushstate.rdata->x_regs[regnum])
             {
-                SAFE_STRNCAT(buff, bufc, mudstate.rdata->x_regs[regnum], mudstate.rdata->x_lens[regnum], LBUF_SIZE);
+                SAFE_STRNCAT(buff, bufc, mushstate.rdata->x_regs[regnum], mushstate.rdata->x_lens[regnum], LBUF_SIZE);
                 return;
             }
         }
@@ -563,13 +563,13 @@ void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), db
     GDATA *g;
     char *bb_p;
 
-    if (!mudstate.rdata)
+    if (!mushstate.rdata)
     {
         return;
     }
 
     bb_p = *bufc;
-    g = mudstate.rdata;
+    g = mushstate.rdata;
 
     for (i = 0; i < g->q_alloc; i++)
     {
@@ -830,11 +830,11 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    save_state = mudstate.f_limitmask;
-    mudstate.f_limitmask |= lmask;
+    save_state = mushstate.f_limitmask;
+    mushstate.f_limitmask |= lmask;
     str = fargs[1];
     exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
-    mudstate.f_limitmask = save_state;
+    mushstate.f_limitmask = save_state;
 }
 
 /*
@@ -907,8 +907,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
             return;
         }
 
-        save_state = mudstate.f_limitmask;
-        mudstate.f_limitmask |= lmask;
+        save_state = mushstate.f_limitmask;
+        mushstate.f_limitmask |= lmask;
     }
 
     /*
@@ -927,52 +927,52 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (!*callp)
     {
-        if (mudstate.rdata)
+        if (mushstate.rdata)
         {
-            for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+            for (int z = 0; z < mushstate.rdata->q_alloc; z++)
             {
-                if (mudstate.rdata->q_regs[z])
-                    XFREE(mudstate.rdata->q_regs[z]);
+                if (mushstate.rdata->q_regs[z])
+                    XFREE(mushstate.rdata->q_regs[z]);
             }
 
-            for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+            for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
             {
-                if (mudstate.rdata->x_names[z])
-                    XFREE(mudstate.rdata->x_names[z]);
+                if (mushstate.rdata->x_names[z])
+                    XFREE(mushstate.rdata->x_names[z]);
 
-                if (mudstate.rdata->x_regs[z])
-                    XFREE(mudstate.rdata->x_regs[z]);
+                if (mushstate.rdata->x_regs[z])
+                    XFREE(mushstate.rdata->x_regs[z]);
             }
 
-            if (mudstate.rdata->q_regs)
+            if (mushstate.rdata->q_regs)
             {
-                XFREE(mudstate.rdata->q_regs);
+                XFREE(mushstate.rdata->q_regs);
             }
 
-            if (mudstate.rdata->q_lens)
+            if (mushstate.rdata->q_lens)
             {
-                XFREE(mudstate.rdata->q_lens);
+                XFREE(mushstate.rdata->q_lens);
             }
 
-            if (mudstate.rdata->x_names)
+            if (mushstate.rdata->x_names)
             {
-                XFREE(mudstate.rdata->x_names);
+                XFREE(mushstate.rdata->x_names);
             }
 
-            if (mudstate.rdata->x_regs)
+            if (mushstate.rdata->x_regs)
             {
-                XFREE(mudstate.rdata->x_regs);
+                XFREE(mushstate.rdata->x_regs);
             }
 
-            if (mudstate.rdata->x_lens)
+            if (mushstate.rdata->x_lens)
             {
-                XFREE(mudstate.rdata->x_lens);
+                XFREE(mushstate.rdata->x_lens);
             }
 
-            XFREE(mudstate.rdata);
+            XFREE(mushstate.rdata);
         }
 
-        mudstate.rdata = NULL;
+        mushstate.rdata = NULL;
     }
     else if (!strcmp(callp, "@_"))
     {
@@ -1004,51 +1004,51 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         /*
 	 * Pass in ONLY the named registers
 	 */
-        if (mudstate.rdata)
+        if (mushstate.rdata)
         {
-            for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+            for (int z = 0; z < mushstate.rdata->q_alloc; z++)
             {
-                if (mudstate.rdata->q_regs[z])
-                    XFREE(mudstate.rdata->q_regs[z]);
+                if (mushstate.rdata->q_regs[z])
+                    XFREE(mushstate.rdata->q_regs[z]);
             }
 
-            for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+            for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
             {
-                if (mudstate.rdata->x_names[z])
-                    XFREE(mudstate.rdata->x_names[z]);
+                if (mushstate.rdata->x_names[z])
+                    XFREE(mushstate.rdata->x_names[z]);
 
-                if (mudstate.rdata->x_regs[z])
-                    XFREE(mudstate.rdata->x_regs[z]);
+                if (mushstate.rdata->x_regs[z])
+                    XFREE(mushstate.rdata->x_regs[z]);
             }
 
-            if (mudstate.rdata->q_regs)
+            if (mushstate.rdata->q_regs)
             {
-                XFREE(mudstate.rdata->q_regs);
+                XFREE(mushstate.rdata->q_regs);
             }
 
-            if (mudstate.rdata->q_lens)
+            if (mushstate.rdata->q_lens)
             {
-                XFREE(mudstate.rdata->q_lens);
+                XFREE(mushstate.rdata->q_lens);
             }
 
-            if (mudstate.rdata->x_names)
+            if (mushstate.rdata->x_names)
             {
-                XFREE(mudstate.rdata->x_names);
+                XFREE(mushstate.rdata->x_names);
             }
 
-            if (mudstate.rdata->x_regs)
+            if (mushstate.rdata->x_regs)
             {
-                XFREE(mudstate.rdata->x_regs);
+                XFREE(mushstate.rdata->x_regs);
             }
 
-            if (mudstate.rdata->x_lens)
+            if (mushstate.rdata->x_lens)
             {
-                XFREE(mudstate.rdata->x_lens);
+                XFREE(mushstate.rdata->x_lens);
             }
 
-            XFREE(mudstate.rdata);
+            XFREE(mushstate.rdata);
         }
-        mudstate.rdata = NULL;
+        mushstate.rdata = NULL;
         call_list = XMALLOC(LBUF_SIZE, "call_list");
         XSTRCPY(call_list, callp);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
@@ -1229,9 +1229,9 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 	     * the new values of the registers on the list.
 	     */
             tmp = preserve;
-            preserve = mudstate.rdata; /* preserve is now the
+            preserve = mushstate.rdata; /* preserve is now the
 					 * new vals */
-            mudstate.rdata = tmp;      /* this is now the original
+            mushstate.rdata = tmp;      /* this is now the original
 					 * vals */
             call_list = XMALLOC(LBUF_SIZE, "call_list");
             XSTRCPY(call_list, callp + 4);
@@ -1450,7 +1450,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (is_sandbox)
     {
-        mudstate.f_limitmask = save_state;
+        mushstate.f_limitmask = save_state;
     }
 }
 
@@ -1546,7 +1546,7 @@ void set_xvar(dbref obj, char *name, char *data)
      * delete the variable.
      */
 
-    if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
+    if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
     {
         if (xvar->text)
         {
@@ -1569,7 +1569,7 @@ void set_xvar(dbref obj, char *name, char *data)
         {
             xvar->text = NULL;
             XFREE(xvar);
-            hashdelete(tbuf, &mudstate.vars_htab);
+            hashdelete(tbuf, &mushstate.vars_htab);
             s_VarsCount(obj, VarsCount(obj) - 1);
         }
     }
@@ -1580,7 +1580,7 @@ void set_xvar(dbref obj, char *name, char *data)
 	 * we're not running into a limit on the number of vars per
 	 * object.
 	 */
-        if (VarsCount(obj) + 1 > mudconf.numvars_lim)
+        if (VarsCount(obj) + 1 > mushconf.numvars_lim)
         {
             XFREE(tbuf);
             return;
@@ -1605,9 +1605,9 @@ void set_xvar(dbref obj, char *name, char *data)
             }
 
             XSTRCPY(xvar->text, data);
-            hashadd(tbuf, (int *)xvar, &mudstate.vars_htab, 0);
+            hashadd(tbuf, (int *)xvar, &mushstate.vars_htab, 0);
             s_VarsCount(obj, VarsCount(obj) + 1);
-            mudstate.max_vars = mudstate.vars_htab.entries > mudstate.max_vars ? mudstate.vars_htab.entries : mudstate.max_vars;
+            mushstate.max_vars = mushstate.vars_htab.entries > mushstate.max_vars ? mushstate.vars_htab.entries : mushstate.max_vars;
         }
     }
     XFREE(tbuf);
@@ -1647,7 +1647,7 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
         SAFE_SB_STR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
-        if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
+        if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
         {
             if (xvar->text)
             {
@@ -1656,7 +1656,7 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
             }
 
             XFREE(xvar);
-            hashdelete(tbuf, &mudstate.vars_htab);
+            hashdelete(tbuf, &mushstate.vars_htab);
         }
     }
 
@@ -1678,7 +1678,7 @@ void xvars_clr(dbref player)
     SAFE_SB_CHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
-    htab = &mudstate.vars_htab;
+    htab = &mushstate.vars_htab;
 
     for (i = 0; i < htab->hashsize; i++)
     {
@@ -1743,7 +1743,7 @@ void fun_x(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
     SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
 
-    if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
+    if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
     {
         SAFE_LB_STR(xvar->text, buff, bufc);
     }
@@ -1897,7 +1897,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         SAFE_SB_STR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
-        if ((xvar = (VARENT *)hashfind(tbuf, &mudstate.vars_htab)))
+        if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
         {
             if (xvar->text)
                 old_xvars[i] = XSTRDUP(xvar->text, "old_xvars[i]");
@@ -1983,7 +1983,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 void fun_lvars(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    print_htab_matches(player, &mudstate.vars_htab, buff, bufc);
+    print_htab_matches(player, &mushstate.vars_htab, buff, bufc);
 }
 
 void fun_clearvars(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -2109,7 +2109,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Enforce limits.
      */
 
-    if (StructCount(player) > mudconf.struct_lim)
+    if (StructCount(player) > mushconf.struct_lim)
     {
         notify_quiet(player, "Too many structures.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2163,7 +2163,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * If we have this structure already, reject.
      */
 
-    if (hashfind(tbuf, &mudstate.structs_htab))
+    if (hashfind(tbuf, &mushstate.structs_htab))
     {
         notify_quiet(player, "Structure is already defined.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2297,8 +2297,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     this_struct->n_instances = 0;
     this_struct->names_base = comp_names;
     this_struct->defs_base = default_vals;
-    hashadd(tbuf, (int *)this_struct, &mudstate.structs_htab, 0);
-    mudstate.max_structs = mudstate.structs_htab.entries > mudstate.max_structs ? mudstate.structs_htab.entries : mudstate.max_structs;
+    hashadd(tbuf, (int *)this_struct, &mushstate.structs_htab, 0);
+    mushstate.max_structs = mushstate.structs_htab.entries > mushstate.max_structs ? mushstate.structs_htab.entries : mushstate.max_structs;
     /*
      * Now that we're done with the base name, we can stick the joining
      * period on the end.
@@ -2371,8 +2371,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
         this_struct->need_typecheck = check_type;
         this_struct->c_array[i] = this_comp;
-        hashadd(cbuf, (int *)this_comp, &mudstate.cdefs_htab, 0);
-        mudstate.max_cdefs = mudstate.cdefs_htab.entries > mudstate.max_cdefs ? mudstate.cdefs_htab.entries : mudstate.max_cdefs;
+        hashadd(cbuf, (int *)this_comp, &mushstate.cdefs_htab, 0);
+        mushstate.max_cdefs = mushstate.cdefs_htab.entries > mushstate.max_cdefs ? mushstate.cdefs_htab.entries : mushstate.max_cdefs;
     }
 
     XFREE(type_names);
@@ -2431,7 +2431,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Enforce limits.
      */
 
-    if (InstanceCount(player) > mudconf.instance_lim)
+    if (InstanceCount(player) > mushconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2470,7 +2470,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     SAFE_SB_STR(fargs[0], ibuf, &ip);
     *ip = '\0';
 
-    if (hashfind(ibuf, &mudstate.instance_htab))
+    if (hashfind(ibuf, &mushstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2494,7 +2494,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     SAFE_SB_STR(fargs[1], tbuf, &tp);
     *tp = '\0';
-    this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
+    this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
@@ -2548,7 +2548,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
             }
 
             SAFE_SB_STR(comp_array[i], cbuf, &cp);
-            c_ptr = (COMPONENT *)hashfind(cbuf, &mudstate.cdefs_htab);
+            c_ptr = (COMPONENT *)hashfind(cbuf, &mushstate.cdefs_htab);
 
             if (!c_ptr)
             {
@@ -2609,8 +2609,8 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
     inst_ptr = (INSTANCE *)XMALLOC(sizeof(INSTANCE), "inst_ptr");
     inst_ptr->datatype = this_struct;
-    hashadd(ibuf, (int *)inst_ptr, &mudstate.instance_htab, 0);
-    mudstate.max_instance = mudstate.instance_htab.entries > mudstate.max_instance ? mudstate.instance_htab.entries : mudstate.max_instance;
+    hashadd(ibuf, (int *)inst_ptr, &mushstate.instance_htab, 0);
+    mushstate.max_instance = mushstate.instance_htab.entries > mushstate.max_instance ? mushstate.instance_htab.entries : mushstate.max_instance;
 
     /*
      * Populate with default values.
@@ -2634,8 +2634,8 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         SAFE_SB_CHR('.', tbuf, &tp);
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
-        hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
-        mudstate.max_instdata = mudstate.instdata_htab.entries > mudstate.max_instdata ? mudstate.instdata_htab.entries : mudstate.max_instdata;
+        hashadd(tbuf, (int *)d_ptr, &mushstate.instdata_htab, 0);
+        mushstate.max_instdata = mushstate.instdata_htab.entries > mushstate.max_instdata ? mushstate.instdata_htab.entries : mushstate.max_instdata;
     }
 
     /*
@@ -2649,7 +2649,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         SAFE_SB_CHR('.', tbuf, &tp);
         SAFE_SB_STR(comp_array[i], tbuf, &tp);
         *tp = '\0';
-        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
+        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
         if (d_ptr)
         {
@@ -2705,7 +2705,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      * Enforce limits.
      */
 
-    if (InstanceCount(player) > mudconf.instance_lim)
+    if (InstanceCount(player) > mushconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2743,7 +2743,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     SAFE_SB_STR(inst_name, ibuf, &ip);
     *ip = '\0';
 
-    if (hashfind(ibuf, &mudstate.instance_htab))
+    if (hashfind(ibuf, &mushstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
         SAFE_LB_CHR('0', buff, bufc);
@@ -2767,7 +2767,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
 
     SAFE_SB_STR(str_name, tbuf, &tp);
     *tp = '\0';
-    this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
+    this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
@@ -2834,8 +2834,8 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      */
     inst_ptr = (INSTANCE *)XMALLOC(sizeof(INSTANCE), "inst_ptr");
     inst_ptr->datatype = this_struct;
-    hashadd(ibuf, (int *)inst_ptr, &mudstate.instance_htab, 0);
-    mudstate.max_instance = mudstate.instance_htab.entries > mudstate.max_instance ? mudstate.instance_htab.entries : mudstate.max_instance;
+    hashadd(ibuf, (int *)inst_ptr, &mushstate.instance_htab, 0);
+    mushstate.max_instance = mushstate.instance_htab.entries > mushstate.max_instance ? mushstate.instance_htab.entries : mushstate.max_instance;
 
     /*
      * Stuff data into memory.
@@ -2857,8 +2857,8 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         SAFE_SB_CHR('.', tbuf, &tp);
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
-        hashadd(tbuf, (int *)d_ptr, &mudstate.instdata_htab, 0);
-        mudstate.max_instdata = mudstate.instdata_htab.entries > mudstate.max_instdata ? mudstate.instdata_htab.entries : mudstate.max_instdata;
+        hashadd(tbuf, (int *)d_ptr, &mushstate.instdata_htab, 0);
+        mushstate.max_instdata = mushstate.instdata_htab.entries > mushstate.max_instdata ? mushstate.instdata_htab.entries : mushstate.max_instdata;
     }
 
     XFREE(val_list);
@@ -2987,7 +2987,7 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
 
     SAFE_SB_STR(fargs[1], tbuf, &tp);
     *tp = '\0';
-    s_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
+    s_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
     if (!s_ptr || !s_ptr->text)
     {
@@ -3036,7 +3036,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
     endp = tp; /* save where we are */
-    inst_ptr = (INSTANCE *)hashfind(tbuf, &mudstate.instance_htab);
+    inst_ptr = (INSTANCE *)hashfind(tbuf, &mushstate.instance_htab);
 
     if (!inst_ptr)
     {
@@ -3074,7 +3074,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
             SAFE_SB_STR(words[i], cbuf, &cp);
             *cp = '\0';
-            c_ptr = (COMPONENT *)hashfind(cbuf, &mudstate.cdefs_htab);
+            c_ptr = (COMPONENT *)hashfind(cbuf, &mushstate.cdefs_htab);
 
             if (!c_ptr)
             {
@@ -3101,7 +3101,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         SAFE_SB_CHR('.', tbuf, &tp);
         SAFE_SB_STR(words[i], tbuf, &tp);
         *tp = '\0';
-        s_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
+        s_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
         if (!s_ptr)
         {
@@ -3156,7 +3156,7 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
 
     SAFE_SB_STR(inst_name, ibuf, &ip);
     *ip = '\0';
-    inst_ptr = (INSTANCE *)hashfind(ibuf, &mudstate.instance_htab);
+    inst_ptr = (INSTANCE *)hashfind(ibuf, &mushstate.instance_htab);
 
     if (!inst_ptr)
     {
@@ -3193,7 +3193,7 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
         SAFE_SB_STR(ibuf, tbuf, &tp);
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
-        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
+        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
         if (d_ptr && d_ptr->text)
         {
@@ -3285,7 +3285,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     SAFE_SB_STR(fargs[0], ibuf, &ip);
     *ip = '\0';
-    inst_ptr = (INSTANCE *)hashfind(ibuf, &mudstate.instance_htab);
+    inst_ptr = (INSTANCE *)hashfind(ibuf, &mushstate.instance_htab);
 
     if (!inst_ptr)
     {
@@ -3302,7 +3302,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
      */
     this_struct = inst_ptr->datatype;
     XFREE(inst_ptr);
-    hashdelete(ibuf, &mudstate.instance_htab);
+    hashdelete(ibuf, &mushstate.instance_htab);
     SAFE_SB_CHR('.', ibuf, &ip);
     *ip = '\0';
 
@@ -3312,7 +3312,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
         SAFE_SB_STR(ibuf, tbuf, &tp);
         SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
-        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mudstate.instdata_htab);
+        d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
         if (d_ptr)
         {
@@ -3322,7 +3322,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
             }
 
             XFREE(d_ptr);
-            hashdelete(tbuf, &mudstate.instdata_htab);
+            hashdelete(tbuf, &mushstate.instdata_htab);
         }
     }
 
@@ -3354,7 +3354,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
 
     SAFE_SB_STR(fargs[0], tbuf, &tp);
     *tp = '\0';
-    this_struct = (STRUCTDEF *)hashfind(tbuf, &mudstate.structs_htab);
+    this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
@@ -3381,7 +3381,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
     /*
      * Wipe the structure from the hashtable.
      */
-    hashdelete(tbuf, &mudstate.structs_htab);
+    hashdelete(tbuf, &mushstate.structs_htab);
     /*
      * Wipe out every component definition.
      */
@@ -3400,7 +3400,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
             XFREE(this_struct->c_array[i]);
         }
 
-        hashdelete(cbuf, &mudstate.cdefs_htab);
+        hashdelete(cbuf, &mushstate.cdefs_htab);
     }
 
     /*
@@ -3428,12 +3428,12 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
 
 void fun_lstructures(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    print_htab_matches(player, &mudstate.structs_htab, buff, bufc);
+    print_htab_matches(player, &mushstate.structs_htab, buff, bufc);
 }
 
 void fun_linstances(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    print_htab_matches(player, &mudstate.instance_htab, buff, bufc);
+    print_htab_matches(player, &mushstate.instance_htab, buff, bufc);
 }
 
 void structure_clr(dbref thing)
@@ -3469,9 +3469,9 @@ void structure_clr(dbref thing)
      * to keep track of all of our pointers, and go back and do them one
      * by one.
      */
-    inst_array = (INSTANCE **)XCALLOC(mudconf.instance_lim + 1, sizeof(INSTANCE *), "inst_array");
-    name_array = (char **)XCALLOC(mudconf.instance_lim + 1, sizeof(char *), "name_array");
-    htab = &mudstate.instance_htab;
+    inst_array = (INSTANCE **)XCALLOC(mushconf.instance_lim + 1, sizeof(INSTANCE *), "inst_array");
+    name_array = (char **)XCALLOC(mushconf.instance_lim + 1, sizeof(char *), "name_array");
+    htab = &mushstate.instance_htab;
     count = 0;
 
     for (i = 0; i < htab->hashsize; i++)
@@ -3499,7 +3499,7 @@ void structure_clr(dbref thing)
         {
             this_struct = inst_array[i]->datatype;
             XFREE(inst_array[i]);
-            hashdelete(name_array[i], &mudstate.instance_htab);
+            hashdelete(name_array[i], &mushstate.instance_htab);
             ip = ibuf;
             SAFE_SB_STR(name_array[i], ibuf, &ip);
             SAFE_SB_CHR('.', ibuf, &ip);
@@ -3511,7 +3511,7 @@ void structure_clr(dbref thing)
                 SAFE_SB_STR(ibuf, cbuf, &cp);
                 SAFE_SB_STR(this_struct->c_names[j], cbuf, &cp);
                 *cp = '\0';
-                d_ptr = (STRUCTDATA *)hashfind(cbuf, &mudstate.instdata_htab);
+                d_ptr = (STRUCTDATA *)hashfind(cbuf, &mushstate.instdata_htab);
 
                 if (d_ptr)
                 {
@@ -3519,7 +3519,7 @@ void structure_clr(dbref thing)
                         XFREE(d_ptr->text);
 
                     XFREE(d_ptr);
-                    hashdelete(cbuf, &mudstate.instdata_htab);
+                    hashdelete(cbuf, &mushstate.instdata_htab);
                 }
             }
 
@@ -3540,9 +3540,9 @@ void structure_clr(dbref thing)
     /*
      * Again, we have the hashtable rechaining problem.
      */
-    struct_array = (STRUCTDEF **)XCALLOC(mudconf.struct_lim + 1, sizeof(STRUCTDEF *), "struct_array");
-    name_array = (char **)XCALLOC(mudconf.struct_lim + 1, sizeof(char *), "name_array2");
-    htab = &mudstate.structs_htab;
+    struct_array = (STRUCTDEF **)XCALLOC(mushconf.struct_lim + 1, sizeof(STRUCTDEF *), "struct_array");
+    name_array = (char **)XCALLOC(mushconf.struct_lim + 1, sizeof(char *), "name_array2");
+    htab = &mushstate.structs_htab;
     count = 0;
 
     for (i = 0; i < htab->hashsize; i++)
@@ -3575,7 +3575,7 @@ void structure_clr(dbref thing)
                 XFREE(tname);
             }
 
-            hashdelete(name_array[i], &mudstate.structs_htab);
+            hashdelete(name_array[i], &mushstate.structs_htab);
             ip = ibuf;
             SAFE_SB_STR(name_array[i], ibuf, &ip);
             SAFE_SB_CHR('.', ibuf, &ip);
@@ -3593,7 +3593,7 @@ void structure_clr(dbref thing)
                     XFREE(struct_array[i]->c_array[j]);
                 }
 
-                hashdelete(cbuf, &mudstate.cdefs_htab);
+                hashdelete(cbuf, &mushstate.cdefs_htab);
             }
 
             XFREE(struct_array[i]->s_name);
@@ -3629,7 +3629,7 @@ void structure_clr(dbref thing)
 void stack_clr(dbref thing)
 {
     OBJSTACK *sp, *tp, *xp;
-    sp = ((OBJSTACK *)nhashfind(thing, &mudstate.objstack_htab));
+    sp = ((OBJSTACK *)nhashfind(thing, &mushstate.objstack_htab));
 
     if (sp)
     {
@@ -3641,7 +3641,7 @@ void stack_clr(dbref thing)
             XFREE(xp);
         }
 
-        nhashdelete(thing, &mudstate.objstack_htab);
+        nhashdelete(thing, &mushstate.objstack_htab);
         s_StackCount(thing, 0);
     }
 }
@@ -3654,20 +3654,20 @@ int stack_set(dbref thing, OBJSTACK *sp)
 
     if (!sp)
     {
-        nhashdelete(thing, &mudstate.objstack_htab);
+        nhashdelete(thing, &mushstate.objstack_htab);
         return 1;
     }
 
-    xsp = ((OBJSTACK *)nhashfind(thing, &mudstate.objstack_htab));
+    xsp = ((OBJSTACK *)nhashfind(thing, &mushstate.objstack_htab));
 
     if (xsp)
     {
-        stat = nhashrepl(thing, (int *)sp, &mudstate.objstack_htab);
+        stat = nhashrepl(thing, (int *)sp, &mushstate.objstack_htab);
     }
     else
     {
-        stat = nhashadd(thing, (int *)sp, &mudstate.objstack_htab);
-        mudstate.max_stacks = mudstate.objstack_htab.entries > mudstate.max_stacks ? mudstate.objstack_htab.entries : mudstate.max_stacks;
+        stat = nhashadd(thing, (int *)sp, &mushstate.objstack_htab);
+        mushstate.max_stacks = mushstate.objstack_htab.entries > mushstate.max_stacks ? mushstate.objstack_htab.entries : mushstate.max_stacks;
     }
 
     if (stat < 0)
@@ -3776,7 +3776,7 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__(
         data = fargs[1];
     }
 
-    if (StackCount(it) + 1 > mudconf.stack_lim)
+    if (StackCount(it) + 1 > mushconf.stack_lim)
     {
         return;
     }
@@ -3788,7 +3788,7 @@ void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__(
         return;
     }
 
-    sp->next = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
+    sp->next = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab));
     sp->data = (char *)XMALLOC(sizeof(char) * (strlen(data) + 1), "sp->data");
 
     if (!sp->data)
@@ -3835,7 +3835,7 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((
         }
     }
 
-    if (StackCount(it) + 1 > mudconf.stack_lim)
+    if (StackCount(it) + 1 > mushconf.stack_lim)
     {
         return;
     }
@@ -3849,7 +3849,7 @@ void fun_dup(char *buff, char **bufc, dbref player, dbref caller __attribute__((
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
-    hp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
+    hp = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab));
 
     for (tp = hp; (count != pos) && (tp != NULL); count++, tp = tp->next)
         ;
@@ -3911,7 +3911,7 @@ void fun_swap(char *buff, char **bufc, dbref player, dbref caller __attribute__(
         }
     }
 
-    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
+    sp = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab));
 
     if (!sp || (sp->next == NULL))
     {
@@ -3966,7 +3966,7 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute_
         pos = (int)strtol(fargs[1], (char **)NULL, 10);
     }
 
-    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
+    sp = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab));
 
     if (!sp)
     {
@@ -4043,7 +4043,7 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
     pos = (int)strtol(fargs[1], (char **)NULL, 10);
     nitems = (int)strtol(fargs[2], (char **)NULL, 10);
-    sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab));
+    sp = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab));
 
     if (!sp)
     {
@@ -4147,7 +4147,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     bb_p = *bufc;
 
-    for (sp = ((OBJSTACK *)nhashfind(it, &mudstate.objstack_htab)); (sp != NULL) && !over; sp = sp->next)
+    for (sp = ((OBJSTACK *)nhashfind(it, &mushstate.objstack_htab)); (sp != NULL) && !over; sp = sp->next)
     {
         if (*bufc != bb_p)
         {
@@ -4178,7 +4178,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
     case_option = Func_Mask(REG_CASELESS);
     all_option = Func_Mask(REG_MATCH_ALL);
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
+    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
 	 * Matching error. Note that this returns a null string
@@ -4388,7 +4388,7 @@ void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribut
     int subpatterns;
     case_option = Func_Mask(REG_CASELESS);
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
+    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
 	 * Matching error.
@@ -4490,7 +4490,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     s = trim_space_sep(fargs[0], &isep);
     bb_p = *bufc;
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
+    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
 	 * Matching error. Note difference from PennMUSH behavior:
@@ -4577,7 +4577,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
         return;
     }
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mudstate.retabs)) == NULL)
+    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
 	 * Matching error. Note difference from PennMUSH behavior:
@@ -4683,7 +4683,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Make sure we have a valid regular expression.
      */
 
-    if ((re = pcre_compile(fargs[lastn + 1], 0, &errptr, &erroffset, mudstate.retabs)) == NULL)
+    if ((re = pcre_compile(fargs[lastn + 1], 0, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
 	 * Return nothing on a bad match.
@@ -4810,7 +4810,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
     }
 
-    for (wc = 0; (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU(); wc++)
+    for (wc = 0; (wc < nwords) && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU(); wc++)
     {
         for (i = 2; i <= lastn; i++)
         {
@@ -4943,7 +4943,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         break;
 
     case GREP_REGEXP:
-        if ((re = pcre_compile(fargs[2], caseless, &errptr, &erroffset, mudstate.retabs)) == NULL)
+        if ((re = pcre_compile(fargs[2], caseless, &errptr, &erroffset, mushstate.retabs)) == NULL)
         {
             notify_quiet(player, errptr);
             return;
@@ -5044,7 +5044,7 @@ void grid_free(dbref thing, OBJGRID *ogp)
             XFREE(ogp->data[r]);
         }
 
-        nhashdelete(thing, &mudstate.objgrid_htab);
+        nhashdelete(thing, &mushstate.objgrid_htab);
         XFREE(ogp);
     }
 }
@@ -5076,13 +5076,13 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     cols = (int)strtol(fargs[1], (char **)NULL, 10);
     dimension = rows * cols;
 
-    if ((dimension > mudconf.max_grid_size) || (dimension < 0))
+    if ((dimension > mushconf.max_grid_size) || (dimension < 0))
     {
         SAFE_LB_STR("#-1 INVALID GRID SIZE", buff, bufc);
         return;
     }
 
-    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
+    ogp = ((OBJGRID *)nhashfind(player, &mushstate.objgrid_htab));
 
     if (ogp)
     {
@@ -5108,7 +5108,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         ogp->data[r] = (char **)XCALLOC(cols, sizeof(char *), "ogp->data[r]");
     }
 
-    status = nhashadd(player, (int *)ogp, &mudstate.objgrid_htab);
+    status = nhashadd(player, (int *)ogp, &mushstate.objgrid_htab);
 
     if (status < 0)
     {
@@ -5171,7 +5171,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    OBJGRID *ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
+    OBJGRID *ogp = ((OBJGRID *)nhashfind(player, &mushstate.objgrid_htab));
 
     if (!ogp)
     {
@@ -5201,7 +5201,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         return;
     }
 
-    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
+    ogp = ((OBJGRID *)nhashfind(player, &mushstate.objgrid_htab));
 
     if (!ogp)
     {
@@ -5423,7 +5423,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    ogp = ((OBJGRID *)nhashfind(player, &mudstate.objgrid_htab));
+    ogp = ((OBJGRID *)nhashfind(player, &mushstate.objgrid_htab));
 
     if (!ogp)
     {

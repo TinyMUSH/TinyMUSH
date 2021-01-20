@@ -35,21 +35,21 @@ int stringblock_hwm = 0;
 
 void vattr_init(void)
 {
-    hashinit(&mudstate.vattr_name_htab, VATTR_HASH_SIZE, HT_STR | HT_KEYREF);
+    hashinit(&mushstate.vattr_name_htab, VATTR_HASH_SIZE, HT_STR | HT_KEYREF);
 }
 
 VATTR *vattr_find(char *name)
 {
-    return (VATTR *)hashfind(name, &mudstate.vattr_name_htab);
+    return (VATTR *)hashfind(name, &mushstate.vattr_name_htab);
 }
 
 VATTR *vattr_alloc(char *name, int flags)
 {
     int number;
 
-    if (((number = mudstate.attr_next++) & 0x7f) == 0)
+    if (((number = mushstate.attr_next++) & 0x7f) == 0)
     {
-        number = mudstate.attr_next++;
+        number = mushstate.attr_next++;
     }
 
     anum_extend(number);
@@ -86,7 +86,7 @@ VATTR *vattr_define(char *name, int number, int flags)
     vp->name = store_string(name);
     vp->flags = flags;
     vp->number = number;
-    hashadd(vp->name, (int *)vp, &mudstate.vattr_name_htab, 0);
+    hashadd(vp->name, (int *)vp, &mushstate.vattr_name_htab, 0);
     anum_extend(vp->number);
     anum_set(vp->number, (ATTR *)vp);
     return (vp);
@@ -105,8 +105,8 @@ void do_dbclean(dbref player, dbref cause, int key)
     CMDENT *cmdp;
     ADDENT *addp;
     raw_broadcast(0, "GAME: Cleaning database. Game may freeze for a few minutes.");
-    used_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "used_table");
-    n_oldtotal = mudstate.attr_next;
+    used_table = (int *)XCALLOC(mushstate.attr_next, sizeof(int), "used_table");
+    n_oldtotal = mushstate.attr_next;
     n_oldtop = anum_alc_top;
     n_deleted = n_renumbered = n_objt = n_atrt = 0;
 
@@ -123,7 +123,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * Walk the database. Mark all the attribute numbers in use.
      */
     atr_push();
-    for (i = 0; i < mudstate.db_top; i++)
+    for (i = 0; i < mushstate.db_top; i++)
     {
         for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
         {
@@ -144,7 +144,7 @@ void do_dbclean(dbref player, dbref cause, int key)
         if (used_table[vpx->number] == 0)
         {
             anum_set(vpx->number, NULL);
-            hashdelete(vpx->name, &mudstate.vattr_name_htab);
+            hashdelete(vpx->name, &mushstate.vattr_name_htab);
             XFREE(vpx);
             n_deleted++;
         }
@@ -156,7 +156,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * to the *Invalid (A_TEMP) attr.
      */
 
-    for (ufp = (UFUN *)hash_firstentry(&mudstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mudstate.ufunc_htab))
+    for (ufp = (UFUN *)hash_firstentry(&mushstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mushstate.ufunc_htab))
     {
         if (used_table[ufp->atr] == 0)
         {
@@ -164,7 +164,7 @@ void do_dbclean(dbref player, dbref cause, int key)
         }
     }
 
-    for (cmdp = (CMDENT *)hash_firstentry(&mudstate.command_htab); cmdp != NULL; cmdp = (CMDENT *)hash_nextentry(&mudstate.command_htab))
+    for (cmdp = (CMDENT *)hash_firstentry(&mushstate.command_htab); cmdp != NULL; cmdp = (CMDENT *)hash_nextentry(&mushstate.command_htab))
     {
         if (cmdp->pre_hook)
         {
@@ -208,7 +208,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * table. Write the number of the free slot into that used slot.
      */
 
-    for (i = A_USER_START, end = mudstate.attr_next - 1; (i < mudstate.attr_next) && (i < end); i++)
+    for (i = A_USER_START, end = mushstate.attr_next - 1; (i < mushstate.attr_next) && (i < end); i++)
     {
         if (used_table[i] == 0)
         {
@@ -229,7 +229,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * Renumber the necessary attributes in the vattr tables.
      */
 
-    for (i = A_USER_START; i < mudstate.attr_next; i++)
+    for (i = A_USER_START; i < mushstate.attr_next; i++)
     {
         if (used_table[i] != i)
         {
@@ -252,7 +252,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * at that slot), we delete the old attribute and add the new one.
      */
     atr_push();
-    for (i = 0; i < mudstate.db_top; i++)
+    for (i = 0; i < mushstate.db_top; i++)
     {
         got = 0;
 
@@ -280,10 +280,10 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * renumbered.
      */
 
-    for (end = A_USER_START; ((end == used_table[end]) && (end < mudstate.attr_next)); end++)
+    for (end = A_USER_START; ((end == used_table[end]) && (end < mushstate.attr_next)); end++)
         ;
 
-    mudstate.attr_next = end;
+    mushstate.attr_next = end;
 
     /*
      * We might be able to shrink the size of the attribute table.
@@ -293,22 +293,22 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * initial size, as if we'd just called anum_extend() for it.
      */
 
-    if (anum_alc_top > mudconf.init_size + A_USER_START)
+    if (anum_alc_top > mushconf.init_size + A_USER_START)
     {
-        if (mudstate.attr_next < mudconf.init_size + A_USER_START)
+        if (mushstate.attr_next < mushconf.init_size + A_USER_START)
         {
-            end = mudconf.init_size + A_USER_START;
+            end = mushconf.init_size + A_USER_START;
         }
         else
         {
-            end = mudstate.attr_next + mudconf.init_size;
+            end = mushstate.attr_next + mushconf.init_size;
         }
 
         if (end < anum_alc_top)
         {
             new_table = (ATTR **)XCALLOC(end + 1, sizeof(ATTR *), "dbclean.new_table");
 
-            for (i = 0; i < mudstate.attr_next; i++)
+            for (i = 0; i < mushstate.attr_next; i++)
             {
                 new_table[i] = anum_table[i];
             }
@@ -324,7 +324,7 @@ void do_dbclean(dbref player, dbref cause, int key)
      * * take care of the attributes that got renumbered.
      */
 
-    for (ufp = (UFUN *)hash_firstentry(&mudstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mudstate.ufunc_htab))
+    for (ufp = (UFUN *)hash_firstentry(&mushstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mushstate.ufunc_htab))
     {
         if (used_table[ufp->atr] != ufp->atr)
         {
@@ -332,7 +332,7 @@ void do_dbclean(dbref player, dbref cause, int key)
         }
     }
 
-    for (cmdp = (CMDENT *)hash_firstentry(&mudstate.command_htab); cmdp != NULL; cmdp = (CMDENT *)hash_nextentry(&mudstate.command_htab))
+    for (cmdp = (CMDENT *)hash_firstentry(&mushstate.command_htab); cmdp != NULL; cmdp = (CMDENT *)hash_nextentry(&mushstate.command_htab))
     {
         if (cmdp->pre_hook)
         {
@@ -371,11 +371,11 @@ void do_dbclean(dbref player, dbref cause, int key)
 
     if (anum_alc_top != n_oldtop)
     {
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cleaned %d user attribute slots (reduced to %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched). Table size reduced from %d to %d.", n_oldtotal - A_USER_START, mudstate.attr_next - A_USER_START, n_deleted, n_renumbered, n_objt, n_atrt, n_oldtop, anum_alc_top);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cleaned %d user attribute slots (reduced to %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched). Table size reduced from %d to %d.", n_oldtotal - A_USER_START, mushstate.attr_next - A_USER_START, n_deleted, n_renumbered, n_objt, n_atrt, n_oldtop, anum_alc_top);
     }
     else
     {
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).", n_oldtotal, mudstate.attr_next, n_deleted, n_renumbered, n_objt, n_atrt);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cleaned %d attributes (now %d): %d deleted, %d renumbered (%d objects and %d individual attrs touched).", n_oldtotal, mushstate.attr_next, n_deleted, n_renumbered, n_objt, n_atrt);
     }
 
     raw_broadcast(0, "GAME: Database cleaning complete.");
@@ -394,13 +394,13 @@ void vattr_delete(char *name)
     }
 
     number = 0;
-    vp = (VATTR *)hashfind(name, &mudstate.vattr_name_htab);
+    vp = (VATTR *)hashfind(name, &mushstate.vattr_name_htab);
 
     if (vp)
     {
         number = vp->number;
         anum_set(number, NULL);
-        hashdelete(name, &mudstate.vattr_name_htab);
+        hashdelete(name, &mushstate.vattr_name_htab);
         XFREE(vp);
     }
 
@@ -437,13 +437,13 @@ VATTR *vattr_rename(char *name, char *newname)
      * We must explicitly delete and add the name to the hashtable,
      * * since we are changing the data.
      */
-    vp = (VATTR *)hashfind(name, &mudstate.vattr_name_htab);
+    vp = (VATTR *)hashfind(name, &mushstate.vattr_name_htab);
 
     if (vp)
     {
         vp->name = store_string(newname);
-        hashdelete(name, &mudstate.vattr_name_htab);
-        hashadd(newname, (int *)vp, &mudstate.vattr_name_htab, 0);
+        hashdelete(name, &mushstate.vattr_name_htab);
+        hashadd(newname, (int *)vp, &mushstate.vattr_name_htab, 0);
     }
 
     return (vp);
@@ -451,7 +451,7 @@ VATTR *vattr_rename(char *name, char *newname)
 
 VATTR *vattr_first(void)
 {
-    return (VATTR *)hash_firstentry(&mudstate.vattr_name_htab);
+    return (VATTR *)hash_firstentry(&mushstate.vattr_name_htab);
 }
 
 VATTR *vattr_next(VATTR *vp)
@@ -461,7 +461,7 @@ VATTR *vattr_next(VATTR *vp)
         return (vattr_first());
     }
 
-    return ((VATTR *)hash_nextentry(&mudstate.vattr_name_htab));
+    return ((VATTR *)hash_nextentry(&mushstate.vattr_name_htab));
 }
 
 void fixcase(char *name)

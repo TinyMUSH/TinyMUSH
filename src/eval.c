@@ -32,7 +32,7 @@
  */
 char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
 {
-	if ((mudconf.space_compress || (eval & EV_STRIP_TS)) && !(eval & EV_NO_COMPRESS) && !first && (cstr[-1] == ' '))
+	if ((mushconf.space_compress || (eval & EV_STRIP_TS)) && !(eval & EV_NO_COMPRESS) && !first && (cstr[-1] == ' '))
 	{
 		zstr--;
 	}
@@ -41,7 +41,7 @@ char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
 	{
 		rstr++;
 
-		if ((mudconf.space_compress && !(eval & EV_NO_COMPRESS)) || (eval & EV_STRIP_LS))
+		if ((mushconf.space_compress && !(eval & EV_NO_COMPRESS)) || (eval & EV_STRIP_LS))
 			while (*rstr && isspace(*rstr))
 			{
 				rstr++;
@@ -50,7 +50,7 @@ char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
 		rstr[-1] = '\0';
 		zstr--;
 
-		if ((mudconf.space_compress && !(eval & EV_NO_COMPRESS)) || (eval & EV_STRIP_TS))
+		if ((mushconf.space_compress && !(eval & EV_NO_COMPRESS)) || (eval & EV_STRIP_TS))
 			while (zstr[-1] && isspace(zstr[-1]))
 			{
 				zstr--;
@@ -100,7 +100,7 @@ char *parse_to(char **dstr, char delim, int eval)
 	sp = 0;
 	rstr = *dstr;
 
-	if ((mudconf.space_compress || (eval & EV_STRIP_LS)) && !(eval & EV_NO_COMPRESS))
+	if ((mushconf.space_compress || (eval & EV_STRIP_LS)) && !(eval & EV_NO_COMPRESS))
 	{
 		while (*rstr && isspace(*rstr))
 		{
@@ -290,7 +290,7 @@ char *parse_to(char **dstr, char delim, int eval)
 			switch (*cstr)
 			{
 			case ' ': /** space */
-				if (mudconf.space_compress && !(eval & EV_NO_COMPRESS))
+				if (mushconf.space_compress && !(eval & EV_NO_COMPRESS))
 				{
 					if (first)
 					{
@@ -584,7 +584,7 @@ void tcache_add(char *orig, char *result)
 	{
 		tcache_count++;
 
-		if (tcache_count <= mudconf.trace_limit)
+		if (tcache_count <= mushconf.trace_limit)
 		{
 			xp = (TCENT *)XMALLOC(SBUF_SIZE, "xp");
 			tp = XMALLOC(LBUF_SIZE, "tp");
@@ -618,7 +618,7 @@ void tcache_finish(dbref player)
 
 	if (H_Redirect(player))
 	{
-		np = (NUMBERTAB *)nhashfind(player, &mudstate.redir_htab);
+		np = (NUMBERTAB *)nhashfind(player, &mushstate.redir_htab);
 
 		if (np)
 		{
@@ -695,7 +695,7 @@ bool special_char(unsigned char ch)
 		 * like a special character, as it gets used a whole heck of a lot.
 		 * 
 		 */
-		return (mudstate.in_loop || mudstate.in_switch) ? 1 : 0;
+		return (mushstate.in_loop || mushstate.in_switch) ? 1 : 0;
 	}
 	return false;
 }
@@ -921,7 +921,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 		     * previous char was not a space
 			 * 
 		     */
-			if (!(mudconf.space_compress && at_space) || (eval & EV_NO_COMPRESS))
+			if (!(mushconf.space_compress && at_space) || (eval & EV_NO_COMPRESS))
 			{
 				SAFE_LB_CHR(' ', buff, bufc);
 				at_space = 1;
@@ -1101,13 +1101,13 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			case 'C':
 			case 'c':
-				if (mudconf.c_cmd_subst)
+				if (mushconf.c_cmd_subst)
 				{
 					/**
 					 * %c is last command executed
 					 * 
 					 */
-					SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
+					SAFE_LB_STR(mushstate.curr_cmd, buff, bufc);
 					break;
 				}
 				//[[fallthrough]];
@@ -1142,7 +1142,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					break;
 				}
 
-				if (!mudconf.ansi_colors)
+				if (!mushconf.ansi_colors)
 				{
 					/**
 				     * just skip over the characters
@@ -1405,7 +1405,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				*xtp = '\0';
 
-				if (!(mudstate.f_limitmask & FN_VARFX) && (xvar = (VARENT *)hashfind(xtbuf, &mudstate.vars_htab)))
+				if (!(mushstate.f_limitmask & FN_VARFX) && (xvar = (VARENT *)hashfind(xtbuf, &mushstate.vars_htab)))
 				{
 					SAFE_LB_STR(xvar->text, buff, bufc);
 				}
@@ -1455,15 +1455,15 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				{
 					i = qidx_chartab((unsigned char)**dstr);
 
-					if ((i < 0) || (i >= mudconf.max_global_regs))
+					if ((i < 0) || (i >= mushconf.max_global_regs))
 					{
 						break;
 					}
 
-					if (mudstate.rdata && mudstate.rdata->q_alloc > i)
+					if (mushstate.rdata && mushstate.rdata->q_alloc > i)
 					{
-						char *qreg = mudstate.rdata->q_regs[i];
-						size_t qlen = mudstate.rdata->q_lens[i];
+						char *qreg = mushstate.rdata->q_regs[i];
+						size_t qlen = mushstate.rdata->q_lens[i];
 						SAFE_STRNCAT(buff, bufc, qreg, qlen, LBUF_SIZE);
 					}
 
@@ -1484,7 +1484,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					break;
 				}
 
-				if (!mudstate.rdata || !mudstate.rdata->xr_alloc)
+				if (!mushstate.rdata || !mushstate.rdata->xr_alloc)
 				{
 					/**
 					 * We know there's no result, so we just advance past.
@@ -1528,11 +1528,11 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 				*xtp = '\0';
 
-				for (i = 0; i < mudstate.rdata->xr_alloc; i++)
+				for (i = 0; i < mushstate.rdata->xr_alloc; i++)
 				{
-					if (mudstate.rdata->x_names[i] && !strcmp(xtbuf, mudstate.rdata->x_names[i]))
+					if (mushstate.rdata->x_names[i] && !strcmp(xtbuf, mushstate.rdata->x_names[i]))
 					{
-						SAFE_STRNCAT(buff, bufc, mudstate.rdata->x_regs[i], mudstate.rdata->x_lens[i], LBUF_SIZE);
+						SAFE_STRNCAT(buff, bufc, mushstate.rdata->x_regs[i], mushstate.rdata->x_lens[i], LBUF_SIZE);
 						break;
 					}
 				}
@@ -1686,7 +1686,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			case 'M':
 			case 'm':
-				SAFE_LB_STR(mudstate.curr_cmd, buff, bufc);
+				SAFE_LB_STR(mushstate.curr_cmd, buff, bufc);
 				break;
 
 			case 'I':
@@ -1735,12 +1735,12 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				     * use number as delta back from current
 					 * 
 				     */
-					if (!mudstate.in_loop || !isdigit(**dstr))
+					if (!mushstate.in_loop || !isdigit(**dstr))
 					{
 						break;
 					}
 
-					i = mudstate.in_loop - 1 - (**dstr - '0');
+					i = mushstate.in_loop - 1 - (**dstr - '0');
 
 					if (i < 0)
 					{
@@ -1748,18 +1748,18 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					}
 				}
 
-				if (i > mudstate.in_loop - 1)
+				if (i > mushstate.in_loop - 1)
 				{
 					break;
 				}
 
 				if ((*xtp == 'i') || (*xtp == 'I'))
 				{
-					SAFE_LB_STR(mudstate.loop_token[i], buff, bufc);
+					SAFE_LB_STR(mushstate.loop_token[i], buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR(mudstate.loop_token2[i], buff, bufc);
+					SAFE_LB_STR(mushstate.loop_token2[i], buff, bufc);
 				}
 
 				break;
@@ -1777,7 +1777,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Piped command output
 				 * 
 				 */
-				SAFE_LB_STR(mudstate.pout, buff, bufc);
+				SAFE_LB_STR(mushstate.pout, buff, bufc);
 				break;
 
 			case '%':
@@ -1828,7 +1828,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			SAFE_SB_STR(oldp, xtbuf, &xtp);
 			*xtp = '\0';
 
-			if (mudconf.space_compress && (eval & EV_FMAND))
+			if (mushconf.space_compress && (eval & EV_FMAND))
 			{
 				while ((--xtp >= xtbuf) && isspace(*xtp))
 					;
@@ -1842,7 +1842,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				*xtp = toupper(*xtp);
 			}
 
-			fp = (FUN *)hashfind(xtbuf, &mudstate.func_htab);
+			fp = (FUN *)hashfind(xtbuf, &mushstate.func_htab);
 			/**
 		     * If not a builtin func, check for global func
 			 * 
@@ -1851,7 +1851,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (fp == NULL)
 			{
-				ufp = (UFUN *)hashfind(xtbuf, &mudstate.ufunc_htab);
+				ufp = (UFUN *)hashfind(xtbuf, &mushstate.ufunc_htab);
 			}
 
 			/**
@@ -1953,14 +1953,14 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 			if (ufp)
 			{
-				mudstate.func_nest_lev++;
-				mudstate.func_invk_ctr++;
+				mushstate.func_nest_lev++;
+				mushstate.func_invk_ctr++;
 
-				if (mudstate.func_nest_lev >= mudconf.func_nest_lim)
+				if (mushstate.func_nest_lev >= mushconf.func_nest_lim)
 				{
 					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
-				else if (mudstate.func_invk_ctr >= mudconf.func_invk_lim)
+				else if (mushstate.func_invk_ctr >= mushconf.func_invk_lim)
 				{
 					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
@@ -1993,8 +1993,8 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (ufp->flags & FN_NOREGS)
 					{
-						preserve = mudstate.rdata;
-						mudstate.rdata = NULL;
+						preserve = mushstate.rdata;
+						mushstate.rdata = NULL;
 					}
 					else if (ufp->flags & FN_PRES)
 					{
@@ -2005,45 +2005,45 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 
 					if (ufp->flags & FN_NOREGS)
 					{
-						if (mudstate.rdata)
+						if (mushstate.rdata)
 						{
-							for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+							for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 							{
-								if (mudstate.rdata->q_regs[z])
-									XFREE(mudstate.rdata->q_regs[z]);
+								if (mushstate.rdata->q_regs[z])
+									XFREE(mushstate.rdata->q_regs[z]);
 							}
-							for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+							for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 							{
-								if (mudstate.rdata->x_names[z])
-									XFREE(mudstate.rdata->x_names[z]);
-								if (mudstate.rdata->x_regs[z])
-									XFREE(mudstate.rdata->x_regs[z]);
+								if (mushstate.rdata->x_names[z])
+									XFREE(mushstate.rdata->x_names[z]);
+								if (mushstate.rdata->x_regs[z])
+									XFREE(mushstate.rdata->x_regs[z]);
 							}
 
-							if (mudstate.rdata->q_regs)
+							if (mushstate.rdata->q_regs)
 							{
-								XFREE(mudstate.rdata->q_regs);
+								XFREE(mushstate.rdata->q_regs);
 							}
-							if (mudstate.rdata->q_lens)
+							if (mushstate.rdata->q_lens)
 							{
-								XFREE(mudstate.rdata->q_lens);
+								XFREE(mushstate.rdata->q_lens);
 							}
-							if (mudstate.rdata->x_names)
+							if (mushstate.rdata->x_names)
 							{
-								XFREE(mudstate.rdata->x_names);
+								XFREE(mushstate.rdata->x_names);
 							}
-							if (mudstate.rdata->x_regs)
+							if (mushstate.rdata->x_regs)
 							{
-								XFREE(mudstate.rdata->x_regs);
+								XFREE(mushstate.rdata->x_regs);
 							}
-							if (mudstate.rdata->x_lens)
+							if (mushstate.rdata->x_lens)
 							{
-								XFREE(mudstate.rdata->x_lens);
+								XFREE(mushstate.rdata->x_lens);
 							}
-							XFREE(mudstate.rdata);
+							XFREE(mushstate.rdata);
 						}
 
-						mudstate.rdata = preserve;
+						mushstate.rdata = preserve;
 					}
 					else if (ufp->flags & FN_PRES)
 					{
@@ -2057,7 +2057,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Return the space allocated for the args
 				 * 
 				 */
-				mudstate.func_nest_lev--;
+				mushstate.func_nest_lev--;
 
 				for (i = 0; i < nfargs; i++)
 					if (fargs[i] != NULL)
@@ -2091,14 +2091,14 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				 * Check recursion limit
 				 * 
 				 */
-				mudstate.func_nest_lev++;
-				mudstate.func_invk_ctr++;
+				mushstate.func_nest_lev++;
+				mushstate.func_invk_ctr++;
 
-				if (mudstate.func_nest_lev >= mudconf.func_nest_lim)
+				if (mushstate.func_nest_lev >= mushconf.func_nest_lim)
 				{
 					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
-				else if (mudstate.func_invk_ctr >= mudconf.func_invk_lim)
+				else if (mushstate.func_invk_ctr >= mushconf.func_invk_lim)
 				{
 					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
@@ -2119,7 +2119,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				{
 					SAFE_NOPERM(buff, bufc);
 				}
-				else if (mudstate.f_limitmask & fp->flags)
+				else if (mushstate.f_limitmask & fp->flags)
 				{
 					SAFE_NOPERM(buff, bufc);
 				}
@@ -2129,7 +2129,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					fp->fun(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs);
 				}
 
-				mudstate.func_nest_lev--;
+				mushstate.func_nest_lev--;
 			}
 			else
 			{
@@ -2165,21 +2165,21 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			}
 			else
 			{
-				if ((**dstr == '#') && mudstate.in_loop)
+				if ((**dstr == '#') && mushstate.in_loop)
 				{
-					SAFE_LB_STR(mudstate.loop_token[mudstate.in_loop - 1], buff, bufc);
+					SAFE_LB_STR(mushstate.loop_token[mushstate.in_loop - 1], buff, bufc);
 				}
-				else if ((**dstr == '@') && mudstate.in_loop)
+				else if ((**dstr == '@') && mushstate.in_loop)
 				{
-					SAFE_LTOS(buff, bufc, mudstate.loop_number[mudstate.in_loop - 1], LBUF_SIZE);
+					SAFE_LTOS(buff, bufc, mushstate.loop_number[mushstate.in_loop - 1], LBUF_SIZE);
 				}
-				else if ((**dstr == '+') && mudstate.in_loop)
+				else if ((**dstr == '+') && mushstate.in_loop)
 				{
-					SAFE_LB_STR(mudstate.loop_token2[mudstate.in_loop - 1], buff, bufc);
+					SAFE_LB_STR(mushstate.loop_token2[mushstate.in_loop - 1], buff, bufc);
 				}
-				else if ((**dstr == '$') && mudstate.in_switch)
+				else if ((**dstr == '$') && mushstate.in_switch)
 				{
-					SAFE_LB_STR(mudstate.switch_token, buff, bufc);
+					SAFE_LB_STR(mushstate.switch_token, buff, bufc);
 				}
 				else if (**dstr == '!')
 				{
@@ -2188,7 +2188,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 					 * nesting level.
 					 * 
 				     */
-					SAFE_LTOS(buff, bufc, ((mudstate.in_loop) ? (mudstate.in_loop - 1) : mudstate.in_switch), LBUF_SIZE);
+					SAFE_LTOS(buff, bufc, ((mushstate.in_loop) ? (mushstate.in_loop - 1) : mushstate.in_switch), LBUF_SIZE);
 				}
 				else
 				{
@@ -2214,7 +2214,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
      * to see if we actually put something in the buffer, too.
 	 * 
      */
-	if (mudconf.space_compress && at_space && !(eval & EV_NO_COMPRESS) && (start != *bufc))
+	if (mushconf.space_compress && at_space && !(eval & EV_NO_COMPRESS) && (start != *bufc))
 	{
 		(*bufc)--;
 	}
@@ -2239,10 +2239,10 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 	if (is_trace)
 	{
 		tcache_add(savestr, start);
-		save_count = tcache_count - mudconf.trace_limit;
+		save_count = tcache_count - mushconf.trace_limit;
 		;
 
-		if (is_top || !mudconf.trace_topdown)
+		if (is_top || !mushconf.trace_topdown)
 		{
 			tcache_finish(player);
 		}
@@ -2278,28 +2278,28 @@ GDATA *save_global_regs(const char *funcname)
 {
 	GDATA *preserve = NULL;
 
-	if (mudstate.rdata)
+	if (mushstate.rdata)
 	{
-		if (mudstate.rdata && (mudstate.rdata->q_alloc || mudstate.rdata->xr_alloc))
+		if (mushstate.rdata && (mushstate.rdata->q_alloc || mushstate.rdata->xr_alloc))
 		{
 			preserve = (GDATA *)XMALLOC(sizeof(GDATA), funcname);
-			preserve->q_alloc = mudstate.rdata->q_alloc;
-			if (mudstate.rdata->q_alloc)
+			preserve->q_alloc = mushstate.rdata->q_alloc;
+			if (mushstate.rdata->q_alloc)
 			{
-				preserve->q_regs = XCALLOC(mudstate.rdata->q_alloc, sizeof(char *), "q_regs");
-				preserve->q_lens = XCALLOC(mudstate.rdata->q_alloc, sizeof(int), "q_lens");
+				preserve->q_regs = XCALLOC(mushstate.rdata->q_alloc, sizeof(char *), "q_regs");
+				preserve->q_lens = XCALLOC(mushstate.rdata->q_alloc, sizeof(int), "q_lens");
 			}
 			else
 			{
 				preserve->q_regs = NULL;
 				preserve->q_lens = NULL;
 			}
-			preserve->xr_alloc = mudstate.rdata->xr_alloc;
-			if (mudstate.rdata->xr_alloc)
+			preserve->xr_alloc = mushstate.rdata->xr_alloc;
+			if (mushstate.rdata->xr_alloc)
 			{
-				preserve->x_names = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_names");
-				preserve->x_regs = XCALLOC(mudstate.rdata->xr_alloc, sizeof(char *), "x_regs");
-				preserve->x_lens = XCALLOC(mudstate.rdata->xr_alloc, sizeof(int), "x_lens");
+				preserve->x_names = XCALLOC(mushstate.rdata->xr_alloc, sizeof(char *), "x_names");
+				preserve->x_regs = XCALLOC(mushstate.rdata->xr_alloc, sizeof(char *), "x_regs");
+				preserve->x_lens = XCALLOC(mushstate.rdata->xr_alloc, sizeof(int), "x_lens");
 			}
 			else
 			{
@@ -2314,35 +2314,35 @@ GDATA *save_global_regs(const char *funcname)
 			preserve = NULL;
 		}
 
-		if (mudstate.rdata && mudstate.rdata->q_alloc)
+		if (mushstate.rdata && mushstate.rdata->q_alloc)
 		{
-			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 			{
-				if (mudstate.rdata->q_regs[z] && *(mudstate.rdata->q_regs[z]))
+				if (mushstate.rdata->q_regs[z] && *(mushstate.rdata->q_regs[z]))
 				{
 					preserve->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
-					XMEMCPY(preserve->q_regs[z], mudstate.rdata->q_regs[z], mudstate.rdata->q_lens[z] + 1);
-					preserve->q_lens[z] = mudstate.rdata->q_lens[z];
+					XMEMCPY(preserve->q_regs[z], mushstate.rdata->q_regs[z], mushstate.rdata->q_lens[z] + 1);
+					preserve->q_lens[z] = mushstate.rdata->q_lens[z];
 				}
 			}
 		}
-		if (mudstate.rdata && mudstate.rdata->xr_alloc)
+		if (mushstate.rdata && mushstate.rdata->xr_alloc)
 		{
-			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
-				if (mudstate.rdata->x_names[z] && *(mudstate.rdata->x_names[z]) && mudstate.rdata->x_regs[z] && *(mudstate.rdata->x_regs[z]))
+				if (mushstate.rdata->x_names[z] && *(mushstate.rdata->x_names[z]) && mushstate.rdata->x_regs[z] && *(mushstate.rdata->x_regs[z]))
 				{
 					preserve->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-					strcpy(preserve->x_names[z], mudstate.rdata->x_names[z]);
+					strcpy(preserve->x_names[z], mushstate.rdata->x_names[z]);
 					preserve->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-					XMEMCPY(preserve->x_regs[z], mudstate.rdata->x_regs[z], mudstate.rdata->x_lens[z] + 1);
-					preserve->x_lens[z] = mudstate.rdata->x_lens[z];
+					XMEMCPY(preserve->x_regs[z], mushstate.rdata->x_regs[z], mushstate.rdata->x_lens[z] + 1);
+					preserve->x_lens[z] = mushstate.rdata->x_lens[z];
 				}
 			}
 		}
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			preserve->dirty = mudstate.rdata->dirty;
+			preserve->dirty = mushstate.rdata->dirty;
 		}
 
 		else
@@ -2363,12 +2363,12 @@ GDATA *save_global_regs(const char *funcname)
  */
 void restore_global_regs(const char *funcname, GDATA *preserve)
 {
-	if (!mudstate.rdata && !preserve)
+	if (!mushstate.rdata && !preserve)
 	{
 		return;
 	}
 
-	if (mudstate.rdata && preserve && (mudstate.rdata->dirty == preserve->dirty))
+	if (mushstate.rdata && preserve && (mushstate.rdata->dirty == preserve->dirty))
 	{
 		/**
 		 * No change in the values. Move along.
@@ -2422,123 +2422,123 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
      */
 	if (!preserve)
 	{
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 			{
-				if (mudstate.rdata->q_regs[z])
-					XFREE(mudstate.rdata->q_regs[z]);
+				if (mushstate.rdata->q_regs[z])
+					XFREE(mushstate.rdata->q_regs[z]);
 			}
 
-			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
-				if (mudstate.rdata->x_names[z])
-					XFREE(mudstate.rdata->x_names[z]);
-				if (mudstate.rdata->x_regs[z])
-					XFREE(mudstate.rdata->x_regs[z]);
+				if (mushstate.rdata->x_names[z])
+					XFREE(mushstate.rdata->x_names[z]);
+				if (mushstate.rdata->x_regs[z])
+					XFREE(mushstate.rdata->x_regs[z]);
 			}
 
-			if (mudstate.rdata->q_regs)
+			if (mushstate.rdata->q_regs)
 			{
-				XFREE(mudstate.rdata->q_regs);
+				XFREE(mushstate.rdata->q_regs);
 			}
-			if (mudstate.rdata->q_lens)
+			if (mushstate.rdata->q_lens)
 			{
-				XFREE(mudstate.rdata->q_lens);
+				XFREE(mushstate.rdata->q_lens);
 			}
-			if (mudstate.rdata->x_names)
+			if (mushstate.rdata->x_names)
 			{
-				XFREE(mudstate.rdata->x_names);
+				XFREE(mushstate.rdata->x_names);
 			}
-			if (mudstate.rdata->x_regs)
+			if (mushstate.rdata->x_regs)
 			{
-				XFREE(mudstate.rdata->x_regs);
+				XFREE(mushstate.rdata->x_regs);
 			}
-			if (mudstate.rdata->x_lens)
+			if (mushstate.rdata->x_lens)
 			{
-				XFREE(mudstate.rdata->x_lens);
+				XFREE(mushstate.rdata->x_lens);
 			}
-			XFREE(mudstate.rdata);
+			XFREE(mushstate.rdata);
 		}
 
-		mudstate.rdata = NULL;
+		mushstate.rdata = NULL;
 	}
 	else
 	{
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			if (mudstate.rdata)
+			if (mushstate.rdata)
 			{
-				for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+				for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 				{
-					if (mudstate.rdata->q_regs[z])
-						XFREE(mudstate.rdata->q_regs[z]);
+					if (mushstate.rdata->q_regs[z])
+						XFREE(mushstate.rdata->q_regs[z]);
 				}
 
-				for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+				for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 				{
-					if (mudstate.rdata->x_names[z])
-						XFREE(mudstate.rdata->x_names[z]);
-					if (mudstate.rdata->x_regs[z])
-						XFREE(mudstate.rdata->x_regs[z]);
+					if (mushstate.rdata->x_names[z])
+						XFREE(mushstate.rdata->x_names[z]);
+					if (mushstate.rdata->x_regs[z])
+						XFREE(mushstate.rdata->x_regs[z]);
 				}
 
-				if (mudstate.rdata->q_regs)
+				if (mushstate.rdata->q_regs)
 				{
-					XFREE(mudstate.rdata->q_regs);
+					XFREE(mushstate.rdata->q_regs);
 				}
-				if (mudstate.rdata->q_lens)
+				if (mushstate.rdata->q_lens)
 				{
-					XFREE(mudstate.rdata->q_lens);
+					XFREE(mushstate.rdata->q_lens);
 				}
-				if (mudstate.rdata->x_names)
+				if (mushstate.rdata->x_names)
 				{
-					XFREE(mudstate.rdata->x_names);
+					XFREE(mushstate.rdata->x_names);
 				}
-				if (mudstate.rdata->x_regs)
+				if (mushstate.rdata->x_regs)
 				{
-					XFREE(mudstate.rdata->x_regs);
+					XFREE(mushstate.rdata->x_regs);
 				}
-				if (mudstate.rdata->x_lens)
+				if (mushstate.rdata->x_lens)
 				{
-					XFREE(mudstate.rdata->x_lens);
+					XFREE(mushstate.rdata->x_lens);
 				}
-				XFREE(mudstate.rdata);
+				XFREE(mushstate.rdata);
 			}
 		}
 
 		if (preserve && (preserve->q_alloc || preserve->xr_alloc))
 		{
-			mudstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
-			mudstate.rdata->q_alloc = preserve->q_alloc;
+			mushstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), (funcname));
+			mushstate.rdata->q_alloc = preserve->q_alloc;
 			if (preserve->q_alloc)
 			{
-				mudstate.rdata->q_regs = XCALLOC(preserve->q_alloc, sizeof(char *), "q_regs");
-				mudstate.rdata->q_lens = XCALLOC(preserve->q_alloc, sizeof(int), "q_lens");
+				mushstate.rdata->q_regs = XCALLOC(preserve->q_alloc, sizeof(char *), "q_regs");
+				mushstate.rdata->q_lens = XCALLOC(preserve->q_alloc, sizeof(int), "q_lens");
 			}
 			else
 			{
-				mudstate.rdata->q_regs = NULL;
-				mudstate.rdata->q_lens = NULL;
+				mushstate.rdata->q_regs = NULL;
+				mushstate.rdata->q_lens = NULL;
 			}
-			mudstate.rdata->xr_alloc = preserve->xr_alloc;
+			mushstate.rdata->xr_alloc = preserve->xr_alloc;
 			if (preserve->xr_alloc)
 			{
-				mudstate.rdata->x_names = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_names");
-				mudstate.rdata->x_regs = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_regs");
-				mudstate.rdata->x_lens = XCALLOC(preserve->xr_alloc, sizeof(int), "x_lens");
+				mushstate.rdata->x_names = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_names");
+				mushstate.rdata->x_regs = XCALLOC(preserve->xr_alloc, sizeof(char *), "x_regs");
+				mushstate.rdata->x_lens = XCALLOC(preserve->xr_alloc, sizeof(int), "x_lens");
 			}
 			else
 			{
-				mudstate.rdata->x_names = NULL;
-				mudstate.rdata->x_regs = NULL;
-				mudstate.rdata->x_lens = NULL;
+				mushstate.rdata->x_names = NULL;
+				mushstate.rdata->x_regs = NULL;
+				mushstate.rdata->x_lens = NULL;
 			}
-			mudstate.rdata->dirty = 0;
+			mushstate.rdata->dirty = 0;
 		}
 		else
 		{
-			mudstate.rdata = NULL;
+			mushstate.rdata = NULL;
 		}
 
 		if (preserve && preserve->q_alloc)
@@ -2547,9 +2547,9 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 			{
 				if (preserve->q_regs[z] && *(preserve->q_regs[z]))
 				{
-					mudstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
-					XMEMCPY(mudstate.rdata->q_regs[z], preserve->q_regs[z], preserve->q_lens[z] + 1);
-					mudstate.rdata->q_lens[z] = preserve->q_lens[z];
+					mushstate.rdata->q_regs[z] = XMALLOC(LBUF_SIZE, funcname);
+					XMEMCPY(mushstate.rdata->q_regs[z], preserve->q_regs[z], preserve->q_lens[z] + 1);
+					mushstate.rdata->q_lens[z] = preserve->q_lens[z];
 				}
 			}
 		}
@@ -2560,18 +2560,18 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 			{
 				if (preserve->x_names[z] && *(preserve->x_names[z]) && preserve->x_regs[z] && *(preserve->x_regs[z]))
 				{
-					mudstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-					strcpy(mudstate.rdata->x_names[z], preserve->x_names[z]);
-					mudstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
-					XMEMCPY(mudstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
-					mudstate.rdata->x_lens[z] = preserve->x_lens[z];
+					mushstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
+					strcpy(mushstate.rdata->x_names[z], preserve->x_names[z]);
+					mushstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
+					XMEMCPY(mushstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
+					mushstate.rdata->x_lens[z] = preserve->x_lens[z];
 				}
 			}
 		}
 
 		if (preserve)
 		{
-			mudstate.rdata->dirty = preserve->dirty;
+			mushstate.rdata->dirty = preserve->dirty;
 
 			for (int z = 0; z < preserve->q_alloc; z++)
 			{
@@ -2610,7 +2610,7 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 		}
 		else
 		{
-			mudstate.rdata->dirty = 0;
+			mushstate.rdata->dirty = 0;
 		}
 	}
 }

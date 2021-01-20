@@ -40,7 +40,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 	int succ = 0;
 	char *s = NULL;
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		if (!strcmp(module_name, mp->modname))
 		{
@@ -68,7 +68,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 		{
 			afp->handler = fn_ptr;
 			s = XASPRINTF("s", "%s_%s", api_name, afp->name);
-			hashadd(s, (int *)afp, &mudstate.api_func_htab, 0);
+			hashadd(s, (int *)afp, &mushstate.api_func_htab, 0);
 			XFREE(s);
 		}
 	}
@@ -86,7 +86,7 @@ void *request_api_function(char *api_name, char *fn_name)
 	API_FUNCTION *afp = NULL;
 
 	char *s = XASPRINTF("s", "%s_%s", api_name, fn_name);
-	afp = (API_FUNCTION *)hashfind(s, &mudstate.api_func_htab);
+	afp = (API_FUNCTION *)hashfind(s, &mushstate.api_func_htab);
 	XFREE(s);
 
 	if (!afp)
@@ -111,9 +111,9 @@ void register_commands(CMDENT *cmdtab)
 	{
 		for (cp = cmdtab; cp->cmdname; cp++)
 		{
-			hashadd(cp->cmdname, (int *)cp, &mudstate.command_htab, 0);
+			hashadd(cp->cmdname, (int *)cp, &mushstate.command_htab, 0);
 			s = XASPRINTF("s", "__%s", cp->cmdname);
-			hashadd(s, (int *)cp, &mudstate.command_htab, HASH_ALIAS);
+			hashadd(s, (int *)cp, &mushstate.command_htab, HASH_ALIAS);
 			XFREE(s);
 		}
 	}
@@ -134,7 +134,7 @@ void register_prefix_cmds(const char *cmdchars)
 		for (cp = cmdchars; *cp; cp++)
 		{
 			cn[0] = *cp;
-			prefix_cmds[(unsigned char)*cp] = (CMDENT *)hashfind(cn, &mudstate.command_htab);
+			prefix_cmds[(unsigned char)*cp] = (CMDENT *)hashfind(cn, &mushstate.command_htab);
 		}
 	}
 	XFREE(cn);
@@ -153,7 +153,7 @@ void register_functions(FUN *functab)
 	{
 		for (fp = functab; fp->name; fp++)
 		{
-			hashadd((char *)fp->name, (int *)fp, &mudstate.func_htab, 0);
+			hashadd((char *)fp->name, (int *)fp, &mushstate.func_htab, 0);
 		}
 	}
 }
@@ -173,7 +173,7 @@ void register_hashtables(MODHASHES *htab, MODHASHES *ntab)
 	{
 		for (hp = htab; hp->tabname != NULL; hp++)
 		{
-			hashinit(hp->htab, hp->size_factor * mudconf.hash_factor, HT_STR);
+			hashinit(hp->htab, hp->size_factor * mushconf.hash_factor, HT_STR);
 		}
 	}
 
@@ -181,7 +181,7 @@ void register_hashtables(MODHASHES *htab, MODHASHES *ntab)
 	{
 		for (np = ntab; np->tabname != NULL; np++)
 		{
-			nhashinit(np->htab, np->size_factor * mudconf.hash_factor);
+			nhashinit(np->htab, np->size_factor * mushconf.hash_factor);
 		}
 	}
 }
@@ -216,16 +216,16 @@ unsigned int register_dbtype(char *modname)
 	 * 
 	 */
 
-	if ((mudstate.moduletype_top >= DBTYPE_RESERVED) && (mudstate.moduletype_top < DBTYPE_END))
+	if ((mushstate.moduletype_top >= DBTYPE_RESERVED) && (mushstate.moduletype_top < DBTYPE_END))
 	{
 		/*
 		 * Write the entry to GDBM
 		 */
-		data.dptr = &mudstate.moduletype_top;
+		data.dptr = &mushstate.moduletype_top;
 		data.dsize = sizeof(unsigned int);
 		db_put(key, data, DBTYPE_MODULETYPE);
-		type = mudstate.moduletype_top;
-		mudstate.moduletype_top++;
+		type = mushstate.moduletype_top;
+		mushstate.moduletype_top++;
 		return type;
 	}
 	else

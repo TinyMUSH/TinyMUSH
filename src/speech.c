@@ -28,7 +28,7 @@ int sp_ok(dbref player)
 		return 0;
 	}
 
-	if (!mudconf.robot_speak)
+	if (!mushconf.robot_speak)
 	{
 		if (Robot(player) && !controls(player, Location(player)))
 		{
@@ -153,18 +153,18 @@ void format_speech(dbref player, dbref speaker, dbref loc, char *message, int ke
 	switch (key)
 	{
 	case SAY_SAY:
-		if (mudconf.you_say)
+		if (mushconf.you_say)
 		{
-			notify_check(speaker, speaker, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You %s \"%s\"", mudconf.comma_say ? "say," : "say", message);
+			notify_check(speaker, speaker, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You %s \"%s\"", mushconf.comma_say ? "say," : "say", message);
 
 			if (loc != NOTHING)
 			{
-				notify_except(loc, player, speaker, MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mudconf.comma_say ? "says," : "says", message);
+				notify_except(loc, player, speaker, MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mushconf.comma_say ? "says," : "says", message);
 			}
 		}
 		else
 		{
-			notify_check(loc, player, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mudconf.comma_say ? "says," : "says", message);
+			notify_check(loc, player, MSG_ME_ALL | MSG_NBR_EXITS_A | MSG_F_UP | MSG_F_CONTENTS | MSG_S_INSIDE | MSG_SPEECH, "%s %s \"%s\"", Name(speaker), mushconf.comma_say ? "says," : "says", message);
 		}
 
 		break;
@@ -572,9 +572,9 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 
 int page_check(dbref player, dbref target)
 {
-	if (!payfor(player, Guest(player) ? 0 : mudconf.pagecost))
+	if (!payfor(player, Guest(player) ? 0 : mushconf.pagecost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
 	}
 	else if (!Connected(target))
 	{
@@ -636,7 +636,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	if (!key && !*message)
 	{
-		if (mudconf.page_req_equals)
+		if (mushconf.page_req_equals)
 		{
 			notify(player, "No one to page.");
 			return;
@@ -1059,14 +1059,14 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			/*
 	     * see if player can pemit to this dbref
 	     */
-			ok_to_do = mudconf.pemit_any;
+			ok_to_do = mushconf.pemit_any;
 
 			if (!ok_to_do && (Long_Fingers(player) || nearby(player, who) || Controls(player, who)))
 			{
 				ok_to_do = 1;
 			}
 
-			if (!ok_to_do && (isPlayer(who)) && mudconf.pemit_players)
+			if (!ok_to_do && (isPlayer(who)) && mushconf.pemit_players)
 			{
 				if (!page_check(player, who))
 				{
@@ -1076,7 +1076,7 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 				ok_to_do = 1;
 			}
 
-			if (do_contents && !mudconf.pemit_any && !Controls(player, who))
+			if (do_contents && !mushconf.pemit_any && !Controls(player, who))
 			{
 				ok_to_do = 0;
 			}
@@ -1195,7 +1195,7 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 			ok_to_do = 1;
 		}
 
-		if (!ok_to_do && (key == PEMIT_PEMIT) && (Typeof(target) == TYPE_PLAYER) && mudconf.pemit_players)
+		if (!ok_to_do && (key == PEMIT_PEMIT) && (Typeof(target) == TYPE_PLAYER) && mushconf.pemit_players)
 		{
 			if (!page_check(player, target))
 			{
@@ -1205,13 +1205,13 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 			ok_to_do = 1;
 		}
 
-		if (!ok_to_do && (!mudconf.pemit_any || (key != PEMIT_PEMIT)))
+		if (!ok_to_do && (!mushconf.pemit_any || (key != PEMIT_PEMIT)))
 		{
 			notify(player, "You are too far away to do that.");
 			return;
 		}
 
-		if (do_contents && !Controls(player, target) && !mudconf.pemit_any)
+		if (do_contents && !Controls(player, target) && !mushconf.pemit_any)
 		{
 			notify(player, NOPERM_MESSAGE);
 			return;
@@ -1279,7 +1279,7 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 					notify_check(target, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s whispers \"%s\"", Name(player), message);
 				}
 
-				if ((!mudconf.quiet_whisper) && !Wizard(player))
+				if ((!mushconf.quiet_whisper) && !Wizard(player))
 				{
 					loc = where_is(player);
 

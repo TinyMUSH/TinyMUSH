@@ -377,7 +377,7 @@ void get_list(FILE *f, dbref i, int new_strings)
 			 * read # then string
 			 * 
 			 */
-			if (mudstate.standalone)
+			if (mushstate.standalone)
 			{
 				atr = unscramble_attrnum(getref(f));
 			}
@@ -717,7 +717,7 @@ void efo_convert(void)
 	int i = 0;
 	dbref link = NOTHING;
 
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		switch (Typeof(i))
 		{
@@ -751,8 +751,8 @@ void fix_mux_zones(void)
      */
 	int *zmarks;
 	char *astr;
-	zmarks = (int *)XCALLOC(mudstate.db_top, sizeof(int), "zmarks");
-	for (int i = 0; i < mudstate.db_top; i++)
+	zmarks = (int *)XCALLOC(mushstate.db_top, sizeof(int), "zmarks");
+	for (int i = 0; i < mushstate.db_top; i++)
 	{
 		if (Zone(i) != NOTHING)
 		{
@@ -761,7 +761,7 @@ void fix_mux_zones(void)
 		}
 	}
 
-	for (int i = 0; i < mudstate.db_top; i++)
+	for (int i = 0; i < mushstate.db_top; i++)
 	{
 		if (zmarks[i])
 		{
@@ -797,7 +797,7 @@ void fix_typed_quotas(void)
 	char *qbuf = NULL, *rqbuf = NULL;
 	char *s = XMALLOC(LBUF_SIZE, "s");
 
-	for (int i = 0; i < mudstate.db_top; i++)
+	for (int i = 0; i < mushstate.db_top; i++)
 	{
 		if (isPlayer(i))
 		{
@@ -852,7 +852,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 	g_version = 0;
 	g_flags = 0;
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "Reading ");
 	}
@@ -865,7 +865,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 		{
 			XFREE(tstr);
 		}
-		if (mudstate.standalone && !(i % 100))
+		if (mushstate.standalone && !(i % 100))
 		{
 			log_write_raw(1, ".");
 		}
@@ -884,7 +884,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				 * Record number of players
 				 * 
 				 */
-				mudstate.record_players = getref(f);
+				mushstate.record_players = getref(f);
 				break;
 
 			default:
@@ -908,7 +908,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				 */
 				if (header_gotten)
 				{
-					if (mudstate.standalone)
+					if (mushstate.standalone)
 					{
 						log_write_raw(1, "\nDuplicate MUSH version header entry at object %d, ignored.\n", i);
 					}
@@ -997,7 +997,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				 */
 				if (size_gotten)
 				{
-					if (mudstate.standalone)
+					if (mushstate.standalone)
 					{
 						log_write_raw(1, "\nDuplicate size entry at object %d, ignored.\n", i);
 					}
@@ -1010,7 +1010,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				}
 				else
 				{
-					mudstate.min_size = getref(f);
+					mushstate.min_size = getref(f);
 				}
 
 				size_gotten = 1;
@@ -1056,7 +1056,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				}
 				else
 				{
-					aflags = mudconf.vattr_flags;
+					aflags = mushconf.vattr_flags;
 				}
 
 				vattr_define((char *)tstr, anum, aflags);
@@ -1077,7 +1077,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				 */
 				if (nextattr_gotten)
 				{
-					if (mudstate.standalone)
+					if (mushstate.standalone)
 					{
 						log_write_raw(1, "\nDuplicate next free vattr entry at object %d, ignored.\n", i);
 					}
@@ -1090,14 +1090,14 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				}
 				else
 				{
-					mudstate.attr_next = getref(f);
+					mushstate.attr_next = getref(f);
 					nextattr_gotten = 1;
 				}
 
 				break;
 
 			default:
-				if (mudstate.standalone)
+				if (mushstate.standalone)
 				{
 					log_write_raw(1, "\nUnexpected character '%c' in MUSH header near object #%d, ignored.\n", ch, i);
 				}
@@ -1133,7 +1133,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			i = getref(f);
 			db_grow(i + 1);
 
-			if (mudconf.lag_check_clk)
+			if (mushconf.lag_check_clk)
 			{
 				obj_time.tv_sec = obj_time.tv_usec = 0;
 				db[i].cpu_time_used.tv_sec = obj_time.tv_sec;
@@ -1348,7 +1348,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			if (strcmp(tstr, "**END OF DUMP***"))
 			{
-				if (mudstate.standalone)
+				if (mushstate.standalone)
 				{
 					log_write_raw(1, "\nBad EOF marker at object #%d\n", i);
 				}
@@ -1357,7 +1357,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			}
 			else
 			{
-				if (mudstate.standalone)
+				if (mushstate.standalone)
 				{
 					log_write_raw(1, "\n");
 				}
@@ -1376,11 +1376,11 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 					fix_mux_zones();
 				}
 
-				return mudstate.db_top;
+				return mushstate.db_top;
 			}
 
 		default:
-			if (mudstate.standalone)
+			if (mushstate.standalone)
 			{
 				log_write_raw(1, "\nIllegal character '%c' near object #%d\n", ch, i);
 			}
@@ -1429,13 +1429,13 @@ int db_read(void)
 	 * 
      */
 	c = data.dptr;
-	XMEMCPY((void *)&mudstate.min_size, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mushstate.min_size, (void *)c, sizeof(int));
 	c++;
-	XMEMCPY((void *)&mudstate.attr_next, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mushstate.attr_next, (void *)c, sizeof(int));
 	c++;
-	XMEMCPY((void *)&mudstate.record_players, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mushstate.record_players, (void *)c, sizeof(int));
 	c++;
-	XMEMCPY((void *)&mudstate.moduletype_top, (void *)c, sizeof(int));
+	XMEMCPY((void *)&mushstate.moduletype_top, (void *)c, sizeof(int));
 	XFREE(data.dptr);
 
 	/**
@@ -1444,7 +1444,7 @@ int db_read(void)
      */
 	blksize = ATRNUM_BLOCK_SIZE;
 
-	for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++)
+	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.attr_next, blksize); i++)
 	{
 		key.dptr = &i;
 		key.dsize = sizeof(int);
@@ -1488,14 +1488,14 @@ int db_read(void)
      * Load the object structures
 	 * 
      */
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write(LOG_ALWAYS, "DBR", "LOAD", "Reading ");
 	}
 
 	blksize = OBJECT_BLOCK_SIZE;
 
-	for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.min_size, blksize); i++)
+	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.min_size, blksize); i++)
 	{
 		key.dptr = &i;
 		key.dsize = sizeof(int);
@@ -1516,7 +1516,7 @@ int db_read(void)
 				s += sizeof(int);
 				db_grow(num + 1);
 
-				if (mudstate.standalone && !(num % 100))
+				if (mushstate.standalone && !(num % 100))
 				{
 					log_write_raw(1, ".");
 				}
@@ -1528,7 +1528,7 @@ int db_read(void)
 				XMEMCPY((void *)&(db[num]), (void *)s, sizeof(DUMPOBJ));
 				s += sizeof(DUMPOBJ);
 
-				if (mudconf.lag_check_clk)
+				if (mushconf.lag_check_clk)
 				{
 					obj_time.tv_sec = obj_time.tv_usec = 0;
 					db[num].cpu_time_used.tv_sec = obj_time.tv_sec;
@@ -1559,12 +1559,12 @@ int db_read(void)
 		}
 	}
 
-	if (!mudstate.standalone)
+	if (!mushstate.standalone)
 	{
 		load_player_names();
 	}
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "\n");
 	}
@@ -1683,7 +1683,7 @@ int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)),
 	{
 		save = 0;
 
-		if (!mudstate.standalone)
+		if (!mushstate.standalone)
 		{
 			a = atr_num(ca);
 
@@ -1789,7 +1789,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		return -1;
 	}
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "Writing ");
 	}
@@ -1798,11 +1798,11 @@ dbref db_write_flatfile(FILE *f, int format, int version)
      * Attribute cleaning, if standalone.
 	 * 
      */
-	if (mudstate.standalone && dbclean)
+	if (mushstate.standalone && dbclean)
 	{
-		used_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "used_attrs_table");
-		old_attrs_table = (int *)XCALLOC(mudstate.attr_next, sizeof(int), "old_attrs_table");
-		n_oldtotal = mudstate.attr_next;
+		used_attrs_table = (int *)XCALLOC(mushstate.attr_next, sizeof(int), "used_attrs_table");
+		old_attrs_table = (int *)XCALLOC(mushstate.attr_next, sizeof(int), "old_attrs_table");
+		n_oldtotal = mushstate.attr_next;
 		n_deleted = n_renumbered = n_objt = n_atrt = 0;
 
 		/**
@@ -1819,7 +1819,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * 
 		 */
 		atr_push();
-		for (i = 0; i < mudstate.db_top; i++)
+		for (i = 0; i < mushstate.db_top; i++)
 		{
 			for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
 			{
@@ -1851,7 +1851,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * a mapping of what things used to be.
 		 * 
 		 */
-		for (n = A_USER_START, end = mudstate.attr_next - 1; (n < mudstate.attr_next) && (n < end); n++)
+		for (n = A_USER_START, end = mushstate.attr_next - 1; (n < mushstate.attr_next) && (n < end); n++)
 		{
 			if (used_attrs_table[n] == 0)
 			{
@@ -1873,7 +1873,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * Count up our renumbers.
 		 * 
 		 */
-		for (n = A_USER_START; n < mudstate.attr_next; n++)
+		for (n = A_USER_START; n < mushstate.attr_next; n++)
 		{
 			if ((used_attrs_table[n] != n) && (used_attrs_table[n] != 0))
 			{
@@ -1891,13 +1891,13 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * we've renumbered.
 		 * 
 		 */
-		for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mudstate.attr_next)); anxt++)
+		for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mushstate.attr_next)); anxt++)
 			;
 	}
 	else
 	{
 		used_attrs_table = NULL;
-		anxt = mudstate.attr_next;
+		anxt = mushstate.attr_next;
 	}
 
 	/**
@@ -1905,14 +1905,14 @@ dbref db_write_flatfile(FILE *f, int format, int version)
      * 3.0 writes '+T'.
 	 * 
      */
-	fprintf(f, "+T%d\n+S%d\n+N%d\n", flags, mudstate.db_top, anxt);
-	fprintf(f, "-R%d\n", mudstate.record_players);
+	fprintf(f, "+T%d\n+S%d\n+N%d\n", flags, mushstate.db_top, anxt);
+	fprintf(f, "-R%d\n", mushstate.record_players);
 
 	/**
      * Dump user-named attribute info
 	 * 
      */
-	if (mudstate.standalone && dbclean)
+	if (mushstate.standalone && dbclean)
 	{
 		for (i = A_USER_START; i < anxt; i++)
 		{
@@ -1952,9 +1952,9 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	 * 
      */
 	n_objt = n_atrt = 0;
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
-		if (mudstate.standalone && !(i % 100))
+		if (mushstate.standalone && !(i % 100))
 		{
 			log_write_raw(1, ".");
 		}
@@ -1964,7 +1964,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	fputs("***END OF DUMP***\n", f);
 	fflush(f);
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "\n");
 
@@ -1984,7 +1984,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		}
 	}
 
-	return (mudstate.db_top);
+	return (mushstate.db_top);
 }
 
 /**
@@ -2001,7 +2001,7 @@ dbref db_write(void)
 
 	al_store();
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "Writing ");
 	}
@@ -2016,7 +2016,7 @@ dbref db_write(void)
      * Write database information
 	 * 
      */
-	i = mudstate.attr_next;
+	i = mushstate.attr_next;
 
 	/**
      * Roll up various paramaters needed for startup into one record.
@@ -2024,13 +2024,13 @@ dbref db_write(void)
 	 * 
      */
 	c = data.dptr = (int *)XMALLOC(4 * sizeof(int), "c");
-	XMEMCPY((void *)c, (void *)&mudstate.db_top, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mushstate.db_top, sizeof(int));
 	c++;
 	XMEMCPY((void *)c, (void *)&i, sizeof(int));
 	c++;
-	XMEMCPY((void *)c, (void *)&mudstate.record_players, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mushstate.record_players, sizeof(int));
 	c++;
-	XMEMCPY((void *)c, (void *)&mudstate.moduletype_top, sizeof(int));
+	XMEMCPY((void *)c, (void *)&mushstate.moduletype_top, sizeof(int));
 
 	/**
      * "TM3" is our unique key
@@ -2060,13 +2060,13 @@ dbref db_write(void)
      */
 	data.dptr = (char *)XMALLOC(ATRNUM_BLOCK_BYTES, "data.dptr");
 
-	for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.attr_next, blksize); i++)
+	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.attr_next, blksize); i++)
 	{
 		dirty = 0;
 		num = 0;
 		s = data.dptr;
 
-		for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.attr_next); j++)
+		for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mushstate.attr_next); j++)
 		{
 			if (j < A_USER_START)
 			{
@@ -2077,7 +2077,7 @@ dbref db_write(void)
 
 			if (vp && !(vp->flags & AF_DELETED))
 			{
-				if (!mudstate.standalone)
+				if (!mushstate.standalone)
 				{
 					if (vp->flags & AF_DIRTY)
 					{
@@ -2116,7 +2116,7 @@ dbref db_write(void)
 		     * attribute numbers in this block
 			 * 
 		     */
-			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.attr_next); j++)
+			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mushstate.attr_next); j++)
 			{
 				/**
 				 * j is an offset of attribute numbers into
@@ -2169,15 +2169,15 @@ dbref db_write(void)
      */
 	data.dptr = (char *)XMALLOC(OBJECT_BLOCK_BYTES, "data.dptr");
 
-	for (i = 0; i <= ENTRY_NUM_BLOCKS(mudstate.db_top, blksize); i++)
+	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.db_top, blksize); i++)
 	{
 		dirty = 0;
 		num = 0;
 		s = data.dptr;
 
-		for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mudstate.db_top); j++)
+		for (j = ENTRY_BLOCK_STARTS(i, blksize); (j <= ENTRY_BLOCK_ENDS(i, blksize)) && (j < mushstate.db_top); j++)
 		{
-			if (mudstate.standalone && !(j % 100))
+			if (mushstate.standalone && !(j % 100))
 			{
 				log_write_raw(1, ".");
 			}
@@ -2189,7 +2189,7 @@ dbref db_write(void)
 		     */
 			if (!Going(j))
 			{
-				if (!mudstate.standalone)
+				if (!mushstate.standalone)
 				{
 					if (Flags3(j) & DIRTY)
 					{
@@ -2228,7 +2228,7 @@ dbref db_write(void)
 		     * objects in this block
 			 * 
 		     */
-			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mudstate.db_top); j++)
+			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mushstate.db_top); j++)
 			{
 				/**
 				 * j is an offset of object numbers into the current block
@@ -2264,12 +2264,12 @@ dbref db_write(void)
      */
 	db_unlock();
 
-	if (mudstate.standalone)
+	if (mushstate.standalone)
 	{
 		log_write_raw(1, "\n");
 	}
 
-	return (mudstate.db_top);
+	return (mushstate.db_top);
 }
 
 /**

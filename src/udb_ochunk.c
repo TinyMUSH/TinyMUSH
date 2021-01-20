@@ -57,10 +57,10 @@ int dddb_init(void)
     char *tmpfile;
     int i;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
 
-        tmpfile = XASPRINTF("tmpfile", "%s/%s", mudconf.dbhome, dbfile);
+        tmpfile = XASPRINTF("tmpfile", "%s/%s", mushconf.dbhome, dbfile);
     }
     else
     {
@@ -69,7 +69,7 @@ int dddb_init(void)
 
     log_write(LOG_ALWAYS, "DB", "INFO", "Opening %s", tmpfile);
 
-    if ((dbp = gdbm_open(tmpfile, mudstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, dbm_error)) == (GDBM_FILE)0)
+    if ((dbp = gdbm_open(tmpfile, mushstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, dbm_error)) == (GDBM_FILE)0)
     {
         warning("dddb_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
         XFREE(tmpfile);
@@ -77,7 +77,7 @@ int dddb_init(void)
     }
     XFREE(tmpfile);
 
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         /*
 	 * Set the cache size to be 400 hash buckets for GDBM.
@@ -133,7 +133,7 @@ int dddb_init(void)
      * * performance no-no; run non-synchronous
      */
 
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         dddb_setsync(0);
     }
@@ -141,7 +141,7 @@ int dddb_init(void)
     /*
      * Grab the file descriptor for locking
      */
-    mudstate.dbm_fd = gdbm_fdesc(dbp);
+    mushstate.dbm_fd = gdbm_fdesc(dbp);
     db_initted = 1;
     return (0);
 }
@@ -315,7 +315,7 @@ void db_lock(void)
      * Attempt to lock the DBM file. Block until the lock is cleared,
      * then set it.
      */
-    if (mudstate.dbm_fd == -1)
+    if (mushstate.dbm_fd == -1)
     {
         return;
     }
@@ -326,7 +326,7 @@ void db_lock(void)
     fl.l_len = 0;
     fl.l_pid = getpid();
 
-    if (fcntl(mudstate.dbm_fd, F_SETLKW, &fl) == -1)
+    if (fcntl(mushstate.dbm_fd, F_SETLKW, &fl) == -1)
     {
         log_perror("DMP", "LOCK", NULL, "fcntl()");
         return;
@@ -335,14 +335,14 @@ void db_lock(void)
 
 void db_unlock(void)
 {
-    if (mudstate.dbm_fd == -1)
+    if (mushstate.dbm_fd == -1)
     {
         return;
     }
 
     fl.l_type = F_UNLCK;
 
-    if (fcntl(mudstate.dbm_fd, F_SETLK, &fl) == -1)
+    if (fcntl(mushstate.dbm_fd, F_SETLK, &fl) == -1)
     {
         log_perror("DMP", "LOCK", NULL, "fcntl()");
         return;

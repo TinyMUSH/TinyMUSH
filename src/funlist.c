@@ -1644,7 +1644,7 @@ int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref playe
 	char *result, *tbuf, *elems[2], *bp;
 	int n;
 
-	if ((mudstate.func_invk_ctr > mudconf.func_invk_lim) || (mudstate.func_nest_lev > mudconf.func_nest_lim) || Too_Much_CPU())
+	if ((mushstate.func_invk_ctr > mushconf.func_invk_lim) || (mushstate.func_nest_lev > mushconf.func_nest_lim) || Too_Much_CPU())
 	{
 		return 0;
 	}
@@ -3910,7 +3910,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			{
 				SAFE_LB_STR(t, buff, bufc);
 			}
-			else if ((mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+			else if ((mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
 			{
 				objs[0] = t;
 				XMEMCPY(atextbuf, atext, alen);

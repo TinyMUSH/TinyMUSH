@@ -29,8 +29,8 @@ extern FUN flist[];
 
 extern DESC *descriptor_list;
 
-extern CONFDATA mudconf;
-extern STATEDATA mudstate;
+extern CONFDATA mushconf;
+extern STATEDATA mushstate;
 
 /**
  * @brief Name Tables

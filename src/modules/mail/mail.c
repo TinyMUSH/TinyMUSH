@@ -602,7 +602,7 @@ void do_mail_read(dbref player, char *msglist)
                 status = status_string(mp);
                 names = make_namelist(player, (char *)mp->tolist);
                 ccnames = make_namelist(player, (char *)mp->cclist);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name(mp->from), mp->time, (Connected(mp->from) && (!Hidden(mp->from) || See_Hidden(player))) ? " (Conn)" : "      ", folder, status, names);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s  %s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mushconf.player_name_length - 6, Name(mp->from), mp->time, (Connected(mp->from) && (!Hidden(mp->from) || See_Hidden(player))) ? " (Conn)" : "      ", folder, status, names);
 
                 if (*ccnames)
                     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames);
@@ -761,7 +761,7 @@ void do_mail_review(dbref player, char *name, char *msglist)
                     /*
                      * list it
                      */
-                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mudconf.player_name_length - 6, Name(mp->to), mp->subject);
+                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mushconf.player_name_length - 6, Name(mp->to), mp->subject);
                 }
             }
         }
@@ -776,7 +776,7 @@ void do_mail_review(dbref player, char *name, char *msglist)
                     /*
                      * list it
                      */
-                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mudconf.player_name_length - 6, Name(mp->to), mp->subject);
+                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) To: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mushconf.player_name_length - 6, Name(mp->to), mp->subject);
                 }
             }
         }
@@ -813,7 +813,7 @@ void do_mail_review(dbref player, char *name, char *msglist)
                         ccnames = make_namelist(player, (char *)mp->cclist);
                         bccnames = make_namelist(player, (char *)mp->bcclist);
                         notify(player, DASH_LINE);
-                        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name(mp->from), mp->time, 0, status, names);
+                        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mushconf.player_name_length - 6, Name(mp->from), mp->time, 0, status, names);
 
                         if (*ccnames)
                             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames);
@@ -855,7 +855,7 @@ void do_mail_review(dbref player, char *name, char *msglist)
                         ccnames = make_namelist(player, (char *)mp->cclist);
                         bccnames = make_namelist(player, (char *)mp->bcclist);
                         notify(player, DASH_LINE);
-                        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mudconf.player_name_length - 6, Name(mp->from), mp->time, 0, status, names);
+                        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%-3d         From:  %-*s  At: %-25s\r\nFldr   : %-2d Status: %s\r\nTo     : %-65s", i, mushconf.player_name_length - 6, Name(mp->from), mp->time, 0, status, names);
 
                         if (*ccnames)
                             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc     : %-65s", ccnames);
@@ -917,9 +917,9 @@ void do_mail_list(dbref player, char *msglist, int sub)
                 time = mail_list_time(mp->time);
 
                 if (sub)
-                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mudconf.player_name_length - 6, Name(mp->from), mp->subject);
+                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s Sub: %.25s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mushconf.player_name_length - 6, Name(mp->from), mp->subject);
                 else
-                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s At: %s %s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mudconf.player_name_length - 6, Name(mp->from), time, ((Connected(mp->from) && (!Hidden(mp->from) || See_Hidden(player))) ? "Conn" : " "));
+                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%s] %-3d (%4d) From: %-*s At: %s %s", status_chars(mp), i, strlen(get_mail_message(mp->number)), mushconf.player_name_length - 6, Name(mp->from), time, ((Connected(mp->from) && (!Hidden(mp->from) || See_Hidden(player))) ? "Conn" : " "));
 
                 XFREE(time);
             }
@@ -1371,7 +1371,7 @@ void do_mail_nuke(dbref player)
     /*
      * walk the list
      */
-    for (thing = 0; thing < mudstate.db_top; thing++)
+    for (thing = 0; thing < mushstate.db_top; thing++)
     {
         for (mp = (struct mail *)nhashfind((int)thing,
                                            &mod_mail_msg_htab);
@@ -1555,9 +1555,9 @@ void do_mail_stats(dbref player, char *name, int full)
      * this command is computationally expensive
      */
 
-    if (!payfor(player, mudconf.searchcost))
+    if (!payfor(player, mushconf.searchcost))
     {
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Finding mail stats costs %d %s.", mudconf.searchcost, (mudconf.searchcost == 1) ? mudconf.one_coin : mudconf.many_coins);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Finding mail stats costs %d %s.", mushconf.searchcost, (mushconf.searchcost == 1) ? mushconf.one_coin : mushconf.many_coins);
         return;
     }
 
@@ -1910,7 +1910,7 @@ void mod_mail_dump_database(FILE *fp)
     /* Write out version number */
     fprintf(fp, "+V6\n");
     putref(fp, mod_mail_config.mail_db_top);
-    for (thing = 0; thing < mudstate.db_top; thing++)
+    for (thing = 0; thing < mushstate.db_top; thing++)
     {
         if (isPlayer(thing))
         {
@@ -3980,7 +3980,7 @@ static void do_mail_proof(dbref player)
         bccnames = make_namelist(player, mailto);
         XFREE(mailto);
         notify(player, DASH_LINE);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "From:  %-*s  Subject: %-35s\nTo: %s", mudconf.player_name_length - 6, Name(player), atr_get_raw(player, A_MAILSUB), names);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "From:  %-*s  Subject: %-35s\nTo: %s", mushconf.player_name_length - 6, Name(player), atr_get_raw(player, A_MAILSUB), names);
 
         if (*ccnames)
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cc: %s", ccnames);
@@ -4532,28 +4532,28 @@ void mod_mail_init(void)
     mod_mail_config.mail_db_size = 0;
     mod_mail_config.mail_freelist = 0;
 
-    switch (mudstate.version.status)
+    switch (mushstate.version.status)
     {
     case 0:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 1:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     case 2:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         break;
 
     default:
-        if (mudstate.version.revision > 0)
+        if (mushstate.version.revision > 0)
         {
-            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mudstate.version.major, mudstate.version.minor, mudstate.version.revision, PACKAGE_RELEASE_DATE);
+            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
         }
         else
         {
-            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mudstate.version.major, mudstate.version.minor, PACKAGE_RELEASE_DATE);
+            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mushstate.version.major, mushstate.version.minor, PACKAGE_RELEASE_DATE);
         }
     }
 

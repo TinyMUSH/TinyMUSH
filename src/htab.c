@@ -601,11 +601,11 @@ void hashresize(HASHTAB *htab, int min_size)
     int size, i, htype, hval;
     HASHTAB new_htab;
     HASHENT *hent, *thent;
-    size = (htab->entries) * mudconf.hash_factor;
+    size = (htab->entries) * mushconf.hash_factor;
     size = (size < min_size) ? min_size : size;
     get_hashmask(&size);
 
-    if ((size > 512) && (size > htab->entries * 1.33 * mudconf.hash_factor))
+    if ((size > 512) && (size > htab->entries * 1.33 * mushconf.hash_factor))
     {
         size /= 2;
     }

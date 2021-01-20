@@ -69,7 +69,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	foundany = 0;
 	isdark = Darkened(player, loc);
 
-	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (!Has_exits(parent))
 		{
@@ -103,7 +103,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	e = buff = XMALLOC(LBUF_SIZE, "buff");
 	e1 = buff1 = XMALLOC(LBUF_SIZE, "buff1");
 
-	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		if (Transparent(loc))
 		{
@@ -146,7 +146,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 					if (buff != e)
 						SAFE_STRCAT(buff, &e, "  ", LBUF_SIZE);
 
-					if (Html(player) && (mudconf.have_pueblo == 1))
+					if (Html(player) && (mushconf.have_pueblo == 1))
 					{
 						e1 = buff1;
 						safe_exit_name(thing, buff1, &e1);
@@ -176,7 +176,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 		}
 	}
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		if (!(Transparent(loc)))
 		{
@@ -221,7 +221,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 		return;
 	}
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		html_buff = html_cp = XMALLOC(LBUF_SIZE, "html_cp");
 	}
@@ -248,7 +248,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 					buff = unparse_object(player, thing, 1);
 					html_cp = html_buff;
 
-					if (Html(player) && (mudconf.have_pueblo == 1))
+					if (Html(player) && (mushconf.have_pueblo == 1))
 					{
 						SAFE_LB_STR("<a xch_cmd=\"look ", html_buff, &html_cp);
 
@@ -297,7 +297,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 		}
 	}
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		XFREE(html_buff);
 	}
@@ -733,7 +733,7 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	}
 	else if (aflags & AF_STRUCTURE)
 	{
-		text = replace_string(GENERIC_STRUCT_STRDELIM, mudconf.struct_dstr, raw_text);
+		text = replace_string(GENERIC_STRUCT_STRDELIM, mushconf.struct_dstr, raw_text);
 	}
 	else
 	{
@@ -1011,7 +1011,7 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 	 * * Attributes already slurped by upper-level objects.
 	 */
 
-		if (check_exclude && ((cattr->flags & AF_PRIVATE) || (cattr->flags & AF_IS_LOCK) || nhashfind(ca, &mudstate.parent_htab)))
+		if (check_exclude && ((cattr->flags & AF_PRIVATE) || (cattr->flags & AF_IS_LOCK) || nhashfind(ca, &mushstate.parent_htab)))
 		{
 			continue;
 		}
@@ -1023,7 +1023,7 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 			if (!(check_exclude && (aflags & AF_PRIVATE)))
 			{
 				if (hash_insert)
-					nhashadd(ca, (int *)cattr, &mudstate.parent_htab);
+					nhashadd(ca, (int *)cattr, &mushstate.parent_htab);
 
 				view_atr(player, thing, cattr, buf, aowner, aflags, 0, is_special);
 			}
@@ -1048,9 +1048,9 @@ void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
 	{
 		hash_insert = 1;
 		check_exclude = 0;
-		nhashflush(&mudstate.parent_htab, 0);
+		nhashflush(&mushstate.parent_htab, 0);
 
-		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Good_obj(Parent(parent)))
 			{
@@ -1089,7 +1089,7 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 
 	if (obey_terse && Terse(player))
 		did_it(player, thing, A_NULL, "You see nothing special.", A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
-	else if (mudconf.have_pueblo == 1)
+	else if (mushconf.have_pueblo == 1)
 	{
 		show_a_desc(player, thing, "You see nothing special.");
 	}
@@ -1098,7 +1098,7 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 		did_it(player, thing, A_DESC, "You see nothing special.", A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
 	}
 
-	if (!mudconf.quiet_look && (!Terse(player) || mudconf.terse_look))
+	if (!mushconf.quiet_look && (!Terse(player) || mushconf.terse_look))
 	{
 		look_atrs(player, thing, 0, 0);
 	}
@@ -1109,7 +1109,7 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 	char *got2;
 	dbref aowner;
 	int aflags, alen, indent = 0;
-	indent = (isRoom(loc) && mudconf.indent_desc && atr_get_raw(loc, A_DESC));
+	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
 
 	if (Html(player))
 	{
@@ -1155,7 +1155,7 @@ void show_desc(dbref player, dbref loc, int key)
 	char *got;
 	dbref aowner;
 	int aflags, alen, indent = 0;
-	indent = (isRoom(loc) && mudconf.indent_desc && atr_get_raw(loc, A_DESC));
+	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
 
 	if ((key & LK_OBEYTERSE) && Terse(player))
 		did_it(player, loc, A_NULL, NULL, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
@@ -1165,7 +1165,7 @@ void show_desc(dbref player, dbref loc, int key)
 			did_it(player, loc, A_IDESC, NULL, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
 		else
 		{
-			if (mudconf.have_pueblo == 1)
+			if (mushconf.have_pueblo == 1)
 			{
 				show_a_desc(player, loc, NULL);
 			}
@@ -1189,7 +1189,7 @@ void show_desc(dbref player, dbref loc, int key)
 	}
 	else
 	{
-		if (mudconf.have_pueblo == 1)
+		if (mushconf.have_pueblo == 1)
 		{
 			show_a_desc(player, loc, NULL);
 		}
@@ -1228,7 +1228,7 @@ void look_in(dbref player, dbref loc, int key)
 	/*
      * If he needs the VRML URL, send it:
      */
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		if (key & LK_SHOWVRML)
 		{
@@ -1246,7 +1246,7 @@ void look_in(dbref player, dbref loc, int key)
 	{
 		buff = unparse_object(player, loc, 1);
 
-		if (mudconf.have_pueblo == 1)
+		if (mushconf.have_pueblo == 1)
 		{
 			if (Html(player))
 			{
@@ -1322,17 +1322,17 @@ void look_in(dbref player, dbref loc, int key)
      * tell him the attributes, contents and exits
      */
 
-	if ((key & LK_SHOWATTR) && !mudconf.quiet_look && !is_terse)
+	if ((key & LK_SHOWATTR) && !mushconf.quiet_look && !is_terse)
 	{
 		look_atrs(player, loc, 0, 0);
 	}
 
-	if (!is_terse || mudconf.terse_contents)
+	if (!is_terse || mushconf.terse_contents)
 	{
 		look_contents(player, loc, "Contents:", CONTENTS_LOCAL);
 	}
 
-	if ((key & LK_SHOWEXIT) && (!is_terse || mudconf.terse_exits))
+	if ((key & LK_SHOWEXIT) && (!is_terse || mushconf.terse_exits))
 	{
 		look_exits(player, loc, "Obvious exits:");
 	}
@@ -1362,7 +1362,7 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 	dbref thing, loc, look_key;
 	look_key = LK_SHOWATTR | LK_SHOWEXIT;
 
-	if (!mudconf.terse_look)
+	if (!mushconf.terse_look)
 	{
 		look_key |= LK_OBEYTERSE;
 	}
@@ -1428,9 +1428,9 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 
 		case TYPE_THING:
 		case TYPE_PLAYER:
-			look_simple(player, thing, !mudconf.terse_look);
+			look_simple(player, thing, !mushconf.terse_look);
 
-			if (!Opaque(thing) && (!Terse(player) || mudconf.terse_contents))
+			if (!Opaque(thing) && (!Terse(player) || mushconf.terse_contents))
 			{
 				look_contents(player, thing, "Carrying:", CONTENTS_NESTED);
 			}
@@ -1438,7 +1438,7 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 			break;
 
 		case TYPE_EXIT:
-			look_simple(player, thing, !mudconf.terse_look);
+			look_simple(player, thing, !mushconf.terse_look);
 
 			if (Transparent(thing) && Good_obj(Location(thing)))
 			{
@@ -1449,7 +1449,7 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 			break;
 
 		default:
-			look_simple(player, thing, !mudconf.terse_look);
+			look_simple(player, thing, !mushconf.terse_look);
 			break;
 		}
 	}
@@ -1595,7 +1595,7 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 			{
 				view_atr(player, thing, ap, buf, aowner, aflags, 0, is_special);
 			}
-			else if ((atr == A_DESC) && (mudconf.read_rem_desc || nearby(player, thing)))
+			else if ((atr == A_DESC) && (mushconf.read_rem_desc || nearby(player, thing)))
 			{
 				show_desc(player, thing, 0);
 			}
@@ -1616,7 +1616,7 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 			{
 				view_atr(player, thing, ap, buf, aowner, aflags, 0, is_special);
 			}
-			else if ((atr == A_DESC) && (mudconf.read_rem_desc || nearby(player, thing)))
+			else if ((atr == A_DESC) && (mushconf.read_rem_desc || nearby(player, thing)))
 			{
 				show_desc(player, thing, 0);
 			}
@@ -1745,7 +1745,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		notify(player, buf2);
 		XFREE(buf2);
 
-		if (mudconf.ex_flags)
+		if (mushconf.ex_flags)
 		{
 			buf2 = flag_description(player, thing);
 			notify(player, buf2);
@@ -1754,9 +1754,9 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	}
 	else
 	{
-		if ((key & EXAM_OWNER) || ((key & EXAM_DEFAULT) && !mudconf.exam_public))
+		if ((key & EXAM_OWNER) || ((key & EXAM_DEFAULT) && !mushconf.exam_public))
 		{
-			if (mudconf.read_rem_name)
+			if (mushconf.read_rem_name)
 			{
 				buf2 = XMALLOC(LBUF_SIZE, "buf2");
 				XSTRCPY(buf2, Name(thing));
@@ -1775,7 +1775,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 	temp = XMALLOC(LBUF_SIZE, "temp");
 
-	if (control || mudconf.read_rem_desc || nearby(player, thing))
+	if (control || mushconf.read_rem_desc || nearby(player, thing))
 	{
 		temp = atr_get_str(temp, thing, A_DESC, &aowner, &aflags, &alen);
 
@@ -1801,17 +1801,17 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		/*
 	 * print owner, key, and value
 	 */
-		savec = mudconf.many_coins[0];
-		mudconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
+		savec = mushconf.many_coins[0];
+		mushconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
 		bexp = parse_boolexp(player, buf2, 1);
 		buf = unparse_boolexp(player, bexp);
 		free_boolexp(bexp);
 		XSTRCPY(buf2, Name(Owner(thing)));
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mudconf.many_coins, Pennies(thing));
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mushconf.many_coins, Pennies(thing));
 		XFREE(buf);
 		XFREE(buf2);
-		mudconf.many_coins[0] = savec;
+		mushconf.many_coins[0] = savec;
 		buf2 = (char *)ctime(&CreateTime(thing));
 		buf2[strlen(buf2) - 1] = '\0';
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", buf2);
@@ -1826,7 +1826,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	 * Print the zone
 	 */
 
-		if (mudconf.have_zones)
+		if (mushconf.have_zones)
 		{
 			buf2 = unparse_object(player, Zone(thing), 0);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Zone: %s", buf2);
@@ -1853,7 +1853,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		XFREE(buf2);
 	}
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->examine)
 		{
@@ -2016,7 +2016,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 	if (!control)
 	{
-		if (mudconf.read_rem_name)
+		if (mushconf.read_rem_name)
 		{
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			XSTRCPY(buf2, Name(thing));
@@ -2033,23 +2033,22 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 void do_score(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You have %d %s.", Pennies(player), (Pennies(player) == 1) ? mudconf.one_coin : mudconf.many_coins);
+	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You have %d %s.", Pennies(player), (Pennies(player) == 1) ? mushconf.one_coin : mushconf.many_coins);
 }
 
 void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
-	dbref thing;
+	//dbref thing;
 	char *buff, *e;
-	thing = Contents(player);
 
-	if (thing == NOTHING)
+	if (Contents(player) == NOTHING)
 	{
 		notify(player, "You aren't carrying anything.");
 	}
 	else
 	{
 		notify(player, "You are carrying:");
-		for (thing = thing; (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
+		for (dbref thing = Contents(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			buff = unparse_object(player, thing, 1);
 			notify(player, buff);
@@ -2057,13 +2056,11 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 		}
 	}
 
-	thing = Exits(player);
-
-	if (thing != NOTHING)
+	if (Exits(player) != NOTHING)
 	{
 		notify(player, "Exits:");
 		e = buff = XMALLOC(LBUF_SIZE, "e");
-		for (thing = thing; (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
+		for (dbref thing = Exits(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			if (e != buff)
 			{
@@ -2117,9 +2114,9 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 		}
 	}
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
 		return;
 	}
 
@@ -2315,7 +2312,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 		/*
 	 * Look for commands on the object and parents too
 	 */
-		for (lev = 0, parent = what; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+		for (lev = 0, parent = what; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (Commer(parent))
 			{
@@ -2332,7 +2329,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 
 	if (key & SWEEP_CONNECT)
 	{
-		if (Connected(what) || (Puppet(what) && Connected(Owner(what))) || (mudconf.player_listen && (Typeof(what) == TYPE_PLAYER) && canhear && Connected(Owner(what))))
+		if (Connected(what) || (Puppet(what) && Connected(Owner(what))) || (mushconf.player_listen && (Typeof(what) == TYPE_PLAYER) && canhear && Connected(Owner(what))))
 		{
 			isconnected = 1;
 		}
@@ -2458,7 +2455,7 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 		{
 			here = Location(sweeploc);
 
-			if ((here == NOTHING) || (Dark(here) && !mudconf.sweep_dark && !Examinable(player, here)))
+			if ((here == NOTHING) || (Dark(here) && !mushconf.sweep_dark && !Examinable(player, here)))
 			{
 				notify_quiet(player, "Sorry, it is dark here and you can't search for bugs");
 				sweep_check(player, sweeploc, what_key, 0);
@@ -2661,7 +2658,7 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 
 		if (aflags & AF_STRUCTURE)
 		{
-			tmp = replace_string(GENERIC_STRUCT_STRDELIM, mudconf.struct_dstr, got);
+			tmp = replace_string(GENERIC_STRUCT_STRDELIM, mushconf.struct_dstr, got);
 			XFREE(got);
 			got = tmp;
 		}

@@ -81,7 +81,7 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	dbref thing;
 	dbref zone;
 
-	if (!mudconf.have_zones)
+	if (!mushconf.have_zones)
 	{
 		notify(player, "Zones disabled.");
 		return;
@@ -165,9 +165,9 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 		}
 		else
 		{
-			s_Flags(thing, Flags(thing) & ~mudconf.stripped_flags.word1);
-			s_Flags2(thing, Flags2(thing) & ~mudconf.stripped_flags.word2);
-			s_Flags3(thing, Flags3(thing) & ~mudconf.stripped_flags.word3);
+			s_Flags(thing, Flags(thing) & ~mushconf.stripped_flags.word1);
+			s_Flags2(thing, Flags2(thing) & ~mushconf.stripped_flags.word2);
+			s_Flags3(thing, Flags3(thing) & ~mushconf.stripped_flags.word3);
 		}
 
 		if (!(key & CHZONE_NOSTRIP) || !God(player))
@@ -307,9 +307,9 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
      * Enforce a maximum number of aliases.
      */
 
-	if (n_aliases > mudconf.max_player_aliases)
+	if (n_aliases > mushconf.max_player_aliases)
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You cannot have more than %d aliases.", mudconf.max_player_aliases);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You cannot have more than %d aliases.", mushconf.max_player_aliases);
 		retcode = 0;
 	}
 
@@ -864,23 +864,23 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	switch (Typeof(thing))
 	{
 	case TYPE_ROOM:
-		cost = mudconf.digcost;
-		quota = mudconf.room_quota;
+		cost = mushconf.digcost;
+		quota = mushconf.room_quota;
 		break;
 
 	case TYPE_THING:
 		cost = OBJECT_DEPOSIT(Pennies(thing));
-		quota = mudconf.thing_quota;
+		quota = mushconf.thing_quota;
 		break;
 
 	case TYPE_EXIT:
-		cost = mudconf.opencost;
-		quota = mudconf.exit_quota;
+		cost = mushconf.opencost;
+		quota = mushconf.exit_quota;
 		break;
 
 	case TYPE_PLAYER:
-		cost = mudconf.robotcost;
-		quota = mudconf.player_quota;
+		cost = mushconf.robotcost;
+		quota = mushconf.player_quota;
 	}
 
 	if (owner == NOTHING)
@@ -928,9 +928,9 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 		}
 		else
 		{
-			s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | mudconf.stripped_flags.word1)) | HALT);
-			s_Flags2(thing, (Flags2(thing) & ~(mudconf.stripped_flags.word2)));
-			s_Flags3(thing, (Flags3(thing) & ~(mudconf.stripped_flags.word3)));
+			s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | mushconf.stripped_flags.word1)) | HALT);
+			s_Flags2(thing, (Flags2(thing) & ~(mushconf.stripped_flags.word2)));
+			s_Flags3(thing, (Flags3(thing) & ~(mushconf.stripped_flags.word3)));
 		}
 
 		/*
@@ -1518,7 +1518,7 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 			continue;
 		}
 
-		if (check_exclude && ((attr->flags & AF_PRIVATE) || nhashfind(ca, &mudstate.parent_htab)))
+		if (check_exclude && ((attr->flags & AF_PRIVATE) || nhashfind(ca, &mushstate.parent_htab)))
 		{
 			continue;
 		}
@@ -1543,7 +1543,7 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 	 * Enforce locality restriction on descriptions
 	 */
 
-		if (ok && (attr->number == A_DESC) && !mudconf.read_rem_desc && !Examinable(player, thing) && !nearby(player, thing))
+		if (ok && (attr->number == A_DESC) && !mushconf.read_rem_desc && !Examinable(player, thing) && !nearby(player, thing))
 		{
 			ok = 0;
 		}
@@ -1554,7 +1554,7 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 
 			if (hash_insert)
 			{
-				nhashadd(ca, (int *)attr, &mudstate.parent_htab);
+				nhashadd(ca, (int *)attr, &mushstate.parent_htab);
 			}
 		}
 	}
@@ -1615,9 +1615,9 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 	{
 		check_exclude = 0;
 		hash_insert = check_parents;
-		nhashflush(&mudstate.parent_htab, 0);
+		nhashflush(&mushstate.parent_htab, 0);
 
-		for (lev = 0, parent = (*thing); (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+		for (lev = 0, parent = (*thing); (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (!Good_obj(Parent(parent)))
 			{
@@ -1647,7 +1647,7 @@ void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char 
 	char *s;
 	edit_string(src, dst, from, to);
 
-	if (mudconf.ansi_colors)
+	if (mushconf.ansi_colors)
 	{
 		s = XASPRINTF("s", "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL);
 		edit_string(src, returnstr, from, s);

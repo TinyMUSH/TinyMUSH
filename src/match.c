@@ -212,7 +212,7 @@ dbref absolute_nref(char *str)
         *bp = '\0';
     }
 
-    np = (int *)hashfind(buf, &mudstate.nref_htab);
+    np = (int *)hashfind(buf, &mushstate.nref_htab);
 
     if (np && Good_obj(*np))
     {
@@ -371,7 +371,7 @@ void match_list(dbref first, int local)
         return;
     }
 
-    for (first = first; (first != NOTHING) && (Next(first) != first); first = Next(first))
+    for (; (first != NOTHING) && (Next(first) != first); first = Next(first))
     {
         if (first == md.absolute_form)
         {
@@ -509,7 +509,7 @@ void match_exit_with_parents(void)
     if (Good_obj(md.player) && Has_location(md.player))
     {
         loc = Location(md.player);
-        for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+        for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
         {
             if (match_exit_internal(parent, loc, CON_LOCAL))
             {
@@ -544,7 +544,7 @@ void match_carried_exit_with_parents(void)
 
     if (Good_obj(md.player) && Has_exits(md.player))
     {
-        for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+        for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
         {
             if (match_exit_internal(parent, md.player, CON_LOCAL))
             {
@@ -562,7 +562,7 @@ void match_master_exit(void)
     }
 
     if (Good_obj(md.player) && Has_exits(md.player))
-        (void)match_exit_internal(mudconf.master_room, mudconf.master_room, 0);
+        (void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
 }
 
 void match_zone_exit(void)
@@ -635,7 +635,7 @@ dbref match_result(void)
         return md.match;
 
     default:
-        return ((mudconf.no_ambiguous_match) ? (md.match) : AMBIGUOUS);
+        return ((mushconf.no_ambiguous_match) ? (md.match) : AMBIGUOUS);
     }
 }
 

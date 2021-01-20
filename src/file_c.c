@@ -21,18 +21,18 @@
 #include "prototypes.h"
 
 FCACHE fcache[] = {
-    {&mudconf.conn_file, NULL, "Conn"},
-    {&mudconf.site_file, NULL, "Conn/Badsite"},
-    {&mudconf.down_file, NULL, "Conn/Down"},
-    {&mudconf.full_file, NULL, "Conn/Full"},
-    {&mudconf.guest_file, NULL, "Conn/Guest"},
-    {&mudconf.creg_file, NULL, "Conn/Reg"},
-    {&mudconf.crea_file, NULL, "Crea/Newuser"},
-    {&mudconf.regf_file, NULL, "Crea/RegFail"},
-    {&mudconf.motd_file, NULL, "Motd"},
-    {&mudconf.wizmotd_file, NULL, "Wizmotd"},
-    {&mudconf.quit_file, NULL, "Quit"},
-    {&mudconf.htmlconn_file, NULL, "Conn/Html"},
+    {&mushconf.conn_file, NULL, "Conn"},
+    {&mushconf.site_file, NULL, "Conn/Badsite"},
+    {&mushconf.down_file, NULL, "Conn/Down"},
+    {&mushconf.full_file, NULL, "Conn/Full"},
+    {&mushconf.guest_file, NULL, "Conn/Guest"},
+    {&mushconf.creg_file, NULL, "Conn/Reg"},
+    {&mushconf.crea_file, NULL, "Crea/Newuser"},
+    {&mushconf.regf_file, NULL, "Crea/RegFail"},
+    {&mushconf.motd_file, NULL, "Motd"},
+    {&mushconf.wizmotd_file, NULL, "Wizmotd"},
+    {&mushconf.quit_file, NULL, "Quit"},
+    {&mushconf.htmlconn_file, NULL, "Conn/Html"},
     {NULL, NULL, NULL}};
 
 void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
@@ -227,7 +227,7 @@ void fcache_send(dbref player, int num)
 {
     DESC *d;
 
-    for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+    for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
     {
         fcache_dump(d, num);
     }

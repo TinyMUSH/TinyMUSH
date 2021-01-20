@@ -456,11 +456,11 @@ OBJENT object_types[8] = {
 void init_flagtab(void)
 {
     FLAGENT *fp;
-    hashinit(&mudstate.flags_htab, 100 * mudconf.hash_factor, HT_STR | HT_KEYREF);
+    hashinit(&mushstate.flags_htab, 100 * mushconf.hash_factor, HT_STR | HT_KEYREF);
 
     for (fp = gen_flags; fp->flagname; fp++)
     {
-        hashadd((char *)fp->flagname, (int *)fp, &mudstate.flags_htab, 0);
+        hashadd((char *)fp->flagname, (int *)fp, &mushstate.flags_htab, 0);
     }
 }
 
@@ -514,7 +514,7 @@ FLAGENT *find_flag(dbref thing __attribute__((unused)), char *flagname)
         *cp = toupper(*cp);
     }
 
-    return (FLAGENT *)hashfind(flagname, &mudstate.flags_htab);
+    return (FLAGENT *)hashfind(flagname, &mushstate.flags_htab);
 }
 
 /**
@@ -735,7 +735,7 @@ char *unparse_flags(dbref player, dbref thing)
 
             if (!strlen(buf) && isMarkerFlag(fp))
             {
-                XSTRCCAT(buf, mudconf.flag_sep[0]);
+                XSTRCCAT(buf, mushconf.flag_sep[0]);
             }
 
             XSTRCCAT(buf, fp->flaglett);
@@ -1166,7 +1166,7 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
         *cp = tolower(*cp);
     }
 
-    if (hashfind(flagstr, &mudstate.flags_htab))
+    if (hashfind(flagstr, &mushstate.flags_htab))
     {
         XFREE(flagstr);
         cf_log(player, "CNF", "SYNTX", cmd, "Marker flag name in use: %s", namestr);
@@ -1179,7 +1179,7 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
     }
 
     fp->flagname = (const char *)flagstr;
-    hashadd((char *)fp->flagname, (int *)fp, &mudstate.flags_htab, 0);
+    hashadd((char *)fp->flagname, (int *)fp, &mushstate.flags_htab, 0);
     return 0;
 }
 

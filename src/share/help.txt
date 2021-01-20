@@ -1088,7 +1088,7 @@ location, and the destination is the object's home.
 & info
   Command: INFO
 
-  This command is intened for the use of automated MUD list data gatherers
+  This command is intened for the use of automated MUSH list data gatherers
   and the like. It returns the MUSH's name, its start time, the number
   of connected players, the number of objects in the database, and the
   MUSH version in an easy-to-parse format. That format is as follows:
@@ -1101,7 +1101,7 @@ location, and the destination is the object's home.
   Version: <server version>
   ### End INFO  
  
-  <MUSH name> is whatever is returned by mudname(). (Conf param 'mud_name'.)
+  <MUSH name> is whatever is returned by mushname(). (Conf param 'mush_name'.)
   <time started> is whatever is returned by starttime().
   <number of players connected> is equivalent to words(lwho()).
   <size> is equivalent to first(stats()).
@@ -5960,7 +5960,8 @@ See also: @link, @open.
  
   MUSH state data:
        config()		connrecord()	hasmodule()	mudname()
-       restarts()	restarttime()	starttime()	version()
+       mushname         restarts()	restarttime()	starttime()
+       version()
  
   Other:
 	die()		helptext()	lnum()		lrand()
@@ -7209,7 +7210,7 @@ performed and the walk down the list stops.
   Function: time()
  
   Gives you the current time.
-  WARNING!  This is the time on the machine that the mud is running on, and
+  WARNING!  This is the time on the machine that the mush is running on, and
   not where you are.
  
   Example:
@@ -9522,15 +9523,20 @@ performed and the walk down the list stops.
 & MUDNAME()
   Function: mudname()
  
-  Returns the name of the MUD.  This is usually (but not necessarily) the name
-  that appears in the various mud lists, and is the name that the mud is
-  listed under in reports from RWHO servers (that is, if the mud sends its
+  See function mushname()
+ 
+& MUSHNAME()
+  Function: mushname()
+ 
+  Returns the name of the MUSH.  This is usually (but not necessarily) the name
+  that appears in the various mush lists, and is the name that the mush is
+  listed under in reports from RWHO servers (that is, if the mush sends its
   WHO information to an RWHO server).
  
   Example:
-    > say mudname()
+    > say mushname()
     You say, "TestMUSH"
-
+ 
 & CAPSTR()
   Function: capstr(<string>)
  
@@ -9541,7 +9547,7 @@ performed and the walk down the list stops.
     > say capstr(this is a string I want capitalized)
     You say, "This is a string I want capitalized"
   See also: lcstr(), ucstr().
-
+ 
 & LCSTR()
   Function: lcstr(<string>)
  
@@ -9551,7 +9557,7 @@ performed and the walk down the list stops.
     > say lcstr(This is something I want to TEST)
     You say, "this is something i want to test"
   See also: capstr(), ucstr().
-
+ 
 & UCSTR()
   Function: ucstr(<string>)
  
@@ -9561,7 +9567,7 @@ performed and the walk down the list stops.
     > say ucstr(This is a test, really!)
     You say, "THIS IS A TEST, REALLY!"
   See also: capstr(), lcstr().
-
+ 
 & LNUM()
   Function:  lnum(<number>[,<other>][,<output delim>])
  
@@ -11669,7 +11675,7 @@ performed and the walk down the list stops.
   setq() can take multiple variable name - value pairs.
  
   Example:
-    > &TEST me=Test on [mudname()] at [time()].
+    > &TEST me=Test on [mushname()] at [time()].
     > say [setq(0,u(TEST))]'[r(0)]' has length [strlen(r(0))].
     You say, "'Test on TestMUSH at Tue Feb 23 17:00:51 1993.' has length 45."
     > say Test.[setq(a,Test,tmp,on,9,TestMUSH)] %qa %q<tmp> %q9.
@@ -11684,7 +11690,7 @@ performed and the walk down the list stops.
   that it returns the string being copied in the register.
  
   Example:
-    > &TEST me=Test on [mudname()] at [time()].
+    > &TEST me=Test on [mushname()] at [time()].
     > say '[setr(0,u(TEST))]' has length [strlen(%q0)].
     You say, "'Test on TestMUSH at Tue Feb 23 17:00:51 1993.' has length 45."
  

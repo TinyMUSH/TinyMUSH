@@ -79,9 +79,9 @@ int start_log(const char *primary, const char *secondary, int key)
     int last_key = 0;
     char *pri, *sec;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        if (mudconf.log_diversion & key)
+        if (mushconf.log_diversion & key)
         {
             if (key != last_key)
             {
@@ -120,9 +120,9 @@ int start_log(const char *primary, const char *secondary, int key)
         log_fp = mainlog_fp;
     }
 
-    mudstate.logging++;
+    mushstate.logging++;
 
-    if (mudstate.logging)
+    if (mushstate.logging)
     {
         if (key & LOG_FORCE)
         {
@@ -131,15 +131,15 @@ int start_log(const char *primary, const char *secondary, int key)
 	     * don't complain about it. This should
 	     * never happens with the new logger.
 	     */
-            mudstate.logging--;
+            mushstate.logging--;
         }
 
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             /*
 	     * Format the timestamp
 	     */
-            if ((mudconf.log_info & LOGOPT_TIMESTAMP) != 0)
+            if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
             {
                 time((time_t *)(&now));
                 tp = localtime((time_t *)(&now));
@@ -157,11 +157,11 @@ int start_log(const char *primary, const char *secondary, int key)
 
                 if (log_pos == NULL)
                 {
-                    log_write_raw(0, "%s %3s/%-5s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, sec);
+                    log_write_raw(0, "%s %3s/%-5s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec);
                 }
                 else
                 {
-                    log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, sec, log_pos);
+                    log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec, log_pos);
                 }
 
                 free(sec);
@@ -173,11 +173,11 @@ int start_log(const char *primary, const char *secondary, int key)
 
                 if (log_pos == NULL)
                 {
-                    log_write_raw(0, "%s %-9s: ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri);
+                    log_write_raw(0, "%s %-9s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri);
                 }
                 else
                 {
-                    log_write_raw(0, "%s %-9s (%s): ", (*(mudconf.mud_shortname) ? (mudconf.mud_shortname) : (mudconf.mud_name)), pri, log_pos);
+                    log_write_raw(0, "%s %-9s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, log_pos);
                 }
 
                 free(pri);
@@ -188,7 +188,7 @@ int start_log(const char *primary, const char *secondary, int key)
 	 * If a recursive call, log it and return indicating no log
 	 */
 
-        if (mudstate.logging != 1)
+        if (mushstate.logging != 1)
         {
             log_write_raw(0, "Recursive logging request.\n");
         }
@@ -212,12 +212,12 @@ void end_log(void)
         fflush(log_fp);
     }
 
-    mudstate.logging--;
+    mushstate.logging--;
 
-    if (mudstate.logging < 0)
+    if (mushstate.logging < 0)
     {
-        log_write_raw(1, "Log was closed too many times (%d)\n", mudstate.logging);
-        mudstate.logging = 0;
+        log_write_raw(1, "Log was closed too many times (%d)\n", mushstate.logging);
+        mushstate.logging = 0;
     }
 }
 
@@ -245,7 +245,7 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
 
 void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...)
 {
-    if ((((key)&mudconf.log_options) != 0) && start_log(primary, secondary, key))
+    if ((((key)&mushconf.log_options) != 0) && start_log(primary, secondary, key))
     {
         int size = 0, vsize = 0;
         char *str = NULL, *str1 = NULL;
@@ -278,7 +278,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
             return;
         }
 
-        if (mudstate.debug)
+        if (mushstate.debug)
         {
             str1 = XNASPRINTF("%s:%d %s", file, line, str);
         }
@@ -286,7 +286,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         /* Do we have a logfile to write to... */
         if ((log_fp != NULL))
         {
-            if (mudstate.debug)
+            if (mushstate.debug)
             {
                 fputs(str1, log_fp);
             }
@@ -298,9 +298,9 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         /* If we are starting up, log to stderr too.. */
 
-        if ((log_fp != stderr) && (mudstate.logstderr))
+        if ((log_fp != stderr) && (mushstate.logstderr))
         {
-            if (mudstate.debug)
+            if (mushstate.debug)
             {
                 fputs(str1, stderr);
             }
@@ -370,7 +370,7 @@ void log_write_raw(int key, const char *format, ...)
     }
 
     /* If we are starting up, log to stderr too.. */
-    if ((log_fp != stderr) && (mudstate.logstderr))
+    if ((log_fp != stderr) && (mushstate.logstderr))
     {
         fputs(str, stderr);
     }
@@ -387,7 +387,7 @@ char *log_getname(dbref target)
 {
     char *name, *s;
 
-    if ((mudconf.log_info & LOGOPT_FLAGS) != 0)
+    if ((mushconf.log_info & LOGOPT_FLAGS) != 0)
     {
         s = unparse_object((dbref)GOD, target, 0);
     }
@@ -441,7 +441,7 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     char *ts, *pname;
     char *s;
     ts = mktimestamp();
-    mudstate.mudlognum++;
+    mushstate.mush_lognum++;
 
     if (mainlog_fp == stderr)
     {
@@ -450,15 +450,15 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     else
     {
         fclose(mainlog_fp);
-        s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
-        copy_file(mudconf.log_file, s, 1);
+        s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
+        copy_file(mushconf.log_file, s, 1);
         XFREE(s);
-        logfile_init(mudconf.log_file);
+        logfile_init(mushconf.log_file);
     }
 
     notify(player, "Logs rotated.");
     pname = log_getname(player);
-    log_write(LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mudstate.mudlognum);
+    log_write(LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mushstate.mush_lognum);
     XFREE(pname);
 
     /*
@@ -505,8 +505,8 @@ void logfile_close(void)
     if (mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
-        s = XASPRINTF("s", "%s.%s", mudconf.log_file, ts);
-        copy_file(mudconf.log_file, s, 1);
+        s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
+        copy_file(mushconf.log_file, s, 1);
         XFREE(s);
     }
 

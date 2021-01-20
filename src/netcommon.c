@@ -76,22 +76,22 @@ struct timeval update_quotas(struct timeval last, struct timeval current)
 {
 	int nslices;
 	DESC *d;
-	nslices = msec_diff(current, last) / mudconf.timeslice;
+	nslices = msec_diff(current, last) / mushconf.timeslice;
 
 	if (nslices > 0)
 	{
 		for (d = descriptor_list; (d); d = (d)->next)
 		{
-			d->quota += mudconf.cmd_quota_incr * nslices;
+			d->quota += mushconf.cmd_quota_incr * nslices;
 
-			if (d->quota > mudconf.cmd_quota_max)
+			if (d->quota > mushconf.cmd_quota_max)
 			{
-				d->quota = mudconf.cmd_quota_max;
+				d->quota = mushconf.cmd_quota_max;
 			}
 		}
 	}
 
-	return msec_add(last, nslices * mudconf.timeslice);
+	return msec_add(last, nslices * mushconf.timeslice);
 }
 
 /* raw_notify_html() -- raw_notify() without the newline */
@@ -122,9 +122,9 @@ void raw_notify_html(dbref player, const char *format, ...)
 
 	va_end(ap);
 
-	if (mudstate.inpipe && (player == mudstate.poutobj))
+	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_LB_STR(msg, mudstate.poutnew, &mudstate.poutbufc);
+		SAFE_LB_STR(msg, mushstate.poutnew, &mushstate.poutbufc);
 		XFREE(msg);
 		return;
 	}
@@ -141,7 +141,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 		return;
 	}
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_string(d, NULL, msg);
 	}
@@ -179,10 +179,10 @@ void raw_notify(dbref player, const char *format, ...)
 
 	va_end(ap);
 
-	if (mudstate.inpipe && (player == mudstate.poutobj))
+	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_LB_STR(msg, mudstate.poutnew, &mudstate.poutbufc);
-		SAFE_CRLF(mudstate.poutnew, &mudstate.poutbufc);
+		SAFE_LB_STR(msg, mushstate.poutnew, &mushstate.poutbufc);
+		SAFE_CRLF(mushstate.poutnew, &mushstate.poutbufc);
 		XFREE(msg);
 		return;
 	}
@@ -193,7 +193,7 @@ void raw_notify(dbref player, const char *format, ...)
 		return;
 	}
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_string(d, NULL, msg);
 		queue_write(d, "\r\n", 2);
@@ -205,9 +205,9 @@ void raw_notify_newline(dbref player)
 {
 	DESC *d;
 
-	if (mudstate.inpipe && (player == mudstate.poutobj))
+	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_CRLF(mudstate.poutnew, &mudstate.poutbufc);
+		SAFE_CRLF(mushstate.poutnew, &mushstate.poutbufc);
 		return;
 	}
 
@@ -216,7 +216,7 @@ void raw_notify_newline(dbref player)
 		return;
 	}
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		queue_write(d, "\r\n", 2);
 	}
@@ -331,12 +331,12 @@ void queue_write(DESC *d, const char *b, int n)
 		return;
 	}
 
-	if (d->output_size + n > mudconf.output_limit)
+	if (d->output_size + n > mushconf.output_limit)
 	{
 		process_output(d);
 	}
 
-	left = mudconf.output_limit - d->output_size - n;
+	left = mushconf.output_limit - d->output_size - n;
 
 	if (left < 0)
 	{
@@ -372,7 +372,7 @@ void queue_write(DESC *d, const char *b, int n)
 	if (d->output_head == NULL)
 	{
 		tp = (TBLOCK *)XMALLOC(sizeof(TBLOCK), "tp");
-		tp->data = XMALLOC(mudconf.output_block_size - sizeof(TBLKHDR), "tp->data");
+		tp->data = XMALLOC(mushconf.output_block_size - sizeof(TBLKHDR), "tp->data");
 		tp->hdr.nxt = NULL;
 		tp->hdr.start = tp->data;
 		tp->hdr.end = tp->data;
@@ -397,7 +397,7 @@ void queue_write(DESC *d, const char *b, int n)
 	 * See if there is enough space in the buffer to hold the
 	 * * string.  If so, copy it and update the pointers..
 	 */
-		left = mudconf.output_block_size - (tp->hdr.end - (char *)tp + 1);
+		left = mushconf.output_block_size - (tp->hdr.end - (char *)tp + 1);
 
 		if (n <= left)
 		{
@@ -422,7 +422,7 @@ void queue_write(DESC *d, const char *b, int n)
 			}
 
 			tp = (TBLOCK *)XMALLOC(sizeof(TBLOCK), "tp");
-			tp->data = XMALLOC(mudconf.output_block_size - sizeof(TBLKHDR), "tp->data");
+			tp->data = XMALLOC(mushconf.output_block_size - sizeof(TBLKHDR), "tp->data");
 			tp->hdr.nxt = NULL;
 			tp->hdr.start = tp->data;
 			tp->hdr.end = tp->data;
@@ -460,7 +460,7 @@ void queue_string(DESC *d, const char *format, ...)
 
 	if (msg)
 	{
-		if (!mudconf.ansi_colors)
+		if (!mushconf.ansi_colors)
 		{
 			queue_write(d, msg, strlen(msg));
 		}
@@ -572,17 +572,17 @@ void desc_addhash(DESC *d)
 	dbref player;
 	DESC *hdesc;
 	player = d->player;
-	hdesc = (DESC *)nhashfind((int)player, &mudstate.desc_htab);
+	hdesc = (DESC *)nhashfind((int)player, &mushstate.desc_htab);
 
 	if (hdesc == NULL)
 	{
 		d->hashnext = NULL;
-		nhashadd((int)player, (int *)d, &mudstate.desc_htab);
+		nhashadd((int)player, (int *)d, &mushstate.desc_htab);
 	}
 	else
 	{
 		d->hashnext = hdesc;
-		nhashrepl((int)player, (int *)d, &mudstate.desc_htab);
+		nhashrepl((int)player, (int *)d, &mushstate.desc_htab);
 	}
 }
 
@@ -596,7 +596,7 @@ void desc_delhash(DESC *d)
 	dbref player;
 	player = d->player;
 	last = NULL;
-	hdesc = (DESC *)nhashfind((int)player, &mudstate.desc_htab);
+	hdesc = (DESC *)nhashfind((int)player, &mushstate.desc_htab);
 
 	while (hdesc != NULL)
 	{
@@ -606,11 +606,11 @@ void desc_delhash(DESC *d)
 			{
 				if (d->hashnext == NULL)
 				{
-					nhashdelete((int)player, &mudstate.desc_htab);
+					nhashdelete((int)player, &mushstate.desc_htab);
 				}
 				else
 				{
-					nhashrepl((int)player, (int *)d->hashnext, &mudstate.desc_htab);
+					nhashrepl((int)player, (int *)d->hashnext, &mushstate.desc_htab);
 				}
 			}
 			else
@@ -630,9 +630,9 @@ void desc_delhash(DESC *d)
 
 void welcome_user(DESC *d)
 {
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
-		queue_rawstring(d, NULL, mudconf.pueblo_version);
+		queue_rawstring(d, NULL, mushconf.pueblo_version);
 		queue_rawstring(d, NULL, "\r\n\r\n");
 	}
 
@@ -721,7 +721,7 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 
 	p = user;
 
-	if (mudconf.name_spaces && (*msg == '\"'))
+	if (mushconf.name_spaces && (*msg == '\"'))
 	{
 		for (; *msg && (*msg == '\"' || isspace(*msg)); msg++)
 			;
@@ -879,17 +879,17 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 	XFREE(buf);
 
-	if (Good_loc(mudconf.master_room) && mudconf.use_global_aconn)
+	if (Good_loc(mushconf.master_room) && mushconf.use_global_aconn)
 	{
-		buf = atr_pget(mudconf.master_room, attr, &aowner, &aflags, &alen);
+		buf = atr_pget(mushconf.master_room, attr, &aowner, &aflags, &alen);
 
 		if (*buf)
-			wait_que(mudconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+			wait_que(mushconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 
 		XFREE(buf);
-		for (obj = Contents(mudconf.master_room); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+		for (obj = Contents(mushconf.master_room); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
-			if (!mudconf.global_aconn_uselocks || could_doit(player, obj, A_LUSE))
+			if (!mushconf.global_aconn_uselocks || could_doit(player, obj, A_LUSE))
 			{
 				buf = atr_pget(obj, attr, &aowner, &aflags, &alen);
 
@@ -906,7 +906,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	/*
      * do the zone of the player's location's possible a(dis)connect
      */
-	if (mudconf.have_zones && ((zone = Zone(loc)) != NOTHING))
+	if (mushconf.have_zones && ((zone = Zone(loc)) != NOTHING))
 	{
 		switch (Typeof(zone))
 		{
@@ -972,9 +972,9 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 			count++;
 		}
 
-	if (mudstate.record_players < count)
+	if (mushstate.record_players < count)
 	{
-		mudstate.record_players = count;
+		mushstate.record_players = count;
 	}
 
 	buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
@@ -982,14 +982,14 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 
 	if (d->timeout <= 0)
 	{
-		d->timeout = mudconf.idle_timeout;
+		d->timeout = mushconf.idle_timeout;
 	}
 
 	XFREE(buf);
 	loc = Location(player);
 	s_Connected(player);
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		if (d->flags & DS_PUEBLOCLIENT)
 		{
@@ -997,33 +997,33 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		}
 	}
 
-	if (mudconf.motd_msg)
+	if (mushconf.motd_msg)
 	{
-		if (mudconf.ansi_colors)
+		if (mushconf.ansi_colors)
 		{
-			raw_notify(player, "\n%sMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mudconf.motd_msg);
+			raw_notify(player, "\n%sMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mushconf.motd_msg);
 		}
 		else
 		{
-			raw_notify(player, "\nMOTD: %s\n", mudconf.motd_msg);
+			raw_notify(player, "\nMOTD: %s\n", mushconf.motd_msg);
 		}
 	}
 
 	if (Wizard(player))
 	{
-		if (mudconf.wizmotd_msg)
+		if (mushconf.wizmotd_msg)
 		{
-			if (mudconf.ansi_colors)
+			if (mushconf.ansi_colors)
 			{
-				raw_notify(player, "%sWIZMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mudconf.wizmotd_msg);
+				raw_notify(player, "%sWIZMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mushconf.wizmotd_msg);
 			}
 			else
 			{
-				raw_notify(player, "WIZMOTD: %s\n", mudconf.wizmotd_msg);
+				raw_notify(player, "WIZMOTD: %s\n", mushconf.wizmotd_msg);
 			}
 		}
 
-		if (!(mudconf.control_flags & CF_LOGIN))
+		if (!(mushconf.control_flags & CF_LOGIN))
 		{
 			raw_notify(player, NULL, "*** Logins are disabled.");
 		}
@@ -1042,7 +1042,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	}
 
 	num = 0;
-	for (dtemp = (DESC *)nhashfind((int)player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+	for (dtemp = (DESC *)nhashfind((int)player, &mushstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
 	{
 		num++;
 	}
@@ -1077,12 +1077,12 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		key |= (MSG_NBR | MSG_NBR_EXITS | MSG_LOC | MSG_FWDLIST);
 	}
 
-	temp = mudstate.curr_enactor;
-	mudstate.curr_enactor = player;
+	temp = mushstate.curr_enactor;
+	mushstate.curr_enactor = player;
 	notify_check(player, player, key, NULL, buf);
 	XFREE(buf);
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->announce_connect)
 		{
@@ -1101,11 +1101,11 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	}
 
 	announce_connattr(d, player, loc, reason, num, A_ACONNECT);
-	time_str = ctime(&mudstate.now);
+	time_str = ctime(&mushstate.now);
 	time_str[strlen(time_str) - 1] = '\0';
 	record_login(player, 1, time_str, d->addr, d->username);
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		look_in(player, Location(player), (LK_SHOWEXIT | LK_OBEYTERSE | LK_SHOWVRML));
 	}
@@ -1114,7 +1114,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		look_in(player, Location(player), (LK_SHOWEXIT | LK_OBEYTERSE));
 	}
 
-	mudstate.curr_enactor = temp;
+	mushstate.curr_enactor = temp;
 }
 
 void announce_disconnect(dbref player, DESC *d, const char *reason)
@@ -1136,12 +1136,12 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 
 	loc = Location(player);
 	num = -1;
-	for (dtemp = (DESC *)nhashfind((int)player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+	for (dtemp = (DESC *)nhashfind((int)player, &mushstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
 	{
 		num++;
 	}
-	temp = mudstate.curr_enactor;
-	mudstate.curr_enactor = player;
+	temp = mushstate.curr_enactor;
+	mushstate.curr_enactor = player;
 
 	if (num < 1)
 	{
@@ -1160,7 +1160,7 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 	 */
 		c_Connected(player);
 
-		if (mudconf.have_pueblo == 1)
+		if (mushconf.have_pueblo == 1)
 		{
 			c_Html(player);
 		}
@@ -1179,7 +1179,7 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 		XFREE(buf);
 	}
 
-	for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
 	{
 		if (cam__mp->announce_disconnect)
 		{
@@ -1203,7 +1203,7 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 		}
 	}
 
-	mudstate.curr_enactor = temp;
+	mushstate.curr_enactor = temp;
 	desc_delhash(d);
 }
 
@@ -1212,7 +1212,7 @@ int boot_off(dbref player, char *message)
 	DESC *d = NULL, *dnext = NULL;
 	int count = 0;
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab), dnext = ((d != NULL) ? d->hashnext : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->hashnext : NULL))
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab), dnext = ((d != NULL) ? d->hashnext : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->hashnext : NULL))
 	{
 		if (message && *message)
 		{
@@ -1260,14 +1260,14 @@ void desc_reload(dbref player)
 	dbref aowner;
 	int aflags, alen;
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
 		d->timeout = (int)strtol(buf, (char **)NULL, 10);
 
 		if (d->timeout <= 0)
 		{
-			d->timeout = mudconf.idle_timeout;
+			d->timeout = mushconf.idle_timeout;
 		}
 
 		XFREE(buf);
@@ -1287,9 +1287,9 @@ int fetch_idle(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)target, &mushstate.desc_htab); d; d = d->hashnext)
 		{
-			idletime = (mudstate.now - d->last_time);
+			idletime = (mushstate.now - d->last_time);
 
 			if ((result == -1) || (idletime < result))
 			{
@@ -1304,7 +1304,7 @@ int fetch_idle(dbref target, int port_num)
 			{
 				if (d->descriptor == port_num)
 				{
-					idletime = (mudstate.now - d->last_time);
+					idletime = (mushstate.now - d->last_time);
 
 					if ((result == -1) || (idletime < result))
 					{
@@ -1327,9 +1327,9 @@ int fetch_connect(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)target, &mushstate.desc_htab); d; d = d->hashnext)
 		{
-			conntime = (mudstate.now - d->connected_at);
+			conntime = (mushstate.now - d->connected_at);
 
 			if (conntime > result)
 			{
@@ -1344,7 +1344,7 @@ int fetch_connect(dbref target, int port_num)
 			{
 				if (d->descriptor == port_num)
 				{
-					conntime = (mudstate.now - d->connected_at);
+					conntime = (mushstate.now - d->connected_at);
 
 					if (conntime > result)
 					{
@@ -1368,14 +1368,14 @@ void check_idle(void)
 	{
 		if (d->flags & DS_CONNECTED)
 		{
-			idletime = mudstate.now - d->last_time;
+			idletime = mushstate.now - d->last_time;
 
 			if ((idletime > d->timeout) && !Can_Idle(d->player))
 			{
 				queue_rawstring(d, NULL, "*** Inactivity Timeout ***\r\n");
 				shutdownsock(d, R_TIMEOUT);
 			}
-			else if (mudconf.idle_wiz_dark && (idletime > mudconf.idle_timeout) && Can_Idle(d->player) && Can_Hide(d->player) && !Hidden(d->player))
+			else if (mushconf.idle_wiz_dark && (idletime > mushconf.idle_timeout) && Can_Idle(d->player) && Can_Hide(d->player) && !Hidden(d->player))
 			{
 				raw_notify(d->player, NULL, "*** Inactivity AutoDark ***");
 				s_Flags(d->player, Flags(d->player) | DARK);
@@ -1384,9 +1384,9 @@ void check_idle(void)
 		}
 		else
 		{
-			idletime = mudstate.now - d->connected_at;
+			idletime = mushstate.now - d->connected_at;
 
-			if (idletime > mudconf.conn_timeout)
+			if (idletime > mushconf.conn_timeout)
 			{
 				queue_rawstring(d, NULL, "*** Login Timeout ***\r\n");
 				shutdownsock(d, R_TIMEOUT);
@@ -1412,13 +1412,13 @@ char *trimmed_site(char *name)
 {
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
-	if (((int)strlen(name) <= mudconf.site_chars) || (mudconf.site_chars == 0))
+	if (((int)strlen(name) <= mushconf.site_chars) || (mushconf.site_chars == 0))
 	{
 		return name;
 	}
 
-	XSTRNCPY(buff, name, mudconf.site_chars);
-	buff[mudconf.site_chars + 1] = '\0';
+	XSTRNCPY(buff, name, mushconf.site_chars);
+	buff[mushconf.site_chars + 1] = '\0';
 	return buff;
 }
 
@@ -1442,7 +1442,7 @@ void dump_users(DESC *e, char *match, int key)
 		match = NULL;
 	}
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		if ((e->flags & DS_PUEBLOCLIENT) && (Html(e->player)))
 		{
@@ -1479,7 +1479,7 @@ void dump_users(DESC *e, char *match, int key)
 			queue_string(e, NULL, " ");
 		}
 
-		queue_string(e, NULL, mudstate.doing_hdr);
+		queue_string(e, NULL, mushstate.doing_hdr);
 		queue_string(e, NULL, "\r\n");
 	}
 
@@ -1591,8 +1591,8 @@ void dump_users(DESC *e, char *match, int key)
 					s = XASPRINTF("s", "%s@%s", d->username, d->addr);
 					char *trs = trimmed_site(((d->username[0] != '\0') ? s : d->addr));
 					char *trn = trimmed_name(d->player);
-					char *tf1 = time_format_1(mudstate.now - d->connected_at);
-					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					char *tf1 = time_format_1(mushstate.now - d->connected_at);
+					char *tf2 = time_format_2(mushstate.now - d->last_time);
 					XSPRINTF(buf, "%-16s%9s %4s%-3s#%-6d%5d%3s%-25s\r\n", trn, tf1, tf2, flist, Location(d->player), d->command_count, slist, trs);
 					XFREE(s);
 					XFREE(tf2);
@@ -1603,8 +1603,8 @@ void dump_users(DESC *e, char *match, int key)
 				else if (key == CMD_SESSION)
 				{
 					char *trn = trimmed_name(d->player);
-					char *tf1 = time_format_1(mudstate.now - d->connected_at);
-					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					char *tf1 = time_format_1(mushstate.now - d->connected_at);
+					char *tf2 = time_format_2(mushstate.now - d->last_time);
 					XSPRINTF(buf, "%-16s%9s %4s%5d%5d%6d%10d%6d%6d%10d\r\n", trn, tf1, tf2, d->descriptor, d->input_size, d->input_lost, d->input_tot, d->output_size, d->output_lost, d->output_tot);
 					XFREE(tf1);
 					XFREE(tf2);
@@ -1613,8 +1613,8 @@ void dump_users(DESC *e, char *match, int key)
 				else if (Wizard_Who(e->player) || See_Hidden(e->player))
 				{
 					char *trn = trimmed_name(d->player);
-					char *tf1 = time_format_1(mudstate.now - d->connected_at);
-					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					char *tf1 = time_format_1(mushstate.now - d->connected_at);
+					char *tf2 = time_format_2(mushstate.now - d->last_time);
 					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
 					XFREE(tf1);
 					XFREE(tf2);
@@ -1623,8 +1623,8 @@ void dump_users(DESC *e, char *match, int key)
 				else
 				{
 					char *trn = trimmed_name(d->player);
-					char *tf1 = time_format_1(mudstate.now - d->connected_at);
-					char *tf2 = time_format_2(mudstate.now - d->last_time);
+					char *tf1 = time_format_1(mushstate.now - d->connected_at);
+					char *tf2 = time_format_2(mushstate.now - d->last_time);
 					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
 					XFREE(tf1);
 					XFREE(tf2);
@@ -1637,12 +1637,12 @@ void dump_users(DESC *e, char *match, int key)
 	/*
      * sometimes I like the ternary operator....
      */
-	s = XASPRINTF("s", "%d", mudconf.max_players);
-	XSPRINTF(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, (count == 1) ? " " : "s ", mudstate.record_players, (mudconf.max_players == -1) ? "no" : s);
+	s = XASPRINTF("s", "%d", mushconf.max_players);
+	XSPRINTF(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, (count == 1) ? " " : "s ", mushstate.record_players, (mushconf.max_players == -1) ? "no" : s);
 	XFREE(s);
 	queue_rawstring(e, NULL, buf);
 
-	if (mudconf.have_pueblo == 1)
+	if (mushconf.have_pueblo == 1)
 	{
 		if ((e->flags & DS_PUEBLOCLIENT) && (Html(e->player)))
 		{
@@ -1662,8 +1662,8 @@ void dump_info(DESC *call_by)
 	LINKEDLIST *llp;
 	int count = 0;
 	queue_rawstring(call_by, NULL, "### Begin INFO 1\r\n");
-	queue_rawstring(call_by, "Name: %s\r\n", mudconf.mud_name);
-	temp = (char *)ctime(&mudstate.start_time);
+	queue_rawstring(call_by, "Name: %s\r\n", mushconf.mush_name);
+	temp = (char *)ctime(&mushstate.start_time);
 	temp[strlen(temp) - 1] = '\0';
 	queue_rawstring(call_by, "Uptime: %s\r\n", temp);
 
@@ -1676,10 +1676,10 @@ void dump_info(DESC *call_by)
 			}
 		}
 	queue_rawstring(call_by, "Connected: %d\r\n", count);
-	queue_rawstring(call_by, "Size: %d\r\n", mudstate.db_top);
-	queue_rawstring(call_by, "Version: %d.%d.%d.%d\r\n", mudstate.version.major, mudstate.version.minor, mudstate.version.status, mudstate.version.revision);
+	queue_rawstring(call_by, "Size: %d\r\n", mushstate.db_top);
+	queue_rawstring(call_by, "Version: %d.%d.%d.%d\r\n", mushstate.version.major, mushstate.version.minor, mushstate.version.status, mushstate.version.revision);
 
-	for (llp = mudconf.infotext_list; llp != NULL; llp = llp->next)
+	for (llp = mushconf.infotext_list; llp != NULL; llp = llp->next)
 	{
 		queue_rawstring(call_by, "%s: %s\r\n", llp->name, llp->value);
 	}
@@ -1710,7 +1710,7 @@ void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __at
 		return;
 	}
 
-	for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		if (d->colormap)
 		{
@@ -1779,7 +1779,7 @@ char *sane_doing(char *arg, char *name __attribute__((unused)))
 			}
 		}
 
-		if (!mudconf.ansi_colors || !strchr(arg, ESC_CHAR))
+		if (!mushconf.ansi_colors || !strchr(arg, ESC_CHAR))
 		{
 			bp = XSTRDUP(arg, "bp");
 		}
@@ -1810,18 +1810,18 @@ void do_doing(dbref player, dbref cause __attribute__((unused)), int key, char *
 			return;
 		}
 
-		if (mudstate.doing_hdr != NULL)
+		if (mushstate.doing_hdr != NULL)
 		{
-			XFREE(mudstate.doing_hdr);
+			XFREE(mushstate.doing_hdr);
 		}
 
 		if (!arg || !*arg)
 		{
-			mudstate.doing_hdr = sane_doing("Doing", "mudstate.doing_hdr");
+			mushstate.doing_hdr = sane_doing("Doing", "mushstate.doing_hdr");
 		}
 		else
 		{
-			mudstate.doing_hdr = sane_doing(arg, "mudstate.doing_hdr");
+			mushstate.doing_hdr = sane_doing(arg, "mushstate.doing_hdr");
 		}
 
 		if (over)
@@ -1836,12 +1836,12 @@ void do_doing(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 	else if (key & DOING_POLL)
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Poll: %s", mudstate.doing_hdr);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Poll: %s", mushstate.doing_hdr);
 	}
 	else
 	{
 		foundany = 0;
-		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 		{
 			if (d->doing != NULL)
 			{
@@ -1879,11 +1879,11 @@ void init_logout_cmdtab(void)
      * * things on the first check.  Remember that the admin can add
      * * aliases.
      */
-	hashinit(&mudstate.logout_cmd_htab, 3 * mudconf.hash_factor, HT_STR);
+	hashinit(&mushstate.logout_cmd_htab, 3 * mushconf.hash_factor, HT_STR);
 
 	for (cp = logout_cmdtable; cp->flag; cp++)
 	{
-		hashadd(cp->name, (int *)cp, &mudstate.logout_cmd_htab, 0);
+		hashadd(cp->name, (int *)cp, &mushstate.logout_cmd_htab, 0);
 	}
 }
 
@@ -1926,8 +1926,8 @@ int check_connect(DESC *d, char *msg)
 	int aflags, alen, nplayers, reason;
 	DESC *d2;
 	char *p, *lname, *pname;
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< check_connect >";
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = (char *)"< check_connect >";
 	/*
      * Hide the password length from SESSION
      */
@@ -1942,7 +1942,7 @@ int check_connect(DESC *d, char *msg)
 
 	if (!strncmp(command, "co", 2) || !strncmp(command, "cd", 2))
 	{
-		if ((string_prefix(user, mudconf.guest_basename)) && Good_obj(mudconf.guest_char) && (mudconf.control_flags & CF_LOGIN))
+		if ((string_prefix(user, mushconf.guest_basename)) && Good_obj(mushconf.guest_char) && (mushconf.control_flags & CF_LOGIN))
 		{
 			if ((p = make_guest(d)) == NULL)
 			{
@@ -1950,22 +1950,22 @@ int check_connect(DESC *d, char *msg)
 				XFREE(command);
 				XFREE(user);
 				XFREE(password);
-				XFREE(mudstate.debug_cmd);
-				mudstate.debug_cmd = cmdsave;
+				XFREE(mushstate.debug_cmd);
+				mushstate.debug_cmd = cmdsave;
 				return 0;
 			}
 
 			XSTRCPY(user, p);
-			XSTRCPY(password, mudconf.guest_password);
+			XSTRCPY(password, mushconf.guest_password);
 		}
 
 		/*
 	 * See if this connection would exceed the max #players
 	 */
 
-		if (mudconf.max_players < 0)
+		if (mushconf.max_players < 0)
 		{
-			nplayers = mudconf.max_players - 1;
+			nplayers = mushconf.max_players - 1;
 		}
 		else
 		{
@@ -1993,12 +1993,12 @@ int check_connect(DESC *d, char *msg)
 				XFREE(user);
 				XFREE(password);
 				shutdownsock(d, R_BADLOGIN);
-				XFREE(mudstate.debug_cmd);
-				mudstate.debug_cmd = cmdsave;
+				XFREE(mushstate.debug_cmd);
+				mushstate.debug_cmd = cmdsave;
 				return 0;
 			}
 		}
-		else if (((mudconf.control_flags & CF_LOGIN) && (nplayers < mudconf.max_players)) || WizRoy(player) || God(player))
+		else if (((mushconf.control_flags & CF_LOGIN) && (nplayers < mushconf.max_players)) || WizRoy(player) || God(player))
 		{
 			if (Guest(player))
 			{
@@ -2020,9 +2020,9 @@ int check_connect(DESC *d, char *msg)
 
 			if (Guest(player) && (d->host_info & H_GUEST))
 			{
-				failconn("CON", "Connect", "Guest Site Forbidden", d, R_GAMEDOWN, player, FC_CONN_SITE, mudconf.downmotd_msg, command, user, password);
-				XFREE(mudstate.debug_cmd);
-				mudstate.debug_cmd = cmdsave;
+				failconn("CON", "Connect", "Guest Site Forbidden", d, R_GAMEDOWN, player, FC_CONN_SITE, mushconf.downmotd_msg, command, user, password);
+				XFREE(mushstate.debug_cmd);
+				mushstate.debug_cmd = cmdsave;
 				return 0;
 			}
 
@@ -2031,7 +2031,7 @@ int check_connect(DESC *d, char *msg)
 	     */
 			pname = log_getname(player);
 
-			if ((mudconf.log_info & LOGOPT_LOC) && Has_location(player))
+			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
 				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, connReasons(reason), user);
@@ -2051,7 +2051,7 @@ int check_connect(DESC *d, char *msg)
 	     * * an @program. If so, drop the new descriptor into
 	     * * it.
 	     */
-			for (d2 = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d2; d2 = d2->hashnext)
+			for (d2 = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d2; d2 = d2->hashnext)
 			{
 				if (d2->program_data != NULL)
 				{
@@ -2102,18 +2102,18 @@ int check_connect(DESC *d, char *msg)
 				queue_rawstring(d, NULL, "> \377\371");
 			}
 		}
-		else if (!(mudconf.control_flags & CF_LOGIN))
+		else if (!(mushconf.control_flags & CF_LOGIN))
 		{
-			failconn("CON", "Connect", "Logins Disabled", d, R_GAMEDOWN, player, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password);
-			XFREE(mudstate.debug_cmd);
-			mudstate.debug_cmd = cmdsave;
+			failconn("CON", "Connect", "Logins Disabled", d, R_GAMEDOWN, player, FC_CONN_DOWN, mushconf.downmotd_msg, command, user, password);
+			XFREE(mushstate.debug_cmd);
+			mushstate.debug_cmd = cmdsave;
 			return 0;
 		}
 		else
 		{
-			failconn("CON", "Connect", "Game Full", d, R_GAMEFULL, player, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password);
-			XFREE(mudstate.debug_cmd);
-			mudstate.debug_cmd = cmdsave;
+			failconn("CON", "Connect", "Game Full", d, R_GAMEFULL, player, FC_CONN_FULL, mushconf.fullmotd_msg, command, user, password);
+			XFREE(mushstate.debug_cmd);
+			mushstate.debug_cmd = cmdsave;
 			return 0;
 		}
 	}
@@ -2125,11 +2125,11 @@ int check_connect(DESC *d, char *msg)
 	 * Enforce game down
 	 */
 
-		if (!(mudconf.control_flags & CF_LOGIN))
+		if (!(mushconf.control_flags & CF_LOGIN))
 		{
-			failconn("CRE", "Create", "Logins Disabled", d, R_GAMEDOWN, NOTHING, FC_CONN_DOWN, mudconf.downmotd_msg, command, user, password);
-			XFREE(mudstate.debug_cmd);
-			mudstate.debug_cmd = cmdsave;
+			failconn("CRE", "Create", "Logins Disabled", d, R_GAMEDOWN, NOTHING, FC_CONN_DOWN, mushconf.downmotd_msg, command, user, password);
+			XFREE(mushstate.debug_cmd);
+			mushstate.debug_cmd = cmdsave;
 			return 0;
 		}
 
@@ -2137,9 +2137,9 @@ int check_connect(DESC *d, char *msg)
 	 * Enforce max #players
 	 */
 
-		if (mudconf.max_players < 0)
+		if (mushconf.max_players < 0)
 		{
-			nplayers = mudconf.max_players;
+			nplayers = mushconf.max_players;
 		}
 		else
 		{
@@ -2150,14 +2150,14 @@ int check_connect(DESC *d, char *msg)
 					nplayers++;
 		}
 
-		if (nplayers > mudconf.max_players)
+		if (nplayers > mushconf.max_players)
 		{
 			/*
 	     * Too many players on, reject the attempt
 	     */
-			failconn("CRE", "Create", "Game Full", d, R_GAMEFULL, NOTHING, FC_CONN_FULL, mudconf.fullmotd_msg, command, user, password);
-			XFREE(mudstate.debug_cmd);
-			mudstate.debug_cmd = cmdsave;
+			failconn("CRE", "Create", "Game Full", d, R_GAMEFULL, NOTHING, FC_CONN_FULL, mushconf.fullmotd_msg, command, user, password);
+			XFREE(mushstate.debug_cmd);
+			mushstate.debug_cmd = cmdsave;
 			return 0;
 		}
 
@@ -2179,7 +2179,7 @@ int check_connect(DESC *d, char *msg)
 				name = log_getname(player);
 				log_write(LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, connReasons(reason), name);
 				XFREE(name);
-				move_object(player, (Good_loc(mudconf.start_room) ? mudconf.start_room : 0));
+				move_object(player, (Good_loc(mushconf.start_room) ? mushconf.start_room : 0));
 				d->flags |= DS_CONNECTED;
 				d->connected_at = time(NULL);
 				d->player = player;
@@ -2198,8 +2198,8 @@ int check_connect(DESC *d, char *msg)
 	XFREE(command);
 	XFREE(user);
 	XFREE(password);
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 	return 1;
 }
 
@@ -2234,7 +2234,7 @@ void logged_out_internal(DESC *d, int key, char *arg)
 		break;
 
 	case CMD_PUEBLOCLIENT:
-		if (mudconf.have_pueblo == 1)
+		if (mushconf.have_pueblo == 1)
 		{
 			/*
 	     * Set the descriptor's flag
@@ -2249,7 +2249,7 @@ void logged_out_internal(DESC *d, int key, char *arg)
 				s_Html(d->player);
 			}
 
-			queue_rawstring(d, NULL, mudconf.pueblo_msg);
+			queue_rawstring(d, NULL, mushconf.pueblo_msg);
 			queue_write(d, "\r\n", 2);
 			fcache_dump(d, FC_CONN_HTML);
 			log_write(LOG_LOGIN, "CON", "HTML", "[%d/%s] PuebloClient enabled.", d->descriptor, d->addr);
@@ -2262,7 +2262,7 @@ void logged_out_internal(DESC *d, int key, char *arg)
 		break;
 
 	default:
-		log_write(LOG_BUGS, "BUG", "PARSE", "Logged-out command with no handler: '%s'", mudstate.debug_cmd);
+		log_write(LOG_BUGS, "BUG", "PARSE", "Logged-out command with no handler: '%s'", mushstate.debug_cmd);
 	}
 }
 
@@ -2272,8 +2272,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	long begin_time = 0L, used_time = 0L;
 	char *arg = NULL, *cmdsave = NULL, *log_cmdbuf = NULL, *pname = NULL, *lname = NULL;
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = XSTRDUP("< do_command >", "mudstate.debug_cmd");
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = XSTRDUP("< do_command >", "mushstate.debug_cmd");
 
 	if (d->flags & DS_CONNECTED)
 	{
@@ -2288,73 +2288,73 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 			queue_write(d, "\r\n", 2);
 		}
 
-		mudstate.curr_player = d->player;
-		mudstate.curr_enactor = d->player;
+		mushstate.curr_player = d->player;
+		mushstate.curr_enactor = d->player;
 
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 			{
-				if (mudstate.rdata->q_regs[z])
-					XFREE(mudstate.rdata->q_regs[z]);
+				if (mushstate.rdata->q_regs[z])
+					XFREE(mushstate.rdata->q_regs[z]);
 			}
 
-			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
-				if (mudstate.rdata->x_names[z])
-					XFREE(mudstate.rdata->x_names[z]);
+				if (mushstate.rdata->x_names[z])
+					XFREE(mushstate.rdata->x_names[z]);
 
-				if (mudstate.rdata->x_regs[z])
-					XFREE(mudstate.rdata->x_regs[z]);
+				if (mushstate.rdata->x_regs[z])
+					XFREE(mushstate.rdata->x_regs[z]);
 			}
 
-			if (mudstate.rdata->q_regs)
+			if (mushstate.rdata->q_regs)
 			{
-				XFREE(mudstate.rdata->q_regs);
+				XFREE(mushstate.rdata->q_regs);
 			}
 
-			if (mudstate.rdata->q_lens)
+			if (mushstate.rdata->q_lens)
 			{
-				XFREE(mudstate.rdata->q_lens);
+				XFREE(mushstate.rdata->q_lens);
 			}
 
-			if (mudstate.rdata->x_names)
+			if (mushstate.rdata->x_names)
 			{
-				XFREE(mudstate.rdata->x_names);
+				XFREE(mushstate.rdata->x_names);
 			}
 
-			if (mudstate.rdata->x_regs)
+			if (mushstate.rdata->x_regs)
 			{
-				XFREE(mudstate.rdata->x_regs);
+				XFREE(mushstate.rdata->x_regs);
 			}
 
-			if (mudstate.rdata->x_lens)
+			if (mushstate.rdata->x_lens)
 			{
-				XFREE(mudstate.rdata->x_lens);
+				XFREE(mushstate.rdata->x_lens);
 			}
 
-			XFREE(mudstate.rdata);
+			XFREE(mushstate.rdata);
 		}
 
-		mudstate.rdata = NULL;
+		mushstate.rdata = NULL;
 
-		if (mudconf.lag_check)
+		if (mushconf.lag_check)
 		{
 			begin_time = time(NULL);
 		}
 
-		mudstate.cmd_invk_ctr = 0;
+		mushstate.cmd_invk_ctr = 0;
 		log_cmdbuf = process_command(d->player, d->player, 1, command, (char **)NULL, 0);
 
-		if (mudconf.lag_check)
+		if (mushconf.lag_check)
 		{
 			used_time = time(NULL) - begin_time;
 
-			if (used_time >= mudconf.max_cmdsecs)
+			if (used_time >= mushconf.max_cmdsecs)
 			{
 				pname = log_getname(d->player);
 
-				if ((mudconf.log_info & LOGOPT_LOC) && Has_location(d->player))
+				if ((mushconf.log_info & LOGOPT_LOC) && Has_location(d->player))
 				{
 					lname = log_getname(Location(d->player));
 					log_write(LOG_PROBLEMS, "CMD", "CPU", "%s in %s entered command taking %ld secs: %s", pname, lname, used_time, log_cmdbuf);
@@ -2370,7 +2370,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 		}
 		XFREE(log_cmdbuf);
 
-		mudstate.curr_cmd = (char *)"";
+		mushstate.curr_cmd = (char *)"";
 
 		if (d->output_suffix)
 		{
@@ -2378,8 +2378,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 			queue_write(d, "\r\n", 2);
 		}
 
-		XFREE(mudstate.debug_cmd);
-		mudstate.debug_cmd = cmdsave;
+		XFREE(mushstate.debug_cmd);
+		mushstate.debug_cmd = cmdsave;
 		return;
 	}
 
@@ -2404,7 +2404,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	/*
      * Look up the command in the logged-out command table.
      */
-	cp = (NAMETAB *)hashfind(command, &mudstate.logout_cmd_htab);
+	cp = (NAMETAB *)hashfind(command, &mushstate.logout_cmd_htab);
 
 	if (cp == NULL)
 	{
@@ -2417,8 +2417,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 			*--arg = ' '; /* restore nullified space */
 		}
 
-		XFREE(mudstate.debug_cmd);
-		mudstate.debug_cmd = cmdsave;
+		XFREE(mushstate.debug_cmd);
+		mushstate.debug_cmd = cmdsave;
 		check_connect(d, command);
 		return;
 	}
@@ -2444,8 +2444,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 	else
 	{
-		XFREE(mudstate.debug_cmd);
-		mudstate.debug_cmd = cp->name;
+		XFREE(mushstate.debug_cmd);
+		mushstate.debug_cmd = cp->name;
 		logged_out_internal(d, cp->flag & CMD_MASK, arg);
 	}
 
@@ -2462,8 +2462,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 		}
 	}
 
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 }
 
 void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
@@ -2475,7 +2475,7 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 		/*
 	 * PUEBLOCLIENT affects all the player's connections.
 	 */
-		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 		{
 			logged_out_internal(d, key, arg);
 		}
@@ -2487,7 +2487,7 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 	 * * most recently used connection.
 	 */
 		dlast = NULL;
-		for (d = (DESC *)nhashfind((int)player, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 		{
 			if (dlast == NULL || d->last_time > dlast->last_time)
 			{
@@ -2508,8 +2508,8 @@ void process_commands(void)
 	DESC *d, *dnext;
 	CBLK *t;
 	char *cmdsave;
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = XSTRDUP("process_commands", "mudstate.debug_cmd");
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = XSTRDUP("process_commands", "mushstate.debug_cmd");
 
 	do
 	{
@@ -2535,7 +2535,7 @@ void process_commands(void)
 		 */
 				if (strcmp(t->cmd, (char *)"IDLE"))
 				{
-					d->last_time = mudstate.now;
+					d->last_time = mushstate.now;
 
 					if (d->program_data != NULL)
 					{
@@ -2552,8 +2552,8 @@ void process_commands(void)
 		}
 	} while (nprocessed > 0);
 
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 }
 
 /* ---------------------------------------------------------------------------
@@ -2701,8 +2701,8 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 
 void list_siteinfo(dbref player)
 {
-	list_sites(player, mudstate.access_list, "Site Access", S_ACCESS);
-	list_sites(player, mudstate.suspect_list, "Suspected Sites", S_SUSPECT);
+	list_sites(player, mushstate.access_list, "Site Access", S_ACCESS);
+	list_sites(player, mushstate.suspect_list, "Suspected Sites", S_SUSPECT);
 }
 
 /* ---------------------------------------------------------------------------
@@ -2811,7 +2811,7 @@ char *get_doing(dbref target, int port_num)
 
 	if (port_num < 0)
 	{
-		for (d = (DESC *)nhashfind((int)target, &mudstate.desc_htab); d; d = d->hashnext)
+		for (d = (DESC *)nhashfind((int)target, &mushstate.desc_htab); d; d = d->hashnext)
 		{
 			return d->doing;
 		}

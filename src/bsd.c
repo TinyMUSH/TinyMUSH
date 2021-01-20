@@ -181,7 +181,7 @@ int make_socket(int port)
 	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_port = (unsigned short)htons((unsigned short)port);
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 		if (bind(s, (struct sockaddr *)&server, sizeof(server)))
 		{
 			log_perror("NET", "FAIL", NULL, "bind");
@@ -211,14 +211,14 @@ void shovechars(int port)
 	char *msgq_Path = NULL;
 	MSGQ_DNSRESOLVER msgq_Dns;
 
-	mudstate.debug_cmd = (char *)"< shovechars >";
+	mushstate.debug_cmd = (char *)"< shovechars >";
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 	{
 		sock = make_socket(port);
 	}
 
-	if (!mudstate.restarting)
+	if (!mushstate.restarting)
 	{
 		maxd = sock + 1;
 	}
@@ -234,7 +234,7 @@ void shovechars(int port)
 	 * 
 	 */
 
-	msgq_Path = mkdtemp(XASPRINTF("s", "%s/%sXXXXXX", mudconf.pid_home, mudconf.mud_shortname));
+	msgq_Path = mkdtemp(XASPRINTF("s", "%s/%sXXXXXX", mushconf.pid_home, mushconf.mush_shortname));
 	msgq_Key = ftok(msgq_Path, 0x32);
 	msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
 	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
@@ -249,14 +249,14 @@ void shovechars(int port)
 	 * @attention This is the main loop of the MUSH, everything derive from here... 
 	 * 
 	 */
-	while (mudstate.shutdown_flag == 0)
+	while (mushstate.shutdown_flag == 0)
 	{
 		gettimeofday(&current_time, NULL);
 
 		last_slice = update_quotas(last_slice, current_time);
 		process_commands();
 
-		if (mudstate.shutdown_flag)
+		if (mushstate.shutdown_flag)
 		{
 			break;
 		}
@@ -264,30 +264,30 @@ void shovechars(int port)
 		 * We've gotten a signal to dump flatfiles
 		 * 
 		 */
-		if (mudstate.flatfile_flag && !mudstate.dumping)
+		if (mushstate.flatfile_flag && !mushstate.dumping)
 		{
-			if (mudconf.dump_msg)
+			if (mushconf.dump_msg)
 			{
-				if (*mudconf.dump_msg)
+				if (*mushconf.dump_msg)
 				{
-					raw_broadcast(0, "%s", mudconf.dump_msg);
+					raw_broadcast(0, "%s", mushconf.dump_msg);
 				}
 			}
 
-			mudstate.dumping = 1;
-			log_write(LOG_DBSAVES, "DMP", "CHKPT", "Flatfiling: %s.#%d#", mudconf.db_file, mudstate.epoch);
+			mushstate.dumping = 1;
+			log_write(LOG_DBSAVES, "DMP", "CHKPT", "Flatfiling: %s.#%d#", mushconf.db_file, mushstate.epoch);
 			dump_database_internal(DUMP_DB_FLATFILE);
-			mudstate.dumping = 0;
+			mushstate.dumping = 0;
 
-			if (mudconf.postdump_msg)
+			if (mushconf.postdump_msg)
 			{
-				if (*mudconf.postdump_msg)
+				if (*mushconf.postdump_msg)
 				{
-					raw_broadcast(0, "%s", mudconf.postdump_msg);
+					raw_broadcast(0, "%s", mushconf.postdump_msg);
 				}
 			}
 
-			mudstate.flatfile_flag = 0;
+			mushstate.flatfile_flag = 0;
 		}
 		/**
 		 * test for events
@@ -300,7 +300,7 @@ void shovechars(int port)
 		 */
 		timeout.tv_sec = que_next();
 		timeout.tv_usec = 0;
-		next_slice = msec_add(last_slice, mudconf.timeslice);
+		next_slice = msec_add(last_slice, mushconf.timeslice);
 		timeval_sub(next_slice, current_time);
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
@@ -384,16 +384,16 @@ void shovechars(int port)
 		 */
 		if (!found)
 		{
-			if (mudconf.queue_chunk)
+			if (mushconf.queue_chunk)
 			{
-				do_top(mudconf.queue_chunk);
+				do_top(mushconf.queue_chunk);
 			}
 
 			continue;
 		}
 		else
 		{
-			do_top(mudconf.active_q_chunk);
+			do_top(mushconf.active_q_chunk);
 		}
 
 		/**
@@ -403,7 +403,7 @@ void shovechars(int port)
 
 		if (msgrcv(msgq_Id, &msgq_Dns, sizeof(msgq_Dns.payload), MSGQ_DEST_REPLY - MSGQ_DEST_DNSRESOLVER, IPC_NOWAIT) > 0)
 		{
-			if (mudconf.use_hostname)
+			if (mushconf.use_hostname)
 			{
 				for (DESC *d = descriptor_list; d; d = d->next)
 				{
@@ -539,8 +539,8 @@ DESC *new_connection(int sock)
 	MSGQ_DNSRESOLVER msgData;
 	int msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = XSTRDUP("< new_connection >", "mudstate.debug_cmd");
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = XSTRDUP("< new_connection >", "mushstate.debug_cmd");
 	addr_len = sizeof(struct sockaddr);
 	newsock = accept(sock, (struct sockaddr *)&addr, &addr_len);
 
@@ -549,7 +549,7 @@ DESC *new_connection(int sock)
 		return 0;
 	}
 
-	if (site_check(addr.sin_addr, mudstate.access_list) & H_FORBIDDEN)
+	if (site_check(addr.sin_addr, mushstate.access_list) & H_FORBIDDEN)
 	{
 		log_write(LOG_NET | LOG_SECURITY, "NET", "SITE", "[%d/%s] Connection refused.  (Remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 		fcache_rawdump(newsock, FC_CONN_SITE);
@@ -574,8 +574,8 @@ DESC *new_connection(int sock)
 		d = initializesock(newsock, &addr);
 	}
 
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 	return d;
 }
 
@@ -674,7 +674,7 @@ void shutdownsock(DESC *d, int reason)
 	int ncon = 0;
 	DESC *dtemp = NULL;
 
-	if ((reason == R_LOGOUT) && (site_check((d->address).sin_addr, mudstate.access_list) & H_FORBIDDEN))
+	if ((reason == R_LOGOUT) && (site_check((d->address).sin_addr, mushstate.access_list) & H_FORBIDDEN))
 	{
 		reason = R_QUIT;
 	}
@@ -711,7 +711,7 @@ void shutdownsock(DESC *d, int reason)
 		 * Plyr# Flags Cmds ConnTime Loc Money [Site] <DiscRsn> Name
 		 * 
  		 */
-		now = mudstate.now - d->connected_at;
+		now = mushstate.now - d->connected_at;
 		buff2 = unparse_flags(GOD, d->player);
 		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, connReasons(reason), buff);
 		XFREE(buff2);
@@ -740,7 +740,7 @@ void shutdownsock(DESC *d, int reason)
 	{
 		ncon = 0;
 
-		for (dtemp = (DESC *)nhashfind((int)d->player, &mudstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
+		for (dtemp = (DESC *)nhashfind((int)d->player, &mushstate.desc_htab); dtemp; dtemp = dtemp->hashnext)
 		{
 			ncon++;
 		}
@@ -817,9 +817,9 @@ void shutdownsock(DESC *d, int reason)
 	{
 		d->flags &= ~DS_CONNECTED;
 		d->connected_at = time(NULL);
-		d->retries_left = mudconf.retry_limit;
+		d->retries_left = mushconf.retry_limit;
 		d->command_count = 0;
-		d->timeout = mudconf.idle_timeout;
+		d->timeout = mushconf.idle_timeout;
 		d->player = 0;
 
 		if (d->doing)
@@ -828,9 +828,9 @@ void shutdownsock(DESC *d, int reason)
 			d->doing = NULL;
 		}
 
-		d->quota = mudconf.cmd_quota_max;
+		d->quota = mushconf.cmd_quota_max;
 		d->last_time = 0;
-		d->host_info = site_check((d->address).sin_addr, mudstate.access_list) | site_check((d->address).sin_addr, mudstate.suspect_list);
+		d->host_info = site_check((d->address).sin_addr, mushstate.access_list) | site_check((d->address).sin_addr, mushstate.suspect_list);
 		d->input_tot = d->input_size;
 		d->output_tot = 0;
 		welcome_user(d);
@@ -902,10 +902,10 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 	d->descriptor = s;
 	d->flags = 0;
 	d->connected_at = time(NULL);
-	d->retries_left = mudconf.retry_limit;
+	d->retries_left = mushconf.retry_limit;
 	d->command_count = 0;
-	d->timeout = mudconf.idle_timeout;
-	d->host_info = site_check((*a).sin_addr, mudstate.access_list) | site_check((*a).sin_addr, mudstate.suspect_list);
+	d->timeout = mushconf.idle_timeout;
+	d->host_info = site_check((*a).sin_addr, mushstate.access_list) | site_check((*a).sin_addr, mushstate.suspect_list);
 	d->player = 0; /* be sure #0 isn't wizard.  Shouldn't be. */
 	d->addr[0] = '\0';
 	d->doing = NULL;
@@ -926,7 +926,7 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 	d->input_lost = 0;
 	d->raw_input = NULL;
 	d->raw_input_at = NULL;
-	d->quota = mudconf.cmd_quota_max;
+	d->quota = mushconf.cmd_quota_max;
 	d->program_data = NULL;
 	d->last_time = 0;
 	d->address = *a;
@@ -957,8 +957,8 @@ int process_output(DESC *d)
 	int cnt = 0;
 	char *cmdsave = NULL;
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = (char *)"< process_output >";
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = (char *)"< process_output >";
 	tb = d->output_head;
 
 	while (tb != NULL)
@@ -969,8 +969,8 @@ int process_output(DESC *d)
 
 			if (cnt < 0)
 			{
-				XFREE(mudstate.debug_cmd);
-				mudstate.debug_cmd = cmdsave;
+				XFREE(mushstate.debug_cmd);
+				mushstate.debug_cmd = cmdsave;
 
 				if (errno == EWOULDBLOCK)
 				{
@@ -997,8 +997,8 @@ int process_output(DESC *d)
 		}
 	}
 	
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 	return 1;
 }
 
@@ -1014,15 +1014,15 @@ int process_input(DESC *d)
 	int got = 0, in = 0, lost = 0;
 	char *p = NULL, *pend = NULL, *q = NULL, *qend = NULL, *cmdsave = NULL;
 
-	cmdsave = mudstate.debug_cmd;
-	mudstate.debug_cmd = XSTRDUP("< process_input >", mudstate.debug_cmd);
+	cmdsave = mushstate.debug_cmd;
+	mushstate.debug_cmd = XSTRDUP("< process_input >", mushstate.debug_cmd);
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	got = in = read(d->descriptor, buf, LBUF_SIZE);
 
 	if (got <= 0)
 	{
-		XFREE(mudstate.debug_cmd);
-		mudstate.debug_cmd = cmdsave;
+		XFREE(mushstate.debug_cmd);
+		mushstate.debug_cmd = cmdsave;
 		XFREE(buf);
 		return 0;
 	}
@@ -1113,8 +1113,8 @@ int process_input(DESC *d)
 	d->input_size += in;
 	d->input_lost += lost;
 	XFREE(buf);
-	XFREE(mudstate.debug_cmd);
-	mudstate.debug_cmd = cmdsave;
+	XFREE(mushstate.debug_cmd);
+	mushstate.debug_cmd = cmdsave;
 	return 1;
 }
 
@@ -1171,15 +1171,15 @@ void report(void)
 {
 	char *player = NULL, *enactor = NULL;
 
-	log_write(LOG_BUGS, "BUG", "INFO", "Command: '%s'", mudstate.debug_cmd);
+	log_write(LOG_BUGS, "BUG", "INFO", "Command: '%s'", mushstate.debug_cmd);
 
-	if (Good_obj(mudstate.curr_player))
+	if (Good_obj(mushstate.curr_player))
 	{
-		player = log_getname(mudstate.curr_player);
+		player = log_getname(mushstate.curr_player);
 
-		if ((mudstate.curr_enactor != mudstate.curr_player) && Good_obj(mudstate.curr_enactor))
+		if ((mushstate.curr_enactor != mushstate.curr_player) && Good_obj(mushstate.curr_enactor))
 		{
-			enactor = log_getname(mudstate.curr_enactor);
+			enactor = log_getname(mushstate.curr_enactor);
 			log_write(LOG_BUGS, "BUG", "INFO", "Player: %s Enactor: %s", player, enactor);
 			XFREE(enactor);
 		}
@@ -1224,11 +1224,11 @@ void sighandler(int sig)
 		break;
 
 	case SIGUSR2: /*!< Dump a flatfile soon */
-		mudstate.flatfile_flag = 1;
+		mushstate.flatfile_flag = 1;
 		break;
 
 	case SIGALRM: /*!< Timer */
-		mudstate.alarm_triggered = 1;
+		mushstate.alarm_triggered = 1;
 		break;
 
 	case SIGCHLD: /*!< Change in child status */
@@ -1238,10 +1238,10 @@ void sighandler(int sig)
 
 		while ((child = waitpid(0, &stat, WNOHANG)) > 0)
 		{
-			if (mudconf.fork_dump && mudstate.dumping && child == mudstate.dumper && (WIFEXITED(stat) || WIFSIGNALED(stat)))
+			if (mushconf.fork_dump && mushstate.dumping && child == mushstate.dumper && (WIFEXITED(stat) || WIFSIGNALED(stat)))
 			{
-				mudstate.dumping = 0;
-				mudstate.dumper = 0;
+				mushstate.dumping = 0;
+				mushstate.dumper = 0;
 			}
 		}
 
@@ -1249,7 +1249,7 @@ void sighandler(int sig)
 
 	case SIGHUP: /*!< Dump database soon */
 		log_signal(signames[sig]);
-		mudstate.dump_counter = 0;
+		mushstate.dump_counter = 0;
 		break;
 
 	case SIGINT: /*!< Force a live backup */
@@ -1258,7 +1258,7 @@ void sighandler(int sig)
 		break;
 
 	case SIGQUIT: /*!< Normal shutdown soon */
-		mudstate.shutdown_flag = 1;
+		mushstate.shutdown_flag = 1;
 		break;
 
 	case SIGTERM: /*!< Killed shutdown now */
@@ -1295,7 +1295,7 @@ void sighandler(int sig)
 		log_signal(signames[sig]);
 		report();
 
-		if (mudconf.sig_action != SA_EXIT)
+		if (mushconf.sig_action != SA_EXIT)
 		{
 			raw_broadcast(0, "GAME: Fatal signal %s caught, restarting with previous database.", signames[sig]);
 			/**
@@ -1333,7 +1333,7 @@ void sighandler(int sig)
 
 			alarm(0);
 			dump_restart_db();
-			execl(mudconf.game_exec, mudconf.game_exec, mudconf.config_file, (char *)NULL);
+			execl(mushconf.game_exec, mushconf.game_exec, mushconf.config_file, (char *)NULL);
 			break;
 		}
 		else
@@ -1355,7 +1355,7 @@ void sighandler(int sig)
 	}
 
 	signal(sig, sighandler);
-	mudstate.panicking = 0;
+	mushstate.panicking = 0;
 	return;
 }
 
@@ -1429,7 +1429,7 @@ void check_panicking(int sig)
 	 * If we are panicking, turn off signal catching and resignal
 	 * 
 	 */
-	if (mudstate.panicking)
+	if (mushstate.panicking)
 	{
 		for (int i = 0; i < NSIG; i++)
 		{
@@ -1439,7 +1439,7 @@ void check_panicking(int sig)
 		kill(getpid(), sig);
 	}
 
-	mudstate.panicking = 1;
+	mushstate.panicking = 1;
 }
 
 /**

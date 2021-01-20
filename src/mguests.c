@@ -27,15 +27,15 @@ dbref create_guest(int num)
     dbref player, aowner;
     int found, same_str, aflags;
     char *name = XMALLOC(LBUF_SIZE * 2, "name");
-    char *base = XMALLOC(mudconf.max_command_args * 2, "base");
+    char *base = XMALLOC(mushconf.max_command_args * 2, "base");
     char *prefixes = XMALLOC(LBUF_SIZE, "prefixes");
     char *suffixes = XMALLOC(LBUF_SIZE, "suffixes");
     char *pp, *sp, *tokp, *toks;
     char *s;
 
-    if (!Wizard(mudconf.guest_nuker) || !Good_obj(mudconf.guest_nuker))
+    if (!Wizard(mushconf.guest_nuker) || !Good_obj(mushconf.guest_nuker))
     {
-        mudconf.guest_nuker = GOD;
+        mushconf.guest_nuker = GOD;
     }
 
     /*
@@ -50,13 +50,13 @@ dbref create_guest(int num)
      */
     found = 0;
 
-    if (mudconf.guest_prefixes && mudconf.guest_suffixes)
+    if (mushconf.guest_prefixes && mushconf.guest_suffixes)
     {
-        XSTRCPY(prefixes, mudconf.guest_prefixes);
+        XSTRCPY(prefixes, mushconf.guest_prefixes);
 
         for (pp = strtok_r(prefixes, " \t", &tokp); pp && !found; pp = strtok_r(NULL, " \t", &tokp))
         {
-            XSTRCPY(suffixes, mudconf.guest_suffixes);
+            XSTRCPY(suffixes, mushconf.guest_suffixes);
 
             for (sp = strtok_r(suffixes, " \t", &toks); sp && !found; sp = strtok_r(NULL, " \t", &toks))
             {
@@ -69,9 +69,9 @@ dbref create_guest(int num)
             }
         }
     }
-    else if (mudconf.guest_prefixes || mudconf.guest_suffixes)
+    else if (mushconf.guest_prefixes || mushconf.guest_suffixes)
     {
-        XSTRCPY(prefixes, (mudconf.guest_prefixes ? mudconf.guest_prefixes : mudconf.guest_suffixes));
+        XSTRCPY(prefixes, (mushconf.guest_prefixes ? mushconf.guest_prefixes : mushconf.guest_suffixes));
 
         for (pp = strtok_r(prefixes, " \t", &tokp); pp && !found; pp = strtok_r(NULL, " \t", &tokp))
         {
@@ -83,10 +83,10 @@ dbref create_guest(int num)
         }
     }
 
-    XSPRINTF(base, "%s%d", mudconf.guest_basename, num + 1);
+    XSPRINTF(base, "%s%d", mushconf.guest_basename, num + 1);
     same_str = 1;
 
-    if (!found || (strlen(name) >= (size_t)mudconf.max_command_args))
+    if (!found || (strlen(name) >= (size_t)mushconf.max_command_args))
     {
         XSTRCPY(name, base);
     }
@@ -108,7 +108,7 @@ dbref create_guest(int num)
     /*
      * Make the player.
      */
-    player = create_player(name, mudconf.guest_password, mudconf.guest_nuker, 0, 1);
+    player = create_player(name, mushconf.guest_password, mushconf.guest_nuker, 0, 1);
 
     if (player == NOTHING)
     {
@@ -135,13 +135,13 @@ dbref create_guest(int num)
      * Turn the player into a guest.
      */
     s_Guest(player);
-    move_object(player, (Good_loc(mudconf.guest_start_room) ? mudconf.guest_start_room : (Good_loc(mudconf.start_room) ? mudconf.start_room : 0)));
-    s_Flags(player, (Flags(mudconf.guest_char) & ~TYPE_MASK & ~mudconf.stripped_flags.word1) | TYPE_PLAYER);
-    s_Flags2(player, Flags2(mudconf.guest_char) & ~mudconf.stripped_flags.word2);
-    s_Flags3(player, Flags3(mudconf.guest_char) & ~mudconf.stripped_flags.word3);
-    s_Pennies(player, Pennies(mudconf.guest_char));
-    s_Zone(player, Zone(mudconf.guest_char));
-    s_Parent(player, Parent(mudconf.guest_char));
+    move_object(player, (Good_loc(mushconf.guest_start_room) ? mushconf.guest_start_room : (Good_loc(mushconf.start_room) ? mushconf.start_room : 0)));
+    s_Flags(player, (Flags(mushconf.guest_char) & ~TYPE_MASK & ~mushconf.stripped_flags.word1) | TYPE_PLAYER);
+    s_Flags2(player, Flags2(mushconf.guest_char) & ~mushconf.stripped_flags.word2);
+    s_Flags3(player, Flags3(mushconf.guest_char) & ~mushconf.stripped_flags.word3);
+    s_Pennies(player, Pennies(mushconf.guest_char));
+    s_Zone(player, Zone(mushconf.guest_char));
+    s_Parent(player, Parent(mushconf.guest_char));
     /*
      * Make sure the guest is locked.
      */
@@ -153,7 +153,7 @@ dbref create_guest(int num)
     /*
      * Copy all attributes.
      */
-    atr_cpy(GOD, player, mudconf.guest_char);
+    atr_cpy(GOD, player, mushconf.guest_char);
 
     XFREE(suffixes);
     XFREE(prefixes);
@@ -166,9 +166,9 @@ void destroy_guest(dbref guest)
 {
     char *s;
 
-    if (!Wizard(mudconf.guest_nuker) || !Good_obj(mudconf.guest_nuker))
+    if (!Wizard(mushconf.guest_nuker) || !Good_obj(mushconf.guest_nuker))
     {
-        mudconf.guest_nuker = GOD;
+        mushconf.guest_nuker = GOD;
     }
 
     if (!Guest(guest))
@@ -176,11 +176,11 @@ void destroy_guest(dbref guest)
         return;
     }
 
-    s = XASPRINTF("s", "%d", mudconf.guest_nuker);
+    s = XASPRINTF("s", "%d", mushconf.guest_nuker);
     atr_add_raw(guest, A_DESTROYER, s);
     XFREE(s);
     destroy_player(guest);
-    destroy_obj(mudconf.guest_nuker, guest);
+    destroy_obj(mushconf.guest_nuker, guest);
 }
 
 char *make_guest(DESC *d)
@@ -193,9 +193,9 @@ char *make_guest(DESC *d)
      * Nuke extra guests.
      */
 
-    for (i = 0; i < mudconf.number_guests; i++)
+    for (i = 0; i < mushconf.number_guests; i++)
     {
-        XSPRINTF(name, "%s%d", mudconf.guest_basename, i + 1);
+        XSPRINTF(name, "%s%d", mushconf.guest_basename, i + 1);
         guest = lookup_player(GOD, name, 0);
 
         if ((guest != NOTHING) && !Connected(guest))
@@ -208,9 +208,9 @@ char *make_guest(DESC *d)
      * Find the first free guest ID.
      */
 
-    for (i = 0; i < mudconf.number_guests; i++)
+    for (i = 0; i < mushconf.number_guests; i++)
     {
-        XSPRINTF(name, "%s%d", mudconf.guest_basename, i + 1);
+        XSPRINTF(name, "%s%d", mushconf.guest_basename, i + 1);
 
         if (lookup_player(GOD, name, 0) == NOTHING)
         {
@@ -218,7 +218,7 @@ char *make_guest(DESC *d)
         }
     }
 
-    if (i == mudconf.number_guests)
+    if (i == mushconf.number_guests)
     {
         queue_string(d, NULL, "GAME: All guests are currently in use. Please try again later.\n");
         XFREE(name);

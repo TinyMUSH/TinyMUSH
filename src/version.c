@@ -28,7 +28,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     MODVER *mver;
     char *ptr;
     char string[MBUF_SIZE];
-    XSNPRINTF(string, MBUF_SIZE, "%s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
+    XSNPRINTF(string, MBUF_SIZE, "%s (%s)", mushstate.version.name, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
     XFREE(ptr);
@@ -40,16 +40,16 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
         uname(&bpInfo);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build platform: %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
 #endif
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mudstate.configureinfo);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mudstate.compilerinfo);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s\n", mudstate.linkerinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Configure Flags: %s", mushstate.configureinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Compiler Flags: %s", mushstate.compilerinfo);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Linker Flags: %s\n", mushstate.linkerinfo);
     }
 
-    if (mudstate.modloaded[0])
+    if (mushstate.modloaded[0])
     {
         MODULE *mp;
 
-        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+        for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
         {
             XSNPRINTF(string, MBUF_SIZE, "Module %s", mp->modname);
             ptr = repeatchar(strlen(string), '-');
@@ -92,54 +92,54 @@ void init_version(void)
 
     if (version != NULL)
     {
-        mudstate.version.major = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mudstate.version.minor = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mudstate.version.status = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mudstate.version.revision = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mushstate.version.major = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mushstate.version.minor = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mushstate.version.status = strtoimax(strsep(&version, "."), (char **)NULL, 10);
+        mushstate.version.revision = strtoimax(strsep(&version, "."), (char **)NULL, 10);
     }
     else
     {
         /* If we hit that, we have a serious problem... */
-        mudstate.version.major = 0;
-        mudstate.version.minor = 0;
-        mudstate.version.status = 0;
-        mudstate.version.revision = 0;
+        mushstate.version.major = 0;
+        mushstate.version.minor = 0;
+        mushstate.version.status = 0;
+        mushstate.version.revision = 0;
     }
 
     XFREE(version);
     version = munge_space(PACKAGE_CONFIG);
-    mudstate.configureinfo = XSTRDUP(version, "mudstate.configureinfo");
+    mushstate.configureinfo = XSTRDUP(version, "mushstate.configureinfo");
     XFREE(version);
 
     version = munge_space(MUSH_BUILD_COMPILE);
-    mudstate.compilerinfo = XSTRDUP(version, "mudstate.compilerinfo");
+    mushstate.compilerinfo = XSTRDUP(version, "mushstate.compilerinfo");
     XFREE(version);
 
     version = munge_space(MUSH_BUILD_LTCOMPILE);
-    mudstate.linkerinfo = XSTRDUP(version, "mudstate.linkerinfo");
+    mushstate.linkerinfo = XSTRDUP(version, "mushstate.linkerinfo");
     XFREE(version);
 
     version = XMALLOC(LBUF_SIZE, "version");
-    XSPRINTFCAT(version, "TinyMUSH version %d.%d", mudstate.version.major, mudstate.version.minor);
+    XSPRINTFCAT(version, "TinyMUSH version %d.%d", mushstate.version.major, mushstate.version.minor);
 
-    switch (mudstate.version.status)
+    switch (mushstate.version.status)
     {
     case 0:
-        XSPRINTFCAT(version, ", Alpha %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Alpha %d", mushstate.version.revision);
         break;
 
     case 1:
-        XSPRINTFCAT(version, ", Beta %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Beta %d", mushstate.version.revision);
         break;
 
     case 2:
-        XSPRINTFCAT(version, ", Release Candidate %d", mudstate.version.revision);
+        XSPRINTFCAT(version, ", Release Candidate %d", mushstate.version.revision);
         break;
 
     default:
-        if (mudstate.version.revision > 0)
+        if (mushstate.version.revision > 0)
         {
-            XSPRINTFCAT(version, ", Patch Level %d", mudstate.version.revision);
+            XSPRINTFCAT(version, ", Patch Level %d", mushstate.version.revision);
         }
         else
         {
@@ -149,15 +149,15 @@ void init_version(void)
         break;
     }
 
-    mudstate.version.name = XSTRDUP(version, "mudstate.version.name");
+    mushstate.version.name = XSTRDUP(version, "mushstate.version.name");
     XFREE(version);
 }
 
 void log_version(void)
 {
-    log_write(LOG_ALWAYS, "INI", "START", "       Starting: %s (%s)", mudstate.version.name, PACKAGE_RELEASE_DATE);
+    log_write(LOG_ALWAYS, "INI", "START", "       Starting: %s (%s)", mushstate.version.name, PACKAGE_RELEASE_DATE);
     log_write(LOG_ALWAYS, "INI", "START", "     Build date: %s, %s", __DATE__, __TIME__);
-    log_write(LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mudstate.configureinfo);
-    log_write(LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mudstate.compilerinfo);
-    log_write(LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mudstate.linkerinfo);
+    log_write(LOG_ALWAYS, "INI", "START", "Configure Flags: %s", mushstate.configureinfo);
+    log_write(LOG_ALWAYS, "INI", "START", " Compiler Flags: %s", mushstate.compilerinfo);
+    log_write(LOG_ALWAYS, "INI", "START", "   Linker Flags: %s", mushstate.linkerinfo);
 }

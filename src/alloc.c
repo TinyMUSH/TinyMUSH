@@ -25,7 +25,7 @@
  * 
  */
 #define XLOGALLOC(x, y, z, s, ...)            \
-	if (mudconf.malloc_logger)                \
+	if (mushconf.malloc_logger)                \
 	{                                         \
 		log_write(x, y, z, s, ##__VA_ARGS__); \
 	}
@@ -75,9 +75,9 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 				mtrk->line = line;
 				mtrk->function = function;
 				mtrk->var = var;
-				mtrk->next = mudstate.raw_allocs;
+				mtrk->next = mushstate.raw_allocs;
 				mtrk->magic = (uint64_t *)((char *)mtrk->bptr + size);
-				mudstate.raw_allocs = mtrk;
+				mushstate.raw_allocs = mtrk;
 				*(mtrk->magic) = XMAGIC;
 				XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Alloc %ld bytes", mtrk->file, mtrk->line, mtrk->function, mtrk->var, mtrk->size);
 				return mtrk->bptr;
@@ -214,9 +214,9 @@ MEMTRACK *__xfind(void *ptr)
 {
 	if (ptr)
 	{
-		if (mudstate.raw_allocs)
+		if (mushstate.raw_allocs)
 		{
-			MEMTRACK *curr = mudstate.raw_allocs;
+			MEMTRACK *curr = mushstate.raw_allocs;
 
 			while (curr)
 			{
@@ -242,9 +242,9 @@ int __xcheck(void *ptr)
 {
 	if (ptr)
 	{
-		if (mudstate.raw_allocs)
+		if (mushstate.raw_allocs)
 		{
-			MEMTRACK *curr = mudstate.raw_allocs;
+			MEMTRACK *curr = mushstate.raw_allocs;
 
 			while (curr)
 			{
@@ -284,7 +284,7 @@ int __xfree(void *ptr)
 	if (ptr)
 	{
 		MEMTRACK *prev = NULL;
-		MEMTRACK *curr = mudstate.raw_allocs;
+		MEMTRACK *curr = mushstate.raw_allocs;
 
 		while (curr)
 		{
@@ -303,9 +303,9 @@ int __xfree(void *ptr)
 
 					XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Free %ld bytes -- OVERRUN ---", curr->file, curr->line, curr->function, curr->var, curr->size);
 				}
-				if (mudstate.raw_allocs == curr)
+				if (mushstate.raw_allocs == curr)
 				{
-					mudstate.raw_allocs = curr->next;
+					mushstate.raw_allocs = curr->next;
 				}
 				else
 				{
@@ -1122,9 +1122,9 @@ void list_rawmemory(dbref player)
 	notify(player, "File             Line   Function            Variable             Allocs Bytes   ");
 	notify(player, "---------------- ------ ------------------- -------------------- ------ --------");
 
-	if (mudstate.raw_allocs != NULL)
+	if (mushstate.raw_allocs != NULL)
 	{
-		for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
+		for (tptr = mushstate.raw_allocs; tptr != NULL; tptr = tptr->next)
 		{
 			n_tags++;
 			total += tptr->size;
@@ -1134,7 +1134,7 @@ void list_rawmemory(dbref player)
 		{
 			t_array = (MEMTRACK **)calloc(total, sizeof(MEMTRACK *));
 
-			for (i = 0, tptr = mudstate.raw_allocs; tptr != NULL; i++, tptr = tptr->next)
+			for (i = 0, tptr = mushstate.raw_allocs; tptr != NULL; i++, tptr = tptr->next)
 			{
 				t_array[i] = tptr;
 			}
@@ -1207,7 +1207,7 @@ void list_rawmemory(dbref player)
 		else
 		{
 			u_tags = 1;
-			s1 = XNASPRINTF("%s:%s", mudstate.raw_allocs->function, mudstate.raw_allocs->var);
+			s1 = XNASPRINTF("%s:%s", mushstate.raw_allocs->function, mushstate.raw_allocs->var);
 			if (c_total < 1024)
 			{
 				raw_notify(player, "%-64.64s %6ld %8ld", s1, n_tags, total);
@@ -1238,7 +1238,7 @@ size_t total_rawmemory(void)
 	MEMTRACK *tptr = NULL;
 	size_t total_bytes = 0;
 
-	for (tptr = mudstate.raw_allocs; tptr != NULL; tptr = tptr->next)
+	for (tptr = mushstate.raw_allocs; tptr != NULL; tptr = tptr->next)
 	{
 		total_bytes += tptr->size;
 	}

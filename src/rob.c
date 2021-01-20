@@ -68,14 +68,14 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 		if (key == KILL_KILL)
 		{
-			if (cost < mudconf.killmin)
+			if (cost < mushconf.killmin)
 			{
-				cost = mudconf.killmin;
+				cost = mushconf.killmin;
 			}
 
-			if (cost > mudconf.killmax)
+			if (cost > mushconf.killmax)
 			{
-				cost = mudconf.killmax;
+				cost = mushconf.killmax;
 			}
 
 			/*
@@ -84,7 +84,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 			if (!payfor(player, cost))
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
 				return;
 			}
 		}
@@ -93,7 +93,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			cost = 0;
 		}
 
-		if (!((mudconf.killguarantee && ((int)(random_range(0, (mudconf.killguarantee)-1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
+		if (!((mushconf.killguarantee && ((int)(random_range(0, (mushconf.killguarantee)-1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
 		{
 			/*
 	     * Failure: notify player and victim only
@@ -176,9 +176,9 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 				 * victim gets half
 				 */
 
-			if (Pennies(Owner(victim)) < mudconf.paylimit)
+			if (Pennies(Owner(victim)) < mushconf.paylimit)
 			{
-				XSPRINTF(buf1, "Your insurance policy pays %d %s.", cost, mudconf.many_coins);
+				XSPRINTF(buf1, "Your insurance policy pays %d %s.", cost, mushconf.many_coins);
 				notify(victim, buf1);
 				giveto(Owner(victim), cost);
 			}
@@ -290,21 +290,21 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 
 	if (amount < 0 && !Steal(giver))
 	{
-		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You look through your pockets. Nope, no negative %s.", mudconf.many_coins);
+		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You look through your pockets. Nope, no negative %s.", mushconf.many_coins);
 		return;
 	}
 
 	if (!amount)
 	{
-		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You must specify a positive number of %s.", mudconf.many_coins);
+		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You must specify a positive number of %s.", mushconf.many_coins);
 		return;
 	}
 
 	if (!Wizard(giver))
 	{
-		if ((Typeof(recipient) == TYPE_PLAYER) && (Pennies(recipient) + amount > mudconf.paylimit))
+		if ((Typeof(recipient) == TYPE_PLAYER) && (Pennies(recipient) + amount > mushconf.paylimit))
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "That player doesn't need that many %s!", mudconf.many_coins);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "That player doesn't need that many %s!", mushconf.many_coins);
 			return;
 		}
 
@@ -321,7 +321,7 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 
 	if (!payfor(giver, amount))
 	{
-		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have that many %s to give!", mudconf.many_coins);
+		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have that many %s to give!", mushconf.many_coins);
 		return;
 	}
 
@@ -364,13 +364,13 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	{
 		if (amount == 1)
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give a %s to %s.", mudconf.one_coin, Name(recipient));
-			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you a %s.", Name(giver), mudconf.one_coin);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give a %s to %s.", mushconf.one_coin, Name(recipient));
+			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you a %s.", Name(giver), mushconf.one_coin);
 		}
 		else
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give %d %s to %s.", amount, mudconf.many_coins, Name(recipient));
-			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you %d %s.", Name(giver), amount, mudconf.many_coins);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give %d %s to %s.", amount, mushconf.many_coins, Name(recipient));
+			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you %d %s.", Name(giver), amount, mushconf.many_coins);
 		}
 	}
 
@@ -380,12 +380,12 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 
 	if ((amount - cost) == 1)
 	{
-		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get 1 %s in change.", mudconf.one_coin);
+		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get 1 %s in change.", mushconf.one_coin);
 		giveto(giver, 1);
 	}
 	else if (amount != cost)
 	{
-		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get %d %s in change.", (amount - cost), mudconf.many_coins);
+		notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You get %d %s in change.", (amount - cost), mushconf.many_coins);
 		giveto(giver, (amount - cost));
 	}
 

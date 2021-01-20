@@ -55,14 +55,14 @@
 #define DASH_LINE  \
   "---------------------------------------------------------------------------"
 
-#define MAIL_ITER_ALL(mp, thing)    for((thing)=0; (thing)<mudstate.db_top; (thing)++) \
+#define MAIL_ITER_ALL(mp, thing)    for((thing)=0; (thing)<mushstate.db_top; (thing)++) \
                         for (mp = (struct mail *)nhashfind((int)thing, &mod_mail_msg_htab); mp != NULL; mp = mp->next)
 
 /* This macro requires you to put nextp = mp->next at
  * the beginning of the loop.
  */
 
-#define MAIL_ITER_SAFE(mp, thing, nextp)    for((thing)=0; (thing)<mudstate.db_top; (thing)++) \
+#define MAIL_ITER_SAFE(mp, thing, nextp)    for((thing)=0; (thing)<mushstate.db_top; (thing)++) \
                             for (mp = (struct mail *)nhashfind((int)thing, &mod_mail_msg_htab); mp != NULL; mp = nextp)
 
 

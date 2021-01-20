@@ -41,7 +41,7 @@ void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hu
         dest = Home(thing);
     }
 
-    if (mudconf.have_pueblo == 1)
+    if (mushconf.have_pueblo == 1)
     {
         if (Html(thing))
         {
@@ -63,8 +63,8 @@ void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hu
      */
     quiet = (!(Wizard(loc) || (!Dark(thing) && !Dark(loc)) || (canhear && !DarkMover(thing)))) || (hush & HUSH_LEAVE);
     oattr = quiet ? A_NULL : A_OLEAVE;
-    aattr = (!quiet || (mudconf.dark_actions && !(hush & HUSH_LEAVE))) ? A_ALEAVE : A_NULL;
-    pattr = (!mudconf.terse_movemsg && Terse(thing)) ? A_NULL : A_LEAVE;
+    aattr = (!quiet || (mushconf.dark_actions && !(hush & HUSH_LEAVE))) ? A_ALEAVE : A_NULL;
+    pattr = (!mushconf.terse_movemsg && Terse(thing)) ? A_NULL : A_LEAVE;
     did_it(thing, loc, pattr, NULL, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
 
     /*
@@ -106,7 +106,7 @@ void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hus
         return;
     }
 
-    if (mudconf.have_pueblo == 1)
+    if (mushconf.have_pueblo == 1)
     {
         show_vrml_url(thing, loc);
     }
@@ -125,8 +125,8 @@ void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hus
      */
     quiet = (!(Wizard(loc) || (!Dark(thing) && !Dark(loc)) || (canhear && !DarkMover(thing)))) || (hush & HUSH_ENTER);
     oattr = quiet ? A_NULL : A_OENTER;
-    aattr = (!quiet || (mudconf.dark_actions && !(hush & HUSH_ENTER))) ? A_AENTER : A_NULL;
-    pattr = (!mudconf.terse_movemsg && Terse(thing)) ? A_NULL : A_ENTER;
+    aattr = (!quiet || (mushconf.dark_actions && !(hush & HUSH_ENTER))) ? A_AENTER : A_NULL;
+    pattr = (!mushconf.terse_movemsg && Terse(thing)) ? A_NULL : A_ENTER;
     did_it(thing, loc, pattr, NULL, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
 
     /*
@@ -195,10 +195,10 @@ void move_object(dbref thing, dbref dest)
      */
     look_in(thing, dest, (LK_SHOWEXIT | LK_OBEYTERSE));
 
-    if (isPlayer(thing) && (mudconf.payfind > 0) && (Pennies(thing) < mudconf.paylimit) && (!Controls(thing, dest)) && (random_range(0, (mudconf.payfind)-1) == 0))
+    if (isPlayer(thing) && (mushconf.payfind > 0) && (Pennies(thing) < mushconf.paylimit) && (!Controls(thing, dest)) && (random_range(0, (mushconf.payfind)-1) == 0))
     {
         giveto(thing, 1);
-        notify_check(thing, thing, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You found a %s!", mudconf.one_coin);
+        notify_check(thing, thing, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You found a %s!", mushconf.one_coin);
     }
 }
 
@@ -344,8 +344,8 @@ void move_via_exit(dbref thing, dbref dest, dbref cause, dbref exit, int hush)
     darkwiz = DarkMover(thing);
     quiet = darkwiz || (hush & HUSH_EXIT);
     oattr = quiet ? A_NULL : A_OSUCC;
-    aattr = (!quiet || (mudconf.dark_actions && !(hush & HUSH_EXIT))) ? A_ASUCC : A_NULL;
-    pattr = (!mudconf.terse_movemsg && Terse(thing)) ? A_NULL : A_SUCC;
+    aattr = (!quiet || (mushconf.dark_actions && !(hush & HUSH_EXIT))) ? A_ASUCC : A_NULL;
+    pattr = (!mushconf.terse_movemsg && Terse(thing)) ? A_NULL : A_SUCC;
     did_it(thing, exit, pattr, NULL, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
     process_leave_loc(thing, dest, cause, canhear, hush);
     move_object(thing, dest);
@@ -353,8 +353,8 @@ void move_via_exit(dbref thing, dbref dest, dbref cause, dbref exit, int hush)
      * Dark wizards don't trigger ODROP/ADROP
      */
     oattr = quiet ? A_NULL : A_ODROP;
-    aattr = (!quiet || (mudconf.dark_actions && !(hush & HUSH_EXIT))) ? A_ADROP : A_NULL;
-    pattr = (!mudconf.terse_movemsg && Terse(thing)) ? A_NULL : A_DROP;
+    aattr = (!quiet || (mushconf.dark_actions && !(hush & HUSH_EXIT))) ? A_ADROP : A_NULL;
+    pattr = (!mushconf.terse_movemsg && Terse(thing)) ? A_NULL : A_DROP;
     did_it(thing, exit, pattr, NULL, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
     did_it(thing, thing, A_MOVE, NULL, A_OMOVE, NULL, A_AMOVE, 0, (char **)NULL, 0, MSG_MOVE);
     process_enter_loc(thing, src, cause, canhear, hush);
@@ -377,7 +377,7 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush)
     {
         curr = src;
 
-        for (count = mudconf.ntfy_nest_lim; count > 0; count--)
+        for (count = mushconf.ntfy_nest_lim; count > 0; count--)
         {
             if (!could_doit(thing, curr, A_LTELOUT))
             {
@@ -524,7 +524,7 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
     else
     {
         oattr = (Dark(player) || (hush & HUSH_EXIT)) ? A_NULL : A_OFAIL;
-        aattr = ((hush & HUSH_EXIT) || (Dark(player) && !mudconf.dark_actions)) ? A_NULL : A_AFAIL;
+        aattr = ((hush & HUSH_EXIT) || (Dark(player) && !mushconf.dark_actions)) ? A_NULL : A_AFAIL;
         did_it(player, exit, A_FAIL, failmsg, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
     }
 }
@@ -542,7 +542,7 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
     { /* go home w/o stuff */
         if (((Fixed(player)) || (Fixed(Owner(player)))) && !(WizRoy(player)))
         {
-            notify(player, mudconf.fixed_home_msg);
+            notify(player, mushconf.fixed_home_msg);
             return;
         }
 
@@ -573,7 +573,7 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
      * find the exit
      */
 
-    if (mudconf.move_match_more)
+    if (mushconf.move_match_more)
     {
         init_match_check_keys(player, direction, TYPE_EXIT);
         match_exit_with_parents();

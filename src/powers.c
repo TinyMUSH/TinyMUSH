@@ -217,11 +217,11 @@ POWERENT gen_powers[] = {
 void init_powertab(void)
 {
     POWERENT *fp;
-    hashinit(&mudstate.powers_htab, 25 * mudconf.hash_factor, HT_STR | HT_KEYREF);
+    hashinit(&mushstate.powers_htab, 25 * mushconf.hash_factor, HT_STR | HT_KEYREF);
 
     for (fp = gen_powers; fp->powername; fp++)
     {
-        hashadd((char *)fp->powername, (int *)fp, &mudstate.powers_htab, 0);
+        hashadd((char *)fp->powername, (int *)fp, &mushstate.powers_htab, 0);
     }
 }
 
@@ -271,7 +271,7 @@ POWERENT *find_power(dbref thing __attribute__((unused)), char *powername)
         *cp = tolower(*cp);
     }
 
-    return (POWERENT *)hashfind(powername, &mudstate.powers_htab);
+    return (POWERENT *)hashfind(powername, &mushstate.powers_htab);
 }
 
 int decode_power(dbref player, char *powername, POWERSET *pset)
@@ -279,7 +279,7 @@ int decode_power(dbref player, char *powername, POWERSET *pset)
     POWERENT *pent;
     pset->word1 = 0;
     pset->word2 = 0;
-    pent = (POWERENT *)hashfind(powername, &mudstate.powers_htab);
+    pent = (POWERENT *)hashfind(powername, &mushstate.powers_htab);
 
     if (!pent)
     {

@@ -129,7 +129,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 		break;
 
 	case BOOLEXP_CONST:
-		if (!mudstate.standalone)
+		if (!mushstate.standalone)
 		{
 			switch (format)
 			{

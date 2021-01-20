@@ -1772,7 +1772,7 @@ char *grabto(char **str, char targ)
 
 int string_compare(const char *s1, const char *s2)
 {
-	if (mudstate.standalone || mudconf.space_compress)
+	if (mushstate.standalone || mushconf.space_compress)
 	{
 		while (isspace(*s1))
 		{

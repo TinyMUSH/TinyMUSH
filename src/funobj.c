@@ -193,9 +193,9 @@ void fun_rloc(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	dbref it;
 	levels = (int)strtol(fargs[1], (char **)NULL, 10);
 
-	if (levels > mudconf.ntfy_nest_lim)
+	if (levels > mushconf.ntfy_nest_lim)
 	{
-		levels = mudconf.ntfy_nest_lim;
+		levels = mushconf.ntfy_nest_lim;
 	}
 
 	it = match_thing(player, fargs[0]);
@@ -235,7 +235,7 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
 	if (locatable(player, it, cause))
 	{
-		for (count = mudconf.ntfy_nest_lim; count > 0; count--)
+		for (count = mushconf.ntfy_nest_lim; count > 0; count--)
 		{
 			it = Location(it);
 
@@ -428,7 +428,7 @@ void handle_name(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	if (!mudconf.read_rem_name)
+	if (!mushconf.read_rem_name)
 	{
 		if (!nearby_or_control(player, it) && !isPlayer(it) && !Long_Fingers(player))
 		{
@@ -753,7 +753,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Return info for all parent levels
      */
 	bb_p = *bufc;
-	for (lev = 0, parent = it; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+	for (lev = 0, parent = it; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		/*
 	 * Look for exits at each level
@@ -835,12 +835,12 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 
 		if (!Good_dbref(high_bound))
 		{
-			high_bound = mudstate.db_top - 1;
+			high_bound = mushstate.db_top - 1;
 		}
 	}
 	else
 	{
-		high_bound = mudstate.db_top - 1;
+		high_bound = mushstate.db_top - 1;
 	}
 
 	find_ex = find_th = find_pl = find_rm = 0;
@@ -918,9 +918,9 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 		}
 	}
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
 		SAFE_NOTHING(buff, bufc);
 		return;
 	}
@@ -1221,7 +1221,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	{
 		it = match_thing(player, fargs[0]);
 
-		if (Good_obj(it) && (mudconf.pub_flags || Examinable(player, it) || (it == cause)))
+		if (Good_obj(it) && (mushconf.pub_flags || Examinable(player, it) || (it == cause)))
 		{
 			buff2 = unparse_flags(player, it);
 			SAFE_LB_STR(buff2, buff, bufc);
@@ -1250,7 +1250,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 	type = Is_Func(LOGIC_OR);
 	negate = temp = 0;
 
-	if (!Good_obj(it) || (!(mudconf.pub_flags || Examinable(player, it) || (it == cause))))
+	if (!Good_obj(it) || (!(mushconf.pub_flags || Examinable(player, it) || (it == cause))))
 	{
 		SAFE_LB_CHR('0', buff, bufc);
 		XFREE(flagletter);
@@ -1404,7 +1404,7 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 			return;
 		}
 
-		if (mudconf.pub_flags || Examinable(player, it) || (it == cause))
+		if (mushconf.pub_flags || Examinable(player, it) || (it == cause))
 		{
 			SAFE_BOOL(buff, bufc, has_flag(player, it, fargs[1]));
 		}
@@ -1426,7 +1426,7 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	if (mudconf.pub_flags || Examinable(player, it) || (it == cause))
+	if (mushconf.pub_flags || Examinable(player, it) || (it == cause))
 	{
 		SAFE_BOOL(buff, bufc, has_power(player, it, fargs[1]));
 	}
@@ -1569,7 +1569,7 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	par = Parent(it);
 	i = 1;
 
-	while (Good_obj(par) && Examinable(player, it) && (i < mudconf.parent_nest_lim))
+	while (Good_obj(par) && Examinable(player, it) && (i < mushconf.parent_nest_lim))
 	{
 		print_separator(&osep, buff, bufc);
 		SAFE_LB_CHR('#', buff, bufc);
@@ -1618,7 +1618,7 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 
 	bb_p = *bufc;
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if (Parent(i) == it)
 		{
@@ -1642,7 +1642,7 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 {
 	dbref it;
 
-	if (!mudconf.have_zones)
+	if (!mushconf.have_zones)
 	{
 		SAFE_LB_STR("#-1 ZONES DISABLED", buff, bufc);
 		return;
@@ -1667,7 +1667,7 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	char *bb_p;
 	type = Func_Mask(TYPE_MASK);
 
-	if (!mudconf.have_zones)
+	if (!mushconf.have_zones)
 	{
 		SAFE_LB_STR("#-1 ZONES DISABLED", buff, bufc);
 		return;
@@ -1695,7 +1695,7 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 
 	bb_p = *bufc;
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if (Typeof(i) == type)
 		{
@@ -1721,7 +1721,7 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause _
 	char *tbuf1, *str;
 	dbref zone = Zone(player);
 
-	if (!mudconf.have_zones)
+	if (!mushconf.have_zones)
 	{
 		SAFE_LB_STR("#-1 ZONES DISABLED", buff, bufc);
 		return;
@@ -2044,8 +2044,8 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 	else if (is_private)
 	{
-		preserve = mudstate.rdata;
-		mudstate.rdata = NULL;
+		preserve = mushstate.rdata;
+		mushstate.rdata = NULL;
 	}
 
 	/*
@@ -2089,52 +2089,52 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 	else if (is_private)
 	{
-		if (mudstate.rdata)
+		if (mushstate.rdata)
 		{
-			for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 			{
-				if (mudstate.rdata->q_regs[z])
-					XFREE(mudstate.rdata->q_regs[z]);
+				if (mushstate.rdata->q_regs[z])
+					XFREE(mushstate.rdata->q_regs[z]);
 			}
 
-			for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
-				if (mudstate.rdata->x_names[z])
-					XFREE(mudstate.rdata->x_names[z]);
+				if (mushstate.rdata->x_names[z])
+					XFREE(mushstate.rdata->x_names[z]);
 
-				if (mudstate.rdata->x_regs[z])
-					XFREE(mudstate.rdata->x_regs[z]);
+				if (mushstate.rdata->x_regs[z])
+					XFREE(mushstate.rdata->x_regs[z]);
 			}
 
-			if (mudstate.rdata->q_regs)
+			if (mushstate.rdata->q_regs)
 			{
-				XFREE(mudstate.rdata->q_regs);
+				XFREE(mushstate.rdata->q_regs);
 			}
 
-			if (mudstate.rdata->q_lens)
+			if (mushstate.rdata->q_lens)
 			{
-				XFREE(mudstate.rdata->q_lens);
+				XFREE(mushstate.rdata->q_lens);
 			}
 
-			if (mudstate.rdata->x_names)
+			if (mushstate.rdata->x_names)
 			{
-				XFREE(mudstate.rdata->x_names);
+				XFREE(mushstate.rdata->x_names);
 			}
 
-			if (mudstate.rdata->x_regs)
+			if (mushstate.rdata->x_regs)
 			{
-				XFREE(mudstate.rdata->x_regs);
+				XFREE(mushstate.rdata->x_regs);
 			}
 
-			if (mudstate.rdata->x_lens)
+			if (mushstate.rdata->x_lens)
 			{
-				XFREE(mudstate.rdata->x_lens);
+				XFREE(mushstate.rdata->x_lens);
 			}
 
-			XFREE(mudstate.rdata);
+			XFREE(mushstate.rdata);
 		}
 
-		mudstate.rdata = preserve;
+		mushstate.rdata = preserve;
 	}
 }
 
@@ -2244,57 +2244,57 @@ void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	char *str;
 	GDATA *preserve;
-	preserve = mudstate.rdata;
-	mudstate.rdata = NULL;
+	preserve = mushstate.rdata;
+	mushstate.rdata = NULL;
 	str = fargs[0];
 	exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 
-	if (mudstate.rdata)
+	if (mushstate.rdata)
 	{
-		for (int z = 0; z < mudstate.rdata->q_alloc; z++)
+		for (int z = 0; z < mushstate.rdata->q_alloc; z++)
 		{
-			if (mudstate.rdata->q_regs[z])
-				XFREE(mudstate.rdata->q_regs[z]);
+			if (mushstate.rdata->q_regs[z])
+				XFREE(mushstate.rdata->q_regs[z]);
 		}
 
-		for (int z = 0; z < mudstate.rdata->xr_alloc; z++)
+		for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 		{
-			if (mudstate.rdata->x_names[z])
-				XFREE(mudstate.rdata->x_names[z]);
+			if (mushstate.rdata->x_names[z])
+				XFREE(mushstate.rdata->x_names[z]);
 
-			if (mudstate.rdata->x_regs[z])
-				XFREE(mudstate.rdata->x_regs[z]);
+			if (mushstate.rdata->x_regs[z])
+				XFREE(mushstate.rdata->x_regs[z]);
 		}
 
-		if (mudstate.rdata->q_regs)
+		if (mushstate.rdata->q_regs)
 		{
-			XFREE(mudstate.rdata->q_regs);
+			XFREE(mushstate.rdata->q_regs);
 		}
 
-		if (mudstate.rdata->q_lens)
+		if (mushstate.rdata->q_lens)
 		{
-			XFREE(mudstate.rdata->q_lens);
+			XFREE(mushstate.rdata->q_lens);
 		}
 
-		if (mudstate.rdata->x_names)
+		if (mushstate.rdata->x_names)
 		{
-			XFREE(mudstate.rdata->x_names);
+			XFREE(mushstate.rdata->x_names);
 		}
 
-		if (mudstate.rdata->x_regs)
+		if (mushstate.rdata->x_regs)
 		{
-			XFREE(mudstate.rdata->x_regs);
+			XFREE(mushstate.rdata->x_regs);
 		}
 
-		if (mudstate.rdata->x_lens)
+		if (mushstate.rdata->x_lens)
 		{
-			XFREE(mudstate.rdata->x_lens);
+			XFREE(mushstate.rdata->x_lens);
 		}
 
-		XFREE(mudstate.rdata);
+		XFREE(mushstate.rdata);
 	}
 
-	mudstate.rdata = preserve;
+	mushstate.rdata = preserve;
 }
 
 /*
@@ -2616,7 +2616,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		*tp = tolower(*tp);
 	}
 
-	p_ptr = (int *)hashfind(temp, &mudstate.player_htab);
+	p_ptr = (int *)hashfind(temp, &mushstate.player_htab);
 	XFREE(temp);
 
 	if (p_ptr)
@@ -2932,7 +2932,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 	else
 	{
-		if (!mudconf.lattr_oldstyle)
+		if (!mushconf.lattr_oldstyle)
 		{
 			SAFE_NOMATCH(buff, bufc);
 		}
@@ -3138,7 +3138,7 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	for (j = 0; j < mudstate.db_top; j++)
+	for (j = 0; j < mushstate.db_top; j++)
 	{
 		if (Owner(j) == thing)
 		{
@@ -3586,7 +3586,7 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 	else
 	{
-		say_str = (char *)(mudconf.comma_say ? "says," : "says");
+		say_str = (char *)(mushconf.comma_say ? "says," : "says");
 	}
 
 	/*

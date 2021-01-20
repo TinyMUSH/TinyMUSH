@@ -89,9 +89,9 @@
  * @brief Macros to help deal with batch writes of attribute numbers and objects
  * 
  */
-#define ATRNUM_BLOCK_SIZE (int)((mudstate.db_block_size - 32) / (2 * sizeof(int) + VNAME_SIZE))
+#define ATRNUM_BLOCK_SIZE (int)((mushstate.db_block_size - 32) / (2 * sizeof(int) + VNAME_SIZE))
 #define ATRNUM_BLOCK_BYTES (int)((ATRNUM_BLOCK_SIZE) * (2 * sizeof(int) + VNAME_SIZE))
-#define OBJECT_BLOCK_SIZE (int)((mudstate.db_block_size - 32) / (sizeof(int) + sizeof(DUMPOBJ)))
+#define OBJECT_BLOCK_SIZE (int)((mushstate.db_block_size - 32) / (sizeof(int) + sizeof(DUMPOBJ)))
 #define OBJECT_BLOCK_BYTES (int)((OBJECT_BLOCK_SIZE) * (sizeof(int) + sizeof(DUMPOBJ)))
 #define ENTRY_NUM_BLOCKS(total, blksize) (int)(total / blksize)
 #define ENTRY_BLOCK_STARTS(blk, blksize) (int)(blk * blksize)
@@ -183,13 +183,13 @@
     db[t].create_time = (n); \
     db[t].flags3 |= DIRTY
 #define s_Accessed(t)                 \
-    db[t].last_access = mudstate.now; \
+    db[t].last_access = mushstate.now; \
     db[t].flags3 |= DIRTY
 #define s_Modified(t)              \
-    db[t].last_mod = mudstate.now; \
+    db[t].last_mod = mushstate.now; \
     db[t].flags3 |= DIRTY
 #define s_Created(t)                  \
-    db[t].create_time = mudstate.now; \
+    db[t].create_time = mushstate.now; \
     db[t].flags3 |= DIRTY
 
 #define s_Clean(t) db[t].flags3 = db[t].flags3 & ~DIRTY
@@ -251,7 +251,7 @@
 //#define Randomize(n) (random_range(0, (n)-1))
 #define Protect(f) (cmdp->perms & f)
 #define Invalid_Objtype(x) ((Protect(CA_LOCATION) && !Has_location(x)) || (Protect(CA_CONTENTS) && !Has_contents(x)) || (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
-#define test_top() ((mudstate.qfirst != NULL) ? 1 : 0)
+#define test_top() ((mushstate.qfirst != NULL) ? 1 : 0)
 #define controls(p, x) Controls(p, x)
 
 /**
@@ -339,7 +339,7 @@
 #define isThing(x) (Typeof(x) == TYPE_THING)
 #define isGarbage(x) (Typeof(x) == TYPE_GARBAGE)
 
-#define Good_dbref(x) (((x) >= 0) && ((x) < mudstate.db_top))
+#define Good_dbref(x) (((x) >= 0) && ((x) < mushstate.db_top))
 #define Good_obj(x) (Good_dbref(x) && (Typeof(x) < GOODTYPE))
 #define Good_owner(x) (Good_obj(x) && OwnsOthers(x))
 #define Good_home(x) (Good_obj(x) && Home_ok(x))
@@ -358,7 +358,7 @@
 #define Transparent(x) ((Flags(x) & SEETHRU) != 0)
 #define Link_ok(x) (((Flags(x) & LINK_OK) != 0) && Has_contents(x))
 #define Wizard(x) ((Flags(x) & WIZARD) || ((Flags(Owner(x)) & WIZARD) && Inherits(x)))
-#define Dark(x) (((Flags(x) & DARK) != 0) && (!Alive(x) || (Wizard(x) && !mudconf.visible_wizzes) || Can_Cloak(x)))
+#define Dark(x) (((Flags(x) & DARK) != 0) && (!Alive(x) || (Wizard(x) && !mushconf.visible_wizzes) || Can_Cloak(x)))
 #define DarkMover(x) ((Wizard(x) || Can_Cloak(x)) && Dark(x))
 #define Jump_ok(x) (((Flags(x) & JUMP_OK) != 0) && Has_contents(x))
 #define Sticky(x) ((Flags(x) & STICKY) != 0)
@@ -380,7 +380,7 @@
 #define Verbose(x) ((Flags(x) & VERBOSE) != 0)
 #define Inherits(x) (((Flags(x) & INHERIT) != 0) || ((Flags(Owner(x)) & INHERIT) != 0) || ((x) == Owner(x)))
 #define Nospoof(x) ((Flags(x) & NOSPOOF) != 0)
-#define Safe(x, p) (OwnsOthers(x) || (Flags(x) & SAFE) || (mudconf.safe_unowned && (Owner(x) != Owner(p))))
+#define Safe(x, p) (OwnsOthers(x) || (Flags(x) & SAFE) || (mushconf.safe_unowned && (Owner(x) != Owner(p))))
 #define Control_ok(x) ((Flags2(x) & CONTROL_OK) != 0)
 #define Constant_Attrs(x) ((Flags2(x) & CONSTANT_ATTRS) != 0)
 #define Audible(x) ((Flags(x) & HEARTHRU) != 0)
@@ -452,11 +452,11 @@
 #define Parentable(p, x) (Controls(p, x) || (Parent_ok(x) && could_doit(p, x, A_LPARENT)))
 #define OnControlLock(p, x) (check_zone(p, x))
 #define Controls(p, x) (Good_obj(x) && (!(God(x) && !God(p))) && (Control_All(p) || ((Owner(p) == Owner(x)) && (Inherits(p) || !Inherits(x))) || OnControlLock(p, x)))
-#define Cannot_Objeval(p, x) ((x == NOTHING) || God(x) || (mudconf.fascist_objeval ? !Controls(p, x) : ((Owner(x) != Owner(p)) && !Wizard(p))))
+#define Cannot_Objeval(p, x) ((x == NOTHING) || God(x) || (mushconf.fascist_objeval ? !Controls(p, x) : ((Owner(x) != Owner(p)) && !Wizard(p))))
 #define Has_power(p, x) (check_access((p), powers_nametab[x].flag))
-#define Mark(x) (mudstate.markbits->chunk[(x) >> 3] |= mudconf.markdata[(x)&7])
-#define Unmark(x) (mudstate.markbits->chunk[(x) >> 3] &= ~mudconf.markdata[(x)&7])
-#define Marked(x) (mudstate.markbits->chunk[(x) >> 3] & mudconf.markdata[(x)&7])
+#define Mark(x) (mushstate.markbits->chunk[(x) >> 3] |= mushconf.markdata[(x)&7])
+#define Unmark(x) (mushstate.markbits->chunk[(x) >> 3] &= ~mushconf.markdata[(x)&7])
+#define Marked(x) (mushstate.markbits->chunk[(x) >> 3] & mushconf.markdata[(x)&7])
 
 /**
  * @brief Visibility constraints.
@@ -482,14 +482,14 @@
  * The player is not a puppet. You don't see yourself or exits. If a location
  * is not dark, you see it if it's not dark or you control it. If the
  * location is dark, you see it if you control it. Seeing your own dark
- * objects is controlled by mudconf.see_own_dark. In dark locations, you also
+ * objects is controlled by mushconf.see_own_dark. In dark locations, you also
  * see things that are LIGHT and !DARK.
  * 
  */
-#define Sees(p, x) (!Darkened(p, x) || (mudconf.see_own_dark && MyopicExam(p, x)))
-#define Sees_Always(p, x) (!Darkened(p, x) || (mudconf.see_own_dark && Examinable(p, x)))
-#define Sees_In_Dark(p, x) ((Light(x) && !Darkened(p, x)) || (mudconf.see_own_dark && MyopicExam(p, x)))
-#define Can_See(p, x, l) (!(((p) == (x)) || isExit(x) || (mudconf.dark_sleepers && isPlayer(x) && !Connected(x) && !Puppet(x))) && ((l) ? Sees(p, x) : Sees_In_Dark(p, x)) && ((!Unreal(x) || Check_Known(p, x)) && (!Unreal(p) || Check_Knows(x, p))))
+#define Sees(p, x) (!Darkened(p, x) || (mushconf.see_own_dark && MyopicExam(p, x)))
+#define Sees_Always(p, x) (!Darkened(p, x) || (mushconf.see_own_dark && Examinable(p, x)))
+#define Sees_In_Dark(p, x) ((Light(x) && !Darkened(p, x)) || (mushconf.see_own_dark && MyopicExam(p, x)))
+#define Can_See(p, x, l) (!(((p) == (x)) || isExit(x) || (mushconf.dark_sleepers && isPlayer(x) && !Connected(x) && !Puppet(x))) && ((l) ? Sees(p, x) : Sees_In_Dark(p, x)) && ((!Unreal(x) || Check_Known(p, x)) && (!Unreal(p) || Check_Knows(x, p))))
 #define Can_See_Exit(p, x, l) (!Darkened(p, x) && (!(l) || Light(x)) && ((!Unreal(x) || Check_Known(p, x)) && (!Unreal(p) || Check_Knows(x, p))))
 
 /**
@@ -531,14 +531,14 @@
  * linklock.
  * 
  */
-#define Passes_Linklock(p, x) ((LinkToAny(p) && !mudconf.wiz_obey_linklock) || could_doit(p, x, A_LLINK))
+#define Passes_Linklock(p, x) ((LinkToAny(p) && !mushconf.wiz_obey_linklock) || could_doit(p, x, A_LLINK))
 
 /**
  * @brief Attribute visibility and write permissions.
  * 
  */
 #define AttrFlags(a, f) ((f) | (a)->flags)
-#define Visible_desc(p, x, a) (((a)->number != A_DESC) || mudconf.read_rem_desc || nearby(p, x))
+#define Visible_desc(p, x, a) (((a)->number != A_DESC) || mushconf.read_rem_desc || nearby(p, x))
 #define Invisible_attr(p, x, a, o, f) ((!Examinable(p, x) && (Owner(p) != o)) || ((AttrFlags(a, f) & AF_MDARK) && !Sees_Hidden_Attrs(p)) || ((AttrFlags(a, f) & AF_DARK) && !God(p)))
 #define Visible_attr(p, x, a, o, f) (((AttrFlags(a, f) & AF_VISUAL) && Visible_desc(p, x, a)) || !Invisible_attr(p, x, a, o, f))
 #define See_attr(p, x, a, o, f) (!((a)->flags & (AF_INTERNAL | AF_IS_LOCK)) && !(f & AF_STRUCTURE) && Visible_attr(p, x, a, o, f))
@@ -638,7 +638,7 @@
  * 
  * @note CPU time logic notes:
  *
- * B = mudstate.cputime_base L = mudstate.cputime_base + mudconf.func_cpu_lim N = mudstate.cputime_now
+ * B = mushstate.cputime_base L = mushstate.cputime_base + mushconf.func_cpu_lim N = mushstate.cputime_now
  *
  * Assuming B != -1 and N != -1 to catch errors on BSD, the possible
  * combinations of these values are as follows (note >> means "much greater
@@ -671,7 +671,7 @@
  * cpu has been used. The code below only checks for 1d. The other two are
  * corner cases that require some distinction between "x > y" and "x >> y".
  */
-#define Too_Much_CPU() ((mudstate.cputime_now = clock()), ((mudstate.cputime_now > mudstate.cputime_base + mudconf.func_cpu_lim) && (mudstate.cputime_base + mudconf.func_cpu_lim > mudstate.cputime_base) && (mudstate.cputime_base != -1) && (mudstate.cputime_now != -1)))
+#define Too_Much_CPU() ((mushstate.cputime_now = clock()), ((mushstate.cputime_now > mushstate.cputime_base + mushconf.func_cpu_lim) && (mushstate.cputime_base + mushconf.func_cpu_lim > mushstate.cputime_base) && (mushstate.cputime_base != -1) && (mushstate.cputime_now != -1)))
 
 /**
  * @brief Database macros

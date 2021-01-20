@@ -822,7 +822,7 @@ typedef struct confdata
     char *backup_compress;     /*!< Flags used to compress */
     char *backup_extract;      /*!< Flags used to extract */
     char *backup_ext;          /*!< Filename extension for backup */
-    char *mudowner;            /*!< Email of the game owner */
+    char *mush_owner;            /*!< Email of the game owner */
     char *modules_home;        /*!< Base path for modules */
     char *game_exec;           /*!< MUSH's executable full path and name */
     char *game_home;           /*!< MUSH's working directory */
@@ -981,8 +981,8 @@ typedef struct confdata
     FLAGSET robot_flags;       /*!< Flags robots start with */
     FLAGSET stripped_flags;    /*!< Flags stripped by @clone and @chown */
     char *flag_sep;            /*!< Separator of dbref from marker flags */
-    char *mud_name;            /*!< Name of the mud */
-    char *mud_shortname;       /*!< Shorter name, for log */
+    char *mush_name;            /*!< Name of the Mush */
+    char *mush_shortname;       /*!< Shorter name, for log */
     char *one_coin;            /*!< name of one coin (ie. "penny") */
     char *many_coins;          /*!< name of many coins (ie. "pennies") */
     int timeslice;             /*!< How often do we bump people's cmd quotas? */
@@ -1112,7 +1112,7 @@ typedef struct statedata
     int logging;                        /*!< Are we in the middle of logging? */
     int epoch;                          /*!< Generation number for dumps */
     int generation;                     /*!< DB global generation number */
-    int mudlognum;                      /*!< Number of logfile */
+    int mush_lognum;                      /*!< Number of logfile */
     int helpfiles;                      /*!< Number of external indexed helpfiles */
     int hfiletab_size;                  /*!< Size of the table storing path pointers */
     char **hfiletab;                    /*!< Array of path pointers */

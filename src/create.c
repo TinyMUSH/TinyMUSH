@@ -140,9 +140,9 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
     	 * Link it if the player can pay for it
          * 
     	 */
-        if (!payfor(player, mudconf.linkcost))
+        if (!payfor(player, mushconf.linkcost))
         {
-            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s to link.", mudconf.many_coins);
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s to link.", mushconf.many_coins);
         }
         else
         {
@@ -249,13 +249,13 @@ void link_exit(dbref player, dbref exit, dbref dest)
      * handle costs
      * 
      */
-    cost = mudconf.linkcost;
+    cost = mushconf.linkcost;
     quot = 0;
 
     if (Owner(exit) != Owner(player))
     {
-        cost += mudconf.opencost;
-        quot += mudconf.exit_quota;
+        cost += mushconf.opencost;
+        quot += mushconf.exit_quota;
     }
 
     if (!canpayfees(player, player, cost, quot, TYPE_EXIT))
@@ -273,7 +273,7 @@ void link_exit(dbref player, dbref exit, dbref dest)
      */
     if (Owner(exit) != Owner(player))
     {
-        payfees(Owner(exit), -mudconf.opencost, -quot, TYPE_EXIT);
+        payfees(Owner(exit), -mushconf.opencost, -quot, TYPE_EXIT);
         s_Owner(exit, Owner(player));
         s_Flags(exit, (Flags(exit) & ~(INHERIT | WIZARD)) | HALT);
     }
@@ -528,7 +528,7 @@ void do_parent(dbref player, dbref cause __attribute__((unused)), int key __attr
     	 * Verify no recursive reference
          * 
     	 */
-        for (lev = 0, curr = parent; (Good_obj(curr) && (lev < mudconf.parent_nest_lim)); curr = Parent(curr), lev++)
+        for (lev = 0, curr = parent; (Good_obj(curr) && (lev < mushconf.parent_nest_lim)); curr = Parent(curr), lev++)
         {
             if (curr == thing)
             {
@@ -756,25 +756,25 @@ void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *
     case TYPE_THING:
         if (key & CLONE_SET_COST)
         {
-            if (cost < mudconf.createmin)
+            if (cost < mushconf.createmin)
             {
-                cost = mudconf.createmin;
+                cost = mushconf.createmin;
             }
 
-            if (cost > mudconf.createmax)
+            if (cost > mushconf.createmax)
             {
-                cost = mudconf.createmax;
+                cost = mushconf.createmax;
             }
         }
         else
         {
-            cost = OBJECT_DEPOSIT((mudconf.clone_copy_cost) ? Pennies(thing) : 1);
+            cost = OBJECT_DEPOSIT((mushconf.clone_copy_cost) ? Pennies(thing) : 1);
         }
 
         break;
 
     case TYPE_ROOM:
-        cost = mudconf.digcost;
+        cost = mushconf.digcost;
         break;
 
     case TYPE_EXIT:
@@ -784,7 +784,7 @@ void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *
             return;
         }
 
-        cost = mudconf.opencost;
+        cost = mushconf.opencost;
         break;
     }
 
@@ -868,7 +868,7 @@ void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *
     }
     else
     {
-        rmv_flags = mudconf.stripped_flags.word1;
+        rmv_flags = mushconf.stripped_flags.word1;
 
         if ((key & CLONE_INHERIT) && Inherits(player))
         {
@@ -876,8 +876,8 @@ void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *
         }
 
         s_Flags(clone, Flags(thing) & ~rmv_flags);
-        s_Flags2(clone, Flags2(thing) & ~mudconf.stripped_flags.word2);
-        s_Flags3(clone, Flags3(thing) & ~mudconf.stripped_flags.word3);
+        s_Flags2(clone, Flags2(thing) & ~mushconf.stripped_flags.word2);
+        s_Flags3(clone, Flags3(thing) & ~mushconf.stripped_flags.word3);
     }
 
     /**
@@ -1004,7 +1004,7 @@ void do_pcreate(dbref player, dbref cause __attribute__((unused)), int key, char
     }
     else
     {
-        move_object(newplayer, (Good_loc(mudconf.start_room) ? mudconf.start_room : 0));
+        move_object(newplayer, (Good_loc(mushconf.start_room) ? mushconf.start_room : 0));
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "New player '%s' (#%d) created with password '%s'", newname, newplayer, pass);
         log_write(LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "%s created by %s", nname, cname);
     }
@@ -1058,7 +1058,7 @@ bool destroyable(dbref victim)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -1236,7 +1236,7 @@ void do_destroy(dbref player, dbref cause __attribute__((unused)), int key, char
      * owners) go away, we do instant destruction.
      * 
      */
-    if ((key & DEST_INSTANT) || (mudconf.instant_recycle && (Destroy_ok(thing) || Destroy_ok(Owner(thing)))))
+    if ((key & DEST_INSTANT) || (mushconf.instant_recycle && (Destroy_ok(thing) || Destroy_ok(Owner(thing)))))
     {
         switch (Typeof(thing))
         {

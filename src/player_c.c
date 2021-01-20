@@ -26,7 +26,7 @@ PCACHE *pcache_head;
 
 void pcache_init(void)
 {
-    nhashinit(&pcache_htab, 15 * mudconf.hash_factor);
+    nhashinit(&pcache_htab, 15 * mushconf.hash_factor);
     pcache_head = NULL;
 }
 
@@ -52,7 +52,7 @@ void pcache_reload1(dbref player, PCACHE *pp)
     }
     else if (!Wizard(player))
     {
-        pp->qmax = mudconf.queuemax;
+        pp->qmax = mushconf.queuemax;
     }
     else
     {
@@ -214,11 +214,11 @@ int QueueMax(dbref player)
         }
         else
         {
-            m = mudstate.db_top + 1;
+            m = mushstate.db_top + 1;
 
-            if (m < mudconf.queuemax)
+            if (m < mushconf.queuemax)
             {
-                m = mudconf.queuemax;
+                m = mushconf.queuemax;
             }
         }
     }
@@ -231,7 +231,7 @@ int Pennies(dbref obj)
     PCACHE *pp;
     char *cp;
 
-    if (!mudstate.standalone && Good_owner(obj))
+    if (!mushstate.standalone && Good_owner(obj))
     {
         pp = pcache_find(obj);
         return pp->money;
@@ -246,7 +246,7 @@ void s_Pennies(dbref obj, int howfew)
     PCACHE *pp;
     char *tbuf;
 
-    if (!mudstate.standalone && Good_owner(obj))
+    if (!mushstate.standalone && Good_owner(obj))
     {
         pp = pcache_find(obj);
         pp->money = howfew;

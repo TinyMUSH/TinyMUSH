@@ -246,7 +246,7 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
 
     if (strncmp(player_last, time_str, 10) != 0)
     {
-        if (Pennies(player) < mudconf.paylimit)
+        if (Pennies(player) < mushconf.paylimit)
         {
             /*
 	     * Don't heap coins on players who already have lots of money.
@@ -255,7 +255,7 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
 
             if (*allowance == '\0')
             {
-                giveto(player, mudconf.paycheck);
+                giveto(player, mushconf.paycheck);
             }
             else
             {
@@ -311,7 +311,7 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
      * initialize everything
      */
 
-        for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+        for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
         {
             if (cam__mp->create_player)
             {
@@ -320,7 +320,7 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
         }
 
     s_Pass(player, crypt(pbuf, "XX"));
-    s_Home(player, (Good_home(mudconf.start_home) ? mudconf.start_home : (Good_home(mudconf.start_room) ? mudconf.start_room : 0)));
+    s_Home(player, (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
     XFREE(pbuf);
     return player;
 }
@@ -438,7 +438,7 @@ int add_player_name(dbref player, char *name)
         *tp = tolower(*tp);
     }
 
-    p = (int *)hashfind(temp, &mudstate.player_htab);
+    p = (int *)hashfind(temp, &mushstate.player_htab);
 
     if (p)
     {
@@ -467,14 +467,14 @@ int add_player_name(dbref player, char *name)
         XFREE(p);
         p = (dbref *)XMALLOC(sizeof(dbref), "p");
         *p = player;
-        stat = hashrepl(temp, p, &mudstate.player_htab);
+        stat = hashrepl(temp, p, &mushstate.player_htab);
         XFREE(temp);
     }
     else
     {
         p = (dbref *)XMALLOC(sizeof(dbref), "p");
         *p = player;
-        stat = hashadd(temp, p, &mudstate.player_htab, 0);
+        stat = hashadd(temp, p, &mushstate.player_htab, 0);
         XFREE(temp);
         stat = (stat < 0) ? 0 : 1;
     }
@@ -494,7 +494,7 @@ int delete_player_name(dbref player, char *name)
         *tp = tolower(*tp);
     }
 
-    p = (int *)hashfind(temp, &mudstate.player_htab);
+    p = (int *)hashfind(temp, &mushstate.player_htab);
 
     if (!p || (*p == NOTHING) || ((player != NOTHING) && (*p != player)))
     {
@@ -503,7 +503,7 @@ int delete_player_name(dbref player, char *name)
     }
 
     XFREE(p);
-    hashdelete(temp, &mudstate.player_htab);
+    hashdelete(temp, &mushstate.player_htab);
     XFREE(temp);
     return 1;
 }
@@ -558,7 +558,7 @@ dbref lookup_player(dbref doer, char *name, int check_who)
         *tp = tolower(*tp);
     }
 
-    p = (int *)hashfind(temp, &mudstate.player_htab);
+    p = (int *)hashfind(temp, &mushstate.player_htab);
     XFREE(temp);
 
     if (!p)
@@ -595,7 +595,7 @@ void load_player_names(void)
     int aflags, alen;
     char *alias, *p, *tokp;
 
-    for (dbref i = 0; i < mudstate.db_top; i++)
+    for (dbref i = 0; i < mushstate.db_top; i++)
     {
         if (Typeof(i) == TYPE_PLAYER)
         {
@@ -605,7 +605,7 @@ void load_player_names(void)
 
     alias = XMALLOC(LBUF_SIZE, "alias");
 
-    for (dbref i = 0; i < mudstate.db_top; i++)
+    for (dbref i = 0; i < mushstate.db_top; i++)
     {
         if (Typeof(i) == TYPE_PLAYER)
         {
@@ -635,8 +635,8 @@ void badname_add(char *bad_name)
      */
     bp = (BADNAME *)XMALLOC(sizeof(BADNAME), "bp");
     bp->name = XSTRDUP(bad_name, "bp->name");
-    bp->next = mudstate.badname_head;
-    mudstate.badname_head = bp;
+    bp->next = mushstate.badname_head;
+    mushstate.badname_head = bp;
 }
 
 void badname_remove(char *bad_name)
@@ -647,7 +647,7 @@ void badname_remove(char *bad_name)
      */
     backp = NULL;
 
-    for (bp = mudstate.badname_head; bp; backp = bp, bp = bp->next)
+    for (bp = mushstate.badname_head; bp; backp = bp, bp = bp->next)
     {
         if (!string_compare(bad_name, bp->name))
         {
@@ -657,7 +657,7 @@ void badname_remove(char *bad_name)
             }
             else
             {
-                mudstate.badname_head = bp->next;
+                mushstate.badname_head = bp->next;
             }
 
             XFREE(bp->name);
@@ -676,7 +676,7 @@ int badname_check(char *bad_name)
      * * then return false.  If no matches in the list, return true.
      */
 
-    for (bp = mudstate.badname_head; bp; bp = bp->next)
+    for (bp = mushstate.badname_head; bp; bp = bp->next)
     {
         if (quick_wild(bp->name, bad_name))
         {
@@ -697,7 +697,7 @@ void badname_list(dbref player, const char *prefix)
     buff = bufp = XMALLOC(LBUF_SIZE, "bufp");
     SAFE_LB_STR((char *)prefix, buff, &bufp);
 
-    for (bp = mudstate.badname_head; bp; bp = bp->next)
+    for (bp = mushstate.badname_head; bp; bp = bp->next)
     {
         SAFE_LB_CHR(' ', buff, &bufp);
         SAFE_LB_STR(bp->name, buff, &bufp);

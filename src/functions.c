@@ -31,15 +31,15 @@ const Delim SPACE_DELIM = {1, " "};
 void init_functab(void)
 {
     FUN *fp;
-    hashinit(&mudstate.func_htab, 250 * mudconf.hash_factor, HT_STR | HT_KEYREF);
+    hashinit(&mushstate.func_htab, 250 * mushconf.hash_factor, HT_STR | HT_KEYREF);
 
     for (fp = flist; fp->name; fp++)
     {
-        hashadd((char *)fp->name, (int *)fp, &mudstate.func_htab, 0);
+        hashadd((char *)fp->name, (int *)fp, &mushstate.func_htab, 0);
     }
 
     ufun_head = NULL;
-    hashinit(&mudstate.ufunc_htab, 15 * mudconf.hash_factor, HT_STR);
+    hashinit(&mushstate.ufunc_htab, 15 * mushconf.hash_factor, HT_STR);
 
     xfunctions.func = NULL;
     xfunctions.count = 0;
@@ -69,7 +69,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
                 *bp = tolower(*bp);
             }
 
-            ufp = (UFUN *)hashfind(fname, &mudstate.ufunc_htab);
+            ufp = (UFUN *)hashfind(fname, &mushstate.ufunc_htab);
 
             if (ufp)
             {
@@ -87,7 +87,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 	 * No name given, list them all.
 	 */
 
-        for (ufp = (UFUN *)hash_firstentry(&mudstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mudstate.ufunc_htab))
+        for (ufp = (UFUN *)hash_firstentry(&mushstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mushstate.ufunc_htab))
         {
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ((ATTR *)atr_num(ufp->atr))->name);
         }
@@ -111,7 +111,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
      * Verify that the function doesn't exist in the builtin table
      */
 
-    if (hashfind(np, &mudstate.func_htab) != NULL)
+    if (hashfind(np, &mushstate.func_htab) != NULL)
     {
         notify_quiet(player, "Function already defined in builtin function table.");
         XFREE(np);
@@ -175,7 +175,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
     /*
      * See if function already exists.  If so, redefine it
      */
-    ufp = (UFUN *)hashfind(np, &mudstate.ufunc_htab);
+    ufp = (UFUN *)hashfind(np, &mushstate.ufunc_htab);
 
     if (!ufp)
     {
@@ -204,7 +204,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
             ufp2->next = ufp;
         }
 
-        if (hashadd(np, (int *)ufp, &mudstate.ufunc_htab, 0))
+        if (hashadd(np, (int *)ufp, &mushstate.ufunc_htab, 0))
         {
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Function %s not defined.", fname);
             XFREE(ufp->name);
@@ -271,7 +271,7 @@ void list_functable(dbref player)
 
     notify(player, buf);
 
-    for (MODULE *mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (MODULE *mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         FUN *modfns;
         char *s = XASPRINTF("s", "mod_%s_%s", mp->modname, "functable");
@@ -364,7 +364,7 @@ void list_funcaccess(dbref player)
     helper_list_funcaccess(player, flist, buff);
     s = XMALLOC(MBUF_SIZE, "list_funcaccess");
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
 
@@ -697,7 +697,8 @@ FUN flist[] = {
     {"MODIFY", fun_modify, 0, FN_VARARGS | FN_VARFX, CA_PUBLIC, NULL},
     {"MONEY", fun_money, 1, 0, CA_PUBLIC, NULL},
     {"MOVES", handle_okpres, 2, PRESFN_MOVES, CA_PUBLIC, NULL},
-    {"MUDNAME", fun_mudname, 0, 0, CA_PUBLIC, NULL},
+    {"MUDNAME", fun_mushname, 0, 0, CA_PUBLIC, NULL},
+    {"MUSHNAME", fun_mushname, 0, 0, CA_PUBLIC, NULL},
     {"MUL", fun_mul, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MUNGE", fun_munge, 0, FN_VARARGS, CA_PUBLIC, NULL},
     /** 

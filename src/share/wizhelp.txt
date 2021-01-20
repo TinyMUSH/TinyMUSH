@@ -1430,7 +1430,7 @@ See also: exit_attr_defaults, player_attr_defaults, room_attr_defaults,
 	guest_prefixes		guest_suffixes		guests_calias
 	guests_channel		info_text		log
 	log_options		money_name_plural	money_name_singular
-	mud_name		mud_shortname		port
+	mush_name		mush_shortname		port
 	public_calias		public_channel		queue_active_chunk
 	queue_idle_chunk	queue_max_size		site_chars
 	sql_database		sql_host		sql_password
@@ -2612,8 +2612,8 @@ use_global_aconn	visible_wizards		wizard_obeys_linklock
   @listmotd command.
   See also: @listmotd, @motd, motd_file.
 
-& mud_name
-  Config parameter: mud_name <string>.  Default: TinyMUSH
+& mush_name
+  Config parameter: mush_name <string>.  Default: TinyMUSH
  
   Specifies the MUSH's name, which is used to identify it in all cases,
   including to remote RWHO servers when reporting information.
@@ -2621,13 +2621,13 @@ use_global_aconn	visible_wizards		wizard_obeys_linklock
   See also: rwho_dump_interval, rwho_host, rwho_info_port, rwho_password,
             rwho_transmit.
  
-& mud_shortname
-  Config parameter: mud_shortname <string>.  Default: blank
+& mush_shortname
+  Config parameter: mush_shortname <string>.  Default: blank
  
   Specifies the MUSH's name as it is used in its log files. (If this is
-  not specified, the mud_name parameter will be used in the log.)
+  not specified, the mush_name parameter will be used in the log.)
  
-  See also: mud_name.
+  See also: mush_name.
  
 & newuser_file
   Config parameter: newuser_file <filename>.  Default: text/newuser.txt
@@ -3102,31 +3102,31 @@ use_global_aconn	visible_wizards		wizard_obeys_linklock
   Sets the number of seconds between RWHO dumps, during which the MUSH sends
   an 'I am alive' message and a list of all connected users to the remote RWHO
   server.
-  See also: mud_name, rwho_host, rwho_info_port, rwho_password, rwho_transmit.
+  See also: mush_name, rwho_host, rwho_info_port, rwho_password, rwho_transmit.
 
 & rwho_host
   Config parameter: rwho_host <hostname/ip_address>.  Default: 36.21.0.69
   Sets the host name or IP address of the remote RWHO server.
-  See also: mud_name, rwho_data_port, rwho_info_port, rwho_password,
+  See also: mush_name, rwho_data_port, rwho_info_port, rwho_password,
             rwho_transmit.
 
 & rwho_info_port
   Config parameter: rwho_info_port <number>.  Default: 6888
   Sets the port number to be used when sending data to the remote RWHO
   server.
-  See also: mud_name, rwho_host, rwho_password, rwho_transmit.
+  See also: mush_name, rwho_host, rwho_password, rwho_transmit.
 
 & rwho_password
   Config parameter: rwho_password <string>.  Default: something wrong.
   Sets the password that is used when sending data to a remote RWHO server.
   You must receive the value for this parameter from the administrator
   of the RWHO server that you are using.
-  See also: mud_name, rwho_host, rwho_info_port, rwho_transmit.
+  See also: mush_name, rwho_host, rwho_info_port, rwho_transmit.
 
 & rwho_transmit
   Config parameter: rwho_transmit <yes/no>.  Default: No
   Indicates whether or not to transmit data to a remote RWHO server.
-  See also: @list, mud_name, rwho_host, rwho_info_port, rwho_password.
+  See also: @list, mush_name, rwho_host, rwho_info_port, rwho_password.
 
 & sacrifice_adjust
   Config parameter: sacrifice_adjust <amount>.  Default -1.

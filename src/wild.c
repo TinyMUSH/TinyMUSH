@@ -166,12 +166,12 @@ int real_quick_wild(char *tstr, char *dstr)
 {
 	int st;
 
-	if (mudstate.wild_times_lev > mudconf.wild_times_lim)
+	if (mushstate.wild_times_lev > mushconf.wild_times_lim)
 	{
 		return -1;
 	}
 
-	mudstate.wild_times_lev++;
+	mushstate.wild_times_lev++;
 
 	while (*tstr != '*')
 	{
@@ -299,10 +299,10 @@ int quick_wild(char *tstr, char *dstr)
 		return 0;
 	}
 
-	mudstate.wild_times_lev = 0;
+	mushstate.wild_times_lev = 0;
 	st = real_quick_wild(tstr, dstr);
 
-	if ((st < 0) && (mudstate.wild_times_lev > mudconf.wild_times_lim))
+	if ((st < 0) && (mushstate.wild_times_lev > mushconf.wild_times_lim))
 	{
 		return 0;
 	}
@@ -325,12 +325,12 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	char *datapos;
 	int argpos, numextra, st;
 
-	if (mudstate.wild_times_lev > mudconf.wild_times_lim)
+	if (mushstate.wild_times_lev > mushconf.wild_times_lim)
 	{
 		return -1;
 	}
 
-	mudstate.wild_times_lev++;
+	mushstate.wild_times_lev++;
 
 	while (*tstr != '*')
 	{
@@ -584,10 +584,10 @@ int wild1(char *tstr, char *dstr, int arg)
 		return 0;
 	}
 
-	mudstate.wild_times_lev = 0;
+	mushstate.wild_times_lev = 0;
 	st = real_wild1(tstr, dstr, arg);
 
-	if ((st < 0) && (mudstate.wild_times_lev > mudconf.wild_times_lim))
+	if ((st < 0) && (mushstate.wild_times_lev > mushconf.wild_times_lim))
 	{
 		return 0;
 	}

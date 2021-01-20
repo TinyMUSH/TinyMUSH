@@ -20,354 +20,354 @@
 #include "externs.h"
 #include "prototypes.h"
 
-CONFDATA mudconf;
-STATEDATA mudstate;
+CONFDATA mushconf;
+STATEDATA mushstate;
 
 /**
- * @brief Initialize mudconf to default values.
+ * @brief Initialize mushconf to default values.
  * 
  */
 void cf_init(void)
 {
-    mudstate.modules_list = NULL;
-    mudstate.modloaded = XMALLOC(MBUF_SIZE, "mudstate.modloaded");
-    mudconf.port = 6250;
-    mudconf.conc_port = 6251;
-    mudconf.init_size = 1000;
-    mudconf.output_block_size = 16384;
-    mudconf.use_global_aconn = 1;
-    mudconf.global_aconn_uselocks = 0;
-    mudconf.guest_char = NOTHING;
-    mudconf.guest_nuker = GOD;
-    mudconf.number_guests = 30;
-    mudconf.guest_basename = XSTRDUP("Guest", "mudconf.guest_basename");
-    mudconf.guest_password = XSTRDUP("guest", "mudconf.guest_password");
-    mudconf.guest_prefixes = XSTRDUP("", "mudconf.guest_prefixes");
-    mudconf.guest_suffixes = XSTRDUP("", "mudconf.guest_suffixes");
-    mudconf.backup_exec = XSTRDUP(DEFAULT_BACKUP_UTIL, "mudconf.backup_exec");
-    mudconf.backup_compress = XSTRDUP(DEFAULT_BACKUP_COMPRESS, "mudconf.backup_compress");
-    mudconf.backup_extract = XSTRDUP(DEFAULT_BACKUP_EXTRACT, "mudconf.backup_extract");
-    mudconf.backup_ext = XSTRDUP(DEFAULT_BACKUP_EXT, "mudconf.backup_ext");
-    mudconf.mudowner = XSTRDUP("", "mudconf.mudowner");
-    mudconf.binhome = XSTRDUP(DEFAULT_BINARY_HOME, "mudconf.binhome");
-    mudconf.dbhome = XSTRDUP(DEFAULT_DATABASE_HOME, "mudconf.dbhome");
-    mudconf.txthome = XSTRDUP(DEFAULT_TEXT_HOME, "mudconf.txthome");
-    mudconf.bakhome = XSTRDUP(DEFAULT_BACKUP_HOME, "mudconf.bakhome");
-    mudconf.modules_home = XSTRDUP(DEFAULT_MODULES_HOME, "mudconf.modules_home");
-    mudconf.scripts_home = XSTRDUP(DEFAULT_SCRIPTS_HOME, "mudconf.scripts_home");
-    mudconf.log_home = XSTRDUP(DEFAULT_LOG_HOME, "mudconf.log_home");
-    mudconf.pid_home = XSTRDUP(DEFAULT_PID_HOME, "mudconf.pid_home");
+    mushstate.modules_list = NULL;
+    mushstate.modloaded = XMALLOC(MBUF_SIZE, "mushstate.modloaded");
+    mushconf.port = 6250;
+    mushconf.conc_port = 6251;
+    mushconf.init_size = 1000;
+    mushconf.output_block_size = 16384;
+    mushconf.use_global_aconn = 1;
+    mushconf.global_aconn_uselocks = 0;
+    mushconf.guest_char = NOTHING;
+    mushconf.guest_nuker = GOD;
+    mushconf.number_guests = 30;
+    mushconf.guest_basename = XSTRDUP("Guest", "mushconf.guest_basename");
+    mushconf.guest_password = XSTRDUP("guest", "mushconf.guest_password");
+    mushconf.guest_prefixes = XSTRDUP("", "mushconf.guest_prefixes");
+    mushconf.guest_suffixes = XSTRDUP("", "mushconf.guest_suffixes");
+    mushconf.backup_exec = XSTRDUP(DEFAULT_BACKUP_UTIL, "mushconf.backup_exec");
+    mushconf.backup_compress = XSTRDUP(DEFAULT_BACKUP_COMPRESS, "mushconf.backup_compress");
+    mushconf.backup_extract = XSTRDUP(DEFAULT_BACKUP_EXTRACT, "mushconf.backup_extract");
+    mushconf.backup_ext = XSTRDUP(DEFAULT_BACKUP_EXT, "mushconf.backup_ext");
+    mushconf.mush_owner = XSTRDUP("", "mushconf.mush_owner");
+    mushconf.binhome = XSTRDUP(DEFAULT_BINARY_HOME, "mushconf.binhome");
+    mushconf.dbhome = XSTRDUP(DEFAULT_DATABASE_HOME, "mushconf.dbhome");
+    mushconf.txthome = XSTRDUP(DEFAULT_TEXT_HOME, "mushconf.txthome");
+    mushconf.bakhome = XSTRDUP(DEFAULT_BACKUP_HOME, "mushconf.bakhome");
+    mushconf.modules_home = XSTRDUP(DEFAULT_MODULES_HOME, "mushconf.modules_home");
+    mushconf.scripts_home = XSTRDUP(DEFAULT_SCRIPTS_HOME, "mushconf.scripts_home");
+    mushconf.log_home = XSTRDUP(DEFAULT_LOG_HOME, "mushconf.log_home");
+    mushconf.pid_home = XSTRDUP(DEFAULT_PID_HOME, "mushconf.pid_home");
     /**
      * We can make theses NULL because we are going to define
      * default values later if they are still NULL.
      * 
      */
-    mudconf.help_users = NULL;
-    mudconf.help_wizards = NULL;
-    mudconf.help_quick = NULL;
-    mudconf.guest_file = NULL;
-    mudconf.conn_file = NULL;
-    mudconf.creg_file = NULL;
-    mudconf.regf_file = NULL;
-    mudconf.motd_file = NULL;
-    mudconf.wizmotd_file = NULL;
-    mudconf.quit_file = NULL;
-    mudconf.down_file = NULL;
-    mudconf.full_file = NULL;
-    mudconf.site_file = NULL;
-    mudconf.crea_file = NULL;
-    mudconf.htmlconn_file = NULL;
-    mudconf.motd_msg = NULL;
-    mudconf.wizmotd_msg = NULL;
-    mudconf.downmotd_msg = NULL;
-    mudconf.fullmotd_msg = NULL;
-    mudconf.dump_msg = NULL;
-    mudconf.postdump_msg = NULL;
-    mudconf.fixed_home_msg = NULL;
-    mudconf.fixed_tel_msg = NULL;
-    mudconf.huh_msg = XSTRDUP("Huh?  (Type \"help\" for help.)", "mudconf.huh_msg");
-    mudconf.pueblo_msg = XSTRDUP("</xch_mudtext><img xch_mode=html><tt>", "mudconf.pueblo_msg");
-    mudconf.pueblo_version = XSTRDUP("This world is Pueblo 1.0 enhanced", "mudconf.pueblo_version");
-    mudconf.infotext_list = NULL;
-    mudconf.indent_desc = 0;
-    mudconf.name_spaces = 1;
-    mudconf.fork_dump = 0;
-    mudconf.fork_vfork = 0;
-    mudconf.dbopt_interval = 0;
-    mudconf.have_pueblo = 1;
-    mudconf.have_zones = 1;
-    mudconf.sig_action = SA_DFLT;
-    mudconf.max_players = -1;
-    mudconf.dump_interval = 3600;
-    mudconf.check_interval = 600;
-    mudconf.events_daily_hour = 7;
-    mudconf.dump_offset = 0;
-    mudconf.check_offset = 300;
-    mudconf.idle_timeout = 3600;
-    mudconf.conn_timeout = 120;
-    mudconf.idle_interval = 60;
-    mudconf.retry_limit = 3;
-    mudconf.output_limit = 16384;
-    mudconf.paycheck = 0;
-    mudconf.paystart = 0;
-    mudconf.paylimit = 10000;
-    mudconf.start_quota = 20;
-    mudconf.start_room_quota = 20;
-    mudconf.start_exit_quota = 20;
-    mudconf.start_thing_quota = 20;
-    mudconf.start_player_quota = 20;
-    mudconf.site_chars = 25;
-    mudconf.payfind = 0;
-    mudconf.digcost = 10;
-    mudconf.linkcost = 1;
-    mudconf.opencost = 1;
-    mudconf.createmin = 10;
-    mudconf.createmax = 505;
-    mudconf.killmin = 10;
-    mudconf.killmax = 100;
-    mudconf.killguarantee = 100;
-    mudconf.robotcost = 1000;
-    mudconf.pagecost = 10;
-    mudconf.searchcost = 100;
-    mudconf.waitcost = 10;
-    mudconf.machinecost = 64;
-    mudconf.building_limit = 50000;
-    mudconf.exit_quota = 1;
-    mudconf.player_quota = 1;
-    mudconf.room_quota = 1;
-    mudconf.thing_quota = 1;
-    mudconf.queuemax = 100;
-    mudconf.queue_chunk = 10;
-    mudconf.active_q_chunk = 10;
-    mudconf.sacfactor = 5;
-    mudconf.sacadjust = -1;
-    mudconf.use_hostname = 1;
-    mudconf.quotas = 0;
-    mudconf.typed_quotas = 0;
-    mudconf.ex_flags = 1;
-    mudconf.robot_speak = 1;
-    mudconf.clone_copy_cost = 0;
-    mudconf.pub_flags = 1;
-    mudconf.quiet_look = 1;
-    mudconf.exam_public = 1;
-    mudconf.read_rem_desc = 0;
-    mudconf.read_rem_name = 0;
-    mudconf.sweep_dark = 0;
-    mudconf.player_listen = 0;
-    mudconf.quiet_whisper = 1;
-    mudconf.dark_sleepers = 1;
-    mudconf.see_own_dark = 1;
-    mudconf.idle_wiz_dark = 0;
-    mudconf.visible_wizzes = 0;
-    mudconf.pemit_players = 0;
-    mudconf.pemit_any = 0;
-    mudconf.addcmd_match_blindly = 1;
-    mudconf.addcmd_obey_stop = 0;
-    mudconf.addcmd_obey_uselocks = 0;
-    mudconf.lattr_oldstyle = 0;
-    mudconf.bools_oldstyle = 0;
-    mudconf.match_mine = 0;
-    mudconf.match_mine_pl = 0;
-    mudconf.switch_df_all = 1;
-    mudconf.fascist_objeval = 0;
-    mudconf.fascist_tport = 0;
-    mudconf.terse_look = 1;
-    mudconf.terse_contents = 1;
-    mudconf.terse_exits = 1;
-    mudconf.terse_movemsg = 1;
-    mudconf.trace_topdown = 1;
-    mudconf.trace_limit = 200;
-    mudconf.safe_unowned = 0;
-    mudconf.wiz_obey_linklock = 0;
-    mudconf.local_masters = 1;
-    mudconf.match_zone_parents = 1;
-    mudconf.req_cmds_flag = 1;
-    mudconf.ansi_colors = 1;
-    mudconf.safer_passwords = 0;
-    mudconf.instant_recycle = 1;
-    mudconf.dark_actions = 0;
-    mudconf.no_ambiguous_match = 0;
-    mudconf.exit_calls_move = 0;
-    mudconf.move_match_more = 0;
-    mudconf.autozone = 1;
-    mudconf.page_req_equals = 0;
-    mudconf.comma_say = 0;
-    mudconf.you_say = 1;
-    mudconf.c_cmd_subst = 1;
-    mudconf.player_name_min = 0;
-    mudconf.register_limit = 50;
-    mudconf.max_qpid = 10000;
-    mudconf.space_compress = 1; /*!< ??? Running SC on a non-SC DB may cause problems */
-    mudconf.start_room = 0;
-    mudconf.guest_start_room = NOTHING; /* default, use start_room */
-    mudconf.start_home = NOTHING;
-    mudconf.default_home = NOTHING;
-    mudconf.master_room = NOTHING;
-    mudconf.player_proto = NOTHING;
-    mudconf.room_proto = NOTHING;
-    mudconf.exit_proto = NOTHING;
-    mudconf.thing_proto = NOTHING;
-    mudconf.player_defobj = NOTHING;
-    mudconf.room_defobj = NOTHING;
-    mudconf.thing_defobj = NOTHING;
-    mudconf.exit_defobj = NOTHING;
-    mudconf.player_parent = NOTHING;
-    mudconf.room_parent = NOTHING;
-    mudconf.exit_parent = NOTHING;
-    mudconf.thing_parent = NOTHING;
-    mudconf.player_flags.word1 = 0;
-    mudconf.player_flags.word2 = 0;
-    mudconf.player_flags.word3 = 0;
-    mudconf.room_flags.word1 = 0;
-    mudconf.room_flags.word2 = 0;
-    mudconf.room_flags.word3 = 0;
-    mudconf.exit_flags.word1 = 0;
-    mudconf.exit_flags.word2 = 0;
-    mudconf.exit_flags.word3 = 0;
-    mudconf.thing_flags.word1 = 0;
-    mudconf.thing_flags.word2 = 0;
-    mudconf.thing_flags.word3 = 0;
-    mudconf.robot_flags.word1 = ROBOT;
-    mudconf.robot_flags.word2 = 0;
-    mudconf.robot_flags.word3 = 0;
-    mudconf.stripped_flags.word1 = IMMORTAL | INHERIT | ROYALTY | WIZARD;
-    mudconf.stripped_flags.word2 = BLIND | CONNECTED | GAGGED | HEAD_FLAG | SLAVE | STAFF | STOP_MATCH | SUSPECT | UNINSPECTED;
-    mudconf.stripped_flags.word3 = 0;
-    mudconf.vattr_flags = 0;
-    mudconf.vattr_flag_list = NULL;
-    mudconf.flag_sep = XSTRDUP("_", "mudconf.flag_sep");
-    mudconf.mud_name = XSTRDUP("TinyMUSH", "mudconf.mud_name");
-    mudconf.one_coin = XSTRDUP("penny", "mudconf.one_coin");
-    mudconf.many_coins = XSTRDUP("pennies", "mudconf.many_coins");
-    mudconf.struct_dstr = XSTRDUP("\r\n", "mudconf.struct_dstr");
-    mudconf.timeslice = 1000;
-    mudconf.cmd_quota_max = 100;
-    mudconf.cmd_quota_incr = 1;
-    mudconf.lag_check = 1;
-    mudconf.lag_check_clk = 1;
-    mudconf.lag_check_cpu = 1;
-    mudconf.malloc_logger = 0;
-    mudconf.max_global_regs = 36;
-    mudconf.max_command_args = 100;
-    mudconf.player_name_length = 22;
-    mudconf.hash_factor = 2;
-    mudconf.max_cmdsecs = 120;
-    mudconf.control_flags = 0xffffffff;      /* Everything for now... */
-    mudconf.control_flags &= ~CF_GODMONITOR; /* Except for monitoring... */
-    mudconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY | LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS | LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD | LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL | LOG_MALLOC;
-    mudconf.log_info = LOGOPT_TIMESTAMP | LOGOPT_LOC;
-    mudconf.log_diversion = 0;
-    mudconf.markdata[0] = 0x01;
-    mudconf.markdata[1] = 0x02;
-    mudconf.markdata[2] = 0x04;
-    mudconf.markdata[3] = 0x08;
-    mudconf.markdata[4] = 0x10;
-    mudconf.markdata[5] = 0x20;
-    mudconf.markdata[6] = 0x40;
-    mudconf.markdata[7] = 0x80;
-    mudconf.wild_times_lim = 25000;
-    mudconf.cmd_nest_lim = 50;
-    mudconf.cmd_invk_lim = 2500;
-    mudconf.func_nest_lim = 50;
-    mudconf.func_invk_lim = 2500;
-    mudconf.func_cpu_lim_secs = 60;
-    mudconf.func_cpu_lim = 60 * CLOCKS_PER_SEC;
-    mudconf.ntfy_nest_lim = 20;
-    mudconf.fwdlist_lim = 100;
-    mudconf.propdir_lim = 10;
-    mudconf.lock_nest_lim = 20;
-    mudconf.parent_nest_lim = 10;
-    mudconf.zone_nest_lim = 20;
-    mudconf.numvars_lim = 50;
-    mudconf.stack_lim = 50;
-    mudconf.struct_lim = 100;
-    mudconf.instance_lim = 100;
-    mudconf.max_grid_size = 1000;
-    mudconf.max_player_aliases = 10;
-    mudconf.cache_width = CACHE_WIDTH;
-    mudconf.cache_size = CACHE_SIZE;
-    mudstate.loading_db = 0;
-    mudstate.panicking = 0;
-    mudstate.standalone = 0;
-    mudstate.logstderr = 1;
-    mudstate.dumping = 0;
-    mudstate.dumper = 0;
-    mudstate.logging = 0;
-    mudstate.epoch = 0;
-    mudstate.generation = 0;
-    mudstate.reboot_nums = 0;
-    mudstate.mudlognum = 0;
-    mudstate.helpfiles = 0;
-    mudstate.hfiletab = NULL;
-    mudstate.hfiletab_size = 0;
-    mudstate.cfiletab = NULL;
-    mudstate.configfiles = 0;
-    mudstate.hfile_hashes = NULL;
-    mudstate.curr_player = NOTHING;
-    mudstate.curr_enactor = NOTHING;
-    mudstate.curr_cmd = (char *)"< none >";
-    mudstate.shutdown_flag = 0;
-    mudstate.flatfile_flag = 0;
-    mudstate.attr_next = A_USER_START;
-    mudstate.debug_cmd = (char *)"< init >";
-    mudstate.doing_hdr = XSTRDUP("Doing", "mudstate.doing_hdr");
-    mudstate.access_list = NULL;
-    mudstate.suspect_list = NULL;
-    mudstate.qfirst = NULL;
-    mudstate.qlast = NULL;
-    mudstate.qlfirst = NULL;
-    mudstate.qllast = NULL;
-    mudstate.qwait = NULL;
-    mudstate.qsemfirst = NULL;
-    mudstate.qsemlast = NULL;
-    mudstate.badname_head = NULL;
-    mudstate.mstat_ixrss[0] = 0;
-    mudstate.mstat_ixrss[1] = 0;
-    mudstate.mstat_idrss[0] = 0;
-    mudstate.mstat_idrss[1] = 0;
-    mudstate.mstat_isrss[0] = 0;
-    mudstate.mstat_isrss[1] = 0;
-    mudstate.mstat_secs[0] = 0;
-    mudstate.mstat_secs[1] = 0;
-    mudstate.mstat_curr = 0;
-    mudstate.iter_alist.data = NULL;
-    mudstate.iter_alist.len = 0;
-    mudstate.iter_alist.next = NULL;
-    mudstate.mod_alist = NULL;
-    mudstate.mod_size = 0;
-    mudstate.mod_al_id = NOTHING;
-    mudstate.olist = NULL;
-    mudstate.min_size = 0;
-    mudstate.db_top = 0;
-    mudstate.db_size = 0;
-    mudstate.moduletype_top = DBTYPE_RESERVED;
-    mudstate.freelist = NOTHING;
-    mudstate.markbits = NULL;
-    mudstate.cmd_nest_lev = 0;
-    mudstate.cmd_invk_ctr = 0;
-    mudstate.func_nest_lev = 0;
-    mudstate.func_invk_ctr = 0;
-    mudstate.wild_times_lev = 0;
-    mudstate.cputime_base = clock();
-    mudstate.ntfy_nest_lev = 0;
-    mudstate.lock_nest_lev = 0;
-    mudstate.zone_nest_num = 0;
-    mudstate.in_loop = 0;
-    mudstate.loop_token[0] = NULL;
-    mudstate.loop_token2[0] = NULL;
-    mudstate.loop_number[0] = 0;
-    mudstate.loop_break[0] = 0;
-    mudstate.in_switch = 0;
-    mudstate.switch_token = NULL;
-    mudstate.break_called = 0;
-    mudstate.f_limitmask = 0;
-    mudstate.inpipe = 0;
-    mudstate.pout = NULL;
-    mudstate.poutnew = NULL;
-    mudstate.poutbufc = NULL;
-    mudstate.poutobj = -1;
-    mudstate.dbm_fd = -1;
-    mudstate.rdata = NULL;
+    mushconf.help_users = NULL;
+    mushconf.help_wizards = NULL;
+    mushconf.help_quick = NULL;
+    mushconf.guest_file = NULL;
+    mushconf.conn_file = NULL;
+    mushconf.creg_file = NULL;
+    mushconf.regf_file = NULL;
+    mushconf.motd_file = NULL;
+    mushconf.wizmotd_file = NULL;
+    mushconf.quit_file = NULL;
+    mushconf.down_file = NULL;
+    mushconf.full_file = NULL;
+    mushconf.site_file = NULL;
+    mushconf.crea_file = NULL;
+    mushconf.htmlconn_file = NULL;
+    mushconf.motd_msg = NULL;
+    mushconf.wizmotd_msg = NULL;
+    mushconf.downmotd_msg = NULL;
+    mushconf.fullmotd_msg = NULL;
+    mushconf.dump_msg = NULL;
+    mushconf.postdump_msg = NULL;
+    mushconf.fixed_home_msg = NULL;
+    mushconf.fixed_tel_msg = NULL;
+    mushconf.huh_msg = XSTRDUP("Huh?  (Type \"help\" for help.)", "mushconf.huh_msg");
+    mushconf.pueblo_msg = XSTRDUP("</xch_mudtext><img xch_mode=html><tt>", "mushconf.pueblo_msg");
+    mushconf.pueblo_version = XSTRDUP("This world is Pueblo 1.0 enhanced", "mushconf.pueblo_version");
+    mushconf.infotext_list = NULL;
+    mushconf.indent_desc = 0;
+    mushconf.name_spaces = 1;
+    mushconf.fork_dump = 0;
+    mushconf.fork_vfork = 0;
+    mushconf.dbopt_interval = 0;
+    mushconf.have_pueblo = 1;
+    mushconf.have_zones = 1;
+    mushconf.sig_action = SA_DFLT;
+    mushconf.max_players = -1;
+    mushconf.dump_interval = 3600;
+    mushconf.check_interval = 600;
+    mushconf.events_daily_hour = 7;
+    mushconf.dump_offset = 0;
+    mushconf.check_offset = 300;
+    mushconf.idle_timeout = 3600;
+    mushconf.conn_timeout = 120;
+    mushconf.idle_interval = 60;
+    mushconf.retry_limit = 3;
+    mushconf.output_limit = 16384;
+    mushconf.paycheck = 0;
+    mushconf.paystart = 0;
+    mushconf.paylimit = 10000;
+    mushconf.start_quota = 20;
+    mushconf.start_room_quota = 20;
+    mushconf.start_exit_quota = 20;
+    mushconf.start_thing_quota = 20;
+    mushconf.start_player_quota = 20;
+    mushconf.site_chars = 25;
+    mushconf.payfind = 0;
+    mushconf.digcost = 10;
+    mushconf.linkcost = 1;
+    mushconf.opencost = 1;
+    mushconf.createmin = 10;
+    mushconf.createmax = 505;
+    mushconf.killmin = 10;
+    mushconf.killmax = 100;
+    mushconf.killguarantee = 100;
+    mushconf.robotcost = 1000;
+    mushconf.pagecost = 10;
+    mushconf.searchcost = 100;
+    mushconf.waitcost = 10;
+    mushconf.machinecost = 64;
+    mushconf.building_limit = 50000;
+    mushconf.exit_quota = 1;
+    mushconf.player_quota = 1;
+    mushconf.room_quota = 1;
+    mushconf.thing_quota = 1;
+    mushconf.queuemax = 100;
+    mushconf.queue_chunk = 10;
+    mushconf.active_q_chunk = 10;
+    mushconf.sacfactor = 5;
+    mushconf.sacadjust = -1;
+    mushconf.use_hostname = 1;
+    mushconf.quotas = 0;
+    mushconf.typed_quotas = 0;
+    mushconf.ex_flags = 1;
+    mushconf.robot_speak = 1;
+    mushconf.clone_copy_cost = 0;
+    mushconf.pub_flags = 1;
+    mushconf.quiet_look = 1;
+    mushconf.exam_public = 1;
+    mushconf.read_rem_desc = 0;
+    mushconf.read_rem_name = 0;
+    mushconf.sweep_dark = 0;
+    mushconf.player_listen = 0;
+    mushconf.quiet_whisper = 1;
+    mushconf.dark_sleepers = 1;
+    mushconf.see_own_dark = 1;
+    mushconf.idle_wiz_dark = 0;
+    mushconf.visible_wizzes = 0;
+    mushconf.pemit_players = 0;
+    mushconf.pemit_any = 0;
+    mushconf.addcmd_match_blindly = 1;
+    mushconf.addcmd_obey_stop = 0;
+    mushconf.addcmd_obey_uselocks = 0;
+    mushconf.lattr_oldstyle = 0;
+    mushconf.bools_oldstyle = 0;
+    mushconf.match_mine = 0;
+    mushconf.match_mine_pl = 0;
+    mushconf.switch_df_all = 1;
+    mushconf.fascist_objeval = 0;
+    mushconf.fascist_tport = 0;
+    mushconf.terse_look = 1;
+    mushconf.terse_contents = 1;
+    mushconf.terse_exits = 1;
+    mushconf.terse_movemsg = 1;
+    mushconf.trace_topdown = 1;
+    mushconf.trace_limit = 200;
+    mushconf.safe_unowned = 0;
+    mushconf.wiz_obey_linklock = 0;
+    mushconf.local_masters = 1;
+    mushconf.match_zone_parents = 1;
+    mushconf.req_cmds_flag = 1;
+    mushconf.ansi_colors = 1;
+    mushconf.safer_passwords = 0;
+    mushconf.instant_recycle = 1;
+    mushconf.dark_actions = 0;
+    mushconf.no_ambiguous_match = 0;
+    mushconf.exit_calls_move = 0;
+    mushconf.move_match_more = 0;
+    mushconf.autozone = 1;
+    mushconf.page_req_equals = 0;
+    mushconf.comma_say = 0;
+    mushconf.you_say = 1;
+    mushconf.c_cmd_subst = 1;
+    mushconf.player_name_min = 0;
+    mushconf.register_limit = 50;
+    mushconf.max_qpid = 10000;
+    mushconf.space_compress = 1; /*!< ??? Running SC on a non-SC DB may cause problems */
+    mushconf.start_room = 0;
+    mushconf.guest_start_room = NOTHING; /* default, use start_room */
+    mushconf.start_home = NOTHING;
+    mushconf.default_home = NOTHING;
+    mushconf.master_room = NOTHING;
+    mushconf.player_proto = NOTHING;
+    mushconf.room_proto = NOTHING;
+    mushconf.exit_proto = NOTHING;
+    mushconf.thing_proto = NOTHING;
+    mushconf.player_defobj = NOTHING;
+    mushconf.room_defobj = NOTHING;
+    mushconf.thing_defobj = NOTHING;
+    mushconf.exit_defobj = NOTHING;
+    mushconf.player_parent = NOTHING;
+    mushconf.room_parent = NOTHING;
+    mushconf.exit_parent = NOTHING;
+    mushconf.thing_parent = NOTHING;
+    mushconf.player_flags.word1 = 0;
+    mushconf.player_flags.word2 = 0;
+    mushconf.player_flags.word3 = 0;
+    mushconf.room_flags.word1 = 0;
+    mushconf.room_flags.word2 = 0;
+    mushconf.room_flags.word3 = 0;
+    mushconf.exit_flags.word1 = 0;
+    mushconf.exit_flags.word2 = 0;
+    mushconf.exit_flags.word3 = 0;
+    mushconf.thing_flags.word1 = 0;
+    mushconf.thing_flags.word2 = 0;
+    mushconf.thing_flags.word3 = 0;
+    mushconf.robot_flags.word1 = ROBOT;
+    mushconf.robot_flags.word2 = 0;
+    mushconf.robot_flags.word3 = 0;
+    mushconf.stripped_flags.word1 = IMMORTAL | INHERIT | ROYALTY | WIZARD;
+    mushconf.stripped_flags.word2 = BLIND | CONNECTED | GAGGED | HEAD_FLAG | SLAVE | STAFF | STOP_MATCH | SUSPECT | UNINSPECTED;
+    mushconf.stripped_flags.word3 = 0;
+    mushconf.vattr_flags = 0;
+    mushconf.vattr_flag_list = NULL;
+    mushconf.flag_sep = XSTRDUP("_", "mushconf.flag_sep");
+    mushconf.mush_name = XSTRDUP("TinyMUSH", "mushconf.mush_name");
+    mushconf.one_coin = XSTRDUP("penny", "mushconf.one_coin");
+    mushconf.many_coins = XSTRDUP("pennies", "mushconf.many_coins");
+    mushconf.struct_dstr = XSTRDUP("\r\n", "mushconf.struct_dstr");
+    mushconf.timeslice = 1000;
+    mushconf.cmd_quota_max = 100;
+    mushconf.cmd_quota_incr = 1;
+    mushconf.lag_check = 1;
+    mushconf.lag_check_clk = 1;
+    mushconf.lag_check_cpu = 1;
+    mushconf.malloc_logger = 0;
+    mushconf.max_global_regs = 36;
+    mushconf.max_command_args = 100;
+    mushconf.player_name_length = 22;
+    mushconf.hash_factor = 2;
+    mushconf.max_cmdsecs = 120;
+    mushconf.control_flags = 0xffffffff;      /* Everything for now... */
+    mushconf.control_flags &= ~CF_GODMONITOR; /* Except for monitoring... */
+    mushconf.log_options = LOG_ALWAYS | LOG_BUGS | LOG_SECURITY | LOG_NET | LOG_LOGIN | LOG_DBSAVES | LOG_CONFIGMODS | LOG_SHOUTS | LOG_STARTUP | LOG_WIZARD | LOG_PROBLEMS | LOG_PCREATES | LOG_TIMEUSE | LOG_LOCAL | LOG_MALLOC;
+    mushconf.log_info = LOGOPT_TIMESTAMP | LOGOPT_LOC;
+    mushconf.log_diversion = 0;
+    mushconf.markdata[0] = 0x01;
+    mushconf.markdata[1] = 0x02;
+    mushconf.markdata[2] = 0x04;
+    mushconf.markdata[3] = 0x08;
+    mushconf.markdata[4] = 0x10;
+    mushconf.markdata[5] = 0x20;
+    mushconf.markdata[6] = 0x40;
+    mushconf.markdata[7] = 0x80;
+    mushconf.wild_times_lim = 25000;
+    mushconf.cmd_nest_lim = 50;
+    mushconf.cmd_invk_lim = 2500;
+    mushconf.func_nest_lim = 50;
+    mushconf.func_invk_lim = 2500;
+    mushconf.func_cpu_lim_secs = 60;
+    mushconf.func_cpu_lim = 60 * CLOCKS_PER_SEC;
+    mushconf.ntfy_nest_lim = 20;
+    mushconf.fwdlist_lim = 100;
+    mushconf.propdir_lim = 10;
+    mushconf.lock_nest_lim = 20;
+    mushconf.parent_nest_lim = 10;
+    mushconf.zone_nest_lim = 20;
+    mushconf.numvars_lim = 50;
+    mushconf.stack_lim = 50;
+    mushconf.struct_lim = 100;
+    mushconf.instance_lim = 100;
+    mushconf.max_grid_size = 1000;
+    mushconf.max_player_aliases = 10;
+    mushconf.cache_width = CACHE_WIDTH;
+    mushconf.cache_size = CACHE_SIZE;
+    mushstate.loading_db = 0;
+    mushstate.panicking = 0;
+    mushstate.standalone = 0;
+    mushstate.logstderr = 1;
+    mushstate.dumping = 0;
+    mushstate.dumper = 0;
+    mushstate.logging = 0;
+    mushstate.epoch = 0;
+    mushstate.generation = 0;
+    mushstate.reboot_nums = 0;
+    mushstate.mush_lognum = 0;
+    mushstate.helpfiles = 0;
+    mushstate.hfiletab = NULL;
+    mushstate.hfiletab_size = 0;
+    mushstate.cfiletab = NULL;
+    mushstate.configfiles = 0;
+    mushstate.hfile_hashes = NULL;
+    mushstate.curr_player = NOTHING;
+    mushstate.curr_enactor = NOTHING;
+    mushstate.curr_cmd = (char *)"< none >";
+    mushstate.shutdown_flag = 0;
+    mushstate.flatfile_flag = 0;
+    mushstate.attr_next = A_USER_START;
+    mushstate.debug_cmd = (char *)"< init >";
+    mushstate.doing_hdr = XSTRDUP("Doing", "mushstate.doing_hdr");
+    mushstate.access_list = NULL;
+    mushstate.suspect_list = NULL;
+    mushstate.qfirst = NULL;
+    mushstate.qlast = NULL;
+    mushstate.qlfirst = NULL;
+    mushstate.qllast = NULL;
+    mushstate.qwait = NULL;
+    mushstate.qsemfirst = NULL;
+    mushstate.qsemlast = NULL;
+    mushstate.badname_head = NULL;
+    mushstate.mstat_ixrss[0] = 0;
+    mushstate.mstat_ixrss[1] = 0;
+    mushstate.mstat_idrss[0] = 0;
+    mushstate.mstat_idrss[1] = 0;
+    mushstate.mstat_isrss[0] = 0;
+    mushstate.mstat_isrss[1] = 0;
+    mushstate.mstat_secs[0] = 0;
+    mushstate.mstat_secs[1] = 0;
+    mushstate.mstat_curr = 0;
+    mushstate.iter_alist.data = NULL;
+    mushstate.iter_alist.len = 0;
+    mushstate.iter_alist.next = NULL;
+    mushstate.mod_alist = NULL;
+    mushstate.mod_size = 0;
+    mushstate.mod_al_id = NOTHING;
+    mushstate.olist = NULL;
+    mushstate.min_size = 0;
+    mushstate.db_top = 0;
+    mushstate.db_size = 0;
+    mushstate.moduletype_top = DBTYPE_RESERVED;
+    mushstate.freelist = NOTHING;
+    mushstate.markbits = NULL;
+    mushstate.cmd_nest_lev = 0;
+    mushstate.cmd_invk_ctr = 0;
+    mushstate.func_nest_lev = 0;
+    mushstate.func_invk_ctr = 0;
+    mushstate.wild_times_lev = 0;
+    mushstate.cputime_base = clock();
+    mushstate.ntfy_nest_lev = 0;
+    mushstate.lock_nest_lev = 0;
+    mushstate.zone_nest_num = 0;
+    mushstate.in_loop = 0;
+    mushstate.loop_token[0] = NULL;
+    mushstate.loop_token2[0] = NULL;
+    mushstate.loop_number[0] = 0;
+    mushstate.loop_break[0] = 0;
+    mushstate.in_switch = 0;
+    mushstate.switch_token = NULL;
+    mushstate.break_called = 0;
+    mushstate.f_limitmask = 0;
+    mushstate.inpipe = 0;
+    mushstate.pout = NULL;
+    mushstate.poutnew = NULL;
+    mushstate.poutbufc = NULL;
+    mushstate.poutobj = -1;
+    mushstate.dbm_fd = -1;
+    mushstate.rdata = NULL;
 }
 
 /**
@@ -389,7 +389,7 @@ void cf_log(dbref player, const char *primary, const char *secondary, char *cmd,
     XVSNPRINTF(buff, LBUF_SIZE, format, ap);
     va_end(ap);
 
-    if (mudstate.initializing)
+    if (mushstate.initializing)
     {
         log_write(LOG_STARTUP, primary, secondary, "%s: %s", cmd, buff);
     }
@@ -429,7 +429,7 @@ CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int fail
 
     if (failure == 0)
     {
-        if (mudstate.initializing)
+        if (mushstate.initializing)
         {
             log_write(LOG_STARTUP, "CNF", "NDATA", "%s: Nothing to set", cmd);
         }
@@ -536,7 +536,7 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
      * No consistency check on initialization.
      * 
      */
-    if (mudstate.initializing)
+    if (mushstate.initializing)
     {
         if (*str == '#')
         {
@@ -606,7 +606,7 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
     void (*initptr)(void) = NULL;
     MODULE *mp = NULL;
 
-    handle = lt_dlopen_format("%s/%s.la", mudconf.modules_home, modname);
+    handle = lt_dlopen_format("%s/%s.la", mushconf.modules_home, modname);
 
     if (!handle)
     {
@@ -617,8 +617,8 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
     mp = (MODULE *)XMALLOC(sizeof(MODULE), "mp");
     mp->modname = XSTRDUP(modname, "mp->modname");
     mp->handle = handle;
-    mp->next = mudstate.modules_list;
-    mudstate.modules_list = mp;
+    mp->next = mushstate.modules_list;
+    mushstate.modules_list = mp;
 
     /**
      * Look up our symbols now, and cache the pointers. They're not going
@@ -643,7 +643,7 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
     mp->cache_put_notify = (void (*)(UDB_DATA, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_put_notify");
     mp->cache_del_notify = (void (*)(UDB_DATA, unsigned int))lt_dlsym_format(handle, "mod_%s_%s", modname, "cache_del_notify");
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
         if ((initptr = (void (*)(void))lt_dlsym_format(handle, "mod_%s_%s", modname, "init")) != NULL)
         {
@@ -723,7 +723,7 @@ CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)
     {
         str[extra - 1] = '\0';
 
-        if (mudstate.initializing)
+        if (mushstate.initializing)
         {
             log_write(LOG_STARTUP, "CNF", "NFND", "%s: String truncated", cmd);
         }
@@ -853,7 +853,7 @@ CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __a
 
     if (!fvalue || !*fvalue)
     {
-        for (itp = mudconf.infotext_list, prev = NULL; itp != NULL; itp = itp->next)
+        for (itp = mushconf.infotext_list, prev = NULL; itp != NULL; itp = itp->next)
         {
             if (!strcasecmp(fname, itp->name))
             {
@@ -866,7 +866,7 @@ CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __a
                 }
                 else
                 {
-                    mudconf.infotext_list = itp->next;
+                    mushconf.infotext_list = itp->next;
                 }
 
                 XFREE(itp);
@@ -885,7 +885,7 @@ CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __a
      * Otherwise we're setting. Replace if we had a previous value.
      * 
      */
-    for (itp = mudconf.infotext_list; itp != NULL; itp = itp->next)
+    for (itp = mushconf.infotext_list; itp != NULL; itp = itp->next)
     {
         if (!strcasecmp(fname, itp->name))
         {
@@ -902,8 +902,8 @@ CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __a
     itp = (LINKEDLIST *)XMALLOC(sizeof(LINKEDLIST), "itp");
     itp->name = XSTRDUP(fname, "itp->name");
     itp->value = XSTRDUP(fvalue, "itp->value");
-    itp->next = mudconf.infotext_list;
-    mudconf.infotext_list = itp;
+    itp->next = mushconf.infotext_list;
+    mushconf.infotext_list = itp;
     return CF_Partial;
 }
 
@@ -1310,7 +1310,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
                     {
                         *cp++ = '\0';
 
-                        for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+                        for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
                         {
                             got_one = 1;
 
@@ -1405,7 +1405,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra __attribute__((unused)), d
          * Set the appropriate bit
          * 
          */
-        fp = (FLAGENT *)hashfind(sp, &mudstate.flags_htab);
+        fp = (FLAGENT *)hashfind(sp, &mushstate.flags_htab);
 
         if (fp != NULL)
         {
@@ -1623,7 +1623,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
      * made while running are processed first.
      * 
      */
-    if (mudstate.initializing)
+    if (mushstate.initializing)
     {
         if (head == NULL)
         {
@@ -1728,7 +1728,7 @@ CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -1800,7 +1800,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
 
     if (fp == NULL)
     {
-        fpath = XASPRINTF("fpath", "%s/%s", mudconf.txthome, fpath);
+        fpath = XASPRINTF("fpath", "%s/%s", mushconf.txthome, fpath);
         XSNPRINTF(s, MAXPATHLEN, "%s.txt", fpath);
         fp = fopen(s, "r");
 
@@ -1844,59 +1844,59 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     cmdp->userperms = NULL;
     cmdp->callseq = CS_ONE_ARG;
     cmdp->info.handler = do_help;
-    cmdp->extra = mudstate.helpfiles;
+    cmdp->extra = mushstate.helpfiles;
 
     if (is_raw)
     {
         cmdp->extra |= HELP_RAWHELP;
     }
 
-    hashdelete(cmdp->cmdname, &mudstate.command_htab);
-    hashadd(cmdp->cmdname, (int *)cmdp, &mudstate.command_htab, 0);
+    hashdelete(cmdp->cmdname, &mushstate.command_htab);
+    hashadd(cmdp->cmdname, (int *)cmdp, &mushstate.command_htab, 0);
     XSNPRINTF(s, MAXPATHLEN, "__%s", cmdp->cmdname);
-    hashdelete(s, &mudstate.command_htab);
-    hashadd(s, (int *)cmdp, &mudstate.command_htab, HASH_ALIAS);
+    hashdelete(s, &mushstate.command_htab);
+    hashadd(s, (int *)cmdp, &mushstate.command_htab, HASH_ALIAS);
 
     /**
      * We may need to grow the helpfiles table, or create it.
      * 
      */
-    if (!mudstate.hfiletab)
+    if (!mushstate.hfiletab)
     {
-        mudstate.hfiletab = (char **)XCALLOC(4, sizeof(char *), "mudstate.hfiletab");
-        mudstate.hfile_hashes = (HASHTAB *)XCALLOC(4, sizeof(HASHTAB), "mudstate.hfile_hashes");
-        mudstate.hfiletab_size = 4;
+        mushstate.hfiletab = (char **)XCALLOC(4, sizeof(char *), "mushstate.hfiletab");
+        mushstate.hfile_hashes = (HASHTAB *)XCALLOC(4, sizeof(HASHTAB), "mushstate.hfile_hashes");
+        mushstate.hfiletab_size = 4;
     }
-    else if (mudstate.helpfiles >= mudstate.hfiletab_size)
+    else if (mushstate.helpfiles >= mushstate.hfiletab_size)
     {
-        ftab = (char **)XREALLOC(mudstate.hfiletab, (mudstate.hfiletab_size + 4) * sizeof(char *), "ftab");
-        hashes = (HASHTAB *)XREALLOC(mudstate.hfile_hashes, (mudstate.hfiletab_size + 4) * sizeof(HASHTAB), "hashes");
-        ftab[mudstate.hfiletab_size] = NULL;
-        ftab[mudstate.hfiletab_size + 1] = NULL;
-        ftab[mudstate.hfiletab_size + 2] = NULL;
-        ftab[mudstate.hfiletab_size + 3] = NULL;
-        mudstate.hfiletab_size += 4;
-        mudstate.hfiletab = ftab;
-        mudstate.hfile_hashes = hashes;
+        ftab = (char **)XREALLOC(mushstate.hfiletab, (mushstate.hfiletab_size + 4) * sizeof(char *), "ftab");
+        hashes = (HASHTAB *)XREALLOC(mushstate.hfile_hashes, (mushstate.hfiletab_size + 4) * sizeof(HASHTAB), "hashes");
+        ftab[mushstate.hfiletab_size] = NULL;
+        ftab[mushstate.hfiletab_size + 1] = NULL;
+        ftab[mushstate.hfiletab_size + 2] = NULL;
+        ftab[mushstate.hfiletab_size + 3] = NULL;
+        mushstate.hfiletab_size += 4;
+        mushstate.hfiletab = ftab;
+        mushstate.hfile_hashes = hashes;
     }
 
     /**
      * Add or replace the path to the file.
      * 
      */
-    if (mudstate.hfiletab[mudstate.helpfiles] != NULL)
+    if (mushstate.hfiletab[mushstate.helpfiles] != NULL)
     {
-        XFREE(mudstate.hfiletab[mudstate.helpfiles]);
+        XFREE(mushstate.hfiletab[mushstate.helpfiles]);
     }
 
-    mudstate.hfiletab[mudstate.helpfiles] = XSTRDUP(fpath, "mudstate.hfiletab[mudstate.helpfiles]");
+    mushstate.hfiletab[mushstate.helpfiles] = XSTRDUP(fpath, "mushstate.hfiletab[mushstate.helpfiles]");
 
     /**
      * Initialize the associated hashtable.
      * 
      */
-    hashinit(&mudstate.hfile_hashes[mudstate.helpfiles], 30 * mudconf.hash_factor, HT_STR);
-    mudstate.helpfiles++;
+    hashinit(&mushstate.hfile_hashes[mushstate.helpfiles], 30 * mushconf.hash_factor, HT_STR);
+    mushstate.helpfiles++;
     cf_log(player, "HLP", "LOAD", confcmd, "Successfully loaded helpfile %s", basename(fpath));
     XFREE(s);
     XFREE(newstr);
@@ -1954,7 +1954,7 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
      * cfiletab_size;  // Size of the table storing config pointers
      */
 
-    if (!mudstate.initializing)
+    if (!mushstate.initializing)
     {
         return CF_Failure;
     }
@@ -1965,7 +1965,7 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
     if (fp == NULL)
     {
         XFREE(buf);
-        buf = XASPRINTF("buf", "%s/%s", mudconf.config_home, str);
+        buf = XASPRINTF("buf", "%s/%s", mushconf.config_home, str);
         fp = fopen(buf, "r");
 
         if (fp == NULL)
@@ -1976,7 +1976,7 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
     }
 
     log_write(LOG_ALWAYS, "CNF", "INFO", "Reading configuration file : %s", buf);
-    mudstate.cfiletab = add_array(mudstate.cfiletab, buf, &mudstate.configfiles);
+    mushstate.cfiletab = add_array(mushstate.cfiletab, buf, &mushstate.configfiles);
     XFREE(buf);
     buf = XMALLOC(LBUF_SIZE, "buf");
 
@@ -2123,20 +2123,20 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
     int i = 0, r = CF_Failure;
     char *buf = NULL, *buff = NULL, *name = NULL, *status = NULL;
 
-    if (!mudstate.standalone && !mudstate.initializing && !check_access(player, tp->flags))
+    if (!mushstate.standalone && !mushstate.initializing && !check_access(player, tp->flags))
     {
         notify(player, NOPERM_MESSAGE);
     }
     else
     {
-        if (!mudstate.initializing)
+        if (!mushstate.initializing)
         {
             buff = XSTRDUP(ap, "buff");
         }
 
         i = tp->interpreter(tp->loc, ap, tp->extra, player, cp);
 
-        if (!mudstate.initializing)
+        if (!mushstate.initializing)
         {
             name = log_getname(player);
 
@@ -2193,7 +2193,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
      * the paramaters we need to load module flatfiles are loaded
      */
 
-    if (mudstate.standalone && strcmp(cp, "module") && strcmp(cp, "database_home"))
+    if (mushstate.standalone && strcmp(cp, "module") && strcmp(cp, "database_home"))
     {
         return CF_Success;
     }
@@ -2206,7 +2206,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -2224,7 +2224,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
      * Config directive not found.  Complain about it.
      * 
      */
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
         cf_log(player, "CNF", "NFND", (char *)"Set", "%s %s not found", "Config directive", cp);
     }
@@ -2287,7 +2287,7 @@ void list_cf_access(dbref player)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -2325,7 +2325,7 @@ void list_cf_read_access(dbref player)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -2363,7 +2363,7 @@ void cf_verify(void)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -2452,7 +2452,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
@@ -2488,7 +2488,7 @@ void list_options(dbref player)
         }
     }
 
-    for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+    for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {

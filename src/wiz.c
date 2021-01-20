@@ -28,7 +28,7 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 
 	if (((Fixed(player)) || (Fixed(Owner(player)))) && !(Tel_Anywhere(player)))
 	{
-		notify(player, mudconf.fixed_tel_msg);
+		notify(player, mushconf.fixed_tel_msg);
 		return;
 	}
 
@@ -135,7 +135,7 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
      * location (after LEAVEing any objects) or it must be JUMP_OK.
      */
 
-	if (mudconf.fascist_tport)
+	if (mushconf.fascist_tport)
 	{
 		loc = where_room(victim);
 
@@ -270,7 +270,7 @@ void do_force(dbref player, __attribute__((unused)) dbref cause, int key, char *
 		process_cmdline(victim, player, command, args, nargs, NULL);
 	}
 	else
-		wait_que(victim, player, 0, NOTHING, 0, command, args, nargs, mudstate.rdata);
+		wait_que(victim, player, 0, NOTHING, 0, command, args, nargs, mushstate.rdata);
 }
 
 /*
@@ -520,7 +520,7 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 
 	amt = (int)strtol(arg1, (char **)NULL, 10);
 	
-	for (a = 0; a < mudstate.db_top; a++)
+	for (a = 0; a < mushstate.db_top; a++)
 	{
 		if (isPlayer(a))
 		{
@@ -589,12 +589,12 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 	switch (key)
 	{
 	case MOTD_ALL:
-		if (mudconf.motd_msg)
+		if (mushconf.motd_msg)
 		{
-			XFREE(mudconf.motd_msg);
+			XFREE(mushconf.motd_msg);
 		}
 
-		mudconf.motd_msg = XSTRDUP(message, "mudconf.motd_msg");
+		mushconf.motd_msg = XSTRDUP(message, "mushconf.motd_msg");
 
 		if (!Quiet(player))
 		{
@@ -604,12 +604,12 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		break;
 
 	case MOTD_WIZ:
-		if (mudconf.wizmotd_msg)
+		if (mushconf.wizmotd_msg)
 		{
-			XFREE(mudconf.wizmotd_msg);
+			XFREE(mushconf.wizmotd_msg);
 		}
 
-		mudconf.wizmotd_msg = XSTRDUP(message, "mudconf.wizmotd_msg");
+		mushconf.wizmotd_msg = XSTRDUP(message, "mushconf.wizmotd_msg");
 
 		if (!Quiet(player))
 		{
@@ -619,12 +619,12 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		break;
 
 	case MOTD_DOWN:
-		if (mudconf.downmotd_msg)
+		if (mushconf.downmotd_msg)
 		{
-			XFREE(mudconf.downmotd_msg);
+			XFREE(mushconf.downmotd_msg);
 		}
 
-		mudconf.downmotd_msg = XSTRDUP(message, "do_motd.downmotd");
+		mushconf.downmotd_msg = XSTRDUP(message, "do_motd.downmotd");
 
 		if (!Quiet(player))
 		{
@@ -634,12 +634,12 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		break;
 
 	case MOTD_FULL:
-		if (mudconf.fullmotd_msg)
+		if (mushconf.fullmotd_msg)
 		{
-			XFREE(mudconf.fullmotd_msg);
+			XFREE(mushconf.fullmotd_msg);
 		}
 
-		mudconf.fullmotd_msg = XSTRDUP(message, "mudconf.fullmotd_msg");
+		mushconf.fullmotd_msg = XSTRDUP(message, "mushconf.fullmotd_msg");
 
 		if (!Quiet(player))
 		{
@@ -660,11 +660,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "----- motd messages -----");
 			}
 
-			if (mudconf.motd_msg)
+			if (mushconf.motd_msg)
 			{
-				if (*mudconf.motd_msg)
+				if (*mushconf.motd_msg)
 				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mudconf.motd_msg);
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mushconf.motd_msg);
 				}
 			}
 			else
@@ -672,11 +672,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "No MOTD.");
 			}
 
-			if (mudconf.wizmotd_msg)
+			if (mushconf.wizmotd_msg)
 			{
-				if (*mudconf.wizmotd_msg)
+				if (*mushconf.wizmotd_msg)
 				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mudconf.wizmotd_msg);
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mushconf.wizmotd_msg);
 				}
 			}
 			else
@@ -684,11 +684,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "No Wizard MOTD.");
 			}
 
-			if (mudconf.downmotd_msg)
+			if (mushconf.downmotd_msg)
 			{
-				if (*mudconf.downmotd_msg)
+				if (*mushconf.downmotd_msg)
 				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mudconf.downmotd_msg);
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mushconf.downmotd_msg);
 				}
 			}
 			else
@@ -696,11 +696,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "No Down MOTD.");
 			}
 
-			if (mudconf.fullmotd_msg)
+			if (mushconf.fullmotd_msg)
 			{
-				if (*mudconf.fullmotd_msg)
+				if (*mushconf.fullmotd_msg)
 				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mudconf.fullmotd_msg);
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mushconf.fullmotd_msg);
 				}
 			}
 			else
@@ -719,10 +719,10 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				fcache_send(player, FC_MOTD);
 			}
 
-			if (mudconf.motd_msg)
+			if (mushconf.motd_msg)
 			{
-				if(*mudconf.motd_msg) {
-					notify_quiet(player, mudconf.motd_msg);
+				if(*mushconf.motd_msg) {
+					notify_quiet(player, mushconf.motd_msg);
 				}
 				
 			}
@@ -758,7 +758,7 @@ void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char 
 	}
 	else if (key == GLOB_ENABLE)
 	{
-		mudconf.control_flags |= flagvalue;
+		mushconf.control_flags |= flagvalue;
 		name = log_getname(player);
 		log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s enabled: %s", name, flag);
 		XFREE(name);
@@ -770,7 +770,7 @@ void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char 
 	}
 	else if (key == GLOB_DISABLE)
 	{
-		mudconf.control_flags &= ~flagvalue;
+		mushconf.control_flags &= ~flagvalue;
 		name = log_getname(player);
 		log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s disabled: %s", name, flag);
 		XFREE(name);

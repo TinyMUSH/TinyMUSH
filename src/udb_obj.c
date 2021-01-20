@@ -455,11 +455,11 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
 
     for (i = 0; i < NUM_OBJPIPES; i++)
     {
-        if (mudstate.objpipes[i] && mudstate.objpipes[i]->name == obj)
+        if (mushstate.objpipes[i] && mushstate.objpipes[i]->name == obj)
         {
-            mudstate.objpipes[i]->counter = mudstate.objc;
-            mudstate.objc++;
-            return mudstate.objpipes[i];
+            mushstate.objpipes[i]->counter = mushstate.objc;
+            mushstate.objc++;
+            return mushstate.objpipes[i];
         }
     }
 
@@ -469,7 +469,7 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
 
     for (i = 0; i < NUM_OBJPIPES; i++)
     {
-        if (!mudstate.objpipes[i])
+        if (!mushstate.objpipes[i])
         {
             /*
 	     * If there's no object there, read one in
@@ -480,7 +480,7 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
 
             if (data.dptr)
             {
-                mudstate.objpipes[i] = unroll_obj(data.dptr);
+                mushstate.objpipes[i] = unroll_obj(data.dptr);
                 XFREE(data.dptr);
             }
             else
@@ -488,23 +488,23 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
                 /*
 		 * New object
 		 */
-                if ((mudstate.objpipes[i] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mudstate.objpipes[i]")) == NULL)
+                if ((mushstate.objpipes[i] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mushstate.objpipes[i]")) == NULL)
                 {
                     return (NULL);
                 }
 
-                mudstate.objpipes[i]->name = obj;
-                mudstate.objpipes[i]->at_count = 0;
-                mudstate.objpipes[i]->dirty = 0;
-                mudstate.objpipes[i]->atrs = NULL;
+                mushstate.objpipes[i]->name = obj;
+                mushstate.objpipes[i]->at_count = 0;
+                mushstate.objpipes[i]->dirty = 0;
+                mushstate.objpipes[i]->atrs = NULL;
             }
 
-            mudstate.objpipes[i]->counter = mudstate.objc;
-            mudstate.objc++;
-            return mudstate.objpipes[i];
+            mushstate.objpipes[i]->counter = mushstate.objc;
+            mushstate.objc++;
+            return mushstate.objpipes[i];
         }
 
-        if (mudstate.objpipes[i]->counter < mudstate.objpipes[j]->counter)
+        if (mushstate.objpipes[i]->counter < mushstate.objpipes[j]->counter)
         {
             j = i;
         }
@@ -515,11 +515,11 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
      * * dirty, write it first
      */
 
-    if (mudstate.objpipes[j]->dirty)
+    if (mushstate.objpipes[j]->dirty)
     {
-        data.dptr = rollup_obj(mudstate.objpipes[j]);
-        data.dsize = obj_siz(mudstate.objpipes[j]);
-        key.dptr = &mudstate.objpipes[j]->name;
+        data.dptr = rollup_obj(mushstate.objpipes[j]);
+        data.dsize = obj_siz(mushstate.objpipes[j]);
+        key.dptr = &mushstate.objpipes[j]->name;
         key.dsize = sizeof(int);
         db_lock();
         db_put(key, data, DBTYPE_ATTRIBUTE);
@@ -527,7 +527,7 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
         XFREE(data.dptr);
     }
 
-    objfree(mudstate.objpipes[j]);
+    objfree(mushstate.objpipes[j]);
     /*
      * Bring in the object from disk if it exists there
      */
@@ -537,10 +537,10 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
 
     if (data.dptr)
     {
-        mudstate.objpipes[j] = unroll_obj(data.dptr);
+        mushstate.objpipes[j] = unroll_obj(data.dptr);
         XFREE(data.dptr);
 
-        if (mudstate.objpipes[j] == NULL)
+        if (mushstate.objpipes[j] == NULL)
         {
             log_write(LOG_PROBLEMS, "ERR", "CACHE", "Null returned on unroll of object #%d", j);
             return (NULL);
@@ -551,20 +551,20 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
         /*
 	 * New object
 	 */
-        if ((mudstate.objpipes[j] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mudstate.objpipes[j]")) == NULL)
+        if ((mushstate.objpipes[j] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mushstate.objpipes[j]")) == NULL)
         {
             return (NULL);
         }
 
-        mudstate.objpipes[j]->name = obj;
-        mudstate.objpipes[j]->at_count = 0;
-        mudstate.objpipes[j]->dirty = 0;
-        mudstate.objpipes[j]->atrs = NULL;
+        mushstate.objpipes[j]->name = obj;
+        mushstate.objpipes[j]->at_count = 0;
+        mushstate.objpipes[j]->dirty = 0;
+        mushstate.objpipes[j]->atrs = NULL;
     }
 
-    mudstate.objpipes[j]->counter = mudstate.objc;
-    mudstate.objc++;
-    return mudstate.objpipes[j];
+    mushstate.objpipes[j]->counter = mushstate.objc;
+    mushstate.objc++;
+    return mushstate.objpipes[j];
 }
 
 char *pipe_get_attrib(int anum, unsigned int obj)
@@ -622,15 +622,15 @@ void attrib_sync(void)
 
     for (i = 0; i < NUM_OBJPIPES; i++)
     {
-        if (mudstate.objpipes[i] && mudstate.objpipes[i]->dirty)
+        if (mushstate.objpipes[i] && mushstate.objpipes[i]->dirty)
         {
-            data.dptr = rollup_obj(mudstate.objpipes[i]);
-            data.dsize = obj_siz(mudstate.objpipes[i]);
-            key.dptr = &mudstate.objpipes[i]->name;
+            data.dptr = rollup_obj(mushstate.objpipes[i]);
+            data.dsize = obj_siz(mushstate.objpipes[i]);
+            key.dptr = &mushstate.objpipes[i]->name;
             key.dsize = sizeof(int);
             db_put(key, data, DBTYPE_ATTRIBUTE);
             XFREE(data.dptr);
-            mudstate.objpipes[i]->dirty = 0;
+            mushstate.objpipes[i]->dirty = 0;
         }
     }
 }

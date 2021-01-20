@@ -37,7 +37,7 @@
         {                                                                                                                 \
             old_db -= SIZE_HACK;                                                                                          \
             memcpy((char *)dg__new_db, (char *)old_db,                                                                    \
-                   (mudstate.db_top + SIZE_HACK) * sizeof(proto));                                                        \
+                   (mushstate.db_top + SIZE_HACK) * sizeof(proto));                                                        \
             dg__cp = (char *)old_db;                                                                                      \
             XFREE(dg__cp);                                                                                                \
         }                                                                                                                 \
@@ -50,7 +50,7 @@
             }                                                                                                             \
         }                                                                                                                 \
         old_db = dg__new_db + SIZE_HACK;                                                                                  \
-        for (dg__i = mudstate.db_top; dg__i < new_size; dg__i++)                                                          \
+        for (dg__i = mushstate.db_top; dg__i < new_size; dg__i++)                                                          \
         {                                                                                                                 \
             OBJ_INIT_MODULE(dg__i);                                                                                       \
         }                                                                                                                 \

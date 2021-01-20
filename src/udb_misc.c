@@ -28,7 +28,7 @@
 
 void log_db_err(int obj, int attr, const char *txt)
 {
-	if (!mudstate.standalone)
+	if (!mushstate.standalone)
 	{
 		if (attr != NOTHING)
 		{

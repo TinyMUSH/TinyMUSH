@@ -266,11 +266,11 @@ void fwdlist_set(dbref thing, FWDLIST *ifp)
         }
 
         XFREE(xfp);
-        stat = nhashrepl(thing, (int *)fp, &mudstate.fwdlist_htab);
+        stat = nhashrepl(thing, (int *)fp, &mushstate.fwdlist_htab);
     }
     else
     {
-        stat = nhashadd(thing, (int *)fp, &mudstate.fwdlist_htab);
+        stat = nhashadd(thing, (int *)fp, &mushstate.fwdlist_htab);
     }
 
     if (stat < 0)
@@ -310,7 +310,7 @@ void fwdlist_clr(dbref thing)
         }
 
         XFREE(xfp);
-        nhashdelete(thing, &mudstate.fwdlist_htab);
+        nhashdelete(thing, &mushstate.fwdlist_htab);
     }
 }
 
@@ -363,7 +363,7 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
         {
             target = (int)strtol(dp, (char **)NULL, 10);
 
-            if (!mudstate.standalone)
+            if (!mushstate.standalone)
             {
                 fail = (!Good_obj(target) || (!God(player) && !controls(player, target) && (!Link_ok(target) || !could_doit(player, target, A_LLINK))));
             }
@@ -374,14 +374,14 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
 
             if (fail)
             {
-                if (!mudstate.standalone)
+                if (!mushstate.standalone)
                 {
                     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cannot forward to #%d: Permission denied.", target);
                 }
 
                 errors++;
             }
-            else if (count < mudconf.fwdlist_lim)
+            else if (count < mushconf.fwdlist_lim)
             {
                 if (fp->data)
                 {
@@ -394,7 +394,7 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
             }
             else
             {
-                if (!mudstate.standalone)
+                if (!mushstate.standalone)
                 {
                     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cannot forward to #%d: Forwardlist limit exceeded.", target);
                 }
@@ -479,7 +479,7 @@ int fwdlist_ck(int key __attribute__((unused)), dbref player, dbref thing, int a
     FWDLIST *fp = NULL;
     int count = 0;
 
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         return 1;
     }
@@ -530,9 +530,9 @@ FWDLIST *fwdlist_get(dbref thing)
     int aflags = 0, alen = 0;
     char *tp = NULL;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        return (FWDLIST *)nhashfind((thing), &mudstate.fwdlist_htab);
+        return (FWDLIST *)nhashfind((thing), &mushstate.fwdlist_htab);
     }
 
     if (!fp)
@@ -596,11 +596,11 @@ void propdir_set(dbref thing, PROPDIR *ifp)
         }
 
         XFREE(xfp);
-        stat = nhashrepl(thing, (int *)fp, &mudstate.propdir_htab);
+        stat = nhashrepl(thing, (int *)fp, &mushstate.propdir_htab);
     }
     else
     {
-        stat = nhashadd(thing, (int *)fp, &mudstate.propdir_htab);
+        stat = nhashadd(thing, (int *)fp, &mushstate.propdir_htab);
     }
 
     if (stat < 0)
@@ -641,7 +641,7 @@ void propdir_clr(dbref thing)
         }
 
         XFREE(xfp);
-        nhashdelete(thing, &mudstate.propdir_htab);
+        nhashdelete(thing, &mushstate.propdir_htab);
     }
 }
 
@@ -694,7 +694,7 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
         {
             target = (int)strtol(dp, (char **)NULL, 10);
 
-            if (!mudstate.standalone)
+            if (!mushstate.standalone)
             {
                 fail = (!Good_obj(target) || !Parentable(player, target));
             }
@@ -705,14 +705,14 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
 
             if (fail)
             {
-                if (!mudstate.standalone)
+                if (!mushstate.standalone)
                 {
                     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cannot parent to #%d: Permission denied.", target);
                 }
 
                 errors++;
             }
-            else if (count < mudconf.propdir_lim)
+            else if (count < mushconf.propdir_lim)
             {
                 if (fp->data)
                 {
@@ -725,7 +725,7 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
             }
             else
             {
-                if (!mudstate.standalone)
+                if (!mushstate.standalone)
                 {
                     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Cannot parent to #%d: Propdir limit exceeded.", target);
                 }
@@ -810,7 +810,7 @@ int propdir_ck(int key __attribute__((unused)), dbref player, dbref thing, int a
     PROPDIR *fp = NULL;
     int count = 0;
 
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         return 1;
     }
@@ -861,9 +861,9 @@ PROPDIR *propdir_get(dbref thing)
     char *tp = NULL;
     PROPDIR *fp = NULL;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        return (PROPDIR *)nhashfind((thing), &mudstate.propdir_htab);
+        return (PROPDIR *)nhashfind((thing), &mushstate.propdir_htab);
     }
 
     if (!fp)
@@ -1110,7 +1110,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
  */
 void s_Pass(dbref thing, const char *s)
 {
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         log_write_raw(1, "P");
     }
@@ -1449,7 +1449,7 @@ void init_attrtab(void)
     ATTR *a = NULL;
     char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
-    hashinit(&mudstate.attr_name_htab, 100 * mudconf.hash_factor, HT_STR);
+    hashinit(&mushstate.attr_name_htab, 100 * mushconf.hash_factor, HT_STR);
 
     for (a = attr; a->number; a++)
     {
@@ -1462,7 +1462,7 @@ void init_attrtab(void)
         }
 
         *p = '\0';
-        hashadd(buff, (int *)a, &mudstate.attr_name_htab, 0);
+        hashadd(buff, (int *)a, &mushstate.attr_name_htab, 0);
     }
 
     XFREE(buff);
@@ -1504,9 +1504,9 @@ ATTR *atr_str(char *s)
      * Look for a predefined attribute 
      * 
      */
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        a = (ATTR *)hashfind_generic((HASHKEY)(buff), (&mudstate.attr_name_htab));
+        a = (ATTR *)hashfind_generic((HASHKEY)(buff), (&mushstate.attr_name_htab));
 
         if (a != NULL)
         {
@@ -1546,7 +1546,7 @@ ATTR *atr_str(char *s)
         return &tattr;
     }
 
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         /**
     	 * No exact match, try for a prefix match on predefined attribs.
@@ -1586,9 +1586,9 @@ void anum_extend(int newtop)
     ATTR **anum_table2 = NULL;
     int delta = 0;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        delta = mudconf.init_size;
+        delta = mushconf.init_size;
     }
     else
     {
@@ -1693,11 +1693,11 @@ int mkattr(char *buff)
          * those flags. Otherwise, use the default vattr flags.
          * 
     	 */
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
-            vflags = mudconf.vattr_flags;
+            vflags = mushconf.vattr_flags;
 
-            for (kp = mudconf.vattr_flag_list; kp != NULL; kp = kp->next)
+            for (kp = mushconf.vattr_flag_list; kp != NULL; kp = kp->next)
             {
                 if (quick_wild(kp->name, buff))
                 {
@@ -1710,7 +1710,7 @@ int mkattr(char *buff)
         }
         else
         {
-            va = vattr_alloc(buff, mudconf.vattr_flags);
+            va = vattr_alloc(buff, mushconf.vattr_flags);
         }
 
         if (!va || !(va->number))
@@ -1803,7 +1803,7 @@ bool Commer(dbref thing)
     dbref aowner = NOTHING;
     ATTR *ap = NULL;
 
-    if ((!Has_Commands(thing) && mudconf.req_cmds_flag) || Halted(thing))
+    if ((!Has_Commands(thing) && mushconf.req_cmds_flag) || Halted(thing))
     {
         return false;
     }
@@ -1890,19 +1890,19 @@ int al_size(char *astr)
  */
 void al_store(void)
 {
-    if (mudstate.mod_al_id != NOTHING)
+    if (mushstate.mod_al_id != NOTHING)
     {
-        if (mudstate.mod_alist && *mudstate.mod_alist)
+        if (mushstate.mod_alist && *mushstate.mod_alist)
         {
-            atr_add_raw(mudstate.mod_al_id, A_LIST, mudstate.mod_alist);
+            atr_add_raw(mushstate.mod_al_id, A_LIST, mushstate.mod_alist);
         }
         else
         {
-            atr_clr(mudstate.mod_al_id, A_LIST);
+            atr_clr(mushstate.mod_al_id, A_LIST);
         }
     }
 
-    mudstate.mod_al_id = NOTHING;
+    mushstate.mod_al_id = NOTHING;
 }
 
 /**
@@ -1920,9 +1920,9 @@ char *al_fetch(dbref thing)
      * We only need fetch if we change things
      * 
      */
-    if (mudstate.mod_al_id == thing)
+    if (mushstate.mod_al_id == thing)
     {
-        return mudstate.mod_alist;
+        return mushstate.mod_alist;
     }
 
     /** 
@@ -1935,17 +1935,17 @@ char *al_fetch(dbref thing)
     if (astr)
     {
         len = al_size(astr);
-        al_extend(&mudstate.mod_alist, &mudstate.mod_size, len, 0);
-        XMEMCPY(mudstate.mod_alist, astr, len);
+        al_extend(&mushstate.mod_alist, &mushstate.mod_size, len, 0);
+        XMEMCPY(mushstate.mod_alist, astr, len);
     }
     else
     {
-        al_extend(&mudstate.mod_alist, &mudstate.mod_size, 1, 0);
-        *mudstate.mod_alist = '\0';
+        al_extend(&mushstate.mod_alist, &mushstate.mod_size, 1, 0);
+        *mushstate.mod_alist = '\0';
     }
 
-    mudstate.mod_al_id = thing;
-    return mudstate.mod_alist;
+    mushstate.mod_al_id = thing;
+    return mushstate.mod_alist;
 }
 
 /**
@@ -1991,15 +1991,15 @@ void al_add(dbref thing, int attrnum)
      * Nope, extend it 
      * 
      */
-    al_extend(&mudstate.mod_alist, &mudstate.mod_size, (cp - abuf + ATR_BUF_INCR), 1);
+    al_extend(&mushstate.mod_alist, &mushstate.mod_size, (cp - abuf + ATR_BUF_INCR), 1);
 
-    if (mudstate.mod_alist != abuf)
+    if (mushstate.mod_alist != abuf)
     {
         /** 
          * extend returned different buffer, re-find the end
          * 
          */
-        abuf = mudstate.mod_alist;
+        abuf = mushstate.mod_alist;
 
         for (cp = abuf; *cp; anum = al_decode(&cp))
             ;
@@ -2085,7 +2085,7 @@ void makekey(dbref thing, int atr, UDB_ANAME *abuff)
  */
 void al_destroy(dbref thing)
 {
-    if (mudstate.mod_al_id == thing)
+    if (mushstate.mod_al_id == thing)
     {
         /**
          * remove from cache
@@ -2282,7 +2282,7 @@ void atr_clr(dbref thing, int atr)
     cache_del(key, DBTYPE_ATTRIBUTE);
     al_delete(thing, atr);
 
-    if (!mudstate.standalone && !mudstate.loading_db)
+    if (!mushstate.standalone && !mushstate.loading_db)
     {
         s_Modified(thing);
     }
@@ -2296,7 +2296,7 @@ void atr_clr(dbref thing, int atr)
     case A_DAILY:
         s_Flags2(thing, Flags2(thing) & ~HAS_DAILY);
 
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             (void)cron_clr(thing, A_DAILY);
         }
@@ -2320,7 +2320,7 @@ void atr_clr(dbref thing, int atr)
         break;
 
     case A_TIMEOUT:
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             desc_reload(thing);
         }
@@ -2328,7 +2328,7 @@ void atr_clr(dbref thing, int atr)
         break;
 
     case A_QUEUEMAX:
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             pcache_reload(thing);
         }
@@ -2382,7 +2382,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
     cache_put(key, data, DBTYPE_ATTRIBUTE);
     al_add(thing, atr);
 
-    if (!mudstate.standalone && !mudstate.loading_db)
+    if (!mushstate.standalone && !mushstate.loading_db)
     {
         s_Modified(thing);
     }
@@ -2396,11 +2396,11 @@ void atr_add_raw(dbref thing, int atr, char *buff)
     case A_DAILY:
         s_Flags2(thing, Flags2(thing) | HAS_DAILY);
 
-        if (!mudstate.standalone && !mudstate.loading_db)
+        if (!mushstate.standalone && !mushstate.loading_db)
         {
             char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
             (void)cron_clr(thing, A_DAILY);
-            XSPRINTF(tbuf, "0 %d * * *", mudconf.events_daily_hour);
+            XSPRINTF(tbuf, "0 %d * * *", mushconf.events_daily_hour);
             call_cron(thing, thing, A_DAILY, tbuf);
             XFREE(tbuf);
         }
@@ -2424,7 +2424,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
         break;
 
     case A_TIMEOUT:
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             desc_reload(thing);
         }
@@ -2432,7 +2432,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
         break;
 
     case A_QUEUEMAX:
-        if (!mudstate.standalone)
+        if (!mushstate.standalone)
         {
             pcache_reload(thing);
         }
@@ -2519,7 +2519,7 @@ char *atr_get_raw(dbref thing, int atr)
         return NULL;
     }
 
-    if (!mudstate.standalone && !mudstate.loading_db)
+    if (!mushstate.standalone && !mushstate.loading_db)
     {
         s_Accessed(thing);
     }
@@ -2626,7 +2626,7 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
     ATTR *ap = NULL;
     PROPDIR *pp = NULL;
 
-    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
     {
         buff = atr_get_raw(parent, atr);
 
@@ -2653,7 +2653,7 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
 
     if (H_Propdir(thing) && ((pp = propdir_get(thing)) != NULL))
     {
-        for (lev = 0; (lev < pp->count) && (lev < mudconf.propdir_lim); lev++)
+        for (lev = 0; (lev < pp->count) && (lev < mushconf.propdir_lim); lev++)
         {
             parent = pp->data[lev];
 
@@ -2715,7 +2715,7 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
     ATTR *ap = NULL;
     PROPDIR *pp = NULL;
 
-    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mudconf.parent_nest_lim)); parent = Parent(parent), lev++)
+    for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
     {
         buff = atr_get_raw(parent, atr);
 
@@ -2742,7 +2742,7 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
 
     if (H_Propdir(thing) && ((pp = propdir_get(thing)) != NULL))
     {
-        for (lev = 0; (lev < pp->count) && (lev < mudconf.propdir_lim); lev++)
+        for (lev = 0; (lev < pp->count) && (lev < mushconf.propdir_lim); lev++)
         {
             parent = pp->data[lev];
 
@@ -2897,12 +2897,12 @@ void atr_push(void)
 {
     ALIST *new_alist = (ALIST *)XMALLOC(SBUF_SIZE, "new_alist");
 
-    new_alist->data = mudstate.iter_alist.data;
-    new_alist->len = mudstate.iter_alist.len;
-    new_alist->next = mudstate.iter_alist.next;
-    mudstate.iter_alist.data = NULL;
-    mudstate.iter_alist.len = 0;
-    mudstate.iter_alist.next = new_alist;
+    new_alist->data = mushstate.iter_alist.data;
+    new_alist->len = mushstate.iter_alist.len;
+    new_alist->next = mushstate.iter_alist.next;
+    mushstate.iter_alist.data = NULL;
+    mushstate.iter_alist.len = 0;
+    mushstate.iter_alist.next = new_alist;
 
     return;
 }
@@ -2913,25 +2913,25 @@ void atr_push(void)
  */
 void atr_pop(void)
 {
-    ALIST *old_alist = mudstate.iter_alist.next;
+    ALIST *old_alist = mushstate.iter_alist.next;
 
-    if (mudstate.iter_alist.data)
+    if (mushstate.iter_alist.data)
     {
-        XFREE(mudstate.iter_alist.data);
+        XFREE(mushstate.iter_alist.data);
     }
 
     if (old_alist)
     {
-        mudstate.iter_alist.data = old_alist->data;
-        mudstate.iter_alist.len = old_alist->len;
-        mudstate.iter_alist.next = old_alist->next;
+        mushstate.iter_alist.data = old_alist->data;
+        mushstate.iter_alist.len = old_alist->len;
+        mushstate.iter_alist.next = old_alist->next;
         XFREE((char *)old_alist);
     }
     else
     {
-        mudstate.iter_alist.data = NULL;
-        mudstate.iter_alist.len = 0;
-        mudstate.iter_alist.next = NULL;
+        mushstate.iter_alist.data = NULL;
+        mushstate.iter_alist.len = 0;
+        mushstate.iter_alist.next = NULL;
     }
 
     return;
@@ -2953,9 +2953,9 @@ int atr_head(dbref thing, char **attrp)
      * Get attribute list. Save a read if it is in the modify atr list
      * 
      */
-    if (thing == mudstate.mod_al_id)
+    if (thing == mushstate.mod_al_id)
     {
-        astr = mudstate.mod_alist;
+        astr = mushstate.mod_alist;
     }
     else
     {
@@ -2977,9 +2977,9 @@ int atr_head(dbref thing, char **attrp)
      * Set up the list and return the first entry
      * 
      */
-    al_extend(&mudstate.iter_alist.data, &mudstate.iter_alist.len, alen, 0);
-    XMEMCPY(mudstate.iter_alist.data, astr, alen);
-    *attrp = mudstate.iter_alist.data;
+    al_extend(&mushstate.iter_alist.data, &mushstate.iter_alist.len, alen, 0);
+    XMEMCPY(mushstate.iter_alist.data, astr, alen);
+    *attrp = mushstate.iter_alist.data;
     return atr_next(attrp);
 }
 
@@ -3026,9 +3026,9 @@ void db_grow(dbref newtop)
     NAME *newnames = NULL, *newpurenames = NULL;
     char *cp = NULL;
 
-    if (!mudstate.standalone)
+    if (!mushstate.standalone)
     {
-        delta = mudconf.init_size;
+        delta = mushconf.init_size;
     }
     else
     {
@@ -3041,7 +3041,7 @@ void db_grow(dbref newtop)
      * frequent reallocations of the db array.
      * 
      */
-    if (newtop <= mudstate.db_top)
+    if (newtop <= mushstate.db_top)
     {
         /**
          * If requested size is smaller than the current db size, ignore it
@@ -3056,16 +3056,16 @@ void db_grow(dbref newtop)
      * and initialize the new area.
      * 
      */
-    if (newtop <= mudstate.db_size)
+    if (newtop <= mushstate.db_size)
     {
-        for (int i = mudstate.db_top; i < newtop; i++)
+        for (int i = mushstate.db_top; i < newtop; i++)
         {
             names[i] = NULL;
             purenames[i] = NULL;
         }
 
-        initialize_objects(mudstate.db_top, newtop);
-        mudstate.db_top = newtop;
+        initialize_objects(mushstate.db_top, newtop);
+        mushstate.db_top = newtop;
         return;
     }
 
@@ -3073,9 +3073,9 @@ void db_grow(dbref newtop)
      * Grow by a minimum of delta objects
      * 
      */
-    if (newtop <= mudstate.db_size + delta)
+    if (newtop <= mushstate.db_size + delta)
     {
-        newsize = mudstate.db_size + delta;
+        newsize = mushstate.db_size + delta;
     }
     else
     {
@@ -3086,9 +3086,9 @@ void db_grow(dbref newtop)
      * Enforce minimum database size
      * 
      */
-    if (newsize < mudstate.min_size)
+    if (newsize < mushstate.min_size)
     {
-        newsize = mudstate.min_size + delta;
+        newsize = mushstate.min_size + delta;
     }
 
     /**
@@ -3188,7 +3188,7 @@ void db_grow(dbref newtop)
          * 
          */
         db -= 1;
-        XMEMCPY((char *)newdb, (char *)db, (mudstate.db_top + 1) * sizeof(OBJ));
+        XMEMCPY((char *)newdb, (char *)db, (mushstate.db_top + 1) * sizeof(OBJ));
         cp = (char *)db;
         XFREE(cp);
     }
@@ -3226,7 +3226,7 @@ void db_grow(dbref newtop)
      * 
      */
 
-    for (MODULE *cam__mp = mudstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
     {
         /**
          * Call all modules
@@ -3238,15 +3238,15 @@ void db_grow(dbref newtop)
         }
     }
 
-    for (int i = mudstate.db_top; i < newtop; i++)
+    for (int i = mushstate.db_top; i < newtop; i++)
     {
         names[i] = NULL;
         purenames[i] = NULL;
     }
 
-    initialize_objects(mudstate.db_top, newtop);
-    mudstate.db_top = newtop;
-    mudstate.db_size = newsize;
+    initialize_objects(mushstate.db_top, newtop);
+    mushstate.db_top = newtop;
+    mushstate.db_size = newsize;
     /** 
      * Grow the db mark buffer
      * 
@@ -3255,15 +3255,15 @@ void db_grow(dbref newtop)
     newmarkbuf = (MARKBUF *)XMALLOC(marksize, "newmarkbuf");
     XMEMSET((char *)newmarkbuf, 0, marksize);
 
-    if (mudstate.markbits)
+    if (mushstate.markbits)
     {
         marksize = (newtop + 7) >> 3;
-        XMEMCPY((char *)newmarkbuf, (char *)mudstate.markbits, marksize);
-        cp = (char *)mudstate.markbits;
+        XMEMCPY((char *)newmarkbuf, (char *)mushstate.markbits, marksize);
+        cp = (char *)mushstate.markbits;
         XFREE(cp);
     }
 
-    mudstate.markbits = newmarkbuf;
+    mushstate.markbits = newmarkbuf;
 }
 
 /**
@@ -3279,9 +3279,9 @@ void db_free(void)
         db = NULL;
     }
 
-    mudstate.db_top = 0;
-    mudstate.db_size = 0;
-    mudstate.freelist = NOTHING;
+    mushstate.db_top = 0;
+    mushstate.db_size = 0;
+    mushstate.freelist = NOTHING;
 }
 
 /**
@@ -3651,7 +3651,7 @@ long getlong(FILE *f)
  */
 int init_gdbm_db(char *gdbmfile)
 {
-    for (mudstate.db_block_size = 1; mudstate.db_block_size < (LBUF_SIZE * 4); mudstate.db_block_size = mudstate.db_block_size << 1)
+    for (mushstate.db_block_size = 1; mushstate.db_block_size < (LBUF_SIZE * 4); mushstate.db_block_size = mushstate.db_block_size << 1)
     {
         /**
          * Calculate proper database block size
@@ -3659,7 +3659,7 @@ int init_gdbm_db(char *gdbmfile)
          */
     }
 
-    cache_init(mudconf.cache_width);
+    cache_init(mushconf.cache_width);
     dddb_setfile(gdbmfile);
     dddb_init();
     log_write(LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", gdbmfile);
@@ -3676,14 +3676,14 @@ int init_gdbm_db(char *gdbmfile)
  */
 bool check_zone(dbref player, dbref thing)
 {
-    if (mudstate.standalone)
+    if (mushstate.standalone)
     {
         return false;
     }
 
-    if (!mudconf.have_zones || (Zone(thing) == NOTHING) || isPlayer(thing) || (mudstate.zone_nest_num + 1 == mudconf.zone_nest_lim))
+    if (!mushconf.have_zones || (Zone(thing) == NOTHING) || isPlayer(thing) || (mushstate.zone_nest_num + 1 == mushconf.zone_nest_lim))
     {
-        mudstate.zone_nest_num = 0;
+        mushstate.zone_nest_num = 0;
         return false;
     }
 
@@ -3698,7 +3698,7 @@ bool check_zone(dbref player, dbref thing)
         return false;
     }
 
-    mudstate.zone_nest_num++;
+    mushstate.zone_nest_num++;
 
     /** 
      * If the zone doesn't have a ControlLock, DON'T allow control.
@@ -3706,7 +3706,7 @@ bool check_zone(dbref player, dbref thing)
      */
     if (atr_get_raw(Zone(thing), A_LCONTROL) && could_doit(player, Zone(thing), A_LCONTROL))
     {
-        mudstate.zone_nest_num = 0;
+        mushstate.zone_nest_num = 0;
         return true;
     }
     else
@@ -3722,17 +3722,17 @@ bool check_zone_for_player(dbref player, dbref thing)
         return false;
     }
 
-    mudstate.zone_nest_num++;
+    mushstate.zone_nest_num++;
 
-    if (!mudconf.have_zones || (Zone(thing) == NOTHING) || (mudstate.zone_nest_num == mudconf.zone_nest_lim) || !(isPlayer(thing)))
+    if (!mushconf.have_zones || (Zone(thing) == NOTHING) || (mushstate.zone_nest_num == mushconf.zone_nest_lim) || !(isPlayer(thing)))
     {
-        mudstate.zone_nest_num = 0;
+        mushstate.zone_nest_num = 0;
         return false;
     }
 
     if (atr_get_raw(Zone(thing), A_LCONTROL) && could_doit(player, Zone(thing), A_LCONTROL))
     {
-        mudstate.zone_nest_num = 0;
+        mushstate.zone_nest_num = 0;
         return true;
     }
     else
@@ -3761,16 +3761,16 @@ void dump_restart_db(void)
     version |= RS_RECORD_PLAYERS;
     version |= RS_NEW_STRINGS;
     version |= RS_COUNT_REBOOTS;
-    dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mushconf.dbhome, mushconf.mush_shortname);
     log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Restart DB: %s", dbf);
     f = fopen(dbf, "w");
     XFREE(dbf);
     fprintf(f, "+V%d\n", version);
     fprintf(f, "%d\n", (int)sock);
-    fprintf(f, "%ld\n", (long)mudstate.start_time);
-    fprintf(f, "%d\n", (int)mudstate.reboot_nums);
-    putstring(f, mudstate.doing_hdr);
-    fprintf(f, "%d\n", (int)mudstate.record_players);
+    fprintf(f, "%ld\n", (long)mushstate.start_time);
+    fprintf(f, "%d\n", (int)mushstate.reboot_nums);
+    putstring(f, mushstate.doing_hdr);
+    fprintf(f, "%d\n", (int)mushstate.record_players);
     for (d = descriptor_list; (d); d = (d)->next)
     {
         fprintf(f, "%d\n", d->descriptor);
@@ -3802,13 +3802,13 @@ void load_restart_db(void)
     struct stat fstatbuf;
     int val = 0, version = 0, new_strings = 0;
     char *temp = NULL, *buf = XMALLOC(SBUF_SIZE, "buf");
-    char *dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mudconf.dbhome, mudconf.mud_shortname);
+    char *dbf = XASPRINTF("dbf", "%s/%s.db.RESTART", mushconf.dbhome, mushconf.mush_shortname);
     FILE *f = fopen(dbf, "r");
 
     if (!f)
     {
         log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Can't open restart DB %s", dbf);
-        mudstate.restarting = 0;
+        mushstate.restarting = 0;
         XFREE(temp);
         XFREE(dbf);
         return;
@@ -3845,16 +3845,16 @@ void load_restart_db(void)
     }
 
     maxd = sock + 1;
-    mudstate.start_time = (time_t)getlong(f);
-    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Start time: %ld", mudstate.start_time);
+    mushstate.start_time = (time_t)getlong(f);
+    log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Start time: %ld", mushstate.start_time);
 
     if (version & RS_COUNT_REBOOTS)
     {
-        mudstate.reboot_nums = getref(f) + 1;
-        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Reboot count: %d", mudstate.reboot_nums);
+        mushstate.reboot_nums = getref(f) + 1;
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Reboot count: %d", mushstate.reboot_nums);
     }
 
-    mudstate.doing_hdr = getstring(f, new_strings);
+    mushstate.doing_hdr = getstring(f, new_strings);
 
     if (version & RS_CONCENTRATE)
     {
@@ -3863,8 +3863,8 @@ void load_restart_db(void)
 
     if (version & RS_RECORD_PLAYERS)
     {
-        mudstate.record_players = getref(f);
-        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Record Player: %d", mudstate.record_players);
+        mushstate.record_players = getref(f);
+        log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Record Player: %d", mushstate.record_players);
     }
 
     while ((val = getref(f)) != 0)
@@ -3874,7 +3874,7 @@ void load_restart_db(void)
         d->descriptor = val;
         d->flags = getref(f);
         d->connected_at = (time_t)getlong(f);
-        d->retries_left = mudconf.retry_limit;
+        d->retries_left = mushconf.retry_limit;
         d->command_count = getref(f);
         d->timeout = getref(f);
         d->host_info = getref(f);
@@ -3943,7 +3943,7 @@ void load_restart_db(void)
         d->input_lost = 0;
         d->raw_input = NULL;
         d->raw_input_at = NULL;
-        d->quota = mudconf.cmd_quota_max;
+        d->quota = mushconf.cmd_quota_max;
         d->program_data = NULL;
         d->hashnext = NULL;
 

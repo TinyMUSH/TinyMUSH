@@ -51,8 +51,8 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	/*
      * Loop through the patterns looking for a match
      */
-	mudstate.in_switch++;
-	save_token = mudstate.switch_token;
+	mushstate.in_switch++;
+	save_token = mushstate.switch_token;
 	got_one = 0;
 
 	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
@@ -65,7 +65,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		{
 			got_one = 1;
 			XFREE(tbuff);
-			mudstate.switch_token = mbuff;
+			mushstate.switch_token = mbuff;
 			str = fargs[i + 1];
 			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 		}
@@ -81,14 +81,14 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (!got_one && (i < nfargs) && fargs[i])
 	{
-		mudstate.switch_token = mbuff;
+		mushstate.switch_token = mbuff;
 		str = fargs[i];
 		exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	}
 
 	XFREE(mbuff);
-	mudstate.in_switch--;
-	mudstate.switch_token = save_token;
+	mushstate.in_switch--;
+	mushstate.switch_token = save_token;
 }
 
 void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -114,8 +114,8 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	/*
      * Loop through the patterns looking for a match
      */
-	mudstate.in_switch++;
-	save_token = mudstate.switch_token;
+	mushstate.in_switch++;
+	save_token = mushstate.switch_token;
 
 	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
 	{
@@ -126,12 +126,12 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		if (quick_wild(tbuff, mbuff))
 		{
 			XFREE(tbuff);
-			mudstate.switch_token = mbuff;
+			mushstate.switch_token = mbuff;
 			str = fargs[i + 1];
 			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 			XFREE(mbuff);
-			mudstate.in_switch--;
-			mudstate.switch_token = save_token;
+			mushstate.in_switch--;
+			mushstate.switch_token = save_token;
 			return;
 		}
 
@@ -144,14 +144,14 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if ((i < nfargs) && fargs[i])
 	{
-		mudstate.switch_token = mbuff;
+		mushstate.switch_token = mbuff;
 		str = fargs[i];
 		exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	}
 
 	XFREE(mbuff);
-	mudstate.in_switch--;
-	mudstate.switch_token = save_token;
+	mushstate.in_switch--;
+	mushstate.switch_token = save_token;
 }
 
 void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -317,9 +317,9 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (flag & IFELSE_TOKEN)
 	{
-		mudstate.in_switch++;
-		save_token = mudstate.switch_token;
-		mudstate.switch_token = mbuff;
+		mushstate.in_switch++;
+		save_token = mushstate.switch_token;
+		mushstate.switch_token = mbuff;
 	}
 
 	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
@@ -327,8 +327,8 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (flag & IFELSE_TOKEN)
 	{
-		mudstate.in_switch--;
-		mudstate.switch_token = save_token;
+		mushstate.in_switch--;
+		mushstate.switch_token = save_token;
 	}
 }
 
@@ -662,7 +662,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
-	temp = (char *)ctime(&mudstate.now);
+	temp = (char *)ctime(&mushstate.now);
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
@@ -674,7 +674,7 @@ void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.now, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.now, LBUF_SIZE);
 }
 
 /*
@@ -930,7 +930,7 @@ int do_convtime(char *str, struct tm *ttm)
 void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	struct tm *ttm;
-	ttm = localtime(&mudstate.now);
+	ttm = localtime(&mushstate.now);
 
 	if (do_convtime(fargs[0], ttm))
 	{
@@ -969,7 +969,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 	if (nfargs == 1)
 	{
-		tt = mudstate.now;
+		tt = mushstate.now;
 	}
 	else if (nfargs == 2)
 	{
@@ -1385,7 +1385,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
-	temp = (char *)ctime(&mudstate.start_time);
+	temp = (char *)ctime(&mushstate.start_time);
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
@@ -1397,7 +1397,7 @@ void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused))
 
 void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.reboot_nums, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.reboot_nums, LBUF_SIZE);
 }
 
 /*
@@ -1408,7 +1408,7 @@ void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)),
 void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *temp;
-	temp = (char *)ctime(&mudstate.restart_time);
+	temp = (char *)ctime(&mushstate.restart_time);
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
@@ -1421,18 +1421,18 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
 void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/* XXX To fix once the new version scheme is done */
-	//SAFE_LB_STR(mudstate.version, buff, bufc);
+	//SAFE_LB_STR(mushstate.version, buff, bufc);
 	SAFE_LB_STR("TinyMUSH", buff, bufc);
 }
 
 /*
  * ---------------------------------------------------------------------------
- * fun_mudname: Return the name of the mud.
+ * fun_mushname: Return the name of the Mush.
  */
 
-void fun_mudname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LB_STR(mudconf.mud_name, buff, bufc);
+	SAFE_LB_STR(mushconf.mush_name, buff, bufc);
 }
 
 /*
@@ -1444,7 +1444,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
 {
 	MODULE *mp;
 
-	for (mp = mudstate.modules_list; mp != NULL; mp = mp->next)
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		if (!strcasecmp(fargs[0], mp->modname))
 		{
@@ -1463,7 +1463,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
 
 void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.record_players, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.record_players, LBUF_SIZE);
 }
 
 /*
@@ -1473,22 +1473,22 @@ void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)
 
 void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.func_invk_ctr, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.func_invk_ctr, LBUF_SIZE);
 }
 
 void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.func_nest_lev, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.func_nest_lev, LBUF_SIZE);
 }
 
 void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.cmd_invk_ctr, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.cmd_invk_ctr, LBUF_SIZE);
 }
 
 void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mudstate.cmd_nest_lev, LBUF_SIZE);
+	SAFE_LTOS(buff, bufc, mushstate.cmd_nest_lev, LBUF_SIZE);
 }
 
 /*
@@ -1517,7 +1517,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		return;
 	}
 
-	if (times > mudconf.func_invk_lim)
+	if (times > mushconf.func_invk_lim)
 	{
 		SAFE_LB_STR("#-1 TOO MANY TIMES", buff, bufc);
 		return;
@@ -1551,7 +1551,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 		total += ut;
 
-		if ((mudstate.func_invk_ctr >= mudconf.func_invk_lim) || (Too_Much_CPU()))
+		if ((mushstate.func_invk_ctr >= mushconf.func_invk_lim) || (Too_Much_CPU()))
 		{
 			/*
 	     * Abort
@@ -1592,7 +1592,7 @@ int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs
 {
 	CMDENT *cmdp;
 
-	if ((cmdp = (CMDENT *)hashfind(name, &mudstate.command_htab)))
+	if ((cmdp = (CMDENT *)hashfind(name, &mushstate.command_htab)))
 	{
 		/*
 	 * Note that these permission checks are NOT identical to the
@@ -1603,7 +1603,7 @@ int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs
 	 * many respects. This is also the same reason why
 	 * side-effects don't trigger hooks.
 	 */
-		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
+		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD)))
 		{
 			SAFE_NOPERM(buff, bufc);
 			return 1;
@@ -1721,7 +1721,7 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 		*p = tolower(*p);
 	}
 
-	cmdp = (CMDENT *)hashfind(fargs[0], &mudstate.command_htab);
+	cmdp = (CMDENT *)hashfind(fargs[0], &mushstate.command_htab);
 
 	if (!cmdp)
 	{
@@ -1729,7 +1729,7 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 		return;
 	}
 
-	if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mudconf.control_flags & CF_BUILD)))
+	if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD)))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;
@@ -1839,7 +1839,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		{
 			cost = (int)strtol(fargs[1], (char **)NULL, 10);
 
-			if (cost < mudconf.createmin || cost > mudconf.createmax)
+			if (cost < mushconf.createmin || cost > mushconf.createmax)
 			{
 				SAFE_LB_STR("#-1 COST OUT OF RANGE", buff, bufc);
 				return;
@@ -1847,7 +1847,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		}
 		else
 		{
-			cost = mudconf.createmin;
+			cost = mushconf.createmin;
 		}
 
 		thing = create_obj(player, TYPE_THING, name, cost);
@@ -2085,7 +2085,7 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 	if (fargs[0] && is_integer(fargs[0]))
 	{
 		qpid = (int)strtol(fargs[0], (char **)NULL, 10);
-		qptr = (BQUE *)nhashfind(qpid, &mudstate.qpid_htab);
+		qptr = (BQUE *)nhashfind(qpid, &mushstate.qpid_htab);
 
 		if (qptr == NULL)
 		{
@@ -2094,11 +2094,11 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 
 		if ((qptr->waittime > 0) && (Good_obj(qptr->sem)))
 		{
-			SAFE_SPRINTF(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mudstate.now, qptr->comm);
+			SAFE_SPRINTF(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mushstate.now, qptr->comm);
 		}
 		else if (qptr->waittime > 0)
 		{
-			SAFE_SPRINTF(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mudstate.now, qptr->comm);
+			SAFE_SPRINTF(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mushstate.now, qptr->comm);
 		}
 		else if (Good_obj(qptr->sem))
 		{
@@ -2171,8 +2171,8 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
      * List all the PIDs that match.
      */
 	bb_p = *bufc;
-	list_qpids(player, player_targ, obj_targ, mudstate.qfirst, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mudstate.qlfirst, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mudstate.qwait, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mudstate.qsemfirst, buff, bufc, bb_p);
+	list_qpids(player, player_targ, obj_targ, mushstate.qfirst, buff, bufc, bb_p);
+	list_qpids(player, player_targ, obj_targ, mushstate.qlfirst, buff, bufc, bb_p);
+	list_qpids(player, player_targ, obj_targ, mushstate.qwait, buff, bufc, bb_p);
+	list_qpids(player, player_targ, obj_targ, mushstate.qsemfirst, buff, bufc, bb_p);
 }

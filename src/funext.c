@@ -206,7 +206,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 		*p = tolower(*p);
 	}
 
-	cmdp = (CMDENT *)hashfind(fargs[0], &mudstate.command_htab);
+	cmdp = (CMDENT *)hashfind(fargs[0], &mushstate.command_htab);
 
 	if (!cmdp || (cmdp->info.handler != do_help))
 	{

@@ -77,7 +77,7 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     bb_p = *bufc;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (!flag && (*bufc != bb_p))
         {
@@ -151,7 +151,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      * Enforce maximum nesting level.
      */
 
-    if (mudstate.in_loop >= MAX_ITER_NESTING - 1)
+    if (mushstate.in_loop >= MAX_ITER_NESTING - 1)
     {
         notify_quiet(player, "Exceeded maximum iteration nesting.");
         return;
@@ -274,15 +274,15 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         return;
     }
 
-    cur_lev = mudstate.in_loop++;
-    mudstate.loop_token[cur_lev] = NULL;
-    mudstate.loop_token2[cur_lev] = NULL;
-    mudstate.loop_number[cur_lev] = 0;
-    mudstate.loop_break[cur_lev] = 0;
+    cur_lev = mushstate.in_loop++;
+    mushstate.loop_token[cur_lev] = NULL;
+    mushstate.loop_token2[cur_lev] = NULL;
+    mushstate.loop_number[cur_lev] = 0;
+    mushstate.loop_break[cur_lev] = 0;
     bb_p = *bufc;
     elen = strlen(ep);
 
-    while ((input_p || input_p2) && !mudstate.loop_break[cur_lev] && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while ((input_p || input_p2) && !mushstate.loop_break[cur_lev] && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (!need_result && (*bufc != bb_p))
         {
@@ -290,20 +290,20 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
 
         if (input_p)
-            mudstate.loop_token[cur_lev] = split_token(&input_p, &isep);
+            mushstate.loop_token[cur_lev] = split_token(&input_p, &isep);
         else
         {
-            mudstate.loop_token[cur_lev] = STRING_EMPTY;
+            mushstate.loop_token[cur_lev] = STRING_EMPTY;
         }
 
         if (input_p2)
-            mudstate.loop_token2[cur_lev] = split_token(&input_p2, &isep);
+            mushstate.loop_token2[cur_lev] = split_token(&input_p2, &isep);
         else
         {
-            mudstate.loop_token2[cur_lev] = STRING_EMPTY;
+            mushstate.loop_token2[cur_lev] = STRING_EMPTY;
         }
 
-        mudstate.loop_number[cur_lev] += 1;
+        mushstate.loop_number[cur_lev] += 1;
         work_buf = XMALLOC(LBUF_SIZE, "work_buf");
 
         /**
@@ -345,7 +345,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     print_separator(&osep, buff, bufc);
                 }
 
-                SAFE_LB_STR(mudstate.loop_token[cur_lev], buff, bufc);
+                SAFE_LB_STR(mushstate.loop_token[cur_lev], buff, bufc);
             }
 
             XFREE(result);
@@ -374,7 +374,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         XFREE(list_str2);
     }
 
-    mudstate.in_loop--;
+    mushstate.in_loop--;
 }
 
 /*
@@ -384,7 +384,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_LTOS(buff, bufc, mudstate.in_loop - 1, LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, mushstate.in_loop - 1, LBUF_SIZE);
 }
 
 void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -392,13 +392,13 @@ void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    if ((lev > mushstate.in_loop - 1) || (lev < 0))
     {
         SAFE_LB_CHR('0', buff, bufc);
         return;
     }
 
-    SAFE_LTOS(buff, bufc, mudstate.loop_number[lev], LBUF_SIZE);
+    SAFE_LTOS(buff, bufc, mushstate.loop_number[lev], LBUF_SIZE);
 }
 
 void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -406,12 +406,12 @@ void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), db
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    if ((lev > mushstate.in_loop - 1) || (lev < 0))
     {
         return;
     }
 
-    SAFE_LB_STR(mudstate.loop_token[lev], buff, bufc);
+    SAFE_LB_STR(mushstate.loop_token[lev], buff, bufc);
 }
 
 void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -419,25 +419,25 @@ void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), d
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    if ((lev > mushstate.in_loop - 1) || (lev < 0))
     {
         return;
     }
 
-    SAFE_LB_STR(mudstate.loop_token2[lev], buff, bufc);
+    SAFE_LB_STR(mushstate.loop_token2[lev], buff, bufc);
 }
 
 void fun_ibreak(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     int lev;
-    lev = mudstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
+    lev = mushstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
 
-    if ((lev > mudstate.in_loop - 1) || (lev < 0))
+    if ((lev > mushstate.in_loop - 1) || (lev < 0))
     {
         return;
     }
 
-    mudstate.loop_break[lev] = 1;
+    mushstate.loop_break[lev] = 1;
 }
 
 /*
@@ -553,7 +553,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     rstore = result;
     result = NULL;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         clist[0] = rstore;
         clist[1] = split_token(&cp, &isep);
@@ -818,7 +818,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     bb_p = *bufc;
     i = 1;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (*bufc != bb_p)
         {
@@ -945,7 +945,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
 
-    for (wc = 0; (wc < nwords) && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU(); wc++)
+    for (wc = 0; (wc < nwords) && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU(); wc++)
     {
         for (i = 0; i < lastn; i++)
         {
@@ -1066,7 +1066,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
     bb_p = *bufc;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (*bufc != bb_p)
         {
@@ -1167,7 +1167,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
     i = -1; /* first letter in string is 0, not 1 */
     cbuf[1] = XMALLOC(SBUF_SIZE, "cbuf[1]");
 
-    while (cp && *cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && *cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (!in_string)
         {
@@ -1535,7 +1535,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     bb_p = *bufc;
     i = 1;
 
-    while (cp && (mudstate.func_invk_ctr < mudconf.func_invk_lim) && !Too_Much_CPU())
+    while (cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
     {
         if (*bufc != bb_p)
         {

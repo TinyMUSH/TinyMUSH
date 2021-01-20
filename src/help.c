@@ -267,7 +267,7 @@ void helpindex_load(dbref player)
 	int i;
 	char *buf = XMALLOC(SBUF_SIZE + 8, "buf");
 
-	if (!mudstate.hfiletab)
+	if (!mushstate.hfiletab)
 	{
 		if ((player != NOTHING) && !Quiet(player))
 			notify(player, "No indexed files have been configured.");
@@ -275,10 +275,10 @@ void helpindex_load(dbref player)
 		return;
 	}
 
-	for (i = 0; i < mudstate.helpfiles; i++)
+	for (i = 0; i < mushstate.helpfiles; i++)
 	{
-		XSPRINTF(buf, "%s.indx", mudstate.hfiletab[i]);
-		helpindex_read(&mudstate.hfile_hashes[i], buf);
+		XSPRINTF(buf, "%s.indx", mushstate.hfiletab[i]);
+		helpindex_read(&mushstate.hfile_hashes[i], buf);
 	}
 
 	if ((player != NOTHING) && !Quiet(player))
@@ -438,7 +438,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	int entry_offset, count;
 	FILE *fp;
 
-	if (hf_num >= mudstate.helpfiles)
+	if (hf_num >= mushstate.helpfiles)
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
 		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
@@ -461,7 +461,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 		*q = '\0';
 	}
 
-	htab_entry = (struct help_entry *)hashfind(tname, &mudstate.hfile_hashes[hf_num]);
+	htab_entry = (struct help_entry *)hashfind(tname, &mushstate.hfile_hashes[hf_num]);
 
 	if (!htab_entry)
 	{
@@ -472,7 +472,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	}
 
 	entry_offset = htab_entry->pos;
-	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
+	XSPRINTF(tbuf, "%s.txt", mushstate.hfiletab[hf_num]);
 
 	if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL)
 	{
@@ -561,7 +561,7 @@ void do_help(dbref player, dbref cause __attribute__((unused)), int key, char *m
 	int hf_num;
 	hf_num = key & ~HELP_RAWHELP;
 
-	if (hf_num >= mudstate.helpfiles)
+	if (hf_num >= mushstate.helpfiles)
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
 		notify(player, "No such indexed file found.");
@@ -569,7 +569,7 @@ void do_help(dbref player, dbref cause __attribute__((unused)), int key, char *m
 		return;
 	}
 
-	XSPRINTF(tbuf, "%s.txt", mudstate.hfiletab[hf_num]);
-	help_write(player, message, &mudstate.hfile_hashes[hf_num], tbuf, (key & HELP_RAWHELP) ? 0 : 1);
+	XSPRINTF(tbuf, "%s.txt", mushstate.hfiletab[hf_num]);
+	help_write(player, message, &mushstate.hfile_hashes[hf_num], tbuf, (key & HELP_RAWHELP) ? 0 : 1);
 	XFREE(tbuf);
 }

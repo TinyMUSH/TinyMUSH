@@ -38,7 +38,7 @@ void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char 
 		process_cmdline(player, cause, command2, cargs, ncargs, NULL);
 	}
 	else
-		wait_que(player, cause, 0, NOTHING, 0, command2, cargs, ncargs, mudstate.rdata);
+		wait_que(player, cause, 0, NOTHING, 0, command2, cargs, ncargs, mushstate.rdata);
 
 	XFREE(command);
 	XFREE(command2);
@@ -98,7 +98,7 @@ void do_dolist(dbref player, dbref cause, int key, char *list, char *command, ch
 	{
 		tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 		XSTRCPY(tbuf, (char *)"@notify me");
-		wait_que(player, cause, 0, NOTHING, A_SEMAPHORE, tbuf, cargs, ncargs, mudstate.rdata);
+		wait_que(player, cause, 0, NOTHING, A_SEMAPHORE, tbuf, cargs, ncargs, mushstate.rdata);
 		XFREE(tbuf);
 	}
 }
@@ -112,9 +112,9 @@ void do_find(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	dbref i, low_bound, high_bound;
 	char *buff;
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mushconf.many_coins);
 		return;
 	}
 
@@ -164,13 +164,13 @@ int get_stats(dbref player, dbref who, STATS *info)
      * Can we afford it?
      */
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mushconf.many_coins);
 		return 0;
 	}
 
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if ((who == NOTHING) || (who == Owner(i)))
 		{
@@ -233,7 +233,7 @@ void do_stats(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	case STAT_PLAYER:
 		if (!(name && *name))
 		{
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "The universe contains %d objects (next free is #%d).", ((mudstate.freelist == NOTHING) ? mudstate.db_top : mudstate.freelist));
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "The universe contains %d objects (next free is #%d).", ((mushstate.freelist == NOTHING) ? mushstate.db_top : mushstate.freelist));
 			return;
 		}
 
@@ -300,12 +300,12 @@ int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)
 	}
 	else
 	{
-		fword1 = CHOWN_OK | mudconf.stripped_flags.word1;
-		fword2 = mudconf.stripped_flags.word2;
-		fword3 = mudconf.stripped_flags.word3;
+		fword1 = CHOWN_OK | mushconf.stripped_flags.word1;
+		fword2 = mushconf.stripped_flags.word2;
+		fword3 = mushconf.stripped_flags.word3;
 	}
 
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if ((Owner(i) == from_player) && (Owner(i) != i))
 		{
@@ -313,7 +313,7 @@ int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)
 			{
 			case TYPE_PLAYER:
 				s_Owner(i, i);
-				q_p += mudconf.player_quota;
+				q_p += mushconf.player_quota;
 				break;
 
 			case TYPE_THING:
@@ -323,17 +323,17 @@ int chown_all(dbref from_player, dbref to_player, dbref acting_player, int key)
 				}
 
 				s_Owner(i, to_player);
-				q_t += mudconf.thing_quota;
+				q_t += mushconf.thing_quota;
 				break;
 
 			case TYPE_ROOM:
 				s_Owner(i, to_player);
-				q_r += mudconf.room_quota;
+				q_r += mushconf.room_quota;
 				break;
 
 			case TYPE_EXIT:
 				s_Owner(i, to_player);
-				q_e += mudconf.exit_quota;
+				q_e += mushconf.exit_quota;
 				break;
 
 			default:
@@ -847,9 +847,9 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
      * make sure player has money to do the search
      */
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s to search. (You need %d)", mudconf.many_coins, mudconf.searchcost);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s to search. (You need %d)", mushconf.many_coins, mushconf.searchcost);
 		return 0;
 	}
 
@@ -864,7 +864,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 	char *buff, *buff2, *atext, *result, *bp, *str;
 	int save_invk_ctr;
 	buff = XMALLOC(SBUF_SIZE, "buff");
-	save_invk_ctr = mudstate.func_invk_ctr;
+	save_invk_ctr = mushstate.func_invk_ctr;
 
 	if (parm->s_rst_ufuntxt)
 	{
@@ -877,7 +877,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 
 	for (thing = parm->low_bound; thing <= parm->high_bound; thing++)
 	{
-		mudstate.func_invk_ctr = save_invk_ctr;
+		mushstate.func_invk_ctr = save_invk_ctr;
 
 		/*
 	 * Check for matching type
@@ -1032,7 +1032,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		XFREE(parm->s_rst_ufuntxt);
 	}
 
-	mudstate.func_invk_ctr = save_invk_ctr;
+	mushstate.func_invk_ctr = save_invk_ctr;
 }
 
 void search_mark(dbref player, int key)
@@ -1082,7 +1082,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	dbref thing, from, to;
 	SEARCH searchparm;
 
-	if ((key != SRCH_SEARCH) && (mudconf.control_flags & CF_DBCHECK))
+	if ((key != SRCH_SEARCH) && (mushconf.control_flags & CF_DBCHECK))
 	{
 		er_mark_disabled(player);
 		return;
@@ -1396,32 +1396,32 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
      * We're walking the db, so this costs as much as a search.
      */
 
-	if (!payfor(player, mudconf.searchcost))
+	if (!payfor(player, mushconf.searchcost))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mudconf.many_coins);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You don't have enough %s.", mushconf.many_coins);
 		return;
 	}
 
 	/*
      * Mark everyplace you can get to via exits from the starting room
      */
-	for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+	for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 	{
-		mudstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits->chunk[i] = (char)0x0;
 	}
 
-	if (Good_loc(mudconf.guest_start_room))
+	if (Good_loc(mushconf.guest_start_room))
 	{
-		mark_place(mudconf.guest_start_room);
+		mark_place(mushconf.guest_start_room);
 	}
 
-	mark_place(Good_loc(mudconf.start_room) ? mudconf.start_room : 0);
+	mark_place(Good_loc(mushconf.start_room) ? mushconf.start_room : 0);
 	/*
      * Report rooms that aren't marked
      */
 	total = 0;
 
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if (isRoom(i) && !Going(i) && !Marked(i))
 		{
@@ -1446,7 +1446,7 @@ void do_markall(dbref player, __attribute__((unused)) dbref cause, int key)
 {
 	int i;
 
-	if (mudconf.control_flags & CF_DBCHECK)
+	if (mushconf.control_flags & CF_DBCHECK)
 	{
 		er_mark_disabled(player);
 		return;
@@ -1454,16 +1454,16 @@ void do_markall(dbref player, __attribute__((unused)) dbref cause, int key)
 
 	if (key == MARK_SET)
 	{
-		for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+		for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 		{
-			mudstate.markbits->chunk[i] = (char)0xff;
+			mushstate.markbits->chunk[i] = (char)0xff;
 		}
 	}
 	else if (key == MARK_CLEAR)
 	{
-		for ((i) = 0; (i) < ((mudstate.db_top + 7) >> 3); (i)++)
+		for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 		{
-			mudstate.markbits->chunk[i] = (char)0x0;
+			mushstate.markbits->chunk[i] = (char)0x0;
 		}
 	}
 
@@ -1484,7 +1484,7 @@ void do_apply_marked(dbref player, dbref cause, __attribute__((unused)) int key,
 	int i;
 	int number = 0;
 
-	if (mudconf.control_flags & CF_DBCHECK)
+	if (mushconf.control_flags & CF_DBCHECK)
 	{
 		er_mark_disabled(player);
 		return;
@@ -1492,7 +1492,7 @@ void do_apply_marked(dbref player, dbref cause, __attribute__((unused)) int key,
 
 	buff = XMALLOC(SBUF_SIZE, "buff");
 
-	for (i = 0; i < mudstate.db_top; i++)
+	for (i = 0; i < mushstate.db_top; i++)
 	{
 		if (Marked(i))
 		{
@@ -1523,8 +1523,8 @@ void olist_push(void)
 {
 	OLSTK *ol;
 	ol = (OLSTK *)XMALLOC(sizeof(OLSTK), "ol");
-	ol->next = mudstate.olist;
-	mudstate.olist = ol;
+	ol->next = mushstate.olist;
+	mushstate.olist = ol;
 	ol->head = NULL;
 	ol->tail = NULL;
 	ol->cblock = NULL;
@@ -1540,16 +1540,16 @@ void olist_pop(void)
 {
 	OLSTK *ol;
 	OBLOCK *op, *onext;
-	ol = mudstate.olist->next;
+	ol = mushstate.olist->next;
 
-	for (op = mudstate.olist->head; op != NULL; op = onext)
+	for (op = mushstate.olist->head; op != NULL; op = onext)
 	{
 		onext = op->next;
 		XFREE(op);
 	}
 
-	XFREE(mudstate.olist);
-	mudstate.olist = ol;
+	XFREE(mushstate.olist);
+	mushstate.olist = ol;
 }
 
 /*
@@ -1560,27 +1560,27 @@ void olist_add(dbref item)
 {
 	OBLOCK *op;
 
-	if (!mudstate.olist->head)
+	if (!mushstate.olist->head)
 	{
 		op = (OBLOCK *)XMALLOC(LBUF_SIZE, "op");
-		mudstate.olist->head = mudstate.olist->tail = op;
-		mudstate.olist->count = 0;
+		mushstate.olist->head = mushstate.olist->tail = op;
+		mushstate.olist->count = 0;
 		op->next = NULL;
 	}
-	else if ((size_t)mudstate.olist->count >= OBLOCK_SIZE)
+	else if ((size_t)mushstate.olist->count >= OBLOCK_SIZE)
 	{
 		op = (OBLOCK *)XMALLOC(LBUF_SIZE, "op");
-		mudstate.olist->tail->next = op;
-		mudstate.olist->tail = op;
-		mudstate.olist->count = 0;
+		mushstate.olist->tail->next = op;
+		mushstate.olist->tail = op;
+		mushstate.olist->count = 0;
 		op->next = NULL;
 	}
 	else
 	{
-		op = mudstate.olist->tail;
+		op = mushstate.olist->tail;
 	}
 
-	op->data[mudstate.olist->count++] = item;
+	op->data[mushstate.olist->count++] = item;
 }
 
 /*
@@ -1589,41 +1589,41 @@ void olist_add(dbref item)
 
 dbref olist_first(void)
 {
-	if (!mudstate.olist->head)
+	if (!mushstate.olist->head)
 	{
 		return NOTHING;
 	}
 
-	if ((mudstate.olist->head == mudstate.olist->tail) && (mudstate.olist->count == 0))
+	if ((mushstate.olist->head == mushstate.olist->tail) && (mushstate.olist->count == 0))
 	{
 		return NOTHING;
 	}
 
-	mudstate.olist->cblock = mudstate.olist->head;
-	mudstate.olist->citm = 0;
-	return mudstate.olist->cblock->data[mudstate.olist->citm++];
+	mushstate.olist->cblock = mushstate.olist->head;
+	mushstate.olist->citm = 0;
+	return mushstate.olist->cblock->data[mushstate.olist->citm++];
 }
 
 dbref olist_next(void)
 {
 	dbref thing;
 
-	if (!mudstate.olist->cblock)
+	if (!mushstate.olist->cblock)
 	{
 		return NOTHING;
 	}
 
-	if ((mudstate.olist->cblock == mudstate.olist->tail) && (mudstate.olist->citm >= mudstate.olist->count))
+	if ((mushstate.olist->cblock == mushstate.olist->tail) && (mushstate.olist->citm >= mushstate.olist->count))
 	{
 		return NOTHING;
 	}
 
-	thing = mudstate.olist->cblock->data[mudstate.olist->citm++];
+	thing = mushstate.olist->cblock->data[mushstate.olist->citm++];
 
-	if (mudstate.olist->citm >= OBLOCK_SIZE)
+	if (mushstate.olist->citm >= OBLOCK_SIZE)
 	{
-		mudstate.olist->cblock = mudstate.olist->cblock->next;
-		mudstate.olist->citm = 0;
+		mushstate.olist->cblock = mushstate.olist->cblock->next;
+		mushstate.olist->citm = 0;
 	}
 
 	return thing;
