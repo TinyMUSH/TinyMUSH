@@ -2793,10 +2793,16 @@ void list_hashstats(dbref player)
  */
 void list_textfiles(dbref player)
 {
-	raw_notify(player, NULL, "Help File        Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
+	char *buff;
+	raw_notify(player, NULL, "Help File       Size    Entries Deleted Empty   Lookups Hits    Checks  Longest");
+	raw_notify(player, NULL, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
 
 	for (int i = 0; i < mushstate.helpfiles; i++)
-		list_hashstat(player, mushstate.hfiletab[i], &mushstate.hfile_hashes[i]);
+	{
+		buff = XASPRINTF("buff", "%-15.15s %7d %7d %7d %7d %7d %7d %7d %7d", basename(mushstate.hfiletab[i]), mushstate.hfile_hashes[i].hashsize, mushstate.hfile_hashes[i].entries, mushstate.hfile_hashes[i].deletes, mushstate.hfile_hashes[i].nulls, mushstate.hfile_hashes[i].scans, mushstate.hfile_hashes[i].hits, mushstate.hfile_hashes[i].checks, mushstate.hfile_hashes[i].max_scan);
+		raw_notify(player, NULL, buff);
+		XFREE(buff);
+	}
 }
 
 /**
