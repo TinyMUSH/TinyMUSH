@@ -31,6 +31,7 @@
 
 // String Functions
 #define XASPRINTF(v, f, ...) __xasprintf(__FILE__, __LINE__, __func__, v, (const char *)(f), ##__VA_ARGS__)
+#define XAVSPRINTF(v, f, a) __xavsprintf(__FILE__, __LINE__, __func__, v, (const char *)(f), a)
 #define XNASPRINTF(f, ...) __xasprintf(NULL, 0, NULL, NULL, (const char *)(f), ##__VA_ARGS__);
 #define XSPRINTF(s, f, ...) __xsprintf((char *)(s), (const char *)(f), ##__VA_ARGS__)
 #define XSPRINTFCAT(s, f, ...) __xsprintfcat((char *)(s), (const char *)(f), ##__VA_ARGS__)

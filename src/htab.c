@@ -473,7 +473,7 @@ char *hashinfo(const char *tab_name, HASHTAB *htab)
 {
     char *buff;
     buff = XMALLOC(MBUF_SIZE, "buff");
-    XSPRINTF(buff, "%-15s %5d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
+    XSPRINTF(buff, "%-15.15s%8d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
     return buff;
 }
 
@@ -747,31 +747,33 @@ NAMETAB *find_nametab_ent_flag(dbref player, NAMETAB *ntab, int flag)
  * display_nametab: Print out the names of the entries in a name table.
  */
 
-void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none)
+void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char *format, ...)
 {
-    char *buf, *bp, *cp;
+    char *prefix, *buf, *bp, *cp;
     NAMETAB *nt;
-    int got_one;
+    bool got_one = false;
     bp = buf = XMALLOC(LBUF_SIZE, "buf");
-    got_one = 0;
 
-    for (cp = prefix; *cp; cp++)
-    {
-        *bp++ = *cp;
-    }
+    va_list ap;
+
+	va_start(ap, format);
+	prefix = XAVSPRINTF("buf", format, ap);
+	va_end(ap);
 
     for (nt = ntab; nt->name; nt++)
     {
         if (God(player) || check_access(player, nt->perm))
         {
-            *bp++ = ' ';
+            if(got_one) {
+                *bp++ = ' ';
+            }
 
             for (cp = nt->name; *cp; cp++)
             {
                 *bp++ = *cp;
             }
 
-            got_one = 1;
+            got_one = true;
         }
     }
 
@@ -779,7 +781,7 @@ void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none
 
     if (got_one || list_if_none)
     {
-        notify(player, buf);
+        raw_notify(player, "%s %s", prefix, buf);
     }
 
     XFREE(buf);
@@ -789,92 +791,58 @@ void display_nametab(dbref player, NAMETAB *ntab, char *prefix, int list_if_none
  * interp_nametab: Print values for flags defined in name table.
  */
 
-void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, char *true_text, char *false_text)
+void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, char *state, char *true_text, char *false_text, bool show_sep)
 {
-    char *buf, *bp, *cp;
-    NAMETAB *nt;
-    buf = XMALLOC(LBUF_SIZE, "buf");
-    bp = buf;
+    NAMETAB *nt = ntab;
 
-    for (cp = prefix; *cp; cp++)
-    {
-        *bp++ = *cp;
+    raw_notify(player, "%-30.30s %s", prefix, state);
+    if(show_sep) {
+        notify(player, "------------------------------ ------------------------------------------------");
     }
-
-    nt = ntab;
-
+    
     while (nt->name)
     {
         if (God(player) || check_access(player, nt->perm))
         {
-            *bp++ = ' ';
-
-            for (cp = nt->name; *cp; cp++)
-            {
-                *bp++ = *cp;
-            }
-
-            *bp++ = '.';
-            *bp++ = '.';
-            *bp++ = '.';
-
-            if ((flagword & nt->flag) != 0)
-            {
-                cp = true_text;
-            }
-            else
-            {
-                cp = false_text;
-            }
-
-            while (*cp)
-            {
-                *bp++ = *cp++;
-            }
-
-            if ((++nt)->name)
-            {
-                *bp++ = ';';
-            }
+            raw_notify(player, "%-30.30s %s", nt->name, (flagword & nt->flag) ? true_text : false_text);
+            ++nt;
         }
     }
-
-    *bp = '\0';
-    notify(player, buf);
-    XFREE(buf);
+    if(show_sep) {
+        notify(player, "-------------------------------------------------------------------------------");
+    }
 }
 
 /* ---------------------------------------------------------------------------
  * listset_nametab: Print values for flags defined in name table.
  */
 
-void listset_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, int list_if_none)
+void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_none, char *format, ...)
 {
-    char *buf, *bp, *cp;
-    NAMETAB *nt;
-    int got_one;
+    char *prefix, *buf, *bp, *cp;
+    NAMETAB *nt = ntab;
+    bool got_one = false;
     buf = bp = XMALLOC(LBUF_SIZE, "buf");
+    va_list ap;
 
-    for (cp = prefix; *cp; cp++)
-    {
-        *bp++ = *cp;
-    }
-
-    nt = ntab;
-    got_one = 0;
+	va_start(ap, format);
+	prefix = XAVSPRINTF("buf", format, ap);
+	va_end(ap);
 
     while (nt->name)
     {
         if (((flagword & nt->flag) != 0) && (God(player) || check_access(player, nt->perm)))
         {
-            *bp++ = ' ';
+            if(got_one) {
+                *bp++ = ' ';
+            }
 
             for (cp = nt->name; *cp; cp++)
             {
                 *bp++ = *cp;
             }
 
-            got_one = 1;
+            got_one = true;
         }
 
         nt++;
@@ -884,10 +852,11 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, in
 
     if (got_one || list_if_none)
     {
-        notify(player, buf);
+        raw_notify(player, "%s%s", prefix, buf);
     }
 
     XFREE(buf);
+    XFREE(prefix);
 }
 
 /* ---------------------------------------------------------------------------

@@ -1877,7 +1877,7 @@ void list_cmdtable(dbref player)
 	 */
 	if (isPlayer(player))
 	{
-		display_nametab(player, logout_cmdtable, buf, 1);
+		display_nametab(player, logout_cmdtable, true, buf);
 	}
 	else
 	{
@@ -1952,7 +1952,7 @@ void list_attrtable(dbref player)
  * @param ctab		Command table
  * @param buff		Buffer for the list
  */
-void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff)
+void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 {
 	CMDENT *cmdp = NULL;
 	ATTR *ap = NULL;
@@ -1969,19 +1969,17 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab, char *buff)
 
 					if (!ap)
 					{
-						XSPRINTF(buff, "%s: user(#%d/?BAD?)", cmdp->cmdname, cmdp->userperms->thing);
+						listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/?BAD?)", cmdp->cmdname, cmdp->userperms->thing);
 					}
 					else
 					{
-						XSPRINTF(buff, "%s: user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, ap->name);
+						listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, ap->name);
 					}
 				}
 				else
 				{
-					XSPRINTF(buff, "%s:", cmdp->cmdname);
+					listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s ", cmdp->cmdname);
 				}
-
-				listset_nametab(player, access_nametab, cmdp->perms, buff, 1);
 			}
 		}
 	}
@@ -1999,7 +1997,10 @@ void list_cmdaccess(dbref player)
 	MODULE *mp = NULL;
 	char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
-	helper_list_cmdaccess(player, command_table, buff);
+	notify(player, "Command                    Permissions");
+	notify(player, "-------------------------- ----------------------------------------------------");
+
+	helper_list_cmdaccess(player, command_table);
 
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -2007,7 +2008,7 @@ void list_cmdaccess(dbref player)
 
 		if ((ctab = (CMDENT *)lt_dlsym(mp->handle, p)) != NULL)
 		{
-			helper_list_cmdaccess(player, ctab, buff);
+			helper_list_cmdaccess(player, ctab);
 		}
 		XFREE(p);
 	}
@@ -2042,10 +2043,12 @@ void list_cmdaccess(dbref player)
 
 		if (!(cmdp->perms & CF_DARK))
 		{
-			XSPRINTF(buff, "%s:", cmdp->cmdname);
-			listset_nametab(player, access_nametab, cmdp->perms, buff, 1);
+			XSPRINTF(buff, "%-26.26s ", cmdp->cmdname);
+			listset_nametab(player, access_nametab, cmdp->perms, true, buff);
 		}
 	}
+
+	notify(player, "-------------------------------------------------------------------------------");
 
 	XFREE(buff);
 }
@@ -2061,6 +2064,9 @@ void list_cmdswitches(dbref player)
 	MODULE *mp = NULL;
 	char *s = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
+	notify(player, "Command          Switches");
+    notify(player, "---------------- ---------------------------------------------------------------");
+
 	for (cmdp = command_table; cmdp->cmdname; cmdp++)
 	{
 		if (cmdp->switches)
@@ -2069,8 +2075,7 @@ void list_cmdswitches(dbref player)
 			{
 				if (!(cmdp->perms & CF_DARK))
 				{
-					XSPRINTF(buff, "%s:", cmdp->cmdname);
-					display_nametab(player, cmdp->switches, buff, 0);
+					display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
 				}
 			}
 		}
@@ -2092,14 +2097,15 @@ void list_cmdswitches(dbref player)
 					{
 						if (!(cmdp->perms & CF_DARK))
 						{
-							XSPRINTF(buff, "%s:", cmdp->cmdname);
-							display_nametab(player, cmdp->switches, buff, 0);
+							display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
 						}
 					}
 				}
 			}
 		}
 	}
+
+	notify(player, "--------------------------------------------------------------------------------");
 
 	XFREE(s);
 	XFREE(buff);
@@ -2113,16 +2119,16 @@ void list_cmdswitches(dbref player)
 void list_attraccess(dbref player)
 {
 	ATTR *ap = NULL;
-
+	notify(player, "Attribute                  Permissions");
+	notify(player, "-------------------------- ----------------------------------------------------");
 	for (ap = attr; ap->name; ap++)
 	{
 		if (Read_attr(player, player, ap, player, 0))
 		{
-			char *buff = XASPRINTF("buff", "%s:", ap->name);
-			listset_nametab(player, attraccess_nametab, ap->flags, buff, 1);
-			XFREE(buff);
+			listset_nametab(player, attraccess_nametab, ap->flags, true, "%-26.26s ", ap->name);
 		}
 	}
+	notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2140,12 +2146,17 @@ void list_attrtypes(dbref player)
 		return;
 	}
 
+	notify(player, "Attribute                  Permissions");
+	notify(player, "-------------------------- ----------------------------------------------------");
+
 	for (kp = mushconf.vattr_flag_list; kp != NULL; kp = kp->next)
 	{
-		char *buff = XASPRINTF("buff", "%s:", kp->name);
-		listset_nametab(player, attraccess_nametab, kp->data, buff, 1);
+		char *buff = XASPRINTF("buff", "%-26.26s ", kp->name);
+		listset_nametab(player, attraccess_nametab, kp->data, true, buff);
 		XFREE(buff);
 	}
+
+	notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2495,7 +2506,15 @@ void list_df_flags(dbref player)
 	char *thingb = decode_flags(player, mushconf.thing_flags);
 	char *robotb = decode_flags(player, mushconf.robot_flags);
 	char *stripb = decode_flags(player, mushconf.stripped_flags);
-	raw_notify(player, "Default flags: Players...P%s  Rooms...R%s  Exits...E%s  Things...%s  Robots...P%s  Stripped...%s", playerb, roomb, exitb, thingb, robotb, stripb);
+	notify(player, "Type           Default flags");
+	notify(player, "-------------- ----------------------------------------------------------------");
+	raw_notify(player, "Players        P%s", playerb);
+	raw_notify(player, "Rooms          R%s", roomb);
+	raw_notify(player, "Exits          E%s", exitb);
+	raw_notify(player, "Things         %s", thingb);
+	raw_notify(player, "Robots         P%s", robotb);
+	raw_notify(player, "Stripped       %s", stripb);
+	notify(player, "-------------------------------------------------------------------------------");
 	XFREE(playerb);
 	XFREE(roomb);
 	XFREE(exitb);
@@ -2513,104 +2532,116 @@ void list_costs(dbref player)
 {
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
-	if (mushconf.quotas)
-	{
-		XSPRINTF(buff, " and %d quota", mushconf.room_quota);
-	}
-
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Digging a room costs %d %s%s.", mushconf.digcost, mushconf.digcost == 1 ? mushconf.one_coin : mushconf.many_coins, buff);
+	notify(player, "Action                                            Minimum   Maximum   Quota");
+	notify(player, "------------------------------------------------- --------- --------- ---------");
 
 	if (mushconf.quotas)
 	{
-		XSPRINTF(buff, " and %d quota", mushconf.exit_quota);
-	}
-
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Opening a new exit costs %d %s%s.", mushconf.opencost, mushconf.opencost == 1 ? mushconf.one_coin : mushconf.many_coins, buff);
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Linking an exit, home, or dropto costs %d %s.", mushconf.linkcost, mushconf.linkcost == 1 ? mushconf.one_coin : mushconf.many_coins);
-
-	if (mushconf.quotas)
-	{
-		XSPRINTF(buff, " and %d quota", mushconf.thing_quota);
-	}
-
-	if (mushconf.createmin == mushconf.createmax)
-	{
-		raw_notify(player, "Creating a new thing costs %d %s%s.", mushconf.createmin, mushconf.createmin == 1 ? mushconf.one_coin : mushconf.many_coins, buff);
+		raw_notify(player, "%-49.49s %-9d           %-9d", "Digging Room", mushconf.digcost, mushconf.room_quota);
 	}
 	else
 	{
-		raw_notify(player, "Creating a new thing costs between %d and %d %s%s.", mushconf.createmin, mushconf.createmax, mushconf.many_coins, buff);
+		raw_notify(player, "%-49.49s %-9d", "Digging Room", mushconf.digcost);
 	}
 
 	if (mushconf.quotas)
 	{
-		XSPRINTF(buff, " and %d quota", mushconf.player_quota);
+		raw_notify(player, "%-49.49s %-9d           %-9d", "Opening Exit", mushconf.opencost, mushconf.exit_quota);
+	}
+	else
+	{
+		raw_notify(player, "%-49.49s %-9d", "Opening Exit", mushconf.opencost);
 	}
 
-	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Creating a robot costs %d %s%s.", mushconf.robotcost, mushconf.robotcost == 1 ? mushconf.one_coin : mushconf.many_coins, buff);
+	raw_notify(player, "%-49.49s %-9d", "Linking Exit or DropTo", mushconf.linkcost);
 
+	if (mushconf.quotas)
+	{
+		raw_notify(player, "%-49.49s %-9d %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax, mushconf.exit_quota);
+	}
+	else {
+		raw_notify(player, "%-49.49s %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax);
+	}
+
+	if (mushconf.quotas)
+	{
+		raw_notify(player, "%-49.49s %-9d           %-9d", "Creating Robot", mushconf.robotcost, mushconf.player_quota);
+	}
+	else
+	{
+		raw_notify(player, "%-49.49s %-9d", "Creating Robot", mushconf.robotcost);
+	}
+
+	raw_notify(player, "%-49.49s %-9d %-9d", "Killing Player", mushconf.killmin, mushconf.killmax);
 	if (mushconf.killmin == mushconf.killmax)
-	{
-		raw_notify(player, "Killing costs %d %s, with a %d%% chance of success.", mushconf.killmin, mushconf.digcost == 1 ? mushconf.one_coin : mushconf.many_coins, (mushconf.killmin * 100) / mushconf.killguarantee);
+	{	
+		raw_notify(player, "  Chance of success: %d%%", (mushconf.killmin * 100) / mushconf.killguarantee);
+
 	}
 	else
 	{
-		raw_notify(player, "Killing costs between %d and %d %s.", mushconf.killmin, mushconf.killmax, mushconf.many_coins);
-		raw_notify(player, "You must spend %d %s to guarantee success.", mushconf.killguarantee, mushconf.digcost == 1 ? mushconf.one_coin : mushconf.many_coins);
+		raw_notify(player, "%-49.49s %-9d", "Guaranted Kill Success", mushconf.killguarantee);
 	}
 
-	raw_notify(player, "Computationally expensive commands and functions (ie: @entrances, @find, @search, @stats (with an argument or switch), search(), and stats()) cost %d %s.", mushconf.searchcost, mushconf.searchcost == 1 ? mushconf.one_coin : mushconf.many_coins);
+	raw_notify(player, "%-49.49s %-9d", "Computationally expensive commands or functions", mushconf.searchcost);
+	raw_notify(player, "  @entrances, @find, @search, @stats,");
+	raw_notify(player, "  search() and stats()");
 
 	if (mushconf.machinecost > 0)
 	{
-		raw_notify(player, "Each command run from the queue costs 1/%d %s.", mushconf.machinecost, mushconf.one_coin);
+		raw_notify(player, "%-49.49s 1/%-7d", "Command run from Queue", mushconf.machinecost);
 	}
 
 	if (mushconf.waitcost > 0)
 	{
-		raw_notify(player, "A %d %s deposit is charged for putting a command on the queue.", mushconf.waitcost, mushconf.one_coin);
-		raw_notify(player, "The deposit is refunded when the command is run or canceled.");
+		raw_notify(player, "%-49.49s %-9d", "Deposit for putting command in Queue", mushconf.waitcost);
+		raw_notify(player, "  Deposit refund when command is run or cancel");
 	}
 
 	if (mushconf.sacfactor == 0)
 	{
-		XSPRINTF(buff, "%d", mushconf.sacadjust);
+		raw_notify(player, "%-49.49s %-9d", "Object Value", mushconf.sacadjust);
 	}
 	else if (mushconf.sacfactor == 1)
 	{
-		if (mushconf.sacadjust < 0)
-			XSPRINTF(buff, "<create cost> - %d", -mushconf.sacadjust);
+		if (mushconf.sacadjust < 0) {
+			raw_notify(player, "%-49.49s Creation Cost - %d", "Object Value", -mushconf.sacadjust);
+		}
 		else if (mushconf.sacadjust > 0)
 		{
-			XSPRINTF(buff, "<create cost> + %d", mushconf.sacadjust);
+			raw_notify(player, "%-49.49s Creation Cost + %d", "Object Value", mushconf.sacadjust);
 		}
 		else
 		{
-			XSPRINTF(buff, "<create cost>");
+			raw_notify(player, "%-49.49s Creation Cost");
 		}
 	}
 	else
 	{
-		if (mushconf.sacadjust < 0)
-			XSPRINTF(buff, "(<create cost> / %d) - %d", mushconf.sacfactor, -mushconf.sacadjust);
+		if (mushconf.sacadjust < 0) {
+			raw_notify(player, "%-49.49s (Creation Cost / %d) - %d", "Object Value", mushconf.sacfactor, -mushconf.sacadjust);
+		}
 		else if (mushconf.sacadjust > 0)
-			XSPRINTF(buff, "(<create cost> / %d) + %d", mushconf.sacfactor, mushconf.sacadjust);
+		{
+			raw_notify(player, "%-49.49s (Creation Cost / %d) + %d", "Object Value", mushconf.sacfactor, mushconf.sacadjust);
+		}
 		else
 		{
-			XSPRINTF(buff, "<create cost> / %d", mushconf.sacfactor);
+			raw_notify(player, "%-49.49s Creation Cost / %d", "Object Value", mushconf.sacfactor);
 		}
 	}
-
-	raw_notify(player, "The value of an object is %s.", buff);
 
 	if (mushconf.clone_copy_cost)
 	{
-		raw_notify(player, "The default value of cloned objects is the value of the original object.");
+		raw_notify(player, "%-49.49s Value Original Object", "Cloned Object Value");
 	}
 	else
 	{
-		raw_notify(player, "The default value of cloned objects is %d %s.", mushconf.createmin, mushconf.createmin == 1 ? mushconf.one_coin : mushconf.many_coins);
+		raw_notify(player, "%-49.49s %-9d", "Cloned Object Value", mushconf.createmin);
 	}
+
+	notify(player, "-------------------------------------------------------------------------------");
+	raw_notify(player, "All costs are in %s", mushconf.many_coins);
 
 	XFREE(buff);
 }
@@ -2624,44 +2655,123 @@ void list_params(dbref player)
 {
 	time_t now = time(NULL);
 
-	raw_notify(player, "Prototypes:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mushconf.room_proto, mushconf.exit_proto, mushconf.thing_proto, mushconf.player_proto);
-	raw_notify(player, "Attr Defaults:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mushconf.room_defobj, mushconf.exit_defobj, mushconf.thing_defobj, mushconf.player_defobj);
-	raw_notify(player, "Default Parents:  Room...#%d  Exit...#%d  Thing...#%d  Player...#%d", mushconf.room_parent, mushconf.exit_parent, mushconf.thing_parent, mushconf.player_parent);
-	raw_notify(player, NULL, "Limits:");
-	raw_notify(player, "  Function recursion...%d  Function invocation...%d", mushconf.func_nest_lim, mushconf.func_invk_lim);
-	raw_notify(player, "  Command recursion...%d  Command invocation...%d", mushconf.cmd_nest_lim, mushconf.cmd_invk_lim);
-	raw_notify(player, "  Output...%d  Queue...%d  CPU...%d  Wild...%d  Aliases...%d", mushconf.output_limit, mushconf.queuemax, mushconf.func_cpu_lim_secs, mushconf.wild_times_lim, mushconf.max_player_aliases);
-	raw_notify(player, "  Forwardlist...%d  Propdirs... %d  Registers...%d  Stacks...%d", mushconf.fwdlist_lim, mushconf.propdir_lim, mushconf.register_limit, mushconf.stack_lim);
-	raw_notify(player, "  Variables...%d  Structures...%d  Instances...%d", mushconf.numvars_lim, mushconf.struct_lim, mushconf.instance_lim);
-	raw_notify(player, "  Objects...%d  Allowance...%d  Trace levels...%d  Connect tries...%d", mushconf.building_limit, mushconf.paylimit, mushconf.trace_limit, mushconf.retry_limit);
+	notify(player, "Prototype           Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Room                #%d", mushconf.room_proto);
+	raw_notify(player, "Exit                #%d", mushconf.exit_proto);
+	raw_notify(player, "Thing               #%d", mushconf.thing_proto);
+	raw_notify(player, "Player              #%d", mushconf.player_proto);
+	notify(player, "\nAttr Default        Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Room                #%d", mushconf.room_defobj);
+	raw_notify(player, "Exit                #%d", mushconf.exit_defobj);
+	raw_notify(player, "Thing               #%d", mushconf.thing_defobj);
+	raw_notify(player, "Player              #%d", mushconf.player_defobj);
+	notify(player, "\nDefault Parents     Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Room                #%d", mushconf.room_parent);
+	raw_notify(player, "Exit                #%d", mushconf.exit_parent);
+	raw_notify(player, "Thing               #%d", mushconf.thing_parent);
+	raw_notify(player, "Player              #%d", mushconf.player_parent);
+	notify(player, "\nLimits              Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Function recursion  %d", mushconf.func_nest_lim);
+	raw_notify(player, "Function invocation %d", mushconf.func_invk_lim);
+	raw_notify(player, "Command recursion   %d", mushconf.cmd_nest_lim);
+	raw_notify(player, "Command invocation  %d", mushconf.cmd_invk_lim);
+	raw_notify(player, "Output              %d", mushconf.output_limit);
+	raw_notify(player, "Queue               %d", mushconf.queuemax);
+	raw_notify(player, "CPU                 %d", mushconf.func_cpu_lim_secs);
+	raw_notify(player, "Wild                %d", mushconf.wild_times_lim);
+	raw_notify(player, "Aliases             %d", mushconf.max_player_aliases);
+	raw_notify(player, "Forwardlist         %d", mushconf.fwdlist_lim);
+	raw_notify(player, "Propdirs            %d", mushconf.propdir_lim);
+	raw_notify(player, "Registers           %d", mushconf.register_limit);
+	raw_notify(player, "Stacks              %d", mushconf.stack_lim);
+	raw_notify(player, "Variables           %d", mushconf.numvars_lim);
+	raw_notify(player, "Structures          %d", mushconf.struct_lim);
+	raw_notify(player, "Instances           %d", mushconf.instance_lim);
+	raw_notify(player, "Objects             %d", mushconf.building_limit);
+	raw_notify(player, "Allowance           %d", mushconf.paylimit);
+	raw_notify(player, "Trace levels        %d", mushconf.trace_limit);
+	raw_notify(player, "Connect tries       %d", mushconf.retry_limit);
 
 	if (mushconf.max_players >= 0)
 	{
-		raw_notify(player, "  Logins...%d", mushconf.max_players);
+		raw_notify(player, "Logins              %d", mushconf.max_players);
 	}
 
-	raw_notify(player, "Nesting:  Locks...%d  Parents...%d  Messages...%d  Zones...%d", mushconf.lock_nest_lim, mushconf.parent_nest_lim, mushconf.ntfy_nest_lim, mushconf.zone_nest_lim);
-	raw_notify(player, "Timeouts:  Idle...%d  Connect...%d  Tries...%d  Lag...%d", mushconf.idle_timeout, mushconf.conn_timeout, mushconf.retry_limit, mushconf.max_cmdsecs);
-	raw_notify(player, "Money:  Start...%d  Daily...%d  Singular: %s  Plural: %s", mushconf.paystart, mushconf.paycheck, mushconf.one_coin, mushconf.many_coins);
+	notify(player, "\nNesting             Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Locks               %d", mushconf.lock_nest_lim);
+	raw_notify(player, "Parents             %d", mushconf.parent_nest_lim);
+	raw_notify(player, "Messages            %d", mushconf.ntfy_nest_lim);
+	raw_notify(player, "Zones               %d", mushconf.zone_nest_lim);
+	notify(player, "\nTimeouts            Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Idle                %d", mushconf.idle_timeout);
+	raw_notify(player, "Connect             %d", mushconf.conn_timeout);
+	raw_notify(player, "Tries               %d", mushconf.retry_limit);
+	raw_notify(player, "Lag                 %d", mushconf.max_cmdsecs);
+	notify(player, "\nMoney               Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Start               %d", mushconf.paystart);
+	raw_notify(player, "Daily               %d", mushconf.paycheck);
+	raw_notify(player, "Singular            %s", mushconf.one_coin);
+	raw_notify(player, "Plural              %s", mushconf.many_coins);
 
 	if (mushconf.payfind > 0)
 	{
-		raw_notify(player, "Chance of finding money: 1 in %d", mushconf.payfind);
+		raw_notify(player, "Find money          1 chance in %d", mushconf.payfind);
 	}
 
-	raw_notify(player, "Start Quotas:  Total...%d  Rooms...%d  Exits...%d  Things...%d  Players...%d", mushconf.start_quota, mushconf.start_room_quota, mushconf.start_exit_quota, mushconf.start_thing_quota, mushconf.start_player_quota);
-	raw_notify(player, NULL, "Dbrefs:");
-	raw_notify(player, "  MasterRoom...#%d  StartRoom...#%d  StartHome...#%d  DefaultHome...#%d", mushconf.master_room, mushconf.start_room, mushconf.start_home, mushconf.default_home);
+	notify(player, "\nStart Quotas        Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Total               %d", mushconf.start_quota);
+	raw_notify(player, "Rooms               %d", mushconf.start_room_quota);
+	raw_notify(player, "Exits               %d", mushconf.start_exit_quota);
+	raw_notify(player, "Things              %d", mushconf.start_thing_quota);
+	raw_notify(player, "Players             %d", mushconf.start_player_quota);
+
+	notify(player, "\nDbrefs              Value");
+	notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "Master Room         #%d", mushconf.master_room);
+	raw_notify(player, "Start Room          #%d", mushconf.start_room);
+	raw_notify(player, "Start Home          #%d", mushconf.start_home);
+	raw_notify(player, "Default Home        #%d", mushconf.default_home);
 
 	if (Wizard(player))
 	{
-		raw_notify(player, "  GuestChar...#%d  GuestStart...#%d  Freelist...#%d", mushconf.guest_char, mushconf.guest_start_room, mushstate.freelist);
-		raw_notify(player, "Queue run sizes:  No net activity... %d  Activity... %d", mushconf.queue_chunk, mushconf.active_q_chunk);
-		raw_notify(player, "Intervals:  Dump...%d  Clean...%d  Idlecheck...%d  Optimize...%d", mushconf.dump_interval, mushconf.check_interval, mushconf.idle_interval, mushconf.dbopt_interval);
-		raw_notify(player, "Timers:  Dump...%d  Clean...%d  Idlecheck...%d", (int)(mushstate.dump_counter - now), (int)(mushstate.check_counter - now), (int)(mushstate.idle_counter - now));
-		raw_notify(player, "Scheduling:  Timeslice...%d  Max_Quota...%d  Increment...%d", mushconf.timeslice, mushconf.cmd_quota_max, mushconf.cmd_quota_incr);
-		raw_notify(player, "Size of attribute cache:  Width...%d  Size...%d", mushconf.cache_width, mushconf.cache_size);
+		raw_notify(player, "Guest Char          #%d", mushconf.guest_char);
+		raw_notify(player, "GuestStart          #%d", mushconf.guest_start_room);
+		raw_notify(player, "Freelist            #%d", mushstate.freelist);
+
+		notify(player, "\nQueue run sizes     Value");
+		notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "No net activity     %d", mushconf.queue_chunk);
+		raw_notify(player, "Activity            %d", mushconf.active_q_chunk);
+		notify(player, "\nIntervals           Value");
+		notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "Dump                %d", mushconf.dump_interval);
+		raw_notify(player, "Clean               %d", mushconf.check_interval);
+		raw_notify(player, "Idle Check          %d", mushconf.idle_interval);
+		raw_notify(player, "Optimize            %d", mushconf.dbopt_interval);
+		notify(player, "\nTimers              Value");
+		notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "Dump                %d", (int)(mushstate.dump_counter - now));
+		raw_notify(player, "Clean               %d", (int)(mushstate.check_counter - now));
+		raw_notify(player, "Idle Check          %d", (int)(mushstate.idle_counter - now));
+		notify(player, "\nScheduling          Value");
+		notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "Timeslice           %d", mushconf.timeslice);
+		raw_notify(player, "Max_Quota           %d", mushconf.cmd_quota_max);
+		raw_notify(player, "Increment           %d", mushconf.cmd_quota_incr);
+		notify(player, "\nAttribute cache     Value");
+		notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "Width               %d", mushconf.cache_width);
+		raw_notify(player, "Size                %d", mushconf.cache_size);
 	}
+	notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2674,18 +2784,18 @@ void list_vattrs(dbref player)
 	VATTR *va = NULL;
 	int na = 0;
 
-	raw_notify(player, NULL, "--- User-Defined Attributes ---");
+	notify(player, "User-Defined Attributes    Attr ID  Permissions");
+	notify(player, "-------------------------- -------- -------------------------------------------");
 
 	for (va = vattr_first(), na = 0; va; va = vattr_next(va), na++)
 	{
 		if (!(va->flags & AF_DELETED))
 		{
-			char *buff = XASPRINTF("buff", "%s(%d):", va->name, va->number);
-			listset_nametab(player, attraccess_nametab, va->flags, buff, 1);
-			XFREE(buff);
+			listset_nametab(player, attraccess_nametab, va->flags, true, "%-26.26s %-8d ", va->name, va->number);
 		}
 	}
 
+	notify(player, "-------------------------------------------------------------------------------");
 	raw_notify(player, "%d attributes, next=%d", na, mushstate.attr_next);
 }
 
@@ -2700,7 +2810,7 @@ void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
 	char *buff = hashinfo(tab_name, htab);
 
-	raw_notify(player, NULL, buff);
+	notify(player, buff);
 
 	XFREE(buff);
 }
@@ -2716,7 +2826,7 @@ void list_nhashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
 	char *buff = nhashinfo(tab_name, htab);
 
-	raw_notify(player, NULL, buff);
+	notify(player, buff);
 
 	XFREE(buff);
 }
@@ -2732,7 +2842,8 @@ void list_hashstats(dbref player)
 	MODHASHES *m_htab = NULL, *hp = NULL, *m_ntab = NULL, *np = NULL;
 	char *s = NULL;
 
-	raw_notify(player, NULL, "Hash Stats       Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
+	notify(player, "Hash Stats         Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
+	notify(player, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
 	list_hashstat(player, "Commands", &mushstate.command_htab);
 	list_hashstat(player, "Logged-out Cmds", &mushstate.logout_cmd_htab);
 	list_hashstat(player, "Functions", &mushstate.func_htab);
@@ -2784,6 +2895,7 @@ void list_hashstats(dbref player)
 			}
 		}
 	}
+	notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2793,16 +2905,15 @@ void list_hashstats(dbref player)
  */
 void list_textfiles(dbref player)
 {
-	char *buff;
 	raw_notify(player, NULL, "Help File       Size    Entries Deleted Empty   Lookups Hits    Checks  Longest");
 	raw_notify(player, NULL, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
 
 	for (int i = 0; i < mushstate.helpfiles; i++)
 	{
-		buff = XASPRINTF("buff", "%-15.15s %7d %7d %7d %7d %7d %7d %7d %7d", basename(mushstate.hfiletab[i]), mushstate.hfile_hashes[i].hashsize, mushstate.hfile_hashes[i].entries, mushstate.hfile_hashes[i].deletes, mushstate.hfile_hashes[i].nulls, mushstate.hfile_hashes[i].scans, mushstate.hfile_hashes[i].hits, mushstate.hfile_hashes[i].checks, mushstate.hfile_hashes[i].max_scan);
-		raw_notify(player, NULL, buff);
-		XFREE(buff);
+		raw_notify(player, "%-15.15s %7d %7d %7d %7d %7d %7d %7d %7d", basename(mushstate.hfiletab[i]), mushstate.hfile_hashes[i].hashsize, mushstate.hfile_hashes[i].entries, mushstate.hfile_hashes[i].deletes, mushstate.hfile_hashes[i].nulls, mushstate.hfile_hashes[i].scans, mushstate.hfile_hashes[i].hits, mushstate.hfile_hashes[i].checks, mushstate.hfile_hashes[i].max_scan);
 	}
+
+	raw_notify(player, NULL, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2812,16 +2923,18 @@ void list_textfiles(dbref player)
  */
 void list_db_stats(dbref player)
 {
-	raw_notify(player, "DB Cache Stats   Writes       Reads  (over %d seconds)", (int)(time(NULL) - cs_ltime));
-	raw_notify(player, "Calls      %12d%12d", cs_writes, cs_reads);
-	raw_notify(player, "Cache Hits %12d%12d", cs_whits, cs_rhits);
-	raw_notify(player, "I/O        %12d%12d", cs_dbwrites, cs_dbreads);
-	raw_notify(player, "Failed                 %12d", cs_fails);
-	raw_notify(player, "Hit ratio            %2.0f%%         %2.0f%%", (cs_writes ? (float)cs_whits / cs_writes * 100 : 0.0), (cs_reads ? (float)cs_rhits / cs_reads * 100 : 0.0));
-	raw_notify(player, "\nDeletes    %12d", cs_dels);
-	raw_notify(player, "Checks     %12d", cs_checks);
-	raw_notify(player, "Syncs      %12d", cs_syncs);
-	raw_notify(player, "Cache Size %12d bytes", cs_size);
+	notify(player, "DB Cache Stats              Writes                    Reads");
+	    notify(player, "--------------------------- ------------------------- -------------------------");
+	raw_notify(player, "Calls                       %-25d %-25d", cs_writes, cs_reads);
+	raw_notify(player, "Cache Hits                  %-25d %-25d", cs_whits, cs_rhits);
+	raw_notify(player, "I/O                         %-25d %-25d", cs_dbwrites, cs_dbreads);
+	raw_notify(player, "Failed                                                %-25d", cs_fails);
+	raw_notify(player, "Hit ratio                   %-3.0f%%                      %-3.0f%%", (cs_writes ? (float)cs_whits / cs_writes * 100 : 0.0), (cs_reads ? (float)cs_rhits / cs_reads * 100 : 0.0));
+	raw_notify(player, "Deletes                     %d", cs_dels);
+	raw_notify(player, "Checks                      %d", cs_checks);
+	raw_notify(player, "Syncs                       %d", cs_syncs);
+	notify(player, "-------------------------------------------------------------------------------");
+	raw_notify(player, "Cache size: %d bytes. Cache time: %d seconds.", cs_size, (int)(time(NULL) - cs_ltime));
 }
 
 /**
@@ -2858,6 +2971,23 @@ void list_process(dbref player)
 #endif
 }
 
+void print_memory(dbref player, const char *item, size_t size)
+{
+
+	if (size < 1024)
+	{
+		raw_notify(player, "%-30.30s %0.2fB", item, size);
+	}
+	else if (size < 1048576)
+	{
+		raw_notify(player, "%-30.30s %0.2fK", item, size / 1024.0);
+	}
+	else
+	{
+		raw_notify(player, "%-30.30s %0.2fM", item, size / 1048576.0);
+	}
+}
+
 /**
  * @brief Breaks down memory usage of the process
  * 
@@ -2887,7 +3017,10 @@ void list_memory(dbref player)
 	 * 
 	 */
 	each = mushstate.db_top * sizeof(OBJ);
-	raw_notify(player, "Object structures: %12.2fk", each / 1024);
+	//raw_notify(player, "%-20s %12.2fk", "Object structures", each / 1024);
+	raw_notify(player, "Item                          Size");
+	raw_notify(player, "------------------------------ ------------------------------------------------");
+	print_memory(player, "Object structures", each);
 	total += each;
 #ifdef MEMORY_BASED
 	each = 0;
@@ -2899,7 +3032,7 @@ void list_memory(dbref player)
 		each += obj_siz(&(db[i].attrtext));
 		each -= sizeof(Obj);
 	}
-	raw_notify(player, "Stored attrtext  : %12.2fk", each / 1024);
+	print_memory(player, "Stored attrtext", each);
 	total += each;
 #endif
 	/**
@@ -2907,14 +3040,14 @@ void list_memory(dbref player)
 	 * 
 	 */
 	each = sizeof(CONFDATA) + sizeof(STATEDATA);
-	raw_notify(player, "mushconf/mushstate : %12.2fk", each / 1024);
+	print_memory(player, "mushconf/mushstate", each);
 	total += each;
 	/**
 	 * Calculate size of cache
 	 * 
 	 */
 	each = cs_size;
-	raw_notify(player, "Cache data       : %12.2fk", each / 1024);
+	print_memory(player, "Cache data", each);
 	total += each;
 	each = sizeof(UDB_CHAIN) * mushconf.cache_width;
 
@@ -2929,8 +3062,8 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Cache keys       : %12.2fk", each2 / 1024);
-	raw_notify(player, "Cache overhead   : %12.2fk", each / 1024);
+	print_memory(player, "Cache keys", each2);
+	print_memory(player, "Cache overhead", each);
 	total += each + each2;
 	/**
 	 * Calculate size of object pipelines
@@ -2946,7 +3079,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Object pipelines : %12.2fk", each / 1024);
+	print_memory(player, "Object pipelines", each);
 	total += each;
 	/**
 	 * Calculate size of name caches
@@ -2966,7 +3099,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Name caches      : %12.2fk", each / 1024);
+	print_memory(player, "Name caches", each);
 	total += each;
 	/**
 	 * Calculate size of Raw Memory allocations
@@ -2974,7 +3107,7 @@ void list_memory(dbref player)
 	 */
 	each = total_rawmemory();
 
-	raw_notify(player, "Raw Memory       : %12.2fk", each / 1024);
+	print_memory(player, "Raw Memory", each);
 	total += each;
 	/**
 	 * Calculate size of command hashtable
@@ -3029,7 +3162,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Command table    : %12.2fk", each / 1024);
+	print_memory(player, "Command table", each);
 	total += each;
 	/**
 	 * Calculate size of logged-out commands hashtable
@@ -3058,7 +3191,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Logout cmd htab  : %12.2fk", each / 1024);
+	print_memory(player, "Logout cmd htab", each);
 	total += each;
 	/**
 	 * Calculate size of functions hashtable
@@ -3089,7 +3222,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Functions htab   : %12.2fk", each / 1024);
+	print_memory(player, "Functions htab", each);
 	total += each;
 	/**
 	 * Calculate size of user-defined functions hashtable
@@ -3123,7 +3256,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "U-functions htab : %12.2fk", each / 1024);
+	print_memory(player, "U-functions htab", each);
 	total += each;
 	/**
 	 * Calculate size of flags hashtable
@@ -3155,7 +3288,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Flags htab       : %12.2fk", each / 1024);
+	print_memory(player, "Flags htab", each);
 	total += each;
 	/**
 	 * Calculate size of powers hashtable
@@ -3187,7 +3320,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Powers htab      : %12.2fk", each / 1024);
+	print_memory(player, "Powers htab", each);
 	total += each;
 	/**
 	 * Calculate size of helpfile hashtables
@@ -3218,7 +3351,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Helpfiles htabs  : %12.2fk", each / 1024);
+	print_memory(player, "Helpfiles htabs", each);
 	total += each;
 	/**
 	 * Calculate size of vattr name hashtable
@@ -3240,7 +3373,7 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Vattr name htab  : %12.2fk", each / 1024);
+	print_memory(player, "Vattr name htab", each);
 	total += each;
 	/**
 	 * Calculate size of attr name hashtable
@@ -3269,14 +3402,14 @@ void list_memory(dbref player)
 		}
 	}
 
-	raw_notify(player, "Attr name htab   : %12.2fk", each / 1024);
+	print_memory(player, "Attr name htab", each);
 	total += each;
 	/**
 	 * Calculate the size of anum_table
 	 * 
 	 */
 	each = sizeof(ATTR *) * anum_alc_top;
-	raw_notify(player, "Attr num table   : %12.2fk", each / 1024);
+	print_memory(player, "Attr num table", each);
 	total += each;
 
 	/**
@@ -3298,7 +3431,7 @@ void list_memory(dbref player)
 
 	if (each)
 	{
-		raw_notify(player, "Object stacks    : %12.2fk", each / 1024);
+		print_memory(player, "Object stacks", each);
 	}
 
 	total += each;
@@ -3327,7 +3460,7 @@ void list_memory(dbref player)
 
 	if (each)
 	{
-		raw_notify(player, "Object grids     : %12.2fk", each / 1024);
+		print_memory(player, "Object grids", each);
 	}
 
 	total += each;
@@ -3374,7 +3507,7 @@ void list_memory(dbref player)
 
 	if (each)
 	{
-		raw_notify(player, "Struct var defs  : %12.2fk", each / 1024);
+		print_memory(player, "Struct var defs", each);
 	}
 
 	total += each;
@@ -3396,7 +3529,7 @@ void list_memory(dbref player)
 
 	if (each)
 	{
-		raw_notify(player, "Struct var data  : %12.2fk", each / 1024);
+		print_memory(player, "Struct var data", each);
 	}
 
 	total += each;
@@ -3404,7 +3537,8 @@ void list_memory(dbref player)
 	 * Report end total.
 	 * 
 	 */
-	raw_notify(player, "\r\nTotal            : %12.2fk", total / 1024);
+	raw_notify(player, "-------------------------------------------------------------------------------");
+	print_memory(player, "Total", total);
 }
 
 /**
@@ -3470,7 +3604,7 @@ void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attr
 		break;
 
 	case LIST_GLOBALS:
-		interp_nametab(player, enable_names, mushconf.control_flags, (char *)"Global parameters:", (char *)"enabled", (char *)"disabled");
+		interp_nametab(player, enable_names, mushconf.control_flags, (char *)"Global parameters", (char *)"Status", (char *)"enabled", (char *)"disabled", true);
 		break;
 
 	case LIST_DF_FLAGS:
@@ -3502,8 +3636,9 @@ void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attr
 		break;
 
 	case LIST_LOGGING:
-		interp_nametab(player, logoptions_nametab, mushconf.log_options, (char *)"Events Logged:", (char *)"enabled", (char *)"disabled");
-		interp_nametab(player, logdata_nametab, mushconf.log_info, (char *)"Information Logged:", (char *)"yes", (char *)"no");
+		interp_nametab(player, logoptions_nametab, mushconf.log_options, (char *)"Events Logged", (char *)"Status", (char *)"enabled", (char *)"disabled", true);
+		notify(player, "");
+		interp_nametab(player, logdata_nametab, mushconf.log_info, (char *)"Information Type", (char *)"Logged", (char *)"yes", (char *)"no", true);
 		break;
 
 	case LIST_DB_STATS:
@@ -3547,6 +3682,6 @@ void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attr
 		break;
 
 	default:
-		display_nametab(player, list_names, (char *)"Unknown option.  Use one of:", 1);
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
 	}
 }

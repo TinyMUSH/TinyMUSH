@@ -25,7 +25,7 @@
  * 
  */
 #define XLOGALLOC(x, y, z, s, ...)            \
-	if (mushconf.malloc_logger)                \
+	if (mushconf.malloc_logger)               \
 	{                                         \
 		log_write(x, y, z, s, ##__VA_ARGS__); \
 	}
@@ -394,6 +394,63 @@ char *__xasprintf(const char *file, int line, const char *function, const char *
 }
 
 /**
+ * @brief Tracked vsprintf replacement that create a new formatted string buffer.
+ * 
+ * Much like vsprintf, but create a new buffer sized for the resulting string. Memory 
+ * for the new string is tracked, and must be freed with __xfree().
+ * 
+ * Do not call this directly, use the wrapper macro XAVSPRINTF(const char *var, const char *format, ...)
+ * that will fill most of the banks for you.
+ * 
+ * @param file     Filename where the allocation is done.
+ * @param line     Line number where the allocation is done.
+ * @param function Function where the allocation is done.
+ * @param var      Name of the variable that will receive the pointer (not the variable itself).
+ * @param format   Format string.
+ * @param ...      Variables arguments for the format string.
+ * @return char*   Pointer to the new string buffer.
+ */
+char *__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)
+{
+	int size = 0;
+	char *str = NULL;
+	va_list ap;
+
+	va_copy(ap, va);
+	size = vsnprintf(str, size, format, ap);
+	va_end(ap);
+
+	if (size > 0)
+	{
+		size++;
+		if (var)
+		{
+			str = (char *)__xmalloc(size, file, line, function, var);
+		}
+		else
+		{
+			str = (char *)calloc(size, sizeof(char));
+		}
+
+		if (str)
+		{
+			va_copy(ap, va);
+			size = vsnprintf(str, size, format, ap);
+			va_end(ap);
+
+			if (size < 0)
+			{
+				__xfree(str);
+				str = NULL;
+			}
+		}
+	}
+
+	return str;
+}
+
+
+/**
  * @brief Tracked sprintf replacement.
  * 
  * Like sprintf, but make sure that the buffer does not overflow if the buffer is tracked.
@@ -568,7 +625,7 @@ char *__xsafesprintf(char *buff, char **bufp, const char *format, ...)
 	va_list ap;
 
 	va_start(ap, format);
-	*bufp += XVSPRINTF(*bufp, format, ap);
+	*bufp += __xvsprintf(*bufp, format, ap);
 	va_end(ap);
 	return (buff);
 }
@@ -1065,7 +1122,7 @@ void *__xmemset(void *s, int c, size_t n)
  */
 void list_bufstats(dbref player)
 {
-	notify(player, "This feature has been removed.");
+	list_rawmemory(player);
 }
 
 /**
@@ -1075,7 +1132,7 @@ void list_bufstats(dbref player)
  */
 void list_buftrace(dbref player)
 {
-	notify(player, "This feature has been removed.");
+	list_rawmemory(player);
 }
 
 /**
@@ -1092,8 +1149,8 @@ int __xsorttrace(const void *p1, const void *p2)
 	char *s1 = NULL, *s2 = NULL;
 	int r = 0;
 
-	s1 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p1)->file, (*(MEMTRACK **)p1)->line, (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
-	s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p2)->file, (*(MEMTRACK **)p2)->line, (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
+	s1 = XNASPRINTF("%-15.15s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p1)->file, (*(MEMTRACK **)p1)->line, (*(MEMTRACK **)p1)->function, (*(MEMTRACK **)p1)->var);
+	s2 = XNASPRINTF("%-15.15s %6d %-19.19s %-20.20s", (*(MEMTRACK **)p2)->file, (*(MEMTRACK **)p2)->line, (*(MEMTRACK **)p2)->function, (*(MEMTRACK **)p2)->var);
 
 	r = strcmp(s1, s2);
 
@@ -1119,8 +1176,8 @@ void list_rawmemory(dbref player)
 	size_t i = 0, j = 0;
 	char *s1 = NULL, *s2 = NULL;
 
-	notify(player, "File             Line   Function            Variable             Allocs Bytes   ");
-	notify(player, "---------------- ------ ------------------- -------------------- ------ --------");
+	notify(player, "File              Line Function            Variable             Allocs    Bytes");
+	notify(player, "--------------- ------ ------------------- -------------------- ------ --------");
 
 	if (mushstate.raw_allocs != NULL)
 	{
@@ -1145,10 +1202,10 @@ void list_rawmemory(dbref player)
 			{
 				u_tags++;
 
-				s1 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[i]->file, t_array[i]->line, t_array[i]->function, t_array[i]->var);
+				s1 = XNASPRINTF("%-15.15s %6d %-19.19s %-20.20s", t_array[i]->file, t_array[i]->line, t_array[i]->function, t_array[i]->var);
 				if (t_array[i + 1] != NULL)
 				{
-					s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[i + 1]->file, t_array[i + 1]->line, t_array[i + 1]->function, t_array[i + 1]->var);
+					s2 = XNASPRINTF("%-15.15s %6d %-19.19s %-20.20s", t_array[i + 1]->file, t_array[i + 1]->line, t_array[i + 1]->function, t_array[i + 1]->var);
 				}
 				else
 				{
@@ -1164,7 +1221,7 @@ void list_rawmemory(dbref player)
 					for (j = i + 2; (j < n_tags); j++)
 					{
 
-						s2 = XNASPRINTF("%-16.16s %6d %-19.19s %-20.20s", t_array[j]->file, t_array[j]->line, t_array[j]->function, t_array[j]->var);
+						s2 = XNASPRINTF("%-15.15s %6d %-19.19s %-20.20s", t_array[j]->file, t_array[j]->line, t_array[j]->function, t_array[j]->var);
 
 						if (strcmp(s1, s2))
 						{
@@ -1189,15 +1246,15 @@ void list_rawmemory(dbref player)
 
 				if (c_total < 1024)
 				{
-					raw_notify(player, "%-64.64s %6ld %8ld", s1, c_tags, c_total);
+					raw_notify(player, "%-63.63s %6ld %8ld", s1, c_tags, c_total);
 				}
 				else if (c_total < 1048756)
 				{
-					raw_notify(player, "%-64.64s %6ld %7.2fK", s1, c_tags, (float)c_total / 1024.0);
+					raw_notify(player, "%-63.63s %6ld %7.2fK", s1, c_tags, (float)c_total / 1024.0);
 				}
 				else
 				{
-					raw_notify(player, "%-64.64s %6ld %7.2fM", s1, c_tags, (float)c_total / 1048756.0);
+					raw_notify(player, "%-63.63s %6ld %7.2fM", s1, c_tags, (float)c_total / 1048756.0);
 				}
 				free(s1);
 			}
@@ -1208,24 +1265,36 @@ void list_rawmemory(dbref player)
 		{
 			u_tags = 1;
 			s1 = XNASPRINTF("%s:%s", mushstate.raw_allocs->function, mushstate.raw_allocs->var);
-			if (c_total < 1024)
+			if (total < 1024)
 			{
-				raw_notify(player, "%-64.64s %6ld %8ld", s1, n_tags, total);
+				raw_notify(player, "%-63.63s %6ld %8ld", s1, n_tags, total);
 			}
-			else if (c_total < 1048756)
+			else if (total < 1048756)
 			{
-				raw_notify(player, "%-64.64s %6ld %7.2fK", s1, n_tags, (float)total / 1024.0);
+				raw_notify(player, "%-63.63s %6ld %7.2fK", s1, n_tags, (float)total / 1024.0);
 			}
 			else
 			{
-				raw_notify(player, "%-64.64s %6ld %7.2fM", s1, n_tags, (float)total / 1048756.0);
+				raw_notify(player, "%-63.63s %6ld %7.2fM", s1, n_tags, (float)total / 1048756.0);
 			}
 			free(s1);
 		}
 	}
 
-	notify(player, "--------------------------------------------------------------------------------");
-	raw_notify(player, "Total: %ld raw allocations in %ld unique tags. %ld bytes (%0.2fK).", n_tags, u_tags, total, (float)total / 1024.0);
+	notify(player, "-------------------------------------------------------------------------------");
+	if (total < 1024)
+	{
+		raw_notify(player, "Total: %ld raw allocations in %ld unique tags, %ld bytes used.", n_tags, u_tags, total);
+	}
+	else if (total < 1048756)
+	{
+		raw_notify(player, "Total: %ld raw allocations in %ld unique tags, %0.2fK bytes used.", n_tags, u_tags, (float)total / 1024.0);
+	}
+	else
+	{
+		raw_notify(player, "Total: %ld raw allocations in %ld unique tags, %0.2fM bytes used.", n_tags, u_tags, total, (float)total / 1048756.0);
+	}
+	
 }
 
 /**

@@ -268,26 +268,25 @@ void list_cached_objs(dbref player)
         }
     }
 
-    raw_notify(player, NULL, "Active Cache:");
-    raw_notify(player, NULL, "Name                            Dbref    Attrs      Size");
-    raw_notify(player, NULL, "========================================================");
+    notify(player, "Active Cache                       Dbref                   Attrs           Size");
+    notify(player, "---------------------------------- -------------- -------------- --------------");
 
     for (x = 0; x < mushstate.db_top; x++)
     {
         if (count_array[x] > 0)
         {
             s = strip_ansi(Name(x));
-            raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
+            raw_notify(player, "%-34.34s #%-13d %14d %14d", s, x, count_array[x], size_array[x]);
             XFREE(s);
             oco++;
             count_array[x] = 0;
             size_array[x] = 0;
         }
     }
+    notify(player, "-------------------------------------------------------------------------------");
 
-    raw_notify(player, NULL, "\nModified Active Cache:");
-    raw_notify(player, NULL, "Name                            Dbref    Attrs      Size");
-    raw_notify(player, NULL, "========================================================");
+    notify(player, "Modified Active Cache              Dbref                   Attrs           Size");
+    notify(player, "---------------------------------- -------------- -------------- --------------");
 
     for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
     {
@@ -308,14 +307,18 @@ void list_cached_objs(dbref player)
         if (count_array[x] > 0)
         {
             s = strip_ansi(Name(x));
-            raw_notify(player, "%-30.30s  #%-6d  %5d  %8d", s, x, count_array[x], size_array[x]);
+            raw_notify(player, "%-34.34s #%-13d %14d %14d", s, x, count_array[x], size_array[x]);
             XFREE(s);
             moco++;
         }
     }
+    notify(player, "-------------------------------------------------------------------------------");
 
-    raw_notify(player, "\nTotals: active %d (%d attrs), modified active %d (%d attrs), total attrs %d", oco, aco, moco, maco, aco + maco);
-    raw_notify(player, "Size: active %d bytes, modified active %d bytes", asize, msize);
+    raw_notify(player, "Active Cache:   %22d  Active Attribute Cache:   %13d", oco, aco);
+    raw_notify(player, "Modified Cache: %22d  Modified Attribute Cache: %13d", moco, maco);
+    raw_notify(player, "                                        Total Attribute Cache:    %13d", aco + maco);
+    raw_notify(player, "Active Cache Size: %13d bytes  Modified Cache Size: %12d bytes", asize, msize);
+    notify(player, "-------------------------------------------------------------------------------");
     XFREE(count_array);
     XFREE(size_array);
 }
@@ -328,9 +331,8 @@ void list_cached_attrs(dbref player)
     int aco, maco, asize, msize;
     ATTR *atr;
     aco = maco = asize = msize = 0;
-    raw_notify(player, NULL, "Active Cache:");
-    raw_notify(player, NULL, "Name                    Attribute                       Dbref   Size");
-    raw_notify(player, NULL, "====================================================================");
+    notify(player, "Active Cache                  Attribute                         Dbref      Size");
+    notify(player, "----------------------------- ---------------------------- ---------- ---------");
 
     for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
     {
@@ -341,14 +343,14 @@ void list_cached_attrs(dbref player)
                 aco++;
                 asize += cp->datalen;
                 atr = atr_num(((UDB_ANAME *)cp->keydata)->attrnum);
-                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
+                raw_notify(player, "%-29.29s %-28.28s #%9d %9d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
             }
         }
     }
 
-    raw_notify(player, NULL, "\nModified Active Cache:");
-    raw_notify(player, NULL, "Name                    Attribute                       Dbref   Size");
-    raw_notify(player, NULL, "====================================================================");
+    notify(player, "-------------------------------------------------------------------------------");
+    notify(player, "Modified Active Cache         Attribute                         Dbref      Size");
+    notify(player, "----------------------------- ---------------------------- ---------- ---------");
 
     for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
     {
@@ -359,13 +361,16 @@ void list_cached_attrs(dbref player)
                 maco++;
                 msize += cp->datalen;
                 atr = atr_num(((UDB_ANAME *)cp->keydata)->attrnum);
-                raw_notify(player, "%-23.23s %-31.31s #%-6d %6d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
+                raw_notify(player, "%-29.29s %-28.28s #%9d %9d", PureName(((UDB_ANAME *)cp->keydata)->object), (atr ? atr->name : "(Unknown)"), ((UDB_ANAME *)cp->keydata)->object, cp->datalen);
             }
         }
     }
 
-    raw_notify(player, "\nTotals: active %d, modified active %d, total attributes %d", aco, maco, aco + maco);
-    raw_notify(player, "Size: active %d bytes, modified active %d bytes", asize, msize);
+    notify(player, "-------------------------------------------------------------------------------");
+    raw_notify(player, "Active Attribute Cache:  %13d  Modified Attribute Cache: %13d", aco, maco);
+    raw_notify(player, "                                        Total Attribute Cache:    %13d", aco + maco);
+    raw_notify(player, "Active Cache Size: %13d bytes  Modified Cache Size: %12d bytes", asize, msize);
+    notify(player, "-------------------------------------------------------------------------------");
 }
 
 /* Search the cache for an entry of a specific type, if found, copy the data

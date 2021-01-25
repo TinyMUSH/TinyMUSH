@@ -2275,15 +2275,14 @@ void list_cf_access(dbref player)
 {
     CONF *tp = NULL, *ctab = NULL;
     MODULE *mp = NULL;
-    char *buff = NULL;
 
+    notify(player, "Attribute                      Permission");
+    notify(player, "------------------------------ ------------------------------------------------");
     for (tp = conftable; tp->pname; tp++)
     {
         if (God(player) || check_access(player, tp->flags))
         {
-            buff = XASPRINTF("buff", "%s:", tp->pname);
-            listset_nametab(player, access_nametab, tp->flags, buff, 1);
-            XFREE(buff);
+            listset_nametab(player, access_nametab, tp->flags, true, "%-30.30s ", tp->pname);
         }
     }
 
@@ -2295,13 +2294,12 @@ void list_cf_access(dbref player)
             {
                 if (God(player) || check_access(player, tp->flags))
                 {
-                    buff = XASPRINTF("buff", "%s:", tp->pname);
-                    listset_nametab(player, access_nametab, tp->flags, buff, 1);
-                    XFREE(buff);
+                    listset_nametab(player, access_nametab, tp->flags, true, "%-30.30s ", tp->pname);
                 }
             }
         }
     }
+    notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2315,12 +2313,14 @@ void list_cf_read_access(dbref player)
     MODULE *mp = NULL;
     char *buff = NULL;
 
+    notify(player, "Attribute                      Permission");
+    notify(player, "------------------------------ ------------------------------------------------");
     for (tp = conftable; tp->pname; tp++)
     {
         if (God(player) || check_access(player, tp->rperms))
         {
-            buff = XASPRINTF("buff", "%s:", tp->pname);
-            listset_nametab(player, access_nametab, tp->rperms, buff, 1);
+            buff = XASPRINTF("buff", "%-30.30s ", tp->pname);
+            listset_nametab(player, access_nametab, tp->rperms, true, buff);
             XFREE(buff);
         }
     }
@@ -2333,13 +2333,14 @@ void list_cf_read_access(dbref player)
             {
                 if (God(player) || check_access(player, tp->rperms))
                 {
-                    buff = XASPRINTF("buff", "%s:", tp->pname);
-                    listset_nametab(player, access_nametab, tp->rperms, buff, 1);
+                    buff = XASPRINTF("buff", "%-30.30s ", tp->pname);
+                    listset_nametab(player, access_nametab, tp->rperms, true, buff);
                     XFREE(buff);
                 }
             }
         }
     }
+    notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
@@ -2479,7 +2480,10 @@ void list_options(dbref player)
 {
     CONF *tp = NULL, *ctab = NULL;
     MODULE *mp = NULL;
+    bool draw_header = false;
 
+    notify(player, "Global Options            S Description");
+    notify(player, "------------------------- - ---------------------------------------------------");
     for (tp = conftable; tp->pname; tp++)
     {
         if (((tp->interpreter == cf_const) || (tp->interpreter == cf_bool)) && (check_access(player, tp->rperms)))
@@ -2492,15 +2496,22 @@ void list_options(dbref player)
     {
         if ((ctab = (CONF *)lt_dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
         {
+            draw_header = false;
             for (tp = ctab; tp->pname; tp++)
             {
                 if (((tp->interpreter == cf_const) || (tp->interpreter == cf_bool)) && (check_access(player, tp->rperms)))
                 {
+                    if(!draw_header) {
+                        raw_notify(player, "\nModule %-18.18s S Description", mp->modname);
+                        notify(player, "------------------------- - ---------------------------------------------------");
+                        draw_header = true;
+                    }
                     raw_notify(player, "%-25s %c %s?", tp->pname, (*(tp->loc) ? 'Y' : 'N'), (tp->extra ? (char *)tp->extra : ""));
                 }
             }
         }
     }
+    notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**

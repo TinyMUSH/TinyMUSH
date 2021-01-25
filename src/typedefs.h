@@ -109,14 +109,13 @@ typedef enum CF_RESULT
 
 typedef char boolexp_type;
 
-typedef struct attr ATTR;
-struct attr
+typedef struct attr
 {
     const char *name;                             /*!< This has to be first.  braindeath. */
     int number;                                   /*!< attr number */
     int flags;                                    /*!< attr flags */
     int (*check)(int, dbref, dbref, int, char *); /*!< check function */
-};
+} ATTR;
 
 extern ATTR attr[];
 

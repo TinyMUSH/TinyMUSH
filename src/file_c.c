@@ -42,7 +42,7 @@ void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra _
 
     if (flagvalue < 0)
     {
-        display_nametab(player, list_files, (char *)"Unknown file.  Use one of:", 1);
+        display_nametab(player, list_files, true, (char *)"Unknown file.  Use one of:");
         return;
     }
 

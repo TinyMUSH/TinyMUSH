@@ -1398,11 +1398,6 @@ void check_idle(void)
 char *trimmed_name(dbref player)
 {
 	char *cbuff = XMALLOC(MBUF_SIZE, "cbuff");
-	if (strlen(Name(player)) <= 16)
-	{
-		return Name(player);
-	}
-
 	XSTRNCPY(cbuff, Name(player), 16);
 	cbuff[16] = '\0';
 	return cbuff;
@@ -1411,12 +1406,6 @@ char *trimmed_name(dbref player)
 char *trimmed_site(char *name)
 {
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
-
-	if (((int)strlen(name) <= mushconf.site_chars) || (mushconf.site_chars == 0))
-	{
-		return name;
-	}
-
 	XSTRNCPY(buff, name, mushconf.site_chars);
 	buff[mushconf.site_chars + 1] = '\0';
 	return buff;
@@ -2654,15 +2643,18 @@ unsigned int mask_to_prefix(unsigned int mask_num)
 	return result;
 }
 
-void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_type)
+void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_type, bool header, bool footer)
 {
 	char *buff, *str, *maskaddr;
 	SITE *this;
 	unsigned int bits;
 	buff = XMALLOC(MBUF_SIZE, "buff");
-	XSPRINTF(buff, "----- %s -----", header_txt);
-	notify(player, buff);
-	notify(player, "IP Prefix         Mask              Status");
+
+	if (header)
+	{
+		notify(player, "Type                IP Prefix           Mask                Status");
+		notify(player, "------------------- ------------------- ------------------- -------------------");
+	}
 
 	for (this = site_list; this; this = this->next)
 	{
@@ -2674,7 +2666,7 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 	 */
 		if ((bits == 0 && htonl(0) == this->mask.s_addr) || htonl(0xFFFFFFFFU << (32 - bits)) == this->mask.s_addr)
 		{
-			XSPRINTF(buff, "%-17s /%-16d %s", inet_ntoa(this->address), bits, str);
+			XSPRINTF(buff, "%-19.19s %-19.19s /%-19d %s", header_txt, inet_ntoa(this->address), bits, str);
 		}
 		else
 		{
@@ -2692,6 +2684,11 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 		notify(player, buff);
 	}
 
+	if (footer)
+	{
+		notify(player, "-------------------------------------------------------------------------------");
+	}
+
 	XFREE(buff);
 }
 
@@ -2701,8 +2698,8 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 
 void list_siteinfo(dbref player)
 {
-	list_sites(player, mushstate.access_list, "Site Access", S_ACCESS);
-	list_sites(player, mushstate.suspect_list, "Suspected Sites", S_SUSPECT);
+	list_sites(player, mushstate.access_list, "Site Access", S_ACCESS, true, false);
+	list_sites(player, mushstate.suspect_list, "Suspected Sites", S_SUSPECT, false, true);
 }
 
 /* ---------------------------------------------------------------------------

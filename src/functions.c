@@ -329,7 +329,7 @@ void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
         {
             if (!fp->xperms)
             {
-                XSPRINTF(buff, "%s:", fp->name);
+                XSPRINTF(buff, "%-30.30s ", fp->name);
             }
             else
             {
@@ -347,7 +347,7 @@ void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
                 }
             }
 
-            listset_nametab(player, access_nametab, fp->perms, buff, 1);
+            listset_nametab(player, access_nametab, fp->perms, true, buff);
         }
 
         fp++;
@@ -360,6 +360,11 @@ void list_funcaccess(dbref player)
     FUN *ftab;
     UFUN *ufp;
     MODULE *mp;
+    bool header = false;
+
+    notify(player, "Build-in                       Access");
+    notify(player, "------------------------------ ------------------------------------------------");
+
     buff = XMALLOC(SBUF_SIZE, "list_funcaccess");
     helper_list_funcaccess(player, flist, buff);
     s = XMALLOC(MBUF_SIZE, "list_funcaccess");
@@ -367,9 +372,15 @@ void list_funcaccess(dbref player)
     for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
-
+        header = false;
         if ((ftab = (FUN *)lt_dlsym(mp->handle, s)) != NULL)
         {
+            if (!header)
+            {
+                raw_notify(player, "\nModule %-23.23s Access", mp->modname);
+                notify(player, "------------------------------ ------------------------------------------------");
+                header = true;
+            }
             helper_list_funcaccess(player, ftab, buff);
         }
     }
@@ -380,10 +391,18 @@ void list_funcaccess(dbref player)
     {
         if (check_access(player, ufp->perms))
         {
-            XSPRINTF(buff, "%s:", ufp->name);
-            listset_nametab(player, access_nametab, ufp->perms, buff, 1);
+            if (!header)
+            {
+                notify(player, "\nUser-defined                   Access");
+                notify(player, "------------------------------ ------------------------------------------------");
+                header = true;
+            }
+            XSPRINTF(buff, "%14s:", ufp->name);
+            listset_nametab(player, access_nametab, ufp->perms, true, buff);
         }
     }
+
+    notify(player, "-------------------------------------------------------------------------------");
 
     XFREE(buff);
 }

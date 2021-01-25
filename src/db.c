@@ -1272,7 +1272,7 @@ void do_attribute(dbref player, dbref cause __attribute__((unused)), int key, ch
         {
             tbuf = XMALLOC(LBUF_SIZE, "tbuf");
             XSPRINTF(tbuf, "%s(%d):", va->name, va->number);
-            listset_nametab(player, attraccess_nametab, va->flags, tbuf, 1);
+            listset_nametab(player, attraccess_nametab, va->flags, true, tbuf);
             XFREE(tbuf);
         }
         else
