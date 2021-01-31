@@ -170,19 +170,9 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(top_srcdir)/src/libltdl/config/compile \
-	$(top_srcdir)/src/libltdl/config/config.guess \
-	$(top_srcdir)/src/libltdl/config/config.sub \
-	$(top_srcdir)/src/libltdl/config/install-sh \
-	$(top_srcdir)/src/libltdl/config/ltmain.sh \
-	$(top_srcdir)/src/libltdl/config/missing AUTHORS COPYING \
-	ChangeLog INSTALL NEWS README compile config.guess config.sub \
-	depcomp install-sh ltmain.sh missing \
-	src/libltdl/config/compile src/libltdl/config/config.guess \
-	src/libltdl/config/config.sub src/libltdl/config/depcomp \
-	src/libltdl/config/install-sh src/libltdl/config/ltmain.sh \
-	src/libltdl/config/missing
+am__DIST_COMMON = $(srcdir)/Makefile.in AUTHORS COPYING ChangeLog \
+	INSTALL NEWS README compile config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -384,7 +374,7 @@ with_tar_prog = @with_tar_prog@
 ACLOCAL_AMFLAGS = -I src/libltdl/m4
 
 #AM_CPPFLAGS     = $(LTDLINCL)
-SUBDIRS = src
+SUBDIRS = src/libltdl src
 EXTRA_DIST = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 all: all-recursive
 

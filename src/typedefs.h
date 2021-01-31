@@ -1307,4 +1307,39 @@ typedef struct msgq_dnsresolver
     } payload;
 } MSGQ_DNSRESOLVER;
 
+/**
+ * @brief Sort list related typedefs
+ * 
+ */
+
+typedef struct f_record
+{
+	double data;
+	char *str;
+	int pos;
+} F_RECORD;
+
+typedef struct i_record
+{
+	long data;
+	char *str;
+	int pos;
+} I_RECORD;
+
+typedef struct a_record
+{
+	char *str;
+	int pos;
+} A_RECORD;
+
+/**
+ * @brief Time conversion related typedefs
+ * 
+ */
+typedef struct monthdays {
+	char *month;
+	int day;
+} MONTHDAYS;
+
+
 #endif /* __TYPEDEFS_H */

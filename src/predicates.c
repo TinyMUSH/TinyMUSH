@@ -92,7 +92,7 @@ int member(dbref thing, dbref list)
  * is_integer, is_number: see if string contains just a number.
  */
 
-int is_integer(char *str)
+bool is_integer(char *str)
 {
 	while (*str && isspace(*str))
 	{
@@ -105,13 +105,13 @@ int is_integer(char *str)
 
 		if (!*str)
 		{
-			return 0; /* but not if just a minus or plus */
+			return false; /* but not if just a minus or plus */
 		}
 	}
 
 	if (!isdigit(*str))
 	{ /* Need at least 1 integer */
-		return 0;
+		return false;
 	}
 
 	while (*str && isdigit(*str))
@@ -124,7 +124,7 @@ int is_integer(char *str)
 		str++; /* Trailing spaces */
 	}
 
-	return (*str ? 0 : 1);
+	return *str ? false : true;
 }
 
 int is_number(char *str)

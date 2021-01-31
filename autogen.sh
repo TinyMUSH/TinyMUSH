@@ -3,8 +3,8 @@
 # Just a quick hack for now. Need to be fixed eventually
 
 TINYMUSH_DIR="$(pwd)"
-autoreconf -ivf
+autoreconf -ivfm
 cd src/libltdl/
-autoreconf -ivf
+autoreconf -ivfm
 cd $TINYMUSH_DIR
 ./configure && make distclean

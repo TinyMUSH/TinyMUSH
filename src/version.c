@@ -28,7 +28,7 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     MODVER *mver;
     char *ptr;
     char string[MBUF_SIZE];
-    XSNPRINTF(string, MBUF_SIZE, "%s (%s)", mushstate.version.name, PACKAGE_RELEASE_DATE);
+    XSNPRINTF(string, MBUF_SIZE, "%s [%s]", mushstate.version.name, PACKAGE_RELEASE_DATE);
     ptr = repeatchar(strlen(string), '-');
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
     XFREE(ptr);

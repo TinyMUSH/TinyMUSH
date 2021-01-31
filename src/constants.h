@@ -1749,3 +1749,10 @@
 #define PCG32_INITIALIZER   { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL }
 
 #endif /* __CONSTANTS_H */
+
+/**
+ * @brief Floating point precision
+ * 
+ */
+
+#define FPTS_DIG LDBL_DIG - 1

@@ -20,34 +20,58 @@
 #include "externs.h"
 #include "prototypes.h"
 
-/*
- * ---------------------------------------------------------------------------
- * config: Display a MUSH config parameter.
+/**
+ * @brief Return a MUSH config parameter.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used 
+ * @param cause Not used 
+ * @param fargs Functions arguments
+ * @param nfargs Not used 
+ * @param cargs Not used 
+ * @param ncargs Not used 
  */
-
 void fun_config(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	cf_display(player, fargs[0], buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_lwho: Return list of connected users.
+/**
+ * @brief Return list of connected users.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_lwho(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	make_ulist(player, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_ports: Returns a list of ports for a user.
+/**
+ * @brief Returns a list of ports for a user.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Number of function arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target;
+	dbref target = NOTHING;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 1, buff, bufc))
 	{
@@ -71,16 +95,24 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_doing: Returns a user's doing.
+/**
+ * @brief Returns a user's doing.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref target = NOTHING;
 	int port = NOTHING;
-	char *str;
+	char *str = NULL;
 
 	if (is_integer(fargs[0]))
 	{
@@ -106,11 +138,19 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * handle_conninfo: return seconds idle or connected (IDLE, CONN).
+/**
+ * @brief Return seconds idle or connected (IDLE, CONN).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref target = NOTHING;
@@ -136,11 +176,19 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
 	SAFE_LTOS(buff, bufc, Is_Func(CONNINFO_IDLE) ? fetch_idle(target, port) : fetch_connect(target, port), LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_session: Return session info about a port.
+/**
+ * @brief Return session info about a port.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref target = NOTHING;
@@ -166,15 +214,22 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute
 	make_sessioninfo(player, target, port, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_programmer: Returns the dbref or #1- of an object in a @program.
+/**
+ * @brief Returns the dbref or #1- of an object in a @program.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target;
-	target = lookup_player(player, fargs[0], 1);
+	dbref target = lookup_player(player, fargs[0], 1);
 
 	if (!Good_obj(target) || !Connected(target) || !Examinable(player, target))
 	{
@@ -186,14 +241,23 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 	SAFE_LTOS(buff, bufc, get_programmer(target), LBUF_SIZE);
 }
 
-/*---------------------------------------------------------------------------
- * fun_helptext: Read an entry from a helpfile.
+/**
+ * @brief Read an entry from a helpfile.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	CMDENT *cmdp;
-	char *p;
+	CMDENT *cmdp = NULL;
+	char *p = NULL;
 
 	if (!fargs[0] || !*fargs[0])
 	{
@@ -223,18 +287,45 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 	help_helper(player, (cmdp->extra & ~HELP_RAWHELP), (cmdp->extra & HELP_RAWHELP) ? 0 : 1, fargs[1], buff, bufc);
 }
 
-/*---------------------------------------------------------------------------
- * Pueblo HTML-related functions.
+/**
+ * @brief Pueblo HTML-related functions.
+ * 
  */
 
+/**
+ * @brief Escape HTML
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_html_escape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	html_escape(fargs[0], buff, bufc);
 }
 
+/**
+ * @brief Un-escape HTML
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	const char *msg_orig;
+	const char *msg_orig = NULL;
 	int ret = 0;
 
 	for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret; msg_orig++)
@@ -275,6 +366,7 @@ void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unus
 		}
 	}
 }
+
 /**
  * @brief Check if a characters should be converted to %<hex>
  * 
@@ -313,11 +405,23 @@ bool escaped_chars(unsigned char ch)
 	return false;
 }
 
+/**
+ * @brief Escape URL
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 
-	//char *escaped_chars = "<>#%{}|\\^~[]';/?:@=&\"+";
-	const char *msg_orig;
+	const char *msg_orig = NULL;
 	int ret = 0;
 	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
 
@@ -340,11 +444,24 @@ void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)
 	XFREE(tbuf);
 }
 
+/**
+ * @brief Un-escape URL
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	const char *msg_orig;
 	int ret = 0;
-	unsigned int tempchar;
+	unsigned int tempchar = 0;
 	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
 	;
 
@@ -368,16 +485,28 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 
 			if (*msg_orig)
 			{
-				msg_orig++; /* Skip the '%' */
+				/** 
+				 * Skip the '%' 
+				 * 
+				 */
+				msg_orig++; 
 			}
 
 			if (*msg_orig)
-			{ /* Skip the 1st hex character. */
+			{ 
+				/** 
+				 * Skip the 1st hex character. 
+				 * 
+				 */
 				msg_orig++;
 			}
 
 			if (*msg_orig)
-			{ /* Skip the 2nd hex character. */
+			{ 
+				/** 
+				 * Skip the 2nd hex character. 
+				 * 
+				 */
 				msg_orig++;
 			}
 

@@ -23,11 +23,13 @@
 extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 
 UFUN *ufun_head;
-
 OBJXFUNCS xfunctions;
-
 const Delim SPACE_DELIM = {1, " "};
 
+/**
+ * @brief Initialize the function hashtable
+ * 
+ */
 void init_functab(void)
 {
     FUN *fp;
@@ -45,6 +47,15 @@ void init_functab(void)
     xfunctions.count = 0;
 }
 
+/**
+ * @brief Add a function
+ * 
+ * @param player DBref of player
+ * @param cause Not used 
+ * @param key Key
+ * @param fname Function name
+ * @param target Target
+ */
 void do_function(dbref player, dbref cause __attribute__((unused)), int key, char *fname, char *target)
 {
     UFUN *ufp, *ufp2;
@@ -53,17 +64,18 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
     int atr, aflags;
     dbref obj, aowner;
 
-    /*
+    /**
      * Check for list first
+     * 
      */
-
     if (key & FUNCT_LIST)
     {
         if (fname && *fname)
         {
-            /*
-	     * Make it case-insensitive, and look it up.
-	     */
+            /**
+             * Make it case-insensitive, and look it up.
+             * 
+             */
             for (bp = fname; *bp; bp++)
             {
                 *bp = tolower(*bp);
@@ -83,10 +95,10 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
             return;
         }
 
-        /*
-	 * No name given, list them all.
-	 */
-
+        /**
+         * No name given, list them all.
+         * 
+         */
         for (ufp = (UFUN *)hash_firstentry(&mushstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mushstate.ufunc_htab))
         {
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", ufp->name, ufp->obj, ((ATTR *)atr_num(ufp->atr))->name);
@@ -95,8 +107,9 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * Make a local uppercase copy of the function name
+     * 
      */
     bp = np = XMALLOC(SBUF_SIZE, "np");
     SAFE_SB_STR(fname, np, &bp);
@@ -107,10 +120,10 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         *bp = toupper(*bp);
     }
 
-    /*
+    /**
      * Verify that the function doesn't exist in the builtin table
+     * 
      */
-
     if (hashfind(np, &mushstate.func_htab) != NULL)
     {
         notify_quiet(player, "Function already defined in builtin function table.");
@@ -118,10 +131,10 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * Make sure the target object exists
+     * 
      */
-
     if (!parse_attrib(player, target, &obj, &atr, 0))
     {
         notify_quiet(player, NOMATCH_MESSAGE);
@@ -129,10 +142,10 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * Make sure the attribute exists
+     * 
      */
-
     if (atr == NOTHING)
     {
         notify_quiet(player, "No such attribute.");
@@ -140,8 +153,9 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * Make sure attribute is readably by me
+     * 
      */
     ap = atr_num(atr);
 
@@ -161,10 +175,10 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * Privileged functions require you control the obj.
+     * 
      */
-
     if ((key & FUNCT_PRIV) && !Controls(player, obj))
     {
         notify_quiet(player, NOPERM_MESSAGE);
@@ -172,8 +186,9 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         return;
     }
 
-    /*
+    /**
      * See if function already exists.  If so, redefine it
+     * 
      */
     ufp = (UFUN *)hashfind(np, &mushstate.ufunc_htab);
 
@@ -253,19 +268,13 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 void list_functable(dbref player)
 {
     char *buf = XMALLOC(LBUF_SIZE, "buf");
-    //buf = XMALLOC(LBUF_SIZE, "buf");
     XSTRCPY(buf, "Built-in functions:");
-    //SAFE_LB_STR((char *)"Built-in functions:", buf, &bp);
 
     for (FUN *fp = flist; fp->name; fp++)
     {
         if (Check_Func_Access(player, fp))
         {
             XSPRINTFCAT(buf, " %s", fp->name);
-            /*
-            SAFE_LB_CHR(' ', buf, &bp);
-            SAFE_LB_STR((char *)fp->name, buf, &bp);
-            */
         }
     }
 
@@ -284,10 +293,6 @@ void list_functable(dbref player)
                 if (Check_Func_Access(player, fp))
                 {
                     XSPRINTFCAT(buf, " %s", fp->name);
-                    /*
-                    SAFE_LB_CHR(' ', buf, &bp);
-                    SAFE_LB_STR((char *)fp->name, buf, &bp);
-                    */
                 }
             }
 
@@ -302,10 +307,6 @@ void list_functable(dbref player)
         if (check_access(player, ufp->perms))
         {
             XSPRINTFCAT(buf, " %s", ufp->name);
-            /*
-            SAFE_LB_CHR(' ', buf, &bp);
-            SAFE_LB_STR(ufp->name, buf, &bp);
-            */
         }
     }
 
@@ -318,10 +319,16 @@ void list_functable(dbref player)
  * list_funcaccess: List access on functions.
  */
 
-void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
+/**
+ * @brief Helper function for list_funcaccess
+ * 
+ * @param player DBref of player
+ * @param fp Function
+ */
+void helper_list_funcaccess(dbref player, FUN *fp)
 {
-    char *bp;
-    int i;
+    char *buff = XMALLOC(SBUF_SIZE, "list_funcaccess");
+    char *bp = NULL;
 
     while (fp->name)
     {
@@ -337,7 +344,7 @@ void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
                 SAFE_LB_STR((char *)fp->name, buff, &bp);
                 SAFE_LB_CHR(':', buff, &bp);
 
-                for (i = 0; i < fp->xperms->num_funcs; i++)
+                for (int i = 0; i < fp->xperms->num_funcs; i++)
                 {
                     if (fp->xperms->ext_funcs[i])
                     {
@@ -354,26 +361,28 @@ void helper_list_funcaccess(dbref player, FUN *fp, char *buff)
     }
 }
 
+/**
+ * @brief List function access rights
+ * 
+ * @param player DBref of player
+ */
 void list_funcaccess(dbref player)
 {
-    char *buff, *s;
-    FUN *ftab;
-    UFUN *ufp;
-    MODULE *mp;
+    FUN *ftab = NULL;
+    UFUN *ufp = NULL;
+    MODULE *mp = NULL;
     bool header = false;
 
     notify(player, "Build-in                       Access");
     notify(player, "------------------------------ ------------------------------------------------");
 
-    buff = XMALLOC(SBUF_SIZE, "list_funcaccess");
-    helper_list_funcaccess(player, flist, buff);
-    s = XMALLOC(MBUF_SIZE, "list_funcaccess");
+    helper_list_funcaccess(player, flist);
 
     for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
-        XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "functable");
+        char *buff = XASPRINTF("s", "mod_%s_%s", mp->modname, "functable");
         header = false;
-        if ((ftab = (FUN *)lt_dlsym(mp->handle, s)) != NULL)
+        if ((ftab = (FUN *)lt_dlsym(mp->handle, buff)) != NULL)
         {
             if (!header)
             {
@@ -381,11 +390,10 @@ void list_funcaccess(dbref player)
                 notify(player, "------------------------------ ------------------------------------------------");
                 header = true;
             }
-            helper_list_funcaccess(player, ftab, buff);
+            helper_list_funcaccess(player, ftab);
         }
+        XFREE(buff);
     }
-
-    XFREE(s);
 
     for (ufp = ufun_head; ufp; ufp = ufp->next)
     {
@@ -397,21 +405,30 @@ void list_funcaccess(dbref player)
                 notify(player, "------------------------------ ------------------------------------------------");
                 header = true;
             }
-            XSPRINTF(buff, "%14s:", ufp->name);
+            char *buff = XASPRINTF("s", "%14s:", ufp->name);
             listset_nametab(player, access_nametab, ufp->perms, true, buff);
+            XFREE(buff);
         }
     }
 
     notify(player, "-------------------------------------------------------------------------------");
-
-    XFREE(buff);
 }
 
 /*
  * ---------------------------------------------------------------------------
- * cf_func_access: set access on functions
+ * cf_func_access: 
  */
 
+/**
+ * @brief Set access on functions
+ * 
+ * @param vp Not used 
+ * @param str Name of function
+ * @param extra Nametab
+ * @param player DBref of player
+ * @param cmd Command
+ * @return int Result
+ */
 int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
     FUN *fp;
@@ -419,7 +436,9 @@ int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref
     char *ap;
 
     for (ap = str; *ap && !isspace(*ap); ap++)
-        ;
+    {
+        /* Skip ofer */
+    }
 
     if (*ap)
     {
@@ -714,6 +733,7 @@ FUN flist[] = {
     {"MIX", fun_mix, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MODULO", fun_modulo, 2, 0, CA_PUBLIC, NULL},
     {"MODIFY", fun_modify, 0, FN_VARARGS | FN_VARFX, CA_PUBLIC, NULL},
+    {"MODULES", fun_modules, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MONEY", fun_money, 1, 0, CA_PUBLIC, NULL},
     {"MOVES", handle_okpres, 2, PRESFN_MOVES, CA_PUBLIC, NULL},
     {"MUDNAME", fun_mushname, 0, 0, CA_PUBLIC, NULL},

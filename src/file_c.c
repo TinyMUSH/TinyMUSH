@@ -20,6 +20,10 @@
 #include "externs.h"
 #include "prototypes.h"
 
+/**
+ * @brief Text files cache.
+ * 
+ */
 FCACHE fcache[] = {
     {&mushconf.conn_file, NULL, "Conn"},
     {&mushconf.site_file, NULL, "Conn/Badsite"},
@@ -35,6 +39,14 @@ FCACHE fcache[] = {
     {&mushconf.htmlconn_file, NULL, "Conn/Html"},
     {NULL, NULL, NULL}};
 
+/**
+ * @brief Show text file.
+ * 
+ * @param player DBref of player
+ * @param cause  Not used
+ * @param extra  Not used
+ * @param arg    File to show
+ */
 void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
 {
     int flagvalue;
@@ -48,16 +60,23 @@ void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra _
 
     fcache_send(player, flagvalue);
 }
-
+/**
+ * @brief Add date to a file block
+ * 
+ * @param fp File block
+ * @param ch character to add
+ * @return FBLOCK* Updated file block.
+ */
 FBLOCK *fcache_fill(FBLOCK *fp, char ch)
 {
     FBLOCK *tfp;
 
     if (fp->hdr.nchars >= (int)(MBUF_SIZE - sizeof(FBLKHDR)))
     {
-        /*
-	 * We filled the current buffer.  Go get a new one.
-	 */
+        /**
+         * We filled the current buffer.  Go get a new one.
+         * 
+         */
         tfp = fp;
         fp = (FBLOCK *)XMALLOC(MBUF_SIZE, "fp");
         fp->hdr.nxt = NULL;
@@ -69,6 +88,13 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
     return fp;
 }
 
+/**
+ * @brief Read a file into cache
+ * 
+ * @param cp Cache buffer
+ * @param filename File to read
+ * @return int Size of cached text.
+ */
 int fcache_read(FBLOCK **cp, char *filename)
 {
     int n = 0, nmax = 0, tchars = 0, fd = 0;
@@ -168,6 +194,12 @@ int fcache_read(FBLOCK **cp, char *filename)
     return tchars;
 }
 
+/**
+ * @brief Raw dump a cache file to a file descriptor
+ * 
+ * @param fd File descriptor
+ * @param num Index of the file in the file cache
+ */
 void fcache_rawdump(int fd, int num)
 {
     int cnt, remaining;
@@ -205,6 +237,12 @@ void fcache_rawdump(int fd, int num)
     return;
 }
 
+/**
+ * @brief Dump a file to a descriptor
+ * 
+ * @param d Descriptor
+ * @param num Index of the file in the file cache
+ */
 void fcache_dump(DESC *d, int num)
 {
     FBLOCK *fp;
@@ -223,6 +261,12 @@ void fcache_dump(DESC *d, int num)
     }
 }
 
+/**
+ * @brief Send the content of a file cache to a player
+ * 
+ * @param player DBref of player
+ * @param num Index of the file in the file cache
+ */
 void fcache_send(dbref player, int num)
 {
     DESC *d;
@@ -233,6 +277,11 @@ void fcache_send(dbref player, int num)
     }
 }
 
+/**
+ * @brief Load all files into cache
+ * 
+ * @param player DBref of player
+ */
 void fcache_load(dbref player)
 {
     FCACHE *fp;
@@ -275,6 +324,10 @@ void fcache_load(dbref player)
     XFREE(sbuf);
 }
 
+/**
+ * @brief Initialize the file cache.
+ * 
+ */
 void fcache_init(void)
 {
     FCACHE *fp;

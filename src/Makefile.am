@@ -1,8 +1,7 @@
 AM_CPPFLAGS				= $(LTDLINCL)
-SUBDIRS					= libltdl
+#SUBDIRS					= libltdl
+SUBDIRS                                        =
 LIBTOOL_DEPS			= @LIBTOOL_DEPS@
-
-AUTOMAKE_OPTIONS		= subdir-objects
 
 netmush_C				= alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
 netmush_H				= api.h externs.h macros.h system.h typedefs.h

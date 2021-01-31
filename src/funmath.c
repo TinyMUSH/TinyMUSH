@@ -20,11 +20,19 @@
 #include "externs.h"
 #include "prototypes.h"
 
+/**
+ * @brief Fix weird math results
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param result Result to check
+ * @return unsigned int Result of the check
+ */
 unsigned int fp_check_weird(char *buff, char **bufc, long double result)
 {
     fp_union_uint fp_sign_mask, fp_exp_mask, fp_mant_mask, fp_val;
     const long double d_zero = 0.0;
-    unsigned int fp_sign, fp_exp, fp_mant;
+    unsigned int fp_sign = 0, fp_exp = 0, fp_mant = 0;
 
     XMEMSET(fp_sign_mask.u, 0, sizeof(fp_sign_mask));
     XMEMSET(fp_exp_mask.u, 0, sizeof(fp_exp_mask));
@@ -49,28 +57,31 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
 
             if (x == fp_exp_mask.u[i])
             {
-                /*
-		 * these bits are all set. can't be zero
-		 * exponent, but could still be max (weird)
-		 * exponent.
-		 */
+                /**
+        		 * these bits are all set. can't be zero
+        		 * exponent, but could still be max (weird)
+        		 * exponent.
+                 * 
+        		 */
                 fp_exp &= ~FP_EXP_ZERO;
             }
             else if (x == 0)
             {
-                /*
-		 * none of these bits are set. can't be max
-		 * exponent, but could still be zero
-		 * exponent.
-		 */
+                /**
+        		 * none of these bits are set. can't be max
+        		 * exponent, but could still be zero
+        		 * exponent.
+                 * 
+        		 */
                 fp_exp &= ~FP_EXP_WEIRD;
             }
             else
             {
-                /*
-		 * some bits were set but not others. can't
-		 * be either zero exponent or max exponent.
-		 */
+                /**
+        		 * some bits were set but not others. can't
+        		 * be either zero exponent or max exponent.
+                 * 
+        		 */
                 fp_exp = 0;
             }
         }
@@ -99,14 +110,17 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
     return fp_exp;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fval: copy the floating point value into a buffer and make it presentable
+/**
+ * @brief Copy the floating point value into a buffer and make it presentable
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param result Result to present
+ * @param precision Precision
  */
-
 void fval(char *buff, char **bufc, long double result, int precision)
 {
-    char *p, *buf1;
+    char *p = NULL, *buf1 = NULL;
 
     switch (fp_check_weird(buff, bufc, result))
     {
@@ -122,18 +136,26 @@ void fval(char *buff, char **bufc, long double result, int precision)
     }
 
     buf1 = *bufc;
-    SAFE_SPRINTF(buff, bufc, "%0.*Lf", precision, result); /* get long double val into buffer */
+    SAFE_SPRINTF(buff, bufc, "%0.*Lf", precision, result);
     **bufc = '\0';
 
+    /**
+     * If integer, we're done.
+     * 
+     */
     p = strrchr(buf1, '.');
     if (p == NULL)
     {
-        return; /* After rounding, our result is 0 no need to trim */
+        return;
     }
 
+    /**
+     * Remove useless zeroes
+     * 
+     */
     p = strrchr(buf1, '0');
     if (p == NULL)
-    { /* remove useless trailing 0's */
+    {
         return;
     }
     else if (*(p + 1) == '\0')
@@ -146,7 +168,11 @@ void fval(char *buff, char **bufc, long double result, int precision)
         *bufc = p + 1;
     }
 
-    p = strrchr(buf1, '.'); /* take care of dangling '.' */
+    /**
+     * take care of dangling '.'
+     * 
+     */
+    p = strrchr(buf1, '.');
 
     if ((p != NULL) && (*(p + 1) == '\0'))
     {
@@ -154,10 +180,10 @@ void fval(char *buff, char **bufc, long double result, int precision)
         *bufc = p;
     }
 
-    /*
+    /**
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
+     * 
      */
-
     if (!strcmp(buf1, "-0"))
     {
         *buf1 = '0';
@@ -165,46 +191,59 @@ void fval(char *buff, char **bufc, long double result, int precision)
     }
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Constant math funcs: PI, E
+/**
+ * @brief Return the PI constant.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    int i = LDBL_DIG;
-
-    if (fargs[0] && *fargs[0])
-    {
-        i = atoi(fargs[0]);
-    }
-
-    fval(buff, bufc, M_PI, i);
+    fval(buff, bufc, M_PI, (fargs[0] && *fargs[0]) ? atoi(fargs[0]) : FPTS_DIG);
 }
 
+/**
+ * @brief Return the E constant.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_e(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    int i = LDBL_DIG;
-
-    if (fargs[0] && *fargs[0])
-    {
-        i = atoi(fargs[0]);
-    }
-
-    fval(buff, bufc, M_E, i);
+    fval(buff, bufc, M_E, (fargs[0] && *fargs[0]) ? atoi(fargs[0]) : FPTS_DIG);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Math operations on one number: SIGN, ABS, FLOOR, CEIL, ROUND, TRUNC, INC,
- * DEC, SQRT, EXP, LN, [A][SIN,COS,TAN][D]
+/**
+ * @brief Returns -1, 0, or 1 depending on whether its argument is negative,
+ *        zero, or positive (respectively).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double num;
-
-    num = strtold(fargs[0], (char **)NULL);
+    long double num = strtold(fargs[0], (char **)NULL);
 
     if (num < 0)
     {
@@ -216,11 +255,22 @@ void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     }
 }
 
+/**
+ * @brief Returns the absolute value of its argument.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double num;
-
-    num = strtold(fargs[0], (char **)NULL);
+    long double num = strtold(fargs[0], (char **)NULL);
 
     if (num == 0)
     {
@@ -228,29 +278,82 @@ void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
     }
     else if (num < 0)
     {
-        fval(buff, bufc, -num, LDBL_DIG);
+        fval(buff, bufc, -num, FPTS_DIG);
     }
     else
     {
-        fval(buff, bufc, num, LDBL_DIG);
+        fval(buff, bufc, num, FPTS_DIG);
     }
 }
 
+/**
+ * @brief   Returns the integer quotient from dividing <number1> by <number2>, 
+ *          rounded down (towards zero if positive, away from zero if negative).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_floor(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, floor(strtold(fargs[0], (char **)NULL)), LDBL_DIG);
+    fval(buff, bufc, floorl(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
 
+/**
+ * @brief Returns the smallest integer greater than or equal to <number>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ceil(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, ceil(strtold(fargs[0], (char **)NULL)), LDBL_DIG);
+    fval(buff, bufc, ceill(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
 
+/**
+ * @brief Rounds <number> to <places> decimal places. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_round(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, strtold(fargs[0], (char **)NULL), strtod(fargs[1], (char **)NULL));
+    fval(buff, bufc, strtold(fargs[0], (char **)NULL), strtol(fargs[1], (char **)NULL, 10));
 }
 
+/**
+ * @brief Returns the value of <number> after truncating off any fractional value.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double x;
@@ -258,19 +361,58 @@ void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), db
     x = strtold(fargs[0], (char **)NULL);
     x = (x >= 0) ? floor(x) : ceil(x);
 
-    fval(buff, bufc, x, LDBL_DIG);
+    fval(buff, bufc, x, FPTS_DIG);
 }
 
+/**
+ * @brief Returns <number>, incremented by 1 (the <number>, plus 1).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_inc(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, strtold(fargs[0], (char **)NULL) + 1.0, LDBL_DIG);
+    fval(buff, bufc, strtold(fargs[0], (char **)NULL) + 1.0, FPTS_DIG);
 }
 
+/**
+ * @brief Returns <number>, decremented by 1 (the <number>, minus 1).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_dec(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, strtold(fargs[0], (char **)NULL) - 1.0, LDBL_DIG);
+    fval(buff, bufc, strtold(fargs[0], (char **)NULL) - 1.0, FPTS_DIG);
 }
 
+/**
+ * @brief Returns the square root of <number>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double val;
@@ -286,15 +428,42 @@ void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     }
     else
     {
-        fval(buff, bufc, sqrtl(val), LDBL_DIG);
+        fval(buff, bufc, sqrtl(val), FPTS_DIG);
     }
 }
 
+/**
+ * @brief Returns the result of raising the numeric constant e to <power>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_exp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, expl(strtold(fargs[0], (char **)NULL)), LDBL_DIG);
+    fval(buff, bufc, expl(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
 
+/**
+ * @brief If only given one argument, this function returns a list of numbers
+ *        from 0 to <number>-1.  <number> must be at least 1.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double val;
@@ -302,7 +471,7 @@ void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 
     if (val > 0)
     {
-        fval(buff, bufc, logl(val), LDBL_DIG);
+        fval(buff, bufc, logl(val), FPTS_DIG);
     }
     else
     {
@@ -310,6 +479,19 @@ void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
     }
 }
 
+/**
+ * @brief Handle trigonometrical functions (sin, cos, tan, etc...)
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void handle_trig(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double val;
@@ -337,56 +519,16 @@ void handle_trig(char *buff, char **bufc, dbref player __attribute__((unused)), 
         val = (val * 180.0) / (long double)M_PI;
     }
 
-    fval(buff, bufc, val, LDBL_DIG);
+    fval(buff, bufc, val, FPTS_DIG);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Base conversion: BASECONV
+/**
+ * @brief Convert a character to it's decimal value.
+ * 
+ * @param ch Character
+ * @param base Base to convert from
+ * @return int Value in decimal base.
  */
-
-/*
-char from_base_64[256] = {
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, 62, -1, 63,
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, 63,
-    -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-
-char to_base_64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-
-char from_base_36[256] = {
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
-    -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
-    -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-
-char to_base_36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-*/
-
 int fromBaseX(char ch, int base)
 {
     int i = -1;
@@ -417,6 +559,13 @@ int fromBaseX(char ch, int base)
     return i;
 }
 
+/**
+ * @brief Convert decival value to it's base X character representation
+ * 
+ * @param i Decimal value
+ * @param base Base to convert to
+ * @return char Character
+ */
 char toBaseX(int i, int base)
 {
     char ch = 0;
@@ -458,6 +607,19 @@ char toBaseX(int i, int base)
     return ch;
 }
 
+/**
+ * @brief Convert to various bases
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long long n, m;
@@ -524,6 +686,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
             SAFE_LB_CHR('-', buff, bufc);
         }
     }
+
     /**
      * Handle the case of 0 and less than base case.
      * 
@@ -533,6 +696,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
         SAFE_LB_CHR(toBaseX((unsigned char)n, to), buff, bufc);
         return;
     }
+
     /**
      * Build up the number backwards, then reverse it.
      * 
@@ -556,46 +720,139 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
     XFREE(nbuf);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Math comparison funcs: GT, GTE, LT, LTE, EQ, NEQ, NCOMP
+/**
+ * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
+ *        than <number2>, and 0 otherwise.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
+ *        than or equal to <number2>, and 0 otherwise. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief Takes two numbers, and returns 1 if and only if <number1> is less
+ *        than <number2>, and 0 otherwise. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief Takes two numbers, and returns 1 if and only if <number1> is less
+ *        than or equal to <number2>, and 0 otherwise.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief Takes two numbers, and returns 1 if they are equal and 0 if they
+ *        are not.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief   Takes two numbers, and returns 1 if they are not equal and 0 if
+ *          they are equal. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_neq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
 }
 
+/**
+ * @brief This function returns 0 if the two numbers are equal, 1 if the first
+ *        number is greater than the second number, and -1 if the first number
+ *        is less than the second number.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double x, y;
-    x = strtold(fargs[0], (char **)NULL);
-    y = strtold(fargs[1], (char **)NULL);
+    long double x = strtold(fargs[0], (char **)NULL);
+    long double y = strtold(fargs[1], (char **)NULL);
 
     if (x == y)
     {
@@ -611,26 +868,46 @@ void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
     }
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Two-argument math functions: SUB, DIV, FLOORDIV, FDIV, MODULO, REMAINDER,
- * POWER, LOG
+/**
+ * @brief Returns the result of subtracting <number2> from <number1>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_sub(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, strtold(fargs[0], (char **)NULL) - strtold(fargs[1], (char **)NULL), LDBL_DIG);
+    fval(buff, bufc, strtold(fargs[0], (char **)NULL) - strtold(fargs[1], (char **)NULL), FPTS_DIG);
 }
 
+/**
+ * @brief   Returns the integer quotient from dividing <number1> by <number2>,
+ *          rounded towards zero.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double top, bot;
-    /*
-     * The C / operator is only fully specified for non-negative
+    /**
+     * The C '/' operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
      */
-    top = strtol(fargs[0], (char **)NULL, 10);
-    bot = strtol(fargs[1], (char **)NULL, 10);
+    long double top = strtold(fargs[0], (char **)NULL);
+    long double bot = strtold(fargs[1], (char **)NULL);
 
     if (bot == 0)
     {
@@ -664,15 +941,30 @@ void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
     fval(buff, bufc, top, 0);
 }
 
+/**
+ * @brief   Returns the integer quotient from dividing <number1> by <number2>,
+ *          rounded down (towards zero if positive, away from zero if negative).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long top, bot, res;
-    /*
-     * The C / operator is only fully specified for non-negative
+    /**
+     * The C '/' operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
+     * 
      */
-    top = strtol(fargs[0], (char **)NULL, 10);
-    bot = strtol(fargs[1], (char **)NULL, 10);
+    long long top = strtoll(fargs[0], (char **)NULL, 10);
+    long long bot = strtoll(fargs[1], (char **)NULL, 10);
+    long long res = 0;
 
     if (bot == 0)
     {
@@ -716,10 +1008,22 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
     fval(buff, bufc, res, 0);
 }
 
+/**
+ * @brief Returns the floating point quotient from dividing <number1> by <number2>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double bot;
-    bot = strtold(fargs[1], (char **)NULL);
+    long double bot = strtold(fargs[1], (char **)NULL);
 
     if (bot == 0)
     {
@@ -727,20 +1031,35 @@ void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     }
     else
     {
-        fval(buff, bufc, (strtold(fargs[0], (char **)NULL) / bot), LDBL_DIG);
+        fval(buff, bufc, (strtold(fargs[0], (char **)NULL) / bot), FPTS_DIG);
     }
 }
 
+/**
+ * @brief Returns the smallest integer with the same sign as <integer2> such
+ *        that the difference between <integer1> and the result is divisible
+ *        by <integer2>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long top, bot;
-    /*
-     * The C % operator is only fully specified for non-negative
-     * operands, so we try not to give it negative operands here
-     */
-    top = strtol(fargs[0], (char **)NULL, 10);
-    bot = strtol(fargs[1], (char **)NULL, 10);
+    long long top = strtoll(fargs[0], (char **)NULL, 10);
+    long long bot = strtoll(fargs[1], (char **)NULL, 10);
 
+    /**
+     * The C '%' operator is only fully specified for non-negative
+     * operands, so we try not to give it negative operands here
+     * 
+     */
     if (bot == 0)
     {
         bot = 1;
@@ -772,16 +1091,31 @@ void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), d
     fval(buff, bufc, top, 0);
 }
 
+/**
+ * @brief Returns the smallest integer with the same sign as <integer1> such
+ *        that the difference between <integer1> and the result is divisible
+ *        by <integer2>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long top, bot;
-    /*
-     * The C % operator is only fully specified for non-negative
-     * operands, so we try not to give it negative operands here
-     */
-    top = strtol(fargs[0], (char **)NULL, 10);
-    bot = strtol(fargs[1], (char **)NULL, 10);
+    long long top = strtoll(fargs[0], (char **)NULL, 10);
+    long long bot = strtoll(fargs[1], (char **)NULL, 10);
 
+    /**
+     * The C '%' operator is only fully specified for non-negative
+     * operands, so we try not to give it negative operands here
+     * 
+     */
     if (bot == 0)
     {
         bot = 1;
@@ -813,11 +1147,23 @@ void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused))
     fval(buff, bufc, top, 0);
 }
 
+/**
+ * @brief Returns the result of raising <number> to the <power>'th power.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double val1, val2;
-    val1 = strtold(fargs[0], (char **)NULL);
-    val2 = strtold(fargs[1], (char **)NULL);
+    long double val1 = strtold(fargs[0], (char **)NULL);
+    long double val2 = strtold(fargs[1], (char **)NULL);
 
     if (val1 < 0)
     {
@@ -825,13 +1171,26 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
     }
     else
     {
-        fval(buff, bufc, powl(val1, val2), LDBL_DIG);
+        fval(buff, bufc, powl(val1, val2), FPTS_DIG);
     }
 }
 
+/**
+ * @brief Returns the result of raising <number> to the <power>'th power.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double val, base;
+    long double val = 0.0, base = 0.0;
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
     {
@@ -859,148 +1218,259 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
     }
     else
     {
-        fval(buff, bufc, logl(val) / logl(base), LDBL_DIG);
+        fval(buff, bufc, logl(val) / logl(base), FPTS_DIG);
     }
 }
 
-/*
- * ------------------------------------------------------------------------
- * Bitwise two-argument integer math functions: SHL, SHR, BAND, BOR, BNAND
+/**
+ * @brief This function returns the result of leftwards bit-shifting <number>
+ *        by <count> times.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_shl(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) << strtoll(fargs[1], (char **)NULL, 10), 0);
 }
 
+/**
+ * @brief This function returns the result of rightwards bit-shifting <number>
+ *        by <count> times.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_shr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) >> strtoll(fargs[1], (char **)NULL, 10), 0);
 }
 
+/**
+ * @brief Intended for use on a bitfield, this function performs a binary AND
+ *        between two numbers.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_band(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) & strtoll(fargs[1], (char **)NULL, 10), 0);
 }
 
+/**
+ * @brief Intended for use on a bitfield, this function performs a binary OR
+ *        between two numbers. It is most useful for "turning on" bits in a
+ *        bitfield.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_bor(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) | strtoll(fargs[1], (char **)NULL, 10), 0);
 }
 
+/**
+ * @brief Intended for use on a bitfield, this function performs a binary AND
+ *        between a number and the complement of another number.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_bnand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) & ~(strtoll(fargs[1], (char **)NULL, 10)), 0);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Multi-argument math functions: ADD, MUL, MAX, MIN
+/**
+ * @brief Returns the result of adding its arguments together.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_add(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double sum;
-    int i;
-
     if (nfargs < 2)
     {
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
-        sum = strtold(fargs[0], (char **)NULL);
+        long double sum = strtold(fargs[0], (char **)NULL);
 
-        for (i = 1; i < nfargs; i++)
+        for (int i = 1; i < nfargs; i++)
         {
             sum += strtold(fargs[i], (char **)NULL);
         }
 
-        fval(buff, bufc, sum, LDBL_DIG);
+        fval(buff, bufc, sum, FPTS_DIG);
     }
 
     return;
 }
 
+/**
+ * @brief Returns the result of multiplying its arguments together.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_mul(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double prod;
-    int i;
-
     if (nfargs < 2)
     {
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
-        prod = strtold(fargs[0], (char **)NULL);
+        long double prod = strtold(fargs[0], (char **)NULL);
 
-        for (i = 1; i < nfargs; i++)
+        for (int i = 1; i < nfargs; i++)
         {
             prod *= strtold(fargs[i], (char **)NULL);
         }
 
-        fval(buff, bufc, prod, LDBL_DIG);
+        fval(buff, bufc, prod, FPTS_DIG);
     }
 
     return;
 }
 
+/**
+ * @brief Returns the largest number from among its arguments.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_max(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double max, val;
-    int i;
-
     if (nfargs < 1)
     {
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
-        max = strtold(fargs[0], (char **)NULL);
+        long double max = strtold(fargs[0], (char **)NULL);
+        long double val = 0.0;
 
-        for (i = 1; i < nfargs; i++)
+        for (int i = 1; i < nfargs; i++)
         {
             val = strtold(fargs[i], (char **)NULL);
             max = (max < val) ? val : max;
         }
 
-        fval(buff, bufc, max, LDBL_DIG);
+        fval(buff, bufc, max, FPTS_DIG);
     }
 }
 
+/**
+ * @brief Returns the smallest number from among its arguments.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_min(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    int i;
-    long double min, val;
-
     if (nfargs < 1)
     {
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
-        min = strtold(fargs[0], (char **)NULL);
+        long double min = strtold(fargs[0], (char **)NULL);
+        long double val = 0.0;
 
-        for (i = 1; i < nfargs; i++)
+        for (int i = 1; i < nfargs; i++)
         {
             val = strtold(fargs[i], (char **)NULL);
             min = (min > val) ? val : min;
         }
 
-        fval(buff, bufc, min, LDBL_DIG);
+        fval(buff, bufc, min, FPTS_DIG);
     }
 }
 
-/*
- * ---------------------------------------------------------------------------
- * bound(): Force a number to conform to specified bounds.
+/**
+ * @brief Force a number to conform to specified bounds.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    long double min, max, val;
-    char *cp;
+    long double min = 0.0, max = 0.0, val = 0.0;
+    char *cp = NULL;
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
     {
@@ -1009,15 +1479,24 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
     val = strtold(fargs[0], (char **)NULL);
 
     if (nfargs < 2)
-    { /* just the number; no bounds enforced */
-        fval(buff, bufc, val, LDBL_DIG);
+    {
+        /** 
+         * just the number; no bounds enforced 
+         * 
+         */
+        fval(buff, bufc, val, FPTS_DIG);
         return;
     }
 
     if (nfargs > 1)
-    { /* if empty, don't check the minimum */
+    {
         for (cp = fargs[1]; *cp && isspace(*cp); cp++)
-            ;
+        {
+            /** 
+             * if empty, don't check the minimum 
+             * 
+             */
+        }
 
         if (*cp)
         {
@@ -1027,9 +1506,14 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
     }
 
     if (nfargs > 2)
-    { /* if empty, don't check the maximum */
+    {
         for (cp = fargs[2]; *cp && isspace(*cp); cp++)
-            ;
+        {
+            /** 
+             * if empty, don't check the maximum 
+             * 
+             */
+        }
 
         if (*cp)
         {
@@ -1038,49 +1522,78 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
         }
     }
 
-    fval(buff, bufc, val, LDBL_DIG);
+    fval(buff, bufc, val, FPTS_DIG);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Integer point distance functions: DIST2D, DIST3D
+/**
+ * @brief Returns the distance between the Cartesian points in two dimensions
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_dist2d(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double d;
     long double r;
-    d = strtoll(fargs[0], (char **)NULL, 10) - strtoll(fargs[2], (char **)NULL, 10);
+    d = strtold(fargs[0], (char **)NULL) - strtold(fargs[2], (char **)NULL);
     r = d * d;
-    d = strtoll(fargs[1], (char **)NULL, 10) - strtoll(fargs[3], (char **)NULL, 10);
+    d = strtold(fargs[1], (char **)NULL) - strtold(fargs[3], (char **)NULL);
     r += d * d;
     d = sqrtl(r);
-    fval(buff, bufc, d, LDBL_DIG);
+    fval(buff, bufc, d, FPTS_DIG);
 }
 
+/**
+ * @brief Returns the distance between the Cartesian points in three dimensions.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_dist3d(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     long double d;
     long double r;
-    d = strtoll(fargs[0], (char **)NULL, 10) - strtoll(fargs[3], (char **)NULL, 10);
+    d = strtold(fargs[0], (char **)NULL) - strtold(fargs[3], (char **)NULL);
     r = d * d;
-    d = strtoll(fargs[1], (char **)NULL, 10) - strtoll(fargs[4], (char **)NULL, 10);
+    d = strtold(fargs[1], (char **)NULL) - strtold(fargs[4], (char **)NULL);
     r += d * d;
-    d = strtoll(fargs[2], (char **)NULL, 10) - strtoll(fargs[5], (char **)NULL, 10);
+    d = strtold(fargs[2], (char **)NULL) - strtold(fargs[5], (char **)NULL);
     r += d * d;
     d = sqrtl(r);
-    fval(buff, bufc, d, LDBL_DIG);
+    fval(buff, bufc, d, FPTS_DIG);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Math "accumulator" operations on a list: LADD, LMAX, LMIN
+/**
+ * @brief Adds a list of numbers together.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    long double sum;
-    char *cp, *curr;
+    long double sum = 0.0;
+    char *cp = NULL, *curr = NULL;
     Delim isep;
 
     if (nfargs == 0)
@@ -1108,13 +1621,26 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         sum += strtold(curr, (char **)NULL);
     }
 
-    fval(buff, bufc, sum, LDBL_DIG);
+    fval(buff, bufc, sum, FPTS_DIG);
 }
 
+/**
+ * @brief Obtains the largest number out of a list of numbers (i.e., the maximum).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    long double max, val;
-    char *cp, *curr;
+    long double max = 0.0, val = 0.0;
+    char *cp = NULL, *curr = NULL;
     Delim isep;
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -1145,14 +1671,27 @@ void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             }
         }
 
-        fval(buff, bufc, max, LDBL_DIG);
+        fval(buff, bufc, max, FPTS_DIG);
     }
 }
 
+/**
+ * @brief Obtains the smallest number out of a list of numbers (i.e., the minimum).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    long double min, val;
-    char *cp, *curr;
+    long double min = 0.0, val = 0.0;
+    char *cp = NULL, *curr = NULL;
     Delim isep;
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -1183,23 +1722,29 @@ void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
             }
         }
 
-        fval(buff, bufc, min, LDBL_DIG);
+        fval(buff, bufc, min, FPTS_DIG);
     }
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Operations on a single vector: VMAG, VUNIT (VDIM is implemented by
- * fun_words)
+/**
+ * @brief Handle Operations on a single vector: VMAG, VUNIT (VDIM is implemented by fun_words)
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-    char **v1;
-    int n, i, oper;
-    long double tmp, res = 0;
+    char **v1 = NULL;
+    long double tmp = 0, res = 0;
+    int n = 0, oper = Func_Mask(VEC_OPER);
     Delim isep, osep;
-    oper = Func_Mask(VEC_OPER);
 
     if (oper == VEC_UNIT)
     {
@@ -1236,8 +1781,9 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
     }
 
-    /*
+    /**
      * split the list up, or return if the list is empty
+     * 
      */
     if (!fargs[0] || !*fargs[0])
     {
@@ -1246,23 +1792,25 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     n = list2arr(&v1, LBUF_SIZE, fargs[0], &isep);
 
-    /*
+    /**
      * calculate the magnitude
+     * 
      */
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         tmp = strtold(v1[i], (char **)NULL);
         res += tmp * tmp;
     }
 
-    /*
+    /**
      * if we're just calculating the magnitude, return it
+     * 
      */
     if (oper == VEC_MAG)
     {
         if (res > 0)
         {
-            fval(buff, bufc, sqrt(res), LDBL_DIG);
+            fval(buff, bufc, sqrtl(res), FPTS_DIG);
         }
         else
         {
@@ -1280,31 +1828,39 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         return;
     }
 
-    res = sqrt(res);
-    fval(buff, bufc, strtold(v1[0], (char **)NULL) / res, LDBL_DIG);
+    res = sqrtl(res);
+    fval(buff, bufc, strtold(v1[0], (char **)NULL) / res, FPTS_DIG);
 
-    for (i = 1; i < n; i++)
+    for (int i = 1; i < n; i++)
     {
         print_separator(&osep, buff, bufc);
-        fval(buff, bufc, strtold(v1[i], (char **)NULL) / res, LDBL_DIG);
+        fval(buff, bufc, strtold(v1[i], (char **)NULL) / res, FPTS_DIG);
     }
 
     XFREE(v1);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR, VAND, VXOR
+/**
+ * @brief Handle operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR, 
+ *        VAND and VXOR.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    int oper;
-    char **v1, **v2;
-    long double scalar;
-    int n, m, i, x, y;
-    oper = Func_Mask(VEC_OPER);
+    char **v1 = NULL, **v2 = NULL;
+    long double scalar = 0.0;
+    int n = 0, m = 0, x = 0, y = 0;
+    int oper = Func_Mask(VEC_OPER);
 
     if (oper != VEC_DOT)
     {
@@ -1330,9 +1886,10 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     }
     else
     {
-        /*
-	 * dot product returns a scalar, so no output delim
-	 */
+        /**
+    	 * dot product returns a scalar, so no output delim
+         * 
+	     */
         if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
         {
             return;
@@ -1344,8 +1901,9 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         }
     }
 
-    /*
+    /**
      * split the list up, or return if the list is empty
+     * 
      */
     if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1])
     {
@@ -1370,23 +1928,23 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     switch (oper)
     {
     case VEC_ADD:
-        fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), LDBL_DIG);
+        fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), FPTS_DIG);
 
-        for (i = 1; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), LDBL_DIG);
+            fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), FPTS_DIG);
         }
 
         break;
 
     case VEC_SUB:
-        fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), LDBL_DIG);
+        fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), FPTS_DIG);
 
-        for (i = 1; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), LDBL_DIG);
+            fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), FPTS_DIG);
         }
 
         break;
@@ -1394,7 +1952,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case VEC_OR:
         SAFE_BOOL(buff, bufc, xlate(v1[0]) || xlate(v2[0]));
 
-        for (i = 1; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
             SAFE_BOOL(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
@@ -1405,7 +1963,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case VEC_AND:
         SAFE_BOOL(buff, bufc, xlate(v1[0]) && xlate(v2[0]));
 
-        for (i = 1; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
             SAFE_BOOL(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
@@ -1418,7 +1976,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         y = xlate(v2[0]);
         SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
 
-        for (i = 1; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
             x = xlate(v1[i]);
@@ -1430,75 +1988,79 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     case VEC_MUL:
 
-        /*
-	 * if n or m is 1, this is scalar multiplication. otherwise,
-	 * multiply elementwise.
-	 */
+        /**
+    	 * if n or m is 1, this is scalar multiplication. otherwise,
+    	 * multiply elementwise.
+         * 
+    	 */
         if (n == 1)
         {
             scalar = strtold(v1[0], (char **)NULL);
-            fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, LDBL_DIG);
+            fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, FPTS_DIG);
 
-            for (i = 1; i < m; i++)
+            for (int i = 1; i < m; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, LDBL_DIG);
+                fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, FPTS_DIG);
             }
         }
         else if (m == 1)
         {
             scalar = strtold(v2[0], (char **)NULL);
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, LDBL_DIG);
+            fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, FPTS_DIG);
 
-            for (i = 1; i < n; i++)
+            for (int i = 1; i < n; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, LDBL_DIG);
+                fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, FPTS_DIG);
             }
         }
         else
         {
-            /*
-	     * vector elementwise product.
-	     *
-	     * Note this is a departure from TinyMUX, but an
-	     * imitation of the PennMUSH behavior: the
-	     * documentation in Penn claims it's a dot product,
-	     * but the actual behavior isn't. We implement dot
-	     * product separately!
-	     */
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), LDBL_DIG);
+            /**
+    	     * vector elementwise product.
+    	     *
+    	     * Note this is a departure from TinyMUX, but an
+    	     * imitation of the PennMUSH behavior: the
+    	     * documentation in Penn claims it's a dot product,
+    	     * but the actual behavior isn't. We implement dot
+    	     * product separately!
+             * 
+    	     */
+            fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), FPTS_DIG);
 
-            for (i = 1; i < n; i++)
+            for (int i = 1; i < n; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), LDBL_DIG);
+                fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), FPTS_DIG);
             }
         }
 
         break;
 
     case VEC_DOT:
-        /*
-	 * dot product: (a,b,c) . (d,e,f) = ad + be + cf
-	 *
-	 * no cross product implementation yet: it would be (a,b,c) x
-	 * (d,e,f) = (bf - ce, cd - af, ae - bd)
-	 */
+        /**
+    	 * dot product: (a,b,c) . (d,e,f) = ad + be + cf
+    	 *
+    	 * no cross product implementation yet: it would be 
+         * (a,b,c) x (d,e,f) = (bf - ce, cd - af, ae - bd)
+         * 
+    	 */
         scalar = 0;
 
-        for (i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
             scalar += strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL);
         }
 
-        fval(buff, bufc, scalar, LDBL_DIG);
+        fval(buff, bufc, scalar, FPTS_DIG);
         break;
 
     default:
-        /*
-	 * If we reached this, we're in trouble.
-	 */
+        /**
+    	 * If we reached this, we're in trouble.
+         * 
+    	 */
         SAFE_LB_STR("#-1 UNIMPLEMENTED", buff, bufc);
         break;
     }
@@ -1507,52 +2069,103 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     XFREE(v2);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Simple boolean funcs: NOT, NOTBOOL, T
+/**
+ * @brief If the input is a non-zero number, returns 0. If it is 0 or the
+ *        equivalent (such as a non-numeric string), returns 1.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, !(int)strtol(fargs[0], (char **)NULL, 10));
+    SAFE_BOOL(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) > 0 ? false : true);
 }
 
+/**
+ * @brief Takes a boolean value, and returns its inverse. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, !xlate(fargs[0]));
 }
 
+/**
+ * @brief Takes a boolean value, and returns 0 if it is false, and 1 if true.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_t(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     SAFE_BOOL(buff, bufc, xlate(fargs[0]));
 }
 
-long long cvtfun(int flag, char *str)
+/**
+ * @brief Convert differents values to Boolean.
+ * 
+ * @param flag Calling function flags
+ * @param str String to parse
+ * @return true 
+ * @return false 
+ */
+bool cvtfun(int flag, char *str)
 {
     if (flag & LOGIC_BOOL)
     {
         return (xlate(str));
     }
-    else
-    {
-        return (strtoll(str, (char **)NULL, 10));
-    }
+    return strtoll(str, (char **)NULL, 10) > 0 ? true : false;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Multi-argument boolean funcs: various combinations of
+/**
+ * @brief Handle multi-argument boolean funcs, various combinations of
  * [L,C][AND,OR,XOR][BOOL]
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
 void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep;
-    int flag, oper, i, val;
-    char *str, *tbuf, *bp;
-    flag = Func_Flags(fargs);
-    oper = (flag & LOGIC_OPER);
-    /*
+    bool val = false;
+    char *str = NULL, *tbuf = NULL, *bp = NULL;
+    int flag = Func_Flags(fargs);
+    int oper = (flag & LOGIC_OPER);
+
+    /**
      * most logic operations on an empty string should be false
+     * 
      */
     val = 0;
 
@@ -1564,9 +2177,10 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
             return;
         }
 
-        /*
-	 * the arguments come in a pre-evaluated list
-	 */
+        /**
+    	 * the arguments come in a pre-evaluated list
+         * 
+    	 */
         if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
         {
             return;
@@ -1592,20 +2206,22 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
     else if (nfargs < 2)
     {
-        /*
-	 * separate arguments, but not enough of them
-	 */
+        /**
+    	 * separate arguments, but not enough of them
+         * 
+    	 */
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
     else if (flag & FN_NO_EVAL)
     {
-        /*
-	 * separate, unevaluated arguments
-	 */
+        /**
+    	 * separate, unevaluated arguments
+         * 
+    	 */
         tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 
-        for (i = 0; i < nfargs; i++)
+        for (int i = 0; i < nfargs; i++)
         {
             str = fargs[i];
             bp = tbuf;
@@ -1622,10 +2238,11 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     }
     else
     {
-        /*
-	 * separate, pre-evaluated arguments
-	 */
-        for (i = 0; i < nfargs; i++)
+        /**
+    	 * separate, pre-evaluated arguments
+         * 
+    	 */
+        for (int i = 0; i < nfargs; i++)
         {
             val = ((oper == LOGIC_XOR) && val) ? !cvtfun(flag, fargs[i]) : cvtfun(flag, fargs[i]);
 
@@ -1639,17 +2256,25 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     SAFE_BOOL(buff, bufc, val);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * ltrue() and lfalse(): Get boolean values for an entire list.
+/**
+ * @brief Handle boolean values for an entire list
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    int flag, n;
-    char *tbuf, *bp, *bb_p;
-    flag = Func_Flags(fargs);
+    bool n =  false;
+    char *tbuf = NULL, *bp = NULL, *bb_p = NULL;
+    int flag = Func_Flags(fargs);
 
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
     {
@@ -1694,7 +2319,7 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
         }
         else
         {
-            n = !((int)strtol(tbuf, (char **)NULL, 10) == 0) && is_number(tbuf);
+            n = !((int)strtoll(tbuf, (char **)NULL, 10) == 0) && is_number(tbuf) ? true : false;
         }
 
         if (flag & IFELSE_FALSE)

@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I src/libltdl/m4
 
 #AM_CPPFLAGS     = $(LTDLINCL)
 
-SUBDIRS         = src
+SUBDIRS         = src/libltdl src
 
 EXTRA_DIST      = contrib/hello CONVERTING ChangeLog.Alpha ChangeLog.Beta ChangeLog.History FAQ MODULES
 	

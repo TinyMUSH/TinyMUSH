@@ -161,7 +161,7 @@ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/src/libltdl/config/depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/api.Po \
 	./$(DEPDIR)/boolexp.Po ./$(DEPDIR)/bsd.Po \
@@ -277,9 +277,9 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = libltdl modules/comsys/ modules/mail/ modules/db_sql/
+DIST_SUBDIRS = modules/comsys/ modules/mail/ modules/db_sql/
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/src/libltdl/config/depcomp
+	$(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -463,8 +463,8 @@ with_dirname_prog = @with_dirname_prog@
 with_install_suffix = @with_install_suffix@
 with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL)
-SUBDIRS = libltdl $(am__append_1) $(am__append_2) $(am__append_3)
-AUTOMAKE_OPTIONS = subdir-objects
+#SUBDIRS					= libltdl
+SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_3)
 netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
 netmush_H = api.h externs.h macros.h system.h typedefs.h
 netmush_SOURCES = $(netmush_C) $(netmush_H)

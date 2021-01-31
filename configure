@@ -696,6 +696,7 @@ WANT_MODULE_COMSYS_TRUE
 GCC_DEBUG_FALSE
 GCC_DEBUG_TRUE
 with_install_suffix
+LIBTOOL_DEPS
 LTDLOPEN
 LT_CONFIG_H
 subdirs
@@ -715,7 +716,6 @@ INCLTDL
 LTDLINCL
 LTDLDEPS
 LIBLTDL
-LIBTOOL_DEPS
 LT_SYS_LIBRARY_PATH
 OTOOL64
 OTOOL
@@ -2633,39 +2633,10 @@ with_included_ltdl="yes"
 
 ac_config_headers="$ac_config_headers src/config.h"
 
-ac_aux_dir=
-for ac_dir in src/libltdl/config "$srcdir"/src/libltdl/config; do
-  if test -f "$ac_dir/install-sh"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install-sh -c"
-    break
-  elif test -f "$ac_dir/install.sh"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install.sh -c"
-    break
-  elif test -f "$ac_dir/shtool"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/shtool install -c"
-    break
-  fi
-done
-if test -z "$ac_aux_dir"; then
-  as_fn_error $? "cannot find install-sh, install.sh, or shtool in src/libltdl/config \"$srcdir\"/src/libltdl/config" "$LINENO" 5
-fi
-
-# These three variables are undocumented and unsupported,
-# and are intended to be withdrawn in a future Autoconf release.
-# They can cause serious problems if a builder's source tree is in a directory
-# whose full name contains unusual characters.
-ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
-ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
-ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
-
-
 
 
 if test -z ; then :
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} ("2020-12-29")%b
 
   Copyright (C) 1989-2020 TinyMUSH development team.
@@ -2673,7 +2644,7 @@ if test -z ; then :
   Report bugs to <%B${PACKAGE_BUGREPORT}%b>.
 "
 else
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} ("2020-12-29")%b
 
   Copyright (C) 1989-2020 TinyMUSH development team.
@@ -3517,6 +3488,35 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+ac_aux_dir=
+for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
+  if test -f "$ac_dir/install-sh"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install-sh -c"
+    break
+  elif test -f "$ac_dir/install.sh"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install.sh -c"
+    break
+  elif test -f "$ac_dir/shtool"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/shtool install -c"
+    break
+  fi
+done
+if test -z "$ac_aux_dir"; then
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in \"$srcdir\" \"$srcdir/..\" \"$srcdir/../..\"" "$LINENO" 5
+fi
+
+# These three variables are undocumented and unsupported,
+# and are intended to be withdrawn in a future Autoconf release.
+# They can cause serious problems if a builder's source tree is in a directory
+# whose full name contains unusual characters.
+ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
+ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
+ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
+
 
 # Expand $ac_aux_dir to an absolute path.
 am_aux_dir=`cd "$ac_aux_dir" && pwd`
@@ -13142,7 +13142,6 @@ CC=$lt_save_CC
 # Only expand once:
 
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking what extension is used for runtime loadable modules" >&5
 $as_echo_n "checking what extension is used for runtime loadable modules... " >&6; }
 if ${libltdl_cv_shlibext+:} false; then :
@@ -14220,6 +14219,8 @@ eval "LTDLOPEN=\"$libname_spec\""
 
 
 # Only expand once:
+
+
 
 
 
@@ -20829,7 +20830,7 @@ fi
 	)`
 
 if test -z ; then :
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} ("2020-12-29")%b
 
   Copyright (C) 1989-2020 TinyMUSH development team.
@@ -20837,7 +20838,7 @@ if test -z ; then :
   Report bugs to <%B${PACKAGE_BUGREPORT}%b>.
 "
 else
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
 %B${PACKAGE_NAME}%b version %B${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR} ${PACKAGE_RELEASE_NAME} ("2020-12-29")%b
 
   Copyright (C) 1989-2020 TinyMUSH development team.
@@ -20847,7 +20848,7 @@ else
 fi
 
 if test -z ; then :
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
                            %BPath
 -------------------------------%b
          Installation directory : %B$tm_prefix%b
@@ -20871,7 +20872,7 @@ if test -z ; then :
 
 If everything is ok, you can now type %Bmake install%b to install the engine."
 else
-  ${ac_aux_dir}/shtool echo -e "
+  src/libltdl/config/shtool echo -e "
                            %BPath
 -------------------------------%b
          Installation directory : %B$tm_prefix%b

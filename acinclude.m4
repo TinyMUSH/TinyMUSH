@@ -11,7 +11,8 @@ m4_include([src/modules/db_sql/m4/ax_check_mysql.m4])
 m4_include([src/modules/db_sql/m4/ax_check_pgsql.m4])
 m4_include([src/modules/db_sql/m4/ax_lib_sqlite3.m4])
 
-AC_DEFUN([AX_PRINT],AS_IF([test -z $2], [${ac_aux_dir}/shtool echo -e "$1"], [${ac_aux_dir}/shtool echo -e "$1: %B$2%b"]))
+dnl AC_DEFUN([AX_PRINT],AS_IF([test -z $2], [${ac_aux_dir}/shtool echo -e "$1"], [${ac_aux_dir}/shtool echo -e "$1: %B$2%b"]))
+AC_DEFUN([AX_PRINT],AS_IF([test -z $2], [src/libltdl/config/shtool echo -e "$1"], [src/libltdl/config/shtool echo -e "$1: %B$2%b"]))
 
 AC_DEFUN([AX_VERSION], [
 	m4_define([count], [0])

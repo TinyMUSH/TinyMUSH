@@ -30,6 +30,13 @@
  * Trim off leading and trailing spaces if the separator char is a space
  */
 
+/**
+ * @brief Trim off leading and trailing spaces if the separator char is a space
+ * 
+ * @param str String to trim
+ * @param sep Separator char
+ * @return char* Trimmed string
+ */
 char *trim_space_sep(char *str, const Delim *sep)
 {
 	char *p;
@@ -44,25 +51,26 @@ char *trim_space_sep(char *str, const Delim *sep)
 		str++;
 	}
 
-	for (p = str; *p; p++)
-		;
+	for (p = str; *p; p++) {
+		// Skip to end of string
+	}
 
-	for (p--; *p == ' ' && p > str; p--)
-		;
+	for (p--; *p == ' ' && p > str; p--){
+		// Back up over spaces
+	}
 
 	p++;
 	*p = '\0';
 	return str;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Tokenizer functions. next_token: Point at start of next token in string.
- * split_token: Get next token from string as null-term string.  String is
- * destructively modified. next_token_ansi: Point at start of next token, and
- * tell what color it is.
+/**
+ * @brief Point at start of next token in string.
+ * 
+ * @param str String with tokens
+ * @param sep Token separators
+ * @return char* Pointer to next token
  */
-
 char *next_token(char *str, const Delim *sep)
 {
 	char *p;
@@ -112,6 +120,14 @@ char *next_token(char *str, const Delim *sep)
 	return str;
 }
 
+/**
+ * @brief Get next token from string as null-term string.  
+ *        String is destructively modified.
+ * 
+ * @param sp String with tokens
+ * @param sep Token separators
+ * @return char* Token
+ */
 char *split_token(char **sp, const Delim *sep)
 {
 	char *str, *save, *p;
@@ -174,6 +190,14 @@ char *split_token(char **sp, const Delim *sep)
 	return save;
 }
 
+/**
+ * @brief Point at start of next token, and tell what color it is.
+ * 
+ * @param str String with token
+ * @param sep Token separator
+ * @param ansi_state_ptr Current ansi state
+ * @return char* Token
+ */
 char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 {
 	int ansi_state = *ansi_state_ptr;
@@ -302,9 +326,10 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	}
 	else
 	{
-		/*
-	 * ansi tracking not supported yet in multichar delims
-	 */
+		/**
+		 * ansi tracking not supported yet in multichar delims
+		 * 
+	 	 */
 		if ((p = strstr(str, sep->str)) == NULL)
 		{
 			return NULL;
@@ -317,11 +342,13 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	return str;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Count the words in a delimiter-separated list.
+/**
+ * @brief Count the words in a delimiter-separated list.
+ * 
+ * @param str String to count words
+ * @param sep Word separators
+ * @return int Number of words
  */
-
 int countwords(char *str, const Delim *sep)
 {
 	int n;
@@ -338,11 +365,15 @@ int countwords(char *str, const Delim *sep)
 	return n;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * list2arr, arr2list: Convert lists to arrays and vice versa.
+/**
+ * @brief Convert lists to arrays
+ * 
+ * @param arr Pointer to Array
+ * @param maxtok Maximum number of token
+ * @param list List to convert
+ * @param sep List separator
+ * @return int Number of token in array.
  */
-
 int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
 	unsigned char *tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
@@ -350,10 +381,11 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	char *tok, *liststart;
 	int ntok, tokpos, i, bits;
 
-	/*
+	/**
      * Mark token starting points in a 1k bitstring, then go back
      * and collect them into an array of just the right number of
      * pointers.
+	 * 
      */
 
 	if (!initted)
@@ -373,13 +405,14 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 
 	if (ntok == 0)
 	{
-		++ntok; //So we don't try to XMALLOC(0).
+		++ntok; /*!< So we don't try to XMALLOC(0). */
 	}
 
-	/*
+	/**
      * Caller must free this array of pointers later. Validity of the
      * pointers is dependent upon the original list string having not
      * been freed yet.
+	 * 
      */
 	*(arr) = (char **)XMALLOC(ntok + 1, "arr");
 	tokpos >>= 3;
@@ -389,10 +422,11 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	{
 		if (tok_starts[i])
 		{
-			/*
-	     * There's at least one token starting in this byte
-	     * of the bitstring, so we scan the bits.
-	     */
+			/**
+		     * There's at least one token starting in this byte
+		     * of the bitstring, so we scan the bits.
+			 * 
+	    	 */
 			bits = tok_starts[i];
 			tok_starts[i] = 0;
 			tok = liststart + (i << 3);
@@ -415,6 +449,13 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	return ntok;
 }
 
+/**
+ * @brief Print separator for arr2list
+ * 
+ * @param sep Separator
+ * @param list List
+ * @param bufc Buffer where to write
+ */
 void print_separator(const Delim *sep, char *list, char **bufc)
 {
 	if (sep->len == 1)
@@ -434,6 +475,15 @@ void print_separator(const Delim *sep, char *list, char **bufc)
 	}
 }
 
+/**
+ * @brief Convert arrays to lists
+ * 
+ * @param arr  Array to convert
+ * @param alen Array length
+ * @param list List buffer
+ * @param bufc Buffer
+ * @param sep Separatpr
+ */
 void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 {
 	int i;
@@ -451,13 +501,19 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Find the ANSI states at the beginning and end of each word of a list.
- * NOTE! Needs one more array slot than list2arr (think fenceposts) but still
- * takes the same maxlen and returns the same number of words.
+/**
+ * @brief Find the ANSI states at the beginning and end of each word of a list.
+ * 
+ * @note Needs one more array slot than list2arr (think fenceposts) but still
+ *       takes the same maxlen and returns the same number of words.
+ * 
+ * @param arr Array
+ * @param prior_state Ansi State
+ * @param maxlen Maximum length of array
+ * @param list List to parse
+ * @param sep Separator
+ * @return int Ansi state
  */
-
 int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep)
 {
 	int i, ansi_state;
@@ -479,11 +535,13 @@ int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *s
 	return i - 1;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Quick-matching for function purposes.
+/**
+ * @brief Quick-matching for function purposes.
+ * 
+ * @param player DBref of player
+ * @param name Name for match
+ * @return dbref Match
  */
-
 dbref match_thing(dbref player, char *name)
 {
 	init_match(player, name, NOTYPE);
@@ -491,17 +549,22 @@ dbref match_thing(dbref player, char *name)
 	return (noisy_match_result());
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fn_range_check: Check # of args to a function with an optional argument
- * for validity.
+/**
+ * @brief Check # of args to a function with an optional argument for validity.
+ * 
+ * @param fname Function name
+ * @param nfargs Number of arguments
+ * @param minargs Minimum number of arguments
+ * @param maxargs Maximum number of arguments
+ * @param result Result message if error
+ * @param bufc Buffer
+ * @return bool 
  */
-
-int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
+bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
 {
 	if ((nfargs >= minargs) && (nfargs <= maxargs))
 	{
-		return 1;
+		return true;
 	}
 
 	if (maxargs == (minargs + 1))
@@ -513,14 +576,26 @@ int fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char
 		SAFE_SPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
 	}
 
-	return 0;
+	return false;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * delim_check: obtain delimiter
+/**
+ * @brief Obtain delimiter
+ * 
+ * @param buff Buffer
+ * @param bufc Buffer tracher
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref oc cause
+ * @param fargs Arguments for functions
+ * @param nfargs Number of arguments for functions
+ * @param cargs Arguments for commands
+ * @param ncargs Number of arguments for commands
+ * @param sep_arg Argument Separator
+ * @param sep Separator
+ * @param dflags Delimiter flags
+ * @return int 
  */
-
 int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags)
 {
 	char *tstr, *bp, *str;
@@ -600,11 +675,13 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	return (sep->len);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Boolean true/false check.
+/**
+ * @brief 
+ * 
+ * @param arg Boolean true/false check.
+ * @return true 
+ * @return false 
  */
-
 bool xlate(char *arg)
 {
 	char *temp2;
@@ -617,21 +694,11 @@ bool xlate(char *arg)
 		{
 			if (mushconf.bools_oldstyle)
 			{
-				switch ((int)strtol(arg, (char **)NULL, 10))
-				{
-				case -1:
-					return false;
-
-				case 0:
-					return false;
-
-				default:
-					return true;
-				}
+				return strtoll(arg, (char **)NULL, 10) > 0 ? true : false;
 			}
 			else
 			{
-				return ((int)strtol(arg, (char **)NULL, 10) >= 0) ? true : false;
+				return strtoll(arg, (char **)NULL, 10) >= 0 ? true : false;
 			}
 		}
 
@@ -641,9 +708,10 @@ bool xlate(char *arg)
 		}
 		else
 		{
-			/*
-	     * Case of '#-1 <string>'
-	     */
+			/**
+			 * Case of '#-1 <string>'
+			 * 
+			 */
 			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' ')) ? true : false;
 		}
 	}
@@ -657,17 +725,18 @@ bool xlate(char *arg)
 
 	if (is_integer(temp2))
 	{
-		return (int)strtol(temp2, (char **)NULL, 10) ? true : false;
+		return strtoll(temp2, (char **)NULL, 10) >= 0 ? true : false;
 	}
 
 	return true;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * used by fun_reverse and fun_revwords to reverse things
+/**
+ * @brief Used by fun_reverse and fun_revwords to reverse things
+ * 
+ * @param from Input
+ * @param to Output
  */
-
 void do_reverse(char *from, char *to)
 {
 	char *tp;
@@ -680,12 +749,13 @@ void do_reverse(char *from, char *to)
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Random number generator, from PennMUSH's get_random_long(), which is turn
- * based on MUX2's RandomINT32().
+/**
+ * @brief Generate random number between low and high
+ * 
+ * @param low Lowest value of random number
+ * @param high Highest value of random number
+ * @return uint32_t Random number
  */
-
 uint32_t random_range(uint32_t low, uint32_t high)
 {
 	uint32_t x;

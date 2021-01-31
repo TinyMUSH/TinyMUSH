@@ -20,40 +20,70 @@
 #include "externs.h"
 #include "prototypes.h"
 
-/*
- * ---------------------------------------------------------------------------
- * fun_switch: Return value based on pattern matching (ala @switch/first)
- * fun_switchall: Similar, but ala @switch/all fun_case: Like switch(), but a
- * straight exact match instead of wildcard. NOTE: These functions expect
- * that their arguments have not been evaluated.
- */
+MONTHDAYS mdtab[] = {
+	{(char *)"Jan", 31},
+	{(char *)"Feb", 29},
+	{(char *)"Mar", 31},
+	{(char *)"Apr", 30},
+	{(char *)"May", 31},
+	{(char *)"Jun", 30},
+	{(char *)"Jul", 31},
+	{(char *)"Aug", 31},
+	{(char *)"Sep", 30},
+	{(char *)"Oct", 31},
+	{(char *)"Nov", 30},
+	{(char *)"Dec", 31}};
 
+/**
+ * @brief   The switchall() function compares <str> against <pat1>, <pat2>, etc.
+ *          (allowing * to match any number of characters and ? to match any 1
+ *          character), and returns the corresponding <resN> parameters (without
+ *          any delimiters) for all <patN> patterns that match.  If none match,
+ *          then the default result <dflt> is returned. The evaluated value of
+ *          <str> can be obtained as '#$'. If switchall() and switch() are
+ *          nested, the nest level can be obtained with '#!'.
+ * 
+ * @note This functions expect that its arguments has not been evaluated.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i, got_one;
-	char *mbuff, *tbuff, *bp, *str, *save_token;
+	int i = 0;
+	bool got_one = false;
+	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
 
-	/*
+	/**
      * If we don't have at least 2 args, return nothing
+	 * 
      */
-
 	if (nfargs < 2)
 	{
 		return;
 	}
 
-	/*
+	/**
      * Evaluate the target in fargs[0]
+	 * 
      */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "mbuff");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	/*
+
+	/**
      * Loop through the patterns looking for a match
+	 * 
      */
 	mushstate.in_switch++;
 	save_token = mushstate.switch_token;
-	got_one = 0;
 
 	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
 	{
@@ -63,7 +93,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 		if (quick_wild(tbuff, mbuff))
 		{
-			got_one = 1;
+			got_one = true;
 			XFREE(tbuff);
 			mushstate.switch_token = mbuff;
 			str = fargs[i + 1];
@@ -75,10 +105,10 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		}
 	}
 
-	/*
+	/**
      * If we didn't match, return the default if there is one
+	 * 
      */
-
 	if (!got_one && (i < nfargs) && fargs[i])
 	{
 		mushstate.switch_token = mbuff;
@@ -91,28 +121,51 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	mushstate.switch_token = save_token;
 }
 
+/**
+ * @brief   The switch() function compares <str> against <pat1>, <pat2>, etc (allowing
+ *          to match any number of characters and ? to match any 1 character), and
+ *          returns the corresponding <resN> parameter for the first <patN> pattern
+ *          that matches.  If none match, then the default result <dflt> is returned.
+ *          The evaluated value of <str> can be obtained as '#$'. If switch() and
+ *          switchall() are nested, the nest level can be obtained with '#!'.
+ * 
+ * @note This functions expect that its arguments has not been evaluated.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i;
-	char *mbuff, *tbuff, *bp, *str, *save_token;
+	int i = 0;
+	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
 
-	/*
+	/**
      * If we don't have at least 2 args, return nothing
+	 * 
      */
-
 	if (nfargs < 2)
 	{
 		return;
 	}
 
-	/*
+	/**
      * Evaluate the target in fargs[0]
+	 * 
      */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	/*
+
+	/**
      * Loop through the patterns looking for a match
+	 * 
      */
 	mushstate.in_switch++;
 	save_token = mushstate.switch_token;
@@ -138,10 +191,10 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		XFREE(tbuff);
 	}
 
-	/*
+	/**
      * Nope, return the default if there is one
+	 * 
      */
-
 	if ((i < nfargs) && fargs[i])
 	{
 		mushstate.switch_token = mbuff;
@@ -154,31 +207,50 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	mushstate.switch_token = save_token;
 }
 
+/**
+ * @brief   This function is similar to switch(), save that it looks for an exact
+ *          match between the patterns and the string, rather than doing a 'wildcard'
+ *          match (case-insensitive match with '*' and '?'), and the '#$' token
+ *          replacement is not done. It performs marginally faster than switch().
+ * 
+ * @note This functions expect that its arguments has not been evaluated.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i;
-	char *mbuff, *tbuff, *bp, *str;
+	int i = 0;
+	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL;
 
-	/*
+	/**
      * If we don't have at least 2 args, return nothing
+	 * 
      */
-
 	if (nfargs < 2)
 	{
 		return;
 	}
 
-	/*
+	/**
      * Evaluate the target in fargs[0]
+	 * 
      */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
-	/*
+	/**
      * Loop through the patterns looking for an exact match
+	 * 
      */
-
 	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
 	{
 		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
@@ -199,10 +271,10 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	XFREE(mbuff);
 
-	/*
+	/**
      * Nope, return the default if there is one
+	 * 
      */
-
 	if ((i < nfargs) && fargs[i])
 	{
 		str = fargs[i];
@@ -212,16 +284,25 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	return;
 }
 
+/**
+ * @brief Handle if else cases.
+ * 
+ * @note This functions expect that its arguments has not been evaluated.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	/*
-     * This function now assumes that its arguments have not been
-     * evaluated.
-     */
-	char *str, *mbuff, *bp, *save_token;
-	int flag, n;
-	char *tbuf = NULL;
-	flag = Func_Flags(fargs);
+	char *str = NULL, *mbuff = NULL, *bp = NULL, *save_token = NULL, *tbuf = NULL;
+	int n = 0, flag = Func_Flags(fargs);
 
 	if (flag & IFELSE_DEFAULT)
 	{
@@ -242,20 +323,21 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
-	/*
+	/**
      * We default to bool-style, but we offer the option of the MUX-style
      * nonzero -- it's true if it's not empty or zero.
+	 * 
      */
-
 	if (!mbuff || !*mbuff)
 	{
 		n = 0;
 	}
 	else if (flag & IFELSE_BOOL)
 	{
-		/*
-	 * xlate() destructively modifies the string
-	 */
+		/**
+		 * xlate() destructively modifies the string
+		 * 
+		 */
 		tbuf = XSTRDUP(mbuff, "tbuf");
 		n = xlate(tbuf);
 		XFREE(tbuf);
@@ -273,9 +355,10 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	if (flag & IFELSE_DEFAULT)
 	{
 		/*
-	 * If we got our condition, return the string, otherwise
-	 * return our 'else' default clause.
-	 */
+		 * If we got our condition, return the string, otherwise
+		 * return our 'else' default clause.
+		 * 
+		 */
 		if (n)
 		{
 			SAFE_LB_STR(mbuff, buff, bufc);
@@ -290,10 +373,10 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		return;
 	}
 
-	/*
+	/**
      * Not default mode: Use our condition to execute result clause
+	 * 
      */
-
 	if (!n)
 	{
 		if (nfargs != 3)
@@ -302,16 +385,18 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 			return;
 		}
 
-		/*
-	 * Do 'false' clause
-	 */
+		/**
+		 * Do 'false' clause
+		 * 
+		 */
 		str = fargs[2];
 	}
 	else
 	{
-		/*
-	 * Do 'true' clause
-	 */
+		/**
+		 * Do 'true' clause
+		 * 
+		 */
 		str = fargs[1];
 	}
 
@@ -332,15 +417,22 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_rand: Return a random number from 0 to arg1-1
+/**
+ * @brief Return a random number from 0 to arg1 - 1
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int num;
-	num = (int)strtol(fargs[0], (char **)NULL, 10);
+	int num = (int)strtol(fargs[0], (char **)NULL, 10);
 
 	if (num < 1)
 	{
@@ -349,16 +441,22 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	else
 	{
 		SAFE_SPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
-		
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * die(<number of dice>,<sides>): Roll XdY dice. lrand(<range bottom>,<range
- * top>,<times>[,<delim>]): Generate random list.
+/**
+ * @brief Roll XdY dice
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int n, die, count;
@@ -393,15 +491,30 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 	SAFE_LTOS(buff, bufc, total, LBUF_SIZE);
 }
 
+/**
+ * @brief Generate random list
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	Delim osep;
-	int n_times, r_bot, r_top, i;
-	double n_range;
-	unsigned int tmp;
-	char *bb_p;
-	/*
+	int n_times = 0, r_bot = 0, r_top = 0, i = 0;
+	double n_range = 0.0;
+	unsigned int tmp = 0;
+	char *bb_p = NULL;
+
+	/**
      * Special: the delim is really an output delim.
+	 * 
      */
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
 	{
@@ -412,9 +525,11 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	{
 		return;
 	}
-	/*
+
+	/**
      * If we're generating no numbers, since this is a list function, we
      * return empty, rather than returning 0.
+	 * 
      */
 	n_times = (int)strtol(fargs[2], (char **)NULL, 10);
 
@@ -433,18 +548,20 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (r_top < r_bot)
 	{
-		/*
-	 * This is an error condition. Just return an empty list. We
-	 * obviously can't return a random number between X and Y if
-	 * Y is less than X.
-	 */
+		/**
+		 * This is an error condition. Just return an empty list. We
+		 * obviously can't return a random number between X and Y if
+		 * Y is less than X.
+		 * 
+		 */
 		return;
 	}
 	else if (r_bot == r_top)
 	{
-		/*
-	 * Just generate a list of n repetitions.
-	 */
+		/**
+		 * Just generate a list of n repetitions.
+		 * 
+		 */
 		bb_p = *bufc;
 
 		for (i = 0; i < n_times; i++)
@@ -460,8 +577,9 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	/*
+	/**
      * We've hit this point, we have a range. Generate a list.
+	 * 
      */
 	n_range = (double)r_top - r_bot + 1;
 	bb_p = *bufc;
@@ -474,21 +592,29 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 
 		tmp = (unsigned int)random_range(0, (n_range)-1);
-		
+
 		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_lnum: Return a list of numbers.
+/**
+ * @brief Return a list of numbers.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	Delim osep;
-	int bot, top, over, i;
-	char *bb_p, *startp, *endp, *tbuf;
+	int bot = 0, top = 0, over = 0, i = 0;
+	char *bb_p = NULL, *startp = NULL, *endp = NULL, *tbuf = NULL;
 	int lnum_init = 0;
 	char *lnum_buff = XMALLOC(290, "lnum_buff");
 
@@ -497,11 +623,11 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		XFREE(lnum_buff);
 		return;
 	}
+
 	/**
      * lnum() is special, since its single delimiter is really an output
      * delimiter.
      */
-
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
 	{
 		return;
@@ -533,19 +659,20 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		}
 	}
 
-	/*
+	/**
      * We keep 0-100 pre-generated so we can do quick copies.
+	 * 
      */
-
 	if (!lnum_init)
 	{
 		XSTRCPY(lnum_buff, (char *)"0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99");
 		lnum_init = 1;
 	}
 
-	/*
+	/**
      * If it's an ascending sequence crossing from negative numbers into
      * positive, get the negative numbers out of the way first.
+	 * 
      */
 	bb_p = *bufc;
 	over = 0;
@@ -572,10 +699,10 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		}
 	}
 
-	/*
+	/**
      * Copy as much out of the pre-gen as we can.
+	 * 
      */
-
 	if ((bot >= 0) && (bot < 100) && (top > bot) && (osep.len == 1) && (osep.str[0] == ' '))
 	{
 		if (*bufc != bb_p)
@@ -608,10 +735,10 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		}
 	}
 
-	/*
+	/**
      * Print a new list.
+	 * 
      */
-
 	if (top == bot)
 	{
 		if (*bufc != bb_p)
@@ -654,73 +781,87 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	XFREE(lnum_buff);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_time: Returns nicely-formatted time.
+/**
+ * @brief Returns nicely-formatted time.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp;
-	temp = (char *)ctime(&mushstate.now);
+	char *temp = (char *)ctime(&mushstate.now);
+
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_time: Seconds since 0:00 1/1/70
+/**
+ * @brief Seconds since 0:00 1/1/70
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.now, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_convsecs: converts seconds to time string, based off 0:00 1/1/70
+/**
+ * @brief Converts seconds to time string, based off 0:00 1/1/70
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp;
-	time_t tt;
-	tt = strtol(fargs[0], (char **)NULL, 10);
-	temp = (char *)ctime(&tt);
+	time_t tt = strtol(fargs[0], (char **)NULL, 10);
+	char *temp = (char *)ctime(&tt);
+
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_convtime: converts time string to seconds, based off 0:00 1/1/70
- * additional auxiliary function and table used to parse time string, since
- * no ANSI standard function are available to do this.
+/**
+ * @brief Converts time string to a struct tm.
+ * 
+ * @note Time string format is always 24 characters long, 
+ *       in format Ddd Mmm DD HH:MM:SS YYYY
+ * 
+ * @param str Time string
+ * @param ttm Pointer to a tm struct
+ * @return true Converted
+ * @return false Something went wrong
  */
 
-const char *monthtab[] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
-const char daystab[] = {
-	31, 29, 31, 30, 31, 30,
-	31, 31, 30, 31, 30, 31};
-
-/*
- * converts time string to a struct tm. Returns 1 on success, 0 on fail. Time
- * string format is always 24 characters long, in format Ddd Mmm DD HH:MM:SS
- * YYYY
- */
-
-int do_convtime(char *str, struct tm *ttm)
+bool do_convtime(char *str, struct tm *ttm)
 {
-	char *buf, *p, *q;
-	int i;
+	char *buf = NULL, *p = NULL, *q = NULL;
+	int i = 0;
 
 	if (!str || !ttm)
 	{
-		return 0;
+		return false;
 	}
 
 	while (*str == ' ')
@@ -728,11 +869,14 @@ int do_convtime(char *str, struct tm *ttm)
 		str++;
 	}
 
-	buf = p = XMALLOC(SBUF_SIZE, "p"); /* make a temp copy of arg */
+	buf = p = XMALLOC(SBUF_SIZE, "p");
 	SAFE_SB_STR(str, buf, &p);
 	*p = '\0';
 
-	/** day-of-week or month */
+	/** 
+	 * day-of-week or month 
+	 * 
+	 */
 	p = strchr(buf, ' ');
 	if (p)
 	{
@@ -744,15 +888,18 @@ int do_convtime(char *str, struct tm *ttm)
 	if (!p || strlen(buf) != 3)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
-	for (i = 0; (i < 12) && string_compare(monthtab[i], p); i++)
+	for (i = 0; (i < 12) && string_compare(mdtab[i].month, p); i++)
 		;
 
 	if (i == 12)
 	{
-		/** month */
+		/** 
+		 * month 
+		 * 
+		 */
 		q = strchr(p, ' ');
 		if (q)
 		{
@@ -764,16 +911,16 @@ int do_convtime(char *str, struct tm *ttm)
 		if (!q || strlen(p) != 3)
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 
-		for (i = 0; (i < 12) && string_compare(monthtab[i], p); i++)
+		for (i = 0; (i < 12) && string_compare(mdtab[i].month, p); i++)
 			;
 
 		if (i == 12)
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 
 		p = q;
@@ -781,7 +928,10 @@ int do_convtime(char *str, struct tm *ttm)
 
 	ttm->tm_mon = i;
 
-	/** day of month */
+	/** 
+	 * day of month 
+	 * 
+	 */
 	q = strchr(p, ' ');
 	if (q)
 	{
@@ -790,18 +940,22 @@ int do_convtime(char *str, struct tm *ttm)
 			q++;
 	}
 
-	if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > daystab[i])
+	if (!q || (ttm->tm_mday = (int)strtol(p, (char **)NULL, 10)) < 1 || ttm->tm_mday > mdtab[i].day)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
-	p = strchr(q, ':'); /* hours */
+	/** 
+	 * hours 
+	 * 
+	 */
+	p = strchr(q, ':');
 
 	if (!p)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
 	*p++ = '\0';
@@ -809,7 +963,7 @@ int do_convtime(char *str, struct tm *ttm)
 	if ((ttm->tm_hour = (int)strtol(q, (char **)NULL, 10)) > 23 || ttm->tm_hour < 0)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
 	if (ttm->tm_hour == 0)
@@ -822,16 +976,20 @@ int do_convtime(char *str, struct tm *ttm)
 		if (*q != '0')
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 	}
 
-	q = strchr(p, ':'); /* minutes */
+	/** 
+	 * minutes 
+	 * 
+	 */
+	q = strchr(p, ':');
 
 	if (!q)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
 	*q++ = '\0';
@@ -839,7 +997,7 @@ int do_convtime(char *str, struct tm *ttm)
 	if ((ttm->tm_min = (int)strtol(p, (char **)NULL, 10)) > 59 || ttm->tm_min < 0)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
 	if (ttm->tm_min == 0)
@@ -852,11 +1010,14 @@ int do_convtime(char *str, struct tm *ttm)
 		if (*p != '0')
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 	}
 
-	/** seconds */
+	/** 
+	 * seconds 
+	 * 
+	 */
 	p = strchr(q, ' ');
 	if (p)
 	{
@@ -868,7 +1029,7 @@ int do_convtime(char *str, struct tm *ttm)
 	if (!p || (ttm->tm_sec = (int)strtol(q, (char **)NULL, 10)) > 59 || ttm->tm_sec < 0)
 	{
 		XFREE(buf);
-		return 0;
+		return false;
 	}
 
 	if (ttm->tm_sec == 0)
@@ -881,11 +1042,14 @@ int do_convtime(char *str, struct tm *ttm)
 		if (*q != '0')
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 	}
 
-	/** year */
+	/** 
+	 * year 
+	 * 
+	 */
 	q = strchr(p, ' ');
 	if (q)
 	{
@@ -904,7 +1068,7 @@ int do_convtime(char *str, struct tm *ttm)
 		if (*p != '0')
 		{
 			XFREE(buf);
-			return 0;
+			return false;
 		}
 	}
 
@@ -917,20 +1081,33 @@ int do_convtime(char *str, struct tm *ttm)
 
 	if (ttm->tm_year < 0)
 	{
-		return 0;
+		return false;
 	}
 
-	/*
+	/**
      * We don't whether or not it's daylight savings time.
+	 * 
      */
 	ttm->tm_isdst = -1;
-	return (ttm->tm_mday != 29 || i != 1 || ((ttm->tm_year) % 400 == 100 || ((ttm->tm_year) % 100 != 0 && (ttm->tm_year) % 4 == 0)));
+	return (ttm->tm_mday != 29 || i != 1 || ((ttm->tm_year) % 400 == 100 || ((ttm->tm_year) % 100 != 0 && (ttm->tm_year) % 4 == 0))) ? true : false;
 }
 
+/**
+ * @brief converts time string to seconds, based off 0:00 1/1/70
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	struct tm *ttm;
-	ttm = localtime(&mushstate.now);
+	struct tm *ttm = localtime(&mushstate.now);
 
 	if (do_convtime(fargs[0], ttm))
 	{
@@ -942,19 +1119,27 @@ void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)),
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_timefmt: Interface to strftime().
+/**
+ * @brief Interface to strftime().
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	time_t tt;
-	struct tm *ttm;
+	time_t tt = 0L;
+	struct tm *ttm = NULL;
 	char *str = XMALLOC(LBUF_SIZE, "str");
 	char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-	char *tp, *p;
-	int len;
+	char *tp = NULL, *p = NULL;
+	int len = 0;
 
 	/**
 	 * Check number of arguments.
@@ -1031,6 +1216,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	}
 
 	*tp = '\0';
+
 	/**
 	 * Get the time and format it. We do this using the local timezone.
 	 * 
@@ -1042,31 +1228,38 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	XFREE(tbuf);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_etimefmt: Format a number of seconds into a human-readable time.
+/**
+ * @brief Format a number of seconds into a human-readable time.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *p, *mark;
-	int raw_secs;
-	int secs, mins, hours, days;
-	int csecs, cmins, chours, cdays;
-	int max, n, x, width;
-	int hidezero, hideearly, showsuffix, clockfmt, usecap;
-	char padc, timec;
-	/*
+	char *p = NULL, *mark = NULL, padc = 0, timec = 0;
+	int raw_secs = 0, secs = 0, mins = 0, hours = 0, days = 0, csecs = 0, cmins = 0, chours = 0, cdays = 0;
+	int max = 0, n = 0, x = 0, width = 0, hidezero = 0, hideearly = 0, showsuffix = 0, clockfmt = 0, usecap = 0;
+
+	/**
      * Figure out time values
+	 * 
      */
 	raw_secs = secs = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (secs < 0)
 	{
-		/*
-	 * Try to be semi-useful. Keep value of secs; zero out the
-	 * rest
-	 */
+		/**
+		 * Try to be semi-useful. Keep value of secs; zero out the
+		 * rest
+		 * 
+		 */
 		mins = hours = days = 0;
 	}
 	else
@@ -1079,8 +1272,9 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 		secs %= 60;
 	}
 
-	/*
+	/**
      * Parse and print format string
+	 * 
      */
 	p = fargs[0];
 
@@ -1088,8 +1282,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 	{
 		if (*p == '$')
 		{
-			mark = p; /* save place in case we need to go
-				 * back */
+			/** 
+			 * save place in case we need to go back 
+			 *
+			 */
+			mark = p;
+
 			p++;
 
 			if (!*p)
@@ -1106,9 +1304,10 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 			{
 				hidezero = hideearly = showsuffix = clockfmt = usecap = 0;
 
-				/*
-		 * Optional width
-		 */
+				/**
+				 * Optional width
+				 * 
+				 */
 				for (width = 0; *p && isdigit((unsigned char)*p); p++)
 				{
 					width *= 10;
@@ -1189,10 +1388,10 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 				case 'a':
 				case 'A':
-
-					/*
-		     * Show the first non-zero thing
-		     */
+					/**
+				     * Show the first non-zero thing
+					 * 
+				     */
 					if (days > 0)
 					{
 						n = days;
@@ -1231,13 +1430,14 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				}
 				else if (!clockfmt)
 				{
-					/*
-		     * If it's 0 and we're hidezero, just
-		     * hide it. If it's 0 and we're
-		     * hideearly, we only hide it if we
-		     * haven't got some bigger increment
-		     * that's non-zero.
-		     */
+					/**
+				     * If it's 0 and we're hidezero, just
+				     * hide it. If it's 0 and we're
+				     * hideearly, we only hide it if we
+		    		 * haven't got some bigger increment
+				     * that's non-zero.
+					 * 
+				     */
 					if ((n == 0) && (hidezero || (hideearly && !(((timec == 's') && (raw_secs > 0)) || ((timec == 'm') && (raw_secs >= 60)) || ((timec == 'h') && (raw_secs >= 3600))))))
 					{
 						if (width > 0)
@@ -1301,11 +1501,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				else
 				{
 					/*
-		     * In clock format, we show
-		     * <d>:<h>:<m>:<s>. The field
-		     * specifier tells us where our
-		     * division stops.
-		     */
+				     * In clock format, we show
+				     * <d>:<h>:<m>:<s>. The field
+				     * specifier tells us where our
+				     * division stops.
+					 * 
+				     */
 					if (timec == 'd')
 					{
 						cdays = days;
@@ -1341,10 +1542,11 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					}
 					else
 					{
-						/*
-			 * Start from the first
-			 * non-zero thing
-			 */
+						/**
+						 * Start from the first
+						 * non-zero thing
+						 * 
+						 */
 						if (chours != 0)
 						{
 							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
@@ -1377,72 +1579,165 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_starttime: What time did this system last reboot?
+/**
+ * @brief What time did this system last reboot?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp;
-	temp = (char *)ctime(&mushstate.start_time);
+	char *temp = (char *)ctime(&mushstate.start_time);
+
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_restarts: How many times have we restarted?
+/**
+ * @brief How many times have we restarted?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.reboot_nums, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_restarttime: When did we last restart?
+/**
+ * @brief When did we last restart?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp;
-	temp = (char *)ctime(&mushstate.restart_time);
+	char *temp = (char *)ctime(&mushstate.restart_time);
+
 	temp[strlen(temp) - 1] = '\0';
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
 /*
  * ---------------------------------------------------------------------------
- * fun_version: Return the MUSH version.
+ * fun_version: 
  */
 
+/**
+ * @brief Return the MUSH version.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	/* XXX To fix once the new version scheme is done */
-	//SAFE_LB_STR(mushstate.version, buff, bufc);
-	SAFE_LB_STR("TinyMUSH", buff, bufc);
+	char *s = XASPRINTF("%s [%s]", mushstate.version.name, PACKAGE_RELEASE_DATE);
+
+	SAFE_LB_STR(s, buff, bufc);
+	XFREE(s);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_mushname: Return the name of the Mush.
+/**
+ * @brief Return the name of the Mush.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LB_STR(mushconf.mush_name, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_hasmodule: Return 1 if a module is installed, 0 if it is not.
+/**
+ * @brief Return a list of modules.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
+void fun_modules(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+{
+	MODULE *mp = NULL;
+	bool got_one = false;
 
+	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
+	{
+		if (got_one)
+		{
+			if (nfargs >= 1)
+			{
+				if (fargs[0] || *fargs[0])
+				{
+					SAFE_LB_STR(fargs[0], buff, bufc);
+				}
+			}
+			else
+			{
+				SAFE_LB_CHR(' ', buff, bufc);
+			}
+		}
+		SAFE_LB_STR(mp->modname, buff, bufc);
+		got_one = true;
+	}
+}
+
+/**
+ * @brief Return 1 if a module is installed, 0 if it is not.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	MODULE *mp;
+	MODULE *mp = NULL;
 
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -1456,54 +1751,121 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
 	SAFE_LB_CHR('0', buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_connrecord: Get max number of simultaneous connects.
+/**
+ * @brief Get max number of simultaneous connects.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.record_players, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * State of the invocation and recursion counters.
+/**
+ * @brief State of the function invocation counters
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.func_invk_ctr, LBUF_SIZE);
 }
 
+/**
+ * @brief State of the function recursion counters
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.func_nest_lev, LBUF_SIZE);
 }
 
+/**
+ * @brief State of the command invocation counters
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.cmd_invk_ctr, LBUF_SIZE);
 }
 
+/**
+ * @brief State of the command recursion counters
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LTOS(buff, bufc, mushstate.cmd_nest_lev, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_benchmark: Benchmark softcode.
+/**
+ * @brief Benchmark softcode.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	struct timeval bt, et;
-	int i, times;
-	double min, max, total, ut;
-	char ebuf[LBUF_SIZE], tbuf[LBUF_SIZE], *tp, *nstr, *s;
-	/*
+	int i = 0, times = 0;
+	double min = 0.0, max = 0.0, total = 0.0, ut = 0.0;
+	char *tp = NULL, *nstr = NULL, *s = NULL;
+	char *ebuf = XMALLOC(LBUF_SIZE, "ebuf");
+	char *tbuf = XMALLOC(LBUF_SIZE, "ebuf");
+
+	/**
      * Evaluate our times argument
+	 * 
      */
 	tp = nstr = XMALLOC(LBUF_SIZE, "nstr");
 	s = fargs[1];
@@ -1514,12 +1876,16 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	if (times < 1)
 	{
 		SAFE_LB_STR("#-1 TOO FEW TIMES", buff, bufc);
+		XFREE(ebuf);
+		XFREE(tbuf);
 		return;
 	}
 
 	if (times > mushconf.func_invk_lim)
 	{
 		SAFE_LB_STR("#-1 TOO MANY TIMES", buff, bufc);
+		XFREE(ebuf);
+		XFREE(tbuf);
 		return;
 	}
 
@@ -1553,15 +1919,18 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 		if ((mushstate.func_invk_ctr >= mushconf.func_invk_lim) || (Too_Much_CPU()))
 		{
-			/*
-	     * Abort
-	     */
+			/**
+		     * Abort
+			 * 
+		     */
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Limits exceeded at benchmark iteration %d.", i + 1);
 			times = i + 1;
 		}
 	}
 
 	SAFE_SPRINTF(buff, bufc, "%.2f %.0f %.0f", total / (double)times, min, max);
+	XFREE(ebuf);
+	XFREE(tbuf);
 }
 
 /*
@@ -1570,6 +1939,19 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * function evaluations.
  */
 
+/**
+ * @brief Force substitution to occur.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	char *str;
@@ -1577,6 +1959,19 @@ void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 	exec(buff, bufc, player, caller, cause, EV_FIGNORE | EV_EVAL, &str, cargs, ncargs);
 }
 
+/**
+ * @brief Like s(), but don't do function evaluations.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *str;
@@ -1588,34 +1983,63 @@ void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * Side-effect functions.
  */
 
-int check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
+/**
+ * @brief Check if the player can execute a command
+ * 
+ * @param player DBref of player
+ * @param name Name of command
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ * @return true User can execute the command
+ * @return false User is not allowed to used the command
+ */
+
+bool check_command(dbref player, char *name, char *buff, char **bufc, char *cargs[], int ncargs)
 {
 	CMDENT *cmdp;
 
 	if ((cmdp = (CMDENT *)hashfind(name, &mushstate.command_htab)))
 	{
-		/*
-	 * Note that these permission checks are NOT identical to the
-	 * ones in process_cmdent(). In particular, side-effects are
-	 * NOT subject to the CA_GBL_INTERP flag. This is a design
-	 * decision based on the concept that these are functions and
-	 * not commands, even though they behave like commands in
-	 * many respects. This is also the same reason why
-	 * side-effects don't trigger hooks.
-	 */
+		/**
+		 * Note that these permission checks are NOT identical to the
+		 * ones in process_cmdent(). In particular, side-effects are
+		 * NOT subject to the CA_GBL_INTERP flag. This is a design
+		 * decision based on the concept that these are functions and
+		 * not commands, even though they behave like commands in
+		 * many respects. This is also the same reason why
+		 * side-effects don't trigger hooks.
+		 * 
+		 */
 		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD)))
 		{
 			SAFE_NOPERM(buff, bufc);
-			return 1;
+			return false;
 		}
 	}
 
-	return 0;
+	return true;
 }
 
+/**
+ * @brief This side-effect function links an object to a location,
+ *        behaving identically to the command:
+ *        '@link <object>=<destination>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@link", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@link", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1623,9 +2047,24 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	do_link(player, cause, 0, fargs[0], fargs[1]);
 }
 
+/**
+ * @brief This side-effect function teleports an object from one place to 
+ *        another, behaving identically to the command:
+ *        '@tel <object>=<destination>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@teleport", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@teleport", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1633,9 +2072,24 @@ void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	do_teleport(player, cause, 0, fargs[0], fargs[1]);
 }
 
+/**
+ * @brief This side-effect function erases some or all attributes from an
+ *        object, behaving identically to the command:
+ *        '@wipe <object>[</wild-attr>]'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@wipe", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@wipe", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1643,9 +2097,24 @@ void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	do_wipe(player, cause, 0, fargs[0]);
 }
 
+/**
+ * @brief This side-effect function sends a message to the list of dbrefs,
+ *        behaving identically to the command:
+ *        '@pemit/list <list of dbrefs>=<string>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1653,9 +2122,24 @@ void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	do_pemit_list(player, fargs[0], fargs[1], 0);
 }
 
+/**
+ * @brief This side-effect function sends a message to the list of dbrefs, 
+ *        behaving identically to the command:
+ *        '@pemit/list/contents <list of dbrefs>=<string>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@pemit", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1663,9 +2147,25 @@ void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	do_pemit_list(player, fargs[0], fargs[1], 1);
 }
 
+/**
+ * @brief This side-effect function sends a message to everyone in <target>'s
+ *        location with the exception of <target>, 
+ *        behaving identically to the command:
+ *        '@oemit <target> = <string>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@oemit", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@oemit", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1673,9 +2173,23 @@ void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	do_pemit(player, cause, PEMIT_OEMIT, fargs[0], fargs[1]);
 }
 
+/**
+ * @brief This side-effect function behaves identically to the command
+ *        '@force <object>=<action>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	if (check_command(player, "@force", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@force", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1683,6 +2197,20 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	do_force(player, cause, FRC_NOW, fargs[0], fargs[1], cargs, ncargs);
 }
 
+/**
+ * @brief This side-effect function behaves identically to the command
+ *        '@trigger <object>/<attribute>=<arg 0>,<arg 1>,...<arg N>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (nfargs < 1)
@@ -1691,7 +2219,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	if (check_command(player, "@trigger", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@trigger", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1699,17 +2227,46 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 	do_trigger(player, cause, TRIG_NOW, fargs[0], &(fargs[1]), nfargs - 1);
 }
 
+/**
+ * @brief This side-effect function behaves identically to the command
+ *        '@wait <timer>=<command>'
+ * 
+ * @param buff Not used
+ * @param bufc Not used
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
 }
 
+/**
+ * @brief This function executes <command> with the given arguments. 
+ *        <command> is presently limited to @chown, @clone, @destroy, 
+ *        @link, @lock, @name, @parent, @teleport, @unlink, @unlock, 
+ *        and @wipe.
+ * 
+ * @param buff Not used
+ * @param bufc Not used
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	CMDENT *cmdp;
-	char *tbuf1, *tbuf2;
-	char *p;
-	int key;
+	CMDENT *cmdp = NULL;
+	char *tbuf1 = NULL, *tbuf2 = NULL, *p = NULL;
+	int key = 0;
 
 	if (!fargs[0] || !*fargs[0])
 	{
@@ -1741,8 +2298,9 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 		return;
 	}
 
-	/*
+	/**
      * Strip command flags that are irrelevant.
+	 * 
      */
 	key = cmdp->extra;
 	key &= ~(SW_GOT_UNIQUE | SW_MULTIPLE | SW_NOEVAL);
@@ -1772,10 +2330,19 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 	}
 }
 
-/*------------------------------------------------------------------------
- * fun_create: Creates a room, thing or exit
+/**
+ * @brief Creates a room, thing or exit
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref thing;
@@ -1804,7 +2371,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	switch (isep.str[0])
 	{
 	case 'r':
-		if (check_command(player, "@dig", buff, bufc, cargs, ncargs))
+		if (!check_command(player, "@dig", buff, bufc, cargs, ncargs))
 		{
 			return;
 		}
@@ -1813,7 +2380,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		break;
 
 	case 'e':
-		if (check_command(player, "@open", buff, bufc, cargs, ncargs))
+		if (!check_command(player, "@open", buff, bufc, cargs, ncargs))
 		{
 			return;
 		}
@@ -1830,7 +2397,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		break;
 
 	default:
-		if (check_command(player, "@create", buff, bufc, cargs, ncargs))
+		if (!check_command(player, "@create", buff, bufc, cargs, ncargs))
 		{
 			return;
 		}
@@ -1866,9 +2433,22 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /*---------------------------------------------------------------------------
- * fun_set: sets an attribute on an object
+ * fun_set: 
  */
 
+/**
+ * @brief Sets an attribute on an object
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref thing, thing2, aowner;
@@ -1876,11 +2456,11 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	int atr, atr2, aflags, alen, clear, flagvalue;
 	ATTR *attr, *attr2;
 
-	/*
+	/**
      * obj/attr form?
+	 * 
      */
-
-	if (check_command(player, "@set", buff, bufc, cargs, ncargs))
+	if (!check_command(player, "@set", buff, bufc, cargs, ncargs))
 	{
 		return;
 	}
@@ -1889,17 +2469,19 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	{
 		if (atr != NOTHING)
 		{
-			/*
-	     * must specify flag name
-	     */
+			/**
+		     * must specify flag name
+			 * 
+		     */
 			if (!fargs[1] || !*fargs[1])
 			{
 				SAFE_LB_STR("#-1 UNSPECIFIED PARAMETER", buff, bufc);
 			}
 
-			/*
-	     * are we clearing?
-	     */
+			/**
+		     * are we clearing?
+			 * 
+		     */
 			clear = 0;
 			p = fargs[1];
 
@@ -1909,9 +2491,10 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 				clear = 1;
 			}
 
-			/*
-	     * valid attribute flag?
-	     */
+			/**
+		     * valid attribute flag?
+			 * 
+		     */
 			flagvalue = search_nametab(player, indiv_attraccess_nametab, p);
 
 			if (flagvalue < 0)
@@ -1920,19 +2503,20 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 				return;
 			}
 
-			/*
-	     * make sure attribute is present
-	     */
-
+			/**
+		     * make sure attribute is present
+			 * 
+		     */
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
 				SAFE_LB_STR("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
 				return;
 			}
 
-			/*
-	     * can we write to attribute?
-	     */
+			/**
+		     * can we write to attribute?
+			 * 
+		     */
 			attr = atr_num(atr);
 
 			if (!attr || !Set_attr(player, thing, attr, aflags))
@@ -1941,10 +2525,10 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 				return;
 			}
 
-			/*
-	     * just do it!
-	     */
-
+			/**
+		     * just do it!
+			 * 
+		     */
 			if (clear)
 			{
 				aflags &= ~flagvalue;
@@ -1960,18 +2544,19 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		}
 	}
 
-	/*
+	/**
      * find thing
+	 * 
      */
-
 	if ((thing = match_controlled(player, fargs[0])) == NOTHING)
 	{
 		SAFE_NOTHING(buff, bufc);
 		return;
 	}
 
-	/*
+	/**
      * check for attr set first
+	 * 
      */
 	for (p = fargs[1]; *p && (*p != ':'); p++)
 		;
@@ -2005,9 +2590,10 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		buff2 = XMALLOC(LBUF_SIZE, "buff2");
 
-		/*
-	 * check for _
-	 */
+		/**
+		 * check for _
+		 * 
+		 */
 		if (*p == '_')
 		{
 			XSTRCPY(buff2, p + 1);
@@ -2031,16 +2617,18 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			}
 		}
 
-		/*
-	 * set it
-	 */
+		/**
+		 * set it
+		 * 
+		 */
 		set_attr_internal(player, thing, atr, p, 0, buff, bufc);
 		XFREE(buff2);
 		return;
 	}
 
-	/*
+	/**
      * set/clear a flag
+	 * 
      */
 	flag_set(thing, player, fargs[1], 0);
 }
@@ -2052,7 +2640,17 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
  *   ps(<PID>): Results in '<PID>:<wait status> <command>'
  */
 
-void list_qpids(dbref player __attribute__((unused)), dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
+/**
+ * @brief List the queue pids
+ * 
+ * @param player_targ DBref of target player
+ * @param obj_targ DBref of target object
+ * @param queue Queue
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param bb_p Original value of output buffer tracher
+ */
+void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char **bufc, char *bb_p)
 {
 	BQUE *tmp;
 
@@ -2070,6 +2668,22 @@ void list_qpids(dbref player __attribute__((unused)), dbref player_targ, dbref o
 	}
 }
 
+/**
+ * @brief Gets details about the queue.
+ *        ps(): Lists everything on the queue by PID
+ *        ps(<object or player>): Lists PIDs enqueued by object or player's stuff
+ *        ps(<PID>): Results in '<PID>:<wait status> <command>'
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int qpid;
@@ -2078,10 +2692,10 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 	ATTR *ap;
 	char *bb_p;
 
-	/*
+	/**
      * Check for the PID case first.
+	 * 
      */
-
 	if (fargs[0] && is_integer(fargs[0]))
 	{
 		qpid = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -2128,10 +2742,10 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 		return;
 	}
 
-	/*
+	/**
      * We either have nothing specified, or an object or player.
+	 * 
      */
-
 	if (!fargs[0] || !*fargs[0])
 	{
 		if (!See_Queue(player))
@@ -2167,12 +2781,13 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 		}
 	}
 
-	/*
+	/**
      * List all the PIDs that match.
+	 * 
      */
 	bb_p = *bufc;
-	list_qpids(player, player_targ, obj_targ, mushstate.qfirst, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mushstate.qlfirst, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mushstate.qwait, buff, bufc, bb_p);
-	list_qpids(player, player_targ, obj_targ, mushstate.qsemfirst, buff, bufc, bb_p);
+	list_qpids(player_targ, obj_targ, mushstate.qfirst, buff, bufc, bb_p);
+	list_qpids(player_targ, obj_targ, mushstate.qlfirst, buff, bufc, bb_p);
+	list_qpids(player_targ, obj_targ, mushstate.qwait, buff, bufc, bb_p);
+	list_qpids(player_targ, obj_targ, mushstate.qsemfirst, buff, bufc, bb_p);
 }

@@ -217,7 +217,7 @@ am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
+depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = $(DEPDIR)/lt__argz.Plo $(DEPDIR)/lt__dirent.Plo \
 	$(DEPDIR)/lt__strl.Plo ./$(DEPDIR)/libltdl_la-lt__alloc.Plo \
@@ -296,13 +296,14 @@ CTAGS = ctags
 CSCOPE = cscope
 AM_RECURSIVE_TARGETS = cscope
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config-h.in \
-	$(top_srcdir)/config/compile $(top_srcdir)/config/config.guess \
-	$(top_srcdir)/config/config.sub $(top_srcdir)/config/depcomp \
-	$(top_srcdir)/config/install-sh $(top_srcdir)/config/ltmain.sh \
-	$(top_srcdir)/config/missing COPYING.LIB README config/compile \
-	config/config.guess config/config.sub config/depcomp \
-	config/install-sh config/ltmain.sh config/missing lt__argz.c \
-	lt__dirent.c lt__strl.c
+	$(top_srcdir)/../../compile $(top_srcdir)/../../config.guess \
+	$(top_srcdir)/../../config.sub $(top_srcdir)/../../depcomp \
+	$(top_srcdir)/../../install-sh $(top_srcdir)/../../ltmain.sh \
+	$(top_srcdir)/../../missing ../../AUTHORS ../../COPYING \
+	../../ChangeLog ../../INSTALL ../../NEWS ../../README \
+	../../compile ../../config.guess ../../config.sub \
+	../../depcomp ../../install-sh ../../ltmain.sh ../../missing \
+	COPYING.LIB README lt__argz.c lt__dirent.c lt__strl.c
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)

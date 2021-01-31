@@ -5959,9 +5959,9 @@ See also: @link, @open.
 	time()		timefmt()
  
   MUSH state data:
-       config()		connrecord()	hasmodule()	mudname()
-       mushname         restarts()	restarttime()	starttime()
-       version()
+       config()		connrecord()	hasmodule()	modules()
+       mudname()	mushname	restarts()	restarttime()
+       starttime()	version()
  
   Other:
 	die()		helptext()	lnum()		lrand()
@@ -7405,7 +7405,7 @@ performed and the walk down the list stops.
 & MAX()
   Function: max(<number1>,<number2>[,<numberN]...)
  
-  Returns the largest integer from among its arguments.
+  Returns the largest number from among its arguments.
   Up to 30 arguments may be specified.
   <numberN> may be a floating point number, and a floating point result
   is returned.
@@ -7421,7 +7421,7 @@ performed and the walk down the list stops.
 & MIN()
   Function: min(<number1>,<number2>[,<numberN]...)
  
-  Returns the smallest integer from among its arguments.
+  Returns the smallest number from among its arguments.
   Up to 30 arguments may be specified.
   <numberN> may be a floating point number, and a floating point result
   is returned.
@@ -7618,7 +7618,7 @@ performed and the walk down the list stops.
 & DIST2D()
   Function: dist2d(x1, y1, x2, y2)
  
-  Returns the integer distance between the Cartesian points in two dimensions
+  Returns the distance between the Cartesian points in two dimensions
   (x1,y1) and (x2,y2).
  
   Example:
@@ -7630,7 +7630,7 @@ performed and the walk down the list stops.
 & DIST3D()
   Function: dist3d(x1, y1, z1, x2, y2, z2)
  
-  Returns the integer distance between the Cartesian points in three
+  Returns the distance between the Cartesian points in three
   dimensions (x1,y1,z1) and (x2,y2,z2).
  
   Example:
@@ -9069,6 +9069,11 @@ performed and the walk down the list stops.
  
   Returns 1 if the named module is currently installed, and 0 if it
   has not.
+ 
+& MODULE()
+  Function: module([output delim>])
+ 
+  Returns a list of all currently installed modules.
  
 & HELPTEXT()
   Function: helptext(<help command>, <entry>)
