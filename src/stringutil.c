@@ -405,7 +405,7 @@ char *strip_ansi(const char *s)
  *
  * \param s Pointer to the original string
  *
- * \return 0 Pointer to the new string with ansi code removed.
+ * \return Pointer to the new string with ansi code removed.
  */
 
 char *strip_xterm(char *s)
@@ -1552,6 +1552,7 @@ int str2xterm(char *str)
 		}
 		else
 		{
+			
 			return (rgb2xterm(rgb));
 		}
 	}

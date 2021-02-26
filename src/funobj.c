@@ -20,15 +20,22 @@
 #include "externs.h"
 #include "prototypes.h"
 
-/*
- * ---------------------------------------------------------------------------
- * fun_objid: Returns an object's objectID.
+/**
+ * @brief Returns an object's objectID.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_objid(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (Good_obj(it))
 	{
@@ -44,15 +51,22 @@ void fun_objid(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_con: Returns first item in contents list of object/room
+/**
+ * @brief Returns first item in contents list of object/room
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_con(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (Good_loc(it) && (Examinable(player, it) || (where_is(player) == it) || (it == cause)))
 	{
@@ -65,16 +79,23 @@ void fun_con(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_exit: Returns first exit in exits list of room.
+/**
+ * @brief Returns first exit in exits list of room.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, exit;
-	int key;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]), exit = NOTHING;
+	int key = 0;
 
 	if (Good_obj(it) && Has_exits(it) && Good_obj(Exits(it)))
 	{
@@ -105,16 +126,23 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_next: return next thing in contents or exits chain
+/**
+ * @brief return next thing in contents or exits chain
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, loc, exit, ex_here;
-	int key;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]), loc = NOTHING, exit = NOTHING, ex_here = NOTHING;
+	int key = 0;
 
 	if (Good_obj(it) && Has_siblings(it))
 	{
@@ -162,10 +190,22 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
 /*
  * ---------------------------------------------------------------------------
- * handle_loc: Locate an object (LOC, WHERE). loc(): Returns the location of
- * something. where(): Returns the "true" location of something
+ * handle_loc: Locate an object (LOC, WHERE).  where(): Returns the "true" location of something
  */
 
+/**
+ * @brief loc(): Returns the location of something.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
@@ -182,23 +222,28 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_rloc: Returns the recursed location of something (specifying #levels)
+/**
+ * @brief Returns the recursed location of something (specifying #levels)
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_rloc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int i, levels;
-	dbref it;
-	levels = (int)strtol(fargs[1], (char **)NULL, 10);
+	int i = 0, levels = (int)strtol(fargs[1], (char **)NULL, 10);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (levels > mushconf.ntfy_nest_lim)
 	{
 		levels = mushconf.ntfy_nest_lim;
 	}
-
-	it = match_thing(player, fargs[0]);
 
 	if (locatable(player, it, cause))
 	{
@@ -222,20 +267,26 @@ void fun_rloc(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	SAFE_NOTHING(buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_room: Find the room an object is ultimately in.
+/**
+ * @brief Find the room an object is ultimately in.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref oc cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	int count;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (locatable(player, it, cause))
 	{
-		for (count = mushconf.ntfy_nest_lim; count > 0; count--)
+		for (int count = mushconf.ntfy_nest_lim; count > 0; count--)
 		{
 			it = Location(it);
 
@@ -267,15 +318,23 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_owner: Return the owner of an object.
+/**
+ * @brief Return the owner of an object.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_owner(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, aowner;
-	int atr, aflags;
+	dbref it = NOTHING, aowner = NOTHING;
+	int atr = 0, aflags = 0;
 
 	if (parse_attrib(player, fargs[0], &it, &atr, 1))
 	{
@@ -303,23 +362,28 @@ void fun_owner(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	SAFE_LTOS(buff, bufc, it, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_controls: Does x control y?
+/**
+ * @brief  Does x control y?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_controls(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref x, y;
-	x = match_thing(player, fargs[0]);
+	dbref x = match_thing(player, fargs[0]), y = match_thing(player, fargs[1]);
 
 	if (!Good_obj(x))
 	{
 		SAFE_LB_STR("#-1 ARG1 NOT FOUND", buff, bufc);
 		return;
 	}
-
-	y = match_thing(player, fargs[1]);
 
 	if (!Good_obj(y))
 	{
@@ -330,17 +394,23 @@ void fun_controls(char *buff, char **bufc, dbref player, dbref caller __attribut
 	SAFE_BOOL(buff, bufc, Controls(x, y));
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_sees: Can X see Y in the normal Contents list of the room. If X or Y
- * do not exist, 0 is returned.
+/**
+ * @brief  Can X see Y in the normal Contents list of the room. If X or Y
+ *         do not exist, 0 is returned.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, thing;
-	it = match_thing(player, fargs[0]);
-	thing = match_thing(player, fargs[1]);
+	dbref it = match_thing(player, fargs[0]), thing = match_thing(player, fargs[1]);
 
 	if (!Good_obj(it) || !Good_obj(thing))
 	{
@@ -351,16 +421,22 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	SAFE_BOOL(buff, bufc, (isExit(thing) ? Can_See_Exit(it, thing, Darkened(it, Location(thing))) : Can_See(it, thing, Sees_Always(it, Location(thing)))));
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_nearby: Return whether or not obj1 is near obj2.
+/**
+ * @brief Return whether or not obj1 is near obj2.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref obj1, obj2;
-	obj1 = match_thing(player, fargs[0]);
-	obj2 = match_thing(player, fargs[1]);
+	dbref obj1 = match_thing(player, fargs[0]), obj2 = match_thing(player, fargs[1]);
 
 	if (!(nearby_or_control(player, obj1) || nearby_or_control(player, obj2)))
 	{
@@ -379,20 +455,32 @@ void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute_
  * <target>? moves(<object>, <mover>): Can <object> see <mover> move?
  */
 
+/**
+ * @brief Handle presence functions.
+ *        hears(<object>, <speaker>): Can <object> hear <speaker> speak?
+ *        knows(<object>, <target>): Can <object> know about <target>?
+ *        moves(<object>, <mover>): Can <object> see <mover> move?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void handle_okpres(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int oper;
-	dbref object, actor;
-	object = match_thing(player, fargs[0]);
-	actor = match_thing(player, fargs[1]);
+	int oper = Func_Mask(PRESFN_OPER);
+	dbref object = match_thing(player, fargs[0]), actor = match_thing(player, fargs[1]);
 
 	if (!Good_obj(object) || !Good_obj(actor))
 	{
 		SAFE_LB_CHR('0', buff, bufc);
 		return;
 	}
-
-	oper = Func_Mask(PRESFN_OPER);
 
 	if (oper == PRESFN_HEARS)
 	{
@@ -412,16 +500,24 @@ void handle_okpres(char *buff, char **bufc, dbref player, dbref caller __attribu
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * handle_name: Get object name (NAME, FULLNAME). name(): Return the name of
- * an object. fullname(): Return the fullname of an object (good for exits).
+/**
+ * @brief Get object name (NAME, FULLNAME). name(): Return the name of
+ *        an object. fullname(): Return the fullname of an object 
+ *        (good for exits).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void handle_name(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (!Good_obj(it))
 	{
@@ -447,17 +543,23 @@ void handle_name(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * handle_pronoun: perform pronoun sub for object (OBJ, POSS, SUBJ, APOSS).
+/**
+ * @brief Perform pronoun sub for object (OBJ, POSS, SUBJ, APOSS).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	char *str;
-	char *pronouns[4] = {"%o", "%p", "%s", "%a"};
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
+	char *str = NULL, *pronouns[4] = {"%o", "%p", "%s", "%a"};
 
 	if (!Good_obj(it) || (!isPlayer(it) && !nearby_or_control(player, it)))
 	{
@@ -470,30 +572,39 @@ void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller __attrib
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Locks.
+/**
+ * @brief Handle locks
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_lock(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, aowner;
-	int aflags, alen;
-	char *tbuf;
-	ATTR *attr;
-	struct boolexp *bexp;
+	dbref it = NOTHING, aowner = NOTHING;
+	int aflags = 0, alen = 0;
+	char *tbuf = NULL;
+	ATTR *attr = NULL;
+	struct boolexp *bexp = NULL;
 
-	/*
+	/**
      * Parse the argument into obj + lock
+	 * 
      */
-
 	if (!get_obj_and_lock(player, fargs[0], &it, &attr, buff, bufc))
 	{
 		return;
 	}
 
-	/*
+	/**
      * Get the attribute and decode it if we can read it
+	 * 
      */
 	tbuf = atr_get(it, attr->number, &aowner, &aflags, &alen);
 
@@ -512,25 +623,39 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	}
 }
 
+/**
+ * @brief Checks if <actor> would pass the named lock on <object>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, victim, aowner;
-	int aflags, alen;
-	char *tbuf;
-	ATTR *attr;
-	struct boolexp *bexp;
+	dbref it = NOTHING, victim = NOTHING, aowner = NOTHING;
+	int aflags = 0, alen = 0;
+	char *tbuf = NULL;
+	ATTR *attr = NULL;
+	struct boolexp *bexp = NULL;
 
-	/*
+	/**
      * Parse lock supplier into obj + lock
+	 * 
      */
-
 	if (!get_obj_and_lock(player, fargs[0], &it, &attr, buff, bufc))
 	{
 		return;
 	}
 
-	/*
+	/**
      * Get the victim and ensure we can do it
+	 * 
      */
 	victim = match_thing(player, fargs[1]);
 
@@ -568,12 +693,23 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
+/**
+ * @brief   Checks if <actor> would pass a lock on <locked object> with syntax
+ *          <lock string>
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref locked_obj, actor_obj;
-	BOOLEXP *okey;
-	locked_obj = match_thing(player, fargs[0]);
-	actor_obj = match_thing(player, fargs[1]);
+	dbref locked_obj = match_thing(player, fargs[0]), actor_obj = match_thing(player, fargs[1]);
 
 	if (!Good_obj(locked_obj) || !Good_obj(actor_obj))
 	{
@@ -589,7 +725,7 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 	else
 	{
-		okey = parse_boolexp(player, fargs[2], 0);
+		BOOLEXP *okey = parse_boolexp(player, fargs[2], 0);
 
 		if (okey == TRUE_BOOLEXP)
 		{
@@ -610,15 +746,29 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 /*
  * ---------------------------------------------------------------------------
- * fun_xcon: Return a partial list of contents of an object, starting from a
- * specified element in the list and copying a specified number of elements.
+ * fun_xcon: 
  */
 
+/**
+ * @brief Return a partial list of contents of an object, starting from a
+ *        specified element in the list and copying a specified number of 
+ *        elements.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing, it;
-	char *bb_p;
-	int i, first, last;
+	dbref thing = NOTHING, it = NOTHING;
+	char *bb_p = NULL;
+	int i = 0, first = 0, last = 0;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
@@ -641,15 +791,17 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if ((first > 0) && (last > 0))
 		{
-			/*
-	     * Move to the first object that we want
-	     */
+			/**
+		     * Move to the first object that we want
+			 * 
+		     */
 			for (thing = Contents(it), i = 1; (i < first) && (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing), i++)
 				;
 
-			/*
-	     * Grab objects until we reach the last one we want
-	     */
+			/**
+		     * Grab objects until we reach the last one we want
+			 * 
+		     */
 			for (i = 0; (i < last) && (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing), i++)
 			{
 				if (*bufc != bb_p)
@@ -668,15 +820,23 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_lcon: Return a list of contents.
+/**
+ * @brief Return a list of contents.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing, it;
-	char *bb_p;
+	dbref thing = NOTHING, it = NOTHING;
+	char *bb_p = NULL;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -711,16 +871,24 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_lexits: Return a list of exits.
+/**
+ * @brief Return a list of exits.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing, it, parent;
-	char *bb_p;
-	int exam, lev, key;
+	dbref thing = NOTHING, it = NOTHING, parent = NOTHING;
+	char *bb_p = NULL;
+	int exam = 0, lev = 0, key = 0;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -749,15 +917,17 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		return;
 	}
 
-	/*
+	/**
      * Return info for all parent levels
+	 * 
      */
 	bb_p = *bufc;
 	for (lev = 0, parent = it; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
-		/*
-	 * Look for exits at each level
-	 */
+		/**
+		 * Look for exits at each level
+		 * 
+		 */
 		if (!Has_exits(parent))
 		{
 			continue;
@@ -797,12 +967,20 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_entrances: approximate equivalent of @entrances command. * borrowed in
- * part from PennMUSH.
+/**
+ * @brief Approximate equivalent of @entrances command.
+ *        Borrowed in part from PennMUSH.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing, i;
@@ -946,15 +1124,22 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 	}
 }
 
-/*
- * --------------------------------------------------------------------------
- * fun_home: Return an object's home
+/**
+ * @brief Return an object's home
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (!Good_obj(it) || !Examinable(player, it))
 	{
@@ -983,15 +1168,22 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_money: Return an object's value
+/**
+ * @brief Return an object's value
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_money(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (!Good_obj(it) || !Examinable(player, it))
 	{
@@ -1003,12 +1195,19 @@ void fun_money(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_findable: can X locate Y
+/**
+ * @brief Can X locate Y
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
-/* Borrowed from PennMUSH 1.50 */
 void fun_findable(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref obj = match_thing(player, fargs[0]);
@@ -1028,21 +1227,27 @@ void fun_findable(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_visible:  Can X examine Y. If X does not exist, 0 is returned. If Y,
- * the object, does not exist, 0 is returned. If Y the object exists, but the
- * optional attribute does not, X's ability to return Y the object is
- * returned.
+/**
+ * @brief Can X examine Y. If X does not exist, 0 is returned. If Y, the 
+ *        object, does not exist, 0 is returned. If Y the object exists, but
+ *        the optional attribute does not, X's ability to return Y the object
+ *        is returned.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
-/* Borrowed from PennMUSH 1.50 */
 void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, thing, aowner;
-	int aflags, atr;
-	ATTR *ap;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]), thing = NOTHING, aowner = NOTHING;
+	int aflags = 0, atr = 0;
+	ATTR *ap = NULL;
 
 	if (!Good_obj(it))
 	{
@@ -1075,18 +1280,25 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 	SAFE_BOOL(buff, bufc, Examinable(it, thing));
 }
 
-/*
- * ------------------------------------------------------------------------
- * fun_writable: Returns 1 if player could set <obj>/<attr>.
+/**
+ * @brief Returns 1 if player could set <obj>/<attr>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, thing, aowner;
-	int aflags, atr, retval;
-	ATTR *ap;
-	char *s;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]), thing = NOTHING, aowner = NOTHING;
+	int aflags = 0, atr = 0, retval = 0;
+	ATTR *ap = NULL;
+	char *s = NULL;
 
 	if (!Good_obj(it))
 	{
@@ -1096,15 +1308,15 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	retval = parse_attrib(player, fargs[1], &thing, &atr, 1);
 
-	/*
+	/**
      * Possibilities: retval is 0, which means we didn't match a thing.
      * retval is NOTHING, which means we matched a thing but have a
      * non-existent attribute. retval is 1; atr is either NOTHING
      * (non-existent attribute or no permission to see), or a valid attr
      * number. In the case of NOTHING we can't tell which it is, so must
      * continue.
+	 * 
      */
-
 	if (retval == 0)
 	{
 		SAFE_LB_CHR('0', buff, bufc);
@@ -1119,10 +1331,10 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	/*
+	/**
      * Non-existent attribute. Go see if it's settable.
+	 * 
      */
-
 	if (!fargs[1] || !*fargs[1])
 	{
 		SAFE_LB_CHR('0', buff, bufc);
@@ -1147,12 +1359,20 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 	SAFE_BOOL(buff, bufc, Set_attr(it, thing, ap, aflags));
 }
 
-/*
- * ------------------------------------------------------------------------
- * fun_flags: Returns the flags on an object. Because @switch is
- * case-insensitive, not quite as useful as it could be.
+/**
+ * @brief Returns the flags on an object. Because @switch is case-insensitive,
+ *        not quite as useful as it could be.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it, aowner;
@@ -1234,11 +1454,19 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * andflags, orflags: Check a list of flags.
+/**
+ * @brief andflags, orflags: Check a list of flags.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref oc cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *s;
@@ -1259,10 +1487,11 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 
 	for (s = fargs[1]; *s; s++)
 	{
-		/*
-	 * Check for a negation sign. If we find it, we note it and
-	 * increment the pointer to the next character.
-	 */
+		/**
+		 * Check for a negation sign. If we find it, we note it and
+		 * increment the pointer to the next character.
+		 * 
+		 */
 		if (*s == '!')
 		{
 			negate = 1;
@@ -1285,12 +1514,13 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 
 		if (!convert_flags(player, flagletter, &fset, &p_type))
 		{
-			/*
-	     * Either we got a '!' that wasn't followed by a
-	     * letter, or we couldn't find that flag. For AND,
-	     * since we've failed a check, we can return false.
-	     * Otherwise we just go on.
-	     */
+			/**
+		     * Either we got a '!' that wasn't followed by a
+		     * letter, or we couldn't find that flag. For AND,
+		     * since we've failed a check, we can return false.
+		     * Otherwise we just go on.
+			 * 
+		     */
 			if (!type)
 			{
 				SAFE_LB_CHR('0', buff, bufc);
@@ -1304,9 +1534,10 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 		}
 		else
 		{
-			/*
-	     * does the object have this flag?
-	     */
+			/**
+		     * does the object have this flag?
+			 * 
+		     */
 			if ((Flags(it) & fset.word1) || (Flags2(it) & fset.word2) || (Flags3(it) & fset.word3) || (Typeof(it) == p_type))
 			{
 				if ((p_type == TYPE_PLAYER) && (fset.word2 == CONNECTED) && Can_Hide(it) && Hidden(it) && !See_Hidden(player))
@@ -1325,21 +1556,23 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 
 			if (!(type ^ negate ^ temp))
 			{
-				/*
-		 * Four ways to satisfy that test: AND, don't
-		 * want flag but we have it; AND, do want
-		 * flag but don't have it; OR, don't want
-		 * flag and don't have it; OR, do want flag
-		 * and do have it.
-		 */
+				/**
+				 * Four ways to satisfy that test: AND, don't
+				 * want flag but we have it; AND, do want
+				 * flag but don't have it; OR, don't want
+				 * flag and don't have it; OR, do want flag
+				 * and do have it.
+				 * 
+				 */
 				SAFE_BOOL(buff, bufc, type);
 				XFREE(flagletter);
 				return;
 			}
 
-			/*
-	     * Otherwise, move on to check the next flag.
-	     */
+			/**
+		     * Otherwise, move on to check the next flag.
+			 * 
+		     */
 		}
 	}
 
@@ -1347,17 +1580,25 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 	XFREE(flagletter);
 }
 
-/*---------------------------------------------------------------------------
- * fun_hasflag:  plus auxiliary function atr_has_flag.
+/**
+ * @brief Auxiliary function for fun_hasflag
+ * 
+ * @param player DBref of player
+ * @param thing DBref of thing
+ * @param attr Attributes
+ * @param aowner Attribute owner
+ * @param aflags Attribute flags
+ * @param flagname Flag Name
+ * @return true Attribute found
+ * @return false Attribute not found
  */
-
-int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname)
+bool atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, char *flagname)
 {
-	int flagval;
+	int flagval = 0;
 
 	if (!See_attr(player, thing, attr, aowner, aflags))
 	{
-		return 0;
+		return false;
 	}
 
 	flagval = search_nametab(player, indiv_attraccess_nametab, flagname);
@@ -1369,17 +1610,32 @@ int atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags, 
 
 	if (flagval < 0)
 	{
-		return 0;
+		return false;
 	}
 
-	return (aflags & flagval);
+	return (aflags & flagval) ? true : false;
 }
 
+/**
+ * @brief   Returns true if object <object> has the flag named <flag> set on 
+ *          it, or, if <flag> is PLAYER, THING, ROOM, or EXIT, if <object> is
+ *          of the specified type.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it, aowner;
-	int atr, aflags;
-	ATTR *ap;
+	dbref it = NOTHING, aowner = NOTHING;
+	int atr = 0, aflags = 0;
+	ATTR *ap = NULL;
 
 	if (parse_attrib(player, fargs[0], &it, &atr, 1))
 	{
@@ -1415,6 +1671,21 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 }
 
+/**
+ * @brief Returns true if object <object> has the flag named <flag> set on
+ *        it, or, if <flag> is PLAYER, THING, ROOM, or EXIT, if <object> is
+ *        of the specified type.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
@@ -1436,11 +1707,21 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * hasflags(<object>, <flag list to AND>, <OR flag list to AND>, <etc.>)
+/**
+ * @brief This function returns 1 if <object> has all the flags in
+ *        <flag list 1>, or all the flags in <flag list 2>, and so
+ *        forth (up to eight lists). Otherwise, it returns 0.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
@@ -1461,11 +1742,12 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	/*
+	/**
      * Walk through each of the lists we've been passed. We need to have
      * all the flags in a particular list (AND) in order to consider that
      * list true. We return 1 if any of the lists are true. (i.e., we OR
      * the list results).
+	 * 
      */
 	result = 0;
 
@@ -1492,11 +1774,19 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribut
 	SAFE_BOOL(buff, bufc, result);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * handle_timestamp: Get timestamps (LASTACCESS, LASTMOD, CREATION).
+/**
+ * @brief Get timestamps (LASTACCESS, LASTMOD, CREATION).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it = match_thing(player, fargs[0]);
@@ -1511,15 +1801,24 @@ void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attr
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Parent-child relationships.
+/**
+ * @brief This function returns 1 if <object> has all the flags in
+ *        <flag list 1>, or all the flags in <flag list 2>, and so
+ *        forth (up to eight lists). Otherwise, it returns 0. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
-	it = match_thing(player, fargs[0]);
+	dbref it = match_thing(player, fargs[0]);
 
 	if (Good_obj(it) && (Examinable(player, it) || (it == cause)))
 	{
@@ -1534,10 +1833,27 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	return;
 }
 
+/**
+ * @brief This function returns the list of dbrefs of the object's "parent
+ *        chain", including itself: i.e., its own dbref, the dbref of the
+ *        object it is @parent'd to, its parent's parent (grandparent),
+ *        and so forth. Note that the function will always return at least one
+ *        element, the dbref of the object itself.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref it, par;
-	int i;
+	dbref it = NOTHING, par = NOTHING;
+	int i = 0;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -1580,10 +1896,23 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 }
 
+/**
+ * @brief This function returns a list of objects that are parented to <object>.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref i, it;
-	char *bb_p;
+	dbref i = NOTHING, it = NOTHING;
+	char *bb_p = NULL;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -1633,14 +1962,23 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Zones.
+/**
+ * @brief Returns the dbref of <object>'s zone (the dbref of the master object
+ *        which defines the zone).
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref it;
+	dbref it = NOTHING;
 
 	if (!mushconf.have_zones)
 	{
@@ -1660,12 +1998,24 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	SAFE_LTOS(buff, bufc, Zone(it), LBUF_SIZE);
 }
 
+/**
+ * @brief Scan zone for content
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref i, it;
-	int type;
-	char *bb_p;
-	type = Func_Mask(TYPE_MASK);
+	dbref i = NOTHING, it = NOTHING;
+	char *bb_p = NULL;
+	int type = Func_Mask(TYPE_MASK);
 
 	if (!mushconf.have_zones)
 	{
@@ -1713,12 +2063,25 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
+/**
+ * @brief Evaluates an attribute on the caller's Zone object
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref aowner;
-	int aflags, alen;
-	ATTR *ap;
-	char *tbuf1, *str;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0;
+	ATTR *ap = NULL;
+	char *tbuf1 = NULL, *str = NULL;
 	dbref zone = Zone(player);
 
 	if (!mushconf.have_zones)
@@ -1738,8 +2101,9 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause _
 		return;
 	}
 
-	/*
+	/**
      * find the user function attribute
+	 * 
      */
 	ap = atr_str(upcasestr(fargs[0]));
 
@@ -1759,27 +2123,35 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause _
 	}
 
 	str = tbuf1;
-	/*
+
+	/**
      * Behavior here is a little wacky. The enactor was always the
      * player, not the cause. You can still get the caller, though.
+	 * 
      */
 	exec(buff, bufc, zone, caller, player, EV_EVAL | EV_STRIP | EV_FCHECK, &str, &(fargs[1]), nfargs - 1);
 	XFREE(tbuf1);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_hasattr: does object X have attribute Y.
+/**
+ * @brief Does object X have attribute Y.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref thing, aowner;
-	int aflags, alen, check_parents;
-	ATTR *attr;
-	char *tbuf;
-	check_parents = Is_Func(CHECK_PARENTS);
-	thing = match_thing(player, fargs[0]);
+	ATTR *attr = NULL;
+	char *tbuf = NULL;
+	int aflags = 0, alen = 0, check_parents = Is_Func(CHECK_PARENTS);
+	dbref thing = match_thing(player, fargs[0]), aowner = NOTHING;
 
 	if (!Good_obj(thing))
 	{
@@ -1837,11 +2209,19 @@ void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_v: Function form of %-substitution
+/**
+ * @brief Function form of %-substitution
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used 
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
 	dbref aowner;
@@ -1852,10 +2232,11 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 
 	if (isalpha(tbuf[0]) && tbuf[1])
 	{
-		/*
-	 * Fetch an attribute from me.  First see if it exists,
-	 * returning a null string if it does not.
-	 */
+		/**
+		 * Fetch an attribute from me.  First see if it exists,
+		 * returning a null string if it does not.
+		 * 
+		 */
 		ap = atr_str(fargs[0]);
 
 		if (!ap)
@@ -1863,10 +2244,10 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 			return;
 		}
 
-		/*
-	 * If we can access it, return it, otherwise return a null
-	 * string
-	 */
+		/**
+		 * If we can access it, return it, otherwise return a null string
+		 * 
+		 */
 		tbuf = atr_pget(player, ap->number, &aowner, &aflags, &alen);
 
 		if (See_attr(player, player, ap, aowner, aflags))
@@ -1878,8 +2259,9 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 		return;
 	}
 
-	/*
+	/**
      * Not an attribute, process as %<arg>
+	 * 
      */
 	sbuf = XMALLOC(SBUF_SIZE, "sbuf");
 	sbufc = sbuf;
@@ -1891,17 +2273,24 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 	XFREE(sbuf);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * perform_get: Get attribute from object: GET, XGET, GET_EVAL, EVAL(obj,atr)
+/**
+ * @brief Get attribute from object: GET, XGET, GET_EVAL, EVAL(obj,atr)
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref thing, aowner;
-	int attrib, aflags, alen, eval_it;
-	char *atr_gotten, *str;
-	eval_it = Is_Func(GET_EVAL);
+	dbref thing = NOTHING, aowner = NOTHING;
+	char *atr_gotten = NULL, *str = NULL;
+	int attrib = 0, aflags = 0, alen, eval_it = Is_Func(GET_EVAL);
 
 	if (Is_Func(GET_XARGS))
 	{
@@ -1931,9 +2320,10 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	/*
+	/**
      * There used to be code here to handle AF_IS_LOCK attributes, but
      * parse_attrib can never return one of those. Use fun_lock instead.
+	 * 
      */
 	atr_gotten = atr_pget(thing, attrib, &aowner, &aflags, &alen);
 
@@ -1950,6 +2340,22 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 	XFREE(atr_gotten);
 }
 
+/**
+ * @brief The first form of this function is identical to get_eval(), but
+ *        splits the <object> and <attribute> into two arguments, rather
+ *        than having an <object>/<attribute> pair. It is provided for
+ *        PennMUSH compatibility.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -1967,33 +2373,41 @@ void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	perform_get(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * do_ufun: Call a user-defined function: U, ULOCAL, UPRIVATE
+/**
+ * @brief Call a user-defined function: U, ULOCAL, UPRIVATE
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref aowner, thing;
-	int is_local, is_private, aflags, alen, anum, trace_flag;
-	ATTR *ap;
-	char *atext, *str;
-	GDATA *preserve;
-	is_local = Is_Func(U_LOCAL);
-	is_private = Is_Func(U_PRIVATE);
+	dbref aowner = NOTHING, thing = NOTHING;
+	int aflags = 0, alen = 0, anum = 0, trace_flag = 0;
+	ATTR *ap = NULL;
+	char *atext = NULL, *str = NULL;
+	GDATA *preserve = NULL;
+	int is_local = Is_Func(U_LOCAL), is_private = Is_Func(U_PRIVATE);
 
-	/*
+	/**
      * We need at least one argument
+	 * 
      */
-
 	if (nfargs < 1)
 	{
 		SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
 		return;
 	}
 
-	/*
+	/**
      * First arg: <obj>/<attr> or <attr> or #lambda/<code>
+	 * 
      */
 	if (string_prefix(fargs[0], "#lambda/"))
 	{
@@ -2033,11 +2447,11 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		}
 	}
 
-	/*
+	/**
      * If we're evaluating locally, preserve the global registers. If
      * we're evaluating privately, preserve and wipe out.
+	 * 
      */
-
 	if (is_local)
 	{
 		preserve = save_global_regs("fun_ulocal.save");
@@ -2048,10 +2462,10 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		mushstate.rdata = NULL;
 	}
 
-	/*
+	/**
      * If the trace flag is on this attr, set the object Trace
+	 * 
      */
-
 	if (!Trace(thing) && (aflags & AF_TRACE))
 	{
 		trace_flag = 1;
@@ -2062,27 +2476,28 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		trace_flag = 0;
 	}
 
-	/*
+	/**
      * Evaluate it using the rest of the passed function args
+	 * 
      */
 	str = atext;
 	exec(buff, bufc, thing, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[1]), nfargs - 1);
 	XFREE(atext);
 
-	/*
+	/**
      * Reset the trace flag if we need to
+	 * 
      */
-
 	if (trace_flag)
 	{
 		c_Trace(thing);
 	}
 
-	/*
+	/**
      * If we're evaluating locally, restore the preserved registers. If
      * we're evaluating privately, free whatever data we had and restore.
+	 * 
      */
-
 	if (is_local)
 	{
 		restore_global_regs("fun_ulocal.restore", preserve);
@@ -2138,19 +2553,27 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * objcall: Call the text of a u-function from a specific object's
- * perspective. (i.e., get the text as the player, but execute it as the
- * specified object.
+/**
+ * @brief  Call the text of a u-function from a specific object's perspective.
+ *         (i.e., get the text as the player, but execute it as the specified
+ *         object.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref obj, aowner, thing;
-	int aflags, alen, anum;
-	ATTR *ap;
-	char *atext, *str;
+	dbref obj = NOTHING, aowner = NOTHING, thing = NOTHING;
+	int aflags = 0, alen = 0, anum = 0;
+	ATTR *ap = NULL;
+	char *atext = NULL, *str = NULL;
 
 	if (nfargs < 2)
 	{
@@ -2158,8 +2581,9 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 		return;
 	}
 
-	/*
+	/**
      * First arg: <obj>/<attr> or <attr> or #lambda/<code>
+	 * 
      */
 	if (string_prefix(fargs[1], "#lambda/"))
 	{
@@ -2198,8 +2622,9 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 			return;
 		}
 	}
-	/*
+	/**
      * Find our perspective.
+	 * 
      */
 	obj = match_thing(player, fargs[0]);
 
@@ -2208,45 +2633,61 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 		obj = player;
 	}
 
-	/*
+	/**
      * Evaluate using the rest of the passed function args.
+	 * 
      */
 	str = atext;
 	exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[2]), nfargs - 2);
 	XFREE(atext);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_localize: Evaluate a function with local scope (i.e., preserve and
- * restore the r-registers). Essentially like calling ulocal() but with the
- * function string directly.
+/**
+ * @brief Evaluate a function with local scope (i.e., preserve and restore the
+ *        r-registers). Essentially like calling ulocal() but with the function
+ *        string directly.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	char *str;
-	GDATA *preserve;
-	preserve = save_global_regs("fun_localize_save");
-	str = fargs[0];
+	char *str = fargs[0];
+	;
+	GDATA *preserve = save_global_regs("fun_localize_save");
+
 	exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 	restore_global_regs("fun_localize_restore", preserve);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_private: Evaluate a function with a strictly local scope -- do not
- * pass global registers and discard any changes made to them. Like calling
- * uprivate() but with the function string directly.
+/**
+ * @brief Evaluate a function with a strictly local scope -- do not pass global
+ *        registers and discard any changes made to them. Like calling 
+ *        uprivate() but with the function string directly.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	char *str;
-	GDATA *preserve;
-	preserve = mushstate.rdata;
+	char *str = fargs[0];
+	GDATA *preserve = mushstate.rdata;
 	mushstate.rdata = NULL;
-	str = fargs[0];
+
 	exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 
 	if (mushstate.rdata)
@@ -2297,30 +2738,35 @@ void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	mushstate.rdata = preserve;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_default, fun_edefault, and fun_udefault: These check for the presence
- * of an attribute. If it exists, then it is gotten, via the equivalent of
- * get(), get_eval(), or u(), respectively. Otherwise, the default message is
- * used. In the case of udefault(), the remaining arguments to the function
- * are used as arguments to the u().
+/**
+ * @brief This function returns the value of <obj>/<attr>, as if retrieved via
+ *        the get() function, if the attribute exists and is readable by Player
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	dbref thing, aowner;
-	int attrib, aflags, alen;
-	ATTR *attr;
-	char *objname, *atr_gotten, *bp, *str;
+	dbref thing = NOTHING, aowner = NOTHING;
+	int attrib = 0, aflags = 0, alen = 0;
+	ATTR *attr = NULL;
+	char *objname = NULL, *atr_gotten = NULL, *bp = NULL, *str = fargs[0];
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
-	str = fargs[0];
+
 	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
-	/*
+	/**
      * First we check to see that the attribute exists on the object. If
      * so, we grab it and use it.
+	 * 
      */
-
 	if (objname != NULL)
 	{
 		if (parse_attrib(player, objname, &thing, &attrib, 0) && (attrib != NOTHING))
@@ -2346,29 +2792,48 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		XFREE(objname);
 	}
 
-	/*
+	/**
      * If we've hit this point, we've not gotten anything useful, so we
      * go and evaluate the default.
+	 * 
      */
 	str = fargs[1];
 	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
+/**
+ * @brief This function returns the evaluated value of <obj>/<attr>, as if 
+ *        retrieved via the get_eval() function, if the attribute exists and
+ *        is readable by you. Otherwise, it evaluates the default case, and
+ *        returns that. The default case is only evaluated if the attribute
+ *        does not exist or cannot be read.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	dbref thing, aowner;
-	int attrib, aflags, alen;
-	ATTR *attr;
-	char *objname, *atr_gotten, *bp, *str;
+	dbref thing = NOTHING, aowner = NOTHING;
+	int attrib = 0, aflags = 0, alen = 0;
+	ATTR *attr = NULL;
+	char *objname = NULL, *atr_gotten = NULL, *bp = NULL, *str = fargs[0];
+
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
-	str = fargs[0];
+
 	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
-	/*
+	/**
      * First we check to see that the attribute exists on the object. If
      * so, we grab it and use it.
+	 * 
      */
-
 	if (objname != NULL)
 	{
 		if (parse_attrib(player, objname, &thing, &attrib, 0) && (attrib != NOTHING))
@@ -2395,23 +2860,44 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		XFREE(objname);
 	}
 
-	/*
+	/**
      * If we've hit this point, we've not gotten anything useful, so we
      * go and evaluate the default.
+	 * 
      */
 	str = fargs[1];
 	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
+/**
+ * @brief This function returns the value of the user-defined function as
+ *        defined by <attr> (or <obj>/<attr>), as if retrieved via the u()
+ *        function, with <args>, if the attribute exists and is readable
+ *        by you.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing, aowner;
-	int aflags, alen, anum, i, j, trace_flag;
-	ATTR *ap;
-	char *objname, *atext, *str, *bp, *xargs[NUM_ENV_VARS];
+	dbref thing = NOTHING, aowner = NOTHING;
+	int aflags = 0, alen = 0, anum = 0, i = 0, j = 0, trace_flag = 0;
+	ATTR *ap = NULL;
+	char *objname = NULL, *atext = NULL, *str = NULL, *bp = NULL, *xargs[NUM_ENV_VARS];
 
 	if (nfargs < 2)
-	{ /* must have at least two arguments */
+	{
+		/** 
+		 * must have at least two arguments 
+		 * 
+		 */
 		return;
 	}
 
@@ -2419,11 +2905,11 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
 	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
-	/*
+	/**
      * First we check to see that the attribute exists on the object. If
      * so, we grab it and use it.
+	 * 
      */
-
 	if (objname != NULL)
 	{
 		if (parse_attrib(player, objname, &thing, &anum, 0))
@@ -2445,11 +2931,12 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 			if (*atext)
 			{
-				/*
-		 * Now we have a problem -- we've got to go
-		 * eval all of those arguments to the
-		 * function.
-		 */
+				/**
+				 * Now we have a problem -- we've got to go
+				 * eval all of those arguments to the
+				 * function.
+				 * 
+		 		 */
 				for (i = 2, j = 0; j < NUM_ENV_VARS; i++, j++)
 				{
 					if ((i < nfargs) && fargs[i])
@@ -2464,12 +2951,11 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 					}
 				}
 
-				/*
-		 * We have the args, now call the ufunction.
-		 * Obey the trace flag on the attribute if
-		 * there is one.
-		 */
-
+				/**
+				 * We have the args, now call the ufunction.
+				 * Obey the trace flag on the attribute if
+				 * there is one.
+				 */
 				if (!Trace(thing) && (aflags & AF_TRACE))
 				{
 					trace_flag = 1;
@@ -2488,10 +2974,10 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 					c_Trace(thing);
 				}
 
-				/*
-		 * Then clean up after ourselves.
-		 */
-
+				/**
+				 * Then clean up after ourselves.
+				 * 
+				 */
 				for (j = 0; j < NUM_ENV_VARS; j++)
 					if (xargs[j])
 					{
@@ -2509,22 +2995,32 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		XFREE(objname);
 	}
 
-	/*
+	/**
      * If we've hit this point, we've not gotten anything useful, so we
      * go and evaluate the default.
+	 * 
      */
 	str = fargs[1];
 	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
-/*---------------------------------------------------------------------------
- * Evaluate from a specific object's perspective.
+/**
+ * @brief Evaluate from a specific object's perspective.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
 {
-	dbref obj;
-	char *name, *bp, *str;
+	dbref obj = NOTHING;
+	char *name = NULL, *bp = NULL, *str = NULL;
 
 	if (!*fargs[0])
 	{
@@ -2536,13 +3032,14 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	exec(name, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 	obj = match_thing(player, name);
 
-	/*
+	/**
      * In order to evaluate from something else's viewpoint, you must
      * have the same owner as it, or be a wizard (unless
      * objeval_requires_control is turned on, in which case you must
      * control it, period). Otherwise, we default to evaluating from our
      * own viewpoint. Also, you cannot evaluate things from the point of
      * view of God.
+	 * 
      */
 	if (Cannot_Objeval(player, obj))
 	{
@@ -2554,27 +3051,50 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	XFREE(name);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Matching functions.
+/**
+ * @brief Returns the dbref number of the object, which must be in the same
+*         room as the object executing num.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_num(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LB_CHR('#', buff, bufc);
 	SAFE_LTOS(buff, bufc, match_thing(player, fargs[0]), LBUF_SIZE);
 }
 
+/**
+ * @brief Given the partial name of a player, it returns that player's dbref
+ *        number. 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *name, *temp, *tp;
-	dbref thing;
-	dbref *p_ptr;
+	char *name = NULL, *temp = NULL, *tp = NULL;
+	dbref thing = NOTHING;
+	dbref *p_ptr = NULL;
 
-	/*
+	/**
      * If we have a valid dbref, it's okay if it's a player.
+	 * 
      */
-
 	if ((*fargs[0] == NUMBER_TOKEN) && fargs[0][1])
 	{
 		thing = parse_dbref(fargs[0] + 1);
@@ -2592,8 +3112,9 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		return;
 	}
 
-	/*
+	/**
      * If we have *name, just advance past the *; it doesn't matter
+	 * 
      */
 	name = fargs[0];
 
@@ -2605,8 +3126,9 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		} while (isspace(*name));
 	}
 
-	/*
+	/**
      * Look up the full name
+	 * 
      */
 	tp = temp = XMALLOC(LBUF_SIZE, "temp");
 	SAFE_LB_STR(name, temp, &tp);
@@ -2621,9 +3143,10 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 	if (p_ptr)
 	{
-		/*
-	 * We've got it. Check to make sure it's a good object.
-	 */
+		/**
+		 * We've got it. Check to make sure it's a good object.
+		 * 
+		 */
 		if (Good_obj(*p_ptr) && isPlayer(*p_ptr))
 		{
 			SAFE_LB_CHR('#', buff, bufc);
@@ -2637,8 +3160,9 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		return;
 	}
 
-	/*
+	/**
      * We haven't found anything. Now we try a partial match.
+	 * 
      */
 	thing = find_connected_ambiguous(player, name);
 
@@ -2657,6 +3181,20 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 }
 
+/**
+ * @brief If <object> is a dbref, if the dbref is valid, that dbref will be
+ *        returned. If the dbref is not valid, #-1 will be returned.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_pfind(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing;
@@ -2680,23 +3218,29 @@ void fun_pfind(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_locate: Search for things with the perspective of another obj.
+/**
+ * @brief Search for things with the perspective of another obj.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int pref_type, check_locks, verbose, multiple;
-	dbref thing, what;
-	char *cp;
-	pref_type = NOTYPE;
-	check_locks = verbose = multiple = 0;
+	int pref_type = NOTYPE, check_locks = 0, verbose = 0, multiple = 0;
+	dbref thing = NOTHING, what = NOTHING;
+	char *cp = NULL;
 
-	/*
+	/**
      * Find the thing to do the looking, make sure we control it.
+	 * 
      */
-
 	if (See_All(player))
 	{
 		thing = match_thing(player, fargs[0]);
@@ -2712,10 +3256,10 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		return;
 	}
 
-	/*
+	/**
      * Get pre- and post-conditions and modifiers
+	 * 
      */
-
 	for (cp = fargs[2]; *cp; cp++)
 	{
 		switch (*cp)
@@ -2750,10 +3294,10 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		}
 	}
 
-	/*
+	/**
      * Set up for the search
+	 * 
      */
-
 	if (check_locks)
 	{
 		init_match_check_keys(thing, fargs[1], pref_type);
@@ -2763,10 +3307,10 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		init_match(thing, fargs[1], pref_type);
 	}
 
-	/*
+	/**
      * Search for each requested thing
+	 * 
      */
-
 	for (cp = fargs[2]; *cp; cp++)
 	{
 		switch (*cp)
@@ -2809,10 +3353,10 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		}
 	}
 
-	/*
+	/**
      * Get the result and return it to the caller
+	 * 
      */
-
 	if (multiple)
 	{
 		what = last_match_result();
@@ -2831,28 +3375,37 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	SAFE_LTOS(buff, bufc, what, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * handle_lattr: lattr: Return list of attributes I can see on the object.
- * nattr: Ditto, but just count 'em up.
+/**
+ * @brief Handler for lattr/nattr
+ *        lattr: Return list of attributes I can see on the object.
+ *        nattr: Ditto, but just count 'em up.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing;
-	ATTR *attr;
-	char *bb_p;
-	int ca = 0, total = 0, count_only = 0, start = 0, count = 0, i = 0, got = 0;
+	dbref thing = NOTHING;
+	ATTR *attr = NULL;
+	char *bb_p = NULL;
+	int ca = 0, total = 0, count_only = Is_Func(LATTR_COUNT), start = 0, count = 0, i = 0, got = 0;
 	Delim osep;
-	count_only = Is_Func(LATTR_COUNT);
 
 	if (!count_only)
 	{
-		/*
-	 * We have two possible syntaxes:
-	 * lattr(<whatever>[,<odelim>])
-	 * lattr(<whatever>,<start>,<count>[,<odelim>])
-	 */
+		/**
+		 * We have two possible syntaxes:
+		 * lattr(<whatever>[,<odelim>])
+		 * lattr(<whatever>,<start>,<count>[,<odelim>])
+		 * 
+		 */
 		if (nfargs > 2)
 		{
 			if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
@@ -2891,10 +3444,11 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		}
 	}
 
-	/*
+	/**
      * Check for wildcard matching.  parse_attrib_wild checks for read
      * permission, so we don't have to.  Have p_a_w assume the slash-star
      * if it is missing.
+	 * 
      */
 	olist_push();
 
@@ -2945,29 +3499,38 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	olist_pop();
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_search: Search the db for things, returning a list of what matches
+/**
+ * @brief Search the db for things, returning a list of what matches
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used 
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Not used 
+ * @param cargs Not used 
+ * @param ncargs Not used 
  */
-
 void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref thing;
-	char *bp, *nbuf;
+	dbref thing = NOTHING;
+	char *bp = NULL, *nbuf = NULL;
 	SEARCH searchparm;
 
-	/*
+	/**
      * Set up for the search.  If any errors, abort.
+	 * 
      */
-
 	if (!search_setup(player, fargs[0], &searchparm))
 	{
 		SAFE_LB_STR("#-1 ERROR DURING SEARCH", buff, bufc);
 		return;
 	}
 
-	/*
+	/**
      * Do the search and report the results
+	 * 
      */
 	olist_push();
 	search_perform(player, cause, &searchparm);
@@ -2992,11 +3555,19 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	olist_pop();
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_stats: Get database size statistics.
+/**
+ * @brief Get database size statistics.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_stats(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref who;
@@ -3031,16 +3602,19 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * Memory usage.
  */
 
-int mem_usage(dbref thing)
+/**
+ * @brief Memory usage of an object
+ * 
+ * @param thing 
+ * @return int 
+ */
+size_t mem_usage(dbref thing)
 {
-	int k;
-	int ca;
-	char *as, *str;
-	ATTR *attr;
-	k = sizeof(OBJ);
-	k += strlen(Name(thing)) + 1;
+	char *as = NULL, *str = NULL;
+	ATTR *attr = NULL;
+	size_t k = sizeof(OBJ) + strlen(Name(thing)) + 1;
 
-	for (ca = atr_head(thing, &as); ca; ca = atr_next(&as))
+	for (int ca = atr_head(thing, &as); ca; ca = atr_next(&as))
 	{
 		str = atr_get_raw(thing, ca);
 
@@ -3065,14 +3639,21 @@ int mem_usage(dbref thing)
 	return k;
 }
 
-int mem_usage_attr(dbref player, char *str)
+/**
+ * @brief Memory usage of an attribute
+ * 
+ * @param player DBref of the player
+ * @param str Attribute
+ * @return size_t 
+ */
+size_t mem_usage_attr(dbref player, char *str)
 {
-	dbref thing, aowner;
-	int atr, aflags, alen;
-	char *abuf;
-	ATTR *ap;
-	int bytes_atext = 0;
-	abuf = XMALLOC(LBUF_SIZE, "abuf");
+	dbref thing = NOTHING, aowner = NOTHING;
+	int atr = 0, aflags = 0, alen = 0;
+	ATTR *ap = NULL;
+	char *abuf = XMALLOC(LBUF_SIZE, "abuf");
+	size_t bytes_atext = 0;
+
 	olist_push();
 
 	if (parse_attrib_wild(player, str, &thing, 0, 0, 1, 1))
@@ -3088,10 +3669,10 @@ int mem_usage_attr(dbref player, char *str)
 
 			abuf = atr_get_str(abuf, thing, atr, &aowner, &aflags, &alen);
 
-			/*
-	     * Player must be able to read attribute with
-	     * 'examine'
-	     */
+			/**
+		     * Player must be able to read attribute with 'examine'
+			 * 
+		     */
 			if (Examinable(player, thing) && Read_attr(player, thing, ap, aowner, aflags))
 			{
 				bytes_atext += alen;
@@ -3104,9 +3685,30 @@ int mem_usage_attr(dbref player, char *str)
 	return bytes_atext;
 }
 
+/**
+ * @brief   If no attribute pattern is specified, this returns the number of 
+ *          bytes of memory consumed by an object, including both attribute 
+ *          text and object overhead.
+ * 
+ *          If an attribute wildcard pattern is specified, this returns the
+ *          number of bytes of memory consumed by attribute text for those
+ *          attributes on <object>. To just get a count of the number of bytes
+ *          used by all attribute text on an object, use 'objmem(<object> / *)'.
+ *          You must be able to read an attribute in order to check its size.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref thing;
+	dbref thing = NOTHING;
 
 	if (strchr(fargs[0], '/'))
 	{
@@ -3125,12 +3727,27 @@ void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	SAFE_LTOS(buff, bufc, mem_usage(thing), LBUF_SIZE);
 }
 
+/**
+ * @brief   Returns the sum total of the size, in bytes, of all objects in the
+ *          database that are owned by <player> (equivalent to doing an objmem()
+ *          on everything that player owns). You must be a Wizard, or have the
+ *          Search power, in order to use this on another player.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	int tot = 0;
-	dbref thing;
-	dbref j;
-	thing = match_thing(player, fargs[0]);
+	dbref thing = match_thing(player, fargs[0]);
+	dbref j = NOTHING;
 
 	if (!Good_obj(thing) || !Examinable(player, thing))
 	{
@@ -3149,11 +3766,20 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 	SAFE_LTOS(buff, bufc, tot, LBUF_SIZE);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Type functions.
+/**
+ * @brief Returns a string indicating the object type of <object>, either EXIT,
+ *        PLAYER, ROOM, or THING.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_type(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it;
@@ -3190,6 +3816,21 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	return;
 }
 
+/**
+ * @brief Returns 1 if <object> is of type <type>, and 0 otherwise. Valid
+ *        types are: ROOM, EXIT, THING, and PLAYER. If an invalid type is
+ *        given, the function returns #-1.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_hastype(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it = match_thing(player, fargs[0]);
@@ -3234,19 +3875,31 @@ void fun_hastype(char *buff, char **bufc, dbref player, dbref caller __attribute
 	};
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_lastcreate: Return the last object of type Y that X created.
+/**
+ * @brief Return the last object of type Y that X created.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int i, aowner, aflags, alen, obj_list[4], obj_type;
-	char *obj_str, *p, *tokst;
+	int i = 0, aowner = 0, aflags = 0, alen = 0, obj_list[4], obj_type = 0;
+	char *obj_str = NULL, *p = NULL, *tokst = NULL;
 	dbref obj = match_thing(player, fargs[0]);
 
 	if (!controls(player, obj))
-	{ /* Automatically checks for GoodObj */
+	{ 
+		/** 
+		 * Automatically checks for GoodObj 
+		 * 
+		 */
 		SAFE_NOTHING(buff, bufc);
 		return;
 	}
@@ -3325,6 +3978,24 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attrib
  * as %0, and the speech part number as %1.
  */
 
+/**
+ * @brief 
+ * 
+ * @param speaker DBref of speaker
+ * @param sname Speaker's name
+ * @param str Text being said
+ * @param key Say or pose key
+ * @param say_str Say string
+ * @param trans_str Transform string
+ * @param empty_str Buffer String
+ * @param open_sep Open Separator
+ * @param close_sep Close Separator
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ */
 void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const Delim *open_sep, const Delim *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc)
 {
 	char *sp, *ep, *save, *tp, *bp;
@@ -3339,12 +4010,17 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 	}
 	else
 	{
+		/** 
+		 * should never happen; caller should check 
+		 * 
+		 */
 		XFREE(tbuf);
-		return; /* should never happen; caller should check */
+		return; 
 	}
 
-	/*
+	/**
      * Find the start of the speech string. Copy up to it.
+	 * 
      */
 	sp = str;
 
@@ -3384,14 +4060,17 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 
 	while (!done)
 	{
-		/*
-	 * Find the end of the speech string.
-	 */
+		/**
+		 * Find the end of the speech string.
+		 * 
+		 */
 		ep = sp;
 		sp = split_token(&ep, close_sep);
+
 		/*
-	 * Pass the stuff in-between through the u-functions.
-	 */
+		 * Pass the stuff in-between through the u-functions.
+		 * 
+		 */
 		tstack[0] = sp;
 		XSPRINTF(tstack[1], "#%d", speaker);
 		XSPRINTF(tstack[2], "%d", spos);
@@ -3429,11 +4108,11 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 			}
 		}
 
-		/*
-	 * If there's more, find it and copy it. sp will point to the
-	 * beginning of the next speech string.
-	 */
-
+		/**
+		 * If there's more, find it and copy it. sp will point to the
+		 * beginning of the next speech string.
+		 * 
+		 */
 		if (ep && *ep)
 		{
 			sp = ep;
@@ -3475,21 +4154,35 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 	XFREE(tbuf);
 }
 
+/**
+ * @brief This function is used to format speech-like constructs, and is 
+ *        capable of transforming text within a speech string; it is useful for
+ *        implementing "language code" and the like.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
 void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	dbref thing, obj1, obj2;
+	dbref thing = NOTHING, obj1 = NOTHING, obj2 = NOTHING, aowner1 = NOTHING, aowner2 = NOTHING;
 	Delim isep, osep; /* really open and close separators */
-	dbref aowner1, aowner2;
-	int aflags1, alen1, anum1, aflags2, alen2, anum2;
-	ATTR *ap1, *ap2;
-	char *atext1, *atext2, *str, *say_str, *s, *tname;
-	int is_transform, key;
-	/*
+	int aflags1 = 0, alen1 = 0, anum1 = 0, aflags2 = 0, alen2 = 0, anum2 = 0, is_transform = 0, key = 0;
+	ATTR *ap1 = NULL, *ap2 = NULL;
+	char *atext1 = NULL, *atext2 = NULL, *str = NULL, *say_str = NULL, *s = NULL, *tname = NULL;
+
+	/**
      * Delimiter processing here is different. We have to do some funky
      * stuff to make sure that a space delimiter is really an intended
      * space, not delim_check() defaulting.
+	 * 
      */
-
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 7, buff, bufc))
 	{
 		return;
@@ -3520,26 +4213,28 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	}
 
-	/*
+	/**
      * We have three possible cases for the speaker: <thing string>&<name
      * string> &<name string> (speaker defaults to player) <thing string>
      * (name string defaults to name of thing)
+	 * 
      */
-
 	if (*fargs[0] == '&')
 	{
-		/*
-	 * name only
-	 */
+		/**
+		 * name only
+		 * 
+		 */
 		thing = player;
 		tname = fargs[0];
 		tname++;
 	}
 	else if (((s = strchr(fargs[0], '&')) == NULL) || !*s++)
 	{
-		/*
-	 * thing only
-	 */
+		/**
+		 * thing only
+		 * 
+		 */
 		thing = match_thing(player, fargs[0]);
 
 		if (!Good_obj(thing))
@@ -3552,9 +4247,10 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 	else
 	{
-		/*
-	 * thing and name
-	 */
+		/**
+		 * thing and name
+		 * 
+		 */
 		*(s - 1) = '\0';
 		thing = match_thing(player, fargs[0]);
 
@@ -3567,19 +4263,19 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		tname = s;
 	}
 
-	/*
+	/**
      * Must have an input string. Otherwise silent fail.
+	 * 
      */
-
 	if (!fargs[1] || !*fargs[1])
 	{
 		return;
 	}
 
-	/*
+	/**
      * Check if there's a string substituting for "says,".
+	 * 
      */
-
 	if ((nfargs >= 3) && fargs[2] && *fargs[2])
 	{
 		say_str = fargs[2];
@@ -3589,9 +4285,10 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		say_str = (char *)(mushconf.comma_say ? "says," : "says");
 	}
 
-	/*
+	/**
      * Find the u-function. If we have a problem with it, we just default
      * to no transformation.
+	 * 
      */
 	atext1 = atext2 = NULL;
 	is_transform = 0;
@@ -3631,10 +4328,10 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	}
 
-	/*
+	/**
      * Do some up-front work on the empty-case u-function, too.
+	 * 
      */
-
 	if (nfargs >= 5)
 	{
 		if (parse_attrib(player, fargs[4], &obj2, &anum2, 0))
@@ -3666,10 +4363,10 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	}
 
-	/*
+	/**
      * Take care of the easy case, no u-function.
+	 * 
      */
-
 	if (!is_transform)
 	{
 		switch (*fargs[1])
@@ -3706,10 +4403,10 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	/*
+	/**
      * Now for the nasty stuff.
+	 * 
      */
-
 	switch (*fargs[1])
 	{
 	case ':':

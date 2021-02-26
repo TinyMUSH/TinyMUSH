@@ -128,4 +128,14 @@ extern int cs_syncs;     /*!<  total cache syncs */
 extern int cs_size;      /*!<  total cache size */
 extern UDB_CHAIN *sys_c; /*!<  sys_c points to all cache lists */
 
+/**
+ * @brief 
+ * 
+ */
+
+extern COLORINFO ansiColor[];
+extern COLORINFO xtermColor[];
+extern COLORINFO cssColors[];
+
+
 #endif /* __EXTERNS_H */

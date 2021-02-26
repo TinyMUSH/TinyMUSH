@@ -1341,5 +1341,44 @@ typedef struct monthdays {
 	int day;
 } MONTHDAYS;
 
+/**
+ * @brief Ansi and color conversion typedefs
+ * 
+ */
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+} xyzColor;
+
+typedef struct
+{
+    float l;
+    float a;
+    float b;
+} CIELABColor;
+
+typedef struct
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} rgbColor;
+
+typedef struct
+{
+    char *name;
+    rgbColor rgb;
+} COLORINFO;
+
+typedef struct
+{
+    float deltaE;
+    COLORINFO color;
+} COLORMATCH;
+
+
 
 #endif /* __TYPEDEFS_H */

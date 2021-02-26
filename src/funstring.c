@@ -20,15 +20,22 @@
 #include "externs.h"
 #include "prototypes.h"
 
-/*
- * ---------------------------------------------------------------------------
- * isword: is every character in the argument a letter? isalnum: is every
- * character in the argument a letter or number?
+/**
+ * @brief Is every character in the argument a letter? 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_isword(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *p;
+	char *p = NULL;
 
 	for (p = fargs[0]; *p; p++)
 	{
@@ -42,9 +49,22 @@ void fun_isword(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	SAFE_LB_CHR('1', buff, bufc);
 }
 
+/**
+ * @brief isalnum: is every character in the argument a letter or number?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_isalnum(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *p;
+	char *p = NULL;
 
 	for (p = fargs[0]; *p; p++)
 	{
@@ -58,31 +78,50 @@ void fun_isalnum(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	SAFE_LB_CHR('1', buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * isnum: is the argument a number?
+/**
+ * @brief Is the argument a number?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_isnum(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_LB_CHR((is_number(fargs[0]) ? '1' : '0'), buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * isdbref: is the argument a valid dbref?
+/**
+ * @brief Is the argument a valid dbref?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_isdbref(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *p;
-	dbref dbitem;
-	p = fargs[0];
+	char *p = fargs[0];
+	dbref dbitem = NOTHING;
 
 	if (*p++ == NUMBER_TOKEN)
 	{
 		if (*p)
-		{ /* just the string '#' won't do! */
+		{
+			/** 
+			 * just the string '#' won't do! 
+			 * 
+			 */
 			dbitem = parse_dbref_only(p);
 
 			if (Good_obj(dbitem))
@@ -96,21 +135,32 @@ void fun_isdbref(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	SAFE_LB_CHR('0', buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * isobjid: is the argument a valid objid?
+/**
+ * @brief Is the argument a valid objid?
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_isobjid(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *p;
-	dbref dbitem;
-	p = fargs[0];
+	char *p = fargs[0];
+	dbref dbitem = NOTHING;
 
 	if (*p++ == NUMBER_TOKEN)
 	{
 		if (*p)
-		{ /* just the string '#' won't do! */
+		{
+			/** 
+			 * just the string '#' won't do! 
+			 * 
+			 */
 			dbitem = parse_objid(p, NULL);
 
 			if (Good_obj(dbitem))
@@ -124,29 +174,46 @@ void fun_isobjid(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	SAFE_LB_CHR('0', buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_null: Just eat the contents of the string. Handy for those times when
- * you've output a bunch of junk in a function call and just want to dispose
- * of the output (like if you've done an iter() that just did a bunch of
- * side-effects, and now you have bunches of spaces you need to get rid of.
+/**
+ * @brief Just eat the contents of the string. Handy for those times when
+ *        you've output a bunch of junk in a function call and just want to
+ *        dispose of the output (like if you've done an iter() that just did 
+ *        a bunch of side-effects, and now you have bunches of spaces you need
+ *        to get rid of.
+ * 
+ * @param buff Not used
+ * @param bufc Not used
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Not used
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_null(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_squish: Squash occurrences of a given character down to 1. We do this
- * both on leading and trailing chars, as well as internal ones; if the
- * player wants to trim off the leading and trailing as well, they can always
- * call trim().
+/**
+ * @brief Squash occurrences of a given character down to 1. We do this
+ *        both on leading and trailing chars, as well as internal ones; if the
+ *        player wants to trim off the leading and trailing as well, they can 
+ *        always call trim().
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *tp, *bp;
+	char *tp = NULL, *bp = NULL;
 	Delim isep;
 
 	if (nfargs == 0)
@@ -168,9 +235,10 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	while (*tp)
 	{
-		/*
-	 * Move over and copy the non-sep characters
-	 */
+		/**
+		 * Move over and copy the non-sep characters
+		 * 
+		 */
 		while (*tp && *tp != isep.str[0])
 		{
 			if (*tp == ESC_CHAR)
@@ -183,22 +251,23 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			}
 		}
 
-		/*
-	 * If we've reached the end of the string, leave the loop.
-	 */
-
+		/**
+		 * If we've reached the end of the string, leave the loop.
+		 * 
+		 */
 		if (!*tp)
 		{
 			break;
 		}
 
-		/*
-	 * Otherwise, we've hit a sep char. Move over it, and then
-	 * move on to the next non-separator. Note that we're
-	 * overwriting our own string as we do this. However, the
-	 * other pointer will always be ahead of our current copy
-	 * pointer.
-	 */
+		/**
+		 * Otherwise, we've hit a sep char. Move over it, and then
+		 * move on to the next non-separator. Note that we're
+		 * overwriting our own string as we do this. However, the
+		 * other pointer will always be ahead of our current copy
+		 * pointer.
+		 * 
+		 */
 		*bp++ = *tp++;
 
 		while (*tp && (*tp == isep.str[0]))
@@ -207,23 +276,32 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		}
 	}
 
-	/*
+	/**
      * Must terminate the string
+	 * 
      */
 	*bp = '\0';
 	SAFE_LB_STR(fargs[0], buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * trim: trim off unwanted white space.
+/**
+ * @brief Trim off unwanted white space.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *p, *q, *endchar, *ep;
+	char *p = NULL, *q = NULL, *endchar = NULL, *ep = NULL;
+	int trim = 0;
 	Delim isep;
-	int trim;
 
 	if (nfargs == 0)
 	{
@@ -264,10 +342,10 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	p = fargs[0];
 
-	/*
+	/**
      * Single-character delimiters are easy.
+	 * 
      */
-
 	if (isep.len == 1)
 	{
 		if (trim & TRIM_L)
@@ -302,10 +380,11 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	/*
+	/**
      * Multi-character delimiters take more work.
+	 * 
      */
-	ep = p + strlen(fargs[0]) - 1; /* last char in string */
+	ep = p + strlen(fargs[0]) - 1; /*!< last char in string */
 
 	if (trim & TRIM_L)
 	{
@@ -354,10 +433,23 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * string.
  */
 
+/**
+ * @brief Return substring after a specified string.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *bp, *cp, *mp, *np, *buf;
-	int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
+	char *bp = NULL, *cp = NULL, *mp = NULL, *np = NULL, *buf = NULL;
+	int ansi_needle = 0, ansi_needle2 = 0, ansi_haystack = 0, ansi_haystack2 = 0;
 
 	if (nfargs == 0)
 	{
@@ -369,13 +461,13 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		return;
 	}
 
-	bp = fargs[0]; /* haystack */
-	mp = fargs[1]; /* needle */
+	bp = fargs[0]; /*!< haystack */
+	mp = fargs[1]; /*!< needle */
 
-	/*
+	/**
      * Sanity-check arg1 and arg2
+	 * 
      */
-
 	if (bp == NULL)
 	{
 		bp = "";
@@ -396,8 +488,9 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		bp = Eat_Spaces(bp);
 	}
 
-	/*
+	/**
      * Get ansi state of the first needle char
+	 * 
      */
 	ansi_needle = ANST_NONE;
 
@@ -457,10 +550,10 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	ansi_haystack = ANST_NORMAL;
 
-	/*
+	/**
      * Look for the needle string
+	 * 
      */
-
 	while (*bp)
 	{
 		while (*bp == ESC_CHAR)
@@ -514,9 +607,10 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 		if ((*bp == *mp) && (ansi_needle == ANST_NONE || ansi_haystack == ansi_needle))
 		{
-			/*
-	     * See if what follows is what we are looking for
-	     */
+			/**
+		     * See if what follows is what we are looking for
+			 * 
+		     */
 			ansi_needle2 = ansi_needle;
 			ansi_haystack2 = ansi_haystack;
 			cp = bp;
@@ -632,9 +726,10 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 			if (!*np)
 			{
-				/*
-		 * Yup, return what follows
-		 */
+				/**
+				 * Yup, return what follows
+				 * 
+				 */
 				buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2);
 				SAFE_LB_STR(buf, buff, bufc);
 				XFREE(buf);
@@ -643,25 +738,40 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 			}
 		}
 
-		/*
-	 * Nope, continue searching
-	 */
+		/**
+		 * Nope, continue searching
+		 * 
+		 */
 		if (*bp)
 		{
 			++bp;
 		}
 	}
 
-	/*
+	/**
      * Ran off the end without finding it
+	 * 
      */
 	return;
 }
 
+/**
+ * @brief Return substring before a specified string.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *haystack, *bp, *cp, *mp, *np, *buf;
-	int ansi_needle, ansi_needle2, ansi_haystack, ansi_haystack2;
+	char *haystack = NULL, *bp = NULL, *cp = NULL, *mp = NULL, *np = NULL, *buf = NULL;
+	int ansi_needle = 0, ansi_needle2 = 0, ansi_haystack = 0, ansi_haystack2 = 0;
 
 	if (nfargs == 0)
 	{
@@ -673,13 +783,13 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		return;
 	}
 
-	haystack = fargs[0]; /* haystack */
-	mp = fargs[1];		 /* needle */
+	haystack = fargs[0]; /*!< haystack */
+	mp = fargs[1];		 /*!< needle */
 
-	/*
+	/**
      * Sanity-check arg1 and arg2
+	 * 
      */
-
 	if (haystack == NULL)
 	{
 		haystack = "";
@@ -701,8 +811,10 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 
 	bp = haystack;
-	/*
+
+	/**
      * Get ansi state of the first needle char
+	 * 
      */
 	ansi_needle = ANST_NONE;
 
@@ -762,15 +874,16 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 	ansi_haystack = ANST_NORMAL;
 
-	/*
+	/**
      * Look for the needle string
+	 * 
      */
-
 	while (*bp)
 	{
-		/*
-	 * See if what follows is what we are looking for
-	 */
+		/**
+		 * See if what follows is what we are looking for
+		 * 
+		 */
 		ansi_needle2 = ansi_needle;
 		ansi_haystack2 = ansi_haystack;
 		cp = bp;
@@ -886,9 +999,10 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 		if (!*np)
 		{
-			/*
-	     * Yup, return what came before this
-	     */
+			/**
+		     * Yup, return what came before this
+			 * 
+		     */
 			*bp = '\0';
 			SAFE_LB_STR(haystack, buff, bufc);
 			buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL);
@@ -897,9 +1011,10 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 			return;
 		}
 
-		/*
-	 * Nope, continue searching
-	 */
+		/**
+		 * Nope, continue searching
+		 * 
+		 */
 		while (*bp == ESC_CHAR)
 		{
 			do
@@ -955,8 +1070,9 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		}
 	}
 
-	/*
+	/**
      * Ran off the end without finding it
+	 * 
      */
 	SAFE_LB_STR(haystack, buff, bufc);
 	return;
@@ -967,10 +1083,23 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * fun_lcstr, fun_ucstr, fun_capstr: Lowercase, uppercase, or capitalize str.
  */
 
+/**
+ * @brief Lowercase string
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_lcstr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *ap;
-	ap = *bufc;
+	char *ap = *bufc;
+
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
 	while (*ap)
@@ -987,10 +1116,23 @@ void fun_lcstr(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 }
 
+/**
+ * @brief Uppercase string
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ucstr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *ap;
-	ap = *bufc;
+	char *ap = *bufc;
+
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
 	while (*ap)
@@ -1007,10 +1149,23 @@ void fun_ucstr(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 }
 
+/**
+ * @brief Capitalize string
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_capstr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *ap;
-	ap = *bufc;
+	char *ap = *bufc;
+
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
 	while (*ap == ESC_CHAR)
@@ -1021,14 +1176,22 @@ void fun_capstr(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	*ap = toupper(*ap);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_space: Make spaces.
+/**
+ * @brief Make spaces.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_space(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int num, max;
+	int num = 0, max = 0;
 
 	if (!fargs[0] || !(*fargs[0]))
 	{
@@ -1041,10 +1204,11 @@ void fun_space(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	if (num < 1)
 	{
-		/*
-	 * If negative or zero spaces return a single space, -except-
-	 * allow 'space(0)' to return "" for calculated padding
-	 */
+		/**
+		 * If negative or zero spaces return a single space, -except-
+		 * allow 'space(0)' to return "" for calculated padding
+		 * 
+		 */
 		if (!is_integer(fargs[0]) || (num != 0))
 		{
 			num = 1;
@@ -1063,10 +1227,23 @@ void fun_space(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * rjust, ljust, center: Justify or center text, specifying fill character
  */
 
+/**
+ * @brief Left justify string, specifying fill character
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int spaces, max, i, slen;
-	char *tp, *fillchars;
+	int spaces = 0, max = 0, i = 0, slen = 0;
+	char *tp = NULL, *fillchars = NULL;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
 	{
@@ -1076,16 +1253,21 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
-	/*
+	/**
      * Sanitize number of spaces
+	 * 
      */
 	if (spaces <= 0)
 	{
-		return; /* no padding needed, just return string */
+		/** 
+		 * no padding needed, just return string 
+		 * 
+		 */
+		return;
 	}
 
 	tp = *bufc;
-	max = LBUF_SIZE - 1 - (tp - buff); /* chars left in buffer */
+	max = LBUF_SIZE - 1 - (tp - buff); /*!< chars left in buffer */
 	spaces = (spaces > max) ? max : spaces;
 
 	if (fargs[2])
@@ -1096,25 +1278,28 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 		if (slen == 0)
 		{
-			/*
-	     * NULL character fill
-	     */
+			/**
+		     * NULL character fill
+			 * 
+		     */
 			XMEMSET(tp, ' ', spaces);
 			tp += spaces;
 		}
 		else if (slen == 1)
 		{
-			/*
-	     * single character fill
-	     */
+			/**
+		     * single character fill
+			 * 
+		     */
 			XMEMSET(tp, *fillchars, spaces);
 			tp += spaces;
 		}
 		else
 		{
-			/*
-	     * multi character fill
-	     */
+			/**
+		     * multi character fill
+			 * 
+		     */
 			for (i = spaces; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1123,9 +1308,10 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 			if (i)
 			{
-				/*
-		 * we have a remainder here
-		 */
+				/**
+				 * we have a remainder here
+				 * 
+				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
 			}
@@ -1135,9 +1321,10 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 	else
 	{
-		/*
-	 * no fill character specified
-	 */
+		/**
+		 * no fill character specified
+		 * 
+		 */
 		XMEMSET(tp, ' ', spaces);
 		tp += spaces;
 	}
@@ -1146,10 +1333,23 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	*bufc = tp;
 }
 
+/**
+ * @brief Right justify string, specifying fill character
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int spaces, max, i, slen;
-	char *tp, *fillchars;
+	int spaces = 0, max = 0, i = 0, slen = 0;
+	char *tp = NULL, *fillchars = NULL;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
 	{
@@ -1158,21 +1358,22 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 
-	/*
+	/**
      * Sanitize number of spaces
+	 * 
      */
-
 	if (spaces <= 0)
 	{
-		/*
-	 * no padding needed, just return string
-	 */
+		/**
+		 * no padding needed, just return string
+		 * 
+		 */
 		SAFE_LB_STR(fargs[0], buff, bufc);
 		return;
 	}
 
 	tp = *bufc;
-	max = LBUF_SIZE - 1 - (tp - buff); /* chars left in buffer */
+	max = LBUF_SIZE - 1 - (tp - buff); /*!< chars left in buffer */
 	spaces = (spaces > max) ? max : spaces;
 
 	if (fargs[2])
@@ -1183,25 +1384,28 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 		if (slen == 0)
 		{
-			/*
-	     * NULL character fill
-	     */
+			/**
+		     * NULL character fill
+			 * 
+		     */
 			XMEMSET(tp, ' ', spaces);
 			tp += spaces;
 		}
 		else if (slen == 1)
 		{
-			/*
-	     * single character fill
-	     */
+			/**
+		     * single character fill
+			 * 
+		     */
 			XMEMSET(tp, *fillchars, spaces);
 			tp += spaces;
 		}
 		else
 		{
-			/*
-	     * multi character fill
-	     */
+			/**
+		     * multi character fill
+			 * 
+		     */
 			for (i = spaces; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1210,9 +1414,10 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 			if (i)
 			{
-				/*
-		 * we have a remainder here
-		 */
+				/**
+				 * we have a remainder here
+				 * 
+				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
 			}
@@ -1222,9 +1427,10 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 	else
 	{
-		/*
-	 * no fill character specified
-	 */
+		/**
+		 * no fill character specified
+		 * 
+		 */
 		XMEMSET(tp, ' ', spaces);
 		tp += spaces;
 	}
@@ -1233,6 +1439,19 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	SAFE_LB_STR(fargs[0], buff, bufc);
 }
 
+/**
+ * @brief Center string, specifying fill character
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *tp = NULL, *fillchars = NULL;
@@ -1255,7 +1474,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 	lead_chrs = (int)((width / 2) - (len / 2) + .5);
 	tp = *bufc;
-	max = LBUF_SIZE - 1 - (tp - buff); /* chars left in buffer */
+	max = LBUF_SIZE - 1 - (tp - buff); /*!< chars left in buffer */
 	lead_chrs = (lead_chrs > max) ? max : lead_chrs;
 
 	if (fargs[2])
@@ -1266,25 +1485,28 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 		if (slen == 0)
 		{
-			/*
-	     * NULL character fill
-	     */
+			/**
+		     * NULL character fill
+			 * 
+		     */
 			XMEMSET(tp, ' ', lead_chrs);
 			tp += lead_chrs;
 		}
 		else if (slen == 1)
 		{
-			/*
-	     * single character fill
-	     */
+			/**
+		     * single character fill
+			 * 
+		     */
 			XMEMSET(tp, *fillchars, lead_chrs);
 			tp += lead_chrs;
 		}
 		else
 		{
-			/*
-	     * multi character fill
-	     */
+			/**
+		     * multi character fill
+			 * 
+		     */
 			for (i = lead_chrs; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1293,9 +1515,10 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 			if (i)
 			{
-				/*
-		 * we have a remainder here
-		 */
+				/**
+				 * we have a remainder here
+				 * 
+				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
 			}
@@ -1305,9 +1528,10 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 	else
 	{
-		/*
-	 * no fill character specified
-	 */
+		/**
+		 * no fill character specified
+		 * 
+		 */
 		XMEMSET(tp, ' ', lead_chrs);
 		tp += lead_chrs;
 	}
@@ -1323,25 +1547,28 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	{
 		if (slen == 0)
 		{
-			/*
-	     * NULL character fill
-	     */
+			/**
+		     * NULL character fill
+			 * 
+		     */
 			XMEMSET(tp, ' ', trail_chrs);
 			tp += trail_chrs;
 		}
 		else if (slen == 1)
 		{
-			/*
-	     * single character fill
-	     */
+			/**
+		     * single character fill
+			 * 
+		     */
 			XMEMSET(tp, *fillchars, trail_chrs);
 			tp += trail_chrs;
 		}
 		else
 		{
-			/*
-	     * multi character fill
-	     */
+			/**
+		     * multi character fill
+			 * 
+		     */
 			for (i = trail_chrs; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1350,9 +1577,10 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 			if (i)
 			{
-				/*
-		 * we have a remainder here
-		 */
+				/**
+				 * we have a remainder here
+				 * 
+				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
 			}
@@ -1360,9 +1588,10 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 	else
 	{
-		/*
-	 * no fill character specified
-	 */
+		/**
+		 * no fill character specified
+		 * 
+		 */
 		XMEMSET(tp, ' ', trail_chrs);
 		tp += trail_chrs;
 	}
@@ -1371,26 +1600,31 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	*bufc = tp;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_left: Returns first n characters in a string fun_right: Returns last n
- * characters in a string strtrunc: now an alias for left
+/**
+ * @brief Returns first n characters in a string
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s;
-	int count, nchars;
+	char *s = fargs[0];
+	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 	int ansi_state = ANST_NORMAL;
-	s = fargs[0];
-	nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (nchars <= 0)
 	{
 		return;
 	}
 
-	for (count = 0; (count < nchars) && *s; count++)
+	for (int count = 0; (count < nchars) && *s; count++)
 	{
 		while (*s == ESC_CHAR)
 		{
@@ -1453,6 +1687,19 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	XFREE(s);
 }
 
+/**
+ * @brief fun_right: Returns last n characters in a string 
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *s, *buf;
@@ -1592,14 +1839,23 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	SAFE_LB_STR(s, buff, bufc);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_chomp: If the line ends with CRLF, CR, or LF, chop it off.
+/**
+ * @brief If the line ends with CRLF, CR, or LF, chop it off
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_chomp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *bb_p = *bufc;
+
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
 	if (*bufc != bb_p && (*bufc)[-1] == '\n')
@@ -1613,16 +1869,22 @@ void fun_chomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_comp: exact-string compare. fun_streq: non-case-sensitive string
- * compare. fun_strmatch: wildcard string compare.
+/**
+ * @brief Exact-string compare
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_comp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int x;
-	x = strcmp(fargs[0], fargs[1]);
+	int x = strcmp(fargs[0], fargs[1]);
 
 	if (x > 0)
 	{
@@ -1638,49 +1900,92 @@ void fun_comp(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	}
 }
 
+/**
+ * @brief non-case-sensitive string compare
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_streq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	SAFE_BOOL(buff, bufc, !string_compare(fargs[0], fargs[1]));
 }
 
+/**
+ * @brief wildcard string compare
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_strmatch(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	/*
+	/**
      * Check if we match the whole string.  If so, return 1
+	 * 
      */
 	SAFE_BOOL(buff, bufc, quick_wild(fargs[1], fargs[0]));
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_edit: Edit text.
+/**
+ * @brief Edit text.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_edit(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *tstr;
+	char *tstr = NULL;
+
 	edit_string(fargs[0], &tstr, fargs[1], fargs[2]);
 	SAFE_LB_STR(tstr, buff, bufc);
 	XFREE(tstr);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_merge:  given two strings and a character, merge the two strings by
- * replacing characters in string1 that are the same as the given character
- * by the corresponding character in string2 (by position). The strings must
- * be of the same length.
+/**
+ * @brief Given two strings and a character, merge the two strings by
+ *        replacing characters in string1 that are the same as the given
+ *        character by the corresponding character in string2 (by position).
+ *        The strings must be of the same length.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *str, *rep;
-	char c;
+	char *str = NULL, *rep = NULL, c = 0;
 
-	/*
+	/**
      * do length checks first
+	 * 
      */
-
 	if (strlen(fargs[0]) != strlen(fargs[1]))
 	{
 		SAFE_LB_STR("#-1 STRING LENGTHS MUST BE EQUAL", buff, bufc);
@@ -1693,11 +1998,10 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		return;
 	}
 
-	/*
-     * find the character to look for. null character is considered a
-     * space
+	/**
+     * find the character to look for. null character is considered a space
+	 * 
      */
-
 	if (!*fargs[2])
 	{
 		c = ' ';
@@ -1707,10 +2011,10 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		c = *fargs[2];
 	}
 
-	/*
+	/**
      * walk strings, copy from the appropriate string
+	 * 
      */
-
 	for (str = fargs[0], rep = fargs[1]; *str && *rep && ((*bufc - buff) < (LBUF_SIZE - 1)); str++, rep++, (*bufc)++)
 	{
 		if (*str == c)
@@ -1726,17 +2030,22 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	return;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * fun_secure, fun_escape: escape [, ], %, \, and the beginning of the
- * string. fun_esc: more limited escape, intended for instances where you
- * only care about string evaluation, not a forced command.
+/**
+ * @brief Returns <string> after replacing the characters [](){};,%\$ with spaces.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_secure(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s;
-	s = fargs[0];
+	char *s = fargs[0];
 
 	while (*s)
 	{
@@ -1769,10 +2078,24 @@ void fun_secure(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 }
 
+/**
+ * @brief Returns <string> after adding an escape character (\) at the start 
+ *        of the string and also before each of the characters %;[]{}\ that 
+ *        appear in the string.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_escape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s, *d;
-	s = fargs[0];
+	char *s = fargs[0], *d = NULL;
 
 	if (!*s)
 	{
@@ -1812,10 +2135,24 @@ void fun_escape(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 }
 
+/**
+ * @brief Less aggressive escape; it does not put a \ at the start of the
+ *        string, and it only escapes %[]\ -- making it more suitable for
+ *        strings that you simply don't want evaluated.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
+ */
 void fun_esc(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s;
-	s = fargs[0];
+	char *s = fargs[0];
 
 	if (!*s)
 	{
@@ -1846,35 +2183,22 @@ void fun_esc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 	}
 }
 
-/*
- * ---------------------------------------------------------------------------
- * stripchars: Remove all of a set of characters from a string.
+/**
+ * @brief Remove all of a set of characters from a string.
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
  */
-
 void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s;
-	/*
-	char stab[256] = {
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,
-		0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0};
-	*/
-	char *stab = XMALLOC(256, "stab");
-
+	char *s = NULL, *stab = XMALLOC(256, "stab");
 	Delim osep;
 
 	if (!fargs[0] || !*fargs[0])
@@ -1882,8 +2206,9 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		return;
 	}
 
-	/*
+	/**
      * Output delimiter should default to null, not a space
+	 * 
      */
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 3, buff, bufc))
 	{
@@ -1919,18 +2244,30 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	XFREE(stab);
 }
 
-/*
- * ---------------------------------------------------------------------------
- * ANSI handlers.
+/**
+ * @brief Highlight a string using ANSI terminal effects.
+ * 
+ * +colorname
+ * #RRGGBB <#RRGGBB>
+ * <RR GG BB>
+ * XTERN
+ * Old Style
+ * 
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player Not used
+ * @param caller Not used
+ * @param cause Not used
+ * @param fargs Function's arguments
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
-
 void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s;
-	int ansi_state;
+	int ansi_state = 0;
 	int xterm = 0;
-	char *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
-	char *xtp;
+	char *s = NULL, *xtp = NULL, *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
 
 	if (!mushconf.ansi_colors)
 	{
@@ -1948,18 +2285,30 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	s = ansi_transition_esccode(ANST_NONE, ansi_state);
 	SAFE_LB_STR(s, buff, bufc);
 	XFREE(s);
-	/* Now that normal ansi has been done, time for xterm */
+
+	/**
+	 * Now that normal ansi has been done, time for xterm 
+	 * 
+	 */
 	s = fargs[0];
 
 	while (*s)
 	{
 		XMEMSET(xtbuf, 0, SBUF_SIZE);
 		if (*s == '<' || *s == '/')
-		{ /* Xterm colors */
-			int xterm_isbg = 0, i;
+		{
+			/** 
+			 * Xterm colors 
+			 * 
+			 */
+			int xterm_isbg = 0, i = 0;
 
 			if (*s == '/')
-			{ /* We are dealing with background */
+			{
+				/** 
+				 * We are dealing with background 
+				 * 
+				 */
 				s++;
 
 				if (!*s)
@@ -1973,11 +2322,19 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 			}
 			else
 			{
-				xterm_isbg = 0; /* We are dealing with foreground */
+				/** 
+				 * We are dealing with foreground 
+				 * 
+				 */
+				xterm_isbg = 0;
 			}
 
 			if (*s == '<')
-			{ /* Ok we got a color to process */
+			{
+				/** 
+				 * Ok we got a color to process 
+				 * 
+				 */
 				s++;
 
 				if (!*s)
@@ -1999,7 +2356,11 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 				}
 
 				*xtp = '\0';
-				/* Now we have the color string... Time to handle it */
+
+				/** 
+				 * Now we have the color string... Time to handle it 
+				 * 
+				 */
 				i = str2xterm(xtbuf);
 
 				if (xterm_isbg)
@@ -2033,6 +2394,8 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		}
 	}
 
+	XFREE(xtbuf);
+	
 	s = fargs[1];
 
 	while (*s)
@@ -2113,7 +2476,6 @@ void fun_stripansi(char *buff, char **bufc, dbref player __attribute__((unused))
 /*---------------------------------------------------------------------------
  * encrypt() and decrypt(): From DarkZone.
  */
-
 
 void crunch_code(char *code)
 {
@@ -4530,3 +4892,4 @@ void fun_beep(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 {
 	SAFE_LB_CHR(BEEP_CHAR, buff, bufc);
 }
+

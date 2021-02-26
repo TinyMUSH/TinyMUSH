@@ -135,7 +135,7 @@ am__objects_1 = alloc.$(OBJEXT) api.$(OBJEXT) boolexp.$(OBJEXT) \
 	stringutil.$(OBJEXT) timer.$(OBJEXT) udb_misc.$(OBJEXT) \
 	udb_obj.$(OBJEXT) udb_ocache.$(OBJEXT) udb_ochunk.$(OBJEXT) \
 	unparse.$(OBJEXT) vattr.$(OBJEXT) version.$(OBJEXT) \
-	walkdb.$(OBJEXT) wild.$(OBJEXT) wiz.$(OBJEXT)
+	vt100.$(OBJEXT) walkdb.$(OBJEXT) wild.$(OBJEXT) wiz.$(OBJEXT)
 am__objects_2 =
 am_netmush_OBJECTS = $(am__objects_1) $(am__objects_2)
 nodist_netmush_OBJECTS =
@@ -186,7 +186,8 @@ am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/api.Po \
 	./$(DEPDIR)/udb_obj.Po ./$(DEPDIR)/udb_ocache.Po \
 	./$(DEPDIR)/udb_ochunk.Po ./$(DEPDIR)/unparse.Po \
 	./$(DEPDIR)/vattr.Po ./$(DEPDIR)/version.Po \
-	./$(DEPDIR)/walkdb.Po ./$(DEPDIR)/wild.Po ./$(DEPDIR)/wiz.Po
+	./$(DEPDIR)/vt100.Po ./$(DEPDIR)/walkdb.Po ./$(DEPDIR)/wild.Po \
+	./$(DEPDIR)/wiz.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -465,7 +466,7 @@ with_tar_prog = @with_tar_prog@
 AM_CPPFLAGS = $(LTDLINCL)
 #SUBDIRS					= libltdl
 SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_3)
-netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+netmush_C = alloc.c api.c boolexp.c bsd.c command.c conf.c cque.c create.c db.c db_rw.c eval.c file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c quota.c recover.c rob.c set.c speech.c stringutil.c timer.c udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c vt100.c walkdb.c wild.c wiz.c
 netmush_H = api.h externs.h macros.h system.h typedefs.h
 netmush_SOURCES = $(netmush_C) $(netmush_H)
 netmush_LDFLAGS = -export-dynamic
@@ -671,6 +672,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unparse.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vattr.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vt100.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/walkdb.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wild.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wiz.Po@am__quote@ # am--include-marker
@@ -988,6 +990,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/unparse.Po
 	-rm -f ./$(DEPDIR)/vattr.Po
 	-rm -f ./$(DEPDIR)/version.Po
+	-rm -f ./$(DEPDIR)/vt100.Po
 	-rm -f ./$(DEPDIR)/walkdb.Po
 	-rm -f ./$(DEPDIR)/wild.Po
 	-rm -f ./$(DEPDIR)/wiz.Po
@@ -1089,6 +1092,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/unparse.Po
 	-rm -f ./$(DEPDIR)/vattr.Po
 	-rm -f ./$(DEPDIR)/version.Po
+	-rm -f ./$(DEPDIR)/vt100.Po
 	-rm -f ./$(DEPDIR)/walkdb.Po
 	-rm -f ./$(DEPDIR)/wild.Po
 	-rm -f ./$(DEPDIR)/wiz.Po

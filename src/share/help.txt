@@ -14086,6 +14086,13 @@ Continued in 'help @malias2'.
  
   See also: STRUCTURE FUNCTIONS
  
+& ZFUN()
+  zfun(<attribute>[, <arg0>[, <arg1>[, ... , <arg29>]]])
+  
+  This function evaluates an attribute on the caller's Zone object. It is essentially identical to
+  
+  u(zone(me)/<attribute>[, <arg0>[, ... , <arg29>]])
+ 
 & MODIFY()
   Function:  modify(<instance>,<components>,<new values>[,<delim>])
  
