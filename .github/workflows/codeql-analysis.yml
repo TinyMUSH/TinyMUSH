@@ -61,8 +61,9 @@ jobs:
 
     - run: |
        sudo apt update -q
-       sudo apt dist-upgrade -qy
+       #sudo apt dist-upgrade -qy
        sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
+       sudo dpkg --get-selections
        ./autogen.sh
        ./configure
        make distclean
