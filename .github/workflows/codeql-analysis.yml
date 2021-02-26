@@ -60,16 +60,17 @@ jobs:
     #    uses a compiled language
 
     - run: |
-       sudo apt update -q
+       cat /usr/include/gdbm.h
+       #sudo apt update -q
        #sudo apt dist-upgrade -qy
-       sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
-       sudo dpkg --get-selections
-       ./autogen.sh
-       ./configure
-       make distclean
-       CC="clang" ./configure --enable-warnings --enable-warnings-extra
-       make
-       make install
+       #sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
+       #sudo dpkg --get-selections
+       #./autogen.sh
+       #./configure
+       #make distclean
+       #CC="clang" ./configure --enable-warnings --enable-warnings-extra
+       #make
+       #make install
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
