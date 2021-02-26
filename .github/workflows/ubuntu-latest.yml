@@ -16,12 +16,12 @@ jobs:
     - name: dependencies
       run: sudo apt update -q && sudo apt install -qy cproto libgdbm-dev
     - name: autoreconf
-      run: autoreconf -ivfm && cd $GITHUB_WORKSPACE/src/libltdl/ && autoreconf -ivfm && cd $GITHUB_WORKSPACE && ./configure && make distclean
+      run: cd $GITHUB_WORKSPACE && autoreconf -ivfm && cd $GITHUB_WORKSPACE/src/libltdl/ && autoreconf -ivfm && cd $GITHUB_WORKSPACE && ./configure && make distclean
     - name: configure
-      run: ./configure --enable-warnings --enable-warnings-extra
+      run: cd $GITHUB_WORKSPACE && ./configure --enable-warnings --enable-warnings-extra
     - name: make
-      run: make
+      run: cd $GITHUB_WORKSPACE && make
     - name: make install
-      run: make install
+      run: cd $GITHUB_WORKSPACE && make install
     - name: make distclean
-      run: make distclean
+      run: cd $GITHUB_WORKSPACE && make distclean
