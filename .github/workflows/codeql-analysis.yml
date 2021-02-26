@@ -64,7 +64,7 @@ jobs:
        #sudo apt dist-upgrade -qy
        #sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool mlocate
        sudo apt install -qy cproto libgdbm-dev
-       ls /usr/include/
+       cat /usr/include/gdbm.h
        #./autogen.sh
        #./configure
        #make distclean
