@@ -60,6 +60,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
+       sudo apt update
        sudo apt install -y build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
        ./autogen.sh
        ./configure
