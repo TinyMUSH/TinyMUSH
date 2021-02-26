@@ -14,16 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: 
-        sudo apt update -q
-        sudo apt install -qy cproto libgdbm-dev
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE/src/libltdl/
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE
-        ./configure
-        make distclean
-        ./configure --enable-warnings --enable-warnings-extra
+      run: sudo apt update -q && sudo apt install -qy cproto libgdbm-dev && autoreconf -ivfm && cd $GITHUB_WORKSPACE/src/libltdl/ && autoreconf -ivfm && cd $GITHUB_WORKSPACE && ./configure && make distclean && ./configure --enable-warnings --enable-warnings-extra
     - name: make
       run: make
     - name: make check
