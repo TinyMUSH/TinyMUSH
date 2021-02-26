@@ -64,14 +64,13 @@ jobs:
        #sudo apt dist-upgrade -qy
        #sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool mlocate
        sudo apt install -qy cproto libgdbm-dev
-       TINYMUSH_DIR="$(pwd)"
        autoreconf -ivfm
-       cd src/libltdl/
+       cd $GITHUB_WORKSPACE/src/libltdl/
        autoreconf -ivfm
-       cd $TINYMUSH_DIR
+       cd $GITHUB_WORKSPACE
        ./configure && make distclean
        #CC="clang" ./configure --enable-warnings --enable-warnings-extra
-       cat src/config.h
+       cat $GITHUB_WORKSPACE/src/config.h
        #make
        #make install
 
