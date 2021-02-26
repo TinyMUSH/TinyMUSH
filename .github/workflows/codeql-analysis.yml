@@ -68,8 +68,9 @@ jobs:
        cd $GITHUB_WORKSPACE/src/libltdl/
        autoreconf -ivfm
        cd $GITHUB_WORKSPACE
-       ./configure && make distclean
-       #CC="clang" ./configure --enable-warnings --enable-warnings-extra
+       ./configure
+       make distclean
+       ./configure --enable-warnings --enable-warnings-extra
        cat $GITHUB_WORKSPACE/src/config.h
        #make
        #make install
