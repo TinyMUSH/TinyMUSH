@@ -1,4 +1,4 @@
-name: Build Test (Ubuntu Latest)
+name: Build Test (Ubuntu 20.04)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
       run: | 
         sudo apt update -q
         sudo apt install -qy cproto libgdbm-dev
-    - name: make
+    - name: autoreconf
       run: |
         autoreconf -ivfm
         cd $GITHUB_WORKSPACE/src/libltdl/
@@ -25,6 +25,8 @@ jobs:
         cd $GITHUB_WORKSPACE
         ./configure
         make distclean
+    - name: make
+      run: |
         ./configure --enable-warnings --enable-warnings-extra
         make
     - name: make install
