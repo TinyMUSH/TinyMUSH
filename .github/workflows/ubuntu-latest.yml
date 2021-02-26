@@ -17,19 +17,16 @@ jobs:
       run: | 
         sudo apt update -q
         sudo apt install -qy cproto libgdbm-dev
-    - name: autoreconf
+    - name: make
       run: |
-        cd $GITHUB_WORKSPACE
         autoreconf -ivfm
         cd $GITHUB_WORKSPACE/src/libltdl/
         autoreconf -ivfm
         cd $GITHUB_WORKSPACE
         ./configure
         make distclean
-    - name: configure
-      run: ./configure --enable-warnings --enable-warnings-extra
-    - name: make
-      run: make
+        ./configure --enable-warnings --enable-warnings-extra
+        make
     - name: make install
       run: make install
     - name: make distclean
