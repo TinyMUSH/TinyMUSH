@@ -23,7 +23,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     strategy:
       fail-fast: false
@@ -60,11 +60,9 @@ jobs:
     #    uses a compiled language
 
     - run: |
-       cat /usr/include/gdbm.h
        #sudo apt update -q
        #sudo apt dist-upgrade -qy
-       #sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
-       #sudo dpkg --get-selections
+       sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
        #./autogen.sh
        #./configure
        #make distclean
