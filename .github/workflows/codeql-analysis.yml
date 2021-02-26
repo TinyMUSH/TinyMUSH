@@ -64,11 +64,14 @@ jobs:
        #sudo apt dist-upgrade -qy
        #sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool mlocate
        sudo apt install -qy cproto libgdbm-dev
-       pwd
-       #./autogen.sh
-       #./configure
-       #make distclean
+       TINYMUSH_DIR="$(pwd)"
+       autoreconf -ivfm
+       cd src/libltdl/
+       autoreconf -ivfm
+       cd $TINYMUSH_DIR
+       ./configure && make distclean
        #CC="clang" ./configure --enable-warnings --enable-warnings-extra
+       cat src/config.h
        #make
        #make install
 
