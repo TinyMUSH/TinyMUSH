@@ -65,6 +65,8 @@ jobs:
        sudo apt install -qy build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
        ./autogen.sh
        ./configure
+       make distclean
+       ./configure
        make
        make install
 
