@@ -71,8 +71,7 @@ jobs:
        ./configure
        make distclean
        ./configure --enable-warnings --enable-warnings-extra
-       cat $GITHUB_WORKSPACE/src/config.h
-       #make
+       make
        #make install
 
     - name: Perform CodeQL Analysis
