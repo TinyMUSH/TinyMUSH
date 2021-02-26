@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/TinyMUSH/TinyMUSH.svg?branch=master)](https://travis-ci.com/TinyMUSH/TinyMUSH)
+[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/security)
 
 - [TinyMUSH](#tinymush)
   - [Introduction](#introduction)
