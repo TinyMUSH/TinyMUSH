@@ -67,7 +67,7 @@ jobs:
        ./autogen.sh
        ./configure
        make distclean
-       CC="gcc" ./configure --enable-warnings --enable-warnings-extra
+       CC="clang" ./configure --enable-warnings --enable-warnings-extra
        make
        make install
 
