@@ -1,9 +1,0 @@
-<map id="descriptor_data" name="descriptor_data">
-<area shape="rect" id="node1" title=" " alt="" coords="192,222,315,249"/>
-<area shape="rect" id="node2" href="$structcmd__block.html" title=" " alt="" coords="47,95,139,121"/>
-<area shape="rect" id="node3" href="$structcmd__block__hdr.html" title=" " alt="" coords="5,222,125,249"/>
-<area shape="rect" id="node4" href="$structtext__block.html" title=" " alt="" coords="451,95,541,121"/>
-<area shape="rect" id="node5" href="$structtext__block__hdr.html" title=" " alt="" coords="465,222,583,249"/>
-<area shape="rect" id="node6" href="$structprog__data.html" title=" " alt="" coords="210,95,297,121"/>
-<area shape="rect" id="node7" href="$structglobal__register__data.html" title=" " alt="" coords="176,5,331,32"/>
-</map>
