@@ -1,4 +1,4 @@
-name: Build Test (MacOS latest)
+name: Build Test (MacOS 10.15)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: macos-latest
+    runs-on: macos-10.15
 
     steps:
     - uses: actions/checkout@v2
