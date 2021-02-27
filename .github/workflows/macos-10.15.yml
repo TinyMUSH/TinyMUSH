@@ -24,10 +24,10 @@ jobs:
         cd $GITHUB_WORKSPACE
         ./configure
         make distclean
+    - name: configure
+      run: ./configure --enable-warnings --enable-warnings-extra
     - name: make
-      run: |
-        ./configure --enable-warnings --enable-warnings-extra
-        make
+      run: make
     - name: make install
       run: make install
     - name: make distclean
