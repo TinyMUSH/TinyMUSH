@@ -1,5 +1,6 @@
 [![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/security)
 [![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-20.04.yml)
+[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-10.15.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-10.15.yml)
 
 
 - [TinyMUSH](#tinymush)
