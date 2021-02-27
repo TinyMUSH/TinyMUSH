@@ -24,10 +24,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
       -name: Setup
         run: mkdir $GITHUB_WORKSPACE/html
-      
+
       - name: Doxygen
         uses: mattnotmitt/doxygen-action@v1
         with:
