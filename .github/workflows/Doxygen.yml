@@ -31,8 +31,8 @@ jobs:
       - name: Doxygen
         uses: mattnotmitt/doxygen-action@v1
         with:
-          working-directory: $GITHUB_WORKSPACE
-          doxyfile-path: $GITHUB_WORKSPACE/.github/Doxyfile
+          working-directory: .
+          doxyfile-path: .github/Doxyfile
       
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
