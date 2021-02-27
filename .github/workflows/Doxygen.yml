@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Doxygen
 
 # Controls when the action will run. 
 on:
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup
-        run: mkdir $GITHUB_WORKSPACE/html
+        run: mkdir ./html
 
       - name: Doxygen
         uses: mattnotmitt/doxygen-action@v1
