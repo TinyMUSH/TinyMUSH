@@ -1,6 +1,5 @@
 |Build status|
 |------------|
-|[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/security)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml)|
