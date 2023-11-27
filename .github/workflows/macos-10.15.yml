@@ -1,4 +1,4 @@
-name: Build Test (MacOS 10.15)
+name: Build Test (MacOS Latest)
 
 on:
   push:
@@ -8,27 +8,14 @@ on:
 
 jobs:
   build:
-
-    runs-on: macos-10.15
-
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: dependencies
       run: | 
-        brew install autoconf automake libtool cproto gdbm pcre
-    - name: autoreconf
+        brew cmake gdbm pcre
+    - name: build
       run: |
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE/src/libltdl/
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE
-        ./configure
-        make distclean
-    - name: configure
-      run: ./configure --enable-warnings --enable-warnings-extra
-    - name: make
-      run: make
-    - name: make install
-      run: make install
-    - name: make distclean
-      run: make distclean
+        cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -S$PWD -B$PWD/build -G "Unix Makefiles"
+        cmake --build $PWD/build --config Debug --target all --
+        cmake --install $PWD/build
