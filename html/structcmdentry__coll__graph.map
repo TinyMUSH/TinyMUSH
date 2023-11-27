@@ -1,6 +1,6 @@
 <map id="cmdentry" name="cmdentry">
-<area shape="rect" id="node1" title=" " alt="" coords="175,124,249,151"/>
-<area shape="rect" id="node2" href="$structaddedentry.html" title=" " alt="" coords="5,5,91,32"/>
-<area shape="rect" id="node3" href="$structname__table.html" title=" " alt="" coords="167,5,257,32"/>
-<area shape="rect" id="node4" href="$structhookentry.html" title=" " alt="" coords="281,5,359,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="121,123,195,148"/>
+<area shape="rect" id="node2" href="$structname__table.html" title=" " alt="" coords="5,5,95,31"/>
+<area shape="rect" id="node3" href="$structhookentry.html" title=" " alt="" coords="119,5,197,31"/>
+<area shape="rect" id="node4" href="$structaddedentry.html" title=" " alt="" coords="222,5,307,31"/>
 </map>

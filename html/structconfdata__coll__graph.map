@@ -1,6 +1,6 @@
 <map id="confdata" name="confdata">
-<area shape="rect" id="node1" title=" " alt="" coords="202,170,274,197"/>
-<area shape="rect" id="node2" href="$structstr__linked__list.html" title=" " alt="" coords="5,7,108,34"/>
-<area shape="rect" id="node3" href="$structkey__linked__list.html" title=" " alt="" coords="185,7,291,34"/>
-<area shape="rect" id="node4" href="$structflagset.html" title=" " alt="" coords="368,7,428,34"/>
+<area shape="rect" id="node1" title=" " alt="" coords="204,169,276,195"/>
+<area shape="rect" id="node2" href="$structkey__linked__list.html" title=" " alt="" coords="5,8,112,33"/>
+<area shape="rect" id="node3" href="$structstr__linked__list.html" title=" " alt="" coords="189,8,291,33"/>
+<area shape="rect" id="node4" href="$structflagset.html" title=" " alt="" coords="367,8,427,33"/>
 </map>

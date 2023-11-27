@@ -1,9 +1,9 @@
 <map id="descriptor_data" name="descriptor_data">
-<area shape="rect" id="node1" title=" " alt="" coords="180,222,291,249"/>
-<area shape="rect" id="node2" href="$structcmd__block.html" title=" " alt="" coords="43,95,129,121"/>
-<area shape="rect" id="node3" href="$structcmd__block__hdr.html" title="Interface related typedefs." alt="" coords="5,222,116,249"/>
-<area shape="rect" id="node4" href="$structtext__block.html" title=" " alt="" coords="413,95,495,121"/>
-<area shape="rect" id="node5" href="$structtext__block__hdr.html" title=" " alt="" coords="426,222,533,249"/>
-<area shape="rect" id="node6" href="$structprog__data.html" title=" " alt="" coords="196,95,275,121"/>
-<area shape="rect" id="node7" href="$structglobal__register__data.html" title=" " alt="" coords="166,5,305,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="186,220,297,245"/>
+<area shape="rect" id="node2" href="$structtext__block.html" title=" " alt="" coords="43,93,125,119"/>
+<area shape="rect" id="node3" href="$structtext__block__hdr.html" title=" " alt="" coords="5,220,112,245"/>
+<area shape="rect" id="node4" href="$structcmd__block.html" title=" " alt="" coords="409,93,495,119"/>
+<area shape="rect" id="node5" href="$structcmd__block__hdr.html" title="Interface related typedefs." alt="" coords="425,220,535,245"/>
+<area shape="rect" id="node6" href="$structprog__data.html" title=" " alt="" coords="202,93,281,119"/>
+<area shape="rect" id="node7" href="$structglobal__register__data.html" title=" " alt="" coords="172,5,311,31"/>
 </map>

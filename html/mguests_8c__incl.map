@@ -1,27 +1,50 @@
-<map id="src/mguests.c" name="src/mguests.c">
-<area shape="rect" id="node1" title="multiguest code originally ported from DarkZone" alt="" coords="1069,5,1173,32"/>
-<area shape="rect" id="node2" href="$system_8h.html" title="Global headers and system compatibility." alt="" coords="765,80,840,107"/>
-<area shape="rect" id="node20" title=" " alt="" coords="865,80,943,107"/>
-<area shape="rect" id="node21" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="967,80,1057,107"/>
-<area shape="rect" id="node22" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="1081,80,1162,107"/>
-<area shape="rect" id="node23" href="$macros_8h.html" title="Macro definitions." alt="" coords="1187,80,1261,107"/>
-<area shape="rect" id="node24" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="1285,80,1360,107"/>
-<area shape="rect" id="node25" title=" " alt="" coords="1385,80,1477,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,155,72,181"/>
-<area shape="rect" id="node4" title=" " alt="" coords="96,155,171,181"/>
-<area shape="rect" id="node5" title=" " alt="" coords="195,155,266,181"/>
-<area shape="rect" id="node6" title=" " alt="" coords="290,155,347,181"/>
-<area shape="rect" id="node7" title=" " alt="" coords="371,155,463,181"/>
-<area shape="rect" id="node8" title=" " alt="" coords="487,155,574,181"/>
-<area shape="rect" id="node9" title=" " alt="" coords="598,155,658,181"/>
-<area shape="rect" id="node10" title=" " alt="" coords="682,155,745,181"/>
-<area shape="rect" id="node11" title=" " alt="" coords="769,155,837,181"/>
-<area shape="rect" id="node12" title=" " alt="" coords="861,155,918,181"/>
-<area shape="rect" id="node13" title=" " alt="" coords="942,155,1037,181"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1061,155,1110,181"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1135,155,1201,181"/>
-<area shape="rect" id="node16" title=" " alt="" coords="1226,155,1294,181"/>
-<area shape="rect" id="node17" title=" " alt="" coords="1319,155,1396,181"/>
-<area shape="rect" id="node18" title=" " alt="" coords="1420,155,1503,181"/>
-<area shape="rect" id="node19" title=" " alt="" coords="1527,155,1591,181"/>
+<map id="netmush/mguests.c" name="netmush/mguests.c">
+<area shape="rect" id="node1" title="multiguest code originally ported from DarkZone" alt="" coords="2161,5,2297,31"/>
+<area shape="rect" id="node2" href="$system_8h.html" title="Global headers and system compatibility." alt="" coords="1873,79,1948,104"/>
+<area shape="rect" id="node43" href="$defaults_8h.html" title="Configuration options set by configure script." alt="" coords="1973,79,2051,104"/>
+<area shape="rect" id="node44" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="2075,79,2165,104"/>
+<area shape="rect" id="node45" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="2189,79,2270,104"/>
+<area shape="rect" id="node46" href="$macros_8h.html" title="Macro definitions." alt="" coords="2295,79,2369,104"/>
+<area shape="rect" id="node47" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="2393,79,2468,104"/>
+<area shape="rect" id="node48" href="$prototypes_8h_source.html" title=" " alt="" coords="2493,79,2585,104"/>
+<area shape="rect" id="node3" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,152,72,177"/>
+<area shape="rect" id="node4" title=" " alt="" coords="97,152,165,177"/>
+<area shape="rect" id="node5" title=" " alt="" coords="189,152,251,177"/>
+<area shape="rect" id="node6" title=" " alt="" coords="275,152,338,177"/>
+<area shape="rect" id="node7" title=" " alt="" coords="363,152,427,177"/>
+<area shape="rect" id="node8" title=" " alt="" coords="451,152,517,177"/>
+<area shape="rect" id="node9" title=" " alt="" coords="542,152,623,177"/>
+<area shape="rect" id="node10" title=" " alt="" coords="647,152,705,177"/>
+<area shape="rect" id="node11" title=" " alt="" coords="729,152,836,177"/>
+<area shape="rect" id="node12" title=" " alt="" coords="860,152,932,177"/>
+<area shape="rect" id="node13" title=" " alt="" coords="957,152,1035,177"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1059,152,1117,177"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1141,152,1221,177"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1246,152,1338,177"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1363,152,1424,177"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1449,152,1519,177"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1543,152,1630,177"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1654,152,1714,177"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1738,152,1801,177"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1825,152,1893,177"/>
+<area shape="rect" id="node23" title=" " alt="" coords="1917,152,2011,177"/>
+<area shape="rect" id="node24" title=" " alt="" coords="2036,152,2143,177"/>
+<area shape="rect" id="node25" title=" " alt="" coords="2167,152,2233,177"/>
+<area shape="rect" id="node26" title=" " alt="" coords="2257,152,2319,177"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2343,152,2428,177"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2452,152,2543,177"/>
+<area shape="rect" id="node29" title=" " alt="" coords="2567,152,2625,177"/>
+<area shape="rect" id="node30" title=" " alt="" coords="2649,152,2709,177"/>
+<area shape="rect" id="node31" title=" " alt="" coords="2733,152,2800,177"/>
+<area shape="rect" id="node32" title=" " alt="" coords="2825,152,2893,177"/>
+<area shape="rect" id="node33" title=" " alt="" coords="2917,152,2995,177"/>
+<area shape="rect" id="node34" title=" " alt="" coords="3019,152,3101,177"/>
+<area shape="rect" id="node35" title=" " alt="" coords="3125,152,3189,177"/>
+<area shape="rect" id="node36" title=" " alt="" coords="3213,152,3269,177"/>
+<area shape="rect" id="node37" title=" " alt="" coords="3293,152,3357,177"/>
+<area shape="rect" id="node38" title=" " alt="" coords="3381,152,3445,177"/>
+<area shape="rect" id="node39" title=" " alt="" coords="3469,152,3544,177"/>
+<area shape="rect" id="node40" title=" " alt="" coords="3569,152,3642,177"/>
+<area shape="rect" id="node41" title=" " alt="" coords="3666,152,3747,177"/>
+<area shape="rect" id="node42" title=" " alt="" coords="3772,152,3847,177"/>
 </map>

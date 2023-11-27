@@ -1,4 +1,10 @@
-<map id="src/api.h" name="src/api.h">
-<area shape="rect" id="node1" title="Functions called only by modules &#45; must be included by all dynamically loaded modules." alt="" coords="5,5,76,32"/>
-<area shape="rect" id="node2" title=" " alt="" coords="16,80,65,107"/>
+<map id="netmush/api.h" name="netmush/api.h">
+<area shape="rect" id="node1" title="Functions called only by modules &#45; must be included by all dynamically loaded modules." alt="" coords="77,5,180,31"/>
+<area shape="rect" id="node2" href="$ltdl_8h_source.html" title=" " alt="" coords="104,79,153,104"/>
+<area shape="rect" id="node3" href="$lt__system_8h_source.html" title=" " alt="" coords="67,225,190,251"/>
+<area shape="rect" id="node7" href="$lt__error_8h_source.html" title=" " alt="" coords="75,152,182,177"/>
+<area shape="rect" id="node8" href="$lt__dlloader_8h_source.html" title=" " alt="" coords="206,152,331,177"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,299,73,324"/>
+<area shape="rect" id="node5" title=" " alt="" coords="97,299,160,324"/>
+<area shape="rect" id="node6" title=" " alt="" coords="184,299,271,324"/>
 </map>

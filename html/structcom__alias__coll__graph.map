@@ -1,6 +1,6 @@
 <map id="com_alias" name="com_alias">
-<area shape="rect" id="node1" title=" " alt="" coords="75,216,157,243"/>
-<area shape="rect" id="node2" href="$structcom__channel.html" title=" " alt="" coords="67,127,165,153"/>
-<area shape="rect" id="node3" href="$structboolexp.html" title=" " alt="" coords="5,7,72,33"/>
-<area shape="rect" id="node4" href="$structcom__player.html" title=" " alt="" coords="152,7,240,33"/>
+<area shape="rect" id="node1" title=" " alt="" coords="85,215,166,240"/>
+<area shape="rect" id="node2" href="$structcom__channel.html" title=" " alt="" coords="76,127,175,152"/>
+<area shape="rect" id="node3" href="$structcom__player.html" title=" " alt="" coords="5,7,93,33"/>
+<area shape="rect" id="node4" href="$structboolexp.html" title=" " alt="" coords="169,7,236,33"/>
 </map>
