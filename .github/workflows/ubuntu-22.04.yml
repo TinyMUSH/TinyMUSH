@@ -1,4 +1,4 @@
-name: Build Test (Ubuntu 22.04)
+name: Build Test (Ubuntu Latest)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
