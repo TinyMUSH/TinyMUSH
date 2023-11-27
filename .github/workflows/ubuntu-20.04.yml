@@ -16,6 +16,6 @@ jobs:
     - name: dependencies
       run: | 
         sudo apt update -q
-        sudo apt install -qy libcrypt-dev libgdbm-dev libnsl-dev libpcre3-dev libssl-dev
+        sudo apt install -qy libcrypt-dev libgdbm-dev libpcre3-dev libssl-dev
     - name: make install
       run: ./install.sh
