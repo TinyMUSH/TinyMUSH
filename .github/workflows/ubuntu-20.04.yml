@@ -16,20 +16,6 @@ jobs:
     - name: dependencies
       run: | 
         sudo apt update -q
-        sudo apt install -qy cproto libgdbm-dev
-    - name: autoreconf
-      run: |
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE/src/libltdl/
-        autoreconf -ivfm
-        cd $GITHUB_WORKSPACE
-        ./configure
-        make distclean
-    - name: configure
-      run: ./configure --enable-warnings --enable-warnings-extra
-    - name: make
-      run: make
+        sudo apt install -qy libcrypt-dev libgdbm-dev libnsl-dev libpcre3-dev libssl-dev
     - name: make install
-      run: make install
-    - name: make distclean
-      run: make distclean
+      run: ./install.sh
