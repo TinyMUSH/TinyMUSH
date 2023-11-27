@@ -1,4 +1,0 @@
-#!/bin/bash
-
-CC="clang" ./configure --enable-warnings --enable-warnings-extra
-

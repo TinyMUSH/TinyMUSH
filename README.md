@@ -11,7 +11,8 @@
     - [TinyMUSH 3.0](#tinymush-30)
     - [TinyMUSH 3.1](#tinymush-31)
     - [TinyMUSH 3.2](#tinymush-32)
-    - [TinyMUSH 3.3 (Alpha Stage)](#tinymush-33-alpha-stage)
+    - [TinyMUSH 3.3](#tinymush-33)
+    - [TinyMUSH 4.0](#tinymush-40)
 - [Installation](#installation)
 - [Full documentation](#full-documentation)
 
@@ -54,89 +55,20 @@ to Sourceforce.
 
 TinyMUSH 3.2 was mostly developped by Lydia Leong.
 
-### TinyMUSH 3.3 (Alpha Stage)
+### TinyMUSH 3.3
 
-TinyMUSH 3.3 is currently in the early stage of development. At this stage of
-development, the goal is to ensure better compatibility with most current operating
-systems and provide a stable base for many more years.
+TinyMUSH 3.3 is no longer being developped and never left alpha stage.
+
+### TinyMUSH 4.0
+
+TinyMUSH 4.0 is the current development branch, it is still in alpha stage.
 
 # Installation
 
-Since TinyMUSH 3.3 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback. Here's a quick rundown on how to build the server (Tested on Ubuntu 20.04.1 LTS, Mac OSX Big Sur and FreeBSD 12.2).
+Since TinyMUSH 4.0 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback.
 
-**Ubuntu / Debian:**
+See INSTALL for an overview of the installation process.
 
-```sh
-# Install dependencies
-#
-$ apt install build-essential cproto libpcre3-dev libgdbm-dev autoconf libtool
-#
-# Clone the repository
-#
-$ git clone https://github.com/TinyMUSH/TinyMUSH.git
-#
-# Build the server
-#
-$ cd TinyMUSH
-$ ./autogen.sh
-$ ./configure
-$ make
-$ make install
-#
-# Start the server and test.
-#
-$ ./game/bin/netmush
-$ telnet localhost 6250
-```
-
-**Mac OSX:**
-
-```sh
-# Install dependencies, you need xcode command-line and brew to start.
-#
-$ brew install autoconf automake libtool cproto gdbm pcre
-#
-# Clone the repository
-#
-$ git clone https://github.com/TinyMUSH/TinyMUSH.git
-#
-# Build the server
-#
-$ cd TinyMUSH
-$ ./autogen.sh
-$ ./configure
-$ make
-$ make install
-#
-# Start the server and test.
-#
-$ ./game/bin/netmush
-$ telnet localhost 6250
-```
-
-**FreeBSD:**
-```sh
-# Install dependencies
-#
-$ su -m root -c 'pkg install git autoconf automake libtool cproto gdbm pcre'
-#
-# Clone the repository
-#
-$ git clone https://github.com/TinyMUSH/TinyMUSH.git
-#
-# Build the server
-#
-$ cd TinyMUSH
-$ ./autogen.sh
-$ ./configure
-$ make
-$ make install
-#
-# Start the server and test.
-#
-$ ./game/bin/netmush
-$ telnet localhost 6250
-```
 
 # Full documentation
 
