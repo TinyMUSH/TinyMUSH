@@ -26,7 +26,6 @@ configure_file(${PROJECT_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CUR
 configure_file(${PROJECT_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example)
 configure_file(${PROJECT_SOURCE_DIR}/systemd/tinymush.service.in ${CMAKE_CURRENT_BINARY_DIR}/systemd/tinymush.service)
 
-
 macro(install_symlink filepath sympath)
     install(CODE "
         file(CREATE_LINK ${filepath} ${sympath} RESULT clerror SYMBOLIC)
