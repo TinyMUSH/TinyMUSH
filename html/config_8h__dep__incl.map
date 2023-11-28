@@ -1,52 +1,52 @@
 <map id="netmush/config.h" name="netmush/config.h">
-<area shape="rect" id="node1" title="Configuration options set by configure script." alt="" coords="2620,5,2740,31"/>
-<area shape="rect" id="node2" href="$db__sql__msql_8c.html" title="Module for mSQL interface." alt="" coords="5,167,160,207"/>
-<area shape="rect" id="node3" href="$db__sql__mysql_8c.html" title="Module for MySQL interface." alt="" coords="184,167,339,207"/>
-<area shape="rect" id="node4" href="$db__sql__none_8c.html" title="Module placeholder when no SQL interface is implemented." alt="" coords="363,167,517,207"/>
-<area shape="rect" id="node5" href="$db__sql__pgsql_8c.html" title="Module for pgSQL interface." alt="" coords="541,167,696,207"/>
-<area shape="rect" id="node6" href="$db__sql__sqlite3_8c.html" title="Module for SQLite3 interface." alt="" coords="720,167,875,207"/>
-<area shape="rect" id="node7" href="$lt____dirent_8h_source.html" title=" " alt="" coords="6296,79,6432,119"/>
-<area shape="rect" id="node8" href="$lt____private_8h_source.html" title=" " alt="" coords="6465,167,6601,207"/>
-<area shape="rect" id="node9" href="$lt____glibc_8h_source.html" title=" " alt="" coords="4745,79,4881,119"/>
-<area shape="rect" id="node10" href="$lt____strl_8h_source.html" title=" " alt="" coords="5580,79,5716,119"/>
-<area shape="rect" id="node11" href="$system_8h.html" title="Global headers and system compatibility." alt="" coords="3244,86,3372,111"/>
-<area shape="rect" id="node12" href="$comsys_8c.html" title="Module implementing DarkZone&#45;style channel system." alt="" coords="3955,255,4133,280"/>
-<area shape="rect" id="node13" href="$db__sql_8c.html" title="Module for SQL interface." alt="" coords="4263,174,4428,199"/>
-<area shape="rect" id="node14" href="$mail_8c.html" title="Module for penn&#45;based mailer system." alt="" coords="4158,255,4295,280"/>
-<area shape="rect" id="node15" href="$alloc_8c.html" title="memory management subsystem" alt="" coords="4453,174,4566,199"/>
-<area shape="rect" id="node16" href="$api_8c.html" title="functions called only by modules" alt="" coords="4085,174,4187,199"/>
-<area shape="rect" id="node17" href="$boolexp_8c.html" title="Handle boolean expressions." alt="" coords="4591,174,4721,199"/>
-<area shape="rect" id="node18" href="$bsd_8c.html" title="BSD&#45;style network and signal routines." alt="" coords="4745,174,4852,199"/>
-<area shape="rect" id="node19" href="$command_8c.html" title="Command parser and support routines." alt="" coords="4877,174,5019,199"/>
-<area shape="rect" id="node20" href="$conf_8c.html" title="Configuration functions and defaults." alt="" coords="5043,174,5154,199"/>
-<area shape="rect" id="node21" href="$cque_8c.html" title="Commands and functions for manipulating the command queue." alt="" coords="5179,174,5293,199"/>
-<area shape="rect" id="node22" href="$create_8c.html" title="Commands that create new objects." alt="" coords="5317,174,5440,199"/>
-<area shape="rect" id="node23" href="$db_8c.html" title="Attribute interface, some flatfile and object routines." alt="" coords="5465,174,5565,199"/>
-<area shape="rect" id="node24" href="$db__rw_8c.html" title="flatfile implementation" alt="" coords="5589,174,5710,199"/>
-<area shape="rect" id="node25" href="$eval_8c.html" title="Command evaluation and cracking." alt="" coords="5734,174,5845,199"/>
-<area shape="rect" id="node26" href="$file__c_8c.html" title="File cache management." alt="" coords="5869,174,5985,199"/>
-<area shape="rect" id="node27" href="$flags_8c.html" title="Flag manipulation routines." alt="" coords="6009,174,6122,199"/>
-<area shape="rect" id="node28" href="$fnhelper_8c.html" title="Helper functions for MUSH functions." alt="" coords="6146,174,6278,199"/>
-<area shape="rect" id="node29" href="$functions_8c.html" title="MUSH function handlers." alt="" coords="6303,174,6441,199"/>
-<area shape="rect" id="node30" href="$funext_8c.html" title="Functions that rely on external call&#45;outs." alt="" coords="899,174,1021,199"/>
-<area shape="rect" id="node31" href="$funiter_8c.html" title="Functions for user&#45;defined iterations over lists." alt="" coords="1045,174,1168,199"/>
-<area shape="rect" id="node32" href="$funlist_8c.html" title="List functions." alt="" coords="1193,174,1314,199"/>
-<area shape="rect" id="node33" href="$funmath_8c.html" title="Math and logic functions." alt="" coords="1339,174,1472,199"/>
-<area shape="rect" id="node34" href="$funmisc_8c.html" title="Misc functions." alt="" coords="1497,174,1629,199"/>
-<area shape="rect" id="node35" href="$funobj_8c.html" title="Object functions." alt="" coords="1653,174,1774,199"/>
-<area shape="rect" id="node36" href="$funstring_8c.html" title="String functions." alt="" coords="1799,174,1935,199"/>
-<area shape="rect" id="node37" href="$funvars_8c.html" title="Structure, variable, stack, and regexp functions." alt="" coords="1959,174,2089,199"/>
-<area shape="rect" id="node38" href="$game_8c.html" title="Main program and misc functions." alt="" coords="2113,174,2231,199"/>
-<area shape="rect" id="node39" href="$help_8c.html" title="Commands for giving help." alt="" coords="2255,174,2366,199"/>
-<area shape="rect" id="node40" href="$htab_8c.html" title="Table hashing routines." alt="" coords="2390,174,2501,199"/>
-<area shape="rect" id="node41" href="$log_8c.html" title="Handle log files and log events." alt="" coords="2525,174,2627,199"/>
-<area shape="rect" id="node42" href="$look_8c.html" title="Commands which look at things." alt="" coords="2651,174,2762,199"/>
-<area shape="rect" id="node43" href="$match_8c.html" title="Routines for parsing arguments." alt="" coords="2787,174,2909,199"/>
-<area shape="rect" id="node44" href="$mguests_8c.html" title="multiguest code originally ported from DarkZone" alt="" coords="2933,174,3069,199"/>
-<area shape="rect" id="node45" href="$move_8c.html" title="Routines for moving about." alt="" coords="3094,174,3213,199"/>
-<area shape="rect" id="node46" href="$nametabs_8c.html" title="Command and other supporting tables." alt="" coords="3237,174,3379,199"/>
-<area shape="rect" id="node47" href="$netcommon_8c.html" title="Routines used by the networking code that do not depend on the implementation." alt="" coords="3404,174,3559,199"/>
-<area shape="rect" id="node48" href="$object_8c.html" title="Low&#45;level object manipulation routines." alt="" coords="3583,174,3705,199"/>
-<area shape="rect" id="node49" href="$player_8c.html" title="Player handling and processing." alt="" coords="3729,174,3849,199"/>
-<area shape="rect" id="node50" href="$player__c_8c.html" title="Player cache routines." alt="" coords="3874,174,4009,199"/>
+<area shape="rect" id="node1" title="Configuration options set by configure script." alt="" coords="492,5,612,31"/>
+<area shape="rect" id="node2" href="$db__sql__msql_8c.html" title="Module for mSQL interface." alt="" coords="5,152,160,192"/>
+<area shape="rect" id="node3" href="$db__sql__mysql_8c.html" title="Module for MySQL interface." alt="" coords="184,152,339,192"/>
+<area shape="rect" id="node4" href="$db__sql__none_8c.html" title="Module placeholder when no SQL interface is implemented." alt="" coords="363,152,517,192"/>
+<area shape="rect" id="node5" href="$db__sql__pgsql_8c.html" title="Module for pgSQL interface." alt="" coords="541,152,696,192"/>
+<area shape="rect" id="node6" href="$db__sql__sqlite3_8c.html" title="Module for SQLite3 interface." alt="" coords="720,152,875,192"/>
+<area shape="rect" id="node7" href="$system_8h.html" title="Global headers and system compatibility." alt="" coords="3547,79,3675,104"/>
+<area shape="rect" id="node8" href="$comsys_8c.html" title="Module implementing DarkZone&#45;style channel system." alt="" coords="5032,240,5211,265"/>
+<area shape="rect" id="node9" href="$db__sql_8c.html" title="Module for SQL interface." alt="" coords="5340,159,5505,185"/>
+<area shape="rect" id="node10" href="$mail_8c.html" title="Module for penn&#45;based mailer system." alt="" coords="5235,240,5373,265"/>
+<area shape="rect" id="node11" href="$alloc_8c.html" title="memory management subsystem" alt="" coords="5530,159,5643,185"/>
+<area shape="rect" id="node12" href="$api_8c.html" title="functions called only by modules" alt="" coords="5162,159,5265,185"/>
+<area shape="rect" id="node13" href="$boolexp_8c.html" title="Handle boolean expressions." alt="" coords="5668,159,5799,185"/>
+<area shape="rect" id="node14" href="$bsd_8c.html" title="BSD&#45;style network and signal routines." alt="" coords="5823,159,5929,185"/>
+<area shape="rect" id="node15" href="$command_8c.html" title="Command parser and support routines." alt="" coords="5954,159,6097,185"/>
+<area shape="rect" id="node16" href="$conf_8c.html" title="Configuration functions and defaults." alt="" coords="6121,159,6231,185"/>
+<area shape="rect" id="node17" href="$cque_8c.html" title="Commands and functions for manipulating the command queue." alt="" coords="6256,159,6371,185"/>
+<area shape="rect" id="node18" href="$create_8c.html" title="Commands that create new objects." alt="" coords="6395,159,6517,185"/>
+<area shape="rect" id="node19" href="$db_8c.html" title="Attribute interface, some flatfile and object routines." alt="" coords="6542,159,6642,185"/>
+<area shape="rect" id="node20" href="$db__rw_8c.html" title="flatfile implementation" alt="" coords="6666,159,6787,185"/>
+<area shape="rect" id="node21" href="$eval_8c.html" title="Command evaluation and cracking." alt="" coords="6811,159,6922,185"/>
+<area shape="rect" id="node22" href="$file__c_8c.html" title="File cache management." alt="" coords="6946,159,7062,185"/>
+<area shape="rect" id="node23" href="$flags_8c.html" title="Flag manipulation routines." alt="" coords="899,159,1013,185"/>
+<area shape="rect" id="node24" href="$fnhelper_8c.html" title="Helper functions for MUSH functions." alt="" coords="1037,159,1169,185"/>
+<area shape="rect" id="node25" href="$functions_8c.html" title="MUSH function handlers." alt="" coords="1193,159,1332,185"/>
+<area shape="rect" id="node26" href="$funext_8c.html" title="Functions that rely on external call&#45;outs." alt="" coords="1357,159,1478,185"/>
+<area shape="rect" id="node27" href="$funiter_8c.html" title="Functions for user&#45;defined iterations over lists." alt="" coords="1503,159,1625,185"/>
+<area shape="rect" id="node28" href="$funlist_8c.html" title="List functions." alt="" coords="1650,159,1771,185"/>
+<area shape="rect" id="node29" href="$funmath_8c.html" title="Math and logic functions." alt="" coords="1796,159,1929,185"/>
+<area shape="rect" id="node30" href="$funmisc_8c.html" title="Misc functions." alt="" coords="1954,159,2086,185"/>
+<area shape="rect" id="node31" href="$funobj_8c.html" title="Object functions." alt="" coords="2110,159,2231,185"/>
+<area shape="rect" id="node32" href="$funstring_8c.html" title="String functions." alt="" coords="2256,159,2392,185"/>
+<area shape="rect" id="node33" href="$funvars_8c.html" title="Structure, variable, stack, and regexp functions." alt="" coords="2417,159,2546,185"/>
+<area shape="rect" id="node34" href="$game_8c.html" title="Main program and misc functions." alt="" coords="2570,159,2689,185"/>
+<area shape="rect" id="node35" href="$help_8c.html" title="Commands for giving help." alt="" coords="2713,159,2823,185"/>
+<area shape="rect" id="node36" href="$htab_8c.html" title="Table hashing routines." alt="" coords="2847,159,2958,185"/>
+<area shape="rect" id="node37" href="$log_8c.html" title="Handle log files and log events." alt="" coords="2982,159,3085,185"/>
+<area shape="rect" id="node38" href="$look_8c.html" title="Commands which look at things." alt="" coords="3109,159,3219,185"/>
+<area shape="rect" id="node39" href="$match_8c.html" title="Routines for parsing arguments." alt="" coords="3244,159,3367,185"/>
+<area shape="rect" id="node40" href="$mguests_8c.html" title="multiguest code originally ported from DarkZone" alt="" coords="3391,159,3527,185"/>
+<area shape="rect" id="node41" href="$move_8c.html" title="Routines for moving about." alt="" coords="3551,159,3670,185"/>
+<area shape="rect" id="node42" href="$nametabs_8c.html" title="Command and other supporting tables." alt="" coords="3694,159,3837,185"/>
+<area shape="rect" id="node43" href="$netcommon_8c.html" title="Routines used by the networking code that do not depend on the implementation." alt="" coords="3861,159,4016,185"/>
+<area shape="rect" id="node44" href="$object_8c.html" title="Low&#45;level object manipulation routines." alt="" coords="4041,159,4162,185"/>
+<area shape="rect" id="node45" href="$player_8c.html" title="Player handling and processing." alt="" coords="4187,159,4307,185"/>
+<area shape="rect" id="node46" href="$player__c_8c.html" title="Player cache routines." alt="" coords="4331,159,4466,185"/>
+<area shape="rect" id="node47" href="$powers_8c.html" title="Power manipulation routines." alt="" coords="4491,159,4619,185"/>
+<area shape="rect" id="node48" href="$predicates_8c.html" title="Command handling and validations." alt="" coords="4643,159,4789,185"/>
+<area shape="rect" id="node49" href="$quota_8c.html" title="Quota management commands." alt="" coords="4814,159,4933,185"/>
+<area shape="rect" id="node50" href="$recover_8c.html" title="Tool to traverse a corrupted GDBM database, look for special tags, and rebuild a consistent database." alt="" coords="4957,159,5086,185"/>
 </map>
