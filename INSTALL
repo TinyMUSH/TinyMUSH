@@ -4,17 +4,24 @@ Installation Instructions
 TinyMUSH now use the CMAKE build system, which is alot easier to maintain
 than Autotools. To make things even simpler, a build script is included.
 
-Make sure you have the following libraries on your system:
-    libcrypt-dev
-    libgdbm-dev
-    libnsl-dev
-    libpcre3-dev
-    libssl-dev
+Build instructions:
 
-You will also need the build tools for your system and CMAKE.
+1) Install dependencies:
 
-For a clean install, simply run 'install.sh' which will build everything
-for you. You can then change to the game directory and start 'netmush'
+    For Ubuntu/Debian:
+    apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
+
+    For OSX:
+    brew install cmake gdbm pcre`
+
+2) Build TinyMUSH:
+
+    ./install.sh
+
+3) Start TinyMUSH:
+
+    cd game
+    ./netmush
 
 Default port is '6250' and default God's password is 'Potrzebie'.
 

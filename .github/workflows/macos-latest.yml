@@ -14,7 +14,7 @@ jobs:
     - name: dependencies
       run: | 
         brew update
-        brew install gdbm pcre
+        brew install cmake gdbm pcre
     - name: build
       run: |
         cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -S$PWD -B$PWD/build -G "Unix Makefiles"

@@ -86,7 +86,7 @@ Please look at the following files for details on specific aspects of TinyMUSH 3
 |ChangeLog.History|TinyMUX 1.0 and TinyMUSH 2.x changelog.                        |
 |MODULES          |Developer information on creating modules.                     |
 
-Note that theses have not been updated since TinyMUSH 3.2 and will only be when 3.3 enter
+Note that theses have not been updated since TinyMUSH 3.2 and will only be when 4.0 enter
 Beta.
 
 You can also browse the doxygen source documentation (work in progress) at https://tinymush.github.io/TinyMUSH/html/
