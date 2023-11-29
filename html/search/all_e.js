@@ -2,8 +2,8 @@ var searchData=
 [
   ['n_5fansi_5fnormal_0',['N_ANSI_NORMAL',['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL():&#160;constants.h'],['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL():&#160;constants.h']]],
   ['n_5finstances_1',['n_instances',['../structstructure__def.html#a6cef95c3b613d433ece134b829f84805',1,'structure_def']]],
-  ['name_2',['NAME',['../typedefs_8h.html#a21f54690bc87103b657347bca1a4f2cb',1,'typedefs.h']]],
-  ['name_3',['Name',['../db_8c.html#ad0d9086dc6e11c897a0e93db0fb0b280',1,'db.c']]],
+  ['name_2',['Name',['../db_8c.html#ad0d9086dc6e11c897a0e93db0fb0b280',1,'db.c']]],
+  ['name_3',['NAME',['../typedefs_8h.html#a21f54690bc87103b657347bca1a4f2cb',1,'typedefs.h']]],
   ['name_4',['name',['../structattr.html#a8635bc65695a57f506841c92e6666dfe',1,'attr::name()'],['../structfun.html#a96761b329fb9cbf9c686e7324c8fc490',1,'fun::name()'],['../structufun.html#a71febc1d2cae7b40ab5b61e13cdb3fbc',1,'ufun::name()'],['../structname__table.html#a7dac8144b1280f4bb667264c1e8a0aaa',1,'name_table::name()'],['../structversioninfo.html#a7fc9bce854e07cb5f9cb022a9f4e9b2f',1,'versioninfo::name()'],['../structuser__attribute.html#a019f6921dc5202bf13f904e5289aac58',1,'user_attribute::name()']]],
   ['name_5flength_5',['name_length',['../structobject.html#ad7236619381ae73a01447b00723b9bd2',1,'object']]],
   ['name_5fspaces_6',['name_spaces',['../structconfdata.html#a578f21bfe1a57b7929dedd18cec8c862',1,'confdata']]],
