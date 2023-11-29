@@ -835,7 +835,6 @@ CONF conftable[] = {
     {(char *)"flag_name", cf_flag_name, CA_GOD, CA_DISABLED, NULL, 0},
     {(char *)"forbid_site", cf_site, CA_GOD, CA_DISABLED, (int *)&mushstate.access_list, H_FORBIDDEN},
     {(char *)"fork_dump", cf_bool, CA_GOD, CA_WIZARD, &mushconf.fork_dump, (long)"Dumps are performed using a forked process"},
-    {(char *)"fork_vfork", cf_bool, CA_GOD, CA_WIZARD, &mushconf.fork_vfork, (long)"Forks are done using vfork()"},
     {(char *)"forwardlist_limit", cf_int, CA_GOD, CA_PUBLIC, &mushconf.fwdlist_lim, 0},
     {(char *)"full_file", cf_string, CA_STATIC, CA_GOD, (int *)&mushconf.full_file, MBUF_SIZE},
     {(char *)"full_motd_message", cf_string, CA_GOD, CA_WIZARD, (int *)&mushconf.fullmotd_msg, GBUF_SIZE},

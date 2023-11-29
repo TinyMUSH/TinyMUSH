@@ -2344,14 +2344,7 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 	{
 		if (mushconf.fork_dump)
 		{
-			if (mushconf.fork_vfork)
-			{
-				mushstate.dumper = vfork();
-			}
-			else
-			{
 				mushstate.dumper = fork();
-			}
 		}
 		else
 		{

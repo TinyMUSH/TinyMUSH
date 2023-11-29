@@ -4,11 +4,11 @@
  * @brief memory management subsystem
  * @version 3.3
  * @date 2020-11-14
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "system.h"
@@ -22,7 +22,7 @@
 
 /**
  * Macros and utilities.
- * 
+ *
  */
 #define XLOGALLOC(x, y, z, s, ...)            \
 	if (mushconf.malloc_logger)               \
@@ -32,22 +32,22 @@
 
 /**
  * Allocation functions
- * 
+ *
  */
 
 /**
  * @brief Tracked version of malloc().
- * 
+ *
  * The __xmalloc() function allocates size bytes and returns a pointer to the allocated memory.
  * The memory is set to zero.  If size is 0, then malloc() returns NULL.
- * 
- * This variant doesn't check if the multiplication of nmemb and size would result in integer 
- * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or 
+ *
+ * This variant doesn't check if the multiplication of nmemb and size would result in integer
+ * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or
  * 4 gigabytes if your still on 32 bits).
- * 
+ *
  * Do not call this directly, use the wrapper macro XMALLOC(size_t size, const char *var) that
  * will fill most of the banks for you.
- * 
+ *
  * @param size     Size of memory to allocate.
  * @param file     Filename where the allocation is done.
  * @param line     Line number where the allocation is done.
@@ -63,7 +63,7 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 		{
 			MEMTRACK *mtrk = NULL;
 
-			//mtrk = (MEMTRACK *)calloc(size + sizeof(MEMTRACK) + sizeof(uint64_t), sizeof(char));
+			// mtrk = (MEMTRACK *)calloc(size + sizeof(MEMTRACK) + sizeof(uint64_t), sizeof(char));
 			mtrk = (MEMTRACK *)malloc(size + sizeof(MEMTRACK) + sizeof(uint64_t));
 			memset(mtrk, 0, size + sizeof(MEMTRACK) + sizeof(uint64_t));
 
@@ -93,19 +93,19 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 
 /**
  * @brief Tracked version of calloc().
- * 
+ *
  * The __xcalloc() function allocates memory for an array of nmemb elements of size bytes each and
  * returns a pointer to the allocated memory. The memory is set to zero.  If nmemb or size is 0, then
- * calloc() returns NULL. If the multiplication of nmemb and size would result in integer overflow, 
+ * calloc() returns NULL. If the multiplication of nmemb and size would result in integer overflow,
  * then __xcalloc() returns an error.
- * 
- * This variant doesn't check if the multiplication of nmemb and size would result in integer 
- * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or 
+ *
+ * This variant doesn't check if the multiplication of nmemb and size would result in integer
+ * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or
  * 4 gigabytes if your still on 32 bits).
- * 
+ *
  * Do not call this directly, use the wrapper macro XCALLOC(size_t nmemb, size_t size, const char *var)
  * that will fill most of the banks for you.
- * 
+ *
  * @param nmemb    Number of elements.
  * @param size     Size of each elements.
  * @param file     Filename where the allocation is done.
@@ -126,7 +126,7 @@ void *__xcalloc(size_t nmemb, size_t size, const char *file, int line, const cha
 
 /**
  * @brief Tracked version of realloc().
- * 
+ *
  * The __xrealloc() function changes the size of the memory block pointed to by ptr to size bytes.  The
  * contents will be unchanged in the range from the start of the region up to the minimum of the old and
  * new sizes.  If the new size is larger than the old size, the added memory  will not be initialized.
@@ -134,14 +134,14 @@ void *__xcalloc(size_t nmemb, size_t size, const char *file, int line, const cha
  * to zero, and ptr is not NULL, then the call is equivalent to free(ptr).  Unless ptr is NULL, it must
  * have been returned by an earlier call to malloc(), calloc(), or realloc().  If the area pointed to was
  * moved, a free(ptr) is done.
- * 
- * This variant doesn't check if the multiplication of nmemb and size would result in integer 
- * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or 
+ *
+ * This variant doesn't check if the multiplication of nmemb and size would result in integer
+ * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or
  * 4 gigabytes if your still on 32 bits).
- * 
+ *
  * Do not call this directly, use the wrapper macro XREALLOC(void *ptr, size_t size, const char *var)
  * that will fill most of the banks for you.
- * 
+ *
  * @param ptr      Pointer to the allocation to be resize.
  * @param size     Size of memory to allocate.
  * @param file     Filename where the allocation is done.
@@ -199,13 +199,13 @@ void *__xrealloc(void *ptr, size_t size, const char *file, int line, const char 
 
 /**
  * @brief Search the tracking list for a pointer and return it's information.
- * 
+ *
  * __xfind will search thru all allocated blocks for the address pointed by ptr,
  * if this address is within the start and end of the allocaed block, it will return
  * the MEMTRACK information about that block.
- * 
+ *
  * It return NULL if nothing found.
- * 
+ *
  * @param ptr      Pointer to or somewhere in the allocated memory block.
  * @return         Pointer to a MEMTRACK structure with information on the memory block.
  *                 or NULL if not found.
@@ -233,7 +233,7 @@ MEMTRACK *__xfind(void *ptr)
 
 /**
  * @brief Check if a buffer wasn't overrun.
- * 
+ *
  * @param ptr      Pointer to check.
  * @return int     1, if everything is allright. 0, if buffer overrun, 2 if the buffer
  *                 isn't track.
@@ -265,15 +265,15 @@ int __xcheck(void *ptr)
 
 /**
  * @brief Tracked version of free().
- * 
+ *
  * The __xfree() function frees the memory space pointed to by ptr, which must have been returned
  * by a previous call to malloc()/__xmalloc(), calloc()/__xcalloc(), or realloc()/__xrealloc().
  * Otherwise, or if __xfree(ptr) has already been called before, undefined behavior occurs.
  * If ptr is NULL, no operation is performed.
- * 
+ *
  * The wrapper macro XFREE(void *ptr) is identical to calling this function directly. Just keep
  * things more redeable.
- * 
+ *
  * @param ptr Pointer to the allocation to be freed.
  * @return 1 if the buffer was tracked and it has been overrun, else 0.
  */
@@ -334,18 +334,18 @@ int __xfree(void *ptr)
 
 /**
  * String functions
- * 
+ *
  */
 
 /**
  * @brief Tracked sprintf replacement that create a new formatted string buffer.
- * 
- * Much like sprintf, but create a new buffer sized for the resulting string. Memory 
+ *
+ * Much like sprintf, but create a new buffer sized for the resulting string. Memory
  * for the new string is tracked, and must be freed with __xfree().
- * 
+ *
  * Do not call this directly, use the wrapper macro XSPRINTF(const char *var, const char *format, ...)
  * that will fill most of the banks for you.
- * 
+ *
  * @param file     Filename where the allocation is done.
  * @param line     Line number where the allocation is done.
  * @param function Function where the allocation is done.
@@ -395,13 +395,13 @@ char *__xasprintf(const char *file, int line, const char *function, const char *
 
 /**
  * @brief Tracked vsprintf replacement that create a new formatted string buffer.
- * 
- * Much like vsprintf, but create a new buffer sized for the resulting string. Memory 
+ *
+ * Much like vsprintf, but create a new buffer sized for the resulting string. Memory
  * for the new string is tracked, and must be freed with __xfree().
- * 
+ *
  * Do not call this directly, use the wrapper macro XAVSPRINTF(const char *var, const char *format, ...)
  * that will fill most of the banks for you.
- * 
+ *
  * @param file     Filename where the allocation is done.
  * @param line     Line number where the allocation is done.
  * @param function Function where the allocation is done.
@@ -449,13 +449,12 @@ char *__xavsprintf(const char *file, int line, const char *function, const char 
 	return str;
 }
 
-
 /**
  * @brief Tracked sprintf replacement.
- * 
+ *
  * Like sprintf, but make sure that the buffer does not overflow if the buffer is tracked.
  * Else, act exactly like vsprintf.
- * 
+ *
  * @param str     Buffer where to write the resulting string.
  * @param format  Format string.
  * @param ...     Variables argument list for the format string.
@@ -475,10 +474,10 @@ int __xsprintf(char *str, const char *format, ...)
 
 /**
  * @brief Tracked vsprintf replacement.
- * 
+ *
  * Like vsprintf, but make sure that the buffer does not overflow if the buffer is tracked.
  * Else, act exactly like vsprintf.
- * 
+ *
  * @param str     Buffer where to write the resulting string.
  * @param format  Format string.
  * @param ap      Variables argument list for the format string.
@@ -525,10 +524,10 @@ int __xvsprintf(char *str, const char *format, va_list ap)
 
 /**
  * @brief Tracked snprintf replacement.
- * 
+ *
  * Like snprintf, but make sure that the buffer does not overflow if the buffer is tracked.
  * Else, act exactly like snprintf.
- * 
+ *
  * @param str      Buffer where to write the resulting string.
  * @param size     Maximum size to write to the buffer.
  * @param format   Format string.
@@ -548,10 +547,10 @@ int __xsnprintf(char *str, size_t size, const char *format, ...)
 
 /**
  * @brief Tracked vsnprintf replacement.
- * 
+ *
  * Like vsnprintf, but make sure that the buffer does not overflow if the buffer is tracked.
  * Else, act exactly like snprintf.
- * 
+ *
  * @param str      Buffer where to write the resulting string.
  * @param size     Maximum size to write to the buffer.
  * @param format   Format string.
@@ -590,10 +589,10 @@ int __xvsnprintf(char *str, size_t size, const char *format, va_list ap)
 
 /**
  * @brief Tracked sprintfcat
- * 
+ *
  * Like sprintf, but append to the buffer and make sure it does not overflow
  * if the buffer is tracked.
- * 
+ *
  * @param str     Buffer where to write the resulting string.
  * @param format  Format string.
  * @param ...     Variables argument list for the format string.
@@ -613,7 +612,7 @@ int __xsprintfcat(char *str, const char *format, ...)
 
 /**
  * @brief tracked safe_printf replacement.
- * 
+ *
  * @param buff		Buffer that will receive the result
  * @param bufp		Pointer to the location in the buffer
  * @param format	Format string.
@@ -632,13 +631,13 @@ char *__xsafesprintf(char *buff, char **bufp, const char *format, ...)
 
 /**
  * @brief Tracked version of strdup
- * 
+ *
  * The __xstrdup() function returns a pointer to a new string which is a duplicate of the
  * string s. Memory for the new string is tracked, and must be freed with __xfree().
- * 
+ *
  * Do not call this directly, use the wrapper macro XSTRDUP(const char *str, size_t size, const char *var)
  * that will fill most of the banks for you.
- * 
+ *
  * @param s        String to duplicate.
  * @param file     Filename where the allocation is done.
  * @param line     Line number where the allocation is done.
@@ -662,13 +661,13 @@ char *__xstrdup(const char *s, const char *file, int line, const char *function,
 
 /**
  * @brief Tracked version of strndup
- * 
+ *
  * The __xstrdup() function returns a pointer to a new string which is a duplicate of the
  * string s. Memory for the new string is tracked, and must be freed with __xfree().
- * 
+ *
  * Do not call this directly, use the wrapper macro XSTRDUP(const char *str, size_t size, const char *var)
  * that will fill most of the banks for you.
- * 
+ *
  * @param s        String to duplicate.
  * @param n        Number of bytes to replicates.
  * @param file     Filename where the allocation is done.
@@ -693,14 +692,14 @@ char *__xstrndup(const char *s, size_t n, const char *file, int line, const char
 
 /**
  * @brief Tracked stpcpy replacement.
- * 
- * Copy a string from src to dest, returning a pointer to the end of the 
- * resulting string at dest. For tracked allocation, make sure that the 
+ *
+ * Copy a string from src to dest, returning a pointer to the end of the
+ * resulting string at dest. For tracked allocation, make sure that the
  * destination buffer does not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
- * @return Pointer to the end of the string dest (that is, the address of the 
+ * @return Pointer to the end of the string dest (that is, the address of the
  *         terminating null byte) rather than the beginning.
  */
 char *__xstpcpy(char *dest, const char *src)
@@ -733,10 +732,10 @@ char *__xstpcpy(char *dest, const char *src)
 
 /**
  * @brief Tracked strcat replacement.
- * 
+ *
  * Append the string src to string dest, returning a pointer to dest. For
  * tracked allocation, make sure that the destination buffer does not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @return Pointer to the destination string dest.
@@ -766,11 +765,11 @@ char *__xstrcat(char *dest, const char *src)
 
 /**
  * @brief Tracked strncat replacement.
- * 
+ *
  * Append at most n bytes from string src to string dest, returning a pointer
  * to dest. For tracked allocation, make sure that the destination buffer does
  * not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @param n Maximum numbers of characters to copy.
@@ -805,10 +804,10 @@ char *__xstrncat(char *dest, const char *src, size_t n)
 
 /**
  * @brief Tracked strccat.
- * 
+ *
  * Append the character src to string dest, returning a pointer to dest. For
  * tracked allocation, make sure that the destination buffer does not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Source character.
  * @return Pointer to the end of destination string dest.
@@ -837,11 +836,11 @@ char *__xstrccat(char *dest, const char src)
 
 /**
  * @brief Tracked strnccat.
- * 
+ *
  * Append the character src to string dest and limit dest lengt to n, returning
- * a pointer to dest. For tracked allocation, make sure that the destination 
+ * a pointer to dest. For tracked allocation, make sure that the destination
  * buffer does not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Source character.
  * @param n Maximum length of dest.
@@ -874,10 +873,10 @@ char *__xstrnccat(char *dest, const char src, size_t n)
 
 /**
  * @brief Tracked strcpy replacement.
- * 
+ *
  * Copy the string src to dest, returning a pointer to dest. For tracked
  * allocation, make sure that the destination buffer does not overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @return Pointer to the destination string dest.
@@ -907,11 +906,11 @@ char *__xstrcpy(char *dest, const char *src)
 
 /**
  * @brief Tracked strncpy replacement.
- * 
+ *
  * Copy at most n bytes from string src to dest, returning a pointer to dest.
  * For tracked allocation, make sure that the destination buffer does not
  * overrun.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @param n Maximum numbers of characters to copy.
@@ -950,12 +949,12 @@ char *__xstrncpy(char *dest, const char *src, size_t n)
 
 /**
  * @brief Tracked memmove replacement.
- * 
+ *
  * The __xmemmove() function copies n bytes from memory area src to memory area
  * dest. The memory areas may overlap: copying takes place as though the bytes
  * in src are first copied into a temporary array that does not overlap src or
  * dest, and the bytes are then copied from the temporary array to dest.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @param n Number of bytes to copy.
@@ -990,15 +989,15 @@ void *__xmemmove(void *dest, const void *src, size_t n)
 
 /**
  * @brief Tracked mempcpy replacement.
- * 
+ *
  * The __xmempcpy() function is nearly identical to the memcpy(3) function. It
- * copies n bytes from the object beginning at src into the object pointed to 
+ * copies n bytes from the object beginning at src into the object pointed to
  * by dest. But instead of returning the value of dest it returns a pointer to
- * the byte following the last written byte. The memory areas may overlap: 
+ * the byte following the last written byte. The memory areas may overlap:
  * copying takes place as though the bytes in src are first copied into a
  * temporary array that does not overlap src or dest, and the bytes are then
  * copied from the temporary array to dest.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @param n Number of bytes to copy.
@@ -1033,13 +1032,13 @@ void *__xmempcpy(void *dest, const void *src, size_t n)
 
 /**
  * @brief Tracked memccpy replacement.
- * 
+ *
  * The memccpy() function copies no more than n bytes from memory area src to
  * memory area dest, stopping when the character c is found. The memory areas
  * may overlap: copying takes place as though the bytes in src are first copied
  * into a temporary array that does not overlap src or dest, and the bytes are
  * then copied from the temporary array to dest.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
  * @param n Number of bytes to copy.
@@ -1080,11 +1079,11 @@ void *__xmemccpy(void *dest, const void *src, int c, size_t n)
 
 /**
  * @brief Tracked memset replacement.
- * 
+ *
  * The __xmemset() function fills the first n bytes of the memory area pointed to by s
  * with the constant byte c. For tracked allocation, make sure that the buffer does not
  * overrun.
- * 
+ *
  * @param s Pointer to the memory area to fill.
  * @param c Character to fill with.
  * @param n Size of the memory area to fill.
@@ -1117,7 +1116,7 @@ void *__xmemset(void *s, int c, size_t n)
 
 /**
  * @brief Function placeholder. Not used for now.
- * 
+ *
  * @param player dbref of the player who did the command
  */
 void list_bufstats(dbref player)
@@ -1127,7 +1126,7 @@ void list_bufstats(dbref player)
 
 /**
  * @brief Function placeholder. Not used for now.
- * 
+ *
  * @param player dbref of the player who did the command
  */
 void list_buftrace(dbref player)
@@ -1137,9 +1136,9 @@ void list_buftrace(dbref player)
 
 /**
  * @brief Helper function to sort the trace table.
- * 
+ *
  * This function is used by list_rawmemory for sorting the trace table via qsort()
- * 
+ *
  * @param p1       Pointer to the first MEMTRACK struct to compare.
  * @param p2       Pointer to the second MEMTRACK struct to compare.
  * @return int     Result of the comparison (see man qsort()).
@@ -1162,10 +1161,10 @@ int __xsorttrace(const void *p1, const void *p2)
 
 /**
  * @brief Show to the player a summary of all allocations.
- * 
+ *
  * Called by @list raw_memory. This is primary a debug function and
  * may cause lag on a very large game. Use with caution.
- * 
+ *
  * @param player   Dbref of the player making the request.
  */
 
@@ -1294,12 +1293,11 @@ void list_rawmemory(dbref player)
 	{
 		raw_notify(player, "Total: %ld raw allocations in %ld unique tags, %0.2fM bytes used.", n_tags, u_tags, total, (float)total / 1048756.0);
 	}
-	
 }
 
 /**
  * @brief Calculate the total size of all allocations.
- * 
+ *
  * @return size_t  Memory usage.
  */
 size_t total_rawmemory(void)
@@ -1317,13 +1315,13 @@ size_t total_rawmemory(void)
 
 /**
  * Replacement for the safe_* functions.
- * 
+ *
  */
 
 /**
  * @brief Copy a string with at most n character from src and update
  * the position pointer to the end of the destination buffer.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param destp Pointer tracking the desstination buffer.
  * @param src Pointer to the string to concatenate.
@@ -1359,7 +1357,7 @@ size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_
 /**
  * @brief Copy char 'c' to dest and update the position pointer to the end of
  *        the destination buffer.
- * 
+ *
  * @param c Char to copy
  * @param dest Pointer to destination buffer.
  * @param destp Pointer tracking the desstination buffer.
@@ -1392,7 +1390,7 @@ int __xsafestrcatchr(char *dest, char **destp, char c, size_t size)
 /**
  * @brief Concatenate two string with at most n character from src and update
  * the position pointer to the end of the destination buffer.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param destp Pointer tracking the desstination buffer.
  * @param src Pointer to the string to concatenate.
@@ -1427,7 +1425,7 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
 
 /**
  * @brief Convert a long signed number into string.
- * 
+ *
  * @param dest Pointer to destination buffer.
  * @param destp Pointer tracking the desstination buffer.
  * @param num Number to convert.
@@ -1443,10 +1441,10 @@ void __xsafeltos(char *dest, char **destp, long num, size_t size)
 
 /**
  * @brief Return a string with 'count' number of 'ch' characters.
- * 
+ *
  * It is the responsibility of the caller to free the resulting buffer.
- * 
- * @param size Size of the string to build. 
+ *
+ * @param size Size of the string to build.
  * @param c Character to fill the string with.
  * @return Pointer to the build string.
  */

@@ -14,6 +14,7 @@
  */
 
 #include "system.h"
+#include <signal.h>
 
 #include "defaults.h"
 #include "constants.h"

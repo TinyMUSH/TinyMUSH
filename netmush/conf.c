@@ -92,7 +92,6 @@ void cf_init(void)
     mushconf.indent_desc = 0;
     mushconf.name_spaces = 1;
     mushconf.fork_dump = 0;
-    mushconf.fork_vfork = 0;
     mushconf.dbopt_interval = 0;
     mushconf.have_pueblo = 1;
     mushconf.have_zones = 1;

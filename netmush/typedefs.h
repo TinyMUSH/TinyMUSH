@@ -871,7 +871,6 @@ typedef struct confdata
     int name_spaces;           /*!< allow player names to have spaces */
     int site_chars;            /*!< where to truncate site name */
     int fork_dump;             /*!< perform dump in a forked process */
-    int fork_vfork;            /*!< use vfork to fork */
     int sig_action;            /*!< What to do with fatal signals */
     int max_players;           /*!< Max # of connected players */
     int dump_interval;         /*!< interval between checkpoint dumps in secs */

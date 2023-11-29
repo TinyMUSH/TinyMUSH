@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.21.0)
 
 project(TinyMUSH VERSION 4.0.0.0 DESCRIPTION "TinyMUSH Game Server" HOMEPAGE_URL https://github.com/TinyMUSH/ LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 set(PACKAGE "tinymush")
 set(PACKAGE_RELEASE_DATE "2023-11-25")
@@ -18,6 +19,9 @@ include(CTest)
 enable_testing()
 
 include_directories(${PROJECT_SOURCE_DIR}/netmush)
+if(APPLE)
+    include_directories(/usr/local/include)
+endif(APPLE)
 
 find_program(TAR_BINARY tar)
 configure_file(${PROJECT_SOURCE_DIR}/netmush/config.h.in ${PROJECT_SOURCE_DIR}/netmush/config.h)

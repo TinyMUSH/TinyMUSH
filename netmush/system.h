@@ -30,8 +30,6 @@
 #include <sys/wait.h>
 #include <sys/param.h>
 #include <errno.h>
-//#include <malloc.h>
-//#include <vfork.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -42,10 +40,8 @@
 #include <signal.h>
 #include <math.h>
 #include <netinet/in.h>
-//#include <zlib.h>
 #include <sys/select.h>
 #include <pcre.h>
-//#include <ltdl.h>
 #include <dlfcn.h>
 #include <libgen.h>
 #include <getopt.h>

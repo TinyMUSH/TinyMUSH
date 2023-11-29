@@ -4,11 +4,11 @@
  * @brief functions called only by modules
  * @version 3.3
  * @date 2020-12-24
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 /* api.c -  */
@@ -26,7 +26,7 @@ extern CMDENT *prefix_cmds[256];
 
 /**
  * @brief Register a module
- * 
+ *
  * @param module_name	Module name
  * @param api_name		API name
  * @param ftable		Function table
@@ -51,9 +51,9 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 
 	if (!succ)
 	{
-		/** 
+		/**
 		 * no such module
-		 * 
+		 *
 		 */
 		return;
 	}
@@ -76,7 +76,7 @@ void register_api(char *module_name, char *api_name, API_FUNCTION *ftable)
 
 /**
  * @brief Return the handler of an API function
- * 
+ *
  * @param api_name	API name
  * @param fn_name 	Function name
  * @return void*	Handler of that function
@@ -99,7 +99,7 @@ void *request_api_function(char *api_name, char *fn_name)
 
 /**
  * @brief Register module's commands with the main command handler
- * 
+ *
  * @param cmdtab Module's command table.
  */
 void register_commands(CMDENT *cmdtab)
@@ -121,12 +121,12 @@ void register_commands(CMDENT *cmdtab)
 
 /**
  * @brief Register prefix commands.
- * 
+ *
  * @param cmdchars char array of prefixes
  */
 void register_prefix_cmds(const char *cmdchars)
 {
-	const char *cp = NULL ;
+	const char *cp = NULL;
 	char *cn = XSTRDUP("x", "cn");
 
 	if (cmdchars)
@@ -142,8 +142,8 @@ void register_prefix_cmds(const char *cmdchars)
 
 /**
  * @brief Register module's functions with the main functions handler
- * 
- * @param functab 
+ *
+ * @param functab
  */
 void register_functions(FUN *functab)
 {
@@ -160,9 +160,9 @@ void register_functions(FUN *functab)
 
 /**
  * @brief Register module's hashtables with the main hashtables handler
- * 
- * @param htab 
- * @param ntab 
+ *
+ * @param htab
+ * @param ntab
  */
 void register_hashtables(MODHASHES *htab, MODHASHES *ntab)
 {
@@ -188,7 +188,7 @@ void register_hashtables(MODHASHES *htab, MODHASHES *ntab)
 
 /**
  * @brief Register a module's DB type.
- * 
+ *
  * @param modname Module name
  * @return unsigned int Module's DBType
  */
@@ -198,7 +198,7 @@ unsigned int register_dbtype(char *modname)
 	UDB_DATA key, data;
 	/**
 	 * Find out if the module already has a registered DB type
-	 * 
+	 *
 	 */
 	key.dptr = modname;
 	key.dsize = strlen(modname) + 1;
@@ -213,7 +213,7 @@ unsigned int register_dbtype(char *modname)
 
 	/**
 	 * If the type is in range, return it, else return zero as an error code
-	 * 
+	 *
 	 */
 
 	if ((mushstate.moduletype_top >= DBTYPE_RESERVED) && (mushstate.moduletype_top < DBTYPE_END))
