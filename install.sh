@@ -14,7 +14,7 @@ case $yn in
         echo -e "\n-- Configuring build environment"
         rm -rf ./game
         cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -S$PWD -B$PWD/build -G "Unix Makefiles"
-        cmake --build $PWD/build --config Debug --target all --
+        cmake --build $PWD/build --config Debug --target all -j $(getconf _NPROCESSORS_ONLN) --
         cmake --install $PWD/build
         echo -e "-- Done: Cleaning up"
         rm -rf $PWD/build
