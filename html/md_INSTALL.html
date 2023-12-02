@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TinyMUSH: Security Policy</title>
+<title>TinyMUSH: Installation Instructions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,20 +70,23 @@ $(function() {
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">Security Policy </div></div>
+  <div class="headertitle"><div class="title">Installation Instructions </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md103"></a>
-Supported Versions</h1>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Version   </th><th class="markdownTableHeadNone">Supported    </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.3.x   </td><td class="markdownTableBodyNone">:white_check_mark:   </td></tr>
-</table>
-<h1><a class="anchor" id="autotoc_md104"></a>
-Reporting a Vulnerability</h1>
-<p >Please open an issue to report a security vulnerability. </p>
+<div class="textblock"><p >TinyMUSH now use the CMAKE build system, which is alot easier to maintain than Autotools. To make things even simpler, a build script is included.</p>
+<p >Build instructions:</p>
+<p >1) Install dependencies: </p><pre class="fragment">For Ubuntu/Debian:
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
+
+For OSX:
+brew install cmake gdbm pcre`
+</pre><p> 2) Build TinyMUSH: </p><pre class="fragment">./install.sh
+</pre><p> 3) Start TinyMUSH: </p><pre class="fragment">cd game
+./netmush
+</pre><p> Default port is '6250' and default God's password is 'Potrzebie'.</p>
+<p >The structure of TinyMUSH has changed again, here's the new directory tree and a short descriptions of their uses.</p>
+<p >├── game Game binaries and pid file. ├── backups Game Backups ├── configs Configuration files ├── db Databases ├── docs Documentation and text files ├── logs Game logs ├── modules Optional modules ├── scripts (not so anymore) Usefull Scripts └── systemd Automatic start / stop / restart scrip for systemd</p>
+<p >More documentation will be available as development goes. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

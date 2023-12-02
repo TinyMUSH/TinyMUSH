@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['security_20policy_0',['Security Policy',['../md_SECURITY.html',1,'']]]
+  ['installation_20instructions_0',['Installation Instructions',['../md_INSTALL.html',1,'']]]
 ];
