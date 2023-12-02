@@ -8,6 +8,5 @@ var searchData=
   ['db_5fsql_5fmysql_2ec_5',['db_sql_mysql.c',['../db__sql__mysql_8c.html',1,'']]],
   ['db_5fsql_5fnone_2ec_6',['db_sql_none.c',['../db__sql__none_8c.html',1,'']]],
   ['db_5fsql_5fpgsql_2ec_7',['db_sql_pgsql.c',['../db__sql__pgsql_8c.html',1,'']]],
-  ['db_5fsql_5fsqlite3_2ec_8',['db_sql_sqlite3.c',['../db__sql__sqlite3_8c.html',1,'']]],
-  ['defaults_2eh_9',['defaults.h',['../defaults_8h.html',1,'']]]
+  ['db_5fsql_5fsqlite3_2ec_8',['db_sql_sqlite3.c',['../db__sql__sqlite3_8c.html',1,'']]]
 ];

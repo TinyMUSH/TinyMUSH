@@ -139,6 +139,5 @@ var searchData=
   ['switch_5fone_136',['SWITCH_ONE',['../constants_8h.html#a6ea7aeaaa80b308cdf61febe0b7d4597',1,'constants.h']]],
   ['switch_5ftoken_137',['switch_token',['../structstatedata.html#ad36188a720998467e141d0d8aae7fc99',1,'statedata']]],
   ['switch_5fvar_138',['SWITCH_VAR',['../constants_8h.html#aa8e5e6abc323cb5bdba485e45e32330b',1,'constants.h']]],
-  ['sys_5fc_139',['sys_c',['../externs_8h.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c():&#160;udb_ocache.c'],['../udb__ocache_8c.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c():&#160;udb_ocache.c']]],
-  ['system_2eh_140',['system.h',['../system_8h.html',1,'']]]
+  ['sys_5fc_139',['sys_c',['../externs_8h.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c():&#160;udb_ocache.c'],['../udb__ocache_8c.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c():&#160;udb_ocache.c']]]
 ];

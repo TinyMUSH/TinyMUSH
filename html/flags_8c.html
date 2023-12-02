@@ -83,65 +83,35 @@ $(function() {
 
 <p>Flag manipulation routines.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="system_8h_source.html">system.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="defaults_8h_source.html">defaults.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;config.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="constants_8h_source.html">constants.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="typedefs_8h_source.html">typedefs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="macros_8h_source.html">macros.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="externs_8h_source.html">externs.h</a>&quot;</code><br />
 <code>#include &quot;prototypes.h&quot;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;ctype.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for flags.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="flags_8c__incl.png" border="0" usemap="#anetmush_2flags_8c" alt=""/></div>
 <map name="anetmush_2flags_8c" id="anetmush_2flags_8c">
-<area shape="rect" title="Flag manipulation routines." alt="" coords="2131,5,2245,31"/>
-<area shape="rect" href="system_8h.html" title="Global headers and system compatibility." alt="" coords="1832,79,1907,104"/>
-<area shape="rect" href="defaults_8h.html" title="Configuration options set by configure script." alt="" coords="1931,79,2010,104"/>
-<area shape="rect" href="constants_8h.html" title="Constants used by the engine." alt="" coords="2034,79,2123,104"/>
-<area shape="rect" href="typedefs_8h.html" title="Type definitions for variables." alt="" coords="2147,79,2229,104"/>
-<area shape="rect" href="macros_8h.html" title="Macro definitions." alt="" coords="2253,79,2328,104"/>
-<area shape="rect" href="externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="2352,79,2427,104"/>
-<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="2451,79,2543,104"/>
-<area shape="rect" href="config_8h.html" title="Configuration options set by configure script." alt="" coords="5,152,72,177"/>
-<area shape="rect" title=" " alt="" coords="97,152,165,177"/>
-<area shape="rect" title=" " alt="" coords="189,152,251,177"/>
-<area shape="rect" title=" " alt="" coords="275,152,338,177"/>
-<area shape="rect" title=" " alt="" coords="363,152,427,177"/>
-<area shape="rect" title=" " alt="" coords="451,152,517,177"/>
-<area shape="rect" title=" " alt="" coords="542,152,623,177"/>
-<area shape="rect" title=" " alt="" coords="647,152,705,177"/>
-<area shape="rect" title=" " alt="" coords="729,152,836,177"/>
-<area shape="rect" title=" " alt="" coords="860,152,932,177"/>
-<area shape="rect" title=" " alt="" coords="957,152,1035,177"/>
-<area shape="rect" title=" " alt="" coords="1059,152,1117,177"/>
-<area shape="rect" title=" " alt="" coords="1141,152,1221,177"/>
-<area shape="rect" title=" " alt="" coords="1246,152,1338,177"/>
-<area shape="rect" title=" " alt="" coords="1363,152,1424,177"/>
-<area shape="rect" title=" " alt="" coords="1449,152,1535,177"/>
-<area shape="rect" title=" " alt="" coords="1559,152,1619,177"/>
-<area shape="rect" title=" " alt="" coords="1643,152,1706,177"/>
-<area shape="rect" title=" " alt="" coords="1730,152,1798,177"/>
-<area shape="rect" title=" " alt="" coords="1822,152,1917,177"/>
-<area shape="rect" title=" " alt="" coords="1941,152,2048,177"/>
-<area shape="rect" title=" " alt="" coords="2072,152,2139,177"/>
-<area shape="rect" title=" " alt="" coords="2163,152,2224,177"/>
-<area shape="rect" title=" " alt="" coords="2248,152,2333,177"/>
-<area shape="rect" title=" " alt="" coords="2357,152,2448,177"/>
-<area shape="rect" title=" " alt="" coords="2473,152,2530,177"/>
-<area shape="rect" title=" " alt="" coords="2554,152,2614,177"/>
-<area shape="rect" title=" " alt="" coords="2639,152,2705,177"/>
-<area shape="rect" title=" " alt="" coords="2730,152,2798,177"/>
-<area shape="rect" title=" " alt="" coords="2823,152,2900,177"/>
-<area shape="rect" title=" " alt="" coords="2924,152,3007,177"/>
-<area shape="rect" title=" " alt="" coords="3031,152,3095,177"/>
-<area shape="rect" title=" " alt="" coords="3119,152,3175,177"/>
-<area shape="rect" title=" " alt="" coords="3199,152,3263,177"/>
-<area shape="rect" title=" " alt="" coords="3287,152,3351,177"/>
-<area shape="rect" title=" " alt="" coords="3375,152,3449,177"/>
-<area shape="rect" title=" " alt="" coords="3474,152,3547,177"/>
-<area shape="rect" title=" " alt="" coords="3571,152,3653,177"/>
-<area shape="rect" title=" " alt="" coords="3677,152,3752,177"/>
+<area shape="rect" title="Flag manipulation routines." alt="" coords="305,5,418,31"/>
+<area shape="rect" title=" " alt="" coords="5,79,72,104"/>
+<area shape="rect" href="constants_8h.html" title="Constants used by the engine." alt="" coords="97,79,186,104"/>
+<area shape="rect" href="typedefs_8h.html" title="Type definitions for variables." alt="" coords="186,152,267,177"/>
+<area shape="rect" href="macros_8h.html" title="Macro definitions." alt="" coords="379,79,453,104"/>
+<area shape="rect" href="externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="477,79,552,104"/>
+<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="262,79,354,104"/>
+<area shape="rect" title=" " alt="" coords="576,79,640,104"/>
+<area shape="rect" title=" " alt="" coords="665,79,727,104"/>
+<area shape="rect" title=" " alt="" coords="55,152,111,177"/>
+<area shape="rect" title=" " alt="" coords="195,225,259,251"/>
+<area shape="rect" title=" " alt="" coords="403,225,463,251"/>
+<area shape="rect" title=" " alt="" coords="113,225,170,251"/>
+<area shape="rect" title=" " alt="" coords="283,225,368,251"/>
+<area shape="rect" title=" " alt="" coords="343,152,406,177"/>
+<area shape="rect" title=" " alt="" coords="482,152,550,177"/>
 </map>
 </div>
 </div><table class="memberdecls">
@@ -1595,15 +1565,15 @@ Variables</h2></td></tr>
 <div class="line">    {<span class="stringliteral">&quot;TYPE5&quot;</span>, <span class="charliteral">&#39;+&#39;</span>, <a class="code hl_define" href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a>, 0},</div>
 <div class="line">    {<span class="stringliteral">&quot;GARBAGE&quot;</span>, <span class="charliteral">&#39;_&#39;</span>, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, <a class="code hl_define" href="constants_8h.html#a2e5c33b3b7ffffea5f5a01df2e0ba108">OF_CONTENTS</a> | <a class="code hl_define" href="constants_8h.html#a66189097383874d603e5aa807ebab85c">OF_LOCATION</a> | <a class="code hl_define" href="constants_8h.html#a8cf5eadb58992458c630b474fa72c0ae">OF_EXITS</a> | <a class="code hl_define" href="constants_8h.html#a6dbf91d1c871616ae86b68b3528e95af">OF_HOME</a> | <a class="code hl_define" href="constants_8h.html#ab33e59550e2cdfedbc27d68fa895cca0">OF_SIBLINGS</a>},</div>
 <div class="line">    {<span class="stringliteral">&quot;GARBAGE&quot;</span>, <span class="charliteral">&#39;#&#39;</span>, <a class="code hl_define" href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a>, 0}}</div>
-<div class="ttc" id="aconstants_8h_html_a2291410b525526d19589a3c9ced83d7b"><div class="ttname"><a href="constants_8h.html#a2291410b525526d19589a3c9ced83d7b">OF_DROPTO</a></div><div class="ttdeci">#define OF_DROPTO</div><div class="ttdef"><b>Definition:</b> constants.h:988</div></div>
-<div class="ttc" id="aconstants_8h_html_a2e5c33b3b7ffffea5f5a01df2e0ba108"><div class="ttname"><a href="constants_8h.html#a2e5c33b3b7ffffea5f5a01df2e0ba108">OF_CONTENTS</a></div><div class="ttdeci">#define OF_CONTENTS</div><div class="ttdef"><b>Definition:</b> constants.h:984</div></div>
-<div class="ttc" id="aconstants_8h_html_a66189097383874d603e5aa807ebab85c"><div class="ttname"><a href="constants_8h.html#a66189097383874d603e5aa807ebab85c">OF_LOCATION</a></div><div class="ttdeci">#define OF_LOCATION</div><div class="ttdef"><b>Definition:</b> constants.h:985</div></div>
-<div class="ttc" id="aconstants_8h_html_a6dbf91d1c871616ae86b68b3528e95af"><div class="ttname"><a href="constants_8h.html#a6dbf91d1c871616ae86b68b3528e95af">OF_HOME</a></div><div class="ttdeci">#define OF_HOME</div><div class="ttdef"><b>Definition:</b> constants.h:987</div></div>
-<div class="ttc" id="aconstants_8h_html_a8cf5eadb58992458c630b474fa72c0ae"><div class="ttname"><a href="constants_8h.html#a8cf5eadb58992458c630b474fa72c0ae">OF_EXITS</a></div><div class="ttdeci">#define OF_EXITS</div><div class="ttdef"><b>Definition:</b> constants.h:986</div></div>
-<div class="ttc" id="aconstants_8h_html_a8fa6239e56cd560c7ad5e88f2218a7bd"><div class="ttname"><a href="constants_8h.html#a8fa6239e56cd560c7ad5e88f2218a7bd">OF_OWNER</a></div><div class="ttdeci">#define OF_OWNER</div><div class="ttdef"><b>Definition:</b> constants.h:989</div></div>
-<div class="ttc" id="aconstants_8h_html_ab33e59550e2cdfedbc27d68fa895cca0"><div class="ttname"><a href="constants_8h.html#ab33e59550e2cdfedbc27d68fa895cca0">OF_SIBLINGS</a></div><div class="ttdeci">#define OF_SIBLINGS</div><div class="ttdef"><b>Definition:</b> constants.h:990</div></div>
-<div class="ttc" id="aconstants_8h_html_ac83d7116eca40585f086d0c0c5e02e0c"><div class="ttname"><a href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a></div><div class="ttdeci">#define CA_PUBLIC</div><div class="ttdoc">Command permission flags.</div><div class="ttdef"><b>Definition:</b> constants.h:371</div></div>
-<div class="ttc" id="aconstants_8h_html_ae3711c84b4ca88296796e8af4df161e2"><div class="ttname"><a href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a></div><div class="ttdeci">#define CA_GOD</div><div class="ttdef"><b>Definition:</b> constants.h:372</div></div>
+<div class="ttc" id="aconstants_8h_html_a2291410b525526d19589a3c9ced83d7b"><div class="ttname"><a href="constants_8h.html#a2291410b525526d19589a3c9ced83d7b">OF_DROPTO</a></div><div class="ttdeci">#define OF_DROPTO</div><div class="ttdef"><b>Definition:</b> constants.h:990</div></div>
+<div class="ttc" id="aconstants_8h_html_a2e5c33b3b7ffffea5f5a01df2e0ba108"><div class="ttname"><a href="constants_8h.html#a2e5c33b3b7ffffea5f5a01df2e0ba108">OF_CONTENTS</a></div><div class="ttdeci">#define OF_CONTENTS</div><div class="ttdef"><b>Definition:</b> constants.h:986</div></div>
+<div class="ttc" id="aconstants_8h_html_a66189097383874d603e5aa807ebab85c"><div class="ttname"><a href="constants_8h.html#a66189097383874d603e5aa807ebab85c">OF_LOCATION</a></div><div class="ttdeci">#define OF_LOCATION</div><div class="ttdef"><b>Definition:</b> constants.h:987</div></div>
+<div class="ttc" id="aconstants_8h_html_a6dbf91d1c871616ae86b68b3528e95af"><div class="ttname"><a href="constants_8h.html#a6dbf91d1c871616ae86b68b3528e95af">OF_HOME</a></div><div class="ttdeci">#define OF_HOME</div><div class="ttdef"><b>Definition:</b> constants.h:989</div></div>
+<div class="ttc" id="aconstants_8h_html_a8cf5eadb58992458c630b474fa72c0ae"><div class="ttname"><a href="constants_8h.html#a8cf5eadb58992458c630b474fa72c0ae">OF_EXITS</a></div><div class="ttdeci">#define OF_EXITS</div><div class="ttdef"><b>Definition:</b> constants.h:988</div></div>
+<div class="ttc" id="aconstants_8h_html_a8fa6239e56cd560c7ad5e88f2218a7bd"><div class="ttname"><a href="constants_8h.html#a8fa6239e56cd560c7ad5e88f2218a7bd">OF_OWNER</a></div><div class="ttdeci">#define OF_OWNER</div><div class="ttdef"><b>Definition:</b> constants.h:991</div></div>
+<div class="ttc" id="aconstants_8h_html_ab33e59550e2cdfedbc27d68fa895cca0"><div class="ttname"><a href="constants_8h.html#ab33e59550e2cdfedbc27d68fa895cca0">OF_SIBLINGS</a></div><div class="ttdeci">#define OF_SIBLINGS</div><div class="ttdef"><b>Definition:</b> constants.h:992</div></div>
+<div class="ttc" id="aconstants_8h_html_ac83d7116eca40585f086d0c0c5e02e0c"><div class="ttname"><a href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a></div><div class="ttdeci">#define CA_PUBLIC</div><div class="ttdoc">Command permission flags.</div><div class="ttdef"><b>Definition:</b> constants.h:373</div></div>
+<div class="ttc" id="aconstants_8h_html_ae3711c84b4ca88296796e8af4df161e2"><div class="ttname"><a href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a></div><div class="ttdeci">#define CA_GOD</div><div class="ttdef"><b>Definition:</b> constants.h:374</div></div>
 </div><!-- fragment --><p >Object types flags </p>
 
 </div>
