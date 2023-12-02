@@ -74,19 +74,33 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p >TinyMUSH now use the CMAKE build system, which is alot easier to maintain than Autotools. To make things even simpler, a build script is included.</p>
-<p >Build instructions:</p>
-<p >1) Install dependencies: </p><pre class="fragment">For Ubuntu/Debian:
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
-
-For OSX:
-brew install cmake gdbm pcre`
-</pre><p> 2) Build TinyMUSH: </p><pre class="fragment">./install.sh
-</pre><p> 3) Start TinyMUSH: </p><pre class="fragment">cd game
-./netmush
-</pre><p> Default port is '6250' and default God's password is 'Potrzebie'.</p>
+<h1><a class="anchor" id="autotoc_md71"></a>
+Build instructions:</h1>
+<ol type="1">
+<li><p class="startli">Install dependencies:</p>
+<p class="startli">For Ubuntu/Debian: </p><div class="fragment"><div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev</div>
+</div><!-- fragment --><p class="startli">For OSX: </p><div class="fragment"><div class="line">brew install cmake gdbm pcre`</div>
+</div><!-- fragment --></li>
+<li>Build TinyMUSH: <div class="fragment"><div class="line">./install.sh</div>
+</div><!-- fragment --></li>
+<li>Start TinyMUSH: <div class="fragment"><div class="line">cd game</div>
+<div class="line">./netmush</div>
+</div><!-- fragment --></li>
+</ol>
+<p >Default port is '6250' and default God's password is 'Potrzebie'.</p>
+<h1><a class="anchor" id="autotoc_md72"></a>
+Structure</h1>
 <p >The structure of TinyMUSH has changed again, here's the new directory tree and a short descriptions of their uses.</p>
-<p >├── game Game binaries and pid file. ├── backups Game Backups ├── configs Configuration files ├── db Databases ├── docs Documentation and text files ├── logs Game logs ├── modules Optional modules ├── scripts (not so anymore) Usefull Scripts └── systemd Automatic start / stop / restart scrip for systemd</p>
-<p >More documentation will be available as development goes. </p>
+<div class="fragment"><div class="line">├── game           Game binaries and pid file.</div>
+<div class="line">    ├── backups    Game Backups</div>
+<div class="line">    ├── configs    Configuration files</div>
+<div class="line">    ├── db         Databases</div>
+<div class="line">    ├── docs       Documentation and text files</div>
+<div class="line">    ├── logs       Game logs</div>
+<div class="line">    ├── modules    Optional modules</div>
+<div class="line">    ├── scripts    (not so anymore) Usefull Scripts</div>
+<div class="line">    └── systemd    Automatic start / stop / restart scrip for systemd</div>
+</div><!-- fragment --><p >More documentation will be available as development goes. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

@@ -73,26 +73,25 @@ $(function() {
   <div class="headertitle"><div class="title">ChangeLog </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p >This document details changes for TinyMUSH 3 "mainline" releases, as well as bugfix updates issued against those mainline releases.</p>
-<hr  />
- <h1><a class="anchor" id="autotoc_md10"></a>
+<div class="textblock"><p >This document details changes for TinyMUSH "mainline" releases, as well as bugfix updates issued against those mainline releases.</p>
+<h1><a class="anchor" id="autotoc_md7"></a>
 TinyMUSH 4.0 Changes</h1>
 <p >TinyMUSH 4.0 is currently in alpha. See Git's log for changes.</p>
-<hr  />
- <h1><a class="anchor" id="autotoc_md12"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 TinyMUSH 3.3 Changes</h1>
 <p >TinyMUSH 3.3 is currently in alpha. See Git's log for changes.</p>
-<hr  />
- <h1><a class="anchor" id="autotoc_md14"></a>
+<h1><a class="anchor" id="autotoc_md9"></a>
 TinyMUSH 3.2 Changes</h1>
-<p >TinyMUSH 3.2 beta 1 was released on February 23rd, 2009. The "full", gamma release of TinyMUSH 3.2 is dated June 6th, 2011.</p>
-<hr  />
- <h1><a class="anchor" id="autotoc_md16"></a>
+<p >TinyMUSH 3.2 beta 1 was released on February 23rd, 2009.</p>
+<p >The "full", gamma release of TinyMUSH 3.2 is dated June 6th, 2011.</p>
+<h1><a class="anchor" id="autotoc_md10"></a>
 TinyMUSH 3.1 Changes</h1>
-<p >TinyMUSH 3.1 beta 1 was released on May 8th, 2002. The "full", gamma release of TinyMUSH 3.1 is dated June 21st, 2004.</p>
-<hr  />
-<p >PATCHES SINCE THE 3.1 RELEASE</p>
-<p >3.1 Patchlevel 6 &ndash; January 12th, 2009</p>
+<p >TinyMUSH 3.1 beta 1 was released on May 8th, 2002.</p>
+<p >The "full", gamma release of TinyMUSH 3.1 is dated June 21st, 2004.</p>
+<h2><a class="anchor" id="autotoc_md11"></a>
+PATCHES SINCE THE 3.1 RELEASE</h2>
+<h3><a class="anchor" id="autotoc_md12"></a>
+3.1 Patchlevel 6 – January 12th, 2009</h3>
 <ul>
 <li>Enhancement: A "reply" command allows you to reply to a page, including being able to reply to the whole group of people paged along with you.</li>
 <li>Enhancement: Property directories (propdirs) offer the ability to inherit attributes from multiple objects. If an object's parent chain does not contain an attribute, the object's @propdir list is searched for that attribute.</li>
@@ -108,7 +107,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>Bugfix: In the ifelse() family, trailing space is no longer accidentally eaten.</li>
 <li>Maintenance: Updated copyright to 2009.</li>
 </ul>
-<p >3.1 Patchlevel 5 &ndash; January 27th, 2008</p>
+<h3><a class="anchor" id="autotoc_md13"></a>
+3.1 Patchlevel 5 – January 27th, 2008</h3>
 <ul>
 <li>Enhancement: The new conf parameter local_master_parents allows the parents of objects in ZONE-set parent rooms to be scanned for $commands.</li>
 <li>Enhancement: New Trace attribute flag, allows tracing of just a single function.</li>
@@ -146,7 +146,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>Maintenance: Updated copyright to 2008.</li>
 <li>Compatibility: Enables TinyMUSH to read the escapes of cr/lf add to the TinyMUX flatfile. Per Brazil.</li>
 </ul>
-<p >3.1 Patchlevel 4 &ndash; December 19th, 2006</p>
+<h3><a class="anchor" id="autotoc_md14"></a>
+3.1 Patchlevel 4 – December 19th, 2006</h3>
 <ul>
 <li>Fixed Always clear @prog data on logout</li>
 <li>Fixed tools (src/tools). Add an install tag to the tools makefile.</li>
@@ -157,7 +158,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>Automated build of TinyGDBM within ./configure.</li>
 <li>Updated the build process a bit to keep in line with autoconf standards.</li>
 </ul>
-<p >3.1 Patchlevel 3</p>
+<h3><a class="anchor" id="autotoc_md15"></a>
+3.1 Patchlevel 3</h3>
 <ul>
 <li>Fixed Update script to work with Sourceforge's new web services.</li>
 <li>Bugfix for integer overflow in PCRE repeat counts.</li>
@@ -172,7 +174,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>Fixed double-evaluation of arguments in columns(). [MUX; Brazil]</li>
 <li>Fixed lack of evaluation of delimiter arguments in list() and loop(). [3.0]</li>
 </ul>
-<p >3.1 Patchlevel 2</p>
+<h3><a class="anchor" id="autotoc_md16"></a>
+3.1 Patchlevel 2</h3>
 <ul>
 <li>Startmush now accept start/stop/restart/reboot switches. You can also pass the name of the config file you want to use instead of the default 'mush.config' one.</li>
 <li>Removed hardcoded binaries path from the engine, a new command line switch ( -b binpath ) new feed the engine with the correct value. The engine can now run its binaries from any directory, not just ./bin/. (slave path was hardcoded.)</li>
@@ -186,12 +189,13 @@ TinyMUSH 3.1 Changes</h1>
 <li>Changed the wizhelp topic text of LOGGING and INHERITANCE to "This topic hasn't been written yet." [MUX; Jared Robertson]</li>
 <li>Added a REGISTRATION wizhelp topic (was referenced by @PCREATE and REGISTER_SITE) [MUX; Jared Robertson]</li>
 </ul>
-<p >3.1 Patchlevel 1 &ndash; August 11th, 2004</p>
+<h3><a class="anchor" id="autotoc_md17"></a>
+3.1 Patchlevel 1 – August 11th, 2004</h3>
 <ul>
 <li>Fixed a bug in dbconvert where the cache wasn't flushed before closing the database, creating an incomplete database. [3.1p0]</li>
 </ul>
-<hr  />
-<p >CHANGES TO THE BASE SERVER</p>
+<h2><a class="anchor" id="autotoc_md18"></a>
+CHANGES TO THE BASE SERVER</h2>
 <ul>
 <li>The licensing scheme has been changed to the Artistic License.</li>
 <li>A new script, Update, automatically downloads and applies official patches to TinyMUSH 3.</li>
@@ -223,12 +227,11 @@ TinyMUSH 3.1 Changes</h1>
 <li>Help entries can now have multiple index terms.</li>
 <li>A rewrite has begun on the help files.</li>
 </ul>
-<hr  />
-<p >CHANGES TO CONFIGURATION PARAMETERS</p>
+<h2><a class="anchor" id="autotoc_md19"></a>
+CHANGES TO CONFIGURATION PARAMETERS</h2>
 <ul>
 <li>Conf parameters that are dbrefs (such as master_room) are now sanity checked, both when they are set and when a @dbck is run. Also, a dbref as well as a number can be used, i.e. the syntax 'master_room #2' is now also valid (whereas 'master_room 2' was previously required).</li>
-<li>A new conf parameter, attr_type, allows attributes whose names match certain wildcard patterns to be given certain default flags. Attribute names can now start with '_'. (To implement a rule like, "All attributes
-  whose names start with '_' can only be set by wizards," you would add, "attr_type _* wizard" to your conf file.)</li>
+<li>A new conf parameter, attr_type, allows attributes whose names match certain wildcard patterns to be given certain default flags. Attribute names can now start with '_'. (To implement a rule like, "All attributes whose names start with '_' can only be set by wizards," you would add, "attr_type _* wizard" to your conf file.)</li>
 <li>A new conf parameter, database_home, has been introduced. This is the directory where all the database files are stored. This eliminates the necessity to provide a directory path for input_database, etc.</li>
 <li>New conf parameters exit_proto, room_proto, etc. allow one object of each type to be defined as the "prototype" for new objects of that type. When an object of that type is created, it copies the flags, parent, zone (if 'autozone' is off), and attributes of the prototype; the effect is similar to cloning.</li>
 <li>New conf parameters exit_attr_defaults, room_attr_defaults, etc. allow one object of each type to be defined as the repository for "attribute defaults" for many built-in attributes, such as attr/oattr pairs (@desc, @odesc, @succ, @osucc, etc.), @conformat, and @exitformat, as well as user attributes that have a global attribute flag of 'default'. These defaults override the attributes set on objects of that type (the local value of the attribute is passed to it as %0, for evaluation). This allows the global definition of formats for those attributes, without requiring a global parenting scheme or an unusual attribute naming scheme. Objects with the FREE flag ignore attribute defaults.</li>
@@ -241,8 +244,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>The new conf parameter visible_wizards (disabled by default) results in DARK wizards being hidden from WHO (and related things), but not being invisible and silent. This prevents accidental or deliberate spying by DARK wizards.</li>
 <li>The new conf parameter wildcard_match_limit restricts how extensive of a recursive search is performed when attempting to match a pattern.</li>
 </ul>
-<hr  />
-<p >CHANGES TO ATTRIBUTES</p>
+<h2><a class="anchor" id="autotoc_md20"></a>
+CHANGES TO ATTRIBUTES</h2>
 <ul>
 <li>@aconnect and @adisconnect attributes are triggered consistently on all connections and disconnections, with a reason in %0 and the player's resulting number of open connections in %1.</li>
 <li>Players can now specify multiple aliases for themselves (up to the conf parameter player_aliases_limit), via @alias, separating aliases with ';'. Players no longer inherit @alias from their parent (this never made sense, or worked properly, anyway).</li>
@@ -259,49 +262,20 @@ TinyMUSH 3.1 Changes</h1>
 <li>@filter, @infilter, and @listen do regular expression matches if set 'regexp'. They do not evaluate themselves before matching, if set 'no_parse'.</li>
 <li>A new attribute flag, 'rmatch', assigns the results of a $-command's wildcard-match, to named local registers, as well as to the stack. Based on an idea from KiliaFae.</li>
 </ul>
-<hr  />
-<p >CHANGES TO FLAGS AND POWERS</p>
+<h2><a class="anchor" id="autotoc_md21"></a>
+CHANGES TO FLAGS AND POWERS</h2>
 <ul>
 <li>An object with the new attr_read power is able to see attributes with the 'hidden' attribute flag, just like Wizards and Royalty can.</li>
 <li>An object with the new attr_write power is able to set attributes with the 'wizard' attribute flag, just like Wizards can.</li>
-<li>An object with the new link_any_home power can set the home of any object (<a class="el" href="">object anywhere), just like Wizards can.If a wizard connects while DARK, they are reminded that they are currently set DARK. Also, wizards are notified when they are set DARK due to idle-wizards-being-set-dark. A player must have the Hide power or equivalent in order to auto-dark.There is a new type of lock, the DarkLock, which controls whether or not a player sees an object as DARK. Based loosely on a patch by Malcolm Campbell (Calum).There is a new power, Cloak, which is God-settable. It enables an object which can listen (such a player or puppet) to be dark in the room contents and movement messages; previously, this was only true for listening objects both Dark and Wizard. Note that since wizard Dark is now affected by the visible_wizards config parameter, if that parameter is enabled, wizards will need this power in order to become invisible.The Expanded_Who power no longer grants the ability to see Dark players in WHO. (Previously those with the power could, but weren't able to see them in functions. Use the See_Hidden power to grant the ability to see Dark players.)The new ORPHAN flag, when set on an object, prevents the object from inheriting $-commands from its parents (just like objects in the master room do not inherit $-commands from their parents). This allows you to  a command object to a data object, without worrying about the overhead of scanning the data object for $-commands.The new PRESENCE flag, in conjunction with six new locks (HeardLock, HearsLock, KnownLock, KnowsLock, MovedLock, MovesLock) supports "altered
-  reality" realm states such as invisibility. </a></li>
-</ul>
-<p >CHANGES TO COMMANDS</p>
-<ul>
-<li>Some commands that would normally be queued can now be executed immediately, using the /now switch: @dolist/now (@iter), @force/now, @switch/now (@branch), @trigger/now (@call), @verb/now force() and trigger() now behave like @force/now and @trigger/now. The new conf parameters command_invocation_limit and command_recursion_limit are used to limit this behavior.</li>
-<li>A user-defined $-command is executed immediately if the attribute has the new Now attribute flag.</li>
-<li>Commands added via @addcommand are now run immediately. Also, these commands now respect an escaped-out ':', as well as the regexp and case attribute flags.</li>
-<li>A new switch, @addcommand/preserve, causes the text of an added command to be executed by the player, not by the specified object, unless the player is God (for security reasons).</li>
-<li>Custom comsys headers can now be specified for channels, via @channel/header. These headers can be listed via @clist/header. Also, the @channel command now interprets its arguments, and channel descriptions are passed through a sanity check.</li>
-<li>The new Spoof comsys flag, when set on a channel, replaces player names with their comtitles, instead of prepending the comtitle to the player name.</li>
-<li>@cpattr can copy multiple attributes at a time.</li>
-<li>Exits can now @destroy themselves.</li>
-<li>@doing (including @doing/header) now takes a /quiet switch.</li>
-<li>A new command, @floaters, shows floating rooms. Floating rooms are no longer reported by @dbck, and thus the FLOATING flag has been eliminated (since it's no longer needed to suppress @dbck spam).</li>
-<li>The new /permit switch to @hook allows the permissions for a built-in command to be defined via a user-defined function.</li>
-<li>Functions defined via @function can be listed via @function/list.</li>
-<li>Function permissions can be listed via '@list func_permissions'.</li>
-<li>Lock syntax is now always sanity-checked. Unbalanced parentheses within a lock are no longer permitted.</li>
-<li>The new @log command can be used to log arbitrary messages to the logfile(s).</li>
-<li>When you log in, you are warned if you are currently in the midst of writing a @mail message.</li>
-<li>A @mail recipient now receives only a single copy of a @mail message, even if he appears multiple times in the list of players the message is to.</li>
-<li>@mail now has real carbon-copy and blind-carbon-copy. Patch from Simon Bland.</li>
-<li>@pemit/list now obeys the same permission checks as @pemit, including obeying pemit_any as well as restricting use of the /contents switch.</li>
-<li>The @emit, @oemit, @femit, @fpose, @fsay, page, pose, and say commands now take a /noeval switch. (Analogous to the /noeval switch for @pemit.)</li>
-<li>The @pemit and @oemit commands now take a /speech switch, which makes the message subject to Presence checks.</li>
-<li>The new @redirect command can be used to redirect Trace, Puppet, and Verbose output from an object, to a player other than the object's owner. The REDIR_OK flag allows an object's output to be redirected by someone who does not control it, thus allowing non-Wizards to participate in mutual debugging sessions. Based on an idea from AlloyMUSH.</li>
-<li>The new @reference command creates named references ("nrefs"), which behave like aliases for dbrefs, in the form of '#_&lt;name&gt;'.</li>
-<li>When speech is formatted, with the exception of say and @fsay, there is now a grammatically-correct comma before "says". The new conf parameter say_uses_comma will insert the comma for say and @fsay, as well.</li>
-<li>If the new conf parameter say_uses_you is turned off, the say and @fsay commands will always show '&lt;name&gt; says' rather than 'You say' to the speaker. This is more convenient for environments where activity is often logged and shared.</li>
+<li>An object with the new link_any_home power can set the home of any object (<a class="el" href="">object anywhere), just like Wizards can.If a wizard connects while DARK, they are reminded that they are currently set DARK. Also, wizards are notified when they are set DARK due to idle-wizards-being-set-dark. A player must have the Hide power or equivalent in order to auto-dark.There is a new type of lock, the DarkLock, which controls whether or not a player sees an object as DARK. Based loosely on a patch by Malcolm Campbell (Calum).There is a new power, Cloak, which is God-settable. It enables an object which can listen (such a player or puppet) to be dark in the room contents and movement messages; previously, this was only true for listening objects both Dark and Wizard. Note that since wizard Dark is now affected by the visible_wizards config parameter, if that parameter is enabled, wizards will need this power in order to become invisible.The Expanded_Who power no longer grants the ability to see Dark players in WHO. (Previously those with the power could, but weren't able to see them in functions. Use the See_Hidden power to grant the ability to see Dark players.)The new ORPHAN flag, when set on an object, prevents the object from inheriting $-commands from its parents (just like objects in the master room do not inherit $-commands from their parents). This allows you to  a command object to a data object, without worrying about the overhead of scanning the data object for $-commands.The new PRESENCE flag, in conjunction with six new locks (HeardLock, HearsLock, KnownLock, KnowsLock, MovedLock, MovesLock) supports "altered reality" realm states such as invisibility.  autotoc_md22 CHANGES TO COMMANDSSome commands that would normally be queued can now be executed immediately, using the /now switch: /now (), /now, /now (), /now (), /now force() and trigger() now behave like /now and /now. The new conf parameters command_invocation_limit and command_recursion_limit are used to limit this behavior.A user-defined $-command is executed immediately if the attribute has the new Now attribute flag.Commands added via  are now run immediately. Also, these commands now respect an escaped-out ':', as well as the regexp and case attribute flags.A new switch, /preserve, causes the text of an added command to be executed by the player, not by the specified object, unless the player is God (for security reasons).Custom comsys headers can now be specified for channels, via /header. These headers can be listed via /header. Also, the  command now interprets its arguments, and channel descriptions are passed through a sanity check.The new Spoof comsys flag, when set on a channel, replaces player names with their comtitles, instead of prepending the comtitle to the player name. can copy multiple attributes at a time.Exits can now  themselves. (including /header) now takes a /quiet switch.A new command, , shows floating rooms. Floating rooms are no longer reported by , and thus the FLOATING flag has been eliminated (since it's no longer needed to suppress  spam).The new /permit switch to  allows the permissions for a built-in command to be defined via a user-defined function.Functions defined via  can be listed via /list.Function permissions can be listed via ' func_permissions'.Lock syntax is now always sanity-checked. Unbalanced parentheses within a lock are no longer permitted.The new  command can be used to log arbitrary messages to the logfile(s).When you log in, you are warned if you are currently in the midst of writing a  message.A  recipient now receives only a single copy of a  message, even if he appears multiple times in the list of players the message is to. now has real carbon-copy and blind-carbon-copy. Patch from Simon Bland./list now obeys the same permission checks as , including obeying pemit_any as well as restricting use of the /contents switch.The , , , , , page, pose, and say commands now take a /noeval switch. (Analogous to the /noeval switch for .)The  and  commands now take a /speech switch, which makes the message subject to Presence checks.The new  command can be used to redirect Trace, Puppet, and Verbose output from an object, to a player other than the object's owner. The REDIR_OK flag allows an object's output to be redirected by someone who does not control it, thus allowing non-Wizards to participate in mutual debugging sessions. Based on an idea from AlloyMUSH.The new  command creates named references ("nrefs"), which behave like aliases for dbrefs, in the form of '#_&lt;name&gt;'.When speech is formatted, with the exception of say and , there is now a grammatically-correct comma before "says". The new conf parameter say_uses_comma will insert the comma for say and , as well.If the new conf parameter say_uses_you is turned off, the say and  commands will always show '</a> says' rather than 'You say' to the speaker. This is more convenient for environments where activity is often logged and shared.</li>
 <li>A @dbck is automatically done before a @restart or normal @shutdown, so recycling cleanup is done first, thus avoiding inconsistencies upon startup.</li>
 <li>The @teleport command can now be used on exits. Players with the Open_Anywhere power can now drop or @teleport exits to any location.</li>
 <li>Specifying an object to @trigger is now optional; if no object is specified, the object defaults to 'me'.</li>
 <li>@verb now takes a no_name switch, which prevents the actor's name from being prepended to the default o-message.</li>
 <li>Attributes containing a $command or ^monitor can now be @trigger'd directly, as well as used as <em></em>-actions; everything before the first un-escaped ':' is ignored. Based on an idea from PennMUSH.</li>
 </ul>
-<hr  />
-<p >CHANGES TO FUNCTIONS</p>
+<h2><a class="anchor" id="autotoc_md23"></a>
+CHANGES TO FUNCTIONS</h2>
 <ul>
 <li>Multi-character input and output delimiters are now supported for most functions.</li>
 <li>There are additional global registers, qa-qz (based on an idea from PennMUSH). Furthermore, arbitrarily-named global registers can be defined on the fly (up to the conf parameter register_limit, per action list). setq() can now take multiple name-value pairs.</li>
@@ -369,8 +343,8 @@ TinyMUSH 3.1 Changes</h1>
 <li>Added @() function, which is like null(), but does not evaluate its argument.</li>
 <li>elock(), hasflag(), haspower(), and type() now all return #-1 NO MATCH when they can't find the object they're checking. Previously they returned #-1 NOT FOUND; for consistency's sake, they now behave like everything else.</li>
 </ul>
-<hr  />
-<p >OTHER CHANGES</p>
+<h2><a class="anchor" id="autotoc_md24"></a>
+OTHER CHANGES</h2>
 <ul>
 <li>Improvement in logging facilities.</li>
 <li>Dynamic allocation of string conf parameters.</li>
@@ -383,14 +357,14 @@ TinyMUSH 3.1 Changes</h1>
 <li>Fatal signals now produce cleaner coredumps, but two signals are required to generate a core file. Based on a patch from Amos Wetherbee.</li>
 <li>Many portability improvements, including support of UWIN, so TinyMUSH 3 can be run under Windows.</li>
 </ul>
-<hr  />
- <h1><a class="anchor" id="autotoc_md26"></a>
-TinyMUSH 3.0 Changes</h1>
+<h2><a class="anchor" id="autotoc_md25"></a>
+TinyMUSH 3.0 Changes</h2>
 <p >This change list details user-visible or otherwise highly significant changes in TinyMUSH 3.0. The bugfixes and general code reworking done in the course of merging TinyMUSH 2.2 and TinyMUX line-by-line, as well as throughout an extensive cleanup, bugfix, and performance-enhancement effort, is too extensive and complex to readily be listed here.</p>
 <p >Note that these are only changes that are completely new to both TinyMUSH 2.2 and TinyMUX; enhancements that were in one server but not the other have been listed in the conversion notes for both servers.</p>
-<p >TinyMUSH 3.0 beta 1 was released on September 27th, 1999. The "full", gamma release of TinyMUSH 3.0 is dated December 1st, 2000.</p>
-<hr  />
-<p >CHANGES TO THE BASE SERVER AND SERVER CONFIGURATION</p>
+<p >TinyMUSH 3.0 beta 1 was released on September 27th, 1999.</p>
+<p >The "full", gamma release of TinyMUSH 3.0 is dated December 1st, 2000.</p>
+<h3><a class="anchor" id="autotoc_md26"></a>
+CHANGES TO THE BASE SERVER AND SERVER CONFIGURATION</h3>
 <ul>
 <li>Build script allows "single-step" configuration, build, and installation.</li>
 <li>Backup and Restore scripts simplify backup maintenance. Archive script allows the archival of all the important files.</li>
@@ -401,11 +375,12 @@ TinyMUSH 3.0 Changes</h1>
 <li>There is now a generic indexed-textfile facility, allowing 'news'-like commands and their associated files to be specified via the 'helpfile' and 'raw_helpfile' parameters in the conf file.</li>
 <li>The readability of a configuration parameter can be set via the config_read_access param, and can be listed with @list config_read_perms. A config() function allows players to obtain the value of a configuration parameter that they have permission to read.</li>
 <li>The new game_log and divert_log parameters allow the logs for different types of events to be sent to different files. The new @logrotate command allows these logfiles to be rotated while the game is running. Logfiles are also rotated when a @restart is done. Old log are marked with a timestamp in seconds. The new Logclean script simplifies cleanup of old logfiles.</li>
-<li>Command-table additions (@addcommand and family) are supported (a cleaned-up version of the MUX implementation). Three new conf parameters:<ul>
+<li><p class="startli">Command-table additions (@addcommand and family) are supported (a cleaned-up version of the MUX implementation). Three new conf parameters:</p><ul>
 <li>addcommands_match_blindly (defaults to 'yes', controls whether or not a 'Huh?' is produced when a match on an @addcommand'd command doesn't actually match a $command)</li>
 <li>addcommands_obey_stop (defaults to 'no') controls whether or not an object with the Stop flag actually enforces a stop of match attempts when a match is found on an @addcomand for that object.</li>
-<li>addcommands_obey_uselocks (defaults to 'no') controls whether or not the uselock is checked when an added command is matched. (The defaults are MUX behavior; we suggest that the reverse of the defaults is more desirable, though.)</li>
+<li>addcommands_obey_uselocks (defaults to 'no') controls whether or not the uselock is checked when an added command is matched.</li>
 </ul>
+<p class="startli">(The defaults are MUX behavior; we suggest that the reverse of the defaults is more desirable, though.)</p>
 </li>
 <li>There are now command "hooks", implemented via the @hook command. Hooks are functions which execute before and/or after a built-in command; using side-effect functions, it is thus possible to customize a command without needing to write a full-blown @addcommand for it, or to execute things before/after every move through an exit.</li>
 <li>The term "zone" is now used for two things: MUX-style control-oriented zones, and 2.2-style local-master-rooms. Both types of zones default to on (local_master_rooms and have_zones conf parameters). MUX-style zones now use ControlLock rather than EnterLock, and only objects set CONTROL_OK may be controlled by a ZMO; this provides slightly better security. A new config parameter, 'autozone', controls whether or not objects are automatically zoned to their creator's ZMO at the time of their creation.</li>
@@ -420,8 +395,8 @@ TinyMUSH 3.0 Changes</h1>
 <li>The new conf parameter guest_starting_room allows Guest characters to start in a different default room than other characters.</li>
 <li>The MUSH manual is included in the distribution in helpfile format. (Thanks to Alierak and sTiLe.)</li>
 </ul>
-<hr  />
-<p >CHANGES TO FLAGS AND POWERS</p>
+<h3><a class="anchor" id="autotoc_md27"></a>
+CHANGES TO FLAGS AND POWERS</h3>
 <ul>
 <li>There are now ten user-defined flags, MARKER0 through MARKER9. The flag names can be set through the flag_name option. Commands, functions, and other things with configurable permissions can also be tied to these flags (for instance, 'function_access lwho marker0').</li>
 <li>The access permissions of flags, including user-defined flags, can be set via the flag_access config directive. In addition to permissions for wizards, wizards/royalty, and god, there is a restrict_player option (only settable by Wizards on players, but settable by mortals on other types of things), and a privileged option (only settable by God on players, but settable by non-robot players on other types of things, if they themselves have the flag).</li>
@@ -433,8 +408,8 @@ TinyMUSH 3.0 Changes</h1>
 <li>There is now a link_to_anything power, and an open_anywhere power, doing the obvious; these are handy for building-staff players.</li>
 <li>The see_hidden power now works. DARK is really two concepts, not showing up in the WHO list and not showing up in the contents list / moving silently. see_hidden allows seeing the former but does not affect the latter. These two concepts are now handled in a consistent manner within the server.</li>
 </ul>
-<hr  />
-<p >CHANGES TO COMMANDS</p>
+<h3><a class="anchor" id="autotoc_md28"></a>
+CHANGES TO COMMANDS</h3>
 <ul>
 <li>New /info switch to @attribute shows global attribute flags for a single attribute (similar to what '@list user_attributes' produces for all user-defined attributes).</li>
 <li>@chown now checks a ChownLock on CHOWN_OK objects.</li>
@@ -455,8 +430,8 @@ TinyMUSH 3.0 Changes</h1>
 <li>@ps now shows the attribute being waited upon, for non-Semaphore semaphore waits.</li>
 <li>@stats() and stats() now count the number of Going objects, as well as the number of objects of unknown (corrupted) type.</li>
 </ul>
-<hr  />
-<p >CHANGES TO FUNCTIONS</p>
+<h3><a class="anchor" id="autotoc_md29"></a>
+CHANGES TO FUNCTIONS</h3>
 <ul>
 <li>Functions for generic named variables, preserved in a manner similar to the stack (i.e., associated with a specific object, persistent until a restart is done), have been added. setx() sets a named variable, xvars() parses a list of strings into a list of variables, regparse() parses a regular expression into a list of variables, x() accesses a named variable (as does _<em>), lvars() lists named variables, clearvars() mass-unsets named variables, and let() does a Scheme-style code block (with localized variables).</em></li>
 <li><em>Functions for generic named data structures (data types), preserved in a manner similar to the stack, in a LISP-like style. structure() defines a structure, unstructure() undefines one, construct() and load() create instances of structures, destruct() removes an instance of a structure, unload() dumps the components of an instance, z() gets the component of an instance, modify() modifies a component of an instance, and lstructures() and linstances() list the names of structures and instances, respectively.</em></li>

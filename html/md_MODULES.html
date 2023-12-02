@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TinyMUSH: MODULES</title>
+<title>TinyMUSH: &lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,18 +70,17 @@ $(function() {
 
 </div><!-- top -->
 <div><div class="header">
-  <div class="headertitle"><div class="title">MODULES </div></div>
+  <div class="headertitle"><div class="title"><center>WARNING&lt;br&gt;<br  />
+THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE</center> </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p >*** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *** </p><hr  />
-<p> *** THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE *** </p><hr  />
-<p> *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***</p>
-<p >DYNAMICALLY LOADABLE MODULES</p>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md74"></a>
+DYNAMICALLY LOADABLE MODULES</h1>
 <p >TinyMUSH versions 3.1 and higher provide an interface for dynamically loadable modules. This allows server administrators to write and install "hardcode" that extends the functionality of the server, without creating undue difficulties with future upgrades.</p>
 <p >If you are writing a module, or you are installing a module written by someone else, please be forewarned: Modules muck directly with the server's internals. Using a module is, for all practical purposes, exactly like directly hacking the server. Thus, the safeguards that exist with softcode do not exist with modules; if modules contain bugs, they could cause severe issues with instability and database corruption.</p>
 <p >If you are writing a module, you should be fluent in reading and writing the C programming language. You should take the time to carefully study the existing server code. It's assumed you can read code to figure out things that aren't explicitly documented (which is just about everything not directly related to module interface). It's also assumed that you understand how dynamic loading works.</p>
-<hr  />
-<p >HOW TO BUILD A MODULE</p>
+<h1><a class="anchor" id="autotoc_md75"></a>
+HOW TO BUILD A MODULE</h1>
 <p >Every module must have a one-word name, such as "hello", or "space3d", referred to generically as '&lt;name&gt;' in the rest of this document. This is the prefix of the shared object files that are loaded by netmush.</p>
 <p >The source for your module should be placed in src/modules/&lt;name&gt;. The directory must use the same name as the shared object files your code produces. The shared objects for modules go in the game/modules directory.</p>
 <p >In your module's source directory you should have at least 5 files: configure.in, configure, Makefile.inc.in, .depend, and a C source file. Your best bet to get started is to make a copy of the 'hello' module source, substitute your own code for hello.c, and modify Makefile.inc.in appropriately. More advanced module code might make use of a customized configure script and Makefile, but that is beyond the scope of this document.</p>
@@ -90,249 +89,345 @@ $(function() {
 <p >Getting the server to load a module is simple. For each module, add the following line to your netmush.conf file: module &lt;name&gt;</p>
 <p >Modules can only be loaded when the game is started.</p>
 <p >CAUTION: If you are changing a dynamically-loaded module while the game is running, do NOT overwrite the old shared objects. The Makefile fragments we've included will move old .so files out of the way, but because they keep only one backup copy, they won't help if you rebuild your module twice before reloading it into the game. To be certain, you must go to game/modules/ and rename the .so file associated with your module.</p>
-<hr  />
-<p >MODULE NAMES AND SYMBOLS</p>
+<h1><a class="anchor" id="autotoc_md76"></a>
+MODULE NAMES AND SYMBOLS</h1>
 <p >Everything within a module should occupy a unique namespace. Functions names, non-static global variables, and other public entities should be named 'mod_&lt;name&gt;_&lt;regular name&gt;'. Macros and constants should be named MOD_&lt;name&gt;_&lt;regular name&gt;. This avoids potential namespace collisions.</p>
 <p >All modules should begin with the following line: #include "../../api.h"</p>
 <p >Including this file should get you access to the commonplace structures and functions in the MUSH server, as well as specific module API things. Please note that if you plan to use any symbol that's not defined within api.h or a file that is #include'd by api.h, you will either need to declare it extern within your module's .c file, or #include the appropriate main server .h file, as appropriate.</p>
 <p >CAUTION: Not all operating system's dlopen() calls properly check for unresolved references. On such a system, if you reference a symbol that your module cannot locate because it's not local and it wasn't declared as extern, the server will crash when it tries to resolve the symbol.</p>
-<hr  />
-<p >MODULE CONFIGURATION</p>
+<h1><a class="anchor" id="autotoc_md77"></a>
+MODULE CONFIGURATION</h1>
 <p >The module configuration should come next, since the rest of your module will use this information.</p>
 <p >You should declare a configuration structure for your module as follows:</p>
-<p >struct mod_&lt;name&gt;<em>confstorage { &lt;type1&gt; &lt;name1&gt;; &lt;typeN&gt; &lt;nameN&gt;; } mod</em>&lt;name&gt;_config;</p>
-<p >Then, you should declare a configuration table, as follows:</p>
-<p >CONF mod_&lt;name&gt;<em>conftable[] = { {(char *)"&lt;name&gt;_alias", cf_alias, &lt;set perms&gt;, &lt;read perms&gt;, (int *)&amp;mod</em>&lt;name&gt;_</p><table class="doxtable">
-</table>
-<p>htab, (long)"&lt;description&gt;"}, {(char *)"&lt;boolean option&gt;", cf_bool, &lt;set perms&gt;, &lt;read perms&gt;, &amp;mod&lt;name&gt;<em>config.&lt;bool_param&gt;, (long)"&lt;yes/no assertion&gt;"}, {(char *)"&lt;read-only param&gt;", cf_const, CA_STATIC, &lt;read perms&gt;, &amp;mod</em>&lt;name&gt;<em>config.&lt;const_param&gt;, (long)&lt;as appropriate&gt;}, {(char *)"&lt;integer param&gt;", cf_int, &lt;set perms&gt;, &lt;read perms&gt;, &amp;mod</em>&lt;name&gt;<em>config.&lt;int_param&gt;, &lt;maximum value or 0&gt;}, {(char *)"&lt;dbref param&gt;", cf_dbref, &lt;set perms&gt;, &lt;read perms&gt;, &amp;mod</em>&lt;name&gt;<em>config.&lt;dbref_param&gt;, &lt;default valid if invalid&gt;}, {(char *)"&lt;options flagword&gt;", cf_modify_bits, &amp;mod</em>&lt;name&gt;<em>config.&lt;options_param&gt;, (long)&lt;name table&gt;}, {(char *)"&lt;nametable&gt;_access", cf_ntab_access, &lt;set perms&gt;, CA_DISABLED, (int *)</p><table class="doxtable">
-</table>
-<p>(long)access_nametab}, {(char *)"&lt;word option&gt;", cf_option, &lt;set perms&gt;, &lt;read perms&gt;, &amp;mod</em>&lt;name&gt;<em>config.&lt;int_param&gt;, (long)&lt;option nametable&gt;}, {(char *)"&lt;whatever&gt;_flags", cf_set_flags, &lt;set perms&gt;, &lt;read perms&gt;, (int *)&amp;mod</em>&lt;name&gt;<em>config.&lt;flag_param&gt;, 0}, {(char *)"&lt;word&gt;", cf_string, &lt;set perms&gt;, &lt;read perms&gt;, (int *)&amp;mod</em>&lt;name&gt;_config.&lt;string_ptr&gt;, &lt;maximum length&gt;}, { NULL, NULL, 0, 0, NULL, 0}};</p>
-<p >Note that the table must always end with a null entry.</p>
+<div class="fragment"><div class="line">struct mod_&lt;name&gt;_confstorage {</div>
+<div class="line">    &lt;type1&gt; &lt;name1&gt;;</div>
+<div class="line">    &lt;typeN&gt; &lt;nameN&gt;;</div>
+<div class="line">} mod_&lt;name&gt;_config;</div>
+</div><!-- fragment --><p >Then, you should declare a configuration table, as follows:</p>
+<div class="fragment"><div class="line">CONF mod_&lt;name&gt;_conftable[] = {</div>
+<div class="line">{(char *)&quot;&lt;name&gt;_alias&quot;,    cf_alias,   &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    (int *)&amp;mod_&lt;name&gt;_&lt;table&gt;_htab,    (long)&quot;&lt;description&gt;&quot;},</div>
+<div class="line">{(char *)&quot;&lt;boolean option&gt;&quot;,    cf_bool,    &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;bool_param&gt;,    (long)&quot;&lt;yes/no assertion&gt;&quot;},</div>
+<div class="line">{(char *)&quot;&lt;read-only param&gt;&quot;,   cf_const,   CA_STATIC,  &lt;read perms&gt;,</div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;const_param&gt;,   (long)&lt;as appropriate&gt;},</div>
+<div class="line">{(char *)&quot;&lt;integer param&gt;&quot;, cf_int,     &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;int_param&gt;,     &lt;maximum value or 0&gt;},</div>
+<div class="line">{(char *)&quot;&lt;dbref param&gt;&quot;,   cf_dbref,   &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;dbref_param&gt;,   &lt;default valid if invalid&gt;},</div>
+<div class="line">{(char *)&quot;&lt;options flagword&gt;&quot;,  cf_modify_bits, </div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;options_param&gt;, (long)&lt;name table&gt;},</div>
+<div class="line">{(char *)&quot;&lt;nametable&gt;_access&quot;,  cf_ntab_access, &lt;set perms&gt;,    CA_DISABLED,</div>
+<div class="line">    (int *)&lt;table&gt;,             (long)access_nametab}, </div>
+<div class="line">{(char *)&quot;&lt;word option&gt;&quot;,   cf_option,  &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    &amp;mod_&lt;name&gt;_config.&lt;int_param&gt;,     (long)&lt;option nametable&gt;},</div>
+<div class="line">{(char *)&quot;&lt;whatever&gt;_flags&quot;,    cf_set_flags,   &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    (int *)&amp;mod_&lt;name&gt;_config.&lt;flag_param&gt;, 0},</div>
+<div class="line">{(char *)&quot;&lt;word&gt;&quot;,      cf_string,  &lt;set perms&gt;,    &lt;read perms&gt;,</div>
+<div class="line">    (int *)&amp;mod_&lt;name&gt;_config.&lt;string_ptr&gt;, &lt;maximum length&gt;},</div>
+<div class="line">{ NULL, NULL, 0, 0, NULL, 0}};</div>
+</div><!-- fragment --><p >Note that the table must always end with a null entry.</p>
 <p >In the conf file, any config parameters for a module must, of course, be placed after module directive loading that module.</p>
-<hr  />
-<p >MODULE INITIALIZATION</p>
+<h1><a class="anchor" id="autotoc_md78"></a>
+MODULE INITIALIZATION</h1>
 <p >The module initialization function goes LAST in your module's .c file. It should read as follows:</p>
-<p >void mod_&lt;name&gt;_init() { /* Initialize local configuration to default values. */</p>
-<p >mod_&lt;name&gt;<em>config.&lt;bool_param&gt; = &lt;0 or 1&gt;; mod</em>&lt;name&gt;<em>config.&lt;int_param&gt; = &lt;integer&gt;; mod</em>&lt;name&gt;<em>config.&lt;string_param&gt; = XSTRDUP(&lt;string&gt;, "mod&lt;/em&gt;&lt;name&gt;_init");</em></p>
-<p ><em> /* Load tables. */</em></p>
-<p ><em> register_hashtables(mod_&lt;name&gt;<em>hashtable, mod</em>&lt;name&gt;<em>nhashtable); register_commands(mod</em>&lt;name&gt;<em>cmdtable); register_prefix_cmds("&lt;prefix chars&gt;"); register_functions(mod</em>&lt;name&gt;_functable);</em></p>
-<p ><em> /* Any other initialization you need to do. */ }</em></p>
-<p ><em>If you have no hashtables, numeric hashtables, commands, and/or functions, you should still call these functions, with a parameter of NULL.</em></p>
-<p ><em>Note that there is no <a class="el" href="game_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main entry point for TinyMUSH">main()</a> function in a module.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>DEFINING COMMANDS</em></p>
-<p ><em>Commands fall into four categories of syntax:</em></p>
-<p ><em>TYPE SYNTAX PATTERN EXAMPLE NO_ARG &lt;cmd&gt; @stats ONE_ARG &lt;cmd&gt; &lt;argument&gt; think &lt;message&gt; TWO_ARG &lt;cmd&gt; &lt;arg 1&gt; = &lt;arg 2&gt; @parent &lt;object&gt; = &lt;parent&gt; TWO_ARG_ARGV &lt;cmd&gt; &lt;arg 1&gt; = &lt;arg 2a&gt;,&lt;...&gt; @trig &lt;obj&gt;/&lt;attr&gt; = &lt;p1&gt;,&lt;..&gt;</em></p>
-<p ><em>api.h defines a number of macros used to declare command handlers. These should be largely self-explanatory. The syntax of a command handler is:</em></p>
-<p ><em>DO_CMD_&lt;type&gt;(mod_&lt;name&gt;<em>do</em>&lt;handler name&gt;) { /* code goes here */ }</em></p>
-<p ><em>To write a handler for "@hello", a command with one argument in a module called "hello", for example, you would write:</em></p>
-<p ><em>DO_CMD_ONE_ARG(mod_hello_do_hello) { /* code goes here */ }</em></p>
-<p ><em>Once you have declared all of your handlers, you must place the handlers in the command table, which takes the following format:</em></p>
-<p ><em>CMDENT mod_&lt;name&gt;<em>cmdtable[] = { {(char *)"&lt;command1&gt;", &lt;switches&gt;, &lt;permissions&gt;, 0, CS</em>&lt;handler type&gt;, NULL, NULL, NULL, {&lt;handler function&gt;}}, {(char *)"&lt;command2&gt;", &lt;switches&gt;, &lt;permissions&gt;, 0, CS_&lt;handler type&gt;, NULL, NULL, NULL, {&lt;handler function&gt;}}, {(char *)NULL, NULL, 0, 0, 0, NULL, NULL, NULL, {NULL}}};</em></p>
-<p ><em>You can put as many commands into this table as you'd like. Make sure it ends with the "null" entry, though.</em></p>
-<p ><em>&lt;switches&gt; is the name of a switch table, described below.</em></p>
-<p ><em>&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD.</em></p>
-<p ><em>&lt;handler type&gt; is the same as the &lt;handler function&gt; type. For example, if you have DO_CMD_NO_ARG(mod_hello_do_heythere), then you will have CS_CMD_NO_ARG for &lt;handler type&gt;. Your &lt;handler function&gt; will be mod_hello_do_heythere.</em></p>
-<p ><em>A switch table takes the following form:</em></p>
-<p ><em>NAMETAB mod_&lt;name&gt;_&lt;command&gt;_sw[] = { {(char *)"switch1", &lt;letters&gt;, &lt;permissions&gt;, &lt;key&gt;}, {(char *)"switch2", &lt;letters&gt;, &lt;permissions&gt;, &lt;key&gt;}, { NULL, 0, 0, 0}};</em></p>
-<p ><em>A command can take an arbitrary number of switches, so each of these switch tables can be as large as you like. Make sure the switch table ends with the "null" entry, though.</em></p>
-<p ><em>&lt;letters&gt; is the number of unique letters of the switch that someone has to type. For example, if your switch name is "foobar", and &lt;letters&gt; is 3, then '/foo' is sufficient.</em></p>
-<p ><em>&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD, just like in the main command table.</em></p>
-<p ><em>&lt;key&gt; is a bit key; handler functions check 'key &amp; &lt;key&gt;' to modify their behavior based on any switches the user passed. If you want a command to be able to take multiple switches as the same time, you should add '|SW_MULTIPLE' to &lt;key&gt;.</em></p>
-<p ><em>Switch tables should be placed BEFORE the command table, in your module's .c file.</em></p>
-<p ><em>If your module defines any single-character prefix commands, you should enter them as CS_ONE_ARG|CS_LEADIN commands in your command table, and also pass the relevant prefix characters in a string to <a class="el" href="api_8c.html#a0f1ec855f01525a7c9f05ca64d2cbcdf" title="Register prefix commands.">register_prefix_cmds()</a>. See the "-" command in the included mail module for example.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>DEFINING FUNCTIONS</em></p>
-<p ><em>A function handler takes the following form:</em></p>
-<p ><em>FUNCTION(mod_&lt;name&gt;<em>fun</em>&lt;function name&gt;) { /* code goes here */ }</em></p>
-<p ><em>See functions.h for what this macro'd function prototype expands to. See the server's fun*.c files for some examples of how to write functions.</em></p>
-<p ><em>Once you have declared all of your function handlers, you must place them in the function table, which takes the following format:</em></p>
-<p ><em>FUN mod_&lt;name&gt;_functable[] = { {"FUNCTION1", &lt;handler&gt;, &lt;args&gt;, &lt;flags&gt;, &lt;permissions&gt;}, {"FUNCTION2", &lt;handler&gt;, &lt;args&gt;, &lt;flags&gt;, &lt;permissions&gt;}, {NULL, NULL, 0, 0, 0}};</em></p>
-<p ><em>You can put as many functions into this table as you'd like. Make sure it ends with the "null" entry, though.</em></p>
-<p ><em>&lt;handler&gt; is the name of the function handler (the name of the C function that's handling the function call: mod_&lt;name&gt;_&lt;fun&gt;_&lt;whatever&gt;).</em></p>
-<p ><em>&lt;args&gt; is the number of arguments that the function should take. If this is variable, use 0.</em></p>
-<p ><em>&lt;flags&gt; are any special function-handling flags, OR'd ('|') together. Functions taking a variable number of arguments get a FN_VARARGS flag. Functions whose arguments should be passed unevaluated get a FN_NO_EVAL flag.</em></p>
-<p ><em>&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD, just like in the main command table.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>DEFINING HASH TABLES</em></p>
-<p ><em>HASHTAB mod_&lt;name&gt;_&lt;htabname1&gt;; HASHTAB mod_&lt;name&gt;_&lt;htabnameN&gt;;</em></p>
-<p ><em>MODHASHES mod_&lt;name&gt;<em>hashtable[] = { { "htabname1", &amp;mod</em>&lt;name&gt;_&lt;htabname1&gt;, &lt;size factor&gt;, &lt;minimum&gt;}, { "htabnameN", &amp;mod_&lt;name&gt;_&lt;htabnameN&gt;, &lt;size factor&gt;, &lt;minimum&gt;}, { NULL, NULL, 0, 0}};</em></p>
-<p ><em>NHSHTAB mod_&lt;name&gt;_&lt;nhtabname1&gt;; NHSHTAB mod_&lt;name&gt;_&lt;nhtabnameN&gt;;</em></p>
-<p ><em>MODNHASHES mod_&lt;name&gt;<em>nhashtable[] = { { "nhtabname1", &amp;mod</em>&lt;name&gt;_&lt;nhtabname1&gt;, &lt;size factor&gt;, &lt;minimum&gt;}, { "nhtabnameN", &amp;mod_&lt;name&gt;_&lt;nhtabnameN&gt;, &lt;size factor&gt;, &lt;minimum&gt;}, { NULL, NULL, 0, 0}};</em></p>
-<p ><em>The initial size factor will be multiplied by the hash factor. The minimum is the absolute smallest size of the hash table, which must be a power of 2.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>EXTENDING THE DATABASE</em></p>
-<p ><em>Though modules have access to the db structure, modules cannot add their own data types to that db structure.</em></p>
-<p ><em>Thus, if you need to store a piece of data for every object in the database, your module needs to have its own parallel db structure, as follows:</em></p>
-<p ><em>typedef struct mod_&lt;name&gt;<em>dbobj MOD</em>&lt;name&gt;<em>OBJ; struct mod</em>&lt;name&gt;_dbobj { &lt;type1&gt; &lt;name1&gt;; &lt;type2&gt; &lt;nameN&gt;; };</em></p>
-<p ><em>MOD_&lt;name&gt;<em>OBJ *mod</em>&lt;name&gt;_db = NULL;</em></p>
-<p ><em>#define OBJ_INIT_MODULE(x) \ mod_&lt;name&gt;<em>db[x].&lt;name1&gt; = &lt;value1&gt;; \ mod</em>&lt;name&gt;_db[x].&lt;nameN&gt; = &lt;valueN&gt;;</em></p>
-<p ><em>void mod_&lt;name&gt;<em>db_grow(newsize) int newsize; { DB_GROW_MODULE(mod</em>&lt;name&gt;<em>db, newsize, newtop, MOD</em>&lt;name&gt;_OBJ); }</em></p>
-<p ><em>The above will automatically take care of extending and initializing your private module database as needed. Initialization of newly-created objects should be taken care of by creating a handler for create_obj() (see below).</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>MODULE API FUNCTIONS</em></p>
-<p ><em>The following are "hooks" into the server. If you place these functions in your module's .c file, they will automatically be called at the appropriate time.</em></p>
-<p ><em>void mod_&lt;name&gt;_create_obj(dbref player, dbref obj) Run when an object is created, after other initialization is done. Passes the creating player and the object dbref created.</em></p>
-<p ><em>void mod_&lt;name&gt;_destroy_obj(dbref player, dbref obj) Run when an object is destroyed, before the player is compensated for its destruction, is notified of its destruction, and the object is wiped out. Passes the destroying player and the object dbref being destroyed. Note that the destroying player may be NOTHING.</em></p>
-<p ><em>void mod_&lt;name&gt;_create_player(dbref creator, dbref player,
-                int isrobot, int isguest) Run when a player is created, after create_obj() has been run.</em></p>
-<p ><em>void mod_&lt;name&gt;_destroy_player(dbref player, dbref victim) Run after the player basics have been cleared out, but before destroy_obj() has been run.</em></p>
-<p ><em>void mod_&lt;name&gt;_announce_connect(dbref player, const char *reason, int num) Run when a player connects, before the player looks at his current location, but after all other connect stuff has been executed. 'reason' is the type of connection - guest, create, connect, or cd. 'num' is the player's resulting number of open connections.</em></p>
-<p ><em>void mod_&lt;name&gt;_announce_disconnect(dbref player, const char *reason, int num) Run when a player disconnects, after all other disconnect stuff has been executed, but before the descriptor has been deleted. 'reason' describes the disconnection (see 'help Conn Reasons'). 'num' is the player's resulting number of open connections.</em></p>
-<p ><em>void mod_&lt;name&gt;_examine(dbref player, dbref cause, dbref thing, 
-            int control, int key) Run when an object is examined, after the basic object information is displayed but before attributes are displayed. 'control' is 1 if the player can examine thing, and 0 if not. 'key' is the key originally passed to the examine command.</em></p>
-<p ><em>void mod_&lt;name&gt;_make_minimal(void) Run if making a minimal database is specified.</em></p>
-<p ><em>void mod_&lt;name&gt;_cleanup_startup(void) Run after the restart database is read, but before @startups on objects are done.</em></p>
-<p ><em>void mod_&lt;name&gt;_do_second(void) Runs once a second.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>MODULE API FUNCTION: process_command</em></p>
-<p ><em>int mod_&lt;name&gt;_process_command(dbref player, dbref cause, int interactive,
-                char *command, char *args[], int nargs)</em></p>
-<p ><em> Run when any object tries to execute a command, before any built-in commands or softcoded commands are checked.</em></p>
-<p ><em> Returns a number: 0 on failure, something greater than 0 on success, and something less than 0 on failure that should stop further matching of commands.</em></p>
-<p ><em> This handler tries to run on each module in sequence. If the handler is not defined for a module, or 0 is returned, it tries the next module. A return of a number other than 0 will result in not running this handler on the other modules, this time around.</em></p>
-<p ><em> The calling server function considers a result greater than 0 to be a successful command match, and will consider the command taken care of.</em></p>
-<p ><em> The 'player' and 'cause' parameters are the dbrefs of the objects taking the action, and which caused the action (the enactor): the equivalent of %! and %#, respectively.</em></p>
-<p ><em> The 'interactive' parameter is passed as 1 if the command was entered from the keyboard (i.e., received over the network), and 0 otherwise.</em></p>
-<p ><em> The 'command' parameter is a pointer to the command entered, space-compressed if space compression is turned on. This string SHOULD NOT be destructively modified.</em></p>
-<p ><em> The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>MODULE API FUNCTION: process_no_match</em></p>
-<p ><em>int mod_&lt;name&gt;_process_no_match(dbref player, dbref cause, int interactive,
-                char *eval_cmd, char *raw_cmd,
-                char *args[], int nargs)</em></p>
-<p ><em> Run when any object tries to execute a command, after all built-in and softcoded commands are checked. This occurs right before a "Huh?" message is given.</em></p>
-<p ><em> Returns a number: 0 on failure, something greater than 0 on success, and something less than 0 on failure that should stop further matching of commands.</em></p>
-<p ><em> This handler tries to run on each module in sequence, most recently-loaded module first, to least recently-loaded module last. If the handler is not defined for a module, or 0 is returned, it tries the next module. A return of a number other than 0 will result in not running this handler on the other modules, this time around.</em></p>
-<p ><em> The calling server function considers a non-zero result to be a successful command match, and will consider the command taken care of. (Note that this is different from process_command, which considers only results greater than zero to be successful.)</em></p>
-<p ><em> The 'player' and 'cause' parameters are the dbrefs of the objects taking the action, and which caused the action (the enactor): the equivalent of %! and %#, respectively.</em></p>
-<p ><em> The 'interactive' parameter is passed as 1 if the command was entered from the keyboard (i.e., received over the network), and 0 otherwise.</em></p>
-<p ><em> The 'eval_cmd' parameter is a pointer to the command, after it has gone through percent-substitutions and other evaluations.</em></p>
-<p ><em> The 'raw_cmd' parameter is a pointer to the command entered, space-compressed if space compression is turned on, but not otherwise evaluated.</em></p>
-<p ><em> The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>MODULE API FUNCTION: did_it</em></p>
-<p ><em>int mod_&lt;name&gt;_did_it(dbref player, dbref thing, dbref master,
-              int what, const char *def,
-              int owhat, const char *odef,
-              int awhat, int ctrl_flags, char *args[], int nargs,
-              int msg_key)</em></p>
-<p ><em> Run when did_it() is called, before the server actually does the notification/others-notification/action.</em></p>
-<p ><em> The handler tries to run this on each module in sequence, most recently-moduled first, to least recently-loaded module last. If a module returns 0, the handler goes on to the next module. If the module returns something other than 0, the handler does not try any further modules. If the module returns a positive number, the main body of the server's own did_it() function is not executed. If the module returns a negative number, the main body of the server's own did_it() function is still executed.</em></p>
-<p ><em> player is the object doing something, and thing is its "victim". player is the object that would normally see the &lt;what&gt; message (@desc, @move, @succ, etc.); thing is the object that would normally execute the &lt;awhat&gt; action (@adesc, @amove, @asucc, etc.)</em></p>
-<p ><em> what, owhat, and awhat are attribute numbers. def and odef are the default strings for what and owhat.</em></p>
-<p ><em> ctrl_flags is a bitmask of VERB_NOW and VERB_NONAME. The VERB_NOW flag is usually the result of passing the /now switch, and normally affects the queueing of actions. The VERB_NONAME flag normally prevents the actor's name from being prepended to the odef message.</em></p>
-<p ><em> args and nargs are the stack and number of items on the stack.</em></p>
-<p ><em> msg_key is a bitmask of MSG_SPEECH, MSG_MOVE, and MSG_PRESENCE, allowing special processing related to the PRESENCE flag.</em></p>
-<p ><em> This function can be used to react to a large number of server actions, by switching on &lt;what&gt;. For example, all commands that move objects eventually call did_it() with &lt;what&gt; of A_MOVE. If you want to intercept all movement, just check for 'what == A_MOVE' and act accordingly in this function.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>STORING DATA IN FLATFILES</em></p>
-<p ><em>This is the first and easiest of three different methods available to a module for storing module-specific data.</em></p>
-<p ><em>Using this method, the module reads its data from a pure ASCII text flatfile on startup, via a module API hook, as follows:</em></p>
-<p ><em>void mod_&lt;name&gt;_load_database(FILE *f) This loads the flatfile specific to the module. It is called at start time, immediately after the main MUSH database and any module GDBM data (see below) is loaded. This function is passed a single input parameter, an open, read-only file pointer for the module flatfile.</em></p>
-<p ><em>Every time the server checkpoints ("database dump" time), it dumps a flatfile containing that data, via the following module API hook:</em></p>
-<p ><em>void mod_&lt;name&gt;_dump_database(FILE *f) This dumps a flat text database specific to the module. It is called at checkpoint time. This function is passed a single input parameter, an open, write-only file pointer for the module flatfile.</em></p>
-<p ><em>The module flatfile is named 'mod_&lt;name&gt;.db' and is stored in the directory specified by the conf parameter database_home. This database file should NEVER be opened or closed directly.</em></p>
-<p ><em>Only printable ASCII data should be stored in this file. You, the module author, are responsible for versioning, the format of this file, etc. Useful functions for reading and writing flatfiles can be found in the core server's <a class="el" href="db__rw_8c.html" title="flatfile implementation">db_rw.c</a> source.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>STORING DATA IN GDBM WITH NO CACHING</em></p>
-<p ><em>This is the second of three different methods available to a module for storing module-specific data.</em></p>
-<p ><em>This method directly stores data within the MUSH's general GDBM database. GDBM is a 'random-access' database that allows you to store and fetch individual pieces of data at a time. This is identical to how the MUSH stores its structure data and requires your module to be able to dump or convert a printable ASCII flatfile when database conversion (backups to and restores from flatfile) is run.</em></p>
-<p ><em>Since the MUSH stores many different types of data in GDBM, it has to have a way to keep these pieces of data seperate. It does so by allocating each subsystem a 'dbtype' number. A block of numbers is already reserved for internal MUSH data, and the rest are available for use by modules. Each subsystem specifies this number when it stores data. Before you may read or write to GDBM, your module must obtain a dbtype number with the register_dbtype function:</em></p>
-<p ><em>unsigned int <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype(char *modname)</a> Assigns a new dbtype ID number for a certain module name. If a dbtype ID has already been assigned for that module, it will be returned.</em></p>
-<p ><em>There are four API hooks provided for reading data needed at startup and checkpointing to GDBM as well as reading and writing flatfiles:</em></p>
-<p ><em>void mod_&lt;name&gt;_db_read(void) Load any module-specific data from GDBM at startup. Called during MUSH startup, and during the backup conversion process before <a class="el" href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4" title="Write a db to Flat File.">db_write_flatfile()</a> is called. Use this to load data which must be present when the MUSH starts.</em></p>
-<p ><em>void mod_&lt;name&gt;_db_write(void) Write any module-specific data to GDBM. Called during MUSH checkpoints, at shutdown, and during the restoral conversion process after <a class="el" href="db__rw_8c.html#a850d602c8ad86e2de86992986370a667" title="Read a flatfile.">db_read_flatfile()</a> is called.</em></p>
-<p ><em>void mod_&lt;name&gt;_db_read_flatfile(FILE *f) </p><pre class="fragment">Load and convert flat text database specific to module, called
-during the restoral db conversion process (the 'Restore' script).
-This is identical to the 'load_database' hook except it is ONLY
-called during database conversion.
-</pre><p> void mod_&lt;name&gt;_db_write_flatfile(FILE *f) Dump flat text database specific to module, called during the backup db conversion process (the 'Backup' script). This is identical to the 'dump_database' hook except it is ONLY called during database conversion and flatfile generation (IE, @dump/flatfile).</em></p>
-<p ><em>It is important to note that <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a> must be called at the beginning of each of these four functions since module initialization DOES NOT TAKE PLACE when your module is loaded during database conversion, and your module cannot know which of these functions will be called first. If your module does not use db_read or db_write, you should call register_dbtype during your cleanup_startup hook to make sure it gets called before anything else. You cannot call register_dbtype in your init hook because init is called before the database is opened.</em></p>
-<p ><em>A typical MUSH server run will look like this:</em></p>
-<p ><em></p><ul>
-<li>MUSH startup</li>
-<li>Module initialization: mod_&lt;name&gt;<em>init()</em></li>
-<li><em>Module executes db_read: mod</em>&lt;name&gt;<em><a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a> <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a></em></li>
-<li><em>Module reads data from GDBM</em></li>
-<li><em>MUSH runs...</em></li>
-<li><em>MUSH and module dump/checkpoint: mod</em>&lt;name&gt;<em><a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a></em></li>
-<li><em>MUSH runs...</em></li>
-<li><em>MUSH and module dump/checkpoint: mod</em>&lt;name&gt;<em><a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a></em></li>
-<li><em>MUSH runs...</em></li>
-<li><em>MUSH shutdown: mod</em>&lt;name&gt;_db_write()</li>
-</ul>
-<p></em></p>
-<p ><em>A backup database process will look like this:</em></p>
-<p ><em></p><ul>
-<li>Database conversion begins</li>
-<li>Module executes db_read: mod_&lt;name&gt;<em><a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a> <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a></em></li>
-<li><em>Module reads data from GDBM</em></li>
-<li><em>Module writes flatfile: mod</em>&lt;name&gt;_db_write_flatfile()</li>
-<li>Database conversion ends</li>
-</ul>
-<p></em></p>
-<p ><em>A restoral process will look like this:</em></p>
-<p ><em></p><ul>
-<li>Database conversion begins</li>
-<li>Module reads flatfile: mod_&lt;name&gt;<em><a class="el" href="db__rw_8c.html#a850d602c8ad86e2de86992986370a667" title="Read a flatfile.">db_read_flatfile()</a></em></li>
-<li><em>Module executes db_write: mod</em>&lt;name&gt;_db_write() <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a></li>
-<li>Module writes data to GDBM</li>
-<li>Database conversion ends</li>
-</ul>
-<p></em></p>
-<p ><em>Reading and writing to GDBM only during <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a> and <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> doesn't offer much advantage over just using flatfiles. However, the advantage of GDBM is that you may read or write any piece of data at any time instead of having to do it all at once. So while the MUSH is running, if your module's data is modified you may choose to write just that data immediately or wait until <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> to write it. In any case, you must make sure that all of your module's data is stored when <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> is finished to ensure consistency when the MUSH is shut down.</em></p>
-<p ><em>Note that during the database conversion process you may have your module read a piece of data from GDBM and write it immediately to a flatfile, or vice versa.</em></p>
-<p ><em>So far we've told you when you can read and write, but not how. Another advantage of GDBM is that you are not limited to printable ASCII data, but that you can store binary data of arbitrary length.</em></p>
-<p ><em>DBData is a structure used by the database API which contains two items: dptr (a pointer to a piece of data) and dsize (the length of that data). DBData is used by the API interface both for search keys and returned or stored data. DBData is declared thusly: </p><pre class="fragment">typedef struct {
-    void *dptr;
-    int dsize;
-} DBData;
-</pre><p> There are three functions available for reading, writing, and deleting data in the database:</em></p>
-<p ><em>DBData db_get(DBData key, unsigned int dbtype) Retrieves data from GDBM.</em></p>
-<p ><em> 'key' is a DBData structure that contains a search key of binary data as well as the length of that data.</em></p>
-<p ><em> 'dbtype' should be the dbtype ID registered for your module by <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a>.</em></p>
-<p ><em> db_get returns a DBData structure which contains the returned data (or NULL if the key cannot be found in the database) as well as the length of that data. It is <em>your</em> responsibility to free() the data returned by db_get.</em></p>
-<p ><em>int db_put(DBData key, DBData data, unsigned int dbtype) Stores or replaces data in GDBM.</em></p>
-<p ><em> 'key' is a DBData structure that contains a search key of binary data as well as the length of that data.</em></p>
-<p ><em> 'data' is a DBData structure which contains the binary data to be stored and the length of that data.</em></p>
-<p ><em> 'dbtype' should be the dbtype ID registered for your module by <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a>.</em></p>
-<p ><em> db_put returns 0 on success and 1 on failure.</em></p>
-<p ><em>int db_del(DBData key, unsigned int dbtype) Deletes data from GDBM.</em></p>
-<p ><em> 'key' is a DBData structure that contains a search key of binary data as well as the length of that data.</em></p>
-<p ><em> 'dbtype' should be the dbtype ID registered for your module by <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a>.</em></p>
-<p ><em> db_del returns 0 on success and 1 on failure.</em></p>
-<p ><em>Your search key may be a string, a number, or binary data of any length. For example, if you want your search key to be three integers, you will create a buffer of length 'sizeof(int)*3' and copy your three integers into it. If you want it to be a null-terminated string, make sure your key length is 'strlen(string) + 1'.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>STORING DATA IN GDBM WITH CACHING</em></p>
-<p ><em>This is the third of three different methods available to a module for storing module-specific data. It is fundamentally similar to the second method, except data is cached in memory.</em></p>
-<p ><em>In MUSH, the cache is essentially a front-end to GDBM, and interacting with it is identical. In fact, the function calls match almost exactly. Instead of db_get(), db_put(), and db_del(), you use cache_get(), cache_put(), and cache_del(). The parameters to the cache functions are the same ones you pass to their GDBM counterparts. The cache acts as a 'buffer', making sure the most often accessed data is already in memory, and making writes more efficient by buffering them until a number of entries may be written at once. You don't need to worry about how the cache operates; it will make sure everything gets read and written properly.</em></p>
-<p ><em>Note that you cannot pass a non-malloc()ed piece of memory to cache_put. It must have been malloc()ed, and it will become the cache subsystem's responsibility to free it.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>WHICH METHOD OF STORING DATA TO USE</em></p>
-<p ><em>If the amount of data your module works with is small and fits easily into memory, use simple flatfiles with load_database() and dump_database() hooks. You do not need to worry about database conversion since all of your data is always in a flatfile!</em></p>
-<p ><em>If you need random access to your data, consider using GDBM. The main server uses GDBM to store everything, from object structures to attribute names. Since it can write individual entries, it only has to write entries that have changed instead of writing them all, thus making the process more efficient. It also allows you to easily store binary data.</em></p>
-<p ><em>If your module with large pieces of data that are needed infrequently, considering using the cache. MUSH attributes are stored using the cache, and data like mail messages or large pieces of text are perfect candidates for it.</em></p>
-<p ><em>As an example, the main server does not cache object structures or attribute names. It reads these completely in at startup in its own <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>, and writes all changes out during every <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a>. It does, however, cache attribute text, and may read or write attributes using the cache at any time while the MUSH process is running. A similar process takes place during database conversion. When it is creating a flatfile from GDBM, MUSH will first load all object structures and attribute names into memory during <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>. When <a class="el" href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4" title="Write a db to Flat File.">db_write_flatfile()</a> executes, it will write a printable ASCII text representation of object structures and attribute names to the flatfile, and it will fetch attributes from GDBM and write them to the flatfile one at a time. At no time does it have all attributes in memory, and it does not even use the cache during database conversion, instead using the direct to GDBM routines.</em></p>
-<p ><em>IMPORTANT NOTE: If you use GDBM, it is your responsibility to clean up your entries if they are no longer used. Since GDBM is not a relational database (you cannot do a wildcard search, you <em>must</em> search for an exact key), you must keep track of every entry that you write to it. Look at the code in <a class="el" href="db__rw_8c.html" title="flatfile implementation">db_rw.c</a> that writes attribute names for an example of how to do this. If your module writes entries to GDBM and never deletes them, they will clog the database until it is converted to flatfile and back, dropping the unused entries in the process.</em></p>
-<p ><em></p><hr  />
-<p></em></p>
-<p ><em>GETTING NOTIFIED WHEN DATA CHANGES</em></p>
-<p ><em>You can have your module notified when a key is stored or deleted in the cache using the following API hooks:</em></p>
-<p ><em>int cache_put_notify(DBData key, unsigned int dbtype) This hook is called when a piece of data is added to or changed in the MUSH cache. Your module should check for an applicable data type before using the key.</em></p>
-<p ><em>int cache_put_notify(DBData key, unsigned int dbtype) This hook is called when a piece of data is deleted from the MUSH cache. Your module should check for an applicable data type before using the key. </em></p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_init()</div>
+<div class="line">{</div>
+<div class="line">    /* Initialize local configuration to default values. */ </div>
+<div class="line"> </div>
+<div class="line">    mod_&lt;name&gt;_config.&lt;bool_param&gt; = &lt;0 or 1&gt;; </div>
+<div class="line">    mod_&lt;name&gt;_config.&lt;int_param&gt; = &lt;integer&gt;;</div>
+<div class="line">    mod_&lt;name&gt;_config.&lt;string_param&gt; = XSTRDUP(&lt;string&gt;,</div>
+<div class="line">                           &quot;mod_&lt;name&gt;_init&quot;);</div>
+<div class="line"> </div>
+<div class="line">    /* Load tables. */</div>
+<div class="line"> </div>
+<div class="line">    register_hashtables(mod_&lt;name&gt;_hashtable, mod_&lt;name&gt;_nhashtable);</div>
+<div class="line">    register_commands(mod_&lt;name&gt;_cmdtable);</div>
+<div class="line">    register_prefix_cmds(&quot;&lt;prefix chars&gt;&quot;);</div>
+<div class="line">    register_functions(mod_&lt;name&gt;_functable);</div>
+<div class="line"> </div>
+<div class="line">    /* Any other initialization you need to do. */</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >If you have no hashtables, numeric hashtables, commands, and/or functions, you should still call these functions, with a parameter of NULL.</p>
+<p >Note that there is no <a class="el" href="game_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main entry point for TinyMUSH">main()</a> function in a module.</p>
+<h1><a class="anchor" id="autotoc_md79"></a>
+DEFINING COMMANDS</h1>
+<p >Commands fall into four categories of syntax:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">TYPE   </th><th class="markdownTableHeadNone">SYNTAX PATTERN   </th><th class="markdownTableHeadNone">EXAMPLE    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">NO_ARG   </td><td class="markdownTableBodyNone">&lt;cmd&gt;   </td><td class="markdownTableBodyNone">@stats    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">ONE_ARG   </td><td class="markdownTableBodyNone">&lt;cmd&gt; &lt;argument&gt;   </td><td class="markdownTableBodyNone">think &lt;message&gt;    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">TWO_ARG   </td><td class="markdownTableBodyNone">&lt;cmd&gt; &lt;arg 1&gt; = &lt;arg 2&gt;   </td><td class="markdownTableBodyNone">@parent &lt;object&gt; = &lt;parent&gt;    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">TWO_ARG_ARGV   </td><td class="markdownTableBodyNone">&lt;cmd&gt; &lt;arg 1&gt; = &lt;arg 2a&gt;,&lt;...&gt;   </td><td class="markdownTableBodyNone">@trig &lt;obj&gt;/&lt;attr&gt; = &lt;p1&gt;,&lt;..&gt;   </td></tr>
+</table>
+<p >api.h defines a number of macros used to declare command handlers. These should be largely self-explanatory. The syntax of a command handler is:</p>
+<div class="fragment"><div class="line">DO_CMD_&lt;type&gt;(mod_&lt;name&gt;_do_&lt;handler name&gt;)</div>
+<div class="line">{</div>
+<div class="line">    /* code goes here */</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >To write a handler for "@hello", a command with one argument in a module called "hello", for example, you would write:</p>
+<div class="fragment"><div class="line">DO_CMD_ONE_ARG(mod_hello_do_hello)</div>
+<div class="line">{</div>
+<div class="line">    /* code goes here */</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >Once you have declared all of your handlers, you must place the handlers in the command table, which takes the following format:</p>
+<div class="fragment"><div class="line">CMDENT mod_&lt;name&gt;_cmdtable[] = {</div>
+<div class="line">{(char *)&quot;&lt;command1&gt;&quot;,      &lt;switches&gt;, &lt;permissions&gt;,</div>
+<div class="line">    0,      CS_&lt;handler type&gt;,</div>
+<div class="line">    NULL,       NULL,   NULL,       {&lt;handler function&gt;}},</div>
+<div class="line">{(char *)&quot;&lt;command2&gt;&quot;,      &lt;switches&gt;, &lt;permissions&gt;,</div>
+<div class="line">    0,      CS_&lt;handler type&gt;,</div>
+<div class="line">    NULL,       NULL,   NULL,       {&lt;handler function&gt;}},</div>
+<div class="line">{(char *)NULL,          NULL,       0,</div>
+<div class="line">    0,      0,</div>
+<div class="line">    NULL,       NULL,   NULL,       {NULL}}};</div>
+</div><!-- fragment --><p >You can put as many commands into this table as you'd like. Make sure it ends with the "null" entry, though.</p>
+<p >&lt;switches&gt; is the name of a switch table, described below.</p>
+<p >&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD.</p>
+<p >&lt;handler type&gt; is the same as the &lt;handler function&gt; type. For example, if you have DO_CMD_NO_ARG(mod_hello_do_heythere), then you will have CS_CMD_NO_ARG for &lt;handler type&gt;. Your &lt;handler function&gt; will be mod_hello_do_heythere.</p>
+<p >A switch table takes the following form:</p>
+<div class="fragment"><div class="line">NAMETAB mod_&lt;name&gt;_&lt;command&gt;_sw[] = {</div>
+<div class="line">{(char *)&quot;switch1&quot;, &lt;letters&gt;,  &lt;permissions&gt;,  &lt;key&gt;},</div>
+<div class="line">{(char *)&quot;switch2&quot;, &lt;letters&gt;,  &lt;permissions&gt;,  &lt;key&gt;},</div>
+<div class="line">{ NULL,         0,      0,      0}};</div>
+</div><!-- fragment --><p >A command can take an arbitrary number of switches, so each of these switch tables can be as large as you like. Make sure the switch table ends with the "null" entry, though.</p>
+<p >&lt;letters&gt; is the number of unique letters of the switch that someone has to type. For example, if your switch name is "foobar", and &lt;letters&gt; is 3, then '/foo' is sufficient.</p>
+<p >&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD, just like in the main command table.</p>
+<p >&lt;key&gt; is a bit key; handler functions check 'key &amp; &lt;key&gt;' to modify their behavior based on any switches the user passed. If you want a command to be able to take multiple switches as the same time, you should add '|SW_MULTIPLE' to &lt;key&gt;.</p>
+<p >Switch tables should be placed BEFORE the command table, in your module's .c file.</p>
+<p >If your module defines any single-character prefix commands, you should enter them as CS_ONE_ARG|CS_LEADIN commands in your command table, and also pass the relevant prefix characters in a string to <a class="el" href="api_8c.html#a0f1ec855f01525a7c9f05ca64d2cbcdf" title="Register prefix commands.">register_prefix_cmds()</a>. See the "-" command in the included mail module for example.</p>
+<hr  />
+<p >DEFINING FUNCTIONS</p>
+<p >A function handler takes the following form:</p>
+<div class="fragment"><div class="line">FUNCTION(mod_&lt;name&gt;_fun_&lt;function name&gt;)</div>
+<div class="line">{</div>
+<div class="line">    /* code goes here */</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >See functions.h for what this macro'd function prototype expands to. See the server's fun*.c files for some examples of how to write functions.</p>
+<p >Once you have declared all of your function handlers, you must place them in the function table, which takes the following format:</p>
+<div class="fragment"><div class="line">FUN mod_&lt;name&gt;_functable[] = {</div>
+<div class="line">{&quot;FUNCTION1&quot;,   &lt;handler&gt;,  &lt;args&gt;, &lt;flags&gt;,    &lt;permissions&gt;},</div>
+<div class="line">{&quot;FUNCTION2&quot;,   &lt;handler&gt;,  &lt;args&gt;, &lt;flags&gt;,    &lt;permissions&gt;},</div>
+<div class="line">{NULL,      NULL,       0,  0,      0}};</div>
+</div><!-- fragment --><p >You can put as many functions into this table as you'd like. Make sure it ends with the "null" entry, though.</p>
+<p >&lt;handler&gt; is the name of the function handler (the name of the C function that's handling the function call: mod_&lt;name&gt;_&lt;fun&gt;_&lt;whatever&gt;).</p>
+<p >&lt;args&gt; is the number of arguments that the function should take. If this is variable, use 0.</p>
+<p >&lt;flags&gt; are any special function-handling flags, OR'd ('|') together. Functions taking a variable number of arguments get a FN_VARARGS flag. Functions whose arguments should be passed unevaluated get a FN_NO_EVAL flag.</p>
+<p >&lt;permissions&gt; consist of an OR'd ('|') list of permissions, such as CA_PUBLIC, CA_WIZARD, and CA_GOD, just like in the main command table.</p>
+<hr  />
+<p >DEFINING HASH TABLES</p>
+<div class="fragment"><div class="line">HASHTAB mod_&lt;name&gt;_&lt;htabname1&gt;;</div>
+<div class="line">HASHTAB mod_&lt;name&gt;_&lt;htabnameN&gt;;</div>
+<div class="line"> </div>
+<div class="line">MODHASHES mod_&lt;name&gt;_hashtable[] = {</div>
+<div class="line">{ &quot;htabname1&quot;,  &amp;mod_&lt;name&gt;_&lt;htabname1&gt;,    &lt;size factor&gt;,  &lt;minimum&gt;},</div>
+<div class="line">{ &quot;htabnameN&quot;,  &amp;mod_&lt;name&gt;_&lt;htabnameN&gt;,    &lt;size factor&gt;,  &lt;minimum&gt;},</div>
+<div class="line">{ NULL,     NULL,               0,      0}};</div>
+<div class="line"> </div>
+<div class="line">NHSHTAB mod_&lt;name&gt;_&lt;nhtabname1&gt;;</div>
+<div class="line">NHSHTAB mod_&lt;name&gt;_&lt;nhtabnameN&gt;;</div>
+<div class="line"> </div>
+<div class="line">MODNHASHES mod_&lt;name&gt;_nhashtable[] = {</div>
+<div class="line">{ &quot;nhtabname1&quot;, &amp;mod_&lt;name&gt;_&lt;nhtabname1&gt;,   &lt;size factor&gt;,  &lt;minimum&gt;},</div>
+<div class="line">{ &quot;nhtabnameN&quot;, &amp;mod_&lt;name&gt;_&lt;nhtabnameN&gt;,   &lt;size factor&gt;,  &lt;minimum&gt;},</div>
+<div class="line">{ NULL,     NULL,               0,      0}};</div>
+</div><!-- fragment --><p >The initial size factor will be multiplied by the hash factor. The minimum is the absolute smallest size of the hash table, which must be a power of 2.</p>
+<hr  />
+<p >EXTENDING THE DATABASE</p>
+<p >Though modules have access to the db structure, modules cannot add their own data types to that db structure.</p>
+<p >Thus, if you need to store a piece of data for every object in the database, your module needs to have its own parallel db structure, as follows:</p>
+<div class="fragment"><div class="line">typedef struct mod_&lt;name&gt;_dbobj MOD_&lt;name&gt;_OBJ;</div>
+<div class="line">struct mod_&lt;name&gt;_dbobj {</div>
+<div class="line">    &lt;type1&gt; &lt;name1&gt;;</div>
+<div class="line">    &lt;type2&gt; &lt;nameN&gt;;</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">MOD_&lt;name&gt;_OBJ *mod_&lt;name&gt;_db = NULL;</div>
+<div class="line"> </div>
+<div class="line">#define OBJ_INIT_MODULE(x) \</div>
+<div class="line">    mod_&lt;name&gt;_db[x].&lt;name1&gt; = &lt;value1&gt;; \</div>
+<div class="line">        mod_&lt;name&gt;_db[x].&lt;nameN&gt; = &lt;valueN&gt;;</div>
+<div class="line"> </div>
+<div class="line">void mod_&lt;name&gt;_db_grow(newsize)</div>
+<div class="line">    int newsize;</div>
+<div class="line">{</div>
+<div class="line">    DB_GROW_MODULE(mod_&lt;name&gt;_db, newsize, newtop, MOD_&lt;name&gt;_OBJ);</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >The above will automatically take care of extending and initializing your private module database as needed. Initialization of newly-created objects should be taken care of by creating a handler for create_obj() (see below).</p>
+<h1><a class="anchor" id="autotoc_md83"></a>
+MODULE API FUNCTIONS</h1>
+<p >The following are "hooks" into the server. If you place these functions in your module's .c file, they will automatically be called at the appropriate time.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_create_obj(dbref player, dbref obj)</div>
+</div><!-- fragment --><p> Run when an object is created, after other initialization is done. Passes the creating player and the object dbref created.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_destroy_obj(dbref player, dbref obj)</div>
+</div><!-- fragment --><p> Run when an object is destroyed, before the player is compensated for its destruction, is notified of its destruction, and the object is wiped out. Passes the destroying player and the object dbref being destroyed. Note that the destroying player may be NOTHING.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_create_player(dbref creator, dbref player, int isrobot, int isguest)</div>
+</div><!-- fragment --><p> Run when a player is created, after create_obj() has been run.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_destroy_player(dbref player, dbref victim)</div>
+</div><!-- fragment --><p> Run after the player basics have been cleared out, but before destroy_obj() has been run.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_announce_connect(dbref player, const char *reason, int num)</div>
+</div><!-- fragment --><p> Run when a player connects, before the player looks at his current location, but after all other connect stuff has been executed. 'reason' is the type of connection - guest, create, connect, or cd. 'num' is the player's resulting number of open connections.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_announce_disconnect(dbref player, const char *reason, int num)</div>
+</div><!-- fragment --><p> Run when a player disconnects, after all other disconnect stuff has been executed, but before the descriptor has been deleted. 'reason' describes the disconnection (see 'help Conn Reasons'). 'num' is the player's resulting number of open connections.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_examine(dbref player, dbref cause, dbref thing, int control, int key)</div>
+</div><!-- fragment --><p> Run when an object is examined, after the basic object information is displayed but before attributes are displayed. 'control' is 1 if the player can examine thing, and 0 if not. 'key' is the key originally passed to the examine command.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_make_minimal(void)</div>
+</div><!-- fragment --><p> Run if making a minimal database is specified.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_cleanup_startup(void)</div>
+</div><!-- fragment --><p> Run after the restart database is read, but before @startups on objects are done.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_do_second(void)</div>
+</div><!-- fragment --><p> Runs once a second.</p>
+<h1><a class="anchor" id="autotoc_md84"></a>
+MODULE API FUNCTION: process_command</h1>
+<div class="fragment"><div class="line">int mod_&lt;name&gt;_process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)</div>
+</div><!-- fragment --><p >Run when any object tries to execute a command, before any built-in commands or softcoded commands are checked.</p>
+<p >Returns a number: 0 on failure, something greater than 0 on success, and something less than 0 on failure that should stop further matching of commands.</p>
+<p >This handler tries to run on each module in sequence. If the handler is not defined for a module, or 0 is returned, it tries the next module. A return of a number other than 0 will result in not running this handler on the other modules, this time around.</p>
+<p >The calling server function considers a result greater than 0 to be a successful command match, and will consider the command taken care of.</p>
+<p >The 'player' and 'cause' parameters are the dbrefs of the objects taking the action, and which caused the action (the enactor): the equivalent of %! and %#, respectively.</p>
+<p >The 'interactive' parameter is passed as 1 if the command was entered from the keyboard (i.e., received over the network), and 0 otherwise.</p>
+<p >The 'command' parameter is a pointer to the command entered, space-compressed if space compression is turned on. This string SHOULD NOT be destructively modified.</p>
+<p >The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</p>
+<h1><a class="anchor" id="autotoc_md85"></a>
+MODULE API FUNCTION: process_no_match</h1>
+<div class="fragment"><div class="line">int mod_&lt;name&gt;_process_no_match(dbref player, dbref cause, int interactive, char *eval_cmd, char *raw_cmd, char *args[], int nargs)</div>
+</div><!-- fragment --><p >Run when any object tries to execute a command, after all built-in and softcoded commands are checked. This occurs right before a "Huh?" message is given.</p>
+<p >Returns a number: 0 on failure, something greater than 0 on success, and something less than 0 on failure that should stop further matching of commands.</p>
+<p >This handler tries to run on each module in sequence, most recently-loaded module first, to least recently-loaded module last. If the handler is not defined for a module, or 0 is returned, it tries the next module. A return of a number other than 0 will result in not running this handler on the other modules, this time around.</p>
+<p >The calling server function considers a non-zero result to be a successful command match, and will consider the command taken care of. (Note that this is different from process_command, which considers only results greater than zero to be successful.)</p>
+<p >The 'player' and 'cause' parameters are the dbrefs of the objects taking the action, and which caused the action (the enactor): the equivalent of %! and %#, respectively.</p>
+<p >The 'interactive' parameter is passed as 1 if the command was entered from the keyboard (i.e., received over the network), and 0 otherwise.</p>
+<p >The 'eval_cmd' parameter is a pointer to the command, after it has gone through percent-substitutions and other evaluations.</p>
+<p >The 'raw_cmd' parameter is a pointer to the command entered, space-compressed if space compression is turned on, but not otherwise evaluated.</p>
+<p >The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</p>
+<h1><a class="anchor" id="autotoc_md86"></a>
+MODULE API FUNCTION: did_it</h1>
+<div class="fragment"><div class="line">int mod_&lt;name&gt;_did_it(dbref player, dbref thing, dbref master, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key)</div>
+</div><!-- fragment --><p >Run when did_it() is called, before the server actually does the notification/others-notification/action.</p>
+<p >The handler tries to run this on each module in sequence, most recently-moduled first, to least recently-loaded module last. If a module returns 0, the handler goes on to the next module. If the module returns something other than 0, the handler does not try any further modules. If the module returns a positive number, the main body of the server's own did_it() function is not executed. If the module returns a negative number, the main body of the server's own did_it() function is still executed.</p>
+<p >player is the object doing something, and thing is its "victim". player is the object that would normally see the &lt;what&gt; message (@desc, @move, @succ, etc.); thing is the object that would normally execute the &lt;awhat&gt; action (@adesc, @amove, @asucc, etc.)</p>
+<p >what, owhat, and awhat are attribute numbers. def and odef are the default strings for what and owhat.</p>
+<p >ctrl_flags is a bitmask of VERB_NOW and VERB_NONAME. The VERB_NOW flag is usually the result of passing the /now switch, and normally affects the queueing of actions. The VERB_NONAME flag normally prevents the actor's name from being prepended to the odef message.</p>
+<p >args and nargs are the stack and number of items on the stack.</p>
+<p >msg_key is a bitmask of MSG_SPEECH, MSG_MOVE, and MSG_PRESENCE, allowing special processing related to the PRESENCE flag.</p>
+<p >This function can be used to react to a large number of server actions, by switching on &lt;what&gt;. For example, all commands that move objects eventually call did_it() with &lt;what&gt; of A_MOVE. If you want to intercept all movement, just check for 'what == A_MOVE' and act accordingly in this function.</p>
+<h1><a class="anchor" id="autotoc_md87"></a>
+STORING DATA IN FLATFILES</h1>
+<p >This is the first and easiest of three different methods available to a module for storing module-specific data.</p>
+<p >Using this method, the module reads its data from a pure ASCII text flatfile on startup, via a module API hook, as follows:</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_load_database(FILE *f)</div>
+</div><!-- fragment --><p> This loads the flatfile specific to the module. It is called at start time, immediately after the main MUSH database and any module GDBM data (see below) is loaded. This function is passed a single input parameter, an open, read-only file pointer for the module flatfile.</p>
+<p >Every time the server checkpoints ("database dump" time), it dumps a flatfile containing that data, via the following module API hook:</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_dump_database(FILE *f)</div>
+</div><!-- fragment --><p> This dumps a flat text database specific to the module. It is called at checkpoint time. This function is passed a single input parameter, an open, write-only file pointer for the module flatfile.</p>
+<p >The module flatfile is named 'mod_&lt;name&gt;.db' and is stored in the directory specified by the conf parameter database_home. This database file should NEVER be opened or closed directly.</p>
+<p >Only printable ASCII data should be stored in this file. You, the module author, are responsible for versioning, the format of this file, etc. Useful functions for reading and writing flatfiles can be found in the core server's <a class="el" href="db__rw_8c.html" title="flatfile implementation">db_rw.c</a> source.</p>
+<h1><a class="anchor" id="autotoc_md88"></a>
+STORING DATA IN GDBM WITH NO CACHING</h1>
+<p >This is the second of three different methods available to a module for storing module-specific data.</p>
+<p >This method directly stores data within the MUSH's general GDBM database. GDBM is a 'random-access' database that allows you to store and fetch individual pieces of data at a time. This is identical to how the MUSH stores its structure data and requires your module to be able to dump or convert a printable ASCII flatfile when database conversion (backups to and restores from flatfile) is run.</p>
+<p >Since the MUSH stores many different types of data in GDBM, it has to have a way to keep these pieces of data seperate. It does so by allocating each subsystem a 'dbtype' number. A block of numbers is already reserved for internal MUSH data, and the rest are available for use by modules. Each subsystem specifies this number when it stores data. Before you may read or write to GDBM, your module must obtain a dbtype number with the register_dbtype function:</p>
+<div class="fragment"><div class="line">unsigned int register_dbtype(char *modname) </div>
+</div><!-- fragment --><p> Assigns a new dbtype ID number for a certain module name. If a dbtype ID has already been assigned for that module, it will be returned.</p>
+<p >There are four API hooks provided for reading data needed at startup and checkpointing to GDBM as well as reading and writing flatfiles:</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_db_read(void)</div>
+</div><!-- fragment --><p> Load any module-specific data from GDBM at startup. Called during MUSH startup, and during the backup conversion process before <a class="el" href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4" title="Write a db to Flat File.">db_write_flatfile()</a> is called. Use this to load data which must be present when the MUSH starts.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_db_write(void)</div>
+</div><!-- fragment --><p> Write any module-specific data to GDBM. Called during MUSH checkpoints, at shutdown, and during the restoral conversion process after <a class="el" href="db__rw_8c.html#a850d602c8ad86e2de86992986370a667" title="Read a flatfile.">db_read_flatfile()</a> is called.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_db_read_flatfile(FILE *f) </div>
+</div><!-- fragment --><p> Load and convert flat text database specific to module, called during the restoral db conversion process (the 'Restore' script). This is identical to the 'load_database' hook except it is ONLY called during database conversion.</p>
+<div class="fragment"><div class="line">void mod_&lt;name&gt;_db_write_flatfile(FILE *f) </div>
+</div><!-- fragment --><p> Dump flat text database specific to module, called during the backup db conversion process (the 'Backup' script). This is identical to the 'dump_database' hook except it is ONLY called during database conversion and flatfile generation (IE, @dump/flatfile).</p>
+<p >It is important to note that <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a> must be called at the beginning of each of these four functions since module initialization DOES NOT TAKE PLACE when your module is loaded during database conversion, and your module cannot know which of these functions will be called first. If your module does not use db_read or db_write, you should call register_dbtype during your cleanup_startup hook to make sure it gets called before anything else. You cannot call register_dbtype in your init hook because init is called before the database is opened.</p>
+<p >A typical MUSH server run will look like this: </p><pre class="fragment">* MUSH startup
+* Module initialization:            mod_\&lt;name&gt;_init()
+* Module executes db_read:          mod_\&lt;name&gt;_db_read()
+                                    register_dbtype()
+* Module reads data from GDBM
+* MUSH runs...
+* MUSH and module dump/checkpoint:  mod_\&lt;name&gt;_db_write()
+* MUSH runs...
+* MUSH and module dump/checkpoint:  mod_\&lt;name&gt;_db_write()
+* MUSH runs...
+* MUSH shutdown:                    mod_\&lt;name&gt;_db_write()
+</pre><p> A backup database process will look like this: </p><pre class="fragment">* Database conversion begins
+* Module executes db_read:      mod_\&lt;name&gt;_db_read()
+                                register_dbtype()
+* Module reads data from GDBM
+* Module writes flatfile:       mod_\&lt;name&gt;_db_write_flatfile()
+* Database conversion ends
+</pre><p> A restoral process will look like this: </p><pre class="fragment">* Database conversion begins
+* Module reads flatfile:        mod_\&lt;name&gt;_db_read_flatfile()
+* Module executes db_write:     mod_\&lt;name&gt;_db_write()
+                                register_dbtype()
+* Module writes data to GDBM
+* Database conversion ends
+</pre><p> Reading and writing to GDBM only during <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a> and <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> doesn't offer much advantage over just using flatfiles. However, the advantage of GDBM is that you may read or write any piece of data at any time instead of having to do it all at once. So while the MUSH is running, if your module's data is modified you may choose to write just that data immediately or wait until <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> to write it. In any case, you must make sure that all of your module's data is stored when <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a> is finished to ensure consistency when the MUSH is shut down.</p>
+<p >Note that during the database conversion process you may have your module read a piece of data from GDBM and write it immediately to a flatfile, or vice versa.</p>
+<p >So far we've told you when you can read and write, but not how. Another advantage of GDBM is that you are not limited to printable ASCII data, but that you can store binary data of arbitrary length.</p>
+<p >DBData is a structure used by the database API which contains two items: dptr (a pointer to a piece of data) and dsize (the length of that data). DBData is used by the API interface both for search keys and returned or stored data. DBData is declared thusly:</p>
+<div class="fragment"><div class="line">typedef struct {</div>
+<div class="line">    void *dptr;</div>
+<div class="line">    int dsize;</div>
+<div class="line">} DBData;</div>
+</div><!-- fragment --><p >There are three functions available for reading, writing, and deleting data in the database:</p>
+<div class="fragment"><div class="line">DBData db_get(DBData key, unsigned int dbtype)</div>
+</div><!-- fragment --> <pre class="fragment">Retrieves data from GDBM. 
+
+'key' is a DBData structure that contains a search key of
+binary data as well as the length of that data.
+
+'dbtype' should be the dbtype ID registered for your module by
+register_dbtype().
+
+db_get returns a DBData structure which contains the returned data
+(or NULL if the key cannot be found in the database) as well as the
+length of that data. It is *your* responsibility to free() the data
+returned by db_get.
+</pre> <div class="fragment"><div class="line">int db_put(DBData key, DBData data, unsigned int dbtype)</div>
+</div><!-- fragment --> <pre class="fragment">Stores or replaces data in GDBM.
+
+'key' is a DBData structure that contains a search key of
+binary data as well as the length of that data.
+
+'data' is a DBData structure which contains the binary data to be
+stored and the length of that data.
+
+'dbtype' should be the dbtype ID registered for your module by
+register_dbtype().
+
+db_put returns 0 on success and 1 on failure.
+</pre> <div class="fragment"><div class="line">int db_del(DBData key, unsigned int dbtype)</div>
+</div><!-- fragment --><p> Deletes data from GDBM.</p>
+<p >'key' is a DBData structure that contains a search key of binary data as well as the length of that data.</p>
+<p >'dbtype' should be the dbtype ID registered for your module by <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a>.</p>
+<p >db_del returns 0 on success and 1 on failure.</p>
+<p >Your search key may be a string, a number, or binary data of any length. For example, if you want your search key to be three integers, you will create a buffer of length 'sizeof(int)*3' and copy your three integers into it. If you want it to be a null-terminated string, make sure your key length is 'strlen(string) + 1'.</p>
+<h1><a class="anchor" id="autotoc_md89"></a>
+STORING DATA IN GDBM WITH CACHING</h1>
+<p >This is the third of three different methods available to a module for storing module-specific data. It is fundamentally similar to the second method, except data is cached in memory.</p>
+<p >In MUSH, the cache is essentially a front-end to GDBM, and interacting with it is identical. In fact, the function calls match almost exactly. Instead of db_get(), db_put(), and db_del(), you use cache_get(), cache_put(), and cache_del(). The parameters to the cache functions are the same ones you pass to their GDBM counterparts. The cache acts as a 'buffer', making sure the most often accessed data is already in memory, and making writes more efficient by buffering them until a number of entries may be written at once. You don't need to worry about how the cache operates; it will make sure everything gets read and written properly.</p>
+<p >Note that you cannot pass a non-malloc()ed piece of memory to cache_put. It must have been malloc()ed, and it will become the cache subsystem's responsibility to free it.</p>
+<h1><a class="anchor" id="autotoc_md90"></a>
+WHICH METHOD OF STORING DATA TO USE</h1>
+<p >If the amount of data your module works with is small and fits easily into memory, use simple flatfiles with load_database() and dump_database() hooks. You do not need to worry about database conversion since all of your data is always in a flatfile!</p>
+<p >If you need random access to your data, consider using GDBM. The main server uses GDBM to store everything, from object structures to attribute names. Since it can write individual entries, it only has to write entries that have changed instead of writing them all, thus making the process more efficient. It also allows you to easily store binary data.</p>
+<p >If your module with large pieces of data that are needed infrequently, considering using the cache. MUSH attributes are stored using the cache, and data like mail messages or large pieces of text are perfect candidates for it.</p>
+<p >As an example, the main server does not cache object structures or attribute names. It reads these completely in at startup in its own <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>, and writes all changes out during every <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a>. It does, however, cache attribute text, and may read or write attributes using the cache at any time while the MUSH process is running. A similar process takes place during database conversion. When it is creating a flatfile from GDBM, MUSH will first load all object structures and attribute names into memory during <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>. When <a class="el" href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4" title="Write a db to Flat File.">db_write_flatfile()</a> executes, it will write a printable ASCII text representation of object structures and attribute names to the flatfile, and it will fetch attributes from GDBM and write them to the flatfile one at a time. At no time does it have all attributes in memory, and it does not even use the cache during database conversion, instead using the direct to GDBM routines.</p>
+<p >IMPORTANT NOTE: If you use GDBM, it is your responsibility to clean up your entries if they are no longer used. Since GDBM is not a relational database (you cannot do a wildcard search, you <em>must</em> search for an exact key), you must keep track of every entry that you write to it. Look at the code in <a class="el" href="db__rw_8c.html" title="flatfile implementation">db_rw.c</a> that writes attribute names for an example of how to do this. If your module writes entries to GDBM and never deletes them, they will clog the database until it is converted to flatfile and back, dropping the unused entries in the process.</p>
+<h1><a class="anchor" id="autotoc_md91"></a>
+GETTING NOTIFIED WHEN DATA CHANGES</h1>
+<p >You can have your module notified when a key is stored or deleted in the cache using the following API hooks:</p>
+<div class="fragment"><div class="line">int cache_put_notify(DBData key, unsigned int dbtype)</div>
+</div><!-- fragment --><p> This hook is called when a piece of data is added to or changed in the MUSH cache. Your module should check for an applicable data type before using the key.</p>
+<div class="fragment"><div class="line">int cache_put_notify(DBData key, unsigned int dbtype)</div>
+</div><!-- fragment --><p> This hook is called when a piece of data is deleted from the MUSH cache. Your module should check for an applicable data type before using the key. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
