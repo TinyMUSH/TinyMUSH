@@ -4,28 +4,41 @@
  * @brief BSD-style network and signal routines
  * @version 3.3
  * @date 2020-12-25
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  * @note Why should I care what color the bikeshed is? :)
- * 
+ *
  */
 
-#include "system.h"
-#include <signal.h>
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <errno.h>
+#include <string.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include <ctype.h>
+#include <signal.h>
+
 /**
  * @attention Since this is the core of the whole show, better keep theses globals.
- * 
+ *
  */
 int sock = 0;				  /*!< Game socket */
 int ndescriptors = 0;		  /*!< New Descriptor */
@@ -34,7 +47,7 @@ DESC *descriptor_list = NULL; /*!< Descriptor list */
 
 /**
  * @brief Message queue related
- * 
+ *
  */
 
 key_t msgq_Key = 0; /*!< Message Queue Key */
@@ -42,9 +55,9 @@ key_t msgq_Key = 0; /*!< Message Queue Key */
 /**
  * @brief Convert a text ip address to binary format for the message queue.
  *        Not used for now.
- * 
+ *
  * @param addr IP address
- * @return MSGQ_DNSRESOLVER 
+ * @return MSGQ_DNSRESOLVER
  */
 MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr)
 {
@@ -83,7 +96,7 @@ MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr)
 
 /**
  * @brief DNS Resolver thread
- * 
+ *
  * @param args Message queue key
  * @return void* Always null. Not used.
  */
@@ -147,14 +160,14 @@ void check_dnsResolver_status(dbref player, __attribute__((unused)) dbref cause,
 	 * @todo Just a placeholder for now. Call by @startslave
 	 * that should also be rename to something better suiting
 	 * once i sort out what this should do.
-	 * 
+	 *
 	 */
 	notify(player, "This feature is being rework.");
 }
 
 /**
  * @brief Create a socket
- * 
+ *
  * @param port Port for the socket
  * @return int file descriptor of the socket
  */
@@ -196,7 +209,7 @@ int make_socket(int port)
 
 /**
  * @brief Process input form a port and feed to the engine.
- * 
+ *
  * @param port Port to listen
  */
 void shovechars(int port)
@@ -232,7 +245,7 @@ void shovechars(int port)
 
 	/**
 	 * @brief Start the message queue.
-	 * 
+	 *
 	 */
 
 	msgq_Path = mkdtemp(XASPRINTF("s", "%s/%sXXXXXX", mushconf.pid_home, mushconf.mush_shortname));
@@ -242,13 +255,13 @@ void shovechars(int port)
 
 	/**
 	 * @brief Start the DNS resolver thread
-	 * 
+	 *
 	 */
 	pthread_create(&thread_Dns, NULL, dnsResolver, &msgq_Key);
 
 	/**
-	 * @attention This is the main loop of the MUSH, everything derive from here... 
-	 * 
+	 * @attention This is the main loop of the MUSH, everything derive from here...
+	 *
 	 */
 	while (mushstate.shutdown_flag == 0)
 	{
@@ -263,7 +276,7 @@ void shovechars(int port)
 		}
 		/**
 		 * We've gotten a signal to dump flatfiles
-		 * 
+		 *
 		 */
 		if (mushstate.flatfile_flag && !mushstate.dumping)
 		{
@@ -292,12 +305,12 @@ void shovechars(int port)
 		}
 		/**
 		 * test for events
-		 * 
+		 *
 		 */
 		dispatch();
 		/**
 		 * any queued robot commands waiting?
-		 * 
+		 *
 		 */
 		timeout.tv_sec = que_next();
 		timeout.tv_usec = 0;
@@ -308,7 +321,7 @@ void shovechars(int port)
 
 		/**
 		 * Listen for new connections if there are free descriptors
-		 * 
+		 *
 		 */
 		if (ndescriptors < avail_descriptors)
 		{
@@ -317,7 +330,7 @@ void shovechars(int port)
 
 		/**
 		 * Mark sockets that we want to test for change in status
-		 * 
+		 *
 		 */
 		for (d = descriptor_list; (d); d = (d)->next)
 		{
@@ -333,7 +346,7 @@ void shovechars(int port)
 		}
 		/**
 		 * Wait for something to happen
-		 * 
+		 *
 		 */
 		found = select(maxd, &input_set, &output_set, (fd_set *)NULL, &timeout);
 
@@ -343,9 +356,9 @@ void shovechars(int port)
 			{
 				/**
 				 * This one is bad, as it results in a spiral
-				 * of doom, unless we can figure out what the bad file 
+				 * of doom, unless we can figure out what the bad file
 				 * descriptor is and get rid of it.
-				 * 
+				 *
 				 */
 				log_perror("NET", "FAIL", "checking for activity", "select");
 
@@ -355,7 +368,7 @@ void shovechars(int port)
 					{
 						/**
 						 * It's a player. Just toss the connection.
-						 * 
+						 *
 						 */
 						log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad descriptor %d", d->descriptor);
 						shutdownsock(d, R_SOCKDIED);
@@ -366,7 +379,7 @@ void shovechars(int port)
 				{
 					/**
 					 * We didn't figured it out, well that's it, game over.
-					 * 
+					 *
 					 */
 					log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad game port descriptor %d", sock);
 					break;
@@ -381,7 +394,7 @@ void shovechars(int port)
 		}
 		/**
 		 * if !found then time for robot commands
-		 * 
+		 *
 		 */
 		if (!found)
 		{
@@ -399,7 +412,7 @@ void shovechars(int port)
 
 		/**
 		 * @brief Check if we have something from the DNS Resolver.
-		 * 
+		 *
 		 */
 
 		if (msgrcv(msgq_Id, &msgq_Dns, sizeof(msgq_Dns.payload), MSGQ_DEST_REPLY - MSGQ_DEST_DNSRESOLVER, IPC_NOWAIT) > 0)
@@ -437,7 +450,7 @@ void shovechars(int port)
 
 		/**
 		 * Check for new connection requests
-		 * 
+		 *
 		 */
 		if (FD_ISSET(sock, &input_set))
 		{
@@ -462,20 +475,20 @@ void shovechars(int port)
 		}
 		/**
 		 * Check for activity on user sockets
-		 * 
+		 *
 		 */
 		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		{
 			/**
 			 * Process input from sockets with pending input
-			 * 
-		 	 */
+			 *
+			 */
 			if (FD_ISSET(d->descriptor, &input_set))
 			{
 				/**
 				 * Undo AutoDark
-				 * 
-		 		 */
+				 *
+				 */
 				if (d->flags & DS_AUTODARK)
 				{
 					d->flags &= ~DS_AUTODARK;
@@ -483,8 +496,8 @@ void shovechars(int port)
 				}
 				/**
 				 * Process received data
-				 * 
-		 		 */
+				 *
+				 */
 				if (!process_input(d))
 				{
 					shutdownsock(d, R_SOCKDIED);
@@ -493,8 +506,8 @@ void shovechars(int port)
 			}
 			/**
 			 * Process output for sockets with pending output
-			 * 
-	 		 */
+			 *
+			 */
 			if (FD_ISSET(d->descriptor, &output_set))
 			{
 				if (!process_output(d))
@@ -507,7 +520,7 @@ void shovechars(int port)
 
 	/**
 	 * @brief Stop the DNS message queue.
-	 * 
+	 *
 	 */
 	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
 	msgq_Dns.destination = MSGQ_DEST_DNSRESOLVER;
@@ -516,7 +529,7 @@ void shovechars(int port)
 
 	/**
 	 * @brief Wait for the thread to end.
-	 * 
+	 *
 	 */
 	pthread_join(thread_Dns, NULL);
 
@@ -526,7 +539,7 @@ void shovechars(int port)
 
 /**
  * @brief Handle new connections
- * 
+ *
  * @param sock		Socket to listen for new connections
  * @return DESC*	Connection descriptor
  */
@@ -563,7 +576,7 @@ DESC *new_connection(int sock)
 	{
 		/**
 		 * @brief Ask DNS Resolver for hostname
-		 * 
+		 *
 		 */
 		memset(&msgData, 0, sizeof(msgData));
 		msgData.destination = MSGQ_DEST_DNSRESOLVER;
@@ -582,7 +595,7 @@ DESC *new_connection(int sock)
 
 /**
  * @brief (Dis)connect reasons that get written to the logfile
- * 
+ *
  * @param reason reason ID
  * @return char* reason message
  */
@@ -624,7 +637,7 @@ char *connReasons(int reason)
 
 /**
  * @brief (Dis)connect reasons that get fed to A_A(DIS)CONNECT via announce_connattr
- * 
+ *
  * @param message reason ID
  * @return char* reason message
  */
@@ -664,7 +677,7 @@ char *connMessages(int reason)
 
 /**
  * @brief Handle disconnections
- * 
+ *
  * @param d			Connection descriptor
  * @param reason	Reason for disconnection
  */
@@ -688,7 +701,7 @@ void shutdownsock(DESC *d, int reason)
 		 * Do the disconnect stuff if we aren't doing a LOGOUT (which
 		 * keeps the connection open so the player can connect to a different
 		 * character).
- 		 */
+		 */
 		if (reason != R_LOGOUT)
 		{
 			if (reason != R_SOCKDIED)
@@ -696,8 +709,8 @@ void shutdownsock(DESC *d, int reason)
 				/**
 				 * If the socket died, there's no reason to
 				 * display the quit file.
-				 * 
- 				 */
+				 *
+				 */
 				fcache_dump(d, FC_QUIT);
 			}
 
@@ -710,8 +723,8 @@ void shutdownsock(DESC *d, int reason)
 		/**
 		 * If requested, write an accounting record of the form:
 		 * Plyr# Flags Cmds ConnTime Loc Money [Site] <DiscRsn> Name
-		 * 
- 		 */
+		 *
+		 */
 		now = mushstate.now - d->connected_at;
 		buff2 = unparse_flags(GOD, d->player);
 		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, connReasons(reason), buff);
@@ -734,8 +747,8 @@ void shutdownsock(DESC *d, int reason)
 
 	/**
 	 * If this was our only connection, get out of interactive mode.
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	if (d->program_data)
 	{
@@ -748,9 +761,9 @@ void shutdownsock(DESC *d, int reason)
 
 		if (ncon == 0)
 		{
-			/** 
-			 * Free_RegData 
-			 * 
+			/**
+			 * Free_RegData
+			 *
 			 */
 			if (d->program_data->wait_data)
 			{
@@ -769,9 +782,9 @@ void shutdownsock(DESC *d, int reason)
 						XFREE(d->program_data->wait_data->x_regs[z]);
 				}
 
-				/** 
+				/**
 				 * Free_RegDataStruct
-				 * 
+				 *
 				 */
 				if (d->program_data->wait_data->q_regs)
 				{
@@ -855,7 +868,7 @@ void shutdownsock(DESC *d, int reason)
 
 /**
  * @brief Make a socket nonblocking if needed
- * 
+ *
  * @param s		Socket to modify.
  */
 void make_nonblocking(int s)
@@ -885,7 +898,7 @@ void make_nonblocking(int s)
 
 /**
  * @brief Initialize a socket
- * 
+ *
  * @param s			Socket file descriptor
  * @param a			Socket internet address descriptor
  * @return DESC*	Connection descriptor
@@ -944,9 +957,9 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 
 /**
  * @brief Process output to a socket
- * 
+ *
  * @param d		Socket description
- * @return int 
+ * @return int
  */
 int process_output(DESC *d)
 {
@@ -993,7 +1006,7 @@ int process_output(DESC *d)
 			d->output_tail = NULL;
 		}
 	}
-	
+
 	XFREE(mushstate.debug_cmd);
 	mushstate.debug_cmd = cmdsave;
 	return 1;
@@ -1001,9 +1014,9 @@ int process_output(DESC *d)
 
 /**
  * @brief Process input from a socket
- * 
+ *
  * @param d		Socket description
- * @return int 
+ * @return int
  */
 int process_input(DESC *d)
 {
@@ -1117,7 +1130,7 @@ int process_input(DESC *d)
 
 /**
  * @brief Close all sockets
- * 
+ *
  * @param emergency Closing caused by emergency?
  * @param message	Message to send before closing
  */
@@ -1153,7 +1166,7 @@ void close_sockets(int emergency, char *message)
 
 /**
  * @brief Suggar we're going down!!!
- * 
+ *
  */
 void emergency_shutdown(void)
 {
@@ -1162,7 +1175,7 @@ void emergency_shutdown(void)
 
 /**
  * @brief Write a report to log
- * 
+ *
  */
 void report(void)
 {
@@ -1190,7 +1203,7 @@ void report(void)
 
 /**
  * @brief Handle system signals
- * 
+ *
  * @param sig Signal to handle
  */
 void sighandler(int sig)
@@ -1281,7 +1294,7 @@ void sighandler(int sig)
 			raw_broadcast(0, "GAME: Fatal signal %s caught, restarting with previous database.", signames[sig]);
 			/**
 			 * Not good, Don't sync, restart using older db.
-			 * 
+			 *
 			 */
 			dump_database_internal(DUMP_DB_CRASH);
 			cache_sync();
@@ -1290,7 +1303,7 @@ void sighandler(int sig)
 			/**
 			 * Try our best to dump a usable core by generating a
 			 * second signal with the SIG_DFL action.
-			 * 
+			 *
 			 */
 			if (fork() > 0)
 			{
@@ -1302,7 +1315,7 @@ void sighandler(int sig)
 				 * signal is delivered. Meanwhile let's close
 				 * all our files to avoid corrupting the
 				 * child process.
-				 * 
+				 *
 				 */
 				for (i = 0; i < maxd; i++)
 				{
@@ -1342,7 +1355,7 @@ void sighandler(int sig)
 
 /**
  * @brief Set the signals handlers
- * 
+ *
  */
 void set_signals(void)
 {
@@ -1352,7 +1365,7 @@ void set_signals(void)
 	 * we triggered a restart on a SIGUSR1. If we did so, then the signal became
 	 * blocked, and stays blocked, since control never returns to the caller;
 	 * i.e., further attempts to send a SIGUSR1 would fail.
-	 * 
+	 *
 	 */
 	sigfillset(&sigs);
 	sigprocmask(SIG_UNBLOCK, &sigs, NULL);
@@ -1389,7 +1402,7 @@ void set_signals(void)
 
 /**
  * @brief Unset the signal handlers
- * 
+ *
  */
 void unset_signals(void)
 {
@@ -1401,14 +1414,14 @@ void unset_signals(void)
 
 /**
  * @brief Check if we are panicking.
- * 
+ *
  * @param sig Signal that triggered the check
  */
 void check_panicking(int sig)
 {
 	/**
 	 * If we are panicking, turn off signal catching and resignal
-	 * 
+	 *
 	 */
 	if (mushstate.panicking)
 	{
@@ -1425,7 +1438,7 @@ void check_panicking(int sig)
 
 /**
  * @brief Log the signal we caugh.
- * 
+ *
  * @param signame Signal name.
  */
 void log_signal(const char *signame)

@@ -11,8 +11,16 @@
  *
  */
 
-#include <system.h>
-#include <api.c>
+#include "config.h"
+
+#include "constants.h"
+#include "typedefs.h"
+#include "macros.h"
+#include "externs.h"
+#include "prototypes.h"
+
+#include <ctype.h>
+#include  <string.h>
 
 /* --------------------------------------------------------------------------
  * Constants.

@@ -4,15 +4,17 @@
  * @brief Constants used by the engine.
  * @version 3.3
  * @date 2021-01-10
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #ifndef __CONSTANTS_H
 #define __CONSTANTS_H
+
+#include <float.h>
 
 #define HBUF_SIZE 32768 /*!< Huge buffer size */
 #define LBUF_SIZE 8192  /*!< Large buffer size */
@@ -24,7 +26,7 @@
 
 /**
  * @brief Attributes constants
- * 
+ *
  */
 
 /**
@@ -33,8 +35,8 @@
 #define STRINGBLOCK 1000
 
 /**
- * @brief Flags's attribute 
- * 
+ * @brief Flags's attribute
+ *
  */
 #define AF_ODARK 0x00000001     /*!< players other than owner can't see it */
 #define AF_DARK 0x00000002      /*!< No one can see it */
@@ -71,7 +73,7 @@
 
 /**
  * @brief General's attributes.
- * 
+ *
  */
 #define A_NULL 0          /*!< Nothing */
 #define A_OSUCC 1         /*!< Others success message */
@@ -335,14 +337,14 @@
 
 /**
  * @brief Commands constants
- * 
+ *
  */
 
 #define NOGO_MESSAGE "You can't go that way."
 
-/** 
+/**
  * @brief Command handler call conventions
- * 
+ *
  */
 #define CS_NO_ARGS 0x00000      /*!< No arguments */
 #define CS_ONE_ARG 0x00001      /*!< One argument */
@@ -364,9 +366,9 @@
 #define CS_ACTOR 0x10000        /*!< @addcommand executed by player, not obj */
 #define CS_PRIVATE 0x20000      /*!< For hooks, use private global registers */
 
-/** 
- * @brief Command permission flags 
- * 
+/**
+ * @brief Command permission flags
+ *
  */
 #define CA_PUBLIC 0x00000000    /*!< No access restrictions */
 #define CA_GOD 0x00000001       /*!< GOD only... */
@@ -450,7 +452,7 @@
 
 /**
  * @brief Database constants
- * 
+ *
  */
 
 #define RS_CONCENTRATE 0x00000002    /*!< Restart DB has Port-Concentrator informations */
@@ -463,20 +465,20 @@
 
 /**
  * Database R/W flags.
- * 
+ *
  */
 #define OUTPUT_VERSION 1 /*!< Version 1 */
 #define UNLOAD_VERSION 1 /*!< version for export */
 
-/** 
+/**
  * @brief Leadin char for attr control data
- * 
+ *
  */
 #define ATR_INFO_CHAR '\1'
 
-/** 
+/**
  * @brief Boolean expressions, for locks
- * 
+ *
  */
 #define BOOLEXP_AND 0
 #define BOOLEXP_OR 1
@@ -491,16 +493,16 @@
 
 /**
  * @briefBoolexp decompile formats
- * 
+ *
  */
 #define F_EXAMINE 1   /** Normal */
 #define F_QUIET 2     /** Binary for db dumps */
 #define F_DECOMPILE 3 /** @decompile output */
 #define F_FUNCTION 4  /** [lock()] output */
 
-/** 
+/**
  * @brief Database format information
- * 
+ *
  */
 #define F_UNKNOWN 0  /*!< Unknown database format */
 #define F_MUSH 1     /*!< MUSH format (many variants) */
@@ -538,8 +540,8 @@
 #define ANY_OWNER -2 /*!< multiple possibilities, for owner */
 
 /**
- * Command handler keys 
- * 
+ * Command handler keys
+ *
  */
 #define ADDCMD_PRESERVE 1       /*!< Use player rather than addcommand thing */
 #define ATTRIB_ACCESS 1         /*!< Change access to attribute */
@@ -731,16 +733,16 @@
 #define VERB_NONAME 16          /*!< Do not prepend name to odefault */
 #define WAIT_UNTIL 1            /*!< Absolute time wait */
 #define WAIT_PID 2              /*!< Change the wait on a PID */
-/** 
- * Hush codes for movement messages 
- * 
+/**
+ * Hush codes for movement messages
+ *
  */
 #define HUSH_ENTER 1 /*!< xENTER/xEFAIL */
 #define HUSH_LEAVE 2 /*!< xLEAVE/xLFAIL */
 #define HUSH_EXIT 4  /*!< xSUCC/xDROP/xFAIL from exits */
-/** 
- * Evaluation directives 
- * 
+/**
+ * Evaluation directives
+ *
  */
 #define EV_FIGNORE 0x00000000      /*!< Don't look for func if () found */
 #define EV_FMAND 0x00000100        /*!< Text before () must be func name */
@@ -756,9 +758,9 @@
 #define EV_NO_COMPRESS 0x00040000  /*!< Don't compress spaces. */
 #define EV_NO_LOCATION 0x00080000  /*!< Suppresses %l */
 #define EV_NOFCHECK 0x00100000     /*!< Do not evaluate functions! */
-/** 
- * Function flags 
- * 
+/**
+ * Function flags
+ *
  */
 #define FN_VARARGS 0x80000000 /*!< allows variable # of args */
 #define FN_NO_EVAL 0x40000000 /*!< Don't evaluate args to function */
@@ -770,11 +772,11 @@
 #define FN_OUTFX 0x01000000   /*!< Output-affecting side effects */
 #define FN_STACKFX 0x00800000 /*!< All stack functions */
 #define FN_VARFX 0x00400000   /*!< All xvars functions */
-/** 
- * Lower flag values are used for function-specific switches 
- * 
- * Message forwarding directives 
- * 
+/**
+ * Lower flag values are used for function-specific switches
+ *
+ * Message forwarding directives
+ *
  */
 #define MSG_PUP_ALWAYS 0x00001  /*!< Always forward msg to puppet own */
 #define MSG_INV 0x00002         /*!< Forward msg to contents */
@@ -795,9 +797,9 @@
 #define MSG_MOVE 0x10000        /*!< This message is movement. */
 #define MSG_PRESENCE 0x20000    /*!< This message is related to presence. */
 
-/** 
- * Look primitive directives 
- * 
+/**
+ * Look primitive directives
+ *
  */
 #define LK_IDESC 0x0001
 #define LK_OBEYTERSE 0x0002
@@ -811,7 +813,7 @@
 
 /**
  * Match related
- * 
+ *
  */
 
 #define CON_LOCAL 0x01    /* Match is near me */
@@ -821,49 +823,49 @@
 #define CON_TOKEN 0x10    /* Name is a special token */
 #define CON_DBREF 0x20    /* Name is a dbref */
 
-/** 
- * Quota types 
- * 
+/**
+ * Quota types
+ *
  */
 #define QTYPE_ALL 0
 #define QTYPE_ROOM 1
 #define QTYPE_EXIT 2
 #define QTYPE_THING 3
 #define QTYPE_PLAYER 4
-/** 
- * Signal handling directives 
- * 
+/**
+ * Signal handling directives
+ *
  */
 #define SA_EXIT 1 /*!< Exit, and dump core */
 #define SA_DFLT 2 /*!< Try to restart on a fatal error */
-/** 
+/**
  * Database dumping directives for dump_database_internal()
- * 
+ *
  */
 #define DUMP_DB_NORMAL 0
 #define DUMP_DB_CRASH 1
 #define DUMP_DB_RESTART 2
 #define DUMP_DB_FLATFILE 3
 #define DUMP_DB_KILLED 4
-/** 
+/**
  * Constant messages
- * 
+ *
  */
 #define CANNOT_HEAR_MSG "That target cannot hear you."
 #define NOT_PRESENT_MSG "That target is not present."
 
 /**
  * @brief Flags constants
- * 
+ *
  */
 
 #define FLAG_WORD1 0x0 /*!< 1st word of flags. */
 #define FLAG_WORD2 0x1 /*!< 2nd word of flags. */
 #define FLAG_WORD3 0x2 /*!< 3rd word of flags. */
 
-/** 
- * Object types 
- * 
+/**
+ * Object types
+ *
  */
 #define TYPE_ROOM 0x0
 #define TYPE_THING 0x1
@@ -874,9 +876,9 @@
 #define GOODTYPE 0x5 /*!< Values less than this pass Good_obj check */
 #define NOTYPE 0x7
 #define TYPE_MASK 0x7
-/** 
- * First word of flags 
- * 
+/**
+ * First word of flags
+ *
  */
 #define SEETHRU 0x00000008     /*!< Can see through to the other side */
 #define WIZARD 0x00000010      /*!< gets automatic control */
@@ -907,9 +909,9 @@
 #define ROYALTY 0x20000000     /*!< Sees like a wiz, but ca't modify */
 #define HEARTHRU 0x40000000    /*!< Can hear out of this obj or exit */
 #define TERSE 0x80000000       /*!< Only show room name on look */
-/** 
- * Second word of flags 
- * 
+/**
+ * Second word of flags
+ *
  */
 #define KEY 0x00000001         /*!< No puppets */
 #define ABODE 0x00000002       /*!< May @set home here */
@@ -943,9 +945,9 @@
 #define WATCHER 0x20000000      /*!< Watch logins */
 #define CONNECTED 0x40000000    /*!< Player is connected */
 #define SLAVE 0x80000000        /*!< Disallow most commands */
-/** 
- * Third word of flags 
- * 
+/**
+ * Third word of flags
+ *
  */
 #define REDIR_OK 0x00000001      /*!< Can be victim of @redirect */
 #define HAS_REDIRECT 0x00000002  /*!< Victim of @redirect */
@@ -995,14 +997,14 @@
 
 /**
  * @brief Functions constants
- * 
+ *
  */
 
 #define MAX_NFARGS 30
 
 /**
  * @brief List management
- * 
+ *
  */
 #define ALPHANUM_LIST 1
 #define NUMERIC_LIST 2
@@ -1016,14 +1018,14 @@
 
 /**
  * @brief String trimming
- * 
+ *
  */
 #define TRIM_L 0x1
 #define TRIM_R 0x2
 
 /**
  * @brief encode() and decode() copy over only alphanumeric chars
- * 
+ *
  */
 #define CRYPTCODE_LO 32  /* space */
 #define CRYPTCODE_HI 126 /* tilde */
@@ -1031,7 +1033,7 @@
 
 /**
  * @brief Constants used in delimiter macros.
- * 
+ *
  */
 #define DELIM_EVAL 0x001   /*!< Must eval delimiter. */
 #define DELIM_NULL 0x002   /*!< Null delimiter okay. */
@@ -1039,27 +1041,27 @@
 #define DELIM_STRING 0x008 /*!< Multi-character delimiter okay. */
 /**
  * @brief Function-specific flags used in the function table.
- * 
- * from handle_sort (sort, isort): 
- * 
+ *
+ * from handle_sort (sort, isort):
+ *
  */
 #define SORT_OPER 0x0f /*!< mask to select sort operation bits */
 #define SORT_ITEMS 0
 #define SORT_POS 1
-/** 
+/**
  * from handle_sets (setunion, setdiff, setinter, lunion, ldiff, linter):
- * 
+ *
  */
 #define SET_OPER 0x0f /*!< mask to select set operation bits */
 #define SET_UNION 0
 #define SET_INTERSECT 1
 #define SET_DIFF 2
 #define SET_TYPE 0x10 /*!< set type is given, don't autodetect */
-/** 
+/**
  * from process_tables (tables, rtables, ctables):
  * from perform_border (border, rborder, cborder):
  * from perform_align (align, lalign):
- * 
+ *
  */
 #define JUST_TYPE 0x0f /*!< mask to select justification bits */
 #define JUST_LEFT 0x01
@@ -1073,7 +1075,7 @@
  * cand, cor, candbool, corbool, xor, xorbool):
  * from handle_flaglists (andflags, orflags):
  * from handle_filter (filter, filterbool):
- * 
+ *
  */
 #define LOGIC_OPER 0x0f /*!< mask to select boolean operation bits */
 #define LOGIC_AND 0
@@ -1081,9 +1083,9 @@
 #define LOGIC_XOR 2
 #define LOGIC_BOOL 0x10 /*!< interpret operands as boolean, not int */
 #define LOGIC_LIST 0x40 /*!< operands come in a list, not separately */
-/** 
+/**
  * from handle_vectors (vadd, vsub, vmul, vdot):
- * 
+ *
  */
 #define VEC_OPER 0x0f /*!< mask to select vector operation bits */
 #define VEC_ADD 0
@@ -1094,16 +1096,16 @@
 #define VEC_OR 7
 #define VEC_AND 8
 #define VEC_XOR 9
-/** 
+/**
  * from handle_vector (vmag, vunit):
- * 
+ *
  */
 #define VEC_MAG 5
 #define VEC_UNIT 6
-/** 
+/**
  * from perform_loop (loop, parse):
  * from perform_iter (list, iter, whentrue, whenfalse, istrue, isfalse):
- * 
+ *
  */
 #define BOOL_COND_TYPE 0x0f   /*!< mask to select exit-condition bits */
 #define BOOL_COND_NONE 1      /*!< loop until end of list */
@@ -1115,33 +1117,33 @@
 #define FILT_COND_TRUE 0x030  /*!< show only true results */
 #define LOOP_NOTIFY 0x100     /*!< send loop results directly to enactor */
 #define LOOP_TWOLISTS 0x200   /*!< process two lists */
-/** 
- * from handle_okpres (hears, moves, knows): 
- * 
+/**
+ * from handle_okpres (hears, moves, knows):
+ *
  */
 #define PRESFN_OPER 0x0f  /*!< Mask to select bits */
 #define PRESFN_HEARS 0x01 /*!< Detect hearing */
 #define PRESFN_MOVES 0x02 /*!< Detect movement */
 #define PRESFN_KNOWS 0x04 /*!< Detect knows */
-/** 
+/**
  * from perform_get (get, get_eval, xget, eval(a,b)):
- * 
+ *
  */
 #define GET_EVAL 0x01  /*!< evaluate the attribute */
 #define GET_XARGS 0x02 /*!< obj and attr are two separate args */
-/** 
+/**
  * from handle_pop (pop, peek, toss):
- * 
+ *
  */
 #define POP_PEEK 0x01 /*!< don't remove item from stack */
 #define POP_TOSS 0x02 /*!< don't display item from stack */
-/** 
+/**
  * from perform_regedit (regedit, regediti, regeditall, regeditalli):
  * from perform_regparse (regparse, regparsei):
  * from perform_regrab (regrab, regrabi, regraball, regraballi):
  * from perform_regmatch (regmatch, regmatchi):
  * from perform_grep (grep, grepi, wildgrep, regrep, regrepi):
- * 
+ *
  */
 #define REG_CASELESS 0x01  /*!< XXX must equal PCRE_CASELESS */
 #define REG_MATCH_ALL 0x02 /*!< operate on all matches in a list */
@@ -1151,7 +1153,7 @@
 #define GREP_REGEXP 8
 /**
  * from handle_trig (sin, cos, tan, asin, acos, atan, sind, cosd, tand, asind, acosd, atand):
- * 
+ *
  */
 #define TRIG_OPER 0x0f /*!< mask to select trig function bits */
 #define TRIG_CO 0x01   /*!< co-function, like cos as opposed to sin */
@@ -1159,39 +1161,39 @@
 #define TRIG_ARC 0x04  /*!< arc-function, like asin as opposed to sin */
 #define TRIG_REC 0x08  /*!<  -- reciprocal, like sec as opposed to sin */
 #define TRIG_DEG 0x10  /*!< angles are in degrees, not radians */
-/** 
+/**
  * from handle_pronoun (obj, poss, subj, aposs):
- * 
+ *
  */
 #define PRONOUN_OBJ 0
 #define PRONOUN_POSS 1
 #define PRONOUN_SUBJ 2
 #define PRONOUN_APOSS 3
-/** 
- * from do_ufun(): 
- * 
+/**
+ * from do_ufun():
+ *
  */
 #define U_LOCAL 0x01   /*!< ulocal: preserve global registers */
 #define U_PRIVATE 0x02 /*!< ulocal: preserve global registers */
-/** 
- * from handle_ifelse() and handle_if() 
- * 
+/**
+ * from handle_ifelse() and handle_if()
+ *
  */
 #define IFELSE_OPER 0x0f    /*!< mask */
 #define IFELSE_BOOL 0x01    /*!< check for boolean (defaults to nonzero) */
 #define IFELSE_FALSE 0x02   /*!< order false,true instead of true,false */
 #define IFELSE_DEFAULT 0x04 /*!< only two args, use condition as output */
 #define IFELSE_TOKEN 0x08   /*!< allow switch-token substitution */
-/** 
- * from handle_timestamps() 
- * 
+/**
+ * from handle_timestamps()
+ *
  */
 #define TIMESTAMP_MOD 0x01 /*!< lastmod() */
 #define TIMESTAMP_ACC 0X02 /*!< lastaccess() */
 #define TIMESTAMP_CRE 0x04 /*!< creation() */
-/** 
- * Miscellaneous 
- * 
+/**
+ * Miscellaneous
+ *
  */
 #define LATTR_COUNT 0x01     /*!< nattr: just return attribute count */
 #define LOCFN_WHERE 0x01     /*!< loc: where() vs. loc() */
@@ -1206,12 +1208,12 @@
 
 /**
  * @brief File cache constants
- * 
+ *
  */
 
-/** 
- * File caches.  These _must_ track the fcache array in file_c.c 
- * 
+/**
+ * File caches.  These _must_ track the fcache array in file_c.c
+ *
  */
 #define FC_CONN 0
 #define FC_CONN_SITE 1
@@ -1229,12 +1231,12 @@
 
 /**
  * @brief Game constants
- * 
+ *
  */
 
-/** 
- * magic lock cookies 
- * 
+/**
+ * magic lock cookies
+ *
  */
 #define NOT_TOKEN '!'
 #define AND_TOKEN '&'
@@ -1245,76 +1247,76 @@
 #define CARRY_TOKEN '+' /*!< One of these two should go. */
 #define IS_TOKEN '='
 #define OWNER_TOKEN '$'
-/** 
- * matching attribute tokens 
- * 
+/**
+ * matching attribute tokens
+ *
  */
 #define AMATCH_CMD '$'
 #define AMATCH_LISTEN '^'
-/** 
- * delimiters for various things 
- * 
+/**
+ * delimiters for various things
+ *
  */
 #define EXIT_DELIMITER ';'
 #define ARG_DELIMITER '='
-/** 
+/**
  * These chars get replaced by the current item from a list in commands and
  * functions that do iterative replacement, such as @apply_marked, dolist,
  * the eval= operator for @search, and iter().
- * 
+ *
  */
 #define BOUND_VAR "##"
 #define LISTPLACE_VAR "#@"
-/** 
- * This token is similar, marking the first argument in a switch. 
- * 
+/**
+ * This token is similar, marking the first argument in a switch.
+ *
  */
 #define SWITCH_VAR "#$"
-/** 
- * This token is used to denote a null output delimiter. 
- * 
+/**
+ * This token is used to denote a null output delimiter.
+ *
  */
 #define NULL_DELIM_VAR "@@"
-/** 
- * This is used to indent output from pretty-printing. 
- * 
+/**
+ * This is used to indent output from pretty-printing.
+ *
  */
 #define INDENT_STR "  "
-/** 
- * This is used as the 'null' delimiter for structures stored via write(). 
- * 
+/**
+ * This is used as the 'null' delimiter for structures stored via write().
+ *
  */
 #define GENERIC_STRUCT_DELIM '\f' /*!< form feed char */
 #define GENERIC_STRUCT_STRDELIM "\f"
-/** 
- * amount of object endowment, based on cost 
- * 
+/**
+ * amount of object endowment, based on cost
+ *
  */
 #define OBJECT_ENDOWMENT(cost) (((cost) / mushconf.sacfactor) + mushconf.sacadjust)
-/** 
- * !!! added for recycling, return value of object 
- * 
+/**
+ * !!! added for recycling, return value of object
+ *
  */
 #define OBJECT_DEPOSIT(pennies) (((pennies)-mushconf.sacadjust) * mushconf.sacfactor)
 /**
  * Always nice to have a trash can.
- * 
+ *
  */
 #define DEV_NULL "/dev/null"
-/** 
- * This is used to define the version of our backup file 
- * 
+/**
+ * This is used to define the version of our backup file
+ *
  */
 #define BACKUP_VERSION 1
 /**
  * Max offset for PCRE
- * 
+ *
  */
 #define PCRE_MAX_OFFSETS 99
 
 /**
  * @brief Help constants
- * 
+ *
  */
 
 #define LINE_SIZE 90
@@ -1323,18 +1325,18 @@
 
 /**
  * @brief HTab constants
- * 
+ *
  */
 
-/** 
- * Hash entry flags 
- * 
+/**
+ * Hash entry flags
+ *
  */
 #define HASH_ALIAS 0x00000001 /*!< This entry is just a copy */
 
-/** 
- * Hash table flags 
- * 
+/**
+ * Hash table flags
+ *
  */
 #define HT_STR 0x00000000      /*!< String-keyed hashtable */
 #define HT_NUM 0x00000001      /*!< Numeric-keyed hashtable */
@@ -1343,7 +1345,7 @@
 
 /**
  * @brief Interface constants
- * 
+ *
  */
 
 /* (Dis)connection reason codes */
@@ -1383,16 +1385,16 @@
 #define DS_AUTODARK 0x0002     /*!< Wizard was auto set dark. */
 #define DS_PUEBLOCLIENT 0x0004 /*!< Client is Pueblo-enhanced. */
 
-/** 
- * Site flags 
- * 
+/**
+ * Site flags
+ *
  */
 #define S_SUSPECT 1
 #define S_ACCESS 2
 
 /**
  * @brief Match constants
- * 
+ *
  */
 
 #define NOMATCH_MESSAGE "I don't see that here."
@@ -1406,12 +1408,12 @@
 
 /**
  * @brief MUSH constants
- * 
+ *
  */
 
-/** 
- * Game control flags in mushconf.control_flags 
- * 
+/**
+ * Game control flags in mushconf.control_flags
+ *
  */
 #define CF_LOGIN 0x0001      /*!< Allow nonwiz logins to the MUSH */
 #define CF_BUILD 0x0002      /*!< Allow building commands */
@@ -1424,17 +1426,17 @@
 #define CF_DEQUEUE 0x0100    /*!< Remove entries from the queue */
 #define CF_GODMONITOR 0x0200 /*!< Display commands to the God. */
 #define CF_EVENTCHECK 0x0400 /*!< Allow events checking */
-/** 
- * Host information codes 
- * 
+/**
+ * Host information codes
+ *
  */
 #define H_REGISTRATION 0x0001 /*!< Registration ALWAYS on */
 #define H_FORBIDDEN 0x0002    /*!< Reject all connects */
 #define H_SUSPECT 0x0004      /*!< Notify wizards of connects/disconnects */
 #define H_GUEST 0x0008        /*!< Don't permit guests from here */
-/** 
- * Logging options 
- * 
+/**
+ * Logging options
+ *
  */
 #define LOG_ALLCOMMANDS 0x00000001 /*!< Log all commands */
 #define LOG_ACCOUNTING 0x00000002  /*!< Write accounting info on logout */
@@ -1467,7 +1469,7 @@
 
 /**
  * @brief Players constants
- * 
+ *
  */
 
 #define NUM_GOOD 4 /*!< # of successful logins to save data for */
@@ -1475,13 +1477,13 @@
 
 /**
  * @brief Powers constants
- * 
+ *
  */
 
 #define POWER_EXT 0x1 /*!< Lives in extended powers word */
-/** 
+/**
  * First word of powers
- * 
+ *
  */
 #define POW_CHG_QUOTAS 0x00000001  /*!< May change and see quotas */
 #define POW_CHOWN_ANY 0x00000002   /*!< Can @chown anything or to anyone */
@@ -1515,9 +1517,9 @@
 #define POW_TEL_ANYWHR 0x20000000  /*!< Teleport anywhere */
 #define POW_TEL_UNRST 0x40000000   /*!< Teleport anything */
 #define POW_UNKILLABLE 0x80000000  /*!< Can't be killed */
-/** 
- * Second word of powers 
- * 
+/**
+ * Second word of powers
+ *
  */
 #define POW_BUILDER 0x00000001    /*!< Can build */
 #define POW_LINKVAR 0x00000002    /*!< Can link an exit to "variable" */
@@ -1529,14 +1531,14 @@
 
 /**
  * @brief String constants
- * 
+ *
  */
 
 #define STRING_EMPTY ""
 
 /**
  * ANSI control codes for various neat-o terminal effects.
- * 
+ *
  */
 #define BEEP_CHAR '\07'
 #define ESC_CHAR '\033'
@@ -1561,7 +1563,7 @@
 
 /**
  * Foreground colors
- * 
+ *
  */
 #define ANSI_BLACK "\033[30m"
 #define ANSI_RED "\033[31m"
@@ -1574,7 +1576,7 @@
 
 /**
  * Background colors
- * 
+ *
  */
 #define ANSI_BBLACK "\033[40m"
 #define ANSI_BRED "\033[41m"
@@ -1587,14 +1589,14 @@
 
 /**
  * XTERM ansi codes
- * 
+ *
  */
 #define ANSI_XTERM_FG "\033[38;5;"
 #define ANSI_XTERM_BG "\033[48;5;"
 
 /**
  * Numeric-only definitions
- * 
+ *
  */
 #define N_ANSI_NORMAL "0"
 #define N_ANSI_HILITE "1"
@@ -1624,7 +1626,7 @@
 
 /**
  * Integers
- * 
+ *
  */
 #define I_ANSI_NORMAL 0
 
@@ -1659,31 +1661,31 @@
 
 /**
  * @brief UDB Constants
- * 
+ *
  */
 
-/** 
- * Define the number of objects we may be reading/writing to at one time 
- * 
+/**
+ * Define the number of objects we may be reading/writing to at one time
+ *
  */
 #define NUM_OBJPIPES 64
 
-/** 
- * Cache flags 
- * 
+/**
+ * Cache flags
+ *
  */
 #define CACHE_DIRTY 0x00000001
 
-/** 
- * default (runtime-resettable) cache parameters 
- * 
+/**
+ * default (runtime-resettable) cache parameters
+ *
  */
 #define CACHE_SIZE 1000000 /*!< 1 million bytes */
 #define CACHE_WIDTH 200    /*!< Cache width */
 
-/** 
- * Datatypes that we have in cache and on disk 
- * 
+/**
+ * Datatypes that we have in cache and on disk
+ *
  */
 #define DBTYPE_EMPTY 0             /*!< This entry is empty */
 #define DBTYPE_ATTRIBUTE 1         /*!< This is an attribute */
@@ -1698,7 +1700,7 @@
 
 /**
  * @brief Player cache related
- * 
+ *
  */
 #define PF_DEAD 0x0001
 #define PF_REF 0x0002
@@ -1707,7 +1709,7 @@
 
 /**
  * @brief User attributes constants
- * 
+ *
  */
 
 #ifndef VATTR_HASH_SIZE /*!< must be a power of two */
@@ -1718,7 +1720,7 @@
 
 /**
  * @brief Cron constants
- * 
+ *
  */
 #define FIRST_MINUTE 0
 #define LAST_MINUTE 59
@@ -1732,9 +1734,9 @@
 #define FIRST_MONTH 1
 #define LAST_MONTH 12
 
-/** 
- * @note on DOW, 0 and 7 are both Sunday, for compatibility reasons. 
- * 
+/**
+ * @note on DOW, 0 and 7 are both Sunday, for compatibility reasons.
+ *
  */
 #define FIRST_DOW 0
 #define LAST_DOW 7
@@ -1743,16 +1745,10 @@
 #define DOW_STAR 0x02
 
 /**
- * @brief PGC related constants
- * 
- */
-#define PCG32_INITIALIZER   { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL }
-
-#endif /* __CONSTANTS_H */
-
-/**
  * @brief Floating point precision
- * 
+ *
  */
 
 #define FPTS_DIG LDBL_DIG - 1
+
+#endif /* __CONSTANTS_H */

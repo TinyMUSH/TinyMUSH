@@ -18,17 +18,17 @@ set(CMAKE_ENABLE_EXPORTS ON)
 include(CTest)
 enable_testing()
 
-include_directories(${PROJECT_SOURCE_DIR}/netmush)
-if(APPLE)
-    include_directories(/usr/local/include)
-endif(APPLE)
-
 find_program(TAR_BINARY tar)
-configure_file(${PROJECT_SOURCE_DIR}/netmush/config.h.in ${PROJECT_SOURCE_DIR}/netmush/config.h)
-configure_file(${PROJECT_SOURCE_DIR}/netmush/defaults.h.in ${PROJECT_SOURCE_DIR}/netmush/defaults.h)
+configure_file(${PROJECT_SOURCE_DIR}/netmush/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
 configure_file(${PROJECT_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf)
 configure_file(${PROJECT_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example)
 configure_file(${PROJECT_SOURCE_DIR}/systemd/tinymush.service.in ${CMAKE_CURRENT_BINARY_DIR}/systemd/tinymush.service)
+
+include_directories(${PROJECT_SOURCE_DIR}/netmush)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+if(APPLE)
+    include_directories(/usr/local/include)
+endif(APPLE)
 
 macro(install_symlink filepath sympath)
     install(CODE "

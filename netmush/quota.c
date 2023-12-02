@@ -11,14 +11,15 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <string.h>
 
 /* ---------------------------------------------------------------------------
  * load_quota: Load a quota into an array. Expects A_QUOTA or A_QUOTA.

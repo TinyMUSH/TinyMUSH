@@ -4,32 +4,34 @@
  * @brief Functions for user-defined iterations over lists
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <stdbool.h>
+#include <string.h>
+
 /*
  * ---------------------------------------------------------------------------
- * perform_loop:  
+ * perform_loop:
  */
 
 /**
  * @brief backwards-compatible looping constructs: LOOP, PARSE
- * 
+ *
  * @note See notes on perform_iter for the explanation.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -135,11 +137,11 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  make it necessary to provide some way of doing backwards compatibility, in
  order to avoid breaking a lot of code that relies upon particular patterns
  of necessary escaping.
- 
+
  whentrue() and whenfalse() work similarly to iter(). whentrue() loops as long
- as the expression evaluates to true. whenfalse() loops as long as the 
+ as the expression evaluates to true. whenfalse() loops as long as the
  expression evaluates to false.
- 
+
  istrue() and isfalse() are inline filterbool() equivalents returning the
  elements of the list which are true or false, respectively.
 
@@ -148,26 +150,26 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /**
  * @brief Looping constructs
- * 
+ *
  * @note  iter() and list() parse an expression, substitute elements of a list,
  *        one at a time, using the '##' replacement token. Uses of these
  *        functions can be nested. In older versions of MUSH, these functions
- *        could not be nested. parse() and loop() exist for reasons of 
- *        backwards compatibility, since the peculiarities of the way 
+ *        could not be nested. parse() and loop() exist for reasons of
+ *        backwards compatibility, since the peculiarities of the way
  *        substitutions were done in the string replacements make it necessary
  *        to provide some way of doing backwards compatibility, in order to
  *        avoid breaking a lot of code that relies upon particular patterns
  *        of necessary escaping.
- * 
+ *
  *        whentrue() and whenfalse() work similarly to iter(). whentrue() loops
- *        as long as the expression evaluates to true. whenfalse() loops as 
+ *        as long as the expression evaluates to true. whenfalse() loops as
  *        long as the expression evaluates to false.
- * 
+ *
  *        istrue() and isfalse() are inline filterbool() equivalents returning
  *        the elements of the list which are true or false, respectively.
- * 
+ *
  *        iter2(), list2(), etc. are two-list versions of all of the above.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -189,7 +191,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * Enforce maximum nesting level.
-     * 
+     *
      */
     if (mushstate.in_loop >= MAX_ITER_NESTING - 1)
     {
@@ -199,7 +201,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * Figure out what functionality we're getting.
-     * 
+     *
      */
     flag = Func_Mask(LOOP_NOTIFY);
     bool_flag = Func_Mask(BOOL_COND_TYPE);
@@ -277,7 +279,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * The list argument is unevaluated. Go evaluate it.
-     * 
+     *
      */
     input_p = lp = list_str = XMALLOC(LBUF_SIZE, "list_str");
     str = fargs[0];
@@ -286,7 +288,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * Same thing for the second list arg, if we have it
-     * 
+     *
      */
     if (two_flag)
     {
@@ -302,7 +304,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * If both lists are empty, we're done
-     * 
+     *
      */
     if (!(input_p && *input_p) && !(input_p2 && *input_p2))
     {
@@ -349,8 +351,8 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         work_buf = XMALLOC(LBUF_SIZE, "work_buf");
 
         /**
-         * we might nibble this 
-         * 
+         * we might nibble this
+         *
          */
         XMEMCPY(work_buf, ep, elen);
         work_buf[elen] = '\0';
@@ -421,7 +423,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /**
  * @brief Obtain nested iter tokens (#!)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -439,7 +441,7 @@ void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Obtain nested iter tokens (#@)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -466,7 +468,7 @@ void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Obtain nested iter tokens (##)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -492,7 +494,7 @@ void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Two-list version of iter
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -518,7 +520,7 @@ void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Break out of an iter.
- * 
+ *
  * @param buff Not used
  * @param bufc Not used
  * @param player Not used
@@ -550,12 +552,12 @@ void fun_ibreak(char *buff __attribute__((unused)), char **bufc __attribute__((u
  * there are elements left in the list.  The optinal base case gives the user
  * a nice starting point.
  *
- * > &REP_NUM object=[%0][repeat(%1,%1)] 
+ * > &REP_NUM object=[%0][repeat(%1,%1)]
  * > say fold(OBJECT/REP_NUM,1 2 3 4 5,->)
  *   You say "->122333444455555"
  *
  * @note To use added list separator, you must use base case!
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -577,7 +579,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     /**
      * We need two to four arguments only
-     * 
+     *
      */
     if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
     {
@@ -591,7 +593,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     /**
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -633,7 +635,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     /**
      * Evaluate it using the rest of the passed function args
-     * 
+     *
      */
     cp = curr = fargs[1];
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
@@ -642,7 +644,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     /**
      * may as well handle first case now
-     * 
+     *
      */
     i = 1;
     clist[2] = XMALLOC(SBUF_SIZE, "clist[2]");
@@ -697,15 +699,15 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 /**
  * @brief iteratively perform a function with a list of arguments and return
  *        the arg, if the function evaluates to TRUE using the arg.
- * 
- * > &IS_ODD object=mod(%0,2) 
- * > say filter(object/is_odd,1 2 3 4 5) 
- *   You say "1 3 5" 
- * > say filter(object/is_odd,1-2-3-4-5,-) 
+ *
+ * > &IS_ODD object=mod(%0,2)
+ * > say filter(object/is_odd,1 2 3 4 5)
+ *   You say "1 3 5"
+ * > say filter(object/is_odd,1-2-3-4-5,-)
  *   You say "1-3-5"
  *
  * @note If you specify a separator it is used to delimit returned list
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -774,7 +776,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     /**
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -816,7 +818,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     /**
      * Now iteratively eval the attrib with the argument list
-     * 
+     *
      */
     cp = curr = trim_space_sep(fargs[1], &isep);
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
@@ -856,20 +858,20 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 /*
  * ---------------------------------------------------------------------------
- * fun_map: 
+ * fun_map:
 
  *
  */
 
 /**
- * @brief Iteratively evaluate an attribute with a list of arguments. 
- * 
- * > &DIV_TWO object=fdiv(%0,2) 
- * > say map(1 2 3 4 5,object/div_two) 
- *   You say "0.5 1 1.5 2 2.5" 
- * > say map(object/div_two,1-2-3-4-5,-) 
+ * @brief Iteratively evaluate an attribute with a list of arguments.
+ *
+ * > &DIV_TWO object=fdiv(%0,2)
+ * > say map(1 2 3 4 5,object/div_two)
+ *   You say "0.5 1 1.5 2 2.5"
+ * > say map(object/div_two,1-2-3-4-5,-)
  *   You say "0.5-1-1.5-2-2.5"
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -913,7 +915,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     /**
      * If we don't have anything for a second arg, don't bother.
-     * 
+     *
      */
     if (!fargs[1] || !*fargs[1])
     {
@@ -922,7 +924,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     /**
      * Two possibilities for the second arg: <obj>/<attr> and <attr>.
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -964,7 +966,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     /**
      * now process the list one element at a time
-     * 
+     *
      */
     cp = trim_space_sep(fargs[1], &isep);
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
@@ -997,7 +999,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 /**
  * @brief Like map, but operates on two lists or more lists simultaneously,
  *        passing the elements as %0, %1, %2, etc.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1006,7 +1008,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * @param fargs Function arguments
  * @param nfargs Number of function arguments
  * @param cargs Command arguments
- * @param ncargs Number of command arguments 
+ * @param ncargs Number of command arguments
  */
 void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1044,7 +1046,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     /**
      * Get the attribute, check the permissions.
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -1093,7 +1095,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     /**
      * process the lists, one element at a time.
-     * 
+     *
      */
     nwords = 0;
 
@@ -1144,7 +1146,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * @brief A little like a fusion of iter() and mix(), it takes elements of
  *        a list X at a time and passes them into a single function as %0, %1,
  *        etc. step(<attribute>,<list>,<step size>,<delim>,<outdelim>)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1153,7 +1155,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
  * @param fargs Function arguments
  * @param nfargs Number of function arguments
  * @param cargs Command arguments
- * @param ncargs Number of command arguments 
+ * @param ncargs Number of command arguments
  */
 void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1196,7 +1198,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     /**
      * Get attribute. Check permissions.
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -1266,7 +1268,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @brief Like map(), but it operates on a string, rather than on a
  * list, calling a user-defined function for each character in the string. No
  * delimiter is inserted between the results.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1345,11 +1347,11 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         end_token = *fargs[3];
     }
 
-    /** 
-     * first letter in string is 0, not 1 
-     * 
+    /**
+     * first letter in string is 0, not 1
+     *
      */
-    i = -1; 
+    i = -1;
     cbuf[1] = XMALLOC(SBUF_SIZE, "cbuf[1]");
 
     while (cp && *cp && (mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
@@ -1358,7 +1360,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         {
             /**
              * Look for a start token.
-             * 
+             *
              */
             while (*cp && (*cp != start_token))
             {
@@ -1373,8 +1375,8 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
             }
 
             /**
-    	     * Skip to the next character. Don't copy the start token.
-             * 
+             * Skip to the next character. Don't copy the start token.
+             *
              */
             cp++;
             i++;
@@ -1390,11 +1392,11 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         if (*cp == end_token)
         {
             /**
-    	     * We've found an end token. Skip over it. Note that
-    	     * it's possible to have a start and end token next
-    	     * to one another.
-             * 
-    	     */
+             * We've found an end token. Skip over it. Note that
+             * it's possible to have a start and end token next
+             * to one another.
+             *
+             */
             cp++;
             i++;
             in_string = 0;
@@ -1420,7 +1422,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 /**
  * @brief Combines two lists in an arbitrary manner.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1471,7 +1473,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     /**
      * Find our object and attribute
-     * 
+     *
      */
     if (string_prefix(fargs[0], "#lambda/"))
     {
@@ -1513,7 +1515,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     /**
      * Copy our lists and chop them up.
-     * 
+     *
      */
     list1 = XMALLOC(LBUF_SIZE, "list1");
     list2 = XMALLOC(LBUF_SIZE, "list2");
@@ -1536,7 +1538,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     /**
      * Call the u-function with the first list as %0. Pass the input
      * separator as %1, which makes sorting, etc. easier.
-     * 
+     *
      */
     st[0] = fargs[1];
     st[1] = XMALLOC(LBUF_SIZE, "st[1]");
@@ -1550,7 +1552,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Now that we have our result, put it back into array form. Search
      * through list1 until we find the element position, then copy the
      * corresponding element from list2.
-     * 
+     *
      */
     nresults = list2arr(&results, LBUF_SIZE / 2, rlist, &isep);
 
@@ -1584,9 +1586,8 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 /*
  * ---------------------------------------------------------------------------
- * fun_while: 
+ * fun_while:
  */
-
 
 /**
  * @brief Evaluate a list until a termination condition is met:
@@ -1594,7 +1595,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * "[strlen(%0)]" and CONDITION_FN is "[strmatch(%0,baz)]" would result in
  * '3-7-3' being returned. The termination condition is an EXACT not wild
  * match.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1639,7 +1640,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     /**
      * If our third arg is null (empty list), don't bother.
-     * 
+     *
      */
     if (!fargs[2] || !*fargs[2])
     {
@@ -1653,7 +1654,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Note that for user-defined attributes, atr_str() returns a pointer to
      * a static, and that therefore we have to be careful about what
      * we're doing.
-     * 
+     *
      */
     if (parse_attrib(player, fargs[0], &thing1, &anum1, 0))
     {
@@ -1698,7 +1699,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (!ap2)
     {
-        XFREE(atext1); 
+        XFREE(atext1);
         return;
     }
 
@@ -1707,7 +1708,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * ourselves some time later. There are two possibilities: we have
      * the exact same obj/attr pair, or the attributes contain identical
      * text.
-     * 
+     *
      */
     if ((thing1 == thing2) && (tmp_num == ap2->number))
     {
@@ -1738,7 +1739,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     /**
      * Process the list one element at a time.
-     * 
+     *
      */
     cp = trim_space_sep(fargs[2], &isep);
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");

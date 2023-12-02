@@ -4,21 +4,25 @@
  * @brief flatfile implementation
  * @version 3.3
  * @date 2020-12-28
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <string.h>
 
 extern struct object *db;
 int g_version;
@@ -29,9 +33,9 @@ int *used_attrs_table;
 
 /**
  * @brief Get boolean subexpression from file.
- * 
+ *
  * @param f			File
- * @return BOOLEXP* 
+ * @return BOOLEXP*
  */
 BOOLEXP *getboolexp1(FILE *f)
 {
@@ -142,9 +146,9 @@ BOOLEXP *getboolexp1(FILE *f)
 			return b;
 		}
 	case '-':
-		/** 
-		 * obsolete NOTHING key, eat it 
-		 * 
+		/**
+		 * obsolete NOTHING key, eat it
+		 *
 		 */
 		while ((c = getc(f)) != '\n')
 		{
@@ -178,7 +182,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		/**
 		 * if last character is : then this is an attribute lock. A
 		 * last character of / means an eval lock
-		 * 
+		 *
 		 */
 		if ((c == ':') || (c == '/'))
 		{
@@ -196,7 +200,7 @@ BOOLEXP *getboolexp1(FILE *f)
 	default:
 		/**
 		 * dbref or attribute
-		 * 
+		 *
 		 */
 		ungetc(c, f);
 		b = alloc_boolexp();
@@ -208,7 +212,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		 * eval locks are of the form <anam-or-anum>:<string> or
 		 * <aname-or-anum>/<string> respectively. The characters
 		 * <nl>, |, and & terminate the string.
-		 * 
+		 *
 		 */
 		if (isdigit(c))
 		{
@@ -230,10 +234,10 @@ BOOLEXP *getboolexp1(FILE *f)
 			}
 			*s = '\0';
 			/**
-		     * Look the name up as an attribute.  If not found,
-		     * create a new attribute.
-			 * 
-		     */
+			 * Look the name up as an attribute.  If not found,
+			 * create a new attribute.
+			 *
+			 */
 			anum = mkattr(buff);
 			if (anum <= 0)
 			{
@@ -252,7 +256,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		/**
 		 * if last character is : then this is an attribute lock. A
 		 * last character of / means an eval lock
-		 * 
+		 *
 		 */
 		if ((c == ':') || (c == '/'))
 		{
@@ -280,8 +284,8 @@ BOOLEXP *getboolexp1(FILE *f)
 	}
 error:
 	log_write_raw(1, "ABORT! db_rw.c, reached error case in getboolexp1().\n");
-	/** 
-	 * bomb out 
+	/**
+	 * bomb out
 	 *
 	 */
 	abort();
@@ -290,9 +294,9 @@ error:
 
 /**
  * @brief Read a boolean expression from the flat file.
- * 
+ *
  * @param f			File
- * @return BOOLEXP* 
+ * @return BOOLEXP*
  */
 BOOLEXP *getboolexp(FILE *f)
 {
@@ -302,8 +306,8 @@ BOOLEXP *getboolexp(FILE *f)
 	if (getc(f) != '\n')
 	{
 		/**
-		 * parse error, we lose 
-		 * 
+		 * parse error, we lose
+		 *
 		 */
 		log_write_raw(1, "ABORT! db_rw.c, parse error in getboolexp().\n");
 		abort();
@@ -319,9 +323,9 @@ BOOLEXP *getboolexp(FILE *f)
 
 /**
  * @brief Fix up attribute numbers from foreign muds
- * 
+ *
  * @param attrnum	attribute numbers
- * @return int 
+ * @return int
  */
 int unscramble_attrnum(int attrnum)
 {
@@ -330,7 +334,7 @@ int unscramble_attrnum(int attrnum)
 	case F_MUSH:
 		/**
 		 * TinyMUSH 2.2:  Deal with different attribute numbers.
-		 * 
+		 *
 		 */
 		switch (attrnum)
 		{
@@ -356,7 +360,7 @@ int unscramble_attrnum(int attrnum)
 
 /**
  * @brief Read attribute list from flat file.
- * 
+ *
  * @param f				File
  * @param i				DBref
  * @param new_strings	New string
@@ -375,7 +379,7 @@ void get_list(FILE *f, dbref i, int new_strings)
 		case '>':
 			/**
 			 * read # then string
-			 * 
+			 *
 			 */
 			if (mushstate.standalone)
 			{
@@ -389,8 +393,8 @@ void get_list(FILE *f, dbref i, int new_strings)
 			if (atr > 0)
 			{
 				/**
-				 * Store the attr 
-				 * 
+				 * Store the attr
+				 *
 				 */
 				buff = getstring(f, new_strings);
 				atr_add_raw(i, atr, buff);
@@ -399,8 +403,8 @@ void get_list(FILE *f, dbref i, int new_strings)
 			else
 			{
 				/**
-				 * Silently discard 
-				 * 
+				 * Silently discard
+				 *
 				 */
 				XFREE(getstring(f, new_strings));
 			}
@@ -410,14 +414,14 @@ void get_list(FILE *f, dbref i, int new_strings)
 		case '\n':
 			/**
 			 * ignore newlines. They're due to v(r).
-			 * 
+			 *
 			 */
 			break;
 
 		case '<':
 			/**
 			 * end of list
-			 * 
+			 *
 			 */
 			c = getc(f);
 
@@ -431,7 +435,7 @@ void get_list(FILE *f, dbref i, int new_strings)
 		default:
 			/**
 			 * We've found a bad spot.  I hope things aren't too bad.
-			 * 
+			 *
 			 */
 			log_write_raw(1, "Bad character '%c' when getting attributes on object %d\n", c, i);
 
@@ -442,7 +446,7 @@ void get_list(FILE *f, dbref i, int new_strings)
 
 /**
  * @brief Write a boolean sub-expression to the flat file.
- * 
+ *
  * @param f File
  * @param b Boolean sub-expression
  */
@@ -542,7 +546,7 @@ void putbool_subexp(FILE *f, BOOLEXP *b)
 
 /**
  * @brief Write boolean expression to the flat file.
- * 
+ *
  * @param f File
  * @param b Boolean expression
  */
@@ -558,7 +562,7 @@ void putboolexp(FILE *f, BOOLEXP *b)
 
 /**
  * @brief Convert foreign flags to MUSH format.
- * 
+ *
  * @param flags1		Flag
  * @param flags2		Flag
  * @param flags3		Flag
@@ -579,7 +583,7 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 
 		/**
 		 * TinyMUSH 2.2 to 3.0 flag conversion
-		 * 
+		 *
 		 */
 		if (newf1 & ROYALTY)
 		{
@@ -627,7 +631,7 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 		{
 			/**
 			 * This is the unimplemented TICKLER flag.
-			 * 
+			 *
 			 */
 			newf2 &= ~HAS_DAILY;
 		}
@@ -648,7 +652,7 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 	{
 		/**
 		 * TinyMUX to 3.0 flag conversion
-		 * 
+		 *
 		 */
 		newf1 = f1;
 		newf2 = f2;
@@ -657,44 +661,44 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 		if (newf2 & ZONE_PARENT)
 		{
 			/**
-		     * This used to be an object set NO_COMMAND. We unset the flag.
-			 * 
-		     */
+			 * This used to be an object set NO_COMMAND. We unset the flag.
+			 *
+			 */
 			newf2 &= ~ZONE_PARENT;
 		}
 		else
 		{
 			/**
-		     * And if it wasn't NO_COMMAND, then it should be COMMANDS.
-			 * 
-		     */
+			 * And if it wasn't NO_COMMAND, then it should be COMMANDS.
+			 *
+			 */
 			newf2 |= HAS_COMMANDS;
 		}
 
 		if (newf2 & WATCHER)
 		{
 			/**
-		     * This used to be the COMPRESS flag, which didn't do anything.
-			 * 
-		     */
+			 * This used to be the COMPRESS flag, which didn't do anything.
+			 *
+			 */
 			newf2 &= ~WATCHER;
 		}
 
 		if ((newf1 & MONITOR) && ((newf1 & TYPE_MASK) == TYPE_PLAYER))
 		{
 			/**
-		     * Players set MONITOR should be set WATCHER as well.
-			 * 
-		     */
+			 * Players set MONITOR should be set WATCHER as well.
+			 *
+			 */
 			newf2 |= WATCHER;
 		}
 	}
 	else if (db_format == F_TINYMUSH)
 	{
 		/**
-		 * Native TinyMUSH 3.0 database. The only thing we have to do is 
+		 * Native TinyMUSH 3.0 database. The only thing we have to do is
 		 * clear the redirection flag, as nothing is ever redirected at startup.
-		 * 
+		 *
 		 */
 		newf1 = f1;
 		newf2 = f2;
@@ -710,7 +714,7 @@ void upgrade_flags(FLAG *flags1, FLAG *flags2, FLAG *flags3, dbref thing, int db
 
 /**
  * @brief Fix things up for Exits-From-Objects
- * 
+ *
  */
 void efo_convert(void)
 {
@@ -724,9 +728,9 @@ void efo_convert(void)
 		case TYPE_PLAYER:
 		case TYPE_THING:
 			/**
-		     * swap Exits and Link
-			 * 
-		     */
+			 * swap Exits and Link
+			 *
+			 */
 			link = Link(i);
 			s_Link(i, Exits(i));
 			s_Exits(i, link);
@@ -737,18 +741,18 @@ void efo_convert(void)
 
 /**
  * @brief Convert MUX-style zones to 3.0-style zones.
- * 
+ *
  */
 void fix_mux_zones(void)
 {
 	/**
-     * For all objects in the database where Zone(thing) != NOTHING, set
-     * the CONTROL_OK flag on them.
-     *
-     * For all objects in the database that are ZMOs (that have other objects 
+	 * For all objects in the database where Zone(thing) != NOTHING, set
+	 * the CONTROL_OK flag on them.
+	 *
+	 * For all objects in the database that are ZMOs (that have other objects
 	 * zoned to them), copy the EnterLock of those objects to the ControlLock.
-	 * 
-     */
+	 *
+	 */
 	int *zmarks;
 	char *astr;
 	zmarks = (int *)XCALLOC(mushstate.db_top, sizeof(int), "zmarks");
@@ -778,22 +782,22 @@ void fix_mux_zones(void)
 
 /**
  * @brief Explode standard quotas into typed quotas
- * 
+ *
  */
 void fix_typed_quotas(void)
 {
 	/**
-     * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
-     * attributes  exist. For simplicity's sake, we assume that players will 
-	 * have the  same quotas for all types, equal to the current value. This 
-	 * is  going to produce incorrect values for RQUOTA; this is easily fixed  
+	 * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
+	 * attributes  exist. For simplicity's sake, we assume that players will
+	 * have the  same quotas for all types, equal to the current value. This
+	 * is  going to produce incorrect values for RQUOTA; this is easily fixed
 	 * by a @quota/fix done from within-game.
-     *
-     * If we have a early beta 2.2 release, we have quotas which are spread
-     * out over ten attributes. We're going to have to grab those, make the 
+	 *
+	 * If we have a early beta 2.2 release, we have quotas which are spread
+	 * out over ten attributes. We're going to have to grab those, make the
 	 * new quotas, and then delete the old attributes.
-	 * 
-     */
+	 *
+	 */
 	char *qbuf = NULL, *rqbuf = NULL;
 	char *s = XMALLOC(LBUF_SIZE, "s");
 
@@ -825,12 +829,12 @@ void fix_typed_quotas(void)
 
 /**
  * @brief Read a flatfile
- * 
+ *
  * @param f				File
  * @param db_format		DB Format
  * @param db_version	DB Version
  * @param db_flags		DB Flags
- * @return dbref 
+ * @return dbref
  */
 dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 {
@@ -875,14 +879,14 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 		case '-':
 			/**
 			 * Misc tag
-			 * 
+			 *
 			 */
 			switch (ch = getc(f))
 			{
 			case 'R':
 				/**
 				 * Record number of players
-				 * 
+				 *
 				 */
 				mushstate.record_players = getref(f);
 				break;
@@ -896,7 +900,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 		case '+':
 			/**
 			 * MUX and MUSH header, 2nd char selects type
-			 * 
+			 *
 			 */
 			ch = getc(f);
 
@@ -904,7 +908,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			{
 				/**
 				 * The following things are common across 2.x, MUX, and 3.0.
-				 * 
+				 *
 				 */
 				if (header_gotten)
 				{
@@ -927,7 +931,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 				/**
 				 * Otherwise extract feature flags
-				 * 
+				 *
 				 */
 				if (g_version & V_GDBM)
 				{
@@ -953,14 +957,14 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * More generic switch.
-			 * 
+			 *
 			 */
 			switch (ch)
 			{
 			case 'T':
 				/**
 				 * 3.0 VERSION
-				 * 
+				 *
 				 */
 				g_format = F_TINYMUSH;
 				read_3flags = (g_version & V_3FLAGS);
@@ -971,8 +975,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			case 'V':
 				/**
-				 * 2.0 VERSION 
-				 * 
+				 * 2.0 VERSION
+				 *
 				 */
 				g_format = F_MUSH;
 				g_version &= V_MASK;
@@ -981,7 +985,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			case 'X':
 				/**
 				 * MUX VERSION
-				 * 
+				 *
 				 */
 				g_format = F_MUX;
 				read_3flags = (g_version & V_3FLAGS);
@@ -993,7 +997,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			case 'S':
 				/**
 				 * SIZE
-				 * 
+				 *
 				 */
 				if (size_gotten)
 				{
@@ -1019,7 +1023,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			case 'A':
 				/**
 				 * USER-NAMED ATTRIBUTE
-				 * 
+				 *
 				 */
 				anum = getref(f);
 
@@ -1042,7 +1046,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 					{
 						/**
 						 * If not AF_ODARK, is AF_VISUAL. Strip AF_ODARK.
-						 * 
+						 *
 						 */
 						if (aflags & AF_ODARK)
 						{
@@ -1065,7 +1069,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			case 'F':
 				/**
 				 * OPEN USER ATTRIBUTE SLOT
-				 * 
+				 *
 				 */
 				anum = getref(f);
 				break;
@@ -1073,7 +1077,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			case 'N':
 				/**
 				 * NEXT ATTR TO ALLOC WHEN NO FREELIST
-				 * 
+				 *
 				 */
 				if (nextattr_gotten)
 				{
@@ -1114,7 +1118,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 		case '!':
 			/**
 			 * MUX and MUSH entries
-			 * 
+			 *
 			 */
 			if (deduce_version)
 			{
@@ -1185,20 +1189,20 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 			}
 
 			/**
-			 * CONTENTS and EXITS 
-			 * 
+			 * CONTENTS and EXITS
+			 *
 			 */
 			s_Contents(i, getref(f));
 
 			/**
-			 * EXITS 
-			 * 
+			 * EXITS
+			 *
 			 */
 			s_Exits(i, getref(f));
 
 			/**
 			 * LINK
-			 * 
+			 *
 			 */
 			if (read_link)
 			{
@@ -1211,13 +1215,13 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * NEXT
-			 * 
+			 *
 			 */
 			s_Next(i, getref(f));
 
 			/**
 			 * LOCK
-			 * 
+			 *
 			 */
 			if (read_key)
 			{
@@ -1230,13 +1234,13 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * OWNER
-			 * 
+			 *
 			 */
 			s_Owner(i, getref(f));
 
 			/**
 			 * PARENT
-			 * 
+			 *
 			 */
 			if (read_parent)
 			{
@@ -1249,7 +1253,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * PENNIES
-			 * 
+			 *
 			 */
 			if (read_money)
 			{
@@ -1258,7 +1262,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * FLAGS
-			 * 
+			 *
 			 */
 			f1 = getref(f);
 
@@ -1317,7 +1321,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * ATTRIBUTES
-			 * 
+			 *
 			 */
 			if (read_attribs)
 			{
@@ -1326,7 +1330,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 			/**
 			 * check to see if it's a player
-			 * 
+			 *
 			 */
 			if (Typeof(i) == TYPE_PLAYER)
 			{
@@ -1338,7 +1342,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 		case '*':
 			/**
 			 * EOF marker
-			 * 
+			 *
 			 */
 			if (tstr)
 			{
@@ -1400,8 +1404,8 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 
 /**
  * @brief Read a DB
- * 
- * @return int 
+ *
+ * @return int
  */
 int db_read(void)
 {
@@ -1411,9 +1415,9 @@ int db_read(void)
 	struct timeval obj_time;
 
 	/**
-     * Fetch the database info
-	 * 
-     */
+	 * Fetch the database info
+	 *
+	 */
 	key.dptr = "TM3";
 	key.dsize = strlen("TM3") + 1;
 	data = db_get(key, DBTYPE_DBINFO);
@@ -1425,9 +1429,9 @@ int db_read(void)
 	}
 
 	/**
-     * Unroll the data returned
-	 * 
-     */
+	 * Unroll the data returned
+	 *
+	 */
 	c = data.dptr;
 	XMEMCPY((void *)&mushstate.min_size, (void *)c, sizeof(int));
 	c++;
@@ -1439,9 +1443,9 @@ int db_read(void)
 	XFREE(data.dptr);
 
 	/**
-     * Load the attribute numbers
-	 * 
-     */
+	 * Load the attribute numbers
+	 *
+	 */
 	blksize = ATRNUM_BLOCK_SIZE;
 
 	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.attr_next, blksize); i++)
@@ -1453,9 +1457,9 @@ int db_read(void)
 		if (data.dptr)
 		{
 			/**
-		     * Unroll the data into flags and name
-			 * 
-		     */
+			 * Unroll the data into flags and name
+			 *
+			 */
 			s = data.dptr;
 
 			while ((s - (char *)data.dptr) < data.dsize)
@@ -1471,9 +1475,9 @@ int db_read(void)
 				{
 
 					/**
-				     * Houston, we have a problem
-					 * 
-				     */
+					 * Houston, we have a problem
+					 *
+					 */
 					log_write(LOG_ALWAYS, "DBR", "LOAD", "Error reading attribute number %d", j + ENTRY_BLOCK_STARTS(i, blksize));
 				}
 
@@ -1485,9 +1489,9 @@ int db_read(void)
 	}
 
 	/**
-     * Load the object structures
-	 * 
-     */
+	 * Load the object structures
+	 *
+	 */
 	if (mushstate.standalone)
 	{
 		log_write(LOG_ALWAYS, "DBR", "LOAD", "Reading ");
@@ -1505,9 +1509,9 @@ int db_read(void)
 		{
 
 			/**
-		     * Unroll the data into objnum and object
-			 * 
-		     */
+			 * Unroll the data into objnum and object
+			 *
+			 */
 			s = data.dptr;
 
 			while ((s - (char *)data.dptr) < data.dsize)
@@ -1523,7 +1527,7 @@ int db_read(void)
 
 				/**
 				 * We read the entire object structure in and copy it into place
-				 * 
+				 *
 				 */
 				XMEMCPY((void *)&(db[num]), (void *)s, sizeof(DUMPOBJ));
 				s += sizeof(DUMPOBJ);
@@ -1541,7 +1545,7 @@ int db_read(void)
 				s_InstanceCount(num, 0);
 				/**
 				 * Check to see if it's a player
-				 * 
+				 *
 				 */
 				if (Typeof(num) == TYPE_PLAYER)
 				{
@@ -1570,13 +1574,13 @@ int db_read(void)
 
 /**
  * @brief Write an object to a DB
- * 
+ *
  * @param f			File
  * @param i			DBref of object
  * @param db_format	DB Format
  * @param flags		Flags
  * @param n_atrt	Number of attributes
- * @return int 
+ * @return int
  */
 int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)), int flags, int *n_atrt)
 {
@@ -1670,9 +1674,9 @@ int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)),
 	}
 
 	/**
-     * write the attribute list
-	 * 
-     */
+	 * write the attribute list
+	 *
+	 */
 	changed = 0;
 
 	for (ca = atr_head(i, &as); ca; ca = atr_next(&as))
@@ -1755,11 +1759,11 @@ int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)),
 
 /**
  * @brief Write a db to Flat File
- * 
+ *
  * @param f			File
  * @param format	Format of the flatfile
  * @param version	Version of the flatfile
- * @return dbref 
+ * @return dbref
  */
 dbref db_write_flatfile(FILE *f, int format, int version)
 {
@@ -1791,9 +1795,9 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	}
 
 	/**
-     * Attribute cleaning, if standalone.
-	 * 
-     */
+	 * Attribute cleaning, if standalone.
+	 *
+	 */
 	if (mushstate.standalone && dbclean)
 	{
 		used_attrs_table = (int *)XCALLOC(mushstate.attr_next, sizeof(int), "used_attrs_table");
@@ -1803,7 +1807,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 
 		/**
 		 * Non-user defined attributes are always considered used.
-		 * 
+		 *
 		 */
 		for (n = 0; n < A_USER_START; n++)
 		{
@@ -1812,7 +1816,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 
 		/**
 		 * Walk the database. Mark all the attribute numbers in use.
-		 * 
+		 *
 		 */
 		atr_push();
 		for (i = 0; i < mushstate.db_top; i++)
@@ -1826,7 +1830,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 
 		/**
 		 * Count up how many attributes we're deleting.
-		 * 
+		 *
 		 */
 		vp = vattr_first();
 
@@ -1845,7 +1849,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		 * free slots, walk backwards to the first used slot at the end of the
 		 * table. Write the number of the free slot into that used slot. Keep
 		 * a mapping of what things used to be.
-		 * 
+		 *
 		 */
 		for (n = A_USER_START, end = mushstate.attr_next - 1; (n < mushstate.attr_next) && (n < end); n++)
 		{
@@ -1867,7 +1871,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 
 		/**
 		 * Count up our renumbers.
-		 * 
+		 *
 		 */
 		for (n = A_USER_START; n < mushstate.attr_next; n++)
 		{
@@ -1885,7 +1889,7 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 		/**
 		 * The new end of the attribute table is the first thing
 		 * we've renumbered.
-		 * 
+		 *
 		 */
 		for (anxt = A_USER_START; ((anxt == used_attrs_table[anxt]) && (anxt < mushstate.attr_next)); anxt++)
 			;
@@ -1897,17 +1901,17 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	}
 
 	/**
-     * Write database information. TinyMUSH 2 wrote '+V', MUX wrote '+X',
-     * 3.0 writes '+T'.
-	 * 
-     */
+	 * Write database information. TinyMUSH 2 wrote '+V', MUX wrote '+X',
+	 * 3.0 writes '+T'.
+	 *
+	 */
 	fprintf(f, "+T%d\n+S%d\n+N%d\n", flags, mushstate.db_top, anxt);
 	fprintf(f, "-R%d\n", mushstate.record_players);
 
 	/**
-     * Dump user-named attribute info
-	 * 
-     */
+	 * Dump user-named attribute info
+	 *
+	 */
 	if (mushstate.standalone && dbclean)
 	{
 		for (i = A_USER_START; i < anxt; i++)
@@ -1944,9 +1948,9 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 	}
 
 	/**
-     * Dump object and attribute info
-	 * 
-     */
+	 * Dump object and attribute info
+	 *
+	 */
 	n_objt = n_atrt = 0;
 	for (i = 0; i < mushstate.db_top; i++)
 	{
@@ -1985,8 +1989,8 @@ dbref db_write_flatfile(FILE *f, int format, int version)
 
 /**
  * @brief Write DB to file
- * 
- * @return dbref 
+ *
+ * @return dbref
  */
 dbref db_write(void)
 {
@@ -2003,22 +2007,22 @@ dbref db_write(void)
 	}
 
 	/**
-     * Lock the database
-	 * 
-     */
+	 * Lock the database
+	 *
+	 */
 	db_lock();
 
 	/**
-     * Write database information
-	 * 
-     */
+	 * Write database information
+	 *
+	 */
 	i = mushstate.attr_next;
 
 	/**
-     * Roll up various paramaters needed for startup into one record.
-     * This should be the only data record of its type
-	 * 
-     */
+	 * Roll up various paramaters needed for startup into one record.
+	 * This should be the only data record of its type
+	 *
+	 */
 	c = data.dptr = (int *)XMALLOC(4 * sizeof(int), "c");
 	XMEMCPY((void *)c, (void *)&mushstate.db_top, sizeof(int));
 	c++;
@@ -2029,9 +2033,9 @@ dbref db_write(void)
 	XMEMCPY((void *)c, (void *)&mushstate.moduletype_top, sizeof(int));
 
 	/**
-     * "TM3" is our unique key
-	 * 
-     */
+	 * "TM3" is our unique key
+	 *
+	 */
 	key.dptr = "TM3";
 	key.dsize = strlen("TM3") + 1;
 	data.dsize = 4 * sizeof(int);
@@ -2039,21 +2043,21 @@ dbref db_write(void)
 	XFREE(data.dptr);
 
 	/**
-     * Dump user-named attribute info
-	 * 
-     * First, calculate the number of attribute entries we can fit in a
-     * block, allowing for some minor DBM key overhead. This should not
-     * change unless the size of VNAME_SIZE or LBUF_SIZE changes, in
-     * which case you'd have to reload anyway
-	 * 
-     */
+	 * Dump user-named attribute info
+	 *
+	 * First, calculate the number of attribute entries we can fit in a
+	 * block, allowing for some minor DBM key overhead. This should not
+	 * change unless the size of VNAME_SIZE or LBUF_SIZE changes, in
+	 * which case you'd have to reload anyway
+	 *
+	 */
 	blksize = ATRNUM_BLOCK_SIZE;
 
 	/**
-     * Step through the attribute number array, writing stuff in 'num'
-     * sized chunks
-	 * 
-     */
+	 * Step through the attribute number array, writing stuff in 'num'
+	 * sized chunks
+	 *
+	 */
 	data.dptr = (char *)XMALLOC(ATRNUM_BLOCK_BYTES, "data.dptr");
 
 	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.attr_next, blksize); i++)
@@ -2079,7 +2083,7 @@ dbref db_write(void)
 					{
 						/**
 						 * Only write the dirty attribute numbers and clear the flag
-						 * 
+						 *
 						 */
 						vp->flags &= ~AF_DIRTY;
 						dirty = 1;
@@ -2097,9 +2101,9 @@ dbref db_write(void)
 		if (!num)
 		{
 			/**
-		     * No valid attributes in this block, delete it
-			 * 
-		     */
+			 * No valid attributes in this block, delete it
+			 *
+			 */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			db_del(key, DBTYPE_ATRNUM);
@@ -2108,16 +2112,16 @@ dbref db_write(void)
 		if (dirty)
 		{
 			/**
-		     * Something is dirty in this block, write all of the
-		     * attribute numbers in this block
-			 * 
-		     */
+			 * Something is dirty in this block, write all of the
+			 * attribute numbers in this block
+			 *
+			 */
 			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mushstate.attr_next); j++)
 			{
 				/**
 				 * j is an offset of attribute numbers into
 				 * the current block
-				 * 
+				 *
 				 */
 				if ((ENTRY_BLOCK_STARTS(i, blksize) + j) < A_USER_START)
 				{
@@ -2139,9 +2143,9 @@ dbref db_write(void)
 			}
 
 			/**
-		     * Write the block: Block number is our key
-			 * 
-		     */
+			 * Write the block: Block number is our key
+			 *
+			 */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			data.dsize = s - (char *)data.dptr;
@@ -2152,17 +2156,17 @@ dbref db_write(void)
 	XFREE(data.dptr);
 
 	/**
-     * Dump object structures using the same block-based method we use to
-     * dump attribute numbers
-	 * 
-     */
+	 * Dump object structures using the same block-based method we use to
+	 * dump attribute numbers
+	 *
+	 */
 	blksize = OBJECT_BLOCK_SIZE;
 
 	/**
-     * Step through the object structure array, writing stuff in 'num'
-     * sized chunks
-	 * 
-     */
+	 * Step through the object structure array, writing stuff in 'num'
+	 * sized chunks
+	 *
+	 */
 	data.dptr = (char *)XMALLOC(OBJECT_BLOCK_BYTES, "data.dptr");
 
 	for (i = 0; i <= ENTRY_NUM_BLOCKS(mushstate.db_top, blksize); i++)
@@ -2179,10 +2183,10 @@ dbref db_write(void)
 			}
 
 			/**
-		     * We assume you always do a dbck before dump, and
-		     * Going objects are really destroyed!
-			 * 
-		     */
+			 * We assume you always do a dbck before dump, and
+			 * Going objects are really destroyed!
+			 *
+			 */
 			if (!Going(j))
 			{
 				if (!mushstate.standalone)
@@ -2191,7 +2195,7 @@ dbref db_write(void)
 					{
 						/**
 						 * Only write the dirty objects and clear the flag
-						 * 
+						 *
 						 */
 						s_Clean(j);
 						dirty = 1;
@@ -2209,9 +2213,9 @@ dbref db_write(void)
 		if (!num)
 		{
 			/**
-		     * No valid objects in this block, delete it
-			 * 
-		     */
+			 * No valid objects in this block, delete it
+			 *
+			 */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			db_del(key, DBTYPE_OBJECT);
@@ -2220,15 +2224,15 @@ dbref db_write(void)
 		if (dirty)
 		{
 			/**
-		     * Something is dirty in this block, write all of the
-		     * objects in this block
-			 * 
-		     */
+			 * Something is dirty in this block, write all of the
+			 * objects in this block
+			 *
+			 */
 			for (j = 0; (j < blksize) && ((ENTRY_BLOCK_STARTS(i, blksize) + j) < mushstate.db_top); j++)
 			{
 				/**
 				 * j is an offset of object numbers into the current block
-				 * 
+				 *
 				 */
 				k = ENTRY_BLOCK_STARTS(i, blksize) + j;
 
@@ -2242,9 +2246,9 @@ dbref db_write(void)
 			}
 
 			/**
-		     * Write the block: Block number is our key
-			 * 
-		     */
+			 * Write the block: Block number is our key
+			 *
+			 */
 			key.dptr = &i;
 			key.dsize = sizeof(int);
 			data.dsize = s - (char *)data.dptr;
@@ -2255,9 +2259,9 @@ dbref db_write(void)
 	XFREE(data.dptr);
 
 	/**
-     * Unlock the database
-	 * 
-     */
+	 * Unlock the database
+	 *
+	 */
 	db_unlock();
 
 	if (mushstate.standalone)
@@ -2270,10 +2274,10 @@ dbref db_write(void)
 
 /**
  * @brief Open a file pointer for a module to use when writing a flatfile
- * 
+ *
  * @param filename	Filename
  * @param wrflag	Open for write or read access.
- * @return FILE* 
+ * @return FILE*
  */
 FILE *db_module_flatfile(char *filename, bool wrflag)
 {

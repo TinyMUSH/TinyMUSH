@@ -13,14 +13,16 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <errno.h>
+#include <string.h>
 
 FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */

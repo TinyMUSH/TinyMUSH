@@ -4,21 +4,25 @@
  * @brief MUSH function handlers
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include <dlfcn.h>
 
 extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 
@@ -28,7 +32,7 @@ const Delim SPACE_DELIM = {1, " "};
 
 /**
  * @brief Initialize the function hashtable
- * 
+ *
  */
 void init_functab(void)
 {
@@ -49,9 +53,9 @@ void init_functab(void)
 
 /**
  * @brief Add a function
- * 
+ *
  * @param player DBref of player
- * @param cause Not used 
+ * @param cause Not used
  * @param key Key
  * @param fname Function name
  * @param target Target
@@ -66,7 +70,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Check for list first
-     * 
+     *
      */
     if (key & FUNCT_LIST)
     {
@@ -74,7 +78,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         {
             /**
              * Make it case-insensitive, and look it up.
-             * 
+             *
              */
             for (bp = fname; *bp; bp++)
             {
@@ -97,7 +101,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
         /**
          * No name given, list them all.
-         * 
+         *
          */
         for (ufp = (UFUN *)hash_firstentry(&mushstate.ufunc_htab); ufp != NULL; ufp = (UFUN *)hash_nextentry(&mushstate.ufunc_htab))
         {
@@ -109,7 +113,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Make a local uppercase copy of the function name
-     * 
+     *
      */
     bp = np = XMALLOC(SBUF_SIZE, "np");
     SAFE_SB_STR(fname, np, &bp);
@@ -122,7 +126,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Verify that the function doesn't exist in the builtin table
-     * 
+     *
      */
     if (hashfind(np, &mushstate.func_htab) != NULL)
     {
@@ -133,7 +137,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Make sure the target object exists
-     * 
+     *
      */
     if (!parse_attrib(player, target, &obj, &atr, 0))
     {
@@ -144,7 +148,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Make sure the attribute exists
-     * 
+     *
      */
     if (atr == NOTHING)
     {
@@ -155,7 +159,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Make sure attribute is readably by me
-     * 
+     *
      */
     ap = atr_num(atr);
 
@@ -177,7 +181,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * Privileged functions require you control the obj.
-     * 
+     *
      */
     if ((key & FUNCT_PRIV) && !Controls(player, obj))
     {
@@ -188,7 +192,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
     /**
      * See if function already exists.  If so, redefine it
-     * 
+     *
      */
     ufp = (UFUN *)hashfind(np, &mushstate.ufunc_htab);
 
@@ -262,8 +266,8 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
 
 /**
  * @brief List available functions.
- * 
- * @param player 
+ *
+ * @param player
  */
 void list_functable(dbref player)
 {
@@ -321,7 +325,7 @@ void list_functable(dbref player)
 
 /**
  * @brief Helper function for list_funcaccess
- * 
+ *
  * @param player DBref of player
  * @param fp Function
  */
@@ -363,7 +367,7 @@ void helper_list_funcaccess(dbref player, FUN *fp)
 
 /**
  * @brief List function access rights
- * 
+ *
  * @param player DBref of player
  */
 void list_funcaccess(dbref player)
@@ -416,13 +420,13 @@ void list_funcaccess(dbref player)
 
 /*
  * ---------------------------------------------------------------------------
- * cf_func_access: 
+ * cf_func_access:
  */
 
 /**
  * @brief Set access on functions
- * 
- * @param vp Not used 
+ *
+ * @param vp Not used
  * @param str Name of function
  * @param extra Nametab
  * @param player DBref of player
@@ -467,15 +471,15 @@ int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref
 
 /**
  * @brief List of existing MUSHCode functions in alphabetical order.
- * 
+ *
  */
 FUN flist[] = {
-    /** 
-     * - @ - 
+    /**
+     * - @ -
      */
     {"@@", fun_null, 1, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /** 
-     * - A - 
+    /**
+     * - A -
      */
     {"ABS", fun_abs, 1, 0, CA_PUBLIC, NULL},
     {"ACOS", handle_trig, 1, TRIG_ARC | TRIG_CO, CA_PUBLIC, NULL},
@@ -496,8 +500,8 @@ FUN flist[] = {
     {"ASIND", handle_trig, 1, TRIG_ARC | TRIG_DEG, CA_PUBLIC, NULL},
     {"ATAN", handle_trig, 1, TRIG_ARC | TRIG_TAN, CA_PUBLIC, NULL},
     {"ATAND", handle_trig, 1, TRIG_ARC | TRIG_TAN | TRIG_DEG, CA_PUBLIC, NULL},
-    /** 
-     * - B - 
+    /**
+     * - B -
      */
     {"BAND", fun_band, 2, 0, CA_PUBLIC, NULL},
     {"BASECONV", fun_baseconv, 3, 0, CA_PUBLIC, NULL},
@@ -508,8 +512,8 @@ FUN flist[] = {
     {"BOUND", fun_bound, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"BOR", fun_bor, 2, 0, CA_PUBLIC, NULL},
     {"BORDER", perform_border, 0, FN_VARARGS | JUST_LEFT, CA_PUBLIC, NULL},
-    /** 
-     * - C - 
+    /**
+     * - C -
      */
     {"CANDBOOL", handle_logic, 0, FN_VARARGS | FN_NO_EVAL | LOGIC_AND | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"CAND", handle_logic, 0, FN_VARARGS | FN_NO_EVAL | LOGIC_AND, CA_PUBLIC, NULL},
@@ -543,8 +547,8 @@ FUN flist[] = {
     {"CREATE", fun_create, 0, FN_VARARGS | FN_DBFX, CA_PUBLIC, NULL},
     {"CREATION", handle_timestamp, 1, TIMESTAMP_CRE, CA_PUBLIC, NULL},
     {"CTABLES", process_tables, 0, FN_VARARGS | JUST_CENTER, CA_PUBLIC, NULL},
-    /** 
-     * - D - 
+    /**
+     * - D -
      */
     {"DEC", fun_dec, 1, 0, CA_PUBLIC, NULL},
     {"DECRYPT", fun_decrypt, 2, 0, CA_PUBLIC, NULL},
@@ -559,8 +563,8 @@ FUN flist[] = {
     {"DIV", fun_div, 2, 0, CA_PUBLIC, NULL},
     {"DOING", fun_doing, 1, 0, CA_PUBLIC, NULL},
     {"DUP", fun_dup, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
-    /** 
-     * - E - 
+    /**
+     * - E -
      */
     {"E", fun_e, 1, 0, CA_PUBLIC, NULL},
     {"EDEFAULT", fun_edefault, 2, FN_NO_EVAL, CA_PUBLIC, NULL},
@@ -580,8 +584,8 @@ FUN flist[] = {
     {"EXP", fun_exp, 1, 0, CA_PUBLIC, NULL},
     {"EXTRACT", fun_extract, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"EVAL", fun_eval, 0, FN_VARARGS | GET_EVAL | GET_XARGS, CA_PUBLIC, NULL},
-    /** 
-     * - F - 
+    /**
+     * - F -
      */
     {"FCOUNT", fun_fcount, 0, 0, CA_PUBLIC, NULL},
     {"FDEPTH", fun_fdepth, 0, 0, CA_PUBLIC, NULL},
@@ -597,8 +601,8 @@ FUN flist[] = {
     {"FORCE", fun_force, 2, FN_QFX, CA_PUBLIC, NULL},
     {"FOREACH", fun_foreach, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"FULLNAME", handle_name, 1, NAMEFN_FULLNAME, CA_PUBLIC, NULL},
-    /** 
-     * - G - 
+    /**
+     * - G -
      */
     {"GET", perform_get, 1, 0, CA_PUBLIC, NULL},
     {"GET_EVAL", perform_get, 1, GET_EVAL, CA_PUBLIC, NULL},
@@ -613,8 +617,8 @@ FUN flist[] = {
     {"GROUP", fun_group, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"GT", fun_gt, 2, 0, CA_PUBLIC, NULL},
     {"GTE", fun_gte, 2, 0, CA_PUBLIC, NULL},
-    /** 
-     * - H - 
+    /**
+     * - H -
      */
     {"HASATTR", fun_hasattr, 2, 0, CA_PUBLIC, NULL},
     {"HASATTRP", fun_hasattr, 2, CHECK_PARENTS, CA_PUBLIC, NULL},
@@ -628,8 +632,8 @@ FUN flist[] = {
     {"HOME", fun_home, 1, 0, CA_PUBLIC, NULL},
     {"HTML_ESCAPE", fun_html_escape, -1, 0, CA_PUBLIC, NULL},
     {"HTML_UNESCAPE", fun_html_unescape, -1, 0, CA_PUBLIC, NULL},
-    /** 
-     * - I - 
+    /**
+     * - I -
      */
     {"IBREAK", fun_ibreak, 1, 0, CA_PUBLIC, NULL},
     {"IDLE", handle_conninfo, 1, CONNINFO_IDLE, CA_PUBLIC, NULL},
@@ -657,16 +661,16 @@ FUN flist[] = {
     {"ISTRUE", perform_iter, 0, FN_VARARGS | FN_NO_EVAL | BOOL_COND_NONE | FILT_COND_TRUE, CA_PUBLIC, NULL},
     {"ITEXT", fun_itext, 1, 0, CA_PUBLIC, NULL},
     {"ITEXT2", fun_itext2, 1, 0, CA_PUBLIC, NULL},
-    /** 
-     * - J - 
+    /**
+     * - J -
      */
     {"JOIN", fun_join, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /** 
-     * - K - 
+    /**
+     * - K -
      */
     {"KNOWS", handle_okpres, 2, PRESFN_KNOWS, CA_PUBLIC, NULL},
-    /** 
-     * - L - 
+    /**
+     * - L -
      */
     {"LADD", fun_ladd, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"LALIGN", fun_lalign, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -719,8 +723,8 @@ FUN flist[] = {
     {"LUNION", handle_sets, 0, FN_VARARGS | SET_TYPE | SET_UNION, CA_PUBLIC, NULL},
     {"LVARS", fun_lvars, 0, FN_VARFX, CA_PUBLIC, NULL},
     {"LWHO", fun_lwho, 0, 0, CA_PUBLIC, NULL},
-    /** 
-     * - M - 
+    /**
+     * - M -
      */
     {"MAP", fun_map, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MATCH", fun_match, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -740,8 +744,8 @@ FUN flist[] = {
     {"MUSHNAME", fun_mushname, 0, 0, CA_PUBLIC, NULL},
     {"MUL", fun_mul, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"MUNGE", fun_munge, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /** 
-     * - N - 
+    /**
+     * - N -
      */
     {"NAME", handle_name, 1, 0, CA_PUBLIC, NULL},
     {"NATTR", handle_lattr, 1, LATTR_COUNT, CA_PUBLIC, NULL},
@@ -757,8 +761,8 @@ FUN flist[] = {
     {"NSECURE", fun_secure, -1, FN_NO_EVAL, CA_PUBLIC, NULL},
     {"NULL", fun_null, 1, 0, CA_PUBLIC, NULL},
     {"NUM", fun_num, 1, 0, CA_PUBLIC, NULL},
-    /** 
-     * - O - 
+    /**
+     * - O -
      */
     {"OBJ", handle_pronoun, 1, PRONOUN_OBJ, CA_PUBLIC, NULL},
     {"OBJCALL", fun_objcall, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -770,8 +774,8 @@ FUN flist[] = {
     {"ORBOOL", handle_logic, 0, FN_VARARGS | LOGIC_OR | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"ORFLAGS", handle_flaglists, 2, LOGIC_OR, CA_PUBLIC, NULL},
     {"OWNER", fun_owner, 1, 0, CA_PUBLIC, NULL},
-    /** 
-     * - P - 
+    /**
+     * - P -
      */
     {"PARENT", fun_parent, 1, 0, CA_PUBLIC, NULL},
     {"PARSE", perform_loop, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
@@ -791,13 +795,13 @@ FUN flist[] = {
     {"PROGRAMMER", fun_programmer, 1, 0, CA_PUBLIC, NULL},
     {"PS", fun_ps, 1, 0, CA_PUBLIC, NULL},
     {"PUSH", fun_push, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
-    /** 
-     * - Q - 
+    /**
+     * - Q -
      */
     {"QSUB", fun_qsub, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"QVARS", fun_qvars, 0, FN_VARARGS, CA_PUBLIC, NULL},
-    /** 
-     * - R - 
+    /**
+     * - R -
      */
     {"R", fun_r, 1, 0, CA_PUBLIC, NULL},
     {"RAND", fun_rand, 1, 0, CA_PUBLIC, NULL},
@@ -833,8 +837,8 @@ FUN flist[] = {
     {"ROOM", fun_room, 1, 0, CA_PUBLIC, NULL},
     {"ROUND", fun_round, 2, 0, CA_PUBLIC, NULL},
     {"RTABLES", process_tables, 0, FN_VARARGS | JUST_RIGHT, CA_PUBLIC, NULL},
-    /** 
-     * - S - 
+    /**
+     * - S -
      */
     {"S", fun_s, -1, 0, CA_PUBLIC, NULL},
     {"SANDBOX", handle_ucall, 0, FN_VARARGS | UCALL_SANDBOX, CA_PUBLIC, NULL},
@@ -882,8 +886,8 @@ FUN flist[] = {
     {"SWAP", fun_swap, 0, FN_VARARGS | FN_STACKFX, CA_PUBLIC, NULL},
     {"SWITCH", fun_switch, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"SWITCHALL", fun_switchall, 0, FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /** 
-     * - T - 
+    /**
+     * - T -
      */
     {"T", fun_t, 1, 0, CA_PUBLIC, NULL},
     {"TABLE", fun_table, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -900,8 +904,8 @@ FUN flist[] = {
     {"TRIM", fun_trim, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"TRUNC", fun_trunc, 1, 0, CA_PUBLIC, NULL},
     {"TYPE", fun_type, 1, 0, CA_PUBLIC, NULL},
-    /** 
-     * - U - 
+    /**
+     * - U -
      */
     {"U", do_ufun, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"UCALL", handle_ucall, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -917,8 +921,8 @@ FUN flist[] = {
     {"URL_UNESCAPE", fun_url_unescape, -1, 0, CA_PUBLIC, NULL},
     {"USETRUE", handle_ifelse, 0, IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
     {"USEFALSE", handle_ifelse, 0, IFELSE_FALSE | IFELSE_DEFAULT | IFELSE_BOOL | FN_VARARGS | FN_NO_EVAL, CA_PUBLIC, NULL},
-    /** 
-     * - V - 
+    /**
+     * - V -
      */
     {"V", fun_v, 1, 0, CA_PUBLIC, NULL},
     {"VADD", handle_vectors, 0, FN_VARARGS | VEC_ADD, CA_PUBLIC, NULL},
@@ -934,8 +938,8 @@ FUN flist[] = {
     {"VSUB", handle_vectors, 0, FN_VARARGS | VEC_SUB, CA_PUBLIC, NULL},
     {"VUNIT", handle_vector, 0, FN_VARARGS | VEC_UNIT, CA_PUBLIC, NULL},
     {"VXOR", handle_vectors, 0, FN_VARARGS | VEC_XOR, CA_PUBLIC, NULL},
-    /** 
-     * - W - 
+    /**
+     * - W -
      */
     {"WAIT", fun_wait, 2, FN_QFX, CA_PUBLIC, NULL},
     {"WHENFALSE", perform_iter, 0, FN_VARARGS | FN_NO_EVAL | BOOL_COND_FALSE | FILT_COND_NONE, CA_PUBLIC, NULL},
@@ -952,8 +956,8 @@ FUN flist[] = {
     {"WORDS", fun_words, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"WRITABLE", fun_writable, 2, 0, CA_PUBLIC, NULL},
     {"WRITE", fun_write, 2, FN_VARFX, CA_PUBLIC, NULL},
-    /** 
-     * - X - 
+    /**
+     * - X -
      */
     {"X", fun_x, 1, FN_VARFX, CA_PUBLIC, NULL},
     {"XCON", fun_xcon, 0, FN_VARARGS, CA_PUBLIC, NULL},
@@ -961,14 +965,14 @@ FUN flist[] = {
     {"XOR", handle_logic, 0, FN_VARARGS | LOGIC_XOR, CA_PUBLIC, NULL},
     {"XORBOOL", handle_logic, 0, FN_VARARGS | LOGIC_XOR | LOGIC_BOOL, CA_PUBLIC, NULL},
     {"XVARS", fun_xvars, 0, FN_VARARGS | FN_VARFX, CA_PUBLIC, NULL},
-    /** 
-     * - Z - 
+    /**
+     * - Z -
      */
     {"Z", fun_z, 2, FN_VARFX, CA_PUBLIC, NULL},
     {"ZFUN", fun_zfun, 0, FN_VARARGS, CA_PUBLIC, NULL},
     {"ZONE", fun_zone, 1, 0, CA_PUBLIC, NULL},
     {"ZWHO", scan_zone, 1, TYPE_PLAYER, CA_PUBLIC, NULL},
-    /** 
-     * - END - 
+    /**
+     * - END -
      */
     {NULL, NULL, 0, 0, 0, NULL}};

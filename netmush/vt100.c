@@ -1,11 +1,13 @@
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <math.h>
 
 /**
  * @brief Convert RGB color to XYZ coordonates

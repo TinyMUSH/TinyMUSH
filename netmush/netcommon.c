@@ -14,14 +14,18 @@
  * portions of the descriptor data structure are not used.
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 /* ---------------------------------------------------------------------------
  * timeval_sub: return difference between two times as a timeval

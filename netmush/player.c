@@ -11,14 +11,17 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <ctype.h>
+#include <string.h>
+#include <unistd.h>
 
 /* ---------------------------------------------------------------------------
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.

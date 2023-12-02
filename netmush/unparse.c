@@ -11,14 +11,15 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <string.h>
 
 /**
  * @brief Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this

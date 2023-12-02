@@ -11,14 +11,17 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <ctype.h>
+#include <string.h>
+#include <unistd.h>
 
 void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {

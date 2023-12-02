@@ -11,14 +11,22 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include <pcre.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <dlfcn.h>
+#include <unistd.h>
 
 CMDENT *prefix_cmds[256];
 CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;

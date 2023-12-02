@@ -11,14 +11,18 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <gdbm.h>
+#include <sys/file.h>
+#include <unistd.h>
 
 char *dbfile = DEFAULT_DBMCHUNKFILE;
 int db_initted = 0;

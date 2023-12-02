@@ -4,16 +4,23 @@
  * @brief Functions prototypes
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #ifndef __PROTOTYPES_H
 #define __PROTOTYPES_H
 
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <netinet/in.h>
+#include <time.h>
+
+#include "typedefs.h"
 
 /* alloc.c */
 extern void *__xmalloc(size_t size, const char *file, int line, const char *function, const char *var);

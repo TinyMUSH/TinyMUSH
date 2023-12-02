@@ -4,30 +4,32 @@
  * @brief Handle boolean expressions
  * @version 3.3
  * @date 2020-12-24
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <stdbool.h>
+#include <ctype.h>
+
 /**
  * @brief indicate if attribute ATTR on player passes key when checked by the object lockobj
- * 
+ *
  * @param player	DBref of player
  * @param lockobj	DBref of locked object
  * @param attr		Attribute
  * @param key		Key
- * @return bool 
+ * @return bool
  */
 bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 {
@@ -40,9 +42,9 @@ bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 
 	if (attr->number == A_LCONTROL)
 	{
-		/** 
-		 * We can see control locks... else we'd break zones 
-		 * 
+		/**
+		 * We can see control locks... else we'd break zones
+		 *
 		 */
 		checkit = true;
 	}
@@ -66,7 +68,7 @@ bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 
 /**
  * @brief Prepare a BOOLEXP item.
- * 
+ *
  * @return BOOLEXP* Initialized BOOLEXP item.
  */
 BOOLEXP *alloc_boolexp(void)
@@ -83,7 +85,7 @@ BOOLEXP *alloc_boolexp(void)
 
 /**
  * @brief Free a BOOLEXP item.
- * 
+ *
  * @param b BOOLEXP item.
  */
 void free_boolexp(BOOLEXP *b)
@@ -120,7 +122,7 @@ void free_boolexp(BOOLEXP *b)
 
 /**
  * @brief Evaluate a boolean expression
- * 
+ *
  * @param player	DBref of player
  * @param thing		DBref of thing
  * @param from		DBref from
@@ -156,7 +158,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		 * BOOLEXP_INDIR (i.e. @) is a unary operation which is
 		 * replaced at evaluation time by the lock of the object
 		 * whose number is the argument of the operation.
-		 * 
+		 *
 		 */
 		mushstate.lock_nest_lev++;
 
@@ -187,10 +189,9 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
-				
+
 				log_write(LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, lname, INDIR_TOKEN, b->sub1->type);
 				XFREE(lname);
-				
 			}
 			else
 			{
@@ -220,15 +221,15 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		if (!a)
 		{
 			/**
-			 * no such attribute 
-			 * 
+			 * no such attribute
+			 *
 			 */
 			return false;
 		}
 
 		/**
 		 * First check the object itself, then its contents
-		 * 
+		 *
 		 */
 		if (check_attr(player, from, a, (char *)b->sub1))
 		{
@@ -249,11 +250,11 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		if (!a)
 		{
-			/** 
-			 * no such attribute 
-			 * 
+			/**
+			 * no such attribute
+			 *
 			 */
-			return false; 
+			return false;
 		}
 
 		source = from;
@@ -295,7 +296,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		/**
 		 * If an object check, do that
-		 * 
+		 *
 		 */
 		if (b->sub1->type == BOOLEXP_CONST)
 		{
@@ -304,7 +305,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		/**
 		 * Nope, do an attribute check
-		 * 
+		 *
 		 */
 		a = atr_num(b->sub1->thing);
 
@@ -319,7 +320,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		/**
 		 * If an object check, do that
-		 * 
+		 *
 		 */
 		if (b->sub1->type == BOOLEXP_CONST)
 		{
@@ -328,7 +329,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 		/**
 		 * Nope, do an attribute check
-		 * 
+		 *
 		 */
 		a = atr_num(b->sub1->thing);
 
@@ -351,17 +352,17 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 
 	default:
 		log_write_raw(1, "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n");
-		/** 
-		 * bad type 
+		/**
+		 * bad type
 		 */
-		abort();	  
+		abort();
 	}
 	return false;
 }
 
 /**
  * @brief Evaluate attribute's boolean expression
- * 
+ *
  * @param player	DBref of player
  * @param thing		DBref of thing
  * @param from		DBref from
@@ -390,12 +391,12 @@ bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key)
 
 /**
  * @attention If the parser returns TRUE_BOOLEXP, you lose TRUE_BOOLEXP cannot be typed in by the user; use @unlock instead
- * 
+ *
  */
 
 /**
  * @brief Skip over whitespace in a string
- * 
+ *
  * @param pBuf Buffer to skip whitespace in
  */
 void skip_whitespace(char **pBuf)
@@ -408,7 +409,7 @@ void skip_whitespace(char **pBuf)
 
 /**
  * @brief Test attriutes
- * 
+ *
  * @param s				Attribute to test
  * @param parse_player	DBref of player triggering the test
  * @return BOOLEXP*		Boolean expression with the result of the test
@@ -447,13 +448,13 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 	 * on eval. Also allow numeric references to attributes.  It can't hurt us,
 	 * and lets us import stuff that stores attr locks by number instead of by
 	 * name.
-	 * 
+	 *
 	 */
 	if (!(attrib = atr_str(buff)))
 	{
-		/** 
-		 * Only #1 can lock on numbers 
-		 * 
+		/**
+		 * Only #1 can lock on numbers
+		 *
 		 */
 		if (!God(parse_player))
 		{
@@ -485,9 +486,9 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 		anum = attrib->number;
 	}
 
-	/** 
-	 * made it now make the parse tree node 
-	 * 
+	/**
+	 * made it now make the parse tree node
+	 *
 	 */
 	b = alloc_boolexp();
 	b->type = locktype;
@@ -499,7 +500,7 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 
 /**
  * @brief L -> (E); L -> object identifier
- * 
+ *
  * @param pBuf				Attribute buffer
  * @param parse_player		DBref of player
  * @param parsing_internal	Engine or player triggered?
@@ -529,9 +530,9 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 
 		break;
 	default:
-		/** 
-		 * must have hit an object ref.  Load the name into our buffer 
-		 * 
+		/**
+		 * must have hit an object ref.  Load the name into our buffer
+		 *
 		 */
 		buf = XMALLOC(LBUF_SIZE, "buf");
 		p = buf;
@@ -547,9 +548,9 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 			*p-- = '\0';
 		}
 
-		/** 
-		 * check for an attribute 
-		 * 
+		/**
+		 * check for an attribute
+		 *
 		 */
 		if ((b = test_atr(buf, parse_player)) != NULL)
 		{
@@ -564,7 +565,7 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 * Do the match. If we are parsing a boolexp that was a
 		 * stored lock then we know that object refs are all dbrefs,
 		 * so we skip the expensive match code.
-		 * 
+		 *
 		 */
 		if (!mushstate.standalone)
 		{
@@ -638,9 +639,9 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 
 /**
  * @brief F -> !F; F -> @L; F -> =L; F -> +L; F -> $L
- * 
+ *
  * The argument L must be type BOOLEXP_CONST
- * 
+ *
  * @param pBuf				Attribute buffer
  * @param parse_player		DBref of player
  * @param parsing_internal	Engine or player triggered?
@@ -764,7 +765,7 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 
 /**
  * @brief T -> F; T -> F & T
- * 
+ *
  * @param pBuf				Attribute buffer
  * @param parse_player		DBref of player
  * @param parsing_internal	Engine or player triggered?
@@ -801,7 +802,7 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 
 /**
  * @brief E -> T; E -> T | E
- * 
+ *
  * @param pBuf				Attribute buffer
  * @param parse_player		DBref of player
  * @param parsing_internal	Engine or player triggered?
@@ -838,7 +839,7 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 
 /**
  * @brief Parse a boolean expression
- * 
+ *
  * @param player	DBref of player
  * @param buf		Attribute buffer
  * @param internal	Internal check?

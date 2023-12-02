@@ -11,14 +11,18 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include <unistd.h>
 
 int check_type;
 

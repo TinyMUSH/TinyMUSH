@@ -4,26 +4,28 @@
  * @brief Helper functions for MUSH functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
- * @copyright PCG Random Number Generation for C, Copyright 2014 Melissa 
- *            O'Neill <oneill@pcg-random.org>. You may distribute under 
- *            the terms of the Apache License, Version 2.0 as specified 
+ *
+ * @copyright PCG Random Number Generation for C, Copyright 2014 Melissa
+ *            O'Neill <oneill@pcg-random.org>. You may distribute under
+ *            the terms of the Apache License, Version 2.0 as specified
  *            in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
+#include <string.h>
 
 /*
  * ---------------------------------------------------------------------------
@@ -32,7 +34,7 @@
 
 /**
  * @brief Trim off leading and trailing spaces if the separator char is a space
- * 
+ *
  * @param str String to trim
  * @param sep Separator char
  * @return char* Trimmed string
@@ -51,11 +53,13 @@ char *trim_space_sep(char *str, const Delim *sep)
 		str++;
 	}
 
-	for (p = str; *p; p++) {
+	for (p = str; *p; p++)
+	{
 		// Skip to end of string
 	}
 
-	for (p--; *p == ' ' && p > str; p--){
+	for (p--; *p == ' ' && p > str; p--)
+	{
 		// Back up over spaces
 	}
 
@@ -66,7 +70,7 @@ char *trim_space_sep(char *str, const Delim *sep)
 
 /**
  * @brief Point at start of next token in string.
- * 
+ *
  * @param str String with tokens
  * @param sep Token separators
  * @return char* Pointer to next token
@@ -121,9 +125,9 @@ char *next_token(char *str, const Delim *sep)
 }
 
 /**
- * @brief Get next token from string as null-term string.  
+ * @brief Get next token from string as null-term string.
  *        String is destructively modified.
- * 
+ *
  * @param sp String with tokens
  * @param sep Token separators
  * @return char* Token
@@ -192,7 +196,7 @@ char *split_token(char **sp, const Delim *sep)
 
 /**
  * @brief Point at start of next token, and tell what color it is.
- * 
+ *
  * @param str String with token
  * @param sep Token separator
  * @param ansi_state_ptr Current ansi state
@@ -220,7 +224,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 						if (*(str) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(str)&0x0f);
+							param_val += (param_val << 2) + (*(str) & 0x0f);
 						}
 						else
 						{
@@ -233,7 +237,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 						}
 					}
 				}
-				while ((*(str)&0xf0) == 0x20)
+				while ((*(str) & 0xf0) == 0x20)
 				{
 					++(str);
 				}
@@ -273,7 +277,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 							if (*(str) < 0x3a)
 							{
 								param_val <<= 1;
-								param_val += (param_val << 2) + (*(str)&0x0f);
+								param_val += (param_val << 2) + (*(str) & 0x0f);
 							}
 							else
 							{
@@ -286,7 +290,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 							}
 						}
 					}
-					while ((*(str)&0xf0) == 0x20)
+					while ((*(str) & 0xf0) == 0x20)
 					{
 						++(str);
 					}
@@ -328,8 +332,8 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	{
 		/**
 		 * ansi tracking not supported yet in multichar delims
-		 * 
-	 	 */
+		 *
+		 */
 		if ((p = strstr(str, sep->str)) == NULL)
 		{
 			return NULL;
@@ -344,7 +348,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 
 /**
  * @brief Count the words in a delimiter-separated list.
- * 
+ *
  * @param str String to count words
  * @param sep Word separators
  * @return int Number of words
@@ -367,7 +371,7 @@ int countwords(char *str, const Delim *sep)
 
 /**
  * @brief Convert lists to arrays
- * 
+ *
  * @param arr Pointer to Array
  * @param maxtok Maximum number of token
  * @param list List to convert
@@ -382,11 +386,11 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	int ntok, tokpos, i, bits;
 
 	/**
-     * Mark token starting points in a 1k bitstring, then go back
-     * and collect them into an array of just the right number of
-     * pointers.
-	 * 
-     */
+	 * Mark token starting points in a 1k bitstring, then go back
+	 * and collect them into an array of just the right number of
+	 * pointers.
+	 *
+	 */
 
 	if (!initted)
 	{
@@ -409,11 +413,11 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	}
 
 	/**
-     * Caller must free this array of pointers later. Validity of the
-     * pointers is dependent upon the original list string having not
-     * been freed yet.
-	 * 
-     */
+	 * Caller must free this array of pointers later. Validity of the
+	 * pointers is dependent upon the original list string having not
+	 * been freed yet.
+	 *
+	 */
 	*(arr) = (char **)XMALLOC(ntok + 1, "arr");
 	tokpos >>= 3;
 	ntok = 0;
@@ -423,10 +427,10 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 		if (tok_starts[i])
 		{
 			/**
-		     * There's at least one token starting in this byte
-		     * of the bitstring, so we scan the bits.
-			 * 
-	    	 */
+			 * There's at least one token starting in this byte
+			 * of the bitstring, so we scan the bits.
+			 *
+			 */
 			bits = tok_starts[i];
 			tok_starts[i] = 0;
 			tok = liststart + (i << 3);
@@ -451,7 +455,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 
 /**
  * @brief Print separator for arr2list
- * 
+ *
  * @param sep Separator
  * @param list List
  * @param bufc Buffer where to write
@@ -477,7 +481,7 @@ void print_separator(const Delim *sep, char *list, char **bufc)
 
 /**
  * @brief Convert arrays to lists
- * 
+ *
  * @param arr  Array to convert
  * @param alen Array length
  * @param list List buffer
@@ -503,10 +507,10 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 
 /**
  * @brief Find the ANSI states at the beginning and end of each word of a list.
- * 
+ *
  * @note Needs one more array slot than list2arr (think fenceposts) but still
  *       takes the same maxlen and returns the same number of words.
- * 
+ *
  * @param arr Array
  * @param prior_state Ansi State
  * @param maxlen Maximum length of array
@@ -537,7 +541,7 @@ int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *s
 
 /**
  * @brief Quick-matching for function purposes.
- * 
+ *
  * @param player DBref of player
  * @param name Name for match
  * @return dbref Match
@@ -551,14 +555,14 @@ dbref match_thing(dbref player, char *name)
 
 /**
  * @brief Check # of args to a function with an optional argument for validity.
- * 
+ *
  * @param fname Function name
  * @param nfargs Number of arguments
  * @param minargs Minimum number of arguments
  * @param maxargs Maximum number of arguments
  * @param result Result message if error
  * @param bufc Buffer
- * @return bool 
+ * @return bool
  */
 bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc)
 {
@@ -581,7 +585,7 @@ bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, cha
 
 /**
  * @brief Obtain delimiter
- * 
+ *
  * @param buff Buffer
  * @param bufc Buffer tracher
  * @param player DBref of player
@@ -594,7 +598,7 @@ bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, cha
  * @param sep_arg Argument Separator
  * @param sep Separator
  * @param dflags Delimiter flags
- * @return int 
+ * @return int
  */
 int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags)
 {
@@ -676,11 +680,11 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param arg Boolean true/false check.
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool xlate(char *arg)
 {
@@ -710,7 +714,7 @@ bool xlate(char *arg)
 		{
 			/**
 			 * Case of '#-1 <string>'
-			 * 
+			 *
 			 */
 			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' ')) ? true : false;
 		}
@@ -733,7 +737,7 @@ bool xlate(char *arg)
 
 /**
  * @brief Used by fun_reverse and fun_revwords to reverse things
- * 
+ *
  * @param from Input
  * @param to Output
  */
@@ -751,7 +755,7 @@ void do_reverse(char *from, char *to)
 
 /**
  * @brief Generate random number between low and high
- * 
+ *
  * @param low Lowest value of random number
  * @param high Highest value of random number
  * @return uint32_t Random number
@@ -762,8 +766,8 @@ uint32_t random_range(uint32_t low, uint32_t high)
 	pcg32_random_t rng1;
 
 	/*
-     * Validate parameters.
-     */
+	 * Validate parameters.
+	 */
 
 	if (high < low)
 	{
@@ -790,71 +794,72 @@ uint32_t random_range(uint32_t low, uint32_t high)
 /**
  * @brief Seed the rng. Specified in two parts, state initializer and a
  * sequence selection constant (a.k.a. stream id)
- * 
+ *
  * @param rng		Address of a pcg32_random_t value previously declared
  * @param initstate	Starting state for the RNG, you can pass any 64-bit value
  * @param initseq	Selects the output sequence for the RNG, you can pass any
  * 					64-bit value, although only the low 63 bits are significant
  */
-void pcg32_srandom_r(pcg32_random_t* rng, uint64_t initstate, uint64_t initseq)
+void pcg32_srandom_r(pcg32_random_t *rng, uint64_t initstate, uint64_t initseq)
 {
-    rng->state = 0U;
-    rng->inc = (initseq << 1u) | 1u;
-    pcg32_random_r(rng);
-    rng->state += initstate;
-    pcg32_random_r(rng);
+	rng->state = 0U;
+	rng->inc = (initseq << 1u) | 1u;
+	pcg32_random_r(rng);
+	rng->state += initstate;
+	pcg32_random_r(rng);
 }
 
 /**
  * @brief Generate a uniformly distributed 32-bit random number
- * 
+ *
  * @param rng		Address of a pcg32_random_t value previously declared
  * @return uint32_t	Uniformly distributed 32-bit random number
  */
-uint32_t pcg32_random_r(pcg32_random_t* rng)
+uint32_t pcg32_random_r(pcg32_random_t *rng)
 {
-    uint64_t oldstate = rng->state;
-    rng->state = oldstate * 6364136223846793005ULL + rng->inc;
-    uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
-    uint32_t rot = oldstate >> 59u;
-    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+	uint64_t oldstate = rng->state;
+	rng->state = oldstate * 6364136223846793005ULL + rng->inc;
+	uint32_t xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+	uint32_t rot = oldstate >> 59u;
+	return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
 /**
  * @brief Generate a uniformly distributed number, r, where 0 <= r < bound
- * 
+ *
  * @param rng		Address of a pcg32_random_t value previously declared
  * @param bound		Upper limit for the generated number
  * @return uint32_t Uniformly distributed 32-bit random number
  */
-uint32_t pcg32_boundedrand_r(pcg32_random_t* rng, uint32_t bound)
+uint32_t pcg32_boundedrand_r(pcg32_random_t *rng, uint32_t bound)
 {
-    // To avoid bias, we need to make the range of the RNG a multiple of
-    // bound, which we do by dropping output less than a threshold.
-    // A naive scheme to calculate the threshold would be to do
-    //
-    //     uint32_t threshold = 0x100000000ull % bound;
-    //
-    // but 64-bit div/mod is slower than 32-bit div/mod (especially on
-    // 32-bit platforms).  In essence, we do
-    //
-    //     uint32_t threshold = (0x100000000ull-bound) % bound;
-    //
-    // because this version will calculate the same modulus, but the LHS
-    // value is less than 2^32.
+	// To avoid bias, we need to make the range of the RNG a multiple of
+	// bound, which we do by dropping output less than a threshold.
+	// A naive scheme to calculate the threshold would be to do
+	//
+	//     uint32_t threshold = 0x100000000ull % bound;
+	//
+	// but 64-bit div/mod is slower than 32-bit div/mod (especially on
+	// 32-bit platforms).  In essence, we do
+	//
+	//     uint32_t threshold = (0x100000000ull-bound) % bound;
+	//
+	// because this version will calculate the same modulus, but the LHS
+	// value is less than 2^32.
 
-    uint32_t threshold = -bound % bound;
+	uint32_t threshold = -bound % bound;
 
-    // Uniformity guarantees that this loop will terminate.  In practice, it
-    // should usually terminate quickly; on average (assuming all bounds are
-    // equally likely), 82.25% of the time, we can expect it to require just
-    // one iteration.  In the worst case, someone passes a bound of 2^31 + 1
-    // (i.e., 2147483649), which invalidates almost 50% of the range.  In 
-    // practice, bounds are typically small and only a tiny amount of the range
-    // is eliminated.
-    for (;;) {
-        uint32_t r = pcg32_random_r(rng);
-        if (r >= threshold)
-            return r % bound;
-    }
+	// Uniformity guarantees that this loop will terminate.  In practice, it
+	// should usually terminate quickly; on average (assuming all bounds are
+	// equally likely), 82.25% of the time, we can expect it to require just
+	// one iteration.  In the worst case, someone passes a bound of 2^31 + 1
+	// (i.e., 2147483649), which invalidates almost 50% of the range.  In
+	// practice, bounds are typically small and only a tiny amount of the range
+	// is eliminated.
+	for (;;)
+	{
+		uint32_t r = pcg32_random_r(rng);
+		if (r >= threshold)
+			return r % bound;
+	}
 }

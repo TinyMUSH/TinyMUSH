@@ -11,14 +11,15 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <stdbool.h>
 
 /* ---------------------------------------------------------------------------
  * process_leave_loc: Generate messages and actions resulting from leaving

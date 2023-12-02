@@ -4,25 +4,29 @@
  * @brief File cache management
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <stdbool.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+
 /**
  * @brief Text files cache.
- * 
+ *
  */
 FCACHE fcache[] = {
     {&mushconf.conn_file, NULL, "Conn"},
@@ -41,7 +45,7 @@ FCACHE fcache[] = {
 
 /**
  * @brief Show text file.
- * 
+ *
  * @param player DBref of player
  * @param cause  Not used
  * @param extra  Not used
@@ -62,7 +66,7 @@ void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra _
 }
 /**
  * @brief Add date to a file block
- * 
+ *
  * @param fp File block
  * @param ch character to add
  * @return FBLOCK* Updated file block.
@@ -75,7 +79,7 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
     {
         /**
          * We filled the current buffer.  Go get a new one.
-         * 
+         *
          */
         tfp = fp;
         fp = (FBLOCK *)XMALLOC(MBUF_SIZE, "fp");
@@ -90,7 +94,7 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
 
 /**
  * @brief Read a file into cache
- * 
+ *
  * @param cp Cache buffer
  * @param filename File to read
  * @return int Size of cached text.
@@ -103,7 +107,7 @@ int fcache_read(FBLOCK **cp, char *filename)
 
     /**
      * Free a prior buffer chain
-     * 
+     *
      */
 
     while (fp != NULL)
@@ -117,7 +121,7 @@ int fcache_read(FBLOCK **cp, char *filename)
 
     /**
      * Set up the initial cache buffer to make things easier
-     * 
+     *
      */
     fp = (FBLOCK *)XMALLOC(MBUF_SIZE, "fp");
     fp->hdr.nxt = NULL;
@@ -131,14 +135,14 @@ int fcache_read(FBLOCK **cp, char *filename)
         {
             /**
              * Read the text file into a new chain
-             * 
+             *
              */
             if ((fd = tf_open(filename, O_RDONLY)) == -1)
             {
                 /**
-            	 * Failure: log the event
-                 * 
-            	 */
+                 * Failure: log the event
+                 *
+                 */
                 log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
                 tf_close(fd);
                 return -1;
@@ -148,7 +152,7 @@ int fcache_read(FBLOCK **cp, char *filename)
 
             /**
              * Process the file, one lbuf at a time
-             * 
+             *
              */
             nmax = read(fd, buff, LBUF_SIZE);
 
@@ -183,7 +187,7 @@ int fcache_read(FBLOCK **cp, char *filename)
 
     /**
      * If we didn't read anything in, toss the initial buffer
-     * 
+     *
      */
     if (fp->hdr.nchars == 0)
     {
@@ -196,7 +200,7 @@ int fcache_read(FBLOCK **cp, char *filename)
 
 /**
  * @brief Raw dump a cache file to a file descriptor
- * 
+ *
  * @param fd File descriptor
  * @param num Index of the file in the file cache
  */
@@ -239,7 +243,7 @@ void fcache_rawdump(int fd, int num)
 
 /**
  * @brief Dump a file to a descriptor
- * 
+ *
  * @param d Descriptor
  * @param num Index of the file in the file cache
  */
@@ -263,7 +267,7 @@ void fcache_dump(DESC *d, int num)
 
 /**
  * @brief Send the content of a file cache to a player
- * 
+ *
  * @param player DBref of player
  * @param num Index of the file in the file cache
  */
@@ -279,7 +283,7 @@ void fcache_send(dbref player, int num)
 
 /**
  * @brief Load all files into cache
- * 
+ *
  * @param player DBref of player
  */
 void fcache_load(dbref player)
@@ -326,7 +330,7 @@ void fcache_load(dbref player)
 
 /**
  * @brief Initialize the file cache.
- * 
+ *
  */
 void fcache_init(void)
 {

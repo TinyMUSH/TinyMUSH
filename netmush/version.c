@@ -11,14 +11,18 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <inttypes.h>
+#include <string.h>
+#include <sys/utsname.h>
+#include <dlfcn.h>
 
 void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int extra)
 {

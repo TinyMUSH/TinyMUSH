@@ -4,25 +4,29 @@
  * @brief Math and logic functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <stdbool.h>
+#include <string.h>
+#include <math.h>
+#include <ctype.h>
+
 /**
  * @brief Fix weird math results
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param result Result to check
@@ -58,30 +62,30 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
             if (x == fp_exp_mask.u[i])
             {
                 /**
-        		 * these bits are all set. can't be zero
-        		 * exponent, but could still be max (weird)
-        		 * exponent.
-                 * 
-        		 */
+                 * these bits are all set. can't be zero
+                 * exponent, but could still be max (weird)
+                 * exponent.
+                 *
+                 */
                 fp_exp &= ~FP_EXP_ZERO;
             }
             else if (x == 0)
             {
                 /**
-        		 * none of these bits are set. can't be max
-        		 * exponent, but could still be zero
-        		 * exponent.
-                 * 
-        		 */
+                 * none of these bits are set. can't be max
+                 * exponent, but could still be zero
+                 * exponent.
+                 *
+                 */
                 fp_exp &= ~FP_EXP_WEIRD;
             }
             else
             {
                 /**
-        		 * some bits were set but not others. can't
-        		 * be either zero exponent or max exponent.
-                 * 
-        		 */
+                 * some bits were set but not others. can't
+                 * be either zero exponent or max exponent.
+                 *
+                 */
                 fp_exp = 0;
             }
         }
@@ -112,7 +116,7 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
 
 /**
  * @brief Copy the floating point value into a buffer and make it presentable
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param result Result to present
@@ -141,7 +145,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
 
     /**
      * If integer, we're done.
-     * 
+     *
      */
     p = strrchr(buf1, '.');
     if (p == NULL)
@@ -151,7 +155,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
 
     /**
      * Remove useless zeroes
-     * 
+     *
      */
     p = strrchr(buf1, '0');
     if (p == NULL)
@@ -170,7 +174,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
 
     /**
      * take care of dangling '.'
-     * 
+     *
      */
     p = strrchr(buf1, '.');
 
@@ -182,7 +186,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
 
     /**
      * Handle bogus result of "-0" from sprintf.  Yay, cclib.
-     * 
+     *
      */
     if (!strcmp(buf1, "-0"))
     {
@@ -193,7 +197,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
 
 /**
  * @brief Return the PI constant.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -211,7 +215,7 @@ void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 
 /**
  * @brief Return the E constant.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -230,7 +234,7 @@ void fun_e(char *buff, char **bufc, dbref player __attribute__((unused)), dbref 
 /**
  * @brief Returns -1, 0, or 1 depending on whether its argument is negative,
  *        zero, or positive (respectively).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -257,7 +261,7 @@ void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Returns the absolute value of its argument.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -287,9 +291,9 @@ void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief   Returns the integer quotient from dividing <number1> by <number2>, 
+ * @brief   Returns the integer quotient from dividing <number1> by <number2>,
  *          rounded down (towards zero if positive, away from zero if negative).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -307,7 +311,7 @@ void fun_floor(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the smallest integer greater than or equal to <number>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -324,8 +328,8 @@ void fun_ceil(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 }
 
 /**
- * @brief Rounds <number> to <places> decimal places. 
- * 
+ * @brief Rounds <number> to <places> decimal places.
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -343,7 +347,7 @@ void fun_round(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the value of <number> after truncating off any fractional value.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -366,7 +370,7 @@ void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns <number>, incremented by 1 (the <number>, plus 1).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -384,7 +388,7 @@ void fun_inc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Returns <number>, decremented by 1 (the <number>, minus 1).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -402,7 +406,7 @@ void fun_dec(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Returns the square root of <number>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -434,7 +438,7 @@ void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Returns the result of raising the numeric constant e to <power>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -453,7 +457,7 @@ void fun_exp(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief If only given one argument, this function returns a list of numbers
  *        from 0 to <number>-1.  <number> must be at least 1.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -481,7 +485,7 @@ void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 
 /**
  * @brief Handle trigonometrical functions (sin, cos, tan, etc...)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -524,7 +528,7 @@ void handle_trig(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Convert a character to it's decimal value.
- * 
+ *
  * @param ch Character
  * @param base Base to convert from
  * @return int Value in decimal base.
@@ -561,7 +565,7 @@ int fromBaseX(char ch, int base)
 
 /**
  * @brief Convert decival value to it's base X character representation
- * 
+ *
  * @param i Decimal value
  * @param base Base to convert to
  * @return char Character
@@ -609,7 +613,7 @@ char toBaseX(int i, int base)
 
 /**
  * @brief Convert to various bases
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -643,7 +647,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
     }
     /**
      * Parse the number to convert
-     * 
+     *
      */
     p = Eat_Spaces(fargs[0]);
     n = 0;
@@ -653,7 +657,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
         /**
          * If we have a leading hyphen, and we're in base 63/64,
          * always treat it as a minus sign. PennMUSH consistency.
-         * 
+         *
          */
         if ((from < 63) && (to < 63) && (*p == '-'))
         {
@@ -689,7 +693,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
     /**
      * Handle the case of 0 and less than base case.
-     * 
+     *
      */
     if (n < to)
     {
@@ -699,7 +703,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
     /**
      * Build up the number backwards, then reverse it.
-     * 
+     *
      */
     nbp = nbuf;
 
@@ -723,7 +727,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 /**
  * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
  *        than <number2>, and 0 otherwise.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -741,8 +745,8 @@ void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 
 /**
  * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
- *        than or equal to <number2>, and 0 otherwise. 
- * 
+ *        than or equal to <number2>, and 0 otherwise.
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -760,8 +764,8 @@ void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Takes two numbers, and returns 1 if and only if <number1> is less
- *        than <number2>, and 0 otherwise. 
- * 
+ *        than <number2>, and 0 otherwise.
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -780,7 +784,7 @@ void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 /**
  * @brief Takes two numbers, and returns 1 if and only if <number1> is less
  *        than or equal to <number2>, and 0 otherwise.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -799,7 +803,7 @@ void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief Takes two numbers, and returns 1 if they are equal and 0 if they
  *        are not.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -817,8 +821,8 @@ void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 
 /**
  * @brief   Takes two numbers, and returns 1 if they are not equal and 0 if
- *          they are equal. 
- * 
+ *          they are equal.
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -838,7 +842,7 @@ void fun_neq(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @brief This function returns 0 if the two numbers are equal, 1 if the first
  *        number is greater than the second number, and -1 if the first number
  *        is less than the second number.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -870,7 +874,7 @@ void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the result of subtracting <number2> from <number1>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -889,7 +893,7 @@ void fun_sub(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief   Returns the integer quotient from dividing <number1> by <number2>,
  *          rounded towards zero.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -944,7 +948,7 @@ void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief   Returns the integer quotient from dividing <number1> by <number2>,
  *          rounded down (towards zero if positive, away from zero if negative).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -960,7 +964,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
     /**
      * The C '/' operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
-     * 
+     *
      */
     long long top = strtoll(fargs[0], (char **)NULL, 10);
     long long bot = strtoll(fargs[1], (char **)NULL, 10);
@@ -1010,7 +1014,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief Returns the floating point quotient from dividing <number1> by <number2>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1039,7 +1043,7 @@ void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @brief Returns the smallest integer with the same sign as <integer2> such
  *        that the difference between <integer1> and the result is divisible
  *        by <integer2>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1058,7 +1062,7 @@ void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), d
     /**
      * The C '%' operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
-     * 
+     *
      */
     if (bot == 0)
     {
@@ -1095,7 +1099,7 @@ void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @brief Returns the smallest integer with the same sign as <integer1> such
  *        that the difference between <integer1> and the result is divisible
  *        by <integer2>.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1114,7 +1118,7 @@ void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused))
     /**
      * The C '%' operator is only fully specified for non-negative
      * operands, so we try not to give it negative operands here
-     * 
+     *
      */
     if (bot == 0)
     {
@@ -1149,7 +1153,7 @@ void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused))
 
 /**
  * @brief Returns the result of raising <number> to the <power>'th power.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1177,7 +1181,7 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the result of raising <number> to the <power>'th power.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1225,7 +1229,7 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief This function returns the result of leftwards bit-shifting <number>
  *        by <count> times.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1244,7 +1248,7 @@ void fun_shl(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief This function returns the result of rightwards bit-shifting <number>
  *        by <count> times.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1263,7 +1267,7 @@ void fun_shr(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief Intended for use on a bitfield, this function performs a binary AND
  *        between two numbers.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1283,7 +1287,7 @@ void fun_band(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @brief Intended for use on a bitfield, this function performs a binary OR
  *        between two numbers. It is most useful for "turning on" bits in a
  *        bitfield.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1302,7 +1306,7 @@ void fun_bor(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief Intended for use on a bitfield, this function performs a binary AND
  *        between a number and the complement of another number.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1320,7 +1324,7 @@ void fun_bnand(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the result of adding its arguments together.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1354,7 +1358,7 @@ void fun_add(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Returns the result of multiplying its arguments together.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1388,7 +1392,7 @@ void fun_mul(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Returns the largest number from among its arguments.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1422,7 +1426,7 @@ void fun_max(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Returns the smallest number from among its arguments.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1456,7 +1460,7 @@ void fun_min(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Force a number to conform to specified bounds.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1480,9 +1484,9 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
     if (nfargs < 2)
     {
-        /** 
-         * just the number; no bounds enforced 
-         * 
+        /**
+         * just the number; no bounds enforced
+         *
          */
         fval(buff, bufc, val, FPTS_DIG);
         return;
@@ -1492,9 +1496,9 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
     {
         for (cp = fargs[1]; *cp && isspace(*cp); cp++)
         {
-            /** 
-             * if empty, don't check the minimum 
-             * 
+            /**
+             * if empty, don't check the minimum
+             *
              */
         }
 
@@ -1509,9 +1513,9 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
     {
         for (cp = fargs[2]; *cp && isspace(*cp); cp++)
         {
-            /** 
-             * if empty, don't check the maximum 
-             * 
+            /**
+             * if empty, don't check the maximum
+             *
              */
         }
 
@@ -1527,7 +1531,7 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns the distance between the Cartesian points in two dimensions
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1552,7 +1556,7 @@ void fun_dist2d(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Returns the distance between the Cartesian points in three dimensions.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1579,7 +1583,7 @@ void fun_dist3d(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Adds a list of numbers together.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1626,7 +1630,7 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Obtains the largest number out of a list of numbers (i.e., the maximum).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1677,7 +1681,7 @@ void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Obtains the smallest number out of a list of numbers (i.e., the minimum).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1728,7 +1732,7 @@ void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Handle Operations on a single vector: VMAG, VUNIT (VDIM is implemented by fun_words)
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1783,7 +1787,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     /**
      * split the list up, or return if the list is empty
-     * 
+     *
      */
     if (!fargs[0] || !*fargs[0])
     {
@@ -1794,7 +1798,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     /**
      * calculate the magnitude
-     * 
+     *
      */
     for (int i = 0; i < n; i++)
     {
@@ -1804,7 +1808,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     /**
      * if we're just calculating the magnitude, return it
-     * 
+     *
      */
     if (oper == VEC_MAG)
     {
@@ -1841,9 +1845,9 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 }
 
 /**
- * @brief Handle operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR, 
+ * @brief Handle operations on a pair of vectors: VADD, VSUB, VMUL, VDOT, VOR,
  *        VAND and VXOR.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1887,9 +1891,9 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     else
     {
         /**
-    	 * dot product returns a scalar, so no output delim
-         * 
-	     */
+         * dot product returns a scalar, so no output delim
+         *
+         */
         if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
         {
             return;
@@ -1903,7 +1907,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     /**
      * split the list up, or return if the list is empty
-     * 
+     *
      */
     if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1])
     {
@@ -1989,10 +1993,10 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case VEC_MUL:
 
         /**
-    	 * if n or m is 1, this is scalar multiplication. otherwise,
-    	 * multiply elementwise.
-         * 
-    	 */
+         * if n or m is 1, this is scalar multiplication. otherwise,
+         * multiply elementwise.
+         *
+         */
         if (n == 1)
         {
             scalar = strtold(v1[0], (char **)NULL);
@@ -2018,15 +2022,15 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         else
         {
             /**
-    	     * vector elementwise product.
-    	     *
-    	     * Note this is a departure from TinyMUX, but an
-    	     * imitation of the PennMUSH behavior: the
-    	     * documentation in Penn claims it's a dot product,
-    	     * but the actual behavior isn't. We implement dot
-    	     * product separately!
-             * 
-    	     */
+             * vector elementwise product.
+             *
+             * Note this is a departure from TinyMUX, but an
+             * imitation of the PennMUSH behavior: the
+             * documentation in Penn claims it's a dot product,
+             * but the actual behavior isn't. We implement dot
+             * product separately!
+             *
+             */
             fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), FPTS_DIG);
 
             for (int i = 1; i < n; i++)
@@ -2040,12 +2044,12 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     case VEC_DOT:
         /**
-    	 * dot product: (a,b,c) . (d,e,f) = ad + be + cf
-    	 *
-    	 * no cross product implementation yet: it would be 
+         * dot product: (a,b,c) . (d,e,f) = ad + be + cf
+         *
+         * no cross product implementation yet: it would be
          * (a,b,c) x (d,e,f) = (bf - ce, cd - af, ae - bd)
-         * 
-    	 */
+         *
+         */
         scalar = 0;
 
         for (int i = 0; i < n; i++)
@@ -2058,9 +2062,9 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     default:
         /**
-    	 * If we reached this, we're in trouble.
-         * 
-    	 */
+         * If we reached this, we're in trouble.
+         *
+         */
         SAFE_LB_STR("#-1 UNIMPLEMENTED", buff, bufc);
         break;
     }
@@ -2072,7 +2076,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 /**
  * @brief If the input is a non-zero number, returns 0. If it is 0 or the
  *        equivalent (such as a non-numeric string), returns 1.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2089,8 +2093,8 @@ void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief Takes a boolean value, and returns its inverse. 
- * 
+ * @brief Takes a boolean value, and returns its inverse.
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2108,7 +2112,7 @@ void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Takes a boolean value, and returns 0 if it is false, and 1 if true.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2126,11 +2130,11 @@ void fun_t(char *buff, char **bufc, dbref player __attribute__((unused)), dbref 
 
 /**
  * @brief Convert differents values to Boolean.
- * 
+ *
  * @param flag Calling function flags
  * @param str String to parse
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool cvtfun(int flag, char *str)
 {
@@ -2144,7 +2148,7 @@ bool cvtfun(int flag, char *str)
 /**
  * @brief Handle multi-argument boolean funcs, various combinations of
  * [L,C][AND,OR,XOR][BOOL]
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2165,7 +2169,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     /**
      * most logic operations on an empty string should be false
-     * 
+     *
      */
     val = 0;
 
@@ -2178,9 +2182,9 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
 
         /**
-    	 * the arguments come in a pre-evaluated list
-         * 
-    	 */
+         * the arguments come in a pre-evaluated list
+         *
+         */
         if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
         {
             return;
@@ -2207,18 +2211,18 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     else if (nfargs < 2)
     {
         /**
-    	 * separate arguments, but not enough of them
-         * 
-    	 */
+         * separate arguments, but not enough of them
+         *
+         */
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
     else if (flag & FN_NO_EVAL)
     {
         /**
-    	 * separate, unevaluated arguments
-         * 
-    	 */
+         * separate, unevaluated arguments
+         *
+         */
         tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 
         for (int i = 0; i < nfargs; i++)
@@ -2239,9 +2243,9 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     else
     {
         /**
-    	 * separate, pre-evaluated arguments
-         * 
-    	 */
+         * separate, pre-evaluated arguments
+         *
+         */
         for (int i = 0; i < nfargs; i++)
         {
             val = ((oper == LOGIC_XOR) && val) ? !cvtfun(flag, fargs[i]) : cvtfun(flag, fargs[i]);
@@ -2258,7 +2262,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /**
  * @brief Handle boolean values for an entire list
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2272,7 +2276,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     Delim isep, osep;
-    bool n =  false;
+    bool n = false;
     char *tbuf = NULL, *bp = NULL, *bb_p = NULL;
     int flag = Func_Flags(fargs);
 

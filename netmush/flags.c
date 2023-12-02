@@ -4,31 +4,33 @@
  * @brief Flag manipulation routines
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
+#include <string.h>
+#include <ctype.h>
+
 /**
  * @brief Set or clear indicated flag bit, no security checking
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_any(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -84,13 +86,13 @@ int fh_any(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Only GOD may set or clear the bit
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_god(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -104,13 +106,13 @@ int fh_god(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Only WIZARDS (or GOD) may set or clear the bit
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_wiz(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -124,13 +126,13 @@ int fh_wiz(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Only WIZARDS, ROYALTY, (or GOD) may set or clear the bit
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_wizroy(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -145,13 +147,13 @@ int fh_wizroy(dbref target, dbref player, FLAG flag, int fflags, int reset)
 /**
  * @brief Only Wizards can set this on players, but ordinary players can set it
  * on other types of objects.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_restrict_player(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -167,13 +169,13 @@ int fh_restrict_player(dbref target, dbref player, FLAG flag, int fflags, int re
  * @brief You can set this flag on a non-player object, if you yourself have
  * this flag and are a player who owns themselves (i.e., no robots). Only God
  * can set this on a player.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_privileged(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -215,13 +217,13 @@ int fh_privileged(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Only players may set or clear this bit.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_inherit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -235,13 +237,13 @@ int fh_inherit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Manipulate the dark bit. Nonwizards may not set on players.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_dark_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -255,15 +257,15 @@ int fh_dark_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Manipulate the going bit. Can only be cleared on objects slated for
- * destruction, by non-god. May only be set by god. Even god can't destroy 
+ * destruction, by non-god. May only be set by god. Even god can't destroy
  * nondestroyable objects.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_going_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -283,13 +285,13 @@ int fh_going_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Set or clear bits that affect hearing.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_hear_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -303,13 +305,13 @@ int fh_hear_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Can set and reset this on everything but players.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_player_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
@@ -323,22 +325,22 @@ int fh_player_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 
 /**
  * @brief Check power bit to set/reset.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param fflags 
- * @param reset 
- * @return int 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param fflags
+ * @param reset
+ * @return int
  */
 int fh_power_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
 {
     if (flag & WATCHER)
     {
         /*
-	 * Wizards can set this on anything. Players with the Watch
-	 * power can set this on themselves.
-	 */
+         * Wizards can set this on anything. Players with the Watch
+         * power can set this on themselves.
+         */
         if (Wizard(player) || ((Owner(player) == Owner(target)) && Can_Watch(player)))
         {
             return (fh_any(target, player, flag, fflags, reset));
@@ -451,7 +453,7 @@ OBJENT object_types[8] = {
 
 /**
  * @brief Initialize flag hash tables.
- * 
+ *
  */
 void init_flagtab(void)
 {
@@ -466,8 +468,8 @@ void init_flagtab(void)
 
 /**
  * @brief Display available flags.
- * 
- * @param player 
+ *
+ * @param player
  */
 void display_flagtab(dbref player)
 {
@@ -496,10 +498,10 @@ void display_flagtab(dbref player)
 
 /**
  * @brief Search for a flag.
- * 
- * @param thing 
- * @param flagname 
- * @return FLAGENT* 
+ *
+ * @param thing
+ * @param flagname
+ * @return FLAGENT*
  */
 FLAGENT *find_flag(dbref thing __attribute__((unused)), char *flagname)
 {
@@ -519,11 +521,11 @@ FLAGENT *find_flag(dbref thing __attribute__((unused)), char *flagname)
 
 /**
  * @brief Set or clear a specified flag on an object.
- * 
- * @param target 
- * @param player 
- * @param flag 
- * @param key 
+ *
+ * @param target
+ * @param player
+ * @param flag
+ * @param key
  */
 void flag_set(dbref target, dbref player, char *flag, int key)
 {
@@ -604,10 +606,10 @@ void flag_set(dbref target, dbref player, char *flag, int key)
 
 /**
  * @brief Converts a flag set into corresponding letters.
- * 
- * @param player 
- * @param flagset 
- * @return char* 
+ *
+ * @param player
+ * @param flagset
+ * @return char*
  */
 char *decode_flags(dbref player, FLAGSET flagset)
 {
@@ -662,10 +664,10 @@ char *decode_flags(dbref player, FLAGSET flagset)
 
 /**
  * @brief Converts a thing's flags into corresponding letters.
- * 
- * @param player 
- * @param thing 
- * @return char* 
+ *
+ * @param player
+ * @param thing
+ * @return char*
  */
 char *unparse_flags(dbref player, dbref thing)
 {
@@ -719,7 +721,7 @@ char *unparse_flags(dbref player, dbref thing)
             }
 
             /**
-             *  Don't show CONNECT on dark wizards to mortals 
+             *  Don't show CONNECT on dark wizards to mortals
              */
 
             if ((flagtype == TYPE_PLAYER) && isConnFlag(fp) && Can_Hide(thing) && Hidden(thing) && !See_Hidden(player))
@@ -750,11 +752,11 @@ char *unparse_flags(dbref player, dbref thing)
 
 /**
  * @brief Does object have flag visible to player?
- * 
- * @param player 
- * @param it 
- * @param flagname 
- * @return int 
+ *
+ * @param player
+ * @param it
+ * @param flagname
+ * @return int
  */
 int has_flag(dbref player, dbref it, char *flagname)
 {
@@ -813,8 +815,8 @@ int has_flag(dbref player, dbref it, char *flagname)
         }
 
         /*
-	 * don't show CONNECT on dark wizards to mortals
-	 */
+         * don't show CONNECT on dark wizards to mortals
+         */
         if (isPlayer(it) && isConnFlag(fp) && Can_Hide(it) && Hidden(it) && !See_Hidden(player))
         {
             return 0;
@@ -833,10 +835,10 @@ int has_flag(dbref player, dbref it, char *flagname)
 
 /**
  * @brief Return a buffer containing the type and flags on thing.
- * 
- * @param player 
- * @param target 
- * @return char* 
+ *
+ * @param player
+ * @param target
+ * @return char*
  */
 char *flag_description(dbref player, dbref target)
 {
@@ -885,7 +887,7 @@ char *flag_description(dbref player, dbref target)
                 /**
                  * Don't show CONNECT on dark wizards to mortals
                  */
-                 
+
                 if (isPlayer(target) && isConnFlag(fp) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
                 {
                     continue;
@@ -909,9 +911,9 @@ char *flag_description(dbref player, dbref target)
 
 /**
  * @brief Return a buffer containing the name and number of an object
- * 
- * @param target 
- * @return char* 
+ *
+ * @param target
+ * @return char*
  */
 char *unparse_object_numonly(dbref target)
 {
@@ -945,11 +947,11 @@ char *unparse_object_numonly(dbref target)
 
 /**
  * @brief Return a buffer pointing to the object name and possibly the db# and flags
- * 
- * @param player 
- * @param target 
- * @param obey_myopic 
- * @return char* 
+ *
+ * @param player
+ * @param target
+ * @param obey_myopic
+ * @return char*
  */
 char *unparse_object(dbref player, dbref target, int obey_myopic)
 {
@@ -1011,9 +1013,9 @@ char *unparse_object(dbref player, dbref target, int obey_myopic)
 
 /**
  * @brief Given a one-character flag abbrev, return the flag pointer.
- * 
- * @param this_letter 
- * @return FLAGENT* 
+ *
+ * @param this_letter
+ * @return FLAGENT*
  */
 FLAGENT *letter_to_flag(char this_letter)
 {
@@ -1032,13 +1034,13 @@ FLAGENT *letter_to_flag(char this_letter)
 
 /**
  * @brief Modify who can set a flag.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_flag_access(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
@@ -1103,13 +1105,13 @@ int cf_flag_access(int *vp __attribute__((unused)), char *str, long extra __attr
 
 /**
  * @brief Modify the name of a user-defined flag.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
@@ -1139,7 +1141,7 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
 
     /**
      * Our conditions: The flag name MUST start with an underscore. It must not
-     * conflict with the name of any existing flag. There is a KNOWN MEMORY 
+     * conflict with the name of any existing flag. There is a KNOWN MEMORY
      * LEAK here -- if you name the flag and rename it later, the old bit of
      * memory for the name won't get freed. This should pretty much never
      * happen, since you're not going to run around arbitrarily giving your
@@ -1186,12 +1188,12 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
 /**
  * @brief convert a list of flag letters into its bit pattern. Also set the
  * type qualifier if specified and not already set.
- * 
- * @param player 
- * @param flaglist 
- * @param fset 
- * @param p_type 
- * @return int 
+ *
+ * @param player
+ * @param flaglist
+ * @param fset
+ * @param p_type
+ * @return int
  */
 int convert_flags(dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type)
 {
@@ -1275,10 +1277,10 @@ int convert_flags(dbref player, char *flaglist, FLAGSET *fset, FLAG *p_type)
 
 /**
  * @brief Produce commands to set flags on target.
- * 
- * @param player 
- * @param thing 
- * @param thingname 
+ *
+ * @param player
+ * @param thing
+ * @param thingname
  */
 void decompile_flags(dbref player, dbref thing, char *thingname)
 {
@@ -1305,7 +1307,7 @@ void decompile_flags(dbref player, dbref thing, char *thingname)
 
         /**
          * Skip if this flag is not set
-         * 
+         *
          */
 
         if (fp->flagflag & FLAG_WORD3)
@@ -1332,7 +1334,7 @@ void decompile_flags(dbref player, dbref thing, char *thingname)
 
         /**
          * Skip if we can't see this flag
-         * 
+         *
          */
 
         if (!check_access(player, fp->listperm))
@@ -1342,7 +1344,7 @@ void decompile_flags(dbref player, dbref thing, char *thingname)
 
         /**
          * We made it this far, report this flag
-         * 
+         *
          */
 
         s = strip_ansi(thingname);

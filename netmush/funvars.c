@@ -4,21 +4,24 @@
  * @brief Structure, variable, stack, and regexp functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <ctype.h>
+#include <string.h>
+#include <pcre.h>
 
 /*
  * ---------------------------------------------------------------------------
@@ -27,7 +30,7 @@
 
 /**
  * @brief Convert ascii characters to global register (%q?) id
- * 
+ *
  * @param ch    ascii character to convert
  * @return char global register id
  */
@@ -62,7 +65,7 @@ char qidx_chartab(int ch)
 
 /**
  * @brief convert global register (%q?) id to ascii character
- * 
+ *
  * @param id    global register id
  * @return char ascii code of the register
  */
@@ -100,11 +103,11 @@ int set_register(const char *funcname, char *name, char *data)
     if (name[1] == '\0')
     {
         /*
-	 * Single-letter q-register. We allocate these either as a
-	 * block of 10 or a block of 36. (Most code won't go beyond
-	 * %q0-%q9, especially legacy code which predates the larger
-	 * number of global registers.)
-	 */
+         * Single-letter q-register. We allocate these either as a
+         * block of 10 or a block of 36. (Most code won't go beyond
+         * %q0-%q9, especially legacy code which predates the larger
+         * number of global registers.)
+         */
         regnum = qidx_chartab((unsigned char)*name);
 
         if ((regnum < 0) || (regnum >= mushconf.max_global_regs))
@@ -113,10 +116,10 @@ int set_register(const char *funcname, char *name, char *data)
         }
 
         /*
-	 * Check to see if we're just clearing. If we're clearing a
-	 * register that doesn't exist, then we do nothing. Otherwise
-	 * we wipe out the data.
-	 */
+         * Check to see if we're just clearing. If we're clearing a
+         * register that doesn't exist, then we do nothing. Otherwise
+         * we wipe out the data.
+         */
 
         if (!data || !*data)
         {
@@ -137,9 +140,9 @@ int set_register(const char *funcname, char *name, char *data)
         }
 
         /*
-	 * We're actually setting a register. Take care of allocating
-	 * space first.
-	 */
+         * We're actually setting a register. Take care of allocating
+         * space first.
+         */
 
         if (!mushstate.rdata)
         {
@@ -171,8 +174,8 @@ int set_register(const char *funcname, char *name, char *data)
         }
 
         /*
-	 * Set it.
-	 */
+         * Set it.
+         */
 
         if (!mushstate.rdata->q_regs[regnum])
         {
@@ -438,11 +441,11 @@ void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     if (nfargs > MAX_NFARGS - 2)
     {
         /*
-	 * Prevent people from doing something dumb by providing this
-	 * too many arguments and thus having the fifteenth register
-	 * contain the remaining args. Cut them off at the
-	 * fourteenth.
-	 */
+         * Prevent people from doing something dumb by providing this
+         * too many arguments and thus having the fifteenth register
+         * contain the remaining args. Cut them off at the
+         * fourteenth.
+         */
         SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs);
         return;
     }
@@ -803,11 +806,11 @@ int calc_limitmask(char *lstr)
 
         case ' ':
             /*
-	     * ignore spaces
-	     */
+             * ignore spaces
+             */
             /*
-	     * EMPTY
-	     */
+             * EMPTY
+             */
             break;
 
         default:
@@ -874,8 +877,6 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     GDATA *preserve = NULL, *tmp = NULL;
     char *atext = NULL, *str = NULL, *callp = NULL, *call_list = NULL, *cbuf = NULL, **cregs = NULL;
     int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0;
-    ;
-    int is_sandbox = is_sandbox = Is_Func(UCALL_SANDBOX);
 
     /*
      * Three arguments to ucall(), five to sandbox()
@@ -887,7 +888,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         return;
     }
 
-    if (is_sandbox && (nfargs < 5))
+    if (Is_Func(UCALL_SANDBOX) && (nfargs < 5))
     {
         SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
@@ -897,7 +898,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Figure our our limits
      */
 
-    if (is_sandbox)
+    if (Is_Func(UCALL_SANDBOX))
     {
         lmask = calc_limitmask(fargs[1]);
 
@@ -916,7 +917,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      */
     preserve = save_global_regs("fun_ucall.save");
 
-    if (is_sandbox)
+    if (Is_Func(UCALL_SANDBOX))
     {
         callp = Eat_Spaces(fargs[2]);
     }
@@ -977,17 +978,17 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     else if (!strcmp(callp, "@_"))
     {
         /*
-	 * Pass everything in
-	 */
+         * Pass everything in
+         */
         /*
-	 * EMPTY
-	 */
+         * EMPTY
+         */
     }
     else if (!strncmp(callp, "@_ ", 3) && callp[3])
     {
         /*
-	 * Pass in everything EXCEPT the named registers
-	 */
+         * Pass in everything EXCEPT the named registers
+         */
         call_list = XMALLOC(LBUF_SIZE, "call_list");
         XSTRCPY(call_list, callp + 3);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
@@ -1002,8 +1003,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     else
     {
         /*
-	 * Pass in ONLY the named registers
-	 */
+         * Pass in ONLY the named registers
+         */
         if (mushstate.rdata)
         {
             for (int z = 0; z < mushstate.rdata->q_alloc; z++)
@@ -1064,21 +1065,21 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     /*
      * What to call: <obj>/<attr> or <attr> or #lambda/<code>
      */
-    if (string_prefix((is_sandbox) ? fargs[4] : fargs[2], "#lambda/"))
+    if (string_prefix((Is_Func(UCALL_SANDBOX)) ? fargs[4] : fargs[2], "#lambda/"))
     {
         thing = player;
         anum = NOTHING;
         ap = NULL;
         atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen(((is_sandbox) ? fargs[4] : fargs[2]) + 8);
-        __xstrcpy(atext, (is_sandbox) ? fargs[4] : fargs[2] + 8);
+        alen = strlen(((Is_Func(UCALL_SANDBOX)) ? fargs[4] : fargs[2]) + 8);
+        __xstrcpy(atext, (Is_Func(UCALL_SANDBOX)) ? fargs[4] : fargs[2] + 8);
         atext[alen] = '\0';
         aowner = player;
         aflags = 0;
     }
     else
     {
-        if (parse_attrib(player, (is_sandbox) ? fargs[4] : fargs[2], &thing, &anum, 0))
+        if (parse_attrib(player, (Is_Func(UCALL_SANDBOX)) ? fargs[4] : fargs[2], &thing, &anum, 0))
         {
             if ((anum == NOTHING) || !(Good_obj(thing)))
                 ap = NULL;
@@ -1088,7 +1089,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         else
         {
             thing = player;
-            ap = atr_str((is_sandbox) ? fargs[4] : fargs[2]);
+            ap = atr_str((Is_Func(UCALL_SANDBOX)) ? fargs[4] : fargs[2]);
         }
         if (!ap)
         {
@@ -1106,7 +1107,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Find our perspective
      */
 
-    if (is_sandbox)
+    if (Is_Func(UCALL_SANDBOX))
     {
         obj = match_thing(player, fargs[0]);
 
@@ -1138,7 +1139,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Evaluate it using the rest of the passed function args
      */
     str = atext;
-    exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, (is_sandbox) ? &(fargs[5]) : &(fargs[3]), nfargs - ((is_sandbox) ? 5 : 3));
+    exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, (Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3]), nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3));
     XFREE(atext);
 
     /*
@@ -1154,7 +1155,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Restore / clean registers
      */
 
-    if (is_sandbox)
+    if (Is_Func(UCALL_SANDBOX))
     {
         callp = Eat_Spaces(fargs[3]);
     }
@@ -1166,8 +1167,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     if (!*callp)
     {
         /*
-	 * Restore nothing, so we keep our data as-is.
-	 */
+         * Restore nothing, so we keep our data as-is.
+         */
         if (preserve)
         {
             for (int z = 0; z < preserve->q_alloc; z++)
@@ -1218,21 +1219,21 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         if (callp[3] == '\0')
         {
             /*
-	     * Clear out all data
-	     */
+             * Clear out all data
+             */
             restore_global_regs("fun_ucall.restore", preserve);
         }
         else
         {
             /*
-	     * Go back to the original registers, but ADD BACK IN
-	     * the new values of the registers on the list.
-	     */
+             * Go back to the original registers, but ADD BACK IN
+             * the new values of the registers on the list.
+             */
             tmp = preserve;
             preserve = mushstate.rdata; /* preserve is now the
-					 * new vals */
+                                         * new vals */
             mushstate.rdata = tmp;      /* this is now the original
-					 * vals */
+                                         * vals */
             call_list = XMALLOC(LBUF_SIZE, "call_list");
             XSTRCPY(call_list, callp + 4);
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
@@ -1295,17 +1296,17 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         if (callp[2] == '\0')
         {
             /*
-	     * Restore all registers we had before
-	     */
+             * Restore all registers we had before
+             */
             call_list = NULL;
         }
         else
         {
             /*
-	     * Restore all registers EXCEPT the ones listed. We
-	     * assume that this list is going to be pretty short,
-	     * so we can do a crude, unsorted search.
-	     */
+             * Restore all registers EXCEPT the ones listed. We
+             * assume that this list is going to be pretty short,
+             * so we can do a crude, unsorted search.
+             */
             call_list = XMALLOC(LBUF_SIZE, "call_list");
             XSTRCPY(call_list, callp + 3);
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
@@ -1389,8 +1390,8 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     else
     {
         /*
-	 * Restore ONLY these named registers
-	 */
+         * Restore ONLY these named registers
+         */
         call_list = XMALLOC(LBUF_SIZE, "call_list");
         XSTRCPY(call_list, callp);
         ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
@@ -1448,7 +1449,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
         }
     }
 
-    if (is_sandbox)
+    if (Is_Func(UCALL_SANDBOX))
     {
         mushstate.f_limitmask = save_state;
     }
@@ -1576,10 +1577,10 @@ void set_xvar(dbref obj, char *name, char *data)
     else
     {
         /*
-	 * We haven't found it. If it's non-empty, set it, provided
-	 * we're not running into a limit on the number of vars per
-	 * object.
-	 */
+         * We haven't found it. If it's non-empty, set it, provided
+         * we're not running into a limit on the number of vars per
+         * object.
+         */
         if (VarsCount(obj) + 1 > mushconf.numvars_lim)
         {
             XFREE(tbuf);
@@ -1793,8 +1794,8 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if (!fargs[1] || !*fargs[1])
     {
         /*
-	 * Empty list, clear out the data.
-	 */
+         * Empty list, clear out the data.
+         */
         clear_xvars(player, xvar_names, n_xvars);
         XFREE(varlist);
         XFREE(xvar_names);
@@ -1915,11 +1916,11 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     if (fargs[1] && *fargs[1])
     {
         /*
-	 * We have data, so we should initialize variables to their
-	 * values, ala xvars(). However, unlike xvars(), if we don't
-	 * get a list, we just leave the values alone (we don't clear
-	 * them out).
-	 */
+         * We have data, so we should initialize variables to their
+         * values, ala xvars(). However, unlike xvars(), if we don't
+         * get a list, we just leave the values alone (we don't clear
+         * them out).
+         */
         elemlist = bp = XMALLOC(LBUF_SIZE, "elemlist");
         str = fargs[1];
         exec(elemlist, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
@@ -2236,8 +2237,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         case 's':
         case 'S':
             /*
-	     * Valid types
-	     */
+             * Valid types
+             */
             break;
 
         default:
@@ -2364,8 +2365,8 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
         default:
             /*
-	     * Should never happen
-	     */
+             * Should never happen
+             */
             this_comp->typer_func = NULL;
         }
 
@@ -2587,8 +2588,8 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     else if ((!fargs[2] || !*fargs[2]) && (!fargs[3] || !*fargs[3]))
     {
         /*
-	 * Blank initializers. This is just fine.
-	 */
+         * Blank initializers. This is just fine.
+         */
         comp_names = init_vals = NULL;
         comp_array = vals_array = NULL;
         n_comps = n_vals = 0;
@@ -3057,8 +3058,8 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     for (i = 0; i < nwords; i++)
     {
         /*
-	 * Find the component and check the type.
-	 */
+         * Find the component and check the type.
+         */
         if (inst_ptr->datatype->need_typecheck)
         {
             cp = cbuf;
@@ -3095,8 +3096,8 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         }
 
         /*
-	 * Now go set it.
-	 */
+         * Now go set it.
+         */
         tp = endp;
         SAFE_SB_CHR('.', tbuf, &tp);
         SAFE_SB_STR(words[i], tbuf, &tp);
@@ -4076,10 +4077,10 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         if (!over)
         {
             /*
-	     * We have to pop off the items regardless of whether
-	     * or not there's an overflow, but we can save
-	     * ourselves some copying if so.
-	     */
+             * We have to pop off the items regardless of whether
+             * or not there's an overflow, but we can save
+             * ourselves some copying if so.
+             */
             if (*bufc != bb_p)
             {
                 print_separator(&osep, buff, bufc);
@@ -4181,11 +4182,11 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
-	 * Matching error. Note that this returns a null string
-	 * rather than '#-1 REGEXP ERROR: <error>', as PennMUSH does,
-	 * in order to remain consistent with our other regexp
-	 * functions.
-	 */
+         * Matching error. Note that this returns a null string
+         * rather than '#-1 REGEXP ERROR: <error>', as PennMUSH does,
+         * in order to remain consistent with our other regexp
+         * functions.
+         */
         notify_quiet(player, errptr);
         return;
     }
@@ -4230,26 +4231,26 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
     do
     {
         /*
-	 * If we had too many subpatterns for the offsets vector, set
-	 * the number to 1/3rd of the size of the offsets vector.
-	 */
+         * If we had too many subpatterns for the offsets vector, set
+         * the number to 1/3rd of the size of the offsets vector.
+         */
         if (subpatterns == 0)
         {
             subpatterns = PCRE_MAX_OFFSETS / 3;
         }
 
         /*
-	 * Copy up to the start of the matched area.
-	 */
+         * Copy up to the start of the matched area.
+         */
         tmp = fargs[0][offsets[0]];
         fargs[0][offsets[0]] = '\0';
         SAFE_LB_STR(start, buff, bufc);
         fargs[0][offsets[0]] = tmp;
 
         /*
-	 * Copy in the replacement, putting in captured
-	 * sub-expressions.
-	 */
+         * Copy in the replacement, putting in captured
+         * sub-expressions.
+         */
 
         for (r = fargs[2]; *r; r++)
         {
@@ -4275,8 +4276,8 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
             if (r == endsub || (have_brace && *endsub != '}'))
             {
                 /*
-		 * Not a valid number.
-		 */
+                 * Not a valid number.
+                 */
                 SAFE_LB_CHR('$', buff, bufc);
 
                 if (have_brace)
@@ -4307,11 +4308,11 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
         match_offset = offsets[1];
     } while (all_option && (((offsets[0] == offsets[1]) &&
                              /*
-			      * PCRE docs note: Perl special-cases the empty-string match in split
-			      * and /g. To emulate, first try the match again at the same position
-			      * with PCRE_NOTEMPTY, then advance the starting offset if that
-			      * fails.
-			      */
+                              * PCRE docs note: Perl special-cases the empty-string match in split
+                              * and /g. To emulate, first try the match again at the same position
+                              * with PCRE_NOTEMPTY, then advance the starting offset if that
+                              * fails.
+                              */
                              (((subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, PCRE_NOTEMPTY, offsets, PCRE_MAX_OFFSETS)) >= 0) || ((match_offset++ < len) && (subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, 0, offsets, PCRE_MAX_OFFSETS)) >= 0))) ||
                             ((match_offset <= len) && (subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, 0, offsets, PCRE_MAX_OFFSETS)) >= 0)));
 
@@ -4391,8 +4392,8 @@ void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribut
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
-	 * Matching error.
-	 */
+         * Matching error.
+         */
         notify_quiet(player, errptr);
         XFREE(matchbuf);
         return;
@@ -4493,10 +4494,10 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
-	 * Matching error. Note difference from PennMUSH behavior:
-	 * Regular expression errors return 0, not #-1 with an error
-	 * message.
-	 */
+         * Matching error. Note difference from PennMUSH behavior:
+         * Regular expression errors return 0, not #-1 with an error
+         * message.
+         */
         notify_quiet(player, errptr);
         return;
     }
@@ -4519,9 +4520,9 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
             if (*bufc != bb_p)
             {
                 /*
-		 * if true, all_option also
-		 * * true
-		 */
+                 * if true, all_option also
+                 * * true
+                 */
                 print_separator(&osep, buff, bufc);
             }
 
@@ -4580,10 +4581,10 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
     if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
-	 * Matching error. Note difference from PennMUSH behavior:
-	 * Regular expression errors return 0, not #-1 with an error
-	 * message.
-	 */
+         * Matching error. Note difference from PennMUSH behavior:
+         * Regular expression errors return 0, not #-1 with an error
+         * message.
+         */
         notify_quiet(player, errptr);
         SAFE_LB_CHR('0', buff, bufc);
         return;
@@ -4686,8 +4687,8 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     if ((re = pcre_compile(fargs[lastn + 1], 0, &errptr, &erroffset, mushstate.retabs)) == NULL)
     {
         /*
-	 * Return nothing on a bad match.
-	 */
+         * Return nothing on a bad match.
+         */
         notify_quiet(player, errptr);
         return;
     }
@@ -4962,8 +4963,8 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     default:
         /*
-	 * No special set-up steps.
-	 */
+         * No special set-up steps.
+         */
         break;
     }
 
@@ -5016,8 +5017,8 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /*
  * ---------------------------------------------------------------------------
- * Grids. 
- * gridmake(<rows>, <columns>[,<grid text>][,<col odelim>][,<row odelim>]) 
+ * Grids.
+ * gridmake(<rows>, <columns>[,<grid text>][,<col odelim>][,<row odelim>])
  * gridload(<grid text>[,<odelim for row elems>][,<odelim between rows>])
  * gridset(<y range>,<x range>,<value>[,<input sep for ranges>])
  * gridsize() - returns rows cols grid( , [,<odelim for row elems>][,<odelim

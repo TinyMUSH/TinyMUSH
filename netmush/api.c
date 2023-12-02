@@ -11,16 +11,17 @@
  *
  */
 
-/* api.c -  */
+#include "config.h"
 
-#include "system.h"
-
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <string.h>
+#include <dlfcn.h>
+
 
 extern CMDENT *prefix_cmds[256];
 

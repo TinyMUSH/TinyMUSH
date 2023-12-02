@@ -4,15 +4,20 @@
  * @brief Type definitions for variables
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #ifndef __TYPEDEFS_H
 #define __TYPEDEFS_H
+
+#include <stdint.h>
+#include <stdio.h>
+#include <time.h>
+#include <netinet/in.h>
 
 typedef int dbref;
 typedef int FLAG;
@@ -93,7 +98,7 @@ struct bque
 
 /**
  * Return values for cf_ functions.
- * 
+ *
  */
 typedef enum CF_RESULT
 {
@@ -104,7 +109,7 @@ typedef enum CF_RESULT
 
 /**
  * DB Related typedefs
- * 
+ *
  */
 
 typedef char boolexp_type;
@@ -159,7 +164,7 @@ typedef struct object
     /**
      * Make sure everything you want to write to the DBM database is in
      * the first part of the structure and included in DUMPOBJ
-     * 
+     *
      */
     int name_length;              /*!< ALL: Length of name string */
     int stack_count;              /*!< ALL: number of things on the stack */
@@ -172,9 +177,9 @@ typedef struct object
 /**
  * @brief The DUMPOBJ structure exists for use during database writes. It is a
  * duplicate of the OBJ structure except for items we don't need to write
- * 
+ *
  */
-//typedef struct dump_object DUMPOBJ;
+// typedef struct dump_object DUMPOBJ;
 typedef struct dump_object
 {
     dbref location;     /*!< PLAYER, THING: where it is */
@@ -219,7 +224,7 @@ typedef struct numbertable
 
 /**
  * @brief File cache related typedefs
- * 
+ *
  */
 
 typedef struct filecache_hdr FCACHE;
@@ -245,12 +250,12 @@ struct filecache_block
 
 /**
  * @brief Power related typedefs
- * 
+ *
  */
 
 /**
  * Information about object powers.
- * 
+ *
  */
 typedef struct power_entry
 {
@@ -269,12 +274,12 @@ typedef struct powerset
 
 /**
  * @brief Flags related typedefs
- * 
+ *
  */
 
 /**
  * @brief Information about object flags.
- * 
+ *
  */
 typedef struct flag_entry
 {
@@ -288,7 +293,7 @@ typedef struct flag_entry
 
 /**
  * @brief Fundamental object types
- * 
+ *
  */
 typedef struct object_entry
 {
@@ -307,7 +312,7 @@ typedef struct flagset
 
 /**
  * @brief Functions related typedefs
- * 
+ *
  */
 
 typedef struct fun
@@ -390,9 +395,9 @@ typedef struct object_xfuncs
     int count;
 } OBJXFUNCS;
 
-/** 
- * @brief Search structure, used by @search and search(). 
- * 
+/**
+ * @brief Search structure, used by @search and search().
+ *
  */
 typedef struct search_type
 {
@@ -411,9 +416,9 @@ typedef struct search_type
     int high_bound;
 } SEARCH;
 
-/** 
- * * @brief Stats structure, used by @stats and stats(). 
- * 
+/**
+ * * @brief Stats structure, used by @stats and stats().
+ *
  */
 typedef struct stats_type
 {
@@ -429,7 +434,7 @@ typedef struct stats_type
 
 /**
  * @brief Help related typedefs
- * 
+ *
  */
 
 typedef struct
@@ -439,9 +444,9 @@ typedef struct
     char topic[TOPIC_NAME_LEN + 1]; /*!< topic of help entry */
 } help_indx;
 
-/** 
- * Pointers to this struct is what gets stored in the help_htab's 
- * 
+/**
+ * Pointers to this struct is what gets stored in the help_htab's
+ *
  */
 struct help_entry
 {
@@ -457,7 +462,7 @@ typedef struct _help_indx_list
 
 /**
  * @brief htab related typedefs
- * 
+ *
  */
 
 typedef union
@@ -501,7 +506,7 @@ typedef struct mod_hashes
 
 /**
  * Definititon of a name table
- * 
+ *
  */
 typedef struct name_table
 {
@@ -513,7 +518,7 @@ typedef struct name_table
 
 /**
  * Command related typedefs
- * 
+ *
  */
 
 typedef struct addedentry
@@ -543,7 +548,7 @@ typedef struct cmdentry
 
 /**
  * @brief Interface related typedefs
- * 
+ *
  */
 
 typedef struct cmd_block_hdr
@@ -616,14 +621,14 @@ typedef struct descriptor_data
 
 /**
  * @brief UDB related typedefs
- * 
+ *
  */
 
-/** 
+/**
  * For MUSH, an int works great as an object ID And attributes are zero
  * terminated strings, so we heave the size out. We hand around attribute
  * identifiers in the last things.
- * 
+ *
  */
 typedef struct udb_aname
 {
@@ -631,9 +636,9 @@ typedef struct udb_aname
     unsigned int attrnum;
 } UDB_ANAME;
 
-/** 
- * In general, we want binary attributes, so we do this. 
- * 
+/**
+ * In general, we want binary attributes, so we do this.
+ *
  */
 typedef struct udb_attrib
 {
@@ -642,10 +647,10 @@ typedef struct udb_attrib
     char *data;
 } UDB_ATTRIB;
 
-/** 
+/**
  * An object is a name, an attribute count, and a vector of attributes which
  * Attr's are stowed in a contiguous array pointed at by atrs.
- * 
+ *
  */
 typedef struct udb_object
 {
@@ -683,7 +688,7 @@ typedef struct udb_data
 
 /**
  * @brief Match related typedefs
- * 
+ *
  */
 
 typedef struct match_state
@@ -700,12 +705,12 @@ typedef struct match_state
 
 /**
  * @brief MUSH Configuration related typedefs
- * 
+ *
  */
 
-/** 
+/**
  * Modules and related things.
- * 
+ *
  */
 typedef struct module_version_info
 {
@@ -758,7 +763,7 @@ typedef union
 
 /**
  * Runtime configurable parameters
- * 
+ *
  */
 typedef struct confparm
 {
@@ -818,7 +823,7 @@ typedef struct confdata
     char *backup_compress;     /*!< Flags used to compress */
     char *backup_extract;      /*!< Flags used to extract */
     char *backup_ext;          /*!< Filename extension for backup */
-    char *mush_owner;            /*!< Email of the game owner */
+    char *mush_owner;          /*!< Email of the game owner */
     char *modules_home;        /*!< Base path for modules */
     char *game_exec;           /*!< MUSH's executable full path and name */
     char *game_home;           /*!< MUSH's working directory */
@@ -976,8 +981,8 @@ typedef struct confdata
     FLAGSET robot_flags;       /*!< Flags robots start with */
     FLAGSET stripped_flags;    /*!< Flags stripped by @clone and @chown */
     char *flag_sep;            /*!< Separator of dbref from marker flags */
-    char *mush_name;            /*!< Name of the Mush */
-    char *mush_shortname;       /*!< Shorter name, for log */
+    char *mush_name;           /*!< Name of the Mush */
+    char *mush_shortname;      /*!< Shorter name, for log */
     char *one_coin;            /*!< name of one coin (ie. "penny") */
     char *many_coins;          /*!< name of many coins (ie. "pennies") */
     int timeslice;             /*!< How often do we bump people's cmd quotas? */
@@ -1071,7 +1076,7 @@ typedef struct propdir_list
 
 /**
  * Version number is Major.Minor.Status.PatchLevel
- * 
+ *
  */
 typedef struct
 {
@@ -1089,74 +1094,74 @@ typedef struct statedata
     UDB_OBJECT *objpipes[NUM_OBJPIPES]; /*!< Number of object pipelines */
     unsigned int objc;                  /*!< Object reference counter */
     versioninfo version;                /*!< MUSH version info */
-    //char *configureinfo;                /*!< Configure switches */
-    //char *compilerinfo;                 /*!< Compiler command line */
-    //char *linkerinfo;                   /*!< Linker command line */
-    char *modloaded;                    /*!< Modules loaded */
-    char **cfiletab;                    /*!< Array of config files */
-    int configfiles;                    /*!< Number of config files */
-    int initializing;                   /*!< Are we reading config file at startup? */
-    int loading_db;                     /*!< Are we loading the db? */
-    int standalone;                     /*!< Are we converting the database? */
-    int panicking;                      /*!< Are we in the middle of dying horribly? */
-    int restarting;                     /*!< Are we restarting? */
-    int dumping;                        /*!< Are we dumping? */
-    int logstderr;                      /*!< Echo log to stderr too? */
-    int debug;                          /*!< Are we being debug? */
-    pid_t dumper;                       /*!< If forked-dumping, with what pid? */
-    int logging;                        /*!< Are we in the middle of logging? */
-    int epoch;                          /*!< Generation number for dumps */
-    int generation;                     /*!< DB global generation number */
-    int mush_lognum;                      /*!< Number of logfile */
-    int helpfiles;                      /*!< Number of external indexed helpfiles */
-    int hfiletab_size;                  /*!< Size of the table storing path pointers */
-    char **hfiletab;                    /*!< Array of path pointers */
-    HASHTAB *hfile_hashes;              /*!< Pointer to an array of index hashtables */
-    dbref curr_enactor;                 /*!< Who initiated the current command */
-    dbref curr_player;                  /*!< Who is running the current command */
-    char *curr_cmd;                     /*!< The current command */
-    int alarm_triggered;                /*!< Has periodic alarm signal occurred? */
-    time_t now;                         /*!< What time is it now? */
-    time_t dump_counter;                /*!< Countdown to next db dump */
-    time_t check_counter;               /*!< Countdown to next db check */
-    time_t idle_counter;                /*!< Countdown to next idle check */
-    time_t mstats_counter;              /*!< Countdown to next mstats snapshot */
-    time_t events_counter;              /*!< Countdown to next events check */
-    int shutdown_flag;                  /*!< Should interface be shut down? */
-    int flatfile_flag;                  /*!< Dump a flatfile when we have the chance */
-    time_t start_time;                  /*!< When was MUSH started */
-    time_t restart_time;                /*!< When did we last restart? */
-    int reboot_nums;                    /*!< How many times have we restarted? */
-    time_t cpu_count_from;              /*!< When did we last reset CPU counters? */
-    char *debug_cmd;                    /*!< The command we are executing (if any) */
-    char *doing_hdr;                    /*!< Doing column header in WHO display */
-    SITE *access_list;                  /*!< Access states for sites */
-    SITE *suspect_list;                 /*!< Sites that are suspect */
-    HASHTAB command_htab;               /*!< Commands hashtable */
-    HASHTAB logout_cmd_htab;            /*!< Logged-out commands hashtable (WHO, etc) */
-    HASHTAB func_htab;                  /*!< Functions hashtable */
-    HASHTAB ufunc_htab;                 /*!< Local functions hashtable */
-    HASHTAB powers_htab;                /*!< Powers hashtable */
-    HASHTAB flags_htab;                 /*!< Flags hashtable */
-    HASHTAB attr_name_htab;             /*!< Attribute names hashtable */
-    HASHTAB vattr_name_htab;            /*!< User attribute names hashtable */
-    HASHTAB player_htab;                /*!< Player name->number hashtable */
-    HASHTAB nref_htab;                  /*!< Object name reference #_name_ mapping */
-    HASHTAB desc_htab;                  /*!< Socket descriptor hashtable */
-    HASHTAB fwdlist_htab;               /*!< Room forwardlists */
-    HASHTAB propdir_htab;               /*!< Propdir lists */
-    HASHTAB qpid_htab;                  /*!< Queue process IDs */
-    HASHTAB redir_htab;                 /*!< Redirections */
-    HASHTAB objstack_htab;              /*!< Object stacks */
-    HASHTAB objgrid_htab;               /*!< Object grids */
-    HASHTAB parent_htab;                /*!< Parent $-command exclusion */
-    HASHTAB vars_htab;                  /*!< Persistent variables hashtable */
-    HASHTAB structs_htab;               /*!< Structure hashtable */
-    HASHTAB cdefs_htab;                 /*!< Components hashtable */
-    HASHTAB instance_htab;              /*!< Instances hashtable */
-    HASHTAB instdata_htab;              /*!< Structure data hashtable */
-    HASHTAB api_func_htab;              /*!< Registered module API functions */
-    MODULE *modules_list;               /*!< Loadable modules hashtable */
+    // char *configureinfo;                /*!< Configure switches */
+    // char *compilerinfo;                 /*!< Compiler command line */
+    // char *linkerinfo;                   /*!< Linker command line */
+    char *modloaded;         /*!< Modules loaded */
+    char **cfiletab;         /*!< Array of config files */
+    int configfiles;         /*!< Number of config files */
+    int initializing;        /*!< Are we reading config file at startup? */
+    int loading_db;          /*!< Are we loading the db? */
+    int standalone;          /*!< Are we converting the database? */
+    int panicking;           /*!< Are we in the middle of dying horribly? */
+    int restarting;          /*!< Are we restarting? */
+    int dumping;             /*!< Are we dumping? */
+    int logstderr;           /*!< Echo log to stderr too? */
+    int debug;               /*!< Are we being debug? */
+    pid_t dumper;            /*!< If forked-dumping, with what pid? */
+    int logging;             /*!< Are we in the middle of logging? */
+    int epoch;               /*!< Generation number for dumps */
+    int generation;          /*!< DB global generation number */
+    int mush_lognum;         /*!< Number of logfile */
+    int helpfiles;           /*!< Number of external indexed helpfiles */
+    int hfiletab_size;       /*!< Size of the table storing path pointers */
+    char **hfiletab;         /*!< Array of path pointers */
+    HASHTAB *hfile_hashes;   /*!< Pointer to an array of index hashtables */
+    dbref curr_enactor;      /*!< Who initiated the current command */
+    dbref curr_player;       /*!< Who is running the current command */
+    char *curr_cmd;          /*!< The current command */
+    int alarm_triggered;     /*!< Has periodic alarm signal occurred? */
+    time_t now;              /*!< What time is it now? */
+    time_t dump_counter;     /*!< Countdown to next db dump */
+    time_t check_counter;    /*!< Countdown to next db check */
+    time_t idle_counter;     /*!< Countdown to next idle check */
+    time_t mstats_counter;   /*!< Countdown to next mstats snapshot */
+    time_t events_counter;   /*!< Countdown to next events check */
+    int shutdown_flag;       /*!< Should interface be shut down? */
+    int flatfile_flag;       /*!< Dump a flatfile when we have the chance */
+    time_t start_time;       /*!< When was MUSH started */
+    time_t restart_time;     /*!< When did we last restart? */
+    int reboot_nums;         /*!< How many times have we restarted? */
+    time_t cpu_count_from;   /*!< When did we last reset CPU counters? */
+    char *debug_cmd;         /*!< The command we are executing (if any) */
+    char *doing_hdr;         /*!< Doing column header in WHO display */
+    SITE *access_list;       /*!< Access states for sites */
+    SITE *suspect_list;      /*!< Sites that are suspect */
+    HASHTAB command_htab;    /*!< Commands hashtable */
+    HASHTAB logout_cmd_htab; /*!< Logged-out commands hashtable (WHO, etc) */
+    HASHTAB func_htab;       /*!< Functions hashtable */
+    HASHTAB ufunc_htab;      /*!< Local functions hashtable */
+    HASHTAB powers_htab;     /*!< Powers hashtable */
+    HASHTAB flags_htab;      /*!< Flags hashtable */
+    HASHTAB attr_name_htab;  /*!< Attribute names hashtable */
+    HASHTAB vattr_name_htab; /*!< User attribute names hashtable */
+    HASHTAB player_htab;     /*!< Player name->number hashtable */
+    HASHTAB nref_htab;       /*!< Object name reference #_name_ mapping */
+    HASHTAB desc_htab;       /*!< Socket descriptor hashtable */
+    HASHTAB fwdlist_htab;    /*!< Room forwardlists */
+    HASHTAB propdir_htab;    /*!< Propdir lists */
+    HASHTAB qpid_htab;       /*!< Queue process IDs */
+    HASHTAB redir_htab;      /*!< Redirections */
+    HASHTAB objstack_htab;   /*!< Object stacks */
+    HASHTAB objgrid_htab;    /*!< Object grids */
+    HASHTAB parent_htab;     /*!< Parent $-command exclusion */
+    HASHTAB vars_htab;       /*!< Persistent variables hashtable */
+    HASHTAB structs_htab;    /*!< Structure hashtable */
+    HASHTAB cdefs_htab;      /*!< Components hashtable */
+    HASHTAB instance_htab;   /*!< Instances hashtable */
+    HASHTAB instdata_htab;   /*!< Structure data hashtable */
+    HASHTAB api_func_htab;   /*!< Registered module API functions */
+    MODULE *modules_list;    /*!< Loadable modules hashtable */
     int max_structs;
     int max_cdefs;
     int max_instance;
@@ -1221,7 +1226,7 @@ typedef struct statedata
 
 /**
  * @brief Player related typedefs
- * 
+ *
  */
 
 typedef struct hostdtm
@@ -1251,7 +1256,7 @@ typedef struct player_cache
 
 /**
  * @brief User attributes related typedefs
- * 
+ *
  */
 
 typedef struct user_attribute
@@ -1263,7 +1268,7 @@ typedef struct user_attribute
 
 /**
  * @brief PGC related typedefs
- * 
+ *
  */
 typedef struct pcg_state_setseq_64
 {
@@ -1274,12 +1279,12 @@ typedef struct pcg_state_setseq_64
 
 /**
  * @brief Message queue related typedefs
- * 
+ *
  */
 
 /**
  * @brief Type of messages for the task handler
- * 
+ *
  */
 typedef enum msgq_destination
 {
@@ -1305,41 +1310,42 @@ typedef struct msgq_dnsresolver
 
 /**
  * @brief Sort list related typedefs
- * 
+ *
  */
 
 typedef struct f_record
 {
-	double data;
-	char *str;
-	int pos;
+    double data;
+    char *str;
+    int pos;
 } F_RECORD;
 
 typedef struct i_record
 {
-	long data;
-	char *str;
-	int pos;
+    long data;
+    char *str;
+    int pos;
 } I_RECORD;
 
 typedef struct a_record
 {
-	char *str;
-	int pos;
+    char *str;
+    int pos;
 } A_RECORD;
 
 /**
  * @brief Time conversion related typedefs
- * 
+ *
  */
-typedef struct monthdays {
-	char *month;
-	int day;
+typedef struct monthdays
+{
+    char *month;
+    int day;
 } MONTHDAYS;
 
 /**
  * @brief Ansi and color conversion typedefs
- * 
+ *
  */
 
 typedef struct
@@ -1374,7 +1380,5 @@ typedef struct
     float deltaE;
     COLORINFO color;
 } COLORMATCH;
-
-
 
 #endif /* __TYPEDEFS_H */

@@ -12,20 +12,19 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
 
-#include <gdbm.h> /* required by code */
-
-#ifdef HAVE_QDBM_H
-#include <qdbm.h> /* required by code */
-#endif
+#include <errno.h>
+#include <string.h>
+#include <getopt.h>
+#include <gdbm.h>
+#include <sys/stat.h>
 
 /* The dbm hash bucket element contains the full 31 bit hash value, the
    "pointer" to the key and data (stored together) with their sizes.  It also

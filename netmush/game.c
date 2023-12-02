@@ -11,14 +11,26 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <ctype.h>
+#include <errno.h>
+#include <getopt.h>
+#include <libgen.h>
+#include <string.h>
+#include <dlfcn.h>
+#include <fcntl.h>
+#include <pcre.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/param.h>
+#include <sys/resource.h>
 
 extern LOGFILETAB logfds_table[];
 

@@ -11,14 +11,16 @@
  * 
  */
 
-#include "system.h"
+#include "config.h"
 
-#include "defaults.h"
 #include "constants.h"
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+
+#include <ctype.h>
+#include <string.h>
 
 int did_attr(dbref player, dbref thing, int what)
 {
