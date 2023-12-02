@@ -18,7 +18,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <netinet/in.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "typedefs.h"
 

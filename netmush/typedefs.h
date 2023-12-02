@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 
 typedef int dbref;
