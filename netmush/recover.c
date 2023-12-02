@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <gdbm.h>
 #include <sys/stat.h>
+#include <libgen.h>
 
 /* The dbm hash bucket element contains the full 31 bit hash value, the
    "pointer" to the key and data (stored together) with their sizes.  It also
