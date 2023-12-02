@@ -1,5 +1,5 @@
 <map id="netmush/help.c" name="netmush/help.c">
-<area shape="rect" id="node1" title="Commands for giving help." alt="" coords="361,5,471,31"/>
+<area shape="rect" id="node1" title="Commands for giving help." alt="" coords="410,5,521,31"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,79,72,104"/>
 <area shape="rect" id="node3" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="97,79,186,104"/>
 <area shape="rect" id="node5" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="177,152,258,177"/>
@@ -9,6 +9,7 @@
 <area shape="rect" id="node16" title=" " alt="" coords="577,79,639,104"/>
 <area shape="rect" id="node17" title=" " alt="" coords="664,79,728,104"/>
 <area shape="rect" id="node18" title=" " alt="" coords="753,79,810,104"/>
+<area shape="rect" id="node19" title=" " alt="" coords="835,79,901,104"/>
 <area shape="rect" id="node4" title=" " alt="" coords="45,152,101,177"/>
 <area shape="rect" id="node6" title=" " alt="" coords="229,225,293,251"/>
 <area shape="rect" id="node7" title=" " alt="" coords="63,225,123,251"/>
