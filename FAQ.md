@@ -1,5 +1,6 @@
-Frequently-Asked Questions
-==========================
+# <center>WARNING<br><br>THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE</center>
+
+## Frequently-Asked Questions
 
 - I found a bug! What do I do?
 - How do I make a new configuration file?
@@ -16,9 +17,7 @@ Frequently-Asked Questions
 - Help! I'm having database problems.
 - How do I set up a link to an external SQL database?
 
-------------------------------------------------------------------------------
-
-I found a bug! What do I do?
+### I found a bug! What do I do?
 
 - Make sure that it really is a bug, and not a new feature or design
   decision. If it crashes the server, it's a bug. If you can't tell,
@@ -64,9 +63,7 @@ I found a bug! What do I do?
 	up	(Repeat until you're at the top procedure level.)
 	quit
 
-------------------------------------------------------------------------------
-
-How do I make a new configuration file?
+### How do I make a new configuration file?
 
 TinyMUSH 3 gets the information it needs to operate the game (aside from
 the database itself) from a configuration file that is read in at startup.
@@ -103,9 +100,7 @@ There are many more configuration directives available. Information
 on individual directives can be obtained with the WIZHELP <directive>
 command within the MUSH.
 
-------------------------------------------------------------------------------
-
-How do I back up my database?
+### How do I back up my database?
 
 Shut down your game. Go into the game directory, and type './Backup'
 This will create a 'flatfile', and compress it with GNU zip; if there's
@@ -138,9 +133,7 @@ or other relevant MUSH files. You can simply copy comsys.db and
 mail.db to a safe place, to back them up. Alternatively, you can
 run the Archive script to back up all the important files.
 
-------------------------------------------------------------------------------
-
-How do I restore a database backup?
+### How do I restore a database backup?
 
 Shut down the game (if it's currently running). Then, go into the game
 directory and type './Restore name-of-flatfile', where name-of-flatfile
@@ -150,9 +143,7 @@ Note that this only restores your database; it does not restore the
 comsys or mail databases. To restore the latter, simply copy your
 saved copies of comsys.db and mail.db back to the game directory.
 
-------------------------------------------------------------------------------
-
-How do I apply a patch upgrade or bugfix?
+### How do I apply a patch upgrade or bugfix?
 
 The easiest way to patch the server, if you have perl installed on
 your system,  is to type './Update' -- this will automatically download
@@ -190,9 +181,7 @@ characters at the end of lines.
 Also, if you're applying multiple patches, make sure to do them in 
 chronological sequence -- oldest to newest patch.
 
-------------------------------------------------------------------------------
-
-How do I recover a lost password for God (#1)?
+### How do I recover a lost password for God (#1)?
 
 You will need to recompile the server with a new God character, use it to
 change the password of the old God character, and then recompile again.
@@ -226,9 +215,7 @@ To do this, do the following:
 
 You should now be able to log into the God character with the new password.
 
-------------------------------------------------------------------------------
-
-How do logfiles work?
+### How do logfiles work?
 
 When you start your game from the command line, the startup information
 is logged to GAMENAME.log, where GAMENAME is what you specified it to
@@ -269,9 +256,7 @@ get rid of all logfiles -- GAMENAME.log, anything named by the
 game_log and divert_log conf parameters, and their old versions
 with .TIMESTAMP and .old extensions.
 
-------------------------------------------------------------------------------
-
-How do I use multiple guests?
+### How do I use multiple guests?
 
 Using multiple guests is easy, and after you set it up, you'll never have to
 worry about it again. Here are the steps needed to implement multiple
@@ -356,9 +341,7 @@ All guests have the 'Guest' power, which is a marker you may use to test
 whether a player is a guest or not. Guests copy the flags, attributes,
 parent, and zone of the guest prototype (the guest_char_num object).
 
-------------------------------------------------------------------------------
-
-How do I create my own flags? (How do I configure marker flags?)
+### How do I create my own flags? (How do I configure marker flags?)
 
 You can define your own flags through the use of "marker flags".
 Flag names and permissions are defined in your conf file.
@@ -402,9 +385,7 @@ flag_alias	CHIEF	_CHIEF
 which makes it possible to do '@set <object> = CHIEF'; the caveats listed
 above about future conflicts with built-ins should be kept in mind, though.
 
-------------------------------------------------------------------------------
-
-How do I create "altered reality" realm states like invisibility?
+### How do I create "altered reality" realm states like invisibility?
 
 There are three special locks -- the HeardLock, KnownLock, and MovedLock --
 that are only activated by the PRESENCE flag.
@@ -499,10 +480,7 @@ Then, handle the locks:
 Fundamentally, you can combine these six locks to end up with any combination
 of what can hear, be heard, see, be seen, notice, and be noticed.
 
-
-------------------------------------------------------------------------------
-
-How do I tune the database cache?
+### How do I tune the database cache?
 
 Cache tuning is something of a black art. The basic tradeoff is this:
 If you make your cache larger, it will consume more memory, but you
@@ -547,9 +525,7 @@ default if okay. If you want to tune this, take a look at the number of
 attributes being cached in '@list cache', divide this number by 50, and use
 that as your cache width.
 
-------------------------------------------------------------------------------
-
-How do I use the in-memory database?
+###  How do I use the in-memory database?
 
 Follow the 'Basic Installition' steps in the INSTALL file, with one
 exception: specify '--disable-disk-based' as an argument to configure (step
@@ -558,9 +534,7 @@ its memory-based database instead of a flatfile. You can still create a
 flatfile using the Backup script the same way you would for a disk-based
 game.
 
-------------------------------------------------------------------------------
-
-Help! I'm having database problems.
+### Help! I'm having database problems.
 
 Almost everyone who runs a MUSH experiences a database disaster at
 least once in their life. There can be many reasons for this; common
@@ -591,9 +565,7 @@ successfully, you can try to start it up with './Startmush' (though
 doing a './Backup' first would be a good idea). If it doesn't complete
 successfully, you'll need to revert to a backup.
 
-------------------------------------------------------------------------------
-
-How do I set up a link to an external SQL database?
+### How do I set up a link to an external SQL database?
 
 There is built-in support in TinyMUSH 3 for connecting to an external
 mSQL or MySQL database. If you want to do this, you'll need to compile
@@ -647,6 +619,6 @@ Note for MySQL users: you may need to specify a username/password to
 connect to the database; use the sql_username and sql_password config
 parameters. These parameters have no effect for mSQL.
 
-------------------------------------------------------------------------------
-    If you have suggestions for more FAQs, please email us and let us know.
-------------------------------------------------------------------------------
+---
+### If you have suggestions for more FAQs, please email us and let us know.
+---

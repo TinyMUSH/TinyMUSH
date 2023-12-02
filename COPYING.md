@@ -1,27 +1,23 @@
-TinyMUSH 3 is a derivation of TinyMUSH 2.2 and TinyMUX, both of which are
-derivations of TinyMUSH 2.0, which in turn is based upon TinyMUD. There are
-also portions of source code derived from PennMUSH 1.50.
+TinyMUSH is a derivation of TinyMUSH 2.2 and TinyMUX, both of which are derivations of TinyMUSH 2.0, which in turn is based upon TinyMUD. There are also portions of source code derived from PennMUSH 1.50.
 
-The TinyMUD copyright follows below. PennMUSH, TinyMUSH 2.0, TinyMUSH 2.2,
-and TinyMUSH 3 follow the OSI-standard Artistic License.
+The TinyMUD copyright follows below. PennMUSH, TinyMUSH 2.0, TinyMUSH 2.2, and TinyMUSH follow the OSI-standard Artistic License.
 
-TinyMUSH 3 Copyright: The "Artistic License"
---------------------------------------------
+# TinyMUSH Copyright: The "Artistic License"
 
-TinyMUSH 3 Source Code:
+    TinyMUSH Source Code:
+        Copyright (c) 2011 - 2021,  TinyMUSH development team.
+        Copyright (c) 2004 - 2010,  by Lydia Leong, David Passmore, Robby Griffin, 
+                                    Scott Dorr, and Eddy Beaupre.
+        Copyright (c) 2001 - 2003,  by Lydia Leong, David Passmore,
+                                    Robby Griffin, and Scott Dorr.
+        Copyright (c) 2000          by Lydia Leong, David Passmore, and Robby Griffin.
+        Copyright (c) 1999          by Lydia Leong and David Passmore.
 
-Copyright (c) 2011 - 2021, TinyMUSH development team.
-Copyright (c) 2004 - 2010, by Lydia Leong, David Passmore, Robby Griffin, 
-                              Scott Dorr, and Eddy Beaupre.
-Copyright (c) 2001 - 2003, by Lydia Leong, David Passmore,
-                              Robby Griffin, and Scott Dorr.
-Copyright (c) 2000 by Lydia Leong, David Passmore, and Robby Griffin.
-Copyright (c) 1999 by Lydia Leong and David Passmore.
-
-All rights reserved.
+        All rights reserved.
 
 See https://github.com/TinyMUSH/ for more information.
 
+```
                          The "Artistic License"
 
                                 Preamble
@@ -149,107 +145,99 @@ IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
                                 The End
-------------------------------------------------------------------------------
+```
 
 TinyMUX Source Code
 -------------------
-Copyright (c) 1995, 1996, 1997, 1998, 1999, David Passmore.
-
+    Copyright (c) 1995, 1996, 1997, 1998, 1999, David Passmore.
 
 TinyMUSH 2.2 Source Code
 ------------------------
-Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, Lydia Leong,
-Jean Marie Diaz, and Deborah Wilson-Hooker.
-
+    Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, Lydia Leong,
+    Jean Marie Diaz, and Deborah Wilson-Hooker.
 
 TinyMUSH 2.0 Source code
 ------------------------
-Copyright (c) 1991, Joseph Traub and Glenn Crocker. All rights reserved.
-
+    Copyright (c) 1991, Joseph Traub and Glenn Crocker. All rights reserved.
 
 Based on TinyMUD code
 ---------------------
-Copyright (c) 1995, David Applegate, James Aspnes, Timothy Freeman,
-                    and Bennet Yee. All rights reserved.
-(Modified by these authors from the original 1989, 1990 TinyMUD copyright.)
+    Copyright (c) 1995, David Applegate, James Aspnes, Timothy Freeman, and Bennet Yee. 
+    All rights  reserved. 
 
-Revised TinyMUD copyright:
+    (Modified by these authors from the original 1989, 1990 TinyMUD copyright.)
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that: (1) source code distributions
-retain the above copyright notice and this paragraph in its entirety,
-and (2) distributions including binary code include the above copyright
-notice and this paragraph in its entirety in the documentation or other
-materials provided with the distribution.  The names of the copyright
-holders may not be used to endorse or promote products derived from 
-this software without specific prior written permission.
+    Revised TinyMUD copyright:
 
-THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-------------------------------------------------------------------------------
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that: (1) source code distributions
+    retain the above copyright notice and this paragraph in its entirety,
+    and (2) distributions including binary code include the above copyright
+    notice and this paragraph in its entirety in the documentation or other
+    materials provided with the distribution.  The names of the copyright
+    holders may not be used to endorse or promote products derived from 
+    this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 UDB Source Code
 ---------------
-Copyright (c) 1990 The Regents of the University of California.
-All rights reserved.
 
-Copyright (c) 1991-1992 Andrew Molitor <amolitor@eagle.wesleyan.edu>
-All rights reserved.
+    Copyright (c) 1990 The Regents of the University of California. All rights reserved.
 
-Copyrignt (c) 1991 Marcus J. Ranum <mjr@ranum.com>. 
-All rights reserved.
+    Copyright (c) 1991-1992 Andrew Molitor <amolitor@eagle.wesleyan.edu> All rights reserved.
 
-This code is derived from software contributed to Berkeley by
-Margo Seltzer.
+    Copyrignt (c) 1991 Marcus J. Ranum <mjr@ranum.com>. All rights reserved.
 
-Redistribution and use in source and binary forms are permitted provided
-that: (1) source distributions retain this entire copyright notice and
-comment, and (2) distributions including binaries display the following
-acknowledgement:  ``This product includes software developed by the
-University of California, Berkeley and its contributors'' in the
-documentation or other materials provided with the distribution and in
-all advertising materials mentioning features or use of this software.
-Neither the name of the University nor the names of its contributors may
-be used to endorse or promote products derived from this software without
-specific prior written permission.
-THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-------------------------------------------------------------------------------
+    This code is derived from software contributed to Berkeley by Margo Seltzer.
+
+    Redistribution and use in source and binary forms are permitted provided
+    that: (1) source distributions retain this entire copyright notice and
+    comment, and (2) distributions including binaries display the following
+    acknowledgement:  ``This product includes software developed by the
+    University of California, Berkeley and its contributors'' in the
+    documentation or other materials provided with the distribution and in
+    all advertising materials mentioning features or use of this software.
+    Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 Wildcard routines 
 -----------------
 
-Written by T. Alexander Popiel, 24 June 1993
-Last modified by T. Alexander Popiel, 19 August 1993
+    Written by T. Alexander Popiel, 24 June 1993
+    Last modified by T. Alexander Popiel, 19 August 1993
 
-Thanks go to Andrew Molitor for debugging
-Thanks also go to Rich $alz for code to benchmark against
+    Thanks go to Andrew Molitor for debugging
+    Thanks also go to Rich $alz for code to benchmark against
 
-Copyright (c) 1993 by T. Alexander Popiel
-This code is hereby placed under GNU copyleft,
-------------------------------------------------------------------------------
+    Copyright (c) 1993 by T. Alexander Popiel
+    This code is hereby placed under GNU copyleft,
 
 PCG Random Number Generation for C
 ----------------------------------
 
-Copyright 2014 Melissa O'Neill <oneill@pcg-random.org>
+    Copyright 2014 Melissa O'Neill <oneill@pcg-random.org>
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
- For additional information about the PCG random number generation scheme,
- including its license and other licensing options, visit
+    For additional information about the PCG random number generation scheme,
+    including its license and other licensing options, visit
 
-     http://www.pcg-random.org
-
+    http://www.pcg-random.org

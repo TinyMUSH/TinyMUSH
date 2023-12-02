@@ -1,2 +1,1 @@
-TinyMUSH 4.0 NEWS
------------------
+# TinyMUSH 4.0 NEWS

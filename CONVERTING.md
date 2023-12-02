@@ -1,12 +1,7 @@
-*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
-***                                                          ***
-*** THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE  ***
-***                                                          ***
-*** WARNING ***  WARNING *** WARNING *** WARNING *** WARNING ***
 
-===========================================================================
-Converting from TinyMUX 1.0
-===========================================================================
+# <center>WARNING<br><br>THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE</center>
+
+# Converting from TinyMUX 1.0
 
 If you are converting your game from TinyMUX 1.x, upgrading to TinyMUSH
 3.1 is just like doing a MUX version upgrade, with some additional
@@ -340,9 +335,7 @@ For a more general look at TinyMUSH 3.0 changes, see the CHANGES file.
 - elements(), filter(), map(), munge(), setunion(), setinter(), setdiff(),
   shuffle(), sort(), sortby(), splice() take output delimiters.
 
-===========================================================================
-Converting from TinyMUSH 2.2
-===========================================================================
+# Converting from TinyMUSH 2.2
 
 If you are converting your game from TinyMUSH 2.2, upgrading to TinyMUSH
 3.1 is similar to doing a normal upgrade, with a couple of additional
