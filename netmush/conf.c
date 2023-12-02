@@ -26,6 +26,7 @@
 #include <dlfcn.h>
 #include <arpa/inet.h>
 #include <sys/param.h>
+#include <libgen.h>
 
 CONFDATA mushconf;
 STATEDATA mushstate;

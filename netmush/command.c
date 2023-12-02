@@ -27,6 +27,7 @@
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <unistd.h>
+#include <libgen.h>
 
 CMDENT *prefix_cmds[256];
 CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;

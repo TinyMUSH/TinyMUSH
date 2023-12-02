@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/resource.h>
+#include <signal.h>
 
 extern LOGFILETAB logfds_table[];
 
