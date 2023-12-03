@@ -5,12 +5,12 @@
  * @brief Binary object handling gear.
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
- * @note Why not just write the attributes individually to disk? Well, when 
+ *
+ * @note Why not just write the attributes individually to disk? Well, when
  *       you're running on a platform that does synchronous writes with a large
  *       database, thousands of I/O operations tend to be expensive. When you
  *       'coalesce' many attribute writes onto a single object and do only one
@@ -18,11 +18,11 @@
  *       especially on loading/unloading to flatfile. It also has the side
  *       effect of pre-fetching on reads, since you often have sequential
  *       attribute reads off of the same object.
- * 
+ *
  *       Wile all of this is extremely true, keep in mind that text was written
  *       over 25 years ago. Even if we didn't optimized our read/write sequence
  *       you woudn't see the difference.
- * 
+ *
  *       If you really want to see the difference, it's time to get youself into
  *       the retro-computing scene :)
  */
@@ -95,8 +95,8 @@ UDB_OBJECT *unroll_obj(char *data)
     for (j = 0; j < i;)
     {
         /*
-	 * Attribute size
-	 */
+         * Attribute size
+         */
         if (XMEMCPY((void *)&(a[j].size), (void *)dptr, sizeof(int)) == NULL)
         {
             goto bail;
@@ -105,8 +105,8 @@ UDB_OBJECT *unroll_obj(char *data)
         dptr += sizeof(int);
 
         /*
-	 * Attribute number
-	 */
+         * Attribute number
+         */
 
         if (XMEMCPY((void *)&(a[j].attrnum), (void *)dptr, sizeof(int)) == NULL)
         {
@@ -116,8 +116,8 @@ UDB_OBJECT *unroll_obj(char *data)
         dptr += sizeof(int);
 
         /*
-	 * get some memory for the data
-	 */
+         * get some memory for the data
+         */
 
         if ((a[j].data = (char *)XMALLOC(a[j].size, "a[j].data")) == NULL)
         {
@@ -125,14 +125,14 @@ UDB_OBJECT *unroll_obj(char *data)
         }
 
         /*
-	 * Preincrement j, so we know how many to free if this next
-	 * * bit fails.
-	 */
+         * Preincrement j, so we know how many to free if this next
+         * * bit fails.
+         */
         j++;
 
         /*
-	 * Now get the data
-	 */
+         * Now get the data
+         */
 
         if (XMEMCPY((void *)a[j - 1].data, (void *)dptr, a[j - 1].size) == NULL)
         {
@@ -203,8 +203,8 @@ char *rollup_obj(UDB_OBJECT *o)
     for (i = 0; i < o->at_count; i++)
     {
         /*
-	 * Attribute size.
-	 */
+         * Attribute size.
+         */
         if (XMEMCPY((void *)dptr, (void *)&(a[i].size), sizeof(int)) == NULL)
         {
             return NULL;
@@ -213,8 +213,8 @@ char *rollup_obj(UDB_OBJECT *o)
         dptr += sizeof(int);
 
         /*
-	 * Attribute number
-	 */
+         * Attribute number
+         */
 
         if (XMEMCPY((void *)dptr, (void *)&(a[i].attrnum), sizeof(int)) == NULL)
         {
@@ -224,8 +224,8 @@ char *rollup_obj(UDB_OBJECT *o)
         dptr += sizeof(int);
 
         /*
-	 * Attribute data
-	 */
+         * Attribute data
+         */
 
         if (XMEMCPY((void *)dptr, (void *)a[i].data, a[i].size) == NULL)
         {
@@ -473,8 +473,8 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
         if (!mushstate.objpipes[i])
         {
             /*
-	     * If there's no object there, read one in
-	     */
+             * If there's no object there, read one in
+             */
             key.dptr = &obj;
             key.dsize = sizeof(int);
             data = db_get(key, DBTYPE_ATTRIBUTE);
@@ -487,8 +487,8 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
             else
             {
                 /*
-		 * New object
-		 */
+                 * New object
+                 */
                 if ((mushstate.objpipes[i] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mushstate.objpipes[i]")) == NULL)
                 {
                     return (NULL);
@@ -550,8 +550,8 @@ UDB_OBJECT *get_free_objpipe(unsigned int obj)
     else
     {
         /*
-	 * New object
-	 */
+         * New object
+         */
         if ((mushstate.objpipes[j] = (UDB_OBJECT *)XMALLOC(sizeof(UDB_OBJECT), "mushstate.objpipes[j]")) == NULL)
         {
             return (NULL);

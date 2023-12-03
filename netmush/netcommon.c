@@ -4,11 +4,11 @@
  * @brief Routines used by the networking code that do not depend on the implementation
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  * @note This file contains routines used by the networking code that do not
  * depend on the implementation of the networking code.  The network-specific
  * portions of the descriptor data structure are not used.
@@ -246,10 +246,10 @@ void raw_broadcast(int inflags, char *template, ...)
 
 	XVSNPRINTF(buff, LBUF_SIZE, template, ap);
 	/*
-     * Note that this use of the flagwords precludes testing for
-     * * type in this function. (Not that this matters, since we
-     * * look at connected descriptors, which must be players.)
-     */
+	 * Note that this use of the flagwords precludes testing for
+	 * * type in this function. (Not that this matters, since we
+	 * * look at connected descriptors, which must be players.)
+	 */
 	test_flag = inflags & ~(FLAG_WORD2 | FLAG_WORD3);
 
 	if (inflags & FLAG_WORD2)
@@ -287,8 +287,8 @@ void raw_broadcast(int inflags, char *template, ...)
 			}
 
 			/*
-	 * If inflags is 0, broadcast to everyone
-	 */
+			 * If inflags is 0, broadcast to everyone
+			 */
 
 			if ((p_flag & test_flag) || (!test_flag))
 			{
@@ -370,8 +370,8 @@ void queue_write(DESC *d, const char *b, int n)
 	}
 
 	/*
-     * Allocate an output buffer if needed
-     */
+	 * Allocate an output buffer if needed
+	 */
 
 	if (d->output_head == NULL)
 	{
@@ -390,17 +390,17 @@ void queue_write(DESC *d, const char *b, int n)
 	}
 
 	/*
-     * Now tp points to the last buffer in the chain
-     */
+	 * Now tp points to the last buffer in the chain
+	 */
 	d->output_size += n;
 	d->output_tot += n;
 
 	do
 	{
 		/*
-	 * See if there is enough space in the buffer to hold the
-	 * * string.  If so, copy it and update the pointers..
-	 */
+		 * See if there is enough space in the buffer to hold the
+		 * * string.  If so, copy it and update the pointers..
+		 */
 		left = mushconf.output_block_size - (tp->hdr.end - (char *)tp + 1);
 
 		if (n <= left)
@@ -413,9 +413,9 @@ void queue_write(DESC *d, const char *b, int n)
 		else
 		{
 			/*
-	     * It didn't fit.  Copy what will fit and then
-	     * * allocate * another buffer and retry.
-	     */
+			 * It didn't fit.  Copy what will fit and then
+			 * * allocate * another buffer and retry.
+			 */
 			if (left > 0)
 			{
 				XSTRNCPY(tp->hdr.end, b, left);
@@ -842,15 +842,15 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	char *buf;
 	char *argv[7];
 	/*
-     * Pass session information on the stack:
-     * *   %0 - reason message
-     * *   %1 - current number of connections
-     * *   %2 - connect time
-     * *   %3 - last input
-     * *   %4 - number of commands entered
-     * *   %5 - bytes input
-     * *   %6 - bytes output
-     */
+	 * Pass session information on the stack:
+	 * *   %0 - reason message
+	 * *   %1 - current number of connections
+	 * *   %2 - connect time
+	 * *   %3 - last input
+	 * *   %4 - number of commands entered
+	 * *   %5 - bytes input
+	 * *   %6 - bytes output
+	 */
 	argv[0] = (char *)reason;
 	argv[1] = XMALLOC(SBUF_SIZE, "argv[1]");
 	XSPRINTF(argv[1], "%d", num);
@@ -908,8 +908,8 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	}
 
 	/*
-     * do the zone of the player's location's possible a(dis)connect
-     */
+	 * do the zone of the player's location's possible a(dis)connect
+	 */
 	if (mushconf.have_zones && ((zone = Zone(loc)) != NOTHING))
 	{
 		switch (Typeof(zone))
@@ -927,9 +927,9 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 		case TYPE_ROOM:
 			/*
-	     * check every object in the room for a (dis)connect
-	     * * action
-	     */
+			 * check every object in the room for a (dis)connect
+			 * * action
+			 */
 			for (obj = Contents(zone); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				buf = atr_pget(obj, attr, &aowner, &aflags, &alen);
@@ -1051,8 +1051,8 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		num++;
 	}
 	/*
-     * Reset vacation flag
-     */
+	 * Reset vacation flag
+	 */
 	s_Flags2(player, Flags2(player) & ~VACATION);
 
 	if (num < 2)
@@ -1160,8 +1160,8 @@ void announce_disconnect(dbref player, DESC *d, const char *reason)
 		XFREE(buf);
 		raw_broadcast(WATCHER | FLAG_WORD2, (char *)"GAME: %s has disconnected.", Name(player));
 		/*
-	 * Must reset flags before we do module stuff.
-	 */
+		 * Must reset flags before we do module stuff.
+		 */
 		c_Connected(player);
 
 		if (mushconf.have_pueblo == 1)
@@ -1496,8 +1496,8 @@ void dump_users(DESC *e, char *match, int key)
 				}
 
 				/*
-	     * Get choice flags for wizards
-	     */
+				 * Get choice flags for wizards
+				 */
 				fp = flist;
 				sp = slist;
 
@@ -1628,8 +1628,8 @@ void dump_users(DESC *e, char *match, int key)
 			}
 		}
 	/*
-     * sometimes I like the ternary operator....
-     */
+	 * sometimes I like the ternary operator....
+	 */
 	s = XASPRINTF("s", "%d", mushconf.max_players);
 	XSPRINTF(buf, "%d Player%slogged in, %d record, %s maximum.\r\n", count, (count == 1) ? " " : "s ", mushstate.record_players, (mushconf.max_players == -1) ? "no" : s);
 	XFREE(s);
@@ -1711,8 +1711,8 @@ void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __at
 			{
 				d->colormap[from_color - I_ANSI_BLACK] = 0;
 				/*
-		 * If no changes, clear colormap
-		 */
+				 * If no changes, clear colormap
+				 */
 				x = 0;
 
 				for (i = 0; i < I_ANSI_NUM - I_ANSI_BLACK; i++)
@@ -1868,10 +1868,10 @@ void init_logout_cmdtab(void)
 {
 	NAMETAB *cp;
 	/*
-     * Make the htab bigger than the number of entries so that we find
-     * * things on the first check.  Remember that the admin can add
-     * * aliases.
-     */
+	 * Make the htab bigger than the number of entries so that we find
+	 * * things on the first check.  Remember that the admin can add
+	 * * aliases.
+	 */
 	hashinit(&mushstate.logout_cmd_htab, 3 * mushconf.hash_factor, HT_STR);
 
 	for (cp = logout_cmdtable; cp->flag; cp++)
@@ -1922,12 +1922,12 @@ int check_connect(DESC *d, char *msg)
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = (char *)"< check_connect >";
 	/*
-     * Hide the password length from SESSION
-     */
+	 * Hide the password length from SESSION
+	 */
 	d->input_tot -= (strlen(msg) + 1);
 	/*
-     * Crack the command apart
-     */
+	 * Crack the command apart
+	 */
 	command = XMALLOC(LBUF_SIZE, "command");
 	user = XMALLOC(LBUF_SIZE, "user");
 	password = XMALLOC(LBUF_SIZE, "password");
@@ -1953,8 +1953,8 @@ int check_connect(DESC *d, char *msg)
 		}
 
 		/*
-	 * See if this connection would exceed the max #players
-	 */
+		 * See if this connection would exceed the max #players
+		 */
 
 		if (mushconf.max_players < 0)
 		{
@@ -1974,8 +1974,8 @@ int check_connect(DESC *d, char *msg)
 		if (player == NOTHING)
 		{
 			/*
-	     * Not a player, or wrong password
-	     */
+			 * Not a player, or wrong password
+			 */
 			queue_rawstring(d, NULL, connect_fail);
 			log_write(LOG_LOGIN | LOG_SECURITY, "CON", "BAD", "[%d/%s] Failed connect to '%s'", d->descriptor, d->addr, user);
 			user[3800] = '\0';
@@ -2008,8 +2008,8 @@ int check_connect(DESC *d, char *msg)
 			}
 
 			/*
-	     * First make sure we don't have a guest from a bad host.
-	     */
+			 * First make sure we don't have a guest from a bad host.
+			 */
 
 			if (Guest(player) && (d->host_info & H_GUEST))
 			{
@@ -2020,8 +2020,8 @@ int check_connect(DESC *d, char *msg)
 			}
 
 			/*
-	     * Logins are enabled, or wiz or god
-	     */
+			 * Logins are enabled, or wiz or god
+			 */
 			pname = log_getname(player);
 
 			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
@@ -2040,10 +2040,10 @@ int check_connect(DESC *d, char *msg)
 			d->connected_at = time(NULL);
 			d->player = player;
 			/*
-	     * Check to see if the player is currently running
-	     * * an @program. If so, drop the new descriptor into
-	     * * it.
-	     */
+			 * Check to see if the player is currently running
+			 * * an @program. If so, drop the new descriptor into
+			 * * it.
+			 */
 			for (d2 = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d2; d2 = d2->hashnext)
 			{
 				if (d2->program_data != NULL)
@@ -2054,10 +2054,10 @@ int check_connect(DESC *d, char *msg)
 			}
 
 			/*
-	     * Give the player the MOTD file and the settable
-	     * * MOTD message(s). Use raw notifies so the
-	     * * player doesn't try to match on the text.
-	     */
+			 * Give the player the MOTD file and the settable
+			 * * MOTD message(s). Use raw notifies so the
+			 * * player doesn't try to match on the text.
+			 */
 
 			if (Guest(player))
 			{
@@ -2087,8 +2087,8 @@ int check_connect(DESC *d, char *msg)
 			announce_connect(player, d, connMessages(reason));
 
 			/*
-	     * If stuck in an @prog, show the prompt
-	     */
+			 * If stuck in an @prog, show the prompt
+			 */
 
 			if (d->program_data != NULL)
 			{
@@ -2115,8 +2115,8 @@ int check_connect(DESC *d, char *msg)
 		reason = R_CREATE;
 
 		/*
-	 * Enforce game down
-	 */
+		 * Enforce game down
+		 */
 
 		if (!(mushconf.control_flags & CF_LOGIN))
 		{
@@ -2127,8 +2127,8 @@ int check_connect(DESC *d, char *msg)
 		}
 
 		/*
-	 * Enforce max #players
-	 */
+		 * Enforce max #players
+		 */
 
 		if (mushconf.max_players < 0)
 		{
@@ -2146,8 +2146,8 @@ int check_connect(DESC *d, char *msg)
 		if (nplayers > mushconf.max_players)
 		{
 			/*
-	     * Too many players on, reject the attempt
-	     */
+			 * Too many players on, reject the attempt
+			 */
 			failconn("CRE", "Create", "Game Full", d, R_GAMEFULL, NOTHING, FC_CONN_FULL, mushconf.fullmotd_msg, command, user, password);
 			XFREE(mushstate.debug_cmd);
 			mushstate.debug_cmd = cmdsave;
@@ -2230,13 +2230,13 @@ void logged_out_internal(DESC *d, int key, char *arg)
 		if (mushconf.have_pueblo == 1)
 		{
 			/*
-	     * Set the descriptor's flag
-	     */
+			 * Set the descriptor's flag
+			 */
 			d->flags |= DS_PUEBLOCLIENT;
 
 			/*
-	     * If we're already connected, set the player's flag
-	     */
+			 * If we're already connected, set the player's flag
+			 */
 			if (d->flags & DS_CONNECTED)
 			{
 				s_Html(d->player);
@@ -2271,8 +2271,8 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	if (d->flags & DS_CONNECTED)
 	{
 		/*
-	 * Normal logged-in command processing
-	 */
+		 * Normal logged-in command processing
+		 */
 		d->command_count++;
 
 		if (d->output_prefix)
@@ -2377,11 +2377,11 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 
 	/*
-     * Login screen (logged-out) command processing.
-     */
+	 * Login screen (logged-out) command processing.
+	 */
 	/*
-     * Split off the command from the arguments
-     */
+	 * Split off the command from the arguments
+	 */
 	arg = command;
 
 	while (*arg && !isspace(*arg))
@@ -2395,16 +2395,16 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 
 	/*
-     * Look up the command in the logged-out command table.
-     */
+	 * Look up the command in the logged-out command table.
+	 */
 	cp = (NAMETAB *)hashfind(command, &mushstate.logout_cmd_htab);
 
 	if (cp == NULL)
 	{
 		/*
-	 * Not in the logged-out command table, so maybe a
-	 * * connect attempt.
-	 */
+		 * Not in the logged-out command table, so maybe a
+		 * * connect attempt.
+		 */
 		if (*arg)
 		{
 			*--arg = ' '; /* restore nullified space */
@@ -2417,9 +2417,9 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 
 	/*
-     * The command was in the logged-out command table.  Perform prefix
-     * * and suffix processing, and invoke the command handler.
-     */
+	 * The command was in the logged-out command table.  Perform prefix
+	 * * and suffix processing, and invoke the command handler.
+	 */
 	d->command_count++;
 
 	if (!(cp->flag & CMD_NOxFIX))
@@ -2443,9 +2443,9 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	}
 
 	/*
-     * QUIT or LOGOUT will close the connection and cause the
-     * * descriptor to be freed!
-     */
+	 * QUIT or LOGOUT will close the connection and cause the
+	 * * descriptor to be freed!
+	 */
 	if (((cp->flag & CMD_MASK) != CMD_QUIT) && ((cp->flag & CMD_MASK) != CMD_LOGOUT) && !(cp->flag & CMD_NOxFIX))
 	{
 		if (d->output_suffix)
@@ -2466,8 +2466,8 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 	if (key == CMD_PUEBLOCLIENT)
 	{
 		/*
-	 * PUEBLOCLIENT affects all the player's connections.
-	 */
+		 * PUEBLOCLIENT affects all the player's connections.
+		 */
 		for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 		{
 			logged_out_internal(d, key, arg);
@@ -2476,9 +2476,9 @@ void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char
 	else
 	{
 		/*
-	 * Other logged-out commands affect only the player's
-	 * * most recently used connection.
-	 */
+		 * Other logged-out commands affect only the player's
+		 * * most recently used connection.
+		 */
 		dlast = NULL;
 		for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 		{
@@ -2524,8 +2524,8 @@ void process_commands(void)
 				log_write(LOG_KBCOMMANDS, "CMD", "KBRD", "[%d/%s] Cmd: %s", d->descriptor, d->addr, t->cmd);
 
 				/*
-		 * ignore the IDLE psuedo-command
-		 */
+				 * ignore the IDLE psuedo-command
+				 */
 				if (strcmp(t->cmd, (char *)"IDLE"))
 				{
 					d->last_time = mushstate.now;
@@ -2628,9 +2628,9 @@ unsigned int mask_to_prefix(unsigned int mask_num)
 	unsigned int i, result, tmp;
 
 	/*
-     * The number of bits in the mask is equal to the number of left
-     * * shifts before it becomes zero. Binary search for that number.
-     */
+	 * The number of bits in the mask is equal to the number of left
+	 * * shifts before it becomes zero. Binary search for that number.
+	 */
 
 	for (i = 16, result = 0; i && mask_num; i >>= 1)
 		if ((tmp = (mask_num << i)))
@@ -2666,8 +2666,8 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 		bits = mask_to_prefix(ntohl(this->mask.s_addr));
 
 		/*
-	 * special-case 0, can't shift by 32
-	 */
+		 * special-case 0, can't shift by 32
+		 */
 		if ((bits == 0 && htonl(0) == this->mask.s_addr) || htonl(0xFFFFFFFFU << (32 - bits)) == this->mask.s_addr)
 		{
 			XSPRINTF(buff, "%-19.19s %-19.19s /%-19d %s", header_txt, inet_ntoa(this->address), bits, str);
@@ -2675,10 +2675,10 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 		else
 		{
 			/*
-	     * Deal with bizarre stuff not along CIDRized boundaries.
-	     * * inet_ntoa() points to a static buffer, so we've got to
-	     * * allocate something temporary.
-	     */
+			 * Deal with bizarre stuff not along CIDRized boundaries.
+			 * * inet_ntoa() points to a static buffer, so we've got to
+			 * * allocate something temporary.
+			 */
 			maskaddr = XMALLOC(MBUF_SIZE, "maskaddr");
 			XSTRCPY(maskaddr, inet_ntoa(this->mask));
 			XSPRINTF(buff, "%-17s %-17s %s", inet_ntoa(this->address), maskaddr, str);
@@ -2796,8 +2796,8 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 			}
 		}
 	/*
-     * Not found, return error.
-     */
+	 * Not found, return error.
+	 */
 	SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
 	XFREE(s);
 }

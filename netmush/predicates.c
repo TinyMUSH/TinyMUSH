@@ -4,11 +4,11 @@
  * @brief Command handling and validations
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -191,8 +191,8 @@ int could_doit(dbref player, dbref thing, int locknum)
 	int aflags, alen, doit;
 
 	/*
-     * no if nonplayer tries to get key
-     */
+	 * no if nonplayer tries to get key
+	 */
 
 	if (!isPlayer(player) && Key(thing))
 	{
@@ -216,8 +216,8 @@ int canpayquota(dbref player, dbref who, int cost, int objtype)
 	int q_list[5];
 
 	/*
-     * If no cost, succeed
-     */
+	 * If no cost, succeed
+	 */
 
 	if (cost <= 0)
 	{
@@ -225,13 +225,13 @@ int canpayquota(dbref player, dbref who, int cost, int objtype)
 	}
 
 	/*
-     * determine basic quota
-     */
+	 * determine basic quota
+	 */
 	load_quota(q_list, Owner(who), A_RQUOTA);
 	quota = q_list[QTYPE_ALL];
 	/*
-     * enough to build?  Wizards always have enough.
-     */
+	 * enough to build?  Wizards always have enough.
+	 */
 	quota -= cost;
 
 	if ((quota < 0) && !Free_Quota(who) && !Free_Quota(Owner(who)))
@@ -255,8 +255,8 @@ int canpayquota(dbref player, dbref who, int cost, int objtype)
 int pay_quota(dbref who, int cost, int objtype)
 {
 	/*
-     * If no cost, succeed.  Negative costs /must/ be managed, however
-     */
+	 * If no cost, succeed.  Negative costs /must/ be managed, however
+	 */
 	if (cost == 0)
 	{
 		return 1;
@@ -307,8 +307,8 @@ int type_quota(int objtype)
 	int qtype;
 
 	/*
-     * determine typed quota
-     */
+	 * determine typed quota
+	 */
 
 	switch (objtype)
 	{
@@ -354,9 +354,9 @@ int payfor(dbref who, dbref cost)
 int payfees(dbref who, int pennies, int quota, int objtype)
 {
 	/*
-     * You /must/ have called canpayfees() first.  If not, your
-     * * database will be eaten by rabid squirrels.
-     */
+	 * You /must/ have called canpayfees() first.  If not, your
+	 * * database will be eaten by rabid squirrels.
+	 */
 	if (mushconf.quotas)
 	{
 		pay_quota(who, quota, objtype);
@@ -397,8 +397,8 @@ int ok_name(const char *name)
 	int i;
 
 	/*
-     * Disallow pure ANSI names
-     */
+	 * Disallow pure ANSI names
+	 */
 
 	if (strlen(purename) == 0)
 	{
@@ -407,8 +407,8 @@ int ok_name(const char *name)
 	}
 
 	/*
-     * Disallow leading spaces
-     */
+	 * Disallow leading spaces
+	 */
 
 	if (isspace(*purename))
 	{
@@ -417,8 +417,8 @@ int ok_name(const char *name)
 	}
 
 	/*
-     * Only printable characters outside of escape codes
-     */
+	 * Only printable characters outside of escape codes
+	 */
 
 	for (cp = purename; *cp; ++cp)
 	{
@@ -430,8 +430,8 @@ int ok_name(const char *name)
 	}
 
 	/*
-     * Disallow trailing spaces
-     */
+	 * Disallow trailing spaces
+	 */
 	cp--;
 
 	if (isspace(*cp))
@@ -441,8 +441,8 @@ int ok_name(const char *name)
 	}
 
 	/*
-     * Exclude names that start with or contain certain magic cookies
-     */
+	 * Exclude names that start with or contain certain magic cookies
+	 */
 	i = (*purename != LOOKUP_TOKEN && *purename != NUMBER_TOKEN && *purename != NOT_TOKEN && !strchr(name, ARG_DELIMITER) && !strchr(name, AND_TOKEN) && !strchr(name, OR_TOKEN) && string_compare(purename, "me") && string_compare(purename, "home") && string_compare(purename, "here"));
 	XFREE(purename);
 	return (i);
@@ -453,9 +453,9 @@ int ok_player_name(const char *name)
 	const char *cp, *good_chars;
 
 	/*
-     * Good name for a thing, not too long, and we either don't have a
-     * * minimum player name length, or we're sufficiently long.
-     */
+	 * Good name for a thing, not too long, and we either don't have a
+	 * * minimum player name length, or we're sufficiently long.
+	 */
 
 	if (!ok_name(name) || (strlen(name) >= (size_t)mushconf.max_command_args) || (mushconf.player_name_min && (strlen(name) < (size_t)mushconf.player_name_min)))
 	{
@@ -472,8 +472,8 @@ int ok_player_name(const char *name)
 	}
 
 	/*
-     * Make sure name only contains legal characters
-     */
+	 * Make sure name only contains legal characters
+	 */
 
 	for (cp = name; cp && *cp; cp++)
 	{
@@ -556,8 +556,8 @@ int ok_password(const char *password, dbref player)
 	}
 
 	/*
-     * Needed.  Change it if you like, but be sure yours is the same.
-     */
+	 * Needed.  Change it if you like, but be sure yours is the same.
+	 */
 	if ((strlen(password) == 13) && (password[0] == 'X') && (password[1] == 'X'))
 	{
 		if (!mushstate.standalone)
@@ -646,8 +646,8 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 	}
 
 	/*
-     * now try a wild card match of buff with stuff in args
-     */
+	 * now try a wild card match of buff with stuff in args
+	 */
 	any = 0;
 	buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
@@ -748,8 +748,8 @@ void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *c
 	if (key == 0)
 	{
 		/*
-	 * List hooks only
-	 */
+		 * List hooks only
+		 */
 		if (cmdp->pre_hook)
 		{
 			ap = atr_num(cmdp->pre_hook->atr);
@@ -808,8 +808,8 @@ void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *c
 	}
 
 	/*
-     * Check for the hook flags.
-     */
+	 * Check for the hook flags.
+	 */
 
 	if (key & HOOK_PRESERVE)
 	{
@@ -835,8 +835,8 @@ void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *c
 	}
 
 	/*
-     * If we didn't get a target, this is a hook deletion.
-     */
+	 * If we didn't get a target, this is a hook deletion.
+	 */
 
 	if (!target || !*target)
 	{
@@ -879,9 +879,9 @@ void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *c
 	}
 
 	/*
-     * Find target object and attribute. Make sure it can be read, and
-     * * that we control the object.
-     */
+	 * Find target object and attribute. Make sure it can be read, and
+	 * * that we control the object.
+	 */
 
 	if (!parse_attrib(player, target, &thing, &atr, 0))
 	{
@@ -918,16 +918,16 @@ void do_hook(dbref player, __attribute__((unused)) dbref cause, int key, char *c
 	}
 
 	/*
-     * All right, we have what we need. Go allocate a hook.
-     */
+	 * All right, we have what we need. Go allocate a hook.
+	 */
 	hp = (HOOKENT *)XMALLOC(sizeof(HOOKENT), "hp");
 	hp->thing = thing;
 	hp->atr = atr;
 
 	/*
-     * If that kind of hook already existed, get rid of it. Put in the
-     * * new one.
-     */
+	 * If that kind of hook already existed, get rid of it. Put in the
+	 * * new one.
+	 */
 
 	if (key & HOOK_BEFORE)
 	{
@@ -980,8 +980,8 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 	char *s1;
 
 	/*
-     * Sanity-check the command name and make it case-insensitive.
-     */
+	 * Sanity-check the command name and make it case-insensitive.
+	 */
 
 	if (!*name || (name[0] == '_' && name[1] == '_'))
 	{
@@ -1011,9 +1011,9 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 	if (old && (old->callseq & CS_ADDED))
 	{
 		/*
-	 * If it's already found in the hash table, and it's being
-	 * added using the same object and attribute...
-	 */
+		 * If it's already found in the hash table, and it's being
+		 * added using the same object and attribute...
+		 */
 		for (nextp = (ADDENT *)old->info.added; nextp != NULL; nextp = nextp->next)
 		{
 			if ((nextp->thing == thing) && (nextp->atr == atr))
@@ -1024,8 +1024,8 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 		}
 
 		/*
-	 * else tack it on to the existing entry...
-	 */
+		 * else tack it on to the existing entry...
+		 */
 		add = (ADDENT *)XMALLOC(sizeof(ADDENT), "add");
 		add->thing = thing;
 		add->atr = atr;
@@ -1048,8 +1048,8 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 		if (old)
 		{
 			/*
-	     * Delete the old built-in
-	     */
+			 * Delete the old built-in
+			 */
 			hashdelete(name, &mushstate.command_htab);
 		}
 
@@ -1073,10 +1073,10 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 		if (old)
 		{
 			/*
-	     * If this command was the canonical form of the
-	     * * command (not an alias), point its aliases to
-	     * * the added command, while keeping the __ alias.
-	     */
+			 * If this command was the canonical form of the
+			 * * command (not an alias), point its aliases to
+			 * * the added command, while keeping the __ alias.
+			 */
 			if (!strcmp(name, old->cmdname))
 			{
 				s1 = XASPRINTF("s1", "__%s", old->cmdname);
@@ -1089,8 +1089,8 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 	}
 
 	/*
-     * We reset the one letter commands here so you can overload them
-     */
+	 * We reset the one letter commands here so you can overload them
+	 */
 	reset_prefix_cmds();
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Command %s added.", name);
 }
@@ -1103,8 +1103,8 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 	char *s, *keyname;
 
 	/*
-     * Let's make this case insensitive...
-     */
+	 * Let's make this case insensitive...
+	 */
 
 	for (s = name; *s; s++)
 	{
@@ -1191,8 +1191,8 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 	}
 
 	/*
-     * Let's make this case insensitive...
-     */
+	 * Let's make this case insensitive...
+	 */
 
 	for (s = name; *s; s++)
 	{
@@ -1209,8 +1209,8 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 			{
 				nextp = prev->next;
 				/*
-		 * Delete it!
-		 */
+				 * Delete it!
+				 */
 				XFREE(prev->name);
 				XFREE(prev);
 			}
@@ -1223,17 +1223,17 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 				hashadd(cmd->cmdname, (int *)cmd, &mushstate.command_htab, 0);
 
 				/*
-		 * in case we deleted by alias
-		 */
+				 * in case we deleted by alias
+				 */
 				if (strcmp(name, cmd->cmdname))
 				{
 					hashadd(name, (int *)cmd, &mushstate.command_htab, HASH_ALIAS);
 				}
 
 				/*
-		 * the __ alias may have been temporarily
-		 * * marked as the original hash entry
-		 */
+				 * the __ alias may have been temporarily
+				 * * marked as the original hash entry
+				 */
 				XSNPRINTF(s1, MBUF_SIZE, "__%s", cmd->cmdname);
 				hashdelete(s1, &mushstate.command_htab);
 				hashadd(s1, (int *)cmd, &mushstate.command_htab, HASH_ALIAS);
@@ -1258,8 +1258,8 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 				if ((nextp->thing == thing) && (nextp->atr == atr))
 				{
 					/*
-		     * Delete it!
-		     */
+					 * Delete it!
+					 */
 					XFREE(nextp->name);
 
 					if (!prev)
@@ -1274,17 +1274,17 @@ void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribut
 								hashadd(cmd->cmdname, (int *)cmd, &mushstate.command_htab, 0);
 
 								/*
-				 * in case we deleted by alias
-				 */
+								 * in case we deleted by alias
+								 */
 								if (strcmp(name, cmd->cmdname))
 								{
 									hashadd(name, (int *)cmd, &mushstate.command_htab, HASH_ALIAS);
 								}
 
 								/*
-				 * the __ alias may have been temporarily
-				 * * marked as the original hash entry
-				 */
+								 * the __ alias may have been temporarily
+								 * * marked as the original hash entry
+								 */
 								XSNPRINTF(s1, MBUF_SIZE, "__%s", cmd->cmdname);
 								hashdelete(s1, &mushstate.command_htab);
 								hashadd(s1, (int *)cmd, &mushstate.command_htab, HASH_ALIAS);
@@ -1343,9 +1343,9 @@ void handle_prog(DESC *d, char *message)
 	int aflags, alen;
 
 	/*
-     * Allow the player to pipe a command while in interactive mode.
-     * * Use telnet protocol's GOAHEAD command to show prompt
-     */
+	 * Allow the player to pipe a command while in interactive mode.
+	 * * Use telnet protocol's GOAHEAD command to show prompt
+	 */
 
 	if (*message == '|')
 	{
@@ -1355,15 +1355,15 @@ void handle_prog(DESC *d, char *message)
 		if (dsave == d)
 		{
 			/*
-	     * We MUST check if we still have a descriptor, and it's
-	     * * the same one, since we could have piped a LOGOUT or
-	     * * QUIT!
-	     */
+			 * We MUST check if we still have a descriptor, and it's
+			 * * the same one, since we could have piped a LOGOUT or
+			 * * QUIT!
+			 */
 
 			/*
-	     * Use telnet protocol's GOAHEAD command to show prompt, make
-	     * sure that we haven't been issues an @quitprogram
-	     */
+			 * Use telnet protocol's GOAHEAD command to show prompt, make
+			 * sure that we haven't been issues an @quitprogram
+			 */
 			if (d->program_data != NULL)
 			{
 				queue_rawstring(d, NULL, "> \377\371");
@@ -1376,8 +1376,8 @@ void handle_prog(DESC *d, char *message)
 	cmd = atr_get(d->player, A_PROGCMD, &aowner, &aflags, &alen);
 	wait_que(d->program_data->wait_cause, d->player, 0, NOTHING, 0, cmd, (char **)&message, 1, d->program_data->wait_data);
 	/*
-     * First, set 'all' to a descriptor we find for this player
-     */
+	 * First, set 'all' to a descriptor we find for this player
+	 */
 	all = (DESC *)nhashfind(d->player, &mushstate.desc_htab);
 
 	if (all->program_data->wait_data)
@@ -1427,8 +1427,8 @@ void handle_prog(DESC *d, char *message)
 
 	XFREE(all->program_data);
 	/*
-     * Set info for all player descriptors to NULL
-     */
+	 * Set info for all player descriptors to NULL
+	 */
 	for (all = (DESC *)nhashfind((int)d->player, &mushstate.desc_htab); all; all = all->hashnext)
 	{
 		all->program_data = NULL;
@@ -1538,8 +1538,8 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 
 	XFREE(d->program_data);
 	/*
-     * Set info for all player descriptors to NULL
-     */
+	 * Set info for all player descriptors to NULL
+	 */
 	for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		d->program_data = NULL;
@@ -1591,9 +1591,9 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 		ap = atr_num(atr);
 		/*
-	 * We've got to find this attribute in the object's
-	 * * parent chain, somewhere.
-	 */
+		 * We've got to find this attribute in the object's
+		 * * parent chain, somewhere.
+		 */
 		found = 0;
 
 		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
@@ -1614,8 +1614,8 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		if (God(player) || (!God(thing) && See_attr(player, thing, ap, aowner, aflags) && (Wizard(player) || (aowner == Owner(player)))))
 		{
 			/*
-	     * Check if cause already has an @prog input pending
-	     */
+			 * Check if cause already has an @prog input pending
+			 */
 			for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d; d = d->hashnext)
 			{
 				if (d->program_data != NULL)
@@ -1643,9 +1643,9 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 	if (mushstate.rdata)
 	{
-		/** 
-		 * Alloc_RegData 
-		 * 
+		/**
+		 * Alloc_RegData
+		 *
 		 */
 		if (mushstate.rdata && (mushstate.rdata->q_alloc || mushstate.rdata->xr_alloc))
 		{
@@ -1685,9 +1685,9 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			program->wait_data = NULL;
 		}
 
-		/** 
-		 * Copy_RegData 
-		 * 
+		/**
+		 * Copy_RegData
+		 *
 		 */
 		if (mushstate.rdata && mushstate.rdata->q_alloc)
 		{
@@ -1732,14 +1732,14 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * Now, start waiting.
-     */
+	 * Now, start waiting.
+	 */
 	for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		d->program_data = program;
 		/*
-	 * Use telnet protocol's GOAHEAD command to show prompt
-	 */
+		 * Use telnet protocol's GOAHEAD command to show prompt
+		 */
 		queue_rawstring(d, NULL, "> \377\371");
 	}
 }
@@ -1761,25 +1761,25 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 	}
 
 	/*
-     * Make sure what follows knows we're restarting. No need to clear
-     * * this, since this process is going away-- this is also set on
-     * * startup when the restart.db is read.
-     */
+	 * Make sure what follows knows we're restarting. No need to clear
+	 * * this, since this process is going away-- this is also set on
+	 * * startup when the restart.db is read.
+	 */
 	mushstate.restarting = 1;
 	raw_broadcast(0, "GAME: Restart by %s, please wait.", Name(Owner(player)));
 	name = log_getname(player);
 	log_write(LOG_ALWAYS, "WIZ", "RSTRT", "Restart by %s", name);
 	XFREE(name);
 	/*
-     * Do a dbck first so we don't end up with an inconsistent state.
-     * * Otherwise, since we don't write out GOING objects, the initial
-     * * dbck at startup won't have valid data to work with in order to
-     * * clean things out.
-     */
+	 * Do a dbck first so we don't end up with an inconsistent state.
+	 * * Otherwise, since we don't write out GOING objects, the initial
+	 * * dbck at startup won't have valid data to work with in order to
+	 * * clean things out.
+	 */
 	do_dbck(NOTHING, NOTHING, 0);
 	/*
-     * Dump databases, etc.
-     */
+	 * Dump databases, etc.
+	 */
 	dump_database_internal(DUMP_DB_RESTART);
 
 	cache_sync();
@@ -1851,8 +1851,8 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 	char *buff, *start, *place, *s1, *d1, *temp;
 
 	/*
-     * First, check normally
-     */
+	 * First, check normally
+	 */
 
 	if (Good_obj(dflt))
 	{
@@ -1860,15 +1860,15 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 	}
 
 	/*
-     * Didn't find it directly.  Recursively do a contents check
-     */
+	 * Didn't find it directly.  Recursively do a contents check
+	 */
 	start = target;
 
 	while (*target)
 	{
 		/*
-	 * Fail if no ' characters
-	 */
+		 * Fail if no ' characters
+		 */
 		place = target;
 		target = strchr(place, '\'');
 
@@ -1878,8 +1878,8 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * If string started with a ', skip past it
-	 */
+		 * If string started with a ', skip past it
+		 */
 
 		if (place == target)
 		{
@@ -1888,8 +1888,8 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * If next character is not an s or a space, skip past
-	 */
+		 * If next character is not an s or a space, skip past
+		 */
 		temp = target++;
 
 		if (!*target)
@@ -1903,9 +1903,9 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * If character was not a space make sure the following
-	 * * character is a space.
-	 */
+		 * If character was not a space make sure the following
+		 * * character is a space.
+		 */
 
 		if (*target != ' ')
 		{
@@ -1923,9 +1923,9 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * Copy the container name to a new buffer so we can
-	 * * terminate it.
-	 */
+		 * Copy the container name to a new buffer so we can
+		 * * terminate it.
+		 */
 		buff = XMALLOC(LBUF_SIZE, "buff");
 
 		for (s1 = start, d1 = buff; *s1 && (s1 < temp); *d1++ = (*s1++))
@@ -1933,9 +1933,9 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 
 		*d1 = '\0';
 		/*
-	 * Look for the container here and in our inventory.  Skip
-	 * * past if we can't find it.
-	 */
+		 * Look for the container here and in our inventory.  Skip
+		 * * past if we can't find it.
+		 */
 		init_match(thing, buff, NOTYPE);
 
 		if (player == thing)
@@ -1958,9 +1958,9 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * If we don't control it and it is either dark or opaque,
-	 * * skip past.
-	 */
+		 * If we don't control it and it is either dark or opaque,
+		 * * skip past.
+		 */
 		control = Controls(player, result1);
 
 		if ((Dark(result1) || Opaque(result1)) && !control)
@@ -1970,8 +1970,8 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * Validate object has the ENTER bit set, if requested
-	 */
+		 * Validate object has the ENTER bit set, if requested
+		 */
 
 		if ((check_enter) && !Enter_ok(result1) && !control)
 		{
@@ -1980,8 +1980,8 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		}
 
 		/*
-	 * Look for the object in the container
-	 */
+		 * Look for the object in the container
+		 */
 		init_match(result1, target, NOTYPE);
 		match_possession();
 		result = match_result();
@@ -2069,14 +2069,14 @@ int parse_thing_slash(dbref player, char *thing, char **after, dbref *it)
 	char *str;
 
 	/*
-     * get name up to /
-     */
+	 * get name up to /
+	 */
 	for (str = thing; *str && (*str != '/'); str++)
 		;
 
 	/*
-     * If no / in string, return failure
-     */
+	 * If no / in string, return failure
+	 */
 
 	if (!*str)
 	{
@@ -2088,14 +2088,14 @@ int parse_thing_slash(dbref player, char *thing, char **after, dbref *it)
 	*str++ = '\0';
 	*after = str;
 	/*
-     * Look for the object
-     */
+	 * Look for the object
+	 */
 	init_match(player, thing, NOTYPE);
 	match_everything(MAT_EXIT_PARENTS);
 	*it = match_result();
 	/*
-     * Return status of search
-     */
+	 * Return status of search
+	 */
 	return (Good_obj(*it));
 }
 
@@ -2109,8 +2109,8 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 	if (parse_thing_slash(player, tbuf, &str, it))
 	{
 		/*
-	 * <obj>/<lock> syntax, use the named lock
-	 */
+		 * <obj>/<lock> syntax, use the named lock
+		 */
 		anum = search_nametab(player, lock_sw, str);
 
 		if (anum == -1)
@@ -2123,8 +2123,8 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 	else
 	{
 		/*
-	 * Not <obj>/<lock>, do a normal get of the default lock
-	 */
+		 * Not <obj>/<lock>, do a normal get of the default lock
+		 */
 		*it = match_thing(player, what);
 
 		if (!Good_obj(*it))
@@ -2138,8 +2138,8 @@ int get_obj_and_lock(dbref player, char *what, dbref *it, ATTR **attr, char *err
 	}
 
 	/*
-     * Get the attribute definition, fail if not found
-     */
+	 * Get the attribute definition, fail if not found
+	 */
 	XFREE(tbuf);
 	*attr = atr_num(anum);
 
@@ -2224,8 +2224,8 @@ int locatable(dbref player, dbref it, dbref cause)
 	int findable_room;
 
 	/*
-     * No sense if trying to locate a bad object
-     */
+	 * No sense if trying to locate a bad object
+	 */
 
 	if (!Good_obj(it))
 	{
@@ -2235,10 +2235,10 @@ int locatable(dbref player, dbref it, dbref cause)
 	loc_it = where_is(it);
 
 	/*
-     * Succeed if we can examine the target, if we are the target, if
-     * * we can examine the location, if a wizard caused the lookup,
-     * * or if the target caused the lookup.
-     */
+	 * Succeed if we can examine the target, if we are the target, if
+	 * * we can examine the location, if a wizard caused the lookup,
+	 * * or if the target caused the lookup.
+	 */
 
 	if (Examinable(player, it) || Find_Unfindable(player) || (loc_it == player) || ((loc_it != NOTHING) && (Examinable(player, loc_it) || loc_it == where_is(player))) || Wizard(cause) || (it == cause))
 	{
@@ -2257,9 +2257,9 @@ int locatable(dbref player, dbref it, dbref cause)
 	}
 
 	/*
-     * Succeed if we control the containing room or if the target is
-     * * findable and the containing room is not unfindable.
-     */
+	 * Succeed if we control the containing room or if the target is
+	 * * findable and the containing room is not unfindable.
+	 */
 
 	if (((room_it != NOTHING) && Examinable(player, room_it)) || Find_Unfindable(player) || (Findable(it) && findable_room))
 	{
@@ -2267,8 +2267,8 @@ int locatable(dbref player, dbref it, dbref cause)
 	}
 
 	/*
-     * We can't do it.
-     */
+	 * We can't do it.
+	 */
 	return 0;
 }
 
@@ -2312,11 +2312,11 @@ int nearby(dbref player, dbref thing)
 char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs, int *f_ptr)
 {
 	/*
-     * If the attribute exists, evaluate it and return pointer to lbuf.
-     * * If not, return NULL.
-     * * Respect global overrides.
-     * * what is assumed to be more than 0.
-     */
+	 * If the attribute exists, evaluate it and return pointer to lbuf.
+	 * * If not, return NULL.
+	 * * Respect global overrides.
+	 * * what is assumed to be more than 0.
+	 */
 	char *d, *m, *buff, *bp, *str, *tbuf, *tp, *sp, *list, *bb_p, *lp;
 	int t, aflags, alen, is_ok, lev;
 	dbref aowner, master, parent, obj;
@@ -2393,9 +2393,9 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 	}
 
 	/*
-     * Construct any arguments that we're going to pass along on the
-     * * stack.
-     */
+	 * Construct any arguments that we're going to pass along on the
+	 * * stack.
+	 */
 
 	switch (what)
 	{
@@ -2458,8 +2458,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 	}
 
 	/*
-     * Go do it.
-     */
+	 * Go do it.
+	 */
 	preserve = save_global_regs("master_attr_save");
 	buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
@@ -2517,15 +2517,15 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	int t = 0, num = 0, aflags = 0, alen = 0, need_pres = 0, retval = 0;
 
 	/*
-     * If we need to call exec() from within this function, we first save
-     * * the state of the global registers, in order to avoid munging them
-     * * inappropriately. Do note that the restoration to their original
-     * * values occurs BEFORE the execution of the @a-attribute. Therefore,
-     * * any changing of setq() values done in the @-attribute and @o-attribute
-     * * will NOT be passed on. This prevents odd behaviors that result from
-     * * odd @verbs and so forth (the idea is to preserve the caller's control
-     * * of the global register values).
-     */
+	 * If we need to call exec() from within this function, we first save
+	 * * the state of the global registers, in order to avoid munging them
+	 * * inappropriately. Do note that the restoration to their original
+	 * * values occurs BEFORE the execution of the @a-attribute. Therefore,
+	 * * any changing of setq() values done in the @-attribute and @o-attribute
+	 * * will NOT be passed on. This prevents odd behaviors that result from
+	 * * odd @verbs and so forth (the idea is to preserve the caller's control
+	 * * of the global register values).
+	 */
 	need_pres = 0;
 
 	if (NoDefault(thing))
@@ -2559,13 +2559,13 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	}
 
 	/*
-     * Module call. Modules can return a negative number, zero, or a
-     * * positive number.
-     * * Positive: Stop calling modules. Return; do not execute normal did_it().
-     * * Zero: Continue calling modules. Execute normal did_it() if we get
-     * *       to the end of the modules and nothing has returned non-zero.
-     * * Negative: Stop calling modules. Execute normal did_it().
-     */
+	 * Module call. Modules can return a negative number, zero, or a
+	 * * positive number.
+	 * * Positive: Stop calling modules. Return; do not execute normal did_it().
+	 * * Zero: Continue calling modules. Execute normal did_it() if we get
+	 * *       to the end of the modules and nothing has returned non-zero.
+	 * * Negative: Stop calling modules. Execute normal did_it().
+	 */
 
 	retval = 0;
 	for (MODULE *csm__mp = mushstate.modules_list; (csm__mp != NULL) && !retval; csm__mp = csm__mp->next)
@@ -2582,21 +2582,21 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	}
 
 	/*
-     * message to player
-     */
+	 * message to player
+	 */
 	m = NULL;
 
 	if (what > 0)
 	{
 		/*
-	 * Check for global attribute format override. If it exists,
-	 * * use that. The actual attribute text we were provided
-	 * * will be passed to that as %0. (Note that if a global
-	 * * override exists, we never use a supplied server default.)
-	 * *
-	 * * Otherwise, we just go evaluate what we've got, and
-	 * * if that's nothing, we go do the default.
-	 */
+		 * Check for global attribute format override. If it exists,
+		 * * use that. The actual attribute text we were provided
+		 * * will be passed to that as %0. (Note that if a global
+		 * * override exists, we never use a supplied server default.)
+		 * *
+		 * * Otherwise, we just go evaluate what we've got, and
+		 * * if that's nothing, we go do the default.
+		 */
 		d = atr_pget(thing, what, &aowner, &aflags, &alen);
 
 		if (Good_obj(master))
@@ -2683,8 +2683,8 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	}
 
 	/*
-     * message to neighbors
-     */
+	 * message to neighbors
+	 */
 	m = NULL;
 
 	if ((owhat > 0) && Has_location(player) && Good_obj(loc = Location(player)))
@@ -2791,8 +2791,8 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	}
 
 	/*
-     * If we preserved the state of the global registers, restore them.
-     */
+	 * If we preserved the state of the global registers, restore them.
+	 */
 
 	if (need_pres)
 	{
@@ -2800,8 +2800,8 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	}
 
 	/*
-     * do the action attribute
-     */
+	 * do the action attribute
+	 */
 
 	if (awhat > 0)
 	{
@@ -2837,11 +2837,11 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			XFREE(charges);
 
 			/*
-	     * Skip any leading $<command>: or ^<monitor>: pattern.
-	     * * If we run off the end of string without finding an unescaped
-	     * * ':' (or there's nothing after it), go back to the beginning
-	     * * of the string and just use that.
-	     */
+			 * Skip any leading $<command>: or ^<monitor>: pattern.
+			 * * If we run off the end of string without finding an unescaped
+			 * * ':' (or there's nothing after it), go back to the beginning
+			 * * of the string and just use that.
+			 */
 
 			if ((*act == '$') || (*act == '^'))
 			{
@@ -2863,8 +2863,8 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			}
 
 			/*
-	     * Go do it.
-	     */
+			 * Go do it.
+			 */
 
 			if (ctrl_flags & (VERB_NOW | TRIG_NOW))
 			{
@@ -2896,8 +2896,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	char *xargs[NUM_ENV_VARS];
 
 	/*
-     * Look for the victim
-     */
+	 * Look for the victim
+	 */
 
 	if (!victim_str || !*victim_str)
 	{
@@ -2906,8 +2906,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get the victim
-     */
+	 * Get the victim
+	 */
 	init_match(player, victim_str, NOTYPE);
 	match_everything(MAT_EXIT_PARENTS);
 	victim = noisy_match_result();
@@ -2918,8 +2918,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get the actor.  Default is my cause
-     */
+	 * Get the actor.  Default is my cause
+	 */
 
 	if ((nargs >= 1) && args[0] && *args[0])
 	{
@@ -2938,13 +2938,13 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Check permissions.  There are two possibilities * 1: Player * * *
-     * controls both victim and actor.  In this case victim runs *    his
-     *
-     * *  * *  * * action list. * 2: Player controls actor.  In this case
-     * * victim * does  * not run his *    action list and any attributes
-     * * that * player cannot  * read from *    victim are defaulted.
-     */
+	 * Check permissions.  There are two possibilities * 1: Player * * *
+	 * controls both victim and actor.  In this case victim runs *    his
+	 *
+	 * *  * *  * * action list. * 2: Player controls actor.  In this case
+	 * * victim * does  * not run his *    action list and any attributes
+	 * * that * player cannot  * read from *    victim are defaulted.
+	 */
 
 	if (!controls(player, actor))
 	{
@@ -2961,8 +2961,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	nxargs = 0;
 
 	/*
-     * Get invoker message attribute
-     */
+	 * Get invoker message attribute
+	 */
 
 	if (nargs >= 2)
 	{
@@ -2975,8 +2975,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get invoker message default
-     */
+	 * Get invoker message default
+	 */
 
 	if ((nargs >= 3) && args[2] && *args[2])
 	{
@@ -2984,8 +2984,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get others message attribute
-     */
+	 * Get others message attribute
+	 */
 
 	if (nargs >= 4)
 	{
@@ -2998,8 +2998,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get others message default
-     */
+	 * Get others message default
+	 */
 
 	if ((nargs >= 5) && args[4] && *args[4])
 	{
@@ -3007,8 +3007,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get action attribute
-     */
+	 * Get action attribute
+	 */
 
 	if (nargs >= 6)
 	{
@@ -3021,8 +3021,8 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Get arguments
-     */
+	 * Get arguments
+	 */
 
 	if (nargs >= 7)
 	{
@@ -3033,10 +3033,10 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * If player doesn't control both, enforce visibility restrictions.
-     * Regardless of control we still check if the player can read the
-     * attribute, since we don't want him getting wiz-readable-only attrs.
-     */
+	 * If player doesn't control both, enforce visibility restrictions.
+	 * Regardless of control we still check if the player can read the
+	 * attribute, since we don't want him getting wiz-readable-only attrs.
+	 */
 	atr_get_info(victim, what, &aowner, &aflags);
 
 	if (what != -1)
@@ -3067,13 +3067,13 @@ void do_verb(dbref player, dbref cause, int key, char *victim_str, char *args[],
 	}
 
 	/*
-     * Go do it
-     */
+	 * Go do it
+	 */
 	did_it(actor, victim, what, whatd, owhat, owhatd, awhat, key & (VERB_NOW | VERB_NONAME), xargs, nxargs, (((key & VERB_SPEECH) ? MSG_SPEECH : 0) | ((key & VERB_MOVE) ? MSG_MOVE : 0) | ((key & VERB_PRESENT) ? MSG_PRESENCE : 0)));
 
 	/*
-     * Free user args
-     */
+	 * Free user args
+	 */
 
 	for (i = 0; i < nxargs; i++)
 	{
@@ -3097,8 +3097,8 @@ void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char
 	char *act, *tp;
 	char *s;
 	/*
-     * Get the attribute. Default to getting it off ourselves.
-     */
+	 * Get the attribute. Default to getting it off ourselves.
+	 */
 	s = XASPRINTF("s", "me/%s", object);
 
 	if (!((parse_attrib(player, object, &thing, &attrib, 0) && (attrib != NOTHING)) || (parse_attrib(player, s, &thing, &attrib, 0) && (attrib != NOTHING))))
@@ -3112,8 +3112,8 @@ void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char
 	if (*(act = atr_pget(thing, attrib, &aowner, &aflags, &alen)))
 	{
 		/*
-	 * Skip leading $command: or ^monitor:
-	 */
+		 * Skip leading $command: or ^monitor:
+		 */
 		if ((*act == '$') || (*act == '^'))
 		{
 			for (tp = act + 1; *tp && ((*tp != ':') || (*(tp - 1) == '\\')); tp++)
@@ -3134,9 +3134,9 @@ void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char
 		}
 
 		/*
-	 * Go do it. Use stack if we have it, otherwise use command stack.
-	 * * Note that an empty stack is still one arg but it's empty.
-	 */
+		 * Go do it. Use stack if we have it, otherwise use command stack.
+		 * * Note that an empty stack is still one arg but it's empty.
+		 */
 
 		if ((nargs > 1) || ((nargs == 1) && *argv[0]))
 		{
@@ -3160,9 +3160,9 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	dbref from_ref, to_ref;
 	NUMBERTAB *np;
 	/*
-     * Find what object we're redirecting from. We must either control it,
-     * * or it must be REDIR_OK.
-     */
+	 * Find what object we're redirecting from. We must either control it,
+	 * * or it must be REDIR_OK.
+	 */
 	init_match(player, from_name, NOTYPE);
 	match_everything(0);
 	from_ref = noisy_match_result();
@@ -3173,11 +3173,11 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	/*
-     * If we have no second argument, we are un-redirecting something
-     * * which is already redirected. We can get rid of it if we control
-     * * the object being redirected, or we control the target of the
-     * * redirection.
-     */
+	 * If we have no second argument, we are un-redirecting something
+	 * * which is already redirected. We can get rid of it if we control
+	 * * the object being redirected, or we control the target of the
+	 * * redirection.
+	 */
 
 	if (!to_name || !*to_name)
 	{
@@ -3192,12 +3192,12 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 		if (np)
 		{
 			/*
-	     * This should always be true -- if we have the flag the
-	     * * hashtable lookup should succeed -- but just in case,
-	     * * we check. (We clear the flag upon startup.)
-	     * * If we have a weird situation, we don't care whether
-	     * * or not the control criteria gets met; we just fix it.
-	     */
+			 * This should always be true -- if we have the flag the
+			 * * hashtable lookup should succeed -- but just in case,
+			 * * we check. (We clear the flag upon startup.)
+			 * * If we have a weird situation, we don't care whether
+			 * * or not the control criteria gets met; we just fix it.
+			 */
 			if (!Controls(player, from_ref) && (np->num != player))
 			{
 				notify(player, NOPERM_MESSAGE);
@@ -3225,8 +3225,8 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	/*
-     * If the object is already being redirected, we cannot do so again.
-     */
+	 * If the object is already being redirected, we cannot do so again.
+	 */
 
 	if (H_Redirect(from_ref))
 	{
@@ -3235,9 +3235,9 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	/*
-     * To redirect something, it needs to either be REDIR_OK or we
-     * * need to control it.
-     */
+	 * To redirect something, it needs to either be REDIR_OK or we
+	 * * need to control it.
+	 */
 
 	if (!Controls(player, from_ref) && !Redir_ok(from_ref))
 	{
@@ -3246,9 +3246,9 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	/*
-     * Find the player that we're redirecting to. We must control the
-     * * player.
-     */
+	 * Find the player that we're redirecting to. We must control the
+	 * * player.
+	 */
 	to_ref = lookup_player(player, to_name, 1);
 
 	if (!Good_obj(to_ref))
@@ -3264,8 +3264,8 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	/*
-     * Insert it into the hashtable.
-     */
+	 * Insert it into the hashtable.
+	 */
 	np = (NUMBERTAB *)XMALLOC(sizeof(NUMBERTAB), "np");
 	np->num = to_ref;
 	nhashadd(from_ref, (int *)np, &mushstate.redir_htab);
@@ -3305,8 +3305,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 		if (!ref_name || !*ref_name)
 		{
 			/*
-	     * Global only.
-	     */
+			 * Global only.
+			 */
 			is_global = 1;
 			tbuf[0] = '_';
 			tbuf[1] = '\0';
@@ -3385,8 +3385,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	}
 
 	/*
-     * We can only reference objects that we can examine.
-     */
+	 * We can only reference objects that we can examine.
+	 */
 
 	if (obj_name && *obj_name)
 	{
@@ -3413,9 +3413,9 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	}
 
 	/*
-     * If the reference name starts with an underscore, it's global.
-     * * Only wizards can do that.
-     */
+	 * If the reference name starts with an underscore, it's global.
+	 * * Only wizards can do that.
+	 */
 	tp = tbuf;
 
 	if (*ref_name == '_')
@@ -3441,8 +3441,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 
 	*tp = '\0';
 	/*
-     * Does this reference name exist already?
-     */
+	 * Does this reference name exist already?
+	 */
 	np = (int *)hashfind(tbuf, &mushstate.nref_htab);
 
 	if (np)
@@ -3456,15 +3456,15 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 		else if (*np == target)
 		{
 			/*
-	     * Already got it.
-	     */
+			 * Already got it.
+			 */
 			notify(player, "That reference has already been made.");
 		}
 		else
 		{
 			/*
-	     * Replace it.
-	     */
+			 * Replace it.
+			 */
 			XFREE(np);
 			np = (dbref *)XMALLOC(sizeof(dbref), "np");
 			*np = target;
@@ -3477,9 +3477,9 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	}
 
 	/*
-     * Didn't find it. We've got a new one (or an error if we have no
-     * * target but the reference didn't exist).
-     */
+	 * Didn't find it. We've got a new one (or an error if we have no
+	 * * target but the reference didn't exist).
+	 */
 
 	if (target == NOTHING)
 	{

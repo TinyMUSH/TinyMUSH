@@ -4,11 +4,11 @@
  * @brief Commands which look at things
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -25,9 +25,9 @@
 int did_attr(dbref player, dbref thing, int what)
 {
 	/*
-     * If the attribute exists, get it, notify the player, return 1.
-     * * If not, return 0.
-     */
+	 * If the attribute exists, get it, notify the player, return 1.
+	 * * If not, return 0.
+	 */
 	char *buff;
 	buff = master_attr(player, thing, what, NULL, 0, NULL);
 
@@ -48,8 +48,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	int foundany, lev, isdark;
 
 	/*
-     * make sure location has exits
-     */
+	 * make sure location has exits
+	 */
 
 	if (!Good_obj(loc) || !Has_exits(loc))
 	{
@@ -57,8 +57,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	}
 
 	/*
-     * Check to see if we're formatting exits in a player-specified way.
-     */
+	 * Check to see if we're formatting exits in a player-specified way.
+	 */
 
 	if (did_attr(player, loc, A_LEXITS_FMT))
 	{
@@ -66,8 +66,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	}
 
 	/*
-     * make sure there is at least one visible exit
-     */
+	 * make sure there is at least one visible exit
+	 */
 	foundany = 0;
 	isdark = Darkened(player, loc);
 
@@ -99,8 +99,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	}
 
 	/*
-     * Display the list of exit names
-     */
+	 * Display the list of exit names
+	 */
 	notify(player, exit_name);
 	e = buff = XMALLOC(LBUF_SIZE, "buff");
 	e1 = buff1 = XMALLOC(LBUF_SIZE, "buff1");
@@ -154,23 +154,23 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 						safe_exit_name(thing, buff1, &e1);
 						SAFE_LB_STR((char *)"<a xch_cmd=\"", buff, &e);
 						/*
-			 * XXX Just stripping ansi isn't really enough.
-			 */
+						 * XXX Just stripping ansi isn't really enough.
+						 */
 						buf = strip_ansi(buff1);
 						SAFE_LB_STR(buf, buff, &e);
 						XFREE(buf);
 						SAFE_LB_STR((char *)"\">", buff, &e);
 						/*
-			 * XXX The exit name needs to be HTML escaped.
-			 */
+						 * XXX The exit name needs to be HTML escaped.
+						 */
 						html_escape(buff1, buff, &e);
 						SAFE_LB_STR((char *)"</a>", buff, &e);
 					}
 					else
 					{
 						/*
-			 * Append this exit to the list
-			 */
+						 * Append this exit to the list
+						 */
 						safe_exit_name(thing, buff, &e);
 					}
 				}
@@ -215,8 +215,8 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	char *buff = NULL, *html_buff = NULL, *html_cp = NULL, *remote_num = NULL;
 
 	/*
-     * Check if we're formatting contents in a player-specified way.
-     */
+	 * Check if we're formatting contents in a player-specified way.
+	 */
 
 	if (did_attr(player, loc, A_LCON_FMT))
 	{
@@ -229,19 +229,19 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	}
 
 	/*
-     * check to see if he can see the location
-     */
+	 * check to see if he can see the location
+	 */
 	can_see_loc = Sees_Always(player, loc);
 	/*
-     * check to see if there is anything there
-     */
+	 * check to see if there is anything there
+	 */
 	for (thing = Contents(loc); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 	{
 		if (Can_See(player, thing, can_see_loc))
 		{
 			/*
-	     * something exists!  show him everything
-	     */
+			 * something exists!  show him everything
+			 */
 			notify(player, contents_name);
 			for (thing = Contents(loc); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
@@ -256,7 +256,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 
 						/**
 						 * @bug Just stripping ansi isn't enough.
-						 * 
+						 *
 						 */
 
 						switch (style)
@@ -379,10 +379,10 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 		case ')':
 
 			/*
-	     * ASCII hack to check for matching parens.
-	     * Since parenlist[0] is 0, this also catches
-	     * the too many close parens bug.
-	     */
+			 * ASCII hack to check for matching parens.
+			 * Since parenlist[0] is 0, this also catches
+			 * the too many close parens bug.
+			 */
 			if (str[pos - 1] != '\\')
 			{
 				if ((parenlist[depth] & 96) == (str[pos] & 96))
@@ -431,9 +431,9 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 	}
 
 	/*
-     * If we reach this point there were too many left parens.
-     * We've gotta go back.
-     */
+	 * If we reach this point there were too many left parens.
+	 * We've gotta go back.
+	 */
 	endp = strbuf;
 	parenlist[0] = 0;
 	depth = 0;
@@ -457,10 +457,10 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 		case '[':
 
 			/*
-	     * ASCII hack to check for matching parens.
-	     * Since parenlist[0] is 0, this also catches
-	     * the too many close parens bug.
-	     */
+			 * ASCII hack to check for matching parens.
+			 * Since parenlist[0] is 0, this also catches
+			 * the too many close parens bug.
+			 */
 			if ((parenlist[depth] & 96) == (str[pos] & 96))
 			{
 				SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
@@ -497,8 +497,8 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 	}
 
 	/*
-     * We won't get here, but what the hell.
-     */
+	 * We won't get here, but what the hell.
+	 */
 
 	for (endp--; endp >= strbuf; endp--)
 	{
@@ -514,8 +514,8 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 void pretty_format(char *dest, char **cp, char *p)
 {
 	/*
-     * Pretty-print an attribute into a buffer (assumed to be an lbuf).
-     */
+	 * Pretty-print an attribute into a buffer (assumed to be an lbuf).
+	 */
 	int indent_lev, i;
 	indent_lev = 0;
 	SAFE_CRLF(dest, cp);
@@ -526,8 +526,8 @@ void pretty_format(char *dest, char **cp, char *p)
 		{
 		case '\\':
 			/*
-	     * Skip escaped chars
-	     */
+			 * Skip escaped chars
+			 */
 			SAFE_LB_CHR(*p, dest, cp);
 			p++;
 			SAFE_LB_CHR(*p, dest, cp);
@@ -629,17 +629,17 @@ void pretty_print(char *dest, char *name, char *text)
 	SAFE_LB_STR(name, dest, &cp);
 
 	/*
-     * Pretty-print contents of text into dest.
-     */
+	 * Pretty-print contents of text into dest.
+	 */
 
 	switch (*text)
 	{
 	case '$':
 	case '^':
 		/*
-	 * Do:  $command:<text to format>
-	 * * Nibble up the first bit then fall through to format the rest.
-	 */
+		 * Do:  $command:<text to format>
+		 * * Nibble up the first bit then fall through to format the rest.
+		 */
 		while (*p && (*p != ':'))
 		{
 			SAFE_LB_CHR(*p, dest, &cp);
@@ -647,8 +647,8 @@ void pretty_print(char *dest, char *name, char *text)
 		}
 
 		/*
-	 * Do the ':'
-	 */
+		 * Do the ':'
+		 */
 		if (*p == ':')
 		{
 			SAFE_LB_CHR(':', dest, &cp);
@@ -667,17 +667,17 @@ void pretty_print(char *dest, char *name, char *text)
 	case '@':
 	case '&':
 		/*
-	 * Normal formatting
-	 */
+		 * Normal formatting
+		 */
 		pretty_format(dest, &cp, p);
 		break;
 
 	case '#':
 		/*
-	 * Special case: If the first word starts with #, there is a
-	 * * second word, and it does NOT start with a #, this is a
-	 * * @force command.
-	 */
+		 * Special case: If the first word starts with #, there is a
+		 * * second word, and it does NOT start with a #, this is a
+		 * * @force command.
+		 */
 		word = p;
 
 		while (*word && !isspace(*word))
@@ -693,8 +693,8 @@ void pretty_print(char *dest, char *name, char *text)
 		if (!*word || (*word == '#'))
 		{
 			/*
-	     * This is a list of dbrefs, probably. Bail.
-	     */
+			 * This is a list of dbrefs, probably. Bail.
+			 */
 			SAFE_LB_STR(p, dest, &cp);
 			return;
 		}
@@ -704,8 +704,8 @@ void pretty_print(char *dest, char *name, char *text)
 
 	default:
 		/*
-	 * Ordinary text
-	 */
+		 * Ordinary text
+		 */
 		SAFE_LB_STR(p, dest, &cp);
 	}
 
@@ -743,9 +743,9 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	}
 
 	/*
-     * If we don't control the object or own the attribute, hide the
-     * * attr owner and flag info.
-     */
+	 * If we don't control the object or own the attribute, hide the
+	 * * attr owner and flag info.
+	 */
 
 	if (!Controls(player, thing) && (Owner(player) != aowner))
 	{
@@ -789,8 +789,8 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	}
 
 	/*
-     * Generate flags
-     */
+	 * Generate flags
+	 */
 
 	xbufp = xbuf;
 	if (aflags & AF_LOCK)
@@ -936,8 +936,8 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		else
 		{
 			/*
-	     * Just fine the way it is
-	     */
+			 * Just fine the way it is
+			 */
 		}
 
 		pairs_print(player, text, buf, &bb_p);
@@ -1003,15 +1003,15 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 		XMEMCPY((char *)cattr, (char *)attr, sizeof(ATTR));
 
 		/*
-	 * Should we exclude this attr?
-	 * * We have a couple of things we exclude:
-	 * * Attributes explicitly marked no_inherit.
-	 * * Locks. Note that UseLock is NOT, strictly speaking, an
-	 * *   inherited lock, since it's just checked when the child
-	 * *   tries to inherit $commands from the parent; the child
-	 * *   itself doesn't acquire the parent's uselock.
-	 * * Attributes already slurped by upper-level objects.
-	 */
+		 * Should we exclude this attr?
+		 * * We have a couple of things we exclude:
+		 * * Attributes explicitly marked no_inherit.
+		 * * Locks. Note that UseLock is NOT, strictly speaking, an
+		 * *   inherited lock, since it's just checked when the child
+		 * *   tries to inherit $commands from the parent; the child
+		 * *   itself doesn't acquire the parent's uselock.
+		 * * Attributes already slurped by upper-level objects.
+		 */
 
 		if (check_exclude && ((cattr->flags & AF_PRIVATE) || (cattr->flags & AF_IS_LOCK) || nhashfind(ca, &mushstate.parent_htab)))
 		{
@@ -1070,8 +1070,8 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 	char *buff;
 
 	/*
-     * Only makes sense for things that can hear
-     */
+	 * Only makes sense for things that can hear
+	 */
 
 	if (!Hearer(player))
 	{
@@ -1079,8 +1079,8 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 	}
 
 	/*
-     * Get the name and db-number if we can examine it.
-     */
+	 * Get the name and db-number if we can examine it.
+	 */
 
 	if (Examinable(player, thing))
 	{
@@ -1219,8 +1219,8 @@ void look_in(dbref player, dbref loc, int key)
 	is_terse = (key & LK_OBEYTERSE) ? Terse(player) : 0;
 
 	/*
-     * Only makes sense for things that can hear
-     */
+	 * Only makes sense for things that can hear
+	 */
 
 	if (!Hearer(player))
 	{
@@ -1228,8 +1228,8 @@ void look_in(dbref player, dbref loc, int key)
 	}
 
 	/*
-     * If he needs the VRML URL, send it:
-     */
+	 * If he needs the VRML URL, send it:
+	 */
 	if (mushconf.have_pueblo == 1)
 	{
 		if (key & LK_SHOWVRML)
@@ -1239,10 +1239,10 @@ void look_in(dbref player, dbref loc, int key)
 	}
 
 	/*
-     * If we can't format it in a player-specified way, then show
-     * * the name (and unparse info, if relevant). We only invoke
-     * * the Pueblo formatting if we weren't given a @nameformat.
-     */
+	 * If we can't format it in a player-specified way, then show
+	 * * the name (and unparse info, if relevant). We only invoke
+	 * * the Pueblo formatting if we weren't given a @nameformat.
+	 */
 
 	if (!did_attr(player, loc, A_NAME_FMT))
 	{
@@ -1275,10 +1275,10 @@ void look_in(dbref player, dbref loc, int key)
 	}
 	/* If we went to NOTHING et al, skip the
 
-     * rest */
+	 * rest */
 	/*
-     * tell him the description
-     */
+	 * tell him the description
+	 */
 	showkey = 0;
 
 	if (loc == Location(player))
@@ -1294,8 +1294,8 @@ void look_in(dbref player, dbref loc, int key)
 	show_desc(player, loc, showkey);
 
 	/*
-     * tell him the appropriate messages if he has the key
-     */
+	 * tell him the appropriate messages if he has the key
+	 */
 
 	if (Typeof(loc) == TYPE_ROOM)
 	{
@@ -1321,8 +1321,8 @@ void look_in(dbref player, dbref loc, int key)
 	}
 
 	/*
-     * tell him the attributes, contents and exits
-     */
+	 * tell him the attributes, contents and exits
+	 */
 
 	if ((key & LK_SHOWATTR) && !mushconf.quiet_look && !is_terse)
 	{
@@ -1378,8 +1378,8 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 	}
 
 	/*
-     * Look for the target locally
-     */
+	 * Look for the target locally
+	 */
 	thing = (key & LOOK_OUTSIDE) ? loc : player;
 	init_match(thing, name, NOTYPE);
 	match_exit_with_parents();
@@ -1398,8 +1398,8 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 	thing = match_result();
 
 	/*
-     * Not found locally, check possessive
-     */
+	 * Not found locally, check possessive
+	 */
 
 	if (!Good_obj(thing))
 	{
@@ -1407,9 +1407,9 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 	}
 
 	/*
-     * First make sure that we aren't looking at our own location, since
-     * * that gets handled a little differently.
-     */
+	 * First make sure that we aren't looking at our own location, since
+	 * * that gets handled a little differently.
+	 */
 	if (thing == loc)
 	{
 		look_here(player, thing, key, look_key);
@@ -1417,8 +1417,8 @@ void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *n
 	}
 
 	/*
-     * If we found something, go handle it
-     */
+	 * If we found something, go handle it
+	 */
 
 	if (Good_obj(thing))
 	{
@@ -1574,15 +1574,15 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 		}
 
 		/*
-	 * Decide if the player should see the attr:
-	 * If obj is Examinable and has rights to see, yes.
-	 * If a player and has rights to see, yes...
-	 *   except if faraway, attr=DESC, and
-	 *   remote DESC-reading is not turned on.
-	 * If I own the attrib and have rights to see, yes...
-	 *   except if faraway, attr=DESC, and
-	 *   remote DESC-reading is not turned on.
-	 */
+		 * Decide if the player should see the attr:
+		 * If obj is Examinable and has rights to see, yes.
+		 * If a player and has rights to see, yes...
+		 *   except if faraway, attr=DESC, and
+		 *   remote DESC-reading is not turned on.
+		 * If I own the attrib and have rights to see, yes...
+		 *   except if faraway, attr=DESC, and
+		 *   remote DESC-reading is not turned on.
+		 */
 
 		if (Examinable(player, thing) && Read_attr_all(player, thing, ap, aowner, aflags, 1))
 		{
@@ -1652,8 +1652,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	time_t save_access_time;
 
 	/*
-     * This command is pointless if the player can't hear.
-     */
+	 * This command is pointless if the player can't hear.
+	 */
 
 	if (!Hearer(player))
 	{
@@ -1687,8 +1687,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	else
 	{
 		/*
-	 * Check for obj/attr first.
-	 */
+		 * Check for obj/attr first.
+		 */
 		olist_push();
 
 		if (parse_attrib_wild(player, name, &thing, do_parent, 1, 0, 1))
@@ -1701,8 +1701,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 		olist_pop();
 		/*
-	 * Look it up
-	 */
+		 * Look it up
+		 */
 		init_match(player, name, NOTYPE);
 		match_everything(MAT_EXIT_PARENTS);
 		thing = noisy_match_result();
@@ -1715,14 +1715,14 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	}
 
 	/*
-     * We have to save our access time, because the very act of
-     * * trying to examine the object will have touched it.
-     */
+	 * We have to save our access time, because the very act of
+	 * * trying to examine the object will have touched it.
+	 */
 	save_access_time = AccessTime(thing);
 
 	/*
-     * Check for the /debug switch
-     */
+	 * Check for the /debug switch
+	 */
 
 	if (key & EXAM_DEBUG)
 	{
@@ -1801,8 +1801,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	if (control)
 	{
 		/*
-	 * print owner, key, and value
-	 */
+		 * print owner, key, and value
+		 */
 		savec = mushconf.many_coins[0];
 		mushconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
@@ -1825,8 +1825,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, buf2);
 
 		/*
-	 * Print the zone
-	 */
+		 * Print the zone
+		 */
 
 		if (mushconf.have_zones)
 		{
@@ -1836,8 +1836,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		}
 
 		/*
-	 * print parent
-	 */
+		 * print parent
+		 */
 		loc = Parent(thing);
 
 		if (loc != NOTHING)
@@ -1848,8 +1848,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		}
 
 		/*
-	 * Show the powers
-	 */
+		 * Show the powers
+		 */
 		buf2 = power_description(player, thing);
 		notify(player, buf2);
 		XFREE(buf2);
@@ -1869,14 +1869,14 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	}
 
 	/*
-     * show him interesting stuff
-     */
+	 * show him interesting stuff
+	 */
 
 	if (control)
 	{
 		/*
-	 * Contents
-	 */
+		 * Contents
+		 */
 		if (Contents(thing) != NOTHING)
 		{
 			notify(player, "Contents:");
@@ -1889,16 +1889,16 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		}
 
 		/*
-	 * Show stuff that depends on the object type
-	 */
+		 * Show stuff that depends on the object type
+		 */
 
 		switch (Typeof(thing))
 		{
 		case TYPE_ROOM:
 
 			/*
-	     * tell him about exits
-	     */
+			 * tell him about exits
+			 */
 			if (Exits(thing) != NOTHING)
 			{
 				notify(player, "Exits:");
@@ -1915,8 +1915,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			}
 
 			/*
-	     * print dropto if present
-	     */
+			 * print dropto if present
+			 */
 
 			if (Dropto(thing) != NOTHING)
 			{
@@ -1931,8 +1931,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		case TYPE_PLAYER:
 
 			/*
-	     * tell him about exits
-	     */
+			 * tell him about exits
+			 */
 			if (Exits(thing) != NOTHING)
 			{
 				notify(player, "Exits:");
@@ -1949,15 +1949,15 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			}
 
 			/*
-	     * print home
-	     */
+			 * print home
+			 */
 			loc = Home(thing);
 			buf2 = unparse_object(player, loc, 0);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Home: %s", buf2);
 			XFREE(buf2);
 			/*
-	     * print location if player can link to it
-	     */
+			 * print location if player can link to it
+			 */
 			loc = Location(thing);
 
 			if ((Location(thing) != NOTHING) && (Examinable(player, loc) || Examinable(player, thing) || Linkable(player, loc)))
@@ -1975,16 +1975,16 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			XFREE(buf2);
 
 			/*
-	     * print destination
-	     */
+			 * print destination
+			 */
 
 			switch (Location(thing))
 			{
 			case NOTHING:
 				/*
-		 * Special case. unparse_object() normally
-		 * * returns -1 as '*NOTHING*'.
-		 */
+				 * Special case. unparse_object() normally
+				 * * returns -1 as '*NOTHING*'.
+				 */
 				notify(player, "Destination: *UNLINKED*");
 				break;
 
@@ -2040,7 +2040,7 @@ void do_score(dbref player, dbref cause __attribute__((unused)), int key __attri
 
 void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
-	//dbref thing;
+	// dbref thing;
 	char *buff, *e;
 
 	if (Contents(player) == NOTHING)
@@ -2168,8 +2168,8 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 			}
 
 			/*
-	     * Check for parents
-	     */
+			 * Check for parents
+			 */
 
 			if (Parent(i) == thing)
 			{
@@ -2180,8 +2180,8 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 			}
 
 			/*
-	     * Check for propdir
-	     */
+			 * Check for propdir
+			 */
 
 			if (H_Propdir(i))
 			{
@@ -2207,8 +2207,8 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 			}
 
 			/*
-	     * Check for forwarding
-	     */
+			 * Check for forwarding
+			 */
 
 			if (H_Fwdlist(i))
 			{
@@ -2283,8 +2283,8 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 				atr_get_str(buff, what, attr, &aowner, &aflags, &alen);
 
 				/*
-		 * Make sure we can execute it
-		 */
+				 * Make sure we can execute it
+				 */
 
 				if ((buff[0] != AMATCH_LISTEN) || (aflags & AF_NOPROG))
 				{
@@ -2292,8 +2292,8 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 				}
 
 				/*
-		 * Make sure there's a : in it
-		 */
+				 * Make sure there's a : in it
+				 */
 
 				for (s = buff + 1; *s && (*s != ':'); s++)
 					;
@@ -2312,8 +2312,8 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 	if ((key & SWEEP_COMMANDS) && !isExit(what))
 	{
 		/*
-	 * Look for commands on the object and parents too
-	 */
+		 * Look for commands on the object and parents too
+		 */
 		for (lev = 0, parent = what; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (Commer(parent))
@@ -2446,8 +2446,8 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 
 	/*
-     * Check my location.  If I have none or it is dark, check just me.
-     */
+	 * Check my location.  If I have none or it is dark, check just me.
+	 */
 
 	if (where_key & SWEEP_HERE)
 	{
@@ -2479,8 +2479,8 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 
 	/*
-     * Check exits in my location
-     */
+	 * Check exits in my location
+	 */
 
 	if ((where_key & SWEEP_EXITS) && Has_location(sweeploc))
 	{
@@ -2493,8 +2493,8 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 
 	/*
-     * Check my inventory
-     */
+	 * Check my inventory
+	 */
 
 	if ((where_key & SWEEP_ME) && Has_contents(sweeploc))
 	{
@@ -2507,8 +2507,8 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 
 	/*
-     * Check carried exits
-     */
+	 * Check carried exits
+	 */
 
 	if ((where_key & SWEEP_EXITS) && Has_exits(sweeploc))
 	{
@@ -2537,8 +2537,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	ATTR *attr;
 	NAMETAB *np;
 	/*
-     * Check for obj/attr first
-     */
+	 * Check for obj/attr first
+	 */
 	olist_push();
 
 	if (parse_attrib_wild(player, name, &thing, 0, 1, 0, 1))
@@ -2554,8 +2554,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	}
 
 	/*
-     * get result
-     */
+	 * get result
+	 */
 	if (thing == NOTHING)
 	{
 		olist_pop();
@@ -2573,9 +2573,9 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	bexp = parse_boolexp(player, thingname, 1);
 
 	/*
-     * Determine the name of the thing to use in reporting and then
-     * * report the command to make the thing.
-     */
+	 * Determine the name of the thing to use in reporting and then
+	 * * report the command to make the thing.
+	 */
 
 	if (qual && *qual)
 	{
@@ -2621,8 +2621,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	XFREE(buf);
 
 	/*
-     * Report the lock (if any)
-     */
+	 * Report the lock (if any)
+	 */
 
 	if (!wild_decomp && (bexp != TRUE_BOOLEXP))
 	{
@@ -2633,8 +2633,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 
 	free_boolexp(bexp);
 	/*
-     * Report attributes
-     */
+	 * Report attributes
+	 */
 	buff = XMALLOC(MBUF_SIZE, "buff");
 
 	for (ca = (wild_decomp ? olist_first() : atr_head(thing, &as)); (wild_decomp) ? (ca != NOTHING) : (ca != (int)0); ca = (wild_decomp ? olist_next() : atr_next(&as)))
@@ -2721,8 +2721,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	}
 
 	/*
-     * If the object has a parent, report it
-     */
+	 * If the object has a parent, report it
+	 */
 
 	if (!wild_decomp && (Parent(thing) != NOTHING))
 	{
@@ -2730,8 +2730,8 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 	}
 
 	/*
-     * If the object has a zone, report it
-     */
+	 * If the object has a zone, report it
+	 */
 
 	if (!wild_decomp && (Zone(thing) != NOTHING))
 	{
@@ -2749,8 +2749,8 @@ void show_vrml_url(dbref thing, dbref loc)
 	int aflags, alen;
 
 	/*
-     * If they don't care about HTML, just return.
-     */
+	 * If they don't care about HTML, just return.
+	 */
 	if (!Html(thing))
 	{
 		return;

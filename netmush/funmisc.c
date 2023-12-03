@@ -4,11 +4,11 @@
  * @brief Misc functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -50,9 +50,9 @@ MONTHDAYS mdtab[] = {
  *          then the default result <dflt> is returned. The evaluated value of
  *          <str> can be obtained as '#$'. If switchall() and switch() are
  *          nested, the nest level can be obtained with '#!'.
- * 
+ *
  * @note This functions expect that its arguments has not been evaluated.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -70,26 +70,26 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
 
 	/**
-     * If we don't have at least 2 args, return nothing
-	 * 
-     */
+	 * If we don't have at least 2 args, return nothing
+	 *
+	 */
 	if (nfargs < 2)
 	{
 		return;
 	}
 
 	/**
-     * Evaluate the target in fargs[0]
-	 * 
-     */
+	 * Evaluate the target in fargs[0]
+	 *
+	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "mbuff");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
-     * Loop through the patterns looking for a match
-	 * 
-     */
+	 * Loop through the patterns looking for a match
+	 *
+	 */
 	mushstate.in_switch++;
 	save_token = mushstate.switch_token;
 
@@ -114,9 +114,9 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	}
 
 	/**
-     * If we didn't match, return the default if there is one
-	 * 
-     */
+	 * If we didn't match, return the default if there is one
+	 *
+	 */
 	if (!got_one && (i < nfargs) && fargs[i])
 	{
 		mushstate.switch_token = mbuff;
@@ -136,9 +136,9 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  *          that matches.  If none match, then the default result <dflt> is returned.
  *          The evaluated value of <str> can be obtained as '#$'. If switch() and
  *          switchall() are nested, the nest level can be obtained with '#!'.
- * 
+ *
  * @note This functions expect that its arguments has not been evaluated.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -155,26 +155,26 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
 
 	/**
-     * If we don't have at least 2 args, return nothing
-	 * 
-     */
+	 * If we don't have at least 2 args, return nothing
+	 *
+	 */
 	if (nfargs < 2)
 	{
 		return;
 	}
 
 	/**
-     * Evaluate the target in fargs[0]
-	 * 
-     */
+	 * Evaluate the target in fargs[0]
+	 *
+	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
-     * Loop through the patterns looking for a match
-	 * 
-     */
+	 * Loop through the patterns looking for a match
+	 *
+	 */
 	mushstate.in_switch++;
 	save_token = mushstate.switch_token;
 
@@ -200,9 +200,9 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	/**
-     * Nope, return the default if there is one
-	 * 
-     */
+	 * Nope, return the default if there is one
+	 *
+	 */
 	if ((i < nfargs) && fargs[i])
 	{
 		mushstate.switch_token = mbuff;
@@ -220,9 +220,9 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  *          match between the patterns and the string, rather than doing a 'wildcard'
  *          match (case-insensitive match with '*' and '?'), and the '#$' token
  *          replacement is not done. It performs marginally faster than switch().
- * 
+ *
  * @note This functions expect that its arguments has not been evaluated.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -239,26 +239,26 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL;
 
 	/**
-     * If we don't have at least 2 args, return nothing
-	 * 
-     */
+	 * If we don't have at least 2 args, return nothing
+	 *
+	 */
 	if (nfargs < 2)
 	{
 		return;
 	}
 
 	/**
-     * Evaluate the target in fargs[0]
-	 * 
-     */
+	 * Evaluate the target in fargs[0]
+	 *
+	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
-     * Loop through the patterns looking for an exact match
-	 * 
-     */
+	 * Loop through the patterns looking for an exact match
+	 *
+	 */
 	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
 	{
 		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
@@ -280,9 +280,9 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	XFREE(mbuff);
 
 	/**
-     * Nope, return the default if there is one
-	 * 
-     */
+	 * Nope, return the default if there is one
+	 *
+	 */
 	if ((i < nfargs) && fargs[i])
 	{
 		str = fargs[i];
@@ -294,9 +294,9 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Handle if else cases.
- * 
+ *
  * @note This functions expect that its arguments has not been evaluated.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -332,10 +332,10 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
-     * We default to bool-style, but we offer the option of the MUX-style
-     * nonzero -- it's true if it's not empty or zero.
-	 * 
-     */
+	 * We default to bool-style, but we offer the option of the MUX-style
+	 * nonzero -- it's true if it's not empty or zero.
+	 *
+	 */
 	if (!mbuff || !*mbuff)
 	{
 		n = 0;
@@ -344,7 +344,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	{
 		/**
 		 * xlate() destructively modifies the string
-		 * 
+		 *
 		 */
 		tbuf = XSTRDUP(mbuff, "tbuf");
 		n = xlate(tbuf);
@@ -365,7 +365,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		/*
 		 * If we got our condition, return the string, otherwise
 		 * return our 'else' default clause.
-		 * 
+		 *
 		 */
 		if (n)
 		{
@@ -382,9 +382,9 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	}
 
 	/**
-     * Not default mode: Use our condition to execute result clause
-	 * 
-     */
+	 * Not default mode: Use our condition to execute result clause
+	 *
+	 */
 	if (!n)
 	{
 		if (nfargs != 3)
@@ -395,7 +395,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 		/**
 		 * Do 'false' clause
-		 * 
+		 *
 		 */
 		str = fargs[2];
 	}
@@ -403,7 +403,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	{
 		/**
 		 * Do 'true' clause
-		 * 
+		 *
 		 */
 		str = fargs[1];
 	}
@@ -427,7 +427,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 /**
  * @brief Return a random number from 0 to arg1 - 1
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -454,7 +454,7 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Roll XdY dice
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -501,7 +501,7 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Generate random list
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -521,9 +521,9 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	char *bb_p = NULL;
 
 	/**
-     * Special: the delim is really an output delim.
-	 * 
-     */
+	 * Special: the delim is really an output delim.
+	 *
+	 */
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
 	{
 		return;
@@ -535,10 +535,10 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 
 	/**
-     * If we're generating no numbers, since this is a list function, we
-     * return empty, rather than returning 0.
-	 * 
-     */
+	 * If we're generating no numbers, since this is a list function, we
+	 * return empty, rather than returning 0.
+	 *
+	 */
 	n_times = (int)strtol(fargs[2], (char **)NULL, 10);
 
 	if (n_times < 1)
@@ -560,7 +560,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		 * This is an error condition. Just return an empty list. We
 		 * obviously can't return a random number between X and Y if
 		 * Y is less than X.
-		 * 
+		 *
 		 */
 		return;
 	}
@@ -568,7 +568,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	{
 		/**
 		 * Just generate a list of n repetitions.
-		 * 
+		 *
 		 */
 		bb_p = *bufc;
 
@@ -586,9 +586,9 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 
 	/**
-     * We've hit this point, we have a range. Generate a list.
-	 * 
-     */
+	 * We've hit this point, we have a range. Generate a list.
+	 *
+	 */
 	n_range = (double)r_top - r_bot + 1;
 	bb_p = *bufc;
 
@@ -607,7 +607,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 /**
  * @brief Return a list of numbers.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -633,9 +633,9 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * lnum() is special, since its single delimiter is really an output
-     * delimiter.
-     */
+	 * lnum() is special, since its single delimiter is really an output
+	 * delimiter.
+	 */
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
 	{
 		return;
@@ -660,7 +660,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		{
 			/**
 			 * still want to generate if arg is 1
-			 * 
+			 *
 			 */
 			XFREE(lnum_buff);
 			return;
@@ -668,9 +668,9 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * We keep 0-100 pre-generated so we can do quick copies.
-	 * 
-     */
+	 * We keep 0-100 pre-generated so we can do quick copies.
+	 *
+	 */
 	if (!lnum_init)
 	{
 		XSTRCPY(lnum_buff, (char *)"0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99");
@@ -678,10 +678,10 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * If it's an ascending sequence crossing from negative numbers into
-     * positive, get the negative numbers out of the way first.
-	 * 
-     */
+	 * If it's an ascending sequence crossing from negative numbers into
+	 * positive, get the negative numbers out of the way first.
+	 *
+	 */
 	bb_p = *bufc;
 	over = 0;
 
@@ -708,9 +708,9 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * Copy as much out of the pre-gen as we can.
-	 * 
-     */
+	 * Copy as much out of the pre-gen as we can.
+	 *
+	 */
 	if ((bot >= 0) && (bot < 100) && (top > bot) && (osep.len == 1) && (osep.str[0] == ' '))
 	{
 		if (*bufc != bb_p)
@@ -744,9 +744,9 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * Print a new list.
-	 * 
-     */
+	 * Print a new list.
+	 *
+	 */
 	if (top == bot)
 	{
 		if (*bufc != bb_p)
@@ -791,7 +791,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Returns nicely-formatted time.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -812,7 +812,7 @@ void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Seconds since 0:00 1/1/70
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -830,7 +830,7 @@ void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief Converts seconds to time string, based off 0:00 1/1/70
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -852,10 +852,10 @@ void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief Converts time string to a struct tm.
- * 
- * @note Time string format is always 24 characters long, 
+ *
+ * @note Time string format is always 24 characters long,
  *       in format Ddd Mmm DD HH:MM:SS YYYY
- * 
+ *
  * @param str Time string
  * @param ttm Pointer to a tm struct
  * @return true Converted
@@ -881,9 +881,9 @@ bool do_convtime(char *str, struct tm *ttm)
 	SAFE_SB_STR(str, buf, &p);
 	*p = '\0';
 
-	/** 
-	 * day-of-week or month 
-	 * 
+	/**
+	 * day-of-week or month
+	 *
 	 */
 	p = strchr(buf, ' ');
 	if (p)
@@ -904,9 +904,9 @@ bool do_convtime(char *str, struct tm *ttm)
 
 	if (i == 12)
 	{
-		/** 
-		 * month 
-		 * 
+		/**
+		 * month
+		 *
 		 */
 		q = strchr(p, ' ');
 		if (q)
@@ -936,9 +936,9 @@ bool do_convtime(char *str, struct tm *ttm)
 
 	ttm->tm_mon = i;
 
-	/** 
-	 * day of month 
-	 * 
+	/**
+	 * day of month
+	 *
 	 */
 	q = strchr(p, ' ');
 	if (q)
@@ -954,9 +954,9 @@ bool do_convtime(char *str, struct tm *ttm)
 		return false;
 	}
 
-	/** 
-	 * hours 
-	 * 
+	/**
+	 * hours
+	 *
 	 */
 	p = strchr(q, ':');
 
@@ -988,9 +988,9 @@ bool do_convtime(char *str, struct tm *ttm)
 		}
 	}
 
-	/** 
-	 * minutes 
-	 * 
+	/**
+	 * minutes
+	 *
 	 */
 	q = strchr(p, ':');
 
@@ -1022,9 +1022,9 @@ bool do_convtime(char *str, struct tm *ttm)
 		}
 	}
 
-	/** 
-	 * seconds 
-	 * 
+	/**
+	 * seconds
+	 *
 	 */
 	p = strchr(q, ' ');
 	if (p)
@@ -1054,9 +1054,9 @@ bool do_convtime(char *str, struct tm *ttm)
 		}
 	}
 
-	/** 
-	 * year 
-	 * 
+	/**
+	 * year
+	 *
 	 */
 	q = strchr(p, ' ');
 	if (q)
@@ -1093,16 +1093,16 @@ bool do_convtime(char *str, struct tm *ttm)
 	}
 
 	/**
-     * We don't whether or not it's daylight savings time.
-	 * 
-     */
+	 * We don't whether or not it's daylight savings time.
+	 *
+	 */
 	ttm->tm_isdst = -1;
 	return (ttm->tm_mday != 29 || i != 1 || ((ttm->tm_year) % 400 == 100 || ((ttm->tm_year) % 100 != 0 && (ttm->tm_year) % 4 == 0))) ? true : false;
 }
 
 /**
  * @brief converts time string to seconds, based off 0:00 1/1/70
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1129,7 +1129,7 @@ void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief Interface to strftime().
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1151,7 +1151,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 	/**
 	 * Check number of arguments.
-	 * 
+	 *
 	 */
 	if ((nfargs < 1) || !fargs[0] || !*fargs[0])
 	{
@@ -1189,7 +1189,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	 * into percent signs for strftime(), unless we get a '$$', which we
 	 * treat as a literal '$'. Step on '$n' as invalid (output literal
 	 * '%n'), because some strftime()s use it to insert a newline.
-	 * 
+	 *
 	 */
 	for (tp = tbuf, p = fargs[0], len = 0; *p && (len < LBUF_SIZE - 2); tp++, p++)
 	{
@@ -1227,7 +1227,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 	/**
 	 * Get the time and format it. We do this using the local timezone.
-	 * 
+	 *
 	 */
 	ttm = localtime(&tt);
 	strftime(str, LBUF_SIZE - 1, tbuf, ttm);
@@ -1238,7 +1238,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Format a number of seconds into a human-readable time.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1256,9 +1256,9 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 	int max = 0, n = 0, x = 0, width = 0, hidezero = 0, hideearly = 0, showsuffix = 0, clockfmt = 0, usecap = 0;
 
 	/**
-     * Figure out time values
-	 * 
-     */
+	 * Figure out time values
+	 *
+	 */
 	raw_secs = secs = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (secs < 0)
@@ -1266,7 +1266,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 		/**
 		 * Try to be semi-useful. Keep value of secs; zero out the
 		 * rest
-		 * 
+		 *
 		 */
 		mins = hours = days = 0;
 	}
@@ -1281,17 +1281,17 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 	}
 
 	/**
-     * Parse and print format string
-	 * 
-     */
+	 * Parse and print format string
+	 *
+	 */
 	p = fargs[0];
 
 	while (*p)
 	{
 		if (*p == '$')
 		{
-			/** 
-			 * save place in case we need to go back 
+			/**
+			 * save place in case we need to go back
 			 *
 			 */
 			mark = p;
@@ -1314,7 +1314,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 				/**
 				 * Optional width
-				 * 
+				 *
 				 */
 				for (width = 0; *p && isdigit((unsigned char)*p); p++)
 				{
@@ -1397,9 +1397,9 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				case 'a':
 				case 'A':
 					/**
-				     * Show the first non-zero thing
-					 * 
-				     */
+					 * Show the first non-zero thing
+					 *
+					 */
 					if (days > 0)
 					{
 						n = days;
@@ -1439,13 +1439,13 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				else if (!clockfmt)
 				{
 					/**
-				     * If it's 0 and we're hidezero, just
-				     * hide it. If it's 0 and we're
-				     * hideearly, we only hide it if we
-		    		 * haven't got some bigger increment
-				     * that's non-zero.
-					 * 
-				     */
+					 * If it's 0 and we're hidezero, just
+					 * hide it. If it's 0 and we're
+					 * hideearly, we only hide it if we
+					 * haven't got some bigger increment
+					 * that's non-zero.
+					 *
+					 */
 					if ((n == 0) && (hidezero || (hideearly && !(((timec == 's') && (raw_secs > 0)) || ((timec == 'm') && (raw_secs >= 60)) || ((timec == 'h') && (raw_secs >= 3600))))))
 					{
 						if (width > 0)
@@ -1509,12 +1509,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				else
 				{
 					/*
-				     * In clock format, we show
-				     * <d>:<h>:<m>:<s>. The field
-				     * specifier tells us where our
-				     * division stops.
-					 * 
-				     */
+					 * In clock format, we show
+					 * <d>:<h>:<m>:<s>. The field
+					 * specifier tells us where our
+					 * division stops.
+					 *
+					 */
 					if (timec == 'd')
 					{
 						cdays = days;
@@ -1553,7 +1553,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 						/**
 						 * Start from the first
 						 * non-zero thing
-						 * 
+						 *
 						 */
 						if (chours != 0)
 						{
@@ -1589,7 +1589,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief What time did this system last reboot?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1610,7 +1610,7 @@ void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused))
 
 /**
  * @brief How many times have we restarted?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1628,7 +1628,7 @@ void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief When did we last restart?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1649,12 +1649,12 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
 
 /*
  * ---------------------------------------------------------------------------
- * fun_version: 
+ * fun_version:
  */
 
 /**
  * @brief Return the MUSH version.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1675,7 +1675,7 @@ void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Return the name of the Mush.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1693,7 +1693,7 @@ void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 /**
  * @brief Return a list of modules.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1732,7 +1732,7 @@ void fun_modules(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Return 1 if a module is installed, 0 if it is not.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1761,7 +1761,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
 
 /**
  * @brief Get max number of simultaneous connects.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1779,7 +1779,7 @@ void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)
 
 /**
  * @brief State of the function invocation counters
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1797,7 +1797,7 @@ void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief State of the function recursion counters
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1815,7 +1815,7 @@ void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief State of the command invocation counters
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1833,7 +1833,7 @@ void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief State of the command recursion counters
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1851,7 +1851,7 @@ void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Benchmark softcode.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1872,9 +1872,9 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	char *tbuf = XMALLOC(LBUF_SIZE, "ebuf");
 
 	/**
-     * Evaluate our times argument
-	 * 
-     */
+	 * Evaluate our times argument
+	 *
+	 */
 	tp = nstr = XMALLOC(LBUF_SIZE, "nstr");
 	s = fargs[1];
 	exec(nstr, &tp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs);
@@ -1928,9 +1928,9 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		if ((mushstate.func_invk_ctr >= mushconf.func_invk_lim) || (Too_Much_CPU()))
 		{
 			/**
-		     * Abort
-			 * 
-		     */
+			 * Abort
+			 *
+			 */
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Limits exceeded at benchmark iteration %d.", i + 1);
 			times = i + 1;
 		}
@@ -1949,7 +1949,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 /**
  * @brief Force substitution to occur.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1969,7 +1969,7 @@ void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 
 /**
  * @brief Like s(), but don't do function evaluations.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -1993,7 +1993,7 @@ void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 /**
  * @brief Check if the player can execute a command
- * 
+ *
  * @param player DBref of player
  * @param name Name of command
  * @param buff Output buffer
@@ -2018,7 +2018,7 @@ bool check_command(dbref player, char *name, char *buff, char **bufc, char *carg
 		 * not commands, even though they behave like commands in
 		 * many respects. This is also the same reason why
 		 * side-effects don't trigger hooks.
-		 * 
+		 *
 		 */
 		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD)))
 		{
@@ -2034,7 +2034,7 @@ bool check_command(dbref player, char *name, char *buff, char **bufc, char *carg
  * @brief This side-effect function links an object to a location,
  *        behaving identically to the command:
  *        '@link <object>=<destination>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2056,10 +2056,10 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 }
 
 /**
- * @brief This side-effect function teleports an object from one place to 
+ * @brief This side-effect function teleports an object from one place to
  *        another, behaving identically to the command:
  *        '@tel <object>=<destination>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2084,7 +2084,7 @@ void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((
  * @brief This side-effect function erases some or all attributes from an
  *        object, behaving identically to the command:
  *        '@wipe <object>[</wild-attr>]'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2109,7 +2109,7 @@ void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__(
  * @brief This side-effect function sends a message to the list of dbrefs,
  *        behaving identically to the command:
  *        '@pemit/list <list of dbrefs>=<string>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2131,10 +2131,10 @@ void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 }
 
 /**
- * @brief This side-effect function sends a message to the list of dbrefs, 
+ * @brief This side-effect function sends a message to the list of dbrefs,
  *        behaving identically to the command:
  *        '@pemit/list/contents <list of dbrefs>=<string>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2157,10 +2157,10 @@ void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 /**
  * @brief This side-effect function sends a message to everyone in <target>'s
- *        location with the exception of <target>, 
+ *        location with the exception of <target>,
  *        behaving identically to the command:
  *        '@oemit <target> = <string>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2184,7 +2184,7 @@ void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 /**
  * @brief This side-effect function behaves identically to the command
  *        '@force <object>=<action>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2208,7 +2208,7 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__
 /**
  * @brief This side-effect function behaves identically to the command
  *        '@trigger <object>/<attribute>=<arg 0>,<arg 1>,...<arg N>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2235,12 +2235,10 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 	do_trigger(player, cause, TRIG_NOW, fargs[0], &(fargs[1]), nfargs - 1);
 }
 
-
-
 /**
  * @brief This side-effect function behaves identically to the command
  *        '@wait <timer>=<command>'
- * 
+ *
  * @param buff Not used
  * @param bufc Not used
  * @param player DBref of player
@@ -2257,11 +2255,11 @@ void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unu
 }
 
 /**
- * @brief This function executes <command> with the given arguments. 
- *        <command> is presently limited to @chown, @clone, @destroy, 
- *        @link, @lock, @name, @parent, @teleport, @unlink, @unlock, 
+ * @brief This function executes <command> with the given arguments.
+ *        <command> is presently limited to @chown, @clone, @destroy,
+ *        @link, @lock, @name, @parent, @teleport, @unlink, @unlock,
  *        and @wipe.
- * 
+ *
  * @param buff Not used
  * @param bufc Not used
  * @param player DBref of player
@@ -2309,39 +2307,39 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 	}
 
 	/**
-     * Strip command flags that are irrelevant.
-	 * 
-     */
+	 * Strip command flags that are irrelevant.
+	 *
+	 */
 	key = cmdp->extra;
 	key &= ~(SW_GOT_UNIQUE | SW_MULTIPLE | SW_NOEVAL);
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
 	case CS_NO_ARGS:
-		{
-			handler_fun_command_no_args = (void (*)(dbref, dbref, int))cmdp->info.handler;
-			(*(handler_fun_command_no_args))(player, cause, key);
-		}
-		break;
+	{
+		handler_fun_command_no_args = (void (*)(dbref, dbref, int))cmdp->info.handler;
+		(*(handler_fun_command_no_args))(player, cause, key);
+	}
+	break;
 
 	case CS_ONE_ARG:
-		{
+	{
 		tbuf1 = XMALLOC(1, "tbuf1");
 		handler_fun_command_one_args = (void (*)(dbref, dbref, int, char *))cmdp->info.handler;
 		(*(handler_fun_command_one_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
 		XFREE(tbuf1);
-		}
-		break;
+	}
+	break;
 
 	case CS_TWO_ARG:
-		{
+	{
 		tbuf1 = XMALLOC(1, "tbuf1");
 		tbuf2 = XMALLOC(1, "tbuf2");
 		handler_fun_command_two_args = (void (*)(dbref, dbref, int, char *, char *))cmdp->info.handler;
 		(*(handler_fun_command_two_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
 		XFREE(tbuf2);
 		XFREE(tbuf1);
-		}
-		break;
+	}
+	break;
 
 	default:
 		notify(player, "Invalid command handler.");
@@ -2351,7 +2349,7 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 
 /**
  * @brief Creates a room, thing or exit
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2452,12 +2450,12 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /*---------------------------------------------------------------------------
- * fun_set: 
+ * fun_set:
  */
 
 /**
  * @brief Sets an attribute on an object
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2476,9 +2474,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	ATTR *attr, *attr2;
 
 	/**
-     * obj/attr form?
-	 * 
-     */
+	 * obj/attr form?
+	 *
+	 */
 	if (!check_command(player, "@set", buff, bufc, cargs, ncargs))
 	{
 		return;
@@ -2489,18 +2487,18 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		if (atr != NOTHING)
 		{
 			/**
-		     * must specify flag name
-			 * 
-		     */
+			 * must specify flag name
+			 *
+			 */
 			if (!fargs[1] || !*fargs[1])
 			{
 				SAFE_LB_STR("#-1 UNSPECIFIED PARAMETER", buff, bufc);
 			}
 
 			/**
-		     * are we clearing?
-			 * 
-		     */
+			 * are we clearing?
+			 *
+			 */
 			clear = 0;
 			p = fargs[1];
 
@@ -2511,9 +2509,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			}
 
 			/**
-		     * valid attribute flag?
-			 * 
-		     */
+			 * valid attribute flag?
+			 *
+			 */
 			flagvalue = search_nametab(player, indiv_attraccess_nametab, p);
 
 			if (flagvalue < 0)
@@ -2523,9 +2521,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			}
 
 			/**
-		     * make sure attribute is present
-			 * 
-		     */
+			 * make sure attribute is present
+			 *
+			 */
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
 				SAFE_LB_STR("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
@@ -2533,9 +2531,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			}
 
 			/**
-		     * can we write to attribute?
-			 * 
-		     */
+			 * can we write to attribute?
+			 *
+			 */
 			attr = atr_num(atr);
 
 			if (!attr || !Set_attr(player, thing, attr, aflags))
@@ -2545,9 +2543,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			}
 
 			/**
-		     * just do it!
-			 * 
-		     */
+			 * just do it!
+			 *
+			 */
 			if (clear)
 			{
 				aflags &= ~flagvalue;
@@ -2564,9 +2562,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 
 	/**
-     * find thing
-	 * 
-     */
+	 * find thing
+	 *
+	 */
 	if ((thing = match_controlled(player, fargs[0])) == NOTHING)
 	{
 		SAFE_NOTHING(buff, bufc);
@@ -2574,9 +2572,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 
 	/**
-     * check for attr set first
-	 * 
-     */
+	 * check for attr set first
+	 *
+	 */
 	for (p = fargs[1]; *p && (*p != ':'); p++)
 		;
 
@@ -2611,7 +2609,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		/**
 		 * check for _
-		 * 
+		 *
 		 */
 		if (*p == '_')
 		{
@@ -2638,7 +2636,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		/**
 		 * set it
-		 * 
+		 *
 		 */
 		set_attr_internal(player, thing, atr, p, 0, buff, bufc);
 		XFREE(buff2);
@@ -2646,9 +2644,9 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 
 	/**
-     * set/clear a flag
-	 * 
-     */
+	 * set/clear a flag
+	 *
+	 */
 	flag_set(thing, player, fargs[1], 0);
 }
 
@@ -2661,7 +2659,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 /**
  * @brief List the queue pids
- * 
+ *
  * @param player_targ DBref of target player
  * @param obj_targ DBref of target object
  * @param queue Queue
@@ -2692,7 +2690,7 @@ void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char
  *        ps(): Lists everything on the queue by PID
  *        ps(<object or player>): Lists PIDs enqueued by object or player's stuff
  *        ps(<PID>): Results in '<PID>:<wait status> <command>'
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2712,9 +2710,9 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 	char *bb_p;
 
 	/**
-     * Check for the PID case first.
-	 * 
-     */
+	 * Check for the PID case first.
+	 *
+	 */
 	if (fargs[0] && is_integer(fargs[0]))
 	{
 		qpid = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -2762,9 +2760,9 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 	}
 
 	/**
-     * We either have nothing specified, or an object or player.
-	 * 
-     */
+	 * We either have nothing specified, or an object or player.
+	 *
+	 */
 	if (!fargs[0] || !*fargs[0])
 	{
 		if (!See_Queue(player))
@@ -2801,9 +2799,9 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 	}
 
 	/**
-     * List all the PIDs that match.
-	 * 
-     */
+	 * List all the PIDs that match.
+	 *
+	 */
 	bb_p = *bufc;
 	list_qpids(player_targ, obj_targ, mushstate.qfirst, buff, bufc, bb_p);
 	list_qpids(player_targ, obj_targ, mushstate.qlfirst, buff, bufc, bb_p);

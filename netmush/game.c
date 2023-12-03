@@ -4,11 +4,11 @@
  * @brief Main program and misc functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -336,17 +336,17 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 	if ((re = pcre_compile(pattern, case_opt, &errptr, &erroffset, mushstate.retabs)) == NULL)
 	{
 		/*
-	 * This is a matching error. We have an error message in
-	 * errptr that we can ignore, since we're doing
-	 * command-matching.
-	 */
+		 * This is a matching error. We have an error message in
+		 * errptr that we can ignore, since we're doing
+		 * command-matching.
+		 */
 		return 0;
 	}
 
 	/*
-     * Now we try to match the pattern. The relevant fields will
-     * automatically be filled in by this.
-     */
+	 * Now we try to match the pattern. The relevant fields will
+	 * automatically be filled in by this.
+	 */
 	if ((subpatterns = pcre_exec(re, NULL, str, strlen(str), 0, 0, offsets, PCRE_MAX_OFFSETS)) < 0)
 	{
 		pcre_free(re);
@@ -354,20 +354,20 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 	}
 
 	/*
-     * If we had too many subpatterns for the offsets vector, set the
-     * number to 1/3rd of the size of the offsets vector.
-     */
+	 * If we had too many subpatterns for the offsets vector, set the
+	 * number to 1/3rd of the size of the offsets vector.
+	 */
 	if (subpatterns == 0)
 	{
 		subpatterns = PCRE_MAX_OFFSETS / 3;
 	}
 
 	/*
-     * Now we fill in our args vector. Note that in regexp matching, 0 is
-     * the entire string matched, and the parenthesized strings go from 1
-     * to 9. We DO PRESERVE THIS PARADIGM, for consistency with other
-     * languages.
-     */
+	 * Now we fill in our args vector. Note that in regexp matching, 0 is
+	 * the entire string matched, and the parenthesized strings go from 1
+	 * to 9. We DO PRESERVE THIS PARADIGM, for consistency with other
+	 * languages.
+	 */
 
 	for (i = 0; i < nargs; i++)
 	{
@@ -381,8 +381,8 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 		if (pcre_copy_substring(str, offsets, subpatterns, i, args[i], LBUF_SIZE) < 0)
 		{
 			/*
-	     * Match behavior of wild(): clear out null values.
-	     */
+			 * Match behavior of wild(): clear out null values.
+			 */
 			XFREE(args[i]);
 			args[i] = NULL;
 		}
@@ -406,8 +406,8 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 	ATTR *ap;
 
 	/*
-     * See if we can do it.  Silently fail if we can't.
-     */
+	 * See if we can do it.  Silently fail if we can't.
+	 */
 
 	if (!could_doit(player, parent, A_LUSE))
 	{
@@ -423,8 +423,8 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 		ap = atr_num(attr);
 
 		/*
-	 * Never check NOPROG attributes.
-	 */
+		 * Never check NOPROG attributes.
+		 */
 
 		if (!ap || (ap->flags & AF_NOPROG))
 		{
@@ -432,9 +432,9 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 		}
 
 		/*
-	 * If we aren't the bottom level check if we saw this attr
-	 * before.  Also exclude it if the attribute type is PRIVATE.
-	 */
+		 * If we aren't the bottom level check if we saw this attr
+		 * before.  Also exclude it if the attribute type is PRIVATE.
+		 */
 
 		if (check_exclude && ((ap->flags & AF_PRIVATE) || nhashfind(ap->number, &mushstate.parent_htab)))
 		{
@@ -444,8 +444,8 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 		atr_get_str(buff, parent, attr, &aowner, &aflags, &alen);
 
 		/*
-	 * Skip if private and on a parent
-	 */
+		 * Skip if private and on a parent
+		 */
 
 		if (check_exclude && (aflags & AF_PRIVATE))
 		{
@@ -453,18 +453,18 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 		}
 
 		/*
-	 * If we aren't the top level remember this attr so we
-	 * exclude it from now on.
-	 */
+		 * If we aren't the top level remember this attr so we
+		 * exclude it from now on.
+		 */
 
 		if (hash_insert)
 			nhashadd(ap->number, (int *)&attr, &mushstate.parent_htab);
 
 		/*
-	 * Check for the leadin character after excluding the attrib
-	 * This lets non-command attribs on the child block commands
-	 * on the parent.
-	 */
+		 * Check for the leadin character after excluding the attrib
+		 * This lets non-command attribs on the child block commands
+		 * on the parent.
+		 */
 
 		if ((buff[0] != type) || (aflags & AF_NOPROG))
 		{
@@ -472,8 +472,8 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 		}
 
 		/*
-	 * decode it: search for first un escaped :
-	 */
+		 * decode it: search for first un escaped :
+		 */
 
 		for (s = buff + 1; *s && ((*s != ':') || (*(s - 1) == '\\')); s++)
 			;
@@ -519,9 +519,9 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
 	dbref parent;
 
 	/*
-     * If thing is halted, or it doesn't have a COMMANDS flag and we're
-     * we're doing a $-match, don't check it.
-     */
+	 * If thing is halted, or it doesn't have a COMMANDS flag and we're
+	 * we're doing a $-match, don't check it.
+	 */
 
 	if (((type == AMATCH_CMD) && !Has_Commands(thing) && mushconf.req_cmds_flag) || Halted(thing))
 	{
@@ -529,16 +529,16 @@ int atr_match(dbref thing, dbref player, char type, char *str, char *raw_str, in
 	}
 
 	/*
-     * If not checking parents, just check the thing
-     */
+	 * If not checking parents, just check the thing
+	 */
 	match = 0;
 
 	if (!check_parents || Orphan(thing))
 		return atr_match1(thing, thing, player, type, str, raw_str, 0, 0);
 
 	/*
-     * Check parents, ignoring halted objects
-     */
+	 * Check parents, ignoring halted objects
+	 */
 	exclude = 0;
 	insert = 1;
 	nhashflush(&mushstate.parent_htab, 0);
@@ -784,8 +784,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	va_end(ap);
 
 	/*
-     * If speaker is invalid or message is empty, just exit
-     */
+	 * If speaker is invalid or message is empty, just exit
+	 */
 
 	if (!Good_obj(target) || !msg)
 	{
@@ -794,8 +794,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	}
 
 	/*
-     * Enforce a recursion limit
-     */
+	 * Enforce a recursion limit
+	 */
 	mushstate.ntfy_nest_lev++;
 
 	if (mushstate.ntfy_nest_lev >= mushconf.ntfy_nest_lim)
@@ -806,9 +806,9 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	}
 
 	/*
-     * If we want NOSPOOF output, generate it.  It is only needed if we
-     * are sending the message to the target object
-     */
+	 * If we want NOSPOOF output, generate it.  It is only needed if we
+	 * are sending the message to the target object
+	 */
 
 	if (key & MSG_ME)
 	{
@@ -845,8 +845,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	}
 
 	/*
-     * msg contains the raw message, msg_ns contains the NOSPOOFed msg
-     */
+	 * msg contains the raw message, msg_ns contains the NOSPOOFed msg
+	 */
 	s_Accessed(target);
 	check_listens = Halted(target) ? 0 : 1;
 	herekey = key & (MSG_SPEECH | MSG_MOVE | MSG_PRESENCE);
@@ -901,18 +901,18 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	case TYPE_ROOM:
 
 		/*
-	 * If we're in a pipe, objects can receive raw_notify if
-	 * they're not a player (players were already notified
-	 * above).
-	 */
+		 * If we're in a pipe, objects can receive raw_notify if
+		 * they're not a player (players were already notified
+		 * above).
+		 */
 		if (mushstate.inpipe && !isPlayer(target) && will_send)
 		{
 			raw_notify(target, NULL, msg_ns);
 		}
 
 		/*
-	 * Forward puppet message if it is for me
-	 */
+		 * Forward puppet message if it is for me
+		 */
 		has_neighbors = Has_location(target);
 		targetloc = where_is(target);
 		is_audible = Audible(target);
@@ -925,12 +925,12 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			SAFE_LB_STR(msg_ns, tbuff, &tp);
 
 			/*
-	     * Criteria for redirection of a puppet is based on
-	     * the "normal" conditions for hearing and not
-	     * conditions based on who the target of the
-	     * redirection. Use of raw_notify() means that
-	     * recursion is avoided.
-	     */
+			 * Criteria for redirection of a puppet is based on
+			 * the "normal" conditions for hearing and not
+			 * conditions based on who the target of the
+			 * redirection. Use of raw_notify() means that
+			 * recursion is avoided.
+			 */
 			if (H_Redirect(target))
 			{
 				np = (NUMBERTAB *)nhashfind(target, &mushstate.redir_htab);
@@ -949,16 +949,16 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Make sure that we're passing an empty set of global
-	 * registers to the evaluations we are going to run. We are
-	 * specifically not calling a save, since that doesn't empty
-	 * the registers.
-	 */
+		 * Make sure that we're passing an empty set of global
+		 * registers to the evaluations we are going to run. We are
+		 * specifically not calling a save, since that doesn't empty
+		 * the registers.
+		 */
 		preserve = mushstate.rdata;
 		mushstate.rdata = NULL;
 		/*
-	 * Check for @Listen match if it will be useful
-	 */
+		 * Check for @Listen match if it will be useful
+		 */
 		pass_listen = 0;
 		nargs = 0;
 
@@ -978,9 +978,9 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * If we matched the @listen or are monitoring, check the * *
-	 * USE lock
-	 */
+		 * If we matched the @listen or are monitoring, check the * *
+		 * USE lock
+		 */
 		pass_uselock = 0;
 
 		if (will_send && (key & MSG_ME) && check_listens && (pass_listen || Monitor(target)))
@@ -989,8 +989,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Process AxHEAR if we pass LISTEN, USElock and it's for me
-	 */
+		 * Process AxHEAR if we pass LISTEN, USElock and it's for me
+		 */
 
 		if (will_send && (key & MSG_ME) && pass_listen && pass_uselock)
 		{
@@ -1003,8 +1003,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Get rid of match arguments. We don't need them any more
-	 */
+		 * Get rid of match arguments. We don't need them any more
+		 */
 
 		if (pass_listen)
 		{
@@ -1016,8 +1016,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Process ^-listens if for me, MONITOR, and we pass UseLock
-	 */
+		 * Process ^-listens if for me, MONITOR, and we pass UseLock
+		 */
 
 		if (will_send && (key & MSG_ME) && pass_uselock && (sender != target) && Monitor(target))
 		{
@@ -1025,10 +1025,10 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message to forwardlist members. No presence
-	 * control is done on forwarders; if the target can get it,
-	 * so can they.
-	 */
+		 * Deliver message to forwardlist members. No presence
+		 * control is done on forwarders; if the target can get it,
+		 * so can they.
+		 */
 
 		if (will_send && (key & MSG_FWDLIST) && Audible(target) && H_Fwdlist(target) && check_filter(target, sender, A_FILTER, msg))
 		{
@@ -1056,10 +1056,10 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message through audible exits. If the exit can get
-	 * it, we don't do further checking for whatever is beyond
-	 * it. Otherwise we have to continue checking.
-	 */
+		 * Deliver message through audible exits. If the exit can get
+		 * it, we don't do further checking for whatever is beyond
+		 * it. Otherwise we have to continue checking.
+		 */
 
 		if (will_send && (key & MSG_INV_EXITS))
 		{
@@ -1077,19 +1077,19 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message through neighboring audible exits. Note
-	 * that the target doesn't have to hear it in order for us to
-	 * do this check. If the exit can get it, we don't do further
-	 * checking for whatever is beyond it. Otherwise we have to
-	 * continue checking.
-	 */
+		 * Deliver message through neighboring audible exits. Note
+		 * that the target doesn't have to hear it in order for us to
+		 * do this check. If the exit can get it, we don't do further
+		 * checking for whatever is beyond it. Otherwise we have to
+		 * continue checking.
+		 */
 
 		if (has_neighbors && ((key & MSG_NBR_EXITS) || ((key & MSG_NBR_EXITS_A) && is_audible)))
 		{
 			/*
-	     * If from inside, we have to add the prefix string
-	     * of the container.
-	     */
+			 * If from inside, we have to add the prefix string
+			 * of the container.
+			 */
 			if (key & MSG_S_INSIDE)
 			{
 				tbuff = dflt_from_msg(sender, target);
@@ -1125,16 +1125,16 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message to contents only if target passes check.
-	 * But things within it must still pass the check.
-	 */
+		 * Deliver message to contents only if target passes check.
+		 * But things within it must still pass the check.
+		 */
 
 		if (will_send && ((key & MSG_INV) || ((key & MSG_INV_L) && pass_listen && check_filter(target, sender, A_INFILTER, msg))))
 		{
 			/*
-	     * Don't prefix the message if we were given the
-	     * MSG_NOPREFIX key.
-	     */
+			 * Don't prefix the message if we were given the
+			 * MSG_NOPREFIX key.
+			 */
 			if (key & MSG_S_OUTSIDE)
 			{
 				buff = add_prefix(target, sender, A_INPREFIX, msg, "");
@@ -1166,8 +1166,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message to neighbors
-	 */
+		 * Deliver message to neighbors
+		 */
 
 		if (has_neighbors && ((key & MSG_NBR) || ((key & MSG_NBR_A) && is_audible && check_filter(target, sender, A_FILTER, msg))))
 		{
@@ -1195,8 +1195,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * Deliver message to container
-	 */
+		 * Deliver message to container
+		 */
 
 		if (has_neighbors && ((key & MSG_LOC) || ((key & MSG_LOC_A) && is_audible && check_filter(target, sender, A_FILTER, msg))))
 		{
@@ -1220,8 +1220,8 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		}
 
 		/*
-	 * mushstate.rdata should be empty, but empty it just in case
-	 */
+		 * mushstate.rdata should be empty, but empty it just in case
+		 */
 
 		if (mushstate.rdata)
 		{
@@ -1395,10 +1395,10 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 		obj_counted = 0;
 		total_msecs = 0;
 		/*
-	 * Step through the db. Care only about the ones that are nonzero.
-	 * And yes, we violate several rules of good programming practice by
-	 * failing to abstract our log calls. Oh well.
-	 */
+		 * Step through the db. Care only about the ones that are nonzero.
+		 * And yes, we violate several rules of good programming practice by
+		 * failing to abstract our log calls. Oh well.
+		 */
 		for (thing = 0; thing < mushstate.db_top; thing++)
 		{
 			obj_time = Time_Used(thing);
@@ -1458,9 +1458,9 @@ void do_timecheck(dbref player, dbref cause __attribute__((unused)), int key)
 	if (key == 0)
 	{
 		/*
-	 * No switches, default to printing to screen and clearing
-	 * counters
-	 */
+		 * No switches, default to printing to screen and clearing
+		 * counters
+		 */
 		yes_screen = 1;
 		yes_clear = 1;
 	}
@@ -1512,8 +1512,8 @@ int backup_copy(char *src, char *dst, int flag)
 	char *fn;
 	int i;
 	/*
-     * Copy or move a file to dst directory
-     */
+	 * Copy or move a file to dst directory
+	 */
 	fn = XASPRINTF("fn", "%s/%s", realpath(dst, NULL), basename(src));
 	i = copy_file(src, fn, flag);
 	XFREE(fn);
@@ -1556,8 +1556,8 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	}
 
 	/*
-     * First, get a list of all our text files
-     */
+	 * First, get a list of all our text files
+	 */
 
 	for (i = 0; i < mushstate.helpfiles; i++)
 	{
@@ -1583,8 +1583,8 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	}
 
 	/*
-     * Next, get a list of all our config files
-     */
+	 * Next, get a list of all our config files
+	 */
 	for (i = 0; i < mushstate.configfiles; i++)
 	{
 		cnf = add_array(cnf, mushstate.cfiletab[i], &cnf_n);
@@ -1598,8 +1598,8 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	}
 
 	/*
-     * Next. get a list of all our module files
-     */
+	 * Next. get a list of all our module files
+	 */
 
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
@@ -1658,8 +1658,8 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 	XFREE(s);
 	/*
-     * End our argument list
-     */
+	 * End our argument list
+	 */
 	txt = add_array(txt, NULL, &txt_n);
 	cnf = add_array(cnf, NULL, &cnf_n);
 	dbf = add_array(dbf, NULL, &dbf_n);
@@ -1969,9 +1969,9 @@ int copy_file(char *src, char *dst, int flag)
 	ssize_t size, wsize;
 	char *buff;
 	/*
-     * Rename could work, but only within the same filesystem.
-     * It's slower but safer. If flag is set, delete src (move file)
-     */
+	 * Rename could work, but only within the same filesystem.
+	 * It's slower but safer. If flag is set, delete src (move file)
+	 */
 	buff = XMALLOC(LBUF_SIZE, "buff");
 
 	if ((fsrc = fopen(src, "r")) == NULL)
@@ -2102,11 +2102,11 @@ void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, cha
 
 		write_status_file(player, "Abort and coredump");
 		/*
-	 * Don't bother to even shut down the network or dump.
-	 */
+		 * Don't bother to even shut down the network or dump.
+		 */
 		/*
-	 * Die. Die now.
-	 */
+		 * Die. Die now.
+		 */
 		abort();
 	}
 
@@ -2140,8 +2140,8 @@ void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, cha
 
 	write_status_file(player, message);
 	/*
-     * Set up for normal shutdown
-     */
+	 * Set up for normal shutdown
+	 */
 	mushstate.shutdown_flag = 1;
 	XFREE(name);
 	return;
@@ -2155,8 +2155,8 @@ void dump_database_internal(int dump_type)
 	FILE *f = NULL;
 	MODULE *mp;
 	/*
-     * Call modules to write to DBM
-     */
+	 * Call modules to write to DBM
+	 */
 	db_lock();
 
 	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
@@ -2195,8 +2195,8 @@ void dump_database_internal(int dump_type)
 	case DUMP_DB_FLATFILE:
 
 		/*
-	 * Trigger modules to write their flat-text dbs
-	 */
+		 * Trigger modules to write their flat-text dbs
+		 */
 		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 		{
 			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
@@ -2227,8 +2227,8 @@ void dump_database_internal(int dump_type)
 		}
 
 		/*
-	 * Write the game's flatfile
-	 */
+		 * Write the game's flatfile
+		 */
 		XSPRINTF(tmpfile, "%s/%s.FLAT", mushconf.bakhome, mushconf.db_file);
 		f = tf_fopen(tmpfile, O_WRONLY | O_CREAT | O_TRUNC);
 
@@ -2251,8 +2251,8 @@ void dump_database_internal(int dump_type)
 		if (f != NULL)
 		{
 			/*
-	     * Write a flatfile
-	     */
+			 * Write a flatfile
+			 */
 			db_write_flatfile(f, F_TINYMUSH, UNLOAD_VERSION | UNLOAD_OUTFLAGS);
 			tf_fclose(f);
 		}
@@ -2270,8 +2270,8 @@ void dump_database_internal(int dump_type)
 	if (dump_type != DUMP_DB_FLATFILE)
 	{
 		/*
-	 * Call modules to write to their flat-text database
-	 */
+		 * Call modules to write to their flat-text database
+		 */
 		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 		{
 			s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
@@ -2357,7 +2357,7 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 	{
 		if (mushconf.fork_dump)
 		{
-				mushstate.dumper = fork();
+			mushstate.dumper = fork();
 		}
 		else
 		{
@@ -2441,12 +2441,12 @@ int load_game(void)
 	}
 
 	/*
-     * Call modules to load data from DBM
-     */
+	 * Call modules to load data from DBM
+	 */
 	call_all_modules_nocache("db_read");
 	/*
-     * Call modules to load data from their flat-text database
-     */
+	 * Call modules to load data from their flat-text database
+	 */
 	s1 = XMALLOC(MBUF_SIZE, "s1");
 
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -2500,7 +2500,7 @@ int list_check(dbref thing, dbref player, char type, char *str, char *raw_str, i
 		else
 		{
 			thing = NOTHING; /* make sure we don't
-				 * infinite loop */
+							  * infinite loop */
 		}
 	}
 
@@ -2544,8 +2544,8 @@ int Hearer(dbref thing)
 		atr_get_str(buff, thing, attr, &aowner, &aflags, &alen);
 
 		/*
-	 * Make sure we can execute it
-	 */
+		 * Make sure we can execute it
+		 */
 
 		if ((buff[0] != AMATCH_LISTEN) || (aflags & AF_NOPROG))
 		{
@@ -2553,8 +2553,8 @@ int Hearer(dbref thing)
 		}
 
 		/*
-	 * Make sure there's a : in it
-	 */
+		 * Make sure there's a : in it
+		 */
 
 		for (s = buff + 1; *s && (*s != ':'); s++)
 			;
@@ -2583,9 +2583,9 @@ void do_logwrite(dbref player, dbref cause __attribute__((unused)), int key __at
 	char *msg, *p, *pname;
 
 	/*
-     * If we don't have both a msgtype and a message, make msgtype LOCAL.
-     * Otherwise, truncate msgtype to five characters and capitalize.
-     */
+	 * If we don't have both a msgtype and a message, make msgtype LOCAL.
+	 * Otherwise, truncate msgtype to five characters and capitalize.
+	 */
 
 	if (!message || !*message)
 	{
@@ -2609,8 +2609,8 @@ void do_logwrite(dbref player, dbref cause __attribute__((unused)), int key __at
 	}
 
 	/*
-     * Just dump it to the log.
-     */
+	 * Just dump it to the log.
+	 */
 	pname = log_getname(player);
 	log_write(LOG_LOCAL, "MSG", mt, "%s: %s", pname, msg);
 	XFREE(pname);
@@ -2643,17 +2643,17 @@ void process_preload(void)
 	for (thing = 0; thing < mushstate.db_top; thing++)
 	{
 		/*
-	 * Ignore GOING objects
-	 */
+		 * Ignore GOING objects
+		 */
 		if (Going(thing))
 		{
 			continue;
 		}
 
 		/*
-	 * Look for a FORWARDLIST attribute. Load these before doing
-	 * anything else, so startup notifications work correctly.
-	 */
+		 * Look for a FORWARDLIST attribute. Load these before doing
+		 * anything else, so startup notifications work correctly.
+		 */
 
 		if (H_Fwdlist(thing))
 		{
@@ -2677,8 +2677,8 @@ void process_preload(void)
 		}
 
 		/*
-	 * Ditto for PROPDIRs
-	 */
+		 * Ditto for PROPDIRs
+		 */
 
 		if (H_Propdir(thing))
 		{
@@ -2703,16 +2703,16 @@ void process_preload(void)
 
 		do_top(10);
 		/*
-	 * Look for STARTUP and DAILY attributes on parents.
-	 */
+		 * Look for STARTUP and DAILY attributes on parents.
+		 */
 		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 		{
 			if (H_Startup(thing))
 			{
 				did_it(Owner(thing), thing, A_NULL, NULL, A_NULL, NULL, A_STARTUP, 0, (char **)NULL, 0, 0);
 				/*
-		 * Process queue entries as we add them
-		 */
+				 * Process queue entries as we add them
+				 */
 				do_second();
 				do_top(10);
 				break;
@@ -2957,8 +2957,8 @@ void recover_flatfile(char *flat)
 	db_read_flatfile(f, &db_format, &db_ver, &db_flags);
 	fclose(f);
 	/*
-     * Call modules to load their flatfiles
-     */
+	 * Call modules to load their flatfiles
+	 */
 	s1 = XMALLOC(MBUF_SIZE, "s1");
 
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -2987,8 +2987,8 @@ void recover_flatfile(char *flat)
 	db_flags = (db_flags & ~clrflags) | setflags;
 	db_write();
 	/*
-     * Call all modules to write to GDBM
-     */
+	 * Call all modules to write to GDBM
+	 */
 	call_all_modules_nocache("db_write");
 	db_unlock();
 	cache_sync();
@@ -3038,8 +3038,8 @@ int dbconvert(int argc, char *argv[])
 		{0, 0, 0, 0}};
 	logfile_init(NULL);
 	/*
-     * Decide what conversions to do and how to format the output file
-     */
+	 * Decide what conversions to do and how to format the output file
+	 */
 	setflags = clrflags = ver = do_check = 0;
 	do_write = 1;
 	dbclean = V_DBCLEAN;
@@ -3163,8 +3163,8 @@ int dbconvert(int argc, char *argv[])
 	mushstate.initializing = 0;
 
 	/*
-     * Open the gdbm file
-     */
+	 * Open the gdbm file
+	 */
 	vattr_init();
 
 	if (init_gdbm_db(argv[optind]) < 0)
@@ -3174,20 +3174,20 @@ int dbconvert(int argc, char *argv[])
 	}
 
 	/*
-     * Lock the database
-     */
+	 * Lock the database
+	 */
 	db_lock();
 
 	/*
-     * Go do it
-     */
+	 * Go do it
+	 */
 
 	if (!(setflags & V_GDBM))
 	{
 		db_read();
 		/*
-	 * Call all modules to read from GDBM
-	 */
+		 * Call all modules to read from GDBM
+		 */
 		call_all_modules_nocache("db_read");
 		db_format = F_TINYMUSH;
 		db_ver = OUTPUT_VERSION;
@@ -3197,8 +3197,8 @@ int dbconvert(int argc, char *argv[])
 	{
 		db_read_flatfile(stdin, &db_format, &db_ver, &db_flags);
 		/*
-	 * Call modules to load their flatfiles
-	 */
+		 * Call modules to load their flatfiles
+		 */
 		s1 = XMALLOC(MBUF_SIZE, "s1");
 
 		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -3251,8 +3251,8 @@ int dbconvert(int argc, char *argv[])
 		{
 			db_write();
 			/*
-	     * Call all modules to write to GDBM
-	     */
+			 * Call all modules to write to GDBM
+			 */
 			db_lock();
 			call_all_modules_nocache("db_write");
 			db_unlock();
@@ -3261,8 +3261,8 @@ int dbconvert(int argc, char *argv[])
 		{
 			db_write_flatfile(stdout, F_TINYMUSH, db_ver | db_flags | dbclean);
 			/*
-	     * Call all modules to write to flatfile
-	     */
+			 * Call all modules to write to flatfile
+			 */
 			s1 = XMALLOC(MBUF_SIZE, "s1");
 
 			for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -3289,8 +3289,8 @@ int dbconvert(int argc, char *argv[])
 	}
 
 	/*
-     * Unlock the database
-     */
+	 * Unlock the database
+	 */
 	db_unlock();
 	cache_sync();
 	dddb_close();
@@ -3332,15 +3332,15 @@ int main(int argc, char *argv[])
 	mushstate.debug = 0;
 	mushstate.restarting = 0;
 	/*
-     * Do this first, before anything gets a chance to allocate memory.
-     */
+	 * Do this first, before anything gets a chance to allocate memory.
+	 */
 	mushstate.raw_allocs = NULL;
 	umask(077); /* Keep things to us by default */
 	init_version();
 	/*
-     * If we are called with the name 'dbconvert', do a DB conversion and
-     * exit
-     */
+	 * If we are called with the name 'dbconvert', do a DB conversion and
+	 * exit
+	 */
 	s = basename(argv[0]);
 
 	if (s && *s && !strcmp(s, "dbconvert"))
@@ -3354,8 +3354,8 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-     * Configure the minimum default values we need to start.
-     */
+	 * Configure the minimum default values we need to start.
+	 */
 	mushconf.mush_shortname = XSTRDUP(DEFAULT_SHORTNAME, "cf_string");
 	s = getcwd(NULL, 0);
 	mushconf.game_home = realpath(s, NULL);
@@ -3363,9 +3363,9 @@ int main(int argc, char *argv[])
 	mushconf.game_exec = realpath(argv[0], NULL);
 
 	/*
-     * Parse options
-     */
-	//while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
+	 * Parse options
+	 */
+	// while ( ( c = getopt ( argc, argv, "drmc?" ) ) != -1 ) {
 	while ((c = getopt_long(argc, argv, "dmcr?", long_options, &option_index)) != -1)
 	{
 		switch (c)
@@ -3397,8 +3397,8 @@ int main(int argc, char *argv[])
 	if (optind < argc)
 	{
 		/*
-	 * The first non-option element is our config file.
-	 */
+		 * The first non-option element is our config file.
+		 */
 		s = XSTRDUP(argv[optind++], "s");
 		mushconf.config_file = realpath(s, NULL);
 		XFREE(s);
@@ -3410,8 +3410,8 @@ int main(int argc, char *argv[])
 	else
 	{
 		/*
-	 * If there was none, use the default value.
-	 */
+		 * If there was none, use the default value.
+		 */
 		s = XSTRDUP(DEFAULT_CONFIG_FILE, "s");
 		mushconf.config_file = realpath(s, NULL);
 		XFREE(s);
@@ -3460,9 +3460,9 @@ int main(int argc, char *argv[])
 	cf_read(mushconf.config_file);
 
 	/*
-     * Abort if someone tried to set the number of global registers to
-     * something stupid. Also adjust the character table if we need to.
-     */
+	 * Abort if someone tried to set the number of global registers to
+	 * something stupid. Also adjust the character table if we need to.
+	 */
 	if ((mushconf.max_global_regs < 10) || (mushconf.max_global_regs > 36))
 	{
 		fprintf(stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n");
@@ -3670,8 +3670,8 @@ int main(int argc, char *argv[])
 	fcache_init();
 	helpindex_init();
 	/*
-     * If after doing all that stuff, there is still no db, create a minimal one.
-     */
+	 * If after doing all that stuff, there is still no db, create a minimal one.
+	 */
 	s = XASPRINTF("s", "%s/%s", mushconf.dbhome, mushconf.db_file);
 
 	if (!fileexist(s))
@@ -3711,8 +3711,8 @@ int main(int argc, char *argv[])
 	set_signals();
 
 	/*
-     * Do a consistency check and set up the freelist
-     */
+	 * Do a consistency check and set up the freelist
+	 */
 
 	if (!Good_obj(GOD) || !isPlayer(GOD))
 	{
@@ -3722,8 +3722,8 @@ int main(int argc, char *argv[])
 
 	do_dbck(NOTHING, NOTHING, 0);
 	/*
-     * Reset all the hash stats
-     */
+	 * Reset all the hash stats
+	 */
 	hashreset(&mushstate.command_htab);
 	hashreset(&mushstate.logout_cmd_htab);
 	hashreset(&mushstate.func_htab);
@@ -3783,49 +3783,49 @@ int main(int argc, char *argv[])
 	XFREE(s);
 	mushstate.now = time(NULL);
 	/*
-     * Initialize PCRE tables for locale.
-     */
+	 * Initialize PCRE tables for locale.
+	 */
 	mushstate.retabs = pcre_maketables();
 	/*
-     * Go do restart things.
-     */
+	 * Go do restart things.
+	 */
 	if (mushstate.restarting)
 	{
 		load_restart_db();
 	}
 
 	/*
-     * We have to do an update, even though we're starting up, because
-     * there may be players connected from a restart, as well as objects.
-     */
+	 * We have to do an update, even though we're starting up, because
+	 * there may be players connected from a restart, as well as objects.
+	 */
 	call_all_modules_nocache("cleanup_startup");
 	/*
-     * You must do your startups AFTER you load your restart database, or
-     * softcode that depends on knowing who is connected and so forth
-     * will be hosed.
-     */
+	 * You must do your startups AFTER you load your restart database, or
+	 * softcode that depends on knowing who is connected and so forth
+	 * will be hosed.
+	 */
 	process_preload();
 
 	/*
-     * Startup is done.
-     */
+	 * Startup is done.
+	 */
 	mushstate.initializing = 0;
 
 	/*
-     * Clear all reference flags in the cache-- what happens when the
-     * game loads is NOT representative of normal cache behavior :)
-     * Neither is creating a new db, but in that case the objects exist
-     * only in the cache...
-     */
+	 * Clear all reference flags in the cache-- what happens when the
+	 * game loads is NOT representative of normal cache behavior :)
+	 * Neither is creating a new db, but in that case the objects exist
+	 * only in the cache...
+	 */
 	if (!mindb)
 	{
 		cache_reset();
 	}
 
 	/*
-     * This must happen after startups are run, in order to get a really
-     * good idea of what's actually out there.
-     */
+	 * This must happen after startups are run, in order to get a really
+	 * good idea of what's actually out there.
+	 */
 	do_hashresize(GOD, GOD, 0);
 	log_write(LOG_STARTUP, "INI", "LOAD", "Cleanup completed.");
 
@@ -3871,8 +3871,8 @@ int main(int argc, char *argv[])
 	if (!mushstate.restarting)
 	{
 		/*
-	 * Cosmetic, force a newline to stderr to clear console logs 
-	 */
+		 * Cosmetic, force a newline to stderr to clear console logs
+		 */
 
 		fflush(stderr);
 		fflush(stdout);
@@ -3893,8 +3893,8 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-     * go do it
-     */
+	 * go do it
+	 */
 	if (!mushstate.debug)
 	{
 		mushstate.logstderr = 0;

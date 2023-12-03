@@ -22,7 +22,6 @@
 #include <string.h>
 #include <dlfcn.h>
 
-
 extern CMDENT *prefix_cmds[256];
 
 /**

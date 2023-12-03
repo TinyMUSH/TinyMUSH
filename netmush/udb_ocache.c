@@ -4,11 +4,11 @@
  * @brief LRU caching
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -168,8 +168,8 @@ void cache_reset(void)
         sp = &sys_c[x];
 
         /*
-	 * traverse the chain
-	 */
+         * traverse the chain
+         */
         for (cp = sp->head; cp != NULL; cp = nxt)
         {
             nxt = cp->nxt;
@@ -454,7 +454,6 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
         }
     }
 
-
     /*
      * DARN IT - at this point we have a certified, type-A cache miss
      */
@@ -518,8 +517,8 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
     if (mushstate.dumping)
     {
         /*
-	 * Link at head of chain
-	 */
+         * Link at head of chain
+         */
         if (sp->head == (UDB_CACHE *)0)
         {
             sp->tail = cp;
@@ -531,8 +530,8 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
         }
         sp->head = cp;
         /*
-	 * Link at head of LRU freelist
-	 */
+         * Link at head of LRU freelist
+         */
         if (freelist->head == (UDB_CACHE *)0)
         {
             freelist->tail = cp;
@@ -549,8 +548,8 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
     else
     {
         /*
-	 * Link at tail of chain
-	 */
+         * Link at tail of chain
+         */
         if (sp->head == (UDB_CACHE *)0)
         {
             sp->head = cp;
@@ -562,8 +561,8 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
         sp->tail = cp;
         cp->nxt = (UDB_CACHE *)0;
         /*
-	 * Link at tail of LRU freelist
-	 */
+         * Link at tail of LRU freelist
+         */
         if (freelist->head == (UDB_CACHE *)0)
         {
             freelist->head = cp;
@@ -628,10 +627,9 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
     if (mushstate.standalone)
     {
 
-
         /*
-	 * Bypass the cache when standalone or memory based for writes
-	 */
+         * Bypass the cache when standalone or memory based for writes
+         */
         if (data.dptr == NULL)
         {
             switch (type)
@@ -654,8 +652,8 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
                 pipe_set_attrib(((UDB_ANAME *)key.dptr)->attrnum, ((UDB_ANAME *)key.dptr)->object, (char *)data.dptr);
 
                 /*
-		 * Don't forget to free data.dptr when standalone
-		 */
+                 * Don't forget to free data.dptr when standalone
+                 */
                 XFREE(data.dptr);
                 break;
 
@@ -821,8 +819,8 @@ UDB_CACHE *get_free_entry(int atrsize)
         if (cp && (cp->flags & CACHE_DIRTY))
         {
             /*
-	     * Flush the modified attributes to disk
-	     */
+             * Flush the modified attributes to disk
+             */
             if (cp->data == NULL)
             {
                 switch (cp->type)
@@ -864,15 +862,15 @@ UDB_CACHE *get_free_entry(int atrsize)
         }
 
         /*
-	 * Take the attribute off of its chain and nuke the
-	 * attribute's memory
-	 */
+         * Take the attribute off of its chain and nuke the
+         * attribute's memory
+         */
 
         if (cp)
         {
             /*
-	     * Find the cache entry inside the real cache
-	     */
+             * Find the cache entry inside the real cache
+             */
             hv = cachehash(cp->keydata, cp->keylen, cp->type);
             sp = &sys_c[hv];
             prv = NULL;
@@ -888,8 +886,8 @@ UDB_CACHE *get_free_entry(int atrsize)
             }
 
             /*
-	     * Remove the cache entry
-	     */
+             * Remove the cache entry
+             */
             if (cp->nxt == (UDB_CACHE *)0)
             {
                 if (prv != (UDB_CACHE *)0)
@@ -1010,9 +1008,9 @@ int cache_sync(void)
     if (mushstate.standalone || mushstate.restarting)
     {
         /*
-	 * If we're restarting or standalone, having DBM wait for
-	 * * each write is a performance no-no; run asynchronously
-	 */
+         * If we're restarting or standalone, having DBM wait for
+         * * each write is a performance no-no; run asynchronously
+         */
         dddb_setsync(0);
     }
 
@@ -1068,7 +1066,6 @@ void cache_del(UDB_DATA key, unsigned int type)
             (*(cam__mp->cache_del_notify))(key, type);
         }
     }
-
 
     cs_dels++;
     hv = cachehash(key.dptr, key.dsize, type);

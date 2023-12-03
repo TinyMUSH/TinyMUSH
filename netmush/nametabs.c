@@ -4,11 +4,11 @@
  * @brief Command and other supporting tables
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -22,7 +22,7 @@
 /**
  * @brief Switch tables for the various commands.
  * @attention  Make sure that all of your command and switch names are lowercase!
- * 
+ *
  */
 NAMETAB addcmd_sw[] = {
     {(char *)"preserve", 1, CA_GOD, ADDCMD_PRESERVE},
@@ -394,7 +394,7 @@ NAMETAB noeval_sw[] = {
 
 /**
  * @brief Command, function, etc. access name table.
- * 
+ *
  */
 NAMETAB access_nametab[] = {
     {(char *)"admin", 2, CA_WIZARD, CA_ADMIN},
@@ -431,7 +431,7 @@ NAMETAB access_nametab[] = {
 
 /**
  * @brief Attribute access name tables.
- * 
+ *
  */
 NAMETAB attraccess_nametab[] = {
     {(char *)"const", 2, CA_PUBLIC, AF_CONST},
@@ -470,7 +470,7 @@ NAMETAB indiv_attraccess_nametab[] = {
 
 /**
  * @brief All available lists for the list command.
- * 
+ *
  */
 NAMETAB list_names[] = {
     {(char *)"allocations", 2, CA_WIZARD, LIST_ALLOCATOR},
@@ -508,7 +508,7 @@ NAMETAB list_names[] = {
 
 /**
  * @brief Boolean nametable
- * 
+ *
  */
 NAMETAB bool_names[] = {
     {(char *)"true", 1, 0, 1},
@@ -521,7 +521,7 @@ NAMETAB bool_names[] = {
 
 /**
  * @brief File nametable
- * 
+ *
  */
 NAMETAB list_files[] = {
     {(char *)"badsite_connect", 1, CA_WIZARD, FC_CONN_SITE},
@@ -540,7 +540,7 @@ NAMETAB list_files[] = {
 
 /**
  * @brief Logging nametables
- * 
+ *
  */
 NAMETAB logdata_nametab[] = {
     {(char *)"flags", 1, 0, LOGOPT_FLAGS},
@@ -575,7 +575,7 @@ NAMETAB logoptions_nametab[] = {
 
 /**
  * @brief Global control flags nametable
- * 
+ *
  */
 NAMETAB enable_names[] = {
     {(char *)"building", 1, CA_PUBLIC, CF_BUILD},
@@ -591,7 +591,7 @@ NAMETAB enable_names[] = {
 
 /**
  * @brief Signal actions nametable
- * 
+ *
  */
 NAMETAB sigactions_nametab[] = {
     {(char *)"exit", 3, 0, SA_EXIT},
@@ -600,23 +600,23 @@ NAMETAB sigactions_nametab[] = {
 
 /**
  * @brief Logged out command tablename
- * 
+ *
  */
 NAMETAB logout_cmdtable[] = {
-	{(char *)"DOING", 5, CA_PUBLIC, CMD_DOING},
-	{(char *)"LOGOUT", 6, CA_PUBLIC, CMD_LOGOUT},
-	{(char *)"OUTPUTPREFIX", 12, CA_PUBLIC, CMD_PREFIX | CMD_NOxFIX},
-	{(char *)"OUTPUTSUFFIX", 12, CA_PUBLIC, CMD_SUFFIX | CMD_NOxFIX},
-	{(char *)"QUIT", 4, CA_PUBLIC, CMD_QUIT},
-	{(char *)"SESSION", 7, CA_PUBLIC, CMD_SESSION},
-	{(char *)"WHO", 3, CA_PUBLIC, CMD_WHO},
-	{(char *)"PUEBLOCLIENT", 12, CA_PUBLIC, CMD_PUEBLOCLIENT},
-	{(char *)"INFO", 4, CA_PUBLIC, CMD_INFO},
-	{NULL, 0, 0, 0}};
+    {(char *)"DOING", 5, CA_PUBLIC, CMD_DOING},
+    {(char *)"LOGOUT", 6, CA_PUBLIC, CMD_LOGOUT},
+    {(char *)"OUTPUTPREFIX", 12, CA_PUBLIC, CMD_PREFIX | CMD_NOxFIX},
+    {(char *)"OUTPUTSUFFIX", 12, CA_PUBLIC, CMD_SUFFIX | CMD_NOxFIX},
+    {(char *)"QUIT", 4, CA_PUBLIC, CMD_QUIT},
+    {(char *)"SESSION", 7, CA_PUBLIC, CMD_SESSION},
+    {(char *)"WHO", 3, CA_PUBLIC, CMD_WHO},
+    {(char *)"PUEBLOCLIENT", 12, CA_PUBLIC, CMD_PUEBLOCLIENT},
+    {(char *)"INFO", 4, CA_PUBLIC, CMD_INFO},
+    {NULL, 0, 0, 0}};
 
 /**
  * @brief Command table: Definitions for builtin commands, used to build the command hash table.
- * 
+ *
  */
 CMDENT command_table[] = {
     {(char *)"@@", NULL, CA_PUBLIC, 0, CS_NO_ARGS, NULL, NULL, NULL, {do_comment}},
@@ -760,7 +760,7 @@ CMDENT command_table[] = {
 
 /**
  * @brief Table for parsing the configuration file.
- * 
+ *
  */
 CONF conftable[] = {
     {(char *)"access", cf_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
@@ -1028,7 +1028,7 @@ CONF conftable[] = {
 
 /**
  * @brief Log file descriptor table
- * 
+ *
  */
 LOGFILETAB logfds_table[] = {
     {LOG_ACCOUNTING, NULL, NULL},
@@ -1232,4 +1232,3 @@ ATTR attr[] = {
     {"*Money", A_MONEY, AF_DARK | AF_NOPROG | AF_NOCMD | AF_INTERNAL, NULL},
     {"*Invalid", A_TEMP, AF_DARK | AF_NOPROG | AF_NOCMD | AF_INTERNAL, NULL},
     {NULL, 0, 0, NULL}};
-

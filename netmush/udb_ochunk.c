@@ -4,11 +4,11 @@
  * @brief Database handling functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -84,8 +84,8 @@ int dddb_init(void)
     if (mushstate.standalone)
     {
         /*
-	 * Set the cache size to be 400 hash buckets for GDBM.
-	 */
+         * Set the cache size to be 400 hash buckets for GDBM.
+         */
         i = 400;
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
@@ -97,10 +97,10 @@ int dddb_init(void)
     else
     {
         /*
-	 * This would set the cache size to be 2 hash buckets
-	 * * for GDBM, except that the library imposes a minimum
-	 * * of 10.
-	 */
+         * This would set the cache size to be 2 hash buckets
+         * * for GDBM, except that the library imposes a minimum
+         * * of 10.
+         */
         i = 2;
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)

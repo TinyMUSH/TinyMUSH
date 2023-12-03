@@ -4,13 +4,13 @@
  * @brief Misc support routines for unter style error management.
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  * @todo Convert to standard logging functions
- * 
+ *
  */
 
 #include "config.h"

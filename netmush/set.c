@@ -4,11 +4,11 @@
  * @brief Commands which set parameters
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -61,8 +61,8 @@ dbref match_affected(dbref player, const char *name)
 {
 	dbref mat;
 	/*
-     * We allow control, as well as having the same owner.
-     */
+	 * We allow control, as well as having the same owner.
+	 */
 	init_match(player, name, NOTYPE);
 	match_everything(MAT_EXIT_PARENTS);
 	mat = noisy_match_result();
@@ -125,9 +125,9 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	}
 
 	/*
-     * a player may change an object's zone to NOTHING or to an object he
-     * * owns
-     */
+	 * a player may change an object's zone to NOTHING or to an object he
+	 * * owns
+	 */
 	if ((zone != NOTHING) && !Wizard(player) && !(Controls(player, zone)) && !(db[player].owner == db[zone].owner))
 	{
 		notify(player, "You cannot move that object to that zone.");
@@ -135,8 +135,8 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	}
 
 	/*
-     * only rooms may be zoned to other rooms
-     */
+	 * only rooms may be zoned to other rooms
+	 */
 
 	if ((zone != NOTHING) && (Typeof(zone) == TYPE_ROOM) && Typeof(thing) != TYPE_ROOM)
 	{
@@ -145,19 +145,19 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	}
 
 	/*
-     * everything is okay, do the change
-     */
+	 * everything is okay, do the change
+	 */
 	s_Zone(thing, zone);
 
 	if (Typeof(thing) != TYPE_PLAYER)
 	{
 		/*
-	 * We do not strip flags and powers on players, due to the
-	 * * inconvenience involved in resetting them. Players will just
-	 * * have to be careful when @chzone'ing players with special
-	 * * privileges.
-	 * * For all other objects, we behave like @chown does.
-	 */
+		 * We do not strip flags and powers on players, due to the
+		 * * inconvenience involved in resetting them. Players will just
+		 * * have to be careful when @chzone'ing players with special
+		 * * privileges.
+		 * * For all other objects, we behave like @chown does.
+		 */
 		if (key & CHZONE_NOSTRIP)
 		{
 			if (!God(player))
@@ -194,8 +194,8 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * check for bad name
-     */
+	 * check for bad name
+	 */
 	if ((*newname == '\0') || (strip_ansi_len(newname) == 0))
 	{
 		notify_quiet(player, "Give it what new name?");
@@ -203,8 +203,8 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * check for renaming a player
-     */
+	 * check for renaming a player
+	 */
 	if (isPlayer(thing))
 	{
 		buff = trim_spaces((char *)newname);
@@ -218,16 +218,16 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		else if (string_compare(buff, Name(thing)) && (lookup_player(NOTHING, buff, 0) != NOTHING))
 		{
 			/*
-	     * string_compare allows changing foo to Foo, etc.
-	     */
+			 * string_compare allows changing foo to Foo, etc.
+			 */
 			notify_quiet(player, "That name is already in use.");
 			XFREE(buff);
 			return;
 		}
 
 		/*
-	 * everything ok, notify
-	 */
+		 * everything ok, notify
+		 */
 		thingname = log_getname(thing);
 		log_write(LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", thingname, buff);
 		XFREE(thingname);
@@ -259,8 +259,8 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		}
 
 		/*
-	 * everything ok, change the name
-	 */
+		 * everything ok, change the name
+		 */
 		s_Name(thing, newname);
 
 		if (!Quiet(player) && !Quiet(thing))
@@ -283,9 +283,9 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	char *tmp_buf, *cpa__p, *cpa__tokp, *p, *tokp, *alias_ptrs[LBUF_SIZE / 2];
 	char *alias_buf = XMALLOC(LBUF_SIZE, "alias_buf");
 	/*
-     * Clear out the original alias, so we can rewrite a new alias
-     * * that uses the same names, if necessary.
-     */
+	 * Clear out the original alias, so we can rewrite a new alias
+	 * * that uses the same names, if necessary.
+	 */
 
 	for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
 	{
@@ -293,9 +293,9 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 
 	/*
-     * Don't nibble the original buffer. Copy it all into an array, because
-     * * we have to eat leading and trailing spaces.
-     */
+	 * Don't nibble the original buffer. Copy it all into an array, because
+	 * * we have to eat leading and trailing spaces.
+	 */
 	retcode = 1;
 
 	tmp_buf = XSTRDUP(list, "tmp_buf");
@@ -306,8 +306,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	XFREE(tmp_buf);
 
 	/*
-     * Enforce a maximum number of aliases.
-     */
+	 * Enforce a maximum number of aliases.
+	 */
 
 	if (n_aliases > mushconf.max_player_aliases)
 	{
@@ -316,8 +316,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 
 	/*
-     * Enforce player name regulations.
-     */
+	 * Enforce player name regulations.
+	 */
 
 	for (i = 0; retcode && (i < n_aliases); i++)
 	{
@@ -334,8 +334,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 		else
 		{
 			/*
-	     * Make sure this alias doesn't duplicate another in the list.
-	     */
+			 * Make sure this alias doesn't duplicate another in the list.
+			 */
 			for (j = i + 1; retcode && (j < n_aliases); j++)
 			{
 				if (!strcasecmp(alias_ptrs[i], alias_ptrs[j]))
@@ -348,8 +348,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 
 	/*
-     * Construct a new alias list, with spaces removed.
-     */
+	 * Construct a new alias list, with spaces removed.
+	 */
 
 	for (i = 0, p = alias_buf; retcode && (i < n_aliases); i++)
 	{
@@ -368,8 +368,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "The alias '%s' is already in use or is illegal.", alias_ptrs[i]);
 
 			/*
-	     * Ugh. Now we have to delete aliases we added up 'til now.
-	     */
+			 * Ugh. Now we have to delete aliases we added up 'til now.
+			 */
 
 			for (j = 0; j < i; j++)
 			{
@@ -379,8 +379,8 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 
 	/*
-     * Free memory allocated by trim_spaces().
-     */
+	 * Free memory allocated by trim_spaces().
+	 */
 
 	for (i = 0; i < n_aliases; i++)
 	{
@@ -388,10 +388,10 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 
 	/*
-     * Twiddle the alias attribute on the object. Note that we have to
-     * * do this regardless of the outcome, since we wiped out the original
-     * * aliases from the player name table earlier.
-     */
+	 * Twiddle the alias attribute on the object. Note that we have to
+	 * * do this regardless of the outcome, since we wiped out the original
+	 * * aliases from the player name table earlier.
+	 */
 
 	if (retcode)
 	{
@@ -422,33 +422,33 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 	}
 
 	/*
-     * check for renaming a player
-     */
+	 * check for renaming a player
+	 */
 	ap = atr_num(A_ALIAS);
 
 	if (isPlayer(thing))
 	{
 		/*
-	 * Fetch the old alias
-	 */
+		 * Fetch the old alias
+		 */
 		oldalias = atr_get(thing, A_ALIAS, &aowner, &aflags, &alen);
 		trimalias = trim_spaces(alias);
 
 		if (!Controls(player, thing))
 		{
 			/*
-	     * Make sure we have rights to do it.  We can't do
-	     * the normal Set_attr check because ALIAS is
-	     * set CONSTANT and we want to keep people from
-	     * doing &ALIAS and bypassing the player name checks.
-	     */
+			 * Make sure we have rights to do it.  We can't do
+			 * the normal Set_attr check because ALIAS is
+			 * set CONSTANT and we want to keep people from
+			 * doing &ALIAS and bypassing the player name checks.
+			 */
 			notify_quiet(player, NOPERM_MESSAGE);
 		}
 		else if (!*trimalias)
 		{
 			/*
-	     * New alias is null, just clear it
-	     */
+			 * New alias is null, just clear it
+			 */
 
 			for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
 			{
@@ -465,8 +465,8 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 		else
 		{
 			/*
-	     * Remove the old name and add the new name
-	     */
+			 * Remove the old name and add the new name
+			 */
 			set_player_aliases(player, thing, oldalias, trimalias, aflags);
 		}
 
@@ -478,8 +478,8 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 		atr_pget_info(thing, A_ALIAS, &aowner, &aflags);
 
 		/*
-	 * Make sure we have rights to do it
-	 */
+		 * Make sure we have rights to do it
+		 */
 
 		if (!Set_attr(player, thing, ap, aflags))
 		{
@@ -570,8 +570,8 @@ void do_lock(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 	else
 	{
 		/*
-	 * everything ok, do it
-	 */
+		 * everything ok, do it
+		 */
 		if (!key)
 		{
 			key = A_LOCK;
@@ -742,13 +742,13 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 			}
 
 			/*
-	     * You may chown an attr to yourself if you
-	     * own the object and the attr is not locked.
-	     * You may chown an attr to the owner of the
-	     * object if you own the attribute. To do
-	     * anything else you must be a wizard. Only
-	     * #1 can chown attributes on #1.
-	     */
+			 * You may chown an attr to yourself if you
+			 * own the object and the attr is not locked.
+			 * You may chown an attr to the owner of the
+			 * object if you own the attribute. To do
+			 * anything else you must be a wizard. Only
+			 * #1 can chown attributes on #1.
+			 */
 
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
@@ -773,9 +773,9 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 			else if (owner == Owner(player))
 			{
 				/*
-		 * chown to me: only if I own the obj
-		 * and !locked
-		 */
+				 * chown to me: only if I own the obj
+				 * and !locked
+				 */
 				if (!Controls(player, thing) || (aflags & AF_LOCK))
 				{
 					notify_quiet(player, NOPERM_MESSAGE);
@@ -788,9 +788,9 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 			else if (owner == Owner(thing))
 			{
 				/*
-		 * chown to obj owner: only if I own attr
-		 * and !locked
-		 */
+				 * chown to obj owner: only if I own attr
+				 * and !locked
+				 */
 				if ((Owner(player) != aowner) || (aflags & AF_LOCK))
 				{
 					notify_quiet(player, NOPERM_MESSAGE);
@@ -914,9 +914,9 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 		atr_chown(thing);
 
 		/*
-	 * If we're not stripping flags, and we're God, don't strip the
-	 * * WIZARD flag. Otherwise, do that, at least.
-	 */
+		 * If we're not stripping flags, and we're God, don't strip the
+		 * * WIZARD flag. Otherwise, do that, at least.
+		 */
 		if (key & CHOWN_NOSTRIP)
 		{
 			if (God(player))
@@ -936,8 +936,8 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 		}
 
 		/*
-	 * Powers are only preserved by God with nostrip
-	 */
+		 * Powers are only preserved by God with nostrip
+		 */
 
 		if (!(key & CHOWN_NOSTRIP) || !God(player))
 		{
@@ -1011,17 +1011,17 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 	ATTR *attr, *attr2;
 
 	/*
-     * See if we have the <obj>/<attr> form, which is how you set * * *
-     * attribute * flags.
-     */
+	 * See if we have the <obj>/<attr> form, which is how you set * * *
+	 * attribute * flags.
+	 */
 
 	if (parse_attrib(player, name, &thing, &atr, 1))
 	{
 		if (atr != NOTHING)
 		{
 			/*
-	     * You must specify a flag name
-	     */
+			 * You must specify a flag name
+			 */
 			if (!flag || !*flag)
 			{
 				notify_quiet(player, "I don't know what you want to set!");
@@ -1029,8 +1029,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			}
 
 			/*
-	     * Check for clearing
-	     */
+			 * Check for clearing
+			 */
 			clear = 0;
 
 			if (*flag == NOT_TOKEN)
@@ -1040,8 +1040,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			}
 
 			/*
-	     * Make sure player specified a valid attribute flag
-	     */
+			 * Make sure player specified a valid attribute flag
+			 */
 			flagvalue = search_nametab(player, indiv_attraccess_nametab, flag);
 
 			if (flagvalue < 0)
@@ -1051,8 +1051,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			}
 
 			/*
-	     * Make sure the object has the attribute present
-	     */
+			 * Make sure the object has the attribute present
+			 */
 
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
@@ -1061,8 +1061,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			}
 
 			/*
-	     * Make sure we can write to the attribute
-	     */
+			 * Make sure we can write to the attribute
+			 */
 			attr = atr_num(atr);
 
 			if (!attr || !Set_attr(player, thing, attr, aflags))
@@ -1072,8 +1072,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			}
 
 			/*
-	     * Go do it
-	     */
+			 * Go do it
+			 */
 
 			if (clear)
 			{
@@ -1087,8 +1087,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 			could_hear = Hearer(thing);
 			atr_set_flags(thing, atr, aflags);
 			/*
-	     * Tell the player about it.
-	     */
+			 * Tell the player about it.
+			 */
 			handle_ears(thing, could_hear, Hearer(thing));
 
 			if (!(key & SET_QUIET) && !Quiet(player) && !Quiet(thing))
@@ -1108,8 +1108,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 	}
 
 	/*
-     * find thing
-     */
+	 * find thing
+	 */
 
 	if ((thing = match_controlled(player, name)) == NOTHING)
 	{
@@ -1117,8 +1117,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 	}
 
 	/*
-     * check for attribute set first
-     */
+	 * check for attribute set first
+	 */
 	for (p = flag; *p && (*p != ':'); p++)
 		;
 
@@ -1152,8 +1152,8 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 		buff = XMALLOC(LBUF_SIZE, "buff");
 
 		/*
-	 * check for _
-	 */
+		 * check for _
+		 */
 		if (*p == '_')
 		{
 			XSTRCPY(buff, p + 1);
@@ -1178,16 +1178,16 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 		}
 
 		/*
-	 * Go set it
-	 */
+		 * Go set it
+		 */
 		set_attr_internal(player, thing, atr, p, key, NULL, NULL);
 		XFREE(buff);
 		return;
 	}
 
 	/*
-     * Set or clear a flag
-     */
+	 * Set or clear a flag
+	 */
 	flag_set(thing, player, flag, key);
 }
 
@@ -1202,8 +1202,8 @@ void do_power(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	/*
-     * find thing
-     */
+	 * find thing
+	 */
 
 	if ((thing = match_controlled(player, name)) == NOTHING)
 	{
@@ -1250,8 +1250,8 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	}
 
 	/*
-     * newpair gets whacked to bits by parse_to(). Do it just once.
-     */
+	 * newpair gets whacked to bits by parse_to(). Do it just once.
+	 */
 	newthings = (char **)XCALLOC(nargs, sizeof(char *), "newthings");
 	newattrs = (char **)XCALLOC(nargs, sizeof(char *), "newattrs");
 
@@ -1303,8 +1303,8 @@ void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__(
 	char *astr;
 
 	/*
-     * Make sure we have something to do.
-     */
+	 * Make sure we have something to do.
+	 */
 
 	if (nargs < 2)
 	{
@@ -1313,8 +1313,8 @@ void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__(
 	}
 
 	/*
-     * Find and make sure we control the target object.
-     */
+	 * Find and make sure we control the target object.
+	 */
 	thing = match_controlled(player, what);
 
 	if (thing == NOTHING)
@@ -1323,9 +1323,9 @@ void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__(
 	}
 
 	/*
-     * Look up the source attribute.  If it either doesn't exist or isn't
-     * * * * * readable, use an empty string.
-     */
+	 * Look up the source attribute.  If it either doesn't exist or isn't
+	 * * * * * readable, use an empty string.
+	 */
 	in_anum = -1;
 	astr = XMALLOC(LBUF_SIZE, "astr");
 	in_attr = atr_str(args[0]);
@@ -1349,8 +1349,8 @@ void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__(
 	}
 
 	/*
-     * Copy the attribute to each target in turn.
-     */
+	 * Copy the attribute to each target in turn.
+	 */
 	no_delete = 0;
 	num_copied = 0;
 
@@ -1396,8 +1396,8 @@ void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__(
 	}
 
 	/*
-     * Remove the source attribute if we can.
-     */
+	 * Remove the source attribute if we can.
+	 */
 
 	if (num_copied < 1)
 	{
@@ -1457,8 +1457,8 @@ int parse_attrib(dbref player, char *str, dbref *thing, int *atr, int ok_structs
 	}
 
 	/*
-     * Break apart string into obj and attr.  Return on failure
-     */
+	 * Break apart string into obj and attr.  Return on failure
+	 */
 	buff = XMALLOC(LBUF_SIZE, "buff");
 	XSTRCPY(buff, str);
 
@@ -1469,8 +1469,8 @@ int parse_attrib(dbref player, char *str, dbref *thing, int *atr, int ok_structs
 	}
 
 	/*
-     * Get the named attribute from the object if we can
-     */
+	 * Get the named attribute from the object if we can
+	 */
 	attr = atr_str(str);
 	XFREE(buff);
 
@@ -1503,8 +1503,8 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 	dbref aowner;
 	int ca, ok, aflags;
 	/*
-     * Walk the attribute list of the object
-     */
+	 * Walk the attribute list of the object
+	 */
 	atr_push();
 
 	for (ca = atr_head(thing, &as); ca; ca = atr_next(&as))
@@ -1512,8 +1512,8 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 		attr = atr_num(ca);
 
 		/*
-	 * Discard bad attributes and ones we've seen before.
-	 */
+		 * Discard bad attributes and ones we've seen before.
+		 */
 
 		if (!attr)
 		{
@@ -1526,9 +1526,9 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 		}
 
 		/*
-	 * If we aren't the top level remember this attr so we * * *
-	 * exclude * it in any parents.
-	 */
+		 * If we aren't the top level remember this attr so we * * *
+		 * exclude * it in any parents.
+		 */
 		atr_get_info(thing, ca, &aowner, &aflags);
 
 		if (check_exclude && (aflags & AF_PRIVATE))
@@ -1542,8 +1542,8 @@ void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, in
 			ok = See_attr_all(player, thing, attr, aowner, aflags, ok_structs);
 
 		/*
-	 * Enforce locality restriction on descriptions
-	 */
+		 * Enforce locality restriction on descriptions
+		 */
 
 		if (ok && (attr->number == A_DESC) && !mushconf.read_rem_desc && !Examinable(player, thing) && !nearby(player, thing))
 		{
@@ -1579,14 +1579,14 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 	XSTRCPY(buff, str);
 
 	/*
-     * Separate name and attr portions at the first /
-     */
+	 * Separate name and attr portions at the first /
+	 */
 
 	if (!parse_thing_slash(player, buff, &str, thing))
 	{
 		/*
-	 * Not in obj/attr format, return if not defaulting to *
-	 */
+		 * Not in obj/attr format, return if not defaulting to *
+		 */
 		if (!df_star)
 		{
 			XFREE(buff);
@@ -1594,8 +1594,8 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 		}
 
 		/*
-	 * Look for the object, return failure if not found
-	 */
+		 * Look for the object, return failure if not found
+		 */
 		init_match(player, buff, NOTYPE);
 		match_everything(MAT_EXIT_PARENTS);
 		*thing = match_result();
@@ -1610,8 +1610,8 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 	}
 
 	/*
-     * Check the object (and optionally all parents) for attributes
-     */
+	 * Check the object (and optionally all parents) for attributes
+	 */
 
 	if (check_parents)
 	{
@@ -1671,8 +1671,8 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	ATTR *ap;
 
 	/*
-     * Make sure we have something to do.
-     */
+	 * Make sure we have something to do.
+	 */
 
 	if ((nargs < 1) || !*args[0])
 	{
@@ -1683,8 +1683,8 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	from = args[0];
 	to = (nargs >= 2) ? args[1] : (char *)"";
 	/*
-     * Look for the object and get the attribute (possibly wildcarded)
-     */
+	 * Look for the object and get the attribute (possibly wildcarded)
+	 */
 	olist_push();
 
 	if (!it || !*it || !parse_attrib_wild(player, it, &thing, 0, 0, 0, 0))
@@ -1695,8 +1695,8 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * Iterate through matching attributes, performing edit
-     */
+	 * Iterate through matching attributes, performing edit
+	 */
 	got_one = 0;
 	atext = XMALLOC(LBUF_SIZE, "atext");
 	could_hear = Hearer(thing);
@@ -1708,15 +1708,15 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		if (ap)
 		{
 			/*
-	     * Get the attr and make sure we can modify it.
-	     */
+			 * Get the attr and make sure we can modify it.
+			 */
 			atr_get_str(atext, thing, ap->number, &aowner, &aflags, &alen);
 
 			if (Set_attr(player, thing, ap, aflags))
 			{
 				/*
-		 * Do the edit and save the result
-		 */
+				 * Do the edit and save the result
+				 */
 				got_one = 1;
 				edit_string_ansi(atext, &result, &returnstr, from, to);
 
@@ -1745,16 +1745,16 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			else
 			{
 				/*
-		 * No rights to change the attr
-		 */
+				 * No rights to change the attr
+				 */
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%s: Permission denied.", ap->name);
 			}
 		}
 	}
 
 	/*
-     * Clean up
-     */
+	 * Clean up
+	 */
 	XFREE(atext);
 	olist_pop();
 
@@ -1785,8 +1785,8 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * Iterate through matching attributes, zapping the writable ones
-     */
+	 * Iterate through matching attributes, zapping the writable ones
+	 */
 	got_one = 0;
 	atext = XMALLOC(LBUF_SIZE, "atext");
 	could_hear = Hearer(thing);
@@ -1798,8 +1798,8 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		if (ap)
 		{
 			/*
-	     * Get the attr and make sure we can modify it.
-	     */
+			 * Get the attr and make sure we can modify it.
+			 */
 			atr_get_str(atext, thing, ap->number, &aowner, &aflags, &alen);
 
 			if (Set_attr(player, thing, ap, aflags))
@@ -1811,8 +1811,8 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 
 	/*
-     * Clean up
-     */
+	 * Clean up
+	 */
 	XFREE(atext);
 	olist_pop();
 
@@ -1856,8 +1856,8 @@ void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char
 	did_it(player, thing, A_NULL, NULL, A_NULL, NULL, attrib, key & TRIG_NOW, argv, nargs, 0);
 
 	/*
-     * XXX be more descriptive as to what was triggered?
-     */
+	 * XXX be more descriptive as to what was triggered?
+	 */
 	if (!(key & TRIG_QUIET) && !Quiet(player))
 	{
 		notify_quiet(player, "Triggered.");
@@ -1889,8 +1889,8 @@ void do_use(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
 	}
 
 	/*
-     * Make sure player can use it
-     */
+	 * Make sure player can use it
+	 */
 
 	if (!could_doit(player, thing, A_LUSE))
 	{
@@ -1944,8 +1944,8 @@ void do_setvattr(dbref player, dbref cause, __attribute__((unused)) int key, cha
 	char *s;
 	int anum;
 	arg1++; /*
-				 * skip the '&'
-				 */
+			 * skip the '&'
+			 */
 
 	for (s = arg1; *s && !isspace(*s); s++)
 		; /*
@@ -1957,12 +1957,12 @@ void do_setvattr(dbref player, dbref cause, __attribute__((unused)) int key, cha
 	{
 		*s++ = '\0';
 	}					 /*
-
-				 * split it
-				 */
+				   
+				   * split it
+				   */
 	anum = mkattr(arg1); /*
-				 * Get or make attribute
-				 */
+						  * Get or make attribute
+						  */
 
 	if (anum <= 0)
 	{

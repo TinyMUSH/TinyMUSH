@@ -4,11 +4,11 @@
  * @brief Routines for moving about
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -196,7 +196,7 @@ void move_object(dbref thing, dbref dest)
      */
     look_in(thing, dest, (LK_SHOWEXIT | LK_OBEYTERSE));
 
-    if (isPlayer(thing) && (mushconf.payfind > 0) && (Pennies(thing) < mushconf.paylimit) && (!Controls(thing, dest)) && (random_range(0, (mushconf.payfind)-1) == 0))
+    if (isPlayer(thing) && (mushconf.payfind > 0) && (Pennies(thing) < mushconf.paylimit) && (!Controls(thing, dest)) && (random_range(0, (mushconf.payfind) - 1) == 0))
     {
         giveto(thing, 1);
         notify_check(thing, thing, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You found a %s!", mushconf.one_coin);
@@ -486,8 +486,8 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
 
     default:
         /*
-	 * EMPTY
-	 */
+         * EMPTY
+         */
         break;
     }
 
@@ -550,14 +550,14 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
         if ((loc = Location(player)) != NOTHING && !Dark(player) && !Dark(loc))
         {
             /*
-	     * tell all
-	     */
+             * tell all
+             */
             notify_except(loc, player, player, MSG_MOVE, "%s goes home.", Name(player));
         }
 
         /*
-	 * give the player the messages
-	 */
+         * give the player the messages
+         */
 
         for (i = 0; i < 3; i++)
         {
@@ -685,8 +685,8 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
     case TYPE_PLAYER:
     case TYPE_THING:
         /*
-	 * You can't take what you already have
-	 */
+         * You can't take what you already have
+         */
         thingloc = Location(thing);
 
         if (thingloc == player)
@@ -736,8 +736,8 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
 
     case TYPE_EXIT:
         /*
-	 * You can't take what you already have
-	 */
+         * You can't take what you already have
+         */
         thingloc = Exits(thing);
 
         if (thingloc == player)
@@ -747,8 +747,8 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
         }
 
         /*
-	 * You must control either the exit or the location
-	 */
+         * You must control either the exit or the location
+         */
         playerloc = Location(player);
 
         if (!Controls(player, thing) && !Controls(player, playerloc))
@@ -758,8 +758,8 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
         }
 
         /*
-	 * Do it
-	 */
+         * Do it
+         */
         s_Exits(thingloc, remove_first(Exits(thingloc), thing));
         s_Exits(player, insert_first(Exits(player), thing));
         s_Exits(thing, player);
@@ -814,8 +814,8 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
     case TYPE_PLAYER:
 
         /*
-	 * You have to be carrying it
-	 */
+         * You have to be carrying it
+         */
         if (((Location(thing) != player) && !Wizard(player)) || (!could_doit(player, thing, A_LDROP)))
         {
             did_it(player, thing, A_DFAIL, "You can't drop that.", A_ODFAIL, NULL, A_ADFAIL, 0, (char **)NULL, 0, MSG_MOVE);
@@ -823,8 +823,8 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
         }
 
         /*
-	 * Move it
-	 */
+         * Move it
+         */
         move_via_generic(thing, Location(player), player, 0);
         notify(thing, "Dropped.");
         quiet = 0;
@@ -841,16 +841,16 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
         did_it(player, thing, A_DROP, "Dropped.", oattr, buf, aattr, 0, (char **)NULL, 0, MSG_MOVE);
         XFREE(buf);
         /*
-	 * Process droptos
-	 */
+         * Process droptos
+         */
         process_dropped_dropto(thing, player);
         break;
 
     case TYPE_EXIT:
 
         /*
-	 * You have to be carrying it
-	 */
+         * You have to be carrying it
+         */
         if ((Exits(thing) != player) && !Wizard(player))
         {
             notify(player, "You can't drop that.");
@@ -864,8 +864,8 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
         }
 
         /*
-	 * Do it
-	 */
+         * Do it
+         */
         exitloc = Exits(thing);
         s_Exits(exitloc, remove_first(Exits(exitloc), thing));
         s_Exits(loc, insert_first(Exits(loc), thing));

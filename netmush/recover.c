@@ -5,11 +5,11 @@
  *        tags, and rebuild a consistent database.
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -40,13 +40,13 @@ typedef struct
 	char start_tag[4];
 	int hash_value;		   /* The complete 31 bit value. */
 	char key_start[SMALL]; /* Up to the first SMALL bytes of the
-                     * key.  */
+							* key.  */
 	off_t data_pointer;	   /* The file address of the key record.
-                     * The data record directly follows
-                     * the key.  */
+							* The data record directly follows
+							* the key.  */
 	int key_size;		   /* Size of key data in the file. */
 	int data_size;		   /* Size of associated data in the
-                     * file. */
+							* file. */
 } bucket_element;
 
 void gdbm_panic(const char *mesg)
@@ -99,8 +99,8 @@ int dbrecover(int argc, char *argv[])
 	}
 
 	/*
-     * Open files
-     */
+	 * Open files
+	 */
 
 	if ((dbp = gdbm_open(outfile, 8192, GDBM_WRCREAT, 0600, gdbm_panic)) == NULL)
 	{
@@ -120,14 +120,14 @@ int dbrecover(int argc, char *argv[])
 	while (fread((void *)&cp, 1, 1, f) != 0)
 	{
 		/*
-	 * Quick and dirty
-	 */
+		 * Quick and dirty
+		 */
 		if (cp == 'T')
 		{
 			filepos = ftell(f);
 			/*
-	     * Rewind one byte
-	     */
+			 * Rewind one byte
+			 */
 			fseek(f, -1, SEEK_CUR);
 
 			if (fread((void *)&be, sizeof(bucket_element), 1, f) == 0)
@@ -137,16 +137,16 @@ int dbrecover(int argc, char *argv[])
 			}
 
 			/*
-	     * Check the tag to make sure it's correct, and
-	     * * make sure the pointer and sizes are sane
-	     */
+			 * Check the tag to make sure it's correct, and
+			 * * make sure the pointer and sizes are sane
+			 */
 
 			if (!memcmp((void *)(be.start_tag), (void *)"TM3S", 4) && be.data_pointer < filesize && be.key_size < filesize && be.data_size < filesize)
 			{
 				filepos = ftell(f);
 				/*
-		 * Seek to where the data begins
-		 */
+				 * Seek to where the data begins
+				 */
 				fseek(f, be.data_pointer, SEEK_SET);
 				key.dptr = (char *)XMALLOC(be.key_size, "key.dptr");
 				key.dsize = be.key_size;
@@ -174,16 +174,16 @@ int dbrecover(int argc, char *argv[])
 				XFREE(key.dptr);
 				XFREE(dat.dptr);
 				/*
-		 * Seek back to where we left off
-		 */
+				 * Seek back to where we left off
+				 */
 				fseek(f, filepos, SEEK_SET);
 			}
 			else
 			{
 				/*
-		 * Seek back to one byte after we started
-		 * * and continue
-		 */
+				 * Seek back to one byte after we started
+				 * * and continue
+				 */
 				fseek(f, filepos, SEEK_SET);
 			}
 		}

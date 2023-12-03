@@ -4,11 +4,11 @@
  * @brief multiguest code originally ported from DarkZone
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -189,7 +189,7 @@ char *make_guest(DESC *d)
     int i;
     dbref guest;
     char *name = XMALLOC(SBUF_SIZE, "name");
-    
+
     /*
      * Nuke extra guests.
      */

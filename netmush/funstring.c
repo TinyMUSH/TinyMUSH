@@ -4,11 +4,11 @@
  * @brief String functions
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -23,8 +23,8 @@
 #include <string.h>
 
 /**
- * @brief Is every character in the argument a letter? 
- * 
+ * @brief Is every character in the argument a letter?
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -53,7 +53,7 @@ void fun_isword(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief isalnum: is every character in the argument a letter or number?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -82,7 +82,7 @@ void fun_isalnum(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Is the argument a number?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -100,7 +100,7 @@ void fun_isnum(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Is the argument a valid dbref?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -120,9 +120,9 @@ void fun_isdbref(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	{
 		if (*p)
 		{
-			/** 
-			 * just the string '#' won't do! 
-			 * 
+			/**
+			 * just the string '#' won't do!
+			 *
 			 */
 			dbitem = parse_dbref_only(p);
 
@@ -139,7 +139,7 @@ void fun_isdbref(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 /**
  * @brief Is the argument a valid objid?
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -159,9 +159,9 @@ void fun_isobjid(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	{
 		if (*p)
 		{
-			/** 
-			 * just the string '#' won't do! 
-			 * 
+			/**
+			 * just the string '#' won't do!
+			 *
 			 */
 			dbitem = parse_objid(p, NULL);
 
@@ -179,10 +179,10 @@ void fun_isobjid(char *buff, char **bufc, dbref player __attribute__((unused)), 
 /**
  * @brief Just eat the contents of the string. Handy for those times when
  *        you've output a bunch of junk in a function call and just want to
- *        dispose of the output (like if you've done an iter() that just did 
+ *        dispose of the output (like if you've done an iter() that just did
  *        a bunch of side-effects, and now you have bunches of spaces you need
  *        to get rid of.
- * 
+ *
  * @param buff Not used
  * @param bufc Not used
  * @param player Not used
@@ -200,9 +200,9 @@ void fun_null(char *buff __attribute__((unused)), char **bufc __attribute__((unu
 /**
  * @brief Squash occurrences of a given character down to 1. We do this
  *        both on leading and trailing chars, as well as internal ones; if the
- *        player wants to trim off the leading and trailing as well, they can 
+ *        player wants to trim off the leading and trailing as well, they can
  *        always call trim().
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -239,7 +239,7 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		/**
 		 * Move over and copy the non-sep characters
-		 * 
+		 *
 		 */
 		while (*tp && *tp != isep.str[0])
 		{
@@ -255,7 +255,7 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 		/**
 		 * If we've reached the end of the string, leave the loop.
-		 * 
+		 *
 		 */
 		if (!*tp)
 		{
@@ -268,7 +268,7 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		 * overwriting our own string as we do this. However, the
 		 * other pointer will always be ahead of our current copy
 		 * pointer.
-		 * 
+		 *
 		 */
 		*bp++ = *tp++;
 
@@ -279,16 +279,16 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	/**
-     * Must terminate the string
-	 * 
-     */
+	 * Must terminate the string
+	 *
+	 */
 	*bp = '\0';
 	SAFE_LB_STR(fargs[0], buff, bufc);
 }
 
 /**
  * @brief Trim off unwanted white space.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -345,9 +345,9 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	p = fargs[0];
 
 	/**
-     * Single-character delimiters are easy.
-	 * 
-     */
+	 * Single-character delimiters are easy.
+	 *
+	 */
 	if (isep.len == 1)
 	{
 		if (trim & TRIM_L)
@@ -383,9 +383,9 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	/**
-     * Multi-character delimiters take more work.
-	 * 
-     */
+	 * Multi-character delimiters take more work.
+	 *
+	 */
 	ep = p + strlen(fargs[0]) - 1; /*!< last char in string */
 
 	if (trim & TRIM_L)
@@ -437,7 +437,7 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 /**
  * @brief Return substring after a specified string.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -467,9 +467,9 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	mp = fargs[1]; /*!< needle */
 
 	/**
-     * Sanity-check arg1 and arg2
-	 * 
-     */
+	 * Sanity-check arg1 and arg2
+	 *
+	 */
 	if (bp == NULL)
 	{
 		bp = "";
@@ -491,9 +491,9 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 
 	/**
-     * Get ansi state of the first needle char
-	 * 
-     */
+	 * Get ansi state of the first needle char
+	 *
+	 */
 	ansi_needle = ANST_NONE;
 
 	while (*mp == ESC_CHAR)
@@ -511,7 +511,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 					if (*(mp) < 0x3a)
 					{
 						param_val <<= 1;
-						param_val += (param_val << 2) + (*(mp)&0x0f);
+						param_val += (param_val << 2) + (*(mp) & 0x0f);
 					}
 					else
 					{
@@ -524,7 +524,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 					}
 				}
 			}
-			while ((*(mp)&0xf0) == 0x20)
+			while ((*(mp) & 0xf0) == 0x20)
 			{
 				++(mp);
 			}
@@ -553,9 +553,9 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	ansi_haystack = ANST_NORMAL;
 
 	/**
-     * Look for the needle string
-	 * 
-     */
+	 * Look for the needle string
+	 *
+	 */
 	while (*bp)
 	{
 		while (*bp == ESC_CHAR)
@@ -573,7 +573,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 						if (*(bp) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(bp)&0x0f);
+							param_val += (param_val << 2) + (*(bp) & 0x0f);
 						}
 						else
 						{
@@ -586,7 +586,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 						}
 					}
 				}
-				while ((*(bp)&0xf0) == 0x20)
+				while ((*(bp) & 0xf0) == 0x20)
 				{
 					++(bp);
 				}
@@ -610,9 +610,9 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		if ((*bp == *mp) && (ansi_needle == ANST_NONE || ansi_haystack == ansi_needle))
 		{
 			/**
-		     * See if what follows is what we are looking for
-			 * 
-		     */
+			 * See if what follows is what we are looking for
+			 *
+			 */
 			ansi_needle2 = ansi_needle;
 			ansi_haystack2 = ansi_haystack;
 			cp = bp;
@@ -635,7 +635,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 								if (*(cp) < 0x3a)
 								{
 									param_val <<= 1;
-									param_val += (param_val << 2) + (*(cp)&0x0f);
+									param_val += (param_val << 2) + (*(cp) & 0x0f);
 								}
 								else
 								{
@@ -648,7 +648,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 								}
 							}
 						}
-						while ((*(cp)&0xf0) == 0x20)
+						while ((*(cp) & 0xf0) == 0x20)
 						{
 							++(cp);
 						}
@@ -684,7 +684,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 								if (*(np) < 0x3a)
 								{
 									param_val <<= 1;
-									param_val += (param_val << 2) + (*(np)&0x0f);
+									param_val += (param_val << 2) + (*(np) & 0x0f);
 								}
 								else
 								{
@@ -697,7 +697,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 								}
 							}
 						}
-						while ((*(np)&0xf0) == 0x20)
+						while ((*(np) & 0xf0) == 0x20)
 						{
 							++(np);
 						}
@@ -730,7 +730,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 			{
 				/**
 				 * Yup, return what follows
-				 * 
+				 *
 				 */
 				buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2);
 				SAFE_LB_STR(buf, buff, bufc);
@@ -742,7 +742,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 		/**
 		 * Nope, continue searching
-		 * 
+		 *
 		 */
 		if (*bp)
 		{
@@ -751,15 +751,15 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 
 	/**
-     * Ran off the end without finding it
-	 * 
-     */
+	 * Ran off the end without finding it
+	 *
+	 */
 	return;
 }
 
 /**
  * @brief Return substring before a specified string.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -789,9 +789,9 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	mp = fargs[1];		 /*!< needle */
 
 	/**
-     * Sanity-check arg1 and arg2
-	 * 
-     */
+	 * Sanity-check arg1 and arg2
+	 *
+	 */
 	if (haystack == NULL)
 	{
 		haystack = "";
@@ -815,9 +815,9 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	bp = haystack;
 
 	/**
-     * Get ansi state of the first needle char
-	 * 
-     */
+	 * Get ansi state of the first needle char
+	 *
+	 */
 	ansi_needle = ANST_NONE;
 
 	while (*mp == ESC_CHAR)
@@ -835,7 +835,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 					if (*(mp) < 0x3a)
 					{
 						param_val <<= 1;
-						param_val += (param_val << 2) + (*(mp)&0x0f);
+						param_val += (param_val << 2) + (*(mp) & 0x0f);
 					}
 					else
 					{
@@ -848,7 +848,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 					}
 				}
 			}
-			while ((*(mp)&0xf0) == 0x20)
+			while ((*(mp) & 0xf0) == 0x20)
 			{
 				++(mp);
 			}
@@ -877,14 +877,14 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	ansi_haystack = ANST_NORMAL;
 
 	/**
-     * Look for the needle string
-	 * 
-     */
+	 * Look for the needle string
+	 *
+	 */
 	while (*bp)
 	{
 		/**
 		 * See if what follows is what we are looking for
-		 * 
+		 *
 		 */
 		ansi_needle2 = ansi_needle;
 		ansi_haystack2 = ansi_haystack;
@@ -908,7 +908,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 							if (*(cp) < 0x3a)
 							{
 								param_val <<= 1;
-								param_val += (param_val << 2) + (*(cp)&0x0f);
+								param_val += (param_val << 2) + (*(cp) & 0x0f);
 							}
 							else
 							{
@@ -921,7 +921,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 							}
 						}
 					}
-					while ((*(cp)&0xf0) == 0x20)
+					while ((*(cp) & 0xf0) == 0x20)
 					{
 						++(cp);
 					}
@@ -957,7 +957,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 							if (*(np) < 0x3a)
 							{
 								param_val <<= 1;
-								param_val += (param_val << 2) + (*(np)&0x0f);
+								param_val += (param_val << 2) + (*(np) & 0x0f);
 							}
 							else
 							{
@@ -970,7 +970,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 							}
 						}
 					}
-					while ((*(np)&0xf0) == 0x20)
+					while ((*(np) & 0xf0) == 0x20)
 					{
 						++(np);
 					}
@@ -1002,9 +1002,9 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		if (!*np)
 		{
 			/**
-		     * Yup, return what came before this
-			 * 
-		     */
+			 * Yup, return what came before this
+			 *
+			 */
 			*bp = '\0';
 			SAFE_LB_STR(haystack, buff, bufc);
 			buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL);
@@ -1015,7 +1015,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 		/**
 		 * Nope, continue searching
-		 * 
+		 *
 		 */
 		while (*bp == ESC_CHAR)
 		{
@@ -1032,7 +1032,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						if (*(bp) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(bp)&0x0f);
+							param_val += (param_val << 2) + (*(bp) & 0x0f);
 						}
 						else
 						{
@@ -1045,7 +1045,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						}
 					}
 				}
-				while ((*(bp)&0xf0) == 0x20)
+				while ((*(bp) & 0xf0) == 0x20)
 				{
 					++(bp);
 				}
@@ -1073,9 +1073,9 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	}
 
 	/**
-     * Ran off the end without finding it
-	 * 
-     */
+	 * Ran off the end without finding it
+	 *
+	 */
 	SAFE_LB_STR(haystack, buff, bufc);
 	return;
 }
@@ -1087,7 +1087,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Lowercase string
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1120,7 +1120,7 @@ void fun_lcstr(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Uppercase string
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1153,7 +1153,7 @@ void fun_ucstr(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Capitalize string
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1180,7 +1180,7 @@ void fun_capstr(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Make spaces.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1209,7 +1209,7 @@ void fun_space(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		/**
 		 * If negative or zero spaces return a single space, -except-
 		 * allow 'space(0)' to return "" for calculated padding
-		 * 
+		 *
 		 */
 		if (!is_integer(fargs[0]) || (num != 0))
 		{
@@ -1231,7 +1231,7 @@ void fun_space(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Left justify string, specifying fill character
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1256,14 +1256,14 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	SAFE_LB_STR(fargs[0], buff, bufc);
 
 	/**
-     * Sanitize number of spaces
-	 * 
-     */
+	 * Sanitize number of spaces
+	 *
+	 */
 	if (spaces <= 0)
 	{
-		/** 
-		 * no padding needed, just return string 
-		 * 
+		/**
+		 * no padding needed, just return string
+		 *
 		 */
 		return;
 	}
@@ -1281,27 +1281,27 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		if (slen == 0)
 		{
 			/**
-		     * NULL character fill
-			 * 
-		     */
+			 * NULL character fill
+			 *
+			 */
 			XMEMSET(tp, ' ', spaces);
 			tp += spaces;
 		}
 		else if (slen == 1)
 		{
 			/**
-		     * single character fill
-			 * 
-		     */
+			 * single character fill
+			 *
+			 */
 			XMEMSET(tp, *fillchars, spaces);
 			tp += spaces;
 		}
 		else
 		{
 			/**
-		     * multi character fill
-			 * 
-		     */
+			 * multi character fill
+			 *
+			 */
 			for (i = spaces; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1312,7 +1312,7 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 			{
 				/**
 				 * we have a remainder here
-				 * 
+				 *
 				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
@@ -1325,7 +1325,7 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	{
 		/**
 		 * no fill character specified
-		 * 
+		 *
 		 */
 		XMEMSET(tp, ' ', spaces);
 		tp += spaces;
@@ -1337,7 +1337,7 @@ void fun_ljust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Right justify string, specifying fill character
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1361,14 +1361,14 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
 
 	/**
-     * Sanitize number of spaces
-	 * 
-     */
+	 * Sanitize number of spaces
+	 *
+	 */
 	if (spaces <= 0)
 	{
 		/**
 		 * no padding needed, just return string
-		 * 
+		 *
 		 */
 		SAFE_LB_STR(fargs[0], buff, bufc);
 		return;
@@ -1387,27 +1387,27 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 		if (slen == 0)
 		{
 			/**
-		     * NULL character fill
-			 * 
-		     */
+			 * NULL character fill
+			 *
+			 */
 			XMEMSET(tp, ' ', spaces);
 			tp += spaces;
 		}
 		else if (slen == 1)
 		{
 			/**
-		     * single character fill
-			 * 
-		     */
+			 * single character fill
+			 *
+			 */
 			XMEMSET(tp, *fillchars, spaces);
 			tp += spaces;
 		}
 		else
 		{
 			/**
-		     * multi character fill
-			 * 
-		     */
+			 * multi character fill
+			 *
+			 */
 			for (i = spaces; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1418,7 +1418,7 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 			{
 				/**
 				 * we have a remainder here
-				 * 
+				 *
 				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
@@ -1431,7 +1431,7 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	{
 		/**
 		 * no fill character specified
-		 * 
+		 *
 		 */
 		XMEMSET(tp, ' ', spaces);
 		tp += spaces;
@@ -1443,7 +1443,7 @@ void fun_rjust(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Center string, specifying fill character
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1488,27 +1488,27 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		if (slen == 0)
 		{
 			/**
-		     * NULL character fill
-			 * 
-		     */
+			 * NULL character fill
+			 *
+			 */
 			XMEMSET(tp, ' ', lead_chrs);
 			tp += lead_chrs;
 		}
 		else if (slen == 1)
 		{
 			/**
-		     * single character fill
-			 * 
-		     */
+			 * single character fill
+			 *
+			 */
 			XMEMSET(tp, *fillchars, lead_chrs);
 			tp += lead_chrs;
 		}
 		else
 		{
 			/**
-		     * multi character fill
-			 * 
-		     */
+			 * multi character fill
+			 *
+			 */
 			for (i = lead_chrs; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1519,7 +1519,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 			{
 				/**
 				 * we have a remainder here
-				 * 
+				 *
 				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
@@ -1532,7 +1532,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	{
 		/**
 		 * no fill character specified
-		 * 
+		 *
 		 */
 		XMEMSET(tp, ' ', lead_chrs);
 		tp += lead_chrs;
@@ -1550,27 +1550,27 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		if (slen == 0)
 		{
 			/**
-		     * NULL character fill
-			 * 
-		     */
+			 * NULL character fill
+			 *
+			 */
 			XMEMSET(tp, ' ', trail_chrs);
 			tp += trail_chrs;
 		}
 		else if (slen == 1)
 		{
 			/**
-		     * single character fill
-			 * 
-		     */
+			 * single character fill
+			 *
+			 */
 			XMEMSET(tp, *fillchars, trail_chrs);
 			tp += trail_chrs;
 		}
 		else
 		{
 			/**
-		     * multi character fill
-			 * 
-		     */
+			 * multi character fill
+			 *
+			 */
 			for (i = trail_chrs; i >= slen; i -= slen)
 			{
 				XMEMCPY(tp, fillchars, slen);
@@ -1581,7 +1581,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 			{
 				/**
 				 * we have a remainder here
-				 * 
+				 *
 				 */
 				XMEMCPY(tp, fillchars, i);
 				tp += i;
@@ -1592,7 +1592,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 	{
 		/**
 		 * no fill character specified
-		 * 
+		 *
 		 */
 		XMEMSET(tp, ' ', trail_chrs);
 		tp += trail_chrs;
@@ -1604,7 +1604,7 @@ void fun_center(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 /**
  * @brief Returns first n characters in a string
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1643,7 +1643,7 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -1656,7 +1656,7 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -1690,8 +1690,8 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 }
 
 /**
- * @brief fun_right: Returns last n characters in a string 
- * 
+ * @brief fun_right: Returns last n characters in a string
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1743,7 +1743,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 					if (*(s) < 0x3a)
 					{
 						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s)&0x0f);
+						param_val += (param_val << 2) + (*(s) & 0x0f);
 					}
 					else
 					{
@@ -1756,7 +1756,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 					}
 				}
 			}
-			while ((*(s)&0xf0) == 0x20)
+			while ((*(s) & 0xf0) == 0x20)
 			{
 				++(s);
 			}
@@ -1796,7 +1796,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -1809,7 +1809,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -1843,7 +1843,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief If the line ends with CRLF, CR, or LF, chop it off
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1873,7 +1873,7 @@ void fun_chomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Exact-string compare
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1904,7 +1904,7 @@ void fun_comp(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 /**
  * @brief non-case-sensitive string compare
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1922,7 +1922,7 @@ void fun_streq(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief wildcard string compare
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1936,15 +1936,15 @@ void fun_streq(char *buff, char **bufc, dbref player __attribute__((unused)), db
 void fun_strmatch(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/**
-     * Check if we match the whole string.  If so, return 1
-	 * 
-     */
+	 * Check if we match the whole string.  If so, return 1
+	 *
+	 */
 	SAFE_BOOL(buff, bufc, quick_wild(fargs[1], fargs[0]));
 }
 
 /**
  * @brief Edit text.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1969,7 +1969,7 @@ void fun_edit(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  *        replacing characters in string1 that are the same as the given
  *        character by the corresponding character in string2 (by position).
  *        The strings must be of the same length.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -1985,9 +1985,9 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	char *str = NULL, *rep = NULL, c = 0;
 
 	/**
-     * do length checks first
-	 * 
-     */
+	 * do length checks first
+	 *
+	 */
 	if (strlen(fargs[0]) != strlen(fargs[1]))
 	{
 		SAFE_LB_STR("#-1 STRING LENGTHS MUST BE EQUAL", buff, bufc);
@@ -2001,9 +2001,9 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 
 	/**
-     * find the character to look for. null character is considered a space
-	 * 
-     */
+	 * find the character to look for. null character is considered a space
+	 *
+	 */
 	if (!*fargs[2])
 	{
 		c = ' ';
@@ -2014,9 +2014,9 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 
 	/**
-     * walk strings, copy from the appropriate string
-	 * 
-     */
+	 * walk strings, copy from the appropriate string
+	 *
+	 */
 	for (str = fargs[0], rep = fargs[1]; *str && *rep && ((*bufc - buff) < (LBUF_SIZE - 1)); str++, rep++, (*bufc)++)
 	{
 		if (*str == c)
@@ -2034,7 +2034,7 @@ void fun_merge(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 /**
  * @brief Returns <string> after replacing the characters [](){};,%\$ with spaces.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2081,10 +2081,10 @@ void fun_secure(char *buff, char **bufc, dbref player __attribute__((unused)), d
 }
 
 /**
- * @brief Returns <string> after adding an escape character (\) at the start 
- *        of the string and also before each of the characters %;[]{}\ that 
+ * @brief Returns <string> after adding an escape character (\) at the start
+ *        of the string and also before each of the characters %;[]{}\ that
  *        appear in the string.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2141,7 +2141,7 @@ void fun_escape(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @brief Less aggressive escape; it does not put a \ at the start of the
  *        string, and it only escapes %[]\ -- making it more suitable for
  *        strings that you simply don't want evaluated.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2187,7 +2187,7 @@ void fun_esc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief Remove all of a set of characters from a string.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -2209,9 +2209,9 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	}
 
 	/**
-     * Output delimiter should default to null, not a space
-	 * 
-     */
+	 * Output delimiter should default to null, not a space
+	 *
+	 */
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 3, buff, bufc))
 	{
 		return;
@@ -2248,13 +2248,13 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 /**
  * @brief Highlight a string using ANSI terminal effects.
- * 
+ *
  * +colorname
  * #RRGGBB <#RRGGBB>
  * <RR GG BB>
  * XTERN
  * Old Style
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player Not used
@@ -2289,8 +2289,8 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	XFREE(s);
 
 	/**
-	 * Now that normal ansi has been done, time for xterm 
-	 * 
+	 * Now that normal ansi has been done, time for xterm
+	 *
 	 */
 	s = fargs[0];
 
@@ -2299,17 +2299,17 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		XMEMSET(xtbuf, 0, SBUF_SIZE);
 		if (*s == '<' || *s == '/')
 		{
-			/** 
-			 * Xterm colors 
-			 * 
+			/**
+			 * Xterm colors
+			 *
 			 */
 			int xterm_isbg = 0, i = 0;
 
 			if (*s == '/')
 			{
-				/** 
-				 * We are dealing with background 
-				 * 
+				/**
+				 * We are dealing with background
+				 *
 				 */
 				s++;
 
@@ -2324,18 +2324,18 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 			}
 			else
 			{
-				/** 
-				 * We are dealing with foreground 
-				 * 
+				/**
+				 * We are dealing with foreground
+				 *
 				 */
 				xterm_isbg = 0;
 			}
 
 			if (*s == '<')
 			{
-				/** 
-				 * Ok we got a color to process 
-				 * 
+				/**
+				 * Ok we got a color to process
+				 *
 				 */
 				s++;
 
@@ -2359,9 +2359,9 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 				*xtp = '\0';
 
-				/** 
-				 * Now we have the color string... Time to handle it 
-				 * 
+				/**
+				 * Now we have the color string... Time to handle it
+				 *
 				 */
 				i = str2xterm(xtbuf);
 
@@ -2397,7 +2397,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	}
 
 	XFREE(xtbuf);
-	
+
 	s = fargs[1];
 
 	while (*s)
@@ -2417,7 +2417,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -2430,7 +2430,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -2525,10 +2525,10 @@ void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
 	SAFE_LB_STR(text, buff, bufc);
 
 	/*
-     * Encryption: Simply go through each character of the text, get its
-     * ascii value, subtract LO, add the ascii value (less LO) of the
-     * code, mod the result, add LO. Continue
-     */
+	 * Encryption: Simply go through each character of the text, get its
+	 * ascii value, subtract LO, add the ascii value (less LO) of the
+	 * code, mod the result, add LO. Continue
+	 */
 	while (*p)
 	{
 		if ((*p >= CRYPTCODE_LO) && (*p <= CRYPTCODE_HI))
@@ -2697,7 +2697,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 					if (*(s) < 0x3a)
 					{
 						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s)&0x0f);
+						param_val += (param_val << 2) + (*(s) & 0x0f);
 					}
 					else
 					{
@@ -2710,7 +2710,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 					}
 				}
 			}
-			while ((*(s)&0xf0) == 0x20)
+			while ((*(s) & 0xf0) == 0x20)
 			{
 				++(s);
 			}
@@ -2750,7 +2750,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -2763,7 +2763,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -2811,7 +2811,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -2824,7 +2824,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -2873,8 +2873,8 @@ void fun_translate(char *buff, char **bufc, dbref player __attribute__((unused))
 	}
 
 	/*
-     * Strictly speaking, we're just checking the first char
-     */
+	 * Strictly speaking, we're just checking the first char
+	 */
 
 	if (nfargs > 1 && (fargs[1][0] == 's' || fargs[1][0] == '0'))
 	{
@@ -3139,7 +3139,7 @@ void fun_ansipos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -3152,7 +3152,7 @@ void fun_ansipos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -3295,8 +3295,8 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 	while (1)
 	{
 		/*
-	 * Locate the next start-of-word (SW)
-	 */
+		 * Locate the next start-of-word (SW)
+		 */
 		for (sw = ew, sw_ansi_state = ew_ansi_state, sw_pos = ew_pos; *sw; ++sw)
 		{
 			switch (*sw)
@@ -3315,7 +3315,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 							if (*(sw) < 0x3a)
 							{
 								param_val <<= 1;
-								param_val += (param_val << 2) + (*(sw)&0x0f);
+								param_val += (param_val << 2) + (*(sw) & 0x0f);
 							}
 							else
 							{
@@ -3328,7 +3328,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 							}
 						}
 					}
-					while ((*(sw)&0xf0) == 0x20)
+					while ((*(sw) & 0xf0) == 0x20)
 					{
 						++(sw);
 					}
@@ -3368,25 +3368,25 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		}
 
 		/*
-	 * Three ways out of that loop: end-of-string (ES),
-	 * end-of-line (EL), and start-of-word (SW)
-	 */
+		 * Three ways out of that loop: end-of-string (ES),
+		 * end-of-line (EL), and start-of-word (SW)
+		 */
 		if (!*sw && sl == NULL)
 		{ /* ES, and nothing left to output */
 			break;
 		}
 
 		/*
-	 * Decide where start-of-line (SL) was
-	 */
+		 * Decide where start-of-line (SL) was
+		 */
 		if (sl == NULL)
 		{
 			if (ew == fargs[0] || ew[-1] == '\n')
 			{
 				/*
-		 * Preserve indentation at SS or after
-		 * explicit EL
-		 */
+				 * Preserve indentation at SS or after
+				 * explicit EL
+				 */
 				sl = ew;
 				sl_ansi_state = ew_ansi_state;
 				sl_pos = ew_pos;
@@ -3394,9 +3394,9 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 			else
 			{
 				/*
-		 * Discard whitespace if previous line
-		 * wrapped
-		 */
+				 * Discard whitespace if previous line
+				 * wrapped
+				 */
 				sl = sw;
 				sl_ansi_state = sw_ansi_state;
 				sl_pos = sw_pos;
@@ -3412,8 +3412,8 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		else
 		{
 			/*
-	     * Locate the next end-of-word (EW)
-	     */
+			 * Locate the next end-of-word (EW)
+			 */
 			for (ew = sw, ew_ansi_state = sw_ansi_state, ew_pos = sw_pos; *ew; ++ew)
 			{
 				switch (*ew)
@@ -3432,7 +3432,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 								if (*(ew) < 0x3a)
 								{
 									param_val <<= 1;
-									param_val += (param_val << 2) + (*(ew)&0x0f);
+									param_val += (param_val << 2) + (*(ew) & 0x0f);
 								}
 								else
 								{
@@ -3445,7 +3445,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 								}
 							}
 						}
-						while ((*(ew)&0xf0) == 0x20)
+						while ((*(ew) & 0xf0) == 0x20)
 						{
 							++(ew);
 						}
@@ -3472,8 +3472,8 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 					*ew = ' ';
 
 					/*
-		     * FALLTHRU
-		     */
+					 * FALLTHRU
+					 */
 				case ' ':
 				case '\n':
 					break;
@@ -3484,8 +3484,8 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 				default:
 
 					/*
-		     * Break up long words
-		     */
+					 * Break up long words
+					 */
 					if (ew_pos - sw_pos == width)
 					{
 						break;
@@ -3499,12 +3499,12 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 			}
 
 			/*
-	     * Three ways out of that loop: ES, EL, EW
-	     */
+			 * Three ways out of that loop: ES, EL, EW
+			 */
 
 			/*
-	     * If it fits on the line, add it
-	     */
+			 * If it fits on the line, add it
+			 */
 			if (ew_pos - sl_pos <= width)
 			{
 				el = ew;
@@ -3513,22 +3513,22 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 			}
 
 			/*
-	     * If it's just EW, not ES or EL, and the line isn't
-	     * too long, keep adding words to the line
-	     */
+			 * If it's just EW, not ES or EL, and the line isn't
+			 * too long, keep adding words to the line
+			 */
 			if (*ew && *ew != '\n' && (ew_pos - sl_pos <= width))
 			{
 				continue;
 			}
 
 			/*
-	     * So now we definitely need to output a line
-	     */
+			 * So now we definitely need to output a line
+			 */
 		}
 
 		/*
-	 * Could be a blank line, no words fit
-	 */
+		 * Could be a blank line, no words fit
+		 */
 		if (el == NULL)
 		{
 			el = sw;
@@ -3537,21 +3537,21 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		}
 
 		/*
-	 * Newline if this isn't the first line
-	 */
+		 * Newline if this isn't the first line
+		 */
 		if (*bufc != bb_p)
 		{
 			SAFE_CRLF(buff, bufc);
 		}
 
 		/*
-	 * Left border text
-	 */
+		 * Left border text
+		 */
 		SAFE_LB_STR(l_fill, buff, bufc);
 
 		/*
-	 * Left space padding if needed
-	 */
+		 * Left space padding if needed
+		 */
 		if (just == JUST_RIGHT)
 		{
 			nleft = width - el_pos + sl_pos;
@@ -3580,25 +3580,25 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		}
 
 		/*
-	 * Restore previous ansi state
-	 */
+		 * Restore previous ansi state
+		 */
 		buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
 		SAFE_LB_STR(buf, buff, bufc);
 		XFREE(buf);
 		/*
-	 * Print the words
-	 */
+		 * Print the words
+		 */
 		SAFE_STRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
 		/*
-	 * Back to ansi normal
-	 */
+		 * Back to ansi normal
+		 */
 		buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
 		SAFE_LB_STR(buf, buff, bufc);
 		XFREE(buf);
 
 		/*
-	 * Right space padding if needed
-	 */
+		 * Right space padding if needed
+		 */
 		if (just == JUST_LEFT)
 		{
 			nleft = width - el_pos + sl_pos;
@@ -3627,42 +3627,42 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		}
 
 		/*
-	 * Right border text
-	 */
+		 * Right border text
+		 */
 		SAFE_LB_STR(r_fill, buff, bufc);
 
 		/*
-	 * Update pointers for the next line
-	 */
+		 * Update pointers for the next line
+		 */
 		if (!*el)
 		{
 			/*
-	     * ES, and nothing left to output
-	     */
+			 * ES, and nothing left to output
+			 */
 			break;
 		}
 		else if (*ew == '\n' && sw == ew)
 		{
 			/*
-	     * EL already handled on this line, and no new word
-	     * yet
-	     */
+			 * EL already handled on this line, and no new word
+			 * yet
+			 */
 			++ew;
 			sl = el = NULL;
 		}
 		else if (sl == sw)
 		{
 			/*
-	     * No new word yet
-	     */
+			 * No new word yet
+			 */
 			sl = el = NULL;
 		}
 		else
 		{
 			/*
-	     * ES with more to output, EL for next line, or just
-	     * a full line
-	     */
+			 * ES with more to output, EL for next line, or just
+			 * a full line
+			 */
 			sl = sw;
 			sl_ansi_state = sw_ansi_state;
 			sl_pos = sw_pos;
@@ -3697,8 +3697,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	int width = 0, just = 0, nleft = 0, max = 0, lead_chrs = 0;
 	int n_done = 0, pending_coaright = 0;
 	/*
-     * Parse the column widths and justifications
-     */
+	 * Parse the column widths and justifications
+	 */
 	col_widths = (int *)XCALLOC(n_cols, sizeof(int), "col_widths");
 	col_justs = (int *)XCALLOC(n_cols, sizeof(int), "col_justs");
 
@@ -3800,9 +3800,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 		for (i = 0; i < n_cols; i++)
 		{
 			/*
-	     * If this is the first column, and it's not our
-	     * first line, output a row separator.
-	     */
+			 * If this is the first column, and it's not our
+			 * first line, output a row separator.
+			 */
 			if ((i == 0) && (*bufc != bb_p))
 			{
 				print_separator(&row_sep, buff, bufc);
@@ -3810,35 +3810,35 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * If our column width is 0, we've coalesced and we
-	     * can safely continue.
-	     */
+			 * If our column width is 0, we've coalesced and we
+			 * can safely continue.
+			 */
 			if (col_widths[i] == 0)
 			{
 				continue;
 			}
 
 			/*
-	     * If this is not the first column of this line,
-	     * output a column separator.
-	     */
+			 * If this is not the first column of this line,
+			 * output a column separator.
+			 */
 			if (*bufc != l_p)
 			{
 				print_separator(&col_sep, buff, bufc);
 			}
 
 			/*
-	     * If we have a pending right-coalesce, we take care
-	     * of it now, though we save our previous width at
-	     * this stage, since we're going to output at that
-	     * width during this pass. We know we're not at width
-	     * 0 ourselves at this point, so we don't have to
-	     * worry about a cascading coalesce; it'll get taken
-	     * care of by the loop, automatically. If we have a
-	     * pending coalesce-right and we're at the first
-	     * column, we know that we overflowed and should just
-	     * clear it.
-	     */
+			 * If we have a pending right-coalesce, we take care
+			 * of it now, though we save our previous width at
+			 * this stage, since we're going to output at that
+			 * width during this pass. We know we're not at width
+			 * 0 ourselves at this point, so we don't have to
+			 * worry about a cascading coalesce; it'll get taken
+			 * care of by the loop, automatically. If we have a
+			 * pending coalesce-right and we're at the first
+			 * column, we know that we overflowed and should just
+			 * clear it.
+			 */
 			width = col_widths[i];
 
 			if (pending_coaright)
@@ -3850,10 +3850,10 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * If we're done and our column width is not zero,
-	     * and we are not repeating, we must fill in spaces
-	     * before we continue.
-	     */
+			 * If we're done and our column width is not zero,
+			 * and we are not repeating, we must fill in spaces
+			 * before we continue.
+			 */
 
 			if (col_done[i] && !(col_justs[i] & JUST_REPEAT))
 			{
@@ -3870,8 +3870,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * Restore our state variables
-	     */
+			 * Restore our state variables
+			 */
 			sl = xsl[i];
 			el = xel[i];
 			sw = xsw[i];
@@ -3889,8 +3889,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			while (1)
 			{
 				/*
-		 * Locate the next start-of-word (SW)
-		 */
+				 * Locate the next start-of-word (SW)
+				 */
 				for (sw = ew, sw_ansi_state = ew_ansi_state, sw_pos = ew_pos; *sw; ++sw)
 				{
 					switch (*sw)
@@ -3909,7 +3909,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 									if (*(sw) < 0x3a)
 									{
 										param_val <<= 1;
-										param_val += (param_val << 2) + (*(sw)&0x0f);
+										param_val += (param_val << 2) + (*(sw) & 0x0f);
 									}
 									else
 									{
@@ -3922,7 +3922,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 									}
 								}
 							}
-							while ((*(sw)&0xf0) == 0x20)
+							while ((*(sw) & 0xf0) == 0x20)
 							{
 								++(sw);
 							}
@@ -3964,32 +3964,32 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				}
 
 				/*
-		 * Three ways out of that locator loop:
-		 * end-of-string (ES), end-of-line (EL), and
-		 * start-of-word (SW)
-		 */
+				 * Three ways out of that locator loop:
+				 * end-of-string (ES), end-of-line (EL), and
+				 * start-of-word (SW)
+				 */
 
 				if (!*sw && sl == NULL)
 				{
 					/*
-		     * ES, and nothing left
-		     * * to output
-		     */
+					 * ES, and nothing left
+					 * * to output
+					 */
 					/*
-		     * If we're coalescing left, we set
-		     * this column to 0 width, and
-		     * increase the width of the left
-		     * column. If we're coalescing right,
-		     * we can't widen that column yet,
-		     * because otherwise it'll throw off
-		     * its width for this pass, so we've
-		     * got to do that later. If we're
-		     * repeating, we reset our pointer
-		     * state, but we keep track of our
-		     * done-ness. Don't increment done
-		     * more than once, since we might
-		     * repeat several times.
-		     */
+					 * If we're coalescing left, we set
+					 * this column to 0 width, and
+					 * increase the width of the left
+					 * column. If we're coalescing right,
+					 * we can't widen that column yet,
+					 * because otherwise it'll throw off
+					 * its width for this pass, so we've
+					 * got to do that later. If we're
+					 * repeating, we reset our pointer
+					 * state, but we keep track of our
+					 * done-ness. Don't increment done
+					 * more than once, since we might
+					 * repeat several times.
+					 */
 					if (!col_done[i])
 					{
 						n_done++;
@@ -3999,20 +3999,20 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					if (i && (just & JUST_COALEFT))
 					{
 						/*
-			 * Find the next-left column
-			 * with a nonzero width,
-			 * since we can have
-			 * casdading coalescing.
-			 */
+						 * Find the next-left column
+						 * with a nonzero width,
+						 * since we can have
+						 * casdading coalescing.
+						 */
 						for (n = i - 1; (n > 0) && (col_widths[n] == 0); n--)
 							;
 
 						/*
-			 * We have to add not only
-			 * the width of the column,
-			 * but the column separator
-			 * length.
-			 */
+						 * We have to add not only
+						 * the width of the column,
+						 * but the column separator
+						 * length.
+						 */
 						col_widths[n] += col_widths[i] + col_sep.len;
 						col_widths[i] = 0;
 					}
@@ -4031,20 +4031,20 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					}
 
 					break; /* get out of our infinite
-				 * while */
+							* while */
 				}
 
 				/*
-		 * Decide where start-of-line (SL) was
-		 */
+				 * Decide where start-of-line (SL) was
+				 */
 				if (sl == NULL)
 				{
 					if (ew == data[i] || ew[-1] == '\n')
 					{
 						/*
-			 * Preserve indentation at SS
-			 * or after explicit EL
-			 */
+						 * Preserve indentation at SS
+						 * or after explicit EL
+						 */
 						sl = ew;
 						sl_ansi_state = ew_ansi_state;
 						sl_pos = ew_pos;
@@ -4052,9 +4052,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					else
 					{
 						/*
-			 * Discard whitespace if
-			 * previous line wrapped
-			 */
+						 * Discard whitespace if
+						 * previous line wrapped
+						 */
 						sl = sw;
 						sl_ansi_state = sw_ansi_state;
 						sl_pos = sw_pos;
@@ -4064,9 +4064,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				if (*sw == '\n')
 				{
 					/*
-		     * EL, so we have to
-		     * * output
-		     */
+					 * EL, so we have to
+					 * * output
+					 */
 					ew = sw;
 					ew_ansi_state = sw_ansi_state;
 					ew_pos = sw_pos;
@@ -4075,8 +4075,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				else
 				{
 					/*
-		     * Locate the next end-of-word (EW)
-		     */
+					 * Locate the next end-of-word (EW)
+					 */
 					for (ew = sw, ew_ansi_state = sw_ansi_state, ew_pos = sw_pos; *ew; ++ew)
 					{
 						switch (*ew)
@@ -4095,7 +4095,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 										if (*(ew) < 0x3a)
 										{
 											param_val <<= 1;
-											param_val += (param_val << 2) + (*(ew)&0x0f);
+											param_val += (param_val << 2) + (*(ew) & 0x0f);
 										}
 										else
 										{
@@ -4108,7 +4108,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 										}
 									}
 								}
-								while ((*(ew)&0xf0) == 0x20)
+								while ((*(ew) & 0xf0) == 0x20)
 								{
 									++(ew);
 								}
@@ -4135,8 +4135,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 							*ew = ' ';
 
 							/*
-			     * FALLTHRU
-			     */
+							 * FALLTHRU
+							 */
 						case ' ':
 						case '\n':
 							break;
@@ -4147,9 +4147,9 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						default:
 
 							/*
-			     * Break up long
-			     * words
-			     */
+							 * Break up long
+							 * words
+							 */
 							if (ew_pos - sw_pos == width)
 							{
 								break;
@@ -4163,13 +4163,13 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					}
 
 					/*
-		     * Three ways out of that previous
-		     * for loop: ES, EL, EW
-		     */
+					 * Three ways out of that previous
+					 * for loop: ES, EL, EW
+					 */
 
 					/*
-		     * If it fits on the line, add it
-		     */
+					 * If it fits on the line, add it
+					 */
 					if (ew_pos - sl_pos <= width)
 					{
 						el = ew;
@@ -4178,26 +4178,26 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					}
 
 					/*
-		     * If it's just EW, not ES or EL, and
-		     * the line isn't too long, keep
-		     * adding words to the line
-		     */
+					 * If it's just EW, not ES or EL, and
+					 * the line isn't too long, keep
+					 * adding words to the line
+					 */
 					if (*ew && *ew != '\n' && (ew_pos - sl_pos <= width))
 					{
 						continue;
 					}
 
 					/*
-		     * So now we definitely need to
-		     * output a line
-		     */
+					 * So now we definitely need to
+					 * output a line
+					 */
 					break;
 				}
 			}
 
 			/*
-	     * Could be a blank line, no words fit
-	     */
+			 * Could be a blank line, no words fit
+			 */
 			if (el == NULL)
 			{
 				el = sw;
@@ -4206,8 +4206,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * Left space padding if needed
-	     */
+			 * Left space padding if needed
+			 */
 			if (just & JUST_RIGHT)
 			{
 				nleft = width - el_pos + sl_pos;
@@ -4236,25 +4236,25 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * Restore previous ansi state
-	     */
+			 * Restore previous ansi state
+			 */
 			buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
 			SAFE_LB_STR(buf, buff, bufc);
 			XFREE(buf);
 			/*
-	     * Print the words
-	     */
+			 * Print the words
+			 */
 			SAFE_STRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
 			/*
-	     * Back to ansi normal
-	     */
+			 * Back to ansi normal
+			 */
 			buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
 			SAFE_LB_STR(buf, buff, bufc);
 			XFREE(buf);
 
 			/*
-	     * Right space padding if needed
-	     */
+			 * Right space padding if needed
+			 */
 			if (just & JUST_LEFT)
 			{
 				nleft = width - el_pos + sl_pos;
@@ -4283,14 +4283,14 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			}
 
 			/*
-	     * Update pointers for the next line
-	     */
+			 * Update pointers for the next line
+			 */
 
 			if (!*el)
 			{
 				/*
-		 * ES, and nothing left to output
-		 */
+				 * ES, and nothing left to output
+				 */
 				if (!col_done[i])
 				{
 					n_done++;
@@ -4323,25 +4323,25 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				if (*ew == '\n' && sw == ew)
 				{
 					/*
-		     * EL already handled on this line,
-		     * and no new word yet
-		     */
+					 * EL already handled on this line,
+					 * and no new word yet
+					 */
 					++ew;
 					sl = el = NULL;
 				}
 				else if (sl == sw)
 				{
 					/*
-		     * No new word yet
-		     */
+					 * No new word yet
+					 */
 					sl = el = NULL;
 				}
 				else
 				{
 					/*
-		     * ES with more to output, EL for
-		     * next line, or just a full line
-		     */
+					 * ES with more to output, EL for
+					 * next line, or just a full line
+					 */
 					sl = sw;
 					sl_ansi_state = sw_ansi_state;
 					sl_pos = sw_pos;
@@ -4351,8 +4351,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				}
 
 				/*
-		 * Save state
-		 */
+				 * Save state
+				 */
 				xsl[i] = sl;
 				xel[i] = el;
 				xsw[i] = sw;
@@ -4399,9 +4399,9 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 
 	/*
-     * We need to know how many columns we have, so we know where the
-     * column arguments stop and where the optional arguments start.
-     */
+	 * We need to know how many columns we have, so we know where the
+	 * column arguments stop and where the optional arguments start.
+	 */
 	n_cols = list2arr(&raw_colstrs, LBUF_SIZE / 2, fargs[0], &SPACE_DELIM);
 
 	if (nfargs < n_cols + 1)
@@ -4608,7 +4608,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -4621,7 +4621,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -4666,7 +4666,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 					if (*(s) < 0x3a)
 					{
 						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s)&0x0f);
+						param_val += (param_val << 2) + (*(s) & 0x0f);
 					}
 					else
 					{
@@ -4679,7 +4679,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 					}
 				}
 			}
-			while ((*(s)&0xf0) == 0x20)
+			while ((*(s) & 0xf0) == 0x20)
 			{
 				++(s);
 			}
@@ -4719,7 +4719,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						if (*(s) < 0x3a)
 						{
 							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s)&0x0f);
+							param_val += (param_val << 2) + (*(s) & 0x0f);
 						}
 						else
 						{
@@ -4732,7 +4732,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 						}
 					}
 				}
-				while ((*(s)&0xf0) == 0x20)
+				while ((*(s) & 0xf0) == 0x20)
 				{
 					++(s);
 				}
@@ -4777,16 +4777,16 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 void fun_lit(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/*
-     * Just returns the argument, literally
-     */
+	 * Just returns the argument, literally
+	 */
 	SAFE_LB_STR(fargs[0], buff, bufc);
 }
 
 void fun_art(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/*
-     * checks a word and returns the appropriate article, "a" or "an"
-     */
+	 * checks a word and returns the appropriate article, "a" or "an"
+	 */
 	char *s = fargs[0];
 	char c;
 
@@ -4865,9 +4865,9 @@ void fun_alphamin(char *buff, char **bufc, dbref player __attribute__((unused)),
 void fun_valid(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	/*
-     * Checks to see if a given <something> is valid as a parameter of a
-     * given type (such as an object name).
-     */
+	 * Checks to see if a given <something> is valid as a parameter of a
+	 * given type (such as an object name).
+	 */
 	if (!fargs[0] || !*fargs[0] || !fargs[1] || !*fargs[1])
 	{
 		SAFE_LB_CHR('0', buff, bufc);
@@ -4894,4 +4894,3 @@ void fun_beep(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 {
 	SAFE_LB_CHR(BEEP_CHAR, buff, bufc);
 }
-

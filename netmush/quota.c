@@ -4,11 +4,11 @@
  * @brief Quota management commands
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -67,7 +67,7 @@ void save_quota(int q_list[], dbref player, int qtype)
 void count_objquota(dbref player, int *aq, int *rq, int *eq, int *tq, int *pq)
 {
 	int a = 0, r = 0, e = 0, t = 0, p = 0;
-	
+
 	for (dbref i = 0; i < mushstate.db_top; i++)
 	{
 		if ((Owner(i) != player) || (Going(i) && !isRoom(i)))
@@ -115,8 +115,8 @@ void adjust_quota(dbref player, int qtype, int value, int key)
 	rq = rq_list[qtype];
 
 	/*
-     * Adjust values
-     */
+	 * Adjust values
+	 */
 
 	if (key & QUOTA_REM)
 	{
@@ -130,8 +130,8 @@ void adjust_quota(dbref player, int qtype, int value, int key)
 	}
 
 	/*
-     * Set both abs and relative quota
-     */
+	 * Set both abs and relative quota
+	 */
 	q_list[qtype] = aq;
 	rq_list[qtype] = rq;
 	save_quota(q_list, player, A_QUOTA);
@@ -146,9 +146,9 @@ void mung_quotas(dbref player, int key, int value)
 	if (key & QUOTA_FIX)
 	{
 		/*
-	 * Get value of stuff owned and good value, set other values
-	 * * from that.
-	 */
+		 * Get value of stuff owned and good value, set other values
+		 * * from that.
+		 */
 		count_objquota(player, &xq, &rooms, &exits, &things, &players);
 
 		if (key & QUOTA_TOT)
@@ -254,8 +254,8 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	/*
-     * Show or set all quotas if requested
-     */
+	 * Show or set all quotas if requested
+	 */
 
 	if (key & QUOTA_ALL)
 	{
@@ -301,8 +301,8 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	/*
-     * Find out whose quota to show or set
-     */
+	 * Find out whose quota to show or set
+	 */
 
 	if (!arg1 || *arg1 == '\0')
 	{
@@ -320,8 +320,8 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	/*
-     * Make sure we have permission to do it
-     */
+	 * Make sure we have permission to do it
+	 */
 
 	if (!Can_Set_Quota(player))
 	{

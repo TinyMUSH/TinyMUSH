@@ -4,14 +4,14 @@
  * @brief Wildcard routines
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  * @copyright Copyright (c) 1993 by T. Alexander Popiel
  *            This code is hereby placed under GNU copyleft,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -40,8 +40,8 @@ int check_literals(char *tstr, char *dstr)
 	int len;
 
 	/*
-     * Fast match the beginning of the string.
-     */
+	 * Fast match the beginning of the string.
+	 */
 
 	while ((*tstr != '*') && (*tstr != '?'))
 	{
@@ -65,8 +65,8 @@ int check_literals(char *tstr, char *dstr)
 	}
 
 	/*
-     * Make a lower-case copy of the data.
-     */
+	 * Make a lower-case copy of the data.
+	 */
 	ep = data;
 
 	while (*dstr)
@@ -78,15 +78,15 @@ int check_literals(char *tstr, char *dstr)
 
 	*ep = '\0';
 	/*
-     * Fast match the end of the string.
-     * * When we're done with this, we'll also have established a better
-     * * end point for the remainder of the literals match.
-     * * ep will point to the null terminator at the end of the data string
-     * * we need to worry about (i.e., that which has not already been
-     * * taken care of by our backwards match).
-     * * xp will point to the last character of the pattern string we need
-     * * to worry about.
-     */
+	 * Fast match the end of the string.
+	 * * When we're done with this, we'll also have established a better
+	 * * end point for the remainder of the literals match.
+	 * * ep will point to the null terminator at the end of the data string
+	 * * we need to worry about (i.e., that which has not already been
+	 * * taken care of by our backwards match).
+	 * * xp will point to the last character of the pattern string we need
+	 * * to worry about.
+	 */
 	ep--;
 	xp = tstr + strlen(tstr) - 1;
 
@@ -104,9 +104,9 @@ int check_literals(char *tstr, char *dstr)
 	ep++;
 	*ep = '\0';
 	/*
-     * Walk the pattern string. Use the wildcard characters as delimiters,
-     * * to extract the literal strings that we need to match sequentially.
-     */
+	 * Walk the pattern string. Use the wildcard characters as delimiters,
+	 * * to extract the literal strings that we need to match sequentially.
+	 */
 	dp = data;
 
 	while (*tstr && (tstr <= xp))
@@ -182,9 +182,9 @@ int real_quick_wild(char *tstr, char *dstr)
 		case '?':
 
 			/*
-	     * Single character match.  Return false if at end
-	     * * of data.
-	     */
+			 * Single character match.  Return false if at end
+			 * * of data.
+			 */
 			if (!*dstr)
 			{
 				return 0;
@@ -194,18 +194,18 @@ int real_quick_wild(char *tstr, char *dstr)
 
 		case '\\':
 			/*
-	     * Escape character.  Move up, and force literal
-	     * * match of next character.
-	     */
+			 * Escape character.  Move up, and force literal
+			 * * match of next character.
+			 */
 			tstr++;
 			//[[fallthrough]];
 			__attribute__((fallthrough));
 		default:
 
 			/*
-	     * Literal character.  Check for a match. If
-	     * * matching end of data, return true.
-	     */
+			 * Literal character.  Check for a match. If
+			 * * matching end of data, return true.
+			 */
 			if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
 				return 0;
@@ -222,13 +222,13 @@ int real_quick_wild(char *tstr, char *dstr)
 	}
 
 	/*
-     * Skip over '*'.
-     */
+	 * Skip over '*'.
+	 */
 	tstr++;
 
 	/*
-     * Return true on trailing '*'.
-     */
+	 * Return true on trailing '*'.
+	 */
 
 	if (!*tstr)
 	{
@@ -236,8 +236,8 @@ int real_quick_wild(char *tstr, char *dstr)
 	}
 
 	/*
-     * Skip over wildcards.
-     */
+	 * Skip over wildcards.
+	 */
 
 	while ((*tstr == '?') || (*tstr == '*'))
 	{
@@ -255,8 +255,8 @@ int real_quick_wild(char *tstr, char *dstr)
 	}
 
 	/*
-     * Skip over a backslash in the pattern string if it is there.
-     */
+	 * Skip over a backslash in the pattern string if it is there.
+	 */
 
 	if (*tstr == '\\')
 	{
@@ -264,8 +264,8 @@ int real_quick_wild(char *tstr, char *dstr)
 	}
 
 	/*
-     * Return true on trailing '*'.
-     */
+	 * Return true on trailing '*'.
+	 */
 
 	if (!*tstr)
 	{
@@ -273,8 +273,8 @@ int real_quick_wild(char *tstr, char *dstr)
 	}
 
 	/*
-     * Scan for possible matches.
-     */
+	 * Scan for possible matches.
+	 */
 
 	while (*dstr)
 	{
@@ -341,9 +341,9 @@ int real_wild1(char *tstr, char *dstr, int arg)
 		case '?':
 
 			/*
-	     * Single character match.  Return false if at end
-	     * * of data.
-	     */
+			 * Single character match.  Return false if at end
+			 * * of data.
+			 */
 			if (!*dstr)
 			{
 				return 0;
@@ -354,8 +354,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			arg++;
 
 			/*
-	     * Jump to the fast routine if we can.
-	     */
+			 * Jump to the fast routine if we can.
+			 */
 
 			if (arg >= numargs)
 			{
@@ -366,21 +366,21 @@ int real_wild1(char *tstr, char *dstr, int arg)
 
 		case '\\':
 			/*
-	     * Escape character.  Move up, and force literal
-	     * * match of next character.
-	     */
+			 * Escape character.  Move up, and force literal
+			 * * match of next character.
+			 */
 			tstr++;
 			//[[fallthrough]];
 			__attribute__((fallthrough));
 			/*
-	     * FALL THROUGH
-	     */
+			 * FALL THROUGH
+			 */
 		default:
 
 			/*
-	     * Literal character.  Check for a match. If
-	     * * matching end of data, return true.
-	     */
+			 * Literal character.  Check for a match. If
+			 * * matching end of data, return true.
+			 */
 			if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
 				return 0;
@@ -397,8 +397,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	}
 
 	/*
-     * If at end of pattern, slurp the rest, and leave.
-     */
+	 * If at end of pattern, slurp the rest, and leave.
+	 */
 
 	if (!tstr[1])
 	{
@@ -408,29 +408,29 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	}
 
 	/*
-     * Remember current position for filling in the '*' return.
-     */
+	 * Remember current position for filling in the '*' return.
+	 */
 	datapos = dstr;
 	argpos = arg;
 
 	/*
-     * Scan forward until we find a non-wildcard.
-     */
+	 * Scan forward until we find a non-wildcard.
+	 */
 
 	do
 	{
 		if (argpos < arg)
 		{
 			/*
-	     * Fill in arguments if someone put another '*'
-	     * * before a fixed string.
-	     */
+			 * Fill in arguments if someone put another '*'
+			 * * before a fixed string.
+			 */
 			arglist[argpos][0] = '\0';
 			argpos++;
 
 			/*
-	     * Jump to the fast routine if we can.
-	     */
+			 * Jump to the fast routine if we can.
+			 */
 
 			if (argpos >= numargs)
 			{
@@ -438,8 +438,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			}
 
 			/*
-	     * Fill in any intervening '?'s
-	     */
+			 * Fill in any intervening '?'s
+			 */
 
 			while (argpos < arg)
 			{
@@ -449,8 +449,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 				argpos++;
 
 				/*
-		 * Jump to the fast routine if we can.
-		 */
+				 * Jump to the fast routine if we can.
+				 */
 
 				if (argpos >= numargs)
 				{
@@ -460,13 +460,13 @@ int real_wild1(char *tstr, char *dstr, int arg)
 		}
 
 		/*
-	 * Skip over the '*' for now...
-	 */
+		 * Skip over the '*' for now...
+		 */
 		tstr++;
 		arg++;
 		/*
-	 * Skip over '?'s for now...
-	 */
+		 * Skip over '?'s for now...
+		 */
 		numextra = 0;
 
 		while (*tstr == '?')
@@ -484,8 +484,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	} while (*tstr == '*');
 
 	/*
-     * Skip over a backslash in the pattern string if it is there.
-     */
+	 * Skip over a backslash in the pattern string if it is there.
+	 */
 
 	if (*tstr == '\\')
 	{
@@ -493,14 +493,14 @@ int real_wild1(char *tstr, char *dstr, int arg)
 	}
 
 	/*
-     * Check for possible matches.  This loop terminates either at end
-     * * of data (resulting in failure), or at a successful match.
-     */
+	 * Check for possible matches.  This loop terminates either at end
+	 * * of data (resulting in failure), or at a successful match.
+	 */
 	while (1)
 	{
 		/*
-	 * Scan forward until first character matches.
-	 */
+		 * Scan forward until first character matches.
+		 */
 		if (*tstr)
 			while ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
 			{
@@ -518,9 +518,9 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			}
 
 		/*
-	 * The first character matches, now.  Check if the rest
-	 * * does, using the fastest method, as usual.
-	 */
+		 * The first character matches, now.  Check if the rest
+		 * * does, using the fastest method, as usual.
+		 */
 
 		if (*dstr)
 		{
@@ -539,17 +539,17 @@ int real_wild1(char *tstr, char *dstr, int arg)
 		if (!*dstr || st)
 		{
 			/*
-	     * Found a match!  Fill in all remaining arguments.
-	     * * First do the '*'...
-	     */
+			 * Found a match!  Fill in all remaining arguments.
+			 * * First do the '*'...
+			 */
 			XSTRNCPY(arglist[argpos], datapos, (dstr - datapos) - numextra);
 			arglist[argpos][(dstr - datapos) - numextra] = '\0';
 			datapos = dstr - numextra;
 			argpos++;
 
 			/*
-	     * Fill in any trailing '?'s that are left.
-	     */
+			 * Fill in any trailing '?'s that are left.
+			 */
 
 			while (numextra)
 			{
@@ -566,8 +566,8 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			}
 
 			/*
-	     * It's done!
-	     */
+			 * It's done!
+			 */
 			return 1;
 		}
 		else
@@ -613,8 +613,8 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 	char *scan;
 
 	/*
-     * Initialize the return array.
-     */
+	 * Initialize the return array.
+	 */
 
 	for (i = 0; i < nargs; i++)
 	{
@@ -622,8 +622,8 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	/*
-     * Do fast match.
-     */
+	 * Do fast match.
+	 */
 
 	while ((*tstr != '*') && (*tstr != '?'))
 	{
@@ -647,8 +647,8 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	/*
-     * Allocate space for the return args.
-     */
+	 * Allocate space for the return args.
+	 */
 	i = 0;
 	scan = tstr;
 
@@ -670,18 +670,18 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	/*
-     * Put stuff in globals for quick recursion.
-     */
+	 * Put stuff in globals for quick recursion.
+	 */
 	arglist = args;
 	numargs = nargs;
 	/*
-     * Do the match.
-     */
+	 * Do the match.
+	 */
 	value = nargs ? wild1(tstr, dstr, 0) : quick_wild(tstr, dstr);
 
 	/*
-     * Clean out any fake match data left by wild1.
-     */
+	 * Clean out any fake match data left by wild1.
+	 */
 
 	for (i = 0; i < nargs; i++)
 		if ((args[i] != NULL) && (!*args[i] || !value))
@@ -742,8 +742,8 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 	char *buff, *scan, *p, *end, *q_names[NUM_ENV_VARS];
 
 	/*
-     * Initialize return array.
-     */
+	 * Initialize return array.
+	 */
 
 	for (i = 0; i < nargs; i++)
 	{
@@ -751,8 +751,8 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	/*
-     * Do fast match.
-     */
+	 * Do fast match.
+	 */
 
 	while ((*tstr != '*') && (*tstr != '?'))
 	{
@@ -776,8 +776,8 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	/*
-     * Convert string, allocate space for the return args.
-     */
+	 * Convert string, allocate space for the return args.
+	 */
 	i = 0;
 	scan = tstr;
 	buff = XMALLOC(LBUF_SIZE, "buff");
@@ -792,8 +792,8 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 		case '?':
 
 			/*
-	     * FALLTHRU
-	     */
+			 * FALLTHRU
+			 */
 		case '*':
 			args[i] = XMALLOC(LBUF_SIZE, "args[i]");
 			scan++;
@@ -823,15 +823,15 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 
 	*p = '\0';
 	/*
-     * Go do it.
-     */
+	 * Go do it.
+	 */
 	arglist = args;
 	numargs = nargs;
 	value = nargs ? wild1(buff, dstr, 0) : quick_wild(buff, dstr);
 
 	/*
-     * Copy things into registers. Clean fake match data from wild1().
-     */
+	 * Copy things into registers. Clean fake match data from wild1().
+	 */
 
 	for (i = 0; i < nargs; i++)
 	{

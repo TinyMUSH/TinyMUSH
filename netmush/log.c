@@ -4,13 +4,13 @@
  * @brief Handle log files and log events
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  * @warning Be carefull that functions doesn't go circural when calling one of the XMALLOC functions.
- * 
+ *
  */
 
 #include "config.h"
@@ -28,7 +28,6 @@ FILE *mainlog_fp = NULL; /*!< Pointer to the main log file */
 FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */
 
 char *log_pos = NULL;
-
 
 /* ---------------------------------------------------------------------------
  * logfile_init: Initialize the main logfile.
@@ -88,16 +87,16 @@ int start_log(const char *primary, const char *secondary, int key)
             if (key != last_key)
             {
                 /*
-		 * Try to save ourselves some lookups
-		 */
+                 * Try to save ourselves some lookups
+                 */
                 last_key = key;
 
                 for (lp = logfds_table; lp->log_flag; lp++)
                 {
                     /*
-		     * Though keys can be OR'd, use the first one
-		     * * matched
-		     */
+                     * Though keys can be OR'd, use the first one
+                     * * matched
+                     */
                     if (lp->log_flag & key)
                     {
                         log_fp = lp->fileptr;
@@ -129,18 +128,18 @@ int start_log(const char *primary, const char *secondary, int key)
         if (key & LOG_FORCE)
         {
             /*
-	     * Log even if we are recursing and
-	     * don't complain about it. This should
-	     * never happens with the new logger.
-	     */
+             * Log even if we are recursing and
+             * don't complain about it. This should
+             * never happens with the new logger.
+             */
             mushstate.logging--;
         }
 
         if (!mushstate.standalone)
         {
             /*
-	     * Format the timestamp
-	     */
+             * Format the timestamp
+             */
             if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
             {
                 time((time_t *)(&now));
@@ -149,8 +148,8 @@ int start_log(const char *primary, const char *secondary, int key)
             }
 
             /*
-	     * Write the header to the log
-	     */
+             * Write the header to the log
+             */
 
             if (secondary && *secondary)
             {
@@ -187,8 +186,8 @@ int start_log(const char *primary, const char *secondary, int key)
         }
 
         /*
-	 * If a recursive call, log it and return indicating no log
-	 */
+         * If a recursive call, log it and return indicating no log
+         */
 
         if (mushstate.logging != 1)
         {
@@ -314,7 +313,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         XFREE(str1);
         free(str);
-        
+
         end_log();
     }
 }

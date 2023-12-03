@@ -23,7 +23,6 @@
 #include <ctype.h>
 #include <string.h>
 
-
 /**
  * @brief Helper for parse_to
  *

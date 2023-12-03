@@ -4,11 +4,11 @@
  * @brief Routines for parsing arguments
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -23,7 +23,8 @@
 
 MSTATE md;
 
-void init_mstate(void) {
+void init_mstate(void)
+{
     md.confidence = 0;
     md.count = 0;
     md.pref_type = 0;
@@ -98,7 +99,7 @@ void promote_match(dbref what, int confidence)
      */
     md.count++;
 
-    if (random_range(0, (md.count)-1) == 0)
+    if (random_range(0, (md.count) - 1) == 0)
     {
         md.match = what;
     }
@@ -117,7 +118,7 @@ void munge_space_for_match(const char *name)
     const char *p;
     p = name;
     q = md.string;
-    
+
     XMEMSET(md.string, 0, LBUF_SIZE);
 
     while (isspace(*p))
@@ -381,11 +382,11 @@ void match_list(dbref first, int local)
         }
 
         /*
-	 * Warning: make sure there are no other calls to Name() in
-	 * promote_match or its called subroutines; they
-	 * would overwrite Name()'s static buffer which is
-	 * needed by string_match().
-	 */
+         * Warning: make sure there are no other calls to Name() in
+         * promote_match or its called subroutines; they
+         * would overwrite Name()'s static buffer which is
+         * needed by string_match().
+         */
         namebuf = (char *)PureName(first);
 
         if (!string_compare(namebuf, md.string))

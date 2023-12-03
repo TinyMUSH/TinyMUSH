@@ -11,7 +11,7 @@
 
 /**
  * @brief Convert RGB color to XYZ coordonates
- * 
+ *
  * The CIE 1931 color spaces are the first defined quantitative links between
  * distributions of wavelengths in the electromagnetic visible spectrum, and
  * physiologically perceived colors in human color vision. The mathematical
@@ -19,8 +19,8 @@
  * management, important when dealing with color inks, illuminated displays,
  * and recording devices such as digital cameras. The system was designed in
  * 1931 by the "Commission Internationale de l'éclairage", known in English
- * as the International Commission on Illumination. 
- * 
+ * as the International Commission on Illumination.
+ *
  * @param c RGB Color to conver
  * @return xyzColor XYZ Coordinates
  */
@@ -68,7 +68,7 @@ xyzColor rgbToXyz(rgbColor rgb)
 
 /**
  * @brief Convert XYZ coordinates to CIELAB Color Space coordinates
- * 
+ *
  * The CIELAB color space also referred to as L*a*b* is a color space defined
  * by the International Commission on Illumination (abbreviated CIE) in 1976.
  * (Referring to CIELAB as "Lab" without asterisks should be avoided to prevent
@@ -78,9 +78,9 @@ xyzColor rgbToXyz(rgbColor rgb)
  * uniform space, where a given numerical change corresponds to similar
  * perceived change in color. While the LAB space is not truly perceptually
  * uniform, it nevertheless is useful in industry for detecting small
- * differences in color. 
- * @param c 
- * @return CIELABColorSpace 
+ * differences in color.
+ * @param c
+ * @return CIELABColorSpace
  */
 CIELABColor xyzToCIELAB(xyzColor xyz)
 {
@@ -128,22 +128,22 @@ CIELABColor xyzToCIELAB(xyzColor xyz)
 
 /**
  * @brief Return the Delta-E between two colors
- * 
+ *
  * Delta E is a metric for understanding how the human eye perceives color difference.
  * The term delta comes from mathematics, meaning change in a variable or function.
  * The suffix E references the German word Empfindung, which broadly means sensation.
- * 
+ *
  * Delta E  Perception
  * <= 1.0   Not perceptible by human eyes.
  * 1 - 2    Perceptible through close observation.
  * 2 - 10   Perceptible at a glance.
  * 11 - 49  Colors are more similar than opposite
  * 100      Colors are exact opposite
- * 
+ *
  * @param c1 First color to compare
  * @param c2 Second color to compare
  * @return float Delta-E between the two colors
- * 
+ *
  */
 float getColorDeltaE(rgbColor c1, rgbColor c2)
 {
@@ -154,14 +154,14 @@ float getColorDeltaE(rgbColor c1, rgbColor c2)
 
 /**
  * @brief Find the closest color in a palette.
- * 
- * @param rgb 
- * @param palette 
- * @return COLORMATCH 
+ *
+ * @param rgb
+ * @param palette
+ * @return COLORMATCH
  */
 COLORMATCH getColorMatch(rgbColor rgb, COLORINFO palette[])
 {
-    COLORMATCH cm = {101, {NULL, {0,0,0}}};
+    COLORMATCH cm = {101, {NULL, {0, 0, 0}}};
     float deltaE;
 
     for (COLORINFO *cinfo = palette; cinfo->name != NULL; cinfo++)
@@ -180,28 +180,31 @@ COLORMATCH getColorMatch(rgbColor rgb, COLORINFO palette[])
     return cm;
 }
 
-char *TrueColor2VT100(rgbColor rgb, bool background) {
+char *TrueColor2VT100(rgbColor rgb, bool background)
+{
     char *vt = calloc(1024, sizeof(char));
 
     sprintf(vt, "\e[%d;2;%d;%d;%dm", background ? 48 : 38, rgb.r, rgb.g, rgb.b);
 
-    return(vt);
+    return (vt);
 }
 
-char *X112VT100(uint8_t color, bool background) {
+char *X112VT100(uint8_t color, bool background)
+{
     char *vt = calloc(1024, sizeof(char));
 
     sprintf(vt, "\e[%d;5;%dm", background ? 48 : 38, color);
 
-    return(vt);
+    return (vt);
 }
 
-char *Ansi2VT100(uint8_t color, bool background) {
+char *Ansi2VT100(uint8_t color, bool background)
+{
     char *vt = calloc(1024, sizeof(char));
 
     sprintf(vt, "\e[%dm", (background ? 40 : 30) + (color & 7));
 
-    return(vt);
+    return (vt);
 }
 
 rgbColor X112RGB(int color)
@@ -247,7 +250,7 @@ uint8_t RGB2X11(rgbColor rgb)
 {
     if (rgb.r + rgb.g + rgb.b == 0)
     {
-        return 0; 
+        return 0;
     }
     else if (((rgb.r & 128) == rgb.r) && ((rgb.g & 128) == rgb.g) && ((rgb.b & 128) == rgb.b))
     {
@@ -278,16 +281,18 @@ uint8_t RGB2X11(rgbColor rgb)
     return 0;
 }
 
-uint8_t X112Ansi(int color) {
+uint8_t X112Ansi(int color)
+{
     return RGB2Ansi(X112RGB(color));
 }
 
-uint8_t RGB2Ansi(rgbColor rgb){
+uint8_t RGB2Ansi(rgbColor rgb)
+{
     COLORMATCH cm = getColorMatch(rgb, ansiColor);
 
     if (cm.color.rgb.r + cm.color.rgb.g + cm.color.rgb.b == 0)
     {
-        return 0; 
+        return 0;
     }
     else if (((cm.color.rgb.r & 128) == cm.color.rgb.r) && ((cm.color.rgb.g & 128) == cm.color.rgb.g) && ((cm.color.rgb.b & 128) == cm.color.rgb.b))
     {
@@ -323,7 +328,7 @@ COLORINFO ansiColor[] = {
     {(char *)"fuchsia", {255, 0, 255}},
     {(char *)"aqua", {0, 255, 255}},
     {(char *)"white", {255, 255, 255}},
-    {(char *)NULL, {0,0,0}}};
+    {(char *)NULL, {0, 0, 0}}};
 
 COLORINFO xtermColor[] = {
     {(char *)"black", {0, 0, 0}},

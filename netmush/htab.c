@@ -4,11 +4,11 @@
  * @brief Table hashing routines
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -91,8 +91,8 @@ void hashinit(HASHTAB *htab, int size, int flags)
     if ((flags & HT_TYPEMASK) == HT_NUM)
     {
         /*
-	 * Numeric hashtabs implicitly store keys by reference
-	 */
+         * Numeric hashtabs implicitly store keys by reference
+         */
         flags |= HT_KEYREF;
     }
 
@@ -616,8 +616,8 @@ void hashresize(HASHTAB *htab, int min_size)
     if (size == htab->hashsize)
     {
         /*
-	 * We're already at the correct size. Don't do anything.
-	 */
+         * We're already at the correct size. Don't do anything.
+         */
         return;
     }
 
@@ -634,8 +634,8 @@ void hashresize(HASHTAB *htab, int min_size)
             hent = hent->next;
 
             /*
-	     * don't free and reallocate entries, just copy the pointers
-	     */
+             * don't free and reallocate entries, just copy the pointers
+             */
             if (htype == HT_STR)
             {
                 hval = hashval(thent->target.s, new_htab.mask);
@@ -759,15 +759,16 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
 
     va_list ap;
 
-	va_start(ap, format);
-	prefix = XAVSPRINTF("buf", format, ap);
-	va_end(ap);
+    va_start(ap, format);
+    prefix = XAVSPRINTF("buf", format, ap);
+    va_end(ap);
 
     for (nt = ntab; nt->name; nt++)
     {
         if (God(player) || check_access(player, nt->perm))
         {
-            if(got_one) {
+            if (got_one)
+            {
                 *bp++ = ' ';
             }
 
@@ -799,10 +800,11 @@ void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, cha
     NAMETAB *nt = ntab;
 
     raw_notify(player, "%-30.30s %s", prefix, state);
-    if(show_sep) {
+    if (show_sep)
+    {
         notify(player, "------------------------------ ------------------------------------------------");
     }
-    
+
     while (nt->name)
     {
         if (God(player) || check_access(player, nt->perm))
@@ -811,7 +813,8 @@ void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, cha
             ++nt;
         }
     }
-    if(show_sep) {
+    if (show_sep)
+    {
         notify(player, "-------------------------------------------------------------------------------");
     }
 }
@@ -828,15 +831,16 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
     buf = bp = XMALLOC(LBUF_SIZE, "buf");
     va_list ap;
 
-	va_start(ap, format);
-	prefix = XAVSPRINTF("buf", format, ap);
-	va_end(ap);
+    va_start(ap, format);
+    prefix = XAVSPRINTF("buf", format, ap);
+    va_end(ap);
 
     while (nt->name)
     {
         if (((flagword & nt->flag) != 0) && (God(player) || check_access(player, nt->perm)))
         {
-            if(got_one) {
+            if (got_one)
+            {
                 *bp++ = ' ';
             }
 

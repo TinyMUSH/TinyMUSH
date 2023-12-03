@@ -4,11 +4,11 @@
  * @brief Low-level object manipulation routines
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -250,8 +250,8 @@ int ok_exit_name(char *name)
 	char *buff = XSTRDUP(name, "buff"); /* munchable buffer */
 
 	/*
-     * walk down the string, checking lengths. skip leading spaces.
-     */
+	 * walk down the string, checking lengths. skip leading spaces.
+	 */
 
 	for (p = buff, lastp = buff; (p = strchr(lastp, ';')) != NULL; lastp = p)
 	{
@@ -272,8 +272,8 @@ int ok_exit_name(char *name)
 	XFREE(buff);
 
 	/*
-     * check last component
-     */
+	 * check last component
+	 */
 
 	while (isspace(*lastp))
 	{
@@ -306,10 +306,10 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	struct timeval obj_time;
 
 	/*
-     * First check to see whether or not we're allowed to grow the
-     * * database any further (we must either have an object in the
-     * * freelist, or we have to be under the limit).
-     */
+	 * First check to see whether or not we're allowed to grow the
+	 * * database any further (we must either have an object in the
+	 * * freelist, or we have to be under the limit).
+	 */
 
 	if ((mushstate.db_top + 1 >= mushconf.building_limit) && (mushstate.freelist == NOTHING))
 	{
@@ -498,8 +498,8 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	}
 
 	/*
-     * Make sure the creator can pay for the object.
-     */
+	 * Make sure the creator can pay for the object.
+	 */
 
 	if ((player != NOTHING) && !canpayfees(player, player, cost, quota, objtype))
 	{
@@ -511,10 +511,10 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	}
 
 	/*
-     * Get the first object from the freelist.  If the object is not
-     * * clean, discard the remainder of the freelist and go get a
-     * * completely new object.
-     */
+	 * Get the first object from the freelist.  If the object is not
+	 * * clean, discard the remainder of the freelist and go get a
+	 * * completely new object.
+	 */
 	obj = NOTHING;
 
 	if (mushstate.freelist != NOTHING)
@@ -541,8 +541,8 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 
 	atr_free(obj); /* just in case... */
 	/*
-     * Set things up according to the object type
-     */
+	 * Set things up according to the object type
+	 */
 	s_Location(obj, NOTHING);
 	s_Contents(obj, NOTHING);
 	s_Exits(obj, NOTHING);
@@ -550,8 +550,8 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	s_Link(obj, NOTHING);
 
 	/*
-     * We do not autozone players to their creators.
-     */
+	 * We do not autozone players to their creators.
+	 */
 
 	if (mushconf.autozone && (player != NOTHING) && (objtype != TYPE_PLAYER))
 	{
@@ -663,14 +663,14 @@ void destroy_obj(dbref player, dbref obj)
 	}
 
 	/*
-     * Validate the owner
-     */
+	 * Validate the owner
+	 */
 	owner = Owner(obj);
 	good_owner = Good_owner(owner);
 
 	/*
-     * Halt any pending commands (waiting or semaphore)
-     */
+	 * Halt any pending commands (waiting or semaphore)
+	 */
 
 	if (halt_que(NOTHING, obj) > 0)
 	{
@@ -683,8 +683,8 @@ void destroy_obj(dbref player, dbref obj)
 	nfy_que(GOD, obj, 0, NFY_DRAIN, 0);
 	cron_clr(obj, NOTHING);
 	/*
-     * Remove forwardlists, stacks, etc. from the hash tables.
-     */
+	 * Remove forwardlists, stacks, etc. from the hash tables.
+	 */
 	fwdlist_clr(obj);
 	propdir_clr(obj);
 	stack_clr(obj);
@@ -700,8 +700,8 @@ void destroy_obj(dbref player, dbref obj)
 	}
 
 	/*
-     * Compensate the owner for the object
-     */
+	 * Compensate the owner for the object
+	 */
 	val = 1;
 	quota = 1;
 
@@ -794,9 +794,9 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 	dbref i, thing;
 
 	/*
-     * We can only take a dbref; don't bother calling match_absolute() even,
-     * * since we're dealing with the garbage pile anyway.
-     */
+	 * We can only take a dbref; don't bother calling match_absolute() even,
+	 * * since we're dealing with the garbage pile anyway.
+	 */
 	if (*str != '#')
 	{
 		notify(player, NOMATCH_MESSAGE);
@@ -820,10 +820,10 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 	}
 
 	/*
-     * The freelist is a linked list going from the lowest-numbered
-     * * objects to the highest-numbered objects. We need to make sure an
-     * * object is clean before we muck with it.
-     */
+	 * The freelist is a linked list going from the lowest-numbered
+	 * * objects to the highest-numbered objects. We need to make sure an
+	 * * object is clean before we muck with it.
+	 */
 
 	if (IS_CLEAN(thing))
 	{
@@ -834,9 +834,9 @@ void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __at
 		}
 
 		/*
-	 * We've got to find this thing's predecessor so we avoid
-	 * * circular chaining.
-	 */
+		 * We've got to find this thing's predecessor so we avoid
+		 * * circular chaining.
+		 */
 		for (i = 0; i < mushstate.db_top; i++)
 		{
 			if (Link(i) == thing)
@@ -876,10 +876,10 @@ void make_freelist(void)
 		if (IS_CLEAN(i))
 		{
 			/*
-	     * If there's clean garbage at the end of the db, just
-	     * * trim it off. Memory will be reused if new objects are
-	     * * needed, but can be eliminated by restarting.
-	     */
+			 * If there's clean garbage at the end of the db, just
+			 * * trim it off. Memory will be reused if new objects are
+			 * * needed, but can be eliminated by restarting.
+			 */
 			mushstate.db_top--;
 		}
 		else
@@ -923,8 +923,8 @@ void empty_obj(dbref obj)
 {
 	dbref targ, next;
 	/*
-     * Send the contents home
-     */
+	 * Send the contents home
+	 */
 	for (targ = Contents(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
 	{
 		if (!Has_location(targ))
@@ -952,8 +952,8 @@ void empty_obj(dbref obj)
 		}
 	}
 	/*
-     * Destroy the exits
-     */
+	 * Destroy the exits
+	 */
 	for (targ = Exits(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
 	{
 		if (!isExit(targ))
@@ -998,8 +998,8 @@ void destroy_player(dbref victim)
 	int count, aflags, alen;
 	char *buf, *a_dest, *cpa__p, *cpa__tokp;
 	/*
-     * Bye bye...
-     */
+	 * Bye bye...
+	 */
 	a_dest = atr_get_raw(victim, A_DESTROYER);
 
 	if (a_dest)
@@ -1020,8 +1020,8 @@ void destroy_player(dbref victim)
 	halt_que(victim, NOTHING);
 	count = chown_all(victim, player, player, 0);
 	/*
-     * Remove the name from the name hash table
-     */
+	 * Remove the name from the name hash table
+	 */
 	delete_player_name(victim, Name(victim));
 	buf = atr_pget(victim, A_ALIAS, &aowner, &aflags, &alen);
 
@@ -1063,8 +1063,8 @@ void purge_going(void)
 
 		case TYPE_ROOM:
 			/*
-	     * Room scheduled for destruction... do it
-	     */
+			 * Room scheduled for destruction... do it
+			 */
 			empty_obj(i);
 			destroy_obj(NOTHING, i);
 			break;
@@ -1082,8 +1082,8 @@ void purge_going(void)
 
 		default:
 			/*
-	     * Something else... How did this happen?
-	     */
+			 * Something else... How did this happen?
+			 */
 			Log_simple_err(i, NOTHING, "GOING object with unexpected type.  Destroyed.");
 			destroy_obj(NOTHING, i);
 		}
@@ -1137,8 +1137,8 @@ void check_dead_refs(void)
 	for (i = 0; i < mushstate.db_top; i++)
 	{
 		/*
-	 * Check the parent
-	 */
+		 * Check the parent
+		 */
 		targ = Parent(i);
 		do
 		{
@@ -1168,8 +1168,8 @@ void check_dead_refs(void)
 			}
 		} while (0);
 		/*
-	 * Check the zone
-	 */
+		 * Check the zone
+		 */
 		targ = Zone(i);
 		do
 		{
@@ -1209,8 +1209,8 @@ void check_dead_refs(void)
 			}
 
 			/*
-	     * Check the home
-	     */
+			 * Check the home
+			 */
 			targ = Home(i);
 			do
 			{
@@ -1240,8 +1240,8 @@ void check_dead_refs(void)
 				}
 			} while (0);
 			/*
-	     * Check the location
-	     */
+			 * Check the location
+			 */
 			targ = Location(i);
 
 			if (!Good_obj(targ))
@@ -1253,8 +1253,8 @@ void check_dead_refs(void)
 			}
 
 			/*
-	     * Check for self-referential Next()
-	     */
+			 * Check for self-referential Next()
+			 */
 
 			if (Next(i) == i)
 			{
@@ -1265,8 +1265,8 @@ void check_dead_refs(void)
 			if (check_type & DBCK_FULL)
 			{
 				/*
-		 * Check wealth or value
-		 */
+				 * Check wealth or value
+				 */
 				targ = OBJECT_ENDOWMENT(mushconf.createmax);
 
 				if (OwnsOthers(i))
@@ -1284,8 +1284,8 @@ void check_dead_refs(void)
 
 		case TYPE_ROOM:
 			/*
-	     * Check the dropto
-	     */
+			 * Check the dropto
+			 */
 			targ = Dropto(i);
 
 			if (targ != HOME)
@@ -1322,8 +1322,8 @@ void check_dead_refs(void)
 			if (check_type & DBCK_FULL)
 			{
 				/*
-		 * NEXT should be null
-		 */
+				 * NEXT should be null
+				 */
 				if (Next(i) != NOTHING)
 				{
 					Log_header_err(i, NOTHING, Next(i), 1, "Next pointer", "should be NOTHING.  Reset.");
@@ -1331,8 +1331,8 @@ void check_dead_refs(void)
 				}
 
 				/*
-		 * LINK should be null
-		 */
+				 * LINK should be null
+				 */
 
 				if (Link(i) != NOTHING)
 				{
@@ -1341,8 +1341,8 @@ void check_dead_refs(void)
 				}
 
 				/*
-		 * Check value
-		 */
+				 * Check value
+				 */
 				check_pennies(i, 1, "Value");
 			}
 
@@ -1350,8 +1350,8 @@ void check_dead_refs(void)
 
 		case TYPE_EXIT:
 			/*
-	     * If it points to something GOING, set it going
-	     */
+			 * If it points to something GOING, set it going
+			 */
 			targ = Location(i);
 
 			if (Good_obj(targ))
@@ -1364,8 +1364,8 @@ void check_dead_refs(void)
 			else if ((targ == HOME) || (targ == AMBIGUOUS))
 			{
 				/*
-		 * null case, always valid
-		 */
+				 * null case, always valid
+				 */
 			}
 			else if (targ != NOTHING)
 			{
@@ -1382,8 +1382,8 @@ void check_dead_refs(void)
 			}
 
 			/*
-	     * Check for self-referential Next()
-	     */
+			 * Check for self-referential Next()
+			 */
 
 			if (Next(i) == i)
 			{
@@ -1394,8 +1394,8 @@ void check_dead_refs(void)
 			if (check_type & DBCK_FULL)
 			{
 				/*
-		 * CONTENTS should be null
-		 */
+				 * CONTENTS should be null
+				 */
 				if (Contents(i) != NOTHING)
 				{
 					Log_header_err(i, Exits(i), Contents(i), 1, "Contents", "should be NOTHING.  Reset.");
@@ -1403,8 +1403,8 @@ void check_dead_refs(void)
 				}
 
 				/*
-		 * LINK should be null
-		 */
+				 * LINK should be null
+				 */
 
 				if (Link(i) != NOTHING)
 				{
@@ -1413,8 +1413,8 @@ void check_dead_refs(void)
 				}
 
 				/*
-		 * Check value
-		 */
+				 * Check value
+				 */
 				check_pennies(i, 1, "Value");
 			}
 
@@ -1425,15 +1425,15 @@ void check_dead_refs(void)
 
 		default:
 			/*
-	     * Funny object type, destroy it
-	     */
+			 * Funny object type, destroy it
+			 */
 			Log_simple_err(i, NOTHING, "Funny object type.  Destroyed.");
 			destroy_obj(NOTHING, i);
 		}
 
 		/*
-	 * Check forwardlist
-	 */
+		 * Check forwardlist
+		 */
 		dirty = 0;
 
 		if (H_Fwdlist(i) && ((fp = fwdlist_get(i)) != NULL))
@@ -1465,8 +1465,8 @@ void check_dead_refs(void)
 		}
 
 		/*
-	 * Check propdir
-	 */
+		 * Check propdir
+		 */
 		dirty = 0;
 
 		if (H_Propdir(i) && ((pp = propdir_get(i)) != NULL))
@@ -1498,8 +1498,8 @@ void check_dead_refs(void)
 		}
 
 		/*
-	 * Check owner
-	 */
+		 * Check owner
+		 */
 		owner = Owner(i);
 
 		if (!Good_obj(owner))
@@ -1542,8 +1542,8 @@ void check_dead_refs(void)
 		if (check_type & DBCK_FULL)
 		{
 			/*
-	     * Check for wizards
-	     */
+			 * Check for wizards
+			 */
 			if (Wizard(i))
 			{
 				if (isPlayer(i))
@@ -1588,8 +1588,8 @@ void check_loc_exits(dbref loc)
 	}
 
 	/*
-     * Only check players, rooms, and things that aren't GOING
-     */
+	 * Only check players, rooms, and things that aren't GOING
+	 */
 
 	if (isExit(loc) || Going(loc))
 	{
@@ -1597,8 +1597,8 @@ void check_loc_exits(dbref loc)
 	}
 
 	/*
-     * If marked, we've checked here already
-     */
+	 * If marked, we've checked here already
+	 */
 
 	if (Marked(loc))
 	{
@@ -1607,8 +1607,8 @@ void check_loc_exits(dbref loc)
 
 	Mark(loc);
 	/*
-     * Check all the exits
-     */
+	 * Check all the exits
+	 */
 	back = NOTHING;
 	exit = Exits(loc);
 
@@ -1626,8 +1626,8 @@ void check_loc_exits(dbref loc)
 		if (!Good_obj(exit))
 		{
 			/*
-	     * A bad pointer - terminate chain
-	     */
+			 * A bad pointer - terminate chain
+			 */
 			Log_pointer_err(back, loc, NOTHING, exit, "Exit list", "is invalid.  List nulled.");
 
 			if (back != NOTHING)
@@ -1644,8 +1644,8 @@ void check_loc_exits(dbref loc)
 		else if (!isExit(exit))
 		{
 			/*
-	     * Not an exit - terminate chain
-	     */
+			 * Not an exit - terminate chain
+			 */
 			Log_pointer_err(back, loc, NOTHING, exit, "Exitlist member", "is not an exit.  List terminated.");
 
 			if (back != NOTHING)
@@ -1662,8 +1662,8 @@ void check_loc_exits(dbref loc)
 		else if (Going(exit))
 		{
 			/*
-	     * Going - silently filter out
-	     */
+			 * Going - silently filter out
+			 */
 			temp = Next(exit);
 
 			if (back != NOTHING)
@@ -1682,8 +1682,8 @@ void check_loc_exits(dbref loc)
 		else if (Marked(exit))
 		{
 			/*
-	     * Already in another list - terminate chain
-	     */
+			 * Already in another list - terminate chain
+			 */
 			Log_pointer_err(back, loc, NOTHING, exit, "Exitlist member", "is in another exitlist.  Cleared.");
 
 			if (back != NOTHING)
@@ -1700,27 +1700,27 @@ void check_loc_exits(dbref loc)
 		else if (!Good_obj(dest) && (dest != HOME) && (dest != AMBIGUOUS) && (dest != NOTHING))
 		{
 			/*
-	     * Destination is not in the db.  Null it.
-	     */
+			 * Destination is not in the db.  Null it.
+			 */
 			Log_pointer_err(back, loc, NOTHING, exit, "Destination", "is invalid.  Cleared.");
 			s_Location(exit, NOTHING);
 		}
 		else if (exitloc != loc)
 		{
 			/*
-	     * Exit thinks it's in another place.  Check the
-	     * * exitlist there and see if it contains this
-	     * * exit. If it does, then our exitlist
-	     * * somehow pointed into the middle of their
-	     * * exitlist. If not, assume we own the exit.
-	     */
+			 * Exit thinks it's in another place.  Check the
+			 * * exitlist there and see if it contains this
+			 * * exit. If it does, then our exitlist
+			 * * somehow pointed into the middle of their
+			 * * exitlist. If not, assume we own the exit.
+			 */
 			check_loc_exits(exitloc);
 
 			if (Marked(exit))
 			{
 				/*
-		 * It's in the other list, give it up
-		 */
+				 * It's in the other list, give it up
+				 */
 				Log_pointer_err(back, loc, NOTHING, exit, "", "is in another exitlist.  List terminated.");
 
 				if (back != NOTHING)
@@ -1737,8 +1737,8 @@ void check_loc_exits(dbref loc)
 			else
 			{
 				/*
-		 * Not in the other list, assume in ours
-		 */
+				 * Not in the other list, assume in ours
+				 */
 				Log_header_err(exit, loc, exitloc, 1, "Not on chain for location", "Reset.");
 				s_Exits(exit, loc);
 			}
@@ -1747,15 +1747,15 @@ void check_loc_exits(dbref loc)
 		if (exit != NOTHING)
 		{
 			/*
-	     * All OK (or all was made OK)
-	     */
+			 * All OK (or all was made OK)
+			 */
 			if (check_type & DBCK_FULL)
 			{
 				/*
-		 * Make sure exit owner owns at least one of
-		 * * the source or destination.  Just
-		 * * warn if he doesn't.
-		 */
+				 * Make sure exit owner owns at least one of
+				 * * the source or destination.  Just
+				 * * warn if he doesn't.
+				 */
 				temp = Owner(exit);
 
 				if ((temp != Owner(loc)) && (temp != Owner(Location(exit))))
@@ -1816,12 +1816,12 @@ void check_loc_contents(dbref);
 void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 {
 	/*
-     * Object thinks it's in another place.  Check the contents list
-     * * there and see if it contains this object.  If it does, then
-     * * our contents list somehow pointed into the middle of their
-     * * contents list and we should truncate our list. If not,
-     * * assume we own the object.
-     */
+	 * Object thinks it's in another place.  Check the contents list
+	 * * there and see if it contains this object.  If it does, then
+	 * * our contents list somehow pointed into the middle of their
+	 * * contents list and we should truncate our list. If not,
+	 * * assume we own the object.
+	 */
 	if (!Good_obj(*obj))
 	{
 		return;
@@ -1838,8 +1838,8 @@ void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 	if (Marked(*obj))
 	{
 		/*
-	 * It's in the other list, give it up
-	 */
+		 * It's in the other list, give it up
+		 */
 		Log_pointer_err(back, loc, NOTHING, *obj, "", "is in another contents list.  Cleared.");
 
 		if (back != NOTHING)
@@ -1856,8 +1856,8 @@ void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 	else
 	{
 		/*
-	 * Not in the other list, assume in ours
-	 */
+		 * Not in the other list, assume in ours
+		 */
 		Log_header_err(*obj, loc, Contents(*obj), 1, "Location", "is invalid.  Reset.");
 		s_Contents(*obj, loc);
 	}
@@ -1875,8 +1875,8 @@ void check_loc_contents(dbref loc)
 	}
 
 	/*
-     * Only check players, rooms, and things that aren't GOING
-     */
+	 * Only check players, rooms, and things that aren't GOING
+	 */
 
 	if (isExit(loc) || Going(loc))
 	{
@@ -1884,8 +1884,8 @@ void check_loc_contents(dbref loc)
 	}
 
 	/*
-     * Check all the exits
-     */
+	 * Check all the exits
+	 */
 	back = NOTHING;
 	obj = Contents(loc);
 
@@ -1894,8 +1894,8 @@ void check_loc_contents(dbref loc)
 		if (!Good_obj(obj))
 		{
 			/*
-	     * A bad pointer - terminate chain
-	     */
+			 * A bad pointer - terminate chain
+			 */
 			Log_pointer_err(back, loc, NOTHING, obj, "Contents list", "is invalid.  Cleared.");
 
 			if (back != NOTHING)
@@ -1912,8 +1912,8 @@ void check_loc_contents(dbref loc)
 		else if (!Has_location(obj))
 		{
 			/*
-	     * Not a player or thing - terminate chain
-	     */
+			 * Not a player or thing - terminate chain
+			 */
 			Log_pointer_err(back, loc, NOTHING, obj, "Contents list member", "is not a player or thing.  Cleared.");
 
 			if (back != NOTHING)
@@ -1930,8 +1930,8 @@ void check_loc_contents(dbref loc)
 		else if (Going(obj) && (Typeof(obj) == TYPE_GARBAGE))
 		{
 			/*
-	     * Going - silently filter out
-	     */
+			 * Going - silently filter out
+			 */
 			temp = Next(obj);
 
 			if (back != NOTHING)
@@ -1950,41 +1950,41 @@ void check_loc_contents(dbref loc)
 		else if (Marked(obj))
 		{
 			/*
-	     * Already visited - either truncate or ignore
-	     */
+			 * Already visited - either truncate or ignore
+			 */
 			if (Location(obj) != loc)
 			{
 				/*
-		 * Location wrong - either truncate or fix
-		 */
+				 * Location wrong - either truncate or fix
+				 */
 				check_misplaced_obj(&obj, back, loc);
 			}
 			else
 			{
 				/*
-		 * Location right - recursive contents
-		 */
+				 * Location right - recursive contents
+				 */
 			}
 		}
 		else if (Location(obj) != loc)
 		{
 			/*
-	     * Location wrong - either truncate or fix
-	     */
+			 * Location wrong - either truncate or fix
+			 */
 			check_misplaced_obj(&obj, back, loc);
 		}
 
 		if (obj != NOTHING)
 		{
 			/*
-	     * All OK (or all was made OK)
-	     */
+			 * All OK (or all was made OK)
+			 */
 			if (check_type & DBCK_FULL)
 			{
 				/*
-		 * Check for wizard command-handlers inside
-		 * * nonwiz. Just warn if we find one.
-		 */
+				 * Check for wizard command-handlers inside
+				 * * nonwiz. Just warn if we find one.
+				 */
 				if (Wizard(obj) && !Wizard(loc))
 				{
 					if (Commer(obj))
@@ -1994,9 +1994,9 @@ void check_loc_contents(dbref loc)
 				}
 
 				/*
-		 * Check for nonwizard objects inside wizard
-		 * * objects.
-		 */
+				 * Check for nonwizard objects inside wizard
+				 * * objects.
+				 */
 
 				if (Wizard(loc) && !Wizard(obj) && !Wizard(Owner(obj)))
 				{

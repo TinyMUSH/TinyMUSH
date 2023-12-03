@@ -4,11 +4,11 @@
  * @brief Functions that rely on external call-outs
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -25,16 +25,16 @@
 
 /**
  * @brief Return a MUSH config parameter.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
- * @param caller Not used 
- * @param cause Not used 
+ * @param caller Not used
+ * @param cause Not used
  * @param fargs Functions arguments
- * @param nfargs Not used 
- * @param cargs Not used 
- * @param ncargs Not used 
+ * @param nfargs Not used
+ * @param cargs Not used
+ * @param ncargs Not used
  */
 void fun_config(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
@@ -43,7 +43,7 @@ void fun_config(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 /**
  * @brief Return list of connected users.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -61,7 +61,7 @@ void fun_lwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
 /**
  * @brief Returns a list of ports for a user.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -100,7 +100,7 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 /**
  * @brief Returns a user's doing.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -143,7 +143,7 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 /**
  * @brief Return seconds idle or connected (IDLE, CONN).
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -181,7 +181,7 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
 
 /**
  * @brief Return session info about a port.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -219,7 +219,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 /**
  * @brief Returns the dbref or #1- of an object in a @program.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -246,7 +246,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 
 /**
  * @brief Read an entry from a helpfile.
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -292,12 +292,12 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 /**
  * @brief Pueblo HTML-related functions.
- * 
+ *
  */
 
 /**
  * @brief Escape HTML
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -315,7 +315,7 @@ void fun_html_escape(char *buff, char **bufc, dbref player __attribute__((unused
 
 /**
  * @brief Un-escape HTML
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -372,7 +372,7 @@ void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unus
 
 /**
  * @brief Check if a characters should be converted to %<hex>
- * 
+ *
  * @param ch Character to check
  * @return true Convert to hex
  * @return false Keep as is.
@@ -410,7 +410,7 @@ bool escaped_chars(unsigned char ch)
 
 /**
  * @brief Escape URL
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -449,7 +449,7 @@ void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)
 
 /**
  * @brief Un-escape URL
- * 
+ *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
@@ -488,27 +488,27 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 
 			if (*msg_orig)
 			{
-				/** 
-				 * Skip the '%' 
-				 * 
-				 */
-				msg_orig++; 
-			}
-
-			if (*msg_orig)
-			{ 
-				/** 
-				 * Skip the 1st hex character. 
-				 * 
+				/**
+				 * Skip the '%'
+				 *
 				 */
 				msg_orig++;
 			}
 
 			if (*msg_orig)
-			{ 
-				/** 
-				 * Skip the 2nd hex character. 
-				 * 
+			{
+				/**
+				 * Skip the 1st hex character.
+				 *
+				 */
+				msg_orig++;
+			}
+
+			if (*msg_orig)
+			{
+				/**
+				 * Skip the 2nd hex character.
+				 *
 				 */
 				msg_orig++;
 			}

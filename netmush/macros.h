@@ -4,11 +4,11 @@
  * @brief Macro definitions
  * @version 3.3
  * @date 2021-01-10
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #ifndef __MACROS_H
@@ -16,7 +16,7 @@
 
 /**
  * @brief XMALLOC related macros
- * 
+ *
  */
 
 // Allocation Functions
@@ -83,12 +83,12 @@
 
 /**
  * @brief DB related macros
- * 
+ *
  */
 
-/** 
+/**
  * @brief Macros to help deal with batch writes of attribute numbers and objects
- * 
+ *
  */
 #define ATRNUM_BLOCK_SIZE (int)((mushstate.db_block_size - 32) / (2 * sizeof(int) + VNAME_SIZE))
 #define ATRNUM_BLOCK_BYTES (int)((ATRNUM_BLOCK_SIZE) * (2 * sizeof(int) + VNAME_SIZE))
@@ -133,7 +133,7 @@
 /**
  * @brief If we modify something on the db object that needs to be written at dump
  * time, set the object DIRTY
- * 
+ *
  */
 #define s_Location(t, n)  \
     db[t].location = (n); \
@@ -183,13 +183,13 @@
 #define s_CreateTime(t, n)   \
     db[t].create_time = (n); \
     db[t].flags3 |= DIRTY
-#define s_Accessed(t)                 \
+#define s_Accessed(t)                  \
     db[t].last_access = mushstate.now; \
     db[t].flags3 |= DIRTY
-#define s_Modified(t)              \
+#define s_Modified(t)               \
     db[t].last_mod = mushstate.now; \
     db[t].flags3 |= DIRTY
-#define s_Created(t)                  \
+#define s_Created(t)                   \
     db[t].create_time = mushstate.now; \
     db[t].flags3 |= DIRTY
 
@@ -204,16 +204,16 @@
 
 #define Dropper(thing) (Connected(Owner(thing)) && Hearer(thing))
 
-/** 
- * Sizes, on disk, of Object and (within the object) Attribute headers 
- * 
+/**
+ * Sizes, on disk, of Object and (within the object) Attribute headers
+ *
  */
 #define OBJ_HEADER_SIZE (sizeof(unsigned int) + sizeof(int))
 #define ATTR_HEADER_SIZE (sizeof(int) * 2)
 
 /**
  * @brief Messages related macros.
- * 
+ *
  */
 #define MSG_ME_ALL (MSG_ME | MSG_INV_EXITS | MSG_FWDLIST)
 #define MSG_F_CONTENTS (MSG_INV)
@@ -221,13 +221,13 @@
 #define MSG_F_DOWN (MSG_INV_L)
 /**
  * @brief Log related macros.
- * 
+ *
  */
 #define log_write(i, p, s, f, ...) _log_write(__FILE__, __LINE__, i, p, s, f, ##__VA_ARGS__)
 #define log_perror(p, s, e, o) _log_perror(__FILE__, __LINE__, p, s, e, o)
 /**
  * A zillion ways to notify things.
- * 
+ *
  */
 #define notify(p, m, ...) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, m, ##__VA_ARGS__)
 #define notify_html(p, m, ...) notify_check(p, p, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN | MSG_HTML, NULL, m, ##__VA_ARGS__)
@@ -247,9 +247,9 @@
 #define notify_all_from_outside(p, c, m, ...) notify_check(p, c, MSG_ME_ALL | MSG_NBR_EXITS | MSG_F_UP | MSG_F_CONTENTS | MSG_S_OUTSIDE, NULL, m, ##__VA_ARGS__)
 /**
  * General macros.
- * 
+ *
  */
-//#define Randomize(n) (random_range(0, (n)-1))
+// #define Randomize(n) (random_range(0, (n)-1))
 #define Protect(f) (cmdp->perms & f)
 #define Invalid_Objtype(x) ((Protect(CA_LOCATION) && !Has_location(x)) || (Protect(CA_CONTENTS) && !Has_contents(x)) || (Protect(CA_PLAYER) && (Typeof(x) != TYPE_PLAYER)))
 #define test_top() ((mushstate.qfirst != NULL) ? 1 : 0)
@@ -257,14 +257,14 @@
 
 /**
  * @brief Flags related macros
- * 
+ *
  */
 
 #define GOD ((dbref)1)
 
-/** 
+/**
  * Object Permission/Attribute Macros:
- * 
+ *
  * IS(X,T,F)            - Is X of type T and have flag F set?
  * Typeof(X)            - What object type is X
  * God(X)               - Is X player #1
@@ -318,7 +318,7 @@
  * Read_attr(P,X,A,O,F) - Can P see attr A on X if attr has owner O
  * Write_attr(P,X,A,F)  - Can P set/change attr A (with flags F) on X
  * Lock_attr(P,X,A,O)   - Can P lock/unlock attr A (with owner O) on X
- * 
+ *
  */
 
 #define IS(thing, type, flag) ((Typeof(thing) == (type)) && (Flags(thing) & (flag)))
@@ -448,20 +448,20 @@
 
 /**
  * @brief Base control-oriented predicates.
- * 
+ *
  */
 #define Parentable(p, x) (Controls(p, x) || (Parent_ok(x) && could_doit(p, x, A_LPARENT)))
 #define OnControlLock(p, x) (check_zone(p, x))
 #define Controls(p, x) (Good_obj(x) && (!(God(x) && !God(p))) && (Control_All(p) || ((Owner(p) == Owner(x)) && (Inherits(p) || !Inherits(x))) || OnControlLock(p, x)))
 #define Cannot_Objeval(p, x) ((x == NOTHING) || God(x) || (mushconf.fascist_objeval ? !Controls(p, x) : ((Owner(x) != Owner(p)) && !Wizard(p))))
 #define Has_power(p, x) (check_access((p), powers_nametab[x].flag))
-#define Mark(x) (mushstate.markbits->chunk[(x) >> 3] |= mushconf.markdata[(x)&7])
-#define Unmark(x) (mushstate.markbits->chunk[(x) >> 3] &= ~mushconf.markdata[(x)&7])
-#define Marked(x) (mushstate.markbits->chunk[(x) >> 3] & mushconf.markdata[(x)&7])
+#define Mark(x) (mushstate.markbits->chunk[(x) >> 3] |= mushconf.markdata[(x) & 7])
+#define Unmark(x) (mushstate.markbits->chunk[(x) >> 3] &= ~mushconf.markdata[(x) & 7])
+#define Marked(x) (mushstate.markbits->chunk[(x) >> 3] & mushconf.markdata[(x) & 7])
 
 /**
  * @brief Visibility constraints.
- * 
+ *
  */
 #define Examinable(p, x) (((Flags(x) & VISUAL) != 0) || (See_All(p)) || (Owner(p) == Owner(x)) || OnControlLock(p, x))
 #define MyopicExam(p, x) (((Flags(x) & VISUAL) != 0) || (!Myopic(p) && (See_All(p) || (Owner(p) == Owner(x)) || OnControlLock(p, x))))
@@ -473,7 +473,7 @@
  * DarkLocks only apply when we are checking if we can see something on a
  * 'look'. They are not checked when matching, when looking at lexits(), when
  * determining whether a move is seen, on @sweep, etc.
- * 
+ *
  */
 #define Darkened(p, x) (Dark(x) && (!H_Darklock(x) || could_doit(p, x, A_LDARK)))
 
@@ -485,7 +485,7 @@
  * location is dark, you see it if you control it. Seeing your own dark
  * objects is controlled by mushconf.see_own_dark. In dark locations, you also
  * see things that are LIGHT and !DARK.
- * 
+ *
  */
 #define Sees(p, x) (!Darkened(p, x) || (mushconf.see_own_dark && MyopicExam(p, x)))
 #define Sees_Always(p, x) (!Darkened(p, x) || (mushconf.see_own_dark && Examinable(p, x)))
@@ -495,7 +495,7 @@
 
 /**
  * @brief nearby_or_control: Check if player is near or controls thing
- * 
+ *
  */
 #define nearby_or_control(p, t) (Good_obj(p) && Good_obj(t) && (Controls(p, t) || nearby(p, t)))
 
@@ -503,18 +503,18 @@
  * @brief For exits visible (for lexits(), etc.), this is true if we can examine the
  * exit's location, examine the exit, or the exit is LIGHT. It is also true
  * if neither the location or base or exit is dark.
- * 
+ *
  */
-#define Exit_Visible(x, p, k) (((k)&VE_LOC_XAM) || Examinable(p, x) || Light(x) || (!((k) & (VE_LOC_DARK | VE_BASE_DARK)) && !Dark(x)))
+#define Exit_Visible(x, p, k) (((k) & VE_LOC_XAM) || Examinable(p, x) || Light(x) || (!((k) & (VE_LOC_DARK | VE_BASE_DARK)) && !Dark(x)))
 
 /**
  * @brief Linking.
- * 
+ *
  */
 
 /**
  * @brief Can I link this exit to something else?
- * 
+ *
  */
 #define Link_exit(p, x) ((Typeof(x) == TYPE_EXIT) && ((Location(x) == NOTHING) || Controls(p, x)))
 
@@ -522,7 +522,7 @@
  * @brief Is this something I can link to? - It must be a valid object, and be able
  * to have contents. - I must control it, or have it be Link_ok, or I must
  * the link_to_any power and not have the destination be God.
- * 
+ *
  */
 #define Linkable(p, x) (Good_obj(x) && Has_contents(x) && (Controls(p, x) || Link_ok(x) || (LinkToAny(p) && !God(x))))
 
@@ -530,13 +530,13 @@
  * @brief Can I pass the linklock check on this? - I must have link_to_any (or be a
  * wizard) and wizards must ignore linklocks, OR - I must be able to pass the
  * linklock.
- * 
+ *
  */
 #define Passes_Linklock(p, x) ((LinkToAny(p) && !mushconf.wiz_obey_linklock) || could_doit(p, x, A_LLINK))
 
 /**
  * @brief Attribute visibility and write permissions.
- * 
+ *
  */
 #define AttrFlags(a, f) ((f) | (a)->flags)
 #define Visible_desc(p, x, a) (((a)->number != A_DESC) || mushconf.read_rem_desc || nearby(p, x))
@@ -554,14 +554,14 @@
  * Constant. - We control the object, and the attribute and master attribute
  * do not have the Wizard or God flags, OR We are a Wizard and the attribute
  * and master attribute do not have the God flags.
- * 
+ *
  */
-#define Set_attr(p, x, a, f) (!((a)->flags & (AF_INTERNAL | AF_IS_LOCK | AF_CONST)) && (God(p) || (!God(x) && !((f)&AF_LOCK) && !Constant_Attrs(x) && ((Controls(p, x) && !((a)->flags & (AF_WIZARD | AF_GOD)) && !((f) & (AF_WIZARD | AF_GOD))) || (Sets_Wiz_Attrs(p) && !((a)->flags & AF_GOD) && !((f)&AF_GOD))))))
+#define Set_attr(p, x, a, f) (!((a)->flags & (AF_INTERNAL | AF_IS_LOCK | AF_CONST)) && (God(p) || (!God(x) && !((f) & AF_LOCK) && !Constant_Attrs(x) && ((Controls(p, x) && !((a)->flags & (AF_WIZARD | AF_GOD)) && !((f) & (AF_WIZARD | AF_GOD))) || (Sets_Wiz_Attrs(p) && !((a)->flags & AF_GOD) && !((f) & AF_GOD))))))
 
 /**
  * @brief Write_attr() is only used by atr_cpy(), and thus is not subject to the
  * effects of the Constant flag.
- * 
+ *
  */
 #define Write_attr(p, x, a, f) (!((a)->flags & (AF_INTERNAL | AF_NOCLONE)) && (God(p) || (!God(x) && !(f & AF_LOCK) && ((Controls(p, x) && !((a)->flags & (AF_WIZARD | AF_GOD)) && !((f) & (AF_WIZARD | AF_GOD))) || (Sets_Wiz_Attrs(p) && !((a)->flags & AF_GOD))))))
 
@@ -571,13 +571,13 @@
  * God. - The object is not set Constant. - The master attribute does not
  * have the Wizard or God flags, OR We are a Wizard and the master attribute
  * does not have the God flag. - We are a Wizard OR we own the attribute.
- * 
+ *
  */
 #define Lock_attr(p, x, a, o) (God(p) || (!God(x) && !((a)->flags & (AF_INTERNAL | AF_IS_LOCK | AF_CONST)) && !Constant_Attrs(x) && (!((a)->flags & (AF_WIZARD | AF_GOD)) || (Sets_Wiz_Attrs(p) && !((a)->flags & AF_GOD))) && (Wizard(p) || (o) == Owner(p))))
 
 /**
- * @brief Visibility abstractions 
- * 
+ * @brief Visibility abstractions
+ *
  */
 #define Are_Real(p, t) (!(Unreal(p) || Unreal(t)))
 #define Check_Heard(t, p) (could_doit((t), (p), A_LHEARD))
@@ -589,34 +589,34 @@
 
 /**
  * @brief Functions related macros
- * 
+ *
  */
 
 /**
  * @brief Miscellaneous macros.
- * 
+ *
  * Get function flags. Note that Is_Func() and Func_Mask() are identical;
  * they are given specific names for code clarity.
- * 
+ *
  */
 #define Func_Flags(x) (((FUN *)(x)[-1])->flags)
 #define Is_Func(x) (((FUN *)fargs[-1])->flags & (x))
 #define Func_Mask(x) (((FUN *)fargs[-1])->flags & (x))
 
 #define IS_CLEAN(i) (IS(i, TYPE_GARBAGE, GOING) && (Location(i) == NOTHING) && (Contents(i) == NOTHING) && (Exits(i) == NOTHING) && (Next(i) == NOTHING) && (Owner(i) == GOD))
-/** 
- * Check access to built-in function. 
- * 
+/**
+ * Check access to built-in function.
+ *
  */
 #define Check_Func_Access(p, f) (check_access(p, (f)->perms) && (!((f)->xperms) || check_mod_access(p, (f)->xperms)))
-/** 
- * Trim spaces. 
- * 
+/**
+ * Trim spaces.
+ *
  */
 #define Eat_Spaces(x) trim_space_sep((x), &SPACE_DELIM)
 /**
  * @brief Handling CPU time checking.
- * 
+ *
  * @note CPU time "clock()" compatibility notes:
  *
  * Linux clock() doesn't necessarily start at 0. BSD clock() does appear to
@@ -636,7 +636,7 @@
  * can't use subtraction.
  *
  * BSD clock() returns -1 if there is an error.
- * 
+ *
  * @note CPU time logic notes:
  *
  * B = mushstate.cputime_base L = mushstate.cputime_base + mushconf.func_cpu_lim N = mushstate.cputime_now
@@ -650,8 +650,8 @@
  * 3. B >  L  strange   -- probably misconfigured
  * 4. B >> L  wrapped   -- limit should be checked, and note L wrapped
  *
- * 1.  normal: 
- *  1a. N << B          -- too much, N wrapped 
+ * 1.  normal:
+ *  1a. N << B          -- too much, N wrapped
  *  1b. N <  B          -- fine, NetBSD counted backwards
  *  1c. N >= B, N <= L  -- fine
  *  1d. N >  L          -- too much
@@ -676,7 +676,7 @@
 
 /**
  * @brief Database macros
- * 
+ *
  */
 
 #define MANDFLAGS (V_LINK | V_PARENT | V_XFLAGS | V_ZONE | V_POWERS | V_3FLAGS | V_QUOTED | V_TQUOTAS | V_TIMESTAMPS | V_VISUALATTRS | V_CREATETIME)
@@ -687,7 +687,7 @@
 
 /**
  * @brief HTab macros
- * 
+ *
  */
 
 #define nhashinit(h, sz) hashinit((h), (sz), HT_NUM)
@@ -709,14 +709,14 @@
 
 /**
  * @brief MUSH macros
- * 
+ *
  */
 
 #define OBLOCK_SIZE (dbref)((LBUF_SIZE - sizeof(OBLOCK *)) / sizeof(dbref))
 
 /**
  * @brief Powers macros
- * 
+ *
  */
 
 #define s_Change_Quotas(c) s_Powers((c), Powers(c) | POW_CHG_QUOTAS)
@@ -794,7 +794,7 @@
 
 /**
  * @brief Cron macros
- * 
+ *
  */
 #define MINUTE_COUNT (LAST_MINUTE - FIRST_MINUTE + 1)
 #define HOUR_COUNT (LAST_HOUR - FIRST_HOUR + 1)

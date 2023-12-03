@@ -4,11 +4,11 @@
  * @brief Wizard-only commands
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -36,8 +36,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * get victim
-     */
+	 * get victim
+	 */
 
 	if (*arg2 == '\0')
 	{
@@ -59,8 +59,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * Validate type of victim
-     */
+	 * Validate type of victim
+	 */
 
 	if (!Has_location(victim) && !isExit(victim))
 	{
@@ -69,12 +69,12 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * If this is an exit, we need to control it, or it must be
-     * * unlinked. (Same permissions as @link.)  Or, we can control
-     * * the room. (Same permissions as get.)
-     * * Otherwise, fail if we're not Tel_Anything, and we don't control
-     * * the victim or the victim's location.
-     */
+	 * If this is an exit, we need to control it, or it must be
+	 * * unlinked. (Same permissions as @link.)  Or, we can control
+	 * * the room. (Same permissions as get.)
+	 * * Otherwise, fail if we're not Tel_Anything, and we don't control
+	 * * the victim or the victim's location.
+	 */
 
 	if (isExit(victim))
 	{
@@ -91,8 +91,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * Check for teleporting home. Exits don't have homes.
-     */
+	 * Check for teleporting home. Exits don't have homes.
+	 */
 
 	if (!string_compare(to, "home"))
 	{
@@ -109,8 +109,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * Find out where to send the victim
-     */
+	 * Find out where to send the victim
+	 */
 	init_match(player, to, NOTYPE);
 	match_everything(0);
 	destination = match_result();
@@ -134,9 +134,9 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * If fascist teleport is on, you must control the victim's ultimate
-     * location (after LEAVEing any objects) or it must be JUMP_OK.
-     */
+	 * If fascist teleport is on, you must control the victim's ultimate
+	 * location (after LEAVEing any objects) or it must be JUMP_OK.
+	 */
 
 	if (mushconf.fascist_tport)
 	{
@@ -150,8 +150,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 
 	/*
-     * If this is an exit, the same privs involved as @open apply.
-     */
+	 * If this is an exit, the same privs involved as @open apply.
+	 */
 
 	if (isExit(victim))
 	{
@@ -173,15 +173,15 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	if (Has_contents(destination))
 	{
 		/*
-	 * You must control the destination, or it must be a JUMP_OK
-	 * room where the victim passes its TELEPORT lock, or you
-	 * must be Tel_Anywhere.
-	 */
+		 * You must control the destination, or it must be a JUMP_OK
+		 * room where the victim passes its TELEPORT lock, or you
+		 * must be Tel_Anywhere.
+		 */
 		if (!(Controls(player, destination) || (Jump_ok(destination) && could_doit(victim, destination, A_LTPORT)) || Tel_Anywhere(player)))
 		{
 			/*
-	     * Nope, report failure
-	     */
+			 * Nope, report failure
+			 */
 			if (player != victim)
 			{
 				notify_quiet(player, NOPERM_MESSAGE);
@@ -192,8 +192,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 		}
 
 		/*
-	 * We're OK, do the teleport
-	 */
+		 * We're OK, do the teleport
+		 */
 
 		if (key & TELEPORT_QUIET)
 		{
@@ -265,8 +265,8 @@ void do_force(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	}
 
 	/*
-     * force victim to do command
-     */
+	 * force victim to do command
+	 */
 
 	if (key & FRC_NOW)
 	{
@@ -332,8 +332,8 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	XFREE(pname);
 
 	/*
-     * Clear everything out
-     */
+	 * Clear everything out
+	 */
 	if (key & TOAD_NO_CHOWN)
 	{
 		count = -1;
@@ -342,8 +342,8 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	{
 		count = chown_all(victim, recipient, player, 0);
 		s_Owner(victim, recipient); /*
-					 * you get it
-					 */
+									 * you get it
+									 */
 	}
 
 	s_Flags(victim, TYPE_THING | HALT);
@@ -351,8 +351,8 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	s_Flags3(victim, 0);
 	s_Pennies(victim, 1);
 	/*
-     * notify people
-     */
+	 * notify people
+	 */
 	loc = Location(victim);
 	buf = XMALLOC(MBUF_SIZE, "buf");
 	XSPRINTF(buf, "%s has been turned into a slimy toad!", Name(victim));
@@ -360,15 +360,15 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	XSPRINTF(buf, "You toaded %s! (%d objects @chowned)", Name(victim), count + 1);
 	notify_quiet(player, buf);
 	/*
-     * Zap the name from the name hash table
-     */
+	 * Zap the name from the name hash table
+	 */
 	delete_player_name(victim, Name(victim));
 	XSPRINTF(buf, "a slimy toad named %s", Name(victim));
 	s_Name(victim, buf);
 	XFREE(buf);
 	/*
-     * Zap the alias too
-     */
+	 * Zap the alias too
+	 */
 	buf = atr_pget(victim, A_ALIAS, &aowner, &aflags, &alen);
 	delete_player_name(victim, buf);
 	XFREE(buf);
@@ -390,9 +390,9 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	if (*password != '\0' && !ok_password(password, player))
 	{
 		/*
-	 * Can set null passwords, but not bad passwords.
-	 * * Notification of reason done by ok_password().
-	 */
+		 * Can set null passwords, but not bad passwords.
+		 * * Notification of reason done by ok_password().
+		 */
 		return;
 	}
 
@@ -408,8 +408,8 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	XFREE(vname);
 	XFREE(pname);
 	/*
-     * it's ok, do it
-     */
+	 * it's ok, do it
+	 */
 	s_Pass(victim, crypt((const char *)password, "XX"));
 	notify_quiet(player, "Password changed.");
 	notify_check(victim, victim, MSG_PUP_ALWAYS | MSG_ME, "Your password has been changed by %s.", Name(player));
@@ -522,7 +522,7 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 	}
 
 	amt = (int)strtol(arg1, (char **)NULL, 10);
-	
+
 	for (a = 0; a < mushstate.db_top; a++)
 	{
 		if (isPlayer(a))
@@ -724,10 +724,10 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 
 			if (mushconf.motd_msg)
 			{
-				if(*mushconf.motd_msg) {
+				if (*mushconf.motd_msg)
+				{
 					notify_quiet(player, mushconf.motd_msg);
 				}
-				
 			}
 			else
 			{
@@ -751,8 +751,8 @@ void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char 
 	int flagvalue;
 	char *name;
 	/*
-     * Set or clear the indicated flag
-     */
+	 * Set or clear the indicated flag
+	 */
 	flagvalue = search_nametab(player, enable_names, flag);
 
 	if (flagvalue < 0)

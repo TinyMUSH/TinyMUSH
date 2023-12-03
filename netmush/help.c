@@ -4,11 +4,11 @@
  * @brief Commands for giving help
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -33,9 +33,9 @@ int helpmkindx_dump_entries(FILE *wfp, long pos, help_indx_list *entries)
 	int depth;
 	help_indx_list *prev_ep, *ep;
 	/*
-     *  if we have more than one entry, the one on the top of the chain
-     *  is going to have the actual pos we want to use to index with
-     */
+	 *  if we have more than one entry, the one on the top of the chain
+	 *  is going to have the actual pos we want to use to index with
+	 */
 	truepos = (long)entries->entry.pos;
 	truelen = (int)(pos - entries->entry.pos);
 	prev_ep = 0;
@@ -63,9 +63,9 @@ int helpmkindx_dump_entries(FILE *wfp, long pos, help_indx_list *entries)
 	}
 
 	/*
-     *  no attempt is made to free the last remaining struct as its actually the
-     *  one on the top of the chain, ie. the statically allocated struct.
-     */
+	 *  no attempt is made to free the last remaining struct as its actually the
+	 *  one on the top of the chain, ie. the statically allocated struct.
+	 */
 	return (0);
 }
 
@@ -192,8 +192,8 @@ int helpindex_read(HASHTAB *htab, char *filename)
 	struct help_entry *htab_entry;
 
 	/*
-     * Let's clean out our hash table, before we throw it away.
-     */
+	 * Let's clean out our hash table, before we throw it away.
+	 */
 	for (p = hash_firstkey(htab); p; p = hash_nextkey(htab))
 	{
 		if (!(hashfindflags(p, htab) & HASH_ALIAS))
@@ -216,9 +216,9 @@ int helpindex_read(HASHTAB *htab, char *filename)
 	while ((fread((char *)&entry, sizeof(help_indx), 1, fp)) == 1)
 	{
 		/*
-	 * Lowercase the entry and add all leftmost substrings.
-	 * * Substrings already added will be rejected by hashadd.
-	 */
+		 * Lowercase the entry and add all leftmost substrings.
+		 * * Substrings already added will be rejected by hashadd.
+		 */
 		for (p = entry.topic; *p; p++)
 		{
 			*p = tolower(*p);
@@ -246,9 +246,9 @@ int helpindex_read(HASHTAB *htab, char *filename)
 					else
 					{
 						/*
-			 * It didn't make it into the hash
-			 * * table
-			 */
+						 * It didn't make it into the hash
+						 * * table
+						 */
 						break;
 					}
 				}
@@ -295,9 +295,9 @@ void helpindex_load(dbref player)
 void helpindex_init(void)
 {
 	/*
-     * We do not need to do hashinits here, as this will already have
-     * * been done by the add_helpfile() calls.
-     */
+	 * We do not need to do hashinits here, as this will already have
+	 * * been done by the add_helpfile() calls.
+	 */
 	helpindex_load(NOTHING);
 }
 

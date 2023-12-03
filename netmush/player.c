@@ -4,11 +4,11 @@
  * @brief Player handling and processing
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -252,8 +252,8 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
         if (Pennies(player) < mushconf.paylimit)
         {
             /*
-	     * Don't heap coins on players who already have lots of money.
-	     */
+             * Don't heap coins on players who already have lots of money.
+             */
             allowance = atr_pget(player, A_ALLOWANCE, &aowner, &aflags, &alen);
 
             if (*allowance == '\0')
@@ -314,13 +314,13 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
      * initialize everything
      */
 
-        for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
+    {
+        if (cam__mp->create_player)
         {
-            if (cam__mp->create_player)
-            {
-                (*(cam__mp->create_player))(creator, player, isrobot, isguest);
-            }
+            (*(cam__mp->create_player))(creator, player, isrobot, isguest);
         }
+    }
 
     s_Pass(player, crypt(pbuf, "XX"));
     s_Home(player, (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
@@ -346,8 +346,8 @@ void do_password(dbref player, dbref cause __attribute__((unused)), int key __at
     else if (!ok_password(newpass, player))
     {
         /*
-	 * Do nothing, notification is handled by ok_password()
-	 */
+         * Do nothing, notification is handled by ok_password()
+         */
     }
     else
     {
@@ -446,10 +446,10 @@ int add_player_name(dbref player, char *name)
     if (p)
     {
         /*
-	 * Entry found in the hashtable.  If a player, succeed if the
-	 * * numbers match (already correctly in the hash table),
-	 * * fail if they don't.
-	 */
+         * Entry found in the hashtable.  If a player, succeed if the
+         * * numbers match (already correctly in the hash table),
+         * * fail if they don't.
+         */
         if (Good_obj(*p) && isPlayer(*p))
         {
             XFREE(temp);
@@ -465,8 +465,8 @@ int add_player_name(dbref player, char *name)
         }
 
         /*
-	 * It's an alias (or an incorrect entry).  Clobber it
-	 */
+         * It's an alias (or an incorrect entry).  Clobber it
+         */
         XFREE(p);
         p = (dbref *)XMALLOC(sizeof(dbref), "p");
         *p = player;

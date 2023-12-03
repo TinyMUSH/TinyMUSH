@@ -4,11 +4,11 @@
  * @brief Support for commands that walk the entire db
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -153,8 +153,8 @@ int get_stats(dbref player, dbref who, STATS *info)
 	info->s_unknown = 0;
 
 	/*
-     * Do we have permission?
-     */
+	 * Do we have permission?
+	 */
 
 	if (Good_obj(who) && !Controls(player, who) && !Stat_Any(player))
 	{
@@ -163,8 +163,8 @@ int get_stats(dbref player, dbref who, STATS *info)
 	}
 
 	/*
-     * Can we afford it?
-     */
+	 * Can we afford it?
+	 */
 
 	if (!payfor(player, mushconf.searchcost))
 	{
@@ -217,8 +217,8 @@ int get_stats(dbref player, dbref who, STATS *info)
 void do_stats(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
 {
 	/*
-     * reworked by R'nice
-     */
+	 * reworked by R'nice
+	 */
 	dbref owner;
 	STATS statinfo;
 
@@ -426,8 +426,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	int attrib, aflags, alen;
 	ATTR *attr;
 	/*
-     * Crack arg into <pname> <type>=<targ>,<low>,<high>
-     */
+	 * Crack arg into <pname> <type>=<targ>,<low>,<high>
+	 */
 	pname = parse_to(&searchfor, '=', EV_STRIP_TS);
 
 	if (!pname || !*pname)
@@ -463,8 +463,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
-     * If the player name is quoted, strip the quotes
-     */
+	 * If the player name is quoted, strip the quotes
+	 */
 
 	if (*pname == '\"')
 	{
@@ -478,12 +478,12 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
-     * Strip any range arguments
-     */
+	 * Strip any range arguments
+	 */
 	parse_range(&searchfor, &parm->low_bound, &parm->high_bound);
 	/*
-     * set limits on who we search
-     */
+	 * set limits on who we search
+	 */
 	parm->s_owner = Owner(player);
 	parm->s_wizard = Search(player);
 	parm->s_rst_owner = NOTHING;
@@ -521,8 +521,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
-     * set limits on what we search for
-     */
+	 * set limits on what we search for
+	 */
 	err = 0;
 	parm->s_rst_name = NULL;
 	parm->s_rst_eval = NULL;
@@ -539,8 +539,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	switch (searchtype[0])
 	{
 	case '\0': /*
-				 * the no class requested class  :)
-				 */
+				* the no class requested class  :)
+				*/
 		break;
 
 	case 'e':
@@ -589,9 +589,9 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 		if (string_prefix("flags", searchtype))
 		{
 			/*
-	     * convert_flags ignores previous values of flag_mask
-	     * * * * * and s_rst_type while setting them
-	     */
+			 * convert_flags ignores previous values of flag_mask
+			 * * * * * and s_rst_type while setting them
+			 */
 			if (!convert_flags(player, searchfor, &parm->s_fset, &parm->s_rst_type))
 			{
 				return 0;
@@ -836,8 +836,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
-     * Make sure player is authorized to do the search
-     */
+	 * Make sure player is authorized to do the search
+	 */
 
 	if (!parm->s_wizard && (parm->s_rst_type != TYPE_PLAYER) && (parm->s_rst_owner != player) && (parm->s_rst_owner != ANY_OWNER))
 	{
@@ -846,8 +846,8 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
-     * make sure player has money to do the search
-     */
+	 * make sure player has money to do the search
+	 */
 
 	if (!payfor(player, mushconf.searchcost))
 	{
@@ -882,8 +882,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		mushstate.func_invk_ctr = save_invk_ctr;
 
 		/*
-	 * Check for matching type
-	 */
+		 * Check for matching type
+		 */
 
 		if ((parm->s_rst_type != NOTYPE) && (parm->s_rst_type != Typeof(thing)))
 		{
@@ -891,8 +891,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching owner
-	 */
+		 * Check for matching owner
+		 */
 
 		if ((parm->s_rst_owner != ANY_OWNER) && (parm->s_rst_owner != Owner(thing)))
 		{
@@ -900,8 +900,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching parent
-	 */
+		 * Check for matching parent
+		 */
 
 		if ((parm->s_parent != NOTHING) && (parm->s_parent != Parent(thing)))
 		{
@@ -909,8 +909,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching zone
-	 */
+		 * Check for matching zone
+		 */
 
 		if ((parm->s_zone != NOTHING) && (parm->s_zone != Zone(thing)))
 		{
@@ -918,8 +918,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching flags
-	 */
+		 * Check for matching flags
+		 */
 		thing3flags = Flags3(thing);
 		thing2flags = Flags2(thing);
 		thing1flags = Flags(thing);
@@ -940,8 +940,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching power
-	 */
+		 * Check for matching power
+		 */
 		thing1powers = Powers(thing);
 		thing2powers = Powers2(thing);
 
@@ -956,8 +956,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for matching name
-	 */
+		 * Check for matching name
+		 */
 
 		if (parm->s_rst_name != NULL)
 		{
@@ -968,8 +968,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * Check for successful evaluation
-	 */
+		 * Check for successful evaluation
+		 */
 
 		if (parm->s_rst_eval != NULL)
 		{
@@ -1017,8 +1017,8 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		}
 
 		/*
-	 * It passed everything.  Amazing.
-	 */
+		 * It passed everything.  Amazing.
+		 */
 		olist_add(thing);
 	}
 
@@ -1048,9 +1048,9 @@ void search_mark(dbref player, int key)
 		is_marked = Marked(thing);
 
 		/*
-	 * Don't bother checking if marking and already marked * (or
-	 * * * * if unmarking and not marked)
-	 */
+		 * Don't bother checking if marking and already marked * (or
+		 * * * * if unmarking and not marked)
+		 */
 
 		if (((key == SRCH_MARK) && is_marked) || ((key == SRCH_UNMARK) && !is_marked))
 		{
@@ -1058,8 +1058,8 @@ void search_mark(dbref player, int key)
 		}
 
 		/*
-	 * Toggle the mark bit and update the counters
-	 */
+		 * Toggle the mark bit and update the counters
+		 */
 		if (key == SRCH_MARK)
 		{
 			Mark(thing);
@@ -1100,8 +1100,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	destitute = 1;
 
 	/*
-     * If we are doing a @mark command, handle that here.
-     */
+	 * If we are doing a @mark command, handle that here.
+	 */
 
 	if (key != SRCH_SEARCH)
 	{
@@ -1114,8 +1114,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	rcount = ecount = tcount = pcount = gcount = 0;
 
 	/*
-     * room search
-     */
+	 * room search
+	 */
 	if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
@@ -1142,8 +1142,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	/*
-     * exit search
-     */
+	 * exit search
+	 */
 	if (searchparm.s_rst_type == TYPE_EXIT || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
@@ -1184,8 +1184,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	/*
-     * object search
-     */
+	 * object search
+	 */
 	if (searchparm.s_rst_type == TYPE_THING || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
@@ -1220,8 +1220,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	/*
-     * garbage search
-     */
+	 * garbage search
+	 */
 	if (searchparm.s_rst_type == TYPE_GARBAGE || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
@@ -1256,8 +1256,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	/*
-     * player search
-     */
+	 * player search
+	 */
 	if (searchparm.s_rst_type == TYPE_PLAYER || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
@@ -1297,8 +1297,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	/*
-     * if nothing found matching search criteria
-     */
+	 * if nothing found matching search criteria
+	 */
 
 	if (destitute)
 	{
@@ -1323,8 +1323,8 @@ void mark_place(dbref loc)
 	dbref exit;
 
 	/*
-     * If already marked, exit.  Otherwise set marked.
-     */
+	 * If already marked, exit.  Otherwise set marked.
+	 */
 
 	if (!Good_obj(loc))
 	{
@@ -1339,8 +1339,8 @@ void mark_place(dbref loc)
 	Mark(loc);
 
 	/*
-     * Visit all places you can get to via exits from here.
-     */
+	 * Visit all places you can get to via exits from here.
+	 */
 
 	for (exit = Exits(loc); exit != NOTHING; exit = Next(exit))
 	{
@@ -1357,8 +1357,8 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 	char *buff;
 
 	/*
-     * Figure out who we're going to search.
-     */
+	 * Figure out who we're going to search.
+	 */
 
 	if (key & FLOATERS_ALL)
 	{
@@ -1395,8 +1395,8 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 	}
 
 	/*
-     * We're walking the db, so this costs as much as a search.
-     */
+	 * We're walking the db, so this costs as much as a search.
+	 */
 
 	if (!payfor(player, mushconf.searchcost))
 	{
@@ -1405,8 +1405,8 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 	}
 
 	/*
-     * Mark everyplace you can get to via exits from the starting room
-     */
+	 * Mark everyplace you can get to via exits from the starting room
+	 */
 	for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 	{
 		mushstate.markbits->chunk[i] = (char)0x0;
@@ -1419,8 +1419,8 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 
 	mark_place(Good_loc(mushconf.start_room) ? mushconf.start_room : 0);
 	/*
-     * Report rooms that aren't marked
-     */
+	 * Report rooms that aren't marked
+	 */
 	total = 0;
 
 	for (i = 0; i < mushstate.db_top; i++)

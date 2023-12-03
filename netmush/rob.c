@@ -4,11 +4,11 @@
  * @brief Commands dealing with giving/taking/killing things or money
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -63,8 +63,8 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		}
 
 		/*
-	 * go for it
-	 */
+		 * go for it
+		 */
 		cost = (int)strtol(costchar, (char **)NULL, 10);
 
 		if (key == KILL_KILL)
@@ -80,8 +80,8 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			}
 
 			/*
-	     * see if it works
-	     */
+			 * see if it works
+			 */
 
 			if (!payfor(player, cost))
 			{
@@ -94,11 +94,11 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			cost = 0;
 		}
 
-		if (!((mushconf.killguarantee && ((int)(random_range(0, (mushconf.killguarantee)-1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
+		if (!((mushconf.killguarantee && ((int)(random_range(0, (mushconf.killguarantee) - 1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
 		{
 			/*
-	     * Failure: notify player and victim only
-	     */
+			 * Failure: notify player and victim only
+			 */
 			notify(player, "Your murder attempt failed.");
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
@@ -127,8 +127,8 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		}
 
 		/*
-	 * Success!  You killed him
-	 */
+		 * Success!  You killed him
+		 */
 		buf1 = XMALLOC(LBUF_SIZE, "buf1");
 		buf2 = XMALLOC(LBUF_SIZE, "buf2");
 
@@ -161,21 +161,21 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 		did_it(player, victim, A_KILL, buf1, A_OKILL, buf2, A_AKILL, 0, (char **)NULL, 0, MSG_PRESENCE);
 		/*
-	 * notify victim
-	 */
+		 * notify victim
+		 */
 		bp = buf1;
 		SAFE_SPRINTF(buf1, &bp, "%s killed you!", Name(player));
 		notify_with_cause(victim, player, buf1);
 
 		/*
-	 * Pay off the bonus
-	 */
+		 * Pay off the bonus
+		 */
 
 		if (key == KILL_KILL)
 		{
 			cost /= 2; /*
-				 * victim gets half
-				 */
+						* victim gets half
+						*/
 
 			if (Pennies(Owner(victim)) < mushconf.paylimit)
 			{
@@ -192,8 +192,8 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		XFREE(buf1);
 		XFREE(buf2);
 		/*
-	 * send him home
-	 */
+		 * send him home
+		 */
 		move_via_generic(victim, HOME, NOTHING, 0);
 		divest_object(victim);
 		break;
@@ -286,8 +286,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	char *str;
 
 	/*
-     * do amount consistency check
-     */
+	 * do amount consistency check
+	 */
 
 	if (amount < 0 && !Steal(giver))
 	{
@@ -317,8 +317,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	}
 
 	/*
-     * try to do the give
-     */
+	 * try to do the give
+	 */
 
 	if (!payfor(giver, amount))
 	{
@@ -327,8 +327,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	}
 
 	/*
-     * Find out cost if an object
-     */
+	 * Find out cost if an object
+	 */
 
 	if (Typeof(recipient) == TYPE_THING)
 	{
@@ -337,8 +337,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 		XFREE(str);
 
 		/*
-	 * Can't afford it?
-	 */
+		 * Can't afford it?
+		 */
 
 		if (amount < cost)
 		{
@@ -348,8 +348,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 		}
 
 		/*
-	 * Negative cost
-	 */
+		 * Negative cost
+		 */
 
 		if (cost < 0)
 		{
@@ -376,8 +376,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	}
 
 	/*
-     * Report change given
-     */
+	 * Report change given
+	 */
 
 	if ((amount - cost) == 1)
 	{
@@ -391,8 +391,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	}
 
 	/*
-     * Transfer the money and run PAY attributes
-     */
+	 * Transfer the money and run PAY attributes
+	 */
 	giveto(recipient, cost);
 	did_it(giver, recipient, A_PAY, NULL, A_OPAY, NULL, A_APAY, 0, (char **)NULL, 0, MSG_PRESENCE);
 	return;
@@ -402,8 +402,8 @@ void do_give(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 {
 	dbref recipient;
 	/*
-     * check recipient
-     */
+	 * check recipient
+	 */
 	init_match(player, who, TYPE_PLAYER);
 	match_neighbor();
 	match_possession();

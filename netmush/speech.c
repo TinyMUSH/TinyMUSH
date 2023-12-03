@@ -4,11 +4,11 @@
  * @brief Commands which involve speaking
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -83,11 +83,11 @@ int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char
 	char *sargs[2], *buff;
 	int aflags;
 	/*
-     * We have to make a copy of our arguments, because the exec() we
-     * * pass it through later can nibble those arguments, and we may
-     * * need to call this function more than once on the same message.
-     */
-	
+	 * We have to make a copy of our arguments, because the exec() we
+	 * * pass it through later can nibble those arguments, and we may
+	 * * need to call this function more than once on the same message.
+	 */
+
 	sargs[0] = XSTRDUP(message, "sargs[0]");
 
 	switch (key)
@@ -109,9 +109,9 @@ int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char
 	}
 
 	/*
-     * Go get it. An empty evaluation is considered equivalent to no
-     * * attribute, unless the attribute has a no_name flag.
-     */
+	 * Go get it. An empty evaluation is considered equivalent to no
+	 * * attribute, unless the attribute has a no_name flag.
+	 */
 	buff = master_attr(speaker, thing, A_SPEECHFMT, sargs, 2, &aflags);
 
 	if (buff)
@@ -180,8 +180,8 @@ void format_speech(dbref player, dbref speaker, dbref loc, char *message, int ke
 
 	default:
 		/*
-	 * NOTREACHED
-	 */
+		 * NOTREACHED
+		 */
 		notify_all_from_inside_speech(loc, player, message);
 	}
 }
@@ -193,8 +193,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 	int say_flags, depth;
 
 	/*
-     * Check for shouts. Need to have Announce power.
-     */
+	 * Check for shouts. Need to have Announce power.
+	 */
 
 	if ((key & SAY_SHOUT) && !Announce(player))
 	{
@@ -203,8 +203,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 	}
 
 	/*
-     * Convert prefix-coded messages into the normal type
-     */
+	 * Convert prefix-coded messages into the normal type
+	 */
 	say_flags = key & (SAY_NOTAG | SAY_HERE | SAY_ROOM | SAY_HTML);
 	key &= ~(SAY_NOTAG | SAY_HERE | SAY_ROOM | SAY_HTML);
 
@@ -233,9 +233,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		case SAY_EMIT:
 
 			/*
-	     * if they doubled the backslash, remove it. Otherwise
-	     * * it's already been removed by evaluation.
-	     */
+			 * if they doubled the backslash, remove it. Otherwise
+			 * * it's already been removed by evaluation.
+			 */
 			if (*message == '\\')
 			{
 				message++;
@@ -249,8 +249,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 	}
 
 	/*
-     * Make sure speaker is somewhere if speaking in a place
-     */
+	 * Make sure speaker is somewhere if speaking in a place
+	 */
 	loc = where_is(player);
 
 	switch (key)
@@ -271,8 +271,8 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 	}
 
 	/*
-     * Send the message on its way
-     */
+	 * Send the message on its way
+	 */
 
 	switch (key)
 	{
@@ -627,13 +627,13 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	char *str, *tokst;
 
 	/*
-     * If we have to have an equals sign in the page command, if
-     * * there's no message, it's an error (otherwise tname would
-     * * be null and message would contain text).
-     * * Otherwise we handle repage by swapping args.
-     * * Unfortunately, we have no way of differentiating
-     * * 'page foo=' from 'page foo' -- both result in a valid tname.
-     */
+	 * If we have to have an equals sign in the page command, if
+	 * * there's no message, it's an error (otherwise tname would
+	 * * be null and message would contain text).
+	 * * Otherwise we handle repage by swapping args.
+	 * * Unfortunately, we have no way of differentiating
+	 * * 'page foo=' from 'page foo' -- both result in a valid tname.
+	 */
 
 	if (!key && !*message)
 	{
@@ -652,16 +652,16 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	{ /* no recipient list; use lastpaged */
 
 		/*
-	 * Clean junk objects out of their lastpaged dbref list
-	 */
+		 * Clean junk objects out of their lastpaged dbref list
+		 */
 		if (key)
 			dbref_list = atr_get(player, A_PAGEGROUP, &aowner, &aflags, &alen);
 		else
 			dbref_list = atr_get(player, A_LASTPAGE, &aowner, &aflags, &alen);
 
 		/*
-	 * How many words in the list of targets?
-	 */
+		 * How many words in the list of targets?
+		 */
 
 		if (!*dbref_list)
 		{
@@ -684,8 +684,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 			dbrefs_array = (int *)XCALLOC(n_dbrefs, sizeof(int), "dbrefs_array");
 
 			/*
-	     * Convert the list into an array of targets. Validate.
-	     */
+			 * Convert the list into an array of targets. Validate.
+			 */
 
 			for (ddp = strtok_r(dbref_list, " ", &tokst); ddp; ddp = strtok_r(NULL, " ", &tokst))
 			{
@@ -698,8 +698,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 				}
 
 				/*
-		 * Eliminate ourselves from repeat and reply pages
-		 */
+				 * Eliminate ourselves from repeat and reply pages
+				 */
 				if (target == player)
 				{
 					continue;
@@ -723,9 +723,9 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 		else
 		{
 			/*
-	     * How many words in the list of targets? Note that we separate
-	     * * with either a comma or a space!
-	     */
+			 * How many words in the list of targets? Note that we separate
+			 * * with either a comma or a space!
+			 */
 			n_dbrefs = 1;
 
 			for (str = tname; *str; str++)
@@ -739,8 +739,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 			dbrefs_array = (int *)XCALLOC(n_dbrefs, sizeof(int), "dbrefs_array");
 
 			/*
-	     * Go look 'em up
-	     */
+			 * Go look 'em up
+			 */
 
 			for (tnp = strtok_r(tname, ", ", &tokst); tnp; tnp = strtok_r(NULL, ", ", &tokst))
 			{
@@ -760,9 +760,9 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	n_dbrefs = count;
 
 	/*
-     * Filter out disconnected and pagelocked, if we're actually sending
-     * * a message.
-     */
+	 * Filter out disconnected and pagelocked, if we're actually sending
+	 * * a message.
+	 */
 
 	if (*message)
 	{
@@ -777,8 +777,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	}
 
 	/*
-     * Write back the lastpaged attribute.
-     */
+	 * Write back the lastpaged attribute.
+	 */
 	dbref_list = ddp = XMALLOC(LBUF_SIZE, "dbref_list");
 
 	for (i = 0; i < n_dbrefs; i++)
@@ -799,8 +799,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	XFREE(dbref_list);
 
 	/*
-     * Check to make sure we have something.
-     */
+	 * Check to make sure we have something.
+	 */
 
 	if (count == 0)
 	{
@@ -827,11 +827,11 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	}
 
 	/*
-     * Each person getting paged is included in the pagegroup, as is the
-     * * person doing the paging. This lets us construct one list rather than
-     * * individual ones for each player. Self-paging is automatically
-     * * eliminated when the pagegroup is used.
-     */
+	 * Each person getting paged is included in the pagegroup, as is the
+	 * * person doing the paging. This lets us construct one list rather than
+	 * * individual ones for each player. Self-paging is automatically
+	 * * eliminated when the pagegroup is used.
+	 */
 	dbref_list = ddp = XMALLOC(LBUF_SIZE, "dbref_list");
 	SAFE_LTOS(dbref_list, &ddp, player, LBUF_SIZE);
 
@@ -854,9 +854,9 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	XFREE(dbref_list);
 	/*
-     * Build name list. Even if we only have one name, we have to go
-     * * through the array, because the first entries might be invalid.
-     */
+	 * Build name list. Even if we only have one name, we have to go
+	 * * through the array, because the first entries might be invalid.
+	 */
 	clean_tname = tnp = XMALLOC(LBUF_SIZE, "clean_tname");
 
 	if (count == 1)
@@ -890,8 +890,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	*tnp = '\0';
 	/*
-     * Mess with message
-     */
+	 * Mess with message
+	 */
 	omessage = omp = XMALLOC(LBUF_SIZE, "omessage");
 	imessage = imp = XMALLOC(LBUF_SIZE, ".imessage");
 
@@ -948,8 +948,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	XFREE(clean_tname);
 
 	/*
-     * Send the message out, checking for idlers
-     */
+	 * Send the message out, checking for idlers
+	 */
 
 	for (i = 0; i < n_dbrefs; i++)
 	{
@@ -963,8 +963,8 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	XFREE(omessage);
 	XFREE(dbrefs_array);
 	/*
-     * Tell the sender
-     */
+	 * Tell the sender
+	 */
 	notify(player, imessage);
 	XFREE(imessage);
 }
@@ -992,11 +992,11 @@ void whisper_pose(dbref player, dbref target, char *message)
 void do_pemit_list(dbref player, char *list, const char *message, int do_contents)
 {
 	/*
-     * Send a message to a list of dbrefs. To avoid repeated generation *
-     * of the NOSPOOF string, we set it up the first time we
-     * encounter something Nospoof, and then check for it
-     * thereafter. The list is destructively modified.
-     */
+	 * Send a message to a list of dbrefs. To avoid repeated generation *
+	 * of the NOSPOOF string, we set it up the first time we
+	 * encounter something Nospoof, and then check for it
+	 * thereafter. The list is destructively modified.
+	 */
 	char *p, *tokst;
 	dbref who, *recips;
 	int n_recips, r, ok_to_do;
@@ -1042,8 +1042,8 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			}
 
 			/*
-	     * avoid pemitting to this dbref if already done
-	     */
+			 * avoid pemitting to this dbref if already done
+			 */
 			for (r = 0; r < n_recips; ++r)
 			{
 				if (recips[r] == who)
@@ -1058,8 +1058,8 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			}
 
 			/*
-	     * see if player can pemit to this dbref
-	     */
+			 * see if player can pemit to this dbref
+			 */
 			ok_to_do = mushconf.pemit_any;
 
 			if (!ok_to_do && (Long_Fingers(player) || nearby(player, who) || Controls(player, who)))
@@ -1089,8 +1089,8 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			}
 
 			/*
-	     * fine, send the message
-	     */
+			 * fine, send the message
+			 */
 			if (do_contents && Has_contents(who))
 			{
 				notify_all_from_inside(who, player, message);
@@ -1101,8 +1101,8 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			}
 
 			/*
-	     * avoid pemitting to this dbref again
-	     */
+			 * avoid pemitting to this dbref again
+			 */
 			recips[n_recips] = who;
 			++n_recips;
 		}
@@ -1189,8 +1189,8 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	default:
 
 		/*
-	 * Enforce locality constraints
-	 */
+		 * Enforce locality constraints
+		 */
 		if (!ok_to_do && (nearby(player, target) || Long_Fingers(player) || Controls(player, target)))
 		{
 			ok_to_do = 1;

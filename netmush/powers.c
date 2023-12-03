@@ -4,14 +4,14 @@
  * @brief Power manipulation routines
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  *
  * @note If everybody is thinking alike, then somebody isn’t thinking. - GGSP
- * 
-*/
+ *
+ */
 
 #include "config.h"
 
@@ -491,16 +491,16 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
     for (fp = gen_powers; fp->powername; fp++)
     {
         /*
-	 * Skip if we shouldn't decompile this power
-	 */
+         * Skip if we shouldn't decompile this power
+         */
         if (fp->listperm & CA_NO_DECOMP)
         {
             continue;
         }
 
         /*
-	 * Skip if this power is not set
-	 */
+         * Skip if this power is not set
+         */
 
         if (fp->powerpower & POWER_EXT)
         {
@@ -518,8 +518,8 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
         }
 
         /*
-	 * Skip if we can't see this power
-	 */
+         * Skip if we can't see this power
+         */
 
         if (!check_access(player, fp->listperm))
         {
@@ -527,8 +527,8 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
         }
 
         /*
-	 * We made it this far, report this power
-	 */
+         * We made it this far, report this power
+         */
         buf = strip_ansi(thingname);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@power %s=%s", buf, fp->powername);
         XFREE(buf);

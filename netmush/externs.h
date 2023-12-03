@@ -4,11 +4,11 @@
  * @brief Prototypes for externs not defined elsewhere
  * @version 3.3
  * @date 2020-12-28
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #ifndef __EXTERNS_H
@@ -34,7 +34,7 @@ extern STATEDATA mushstate;
 
 /**
  * @brief Name Tables
- * 
+ *
  */
 extern NAMETAB addcmd_sw[];
 extern NAMETAB attrib_sw[];
@@ -129,13 +129,12 @@ extern int cs_size;      /*!<  total cache size */
 extern UDB_CHAIN *sys_c; /*!<  sys_c points to all cache lists */
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 
 extern COLORINFO ansiColor[];
 extern COLORINFO xtermColor[];
 extern COLORINFO cssColors[];
-
 
 #endif /* __EXTERNS_H */
