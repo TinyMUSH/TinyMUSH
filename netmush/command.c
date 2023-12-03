@@ -4,11 +4,11 @@
  * @brief Command parser and support routines
  * @version 3.3
  * @date 2020-12-25
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -29,12 +29,21 @@
 #include <unistd.h>
 #include <libgen.h>
 
+void (*handler_cs_no_args)(dbref, dbref, int);
+void (*handler_cs_one_args)(dbref, dbref, int, char *);
+void (*handler_cs_one_args_unparse)(dbref, char *);
+void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);
+void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
+void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);
+void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);
+void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int);
+
 CMDENT *prefix_cmds[256];
 CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
 
 /**
  * @brief Initialize the command table.
- * 
+ *
  */
 void init_cmdtab(void)
 {
@@ -48,7 +57,7 @@ void init_cmdtab(void)
 
 	/**
 	 * Load attribute-setting commands
-	 * 
+	 *
 	 */
 	for (ap = attr; ap->name; ap++)
 	{
@@ -89,7 +98,7 @@ void init_cmdtab(void)
 			{
 				/**
 				 * also add the __ alias form
-				 * 
+				 *
 				 */
 				s = XASPRINTF("s", "__%s", cp->cmdname);
 				hashadd(s, (int *)cp, &mushstate.command_htab, HASH_ALIAS);
@@ -102,7 +111,7 @@ void init_cmdtab(void)
 
 	/**
 	 * Load the builtin commands, plus __ aliases
-	 * 
+	 *
 	 */
 	for (cp = command_table; cp->cmdname; cp++)
 	{
@@ -114,7 +123,7 @@ void init_cmdtab(void)
 
 	/**
 	 * Set the builtin prefix commands
-	 * 
+	 *
 	 */
 	for (i = 0; i < 256; i++)
 	{
@@ -130,7 +139,7 @@ void init_cmdtab(void)
 
 /**
  * @brief Reset prefix's commands
- * 
+ *
  */
 void reset_prefix_cmds(void)
 {
@@ -152,10 +161,10 @@ void reset_prefix_cmds(void)
 /**
  * @brief Check if player has access to function. Note that the calling function
  * may also give permission denied messages on failure.
- * 
+ *
  * @param player	Player doing the command
  * @param mask		Permission's mask
- * @return bool		Permission granted or not 
+ * @return bool		Permission granted or not
  */
 bool check_access(dbref player, int mask)
 {
@@ -163,7 +172,7 @@ bool check_access(dbref player, int mask)
 
 	/**
 	 * Check if we have permission to execute
-	 * 
+	 *
 	 */
 	if (mask & (CA_DISABLED | CA_STATIC))
 	{
@@ -180,7 +189,7 @@ bool check_access(dbref player, int mask)
 	 * God at this point, if it is God-only, it fails. (God in combination with
 	 * other stuff is implicitly checked, since we return false if we don't find
 	 * the other bits.)
-	 * 
+	 *
 	 */
 	if ((mval = mask & (CA_ISPRIV_MASK | CA_MARKER_MASK)) == CA_GOD)
 	{
@@ -216,7 +225,7 @@ bool check_access(dbref player, int mask)
 	}
 	/**
 	 * Check the things that we can't be.
-	 * 
+	 *
 	 */
 	if (((mask & CA_ISNOT_MASK) && !Wizard(player)) && (((mask & CA_NO_HAVEN) && Player_haven(player)) || ((mask & CA_NO_ROBOT) && Robot(player)) || ((mask & CA_NO_SLAVE) && Slave(player)) || ((mask & CA_NO_SUSPECT) && Suspect(player)) || ((mask & CA_NO_GUEST) && Guest(player))))
 	{
@@ -228,10 +237,10 @@ bool check_access(dbref player, int mask)
 
 /**
  * @brief Go through sequence of module call-outs, treating all of them like permission checks.
- * 
+ *
  * @param player	Player doing the command
  * @param xperms	Extended functions list
- * @return bool		Permission granted or not 
+ * @return bool		Permission granted or not
  *
  */
 bool check_mod_access(dbref player, EXTFUNCS *xperms)
@@ -254,12 +263,12 @@ bool check_mod_access(dbref player, EXTFUNCS *xperms)
 
 /**
  * @brief Check if user has access to command with user-def'd permissions.
- * 
+ *
  * @param player	Player doing the command
  * @param hookp		Hook entry point
  * @param cargs		Command argument list
  * @param ncargs	Number of arguments
- * @return bool		Permission granted or not 
+ * @return bool		Permission granted or not
  */
 bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncargs)
 {
@@ -272,11 +281,11 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
 	 * We have user-defined command permissions. Go evaluate the obj/attr
 	 * pair that we've been given. If that result is nonexistent, we consider it
 	 * a failure. We use boolean truth here.
-	 * 
+	 *
 	 * Note that unlike before and after hooks, we always preserve the registers.
 	 * (When you get right down to it, this thing isn't really a hook. It's just
 	 * convenient to re-use the same code that we use with hooks.)
-	 * 
+	 *
 	 */
 	tstr = atr_get(hookp->thing, hookp->atr, &aowner, &aflags, &alen);
 
@@ -304,7 +313,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
 
 /**
  * @brief Evaluate a hook.
- * 
+ *
  * @param hp			Hook Entry
  * @param save_globs	Save globals?
  * @param player		Player being evaluated
@@ -325,7 +334,7 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 	 * We know we have a non-null hook. We want to evaluate the obj/attr
 	 * pair of that hook. We consider the enactor to be the player who executed
 	 * the command that caused this hook to be called.
-	 * 
+	 *
 	 */
 	if (save_globs & CS_PRESERVE)
 	{
@@ -399,7 +408,7 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 
 /**
  * @brief Call the hooks before and after leaving a room
- * 
+ *
  * @param player	DBref of Player leaving
  * @param cause		DBref of what caused the action
  * @param state		True: before, False: after
@@ -427,7 +436,7 @@ void call_move_hook(dbref player, dbref cause, bool state)
 
 /**
  * @brief Check if user has access to command
- * 
+ *
  * @param player	DBref of playuer
  * @param cmdp		Command entry
  * @param cargs		Command Arguments
@@ -441,7 +450,7 @@ bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
 
 /**
  * @brief Perform indicated command with passed args.
- * 
+ *
  * @param cmdp			Command
  * @param switchp		Switches
  * @param player		DBref of player doing the command
@@ -466,7 +475,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 	/**
 	 * Perform object type checks.
-	 * 
+	 *
 	 */
 	if (Invalid_Objtype(player))
 	{
@@ -476,7 +485,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 	/**
 	 * Check if we have permission to execute the command
-	 * 
+	 *
 	 */
 
 	if (!check_cmd_access(player, cmdp, cargs, ncargs))
@@ -487,7 +496,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 	/**
 	 * Check global flags
-	 * 
+	 *
 	 */
 	if ((!Builder(player)) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD))
 	{
@@ -517,7 +526,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	 * Check command switches.  Note that there may be more than one, and
 	 * that we OR all of them together along with the extra value from the command
 	 * table to produce the key value in the handler call.
-	 * 
+	 *
 	 */
 	if (switchp && cmdp->switches)
 	{
@@ -579,12 +588,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	/**
 	 * If the command normally has interpreted args, but the user
 	 * specified, /noeval, just do EV_STRIP.
-	 * 
+	 *
 	 * If the command is interpreted, or we're interactive (and the command
 	 * isn't specified CS_NOINTERP), eval the args.
-	 * 
+	 *
 	 * The others are obvious.
-	 * 
+	 *
 	 */
 	if ((cmdp->callseq & CS_INTERP) && (key & SW_NOEVAL))
 	{
@@ -611,22 +620,27 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
 	case CS_NO_ARGS: /*!< <cmd> (no args) */
-		(*(cmdp->info.handler))(player, cause, key);
-		break;
+	{
+		handler_cs_no_args = cmdp->info.handler;
+		(*(handler_cs_no_args))(player, cause, key);
+	}
+	//(*(cmdp->info.handler))(player, cause, key);
+	break;
 
 	case CS_ONE_ARG: /*!< <cmd> <arg> */
 		/**
 		 * If an unparsed command, just give it to the handler
-		 * 
+		 *
 		 */
 		if (cmdp->callseq & CS_UNPARSE)
 		{
-			(*(cmdp->info.handler))(player, unp_command);
+			handler_cs_one_args_unparse = cmdp->info.handler;
+			(*(handler_cs_one_args_unparse))(player, unp_command);
 			break;
 		}
 		/**
 		 * Interpret if necessary, but not twice for CS_ADDED
-		 * 
+		 *
 		 */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
@@ -640,11 +654,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 		/**
 		 * Call the correct handler
-		 * 
+		 *
 		 */
 		if (cmdp->callseq & CS_CMDARG)
 		{
-			(*(cmdp->info.handler))(player, cause, key, buf1, cargs, ncargs);
+			handler_cs_one_args_cmdargs = cmdp->info.handler;
+			(*(handler_cs_one_args_cmdargs))(player, cause, key, buf1, cargs, ncargs);
 		}
 		else
 		{
@@ -653,11 +668,11 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				preserve = save_global_regs("process_cmdent_added");
 				/**
 				 * Construct the matching buffer.
-				 * 
+				 *
 				 * In the case of a single-letter prefix, we want to just skip
 				 * past that first letter. want to just skip past that first
 				 * letter. Otherwise we want to go past the first word.
-				 * 
+				 *
 				 */
 				if (!(cmdp->callseq & CS_LEADIN))
 				{
@@ -677,7 +692,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				{
 					/**
 					 * No args
-					 * 
+					 *
 					 */
 					if (!(cmdp->callseq & CS_LEADIN))
 					{
@@ -722,14 +737,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				/**
 				 * Now search against the attributes, unless we can't
 				 * pass the uselock.
-				 * 
+				 *
 				 */
 				for (add = (ADDENT *)cmdp->info.added; add != NULL; add = add->next)
 				{
 					buff = atr_get(add->thing, add->atr, &aowner, &aflags, &alen);
 					/**
 					 * Skip the '$' character, and the next
-					 * 
+					 *
 					 */
 					for (s = buff + 2; *s && ((*s != ':') || (*(s - 1) == '\\')); s++)
 						;
@@ -770,7 +785,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 					 * the wildcard patterns we have for that addcommand. We
 					 * should raise an error. We DO NOT go back into trying to
 					 * match other stuff -- this is a 'Huh?' situation.
-					 * 
+					 *
 					 */
 					notify(player, mushconf.huh_msg);
 					pname = log_getname(player);
@@ -793,11 +808,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				restore_global_regs("process_cmdent", preserve);
 			}
 			else
-				(*(cmdp->info.handler))(player, cause, key, buf1);
+			{
+				handler_cs_one_args = cmdp->info.handler;
+				(*handler_cs_one_args)(player, cause, key, buf1);
+			}
 		}
 		/**
 		 * Free the buffer if one was allocated
-		 * 
+		 *
 		 */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
@@ -809,12 +827,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	case CS_TWO_ARG: /* <cmd> <arg1> = <arg2> */
 		/**
 		 * Interpret ARG1
-		 * 
+		 *
 		 */
 		buf2 = parse_to(&arg, '=', EV_STRIP_TS);
 		/**
 		 * Handle when no '=' was specified
-		 * 
+		 *
 		 */
 		if (!arg || (arg && !*arg))
 		{
@@ -830,7 +848,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			/**
 			 * Arg2 is ARGV style. Go get the args
-			 * 
+			 *
 			 */
 			parse_arglist(player, cause, cause, arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS, args, mushconf.max_command_args, cargs, ncargs);
 
@@ -838,19 +856,21 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				;
 			/**
 			 * Call the correct command handler
-			 * 
+			 *
 			 */
 			if (cmdp->callseq & CS_CMDARG)
 			{
-				(*(cmdp->info.handler))(player, cause, key, buf1, args, nargs, cargs, ncargs);
+				handler_cs_two_args_cmdargs_argv = cmdp->info.handler;
+				(*handler_cs_two_args_cmdargs_argv)(player, cause, key, buf1, args, nargs, cargs, ncargs);
 			}
 			else
 			{
-				(*(cmdp->info.handler))(player, cause, key, buf1, args, nargs);
+				handler_cs_two_args_argv = cmdp->info.handler;
+				(*handler_cs_two_args_argv)(player, cause, key, buf1, args, nargs);
 			}
 			/**
 			 * Free the argument buffers
-			 * 
+			 *
 			 */
 			for (i = 0; i <= nargs; i++)
 				if (args[i])
@@ -862,7 +882,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			/**
 			 * Arg2 is normal style. Interpret if needed
-			 * 
+			 *
 			 */
 			if (interp & EV_EVAL)
 			{
@@ -880,19 +900,21 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			}
 			/**
 			 * Call the correct command handler
-			 * 
+			 *
 			 */
 			if (cmdp->callseq & CS_CMDARG)
 			{
-				(*(cmdp->info.handler))(player, cause, key, buf1, buf2, cargs, ncargs);
+				handler_cs_two_args_cmdargs = cmdp->info.handler;
+				(*handler_cs_two_args_cmdargs)(player, cause, key, buf1, buf2, cargs, ncargs);
 			}
 			else
 			{
-				(*(cmdp->info.handler))(player, cause, key, buf1, buf2);
+				handler_cs_two_args = cmdp->info.handler;
+				(*handler_cs_two_args)(player, cause, key, buf1, buf2);
 			}
 			/**
 			 * Free the buffer, if needed
-			 * 
+			 *
 			 */
 			if (interp & EV_EVAL)
 			{
@@ -901,14 +923,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 		/**
 		 * Free the buffer obtained by evaluating Arg1
-		 * 
+		 *
 		 */
 		XFREE(buf1);
 		break;
 	}
 	/**
 	 * And now we go do the posthook, if we have one.
-	 * 
+	 *
 	 */
 	if ((cmdp->post_hook != NULL) && !(cmdp->callseq & CS_ADDED))
 	{
@@ -919,14 +941,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 /**
  * @brief Execute a command.
- * 
+ *
  * @param player		DBref of player doing the command
  * @param cause			DBref of what caused the action
  * @param interactive	Is the command interractive?
  * @param command		Command
  * @param args			Arguments
  * @param nargs			Number of arguments
- * @return char* 
+ * @return char*
  */
 char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
@@ -949,7 +971,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Robustify player
-	 * 
+	 *
 	 */
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = XSTRDUP("< process_command >", "mushstate.debug_cmd");
@@ -969,7 +991,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Make sure player isn't going or halted
-	 * 
+	 *
 	 */
 	if (Going(player) || (Halted(player) && !((Typeof(player) == TYPE_PLAYER) && interactive)))
 	{
@@ -1012,7 +1034,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Reset recursion and other limits. Baseline the CPU counter.
-	 * 
+	 *
 	 */
 	mushstate.func_nest_lev = 0;
 	mushstate.func_invk_ctr = 0;
@@ -1039,7 +1061,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			{
 				/**
 				 * We have no pointer, we should have no flags.
-				 * 
+				 *
 				 */
 				s_Flags3(player, Flags3(player) & ~HAS_REDIRECT);
 			}
@@ -1052,7 +1074,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * @warning NOTE THAT THIS WILL BREAK IF "GOD" IS NOT A DBREF.
-	 * 
+	 *
 	 */
 	if (mushconf.control_flags & CF_GODMONITOR)
 	{
@@ -1061,7 +1083,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Eat leading whitespace, and space-compress if configured
-	 * 
+	 *
 	 */
 	while (*command && isspace(*command))
 	{
@@ -1099,7 +1121,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Allow modules to intercept command strings.
-	 * 
+	 *
 	 */
 	for (csm__mp = mushstate.modules_list, retval = 0; (csm__mp != NULL) && !retval; csm__mp = csm__mp->next)
 	{
@@ -1149,13 +1171,13 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Only check for exits if we may use the goto command
-	 * 
+	 *
 	 */
 	if (check_cmd_access(player, goto_cmdp, args, nargs))
 	{
 		/**
 		 * Check for an exit name
-		 * 
+		 *
 		 */
 		init_match_check_keys(player, command, TYPE_EXIT);
 		match_exit_with_parents();
@@ -1167,7 +1189,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			{
 				/**
 				 * Exits literally call the 'move' command. Note that,
-				 * later, when we go to matching master-room and other 
+				 * later, when we go to matching master-room and other
 				 * global-ish exits, that we also need to have move_match_more
 				 * set to 'yes', or we'll match here only to encounter dead
 				 * silence when we try to find the exit inside the move routine.
@@ -1195,7 +1217,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			{
 				/**
 				 * Execute the pre-hook for the goto command
-				 * 
+				 *
 				 */
 
 				if ((goto_cmdp->pre_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
@@ -1205,7 +1227,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				move_exit(player, exit, 0, NOGO_MESSAGE, 0);
 				/**
 				 * Execute the post-hook for the goto command
-				 * 
+				 *
 				 */
 				if ((goto_cmdp->post_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
 				{
@@ -1219,7 +1241,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 		/**
 		 * Check for an exit in the master room
-		 * 
+		 *
 		 */
 		init_match_check_keys(player, command, TYPE_EXIT);
 		match_master_exit();
@@ -1267,10 +1289,10 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * the arguments, make a copy so that we keep the original command
 	 * line intact.  Store the edible copy in lcbuf after the lowercased
 	 * command.
-	 * 
+	 *
 	 * Removed copy of the rest of the command, since it's ok to allow it
 	 * to be trashed.  -dcm
-	 * 
+	 *
 	 */
 	lcbuf = XMALLOC(LBUF_SIZE, "lcbuf");
 
@@ -1297,7 +1319,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Check for a builtin command (or an alias of a builtin command)
-	 * 
+	 *
 	 */
 	cmdp = (CMDENT *)hashfind(lcbuf, &mushstate.command_htab);
 
@@ -1309,7 +1331,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			 * We handle this specially -- there is no space
 			 * compression involved, so we must go back to the
 			 * preserved command.
-			 * 
+			 *
 			 */
 			XSTRCPY(command, preserve_cmd);
 			arg = command;
@@ -1337,7 +1359,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * player's inventory, and on the room that holds the player. We
 	 * evaluate the command line here to allow chains of $-commands to
 	 * work.
-	 * 
+	 *
 	 */
 	str = evcmd = XMALLOC(LBUF_SIZE, "evcmd");
 	XSTRCPY(evcmd, command);
@@ -1348,14 +1370,14 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Idea for enter/leave aliases from R'nice@TinyTIM
-	 * 
+	 *
 	 */
 	if (Has_location(player) && Good_obj(Location(player)))
 	{
 		/**
 		 * Check for a leave alias, if we have permissions to use the
 		 * 'leave' command.
-		 * 
+		 *
 		 */
 		if (check_cmd_access(player, leave_cmdp, args, nargs))
 		{
@@ -1424,13 +1446,13 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	/**
 	 * At each of the following stages, we check to make sure that we
 	 * haven't hit a match on a STOP-set object.
-	 * 
+	 *
 	 */
 	got_stop = 0;
 
 	/**
 	 * Check for $-command matches on me
-	 * 
+	 *
 	 */
 	if (mushconf.match_mine)
 	{
@@ -1443,7 +1465,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * Check for $-command matches on nearby things and on my room
-	 * 
+	 *
 	 */
 	if (!got_stop && Has_location(player))
 	{
@@ -1471,14 +1493,14 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * room: parents of the contents of the rooms aren't checked for
 	 * commands. We try to maintain 2.2/MUX compatibility here, putting
 	 * both sets of checks together.
-	 * 
+	 *
 	 */
 
 	if (Has_location(player) && Good_obj(Location(player)))
 	{
 		/**
-	 	 * 2.2 style location
-		 * 
+		 * 2.2 style location
+		 *
 		 */
 		if (!succ && mushconf.local_masters)
 		{
@@ -1498,22 +1520,22 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 
 		/**
-	 	 * MUX style location
-		 * 
+		 * MUX style location
+		 *
 		 */
 		if ((!succ) && mushconf.have_zones && (Zone(Location(player)) != NOTHING))
 		{
 			if (Typeof(Zone(Location(player))) == TYPE_ROOM)
 			{
 				/**
-	 			 * zone of player's location is a parent room
-				 * 
+				 * zone of player's location is a parent room
+				 *
 				 */
 				if (Location(player) != Zone(player))
 				{
 					/**
-	 				 * check parent room exits
-					 * 
+					 * check parent room exits
+					 *
 					 */
 					init_match_check_keys(player, command, TYPE_EXIT);
 					match_zone_exit();
@@ -1563,19 +1585,19 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			}
 			else
 				/**
-			 * try matching commands on area zone object
-			 * 
-			 */
+				 * try matching commands on area zone object
+				 *
+				 */
 				if (!got_stop && !succ && mushconf.have_zones && (Zone(Location(player)) != NOTHING))
-			{
-				succ += atr_match(Zone(Location(player)), player, AMATCH_CMD, lcbuf, preserve_cmd, 1);
-			}
+				{
+					succ += atr_match(Zone(Location(player)), player, AMATCH_CMD, lcbuf, preserve_cmd, 1);
+				}
 		}
 	}
 
 	/**
 	 * 2.2 style player
-	 * 
+	 *
 	 */
 	if (!succ && mushconf.local_masters)
 	{
@@ -1600,10 +1622,10 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * MUX style player
-	 * 
+	 *
 	 * if nothing matched with parent room/zone object, try matching zone
 	 * commands on the player's personal zone
-	 * 
+	 *
 	 */
 	if (!got_stop && !succ && mushconf.have_zones && (Zone(player) != NOTHING) && (!Has_location(player) || !Good_obj(Location(player)) || (Zone(Location(player)) != Zone(player))))
 	{
@@ -1612,7 +1634,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * If we didn't find anything, try in the master room
-	 * 
+	 *
 	 */
 	if (!got_stop && !succ)
 	{
@@ -1630,7 +1652,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	/**
 	 * Allow modules to intercept, if still no match. This time we pass
 	 * both the lower-cased evaluated buffer and the preserved command.
-	 * 
+	 *
 	 */
 	if (!succ)
 	{
@@ -1647,7 +1669,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	/**
 	 * If we still didn't find anything, tell how to get help.
-	 * 
+	 *
 	 */
 	if (!succ)
 	{
@@ -1674,13 +1696,13 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 /**
  * @brief Execute a semicolon/pipe-delimited series of commands.
- * 
+ *
  * @param player	DBref of the player
  * @param cause		DBref of the cause
  * @param cmdline	Command
  * @param args		Arguments
  * @param nargs		Number of arguments
- * @param qent		Command queue. 
+ * @param qent		Command queue.
  */
 void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
@@ -1727,7 +1749,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 				mushstate.debug_cmd = cp;
 				/**
 				 * No lag check on piped commands
-				 * 
+				 *
 				 */
 				process_command(player, cause, 0, cp, args, nargs);
 
@@ -1748,7 +1770,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 			mushstate.debug_cmd = cp;
 			/**
 			 * Is the queue still linked like we think it is?
-			 * 
+			 *
 			 */
 			if (qent && qent != mushstate.qfirst)
 			{
@@ -1810,7 +1832,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 				}
 				/**
 				 * Don't use msec_add(), this is more accurate
-				 * 
+				 *
 				 */
 				if (mushconf.lag_check_clk)
 				{
@@ -1859,7 +1881,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 /**
  * @brief List internal commands. Note that user-defined command permissions are
  * ignored in this context.
- * 
+ *
  * @param player DBref of the player
  */
 void list_cmdtable(dbref player)
@@ -1882,7 +1904,7 @@ void list_cmdtable(dbref player)
 
 	/**
 	 * Players get the list of logged-out cmds too
-	 * 
+	 *
 	 */
 	if (isPlayer(player))
 	{
@@ -1921,8 +1943,8 @@ void list_cmdtable(dbref player)
 
 /**
  * @brief List available attributes.
- * 
- * @param player 
+ *
+ * @param player
  */
 void list_attrtable(dbref player)
 {
@@ -1956,7 +1978,7 @@ void list_attrtable(dbref player)
 
 /**
  * @brief Helper for the list access commands.
- * 
+ *
  * @param player	DBref of the player
  * @param ctab		Command table
  * @param buff		Buffer for the list
@@ -1996,7 +2018,7 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 
 /**
  * @brief List access commands.
- * 
+ *
  * @param player DBref of the player
  */
 void list_cmdaccess(dbref player)
@@ -2064,7 +2086,7 @@ void list_cmdaccess(dbref player)
 
 /**
  * @brief List switches for commands.
- * 
+ *
  * @param player DBref of the player
  */
 void list_cmdswitches(dbref player)
@@ -2074,7 +2096,7 @@ void list_cmdswitches(dbref player)
 	char *s = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
 
 	notify(player, "Command          Switches");
-    notify(player, "---------------- ---------------------------------------------------------------");
+	notify(player, "---------------- ---------------------------------------------------------------");
 
 	for (cmdp = command_table; cmdp->cmdname; cmdp++)
 	{
@@ -2122,7 +2144,7 @@ void list_cmdswitches(dbref player)
 
 /**
  * @brief List access to attributes.
- * 
+ *
  * @param player DBref of player
  */
 void list_attraccess(dbref player)
@@ -2142,7 +2164,7 @@ void list_attraccess(dbref player)
 
 /**
  * @brief List attribute "types" (wildcards and permissions)
- * 
+ *
  * @param player DBref of player
  */
 void list_attrtypes(dbref player)
@@ -2170,13 +2192,13 @@ void list_attrtypes(dbref player)
 
 /**
  * @brief Change command or switch permissions.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
@@ -2225,13 +2247,13 @@ int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref play
 
 /**
  * @brief Change command permissions for all attr-setting cmds.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
@@ -2273,13 +2295,13 @@ int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref
 
 /**
  * @brief Change access on an attribute.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
@@ -2315,13 +2337,13 @@ int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref
 /**
  * @brief Define attribute flags for new user-named attributes whose
  * names match a certain pattern.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
@@ -2333,7 +2355,7 @@ int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref p
 	 * Split our string into the attribute pattern and privileges. Also
 	 * uppercase it, while we're at it. Make sure it's not longer than an
 	 * attribute name can be.
-	 * 
+	 *
 	 */
 	for (privs = str; *privs && !isspace(*privs); privs++)
 	{
@@ -2378,13 +2400,13 @@ int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref p
 
 /**
  * @brief Add a command alias.
- * 
- * @param vp 
- * @param str 
- * @param extra 
- * @param player 
- * @param cmd 
- * @return int 
+ *
+ * @param vp
+ * @param str
+ * @param extra
+ * @param player
+ * @param cmd
+ * @return int
  */
 int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
 {
@@ -2400,7 +2422,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 	{
 		/**
 		 * we only got one argument to @alias. Bad.
-		 * 
+		 *
 		 */
 		cf_log(player, "CNF", "SYNTX", cmd, "Invalid original for alias %s", alias);
 		return -1;
@@ -2424,7 +2446,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		*ap++ = '\0';
 		/**
 		 * Look up the command
-		 * 
+		 *
 		 */
 		cmdp = (CMDENT *)hashfind(orig, (HASHTAB *)vp);
 
@@ -2435,7 +2457,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		}
 		/**
 		 * Look up the switch
-		 * 
+		 *
 		 */
 		nt = find_nametab_ent(player, (NAMETAB *)cmdp->switches, ap);
 
@@ -2446,7 +2468,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		}
 		/**
 		 * Got it, create the new command table entry
-		 * 
+		 *
 		 */
 		cmd2 = (CMDENT *)XMALLOC(sizeof(CMDENT), "cmd2");
 		cmd2->cmdname = XSTRDUP(alias, "cmd2->cmdname");
@@ -2469,7 +2491,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		 * therefore gets the hook). This is preferable to having to
 		 * search the hashtable for hooks when a hook is deleted,
 		 * though.
-		 * 
+		 *
 		 */
 		cmd2->pre_hook = NULL;
 		cmd2->post_hook = NULL;
@@ -2486,7 +2508,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 	{
 		/**
 		 * A normal (non-switch) alias
-		 * 
+		 *
 		 */
 		hp = hashfind(orig, (HASHTAB *)vp);
 
@@ -2504,7 +2526,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 
 /**
  * @brief List default flags at create time.
- * 
+ *
  * @param player DBref of player
  */
 void list_df_flags(dbref player)
@@ -2534,7 +2556,7 @@ void list_df_flags(dbref player)
 
 /**
  * @brief List the costs of things.
- * 
+ *
  * @param player DBref of player
  */
 void list_costs(dbref player)
@@ -2568,7 +2590,8 @@ void list_costs(dbref player)
 	{
 		raw_notify(player, "%-49.49s %-9d %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax, mushconf.exit_quota);
 	}
-	else {
+	else
+	{
 		raw_notify(player, "%-49.49s %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax);
 	}
 
@@ -2583,9 +2606,8 @@ void list_costs(dbref player)
 
 	raw_notify(player, "%-49.49s %-9d %-9d", "Killing Player", mushconf.killmin, mushconf.killmax);
 	if (mushconf.killmin == mushconf.killmax)
-	{	
+	{
 		raw_notify(player, "  Chance of success: %d%%", (mushconf.killmin * 100) / mushconf.killguarantee);
-
 	}
 	else
 	{
@@ -2613,7 +2635,8 @@ void list_costs(dbref player)
 	}
 	else if (mushconf.sacfactor == 1)
 	{
-		if (mushconf.sacadjust < 0) {
+		if (mushconf.sacadjust < 0)
+		{
 			raw_notify(player, "%-49.49s Creation Cost - %d", "Object Value", -mushconf.sacadjust);
 		}
 		else if (mushconf.sacadjust > 0)
@@ -2627,7 +2650,8 @@ void list_costs(dbref player)
 	}
 	else
 	{
-		if (mushconf.sacadjust < 0) {
+		if (mushconf.sacadjust < 0)
+		{
 			raw_notify(player, "%-49.49s (Creation Cost / %d) - %d", "Object Value", mushconf.sacfactor, -mushconf.sacadjust);
 		}
 		else if (mushconf.sacadjust > 0)
@@ -2657,7 +2681,7 @@ void list_costs(dbref player)
 
 /**
  * @brief List boolean game options from mushconf. list_config: List non-boolean game options.
- * 
+ *
  * @param player DBref of player
  */
 void list_params(dbref player)
@@ -2785,7 +2809,7 @@ void list_params(dbref player)
 
 /**
  * @brief List user-defined attributes
- * 
+ *
  * @param player DBref of player
  */
 void list_vattrs(dbref player)
@@ -2810,7 +2834,7 @@ void list_vattrs(dbref player)
 
 /**
  * @brief Helper for listing information from an hash table
- * 
+ *
  * @param player	DBref of player
  * @param tab_name	Hash table name
  * @param htab		Hash table
@@ -2826,7 +2850,7 @@ void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 
 /**
  * @brief Helper for listing information from an nhash table
- * 
+ *
  * @param player	DBref of player
  * @param tab_name	NHash table name
  * @param htab		NHash table
@@ -2842,7 +2866,7 @@ void list_nhashstat(dbref player, const char *tab_name, HASHTAB *htab)
 
 /**
  * @brief List informations from Hash/NHash tables
- * 
+ *
  * @param player DBref of player
  */
 void list_hashstats(dbref player)
@@ -2909,7 +2933,7 @@ void list_hashstats(dbref player)
 
 /**
  * @brief List textfiles
- * 
+ *
  * @param player DBref of player
  */
 void list_textfiles(dbref player)
@@ -2927,13 +2951,13 @@ void list_textfiles(dbref player)
 
 /**
  * @brief Get useful info from the DB layer about hash stats, etc.
- * 
+ *
  * @param player DBref of player
  */
 void list_db_stats(dbref player)
 {
 	notify(player, "DB Cache Stats              Writes                    Reads");
-	    notify(player, "--------------------------- ------------------------- -------------------------");
+	notify(player, "--------------------------- ------------------------- -------------------------");
 	raw_notify(player, "Calls                       %-25d %-25d", cs_writes, cs_reads);
 	raw_notify(player, "Cache Hits                  %-25d %-25d", cs_whits, cs_rhits);
 	raw_notify(player, "I/O                         %-25d %-25d", cs_dbwrites, cs_dbreads);
@@ -2949,7 +2973,7 @@ void list_db_stats(dbref player)
 /**
  * @brief List local resource usage stats of the MUSH process. Adapted
  * from code by Claudius@PythonMUCK, posted to the net by Howard/Dark_Lord.
- * 
+ *
  * @param player DBref of player
  */
 void list_process(dbref player)
@@ -2962,7 +2986,7 @@ void list_process(dbref player)
 	psize = getpagesize();
 	/**
 	 * Go display everything
-	 * 
+	 *
 	 */
 	raw_notify(player, "      Process ID: %10d        %10d bytes per page", pid, psize);
 	raw_notify(player, "       Time used: %10d user   %10d sys", usage.ru_utime.tv_sec, usage.ru_stime.tv_sec);
@@ -2994,7 +3018,7 @@ void print_memory(dbref player, const char *item, size_t size)
 
 /**
  * @brief Breaks down memory usage of the process
- * 
+ *
  * @param player DBref of player
  */
 void list_memory(dbref player)
@@ -3018,24 +3042,24 @@ void list_memory(dbref player)
 
 	/**
 	 * Calculate size of object structures
-	 * 
+	 *
 	 */
 	each = mushstate.db_top * sizeof(OBJ);
-	//raw_notify(player, "%-20s %12.2fk", "Object structures", each / 1024);
+	// raw_notify(player, "%-20s %12.2fk", "Object structures", each / 1024);
 	raw_notify(player, "Item                          Size");
 	raw_notify(player, "------------------------------ ------------------------------------------------");
 	print_memory(player, "Object structures", each);
 	total += each;
 	/**
 	 * Calculate size of mushstate and mushconf structures
-	 * 
+	 *
 	 */
 	each = sizeof(CONFDATA) + sizeof(STATEDATA);
 	print_memory(player, "mushconf/mushstate", each);
 	total += each;
 	/**
 	 * Calculate size of cache
-	 * 
+	 *
 	 */
 	each = cs_size;
 	print_memory(player, "Cache data", each);
@@ -3058,7 +3082,7 @@ void list_memory(dbref player)
 	total += each + each2;
 	/**
 	 * Calculate size of object pipelines
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3094,7 +3118,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of Raw Memory allocations
-	 * 
+	 *
 	 */
 	each = total_rawmemory();
 
@@ -3102,7 +3126,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of command hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.command_htab.hashsize;
@@ -3118,7 +3142,7 @@ void list_memory(dbref player)
 
 			/**
 			 * Add up all the little bits in the CMDENT.
-			 * 
+			 *
 			 */
 
 			if (!(htab->flags & HASH_ALIAS))
@@ -3157,7 +3181,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of logged-out commands hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.logout_cmd_htab.hashsize;
@@ -3207,7 +3231,7 @@ void list_memory(dbref player)
 			/**
 			 * We don't count func->name because we already got
 			 * it with htab->target.s
-			 * 
+			 *
 			 */
 			htab = htab->next;
 		}
@@ -3217,7 +3241,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of user-defined functions hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.ufunc_htab.hashsize;
@@ -3251,7 +3275,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of flags hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.flags_htab.hashsize;
@@ -3273,7 +3297,7 @@ void list_memory(dbref player)
 			/**
 			 * We don't count flag->flagname because we already
 			 * got it with htab->target.s
-			 * 
+			 *
 			 */
 			htab = htab->next;
 		}
@@ -3283,7 +3307,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of powers hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.powers_htab.hashsize;
@@ -3305,7 +3329,7 @@ void list_memory(dbref player)
 			/**
 			 * We don't count power->powername because we already
 			 * got it with htab->target.s
-			 * 
+			 *
 			 */
 			htab = htab->next;
 		}
@@ -3315,7 +3339,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of helpfile hashtables
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3346,7 +3370,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of vattr name hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.vattr_name_htab.hashsize;
@@ -3368,7 +3392,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate size of attr name hashtable
-	 * 
+	 *
 	 */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.attr_name_htab.hashsize;
@@ -3397,7 +3421,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate the size of anum_table
-	 * 
+	 *
 	 */
 	each = sizeof(ATTR *) * anum_alc_top;
 	print_memory(player, "Attr num table", each);
@@ -3405,12 +3429,12 @@ void list_memory(dbref player)
 
 	/**
 	 * After this point, we only report if it's non-zero.
-	 * 
+	 *
 	 */
 
 	/**
 	 * Calculate size of object stacks
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3428,7 +3452,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate the size of grids
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3474,7 +3498,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate the size of overhead associated with structures.
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3504,7 +3528,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Calculate the size of data associated with structures.
-	 * 
+	 *
 	 */
 	each = 0;
 
@@ -3526,7 +3550,7 @@ void list_memory(dbref player)
 	total += each;
 	/**
 	 * Report end total.
-	 * 
+	 *
 	 */
 	raw_notify(player, "-------------------------------------------------------------------------------");
 	print_memory(player, "Total", total);
@@ -3534,7 +3558,7 @@ void list_memory(dbref player)
 
 /**
  * @brief List information stored in internal structures.
- * 
+ *
  * @param player	DBref of player
  * @param cause		DBref of cause
  * @param extra		Not used.

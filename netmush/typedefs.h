@@ -260,11 +260,11 @@ struct filecache_block
  */
 typedef struct power_entry
 {
-    const char *powername; /*!< Name of the flag */
-    int powervalue;        /*!< Which bit in the object is the flag */
-    int powerpower;        /*!< Ctrl flags for this power (recursive? :-) */
-    int listperm;          /*!< Who sees this flag when set */
-    int (*handler)();      /*!< Handler for setting/clearing this flag */
+    const char *powername;                       /*!< Name of the flag */
+    int powervalue;                              /*!< Which bit in the object is the flag */
+    int powerpower;                              /*!< Ctrl flags for this power (recursive? :-) */
+    int listperm;                                /*!< Who sees this flag when set */
+    int (*handler)(dbref, dbref, int, int, int); /*!< Handler for setting/clearing this flag */
 } POWERENT;
 
 typedef struct powerset
@@ -284,12 +284,12 @@ typedef struct powerset
  */
 typedef struct flag_entry
 {
-    const char *flagname; /*!< Name of the flag */
-    int flagvalue;        /*!< Which bit in the object is the flag */
-    char flaglett;        /*!< Flag letter for listing */
-    int flagflag;         /*!< Ctrl flags for this flag (recursive? :-) */
-    int listperm;         /*!< Who sees this flag when set */
-    int (*handler)();     /*!< Handler for setting/clearing this flag */
+    const char *flagname;                        /*!< Name of the flag */
+    int flagvalue;                               /*!< Which bit in the object is the flag */
+    char flaglett;                               /*!< Flag letter for listing */
+    int flagflag;                                /*!< Ctrl flags for this flag (recursive? :-) */
+    int listperm;                                /*!< Who sees this flag when set */
+    int (*handler)(dbref, dbref, int, int, int); /*!< Handler for setting/clearing this flag */
 } FLAGENT;
 
 /**
@@ -318,12 +318,12 @@ typedef struct flagset
 
 typedef struct fun
 {
-    const char *name;   /*!< Function name */
-    void (*fun)();      /*!< Handler */
-    int nargs;          /*!< Number of args needed or expected */
-    unsigned int flags; /*!< Function flags */
-    int perms;          /*!< Access to function */
-    EXTFUNCS *xperms;   /*!< Extended access to function */
+    const char *name;                                                               /*!< Function name */
+    void (*fun)(char *, char **, dbref, dbref, dbref, char **, int, char *[], int); /*!< Handler */
+    int nargs;                                                                      /*!< Number of args needed or expected */
+    unsigned int flags;                                                             /*!< Function flags */
+    int perms;                                                                      /*!< Access to function */
+    EXTFUNCS *xperms;                                                               /*!< Extended access to function */
 } FUN;
 
 typedef struct ufun
@@ -349,8 +349,8 @@ typedef struct var_entry
 
 typedef struct component_def
 {
-    int (*typer_func)(); /*!< type-checking handler */
-    char *def_val;       /*!< default value */
+    int (*typer_func)(char *); /*!< type-checking handler */
+    char *def_val;             /*!< default value */
 } COMPONENT;
 
 typedef struct structure_def

@@ -24,6 +24,10 @@
 #include <string.h>
 #include <sys/time.h>
 
+void (*handler_cs_no_args)(dbref, dbref, int);
+void (*handler_cs_one_args)(dbref, dbref, int, char *);
+void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
+
 MONTHDAYS mdtab[] = {
 	{(char *)"Jan", 31},
 	{(char *)"Feb", 29},
@@ -2231,6 +2235,8 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 	do_trigger(player, cause, TRIG_NOW, fargs[0], &(fargs[1]), nfargs - 1);
 }
 
+
+
 /**
  * @brief This side-effect function behaves identically to the command
  *        '@wait <timer>=<command>'
@@ -2311,21 +2317,30 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
 	case CS_NO_ARGS:
-		(*(cmdp->info.handler))(player, cause, key);
+		{
+			handler_cs_no_args = (void (*)(dbref, dbref, int))cmdp->info.handler;
+			(*(handler_cs_no_args))(player, cause, key);
+		}
 		break;
 
 	case CS_ONE_ARG:
+		{
 		tbuf1 = XMALLOC(1, "tbuf1");
-		(*(cmdp->info.handler))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
+		handler_cs_one_args = (void (*)(dbref, dbref, int, char *))cmdp->info.handler;
+		(*(handler_cs_one_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
 		XFREE(tbuf1);
+		}
 		break;
 
 	case CS_TWO_ARG:
+		{
 		tbuf1 = XMALLOC(1, "tbuf1");
 		tbuf2 = XMALLOC(1, "tbuf2");
-		(*(cmdp->info.handler))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
+		handler_cs_two_args = (void (*)(dbref, dbref, int, char *, char *))cmdp->info.handler;
+		(*(handler_cs_two_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
 		XFREE(tbuf2);
 		XFREE(tbuf1);
+		}
 		break;
 
 	default:

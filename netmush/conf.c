@@ -2116,6 +2116,7 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
     return CF_Success;
 }
 
+int (*cf_interpreter)(int *, char *, long, dbref, char *);
 /**
  * @brief Set config parameter.
  * 
@@ -2141,7 +2142,8 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
             buff = XSTRDUP(ap, "buff");
         }
 
-        i = tp->interpreter(tp->loc, ap, tp->extra, player, cp);
+        cf_interpreter = tp->interpreter;
+        i = cf_interpreter(tp->loc, ap, tp->extra, player, cp);
 
         if (!mushstate.initializing)
         {
