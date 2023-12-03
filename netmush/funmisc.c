@@ -24,9 +24,9 @@
 #include <string.h>
 #include <sys/time.h>
 
-void (*handler_cs_no_args)(dbref, dbref, int);
-void (*handler_cs_one_args)(dbref, dbref, int, char *);
-void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
+void (*handler_fun_command_no_args)(dbref, dbref, int);
+void (*handler_fun_command_one_args)(dbref, dbref, int, char *);
+void (*handler_fun_command_two_args)(dbref, dbref, int, char *, char *);
 
 MONTHDAYS mdtab[] = {
 	{(char *)"Jan", 31},
@@ -2318,16 +2318,16 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 	{
 	case CS_NO_ARGS:
 		{
-			handler_cs_no_args = (void (*)(dbref, dbref, int))cmdp->info.handler;
-			(*(handler_cs_no_args))(player, cause, key);
+			handler_fun_command_no_args = (void (*)(dbref, dbref, int))cmdp->info.handler;
+			(*(handler_fun_command_no_args))(player, cause, key);
 		}
 		break;
 
 	case CS_ONE_ARG:
 		{
 		tbuf1 = XMALLOC(1, "tbuf1");
-		handler_cs_one_args = (void (*)(dbref, dbref, int, char *))cmdp->info.handler;
-		(*(handler_cs_one_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
+		handler_fun_command_one_args = (void (*)(dbref, dbref, int, char *))cmdp->info.handler;
+		(*(handler_fun_command_one_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1));
 		XFREE(tbuf1);
 		}
 		break;
@@ -2336,8 +2336,8 @@ void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((
 		{
 		tbuf1 = XMALLOC(1, "tbuf1");
 		tbuf2 = XMALLOC(1, "tbuf2");
-		handler_cs_two_args = (void (*)(dbref, dbref, int, char *, char *))cmdp->info.handler;
-		(*(handler_cs_two_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
+		handler_fun_command_two_args = (void (*)(dbref, dbref, int, char *, char *))cmdp->info.handler;
+		(*(handler_fun_command_two_args))(player, cause, key, ((fargs[1]) ? (fargs[1]) : tbuf1), ((fargs[2]) ? (fargs[2]) : tbuf2));
 		XFREE(tbuf2);
 		XFREE(tbuf1);
 		}
