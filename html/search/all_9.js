@@ -25,7 +25,7 @@ var searchData=
   ['handle_5ftrig_22',['handle_trig',['../funmath_8c.html#a0807e36e0515377ee50ce195fcc3ebed',1,'funmath.c']]],
   ['handle_5fvector_23',['handle_vector',['../funmath_8c.html#a0788c26955bc8d23a6e045d3f2b39022',1,'funmath.c']]],
   ['handle_5fvectors_24',['handle_vectors',['../funmath_8c.html#a5475c24443132bc6a498eb43ae6b6d83',1,'funmath.c']]],
-  ['handler_25',['handler',['../structflag__entry.html#a557a37b4b5dafca28bd048416b3744ee',1,'flag_entry::handler()'],['../structpower__entry.html#a6123887afbd2137d80d32ced67d3a739',1,'power_entry::handler()']]],
+  ['handler_25',['handler',['../structflag__entry.html#a71e2bdbc23982f303ce5a83f16351e27',1,'flag_entry::handler()'],['../structpower__entry.html#afe206c309abd33037b5766ba8d6fd81a',1,'power_entry::handler()']]],
   ['has_5fcommands_26',['HAS_COMMANDS',['../constants_8h.html#a690c2d9b54b677db4c29fab6cdfc1f53',1,'constants.h']]],
   ['has_5fdarklock_27',['HAS_DARKLOCK',['../constants_8h.html#ac2e15891c4a741ae72032dcd6a733106',1,'constants.h']]],
   ['has_5fflag_28',['has_flag',['../flags_8c.html#ab593e292837e3bd2e8b9d1951323c6a8',1,'flags.c']]],

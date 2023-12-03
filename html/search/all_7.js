@@ -105,7 +105,7 @@ var searchData=
   ['frombasex_102',['fromBaseX',['../funmath_8c.html#a8200c90f880add3e931889bdbc7f1912',1,'funmath.c']]],
   ['full_5ffile_103',['full_file',['../structconfdata.html#a0e5e21a7b5d1c1980ced45a050a2d762',1,'confdata']]],
   ['fullmotd_5fmsg_104',['fullmotd_msg',['../structconfdata.html#a471b21bc9c11c445fec50301b664832b',1,'confdata']]],
-  ['fun_105',['fun',['../structfun.html#aa977ee08fceb202c5de3d89371cc6bcd',1,'fun']]],
+  ['fun_105',['fun',['../structfun.html#ac43e1fb4ce426c3e271351fc63014c6b',1,'fun']]],
   ['fun_106',['FUN',['../typedefs_8h.html#a0f18fc0183410899f41fc4c37c2dd9c5',1,'typedefs.h']]],
   ['fun_107',['fun',['../structfun.html',1,'']]],
   ['fun_5fabs_108',['fun_abs',['../funmath_8c.html#ac62c4039b53ed4bb88655ebf7ecda878',1,'funmath.c']]],
