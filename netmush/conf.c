@@ -27,6 +27,7 @@
 #include <arpa/inet.h>
 #include <sys/param.h>
 #include <libgen.h>
+#include <unistd.h>
 
 CONFDATA mushconf;
 STATEDATA mushstate;

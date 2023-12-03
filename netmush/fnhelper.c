@@ -729,7 +729,7 @@ bool xlate(char *arg)
 
 	if (is_integer(temp2))
 	{
-		return strtoll(temp2, (char **)NULL, 10) >= 0 ? true : false;
+		return strtoll(temp2, (char **)NULL, 10) >= (mushconf.bools_oldstyle ? 1 : 0) ? true : false;
 	}
 
 	return true;
