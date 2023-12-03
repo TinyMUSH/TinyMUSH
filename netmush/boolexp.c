@@ -535,11 +535,13 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 *
 		 */
 		buf = XMALLOC(LBUF_SIZE, "buf");
+		//buf = XSTRDUP(*pBuf, "buf");
 		p = buf;
 
 		while ((**pBuf) && ((**pBuf) != AND_TOKEN) && ((**pBuf) != OR_TOKEN) && ((**pBuf) != ')'))
 		{
-			*p++ = (**pBuf)++;
+			*p++ = (**pBuf);
+			(*pBuf)++;
 		}
 
 		*p-- = '\0';
