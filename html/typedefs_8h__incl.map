@@ -1,8 +1,9 @@
 <map id="netmush/typedefs.h" name="netmush/typedefs.h">
-<area shape="rect" id="node1" title="Type definitions for variables." alt="" coords="139,5,274,31"/>
+<area shape="rect" id="node1" title="Type definitions for variables." alt="" coords="194,5,329,31"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,79,69,104"/>
 <area shape="rect" id="node3" title=" " alt="" coords="94,79,154,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="178,79,235,104"/>
-<area shape="rect" id="node5" title=" " alt="" coords="259,79,341,104"/>
-<area shape="rect" id="node6" title=" " alt="" coords="365,79,451,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="179,79,253,104"/>
+<area shape="rect" id="node5" title=" " alt="" coords="278,79,335,104"/>
+<area shape="rect" id="node6" title=" " alt="" coords="359,79,441,104"/>
+<area shape="rect" id="node7" title=" " alt="" coords="465,79,551,104"/>
 </map>

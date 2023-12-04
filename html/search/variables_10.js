@@ -14,14 +14,13 @@ var searchData=
   ['restarting_11',['restarting',['../structstatedata.html#ae784241272471963066b88a1c1082671',1,'statedata']]],
   ['retabs_12',['retabs',['../structstatedata.html#a8a95f59bc7f987799e80abfbff4722c7',1,'statedata']]],
   ['retry_5flimit_13',['retry_limit',['../structconfdata.html#a948e107a52888c06cedde000180aa2cf',1,'confdata']]],
-  ['revision_14',['revision',['../structversioninfo.html#a062c07b4fdbcb85b9199ff541b0ee419',1,'versioninfo']]],
-  ['robot_5fflags_15',['robot_flags',['../structconfdata.html#a452cb49e120d0b271e83aa9fa0f3de9d',1,'confdata']]],
-  ['robot_5fspeak_16',['robot_speak',['../structconfdata.html#a46f17a21868e9c906c62b47587734679',1,'confdata']]],
-  ['robotcost_17',['robotcost',['../structconfdata.html#af6e4a38a24e4d09e892611fcc60bc84c',1,'confdata']]],
-  ['room_5fdefobj_18',['room_defobj',['../structconfdata.html#a5e29f923d9d1cbe73f3b9e29c447731c',1,'confdata']]],
-  ['room_5fflags_19',['room_flags',['../structconfdata.html#a0ca9161d2f5adaed25407d11d3921416',1,'confdata']]],
-  ['room_5fparent_20',['room_parent',['../structconfdata.html#aaa614820a4dae4e6c0839bc07d4af41e',1,'confdata']]],
-  ['room_5fproto_21',['room_proto',['../structconfdata.html#aed91cd5997e4d75b0f838e9ced3c96a3',1,'confdata']]],
-  ['room_5fquota_22',['room_quota',['../structconfdata.html#aa3204d0f46de468fe5794b8ef5ec6ddd',1,'confdata']]],
-  ['rperms_23',['rperms',['../structconfparm.html#a405749ba5a0acaa6a4c1d43374941197',1,'confparm']]]
+  ['robot_5fflags_14',['robot_flags',['../structconfdata.html#a452cb49e120d0b271e83aa9fa0f3de9d',1,'confdata']]],
+  ['robot_5fspeak_15',['robot_speak',['../structconfdata.html#a46f17a21868e9c906c62b47587734679',1,'confdata']]],
+  ['robotcost_16',['robotcost',['../structconfdata.html#af6e4a38a24e4d09e892611fcc60bc84c',1,'confdata']]],
+  ['room_5fdefobj_17',['room_defobj',['../structconfdata.html#a5e29f923d9d1cbe73f3b9e29c447731c',1,'confdata']]],
+  ['room_5fflags_18',['room_flags',['../structconfdata.html#a0ca9161d2f5adaed25407d11d3921416',1,'confdata']]],
+  ['room_5fparent_19',['room_parent',['../structconfdata.html#aaa614820a4dae4e6c0839bc07d4af41e',1,'confdata']]],
+  ['room_5fproto_20',['room_proto',['../structconfdata.html#aed91cd5997e4d75b0f838e9ced3c96a3',1,'confdata']]],
+  ['room_5fquota_21',['room_quota',['../structconfdata.html#aa3204d0f46de468fe5794b8ef5ec6ddd',1,'confdata']]],
+  ['rperms_22',['rperms',['../structconfparm.html#a405749ba5a0acaa6a4c1d43374941197',1,'confparm']]]
 ];

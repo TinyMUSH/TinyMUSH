@@ -95,7 +95,7 @@ var searchData=
   ['statedata_92',['statedata',['../structstatedata.html',1,'']]],
   ['stats_93',['STATS',['../typedefs_8h.html#a47cd810158e692024656f336197ca0e1',1,'typedefs.h']]],
   ['stats_5ftype_94',['stats_type',['../structstats__type.html',1,'']]],
-  ['status_95',['status',['../structversioninfo.html#ab03a894e200a50755c608e45073b8a68',1,'versioninfo']]],
+  ['status_95',['status',['../structversioninfo.html#a36c75da763b7b32e3f6207fd3b909087',1,'versioninfo']]],
   ['status_5ffile_96',['status_file',['../structconfdata.html#a85d4a9803a7a0cca1a91757be4b7cfef',1,'confdata']]],
   ['sticky_97',['STICKY',['../constants_8h.html#a89a55e5edbd28d498bdb70b914bd40a3',1,'constants.h']]],
   ['stop_5fmatch_98',['STOP_MATCH',['../constants_8h.html#a4d81c7546c9a6d8aabcd62aab51cbf2b',1,'constants.h']]],

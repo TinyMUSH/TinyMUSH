@@ -17,7 +17,7 @@ var searchData=
   ['terse_5flook_14',['terse_look',['../structconfdata.html#aec427ca644bb7a62c8b0a7027e51b0e0',1,'confdata']]],
   ['terse_5fmovemsg_15',['terse_movemsg',['../structconfdata.html#a798fff870dd95f057e83fd6726f76e41',1,'confdata']]],
   ['test_5fatr_16',['test_atr',['../boolexp_8c.html#a12e3a2937767bc6f88f7929422bce140',1,'boolexp.c']]],
-  ['text_17',['text',['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text()'],['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text()']]],
+  ['text_17',['text',['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text()'],['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text()']]],
   ['text_5fblock_18',['text_block',['../structtext__block.html',1,'']]],
   ['text_5fblock_5fhdr_19',['text_block_hdr',['../structtext__block__hdr.html',1,'']]],
   ['tf_5fclose_20',['tf_close',['../db_8c.html#ac9711a0bcc02328436b1af52b7509eb8',1,'db.c']]],
@@ -76,9 +76,10 @@ var searchData=
   ['twarp_5fevents_73',['TWARP_EVENTS',['../constants_8h.html#afc1e86a84b41323ddceee21fd40e39c5',1,'constants.h']]],
   ['twarp_5fidle_74',['TWARP_IDLE',['../constants_8h.html#ae60c7561fe257b9e09f45dd42b552f45',1,'constants.h']]],
   ['twarp_5fqueue_75',['TWARP_QUEUE',['../constants_8h.html#a713e365e240e4fa4a0e7e0d77684ea54',1,'constants.h']]],
-  ['txthome_76',['txthome',['../structconfdata.html#ab92ad2113baf9414f48a3749b468a2d9',1,'confdata']]],
-  ['type_5froom_77',['TYPE_ROOM',['../constants_8h.html#a68feaa4bbf72309400135df83c6584e6',1,'constants.h']]],
-  ['typed_5fquotas_78',['typed_quotas',['../structconfdata.html#a799cf9183f184868909d63071817d259',1,'confdata']]],
-  ['typedefs_2eh_79',['typedefs.h',['../typedefs_8h.html',1,'']]],
-  ['typer_5ffunc_80',['typer_func',['../structcomponent__def.html#a20f580c1cf9780a9e290ff7296513c4d',1,'component_def']]]
+  ['tweak_76',['tweak',['../structversioninfo.html#a52630b139d61f71bd2b822ee2faf0a26',1,'versioninfo']]],
+  ['txthome_77',['txthome',['../structconfdata.html#ab92ad2113baf9414f48a3749b468a2d9',1,'confdata']]],
+  ['type_5froom_78',['TYPE_ROOM',['../constants_8h.html#a68feaa4bbf72309400135df83c6584e6',1,'constants.h']]],
+  ['typed_5fquotas_79',['typed_quotas',['../structconfdata.html#a799cf9183f184868909d63071817d259',1,'confdata']]],
+  ['typedefs_2eh_80',['typedefs.h',['../typedefs_8h.html',1,'']]],
+  ['typer_5ffunc_81',['typer_func',['../structcomponent__def.html#a20f580c1cf9780a9e290ff7296513c4d',1,'component_def']]]
 ];

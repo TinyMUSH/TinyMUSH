@@ -42,7 +42,7 @@ var searchData=
   ['verbose_39',['VERBOSE',['../constants_8h.html#a42f8c497a1968074f38bf5055c650dca',1,'constants.h']]],
   ['version_40',['version',['../structstatedata.html#a0072b0e3f1bfd84ea7dfec76d3be6824',1,'statedata']]],
   ['version_2ec_41',['version.c',['../version_8c.html',1,'']]],
-  ['versioninfo_42',['versioninfo',['../structversioninfo.html',1,'']]],
+  ['versioninfo_42',['versioninfo',['../structversioninfo.html',1,'versioninfo'],['../structversioninfo.html#a806525d01a8027750a98669a1b7b033a',1,'versioninfo::versioninfo()']]],
   ['visible_5fwizzes_43',['visible_wizzes',['../structconfdata.html#a8881d0469775df15c6c9814ab4a3fdaa',1,'confdata']]],
   ['visual_44',['VISUAL',['../constants_8h.html#a5719963d148e344fe549ddff3b70f9b2',1,'constants.h']]]
 ];

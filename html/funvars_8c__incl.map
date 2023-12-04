@@ -1,20 +1,21 @@
 <map id="netmush/funvars.c" name="netmush/funvars.c">
-<area shape="rect" id="node1" title="Structure, variable, stack, and regexp functions." alt="" coords="351,5,481,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,79,72,104"/>
-<area shape="rect" id="node3" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="97,79,186,104"/>
-<area shape="rect" id="node5" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="177,152,258,177"/>
-<area shape="rect" id="node11" href="$macros_8h.html" title="Macro definitions." alt="" coords="379,79,453,104"/>
-<area shape="rect" id="node12" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="477,79,552,104"/>
-<area shape="rect" id="node13" href="$prototypes_8h_source.html" title=" " alt="" coords="262,79,354,104"/>
-<area shape="rect" id="node16" title=" " alt="" coords="577,79,639,104"/>
-<area shape="rect" id="node17" title=" " alt="" coords="664,79,728,104"/>
-<area shape="rect" id="node18" title=" " alt="" coords="753,79,810,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="45,152,101,177"/>
-<area shape="rect" id="node6" title=" " alt="" coords="229,225,293,251"/>
-<area shape="rect" id="node7" title=" " alt="" coords="63,225,123,251"/>
-<area shape="rect" id="node8" title=" " alt="" coords="147,225,205,251"/>
-<area shape="rect" id="node9" title=" " alt="" coords="318,225,399,251"/>
-<area shape="rect" id="node10" title=" " alt="" coords="424,225,509,251"/>
-<area shape="rect" id="node14" title=" " alt="" coords="477,152,539,177"/>
-<area shape="rect" id="node15" title=" " alt="" coords="282,152,350,177"/>
+<area shape="rect" id="node1" title="Structure, variable, stack, and regexp functions." alt="" coords="432,5,561,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="86,79,153,104"/>
+<area shape="rect" id="node3" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="177,79,267,104"/>
+<area shape="rect" id="node5" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="265,152,347,177"/>
+<area shape="rect" id="node12" href="$macros_8h.html" title="Macro definitions." alt="" coords="459,79,534,104"/>
+<area shape="rect" id="node13" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="558,79,633,104"/>
+<area shape="rect" id="node14" href="$prototypes_8h_source.html" title=" " alt="" coords="343,79,435,104"/>
+<area shape="rect" id="node17" title=" " alt="" coords="657,79,720,104"/>
+<area shape="rect" id="node18" title=" " alt="" coords="745,79,809,104"/>
+<area shape="rect" id="node19" title=" " alt="" coords="833,79,891,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="134,152,190,177"/>
+<area shape="rect" id="node6" title=" " alt="" coords="90,225,154,251"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,225,65,251"/>
+<area shape="rect" id="node8" title=" " alt="" coords="178,225,253,251"/>
+<area shape="rect" id="node9" title=" " alt="" coords="277,225,335,251"/>
+<area shape="rect" id="node10" title=" " alt="" coords="359,225,440,251"/>
+<area shape="rect" id="node11" title=" " alt="" coords="465,225,550,251"/>
+<area shape="rect" id="node15" title=" " alt="" coords="476,152,539,177"/>
+<area shape="rect" id="node16" title=" " alt="" coords="563,152,631,177"/>
 </map>

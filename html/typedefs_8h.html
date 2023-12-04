@@ -87,6 +87,7 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;time.h&gt;</code><br />
 <code>#include &lt;sys/time.h&gt;</code><br />
 <code>#include &lt;netinet/in.h&gt;</code><br />
@@ -95,12 +96,13 @@ Include dependency graph for typedefs.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="typedefs_8h__incl.png" border="0" usemap="#anetmush_2typedefs_8h" alt=""/></div>
 <map name="anetmush_2typedefs_8h" id="anetmush_2typedefs_8h">
-<area shape="rect" title="Type definitions for variables." alt="" coords="139,5,274,31"/>
+<area shape="rect" title="Type definitions for variables." alt="" coords="194,5,329,31"/>
 <area shape="rect" title=" " alt="" coords="5,79,69,104"/>
 <area shape="rect" title=" " alt="" coords="94,79,154,104"/>
-<area shape="rect" title=" " alt="" coords="178,79,235,104"/>
-<area shape="rect" title=" " alt="" coords="259,79,341,104"/>
-<area shape="rect" title=" " alt="" coords="365,79,451,104"/>
+<area shape="rect" title=" " alt="" coords="179,79,253,104"/>
+<area shape="rect" title=" " alt="" coords="278,79,335,104"/>
+<area shape="rect" title=" " alt="" coords="359,79,441,104"/>
+<area shape="rect" title=" " alt="" coords="465,79,551,104"/>
 </map>
 </div>
 </div>
@@ -521,6 +523,9 @@ typedef struct <a class="el" href="structforward__list.html">forward_list</a>&#1
 <tr class="memitem:a329d208af4cba24b4e7424ed7848942b"><td class="memItemLeft" align="right" valign="top"><a id="a329d208af4cba24b4e7424ed7848942b" name="a329d208af4cba24b4e7424ed7848942b"></a>
 typedef struct <a class="el" href="structpropdir__list.html">propdir_list</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PROPDIR</b></td></tr>
 <tr class="separator:a329d208af4cba24b4e7424ed7848942b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae469d04a90e4c02def4ea512a649a04e"><td class="memItemLeft" align="right" valign="top"><a id="ae469d04a90e4c02def4ea512a649a04e" name="ae469d04a90e4c02def4ea512a649a04e"></a>
+typedef enum release_status&#160;</td><td class="memItemRight" valign="bottom"><b>RELEASE_STATUS</b></td></tr>
+<tr class="separator:ae469d04a90e4c02def4ea512a649a04e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fae9df02178e7a66e2c0811e0078692"><td class="memItemLeft" align="right" valign="top"><a id="a4fae9df02178e7a66e2c0811e0078692" name="a4fae9df02178e7a66e2c0811e0078692"></a>
 typedef struct <a class="el" href="structstatedata.html">statedata</a>&#160;</td><td class="memItemRight" valign="bottom"><b>STATEDATA</b></td></tr>
 <tr class="separator:a4fae9df02178e7a66e2c0811e0078692"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -565,6 +570,12 @@ Enumerations</h2></td></tr>
 , <b>CF_Partial</b>
  }</td></tr>
 <tr class="separator:a20aa988138ec997897a60719ae914bff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa050e1d043e7132880a4f4951c010d17"><td class="memItemLeft" align="right" valign="top"><a id="aa050e1d043e7132880a4f4951c010d17" name="aa050e1d043e7132880a4f4951c010d17"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>release_status</b> { <b>RELEASE_ALPHA</b>
+, <b>RELEASE_BETA</b>
+, <b>RELEASE_CANDIDATE</b>
+, <b>RELEASE_STABLE</b>
+ }</td></tr>
+<tr class="separator:aa050e1d043e7132880a4f4951c010d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90995931d172c88c20dd13fde532b7c4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="typedefs_8h.html#a90995931d172c88c20dd13fde532b7c4">msgq_destination</a> { <a class="el" href="typedefs_8h.html#a90995931d172c88c20dd13fde532b7c4a6ae7b27fe3f9f384ef8dec8dc1128a52">MSGQ_DEST_DNSRESOLVER</a> = 1L
 , <b>MSGQ_DEST_REPLY</b> = __LONG_MAX__
  }</td></tr>

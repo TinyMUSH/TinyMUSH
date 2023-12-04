@@ -1,7 +1,7 @@
 var searchData=
 [
   ['n_5finstances_0',['n_instances',['../structstructure__def.html#a6cef95c3b613d433ece134b829f84805',1,'structure_def']]],
-  ['name_1',['name',['../structattr.html#a8635bc65695a57f506841c92e6666dfe',1,'attr::name()'],['../structfun.html#a96761b329fb9cbf9c686e7324c8fc490',1,'fun::name()'],['../structufun.html#a71febc1d2cae7b40ab5b61e13cdb3fbc',1,'ufun::name()'],['../structname__table.html#a7dac8144b1280f4bb667264c1e8a0aaa',1,'name_table::name()'],['../structversioninfo.html#a7fc9bce854e07cb5f9cb022a9f4e9b2f',1,'versioninfo::name()'],['../structuser__attribute.html#a019f6921dc5202bf13f904e5289aac58',1,'user_attribute::name()']]],
+  ['name_1',['name',['../structattr.html#a8635bc65695a57f506841c92e6666dfe',1,'attr::name()'],['../structfun.html#a96761b329fb9cbf9c686e7324c8fc490',1,'fun::name()'],['../structufun.html#a71febc1d2cae7b40ab5b61e13cdb3fbc',1,'ufun::name()'],['../structname__table.html#a7dac8144b1280f4bb667264c1e8a0aaa',1,'name_table::name()'],['../structuser__attribute.html#a019f6921dc5202bf13f904e5289aac58',1,'user_attribute::name()']]],
   ['name_5flength_2',['name_length',['../structobject.html#ad7236619381ae73a01447b00723b9bd2',1,'object']]],
   ['name_5fspaces_3',['name_spaces',['../structconfdata.html#a578f21bfe1a57b7929dedd18cec8c862',1,'confdata']]],
   ['names_4',['names',['../externs_8h.html#a331efbce3968c9f128ca29634765ca7b',1,'names():&#160;help.txt'],['../db_8c.html#a331efbce3968c9f128ca29634765ca7b',1,'names():&#160;db.c']]],
