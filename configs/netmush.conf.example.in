@@ -6,14 +6,14 @@
 #    define in here and mush.config is simply a shell script
 #    able to read them from here:
 #
-backup_home         ${CMAKE_INSTALL_PREFIX}/game/backups
-binary_home         ${CMAKE_INSTALL_PREFIX}/game
-database_home       ${CMAKE_INSTALL_PREFIX}/game/db
-modules_home        ${CMAKE_INSTALL_PREFIX}/game/modules
-scripts_home        ${CMAKE_INSTALL_PREFIX}/game/scripts
-log_home            ${CMAKE_INSTALL_PREFIX}/game/logs
-pid_home            ${CMAKE_INSTALL_PREFIX}/game
-text_home           ${CMAKE_INSTALL_PREFIX}/game/docs
+backup_home         ${TINYMUSH_ROOT_DIRECTORY}/backups
+binary_home         ${TINYMUSH_ROOT_DIRECTORY}
+database_home       ${TINYMUSH_ROOT_DIRECTORY}/db
+modules_home        ${TINYMUSH_ROOT_DIRECTORY}/modules
+scripts_home        ${TINYMUSH_ROOT_DIRECTORY}/scripts
+log_home            ${TINYMUSH_ROOT_DIRECTORY}/logs
+pid_home            ${TINYMUSH_ROOT_DIRECTORY}
+text_home           ${TINYMUSH_ROOT_DIRECTORY}/docs
 backup_util         ${TAR_BINARY}
 backup_compress     cJf
 backup_extract      xJf
