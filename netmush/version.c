@@ -82,7 +82,7 @@ void format_version(void) {
     if(mushstate.version.patch > 0)
         XSPRINTFCAT(buf, " Patch %d", mushstate.version.patch);
     if(mushstate.version.tweak > 0)
-        XSPRINTFCAT(buf, " Tweak %d", mushstate.version.tweak);
+        XSPRINTFCAT(buf, " Revision %d", mushstate.version.tweak);
     XSPRINTFCAT(buf, " (%s%s %s)", mushstate.version.git_hash, mushstate.version.git_dirty ? "-dirty" : "", mushstate.version.git_date);
     
     mushstate.version.versioninfo = XSTRDUP(buf, "mushstate.version.versioninfo");
@@ -95,7 +95,7 @@ void init_version(void)
        Major  : The main branch.
        Minor  : The minor version.
        Patch  : Patch Level.
-       Tweak  : Tweak Level.
+       Tweak  : Revision Level.
        Status : 0 - Alpha Release.
                 1 - Beta Release.
                 2 - Release Candidate.
