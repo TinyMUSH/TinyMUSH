@@ -2521,41 +2521,18 @@ void mod_comsys_destroy_player(dbref player, dbref victim)
 
 void mod_comsys_init(void)
 {
+    
     mod_comsys_config.public_channel = XSTRDUP("Public", "mod_comsys_init.mod_comsys_config.public_channel");
     mod_comsys_config.guests_channel = XSTRDUP("Guests", "mod_comsys_init.mod_comsys_config.guests_channel");
     mod_comsys_config.public_calias = XSTRDUP("pub", "mod_comsys_init.mod_comsys_config.public_calias");
     mod_comsys_config.guests_calias = XSTRDUP("g", "mod_comsys_init.mod_comsys_config.guests_calias");
 
-    switch (mushstate.version.status)
-    {
-    case 0:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    case 1:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    case 2:
-        mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    default:
-        if (mushstate.version.revision > 0)
-        {
-            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        }
-        else
-        {
-            mod_comsys_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mushstate.version.major, mushstate.version.minor, PACKAGE_RELEASE_DATE);
-        }
-    }
-
-    mod_comsys_version.author = XSTRDUP("TinyMUSH Development Team", "mod_comsys_init.mod_comsys_version.author");
-    mod_comsys_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_comsys_init.mod_comsys_version.email");
-    mod_comsys_version.url = XSTRDUP("https://github.com/TinyMUSH", "mod_comsys_init.mod_comsys_version.url");
+    mod_comsys_version.version = XSTRDUP(mushstate.version.versioninfo, "mod_comsys_init.mod_comsys_version.version");
+    mod_comsys_version.author = XSTRDUP(TINYMUSH_AUTHOR, "mod_comsys_init.mod_comsys_version.author");
+    mod_comsys_version.email = XSTRDUP(TINYMUSH_CONTACT, "mod_comsys_init.mod_comsys_version.email");
+    mod_comsys_version.url = XSTRDUP(TINYMUSH_HOMEPAGE_URL, "mod_comsys_init.mod_comsys_version.url");
     mod_comsys_version.description = XSTRDUP("Communication system for TinyMUSH", "mod_comsys_init.mod_comsys_version.description");
-    mod_comsys_version.copyright = XSTRDUP("Copyright (C) TinyMUSH development team.", "mod_comsys_init.mod_comsys_version.copyright");
+    mod_comsys_version.copyright = XSTRDUP(TINYMUSH_COPYRIGHT, "mod_comsys_init.mod_comsys_version.copyright");
 
     register_hashtables(mod_comsys_hashtable, mod_comsys_nhashtable);
     register_commands(mod_comsys_cmdtable);

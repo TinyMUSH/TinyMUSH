@@ -29,18 +29,23 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     MODVER *mver;
     char *ptr;
     char string[MBUF_SIZE];
-    XSNPRINTF(string, MBUF_SIZE, "%s [%s]", mushstate.version.name, PACKAGE_RELEASE_DATE);
-    ptr = repeatchar(strlen(string), '-');
-    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\n%s\n%s\n", string, ptr);
-    XFREE(ptr);
-    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Build date: %s, %s", __DATE__, __TIME__);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "\nTinyMUSH Engine\n---------------");
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Version : %s", mushstate.version.versioninfo);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Author : %s", TINYMUSH_AUTHOR);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "      Email : %s", TINYMUSH_CONTACT);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Website : %s", TINYMUSH_HOMEPAGE_URL);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "  Copyright : %s", TINYMUSH_COPYRIGHT);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Licence : %s", TINYMUSH_LICENSE);
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " Build date : %s", TINYMUSH_BUILD_DATE);
 
     if (Wizard(player))
     {
         struct utsname bpInfo;
         uname(&bpInfo);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "       Platform: %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Platform : %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
     }
+
+    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " ");
 
     if (mushstate.modloaded[0])
     {
@@ -50,96 +55,71 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
         {
             XSNPRINTF(string, MBUF_SIZE, "Module %s", mp->modname);
             ptr = repeatchar(strlen(string), '-');
-            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s\n", string, ptr);
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s\n%s", string, ptr);
             XFREE(ptr);
             XSNPRINTF(string, MBUF_SIZE, "mod_%s_%s", mp->modname, "version");
 
             if ((mver = (MODVER *)dlsym(mp->handle, string)) != NULL)
             {
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Version: %s", mver->version);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "         Author: %s", mver->author);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "          Email: %s", mver->email);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "        Website: %s", mver->url);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "      Copyright: %s", mver->copyright);
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Description: %s\n", mver->description);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Version : %s", mver->version);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "     Author : %s", mver->author);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "      Email : %s", mver->email);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Website : %s", mver->url);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "  Copyright : %s", mver->copyright);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Description : %s\n", mver->description);
             }
             else
             {
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "module %s: no version information", mp->modname);
+                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "    Version : No version information for module %s", mp->modname);
             }
         }
     }
+}
+
+void format_version(void) {
+    static char buf[MBUF_SIZE];
+    XSNPRINTF(buf, MBUF_SIZE, "%d.%d %s", mushstate.version.major, mushstate.version.minor, mushstate.version.status == 0 ? "alpha" : mushstate.version.status == 1 ? "beta" : mushstate.version.status == 2 ? "rc" : "stable");
+    if(mushstate.version.patch > 0)
+        XSPRINTFCAT(buf, " Patch %d", mushstate.version.patch);
+    if(mushstate.version.tweak > 0)
+        XSPRINTFCAT(buf, " Tweak %d", mushstate.version.tweak);
+    XSPRINTFCAT(buf, " (%s%s %s)", mushstate.version.git_hash, mushstate.version.git_dirty ? "-dirty" : "", mushstate.version.git_date);
+    
+    mushstate.version.versioninfo = XSTRDUP(buf, "mushstate.version.versioninfo");
+    XFREE(buf);
 }
 
 void init_version(void)
 {
-    /* TinyMUSH 3.3 version scheme : Major Version.Minor Version.Status.Revision
-       Major version   : The main branch.
-       Minor version   : The minor version.
-       Revision    : Patch Level.
-       Status      : 0 - Alpha Release.
-       1 - Beta Release.
-       2 - Release Candidate.
-       3 - Release Version (Gamma).
+    /* TinyMUSH 4.0 version scheme : Major.Minor.Patch.Tweak-Status
+       Major  : The main branch.
+       Minor  : The minor version.
+       Patch  : Patch Level.
+       Tweak  : Tweak Level.
+       Status : 0 - Alpha Release.
+                1 - Beta Release.
+                2 - Release Candidate.
+                3 - Stable.
 
        Everything is now set from the configure script. No need to edit this file anymore.
      */
-    char *version;
-    version = XSTRDUP(PACKAGE_VERSION, "version");
 
-    if (version != NULL)
-    {
-        mushstate.version.major = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mushstate.version.minor = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mushstate.version.status = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-        mushstate.version.revision = strtoimax(strsep(&version, "."), (char **)NULL, 10);
-    }
-    else
-    {
-        /* If we hit that, we have a serious problem... */
-        mushstate.version.major = 0;
-        mushstate.version.minor = 0;
-        mushstate.version.status = 0;
-        mushstate.version.revision = 0;
-    }
+    mushstate.version.major = TINYMUSH_VERSION_MAJOR;
+    mushstate.version.minor = TINYMUSH_VERSION_MINOR;
+    mushstate.version.patch = TINYMUSH_VERSION_PATCH;
+    mushstate.version.tweak = TINYMUSH_VERSION_TWEAK;
+    mushstate.version.status = TINYMUSH_VERSION_STATUS;
+    mushstate.version.git_hash = XSTRDUP(TINYMUSH_GIT_HASH, "mushstate.version.name");
+    mushstate.version.git_dirty = (bool)TINYMUSH_GIT_DIRTY;
+    mushstate.version.git_date = XSTRDUP(TINYMUSH_GIT_RELEASE_DATE, "mushstate.version.name");
 
-    XFREE(version);
-    version = XMALLOC(LBUF_SIZE, "version");
-    XSPRINTFCAT(version, "TinyMUSH version %d.%d", mushstate.version.major, mushstate.version.minor);
-
-    switch (mushstate.version.status)
-    {
-    case 0:
-        XSPRINTFCAT(version, ", Alpha %d", mushstate.version.revision);
-        break;
-
-    case 1:
-        XSPRINTFCAT(version, ", Beta %d", mushstate.version.revision);
-        break;
-
-    case 2:
-        XSPRINTFCAT(version, ", Release Candidate %d", mushstate.version.revision);
-        break;
-
-    default:
-        if (mushstate.version.revision > 0)
-        {
-            XSPRINTFCAT(version, ", Patch Level %d", mushstate.version.revision);
-        }
-        else
-        {
-            XSPRINTFCAT(version, ", Gold Release");
-        }
-
-        break;
-    }
-
-    mushstate.version.name = XSTRDUP(version, "mushstate.version.name");
-    XFREE(version);
+    format_version();
 }
+
+
 
 void log_version(void)
 {
-    log_write(LOG_ALWAYS, "INI", "START", "       Starting: %s (%s)", mushstate.version.name, PACKAGE_RELEASE_DATE);
-    log_write(LOG_ALWAYS, "INI", "START", "     Build date: %s, %s", __DATE__, __TIME__);
+    log_write(LOG_ALWAYS, "INI", "START", "TinyMUSH version %s", mushstate.version.versioninfo);
+    log_write(LOG_ALWAYS, "INI", "START", "Build date: %s", TINYMUSH_BUILD_DATE);
 }

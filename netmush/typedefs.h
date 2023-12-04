@@ -16,6 +16,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <time.h>
 #include <sys/time.h>
 #include <netinet/in.h>
@@ -1075,17 +1076,29 @@ typedef struct propdir_list
     int *data;
 } PROPDIR;
 
+typedef enum release_status
+{
+    RELEASE_ALPHA,
+    RELEASE_BETA,
+    RELEASE_CANDIDATE,
+    RELEASE_STABLE
+} RELEASE_STATUS;
+
 /**
  * Version number is Major.Minor.Status.PatchLevel
  *
  */
 typedef struct
 {
-    char *name;   /*!< Complete version string */
-    int major;    /*!< Major Version */
-    int minor;    /*!< Minor Version */
-    int status;   /*!< Status : 0 - Alpha, 1 - Beta, 2 - Release Candidate, 3 - Gamma */
-    int revision; /*!< Patch Level */
+    char *versioninfo;     /*!< Version string */
+    int major;             /*!< Major Version */
+    int minor;             /*!< Minor Version */
+    int patch;             /*!< Patch level */
+    int tweak;             /*!< Tweak level */
+    RELEASE_STATUS status; /*!< Release status */
+    char *git_date;        /*!< Date of release */
+    char *git_hash;        /*!< Git hash of release */
+    bool git_dirty;        /*!< Git dirty flag */
 } versioninfo;
 
 typedef struct statedata

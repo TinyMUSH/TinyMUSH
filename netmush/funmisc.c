@@ -1667,10 +1667,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
  */
 void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *s = XASPRINTF("%s [%s]", mushstate.version.name, PACKAGE_RELEASE_DATE);
-
-	SAFE_LB_STR(s, buff, bufc);
-	XFREE(s);
+	SAFE_LB_STR(mushstate.version.versioninfo, buff, bufc);
 }
 
 /**

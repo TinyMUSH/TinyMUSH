@@ -27,32 +27,44 @@
 /* Number of env vars (%0 et al) */
 #define NUM_ENV_VARS ${NUM_ENV_VARS}
 
-/* Name of package */
-#define PACKAGE "${PACKAGE}"
+/* Define to the version broken down to it's components */
+#define TINYMUSH_VERSION_MAJOR ${TINYMUSH_VERSION_MAJOR}
+#define TINYMUSH_VERSION_MINOR ${TINYMUSH_VERSION_MINOR}
+#define TINYMUSH_VERSION_PATCH ${TINYMUSH_VERSION_PATCH}
+#define TINYMUSH_VERSION_TWEAK ${TINYMUSH_VERSION_TWEAK}
 
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "${PROJECT_HOMEPAGE_URL}TinyMUSH/issues"
-
-/* Copyright Notice */
-#define PACKAGE_COPYRIGHT "Copyright (C) 1989-2023 TinyMUSH development team."
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME "${PROJECT_NAME}"
-
-/* Date of Release */
-#define PACKAGE_RELEASE_DATE "${PACKAGE_RELEASE_DATE}"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "${PACKAGE}"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL "${PROJECT_HOMEPAGE_URL}"
+/* Define to the release status */
+#define TINYMUSH_VERSION_STATUS ${TINYMUSH_VERSION_STATUS}
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "${PROJECT_VERSION}"
+#define TINYMUSH_GIT_VERSION "${TINYMUSH_GIT_VERSION}"
+
+/* Define to the last commit date */
+#define TINYMUSH_GIT_RELEASE_DATE "${TINYMUSH_GIT_RELEASE_DATE}"
+
+/* Define to the git hash of the last commit. */
+#define TINYMUSH_GIT_HASH "${TINYMUSH_GIT_HASH}"
+
+/* 1 if source was modified since the last commit, else 0. */
+#define TINYMUSH_GIT_DIRTY ${TINYMUSH_GIT_DIRTY}
+
+/* Define to the build date*/
+#define TINYMUSH_BUILD_DATE "${TINYMUSH_BUILD_DATE}"
+
+/* Define to the authors*/
+#define TINYMUSH_AUTHOR "${TINYMUSH_AUTHOR}"
+
+/* Define to the email contact*/
+#define TINYMUSH_CONTACT "${TINYMUSH_CONTACT}"
+
+/* Define to the project copyright*/
+#define TINYMUSH_COPYRIGHT "${TINYMUSH_COPYRIGHT}"
+
+/* Define to the project license*/
+#define TINYMUSH_LICENSE "${TINYMUSH_LICENSE}"
+
+/* Define to the homepage url*/
+#define TINYMUSH_HOMEPAGE_URL "${PROJECT_HOMEPAGE_URL}"
 
 #define DEFAULT_SHORTNAME "netmush"
 

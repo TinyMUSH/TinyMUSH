@@ -764,11 +764,19 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 
-	if ((!format || !*format))
+	if ((!format || !(*format)))
 	{
-		if ((tbuff = va_arg(ap, char *)) != NULL)
+		if (!strcmp((const char *)ap, ""))
 		{
-			XSTRNCPY(msg, tbuff, LBUF_SIZE);
+			if ((tbuff = va_arg(ap, char *)) != NULL)
+			{
+				XSTRNCPY(msg, tbuff, LBUF_SIZE);
+			}
+			else
+			{
+				XFREE(msg);
+				return;
+			}
 		}
 		else
 		{
@@ -2904,7 +2912,7 @@ void usage_dbrecover(void)
 
 void usage(char *prog, int which)
 {
-	fprintf(stderr, "\n%s\n\n", mushstate.version.name);
+	fprintf(stderr, "\n%s\n\n", mushstate.version.versioninfo);
 
 	switch (which)
 	{

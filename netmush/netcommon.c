@@ -1670,7 +1670,7 @@ void dump_info(DESC *call_by)
 		}
 	queue_rawstring(call_by, "Connected: %d\r\n", count);
 	queue_rawstring(call_by, "Size: %d\r\n", mushstate.db_top);
-	queue_rawstring(call_by, "Version: %d.%d.%d.%d\r\n", mushstate.version.major, mushstate.version.minor, mushstate.version.status, mushstate.version.revision);
+	queue_rawstring(call_by, "Version: %d.%d.%d.%d-%d\r\n", mushstate.version.major, mushstate.version.minor, mushstate.version.patch, mushstate.version.tweak, mushstate.version.status);
 
 	for (llp = mushconf.infotext_list; llp != NULL; llp = llp->next)
 	{

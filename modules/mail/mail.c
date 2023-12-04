@@ -4534,36 +4534,12 @@ void mod_mail_init(void)
     mod_mail_config.mail_db_size = 0;
     mod_mail_config.mail_freelist = 0;
 
-    switch (mushstate.version.status)
-    {
-    case 0:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Alpha %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    case 1:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Beta %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    case 2:
-        mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Release Candidate %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        break;
-
-    default:
-        if (mushstate.version.revision > 0)
-        {
-            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Patch Level %d (%s)", mushstate.version.major, mushstate.version.minor, mushstate.version.revision, PACKAGE_RELEASE_DATE);
-        }
-        else
-        {
-            mod_mail_version.version = XASPRINTF("mod_comsys_version.version", "%d.%d, Gold Release (%s)", mushstate.version.major, mushstate.version.minor, PACKAGE_RELEASE_DATE);
-        }
-    }
-
-    mod_mail_version.author = XSTRDUP("TinyMUSH Development Team", "mod_mail_version.author");
-    mod_mail_version.email = XSTRDUP("tinymush@googlegroups.com", "mod_mail_version.email");
-    mod_mail_version.url = XSTRDUP("https://github.com/TinyMUSH", "mod_mail_version.url");
+    mod_mail_version.version = XSTRDUP(mushstate.version.versioninfo, "mod_mail_version.version");
+    mod_mail_version.author = XSTRDUP(TINYMUSH_AUTHOR, "mod_mail_version.author");
+    mod_mail_version.email = XSTRDUP(TINYMUSH_CONTACT, "mod_mail_version.email");
+    mod_mail_version.url = XSTRDUP(TINYMUSH_HOMEPAGE_URL, "mod_mail_version.url");
     mod_mail_version.description = XSTRDUP("Mail system for TinyMUSH", "mod_mail_version.description");
-    mod_mail_version.copyright = XSTRDUP("Copyright (C) TinyMUSH development team.", "mod_mail_version.copyright");
+    mod_mail_version.copyright = XSTRDUP(TINYMUSH_COPYRIGHT, "mod_mail_version.copyright");
     register_commands(mod_mail_cmdtable);
     register_prefix_cmds("-~");
     register_functions(mod_mail_functable);
