@@ -766,17 +766,12 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 
 	if ((!format || !(*format)))
 	{
-		if (!strcmp((const char *)ap, ""))
+		/*
+		 * @todo: Check if ap is NULL
+		 */
+		if ((tbuff = va_arg(ap, char *)) != NULL)
 		{
-			if ((tbuff = va_arg(ap, char *)) != NULL)
-			{
-				XSTRNCPY(msg, tbuff, LBUF_SIZE);
-			}
-			else
-			{
-				XFREE(msg);
-				return;
-			}
+			XSTRNCPY(msg, tbuff, LBUF_SIZE);
 		}
 		else
 		{
