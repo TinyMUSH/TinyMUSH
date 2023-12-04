@@ -108,7 +108,7 @@ void init_version(void)
     mushstate.version.minor = TINYMUSH_VERSION_MINOR;
     mushstate.version.patch = TINYMUSH_VERSION_PATCH;
     mushstate.version.tweak = TINYMUSH_VERSION_TWEAK;
-    mushstate.version.status = TINYMUSH_VERSION_STATUS;
+    mushstate.version.status = TINYMUSH_RELEASE_STATUS;
     mushstate.version.git_hash = XSTRDUP(TINYMUSH_GIT_HASH, "mushstate.version.name");
     mushstate.version.git_dirty = (bool)TINYMUSH_GIT_DIRTY;
     mushstate.version.git_date = XSTRDUP(TINYMUSH_GIT_RELEASE_DATE, "mushstate.version.name");
