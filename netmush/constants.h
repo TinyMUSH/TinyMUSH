@@ -959,7 +959,7 @@
 #define HAS_SPEECHMOD 0x00000080 /*!< Check @speechmod attr */
 #define HAS_PROPDIR 0X00000100   /*!< Internal: has Propdir attr */
 #define COLOR256 0x00000200      /*!< Player support XTERM 256 colors */
-#define FLAG_RES02 0x00000400
+#define COLOR24BIT 0x00000400    /*!< Player support XTERM 24 bit colors */
 #define FLAG_RES03 0x00000800
 #define FLAG_RES04 0x00001000
 #define FLAG_RES05 0x00002000
@@ -1593,6 +1593,9 @@
  */
 #define ANSI_XTERM_FG "\033[38;5;"
 #define ANSI_XTERM_BG "\033[48;5;"
+
+#define ANSI_24BIT_FG "\033[38;2;"
+#define ANSI_24BIT_BG "\033[48;2;"
 
 /**
  * Numeric-only definitions

@@ -479,6 +479,85 @@ char *strip_xterm(char *s)
 }
 
 /**
+ * \fn char *strip_xterm ( char *s )
+ * \brief Return a new string with xterm color code removed
+ *
+ * It is the responsibility of the caller to free the returned
+ * buffer with XFREE().
+ *
+ * \param s Pointer to the original string
+ *
+ * \return Pointer to the new string with ansi code removed.
+ */
+
+char *strip_24bit(char *s)
+{
+	char *buf, *p;
+	char *s1 = s;
+	int skip = 0;
+	p = buf = XMALLOC(LBUF_SIZE, "buf");
+
+	while (*s1)
+	{
+		if (strncmp(s1, ANSI_24BIT_FG, strlen(ANSI_24BIT_FG)) == 0)
+		{
+			skip = 1;
+
+			while (skip)
+			{
+				if ((*s1 == '\0') || (*s1 == ANSI_END))
+				{
+					skip = 0;
+
+					if (*s1 == ANSI_END)
+					{
+						s1++;
+					}
+				}
+				else
+				{
+					s1++;
+				}
+			}
+		}
+
+		if (strncmp(s1, ANSI_24BIT_BG, strlen(ANSI_24BIT_BG)) == 0)
+		{
+			skip = 1;
+
+			while (skip)
+			{
+				if ((*s1 == '\0') || (*s1 == ANSI_END))
+				{
+					skip = 0;
+
+					if (*s1 == ANSI_END)
+					{
+						s1++;
+					}
+				}
+				else
+				{
+					s1++;
+				}
+			}
+		}
+
+		if (*s1)
+		{
+			*p++ = *s1++;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	*p = '\0';
+	return (buf);
+}
+
+/**
  * \fn int strip_ansi_len ( const char *s )
  * \brief Count non-escape-code characters.
  *

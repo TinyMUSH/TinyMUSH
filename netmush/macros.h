@@ -354,6 +354,7 @@
 #define Uninspected(x) ((Flags2(x) & UNINSPECTED) != 0)
 #define Ansi(x) ((Flags2(x) & ANSI) != 0)
 #define Color256(x) ((Flags3(x) & COLOR256) != 0)
+#define Color24Bit(x) ((Flags3(x) & COLOR24BIT) != 0)
 #define NoBleed(x) ((Flags2(x) & NOBLEED) != 0)
 
 #define Transparent(x) ((Flags(x) & SEETHRU) != 0)

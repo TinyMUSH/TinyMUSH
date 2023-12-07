@@ -438,6 +438,7 @@ FLAGENT gen_flags[] = {
     {"MARKER8", MARK_8, '8', FLAG_WORD3, 0, fh_god},
     {"MARKER9", MARK_9, '9', FLAG_WORD3, 0, fh_god},
     {"COLOR256", COLOR256, ':', FLAG_WORD3, 0, fh_any},
+    {"COLOR24BIT", COLOR24BIT , ';', FLAG_WORD3, 0, fh_any},
     {NULL, 0, ' ', 0, 0, NULL}};
 
 OBJENT object_types[8] = {

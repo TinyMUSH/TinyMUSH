@@ -482,6 +482,12 @@ void queue_string(DESC *d, const char *format, ...)
 				XSTRNCPY(msg, buf, LBUF_SIZE);
 				XFREE(buf);
 			}
+			else if (!Color24Bit(d->player))
+			{
+				buf = strip_24bit(msg);
+				XSTRNCPY(msg, buf, LBUF_SIZE);
+				XFREE(buf);
+			}
 			else if (NoBleed(d->player))
 			{
 				buf = normal_to_white(msg);

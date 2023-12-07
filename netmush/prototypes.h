@@ -1251,6 +1251,7 @@ extern int ansiBitsMask(int num);
 extern int ansiBits(int num);
 extern char *strip_ansi(const char *s);
 extern char *strip_xterm(char *s);
+extern char *strip_24bit(char *s);
 extern int strip_ansi_len(const char *s);
 extern char *normal_to_white(const char *raw);
 extern char *ansi_transition_esccode(int ansi_before, int ansi_after);

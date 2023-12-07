@@ -180,33 +180,60 @@ COLORMATCH getColorMatch(rgbColor rgb, COLORINFO palette[])
     return cm;
 }
 
+/**
+ * @brief Format RGB color to VT100 color sequence.
+ *
+ * @param rgb           RGB Color to format
+ * @param background    True if background color
+ * @return char*        VT100 color sequence
+ */
 char *TrueColor2VT100(rgbColor rgb, bool background)
 {
-    char *vt = calloc(1024, sizeof(char));
+    char *vt = NULL;
 
-    sprintf(vt, "\e[%d;2;%d;%d;%dm", background ? 48 : 38, rgb.r, rgb.g, rgb.b);
+    XASPRINTF(vt, "\e[%d;2;%d;%d;%dm", background ? 48 : 38, rgb.r, rgb.g, rgb.b);
 
     return (vt);
 }
 
+/**
+ * @brief Format X11 color to VT100 color sequence.
+ *
+ * @param color         X11 color code
+ * @param background    True if background color
+ * @return char*        VT100 color sequence
+ */
 char *X112VT100(uint8_t color, bool background)
 {
-    char *vt = calloc(1024, sizeof(char));
+    char *vt = NULL;
 
-    sprintf(vt, "\e[%d;5;%dm", background ? 48 : 38, color);
+    XASPRINTF(vt, "\e[%d;5;%dm", background ? 48 : 38, color);
 
     return (vt);
 }
 
+/**
+ * @brief Format ANSI color to VT100 color sequence.
+ *
+ * @param color         ANSI color code
+ * @param background    True if background color
+ * @return char*        VT100 color sequence
+ */
 char *Ansi2VT100(uint8_t color, bool background)
 {
-    char *vt = calloc(1024, sizeof(char));
+    char *vt = NULL;
 
-    sprintf(vt, "\e[%dm", (background ? 40 : 30) + (color & 7));
+    XASPRINTF(vt, "\e[%dm", (background ? 40 : 30) + (color & 7) + (color > 7 ? 60 : 0));
 
     return (vt);
 }
 
+/**
+ * @brief Convert X11 color code to RGB value.
+ *
+ * @param color         X11 color code
+ * @return rgbColor     RGB Color
+ */
 rgbColor X112RGB(int color)
 {
     rgbColor rgb = {0, 0, 0};
@@ -246,6 +273,12 @@ rgbColor X112RGB(int color)
     return rgb;
 }
 
+/**
+ * @brief Convert RGB values to X11 color code.
+ *
+ * @param rgb       RGB Color
+ * @return uint8_t  X11 color code
+ */
 uint8_t RGB2X11(rgbColor rgb)
 {
     if (rgb.r + rgb.g + rgb.b == 0)
@@ -281,11 +314,23 @@ uint8_t RGB2X11(rgbColor rgb)
     return 0;
 }
 
+/**
+ * @brief Convert X11 color code to RGB value.
+ *
+ * @param color         ANSI color code
+ * @return rgbColor     RGB Color
+ */
 uint8_t X112Ansi(int color)
 {
     return RGB2Ansi(X112RGB(color));
 }
 
+/**
+ * @brief Convert RGB values to ANSI color code.
+ *
+ * @param rgb       RGB Color
+ * @return uint8_t  ANSI color code
+ */
 uint8_t RGB2Ansi(rgbColor rgb)
 {
     COLORMATCH cm = getColorMatch(rgb, ansiColor);
