@@ -47,3 +47,4 @@ The structure of TinyMUSH has changed again, here's the new directory tree and a
 ```
 
 More documentation will be available as development goes.
+
