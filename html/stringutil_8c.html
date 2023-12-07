@@ -143,6 +143,9 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>ansiMushCode</b> (int
 <tr class="memitem:a90ad101d06cc90f7c4a60471a6fd645f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stringutil_8c.html#a90ad101d06cc90f7c4a60471a6fd645f">strip_xterm</a> (char *s)</td></tr>
 <tr class="memdesc:a90ad101d06cc90f7c4a60471a6fd645f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a new string with xterm color code removed.  <a href="stringutil_8c.html#a90ad101d06cc90f7c4a60471a6fd645f">More...</a><br /></td></tr>
 <tr class="separator:a90ad101d06cc90f7c4a60471a6fd645f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0956358017b3ed7b51e734a99104db10"><td class="memItemLeft" align="right" valign="top"><a id="a0956358017b3ed7b51e734a99104db10" name="a0956358017b3ed7b51e734a99104db10"></a>
+char *&#160;</td><td class="memItemRight" valign="bottom"><b>strip_24bit</b> (char *s)</td></tr>
+<tr class="separator:a0956358017b3ed7b51e734a99104db10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea1db255d5adf4ab375252c9144ba714"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stringutil_8c.html#aea1db255d5adf4ab375252c9144ba714">strip_ansi_len</a> (const char *s)</td></tr>
 <tr class="memdesc:aea1db255d5adf4ab375252c9144ba714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count non-escape-code characters.  <a href="stringutil_8c.html#aea1db255d5adf4ab375252c9144ba714">More...</a><br /></td></tr>
 <tr class="separator:aea1db255d5adf4ab375252c9144ba714"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1237,6 +1240,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 </div><div class="memdoc">
 
 <p>Return a new string with xterm color code removed. </p>
+<p >It is the responsibility of the caller to free the returned buffer with XFREE().</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to the original string</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the new string with ansi code removed.</dd></dl>
 <p >It is the responsibility of the caller to free the returned buffer with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
