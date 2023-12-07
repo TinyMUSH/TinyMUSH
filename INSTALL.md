@@ -14,7 +14,7 @@ TinyMUSH now use the CMAKE build system, which is alot easier to maintain than A
 
     For OSX:
     ```
-    brew install cmake gdbm pcre`
+    brew install cmake gdbm pcre
     ```
 
 2. Build TinyMUSH:
@@ -28,7 +28,7 @@ TinyMUSH now use the CMAKE build system, which is alot easier to maintain than A
     ./netmush
     ```
 
-Default port is '6250' and default God's password is 'Potrzebie'.
+Default port is '6250' and default God's password is 'potrzebie'.
 
 ## Structure
 

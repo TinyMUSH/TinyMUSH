@@ -70,7 +70,7 @@ configure_file(${CMAKE_SOURCE_DIR}/systemd/tinymush.service.in ${CMAKE_CURRENT_B
 include_directories(${CMAKE_SOURCE_DIR}/netmush)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 if(APPLE)
-    include_directories(/usr/local/include)
+    include_directories(/usr/local/include /opt/homebrew/include)
 endif(APPLE)
 
 macro(install_symlink filepath sympath)
