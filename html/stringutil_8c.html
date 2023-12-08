@@ -137,6 +137,9 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>ansiMushCode</b> (int
 <tr class="memitem:aeea32225c2e762704649e5f6552e0196"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stringutil_8c.html#aeea32225c2e762704649e5f6552e0196">ansiBits</a> (int num)</td></tr>
 <tr class="memdesc:aeea32225c2e762704649e5f6552e0196"><td class="mdescLeft">&#160;</td><td class="mdescRight">ANSI packed state definitions &ndash; number-to-bitvalue translation table.  <a href="stringutil_8c.html#aeea32225c2e762704649e5f6552e0196">More...</a><br /></td></tr>
 <tr class="separator:aeea32225c2e762704649e5f6552e0196"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a717386e8da894eee3a7cd535b5926eb4"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stringutil_8c.html#a717386e8da894eee3a7cd535b5926eb4">level_ansi</a> (const char *s, bool ansi, bool xterm, bool truecolors)</td></tr>
+<tr class="memdesc:a717386e8da894eee3a7cd535b5926eb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go to a string and convert ansi to the lowest supported level.  <a href="stringutil_8c.html#a717386e8da894eee3a7cd535b5926eb4">More...</a><br /></td></tr>
+<tr class="separator:a717386e8da894eee3a7cd535b5926eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7464d90ae1acb37dd803284f3586b795"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stringutil_8c.html#a7464d90ae1acb37dd803284f3586b795">strip_ansi</a> (const char *s)</td></tr>
 <tr class="memdesc:a7464d90ae1acb37dd803284f3586b795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a new string with ansi escape codes removed.  <a href="stringutil_8c.html#a7464d90ae1acb37dd803284f3586b795">More...</a><br /></td></tr>
 <tr class="separator:a7464d90ae1acb37dd803284f3586b795"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -447,7 +450,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 <p >0x1000 &ndash; No ansi. Every valid ansi code clears this bit. 0x0800 &ndash; inverse 0x0400 &ndash; flash 0x0200 &ndash; underline 0x0100 &ndash; highlight 0x0080 &ndash; "use default bg", set by ansi normal, cleared by other bg's 0x0070 &ndash; three bits of bg color 0x0008 &ndash; "use default fg", set by ansi normal, cleared by other fg's 0x0007 &ndash; three bits of fg color</p>
 <p >ANSI packed state definitions &ndash; number-to-bitmask translation</p>
 <p >The mask specifies the state bits that are altered by a particular ansi code. Bits are laid out as follows:</p>
-<p >0x1000 &ndash; No ansi. Every valid ansi code clears this bit. 0x0800 &ndash; inverse 0x0400 &ndash; flash 0x0200 &ndash; underline 0x0100 &ndash; highlight 0x0080 &ndash; "use default bg", set by ansi normal, cleared by other bg's 0x0070 &ndash; three bits of bg color 0x0008 &ndash; "use default fg", set by ansi normal, cleared by other fg's 0x0007 &ndash; three bits of fg color</p>
+<p >0x2000 &ndash; Bright color flags 0x1000 &ndash; No ansi. Every valid ansi code clears this bit. 0x0800 &ndash; inverse 0x0400 &ndash; flash 0x0200 &ndash; underline 0x0100 &ndash; highlight 0x0080 &ndash; "use default bg", set by ansi normal, cleared by other bg's 0x0070 &ndash; three bits of bg color 0x0008 &ndash; "use default fg", set by ansi normal, cleared by other fg's 0x0007 &ndash; three bits of fg color</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num</td><td>ANSI number </td></tr>
@@ -664,6 +667,58 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The string up to the character you've search for. </dd></dl>
+
+</div>
+</div>
+<a id="a717386e8da894eee3a7cd535b5926eb4" name="a717386e8da894eee3a7cd535b5926eb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a717386e8da894eee3a7cd535b5926eb4">&#9670;&#160;</a></span>level_ansi()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * level_ansi </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ansi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>xterm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>truecolors</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Go to a string and convert ansi to the lowest supported level. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>String to convert </td></tr>
+    <tr><td class="paramname">ansi</td><td>Player support ansi </td></tr>
+    <tr><td class="paramname">xterm</td><td>Player support xterm colors </td></tr>
+    <tr><td class="paramname">truecolors</td><td>Player system support true colors </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>char* Converted string </dd></dl>
 
 </div>
 </div>

@@ -1278,7 +1278,30 @@ $(function() {
 <div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>    <a class="code hl_struct" href="structCOLORINFO.html">COLORINFO</a> color;</div>
 <div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span>} <a class="code hl_struct" href="structCOLORMATCH.html">COLORMATCH</a>;</div>
 <div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span> </div>
-<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span><span class="preprocessor">#endif </span><span class="comment">/* __TYPEDEFS_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span><span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span>{</div>
+<div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>    ANSICOLORTYPE_NONE,</div>
+<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>    ANSICOLORTYPE_STANDARD,</div>
+<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>    ANSICOLORTYPE_XTERM,</div>
+<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>    ANSICOLORTYPE_TRUECOLORS</div>
+<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span>} ANSICOLORTYPES;</div>
+<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span> </div>
+<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"><a class="line" href="structVT100COLOR.html"> 1406</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>{</div>
+<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>    ANSICOLORTYPES type;</div>
+<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>    <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> rgb;</div>
+<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>} <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a>;</div>
+<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span> </div>
+<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"><a class="line" href="structVT100ATTR.html"> 1412</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>{</div>
+<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> foreground;</div>
+<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> background;</div>
+<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>    <span class="keywordtype">bool</span> reset;</div>
+<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>} <a class="code hl_struct" href="structVT100ATTR.html">VT100ATTR</a>;</div>
+<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span> </div>
+<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span> </div>
+<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span> </div>
+<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span><span class="preprocessor">#endif </span><span class="comment">/* __TYPEDEFS_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="acommand_8c_html_a3fb9f2ed35ae78e9877a8236e15b852b"><div class="ttname"><a href="command_8c.html#a3fb9f2ed35ae78e9877a8236e15b852b">process_command</a></div><div class="ttdeci">char * process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)</div><div class="ttdoc">Execute a command.</div><div class="ttdef"><b>Definition:</b> command.c:953</div></div>
 <div class="ttc" id="aconstants_8h_html_a16a7a8efa1d35edcca6b8cffb9db470b"><div class="ttname"><a href="constants_8h.html#a16a7a8efa1d35edcca6b8cffb9db470b">NUM_GOOD</a></div><div class="ttdeci">#define NUM_GOOD</div><div class="ttdoc">Players constants.</div><div class="ttdef"><b>Definition:</b> constants.h:1475</div></div>
 <div class="ttc" id="aconstants_8h_html_a2b80165f3b5e89e8aa0130ee2b08d59c"><div class="ttname"><a href="constants_8h.html#a2b80165f3b5e89e8aa0130ee2b08d59c">NUM_OBJPIPES</a></div><div class="ttdeci">#define NUM_OBJPIPES</div><div class="ttdoc">UDB Constants.</div><div class="ttdef"><b>Definition:</b> constants.h:1674</div></div>
@@ -1292,6 +1315,8 @@ $(function() {
 <div class="ttc" id="astructCIELABColor_html"><div class="ttname"><a href="structCIELABColor.html">CIELABColor</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1373</div></div>
 <div class="ttc" id="astructCOLORINFO_html"><div class="ttname"><a href="structCOLORINFO.html">COLORINFO</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1387</div></div>
 <div class="ttc" id="astructCOLORMATCH_html"><div class="ttname"><a href="structCOLORMATCH.html">COLORMATCH</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1393</div></div>
+<div class="ttc" id="astructVT100ATTR_html"><div class="ttname"><a href="structVT100ATTR.html">VT100ATTR</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1413</div></div>
+<div class="ttc" id="astructVT100COLOR_html"><div class="ttname"><a href="structVT100COLOR.html">VT100COLOR</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1407</div></div>
 <div class="ttc" id="astruct__help__indx__list_html"><div class="ttname"><a href="struct__help__indx__list.html">_help_indx_list</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:460</div></div>
 <div class="ttc" id="astructa__record_html"><div class="ttname"><a href="structa__record.html">a_record</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:1345</div></div>
 <div class="ttc" id="astructaddedentry_html"><div class="ttname"><a href="structaddedentry.html">addedentry</a></div><div class="ttdef"><b>Definition:</b> typedefs.h:527</div></div>
