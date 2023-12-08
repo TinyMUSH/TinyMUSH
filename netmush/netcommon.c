@@ -470,25 +470,33 @@ void queue_string(DESC *d, const char *format, ...)
 		}
 		else
 		{
+
+			buf = level_ansi(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player));
+			XSTRNCPY(msg, buf, LBUF_SIZE);
+			XFREE(buf);
+			/*
 			if (!Ansi(d->player) && strchr(s, ESC_CHAR))
 			{
 				buf = strip_ansi(msg);
 				XSTRNCPY(msg, buf, LBUF_SIZE);
 				XFREE(buf);
 			}
-			else if (!Color256(d->player))
+			else if (!Color256(d->player)  && strchr(s, ESC_CHAR))
 			{
 				buf = strip_xterm(msg);
 				XSTRNCPY(msg, buf, LBUF_SIZE);
 				XFREE(buf);
 			}
-			else if (!Color24Bit(d->player))
+			else if (!Color24Bit(d->player)  && strchr(s, ESC_CHAR))
 			{
 				buf = strip_24bit(msg);
 				XSTRNCPY(msg, buf, LBUF_SIZE);
 				XFREE(buf);
 			}
+			
 			else if (NoBleed(d->player))
+			*/
+			if (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)))
 			{
 				buf = normal_to_white(msg);
 				XSTRNCPY(msg, buf, LBUF_SIZE);

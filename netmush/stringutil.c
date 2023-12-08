@@ -246,6 +246,7 @@ int ansi_mask_bits[I_ANSI_LIM] = {
  * The mask specifies the state bits that are altered by a particular ansi
  * code. Bits are laid out as follows:
  *
+ *  0x2000 -- Bright color flags
  *  0x1000 -- No ansi. Every valid ansi code clears this bit.
  *  0x0800 -- inverse
  *  0x0400 -- flash
@@ -355,6 +356,155 @@ int ansiBits(int num)
 		return 0x0070;
 	}
 	return 0;
+}
+
+/**
+ * @brief Go to a string and convert ansi to the lowest supported level.
+ *
+ * @param s String to convert
+ * @param ansi Player support ansi
+ * @param xterm Player support xterm colors
+ * @param truecolors Player system support true colors
+ * @return char* Converted string
+ */
+char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
+{
+	char *buf, *p;
+	p = buf = XMALLOC(LBUF_SIZE, "buf");
+
+	if (s && *s)
+	{
+		while (*s)
+		{
+			if (*s == '\e')
+			{
+				// Got an escape code
+				if (truecolors)
+				{
+					// Player support everything, just shove it and continue
+					*p++ = *s++;
+				}
+				else
+				{
+					// Player doesn't support true colors, find what is the color.
+					VT100ATTR attr = decodeVT100(&s);
+					if (xterm)
+					{
+						char *t = NULL;
+						// Player support xterm colors, convert to xterm
+						*p++ = '\e';
+						*p++ = '[';
+
+						if (attr.foreground.type)
+						{
+							t = XASPRINTF("level_ansi.t", "38;5;%d", RGB2X11(attr.foreground.rgb));
+							while (*t)
+							{
+								*p++ = *t++;
+							}
+							XFREE(t);
+
+							if (attr.background.type)
+							{
+								*p++ = ';';
+							}
+						}
+
+						if (attr.background.type)
+						{
+							t = XASPRINTF("level_ansi.t", "48;5;%d", RGB2X11(attr.background.rgb));
+							while (*t)
+							{
+								*p++ = *t++;
+							}
+							XFREE(t);
+
+							if (attr.reset)
+							{
+								*p++ = ';';
+							}
+						}
+
+						if (attr.reset)
+						{
+							*p++ = '0';
+						}
+						*p++ = 'm';
+					}
+					else if (ansi)
+					{
+						// Player support ansi colors, convert to ansi
+						char *t = NULL;
+						// Player support xterm colors, convert to xterm
+						*p++ = '\e';
+						*p++ = '[';
+
+						if (attr.foreground.type)
+						{
+							uint8_t f = RGB2Ansi(attr.foreground.rgb);
+							if (f < 8)
+							{
+								f += 30;
+							}
+							else
+							{
+								f += 82;
+							}
+							t = XASPRINTF("level_ansi.t", "%d", f);
+							while (*t)
+							{
+								*p++ = *t++;
+							}
+							XFREE(t);
+
+							if (attr.background.type)
+							{
+								*p++ = ';';
+							}
+						}
+
+						if (attr.background.type)
+						{
+							uint8_t b = RGB2Ansi(attr.background.rgb);
+							if (b < 8)
+							{
+								b += 40;
+							}
+							else
+							{
+								b += 92;
+							}
+							t = XASPRINTF("level_ansi.t", "%d", b);
+							while (*t)
+							{
+								*p++ = *t++;
+							}
+							XFREE(t);
+
+							if (attr.reset)
+							{
+								*p++ = ';';
+							}
+						}
+
+						if (attr.reset)
+						{
+							*p++ = '0';
+						}
+
+						*p++ = 'm';
+					}
+				}
+			}
+			else
+			{
+				*p++ = *s++;
+			}
+		}
+		*p = '\0';
+	}
+
+	return buf;
 }
 
 /**

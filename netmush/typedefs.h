@@ -1395,4 +1395,27 @@ typedef struct
     COLORINFO color;
 } COLORMATCH;
 
+typedef enum
+{
+    ANSICOLORTYPE_NONE,
+    ANSICOLORTYPE_STANDARD,
+    ANSICOLORTYPE_XTERM,
+    ANSICOLORTYPE_TRUECOLORS
+} ANSICOLORTYPES;
+
+typedef struct
+{
+    ANSICOLORTYPES type;
+    rgbColor rgb;
+} VT100COLOR;
+
+typedef struct
+{
+    VT100COLOR foreground;
+    VT100COLOR background;
+    bool reset;
+} VT100ATTR;
+
+
+
 #endif /* __TYPEDEFS_H */

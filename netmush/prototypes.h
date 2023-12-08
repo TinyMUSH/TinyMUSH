@@ -1249,6 +1249,7 @@ extern char ansiLetter(int num);
 extern char ansiMushCode(int num, _Bool bg);
 extern int ansiBitsMask(int num);
 extern int ansiBits(int num);
+extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
 extern char *strip_ansi(const char *s);
 extern char *strip_xterm(char *s);
 extern char *strip_24bit(char *s);
@@ -1375,6 +1376,7 @@ extern rgbColor X112RGB(int color);
 extern uint8_t RGB2X11(rgbColor rgb);
 extern uint8_t X112Ansi(int color);
 extern uint8_t RGB2Ansi(rgbColor rgb);
+VT100ATTR decodeVT100(const char **ansi);
 
 /* walkdb.c */
 extern void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now);
