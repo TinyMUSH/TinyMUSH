@@ -967,7 +967,7 @@
 #define HAS_PROPDIR 0X00000100   /*!< Internal: has Propdir attr */
 #define COLOR256 0x00000200      /*!< Player support XTERM 256 colors */
 #define COLOR24BIT 0x00000400    /*!< Player support XTERM 24 bit colors */
-#define FLAG_RES03 0x00000800
+#define OPEN_OK 0x00000800       /*!< anybody can open exits in this room */
 #define FLAG_RES04 0x00001000
 #define FLAG_RES05 0x00002000
 #define FLAG_RES06 0x00004000

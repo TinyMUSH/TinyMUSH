@@ -354,6 +354,7 @@
 
 #define Transparent(x) ((Flags(x) & SEETHRU) != 0)
 #define Link_ok(x) (((Flags(x) & LINK_OK) != 0) && Has_contents(x))
+#define Open_ok(x) (((Flags3(x) & OPEN_OK) != 0) && Has_contents(x))
 #define Wizard(x) ((Flags(x) & WIZARD) || ((Flags(Owner(x)) & WIZARD) && Inherits(x)))
 #define Dark(x) (((Flags(x) & DARK) != 0) && (!Alive(x) || (Wizard(x) && !mushconf.visible_wizzes) || Can_Cloak(x)))
 #define DarkMover(x) ((Wizard(x) || Can_Cloak(x)) && Dark(x))

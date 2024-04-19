@@ -985,7 +985,7 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
             return;
         }
 
-        if (!Controls(player, loc) && !Open_Anywhere(player))
+        if (!Controls(player, loc) && !Open_Anywhere(player) && !Open_ok(loc))
         {
             notify(player, NOPERM_MESSAGE);
             return;

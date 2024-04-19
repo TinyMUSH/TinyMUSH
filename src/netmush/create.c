@@ -89,7 +89,7 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
         notify_quiet(player, "Open where?");
         return;
     }
-    else if (!(controls(player, loc) || (Open_Anywhere(player) && !God(loc))))
+    else if (!(controls(player, loc) || ((Open_Anywhere(player) || Open_ok(loc)) && !God(loc))))
     {
         notify_quiet(player, NOPERM_MESSAGE);
         return;

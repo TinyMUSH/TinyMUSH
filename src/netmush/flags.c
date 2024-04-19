@@ -373,6 +373,7 @@ FLAGENT gen_flags[] = {
     {"MONITOR", MONITOR, 'M', FLAG_WORD1, 0, fh_hear_bit},
     {"NOSPOOF", NOSPOOF, 'N', FLAG_WORD1, CA_WIZARD, fh_any},
     {"OPAQUE", OPAQUE, 'O', FLAG_WORD1, 0, fh_any},
+    {"OPEN_OK", OPEN_OK, 'P', FLAG_WORD3, 0, fh_any},
     {"QUIET", QUIET, 'Q', FLAG_WORD1, 0, fh_any},
     {"STICKY", STICKY, 'S', FLAG_WORD1, 0, fh_any},
     {"TRACE", TRACE, 'T', FLAG_WORD1, 0, fh_any},
