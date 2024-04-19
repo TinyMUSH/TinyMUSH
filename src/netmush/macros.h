@@ -532,6 +532,22 @@
 #define Passes_Linklock(p, x) ((LinkToAny(p) && !mushconf.wiz_obey_linklock) || could_doit(p, x, A_LLINK))
 
 /**
+ * @brief Is this somewhere I can open exits from? - It must be a valid object, and be able
+ * to have contents. - I must control it, or have it be Open_ok, or I must have
+ * the open_anywhere power and not have the location be God.
+ *
+ */
+#define Openable(p, x) (Good_obj(x) && Has_contents(x) && (Controls(p, x) || Open_ok(x) || (Open_Anywhere(p) && !God(x))))
+
+/**
+ * @brief Can I pass the openlock check on this? - I must have open_anywhere (or be a
+ * wizard) and wizards must ignore openlocks, OR - I must be able to pass the
+ * openlock.
+ *
+ */
+#define Passes_Openlock(p, x) ((Open_Anywhere(p) && !mushconf.wiz_obey_openlock) || could_doit(p, x, A_LOPEN))
+
+/**
  * @brief Attribute visibility and write permissions.
  *
  */

@@ -985,7 +985,14 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
             return;
         }
 
-        if (!Controls(player, loc) && !Open_Anywhere(player) && !Open_ok(loc))
+        /**
+        * Make sure we can open here: - We must control the destination or it must
+        * be OPEN_OK or we must have Open_Anywhere and the location's not God. - We
+        * must be able to pass the openlock, or we must be able to Open_Anywhere
+        * (power, or be a wizard) and be config'd so wizards ignore openlocks
+        *
+        */
+        if (!(Openable(player, loc) && Passes_Openlock(player, loc)))
         {
             notify(player, NOPERM_MESSAGE);
             return;

@@ -226,7 +226,7 @@
 #define A_TOFAIL 141      /*!< Teleport (from) fail message */
 #define A_OTOFAIL 142     /*!< Others teleport (from) fail message */
 #define A_ATOFAIL 143     /*!< Teleport (from) fail action */
-#define A_FREE144 144     /*!< Unused */
+#define A_LOPEN 144       /*!< Who may open from here */
 #define A_FREE145 145     /*!< Unused */
 #define A_FREE146 146     /*!< Unused */
 #define A_FREE147 147     /*!< Unused */
