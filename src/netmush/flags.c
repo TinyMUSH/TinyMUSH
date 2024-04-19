@@ -373,7 +373,6 @@ FLAGENT gen_flags[] = {
     {"MONITOR", MONITOR, 'M', FLAG_WORD1, 0, fh_hear_bit},
     {"NOSPOOF", NOSPOOF, 'N', FLAG_WORD1, CA_WIZARD, fh_any},
     {"OPAQUE", OPAQUE, 'O', FLAG_WORD1, 0, fh_any},
-    {"OPEN_OK", OPEN_OK, 'P', FLAG_WORD3, 0, fh_any},
     {"QUIET", QUIET, 'Q', FLAG_WORD1, 0, fh_any},
     {"STICKY", STICKY, 'S', FLAG_WORD1, 0, fh_any},
     {"TRACE", TRACE, 'T', FLAG_WORD1, 0, fh_any},
@@ -439,6 +438,7 @@ FLAGENT gen_flags[] = {
     {"MARKER9", MARK_9, '9', FLAG_WORD3, 0, fh_god},
     {"COLOR256", COLOR256, ':', FLAG_WORD3, 0, fh_any},
     {"COLOR24BIT", COLOR24BIT, ';', FLAG_WORD3, 0, fh_any},
+    {"OPEN_OK", OPEN_OK, '%', FLAG_WORD3, 0, fh_any},
     {NULL, 0, ' ', 0, 0, NULL}};
 
 OBJENT object_types[8] = {
