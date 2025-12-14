@@ -28,6 +28,7 @@
 #include <sys/param.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <errno.h>
 
 CONFDATA mushconf;
 STATEDATA mushstate;
@@ -482,17 +483,48 @@ CF_Result cf_const(int *vp __attribute__((unused)), char *str __attribute__((unu
  */
 CF_Result cf_int(int *vp, char *str, long extra, dbref player, char *cmd)
 {
+    char *endptr = NULL;
+    long val = 0;
+
     /**
-     * Copy the numeric value to the parameter
+     * Copy the numeric value to the parameter.
+     * Use strtol with proper error handling.
      *
      */
-    if ((extra > 0) && ((int)strtol(str, (char **)NULL, 10) > extra))
+    errno = 0;
+    val = strtol(str, &endptr, 10);
+
+    /**
+     * Validate conversion: check for range errors and invalid input
+     *
+     */
+    if (errno == ERANGE || val > INT_MAX || val < INT_MIN)
     {
-        cf_log(player, "CNF", "SYNTX", cmd, "Value exceeds limit of %d", extra);
+        cf_log(player, "CNF", "SYNTX", cmd, "Value out of range or too large");
         return CF_Failure;
     }
 
-    sscanf(str, "%d", vp);
+    /**
+     * Verify entire string was consumed (no trailing garbage)
+     *
+     */
+    if (*endptr != '\0' && !isspace(*endptr))
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "Invalid numeric format: %s", str);
+        return CF_Failure;
+    }
+
+    /**
+     * Check against upper limit if specified
+     *
+     */
+    if ((extra > 0) && (val > extra))
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "Value exceeds limit of %ld", extra);
+        return CF_Failure;
+    }
+
+    *vp = (int)val;
     return CF_Success;
 }
 
@@ -508,21 +540,58 @@ CF_Result cf_int(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int num = (int)strtol(str, (char **)NULL, 10);
+    char *endptr = NULL;
+    long num = 0;
 
-    if ((extra > 0) && (num > extra))
+    /**
+     * Parse integer with proper error handling.
+     * Factors cannot be 0, so we check this explicitly.
+     *
+     */
+    errno = 0;
+    num = strtol(str, &endptr, 10);
+
+    /**
+     * Validate conversion: check for range errors and invalid input
+     *
+     */
+    if (errno == ERANGE || num > INT_MAX || num < INT_MIN)
     {
-        cf_log(player, "CNF", "SYNTX", cmd, "Value exceeds limit of %d", extra);
+        cf_log(player, "CNF", "SYNTX", cmd, "Value out of range or too large");
         return CF_Failure;
     }
 
+    /**
+     * Verify entire string was consumed
+     *
+     */
+    if (*endptr != '\0' && !isspace(*endptr))
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "Invalid numeric format: %s", str);
+        return CF_Failure;
+    }
+
+    /**
+     * Check against upper limit if specified
+     *
+     */
+    if ((extra > 0) && (num > extra))
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "Value exceeds limit of %ld", extra);
+        return CF_Failure;
+    }
+
+    /**
+     * Factor cannot be zero
+     *
+     */
     if (num == 0)
     {
         cf_log(player, "CNF", "SYNTX", cmd, "Value cannot be 0. You may want a value of 1.");
         return CF_Failure;
     }
 
-    sscanf(str, "%d", vp);
+    *vp = (int)num;
     return CF_Success;
 }
 
@@ -538,54 +607,91 @@ CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    int num = 0;
+    char *endptr = NULL;
+    long num = 0;
 
     /**
      * No consistency check on initialization.
+     * Accept any value during startup.
      *
      */
     if (mushstate.initializing)
     {
         if (*str == '#')
         {
-            sscanf(str, "#%d", vp);
+            errno = 0;
+            num = strtol(str + 1, &endptr, 10);
+            if (errno == ERANGE || num > INT_MAX || num < INT_MIN)
+            {
+                cf_log(player, "CNF", "SYNTX", cmd, "DBref value out of range");
+                return CF_Failure;
+            }
         }
         else
         {
-            sscanf(str, "%d", vp);
+            errno = 0;
+            num = strtol(str, &endptr, 10);
+            if (errno == ERANGE || num > INT_MAX || num < INT_MIN)
+            {
+                cf_log(player, "CNF", "SYNTX", cmd, "DBref value out of range");
+                return CF_Failure;
+            }
         }
 
+        *vp = (int)num;
         return CF_Success;
     }
 
     /**
-     * Otherwise we have to validate this. If 'extra' is non-zero, the
-     * dbref is allowed to be NOTHING.
+     * Otherwise we have to validate this. If 'extra' is non-zero (NOTHING),
+     * the dbref is allowed to be NOTHING (-1).
      *
      */
     if (*str == '#')
     {
-        num = (int)strtol(str + 1, (char **)NULL, 10);
+        errno = 0;
+        num = strtol(str + 1, &endptr, 10);
     }
     else
     {
-        num = (int)strtol(str, (char **)NULL, 10);
+        errno = 0;
+        num = strtol(str, &endptr, 10);
     }
 
+    /**
+     * Validate conversion: check for range errors and invalid input
+     *
+     */
+    if (errno == ERANGE || num > INT_MAX || num < INT_MIN)
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "DBref value out of range");
+        return CF_Failure;
+    }
+
+    /**
+     * Verify entire string was consumed (except for leading # if present)
+     *
+     */
+    if (*endptr != '\0' && !isspace(*endptr))
+    {
+        cf_log(player, "CNF", "SYNTX", cmd, "Invalid DBref format: %s", str);
+        return CF_Failure;
+    }
+
+    /**
+     * Validate the dbref is either NOTHING (if allowed) or a valid object
+     *
+     */
     if (((extra == NOTHING) && (num == NOTHING)) || (Good_obj(num) && !Going(num)))
     {
-        if (*str == '#')
-        {
-            sscanf(str, "#%d", vp);
-        }
-        else
-        {
-            sscanf(str, "%d", vp);
-        }
-
+        *vp = (int)num;
         return CF_Success;
     }
 
+    /**
+     * Report appropriate error message
+     *
+     */
     if (extra == NOTHING)
     {
         cf_log(player, "CNF", "SYNTX", cmd, "A valid dbref, or -1, is required.");
@@ -1979,6 +2085,7 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
         if (fp == NULL)
         {
             cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Config file", str);
+            XFREE(buf);
             return CF_Failure;
         }
     }
