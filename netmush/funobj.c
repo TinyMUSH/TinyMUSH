@@ -112,6 +112,8 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 		if (Dark(it))
 		{
 			key |= VE_LOC_DARK;
+			/* Base dark of starting location can affect visibility */
+			key |= VE_BASE_DARK;
 		}
 
 		for (exit = Exits(it); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
