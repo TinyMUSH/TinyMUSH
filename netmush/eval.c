@@ -2335,8 +2335,14 @@ GDATA *save_global_regs(const char *funcname)
 			{
 				if (mushstate.rdata->x_names[z] && *(mushstate.rdata->x_names[z]) && mushstate.rdata->x_regs[z] && *(mushstate.rdata->x_regs[z]))
 				{
+					size_t name_len = strlen(mushstate.rdata->x_names[z]);
+					if (name_len >= SBUF_SIZE)
+					{
+						continue; /** skip overlong name to avoid overflow */
+					}
 					preserve->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-					strcpy(preserve->x_names[z], mushstate.rdata->x_names[z]);
+					XSTRNCPY(preserve->x_names[z], mushstate.rdata->x_names[z], SBUF_SIZE - 1);
+					preserve->x_names[z][SBUF_SIZE - 1] = '\0';
 					preserve->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
 					XMEMCPY(preserve->x_regs[z], mushstate.rdata->x_regs[z], mushstate.rdata->x_lens[z] + 1);
 					preserve->x_lens[z] = mushstate.rdata->x_lens[z];
@@ -2563,8 +2569,14 @@ void restore_global_regs(const char *funcname, GDATA *preserve)
 			{
 				if (preserve->x_names[z] && *(preserve->x_names[z]) && preserve->x_regs[z] && *(preserve->x_regs[z]))
 				{
+					size_t name_len = strlen(preserve->x_names[z]);
+					if (name_len >= SBUF_SIZE)
+					{
+						continue; /** skip overlong name to avoid overflow */
+					}
 					mushstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-					strcpy(mushstate.rdata->x_names[z], preserve->x_names[z]);
+					XSTRNCPY(mushstate.rdata->x_names[z], preserve->x_names[z], SBUF_SIZE - 1);
+					mushstate.rdata->x_names[z][SBUF_SIZE - 1] = '\0';
 					mushstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
 					XMEMCPY(mushstate.rdata->x_regs[z], preserve->x_regs[z], preserve->x_lens[z] + 1);
 					mushstate.rdata->x_lens[z] = preserve->x_lens[z];
