@@ -193,6 +193,34 @@ validate_list_args(const char *func_name, char *buff, char **bufc, dbref player,
 }
 
 /**
+ * @brief Validate multiple delimiters for table functions
+ * @return int 1 if valid, 0 if error
+ */
+static int
+validate_table_delims(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
+					  char *fargs[], int nfargs, char *cargs[], int ncargs,
+					  Delim *list_sep, Delim *field_sep, Delim *pad_char,
+					  int list_pos, int field_pos, int pad_pos)
+{
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, list_pos, list_sep, DELIM_STRING))
+	{
+		return 0;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, field_pos, field_sep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	{
+		return 0;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, pad_pos, pad_char, 0))
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
  * @brief Macro helpers for grouped allocations/deallocations
  */
 #define ALLOC_LBUF_TRIO(buf1, buf2, buf3, tag1, tag2, tag3) \
@@ -3062,17 +3090,7 @@ void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		return;
 	}
 
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &list_sep, DELIM_STRING))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &field_sep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 7, &pad_char, 0))
+	if (!validate_table_delims(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, &list_sep, &field_sep, &pad_char, 5, 6, 7))
 	{
 		return;
 	}
@@ -3157,17 +3175,7 @@ void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &list_sep, DELIM_STRING))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &field_sep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &pad_char, 0))
+	if (!validate_table_delims(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, &list_sep, &field_sep, &pad_char, 4, 5, 6))
 	{
 		return;
 	}
