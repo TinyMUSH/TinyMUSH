@@ -622,6 +622,12 @@ void hashreplall(int *old, int *new, HASHTAB *htab)
 char *hashinfo(const char *tab_name, HASHTAB *htab)
 {
     char *buff;
+
+    if (htab == NULL)
+    {
+        return NULL;
+    }
+
     buff = XMALLOC(MBUF_SIZE, "buff");
 
     if (buff == NULL)
