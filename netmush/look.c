@@ -1928,25 +1928,48 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		savec = mushconf.many_coins[0];
 		mushconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-		bexp = parse_boolexp(player, buf2, 1);
-		buf = unparse_boolexp(player, bexp);
-		free_boolexp(bexp);
-		XSTRCPY(buf2, Name(Owner(thing)));
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", buf2, buf, mushconf.many_coins, Pennies(thing));
-		XFREE(buf);
-		XFREE(buf2);
+		if (buf2)
+		{
+			bexp = parse_boolexp(player, buf2, 1);
+			if (bexp)
+			{
+				buf = unparse_boolexp(player, bexp);
+				if (buf)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", Name(Owner(thing)), buf, mushconf.many_coins, Pennies(thing));
+					XFREE(buf);
+				}
+				free_boolexp(bexp);
+			}
+			XFREE(buf2);
+		}
 		mushconf.many_coins[0] = savec;
 		char created_str[26], accessed_str[26], modified_str[26];
 		struct tm tm_created, tm_accessed, tm_modified;
-		localtime_r(&CreateTime(thing), &tm_created);
-		strftime(created_str, sizeof(created_str), "%a %b %d %H:%M:%S %Y", &tm_created);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", created_str);
-		localtime_r(&save_access_time, &tm_accessed);
-		strftime(accessed_str, sizeof(accessed_str), "%a %b %d %H:%M:%S %Y", &tm_accessed);
-		XSTRCPY(timebuf, accessed_str);
-		localtime_r(&ModTime(thing), &tm_modified);
-		strftime(modified_str, sizeof(modified_str), "%a %b %d %H:%M:%S %Y", &tm_modified);
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, modified_str);
+		if (localtime_r(&CreateTime(thing), &tm_created) != NULL)
+		{
+			if (strftime(created_str, sizeof(created_str), "%a %b %d %H:%M:%S %Y", &tm_created) > 0)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", created_str);
+			}
+		}
+		if (localtime_r(&save_access_time, &tm_accessed) != NULL)
+		{
+			if (strftime(accessed_str, sizeof(accessed_str), "%a %b %d %H:%M:%S %Y", &tm_accessed) > 0)
+			{
+				if (timebuf)
+				{
+					XSTRCPY(timebuf, accessed_str);
+				}
+			}
+		}
+		if (localtime_r(&ModTime(thing), &tm_modified) != NULL)
+		{
+			if (strftime(modified_str, sizeof(modified_str), "%a %b %d %H:%M:%S %Y", &tm_modified) > 0)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, modified_str);
+			}
+		}
 
 		/*
 		 * Print the zone
@@ -1955,8 +1978,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		if (mushconf.have_zones)
 		{
 			buf2 = unparse_object(player, Zone(thing), 0);
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Zone: %s", buf2);
-			XFREE(buf2);
+			if (buf2)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Zone: %s", buf2);
+				XFREE(buf2);
+			}
 		}
 
 		/*
@@ -1967,16 +1993,22 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		if (loc != NOTHING)
 		{
 			buf2 = unparse_object(player, loc, 0);
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Parent: %s", buf2);
-			XFREE(buf2);
+			if (buf2)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Parent: %s", buf2);
+				XFREE(buf2);
+			}
 		}
 
 		/*
 		 * Show the powers
 		 */
 		buf2 = power_description(player, thing);
-		notify(player, buf2);
-		XFREE(buf2);
+		if (buf2)
+		{
+			notify(player, buf2);
+			XFREE(buf2);
+		}
 	}
 
 	for (MODULE *cam__mp = mushstate.modules_list; cam__mp != NULL; cam__mp = cam__mp->next)
@@ -2007,8 +2039,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			for (content = Contents(thing); (content != NOTHING) && (Next(content) != content); content = Next(content))
 			{
 				buf2 = unparse_object(player, content, 0);
-				notify(player, buf2);
-				XFREE(buf2);
+				if (buf2)
+				{
+					notify(player, buf2);
+					XFREE(buf2);
+				}
 			}
 		}
 
@@ -2029,8 +2064,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 				for (exit = Exits(thing); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
 					buf2 = unparse_object(player, exit, 0);
-					notify(player, buf2);
-					XFREE(buf2);
+					if (buf2)
+					{
+						notify(player, buf2);
+						XFREE(buf2);
+					}
 				}
 			}
 			else
@@ -2045,8 +2083,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if (Dropto(thing) != NOTHING)
 			{
 				buf2 = unparse_object(player, Dropto(thing), 0);
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Dropped objects go to: %s", buf2);
-				XFREE(buf2);
+				if (buf2)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Dropped objects go to: %s", buf2);
+					XFREE(buf2);
+				}
 			}
 
 			break;
@@ -2063,8 +2104,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 				for (exit = Exits(thing); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
 					buf2 = unparse_object(player, exit, 0);
-					notify(player, buf2);
-					XFREE(buf2);
+					if (buf2)
+					{
+						notify(player, buf2);
+						XFREE(buf2);
+					}
 				}
 			}
 			else
@@ -2077,8 +2121,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			 */
 			loc = Home(thing);
 			buf2 = unparse_object(player, loc, 0);
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Home: %s", buf2);
-			XFREE(buf2);
+			if (buf2)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Home: %s", buf2);
+				XFREE(buf2);
+			}
 			/*
 			 * print location if player can link to it
 			 */
@@ -2087,16 +2134,22 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if ((Location(thing) != NOTHING) && (Examinable(player, loc) || Examinable(player, thing) || Linkable(player, loc)))
 			{
 				buf2 = unparse_object(player, loc, 0);
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Location: %s", buf2);
-				XFREE(buf2);
+				if (buf2)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Location: %s", buf2);
+					XFREE(buf2);
+				}
 			}
 
 			break;
 
 		case TYPE_EXIT:
 			buf2 = unparse_object(player, Exits(thing), 0);
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Source: %s", buf2);
-			XFREE(buf2);
+			if (buf2)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Source: %s", buf2);
+				XFREE(buf2);
+			}
 
 			/*
 			 * print destination
@@ -2114,8 +2167,11 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 			default:
 				buf2 = unparse_object(player, Location(thing), 0);
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Destination: %s", buf2);
-				XFREE(buf2);
+				if (buf2)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Destination: %s", buf2);
+					XFREE(buf2);
+				}
 				break;
 			}
 
@@ -2145,9 +2201,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		if (mushconf.read_rem_name)
 		{
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
-			XSTRCPY(buf2, Name(thing));
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
-			XFREE(buf2);
+			if (buf2)
+			{
+				XSTRCPY(buf2, Name(thing));
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
+				XFREE(buf2);
+			}
 		}
 		else
 		{
