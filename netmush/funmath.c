@@ -25,6 +25,38 @@
 #include <ctype.h>
 
 /**
+ * @brief Validate list function arguments and delimiter
+ * @return int 1 if valid, 0 if error (already printed to buff)
+ */
+static int
+validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause,
+                   char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args,
+                   int delim_pos, int delim_flags, Delim *isep)
+{
+    if (!fn_range_check(func_name, nfargs, min_args, max_args, buff, bufc))
+    {
+        return 0;
+    }
+
+    if (delim_pos > 0 && !delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, delim_pos, isep, delim_flags))
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * @brief Validate math function arguments (range check only, no delimiter)
+ * @return int 1 if valid, 0 if error (already printed to buff)
+ */
+static inline int
+validate_math_args(const char *func_name, int nfargs, int min_args, int max_args, char *buff, char **bufc)
+{
+    return fn_range_check(func_name, nfargs, min_args, max_args, buff, bufc);
+}
+
+/**
  * @brief Fix weird math results
  *
  * @param buff Output buffer
@@ -1196,7 +1228,7 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 {
     long double val = 0.0, base = 0.0;
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    if (!validate_math_args(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
     {
         return;
     }
@@ -1476,7 +1508,7 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
     long double min = 0.0, max = 0.0, val = 0.0;
     char *cp = NULL;
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+    if (!validate_math_args(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
     {
         return;
     }
@@ -1606,12 +1638,7 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         return;
     }
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-    {
-        return;
-    }
-
-    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
     {
         return;
     }
@@ -1647,12 +1674,7 @@ void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     char *cp = NULL, *curr = NULL;
     Delim isep;
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-    {
-        return;
-    }
-
-    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
     {
         return;
     }
@@ -1698,12 +1720,7 @@ void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     char *cp = NULL, *curr = NULL;
     Delim isep;
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-    {
-        return;
-    }
-
-    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
     {
         return;
     }
@@ -1752,11 +1769,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (oper == VEC_UNIT)
     {
-        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
-        {
-            return;
-        }
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 3, 2, DELIM_STRING, &isep))
         {
             return;
         }
@@ -1774,12 +1787,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
     else
     {
-        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-        {
-            return;
-        }
-
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
         {
             return;
         }
@@ -1868,11 +1876,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
     if (oper != VEC_DOT)
     {
-        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
-        {
-            return;
-        }
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 4, 3, DELIM_STRING, &isep))
         {
             return;
         }
@@ -1894,12 +1898,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
          * dot product returns a scalar, so no output delim
          *
          */
-        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
-        {
-            return;
-        }
-
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+        if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 3, 3, DELIM_STRING, &isep))
         {
             return;
         }
@@ -2185,12 +2184,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
          * the arguments come in a pre-evaluated list
          *
          */
-        if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-        {
-            return;
-        }
-
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+        if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
         {
             return;
         }
@@ -2280,11 +2274,7 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
     char *tbuf = NULL, *bp = NULL, *bb_p = NULL;
     int flag = Func_Flags(fargs);
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
-    {
-        return;
-    }
-    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+    if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 3, 2, DELIM_STRING, &isep))
     {
         return;
     }
