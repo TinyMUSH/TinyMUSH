@@ -936,6 +936,11 @@ int search_nametab(dbref player, NAMETAB *ntab, char *flagname)
 {
     NAMETAB *nt;
 
+    if (ntab == NULL)
+    {
+        return -1;
+    }
+
     for (nt = ntab; nt->name; nt++)
     {
         if (minmatch(flagname, nt->name, nt->minlen))
@@ -962,6 +967,11 @@ NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname)
 {
     NAMETAB *nt;
 
+    if (ntab == NULL)
+    {
+        return NULL;
+    }
+
     for (nt = ntab; nt->name; nt++)
     {
         if (minmatch(flagname, nt->name, nt->minlen))
@@ -984,6 +994,11 @@ NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname)
 NAMETAB *find_nametab_ent_flag(dbref player, NAMETAB *ntab, int flag)
 {
     NAMETAB *nt;
+
+    if (ntab == NULL)
+    {
+        return NULL;
+    }
 
     for (nt = ntab; nt->name; nt++)
     {
@@ -1008,6 +1023,12 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
     char *prefix, *buf, *bp, *cp;
     NAMETAB *nt;
     bool got_one = false;
+
+    if (ntab == NULL)
+    {
+        return;
+    }
+
     bp = buf = XMALLOC(LBUF_SIZE, "buf");
 
     if (buf == NULL)
@@ -1074,6 +1095,11 @@ void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, cha
 {
     NAMETAB *nt = ntab;
 
+    if (ntab == NULL)
+    {
+        return;
+    }
+
     raw_notify(player, "%-30.30s %s", prefix, state);
     if (show_sep)
     {
@@ -1103,6 +1129,12 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
     char *prefix, *buf, *bp, *cp;
     NAMETAB *nt = ntab;
     bool got_one = false;
+
+    if (ntab == NULL)
+    {
+        return;
+    }
+
     buf = bp = XMALLOC(LBUF_SIZE, "buf");
 
     if (buf == NULL)
