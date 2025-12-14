@@ -411,7 +411,15 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			if (pos == 0 || str[pos - 1] != '\\')
 			{
 				depth++;
-				parenlist[depth] = str[pos];
+				if (depth < LBUF_SIZE)
+				{
+					parenlist[depth] = str[pos];
+				}
+				else
+				{
+					depth--;
+					break;
+				}
 				SAFE_LB_STR(pairColor(depth % 5), strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
 				SAFE_ANSI_NORMAL(strbuf, &endp);
@@ -514,7 +522,10 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			{
 				SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
-				SAFE_LB_STR(pairRevColor(depth % 5), strbuf, &endp);
+				if (depth < LBUF_SIZE)
+				{
+					SAFE_LB_STR(pairRevColor(depth % 5), strbuf, &endp);
+				}
 				depth--;
 			}
 			else
@@ -819,13 +830,29 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 	if (ap->flags & AF_IS_LOCK)
 	{
+		BOOLEXP *bexp = NULL;
 		bexp = parse_boolexp(player, raw_text, 1);
-		text = unparse_boolexp(player, bexp);
-		free_boolexp(bexp);
+		if (bexp)
+		{
+			text = unparse_boolexp(player, bexp);
+			free_boolexp(bexp);
+		}
+		else
+		{
+			text = raw_text;
+		}
 	}
 	else if (aflags & AF_STRUCTURE)
 	{
-		text = replace_string(GENERIC_STRUCT_STRDELIM, mushconf.struct_dstr, raw_text);
+		char *replaced = replace_string(GENERIC_STRUCT_STRDELIM, mushconf.struct_dstr, raw_text);
+		if (replaced)
+		{
+			text = replaced;
+		}
+		else
+		{
+			text = raw_text;
+		}
 	}
 	else
 	{
@@ -1217,6 +1244,11 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 	int aflags = 0, alen = 0, indent = 0;
 	char *raw_desc = NULL;
 
+	if (!msg)
+	{
+		msg = "You see nothing special.";
+	}
+
 	raw_desc = atr_get_raw(loc, A_DESC);
 	indent = (isRoom(loc) && mushconf.indent_desc && raw_desc && *raw_desc);
 
@@ -1266,6 +1298,9 @@ void show_desc(dbref player, dbref loc, int key)
 	dbref aowner = NOTHING;
 	int aflags = 0, alen = 0, indent = 0;
 	char *raw_desc = NULL;
+	const char *msg = NULL;
+
+	msg = "You see nothing special.";
 
 	raw_desc = atr_get_raw(loc, A_DESC);
 	indent = (isRoom(loc) && mushconf.indent_desc && raw_desc && *raw_desc);
