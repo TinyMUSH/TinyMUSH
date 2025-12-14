@@ -148,6 +148,10 @@ void hashreset(HASHTAB *htab)
     htab->max_scan = 0;
     htab->hits = 0;
     /* Note: entries and deletes are structural, not reset here */
+
+    /* Invalidate iterator state for consistency */
+    htab->last_entry = NULL;
+    htab->last_hval = 0;
 }
 
 /* ---------------------------------------------------------------------------
@@ -448,6 +452,10 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
                 htab->nulls++;
             }
 
+            /* Invalidate iterator state to prevent use-after-free */
+            htab->last_entry = NULL;
+            htab->last_hval = 0;
+
             return;
         }
     }
@@ -510,6 +518,10 @@ void hashdelall(int *old, HASHTAB *htab)
             htab->nulls++;
         }
     }
+
+    /* Invalidate iterator state to prevent use-after-free */
+    htab->last_entry = NULL;
+    htab->last_hval = 0;
 }
 
 /* ---------------------------------------------------------------------------
