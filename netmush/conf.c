@@ -41,6 +41,7 @@ void cf_init(void)
 {
     mushstate.modules_list = NULL;
     mushstate.modloaded = XMALLOC(MBUF_SIZE, "mushstate.modloaded");
+    mushconf.rng_seed = -1;
     mushconf.port = 6250;
     mushconf.conc_port = 6251;
     mushconf.init_size = 1000;

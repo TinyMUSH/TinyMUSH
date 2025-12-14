@@ -785,6 +785,7 @@ typedef struct confparm
 
 typedef struct confdata
 {
+    int rng_seed;              /*!< Deterministic RNG seed; <0 means unset */
     int cache_size;            /*!< Maximum size of cache */
     int cache_width;           /*!< Number of cache cells */
     int paylimit;              /*!< getting money gets hard over this much */

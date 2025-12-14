@@ -772,7 +772,39 @@ void rng_global_init(void)
 {
 	if (!rng_initialized)
 	{
-		pcg32_srandom_r(&rng_global, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng_global);
+		uint64_t initstate;
+		uint64_t initseq;
+		/* Priority: config rng_seed (if >=0) > env var > time-based */
+		if (mushconf.rng_seed >= 0)
+		{
+			initstate = (uint64_t)mushconf.rng_seed;
+			initseq = 0x853c49e6748fea9bULL; /* default PCG stream constant */
+		}
+		else
+		{
+			const char *env_seed = getenv("TINYMUSH_RNG_SEED");
+			if (env_seed && *env_seed)
+			{
+				char *endp = NULL;
+				unsigned long long seed_val = strtoull(env_seed, &endp, 10);
+				if (endp && *endp == '\0')
+				{
+					initstate = (uint64_t)seed_val;
+					initseq = 0x853c49e6748fea9bULL; /* default PCG stream constant */
+				}
+				else
+				{
+					initstate = (uint64_t)time(NULL);
+					initseq = (uint64_t)(uintptr_t)&rng_global;
+				}
+			}
+			else
+			{
+				initstate = (uint64_t)time(NULL);
+				initseq = (uint64_t)(uintptr_t)&rng_global;
+			}
+		}
+		pcg32_srandom_r(&rng_global, initstate, initseq);
 		rng_initialized = 1;
 	}
 }

@@ -763,6 +763,7 @@ CMDENT command_table[] = {
  *
  */
 CONF conftable[] = {
+    {(char *)"rng_seed", cf_int, CA_STATIC, CA_WIZARD, &mushconf.rng_seed, 0},
     {(char *)"access", cf_access, CA_GOD, CA_DISABLED, NULL, (long)access_nametab},
     {(char *)"addcommands_match_blindly", cf_bool, CA_GOD, CA_WIZARD, &mushconf.addcmd_match_blindly, (long)"@addcommands don't error if no match is found"},
     {(char *)"addcommands_obey_stop", cf_bool, CA_GOD, CA_WIZARD, &mushconf.addcmd_obey_stop, (long)"@addcommands obey STOP"},
