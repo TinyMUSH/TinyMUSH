@@ -757,7 +757,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     Delim isep, osep;
     int flag = 0; /*!< 0 is filter(), 1 is filterbool() */
     dbref aowner = NOTHING, thing = NOTHING;
-    int aflags = 0, alen = 0, anum = 0, i = 0;
+    int aflags = 0, alen = 0, i = 0;
     ATTR *ap = NULL;
     char *atext = NULL, *result = NULL, *curr = NULL, *bp = NULL, *str = NULL, *cp = NULL, *op = NULL, *atextbuf = NULL, *bb_p = NULL;
     char *objs[2];
@@ -864,7 +864,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     dbref aowner = NOTHING, thing = NOTHING;
-    int aflags = 0, alen = 0, anum = 0, i = 0;
+    int aflags = 0, alen = 0, i = 0;
     ATTR *ap = NULL;
     char *atext = NULL, *str = NULL, *cp = NULL, *atextbuf = NULL, *bb_p = NULL, *op = NULL;
     char *objs[2];
@@ -959,7 +959,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     dbref aowner = NOTHING, thing = NOTHING;
-    int aflags = 0, alen = 0, anum = 0, i = 0, lastn = 0, nwords = 0, wc = 0, count[NUM_ENV_VARS];
+    int aflags = 0, alen = 0, i = 0, lastn = 0, nwords = 0, wc = 0, count[NUM_ENV_VARS];
     ATTR *ap = NULL;
     char *str = NULL, *atext = NULL, *atextbuf = NULL, *bb_p = NULL;
     char *os[NUM_ENV_VARS], *cp[NUM_ENV_VARS];
@@ -1074,7 +1074,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
     ATTR *ap;
     dbref aowner, thing;
-    int aflags, alen, anum;
+    int aflags, alen;
     char *atext, *str, *cp, *atextbuf, *bb_p, *os[NUM_ENV_VARS];
     Delim isep, osep;
     int step_size, i;
@@ -1162,7 +1162,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     dbref aowner = NOTHING, thing = NOTHING;
-    int aflags = 0, alen = 0, anum = 0, i = 0, in_string = 1;
+    int aflags = 0, alen = 0, i = 0, in_string = 1;
     ATTR *ap = NULL;
     char *str = NULL, *atext = NULL, *atextbuf = NULL, *cp = NULL, *cbuf[2], *op = NULL;
     char start_token = 0, end_token = 0;
@@ -1283,7 +1283,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     dbref aowner, thing;
-    int aflags, alen, anum, nptrs1, nptrs2, nresults, i, j;
+    int aflags, alen, nptrs1, nptrs2, nresults, i, j;
     ATTR *ap;
     char *list1, *list2, *rlist, *st[2];
     char **ptrs1, **ptrs2, **results;
