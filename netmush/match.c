@@ -435,6 +435,11 @@ void match_list(dbref first, int local)
         return;
     }
 
+    if (first == NOTHING)
+    {
+        return;
+    }
+
     for (; (first != NOTHING) && (Next(first) != first) && (iteration_count < MAX_ITERATIONS); first = Next(first), iteration_count++)
     {
         if (first == md.absolute_form)
