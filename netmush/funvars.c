@@ -1312,7 +1312,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
         }
 
-        cbuf = XMALLOC(2, "cbuf");
+        char cbuf[2];
         for (i = 0; i < preserve->q_alloc; i++)
         {
             if (preserve->q_regs[i] && *(preserve->q_regs[i]))
@@ -1324,7 +1324,6 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
                     set_register("fun_ucall", cbuf, preserve->q_regs[i]);
             }
         }
-        XFREE(cbuf);
 
         for (i = 0; i < preserve->xr_alloc; i++)
         {
