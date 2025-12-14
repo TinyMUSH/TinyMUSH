@@ -226,6 +226,12 @@ validate_list_args(const char *func_name, char *buff, char **bufc, dbref player,
 	} while (0)
 
 /**
+ * @brief Copy delimiter structure (osep = isep)
+ */
+#define COPY_DELIM(dest, src) \
+	XMEMCPY(&(dest), &(src), sizeof(Delim) - MAX_DELIM_LEN + 1 + (src).len)
+
+/**
  * @brief Convert a DBref (#db) to it's numerical value (db)
  *
  * @param dbr Text DBref value
@@ -266,12 +272,7 @@ void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -353,12 +354,7 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -403,12 +399,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -663,7 +654,7 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -744,7 +735,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	if (nfargs < 5)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -1129,12 +1120,7 @@ void fun_ldelete(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
-	{
-		return;
-	};
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 3, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -1159,12 +1145,7 @@ void fun_replace(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, 4, 4, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -1238,7 +1219,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 	if (nfargs < 5)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -1519,7 +1500,7 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 	if (nfargs < 5)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -1873,7 +1854,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -2090,7 +2071,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -2232,7 +2213,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		}
 		if (nfargs < 5)
 		{
-			XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+			COPY_DELIM(osep, isep);
 		}
 		else
 		{
@@ -2254,7 +2235,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		}
 		if (nfargs < 4)
 		{
-			XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+			COPY_DELIM(osep, isep);
 		}
 		else
 		{
@@ -3356,7 +3337,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -3581,7 +3562,7 @@ void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -3853,7 +3834,7 @@ void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	if (nfargs < 4)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -3930,7 +3911,7 @@ void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	if (nfargs < 3)
 	{
-		XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -3991,7 +3972,7 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs < 5)
 	{
-		XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+		COPY_DELIM(osep, isep);
 	}
 	else
 	{
@@ -4054,511 +4035,511 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	XFREE(ptrs_old);
 	XFREE(ptrs_new);
 }
-	/**
-	 * @brief Turn a list into a punctuated list.
-	 *
-	 * @param buff Output buffer
-	 * @param bufc Output buffer tracker
-	 * @param player DBref of player
-	 * @param caller DBref of caller
-	 * @param cause DBref of cause
-	 * @param fargs Function's arguments
-	 * @param nfargs Number of function's arguments
-	 * @param cargs Command's arguments
-	 * @param ncargs Nomber of command's arguments
-	 */
-	void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+/**
+ * @brief Turn a list into a punctuated list.
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
+void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	Delim isep, osep;
+	int n_elems, i;
+	char *conj_str, **elems;
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 4, buff, bufc))
 	{
-		Delim isep, osep;
-		int n_elems, i;
-		char *conj_str, **elems;
-
-		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 4, buff, bufc))
-		{
-			return;
-		}
-
-		if (!fargs[0] || !*fargs[0])
-		{
-			return;
-		}
-
-		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
-		{
-			return;
-		}
-
-		if (nfargs < 3)
-		{
-			conj_str = (char *)"and";
-		}
-		else
-		{
-			conj_str = fargs[2];
-		}
-
-		if (nfargs < 4)
-		{
-			osep.str[0] = ',';
-			osep.len = 1;
-		}
-		else
-		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-			{
-				return;
-			}
-		}
-
-		n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
-
-		if (n_elems == 1)
-		{
-			SAFE_LB_STR(elems[0], buff, bufc);
-		}
-		else if (n_elems == 2)
-		{
-			SAFE_LB_STR(elems[0], buff, bufc);
-
-			if (*conj_str)
-			{
-				SAFE_LB_CHR(' ', buff, bufc);
-				SAFE_LB_STR(conj_str, buff, bufc);
-			}
-
-			SAFE_LB_CHR(' ', buff, bufc);
-			SAFE_LB_STR(elems[1], buff, bufc);
-		}
-		else
-		{
-			for (i = 0; i < (n_elems - 1); i++)
-			{
-				SAFE_LB_STR(elems[i], buff, bufc);
-				print_separator(&osep, buff, bufc);
-				SAFE_LB_CHR(' ', buff, bufc);
-			}
-
-			if (*conj_str)
-			{
-				SAFE_LB_STR(conj_str, buff, bufc);
-				SAFE_LB_CHR(' ', buff, bufc);
-			}
-
-			SAFE_LB_STR(elems[i], buff, bufc);
-		}
-
-		XFREE(elems);
+		return;
 	}
 
-	/**
-	 * @brief Weighted random choice from a list.
-	 *
-	 * choose(<list of items>,<list of weights>,<input delim>)
-	 *
-	 * @param buff Output buffer
-	 * @param bufc Output buffer tracker
-	 * @param player DBref of player
-	 * @param caller DBref of caller
-	 * @param cause DBref of cause
-	 * @param fargs Function's arguments
-	 * @param nfargs Number of function's arguments
-	 * @param cargs Command's arguments
-	 * @param ncargs Nomber of command's arguments
-	 */
-	void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+	if (!fargs[0] || !*fargs[0])
 	{
-		Delim isep;
-		char **elems, **weights;
-		int i, num, n_elems, n_weights, *ip;
-		int sum = 0;
+		return;
+	}
 
-		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
+	if (nfargs < 3)
+	{
+		conj_str = (char *)"and";
+	}
+	else
+	{
+		conj_str = fargs[2];
+	}
+
+	if (nfargs < 4)
+	{
+		osep.str[0] = ',';
+		osep.len = 1;
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
 		{
 			return;
-		};
+		}
+	}
 
-		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
+
+	if (n_elems == 1)
+	{
+		SAFE_LB_STR(elems[0], buff, bufc);
+	}
+	else if (n_elems == 2)
+	{
+		SAFE_LB_STR(elems[0], buff, bufc);
+
+		if (*conj_str)
 		{
-			return;
+			SAFE_LB_CHR(' ', buff, bufc);
+			SAFE_LB_STR(conj_str, buff, bufc);
 		}
 
-		n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
-		n_weights = list2arr(&weights, LBUF_SIZE / 2, fargs[1], &SPACE_DELIM);
-
-		if (n_elems != n_weights)
+		SAFE_LB_CHR(' ', buff, bufc);
+		SAFE_LB_STR(elems[1], buff, bufc);
+	}
+	else
+	{
+		for (i = 0; i < (n_elems - 1); i++)
 		{
-			SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
-			XFREE(elems);
-			XFREE(weights);
-			return;
+			SAFE_LB_STR(elems[i], buff, bufc);
+			print_separator(&osep, buff, bufc);
+			SAFE_LB_CHR(' ', buff, bufc);
 		}
 
-		/**
-		 * Store the breakpoints, not the choose weights themselves.
-		 *
-		 */
-		ip = (int *)XCALLOC(n_weights, sizeof(int), "ip");
-
-		for (i = 0; i < n_weights; i++)
+		if (*conj_str)
 		{
-			num = (int)strtol(weights[i], (char **)NULL, 10);
-
-			if (num < 0)
-			{
-				num = 0;
-			}
-
-			if (num == 0)
-			{
-				ip[i] = 0;
-			}
-			else
-			{
-				sum += num;
-				ip[i] = sum;
-			}
+			SAFE_LB_STR(conj_str, buff, bufc);
+			SAFE_LB_CHR(' ', buff, bufc);
 		}
 
-		num = (int)random_range(0, (sum)-1);
+		SAFE_LB_STR(elems[i], buff, bufc);
+	}
 
-		for (i = 0; i < n_weights; i++)
-		{
-			if ((ip[i] != 0) && (num < ip[i]))
-			{
-				SAFE_LB_STR(elems[i], buff, bufc);
-				break;
-			}
-		}
+	XFREE(elems);
+}
 
-		XFREE(ip);
+/**
+ * @brief Weighted random choice from a list.
+ *
+ * choose(<list of items>,<list of weights>,<input delim>)
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
+void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	Delim isep;
+	char **elems, **weights;
+	int i, num, n_elems, n_weights, *ip;
+	int sum = 0;
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
+	{
+		return;
+	};
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
+	n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
+	n_weights = list2arr(&weights, LBUF_SIZE / 2, fargs[1], &SPACE_DELIM);
+
+	if (n_elems != n_weights)
+	{
+		SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
 		XFREE(elems);
 		XFREE(weights);
+		return;
 	}
 
 	/**
-	 * @brief Sort a list by numerical-size group, i.e., take every Nth
-	 * element. Useful for passing to a column-type function where you want the
-	 * list to go down rather than across, for instance.
+	 * Store the breakpoints, not the choose weights themselves.
 	 *
-	 * group(<list>, <number of groups>, <idelim>, <odelim>, <gdelim>)
-	 *
-	 * @param buff Output buffer
-	 * @param bufc Output buffer tracker
-	 * @param player DBref of player
-	 * @param caller DBref of caller
-	 * @param cause DBref of cause
-	 * @param fargs Function's arguments
-	 * @param nfargs Number of function's arguments
-	 * @param cargs Command's arguments
-	 * @param ncargs Nomber of command's arguments
 	 */
-	void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+	ip = (int *)XCALLOC(n_weights, sizeof(int), "ip");
+
+	for (i = 0; i < n_weights; i++)
 	{
-		char *bb_p, **elems;
-		Delim isep, osep, gsep;
-		int n_elems, n_groups, i, j;
+		num = (int)strtol(weights[i], (char **)NULL, 10);
 
-		/**
-		 * Separator checking is weird in this, since we can delimit by
-		 * group, too, as well as the element delimiter. The group delimiter
-		 * defaults to the output delimiter.
-		 *
-		 */
-		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 5, buff, bufc))
+		if (num < 0)
 		{
-			return;
+			num = 0;
 		}
 
-		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+		if (num == 0)
 		{
-			return;
-		}
-
-		if (nfargs < 4)
-		{
-			XMEMCPY(&osep, &isep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
+			ip[i] = 0;
 		}
 		else
 		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-			{
-				return;
-			}
+			sum += num;
+			ip[i] = sum;
 		}
+	}
 
-		if (nfargs < 5)
+	num = (int)random_range(0, (sum)-1);
+
+	for (i = 0; i < n_weights; i++)
+	{
+		if ((ip[i] != 0) && (num < ip[i]))
 		{
-			XMEMCPY(&gsep, &osep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&osep)->len);
+			SAFE_LB_STR(elems[i], buff, bufc);
+			break;
 		}
-		else
-		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &gsep, DELIM_NULL | DELIM_CRLF | DELIM_STRING))
-			{
-				return;
-			}
-		}
+	}
 
-		/**
-		 * Go do it, unless the group size doesn't make sense.
-		 *
-		 */
-		n_groups = (int)strtol(fargs[1], (char **)NULL, 10);
-		n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
+	XFREE(ip);
+	XFREE(elems);
+	XFREE(weights);
+}
 
-		if (n_groups < 2)
+/**
+ * @brief Sort a list by numerical-size group, i.e., take every Nth
+ * element. Useful for passing to a column-type function where you want the
+ * list to go down rather than across, for instance.
+ *
+ * group(<list>, <number of groups>, <idelim>, <odelim>, <gdelim>)
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
+void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	char *bb_p, **elems;
+	Delim isep, osep, gsep;
+	int n_elems, n_groups, i, j;
+
+	/**
+	 * Separator checking is weird in this, since we can delimit by
+	 * group, too, as well as the element delimiter. The group delimiter
+	 * defaults to the output delimiter.
+	 *
+	 */
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 5, buff, bufc))
+	{
+		return;
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
+	if (nfargs < 4)
+	{
+		COPY_DELIM(osep, isep);
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
 		{
-			arr2list(elems, n_elems, buff, bufc, &osep);
-			XFREE(elems);
 			return;
 		}
+	}
 
-		if (n_groups >= n_elems)
+	if (nfargs < 5)
+	{
+		XMEMCPY(&gsep, &osep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&osep)->len);
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &gsep, DELIM_NULL | DELIM_CRLF | DELIM_STRING))
 		{
-			arr2list(elems, n_elems, buff, bufc, &gsep);
-			XFREE(elems);
 			return;
 		}
+	}
 
-		bb_p = *bufc;
+	/**
+	 * Go do it, unless the group size doesn't make sense.
+	 *
+	 */
+	n_groups = (int)strtol(fargs[1], (char **)NULL, 10);
+	n_elems = list2arr(&elems, LBUF_SIZE / 2, fargs[0], &isep);
 
-		for (i = 0; i < n_groups; i++)
-		{
-			for (j = 0; i + j < n_elems; j += n_groups)
-			{
-				if (*bufc != bb_p)
-				{
-					if (j == 0)
-					{
-						print_separator(&gsep, buff, bufc);
-					}
-					else
-					{
-						print_separator(&osep, buff, bufc);
-					}
-				}
-
-				SAFE_LB_STR(elems[i + j], buff, bufc);
-			}
-		}
-
+	if (n_groups < 2)
+	{
+		arr2list(elems, n_elems, buff, bufc, &osep);
 		XFREE(elems);
+		return;
 	}
 
-	/**
-	 * @brief Take a string such as 'this "Joe Bloggs" John' and turn it
-	 * into an output delim-separated list.
-	 *
-	 * tokens(<string>[,<obj>/<attr>][,<open>][,<close>][,<sep>][,<osep>])
-	 *
-	 * @param buff Output buffer
-	 * @param bufc Output buffer tracker
-	 * @param player DBref of player
-	 * @param caller DBref of caller
-	 * @param cause DBref of cause
-	 * @param fargs Function's arguments
-	 * @param nfargs Number of function's arguments
-	 * @param cargs Command's arguments
-	 * @param ncargs Nomber of command's arguments
-	 */
-	void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+	if (n_groups >= n_elems)
 	{
-		char *s, *t, *bb_p, *atext, *atextbuf, *objs[1], *str;
-		int anum, aflags, alen;
-		dbref aowner, thing;
-		ATTR *ap;
-		Delim omark, cmark, isep, osep;
+		arr2list(elems, n_elems, buff, bufc, &gsep);
+		XFREE(elems);
+		return;
+	}
 
-		if (!fargs[0] || !*fargs[0])
-		{
-			return;
-		}
+	bb_p = *bufc;
 
-		if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 6, buff, bufc))
+	for (i = 0; i < n_groups; i++)
+	{
+		for (j = 0; i + j < n_elems; j += n_groups)
 		{
-			return;
-		}
-
-		if (nfargs < 3)
-		{
-			omark.str[0] = '"';
-			omark.len = 1;
-		}
-		else
-		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &omark, DELIM_STRING))
+			if (*bufc != bb_p)
 			{
-				return;
-			}
-		}
-
-		if (nfargs < 4)
-		{
-			XMEMCPY(&cmark, &omark, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&omark)->len);
-		}
-		else
-		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &cmark, DELIM_STRING))
-			{
-				return;
-			}
-		}
-
-		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &isep, DELIM_STRING))
-		{
-			return;
-		}
-
-		if (nfargs < 6)
-		{
-			XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
-		}
-		else
-		{
-			if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-			{
-				return;
-			}
-		}
-
-		if ((nfargs > 1) && fargs[1] && *fargs[1])
-		{
-			if (string_prefix(fargs[1], "#lambda/"))
-			{
-				thing = player;
-				anum = NOTHING;
-				ap = NULL;
-				atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-				alen = strlen(fargs[1] + 8);
-				__xstrcpy(atext, fargs[1] + 8);
-				atext[alen] = '\0';
-				aowner = player;
-				aflags = 0;
-			}
-			else
-			{
-				if (parse_attrib(player, fargs[1], &thing, &anum, 0))
+				if (j == 0)
 				{
-					if ((anum == NOTHING) || !(Good_obj(thing)))
-						ap = NULL;
-					else
-						ap = atr_num(anum);
+					print_separator(&gsep, buff, bufc);
 				}
 				else
-				{
-					thing = player;
-					ap = atr_str(fargs[1]);
-				}
-				if (!ap)
-				{
-					return;
-				}
-				atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-				if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-				{
-					XFREE(atext);
-					return;
-				}
-			}
-
-			atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
-		}
-		else
-		{
-			atextbuf = NULL;
-		}
-
-		bb_p = *bufc;
-		s = trim_space_sep(fargs[0], &isep);
-
-		while (s && *s)
-		{
-			if ((omark.len == 1) ? (*s == omark.str[0]) : !strncmp(s, omark.str, omark.len))
-			{
-				/**
-				 * Now we're inside quotes. Find the end quote, and
-				 * copy the token inside of it. If we run off the end
-				 * of the string, we ignore the literal opening
-				 * marker that we've skipped.
-				 *
-				 */
-				s += omark.len;
-
-				if (*s)
-				{
-					t = split_token(&s, &cmark);
-				}
-				else
-				{
-					break;
-				}
-			}
-			else
-			{
-				/**
-				 * We are at a bare word. Split it off.
-				 *
-				 */
-				t = split_token(&s, &isep);
-			}
-
-			/**
-			 * Pass the token through the transformation function if we
-			 * have one, or just copy it, if not.
-			 *
-			 */
-			if (t)
-			{
-				if (*bufc != bb_p)
 				{
 					print_separator(&osep, buff, bufc);
 				}
-
-				if (!atextbuf)
-				{
-					SAFE_LB_STR(t, buff, bufc);
-				}
-				else if ((mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
-				{
-					objs[0] = t;
-					XMEMCPY(atextbuf, atext, alen);
-					atextbuf[alen] = '\0';
-					str = atextbuf;
-					eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 1);
-				}
 			}
 
+			SAFE_LB_STR(elems[i + j], buff, bufc);
+		}
+	}
+
+	XFREE(elems);
+}
+
+/**
+ * @brief Take a string such as 'this "Joe Bloggs" John' and turn it
+ * into an output delim-separated list.
+ *
+ * tokens(<string>[,<obj>/<attr>][,<open>][,<close>][,<sep>][,<osep>])
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Nomber of command's arguments
+ */
+void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	char *s, *t, *bb_p, *atext, *atextbuf, *objs[1], *str;
+	int anum, aflags, alen;
+	dbref aowner, thing;
+	ATTR *ap;
+	Delim omark, cmark, isep, osep;
+
+	if (!fargs[0] || !*fargs[0])
+	{
+		return;
+	}
+
+	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 0, 6, buff, bufc))
+	{
+		return;
+	}
+
+	if (nfargs < 3)
+	{
+		omark.str[0] = '"';
+		omark.len = 1;
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &omark, DELIM_STRING))
+		{
+			return;
+		}
+	}
+
+	if (nfargs < 4)
+	{
+		XMEMCPY(&cmark, &omark, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&omark)->len);
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &cmark, DELIM_STRING))
+		{
+			return;
+		}
+	}
+
+	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 5, &isep, DELIM_STRING))
+	{
+		return;
+	}
+
+	if (nfargs < 6)
+	{
+		COPY_DELIM(osep, isep);
+	}
+	else
+	{
+		if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 6, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+		{
+			return;
+		}
+	}
+
+	if ((nfargs > 1) && fargs[1] && *fargs[1])
+	{
+		if (string_prefix(fargs[1], "#lambda/"))
+		{
+			thing = player;
+			anum = NOTHING;
+			ap = NULL;
+			atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+			alen = strlen(fargs[1] + 8);
+			__xstrcpy(atext, fargs[1] + 8);
+			atext[alen] = '\0';
+			aowner = player;
+			aflags = 0;
+		}
+		else
+		{
+			if (parse_attrib(player, fargs[1], &thing, &anum, 0))
+			{
+				if ((anum == NOTHING) || !(Good_obj(thing)))
+					ap = NULL;
+				else
+					ap = atr_num(anum);
+			}
+			else
+			{
+				thing = player;
+				ap = atr_str(fargs[1]);
+			}
+			if (!ap)
+			{
+				return;
+			}
+			atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
+			if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
+			{
+				XFREE(atext);
+				return;
+			}
+		}
+
+		atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
+	}
+	else
+	{
+		atextbuf = NULL;
+	}
+
+	bb_p = *bufc;
+	s = trim_space_sep(fargs[0], &isep);
+
+	while (s && *s)
+	{
+		if ((omark.len == 1) ? (*s == omark.str[0]) : !strncmp(s, omark.str, omark.len))
+		{
 			/**
-			 * Skip to start of next token, ignoring input separators.
+			 * Now we're inside quotes. Find the end quote, and
+			 * copy the token inside of it. If we run off the end
+			 * of the string, we ignore the literal opening
+			 * marker that we've skipped.
 			 *
 			 */
-			if (s && *s)
+			s += omark.len;
+
+			if (*s)
 			{
-				if ((isep.len == 1) && (isep.str[0] == ' '))
+				t = split_token(&s, &cmark);
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			/**
+			 * We are at a bare word. Split it off.
+			 *
+			 */
+			t = split_token(&s, &isep);
+		}
+
+		/**
+		 * Pass the token through the transformation function if we
+		 * have one, or just copy it, if not.
+		 *
+		 */
+		if (t)
+		{
+			if (*bufc != bb_p)
+			{
+				print_separator(&osep, buff, bufc);
+			}
+
+			if (!atextbuf)
+			{
+				SAFE_LB_STR(t, buff, bufc);
+			}
+			else if ((mushstate.func_invk_ctr < mushconf.func_invk_lim) && !Too_Much_CPU())
+			{
+				objs[0] = t;
+				XMEMCPY(atextbuf, atext, alen);
+				atextbuf[alen] = '\0';
+				str = atextbuf;
+				eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 1);
+			}
+		}
+
+		/**
+		 * Skip to start of next token, ignoring input separators.
+		 *
+		 */
+		if (s && *s)
+		{
+			if ((isep.len == 1) && (isep.str[0] == ' '))
+			{
+				s = trim_space_sep(s, &isep);
+			}
+			else
+			{
+				if (isep.len == 1)
 				{
-					s = trim_space_sep(s, &isep);
+					while (*s == isep.str[0])
+					{
+						s++;
+					}
 				}
 				else
 				{
-					if (isep.len == 1)
+					while (*s && !strncmp(s, isep.str, isep.len))
 					{
-						while (*s == isep.str[0])
-						{
-							s++;
-						}
-					}
-					else
-					{
-						while (*s && !strncmp(s, isep.str, isep.len))
-						{
-							s += isep.len;
-						}
+						s += isep.len;
 					}
 				}
 			}
 		}
-
-		if (atextbuf)
-		{
-			XFREE(atextbuf);
-		}
 	}
+
+	if (atextbuf)
+	{
+		XFREE(atextbuf);
+	}
+}
