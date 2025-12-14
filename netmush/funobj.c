@@ -1866,7 +1866,8 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		SAFE_NOMATCH(buff, bufc);
 		return;
 	}
-	else if (!(Examinable(player, it)))
+	int exam = Examinable(player, it);
+	if (!exam)
 	{
 		SAFE_NOPERM(buff, bufc);
 		return;
@@ -1878,12 +1879,13 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	par = Parent(it);
 	i = 1;
 
-	while (Good_obj(par) && Examinable(player, it) && (i < mushconf.parent_nest_lim))
+	while (Good_obj(par) && exam && (i < mushconf.parent_nest_lim))
 	{
 		print_separator(&osep, buff, bufc);
 		SAFE_LB_CHR('#', buff, bufc);
 		SAFE_LTOS(buff, bufc, par, LBUF_SIZE);
 		it = par;
+		exam = Examinable(player, it);
 		par = Parent(par);
 		i++;
 	}
@@ -1981,7 +1983,8 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
 	it = match_thing(player, fargs[0]);
 
-	if (!Good_obj(it) || !Examinable(player, it))
+	int exam = Good_obj(it) ? Examinable(player, it) : 0;
+	if (!exam)
 	{
 		SAFE_NOTHING(buff, bufc);
 		return;
