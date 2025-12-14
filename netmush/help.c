@@ -108,6 +108,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 	/* create initial entry storage */
 	entries = (help_indx_list *)XMALLOC(sizeof(help_indx_list), "entries");
+	XMEMSET(entries, 0, sizeof(help_indx_list));
 
 	while (fgets(line, LINE_SIZE, rfp) != NULL)
 	{
@@ -116,7 +117,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 
 		if (line[n - 1] != '\n')
 		{
-			cf_log(player, "HLP", "INDX", confcmd, "line %d: line too long", lineno);
+			cf_log(player, "HLP", "INDX", confcmd, "line %d: line too long (max %d bytes)", lineno, LINE_SIZE);
 		}
 
 		if (line[0] == '&')
@@ -131,7 +132,12 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 				if (helpmkindx_dump_entries(wfp, pos, entries))
 				{
 					cf_log(player, "HLP", "INDX", confcmd, "error writing %s", dst);
+					fclose(rfp);
+					fclose(wfp);
 					XFREE(line);
+					XFREE(src);
+					XFREE(dst);
+					XFREE(entries);
 					return -1;
 				}
 
@@ -143,6 +149,7 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 				/* we're already working on an entry... time to start nesting */
 				ep = entries;
 				entries = (help_indx_list *)XMALLOC(sizeof(help_indx_list), "entries");
+				XMEMSET(entries, 0, sizeof(help_indx_list));
 				entries->next = ep;
 			}
 
@@ -177,20 +184,38 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	if (helpmkindx_dump_entries(wfp, pos, entries))
 	{
 		cf_log(player, "HLP", "INDX", confcmd, "error writing %s", dst);
-		fclose(rfp);
-		fclose(wfp);
+		if (fclose(rfp) != 0)
+		{
+			log_write(LOG_PROBLEMS, "HLP", "INDX", "Error closing source file %s", src);
+		}
+
+		if (fclose(wfp) != 0)
+		{
+			log_write(LOG_PROBLEMS, "HLP", "INDX", "Error closing destination file %s", dst);
+		}
+
 		XFREE(line);
 		XFREE(src);
 		XFREE(dst);
+		XFREE(entries);
 		return -1;
 	}
 
-	fclose(rfp);
-	fclose(wfp);
+	if (fclose(rfp) != 0)
+	{
+		log_write(LOG_PROBLEMS, "HLP", "INDX", "Error closing source file %s", src);
+	}
+
+	if (fclose(wfp) != 0)
+	{
+		log_write(LOG_PROBLEMS, "HLP", "INDX", "Error closing destination file %s", dst);
+	}
+
 	cf_log(player, "HLP", "INDX", confcmd, "%d topics indexed", ntopics);
 	XFREE(line);
 	XFREE(src);
 	XFREE(dst);
+	XFREE(entries);
 	return 0;
 }
 
@@ -469,7 +494,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		for (p = topic, q = tname; *p; p++, q++)
 		{
-			*q = tolower(*p);
+			*q = tolower((unsigned char)*p);
 		}
 
 		*q = '\0';
