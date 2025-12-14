@@ -779,6 +779,7 @@ void rng_global_init(void)
 		{
 			initstate = (uint64_t)mushconf.rng_seed;
 			initseq = 0x853c49e6748fea9bULL; /* default PCG stream constant */
+			log_write(LOG_STARTUP, "INI", "RNG", "RNG seeded from config: rng_seed=%d", mushconf.rng_seed);
 		}
 		else
 		{
@@ -791,17 +792,20 @@ void rng_global_init(void)
 				{
 					initstate = (uint64_t)seed_val;
 					initseq = 0x853c49e6748fea9bULL; /* default PCG stream constant */
+					log_write(LOG_STARTUP, "INI", "RNG", "RNG seeded from env: TINYMUSH_RNG_SEED=%s", env_seed);
 				}
 				else
 				{
 					initstate = (uint64_t)time(NULL);
 					initseq = (uint64_t)(uintptr_t)&rng_global;
+					log_write(LOG_STARTUP, "INI", "RNG", "Invalid env seed '%s'; using time-based seed", env_seed);
 				}
 			}
 			else
 			{
 				initstate = (uint64_t)time(NULL);
 				initseq = (uint64_t)(uintptr_t)&rng_global;
+				log_write(LOG_STARTUP, "INI", "RNG", "RNG seeded from time: initstate=%llu", (unsigned long long)initstate);
 			}
 		}
 		pcg32_srandom_r(&rng_global, initstate, initseq);
