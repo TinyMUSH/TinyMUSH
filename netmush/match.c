@@ -64,7 +64,7 @@ void promote_match(dbref what, int confidence)
         MSTATE save_md;
         save_match_state(&save_md);
 
-        if (Good_obj(what) && could_doit(md.player, what, A_LOCK))
+        if (Good_obj(md.player) && Good_obj(what) && could_doit(md.player, what, A_LOCK))
         {
             confidence |= CON_LOCK;
         }
