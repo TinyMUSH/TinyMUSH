@@ -298,14 +298,12 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
         }
     }
 
-    htab->entries++;
-
-    if (htab->entry[hval] == NULL)
-    {
-        htab->nulls--;
-    }
-
     hptr = (HASHENT *)XMALLOC(sizeof(HASHENT), "hptr");
+
+    if (hptr == NULL)
+    {
+        return CF_Failure;
+    }
 
     if (htab->flags & HT_KEYREF)
     {
@@ -314,6 +312,19 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     else
     {
         hptr->target.s = XSTRDUP(key.s, "hptr->target.s");
+
+        if (hptr->target.s == NULL)
+        {
+            XFREE(hptr);
+            return CF_Failure;
+        }
+    }
+
+    htab->entries++;
+
+    if (htab->entry[hval] == NULL)
+    {
+        htab->nulls--;
     }
 
     hptr->data = hashdata;
@@ -545,8 +556,9 @@ int *hash_firstentry(HASHTAB *htab)
 {
     int hval;
 
-    /* Reset iterator state for consistent iteration */
-    hashreset(htab);
+    /* Reset iterator state only, not stats */
+    htab->last_entry = NULL;
+    htab->last_hval = 0;
 
     for (hval = 0; hval < htab->hashsize; hval++)
         if (htab->entry[hval] != NULL)
