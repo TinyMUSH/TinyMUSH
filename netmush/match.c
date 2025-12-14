@@ -365,7 +365,7 @@ void match_here(void)
             {
                 promote_match(loc, CON_TOKEN | CON_LOCAL);
             }
-            else if (!string_compare(md.string, (char *)PureName(loc)))
+			else if (PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
             {
                 promote_match(loc, CON_COMPLETE | CON_LOCAL);
             }
@@ -396,7 +396,11 @@ void match_list(dbref first, int local)
          * would overwrite Name()'s static buffer which is
          * needed by string_match().
          */
-        namebuf = (char *)PureName(first);
+	namebuf = (char *)PureName(first);
+	if (!namebuf)
+	{
+		continue;
+	}
 
         if (!string_compare(namebuf, md.string))
         {
@@ -481,7 +485,7 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
             }
         }
 
-        if (matches_exit_from_list(md.string, (char *)PureName(exit)))
+		if (PureName(exit) && matches_exit_from_list(md.string, (char *)PureName(exit)))
         {
             promote_match(exit, CON_COMPLETE | local);
             result = 1;
