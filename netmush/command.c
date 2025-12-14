@@ -472,6 +472,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	dbref aowner = NOTHING;
 	ADDENT *add = NULL;
 	GDATA *preserve = NULL;
+	/**
+	 * Validate arguments count to prevent buffer overflow
+	 *
+	 */
+	if (ncargs < 0 || ncargs > NUM_ENV_VARS)
+	{
+		return;
+	}
 
 	/**
 	 * Perform object type checks.
@@ -872,7 +880,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			 * Free the argument buffers
 			 *
 			 */
-			for (i = 0; i <= nargs; i++)
+			for (i = 0; i < nargs; i++)
 				if (args[i])
 				{
 					XFREE(args[i]);
