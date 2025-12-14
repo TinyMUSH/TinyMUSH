@@ -174,9 +174,9 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 					key |= VE_LOC_DARK;
 				}
 
-				for (exit = it; (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
+				for (exit = Next(it); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
 				{
-					if ((exit != it) && Exit_Visible(exit, player, key))
+					if (Exit_Visible(exit, player, key))
 					{
 						SAFE_LB_CHR('#', buff, bufc);
 						SAFE_LTOS(buff, bufc, exit, LBUF_SIZE);
