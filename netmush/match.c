@@ -202,6 +202,12 @@ dbref absolute_nref(char *str)
      * * If we're matching locally we copy the dbref of the owner first,
      * * which means that we then need to worry about buffer size.
      */
+
+    if (!str)
+    {
+        return NOTHING;
+    }
+
     buf = XMALLOC(LBUF_SIZE, "buf");
     if (!buf)
     {
@@ -461,6 +467,11 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
     int result, key;
 
     if (!Good_obj(loc) || !Has_exits(loc))
+    {
+        return 1;
+    }
+
+    if (!Good_obj(baseloc))
     {
         return 1;
     }
@@ -761,6 +772,11 @@ void restore_match_state(MSTATE *m_state)
 
 void init_match(dbref player, const char *name, int type)
 {
+    if (!Good_obj(player))
+    {
+        player = NOTHING;
+    }
+
     md.confidence = -1;
     md.count = md.check_keys = 0;
     md.pref_type = type;
