@@ -232,6 +232,12 @@ dbref absolute_nref(char *str)
     }
     else
     {
+        if (!Good_obj(md.player))
+        {
+            XFREE(buf);
+            return NOTHING;
+        }
+
         bp = buf;
         SAFE_LTOS(buf, &bp, Owner(md.player), LBUF_SIZE);
         SAFE_LB_CHR('.', buf, &bp);
