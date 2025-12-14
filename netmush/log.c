@@ -67,15 +67,23 @@ char *logfile_init(char *filename)
 
 void logfile_move(char *oldfn, char *newfn)
 {
+    FILE *backup_fp = mainlog_fp;
+
     if (mainlog_fp != NULL && mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
+        mainlog_fp = NULL;
     }
+
     if (copy_file(oldfn, newfn, 1) != 0)
     {
         fprintf(stderr, "Warning: Failed to copy log file from %s to %s\n", oldfn, newfn);
     }
-    logfile_init(newfn);
+
+    if (logfile_init(newfn) == NULL)
+    {
+        fprintf(stderr, "Error: Failed to initialize new log file %s, logging to stderr\n", newfn);
+    }
 }
 
 /* ---------------------------------------------------------------------------
@@ -89,6 +97,11 @@ int start_log(const char *primary, const char *secondary, int key)
     LOGFILETAB *lp;
     static int last_key = 0;
     char *pri = NULL, *sec = NULL;
+
+    if (!primary)
+    {
+        return 0;
+    }
 
     if (!mushstate.standalone)
     {
@@ -145,8 +158,8 @@ int start_log(const char *primary, const char *secondary, int key)
              * Log even if we are recursing and
              * don't complain about it. This should
              * never happens with the new logger.
+             * Note: We don't decrement here, we'll let end_log do it
              */
-            mushstate.logging--;
         }
         else
         {
@@ -154,7 +167,8 @@ int start_log(const char *primary, const char *secondary, int key)
              * Recursive call, log it and return indicating no log
              */
             log_write_raw(0, "Recursive logging request.\n");
-            return (1);
+            mushstate.logging--;
+            return (0);
         }
     }
 
@@ -393,8 +407,8 @@ void log_write_raw(int key, const char *format, ...)
         fputs(str, lfp);
     }
 
-    /* If we are starting up, log to stderr too.. */
-    if ((log_fp != stderr) && (mushstate.logstderr))
+    /* If we are starting up, log to stderr too (but avoid duplicating if already writing to stderr) */
+    if ((lfp != stderr) && (mushstate.logstderr))
     {
         fputs(str, stderr);
     }
@@ -473,8 +487,8 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     }
     else
     {
-        FILE *old_fp = mainlog_fp;
         fclose(mainlog_fp);
+        mainlog_fp = NULL;
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
         copy_file(mushconf.log_file, s, 1);
         XFREE(s);
