@@ -747,9 +747,17 @@ dbref match_result(void)
         return NOTHING;
 
     case 1:
-        return md.match;
+        if (Good_obj(md.match))
+        {
+            return md.match;
+        }
+        return NOTHING;
 
     default:
+        if (!Good_obj(md.match))
+        {
+            return NOTHING;
+        }
         return ((mushconf.no_ambiguous_match) ? (md.match) : AMBIGUOUS);
     }
 }
