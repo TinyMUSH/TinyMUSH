@@ -51,6 +51,16 @@ DESC *descriptor_list = NULL; /*!< Descriptor list */
  */
 
 key_t msgq_Key = 0; /*!< Message Queue Key */
+int msgq_Id = 0;	/*!< Message Queue ID (cached globally) */
+
+/**
+ * @brief Static debug command labels to avoid repeated allocations
+ *
+ */
+static const char *DBG_SHOVECHARS = "< shovechars >";
+static const char *DBG_NEW_CONNECTION = "< new_connection >";
+static const char *DBG_PROCESS_OUTPUT = "< process_output >";
+static const char *DBG_PROCESS_INPUT = "< process_input >";
 
 /**
  * @brief Convert a text ip address to binary format for the message queue.
@@ -551,10 +561,9 @@ DESC *new_connection(int sock)
 	struct sockaddr_in addr;
 	socklen_t addr_len;
 	MSGQ_DNSRESOLVER msgData;
-	int msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
 
 	cmdsave = mushstate.debug_cmd;
-	mushstate.debug_cmd = XSTRDUP("< new_connection >", "mushstate.debug_cmd");
+	mushstate.debug_cmd = (char *)DBG_NEW_CONNECTION;
 	addr_len = sizeof(struct sockaddr);
 	newsock = accept(sock, (struct sockaddr *)&addr, &addr_len);
 
@@ -588,7 +597,7 @@ DESC *new_connection(int sock)
 		d = initializesock(newsock, &addr);
 	}
 
-	XFREE(mushstate.debug_cmd);
+	/* Do not free debug_cmd - it's pointing to a static constant */
 	mushstate.debug_cmd = cmdsave;
 	return d;
 }
@@ -1025,13 +1034,12 @@ int process_input(DESC *d)
 	char *p = NULL, *pend = NULL, *q = NULL, *qend = NULL, *cmdsave = NULL;
 
 	cmdsave = mushstate.debug_cmd;
-	mushstate.debug_cmd = XSTRDUP("< process_input >", mushstate.debug_cmd);
+	mushstate.debug_cmd = (char *)DBG_PROCESS_INPUT;
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	got = in = read(d->descriptor, buf, LBUF_SIZE);
 
 	if (got <= 0)
 	{
-		XFREE(mushstate.debug_cmd);
 		mushstate.debug_cmd = cmdsave;
 		XFREE(buf);
 		return 0;
@@ -1123,7 +1131,6 @@ int process_input(DESC *d)
 	d->input_size += in;
 	d->input_lost += lost;
 	XFREE(buf);
-	XFREE(mushstate.debug_cmd);
 	mushstate.debug_cmd = cmdsave;
 	return 1;
 }
