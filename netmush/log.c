@@ -67,6 +67,12 @@ char *logfile_init(char *filename)
 
 void logfile_move(char *oldfn, char *newfn)
 {
+    if (!oldfn || !newfn)
+    {
+        fprintf(stderr, "Error: Invalid parameters to logfile_move\n");
+        return;
+    }
+
     if (mainlog_fp != NULL && mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
@@ -137,11 +143,7 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_fp = mainlog_fp;
                 }
             }
-            else
-            {
-                /* Key changed but still in diversion mode, reset cache */
-                log_fp = mainlog_fp;
-            }
+            /* else: key == last_key, use cached log_fp */
         }
         else
         {
@@ -348,11 +350,17 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         {
             if (mushstate.debug && str1 != NULL)
             {
-                fputs(str1, log_fp);
+                if (fputs(str1, log_fp) == EOF)
+                {
+                    fprintf(stderr, "Error writing to log file\n");
+                }
             }
             else
             {
-                fputs(str, log_fp);
+                if (fputs(str, log_fp) == EOF)
+                {
+                    fprintf(stderr, "Error writing to log file\n");
+                }
             }
         }
 
@@ -362,11 +370,11 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         {
             if (mushstate.debug && str1 != NULL)
             {
-                fputs(str1, stderr);
+                fputs(str1, stderr); /* Ignore errors on stderr */
             }
             else
             {
-                fputs(str, stderr);
+                fputs(str, stderr); /* Ignore errors on stderr */
             }
         }
 
@@ -420,13 +428,20 @@ void log_write_raw(int key, const char *format, ...)
     /* Do we have a logfile to write to... */
     if (lfp != NULL)
     {
-        fputs(str, lfp);
+        if (fputs(str, lfp) == EOF)
+        {
+            /* Only report error if not writing to stderr (avoid recursion) */
+            if (lfp != stderr)
+            {
+                fprintf(stderr, "Error writing to log file\n");
+            }
+        }
     }
 
     /* If we are starting up, log to stderr too (but avoid duplicating if already writing to stderr) */
     if ((lfp != stderr) && (mushstate.logstderr))
     {
-        fputs(str, stderr);
+        fputs(str, stderr); /* Ignore errors on stderr */
     }
 
     free(str);
@@ -494,6 +509,13 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     LOGFILETAB *lp;
     char *ts, *pname;
     char *s;
+
+    if (mushstate.logging > 0)
+    {
+        notify(player, "Error: Cannot rotate logs while logging is in progress.");
+        return;
+    }
+
     ts = mktimestamp();
     mushstate.mush_lognum++;
 
@@ -556,6 +578,13 @@ void logfile_close(void)
     LOGFILETAB *lp;
     char *s;
     char *ts;
+
+    if (mushstate.logging > 0)
+    {
+        fprintf(stderr, "Warning: Closing log files while logging is in progress (count=%d)\n", mushstate.logging);
+        /* Continue anyway, we're shutting down */
+    }
+
     ts = mktimestamp();
 
     if (logfds_table != NULL)
