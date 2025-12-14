@@ -171,7 +171,8 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 					key |= VE_LOC_XAM;
 				}
 
-				if (Dark(loc))
+				int loc_is_dark = Dark(loc);
+				if (loc_is_dark)
 				{
 					key |= VE_LOC_DARK;
 				}
@@ -1263,16 +1264,19 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 		if (atr == NOTHING)
 		{
 			SAFE_BOOL(buff, bufc, Examinable(it, thing));
-			return;
 		}
-		ap = atr_num(atr);
-		atr_pget_info(thing, atr, &aowner, &aflags);
-		SAFE_BOOL(buff, bufc, See_attr_all(it, thing, ap, aowner, aflags, 1));
+		else
+		{
+			ap = atr_num(atr);
+			atr_pget_info(thing, atr, &aowner, &aflags);
+			SAFE_BOOL(buff, bufc, See_attr_all(it, thing, ap, aowner, aflags, 1));
+		}
 		return;
 	}
 
 	thing = match_thing(player, fargs[1]);
-	SAFE_BOOL(buff, bufc, Good_obj(thing) ? Examinable(it, thing) : 0);
+	int good = Good_obj(thing);
+	SAFE_BOOL(buff, bufc, good ? Examinable(it, thing) : 0);
 }
 
 /**
