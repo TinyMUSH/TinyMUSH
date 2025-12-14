@@ -79,12 +79,12 @@ struct timeval msec_add(struct timeval t, int x)
 struct timeval update_quotas(struct timeval last, struct timeval current)
 {
 	int nslices;
-	DESC *d;
+	DESC *d, *dnext;
 	nslices = msec_diff(current, last) / mushconf.timeslice;
 
 	if (nslices > 0)
 	{
-		for (d = descriptor_list; (d); d = (d)->next)
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		{
 			d->quota += mushconf.cmd_quota_incr * nslices;
 
@@ -452,6 +452,7 @@ void queue_string(DESC *d, const char *format, ...)
 		}
 		else
 		{
+			XFREE(msg);
 			return;
 		}
 	}
@@ -549,6 +550,12 @@ void freeqs(DESC *d)
 {
 	TBLOCK *tb, *tnext;
 	CBLK *cb, *cnext;
+
+	if (!d)
+	{
+		return;
+	}
+
 	tb = d->output_head;
 
 	while (tb)
@@ -738,15 +745,16 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 	}
 
 	p = user;
+	char *user_end = user + LBUF_SIZE - 1;
 
 	if (mushconf.name_spaces && (*msg == '\"'))
 	{
 		for (; *msg && (*msg == '\"' || isspace(*msg)); msg++)
 			;
 
-		while (*msg && *msg != '\"')
+		while (*msg && *msg != '\"' && p < user_end)
 		{
-			while (*msg && !isspace(*msg) && (*msg != '\"'))
+			while (*msg && !isspace(*msg) && (*msg != '\"') && p < user_end)
 			{
 				*p++ = *msg++;
 			}
@@ -761,7 +769,7 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 				msg++;
 			}
 
-			if (*msg && (*msg != '\"'))
+			if (*msg && (*msg != '\"') && p < user_end)
 			{
 				*p++ = ' ';
 			}
@@ -771,7 +779,7 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 			;
 	}
 	else
-		while (*msg && isascii(*msg) && !isspace(*msg))
+		while (*msg && isascii(*msg) && !isspace(*msg) && p < user_end)
 		{
 			*p++ = *msg++;
 		}
@@ -784,8 +792,9 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 	}
 
 	p = pass;
+	char *pass_end = pass + LBUF_SIZE - 1;
 
-	while (*msg && isascii(*msg) && !isspace(*msg))
+	while (*msg && isascii(*msg) && !isspace(*msg) && p < pass_end)
 	{
 		*p++ = *msg++;
 	}
@@ -898,7 +907,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 	XFREE(buf);
 
-	if (Good_loc(mushconf.master_room) && mushconf.use_global_aconn)
+	if (Good_obj(mushconf.master_room) && mushconf.use_global_aconn)
 	{
 		buf = atr_pget(mushconf.master_room, attr, &aowner, &aflags, &alen);
 
@@ -925,7 +934,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	/*
 	 * do the zone of the player's location's possible a(dis)connect
 	 */
-	if (mushconf.have_zones && ((zone = Zone(loc)) != NOTHING))
+	if (mushconf.have_zones && ((zone = Zone(loc)) != NOTHING) && Good_obj(zone))
 	{
 		switch (Typeof(zone))
 		{
@@ -1232,6 +1241,11 @@ int boot_off(dbref player, char *message)
 {
 	DESC *d = NULL, *dnext = NULL;
 	int count = 0;
+
+	if (!Good_obj(player))
+	{
+		return 0;
+	}
 
 	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab), dnext = ((d != NULL) ? d->hashnext : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->hashnext : NULL))
 	{
