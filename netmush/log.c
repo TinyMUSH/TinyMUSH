@@ -62,7 +62,10 @@ char *logfile_init(char *filename)
 
 void logfile_move(char *oldfn, char *newfn)
 {
-    fclose(mainlog_fp);
+    if (mainlog_fp != NULL && mainlog_fp != stderr)
+    {
+        fclose(mainlog_fp);
+    }
     copy_file(oldfn, newfn, 1);
     logfile_init(newfn);
 }
@@ -74,11 +77,10 @@ void logfile_move(char *oldfn, char *newfn)
 
 int start_log(const char *primary, const char *secondary, int key)
 {
-    struct tm *tp;
     time_t now;
     LOGFILETAB *lp;
-    int last_key = 0;
-    char *pri, *sec;
+    static int last_key = 0;
+    char *pri = NULL, *sec = NULL;
 
     if (!mushstate.standalone)
     {
@@ -157,6 +159,14 @@ int start_log(const char *primary, const char *secondary, int key)
                 pri = strndup(primary, 3);
                 sec = strndup(secondary, 5);
 
+                if (pri == NULL || sec == NULL)
+                {
+                    free(pri);
+                    free(sec);
+                    mushstate.logging--;
+                    return 0;
+                }
+
                 if (log_pos == NULL)
                 {
                     log_write_raw(0, "%s %3s/%-5s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec);
@@ -172,6 +182,12 @@ int start_log(const char *primary, const char *secondary, int key)
             else
             {
                 pri = strndup(primary, 9);
+
+                if (pri == NULL)
+                {
+                    mushstate.logging--;
+                    return 0;
+                }
 
                 if (log_pos == NULL)
                 {
@@ -251,16 +267,17 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 {
     if ((((key)&mushconf.log_options) != 0) && start_log(primary, secondary, key))
     {
-        int size = 0, vsize = 0;
+        int size = 0;
         char *str = NULL, *str1 = NULL;
         va_list ap;
 
         va_start(ap, format);
-        size = vsnprintf(str, size, format, ap);
+        size = vsnprintf(NULL, 0, format, ap);
         va_end(ap);
 
         if (size < 0)
         {
+            end_log();
             return;
         }
 
@@ -269,18 +286,13 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         if (str == NULL)
         {
+            end_log();
             return;
         }
 
         va_start(ap, format);
-        vsize = vsnprintf(str, size, format, ap);
+        vsnprintf(str, size, format, ap);
         va_end(ap);
-
-        if (vsize < 0)
-        {
-            free(str);
-            return;
-        }
 
         if (mushstate.debug)
         {
@@ -326,13 +338,13 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
  */
 void log_write_raw(int key, const char *format, ...)
 {
-    int size = 0, vsize = 0;
+    int size = 0;
     char *str = NULL;
     va_list ap;
     FILE *lfp;
 
     va_start(ap, format);
-    size = vsnprintf(str, size, format, ap);
+    size = vsnprintf(NULL, 0, format, ap);
     va_end(ap);
 
     if (size < 0)
@@ -349,14 +361,8 @@ void log_write_raw(int key, const char *format, ...)
     }
 
     va_start(ap, format);
-    vsize = vsnprintf(str, size, format, ap);
+    vsnprintf(str, size, format, ap);
     va_end(ap);
-
-    if (vsize < 0)
-    {
-        free(str);
-        return;
-    }
 
     if (key)
     {
@@ -474,8 +480,9 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
         if (lp->filename && lp->fileptr)
         {
             fclose(lp->fileptr);
-            snprintf(s, MBUF_SIZE, "%s.%s", lp->filename, ts);
+            s = XASPRINTF("s", "%s.%s", lp->filename, ts);
             copy_file(lp->filename, s, 1);
+            XFREE(s);
             lp->fileptr = fopen(lp->filename, "a");
 
             if (lp->fileptr)
