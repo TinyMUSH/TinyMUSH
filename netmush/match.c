@@ -744,6 +744,11 @@ dbref match_status(dbref player, dbref match)
         return NOTHING;
     }
 
+    if (match < 0)
+    {
+        return NOTHING;
+    }
+
     switch (match)
     {
     case NOTHING:
@@ -833,5 +838,8 @@ void init_match(dbref player, const char *name, int type)
 void init_match_check_keys(dbref player, const char *name, int type)
 {
     init_match(player, name, type);
-    md.check_keys = 1;
+    if (md.pref_type != NOTYPE && type != NOTYPE)
+    {
+        md.check_keys = 1;
+    }
 }
