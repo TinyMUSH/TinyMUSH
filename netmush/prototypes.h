@@ -951,7 +951,7 @@ extern void match_here(void);
 extern void match_list(dbref first, int local);
 extern void match_possession(void);
 extern void match_neighbor(void);
-extern int match_exit_internal(dbref loc, dbref baseloc, int local);
+extern bool match_exit_internal(dbref loc, dbref baseloc, int local);
 extern void match_exit(void);
 extern void match_exit_with_parents(void);
 extern void match_carried_exit(void);

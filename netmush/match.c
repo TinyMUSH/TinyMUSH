@@ -516,28 +516,29 @@ void match_neighbor(void)
     }
 }
 
-int match_exit_internal(dbref loc, dbref baseloc, int local)
+bool match_exit_internal(dbref loc, dbref baseloc, int local)
 {
     dbref exit;
-    int result, key;
+    bool result;
+    int key;
 
     if (!Good_obj(loc) || !Has_exits(loc))
     {
-        return 1;
+        return true;
     }
 
     if (!Good_obj(baseloc))
     {
-        return 1;
+        return true;
     }
 
     exit = Exits(loc);
     if (exit == NOTHING)
     {
-        return 0;
+        return false;
     }
 
-    result = 0;
+    result = false;
     for (; (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
     {
         if (exit == md.absolute_form)
@@ -562,14 +563,14 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
             if (Exit_Visible(exit, md.player, key))
             {
                 promote_match(exit, CON_DBREF | local);
-                return 1;
+                return true;
             }
         }
 
         if (PureName(exit) && matches_exit_from_list(md.string, (char *)PureName(exit)))
         {
             promote_match(exit, CON_COMPLETE | local);
-            result = 1;
+            result = true;
         }
     }
     return result;
