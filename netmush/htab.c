@@ -367,6 +367,12 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr, *last;
     int htype = htab->flags & HT_TYPEMASK;
 
+    /* Guard against uninitialized or failed hash table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return;
+    }
+
     hval = get_hash_value(key, htab);
     last = NULL;
 
@@ -407,8 +413,8 @@ void hashdelall(int *old, HASHTAB *htab)
     int hval;
     HASHENT *hptr, *prev, *nextp;
 
-    /* Guard against NULL pointer deletion */
-    if (old == NULL)
+    /* Guard against NULL pointer deletion and uninitialized table */
+    if (old == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
@@ -519,6 +525,12 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
     int hval;
     int htype = htab->flags & HT_TYPEMASK;
 
+    /* Guard against uninitialized or failed hash table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return 0;
+    }
+
     hval = get_hash_value(key, htab);
 
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
@@ -538,8 +550,8 @@ void hashreplall(int *old, int *new, HASHTAB *htab)
     int hval;
     HASHENT *hptr;
 
-    /* Guard against NULL pointers */
-    if (old == NULL || new == NULL)
+    /* Guard against NULL pointers and uninitialized table */
+    if (old == NULL || new == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
