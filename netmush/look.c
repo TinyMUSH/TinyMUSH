@@ -528,7 +528,10 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 		case '}':
 		case ')':
 			depth++;
-			parenlist[depth] = str[pos];
+			if (depth < LBUF_SIZE)
+			{
+				parenlist[depth] = str[pos];
+			}
 			SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 			SAFE_LB_CHR(str[pos], strbuf, &endp);
 			SAFE_LB_STR(pairRevColor(depth % 5), strbuf, &endp);
