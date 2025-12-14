@@ -485,6 +485,12 @@ void hashreplall(int *old, int *new, HASHTAB *htab)
     int hval;
     HASHENT *hptr;
 
+    /* Guard against NULL pointers */
+    if (old == NULL || new == NULL)
+    {
+        return;
+    }
+
     for (hval = 0; hval < htab->hashsize; hval++)
         for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
         {
@@ -503,6 +509,12 @@ char *hashinfo(const char *tab_name, HASHTAB *htab)
 {
     char *buff;
     buff = XMALLOC(MBUF_SIZE, "buff");
+
+    if (buff == NULL)
+    {
+        return NULL;
+    }
+
     XSPRINTF(buff, "%-15.15s%8d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
     return buff;
 }
@@ -512,6 +524,9 @@ char *hashinfo(const char *tab_name, HASHTAB *htab)
 int *hash_firstentry(HASHTAB *htab)
 {
     int hval;
+
+    /* Reset iterator state for consistent iteration */
+    hashreset(htab);
 
     for (hval = 0; hval < htab->hashsize; hval++)
         if (htab->entry[hval] != NULL)
