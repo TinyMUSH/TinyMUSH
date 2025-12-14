@@ -1071,11 +1071,15 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int hash_insert, int is_special)
 {
-	dbref aowner;
-	int ca, aflags, alen;
-	ATTR *attr, *cattr;
-	char *as, *buf;
+	dbref aowner = NOTHING;
+	int ca = 0, aflags = 0, alen = 0;
+	ATTR *attr = NULL, *cattr = NULL;
+	char *as = NULL, *buf = NULL;
 	cattr = (ATTR *)XMALLOC(sizeof(ATTR), "cattr");
+	if (!cattr)
+	{
+		return;
+	}
 
 	for (ca = atr_head(thing, &as); ca; ca = atr_next(&as))
 	{
@@ -1111,7 +1115,7 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 
 		buf = atr_get(thing, ca, &aowner, &aflags, &alen);
 
-		if (Read_attr_all(player, othing, cattr, aowner, aflags, 1))
+		if (buf && Read_attr_all(player, othing, cattr, aowner, aflags, 1))
 		{
 			if (!(check_exclude && (aflags & AF_PRIVATE)))
 			{
@@ -1122,7 +1126,8 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 			}
 		}
 
-		XFREE(buf);
+		if (buf)
+			XFREE(buf);
 	}
 
 	XFREE(cattr);
@@ -1345,25 +1350,28 @@ void look_in(dbref player, dbref loc, int key)
 	{
 		buff = unparse_object(player, loc, 1);
 
-		if (mushconf.have_pueblo == 1)
+		if (buff)
 		{
-			if (Html(player))
+			if (mushconf.have_pueblo == 1)
 			{
-				notify_html(player, "<center><h3>");
-				notify(player, buff);
-				notify_html(player, "</h3></center>");
+				if (Html(player))
+				{
+					notify_html(player, "<center><h3>");
+					notify(player, buff);
+					notify_html(player, "</h3></center>");
+				}
+				else
+				{
+					notify(player, buff);
+				}
 			}
 			else
 			{
 				notify(player, buff);
 			}
-		}
-		else
-		{
-			notify(player, buff);
-		}
 
-		XFREE(buff);
+			XFREE(buff);
+		}
 	}
 
 	if (!Good_obj(loc))
@@ -1464,7 +1472,7 @@ void look_here(dbref player, dbref thing, int key, int look_key)
 
 void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *name)
 {
-	dbref thing, loc, look_key;
+	dbref thing = NOTHING, loc = NOTHING, look_key = 0;
 	look_key = LK_SHOWATTR | LK_SHOWEXIT;
 
 	if (!mushconf.terse_look)
