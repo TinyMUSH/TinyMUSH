@@ -155,6 +155,11 @@ static inline int key_matches(HASHKEY a, HASHKEY b, int htype)
 {
     if (htype == HT_STR)
     {
+        /* Guard against NULL pointers */
+        if (a.s == NULL || b.s == NULL)
+        {
+            return (a.s == b.s);
+        }
         return strcmp(a.s, b.s) == 0;
     }
     else
