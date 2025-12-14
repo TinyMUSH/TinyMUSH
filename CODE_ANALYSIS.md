@@ -29,6 +29,60 @@ XSTRNCPY(mushstate.rdata->x_names[z], mushstate.qfirst->gdata->x_names[z], SBUF_
 
 **Status:** ✓ CORRIGÉ
 
+### 2. Utilisation Inconsistante de l'Allocation Mémoire dans vt100.c (MOYEN)
+
+**Fichier:** `netmush/vt100.c`  
+**Lignes:** 392, 402, 420, 508  
+**Sévérité:** MOYEN - Inconsistance avec les pratiques du projet
+
+**Problème:**
+Le code utilisait `realloc()` et `free()` standards au lieu des wrappers avec tracking `XREALLOC()` et `XFREE()`, créant une inconsistance avec le reste de la base de code et empêchant le tracking mémoire.
+
+**Solution:**
+Remplacement de toutes les occurrences:
+- `realloc()` → `XREALLOC()`
+- `free()` → `XFREE()`
+
+**Status:** ✓ CORRIGÉ
+
+### 3. Débordement de Tableau Potentiel dans vt100.c (CRITIQUE)
+
+**Fichier:** `netmush/vt100.c`  
+**Lignes:** 439-481  
+**Sévérité:** CRITIQUE - Débordement de tableau possible
+
+**Problème:**
+Dans la fonction `decodeVT100()`, le code incrémentait l'index `i` plusieurs fois sans vérifier qu'il reste dans les limites du tableau `codes`:
+```c
+case 38:
+    i++;  // Pas de vérification
+    switch (codes[i])
+    {
+    case 2:
+        i++;  // Débordement possible ici
+        attr.foreground.rgb.r = codes[i];
+        i++;  // Et ici
+        // etc.
+```
+
+Si une séquence ANSI malformée était fournie, cela pouvait causer un accès mémoire hors limites.
+
+**Solution:**
+Ajout de vérifications de limites avant chaque incrémentation:
+```c
+case 38:
+    if (++i >= index) break;
+    switch (codes[i])
+    {
+    case 2:
+        if (++i >= index) break;
+        attr.foreground.rgb.r = codes[i];
+        if (++i >= index) break;
+        // etc.
+```
+
+**Status:** ✓ CORRIGÉ
+
 ## Bonnes Pratiques Observées
 
 ### Gestion de la Mémoire
@@ -106,11 +160,17 @@ La base de code TinyMUSH démontre une bonne discipline en matière de:
 - Utilisation de wrappers sécurisés pour les opérations sur les chaînes
 - Gestion des ressources (fichiers, sockets)
 
-Le bug critique de débordement de buffer identifié et corrigé dans `cque.c` était le seul problème de sécurité majeur trouvé lors de cette analyse. La compilation réussit avec le correctif appliqué.
+**Bugs critiques corrigés :**
+1. Débordement de buffer dans `cque.c` (strcpy non sécurisé)
+2. Débordement de tableau dans `vt100.c` (accès hors limites)
+3. Incohérence d'allocation mémoire dans `vt100.c` (utilisation de realloc/free standards)
+
+La compilation réussit avec tous les correctifs appliqués.
 
 ## Fichiers Analysés
 
-- `netmush/cque.c` - File de commandes
+- `netmush/cque.c` - File de commandes ✓ CORRIGÉ
+- `netmush/vt100.c` - Traitement des séquences ANSI ✓ CORRIGÉ
 - `netmush/alloc.c` - Gestion de la mémoire
 - `netmush/game.c` - Logique principale du jeu
 - `netmush/bsd.c` - Gestion réseau
@@ -118,6 +178,7 @@ Le bug critique de débordement de buffer identifié et corrigé dans `cque.c` �
 - `netmush/conf.c` - Configuration
 - `netmush/stringutil.c` - Utilitaires de chaînes
 - `netmush/constants.h` - Constantes système
+- `netmush/help.c` - Système d'aide
 
 ## Prochaines Étapes Recommandées
 

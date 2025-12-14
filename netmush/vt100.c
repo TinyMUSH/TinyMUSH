@@ -389,7 +389,7 @@ VT100ATTR decodeVT100(const char **ansi)
             {
                 if (isdigit(**ansi))
                 {
-                    int *tmp = (int *)realloc(codes, (index + 1) * sizeof(int));
+                    int *tmp = (int *)XREALLOC(codes, (index + 1) * sizeof(int), "codes");
                     if (tmp != NULL)
                     {
                         codes = tmp;
@@ -402,7 +402,7 @@ VT100ATTR decodeVT100(const char **ansi)
                     }
                     else
                     {
-                        free(codes);
+                        XFREE(codes);
                         codes = NULL;
                         break;
                     }
@@ -426,7 +426,7 @@ VT100ATTR decodeVT100(const char **ansi)
         {
             if (codes != NULL)
             {
-                free(codes);
+                XFREE(codes);
                 codes = NULL;
             }
         }
@@ -442,40 +442,50 @@ VT100ATTR decodeVT100(const char **ansi)
                 attr.reset = true;
                 break;
             case 38:
-                i++;
+                if (++i >= index)
+                    break;
                 switch (codes[i])
                 {
                 case 2:
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.foreground.type = ANSICOLORTYPE_TRUECOLORS;
                     attr.foreground.rgb.r = codes[i];
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.foreground.rgb.g = codes[i];
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.foreground.rgb.b = codes[i];
                     break;
                 case 5:
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.foreground.type = ANSICOLORTYPE_XTERM;
                     attr.foreground.rgb = xtermColor[codes[i]].rgb;
                     break;
                 }
                 break;
             case 48:
-                i++;
+                if (++i >= index)
+                    break;
                 switch (codes[i])
                 {
                 case 2:
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.background.type = ANSICOLORTYPE_TRUECOLORS;
                     attr.background.rgb.r = codes[i];
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.background.rgb.g = codes[i];
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.background.rgb.b = codes[i];
                     break;
                 case 5:
-                    i++;
+                    if (++i >= index)
+                        break;
                     attr.background.type = ANSICOLORTYPE_XTERM;
                     attr.background.rgb = xtermColor[codes[i]].rgb;
                     break;
@@ -505,7 +515,7 @@ VT100ATTR decodeVT100(const char **ansi)
                 break;
             }
         }
-        free(codes);
+        XFREE(codes);
     }
     return attr;
 }
