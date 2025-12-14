@@ -23,6 +23,9 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
 
 extern struct object *db;
 int g_version;
@@ -1161,8 +1164,21 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				{
 					if (isdigit(*tstr))
 					{
+						char *endptr = NULL;
+						long val = 0;
+
 						read_name = 0;
-						s_Location(i, (int)strtol(tstr, (char **)NULL, 10));
+
+						errno = 0;
+						val = strtol(tstr, &endptr, 10);
+
+						if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == tstr || *endptr != '\0')
+						{
+							log_write_raw(1, "ABORT! db_rw.c, invalid location value in deduce_name.\n");
+							abort();
+						}
+
+						s_Location(i, (int)val);
 					}
 					else
 					{
