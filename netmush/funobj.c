@@ -867,7 +867,6 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			{
 				print_separator(&osep, buff, bufc);
 			}
-
 			SAFE_LB_CHR('#', buff, bufc);
 			SAFE_LTOS(buff, bufc, thing, LBUF_SIZE);
 		}
@@ -941,21 +940,12 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		}
 
 		key = 0;
-
 		if (Examinable(player, parent))
-		{
 			key |= VE_LOC_XAM;
-		}
-
 		if (Dark(parent))
-		{
 			key |= VE_LOC_DARK;
-		}
-
 		if (Dark(it))
-		{
 			key |= VE_BASE_DARK;
-		}
 
 		for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
@@ -1269,7 +1259,6 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 			SAFE_BOOL(buff, bufc, Examinable(it, thing));
 			return;
 		}
-
 		ap = atr_num(atr);
 		atr_pget_info(thing, atr, &aowner, &aflags);
 		SAFE_BOOL(buff, bufc, See_attr_all(it, thing, ap, aowner, aflags, 1));
@@ -1277,14 +1266,7 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 
 	thing = match_thing(player, fargs[1]);
-
-	if (!Good_obj(thing))
-	{
-		SAFE_LB_CHR('0', buff, bufc);
-		return;
-	}
-
-	SAFE_BOOL(buff, bufc, Examinable(it, thing));
+	SAFE_BOOL(buff, bufc, Good_obj(thing) ? Examinable(it, thing) : 0);
 }
 
 /**
