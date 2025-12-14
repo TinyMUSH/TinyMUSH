@@ -3628,7 +3628,7 @@ size_t mem_usage(dbref thing)
 
 			if (str && *str)
 			{
-				k += strlen(((ATTR *)atr_num(ca))->name);
+				k += strlen(str);
 			}
 		}
 	}
@@ -3655,6 +3655,7 @@ size_t mem_usage_attr(dbref player, char *str)
 
 	if (parse_attrib_wild(player, str, &thing, 0, 0, 1, 1))
 	{
+		int exam = Examinable(player, thing);
 		for (atr = olist_first(); atr != NOTHING; atr = olist_next())
 		{
 			ap = atr_num(atr);
@@ -3670,7 +3671,7 @@ size_t mem_usage_attr(dbref player, char *str)
 			 * Player must be able to read attribute with 'examine'
 			 *
 			 */
-			if (Examinable(player, thing) && Read_attr(player, thing, ap, aowner, aflags))
+			if (exam && Read_attr(player, thing, ap, aowner, aflags))
 			{
 				bytes_atext += alen;
 			}
