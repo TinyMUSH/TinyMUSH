@@ -180,7 +180,7 @@ void match_player(void)
         return;
     }
 
-    if (*md.string == LOOKUP_TOKEN)
+    if (md.string && *md.string == LOOKUP_TOKEN)
     {
         match = lookup_player(NOTHING, md.string, 1);
 
@@ -408,11 +408,11 @@ void match_here(void)
             {
                 promote_match(loc, CON_DBREF | CON_LOCAL);
             }
-            else if (!string_compare(md.string, "here"))
+            else if (md.string && !string_compare(md.string, "here"))
             {
                 promote_match(loc, CON_TOKEN | CON_LOCAL);
             }
-            else if (PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
+            else if (md.string && PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
             {
                 promote_match(loc, CON_COMPLETE | CON_LOCAL);
             }
