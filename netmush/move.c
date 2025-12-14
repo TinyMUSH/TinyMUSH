@@ -168,6 +168,13 @@ void move_object(dbref thing, dbref dest)
 {
     dbref src;
     /*
+     * Validate the object being moved
+     */
+    if (!Good_obj(thing))
+    {
+        return;
+    }
+    /*
      * Remove from the source location
      */
     src = Location(thing);
@@ -449,6 +456,11 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush)
     if (dest == HOME)
     {
         dest = Home(thing);
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "move_via_teleport: Invalid HOME destination for object #%d", thing);
+            return 0;
+        }
     }
 
     /*
@@ -535,6 +547,13 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
     {
     case HOME:
         loc = Home(player);
+        if (!Good_obj(loc))
+        {
+            oattr = (Dark(player) || (hush & HUSH_EXIT)) ? A_NULL : A_OFAIL;
+            aattr = ((hush & HUSH_EXIT) || (Dark(player) && !mushconf.dark_actions)) ? A_NULL : A_AFAIL;
+            did_it(player, exit, A_FAIL, "That exit doesn't lead anywhere.", oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
+            return;
+        }
         break;
 
     case AMBIGUOUS:
@@ -981,10 +1000,13 @@ void do_enter_internal(dbref player, dbref thing, int quiet)
     else if (could_doit(player, thing, A_LENTER))
     {
         loc = Location(player);
-        oattr = quiet ? HUSH_ENTER : 0;
-        move_via_generic(player, thing, NOTHING, oattr);
-        divest_object(player);
-        process_sticky_dropto(loc, player);
+        if (Good_obj(loc))
+        {
+            oattr = quiet ? HUSH_ENTER : 0;
+            move_via_generic(player, thing, NOTHING, oattr);
+            divest_object(player);
+            process_sticky_dropto(loc, player);
+        }
     }
     else
     {
