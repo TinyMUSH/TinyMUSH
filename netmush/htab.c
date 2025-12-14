@@ -773,7 +773,24 @@ void hashresize(HASHTAB *htab, int min_size)
     int size, i, htype, hval;
     HASHTAB new_htab;
     HASHENT *hent, *thent;
-    size = (htab->entries) * mushconf.hash_factor;
+
+    /* Guard against uninitialized table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return;
+    }
+
+    /* Calculate new size with overflow check */
+    if (htab->entries > INT_MAX / mushconf.hash_factor)
+    {
+        /* Avoid overflow; cap at reasonable size */
+        size = INT_MAX / 2;
+    }
+    else
+    {
+        size = (htab->entries) * mushconf.hash_factor;
+    }
+
     size = (size < min_size) ? min_size : size;
     get_hashmask(&size);
 
