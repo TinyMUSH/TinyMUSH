@@ -1649,7 +1649,8 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 			return;
 		}
 
-		if (mushconf.pub_flags || Examinable(player, it) || (it == cause))
+		int exam = Examinable(player, it);
+		if (mushconf.pub_flags || exam || (it == cause))
 		{
 			SAFE_BOOL(buff, bufc, has_flag(player, it, fargs[1]));
 		}
@@ -1686,7 +1687,8 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	if (mushconf.pub_flags || Examinable(player, it) || (it == cause))
+	int exam = Examinable(player, it);
+	if (mushconf.pub_flags || exam || (it == cause))
 	{
 		SAFE_BOOL(buff, bufc, has_power(player, it, fargs[1]));
 	}
