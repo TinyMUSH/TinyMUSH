@@ -2200,7 +2200,8 @@ void fun_esc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  */
 void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s = NULL, *stab = XMALLOC(256, "stab");
+	char *s = NULL;
+	unsigned char stab[256];
 	Delim osep;
 
 	if (!fargs[0] || !*fargs[0])
@@ -2227,6 +2228,8 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		osep.str[0] = '\0';
 	}
 
+	XMEMSET(stab, 0, sizeof(stab));
+
 	for (s = fargs[1]; *s; s++)
 	{
 		stab[(unsigned char)*s] = 1;
@@ -2243,7 +2246,6 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			print_separator(&osep, buff, bufc);
 		}
 	}
-	XFREE(stab);
 }
 
 /**
@@ -2269,7 +2271,8 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 {
 	int ansi_state = 0;
 	int xterm = 0;
-	char *s = NULL, *xtp = NULL, *xtbuf = XMALLOC(SBUF_SIZE, "xtbuf");
+	char *s = NULL, *xtp = NULL;
+	char xtbuf[SBUF_SIZE];
 
 	if (!mushconf.ansi_colors)
 	{
