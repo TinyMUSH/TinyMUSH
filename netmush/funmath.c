@@ -220,7 +220,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
  */
 void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, M_PI, (fargs[0] && *fargs[0]) ? atoi(fargs[0]) : FPTS_DIG);
+    fval(buff, bufc, M_PI, (fargs[0] && *fargs[0]) ? (int)strtol(fargs[0], (char **)NULL, 10) : FPTS_DIG);
 }
 
 /**
@@ -238,7 +238,7 @@ void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  */
 void fun_e(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    fval(buff, bufc, M_E, (fargs[0] && *fargs[0]) ? atoi(fargs[0]) : FPTS_DIG);
+    fval(buff, bufc, M_E, (fargs[0] && *fargs[0]) ? (int)strtol(fargs[0], (char **)NULL, 10) : FPTS_DIG);
 }
 
 /**
