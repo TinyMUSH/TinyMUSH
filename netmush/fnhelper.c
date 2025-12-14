@@ -195,6 +195,59 @@ char *split_token(char **sp, const Delim *sep)
 }
 
 /**
+ * @brief Parse ANSI escape sequence and update state.
+ *
+ * @param strp Pointer to string position (updated in place)
+ * @param ansi_state Current ANSI state (updated in place)
+ */
+#define PARSE_ANSI_SEQUENCE(strp, ansi_state)                                                       \
+	do                                                                                              \
+	{                                                                                               \
+		int ansi_mask = 0;                                                                          \
+		int ansi_diff = 0;                                                                          \
+		unsigned int param_val = 0;                                                                 \
+		++(strp);                                                                                   \
+		if (*(strp) == ANSI_CSI)                                                                    \
+		{                                                                                           \
+			while ((*(++(strp)) & 0xf0) == 0x30)                                                    \
+			{                                                                                       \
+				if (*(strp) < 0x3a)                                                                 \
+				{                                                                                   \
+					param_val <<= 1;                                                                \
+					param_val += (param_val << 2) + (*(strp) & 0x0f);                               \
+				}                                                                                   \
+				else                                                                                \
+				{                                                                                   \
+					if (param_val < I_ANSI_LIM)                                                     \
+					{                                                                               \
+						ansi_mask |= ansiBitsMask(param_val);                                       \
+						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val)); \
+					}                                                                               \
+					param_val = 0;                                                                  \
+				}                                                                                   \
+			}                                                                                       \
+		}                                                                                           \
+		while ((*(strp) & 0xf0) == 0x20)                                                            \
+		{                                                                                           \
+			++(strp);                                                                               \
+		}                                                                                           \
+		if (*(strp) == ANSI_END)                                                                    \
+		{                                                                                           \
+			if (param_val < I_ANSI_LIM)                                                             \
+			{                                                                                       \
+				ansi_mask |= ansiBitsMask(param_val);                                               \
+				ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));         \
+			}                                                                                       \
+			ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;                                     \
+			++(strp);                                                                               \
+		}                                                                                           \
+		else if (*(strp))                                                                           \
+		{                                                                                           \
+			++(strp);                                                                               \
+		}                                                                                           \
+	} while (0)
+
+/**
  * @brief Point at start of next token, and tell what color it is.
  *
  * @param str String with token
@@ -211,51 +264,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	{
 		while (*str == ESC_CHAR)
 		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(str);
-				if (*(str) == ANSI_CSI)
-				{
-					while ((*(++(str)) & 0xf0) == 0x30)
-					{
-						if (*(str) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(str) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(str) & 0xf0) == 0x20)
-				{
-					++(str);
-				}
-				if (*(str) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(str);
-				}
-				else if (*(str))
-				{
-					++(str);
-				}
-			} while (0);
+			PARSE_ANSI_SEQUENCE(str, ansi_state);
 		}
 
 		while (*str && (*str != sep->str[0]))
@@ -264,51 +273,7 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 
 			while (*str == ESC_CHAR)
 			{
-				do
-				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
-					++(str);
-					if (*(str) == ANSI_CSI)
-					{
-						while ((*(++(str)) & 0xf0) == 0x30)
-						{
-							if (*(str) < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*(str) & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*(str) & 0xf0) == 0x20)
-					{
-						++(str);
-					}
-					if (*(str) == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-						++(str);
-					}
-					else if (*(str))
-					{
-						++(str);
-					}
-				} while (0);
+				PARSE_ANSI_SEQUENCE(str, ansi_state);
 			}
 		}
 
@@ -381,7 +346,6 @@ int countwords(char *str, const Delim *sep)
 int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
 	unsigned char *tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
-	int initted = 0;
 	char *tok, *liststart;
 	int ntok, tokpos, i, bits;
 
@@ -392,11 +356,7 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	 *
 	 */
 
-	if (!initted)
-	{
-		XMEMSET(tok_starts, 0, sizeof(tok_starts));
-		initted = 1;
-	}
+	XMEMSET(tok_starts, 0, sizeof(tok_starts));
 
 	liststart = list = trim_space_sep(list, sep);
 	tok = split_token(&list, sep);
@@ -780,9 +740,13 @@ uint32_t random_range(uint32_t low, uint32_t high)
 
 	x = high - low;
 
-	if (UINT32_MAX < x)
+	/**
+	 * Check for overflow: if high - low + 1 would overflow uint32_t,
+	 * the range is invalid (x == UINT32_MAX means x+1 would overflow).
+	 */
+	if (x == UINT32_MAX)
 	{
-		return -1;
+		return 0;
 	}
 
 	x++;
