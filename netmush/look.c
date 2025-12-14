@@ -1806,6 +1806,8 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	BOOLEXP *bexp = NULL;
 	int control = 0, aflags = 0, alen = 0, do_parent = 0, is_special = 0;
 	time_t save_access_time = 0;
+	char created_str[26] = {0}, accessed_str[26] = {0}, modified_str[26] = {0};
+	struct tm tm_created = {0}, tm_accessed = {0}, tm_modified = {0};
 
 	/*
 	 * This command is pointless if the player can't hear.
@@ -1997,8 +1999,6 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			XFREE(buf2);
 		}
 		mushconf.many_coins[0] = savec;
-		char created_str[26], accessed_str[26], modified_str[26];
-		struct tm tm_created, tm_accessed, tm_modified;
 		if (localtime_r(&CreateTime(thing), &tm_created) != NULL)
 		{
 			if (strftime(created_str, sizeof(created_str), "%a %b %d %H:%M:%S %Y", &tm_created) > 0)
