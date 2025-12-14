@@ -824,6 +824,13 @@ void hashresize(HASHTAB *htab, int min_size)
         return;
     }
 
+    /* Guard against invalid hash_factor */
+    if (mushconf.hash_factor < 1)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash_factor %d, aborting resize", mushconf.hash_factor);
+        return;
+    }
+
     /* Calculate new size with overflow check */
     if (htab->entries > INT_MAX / mushconf.hash_factor)
     {
