@@ -590,6 +590,12 @@ int *hash_firstentry(HASHTAB *htab)
 {
     int hval;
 
+    /* Guard against uninitialized table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return NULL;
+    }
+
     /* Reset iterator state only, not stats */
     htab->last_entry = NULL;
     htab->last_hval = 0;
@@ -609,6 +615,13 @@ int *hash_nextentry(HASHTAB *htab)
 {
     int hval;
     HASHENT *hptr;
+
+    /* Guard against uninitialized table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return NULL;
+    }
+
     hval = htab->last_hval;
     hptr = htab->last_entry;
 
@@ -649,6 +662,19 @@ HASHKEY hash_firstkey_generic(HASHTAB *htab)
 {
     int hval;
 
+    /* Guard against uninitialized table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        if ((htab->flags & HT_TYPEMASK) == HT_STR)
+        {
+            return (HASHKEY)((char *)NULL);
+        }
+        else
+        {
+            return (HASHKEY)((int)-1);
+        }
+    }
+
     for (hval = 0; hval < htab->hashsize; hval++)
         if (htab->entry[hval] != NULL)
         {
@@ -671,6 +697,20 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
 {
     int hval;
     HASHENT *hptr;
+
+    /* Guard against uninitialized table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        if ((htab->flags & HT_TYPEMASK) == HT_STR)
+        {
+            return (HASHKEY)((char *)NULL);
+        }
+        else
+        {
+            return (HASHKEY)((int)-1);
+        }
+    }
+
     hval = htab->last_hval;
     hptr = htab->last_entry;
 
