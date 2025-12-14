@@ -157,6 +157,12 @@ void hashreset(HASHTAB *htab)
 
 static inline int get_hash_value(HASHKEY key, HASHTAB *htab)
 {
+    /* This should never happen if callers are correct, but be defensive */
+    if (htab == NULL)
+    {
+        return 0;
+    }
+
     int htype = htab->flags & HT_TYPEMASK;
 
     if (htype == HT_STR)
