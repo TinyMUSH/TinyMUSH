@@ -414,6 +414,7 @@ void fun_controls(char *buff, char **bufc, dbref player, dbref caller __attribut
 void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref it = match_thing(player, fargs[0]), thing = match_thing(player, fargs[1]);
+	dbref loc = NOTHING;
 
 	if (!Good_obj(it) || !Good_obj(thing))
 	{
@@ -421,7 +422,8 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 		return;
 	}
 
-	SAFE_BOOL(buff, bufc, (isExit(thing) ? Can_See_Exit(it, thing, Darkened(it, Location(thing))) : Can_See(it, thing, Sees_Always(it, Location(thing)))));
+	loc = Location(thing);
+	SAFE_BOOL(buff, bufc, (isExit(thing) ? Can_See_Exit(it, thing, Darkened(it, loc)) : Can_See(it, thing, Sees_Always(it, loc))));
 }
 
 /**
@@ -440,8 +442,10 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref obj1 = match_thing(player, fargs[0]), obj2 = match_thing(player, fargs[1]);
+	bool nb1 = nearby_or_control(player, obj1);
+	bool nb2 = nearby_or_control(player, obj2);
 
-	if (!(nearby_or_control(player, obj1) || nearby_or_control(player, obj2)))
+	if (!(nb1 || nb2))
 	{
 		SAFE_LB_CHR('0', buff, bufc);
 	}
