@@ -664,7 +664,7 @@ void pretty_format(char *dest, char **cp, char *p)
 		p++;
 	}
 
-	if (*(*cp - 1) != '\n')
+	if (cp && *cp && dest && (*cp > dest) && (*(*cp - 1) != '\n'))
 	{
 		SAFE_CRLF(dest, cp);
 	}
@@ -729,9 +729,15 @@ void pretty_print(char *dest, char *name, char *text)
 		 */
 		word = p;
 
-		while (*word && !isspace(*word))
+		while (word && *word && !isspace(*word))
 		{
 			word++;
+		}
+
+		if (!word)
+		{
+			SAFE_LB_STR(p, dest, &cp);
+			return;
 		}
 
 		while (*word && isspace(*word))
@@ -758,7 +764,7 @@ void pretty_print(char *dest, char *name, char *text)
 		SAFE_LB_STR(p, dest, &cp);
 	}
 
-	if ((cp - 1) && (*(cp - 1) != '\n'))
+	if (cp && dest && (cp > dest) && (*(cp - 1) != '\n'))
 	{
 		SAFE_CRLF(dest, &cp);
 	}
@@ -1754,13 +1760,13 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 
 void do_examine(dbref player, dbref cause, int key, char *name)
 {
-	dbref thing, content, exit, aowner, loc;
-	char savec;
+	dbref thing = NOTHING, content = NOTHING, exit = NOTHING, aowner = NOTHING, loc = NOTHING;
+	char savec = '\0';
 	char *temp = NULL, *buf = NULL, *buf2 = NULL;
 	char *timebuf = NULL;
 	BOOLEXP *bexp = NULL;
-	int control, aflags, alen, do_parent, is_special;
-	time_t save_access_time;
+	int control = 0, aflags = 0, alen = 0, do_parent = 0, is_special = 0;
+	time_t save_access_time = 0;
 
 	/*
 	 * This command is pointless if the player can't hear.
@@ -2261,14 +2267,20 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 			e = buff;
 			for (thing = Exits(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
-				if (e != buff)
+				if (e != buff && e && *e)
 				{
-					SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+					if ((e - buff + 2) < LBUF_SIZE)
+					{
+						SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+					}
 				}
 
 				safe_exit_name(thing, buff, &e);
 			}
-			*e = '\0';
+			if (e && buff)
+			{
+				*e = '\0';
+			}
 			notify(player, buff);
 			XFREE(buff);
 		}
@@ -2279,9 +2291,9 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 
 void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *name)
 {
-	dbref thing, i, j;
+	dbref thing = NOTHING, i = NOTHING, j = NOTHING;
 	char *exit = NULL, *message = NULL;
-	int control_thing, count = 0, low_bound, high_bound;
+	int control_thing = 0, count = 0, low_bound = 0, high_bound = 0;
 	FWDLIST *fp = NULL;
 	PROPDIR *pp = NULL;
 	parse_range(&name, &low_bound, &high_bound);
@@ -2433,7 +2445,10 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 		}
 	}
 
-	XFREE(message);
+	if (message)
+	{
+		XFREE(message);
+	}
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%d entrance%s found.", count, (count == 1) ? "" : "s");
 }
 
@@ -2441,18 +2456,11 @@ void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __a
 
 void sweep_check(dbref player, dbref what, int key, int is_loc)
 {
-	dbref aowner, parent;
-	int canhear, cancom, isplayer, ispuppet, isconnected, is_audible, attr, aflags, alen;
-	int is_parent, lev;
-	char *buf, *buf2, *bp, *as, *buff, *s;
-	ATTR *ap;
-	canhear = 0;
-	cancom = 0;
-	isplayer = 0;
-	ispuppet = 0;
-	isconnected = 0;
-	is_audible = 0;
-	is_parent = 0;
+	dbref aowner = NOTHING, parent = NOTHING;
+	int canhear = 0, cancom = 0, isplayer = 0, ispuppet = 0, isconnected = 0, is_audible = 0, attr = 0, aflags = 0, alen = 0;
+	int is_parent = 0, lev = 0;
+	char *buf = NULL, *buf2 = NULL, *bp = NULL, *as = NULL, *buff = NULL, *s = NULL;
+	ATTR *ap = NULL;
 
 	if ((key & SWEEP_LISTEN) && ((isExit(what) || is_loc) && Audible(what)))
 	{
