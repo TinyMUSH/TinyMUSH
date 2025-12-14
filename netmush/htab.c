@@ -71,8 +71,15 @@ int get_hashmask(int *size)
         *size = 1;
     }
 
-    /* Check for overflow: if tsize would exceed INT_MAX/2, cap it */
-    for (tsize = 1; tsize < *size && tsize > 0; tsize = tsize << 1)
+    /* Check for overflow: cap at largest safe power of 2 */
+    if (*size > (INT_MAX / 2))
+    {
+        *size = (INT_MAX / 2) + 1; /* Largest power of 2 that fits in int */
+        return *size - 1;
+    }
+
+    /* Find next power-of-two >= size */
+    for (tsize = 1; tsize < *size; tsize = tsize << 1)
         ;
 
     *size = tsize;
