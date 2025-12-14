@@ -720,7 +720,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	 * have to go token by token.
 	 *
 	 */
-	if (!strcmp((&isep)->str, (&osep)->str))
+	if (!strcmp(isep.str, osep.str))
 	{
 		/**
 		 * Count off the words in the string to save
@@ -2040,7 +2040,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		anum = NOTHING;
 		ap = NULL;
 		atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-		alen = strlen((fargs[0]) + 8);
+		alen = strlen(fargs[0] + 8);
 		__xstrcpy(atext, fargs[0] + 8);
 		atext[alen] = '\0';
 		aowner = player;
@@ -2124,22 +2124,22 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 static int
 compare_items(const char *s1, const char *s2, int sort_type, int *ip1, int *ip2, double *fp1, double *fp2)
 {
-if (sort_type == ALPHANUM_LIST)
-{
-return strcmp(s1, s2);
-}
-else if (sort_type == NOCASE_LIST)
-{
-return strcasecmp(s1, s2);
-}
-else if (sort_type == FLOAT_LIST)
-{
-return (*fp1 > *fp2) ? 1 : ((*fp1 < *fp2) ? -1 : 0);
-}
-else
-{
-return (*ip1 > *ip2) ? 1 : ((*ip1 < *ip2) ? -1 : 0);
-}
+	if (sort_type == ALPHANUM_LIST)
+	{
+		return strcmp(s1, s2);
+	}
+	else if (sort_type == NOCASE_LIST)
+	{
+		return strcasecmp(s1, s2);
+	}
+	else if (sort_type == FLOAT_LIST)
+	{
+		return (*fp1 > *fp2) ? 1 : ((*fp1 < *fp2) ? -1 : 0);
+	}
+	else
+	{
+		return (*ip1 > *ip2) ? 1 : ((*ip1 < *ip2) ? -1 : 0);
+	}
 }
 
 void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -4365,7 +4365,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			anum = NOTHING;
 			ap = NULL;
 			atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-			alen = strlen((fargs[1]) + 8);
+			alen = strlen(fargs[1] + 8);
 			__xstrcpy(atext, fargs[1] + 8);
 			atext[alen] = '\0';
 			aowner = player;
