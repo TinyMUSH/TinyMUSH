@@ -789,6 +789,7 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
     }
 
     XFREE(buf);
+    XFREE(prefix);
 }
 
 /* ---------------------------------------------------------------------------
@@ -810,8 +811,8 @@ void interp_nametab(dbref player, NAMETAB *ntab, int flagword, char *prefix, cha
         if (God(player) || check_access(player, nt->perm))
         {
             raw_notify(player, "%-30.30s %s", nt->name, (flagword & nt->flag) ? true_text : false_text);
-            ++nt;
         }
+        ++nt;
     }
     if (show_sep)
     {
