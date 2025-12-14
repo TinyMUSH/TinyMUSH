@@ -1502,7 +1502,16 @@ void do_timecheck(dbref player, dbref cause __attribute__((unused)), int key)
 
 char **add_array(char **b, char *s, int *i)
 {
-	b = (char **)XREALLOC(b, (*i + 1) * sizeof(char *), "b");
+	static int capacity = 0;
+	int new_capacity;
+
+	/* Growth strategy: allocate in chunks to avoid O(n²) reallocations */
+	if (*i >= capacity)
+	{
+		new_capacity = (capacity == 0) ? 16 : capacity * 2;
+		b = (char **)XREALLOC(b, new_capacity * sizeof(char *), "b");
+		capacity = new_capacity;
+	}
 
 	if (s != NULL)
 	{
@@ -1511,6 +1520,7 @@ char **add_array(char **b, char *s, int *i)
 	else
 	{
 		b[*i] = NULL;
+		capacity = 0; /* Reset capacity on array termination */
 	}
 
 	*i = *i + 1;
@@ -1834,27 +1844,36 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 	if ((fp = popen(s, "r")) != NULL)
 	{
+		int pclose_status;
+		char *nl;
+
 		while (fgets(buff, MBUF_SIZE, fp) != NULL)
 		{
-			if ((tb = strchr(buff, '\n')))
-			{
-				tb[0] = 0x00;
-			}
-
-			if ((tb = strchr(buff, '\r')))
-			{
-				tb[0] = 0x00;
-			}
+			/* Strip both \r and \n more efficiently */
+			nl = buff + strcspn(buff, "\r\n");
+			*nl = 0x00;
 
 			log_write(LOG_ALWAYS, "BCK", "RUN", "%s", buff);
 		}
 
-		pclose(fp);
-		log_write(LOG_ALWAYS, "BCK", "RUN", "External command done");
-
-		if (player != NOTHING)
+		pclose_status = pclose(fp);
+		if (pclose_status == -1)
 		{
-			notify(player, "External command done");
+			log_write(LOG_ALWAYS, "BCK", "RUN", "External command error: %s", safe_strerror(errno));
+
+			if (player != NOTHING)
+			{
+				notify(player, "External command error");
+			}
+		}
+		else
+		{
+			log_write(LOG_ALWAYS, "BCK", "RUN", "External command done");
+
+			if (player != NOTHING)
+			{
+				notify(player, "External command done");
+			}
 		}
 	}
 	else
