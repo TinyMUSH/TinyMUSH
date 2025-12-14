@@ -80,7 +80,7 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     dp = cp = curr = XMALLOC(LBUF_SIZE, "curr");
     str = fargs[0];
-    exec(curr, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+    eval_expression_string(curr, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
     cp = trim_space_sep(cp, &isep);
 
     if (!*cp)
@@ -108,12 +108,12 @@ void perform_loop(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         if (!flag)
         {
-            exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
         }
         else
         {
             dp = result = XMALLOC(LBUF_SIZE, "result");
-            exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            eval_expression_string(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
             notify(cause, result);
             XFREE(result);
         }
@@ -283,7 +283,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
      */
     input_p = lp = list_str = XMALLOC(LBUF_SIZE, "list_str");
     str = fargs[0];
-    exec(list_str, &lp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+    eval_expression_string(list_str, &lp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
     input_p = trim_space_sep(input_p, &isep);
 
     /**
@@ -294,7 +294,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         input_p2 = lp2 = list_str2 = XMALLOC(LBUF_SIZE, "list_str2");
         str = fargs[1];
-        exec(list_str2, &lp2, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+        eval_expression_string(list_str2, &lp2, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
         input_p2 = trim_space_sep(input_p2, &isep);
     }
     else
@@ -361,7 +361,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         if (!need_result)
         {
-            exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
             if (need_bool)
             {
@@ -371,7 +371,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         else
         {
             dp = result = XMALLOC(LBUF_SIZE, "result");
-            exec(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+            eval_expression_string(result, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
             if (need_bool)
             {
@@ -657,7 +657,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         clist[1] = split_token(&cp, &isep);
         result = bp = XMALLOC(LBUF_SIZE, "result");
         str = atextbuf;
-        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
         i++;
     }
     else
@@ -666,7 +666,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         clist[1] = split_token(&cp, &isep);
         result = bp = XMALLOC(LBUF_SIZE, "fun_fold");
         str = atextbuf;
-        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
         i += 2;
     }
 
@@ -683,7 +683,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
-        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
+        eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, clist, 3);
         XSTRCPY(rstore, result);
         XFREE(result);
         i++;
@@ -835,7 +835,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
         str = atextbuf;
-        exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
 
         if ((!flag && (*result == '1')) || (flag && xlate(result)))
         {
@@ -987,7 +987,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
         i++;
     }
 
@@ -1135,7 +1135,7 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
         }
 
         str = atextbuf;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, os, lastn);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, os, lastn);
     }
 
     XFREE(atext);
@@ -1257,7 +1257,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), i);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), i);
     }
 
     XFREE(atext);
@@ -1411,7 +1411,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cbuf, 2);
     }
 
     XFREE(atextbuf);
@@ -1546,7 +1546,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     print_separator(&isep, st[1], &bp);
     bp = rlist = XMALLOC(LBUF_SIZE, "rlist");
     str = atext;
-    exec(rlist, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, st, 2);
+    eval_expression_string(rlist, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, st, 2);
 
     /**
      * Now that we have our result, put it back into array form. Search
@@ -1767,7 +1767,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         atextbuf[alen1] = '\0';
         str = atextbuf;
         savep = *bufc;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
 
         if (!is_same)
         {
@@ -1775,7 +1775,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             atextbuf[alen2] = '\0';
             dp = savep = condbuf;
             str = atextbuf;
-            exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
+            eval_expression_string(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 2);
         }
 
         if (!strcmp(savep, fargs[3]))

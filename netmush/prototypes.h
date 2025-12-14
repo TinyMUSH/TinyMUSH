@@ -345,7 +345,7 @@ extern char *get_subj(int subj);
 extern char *get_poss(int poss);
 extern char *get_obj(int obj);
 extern char *get_absp(int absp);
-extern void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs);
+extern void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs);
 extern GDATA *save_global_regs(const char *funcname);
 extern void restore_global_regs(const char *funcname, GDATA *preserve);
 

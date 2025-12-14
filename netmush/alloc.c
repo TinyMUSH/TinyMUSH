@@ -19,7 +19,14 @@
 #include "externs.h"
 #include "prototypes.h"
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+
+/**
+ * @brief Alignment value for MEMTRACK structures (16 bytes for cache line optimization)
+ */
+#define MEMTRACK_ALIGNMENT 16
 
 /**
  * Macros and utilities.
@@ -30,6 +37,37 @@
 	{                                         \
 		log_write(x, y, z, s, ##__VA_ARGS__); \
 	}
+
+/**
+ * @brief Allocate aligned memory for MEMTRACK structure
+ *
+ * Uses C11 aligned_alloc if available, otherwise uses posix_memalign or malloc.
+ * Ensures MEMTRACK structures are properly aligned for optimal cache performance.
+ *
+ * @param size Total size to allocate (including MEMTRACK header and magic)
+ * @return void* Pointer to aligned memory, or NULL on failure
+ */
+static inline void *__xalloc_aligned(size_t size)
+{
+	void *ptr = NULL;
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+	// C11 aligned_alloc requires size to be a multiple of alignment
+	size_t aligned_size = ((size + MEMTRACK_ALIGNMENT - 1) / MEMTRACK_ALIGNMENT) * MEMTRACK_ALIGNMENT;
+	ptr = aligned_alloc(MEMTRACK_ALIGNMENT, aligned_size);
+#elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+	// POSIX posix_memalign
+	if (posix_memalign(&ptr, MEMTRACK_ALIGNMENT, size) != 0)
+	{
+		ptr = NULL;
+	}
+#else
+	// Fallback to regular malloc - compiler will align MEMTRACK due to __attribute__((aligned(16)))
+	ptr = malloc(size);
+#endif
+
+	return ptr;
+}
 
 /**
  * Allocation functions
@@ -63,13 +101,16 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 		if (var)
 		{
 			MEMTRACK *mtrk = NULL;
+			size_t total_size = size + sizeof(MEMTRACK) + sizeof(uint64_t);
 
-			// mtrk = (MEMTRACK *)calloc(size + sizeof(MEMTRACK) + sizeof(uint64_t), sizeof(char));
-			mtrk = (MEMTRACK *)malloc(size + sizeof(MEMTRACK) + sizeof(uint64_t));
-			memset(mtrk, 0, size + sizeof(MEMTRACK) + sizeof(uint64_t));
+			// Use aligned allocation for MEMTRACK structure
+			mtrk = (MEMTRACK *)__xalloc_aligned(total_size);
 
 			if (mtrk)
 			{
+				// Zero-initialize the allocated memory
+				memset(mtrk, 0, total_size);
+
 				mtrk->bptr = (void *)((char *)mtrk + sizeof(MEMTRACK));
 				mtrk->size = size;
 				mtrk->file = file;
@@ -98,11 +139,10 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
  * The __xcalloc() function allocates memory for an array of nmemb elements of size bytes each and
  * returns a pointer to the allocated memory. The memory is set to zero.  If nmemb or size is 0, then
  * calloc() returns NULL. If the multiplication of nmemb and size would result in integer overflow,
- * then __xcalloc() returns an error.
+ * then __xcalloc() returns NULL.
  *
- * This variant doesn't check if the multiplication of nmemb and size would result in integer
- * overflow, so don't be silly and don't try to allocate more than 18 exabytes of memory (or
- * 4 gigabytes if your still on 32 bits).
+ * This variant checks for integer overflow using SIZE_MAX bounds checking before performing
+ * the multiplication to prevent security vulnerabilities.
  *
  * Do not call this directly, use the wrapper macro XCALLOC(size_t nmemb, size_t size, const char *var)
  * that will fill most of the banks for you.
@@ -113,12 +153,21 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
  * @param line     Line number where the allocation is done.
  * @param function Function where the allocation is done.
  * @param var      Name of the variable that will receive the pointer (not the variable itself).
- * @return void*   Pointer to the allocated buffer.
+ * @return void*   Pointer to the allocated buffer, or NULL if overflow detected.
  */
 void *__xcalloc(size_t nmemb, size_t size, const char *file, int line, const char *function, const char *var)
 {
-	if ((nmemb * size) > 0)
+	/**
+	 * Check for integer overflow: if nmemb > SIZE_MAX / size, then nmemb * size would overflow.
+	 * We check this before multiplication to avoid undefined behavior.
+	 */
+	if (nmemb > 0 && size > 0)
 	{
+		if (nmemb > SIZE_MAX / size)
+		{
+			XLOGALLOC(LOG_ALWAYS, "MEM", "ERROR", "Integer overflow detected in __xcalloc(%zu, %zu)", nmemb, size);
+			return NULL;
+		}
 		return __xmalloc(nmemb * size, file, line, function, var);
 	}
 
@@ -654,7 +703,11 @@ char *__xstrdup(const char *s, const char *file, int line, const char *function,
 	{
 		size_t l = strlen(s);
 		r = (char *)__xmalloc(l + 1, file, line, function, var);
-		strcpy(r, s);
+		if (r)
+		{
+			strncpy(r, s, l);
+			r[l] = '\0'; // Ensure null termination
+		}
 	}
 
 	return (r);

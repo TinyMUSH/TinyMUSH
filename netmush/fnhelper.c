@@ -623,7 +623,7 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		tstr = bp = XMALLOC(LBUF_SIZE, "tstr");
 		str = fargs[sep_arg - 1];
-		exec(tstr, &bp, player, caller, cause, EV_EVAL | EV_FCHECK, &str, cargs, ncargs);
+		eval_expression_string(tstr, &bp, player, caller, cause, EV_EVAL | EV_FCHECK, &str, cargs, ncargs);
 		tlen = strlen(tstr);
 	}
 	else

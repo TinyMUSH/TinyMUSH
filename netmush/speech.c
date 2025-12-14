@@ -73,7 +73,7 @@ void do_think(dbref player, dbref cause, __attribute__((unused)) int key, char *
 	char *str, *buf, *bp;
 	buf = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = message;
-	exec(buf, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
+	eval_expression_string(buf, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
 	notify(player, buf);
 	XFREE(buf);
 }
@@ -83,7 +83,7 @@ int check_speechformat(dbref player, dbref speaker, dbref loc, dbref thing, char
 	char *sargs[2], *buff;
 	int aflags;
 	/*
-	 * We have to make a copy of our arguments, because the exec() we
+	 * We have to make a copy of our arguments, because the eval_expression_string() we
 	 * * pass it through later can nibble those arguments, and we may
 	 * * need to call this function more than once on the same message.
 	 */
@@ -550,7 +550,7 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	{
 		str2 = bp = XMALLOC(LBUF_SIZE, "str2");
 		buf = str;
-		exec(str2, &bp, target, player, player, EV_FCHECK | EV_EVAL | EV_TOP | EV_NO_LOCATION, &buf, (char **)NULL, 0);
+		eval_expression_string(str2, &bp, target, player, player, EV_FCHECK | EV_EVAL | EV_TOP | EV_NO_LOCATION, &buf, (char **)NULL, 0);
 
 		if (*str2)
 		{

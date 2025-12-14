@@ -594,7 +594,7 @@ int check_filter(dbref object, dbref player, int filter, const char *msg)
 		preserve = save_global_regs("check_filter.save");
 		nbuf = dp = XMALLOC(LBUF_SIZE, "dp");
 		str = buf;
-		exec(nbuf, &dp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
+		eval_expression_string(nbuf, &dp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
 		dp = nbuf;
 		XFREE(buf);
 		restore_global_regs("check_filter.restore", preserve);
@@ -666,7 +666,7 @@ char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const 
 		preserve = save_global_regs("add_prefix_save");
 		nbuf = cp = XMALLOC(LBUF_SIZE, "cp");
 		str = buf;
-		exec(nbuf, &cp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
+		eval_expression_string(nbuf, &cp, object, player, player, EV_FIGNORE | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
 		XFREE(buf);
 		restore_global_regs("add_prefix_restore", preserve);
 		buf = nbuf;

@@ -283,7 +283,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			preserve = save_global_regs("eval_boolexp_save");
 			buff2 = bp = XMALLOC(LBUF_SIZE, "buff2");
 			str = buff;
-			exec(buff2, &bp, source, ((lock_originator == NOTHING) ? player : lock_originator), player, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
+			eval_expression_string(buff2, &bp, source, ((lock_originator == NOTHING) ? player : lock_originator), player, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
 			restore_global_regs("eval_boolexp_save", preserve);
 			checkit = !string_compare(buff2, (char *)b->sub1);
 			XFREE(buff2);

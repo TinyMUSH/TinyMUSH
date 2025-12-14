@@ -411,7 +411,7 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 		{
 			str = line;
 			bp = result;
-			exec(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
+			eval_expression_string(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL, result);
 		}
 		else
@@ -533,7 +533,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 		{
 			str = line;
 			bp = result;
-			exec(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
+			eval_expression_string(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
 			SAFE_LB_STR(result, buff, bufc);
 		}
 		else

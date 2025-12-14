@@ -1891,7 +1891,7 @@ int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref playe
 	elems[1] = (char *)s2;
 	XSTRCPY(tbuf, cbuff);
 	result = bp = XMALLOC(LBUF_SIZE, "result");
-	exec(result, &bp, thing, player, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tbuf, elems, 2);
+	eval_expression_string(result, &bp, thing, player, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tbuf, elems, 2);
 	n = (int)strtol(result, (char **)NULL, 10);
 	XFREE(result);
 	XFREE(tbuf);
@@ -4427,7 +4427,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 				XMEMCPY(atextbuf, atext, alen);
 				atextbuf[alen] = '\0';
 				str = atextbuf;
-				exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 1);
+				eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, objs, 1);
 			}
 		}
 

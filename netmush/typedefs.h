@@ -25,6 +25,12 @@ typedef int dbref;
 typedef int FLAG;
 typedef int POWER;
 
+/**
+ * @brief Memory tracking header structure
+ *
+ * Aligned to 16 bytes for optimal performance on modern architectures.
+ * This ensures proper cache line alignment and prevents false sharing.
+ */
 typedef struct tracemem_header
 {
     size_t size;
@@ -35,7 +41,7 @@ typedef struct tracemem_header
     const char *var;
     uint64_t *magic;
     struct tracemem_header *next;
-} MEMTRACK;
+} __attribute__((aligned(16))) MEMTRACK;
 
 typedef struct hookentry
 {
@@ -1415,7 +1421,5 @@ typedef struct
     VT100COLOR background;
     bool reset;
 } VT100ATTR;
-
-
 
 #endif /* __TYPEDEFS_H */

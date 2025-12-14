@@ -447,7 +447,7 @@ dbref find_var_dest(dbref player, dbref exit)
     preserve = save_global_regs("find_var_dest_save");
     ebuf = ep = XMALLOC(LBUF_SIZE, "ep");
     str = buf;
-    exec(ebuf, &ep, exit, player, player, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
+    eval_expression_string(ebuf, &ep, exit, player, player, EV_FCHECK | EV_EVAL | EV_TOP, &str, (char **)NULL, 0);
     XFREE(buf);
     restore_global_regs("find_var_dest_save", preserve);
 

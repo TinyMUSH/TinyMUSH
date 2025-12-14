@@ -982,7 +982,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 			buff2 = replace_string(BOUND_VAR, buff, parm->s_rst_eval);
 			result = bp = XMALLOC(LBUF_SIZE, "result");
 			str = buff2;
-			exec(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, (char **)NULL, 0);
+			eval_expression_string(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, (char **)NULL, 0);
 			XFREE(buff2);
 
 			if (!*result || !xlate(result))
@@ -1005,7 +1005,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 			result = bp = XMALLOC(LBUF_SIZE, "result");
 			XSTRCPY(atext, parm->s_rst_ufuntxt);
 			str = atext;
-			exec(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, &buff, 1);
+			eval_expression_string(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, &buff, 1);
 
 			if (!*result || !xlate(result))
 			{

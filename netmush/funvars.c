@@ -836,7 +836,7 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     save_state = mushstate.f_limitmask;
     mushstate.f_limitmask |= lmask;
     str = fargs[1];
-    exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+    eval_expression_string(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
     mushstate.f_limitmask = save_state;
 }
 
@@ -1139,7 +1139,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Evaluate it using the rest of the passed function args
      */
     str = atext;
-    exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, (Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3]), nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3));
+    eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, (Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3]), nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3));
     XFREE(atext);
 
     /*
@@ -1859,7 +1859,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
     varlist = bp = XMALLOC(LBUF_SIZE, "varlist");
     str = fargs[0];
-    exec(varlist, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+    eval_expression_string(varlist, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
     n_xvars = list2arr(&xvar_names, LBUF_SIZE / 2, varlist, &SPACE_DELIM);
 
     if (n_xvars == 0)
@@ -1923,7 +1923,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
          */
         elemlist = bp = XMALLOC(LBUF_SIZE, "elemlist");
         str = fargs[1];
-        exec(elemlist, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+        eval_expression_string(elemlist, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
         n_elems = list2arr(&elems, LBUF_SIZE / 2, elemlist, &isep);
 
         if (n_elems != n_xvars)
@@ -1959,7 +1959,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * Now we go to execute our function body.
      */
     str = fargs[2];
-    exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+    eval_expression_string(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 
     /*
      * Restore the old values.
@@ -4834,7 +4834,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         atextbuf[alen1] = 0;
         str = atextbuf;
         savep = *bufc;
-        exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
+        eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
 
         if (!is_same)
         {
@@ -4842,7 +4842,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             atextbuf[alen2] = '\0';
             dp = savep = condbuf;
             str = atextbuf;
-            exec(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
+            eval_expression_string(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
         }
 
         subpatterns = pcre_exec(re, NULL, savep, strlen(savep), 0, 0, offsets, PCRE_MAX_OFFSETS);

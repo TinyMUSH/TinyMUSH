@@ -571,7 +571,7 @@ void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller __attrib
 	else
 	{
 		str = pronouns[Func_Flags(fargs)];
-		exec(buff, bufc, it, it, it, 0, &str, (char **)NULL, 0);
+		eval_expression_string(buff, bufc, it, it, it, 0, &str, (char **)NULL, 0);
 	}
 }
 
@@ -2132,7 +2132,7 @@ void fun_zfun(char *buff, char **bufc, dbref player, dbref caller, dbref cause _
 	 * player, not the cause. You can still get the caller, though.
 	 *
 	 */
-	exec(buff, bufc, zone, caller, player, EV_EVAL | EV_STRIP | EV_FCHECK, &str, &(fargs[1]), nfargs - 1);
+	eval_expression_string(buff, bufc, zone, caller, player, EV_EVAL | EV_STRIP | EV_FCHECK, &str, &(fargs[1]), nfargs - 1);
 	XFREE(tbuf1);
 }
 
@@ -2272,7 +2272,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 	SAFE_SB_STR(fargs[0], sbuf, &sbufc);
 	*sbufc = '\0';
 	str = sbuf;
-	exec(buff, bufc, player, caller, cause, EV_FIGNORE, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_FIGNORE, &str, cargs, ncargs);
 	XFREE(sbuf);
 }
 
@@ -2333,7 +2333,7 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 	if (eval_it)
 	{
 		str = atr_gotten;
-		exec(buff, bufc, thing, player, player, EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
+		eval_expression_string(buff, bufc, thing, player, player, EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
 	}
 	else
 	{
@@ -2369,7 +2369,7 @@ void fun_eval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	if (nfargs == 1)
 	{
 		char *str = fargs[0];
-		exec(buff, bufc, player, caller, cause, EV_EVAL | EV_FCHECK, &str, (char **)NULL, 0);
+		eval_expression_string(buff, bufc, player, caller, cause, EV_EVAL | EV_FCHECK, &str, (char **)NULL, 0);
 		return;
 	}
 
@@ -2484,7 +2484,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	 *
 	 */
 	str = atext;
-	exec(buff, bufc, thing, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[1]), nfargs - 1);
+	eval_expression_string(buff, bufc, thing, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[1]), nfargs - 1);
 	XFREE(atext);
 
 	/**
@@ -2641,7 +2641,7 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 	 *
 	 */
 	str = atext;
-	exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[2]), nfargs - 2);
+	eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, &(fargs[2]), nfargs - 2);
 	XFREE(atext);
 }
 
@@ -2666,7 +2666,7 @@ void fun_localize(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	;
 	GDATA *preserve = save_global_regs("fun_localize_save");
 
-	exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 	restore_global_regs("fun_localize_restore", preserve);
 }
 
@@ -2691,7 +2691,7 @@ void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	GDATA *preserve = mushstate.rdata;
 	mushstate.rdata = NULL;
 
-	exec(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 
 	if (mushstate.rdata)
 	{
@@ -2763,7 +2763,7 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	char *objname = NULL, *atr_gotten = NULL, *bp = NULL, *str = fargs[0];
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
 
-	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
 	/**
 	 * First we check to see that the attribute exists on the object. If
@@ -2801,7 +2801,7 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	 *
 	 */
 	str = fargs[1];
-	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
 /**
@@ -2830,7 +2830,7 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
 
-	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
 	/**
 	 * First we check to see that the attribute exists on the object. If
@@ -2850,7 +2850,7 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				if (*atr_gotten)
 				{
 					str = atr_gotten;
-					exec(buff, bufc, thing, player, player, EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
+					eval_expression_string(buff, bufc, thing, player, player, EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
 					XFREE(atr_gotten);
 					XFREE(objname);
 					return;
@@ -2869,7 +2869,7 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 *
 	 */
 	str = fargs[1];
-	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
 /**
@@ -2906,7 +2906,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	str = fargs[0];
 	objname = bp = XMALLOC(LBUF_SIZE, "objname");
-	exec(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(objname, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 
 	/**
 	 * First we check to see that the attribute exists on the object. If
@@ -2946,7 +2946,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 					{
 						bp = xargs[j] = XMALLOC(LBUF_SIZE, "xargs[j]");
 						str = fargs[i];
-						exec(xargs[j], &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+						eval_expression_string(xargs[j], &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 					}
 					else
 					{
@@ -2970,7 +2970,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				}
 
 				str = atext;
-				exec(buff, bufc, thing, player, cause, EV_FCHECK | EV_EVAL, &str, xargs, nfargs - 2);
+				eval_expression_string(buff, bufc, thing, player, cause, EV_FCHECK | EV_EVAL, &str, xargs, nfargs - 2);
 
 				if (trace_flag)
 				{
@@ -3004,7 +3004,7 @@ void fun_udefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 *
 	 */
 	str = fargs[1];
-	exec(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
 }
 
 /**
@@ -3032,7 +3032,7 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	name = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
-	exec(name, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(name, &bp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 	obj = match_thing(player, name);
 
 	/**
@@ -3050,7 +3050,7 @@ void fun_objeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	str = fargs[1];
-	exec(buff, bufc, obj, player, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &str, cargs, ncargs);
 	XFREE(name);
 }
 
@@ -4081,7 +4081,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 		tbuf[trans_len] = '\0';
 		tp = tbuf;
 		bp = result;
-		exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, tstack, 3);
+		eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, tstack, 3);
 
 		if (result && *result)
 		{
@@ -4103,7 +4103,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 
 			tp = tbuf;
 			bp = result;
-			exec(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, estack, 2);
+			eval_expression_string(result, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &tp, estack, 2);
 
 			if (result && *result)
 			{

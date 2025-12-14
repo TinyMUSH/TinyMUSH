@@ -260,7 +260,7 @@ static int add_mail_message(dbref player, char *message)
     atrstr = atr_get(player, A_SIGNATURE, &aowner, &aflags, &alen);
     execstr = bp = XMALLOC(LBUF_SIZE, "execstr");
     str = atrstr;
-    exec(execstr, &bp, player, player, player, EV_STRIP | EV_FCHECK | EV_EVAL, &str, (char **)NULL, 0);
+    eval_expression_string(execstr, &bp, player, player, player, EV_STRIP | EV_FCHECK | EV_EVAL, &str, (char **)NULL, 0);
     s = XMALLOC(LBUF_SIZE, "s");
     snprintf(s, LBUF_SIZE, "%s %s", message, execstr);
     mod_mail_config.mail_list[number].message = XSTRDUP(s, "mod_mail_config.mail_list[number].message");

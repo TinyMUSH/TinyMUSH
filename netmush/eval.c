@@ -483,7 +483,7 @@ char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char de
 		{
 			bp = fargs[arg] = XMALLOC(LBUF_SIZE, "fargs[arg]");
 			str = tstr;
-			exec(fargs[arg], &bp, player, caller, cause, eval | EV_FCHECK, &str, cargs, ncargs);
+			eval_expression_string(fargs[arg], &bp, player, caller, cause, eval | EV_FCHECK, &str, cargs, ncargs);
 		}
 		else
 		{
@@ -827,7 +827,7 @@ char *get_absp(int absp)
  * @param cargs		Command arguments
  * @param ncargs	Number of command arguments
  */
-void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs)
+void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs)
 {
 	char *real_fargs[MAX_NFARGS + 1];
 	char **fargs = real_fargs + 1;
@@ -979,7 +979,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 			else
 			{
 				str = tbuf;
-				exec(buff, bufc, player, caller, cause, (eval | EV_FCHECK | EV_FMAND), &str, cargs, ncargs);
+				eval_expression_string(buff, bufc, player, caller, cause, (eval | EV_FCHECK | EV_FMAND), &str, cargs, ncargs);
 				(*dstr)--;
 			}
 
@@ -1018,7 +1018,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 				}
 
 				str = tbuf;
-				exec(buff, bufc, player, caller, cause, (eval & ~(EV_STRIP | EV_FCHECK)), &str, cargs, ncargs);
+				eval_expression_string(buff, bufc, player, caller, cause, (eval & ~(EV_STRIP | EV_FCHECK)), &str, cargs, ncargs);
 
 				if (!(eval & EV_STRIP))
 				{
@@ -2004,7 +2004,7 @@ void exec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int 
 						preserve = save_global_regs("eval.save");
 					}
 
-					exec(buff, bufc, i, player, cause, ((ufp->flags & FN_NO_EVAL) ? (EV_FCHECK | EV_EVAL) : feval), &str, fargs, nfargs);
+					eval_expression_string(buff, bufc, i, player, cause, ((ufp->flags & FN_NO_EVAL) ? (EV_FCHECK | EV_EVAL) : feval), &str, fargs, nfargs);
 
 					if (ufp->flags & FN_NOREGS)
 					{

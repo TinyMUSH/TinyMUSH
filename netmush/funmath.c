@@ -2229,7 +2229,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         {
             str = fargs[i];
             bp = tbuf;
-            exec(tbuf, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
+            eval_expression_string(tbuf, &bp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &str, cargs, ncargs);
             val = ((oper == LOGIC_XOR) && val) ? !cvtfun(flag, tbuf) : cvtfun(flag, tbuf);
 
             if (((oper == LOGIC_AND) && !val) || ((oper == LOGIC_OR) && val))

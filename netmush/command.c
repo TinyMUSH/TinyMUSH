@@ -303,7 +303,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
 	str = tstr;
 	preserve = save_global_regs("check_userdef_access");
 	bp = buf = XMALLOC(LBUF_SIZE, "buf");
-	exec(buf, &bp, hookp->thing, player, player, EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+	eval_expression_string(buf, &bp, hookp->thing, player, player, EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 	restore_global_regs("check_userdef_access", preserve);
 	result = xlate(buf);
 	XFREE(buf);
@@ -347,7 +347,7 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attri
 	}
 
 	buf = bp = XMALLOC(LBUF_SIZE, "buf");
-	exec(buf, &bp, hp->thing, player, player, EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+	eval_expression_string(buf, &bp, hp->thing, player, player, EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 	XFREE(buf);
 
 	if (save_globs & CS_PRESERVE)
@@ -646,7 +646,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			buf1 = bp = XMALLOC(LBUF_SIZE, "buf1");
 			str = arg;
-			exec(buf1, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+			eval_expression_string(buf1, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 		}
 		else
 		{
@@ -842,7 +842,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 		buf1 = bp = XMALLOC(LBUF_SIZE, "buf1");
 		str = buf2;
-		exec(buf1, &bp, player, cause, cause, EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
+		eval_expression_string(buf1, &bp, player, cause, cause, EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
 
 		if (cmdp->callseq & CS_ARGV)
 		{
@@ -888,7 +888,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			{
 				buf2 = bp = XMALLOC(LBUF_SIZE, "buf2");
 				str = arg;
-				exec(buf2, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+				eval_expression_string(buf2, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 			}
 			else if (cmdp->callseq & CS_UNPARSE)
 			{
@@ -1364,7 +1364,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	str = evcmd = XMALLOC(LBUF_SIZE, "evcmd");
 	XSTRCPY(evcmd, command);
 	bp = lcbuf;
-	exec(lcbuf, &bp, player, cause, cause, EV_EVAL | EV_FCHECK | EV_STRIP | EV_TOP, &str, args, nargs);
+	eval_expression_string(lcbuf, &bp, player, cause, cause, EV_EVAL | EV_FCHECK | EV_STRIP | EV_TOP, &str, args, nargs);
 	XFREE(evcmd);
 	succ = 0;
 

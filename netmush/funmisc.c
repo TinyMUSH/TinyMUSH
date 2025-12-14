@@ -84,7 +84,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "mbuff");
 	str = fargs[0];
-	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
 	 * Loop through the patterns looking for a match
@@ -97,7 +97,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	{
 		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 		str = fargs[i];
-		exec(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 		if (quick_wild(tbuff, mbuff))
 		{
@@ -105,7 +105,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 			XFREE(tbuff);
 			mushstate.switch_token = mbuff;
 			str = fargs[i + 1];
-			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 		}
 		else
 		{
@@ -121,7 +121,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	{
 		mushstate.switch_token = mbuff;
 		str = fargs[i];
-		exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	}
 
 	XFREE(mbuff);
@@ -169,7 +169,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
-	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
 	 * Loop through the patterns looking for a match
@@ -182,14 +182,14 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 		str = fargs[i];
-		exec(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 		if (quick_wild(tbuff, mbuff))
 		{
 			XFREE(tbuff);
 			mushstate.switch_token = mbuff;
 			str = fargs[i + 1];
-			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 			XFREE(mbuff);
 			mushstate.in_switch--;
 			mushstate.switch_token = save_token;
@@ -207,7 +207,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		mushstate.switch_token = mbuff;
 		str = fargs[i];
-		exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	}
 
 	XFREE(mbuff);
@@ -253,7 +253,7 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	 */
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
-	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
 	 * Loop through the patterns looking for an exact match
@@ -263,13 +263,13 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	{
 		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 		str = fargs[i];
-		exec(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 		if (!strcmp(tbuff, mbuff))
 		{
 			XFREE(tbuff);
 			str = fargs[i + 1];
-			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 			XFREE(mbuff);
 			return;
 		}
@@ -286,7 +286,7 @@ void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	if ((i < nfargs) && fargs[i])
 	{
 		str = fargs[i];
-		exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	}
 
 	return;
@@ -329,7 +329,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
 	str = fargs[0];
-	exec(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 
 	/**
 	 * We default to bool-style, but we offer the option of the MUX-style
@@ -374,7 +374,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		else
 		{
 			str = fargs[1];
-			exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 		}
 
 		XFREE(mbuff);
@@ -415,7 +415,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		mushstate.switch_token = mbuff;
 	}
 
-	exec(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
 	XFREE(mbuff);
 
 	if (flag & IFELSE_TOKEN)
@@ -1874,7 +1874,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 	 */
 	tp = nstr = XMALLOC(LBUF_SIZE, "nstr");
 	s = fargs[1];
-	exec(nstr, &tp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs);
+	eval_expression_string(nstr, &tp, player, caller, cause, EV_EVAL | EV_STRIP | EV_FCHECK, &s, cargs, ncargs);
 	times = (int)strtol(nstr, (char **)NULL, 10);
 	XFREE(nstr);
 
@@ -1904,7 +1904,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 		gettimeofday(&bt, NULL);
 
-		exec(tbuf, &tp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &s, cargs, ncargs);
+		eval_expression_string(tbuf, &tp, player, caller, cause, EV_FCHECK | EV_STRIP | EV_EVAL, &s, cargs, ncargs);
 
 		gettimeofday(&et, NULL);
 
@@ -1961,7 +1961,7 @@ void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 {
 	char *str;
 	str = fargs[0];
-	exec(buff, bufc, player, caller, cause, EV_FIGNORE | EV_EVAL, &str, cargs, ncargs);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_FIGNORE | EV_EVAL, &str, cargs, ncargs);
 }
 
 /**
@@ -1981,7 +1981,7 @@ void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	char *str;
 	str = fargs[0];
-	exec(buff, bufc, player, caller, cause, EV_NO_LOCATION | EV_NOFCHECK | EV_FIGNORE | EV_NO_COMPRESS, &str, (char **)NULL, 0);
+	eval_expression_string(buff, bufc, player, caller, cause, EV_NO_LOCATION | EV_NOFCHECK | EV_FIGNORE | EV_NO_COMPRESS, &str, (char **)NULL, 0);
 }
 
 /*------------------------------------------------------------------------

@@ -655,7 +655,7 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 	{
 		bp = buff;
 		str = args[a];
-		exec(buff, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
+		eval_expression_string(buff, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
 
 		if (wild_match(buff, expr))
 		{
@@ -2471,19 +2471,19 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 		{
 			sp = d;
 			tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
-			exec(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, ((list == NULL) ? sargs : &list), is_ok);
-			exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
+			eval_expression_string(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, ((list == NULL) ? sargs : &list), is_ok);
+			eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
 			XFREE(tbuf);
 		}
 		else
 		{
-			exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
+			eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
 		}
 	}
 	else if (*d)
 	{
 		str = d;
-		exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
+		eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
 	}
 
 	*bp = '\0';
@@ -2517,7 +2517,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	int t = 0, num = 0, aflags = 0, alen = 0, need_pres = 0, retval = 0;
 
 	/*
-	 * If we need to call exec() from within this function, we first save
+	 * If we need to call eval_expression_string() from within this function, we first save
 	 * * the state of the global registers, in order to avoid munging them
 	 * * inappropriately. Do note that the restoration to their original
 	 * * values occurs BEFORE the execution of the @a-attribute. Therefore,
@@ -2628,19 +2628,19 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				{
 					sp = d;
 					tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
-					exec(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, args, nargs);
-					exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
+					eval_expression_string(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, args, nargs);
+					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
 					XFREE(tbuf);
 				}
 				else
 				{
-					exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
+					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
 				}
 			}
 			else if (*d)
 			{
 				str = d;
-				exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
+				eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
 			}
 
 			*bp = '\0';
@@ -2724,23 +2724,23 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				{
 					sp = d;
 					tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
-					exec(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, args, nargs);
-					exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
+					eval_expression_string(tbuf, &tp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &sp, args, nargs);
+					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, &tbuf, 1);
 					XFREE(tbuf);
 				}
 				else if (odef)
 				{
-					exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)&odef, 1);
+					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)&odef, 1);
 				}
 				else
 				{
-					exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
+					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
 				}
 			}
 			else if (*d)
 			{
 				str = d;
-				exec(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
+				eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
 			}
 
 			*bp = '\0';
