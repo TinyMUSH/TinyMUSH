@@ -648,10 +648,12 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	{
 		return;
 	}
+
 	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
 	{
 		return;
 	}
+
 	if (nfargs < 4)
 	{
 		COPY_DELIM(osep, isep);
@@ -1170,12 +1172,7 @@ void fun_insert(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 {
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, 4, 4, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -1305,12 +1302,7 @@ void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	Delim isep;
 	int found;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
-	{
-		return;
-	};
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 3, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -1372,12 +1364,7 @@ void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char *r, *s;
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 3, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -1429,12 +1416,7 @@ void fun_revwords(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		return;
 	}
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 2, 2, DELIM_STRING, &isep))
 	{
 		return;
 	}
@@ -2591,12 +2573,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	char *p, *q, *buf, *objstring, *cp, *cr = NULL;
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 4, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
