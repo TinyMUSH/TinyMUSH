@@ -1355,7 +1355,7 @@ void sighandler(int sig)
 		abort();
 	}
 
-	signal(sig, sighandler);
+	// Signal handler is persistent with sigaction(), no need to re-register
 	mushstate.panicking = 0;
 	return;
 }
@@ -1367,6 +1367,7 @@ void sighandler(int sig)
 void set_signals(void)
 {
 	sigset_t sigs;
+	struct sigaction sa;
 	/**
 	 * We have to reset our signal mask, because of the possibility that
 	 * we triggered a restart on a SIGUSR1. If we did so, then the signal became
@@ -1376,34 +1377,52 @@ void set_signals(void)
 	 */
 	sigfillset(&sigs);
 	sigprocmask(SIG_UNBLOCK, &sigs, NULL);
-	signal(SIGALRM, sighandler);
-	signal(SIGCHLD, sighandler);
-	signal(SIGHUP, sighandler);
-	signal(SIGINT, sighandler);
-	signal(SIGQUIT, sighandler);
-	signal(SIGTERM, sighandler);
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGUSR1, sighandler);
-	signal(SIGUSR2, sighandler);
-	signal(SIGTRAP, sighandler);
+
+	// Setup sigaction structure for our handler
+	sa.sa_handler = sighandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART; // Restart interrupted syscalls automatically
+
+	sigaction(SIGALRM, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
+	sigaction(SIGHUP, &sa, NULL);
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
+
+	// Setup for SIG_IGN
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &sa, NULL);
+
+	// Restore handler for remaining signals
+	sa.sa_handler = sighandler;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
+	sigaction(SIGTRAP, &sa, NULL);
 #ifdef SIGXCPU
-	signal(SIGXCPU, sighandler);
+	sigaction(SIGXCPU, &sa, NULL);
 #endif
-	signal(SIGFPE, SIG_IGN);
-	signal(SIGILL, sighandler);
-	signal(SIGSEGV, sighandler);
-	signal(SIGABRT, sighandler);
+
+	// Setup for SIG_IGN
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGFPE, &sa, NULL);
+
+	// Restore handler for remaining signals
+	sa.sa_handler = sighandler;
+	sigaction(SIGILL, &sa, NULL);
+	sigaction(SIGSEGV, &sa, NULL);
+	sigaction(SIGABRT, &sa, NULL);
 #ifdef SIGFSZ
-	signal(SIGXFSZ, sighandler);
+	sigaction(SIGXFSZ, &sa, NULL);
 #endif
 #ifdef SIGEMT
-	signal(SIGEMT, sighandler);
+	sigaction(SIGEMT, &sa, NULL);
 #endif
 #ifdef SIGBUS
-	signal(SIGBUS, sighandler);
+	sigaction(SIGBUS, &sa, NULL);
 #endif
 #ifdef SIGSYS
-	signal(SIGSYS, sighandler);
+	sigaction(SIGSYS, &sa, NULL);
 #endif
 }
 
@@ -1413,9 +1432,14 @@ void set_signals(void)
  */
 void unset_signals(void)
 {
+	struct sigaction sa;
+	sa.sa_handler = SIG_DFL;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+
 	for (int i = 0; i < NSIG; i++)
 	{
-		signal(i, SIG_DFL);
+		sigaction(i, &sa, NULL);
 	}
 }
 
