@@ -64,6 +64,12 @@ int get_hashmask(int *size)
      * * ANDing
      */
 
+    /* Ensure size is at least 1 to avoid undefined behavior */
+    if (*size < 1)
+    {
+        *size = 1;
+    }
+
     for (tsize = 1; tsize < *size; tsize = tsize << 1)
         ;
 
@@ -98,11 +104,7 @@ void hashinit(HASHTAB *htab, int size, int flags)
 
     htab->flags = flags;
     htab->entry = (HASHENT **)XCALLOC(size, sizeof(HASHENT *), "htab->entry");
-
-    for (i = 0; i < size; i++)
-    {
-        htab->entry[i] = NULL;
-    }
+    /* XCALLOC already initializes all entries to NULL, no loop needed */
 }
 
 /* ---------------------------------------------------------------------------
@@ -512,6 +514,11 @@ int *hash_nextentry(HASHTAB *htab)
     hval = htab->last_hval;
     hptr = htab->last_entry;
 
+    if (hptr == NULL)
+    {
+        return NULL;
+    }
+
     if (hptr->next != NULL)
     { /* We can stay in the same chain */
         htab->last_entry = hptr->next;
@@ -568,6 +575,18 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
     HASHENT *hptr;
     hval = htab->last_hval;
     hptr = htab->last_entry;
+
+    if (hptr == NULL)
+    {
+        if ((htab->flags & HT_TYPEMASK) == HT_STR)
+        {
+            return (HASHKEY)((char *)NULL);
+        }
+        else
+        {
+            return (HASHKEY)((int)-1);
+        }
+    }
 
     if (hptr->next != NULL)
     { /* We can stay in the same chain */
