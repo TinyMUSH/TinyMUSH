@@ -137,7 +137,9 @@ void munge_space_for_match(const char *name)
             *q++ = *p++;
         }
 
-        while (*p && isspace(*++p))
+		p++;
+		while (*p && isspace(*p))
+			p++;
             ;
 
         if (*p)
@@ -222,7 +224,7 @@ dbref absolute_nref(char *str)
         *bp = '\0';
     }
 
-    np = (int *)hashfind(buf, &mushstate.nref_htab);
+    np = (dbref *)hashfind(buf, &mushstate.nref_htab);
 
     if (np && Good_obj(*np))
     {
@@ -577,7 +579,10 @@ void match_master_exit(void)
     }
 
     if (Good_obj(md.player) && Has_exits(md.player))
-        (void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
+		if (Good_obj(mushconf.master_room))
+		{
+			(void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
+		}
 }
 
 void match_zone_exit(void)
