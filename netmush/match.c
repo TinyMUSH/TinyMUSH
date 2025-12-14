@@ -712,8 +712,12 @@ void restore_match_state(MSTATE *m_state)
     md.absolute_form = m_state->absolute_form;
     md.match = m_state->match;
     md.player = m_state->player;
-    XSTRCPY(md.string, m_state->string);
-    XFREE(m_state->string);
+	if (m_state->string)
+	{
+		XSTRCPY(md.string, m_state->string);
+	}
+	if (m_state->string)
+		XFREE(m_state->string);
 }
 
 void init_match(dbref player, const char *name, int type)
