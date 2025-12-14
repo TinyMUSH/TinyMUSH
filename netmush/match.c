@@ -887,6 +887,11 @@ void init_match(dbref player, const char *name, int type)
         player = NOTHING;
     }
 
+    if (!name)
+    {
+        name = "";
+    }
+
     md.confidence = -1;
     md.count = md.check_keys = 0;
     md.pref_type = type;
