@@ -49,8 +49,7 @@ const lt_dlsymlist lt_preloaded_symbols[] = {{0, (lt_ptr_t)0}};
 pid_t isrunning(char *pidfile)
 {
 	FILE *fp;
-	pid_t pid = 0, rpid = 0;
-	int i = 0;
+	pid_t pid = 0;
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
 
 	if (mushstate.restarting)
@@ -76,28 +75,7 @@ pid_t isrunning(char *pidfile)
 
 	fclose(fp);
 	pid = (pid_t)strtol(buff, (char **)NULL, 10);
-	fp = popen("pgrep netmush", "r");
-
-	if (fp == NULL)
-	{
-		XFREE(buff);
-		return 0;
-	}
-
-	while (fgets(buff, MBUF_SIZE, fp) != NULL)
-	{
-		rpid = (pid_t)strtol(buff, (char **)NULL, 10);
-
-		if (pid == rpid)
-		{
-			i = 1;
-			break;
-		}
-	}
-
-	pclose(fp);
-
-	if (i)
+	if (pid > 0 && kill(pid, 0) == 0)
 	{
 		XFREE(buff);
 		return pid;
@@ -144,7 +122,15 @@ void handlestartupflatfiles(int flag)
 	{
 		fstat(i, &sb1);
 		close(i);
-		stat(db, &sb2);
+		if (stat(db, &sb2) != 0)
+		{
+			log_write(LOG_ALWAYS, "INI", "LOAD", "Unable to stat db file: %s", db);
+			XFREE(db);
+			XFREE(flat);
+			XFREE(db_bak);
+			XFREE(flat_bak);
+			return;
+		}
 
 		if (tailfind(flat, "***END OF DUMP***\n"))
 		{
@@ -212,6 +198,8 @@ void handlestartupflatfiles(int flag)
 int tailfind(char *file, char *key)
 {
 	int fp;
+	struct stat st;
+	ssize_t klen = (ssize_t)strlen(key);
 	char *s = XMALLOC(MBUF_SIZE, "s");
 	fp = open(file, O_RDONLY);
 
@@ -221,21 +209,40 @@ int tailfind(char *file, char *key)
 		return 0;
 	}
 
-	lseek(fp, 0 - strlen(key), SEEK_END);
-
-	if (read(fp, s, strlen(key)) != -1)
+	if (fstat(fp, &st) != 0)
 	{
-		if (strncmp(s, key, strlen(key)) == 0)
+		close(fp);
+		XFREE(s);
+		return 0;
+	}
+
+	if (st.st_size < klen)
+	{
+		close(fp);
+		XFREE(s);
+		return 0;
+	}
+
+	if (lseek(fp, (off_t)(st.st_size - klen), SEEK_SET) == (off_t)-1)
+	{
+		close(fp);
+		XFREE(s);
+		return 0;
+	}
+
+	if (read(fp, s, (size_t)klen) == klen)
+	{
+		if (strncmp(s, key, (size_t)klen) == 0)
 		{
 			close(fp);
 			XFREE(s);
-			return (1);
+			return 1;
 		}
 	}
 
 	close(fp);
 	XFREE(s);
-	return (0);
+	return 0;
 }
 
 /*
