@@ -119,32 +119,61 @@ void hashreset(HASHTAB *htab)
 }
 
 /* ---------------------------------------------------------------------------
+ * get_hash_value: Compute bucket index for a key in a hash table.
+ * Handles both string and numeric key types.
+ */
+
+static inline int get_hash_value(HASHKEY key, HASHTAB *htab)
+{
+    int htype = htab->flags & HT_TYPEMASK;
+
+    if (htype == HT_STR)
+    {
+        return hashval(key.s, htab->mask);
+    }
+    else
+    {
+        return (key.i & htab->mask);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * key_matches: Check if two keys match based on hash table type.
+ * Works for both string and numeric hash tables.
+ */
+
+static inline int key_matches(HASHKEY a, HASHKEY b, int htype)
+{
+    if (htype == HT_STR)
+    {
+        return strcmp(a.s, b.s) == 0;
+    }
+    else
+    {
+        return a.i == b.i;
+    }
+}
+
+/* ---------------------------------------------------------------------------
  * hashfind_generic: Look up an entry in a hash table and return a pointer
  * to its hash data. Works for both string and numeric hash tables.
  */
 
 int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 {
-    int htype, hval, numchecks;
+    int hval, numchecks;
     HASHENT *hptr;
+    int htype = htab->flags & HT_TYPEMASK;
     numchecks = 0;
     htab->scans++;
-    htype = htab->flags & HT_TYPEMASK;
 
-    if (htype == HT_STR)
-    {
-        hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
-        hval = (key.i & htab->mask);
-    }
+    hval = get_hash_value(key, htab);
 
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         numchecks++;
 
-        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        if (key_matches(key, hptr->target, htype))
         {
             htab->hits++;
 
@@ -174,26 +203,19 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 
 int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
 {
-    int htype, hval, numchecks;
+    int hval, numchecks;
     HASHENT *hptr;
+    int htype = htab->flags & HT_TYPEMASK;
     numchecks = 0;
     htab->scans++;
-    htype = htab->flags & HT_TYPEMASK;
 
-    if (htype == HT_STR)
-    {
-        hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
-        hval = (key.i & htab->mask);
-    }
+    hval = get_hash_value(key, htab);
 
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         numchecks++;
 
-        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        if (key_matches(key, hptr->target, htype))
         {
             htab->hits++;
 
@@ -223,8 +245,9 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
 
 CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
 {
-    int htype, hval;
+    int hval;
     HASHENT *hptr;
+    int htype = htab->flags & HT_TYPEMASK;
 
     /*
      * Make sure that the entry isn't already in the hash table.  If it
@@ -232,21 +255,12 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
      * link it in at the head of its thread.
      */
 
-    htype = htab->flags & HT_TYPEMASK;
+    hval = get_hash_value(key, htab);
 
-    if (htype == HT_STR)
-    {
-        hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
-        hval = (key.i & htab->mask);
-    }
-
-    /* Check for duplicate in single pass without calling hashfind_generic */
+    /* Check for duplicate in single pass */
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
-        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        if (key_matches(key, hptr->target, htype))
         {
             return CF_Failure;
         }
@@ -284,24 +298,16 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
 
 void hashdelete_generic(HASHKEY key, HASHTAB *htab)
 {
-    int htype, hval;
+    int hval;
     HASHENT *hptr, *last;
-    htype = htab->flags & HT_TYPEMASK;
+    int htype = htab->flags & HT_TYPEMASK;
 
-    if (htype == HT_STR)
-    {
-        hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
-        hval = (key.i & htab->mask);
-    }
-
+    hval = get_hash_value(key, htab);
     last = NULL;
 
     for (hptr = htab->entry[hval]; hptr != NULL; last = hptr, hptr = hptr->next)
     {
-        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        if (key_matches(key, hptr->target, htype))
         {
             if (last == NULL)
             {
@@ -335,6 +341,12 @@ void hashdelall(int *old, HASHTAB *htab)
 {
     int hval;
     HASHENT *hptr, *prev, *nextp;
+
+    /* Guard against NULL pointer deletion */
+    if (old == NULL)
+    {
+        return;
+    }
 
     for (hval = 0; hval < htab->hashsize; hval++)
     {
@@ -439,21 +451,14 @@ void hashflush(HASHTAB *htab, int size)
 int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
 {
     HASHENT *hptr;
-    int htype, hval;
-    htype = htab->flags & HT_TYPEMASK;
+    int hval;
+    int htype = htab->flags & HT_TYPEMASK;
 
-    if (htype == HT_STR)
-    {
-        hval = hashval(key.s, htab->mask);
-    }
-    else
-    {
-        hval = (key.i & htab->mask);
-    }
+    hval = get_hash_value(key, htab);
 
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
-        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        if (key_matches(key, hptr->target, htype))
         {
             hptr->data = hashdata;
             return 1;
