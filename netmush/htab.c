@@ -29,13 +29,12 @@
 
 int hashval(char *str, int hashmask)
 {
-    int hash = 0;
+    unsigned int hash = 2166136261u; /* FNV-1a offset basis */
     char *sp;
 
     /*
-     * If the string pointer is null, return 0.  If not, add up the
-     * * numeric value of all the characters and return the sum,
-     * * modulo the size of the hash table.
+     * If the string pointer is null, return 0.  If not, use FNV-1a hash
+     * to avoid overflow issues with signed arithmetic.
      */
 
     if (str == NULL)
@@ -45,7 +44,8 @@ int hashval(char *str, int hashmask)
 
     for (sp = str; *sp; sp++)
     {
-        hash = (hash << 5) + hash + *sp;
+        hash ^= (unsigned char)(*sp);
+        hash *= 16777619u; /* FNV prime */
     }
 
     return (hash & hashmask);
@@ -104,6 +104,18 @@ void hashinit(HASHTAB *htab, int size, int flags)
 
     htab->flags = flags;
     htab->entry = (HASHENT **)XCALLOC(size, sizeof(HASHENT *), "htab->entry");
+
+    if (htab->entry == NULL)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Failed to allocate hash table of size %d", size);
+        /* Initialize with minimal state to prevent crashes */
+        htab->hashsize = 0;
+        htab->mask = 0;
+        htab->entries = 0;
+        htab->nulls = 0;
+        return;
+    }
+
     /* XCALLOC already initializes all entries to NULL, no loop needed */
 }
 
@@ -654,6 +666,13 @@ void hashresize(HASHTAB *htab, int min_size)
     }
 
     hashinit(&new_htab, size, htab->flags);
+
+    if (new_htab.entry == NULL)
+    {
+        /* Allocation failed, abort resize */
+        return;
+    }
+
     htype = htab->flags & HT_TYPEMASK;
 
     for (i = 0; i < htab->hashsize; i++)
@@ -668,14 +687,7 @@ void hashresize(HASHTAB *htab, int min_size)
             /*
              * don't free and reallocate entries, just copy the pointers
              */
-            if (htype == HT_STR)
-            {
-                hval = hashval(thent->target.s, new_htab.mask);
-            }
-            else
-            {
-                hval = (thent->target.i & new_htab.mask);
-            }
+            hval = get_hash_value(thent->target, &new_htab);
 
             if (new_htab.entry[hval] == NULL)
             {
