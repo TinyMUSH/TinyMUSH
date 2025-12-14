@@ -22,6 +22,73 @@
 #include <stdbool.h>
 #include <string.h>
 
+/**
+ * @brief Load attribute text for iteration functions.
+ *
+ * Handles both #lambda/ and regular obj/attr syntax.
+ * Returns 0 on success, 1 on error (caller should return).
+ *
+ * @param player Player performing the lookup
+ * @param farg Attribute argument (#lambda/... or obj/attr)
+ * @param thing Output: object dbref
+ * @param ap Output: attribute pointer
+ * @param atext Output: allocated attribute text
+ * @param aowner Output: attribute owner
+ * @param aflags Output: attribute flags
+ * @param alen Output: attribute length
+ * @return 0 on success, 1 on error
+ */
+static int load_iter_attrib(dbref player, char *farg, dbref *thing, ATTR **ap, char **atext, dbref *aowner, int *aflags, int *alen)
+{
+    int anum = 0;
+
+    *thing = NOTHING;
+    *ap = NULL;
+    *atext = NULL;
+    *aowner = NOTHING;
+    *aflags = 0;
+    *alen = 0;
+
+    if (string_prefix(farg, "#lambda/"))
+    {
+        *thing = player;
+        *atext = XMALLOC(LBUF_SIZE, "lambda.atext");
+        *alen = strlen(farg + 8);
+        __xstrcpy(*atext, farg + 8);
+        (*atext)[*alen] = '\0';
+        *aowner = player;
+        *aflags = 0;
+        return 0;
+    }
+
+    if (parse_attrib(player, farg, thing, &anum, 0))
+    {
+        if ((anum == NOTHING) || !(Good_obj(*thing)))
+            *ap = NULL;
+        else
+            *ap = atr_num(anum);
+    }
+    else
+    {
+        *thing = player;
+        *ap = atr_str(farg);
+    }
+
+    if (!(*ap))
+    {
+        return 1;
+    }
+
+    *atext = atr_pget(*thing, (*ap)->number, aowner, aflags, alen);
+    if (!**atext || !(See_attr(player, *thing, *ap, *aowner, *aflags)))
+    {
+        XFREE(*atext);
+        return 1;
+    }
+
+    return 0;
+}
+
 /*
  * ---------------------------------------------------------------------------
  * perform_loop:
@@ -571,7 +638,7 @@ void fun_ibreak(char *buff __attribute__((unused)), char **bufc __attribute__((u
 void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     dbref aowner = NOTHING, thing = NOTHING;
-    int aflags = 0, alen = 0, anum, i = 0;
+    int aflags = 0, alen = 0, i = 0;
     ATTR *ap = NULL;
     char *atext = NULL, *result = NULL, *curr = NULL, *bp = NULL, *str = NULL, *cp = NULL, *atextbuf = NULL, *op = NULL, *rstore = NULL;
     char *clist[3];
@@ -595,42 +662,9 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     /**
@@ -752,68 +786,13 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         };
     }
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
-    {
-        return;
-    }
-
-    if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
-    {
-        return;
-    }
-
-    if (nfargs < 4)
-    {
-        XMEMCPY((&osep), (&isep), sizeof(Delim) - MAX_DELIM_LEN + 1 + (&isep)->len);
-    }
-    else
-    {
-        if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-        {
-            return;
-        };
-    }
-
     /**
      * Two possibilities for the first arg: <obj>/<attr> and <attr>.
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     /**
@@ -926,42 +905,9 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * Two possibilities for the second arg: <obj>/<attr> and <attr>.
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     /**
@@ -1048,42 +994,9 @@ void fun_mix(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * Get the attribute, check the permissions.
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     for (i = 0; i < NUM_ENV_VARS; i++)
@@ -1200,42 +1113,9 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
      * Get attribute. Check permissions.
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     cp = trim_space_sep(fargs[1], &isep);
@@ -1292,42 +1172,9 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         return;
     }
 
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     atextbuf = XMALLOC(LBUF_SIZE, "atextbuf");
@@ -1475,42 +1322,9 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Find our object and attribute
      *
      */
-    if (string_prefix(fargs[0], "#lambda/"))
+    if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
     {
-        thing = player;
-        anum = NOTHING;
-        ap = NULL;
-        atext = XMALLOC(LBUF_SIZE, "lambda.atext");
-        alen = strlen((fargs[0]) + 8);
-        __xstrcpy(atext, fargs[0] + 8);
-        atext[alen] = '\0';
-        aowner = player;
-        aflags = 0;
-    }
-    else
-    {
-        if (parse_attrib(player, fargs[0], &thing, &anum, 0))
-        {
-            if ((anum == NOTHING) || !(Good_obj(thing)))
-                ap = NULL;
-            else
-                ap = atr_num(anum);
-        }
-        else
-        {
-            thing = player;
-            ap = atr_str(fargs[0]);
-        }
-        if (!ap)
-        {
-            return;
-        }
-        atext = atr_pget(thing, ap->number, &aowner, &aflags, &alen);
-        if (!*atext || !(See_attr(player, thing, ap, aowner, aflags)))
-        {
-            XFREE(atext);
-            return;
-        }
+        return;
     }
 
     /**
@@ -1610,7 +1424,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 {
     Delim isep, osep;
     dbref aowner1 = NOTHING, thing1 = NOTHING, aowner2 = NOTHING, thing2 = NOTHING;
-    int aflags1 = 0, aflags2 = 0, anum1 = 0, anum2 = 0, alen1 = 0, alen2 = 0, i = 0, tmp_num = 0;
+    int aflags1 = 0, aflags2 = 0, alen1 = 0, alen2 = 0, i = 0, tmp_num = 0;
     int is_same = 0, is_exact_same = 0;
     ATTR *ap = NULL, *ap2 = NULL;
     char *atext1 = NULL, *atext2 = NULL, *atextbuf = NULL, *condbuf = NULL;
@@ -1651,53 +1465,15 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Our first and second args can be <obj>/<attr> or just <attr>. Use
      * them if we can access them, otherwise return an empty string.
      *
-     * Note that for user-defined attributes, atr_str() returns a pointer to
-     * a static, and that therefore we have to be careful about what
-     * we're doing.
-     *
      */
-    if (parse_attrib(player, fargs[0], &thing1, &anum1, 0))
+    if (load_iter_attrib(player, fargs[0], &thing1, &ap, &atext1, &aowner1, &aflags1, &alen1))
     {
-        if ((anum1 == NOTHING) || !(Good_obj(thing1)))
-            ap = NULL;
-        else
-            ap = atr_num(anum1);
-    }
-    else
-    {
-        thing1 = player;
-        ap = atr_str(fargs[0]);
-    }
-
-    if (!ap)
-    {
-        return;
-    }
-
-    atext1 = atr_pget(thing1, ap->number, &aowner1, &aflags1, &alen1);
-
-    if (!*atext1 || !(See_attr(player, thing1, ap, aowner1, aflags1)))
-    {
-        XFREE(atext1);
         return;
     }
 
     tmp_num = ap->number;
 
-    if (parse_attrib(player, fargs[1], &thing2, &anum2, 0))
-    {
-        if ((anum2 == NOTHING) || !(Good_obj(thing2)))
-            ap2 = NULL;
-        else
-            ap2 = atr_num(anum2);
-    }
-    else
-    {
-        thing2 = player;
-        ap2 = atr_str(fargs[1]);
-    }
-
-    if (!ap2)
+    if (load_iter_attrib(player, fargs[1], &thing2, &ap2, &atext2, &aowner2, &aflags2, &alen2))
     {
         XFREE(atext1);
         return;
