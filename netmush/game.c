@@ -1532,11 +1532,11 @@ int backup_copy(char *src, char *dst, int flag)
 
 char *mktimestamp(void)
 {
-	struct tm *t;
+	struct tm t;
 	time_t ts;
 	ts = time(NULL);
-	t = localtime(&ts);
-	return XASPRINTF("buff", "%04d%02d%02d-%02d%02d%02d", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
+	localtime_r(&ts, &t);
+	return XASPRINTF("buff", "%04d%02d%02d-%02d%02d%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
 }
 
 void do_backup_mush(dbref player, dbref cause, int key)

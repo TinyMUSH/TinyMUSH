@@ -223,10 +223,11 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
     dbref player, aowner;
     int aflags, alen;
     time_t tt;
-    char *time_str, *player_last, *allowance;
+    char time_str[26], *player_last, *allowance;
+    struct tm tm_buf;
     time(&tt);
-    time_str = ctime(&tt);
-    time_str[strlen(time_str) - 1] = '\0';
+    localtime_r(&tt, &tm_buf);
+    strftime(time_str, sizeof(time_str), "%a %b %d %H:%M:%S %Y", &tm_buf);
 
     if ((player = lookup_player(NOTHING, name, 0)) == NOTHING)
     {
@@ -240,14 +241,16 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
     }
 
     time(&tt);
-    time_str = ctime(&tt);
-    time_str[strlen(time_str) - 1] = '\0';
+    char time_str2[26];
+    struct tm tm_buf2;
+    localtime_r(&tt, &tm_buf2);
+    strftime(time_str2, sizeof(time_str2), "%a %b %d %H:%M:%S %Y", &tm_buf2);
     /*
      * compare to last connect see if player gets salary
      */
     player_last = atr_get(player, A_LAST, &aowner, &aflags, &alen);
 
-    if (strncmp(player_last, time_str, 10) != 0)
+    if (strncmp(player_last, time_str2, 10) != 0)
     {
         if (Pennies(player) < mushconf.paylimit)
         {
@@ -269,7 +272,7 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
         }
     }
 
-    atr_add_raw(player, A_LAST, time_str);
+    atr_add_raw(player, A_LAST, time_str2);
     XFREE(player_last);
 
     if (ip_addr && *ip_addr)

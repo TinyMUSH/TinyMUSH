@@ -493,7 +493,7 @@ void queue_string(DESC *d, const char *format, ...)
 				XSTRNCPY(msg, buf, LBUF_SIZE);
 				XFREE(buf);
 			}
-			
+
 			else if (NoBleed(d->player))
 			*/
 			if (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)))
@@ -795,7 +795,7 @@ void parse_connect(const char *msg, char *command, char *user, char *pass)
 
 char *time_format_1(time_t dt)
 {
-	register struct tm *delta;
+	// Removed: register struct tm *delta;
 	char *buf = XMALLOC(MBUF_SIZE, "buf");
 
 	if (dt < 0)
@@ -803,15 +803,16 @@ char *time_format_1(time_t dt)
 		dt = 0;
 	}
 
-	delta = gmtime(&dt);
+	struct tm delta;
+	gmtime_r(&dt, &delta);
 
-	if (delta->tm_yday > 0)
+	if (delta.tm_yday > 0)
 	{
-		XSPRINTF(buf, "%dd %02d:%02d", delta->tm_yday, delta->tm_hour, delta->tm_min);
+		XSPRINTF(buf, "%dd %02d:%02d", delta.tm_yday, delta.tm_hour, delta.tm_min);
 	}
 	else
 	{
-		XSPRINTF(buf, "%02d:%02d", delta->tm_hour, delta->tm_min);
+		XSPRINTF(buf, "%02d:%02d", delta.tm_hour, delta.tm_min);
 	}
 
 	return buf;
@@ -819,7 +820,6 @@ char *time_format_1(time_t dt)
 
 char *time_format_2(time_t dt)
 {
-	register struct tm *delta;
 	char *buf = XMALLOC(MBUF_SIZE, "buf");
 
 	if (dt < 0)
@@ -827,23 +827,24 @@ char *time_format_2(time_t dt)
 		dt = 0;
 	}
 
-	delta = gmtime(&dt);
+	struct tm delta;
+	gmtime_r(&dt, &delta);
 
-	if (delta->tm_yday > 0)
+	if (delta.tm_yday > 0)
 	{
-		XSPRINTF(buf, "%dd", delta->tm_yday);
+		XSPRINTF(buf, "%dd", delta.tm_yday);
 	}
-	else if (delta->tm_hour > 0)
+	else if (delta.tm_hour > 0)
 	{
-		XSPRINTF(buf, "%dh", delta->tm_hour);
+		XSPRINTF(buf, "%dh", delta.tm_hour);
 	}
-	else if (delta->tm_min > 0)
+	else if (delta.tm_min > 0)
 	{
-		XSPRINTF(buf, "%dm", delta->tm_min);
+		XSPRINTF(buf, "%dm", delta.tm_min);
 	}
 	else
 	{
-		XSPRINTF(buf, "%ds", delta->tm_sec);
+		XSPRINTF(buf, "%ds", delta.tm_sec);
 	}
 
 	return buf;
@@ -1119,9 +1120,11 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	}
 
 	announce_connattr(d, player, loc, reason, num, A_ACONNECT);
-	time_str = ctime(&mushstate.now);
-	time_str[strlen(time_str) - 1] = '\0';
-	record_login(player, 1, time_str, d->addr, d->username);
+	char conn_time_buf[26];
+	struct tm conn_time_tm;
+	localtime_r(&mushstate.now, &conn_time_tm);
+	strftime(conn_time_buf, sizeof(conn_time_buf), "%a %b %d %H:%M:%S %Y", &conn_time_tm);
+	record_login(player, 1, conn_time_buf, d->addr, d->username);
 
 	if (mushconf.have_pueblo == 1)
 	{
@@ -1670,9 +1673,11 @@ void dump_info(DESC *call_by)
 	int count = 0;
 	queue_rawstring(call_by, NULL, "### Begin INFO 1\r\n");
 	queue_rawstring(call_by, "Name: %s\r\n", mushconf.mush_name);
-	temp = (char *)ctime(&mushstate.start_time);
-	temp[strlen(temp) - 1] = '\0';
-	queue_rawstring(call_by, "Uptime: %s\r\n", temp);
+	char uptime_buf[26];
+	struct tm tm_buf;
+	localtime_r(&mushstate.start_time, &tm_buf);
+	strftime(uptime_buf, sizeof(uptime_buf), "%a %b %d %H:%M:%S %Y", &tm_buf);
+	queue_rawstring(call_by, "Uptime: %s\r\n", uptime_buf);
 
 	for (d = descriptor_list; d; d = d->next)
 		if (d->flags & DS_CONNECTED)

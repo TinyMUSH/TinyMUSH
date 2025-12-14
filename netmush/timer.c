@@ -4,11 +4,11 @@
  * @brief Subroutines for (system-) timed events
  * @version 3.3
  * @date 2021-01-04
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  */
 
 #include "config.h"
@@ -45,7 +45,7 @@ CRONTAB *cron_head = NULL;
 
 void check_cron(void)
 {
-    struct tm *ltime;
+    // Removed: struct tm *ltime;
     int minute, hour, dom, month, dow;
     CRONTAB *crp;
     char *cmd;
@@ -54,12 +54,13 @@ void check_cron(void)
     /*
      * Convert our time to a zero basis, so the elements can be used as indices.
      */
-    ltime = localtime(&mushstate.events_counter);
-    minute = ltime->tm_min - FIRST_MINUTE;
-    hour = ltime->tm_hour - FIRST_HOUR;
-    dom = ltime->tm_mday - FIRST_DOM;
-    month = ltime->tm_mon + 1 - FIRST_MONTH; /* must convert 0-11 to 1-12 */
-    dow = ltime->tm_wday - FIRST_DOW;
+    struct tm ltime;
+    localtime_r(&mushstate.events_counter, &ltime);
+    minute = ltime.tm_min - FIRST_MINUTE;
+    hour = ltime.tm_hour - FIRST_HOUR;
+    dom = ltime.tm_mday - FIRST_DOM;
+    month = ltime.tm_mon + 1 - FIRST_MONTH; /* must convert 0-11 to 1-12 */
+    dow = ltime.tm_wday - FIRST_DOW;
 
     /*
      * Do it if the minute, hour, and month match, plus a day selection
@@ -138,15 +139,15 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
             if (*bufp != '-')
             {
                 /*
-		 * We have a single number, not a range.
-		 */
+                 * We have a single number, not a range.
+                 */
                 n_end = n_begin;
             }
             else
             {
                 /*
-		 * Eat the dash, get the range.
-		 */
+                 * Eat the dash, get the range.
+                 */
                 bufp++;
                 n_end = (int)strtol(bufp, (char **)NULL, 10);
 
@@ -163,8 +164,8 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
         }
 
         /*
-	 * Check for step size.
-	 */
+         * Check for step size.
+         */
 
         if (*bufp == '/')
         {
@@ -188,8 +189,8 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
         }
 
         /*
-	 * Go set it.
-	 */
+         * Go set it.
+         */
 
         for (i = n_begin; i <= n_end; i += step_size)
         {
@@ -198,8 +199,8 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
         }
 
         /*
-	 * We've made it through one pass. If the next character isn't a comma, we break out of this loop.
-	 */
+         * We've made it through one pass. If the next character isn't a comma, we break out of this loop.
+         */
 
         if (*bufp == ',')
         {

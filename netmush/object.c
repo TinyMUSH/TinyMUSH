@@ -614,9 +614,11 @@ dbref create_obj(dbref player, int objtype, char *name, int cost)
 	if (objtype == TYPE_PLAYER)
 	{
 		time(&tt);
-		buff = (char *)ctime(&tt);
-		buff[strlen(buff) - 1] = '\0';
-		atr_add_raw(obj, A_LAST, buff);
+		char timebuf[26];
+		struct tm tm_buf;
+		localtime_r(&tt, &tm_buf);
+		strftime(timebuf, sizeof(timebuf), "%a %b %d %H:%M:%S %Y", &tm_buf);
+		atr_add_raw(obj, A_LAST, timebuf);
 		buff = XMALLOC(SBUF_SIZE, "buff");
 		XSPRINTF(buff, "%d %d %d %d %d", quota, mushconf.start_room_quota, mushconf.start_exit_quota, mushconf.start_thing_quota, mushconf.start_player_quota);
 		atr_add_raw(obj, A_QUOTA, buff);

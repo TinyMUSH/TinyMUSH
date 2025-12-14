@@ -1814,15 +1814,17 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		XFREE(buf);
 		XFREE(buf2);
 		mushconf.many_coins[0] = savec;
-		buf2 = (char *)ctime(&CreateTime(thing));
-		buf2[strlen(buf2) - 1] = '\0';
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", buf2);
-		buf2 = (char *)ctime(&save_access_time);
-		buf2[strlen(buf2) - 1] = '\0';
-		XSTRCPY(timebuf, buf2);
-		buf2 = (char *)ctime(&ModTime(thing));
-		buf2[strlen(buf2) - 1] = '\0';
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, buf2);
+		char created_str[26], accessed_str[26], modified_str[26];
+		struct tm tm_created, tm_accessed, tm_modified;
+		localtime_r(&CreateTime(thing), &tm_created);
+		strftime(created_str, sizeof(created_str), "%a %b %d %H:%M:%S %Y", &tm_created);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Created: %s", created_str);
+		localtime_r(&save_access_time, &tm_accessed);
+		strftime(accessed_str, sizeof(accessed_str), "%a %b %d %H:%M:%S %Y", &tm_accessed);
+		XSTRCPY(timebuf, accessed_str);
+		localtime_r(&ModTime(thing), &tm_modified);
+		strftime(modified_str, sizeof(modified_str), "%a %b %d %H:%M:%S %Y", &tm_modified);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Accessed: %s    Modified: %s", timebuf, modified_str);
 
 		/*
 		 * Print the zone

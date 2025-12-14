@@ -143,8 +143,9 @@ int start_log(const char *primary, const char *secondary, int key)
             if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
             {
                 time((time_t *)(&now));
-                tp = localtime((time_t *)(&now));
-                log_write_raw(0, "%02d%02d%02d.%02d%02d%02d ", (tp->tm_year % 100), tp->tm_mon + 1, tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec);
+                struct tm tp;
+                localtime_r((time_t *)(&now), &tp);
+                log_write_raw(0, "%02d%02d%02d.%02d%02d%02d ", (tp.tm_year % 100), tp.tm_mon + 1, tp.tm_mday, tp.tm_hour, tp.tm_min, tp.tm_sec);
             }
 
             /*

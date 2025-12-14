@@ -601,9 +601,10 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  */
 void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp = (char *)ctime(&mushstate.now);
-
-	temp[strlen(temp) - 1] = '\0';
+	char temp[26];
+	struct tm tm_buf;
+	localtime_r(&mushstate.now, &tm_buf);
+	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
@@ -641,9 +642,10 @@ void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	time_t tt = strtol(fargs[0], (char **)NULL, 10);
-	char *temp = (char *)ctime(&tt);
-
-	temp[strlen(temp) - 1] = '\0';
+	char temp[26];
+	struct tm tm_buf;
+	localtime_r(&tt, &tm_buf);
+	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
@@ -912,11 +914,12 @@ bool do_convtime(char *str, struct tm *ttm)
  */
 void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	struct tm *ttm = localtime(&mushstate.now);
+	struct tm ttm;
+	localtime_r(&mushstate.now, &ttm);
 
-	if (do_convtime(fargs[0], ttm))
+	if (do_convtime(fargs[0], &ttm))
 	{
-		SAFE_LTOS(buff, bufc, mktime(ttm), LBUF_SIZE);
+		SAFE_LTOS(buff, bufc, mktime(&ttm), LBUF_SIZE);
 	}
 	else
 	{
@@ -1026,8 +1029,9 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	 * Get the time and format it. We do this using the local timezone.
 	 *
 	 */
-	ttm = localtime(&tt);
-	strftime(str, LBUF_SIZE - 1, tbuf, ttm);
+	struct tm time_tm;
+	localtime_r(&tt, &time_tm);
+	strftime(str, LBUF_SIZE - 1, tbuf, &time_tm);
 	SAFE_LB_STR(str, buff, bufc);
 	XFREE(str);
 	XFREE(tbuf);
@@ -1350,9 +1354,10 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
  */
 void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp = (char *)ctime(&mushstate.start_time);
-
-	temp[strlen(temp) - 1] = '\0';
+	char temp[26];
+	struct tm tm_buf;
+	localtime_r(&mushstate.start_time, &tm_buf);
+	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
 	SAFE_LB_STR(temp, buff, bufc);
 }
 
@@ -1389,9 +1394,10 @@ void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)),
  */
 void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *temp = (char *)ctime(&mushstate.restart_time);
-
-	temp[strlen(temp) - 1] = '\0';
+	char temp[26];
+	struct tm tm_buf;
+	localtime_r(&mushstate.restart_time, &tm_buf);
+	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
 	SAFE_LB_STR(temp, buff, bufc);
 }
 

@@ -555,9 +555,10 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 		if (*str2)
 		{
 			t = time(NULL);
-			tp = localtime(&t);
+			struct tm tp;
+			localtime_r(&t, &tp);
 			notify_check(player, target, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s message from %s: %s", tag, Name(target), str2);
-			notify_check(player, target, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%d:%02d] %s message sent to %s.", tp->tm_hour, tp->tm_min, tag, Name(player));
+			notify_check(player, target, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%d:%02d] %s message sent to %s.", tp.tm_hour, tp.tm_min, tag, Name(player));
 		}
 
 		XFREE(str2);
