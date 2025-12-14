@@ -451,7 +451,7 @@ void match_possession(void)
         return;
     }
 
-    if (Good_loc(md.player))
+    if (Good_obj(md.player) && Good_loc(md.player))
     {
         match_list(Contents(md.player), CON_LOCAL);
     }
@@ -657,6 +657,12 @@ void match_everything(int key)
      * this will hit most cases. STOP if we get something, since those are
      * exact matches.
      */
+
+    if (key < 0)
+    {
+        return;
+    }
+
     match_me();
     match_here();
     match_absolute();
@@ -698,6 +704,11 @@ void match_everything(int key)
 
 dbref match_result(void)
 {
+    if (md.count < 0)
+    {
+        return NOTHING;
+    }
+
     switch (md.count)
     {
     case 0:
