@@ -40,15 +40,16 @@ void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hu
     if (dest == HOME)
     {
         dest = Home(thing);
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "process_leave_loc: Invalid HOME destination for object #%d", thing);
+            return;
+        }
     }
-
-    /*
-     * Validate destination before processing leave messages
-     */
-    if (!Good_obj(dest))
+    else if (!Good_obj(dest))
     {
         log_write(LOG_PROBLEMS, "BUG", "MOVE", "process_leave_loc: Invalid destination #%d from object #%d", dest, thing);
-        dest = NOTHING;
+        return;
     }
 
     if (mushconf.have_pueblo == 1)
@@ -191,6 +192,11 @@ void move_object(dbref thing, dbref dest)
     if (dest == HOME)
     {
         dest = Home(thing);
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "move_object: Invalid HOME destination for object #%d", thing);
+            return;
+        }
     }
 
     /*
@@ -228,14 +234,15 @@ void move_object(dbref thing, dbref dest)
 
 void send_dropto(dbref thing, dbref player)
 {
-    dbref dest;
+    dbref dest, loc;
 
     if (!Sticky(thing))
     {
-        dest = Dropto(Location(thing));
+        loc = Location(thing);
+        dest = Dropto(loc);
         if (!Good_obj(dest))
         {
-            log_write(LOG_PROBLEMS, "BUG", "MOVE", "send_dropto: Invalid dropto destination #%d from object #%d at location #%d", dest, thing, Location(thing));
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "send_dropto: Invalid dropto destination #%d from object #%d at location #%d", dest, thing, loc);
             dest = HOME;
         }
         move_via_generic(thing, dest, player, 0);
@@ -667,12 +674,16 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
 
     /*
      * find the exit - init once and reuse across multiple match attempts
+     * Use init_match_check_keys once, then try different matchers in order
      */
 
     init_match_check_keys(player, direction, TYPE_EXIT);
 
     if (mushconf.move_match_more)
     {
+        /*
+         * Try increasingly broad match scopes
+         */
         match_exit_with_parents();
         exit = last_match_result();
 
