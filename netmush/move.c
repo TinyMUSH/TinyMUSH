@@ -425,7 +425,14 @@ void move_via_exit(dbref thing, dbref dest, dbref cause, dbref exit, int hush)
     did_it(thing, exit, pattr, NULL, oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
     did_it(thing, thing, A_MOVE, NULL, A_OMOVE, NULL, A_AMOVE, 0, (char **)NULL, 0, MSG_MOVE);
     process_enter_loc(thing, src, cause, canhear, hush);
-    process_sticky_dropto(src, thing);
+
+    /*
+     * Process sticky dropto on source location (validate src is valid)
+     */
+    if (Good_obj(src))
+    {
+        process_sticky_dropto(src, thing);
+    }
 }
 
 /* ---------------------------------------------------------------------------
@@ -502,7 +509,14 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush)
     did_it(thing, thing, A_MOVE, NULL, A_OMOVE, NULL, A_AMOVE, 0, (char **)NULL, 0, MSG_MOVE);
     process_enter_loc(thing, src, NOTHING, canhear, hush);
     divest_object(thing);
-    process_sticky_dropto(src, thing);
+
+    /*
+     * Process sticky dropto on source location (validate src is valid)
+     */
+    if (Good_obj(src))
+    {
+        process_sticky_dropto(src, thing);
+    }
     return 1;
 }
 
