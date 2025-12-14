@@ -25,6 +25,9 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <limits.h>
 
 /**
  * Restart definitions
@@ -367,7 +370,21 @@ int fwdlist_load(FWDLIST *fp, dbref player, char *atext)
 
         if ((*dp++ == '#') && isdigit(*dp))
         {
-            target = (int)strtol(dp, (char **)NULL, 10);
+            char *endptr = NULL;
+            long val = 0;
+
+            errno = 0;
+            val = strtol(dp, &endptr, 10);
+
+            if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == dp || *endptr != '\0')
+            {
+                target = NOTHING;
+                fail = 1;
+            }
+            else
+            {
+                target = (int)val;
+            }
 
             if (!mushstate.standalone)
             {
@@ -698,7 +715,21 @@ int propdir_load(PROPDIR *fp, dbref player, char *atext)
 
         if ((*dp++ == '#') && isdigit(*dp))
         {
-            target = (int)strtol(dp, (char **)NULL, 10);
+            char *endptr = NULL;
+            long val = 0;
+
+            errno = 0;
+            val = strtol(dp, &endptr, 10);
+
+            if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == dp || *endptr != '\0')
+            {
+                target = NOTHING;
+                fail = 1;
+            }
+            else
+            {
+                target = (int)val;
+            }
 
             if (!mushstate.standalone)
             {
@@ -1331,8 +1362,22 @@ void do_fixdb(dbref player, dbref cause __attribute__((unused)), int key, char *
         break;
 
     case FIXDB_PENNIES:
-        res = (int)strtol(arg2, (char **)NULL, 10);
+    {
+        char *endptr = NULL;
+        long val = 0;
+
+        errno = 0;
+        val = strtol(arg2, &endptr, 10);
+
+        if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == arg2 || *endptr != '\0')
+        {
+            notify_quiet(player, "Invalid pennies value.");
+            return;
+        }
+
+        res = (int)val;
         break;
+    }
     }
 
     switch (key)
@@ -3350,7 +3395,18 @@ dbref parse_dbref_only(const char *s)
         }
     }
 
-    x = (int)strtol(s, (char **)NULL, 10);
+    char *endptr = NULL;
+    long val = 0;
+
+    errno = 0;
+    val = strtol(s, &endptr, 10);
+
+    if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == s || *endptr != '\0')
+    {
+        return NOTHING;
+    }
+
+    x = (int)val;
     return ((x >= 0) ? x : NOTHING);
 }
 
@@ -3405,7 +3461,15 @@ dbref parse_objid(const char *s, const char *p)
             }
         }
 
-        tt = (time_t)strtol(p, (char **)NULL, 10);
+        char *endptr = NULL;
+        errno = 0;
+        tt = (time_t)strtol(p, &endptr, 10);
+
+        if (errno == ERANGE || endptr == p || *endptr != '\0')
+        {
+            XFREE(tbuf);
+            return NOTHING;
+        }
         XFREE(tbuf);
         return ((CreateTime(it) == tt) ? it : NOTHING);
     }
@@ -3620,7 +3684,19 @@ dbref getref(FILE *f)
 
     if (fgets(buf, SBUF_SIZE, f) != NULL)
     {
-        d = ((int)strtol(buf, (char **)NULL, 10));
+        char *endptr = NULL;
+        long val = 0;
+
+        errno = 0;
+        val = strtol(buf, &endptr, 10);
+
+        if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == buf || (*endptr != '\0' && *endptr != '\n'))
+        {
+            XFREE(buf);
+            return NOTHING;
+        }
+
+        d = (dbref)val;
     }
 
     XFREE(buf);
@@ -3640,7 +3716,19 @@ long getlong(FILE *f)
 
     if (fgets(buf, SBUF_SIZE, f) != NULL)
     {
-        d = (strtol(buf, (char **)NULL, 10));
+        char *endptr = NULL;
+        long val = 0;
+
+        errno = 0;
+        val = strtol(buf, &endptr, 10);
+
+        if (errno == ERANGE || endptr == buf || (*endptr != '\0' && *endptr != '\n'))
+        {
+            XFREE(buf);
+            return 0;
+        }
+
+        d = val;
     }
 
     XFREE(buf);
