@@ -67,8 +67,6 @@ char *logfile_init(char *filename)
 
 void logfile_move(char *oldfn, char *newfn)
 {
-    FILE *backup_fp = mainlog_fp;
-
     if (mainlog_fp != NULL && mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
@@ -125,7 +123,10 @@ int start_log(const char *primary, const char *secondary, int key)
                          */
                         if (lp->log_flag & key)
                         {
-                            log_fp = lp->fileptr;
+                            if (lp->fileptr != NULL)
+                            {
+                                log_fp = lp->fileptr;
+                            }
                             break;
                         }
                     }
@@ -136,10 +137,15 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_fp = mainlog_fp;
                 }
             }
+            else
+            {
+                /* Key changed but still in diversion mode, reset cache */
+                log_fp = mainlog_fp;
+            }
         }
         else
         {
-            last_key = key;
+            last_key = 0; /* Not in diversion mode, clear cache */
             log_fp = mainlog_fp;
         }
     }
@@ -188,6 +194,7 @@ int start_log(const char *primary, const char *secondary, int key)
         /*
          * Write the header to the log
          */
+        const char *mush_name = (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name));
 
         if (secondary && *secondary)
         {
@@ -204,11 +211,11 @@ int start_log(const char *primary, const char *secondary, int key)
 
             if (log_pos == NULL)
             {
-                log_write_raw(0, "%s %3s/%-5s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec);
+                log_write_raw(0, "%s %3s/%-5s: ", mush_name, pri, sec);
             }
             else
             {
-                log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec, log_pos);
+                log_write_raw(0, "%s %3s/%-5s (%s): ", mush_name, pri, sec, log_pos);
             }
 
             free(sec);
@@ -226,11 +233,11 @@ int start_log(const char *primary, const char *secondary, int key)
 
             if (log_pos == NULL)
             {
-                log_write_raw(0, "%s %-9s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri);
+                log_write_raw(0, "%s %-9s: ", mush_name, pri);
             }
             else
             {
-                log_write_raw(0, "%s %-9s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, log_pos);
+                log_write_raw(0, "%s %-9s (%s): ", mush_name, pri, log_pos);
             }
 
             free(pri);
@@ -257,7 +264,11 @@ void end_log(void)
 
     if (mushstate.logging < 0)
     {
-        log_write_raw(1, "Log was closed too many times (%d)\n", mushstate.logging);
+        /* Use fprintf directly to avoid recursion */
+        if (mainlog_fp != NULL)
+        {
+            fprintf(mainlog_fp, "Log was closed too many times (%d)\n", mushstate.logging);
+        }
         mushstate.logging = 0;
     }
 }
@@ -298,6 +309,11 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         int size = 0;
         char *str = NULL, *str1 = NULL;
         va_list ap;
+
+        if (!file)
+        {
+            file = "<unknown>";
+        }
 
         va_start(ap, format);
         size = vsnprintf(NULL, 0, format, ap);
@@ -525,6 +541,7 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
                 }
                 else
                 {
+                    lp->fileptr = NULL;
                     fprintf(stderr, "Error: Failed to reopen log file %s after rotation\n", lp->filename);
                 }
             }
