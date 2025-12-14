@@ -143,7 +143,12 @@ int start_log(const char *primary, const char *secondary, int key)
                     log_fp = mainlog_fp;
                 }
             }
-            /* else: key == last_key, use cached log_fp */
+            /* else: key == last_key, use cached log_fp but verify it's still valid */
+            else if (!log_fp)
+            {
+                /* Cache is invalid, reset to mainlog */
+                log_fp = mainlog_fp;
+            }
         }
         else
         {
@@ -154,6 +159,13 @@ int start_log(const char *primary, const char *secondary, int key)
     else
     {
         log_fp = mainlog_fp;
+    }
+
+    /* Sanity check: ensure we have a valid log_fp */
+    if (!log_fp)
+    {
+        fprintf(stderr, "Error: Invalid log file pointer in start_log\n");
+        return 0;
     }
 
     mushstate.logging++;
@@ -264,7 +276,14 @@ void end_log(void)
 
     if (log_fp != NULL)
     {
-        fflush(log_fp);
+        if (fflush(log_fp) == EOF)
+        {
+            /* Don't use log_write_raw to avoid recursion */
+            if (log_fp != stderr)
+            {
+                fprintf(stderr, "Error: Failed to flush log file\n");
+            }
+        }
     }
 
     mushstate.logging--;
@@ -288,7 +307,12 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
 {
     int my_errno = errno;
     char errbuf[256];
-    strerror_r(my_errno, errbuf, sizeof(errbuf));
+
+    /* Use XSI-compliant strerror_r (returns int) */
+    if (strerror_r(my_errno, errbuf, sizeof(errbuf)) != 0)
+    {
+        snprintf(errbuf, sizeof(errbuf), "Unknown error %d", my_errno);
+    }
 
     if (!failing_object)
     {
@@ -551,8 +575,17 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
         fclose(mainlog_fp);
         mainlog_fp = NULL;
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
-        copy_file(mushconf.log_file, s, 1);
-        XFREE(s);
+
+        if (s)
+        {
+            copy_file(mushconf.log_file, s, 1);
+            XFREE(s);
+        }
+        else
+        {
+            fprintf(stderr, "Error: Failed to allocate memory for log rotation\n");
+        }
+
         if (logfile_init(mushconf.log_file) == NULL)
         {
             fprintf(stderr, "Error: Failed to reinitialize main log after rotation\n");
@@ -573,8 +606,13 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
             {
                 fclose(lp->fileptr);
                 s = XASPRINTF("s", "%s.%s", lp->filename, ts);
-                copy_file(lp->filename, s, 1);
-                XFREE(s);
+
+                if (s)
+                {
+                    copy_file(lp->filename, s, 1);
+                    XFREE(s);
+                }
+
                 lp->fileptr = fopen(lp->filename, "a");
 
                 if (lp->fileptr)
@@ -639,8 +677,12 @@ void logfile_close(void)
                 fclose(lp->fileptr);
                 lp->fileptr = NULL;
                 s = XASPRINTF("s", "%s.%s", lp->filename, ts);
-                copy_file(lp->filename, s, 1);
-                XFREE(s);
+
+                if (s)
+                {
+                    copy_file(lp->filename, s, 1);
+                    XFREE(s);
+                }
             }
         }
     }
@@ -650,8 +692,12 @@ void logfile_close(void)
         fclose(mainlog_fp);
         mainlog_fp = NULL;
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
-        copy_file(mushconf.log_file, s, 1);
-        XFREE(s);
+
+        if (s)
+        {
+            copy_file(mushconf.log_file, s, 1);
+            XFREE(s);
+        }
     }
 
     XFREE(ts);
