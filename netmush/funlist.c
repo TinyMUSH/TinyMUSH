@@ -260,6 +260,71 @@ validate_table_delims(char *buff, char **bufc, dbref player, dbref caller, dbref
 	XMEMCPY(&(dest), &(src), sizeof(Delim) - MAX_DELIM_LEN + 1 + (src).len)
 
 /**
+ * @brief Parse ANSI escape sequences and update ansi_state
+ *
+ * This function processes ANSI escape sequences (color codes) at the current
+ * position in the string, advancing the pointer past the escape sequence and
+ * updating the ANSI state accordingly.
+ *
+ * @param s Pointer to string pointer (will be advanced past ANSI sequences)
+ * @param ansi_state Pointer to current ANSI state (will be updated)
+ *
+ * Implementation note: This is a static inline function rather than a macro
+ * for type safety and maintainability, while preserving performance.
+ */
+static inline void parse_ansi_escapes(char **s, int *ansi_state)
+{
+	while (**s == ESC_CHAR)
+	{
+		do
+		{
+			int ansi_mask = 0;
+			int ansi_diff = 0;
+			unsigned int param_val = 0;
+			++(*s);
+			if (**s == ANSI_CSI)
+			{
+				while ((*(++(*s)) & 0xf0) == 0x30)
+				{
+					if (**s < 0x3a)
+					{
+						param_val <<= 1;
+						param_val += (param_val << 2) + (**s & 0x0f);
+					}
+					else
+					{
+						if (param_val < I_ANSI_LIM)
+						{
+							ansi_mask |= ansiBitsMask(param_val);
+							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+						}
+						param_val = 0;
+					}
+				}
+			}
+			while ((**s & 0xf0) == 0x20)
+			{
+				++(*s);
+			}
+			if (**s == ANSI_END)
+			{
+				if (param_val < I_ANSI_LIM)
+				{
+					ansi_mask |= ansiBitsMask(param_val);
+					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+				}
+				*ansi_state = (*ansi_state & ~ansi_mask) | ansi_diff;
+				++(*s);
+			}
+			else if (**s)
+			{
+				++(*s);
+			}
+		} while (0);
+	}
+}
+
+/**
  * @brief Convert a DBref (#db) to it's numerical value (db)
  *
  * @param dbr Text DBref value
@@ -442,107 +507,12 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			 * this is like next_token(), but tracking ansi
 			 *
 			 */
-			while (*s == ESC_CHAR)
-			{
-				do
-				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
-					++(s);
-					if (*(s) == ANSI_CSI)
-					{
-						while ((*(++(s)) & 0xf0) == 0x30)
-						{
-							if (*(s) < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*(s) & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*(s) & 0xf0) == 0x20)
-					{
-						++(s);
-					}
-					if (*(s) == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-						++(s);
-					}
-					else if (*(s))
-					{
-						++(s);
-					}
-				} while (0);
-			}
+			parse_ansi_escapes(&s, &ansi_state);
 
 			while (*s && (*s != isep.str[0]))
 			{
 				++s;
-
-				while (*s == ESC_CHAR)
-				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(s);
-						if (*(s) == ANSI_CSI)
-						{
-							while ((*(++(s)) & 0xf0) == 0x30)
-							{
-								if (*(s) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(s) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*(s) & 0xf0) == 0x20)
-						{
-							++(s);
-						}
-						if (*(s) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-							++(s);
-						}
-						else if (*(s))
-						{
-							++(s);
-						}
-					} while (0);
-				}
+				parse_ansi_escapes(&s, &ansi_state);
 			}
 
 			if (*s)
