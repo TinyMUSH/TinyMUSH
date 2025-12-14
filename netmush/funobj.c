@@ -2145,13 +2145,14 @@ void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller __attribute
 	char *tbuf = NULL;
 	int aflags = 0, alen = 0, check_parents = Is_Func(CHECK_PARENTS);
 	dbref thing = match_thing(player, fargs[0]), aowner = NOTHING;
+	int exam = 0;
 
 	if (!Good_obj(thing))
 	{
 		SAFE_NOMATCH(buff, bufc);
 		return;
 	}
-	else if (!Examinable(player, thing))
+	else if (!(exam = Examinable(player, thing)))
 	{
 		SAFE_NOPERM(buff, bufc);
 		return;
@@ -3711,7 +3712,8 @@ void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 	thing = match_thing(player, fargs[0]);
 
-	if (!Good_obj(thing) || !Examinable(player, thing))
+	int exam = Good_obj(thing) ? Examinable(player, thing) : 0;
+	if (!exam)
 	{
 		SAFE_NOPERM(buff, bufc);
 		return;
@@ -3742,7 +3744,8 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 	dbref thing = match_thing(player, fargs[0]);
 	dbref j = NOTHING;
 
-	if (!Good_obj(thing) || !Examinable(player, thing))
+	int exam = Good_obj(thing) ? Examinable(player, thing) : 0;
+	if (!exam)
 	{
 		SAFE_NOPERM(buff, bufc);
 		return;
