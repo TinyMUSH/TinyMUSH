@@ -515,6 +515,12 @@ void hashflush(HASHTAB *htab, int size)
     HASHENT *hent, *thent;
     int i;
 
+    /* Guard against NULL hash table */
+    if (htab == NULL)
+    {
+        return;
+    }
+
     /* Validate size parameter */
     if (size < 0)
     {
@@ -610,7 +616,7 @@ void hashreplall(int *old, int *new, HASHTAB *htab)
     HASHENT *hptr;
 
     /* Guard against NULL pointers and uninitialized table */
-    if (old == NULL || new == NULL || htab->entry == NULL || htab->hashsize == 0)
+    if (htab == NULL || old == NULL || new == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
