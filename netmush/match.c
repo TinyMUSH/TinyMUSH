@@ -468,6 +468,8 @@ void match_list(dbref first, int local)
 
 void match_possession(void)
 {
+    dbref contents;
+
     if (md.confidence >= CON_DBREF)
     {
         return;
@@ -475,13 +477,17 @@ void match_possession(void)
 
     if (Good_obj(md.player) && Good_loc(md.player))
     {
-        match_list(Contents(md.player), CON_LOCAL);
+        contents = Contents(md.player);
+        if (contents != NOTHING)
+        {
+            match_list(contents, CON_LOCAL);
+        }
     }
 }
 
 void match_neighbor(void)
 {
-    dbref loc;
+    dbref loc, contents;
 
     if (md.confidence >= CON_DBREF)
     {
@@ -494,7 +500,11 @@ void match_neighbor(void)
 
         if (Good_obj(loc))
         {
-            match_list(Contents(loc), CON_LOCAL);
+            contents = Contents(loc);
+            if (contents != NOTHING)
+            {
+                match_list(contents, CON_LOCAL);
+            }
         }
     }
 }
