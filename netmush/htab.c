@@ -171,7 +171,10 @@ static inline void update_hash_stats(HASHTAB *htab, int numchecks, int is_hit)
 {
     if (is_hit)
     {
-        htab->hits++;
+        if (htab->hits < INT_MAX)
+        {
+            htab->hits++;
+        }
     }
 
     if (numchecks > htab->max_scan)
@@ -395,7 +398,12 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
             }
 
             XFREE(hptr);
-            htab->deletes++;
+
+            if (htab->deletes < INT_MAX)
+            {
+                htab->deletes++;
+            }
+
             htab->entries--;
 
             if (htab->entry[hval] == NULL)
@@ -444,7 +452,12 @@ void hashdelall(int *old, HASHTAB *htab)
                 }
 
                 XFREE(hptr);
-                htab->deletes++;
+
+                if (htab->deletes < INT_MAX)
+                {
+                    htab->deletes++;
+                }
+
                 htab->entries--;
 
                 if (htab->entry[hval] == NULL)
