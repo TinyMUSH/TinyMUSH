@@ -265,7 +265,8 @@ void raw_broadcast(int inflags, char *template, ...)
 		which_flag = 1;
 	}
 
-	for (d = descriptor_list; d; d = d->next)
+	DESC *dnext;
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			switch (which_flag)
@@ -307,6 +308,11 @@ void raw_broadcast(int inflags, char *template, ...)
 
 void clearstrings(DESC *d)
 {
+	if (!d)
+	{
+		return;
+	}
+
 	if (d->output_prefix)
 	{
 		XFREE(d->output_prefix);
@@ -561,6 +567,10 @@ void freeqs(DESC *d)
 	while (tb)
 	{
 		tnext = tb->hdr.nxt;
+		if (tb->data)
+		{
+			XFREE(tb->data);
+		}
 		XFREE(tb);
 		tb = tnext;
 	}
@@ -915,7 +925,12 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 			wait_que(mushconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 
 		XFREE(buf);
-		for (obj = Contents(mushconf.master_room); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+		dbref master_contents = Contents(mushconf.master_room);
+		if (!Good_obj(master_contents))
+		{
+			master_contents = NOTHING;
+		}
+		for (obj = master_contents; (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 		{
 			if (!mushconf.global_aconn_uselocks || could_doit(player, obj, A_LUSE))
 			{
@@ -1135,13 +1150,19 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	strftime(conn_time_buf, sizeof(conn_time_buf), "%a %b %d %H:%M:%S %Y", &conn_time_tm);
 	record_login(player, 1, conn_time_buf, d->addr, d->username);
 
+	dbref player_loc = Location(player);
+	if (!Good_obj(player_loc))
+	{
+		player_loc = mushconf.start_room;
+	}
+
 	if (mushconf.have_pueblo == 1)
 	{
-		look_in(player, Location(player), (LK_SHOWEXIT | LK_OBEYTERSE | LK_SHOWVRML));
+		look_in(player, player_loc, (LK_SHOWEXIT | LK_OBEYTERSE | LK_SHOWVRML));
 	}
 	else
 	{
-		look_in(player, Location(player), (LK_SHOWEXIT | LK_OBEYTERSE));
+		look_in(player, player_loc, (LK_SHOWEXIT | LK_OBEYTERSE));
 	}
 
 	mushstate.curr_enactor = temp;
@@ -1295,6 +1316,11 @@ void desc_reload(dbref player)
 	dbref aowner;
 	int aflags, alen;
 
+	if (!Good_obj(player))
+	{
+		return;
+	}
+
 	for (d = (DESC *)nhashfind((int)player, &mushstate.desc_htab); d; d = d->hashnext)
 	{
 		buf = atr_pget(player, A_TIMEOUT, &aowner, &aflags, &alen);
@@ -1441,8 +1467,9 @@ char *trimmed_name(dbref player)
 char *trimmed_site(char *name)
 {
 	char *buff = XMALLOC(MBUF_SIZE, "buff");
-	XSTRNCPY(buff, name, mushconf.site_chars);
-	buff[mushconf.site_chars + 1] = '\0';
+	int max_chars = (mushconf.site_chars < MBUF_SIZE - 1) ? mushconf.site_chars : MBUF_SIZE - 1;
+	XSTRNCPY(buff, name, max_chars);
+	buff[max_chars] = '\0';
 	return buff;
 }
 
@@ -1508,8 +1535,9 @@ void dump_users(DESC *e, char *match, int key)
 	}
 
 	count = 0;
+	DESC *dnext;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if (!Hidden(d->player) || ((e->flags & DS_CONNECTED) && See_Hidden(e->player)))
