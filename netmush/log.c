@@ -43,17 +43,22 @@ char *logfile_init(char *filename)
     else if (strstr(filename, "XXXXXX") != NULL)
     {
         mainlog_fp = fmkstemp(filename);
+        if (!mainlog_fp)
+        {
+            fprintf(stderr, "Could not create temporary logfile %s.\n", filename);
+            mainlog_fp = stderr;
+            return (NULL);
+        }
     }
     else
     {
         mainlog_fp = fopen(filename, "a");
-    }
-
-    if (!mainlog_fp)
-    {
-        fprintf(stderr, "Could not open logfile %s for writing.\n", filename);
-        mainlog_fp = stderr;
-        return (NULL);
+        if (!mainlog_fp)
+        {
+            fprintf(stderr, "Could not open logfile %s for writing.\n", filename);
+            mainlog_fp = stderr;
+            return (NULL);
+        }
     }
 
     setbuf(mainlog_fp, NULL); /* unbuffered */
@@ -92,17 +97,21 @@ int start_log(const char *primary, const char *secondary, int key)
                  * Try to save ourselves some lookups
                  */
                 last_key = key;
+                log_fp = NULL;
 
-                for (lp = logfds_table; lp->log_flag; lp++)
+                if (logfds_table != NULL)
                 {
-                    /*
-                     * Though keys can be OR'd, use the first one
-                     * * matched
-                     */
-                    if (lp->log_flag & key)
+                    for (lp = logfds_table; lp->log_flag; lp++)
                     {
-                        log_fp = lp->fileptr;
-                        break;
+                        /*
+                         * Though keys can be OR'd, use the first one
+                         * * matched
+                         */
+                        if (lp->log_flag & key)
+                        {
+                            log_fp = lp->fileptr;
+                            break;
+                        }
                     }
                 }
 
@@ -125,7 +134,7 @@ int start_log(const char *primary, const char *secondary, int key)
 
     mushstate.logging++;
 
-    if (mushstate.logging)
+    if (mushstate.logging > 1)
     {
         if (key & LOG_FORCE)
         {
@@ -136,85 +145,82 @@ int start_log(const char *primary, const char *secondary, int key)
              */
             mushstate.logging--;
         }
-
-        if (!mushstate.standalone)
+        else
         {
             /*
-             * Format the timestamp
+             * Recursive call, log it and return indicating no log
              */
-            if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
-            {
-                time((time_t *)(&now));
-                struct tm tp;
-                localtime_r((time_t *)(&now), &tp);
-                log_write_raw(0, "%02d%02d%02d.%02d%02d%02d ", (tp.tm_year % 100), tp.tm_mon + 1, tp.tm_mday, tp.tm_hour, tp.tm_min, tp.tm_sec);
-            }
+            log_write_raw(0, "Recursive logging request.\n");
+            return (1);
+        }
+    }
 
-            /*
-             * Write the header to the log
-             */
-
-            if (secondary && *secondary)
-            {
-                pri = strndup(primary, 3);
-                sec = strndup(secondary, 5);
-
-                if (pri == NULL || sec == NULL)
-                {
-                    free(pri);
-                    free(sec);
-                    mushstate.logging--;
-                    return 0;
-                }
-
-                if (log_pos == NULL)
-                {
-                    log_write_raw(0, "%s %3s/%-5s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec);
-                }
-                else
-                {
-                    log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec, log_pos);
-                }
-
-                free(sec);
-                free(pri);
-            }
-            else
-            {
-                pri = strndup(primary, 9);
-
-                if (pri == NULL)
-                {
-                    mushstate.logging--;
-                    return 0;
-                }
-
-                if (log_pos == NULL)
-                {
-                    log_write_raw(0, "%s %-9s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri);
-                }
-                else
-                {
-                    log_write_raw(0, "%s %-9s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, log_pos);
-                }
-
-                free(pri);
-            }
+    if (!mushstate.standalone)
+    {
+        /*
+         * Format the timestamp
+         */
+        if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
+        {
+            time((time_t *)(&now));
+            struct tm tp;
+            localtime_r((time_t *)(&now), &tp);
+            log_write_raw(0, "%02d%02d%02d.%02d%02d%02d ", (tp.tm_year % 100), tp.tm_mon + 1, tp.tm_mday, tp.tm_hour, tp.tm_min, tp.tm_sec);
         }
 
         /*
-         * If a recursive call, log it and return indicating no log
+         * Write the header to the log
          */
 
-        if (mushstate.logging != 1)
+        if (secondary && *secondary)
         {
-            log_write_raw(0, "Recursive logging request.\n");
-        }
+            pri = strndup(primary, 3);
+            sec = strndup(secondary, 5);
 
-        return (1);
+            if (pri == NULL || sec == NULL)
+            {
+                free(pri);
+                free(sec);
+                mushstate.logging--;
+                return 0;
+            }
+
+            if (log_pos == NULL)
+            {
+                log_write_raw(0, "%s %3s/%-5s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec);
+            }
+            else
+            {
+                log_write_raw(0, "%s %3s/%-5s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, sec, log_pos);
+            }
+
+            free(sec);
+            free(pri);
+        }
+        else
+        {
+            pri = strndup(primary, 9);
+
+            if (pri == NULL)
+            {
+                mushstate.logging--;
+                return 0;
+            }
+
+            if (log_pos == NULL)
+            {
+                log_write_raw(0, "%s %-9s: ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri);
+            }
+            else
+            {
+                log_write_raw(0, "%s %-9s (%s): ", (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name)), pri, log_pos);
+            }
+
+            free(pri);
+        }
     }
 
-    return 0;
+    return (1);
 }
 
 /* ---------------------------------------------------------------------------
@@ -248,6 +254,11 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
     int my_errno = errno;
     char errbuf[256];
     strerror_r(my_errno, errbuf, sizeof(errbuf));
+
+    if (!failing_object)
+    {
+        failing_object = "(null)";
+    }
 
     if (extra && *extra)
     {
@@ -475,19 +486,22 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
      * Any additional special ones
      */
 
-    for (lp = logfds_table; lp->log_flag; lp++)
+    if (logfds_table != NULL)
     {
-        if (lp->filename && lp->fileptr)
+        for (lp = logfds_table; lp->log_flag; lp++)
         {
-            fclose(lp->fileptr);
-            s = XASPRINTF("s", "%s.%s", lp->filename, ts);
-            copy_file(lp->filename, s, 1);
-            XFREE(s);
-            lp->fileptr = fopen(lp->filename, "a");
-
-            if (lp->fileptr)
+            if (lp->filename && lp->fileptr)
             {
-                setbuf(lp->fileptr, NULL);
+                fclose(lp->fileptr);
+                s = XASPRINTF("s", "%s.%s", lp->filename, ts);
+                copy_file(lp->filename, s, 1);
+                XFREE(s);
+                lp->fileptr = fopen(lp->filename, "a");
+
+                if (lp->fileptr)
+                {
+                    setbuf(lp->fileptr, NULL);
+                }
             }
         }
     }
@@ -502,14 +516,17 @@ void logfile_close(void)
     char *ts;
     ts = mktimestamp();
 
-    for (lp = logfds_table; lp->log_flag; lp++)
+    if (logfds_table != NULL)
     {
-        if (lp->filename && lp->fileptr)
+        for (lp = logfds_table; lp->log_flag; lp++)
         {
-            fclose(lp->fileptr);
-            s = XASPRINTF("s", "%s.%s", lp->filename, ts);
-            copy_file(lp->filename, s, 1);
-            XFREE(s);
+            if (lp->filename && lp->fileptr)
+            {
+                fclose(lp->fileptr);
+                s = XASPRINTF("s", "%s.%s", lp->filename, ts);
+                copy_file(lp->filename, s, 1);
+                XFREE(s);
+            }
         }
     }
 
