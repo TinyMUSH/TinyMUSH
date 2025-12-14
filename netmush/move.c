@@ -42,6 +42,15 @@ void process_leave_loc(dbref thing, dbref dest, dbref cause, int canhear, int hu
         dest = Home(thing);
     }
 
+    /*
+     * Validate destination before processing leave messages
+     */
+    if (!Good_obj(dest))
+    {
+        log_write(LOG_PROBLEMS, "BUG", "MOVE", "process_leave_loc: Invalid destination #%d from object #%d", dest, thing);
+        dest = NOTHING;
+    }
+
     if (mushconf.have_pueblo == 1)
     {
         if (Html(thing))
@@ -212,9 +221,17 @@ void move_object(dbref thing, dbref dest)
 
 void send_dropto(dbref thing, dbref player)
 {
+    dbref dest;
+
     if (!Sticky(thing))
     {
-        move_via_generic(thing, Dropto(Location(thing)), player, 0);
+        dest = Dropto(Location(thing));
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "send_dropto: Invalid dropto destination #%d from object #%d at location #%d", dest, thing, Location(thing));
+            dest = HOME;
+        }
+        move_via_generic(thing, dest, player, 0);
     }
     else
     {
@@ -429,6 +446,15 @@ int move_via_teleport(dbref thing, dbref dest, dbref cause, int hush)
         dest = Home(thing);
     }
 
+    /*
+     * Validate destination is accessible
+     */
+    if (!Good_obj(dest))
+    {
+        log_write(LOG_PROBLEMS, "BUG", "MOVE", "move_via_teleport: Invalid destination #%d for object #%d", dest, thing);
+        return 0;
+    }
+
     canhear = Hearer(thing);
 
     if (!(hush & HUSH_LEAVE))
@@ -510,6 +536,15 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
         loc = find_var_dest(player, exit);
         break;
 
+    case NOTHING:
+        /*
+         * No valid destination found
+         */
+        oattr = (Dark(player) || (hush & HUSH_EXIT)) ? A_NULL : A_OFAIL;
+        aattr = ((hush & HUSH_EXIT) || (Dark(player) && !mushconf.dark_actions)) ? A_NULL : A_AFAIL;
+        did_it(player, exit, A_FAIL, "That exit doesn't lead anywhere.", oattr, NULL, aattr, 0, (char **)NULL, 0, MSG_MOVE);
+        return;
+
     default:
         /*
          * EMPTY
@@ -522,6 +557,14 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
         switch (Typeof(loc))
         {
         case TYPE_ROOM:
+            /*
+             * Validate room is not going away
+             */
+            if (Going(loc))
+            {
+                notify(player, "You can't go that way.");
+                return;
+            }
             move_via_exit(player, loc, NOTHING, exit, hush);
 
             if (divest)
@@ -773,7 +816,6 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
         /*
          * You must control either the exit or the location
          */
-        playerloc = Location(player);
 
         if (!Controls(player, thing) && !Controls(player, playerloc))
         {
