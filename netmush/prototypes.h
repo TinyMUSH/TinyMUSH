@@ -1246,6 +1246,7 @@ extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *
 
 /* stringutil.c */
 extern const char *safe_strerror(int errnum);
+extern int safe_gettimeofday(struct timeval *tv, void *tz);
 extern char *ansiChar(int ch);
 extern int ansiNum(int ch);
 extern char ansiLetter(int num);

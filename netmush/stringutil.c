@@ -37,6 +37,26 @@ const char *safe_strerror(int errnum)
 }
 
 /**
+ * @brief High-resolution timer using clock_gettime
+ * Returns struct timeval for compatibility with existing code
+ *
+ * @param tv Pointer to timeval structure to fill
+ * @param tz Unused (for gettimeofday compatibility)
+ * @return int 0 on success, -1 on error
+ */
+int safe_gettimeofday(struct timeval *tv, void *tz __attribute__((unused)))
+{
+	struct timespec ts;
+	if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1)
+	{
+		return -1;
+	}
+	tv->tv_sec = ts.tv_sec;
+	tv->tv_usec = ts.tv_nsec / 1000;
+	return 0;
+}
+
+/**
  * @brief Convert ansi character code (%x?) to ansi sequence.
  *
  * @param ch Character to convert

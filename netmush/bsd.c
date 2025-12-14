@@ -253,7 +253,7 @@ void shovechars(int port)
 		maxd = sock + 1;
 	}
 
-	gettimeofday(&last_slice, NULL);
+	safe_gettimeofday(&last_slice, NULL);
 
 	maxfds = getdtablesize();
 
@@ -281,7 +281,7 @@ void shovechars(int port)
 	 */
 	while (mushstate.shutdown_flag == 0)
 	{
-		gettimeofday(&current_time, NULL);
+		safe_gettimeofday(&current_time, NULL);
 
 		last_slice = update_quotas(last_slice, current_time);
 		process_commands();
