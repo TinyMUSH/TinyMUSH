@@ -62,7 +62,7 @@ int get_hashmask(int *size)
 
     /*
      * Get next power-of-two >= size, return power-1 as the mask for
-     * * ANDing
+     * ANDing. Ensure size doesn't overflow.
      */
 
     /* Ensure size is at least 1 to avoid undefined behavior */
@@ -71,7 +71,8 @@ int get_hashmask(int *size)
         *size = 1;
     }
 
-    for (tsize = 1; tsize < *size; tsize = tsize << 1)
+    /* Check for overflow: if tsize would exceed INT_MAX/2, cap it */
+    for (tsize = 1; tsize < *size && tsize > 0; tsize = tsize << 1)
         ;
 
     *size = tsize;
