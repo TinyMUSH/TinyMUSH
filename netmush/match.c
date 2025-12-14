@@ -591,6 +591,11 @@ void match_exit(void)
 
     loc = Location(md.player);
 
+    if (!Good_obj(loc))
+    {
+        return;
+    }
+
     if (Good_obj(loc))
     {
         (void)match_exit_internal(loc, loc, CON_LOCAL);
