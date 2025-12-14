@@ -972,12 +972,28 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
         {
             if (got_one)
             {
+                /* Check buffer overflow before adding separator */
+                if (bp - buf >= LBUF_SIZE - 1)
+                {
+                    break;
+                }
                 *bp++ = ' ';
             }
 
             for (cp = nt->name; *cp; cp++)
             {
+                /* Check buffer overflow before adding each character */
+                if (bp - buf >= LBUF_SIZE - 1)
+                {
+                    break;
+                }
                 *bp++ = *cp;
+            }
+
+            /* Stop if buffer is full */
+            if (bp - buf >= LBUF_SIZE - 1)
+            {
+                break;
             }
 
             got_one = true;
@@ -1051,12 +1067,28 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
         {
             if (got_one)
             {
+                /* Check buffer overflow before adding separator */
+                if (bp - buf >= LBUF_SIZE - 1)
+                {
+                    break;
+                }
                 *bp++ = ' ';
             }
 
             for (cp = nt->name; *cp; cp++)
             {
+                /* Check buffer overflow before adding each character */
+                if (bp - buf >= LBUF_SIZE - 1)
+                {
+                    break;
+                }
                 *bp++ = *cp;
+            }
+
+            /* Stop if buffer is full */
+            if (bp - buf >= LBUF_SIZE - 1)
+            {
+                break;
             }
 
             got_one = true;
