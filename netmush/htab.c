@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 
 /* ---------------------------------------------------------------------------
  * hashval: Compute hash value of a string for a hash table.
@@ -127,6 +128,7 @@ void hashreset(HASHTAB *htab)
 {
     htab->checks = 0;
     htab->scans = 0;
+    htab->max_scan = 0;
     htab->hits = 0;
 }
 
@@ -149,11 +151,6 @@ static inline int get_hash_value(HASHKEY key, HASHTAB *htab)
     }
 }
 
-/* ---------------------------------------------------------------------------
- * key_matches: Check if two keys match based on hash table type.
- * Works for both string and numeric hash tables.
- */
-
 static inline int key_matches(HASHKEY a, HASHKEY b, int htype)
 {
     if (htype == HT_STR)
@@ -163,6 +160,53 @@ static inline int key_matches(HASHKEY a, HASHKEY b, int htype)
     else
     {
         return a.i == b.i;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * update_hash_stats: Safely update hash statistics with overflow protection.
+ */
+
+static inline void update_hash_stats(HASHTAB *htab, int numchecks, int is_hit)
+{
+    if (is_hit)
+    {
+        htab->hits++;
+    }
+
+    if (numchecks > htab->max_scan)
+    {
+        htab->max_scan = numchecks;
+    }
+
+    /* Add with overflow check to prevent stat corruption */
+    if (htab->checks < INT_MAX - numchecks)
+    {
+        htab->checks += numchecks;
+    }
+    else
+    {
+        /* Overflow detected; reset stats to prevent corruption */
+        log_write(LOG_BUGS, "BUG", "HASH", "Hash statistics overflow detected, resetting stats");
+        hashreset(htab);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * increment_scans: Safely increment scan counter with overflow protection.
+ */
+
+static inline void increment_scans(HASHTAB *htab)
+{
+    if (htab->scans < INT_MAX)
+    {
+        htab->scans++;
+    }
+    else
+    {
+        /* Overflow detected; reset stats to prevent corruption */
+        log_write(LOG_BUGS, "BUG", "HASH", "Hash scans counter overflow detected, resetting stats");
+        hashreset(htab);
     }
 }
 
@@ -177,7 +221,7 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr;
     int htype = htab->flags & HT_TYPEMASK;
     numchecks = 0;
-    htab->scans++;
+    increment_scans(htab);
 
     hval = get_hash_value(key, htab);
 
@@ -187,24 +231,12 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 
         if (key_matches(key, hptr->target, htype))
         {
-            htab->hits++;
-
-            if (numchecks > htab->max_scan)
-            {
-                htab->max_scan = numchecks;
-            }
-
-            htab->checks += numchecks;
+            update_hash_stats(htab, numchecks, 1);
             return hptr->data;
         }
     }
 
-    if (numchecks > htab->max_scan)
-    {
-        htab->max_scan = numchecks;
-    }
-
-    htab->checks += numchecks;
+    update_hash_stats(htab, numchecks, 0);
     return NULL;
 }
 
@@ -219,7 +251,7 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr;
     int htype = htab->flags & HT_TYPEMASK;
     numchecks = 0;
-    htab->scans++;
+    increment_scans(htab);
 
     hval = get_hash_value(key, htab);
 
@@ -229,24 +261,12 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
 
         if (key_matches(key, hptr->target, htype))
         {
-            htab->hits++;
-
-            if (numchecks > htab->max_scan)
-            {
-                htab->max_scan = numchecks;
-            }
-
-            htab->checks += numchecks;
+            update_hash_stats(htab, numchecks, 1);
             return hptr->flags;
         }
     }
 
-    if (numchecks > htab->max_scan)
-    {
-        htab->max_scan = numchecks;
-    }
-
-    htab->checks += numchecks;
+    update_hash_stats(htab, numchecks, 0);
     return 0;
 }
 
