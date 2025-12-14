@@ -524,8 +524,14 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
         return 1;
     }
 
+    exit = Exits(loc);
+    if (exit == NOTHING)
+    {
+        return 0;
+    }
+
     result = 0;
-    for (exit = Exits(loc); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
+    for (; (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
     {
         if (exit == md.absolute_form)
         {
