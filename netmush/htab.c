@@ -265,6 +265,12 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 
     htype = htab->flags & HT_TYPEMASK;
 
+    /* String hash tables should not be queried with NULL keys */
+    if (htype == HT_STR && key.s == NULL)
+    {
+        return NULL;
+    }
+
     numchecks = 0;
     increment_scans(htab);
 
@@ -303,6 +309,12 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
     }
 
     htype = htab->flags & HT_TYPEMASK;
+
+    /* String hash tables should not be queried with NULL keys */
+    if (htype == HT_STR && key.s == NULL)
+    {
+        return 0;
+    }
 
     numchecks = 0;
     increment_scans(htab);
@@ -343,6 +355,13 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     }
 
     htype = htab->flags & HT_TYPEMASK;
+
+    /* Validate key for string hash tables */
+    if (htype == HT_STR && key.s == NULL)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Attempted to add NULL string key to hash table");
+        return CF_Failure;
+    }
 
     /*
      * Make sure that the entry isn't already in the hash table.  If it
@@ -416,6 +435,12 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
     }
 
     htype = htab->flags & HT_TYPEMASK;
+
+    /* String hash tables should not delete with NULL keys */
+    if (htype == HT_STR && key.s == NULL)
+    {
+        return;
+    }
 
     hval = get_hash_value(key, htab);
     last = NULL;
@@ -613,6 +638,12 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
     }
 
     htype = htab->flags & HT_TYPEMASK;
+
+    /* String hash tables should not replace with NULL keys */
+    if (htype == HT_STR && key.s == NULL)
+    {
+        return 0;
+    }
 
     hval = get_hash_value(key, htab);
 
@@ -975,7 +1006,7 @@ int search_nametab(dbref player, NAMETAB *ntab, char *flagname)
 {
     NAMETAB *nt;
 
-    if (ntab == NULL)
+    if (ntab == NULL || flagname == NULL)
     {
         return -1;
     }
@@ -1006,7 +1037,7 @@ NAMETAB *find_nametab_ent(dbref player, NAMETAB *ntab, char *flagname)
 {
     NAMETAB *nt;
 
-    if (ntab == NULL)
+    if (ntab == NULL || flagname == NULL)
     {
         return NULL;
     }
@@ -1242,6 +1273,12 @@ int cf_ntab_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     NAMETAB *np;
     char *ap;
+
+    if (str == NULL)
+    {
+        cf_log(player, "CNF", "NFND", cmd, "NULL string provided");
+        return -1;
+    }
 
     for (ap = str; *ap && !isspace(*ap); ap++)
         ;
