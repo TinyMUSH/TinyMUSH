@@ -844,6 +844,7 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
 	dbref thing = NOTHING, it = NOTHING;
 	char *bb_p = NULL;
+	int exam = 0;
 	Delim osep;
 
 	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
@@ -859,7 +860,8 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	it = match_thing(player, fargs[0]);
 	bb_p = *bufc;
 
-	if (Good_loc(it) && (Examinable(player, it) || (Location(player) == it) || (it == cause)))
+	exam = Good_loc(it) ? Examinable(player, it) : 0;
+	if (Good_loc(it) && (exam || (Location(player) == it) || (it == cause)))
 	{
 		for (thing = Contents(it); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
@@ -928,6 +930,8 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	 *
 	 */
 	bb_p = *bufc;
+	/* Cache base dark once for the original object */
+	int base_dark_flag = Dark(it) ? VE_BASE_DARK : 0;
 	for (lev = 0, parent = it; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
 		/**
@@ -944,8 +948,8 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			key |= VE_LOC_XAM;
 		if (Dark(parent))
 			key |= VE_LOC_DARK;
-		if (Dark(it))
-			key |= VE_BASE_DARK;
+		/* Reuse cached base dark flag for the starting room/object */
+		key |= base_dark_flag;
 
 		for (thing = Exits(parent); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
@@ -1523,24 +1527,15 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 		}
 		else
 		{
-			/**
-			 * does the object have this flag?
-			 *
-			 */
-			if ((Flags(it) & fset.word1) || (Flags2(it) & fset.word2) || (Flags3(it) & fset.word3) || (Typeof(it) == p_type))
+			/* Determine if the object has this flag once */
+			int has_flag = ((Flags(it) & fset.word1) || (Flags2(it) & fset.word2) || (Flags3(it) & fset.word3) || (Typeof(it) == p_type)) ? 1 : 0;
+			if (has_flag && (p_type == TYPE_PLAYER) && (fset.word2 == CONNECTED) && Can_Hide(it) && Hidden(it) && !See_Hidden(player))
 			{
-				if ((p_type == TYPE_PLAYER) && (fset.word2 == CONNECTED) && Can_Hide(it) && Hidden(it) && !See_Hidden(player))
-				{
-					temp = 0;
-				}
-				else
-				{
-					temp = 1;
-				}
+				temp = 0;
 			}
 			else
 			{
-				temp = 0;
+				temp = has_flag;
 			}
 
 			if (!(type ^ negate ^ temp))
@@ -1558,10 +1553,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 				return;
 			}
 
-			/**
-			 * Otherwise, move on to check the next flag.
-			 *
-			 */
+			/* Otherwise, move on to check the next flag. */
 		}
 	}
 
