@@ -120,6 +120,13 @@ void munge_space_for_match(const char *name)
 {
     char *q;
     const char *p;
+
+    if (!name)
+    {
+        XMEMSET(md.string, 0, LBUF_SIZE);
+        return;
+    }
+
     p = name;
     q = md.string;
 
@@ -526,12 +533,18 @@ void match_exit_with_parents(void)
     if (Good_obj(md.player) && Has_location(md.player))
     {
         loc = Location(md.player);
-        for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
+        for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); lev++)
         {
+            dbref next_parent = Parent(parent);
+            if (next_parent == parent)
+            {
+                break;
+            }
             if (match_exit_internal(parent, loc, CON_LOCAL))
             {
                 break;
             }
+            parent = next_parent;
         }
     }
 }
@@ -561,12 +574,18 @@ void match_carried_exit_with_parents(void)
 
     if (Good_obj(md.player) && Has_exits(md.player))
     {
-        for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
+        for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); lev++)
         {
+            dbref next_parent = Parent(parent);
+            if (next_parent == parent)
+            {
+                break;
+            }
             if (match_exit_internal(parent, md.player, CON_LOCAL))
             {
                 break;
             }
+            parent = next_parent;
         }
     }
 }
@@ -579,10 +598,12 @@ void match_master_exit(void)
     }
 
     if (Good_obj(md.player) && Has_exits(md.player))
+    {
         if (Good_obj(mushconf.master_room))
         {
             (void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
         }
+    }
 }
 
 void match_zone_exit(void)
