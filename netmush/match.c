@@ -413,13 +413,15 @@ void match_here(void)
 void match_list(dbref first, int local)
 {
     char *namebuf;
+    int iteration_count = 0;
+    const int MAX_ITERATIONS = 10000;
 
     if (md.confidence >= CON_DBREF)
     {
         return;
     }
 
-    for (; (first != NOTHING) && (Next(first) != first); first = Next(first))
+    for (; (first != NOTHING) && (Next(first) != first) && (iteration_count < MAX_ITERATIONS); first = Next(first), iteration_count++)
     {
         if (first == md.absolute_form)
         {
