@@ -68,6 +68,19 @@ Since TinyMUSH 4.0 is currently in alpha, there will be bugs and time where the 
 
 See INSTALL for an overview of the installation process.
 
+## Configuration
+
+TinyMUSH reads its configuration from a file passed at startup. See configs/netmush.conf.example.in for a full list of options.
+
+### RNG Seed
+- `rng_seed`: Optional deterministic seed for the global RNG. When set to a non-negative integer, the server seeds its PCG32 RNG with this value, ensuring reproducible random behavior across runs. If not set (or negative), TinyMUSH checks the environment variable `TINYMUSH_RNG_SEED`; if neither is provided, seeding falls back to a time-based value.
+
+Example:
+
+```
+rng_seed 123456
+```
+
 
 # Full documentation
 

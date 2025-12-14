@@ -90,6 +90,14 @@ access		@find	disabled
 # player_starting_home	45
 # master_room		2
 # guest_char_num	16
+
+# Deterministic RNG seed (optional)
+# If set to a non-negative integer, TinyMUSH uses this value to seed
+# the global RNG, producing deterministic random sequences across runs.
+# If unset or negative, TinyMUSH will check environment variable
+# TINYMUSH_RNG_SEED, otherwise fall back to time-based seeding.
+# 
+# rng_seed 123456
 #
 # -- Pueblo Support
 #
