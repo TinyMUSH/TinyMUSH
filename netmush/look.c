@@ -2709,7 +2709,7 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	{
 		notify(player, "Sweeping exits...");
 
-		for (here = Exits(Location(sweeploc)); here != NOTHING; here = Next(here))
+		for (here = Exits(Location(sweeploc)); (here != NOTHING) && (Next(here) != here); here = Next(here))
 		{
 			sweep_check(player, here, what_key, 0);
 		}
@@ -2723,7 +2723,7 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	{
 		notify(player, "Sweeping inventory...");
 
-		for (here = Contents(sweeploc); here != NOTHING; here = Next(here))
+		for (here = Contents(sweeploc); (here != NOTHING) && (Next(here) != here); here = Next(here))
 		{
 			sweep_check(player, here, what_key, 0);
 		}
@@ -2737,7 +2737,7 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 	{
 		notify(player, "Sweeping carried exits...");
 
-		for (here = Exits(sweeploc); here != NOTHING; here = Next(here))
+		for (here = Exits(sweeploc); (here != NOTHING) && (Next(here) != here); here = Next(here))
 		{
 			sweep_check(player, here, what_key, 0);
 		}
