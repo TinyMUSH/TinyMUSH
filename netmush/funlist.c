@@ -2333,7 +2333,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 				oldp = *bufc;
 
-				if (((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0))))) < 0)
+				if (compare_items(ptrs1[i1], ptrs2[i2], sort_type, &ip1[i1], &ip2[i2], &fp1[i1], &fp2[i2]) < 0)
 				{
 					SAFE_LB_STR(ptrs1[i1], buff, bufc);
 					i1++;
@@ -2387,7 +2387,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	case SET_INTERSECT: /*!< Copy elements not in both lists */
 		while ((i1 < n1) && (i2 < n2))
 		{
-			val = ((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0)))));
+			val = compare_items(ptrs1[i1], ptrs2[i2], sort_type, &ip1[i1], &ip2[i2], &fp1[i1], &fp2[i2]);
 
 			if (!val)
 			{
@@ -2430,7 +2430,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	case SET_DIFF: /*!< Copy elements unique to list1 */
 		while ((i1 < n1) && (i2 < n2))
 		{
-			val = ((sort_type == ALPHANUM_LIST) ? strcmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == NOCASE_LIST) ? strcasecmp(ptrs1[i1], ptrs2[i2]) : ((sort_type == FLOAT_LIST) ? ((fp1[i1] > fp2[i2]) ? 1 : ((fp1[i1] < fp2[i2]) ? -1 : 0)) : ((ip1[i1] > ip2[i2]) ? 1 : ((ip1[i1] < ip2[i2]) ? -1 : 0)))));
+			val = compare_items(ptrs1[i1], ptrs2[i2], sort_type, &ip1[i1], &ip2[i2], &fp1[i1], &fp2[i2]);
 
 			if (!val)
 			{
