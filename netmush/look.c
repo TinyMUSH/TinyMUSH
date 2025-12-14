@@ -551,8 +551,9 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 				str[pos] = '\0';
 				SAFE_LB_STR(str, buff, bufc);
 
-				for (endp--; endp >= strbuf; endp--)
+				while (endp >= strbuf)
 				{
+					endp--;
 					SAFE_LB_CHR(*endp, buff, bufc);
 				}
 
@@ -575,8 +576,9 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 	 * We won't get here, but what the hell.
 	 */
 
-	for (endp--; endp >= strbuf; endp--)
+	while (endp >= strbuf)
 	{
+		endp--;
 		SAFE_LB_CHR(*endp, buff, bufc);
 	}
 
