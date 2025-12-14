@@ -61,7 +61,12 @@ char *logfile_init(char *filename)
         }
     }
 
-    setbuf(mainlog_fp, NULL); /* unbuffered */
+    /* Only unbuffer if not using stderr (don't modify system stderr) */
+    if (mainlog_fp != stderr)
+    {
+        setbuf(mainlog_fp, NULL); /* unbuffered */
+    }
+
     return (filename);
 }
 
@@ -423,6 +428,12 @@ void log_write_raw(int key, const char *format, ...)
     char *str = NULL;
     va_list ap;
     FILE *lfp;
+
+    if (!format)
+    {
+        fprintf(stderr, "Error: NULL format string in log_write_raw\n");
+        return;
+    }
 
     va_start(ap, format);
     size = vsnprintf(NULL, 0, format, ap);
