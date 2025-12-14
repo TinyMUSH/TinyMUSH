@@ -340,6 +340,12 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
 
 void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...)
 {
+    if (!format)
+    {
+        fprintf(stderr, "Error: NULL format string in _log_write\n");
+        return;
+    }
+
     if ((((key)&mushconf.log_options) != 0) && start_log(primary, secondary, key))
     {
         int size = 0;
@@ -615,6 +621,12 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
         {
             if (lp->filename && lp->fileptr)
             {
+                /* Reset log_fp if it points to this file */
+                if (log_fp == lp->fileptr)
+                {
+                    log_fp = mainlog_fp;
+                }
+
                 fclose(lp->fileptr);
                 s = XASPRINTF("s", "%s.%s", lp->filename, ts);
 
