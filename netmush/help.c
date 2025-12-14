@@ -23,6 +23,12 @@
 #include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <errno.h>
+
+#ifdef HELP_SELFTEST
+int g_help_test_fail_after = 0;
+int g_help_test_call = 0;
+#endif
 
 /* Functions used to build indexes */
 
@@ -32,6 +38,18 @@ int helpmkindx_dump_entries(FILE *wfp, long pos, help_indx_list *entries)
 	int truelen;
 	int depth;
 	help_indx_list *prev_ep, *ep;
+
+#ifdef HELP_SELFTEST
+	if (g_help_test_fail_after > 0)
+	{
+		g_help_test_call++;
+		if (g_help_test_call >= g_help_test_fail_after)
+		{
+			errno = EIO;
+			return (-1);
+		}
+	}
+#endif
 	/*
 	 *  if we have more than one entry, the one on the top of the chain
 	 *  is going to have the actual pos we want to use to index with
@@ -218,6 +236,8 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	XFREE(entries);
 	return 0;
 }
+
+#ifndef HELP_SELFTEST
 
 int helpindex_read(HASHTAB *htab, char *filename)
 {
@@ -611,3 +631,5 @@ void do_help(dbref player, dbref cause __attribute__((unused)), int key, char *m
 	help_write(player, message, &mushstate.hfile_hashes[hf_num], tbuf, (key & HELP_RAWHELP) ? 0 : 1);
 	XFREE(tbuf);
 }
+
+#endif /* HELP_SELFTEST */

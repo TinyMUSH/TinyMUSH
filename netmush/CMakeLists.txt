@@ -9,3 +9,7 @@ if(NOT APPLE)
 endif(NOT APPLE)
 target_link_libraries(netmush PRIVATE ${C_LIBRARY} ${CRYPT_LIBRARY} ${GDBM_LIBRARY} ${MATH_LIBRARY} ${NSL_LIBRARY} ${PCRE_LIBRARY} ${RESOLV_LIBRARY} ${DL_LIBRARY})
 install(TARGETS netmush DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+
+add_executable(help_selftest tests/help_selftest.c help.c)
+target_compile_definitions(help_selftest PRIVATE HELP_SELFTEST)
+target_include_directories(help_selftest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
