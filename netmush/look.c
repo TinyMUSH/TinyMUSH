@@ -510,7 +510,17 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 	parenlist[0] = 0;
 	depth = 0;
 
-	for (pos = strlen(str) - 1; pos >= 0; pos--)
+	if (strlen(str) == 0)
+	{
+		*endp = '\0';
+		SAFE_LB_STR(strbuf, buff, bufc);
+		XFREE(str);
+		XFREE(strbuf);
+		XFREE(parenlist);
+		return;
+	}
+
+	for (pos = (int)strlen(str) - 1; pos >= 0; pos--)
 	{
 		switch (str[pos])
 		{
