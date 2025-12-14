@@ -176,15 +176,8 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 						 * XXX Just stripping ansi isn't really enough.
 						 */
 						buf = strip_ansi(buff1);
-						if (buf)
-						{
-							SAFE_LB_STR(buf, buff, &e);
-							XFREE(buf);
-						}
-						else
-						{
-							SAFE_LB_STR(buff1, buff, &e);
-						}
+						SAFE_LB_STR(buf, buff, &e);
+						XFREE(buf);
 						SAFE_LB_STR((char *)"\">", buff, &e);
 						/*
 						 * XXX The exit name needs to be HTML escaped.
@@ -278,14 +271,6 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 				if (Can_See(player, thing, can_see_loc))
 				{
 					buff = unparse_object(player, thing, 1);
-				if (!buff)
-				{
-					continue;
-				}
-				if (!buff)
-				{
-					continue;
-				}
 					html_cp = html_buff;
 
 					if (Html(player) && (mushconf.have_pueblo == 1))
