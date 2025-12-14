@@ -80,10 +80,19 @@ char *parse_to_cleanup(int eval, bool first, char *cstr, char *rstr, char *zstr)
  * @param eval	Evaluation flags
  * @return char*
  */
+
 char *parse_to(char **dstr, char delim, int eval)
 {
 	int sp = 0, tp = 0, bracketlev = 0;
-	char *rstr = NULL, *cstr = NULL, *zstr = NULL, *stack = XMALLOC(32, "stack");
+	int stack_limit = mushconf.parse_stack_limit;
+	char *rstr = NULL, *cstr = NULL, *zstr = NULL;
+
+	if (stack_limit <= 0)
+	{
+		stack_limit = 1;
+	}
+
+	char *stack = XMALLOC(stack_limit, "stack");
 	bool first = true;
 
 	if ((dstr == NULL) || (*dstr == NULL))
@@ -317,7 +326,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				break;
 
 			case '[':
-				if (sp < 32)
+				if (sp < stack_limit)
 				{
 					stack[sp++] = ']';
 				}
@@ -335,7 +344,7 @@ char *parse_to(char **dstr, char delim, int eval)
 				break;
 
 			case '(':
-				if (sp < 32)
+				if (sp < stack_limit)
 				{
 					stack[sp++] = ')';
 				}

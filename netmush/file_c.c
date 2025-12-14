@@ -21,6 +21,7 @@
 
 #include <stdbool.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -101,7 +102,8 @@ FBLOCK *fcache_fill(FBLOCK *fp, char ch)
  */
 int fcache_read(FBLOCK **cp, char *filename)
 {
-    int n = 0, nmax = 0, tchars = 0, fd = 0;
+    int n = 0, tchars = 0, fd = 0;
+    ssize_t nmax = 0;
     char *buff = NULL;
     FBLOCK *fp = *cp, *tfp = NULL;
 
@@ -144,7 +146,6 @@ int fcache_read(FBLOCK **cp, char *filename)
                  *
                  */
                 log_write(LOG_PROBLEMS, "FIL", "OPEN", "Couldn't open file '%s'.", filename);
-                tf_close(fd);
                 return -1;
             }
 
@@ -156,8 +157,22 @@ int fcache_read(FBLOCK **cp, char *filename)
              */
             nmax = read(fd, buff, LBUF_SIZE);
 
-            while (nmax > 0)
+            while (nmax != 0)
             {
+                if (nmax < 0)
+                {
+                    if (errno == EINTR || errno == EAGAIN)
+                    {
+                        nmax = read(fd, buff, LBUF_SIZE);
+                        continue;
+                    }
+
+                    log_write(LOG_PROBLEMS, "FIL", "READ", "Error reading file '%s': %s", filename, strerror(errno));
+                    XFREE(buff);
+                    tf_close(fd);
+                    return -1;
+                }
+
                 for (n = 0; n < nmax; n++)
                 {
                     switch (buff[n])
@@ -181,7 +196,11 @@ int fcache_read(FBLOCK **cp, char *filename)
             }
 
             XFREE(buff);
-            tf_close(fd);
+
+            if (fd >= 0)
+            {
+                tf_close(fd);
+            }
         }
     }
 
@@ -206,7 +225,7 @@ int fcache_read(FBLOCK **cp, char *filename)
  */
 void fcache_rawdump(int fd, int num)
 {
-    int cnt, remaining;
+    ssize_t cnt, remaining;
     char *start;
     FBLOCK *fp;
 
@@ -228,6 +247,18 @@ void fcache_rawdump(int fd, int num)
 
             if (cnt < 0)
             {
+                if (errno == EINTR)
+                {
+                    continue;
+                }
+
+                log_write(LOG_PROBLEMS, "FIL", "WRITE", "Error writing cached file %d: %s", num, strerror(errno));
+                return;
+            }
+
+            if (cnt == 0)
+            {
+                log_write(LOG_PROBLEMS, "FIL", "WRITE", "Zero-length write while dumping cached file %d", num);
                 return;
             }
 
@@ -297,6 +328,19 @@ void fcache_load(dbref player)
     for (fp = fcache; fp->filename; fp++)
     {
         i = fcache_read(&fp->fileblock, *(fp->filename));
+
+        if (i < 0)
+        {
+            log_write(LOG_PROBLEMS, "FIL", "LOAD", "Failed to load cached file '%s'", *(fp->filename));
+
+            if ((player != NOTHING) && !Quiet(player))
+            {
+                XSPRINTF(sbuf, "cache load failed: %s", *(fp->filename));
+                notify(player, sbuf);
+            }
+
+            continue;
+        }
 
         if ((player != NOTHING) && !Quiet(player))
         {

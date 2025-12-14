@@ -279,6 +279,7 @@ void cf_init(void)
     mushconf.cmd_invk_lim = 2500;
     mushconf.func_nest_lim = 50;
     mushconf.func_invk_lim = 2500;
+    mushconf.parse_stack_limit = 64;
     mushconf.func_cpu_lim_secs = 60;
     mushconf.func_cpu_lim = 60 * CLOCKS_PER_SEC;
     mushconf.ntfy_nest_lim = 20;

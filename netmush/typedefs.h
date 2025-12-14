@@ -1011,6 +1011,7 @@ typedef struct confdata
     int cmd_invk_lim;          /*!< Max commands in one queue entry */
     int func_nest_lim;         /*!< Max nesting of functions */
     int func_invk_lim;         /*!< Max funcs invoked by a command */
+    int parse_stack_limit;     /*!< Max nesting depth for parse_to delimiter stack */
     int func_cpu_lim_secs;     /*!< Max secs of func CPU time by a cmd */
     clock_t func_cpu_lim;      /*!< Max clock ticks of func CPU time by a cmd */
     int lock_nest_lim;         /*!< Max nesting of lock evals */

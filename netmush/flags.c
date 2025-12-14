@@ -438,7 +438,7 @@ FLAGENT gen_flags[] = {
     {"MARKER8", MARK_8, '8', FLAG_WORD3, 0, fh_god},
     {"MARKER9", MARK_9, '9', FLAG_WORD3, 0, fh_god},
     {"COLOR256", COLOR256, ':', FLAG_WORD3, 0, fh_any},
-    {"COLOR24BIT", COLOR24BIT , ';', FLAG_WORD3, 0, fh_any},
+    {"COLOR24BIT", COLOR24BIT, ';', FLAG_WORD3, 0, fh_any},
     {NULL, 0, ' ', 0, 0, NULL}};
 
 OBJENT object_types[8] = {
@@ -507,17 +507,22 @@ void display_flagtab(dbref player)
 FLAGENT *find_flag(dbref thing __attribute__((unused)), char *flagname)
 {
     char *cp;
+    char tmpbuf[SBUF_SIZE];
 
     /*
-     * Make sure the flag name is uppercase
+     * Make sure the flag name is uppercase without mutating the caller buffer
      */
 
-    for (cp = flagname; *cp; cp++)
+    cp = tmpbuf;
+
+    while (*flagname && ((cp - tmpbuf) < (SBUF_SIZE - 1)))
     {
-        *cp = toupper(*cp);
+        *cp++ = toupper(*flagname++);
     }
 
-    return (FLAGENT *)hashfind(flagname, &mushstate.flags_htab);
+    *cp = '\0';
+
+    return (FLAGENT *)hashfind(tmpbuf, &mushstate.flags_htab);
 }
 
 /**
@@ -1155,6 +1160,7 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
     {
         cf_log(player, "CNF", "SYNTX", cmd, "Marker flag name too long: %s", namestr);
         XFREE(flagstr);
+        return -1;
     }
 
     for (cp = flagstr; cp && *cp; cp++)
@@ -1179,6 +1185,18 @@ int cf_flag_name(int *vp __attribute__((unused)), char *str, long extra __attrib
     for (cp = flagstr; cp && *cp; cp++)
     {
         *cp = toupper(*cp);
+    }
+
+    /* remove old name binding, if any */
+    if (fp->flagname)
+    {
+        hashdelete((char *)fp->flagname, &mushstate.flags_htab);
+
+        /* free previous dynamic names (renamed markers start with '_') */
+        if (fp->flagname[0] == '_')
+        {
+            XFREE((void *)fp->flagname);
+        }
     }
 
     fp->flagname = (const char *)flagstr;

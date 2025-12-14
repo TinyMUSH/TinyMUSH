@@ -927,6 +927,7 @@ CONF conftable[] = {
     {(char *)"page_cost", cf_int, CA_GOD, CA_PUBLIC, &mushconf.pagecost, 0},
     {(char *)"page_requires_equals", cf_bool, CA_GOD, CA_PUBLIC, &mushconf.page_req_equals, (long)"page command always requires an equals sign"},
     {(char *)"parent_recursion_limit", cf_int, CA_GOD, CA_PUBLIC, &mushconf.parent_nest_lim, 0},
+    {(char *)"parse_stack_limit", cf_int, CA_GOD, CA_PUBLIC, &mushconf.parse_stack_limit, 0},
     {(char *)"paycheck", cf_int, CA_GOD, CA_PUBLIC, &mushconf.paycheck, 0},
     {(char *)"pemit_far_players", cf_bool, CA_GOD, CA_PUBLIC, &mushconf.pemit_players, (long)"@pemit targets can be players in other locations"},
     {(char *)"pemit_any_object", cf_bool, CA_GOD, CA_PUBLIC, &mushconf.pemit_any, (long)"@pemit targets can be objects in other locations"},
