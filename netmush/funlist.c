@@ -2109,6 +2109,39 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
+
+/**
+ * @brief Compare two items by sort type
+ * @param s1 First item string
+ * @param s2 Second item string
+ * @param sort_type Sort type (ALPHANUM_LIST, NOCASE_LIST, FLOAT_LIST, INT_LIST)
+ * @param ip1 Pointer to first integer value (for INT_LIST)
+ * @param ip2 Pointer to second integer value (for INT_LIST)
+ * @param fp1 Pointer to first float value (for FLOAT_LIST)
+ * @param fp2 Pointer to second float value (for FLOAT_LIST)
+ * @return Comparison result: <0, 0, or >0
+ */
+static int
+compare_items(const char *s1, const char *s2, int sort_type, int *ip1, int *ip2, double *fp1, double *fp2)
+{
+if (sort_type == ALPHANUM_LIST)
+{
+return strcmp(s1, s2);
+}
+else if (sort_type == NOCASE_LIST)
+{
+return strcasecmp(s1, s2);
+}
+else if (sort_type == FLOAT_LIST)
+{
+return (*fp1 > *fp2) ? 1 : ((*fp1 < *fp2) ? -1 : 0);
+}
+else
+{
+return (*ip1 > *ip2) ? 1 : ((*ip1 < *ip2) ? -1 : 0);
+}
+}
+
 void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	Delim isep, osep;
