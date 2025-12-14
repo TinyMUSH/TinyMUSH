@@ -848,6 +848,7 @@ void restore_match_state(MSTATE *m_state)
     {
         XSTRCPY(md.string, m_state->string);
         XFREE(m_state->string);
+        m_state->string = NULL;
     }
 }
 
