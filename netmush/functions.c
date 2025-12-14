@@ -115,14 +115,17 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
     }
 
     /**
-     * Make a local uppercase copy of the function name
+     * Make a local uppercase copy of the function name for builtin check
      *
      */
     bp = np = XMALLOC(SBUF_SIZE, "np");
     SAFE_SB_STR(fname, np, &bp);
     *bp = '\0';
 
-    for (bp = np; *bp; bp++)
+    char *np_upper = XMALLOC(SBUF_SIZE, "np_upper");
+    XSTRCPY(np_upper, np);
+
+    for (bp = np_upper; *bp; bp++)
     {
         *bp = toupper(*bp);
     }
@@ -131,11 +134,22 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
      * Verify that the function doesn't exist in the builtin table
      *
      */
-    if (hashfind(np, &mushstate.func_htab) != NULL)
+    if (hashfind(np_upper, &mushstate.func_htab) != NULL)
     {
         notify_quiet(player, "Function already defined in builtin function table.");
+        XFREE(np_upper);
         XFREE(np);
         return;
+    }
+
+    XFREE(np_upper);
+
+    /**
+     * Normalize to lowercase for UFUN hash lookups
+     */
+    for (bp = np; *bp; bp++)
+    {
+        *bp = tolower(*bp);
     }
 
     /**
@@ -232,25 +246,16 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         }
 
         /**
-         * Hash lookup uses lowercase key.
+         * Add to hash table (np already lowercase).
          */
-        char *lc_key = XSTRDUP(np, "lc_key");
-        for (bp = lc_key; *bp; bp++)
+        if (hashadd(np, (int *)ufp, &mushstate.ufunc_htab, 0))
         {
-            *bp = tolower(*bp);
-        }
-
-        if (hashadd(lc_key, (int *)ufp, &mushstate.ufunc_htab, 0))
-        {
-            XFREE(lc_key);
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Function %s not defined.", fname);
             XFREE(ufp->name);
             XFREE(ufp);
             XFREE(np);
             return;
         }
-
-        XFREE(lc_key);
     }
 
     ufp->obj = obj;
