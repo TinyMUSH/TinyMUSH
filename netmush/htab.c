@@ -230,11 +230,6 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
      * link it in at the head of its thread.
      */
 
-    if (hashfind_generic(key, htab) != NULL)
-    {
-        return CF_Failure;
-    }
-
     htype = htab->flags & HT_TYPEMASK;
 
     if (htype == HT_STR)
@@ -244,6 +239,15 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     else
     {
         hval = (key.i & htab->mask);
+    }
+
+    /* Check for duplicate in single pass without calling hashfind_generic */
+    for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
+    {
+        if ((htype == HT_STR && strcmp(key.s, hptr->target.s) == 0) || (htype == HT_NUM && key.i == hptr->target.i))
+        {
+            return CF_Failure;
+        }
     }
 
     htab->entries++;
@@ -419,6 +423,10 @@ void hashflush(HASHTAB *htab, int size)
         htab->deletes = 0;
         htab->nulls = htab->hashsize;
     }
+
+    /* Reset iterator state to prevent use-after-free on next_* calls */
+    htab->last_entry = NULL;
+    htab->last_hval = 0;
 }
 
 /* ---------------------------------------------------------------------------
