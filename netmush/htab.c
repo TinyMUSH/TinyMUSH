@@ -114,10 +114,15 @@ void hashinit(HASHTAB *htab, int size, int flags)
         htab->mask = 0;
         htab->entries = 0;
         htab->nulls = 0;
+        htab->last_entry = NULL;
+        htab->last_hval = 0;
         return;
     }
 
     /* XCALLOC already initializes all entries to NULL, no loop needed */
+    /* Initialize iterator state */
+    htab->last_entry = NULL;
+    htab->last_hval = 0;
 }
 
 /* ---------------------------------------------------------------------------
@@ -126,10 +131,16 @@ void hashinit(HASHTAB *htab, int size, int flags)
 
 void hashreset(HASHTAB *htab)
 {
+    if (htab == NULL)
+    {
+        return;
+    }
+
     htab->checks = 0;
     htab->scans = 0;
     htab->max_scan = 0;
     htab->hits = 0;
+    /* Note: entries and deletes are structural, not reset here */
 }
 
 /* ---------------------------------------------------------------------------
@@ -435,6 +446,7 @@ void hashdelall(int *old, HASHTAB *htab)
     for (hval = 0; hval < htab->hashsize; hval++)
     {
         prev = NULL;
+        bool bucket_was_nonempty = (htab->entry[hval] != NULL);
 
         for (hptr = htab->entry[hval]; hptr != NULL; hptr = nextp)
         {
@@ -465,15 +477,16 @@ void hashdelall(int *old, HASHTAB *htab)
 
                 htab->entries--;
 
-                if (htab->entry[hval] == NULL)
-                {
-                    htab->nulls++;
-                }
-
                 continue;
             }
 
             prev = hptr;
+        }
+
+        /* Update nulls count only once per bucket if it became empty */
+        if (bucket_was_nonempty && htab->entry[hval] == NULL)
+        {
+            htab->nulls++;
         }
     }
 }
@@ -812,11 +825,22 @@ void hashresize(HASHTAB *htab, int min_size)
     size = (size < min_size) ? min_size : size;
     get_hashmask(&size);
 
-    if ((size > 512) && (size > htab->entries * 1.33 * mushconf.hash_factor))
+    /* Downsize if table is oversized (avoid overflow in threshold calculation) */
+    if (size > 512)
     {
-        size /= 2;
-        /* Ensure size remains power-of-2 after division */
-        get_hashmask(&size);
+        /* Use integer arithmetic to avoid overflow: size > entries * 1.33 * factor
+         * means size > entries * factor * 1.33, approximately size > entries * factor * 4/3 */
+        long long threshold = ((long long)htab->entries * mushconf.hash_factor * 4) / 3;
+        if (threshold > INT_MAX)
+        {
+            threshold = INT_MAX;
+        }
+        if (size > threshold)
+        {
+            size /= 2;
+            /* Ensure size remains power-of-2 after division */
+            get_hashmask(&size);
+        }
     }
 
     if (size == htab->hashsize)
