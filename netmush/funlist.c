@@ -4198,7 +4198,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs < 5)
 	{
-		XMEMCPY(&gsep, &osep, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&osep)->len);
+		COPY_DELIM(gsep, osep);
 	}
 	else
 	{
@@ -4303,7 +4303,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (nfargs < 4)
 	{
-		XMEMCPY(&cmark, &omark, sizeof(Delim) - MAX_DELIM_LEN + 1 + (&omark)->len);
+		COPY_DELIM(cmark, omark);
 	}
 	else
 	{
