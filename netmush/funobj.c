@@ -1145,7 +1145,8 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 {
 	dbref it = match_thing(player, fargs[0]);
 
-	if (!Good_obj(it) || !Examinable(player, it))
+	int exam = Good_obj(it) ? Examinable(player, it) : 0;
+	if (!exam)
 	{
 		SAFE_NOTHING(buff, bufc);
 	}
@@ -1189,7 +1190,8 @@ void fun_money(char *buff, char **bufc, dbref player, dbref caller __attribute__
 {
 	dbref it = match_thing(player, fargs[0]);
 
-	if (!Good_obj(it) || !Examinable(player, it))
+	int exam = Good_obj(it) ? Examinable(player, it) : 0;
+	if (!exam)
 	{
 		SAFE_NOTHING(buff, bufc);
 	}
