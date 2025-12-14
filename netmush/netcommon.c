@@ -1360,7 +1360,8 @@ int fetch_idle(dbref target, int port_num)
 	}
 	else
 	{
-		for (d = descriptor_list; d; d = d->next)
+		DESC *dnext;
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 			if (d->flags & DS_CONNECTED)
 			{
 				if (d->descriptor == port_num)
@@ -1400,7 +1401,8 @@ int fetch_connect(dbref target, int port_num)
 	}
 	else
 	{
-		for (d = descriptor_list; d; d = d->next)
+		DESC *dnext;
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 			if (d->flags & DS_CONNECTED)
 			{
 				if (d->descriptor == port_num)
@@ -2883,7 +2885,8 @@ char *get_doing(dbref target, int port_num)
 	}
 	else
 	{
-		for (d = descriptor_list; d; d = d->next)
+		DESC *dnext;
+		for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 			if (d->flags & DS_CONNECTED)
 			{
 				if (d->descriptor == port_num)
@@ -2902,9 +2905,9 @@ char *get_doing(dbref target, int port_num)
 
 dbref get_programmer(dbref target)
 {
-	DESC *d;
+	DESC *d, *dnext;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if ((d->player == target) && (d->program_data != NULL))
@@ -2923,11 +2926,11 @@ dbref get_programmer(dbref target)
 
 dbref find_connected_name(dbref player, char *name)
 {
-	DESC *d;
+	DESC *d, *dnext;
 	dbref found;
 	found = NOTHING;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
@@ -2959,11 +2962,11 @@ dbref find_connected_name(dbref player, char *name)
 
 dbref find_connected_ambiguous(dbref player, char *name)
 {
-	DESC *d;
+	DESC *d, *dnext;
 	dbref found;
 	found = NOTHING;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if (Good_obj(player) && !See_Hidden(player) && Hidden(d->player))
