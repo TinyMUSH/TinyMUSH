@@ -4011,14 +4011,7 @@ void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		return;
 	}
 
-	if (nfargs < 3)
-	{
-		conj_str = (char *)"and";
-	}
-	else
-	{
-		conj_str = fargs[2];
-	}
+	conj_str = (nfargs < 3) ? (char *)"and" : fargs[2];
 
 	if (nfargs < 4)
 	{
