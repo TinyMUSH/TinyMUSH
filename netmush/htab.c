@@ -341,17 +341,18 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
         }
     }
 
-    htab->entries++;
-
-    if (htab->entry[hval] == NULL)
-    {
-        htab->nulls--;
-    }
-
     hptr->data = hashdata;
     hptr->flags = flags;
     hptr->next = htab->entry[hval];
     htab->entry[hval] = hptr;
+
+    /* Update statistics only after successful insertion */
+    htab->entries++;
+
+    if (hptr->next == NULL)
+    {
+        htab->nulls--;
+    }
     return CF_Success;
 }
 
@@ -467,6 +468,13 @@ void hashflush(HASHTAB *htab, int size)
 {
     HASHENT *hent, *thent;
     int i;
+
+    /* Validate size parameter */
+    if (size < 0)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "hashflush called with negative size %d", size);
+        size = 0;
+    }
 
     /* Guard against uninitialized table */
     if (htab->entry != NULL && htab->hashsize > 0)
@@ -664,18 +672,25 @@ int *hash_nextentry(HASHTAB *htab)
 HASHKEY hash_firstkey_generic(HASHTAB *htab)
 {
     int hval;
+    int htype;
+    HASHKEY null_key;
+
+    htype = htab->flags & HT_TYPEMASK;
+
+    /* Prepare type-appropriate NULL key */
+    if (htype == HT_STR)
+    {
+        null_key.s = NULL;
+    }
+    else
+    {
+        null_key.i = -1;
+    }
 
     /* Guard against uninitialized table */
     if (htab->entry == NULL || htab->hashsize == 0)
     {
-        if ((htab->flags & HT_TYPEMASK) == HT_STR)
-        {
-            return (HASHKEY)((char *)NULL);
-        }
-        else
-        {
-            return (HASHKEY)((int)-1);
-        }
+        return null_key;
     }
 
     for (hval = 0; hval < htab->hashsize; hval++)
@@ -686,32 +701,32 @@ HASHKEY hash_firstkey_generic(HASHTAB *htab)
             return htab->entry[hval]->target;
         }
 
-    if ((htab->flags & HT_TYPEMASK) == HT_STR)
-    {
-        return (HASHKEY)((char *)NULL);
-    }
-    else
-    {
-        return (HASHKEY)((int)-1);
-    }
+    return null_key;
 }
 
 HASHKEY hash_nextkey_generic(HASHTAB *htab)
 {
     int hval;
     HASHENT *hptr;
+    int htype;
+    HASHKEY null_key;
+
+    htype = htab->flags & HT_TYPEMASK;
+
+    /* Prepare type-appropriate NULL key */
+    if (htype == HT_STR)
+    {
+        null_key.s = NULL;
+    }
+    else
+    {
+        null_key.i = -1;
+    }
 
     /* Guard against uninitialized table */
     if (htab->entry == NULL || htab->hashsize == 0)
     {
-        if ((htab->flags & HT_TYPEMASK) == HT_STR)
-        {
-            return (HASHKEY)((char *)NULL);
-        }
-        else
-        {
-            return (HASHKEY)((int)-1);
-        }
+        return null_key;
     }
 
     hval = htab->last_hval;
@@ -719,14 +734,7 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
 
     if (hptr == NULL)
     {
-        if ((htab->flags & HT_TYPEMASK) == HT_STR)
-        {
-            return (HASHKEY)((char *)NULL);
-        }
-        else
-        {
-            return (HASHKEY)((int)-1);
-        }
+        return null_key;
     }
 
     if (hptr->next != NULL)
@@ -752,14 +760,7 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
         hval++;
     }
 
-    if ((htab->flags & HT_TYPEMASK) == HT_STR)
-    {
-        return (HASHKEY)((char *)NULL);
-    }
-    else
-    {
-        return (HASHKEY)((int)-1);
-    }
+    return null_key;
 }
 
 /* ---------------------------------------------------------------------------
@@ -848,8 +849,9 @@ void hashresize(HASHTAB *htab, int min_size)
     /* Keep original statistics across resize; only update structure references */
     htab->nulls = new_htab.nulls;
     htab->entry = new_htab.entry;
-    htab->last_hval = new_htab.last_hval;
-    htab->last_entry = new_htab.last_entry;
+    /* Note: Resize invalidates any active iterators. Caller must restart iteration. */
+    htab->last_hval = 0;
+    htab->last_entry = NULL;
     /*
      * number of entries doesn't change
      */
