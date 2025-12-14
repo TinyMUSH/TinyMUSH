@@ -1780,7 +1780,8 @@ void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attr
 {
 	dbref it = match_thing(player, fargs[0]);
 
-	if (!Good_obj(it) || !Examinable(player, it))
+	int exam = Good_obj(it) ? Examinable(player, it) : 0;
+	if (!exam)
 	{
 		SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
 	}
@@ -1809,7 +1810,8 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute_
 {
 	dbref it = match_thing(player, fargs[0]);
 
-	if (Good_obj(it) && (Examinable(player, it) || (it == cause)))
+	int exam = Good_obj(it) ? Examinable(player, it) : 0;
+	if (exam || (it == cause))
 	{
 		SAFE_LB_CHR('#', buff, bufc);
 		SAFE_LTOS(buff, bufc, Parent(it), LBUF_SIZE);
