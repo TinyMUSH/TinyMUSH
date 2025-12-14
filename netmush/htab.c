@@ -776,6 +776,8 @@ void hashresize(HASHTAB *htab, int min_size)
     if ((size > 512) && (size > htab->entries * 1.33 * mushconf.hash_factor))
     {
         size /= 2;
+        /* Ensure size remains power-of-2 after division */
+        get_hashmask(&size);
     }
 
     if (size == htab->hashsize)
