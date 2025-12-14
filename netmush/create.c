@@ -21,6 +21,8 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
+#include <limits.h>
 
 /**
  * @brief Get a location to link to.
@@ -627,15 +629,36 @@ void do_create(dbref player, dbref cause __attribute__((unused)), int key __attr
 {
     dbref thing = NOTHING;
     int cost = 0;
-
-    cost = (int)strtol(coststr, (char **)NULL, 10);
+    char *endptr = NULL;
+    long val = 0;
 
     if (!name || !*name || (strip_ansi_len(name) == 0))
     {
         notify_quiet(player, "Create what?");
         return;
     }
-    else if (cost < 0)
+
+    if (coststr && *coststr)
+    {
+        errno = 0;
+        val = strtol(coststr, &endptr, 10);
+
+        if (errno == ERANGE || val > INT_MAX || val < INT_MIN)
+        {
+            notify_quiet(player, "Invalid cost value.");
+            return;
+        }
+
+        if (endptr == coststr || *endptr != '\0')
+        {
+            notify_quiet(player, "Invalid cost value.");
+            return;
+        }
+
+        cost = (int)val;
+    }
+
+    if (cost < 0)
     {
         notify_quiet(player, "You can't create an object for less than nothing!");
         return;
@@ -745,7 +768,32 @@ void do_clone(dbref player, dbref cause __attribute__((unused)), int key, char *
      */
     if (key & CLONE_SET_COST)
     {
-        cost = (int)strtol(arg2, (char **)NULL, 10);
+        if (arg2 && *arg2)
+        {
+            char *endptr = NULL;
+            long val = 0;
+
+            errno = 0;
+            val = strtol(arg2, &endptr, 10);
+
+            if (errno == ERANGE || val > INT_MAX || val < INT_MIN)
+            {
+                notify_quiet(player, "Invalid cost value.");
+                return;
+            }
+
+            if (endptr == arg2 || *endptr != '\0')
+            {
+                notify_quiet(player, "Invalid cost value.");
+                return;
+            }
+
+            cost = (int)val;
+        }
+        else
+        {
+            cost = 0;
+        }
         arg2 = NULL;
     }
     else
