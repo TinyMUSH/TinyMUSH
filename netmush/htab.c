@@ -749,11 +749,7 @@ void hashresize(HASHTAB *htab, int min_size)
     XFREE(htab->entry);
     htab->hashsize = new_htab.hashsize;
     htab->mask = new_htab.mask;
-    htab->checks = new_htab.checks;
-    htab->scans = new_htab.scans;
-    htab->max_scan = new_htab.max_scan;
-    htab->hits = new_htab.hits;
-    htab->deletes = new_htab.deletes;
+    /* Keep original statistics across resize; only update structure references */
     htab->nulls = new_htab.nulls;
     htab->entry = new_htab.entry;
     htab->last_hval = new_htab.last_hval;
