@@ -33,10 +33,10 @@ void init_mstate(void)
     md.match = NOTHING;
     md.player = NOTHING;
     md.string = XMALLOC(LBUF_SIZE, "buffer");
-	if (!md.string)
-	{
-		return;
-	}
+    if (!md.string)
+    {
+        return;
+    }
 }
 
 void promote_match(dbref what, int confidence)
@@ -103,10 +103,10 @@ void promote_match(dbref what, int confidence)
      */
     md.count++;
 
-	if (md.count > 1 && random_range(0, (md.count) - 1) == 0)
-	{
-		md.match = what;
-	}
+    if (md.count > 1 && random_range(0, (md.count) - 1) == 0)
+    {
+        md.match = what;
+    }
 
     return;
 }
@@ -137,10 +137,10 @@ void munge_space_for_match(const char *name)
             *q++ = *p++;
         }
 
-		p++;
-		while (*p && isspace(*p))
-			p++;
-            ;
+        p++;
+        while (*p && isspace(*p))
+            p++;
+        ;
 
         if (*p)
         {
@@ -196,10 +196,10 @@ dbref absolute_nref(char *str)
      * * which means that we then need to worry about buffer size.
      */
     buf = XMALLOC(LBUF_SIZE, "buf");
-	if (!buf)
-	{
-		return NOTHING;
-	}
+    if (!buf)
+    {
+        return NOTHING;
+    }
 
     if (*str == '_')
     {
@@ -236,7 +236,7 @@ dbref absolute_nref(char *str)
     }
 
     if (buf)
-    	XFREE(buf);
+        XFREE(buf);
     return nref;
 }
 
@@ -367,7 +367,7 @@ void match_here(void)
             {
                 promote_match(loc, CON_TOKEN | CON_LOCAL);
             }
-			else if (PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
+            else if (PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
             {
                 promote_match(loc, CON_COMPLETE | CON_LOCAL);
             }
@@ -398,11 +398,11 @@ void match_list(dbref first, int local)
          * would overwrite Name()'s static buffer which is
          * needed by string_match().
          */
-	namebuf = (char *)PureName(first);
-	if (!namebuf)
-	{
-		continue;
-	}
+        namebuf = (char *)PureName(first);
+        if (!namebuf)
+        {
+            continue;
+        }
 
         if (!string_compare(namebuf, md.string))
         {
@@ -487,7 +487,7 @@ int match_exit_internal(dbref loc, dbref baseloc, int local)
             }
         }
 
-		if (PureName(exit) && matches_exit_from_list(md.string, (char *)PureName(exit)))
+        if (PureName(exit) && matches_exit_from_list(md.string, (char *)PureName(exit)))
         {
             promote_match(exit, CON_COMPLETE | local);
             result = 1;
@@ -579,10 +579,10 @@ void match_master_exit(void)
     }
 
     if (Good_obj(md.player) && Has_exits(md.player))
-		if (Good_obj(mushconf.master_room))
-		{
-			(void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
-		}
+        if (Good_obj(mushconf.master_room))
+        {
+            (void)match_exit_internal(mushconf.master_room, mushconf.master_room, 0);
+        }
 }
 
 void match_zone_exit(void)
@@ -594,11 +594,11 @@ void match_zone_exit(void)
 
     if (Good_obj(md.player) && Has_exits(md.player))
     {
-		dbref zone = Zone(md.player);
-		if (Good_obj(zone))
-		{
-			(void)match_exit_internal(zone, zone, 0);
-		}
+        dbref zone = Zone(md.player);
+        if (Good_obj(zone))
+        {
+            (void)match_exit_internal(zone, zone, 0);
+        }
     }
 }
 
@@ -672,12 +672,12 @@ dbref last_match_result(void)
 
 dbref match_status(dbref player, dbref match)
 {
-    switch (match)
-		if (!Good_obj(player))
-		{
-			return NOTHING;
-		}
+    if (!Good_obj(player))
+    {
+        return NOTHING;
+    }
 
+    switch (match)
     {
     case NOTHING:
         notify(player, NOMATCH_MESSAGE);
@@ -697,11 +697,11 @@ dbref match_status(dbref player, dbref match)
 
 dbref noisy_match_result(void)
 {
-	if (!Good_obj(md.player))
-	{
-		return NOTHING;
-	}
-	return match_status(md.player, match_result());
+    if (!Good_obj(md.player))
+    {
+        return NOTHING;
+    }
+    return match_status(md.player, match_result());
 }
 
 void save_match_state(MSTATE *m_state)
@@ -714,10 +714,10 @@ void save_match_state(MSTATE *m_state)
     m_state->match = md.match;
     m_state->player = md.player;
     m_state->string = XMALLOC(LBUF_SIZE, "m_state->string");
-	if (!m_state->string)
-	{
-		return;
-	}
+    if (!m_state->string)
+    {
+        return;
+    }
     XSTRCPY(m_state->string, md.string);
 }
 
@@ -730,12 +730,12 @@ void restore_match_state(MSTATE *m_state)
     md.absolute_form = m_state->absolute_form;
     md.match = m_state->match;
     md.player = m_state->player;
-	if (m_state->string)
-	{
-		XSTRCPY(md.string, m_state->string);
-	}
-	if (m_state->string)
-		XFREE(m_state->string);
+    if (m_state->string)
+    {
+        XSTRCPY(md.string, m_state->string);
+    }
+    if (m_state->string)
+        XFREE(m_state->string);
 }
 
 void init_match(dbref player, const char *name, int type)
