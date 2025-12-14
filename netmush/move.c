@@ -261,6 +261,16 @@ void process_sticky_dropto(dbref loc, dbref player)
             return;
         }
     }
+
+    /*
+     * Check for corrupted object chain (cycle detected)
+     */
+    if ((thing != NOTHING) && (Next(thing) == thing))
+    {
+        log_write(LOG_PROBLEMS, "BUG", "MOVE", "Corrupted object chain detected in process_sticky_dropto: object #%d has Next(thing)==thing", thing);
+        return;
+    }
+
     /*
      * Send everything through the dropto
      */
@@ -269,6 +279,14 @@ void process_sticky_dropto(dbref loc, dbref player)
     for (thing = Contents(loc), next = (thing == NOTHING ? NOTHING : Next(thing)); (thing != NOTHING) && (Next(thing) != thing); thing = next, next = Next(next))
     {
         send_dropto(thing, player);
+    }
+
+    /*
+     * Check for corrupted object chain in final loop
+     */
+    if ((thing != NOTHING) && (Next(thing) == thing))
+    {
+        log_write(LOG_PROBLEMS, "BUG", "MOVE", "Corrupted object chain detected in process_sticky_dropto final loop: object #%d has Next(thing)==thing", thing);
     }
 }
 
@@ -294,7 +312,10 @@ void process_dropped_dropto(dbref thing, dbref player)
      */
     loc = Location(thing);
 
-    if (Has_dropto(loc) && (Dropto(loc) != NOTHING) && !Sticky(loc))
+    /*
+     * Validate location before accessing dropto macros
+     */
+    if (Good_obj(loc) && Has_dropto(loc) && (Dropto(loc) != NOTHING) && !Sticky(loc))
     {
         send_dropto(thing, player);
     }
@@ -571,32 +592,30 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
     }
 
     /*
-     * find the exit
+     * find the exit - init once and reuse across multiple match attempts
      */
+
+    init_match_check_keys(player, direction, TYPE_EXIT);
 
     if (mushconf.move_match_more)
     {
-        init_match_check_keys(player, direction, TYPE_EXIT);
         match_exit_with_parents();
         exit = last_match_result();
 
         if (exit == NOTHING)
         {
-            init_match_check_keys(player, direction, TYPE_EXIT);
             match_master_exit();
             exit = last_match_result();
         }
 
         if (exit == NOTHING)
         {
-            init_match_check_keys(player, direction, TYPE_EXIT);
             match_zone_exit();
             exit = last_match_result();
         }
     }
     else
     {
-        init_match_check_keys(player, direction, TYPE_EXIT);
         match_exit();
         exit = match_result();
     }
