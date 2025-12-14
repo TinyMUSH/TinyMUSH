@@ -257,8 +257,8 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr;
     int htype;
 
-    /* Guard against uninitialized or failed hash table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized or failed hash table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return NULL;
     }
@@ -296,8 +296,8 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr;
     int htype;
 
-    /* Guard against uninitialized or failed hash table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized or failed hash table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return 0;
     }
@@ -335,10 +335,10 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     HASHENT *hptr;
     int htype;
 
-    /* Guard against uninitialized or failed hash table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized or failed hash table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
-        log_write(LOG_BUGS, "BUG", "HASH", "Attempted to add to uninitialized hash table");
+        log_write(LOG_BUGS, "BUG", "HASH", "Attempted to add to NULL or uninitialized hash table");
         return CF_Failure;
     }
 
@@ -409,8 +409,8 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
     HASHENT *hptr, *last;
     int htype;
 
-    /* Guard against uninitialized or failed hash table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized or failed hash table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
@@ -466,8 +466,8 @@ void hashdelall(int *old, HASHTAB *htab)
     int hval;
     HASHENT *hptr, *prev, *nextp;
 
-    /* Guard against NULL pointer deletion and uninitialized table */
-    if (old == NULL || htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointers and uninitialized table */
+    if (htab == NULL || old == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
@@ -606,8 +606,8 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
     int hval;
     int htype;
 
-    /* Guard against uninitialized or failed hash table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized or failed hash table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return 0;
     }
@@ -860,6 +860,13 @@ void hashresize(HASHTAB *htab, int min_size)
     if (htab->entry == NULL || htab->hashsize == 0)
     {
         return;
+    }
+
+    /* Validate min_size parameter */
+    if (min_size < 0)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "hashresize called with negative min_size %d", min_size);
+        min_size = 0;
     }
 
     /* Guard against invalid hash_factor */
