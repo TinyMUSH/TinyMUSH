@@ -469,24 +469,28 @@ void hashflush(HASHTAB *htab, int size)
     HASHENT *hent, *thent;
     int i;
 
-    for (i = 0; i < htab->hashsize; i++)
+    /* Guard against uninitialized table */
+    if (htab->entry != NULL && htab->hashsize > 0)
     {
-        hent = htab->entry[i];
-
-        while (hent != NULL)
+        for (i = 0; i < htab->hashsize; i++)
         {
-            thent = hent;
-            hent = hent->next;
+            hent = htab->entry[i];
 
-            if (!(htab->flags & HT_KEYREF))
+            while (hent != NULL)
             {
-                XFREE(thent->target.s);
+                thent = hent;
+                hent = hent->next;
+
+                if (!(htab->flags & HT_KEYREF))
+                {
+                    XFREE(thent->target.s);
+                }
+
+                XFREE(thent);
             }
 
-            XFREE(thent);
+            htab->entry[i] = NULL;
         }
-
-        htab->entry[i] = NULL;
     }
 
     /*
