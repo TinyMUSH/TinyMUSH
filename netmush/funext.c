@@ -24,6 +24,33 @@
 #include <string.h>
 
 /**
+ * @brief Parse port number or player name with visibility checks.
+ *
+ * @param viewer DBref of player doing the lookup
+ * @param arg Argument string (port number or player name)
+ * @param target Output: resolved player dbref (or NOTHING)
+ * @param port Output: port number (or NOTHING)
+ */
+static void parse_port_or_player(dbref viewer, char *arg, dbref *target, int *port)
+{
+	*target = NOTHING;
+	*port = NOTHING;
+
+	if (is_integer(arg))
+	{
+		*port = (int)strtol(arg, (char **)NULL, 10);
+	}
+	else
+	{
+		*target = lookup_player(viewer, arg, 1);
+		if (Good_obj(*target) && Can_Hide(*target) && Hidden(*target) && !See_Hidden(viewer))
+		{
+			*target = NOTHING;
+		}
+	}
+}
+
+/**
  * @brief Return a MUSH config parameter.
  *
  * @param buff Output buffer
@@ -113,20 +140,11 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__
  */
 void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target = NOTHING;
-	int port = NOTHING;
+	dbref target;
+	int port;
 	char *str = NULL;
 
-	if (is_integer(fargs[0]))
-	{
-		port = (int)strtol(fargs[0], (char **)NULL, 10);
-	}
-	else
-	{
-		target = lookup_player(player, fargs[0], 1);
-		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
-			target = NOTHING;
-	}
+	parse_port_or_player(player, fargs[0], &target, &port);
 
 	if ((port < 0) && (target == NOTHING))
 	{
@@ -156,19 +174,10 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
  */
 void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target = NOTHING;
-	int port = NOTHING;
+	dbref target;
+	int port;
 
-	if (is_integer(fargs[0]))
-	{
-		port = (int)strtol(fargs[0], (char **)NULL, 10);
-	}
-	else
-	{
-		target = lookup_player(player, fargs[0], 1);
-		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
-			target = NOTHING;
-	}
+	parse_port_or_player(player, fargs[0], &target, &port);
 
 	if ((port < 0) && (target == NOTHING))
 	{
@@ -194,19 +203,10 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
  */
 void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	dbref target = NOTHING;
-	int port = NOTHING;
+	dbref target;
+	int port;
 
-	if (is_integer(fargs[0]))
-	{
-		port = (int)strtol(fargs[0], (char **)NULL, 10);
-	}
-	else
-	{
-		target = lookup_player(player, fargs[0], 1);
-		if (Good_obj(target) && Can_Hide(target) && Hidden(target) && !See_Hidden(player))
-			target = NOTHING;
-	}
+	parse_port_or_player(player, fargs[0], &target, &port);
 
 	if ((port < 0) && (target == NOTHING))
 	{
@@ -261,6 +261,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 {
 	CMDENT *cmdp = NULL;
 	char *p = NULL;
+	char *cmd_lower = NULL;
 
 	if (!fargs[0] || !*fargs[0])
 	{
@@ -268,25 +269,32 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	for (p = fargs[0]; *p; p++)
+	/**
+	 * Copy to temp buffer to avoid mutating fargs.
+	 */
+	cmd_lower = XSTRDUP(fargs[0], "cmd_lower");
+	for (p = cmd_lower; *p; p++)
 	{
 		*p = tolower(*p);
 	}
 
-	cmdp = (CMDENT *)hashfind(fargs[0], &mushstate.command_htab);
+	cmdp = (CMDENT *)hashfind(cmd_lower, &mushstate.command_htab);
 
 	if (!cmdp || (cmdp->info.handler != do_help))
 	{
+		XFREE(cmd_lower);
 		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
 	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
+		XFREE(cmd_lower);
 		SAFE_NOPERM(buff, bufc);
 		return;
 	}
 
+	XFREE(cmd_lower);
 	help_helper(player, (cmdp->extra & ~HELP_RAWHELP), (cmdp->extra & HELP_RAWHELP) ? 0 : 1, fargs[1], buff, bufc);
 }
 
@@ -432,7 +440,7 @@ void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)
 	{
 		if (escaped_chars(*msg_orig))
 		{
-			XSPRINTF(tbuf, "%%%2x", *msg_orig);
+			XSPRINTF(tbuf, "%%02X", (unsigned char)*msg_orig);
 			ret = SAFE_LB_STR(tbuf, buff, bufc);
 		}
 		else if (*msg_orig == ' ')
@@ -466,7 +474,6 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 	int ret = 0;
 	unsigned int tempchar = 0;
 	char *tbuf = XMALLOC(SBUF_SIZE, "tbuf");
-	;
 
 	for (msg_orig = fargs[0]; msg_orig && *msg_orig && !ret;)
 	{
