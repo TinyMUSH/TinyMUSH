@@ -451,6 +451,7 @@ extern void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref
 /* funlist.c */
 extern int autodetect_list(char *ptrs[], int nitems);
 extern int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems);
+extern int validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args, int delim_pos, int delim_flags, Delim *isep);
 extern int dbnum(char *dbr);
 extern void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_first(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);

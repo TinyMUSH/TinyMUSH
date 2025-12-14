@@ -174,10 +174,9 @@ int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nit
  * @param isep Pointer to Delim structure to populate
  * @return int 1 if valid, 0 if error (already printed to buff)
  */
-static int
-validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause,
-				   char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args,
-				   int delim_pos, int delim_flags, Delim *isep)
+int validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause,
+					   char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args,
+					   int delim_pos, int delim_flags, Delim *isep)
 {
 	if (!fn_range_check(func_name, nfargs, min_args, max_args, buff, bufc))
 	{

@@ -25,28 +25,6 @@
 #include <ctype.h>
 
 /**
- * @brief Validate list function arguments and delimiter
- * @return int 1 if valid, 0 if error (already printed to buff)
- */
-static int
-validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause,
-                   char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args,
-                   int delim_pos, int delim_flags, Delim *isep)
-{
-    if (!fn_range_check(func_name, nfargs, min_args, max_args, buff, bufc))
-    {
-        return 0;
-    }
-
-    if (delim_pos > 0 && !delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, delim_pos, isep, delim_flags))
-    {
-        return 0;
-    }
-
-    return 1;
-}
-
-/**
  * @brief Validate math function arguments (range check only, no delimiter)
  * @return int 1 if valid, 0 if error (already printed to buff)
  */
