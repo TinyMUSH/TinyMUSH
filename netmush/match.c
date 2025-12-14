@@ -330,13 +330,19 @@ void match_me(void)
 
     if (Good_obj(md.absolute_form) && (md.absolute_form == md.player))
     {
-        promote_match(md.player, CON_DBREF | CON_LOCAL);
+        if (Good_obj(md.player))
+        {
+            promote_match(md.player, CON_DBREF | CON_LOCAL);
+        }
         return;
     }
 
     if (!string_compare(md.string, "me"))
     {
-        promote_match(md.player, CON_TOKEN | CON_LOCAL);
+        if (Good_obj(md.player))
+        {
+            promote_match(md.player, CON_TOKEN | CON_LOCAL);
+        }
     }
 
     return;
@@ -351,7 +357,10 @@ void match_home(void)
 
     if (!string_compare(md.string, "home"))
     {
-        promote_match(HOME, CON_TOKEN);
+        if (Good_obj(HOME))
+        {
+            promote_match(HOME, CON_TOKEN);
+        }
     }
 
     return;
