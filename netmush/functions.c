@@ -27,6 +27,7 @@
 extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 
 UFUN *ufun_head;
+UFUN *ufun_tail;
 OBJXFUNCS xfunctions;
 const Delim SPACE_DELIM = {1, " "};
 
@@ -45,6 +46,7 @@ void init_functab(void)
     }
 
     ufun_head = NULL;
+    ufun_tail = NULL;
     hashinit(&mushstate.ufunc_htab, 15 * mushconf.hash_factor, HT_STR);
 
     xfunctions.func = NULL;
@@ -78,6 +80,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         {
             /**
              * Make it case-insensitive, and look it up.
+             * Note: UFUN names stored lowercase for consistent lookup.
              *
              */
             for (bp = fname; *bp; bp++)
@@ -201,9 +204,12 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         ufp = (UFUN *)XMALLOC(sizeof(UFUN), "ufp");
         ufp->name = XSTRDUP(np, "ufp->name");
 
+        /**
+         * Store name in lowercase for case-insensitive lookup consistency.
+         */
         for (bp = (char *)ufp->name; *bp; bp++)
         {
-            *bp = toupper(*bp);
+            *bp = tolower(*bp);
         }
 
         ufp->obj = obj;
@@ -211,26 +217,40 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
         ufp->perms = CA_PUBLIC;
         ufp->next = NULL;
 
+        /**
+         * Append to tail for O(1) insertion.
+         */
         if (!ufun_head)
         {
             ufun_head = ufp;
+            ufun_tail = ufp;
         }
         else
         {
-            for (ufp2 = ufun_head; ufp2->next; ufp2 = ufp2->next)
-                ;
-
-            ufp2->next = ufp;
+            ufun_tail->next = ufp;
+            ufun_tail = ufp;
         }
 
-        if (hashadd(np, (int *)ufp, &mushstate.ufunc_htab, 0))
+        /**
+         * Hash lookup uses lowercase key.
+         */
+        char *lc_key = XSTRDUP(np, "lc_key");
+        for (bp = lc_key; *bp; bp++)
         {
+            *bp = tolower(*bp);
+        }
+
+        if (hashadd(lc_key, (int *)ufp, &mushstate.ufunc_htab, 0))
+        {
+            XFREE(lc_key);
             notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Function %s not defined.", fname);
             XFREE(ufp->name);
             XFREE(ufp);
             XFREE(np);
             return;
         }
+
+        XFREE(lc_key);
     }
 
     ufp->obj = obj;
@@ -338,13 +358,13 @@ void helper_list_funcaccess(dbref player, FUN *fp)
     {
         if (Check_Func_Access(player, fp))
         {
+            bp = buff;
             if (!fp->xperms)
             {
                 XSPRINTF(buff, "%-30.30s ", fp->name);
             }
             else
             {
-                bp = buff;
                 SAFE_LB_STR((char *)fp->name, buff, &bp);
                 SAFE_LB_CHR(':', buff, &bp);
 
@@ -385,20 +405,16 @@ void list_funcaccess(dbref player)
     for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
         char *buff = XASPRINTF("s", "mod_%s_%s", mp->modname, "functable");
-        header = false;
         if ((ftab = (FUN *)dlsym(mp->handle, buff)) != NULL)
         {
-            if (!header)
-            {
-                raw_notify(player, "\nModule %-23.23s Access", mp->modname);
-                notify(player, "------------------------------ ------------------------------------------------");
-                header = true;
-            }
+            raw_notify(player, "\nModule %-23.23s Access", mp->modname);
+            notify(player, "------------------------------ ------------------------------------------------");
             helper_list_funcaccess(player, ftab);
         }
         XFREE(buff);
     }
 
+    header = false;
     for (ufp = ufun_head; ufp; ufp = ufp->next)
     {
         if (check_access(player, ufp->perms))
@@ -441,7 +457,7 @@ int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref
 
     for (ap = str; *ap && !isspace(*ap); ap++)
     {
-        /* Skip ofer */
+        /* Skip over */
     }
 
     if (*ap)
