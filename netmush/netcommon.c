@@ -1006,10 +1006,10 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	dbref loc = NOTHING, aowner = NOTHING, temp = NOTHING;
 	int aflags = 0, alen = 0, num = 0, key = 0, count = 0;
 	char *buf = NULL, *time_str = NULL;
-	DESC *dtemp = NULL;
+	DESC *dtemp = NULL, *dtemp_next = NULL;
 	desc_addhash(d);
 
-	for (dtemp = descriptor_list; dtemp; dtemp = dtemp->next)
+	for (dtemp = descriptor_list, dtemp_next = ((dtemp != NULL) ? dtemp->next : NULL); dtemp; dtemp = dtemp_next, dtemp_next = ((dtemp_next != NULL) ? dtemp_next->next : NULL))
 		if (dtemp->flags & DS_CONNECTED)
 		{
 			count++;
@@ -1723,7 +1723,8 @@ void dump_info(DESC *call_by)
 	strftime(uptime_buf, sizeof(uptime_buf), "%a %b %d %H:%M:%S %Y", &tm_buf);
 	queue_rawstring(call_by, "Uptime: %s\r\n", uptime_buf);
 
-	for (d = descriptor_list; d; d = d->next)
+	DESC *dnext;
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if (!Hidden(d->player) || ((call_by->flags & DS_CONNECTED) && See_Hidden(call_by->player)))
@@ -2026,8 +2027,9 @@ int check_connect(DESC *d, char *msg)
 		else
 		{
 			nplayers = 0;
+			DESC *d2next;
 
-			for (d2 = descriptor_list; d2; d2 = d2->next)
+			for (d2 = descriptor_list, d2next = ((d2 != NULL) ? d2->next : NULL); d2; d2 = d2next, d2next = ((d2next != NULL) ? d2next->next : NULL))
 				if (d2->flags & DS_CONNECTED)
 					nplayers++;
 		}
@@ -2202,8 +2204,9 @@ int check_connect(DESC *d, char *msg)
 		else
 		{
 			nplayers = 0;
+			DESC *d2next;
 
-			for (d2 = descriptor_list; d2; d2 = d2->next)
+			for (d2 = descriptor_list, d2next = ((d2 != NULL) ? d2->next : NULL); d2; d2 = d2next, d2next = ((d2next != NULL) ? d2next->next : NULL))
 				if (d2->flags & DS_CONNECTED)
 					nplayers++;
 		}
@@ -2779,10 +2782,10 @@ void list_siteinfo(dbref player)
 void make_ulist(dbref player, char *buff, char **bufc)
 {
 	char *cp;
-	DESC *d;
+	DESC *d, *dnext;
 	cp = *bufc;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if (!See_Hidden(player) && Hidden(d->player))
@@ -2806,11 +2809,11 @@ void make_ulist(dbref player, char *buff, char **bufc)
 
 void make_portlist(dbref player __attribute__((unused)), dbref target, char *buff, char **bufc)
 {
-	DESC *d;
+	DESC *d, *dnext;
 	char *s = XMALLOC(MBUF_SIZE, "s");
 	int i = 0;
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if ((target == NOTHING) || (d->player == target))
@@ -2837,10 +2840,10 @@ void make_portlist(dbref player __attribute__((unused)), dbref target, char *buf
 
 void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char **bufc)
 {
-	DESC *d;
+	DESC *d, *dnext;
 	char *s = XMALLOC(MBUF_SIZE, "s");
 
-	for (d = descriptor_list; d; d = d->next)
+	for (d = descriptor_list, dnext = ((d != NULL) ? d->next : NULL); d; d = dnext, dnext = ((dnext != NULL) ? dnext->next : NULL))
 		if (d->flags & DS_CONNECTED)
 		{
 			if ((d->descriptor == port_num) || (d->player == target))
