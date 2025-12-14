@@ -697,6 +697,12 @@ void logfile_close(void)
         {
             if (lp->filename && lp->fileptr)
             {
+                /* Reset log_fp if it points to this file */
+                if (log_fp == lp->fileptr)
+                {
+                    log_fp = mainlog_fp;
+                }
+
                 fclose(lp->fileptr);
                 lp->fileptr = NULL;
                 s = XASPRINTF("s", "%s.%s", lp->filename, ts);
