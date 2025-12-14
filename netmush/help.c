@@ -86,13 +86,18 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	{
 		cf_log(player, "HLP", "INDX", confcmd, "can't open %s for reading", src);
 		XFREE(line);
+		XFREE(src);
+		XFREE(dst);
 		return -1;
 	}
 
 	if ((wfp = fopen(dst, "w")) == NULL)
 	{
 		cf_log(player, "HLP", "INDX", confcmd, "can't open %s for writing", dst);
+		fclose(rfp);
 		XFREE(line);
+		XFREE(src);
+		XFREE(dst);
 		return -1;
 	}
 
@@ -172,7 +177,11 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	if (helpmkindx_dump_entries(wfp, pos, entries))
 	{
 		cf_log(player, "HLP", "INDX", confcmd, "error writing %s", dst);
+		fclose(rfp);
+		fclose(wfp);
 		XFREE(line);
+		XFREE(src);
+		XFREE(dst);
 		return -1;
 	}
 
@@ -180,6 +189,8 @@ int helpmkindx(dbref player, char *confcmd, char *helpfile)
 	fclose(wfp);
 	cf_log(player, "HLP", "INDX", confcmd, "%d topics indexed", ntopics);
 	XFREE(line);
+	XFREE(src);
+	XFREE(dst);
 	return 0;
 }
 
@@ -221,7 +232,7 @@ int helpindex_read(HASHTAB *htab, char *filename)
 		 */
 		for (p = entry.topic; *p; p++)
 		{
-			*p = tolower(*p);
+			*p = tolower((unsigned char)*p);
 		}
 
 		htab_entry = (struct help_entry *)XMALLOC(sizeof(struct help_entry), "htab_entry");
@@ -307,7 +318,7 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 	char *p, *line, *result, *str, *bp;
 	int entry_offset;
 	struct help_entry *htab_entry;
-	char matched;
+	char matched = 0;
 	char *topic_list, *buffp;
 
 	if (*topic == '\0')
@@ -317,7 +328,7 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 	else
 		for (p = topic; *p; p++)
 		{
-			*p = tolower(*p);
+			*p = tolower((unsigned char)*p);
 		}
 
 	htab_entry = (struct help_entry *)hashfind(topic, htab);
@@ -401,11 +412,10 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 			break;
 		}
 
-		for (p = line; *p != '\0'; p++)
-			if (*p == '\n')
-			{
-				*p = '\0';
-			}
+		if ((p = strchr(line, '\n')))
+		{
+			*p = '\0';
+		}
 
 		if (eval)
 		{
@@ -518,11 +528,10 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 			break;
 		}
 
-		for (p = line; *p != '\0'; p++)
-			if (*p == '\n')
-			{
-				*p = '\0';
-			}
+		if ((p = strchr(line, '\n')))
+		{
+			*p = '\0';
+		}
 
 		if (count > 0)
 		{
