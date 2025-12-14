@@ -325,7 +325,7 @@ void process_sticky_dropto(dbref loc, dbref player)
 
 void process_dropped_dropto(dbref thing, dbref player)
 {
-    dbref loc;
+    dbref loc, dropto;
 
     /*
      * If STICKY, send home
@@ -346,9 +346,13 @@ void process_dropped_dropto(dbref thing, dbref player)
     /*
      * Validate location before accessing dropto macros
      */
-    if (Good_obj(loc) && Has_dropto(loc) && (Dropto(loc) != NOTHING) && !Sticky(loc))
+    if (Good_obj(loc) && Has_dropto(loc))
     {
-        send_dropto(thing, player);
+        dropto = Dropto(loc);
+        if ((dropto != NOTHING) && !Sticky(loc))
+        {
+            send_dropto(thing, player);
+        }
     }
 }
 
@@ -392,6 +396,11 @@ void move_via_exit(dbref thing, dbref dest, dbref cause, dbref exit, int hush)
     if (dest == HOME)
     {
         dest = Home(thing);
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "move_via_exit: Invalid HOME destination for object #%d", thing);
+            return;
+        }
     }
 
     src = Location(thing);
@@ -1087,7 +1096,15 @@ void do_leave(dbref player, dbref cause __attribute__((unused)), int key)
     if (could_doit(player, loc, A_LLEAVE))
     {
         dbref dest = Location(loc);
-        move_via_generic(player, dest, NOTHING, quiet);
+        if (Good_obj(dest))
+        {
+            move_via_generic(player, dest, NOTHING, quiet);
+        }
+        else
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "do_leave: Invalid destination #%d for player #%d", dest, player);
+            notify(player, "You can't leave.");
+        }
     }
     else
     {
