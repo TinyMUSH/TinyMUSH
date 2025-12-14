@@ -1245,6 +1245,7 @@ extern void do_pemit_list(dbref player, char *list, const char *message, int do_
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
 /* stringutil.c */
+extern const char *safe_strerror(int errnum);
 extern char *ansiChar(int ch);
 extern int ansiNum(int ch);
 extern char ansiLetter(int num);

@@ -1798,7 +1798,9 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 
 	if (err)
 	{
-		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", strerror(err));
+		char errbuf[256];
+		strerror_r(err, errbuf, sizeof(errbuf));
+		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", errbuf);
 	}
 }
 

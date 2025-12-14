@@ -104,13 +104,17 @@ int dbrecover(int argc, char *argv[])
 
 	if ((dbp = gdbm_open(outfile, 8192, GDBM_WRCREAT, 0600, gdbm_panic)) == NULL)
 	{
-		fprintf(stderr, "Fatal error in gdbm_open (%s): %s\n", outfile, strerror(errno));
+		char errbuf[256];
+		strerror_r(errno, errbuf, sizeof(errbuf));
+		fprintf(stderr, "Fatal error in gdbm_open (%s): %s\n", outfile, errbuf);
 		exit(EXIT_FAILURE);
 	}
 
 	if (stat(infile, &buf))
 	{
-		fprintf(stderr, "Fatal error in stat (%s): %s\n", infile, strerror(errno));
+		char errbuf[256];
+		strerror_r(errno, errbuf, sizeof(errbuf));
+		fprintf(stderr, "Fatal error in stat (%s): %s\n", infile, errbuf);
 		exit(EXIT_FAILURE);
 	}
 
@@ -167,7 +171,9 @@ int dbrecover(int argc, char *argv[])
 
 				if (gdbm_store(dbp, key, dat, GDBM_REPLACE))
 				{
-					fprintf(stderr, "Fatal error in gdbm_store (%s): %s\n", outfile, strerror(errno));
+					char errbuf[256];
+					strerror_r(errno, errbuf, sizeof(errbuf));
+					fprintf(stderr, "Fatal error in gdbm_store (%s): %s\n", outfile, errbuf);
 					exit(EXIT_FAILURE);
 				}
 

@@ -74,7 +74,7 @@ void warning(char *p, ...)
 
 		if (p == (char *)-1)
 		{
-			p = (char *)strerror(errno);
+			p = (char *)safe_strerror(errno);
 		}
 
 		log_write_raw(1, "%s", p);
@@ -104,7 +104,9 @@ void fatal(char *p, ...)
 
 		if (p == (char *)-1)
 		{
-			p = (char *)strerror(errno);
+			static char errbuf[256];
+			strerror_r(errno, errbuf, sizeof(errbuf));
+			p = errbuf;
 		}
 
 		log_write_raw(1, "%s", p);

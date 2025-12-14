@@ -24,6 +24,19 @@
 #include <string.h>
 
 /**
+ * @brief Thread-safe wrapper for strerror
+ *
+ * @param errnum Error number
+ * @return const char* Error message string
+ */
+const char *safe_strerror(int errnum)
+{
+	static __thread char errbuf[256];
+	strerror_r(errnum, errbuf, sizeof(errbuf));
+	return errbuf;
+}
+
+/**
  * @brief Convert ansi character code (%x?) to ansi sequence.
  *
  * @param ch Character to convert

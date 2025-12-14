@@ -230,14 +230,16 @@ void end_log(void)
 void _log_perror(const char *file, int line, const char *primary, const char *secondary, const char *extra, const char *failing_object)
 {
     int my_errno = errno;
+    char errbuf[256];
+    strerror_r(my_errno, errbuf, sizeof(errbuf));
 
     if (extra && *extra)
     {
-        _log_write(file, line, LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, strerror(my_errno));
+        _log_write(file, line, LOG_ALWAYS, primary, secondary, "(%s) %s: %s", extra, failing_object, errbuf);
     }
     else
     {
-        _log_write(file, line, LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, strerror(my_errno));
+        _log_write(file, line, LOG_ALWAYS, primary, secondary, "%s: %s", failing_object, errbuf);
     }
 }
 

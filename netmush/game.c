@@ -3861,7 +3861,7 @@ int main(int argc, char *argv[])
 
 		if (forkstatus < 0)
 		{
-			log_write(LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", strerror(errno));
+			log_write(LOG_STARTUP, "INI", "FORK", "Unable to fork, %s", safe_strerror(errno));
 		}
 		else if (forkstatus > 0)
 		{
@@ -3873,7 +3873,7 @@ int main(int argc, char *argv[])
 
 			if (chdir(mushconf.game_home) < 0)
 			{
-				log_write(LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", strerror(errno));
+				log_write(LOG_STARTUP, "INI", "FORK", "Unable to chdir to game directory, %s", safe_strerror(errno));
 			}
 		}
 	}

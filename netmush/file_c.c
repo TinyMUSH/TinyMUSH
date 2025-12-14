@@ -167,7 +167,7 @@ int fcache_read(FBLOCK **cp, char *filename)
                         continue;
                     }
 
-                    log_write(LOG_PROBLEMS, "FIL", "READ", "Error reading file '%s': %s", filename, strerror(errno));
+                    log_write(LOG_PROBLEMS, "FIL", "READ", "Error reading file '%s': %s", filename, safe_strerror(errno));
                     XFREE(buff);
                     tf_close(fd);
                     return -1;
@@ -252,7 +252,7 @@ void fcache_rawdump(int fd, int num)
                     continue;
                 }
 
-                log_write(LOG_PROBLEMS, "FIL", "WRITE", "Error writing cached file %d: %s", num, strerror(errno));
+                log_write(LOG_PROBLEMS, "FIL", "WRITE", "Error writing cached file %d: %s", num, safe_strerror(errno));
                 return;
             }
 
