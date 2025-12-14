@@ -673,6 +673,11 @@ dbref last_match_result(void)
 dbref match_status(dbref player, dbref match)
 {
     switch (match)
+		if (!Good_obj(player))
+		{
+			return NOTHING;
+		}
+
     {
     case NOTHING:
         notify(player, NOMATCH_MESSAGE);
@@ -692,7 +697,11 @@ dbref match_status(dbref player, dbref match)
 
 dbref noisy_match_result(void)
 {
-    return match_status(md.player, match_result());
+	if (!Good_obj(md.player))
+	{
+		return NOTHING;
+	}
+	return match_status(md.player, match_result());
 }
 
 void save_match_state(MSTATE *m_state)
