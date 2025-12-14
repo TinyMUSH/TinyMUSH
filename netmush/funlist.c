@@ -156,6 +156,43 @@ int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nit
 }
 
 /**
+ * @brief Validate function arguments and delimiter for list functions
+ * @param func_name Name of the function (for error messages)
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function's arguments
+ * @param nfargs Number of function's arguments
+ * @param cargs Command's arguments
+ * @param ncargs Command's argument count
+ * @param min_args Minimum number of arguments
+ * @param max_args Maximum number of arguments
+ * @param delim_pos Position of delimiter argument (-1 if none, or uses 1-based index)
+ * @param delim_flags Delimiter flags (DELIM_STRING, etc.)
+ * @param isep Pointer to Delim structure to populate
+ * @return int 1 if valid, 0 if error (already printed to buff)
+ */
+static int
+validate_list_args(const char *func_name, char *buff, char **bufc, dbref player, dbref caller, dbref cause,
+				   char *fargs[], int nfargs, char *cargs[], int ncargs, int min_args, int max_args,
+				   int delim_pos, int delim_flags, Delim *isep)
+{
+	if (!fn_range_check(func_name, nfargs, min_args, max_args, buff, bufc))
+	{
+		return 0;
+	}
+
+	if (delim_pos > 0 && !delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, delim_pos, isep, delim_flags))
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
  * @brief Convert a DBref (#db) to it's numerical value (db)
  *
  * @param dbr Text DBref value
