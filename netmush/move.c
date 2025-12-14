@@ -475,6 +475,11 @@ dbref find_var_dest(dbref player, dbref exit)
     if (*ebuf == '#')
     {
         dest_room = parse_dbref(ebuf + 1);
+        if (!Good_obj(dest_room))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "find_var_dest: Invalid destination #%d from exit #%d", dest_room, exit);
+            dest_room = NOTHING;
+        }
     }
     else
     {
@@ -725,7 +730,7 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
         }
         else if (could_doit(player, thing, A_LOCK))
         {
-            if (thingloc != Location(player))
+            if (thingloc != playerloc)
             {
                 notify_check(thingloc, thingloc, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s was taken from you.", Name(thing));
             }
@@ -741,7 +746,7 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
             oattr = quiet ? 0 : A_OFAIL;
             aattr = quiet ? 0 : A_AFAIL;
 
-            if (thingloc != Location(player))
+            if (thingloc != playerloc)
                 failmsg = (char *)"You can't take that from there.";
             else
             {
@@ -831,11 +836,13 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
     {
     case TYPE_THING:
     case TYPE_PLAYER:
+    {
+        dbref thingloc = Location(thing);
 
         /*
          * You have to be carrying it
          */
-        if (((Location(thing) != player) && !Wizard(player)) || (!could_doit(player, thing, A_LDROP)))
+        if (((thingloc != player) && !Wizard(player)) || (!could_doit(player, thing, A_LDROP)))
         {
             did_it(player, thing, A_DFAIL, "You can't drop that.", A_ODFAIL, NULL, A_ADFAIL, 0, (char **)NULL, 0, MSG_MOVE);
             return;
@@ -844,7 +851,7 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
         /*
          * Move it
          */
-        move_via_generic(thing, Location(player), player, 0);
+        move_via_generic(thing, loc, player, 0);
         notify(thing, "Dropped.");
         quiet = 0;
 
@@ -853,7 +860,7 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
             quiet = 1;
         }
 
-        bp = buf = XMALLOC(LBUF_SIZE, "buf");
+        bp = buf = XMALLOC(SBUF_SIZE, "buf");
         SAFE_SPRINTF(buf, &bp, "dropped %s.", Name(thing));
         oattr = quiet ? 0 : A_ODROP;
         aattr = quiet ? 0 : A_ADROP;
@@ -863,7 +870,8 @@ void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *n
          * Process droptos
          */
         process_dropped_dropto(thing, player);
-        break;
+    }
+    break;
 
     case TYPE_EXIT:
 
