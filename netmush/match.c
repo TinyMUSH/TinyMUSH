@@ -338,7 +338,7 @@ void match_numeric(void)
 
     match = absolute_name(0);
 
-    if (Good_obj(match))
+    if (match >= 0 && Good_obj(match))
     {
         promote_match(match, CON_DBREF);
     }
