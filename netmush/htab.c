@@ -85,7 +85,6 @@ int get_hashmask(int *size)
 
 void hashinit(HASHTAB *htab, int size, int flags)
 {
-    int i;
     htab->mask = get_hashmask(&size);
     htab->hashsize = size;
     htab->checks = 0;
