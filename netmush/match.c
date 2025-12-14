@@ -274,15 +274,25 @@ dbref absolute_name(int need_pound)
     char *mname;
     mname = md.string;
 
+    if (!mname)
+    {
+        return NOTHING;
+    }
+
     if (need_pound)
     {
-        if (*md.string != NUMBER_TOKEN)
+        if (*mname != NUMBER_TOKEN)
         {
             return NOTHING;
         }
         else
         {
             mname++;
+        }
+
+        if (!mname)
+        {
+            return NOTHING;
         }
 
         if ((*mname == '_') && *(mname + 1))
