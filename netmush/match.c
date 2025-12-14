@@ -37,6 +37,7 @@ void init_mstate(void)
     {
         return;
     }
+    XMEMSET(md.string, 0, LBUF_SIZE);
 }
 
 void promote_match(dbref what, int confidence)
@@ -44,6 +45,12 @@ void promote_match(dbref what, int confidence)
     /*
      * Check for type and locks, if requested
      */
+
+    if (confidence < 0)
+    {
+        return;
+    }
+
     if (md.pref_type != NOTYPE)
     {
         if (Good_obj(what) && (Typeof(what) == md.pref_type))
