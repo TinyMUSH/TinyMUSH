@@ -572,13 +572,15 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
 {
     HASHENT *hptr;
     int hval;
-    int htype = htab->flags & HT_TYPEMASK;
+    int htype;
 
     /* Guard against uninitialized or failed hash table */
     if (htab->entry == NULL || htab->hashsize == 0)
     {
         return 0;
     }
+
+    htype = htab->flags & HT_TYPEMASK;
 
     hval = get_hash_value(key, htab);
 
@@ -719,6 +721,14 @@ HASHKEY hash_firstkey_generic(HASHTAB *htab)
     int htype;
     HASHKEY null_key;
 
+    /* Guard against uninitialized table - check before accessing htab->flags */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
+    {
+        /* Return safe NULL key - assume string type for safety */
+        null_key.s = NULL;
+        return null_key;
+    }
+
     htype = htab->flags & HT_TYPEMASK;
 
     /* Prepare type-appropriate NULL key */
@@ -729,12 +739,6 @@ HASHKEY hash_firstkey_generic(HASHTAB *htab)
     else
     {
         null_key.i = -1;
-    }
-
-    /* Guard against uninitialized table */
-    if (htab->entry == NULL || htab->hashsize == 0)
-    {
-        return null_key;
     }
 
     for (hval = 0; hval < htab->hashsize; hval++)
@@ -755,6 +759,14 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
     int htype;
     HASHKEY null_key;
 
+    /* Guard against uninitialized table - check before accessing htab->flags */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
+    {
+        /* Return safe NULL key - assume string type for safety */
+        null_key.s = NULL;
+        return null_key;
+    }
+
     htype = htab->flags & HT_TYPEMASK;
 
     /* Prepare type-appropriate NULL key */
@@ -765,12 +777,6 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
     else
     {
         null_key.i = -1;
-    }
-
-    /* Guard against uninitialized table */
-    if (htab->entry == NULL || htab->hashsize == 0)
-    {
-        return null_key;
     }
 
     hval = htab->last_hval;
