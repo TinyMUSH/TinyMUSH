@@ -594,7 +594,11 @@ void match_zone_exit(void)
 
     if (Good_obj(md.player) && Has_exits(md.player))
     {
-        (void)match_exit_internal(Zone(md.player), Zone(md.player), 0);
+		dbref zone = Zone(md.player);
+		if (Good_obj(zone))
+		{
+			(void)match_exit_internal(zone, zone, 0);
+		}
     }
 }
 
