@@ -579,12 +579,11 @@ void pretty_format(char *dest, char **cp, char *p)
 			 */
 			SAFE_LB_CHR(*p, dest, cp);
 			p++;
-			SAFE_LB_CHR(*p, dest, cp);
-
 			if (!*p)
 			{
 				return; /* we're done */
 			}
+			SAFE_LB_CHR(*p, dest, cp);
 
 			break;
 
@@ -1141,8 +1140,8 @@ void look_atrs1(dbref player, dbref thing, dbref othing, int check_exclude, int 
 
 void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
 {
-	dbref parent;
-	int lev, check_exclude, hash_insert;
+	dbref parent = NOTHING;
+	int lev = 0, check_exclude = 0, hash_insert = 0;
 
 	if (!check_parents)
 	{
@@ -1216,7 +1215,10 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 	char *got2 = NULL;
 	dbref aowner = NOTHING;
 	int aflags = 0, alen = 0, indent = 0;
-	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
+	char *raw_desc = NULL;
+
+	raw_desc = atr_get_raw(loc, A_DESC);
+	indent = (isRoom(loc) && mushconf.indent_desc && raw_desc && *raw_desc);
 
 	if (Html(player))
 	{
@@ -1263,7 +1265,10 @@ void show_desc(dbref player, dbref loc, int key)
 	char *got = NULL;
 	dbref aowner = NOTHING;
 	int aflags = 0, alen = 0, indent = 0;
-	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
+	char *raw_desc = NULL;
+
+	raw_desc = atr_get_raw(loc, A_DESC);
+	indent = (isRoom(loc) && mushconf.indent_desc && raw_desc && *raw_desc);
 
 	if ((key & LK_OBEYTERSE) && Terse(player))
 		did_it(player, loc, A_NULL, NULL, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
@@ -1322,8 +1327,8 @@ void show_desc(dbref player, dbref loc, int key)
 
 void look_in(dbref player, dbref loc, int key)
 {
-	int pattr, oattr, aattr, is_terse, showkey;
-	char *buff;
+	int pattr = 0, oattr = 0, aattr = 0, is_terse = 0, showkey = 0;
+	char *buff = NULL;
 	is_terse = (key & LK_OBEYTERSE) ? Terse(player) : 0;
 
 	/*
@@ -1670,7 +1675,6 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 	char *buf = NULL;
 	dbref aowner = NOTHING;
 	ATTR *ap = NULL;
-	got_any = 0;
 
 	for (atr = olist_first(); atr != NOTHING; atr = olist_next())
 	{
@@ -1701,12 +1705,12 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 		 *   remote DESC-reading is not turned on.
 		 */
 
-		if (Examinable(player, thing) && Read_attr_all(player, thing, ap, aowner, aflags, 1))
+		if (ap && Examinable(player, thing) && Read_attr_all(player, thing, ap, aowner, aflags, 1))
 		{
 			got_any = 1;
 			view_atr(player, thing, ap, buf, aowner, aflags, 0, is_special);
 		}
-		else if ((Typeof(thing) == TYPE_PLAYER) && Read_attr_all(player, thing, ap, aowner, aflags, 1))
+		else if (ap && (Typeof(thing) == TYPE_PLAYER) && Read_attr_all(player, thing, ap, aowner, aflags, 1))
 		{
 			got_any = 1;
 
@@ -1727,7 +1731,7 @@ void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 				notify(player, "<Too far away to get a good look>");
 			}
 		}
-		else if (Read_attr_all(player, thing, ap, aowner, aflags, 1))
+		else if (ap && Read_attr_all(player, thing, ap, aowner, aflags, 1))
 		{
 			got_any = 1;
 
