@@ -22,6 +22,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
+#include <errno.h>
+#include <ctype.h>
 
 extern int a_Queue(dbref, int);
 extern void s_Queue(dbref, int);
@@ -78,12 +80,35 @@ void delete_qentry(BQUE *qptr)
  */
 int add_to(dbref doer, dbref player, int am, int attrnum)
 {
+	long val = 0;
 	int num = 0, aflags = 0, alen = 0;
 	dbref aowner = NOTHING;
 	char *buff = NULL;
 	char *atr_gotten = NULL;
+	char *endptr = NULL;
 
-	num = (int)strtol(atr_gotten = atr_get(player, attrnum, &aowner, &aflags, &alen), (char **)NULL, 10);
+	/**
+	 * Get attribute value and parse it safely
+	 *
+	 */
+	atr_gotten = atr_get(player, attrnum, &aowner, &aflags, &alen);
+
+	errno = 0;
+	val = strtol(atr_gotten, &endptr, 10);
+
+	/**
+	 * Validate conversion and range
+	 *
+	 */
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || (*endptr != '\0' && !isspace(*endptr)))
+	{
+		num = 0;
+	}
+	else
+	{
+		num = (int)val;
+	}
+
 	XFREE(atr_gotten);
 	num += am;
 
@@ -95,7 +120,7 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
 	}
 	else
 	{
-		atr_add(player, attrnum, (char *)'\0', Owner(doer), aflags);
+		atr_add(player, attrnum, NULL, Owner(doer), aflags);
 	}
 
 	return (num);
@@ -373,6 +398,8 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 	dbref victim = NOTHING;
 	int qpid = 0;
 	BQUE *qptr = NULL, *last = NULL, *tmp = NULL;
+	char *endptr = NULL;
+	long val = 0;
 
 	if (!is_integer(pidstr))
 	{
@@ -380,7 +407,22 @@ void do_halt_pid(dbref player, dbref cause __attribute__((unused)), int key __at
 		return;
 	}
 
-	qpid = (int)strtol(pidstr, (char **)NULL, 10);
+	errno = 0;
+	val = strtol(pidstr, &endptr, 10);
+
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN)
+	{
+		notify(player, "That is not a valid PID.");
+		return;
+	}
+
+	if (endptr == pidstr || *endptr != '\0')
+	{
+		notify(player, "That is not a valid PID.");
+		return;
+	}
+
+	qpid = (int)val;
 
 	if ((qpid < 1) || (qpid > mushconf.max_qpid))
 	{
@@ -568,12 +610,32 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 	int num = 0, aflags = 0, alen = 0;
 	dbref aowner = NOTHING;
 	char *str = NULL;
+	char *endptr = NULL;
+	long val = 0;
 
 	if (attr)
 	{
 		str = atr_get(sem, attr, &aowner, &aflags, &alen);
-		num = (int)strtol(str, (char **)NULL, 10);
-		;
+
+		if (str && *str)
+		{
+			errno = 0;
+			val = strtol(str, &endptr, 10);
+
+			if (errno != ERANGE && val >= INT_MIN && val <= INT_MAX && endptr != str && *endptr == '\0')
+			{
+				num = (int)val;
+			}
+			else
+			{
+				num = 0;
+			}
+		}
+		else
+		{
+			num = 0;
+		}
+
 		XFREE(str);
 	}
 	else
@@ -717,7 +779,19 @@ void do_notify(dbref player, dbref cause __attribute__((unused)), int key, char 
 
 		if (count && *count)
 		{
-			loccount = (int)strtol(count, (char **)NULL, 10);
+			char *endptr = NULL;
+			long val = 0;
+
+			errno = 0;
+			val = strtol(count, &endptr, 10);
+
+			if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == count || *endptr != '\0')
+			{
+				notify_quiet(player, "Invalid count value.");
+				return;
+			}
+
+			loccount = (int)val;
 		}
 		else
 		{
@@ -849,25 +923,42 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 
 	/**
 	 * We passed all the tests, calculate the length of the save string.
+	 * Check for integer overflow during accumulation.
 	 *
 	 */
 	tlen = 0;
 
 	if (command)
 	{
-		tlen = strlen(command) + 1;
+		size_t cmd_len = strlen(command) + 1;
+		if (cmd_len > INT_MAX || tlen > INT_MAX - cmd_len)
+		{
+			notify(Owner(player), "Command too large to queue.");
+			return NULL;
+		}
+		tlen += cmd_len;
 	}
 
 	if (nargs > NUM_ENV_VARS)
 	{
 		nargs = NUM_ENV_VARS;
 	}
+	else if (nargs < 0)
+	{
+		nargs = 0;
+	}
 
 	for (a = 0; a < nargs; a++)
 	{
 		if (args[a])
 		{
-			tlen += (strlen(args[a]) + 1);
+			size_t arg_len = strlen(args[a]) + 1;
+			if (arg_len > INT_MAX || tlen > INT_MAX - arg_len)
+			{
+				notify(Owner(player), "Arguments too large to queue.");
+				return NULL;
+			}
+			tlen += arg_len;
 		}
 	}
 
@@ -877,7 +968,13 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 		{
 			if (gargs->q_regs[a])
 			{
-				tlen += gargs->q_lens[a] + 1;
+				size_t reg_len = gargs->q_lens[a] + 1;
+				if (reg_len > INT_MAX || tlen > INT_MAX - reg_len)
+				{
+					notify(Owner(player), "Global registers too large to queue.");
+					return NULL;
+				}
+				tlen += reg_len;
 			}
 		}
 
@@ -885,7 +982,13 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 		{
 			if (gargs->x_names[a] && gargs->x_regs[a])
 			{
-				tlen += strlen(gargs->x_names[a]) + gargs->x_lens[a] + 2;
+				size_t xr_len = strlen(gargs->x_names[a]) + gargs->x_lens[a] + 2;
+				if (xr_len > INT_MAX || tlen > INT_MAX - xr_len)
+				{
+					notify(Owner(player), "Extended registers too large to queue.");
+					return NULL;
+				}
+				tlen += xr_len;
 			}
 		}
 	}
@@ -1043,17 +1146,27 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 	}
 
 	/**
-	 * Set wait time, and check for integer overflow
+	 * Set wait time, and check for integer overflow before the addition
 	 *
 	 */
 	if (wait != 0)
 	{
-		tmp->waittime = time(NULL) + wait;
-	}
-
-	if ((wait > 0) && (tmp->waittime < 0))
-	{
-		tmp->waittime = INT_MAX;
+		time_t now = time(NULL);
+		/**
+		 * Check for overflow before performing the addition
+		 */
+		if (wait > 0 && (time_t)wait > INT_MAX - now)
+		{
+			tmp->waittime = INT_MAX;
+		}
+		else if (wait < 0 && (time_t)wait < INT_MIN - now)
+		{
+			tmp->waittime = INT_MIN;
+		}
+		else
+		{
+			tmp->waittime = now + wait;
+		}
 	}
 
 	tmp->sem = sem;
@@ -1118,6 +1231,8 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
 	int qpid = 0, wsecs = 0;
 	BQUE *qptr = NULL, *point = NULL, *trail = NULL;
+	char *endptr = NULL;
+	long val = 0;
 
 	if (!is_integer(timestr))
 	{
@@ -1131,7 +1246,16 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 		return;
 	}
 
-	qpid = (int)strtol(pidstr, (char **)NULL, 10);
+	errno = 0;
+	val = strtol(pidstr, &endptr, 10);
+
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == pidstr || *endptr != '\0')
+	{
+		notify(player, "That is not a valid PID.");
+		return;
+	}
+
+	qpid = (int)val;
 
 	if ((qpid < 1) || (qpid > mushconf.max_qpid))
 	{
@@ -1167,7 +1291,19 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 
 	if (key & WAIT_UNTIL)
 	{
-		wsecs = (int)strtol(timestr, (char **)NULL, 10);
+		char *endptr_time = NULL;
+		long val_time = 0;
+
+		errno = 0;
+		val_time = strtol(timestr, &endptr_time, 10);
+
+		if (errno == ERANGE || val_time > INT_MAX || val_time < INT_MIN || endptr_time == timestr || *endptr_time != '\0')
+		{
+			notify(player, "That is not a valid wait time.");
+			return;
+		}
+
+		wsecs = (int)val_time;
 
 		if (wsecs < 0)
 		{
@@ -1180,14 +1316,41 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 	}
 	else
 	{
+		char *endptr_time = NULL;
+		long val_time = 0;
+
+		errno = 0;
+		val_time = strtol(timestr, &endptr_time, 10);
+
+		if (errno == ERANGE || val_time > INT_MAX || val_time < INT_MIN || endptr_time == timestr || *endptr_time != '\0')
+		{
+			notify(player, "That is not a valid wait time.");
+			return;
+		}
+
 		if ((timestr[0] == '+') || (timestr[0] == '-'))
 		{
-			qptr->waittime += (int)strtol(timestr, (char **)NULL, 10);
+			time_t old_time = qptr->waittime;
+			if ((val_time > 0 && old_time > INT_MAX - val_time) || (val_time < 0 && old_time < INT_MIN - val_time))
+			{
+				qptr->waittime = (val_time > 0) ? INT_MAX : INT_MIN;
+			}
+			else
+			{
+				qptr->waittime = old_time + (int)val_time;
+			}
 		}
 		else
 		{
-			qptr->waittime = time(NULL) + (int)strtol(timestr, (char **)NULL, 10);
-			;
+			time_t now = time(NULL);
+			if ((val_time > 0 && now > INT_MAX - val_time) || (val_time < 0 && now < INT_MIN - val_time))
+			{
+				qptr->waittime = (val_time > 0) ? INT_MAX : INT_MIN;
+			}
+			else
+			{
+				qptr->waittime = now + (int)val_time;
+			}
 		}
 
 		if (qptr->waittime < 0)
@@ -1262,18 +1425,37 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 	 */
 	if (is_number(event))
 	{
+		char *endptr = NULL;
+		long val = 0;
+
+		errno = 0;
+		val = strtol(event, &endptr, 10);
+
+		if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == event || *endptr != '\0')
+		{
+			notify(player, "Invalid wait time.");
+			return;
+		}
+
 		if (key & WAIT_UNTIL)
 		{
-			howlong = (int)strtol(event, (char **)NULL, 10) - time(NULL);
-
-			if (howlong < 0)
+			time_t now = time(NULL);
+			if (val < (long)now)
 			{
 				howlong = 0;
+			}
+			else if (val - now > INT_MAX)
+			{
+				howlong = INT_MAX;
+			}
+			else
+			{
+				howlong = (int)(val - now);
 			}
 		}
 		else
 		{
-			howlong = (int)strtol(event, (char **)NULL, 10);
+			howlong = (int)val;
 		}
 
 		wait_que(player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mushstate.rdata);
@@ -1305,20 +1487,39 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 		 */
 		if (event && *event && is_number(event))
 		{
+			char *endptr = NULL;
+			long val = 0;
+
 			attr = A_SEMAPHORE;
+
+			errno = 0;
+			val = strtol(event, &endptr, 10);
+
+			if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == event || *endptr != '\0')
+			{
+				notify(player, "Invalid wait time.");
+				return;
+			}
 
 			if (key & WAIT_UNTIL)
 			{
-				howlong = (int)strtol(event, (char **)NULL, 10) - time(NULL);
-
-				if (howlong < 0)
+				time_t now = time(NULL);
+				if (val < (long)now)
 				{
 					howlong = 0;
+				}
+				else if (val - now > INT_MAX)
+				{
+					howlong = INT_MAX;
+				}
+				else
+				{
+					howlong = (int)(val - now);
 				}
 			}
 			else
 			{
-				howlong = (int)strtol(event, (char **)NULL, 10);
+				howlong = (int)val;
 			}
 		}
 		else
@@ -2101,8 +2302,19 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 
 	if (key == QUEUE_KICK)
 	{
-		i = (int)strtol(arg, (char **)NULL, 10);
-		;
+		char *endptr = NULL;
+		long val = 0;
+
+		errno = 0;
+		val = strtol(arg, &endptr, 10);
+
+		if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == arg || *endptr != '\0')
+		{
+			notify(player, "Invalid number of commands.");
+			return;
+		}
+
+		i = (int)val;
 
 		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 		{
@@ -2125,8 +2337,19 @@ void do_queue(dbref player, dbref cause __attribute__((unused)), int key, char *
 	}
 	else if (key == QUEUE_WARP)
 	{
-		i = (int)strtol(arg, (char **)NULL, 10);
-		;
+		char *endptr = NULL;
+		long val = 0;
+
+		errno = 0;
+		val = strtol(arg, &endptr, 10);
+
+		if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == arg || *endptr != '\0')
+		{
+			notify(player, "Invalid time value.");
+			return;
+		}
+
+		i = (int)val;
 
 		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 		{
