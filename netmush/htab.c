@@ -845,6 +845,11 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
     bool got_one = false;
     bp = buf = XMALLOC(LBUF_SIZE, "buf");
 
+    if (buf == NULL)
+    {
+        return;
+    }
+
     va_list ap;
 
     va_start(ap, format);
@@ -871,7 +876,7 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
 
     *bp = '\0';
 
-    if (got_one || list_if_none)
+    if ((got_one || list_if_none) && prefix != NULL)
     {
         raw_notify(player, "%s %s", prefix, buf);
     }
@@ -918,6 +923,12 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
     NAMETAB *nt = ntab;
     bool got_one = false;
     buf = bp = XMALLOC(LBUF_SIZE, "buf");
+
+    if (buf == NULL)
+    {
+        return;
+    }
+
     va_list ap;
 
     va_start(ap, format);
@@ -946,7 +957,7 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
 
     *bp = '\0';
 
-    if (got_one || list_if_none)
+    if ((got_one || list_if_none) && prefix != NULL)
     {
         raw_notify(player, "%s%s", prefix, buf);
     }
