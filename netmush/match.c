@@ -557,9 +557,14 @@ void match_exit(void)
         return;
     }
 
+    if (!Good_obj(md.player) || !Has_location(md.player))
+    {
+        return;
+    }
+
     loc = Location(md.player);
 
-    if (Good_obj(md.player) && Has_location(md.player))
+    if (Good_obj(loc))
     {
         (void)match_exit_internal(loc, loc, CON_LOCAL);
     }
@@ -578,10 +583,15 @@ void match_exit_with_parents(void)
     if (Good_obj(md.player) && Has_location(md.player))
     {
         loc = Location(md.player);
+        if (!Good_obj(loc))
+        {
+            return;
+        }
+
         for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); lev++)
         {
             dbref next_parent = Parent(parent);
-            if (next_parent == parent)
+            if (!Good_obj(next_parent) || next_parent == parent)
             {
                 break;
             }
@@ -622,7 +632,7 @@ void match_carried_exit_with_parents(void)
         for (lev = 0, parent = (md.player); (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); lev++)
         {
             dbref next_parent = Parent(parent);
-            if (next_parent == parent)
+            if (!Good_obj(next_parent) || next_parent == parent)
             {
                 break;
             }
