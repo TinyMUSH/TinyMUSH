@@ -221,6 +221,13 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
     int hval, numchecks;
     HASHENT *hptr;
     int htype = htab->flags & HT_TYPEMASK;
+
+    /* Guard against uninitialized or failed hash table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return NULL;
+    }
+
     numchecks = 0;
     increment_scans(htab);
 
@@ -251,6 +258,13 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
     int hval, numchecks;
     HASHENT *hptr;
     int htype = htab->flags & HT_TYPEMASK;
+
+    /* Guard against uninitialized or failed hash table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        return 0;
+    }
+
     numchecks = 0;
     increment_scans(htab);
 
@@ -281,6 +295,13 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
     int hval;
     HASHENT *hptr;
     int htype = htab->flags & HT_TYPEMASK;
+
+    /* Guard against uninitialized or failed hash table */
+    if (htab->entry == NULL || htab->hashsize == 0)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Attempted to add to uninitialized hash table");
+        return CF_Failure;
+    }
 
     /*
      * Make sure that the entry isn't already in the hash table.  If it
