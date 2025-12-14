@@ -187,9 +187,9 @@ int start_log(const char *primary, const char *secondary, int key)
          */
         if ((mushconf.log_info & LOGOPT_TIMESTAMP) != 0)
         {
-            time((time_t *)(&now));
+            now = time(NULL);
             struct tm tp;
-            localtime_r((time_t *)(&now), &tp);
+            localtime_r(&now, &tp);
             log_write_raw(0, "%02d%02d%02d.%02d%02d%02d ", (tp.tm_year % 100), tp.tm_mon + 1, tp.tm_mday, tp.tm_hour, tp.tm_min, tp.tm_sec);
         }
 
@@ -197,6 +197,11 @@ int start_log(const char *primary, const char *secondary, int key)
          * Write the header to the log
          */
         const char *mush_name = (*(mushconf.mush_shortname) ? (mushconf.mush_shortname) : (mushconf.mush_name));
+
+        if (!mush_name)
+        {
+            mush_name = "MUSH";
+        }
 
         if (secondary && *secondary)
         {
@@ -467,6 +472,12 @@ char *log_getname(dbref target)
 
     name = strip_ansi(s);
     XFREE(s);
+
+    if (!name)
+    {
+        return XSTRDUP("<error>", "log_getname");
+    }
+
     return (name);
 }
 
@@ -517,6 +528,13 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     }
 
     ts = mktimestamp();
+
+    if (!ts)
+    {
+        notify(player, "Error: Failed to generate timestamp for log rotation.");
+        return;
+    }
+
     mushstate.mush_lognum++;
 
     if (mainlog_fp == stderr)
@@ -525,6 +543,11 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     }
     else
     {
+        /* Log the rotation before closing files */
+        pname = log_getname(player);
+        log_write(LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mushstate.mush_lognum);
+        XFREE(pname);
+
         fclose(mainlog_fp);
         mainlog_fp = NULL;
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
@@ -537,9 +560,6 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     }
 
     notify(player, "Logs rotated.");
-    pname = log_getname(player);
-    log_write(LOG_ALWAYS, "WIZ", "LOGROTATE", "%s: logfile rotation %d", pname, mushstate.mush_lognum);
-    XFREE(pname);
 
     /*
      * Any additional special ones
@@ -586,6 +606,29 @@ void logfile_close(void)
     }
 
     ts = mktimestamp();
+
+    if (!ts)
+    {
+        fprintf(stderr, "Error: Failed to generate timestamp for log closure, skipping file archiving\n");
+        /* Still close files even if we can't archive them */
+        if (logfds_table != NULL)
+        {
+            for (lp = logfds_table; lp->log_flag; lp++)
+            {
+                if (lp->fileptr)
+                {
+                    fclose(lp->fileptr);
+                    lp->fileptr = NULL;
+                }
+            }
+        }
+        if (mainlog_fp != stderr)
+        {
+            fclose(mainlog_fp);
+            mainlog_fp = NULL;
+        }
+        return;
+    }
 
     if (logfds_table != NULL)
     {
