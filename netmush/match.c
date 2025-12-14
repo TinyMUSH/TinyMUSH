@@ -738,6 +738,11 @@ dbref noisy_match_result(void)
 
 void save_match_state(MSTATE *m_state)
 {
+    if (!m_state)
+    {
+        return;
+    }
+
     m_state->confidence = md.confidence;
     m_state->count = md.count;
     m_state->pref_type = md.pref_type;
@@ -755,6 +760,11 @@ void save_match_state(MSTATE *m_state)
 
 void restore_match_state(MSTATE *m_state)
 {
+    if (!m_state)
+    {
+        return;
+    }
+
     md.confidence = m_state->confidence;
     md.count = m_state->count;
     md.pref_type = m_state->pref_type;
@@ -765,9 +775,8 @@ void restore_match_state(MSTATE *m_state)
     if (m_state->string)
     {
         XSTRCPY(md.string, m_state->string);
-    }
-    if (m_state->string)
         XFREE(m_state->string);
+    }
 }
 
 void init_match(dbref player, const char *name, int type)
