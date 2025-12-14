@@ -1519,12 +1519,18 @@ char **add_array(char **b, char *s, int *i)
 
 int backup_copy(char *src, char *dst, int flag)
 {
-	char *fn;
+	char *fn, *rp;
+	char resolved_path[PATH_MAX];
 	int i;
 	/*
 	 * Copy or move a file to dst directory
 	 */
-	fn = XASPRINTF("fn", "%s/%s", realpath(dst, NULL), basename(src));
+	rp = realpath(dst, resolved_path);
+	if (rp == NULL)
+	{
+		return -1; /* realpath failed */
+	}
+	fn = XASPRINTF("fn", "%s/%s", rp, basename(src));
 	i = copy_file(src, fn, flag);
 	XFREE(fn);
 	return (i);
@@ -1697,6 +1703,9 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 		XFREE(tmpdir);
 		XFREE(s1);
+		XFREE(txt);
+		XFREE(cnf);
+		XFREE(dbf);
 		return (-1);
 	}
 
