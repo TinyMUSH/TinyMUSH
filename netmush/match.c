@@ -103,10 +103,10 @@ void promote_match(dbref what, int confidence)
      */
     md.count++;
 
-    if (random_range(0, (md.count) - 1) == 0)
-    {
-        md.match = what;
-    }
+	if (md.count > 1 && random_range(0, (md.count) - 1) == 0)
+	{
+		md.match = what;
+	}
 
     return;
 }
