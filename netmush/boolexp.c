@@ -21,6 +21,98 @@
 
 #include <stdbool.h>
 #include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+
+/**
+ * @brief Maximum parse depth to prevent stack overflow
+ */
+#define MAX_PARSE_DEPTH 100
+
+/**
+ * @brief Error message constants
+ */
+#define ERR_BOOLEXP_ATR_NULL "ERROR: boolexp.c BOOLEXP_ATR has NULL sub1\n"
+#define ERR_BOOLEXP_EVAL_NULL "ERROR: boolexp.c BOOLEXP_EVAL has NULL sub1\n"
+#define ERR_BOOLEXP_IS_NULL "ERROR: boolexp.c BOOLEXP_IS attribute check has NULL sub1->sub1\n"
+#define ERR_BOOLEXP_CARRY_NULL "ERROR: boolexp.c BOOLEXP_CARRY attribute check has NULL sub1->sub1\n"
+#define ERR_BOOLEXP_UNKNOWN_TYPE "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n"
+#define ERR_ATTR_NUM_OVERFLOW "ERROR: boolexp.c attribute number overflow or invalid\n"
+#define ERR_PARSE_DEPTH_EXCEEDED "ERROR: boolexp.c parse depth exceeded limit\n"
+
+/**
+ * @brief Parser state structure
+ */
+typedef struct parse_state
+{
+	dbref parse_player;	   /*!< Player doing the parsing */
+	bool parsing_internal; /*!< Internal parse (stored lock) or user input */
+	int depth;			   /*!< Current recursion depth */
+} PARSE_STATE;
+
+/**
+ * @brief Current parse depth (for recursion limiting)
+ */
+static int parse_depth = 0;
+
+/**
+ * @brief Helper function for attribute-based lock checks (IS and CARRY operators)
+ *
+ * @param b			BOOLEXP structure containing attribute check
+ * @param player	DBref being checked
+ * @param from		Object containing the lock
+ * @param check_inventory	If true, check player's inventory (CARRY), else check player only (IS)
+ * @return bool		True if attribute check passes
+ */
+static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory)
+{
+	ATTR *a = NULL;
+	dbref obj = NOTHING;
+
+	/**
+	 * Get the attribute
+	 */
+	a = atr_num(b->sub1->thing);
+
+	if (!a)
+	{
+		return false;
+	}
+
+	/**
+	 * Validate sub1->sub1 pointer before casting to char*
+	 */
+	if (!(b->sub1)->sub1)
+	{
+		log_write_raw(1, check_inventory ? ERR_BOOLEXP_CARRY_NULL : ERR_BOOLEXP_IS_NULL);
+		return false;
+	}
+
+	/**
+	 * Check player first
+	 */
+	if (!check_inventory && check_attr(player, from, a, (char *)(b->sub1)->sub1))
+	{
+		return true;
+	}
+
+	/**
+	 * If checking inventory, iterate through contents
+	 */
+	if (check_inventory)
+	{
+		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+		{
+			if (check_attr(obj, from, a, (char *)(b->sub1)->sub1))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	return false;
+}
 
 /**
  * @brief indicate if attribute ATTR on player passes key when checked by the object lockobj
@@ -228,6 +320,15 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		}
 
 		/**
+		 * Validate sub1 pointer before casting to char*
+		 */
+		if (!b->sub1)
+		{
+			log_write_raw(1, ERR_BOOLEXP_ATR_NULL);
+			return false;
+		}
+
+		/**
 		 * First check the object itself, then its contents
 		 *
 		 */
@@ -254,6 +355,15 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			 * no such attribute
 			 *
 			 */
+			return false;
+		}
+
+		/**
+		 * Validate sub1 pointer before casting to char*
+		 */
+		if (!b->sub1)
+		{
+			log_write_raw(1, ERR_BOOLEXP_EVAL_NULL);
 			return false;
 		}
 
@@ -304,17 +414,9 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		}
 
 		/**
-		 * Nope, do an attribute check
-		 *
+		 * Attribute check - use helper function
 		 */
-		a = atr_num(b->sub1->thing);
-
-		if (!a)
-		{
-			return false;
-		}
-
-		return (check_attr(player, from, a, (char *)(b->sub1)->sub1));
+		return check_attr_lock(b, player, from, false);
 
 	case BOOLEXP_CARRY:
 
@@ -328,30 +430,15 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		}
 
 		/**
-		 * Nope, do an attribute check
-		 *
+		 * Attribute check - use helper function (with inventory check)
 		 */
-		a = atr_num(b->sub1->thing);
-
-		if (!a)
-		{
-			return false;
-		}
-
-		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
-		{
-			if (check_attr(obj, from, a, (char *)(b->sub1)->sub1))
-			{
-				return true;
-			}
-		}
-		return false;
+		return check_attr_lock(b, player, from, true);
 
 	case BOOLEXP_OWNER:
 		return (Owner(b->sub1->thing) == Owner(player));
 
 	default:
-		log_write_raw(1, "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n");
+		log_write_raw(1, ERR_BOOLEXP_UNKNOWN_TYPE);
 		/**
 		 * bad type
 		 */
@@ -473,13 +560,20 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 			return ((BOOLEXP *)NULL);
 		}
 
-		anum = (int)strtol(buff, (char **)NULL, 10);
+		/**
+		 * Convert to long with overflow detection
+		 */
+		errno = 0;
+		long temp = strtol(buff, (char **)NULL, 10);
 
-		if (anum <= 0)
+		if (errno == ERANGE || temp <= 0 || temp > INT_MAX)
 		{
+			log_write_raw(1, ERR_ATTR_NUM_OVERFLOW);
 			XFREE(buff);
 			return ((BOOLEXP *)NULL);
 		}
+
+		anum = (int)temp;
 	}
 	else
 	{
@@ -535,7 +629,7 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 *
 		 */
 		buf = XMALLOC(LBUF_SIZE, "buf");
-		//buf = XSTRDUP(*pBuf, "buf");
+		// buf = XSTRDUP(*pBuf, "buf");
 		p = buf;
 
 		while ((**pBuf) && ((**pBuf) != AND_TOKEN) && ((**pBuf) != OR_TOKEN) && ((**pBuf) != ')'))
@@ -653,6 +747,16 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 {
 	BOOLEXP *b2 = NULL;
 
+	/**
+	 * Check parse depth to prevent stack overflow
+	 */
+	if (++parse_depth > MAX_PARSE_DEPTH)
+	{
+		log_write_raw(1, "ERROR: boolexp.c parse depth exceeded limit\n");
+		parse_depth--;
+		return TRUE_BOOLEXP;
+	}
+
 	skip_whitespace(pBuf);
 
 	switch ((**pBuf))
@@ -665,10 +769,12 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		if ((b2->sub1 = parse_boolexp_F(pBuf, parse_player, parsing_internal)) == TRUE_BOOLEXP)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else
 		{
+			parse_depth--;
 			return (b2);
 		}
 
@@ -682,15 +788,18 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		if ((b2->sub1) == TRUE_BOOLEXP)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else if ((b2->sub1->type) != BOOLEXP_CONST)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else
 		{
+			parse_depth--;
 			return (b2);
 		}
 
@@ -704,15 +813,18 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		if ((b2->sub1) == TRUE_BOOLEXP)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else if (((b2->sub1->type) != BOOLEXP_CONST) && ((b2->sub1->type) != BOOLEXP_ATR))
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else
 		{
+			parse_depth--;
 			return (b2);
 		}
 
@@ -726,15 +838,18 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		if ((b2->sub1) == TRUE_BOOLEXP)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else if (((b2->sub1->type) != BOOLEXP_CONST) && ((b2->sub1->type) != BOOLEXP_ATR))
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else
 		{
+			parse_depth--;
 			return (b2);
 		}
 
@@ -748,20 +863,25 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		if ((b2->sub1) == TRUE_BOOLEXP)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else if ((b2->sub1->type) != BOOLEXP_CONST)
 		{
 			free_boolexp(b2);
+			parse_depth--;
 			return (TRUE_BOOLEXP);
 		}
 		else
 		{
+			parse_depth--;
 			return (b2);
 		}
 
 	default:
-		return (parse_boolexp_L(pBuf, parse_player, parsing_internal));
+		b2 = parse_boolexp_L(pBuf, parse_player, parsing_internal);
+		parse_depth--;
+		return b2;
 	}
 }
 
@@ -776,6 +896,16 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 {
 	BOOLEXP *b = NULL, *b2 = NULL;
+
+	/**
+	 * Check parse depth to prevent stack overflow
+	 */
+	if (++parse_depth > MAX_PARSE_DEPTH)
+	{
+		log_write_raw(1, ERR_PARSE_DEPTH_EXCEEDED);
+		parse_depth--;
+		return TRUE_BOOLEXP;
+	}
 
 	if ((b = parse_boolexp_F(pBuf, parse_player, parsing_internal)) != TRUE_BOOLEXP)
 	{
@@ -792,6 +922,7 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 			if ((b2->sub2 = parse_boolexp_T(pBuf, parse_player, parsing_internal)) == TRUE_BOOLEXP)
 			{
 				free_boolexp(b2);
+				parse_depth--;
 				return TRUE_BOOLEXP;
 			}
 
@@ -799,6 +930,7 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 		}
 	}
 
+	parse_depth--;
 	return b;
 }
 
@@ -813,6 +945,16 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 {
 	BOOLEXP *b = NULL, *b2 = NULL;
+
+	/**
+	 * Check parse depth to prevent stack overflow
+	 */
+	if (++parse_depth > MAX_PARSE_DEPTH)
+	{
+		log_write_raw(1, ERR_PARSE_DEPTH_EXCEEDED);
+		parse_depth--;
+		return TRUE_BOOLEXP;
+	}
 
 	if ((b = parse_boolexp_T(pBuf, parse_player, parsing_internal)) != TRUE_BOOLEXP)
 	{
@@ -829,6 +971,7 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 			if ((b2->sub2 = parse_boolexp_E(pBuf, parse_player, parsing_internal)) == TRUE_BOOLEXP)
 			{
 				free_boolexp(b2);
+				parse_depth--;
 				return TRUE_BOOLEXP;
 			}
 
@@ -836,6 +979,7 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 		}
 	}
 
+	parse_depth--;
 	return b;
 }
 
@@ -902,6 +1046,11 @@ BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal)
 	{
 		parsing_internal = internal;
 	}
+
+	/**
+	 * Reset parse depth counter for each top-level parse
+	 */
+	parse_depth = 0;
 
 	ret = parse_boolexp_E(&pBuf, player, parsing_internal);
 	XFREE(pStore);
