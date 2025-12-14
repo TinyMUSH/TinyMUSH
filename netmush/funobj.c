@@ -1112,19 +1112,29 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 
 	for (i = low_bound; i <= high_bound; i++)
 	{
-		if (control_thing || Examinable(player, i))
-		{
-			if ((find_ex && isExit(i) && (Location(i) == thing)) || (find_rm && isRoom(i) && (Dropto(i) == thing)) || (find_th && isThing(i) && (Home(i) == thing)) || (find_pl && isPlayer(i) && (Home(i) == thing)))
-			{
-				if (*bufc != bb_p)
-				{
-					SAFE_LB_CHR(' ', buff, bufc);
-				}
+		/* Cheap type/location checks first, defer Examinable unless needed */
+		int match_exit = find_ex && isExit(i) && (Location(i) == thing);
+		int match_room = find_rm && isRoom(i) && (Dropto(i) == thing);
+		int match_thing = find_th && isThing(i) && (Home(i) == thing);
+		int match_player = find_pl && isPlayer(i) && (Home(i) == thing);
 
-				SAFE_LB_CHR('#', buff, bufc);
-				SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
-			}
+		if (!(match_exit || match_room || match_thing || match_player))
+		{
+			continue;
 		}
+
+		if (!control_thing && !Examinable(player, i))
+		{
+			continue;
+		}
+
+		if (*bufc != bb_p)
+		{
+			SAFE_LB_CHR(' ', buff, bufc);
+		}
+
+		SAFE_LB_CHR('#', buff, bufc);
+		SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
 	}
 }
 
@@ -1389,7 +1399,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 		else
 		{
 			atr_pget_info(it, atr, &aowner, &aflags);
-			xbuf = XMALLOC(16, "xbuf");
+			char xbuf[16];
 
 			xbufp = xbuf;
 			if (aflags & AF_LOCK)
@@ -1435,7 +1445,6 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 			*xbufp = '\0';
 
 			SAFE_LB_STR(xbuf, buff, bufc);
-			XFREE(xbuf);
 		}
 	}
 	else
@@ -1471,7 +1480,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	char *s;
-	char *flagletter = XMALLOC(2, "flagletter");
+	char flagletter[2];
 	FLAGSET fset;
 	FLAG p_type;
 	int negate, temp, type;
@@ -1482,7 +1491,6 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 	if (!Good_obj(it) || (!(mushconf.pub_flags || Examinable(player, it) || (it == cause))))
 	{
 		SAFE_LB_CHR('0', buff, bufc);
-		XFREE(flagletter);
 		return;
 	}
 
@@ -1506,7 +1514,6 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 		if (!*s)
 		{
 			SAFE_LB_CHR('0', buff, bufc);
-			XFREE(flagletter);
 			return;
 		}
 
@@ -1566,7 +1573,6 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 	}
 
 	SAFE_BOOL(buff, bufc, !type);
-	XFREE(flagletter);
 }
 
 /**
