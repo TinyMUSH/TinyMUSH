@@ -771,7 +771,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 
-	if ((!format || !(*format)))
+	if ((!format || !(*format)) || !ap)
 	{
 		/*
 		 * @todo: Check if ap is NULL
@@ -1809,6 +1809,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 			raw_broadcast(0, "GAME: Backup finished.");
 		}
 
+		XFREE(cwd);
 		XFREE(s);
 		XFREE(s1);
 		return -1;
@@ -1865,6 +1866,12 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 		{
 			notify(player, "Unable to restore the working directory");
 		}
+
+		XFREE(cwd);
+		XFREE(buff);
+		XFREE(s);
+		XFREE(s1);
+		return -1;
 	}
 
 	XFREE(cwd);
