@@ -415,6 +415,60 @@ void fun_dec(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
+ * @brief Return a random number from 0 to arg1 - 1
+ */
+void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+{
+    int num = (int)strtol(fargs[0], (char **)NULL, 10);
+
+    if (num < 1)
+    {
+        SAFE_LB_CHR('0', buff, bufc);
+    }
+    else
+    {
+        SAFE_SPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
+    }
+}
+
+/**
+ * @brief Roll XdY dice
+ */
+void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+{
+    int n, die, count;
+    int total = 0;
+
+    if (!fargs[0] || !fargs[1])
+    {
+        SAFE_LB_CHR('0', buff, bufc);
+        return;
+    }
+
+    n = (int)strtol(fargs[0], (char **)NULL, 10);
+    die = (int)strtol(fargs[1], (char **)NULL, 10);
+
+    if ((n == 0) || (die <= 0))
+    {
+        SAFE_LB_CHR('0', buff, bufc);
+        return;
+    }
+
+    if ((n < 1) || (n > 100))
+    {
+        SAFE_LB_STR("#-1 NUMBER OUT OF RANGE", buff, bufc);
+        return;
+    }
+
+    for (count = 0; count < n; count++)
+    {
+        total += (int)random_range(1, die);
+    }
+
+    SAFE_LTOS(buff, bufc, total, LBUF_SIZE);
+}
+
+/**
  * @brief Returns the square root of <number>.
  *
  * @param buff Output buffer

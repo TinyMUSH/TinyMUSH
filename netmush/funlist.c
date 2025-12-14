@@ -220,6 +220,74 @@ validate_table_delims(char *buff, char **bufc, dbref player, dbref caller, dbref
 }
 
 /**
+ * @brief Generate random list
+ */
+void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	Delim osep;
+	int n_times = 0, r_bot = 0, r_top = 0, i = 0;
+	double n_range = 0.0;
+	unsigned int tmp = 0;
+	char *bb_p = NULL;
+
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, 4, 4, DELIM_STRING | DELIM_NULL | DELIM_CRLF, &osep))
+	{
+		return;
+	}
+
+	n_times = (int)strtol(fargs[2], (char **)NULL, 10);
+
+	if (n_times < 1)
+	{
+		return;
+	}
+
+	if (n_times > LBUF_SIZE)
+	{
+		n_times = LBUF_SIZE;
+	}
+
+	r_bot = (int)strtol(fargs[0], (char **)NULL, 10);
+	r_top = (int)strtol(fargs[1], (char **)NULL, 10);
+
+	if (r_top < r_bot)
+	{
+		return;
+	}
+	else if (r_bot == r_top)
+	{
+		bb_p = *bufc;
+
+		for (i = 0; i < n_times; i++)
+		{
+			if (*bufc != bb_p)
+			{
+				print_separator(&osep, buff, bufc);
+			}
+
+			SAFE_LTOS(buff, bufc, r_bot, LBUF_SIZE);
+		}
+
+		return;
+	}
+
+	n_range = (double)r_top - r_bot + 1;
+	bb_p = *bufc;
+
+	for (i = 0; i < n_times; i++)
+	{
+		if (*bufc != bb_p)
+		{
+			print_separator(&osep, buff, bufc);
+		}
+
+		tmp = (unsigned int)random_range(0, (n_range)-1);
+
+		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
+	}
+}
+
+/**
  * @brief Macro helpers for grouped allocations/deallocations
  */
 #define ALLOC_LBUF_TRIO(buf1, buf2, buf3, tag1, tag2, tag3) \

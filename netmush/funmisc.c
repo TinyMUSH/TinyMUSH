@@ -42,6 +42,168 @@ MONTHDAYS mdtab[] = {
 	{(char *)"Nov", 30},
 	{(char *)"Dec", 31}};
 
+static void handle_switch_wild(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, bool return_all)
+{
+	int i = 0;
+	bool got_one = false;
+	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
+
+	if (nfargs < 2)
+	{
+		return;
+	}
+
+	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
+	str = fargs[0];
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+
+	mushstate.in_switch++;
+	save_token = mushstate.switch_token;
+
+	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
+	{
+		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
+		str = fargs[i];
+		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+
+		if (quick_wild(tbuff, mbuff))
+		{
+			got_one = true;
+			XFREE(tbuff);
+			mushstate.switch_token = mbuff;
+			str = fargs[i + 1];
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+
+			if (!return_all)
+			{
+				mushstate.in_switch--;
+				mushstate.switch_token = save_token;
+				XFREE(mbuff);
+				return;
+			}
+			continue;
+		}
+
+		XFREE(tbuff);
+	}
+
+	if (!got_one && (i < nfargs) && fargs[i])
+	{
+		mushstate.switch_token = mbuff;
+		str = fargs[i];
+		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	}
+
+	XFREE(mbuff);
+	mushstate.in_switch--;
+	mushstate.switch_token = save_token;
+}
+
+static void handle_switch_exact(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+{
+	int i = 0;
+	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL;
+
+	if (nfargs < 2)
+	{
+		return;
+	}
+
+	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
+	str = fargs[0];
+	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+
+	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
+	{
+		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
+		str = fargs[i];
+		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+
+		if (!strcmp(tbuff, mbuff))
+		{
+			XFREE(tbuff);
+			str = fargs[i + 1];
+			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+			XFREE(mbuff);
+			return;
+		}
+
+		XFREE(tbuff);
+	}
+
+	XFREE(mbuff);
+
+	if ((i < nfargs) && fargs[i])
+	{
+		str = fargs[i];
+		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
+	}
+}
+
+static void emit_clock_time(char *buff, char **bufc, int width, int cdays, int chours, int cmins, int csecs, bool zero_pad, bool hidezero)
+{
+	if (!hidezero || (cdays != 0))
+	{
+		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
+		return;
+	}
+
+	if (chours != 0)
+	{
+		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
+		return;
+	}
+
+	if (cmins != 0)
+	{
+		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
+		return;
+	}
+
+	SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d" : "%*d", width, csecs);
+}
+
+static char parse_etimefmt_flags(char **p, int *width, int *hidezero, int *hideearly, int *showsuffix, int *clockfmt, int *usecap)
+{
+	char *s = *p;
+
+	*hidezero = *hideearly = *showsuffix = *clockfmt = *usecap = 0;
+
+	*width = 0;
+
+	for (; *s && isdigit((unsigned char)*s); s++)
+	{
+		*width = (*width * 10) + (*s - '0');
+	}
+
+	for (; (*s == 'z') || (*s == 'Z') || (*s == 'x') || (*s == 'X') || (*s == 'c') || (*s == 'C'); s++)
+	{
+		if (*s == 'z')
+		{
+			*hidezero = 1;
+		}
+		else if (*s == 'Z')
+		{
+			*hideearly = 1;
+		}
+		else if ((*s == 'x') || (*s == 'X'))
+		{
+			*showsuffix = 1;
+		}
+		else if (*s == 'c')
+		{
+			*clockfmt = 1;
+		}
+		else if (*s == 'C')
+		{
+			*usecap = 1;
+		}
+	}
+
+	*p = s;
+	return *s;
+}
+
 /**
  * @brief   The switchall() function compares <str> against <pat1>, <pat2>, etc.
  *          (allowing * to match any number of characters and ? to match any 1
@@ -65,68 +227,7 @@ MONTHDAYS mdtab[] = {
  */
 void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i = 0;
-	bool got_one = false;
-	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
-
-	/**
-	 * If we don't have at least 2 args, return nothing
-	 *
-	 */
-	if (nfargs < 2)
-	{
-		return;
-	}
-
-	/**
-	 * Evaluate the target in fargs[0]
-	 *
-	 */
-	mbuff = bp = XMALLOC(LBUF_SIZE, "mbuff");
-	str = fargs[0];
-	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-	/**
-	 * Loop through the patterns looking for a match
-	 *
-	 */
-	mushstate.in_switch++;
-	save_token = mushstate.switch_token;
-
-	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-	{
-		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
-		str = fargs[i];
-		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-		if (quick_wild(tbuff, mbuff))
-		{
-			got_one = true;
-			XFREE(tbuff);
-			mushstate.switch_token = mbuff;
-			str = fargs[i + 1];
-			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-		}
-		else
-		{
-			XFREE(tbuff);
-		}
-	}
-
-	/**
-	 * If we didn't match, return the default if there is one
-	 *
-	 */
-	if (!got_one && (i < nfargs) && fargs[i])
-	{
-		mushstate.switch_token = mbuff;
-		str = fargs[i];
-		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	}
-
-	XFREE(mbuff);
-	mushstate.in_switch--;
-	mushstate.switch_token = save_token;
+	handle_switch_wild(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, true);
 }
 
 /**
@@ -151,68 +252,7 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  */
 void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i = 0;
-	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL, *save_token = NULL;
-
-	/**
-	 * If we don't have at least 2 args, return nothing
-	 *
-	 */
-	if (nfargs < 2)
-	{
-		return;
-	}
-
-	/**
-	 * Evaluate the target in fargs[0]
-	 *
-	 */
-	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
-	str = fargs[0];
-	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-	/**
-	 * Loop through the patterns looking for a match
-	 *
-	 */
-	mushstate.in_switch++;
-	save_token = mushstate.switch_token;
-
-	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-	{
-		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
-		str = fargs[i];
-		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-		if (quick_wild(tbuff, mbuff))
-		{
-			XFREE(tbuff);
-			mushstate.switch_token = mbuff;
-			str = fargs[i + 1];
-			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-			XFREE(mbuff);
-			mushstate.in_switch--;
-			mushstate.switch_token = save_token;
-			return;
-		}
-
-		XFREE(tbuff);
-	}
-
-	/**
-	 * Nope, return the default if there is one
-	 *
-	 */
-	if ((i < nfargs) && fargs[i])
-	{
-		mushstate.switch_token = mbuff;
-		str = fargs[i];
-		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	}
-
-	XFREE(mbuff);
-	mushstate.in_switch--;
-	mushstate.switch_token = save_token;
+	handle_switch_wild(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, false);
 }
 
 /**
@@ -235,61 +275,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  */
 void fun_case(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int i = 0;
-	char *mbuff = NULL, *tbuff = NULL, *bp = NULL, *str = NULL;
-
-	/**
-	 * If we don't have at least 2 args, return nothing
-	 *
-	 */
-	if (nfargs < 2)
-	{
-		return;
-	}
-
-	/**
-	 * Evaluate the target in fargs[0]
-	 *
-	 */
-	mbuff = bp = XMALLOC(LBUF_SIZE, "bp");
-	str = fargs[0];
-	eval_expression_string(mbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-	/**
-	 * Loop through the patterns looking for an exact match
-	 *
-	 */
-	for (i = 1; (i < nfargs - 1) && fargs[i] && fargs[i + 1]; i += 2)
-	{
-		tbuff = bp = XMALLOC(LBUF_SIZE, "bp");
-		str = fargs[i];
-		eval_expression_string(tbuff, &bp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-
-		if (!strcmp(tbuff, mbuff))
-		{
-			XFREE(tbuff);
-			str = fargs[i + 1];
-			eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-			XFREE(mbuff);
-			return;
-		}
-
-		XFREE(tbuff);
-	}
-
-	XFREE(mbuff);
-
-	/**
-	 * Nope, return the default if there is one
-	 *
-	 */
-	if ((i < nfargs) && fargs[i])
-	{
-		str = fargs[i];
-		eval_expression_string(buff, bufc, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, cargs, ncargs);
-	}
-
-	return;
+	handle_switch_exact(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs);
 }
 
 /**
@@ -426,186 +412,6 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 }
 
 /**
- * @brief Return a random number from 0 to arg1 - 1
- *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player Not used
- * @param caller Not used
- * @param cause Not used
- * @param fargs Function's arguments
- * @param nfargs Not used
- * @param cargs Not used
- * @param ncargs Not used
- */
-void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
-{
-	int num = (int)strtol(fargs[0], (char **)NULL, 10);
-
-	if (num < 1)
-	{
-		SAFE_LB_CHR('0', buff, bufc);
-	}
-	else
-	{
-		SAFE_SPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
-	}
-}
-
-/**
- * @brief Roll XdY dice
- *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player Not used
- * @param caller Not used
- * @param cause Not used
- * @param fargs Function's arguments
- * @param nfargs Not used
- * @param cargs Not used
- * @param ncargs Not used
- */
-void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
-{
-	int n, die, count;
-	int total = 0;
-
-	if (!fargs[0] || !fargs[1])
-	{
-		SAFE_LB_CHR('0', buff, bufc);
-		return;
-	}
-
-	n = (int)strtol(fargs[0], (char **)NULL, 10);
-	die = (int)strtol(fargs[1], (char **)NULL, 10);
-
-	if ((n == 0) || (die <= 0))
-	{
-		SAFE_LB_CHR('0', buff, bufc);
-		return;
-	}
-
-	if ((n < 1) || (n > 100))
-	{
-		SAFE_LB_STR("#-1 NUMBER OUT OF RANGE", buff, bufc);
-		return;
-	}
-
-	for (count = 0; count < n; count++)
-	{
-		total += (int)random_range(1, die);
-	}
-
-	SAFE_LTOS(buff, bufc, total, LBUF_SIZE);
-}
-
-/**
- * @brief Generate random list
- *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
- */
-void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
-{
-	Delim osep;
-	int n_times = 0, r_bot = 0, r_top = 0, i = 0;
-	double n_range = 0.0;
-	unsigned int tmp = 0;
-	char *bb_p = NULL;
-
-	/**
-	 * Special: the delim is really an output delim.
-	 *
-	 */
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 4, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
-	{
-		return;
-	}
-
-	/**
-	 * If we're generating no numbers, since this is a list function, we
-	 * return empty, rather than returning 0.
-	 *
-	 */
-	n_times = (int)strtol(fargs[2], (char **)NULL, 10);
-
-	if (n_times < 1)
-	{
-		return;
-	}
-
-	if (n_times > LBUF_SIZE)
-	{
-		n_times = LBUF_SIZE;
-	}
-
-	r_bot = (int)strtol(fargs[0], (char **)NULL, 10);
-	r_top = (int)strtol(fargs[1], (char **)NULL, 10);
-
-	if (r_top < r_bot)
-	{
-		/**
-		 * This is an error condition. Just return an empty list. We
-		 * obviously can't return a random number between X and Y if
-		 * Y is less than X.
-		 *
-		 */
-		return;
-	}
-	else if (r_bot == r_top)
-	{
-		/**
-		 * Just generate a list of n repetitions.
-		 *
-		 */
-		bb_p = *bufc;
-
-		for (i = 0; i < n_times; i++)
-		{
-			if (*bufc != bb_p)
-			{
-				print_separator(&osep, buff, bufc);
-			}
-
-			SAFE_LTOS(buff, bufc, r_bot, LBUF_SIZE);
-		}
-
-		return;
-	}
-
-	/**
-	 * We've hit this point, we have a range. Generate a list.
-	 *
-	 */
-	n_range = (double)r_top - r_bot + 1;
-	bb_p = *bufc;
-
-	for (i = 0; i < n_times; i++)
-	{
-		if (*bufc != bb_p)
-		{
-			print_separator(&osep, buff, bufc);
-		}
-
-		tmp = (unsigned int)random_range(0, (n_range)-1);
-
-		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
-	}
-}
-
-/**
  * @brief Return a list of numbers.
  *
  * @param buff Output buffer
@@ -632,16 +438,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	/**
-	 * lnum() is special, since its single delimiter is really an output
-	 * delimiter.
-	 */
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &osep, DELIM_STRING | DELIM_NULL | DELIM_CRLF))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 3, 3, DELIM_STRING | DELIM_NULL | DELIM_CRLF, &osep))
 	{
 		return;
 	}
@@ -1310,43 +1107,18 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 			}
 			else
 			{
-				hidezero = hideearly = showsuffix = clockfmt = usecap = 0;
+				char spec = parse_etimefmt_flags(&p, &width, &hidezero, &hideearly, &showsuffix, &clockfmt, &usecap);
 
-				/**
-				 * Optional width
-				 *
-				 */
-				for (width = 0; *p && isdigit((unsigned char)*p); p++)
+				if (clockfmt && (raw_secs < 0))
 				{
-					width *= 10;
-					width += *p - '0';
+					cdays = chours = cmins = 0;
+					csecs = raw_secs;
+					emit_clock_time(buff, bufc, width, cdays, chours, cmins, csecs, isupper(spec), hidezero);
+					p++;
+					continue;
 				}
 
-				for (; (*p == 'z') || (*p == 'Z') || (*p == 'x') || (*p == 'X') || (*p == 'c') || (*p == 'C'); p++)
-				{
-					if (*p == 'z')
-					{
-						hidezero = 1;
-					}
-					else if (*p == 'Z')
-					{
-						hideearly = 1;
-					}
-					else if ((*p == 'x') || (*p == 'X'))
-					{
-						showsuffix = 1;
-					}
-					else if (*p == 'c')
-					{
-						clockfmt = 1;
-					}
-					else if (*p == 'C')
-					{
-						usecap = 1;
-					}
-				}
-
-				switch (*p)
+				switch (spec)
 				{
 				case 's':
 				case 'S':
@@ -1450,7 +1222,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					{
 						if (width > 0)
 						{
-							padc = isupper(*p) ? '0' : ' ';
+							padc = isupper(spec) ? '0' : ' ';
 
 							if (showsuffix)
 							{
@@ -1480,7 +1252,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					}
 					else if (width > 0)
 					{
-						if (isupper(*p))
+						if (isupper(spec))
 						{
 							SAFE_SPRINTF(buff, bufc, "%0*d", width, n);
 						}
@@ -1525,50 +1297,26 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					else if (timec == 'h')
 					{
 						cdays = 0;
-						csecs = raw_secs;
-						chours = csecs / 3600;
-						csecs %= 3600;
-						cmins = csecs / 60;
-						csecs %= 60;
+						chours = hours + (days * 24);
+						cmins = mins;
+						csecs = secs;
 					}
 					else if (timec == 'm')
 					{
-						cdays = chours = 0;
-						csecs = raw_secs;
-						cmins = csecs / 60;
-						csecs %= 60;
+						cdays = 0;
+						chours = 0;
+						cmins = mins + (hours * 60) + (days * 1440);
+						csecs = secs;
 					}
-					else
+					else if (timec == 's')
 					{
-						cdays = chours = cmins = 0;
+						cdays = 0;
+						chours = 0;
+						cmins = 0;
 						csecs = raw_secs;
 					}
 
-					if (!hidezero || (cdays != 0))
-					{
-						SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
-					}
-					else
-					{
-						/**
-						 * Start from the first
-						 * non-zero thing
-						 *
-						 */
-						if (chours != 0)
-						{
-							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
-						}
-						else if (cmins != 0)
-						{
-							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
-						}
-						else
-						{
-							SAFE_SPRINTF(buff, bufc, isupper(*p) ? "%0*d" : "%*d", width, csecs);
-						}
-					}
-
+					emit_clock_time(buff, bufc, width, cdays, chours, cmins, csecs, isupper(spec), hidezero);
 					p++;
 				}
 			}
@@ -2364,12 +2112,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char *name;
 	Delim isep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 3, buff, bufc))
-	{
-		return;
-	}
-
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, 0))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 3, 3, 0, &isep))
 	{
 		return;
 	}
