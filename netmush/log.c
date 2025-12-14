@@ -71,7 +71,10 @@ void logfile_move(char *oldfn, char *newfn)
     {
         fclose(mainlog_fp);
     }
-    copy_file(oldfn, newfn, 1);
+    if (copy_file(oldfn, newfn, 1) != 0)
+    {
+        fprintf(stderr, "Warning: Failed to copy log file from %s to %s\n", oldfn, newfn);
+    }
     logfile_init(newfn);
 }
 
@@ -181,7 +184,7 @@ int start_log(const char *primary, const char *secondary, int key)
             {
                 free(pri);
                 free(sec);
-                mushstate.logging--;
+                end_log();
                 return 0;
             }
 
@@ -203,7 +206,7 @@ int start_log(const char *primary, const char *secondary, int key)
 
             if (pri == NULL)
             {
-                mushstate.logging--;
+                end_log();
                 return 0;
             }
 
@@ -313,7 +316,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         /* Do we have a logfile to write to... */
         if ((log_fp != NULL))
         {
-            if (mushstate.debug)
+            if (mushstate.debug && str1 != NULL)
             {
                 fputs(str1, log_fp);
             }
@@ -327,7 +330,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
 
         if ((log_fp != stderr) && (mushstate.logstderr))
         {
-            if (mushstate.debug)
+            if (mushstate.debug && str1 != NULL)
             {
                 fputs(str1, stderr);
             }
@@ -470,11 +473,15 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
     }
     else
     {
+        FILE *old_fp = mainlog_fp;
         fclose(mainlog_fp);
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
         copy_file(mushconf.log_file, s, 1);
         XFREE(s);
-        logfile_init(mushconf.log_file);
+        if (logfile_init(mushconf.log_file) == NULL)
+        {
+            fprintf(stderr, "Error: Failed to reinitialize main log after rotation\n");
+        }
     }
 
     notify(player, "Logs rotated.");
@@ -502,6 +509,10 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
                 {
                     setbuf(lp->fileptr, NULL);
                 }
+                else
+                {
+                    fprintf(stderr, "Error: Failed to reopen log file %s after rotation\n", lp->filename);
+                }
             }
         }
     }
@@ -523,6 +534,7 @@ void logfile_close(void)
             if (lp->filename && lp->fileptr)
             {
                 fclose(lp->fileptr);
+                lp->fileptr = NULL;
                 s = XASPRINTF("s", "%s.%s", lp->filename, ts);
                 copy_file(lp->filename, s, 1);
                 XFREE(s);
@@ -533,6 +545,7 @@ void logfile_close(void)
     if (mainlog_fp != stderr)
     {
         fclose(mainlog_fp);
+        mainlog_fp = NULL;
         s = XASPRINTF("s", "%s.%s", mushconf.log_file, ts);
         copy_file(mushconf.log_file, s, 1);
         XFREE(s);
