@@ -1988,7 +1988,9 @@ int check_connect(DESC *d, char *msg)
 					nplayers++;
 		}
 
-		player = connect_player(user, password, d->addr, d->username, inet_ntoa((d->address).sin_addr));
+		char login_addr[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &(d->address).sin_addr, login_addr, sizeof(login_addr));
+		player = connect_player(user, password, d->addr, d->username, login_addr);
 
 		if (player == NOTHING)
 		{
@@ -2689,19 +2691,20 @@ void list_sites(dbref player, SITE *site_list, const char *header_txt, int stat_
 		 */
 		if ((bits == 0 && htonl(0) == this->mask.s_addr) || htonl(0xFFFFFFFFU << (32 - bits)) == this->mask.s_addr)
 		{
-			XSPRINTF(buff, "%-19.19s %-19.19s /%-19d %s", header_txt, inet_ntoa(this->address), bits, str);
+			char cidr_addr[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &this->address, cidr_addr, sizeof(cidr_addr));
+			XSPRINTF(buff, "%-19.19s %-19.19s /%-19d %s", header_txt, cidr_addr, bits, str);
 		}
 		else
 		{
 			/*
 			 * Deal with bizarre stuff not along CIDRized boundaries.
-			 * * inet_ntoa() points to a static buffer, so we've got to
-			 * * allocate something temporary.
 			 */
-			maskaddr = XMALLOC(MBUF_SIZE, "maskaddr");
-			XSTRCPY(maskaddr, inet_ntoa(this->mask));
-			XSPRINTF(buff, "%-17s %-17s %s", inet_ntoa(this->address), maskaddr, str);
-			XFREE(maskaddr);
+			char mask_addr[INET_ADDRSTRLEN];
+			char site_addr[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &this->mask, mask_addr, sizeof(mask_addr));
+			inet_ntop(AF_INET, &this->address, site_addr, sizeof(site_addr));
+			XSPRINTF(buff, "%-17s %-17s %s", site_addr, mask_addr, str);
 		}
 
 		notify(player, buff);

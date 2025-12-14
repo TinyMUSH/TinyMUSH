@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <crypt.h>
 
 /* ---------------------------------------------------------------------------
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.
@@ -193,7 +194,9 @@ int check_pass(dbref player, const char *password)
     char *target;
     target = atr_get(player, A_PASS, &aowner, &aflags, &alen);
 
-    if (*target && strcmp(target, password) && strcmp(crypt(password, "XX"), target))
+    struct crypt_data cdata;
+    cdata.initialized = 0;
+    if (*target && strcmp(target, password) && strcmp(crypt_r(password, "XX", &cdata), target))
     {
         XFREE(target);
         return 0;
@@ -325,7 +328,9 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
         }
     }
 
-    s_Pass(player, crypt(pbuf, "XX"));
+    struct crypt_data cdata;
+    cdata.initialized = 0;
+    s_Pass(player, crypt_r(pbuf, "XX", &cdata));
     s_Home(player, (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
     XFREE(pbuf);
     return player;
@@ -354,7 +359,9 @@ void do_password(dbref player, dbref cause __attribute__((unused)), int key __at
     }
     else
     {
-        atr_add_raw(player, A_PASS, crypt(newpass, "XX"));
+        struct crypt_data cdata;
+        cdata.initialized = 0;
+        atr_add_raw(player, A_PASS, crypt_r(newpass, "XX", &cdata));
         notify(player, "Password changed.");
     }
 

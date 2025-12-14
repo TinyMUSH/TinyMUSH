@@ -130,25 +130,31 @@ void *dnsResolver(void *args)
 			switch (msgData.payload.addrf)
 			{
 			case AF_INET:
-				hostEnt = gethostbyaddr(&(msgData.payload.ip.v4), sizeof(msgData.payload.ip.v4), AF_INET);
-				if (hostEnt)
+			{
+				struct sockaddr_in sa;
+				char hostname[NI_MAXHOST];
+				memset(&sa, 0, sizeof(sa));
+				sa.sin_family = AF_INET;
+				sa.sin_addr = msgData.payload.ip.v4;
+				if (getnameinfo((struct sockaddr *)&sa, sizeof(sa), hostname, sizeof(hostname), NULL, 0, NI_NAMEREQD) == 0)
 				{
-					if (hostEnt->h_name)
-					{
-						clbData.payload.hostname = strdup(hostEnt->h_name);
-					}
+					clbData.payload.hostname = strdup(hostname);
 				}
-				break;
+			}
+			break;
 			case AF_INET6:
-				hostEnt = gethostbyaddr(&(msgData.payload.ip.v6), sizeof(msgData.payload.ip.v6), AF_INET6);
-				if (hostEnt)
+			{
+				struct sockaddr_in6 sa6;
+				char hostname[NI_MAXHOST];
+				memset(&sa6, 0, sizeof(sa6));
+				sa6.sin6_family = AF_INET6;
+				sa6.sin6_addr = msgData.payload.ip.v6;
+				if (getnameinfo((struct sockaddr *)&sa6, sizeof(sa6), hostname, sizeof(hostname), NULL, 0, NI_NAMEREQD) == 0)
 				{
-					if (hostEnt->h_name)
-					{
-						clbData.payload.hostname = strdup(hostEnt->h_name);
-					}
+					clbData.payload.hostname = strdup(hostname);
 				}
-				break;
+			}
+			break;
 			}
 			if (clbData.payload.hostname)
 			{
@@ -574,7 +580,9 @@ DESC *new_connection(int sock)
 
 	if (site_check(addr.sin_addr, mushstate.access_list) & H_FORBIDDEN)
 	{
-		log_write(LOG_NET | LOG_SECURITY, "NET", "SITE", "[%d/%s] Connection refused.  (Remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+		char addr_str[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &addr.sin_addr, addr_str, sizeof(addr_str));
+		log_write(LOG_NET | LOG_SECURITY, "NET", "SITE", "[%d/%s] Connection refused.  (Remote port %d)", newsock, addr_str, ntohs(addr.sin_port));
 		fcache_rawdump(newsock, FC_CONN_SITE);
 		shutdown(newsock, 2);
 		close(newsock);
@@ -593,7 +601,9 @@ DESC *new_connection(int sock)
 		msgData.payload.addrf = AF_INET;
 		msgsnd(msgq_Id, &msgData, sizeof(msgData.payload), 0);
 
-		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+		char conn_addr_str[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &addr.sin_addr, conn_addr_str, sizeof(conn_addr_str));
+		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, conn_addr_str, ntohs(addr.sin_port));
 		d = initializesock(newsock, &addr);
 	}
 
@@ -958,7 +968,7 @@ DESC *initializesock(int s, struct sockaddr_in *a)
 	d->hashnext = NULL;
 	d->next = descriptor_list;
 	d->prev = &descriptor_list;
-	XSTRNCPY(d->addr, inet_ntoa(a->sin_addr), 50);
+	inet_ntop(AF_INET, &a->sin_addr, d->addr, 50);
 	descriptor_list = d;
 	welcome_user(d);
 	return d;

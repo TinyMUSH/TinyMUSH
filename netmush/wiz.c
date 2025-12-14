@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <crypt.h>
 
 void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
@@ -410,7 +411,9 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	/*
 	 * it's ok, do it
 	 */
-	s_Pass(victim, crypt((const char *)password, "XX"));
+	struct crypt_data cdata;
+	cdata.initialized = 0;
+	s_Pass(victim, crypt_r((const char *)password, "XX", &cdata));
 	notify_quiet(player, "Password changed.");
 	notify_check(victim, victim, MSG_PUP_ALWAYS | MSG_ME, "Your password has been changed by %s.", Name(player));
 }

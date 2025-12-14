@@ -1625,7 +1625,12 @@ in_addr_t sane_inet_addr(char *str)
     }
     else
     {
-        return inet_addr(str);
+        struct in_addr addr;
+        if (inet_pton(AF_INET, str, &addr) == 1)
+        {
+            return addr.s_addr;
+        }
+        return INADDR_NONE;
     }
 }
 
