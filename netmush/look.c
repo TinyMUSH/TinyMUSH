@@ -43,15 +43,23 @@ int did_attr(dbref player, dbref thing, int what)
 
 void look_exits(dbref player, dbref loc, const char *exit_name)
 {
-	dbref thing, parent;
-	char *buff, *e, *buff1, *e1, *buf;
-	int foundany, lev, isdark;
+	dbref thing = NOTHING, parent = NOTHING;
+	char *buff = NULL, *e = NULL, *buff1 = NULL, *e1 = NULL, *buf = NULL;
+	int foundany = 0, lev = 0, isdark = 0;
 
 	/*
 	 * make sure location has exits
 	 */
 
 	if (!Good_obj(loc) || !Has_exits(loc))
+	{
+		return;
+	}
+
+	/*
+	 * exit_name must be valid for notification
+	 */
+	if (!exit_name)
 	{
 		return;
 	}
@@ -102,8 +110,19 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 	 * Display the list of exit names
 	 */
 	notify(player, exit_name);
-	e = buff = XMALLOC(LBUF_SIZE, "buff");
-	e1 = buff1 = XMALLOC(LBUF_SIZE, "buff1");
+	buff = XMALLOC(LBUF_SIZE, "buff");
+	if (!buff)
+	{
+		return;
+	}
+	e = buff;
+	buff1 = XMALLOC(LBUF_SIZE, "buff1");
+	if (!buff1)
+	{
+		XFREE(buff);
+		return;
+	}
+	e1 = buff1;
 
 	for (lev = 0, parent = loc; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
 	{
@@ -145,7 +164,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 			{
 				if (Can_See_Exit(player, thing, isdark))
 				{
-					if (buff != e)
+					if (e != buff)
 						SAFE_STRCAT(buff, &e, "  ", LBUF_SIZE);
 
 					if (Html(player) && (mushconf.have_pueblo == 1))
@@ -178,41 +197,40 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 		}
 	}
 
-	if (mushconf.have_pueblo == 1)
+	if (!(Transparent(loc)))
 	{
-		if (!(Transparent(loc)))
+		*e = '\0';
+		if (mushconf.have_pueblo == 1 && Html(player))
 		{
-			if (Html(player))
-			{
-				SAFE_LB_CHR('\r', buff, &e);
-				SAFE_LB_CHR('\n', buff, &e);
-				*e = '\0';
-				notify_html(player, buff);
-			}
-			else
-			{
-				*e = '\0';
-				notify(player, buff);
-			}
-		}
-	}
-	else
-	{
-		if (!(Transparent(loc)))
-		{
+			SAFE_LB_CHR('\r', buff, &e);
+			SAFE_LB_CHR('\n', buff, &e);
 			*e = '\0';
+			notify_html(player, buff);
+		}
+		else
+		{
 			notify(player, buff);
 		}
 	}
 
-	XFREE(buff);
-	XFREE(buff1);
+	if (buff)
+		XFREE(buff);
+	if (buff1)
+		XFREE(buff1);
 }
 
 void look_contents(dbref player, dbref loc, const char *contents_name, int style)
 {
 	dbref thing = NOTHING, can_see_loc = NOTHING;
 	char *buff = NULL, *html_buff = NULL, *html_cp = NULL, *remote_num = NULL;
+
+	/*
+	 * Validate input parameters
+	 */
+	if (!Good_obj(loc) || !contents_name)
+	{
+		return;
+	}
 
 	/*
 	 * Check if we're formatting contents in a player-specified way.
@@ -225,7 +243,12 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 
 	if (mushconf.have_pueblo == 1)
 	{
-		html_buff = html_cp = XMALLOC(LBUF_SIZE, "html_cp");
+		html_buff = XMALLOC(LBUF_SIZE, "html_cp");
+		if (!html_buff)
+		{
+			return;
+		}
+		html_cp = html_buff;
 	}
 
 	/*
@@ -299,7 +322,7 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 		}
 	}
 
-	if (mushconf.have_pueblo == 1)
+	if (html_buff)
 	{
 		XFREE(html_buff);
 	}
@@ -319,8 +342,9 @@ char *pairColor(int color)
 		return ANSI_CYAN;
 	case 4:
 		return ANSI_BLUE;
+	default:
+		return ANSI_NORMAL;
 	}
-	return NULL;
 }
 
 char *pairRevColor(int color)
@@ -337,17 +361,42 @@ char *pairRevColor(int color)
 		return "m63[\033";
 	case 4:
 		return "m43[\033";
+	default:
+		return ANSI_NORMAL;
 	}
-	return NULL;
 }
 
 void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, char **bufc)
 {
 	int pos, depth;
 	char *str, *strbuf, *parenlist, *endp;
+
+	if (!atext || !buff || !bufc)
+	{
+		return;
+	}
+
 	str = strip_ansi(atext);
+	if (!str)
+	{
+		return;
+	}
+
 	strbuf = XMALLOC(LBUF_SIZE, "strbuf");
+	if (!strbuf)
+	{
+		XFREE(str);
+		return;
+	}
+
 	parenlist = XMALLOC(LBUF_SIZE, "parenlist");
+	if (!parenlist)
+	{
+		XFREE(strbuf);
+		XFREE(str);
+		return;
+	}
+
 	endp = strbuf;
 	parenlist[0] = 0;
 	depth = 0;
@@ -359,7 +408,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 		case '(':
 		case '{':
 		case '[':
-			if (str[pos - 1] != '\\')
+			if (pos == 0 || str[pos - 1] != '\\')
 			{
 				depth++;
 				parenlist[depth] = str[pos];
@@ -383,7 +432,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			 * Since parenlist[0] is 0, this also catches
 			 * the too many close parens bug.
 			 */
-			if (str[pos - 1] != '\\')
+			if (pos == 0 || str[pos - 1] != '\\')
 			{
 				if ((parenlist[depth] & 96) == (str[pos] & 96))
 				{
@@ -461,7 +510,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			 * Since parenlist[0] is 0, this also catches
 			 * the too many close parens bug.
 			 */
-			if ((parenlist[depth] & 96) == (str[pos] & 96))
+			if (depth > 0 && (parenlist[depth] & 96) == (str[pos] & 96))
 			{
 				SAFE_LB_STR(ANSI_REVERSE_NORMAL, strbuf, &endp);
 				SAFE_LB_CHR(str[pos], strbuf, &endp);
@@ -719,13 +768,49 @@ void pretty_print(char *dest, char *name, char *text)
 
 void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner, int aflags, int skip_tag, int is_special)
 {
-	char *text = NULL, *buf, *bp, *bb_p;
-	char *xbuf = XMALLOC(16, "xbuf");
-	char *gbuf = XMALLOC(16, "gbuf");
-	char *flag_buf = XMALLOC(34, "flag_buf");
+	char *text = NULL, *buf = NULL, *bp = NULL, *bb_p = NULL;
+	char *xbuf = NULL, *gbuf = NULL, *flag_buf = NULL;
 	char *xbufp, *gbufp, *fbp;
-	char *s = XMALLOC(GBUF_SIZE, "s");
-	BOOLEXP *bexp;
+	char *s = NULL;
+	BOOLEXP *bexp = NULL;
+
+	/*
+	 * Validate input parameters
+	 */
+	if (!ap || !raw_text)
+	{
+		return;
+	}
+
+	xbuf = XMALLOC(16, "xbuf");
+	if (!xbuf)
+	{
+		return;
+	}
+
+	gbuf = XMALLOC(16, "gbuf");
+	if (!gbuf)
+	{
+		XFREE(xbuf);
+		return;
+	}
+
+	flag_buf = XMALLOC(34, "flag_buf");
+	if (!flag_buf)
+	{
+		XFREE(xbuf);
+		XFREE(gbuf);
+		return;
+	}
+
+	s = XMALLOC(GBUF_SIZE, "s");
+	if (!s)
+	{
+		XFREE(xbuf);
+		XFREE(gbuf);
+		XFREE(flag_buf);
+		return;
+	}
 
 	if (ap->flags & AF_IS_LOCK)
 	{
@@ -912,38 +997,44 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		}
 
 		buf = XMALLOC(LBUF_SIZE, "buf");
-		pretty_print(buf, s, text);
-		notify(player, buf);
-		XFREE(buf);
+		if (buf)
+		{
+			pretty_print(buf, s, text);
+			notify(player, buf);
+			XFREE(buf);
+		}
 	}
 	else if (is_special == 2)
 	{
 		buf = XMALLOC(LBUF_SIZE, "buf");
-		bb_p = buf;
+		if (buf)
+		{
+			bb_p = buf;
 
-		if ((aowner != Owner(thing)) && (aowner != NOTHING))
-		{
-			SAFE_SPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
-		}
-		else if (*fbp)
-		{
-			SAFE_SPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
-		}
-		else if (!skip_tag || (ap->number != A_DESC))
-		{
-			SAFE_SPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
-		}
-		else
-		{
-			/*
-			 * Just fine the way it is
-			 */
-		}
+			if ((aowner != Owner(thing)) && (aowner != NOTHING))
+			{
+				SAFE_SPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+			}
+			else if (*fbp)
+			{
+				SAFE_SPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+			}
+			else if (!skip_tag || (ap->number != A_DESC))
+			{
+				SAFE_SPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+			}
+			else
+			{
+				/*
+				 * Just fine the way it is
+				 */
+			}
 
-		pairs_print(player, text, buf, &bb_p);
-		*bb_p = '\0';
-		notify(player, buf);
-		XFREE(buf);
+			pairs_print(player, text, buf, &bb_p);
+			*bb_p = '\0';
+			notify(player, buf);
+			XFREE(buf);
+		}
 	}
 	else
 	{
@@ -1067,7 +1158,7 @@ void look_atrs(dbref player, dbref thing, int check_parents, int is_special)
 
 void look_simple(dbref player, dbref thing, int obey_terse)
 {
-	char *buff;
+	char *buff = NULL;
 
 	/*
 	 * Only makes sense for things that can hear
@@ -1085,8 +1176,11 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 	if (Examinable(player, thing))
 	{
 		buff = unparse_object(player, thing, 1);
-		notify(player, buff);
-		XFREE(buff);
+		if (buff)
+		{
+			notify(player, buff);
+			XFREE(buff);
+		}
 	}
 
 	if (obey_terse && Terse(player))
@@ -1108,16 +1202,16 @@ void look_simple(dbref player, dbref thing, int obey_terse)
 
 void show_a_desc(dbref player, dbref loc, const char *msg)
 {
-	char *got2;
-	dbref aowner;
-	int aflags, alen, indent = 0;
+	char *got2 = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0, indent = 0;
 	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
 
 	if (Html(player))
 	{
 		got2 = atr_pget(loc, A_HTDESC, &aowner, &aflags, &alen);
 
-		if (*got2)
+		if (got2 && *got2)
 			did_it(player, loc, A_HTDESC, msg, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
 		else
 		{
@@ -1134,7 +1228,8 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 			}
 		}
 
-		XFREE(got2);
+		if (got2)
+			XFREE(got2);
 	}
 	else
 	{
@@ -1154,16 +1249,17 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 
 void show_desc(dbref player, dbref loc, int key)
 {
-	char *got;
-	dbref aowner;
-	int aflags, alen, indent = 0;
+	char *got = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0, indent = 0;
 	indent = (isRoom(loc) && mushconf.indent_desc && atr_get_raw(loc, A_DESC));
 
 	if ((key & LK_OBEYTERSE) && Terse(player))
 		did_it(player, loc, A_NULL, NULL, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
 	else if ((Typeof(loc) != TYPE_ROOM) && (key & LK_IDESC))
 	{
-		if (*(got = atr_pget(loc, A_IDESC, &aowner, &aflags, &alen)))
+		got = atr_pget(loc, A_IDESC, &aowner, &aflags, &alen);
+		if (got && *got)
 			did_it(player, loc, A_IDESC, NULL, A_ODESC, NULL, A_ADESC, 0, (char **)NULL, 0, MSG_PRESENCE);
 		else
 		{
@@ -1187,7 +1283,8 @@ void show_desc(dbref player, dbref loc, int key)
 			}
 		}
 
-		XFREE(got);
+		if (got)
+			XFREE(got);
 	}
 	else
 	{
@@ -1342,21 +1439,27 @@ void look_in(dbref player, dbref loc, int key)
 
 void look_here(dbref player, dbref thing, int key, int look_key)
 {
-	if (Good_obj(thing))
+	if (!Good_obj(thing))
 	{
-		if (key & LOOK_OUTSIDE)
-		{
-			if ((isRoom(thing)) || Opaque(thing))
-			{
-				notify_quiet(player, "You can't look outside.");
-				return;
-			}
+		return;
+	}
 
-			thing = Location(thing);
+	if (key & LOOK_OUTSIDE)
+	{
+		if ((isRoom(thing)) || Opaque(thing))
+		{
+			notify_quiet(player, "You can't look outside.");
+			return;
 		}
 
-		look_in(player, thing, look_key);
+		thing = Location(thing);
+		if (!Good_obj(thing))
+		{
+			return;
+		}
 	}
+
+	look_in(player, thing, look_key);
 }
 
 void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *name)
@@ -1549,10 +1652,10 @@ void debug_examine(dbref player, dbref thing)
 
 void exam_wildattrs(dbref player, dbref thing, int do_parent, int is_special)
 {
-	int atr, aflags, alen, got_any;
-	char *buf;
-	dbref aowner;
-	ATTR *ap;
+	int atr = NOTHING, aflags = 0, alen = 0, got_any = 0;
+	char *buf = NULL;
+	dbref aowner = NOTHING;
+	ATTR *ap = NULL;
 	got_any = 0;
 
 	for (atr = olist_first(); atr != NOTHING; atr = olist_next())
@@ -1645,9 +1748,9 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 {
 	dbref thing, content, exit, aowner, loc;
 	char savec;
-	char *temp, *buf, *buf2;
-	char *timebuf = XMALLOC(32, "timebuf");
-	BOOLEXP *bexp;
+	char *temp = NULL, *buf = NULL, *buf2 = NULL;
+	char *timebuf = NULL;
+	BOOLEXP *bexp = NULL;
 	int control, aflags, alen, do_parent, is_special;
 	time_t save_access_time;
 
@@ -1657,7 +1760,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 
 	if (!Hearer(player))
 	{
-		XFREE(timebuf);
+		return;
+	}
+
+	timebuf = XMALLOC(32, "timebuf");
+	if (!timebuf)
+	{
 		return;
 	}
 
@@ -1744,14 +1852,20 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	if (control && !(key & EXAM_OWNER))
 	{
 		buf2 = unparse_object(player, thing, 0);
-		notify(player, buf2);
-		XFREE(buf2);
+		if (buf2)
+		{
+			notify(player, buf2);
+			XFREE(buf2);
+		}
 
 		if (mushconf.ex_flags)
 		{
 			buf2 = flag_description(player, thing);
-			notify(player, buf2);
-			XFREE(buf2);
+			if (buf2)
+			{
+				notify(player, buf2);
+				XFREE(buf2);
+			}
 		}
 	}
 	else
@@ -1761,9 +1875,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			if (mushconf.read_rem_name)
 			{
 				buf2 = XMALLOC(LBUF_SIZE, "buf2");
-				XSTRCPY(buf2, Name(thing));
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
-				XFREE(buf2);
+				if (buf2)
+				{
+					XSTRCPY(buf2, Name(thing));
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s is owned by %s", buf2, Name(Owner(thing)));
+					XFREE(buf2);
+				}
 			}
 			else
 			{
@@ -1776,12 +1893,17 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	}
 
 	temp = XMALLOC(LBUF_SIZE, "temp");
+	if (!temp)
+	{
+		XFREE(timebuf);
+		return;
+	}
 
 	if (control || mushconf.read_rem_desc || nearby(player, thing))
 	{
 		temp = atr_get_str(temp, thing, A_DESC, &aowner, &aflags, &alen);
 
-		if (*temp)
+		if (temp && *temp)
 		{
 			if (Examinable(player, thing) || (aowner == Owner(player)))
 			{
@@ -2042,8 +2164,8 @@ void do_score(dbref player, dbref cause __attribute__((unused)), int key __attri
 
 void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
-	// dbref thing;
-	char *buff, *e;
+	char *buff = NULL, *e = NULL;
+	dbref thing;
 
 	if (Contents(player) == NOTHING)
 	{
@@ -2052,30 +2174,37 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 	else
 	{
 		notify(player, "You are carrying:");
-		for (dbref thing = Contents(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
+		for (thing = Contents(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 		{
 			buff = unparse_object(player, thing, 1);
-			notify(player, buff);
-			XFREE(buff);
+			if (buff)
+			{
+				notify(player, buff);
+				XFREE(buff);
+			}
 		}
 	}
 
 	if (Exits(player) != NOTHING)
 	{
 		notify(player, "Exits:");
-		e = buff = XMALLOC(LBUF_SIZE, "e");
-		for (dbref thing = Exits(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
+		buff = XMALLOC(LBUF_SIZE, "buff");
+		if (buff)
 		{
-			if (e != buff)
+			e = buff;
+			for (thing = Exits(player); (thing != NOTHING) && (Next(thing) != thing); thing = Next(thing))
 			{
-				SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
-			}
+				if (e != buff)
+				{
+					SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+				}
 
-			safe_exit_name(thing, buff, &e);
+				safe_exit_name(thing, buff, &e);
+			}
+			*e = '\0';
+			notify(player, buff);
+			XFREE(buff);
 		}
-		*e = '\0';
-		notify(player, buff);
-		XFREE(buff);
 	}
 
 	do_score(player, player, 0);
@@ -2084,10 +2213,10 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *name)
 {
 	dbref thing, i, j;
-	char *exit, *message;
-	int control_thing, count, low_bound, high_bound;
-	FWDLIST *fp;
-	PROPDIR *pp;
+	char *exit = NULL, *message = NULL;
+	int control_thing, count = 0, low_bound, high_bound;
+	FWDLIST *fp = NULL;
+	PROPDIR *pp = NULL;
 	parse_range(&name, &low_bound, &high_bound);
 
 	if (!name || !*name)
@@ -2272,6 +2401,10 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 		else if (Monitor(what))
 		{
 			buff = XMALLOC(LBUF_SIZE, "buff");
+			if (!buff)
+			{
+				return;
+			}
 
 			for (attr = atr_head(what, &as); attr; attr = atr_next(&as))
 			{
@@ -2355,6 +2488,10 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 	if (canhear || cancom || isplayer || ispuppet || isconnected || is_audible || is_parent)
 	{
 		buf = XMALLOC(LBUF_SIZE, "buf");
+		if (!buf)
+		{
+			return;
+		}
 		bp = buf;
 
 		if (cancom)
@@ -2403,6 +2540,11 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 		else
 		{
 			bp = buf2 = XMALLOC(LBUF_SIZE, "buf2");
+			if (!buf2)
+			{
+				XFREE(buf);
+				return;
+			}
 			safe_exit_name(what, buf2, &bp);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "  %s is listening. [%s]", buf2, buf);
 			XFREE(buf2);
@@ -2532,12 +2674,12 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
 
 void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char *name, char *qual)
 {
-	BOOLEXP *bexp;
-	char *got, *thingname, *as, *ltext, *buff, *tbuf, *tmp, *buf;
-	dbref aowner, thing;
-	int val, aflags, alen, ca, wild_decomp;
-	ATTR *attr;
-	NAMETAB *np;
+	BOOLEXP *bexp = NULL;
+	char *got = NULL, *thingname = NULL, *as = NULL, *ltext = NULL, *buff = NULL, *tbuf = NULL, *tmp = NULL, *buf = NULL;
+	dbref aowner = NOTHING, thing = NOTHING;
+	int val = 0, aflags = 0, alen = 0, ca = 0, wild_decomp = 0;
+	ATTR *attr = NULL;
+	NAMETAB *np = NULL;
 	/*
 	 * Check for obj/attr first
 	 */
@@ -2685,11 +2827,16 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 				{
 					tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 					buf = XMALLOC(GBUF_SIZE, "buf");
-					XSNPRINTF(buf, GBUF_SIZE, "%c%s %s=", ((ca < A_USER_START) ? '@' : '&'), buff, thingname);
-					pretty_print(tbuf, buf, got);
-					XFREE(buf);
-					notify(player, tbuf);
-					XFREE(tbuf);
+					if (tbuf && buf)
+					{
+						XSNPRINTF(buf, GBUF_SIZE, "%c%s %s=", ((ca < A_USER_START) ? '@' : '&'), buff, thingname);
+						pretty_print(tbuf, buf, got);
+						notify(player, tbuf);
+					}
+					if (tbuf)
+						XFREE(tbuf);
+					if (buf)
+						XFREE(buf);
 				}
 				else
 				{
@@ -2746,9 +2893,9 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 
 void show_vrml_url(dbref thing, dbref loc)
 {
-	char *vrml_url;
-	dbref aowner;
-	int aflags, alen;
+	char *vrml_url = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0;
 
 	/*
 	 * If they don't care about HTML, just return.
@@ -2760,21 +2907,26 @@ void show_vrml_url(dbref thing, dbref loc)
 
 	vrml_url = atr_pget(loc, A_VRML_URL, &aowner, &aflags, &alen);
 
-	if (*vrml_url)
+	if (vrml_url && *vrml_url)
 	{
-		char *vrml_message, *vrml_cp;
-		vrml_message = vrml_cp = XMALLOC(LBUF_SIZE, "vrml_cp");
-		SAFE_LB_STR("<img xch_graph=load href=\"", vrml_message, &vrml_cp);
-		SAFE_LB_STR(vrml_url, vrml_message, &vrml_cp);
-		SAFE_LB_STR("\">", vrml_message, &vrml_cp);
-		*vrml_cp = 0;
-		notify_html(thing, vrml_message);
-		XFREE(vrml_message);
+		char *vrml_message = NULL, *vrml_cp = NULL;
+		vrml_message = XMALLOC(LBUF_SIZE, "vrml_message");
+		if (vrml_message)
+		{
+			vrml_cp = vrml_message;
+			SAFE_LB_STR("<img xch_graph=load href=\"", vrml_message, &vrml_cp);
+			SAFE_LB_STR(vrml_url, vrml_message, &vrml_cp);
+			SAFE_LB_STR("\">", vrml_message, &vrml_cp);
+			*vrml_cp = 0;
+			notify_html(thing, vrml_message);
+			XFREE(vrml_message);
+		}
 	}
 	else
 	{
 		notify_html(thing, "<img xch_graph=hide>");
 	}
 
-	XFREE(vrml_url);
+	if (vrml_url)
+		XFREE(vrml_url);
 }
