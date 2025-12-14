@@ -33,6 +33,10 @@ void init_mstate(void)
     md.match = NOTHING;
     md.player = NOTHING;
     md.string = XMALLOC(LBUF_SIZE, "buffer");
+	if (!md.string)
+	{
+		return;
+	}
 }
 
 void promote_match(dbref what, int confidence)
@@ -190,6 +194,10 @@ dbref absolute_nref(char *str)
      * * which means that we then need to worry about buffer size.
      */
     buf = XMALLOC(LBUF_SIZE, "buf");
+	if (!buf)
+	{
+		return NOTHING;
+	}
 
     if (*str == '_')
     {
@@ -225,7 +233,8 @@ dbref absolute_nref(char *str)
         nref = NOTHING;
     }
 
-    XFREE(buf);
+    if (buf)
+    	XFREE(buf);
     return nref;
 }
 
@@ -683,6 +692,10 @@ void save_match_state(MSTATE *m_state)
     m_state->match = md.match;
     m_state->player = md.player;
     m_state->string = XMALLOC(LBUF_SIZE, "m_state->string");
+	if (!m_state->string)
+	{
+		return;
+	}
     XSTRCPY(m_state->string, md.string);
 }
 
