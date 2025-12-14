@@ -406,20 +406,22 @@ void match_here(void)
     {
         loc = Location(md.player);
 
-        if (Good_obj(loc))
+        if (!Good_obj(loc))
         {
-            if (loc == md.absolute_form)
-            {
-                promote_match(loc, CON_DBREF | CON_LOCAL);
-            }
-            else if (md.string && !string_compare(md.string, "here"))
-            {
-                promote_match(loc, CON_TOKEN | CON_LOCAL);
-            }
-            else if (md.string && PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
-            {
-                promote_match(loc, CON_COMPLETE | CON_LOCAL);
-            }
+            return;
+        }
+
+        if (loc == md.absolute_form)
+        {
+            promote_match(loc, CON_DBREF | CON_LOCAL);
+        }
+        else if (md.string && !string_compare(md.string, "here"))
+        {
+            promote_match(loc, CON_TOKEN | CON_LOCAL);
+        }
+        else if (md.string && PureName(loc) && !string_compare(md.string, (char *)PureName(loc)))
+        {
+            promote_match(loc, CON_COMPLETE | CON_LOCAL);
         }
     }
 }
