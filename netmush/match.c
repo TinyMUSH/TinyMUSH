@@ -127,6 +127,7 @@ void munge_space_for_match(const char *name)
 {
     char *q;
     const char *p;
+    int space_left;
 
     if (!name)
     {
@@ -136,6 +137,7 @@ void munge_space_for_match(const char *name)
 
     p = name;
     q = md.string;
+    space_left = LBUF_SIZE - 1;
 
     XMEMSET(md.string, 0, LBUF_SIZE);
 
@@ -144,11 +146,12 @@ void munge_space_for_match(const char *name)
         p++; /* remove inital spaces */
     }
 
-    while (*p)
+    while (*p && space_left > 0)
     {
-        while (*p && !isspace(*p))
+        while (*p && !isspace(*p) && space_left > 0)
         {
             *q++ = *p++;
+            space_left--;
         }
 
         p++;
@@ -156,9 +159,10 @@ void munge_space_for_match(const char *name)
             p++;
         ;
 
-        if (*p)
+        if (*p && space_left > 0)
         {
             *q++ = ' ';
+            space_left--;
         }
     }
 
