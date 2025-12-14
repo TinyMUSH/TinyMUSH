@@ -25,6 +25,14 @@
 #define XMAGIC 0x00deadbeefbaad00 /*!< __XMALLOC magic ID */
 
 /**
+ * @brief Maximum iterations for list/exit traversal in match.c
+ *
+ * Prevents infinite loops when traversing potentially circular
+ * linked lists in the database (contents, exits, parent chains).
+ */
+#define MAX_MATCH_ITERATIONS 10000
+
+/**
  * @brief Attributes constants
  *
  */
@@ -1297,7 +1305,7 @@
  * !!! added for recycling, return value of object
  *
  */
-#define OBJECT_DEPOSIT(pennies) (((pennies)-mushconf.sacadjust) * mushconf.sacfactor)
+#define OBJECT_DEPOSIT(pennies) (((pennies) - mushconf.sacadjust) * mushconf.sacfactor)
 /**
  * Always nice to have a trash can.
  *

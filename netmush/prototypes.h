@@ -829,6 +829,7 @@ extern void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int 
 extern void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear);
 extern void do_timecheck(dbref player, dbref cause, int key);
 extern char **add_array(char **b, char *s, int *i);
+extern char **add_array_with_cap(char **b, char *s, int *i, int *cap);
 extern int backup_copy(char *src, char *dst, int flag);
 extern char *mktimestamp(void);
 extern void do_backup_mush(dbref player, dbref cause, int key);

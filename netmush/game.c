@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <pcre.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -1500,9 +1501,9 @@ void do_timecheck(dbref player, dbref cause __attribute__((unused)), int key)
  * Miscellaneous startup/stop routines.
  */
 
-char **add_array(char **b, char *s, int *i)
+char **add_array_with_cap(char **b, char *s, int *i, int *cap)
 {
-	static int capacity = 0;
+	int capacity = (cap ? *cap : 0);
 	int new_capacity;
 
 	/* Growth strategy: allocate in chunks to avoid O(n²) reallocations */
@@ -1510,7 +1511,15 @@ char **add_array(char **b, char *s, int *i)
 	{
 		new_capacity = (capacity == 0) ? 16 : capacity * 2;
 		b = (char **)XREALLOC(b, new_capacity * sizeof(char *), "b");
+		if (!b)
+		{
+			return NULL;
+		}
 		capacity = new_capacity;
+		if (cap)
+		{
+			*cap = capacity;
+		}
 	}
 
 	if (s != NULL)
@@ -1520,11 +1529,19 @@ char **add_array(char **b, char *s, int *i)
 	else
 	{
 		b[*i] = NULL;
-		capacity = 0; /* Reset capacity on array termination */
+		if (cap)
+		{
+			*cap = 0; /* Reset capacity on array termination */
+		}
 	}
 
 	*i = *i + 1;
 	return (b);
+}
+
+char **add_array(char **b, char *s, int *i)
+{
+	return add_array_with_cap(b, s, i, NULL);
 }
 
 int backup_copy(char *src, char *dst, int flag)
@@ -1563,6 +1580,7 @@ void do_backup_mush(dbref player, dbref cause, int key)
 int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
 	int i, txt_n = 0, cnf_n = 0, dbf_n = 0;
+	int txt_cap = 0, cnf_cap = 0, dbf_cap = 0;
 	char **txt = NULL, **cnf = NULL, **dbf = NULL;
 	char *tmpdir, *s, *buff, *tb, *cwd, *ts;
 	char *s1 = XMALLOC(MBUF_SIZE, "s1");
@@ -1588,24 +1606,24 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	for (i = 0; i < mushstate.helpfiles; i++)
 	{
 		XSNPRINTF(s1, MBUF_SIZE, "%s.txt", mushstate.hfiletab[i]);
-		txt = add_array(txt, s1, &txt_n);
+		txt = add_array_with_cap(txt, s1, &txt_n, &txt_cap);
 	}
 
-	txt = add_array(txt, mushconf.guest_file, &txt_n);
-	txt = add_array(txt, mushconf.conn_file, &txt_n);
-	txt = add_array(txt, mushconf.creg_file, &txt_n);
-	txt = add_array(txt, mushconf.regf_file, &txt_n);
-	txt = add_array(txt, mushconf.motd_file, &txt_n);
-	txt = add_array(txt, mushconf.wizmotd_file, &txt_n);
-	txt = add_array(txt, mushconf.quit_file, &txt_n);
-	txt = add_array(txt, mushconf.down_file, &txt_n);
-	txt = add_array(txt, mushconf.full_file, &txt_n);
-	txt = add_array(txt, mushconf.site_file, &txt_n);
-	txt = add_array(txt, mushconf.crea_file, &txt_n);
+	txt = add_array_with_cap(txt, mushconf.guest_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.conn_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.creg_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.regf_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.motd_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.wizmotd_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.quit_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.down_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.full_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.site_file, &txt_n, &txt_cap);
+	txt = add_array_with_cap(txt, mushconf.crea_file, &txt_n, &txt_cap);
 
 	if (mushconf.have_pueblo == 1)
 	{
-		txt = add_array(txt, mushconf.htmlconn_file, &txt_n);
+		txt = add_array_with_cap(txt, mushconf.htmlconn_file, &txt_n, &txt_cap);
 	}
 
 	/*
@@ -1613,7 +1631,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	 */
 	for (i = 0; i < mushstate.configfiles; i++)
 	{
-		cnf = add_array(cnf, mushstate.cfiletab[i], &cnf_n);
+		cnf = add_array_with_cap(cnf, mushstate.cfiletab[i], &cnf_n, &cnf_cap);
 	}
 
 	log_write(LOG_ALWAYS, "BCK", "INFO", "Making sure flatfiles are up to date");
@@ -1637,7 +1655,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 			if (fp)
 			{
-				dbf = add_array(dbf, s, &dbf_n);
+				dbf = add_array_with_cap(dbf, s, &dbf_n, &dbf_cap);
 				(*(mp->db_write_flatfile))(fp);
 				tf_fclose(fp);
 			}
@@ -1649,7 +1667,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 			if (fp)
 			{
-				dbf = add_array(dbf, s, &dbf_n);
+				dbf = add_array_with_cap(dbf, s, &dbf_n, &dbf_cap);
 				(*(mp->dump_database))(fp);
 				tf_fclose(fp);
 			}
@@ -1667,7 +1685,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 
 	if (fp != NULL)
 	{
-		dbf = add_array(dbf, s, &dbf_n);
+		dbf = add_array_with_cap(dbf, s, &dbf_n, &dbf_cap);
 		db_write_flatfile(fp, F_TINYMUSH, UNLOAD_VERSION | UNLOAD_OUTFLAGS);
 		tf_fclose(fp);
 	}
@@ -1686,9 +1704,9 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	/*
 	 * End our argument list
 	 */
-	txt = add_array(txt, NULL, &txt_n);
-	cnf = add_array(cnf, NULL, &cnf_n);
-	dbf = add_array(dbf, NULL, &dbf_n);
+	txt = add_array_with_cap(txt, NULL, &txt_n, &txt_cap);
+	cnf = add_array_with_cap(cnf, NULL, &cnf_n, &cnf_cap);
+	dbf = add_array_with_cap(dbf, NULL, &dbf_n, &dbf_cap);
 	log_write(LOG_ALWAYS, "BCK", "INFO", "Found %d text files to backup", txt_n - 1);
 	log_write(LOG_ALWAYS, "BCK", "INFO", "Found %d config files to backup", cnf_n - 1);
 	log_write(LOG_ALWAYS, "BCK", "INFO", "Found %d db files to backup", dbf_n - 1);
@@ -1859,11 +1877,44 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 		pclose_status = pclose(fp);
 		if (pclose_status == -1)
 		{
-			log_write(LOG_ALWAYS, "BCK", "RUN", "External command error: %s", safe_strerror(errno));
+			/* pclose() can return -1 with ECHILD if SIGCHLD handler already reaped the child.
+			 * In this case, tar likely succeeded, so we only log actual errors. */
+			if (errno != ECHILD)
+			{
+				log_write(LOG_ALWAYS, "BCK", "RUN", "External command pclose() error: %s", safe_strerror(errno));
+
+				if (player != NOTHING)
+				{
+					notify(player, "External command pclose() error");
+				}
+			}
+			else
+			{
+				/* ECHILD means child was already reaped by signal handler; assume success */
+				log_write(LOG_ALWAYS, "BCK", "RUN", "External command done (SIGCHLD reaped)");
+
+				if (player != NOTHING)
+				{
+					notify(player, "External command done");
+				}
+			}
+		}
+		else if (WIFEXITED(pclose_status) && WEXITSTATUS(pclose_status) != 0)
+		{
+			log_write(LOG_ALWAYS, "BCK", "RUN", "External command failed with exit code %d", WEXITSTATUS(pclose_status));
 
 			if (player != NOTHING)
 			{
-				notify(player, "External command error");
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "External command failed with exit code %d", WEXITSTATUS(pclose_status));
+			}
+		}
+		else if (WIFSIGNALED(pclose_status))
+		{
+			log_write(LOG_ALWAYS, "BCK", "RUN", "External command terminated by signal %d", WTERMSIG(pclose_status));
+
+			if (player != NOTHING)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "External command terminated by signal %d", WTERMSIG(pclose_status));
 			}
 		}
 		else
