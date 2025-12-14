@@ -143,7 +143,7 @@ void process_enter_loc(dbref thing, dbref src, dbref cause, int canhear, int hus
      * Do OXLEAVE for sending room
      */
 
-    if ((src != NOTHING) && !quiet)
+    if ((src != NOTHING) && !quiet && Good_obj(src))
         did_it(thing, src, A_NULL, NULL, A_OXLEAVE, NULL, A_NULL, 0, (char **)NULL, 0, MSG_MOVE);
 
     /*
@@ -351,6 +351,11 @@ void move_via_generic(dbref thing, dbref dest, dbref cause, int hush)
     if (dest == HOME)
     {
         dest = Home(thing);
+        if (!Good_obj(dest))
+        {
+            log_write(LOG_PROBLEMS, "BUG", "MOVE", "Invalid HOME destination for object #%d", thing);
+            return;
+        }
     }
 
     src = Location(thing);
@@ -554,17 +559,18 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
 
     if (Good_obj(loc) && could_doit(player, exit, A_LOCK))
     {
+        /*
+         * Check if destination is going away before processing movement
+         */
+        if (Going(loc))
+        {
+            notify(player, "You can't go that way.");
+            return;
+        }
+
         switch (Typeof(loc))
         {
         case TYPE_ROOM:
-            /*
-             * Validate room is not going away
-             */
-            if (Going(loc))
-            {
-                notify(player, "You can't go that way.");
-                return;
-            }
             move_via_exit(player, loc, NOTHING, exit, hush);
 
             if (divest)
@@ -576,12 +582,6 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
 
         case TYPE_PLAYER:
         case TYPE_THING:
-            if (Going(loc))
-            {
-                notify(player, "You can't go that way.");
-                return;
-            }
-
             move_via_exit(player, loc, NOTHING, exit, hush);
             divest_object(player);
             break;
@@ -635,7 +635,14 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
 
         move_via_generic(player, HOME, NOTHING, 0);
         divest_object(player);
-        process_sticky_dropto(loc, player);
+
+        /*
+         * Process sticky dropto on source location (check loc is valid)
+         */
+        if (Good_obj(loc))
+        {
+            process_sticky_dropto(loc, player);
+        }
         return;
     }
 
@@ -1046,7 +1053,8 @@ void do_leave(dbref player, dbref cause __attribute__((unused)), int key)
 
     if (could_doit(player, loc, A_LLEAVE))
     {
-        move_via_generic(player, Location(loc), NOTHING, quiet);
+        dbref dest = Location(loc);
+        move_via_generic(player, dest, NOTHING, quiet);
     }
     else
     {
