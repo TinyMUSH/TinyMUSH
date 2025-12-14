@@ -727,14 +727,11 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	char *r, *s, *t;
 	Delim isep, osep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 5, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, 5, 4, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 5)
 	{
 		COPY_DELIM(osep, isep);
@@ -1206,14 +1203,11 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 * list is blank, and/or the position list is blank.
 	 *
 	 */
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 5, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 5, 4, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 5)
 	{
 		COPY_DELIM(osep, isep);
@@ -1472,14 +1466,11 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	Delim isep, osep;
 	int words, i;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 3, 5, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, 5, 4, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 4, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 5)
 	{
 		COPY_DELIM(osep, isep);
@@ -3304,14 +3295,11 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	char *end_p, *step_p;
 	Delim isep, osep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 4, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 4)
 	{
 		COPY_DELIM(osep, isep);
@@ -3801,14 +3789,11 @@ void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	char *r, *s, *bb_p;
 	Delim isep, osep;
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 2, 4, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, 4, 3, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 3, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 4)
 	{
 		COPY_DELIM(osep, isep);
@@ -3878,14 +3863,11 @@ void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		return;
 	}
 
-	if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 3, buff, bufc))
+	if (!validate_list_args(((FUN *)fargs[-1])->name, buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 1, 3, 2, DELIM_STRING, &isep))
 	{
 		return;
 	}
-	if (!delim_check(buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs, 2, &isep, DELIM_STRING))
-	{
-		return;
-	}
+
 	if (nfargs < 3)
 	{
 		COPY_DELIM(osep, isep);
