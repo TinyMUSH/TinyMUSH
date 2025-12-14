@@ -1935,7 +1935,7 @@ int do_top(int ncmds)
 							if (mushstate.qfirst->gdata->x_names[z] && *(mushstate.qfirst->gdata->x_names[z]) && mushstate.qfirst->gdata->x_regs[z] && *(mushstate.qfirst->gdata->x_regs[z]))
 							{
 								mushstate.rdata->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-								strcpy(mushstate.rdata->x_names[z], mushstate.qfirst->gdata->x_names[z]);
+								XSTRNCPY(mushstate.rdata->x_names[z], mushstate.qfirst->gdata->x_names[z], SBUF_SIZE);
 								mushstate.rdata->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
 								XMEMCPY(mushstate.rdata->x_regs[z], mushstate.qfirst->gdata->x_regs[z], mushstate.qfirst->gdata->x_lens[z] + 1);
 								mushstate.rdata->x_lens[z] = mushstate.qfirst->gdata->x_lens[z];
