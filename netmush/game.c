@@ -3453,6 +3453,8 @@ int main(int argc, char *argv[])
 	init_flagtab();
 	init_powertab();
 	init_functab();
+	/* Seed global RNG early to ensure good randomness across rapid calls */
+	rng_global_init();
 	init_attrtab();
 	log_version();
 	init_mstate();

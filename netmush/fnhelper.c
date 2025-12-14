@@ -26,6 +26,10 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+/* Global PCG32 RNG state (file-scope) */
+static pcg32_random_t rng_global;
+static int rng_initialized = 0;
 
 /*
  * ---------------------------------------------------------------------------
@@ -723,7 +727,6 @@ void do_reverse(char *from, char *to)
 uint32_t random_range(uint32_t low, uint32_t high)
 {
 	uint32_t x;
-	pcg32_random_t rng1;
 
 	/*
 	 * Validate parameters.
@@ -751,8 +754,27 @@ uint32_t random_range(uint32_t low, uint32_t high)
 
 	x++;
 
-	pcg32_srandom_r(&rng1, time(NULL), (intptr_t)&rng1);
-	return pcg32_boundedrand_r(&rng1, x) + low;
+	if (!rng_initialized)
+	{
+		/* seed global RNG once */
+		pcg32_srandom_r(&rng_global, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng_global);
+		rng_initialized = 1;
+	}
+
+	return pcg32_boundedrand_r(&rng_global, x) + low;
+}
+
+/**
+ * @brief Initialize the global RNG explicitly (optional).
+ *        Can be called early in startup to ensure seeding.
+ */
+void rng_global_init(void)
+{
+	if (!rng_initialized)
+	{
+		pcg32_srandom_r(&rng_global, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng_global);
+		rng_initialized = 1;
+	}
 }
 
 /**
