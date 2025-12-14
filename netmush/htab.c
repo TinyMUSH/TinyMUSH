@@ -58,7 +58,7 @@ int hashval(char *str, int hashmask)
 
 int get_hashmask(int *size)
 {
-    int tsize;
+    unsigned int tsize;
 
     /*
      * Get next power-of-two >= size, return power-1 as the mask for
@@ -74,16 +74,17 @@ int get_hashmask(int *size)
     /* Check for overflow: cap at largest safe power of 2 */
     if (*size > (INT_MAX / 2))
     {
-        *size = (INT_MAX / 2) + 1; /* Largest power of 2 that fits in int */
+        /* Largest power of 2 that fits in positive int: 2^30 = 1073741824 */
+        *size = 1 << 30;
         return *size - 1;
     }
 
-    /* Find next power-of-two >= size */
-    for (tsize = 1; tsize < *size; tsize = tsize << 1)
+    /* Find next power-of-two >= size using unsigned to avoid UB on shift */
+    for (tsize = 1; tsize < (unsigned int)*size; tsize = tsize << 1)
         ;
 
-    *size = tsize;
-    return tsize - 1;
+    *size = (int)tsize;
+    return (int)tsize - 1;
 }
 
 /* ---------------------------------------------------------------------------
@@ -92,6 +93,13 @@ int get_hashmask(int *size)
 
 void hashinit(HASHTAB *htab, int size, int flags)
 {
+    /* Guard against NULL hash table pointer */
+    if (htab == NULL)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "hashinit called with NULL hash table");
+        return;
+    }
+
     htab->mask = get_hashmask(&size);
     htab->hashsize = size;
     htab->checks = 0;
@@ -276,6 +284,13 @@ int *hashfind_generic(HASHKEY key, HASHTAB *htab)
 
     hval = get_hash_value(key, htab);
 
+    /* Validate hash value to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d for table size %d", hval, htab->hashsize);
+        return NULL;
+    }
+
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         numchecks++;
@@ -320,6 +335,13 @@ int hashfindflags_generic(HASHKEY key, HASHTAB *htab)
     increment_scans(htab);
 
     hval = get_hash_value(key, htab);
+
+    /* Validate hash value to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d for table size %d", hval, htab->hashsize);
+        return 0;
+    }
 
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
@@ -370,6 +392,13 @@ CF_Result hashadd_generic(HASHKEY key, int *hashdata, HASHTAB *htab, int flags)
      */
 
     hval = get_hash_value(key, htab);
+
+    /* Validate hash value to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d for table size %d", hval, htab->hashsize);
+        return CF_Failure;
+    }
 
     /* Check for duplicate in single pass */
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
@@ -443,6 +472,14 @@ void hashdelete_generic(HASHKEY key, HASHTAB *htab)
     }
 
     hval = get_hash_value(key, htab);
+
+    /* Validate hash value to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d for table size %d", hval, htab->hashsize);
+        return;
+    }
+
     last = NULL;
 
     for (hptr = htab->entry[hval]; hptr != NULL; last = hptr, hptr = hptr->next)
@@ -601,8 +638,11 @@ void hashflush(HASHTAB *htab, int size)
 
     if ((size > 0) && (size != htab->hashsize))
     {
+        int old_flags = htab->flags;
         XFREE(htab->entry);
-        hashinit(htab, size, htab->flags);
+        htab->entry = NULL; /* Mark as NULL before reinit */
+        hashinit(htab, size, old_flags);
+        /* If hashinit failed, htab->entry will be NULL and hashsize will be 0 */
     }
     else
     {
@@ -647,6 +687,13 @@ int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab)
 
     hval = get_hash_value(key, htab);
 
+    /* Validate hash value to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d for table size %d", hval, htab->hashsize);
+        return 0;
+    }
+
     for (hptr = htab->entry[hval]; hptr != NULL; hptr = hptr->next)
     {
         if (key_matches(key, hptr->target, htype))
@@ -688,7 +735,7 @@ char *hashinfo(const char *tab_name, HASHTAB *htab)
 {
     char *buff;
 
-    if (htab == NULL)
+    if (htab == NULL || tab_name == NULL)
     {
         return NULL;
     }
@@ -710,8 +757,8 @@ int *hash_firstentry(HASHTAB *htab)
 {
     int hval;
 
-    /* Guard against uninitialized table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return NULL;
     }
@@ -736,8 +783,8 @@ int *hash_nextentry(HASHTAB *htab)
     int hval;
     HASHENT *hptr;
 
-    /* Guard against uninitialized table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return NULL;
     }
@@ -747,6 +794,15 @@ int *hash_nextentry(HASHTAB *htab)
 
     if (hptr == NULL)
     {
+        return NULL;
+    }
+
+    /* Validate last_hval to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        /* Iterator state corrupted, reset and return NULL */
+        htab->last_hval = 0;
+        htab->last_entry = NULL;
         return NULL;
     }
 
@@ -850,6 +906,15 @@ HASHKEY hash_nextkey_generic(HASHTAB *htab)
         return null_key;
     }
 
+    /* Validate last_hval to prevent out-of-bounds access */
+    if (hval < 0 || hval >= htab->hashsize)
+    {
+        /* Iterator state corrupted, reset and return NULL key */
+        htab->last_hval = 0;
+        htab->last_entry = NULL;
+        return null_key;
+    }
+
     if (hptr->next != NULL)
     { /* We can stay in the same chain */
         htab->last_entry = hptr->next;
@@ -887,8 +952,8 @@ void hashresize(HASHTAB *htab, int min_size)
     HASHTAB new_htab;
     HASHENT *hent, *thent;
 
-    /* Guard against uninitialized table */
-    if (htab->entry == NULL || htab->hashsize == 0)
+    /* Guard against NULL pointer and uninitialized table */
+    if (htab == NULL || htab->entry == NULL || htab->hashsize == 0)
     {
         return;
     }
@@ -970,6 +1035,14 @@ void hashresize(HASHTAB *htab, int min_size)
              * don't free and reallocate entries, just copy the pointers
              */
             hval = get_hash_value(thent->target, &new_htab);
+
+            /* Validate hash value to prevent out-of-bounds access during resize */
+            if (hval < 0 || hval >= new_htab.hashsize)
+            {
+                log_write(LOG_BUGS, "BUG", "HASH", "Invalid hash value %d during resize for table size %d", hval, new_htab.hashsize);
+                /* Skip this entry to avoid corruption - this should never happen */
+                continue;
+            }
 
             if (new_htab.entry[hval] == NULL)
             {
@@ -1121,7 +1194,7 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
                 /* Check buffer overflow before adding separator */
                 if (bp - buf >= LBUF_SIZE - 1)
                 {
-                    break;
+                    goto display_done;
                 }
                 *bp++ = ' ';
             }
@@ -1131,20 +1204,16 @@ void display_nametab(dbref player, NAMETAB *ntab, bool list_if_none, const char 
                 /* Check buffer overflow before adding each character */
                 if (bp - buf >= LBUF_SIZE - 1)
                 {
-                    break;
+                    goto display_done;
                 }
                 *bp++ = *cp;
-            }
-
-            /* Stop if buffer is full */
-            if (bp - buf >= LBUF_SIZE - 1)
-            {
-                break;
             }
 
             got_one = true;
         }
     }
+
+display_done:
 
     *bp = '\0';
 
@@ -1227,7 +1296,7 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
                 /* Check buffer overflow before adding separator */
                 if (bp - buf >= LBUF_SIZE - 1)
                 {
-                    break;
+                    goto listset_done;
                 }
                 *bp++ = ' ';
             }
@@ -1237,15 +1306,9 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
                 /* Check buffer overflow before adding each character */
                 if (bp - buf >= LBUF_SIZE - 1)
                 {
-                    break;
+                    goto listset_done;
                 }
                 *bp++ = *cp;
-            }
-
-            /* Stop if buffer is full */
-            if (bp - buf >= LBUF_SIZE - 1)
-            {
-                break;
             }
 
             got_one = true;
@@ -1253,6 +1316,8 @@ void listset_nametab(dbref player, NAMETAB *ntab, int flagword, bool list_if_non
 
         nt++;
     }
+
+listset_done:
 
     *bp = '\0';
 
@@ -1273,6 +1338,12 @@ int cf_ntab_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     NAMETAB *np;
     char *ap;
+
+    if (vp == NULL)
+    {
+        cf_log(player, "CNF", "NFND", cmd, "NULL nametab provided");
+        return -1;
+    }
 
     if (str == NULL)
     {
