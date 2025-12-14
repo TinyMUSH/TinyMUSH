@@ -2229,7 +2229,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 {
 	dbref aowner;
 	int aflags, alen;
-	char *sbuf, *sbufc, *tbuf, *str;
+	char *sbufc, *tbuf, *str;
 	ATTR *ap;
 	tbuf = fargs[0];
 
@@ -2266,14 +2266,13 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 	 * Not an attribute, process as %<arg>
 	 *
 	 */
-	sbuf = XMALLOC(SBUF_SIZE, "sbuf");
+	char sbuf[SBUF_SIZE];
 	sbufc = sbuf;
 	SAFE_SB_CHR('%', sbuf, &sbufc);
 	SAFE_SB_STR(fargs[0], sbuf, &sbufc);
 	*sbufc = '\0';
 	str = sbuf;
 	eval_expression_string(buff, bufc, player, caller, cause, EV_FIGNORE, &str, cargs, ncargs);
-	XFREE(sbuf);
 }
 
 /**
@@ -3518,7 +3517,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
 	dbref thing = NOTHING;
-	char *bp = NULL, *nbuf = NULL;
+	char *bp = NULL;
 	SEARCH searchparm;
 
 	/**
@@ -3538,7 +3537,7 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	olist_push();
 	search_perform(player, cause, &searchparm);
 	bp = *bufc;
-	nbuf = XMALLOC(SBUF_SIZE, "nbuf");
+	char nbuf[SBUF_SIZE];
 
 	for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 	{
@@ -3553,8 +3552,6 @@ void fun_search(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 		SAFE_LB_STR(nbuf, buff, bufc);
 	}
-
-	XFREE(nbuf);
 	olist_pop();
 }
 
@@ -4006,6 +4003,8 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 {
 	char *sp, *ep, *save, *tp, *bp;
 	char *result, *tstack[3], *estack[2];
+	char tstack_buf1[SBUF_SIZE], tstack_buf2[SBUF_SIZE];
+	char estack_buf0[SBUF_SIZE], estack_buf1[SBUF_SIZE];
 	char *tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 	int spos, trans_len, empty_len;
 	int done = 0;
@@ -4048,14 +4047,14 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 		spos = 1;
 	}
 
-	tstack[1] = XMALLOC(SBUF_SIZE, "tstack[1]");
-	tstack[2] = XMALLOC(SBUF_SIZE, "tstack[2]");
+	tstack[1] = tstack_buf1;
+	tstack[2] = tstack_buf2;
 
 	if (empty_str && *empty_str)
 	{
 		empty_len = strlen(empty_str);
-		estack[0] = XMALLOC(SBUF_SIZE, "estack[0]");
-		estack[1] = XMALLOC(SBUF_SIZE, "estack[1]");
+		estack[0] = estack_buf0;
+		estack[1] = estack_buf1;
 	}
 	else
 	{
@@ -4139,14 +4138,6 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 	}
 
 	XFREE(result);
-	XFREE(tstack[1]);
-	XFREE(tstack[2]);
-
-	if (empty_len > 0)
-	{
-		XFREE(estack[0]);
-		XFREE(estack[1]);
-	}
 
 	if (trans_str)
 	{
