@@ -79,7 +79,7 @@ int ph_god(dbref target, dbref player, POWER power, int fpowers, int reset)
 
 int ph_wiz(dbref target, dbref player, POWER power, int fpowers, int reset)
 {
-    if (!Wizard(player) & !God(player))
+    if (!Wizard(player) && !God(player))
     {
         return 0;
     }
@@ -94,7 +94,7 @@ int ph_wiz(dbref target, dbref player, POWER power, int fpowers, int reset)
 
 int ph_wizroy(dbref target, dbref player, POWER power, int fpowers, int reset)
 {
-    if (!WizRoy(player) & !God(player))
+    if (!WizRoy(player) && !God(player))
     {
         return 0;
     }
