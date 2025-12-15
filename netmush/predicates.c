@@ -1130,7 +1130,15 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 
 			for (nextp = (ADDENT *)old->info.added; nextp != NULL; nextp = nextp->next)
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ((ATTR *)atr_num(nextp->atr))->name);
+				ATTR *ap_check = (ATTR *)atr_num(nextp->atr);
+				if (ap_check)
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ap_check->name);
+				}
+				else
+				{
+					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/<invalid>", nextp->name, nextp->thing);
+				}
 			}
 		}
 		else
@@ -1156,7 +1164,15 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 
 				for (nextp = (ADDENT *)old->info.added; nextp != NULL; nextp = nextp->next)
 				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ((ATTR *)atr_num(nextp->atr))->name);
+					ATTR *ap_check = (ATTR *)atr_num(nextp->atr);
+					if (ap_check)
+					{
+						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/%s", nextp->name, nextp->thing, ap_check->name);
+					}
+					else
+					{
+						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s: #%d/<invalid>", nextp->name, nextp->thing);
+					}
 					didit = 1;
 				}
 			}
@@ -1391,6 +1407,12 @@ void handle_prog(DESC *d, char *message)
 		return;
 	}
 
+	if (!all->program_data)
+	{
+		XFREE(cmd);
+		return;
+	}
+
 	if (all->program_data->wait_data)
 	{
 		for (int z = 0; z < all->program_data->wait_data->q_alloc; z++)
@@ -1510,6 +1532,12 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	if (!d)
 	{
 		notify(player, "Player descriptor not found.");
+		return;
+	}
+
+	if (!d->program_data)
+	{
+		notify(player, "Player has no program data.");
 		return;
 	}
 
@@ -1732,7 +1760,8 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 				if (mushstate.rdata->x_names[z] && *(mushstate.rdata->x_names[z]) && mushstate.rdata->x_regs[z] && *(mushstate.rdata->x_regs[z]))
 				{
 					program->wait_data->x_names[z] = XMALLOC(SBUF_SIZE, "glob.x_name");
-					strcpy(program->wait_data->x_names[z], mushstate.rdata->x_names[z]);
+					strncpy(program->wait_data->x_names[z], mushstate.rdata->x_names[z], SBUF_SIZE - 1);
+					program->wait_data->x_names[z][SBUF_SIZE - 1] = '\0';
 					program->wait_data->x_regs[z] = XMALLOC(LBUF_SIZE, "glob.x_reg");
 					XMEMCPY(program->wait_data->x_regs[z], mushstate.rdata->x_regs[z], mushstate.rdata->x_lens[z] + 1);
 					program->wait_data->x_lens[z] = mushstate.rdata->x_lens[z];
