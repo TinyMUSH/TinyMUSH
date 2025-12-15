@@ -1443,11 +1443,11 @@ void handle_prog(DESC *d, char *message)
 	}
 
 	cmd = atr_get(d->player, A_PROGCMD, &aowner, &aflags, &alen);
-	wait_que(d->program_data->wait_cause, d->player, 0, NOTHING, 0, cmd, (char **)&message, 1, d->program_data->wait_data);
-	/*
-	 * First, set 'all' to a descriptor we find for this player
-	 */
-	all = (DESC *)nhashfind(d->player, &mushstate.desc_htab);
+
+	if (!cmd)
+	{
+		return;
+	}
 
 	if (!all)
 	{
@@ -1683,10 +1683,13 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 		}
 
 		ap = atr_num(atr);
-		/*
-		 * We've got to find this attribute in the object's
-		 * * parent chain, somewhere.
-		 */
+
+		if (!ap)
+		{
+			notify(player, "No such attribute.");
+			return;
+		}
+
 		found = 0;
 
 		for (lev = 0, parent = thing; (Good_obj(parent) && (lev < mushconf.parent_nest_lim)); parent = Parent(parent), lev++)
@@ -1834,7 +1837,8 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	/*
 	 * Now, start waiting.
 	 */
-	for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d; d = d->hashnext)
+	int desc_count = 0;
+	for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d && desc_count < 1000; d = d->hashnext, desc_count++)
 	{
 		d->program_data = program;
 		/*
@@ -3245,7 +3249,14 @@ void do_include(dbref player, dbref cause, __attribute__((unused)) int key, char
 	}
 	XFREE(s);
 
-	if (*(act = atr_pget(thing, attrib, &aowner, &aflags, &alen)))
+	act = atr_pget(thing, attrib, &aowner, &aflags, &alen);
+
+	if (!act)
+	{
+		return;
+	}
+
+	if (*act)
 	{
 		/*
 		 * Skip leading $command: or ^monitor:
@@ -3581,7 +3592,7 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	/*
 	 * Does this reference name exist already?
 	 */
-	np = (int *)hashfind(tbuf, &mushstate.nref_htab);
+	np = (dbref *)hashfind(tbuf, &mushstate.nref_htab);
 
 	if (np)
 	{
