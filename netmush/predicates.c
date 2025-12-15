@@ -21,6 +21,8 @@
 
 #include <stdbool.h>
 #include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 #include <string.h>
 #include <unistd.h>
 #include <dlfcn.h>
@@ -110,6 +112,11 @@ bool is_integer(char *str)
 		str++; /* Leading spaces */
 	}
 
+	if (!*str)
+	{
+		return false; /* Empty string or only spaces */
+	}
+
 	if ((*str == '-') || (*str == '+'))
 	{ /* Leading minus or plus */
 		str++;
@@ -145,6 +152,11 @@ int is_number(char *str)
 	while (*str && isspace(*str))
 	{
 		str++; /* Leading spaces */
+	}
+
+	if (!*str)
+	{
+		return 0; /* Empty string or only spaces */
 	}
 
 	if ((*str == '-') || (*str == '+'))
@@ -667,6 +679,29 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 	 * now try a wild card match of buff with stuff in args
 	 */
 	any = 0;
+
+	/* Only allocate if we have arguments to process */
+	if (nargs < 2 || !args[0] || !args[1])
+	{
+		/* No switch cases, check for default */
+		if (nargs > 0 && args[0])
+		{
+			tbuf = replace_string(SWITCH_VAR, expr, args[0]);
+
+			if (now)
+			{
+				process_cmdline(player, cause, tbuf, cargs, ncargs, NULL);
+			}
+			else
+			{
+				wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
+			}
+
+			XFREE(tbuf);
+		}
+		return;
+	}
+
 	buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
 	for (a = 0; (a < (nargs - 1)) && args[a] && args[a + 1]; a += 2)
@@ -2100,11 +2135,19 @@ void parse_range(char **name, dbref *low_bound, dbref *high_bound)
 				buff1++;
 			}
 
-			*high_bound = (int)strtol(buff1, (char **)NULL, 10);
-
-			if (*high_bound >= mushstate.db_top)
+			errno = 0;
+			long temp_val = strtol(buff1, (char **)NULL, 10);
+			if (errno == ERANGE || temp_val > INT_MAX || temp_val < INT_MIN)
 			{
 				*high_bound = mushstate.db_top - 1;
+			}
+			else
+			{
+				*high_bound = (int)temp_val;
+				if (*high_bound >= mushstate.db_top)
+				{
+					*high_bound = mushstate.db_top - 1;
+				}
 			}
 		}
 		else
@@ -2122,11 +2165,19 @@ void parse_range(char **name, dbref *low_bound, dbref *high_bound)
 			buff2++;
 		}
 
-		*low_bound = (int)strtol(buff2, (char **)NULL, 10);
-
-		if (*low_bound < 0)
+		errno = 0;
+		long temp_low = strtol(buff2, (char **)NULL, 10);
+		if (errno == ERANGE || temp_low > INT_MAX || temp_low < INT_MIN)
 		{
 			*low_bound = 0;
+		}
+		else
+		{
+			*low_bound = (int)temp_low;
+			if (*low_bound < 0)
+			{
+				*low_bound = 0;
+			}
 		}
 	}
 	else
@@ -3439,7 +3490,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 				{
 					total++;
 					bp = outbuf;
-					SAFE_SPRINTF(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : strchr(hptr->target.s, '.') + 1));
+					char *dot_pos = strchr(hptr->target.s, '.');
+					SAFE_SPRINTF(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : (dot_pos ? dot_pos + 1 : hptr->target.s)));
 					buff = unparse_object(player, *(hptr->data), 0);
 					SAFE_LB_STR(buff, outbuf, &bp);
 					XFREE(buff);
