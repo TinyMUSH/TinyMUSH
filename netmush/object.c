@@ -908,8 +908,15 @@ void divest_object(dbref thing)
 {
 	dbref curr, temp;
 
-	for (curr = Contents(thing), temp = (curr == NOTHING ? NOTHING : Next(curr)); (curr != NOTHING) && (Next(curr) != curr); curr = temp, temp = Next(temp))
+	for (curr = Contents(thing); curr != NOTHING; curr = temp)
 	{
+		temp = Next(curr);
+
+		if (temp == curr)
+		{
+			break;
+		}
+
 		if (!Controls(thing, curr) && Has_location(curr) && Key(curr))
 		{
 			move_via_generic(curr, HOME, NOTHING, 0);
@@ -927,8 +934,15 @@ void empty_obj(dbref obj)
 	/*
 	 * Send the contents home
 	 */
-	for (targ = Contents(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
+	for (targ = Contents(obj); targ != NOTHING; targ = next)
 	{
+		next = Next(targ);
+
+		if (next == targ)
+		{
+			break;
+		}
+
 		if (!Has_location(targ))
 		{
 			Log_simple_err(targ, obj, "Funny object type in contents list of GOING location. Flush terminated.");
@@ -956,8 +970,15 @@ void empty_obj(dbref obj)
 	/*
 	 * Destroy the exits
 	 */
-	for (targ = Exits(obj), next = (targ == NOTHING ? NOTHING : Next(targ)); (targ != NOTHING) && (Next(targ) != targ); targ = next, next = Next(next))
+	for (targ = Exits(obj); targ != NOTHING; targ = next)
 	{
+		next = Next(targ);
+
+		if (next == targ)
+		{
+			break;
+		}
+
 		if (!isExit(targ))
 		{
 			Log_simple_err(targ, obj, "Funny object type in exit list of GOING location. Flush terminated.");
@@ -1363,7 +1384,7 @@ void check_dead_refs(void)
 					s_Going(i);
 				}
 			}
-			else if ((targ == HOME) || (targ == AMBIGUOUS))
+			else if ((targ == HOME) || (targ == AMBIGUOUS) || (targ == NOTHING))
 			{
 				/*
 				 * null case, always valid
@@ -1376,11 +1397,8 @@ void check_dead_refs(void)
 			}
 			else
 			{
-				if (!Has_contents(targ))
-				{
-					Log_header_err(i, Exits(i), targ, 1, "Destination", "is not a valid type.  Exit destroyed.");
-					s_Going(i);
-				}
+				Log_header_err(i, Exits(i), targ, 1, "Destination", "is not a valid type.  Exit destroyed.");
+				s_Going(i);
 			}
 
 			/*
@@ -1768,7 +1786,16 @@ void check_loc_exits(dbref loc)
 
 			Mark(exit);
 			back = exit;
-			exit = Next(exit);
+			temp = Next(exit);
+
+			if (temp == exit)
+			{
+				Log_simple_err(exit, loc, "Next points to self in exit chain. Next cleared.");
+				s_Next(exit, NOTHING);
+				break;
+			}
+
+			exit = temp;
 		}
 	}
 
@@ -1817,6 +1844,8 @@ void check_loc_contents(dbref);
 
 void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 {
+	dbref claimed_loc;
+
 	/*
 	 * Object thinks it's in another place.  Check the contents list
 	 * * there and see if it contains this object.  If it does, then
@@ -1829,12 +1858,12 @@ void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 		return;
 	}
 
-	loc = Location(*obj);
+	claimed_loc = Location(*obj);
 	Unmark(*obj);
 
-	if (Good_obj(loc))
+	if (Good_obj(claimed_loc))
 	{
-		check_loc_contents(loc);
+		check_loc_contents(claimed_loc);
 	}
 
 	if (Marked(*obj))
@@ -1860,8 +1889,8 @@ void check_misplaced_obj(dbref *obj, dbref back, dbref loc)
 		/*
 		 * Not in the other list, assume in ours
 		 */
-		Log_header_err(*obj, loc, Contents(*obj), 1, "Location", "is invalid.  Reset.");
-		s_Contents(*obj, loc);
+		Log_header_err(*obj, claimed_loc, claimed_loc, 1, "Location", "is invalid.  Reset.");
+		s_Location(*obj, loc);
 	}
 
 	return;
@@ -2008,7 +2037,16 @@ void check_loc_contents(dbref loc)
 
 			Mark(obj);
 			back = obj;
-			obj = Next(obj);
+			temp = Next(obj);
+
+			if (temp == obj)
+			{
+				Log_simple_err(obj, loc, "Next points to self in contents chain. Next cleared.");
+				s_Next(obj, NOTHING);
+				break;
+			}
+
+			obj = temp;
 		}
 	}
 
