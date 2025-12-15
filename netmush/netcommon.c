@@ -969,7 +969,14 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 			 * check every object in the room for a (dis)connect
 			 * * action
 			 */
-			for (obj = Contents(zone); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+			dbref zone_contents = Contents(zone);
+
+			if (!Good_obj(zone_contents))
+			{
+				zone_contents = NOTHING;
+			}
+
+			for (obj = zone_contents; (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
 			{
 				buf = atr_pget(obj, attr, &aowner, &aflags, &alen);
 
@@ -1460,9 +1467,10 @@ void check_idle(void)
 
 char *trimmed_name(dbref player)
 {
+	const int NAME_TRIM_LEN = 16;
 	char *cbuff = XMALLOC(MBUF_SIZE, "cbuff");
-	XSTRNCPY(cbuff, Name(player), 16);
-	cbuff[16] = '\0';
+	XSTRNCPY(cbuff, Name(player), NAME_TRIM_LEN);
+	cbuff[NAME_TRIM_LEN] = '\0';
 	return cbuff;
 }
 
