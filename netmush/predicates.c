@@ -434,12 +434,15 @@ int ok_name(const char *name)
 	/*
 	 * Disallow trailing spaces
 	 */
-	cp--;
-
-	if (isspace(*cp))
+	if (cp > purename)
 	{
-		XFREE(purename);
-		return (0);
+		cp--;
+
+		if (isspace(*cp))
+		{
+			XFREE(purename);
+			return (0);
+		}
 	}
 
 	/*
@@ -1382,6 +1385,12 @@ void handle_prog(DESC *d, char *message)
 	 */
 	all = (DESC *)nhashfind(d->player, &mushstate.desc_htab);
 
+	if (!all)
+	{
+		XFREE(cmd);
+		return;
+	}
+
 	if (all->program_data->wait_data)
 	{
 		for (int z = 0; z < all->program_data->wait_data->q_alloc; z++)
@@ -1497,6 +1506,12 @@ void do_quitprog(dbref player, __attribute__((unused)) dbref cause, __attribute_
 	}
 
 	d = (DESC *)nhashfind(doer, &mushstate.desc_htab);
+
+	if (!d)
+	{
+		notify(player, "Player descriptor not found.");
+		return;
+	}
 
 	if (d->program_data->wait_data)
 	{
@@ -1618,13 +1633,19 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			/*
 			 * Check if cause already has an @prog input pending
 			 */
+			int has_pending = 0;
 			for (d = (DESC *)nhashfind((int)doer, &mushstate.desc_htab); d; d = d->hashnext)
 			{
 				if (d->program_data != NULL)
 				{
-					notify(player, "Input already pending.");
-					return;
+					has_pending = 1;
+					break;
 				}
+			}
+			if (has_pending)
+			{
+				notify(player, "Input already pending.");
+				return;
 			}
 			atr_add_raw(doer, A_PROGCMD, atr_get_raw(parent, atr));
 		}
@@ -2198,6 +2219,7 @@ dbref where_is(dbref what)
 dbref where_room(dbref what)
 {
 	int count;
+	dbref loc;
 
 	for (count = mushconf.ntfy_nest_lim; count > 0; count--)
 	{
@@ -2216,7 +2238,12 @@ dbref where_room(dbref what)
 			break;
 		}
 
-		what = Location(what);
+		loc = Location(what);
+		if (loc == what)
+		{
+			break;
+		}
+		what = loc;
 	}
 
 	return NOTHING;
