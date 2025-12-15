@@ -263,7 +263,7 @@ int canpayquota(dbref player, dbref who, int cost, int objtype)
 	{
 		quota = q_list[type_quota(objtype)];
 
-		if ((quota <= 0) && !Free_Quota(player) && !Free_Quota(Owner(player)))
+		if ((quota <= 0) && !Free_Quota(who) && !Free_Quota(Owner(who)))
 		{
 			return 0;
 		}
@@ -2349,7 +2349,7 @@ dbref where_room(dbref what)
 
 int locatable(dbref player, dbref it, dbref cause)
 {
-	dbref loc_it, room_it;
+	dbref loc_it, room_it, player_loc;
 	int findable_room;
 
 	/*
@@ -2362,6 +2362,7 @@ int locatable(dbref player, dbref it, dbref cause)
 	}
 
 	loc_it = where_is(it);
+	player_loc = where_is(player);
 
 	/*
 	 * Succeed if we can examine the target, if we are the target, if
@@ -2369,7 +2370,7 @@ int locatable(dbref player, dbref it, dbref cause)
 	 * * or if the target caused the lookup.
 	 */
 
-	if (Examinable(player, it) || Find_Unfindable(player) || (loc_it == player) || ((loc_it != NOTHING) && (Examinable(player, loc_it) || loc_it == where_is(player))) || Wizard(cause) || (it == cause))
+	if (Examinable(player, it) || Find_Unfindable(player) || (loc_it == player) || ((loc_it != NOTHING) && (Examinable(player, loc_it) || loc_it == player_loc)) || Wizard(cause) || (it == cause))
 	{
 		return 1;
 	}
@@ -2942,75 +2943,79 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 
 			if (*charges)
 			{
-				num = (int)strtol(charges, (char **)NULL, 10);
-
-				if (num > 0)
+				errno = 0;
+				long temp_charges = strtol(charges, (char **)NULL, 10);
+				if (errno == ERANGE || temp_charges > INT_MAX || temp_charges < INT_MIN)
 				{
-					buff = XMALLOC(SBUF_SIZE, "buff");
-					XSPRINTF(buff, "%d", num - 1);
-					atr_add_raw(thing, A_CHARGES, buff);
-					XFREE(buff);
-				}
-				else if (*(buff = atr_pget(thing, A_RUNOUT, &aowner, &aflags, &alen)))
-				{
-					XFREE(act);
-					act = buff;
-				}
-				else
-				{
-					XFREE(act);
-					XFREE(buff);
+					/* Invalid charge value, skip */
 					XFREE(charges);
+					XFREE(act);
 					return;
 				}
+				num = (int)temp_charges;
+				XSPRINTF(buff, "%d", num - 1);
+				atr_add_raw(thing, A_CHARGES, buff);
+				XFREE(buff);
 			}
-
-			XFREE(charges);
-
-			/*
-			 * Skip any leading $<command>: or ^<monitor>: pattern.
-			 * * If we run off the end of string without finding an unescaped
-			 * * ':' (or there's nothing after it), go back to the beginning
-			 * * of the string and just use that.
-			 */
-
-			if ((*act == '$') || (*act == '^'))
+			else if (*(buff = atr_pget(thing, A_RUNOUT, &aowner, &aflags, &alen)))
 			{
-				for (tp = act + 1; *tp && ((*tp != ':') || (*(tp - 1) == '\\')); tp++)
-					;
-
-				if (!*tp)
-				{
-					tp = act;
-				}
-				else
-				{
-					tp++; /* must advance past the ':' */
-				}
+				XFREE(act);
+				act = buff;
 			}
 			else
 			{
-				tp = act;
-			}
-
-			/*
-			 * Go do it.
-			 */
-
-			if (ctrl_flags & (VERB_NOW | TRIG_NOW))
-			{
-				preserve = save_global_regs("did_it_save2");
-				process_cmdline(thing, player, tp, args, nargs, NULL);
-				restore_global_regs("did_it_restore2", preserve);
-			}
-			else
-			{
-				wait_que(thing, player, 0, NOTHING, 0, tp, args, nargs, mushstate.rdata);
+				XFREE(act);
+				XFREE(buff);
+				XFREE(charges);
+				return;
 			}
 		}
 
-		XFREE(act);
+		XFREE(charges);
+
+		/*
+		 * Skip any leading $<command>: or ^<monitor>: pattern.
+		 * * If we run off the end of string without finding an unescaped
+		 * * ':' (or there's nothing after it), go back to the beginning
+		 * * of the string and just use that.
+		 */
+
+		if ((*act == '$') || (*act == '^'))
+		{
+			for (tp = act + 1; *tp && ((*tp != ':') || (*(tp - 1) == '\\')); tp++)
+				;
+
+			if (!*tp)
+			{
+				tp = act;
+			}
+			else
+			{
+				tp++; /* must advance past the ':' */
+			}
+		}
+		else
+		{
+			tp = act;
+		}
+
+		/*
+		 * Go do it.
+		 */
+
+		if (ctrl_flags & (VERB_NOW | TRIG_NOW))
+		{
+			preserve = save_global_regs("did_it_save2");
+			process_cmdline(thing, player, tp, args, nargs, NULL);
+			restore_global_regs("did_it_restore2", preserve);
+		}
+		else
+		{
+			wait_que(thing, player, 0, NOTHING, 0, tp, args, nargs, mushstate.rdata);
+		}
 	}
+
+	XFREE(act);
 }
 
 /*
