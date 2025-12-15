@@ -63,10 +63,16 @@ dbref remove_first(dbref head, dbref thing)
 dbref reverse_list(dbref list)
 {
 	dbref newlist, rest;
+	int count = 0;
 	newlist = NOTHING;
 
 	while (list != NOTHING)
 	{
+		if (++count > mushstate.db_top)
+		{
+			/* Circular list detected */
+			break;
+		}
 		rest = Next(list);
 		s_Next(list, newlist);
 		newlist = list;
@@ -343,8 +349,15 @@ int payfor(dbref who, dbref cost)
 	}
 
 	who = Owner(who);
+	tmp = Pennies(who);
 
-	if ((tmp = Pennies(who)) >= cost)
+	/* Validate Pennies() returned a reasonable value */
+	if (tmp < 0)
+	{
+		return 0;
+	}
+
+	if (tmp >= cost)
 	{
 		s_Pennies(who, tmp - cost);
 		return 1;
@@ -2039,7 +2052,12 @@ dbref match_possessed(dbref player, dbref thing, char *target, dbref dflt, int c
 		init_match(result1, target, NOTYPE);
 		match_possession();
 		result = match_result();
-		result = match_possessed(player, result1, target, result, check_enter);
+
+		/* Limit recursion depth to prevent stack overflow */
+		if (--check_enter >= -mushconf.parent_nest_lim)
+		{
+			result = match_possessed(player, result1, target, result, check_enter);
+		}
 
 		if (Good_obj(result))
 		{
@@ -3268,7 +3286,7 @@ void do_redirect(dbref player, __attribute__((unused)) dbref cause, __attribute_
 
 			if (np->num != player)
 			{
-				notify_check(np->num, np->num, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Output from %s(#%d) is no being redirected to you.", Name(from_ref), from_ref);
+				notify_check(np->num, np->num, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Output from %s(#%d) is no longer being redirected to you.", Name(from_ref), from_ref);
 			}
 
 			XFREE(np);
@@ -3414,7 +3432,8 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 
 		for (i = 0; i < htab->hashsize; i++)
 		{
-			for (hptr = htab->entry[i]; hptr != NULL; hptr = hptr->next)
+			int entry_count = 0;
+			for (hptr = htab->entry[i]; hptr != NULL && entry_count < mushstate.db_top; hptr = hptr->next, entry_count++)
 			{
 				if (!strncmp(tbuf, hptr->target.s, len))
 				{
