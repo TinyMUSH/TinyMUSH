@@ -127,16 +127,22 @@ void pcache_trim(void)
 
     while (pp)
     {
+        ppnext = pp->next;
+
+        if (ppnext == pp)
+        {
+            pp->next = NULL;
+            ppnext = NULL;
+        }
+
         if (!(pp->cflags & PF_DEAD) && (pp->queue || (pp->cflags & PF_REF)))
         {
             pp->cflags &= ~PF_REF;
             pplast = pp;
-            pp = pp->next;
+            pp = ppnext;
         }
         else
         {
-            ppnext = pp->next;
-
             if (pplast)
             {
                 pplast->next = ppnext;
@@ -160,13 +166,20 @@ void pcache_trim(void)
 
 void pcache_sync(void)
 {
-    PCACHE *pp;
+    PCACHE *pp, *ppnext;
     pp = pcache_head;
 
     while (pp)
     {
+        ppnext = pp->next;
+
+        if (ppnext == pp)
+        {
+            break;
+        }
+
         pcache_save(pp);
-        pp = pp->next;
+        pp = ppnext;
     }
 }
 
@@ -237,7 +250,13 @@ int Pennies(dbref obj)
     }
 
     cp = atr_get_raw(obj, A_MONEY);
-    return ((int)strtol(cp, (char **)NULL, 10));
+
+    if (cp && *cp)
+    {
+        return ((int)strtol(cp, (char **)NULL, 10));
+    }
+
+    return 0;
 }
 
 void s_Pennies(dbref obj, int howfew)
