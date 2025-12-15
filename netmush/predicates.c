@@ -38,13 +38,14 @@ dbref insert_first(dbref head, dbref thing)
 dbref remove_first(dbref head, dbref thing)
 {
 	dbref prev;
+	int count = 0;
 
 	if (head == thing)
 	{
 		return (Next(thing));
 	}
 
-	for (prev = head; (prev != NOTHING) && (Next(prev) != prev); prev = Next(prev))
+	for (prev = head; (prev != NOTHING) && (Next(prev) != prev) && (count < mushstate.db_top); prev = Next(prev), count++)
 	{
 		if (Next(prev) == thing)
 		{
@@ -81,7 +82,8 @@ dbref reverse_list(dbref list)
 
 int member(dbref thing, dbref list)
 {
-	for (; (list != NOTHING) && (Next(list) != list); list = Next(list))
+	int count = 0;
+	for (; (list != NOTHING) && (Next(list) != list) && (count < mushstate.db_top); list = Next(list), count++)
 	{
 		if (list == thing)
 		{
@@ -2413,7 +2415,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 				continue;
 			}
 
-			for (obj = Exits(parent); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+			int exit_count = 0;
+			for (obj = Exits(parent); (obj != NOTHING) && (Next(obj) != obj) && (exit_count < mushstate.db_top); obj = Next(obj), exit_count++)
 			{
 				if (Can_See_Exit(player, obj, is_ok))
 				{
@@ -2436,7 +2439,8 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 		bb_p = lp = list;
 		is_ok = Sees_Always(player, thing);
 
-		for (obj = Contents(thing); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+		int cont_count = 0;
+		for (obj = Contents(thing); (obj != NOTHING) && (Next(obj) != obj) && (cont_count < mushstate.db_top); obj = Next(obj), cont_count++)
 		{
 			if (Can_See(player, obj, is_ok))
 			{
