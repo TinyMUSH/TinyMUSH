@@ -14,6 +14,7 @@
     - [TinyMUSH 4.0](#tinymush-40)
 - [Installation](#installation)
 - [Full documentation](#full-documentation)
+ - [Developer docs](#developer-docs)
 
 # TinyMUSH
 
@@ -103,3 +104,8 @@ Note that theses have not been updated since TinyMUSH 3.2 and will only be when 
 Beta.
 
 You can also browse the doxygen source documentation (work in progress) at https://tinymush.github.io/TinyMUSH/html/
+
+## Developer Docs
+
+- [Commands and Registries Reference](COMMANDS_AND_REGISTRIES_REFERENCE.md): consolidated guide to commands, functions, flags, powers, attributes, switch tables, and config keywords, with pointers to their initializers.
+- [MODULES.md](MODULES.md): overview for creating and integrating modules.

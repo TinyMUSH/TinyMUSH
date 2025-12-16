@@ -31,27 +31,22 @@
 
 int ph_any(dbref target, dbref player __attribute__((unused)), POWER power, int fpowers, int reset)
 {
+    POWER current;
+    POWER newvalue;
+
     if (fpowers & POWER_EXT)
     {
-        if (reset)
-        {
-            s_Powers2(target, Powers2(target) & ~power);
-        }
-        else
-        {
-            s_Powers2(target, Powers2(target) | power);
-        }
+        /* Memoize read to avoid redundant macro calls */
+        current = Powers2(target);
+        newvalue = reset ? (current & ~power) : (current | power);
+        s_Powers2(target, newvalue);
     }
     else
     {
-        if (reset)
-        {
-            s_Powers(target, Powers(target) & ~power);
-        }
-        else
-        {
-            s_Powers(target, Powers(target) | power);
-        }
+        /* Memoize read to avoid redundant macro calls */
+        current = Powers(target);
+        newvalue = reset ? (current & ~power) : (current | power);
+        s_Powers(target, newvalue);
     }
 
     return 1;
@@ -137,14 +132,14 @@ int ph_privileged(dbref target, dbref player, POWER power, int fpowers, int rese
             return 0;
         }
 
-        if (Powers(player) & power)
+        /* Memoize power read to avoid redundant macro calls in both branches */
+        POWER player_power = (fpowers & POWER_EXT) ? Powers2(player) : Powers(player);
+
+        if (player_power & power)
         {
             return (ph_any(target, player, power, fpowers, reset));
         }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     return (ph_any(target, player, power, fpowers, reset));
@@ -166,7 +161,9 @@ int ph_inherit(dbref target, dbref player, POWER power, int fpowers, int reset)
 }
 /* *INDENT-OFF* */
 
-/* All power names must be in lowercase! */
+/* All power names must be in lowercase!
+ * Array is terminated by an entry with NULL powername for safe iteration.
+ */
 
 POWERENT gen_powers[] = {
     {(char *)"announce", POW_ANNOUNCE, 0, 0, ph_wiz},
@@ -236,17 +233,27 @@ void display_powertab(dbref player)
 {
     char *buf, *bp;
     POWERENT *fp;
+    int is_wizard, is_god;
+
     bp = buf = XMALLOC(LBUF_SIZE, "buf");
+    if (!buf)
+    {
+        return;
+    }
     SAFE_LB_STR((char *)"Powers:", buf, &bp);
+
+    /* Memoize permission checks to avoid repeated macro calls in loop */
+    is_wizard = Wizard(player);
+    is_god = God(player);
 
     for (fp = gen_powers; fp->powername; fp++)
     {
-        if ((fp->listperm & CA_WIZARD) && !Wizard(player))
+        if ((fp->listperm & CA_WIZARD) && !is_wizard)
         {
             continue;
         }
 
-        if ((fp->listperm & CA_GOD) && !God(player))
+        if ((fp->listperm & CA_GOD) && !is_god)
         {
             continue;
         }
@@ -260,28 +267,83 @@ void display_powertab(dbref player)
     XFREE(buf);
 }
 
-POWERENT *find_power(dbref thing __attribute__((unused)), char *powername)
+POWERENT *find_power(dbref thing __attribute__((unused)), const char *powername)
 {
-    char *cp;
-
-    /*
-     * Make sure the power name is valid
+    /* Build a lowercase, trimmed token without modifying the input.
+     * The 'thing' parameter is unused; this function performs a global lookup
+     * regardless of the object passed, consistent with the hash table design.
      */
+    char namebuf[SBUF_SIZE];
+    size_t i = 0;
 
-    for (cp = powername; *cp; cp++)
+    if (!powername)
     {
-        *cp = tolower(*cp);
+        return NULL;
     }
 
-    return (POWERENT *)hashfind(powername, &mushstate.powers_htab);
+    /* Skip leading whitespace */
+    while (*powername && isspace((unsigned char)*powername))
+    {
+        powername++;
+    }
+
+    /* Tolerate a leading negation/plus sign if passed inadvertently */
+    if (*powername == '!' || *powername == '+')
+    {
+        powername++;
+        while (*powername && isspace((unsigned char)*powername))
+        {
+            powername++;
+        }
+    }
+
+    /* Copy until delimiter or NUL, guarding against overflow */
+    while (*powername)
+    {
+        unsigned char ch = (unsigned char)*powername;
+        if (isspace(ch) || ch == '=' || ch == ',')
+        {
+            break;
+        }
+        if (i >= (sizeof(namebuf) - 1))
+        {
+            /* Name too long for our static buffer */
+            return NULL;
+        }
+        namebuf[i++] = (char)tolower(ch);
+        powername++;
+    }
+    namebuf[i] = '\0';
+
+    if (i == 0)
+    {
+        return NULL;
+    }
+
+    return (POWERENT *)hashfind(namebuf, &mushstate.powers_htab);
 }
 
 int decode_power(dbref player, char *powername, POWERSET *pset)
 {
     POWERENT *pent;
+    if (!pset)
+    {
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s", "Internal error: NULL POWERSET");
+        return 0;
+    }
+
     pset->word1 = 0;
     pset->word2 = 0;
-    pent = (POWERENT *)hashfind(powername, &mushstate.powers_htab);
+
+    if (!powername || !*powername)
+    {
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s", "Power not specified.");
+        return 0;
+    }
+    /* Use find_power to ensure case-insensitive lookup without mutating input.
+     * find_power handles trimming and case normalization internally.
+     */
+    pent = find_power(GOD, powername);
 
     if (!pent)
     {
@@ -311,11 +373,12 @@ void power_set(dbref target, dbref player, char *power, int key)
     POWERENT *fp;
     int negate, result;
     /*
-     * Trim spaces, and handle the negation character
+     * Trim spaces, and handle the negation character.
+     * Early exit if the input is empty or whitespace-only.
      */
     negate = 0;
 
-    while (*power && isspace(*power))
+    while (*power && isspace((unsigned char)*power))
     {
         power++;
     }
@@ -326,15 +389,12 @@ void power_set(dbref target, dbref player, char *power, int key)
         power++;
     }
 
-    while (*power && isspace(*power))
+    while (*power && isspace((unsigned char)*power))
     {
         power++;
     }
 
-    /*
-     * Make sure a power name was specified
-     */
-
+    /* Early exit: ensure a power name was specified after trimming */
     if (*power == '\0')
     {
         if (negate)
@@ -366,10 +426,14 @@ void power_set(dbref target, dbref player, char *power, int key)
     {
         notify(player, NOPERM_MESSAGE);
     }
-    else if (!(key & SET_QUIET) && !Quiet(player))
+    else
     {
-        notify(player, (negate ? "Cleared." : "Set."));
+        /* Mark target modified regardless of quiet notifications */
         s_Modified(target);
+        if (!(key & SET_QUIET) && !Quiet(player))
+        {
+            notify(player, (negate ? "Cleared." : "Set."));
+        }
     }
 
     return;
@@ -384,6 +448,7 @@ int has_power(dbref player, dbref it, char *powername)
 {
     POWERENT *fp;
     POWER fv;
+
     fp = find_power(it, powername);
 
     if (fp == NULL)
@@ -391,6 +456,10 @@ int has_power(dbref player, dbref it, char *powername)
         return 0;
     }
 
+    /* Conditionally read only the required power bank to minimize macro overhead.
+     * Unlike power_description which iterates and needs both, has_power checks a single
+     * power once, so unconditional memoization would be wasteful.
+     */
     if (fp->powerpower & POWER_EXT)
     {
         fv = Powers2(it);
@@ -427,35 +496,48 @@ char *power_description(dbref player, dbref target)
 {
     char *buff, *bp;
     POWERENT *fp;
+    POWER f1, f2;
     POWER fv;
+    int is_wizard, is_god;
+
     /*
      * Allocate the return buffer
      */
     bp = buff = XMALLOC(MBUF_SIZE, "buff");
+    if (!buff)
+    {
+        return NULL;
+    }
     /*
      * Store the header strings and object type
      */
     SAFE_MB_STR((char *)"Powers:", buff, &bp);
 
+    /* Memoize power reads and permission checks for efficiency */
+    f1 = Powers(target);
+    f2 = Powers2(target);
+    is_wizard = Wizard(player);
+    is_god = God(player);
+
     for (fp = gen_powers; fp->powername; fp++)
     {
         if (fp->powerpower & POWER_EXT)
         {
-            fv = Powers2(target);
+            fv = f2;
         }
         else
         {
-            fv = Powers(target);
+            fv = f1;
         }
 
         if (fv & fp->powervalue)
         {
-            if ((fp->listperm & CA_WIZARD) && !Wizard(player))
+            if ((fp->listperm & CA_WIZARD) && !is_wizard)
             {
                 continue;
             }
 
-            if ((fp->listperm & CA_GOD) && !God(player))
+            if ((fp->listperm & CA_GOD) && !is_god)
             {
                 continue;
             }
@@ -483,13 +565,24 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
     POWERENT *fp;
     char *buf;
     /*
-     * Report generic powers
+     * Report generic powers.
+     * thingname is assumed non-NULL from caller; it will be strip_ansi'd once for output.
      */
     f1 = Powers(thing);
     f2 = Powers2(thing);
 
+    /* Strip ANSI codes once before the loop instead of repeatedly inside */
+    buf = strip_ansi(thingname);
+    if (!buf)
+    {
+        return;
+    }
+
     for (fp = gen_powers; fp->powername; fp++)
     {
+        /* Memoize POWER_EXT check to avoid redundant bitwise operations */
+        int is_ext = (fp->powerpower & POWER_EXT);
+
         /*
          * Skip if we shouldn't decompile this power
          */
@@ -502,7 +595,7 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
          * Skip if this power is not set
          */
 
-        if (fp->powerpower & POWER_EXT)
+        if (is_ext)
         {
             if (!(f2 & fp->powervalue))
             {
@@ -529,10 +622,11 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
         /*
          * We made it this far, report this power
          */
-        buf = strip_ansi(thingname);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@power %s=%s", buf, fp->powername);
-        XFREE(buf);
     }
+
+    /* Free the stripped buffer once after the loop */
+    XFREE(buf);
 }
 
 /* ---------------------------------------------------------------------------
@@ -544,12 +638,35 @@ int cf_power_access(int *vp __attribute__((unused)), char *str, long extra __att
 {
     char *fstr, *permstr, *tokst;
     POWERENT *fp;
+
+    /* Validate input: str must be provided for strtok_r to succeed */
+    if (!str || !*str)
+    {
+        return -1;
+    }
+
     fstr = strtok_r(str, " \t=,", &tokst);
     permstr = strtok_r(NULL, " \t=,", &tokst);
 
     if (!fstr || !*fstr)
     {
         return -1;
+    }
+
+    if (!permstr || !*permstr)
+    {
+        cf_log(player, "CNF", "NFND", cmd, "%s", "Missing power access qualifier");
+        return -1;
+    }
+
+    /* Normalize permstr to lowercase for case-insensitive matching.
+     * Safe to modify in-place: strtok_r() returns a pointer into the 'str' buffer,
+     * which is mutable and not used after this point. Lowercasing avoids repeated
+     * string allocations and keeps the lookup efficient.
+     */
+    for (char *p = permstr; *p; ++p)
+    {
+        *p = (char)tolower((unsigned char)*p);
     }
 
     if ((fp = find_power(GOD, fstr)) == NULL)

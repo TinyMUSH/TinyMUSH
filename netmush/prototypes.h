@@ -1124,7 +1124,7 @@ extern int ph_privileged(dbref target, dbref player, POWER power, int fpowers, i
 extern int ph_inherit(dbref target, dbref player, POWER power, int fpowers, int reset);
 extern void init_powertab(void);
 extern void display_powertab(dbref player);
-extern POWERENT *find_power(dbref thing, char *powername);
+extern POWERENT *find_power(dbref thing, const char *powername);
 extern int decode_power(dbref player, char *powername, POWERSET *pset);
 extern void power_set(dbref target, dbref player, char *power, int key);
 extern int has_power(dbref player, dbref it, char *powername);

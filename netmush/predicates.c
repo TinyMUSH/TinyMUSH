@@ -1449,6 +1449,8 @@ void handle_prog(DESC *d, char *message)
 		return;
 	}
 
+	all = (DESC *)nhashfind((int)d->player, &mushstate.desc_htab);
+
 	if (!all)
 	{
 		XFREE(cmd);
@@ -1900,10 +1902,11 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 
 	err = execl(mushconf.game_exec, mushconf.game_exec, mushconf.config_file, (char *)NULL);
 
-	if (err)
+	if (err == -1)
 	{
+		int saved_errno = errno;
 		char errbuf[256];
-		strerror_r(err, errbuf, sizeof(errbuf));
+		strerror_r(saved_errno, errbuf, sizeof(errbuf));
 		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", errbuf);
 	}
 }
@@ -2514,9 +2517,15 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 		*f_ptr = aflags;
 	}
 
-	if (!(*d || (t && *m)))
+	const int has_d = (d && *d);
+	const int has_m = (t && m && *m);
+
+	if (!(has_d || has_m))
 	{
-		XFREE(d);
+		if (d)
+		{
+			XFREE(d);
+		}
 
 		if (m)
 		{
@@ -2599,11 +2608,11 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 	preserve = save_global_regs("master_attr_save");
 	buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
-	if (t && *m)
+	if (has_m)
 	{
 		str = m;
 
-		if (*d)
+		if (has_d)
 		{
 			sp = d;
 			tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
@@ -2616,14 +2625,17 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 			eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
 		}
 	}
-	else if (*d)
+	else if (has_d)
 	{
 		str = d;
 		eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, ((list == NULL) ? sargs : &list), is_ok);
 	}
 
 	*bp = '\0';
-	XFREE(d);
+	if (d)
+	{
+		XFREE(d);
+	}
 
 	if (m)
 	{
@@ -2708,7 +2720,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	{
 		if (csm__mp->did_it)
 		{
-			retval = (*(csm__mp->did_it))(player, thing, master, what, def, owhat, def, awhat, ctrl_flags, args, nargs, msg_key);
+			retval = (*(csm__mp->did_it))(player, thing, master, what, def, owhat, odef, awhat, ctrl_flags, args, nargs, msg_key);
 		}
 	}
 
@@ -2750,17 +2762,20 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			m = atr_pget(master, what, &aowner, &aflags, &alen);
 		}
 
-		if (*d || (t && *m))
+		const int has_d = (d && *d);
+		const int has_m = (t && m && *m);
+
+		if (has_d || has_m)
 		{
 			need_pres = 1;
 			preserve = save_global_regs("did_it_save");
 			buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
-			if (t && *m)
+			if (has_m)
 			{
 				str = m;
 
-				if (*d)
+				if (has_d)
 				{
 					sp = d;
 					tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
@@ -2773,7 +2788,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
 				}
 			}
-			else if (*d)
+			else if (has_d)
 			{
 				str = d;
 				eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
@@ -2806,7 +2821,10 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			notify(player, def);
 		}
 
-		XFREE(d);
+		if (d)
+		{
+			XFREE(d);
+		}
 	}
 	else if ((what < 0) && def)
 	{
@@ -2842,7 +2860,10 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			m = atr_pget(master, owhat, &aowner, &aflags, &alen);
 		}
 
-		if (*d || (t && *m))
+		const int has_d = (d && *d);
+		const int has_m = (t && m && *m);
+
+		if (has_d || has_m)
 		{
 			if (!need_pres)
 			{
@@ -2852,11 +2873,11 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 
 			buff = bp = XMALLOC(LBUF_SIZE, "bp");
 
-			if (t && *m)
+			if (has_m)
 			{
 				str = m;
 
-				if (*d)
+				if (has_d)
 				{
 					sp = d;
 					tbuf = tp = XMALLOC(LBUF_SIZE, "tp");
@@ -2873,7 +2894,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 					eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, (char **)NULL, 0);
 				}
 			}
-			else if (*d)
+			else if (has_d)
 			{
 				str = d;
 				eval_expression_string(buff, &bp, thing, player, player, EV_EVAL | EV_FIGNORE | EV_TOP, &str, args, nargs);
@@ -2907,7 +2928,10 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 			}
 		}
 
-		XFREE(d);
+		if (d)
+		{
+			XFREE(d);
+		}
 	}
 	else if ((owhat < 0) && odef && Has_location(player) && Good_obj(loc = Location(player)))
 	{
@@ -2941,11 +2965,19 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 
 	if (awhat > 0)
 	{
-		if (*(act = atr_pget(thing, awhat, &aowner, &aflags, &alen)))
+		act = atr_pget(thing, awhat, &aowner, &aflags, &alen);
+
+		if (!act)
+		{
+			return;
+		}
+
+		if (*act)
 		{
 			charges = atr_pget(thing, A_CHARGES, &aowner, &aflags, &alen);
+			char *runout = NULL;
 
-			if (*charges)
+			if (charges && *charges)
 			{
 				errno = 0;
 				long temp_charges = strtol(charges, (char **)NULL, 10);
@@ -2957,25 +2989,41 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 					return;
 				}
 				num = (int)temp_charges;
+				buff = XMALLOC(LBUF_SIZE, "buff");
 				XSPRINTF(buff, "%d", num - 1);
 				atr_add_raw(thing, A_CHARGES, buff);
 				XFREE(buff);
 			}
-			else if (*(buff = atr_pget(thing, A_RUNOUT, &aowner, &aflags, &alen)))
+			else if ((runout = atr_pget(thing, A_RUNOUT, &aowner, &aflags, &alen)) && *runout)
 			{
 				XFREE(act);
-				act = buff;
+				act = runout;
+				runout = NULL;
 			}
 			else
 			{
 				XFREE(act);
-				XFREE(buff);
-				XFREE(charges);
+				if (runout)
+				{
+					XFREE(runout);
+				}
+				if (charges)
+				{
+					XFREE(charges);
+				}
 				return;
+			}
+
+			if (runout)
+			{
+				XFREE(runout);
 			}
 		}
 
-		XFREE(charges);
+		if (charges)
+		{
+			XFREE(charges);
+		}
 
 		/*
 		 * Skip any leading $<command>: or ^<monitor>: pattern.
