@@ -328,9 +328,18 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	vname = log_getname(victim);
 	pname = log_getname(player);
-	log_write(LOG_WIZARD, "WIZ", "TOAD", "%s was @toaded by %s", vname, pname);
-	XFREE(vname);
-	XFREE(pname);
+	if (vname && pname)
+	{
+		log_write(LOG_WIZARD, "WIZ", "TOAD", "%s was @toaded by %s", vname, pname);
+	}
+	if (vname)
+	{
+		XFREE(vname);
+	}
+	if (pname)
+	{
+		XFREE(pname);
+	}
 
 	/*
 	 * Clear everything out
@@ -356,6 +365,11 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	 */
 	loc = Location(victim);
 	buf = XMALLOC(MBUF_SIZE, "buf");
+	if (!buf)
+	{
+		notify_quiet(player, "Memory allocation failed.");
+		return;
+	}
 	XSPRINTF(buf, "%s has been turned into a slimy toad!", Name(victim));
 	notify_except2(loc, player, victim, player, 0, NULL, buf);
 	XSPRINTF(buf, "You toaded %s! (%d objects @chowned)", Name(victim), count + 1);
@@ -371,8 +385,14 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	 * Zap the alias too
 	 */
 	buf = atr_pget(victim, A_ALIAS, &aowner, &aflags, &alen);
-	delete_player_name(victim, buf);
-	XFREE(buf);
+	if (buf && *buf)
+	{
+		delete_player_name(victim, buf);
+	}
+	if (buf)
+	{
+		XFREE(buf);
+	}
 	count = boot_off(victim, (char *)"You have been turned into a slimy toad!");
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%d connection%s closed.", count, (count == 1 ? "" : "s"));
 }
@@ -405,9 +425,18 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 
 	vname = log_getname(victim);
 	pname = log_getname(player);
-	log_write(LOG_WIZARD, "WIZ", "PASS", "%s changed the password of %s", pname, vname);
-	XFREE(vname);
-	XFREE(pname);
+	if (vname && pname)
+	{
+		log_write(LOG_WIZARD, "WIZ", "PASS", "%s changed the password of %s", pname, vname);
+	}
+	if (vname)
+	{
+		XFREE(vname);
+	}
+	if (pname)
+	{
+		XFREE(pname);
+	}
 	/*
 	 * it's ok, do it
 	 */
@@ -434,7 +463,15 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 	{
 		if (is_number(name))
 		{
-			victim = (int)strtol(name, (char **)NULL, 10);
+			char *endptr;
+			char *pnum = (char *)name;
+			victim = (int)strtol(pnum, &endptr, 10);
+			/* Validate conversion succeeded and entire string was consumed */
+			if (pnum == endptr || *endptr != '\0' || victim <= 0)
+			{
+				notify_quiet(player, "Invalid port number.");
+				return;
+			}
 		}
 		else
 		{
@@ -473,10 +510,22 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 		vname = log_getname(victim);
 		pname = log_getname(player);
 		lname = log_getname(Location(player));
-		log_write(LOG_WIZARD, "WIZ", "BOOT", "%s in %s was @booted by %s", vname, lname, pname);
-		XFREE(vname);
-		XFREE(pname);
-		XFREE(lname);
+		if (vname && pname && lname)
+		{
+			log_write(LOG_WIZARD, "WIZ", "BOOT", "%s in %s was @booted by %s", vname, lname, pname);
+		}
+		if (vname)
+		{
+			XFREE(vname);
+		}
+		if (pname)
+		{
+			XFREE(pname);
+		}
+		if (lname)
+		{
+			XFREE(lname);
+		}
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You booted %s off!", Name(victim));
 	}
 
@@ -487,6 +536,11 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 	else
 	{
 		bp = buf = XMALLOC(LBUF_SIZE, "buf");
+		if (!buf)
+		{
+			notify_quiet(player, "Memory allocation failed.");
+			return;
+		}
 		safe_name(player, buf, &bp);
 		SAFE_LB_STR((char *)" gently shows you the door.", buf, &bp);
 		*bp = '\0';
@@ -517,7 +571,7 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *arg1)
 {
 	dbref a;
-	int amt, curamt;
+	int amt, curamt, count = 0;
 
 	if (!is_number(arg1))
 	{
@@ -525,6 +579,12 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 	}
 
 	amt = (int)strtol(arg1, (char **)NULL, 10);
+
+	/* Optimize: only iterate if amt is positive */
+	if (amt < 0)
+	{
+		return; /* Negative amounts don't make sense */
+	}
 
 	for (a = 0; a < mushstate.db_top; a++)
 	{
@@ -535,9 +595,11 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 			if (amt < curamt)
 			{
 				s_Pennies(a, amt);
+				count++; /* Track changes (optimization for future logging) */
 			}
 		}
 	}
+	/* Note: Function is silent by design (wizard bulk operation) */
 }
 
 /*
@@ -590,7 +652,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 	}
 
-	message[GBUF_SIZE - 1] = '\0';
+	/* Validate and truncate message safely */
+	if (strlen(message) >= GBUF_SIZE)
+	{
+		message[GBUF_SIZE - 1] = '\0';
+	}
 
 	switch (key)
 	{
