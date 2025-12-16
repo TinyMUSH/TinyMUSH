@@ -766,29 +766,26 @@ char *strip_24bit(char *s)
 int strip_ansi_len(const char *s)
 {
 	int n = 0;
-	char *s1;
-	char *s2;
-	s1 = XSTRDUP(s, "s1");
-	s2 = s1;
 
-	if (s1)
+	if (!s)
 	{
-		while (*s1 == ESC_CHAR)
+		return 0;
+	}
+
+	while (*s == ESC_CHAR)
+	{
+		skip_esccode((char **)&s);
+	}
+
+	while (*s)
+	{
+		++n;
+		++s;
+
+		while (*s == ESC_CHAR)
 		{
-			skip_esccode(&s1);
+			skip_esccode((char **)&s);
 		}
-
-		while (*s1)
-		{
-			++s1, ++n;
-
-			while (*s1 == ESC_CHAR)
-			{
-				skip_esccode(&s1);
-			}
-		}
-
-		XFREE(s2);
 	}
 
 	return n;
