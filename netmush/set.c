@@ -111,6 +111,13 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 			return;
 		}
 
+		/* Prevent self-zoning to avoid cycles */
+		if (zone == thing)
+		{
+			notify(player, "You cannot set an object's zone to itself.");
+			return;
+		}
+
 		if ((Typeof(zone) != TYPE_THING) && (Typeof(zone) != TYPE_ROOM))
 		{
 			notify(player, "Invalid zone object type.");
@@ -299,9 +306,22 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	retcode = 1;
 
 	tmp_buf = XSTRDUP(list, "tmp_buf");
-	for (n_aliases = 0, p = strtok_r(tmp_buf, ";", &tokp); p; n_aliases++, p = strtok_r(NULL, ";", &tokp))
+	for (n_aliases = 0, p = strtok_r(tmp_buf, ";", &tokp); p; p = strtok_r(NULL, ";", &tokp))
 	{
-		alias_ptrs[n_aliases] = trim_spaces(p);
+		if (n_aliases >= (int)(LBUF_SIZE / 2))
+		{
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Too many aliases specified (limit %d).", mushconf.max_player_aliases);
+			retcode = 0;
+			break;
+		}
+		if (n_aliases >= mushconf.max_player_aliases)
+		{
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You cannot have more than %d aliases.", mushconf.max_player_aliases);
+			retcode = 0;
+			break;
+		}
+
+		alias_ptrs[n_aliases++] = trim_spaces(p);
 	}
 	XFREE(tmp_buf);
 
@@ -401,11 +421,17 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 		{
 			notify_quiet(player, "Alias set.");
 		}
+
+		/* Free allocated alias buffer after successful set */
+		XFREE(alias_buf);
 	}
 	else
 	{
 		atr_clr(target, A_ALIAS);
 		notify_quiet(player, "Alias cleared due to error.");
+
+		/* Free allocated alias buffer on error path */
+		XFREE(alias_buf);
 	}
 }
 
@@ -487,7 +513,18 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 		}
 		else
 		{
-			atr_add(thing, A_ALIAS, alias, Owner(player), aflags);
+			/* Basic validation: trim and reject empty alias for non-players */
+			char *alias_trim = trim_spaces(alias);
+			if (!*alias_trim)
+			{
+				atr_clr(thing, A_ALIAS);
+				notify_quiet(player, "Alias removed.");
+				XFREE(alias_trim);
+				return;
+			}
+
+			atr_add(thing, A_ALIAS, alias_trim, Owner(player), aflags);
+			XFREE(alias_trim);
 
 			if (!Quiet(player))
 			{
@@ -1956,10 +1993,10 @@ void do_setvattr(dbref player, dbref cause, __attribute__((unused)) int key, cha
 	if (*s)
 	{
 		*s++ = '\0';
-	}					 /*
-				   
-				   * split it
-				   */
+	} /*
+
+* split it
+*/
 	anum = mkattr(arg1); /*
 						  * Get or make attribute
 						  */
