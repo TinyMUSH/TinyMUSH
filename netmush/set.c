@@ -113,7 +113,8 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 
 		/* Allow self-zoning per TinyMUSH semantics (policy choice) */
 
-		if ((Typeof(zone) != TYPE_THING) && (Typeof(zone) != TYPE_ROOM))
+		int zone_type = Typeof(zone);
+		if ((zone_type != TYPE_THING) && (zone_type != TYPE_ROOM))
 		{
 			notify(player, "Invalid zone object type.");
 			return;
