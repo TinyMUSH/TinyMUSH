@@ -41,8 +41,15 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     if (Wizard(player))
     {
         struct utsname bpInfo;
-        uname(&bpInfo);
-        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Platform : %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
+
+        if (uname(&bpInfo) == 0)
+        {
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Platform : %s %s %s %s %s", bpInfo.sysname, bpInfo.nodename, bpInfo.release, bpInfo.version, bpInfo.machine);
+        }
+        else
+        {
+            notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Platform : unavailable (uname failed)");
+        }
     }
 
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, " ");
@@ -76,17 +83,24 @@ void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__
     }
 }
 
-void format_version(void) {
+void format_version(void)
+{
     static char buf[MBUF_SIZE];
-    XSNPRINTF(buf, MBUF_SIZE, "%d.%d %s", mushstate.version.major, mushstate.version.minor, mushstate.version.status == 0 ? "alpha" : mushstate.version.status == 1 ? "beta" : mushstate.version.status == 2 ? "rc" : "stable");
-    if(mushstate.version.patch > 0)
+    XSNPRINTF(buf, MBUF_SIZE, "%d.%d %s", mushstate.version.major, mushstate.version.minor, mushstate.version.status == 0 ? "alpha" : mushstate.version.status == 1 ? "beta"
+                                                                                                                                  : mushstate.version.status == 2   ? "rc"
+                                                                                                                                                                    : "stable");
+    if (mushstate.version.patch > 0)
         XSPRINTFCAT(buf, " Patch %d", mushstate.version.patch);
-    if(mushstate.version.tweak > 0)
+    if (mushstate.version.tweak > 0)
         XSPRINTFCAT(buf, " Revision %d", mushstate.version.tweak);
     XSPRINTFCAT(buf, " (%s%s %s)", mushstate.version.git_hash, mushstate.version.git_dirty ? "-dirty" : "", mushstate.version.git_date);
-    
+
+    if (mushstate.version.versioninfo)
+    {
+        XFREE(mushstate.version.versioninfo);
+    }
+
     mushstate.version.versioninfo = XSTRDUP(buf, "mushstate.version.versioninfo");
-    XFREE(buf);
 }
 
 void init_version(void)
@@ -115,8 +129,6 @@ void init_version(void)
 
     format_version();
 }
-
-
 
 void log_version(void)
 {
