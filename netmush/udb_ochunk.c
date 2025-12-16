@@ -20,6 +20,7 @@
 #include "prototypes.h"
 
 #include <stdbool.h>
+#include <limits.h>
 #include <gdbm.h>
 #include <sys/file.h>
 #include <unistd.h>
@@ -206,8 +207,18 @@ UDB_DATA db_get(UDB_DATA gamekey, unsigned int type)
     datum dat;
     datum key;
     char *s;
+    size_t keylen;
 
-    if (!db_initted)
+    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    {
+        gamedata.dptr = NULL;
+        gamedata.dsize = 0;
+        return gamedata;
+    }
+
+    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
+
+    if (keylen > INT_MAX)
     {
         gamedata.dptr = NULL;
         gamedata.dsize = 0;
@@ -217,11 +228,11 @@ UDB_DATA db_get(UDB_DATA gamekey, unsigned int type)
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
+    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
     XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = sizeof(int) + gamekey.dsize;
+    key.dsize = (int)keylen;
     dat = gdbm_fetch(dbp, key);
     gamedata.dptr = dat.dptr;
     gamedata.dsize = dat.dsize;
@@ -236,8 +247,16 @@ int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
     datum dat;
     datum key;
     char *s;
+    size_t keylen;
 
-    if (!db_initted)
+    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    {
+        return (1);
+    }
+
+    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
+
+    if (keylen > INT_MAX)
     {
         return (1);
     }
@@ -245,11 +264,11 @@ int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
+    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
     XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = sizeof(int) + gamekey.dsize;
+    key.dsize = (int)keylen;
     /*
      * make table entry
      */
@@ -274,20 +293,28 @@ int db_del(UDB_DATA gamekey, unsigned int type)
     datum dat;
     datum key;
     char *s;
+    size_t keylen;
 
-    if (!db_initted)
+    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
     {
         return (-1);
+    }
+
+    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
+
+    if (keylen > INT_MAX)
+    {
+        return (1);
     }
 
     /*
      * Construct a key (GDBM likes first 4 bytes to be unique)
      */
-    s = key.dptr = (char *)XMALLOC(sizeof(int) + gamekey.dsize, "key.dptr");
+    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
     XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
     s += gamekey.dsize;
     XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = sizeof(int) + gamekey.dsize;
+    key.dsize = (int)keylen;
     dat = gdbm_fetch(dbp, key);
 
     /* not there? */
