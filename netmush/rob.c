@@ -431,11 +431,13 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 		}
 
 		/*
-		 * Negative cost
+		 * Negative cost: refund and abort to avoid charging the giver
 		 */
 
 		if (cost < 0)
 		{
+			notify(giver, "That item cannot be purchased.");
+			giveto(giver, amount);
 			return;
 		}
 	}
