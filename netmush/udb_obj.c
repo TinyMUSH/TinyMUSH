@@ -36,6 +36,7 @@
 #include "prototypes.h"
 
 #include <string.h>
+#include <limits.h>
 
 /* Take a chunk of data which contains an object, and parse it into an
  * object structure. */
@@ -77,6 +78,13 @@ UDB_OBJECT *unroll_obj(char *data)
 
     dptr += sizeof(int);
     o->at_count = i;
+
+    if ((i < 0) || (i > (INT_MAX / (int)sizeof(UDB_ATTRIB))))
+    {
+        XFREE(o);
+        return (NULL);
+    }
+
     /*
      * Now get an array of Attrs
      */
@@ -103,6 +111,11 @@ UDB_OBJECT *unroll_obj(char *data)
         }
 
         dptr += sizeof(int);
+
+        if (a[j].size <= 0)
+        {
+            goto bail;
+        }
 
         /*
          * Attribute number
