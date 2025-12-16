@@ -17,6 +17,38 @@
 // Forward declaration of unified color palette
 extern COLORINFO colorPalette[];
 
+// ANSI 16-color lookup table (0-15)
+static const rgbColor ANSI16[16] = {
+    {0, 0, 0},       // 0: black
+    {128, 0, 0},     // 1: red
+    {0, 128, 0},     // 2: green
+    {128, 128, 0},   // 3: yellow
+    {0, 0, 128},     // 4: blue
+    {128, 0, 128},   // 5: magenta
+    {0, 128, 128},   // 6: cyan
+    {192, 192, 192}, // 7: light gray
+    {128, 128, 128}, // 8: dark gray
+    {255, 0, 0},     // 9: bright red
+    {0, 255, 0},     // 10: bright green
+    {255, 255, 0},   // 11: bright yellow
+    {0, 0, 255},     // 12: bright blue
+    {255, 0, 255},   // 13: bright magenta
+    {0, 255, 255},   // 14: bright cyan
+    {255, 255, 255}  // 15: white
+};
+
+// Simple LRU cache for color matches
+typedef struct
+{
+    uint32_t key; // packed rgb + schemes
+    COLORMATCH match;
+    uint32_t tick;
+    bool valid;
+} ColorCacheEntry;
+
+static ColorCacheEntry g_colorCache[COLOR_PALETTE_CACHE_MAX];
+static uint32_t g_colorCacheTick = 0;
+
 /**
  * @brief Convert RGB color to XYZ coordonates
  *
@@ -143,25 +175,79 @@ CIELABColor xyzToCIELAB(xyzColor xyz)
  */
 COLORMATCH getColorMatch(rgbColor rgb, uint8_t schemes)
 {
+    // TODO: Future optimization - implement LRU cache using COLOR_PALETTE_CACHE_MAX (256 entries)
+    // This would cache frequently requested RGB→COLORINFO mappings to avoid repeated deltaE calculations
     COLORMATCH cm = {101, {NULL, {0, 0, 0}, {0.0f, 0.0f, 0.0f}, 0}};
+
+    // Treat 'no scheme specified' as 'all schemes'
+    if (schemes == 0)
+        schemes = COLOR_SCHEME_ANSI | COLOR_SCHEME_XTERM | COLOR_SCHEME_CSS;
+
+    // Pre-compute target color in CIELAB space (perceptually uniform distance metric)
     CIELABColor labTarget = xyzToCIELAB(rgbToXyz(rgb));
 
-    for (COLORINFO *cinfo = colorPalette; cinfo->name != NULL; cinfo++)
+    // LRU cache lookup
+    uint32_t key = (uint32_t)rgb.r | ((uint32_t)rgb.g << 8) | ((uint32_t)rgb.b << 16) | ((uint32_t)schemes << 24);
+    uint32_t now = ++g_colorCacheTick;
+    int evictIdx = -1;
+    uint32_t oldestTick = UINT32_MAX;
+    for (int i = 0; i < COLOR_PALETTE_CACHE_MAX; i++)
     {
-        // Skip colors that don't match requested schemes
+        if (!g_colorCache[i].valid)
+        {
+            evictIdx = i; // Prefer first invalid slot
+            oldestTick = 0;
+            break;
+        }
+        if (g_colorCache[i].key == key)
+        {
+            g_colorCache[i].tick = now;
+            return g_colorCache[i].match;
+        }
+        if (g_colorCache[i].tick < oldestTick)
+        {
+            oldestTick = g_colorCache[i].tick;
+            evictIdx = i;
+        }
+    }
+
+    // Track best squared distance to avoid powf/sqrtf in the loop
+    float bestDist2 = cm.deltaE * cm.deltaE; // 101^2 sentinel
+    const COLORINFO *best = NULL;
+
+    // O(n) linear search through palette with scheme filtering
+    for (const COLORINFO *cinfo = colorPalette; cinfo->name != NULL; cinfo++)
+    {
         if ((cinfo->schemes & schemes) == 0)
             continue;
 
-        float deltaE = sqrtf(powf(labTarget.l - cinfo->lab.l, 2) + powf(labTarget.a - cinfo->lab.a, 2) + powf(labTarget.b - cinfo->lab.b, 2));
+        float dL = labTarget.l - cinfo->lab.l;
+        float dA = labTarget.a - cinfo->lab.a;
+        float dB = labTarget.b - cinfo->lab.b;
+        float dist2 = dL * dL + dA * dA + dB * dB;
 
-        if (deltaE == 0)
+        if (dist2 == 0.0f)
         {
-            return (COLORMATCH){deltaE, *cinfo};
+            return (COLORMATCH){0.0f, *cinfo};
         }
-        else if (deltaE < cm.deltaE)
+        if (dist2 < bestDist2)
         {
-            cm.deltaE = deltaE;
-            cm.color = *cinfo;
+            bestDist2 = dist2;
+            best = cinfo;
+        }
+    }
+
+    if (best != NULL)
+    {
+        cm.deltaE = sqrtf(bestDist2);
+        cm.color = *best;
+        // Populate cache
+        if (evictIdx >= 0)
+        {
+            g_colorCache[evictIdx].key = key;
+            g_colorCache[evictIdx].match = cm;
+            g_colorCache[evictIdx].tick = now;
+            g_colorCache[evictIdx].valid = true;
         }
     }
 
@@ -226,23 +312,15 @@ rgbColor X112RGB(int color)
 {
     rgbColor rgb = {0, 0, 0};
 
-    if (color <= 6 || ((color >= 8) && (color <= 15)))
+    // Bounds checking for invalid color codes
+    if (color < 0 || color > 255)
     {
-        rgb.r = color & 1 ? (color & 8 ? 255 : 128) : 0;
-        rgb.g = color & 2 ? (color & 8 ? 255 : 128) : 0;
-        rgb.b = color & 4 ? (color & 8 ? 255 : 128) : 0;
+        return rgb; // Return black for invalid colors
     }
-    else if (color == 7)
+
+    if (color < 16)
     {
-        rgb.r = 192;
-        rgb.g = 192;
-        rgb.b = 192;
-    }
-    else if (color == 8)
-    {
-        rgb.r = 128;
-        rgb.g = 128;
-        rgb.b = 128;
+        return ANSI16[color];
     }
     else if ((color >= 16) && (color <= 231))
     {
@@ -269,48 +347,56 @@ rgbColor X112RGB(int color)
  */
 uint8_t RGB2X11(rgbColor rgb)
 {
+    // Pure black
     if (rgb.r + rgb.g + rgb.b == 0)
-    {
         return 0;
-    }
-    else if (((rgb.r & 128) == rgb.r) && ((rgb.g & 128) == rgb.g) && ((rgb.b & 128) == rgb.b))
+
+    // Standard ANSI colors (0-15)
+    if ((rgb.r & 128) && (rgb.g & 128) && (rgb.b & 128))
     {
         uint8_t c = (rgb.r >> 7) + (rgb.g >> 6) + (rgb.b >> 5);
         return c == 7 ? 8 : c;
     }
-    else if ((rgb.r == 192) && (rgb.g == 192) && (rgb.b == 192))
-    {
+
+    // Default gray (192,192,192)
+    if (rgb.r == 192 && rgb.g == 192 && rgb.b == 192)
         return 7;
-    }
-    else if ((rgb.r == 255 || rgb.r == 0) && (rgb.g == 255 || rgb.g == 0) && (rgb.b == 255 || rgb.b == 0))
+
+    // Bright standard colors (matching 0-15 bright variants)
+    if ((rgb.r == 255 || rgb.r == 0) && (rgb.g == 255 || rgb.g == 0) && (rgb.b == 255 || rgb.b == 0))
     {
         return (rgb.r & 1) + (rgb.g & 2) + (rgb.b & 4) + 8;
     }
-    else if ((rgb.r == rgb.g) && (rgb.r == rgb.b))
+
+    // Grayscale (232-255)
+    if (rgb.r == rgb.g && rgb.r == rgb.b)
     {
         int level = (rgb.r - 8) / 10;
 
         if (level < 0)
-        {
             level = 0;
-        }
         else if (level > 23)
-        {
             level = 23;
-        }
 
         return (uint8_t)(level + 232);
     }
-    else
+
+    // 216-color cube (16-231)
     {
         int xr = (rgb.r - 55) / 40;
         int xg = (rgb.g - 55) / 40;
         int xb = (rgb.b - 55) / 40;
 
-        return ((xr > 0 ? xr : 0) * 36) + ((xg > 0 ? xg : 0) * 6) + (xb > 0 ? xb : 0) + 16;
-    }
+        // Clamp to valid range
+        if (xr < 0)
+            xr = 0;
+        if (xg < 0)
+            xg = 0;
+        if (xb < 0)
+            xb = 0;
 
-    return 0;
+        return (uint8_t)(xr * 36 + xg * 6 + xb + 16);
+    }
 }
 
 /**
@@ -376,8 +462,9 @@ uint8_t RGB2Ansi(rgbColor rgb)
 
 VT100ATTR decodeVT100(const char **ansi)
 {
-    int *codes = NULL;
+    int codes[SGR_CODES_MAX];
     int index = 0;
+    bool has_m = false;
     VT100ATTR attr = {{ANSICOLORTYPE_NONE, {0, 0, 0}}, {ANSICOLORTYPE_NONE, {0, 0, 0}}, false};
 
     if (ansi == NULL || *ansi == NULL || **ansi != '\e')
@@ -396,27 +483,16 @@ VT100ATTR decodeVT100(const char **ansi)
             {
                 if (isdigit(**ansi))
                 {
-                    int *tmp = (int *)XREALLOC(codes, (index + 1) * sizeof(int), "codes");
-                    if (tmp != NULL)
+                    codes[index] = 0;
+                    while (isdigit(**ansi))
                     {
-                        codes = tmp;
-                        codes[index] = 0;
-                        while (isdigit(**ansi))
-                        {
-                            codes[index] = codes[index] * 10 + (**ansi - '0');
-                            (*ansi)++;
-                        }
-                        index++;
-                        if (**ansi == ';')
-                        {
-                            (*ansi)++;
-                        }
+                        codes[index] = codes[index] * 10 + (**ansi - '0');
+                        (*ansi)++;
                     }
-                    else
+                    index++;
+                    if (**ansi == ';')
                     {
-                        XFREE(codes);
-                        codes = NULL;
-                        break;
+                        (*ansi)++;
                     }
                 }
                 else
@@ -429,18 +505,11 @@ VT100ATTR decodeVT100(const char **ansi)
         if (**ansi == 'm')
         {
             (*ansi)++;
-        }
-        else
-        {
-            if (codes != NULL)
-            {
-                XFREE(codes);
-                codes = NULL;
-            }
+            has_m = true;
         }
     }
 
-    if (codes != NULL)
+    if (has_m && index > 0)
     {
         for (size_t i = 0; i < (size_t)index; i++)
         {
@@ -530,7 +599,6 @@ VT100ATTR decodeVT100(const char **ansi)
                 break;
             }
         }
-        XFREE(codes);
     }
     return attr;
 }
