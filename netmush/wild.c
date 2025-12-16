@@ -235,7 +235,11 @@ int real_quick_wild(char *tstr, char *dstr)
 			 * * match of next character.
 			 */
 			tstr++;
-			//[[fallthrough]];
+			/* Check for end of pattern after escape */
+			if (!*tstr)
+			{
+				return 0; /* Invalid escape at end */
+			}
 			__attribute__((fallthrough));
 		default:
 
@@ -378,6 +382,12 @@ int real_wild1(char *tstr, char *dstr, int arg)
 		return -1;
 	}
 
+	/* Guard: prevent excessive recursion depth (additional safeguard) */
+	if (mushstate.wild_times_lev > 100)
+	{
+		return -1;
+	}
+
 	mushstate.wild_times_lev++;
 
 	while (*tstr != '*')
@@ -416,7 +426,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			 * * match of next character.
 			 */
 			tstr++;
-			//[[fallthrough]];
+			/* Check for end of pattern after escape */
+			if (!*tstr)
+			{
+				return 0; /* Invalid escape at end */
+			}
 			__attribute__((fallthrough));
 			/*
 			 * FALL THROUGH
@@ -588,8 +602,13 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			 * Found a match!  Fill in all remaining arguments.
 			 * * First do the '*'...
 			 */
-			XSTRNCPY(arglist[argpos], datapos, (dstr - datapos) - numextra);
-			arglist[argpos][(dstr - datapos) - numextra] = '\0';
+			int copy_len = (dstr - datapos) - numextra;
+			if (copy_len < 0)
+			{
+				copy_len = 0; /* Guard against underflow */
+			}
+			XSTRNCPY(arglist[argpos], datapos, copy_len);
+			arglist[argpos][copy_len] = '\0';
 			datapos = dstr - numextra;
 			argpos++;
 
