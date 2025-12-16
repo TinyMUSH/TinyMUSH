@@ -212,6 +212,7 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	if (isPlayer(thing))
 	{
 		buff = trim_spaces((char *)newname);
+		const char *old_name = Name(thing);
 
 		if (!ok_player_name(buff) || !badname_check(buff))
 		{
@@ -219,7 +220,7 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			XFREE(buff);
 			return;
 		}
-		else if (string_compare(buff, Name(thing)) && (lookup_player(NOTHING, buff, 0) != NOTHING))
+		else if (string_compare(buff, old_name) && (lookup_player(NOTHING, buff, 0) != NOTHING))
 		{
 			/*
 			 * string_compare allows changing foo to Foo, etc.
@@ -241,7 +242,7 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			raw_broadcast(WIZARD, "[Suspect] %s renamed to %s", Name(thing), buff);
 		}
 
-		delete_player_name(thing, Name(thing));
+		delete_player_name(thing, old_name);
 		s_Name(thing, buff);
 		add_player_name(thing, Name(thing));
 
@@ -305,6 +306,13 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	tmp_buf = XSTRDUP(list, "tmp_buf");
 	for (n_aliases = 0, p = strtok_r(tmp_buf, ";", &tokp); p; p = strtok_r(NULL, ";", &tokp))
 	{
+		/* Skip empty or whitespace-only tokens early to reduce work */
+		char *t = trim_spaces(p);
+		if (!*t)
+		{
+			XFREE(t);
+			continue;
+		}
 		if (n_aliases >= (int)(LBUF_SIZE / 2))
 		{
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Too many aliases specified (limit %d).", mushconf.max_player_aliases);
@@ -318,7 +326,7 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 			break;
 		}
 
-		alias_ptrs[n_aliases++] = trim_spaces(p);
+		alias_ptrs[n_aliases++] = t;
 	}
 	XFREE(tmp_buf);
 
