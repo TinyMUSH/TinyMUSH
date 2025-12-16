@@ -30,7 +30,7 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	char *to;
 	int hush = 0;
 
-	if (((Fixed(player)) || (Fixed(Owner(player)))) && !(Tel_Anywhere(player)))
+	if (((Fixed(player)) || (Fixed(Owner(player)) && Owner(player) != NOTHING)) && !(Tel_Anywhere(player)))
 	{
 		notify(player, mushconf.fixed_tel_msg);
 		return;
@@ -79,7 +79,8 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 
 	if (isExit(victim))
 	{
-		if ((Location(victim) != NOTHING) && !Controls(player, victim) && !Controls(player, Exits(victim)))
+		dbref victim_loc = Location(victim);
+		if ((victim_loc != NOTHING) && !Controls(player, victim) && !Controls(player, Exits(victim)))
 		{
 			notify_quiet(player, NOPERM_MESSAGE);
 			return;
@@ -242,7 +243,7 @@ void do_force_prefixed(dbref player, dbref cause, int key, char *command, char *
 	char *cp;
 	cp = parse_to(&command, ' ', 0);
 
-	if (!command)
+	if (!cp || !command)
 	{
 		return;
 	}
@@ -371,6 +372,11 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	 * notify people
 	 */
 	loc = Location(victim);
+	if (!Good_obj(loc))
+	{
+		notify_quiet(player, "Cannot toad player in invalid location.");
+		return;
+	}
 	buf = XMALLOC(MBUF_SIZE, "buf");
 	if (!buf)
 	{
@@ -865,8 +871,11 @@ void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char 
 	{
 		mushconf.control_flags |= flagvalue;
 		name = log_getname(player);
-		log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s enabled: %s", name, flag);
-		XFREE(name);
+		if (name)
+		{
+			log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s enabled: %s", name, flag);
+			XFREE(name);
+		}
 
 		if (!Quiet(player))
 		{
@@ -877,8 +886,11 @@ void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char 
 	{
 		mushconf.control_flags &= ~flagvalue;
 		name = log_getname(player);
-		log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s disabled: %s", name, flag);
-		XFREE(name);
+		if (name)
+		{
+			log_write(LOG_CONFIGMODS, "CFG", "GLOBAL", "%s disabled: %s", name, flag);
+			XFREE(name);
+		}
 
 		if (!Quiet(player))
 		{
