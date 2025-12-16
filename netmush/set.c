@@ -121,7 +121,13 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 		}
 	}
 
-	if (!Wizard(player) && !(Controls(player, thing)) && !(check_zone_for_player(player, thing)) && !(db[player].owner == db[thing].owner))
+	/* Cache common permission checks for clarity and minor performance gains */
+	int is_wiz = Wizard(player);
+	int controls_thing = Controls(player, thing);
+	int same_owner_thing = (db[player].owner == db[thing].owner);
+	int player_ok_in_zone = check_zone_for_player(player, thing);
+
+	if (!is_wiz && !controls_thing && !player_ok_in_zone && !same_owner_thing)
 	{
 		notify(player, "You don't have the power to shift reality.");
 		return;
@@ -131,7 +137,10 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	 * a player may change an object's zone to NOTHING or to an object he
 	 * * owns
 	 */
-	if ((zone != NOTHING) && !Wizard(player) && !(Controls(player, zone)) && !(db[player].owner == db[zone].owner))
+	int controls_zone = (zone != NOTHING) ? Controls(player, zone) : 0;
+	int same_owner_zone = (zone != NOTHING) ? (db[player].owner == db[zone].owner) : 0;
+
+	if ((zone != NOTHING) && !is_wiz && !controls_zone && !same_owner_zone)
 	{
 		notify(player, "You cannot move that object to that zone.");
 		return;
@@ -141,7 +150,10 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	 * only rooms may be zoned to other rooms
 	 */
 
-	if ((zone != NOTHING) && (Typeof(zone) == TYPE_ROOM) && Typeof(thing) != TYPE_ROOM)
+	int zone_is_room = (zone != NOTHING) ? (Typeof(zone) == TYPE_ROOM) : 0;
+	int thing_is_room = (Typeof(thing) == TYPE_ROOM);
+
+	if (zone != NOTHING && zone_is_room && !thing_is_room)
 	{
 		notify(player, "Only rooms may have parent rooms.");
 		return;
@@ -242,7 +254,13 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 			raw_broadcast(WIZARD, "[Suspect] %s renamed to %s", Name(thing), buff);
 		}
 
-		delete_player_name(thing, old_name);
+		/* delete_player_name expects a mutable string; duplicate safely */
+		if (old_name)
+		{
+			char *old_name_mut = XSTRDUP((char *)old_name, "do_name old_name_mut");
+			delete_player_name(thing, old_name_mut);
+			XFREE(old_name_mut);
+		}
 		s_Name(thing, buff);
 		add_player_name(thing, Name(thing));
 
