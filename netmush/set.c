@@ -111,12 +111,7 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 			return;
 		}
 
-		/* Prevent self-zoning to avoid cycles */
-		if (zone == thing)
-		{
-			notify(player, "You cannot set an object's zone to itself.");
-			return;
-		}
+		/* Allow self-zoning per TinyMUSH semantics (policy choice) */
 
 		if ((Typeof(zone) != TYPE_THING) && (Typeof(zone) != TYPE_ROOM))
 		{
@@ -154,6 +149,7 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	/*
 	 * everything is okay, do the change
 	 */
+	/* Policy: permit self-zoning; no final guard */
 	s_Zone(thing, zone);
 
 	if (Typeof(thing) != TYPE_PLAYER)
