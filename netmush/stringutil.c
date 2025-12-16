@@ -402,8 +402,28 @@ int ansiBits(int num)
  */
 char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 {
-	char *buf, *p;
+	char *buf, *p, *end;
 	p = buf = XMALLOC(LBUF_SIZE, "buf");
+	end = buf + LBUF_SIZE - 1;
+
+#define APPEND_CH(ch)    \
+	do                   \
+	{                    \
+		if (p < end)     \
+		{                \
+			*p++ = (ch); \
+		}                \
+	} while (0)
+
+#define APPEND_STR(str)             \
+	do                              \
+	{                               \
+		const char *tmp__ = (str);  \
+		while (*tmp__ && (p < end)) \
+		{                           \
+			*p++ = *tmp__++;        \
+		}                           \
+	} while (0)
 
 	if (s && *s)
 	{
@@ -415,7 +435,7 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 				if (truecolors)
 				{
 					// Player support everything, just shove it and continue
-					*p++ = *s++;
+					APPEND_CH(*s++);
 				}
 				else
 				{
@@ -425,52 +445,46 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 					{
 						char *t = NULL;
 						// Player support xterm colors, convert to xterm
-						*p++ = '\e';
-						*p++ = '[';
+						APPEND_CH('\e');
+						APPEND_CH('[');
 
 						if (attr.foreground.type)
 						{
 							t = XASPRINTF("level_ansi.t", "38;5;%d", RGB2X11(attr.foreground.rgb));
-							while (*t)
-							{
-								*p++ = *t++;
-							}
+							APPEND_STR(t);
 							XFREE(t);
 
 							if (attr.background.type)
 							{
-								*p++ = ';';
+								APPEND_CH(';');
 							}
 						}
 
 						if (attr.background.type)
 						{
 							t = XASPRINTF("level_ansi.t", "48;5;%d", RGB2X11(attr.background.rgb));
-							while (*t)
-							{
-								*p++ = *t++;
-							}
+							APPEND_STR(t);
 							XFREE(t);
 
 							if (attr.reset)
 							{
-								*p++ = ';';
+								APPEND_CH(';');
 							}
 						}
 
 						if (attr.reset)
 						{
-							*p++ = '0';
+							APPEND_CH('0');
 						}
-						*p++ = 'm';
+						APPEND_CH('m');
 					}
 					else if (ansi)
 					{
 						// Player support ansi colors, convert to ansi
 						char *t = NULL;
 						// Player support xterm colors, convert to xterm
-						*p++ = '\e';
-						*p++ = '[';
+						APPEND_CH('\e');
+						APPEND_CH('[');
 
 						if (attr.foreground.type)
 						{
@@ -484,15 +498,12 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 								f += 82;
 							}
 							t = XASPRINTF("level_ansi.t", "%d", f);
-							while (*t)
-							{
-								*p++ = *t++;
-							}
+							APPEND_STR(t);
 							XFREE(t);
 
 							if (attr.background.type)
 							{
-								*p++ = ';';
+								APPEND_CH(';');
 							}
 						}
 
@@ -508,34 +519,34 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 								b += 92;
 							}
 							t = XASPRINTF("level_ansi.t", "%d", b);
-							while (*t)
-							{
-								*p++ = *t++;
-							}
+							APPEND_STR(t);
 							XFREE(t);
 
 							if (attr.reset)
 							{
-								*p++ = ';';
+								APPEND_CH(';');
 							}
 						}
 
 						if (attr.reset)
 						{
-							*p++ = '0';
+							APPEND_CH('0');
 						}
 
-						*p++ = 'm';
+						APPEND_CH('m');
 					}
 				}
 			}
 			else
 			{
-				*p++ = *s++;
+				APPEND_CH(*s++);
 			}
 		}
 		*p = '\0';
 	}
+
+#undef APPEND_CH
+#undef APPEND_STR
 
 	return buf;
 }
@@ -1318,8 +1329,16 @@ char *remap_colors(const char *s, int *cmap)
 
 	if (!s || !*s || !cmap)
 	{
-		XSTRNCPY(buf, s, LBUF_SIZE);
-		buf[LBUF_SIZE] = '\0';
+		if (s)
+		{
+			XSTRNCPY(buf, s, LBUF_SIZE - 1);
+			buf[LBUF_SIZE - 1] = '\0';
+		}
+		else
+		{
+			buf[0] = '\0';
+		}
+
 		return (buf);
 	}
 
@@ -1466,7 +1485,9 @@ char *translate_string(char *str, int type)
 					} while (0);
 				}
 
-				SAFE_LB_STR(ansi_transition_mushcode(ansi_state_prev, ansi_state), buff, &bp);
+				char *transition = ansi_transition_mushcode(ansi_state_prev, ansi_state);
+				SAFE_LB_STR(transition, buff, &bp);
+				XFREE(transition);
 				ansi_state_prev = ansi_state;
 				continue;
 
@@ -1891,7 +1912,7 @@ char *upcasestr(char *s)
 
 	for (p = s; p && *p; p++)
 	{
-		*p = toupper(*p);
+		*p = toupper((unsigned char)*p);
 	}
 
 	return s;
@@ -2768,8 +2789,15 @@ char *ltos(long num)
 	unsigned long anum;
 	p = buf = XMALLOC(SBUF_SIZE, "ltos_buf");
 	destp = dest = XMALLOC(SBUF_SIZE, "ltos_dest");
-	/* absolute value */
-	anum = (num < 0) ? -num : num;
+	/* absolute value (avoid undefined behavior on LONG_MIN) */
+	if (num < 0)
+	{
+		anum = (unsigned long)(-(num + 1)) + 1;
+	}
+	else
+	{
+		anum = (unsigned long)num;
+	}
 
 	/* build up the digits backwards by successive division */
 	while (anum > 9)
@@ -2816,6 +2844,15 @@ char *repeatchar(int count, char ch)
 {
 	char *str, *ptr;
 	ptr = str = XMALLOC(LBUF_SIZE, "repeatchar_ptr");
+
+	if (count < 0)
+	{
+		count = 0;
+	}
+	else if (count >= LBUF_SIZE)
+	{
+		count = LBUF_SIZE - 1;
+	}
 
 	if (count > 0)
 	{
@@ -2961,10 +2998,21 @@ void track_ansi_letters(char *t, int *ansi_state)
 				++s;
 			}
 
+			if (*s == '>')
+			{
+				++s;
+			}
+
 			break;
 		default:
-			*ansi_state = ((*ansi_state & ~ansiBitsMask(ansiNum((unsigned char)*s))) | ansiBits(ansiNum((unsigned char)*s)));
+		{
+			int ansi_code = ansiNum((unsigned char)*s);
+			if (ansi_code != 0)
+			{
+				*ansi_state = ((*ansi_state & ~ansiBitsMask(ansi_code)) | ansiBits(ansi_code));
+			}
 			++s;
+		}
 		}
 	}
 }
