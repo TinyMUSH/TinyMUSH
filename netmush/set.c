@@ -305,15 +305,18 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	int i, j, n_aliases, retcode;
 	char *tmp_buf, *cpa__p, *cpa__tokp, *p, *tokp, *alias_ptrs[LBUF_SIZE / 2];
 	char *alias_buf = XMALLOC(LBUF_SIZE, "alias_buf");
+	char *oldalias_copy;
 	/*
 	 * Clear out the original alias, so we can rewrite a new alias
 	 * * that uses the same names, if necessary.
 	 */
 
-	for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
+	oldalias_copy = XSTRDUP(oldalias, "oldalias_copy");
+	for (cpa__p = strtok_r(oldalias_copy, ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
 	{
 		delete_player_name((target), cpa__p);
 	}
+	XFREE(oldalias_copy);
 
 	/*
 	 * Don't nibble the original buffer. Copy it all into an array, because
@@ -331,12 +334,6 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 			XFREE(t);
 			continue;
 		}
-		if (n_aliases >= (int)(LBUF_SIZE / 2))
-		{
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Too many aliases specified (limit %d).", mushconf.max_player_aliases);
-			retcode = 0;
-			break;
-		}
 		if (n_aliases >= mushconf.max_player_aliases)
 		{
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You cannot have more than %d aliases.", mushconf.max_player_aliases);
@@ -347,16 +344,6 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 		alias_ptrs[n_aliases++] = t;
 	}
 	XFREE(tmp_buf);
-
-	/*
-	 * Enforce a maximum number of aliases.
-	 */
-
-	if (n_aliases > mushconf.max_player_aliases)
-	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "You cannot have more than %d aliases.", mushconf.max_player_aliases);
-		retcode = 0;
-	}
 
 	/*
 	 * Enforce player name regulations.
@@ -492,17 +479,22 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 			 * doing &ALIAS and bypassing the player name checks.
 			 */
 			notify_quiet(player, NOPERM_MESSAGE);
+			XFREE(trimalias);
+			XFREE(oldalias);
 		}
 		else if (!*trimalias)
 		{
 			/*
 			 * New alias is null, just clear it
 			 */
+			char *oldalias_copy = XSTRDUP(oldalias, "oldalias_copy");
 
-			for (cpa__p = strtok_r((oldalias), ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
+			for (cpa__p = strtok_r(oldalias_copy, ";", &cpa__tokp); cpa__p; cpa__p = strtok_r(NULL, ";", &cpa__tokp))
 			{
 				delete_player_name((thing), cpa__p);
 			}
+
+			XFREE(oldalias_copy);
 
 			atr_clr(thing, A_ALIAS);
 
@@ -510,6 +502,9 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 			{
 				notify_quiet(player, "Alias removed.");
 			}
+
+			XFREE(trimalias);
+			XFREE(oldalias);
 		}
 		else
 		{
@@ -517,10 +512,9 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
 			 * Remove the old name and add the new name
 			 */
 			set_player_aliases(player, thing, oldalias, trimalias, aflags);
+			XFREE(trimalias);
+			XFREE(oldalias);
 		}
-
-		XFREE(trimalias);
-		XFREE(oldalias);
 	}
 	else
 	{
@@ -683,7 +677,7 @@ void do_unlock(dbref player, __attribute__((unused)) dbref cause, int key, char 
 				aflags &= ~AF_LOCK;
 				atr_set_flags(thing, atr, aflags);
 
-				if (Owner(player != Owner(thing)))
+				if (Owner(player) != Owner(thing))
 					if (!Quiet(player) && !Quiet(thing))
 						notify_quiet(player, "Attribute unlocked.");
 			}
@@ -953,66 +947,74 @@ void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	{
 		notify_quiet(player, "Players always own themselves.");
 	}
-	else if (((!controls(player, thing) && !Chown_Any(player) && !(Chown_ok(thing) && could_doit(player, thing, A_LCHOWN))) || (isThing(thing) && (Location(thing) != player) && !Chown_Any(player))) || (!controls(player, owner) && !Chown_Any(player)) || God(thing))
+	else
 	{
-		notify_quiet(player, NOPERM_MESSAGE);
-	}
-	else if (canpayfees(player, owner, cost, quota, Typeof(thing)))
-	{
-		payfees(owner, cost, quota, Typeof(thing));
-		payfees(Owner(thing), -cost, -quota, Typeof(thing));
+		/* Permission checks broken down for clarity */
+		int can_control_thing = controls(player, thing) || Chown_Any(player) || (Chown_ok(thing) && could_doit(player, thing, A_LCHOWN));
+		int thing_not_held = isThing(thing) && (Location(thing) != player) && !Chown_Any(player);
+		int can_control_owner = controls(player, owner) || Chown_Any(player);
 
-		if (God(player))
+		if (!can_control_thing || thing_not_held || !can_control_owner || God(thing))
 		{
-			s_Owner(thing, owner);
+			notify_quiet(player, NOPERM_MESSAGE);
 		}
-		else
+		else if (canpayfees(player, owner, cost, quota, Typeof(thing)))
 		{
-			s_Owner(thing, Owner(owner));
-		}
+			payfees(owner, cost, quota, Typeof(thing));
+			payfees(Owner(thing), -cost, -quota, Typeof(thing));
 
-		atr_chown(thing);
-
-		/*
-		 * If we're not stripping flags, and we're God, don't strip the
-		 * * WIZARD flag. Otherwise, do that, at least.
-		 */
-		if (key & CHOWN_NOSTRIP)
-		{
 			if (God(player))
 			{
-				s_Flags(thing, (Flags(thing) & ~CHOWN_OK) | HALT);
+				s_Owner(thing, owner);
 			}
 			else
 			{
-				s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | WIZARD)) | HALT);
+				s_Owner(thing, Owner(owner));
 			}
+
+			atr_chown(thing);
+
+			/*
+			 * If we're not stripping flags, and we're God, don't strip the
+			 * * WIZARD flag. Otherwise, do that, at least.
+			 */
+			if (key & CHOWN_NOSTRIP)
+			{
+				if (God(player))
+				{
+					s_Flags(thing, (Flags(thing) & ~CHOWN_OK) | HALT);
+				}
+				else
+				{
+					s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | WIZARD)) | HALT);
+				}
+			}
+			else
+			{
+				s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | mushconf.stripped_flags.word1)) | HALT);
+				s_Flags2(thing, (Flags2(thing) & ~(mushconf.stripped_flags.word2)));
+				s_Flags3(thing, (Flags3(thing) & ~(mushconf.stripped_flags.word3)));
+			}
+
+			/*
+			 * Powers are only preserved by God with nostrip
+			 */
+
+			if (!(key & CHOWN_NOSTRIP) || !God(player))
+			{
+				s_Powers(thing, 0);
+				s_Powers2(thing, 0);
+			}
+
+			halt_que(NOTHING, thing);
+
+			if (!Quiet(player))
+			{
+				notify_quiet(player, "Owner changed.");
+			}
+
+			s_Modified(thing);
 		}
-		else
-		{
-			s_Flags(thing, (Flags(thing) & ~(CHOWN_OK | mushconf.stripped_flags.word1)) | HALT);
-			s_Flags2(thing, (Flags2(thing) & ~(mushconf.stripped_flags.word2)));
-			s_Flags3(thing, (Flags3(thing) & ~(mushconf.stripped_flags.word3)));
-		}
-
-		/*
-		 * Powers are only preserved by God with nostrip
-		 */
-
-		if (!(key & CHOWN_NOSTRIP) || !God(player))
-		{
-			s_Powers(thing, 0);
-			s_Powers2(thing, 0);
-		}
-
-		halt_que(NOTHING, thing);
-
-		if (!Quiet(player))
-		{
-			notify_quiet(player, "Owner changed.");
-		}
-
-		s_Modified(thing);
 	}
 }
 
@@ -1294,20 +1296,19 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	dbref oldthing;
 	char **newthings, **newattrs, *tp;
 	ATTR *oldattr;
-	char *s = XMALLOC(MBUF_SIZE, "s");
-	;
+	char *s;
 
 	if (!*oldpair || !**newpair || !oldpair || !*newpair)
 	{
-		XFREE(s);
 		return;
 	}
 
 	if (nargs < 1)
 	{
-		XFREE(s);
 		return;
 	}
+
+	s = XMALLOC(MBUF_SIZE, "s");
 
 	/*
 	 * newpair gets whacked to bits by parse_to(). Do it just once.
@@ -1834,7 +1835,6 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	int attr, got_one, aflags, alen;
 	int could_hear;
 	ATTR *ap;
-	char *atext;
 	olist_push();
 
 	if (!it || !*it || !parse_attrib_wild(player, it, &thing, 0, 0, 1, 1))
@@ -1848,7 +1848,6 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	 * Iterate through matching attributes, zapping the writable ones
 	 */
 	got_one = 0;
-	atext = XMALLOC(LBUF_SIZE, "atext");
 	could_hear = Hearer(thing);
 
 	for (attr = olist_first(); attr != NOTHING; attr = olist_next())
@@ -1857,11 +1856,6 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 		if (ap)
 		{
-			/*
-			 * Get the attr and make sure we can modify it.
-			 */
-			atr_get_str(atext, thing, ap->number, &aowner, &aflags, &alen);
-
 			if (Set_attr(player, thing, ap, aflags))
 			{
 				atr_clr(thing, ap->number);
@@ -1873,7 +1867,6 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	/*
 	 * Clean up
 	 */
-	XFREE(atext);
 	olist_pop();
 
 	if (!got_one)
