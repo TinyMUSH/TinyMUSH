@@ -163,9 +163,8 @@ void cache_reset(void)
      */
     db_lock();
 
-    for (x = 0; x < cwidth; x++, sp++)
+    for (x = 0, sp = sys_c; x < cwidth; x++, sp++)
     {
-        sp = &sys_c[x];
 
         /*
          * traverse the chain
@@ -409,7 +408,7 @@ UDB_DATA cache_get(UDB_DATA key, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
+        if ((type == cp->type) && (cp->keylen == key.dsize) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
             if (!mushstate.standalone && !mushstate.dumping)
             {
@@ -679,7 +678,7 @@ int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
+        if ((type == cp->type) && (cp->keylen == key.dsize) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
             if (!mushstate.dumping)
             {
@@ -911,6 +910,12 @@ UDB_CACHE *get_free_entry(int atrsize)
         }
 
         cp = NULL;
+
+        if (freelist->head == NULL)
+        {
+            /* Nothing left to evict; proceed even if this entry exceeds the target size. */
+            break;
+        }
     }
 
     /*
@@ -1077,7 +1082,7 @@ void cache_del(UDB_DATA key, unsigned int type)
 
     for (cp = sp->head; cp != NULL; cp = cp->nxt)
     {
-        if ((type == cp->type) && !memcmp(key.dptr, cp->keydata, key.dsize))
+        if ((type == cp->type) && (cp->keylen == key.dsize) && !memcmp(key.dptr, cp->keydata, key.dsize))
         {
             if (cp->nxtfree == (UDB_CACHE *)0)
             {
