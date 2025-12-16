@@ -464,7 +464,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 			raw_broadcast(WIZARD, "%s %s", Name(player), message);
 		}
 		else
+		{
 			raw_broadcast(WIZARD, "Broadcast: %s %s", Name(player), message);
+		}
 
 		name = log_getname(player);
 		buf2 = strip_ansi(message);
@@ -520,7 +522,6 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	dbref aowner;
 	int aflags, alen;
 	char *str, *str2, *buf, *bp;
-	struct tm *tp;
 	time_t t;
 	char *dflt = XMALLOC(LBUF_SIZE, "dflt");
 	char *s;
@@ -670,15 +671,12 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 		}
 		else
 		{
-			for (n_dbrefs = 1, str = dbref_list;; n_dbrefs++)
+			n_dbrefs = 1;
+			for (str = dbref_list; *str; str++)
 			{
-				if ((str = strchr(str, ' ')) != NULL)
+				if (*str == ' ')
 				{
-					str++;
-				}
-				else
-				{
-					break;
+					n_dbrefs++;
 				}
 			}
 
@@ -702,6 +700,23 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 				 * Eliminate ourselves from repeat and reply pages
 				 */
 				if (target == player)
+				{
+					continue;
+				}
+
+				/*
+				 * Skip duplicates so we don't page the same player multiple times
+				 */
+				for (i = 0; i < count; i++)
+				{
+					if (dbrefs_array[i] == target)
+					{
+						target = NOTHING;
+						break;
+					}
+				}
+
+				if (target == NOTHING)
 				{
 					continue;
 				}
@@ -747,6 +762,20 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 			{
 				if ((target = lookup_player(player, tnp, 1)) != NOTHING)
 				{
+					for (i = 0; i < count; i++)
+					{
+						if (dbrefs_array[i] == target)
+						{
+							target = NOTHING;
+							break;
+						}
+					}
+
+					if (target == NOTHING)
+					{
+						continue;
+					}
+
 					dbrefs_array[count] = target;
 					count++;
 				}
@@ -999,26 +1028,16 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 	 * thereafter. The list is destructively modified.
 	 */
 	char *p, *tokst;
-	dbref who, *recips;
-	int n_recips, r, ok_to_do;
+	dbref who;
+	int ok_to_do;
+	char *seen;
 
 	if (!message || !*message || !list || !*list)
 	{
 		return;
 	}
 
-	n_recips = 1;
-
-	for (p = list; *p; ++p)
-	{
-		if (*p == ' ')
-		{
-			++n_recips;
-		}
-	}
-
-	recips = (dbref *)XCALLOC(n_recips, sizeof(dbref), "recips");
-	n_recips = 0;
+	seen = (char *)XCALLOC(mushstate.db_top + 1, sizeof(char), "pemit_seen");
 
 	for (p = strtok_r(list, " ", &tokst); p != NULL; p = strtok_r(NULL, " ", &tokst))
 	{
@@ -1042,18 +1061,15 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 				continue;
 			}
 
+			if ((who < 0) || (who > mushstate.db_top))
+			{
+				continue;
+			}
+
 			/*
 			 * avoid pemitting to this dbref if already done
 			 */
-			for (r = 0; r < n_recips; ++r)
-			{
-				if (recips[r] == who)
-				{
-					break;
-				}
-			}
-
-			if (r < n_recips)
+			if (seen[who])
 			{
 				continue;
 			}
@@ -1104,12 +1120,11 @@ void do_pemit_list(dbref player, char *list, const char *message, int do_content
 			/*
 			 * avoid pemitting to this dbref again
 			 */
-			recips[n_recips] = who;
-			++n_recips;
+			seen[who] = 1;
 		}
 	}
 
-	XFREE(recips);
+	XFREE(seen);
 }
 
 void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *recipient, char *message)
