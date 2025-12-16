@@ -97,14 +97,21 @@ int check_literals(char *tstr, char *dstr)
 
 	while ((ep >= dstr) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
 	{
-		/* Handle escape: if xp is escape, check next char (xp-1) */
+		/* Handle escape: if xp is escape, check next char (xp-1), then decrement xp only once */
 		if (*xp == '\\')
 		{
-			if (xp > tstr && ((*ep != *(xp - 1)) && (tolower(*ep) != tolower(*(xp - 1)))))
+			if (xp > tstr)
 			{
-				return 0;
+				xp--; /* Move to escaped char */
+				if ((*ep != *xp) && (tolower(*ep) != tolower(*xp)))
+				{
+					return 0;
+				}
 			}
-			xp--;
+			else
+			{
+				return 0; /* Escape at start of pattern is invalid */
+			}
 		}
 		else if ((*ep != *xp) && (tolower(*ep) != tolower(*xp)))
 		{
@@ -116,6 +123,11 @@ int check_literals(char *tstr, char *dstr)
 	}
 
 	ep++;
+	/* Validate ep is still in bounds */
+	if (ep < data || ep >= data + LBUF_SIZE)
+	{
+		return 0;
+	}
 	*ep = '\0';
 	/*
 	 * Walk the pattern string. Use the wildcard characters as delimiters,
@@ -143,6 +155,12 @@ int check_literals(char *tstr, char *dstr)
 			if (*tstr == '\\')
 			{
 				tstr++;
+			}
+
+			/* Bounds check: prevent pattern overflow */
+			if (p - pattern >= LBUF_SIZE - 1)
+			{
+				return 0; /* Pattern literal too long */
 			}
 
 			*p = tolower(*tstr);
@@ -280,6 +298,10 @@ int real_quick_wild(char *tstr, char *dstr)
 	if (*tstr == '\\')
 	{
 		tstr++;
+		if (*tstr)
+		{
+			tstr++; /* Skip the escaped character */
+		}
 	}
 
 	/*
@@ -612,8 +634,9 @@ int wild1(char *tstr, char *dstr, int arg)
 
 	mushstate.wild_times_lev = 0;
 	st = real_wild1(tstr, dstr, arg);
+	mushstate.wild_times_lev = 0; /* Always reset */
 
-	if ((st < 0) && (mushstate.wild_times_lev > mushconf.wild_times_lim))
+	if (st < 0)
 	{
 		return 0;
 	}
@@ -811,6 +834,10 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 	i = 0;
 	scan = tstr;
 	buff = XMALLOC(LBUF_SIZE, "buff");
+	if (!buff)
+	{
+		return 0; /* Allocation failed */
+	}
 	p = buff;
 
 	while (*scan)
