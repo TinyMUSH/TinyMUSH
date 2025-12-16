@@ -579,7 +579,8 @@ char *strip_ansi(const char *s)
 
 		while (*s1)
 		{
-			*p++ = *s1++;
+			SAFE_LB_CHR(*s1, buf, &p);
+			++s1;
 
 			while (*s1 == ESC_CHAR)
 			{
@@ -660,7 +661,8 @@ char *strip_xterm(char *s)
 
 		if (*s1)
 		{
-			*p++ = *s1++;
+			SAFE_LB_CHR(*s1, buf, &p);
+			++s1;
 		}
 		else
 		{
@@ -739,7 +741,8 @@ char *strip_24bit(char *s)
 
 		if (*s1)
 		{
-			*p++ = *s1++;
+			SAFE_LB_CHR(*s1, buf, &p);
+			++s1;
 		}
 		else
 		{
@@ -1975,7 +1978,8 @@ char *munge_space(char *string)
 	{
 		while (*p && !isspace((unsigned char)*p))
 		{
-			*q++ = *p++;
+			SAFE_LB_CHR(*p, buffer, &q);
+			++p;
 		}
 
 		while (*p && isspace((unsigned char)*++p))
@@ -1983,7 +1987,7 @@ char *munge_space(char *string)
 
 		if (*p)
 		{
-			*q++ = ' ';
+			SAFE_LB_CHR(' ', buffer, &q);
 		}
 	}
 
@@ -2017,7 +2021,8 @@ char *trim_spaces(char *string)
 	{
 		while (*p && !isspace((unsigned char)*p))
 		{
-			*q++ = *p++; /* copy nonspace chars */
+			SAFE_LB_CHR(*p, buffer, &q); /* copy nonspace chars */
+			++p;
 		}
 
 		while (*p && isspace((unsigned char)*p))
@@ -2027,7 +2032,7 @@ char *trim_spaces(char *string)
 
 		if (*p)
 		{
-			*q++ = ' '; /* leave one space */
+			SAFE_LB_CHR(' ', buffer, &q); /* leave one space */
 		}
 	}
 
