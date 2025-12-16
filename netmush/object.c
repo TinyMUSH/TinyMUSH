@@ -1806,7 +1806,7 @@ void check_exit_chains(void)
 {
 	for (dbref i = 0; i < ((mushstate.db_top + 7) >> 3); i++)
 	{
-		mushstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits[i] = (char)0x0;
 	}
 
 	for (dbref i = 0; i < mushstate.db_top; i++)
@@ -2057,7 +2057,7 @@ void check_contents_chains(void)
 {
 	for (dbref i = 0; i < ((mushstate.db_top + 7) >> 3); i++)
 	{
-		mushstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits[i] = (char)0x0;
 	}
 
 	for (dbref i = 0; i < mushstate.db_top; i++)

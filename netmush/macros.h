@@ -456,9 +456,9 @@
 #define Controls(p, x) (Good_obj(x) && (!(God(x) && !God(p))) && (Control_All(p) || ((Owner(p) == Owner(x)) && (Inherits(p) || !Inherits(x))) || OnControlLock(p, x)))
 #define Cannot_Objeval(p, x) ((x == NOTHING) || God(x) || (mushconf.fascist_objeval ? !Controls(p, x) : ((Owner(x) != Owner(p)) && !Wizard(p))))
 #define Has_power(p, x) (check_access((p), powers_nametab[x].flag))
-#define Mark(x) (mushstate.markbits->chunk[(x) >> 3] |= mushconf.markdata[(x) & 7])
-#define Unmark(x) (mushstate.markbits->chunk[(x) >> 3] &= ~mushconf.markdata[(x) & 7])
-#define Marked(x) (mushstate.markbits->chunk[(x) >> 3] & mushconf.markdata[(x) & 7])
+#define Mark(x) (mushstate.markbits[(x) >> 3] |= mushconf.markdata[(x) & 7])
+#define Unmark(x) (mushstate.markbits[(x) >> 3] &= ~mushconf.markdata[(x) & 7])
+#define Marked(x) (mushstate.markbits[(x) >> 3] & mushconf.markdata[(x) & 7])
 
 /**
  * @brief Visibility constraints.

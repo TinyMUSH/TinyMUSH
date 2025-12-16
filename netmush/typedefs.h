@@ -1054,10 +1054,10 @@ typedef struct objlist_stack
     dbref citm;                 /*!< Current item for scan */
 } OLSTK;
 
-typedef struct markbuf
-{
-    char chunk[5000];
-} MARKBUF;
+// Mark buffer sized dynamically to (db_size+7)>>3 bytes.
+// Mark buffer stored as a raw byte array sized to (db_size+7)>>3.
+// Previously a fixed-size struct; now a pointer to bytes for correctness.
+typedef char MARKBYTE;
 
 typedef struct alist
 {
@@ -1215,7 +1215,7 @@ typedef struct statedata
     int db_size;                         /*!< Allocated size of db structure */
     unsigned int moduletype_top;         /*!< Highest module DBTYPE */
     int *guest_free;                     /*!< Table to keep track of free guests */
-    MARKBUF *markbits;                   /*!< temp storage for marking/unmarking */
+    MARKBYTE *markbits;                  /*!< temp storage for marking/unmarking */
     int in_loop;                         /*!< In a loop() statement? */
     char *loop_token[MAX_ITER_NESTING];  /*!< Value of ## */
     char *loop_token2[MAX_ITER_NESTING]; /*!< Value of #? */

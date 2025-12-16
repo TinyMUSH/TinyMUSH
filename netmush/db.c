@@ -3068,7 +3068,7 @@ void initialize_objects(dbref first, dbref last)
 void db_grow(dbref newtop)
 {
     int newsize = 0, marksize = 0, delta = 0;
-    MARKBUF *newmarkbuf = NULL;
+    MARKBYTE *newmarkbuf = NULL;
     OBJ *newdb = NULL;
     NAME *newnames = NULL, *newpurenames = NULL;
     char *cp = NULL;
@@ -3299,7 +3299,7 @@ void db_grow(dbref newtop)
      *
      */
     marksize = (newsize + 7) >> 3;
-    newmarkbuf = (MARKBUF *)XMALLOC(marksize, "newmarkbuf");
+    newmarkbuf = (MARKBYTE *)XMALLOC(marksize, "newmarkbuf");
     XMEMSET((char *)newmarkbuf, 0, marksize);
 
     if (mushstate.markbits)

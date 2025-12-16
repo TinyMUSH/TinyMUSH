@@ -21,6 +21,16 @@
 
 #include <ctype.h>
 #include <string.h>
+/* Helper to batch notifications: flush accumulated lines in outbuf */
+static void flush_lines(dbref player, char *outbuf, char **bp)
+{
+	if (*bp > outbuf)
+	{
+		**bp = '\0';
+		notify(player, outbuf);
+		*bp = outbuf;
+	}
+}
 
 /*
  * Bind occurances of the universal var in ACTION to ARG, then run ACTION.
@@ -491,6 +501,15 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 		parm->low_bound = parm->high_bound;
 		parm->high_bound = tmp;
 	}
+	/* Clamp to valid db range */
+	if (parm->low_bound < 0)
+	{
+		parm->low_bound = 0;
+	}
+	if (parm->high_bound >= mushstate.db_top)
+	{
+		parm->high_bound = mushstate.db_top - 1;
+	}
 	/*
 	 * set limits on who we search
 	 */
@@ -887,6 +906,9 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		atext = NULL;
 	}
 
+	/* Reuse a single result buffer across evaluations to reduce churn */
+	result = XMALLOC(LBUF_SIZE, "result");
+
 	for (thing = parm->low_bound; thing <= parm->high_bound; thing++)
 	{
 		mushstate.func_invk_ctr = save_invk_ctr;
@@ -990,18 +1012,15 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 
 			XSPRINTF(buff, "#%d", thing);
 			buff2 = replace_string(BOUND_VAR, buff, parm->s_rst_eval);
-			result = bp = XMALLOC(LBUF_SIZE, "result");
+			bp = result;
 			str = buff2;
 			eval_expression_string(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, (char **)NULL, 0);
 			XFREE(buff2);
 
 			if (!*result || !xlate(result))
 			{
-				XFREE(result);
 				continue;
 			}
-
-			XFREE(result);
 		}
 
 		if (parm->s_rst_ufuntxt != NULL)
@@ -1012,18 +1031,15 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 			}
 
 			XSPRINTF(buff, "#%d", thing);
-			result = bp = XMALLOC(LBUF_SIZE, "result");
+			bp = result;
 			XSTRCPY(atext, parm->s_rst_ufuntxt);
 			str = atext;
 			eval_expression_string(result, &bp, player, cause, cause, EV_FCHECK | EV_EVAL | EV_NOTRACE, &str, &buff, 1);
 
 			if (!*result || !xlate(result))
 			{
-				XFREE(result);
 				continue;
 			}
-
-			XFREE(result);
 		}
 
 		/*
@@ -1044,6 +1060,7 @@ void search_perform(dbref player, dbref cause, SEARCH *parm)
 		XFREE(parm->s_rst_ufuntxt);
 	}
 
+	XFREE(result);
 	mushstate.func_invk_ctr = save_invk_ctr;
 }
 
@@ -1129,6 +1146,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1145,10 +1163,16 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			}
 
 			buff = unparse_object(player, thing, 0);
-			notify(player, buff);
+			SAFE_LB_STR(buff, outbuf, &bp);
+			SAFE_LB_CHR('\n', outbuf, &bp);
 			XFREE(buff);
+			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+			{
+				flush_lines(player, outbuf, &bp);
+			}
 			rcount++;
 		}
+		flush_lines(player, outbuf, &bp);
 	}
 
 	/*
@@ -1157,6 +1181,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_EXIT || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1179,18 +1204,36 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
 			SAFE_LB_STR((char *)" [from ", outbuf, &bp);
-			buff = unparse_object(player, from, 0);
-			SAFE_LB_STR(((from == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
-			XFREE(buff);
+			if (from == NOTHING)
+			{
+				SAFE_LB_STR((char *)"NOWHERE", outbuf, &bp);
+			}
+			else
+			{
+				buff = unparse_object(player, from, 0);
+				SAFE_LB_STR(buff, outbuf, &bp);
+				XFREE(buff);
+			}
 			SAFE_LB_STR((char *)" to ", outbuf, &bp);
-			buff = unparse_object(player, to, 0);
-			SAFE_LB_STR(((to == NOTHING) ? "NOWHERE" : buff), outbuf, &bp);
-			XFREE(buff);
+			if (to == NOTHING)
+			{
+				SAFE_LB_STR((char *)"NOWHERE", outbuf, &bp);
+			}
+			else
+			{
+				buff = unparse_object(player, to, 0);
+				SAFE_LB_STR(buff, outbuf, &bp);
+				XFREE(buff);
+			}
 			SAFE_LB_CHR(']', outbuf, &bp);
-			*bp = '\0';
-			notify(player, outbuf);
+			SAFE_LB_CHR('\n', outbuf, &bp);
+			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+			{
+				flush_lines(player, outbuf, &bp);
+			}
 			ecount++;
 		}
+		flush_lines(player, outbuf, &bp);
 	}
 
 	/*
@@ -1199,6 +1242,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_THING || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1223,10 +1267,14 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
 			SAFE_LB_CHR(']', outbuf, &bp);
-			*bp = '\0';
-			notify(player, outbuf);
+			SAFE_LB_CHR('\n', outbuf, &bp);
+			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+			{
+				flush_lines(player, outbuf, &bp);
+			}
 			tcount++;
 		}
+		flush_lines(player, outbuf, &bp);
 	}
 
 	/*
@@ -1235,6 +1283,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_GARBAGE || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1259,10 +1308,14 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			SAFE_LB_STR(buff, outbuf, &bp);
 			XFREE(buff);
 			SAFE_LB_CHR(']', outbuf, &bp);
-			*bp = '\0';
-			notify(player, outbuf);
+			SAFE_LB_CHR('\n', outbuf, &bp);
+			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+			{
+				flush_lines(player, outbuf, &bp);
+			}
 			gcount++;
 		}
+		flush_lines(player, outbuf, &bp);
 	}
 
 	/*
@@ -1271,6 +1324,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_PLAYER || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1300,10 +1354,14 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				SAFE_LB_CHR(']', outbuf, &bp);
 			}
 
-			*bp = '\0';
-			notify(player, outbuf);
+			SAFE_LB_CHR('\n', outbuf, &bp);
+			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+			{
+				flush_lines(player, outbuf, &bp);
+			}
 			pcount++;
 		}
+		flush_lines(player, outbuf, &bp);
 	}
 
 	/*
@@ -1328,37 +1386,47 @@ void do_search(dbref player, dbref cause, int key, char *arg)
  * do_floaters: Report floating rooms.
  */
 
-void mark_place(dbref loc)
+/* Iterative marking to avoid deep recursion on complex exit graphs */
+void mark_place(dbref start)
 {
-	dbref exit;
-
-	/*
-	 * If already marked, exit.  Otherwise set marked.
-	 */
-
-	if (!Good_obj(loc))
+	if (!Good_obj(start))
 	{
 		return;
 	}
 
-	if (Marked(loc))
+	/* Simple stack for DFS */
+	dbref *stack = (dbref *)XMALLOC(sizeof(dbref) * mushstate.db_top, "mark_stack");
+	int sp = 0;
+
+	stack[sp++] = start;
+
+	while (sp > 0)
 	{
-		return;
-	}
-
-	Mark(loc);
-
-	/*
-	 * Visit all places you can get to via exits from here.
-	 */
-
-	for (exit = Exits(loc); exit != NOTHING; exit = Next(exit))
-	{
-		if (Good_obj(Location(exit)))
+		dbref loc = stack[--sp];
+		if (!Good_obj(loc))
 		{
-			mark_place(Location(exit));
+			continue;
+		}
+		if (Marked(loc))
+		{
+			continue;
+		}
+		Mark(loc);
+
+		for (dbref ex = Exits(loc); ex != NOTHING; ex = Next(ex))
+		{
+			dbref dest = Location(ex);
+			if (Good_obj(dest) && !Marked(dest))
+			{
+				if (sp < mushstate.db_top)
+				{
+					stack[sp++] = dest;
+				}
+			}
 		}
 	}
+
+	XFREE(stack);
 }
 
 void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
@@ -1419,7 +1487,7 @@ void do_floaters(dbref player, __attribute__((unused)) dbref cause, int key, cha
 	 */
 	for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 	{
-		mushstate.markbits->chunk[i] = (char)0x0;
+		mushstate.markbits[i] = (char)0x0;
 	}
 
 	if (Good_loc(mushconf.guest_start_room))
@@ -1468,14 +1536,14 @@ void do_markall(dbref player, __attribute__((unused)) dbref cause, int key)
 	{
 		for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 		{
-			mushstate.markbits->chunk[i] = (char)0xff;
+			mushstate.markbits[i] = (char)0xff;
 		}
 	}
 	else if (key == MARK_CLEAR)
 	{
 		for ((i) = 0; (i) < ((mushstate.db_top + 7) >> 3); (i)++)
 		{
-			mushstate.markbits->chunk[i] = (char)0x0;
+			mushstate.markbits[i] = (char)0x0;
 		}
 	}
 
