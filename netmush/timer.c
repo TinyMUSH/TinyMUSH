@@ -85,29 +85,10 @@ void check_cron(void)
 char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char *bufp)
 {
     int i, n_begin, n_end, step_size;
-    unsigned char *_bits = bits; /* Default is all off */
-    int _start = 0, _stop = (high - low + 1);
-    int _startbyte = (_start >> 3);
-    int _stopbyte = (_stop >> 3);
-
-    if (_startbyte == _stopbyte)
-    {
-        _bits[_startbyte] &= ((0xff >> (8 - (_start & 0x7))) | (0xff << ((_stop & 0x7) + 1)));
-    }
-    else
-    {
-        _bits[_startbyte] &= 0xff >> (8 - (_start & 0x7));
-        while (++_startbyte < _stopbyte)
-            _bits[_startbyte] = 0;
-        _bits[_stopbyte] &= 0xff << ((_stop & 0x7) + 1);
-    }
+    const size_t bit_bytes = (size_t)(((high - low) >> 3) + 1);
+    memset(bits, 0, bit_bytes);
 
     if (!bufp || !*bufp)
-    {
-        return NULL;
-    }
-
-    if (!*bufp)
     {
         return NULL;
     }
@@ -119,7 +100,7 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
      * function.
      */
 
-    while (*bufp && !isspace(*bufp))
+    while (*bufp && !isspace((unsigned char)*bufp))
     {
         if (*bufp == '*')
         {
@@ -127,11 +108,11 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
             n_end = high;
             bufp++;
         }
-        else if (isdigit(*bufp))
+        else if (isdigit((unsigned char)*bufp))
         {
             n_begin = (int)strtol(bufp, (char **)NULL, 10);
 
-            while (*bufp && isdigit(*bufp))
+            while (*bufp && isdigit((unsigned char)*bufp))
             {
                 bufp++;
             }
@@ -151,7 +132,7 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
                 bufp++;
                 n_end = (int)strtol(bufp, (char **)NULL, 10);
 
-                while (*bufp && isdigit(*bufp))
+                while (*bufp && isdigit((unsigned char)*bufp))
                 {
                     bufp++;
                 }
@@ -178,7 +159,7 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
                 return NULL;
             }
 
-            while (*bufp && isdigit(*bufp))
+            while (*bufp && isdigit((unsigned char)*bufp))
             {
                 bufp++;
             }
@@ -195,7 +176,10 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
         for (i = n_begin; i <= n_end; i += step_size)
         {
             if ((i >= low) && (i <= high))
-                bits[i - low] |= (1 << ((i - low) & 0x7));
+            {
+                const int offset = i - low;
+                bits[offset >> 3] |= (1 << (offset & 0x7));
+            }
         }
 
         /*
@@ -216,7 +200,7 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
      * Skip over trailing garbage.
      */
 
-    while (*bufp && !isspace(*bufp))
+    while (*bufp && !isspace((unsigned char)*bufp))
     {
         bufp++;
     }
@@ -227,7 +211,7 @@ char *parse_cronlist(dbref player, unsigned char *bits, int low, int high, char 
      * Skip spaces as well.
      */
 
-    while (isspace(*bufp))
+    while (isspace((unsigned char)*bufp))
     {
         bufp++;
     }
@@ -254,9 +238,9 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
     }
 
     crp = (CRONTAB *)XMALLOC(sizeof(CRONTAB), "crp");
+    memset(crp, 0, sizeof(CRONTAB));
     crp->obj = thing;
     crp->atr = attrib;
-    crp->flags = 0;
     crp->cronstr = XSTRDUP(timestr, "crp->cronstr");
 
     /*
@@ -268,7 +252,7 @@ int call_cron(dbref player, dbref thing, int attrib, char *timestr)
     errcode = 0;
     bufp = timestr;
 
-    while (isspace(*bufp))
+    while (isspace((unsigned char)*bufp))
     {
         bufp++;
     }
@@ -612,7 +596,7 @@ void dispatch(void)
 
     if (mushconf.control_flags & CF_EVENTCHECK)
     {
-        if (mushstate.now >= mushstate.events_counter)
+        while (mushstate.now >= mushstate.events_counter)
         {
             mushstate.debug_cmd = (char *)"< croncheck >";
             check_cron();
