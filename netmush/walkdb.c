@@ -71,13 +71,13 @@ void do_dolist(dbref player, dbref cause, int key, char *list, char *command, ch
 	if (key & DOLIST_DELIMIT)
 	{
 		char *tempstr;
-
-		if (strlen((tempstr = parse_to(&curr, ' ', EV_STRIP))) > 1)
+		tempstr = parse_to(&curr, ' ', EV_STRIP);
+		size_t dlen = strlen(tempstr);
+		if (dlen != 1)
 		{
 			notify(player, "The delimiter must be a single character!");
 			return;
 		}
-
 		delimiter = *tempstr;
 	}
 
@@ -235,7 +235,10 @@ void do_stats(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	case STAT_PLAYER:
 		if (!(name && *name))
 		{
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "The universe contains %d objects (next free is #%d).", ((mushstate.freelist == NOTHING) ? mushstate.db_top : mushstate.freelist));
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME,
+						 "The universe contains %d objects (next free is #%d).",
+						 mushstate.db_top,
+						 ((mushstate.freelist == NOTHING) ? mushstate.db_top : mushstate.freelist));
 			return;
 		}
 
@@ -481,6 +484,13 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	 * Strip any range arguments
 	 */
 	parse_range(&searchfor, &parm->low_bound, &parm->high_bound);
+	/* Defensive: ensure low_bound <= high_bound */
+	if (parm->low_bound > parm->high_bound)
+	{
+		dbref tmp = parm->low_bound;
+		parm->low_bound = parm->high_bound;
+		parm->high_bound = tmp;
+	}
 	/*
 	 * set limits on who we search
 	 */
