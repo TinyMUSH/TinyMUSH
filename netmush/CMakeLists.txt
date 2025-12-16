@@ -10,12 +10,4 @@ endif(NOT APPLE)
 target_link_libraries(netmush PRIVATE ${C_LIBRARY} ${CRYPT_LIBRARY} ${GDBM_LIBRARY} ${MATH_LIBRARY} ${NSL_LIBRARY} ${PCRE_LIBRARY} ${RESOLV_LIBRARY} ${DL_LIBRARY})
 install(TARGETS netmush DESTINATION ${CMAKE_INSTALL_PREFIX}/)
 
-# Tests and micro-benchmarks for vt100
-add_executable(test_vt100 tests/test_vt100.c tests/shim_alloc.c vt100.c)
-target_include_directories(test_vt100 PRIVATE ${CMAKE_SOURCE_DIR}/netmush ${CMAKE_CURRENT_BINARY_DIR}/../include)
-target_link_libraries(test_vt100 PRIVATE ${MATH_LIBRARY})
-add_test(NAME vt100_tests COMMAND test_vt100)
-
-add_executable(bench_getColorMatch tests/bench_getColorMatch.c tests/shim_alloc.c vt100.c)
-target_include_directories(bench_getColorMatch PRIVATE ${CMAKE_SOURCE_DIR}/netmush ${CMAKE_CURRENT_BINARY_DIR}/../include)
-target_link_libraries(bench_getColorMatch PRIVATE ${MATH_LIBRARY})
+## Removed temporary vt100 test and benchmark executables
