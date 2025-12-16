@@ -1391,11 +1391,17 @@ typedef struct
     uint8_t b;
 } rgbColor;
 
+/* Color scheme membership flags */
+#define COLOR_SCHEME_ANSI 0x01  /*!< Member of standard 16 ANSI colors */
+#define COLOR_SCHEME_XTERM 0x02 /*!< Member of xterm 256-color palette */
+#define COLOR_SCHEME_CSS 0x04   /*!< Member of CSS named colors */
+
 typedef struct
 {
     char *name;
     rgbColor rgb;
     CIELABColor lab; /*!< Pre-computed CIELAB coordinates for color matching */
+    uint8_t schemes; /*!< Bit flags indicating scheme membership (COLOR_SCHEME_*) */
 } COLORINFO;
 
 typedef struct

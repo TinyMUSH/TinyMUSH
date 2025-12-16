@@ -1373,7 +1373,7 @@ extern void log_version(void);
 extern xyzColor rgbToXyz(rgbColor rgb);
 extern CIELABColor xyzToCIELAB(xyzColor xyz);
 extern float getColorDeltaE(rgbColor c1, rgbColor c2);
-extern COLORMATCH getColorMatch(rgbColor rgb, COLORINFO palette[]);
+extern COLORMATCH getColorMatch(rgbColor rgb, uint8_t schemes);
 extern char *TrueColor2VT100(rgbColor rgb, _Bool background);
 extern char *X112VT100(uint8_t color, _Bool background);
 extern char *Ansi2VT100(uint8_t color, _Bool background);
