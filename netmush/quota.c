@@ -31,14 +31,17 @@ void load_quota(int q_list[], dbref player, int qtype)
 	char *quota_str, *p, *tokst;
 	quota_str = atr_get(player, qtype, &aowner, &aflags, &alen);
 
-	if (!*quota_str)
+	if (!quota_str || !*quota_str)
 	{
 		for (i = 0; i < 5; i++)
 		{
 			q_list[i] = 0;
 		}
 
-		XFREE(quota_str);
+		if (quota_str)
+		{
+			XFREE(quota_str);
+		}
 		return;
 	}
 
@@ -155,7 +158,7 @@ void mung_quotas(dbref player, int key, int value)
 		{
 			load_quota(rq_list, player, A_RQUOTA);
 			rq_list[QTYPE_ALL] += xq;
-			save_quota(rq_list, player, A_QUOTA);
+			save_quota(rq_list, player, A_RQUOTA);
 		}
 		else
 		{
@@ -165,7 +168,7 @@ void mung_quotas(dbref player, int key, int value)
 			q_list[QTYPE_EXIT] -= exits;
 			q_list[QTYPE_THING] -= things;
 			q_list[QTYPE_PLAYER] -= players;
-			save_quota(q_list, player, A_RQUOTA);
+			save_quota(q_list, player, A_QUOTA);
 		}
 	}
 	else if (key & QUOTA_ROOM)
@@ -312,7 +315,7 @@ void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	{
 		who = lookup_player(player, arg1, 1);
 
-		if (!Good_obj(who))
+		if (!Good_obj(who) || !isPlayer(who))
 		{
 			notify_quiet(player, "Not found.");
 			return;
