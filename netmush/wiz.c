@@ -30,6 +30,12 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	char *to;
 	int hush = 0;
 
+	if (!arg1 || !arg2)
+	{
+		notify_quiet(player, "Invalid arguments.");
+		return;
+	}
+
 	if (((Fixed(player)) || (Fixed(Owner(player)) && Owner(player) != NOTHING)) && !(Tel_Anywhere(player)))
 	{
 		notify(player, mushconf.fixed_tel_msg);
@@ -521,8 +527,11 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 		}
 
 		pname = log_getname(player);
-		log_write(LOG_WIZARD, "WIZ", "BOOT", "Port %d was @booted by %s", victim, pname);
-		XFREE(pname);
+		if (pname)
+		{
+			log_write(LOG_WIZARD, "WIZ", "BOOT", "Port %d was @booted by %s", victim, pname);
+			XFREE(pname);
+		}
 	}
 	else
 	{
@@ -550,7 +559,8 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 
 		vname = log_getname(victim);
 		pname = log_getname(player);
-		lname = log_getname(Location(player));
+		dbref player_loc = Location(player);
+		lname = (Good_obj(player_loc)) ? log_getname(player_loc) : NULL;
 		if (vname && pname && lname)
 		{
 			log_write(LOG_WIZARD, "WIZ", "BOOT", "%s in %s was @booted by %s", vname, lname, pname);
@@ -672,6 +682,7 @@ void do_cut(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
 	default:
 		s_Next(object, NOTHING);
 		notify_quiet(player, "Cut.");
+		break;
 	}
 }
 
@@ -699,9 +710,17 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 	}
 
-	/* Validate and truncate message safely */
-	if (strlen(message) >= GBUF_SIZE)
+	/* Validate message pointer and truncate safely */
+	if (!message)
 	{
+		notify_quiet(player, "Invalid message.");
+		return;
+	}
+
+	size_t msg_len = strlen(message);
+	if (msg_len >= GBUF_SIZE)
+	{
+		/* Message is too long - truncate at GBUF_SIZE-1 boundary */
 		message[GBUF_SIZE - 1] = '\0';
 	}
 
