@@ -201,6 +201,9 @@ static int is_listenchannel(dbref player, CHANNEL *chp)
 {
     int i;
 
+    if (!chp->connect_who)
+        return 0;
+
     for (i = 0; i < chp->num_connected; i++)
     {
         if (chp->connect_who[i]->player == player)
@@ -381,6 +384,9 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
     mh = mh_ns = NULL;
     chp->num_sent++;
     mp = NULL;
+
+    if (!chp->connect_who)
+        return;
 
     for (i = 0; i < chp->num_connected; i++)
     {
@@ -679,35 +685,41 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
          */
         notify(player, "-- Players --");
 
-        for (i = 0; i < cap->channel->num_connected; i++)
+        if (cap->channel->connect_who)
         {
-            wp = cap->channel->connect_who[i];
-
-            if (isPlayer(wp->player))
+            for (i = 0; i < cap->channel->num_connected; i++)
             {
-                if (wp->is_listening && Connected(wp->player) &&
-                    (!Hidden(wp->player) || See_Hidden(player)))
+                wp = cap->channel->connect_who[i];
+
+                if (isPlayer(wp->player))
                 {
-                    buff = unparse_object(player, wp->player, 0);
-                    notify(player, buff);
-                    XFREE(buff);
+                    if (wp->is_listening && Connected(wp->player) &&
+                        (!Hidden(wp->player) || See_Hidden(player)))
+                    {
+                        buff = unparse_object(player, wp->player, 0);
+                        notify(player, buff);
+                        XFREE(buff);
+                    }
                 }
             }
         }
 
         notify(player, "-- Objects -- ");
 
-        for (i = 0; i < cap->channel->num_connected; i++)
+        if (cap->channel->connect_who)
         {
-            wp = cap->channel->connect_who[i];
-
-            if (!isPlayer(wp->player))
+            for (i = 0; i < cap->channel->num_connected; i++)
             {
-                if (wp->is_listening)
+                wp = cap->channel->connect_who[i];
+
+                if (!isPlayer(wp->player))
                 {
-                    buff = unparse_object(player, wp->player, 0);
-                    notify(player, buff);
-                    XFREE(buff);
+                    if (wp->is_listening)
+                    {
+                        buff = unparse_object(player, wp->player, 0);
+                        notify(player, buff);
+                        XFREE(buff);
+                    }
                 }
             }
         }
@@ -1499,23 +1511,26 @@ void do_cwho(dbref player, dbref cause __attribute__((unused)), int key, char *c
     }
     else
     {
-        for (i = 0; i < chp->num_connected; i++)
+        if (chp->connect_who)
         {
-            wp = chp->connect_who[i];
-
-            if (!Hidden(wp->player) || See_Hidden(player))
+            for (i = 0; i < chp->num_connected; i++)
             {
-                notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s  %-25s %7s", (wp->is_listening) ? "[on]" : "    ", Name(wp->player), isPlayer(wp->player) ? "Yes" : "No");
+                wp = chp->connect_who[i];
 
-                if (isPlayer(wp->player))
-                    p_count++;
-                else
-                    o_count++;
+                if (!Hidden(wp->player) || See_Hidden(player))
+                {
+                    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s  %-25s %7s", (wp->is_listening) ? "[on]" : "    ", Name(wp->player), isPlayer(wp->player) ? "Yes" : "No");
+
+                    if (isPlayer(wp->player))
+                        p_count++;
+                    else
+                        o_count++;
+                }
             }
         }
-    }
 
-    notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Counted %d %s and %d %s on channel %s.", p_count, (p_count == 1) ? "player" : "players", o_count, (o_count == 1) ? "object" : "objects", chp->name);
+        notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Counted %d %s and %d %s on channel %s.", p_count, (p_count == 1) ? "player" : "players", o_count, (o_count == 1) ? "object" : "objects", chp->name);
+    }
 }
 
 /* --------------------------------------------------------------------------
