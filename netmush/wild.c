@@ -48,6 +48,10 @@ int check_literals(char *tstr, char *dstr)
 		if (*tstr == '\\')
 		{
 			tstr++;
+			if (!*tstr)
+			{
+				return 0; /* Escape at pattern end */
+			}
 		}
 
 		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
@@ -530,6 +534,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			{
 				return 1; /* No more room, but match succeeds */
 			}
+			/* Verify arglist[argpos] is allocated before use */
+			if (!arglist || !arglist[argpos])
+			{
+				return 0; /* Allocation failed */
+			}
 			arglist[argpos][0] = '\0';
 			argpos++;
 
@@ -551,6 +560,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 				if (argpos >= numargs)
 				{
 					return 1; /* No more room */
+				}
+				/* Verify arglist[argpos] is allocated before use */
+				if (!arglist || !arglist[argpos])
+				{
+					return 0; /* Allocation failed */
 				}
 				arglist[argpos][0] = *datapos;
 				arglist[argpos][1] = '\0';
@@ -651,10 +665,24 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			 * Found a match!  Fill in all remaining arguments.
 			 * * First do the '*'...
 			 */
+			/* Validate pointer arithmetic and bounds */
+			if (argpos >= numargs)
+			{
+				return 1; /* No more room for args */
+			}
+			if (dstr < datapos)
+			{
+				return 0; /* Invalid pointer relationship */
+			}
 			int copy_len = (dstr - datapos) - numextra;
 			if (copy_len < 0)
 			{
 				copy_len = 0; /* Guard against underflow */
+			}
+			/* Cap copy_len to buffer size */
+			if (copy_len > LBUF_SIZE - 1)
+			{
+				copy_len = LBUF_SIZE - 1;
 			}
 			XSTRNCPY(arglist[argpos], datapos, copy_len);
 			arglist[argpos][copy_len] = '\0';
@@ -670,6 +698,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 				if (argpos >= numargs)
 				{
 					return 1;
+				}
+				/* Verify datapos is valid before dereference */
+				if (!*datapos)
+				{
+					break; /* End of data reached */
 				}
 
 				arglist[argpos][0] = *datapos;
@@ -785,6 +818,10 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 			if (i < nargs)
 			{
 				args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+				if (!args[i])
+				{
+					return 0; /* Allocation failed */
+				}
 				i++;
 			}
 			break;
@@ -793,6 +830,10 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 			if (i < nargs)
 			{
 				args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+				if (!args[i])
+				{
+					return 0; /* Allocation failed */
+				}
 				i++;
 			}
 		}
@@ -879,6 +920,10 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 		return 0;
 	}
 	q_names = (char **)XCALLOC(nargs, sizeof(char *), "q_names");
+	if (!q_names)
+	{
+		return 0; /* Allocation failed */
+	}
 
 	/*
 	 * Initialize return array.
