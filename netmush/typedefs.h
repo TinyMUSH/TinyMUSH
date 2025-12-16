@@ -1395,6 +1395,7 @@ typedef struct
 {
     char *name;
     rgbColor rgb;
+    CIELABColor lab; /*!< Pre-computed CIELAB coordinates for color matching */
 } COLORINFO;
 
 typedef struct
