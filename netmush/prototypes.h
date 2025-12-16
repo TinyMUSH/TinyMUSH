@@ -1300,8 +1300,8 @@ extern void do_timewarp(dbref player, dbref cause, int key, char *arg);
 
 /* udb_misc.c */
 extern void log_db_err(int obj, int attr, const char *txt);
-extern void warning(char *p, ...);
-extern void fatal(char *p, ...);
+extern void warning(const char *p, ...);
+extern void fatal(const char *p, ...);
 
 /* udb_obj.c */
 extern UDB_OBJECT *unroll_obj(char *data);

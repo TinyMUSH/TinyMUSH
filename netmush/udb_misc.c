@@ -60,28 +60,29 @@ void log_db_err(int obj, int attr, const char *txt)
 /*
  * VARARGS
  */
-void warning(char *p, ...)
+void warning(const char *p, ...)
 {
 	va_list ap;
 	va_start(ap, p);
 
 	while (1)
 	{
-		if (p == (char *)0)
+		if (p == (const char *)0)
 		{
 			break;
 		}
 
-		if (p == (char *)-1)
+		if (p == (const char *)-1)
 		{
-			p = (char *)safe_strerror(errno);
+			p = (const char *)safe_strerror(errno);
 		}
 
 		log_write_raw(1, "%s", p);
-		p = va_arg(ap, char *);
+		p = va_arg(ap, const char *);
 	}
 
 	va_end(ap);
+	log_write_raw(1, "\n");
 }
 
 /*
@@ -90,19 +91,19 @@ void warning(char *p, ...)
 /*
  * VARARGS
  */
-void fatal(char *p, ...)
+void fatal(const char *p, ...)
 {
 	va_list ap;
 	va_start(ap, p);
 
 	while (1)
 	{
-		if (p == (char *)0)
+		if (p == (const char *)0)
 		{
 			break;
 		}
 
-		if (p == (char *)-1)
+		if (p == (const char *)-1)
 		{
 			static char errbuf[256];
 			strerror_r(errno, errbuf, sizeof(errbuf));
@@ -110,9 +111,10 @@ void fatal(char *p, ...)
 		}
 
 		log_write_raw(1, "%s", p);
-		p = va_arg(ap, char *);
+		p = va_arg(ap, const char *);
 	}
 
 	va_end(ap);
+	log_write_raw(1, "\n");
 	exit(EXIT_FAILURE);
 }
