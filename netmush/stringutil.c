@@ -1238,11 +1238,23 @@ int ansi_map_states(const char *s, int **m, char **p)
 	char *stripped;
 	char *s1, *s2;
 	int n = 0, ansi_state = ANST_NORMAL;
+	const int map_cap = HBUF_SIZE - 1;
+	const int strip_cap = LBUF_SIZE - 1;
 	ansi_map = (int *)XCALLOC(HBUF_SIZE, sizeof(int), "ansi_map");
 	stripped = XMALLOC(LBUF_SIZE, "stripped");
+
+	if (!s)
+	{
+		ansi_map[0] = ANST_NORMAL;
+		stripped[0] = '\0';
+		*m = ansi_map;
+		*p = stripped;
+		return 0;
+	}
+
 	s2 = s1 = XSTRDUP(s, "s1");
 
-	while (*s1)
+	while (*s1 && n < map_cap && n < strip_cap)
 	{
 		if (*s1 == ESC_CHAR)
 		{
@@ -1296,6 +1308,21 @@ int ansi_map_states(const char *s, int **m, char **p)
 		{
 			ansi_map[n] = ansi_state;
 			stripped[n++] = *s1++;
+		}
+	}
+
+	/* If we stopped due to buffer limits, continue consuming escape codes only
+	 * to keep the input pointer consistent; ansi_state beyond this point is not
+	 * recorded to avoid overruns. */
+	while (*s1)
+	{
+		if (*s1 == ESC_CHAR)
+		{
+			skip_esccode(&s1);
+		}
+		else
+		{
+			++s1;
 		}
 	}
 
@@ -1863,7 +1890,7 @@ int str2xterm(char *str)
 		{
 			p = t;
 
-			while (!isdigit(*p) && (*p != 0))
+			while (!isdigit((unsigned char)*p) && (*p != 0))
 			{
 				p++;
 			}
@@ -1877,7 +1904,7 @@ int str2xterm(char *str)
 
 			p = t;
 
-			while (!isdigit(*p) && (*p != 0))
+			while (!isdigit((unsigned char)*p) && (*p != 0))
 			{
 				p++;
 			}
@@ -1946,12 +1973,12 @@ char *munge_space(char *string)
 
 	while (p && *p)
 	{
-		while (*p && !isspace(*p))
+		while (*p && !isspace((unsigned char)*p))
 		{
 			*q++ = *p++;
 		}
 
-		while (*p && isspace(*++p))
+		while (*p && isspace((unsigned char)*++p))
 			;
 
 		if (*p)
@@ -1988,12 +2015,12 @@ char *trim_spaces(char *string)
 
 	while (p && *p)
 	{
-		while (*p && !isspace(*p))
+		while (*p && !isspace((unsigned char)*p))
 		{
 			*q++ = *p++; /* copy nonspace chars */
 		}
 
-		while (*p && isspace(*p))
+		while (*p && isspace((unsigned char)*p))
 		{
 			p++; /* compress spaces */
 		}
@@ -2061,27 +2088,27 @@ int string_compare(const char *s1, const char *s2)
 {
 	if (mushstate.standalone || mushconf.space_compress)
 	{
-		while (isspace(*s1))
+		while (isspace((unsigned char)*s1))
 		{
 			s1++;
 		}
 
-		while (isspace(*s2))
+		while (isspace((unsigned char)*s2))
 		{
 			s2++;
 		}
 
-		while (*s1 && *s2 && ((tolower(*s1) == tolower(*s2)) || (isspace(*s1) && isspace(*s2))))
+		while (*s1 && *s2 && ((tolower((unsigned char)*s1) == tolower((unsigned char)*s2)) || (isspace((unsigned char)*s1) && isspace((unsigned char)*s2))))
 		{
-			if (isspace(*s1) && isspace(*s2))
+			if (isspace((unsigned char)*s1) && isspace((unsigned char)*s2))
 			{
 				/* skip all other spaces */
-				while (isspace(*s1))
+				while (isspace((unsigned char)*s1))
 				{
 					s1++;
 				}
 
-				while (isspace(*s2))
+				while (isspace((unsigned char)*s2))
 				{
 					s2++;
 				}
@@ -2098,9 +2125,9 @@ int string_compare(const char *s1, const char *s2)
 			return (1);
 		}
 
-		if (isspace(*s1))
+		if (isspace((unsigned char)*s1))
 		{
-			while (isspace(*s1))
+			while (isspace((unsigned char)*s1))
 			{
 				s1++;
 			}
@@ -2108,9 +2135,9 @@ int string_compare(const char *s1, const char *s2)
 			return (*s1);
 		}
 
-		if (isspace(*s2))
+		if (isspace((unsigned char)*s2))
 		{
-			while (isspace(*s2))
+			while (isspace((unsigned char)*s2))
 			{
 				s2++;
 			}
@@ -2127,12 +2154,12 @@ int string_compare(const char *s1, const char *s2)
 	}
 	else
 	{
-		while (*s1 && *s2 && tolower(*s1) == tolower(*s2))
+		while (*s1 && *s2 && tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
 		{
 			s1++, s2++;
 		}
 
-		return (tolower(*s1) - tolower(*s2));
+		return (tolower((unsigned char)*s1) - tolower((unsigned char)*s2));
 	}
 }
 
@@ -2150,7 +2177,7 @@ int string_prefix(const char *string, const char *prefix)
 {
 	int count = 0;
 
-	while (*string && *prefix && tolower(*string) == tolower(*prefix))
+	while (*string && *prefix && tolower((unsigned char)*string) == tolower((unsigned char)*prefix))
 	{
 		string++, prefix++, count++;
 	}
@@ -2188,12 +2215,12 @@ const char *string_match(const char *src, const char *sub)
 
 			/*  else scan to beginning of next word */
 
-			while (*src && isalnum(*src))
+			while (*src && isalnum((unsigned char)*src))
 			{
 				src++;
 			}
 
-			while (*src && !isalnum(*src))
+			while (*src && !isalnum((unsigned char)*src))
 			{
 				src++;
 			}
@@ -2693,7 +2720,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 
 int minmatch(char *str, char *target, int min)
 {
-	while (*str && *target && (tolower(*str) == tolower(*target)))
+	while (*str && *target && (tolower((unsigned char)*str) == tolower((unsigned char)*target)))
 	{
 		str++;
 		target++;
@@ -2735,7 +2762,7 @@ int matches_exit_from_list(char *exit_list, char *pattern)
 	while (*pattern)
 	{
 		/* check out this one */
-		for (s = exit_list; (*s && (tolower(*s) == tolower(*pattern)) && *pattern && (*pattern != EXIT_DELIMITER)); s++, pattern++)
+		for (s = exit_list; (*s && (tolower((unsigned char)*s) == tolower((unsigned char)*pattern)) && *pattern && (*pattern != EXIT_DELIMITER)); s++, pattern++)
 			;
 
 		/* Did we match it all? */
@@ -2761,7 +2788,7 @@ int matches_exit_from_list(char *exit_list, char *pattern)
 		while (*pattern && *pattern++ != EXIT_DELIMITER)
 			;
 
-		while (isspace(*pattern))
+		while (isspace((unsigned char)*pattern))
 		{
 			pattern++;
 		}
