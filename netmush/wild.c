@@ -93,16 +93,21 @@ int check_literals(char *tstr, char *dstr)
 	 * * to worry about.
 	 */
 	ep--;
-	/* Validate pattern is not empty to prevent wraparound */
-	if (tstr >= tstr + strlen(tstr))
+	/* Validate ep is still in bounds and pattern is not empty */
+	if (ep < data)
 	{
-		return (*dstr == '\0') ? 1 : 0; /* Empty pattern remaining */
+		return 0; /* Data pointer underflow from ep-- */
 	}
-	xp = tstr + strlen(tstr) - 1;
-
-	while ((ep >= dstr) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
+	if (!*tstr)
 	{
-		/* Handle escape: if xp is escape, check next char (xp-1), then decrement xp only once */
+		return 1; /* Empty pattern - match succeeds */
+	}
+	int tstr_len = strlen(tstr);
+	xp = tstr + tstr_len - 1;
+
+	while ((ep >= data) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
+	{
+		/* Handle escape: if xp is escape, check next char (xp-1) */
 		if (*xp == '\\')
 		{
 			if (xp > tstr)
@@ -128,10 +133,14 @@ int check_literals(char *tstr, char *dstr)
 	}
 
 	ep++;
-	/* Validate ep is still in bounds */
-	if (ep < data || ep >= data + LBUF_SIZE)
+	/* Validate ep is still in bounds after increment */
+	if (ep < data || ep > data + LBUF_SIZE - 1)
 	{
 		return 0;
+	}
+	if (ep <= data)
+	{
+		return 0; /* No valid data range */
 	}
 	*ep = '\0';
 	/*
@@ -177,6 +186,12 @@ int check_literals(char *tstr, char *dstr)
 			p++;
 			tstr++;
 			len++;
+
+			/* Exit if we've exceeded pattern bounds */
+			if (tstr > xp)
+			{
+				break;
+			}
 		}
 
 		*p = '\0';
@@ -191,7 +206,8 @@ int check_literals(char *tstr, char *dstr)
 			dp += len;
 		}
 
-		if (dp >= ep)
+		/* Ensure dp hasn't gone past valid data boundary */
+		if (dp > ep)
 		{
 			return 1;
 		}
@@ -312,9 +328,14 @@ int real_quick_wild(char *tstr, char *dstr)
 	if (*tstr == '\\')
 	{
 		tstr++;
+		/* Only skip escaped character if pattern continues */
 		if (*tstr)
 		{
 			tstr++; /* Skip the escaped character */
+		}
+		else
+		{
+			return 0; /* Escape at pattern end is invalid */
 		}
 	}
 
@@ -476,6 +497,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 		if (arg >= numargs)
 		{
 			return 1; /* Can't store more args, but match succeeds */
+		}
+		/* Verify arglist and allocation before use */
+		if (!arglist || !arglist[arg])
+		{
+			return 0; /* Allocation failed */
 		}
 		XSTRNCPY(arglist[arg], dstr, LBUF_SIZE - 1);
 		arglist[arg][LBUF_SIZE - 1] = '\0';
