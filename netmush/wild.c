@@ -65,11 +65,11 @@ int check_literals(char *tstr, char *dstr)
 	}
 
 	/*
-	 * Make a lower-case copy of the data.
+	 * Make a lower-case copy of the data. Bounds-check to prevent overflow.
 	 */
 	ep = data;
 
-	while (*dstr)
+	while (*dstr && (ep - data < LBUF_SIZE - 1))
 	{
 		*ep = tolower(*dstr);
 		ep++;
@@ -77,6 +77,11 @@ int check_literals(char *tstr, char *dstr)
 	}
 
 	*ep = '\0';
+	/* If dstr was truncated, fail (data too long) */
+	if (*dstr)
+	{
+		return 0;
+	}
 	/*
 	 * Fast match the end of the string.
 	 * * When we're done with this, we'll also have established a better
@@ -92,7 +97,16 @@ int check_literals(char *tstr, char *dstr)
 
 	while ((ep >= dstr) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
 	{
-		if ((*xp != '\\') && ((*ep != *xp) && (tolower(*ep) != tolower(*xp))))
+		/* Handle escape: if xp is escape, check next char (xp-1) */
+		if (*xp == '\\')
+		{
+			if (xp > tstr && ((*ep != *(xp - 1)) && (tolower(*ep) != tolower(*(xp - 1)))))
+			{
+				return 0;
+			}
+			xp--;
+		}
+		else if ((*ep != *xp) && (tolower(*ep) != tolower(*xp)))
 		{
 			return 0;
 		}
@@ -167,6 +181,11 @@ int check_literals(char *tstr, char *dstr)
 int real_quick_wild(char *tstr, char *dstr)
 {
 	int st;
+
+	if (!tstr || !dstr)
+	{
+		return 0;
+	}
 
 	if (mushstate.wild_times_lev > mushconf.wild_times_lim)
 	{
@@ -326,6 +345,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 {
 	char *datapos;
 	int argpos, numextra, st;
+
+	if (!tstr || !dstr)
+	{
+		return 0;
+	}
 
 	if (mushstate.wild_times_lev > mushconf.wild_times_lim)
 	{
@@ -611,6 +635,12 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 {
 	int i, value;
 	char *scan;
+
+	/* Guard against null inputs */
+	if (!tstr || !dstr || !args || nargs <= 0)
+	{
+		return 0;
+	}
 
 	/*
 	 * Initialize the return array.
