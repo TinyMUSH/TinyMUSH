@@ -128,6 +128,11 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 		return;
 
 	default:
+		if (!Good_obj(destination))
+		{
+			notify_quiet(player, "Destination no longer exists.");
+			return;
+		}
 		if ((victim == destination) || Going(destination))
 		{
 			notify_quiet(player, "Bad destination.");
@@ -169,8 +174,15 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 			notify_quiet(player, "Exit has no source location.");
 			return;
 		}
-		s_Exits(exitloc, remove_first(Exits(exitloc), victim));
-		s_Exits(destination, insert_first(Exits(destination), victim));
+		if (!Good_obj(destination))
+		{
+			notify_quiet(player, "Destination is invalid.");
+			return;
+		}
+		dbref exitloc_exits = Exits(exitloc);
+		dbref dest_exits = Exits(destination);
+		s_Exits(exitloc, remove_first(exitloc_exits, victim));
+		s_Exits(destination, insert_first(dest_exits, victim));
 		s_Exits(victim, destination);
 		s_Modified(victim);
 		notify_quiet(player, "Teleported.");
@@ -326,6 +338,11 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 		if ((recipient = noisy_match_result()) == NOTHING)
 		{
+			return;
+		}
+		if (!Good_obj(recipient) || !isPlayer(recipient))
+		{
+			notify_quiet(player, "Invalid new owner.");
 			return;
 		}
 	}
@@ -484,13 +501,14 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 		{
 			char *endptr;
 			char *pnum = (char *)name;
-			victim = (int)strtol(pnum, &endptr, 10);
-			/* Validate conversion succeeded and entire string was consumed */
-			if (pnum == endptr || *endptr != '\0' || victim <= 0)
+			long port_num = strtol(pnum, &endptr, 10);
+			/* Validate conversion succeeded, entire string consumed, and port in valid range */
+			if (pnum == endptr || *endptr != '\0' || port_num <= 0 || port_num > 65535)
 			{
 				notify_quiet(player, "Invalid port number.");
 				return;
 			}
+			victim = (int)port_num;
 		}
 		else
 		{
@@ -771,48 +789,37 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 				notify_quiet(player, "----- motd messages -----");
 			}
 
-			if (mushconf.motd_msg)
+			/* Optimized MOTD display using && for null-safety */
+			if (mushconf.motd_msg && *mushconf.motd_msg)
 			{
-				if (*mushconf.motd_msg)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mushconf.motd_msg);
-				}
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "MOTD: %s", mushconf.motd_msg);
 			}
 			else
 			{
 				notify_quiet(player, "No MOTD.");
 			}
 
-			if (mushconf.wizmotd_msg)
+			if (mushconf.wizmotd_msg && *mushconf.wizmotd_msg)
 			{
-				if (*mushconf.wizmotd_msg)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mushconf.wizmotd_msg);
-				}
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Wizard MOTD: %s", mushconf.wizmotd_msg);
 			}
 			else
 			{
 				notify_quiet(player, "No Wizard MOTD.");
 			}
 
-			if (mushconf.downmotd_msg)
+			if (mushconf.downmotd_msg && *mushconf.downmotd_msg)
 			{
-				if (*mushconf.downmotd_msg)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mushconf.downmotd_msg);
-				}
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Down MOTD: %s", mushconf.downmotd_msg);
 			}
 			else
 			{
 				notify_quiet(player, "No Down MOTD.");
 			}
 
-			if (mushconf.fullmotd_msg)
+			if (mushconf.fullmotd_msg && *mushconf.fullmotd_msg)
 			{
-				if (*mushconf.fullmotd_msg)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mushconf.fullmotd_msg);
-				}
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Full MOTD: %s", mushconf.fullmotd_msg);
 			}
 			else
 			{
