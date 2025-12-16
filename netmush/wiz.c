@@ -145,6 +145,7 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	 * location (after LEAVEing any objects) or it must be JUMP_OK.
 	 */
 
+	loc = NOTHING;
 	if (mushconf.fascist_tport)
 	{
 		loc = where_room(victim);
@@ -402,12 +403,14 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	}
 	XSPRINTF(buf, "%s has been turned into a slimy toad!", Name(victim));
 	notify_except2(loc, player, victim, player, 0, NULL, buf);
+	*buf = '\0'; /* Clear buffer for reuse */
 	XSPRINTF(buf, "You toaded %s! (%d objects @chowned)", Name(victim), count + 1);
 	notify_quiet(player, buf);
 	/*
 	 * Zap the name from the name hash table
 	 */
 	delete_player_name(victim, Name(victim));
+	*buf = '\0'; /* Clear buffer for reuse */
 	XSPRINTF(buf, "a slimy toad named %s", Name(victim));
 	s_Name(victim, buf);
 	XFREE(buf);
@@ -431,6 +434,8 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 {
 	dbref victim;
 	char *pname, *vname;
+	struct crypt_data cdata;
+	char *crypt_result;
 
 	if ((victim = lookup_player(player, name, 0)) == NOTHING)
 	{
@@ -470,9 +475,8 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	/*
 	 * it's ok, do it
 	 */
-	struct crypt_data cdata;
 	cdata.initialized = 0;
-	char *crypt_result = crypt_r((const char *)password, "XX", &cdata);
+	crypt_result = crypt_r((const char *)password, "XX", &cdata);
 	if (!crypt_result)
 	{
 		notify_quiet(player, "Password encryption failed.");
@@ -615,12 +619,18 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
 		return;
 	}
 
-	amt = (int)strtol(arg1, (char **)NULL, 10);
-
-	/* Optimize: only iterate if amt is positive */
-	if (amt < 0)
+	char *endptr;
+	amt = (int)strtol(arg1, &endptr, 10);
+	/* Validate entire string was consumed */
+	if (*endptr != '\0')
 	{
-		return; /* Negative amounts don't make sense */
+		return;
+	}
+
+	/* Validate: only iterate if amt is non-negative and db_top is valid */
+	if (amt < 0 || mushstate.db_top <= 0)
+	{
+		return;
 	}
 
 	for (a = 0; a < mushstate.db_top; a++)
