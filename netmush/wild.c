@@ -725,6 +725,10 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 		if (*tstr == '\\')
 		{
 			tstr++;
+			if (!*tstr)
+			{
+				return 0; /* Escape at pattern end */
+			}
 		}
 
 		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
@@ -752,13 +756,19 @@ int wild(char *tstr, char *dstr, char *args[], int nargs)
 		switch (*scan)
 		{
 		case '?':
-			args[i] = XMALLOC(LBUF_SIZE, "args[i]");
-			i++;
+			if (i < nargs)
+			{
+				args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+				i++;
+			}
 			break;
 
 		case '*':
-			args[i] = XMALLOC(LBUF_SIZE, "args[i]");
-			i++;
+			if (i < nargs)
+			{
+				args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+				i++;
+			}
 		}
 
 		scan++;
@@ -834,7 +844,15 @@ int wild_match(char *tstr, char *dstr)
 int register_match(char *tstr, char *dstr, char *args[], int nargs)
 {
 	int i, value;
-	char *buff, *scan, *p, *end, *q_names[NUM_ENV_VARS];
+	char *buff, *scan, *p, *end;
+	char **q_names;
+
+	/* Allocate q_names array with same bounds as nargs */
+	if (nargs <= 0)
+	{
+		return 0;
+	}
+	q_names = (char **)XCALLOC(nargs, sizeof(char *), "q_names");
 
 	/*
 	 * Initialize return array.
@@ -854,6 +872,11 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 		if (*tstr == '\\')
 		{
 			tstr++;
+			if (!*tstr)
+			{
+				XFREE(q_names);
+				return 0; /* Escape at pattern end */
+			}
 		}
 
 		if ((*dstr != *tstr) && (tolower(*dstr) != tolower(*tstr)))
@@ -894,7 +917,19 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 			 * FALLTHRU
 			 */
 		case '*':
+			if (i >= nargs)
+			{
+				break; /* Skip allocations beyond nargs */
+			}
+
 			args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+			if (!args[i])
+			{
+				XFREE(q_names);
+				XFREE(buff);
+				return 0; /* Allocation failed */
+			}
+
 			scan++;
 
 			if (*scan == '{')
@@ -952,5 +987,6 @@ int register_match(char *tstr, char *dstr, char *args[], int nargs)
 	}
 
 	XFREE(buff);
+	XFREE(q_names);
 	return value;
 }
