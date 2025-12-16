@@ -4,15 +4,15 @@
  * @brief Module for penn-based mailer system
  * @version 3.3
  * @date 2020-12-28
- * 
+ *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
- * 
+ *
  * @note This code was taken from Kalkin's DarkZone code, which was originally
  * taken from PennMUSH 1.50 p10, and has been heavily modified since being
  * included in MUX (and then being imported wholesale into 3.0).
- * 
+ *
  */
 
 #include "config.h"
@@ -262,7 +262,7 @@ static int add_mail_message(dbref player, char *message)
     str = atrstr;
     eval_expression_string(execstr, &bp, player, player, player, EV_STRIP | EV_FCHECK | EV_EVAL, &str, (char **)NULL, 0);
     s = XMALLOC(LBUF_SIZE, "s");
-    snprintf(s, LBUF_SIZE, "%s %s", message, execstr);
+    XSNPRINTF(s, LBUF_SIZE, "%s %s", message, execstr);
     mod_mail_config.mail_list[number].message = XSTRDUP(s, "mod_mail_config.mail_list[number].message");
     XFREE(s);
     XFREE(atrstr);
@@ -554,8 +554,8 @@ void do_mail_file(dbref player, char *msglist, char *folder)
             {
                 j++;
                 mp->read &= M_FMASK; /*
-                             * Clear the folder
-                             */
+                                      * Clear the folder
+                                      */
                 mp->read |= FolderBit(foldernum);
                 notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "MAIL: Msg %d filed in folder %d", i, foldernum);
             }
@@ -578,14 +578,12 @@ void do_mail_file(dbref player, char *msglist, char *folder)
 void do_mail_read(dbref player, char *msglist)
 {
     struct mail *mp;
-    char *tbuf1, *buff, *status, *names, *ccnames;
+    const char *msgtext;
+    char *status, *names, *ccnames;
     struct mail_selector ms;
     int i = 0, j = 0, folder;
-    tbuf1 = XMALLOC(LBUF_SIZE, "tbuf1");
-
     if (!parse_msglist(msglist, &ms, player))
     {
-        XFREE(tbuf1);
         return;
     }
 
@@ -604,8 +602,7 @@ void do_mail_read(dbref player, char *msglist)
                  * Read it
                  */
                 j++;
-                buff = XMALLOC(LBUF_SIZE, "buff");
-                XSTRCPY(buff, get_mail_message(mp->number));
+                msgtext = get_mail_message(mp->number);
                 notify(player, DASH_LINE);
                 status = status_string(mp);
                 names = make_namelist(player, (char *)mp->tolist);
@@ -620,10 +617,11 @@ void do_mail_read(dbref player, char *msglist)
                 XFREE(ccnames);
                 XFREE(status);
                 notify(player, DASH_LINE);
-                XSTRCPY(tbuf1, buff);
-                notify(player, tbuf1);
+                if (msgtext)
+                {
+                    notify(player, msgtext);
+                }
                 notify(player, DASH_LINE);
-                XFREE(buff);
 
                 if (Unread(mp))
                 {
@@ -641,8 +639,6 @@ void do_mail_read(dbref player, char *msglist)
          */
         notify(player, "MAIL: You don't have that many matching messages!");
     }
-
-    XFREE(tbuf1);
 }
 
 void do_mail_retract(dbref player, char *name, char *msglist)
@@ -1081,7 +1077,7 @@ void do_mail_fwd(dbref player, char *msg, char *tolist)
     }
 
     s = XMALLOC(LBUF_SIZE, "s");
-    snprintf(s, LBUF_SIZE, "%s (fwd from %s)", mp->subject, Name(mp->from));
+    XSNPRINTF(s, LBUF_SIZE, "%s (fwd from %s)", mp->subject, Name(mp->from));
     mail_ok = do_expmail_start(player, tolist, NULL, s);
     XFREE(s);
 
@@ -1089,7 +1085,7 @@ void do_mail_fwd(dbref player, char *msg, char *tolist)
     {
         atr_add_raw(player, A_MAILMSG, get_mail_message(mp->number));
         s = XMALLOC(LBUF_SIZE, "s");
-        snprintf(s, LBUF_SIZE, "%d", atoi(atr_get_raw(player, A_MAILFLAGS)) | M_FORWARD);
+        XSNPRINTF(s, LBUF_SIZE, "%d", atoi(atr_get_raw(player, A_MAILFLAGS)) | M_FORWARD);
         atr_add_raw(player, A_MAILFLAGS, s);
         XFREE(s);
     }
@@ -1099,7 +1095,8 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
 {
     struct mail *mp;
     int num, mail_ok;
-    char *tolist, *ccnames, *bp, *p, *oldlist, *tokst, *s;
+    char *ccnames, *bp, *p, *oldlist, *tokst, *s;
+    char tolist_buf[LBUF_SIZE];
 
     if (Sending_Mail(player))
     {
@@ -1165,29 +1162,29 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
         XFREE(oldlist);
     }
 
-    tolist = msg;
+    XSNPRINTF(tolist_buf, LBUF_SIZE, "%d", mp->from);
     s = XMALLOC(LBUF_SIZE, "s");
 
     if (strncmp(mp->subject, "Re:", 3))
     {
-        snprintf(s, LBUF_SIZE, "Re: %s", mp->subject);
-        mail_ok = do_expmail_start(player, tolist, ccnames, s);
+        XSNPRINTF(s, LBUF_SIZE, "Re: %s", mp->subject);
+        mail_ok = do_expmail_start(player, tolist_buf, ccnames, s);
     }
     else
     {
-        snprintf(s, LBUF_SIZE, "%s", mp->subject);
-        mail_ok = do_expmail_start(player, tolist, ccnames, s);
+        XSNPRINTF(s, LBUF_SIZE, "%s", mp->subject);
+        mail_ok = do_expmail_start(player, tolist_buf, ccnames, s);
     }
 
     if (mail_ok)
     {
         if (key & MAIL_QUOTE)
         {
-            snprintf(s, LBUF_SIZE, "On %s, %s wrote:\r\n\r\n%s\r\n\r\n********** End of included message from %s\r\n", mp->time, Name(mp->from), get_mail_message(mp->number), Name(mp->from));
+            XSNPRINTF(s, LBUF_SIZE, "On %s, %s wrote:\r\n\r\n%s\r\n\r\n********** End of included message from %s\r\n", mp->time, Name(mp->from), get_mail_message(mp->number), Name(mp->from));
             atr_add_raw(player, A_MAILMSG, s);
         }
 
-        snprintf(s, LBUF_SIZE, "%d", (atoi(atr_get_raw(player, A_MAILFLAGS)) | M_REPLY));
+        XSNPRINTF(s, LBUF_SIZE, "%d", (atoi(atr_get_raw(player, A_MAILFLAGS)) | M_REPLY));
         atr_add_raw(player, A_MAILFLAGS, s);
     }
 
@@ -1297,8 +1294,8 @@ static void send_mail(dbref player, dbref target, char *tolist, char *cclist, ch
     tt = time(NULL);
     XSTRCPY(tbuf1, ctime(&tt));
     tbuf1[strlen(tbuf1) - 1] = '\0'; /*
-                         * whack the newline
-                         */
+                                      * whack the newline
+                                      */
     /*
      * initialize the appropriate fields
      */
@@ -1330,8 +1327,8 @@ static void send_mail(dbref player, dbref target, char *tolist, char *cclist, ch
     newp->time = XSTRDUP(tbuf1, "newp->time");
     newp->subject = XSTRDUP(subject, "newp->subject");
     newp->read = flags & M_FMASK; /*
-                     * Send to folder 0
-                     */
+                                   * Send to folder 0
+                                   */
 
     /*
      * if this is the first message, it is the head and the tail
@@ -1572,8 +1569,8 @@ void do_mail_stats(dbref player, char *name, int full)
     if (target == AMBIGUOUS)
     {
         /*
-                         * stats for all
-                         */
+         * stats for all
+         */
         if (full == 0)
         {
             MAIL_ITER_ALL(mp, thing)
@@ -2085,7 +2082,7 @@ void mod_mail_load_database(FILE *fp)
         else
         {
             s = XMALLOC(LBUF_SIZE, "s");
-            snprintf(s, LBUF_SIZE, "%d", mp->to);
+            XSNPRINTF(s, LBUF_SIZE, "%d", mp->to);
             mp->tolist = XSTRDUP(s, "mp->tolist");
             XFREE(s);
         }
@@ -2171,7 +2168,14 @@ static int get_folder_number(dbref player, char *name)
 
     str = XMALLOC(LBUF_SIZE, "str");
     bp = pat = XMALLOC(LBUF_SIZE, "pat");
-    strcpy(str, atrstr);
+    if (!str || !pat)
+    {
+        XFREE(str);
+        XFREE(pat);
+        XFREE(atrstr);
+        return -1;
+    }
+    XSTRNCPY(str, atrstr, LBUF_SIZE - 1);
     SAFE_SPRINTF(pat, &bp, ":%s:", upcasestr(name));
     res = (char *)strstr(str, pat);
 
@@ -2189,7 +2193,7 @@ static int get_folder_number(dbref player, char *name)
     while (!isspace(*p))
         p++;
 
-    p = 0;
+    *p = '\0';
     XFREE(atrstr);
     XFREE(str);
     XFREE(pat);
@@ -2207,7 +2211,7 @@ static char *get_folder_name(dbref player, int fld)
      * Get the name of the folder, or "nameless"
      */
     pat = XMALLOC(LBUF_SIZE, "pat");
-    snprintf(pat, LBUF_SIZE, "%d:", fld);
+    XSNPRINTF(pat, LBUF_SIZE, "%d:", fld);
     old = NULL;
     atrstr = atr_get(player, A_MAILFOLDERS, &player, &flags, &alen);
 
@@ -2257,8 +2261,8 @@ void add_folder_name(dbref player, int fld, char *name)
     pat = XMALLOC(LBUF_SIZE, "pat");
     str = XMALLOC(LBUF_SIZE, "str");
     tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-    snprintf(new, LBUF_SIZE, "%d:%s:%d ", fld, upcasestr(name), fld);
-    snprintf(pat, LBUF_SIZE, "%d:", fld);
+    XSNPRINTF(new, LBUF_SIZE, "%d:%s:%d ", fld, upcasestr(name), fld);
+    XSNPRINTF(pat, LBUF_SIZE, "%d:", fld);
     /* get the attrib and the old string, if any */
     old = NULL;
     atrstr = atr_get(player, A_MAILFOLDERS, &player, &aflags, &alen);
@@ -2332,7 +2336,7 @@ void set_player_folder(dbref player, int fnum)
     ATTR *a;
     char *tbuf1;
     tbuf1 = XMALLOC(LBUF_SIZE, "tbuf1");
-    snprintf(tbuf1, LBUF_SIZE, "%d", fnum);
+    XSNPRINTF(tbuf1, LBUF_SIZE, "%d", fnum);
     a = (ATTR *)atr_num(A_MAILCURF);
 
     if (a)
@@ -2340,8 +2344,8 @@ void set_player_folder(dbref player, int fnum)
     else
     {
         /*
-                     * Shouldn't happen, but...
-                     */
+         * Shouldn't happen, but...
+         */
         atr_add(player, A_MAILCURF, tbuf1, GOD, AF_WIZARD | AF_NOPROG | AF_LOCK);
     }
 
@@ -2474,8 +2478,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
     if (!p || !*p)
     {
         return 1; /*
-                 * all messages
-                 */
+                   * all messages
+                   */
     }
 
     if (isdigit(*p))
@@ -2531,8 +2535,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
         switch (*p)
         {
         case '-': /*
-                 * Range with no start
-                 */
+                   * Range with no start
+                   */
             p++;
 
             if (!p || !*p)
@@ -2552,8 +2556,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             break;
 
         case '~': /*
-                 * exact # of days old
-                 */
+                   * exact # of days old
+                   */
             p++;
 
             if (!p || !*p)
@@ -2574,8 +2578,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             break;
 
         case '<': /*
-                 * less than # of days old
-                 */
+                   * less than # of days old
+                   */
             p++;
 
             if (!p || !*p)
@@ -2596,8 +2600,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             break;
 
         case '>': /*
-                 * greater than # of days old
-                 */
+                   * greater than # of days old
+                   */
             p++;
 
             if (!p || !*p)
@@ -2618,8 +2622,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             break;
 
         case '#': /*
-                 * From db#
-                 */
+                   * From db#
+                   */
             p++;
 
             if (!p || !*p)
@@ -2639,8 +2643,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             break;
 
         case '*': /*
-                 * From player name
-                 */
+                   * From player name
+                   */
             p++;
 
             if (!p || !*p)
@@ -2672,15 +2676,15 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
             switch (*p)
             {
             case 'r': /*
-                     * Urgent
-                     */
+                       * Urgent
+                       */
             case 'R':
                 ms->flags = M_URGENT;
                 break;
 
             case 'n': /*
-                     * Unread
-                     */
+                       * Unread
+                       */
             case 'N':
                 ms->flags = M_MSUNREAD;
                 break;
@@ -2709,8 +2713,8 @@ static int parse_msglist(char *msglist, struct mail_selector *ms, dbref player)
 
         case 'm':
         case 'M': /*
-                 * Mass, me
-                 */
+                   * Mass, me
+                   */
             p++;
 
             if (!p || !*p)
@@ -2847,27 +2851,27 @@ static char *status_string(struct mail *mp)
     XSTRCPY(tbuf1, "");
 
     if (Read(mp))
-        strcat(tbuf1, "Read ");
+        XSTRCAT(tbuf1, "Read ");
     else
-        strcat(tbuf1, "Unread ");
+        XSTRCAT(tbuf1, "Unread ");
 
     if (Cleared(mp))
-        strcat(tbuf1, "Cleared ");
+        XSTRCAT(tbuf1, "Cleared ");
 
     if (Urgent(mp))
-        strcat(tbuf1, "Urgent ");
+        XSTRCAT(tbuf1, "Urgent ");
 
     if (Mass(mp))
-        strcat(tbuf1, "Mass ");
+        XSTRCAT(tbuf1, "Mass ");
 
     if (Forward(mp))
-        strcat(tbuf1, "Fwd ");
+        XSTRCAT(tbuf1, "Fwd ");
 
     if (Tagged(mp))
-        strcat(tbuf1, "Tagged ");
+        XSTRCAT(tbuf1, "Tagged ");
 
     if (M_Safe(mp))
-        strcat(tbuf1, "Safe");
+        XSTRCAT(tbuf1, "Safe");
 
     return tbuf1;
 }
@@ -3011,8 +3015,8 @@ struct malias *get_malias(dbref player, char *alias)
             if ((m->owner == player) || God(m->owner))
             {
                 if (!strcmp(mal, m->name)) /*
-                                 * Found it!
-                                 */
+                                            * Found it!
+                                            */
                     return m;
             }
         }
@@ -3160,8 +3164,8 @@ void do_malias_create(dbref player, char *alias, char *tolist)
     XSTRCPY(malias[ma_top]->name, na);
     malias[ma_top]->desc = (char *)XMALLOC(sizeof(char) * (strlen(na) + 1), "malias[ma_top]->desc");
     XSTRCPY(malias[ma_top]->desc, na); /*
-                         * For now do this.
-                         */
+                                        * For now do this.
+                                        */
     ma_top++;
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "MAIL: Alias set '%s' defined.", alias);
 }
@@ -3761,7 +3765,7 @@ void mail_to_list(dbref player, char *tolist, char *cclist, char *bcclist, char 
                 else
                 {
                     s = XMALLOC(LBUF_SIZE, "s");
-                    snprintf(s, LBUF_SIZE, "Alias Error: Bad Player %d for %s", m->list[i], head);
+                    XSNPRINTF(s, LBUF_SIZE, "Alias Error: Bad Player %d for %s", m->list[i], head);
                     send_mail(GOD, GOD, tolist, NULL, NULL, subject, add_mail_message(player, s), flags, silent);
                     XFREE(s);
                 }
@@ -4392,7 +4396,10 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
     dbref playerask;
     int num;
 
-    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc)) { return; }
+    if (!fn_range_check(((FUN *)fargs[-1])->name, nfargs, 1, 2, buff, bufc))
+    {
+        return;
+    }
 
     if (nfargs == 1)
     {
