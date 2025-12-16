@@ -20,6 +20,7 @@
 #include "prototypes.h"
 
 #include <string.h>
+#include <limits.h>
 
 void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *what, char *costchar)
 {
@@ -50,6 +51,13 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		break;
 
 	default:
+		/* Validate victim is a valid object */
+		if (!Good_obj(victim))
+		{
+			notify(player, "Invalid target.");
+			break;
+		}
+
 		if ((Typeof(victim) != TYPE_PLAYER) && (Typeof(victim) != TYPE_THING))
 		{
 			notify(player, "Sorry, you can only kill players and things.");
@@ -63,9 +71,18 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		}
 
 		/*
-		 * go for it
+		 * go for it - validate cost conversion
 		 */
-		cost = (int)strtol(costchar, (char **)NULL, 10);
+		char *endptr;
+		long lval = strtol(costchar, &endptr, 10);
+		if (endptr == costchar || *endptr != '\0' || lval < 0 || lval > INT_MAX)
+		{
+			cost = 0; /* Invalid conversion, use 0 */
+		}
+		else
+		{
+			cost = (int)lval;
+		}
 
 		if (key == KILL_KILL)
 		{
@@ -94,7 +111,14 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			cost = 0;
 		}
 
-		if (!((mushconf.killguarantee && ((int)(random_range(0, (mushconf.killguarantee) - 1)) < cost)) || (key == KILL_SLAY)) || Wizard(victim))
+		/* Protect against division by zero in killguarantee and validate random_range */
+		int kill_success = 0;
+		if (mushconf.killguarantee > 0)
+		{
+			kill_success = ((int)(random_range(0, (mushconf.killguarantee) - 1)) < cost);
+		}
+
+		if (!(((mushconf.killguarantee > 0) && kill_success) || (key == KILL_SLAY)) || Wizard(victim))
 		{
 			/*
 			 * Failure: notify player and victim only
@@ -102,22 +126,26 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			notify(player, "Your murder attempt failed.");
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
-			SAFE_SPRINTF(buf1, &bp, "%s tried to kill you!", Name(player));
+			const char *pname = Name(player);
+			SAFE_SPRINTF(buf1, &bp, "%s tried to kill you!", pname ? pname : "Someone");
 			notify_with_cause(victim, player, buf1);
 
 			if (Suspect(player))
 			{
-				XSTRCPY(buf1, Name(player));
+				const char *pname = Name(player);
+				const char *vname = Name(victim);
+				XSTRCPY(buf1, pname ? pname : "?Unknown?");
 
 				if (player == Owner(player))
 				{
-					raw_broadcast(WIZARD, "[Suspect] %s tried to kill %s(#%d).", buf1, Name(victim), victim);
+					raw_broadcast(WIZARD, "[Suspect] %s tried to kill %s(#%d).", buf1, vname ? vname : "?Unknown?", victim);
 				}
 				else
 				{
 					buf2 = XMALLOC(LBUF_SIZE, "buf2");
-					XSTRCPY(buf2, Name(Owner(player)));
-					raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> tried to kill %s(#%d).", buf2, buf1, player, Name(victim), victim);
+					const char *oname = Name(Owner(player));
+					XSTRCPY(buf2, oname ? oname : "?Unknown?");
+					raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> tried to kill %s(#%d).", buf2, buf1, player, vname ? vname : "?Unknown?", victim);
 					XFREE(buf2);
 				}
 			}
@@ -131,26 +159,30 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		 */
 		buf1 = XMALLOC(LBUF_SIZE, "buf1");
 		buf2 = XMALLOC(LBUF_SIZE, "buf2");
+		const char *vname = Name(victim);
+		const char *safe_vname = vname ? vname : "?Unknown?";
 
 		if (Suspect(player))
 		{
-			XSTRCPY(buf1, Name(player));
+			const char *pname = Name(player);
+			XSTRCPY(buf1, pname ? pname : "?Unknown?");
 
 			if (player == Owner(player))
 			{
-				raw_broadcast(WIZARD, "[Suspect] %s killed %s(#%d).", buf1, Name(victim), victim);
+				raw_broadcast(WIZARD, "[Suspect] %s killed %s(#%d).", buf1, safe_vname, victim);
 			}
 			else
 			{
-				XSTRCPY(buf2, Name(Owner(player)));
-				raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> killed %s(#%d).", buf2, buf1, player, Name(victim), victim);
+				const char *oname = Name(Owner(player));
+				XSTRCPY(buf2, oname ? oname : "?Unknown?");
+				raw_broadcast(WIZARD, "[Suspect] %s <via %s(#%d)> killed %s(#%d).", buf2, buf1, player, safe_vname, victim);
 			}
 		}
 
 		bp = buf1;
-		SAFE_SPRINTF(buf1, &bp, "You killed %s!", Name(victim));
+		SAFE_SPRINTF(buf1, &bp, "You killed %s!", safe_vname);
 		bp = buf2;
-		SAFE_SPRINTF(buf2, &bp, "killed %s!", Name(victim));
+		SAFE_SPRINTF(buf2, &bp, "killed %s!", safe_vname);
 
 		if (Typeof(victim) != TYPE_PLAYER)
 			if (halt_que(NOTHING, victim) > 0)
@@ -164,7 +196,8 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		 * notify victim
 		 */
 		bp = buf1;
-		SAFE_SPRINTF(buf1, &bp, "%s killed you!", Name(player));
+		const char *pname = Name(player);
+		SAFE_SPRINTF(buf1, &bp, "%s killed you!", pname ? pname : "Someone");
 		notify_with_cause(victim, player, buf1);
 
 		/*
@@ -225,9 +258,23 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 		return;
 	}
 
+	/* Validate thing is a valid object */
+	if (!Good_obj(thing))
+	{
+		notify(giver, "Invalid object.");
+		return;
+	}
+
 	if (thing == giver)
 	{
 		notify(giver, "You can't give yourself away!");
+		return;
+	}
+
+	/* Validate recipient is a valid object */
+	if (!Good_obj(recipient))
+	{
+		notify(giver, "Invalid recipient.");
 		return;
 	}
 
@@ -268,10 +315,13 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	if (!(key & GIVE_QUIET))
 	{
 		str = XMALLOC(LBUF_SIZE, "str");
-		XSTRCPY(str, Name(giver));
-		notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you %s.", str, Name(thing));
+		const char *gname = Name(giver);
+		const char *tname = Name(thing);
+		const char *rname = Name(recipient);
+		XSTRCPY(str, gname ? gname : "Someone");
+		notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you %s.", str, tname ? tname : "something");
 		notify(giver, "Given.");
-		notify_check(thing, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you to %s.", str, Name(recipient));
+		notify_check(thing, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gave you to %s.", str, rname ? rname : "someone");
 		XFREE(str);
 	}
 
@@ -284,6 +334,13 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	dbref aowner;
 	int cost, aflags, alen;
 	char *str;
+
+	/* Validate recipient is a valid object */
+	if (!Good_obj(recipient))
+	{
+		notify(giver, "Invalid recipient.");
+		return;
+	}
 
 	/*
 	 * do amount consistency check
@@ -301,9 +358,17 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 		return;
 	}
 
+	/* Protect against integer overflow with INT_MIN */
+	if (amount == INT_MIN)
+	{
+		notify(giver, "Invalid amount.");
+		return;
+	}
+
 	if (!Wizard(giver))
 	{
-		if ((Typeof(recipient) == TYPE_PLAYER) && (Pennies(recipient) + amount > mushconf.paylimit))
+		/* Protect against integer overflow in addition */
+		if ((Typeof(recipient) == TYPE_PLAYER) && amount > 0 && (Pennies(recipient) > mushconf.paylimit - amount))
 		{
 			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "That player doesn't need that many %s!", mushconf.many_coins);
 			return;
@@ -311,7 +376,8 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 
 		if (!could_doit(giver, recipient, A_LRECEIVE))
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s won't take your money.", Name(recipient));
+			const char *rname = Name(recipient);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s won't take your money.", rname ? rname : "Someone");
 			return;
 		}
 	}
@@ -333,8 +399,25 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	if (Typeof(recipient) == TYPE_THING)
 	{
 		str = atr_pget(recipient, A_COST, &aowner, &aflags, &alen);
-		cost = (int)strtol(str, (char **)NULL, 10);
-		XFREE(str);
+		char *endptr = NULL;
+		long lval = 0;
+		if (str && *str)
+		{
+			lval = strtol(str, &endptr, 10);
+		}
+
+		if (!str || endptr == str || (endptr && *endptr != '\0') || lval < INT_MIN || lval > INT_MAX)
+		{
+			cost = 0; /* Missing or invalid conversion */
+		}
+		else
+		{
+			cost = (int)lval;
+		}
+		if (str)
+		{
+			XFREE(str);
+		}
 
 		/*
 		 * Can't afford it?
@@ -363,15 +446,20 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 
 	if (!(key & GIVE_QUIET))
 	{
+		const char *gname = Name(giver);
+		const char *rname = Name(recipient);
+		const char *safe_gname = gname ? gname : "Someone";
+		const char *safe_rname = rname ? rname : "someone";
+
 		if (amount == 1)
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give a %s to %s.", mushconf.one_coin, Name(recipient));
-			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you a %s.", Name(giver), mushconf.one_coin);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give a %s to %s.", mushconf.one_coin, safe_rname);
+			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you a %s.", safe_gname, mushconf.one_coin);
 		}
 		else
 		{
-			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give %d %s to %s.", amount, mushconf.many_coins, Name(recipient));
-			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you %d %s.", Name(giver), amount, mushconf.many_coins);
+			notify_check(giver, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You give %d %s to %s.", amount, mushconf.many_coins, safe_rname);
+			notify_check(recipient, giver, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%s gives you %d %s.", safe_gname, amount, mushconf.many_coins);
 		}
 	}
 
@@ -428,6 +516,13 @@ void do_give(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		return;
 	}
 
+	/* Validate recipient is a valid object */
+	if (!Good_obj(recipient))
+	{
+		notify(player, "Invalid recipient.");
+		return;
+	}
+
 	if (isExit(recipient))
 	{
 		notify(player, "You can't give anything to an exit.");
@@ -442,7 +537,14 @@ void do_give(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 
 	if (is_number(amnt))
 	{
-		give_money(player, recipient, key, (int)strtol(amnt, (char **)NULL, 10));
+		char *endptr;
+		long lval = strtol(amnt, &endptr, 10);
+		if (endptr == amnt || *endptr != '\0' || lval < INT_MIN || lval > INT_MAX)
+		{
+			notify(player, "Invalid amount.");
+			return;
+		}
+		give_money(player, recipient, key, (int)lval);
 	}
 	else
 	{
