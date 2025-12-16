@@ -471,7 +471,7 @@ void fixcase(char *name)
 
     while (*cp)
     {
-        *cp = toupper(*cp);
+        *cp = (char)toupper((unsigned char)*cp);
         cp++;
     }
 
