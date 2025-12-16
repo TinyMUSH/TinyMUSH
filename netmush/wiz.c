@@ -163,6 +163,11 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 		}
 
 		exitloc = Exits(victim);
+		if (exitloc == NOTHING)
+		{
+			notify_quiet(player, "Exit has no source location.");
+			return;
+		}
 		s_Exits(exitloc, remove_first(Exits(exitloc), victim));
 		s_Exits(destination, insert_first(Exits(destination), victim));
 		s_Exits(victim, destination);
@@ -214,7 +219,9 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 	}
 	else if (isExit(destination))
 	{
-		if (Exits(destination) == Location(victim))
+		dbref dest_exits = Exits(destination);
+		dbref victim_loc = Location(victim);
+		if (dest_exits != NOTHING && dest_exits == victim_loc)
 		{
 			move_exit(victim, destination, 0, "You can't go that way.", 0);
 		}
@@ -442,7 +449,13 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	 */
 	struct crypt_data cdata;
 	cdata.initialized = 0;
-	s_Pass(victim, crypt_r((const char *)password, "XX", &cdata));
+	char *crypt_result = crypt_r((const char *)password, "XX", &cdata);
+	if (!crypt_result)
+	{
+		notify_quiet(player, "Password encryption failed.");
+		return;
+	}
+	s_Pass(victim, crypt_result);
 	notify_quiet(player, "Password changed.");
 	notify_check(victim, victim, MSG_PUP_ALWAYS | MSG_ME, "Your password has been changed by %s.", Name(player));
 }
@@ -667,6 +680,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 
 		mushconf.motd_msg = XSTRDUP(message, "mushconf.motd_msg");
+		if (!mushconf.motd_msg)
+		{
+			notify_quiet(player, "Memory allocation failed.");
+			return;
+		}
 
 		if (!Quiet(player))
 		{
@@ -682,6 +700,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 
 		mushconf.wizmotd_msg = XSTRDUP(message, "mushconf.wizmotd_msg");
+		if (!mushconf.wizmotd_msg)
+		{
+			notify_quiet(player, "Memory allocation failed.");
+			return;
+		}
 
 		if (!Quiet(player))
 		{
@@ -697,6 +720,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 
 		mushconf.downmotd_msg = XSTRDUP(message, "do_motd.downmotd");
+		if (!mushconf.downmotd_msg)
+		{
+			notify_quiet(player, "Memory allocation failed.");
+			return;
+		}
 
 		if (!Quiet(player))
 		{
@@ -712,6 +740,11 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
 		}
 
 		mushconf.fullmotd_msg = XSTRDUP(message, "mushconf.fullmotd_msg");
+		if (!mushconf.fullmotd_msg)
+		{
+			notify_quiet(player, "Memory allocation failed.");
+			return;
+		}
 
 		if (!Quiet(player))
 		{
