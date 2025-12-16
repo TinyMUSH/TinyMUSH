@@ -1400,14 +1400,14 @@ char *remap_colors(const char *s, int *cmap)
 					{
 						SAFE_LTOS(buf, &bp, cmap[n - I_ANSI_BLACK], LBUF_SIZE);
 
-						while (isdigit(*s))
+						while (isdigit((unsigned char)*s))
 						{
 							s++;
 						}
 					}
 					else
 					{
-						while (isdigit(*s))
+						while (isdigit((unsigned char)*s))
 						{
 							SAFE_LB_CHR(*s, buf, &bp);
 							s++;
@@ -1967,7 +1967,7 @@ char *munge_space(char *string)
 	p = string;
 	q = buffer;
 
-	while (p && *p && isspace(*p))
+	while (p && *p && isspace((unsigned char)*p))
 	{
 		p++;
 	}
@@ -2012,7 +2012,7 @@ char *trim_spaces(char *string)
 	p = string;
 	q = buffer;
 
-	while (p && *p && isspace(*p))
+	while (p && *p && isspace((unsigned char)*p))
 	{
 		p++; /* remove inital spaces */
 	}
@@ -2775,7 +2775,7 @@ int matches_exit_from_list(char *exit_list, char *pattern)
 		if (*s == '\0')
 		{
 			/* Make sure nothing afterwards */
-			while (*pattern && isspace(*pattern))
+			while (*pattern && isspace((unsigned char)*pattern))
 			{
 				pattern++;
 			}
