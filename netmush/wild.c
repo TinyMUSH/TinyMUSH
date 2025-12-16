@@ -93,6 +93,11 @@ int check_literals(char *tstr, char *dstr)
 	 * * to worry about.
 	 */
 	ep--;
+	/* Validate pattern is not empty to prevent wraparound */
+	if (tstr >= tstr + strlen(tstr))
+	{
+		return (*dstr == '\0') ? 1 : 0; /* Empty pattern remaining */
+	}
 	xp = tstr + strlen(tstr) - 1;
 
 	while ((ep >= dstr) && (xp >= tstr) && (*xp != '*') && (*xp != '?'))
@@ -155,6 +160,11 @@ int check_literals(char *tstr, char *dstr)
 			if (*tstr == '\\')
 			{
 				tstr++;
+				/* Validate we didn't go past end of pattern */
+				if (!*tstr || tstr > xp)
+				{
+					return 0; /* Invalid escape at end */
+				}
 			}
 
 			/* Bounds check: prevent pattern overflow */
@@ -462,6 +472,11 @@ int real_wild1(char *tstr, char *dstr, int arg)
 
 	if (!tstr[1])
 	{
+		/* Bounds check: ensure arg is within valid range */
+		if (arg >= numargs)
+		{
+			return 1; /* Can't store more args, but match succeeds */
+		}
 		XSTRNCPY(arglist[arg], dstr, LBUF_SIZE - 1);
 		arglist[arg][LBUF_SIZE - 1] = '\0';
 		return 1;
@@ -485,6 +500,10 @@ int real_wild1(char *tstr, char *dstr, int arg)
 			 * Fill in arguments if someone put another '*'
 			 * * before a fixed string.
 			 */
+			if (argpos >= numargs)
+			{
+				return 1; /* No more room, but match succeeds */
+			}
 			arglist[argpos][0] = '\0';
 			argpos++;
 
@@ -503,6 +522,10 @@ int real_wild1(char *tstr, char *dstr, int arg)
 
 			while (argpos < arg)
 			{
+				if (argpos >= numargs)
+				{
+					return 1; /* No more room */
+				}
 				arglist[argpos][0] = *datapos;
 				arglist[argpos][1] = '\0';
 				datapos++;
