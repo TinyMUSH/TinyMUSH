@@ -21,6 +21,8 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <limits.h>
 
 /* --------------------------------------------------------------------------
  * Constants.
@@ -835,11 +837,28 @@ void join_channel(dbref player, char *chan_name, char *alias_str, char *title_st
     cap->player = player;
     cap->alias = XSTRDUP(alias_str, "join_channel.cap->alias");
 
+    if (!cap->alias)
+    {
+        notify(player, "Out of memory.");
+        XFREE(cap);
+        return;
+    }
+
     /* Note that even if the player is already on this channel,
      * we do not inherit the channel title from other aliases.
      */
     if (title_str && *title_str)
+    {
         cap->title = XSTRDUP(munge_comtitle(title_str), "join_channel.cap->title");
+
+        if (!cap->title)
+        {
+            notify(player, "Out of memory.");
+            XFREE(cap->alias);
+            XFREE(cap);
+            return;
+        }
+    }
     else
         cap->title = NULL;
 
@@ -947,6 +966,12 @@ void channel_clr(dbref player)
 
         if (!found)
         {
+            if (pos >= mod_comsys_comsys_htab.entries)
+            {
+                log_write(LOG_BUGS, "BUG", "CHR", "ch_array overflow in mod_comsys_cleanup_player");
+                break;
+            }
+
             ch_array[pos] = cl_ptr->alias_ptr->channel;
             pos++;
         }
@@ -1088,6 +1113,14 @@ void do_ccreate(dbref player, dbref cause __attribute__((unused)), int key __att
     }
 
     chp->name = XSTRDUP(name, "do_ccreate.chp->name");
+
+    if (!chp->name)
+    {
+        notify(player, "Out of memory.");
+        XFREE(chp);
+        return;
+    }
+
     chp->owner = Owner(player);
     chp->flags = CHAN_FLAG_P_JOIN | CHAN_FLAG_P_TRANS | CHAN_FLAG_P_RECV |
                  CHAN_FLAG_O_JOIN | CHAN_FLAG_O_TRANS | CHAN_FLAG_O_RECV;
@@ -1102,6 +1135,15 @@ void do_ccreate(dbref player, dbref cause __attribute__((unused)), int key __att
     chp->join_lock = chp->trans_lock = chp->recv_lock = NULL;
     snprintf(buf, MBUF_SIZE, "[%s]", chp->name);
     chp->header = XSTRDUP(buf, "do_ccreate.chp->header");
+
+    if (!chp->header)
+    {
+        notify(player, "Out of memory.");
+        XFREE(chp->name);
+        XFREE(chp);
+        return;
+    }
+
     hashadd(name, (int *)chp, &mod_comsys_comsys_htab, 0);
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Channel %s created.", name);
 }
@@ -1141,6 +1183,12 @@ void do_cdestroy(dbref player, dbref cause __attribute__((unused)), int key __at
 
             if (cap->channel == chp)
             {
+                if (count >= htab->entries)
+                {
+                    log_write(LOG_BUGS, "BUG", "CHR", "alias_array overflow in do_cdestroy");
+                    break;
+                }
+
                 name_array[count] = hptr->target.s;
                 alias_array[count] = cap;
                 count++;
@@ -1345,14 +1393,19 @@ void do_channel(dbref player, dbref cause __attribute__((unused)), int key, char
     }
     else if (key & CHANNEL_CHARGE)
     {
-        c_charge = atoi(arg);
+        char *endptr;
+        long val;
 
-        if ((c_charge < 0) || (c_charge > 32767))
+        errno = 0;
+        val = strtol(arg, &endptr, 10);
+
+        if (errno != 0 || *endptr != '\0' || val < 0 || val > 32767)
         {
             notify(player, "That is not a reasonable cost.");
             return;
         }
 
+        c_charge = (int)val;
         chp->charge = c_charge;
         notify(player, "Set.");
     }
@@ -1640,6 +1693,13 @@ void do_comtitle(dbref player, dbref cause __attribute__((unused)), int key __at
     }
 
     cap->title = XSTRDUP(munge_comtitle(title), "do_comtitle.cap->title");
+
+    if (!cap->title)
+    {
+        notify(player, "Out of memory.");
+        return;
+    }
+
     notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Title set to '%s' on channel %s.", cap->title, cap->channel->name);
 }
 
@@ -1813,6 +1873,11 @@ int mod_comsys_process_command(dbref player, dbref cause __attribute__((unused))
 
     if (!in_cmd || !*in_cmd || Slave(player))
         return 0;
+
+    if (strlen(in_cmd) >= LBUF_SIZE)
+    {
+        return 0; /* Input too long, cannot process */
+    }
 
     strcpy(cmd, in_cmd);
     arg = cmd;
@@ -2266,6 +2331,12 @@ static void sanitize_comsys(void)
         {
             if (!Good_obj(hptr->target.i))
             {
+                if (count >= htab->entries)
+                {
+                    log_write(LOG_BUGS, "BUG", "CHR", "ptab overflow in sanitize_comsys");
+                    break;
+                }
+
                 ptab[count] = hptr->target.i;
                 count++;
             }
@@ -2310,7 +2381,17 @@ void mod_comsys_load_database(FILE *fp)
     {
         if (!strncmp(buffer, (char *)"+V", 2))
         {
-            read_comsys(fp, atoi(buffer + 2));
+            char *endptr;
+            long version;
+
+            errno = 0;
+            version = strtol(buffer + 2, &endptr, 10);
+
+            if (errno == 0 && version >= 0 && version <= INT_MAX)
+                read_comsys(fp, (int)version);
+            else
+                log_write(LOG_STARTUP, "INI", "COM", "Invalid comsys version.");
+
             sanitize_comsys();
         }
         else
