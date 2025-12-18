@@ -96,12 +96,12 @@ include(CTest)
 enable_testing()
 
 find_program(TAR_BINARY tar)
-configure_file(${CMAKE_SOURCE_DIR}/netmush/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
-configure_file(${CMAKE_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf)
-configure_file(${CMAKE_SOURCE_DIR}/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example)
+configure_file(${CMAKE_SOURCE_DIR}/src/netmush/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/src/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf)
+configure_file(${CMAKE_SOURCE_DIR}/src/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example)
 configure_file(${CMAKE_SOURCE_DIR}/systemd/tinymush.service.in ${CMAKE_CURRENT_BINARY_DIR}/systemd/tinymush.service)
 
-include_directories(${CMAKE_SOURCE_DIR}/netmush)
+include_directories(${CMAKE_SOURCE_DIR}/src/netmush)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 if(APPLE)
     include_directories(/usr/local/include /opt/homebrew/include)
@@ -129,11 +129,11 @@ macro(install_symlink filepath sympath)
     ")
 endmacro(install_symlink)
 
-add_subdirectory(netmush)
-add_subdirectory(modules/mail)
-add_subdirectory(modules/comsys)
+add_subdirectory(src/netmush)
+add_subdirectory(src/modules/mail)
+add_subdirectory(src/modules/comsys)
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/docs DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/docs DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
 install(DIRECTORY DESTINATION backups)
 install(DIRECTORY DESTINATION db)
 install(DIRECTORY DESTINATION logs)
@@ -156,20 +156,20 @@ if(TINYMUSH_PRESERVE_CONFIGS)
         ")
     endif()
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example DESTINATION configs)
-    install_config_if_missing("${CMAKE_SOURCE_DIR}/configs/alias.conf" "alias.conf")
-    install_config_if_missing("${CMAKE_SOURCE_DIR}/configs/compat.conf" "compat.conf")
+    install_config_if_missing("${CMAKE_SOURCE_DIR}/src/configs/alias.conf" "alias.conf")
+    install_config_if_missing("${CMAKE_SOURCE_DIR}/src/configs/compat.conf" "compat.conf")
     install_config_if_missing("${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf" "netmush.conf")
 else()
     install(FILES 
-        ${CMAKE_SOURCE_DIR}/configs/alias.conf
-        ${CMAKE_SOURCE_DIR}/configs/compat.conf
+        ${CMAKE_SOURCE_DIR}/src/configs/alias.conf
+        ${CMAKE_SOURCE_DIR}/src/configs/compat.conf
         ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf
         ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example
         DESTINATION configs)
 endif()
 install_symlink(${CMAKE_SOURCE_DIR}/game/netmush ${CMAKE_INSTALL_PREFIX}/recover)
 install_symlink(${CMAKE_SOURCE_DIR}/game/netmush ${CMAKE_INSTALL_PREFIX}/dbconvert)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/scripts DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/systemd DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
 
 add_custom_target(install-upgrade
