@@ -1727,7 +1727,7 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	if (nfargs < 2)
 	{
-		SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (HASFLAGS) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
+		XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (HASFLAGS) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
 		return;
 	}
 
@@ -3594,7 +3594,7 @@ void fun_stats(char *buff, char **bufc, dbref player, dbref caller __attribute__
 		return;
 	}
 
-	SAFE_SPRINTF(buff, bufc, "%d %d %d %d %d %d %d %d", statinfo.s_total, statinfo.s_rooms, statinfo.s_exits, statinfo.s_things, statinfo.s_players, statinfo.s_unknown, statinfo.s_going, statinfo.s_garbage);
+	XSAFESPRINTF(buff, bufc, "%d %d %d %d %d %d %d %d", statinfo.s_total, statinfo.s_rooms, statinfo.s_exits, statinfo.s_things, statinfo.s_players, statinfo.s_unknown, statinfo.s_going, statinfo.s_garbage);
 }
 
 /*
@@ -4089,7 +4089,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 		{
 			if ((key == SAY_SAY) && (spos == 0))
 			{
-				SAFE_SPRINTF(buff, bufc, "%s %s %s", sname, say_str, result);
+				XSAFESPRINTF(buff, bufc, "%s %s %s", sname, say_str, result);
 			}
 			else
 			{
@@ -4371,29 +4371,29 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		case ':':
 			if (*(fargs[1] + 1) == ' ')
 			{
-				SAFE_SPRINTF(buff, bufc, "%s%s", tname, fargs[1] + 2);
+				XSAFESPRINTF(buff, bufc, "%s%s", tname, fargs[1] + 2);
 			}
 			else
 			{
-				SAFE_SPRINTF(buff, bufc, "%s %s", tname, fargs[1] + 1);
+				XSAFESPRINTF(buff, bufc, "%s %s", tname, fargs[1] + 1);
 			}
 
 			break;
 
 		case ';':
-			SAFE_SPRINTF(buff, bufc, "%s%s", tname, fargs[1] + 1);
+			XSAFESPRINTF(buff, bufc, "%s%s", tname, fargs[1] + 1);
 			break;
 
 		case '|':
-			SAFE_SPRINTF(buff, bufc, "%s", fargs[1] + 1);
+			XSAFESPRINTF(buff, bufc, "%s", fargs[1] + 1);
 			break;
 
 		case '"':
-			SAFE_SPRINTF(buff, bufc, "%s %s \"%s\"", tname, say_str, fargs[1] + 1);
+			XSAFESPRINTF(buff, bufc, "%s %s \"%s\"", tname, say_str, fargs[1] + 1);
 			break;
 
 		default:
-			SAFE_SPRINTF(buff, bufc, "%s %s \"%s\"", tname, say_str, fargs[1]);
+			XSAFESPRINTF(buff, bufc, "%s %s \"%s\"", tname, say_str, fargs[1]);
 			break;
 		}
 

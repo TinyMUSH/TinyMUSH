@@ -941,11 +941,11 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 		if (count != 1)
 		{
-			SAFE_SPRINTF(omessage, &omp, "to %s: ", clean_tname);
+			XSAFESPRINTF(omessage, &omp, "to %s: ", clean_tname);
 		}
 
-		SAFE_SPRINTF(omessage, &omp, "%s %s", Name(player), message);
-		SAFE_SPRINTF(imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name(player), message);
+		XSAFESPRINTF(omessage, &omp, "%s %s", Name(player), message);
+		XSAFESPRINTF(imessage, &imp, "Long distance to %s: %s %s", clean_tname, Name(player), message);
 		break;
 
 	case ';':
@@ -954,11 +954,11 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 		if (count != 1)
 		{
-			SAFE_SPRINTF(omessage, &omp, "to %s: ", clean_tname);
+			XSAFESPRINTF(omessage, &omp, "to %s: ", clean_tname);
 		}
 
-		SAFE_SPRINTF(omessage, &omp, "%s%s", Name(player), message);
-		SAFE_SPRINTF(imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name(player), message);
+		XSAFESPRINTF(omessage, &omp, "%s%s", Name(player), message);
+		XSAFESPRINTF(imessage, &imp, "Long distance to %s: %s%s", clean_tname, Name(player), message);
 		break;
 
 	case '"':
@@ -968,11 +968,11 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	default:
 		if (count != 1)
 		{
-			SAFE_SPRINTF(omessage, &omp, "To %s, ", clean_tname);
+			XSAFESPRINTF(omessage, &omp, "To %s, ", clean_tname);
 		}
 
-		SAFE_SPRINTF(omessage, &omp, "%s pages: %s", Name(player), message);
-		SAFE_SPRINTF(imessage, &imp, "You paged %s with '%s'.", clean_tname, message);
+		XSAFESPRINTF(omessage, &omp, "%s pages: %s", Name(player), message);
+		XSAFESPRINTF(imessage, &imp, "You paged %s with '%s'.", clean_tname, message);
 	}
 
 	XFREE(clean_tname);

@@ -920,7 +920,7 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 			{
 				buf = XMALLOC(LBUF_SIZE, "buf");
 				bp = buf;
-				SAFE_SPRINTF(buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				XSAFESPRINTF(buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 				pairs_print(player, text, buf, &bp);
 				*bp = '\0';
 				notify(player, buf);
@@ -1075,15 +1075,15 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 			if ((aowner != Owner(thing)) && (aowner != NOTHING))
 			{
-				SAFE_SPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+				XSAFESPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
 			}
 			else if (*fbp)
 			{
-				SAFE_SPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+				XSAFESPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
 			}
 			else if (!skip_tag || (ap->number != A_DESC))
 			{
-				SAFE_SPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				XSAFESPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
 			}
 			else
 			{

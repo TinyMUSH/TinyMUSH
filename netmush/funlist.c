@@ -2799,7 +2799,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 
 	if (nstates != nwords)
 	{
-		SAFE_SPRINTF(buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d", nstates, nwords);
+		XSAFESPRINTF(buff, bufc, "#-1 STATE/WORD COUNT OFF: %d/%d", nstates, nwords);
 		XFREE(words);
 		return;
 	}

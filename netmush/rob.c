@@ -150,7 +150,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 			notify(player, "Your murder attempt failed.");
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
-			SAFE_SPRINTF(buf1, &bp, "%s tried to kill you!", safe_pname);
+			XSAFESPRINTF(buf1, &bp, "%s tried to kill you!", safe_pname);
 			notify_with_cause(victim, player, buf1);
 
 			int is_suspect = Suspect(player);
@@ -202,9 +202,9 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		}
 
 		bp = buf1;
-		SAFE_SPRINTF(buf1, &bp, "You killed %s!", safe_vname);
+		XSAFESPRINTF(buf1, &bp, "You killed %s!", safe_vname);
 		bp = buf2;
-		SAFE_SPRINTF(buf2, &bp, "killed %s!", safe_vname);
+		XSAFESPRINTF(buf2, &bp, "killed %s!", safe_vname);
 
 		if (victim_type != TYPE_PLAYER)
 			if (halt_que(NOTHING, victim) > 0)
@@ -218,7 +218,7 @@ void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *w
 		 * notify victim
 		 */
 		bp = buf1;
-		SAFE_SPRINTF(buf1, &bp, "%s killed you!", safe_pname);
+		XSAFESPRINTF(buf1, &bp, "%s killed you!", safe_pname);
 		notify_with_cause(victim, player, buf1);
 
 		/*

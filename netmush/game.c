@@ -831,20 +831,20 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			{
 				if (sender != mushstate.curr_enactor)
 				{
-					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mushstate.curr_enactor);
+					XSAFESPRINTF(msg_ns, &mp, "[%s(#%d){%s}<-(#%d)] ", Name(sender), sender, Name(Owner(sender)), mushstate.curr_enactor);
 				}
 				else
 				{
-					SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d){%s}] ", Name(sender), sender, Name(Owner(sender)));
+					XSAFESPRINTF(msg_ns, &mp, "[%s(#%d){%s}] ", Name(sender), sender, Name(Owner(sender)));
 				}
 			}
 			else if (sender != mushstate.curr_enactor)
 			{
-				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mushstate.curr_enactor);
+				XSAFESPRINTF(msg_ns, &mp, "[%s(#%d)<-(#%d)] ", Name(sender), sender, mushstate.curr_enactor);
 			}
 			else
 			{
-				SAFE_SPRINTF(msg_ns, &mp, "[%s(#%d)] ", Name(sender), sender);
+				XSAFESPRINTF(msg_ns, &mp, "[%s(#%d)] ", Name(sender), sender);
 			}
 		}
 

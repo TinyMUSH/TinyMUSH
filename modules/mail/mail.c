@@ -1134,7 +1134,7 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
         SAFE_LB_STR((char *)mp->tolist, oldlist, &bp);
 
         if (*mp->cclist)
-            SAFE_SPRINTF(oldlist, &bp, " %s", mp->cclist);
+            XSAFESPRINTF(oldlist, &bp, " %s", mp->cclist);
 
         bp = ccnames = XMALLOC(LBUF_SIZE, "ccnames");
 
@@ -2176,7 +2176,7 @@ static int get_folder_number(dbref player, char *name)
         return -1;
     }
     XSTRNCPY(str, atrstr, LBUF_SIZE - 1);
-    SAFE_SPRINTF(pat, &bp, ":%s:", upcasestr(name));
+    XSAFESPRINTF(pat, &bp, ":%s:", upcasestr(name));
     res = (char *)strstr(str, pat);
 
     if (!res)
@@ -3190,7 +3190,7 @@ void do_malias_list(dbref player, char *alias)
     }
 
     bp = buff = XMALLOC(LBUF_SIZE, "bp");
-    SAFE_SPRINTF(buff, &bp, "MAIL: Alias *%s: ", m->name);
+    XSAFESPRINTF(buff, &bp, "MAIL: Alias *%s: ", m->name);
 
     for (i = m->numrecep - 1; i > -1; i--)
     {
@@ -4342,7 +4342,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
             else
             {
                 count_mail(playerask, 0, &rc, &uc, &cc);
-                SAFE_SPRINTF(buff, bufc, "%d %d %d", rc, uc, cc);
+                XSAFESPRINTF(buff, bufc, "%d %d %d", rc, uc, cc);
                 return;
             }
         }

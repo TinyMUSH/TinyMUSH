@@ -1974,9 +1974,9 @@ void do_use(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
 		df_use = XMALLOC(LBUF_SIZE, "df_use");
 		df_ouse = XMALLOC(LBUF_SIZE, "df_ouse");
 		bp = df_use;
-		SAFE_SPRINTF(df_use, &bp, "You use %s", Name(thing));
+		XSAFESPRINTF(df_use, &bp, "You use %s", Name(thing));
 		bp = df_ouse;
-		SAFE_SPRINTF(df_ouse, &bp, "uses %s", Name(thing));
+		XSAFESPRINTF(df_ouse, &bp, "uses %s", Name(thing));
 		did_it(player, thing, A_USE, df_use, A_OUSE, df_ouse, A_AUSE, 1, (char **)NULL, 0, MSG_PRESENCE);
 		XFREE(df_use);
 		XFREE(df_ouse);

@@ -3555,7 +3555,7 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 					total++;
 					bp = outbuf;
 					char *dot_pos = strchr(hptr->target.s, '.');
-					SAFE_SPRINTF(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : (dot_pos ? dot_pos + 1 : hptr->target.s)));
+					XSAFESPRINTF(outbuf, &bp, "%s:  ", ((is_global) ? hptr->target.s : (dot_pos ? dot_pos + 1 : hptr->target.s)));
 					buff = unparse_object(player, *(hptr->data), 0);
 					SAFE_LB_STR(buff, outbuf, &bp);
 					XFREE(buff);

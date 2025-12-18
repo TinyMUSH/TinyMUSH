@@ -150,7 +150,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
     }
 
     buf1 = *bufc;
-    SAFE_SPRINTF(buff, bufc, "%0.*Lf", precision, result);
+    XSAFESPRINTF(buff, bufc, "%0.*Lf", precision, result);
     **bufc = '\0';
 
     /**
@@ -427,7 +427,7 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     }
     else
     {
-        SAFE_SPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
+        XSAFESPRINTF(buff, bufc, "%ld", random_range(0, (num)-1));
     }
 }
 
@@ -571,7 +571,7 @@ void handle_trig(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
     if ((flag & TRIG_ARC) && !(flag & TRIG_TAN) && ((val < -1) || (val > 1)))
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE", ((FUN *)fargs[-1])->name);
+        XSAFESPRINTF(buff, bufc, "#-1 %s ARGUMENT OUT OF RANGE", ((FUN *)fargs[-1])->name);
         return;
     }
 

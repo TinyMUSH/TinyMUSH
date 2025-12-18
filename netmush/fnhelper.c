@@ -537,11 +537,11 @@ bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, cha
 
 	if (maxargs == (minargs + 1))
 	{
-		SAFE_SPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+		XSAFESPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS %d OR %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
 	}
 	else
 	{
-		SAFE_SPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
+		XSAFESPRINTF(result, bufc, "#-1 FUNCTION (%s) EXPECTS BETWEEN %d AND %d ARGUMENTS BUT GOT %d", fname, minargs, maxargs, nfargs);
 	}
 
 	return false;

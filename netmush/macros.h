@@ -51,7 +51,8 @@
 #define XMEMSET(s, c, n) __xmemset((void *)(s), c, n)
 
 // Replacement for the safe_* functions.
-#define SAFE_SPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__);
+#define XSAFESPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__)
+#define SAFE_SPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__)
 
 #define SAFE_COPY_CHR(c, b, p, s) __xsafestrcatchr(b, p, c, s)
 #define SAFE_STRCATCHR(b, p, c, s) __xsafestrcatchr(b, p, c, s)

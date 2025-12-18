@@ -144,23 +144,23 @@ static void emit_clock_time(char *buff, char **bufc, int width, int cdays, int c
 {
 	if (!hidezero || (cdays != 0))
 	{
-		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
+		XSAFESPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d:%0*d" : "%*d:%*d:%*d:%*d", width, cdays, width, chours, width, cmins, width, csecs);
 		return;
 	}
 
 	if (chours != 0)
 	{
-		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
+		XSAFESPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d:%0*d" : "%*d:%*d:%*d", width, chours, width, cmins, width, csecs);
 		return;
 	}
 
 	if (cmins != 0)
 	{
-		SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
+		XSAFESPRINTF(buff, bufc, zero_pad ? "%0*d:%0*d" : "%*d:%*d", width, cmins, width, csecs);
 		return;
 	}
 
-	SAFE_SPRINTF(buff, bufc, zero_pad ? "%0*d" : "%*d", width, csecs);
+	XSAFESPRINTF(buff, bufc, zero_pad ? "%0*d" : "%*d", width, csecs);
 }
 
 static char parse_etimefmt_flags(char **p, int *width, int *hidezero, int *hideearly, int *showsuffix, int *clockfmt, int *usecap)
@@ -979,7 +979,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	}
 	else
 	{
-		SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs);
+		XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (TIMEFMT) EXPECTS 1 OR 2 ARGUMENTS BUT GOT %d", nfargs);
 		XFREE(str);
 		XFREE(tbuf);
 		return;
@@ -1258,11 +1258,11 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					{
 						if (isupper(spec))
 						{
-							SAFE_SPRINTF(buff, bufc, "%0*d", width, n);
+							XSAFESPRINTF(buff, bufc, "%0*d", width, n);
 						}
 						else
 						{
-							SAFE_SPRINTF(buff, bufc, "%*d", width, n);
+							XSAFESPRINTF(buff, bufc, "%*d", width, n);
 						}
 
 						if (showsuffix)
@@ -1687,7 +1687,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		}
 	}
 
-	SAFE_SPRINTF(buff, bufc, "%.2f %.0f %.0f", total / (double)times, min, max);
+	XSAFESPRINTF(buff, bufc, "%.2f %.0f %.0f", total / (double)times, min, max);
 	XFREE(ebuf);
 	XFREE(tbuf);
 }
@@ -2471,17 +2471,17 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 
 		if ((qptr->waittime > 0) && (Good_obj(qptr->sem)))
 		{
-			SAFE_SPRINTF(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mushstate.now, qptr->comm);
+			XSAFESPRINTF(buff, bufc, "#%d:#%d/%d %s", qptr->player, qptr->sem, qptr->waittime - mushstate.now, qptr->comm);
 		}
 		else if (qptr->waittime > 0)
 		{
-			SAFE_SPRINTF(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mushstate.now, qptr->comm);
+			XSAFESPRINTF(buff, bufc, "#%d:%d %s", qptr->player, qptr->waittime - mushstate.now, qptr->comm);
 		}
 		else if (Good_obj(qptr->sem))
 		{
 			if (qptr->attr == A_SEMAPHORE)
 			{
-				SAFE_SPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
+				XSAFESPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
 			}
 			else
 			{
@@ -2489,17 +2489,17 @@ void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((u
 
 				if (ap && ap->name)
 				{
-					SAFE_SPRINTF(buff, bufc, "#%d:#%d/%s %s", qptr->player, qptr->sem, ap->name, qptr->comm);
+					XSAFESPRINTF(buff, bufc, "#%d:#%d/%s %s", qptr->player, qptr->sem, ap->name, qptr->comm);
 				}
 				else
 				{
-					SAFE_SPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
+					XSAFESPRINTF(buff, bufc, "#%d:#%d %s", qptr->player, qptr->sem, qptr->comm);
 				}
 			}
 		}
 		else
 		{
-			SAFE_SPRINTF(buff, bufc, "#%d: %s", qptr->player, qptr->comm);
+			XSAFESPRINTF(buff, bufc, "#%d: %s", qptr->player, qptr->comm);
 		}
 
 		return;

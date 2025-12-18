@@ -1875,12 +1875,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (eval & EV_FMAND)
 				{
 					*bufc = oldp;
-					SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
-					alldone = 1;
-				}
-				else
-				{
-					SAFE_LB_CHR('(', buff, bufc);
+				XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
 				}
 
 				eval &= ~EV_FCHECK;
@@ -2145,15 +2140,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			}
 			else
 			{
-				SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
-			}
+			XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
+		}
 
-			/**
-			 * Return the space allocated for the arguments
-			 *
-			 */
-			for (i = 0; i < nfargs; i++)
-				if (fargs[i] != NULL)
+		/**
+		 * Return the space allocated for the arguments
 				{
 					XFREE(fargs[i]);
 				}

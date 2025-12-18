@@ -428,13 +428,13 @@ void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (nfargs < 2)
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
+        XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AT LEAST 2 ARGUMENTS BUT GOT %d", nfargs);
         return;
     }
 
     if (nfargs % 2 != 0)
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d", nfargs);
+        XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS AN EVEN NUMBER OF ARGUMENTS BUT GOT %d", nfargs);
         return;
     }
 
@@ -446,7 +446,7 @@ void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
          * contain the remaining args. Cut them off at the
          * fourteenth.
          */
-        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs);
+        XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (SETQ) EXPECTS NO MORE THAN %d ARGUMENTS BUT GOT %d", MAX_NFARGS - 2, nfargs);
         return;
     }
 
@@ -480,7 +480,7 @@ void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (count > 0)
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 ENCOUNTERED %d ERRORS", count);
+        XSAFESPRINTF(buff, bufc, "#-1 ENCOUNTERED %d ERRORS", count);
     }
 }
 
@@ -2420,7 +2420,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (nfargs == 3)
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d", nfargs);
+        XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (CONSTRUCT) EXPECTS 2 OR 4 OR 5 ARGUMENTS BUT GOT %d", nfargs);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -4969,7 +4969,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     bb_p = *bufc;
     patc = patbuf = XMALLOC(LBUF_SIZE, "patbuf");
-    SAFE_SPRINTF(patbuf, &patc, "#%d/%s", it, fargs[1]);
+    XSAFESPRINTF(patbuf, &patc, "#%d/%s", it, fargs[1]);
     olist_push();
 
     if (parse_attrib_wild(player, patbuf, &thing, 0, 0, 1, 1))
@@ -5147,7 +5147,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
         if (data_elems > cols)
         {
-            SAFE_SPRINTF(buff, bufc, "#-1 ROW %d HAS TOO MANY ELEMS", r);
+            XSAFESPRINTF(buff, bufc, "#-1 ROW %d HAS TOO MANY ELEMS", r);
             XFREE(rbuf);
             grid_free(player, ogp);
             return;
@@ -5179,7 +5179,7 @@ void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller __attribut
     }
     else
     {
-        SAFE_SPRINTF(buff, bufc, "%d %d", ogp->rows, ogp->cols);
+        XSAFESPRINTF(buff, bufc, "%d %d", ogp->rows, ogp->cols);
     }
 }
 
@@ -5237,7 +5237,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
         if (errs)
         {
-            SAFE_SPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
+            XSAFESPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
         }
 
         return;
@@ -5396,7 +5396,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (errs)
     {
-        SAFE_SPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
+        XSAFESPRINTF(buff, bufc, "#-1 GOT %d OUT OF RANGE ERRORS", errs);
     }
 }
 
