@@ -57,20 +57,18 @@
 #define XSAFESBCHR(c, b, p) __xsafestrcatchr(b, p, c, SBUF_SIZE - 1)
 #define XSAFEMBCHR(c, b, p) __xsafestrcatchr(b, p, c, MBUF_SIZE - 1)
 #define XSAFELBCHR(c, b, p) __xsafestrcatchr(b, p, c, LBUF_SIZE - 1)
-
 #define XSAFESBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), SBUF_SIZE - 1) : 0)
 #define XSAFEMBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), MBUF_SIZE - 1) : 0)
 #define XSAFELBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), LBUF_SIZE - 1) : 0)
+#define XSAFESTRCAT(b, p, s, n) (s ? __xsafestrncat(b, p, s, strlen(s), n) : 0)
+#define XSAFESTRNCAT(b, p, s, n, z) __xsafestrncat(b, p, s, n, z)
 
-#define SAFE_STRNCAT(b, p, s, n, z) __xsafestrncat(b, p, s, n, z);
-#define SAFE_STRCAT(b, p, s, n) (s ? __xsafestrncat(b, p, s, strlen(s), n) : 0)
-
-#define SAFE_CRLF(b, p) SAFE_STRCAT(b, p, "\r\n", LBUF_SIZE - 1)
-#define SAFE_ANSI_NORMAL(b, p) SAFE_STRCAT(b, p, ANSI_NORMAL, LBUF_SIZE - 1)
-#define SAFE_NOTHING(b, p) SAFE_STRCAT(b, p, "#-1", LBUF_SIZE - 1)
-#define SAFE_NOPERM(b, p) SAFE_STRCAT(b, p, "#-1 PERMISSION DENIED", LBUF_SIZE - 1)
-#define SAFE_NOMATCH(b, p) SAFE_STRCAT(b, p, "#-1 NO MATCH", LBUF_SIZE - 1)
-#define SAFE_BOOL(b, p, n) XSAFELBCHR(((n) ? '1' : '0'), (b), (p))
+#define XSAFECRLF(b, p) __xsafestrncat(b, p, "\r\n", 2, LBUF_SIZE - 1)
+#define XSAFEANSINORMAL(b, p) __xsafestrncat(b, p, ANSI_NORMAL, strlen(ANSI_NORMAL), LBUF_SIZE - 1)
+#define XSAFENOTHING(b, p) __xsafestrncat(b, p, "#-1", 3, LBUF_SIZE - 1)
+#define XSAFENOPERM(b, p) __xsafestrncat(b, p, "#-1 PERMISSION DENIED", 21, LBUF_SIZE - 1)
+#define XSAFENOMATCH(b, p) __xsafestrncat(b, p, "#-1 NO MATCH", 12, LBUF_SIZE - 1)
+#define XSAFEBOOL(b, p, n) __xsafestrcatchr((b), (p), ((n) ? '1' : '0'), LBUF_SIZE - 1)
 
 #define SAFE_LTOS(d, p, n, s) __xsafeltos(d, p, n, s)
 

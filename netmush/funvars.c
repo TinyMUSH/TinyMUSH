@@ -499,7 +499,7 @@ void fun_setr(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
     }
     else if (result > 0)
     {
-        SAFE_STRNCAT(buff, bufc, fargs[1], result, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, fargs[1], result, LBUF_SIZE);
     }
 }
 
@@ -520,7 +520,7 @@ void read_register(char *regname, char *buff, char **bufc)
         {
             if (mushstate.rdata && (mushstate.rdata->q_alloc > regnum) && mushstate.rdata->q_regs[regnum])
             {
-                SAFE_STRNCAT(buff, bufc, mushstate.rdata->q_regs[regnum], mushstate.rdata->q_lens[regnum], LBUF_SIZE);
+                XSAFESTRNCAT(buff, bufc, mushstate.rdata->q_regs[regnum], mushstate.rdata->q_lens[regnum], LBUF_SIZE);
             }
         }
 
@@ -543,7 +543,7 @@ void read_register(char *regname, char *buff, char **bufc)
         {
             if (mushstate.rdata->x_regs[regnum])
             {
-                SAFE_STRNCAT(buff, bufc, mushstate.rdata->x_regs[regnum], mushstate.rdata->x_lens[regnum], LBUF_SIZE);
+                XSAFESTRNCAT(buff, bufc, mushstate.rdata->x_regs[regnum], mushstate.rdata->x_lens[regnum], LBUF_SIZE);
                 return;
             }
         }
@@ -829,7 +829,7 @@ void fun_nofx(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (lmask == -1)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
         return;
     }
 
@@ -884,13 +884,13 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (nfargs < 3)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
 
     if (Is_Func(UCALL_SANDBOX) && (nfargs < 5))
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
 
@@ -904,7 +904,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
 
         if (lmask == -1)
         {
-            SAFE_STRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
+            XSAFESTRNCAT(buff, bufc, "#-1 INVALID LIMIT", 17, LBUF_SIZE);
             return;
         }
 
@@ -2937,7 +2937,7 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
     {
-        SAFE_NOPERM(buff, bufc);
+        XSAFENOPERM(buff, bufc);
         return;
     }
 
@@ -3230,7 +3230,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
     if (!parse_thing_slash(player, fargs[0], &str, &it))
     {
-        SAFE_NOMATCH(buff, bufc);
+        XSAFENOMATCH(buff, bufc);
         return;
     }
 
@@ -3253,7 +3253,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
         if (!attr || !Set_attr(player, it, attr, aflags) || (attr->check != NULL))
         {
-            SAFE_NOPERM(buff, bufc);
+            XSAFENOPERM(buff, bufc);
         }
         else
         {
@@ -4590,7 +4590,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
     }
 
     subpatterns = pcre_exec(re, NULL, fargs[0], strlen(fargs[0]), 0, 0, offsets, PCRE_MAX_OFFSETS);
-    SAFE_BOOL(buff, bufc, (subpatterns >= 0));
+    XSAFEBOOL(buff, bufc, (subpatterns >= 0));
 
     /*
      * If we had too many subpatterns for the offsets vector, set the
@@ -4904,12 +4904,12 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!Good_obj(it))
     {
-        SAFE_NOMATCH(buff, bufc);
+        XSAFENOMATCH(buff, bufc);
         return;
     }
     else if (!(Examinable(player, it)))
     {
-        SAFE_NOPERM(buff, bufc);
+        XSAFENOPERM(buff, bufc);
         return;
     }
 

@@ -181,7 +181,7 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
 
 	if ((port < 0) && (target == NOTHING))
 	{
-		SAFE_STRNCAT(buff, bufc, (char *)"-1", 2, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, (char *)"-1", 2, LBUF_SIZE);
 		return;
 	}
 
@@ -236,7 +236,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 
 	if (!Good_obj(target) || !Connected(target) || !Examinable(player, target))
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -290,7 +290,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
 		XFREE(cmd_lower);
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 

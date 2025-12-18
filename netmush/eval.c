@@ -1090,7 +1090,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Carriage return
 				 *
 				 */
-				SAFE_CRLF(buff, bufc);
+				XSAFECRLF(buff, bufc);
 				break;
 
 			case 't':
@@ -1342,7 +1342,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (See_attr(player, player, ap, aowner, aflags))
 				{
 					atr_gotten = atr_pget(player, ap->number, &aowner, &aflags, &alen);
-					SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+					XSAFESTRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 					XFREE(atr_gotten);
 				}
 
@@ -1445,7 +1445,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				i = A_VA + ch - 'A';
 				atr_gotten = atr_pget(player, i, &aowner, &aflags, &alen);
-				SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+				XSAFESTRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 				XFREE(atr_gotten);
 				break;
 
@@ -1476,7 +1476,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					{
 						char *qreg = mushstate.rdata->q_regs[i];
 						size_t qlen = mushstate.rdata->q_lens[i];
-						SAFE_STRNCAT(buff, bufc, qreg, qlen, LBUF_SIZE);
+						XSAFESTRNCAT(buff, bufc, qreg, qlen, LBUF_SIZE);
 					}
 
 					if (!**dstr)
@@ -1544,7 +1544,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				{
 					if (mushstate.rdata->x_names[i] && !strcmp(xtbuf, mushstate.rdata->x_names[i]))
 					{
-						SAFE_STRNCAT(buff, bufc, mushstate.rdata->x_regs[i], mushstate.rdata->x_lens[i], LBUF_SIZE);
+						XSAFESTRNCAT(buff, bufc, mushstate.rdata->x_regs[i], mushstate.rdata->x_lens[i], LBUF_SIZE);
 						break;
 					}
 				}
@@ -1981,7 +1981,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				}
 				else if (!check_access(player, ufp->perms))
 				{
-					SAFE_NOPERM(buff, bufc);
+					XSAFENOPERM(buff, bufc);
 				}
 				else
 				{
@@ -2124,11 +2124,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				}
 				else if (!Check_Func_Access(player, fp))
 				{
-					SAFE_NOPERM(buff, bufc);
+					XSAFENOPERM(buff, bufc);
 				}
 				else if (mushstate.f_limitmask & fp->flags)
 				{
-					SAFE_NOPERM(buff, bufc);
+					XSAFENOPERM(buff, bufc);
 				}
 				else
 				{
@@ -2230,7 +2230,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 	 */
 	if (ansi)
 	{
-		SAFE_ANSI_NORMAL(buff, bufc);
+		XSAFEANSINORMAL(buff, bufc);
 	}
 
 	**bufc = '\0';

@@ -923,7 +923,7 @@ void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)),
 	}
 	else
 	{
-		SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
 	}
 }
 
@@ -1210,7 +1210,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 						p++;
 					}
 
-					SAFE_STRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
+					XSAFESTRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
 				}
 				else if (!clockfmt)
 				{
@@ -1334,7 +1334,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 				p++;
 			}
 
-			SAFE_STRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
+			XSAFESTRNCAT(buff, bufc, mark, p - mark, LBUF_SIZE);
 		}
 	}
 }
@@ -1773,7 +1773,7 @@ bool check_command(dbref player, char *name, char *buff, char **bufc, char *carg
 		 */
 		if (Invalid_Objtype(player) || !check_cmd_access(player, cmdp, cargs, ncargs) || (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD)))
 		{
-			SAFE_NOPERM(buff, bufc);
+			XSAFENOPERM(buff, bufc);
 			return false;
 		}
 	}
@@ -2284,7 +2284,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 			if (!attr || !Set_attr(player, thing, attr, aflags))
 			{
-				SAFE_NOPERM(buff, bufc);
+				XSAFENOPERM(buff, bufc);
 				return;
 			}
 
@@ -2313,7 +2313,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	 */
 	if ((thing = match_controlled(player, fargs[0])) == NOTHING)
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -2339,7 +2339,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		if (!attr)
 		{
-			SAFE_NOPERM(buff, bufc);
+			XSAFENOPERM(buff, bufc);
 			return;
 		}
 
@@ -2347,7 +2347,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		if (!Set_attr(player, thing, attr, aflags))
 		{
-			SAFE_NOPERM(buff, bufc);
+			XSAFENOPERM(buff, bufc);
 			return;
 		}
 
@@ -2364,7 +2364,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			if (!parse_attrib(player, p + 1, &thing2, &atr2, 0) || (atr == NOTHING))
 			{
 				XFREE(buff2);
-				SAFE_NOMATCH(buff, bufc);
+				XSAFENOMATCH(buff, bufc);
 				return;
 			}
 
@@ -2375,7 +2375,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			if (!attr2 || !See_attr(player, thing2, attr2, aowner, aflags))
 			{
 				XFREE(buff2);
-				SAFE_NOPERM(buff, bufc);
+				XSAFENOPERM(buff, bufc);
 				return;
 			}
 		}

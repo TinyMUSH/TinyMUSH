@@ -2521,7 +2521,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 
     if (!check_access(player, tp->rperms))
     {
-        SAFE_NOPERM(buff, bufc);
+        XSAFENOPERM(buff, bufc);
         return;
     }
 
@@ -2551,7 +2551,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
         return;
     }
 
-    SAFE_NOPERM(buff, bufc);
+    XSAFENOPERM(buff, bufc);
     return;
 }
 
@@ -2592,7 +2592,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
         }
     }
 
-    SAFE_NOMATCH(buff, bufc);
+    XSAFENOMATCH(buff, bufc);
 }
 
 /**

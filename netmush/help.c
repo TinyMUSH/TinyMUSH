@@ -561,7 +561,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
 		if (count > 0)
 		{
-			SAFE_CRLF(buff, bufc);
+			XSAFECRLF(buff, bufc);
 		}
 
 		if (eval)

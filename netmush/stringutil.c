@@ -818,7 +818,7 @@ char *normal_to_white(const char *raw)
 	{
 		if (*p == ESC_CHAR)
 		{
-			SAFE_STRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
+			XSAFESTRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
 
 			if (p[1] == ANSI_CSI)
 			{
@@ -868,7 +868,7 @@ char *normal_to_white(const char *raw)
 								/*
 								 * ansi normal
 								 */
-								SAFE_STRNCAT(buf, &q, "m\033[37m\033[", 8, LBUF_SIZE);
+								XSAFESTRNCAT(buf, &q, "m\033[37m\033[", 8, LBUF_SIZE);
 							}
 							else
 							{
@@ -894,13 +894,13 @@ char *normal_to_white(const char *raw)
 
 					if (param_val == 0)
 					{
-						SAFE_STRNCAT(buf, &q, ANSI_WHITE, 5, LBUF_SIZE);
+						XSAFESTRNCAT(buf, &q, ANSI_WHITE, 5, LBUF_SIZE);
 					}
 				}
 				else
 				{
 					++p;
-					SAFE_STRNCAT(buf, &q, just_after_csi, p - just_after_csi, LBUF_SIZE);
+					XSAFESTRNCAT(buf, &q, just_after_csi, p - just_after_csi, LBUF_SIZE);
 				}
 			}
 			else
@@ -916,7 +916,7 @@ char *normal_to_white(const char *raw)
 		}
 	}
 
-	SAFE_STRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
+	XSAFESTRNCAT(buf, &q, just_after_esccode, p - just_after_esccode, LBUF_SIZE);
 	return (buf);
 }
 
@@ -1521,7 +1521,7 @@ char *translate_string(char *str, int type)
 			case ' ':
 				if (str[1] == ' ')
 				{
-					SAFE_STRNCAT(buff, &bp, "%b", 2, LBUF_SIZE);
+					XSAFESTRNCAT(buff, &bp, "%b", 2, LBUF_SIZE);
 				}
 				else
 				{
@@ -1546,11 +1546,11 @@ char *translate_string(char *str, int type)
 				break;
 
 			case '\n':
-				SAFE_STRNCAT(buff, &bp, "%r", 2, LBUF_SIZE);
+				XSAFESTRNCAT(buff, &bp, "%r", 2, LBUF_SIZE);
 				break;
 
 			case '\t':
-				SAFE_STRNCAT(buff, &bp, "%t", 2, LBUF_SIZE);
+				XSAFESTRNCAT(buff, &bp, "%t", 2, LBUF_SIZE);
 				break;
 
 			default:
@@ -2404,7 +2404,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	if (!strcmp(from, "^"))
 	{
 		/* Prepend 'to' to string */
-		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
+		XSAFESTRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 
 		do
 		{
@@ -2466,7 +2466,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			}
 		} while (0);
 
-		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
+		XSAFESTRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 	}
 	else if (!strcmp(from, "$"))
 	{
@@ -2533,10 +2533,10 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			}
 		} while (0);
 
-		SAFE_STRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
+		XSAFESTRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
 		ansi_state |= to_ansi_set;
 		ansi_state &= ~to_ansi_clr;
-		SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
+		XSAFESTRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 	}
 	else
 	{
@@ -2613,7 +2613,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 				}
 			}
 
-			SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
+			XSAFESTRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 
 			/*
 			 * If we are really at a FROM, append TO to the result
@@ -2628,7 +2628,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					/* Apply whatever ANSI transition happens in TO */
 					ansi_state |= to_ansi_set;
 					ansi_state &= ~to_ansi_clr;
-					SAFE_STRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
+					XSAFESTRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 					src += flen;
 				}
 				else
@@ -2689,7 +2689,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 								++(src);
 							}
 						} while (0);
-						SAFE_STRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
+						XSAFESTRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else
 					{

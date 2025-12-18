@@ -2801,7 +2801,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				if ((aflags & AF_HTML) && Html(player))
 				{
 					char *buff_cp = buff + strlen(buff);
-					SAFE_CRLF(buff, &buff_cp);
+					XSAFECRLF(buff, &buff_cp);
 					notify_html(player, buff);
 				}
 				else

@@ -260,7 +260,7 @@ static char *munge_comtitle(char *title)
 
     if (strchr(title, ESC_CHAR))
     {
-        SAFE_STRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
+        XSAFESTRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
         XSAFEMBSTR(ANSI_NORMAL, tbuf, &tp);
     }
     else
@@ -430,12 +430,12 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
 
                         if (cause != mushstate.curr_enactor)
                         {
-                            SAFE_STRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
+                            XSAFESTRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
                             SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
                             XSAFELBCHR(')', msg_ns, &mp);
                         }
 
-                        SAFE_STRCAT(msg_ns, &mp, "] ", LBUF_SIZE);
+                        XSAFESTRCAT(msg_ns, &mp, "] ", LBUF_SIZE);
                         XSAFELBSTR(msg, msg_ns, &mp);
                     }
 

@@ -601,7 +601,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
-		SAFE_STRNCAT(buff, bufc, last, s - last, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, last, s - last, LBUF_SIZE);
 	}
 	else
 	{
@@ -2708,7 +2708,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (isansi)
 		{
-			SAFE_ANSI_NORMAL(buf, &q);
+			XSAFEANSINORMAL(buf, &q);
 		}
 
 		*q = '\0';
@@ -2737,7 +2737,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (!(rturn % (int)((78 - indent) / number)))
 		{
-			SAFE_CRLF(buff, bufc);
+			XSAFECRLF(buff, bufc);
 			cr = *bufc;
 
 			for (i = 0; i < indent; i++)
@@ -2760,7 +2760,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 	else
 	{
-		SAFE_CRLF(buff, bufc);
+		XSAFECRLF(buff, bufc);
 	}
 
 	XFREE(buf);
@@ -2821,7 +2821,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 		 */
 		if (wcount != 0)
 		{
-			SAFE_CRLF(buff, bufc);
+			XSAFECRLF(buff, bufc);
 		}
 
 		if (lead_str)
@@ -2954,7 +2954,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 					}
 				}
 
-				SAFE_STRNCAT(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
+				XSAFESTRNCAT(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
 				buf = ansi_transition_esccode(ansi_state, ANST_NONE);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
@@ -3085,7 +3085,7 @@ void perform_tables(dbref player __attribute__((unused)), char *list, int n_cols
 
 		if (*bufc != bb_p)
 		{
-			SAFE_CRLF(buff, bufc);
+			XSAFECRLF(buff, bufc);
 		}
 
 		tables_helper(savep, &ansi_state, n_cols, col_widths, lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just);
@@ -3095,7 +3095,7 @@ void perform_tables(dbref player __attribute__((unused)), char *list, int n_cols
 
 	if (*bufc != bb_p)
 	{
-		SAFE_CRLF(buff, bufc);
+		XSAFECRLF(buff, bufc);
 	}
 
 	tables_helper(savep, &ansi_state, n_cols, col_widths, lead_str, trail_str, list_sep, field_sep, pad_char, buff, bufc, just);

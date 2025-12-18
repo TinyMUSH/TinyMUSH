@@ -50,7 +50,7 @@ void fun_objid(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 
@@ -78,7 +78,7 @@ void fun_con(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 		return;
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 	return;
 }
 
@@ -127,7 +127,7 @@ void fun_exit(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 		}
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 	return;
 }
 
@@ -190,7 +190,7 @@ void fun_next(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 		}
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 	return;
 }
 
@@ -224,7 +224,7 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 
@@ -270,7 +270,7 @@ void fun_rloc(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 		return;
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 }
 
 /**
@@ -309,7 +309,7 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 			}
 		}
 
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 	else if (isRoom(it))
 	{
@@ -318,7 +318,7 @@ void fun_room(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 
 	return;
@@ -397,7 +397,7 @@ void fun_controls(char *buff, char **bufc, dbref player, dbref caller __attribut
 		return;
 	}
 
-	SAFE_BOOL(buff, bufc, Controls(x, y));
+	XSAFEBOOL(buff, bufc, Controls(x, y));
 }
 
 /**
@@ -426,7 +426,7 @@ void fun_sees(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	}
 
 	loc = Location(thing);
-	SAFE_BOOL(buff, bufc, (isExit(thing) ? Can_See_Exit(it, thing, Darkened(it, loc)) : Can_See(it, thing, Sees_Always(it, loc))));
+	XSAFEBOOL(buff, bufc, (isExit(thing) ? Can_See_Exit(it, thing, Darkened(it, loc)) : Can_See(it, thing, Sees_Always(it, loc))));
 }
 
 /**
@@ -454,7 +454,7 @@ void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 	else
 	{
-		SAFE_BOOL(buff, bufc, nearby(obj1, obj2));
+		XSAFEBOOL(buff, bufc, nearby(obj1, obj2));
 	}
 }
 
@@ -494,15 +494,15 @@ void handle_okpres(char *buff, char **bufc, dbref player, dbref caller __attribu
 
 	if (oper == PRESFN_HEARS)
 	{
-		SAFE_BOOL(buff, bufc, ((Unreal(actor) && !Check_Heard(object, actor)) || (Unreal(object) && !Check_Hears(actor, object))) ? 0 : 1);
+		XSAFEBOOL(buff, bufc, ((Unreal(actor) && !Check_Heard(object, actor)) || (Unreal(object) && !Check_Hears(actor, object))) ? 0 : 1);
 	}
 	else if (oper == PRESFN_MOVES)
 	{
-		SAFE_BOOL(buff, bufc, ((Unreal(actor) && !Check_Noticed(object, actor)) || (Unreal(object) && !Check_Notices(actor, object))) ? 0 : 1);
+		XSAFEBOOL(buff, bufc, ((Unreal(actor) && !Check_Noticed(object, actor)) || (Unreal(object) && !Check_Notices(actor, object))) ? 0 : 1);
 	}
 	else if (oper == PRESFN_KNOWS)
 	{
-		SAFE_BOOL(buff, bufc, ((Unreal(actor) && !Check_Known(object, actor)) || (Unreal(object) && !Check_Knows(actor, object))) ? 0 : 1);
+		XSAFEBOOL(buff, bufc, ((Unreal(actor) && !Check_Known(object, actor)) || (Unreal(object) && !Check_Knows(actor, object))) ? 0 : 1);
 	}
 	else
 	{
@@ -573,7 +573,7 @@ void handle_pronoun(char *buff, char **bufc, dbref player, dbref caller __attrib
 
 	if (!Good_obj(it) || (!isPlayer(it) && !nearby_or_control(player, it)))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 	}
 	else
 	{
@@ -671,7 +671,7 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 	if (!Good_obj(victim))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 	}
 	else if (!nearby_or_control(player, victim) && !nearby_or_control(player, it))
 	{
@@ -690,7 +690,7 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__
 			else
 			{
 				bexp = parse_boolexp(player, tbuf, 1);
-				SAFE_BOOL(buff, bufc, eval_boolexp(victim, it, it, bexp));
+				XSAFEBOOL(buff, bufc, eval_boolexp(victim, it, it, bexp));
 				free_boolexp(bexp);
 			}
 		}
@@ -723,7 +723,7 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	if (!Good_obj(locked_obj) || !Good_obj(actor_obj))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 	}
 	else if (!nearby_or_control(player, actor_obj))
 	{
@@ -731,7 +731,7 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 	else if (!Controls(player, locked_obj))
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 	}
 	else
 	{
@@ -826,7 +826,7 @@ void fun_xcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 
@@ -878,7 +878,7 @@ void fun_lcon(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 
@@ -916,7 +916,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (!Good_obj(it) || !Has_exits(it))
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -924,7 +924,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (!exam && (where_is(player) != it) && (it != cause))
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -1083,7 +1083,7 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 
 		if (!Good_obj(thing))
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 			return;
 		}
 	}
@@ -1095,7 +1095,7 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 
 		if (!Good_obj(thing))
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 			return;
 		}
 	}
@@ -1103,7 +1103,7 @@ void fun_entrances(char *buff, char **bufc, dbref player, dbref caller __attribu
 	if (!payfor(player, mushconf.searchcost))
 	{
 		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You don't have enough %s.", mushconf.many_coins);
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -1158,7 +1158,7 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	int exam = Good_obj(it) ? Examinable(player, it) : 0;
 	if (!exam)
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 	else if (Has_home(it))
 	{
@@ -1177,7 +1177,7 @@ void fun_home(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 
 	return;
@@ -1203,7 +1203,7 @@ void fun_money(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	int exam = Good_obj(it) ? Examinable(player, it) : 0;
 	if (!exam)
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 	else
 	{
@@ -1239,7 +1239,7 @@ void fun_findable(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 	else
 	{
-		SAFE_BOOL(buff, bufc, locatable(obj, victim, obj));
+		XSAFEBOOL(buff, bufc, locatable(obj, victim, obj));
 	}
 }
 
@@ -1275,20 +1275,20 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 	{
 		if (atr == NOTHING)
 		{
-			SAFE_BOOL(buff, bufc, Examinable(it, thing));
+			XSAFEBOOL(buff, bufc, Examinable(it, thing));
 		}
 		else
 		{
 			ap = atr_num(atr);
 			atr_pget_info(thing, atr, &aowner, &aflags);
-			SAFE_BOOL(buff, bufc, See_attr_all(it, thing, ap, aowner, aflags, 1));
+			XSAFEBOOL(buff, bufc, See_attr_all(it, thing, ap, aowner, aflags, 1));
 		}
 		return;
 	}
 
 	thing = match_thing(player, fargs[1]);
 	int good = Good_obj(thing);
-	SAFE_BOOL(buff, bufc, good ? Examinable(it, thing) : 0);
+	XSAFEBOOL(buff, bufc, good ? Examinable(it, thing) : 0);
 }
 
 /**
@@ -1338,7 +1338,7 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 	{
 		ap = atr_num(atr);
 		atr_pget_info(thing, atr, &aowner, &aflags);
-		SAFE_BOOL(buff, bufc, Set_attr(it, thing, ap, aflags));
+		XSAFEBOOL(buff, bufc, Set_attr(it, thing, ap, aflags));
 		return;
 	}
 
@@ -1367,7 +1367,7 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 	}
 
 	atr_pget_info(thing, atr, &aowner, &aflags);
-	SAFE_BOOL(buff, bufc, Set_attr(it, thing, ap, aflags));
+	XSAFEBOOL(buff, bufc, Set_attr(it, thing, ap, aflags));
 }
 
 /**
@@ -1394,7 +1394,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	{
 		if (atr == NOTHING)
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 		}
 		else
 		{
@@ -1459,7 +1459,7 @@ void fun_flags(char *buff, char **bufc, dbref player, dbref caller __attribute__
 		}
 		else
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 		}
 	}
 }
@@ -1563,7 +1563,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 				 * and do have it.
 				 *
 				 */
-				SAFE_BOOL(buff, bufc, type);
+				XSAFEBOOL(buff, bufc, type);
 				XFREE(flagletter);
 				return;
 			}
@@ -1572,7 +1572,7 @@ void handle_flaglists(char *buff, char **bufc, dbref player, dbref caller __attr
 		}
 	}
 
-	SAFE_BOOL(buff, bufc, !type);
+	XSAFEBOOL(buff, bufc, !type);
 }
 
 /**
@@ -1642,7 +1642,7 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 		{
 			ap = atr_num(atr);
 			atr_pget_info(it, atr, &aowner, &aflags);
-			SAFE_BOOL(buff, bufc, atr_has_flag(player, it, ap, aowner, aflags, fargs[1]));
+			XSAFEBOOL(buff, bufc, atr_has_flag(player, it, ap, aowner, aflags, fargs[1]));
 		}
 	}
 	else
@@ -1651,18 +1651,18 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 		if (!Good_obj(it))
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 			return;
 		}
 
 		int exam = Examinable(player, it);
 		if (mushconf.pub_flags || exam || (it == cause))
 		{
-			SAFE_BOOL(buff, bufc, has_flag(player, it, fargs[1]));
+			XSAFEBOOL(buff, bufc, has_flag(player, it, fargs[1]));
 		}
 		else
 		{
-			SAFE_NOPERM(buff, bufc);
+			XSAFENOPERM(buff, bufc);
 		}
 	}
 }
@@ -1689,18 +1689,18 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	if (!Good_obj(it))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 
 	int exam = Examinable(player, it);
 	if (mushconf.pub_flags || exam || (it == cause))
 	{
-		SAFE_BOOL(buff, bufc, has_power(player, it, fargs[1]));
+		XSAFEBOOL(buff, bufc, has_power(player, it, fargs[1]));
 	}
 	else
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 	}
 }
 
@@ -1735,7 +1735,7 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	if (!Good_obj(it))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 
@@ -1768,7 +1768,7 @@ void fun_hasflags(char *buff, char **bufc, dbref player, dbref caller __attribut
 		XFREE(elems);
 	}
 
-	SAFE_BOOL(buff, bufc, result);
+	XSAFEBOOL(buff, bufc, result);
 }
 
 /**
@@ -1791,7 +1791,7 @@ void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attr
 	int exam = Good_obj(it) ? Examinable(player, it) : 0;
 	if (!exam)
 	{
-		SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
 	}
 	else
 	{
@@ -1826,7 +1826,7 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 
 	return;
@@ -1869,13 +1869,13 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (!Good_obj(it))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 	int exam = Examinable(player, it);
 	if (!exam)
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -1936,14 +1936,14 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 		if (!Good_obj(it))
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 			return;
 		}
 	}
 
 	if (!Controls(player, it) && !See_All(player))
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -1992,7 +1992,7 @@ void fun_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 	int exam = Good_obj(it) ? Examinable(player, it) : 0;
 	if (!exam)
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -2035,14 +2035,14 @@ void scan_zone(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 		if (!Good_obj(it))
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 			return;
 		}
 	}
 
 	if (!Controls(player, it) && !WizRoy(player))
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -2158,12 +2158,12 @@ void fun_hasattr(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 	if (!Good_obj(thing))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 	else if (!(exam = Examinable(player, thing)))
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -2255,7 +2255,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 
 		if (See_attr(player, player, ap, aowner, aflags))
 		{
-			SAFE_STRNCAT(buff, bufc, tbuf, alen, LBUF_SIZE);
+			XSAFESTRNCAT(buff, bufc, tbuf, alen, LBUF_SIZE);
 		}
 
 		XFREE(tbuf);
@@ -2310,7 +2310,7 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 	if (!parse_attrib(player, str, &thing, &attrib, 0))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		XFREE(str);
 		return;
 	}
@@ -2336,7 +2336,7 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 	else
 	{
-		SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 	}
 
 	XFREE(atr_gotten);
@@ -2403,7 +2403,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	 */
 	if (nfargs < 1)
 	{
-		SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
 		return;
 	}
 
@@ -2579,7 +2579,7 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 	if (nfargs < 2)
 	{
-		SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
 		return;
 	}
 
@@ -2781,7 +2781,7 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 				if (*atr_gotten)
 				{
-					SAFE_STRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
+					XSAFESTRNCAT(buff, bufc, atr_gotten, alen, LBUF_SIZE);
 					XFREE(atr_gotten);
 					XFREE(objname);
 					return;
@@ -3108,7 +3108,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		}
 		else
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 		}
 
 		return;
@@ -3156,7 +3156,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 		}
 		else
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 		}
 
 		return;
@@ -3170,7 +3170,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 	if (thing == AMBIGUOUS)
 	{
-		SAFE_STRNCAT(buff, bufc, "#-2", 3, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "#-2", 3, LBUF_SIZE);
 	}
 	else if (Good_obj(thing) && isPlayer(thing))
 	{
@@ -3179,7 +3179,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 
@@ -3216,7 +3216,7 @@ void fun_pfind(char *buff, char **bufc, dbref player, dbref caller __attribute__
 	}
 	else
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 	}
 }
 
@@ -3254,7 +3254,7 @@ void fun_locate(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 	if (!Good_obj(thing))
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -3490,7 +3490,7 @@ void handle_lattr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	{
 		if (!mushconf.lattr_oldstyle)
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 		}
 		else if (count_only)
 		{
@@ -3722,7 +3722,7 @@ void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute_
 	int exam = Good_obj(thing) ? Examinable(player, thing) : 0;
 	if (!exam)
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -3754,7 +3754,7 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 	int exam = Good_obj(thing) ? Examinable(player, thing) : 0;
 	if (!exam)
 	{
-		SAFE_NOPERM(buff, bufc);
+		XSAFENOPERM(buff, bufc);
 		return;
 	}
 
@@ -3790,26 +3790,26 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
 	if (!Good_obj(it))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 
 	switch (Typeof(it))
 	{
 	case TYPE_ROOM:
-		SAFE_STRNCAT(buff, bufc, "ROOM", 4, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "ROOM", 4, LBUF_SIZE);
 		break;
 
 	case TYPE_EXIT:
-		SAFE_STRNCAT(buff, bufc, "EXIT", 4, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "EXIT", 4, LBUF_SIZE);
 		break;
 
 	case TYPE_PLAYER:
-		SAFE_STRNCAT(buff, bufc, "PLAYER", 6, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "PLAYER", 6, LBUF_SIZE);
 		break;
 
 	case TYPE_THING:
-		SAFE_STRNCAT(buff, bufc, "THING", 5, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "THING", 5, LBUF_SIZE);
 		break;
 
 	default:
@@ -3840,7 +3840,7 @@ void fun_hastype(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 	if (!Good_obj(it))
 	{
-		SAFE_NOMATCH(buff, bufc);
+		XSAFENOMATCH(buff, bufc);
 		return;
 	}
 
@@ -3854,22 +3854,22 @@ void fun_hastype(char *buff, char **bufc, dbref player, dbref caller __attribute
 	{
 	case 'r':
 	case 'R':
-		SAFE_BOOL(buff, bufc, isRoom(it));
+		XSAFEBOOL(buff, bufc, isRoom(it));
 		break;
 
 	case 'e':
 	case 'E':
-		SAFE_BOOL(buff, bufc, isExit(it));
+		XSAFEBOOL(buff, bufc, isExit(it));
 		break;
 
 	case 'p':
 	case 'P':
-		SAFE_BOOL(buff, bufc, isPlayer(it));
+		XSAFEBOOL(buff, bufc, isPlayer(it));
 		break;
 
 	case 't':
 	case 'T':
-		SAFE_BOOL(buff, bufc, isThing(it));
+		XSAFEBOOL(buff, bufc, isThing(it));
 		break;
 
 	default:
@@ -3903,7 +3903,7 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attrib
 		 * Automatically checks for GoodObj
 		 *
 		 */
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -3932,7 +3932,7 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attrib
 
 	default:
 		notify_quiet(player, "Invalid object type.");
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -3941,7 +3941,7 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attrib
 	if (!*obj_str)
 	{
 		XFREE(obj_str);
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 		return;
 	}
 
@@ -4236,7 +4236,7 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		if (!Good_obj(thing))
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 			return;
 		}
 
@@ -4253,7 +4253,7 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		if (!Good_obj(thing))
 		{
-			SAFE_NOMATCH(buff, bufc);
+			XSAFENOMATCH(buff, bufc);
 			return;
 		}
 

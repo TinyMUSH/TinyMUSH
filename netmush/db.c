@@ -952,7 +952,7 @@ void safe_name(dbref thing, char *outbuf, char **bufc)
         XFREE(buff);
     }
 
-    SAFE_STRNCAT(outbuf, bufc, names[thing], NameLen(thing), LBUF_SIZE);
+    XSAFESTRNCAT(outbuf, bufc, names[thing], NameLen(thing), LBUF_SIZE);
     s_AccessTime(thing, save_access_time);
 }
 

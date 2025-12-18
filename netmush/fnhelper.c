@@ -430,7 +430,7 @@ void print_separator(const Delim *sep, char *list, char **bufc)
 	{
 		if (sep->str[0] == '\r')
 		{
-			SAFE_CRLF(list, bufc);
+			XSAFECRLF(list, bufc);
 		}
 		else if (sep->str[0] != '\0')
 		{
@@ -439,7 +439,7 @@ void print_separator(const Delim *sep, char *list, char **bufc)
 	}
 	else
 	{
-		SAFE_STRNCAT(list, bufc, sep->str, sep->len, LBUF_SIZE);
+		XSAFESTRNCAT(list, bufc, sep->str, sep->len, LBUF_SIZE);
 	}
 }
 

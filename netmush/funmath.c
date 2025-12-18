@@ -113,11 +113,11 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
 
         if (fp_mant)
         {
-            SAFE_STRNCAT(buff, bufc, "NaN", 3, LBUF_SIZE);
+            XSAFESTRNCAT(buff, bufc, "NaN", 3, LBUF_SIZE);
         }
         else
         {
-            SAFE_STRNCAT(buff, bufc, "Inf", 3, LBUF_SIZE);
+            XSAFESTRNCAT(buff, bufc, "Inf", 3, LBUF_SIZE);
         }
     }
 
@@ -261,11 +261,11 @@ void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (num < 0)
     {
-        SAFE_STRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "-1", 2, LBUF_SIZE);
     }
     else
     {
-        SAFE_BOOL(buff, bufc, (num > 0));
+        XSAFEBOOL(buff, bufc, (num > 0));
     }
 }
 
@@ -804,7 +804,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
  */
 void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -823,7 +823,7 @@ void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  */
 void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -842,7 +842,7 @@ void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  */
 void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -861,7 +861,7 @@ void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  */
 void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -880,7 +880,7 @@ void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  */
 void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -899,7 +899,7 @@ void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  */
 void fun_neq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
+    XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
 }
 
 /**
@@ -1403,7 +1403,7 @@ void fun_add(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 {
     if (nfargs < 2)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -1437,7 +1437,7 @@ void fun_mul(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 {
     if (nfargs < 2)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -1471,7 +1471,7 @@ void fun_max(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 {
     if (nfargs < 1)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -1505,7 +1505,7 @@ void fun_min(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 {
     if (nfargs < 1)
     {
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
     }
     else
     {
@@ -1985,23 +1985,23 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         break;
 
     case VEC_OR:
-        SAFE_BOOL(buff, bufc, xlate(v1[0]) || xlate(v2[0]));
+        XSAFEBOOL(buff, bufc, xlate(v1[0]) || xlate(v2[0]));
 
         for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            SAFE_BOOL(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
+            XSAFEBOOL(buff, bufc, xlate(v1[i]) || xlate(v2[i]));
         }
 
         break;
 
     case VEC_AND:
-        SAFE_BOOL(buff, bufc, xlate(v1[0]) && xlate(v2[0]));
+        XSAFEBOOL(buff, bufc, xlate(v1[0]) && xlate(v2[0]));
 
         for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            SAFE_BOOL(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
+            XSAFEBOOL(buff, bufc, xlate(v1[i]) && xlate(v2[i]));
         }
 
         break;
@@ -2009,14 +2009,14 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
     case VEC_XOR:
         x = xlate(v1[0]);
         y = xlate(v2[0]);
-        SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
+        XSAFEBOOL(buff, bufc, (x && !y) || (!x && y));
 
         for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
             x = xlate(v1[i]);
             y = xlate(v2[i]);
-            SAFE_BOOL(buff, bufc, (x && !y) || (!x && y));
+            XSAFEBOOL(buff, bufc, (x && !y) || (!x && y));
         }
 
         break;
@@ -2120,7 +2120,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
  */
 void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) > 0 ? false : true);
+    XSAFEBOOL(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) > 0 ? false : true);
 }
 
 /**
@@ -2138,7 +2138,7 @@ void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  */
 void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, !xlate(fargs[0]));
+    XSAFEBOOL(buff, bufc, !xlate(fargs[0]));
 }
 
 /**
@@ -2156,7 +2156,7 @@ void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), 
  */
 void fun_t(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_BOOL(buff, bufc, xlate(fargs[0]));
+    XSAFEBOOL(buff, bufc, xlate(fargs[0]));
 }
 
 /**
@@ -2240,7 +2240,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
          * separate arguments, but not enough of them
          *
          */
-        SAFE_STRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
+        XSAFESTRNCAT(buff, bufc, "#-1 TOO FEW ARGUMENTS", 21, LBUF_SIZE);
         return;
     }
     else if (flag & FN_NO_EVAL)
@@ -2283,7 +2283,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         }
     }
 
-    SAFE_BOOL(buff, bufc, val);
+    XSAFEBOOL(buff, bufc, val);
 }
 
 /**
@@ -2353,6 +2353,6 @@ void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref 
             n = !n;
         }
 
-        SAFE_BOOL(buff, bufc, n);
+        XSAFEBOOL(buff, bufc, n);
     }
 }

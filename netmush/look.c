@@ -165,7 +165,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 				if (Can_See_Exit(player, thing, isdark))
 				{
 					if (e != buff)
-						SAFE_STRCAT(buff, &e, "  ", LBUF_SIZE);
+						XSAFESTRCAT(buff, &e, "  ", LBUF_SIZE);
 
 					if (Html(player) && (mushconf.have_pueblo == 1))
 					{
@@ -437,7 +437,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 				}
 				XSAFELBSTR(pairColor(depth % 5), strbuf, &endp);
 				XSAFELBCHR(str[pos], strbuf, &endp);
-				SAFE_ANSI_NORMAL(strbuf, &endp);
+				XSAFEANSINORMAL(strbuf, &endp);
 			}
 			else
 			{
@@ -461,7 +461,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 				{
 					XSAFELBSTR(pairColor(depth % 5), strbuf, &endp);
 					XSAFELBCHR(str[pos], strbuf, &endp);
-					SAFE_ANSI_NORMAL(strbuf, &endp);
+					XSAFEANSINORMAL(strbuf, &endp);
 					depth--;
 				}
 				else
@@ -469,7 +469,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 					XSAFELBSTR(ANSI_HILITE, strbuf, &endp);
 					XSAFELBSTR(ANSI_RED, strbuf, &endp);
 					XSAFELBCHR(str[pos], strbuf, &endp);
-					SAFE_ANSI_NORMAL(strbuf, &endp);
+					XSAFEANSINORMAL(strbuf, &endp);
 					*endp = '\0';
 					XSAFELBSTR(strbuf, buff, bufc);
 					XSAFELBSTR(str + pos + 1, buff, bufc);
@@ -608,7 +608,7 @@ void pretty_format(char *dest, char **cp, char *p)
 	 */
 	int indent_lev, i;
 	indent_lev = 0;
-	SAFE_CRLF(dest, cp);
+	XSAFECRLF(dest, cp);
 
 	while (*p)
 	{
@@ -629,7 +629,7 @@ void pretty_format(char *dest, char **cp, char *p)
 			break;
 
 		case '{':
-			SAFE_CRLF(dest, cp);
+			XSAFECRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
@@ -637,7 +637,7 @@ void pretty_format(char *dest, char **cp, char *p)
 			}
 
 			XSAFELBCHR(*p, dest, cp);
-			SAFE_CRLF(dest, cp);
+			XSAFECRLF(dest, cp);
 			indent_lev++;
 
 			for (i = 0; i < indent_lev; i++)
@@ -658,7 +658,7 @@ void pretty_format(char *dest, char **cp, char *p)
 				indent_lev--;
 			}
 
-			SAFE_CRLF(dest, cp);
+			XSAFECRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
@@ -666,7 +666,7 @@ void pretty_format(char *dest, char **cp, char *p)
 			}
 
 			XSAFELBCHR(*p, dest, cp);
-			SAFE_CRLF(dest, cp);
+			XSAFECRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
@@ -682,7 +682,7 @@ void pretty_format(char *dest, char **cp, char *p)
 
 		case ';':
 			XSAFELBCHR(*p, dest, cp);
-			SAFE_CRLF(dest, cp);
+			XSAFECRLF(dest, cp);
 
 			for (i = 0; i < indent_lev; i++)
 			{
@@ -706,7 +706,7 @@ void pretty_format(char *dest, char **cp, char *p)
 
 	if (cp && *cp && dest && (*cp > dest) && (*(*cp - 1) != '\n'))
 	{
-		SAFE_CRLF(dest, cp);
+		XSAFECRLF(dest, cp);
 	}
 }
 
@@ -806,7 +806,7 @@ void pretty_print(char *dest, char *name, char *text)
 
 	if (cp && dest && (cp > dest) && (*(cp - 1) != '\n'))
 	{
-		SAFE_CRLF(dest, &cp);
+		XSAFECRLF(dest, &cp);
 	}
 
 	XSAFELBCHR('-', dest, &cp);
@@ -2340,7 +2340,7 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 				{
 					if ((e - buff + 2) < LBUF_SIZE)
 					{
-						SAFE_STRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
+						XSAFESTRNCAT(buff, &e, (char *)"  ", 2, LBUF_SIZE);
 					}
 				}
 

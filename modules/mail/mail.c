@@ -4336,7 +4336,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
             }
             else if ((player != playerask) && !Wizard(player))
             {
-                SAFE_NOPERM(buff, bufc);
+                XSAFENOPERM(buff, bufc);
                 return;
             }
             else
@@ -4361,7 +4361,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
         }
         else if ((player != playerask) && !God(player))
         {
-            SAFE_NOPERM(buff, bufc);
+            XSAFENOPERM(buff, bufc);
             return;
         }
 
@@ -4415,7 +4415,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
         }
         else if ((player != playerask) && !Wizard(player))
         {
-            SAFE_NOPERM(buff, bufc);
+            XSAFENOPERM(buff, bufc);
             return;
         }
 

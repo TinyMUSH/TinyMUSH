@@ -909,7 +909,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 			if (dbrefs_array[i] != NOTHING)
 			{
 				if (tnp != clean_tname + 1)
-					SAFE_STRNCAT(clean_tname, &tnp, ", ", 2, LBUF_SIZE);
+					XSAFESTRNCAT(clean_tname, &tnp, ", ", 2, LBUF_SIZE);
 
 				safe_name(dbrefs_array[i], clean_tname, &tnp);
 			}

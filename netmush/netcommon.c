@@ -186,7 +186,7 @@ void raw_notify(dbref player, const char *format, ...)
 	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
 		XSAFELBSTR(msg, mushstate.poutnew, &mushstate.poutbufc);
-		SAFE_CRLF(mushstate.poutnew, &mushstate.poutbufc);
+		XSAFECRLF(mushstate.poutnew, &mushstate.poutbufc);
 		XFREE(msg);
 		return;
 	}
@@ -211,7 +211,7 @@ void raw_notify_newline(dbref player)
 
 	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_CRLF(mushstate.poutnew, &mushstate.poutbufc);
+		XSAFECRLF(mushstate.poutnew, &mushstate.poutbufc);
 		return;
 	}
 

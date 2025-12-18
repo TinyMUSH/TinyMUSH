@@ -693,7 +693,7 @@ char *dflt_from_msg(dbref sender, dbref sendloc)
 {
 	char *tp, *tbuff;
 	tp = tbuff = XMALLOC(LBUF_SIZE, "tbuff");
-	SAFE_STRNCAT(tbuff, &tp, (char *)"From ", 5, LBUF_SIZE);
+	XSAFESTRNCAT(tbuff, &tp, (char *)"From ", 5, LBUF_SIZE);
 
 	if (Good_obj(sendloc))
 	{
@@ -734,19 +734,19 @@ void html_escape(const char *src, char *dest, char **destp)
 		switch (*msg_orig)
 		{
 		case '<':
-			SAFE_STRNCAT(dest, destp, "&lt;", 4, LBUF_SIZE);
+			XSAFESTRNCAT(dest, destp, "&lt;", 4, LBUF_SIZE);
 			break;
 
 		case '>':
-			SAFE_STRNCAT(dest, destp, "&gt;", 4, LBUF_SIZE);
+			XSAFESTRNCAT(dest, destp, "&gt;", 4, LBUF_SIZE);
 			break;
 
 		case '&':
-			SAFE_STRNCAT(dest, destp, "&amp;", 5, LBUF_SIZE);
+			XSAFESTRNCAT(dest, destp, "&amp;", 5, LBUF_SIZE);
 			break;
 
 		case '\"':
-			SAFE_STRNCAT(dest, destp, "&quot;", 6, LBUF_SIZE);
+			XSAFESTRNCAT(dest, destp, "&quot;", 6, LBUF_SIZE);
 			break;
 
 		default:
@@ -932,7 +932,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		{
 			tp = tbuff = XMALLOC(LBUF_SIZE, "tbuff");
 			safe_name(target, tbuff, &tp);
-			SAFE_STRNCAT(tbuff, &tp, (char *)"> ", 2, LBUF_SIZE);
+			XSAFESTRNCAT(tbuff, &tp, (char *)"> ", 2, LBUF_SIZE);
 			XSAFELBSTR(msg_ns, tbuff, &tp);
 
 			/*

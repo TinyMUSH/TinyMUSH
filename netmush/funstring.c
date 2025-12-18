@@ -1683,7 +1683,7 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		}
 	}
 
-	SAFE_STRNCAT(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
+	XSAFESTRNCAT(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
 	s = ansi_transition_esccode(ansi_state, ANST_NORMAL);
 	XSAFELBSTR(s, buff, bufc);
 	XFREE(s);
@@ -1917,7 +1917,7 @@ void fun_comp(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  */
 void fun_streq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_BOOL(buff, bufc, !string_compare(fargs[0], fargs[1]));
+	XSAFEBOOL(buff, bufc, !string_compare(fargs[0], fargs[1]));
 }
 
 /**
@@ -1939,7 +1939,7 @@ void fun_strmatch(char *buff, char **bufc, dbref player __attribute__((unused)),
 	 * Check if we match the whole string.  If so, return 1
 	 *
 	 */
-	SAFE_BOOL(buff, bufc, quick_wild(fargs[1], fargs[0]));
+	XSAFEBOOL(buff, bufc, quick_wild(fargs[1], fargs[0]));
 }
 
 /**
@@ -2466,7 +2466,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 	if (xterm)
 	{
-		SAFE_ANSI_NORMAL(buff, bufc);
+		XSAFEANSINORMAL(buff, bufc);
 	}
 }
 
@@ -2854,7 +2854,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 		}
 	}
 
-	SAFE_STRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
+	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
 	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
 	XSAFELBSTR(buf, buff, bufc);
 	XFREE(buf);
@@ -2922,7 +2922,7 @@ void fun_pos(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 		}
 		else
 		{
-			SAFE_NOTHING(buff, bufc);
+			XSAFENOTHING(buff, bufc);
 		}
 
 		XFREE(s1);
@@ -2951,7 +2951,7 @@ void fun_pos(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 		++i, ++s;
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 	XFREE(s1);
 	XFREE(b1);
 	return;
@@ -3099,7 +3099,7 @@ void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		return;
 	}
 
-	SAFE_NOTHING(buff, bufc);
+	XSAFENOTHING(buff, bufc);
 	XFREE(buf);
 	return;
 }
@@ -3233,7 +3233,7 @@ void fun_repeat(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 		if (times > maxtimes)
 		{
-			SAFE_STRNCAT(buff, bufc, fargs[0], len, LBUF_SIZE);
+			XSAFESTRNCAT(buff, bufc, fargs[0], len, LBUF_SIZE);
 		}
 	}
 }
@@ -3544,7 +3544,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		 */
 		if (*bufc != bb_p)
 		{
-			SAFE_CRLF(buff, bufc);
+			XSAFECRLF(buff, bufc);
 		}
 
 		/*
@@ -3591,7 +3591,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		/*
 		 * Print the words
 		 */
-		SAFE_STRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
 		/*
 		 * Back to ansi normal
 		 */
@@ -4247,7 +4247,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Print the words
 			 */
-			SAFE_STRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
+			XSAFESTRNCAT(buff, bufc, sl, el - sl, LBUF_SIZE);
 			/*
 			 * Back to ansi normal
 			 */
@@ -4651,7 +4651,7 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 		}
 	}
 
-	SAFE_STRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
+	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
 	ansi_state_r = ansi_state_l;
 
 	while (*s == ESC_CHAR)
@@ -4809,7 +4809,7 @@ void fun_art(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 	if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
 	{
-		SAFE_STRNCAT(buff, bufc, "an", 2, LBUF_SIZE);
+		XSAFESTRNCAT(buff, bufc, "an", 2, LBUF_SIZE);
 	}
 	else
 	{
@@ -4877,19 +4877,19 @@ void fun_valid(char *buff, char **bufc, dbref player __attribute__((unused)), db
 	}
 	else if (!strcasecmp(fargs[0], "name"))
 	{
-		SAFE_BOOL(buff, bufc, ok_name(fargs[1]));
+		XSAFEBOOL(buff, bufc, ok_name(fargs[1]));
 	}
 	else if (!strcasecmp(fargs[0], "attrname"))
 	{
-		SAFE_BOOL(buff, bufc, ok_attr_name(fargs[1]));
+		XSAFEBOOL(buff, bufc, ok_attr_name(fargs[1]));
 	}
 	else if (!strcasecmp(fargs[0], "playername"))
 	{
-		SAFE_BOOL(buff, bufc, (ok_player_name(fargs[1]) && badname_check(fargs[1])));
+		XSAFEBOOL(buff, bufc, (ok_player_name(fargs[1]) && badname_check(fargs[1])));
 	}
 	else
 	{
-		SAFE_NOTHING(buff, bufc);
+		XSAFENOTHING(buff, bufc);
 	}
 }
 

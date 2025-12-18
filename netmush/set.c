@@ -1037,7 +1037,7 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 		{
 			if (buff)
 			{
-				SAFE_NOPERM(buff, bufc);
+				XSAFENOPERM(buff, bufc);
 			}
 
 			return;
@@ -1056,7 +1056,7 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 	{
 		if (buff)
 		{
-			SAFE_NOPERM(buff, bufc);
+			XSAFENOPERM(buff, bufc);
 		}
 		else
 		{
