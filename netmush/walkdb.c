@@ -1163,8 +1163,8 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			}
 
 			buff = unparse_object(player, thing, 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
-			SAFE_LB_CHR('\n', outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
+			XSAFELBCHR('\n', outbuf, &bp);
 			XFREE(buff);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
@@ -1201,32 +1201,32 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			to = Location(thing);
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			SAFE_LB_STR((char *)" [from ", outbuf, &bp);
+			XSAFELBSTR((char *)" [from ", outbuf, &bp);
 			if (from == NOTHING)
 			{
-				SAFE_LB_STR((char *)"NOWHERE", outbuf, &bp);
+				XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
 			}
 			else
 			{
 				buff = unparse_object(player, from, 0);
-				SAFE_LB_STR(buff, outbuf, &bp);
+				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
 			}
-			SAFE_LB_STR((char *)" to ", outbuf, &bp);
+			XSAFELBSTR((char *)" to ", outbuf, &bp);
 			if (to == NOTHING)
 			{
-				SAFE_LB_STR((char *)"NOWHERE", outbuf, &bp);
+				XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
 			}
 			else
 			{
 				buff = unparse_object(player, to, 0);
-				SAFE_LB_STR(buff, outbuf, &bp);
+				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
 			}
-			SAFE_LB_CHR(']', outbuf, &bp);
-			SAFE_LB_CHR('\n', outbuf, &bp);
+			XSAFELBCHR(']', outbuf, &bp);
+			XSAFELBCHR('\n', outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1260,14 +1260,14 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			SAFE_LB_STR((char *)" [owner: ", outbuf, &bp);
+			XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
 			buff = unparse_object(player, Owner(thing), 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			SAFE_LB_CHR(']', outbuf, &bp);
-			SAFE_LB_CHR('\n', outbuf, &bp);
+			XSAFELBCHR(']', outbuf, &bp);
+			XSAFELBCHR('\n', outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1301,14 +1301,14 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			SAFE_LB_STR((char *)" [owner: ", outbuf, &bp);
+			XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
 			buff = unparse_object(player, Owner(thing), 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			SAFE_LB_CHR(']', outbuf, &bp);
-			SAFE_LB_CHR('\n', outbuf, &bp);
+			XSAFELBCHR(']', outbuf, &bp);
+			XSAFELBCHR('\n', outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1342,19 +1342,19 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
-			SAFE_LB_STR(buff, outbuf, &bp);
+			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
 
 			if (searchparm.s_wizard)
 			{
-				SAFE_LB_STR((char *)" [location: ", outbuf, &bp);
+				XSAFELBSTR((char *)" [location: ", outbuf, &bp);
 				buff = unparse_object(player, Location(thing), 0);
-				SAFE_LB_STR(buff, outbuf, &bp);
+				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
-				SAFE_LB_CHR(']', outbuf, &bp);
+				XSAFELBCHR(']', outbuf, &bp);
 			}
 
-			SAFE_LB_CHR('\n', outbuf, &bp);
+			XSAFELBCHR('\n', outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);

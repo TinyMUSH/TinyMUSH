@@ -579,7 +579,7 @@ char *strip_ansi(const char *s)
 
 		while (*s1)
 		{
-			SAFE_LB_CHR(*s1, buf, &p);
+			XSAFELBCHR(*s1, buf, &p);
 			++s1;
 
 			while (*s1 == ESC_CHAR)
@@ -661,7 +661,7 @@ char *strip_xterm(char *s)
 
 		if (*s1)
 		{
-			SAFE_LB_CHR(*s1, buf, &p);
+			XSAFELBCHR(*s1, buf, &p);
 			++s1;
 		}
 		else
@@ -741,7 +741,7 @@ char *strip_24bit(char *s)
 
 		if (*s1)
 		{
-			SAFE_LB_CHR(*s1, buf, &p);
+			XSAFELBCHR(*s1, buf, &p);
 			++s1;
 		}
 		else
@@ -822,9 +822,9 @@ char *normal_to_white(const char *raw)
 
 			if (p[1] == ANSI_CSI)
 			{
-				SAFE_LB_CHR(*p, buf, &q);
+				XSAFELBCHR(*p, buf, &q);
 				++p;
-				SAFE_LB_CHR(*p, buf, &q);
+				XSAFELBCHR(*p, buf, &q);
 				++p;
 				just_after_csi = p;
 				has_zero = 0;
@@ -859,7 +859,7 @@ char *normal_to_white(const char *raw)
 						{
 							param_val <<= 1;
 							param_val += (param_val << 2) + (*p & 0x0f);
-							SAFE_LB_CHR(*p, buf, &q);
+							XSAFELBCHR(*p, buf, &q);
 						}
 						else
 						{
@@ -875,7 +875,7 @@ char *normal_to_white(const char *raw)
 								/*
 								 * some other color
 								 */
-								SAFE_LB_CHR(*p, buf, &q);
+								XSAFELBCHR(*p, buf, &q);
 							}
 
 							param_val = 0;
@@ -889,7 +889,7 @@ char *normal_to_white(const char *raw)
 						++p;
 					}
 
-					SAFE_LB_CHR(*p, buf, &q);
+					XSAFELBCHR(*p, buf, &q);
 					++p;
 
 					if (param_val == 0)
@@ -1375,18 +1375,18 @@ char *remap_colors(const char *s, int *cmap)
 	{
 		while (*s && (*s != ESC_CHAR))
 		{
-			SAFE_LB_CHR(*s, buf, &bp);
+			XSAFELBCHR(*s, buf, &bp);
 			s++;
 		}
 
 		if (*s == ESC_CHAR)
 		{
-			SAFE_LB_CHR(*s, buf, &bp);
+			XSAFELBCHR(*s, buf, &bp);
 			s++;
 
 			if (*s == ANSI_CSI)
 			{
-				SAFE_LB_CHR(*s, buf, &bp);
+				XSAFELBCHR(*s, buf, &bp);
 				s++;
 
 				do
@@ -1406,27 +1406,27 @@ char *remap_colors(const char *s, int *cmap)
 					{
 						while (isdigit((unsigned char)*s))
 						{
-							SAFE_LB_CHR(*s, buf, &bp);
+							XSAFELBCHR(*s, buf, &bp);
 							s++;
 						}
 					}
 
 					if (*s == ';')
 					{
-						SAFE_LB_CHR(*s, buf, &bp);
+						XSAFELBCHR(*s, buf, &bp);
 						s++;
 					}
 				} while (*s && (*s != ANSI_END));
 
 				if (*s == ANSI_END)
 				{
-					SAFE_LB_CHR(*s, buf, &bp);
+					XSAFELBCHR(*s, buf, &bp);
 					s++;
 				}
 			}
 			else if (*s)
 			{
-				SAFE_LB_CHR(*s, buf, &bp);
+				XSAFELBCHR(*s, buf, &bp);
 				s++;
 			}
 		}
@@ -1513,7 +1513,7 @@ char *translate_string(char *str, int type)
 				}
 
 				char *transition = ansi_transition_mushcode(ansi_state_prev, ansi_state);
-				SAFE_LB_STR(transition, buff, &bp);
+				XSAFELBSTR(transition, buff, &bp);
 				XFREE(transition);
 				ansi_state_prev = ansi_state;
 				continue;
@@ -1525,7 +1525,7 @@ char *translate_string(char *str, int type)
 				}
 				else
 				{
-					SAFE_LB_CHR(' ', buff, &bp);
+					XSAFELBCHR(' ', buff, &bp);
 				}
 
 				break;
@@ -1538,8 +1538,8 @@ char *translate_string(char *str, int type)
 			case '}':
 			case '(':
 			case ')':
-				SAFE_LB_CHR('%', buff, &bp);
-				SAFE_LB_CHR(*str, buff, &bp);
+				XSAFELBCHR('%', buff, &bp);
+				XSAFELBCHR(*str, buff, &bp);
 				break;
 
 			case '\r':
@@ -1554,7 +1554,7 @@ char *translate_string(char *str, int type)
 				break;
 
 			default:
-				SAFE_LB_CHR(*str, buff, &bp);
+				XSAFELBCHR(*str, buff, &bp);
 			}
 
 			str++;
@@ -1575,11 +1575,11 @@ char *translate_string(char *str, int type)
 
 			case '\n':
 			case '\t':
-				SAFE_LB_CHR(' ', buff, &bp);
+				XSAFELBCHR(' ', buff, &bp);
 				break;
 
 			default:
-				SAFE_LB_CHR(*str, buff, &bp);
+				XSAFELBCHR(*str, buff, &bp);
 			}
 
 			str++;
@@ -1975,7 +1975,7 @@ char *munge_space(char *string)
 	{
 		while (*p && !isspace((unsigned char)*p))
 		{
-			SAFE_LB_CHR(*p, buffer, &q);
+			XSAFELBCHR(*p, buffer, &q);
 			++p;
 		}
 
@@ -1984,7 +1984,7 @@ char *munge_space(char *string)
 
 		if (*p)
 		{
-			SAFE_LB_CHR(' ', buffer, &q);
+			XSAFELBCHR(' ', buffer, &q);
 		}
 	}
 
@@ -2018,7 +2018,7 @@ char *trim_spaces(char *string)
 	{
 		while (*p && !isspace((unsigned char)*p))
 		{
-			SAFE_LB_CHR(*p, buffer, &q); /* copy nonspace chars */
+			XSAFELBCHR(*p, buffer, &q); /* copy nonspace chars */
 			++p;
 		}
 
@@ -2029,7 +2029,7 @@ char *trim_spaces(char *string)
 
 		if (*p)
 		{
-			SAFE_LB_CHR(' ', buffer, &q); /* leave one space */
+			XSAFELBCHR(' ', buffer, &q); /* leave one space */
 		}
 	}
 
@@ -2259,7 +2259,7 @@ char *replace_string(const char *old, const char *new, const char *string)
 			/* Copy up to the next occurrence of the first char of OLD */
 			while (*s && *s != *old)
 			{
-				SAFE_LB_CHR(*s, result, &r);
+				XSAFELBCHR(*s, result, &r);
 				s++;
 			}
 
@@ -2273,12 +2273,12 @@ char *replace_string(const char *old, const char *new, const char *string)
 			{
 				if (!strncmp(old, s, olen))
 				{
-					SAFE_LB_STR((char *)new, result, &r);
+					XSAFELBSTR((char *)new, result, &r);
 					s += olen;
 				}
 				else
 				{
-					SAFE_LB_CHR(*s, result, &r);
+					XSAFELBCHR(*s, result, &r);
 					s++;
 				}
 			}
@@ -2693,7 +2693,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					}
 					else
 					{
-						SAFE_LB_CHR(*src, *dst, &cp);
+						XSAFELBCHR(*src, *dst, &cp);
 						++src;
 					}
 				}
@@ -2702,7 +2702,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	}
 
 	p = ansi_transition_esccode(ansi_state, ANST_NONE);
-	SAFE_LB_STR(p, *dst, &cp);
+	XSAFELBSTR(p, *dst, &cp);
 	XFREE(p);
 }
 
@@ -2975,27 +2975,27 @@ void copy_esccode(char **s, char **t)
 
 void safe_copy_esccode(char **s, char *buff, char **bufc)
 {
-	SAFE_LB_CHR(**s, buff, bufc);
+	XSAFELBCHR(**s, buff, bufc);
 	++(*s);
 
 	if (**s == ANSI_CSI)
 	{
 		do
 		{
-			SAFE_LB_CHR(**s, buff, bufc);
+			XSAFELBCHR(**s, buff, bufc);
 			++(*s);
 		} while ((**s & 0xf0) == 0x30);
 	}
 
 	while ((**s & 0xf0) == 0x20)
 	{
-		SAFE_LB_CHR(**s, buff, bufc);
+		XSAFELBCHR(**s, buff, bufc);
 		++(*s);
 	}
 
 	if (**s)
 	{
-		SAFE_LB_CHR(**s, buff, bufc);
+		XSAFELBCHR(**s, buff, bufc);
 		++(*s);
 	}
 }

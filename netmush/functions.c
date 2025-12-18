@@ -119,7 +119,7 @@ void do_function(dbref player, dbref cause __attribute__((unused)), int key, cha
      *
      */
     bp = np = XMALLOC(SBUF_SIZE, "np");
-    SAFE_SB_STR(fname, np, &bp);
+    XSAFESBSTR(fname, np, &bp);
     *bp = '\0';
 
     char *np_upper = XMALLOC(SBUF_SIZE, "np_upper");
@@ -370,15 +370,15 @@ void helper_list_funcaccess(dbref player, FUN *fp)
             }
             else
             {
-                SAFE_LB_STR((char *)fp->name, buff, &bp);
-                SAFE_LB_CHR(':', buff, &bp);
+                XSAFELBSTR((char *)fp->name, buff, &bp);
+                XSAFELBCHR(':', buff, &bp);
 
                 for (int i = 0; i < fp->xperms->num_funcs; i++)
                 {
                     if (fp->xperms->ext_funcs[i])
                     {
-                        SAFE_LB_CHR(' ', buff, &bp);
-                        SAFE_LB_STR(fp->xperms->ext_funcs[i]->fn_name, buff, &bp);
+                        XSAFELBCHR(' ', buff, &bp);
+                        XSAFELBSTR(fp->xperms->ext_funcs[i]->fn_name, buff, &bp);
                     }
                 }
             }

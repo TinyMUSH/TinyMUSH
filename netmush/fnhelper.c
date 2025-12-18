@@ -434,7 +434,7 @@ void print_separator(const Delim *sep, char *list, char **bufc)
 		}
 		else if (sep->str[0] != '\0')
 		{
-			SAFE_LB_CHR(sep->str[0], list, bufc);
+			XSAFELBCHR(sep->str[0], list, bufc);
 		}
 	}
 	else
@@ -458,14 +458,14 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 
 	if (alen)
 	{
-		SAFE_LB_STR(arr[0], list, bufc);
+		XSAFELBSTR(arr[0], list, bufc);
 	}
 
 	for (i = 1; i < alen; i++)
 	{
 		print_separator(sep, list, bufc);
 
-		SAFE_LB_STR(arr[i], list, bufc);
+		XSAFELBSTR(arr[i], list, bufc);
 	}
 }
 
@@ -619,7 +619,7 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		{
 			if (tlen > MAX_DELIM_LEN)
 			{
-				SAFE_LB_STR("#-1 SEPARATOR TOO LONG", buff, bufc);
+				XSAFELBSTR("#-1 SEPARATOR TOO LONG", buff, bufc);
 				sep->len = 0;
 			}
 			else
@@ -630,7 +630,7 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		}
 		else
 		{
-			SAFE_LB_STR("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
+			XSAFELBSTR("#-1 SEPARATOR MUST BE ONE CHARACTER", buff, bufc);
 			sep->len = 0;
 		}
 	}

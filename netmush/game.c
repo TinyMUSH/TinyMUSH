@@ -667,7 +667,7 @@ char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const 
 	if (!*buf)
 	{
 		cp = buf;
-		SAFE_LB_STR((char *)dflt, buf, &cp);
+		XSAFELBSTR((char *)dflt, buf, &cp);
 	}
 	else
 	{
@@ -682,10 +682,10 @@ char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const 
 
 	if (cp != buf)
 	{
-		SAFE_LB_CHR(' ', buf, &cp);
+		XSAFELBCHR(' ', buf, &cp);
 	}
 
-	SAFE_LB_STR((char *)msg, buf, &cp);
+	XSAFELBSTR((char *)msg, buf, &cp);
 	return (buf);
 }
 
@@ -704,7 +704,7 @@ char *dflt_from_msg(dbref sender, dbref sendloc)
 		safe_name(sender, tbuff, &tp);
 	}
 
-	SAFE_LB_CHR(',', tbuff, &tp);
+	XSAFELBCHR(',', tbuff, &tp);
 	return tbuff;
 }
 
@@ -750,7 +750,7 @@ void html_escape(const char *src, char *dest, char **destp)
 			break;
 
 		default:
-			SAFE_LB_CHR(*msg_orig, dest, destp);
+			XSAFELBCHR(*msg_orig, dest, destp);
 			break;
 		}
 	}
@@ -848,7 +848,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			}
 		}
 
-		SAFE_LB_STR(msg, msg_ns, &mp);
+		XSAFELBSTR(msg, msg_ns, &mp);
 	}
 	else
 	{
@@ -933,7 +933,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 			tp = tbuff = XMALLOC(LBUF_SIZE, "tbuff");
 			safe_name(target, tbuff, &tp);
 			SAFE_STRNCAT(tbuff, &tp, (char *)"> ", 2, LBUF_SIZE);
-			SAFE_LB_STR(msg_ns, tbuff, &tp);
+			XSAFELBSTR(msg_ns, tbuff, &tp);
 
 			/*
 			 * Criteria for redirection of a puppet is based on
@@ -3758,10 +3758,10 @@ int main(int argc, char *argv[])
 	{
 		if (bp != mushstate.modloaded)
 		{
-			SAFE_MB_CHR(' ', mushstate.modloaded, &bp);
+			XSAFEMBCHR(' ', mushstate.modloaded, &bp);
 		}
 
-		SAFE_MB_STR(mp->modname, mushstate.modloaded, &bp);
+		XSAFEMBSTR(mp->modname, mushstate.modloaded, &bp);
 	}
 
 	mushconf.exec_path = XSTRDUP(argv[0], "argv");

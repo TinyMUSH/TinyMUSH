@@ -2152,11 +2152,11 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
 				{
 					if (tmp->env[i] != NULL)
 					{
-						SAFE_LB_STR((char *)"; Arg", bufp, &bp);
-						SAFE_LB_CHR(i + '0', bufp, &bp);
-						SAFE_LB_STR((char *)"='", bufp, &bp);
-						SAFE_LB_STR(tmp->env[i], bufp, &bp);
-						SAFE_LB_CHR('\'', bufp, &bp);
+						XSAFELBSTR((char *)"; Arg", bufp, &bp);
+						XSAFELBCHR(i + '0', bufp, &bp);
+						XSAFELBSTR((char *)"='", bufp, &bp);
+						XSAFELBSTR(tmp->env[i], bufp, &bp);
+						XSAFELBCHR('\'', bufp, &bp);
 					}
 				}
 

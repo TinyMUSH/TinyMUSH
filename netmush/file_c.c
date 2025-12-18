@@ -348,16 +348,16 @@ void fcache_load(dbref player)
 
             if (fp == fcache)
             {
-                SAFE_LB_STR((char *)"File sizes: ", buff, &bufc);
+                XSAFELBSTR((char *)"File sizes: ", buff, &bufc);
             }
             else
             {
-                SAFE_LB_STR((char *)"  ", buff, &bufc);
+                XSAFELBSTR((char *)"  ", buff, &bufc);
             }
 
-            SAFE_LB_STR((char *)fp->desc, buff, &bufc);
-            SAFE_LB_STR((char *)"...", buff, &bufc);
-            SAFE_LB_STR(sbuf, buff, &bufc);
+            XSAFELBSTR((char *)fp->desc, buff, &bufc);
+            XSAFELBSTR((char *)"...", buff, &bufc);
+            XSAFELBSTR(sbuf, buff, &bufc);
         }
     }
 

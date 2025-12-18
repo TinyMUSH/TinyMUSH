@@ -1339,7 +1339,7 @@ void do_destroy(dbref player, dbref cause __attribute__((unused)), int key, char
     if ((Owner(thing) != player) && !Quiet(player))
     {
         t = tbuf = XMALLOC(SBUF_SIZE, "t");
-        SAFE_SB_STR(Name(Owner(thing)), tbuf, &t);
+        XSAFESBSTR(Name(Owner(thing)), tbuf, &t);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Destroyed. %s's %s(#%d)", tbuf, Name(thing), thing);
         XFREE(tbuf);
     }

@@ -387,10 +387,10 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 		{
 			if (p != alias_buf)
 			{
-				SAFE_LB_CHR(';', alias_buf, &p);
+				XSAFELBCHR(';', alias_buf, &p);
 			}
 
-			SAFE_LB_STR(alias_ptrs[i], alias_buf, &p);
+			XSAFELBSTR(alias_ptrs[i], alias_buf, &p);
 		}
 		else
 		{

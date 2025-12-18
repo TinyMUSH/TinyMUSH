@@ -155,7 +155,7 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 	if (str)
 	{
-		SAFE_LB_STR(str, buff, bufc);
+		XSAFELBSTR(str, buff, bufc);
 	}
 }
 
@@ -210,7 +210,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 	if ((port < 0) && (target == NOTHING))
 	{
-		SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+		XSAFELBSTR((char *)"-1 -1 -1", buff, bufc);
 		return;
 	}
 
@@ -240,7 +240,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 		return;
 	}
 
-	SAFE_LB_CHR('#', buff, bufc);
+	XSAFELBCHR('#', buff, bufc);
 	SAFE_LTOS(buff, bufc, get_programmer(target), LBUF_SIZE);
 }
 
@@ -265,7 +265,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 
 	if (!fargs[0] || !*fargs[0])
 	{
-		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XSAFELBSTR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
@@ -283,7 +283,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
 	if (!cmdp || (cmdp->info.handler != do_help))
 	{
 		XFREE(cmd_lower);
-		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XSAFELBSTR((char *)"#-1 NOT FOUND", buff, bufc);
 		return;
 	}
 
@@ -346,33 +346,33 @@ void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unus
 		case '&':
 			if (!strncmp(msg_orig, "&quot;", 6))
 			{
-				ret = SAFE_LB_CHR('\"', buff, bufc);
+				ret = XSAFELBCHR('\"', buff, bufc);
 				msg_orig += 5;
 			}
 			else if (!strncmp(msg_orig, "&lt;", 4))
 			{
-				ret = SAFE_LB_CHR('<', buff, bufc);
+				ret = XSAFELBCHR('<', buff, bufc);
 				msg_orig += 3;
 			}
 			else if (!strncmp(msg_orig, "&gt;", 4))
 			{
-				ret = SAFE_LB_CHR('>', buff, bufc);
+				ret = XSAFELBCHR('>', buff, bufc);
 				msg_orig += 3;
 			}
 			else if (!strncmp(msg_orig, "&amp;", 5))
 			{
-				ret = SAFE_LB_CHR('&', buff, bufc);
+				ret = XSAFELBCHR('&', buff, bufc);
 				msg_orig += 4;
 			}
 			else
 			{
-				ret = SAFE_LB_CHR('&', buff, bufc);
+				ret = XSAFELBCHR('&', buff, bufc);
 			}
 
 			break;
 
 		default:
-			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
+			ret = XSAFELBCHR(*msg_orig, buff, bufc);
 			break;
 		}
 	}
@@ -441,15 +441,15 @@ void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)
 		if (escaped_chars(*msg_orig))
 		{
 			XSPRINTF(tbuf, "%%02X", (unsigned char)*msg_orig);
-			ret = SAFE_LB_STR(tbuf, buff, bufc);
+			ret = XSAFELBSTR(tbuf, buff, bufc);
 		}
 		else if (*msg_orig == ' ')
 		{
-			ret = SAFE_LB_CHR('+', buff, bufc);
+			ret = XSAFELBCHR('+', buff, bufc);
 		}
 		else
 		{
-			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
+			ret = XSAFELBCHR(*msg_orig, buff, bufc);
 		}
 	}
 	XFREE(tbuf);
@@ -480,7 +480,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 		switch (*msg_orig)
 		{
 		case '+':
-			ret = SAFE_LB_CHR(' ', buff, bufc);
+			ret = XSAFELBCHR(' ', buff, bufc);
 			msg_orig++;
 			break;
 
@@ -490,7 +490,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 
 			if ((sscanf(tbuf, "%x", &tempchar) == 1) && (tempchar > 0x1F) && (tempchar < 0x7F))
 			{
-				ret = SAFE_LB_CHR((char)tempchar, buff, bufc);
+				ret = XSAFELBCHR((char)tempchar, buff, bufc);
 			}
 
 			if (*msg_orig)
@@ -523,7 +523,7 @@ void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unuse
 			break;
 
 		default:
-			ret = SAFE_LB_CHR(*msg_orig, buff, bufc);
+			ret = XSAFELBCHR(*msg_orig, buff, bufc);
 			msg_orig++;
 			break;
 		}

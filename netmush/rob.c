@@ -309,9 +309,9 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	if (!could_doit(giver, thing, A_LGIVE))
 	{
 		sp = str = XMALLOC(LBUF_SIZE, "str");
-		SAFE_LB_STR((char *)"You can't give ", str, &sp);
+		XSAFELBSTR((char *)"You can't give ", str, &sp);
 		safe_name(thing, str, &sp);
-		SAFE_LB_STR((char *)" away.", str, &sp);
+		XSAFELBSTR((char *)" away.", str, &sp);
 		*sp = '\0';
 		did_it(giver, thing, A_GFAIL, str, A_OGFAIL, NULL, A_AGFAIL, 0, (char **)NULL, 0, MSG_MOVE);
 		XFREE(str);
@@ -322,9 +322,9 @@ void give_thing(dbref giver, dbref recipient, int key, char *what)
 	{
 		sp = str = XMALLOC(LBUF_SIZE, "str");
 		safe_name(recipient, str, &sp);
-		SAFE_LB_STR((char *)" doesn't want ", str, &sp);
+		XSAFELBSTR((char *)" doesn't want ", str, &sp);
 		safe_name(thing, str, &sp);
-		SAFE_LB_CHR('.', str, &sp);
+		XSAFELBCHR('.', str, &sp);
 		*sp = '\0';
 		did_it(giver, recipient, A_RFAIL, str, A_ORFAIL, NULL, A_ARFAIL, 0, (char **)NULL, 0, MSG_MOVE);
 		XFREE(str);

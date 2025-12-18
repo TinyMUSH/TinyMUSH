@@ -935,7 +935,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			 */
 			if (!(mushconf.space_compress && at_space) || (eval & EV_NO_COMPRESS))
 			{
-				SAFE_LB_CHR(' ', buff, bufc);
+				XSAFELBCHR(' ', buff, bufc);
 				at_space = 1;
 			}
 
@@ -952,7 +952,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			if (**dstr)
 			{
-				SAFE_LB_CHR(**dstr, buff, bufc);
+				XSAFELBCHR(**dstr, buff, bufc);
 			}
 			else
 			{
@@ -973,7 +973,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			if (eval & EV_NOFCHECK)
 			{
-				SAFE_LB_CHR('[', buff, bufc);
+				XSAFELBCHR('[', buff, bufc);
 				*dstr = tstr;
 				break;
 			}
@@ -982,7 +982,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			if (*dstr == NULL)
 			{
-				SAFE_LB_CHR('[', buff, bufc);
+				XSAFELBCHR('[', buff, bufc);
 				*dstr = tstr;
 			}
 			else
@@ -1007,14 +1007,14 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			if (*dstr == NULL)
 			{
-				SAFE_LB_CHR('{', buff, bufc);
+				XSAFELBCHR('{', buff, bufc);
 				*dstr = tstr;
 			}
 			else
 			{
 				if (!(eval & EV_STRIP))
 				{
-					SAFE_LB_CHR('{', buff, bufc);
+					XSAFELBCHR('{', buff, bufc);
 				}
 
 				/**
@@ -1022,7 +1022,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 */
 				if (*tbuf == ' ')
 				{
-					SAFE_LB_CHR(' ', buff, bufc);
+					XSAFELBCHR(' ', buff, bufc);
 					tbuf++;
 				}
 
@@ -1031,7 +1031,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if (!(eval & EV_STRIP))
 				{
-					SAFE_LB_CHR('}', buff, bufc);
+					XSAFELBCHR('}', buff, bufc);
 				}
 
 				(*dstr)--;
@@ -1079,7 +1079,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if ((i < ncargs) && (cargs[i] != NULL))
 				{
-					SAFE_LB_STR(cargs[i], buff, bufc);
+					XSAFELBSTR(cargs[i], buff, bufc);
 				}
 
 				break;
@@ -1099,7 +1099,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Tab
 				 *
 				 */
-				SAFE_LB_CHR('\t', buff, bufc);
+				XSAFELBCHR('\t', buff, bufc);
 				break;
 
 			case 'B':
@@ -1108,7 +1108,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Blank
 				 *
 				 */
-				SAFE_LB_CHR(' ', buff, bufc);
+				XSAFELBCHR(' ', buff, bufc);
 				break;
 
 			case 'C':
@@ -1119,7 +1119,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					 * %c is last command executed
 					 *
 					 */
-					SAFE_LB_STR(mushstate.curr_cmd, buff, bufc);
+					XSAFELBSTR(mushstate.curr_cmd, buff, bufc);
 					break;
 				}
 				//[[fallthrough]];
@@ -1222,7 +1222,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 							while (**dstr && (**dstr != '>'))
 							{
-								SAFE_SB_CHR(**dstr, xtbuf, &xtp);
+								XSAFESBCHR(**dstr, xtbuf, &xtp);
 								(*dstr)++;
 							}
 
@@ -1252,7 +1252,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 								XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
 							}
 
-							SAFE_LB_STR(xtbuf, buff, bufc);
+							XSAFELBSTR(xtbuf, buff, bufc);
 							ansi = 1;
 						}
 						else
@@ -1279,11 +1279,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if (!ansiChar((unsigned char)**dstr))
 				{
-					SAFE_LB_CHR(**dstr, buff, bufc);
+					XSAFELBCHR(**dstr, buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR(ansiChar((unsigned char)**dstr), buff, bufc);
+					XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
 					ansi = (**dstr == 'n') ? 0 : 1;
 				}
 
@@ -1315,7 +1315,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				while (**dstr && (**dstr != '>'))
 				{
-					SAFE_SB_CHR(**dstr, xtbuf, &xtp);
+					XSAFESBCHR(**dstr, xtbuf, &xtp);
 					(*dstr)++;
 				}
 
@@ -1375,8 +1375,8 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 					xtp = xtbuf;
 					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
-					SAFE_COPY_CHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
-					SAFE_COPY_CHR(ch, xtbuf, &xtp, SBUF_SIZE - 1);
+					XSAFECOPYCHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
+					XSAFECOPYCHR(ch, xtbuf, &xtp, SBUF_SIZE - 1);
 				}
 				else
 				{
@@ -1391,7 +1391,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 					xtp = xtbuf;
 					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
-					SAFE_COPY_CHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
+					XSAFECOPYCHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
 
 					while (**dstr && (**dstr != '>'))
 					{
@@ -1400,7 +1400,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 						 *
 						 */
 						ch = tolower(**dstr);
-						SAFE_SB_CHR(ch, xtbuf, &xtp);
+						XSAFESBCHR(ch, xtbuf, &xtp);
 						(*dstr)++;
 					}
 
@@ -1419,7 +1419,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if (!(mushstate.f_limitmask & FN_VARFX) && (xvar = (VARENT *)hashfind(xtbuf, &mushstate.vars_htab)))
 				{
-					SAFE_LB_STR(xvar->text, buff, bufc);
+					XSAFELBSTR(xvar->text, buff, bufc);
 				}
 
 				break;
@@ -1524,7 +1524,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				while (**dstr && (**dstr != '>'))
 				{
-					SAFE_SB_CHR(tolower(**dstr), xtbuf, &xtp);
+				XSAFESBCHR(tolower(**dstr), xtbuf, &xtp);
 					(*dstr)++;
 				}
 
@@ -1567,7 +1567,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					safe_name(cause, buff, bufc);
 				}
 				else
-					SAFE_LB_STR((char *)get_obj(gender), buff, bufc);
+					XSAFELBSTR((char *)get_obj(gender), buff, bufc);
 
 				break;
 
@@ -1585,11 +1585,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (!gender)
 				{
 					safe_name(cause, buff, bufc);
-					SAFE_LB_CHR('s', buff, bufc);
+					XSAFELBCHR('s', buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR((char *)get_poss(gender), buff, bufc);
+					XSAFELBSTR((char *)get_poss(gender), buff, bufc);
 				}
 
 				break;
@@ -1610,7 +1610,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					safe_name(cause, buff, bufc);
 				}
 				else
-					SAFE_LB_STR((char *)get_subj(gender), buff, bufc);
+					XSAFELBSTR((char *)get_subj(gender), buff, bufc);
 
 				break;
 
@@ -1628,11 +1628,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (!gender)
 				{
 					safe_name(cause, buff, bufc);
-					SAFE_LB_CHR('s', buff, bufc);
+					XSAFELBCHR('s', buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR((char *)get_absp(gender), buff, bufc);
+					XSAFELBSTR((char *)get_absp(gender), buff, bufc);
 				}
 
 				break;
@@ -1642,7 +1642,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Invoker DB number
 				 *
 				 */
-				SAFE_LB_CHR('#', buff, bufc);
+				XSAFELBCHR('#', buff, bufc);
 				SAFE_LTOS(buff, bufc, cause, LBUF_SIZE);
 				break;
 
@@ -1651,7 +1651,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Executor DB number
 				 *
 				 */
-				SAFE_LB_CHR('#', buff, bufc);
+				XSAFELBCHR('#', buff, bufc);
 				SAFE_LTOS(buff, bufc, player, LBUF_SIZE);
 				break;
 
@@ -1672,7 +1672,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 */
 				if (!(eval & EV_NO_LOCATION))
 				{
-					SAFE_LB_CHR('#', buff, bufc);
+					XSAFELBCHR('#', buff, bufc);
 					SAFE_LTOS(buff, bufc, where_is(cause), LBUF_SIZE);
 				}
 
@@ -1683,7 +1683,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Caller dbref
 				 *
 				 */
-				SAFE_LB_CHR('#', buff, bufc);
+				XSAFELBCHR('#', buff, bufc);
 				SAFE_LTOS(buff, bufc, caller, LBUF_SIZE);
 				break;
 
@@ -1692,13 +1692,13 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Enactor's objID
 				 *
 				 */
-				SAFE_LB_CHR(':', buff, bufc);
+				XSAFELBCHR(':', buff, bufc);
 				SAFE_LTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
 				break;
 
 			case 'M':
 			case 'm':
-				SAFE_LB_STR(mushstate.curr_cmd, buff, bufc);
+				XSAFELBSTR(mushstate.curr_cmd, buff, bufc);
 				break;
 
 			case 'I':
@@ -1767,11 +1767,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if ((*xtp == 'i') || (*xtp == 'I'))
 				{
-					SAFE_LB_STR(mushstate.loop_token[i], buff, bufc);
+					XSAFELBSTR(mushstate.loop_token[i], buff, bufc);
 				}
 				else
 				{
-					SAFE_LB_STR(mushstate.loop_token2[i], buff, bufc);
+					XSAFELBSTR(mushstate.loop_token2[i], buff, bufc);
 				}
 
 				break;
@@ -1789,7 +1789,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Piped command output
 				 *
 				 */
-				SAFE_LB_STR(mushstate.pout, buff, bufc);
+				XSAFELBSTR(mushstate.pout, buff, bufc);
 				break;
 
 			case '%':
@@ -1797,7 +1797,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Percent - a literal %
 				 *
 				 */
-				SAFE_LB_CHR('%', buff, bufc);
+				XSAFELBCHR('%', buff, bufc);
 				break;
 
 			default:
@@ -1805,7 +1805,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Just copy
 				 *
 				 */
-				SAFE_LB_CHR(**dstr, buff, bufc);
+				XSAFELBCHR(**dstr, buff, bufc);
 			}
 
 			if (isupper(savec))
@@ -1825,7 +1825,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			if (!(eval & EV_FCHECK))
 			{
-				SAFE_LB_CHR('(', buff, bufc);
+				XSAFELBCHR('(', buff, bufc);
 				break;
 			}
 
@@ -1837,7 +1837,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			 */
 			**bufc = '\0';
 			xtp = xtbuf;
-			SAFE_SB_STR(oldp, xtbuf, &xtp);
+			XSAFESBSTR(oldp, xtbuf, &xtp);
 			*xtp = '\0';
 
 			if (mushconf.space_compress && (eval & EV_FMAND))
@@ -1920,7 +1920,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			if (!*dstr)
 			{
 				*dstr = tstr;
-				SAFE_LB_CHR(**dstr, buff, bufc);
+				XSAFELBCHR(**dstr, buff, bufc);
 
 				for (i = 0; i < nfargs; i++)
 					if (fargs[i] != NULL)
@@ -1965,19 +1965,19 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if (mushstate.func_nest_lev >= mushconf.func_nest_lim)
 				{
-					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (mushstate.func_invk_ctr >= mushconf.func_invk_lim)
 				{
-					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Too_Much_CPU())
 				{
-					SAFE_LB_STR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Going(player))
 				{
-					SAFE_LB_STR("#-1 BAD INVOKER", buff, bufc);
+					XSAFELBSTR("#-1 BAD INVOKER", buff, bufc);
 				}
 				else if (!check_access(player, ufp->perms))
 				{
@@ -2103,15 +2103,15 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				if (mushstate.func_nest_lev >= mushconf.func_nest_lim)
 				{
-					SAFE_LB_STR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION RECURSION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (mushstate.func_invk_ctr >= mushconf.func_invk_lim)
 				{
-					SAFE_LB_STR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION INVOCATION LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Too_Much_CPU())
 				{
-					SAFE_LB_STR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
+					XSAFELBSTR("#-1 FUNCTION CPU LIMIT EXCEEDED", buff, bufc);
 				}
 				else if (Going(player))
 				{
@@ -2120,7 +2120,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					 * mid-function sequence, such as with a command()/@destroy combo...
 					 *
 					 */
-					SAFE_LB_STR("#-1 BAD INVOKER", buff, bufc);
+					XSAFELBSTR("#-1 BAD INVOKER", buff, bufc);
 				}
 				else if (!Check_Func_Access(player, fp))
 				{
@@ -2164,13 +2164,13 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			if (!token_char((unsigned char)**dstr))
 			{
 				(*dstr)--;
-				SAFE_LB_CHR(**dstr, buff, bufc);
+				XSAFELBCHR(**dstr, buff, bufc);
 			}
 			else
 			{
 				if ((**dstr == '#') && mushstate.in_loop)
 				{
-					SAFE_LB_STR(mushstate.loop_token[mushstate.in_loop - 1], buff, bufc);
+					XSAFELBSTR(mushstate.loop_token[mushstate.in_loop - 1], buff, bufc);
 				}
 				else if ((**dstr == '@') && mushstate.in_loop)
 				{
@@ -2178,11 +2178,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				}
 				else if ((**dstr == '+') && mushstate.in_loop)
 				{
-					SAFE_LB_STR(mushstate.loop_token2[mushstate.in_loop - 1], buff, bufc);
+					XSAFELBSTR(mushstate.loop_token2[mushstate.in_loop - 1], buff, bufc);
 				}
 				else if ((**dstr == '$') && mushstate.in_switch)
 				{
-					SAFE_LB_STR(mushstate.switch_token, buff, bufc);
+					XSAFELBSTR(mushstate.switch_token, buff, bufc);
 				}
 				else if (**dstr == '!')
 				{
@@ -2196,7 +2196,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				else
 				{
 					(*dstr)--;
-					SAFE_LB_CHR(**dstr, buff, bufc);
+					XSAFELBCHR(**dstr, buff, bufc);
 				}
 			}
 
@@ -2262,7 +2262,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 	if (realbuff)
 	{
 		*bufc = realbp;
-		SAFE_LB_STR(buff, realbuff, bufc);
+		XSAFELBSTR(buff, realbuff, bufc);
 		**bufc = '\0';
 		XFREE(buff);
 		buff = realbuff;

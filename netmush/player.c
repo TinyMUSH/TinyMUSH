@@ -444,7 +444,7 @@ int add_player_name(dbref player, char *name)
      * Convert to all lowercase
      */
     tp = temp = XMALLOC(LBUF_SIZE, "tp");
-    SAFE_LB_STR(name, temp, &tp);
+    XSAFELBSTR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -500,7 +500,7 @@ int delete_player_name(dbref player, char *name)
     dbref *p;
     char *temp, *tp;
     tp = temp = XMALLOC(LBUF_SIZE, "temp");
-    SAFE_LB_STR(name, temp, &tp);
+    XSAFELBSTR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -564,7 +564,7 @@ dbref lookup_player(dbref doer, char *name, int check_who)
     }
 
     tp = temp = XMALLOC(LBUF_SIZE, "temp");
-    SAFE_LB_STR(name, temp, &tp);
+    XSAFELBSTR(name, temp, &tp);
 
     for (tp = temp; *tp; tp++)
     {
@@ -708,12 +708,12 @@ void badname_list(dbref player, const char *prefix)
      * Construct an lbuf with all the names separated by spaces
      */
     buff = bufp = XMALLOC(LBUF_SIZE, "bufp");
-    SAFE_LB_STR((char *)prefix, buff, &bufp);
+    XSAFELBSTR((char *)prefix, buff, &bufp);
 
     for (bp = mushstate.badname_head; bp; bp = bp->next)
     {
-        SAFE_LB_CHR(' ', buff, &bufp);
-        SAFE_LB_STR(bp->name, buff, &bufp);
+        XSAFELBCHR(' ', buff, &bufp);
+        XSAFELBSTR(bp->name, buff, &bufp);
     }
 
     /*

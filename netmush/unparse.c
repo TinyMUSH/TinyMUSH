@@ -62,7 +62,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 	{
 		if (format == F_EXAMINE)
 		{
-			SAFE_LB_STR("*UNLOCKED*", boolexp_buf, buftop);
+			XSAFELBSTR("*UNLOCKED*", boolexp_buf, buftop);
 		}
 
 		return;
@@ -73,16 +73,16 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 	case BOOLEXP_AND:
 		if (outer_type == BOOLEXP_NOT)
 		{
-			SAFE_LB_CHR('(', boolexp_buf, buftop);
+			XSAFELBCHR('(', boolexp_buf, buftop);
 		}
 
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
-		SAFE_LB_CHR(AND_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(AND_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub2, b->type, format, boolexp_buf, buftop);
 
 		if (outer_type == BOOLEXP_NOT)
 		{
-			SAFE_LB_CHR(')', boolexp_buf, buftop);
+			XSAFELBCHR(')', boolexp_buf, buftop);
 		}
 
 		break;
@@ -90,42 +90,42 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 	case BOOLEXP_OR:
 		if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND)
 		{
-			SAFE_LB_CHR('(', boolexp_buf, buftop);
+			XSAFELBCHR('(', boolexp_buf, buftop);
 		}
 
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
-		SAFE_LB_CHR(OR_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(OR_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub2, b->type, format, boolexp_buf, buftop);
 
 		if (outer_type == BOOLEXP_NOT || outer_type == BOOLEXP_AND)
 		{
-			SAFE_LB_CHR(')', boolexp_buf, buftop);
+			XSAFELBCHR(')', boolexp_buf, buftop);
 		}
 
 		break;
 
 	case BOOLEXP_NOT:
-		SAFE_LB_CHR('!', boolexp_buf, buftop);
+		XSAFELBCHR('!', boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_INDIR:
-		SAFE_LB_CHR(INDIR_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(INDIR_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_IS:
-		SAFE_LB_CHR(IS_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(IS_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_CARRY:
-		SAFE_LB_CHR(CARRY_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(CARRY_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
 	case BOOLEXP_OWNER:
-		SAFE_LB_CHR(OWNER_TOKEN, boolexp_buf, buftop);
+		XSAFELBCHR(OWNER_TOKEN, boolexp_buf, buftop);
 		unparse_boolexp1(player, b->sub1, b->type, format, boolexp_buf, buftop);
 		break;
 
@@ -140,7 +140,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 				 * Always #Num
 				 */
 				buff = unparse_object_quiet(b->thing);
-				SAFE_LB_STR(buff, boolexp_buf, buftop);
+				XSAFELBSTR(buff, boolexp_buf, buftop);
 				XFREE(buff);
 				break;
 
@@ -150,7 +150,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 				 * Name(#Num) or Name
 				 */
 				buff = unparse_object(player, b->thing, 0);
-				SAFE_LB_STR(buff, boolexp_buf, buftop);
+				XSAFELBSTR(buff, boolexp_buf, buftop);
 				XFREE(buff);
 				break;
 
@@ -164,7 +164,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 				switch (Typeof(b->thing))
 				{
 				case TYPE_PLAYER:
-					SAFE_LB_CHR('*', boolexp_buf, buftop);
+					XSAFELBCHR('*', boolexp_buf, buftop);
 					//[[fallthrough]];
 					__attribute__((fallthrough));
 				case TYPE_THING:
@@ -172,7 +172,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 					break;
 
 				default:
-					SAFE_LB_CHR('#', boolexp_buf, buftop);
+					XSAFELBCHR('#', boolexp_buf, buftop);
 					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
@@ -188,12 +188,12 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 				switch (Typeof(b->thing))
 				{
 				case TYPE_PLAYER:
-					SAFE_LB_CHR('*', boolexp_buf, buftop);
+					XSAFELBCHR('*', boolexp_buf, buftop);
 					safe_name(b->thing, boolexp_buf, buftop);
 					break;
 
 				default:
-					SAFE_LB_CHR('#', boolexp_buf, buftop);
+					XSAFELBCHR('#', boolexp_buf, buftop);
 					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
@@ -202,7 +202,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 		else
 		{
 			buff = unparse_object_quiet(b->thing);
-			SAFE_LB_STR(buff, boolexp_buf, buftop);
+			XSAFELBSTR(buff, boolexp_buf, buftop);
 			XFREE(buff);
 		}
 
@@ -223,15 +223,15 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 
 		if (ap && ap->number)
 		{
-			SAFE_LB_STR((char *)ap->name, boolexp_buf, buftop);
+			XSAFELBSTR((char *)ap->name, boolexp_buf, buftop);
 		}
 		else
 		{
 			SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 		}
 
-		SAFE_LB_CHR(sep_ch, boolexp_buf, buftop);
-		SAFE_LB_STR((char *)b->sub1, boolexp_buf, buftop);
+		XSAFELBCHR(sep_ch, boolexp_buf, buftop);
+		XSAFELBSTR((char *)b->sub1, boolexp_buf, buftop);
 		break;
 
 	default:

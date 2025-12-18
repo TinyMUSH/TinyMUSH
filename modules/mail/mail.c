@@ -1131,7 +1131,7 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
     if (all)
     {
         bp = oldlist = XMALLOC(LBUF_SIZE, "oldlist");
-        SAFE_LB_STR((char *)mp->tolist, oldlist, &bp);
+        XSAFELBSTR((char *)mp->tolist, oldlist, &bp);
 
         if (*mp->cclist)
             XSAFESPRINTF(oldlist, &bp, " %s", mp->cclist);
@@ -1144,18 +1144,18 @@ void do_mail_reply(dbref player, char *msg, int all, int key)
         {
             if (bp != ccnames)
             {
-                SAFE_LB_CHR(' ', ccnames, &bp);
+                XSAFELBCHR(' ', ccnames, &bp);
             }
 
             if (*p == '*')
             {
-                SAFE_LB_STR(p, ccnames, &bp);
+                XSAFELBSTR(p, ccnames, &bp);
             }
             else if (atoi(p) != mp->from)
             {
-                SAFE_LB_CHR('"', ccnames, &bp);
+                XSAFELBCHR('"', ccnames, &bp);
                 safe_name(atoi(p), ccnames, &bp);
-                SAFE_LB_CHR('"', ccnames, &bp);
+                XSAFELBCHR('"', ccnames, &bp);
             }
         }
 
@@ -2289,9 +2289,9 @@ void add_folder_name(dbref player, int fld, char *name)
         r = res = XMALLOC(LBUF_SIZE, "res");
 
         if (*atrstr)
-            SAFE_LB_STR(str, res, &r);
+            XSAFELBSTR(str, res, &r);
 
-        SAFE_LB_STR(new, res, &r);
+        XSAFELBSTR(new, res, &r);
         *r = '\0';
     }
 
@@ -3195,7 +3195,7 @@ void do_malias_list(dbref player, char *alias)
     for (i = m->numrecep - 1; i > -1; i--)
     {
         safe_name(m->list[i], buff, &bp);
-        SAFE_LB_CHR(' ', buff, &bp);
+        XSAFELBCHR(' ', buff, &bp);
     }
 
     *bp = '\0';
@@ -3484,12 +3484,12 @@ static char *make_namelist(dbref player __attribute__((unused)), char *arg)
     {
         if (bp != names)
         {
-            SAFE_LB_STR(", ", names, &bp);
+            XSAFELBSTR(", ", names, &bp);
         }
 
         if (*p == '*')
         {
-            SAFE_LB_STR(p, names, &bp);
+            XSAFELBSTR(p, names, &bp);
         }
         else
         {
@@ -3563,7 +3563,7 @@ static char *make_numlist(dbref player, char *arg)
             }
 
             buf = XASPRINTF("buf", "%d ", temp->from);
-            SAFE_LB_STR(buf, numbuf, &numbp);
+            XSAFELBSTR(buf, numbuf, &numbp);
             XFREE(buf);
         }
         else if (*head == '*')
@@ -3577,8 +3577,8 @@ static char *make_numlist(dbref player, char *arg)
                 return NULL;
             }
 
-            SAFE_LB_STR(head, numbuf, &numbp);
-            SAFE_LB_CHR(' ', numbuf, &numbp);
+            XSAFELBSTR(head, numbuf, &numbp);
+            XSAFELBCHR(' ', numbuf, &numbp);
         }
         else
         {
@@ -3587,7 +3587,7 @@ static char *make_numlist(dbref player, char *arg)
             if (target != NOTHING)
             {
                 buf = XASPRINTF("buf", "%d ", target);
-                SAFE_LB_STR(buf, numbuf, &numbp);
+                XSAFELBSTR(buf, numbuf, &numbp);
                 XFREE(buf);
             }
             else
@@ -3679,18 +3679,18 @@ void mail_to_list(dbref player, char *tolist, char *cclist, char *bcclist, char 
     }
 
     bp = list = XMALLOC(LBUF_SIZE, "bp");
-    SAFE_LB_STR(tolist, list, &bp);
+    XSAFELBSTR(tolist, list, &bp);
 
     if (cclist && *cclist)
     {
-        SAFE_LB_CHR(' ', list, &bp);
-        SAFE_LB_STR(cclist, list, &bp);
+        XSAFELBCHR(' ', list, &bp);
+        XSAFELBSTR(cclist, list, &bp);
     }
 
     if (bcclist && *bcclist)
     {
-        SAFE_LB_CHR(' ', list, &bp);
-        SAFE_LB_STR(bcclist, list, &bp);
+        XSAFELBCHR(' ', list, &bp);
+        XSAFELBSTR(bcclist, list, &bp);
     }
 
     number = add_mail_message(player, message);
@@ -3888,9 +3888,9 @@ void do_prepend(dbref player, dbref cause __attribute__((unused)), int key __att
         if (*oldmsg)
         {
             bp = newmsg = XMALLOC(LBUF_SIZE, "newmsg");
-            SAFE_LB_STR(text + 1, newmsg, &bp);
-            SAFE_LB_CHR(' ', newmsg, &bp);
-            SAFE_LB_STR(oldmsg, newmsg, &bp);
+            XSAFELBSTR(text + 1, newmsg, &bp);
+            XSAFELBCHR(' ', newmsg, &bp);
+            XSAFELBSTR(oldmsg, newmsg, &bp);
             *bp = '\0';
             atr_add_raw(player, A_MAILMSG, newmsg);
             XFREE(newmsg);
@@ -3927,9 +3927,9 @@ void do_postpend(dbref player, dbref cause __attribute__((unused)), int key __at
         if (*oldmsg)
         {
             bp = newmsg = XMALLOC(LBUF_SIZE, "newmsg");
-            SAFE_LB_STR(oldmsg, newmsg, &bp);
-            SAFE_LB_CHR(' ', newmsg, &bp);
-            SAFE_LB_STR(text + 1, newmsg, &bp);
+            XSAFELBSTR(oldmsg, newmsg, &bp);
+            XSAFELBCHR(' ', newmsg, &bp);
+            XSAFELBSTR(text + 1, newmsg, &bp);
             *bp = '\0';
             atr_add_raw(player, A_MAILMSG, newmsg);
             XFREE(newmsg);
@@ -4331,7 +4331,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
              */
             if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
             {
-                SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
+                XSAFELBSTR("#-1 NO SUCH PLAYER", buff, bufc);
                 return;
             }
             else if ((player != playerask) && !Wizard(player))
@@ -4356,7 +4356,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     {
         if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
         {
-            SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
+            XSAFELBSTR("#-1 NO SUCH PLAYER", buff, bufc);
             return;
         }
         else if ((player != playerask) && !God(player))
@@ -4370,7 +4370,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
     if ((num < 1) || (Typeof(playerask) != TYPE_PLAYER))
     {
-        SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
+        XSAFELBSTR("#-1 NO SUCH MESSAGE", buff, bufc);
         return;
     }
 
@@ -4378,12 +4378,12 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
     if (mp != NULL)
     {
-        SAFE_LB_STR(get_mail_message(mp->number), buff, bufc);
+        XSAFELBSTR(get_mail_message(mp->number), buff, bufc);
         return;
     }
 
     /* ran off the end of the list without finding anything */
-    SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
+    XSAFELBSTR("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
 void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -4410,7 +4410,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
     {
         if ((playerask = lookup_player(player, fargs[0], 1)) == NOTHING)
         {
-            SAFE_LB_STR("#-1 NO SUCH PLAYER", buff, bufc);
+            XSAFELBSTR("#-1 NO SUCH PLAYER", buff, bufc);
             return;
         }
         else if ((player != playerask) && !Wizard(player))
@@ -4424,7 +4424,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if ((num < 1) || (Typeof(playerask) != TYPE_PLAYER))
     {
-        SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
+        XSAFELBSTR("#-1 NO SUCH MESSAGE", buff, bufc);
         return;
     }
 
@@ -4432,13 +4432,13 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (mp != NULL)
     {
-        SAFE_LB_CHR('#', buff, bufc);
+        XSAFELBCHR('#', buff, bufc);
         SAFE_LTOS(buff, bufc, mp->from, LBUF_SIZE);
         return;
     }
 
     /* ran off the end of the list without finding anything */
-    SAFE_LB_STR("#-1 NO SUCH MESSAGE", buff, bufc);
+    XSAFELBSTR("#-1 NO SUCH MESSAGE", buff, bufc);
 }
 
 FUN mod_mail_functable[] = {

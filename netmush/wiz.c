@@ -593,7 +593,7 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
 			return;
 		}
 		safe_name(player, buf, &bp);
-		SAFE_LB_STR((char *)" gently shows you the door.", buf, &bp);
+		XSAFELBSTR((char *)" gently shows you the door.", buf, &bp);
 		*bp = '\0';
 	}
 

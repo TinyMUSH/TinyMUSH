@@ -52,28 +52,25 @@
 
 // Replacement for the safe_* functions.
 #define XSAFESPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__)
-#define SAFE_SPRINTF(s, p, f, ...) __xsafesprintf(s, p, f, ##__VA_ARGS__)
+#define XSAFECOPYCHR(c, b, p, s) __xsafestrcatchr(b, p, c, s)
 
-#define SAFE_COPY_CHR(c, b, p, s) __xsafestrcatchr(b, p, c, s)
-#define SAFE_STRCATCHR(b, p, c, s) __xsafestrcatchr(b, p, c, s)
+#define XSAFESBCHR(c, b, p) __xsafestrcatchr(b, p, c, SBUF_SIZE - 1)
+#define XSAFEMBCHR(c, b, p) __xsafestrcatchr(b, p, c, MBUF_SIZE - 1)
+#define XSAFELBCHR(c, b, p) __xsafestrcatchr(b, p, c, LBUF_SIZE - 1)
 
-#define SAFE_LB_CHR(c, b, p) __xsafestrcatchr(b, p, c, LBUF_SIZE - 1)
-#define SAFE_SB_CHR(c, b, p) __xsafestrcatchr(b, p, c, SBUF_SIZE - 1)
-#define SAFE_MB_CHR(c, b, p) __xsafestrcatchr(b, p, c, MBUF_SIZE - 1)
+#define XSAFESBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), SBUF_SIZE - 1) : 0)
+#define XSAFEMBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), MBUF_SIZE - 1) : 0)
+#define XSAFELBSTR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), LBUF_SIZE - 1) : 0)
 
 #define SAFE_STRNCAT(b, p, s, n, z) __xsafestrncat(b, p, s, n, z);
 #define SAFE_STRCAT(b, p, s, n) (s ? __xsafestrncat(b, p, s, strlen(s), n) : 0)
-
-#define SAFE_LB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), LBUF_SIZE - 1) : 0)
-#define SAFE_SB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), SBUF_SIZE - 1) : 0)
-#define SAFE_MB_STR(s, b, p) (s ? __xsafestrncpy(b, p, s, strlen(s), MBUF_SIZE - 1) : 0)
 
 #define SAFE_CRLF(b, p) SAFE_STRCAT(b, p, "\r\n", LBUF_SIZE - 1)
 #define SAFE_ANSI_NORMAL(b, p) SAFE_STRCAT(b, p, ANSI_NORMAL, LBUF_SIZE - 1)
 #define SAFE_NOTHING(b, p) SAFE_STRCAT(b, p, "#-1", LBUF_SIZE - 1)
 #define SAFE_NOPERM(b, p) SAFE_STRCAT(b, p, "#-1 PERMISSION DENIED", LBUF_SIZE - 1)
 #define SAFE_NOMATCH(b, p) SAFE_STRCAT(b, p, "#-1 NO MATCH", LBUF_SIZE - 1)
-#define SAFE_BOOL(b, p, n) SAFE_LB_CHR(((n) ? '1' : '0'), (b), (p))
+#define SAFE_BOOL(b, p, n) XSAFELBCHR(((n) ? '1' : '0'), (b), (p))
 
 #define SAFE_LTOS(d, p, n, s) __xsafeltos(d, p, n, s)
 

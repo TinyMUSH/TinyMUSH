@@ -261,11 +261,11 @@ static char *munge_comtitle(char *title)
     if (strchr(title, ESC_CHAR))
     {
         SAFE_STRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
-        SAFE_MB_STR(ANSI_NORMAL, tbuf, &tp);
+        XSAFEMBSTR(ANSI_NORMAL, tbuf, &tp);
     }
     else
     {
-        SAFE_MB_STR(title, tbuf, &tp);
+        XSAFEMBSTR(title, tbuf, &tp);
     }
 
     return tbuf;
@@ -414,29 +414,29 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                     if (!mp)
                     {
                         mp = msg_ns;
-                        SAFE_LB_CHR('[', msg_ns, &mp);
+                        XSAFELBCHR('[', msg_ns, &mp);
                         safe_name(cause, msg_ns, &mp);
-                        SAFE_LB_CHR('(', msg_ns, &mp);
-                        SAFE_LB_CHR('#', msg_ns, &mp);
+                        XSAFELBCHR('(', msg_ns, &mp);
+                        XSAFELBCHR('#', msg_ns, &mp);
                         SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
-                        SAFE_LB_CHR(')', msg_ns, &mp);
+                        XSAFELBCHR(')', msg_ns, &mp);
 
                         if (Good_obj(cause) && cause != Owner(cause))
                         {
-                            SAFE_LB_CHR('{', msg_ns, &mp);
+                            XSAFELBCHR('{', msg_ns, &mp);
                             safe_name(Owner(cause), msg_ns, &mp);
-                            SAFE_LB_CHR('}', msg_ns, &mp);
+                            XSAFELBCHR('}', msg_ns, &mp);
                         }
 
                         if (cause != mushstate.curr_enactor)
                         {
                             SAFE_STRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
                             SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
-                            SAFE_LB_CHR(')', msg_ns, &mp);
+                            XSAFELBCHR(')', msg_ns, &mp);
                         }
 
                         SAFE_STRCAT(msg_ns, &mp, "] ", LBUF_SIZE);
-                        SAFE_LB_STR(msg, msg_ns, &mp);
+                        XSAFELBSTR(msg, msg_ns, &mp);
                     }
 
                     if (mushconf.have_pueblo != 1)
@@ -793,8 +793,8 @@ static void process_comsys(dbref player, char *arg, COMALIAS *cap)
             else
             {
                 tp = tbuf;
-                SAFE_LB_STR(cap->title, tbuf, &tp);
-                SAFE_LB_CHR(' ', tbuf, &tp);
+                XSAFELBSTR(cap->title, tbuf, &tp);
+                XSAFELBCHR(' ', tbuf, &tp);
                 safe_name(player, tbuf, &tp);
                 *tp = '\0';
                 name_buf = tbuf;
@@ -1634,7 +1634,7 @@ void do_cboot(dbref player, dbref cause __attribute__((unused)), int key, char *
     {
         remove_from_channel(thing, chp, 1);
         t = tbuf;
-        SAFE_SB_STR(Name(player), tbuf, &t);
+        XSAFESBSTR(Name(player), tbuf, &t);
         s = XMALLOC(LBUF_SIZE, "do_cboot.s");
         if (s)
         {
@@ -1862,34 +1862,34 @@ void do_clist(dbref player, dbref cause __attribute__((unused)), int key, char *
         check_owned_channel(player, chp);
         notify(player, chp->name);
         tp = tbuf;
-        SAFE_LB_STR("Flags:", tbuf, &tp);
+        XSAFELBSTR("Flags:", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_PUBLIC)
-            SAFE_LB_STR(" Public", tbuf, &tp);
+            XSAFELBSTR(" Public", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_LOUD)
-            SAFE_LB_STR(" Loud", tbuf, &tp);
+            XSAFELBSTR(" Loud", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_SPOOF)
-            SAFE_LB_STR(" Spoof", tbuf, &tp);
+            XSAFELBSTR(" Spoof", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_JOIN)
-            SAFE_LB_STR(" P_Join", tbuf, &tp);
+            XSAFELBSTR(" P_Join", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_RECV)
-            SAFE_LB_STR(" P_Receive", tbuf, &tp);
+            XSAFELBSTR(" P_Receive", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_P_TRANS)
-            SAFE_LB_STR(" P_Transmit", tbuf, &tp);
+            XSAFELBSTR(" P_Transmit", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_JOIN)
-            SAFE_LB_STR(" O_Join", tbuf, &tp);
+            XSAFELBSTR(" O_Join", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_RECV)
-            SAFE_LB_STR(" O_Receive", tbuf, &tp);
+            XSAFELBSTR(" O_Receive", tbuf, &tp);
 
         if (chp->flags & CHAN_FLAG_O_TRANS)
-            SAFE_LB_STR(" O_Transmit", tbuf, &tp);
+            XSAFELBSTR(" O_Transmit", tbuf, &tp);
 
         *tp = '\0';
         notify(player, tbuf);
@@ -2677,12 +2677,12 @@ void mod_comsys_load_database(FILE *fp)
     chp = lookup_channel(fargs[0]);                                  \
     if (!chp)                                                        \
     {                                                                \
-        SAFE_LB_STR((char *)"#-1 CHANNEL NOT FOUND", buff, bufc);    \
+        XSAFELBSTR((char *)"#-1 CHANNEL NOT FOUND", buff, bufc);    \
         return;                                                      \
     }                                                                \
     if ((!Comm_All(p) && ((p) != chp->owner)))                       \
     {                                                                \
-        SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
+        XSAFELBSTR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
         return;                                                      \
     }
 
@@ -2690,7 +2690,7 @@ void mod_comsys_load_database(FILE *fp)
     t = lookup_player(p, fargs[0], 1);                               \
     if (!Good_obj(t) || (!Controls(p, t) && !Comm_All(p)))           \
     {                                                                \
-        SAFE_LB_STR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
+        XSAFELBSTR((char *)"#-1 NO PERMISSION TO USE", buff, bufc); \
         return;                                                      \
     }
 
@@ -2698,7 +2698,7 @@ void mod_comsys_load_database(FILE *fp)
     cap = lookup_calias(p, n);                                \
     if (!cap)                                                 \
     {                                                         \
-        SAFE_LB_STR((char *)"#-1 NO SUCH ALIAS", buff, bufc); \
+        XSAFELBSTR((char *)"#-1 NO SUCH ALIAS", buff, bufc); \
         return;                                               \
     }
 
@@ -2732,7 +2732,7 @@ void fun_comlist(char *buff, char **bufc, dbref player, dbref caller, dbref caus
                 print_separator(&osep, buff, bufc);
             }
 
-            SAFE_LB_STR(chp->name, buff, bufc);
+            XSAFELBSTR(chp->name, buff, bufc);
         }
     }
 }
@@ -2759,9 +2759,9 @@ void fun_cwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
               (!Hidden(chp->connect_who[i]->player) || See_Hidden(player)))))
         {
             if (*bufc != bb_p)
-                SAFE_LB_CHR(' ', buff, bufc);
+                XSAFELBCHR(' ', buff, bufc);
 
-            SAFE_LB_CHR('#', buff, bufc);
+            XSAFELBCHR('#', buff, bufc);
             SAFE_LTOS(buff, bufc, chp->connect_who[i]->player, LBUF_SIZE);
         }
     }
@@ -2778,9 +2778,9 @@ void fun_cwhoall(char *buff, char **bufc, dbref player, dbref caller __attribute
     for (wp = chp->who; wp != NULL; wp = wp->next)
     {
         if (*bufc != bb_p)
-            SAFE_LB_CHR(' ', buff, bufc);
+            XSAFELBCHR(' ', buff, bufc);
 
-        SAFE_LB_CHR('#', buff, bufc);
+        XSAFELBCHR('#', buff, bufc);
         SAFE_LTOS(buff, bufc, wp->player, LBUF_SIZE);
     }
 }
@@ -2789,7 +2789,7 @@ void fun_comowner(char *buff, char **bufc, dbref player, dbref caller __attribut
 {
     CHANNEL *chp;
     Grab_Channel(player);
-    SAFE_LB_CHR('#', buff, bufc);
+    XSAFELBCHR('#', buff, bufc);
     SAFE_LTOS(buff, bufc, chp->owner, LBUF_SIZE);
 }
 
@@ -2799,7 +2799,7 @@ void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller __attribute
     Grab_Channel(player);
 
     if (chp->descrip)
-        SAFE_LB_STR(chp->descrip, buff, bufc);
+        XSAFELBSTR(chp->descrip, buff, bufc);
 }
 
 void fun_comheader(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -2808,7 +2808,7 @@ void fun_comheader(char *buff, char **bufc, dbref player, dbref caller __attribu
     Grab_Channel(player);
 
     if (chp->header)
-        SAFE_LB_STR(chp->header, buff, bufc);
+        XSAFELBSTR(chp->header, buff, bufc);
 }
 
 void fun_comalias(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -2831,9 +2831,9 @@ void fun_comalias(char *buff, char **bufc, dbref player, dbref caller __attribut
             continue;
 
         if (*bufc != bb_p)
-            SAFE_LB_CHR(' ', buff, bufc);
+            XSAFELBCHR(' ', buff, bufc);
 
-        SAFE_LB_STR(cl_ptr->alias_ptr->alias, buff, bufc);
+        XSAFELBSTR(cl_ptr->alias_ptr->alias, buff, bufc);
     }
 }
 
@@ -2844,9 +2844,9 @@ void fun_cominfo(char *buff, char **bufc, dbref player, dbref caller __attribute
     Comsys_User(player, target);
     Grab_Alias(target, fargs[1]);
     if (cap->channel)
-        SAFE_LB_STR(cap->channel->name, buff, bufc);
+        XSAFELBSTR(cap->channel->name, buff, bufc);
     else
-        SAFE_LB_STR((char *)"#-1 INVALID CHANNEL", buff, bufc);
+        XSAFELBSTR((char *)"#-1 INVALID CHANNEL", buff, bufc);
 }
 
 void fun_comtitle(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
@@ -2857,7 +2857,7 @@ void fun_comtitle(char *buff, char **bufc, dbref player, dbref caller __attribut
     Grab_Alias(target, fargs[1]);
 
     if (cap->title)
-        SAFE_LB_STR(cap->title, buff, bufc);
+        XSAFELBSTR(cap->title, buff, bufc);
 }
 
 void fun_cemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

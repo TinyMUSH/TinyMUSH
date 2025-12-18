@@ -240,7 +240,7 @@ void display_powertab(dbref player)
     {
         return;
     }
-    SAFE_LB_STR((char *)"Powers:", buf, &bp);
+    XSAFELBSTR((char *)"Powers:", buf, &bp);
 
     /* Memoize permission checks to avoid repeated macro calls in loop */
     is_wizard = Wizard(player);
@@ -258,8 +258,8 @@ void display_powertab(dbref player)
             continue;
         }
 
-        SAFE_LB_CHR(' ', buf, &bp);
-        SAFE_LB_STR((char *)fp->powername, buf, &bp);
+        XSAFELBCHR(' ', buf, &bp);
+        XSAFELBSTR((char *)fp->powername, buf, &bp);
     }
 
     *bp = '\0';
@@ -511,7 +511,7 @@ char *power_description(dbref player, dbref target)
     /*
      * Store the header strings and object type
      */
-    SAFE_MB_STR((char *)"Powers:", buff, &bp);
+    XSAFEMBSTR((char *)"Powers:", buff, &bp);
 
     /* Memoize power reads and permission checks for efficiency */
     f1 = Powers(target);
@@ -542,8 +542,8 @@ char *power_description(dbref player, dbref target)
                 continue;
             }
 
-            SAFE_MB_CHR(' ', buff, &bp);
-            SAFE_MB_STR((char *)fp->powername, buff, &bp);
+            XSAFEMBCHR(' ', buff, &bp);
+            XSAFEMBSTR((char *)fp->powername, buff, &bp);
         }
     }
 

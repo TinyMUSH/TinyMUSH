@@ -378,9 +378,9 @@ void help_write(dbref player, char *topic, HASHTAB *htab, char *filename, int ev
 					buffp = topic_list;
 				}
 
-				SAFE_LB_STR(result, topic_list, &buffp);
-				SAFE_LB_CHR(' ', topic_list, &buffp);
-				SAFE_LB_CHR(' ', topic_list, &buffp);
+				XSAFELBSTR(result, topic_list, &buffp);
+				XSAFELBCHR(' ', topic_list, &buffp);
+				XSAFELBCHR(' ', topic_list, &buffp);
 			}
 		}
 
@@ -481,7 +481,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	if (hf_num >= mushstate.helpfiles)
 	{
 		log_write(LOG_BUGS, "BUG", "HELP", "Unknown help file number: %d", hf_num);
-		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XSAFELBSTR((char *)"#-1 NOT FOUND", buff, bufc);
 		XFREE(tname);
 		XFREE(tbuf);
 		return;
@@ -505,7 +505,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 
 	if (!htab_entry)
 	{
-		SAFE_LB_STR((char *)"#-1 NOT FOUND", buff, bufc);
+		XSAFELBSTR((char *)"#-1 NOT FOUND", buff, bufc);
 		XFREE(tname);
 		XFREE(tbuf);
 		return;
@@ -517,7 +517,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	if ((fp = tf_fopen(tbuf, O_RDONLY)) == NULL)
 	{
 		log_write(LOG_PROBLEMS, "HLP", "OPEN", "Can't open %s for reading.", tbuf);
-		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
+		XSAFELBSTR((char *)"#-1 ERROR", buff, bufc);
 		XFREE(tname);
 		XFREE(tbuf);
 		return;
@@ -527,7 +527,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 	{
 		log_write(LOG_PROBLEMS, "HLP", "SEEK", "Seek error in file %s.", tbuf);
 		tf_fclose(fp);
-		SAFE_LB_STR((char *)"#-1 ERROR", buff, bufc);
+		XSAFELBSTR((char *)"#-1 ERROR", buff, bufc);
 		XFREE(tname);
 		XFREE(tbuf);
 		return;
@@ -569,11 +569,11 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
 			str = line;
 			bp = result;
 			eval_expression_string(result, &bp, 0, player, player, EV_NO_COMPRESS | EV_FIGNORE | EV_EVAL, &str, (char **)NULL, 0);
-			SAFE_LB_STR(result, buff, bufc);
+			XSAFELBSTR(result, buff, bufc);
 		}
 		else
 		{
-			SAFE_LB_STR(line, buff, bufc);
+			XSAFELBSTR(line, buff, bufc);
 		}
 
 		count++;

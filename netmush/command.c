@@ -704,17 +704,17 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 					 */
 					if (!(cmdp->callseq & CS_LEADIN))
 					{
-						SAFE_LB_STR(cmdp->cmdname, new, &bp);
+						XSAFELBSTR(cmdp->cmdname, new, &bp);
 					}
 					else
 					{
-						SAFE_LB_STR(unp_command, new, &bp);
+						XSAFELBSTR(unp_command, new, &bp);
 					}
 
 					if (switchp)
 					{
-						SAFE_LB_CHR('/', new, &bp);
-						SAFE_LB_STR(switchp, new, &bp);
+						XSAFELBCHR('/', new, &bp);
+						XSAFELBSTR(switchp, new, &bp);
 					}
 
 					*bp = '\0';
@@ -726,20 +726,20 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 						j++;
 					}
 
-					SAFE_LB_STR(cmdp->cmdname, new, &bp);
+					XSAFELBSTR(cmdp->cmdname, new, &bp);
 
 					if (switchp)
 					{
-						SAFE_LB_CHR('/', new, &bp);
-						SAFE_LB_STR(switchp, new, &bp);
+						XSAFELBCHR('/', new, &bp);
+						XSAFELBSTR(switchp, new, &bp);
 					}
 
 					if (!(cmdp->callseq & CS_LEADIN))
 					{
-						SAFE_LB_CHR(' ', new, &bp);
+						XSAFELBCHR(' ', new, &bp);
 					}
 
-					SAFE_LB_STR(j, new, &bp);
+					XSAFELBSTR(j, new, &bp);
 					*bp = '\0';
 				}
 				/**
@@ -1213,9 +1213,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				{
 					gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 					gc = gbuf;
-					SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
-					SAFE_LB_CHR(' ', gbuf, &gc);
-					SAFE_LB_STR(command, gbuf, &gc);
+					XSAFELBSTR(cmdp->cmdname, gbuf, &gc);
+					XSAFELBCHR(' ', gbuf, &gc);
+					XSAFELBSTR(command, gbuf, &gc);
 					*gc = '\0';
 					process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 					XFREE(gbuf);
@@ -1265,9 +1265,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				{
 					gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 					gc = gbuf;
-					SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
-					SAFE_LB_CHR(' ', gbuf, &gc);
-					SAFE_LB_STR(command, gbuf, &gc);
+					XSAFELBSTR(cmdp->cmdname, gbuf, &gc);
+					XSAFELBCHR(' ', gbuf, &gc);
+					XSAFELBSTR(command, gbuf, &gc);
 					*gc = '\0';
 					process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 					XFREE(gbuf);
@@ -1560,9 +1560,9 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 							{
 								gbuf = XMALLOC(LBUF_SIZE, "gbuf");
 								gc = gbuf;
-								SAFE_LB_STR(cmdp->cmdname, gbuf, &gc);
-								SAFE_LB_CHR(' ', gbuf, &gc);
-								SAFE_LB_STR(command, gbuf, &gc);
+								XSAFELBSTR(cmdp->cmdname, gbuf, &gc);
+								XSAFELBCHR(' ', gbuf, &gc);
+								XSAFELBSTR(command, gbuf, &gc);
 								*gc = '\0';
 								process_cmdent(cmdp, NULL, player, cause, interactive, command, gbuf, args, nargs);
 								XFREE(gbuf);

@@ -128,7 +128,7 @@ void raw_notify_html(dbref player, const char *format, ...)
 
 	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_LB_STR(msg, mushstate.poutnew, &mushstate.poutbufc);
+		XSAFELBSTR(msg, mushstate.poutnew, &mushstate.poutbufc);
 		XFREE(msg);
 		return;
 	}
@@ -185,7 +185,7 @@ void raw_notify(dbref player, const char *format, ...)
 
 	if (mushstate.inpipe && (player == mushstate.poutobj))
 	{
-		SAFE_LB_STR(msg, mushstate.poutnew, &mushstate.poutbufc);
+		XSAFELBSTR(msg, mushstate.poutnew, &mushstate.poutbufc);
 		SAFE_CRLF(mushstate.poutnew, &mushstate.poutbufc);
 		XFREE(msg);
 		return;
@@ -2803,10 +2803,10 @@ void make_ulist(dbref player, char *buff, char **bufc)
 
 			if (cp != *bufc)
 			{
-				SAFE_LB_CHR(' ', buff, bufc);
+				XSAFELBCHR(' ', buff, bufc);
 			}
 
-			SAFE_LB_CHR('#', buff, bufc);
+			XSAFELBCHR('#', buff, bufc);
 			SAFE_LTOS(buff, bufc, d->player, LBUF_SIZE);
 		}
 }
@@ -2827,7 +2827,7 @@ void make_portlist(dbref player __attribute__((unused)), dbref target, char *buf
 			if ((target == NOTHING) || (d->player == target))
 			{
 				XSNPRINTF(s, MBUF_SIZE, "%d ", d->descriptor);
-				SAFE_LB_STR(s, buff, bufc);
+				XSAFELBSTR(s, buff, bufc);
 				i = 1;
 			}
 		}
@@ -2859,14 +2859,14 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 				if (Wizard_Who(player) || Controls(player, d->player))
 				{
 					XSNPRINTF(s, MBUF_SIZE, "%d %d %d", d->command_count, d->input_tot, d->output_tot);
-					SAFE_LB_STR(s, buff, bufc);
+					XSAFELBSTR(s, buff, bufc);
 					XFREE(s);
 					return;
 				}
 				else
 				{
 					notify_quiet(player, NOPERM_MESSAGE);
-					SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+					XSAFELBSTR((char *)"-1 -1 -1", buff, bufc);
 					XFREE(s);
 					return;
 				}
@@ -2875,7 +2875,7 @@ void make_sessioninfo(dbref player, dbref target, int port_num, char *buff, char
 	/*
 	 * Not found, return error.
 	 */
-	SAFE_LB_STR((char *)"-1 -1 -1", buff, bufc);
+	XSAFELBSTR((char *)"-1 -1 -1", buff, bufc);
 	XFREE(s);
 }
 

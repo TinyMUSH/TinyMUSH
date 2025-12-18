@@ -456,7 +456,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     print_separator(&osep, buff, bufc);
                 }
 
-                SAFE_LB_STR(mushstate.loop_token[cur_lev], buff, bufc);
+                XSAFELBSTR(mushstate.loop_token[cur_lev], buff, bufc);
             }
 
             XFREE(result);
@@ -526,7 +526,7 @@ void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if ((lev > mushstate.in_loop - 1) || (lev < 0))
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
@@ -556,7 +556,7 @@ void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), db
         return;
     }
 
-    SAFE_LB_STR(mushstate.loop_token[lev], buff, bufc);
+    XSAFELBSTR(mushstate.loop_token[lev], buff, bufc);
 }
 
 /**
@@ -582,7 +582,7 @@ void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), d
         return;
     }
 
-    SAFE_LB_STR(mushstate.loop_token2[lev], buff, bufc);
+    XSAFELBSTR(mushstate.loop_token2[lev], buff, bufc);
 }
 
 /**
@@ -723,7 +723,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         i++;
     }
 
-    SAFE_LB_STR(rstore, buff, bufc);
+    XSAFELBSTR(rstore, buff, bufc);
     XFREE(rstore);
     XFREE(atext);
     XFREE(atextbuf);
@@ -823,7 +823,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 print_separator(&osep, buff, bufc);
             }
 
-            SAFE_LB_STR(objs[0], buff, bufc);
+            XSAFELBSTR(objs[0], buff, bufc);
         }
 
         XFREE(result);
@@ -1211,7 +1211,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
              */
             while (*cp && (*cp != start_token))
             {
-                SAFE_LB_CHR(*cp, buff, bufc);
+                XSAFELBCHR(*cp, buff, bufc);
                 cp++;
                 i++;
             }
@@ -1340,7 +1340,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (nptrs1 != nptrs2)
     {
-        SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+        XSAFELBSTR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(atext);
         XFREE(list1);
         XFREE(list2);
@@ -1381,7 +1381,7 @@ void fun_munge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
                     print_separator(&osep, buff, bufc);
                 }
 
-                SAFE_LB_STR(ptrs2[j], buff, bufc);
+                XSAFELBSTR(ptrs2[j], buff, bufc);
                 ptrs1[j][0] = '\0';
                 break;
             }

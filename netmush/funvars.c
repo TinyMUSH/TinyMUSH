@@ -456,11 +456,11 @@ void fun_setq(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
         if (result == -1)
         {
-            SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+            XSAFELBSTR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
         }
         else if (result == -2)
         {
-            SAFE_LB_STR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
+            XSAFELBSTR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
         }
 
         return;
@@ -491,11 +491,11 @@ void fun_setr(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (result == -1)
     {
-        SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+        XSAFELBSTR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
     }
     else if (result == -2)
     {
-        SAFE_LB_STR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
+        XSAFELBSTR("#-1 REGISTER LIMIT EXCEEDED", buff, bufc);
     }
     else if (result > 0)
     {
@@ -514,7 +514,7 @@ void read_register(char *regname, char *buff, char **bufc)
 
         if ((regnum < 0) || (regnum >= mushconf.max_global_regs))
         {
-            SAFE_LB_STR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
+            XSAFELBSTR("#-1 INVALID GLOBAL REGISTER", buff, bufc);
         }
         else
         {
@@ -583,7 +583,7 @@ void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), db
                 print_separator(&SPACE_DELIM, buff, bufc);
             }
 
-            SAFE_LB_CHR(qidx_str(i), buff, bufc);
+            XSAFELBCHR(qidx_str(i), buff, bufc);
         }
     }
 
@@ -596,7 +596,7 @@ void fun_lregs(char *buff, char **bufc, dbref player __attribute__((unused)), db
                 print_separator(&SPACE_DELIM, buff, bufc);
             }
 
-            SAFE_LB_STR(g->x_names[i], buff, bufc);
+            XSAFELBSTR(g->x_names[i], buff, bufc);
         }
     }
 }
@@ -614,11 +614,11 @@ void fun_wildmatch(char *buff, char **bufc, dbref player __attribute__((unused))
 
     if (!wild(fargs[1], fargs[0], t_args, NUM_ENV_VARS))
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     /*
      * Parse the list of registers. Anything that we don't get is assumed
      * to be -1. Fill them in.
@@ -690,7 +690,7 @@ void fun_qvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (n_elems != nqregs)
     {
-        SAFE_LB_STR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
+        XSAFELBSTR("#-1 LISTS MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(varlist);
         XFREE(elemlist);
         XFREE(qreg_names);
@@ -756,7 +756,7 @@ void fun_qsub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     while (nextp && ((strp = split_token(&nextp, &bdelim)) != NULL))
     {
-        SAFE_LB_STR(strp, buff, bufc);
+        XSAFELBSTR(strp, buff, bufc);
 
         if (nextp)
         {
@@ -1471,7 +1471,7 @@ void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
     int i, len;
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     bb_p = *bufc;
@@ -1484,10 +1484,10 @@ void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
             {
                 if (*bufc != bb_p)
                 {
-                    SAFE_LB_CHR(' ', buff, bufc);
+                    XSAFELBCHR(' ', buff, bufc);
                 }
 
-                SAFE_LB_STR(strchr(hptr->target.s, '.') + 1, buff, bufc);
+                XSAFELBSTR(strchr(hptr->target.s, '.') + 1, buff, bufc);
             }
         }
     }
@@ -1531,14 +1531,14 @@ void set_xvar(dbref obj, char *name, char *data)
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(name, tbuf, &tp);
+    XSAFESBSTR(name, tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -1628,7 +1628,7 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
      */
     tp = pre;
     SAFE_LTOS(pre, &tp, obj, LBUF_SIZE);
-    SAFE_SB_CHR('.', pre, &tp);
+    XSAFESBCHR('.', pre, &tp);
     *tp = '\0';
 
     /*
@@ -1643,8 +1643,8 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
         }
 
         tp = tbuf;
-        SAFE_SB_STR(pre, tbuf, &tp);
-        SAFE_SB_STR(xvar_names[i], tbuf, &tp);
+        XSAFESBSTR(pre, tbuf, &tp);
+        XSAFESBSTR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
         if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
@@ -1675,7 +1675,7 @@ void xvars_clr(dbref player)
     VARENT *xvar;
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     htab = &mushstate.vars_htab;
@@ -1733,19 +1733,19 @@ void fun_x(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], tbuf, &tp);
+    XSAFESBSTR(fargs[0], tbuf, &tp);
     *tp = '\0';
 
     if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
     {
-        SAFE_LB_STR(xvar->text, buff, bufc);
+        XSAFELBSTR(xvar->text, buff, bufc);
     }
     XFREE(tbuf);
 }
@@ -1758,7 +1758,7 @@ void fun_setx(char *buff __attribute__((unused)), char **bufc __attribute__((unu
 void fun_store(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
     set_xvar(player, fargs[0], fargs[1]);
-    SAFE_LB_STR(fargs[1], buff, bufc);
+    XSAFELBSTR(fargs[1], buff, bufc);
 }
 
 void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
@@ -1807,7 +1807,7 @@ void fun_xvars(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
     if (n_elems != n_xvars)
     {
-        SAFE_LB_STR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
+        XSAFELBSTR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
         XFREE(varlist);
         XFREE(elemlist);
         XFREE(xvar_names);
@@ -1887,14 +1887,14 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      */
     tp = pre;
     SAFE_LTOS(pre, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', pre, &tp);
+    XSAFESBCHR('.', pre, &tp);
     *tp = '\0';
 
     for (i = 0; i < n_xvars; i++)
     {
         tp = tbuf;
-        SAFE_SB_STR(pre, tbuf, &tp);
-        SAFE_SB_STR(xvar_names[i], tbuf, &tp);
+        XSAFESBSTR(pre, tbuf, &tp);
+        XSAFESBSTR(xvar_names[i], tbuf, &tp);
         *tp = '\0';
 
         if ((xvar = (VARENT *)hashfind(tbuf, &mushstate.vars_htab)))
@@ -1927,7 +1927,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
         if (n_elems != n_xvars)
         {
-            SAFE_LB_STR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
+            XSAFELBSTR("#-1 LIST MUST BE OF EQUAL SIZE", buff, bufc);
             XFREE(varlist);
             XFREE(elemlist);
 
@@ -2099,7 +2099,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if ((osep.len > 1) || (osep.str[0] == '\0') || (osep.str[0] == '\r'))
     {
         notify_quiet(player, "You cannot use that output delimiter.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -2112,7 +2112,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (StructCount(player) > mushconf.struct_lim)
     {
         notify_quiet(player, "Too many structures.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -2125,7 +2125,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Structure name is too long.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -2138,7 +2138,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strchr(fargs[0], '.'))
     {
         notify_quiet(player, "Structure names cannot contain periods.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -2149,14 +2149,14 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], tbuf, &tp);
+    XSAFESBSTR(fargs[0], tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -2166,7 +2166,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (hashfind(tbuf, &mushstate.structs_htab))
     {
         notify_quiet(player, "Structure is already defined.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -2183,7 +2183,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (n_comps < 1)
     {
         notify_quiet(player, "There must be at least one component.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(comp_names);
         XFREE(comp_array);
         XFREE(cbuf);
@@ -2201,7 +2201,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         if (strlen(comp_array[i]) > (SBUF_SIZE / 2) - 9)
         {
             notify_quiet(player, "Component name is too long.");
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(comp_array);
             XFREE(cbuf);
@@ -2242,7 +2242,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
         default:
             notify_quiet(player, "Invalid data type specified.");
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(comp_array);
             XFREE(type_names);
@@ -2267,7 +2267,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if ((n_comps != n_types) || (n_defs && (n_comps != n_defs)))
     {
         notify_quiet(player, "List sizes must be identical.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(comp_names);
         XFREE(comp_array);
         XFREE(type_names);
@@ -2303,7 +2303,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Now that we're done with the base name, we can stick the joining
      * period on the end.
      */
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
 
     /*
@@ -2313,14 +2313,14 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     for (i = 0; i < n_comps; i++)
     {
         cp = cbuf;
-        SAFE_SB_STR(tbuf, cbuf, &cp);
+        XSAFESBSTR(tbuf, cbuf, &cp);
 
         for (p = comp_array[i]; *p; p++)
         {
             *p = tolower(*p);
         }
 
-        SAFE_SB_STR(comp_array[i], cbuf, &cp);
+        XSAFESBSTR(comp_array[i], cbuf, &cp);
         *cp = '\0';
         this_comp = (COMPONENT *)XMALLOC(sizeof(COMPONENT), "this_comp");
         this_comp->def_val = (default_vals ? def_array[i] : NULL);
@@ -2384,7 +2384,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
 
     s_StructCount(player, StructCount(player) + 1);
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     XFREE(cbuf);
     XFREE(tbuf);
 }
@@ -2434,7 +2434,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (InstanceCount(player) > mushconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -2448,7 +2448,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     if (strlen(fargs[0]) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Instance name is too long.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -2460,20 +2460,20 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
     ip = ibuf;
     SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], ibuf, &ip);
+    XSAFESBSTR(fargs[0], ibuf, &ip);
     *ip = '\0';
 
     if (hashfind(ibuf, &mushstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -2485,21 +2485,21 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[1]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[1], tbuf, &tp);
+    XSAFESBSTR(fargs[1], tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -2511,7 +2511,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * have been given defaults. Also, make sure that the defaults are of
      * the appropriate type.
      */
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
 
     if (fargs[2] && *fargs[2] && fargs[3] && *fargs[3])
@@ -2526,7 +2526,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         if (n_comps != n_vals)
         {
             notify_quiet(player, "List sizes must be identical.");
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
             XFREE(comp_names);
             XFREE(init_vals);
             XFREE(comp_array);
@@ -2540,20 +2540,20 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         for (i = 0; i < n_comps; i++)
         {
             cp = cbuf;
-            SAFE_SB_STR(tbuf, cbuf, &cp);
+            XSAFESBSTR(tbuf, cbuf, &cp);
 
             for (p = comp_array[i]; *p; p++)
             {
                 *p = tolower(*p);
             }
 
-            SAFE_SB_STR(comp_array[i], cbuf, &cp);
+            XSAFESBSTR(comp_array[i], cbuf, &cp);
             c_ptr = (COMPONENT *)hashfind(cbuf, &mushstate.cdefs_htab);
 
             if (!c_ptr)
             {
                 notify_quiet(player, "Invalid component name.");
-                SAFE_LB_CHR('0', buff, bufc);
+                XSAFELBCHR('0', buff, bufc);
                 XFREE(comp_names);
                 XFREE(init_vals);
                 XFREE(comp_array);
@@ -2571,7 +2571,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
                 if (!retval)
                 {
                     notify_quiet(player, "Default value is of invalid type.");
-                    SAFE_LB_CHR('0', buff, bufc);
+                    XSAFELBCHR('0', buff, bufc);
                     XFREE(comp_names);
                     XFREE(init_vals);
                     XFREE(comp_array);
@@ -2596,7 +2596,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     else
     {
         notify_quiet(player, "List sizes must be identical.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(ibuf);
         XFREE(tbuf);
@@ -2630,9 +2630,9 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
 
         tp = tbuf;
-        SAFE_SB_STR(ibuf, tbuf, &tp);
-        SAFE_SB_CHR('.', tbuf, &tp);
-        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
+        XSAFESBSTR(ibuf, tbuf, &tp);
+        XSAFESBCHR('.', tbuf, &tp);
+        XSAFESBSTR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mushstate.instdata_htab, 0);
         mushstate.max_instdata = mushstate.instdata_htab.entries > mushstate.max_instdata ? mushstate.instdata_htab.entries : mushstate.max_instdata;
@@ -2645,9 +2645,9 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     for (i = 0; i < n_comps; i++)
     {
         tp = tbuf;
-        SAFE_SB_STR(ibuf, tbuf, &tp);
-        SAFE_SB_CHR('.', tbuf, &tp);
-        SAFE_SB_STR(comp_array[i], tbuf, &tp);
+        XSAFESBSTR(ibuf, tbuf, &tp);
+        XSAFESBCHR('.', tbuf, &tp);
+        XSAFESBSTR(comp_array[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
@@ -2681,7 +2681,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     this_struct->n_instances += 1;
     s_InstanceCount(player, InstanceCount(player) + 1);
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     XFREE(cbuf);
     XFREE(ibuf);
     XFREE(tbuf);
@@ -2708,7 +2708,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     if (InstanceCount(player) > mushconf.instance_lim)
     {
         notify_quiet(player, "Too many instances.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(ibuf);
         XFREE(tbuf);
         return;
@@ -2721,7 +2721,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     if (strlen(inst_name) > (SBUF_SIZE / 2) - 9)
     {
         notify_quiet(player, "Instance name is too long.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(ibuf);
         XFREE(tbuf);
 
@@ -2733,20 +2733,20 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      */
     ip = ibuf;
     SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(inst_name, ibuf, &ip);
+    XSAFESBSTR(inst_name, ibuf, &ip);
     *ip = '\0';
 
     if (hashfind(ibuf, &mushstate.instance_htab))
     {
         notify_quiet(player, "That instance has already been defined.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(ibuf);
         XFREE(tbuf);
 
@@ -2758,21 +2758,21 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = str_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(str_name, tbuf, &tp);
+    XSAFESBSTR(str_name, tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(ibuf);
         XFREE(tbuf);
 
@@ -2800,7 +2800,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     if (n_vals != this_struct->c_count)
     {
         notify_quiet(player, "Incorrect number of components.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(val_list);
         XFREE(val_array);
         XFREE(ibuf);
@@ -2818,7 +2818,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         if (this_struct->c_array[i]->typer_func && !((*(this_struct->c_array[i]->typer_func))(val_array[i])))
         {
             notify_quiet(player, "Value is of invalid type.");
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
             XFREE(val_list);
             XFREE(val_array);
             XFREE(ibuf);
@@ -2853,9 +2853,9 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
         }
 
         tp = tbuf;
-        SAFE_SB_STR(ibuf, tbuf, &tp);
-        SAFE_SB_CHR('.', tbuf, &tp);
-        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
+        XSAFESBSTR(ibuf, tbuf, &tp);
+        XSAFESBCHR('.', tbuf, &tp);
+        XSAFESBSTR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         hashadd(tbuf, (int *)d_ptr, &mushstate.instdata_htab, 0);
         mushstate.max_instdata = mushstate.instdata_htab.entries > mushstate.max_instdata ? mushstate.instdata_htab.entries : mushstate.max_instdata;
@@ -2865,7 +2865,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
     XFREE(val_array);
     this_struct->n_instances += 1;
     s_InstanceCount(player, InstanceCount(player) + 1);
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     XFREE(ibuf);
     XFREE(tbuf);
 }
@@ -2895,7 +2895,7 @@ void fun_read(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 
     if (!parse_attrib(player, fargs[0], &it, &atr, 1) || (atr == NOTHING))
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
@@ -2946,16 +2946,16 @@ void fun_delimit(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (nitems)
     {
-        over = SAFE_LB_STR(ptrs[0], buff, bufc);
+        over = XSAFELBSTR(ptrs[0], buff, bufc);
     }
 
     for (i = 1; !over && (i < nitems); i++)
     {
-        over = SAFE_LB_STR(fargs[1], buff, bufc);
+        over = XSAFELBSTR(fargs[1], buff, bufc);
 
         if (!over)
         {
-            over = SAFE_LB_STR(ptrs[i], buff, bufc);
+            over = XSAFELBSTR(ptrs[i], buff, bufc);
         }
     }
 
@@ -2970,22 +2970,22 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
     STRUCTDATA *s_ptr;
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], tbuf, &tp);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBSTR(fargs[0], tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[1]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[1], tbuf, &tp);
+    XSAFESBSTR(fargs[1], tbuf, &tp);
     *tp = '\0';
     s_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
@@ -2995,7 +2995,7 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
         return;
     }
 
-    SAFE_LB_STR(s_ptr->text, buff, bufc);
+    XSAFELBSTR(s_ptr->text, buff, bufc);
     XFREE(tbuf);
 }
 
@@ -3026,14 +3026,14 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], tbuf, &tp);
+    XSAFESBSTR(fargs[0], tbuf, &tp);
     *tp = '\0';
     endp = tp; /* save where we are */
     inst_ptr = (INSTANCE *)hashfind(tbuf, &mushstate.instance_htab);
@@ -3041,7 +3041,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
     if (!inst_ptr)
     {
         notify_quiet(player, "No such instance.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(tbuf);
         XFREE(cbuf);
         return;
@@ -3063,16 +3063,16 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         {
             cp = cbuf;
             SAFE_LTOS(cbuf, &cp, player, LBUF_SIZE);
-            SAFE_SB_CHR('.', cbuf, &cp);
-            SAFE_SB_STR(inst_ptr->datatype->s_name, cbuf, &cp);
-            SAFE_SB_CHR('.', cbuf, &cp);
+            XSAFESBCHR('.', cbuf, &cp);
+            XSAFESBSTR(inst_ptr->datatype->s_name, cbuf, &cp);
+            XSAFESBCHR('.', cbuf, &cp);
 
             for (p = words[i]; *p; p++)
             {
                 *p = tolower(*p);
             }
 
-            SAFE_SB_STR(words[i], cbuf, &cp);
+            XSAFESBSTR(words[i], cbuf, &cp);
             *cp = '\0';
             c_ptr = (COMPONENT *)hashfind(cbuf, &mushstate.cdefs_htab);
 
@@ -3098,8 +3098,8 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
          * Now go set it.
          */
         tp = endp;
-        SAFE_SB_CHR('.', tbuf, &tp);
-        SAFE_SB_STR(words[i], tbuf, &tp);
+        XSAFESBCHR('.', tbuf, &tp);
+        XSAFESBSTR(words[i], tbuf, &tp);
         *tp = '\0';
         s_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
@@ -3147,14 +3147,14 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
      */
     ip = ibuf;
     SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(inst_name, ibuf, &ip);
+    XSAFESBSTR(inst_name, ibuf, &ip);
     *ip = '\0';
     inst_ptr = (INSTANCE *)hashfind(ibuf, &mushstate.instance_htab);
 
@@ -3170,7 +3170,7 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
      * have the information we need to figure out what components are
      * associated with this, and print them appropriately.
      */
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
     *ip = '\0';
     this_struct = inst_ptr->datatype;
 
@@ -3186,18 +3186,18 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
     {
         if (i != 0)
         {
-            SAFE_LB_CHR(sep, buff, bufc);
+            XSAFELBCHR(sep, buff, bufc);
         }
 
         tp = tbuf;
-        SAFE_SB_STR(ibuf, tbuf, &tp);
-        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
+        XSAFESBSTR(ibuf, tbuf, &tp);
+        XSAFESBSTR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
         if (d_ptr && d_ptr->text)
         {
-            SAFE_LB_STR(d_ptr->text, buff, bufc);
+            XSAFELBSTR(d_ptr->text, buff, bufc);
         }
     }
     XFREE(ibuf);
@@ -3244,7 +3244,7 @@ void fun_write(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
         if (atrnum <= 0)
         {
-            SAFE_LB_STR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
+            XSAFELBSTR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
             return;
         }
 
@@ -3276,21 +3276,21 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
      */
     ip = ibuf;
     SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], ibuf, &ip);
+    XSAFESBSTR(fargs[0], ibuf, &ip);
     *ip = '\0';
     inst_ptr = (INSTANCE *)hashfind(ibuf, &mushstate.instance_htab);
 
     if (!inst_ptr)
     {
         notify_quiet(player, "No such instance.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(ibuf);
         XFREE(tbuf);
         return;
@@ -3303,14 +3303,14 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
     this_struct = inst_ptr->datatype;
     XFREE(inst_ptr);
     hashdelete(ibuf, &mushstate.instance_htab);
-    SAFE_SB_CHR('.', ibuf, &ip);
+    XSAFESBCHR('.', ibuf, &ip);
     *ip = '\0';
 
     for (i = 0; i < this_struct->c_count; i++)
     {
         tp = tbuf;
-        SAFE_SB_STR(ibuf, tbuf, &tp);
-        SAFE_SB_STR(this_struct->c_names[i], tbuf, &tp);
+        XSAFESBSTR(ibuf, tbuf, &tp);
+        XSAFESBSTR(this_struct->c_names[i], tbuf, &tp);
         *tp = '\0';
         d_ptr = (STRUCTDATA *)hashfind(tbuf, &mushstate.instdata_htab);
 
@@ -3328,7 +3328,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     this_struct->n_instances -= 1;
     s_InstanceCount(player, InstanceCount(player) - 1);
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     XFREE(ibuf);
     XFREE(tbuf);
 }
@@ -3345,21 +3345,21 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
     {
         *p = tolower(*p);
     }
 
-    SAFE_SB_STR(fargs[0], tbuf, &tp);
+    XSAFESBSTR(fargs[0], tbuf, &tp);
     *tp = '\0';
     this_struct = (STRUCTDEF *)hashfind(tbuf, &mushstate.structs_htab);
 
     if (!this_struct)
     {
         notify_quiet(player, "No such structure.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -3372,7 +3372,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
     if (this_struct->n_instances > 0)
     {
         notify_quiet(player, "This structure is in use.");
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         XFREE(cbuf);
         XFREE(tbuf);
         return;
@@ -3385,14 +3385,14 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
     /*
      * Wipe out every component definition.
      */
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
 
     for (i = 0; i < this_struct->c_count; i++)
     {
         cp = cbuf;
-        SAFE_SB_STR(tbuf, cbuf, &cp);
-        SAFE_SB_STR(this_struct->c_names[i], cbuf, &cp);
+        XSAFESBSTR(tbuf, cbuf, &cp);
+        XSAFESBSTR(this_struct->c_names[i], cbuf, &cp);
         *cp = '\0';
 
         if (this_struct->c_array[i])
@@ -3421,7 +3421,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
     XFREE(this_struct->c_names);
     XFREE(this_struct);
     s_StructCount(player, StructCount(player) - 1);
-    SAFE_LB_CHR('1', buff, bufc);
+    XSAFELBCHR('1', buff, bufc);
     XFREE(cbuf);
     XFREE(tbuf);
 }
@@ -3460,7 +3460,7 @@ void structure_clr(dbref thing)
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     /*
@@ -3501,15 +3501,15 @@ void structure_clr(dbref thing)
             XFREE(inst_array[i]);
             hashdelete(name_array[i], &mushstate.instance_htab);
             ip = ibuf;
-            SAFE_SB_STR(name_array[i], ibuf, &ip);
-            SAFE_SB_CHR('.', ibuf, &ip);
+            XSAFESBSTR(name_array[i], ibuf, &ip);
+            XSAFESBCHR('.', ibuf, &ip);
             *ip = '\0';
 
             for (j = 0; j < this_struct->c_count; j++)
             {
                 cp = cbuf;
-                SAFE_SB_STR(ibuf, cbuf, &cp);
-                SAFE_SB_STR(this_struct->c_names[j], cbuf, &cp);
+                XSAFESBSTR(ibuf, cbuf, &cp);
+                XSAFESBSTR(this_struct->c_names[j], cbuf, &cp);
                 *cp = '\0';
                 d_ptr = (STRUCTDATA *)hashfind(cbuf, &mushstate.instdata_htab);
 
@@ -3534,7 +3534,7 @@ void structure_clr(dbref thing)
      */
     tp = tbuf;
     SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
-    SAFE_SB_CHR('.', tbuf, &tp);
+    XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
     /*
@@ -3577,15 +3577,15 @@ void structure_clr(dbref thing)
 
             hashdelete(name_array[i], &mushstate.structs_htab);
             ip = ibuf;
-            SAFE_SB_STR(name_array[i], ibuf, &ip);
-            SAFE_SB_CHR('.', ibuf, &ip);
+            XSAFESBSTR(name_array[i], ibuf, &ip);
+            XSAFESBCHR('.', ibuf, &ip);
             *ip = '\0';
 
             for (j = 0; j < struct_array[i]->c_count; j++)
             {
                 cp = cbuf;
-                SAFE_SB_STR(ibuf, cbuf, &cp);
-                SAFE_SB_STR(struct_array[i]->c_names[j], cbuf, &cp);
+                XSAFESBSTR(ibuf, cbuf, &cp);
+                XSAFESBSTR(struct_array[i]->c_names[j], cbuf, &cp);
                 *cp = '\0';
 
                 if (struct_array[i]->c_array[j])
@@ -3992,7 +3992,7 @@ void handle_pop(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
     if (!toss_flag)
     {
-        SAFE_LB_STR(sp->data, buff, bufc);
+        XSAFELBSTR(sp->data, buff, bufc);
     }
 
     if (!peek_flag)
@@ -4085,7 +4085,7 @@ void fun_popn(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                 print_separator(&osep, buff, bufc);
             }
 
-            over = SAFE_LB_STR(tp->data, buff, bufc);
+            over = XSAFELBSTR(tp->data, buff, bufc);
         }
 
         xp = tp;
@@ -4154,7 +4154,7 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
             print_separator(&osep, buff, bufc);
         }
 
-        over = SAFE_LB_STR(sp->data, buff, bufc);
+        over = XSAFELBSTR(sp->data, buff, bufc);
     }
 }
 
@@ -4223,7 +4223,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
             XFREE(study);
         }
 
-        SAFE_LB_STR(fargs[0], buff, bufc);
+        XSAFELBSTR(fargs[0], buff, bufc);
         return;
     }
 
@@ -4243,7 +4243,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
          */
         tmp = fargs[0][offsets[0]];
         fargs[0][offsets[0]] = '\0';
-        SAFE_LB_STR(start, buff, bufc);
+        XSAFELBSTR(start, buff, bufc);
         fargs[0][offsets[0]] = tmp;
 
         /*
@@ -4258,7 +4258,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
 
             if (*r != '$')
             {
-                SAFE_LB_CHR(*r, buff, bufc);
+                XSAFELBCHR(*r, buff, bufc);
                 continue;
             }
 
@@ -4277,11 +4277,11 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
                 /*
                  * Not a valid number.
                  */
-                SAFE_LB_CHR('$', buff, bufc);
+                XSAFELBCHR('$', buff, bufc);
 
                 if (have_brace)
                 {
-                    SAFE_LB_CHR('{', buff, bufc);
+                    XSAFELBCHR('{', buff, bufc);
                 }
 
                 r--;
@@ -4298,7 +4298,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
             tbuf = XMALLOC(LBUF_SIZE, "tbuf");
             if (pcre_copy_substring(fargs[0], offsets, subpatterns, offset, tbuf, LBUF_SIZE) >= 0)
             {
-                SAFE_LB_STR(tbuf, buff, bufc);
+                XSAFELBSTR(tbuf, buff, bufc);
             }
             XFREE(tbuf);
         }
@@ -4318,7 +4318,7 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
     /*
      * Copy everything after the matched bit.
      */
-    SAFE_LB_STR(start, buff, bufc);
+    XSAFELBSTR(start, buff, bufc);
     XFREE(re);
 
     if (study)
@@ -4525,7 +4525,7 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
                 print_separator(&osep, buff, bufc);
             }
 
-            SAFE_LB_STR(r, buff, bufc);
+            XSAFELBSTR(r, buff, bufc);
 
             if (!all_option)
             {
@@ -4585,7 +4585,7 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
          * message.
          */
         notify_quiet(player, errptr);
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
@@ -4919,13 +4919,13 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (!fargs[1] || !*fargs[1])
     {
-        SAFE_LB_STR("#-1 NO SUCH ATTRIBUTE", buff, bufc);
+        XSAFELBSTR("#-1 NO SUCH ATTRIBUTE", buff, bufc);
         return;
     }
 
     if (!fargs[2] || !*fargs[2])
     {
-        SAFE_LB_STR("#-1 INVALID GREP PATTERN", buff, bufc);
+        XSAFELBSTR("#-1 INVALID GREP PATTERN", buff, bufc);
         return;
     }
 
@@ -4993,7 +4993,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                     print_separator(&osep, buff, bufc);
                 }
 
-                SAFE_LB_STR((char *)(atr_num(ca))->name, buff, bufc);
+                XSAFELBSTR((char *)(atr_num(ca))->name, buff, bufc);
             }
 
             XFREE(attrib);
@@ -5078,7 +5078,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if ((dimension > mushconf.max_grid_size) || (dimension < 0))
     {
-        SAFE_LB_STR("#-1 INVALID GRID SIZE", buff, bufc);
+        XSAFELBSTR("#-1 INVALID GRID SIZE", buff, bufc);
         return;
     }
 
@@ -5116,7 +5116,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         log_write(LOG_BUGS, "GRD", "MAKE", "%s Failure");
         XFREE(pname);
         grid_free(player, ogp);
-        SAFE_LB_STR("#-1 FAILURE", buff, bufc);
+        XSAFELBSTR("#-1 FAILURE", buff, bufc);
         return;
     }
 
@@ -5135,7 +5135,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (data_rows > rows)
     {
-        SAFE_LB_STR("#-1 TOO MANY DATA ROWS", buff, bufc);
+        XSAFELBSTR("#-1 TOO MANY DATA ROWS", buff, bufc);
         XFREE(rbuf);
         grid_free(player, ogp);
         return;
@@ -5175,7 +5175,7 @@ void fun_gridsize(char *buff, char **bufc, dbref player, dbref caller __attribut
 
     if (!ogp)
     {
-        SAFE_LB_STR("0 0", buff, bufc);
+        XSAFELBSTR("0 0", buff, bufc);
     }
     else
     {
@@ -5205,7 +5205,7 @@ void fun_gridset(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
     if (!ogp)
     {
-        SAFE_LB_STR("#-1 NO GRID", buff, bufc);
+        XSAFELBSTR("#-1 NO GRID", buff, bufc);
         return;
     }
 
@@ -5427,7 +5427,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (!ogp)
     {
-        SAFE_LB_STR("#-1 NO GRID", buff, bufc);
+        XSAFELBSTR("#-1 NO GRID", buff, bufc);
         return;
     }
 
@@ -5442,7 +5442,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
         if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
         {
-            SAFE_LB_STR((ogp)->data[(r)][(c)], buff, bufc);
+            XSAFELBSTR((ogp)->data[(r)][(c)], buff, bufc);
         }
 
         return;
@@ -5505,7 +5505,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                     }
                     if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
                     {
-                        SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                        XSAFELBSTR(ogp->data[r][c], buff, bufc);
                     }
                 }
             }
@@ -5520,7 +5520,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                     }
                     if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
                     {
-                        SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                        XSAFELBSTR(ogp->data[r][c], buff, bufc);
                     }
                 }
             }
@@ -5549,7 +5549,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                         }
                         if (!((r < 0) || (c < 0) || (r >= ogp->rows) || ((c) >= ogp->cols) || (ogp->data[r][c] == NULL)))
                         {
-                            SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                            XSAFELBSTR(ogp->data[r][c], buff, bufc);
                         }
                     }
                 }
@@ -5564,7 +5564,7 @@ void fun_grid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
                         }
                         if (!((r < 0) || (c < 0) || (r >= ogp->rows) || (c >= ogp->cols) || (ogp->data[r][c] == NULL)))
                         {
-                            SAFE_LB_STR(ogp->data[r][c], buff, bufc);
+                            XSAFELBSTR(ogp->data[r][c], buff, bufc);
                         }
                     }
                 }

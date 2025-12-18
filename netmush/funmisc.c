@@ -355,7 +355,7 @@ void handle_ifelse(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 		 */
 		if (n)
 		{
-			SAFE_LB_STR(mbuff, buff, bufc);
+			XSAFELBSTR(mbuff, buff, bufc);
 		}
 		else
 		{
@@ -492,7 +492,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(bot);
-			over = SAFE_LB_STR(tbuf, buff, bufc);
+			over = XSAFELBSTR(tbuf, buff, bufc);
 			XFREE(tbuf);
 			bot++;
 		}
@@ -519,13 +519,13 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		if (top >= 99)
 		{
-			SAFE_LB_STR(startp, buff, bufc);
+			XSAFELBSTR(startp, buff, bufc);
 		}
 		else
 		{
 			endp = lnum_buff + (top + 1 < 10 ? 2 * top + 1 : (3 * top + 1) - 10) - 1;
 			*endp = '\0';
-			SAFE_LB_STR(startp, buff, bufc);
+			XSAFELBSTR(startp, buff, bufc);
 			*endp = ' ';
 		}
 
@@ -565,7 +565,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(i);
-			over = SAFE_LB_STR(tbuf, buff, bufc);
+			over = XSAFELBSTR(tbuf, buff, bufc);
 			XFREE(tbuf);
 		}
 	}
@@ -579,7 +579,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 
 			tbuf = ltos(i);
-			over = SAFE_LB_STR(tbuf, buff, bufc);
+			over = XSAFELBSTR(tbuf, buff, bufc);
 			XFREE(tbuf);
 		}
 	}
@@ -605,7 +605,7 @@ void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	struct tm tm_buf;
 	localtime_r(&mushstate.now, &tm_buf);
 	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
-	SAFE_LB_STR(temp, buff, bufc);
+	XSAFELBSTR(temp, buff, bufc);
 }
 
 /**
@@ -646,7 +646,7 @@ void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)),
 	struct tm tm_buf;
 	localtime_r(&tt, &tm_buf);
 	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
-	SAFE_LB_STR(temp, buff, bufc);
+	XSAFELBSTR(temp, buff, bufc);
 }
 
 /**
@@ -677,7 +677,7 @@ bool do_convtime(char *str, struct tm *ttm)
 	}
 
 	buf = p = XMALLOC(SBUF_SIZE, "p");
-	SAFE_SB_STR(str, buf, &p);
+	XSAFESBSTR(str, buf, &p);
 	*p = '\0';
 
 	/**
@@ -971,7 +971,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 		if (tt < 0)
 		{
-			SAFE_LB_STR("#-1 INVALID TIME", buff, bufc);
+			XSAFELBSTR("#-1 INVALID TIME", buff, bufc);
 			XFREE(str);
 			XFREE(tbuf);
 			return;
@@ -1032,7 +1032,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	struct tm time_tm;
 	localtime_r(&tt, &time_tm);
 	strftime(str, LBUF_SIZE - 1, tbuf, &time_tm);
-	SAFE_LB_STR(str, buff, bufc);
+	XSAFELBSTR(str, buff, bufc);
 	XFREE(str);
 	XFREE(tbuf);
 }
@@ -1101,12 +1101,12 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 			if (!*p)
 			{
-				SAFE_LB_CHR('$', buff, bufc);
+				XSAFELBCHR('$', buff, bufc);
 				break;
 			}
 			else if (*p == '$')
 			{
-				SAFE_LB_CHR('$', buff, bufc);
+				XSAFELBCHR('$', buff, bufc);
 				p++;
 			}
 			else
@@ -1267,7 +1267,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 						if (showsuffix)
 						{
-							SAFE_LB_CHR(timec, buff, bufc);
+							XSAFELBCHR(timec, buff, bufc);
 						}
 					}
 					else
@@ -1276,7 +1276,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 						if (showsuffix)
 						{
-							SAFE_LB_CHR(timec, buff, bufc);
+							XSAFELBCHR(timec, buff, bufc);
 						}
 					}
 
@@ -1358,7 +1358,7 @@ void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused))
 	struct tm tm_buf;
 	localtime_r(&mushstate.start_time, &tm_buf);
 	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
-	SAFE_LB_STR(temp, buff, bufc);
+	XSAFELBSTR(temp, buff, bufc);
 }
 
 /**
@@ -1398,7 +1398,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
 	struct tm tm_buf;
 	localtime_r(&mushstate.restart_time, &tm_buf);
 	strftime(temp, sizeof(temp), "%a %b %d %H:%M:%S %Y", &tm_buf);
-	SAFE_LB_STR(temp, buff, bufc);
+	XSAFELBSTR(temp, buff, bufc);
 }
 
 /*
@@ -1421,7 +1421,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
  */
 void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LB_STR(mushstate.version.versioninfo, buff, bufc);
+	XSAFELBSTR(mushstate.version.versioninfo, buff, bufc);
 }
 
 /**
@@ -1439,7 +1439,7 @@ void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), 
  */
 void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LB_STR(mushconf.mush_name, buff, bufc);
+	XSAFELBSTR(mushconf.mush_name, buff, bufc);
 }
 
 /**
@@ -1468,15 +1468,15 @@ void fun_modules(char *buff, char **bufc, dbref player __attribute__((unused)), 
 			{
 				if (fargs[0] || *fargs[0])
 				{
-					SAFE_LB_STR(fargs[0], buff, bufc);
+					XSAFELBSTR(fargs[0], buff, bufc);
 				}
 			}
 			else
 			{
-				SAFE_LB_CHR(' ', buff, bufc);
+				XSAFELBCHR(' ', buff, bufc);
 			}
 		}
-		SAFE_LB_STR(mp->modname, buff, bufc);
+		XSAFELBSTR(mp->modname, buff, bufc);
 		got_one = true;
 	}
 }
@@ -1502,12 +1502,12 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
 	{
 		if (!strcasecmp(fargs[0], mp->modname))
 		{
-			SAFE_LB_CHR('1', buff, bufc);
+			XSAFELBCHR('1', buff, bufc);
 			return;
 		}
 	}
 
-	SAFE_LB_CHR('0', buff, bufc);
+	XSAFELBCHR('0', buff, bufc);
 }
 
 /**
@@ -1634,7 +1634,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (times < 1)
 	{
-		SAFE_LB_STR("#-1 TOO FEW TIMES", buff, bufc);
+		XSAFELBSTR("#-1 TOO FEW TIMES", buff, bufc);
 		XFREE(ebuf);
 		XFREE(tbuf);
 		return;
@@ -1642,7 +1642,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (times > mushconf.func_invk_lim)
 	{
-		SAFE_LB_STR("#-1 TOO MANY TIMES", buff, bufc);
+		XSAFELBSTR("#-1 TOO MANY TIMES", buff, bufc);
 		XFREE(ebuf);
 		XFREE(tbuf);
 		return;
@@ -1974,7 +1974,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 {
 	if (nfargs < 1)
 	{
-		SAFE_LB_STR("#-1 TOO FEW ARGUMENTS", buff, bufc);
+		XSAFELBSTR("#-1 TOO FEW ARGUMENTS", buff, bufc);
 		return;
 	}
 
@@ -2127,7 +2127,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (!name || !*name)
 	{
-		SAFE_LB_STR("#-1 ILLEGAL NAME", buff, bufc);
+		XSAFELBSTR("#-1 ILLEGAL NAME", buff, bufc);
 		return;
 	}
 
@@ -2171,7 +2171,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 			if (cost < mushconf.createmin || cost > mushconf.createmax)
 			{
-				SAFE_LB_STR("#-1 COST OUT OF RANGE", buff, bufc);
+				XSAFELBSTR("#-1 COST OUT OF RANGE", buff, bufc);
 				return;
 			}
 		}
@@ -2191,7 +2191,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		break;
 	}
 
-	SAFE_LB_CHR('#', buff, bufc);
+	XSAFELBCHR('#', buff, bufc);
 	SAFE_LTOS(buff, bufc, thing, LBUF_SIZE);
 }
 
@@ -2238,7 +2238,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			 */
 			if (!fargs[1] || !*fargs[1])
 			{
-				SAFE_LB_STR("#-1 UNSPECIFIED PARAMETER", buff, bufc);
+				XSAFELBSTR("#-1 UNSPECIFIED PARAMETER", buff, bufc);
 			}
 
 			/**
@@ -2262,7 +2262,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 			if (flagvalue < 0)
 			{
-				SAFE_LB_STR("#-1 CAN NOT SET", buff, bufc);
+				XSAFELBSTR("#-1 CAN NOT SET", buff, bufc);
 				return;
 			}
 
@@ -2272,7 +2272,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 			 */
 			if (!atr_get_info(thing, atr, &aowner, &aflags))
 			{
-				SAFE_LB_STR("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
+				XSAFELBSTR("#-1 ATTRIBUTE NOT PRESENT ON OBJECT", buff, bufc);
 				return;
 			}
 
@@ -2331,7 +2331,7 @@ void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 
 		if (atr <= 0)
 		{
-			SAFE_LB_STR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
+			XSAFELBSTR("#-1 UNABLE TO CREATE ATTRIBUTE", buff, bufc);
 			return;
 		}
 

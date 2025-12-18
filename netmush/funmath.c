@@ -108,7 +108,7 @@ unsigned int fp_check_weird(char *buff, char **bufc, long double result)
     {
         if (fp_sign)
         {
-            SAFE_LB_CHR('-', buff, bufc);
+            XSAFELBCHR('-', buff, bufc);
         }
 
         if (fp_mant)
@@ -288,7 +288,7 @@ void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
     if (num == 0)
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
     }
     else if (num < 0)
     {
@@ -423,7 +423,7 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (num < 1)
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
     }
     else
     {
@@ -441,7 +441,7 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
     if (!fargs[0] || !fargs[1])
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
@@ -450,13 +450,13 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
     if ((n == 0) || (die <= 0))
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
     if ((n < 1) || (n > 100))
     {
-        SAFE_LB_STR("#-1 NUMBER OUT OF RANGE", buff, bufc);
+        XSAFELBSTR("#-1 NUMBER OUT OF RANGE", buff, bufc);
         return;
     }
 
@@ -488,11 +488,11 @@ void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (val < 0)
     {
-        SAFE_LB_STR("#-1 SQUARE ROOT OF NEGATIVE", buff, bufc);
+        XSAFELBSTR("#-1 SQUARE ROOT OF NEGATIVE", buff, bufc);
     }
     else if (val == 0)
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
     }
     else
     {
@@ -543,7 +543,7 @@ void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
     }
     else
     {
-        SAFE_LB_STR("#-1 LN OF NEGATIVE OR ZERO", buff, bufc);
+        XSAFELBSTR("#-1 LN OF NEGATIVE OR ZERO", buff, bufc);
     }
 }
 
@@ -697,7 +697,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
     if (!is_integer(fargs[1]) || !is_integer(fargs[2]))
     {
-        SAFE_LB_STR("#-1 INVALID BASE", buff, bufc);
+        XSAFELBSTR("#-1 INVALID BASE", buff, bufc);
         return;
     }
 
@@ -706,7 +706,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
     if ((from < 2) || (from > 64) || (to < 2) || (to > 64))
     {
-        SAFE_LB_STR("#-1 BASE OUT OF RANGE", buff, bufc);
+        XSAFELBSTR("#-1 BASE OUT OF RANGE", buff, bufc);
         return;
     }
     /**
@@ -744,14 +744,14 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
             }
             else
             {
-                SAFE_LB_STR("#-1 MALFORMED NUMBER", buff, bufc);
+                XSAFELBSTR("#-1 MALFORMED NUMBER", buff, bufc);
                 return;
             }
         }
 
         if (isneg)
         {
-            SAFE_LB_CHR('-', buff, bufc);
+            XSAFELBCHR('-', buff, bufc);
         }
     }
 
@@ -761,7 +761,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
      */
     if (n < to)
     {
-        SAFE_LB_CHR(toBaseX((unsigned char)n, to), buff, bufc);
+        XSAFELBCHR(toBaseX((unsigned char)n, to), buff, bufc);
         return;
     }
 
@@ -775,14 +775,14 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
     {
         m = n % to;
         n = n / to;
-        SAFE_LB_CHR(toBaseX((unsigned char)m, to), nbuf, &nbp);
+        XSAFELBCHR(toBaseX((unsigned char)m, to), nbuf, &nbp);
     }
 
     nbp--;
 
     while (nbp >= nbuf)
     {
-        SAFE_LB_CHR(*nbp, buff, bufc);
+        XSAFELBCHR(*nbp, buff, bufc);
         nbp--;
     }
     XFREE(nbuf);
@@ -924,15 +924,15 @@ void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
     if (x == y)
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
     }
     else if (x < y)
     {
-        SAFE_LB_STR("-1", buff, bufc);
+        XSAFELBSTR("-1", buff, bufc);
     }
     else
     {
-        SAFE_LB_CHR('1', buff, bufc);
+        XSAFELBCHR('1', buff, bufc);
     }
 }
 
@@ -979,7 +979,7 @@ void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
     if (bot == 0)
     {
-        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
+        XSAFELBSTR("#-1 DIVIDE BY ZERO", buff, bufc);
         return;
     }
 
@@ -1036,7 +1036,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
 
     if (bot == 0)
     {
-        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
+        XSAFELBSTR("#-1 DIVIDE BY ZERO", buff, bufc);
         return;
     }
 
@@ -1095,7 +1095,7 @@ void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
     if (bot == 0)
     {
-        SAFE_LB_STR("#-1 DIVIDE BY ZERO", buff, bufc);
+        XSAFELBSTR("#-1 DIVIDE BY ZERO", buff, bufc);
     }
     else
     {
@@ -1235,7 +1235,7 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
     if (val1 < 0)
     {
-        SAFE_LB_STR("#-1 POWER OF NEGATIVE", buff, bufc);
+        XSAFELBSTR("#-1 POWER OF NEGATIVE", buff, bufc);
     }
     else
     {
@@ -1278,11 +1278,11 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
     if ((val <= 0) || (base <= 0))
     {
-        SAFE_LB_STR("#-1 LOG OF NEGATIVE OR ZERO", buff, bufc);
+        XSAFELBSTR("#-1 LOG OF NEGATIVE OR ZERO", buff, bufc);
     }
     else if (base == 1)
     {
-        SAFE_LB_STR("#-1 DIVISION BY ZERO", buff, bufc);
+        XSAFELBSTR("#-1 DIVISION BY ZERO", buff, bufc);
     }
     else
     {
@@ -1666,7 +1666,7 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
     if (nfargs == 0)
     {
-        SAFE_LB_CHR('0', buff, bufc);
+        XSAFELBCHR('0', buff, bufc);
         return;
     }
 
@@ -1858,7 +1858,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
         }
         else
         {
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
         }
 
         XFREE(v1);
@@ -1867,7 +1867,7 @@ void handle_vector(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
     if (res <= 0)
     {
-        SAFE_LB_STR("#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR", buff, bufc);
+        XSAFELBSTR("#-1 CAN'T MAKE UNIT VECTOR FROM ZERO-LENGTH VECTOR", buff, bufc);
         XFREE(v1);
         return;
     }
@@ -1954,7 +1954,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
      */
     if ((n != m) && !((oper == VEC_MUL) && ((n == 1) || (m == 1))))
     {
-        SAFE_LB_STR("#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc);
+        XSAFELBSTR("#-1 VECTORS MUST BE SAME DIMENSIONS", buff, bufc);
         XFREE(v1);
         XFREE(v2);
         return;
@@ -2096,7 +2096,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
          * If we reached this, we're in trouble.
          *
          */
-        SAFE_LB_STR("#-1 UNIMPLEMENTED", buff, bufc);
+        XSAFELBSTR("#-1 UNIMPLEMENTED", buff, bufc);
         break;
     }
 
@@ -2208,7 +2208,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     {
         if (nfargs == 0)
         {
-            SAFE_LB_CHR('0', buff, bufc);
+            XSAFELBCHR('0', buff, bufc);
             return;
         }
 

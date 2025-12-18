@@ -467,7 +467,7 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
             if (Good_obj(fp->data[i]))
             {
                 XSPRINTF(tp, "#%d ", fp->data[i]);
-                SAFE_LB_STR(tp, atext, &bp);
+                XSAFELBSTR(tp, atext, &bp);
             }
             else
             {
@@ -812,7 +812,7 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
             if (Good_obj(fp->data[i]))
             {
                 XSPRINTF(tp, "#%d ", fp->data[i]);
-                SAFE_LB_STR(tp, atext, &bp);
+                XSAFELBSTR(tp, atext, &bp);
             }
             else
             {
@@ -1135,7 +1135,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
 
     *bufc = s;
     buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
-    SAFE_LB_STR(buf, buff, bufc);
+    XSAFELBSTR(buf, buff, bufc);
     XFREE(buf);
 }
 
@@ -3613,7 +3613,7 @@ char *getstring(FILE *f, bool new_strings)
                 return ret;
             }
 
-            SAFE_LB_CHR(c, buf, &p);
+            XSAFELBCHR(c, buf, &p);
         }
     }
     else
@@ -3666,7 +3666,7 @@ char *getstring(FILE *f, bool new_strings)
                 return ret;
             }
 
-            SAFE_LB_CHR(c, buf, &p);
+            XSAFELBCHR(c, buf, &p);
         }
     }
 }

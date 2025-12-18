@@ -2533,13 +2533,13 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 
     if (tp->interpreter == cf_string)
     {
-        SAFE_LB_STR(*((char **)tp->loc), buff, bufc);
+        XSAFELBSTR(*((char **)tp->loc), buff, bufc);
         return;
     }
 
     if (tp->interpreter == cf_dbref)
     {
-        SAFE_LB_CHR('#', buff, bufc);
+        XSAFELBCHR('#', buff, bufc);
         SAFE_LTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
         return;
     }
@@ -2547,7 +2547,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
     if (tp->interpreter == cf_option)
     {
         opt = find_nametab_ent_flag(GOD, (NAMETAB *)tp->extra, *(tp->loc));
-        SAFE_LB_STR((opt ? opt->name : "*UNKNOWN*"), buff, bufc);
+        XSAFELBSTR((opt ? opt->name : "*UNKNOWN*"), buff, bufc);
         return;
     }
 

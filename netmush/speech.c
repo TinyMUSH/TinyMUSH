@@ -355,9 +355,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			SAFE_LB_STR((char *)" shouts, \"", buf2, &bp);
-			SAFE_LB_STR(message, buf2, &bp);
-			SAFE_LB_CHR('"', buf2, &bp);
+			XSAFELBSTR((char *)" shouts, \"", buf2, &bp);
+			XSAFELBSTR(message, buf2, &bp);
+			XSAFELBCHR('"', buf2, &bp);
 			say_shout(0, announce_msg, say_flags, player, buf2);
 			XFREE(buf2);
 		}
@@ -389,9 +389,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			SAFE_LB_STR((char *)" says, \"", buf2, &bp);
-			SAFE_LB_STR(message, buf2, &bp);
-			SAFE_LB_CHR('"', buf2, &bp);
+			XSAFELBSTR((char *)" says, \"", buf2, &bp);
+			XSAFELBSTR(message, buf2, &bp);
+			XSAFELBCHR('"', buf2, &bp);
 			say_shout(WIZARD, broadcast_msg, say_flags, player, buf2);
 			XFREE(buf2);
 		}
@@ -425,9 +425,9 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		default:
 			buf2 = XMALLOC(LBUF_SIZE, "buf2");
 			bp = buf2;
-			SAFE_LB_STR((char *)" says, \"", buf2, &bp);
-			SAFE_LB_STR(message, buf2, &bp);
-			SAFE_LB_CHR('"', buf2, &bp);
+			XSAFELBSTR((char *)" says, \"", buf2, &bp);
+			XSAFELBSTR(message, buf2, &bp);
+			XSAFELBCHR('"', buf2, &bp);
 			*bp = '\0';
 			say_shout(WIZARD, admin_msg, say_flags, player, buf2);
 			say_shout(ROYALTY, admin_msg, say_flags, player, buf2);
@@ -817,7 +817,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 		{
 			if (ddp != dbref_list)
 			{
-				SAFE_LB_CHR(' ', dbref_list, &ddp);
+				XSAFELBCHR(' ', dbref_list, &ddp);
 			}
 
 			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
@@ -869,7 +869,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	{
 		if (dbrefs_array[i] != NOTHING)
 		{
-			SAFE_LB_CHR(' ', dbref_list, &ddp);
+			XSAFELBCHR(' ', dbref_list, &ddp);
 			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
 		}
 	}
@@ -902,7 +902,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	}
 	else
 	{
-		SAFE_LB_CHR('(', clean_tname, &tnp);
+		XSAFELBCHR('(', clean_tname, &tnp);
 
 		for (i = 0; i < n_dbrefs; i++)
 		{
@@ -915,7 +915,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 			}
 		}
 
-		SAFE_LB_CHR(')', clean_tname, &tnp);
+		XSAFELBCHR(')', clean_tname, &tnp);
 	}
 
 	*tnp = '\0';
@@ -937,7 +937,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	case ':':
 		message++;
-		SAFE_LB_STR("From afar, ", omessage, &omp);
+		XSAFELBSTR("From afar, ", omessage, &omp);
 
 		if (count != 1)
 		{
@@ -950,7 +950,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 
 	case ';':
 		message++;
-		SAFE_LB_STR("From afar, ", omessage, &omp);
+		XSAFELBSTR("From afar, ", omessage, &omp);
 
 		if (count != 1)
 		{
@@ -1305,7 +1305,7 @@ void do_pemit(dbref player, __attribute__((unused)) dbref cause, int key, char *
 						buf2 = XMALLOC(LBUF_SIZE, "buf2");
 						bp = buf2;
 						safe_name(player, buf2, &bp);
-						SAFE_LB_STR((char *)" whispers something to ", buf2, &bp);
+						XSAFELBSTR((char *)" whispers something to ", buf2, &bp);
 						safe_name(target, buf2, &bp);
 						*bp = '\0';
 						notify_except2(loc, player, player, target, MSG_SPEECH, NULL, buf2);
