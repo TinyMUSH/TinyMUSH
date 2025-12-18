@@ -1,7 +1,7 @@
 # Installation Instructions
 
 
-TinyMUSH now use the CMAKE build system, which is alot easier to maintain than Autotools. To make things even simpler, a build script is included.
+TinyMUSH now uses the CMake build system. Use the CMake targets directly; install.sh has been removed.
 
 ## Build instructions:
 
@@ -12,19 +12,24 @@ TinyMUSH now use the CMAKE build system, which is alot easier to maintain than A
     apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
     ```
 
-    For OSX:
+    For macOS (Homebrew):
     ```
     brew install cmake gdbm pcre
     ```
 
-2. Build TinyMUSH:
+2. Configure and build:
     ```
-    ./install.sh
+    mkdir -p build && cd build
+    cmake ..
+    cmake --build . --target install-upgrade
     ```
+    - `install-upgrade` (default): installs to `../game`, preserves existing configs, and backs them up under `game/backups/upgrade-<timestamp>`.
+    - `install-fresh`: removes `../game` before installing (clean reinstall).
+    - To disable preservation/backups: `cmake -DTINYMUSH_PRESERVE_CONFIGS=OFF -DTINYMUSH_BACKUP_CONFIGS=OFF ..`
 
 3. Start TinyMUSH:
     ```
-    cd game
+    cd ../game
     ./netmush
     ```
 

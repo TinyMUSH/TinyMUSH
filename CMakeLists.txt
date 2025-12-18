@@ -73,6 +73,21 @@ if(APPLE)
     include_directories(/usr/local/include /opt/homebrew/include)
 endif(APPLE)
 
+option(TINYMUSH_PRESERVE_CONFIGS "Preserve existing config files during install" ON)
+option(TINYMUSH_BACKUP_CONFIGS "Backup existing configs before install when preserving" ON)
+
+function(install_config_if_missing src filename)
+    install(CODE "
+        set(dst \"${CMAKE_INSTALL_PREFIX}/configs/${filename}\")
+        if(NOT EXISTS \"${dst}\")
+            file(INSTALL DESTINATION \"${CMAKE_INSTALL_PREFIX}/configs\" TYPE FILE FILES \"${src}\")
+            message(\"-- Installed ${filename}\")
+        else()
+            message(\"-- Preserved existing ${filename}\")
+        endif()
+    ")
+endfunction()
+
 macro(install_symlink filepath sympath)
     install(CODE "
         file(CREATE_LINK ${filepath} ${sympath} RESULT clerror SYMBOLIC)
@@ -88,16 +103,51 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/docs DESTINATION ${CMAKE_INSTALL_PREFIX} U
 install(DIRECTORY DESTINATION backups)
 install(DIRECTORY DESTINATION db)
 install(DIRECTORY DESTINATION logs)
-install(FILES 
-    ${CMAKE_SOURCE_DIR}/configs/alias.conf
-    ${CMAKE_SOURCE_DIR}/configs/compat.conf
-    ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf
-    ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example
-    DESTINATION configs)
+
+if(TINYMUSH_PRESERVE_CONFIGS)
+    if(TINYMUSH_BACKUP_CONFIGS)
+        install(CODE "
+            set(cfg_dir \"${CMAKE_INSTALL_PREFIX}/configs\")
+            if(EXISTS \"${cfg_dir}\")
+                file(TIMESTAMP ts \"%Y%m%d%H%M%S\" UTC)
+                set(backup_dir \"${CMAKE_INSTALL_PREFIX}/backups/upgrade-${ts}\")
+                file(MAKE_DIRECTORY \"${backup_dir}\")
+                foreach(f alias.conf compat.conf netmush.conf)
+                    if(EXISTS \"${cfg_dir}/${f}\")
+                        file(COPY \"${cfg_dir}/${f}\" DESTINATION \"${backup_dir}\")
+                    endif()
+                endforeach()
+                message(\"-- Backed up existing configs to ${backup_dir}\")
+            endif()
+        ")
+    endif()
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example DESTINATION configs)
+    install_config_if_missing("${CMAKE_SOURCE_DIR}/configs/alias.conf" "alias.conf")
+    install_config_if_missing("${CMAKE_SOURCE_DIR}/configs/compat.conf" "compat.conf")
+    install_config_if_missing("${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf" "netmush.conf")
+else()
+    install(FILES 
+        ${CMAKE_SOURCE_DIR}/configs/alias.conf
+        ${CMAKE_SOURCE_DIR}/configs/compat.conf
+        ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf
+        ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example
+        DESTINATION configs)
+endif()
 install_symlink(${CMAKE_SOURCE_DIR}/game/netmush ${CMAKE_INSTALL_PREFIX}/recover)
 install_symlink(${CMAKE_SOURCE_DIR}/game/netmush ${CMAKE_INSTALL_PREFIX}/dbconvert)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/systemd DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
+
+add_custom_target(install-upgrade
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
+    COMMENT "Install (upgrade mode: preserve configs)"
+)
+
+add_custom_target(install-fresh
+    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_INSTALL_PREFIX}
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
+    COMMENT "Fresh install: removed ${CMAKE_INSTALL_PREFIX} then installed"
+)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
