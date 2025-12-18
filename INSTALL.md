@@ -21,11 +21,17 @@ TinyMUSH now uses the CMake build system. Use the CMake targets directly; instal
     ```
     mkdir -p build && cd build
     cmake ..
-    cmake --build . --target install-upgrade
+    cmake --build . --target install-upgrade -j$(nproc)
     ```
     - `install-upgrade` (default): installs to `../game`, preserves existing configs, and backs them up under `game/backups/upgrade-<timestamp>`.
     - `install-fresh`: removes `../game` before installing (clean reinstall).
-    - To disable preservation/backups: `cmake -DTINYMUSH_PRESERVE_CONFIGS=OFF -DTINYMUSH_BACKUP_CONFIGS=OFF ..`
+    - Build options:
+        - `-DCMAKE_BUILD_TYPE=Release` (default) or `Debug`
+        - `-DTINYMUSH_USE_CCACHE=ON` (default): use ccache for faster rebuilds
+        - `-DTINYMUSH_USE_LTO=ON` (default): enable link-time optimization for Release
+        - `-DTINYMUSH_PRESERVE_CONFIGS=OFF`: overwrite existing configs
+        - `-DTINYMUSH_BACKUP_CONFIGS=OFF`: skip config backups
+        - `-G Ninja`: use Ninja generator (faster than Make, requires `ninja-build`)
 
 3. Start TinyMUSH:
     ```

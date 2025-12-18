@@ -46,6 +46,40 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# Build optimizations
+option(TINYMUSH_USE_CCACHE "Use ccache for faster rebuilds" ON)
+option(TINYMUSH_USE_LTO "Enable link-time optimization for Release builds" ON)
+
+if(TINYMUSH_USE_CCACHE)
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+        message("-- Using ccache: ${CCACHE_PROGRAM}")
+    endif()
+endif()
+
+if(TINYMUSH_USE_LTO AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+    if(ipo_supported)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+        message("-- Enabled link-time optimization (LTO)")
+    else()
+        message(WARNING "LTO not supported: ${ipo_error}")
+    endif()
+endif()
+
+# Compiler-specific optimizations
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(
+        $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Release>:-march=native>
+        $<$<CONFIG:Debug>:-Og>
+        $<$<CONFIG:Debug>:-g3>
+    )
+endif()
+
 if(TINYMUSH_GIT_DIRTY)
     message("-- Building ${PROJECT_NAME} ${TINYMUSH_GIT_VERSION}-${TINYMUSH_GIT_HASH}-dirty [${TINYMUSH_GIT_RELEASE_DATE}]")
 else()
