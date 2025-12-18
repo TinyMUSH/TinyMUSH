@@ -99,7 +99,7 @@ find_program(TAR_BINARY tar)
 configure_file(${CMAKE_SOURCE_DIR}/src/netmush/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/config.h)
 configure_file(${CMAKE_SOURCE_DIR}/src/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf)
 configure_file(${CMAKE_SOURCE_DIR}/src/configs/netmush.conf.example.in ${CMAKE_CURRENT_BINARY_DIR}/configs/netmush.conf.example)
-configure_file(${CMAKE_SOURCE_DIR}/systemd/tinymush.service.in ${CMAKE_CURRENT_BINARY_DIR}/systemd/tinymush.service)
+configure_file(${CMAKE_SOURCE_DIR}/src/systemd/tinymush.service.in ${CMAKE_CURRENT_BINARY_DIR}/systemd/tinymush.service)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/netmush)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
