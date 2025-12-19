@@ -1,8 +1,71 @@
-#Visual Studio Code
-.vscode
+# Visual Studio Code
+.vscode/
+.vscode-server/
 *.code-workspace
+.history/
+*.vsix
+
+# Package files
 packages-microsoft-prod.deb
 
-#CMake
+# CMake build directories
 /build
 /game
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+Makefile
+install_manifest.txt
+DartConfiguration.tcl
+
+# Compiled Object files
+*.o
+*.obj
+*.slo
+*.lo
+*.ko
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+*.la
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.*.swp
+
+# Core dumps
+core
+core.*
