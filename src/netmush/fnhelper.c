@@ -696,7 +696,15 @@ bool xlate(char *arg)
 
 	if (is_integer(temp2))
 	{
-		return strtoll(temp2, (char **)NULL, 10) >= (mushconf.bools_oldstyle ? 1 : 0) ? true : false;
+		long long val = strtoll(temp2, (char **)NULL, 10);
+		if (mushconf.bools_oldstyle)
+		{
+			return val >= 1 ? true : false;
+		}
+		else
+		{
+			return val != 0 ? true : false;
+		}
 	}
 
 	return true;

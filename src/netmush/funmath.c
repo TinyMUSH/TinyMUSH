@@ -1967,7 +1967,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) + strtold(v2[0], (char **)NULL), FPTS_DIG);
+            fval(buff, bufc, strtold(v1[i], (char **)NULL) + strtold(v2[i], (char **)NULL), FPTS_DIG);
         }
 
         break;
@@ -1978,7 +1978,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
         for (int i = 1; i < n; i++)
         {
             print_separator(&osep, buff, bufc);
-            fval(buff, bufc, strtold(v1[0], (char **)NULL) - strtold(v2[0], (char **)NULL), FPTS_DIG);
+            fval(buff, bufc, strtold(v1[i], (char **)NULL) - strtold(v2[i], (char **)NULL), FPTS_DIG);
         }
 
         break;
@@ -2035,7 +2035,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
             for (int i = 1; i < m; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v2[0], (char **)NULL) * scalar, FPTS_DIG);
+                fval(buff, bufc, strtold(v2[i], (char **)NULL) * scalar, FPTS_DIG);
             }
         }
         else if (m == 1)
@@ -2046,7 +2046,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
             for (int i = 1; i < n; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v1[0], (char **)NULL) * scalar, FPTS_DIG);
+                fval(buff, bufc, strtold(v1[i], (char **)NULL) * scalar, FPTS_DIG);
             }
         }
         else
@@ -2066,7 +2066,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
             for (int i = 1; i < n; i++)
             {
                 print_separator(&osep, buff, bufc);
-                fval(buff, bufc, strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL), FPTS_DIG);
+                fval(buff, bufc, strtold(v1[i], (char **)NULL) * strtold(v2[i], (char **)NULL), FPTS_DIG);
             }
         }
 
@@ -2084,7 +2084,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
         for (int i = 0; i < n; i++)
         {
-            scalar += strtold(v1[0], (char **)NULL) * strtold(v2[0], (char **)NULL);
+            scalar += strtold(v1[i], (char **)NULL) * strtold(v2[i], (char **)NULL);
         }
 
         fval(buff, bufc, scalar, FPTS_DIG);
