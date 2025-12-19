@@ -259,14 +259,14 @@ Add a Builtin Function</h2>
 <h2><a class="anchor" id="autotoc_md149"></a>
 Add a Flag</h2>
 <ol type="1">
-<li>Add a constant in <code><a class="el" href="constants_8h.html" title="Constants used by the engine.">constants.h</a></code> and integrate with flag word (FLAG_WORD1/2/3).</li>
+<li>Add a constant in <code><a class="el" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens.">constants.h</a></code> and integrate with flag word (FLAG_WORD1/2/3).</li>
 <li>Add an entry to <code>FLAGENT gen_flags[]</code> in <a href="netmush/flags.c#L362">netmush/flags.c</a> with a setter policy (e.g., <code>fh_wiz</code>, <code>fh_god</code>).</li>
 <li>If needed, add aliases via the <code>flag_alias</code> config.</li>
 </ol>
 <h2><a class="anchor" id="autotoc_md150"></a>
 Add a Power</h2>
 <ol type="1">
-<li>Add a constant in <code><a class="el" href="constants_8h.html" title="Constants used by the engine.">constants.h</a></code> and specify main vs extended word (<code>POWER_EXT</code>).</li>
+<li>Add a constant in <code><a class="el" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens.">constants.h</a></code> and specify main vs extended word (<code>POWER_EXT</code>).</li>
 <li>Add an entry to <code>POWERENT gen_powers[]</code> in <a href="netmush/powers.c#L171">netmush/powers.c</a> with a policy (<code>ph_wiz</code>, <code>ph_god</code>, etc.).</li>
 <li>Use <code>power_alias</code> for aliases.</li>
 </ol>

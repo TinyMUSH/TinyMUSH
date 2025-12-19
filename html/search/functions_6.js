@@ -11,9 +11,10 @@ var searchData=
   ['get_5fsubj_8',['get_subj',['../eval_8c.html#a823fb6a3e1846d5bfbce36bcdc2c3d22',1,'eval.c']]],
   ['getboolexp_9',['getboolexp',['../db__rw_8c.html#add7c2b24bbc4798a914920521426df5f',1,'db_rw.c']]],
   ['getboolexp1_10',['getboolexp1',['../db__rw_8c.html#abc48f11473ca52157d1e8d48a6fac2e1',1,'db_rw.c']]],
-  ['getlong_11',['getlong',['../db_8c.html#a7b28b28557d692ebdcb44e905f5f7a51',1,'db.c']]],
-  ['getref_12',['getref',['../db_8c.html#a9c760b283de7813e710fcab3dc09a712',1,'db.c']]],
-  ['getstring_13',['getstring',['../db_8c.html#a2a57a313ae2a3c58242512df045d33aa',1,'db.c']]],
-  ['give_5fque_14',['give_que',['../cque_8c.html#ad42b5a68e8ff34ceedca52df77b818d5',1,'cque.c']]],
-  ['grabto_15',['grabto',['../stringutil_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'stringutil.c']]]
+  ['getcolormatch_11',['getColorMatch',['../vt100_8c.html#afae35eaaf3f6515e78b4fa150ab4658f',1,'vt100.c']]],
+  ['getlong_12',['getlong',['../db_8c.html#a7b28b28557d692ebdcb44e905f5f7a51',1,'db.c']]],
+  ['getref_13',['getref',['../db_8c.html#a9c760b283de7813e710fcab3dc09a712',1,'db.c']]],
+  ['getstring_14',['getstring',['../db_8c.html#a2a57a313ae2a3c58242512df045d33aa',1,'db.c']]],
+  ['give_5fque_15',['give_que',['../cque_8c.html#ad42b5a68e8ff34ceedca52df77b818d5',1,'cque.c']]],
+  ['grabto_16',['grabto',['../stringutil_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'stringutil.c']]]
 ];

@@ -95,7 +95,7 @@ $(function(){ initResizable(false); });
 </div><!--header-->
 <div class="contents">
 
-<p>Constants used by the engine.  
+<p>Global numeric and string constants for flags, limits, and parser tokens.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;float.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -103,7 +103,7 @@ Include dependency graph for constants.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="constants_8h__incl.png" border="0" usemap="#asrc_2netmush_2constants_8h" alt=""/></div>
 <map name="asrc_2netmush_2constants_8h" id="asrc_2netmush_2constants_8h">
-<area shape="rect" title="Constants used by the engine." alt="" coords="5,5,170,31"/>
+<area shape="rect" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="5,5,170,31"/>
 <area shape="rect" title=" " alt="" coords="60,79,115,105"/>
 <area shape="poly" title=" " alt="" coords="90,31,90,63,85,63,85,31"/>
 </map>
@@ -126,7 +126,7 @@ Macros</h2></td></tr>
 <tr class="memitem:af97a57cc26b845a2952925a7991cf9a3" id="r_af97a57cc26b845a2952925a7991cf9a3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af97a57cc26b845a2952925a7991cf9a3">XMAGIC</a>&#160;&#160;&#160;0x00deadbeefbaad00</td></tr>
 <tr class="separator:af97a57cc26b845a2952925a7991cf9a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8222fe26572eccf54b3a5ec8a478803a" id="r_a8222fe26572eccf54b3a5ec8a478803a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8222fe26572eccf54b3a5ec8a478803a">MAX_MATCH_ITERATIONS</a>&#160;&#160;&#160;10000</td></tr>
-<tr class="memdesc:a8222fe26572eccf54b3a5ec8a478803a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum iterations for list/exit traversal in <a class="el" href="match_8c.html" title="Routines for parsing arguments.">match.c</a>.  <br /></td></tr>
+<tr class="memdesc:a8222fe26572eccf54b3a5ec8a478803a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum iterations for list/exit traversal in <a class="el" href="match_8c.html" title="Name matching and object resolution utilities for commands and locks.">match.c</a>.  <br /></td></tr>
 <tr class="separator:a8222fe26572eccf54b3a5ec8a478803a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a179eb77abe00e3f4bda842bd2d780636" id="r_a179eb77abe00e3f4bda842bd2d780636"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a179eb77abe00e3f4bda842bd2d780636">STRINGBLOCK</a>&#160;&#160;&#160;1000</td></tr>
 <tr class="memdesc:a179eb77abe00e3f4bda842bd2d780636"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attributes constants.  <br /></td></tr>
@@ -2855,7 +2855,7 @@ Macros</h2></td></tr>
 <tr class="separator:a6c80b66650236095d6c77f18a536a539"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Constants used by the engine. </p>
+<div class="textblock"><p>Global numeric and string constants for flags, limits, and parser tokens. </p>
 <dl class="section author"><dt>Author</dt><dd>TinyMUSH development team (<a href="https://github.com/TinyMUSH">https://github.com/TinyMUSH</a>) </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file. </dd></dl>
@@ -9892,7 +9892,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>File cache constants. </p>
-<p>File caches. These <em>must</em> track the fcache array in <a class="el" href="file__c_8c.html" title="File cache management.">file_c.c</a> </p>
+<p>File caches. These <em>must</em> track the fcache array in <a class="el" href="file__c_8c.html" title="In-memory cache for help/text files to reduce disk I/O.">file_c.c</a> </p>
 
 </div>
 </div>
@@ -12087,7 +12087,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Maximum iterations for list/exit traversal in <a class="el" href="match_8c.html" title="Routines for parsing arguments.">match.c</a>. </p>
+<p>Maximum iterations for list/exit traversal in <a class="el" href="match_8c.html" title="Name matching and object resolution utilities for commands and locks.">match.c</a>. </p>
 <p>Prevents infinite loops when traversing potentially circular linked lists in the database (contents, exits, parent chains). </p>
 
 </div>

@@ -1,11 +1,11 @@
 <map id="src/modules/db_sql/db_sql_pgsql.c" name="src/modules/db_sql/db_sql_pgsql.c">
-<area shape="rect" id="Node000001" title="Module for pgSQL interface." alt="" coords="119,5,253,46"/>
+<area shape="rect" id="Node000001" title="PostgreSQL backend driver for the SQL abstraction layer." alt="" coords="119,5,253,46"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,94,71,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,49,75,89,73,84,148,44"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="95,94,168,120"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,48,151,83,146,79,170,45"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="192,94,292,120"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="202,45,227,79,222,83,198,48"/>
-<area shape="rect" id="Node000005" href="$db__sql_8h.html" title="Module for SQL interface." alt="" coords="317,94,386,120"/>
+<area shape="rect" id="Node000005" href="$db__sql_8h.html" title="Public API for the SQL abstraction layer and backend drivers." alt="" coords="317,94,386,120"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="228,44,313,85,311,89,226,49"/>
 </map>

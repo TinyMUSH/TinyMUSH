@@ -1,5 +1,5 @@
 <map id="src/netmush/typedefs.h" name="src/netmush/typedefs.h">
-<area shape="rect" id="Node000001" title="Type definitions for variables." alt="" coords="179,5,335,31"/>
+<area shape="rect" id="Node000001" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="179,5,335,31"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,79,69,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,34,85,78,83,73,219,29"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="93,79,152,105"/>

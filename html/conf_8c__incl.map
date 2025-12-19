@@ -1,16 +1,16 @@
 <map id="src/netmush/conf.c" name="src/netmush/conf.c">
-<area shape="rect" id="Node000001" title="Configuration functions and defaults." alt="" coords="764,5,896,31"/>
+<area shape="rect" id="Node000001" title="Configuration parsing, defaults, and runtime reload support." alt="" coords="764,5,896,31"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="104,79,170,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="764,25,513,41,352,58,185,82,185,76,351,53,513,36,763,20"/>
-<area shape="rect" id="Node000003" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="194,79,282,105"/>
+<area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="194,79,282,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="764,28,560,47,298,81,297,76,559,42,763,22"/>
-<area shape="rect" id="Node000005" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="414,153,494,178"/>
+<area shape="rect" id="Node000005" href="$typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="414,153,494,178"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="764,28,620,47,553,62,508,81,482,108,466,139,461,137,478,105,505,77,551,57,619,42,763,23"/>
 <area shape="rect" id="Node000008" title=" " alt="" coords="620,226,694,252"/>
 <area shape="poly" id="edge20_Node000001_Node000008" title=" " alt="" coords="764,27,703,34,640,45,585,60,565,70,552,81,543,98,543,116,548,134,559,152,592,187,627,215,624,219,588,191,555,156,543,136,537,116,538,96,548,77,563,65,583,55,639,39,702,28,763,22"/>
-<area shape="rect" id="Node000012" href="$macros_8h.html" title="Macro definitions." alt="" coords="562,79,637,105"/>
+<area shape="rect" id="Node000012" href="$macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="562,79,637,105"/>
 <area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="792,34,652,77,651,72,790,29"/>
-<area shape="rect" id="Node000013" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="660,79,734,105"/>
+<area shape="rect" id="Node000013" href="$externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="660,79,734,105"/>
 <area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="809,34,734,74,732,69,806,29"/>
 <area shape="rect" id="Node000014" href="$prototypes_8h_source.html" title=" " alt="" coords="306,79,397,105"/>
 <area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="764,32,413,84,412,79,763,27"/>

@@ -1,18 +1,18 @@
 <map id="src/modules/mail/mail.c" name="src/modules/mail/mail.c">
-<area shape="rect" id="Node000001" title="Module for penn&#45;based mailer system." alt="" coords="410,5,569,31"/>
+<area shape="rect" id="Node000001" title="PennMUSH&#45;compatible in&#45;game mail delivery and mailbox management." alt="" coords="410,5,569,31"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="85,79,150,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="415,34,166,81,165,76,414,29"/>
-<area shape="rect" id="Node000003" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="175,79,263,105"/>
+<area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="175,79,263,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="444,34,279,77,278,72,443,29"/>
-<area shape="rect" id="Node000005" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="262,153,342,178"/>
+<area shape="rect" id="Node000005" href="$typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="262,153,342,178"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="414,34,367,52,346,65,328,81,312,108,306,138,300,136,307,106,324,77,343,60,365,47,412,29"/>
-<area shape="rect" id="Node000012" href="$macros_8h.html" title="Macro definitions." alt="" coords="452,79,527,105"/>
+<area shape="rect" id="Node000012" href="$macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="452,79,527,105"/>
 <area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="492,31,492,63,487,63,487,31"/>
-<area shape="rect" id="Node000013" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="550,79,624,105"/>
+<area shape="rect" id="Node000013" href="$externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="550,79,624,105"/>
 <area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="508,29,560,68,557,72,505,34"/>
 <area shape="rect" id="Node000014" href="$prototypes_8h_source.html" title=" " alt="" coords="337,79,429,105"/>
 <area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="473,34,415,72,412,68,470,29"/>
-<area shape="rect" id="Node000017" href="$mail_8h.html" title="Module for penn&#45;based mailer system." alt="" coords="647,79,703,105"/>
+<area shape="rect" id="Node000017" href="$mail_8h.html" title="Interfaces and data structures for the PennMUSH&#45;style mail subsystem." alt="" coords="647,79,703,105"/>
 <area shape="poly" id="edge20_Node000001_Node000017" title=" " alt="" coords="522,29,634,72,632,77,520,34"/>
 <area shape="rect" id="Node000018" title=" " alt="" coords="726,79,789,105"/>
 <area shape="poly" id="edge21_Node000001_Node000018" title=" " alt="" coords="537,29,712,75,711,81,535,34"/>

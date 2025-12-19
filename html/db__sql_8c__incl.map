@@ -1,9 +1,9 @@
 <map id="src/modules/db_sql/db_sql.c" name="src/modules/db_sql/db_sql.c">
-<area shape="rect" id="Node000001" title="Module for SQL interface." alt="" coords="86,5,220,46"/>
+<area shape="rect" id="Node000001" title="Core SQL abstraction layer and dispatcher for database backends." alt="" coords="86,5,220,46"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,94,79,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,49,73,87,70,82,124,44"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="102,94,203,120"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,46,155,78,150,78,150,46"/>
-<area shape="rect" id="Node000004" href="$db__sql_8h.html" title="Module for SQL interface." alt="" coords="227,94,297,120"/>
+<area shape="rect" id="Node000004" href="$db__sql_8h.html" title="Public API for the SQL abstraction layer and backend drivers." alt="" coords="227,94,297,120"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="181,44,234,82,231,87,178,49"/>
 </map>
