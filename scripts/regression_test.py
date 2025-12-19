@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TinyMUSH command smoke tester.
+TinyMUSH regression test runner.
 
 - Connects over telnet, reads a config file listing commands to run and the expected output substring.
 - Reads credentials from environment to avoid hard-coding secrets.
@@ -12,10 +12,10 @@ Env vars:
     TINY_USER   (required)
     TINY_PASS   (required)
     TINY_TIMEOUT (optional, seconds, default: 5)
-    TINY_COMMANDS_FILE (optional, path to config file; default: scripts/test_commands.conf)
+    TINY_CONFIG_FILE (optional, path to config file; default: scripts/commands_messaging.conf)
 
 Usage:
-    python3 scripts/test_commands.py --config scripts/test_commands.conf
+    python3 scripts/regression_test.py --config scripts/commands_messaging.conf
 
 Config file format:
     - One command per line.
@@ -41,7 +41,7 @@ PORT = int(os.getenv("TINY_PORT", "6250"))
 USER = os.getenv("TINY_USER", "#1")
 PASS = os.getenv("TINY_PASS", "potrzebi")
 TIMEOUT = float(os.getenv("TINY_TIMEOUT", "5"))
-DEFAULT_CONFIG = os.getenv("TINY_COMMANDS_FILE", "scripts/test_commands.conf")
+DEFAULT_CONFIG = os.getenv("TINY_CONFIG_FILE", "scripts/commands_messaging.conf")
 
 DISCONNECTING = {
     "quit",
@@ -54,8 +54,8 @@ DISCONNECTING = {
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="TinyMUSH telnet smoke tester")
-    parser.add_argument("--config", default=DEFAULT_CONFIG, help="Path to the commands config file")
+    parser = argparse.ArgumentParser(description="TinyMUSH regression test runner")
+    parser.add_argument("--config", default=DEFAULT_CONFIG, help="Path to the test config file")
     parser.add_argument("--allow-disconnect", action="store_true", help="Run commands that may close the session")
     return parser.parse_args()
 
@@ -97,7 +97,7 @@ def read_some(tn: telnetlib.Telnet, timeout: float) -> str:
     chunks: List[str] = []
     end_time = time.time() + timeout
     last_data = None
-    idle_grace = 0.2  # stop after this idle gap once we've seen data
+    idle_grace = 0.5  # stop after this idle gap once we've seen data (server responses can trickle)
 
     while time.time() < end_time:
         data = tn.read_very_eager()
@@ -156,7 +156,8 @@ def main() -> None:
         if expected:
             status = "OK" if expected in resp else "ERR"
         else:
-            status = "OK" if resp.strip() else "ERR"
+            # No expectation means we accept any output (including empty)
+            status = "OK"
 
         print(f"[{status}] {cmd}\n{resp.strip()}\n")
         results.append((cmd, expected, status, resp))

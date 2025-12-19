@@ -348,7 +348,9 @@ int countwords(char *str, const Delim *sep)
  */
 int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 {
-	unsigned char *tok_starts = XMALLOC((LBUF_SIZE >> 3) + 1, "tok_starts");
+	/* Bitstring marking token starts across the LBUF window */
+	size_t bitbuf_len = (LBUF_SIZE >> 3) + 1; /* one bit per byte of list */
+	unsigned char *tok_starts = XMALLOC(bitbuf_len, "tok_starts");
 	char *tok, *liststart;
 	int ntok, tokpos, i, bits;
 
@@ -359,7 +361,8 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	 *
 	 */
 
-	XMEMSET(tok_starts, 0, sizeof(tok_starts));
+	/* Clear the entire bit buffer, not just the pointer size */
+	XMEMSET(tok_starts, 0, bitbuf_len);
 
 	liststart = list = trim_space_sep(list, sep);
 	tok = split_token(&list, sep);
@@ -381,7 +384,8 @@ int list2arr(char ***arr, int maxtok, char *list, const Delim *sep)
 	 * been freed yet.
 	 *
 	 */
-	*(arr) = (char **)XMALLOC(ntok + 1, "arr");
+	/* Allocate pointer array sized for tokens (+1 for sentinel) */
+	*(arr) = (char **)XMALLOC((ntok + 1) * sizeof(char *), "arr");
 	tokpos >>= 3;
 	ntok = 0;
 

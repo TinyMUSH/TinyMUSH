@@ -12884,8 +12884,32 @@ performed and the walk down the list stops.
   This function is provided for PennMUSH compatibility.
  
 & ZFUN()
+  Function: zfun(<attribute>[, <arg0>[, <arg1>[, ... , <arg29>]]])
 
-  Undocumented.
+  Evaluates <attribute> on your current Zone object, passing any arguments
+  to it like a u()-style user function. If zones are disabled, or you are
+  not in a zone, the function returns an error ("#-1 ZONES DISABLED" or
+  "#-1 INVALID ZONE").
+
+  The attribute name must exist on the zone object and be readable by the
+  caller, otherwise you will see "#-1 NO SUCH USER FUNCTION" or
+  "#-1 NO PERMISSION TO GET ATTRIBUTE". The evaluation happens from the
+  zone object's viewpoint, with you as the enactor; arguments are available
+  as %0, %1, etc.
+
+  Examples:
+    > @zone here=#100
+    > &ZHELLO #100=[capstr(name(%#))] waves from the zone.
+    > say zfun(ZHELLO)
+    You say, "Wizard waves from the zone."
+    > &ZGREET #100=[switch(%0,,Hello from the zone!,Hello, %0!)]
+    > say zfun(ZGREET,Foobar)
+    You say, "Hello, Foobar!"
+    > @zone here
+    > say zfun(ZHELLO)
+    You say, "#-1 INVALID ZONE"
+
+  Essentially equivalent to: u(zone(me)/<attribute>, <args>...)
  
 & ZONE()
   Function: zone(<object>)
@@ -14085,13 +14109,6 @@ Continued in 'help @malias2'.
     You say, "3"
  
   See also: STRUCTURE FUNCTIONS
- 
-& ZFUN()
-  zfun(<attribute>[, <arg0>[, <arg1>[, ... , <arg29>]]])
-  
-  This function evaluates an attribute on the caller's Zone object. It is essentially identical to
-  
-  u(zone(me)/<attribute>[, <arg0>[, ... , <arg29>]])
  
 & MODIFY()
   Function:  modify(<instance>,<components>,<new values>[,<delim>])

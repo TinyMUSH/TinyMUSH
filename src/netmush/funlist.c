@@ -2224,7 +2224,8 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 {
 	Delim isep, osep;
 	int oper, type_arg;
-	char *list1, *list2, *oldp, *bb_p;
+	char *list1, *list2, *bb_p;
+	char oldstr[LBUF_SIZE];
 	char **ptrs1, **ptrs2;
 	int i1, i2, n1, n2, val, sort_type;
 	int *ip1, *ip2;
@@ -2352,7 +2353,8 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	i1 = i2 = 0;
-	bb_p = oldp = *bufc;
+	bb_p = *bufc;
+	*oldstr = '\0';
 	**bufc = '\0';
 
 	switch (oper)
@@ -2381,12 +2383,12 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 			 */
 			if ((i1 > 0) || (i2 > 0))
 			{
-				while ((i1 < n1) && !strcmp(ptrs1[i1], oldp))
+				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 				{
 					i1++;
 				}
 
-				while ((i2 < n2) && !strcmp(ptrs2[i2], oldp))
+				while ((i2 < n2) && !strcmp(ptrs2[i2], oldstr))
 				{
 					i2++;
 				}
@@ -2403,16 +2405,16 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 					print_separator(&osep, buff, bufc);
 				}
 
-				oldp = *bufc;
-
 				if (compare_items(ptrs1[i1], ptrs2[i2], sort_type, &ip1[i1], &ip2[i2], &fp1[i1], &fp2[i2]) < 0)
 				{
 					XSAFELBSTR(ptrs1[i1], buff, bufc);
+					XSTRCPY(oldstr, ptrs1[i1]);
 					i1++;
 				}
 				else
 				{
 					XSAFELBSTR(ptrs2[i2], buff, bufc);
+					XSTRCPY(oldstr, ptrs2[i2]);
 					i2++;
 				}
 
@@ -2426,14 +2428,14 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		 */
 		for (; i1 < n1; i1++)
 		{
-			if (strcmp(oldp, ptrs1[i1]))
+			if (strcmp(oldstr, ptrs1[i1]))
 			{
 				if (*bufc != bb_p)
 				{
 					print_separator(&osep, buff, bufc);
 				}
 
-				oldp = *bufc;
+				XSTRCPY(oldstr, ptrs1[i1]);
 				XSAFELBSTR(ptrs1[i1], buff, bufc);
 				**bufc = '\0';
 			}
@@ -2441,14 +2443,14 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		for (; i2 < n2; i2++)
 		{
-			if (strcmp(oldp, ptrs2[i2]))
+			if (strcmp(oldstr, ptrs2[i2]))
 			{
 				if (*bufc != bb_p)
 				{
 					print_separator(&osep, buff, bufc);
 				}
 
-				oldp = *bufc;
+				XSTRCPY(oldstr, ptrs2[i2]);
 				XSAFELBSTR(ptrs2[i2], buff, bufc);
 				**bufc = '\0';
 			}
@@ -2472,17 +2474,17 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 					print_separator(&osep, buff, bufc);
 				}
 
-				oldp = *bufc;
+				XSTRCPY(oldstr, ptrs1[i1]);
 				XSAFELBSTR(ptrs1[i1], buff, bufc);
 				i1++;
 				i2++;
 
-				while ((i1 < n1) && !strcmp(ptrs1[i1], oldp))
+				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 				{
 					i1++;
 				}
 
-				while ((i2 < n2) && !strcmp(ptrs2[i2], oldp))
+				while ((i2 < n2) && !strcmp(ptrs2[i2], oldstr))
 				{
 					i2++;
 				}
@@ -2510,14 +2512,14 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				 * Got a match, increment pointers
 				 *
 				 */
-				oldp = ptrs1[i1];
+				XSTRCPY(oldstr, ptrs1[i1]);
 
-				while ((i1 < n1) && !strcmp(ptrs1[i1], oldp))
+				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 				{
 					i1++;
 				}
 
-				while ((i2 < n2) && !strcmp(ptrs2[i2], oldp))
+				while ((i2 < n2) && !strcmp(ptrs2[i2], oldstr))
 				{
 					i2++;
 				}
@@ -2534,10 +2536,10 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				}
 
 				XSAFELBSTR(ptrs1[i1], buff, bufc);
-				oldp = ptrs1[i1];
+				XSTRCPY(oldstr, ptrs1[i1]);
 				i1++;
 
-				while ((i1 < n1) && !strcmp(ptrs1[i1], oldp))
+				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 				{
 					i1++;
 				}
@@ -2548,10 +2550,10 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				 * Item in list2 but not in list1, discard
 				 *
 				 */
-				oldp = ptrs2[i2];
+				XSTRCPY(oldstr, ptrs2[i2]);
 				i2++;
 
-				while ((i2 < n2) && !strcmp(ptrs2[i2], oldp))
+				while ((i2 < n2) && !strcmp(ptrs2[i2], oldstr))
 				{
 					i2++;
 				}
@@ -2569,11 +2571,11 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_separator(&osep, buff, bufc);
 			}
 
-			XSAFELBSTR(ptrs1[i1], buff, bufc);
-			oldp = ptrs1[i1];
-			i1++;
+				XSAFELBSTR(ptrs1[i1], buff, bufc);
+				XSTRCPY(oldstr, ptrs1[i1]);
+				i1++;
 
-			while ((i1 < n1) && !strcmp(ptrs1[i1], oldp))
+				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 			{
 				i1++;
 			}
@@ -2593,6 +2595,8 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	XFREE(ptrs1);
 	XFREE(ptrs2);
+	XFREE(list1);
+	XFREE(list2);
 }
 
 /**
