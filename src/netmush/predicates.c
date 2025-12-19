@@ -1197,8 +1197,19 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 	}
 	else
 	{
+		char *last_keyname = NULL;
+		
 		for (keyname = hash_firstkey(&mushstate.command_htab); keyname != NULL; keyname = hash_nextkey(&mushstate.command_htab))
 		{
+			// Detect infinite loop - if we get the same key twice, exit
+			if (last_keyname != NULL && keyname == last_keyname)
+			{
+				log_write(LOG_BUGS, "BUG", "LISTCOMMANDS", "Infinite loop detected in hash iteration");
+				notify(player, "Error: Unable to enumerate commands (infinite loop detected).");
+				break;
+			}
+			last_keyname = keyname;
+			
 			old = (CMDENT *)hashfind(keyname, &mushstate.command_htab);
 
 			if (old && (old->callseq & CS_ADDED))
@@ -1224,11 +1235,6 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 				}
 			}
 		}
-	}
-
-	if (!didit)
-	{
-		notify(player, "No added commands found in command table.");
 	}
 }
 

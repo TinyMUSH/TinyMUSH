@@ -3,9 +3,8 @@
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Configuration options set by configure script
  * @version 4.0
- * @date 2023-11-26
  *
- * @copyright Copyright (C) 1989-2023 TinyMUSH development team.
+ * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  *
