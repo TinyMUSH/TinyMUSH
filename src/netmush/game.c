@@ -771,14 +771,33 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 
+	/*
+	 * Allow callers to pass a NULL format string and supply the message as the
+	 * first vararg (matches raw_notify()/notify_except behavior). Previously we
+	 * returned early, dropping all such notifications (e.g., the notify() macro
+	 * which passes format=NULL), so help/listcommands output never reached the
+	 * client.
+	 */
 	if (!format || !(*format))
 	{
-		XFREE(msg);
-		va_end(ap);
-		return;
+		char *s = va_arg(ap, char *);
+
+		if (s)
+		{
+			XSTRNCPY(msg, s, LBUF_SIZE);
+		}
+		else
+		{
+			XFREE(msg);
+			va_end(ap);
+			return;
+		}
+	}
+	else
+	{
+		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	}
 
-	XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	va_end(ap);
 
 	/*

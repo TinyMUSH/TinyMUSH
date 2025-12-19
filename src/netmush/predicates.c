@@ -1197,23 +1197,8 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 	}
 	else
 	{
-		char *last_keyname = NULL;
-		int iteration_count = 0;
-		const int MAX_ITERATIONS = 100000;
-		
-		for (keyname = hash_firstkey(&mushstate.command_htab); keyname != NULL && iteration_count < MAX_ITERATIONS; keyname = hash_nextkey(&mushstate.command_htab))
+		for (keyname = hash_firstkey(&mushstate.command_htab); keyname != NULL; keyname = hash_nextkey(&mushstate.command_htab))
 		{
-			iteration_count++;
-			
-			// Detect infinite loop - if we get the same key twice in a row, exit
-			if (last_keyname != NULL && strcmp(keyname, last_keyname) == 0)
-			{
-				log_write(LOG_BUGS, "BUG", "LISTCOMMANDS", "Infinite loop detected in hash iteration - same key returned twice");
-				notify(player, "Error: Unable to enumerate commands (infinite loop detected).");
-				break;
-			}
-			last_keyname = keyname;
-			
 			old = (CMDENT *)hashfind(keyname, &mushstate.command_htab);
 
 			if (old && (old->callseq & CS_ADDED))
@@ -1238,12 +1223,6 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 					didit = 1;
 				}
 			}
-		}
-		
-		if (iteration_count >= MAX_ITERATIONS)
-		{
-			log_write(LOG_BUGS, "BUG", "LISTCOMMANDS", "Hash iteration exceeded maximum iterations (%d)", MAX_ITERATIONS);
-			notify(player, "Error: Command enumeration exceeded maximum iterations.");
 		}
 	}
 
