@@ -1,7 +1,7 @@
 /**
  * @file match.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Routines for parsing arguments
+ * @brief Name matching and object resolution utilities for commands and locks
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

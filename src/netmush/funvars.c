@@ -1,7 +1,7 @@
 /**
  * @file funvars.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Structure, variable, stack, and regexp functions
+ * @brief Variable/stack/regexp built-ins and helpers for structured data manipulation
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

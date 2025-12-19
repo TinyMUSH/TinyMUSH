@@ -1,7 +1,7 @@
 /**
  * @file db.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Attribute interface, some flatfile and object routines
+ * @brief Core database object utilities and attribute access/manipulation helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

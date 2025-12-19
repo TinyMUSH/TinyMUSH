@@ -1,7 +1,7 @@
 /**
  * @file functions.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief MUSH function handlers
+ * @brief Core built-in function implementations and dispatch table setup
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

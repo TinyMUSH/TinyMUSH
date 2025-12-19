@@ -1,7 +1,7 @@
 /**
  * @file player_c.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Player cache routines
+ * @brief Player cache for hostname/character lookups and login throttling
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

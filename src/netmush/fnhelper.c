@@ -1,7 +1,7 @@
 /**
  * @file fnhelper.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Helper functions for MUSH functions
+ * @brief Shared utilities for built-in functions: delimiter handling, coercion, and validation
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

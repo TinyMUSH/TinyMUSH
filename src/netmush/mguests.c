@@ -1,7 +1,7 @@
 /**
  * @file mguests.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief multiguest code originally ported from DarkZone
+ * @brief Guest account pool management and multiguest login handling
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

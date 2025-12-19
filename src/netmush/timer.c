@@ -1,7 +1,7 @@
 /**
  * @file timer.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Subroutines for (system-) timed events
+ * @brief Timer queue management for periodic tasks, alarms, and delayed execution
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

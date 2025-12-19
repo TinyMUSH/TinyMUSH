@@ -1,7 +1,7 @@
 /**
  * @file unparse.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Convert boolexps to printable form
+ * @brief Render locks and boolean expressions to printable strings for output and decompile
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

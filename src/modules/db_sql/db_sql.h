@@ -1,7 +1,7 @@
 /**
  * @file db_sql.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module for SQL interface
+ * @brief Public API for the SQL abstraction layer and backend drivers
  * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

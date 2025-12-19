@@ -1,7 +1,7 @@
 /**
  * @file constants.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Constants used by the engine.
+ * @brief Global numeric and string constants for flags, limits, and parser tokens
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

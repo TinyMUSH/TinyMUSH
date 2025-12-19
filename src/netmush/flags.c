@@ -1,7 +1,7 @@
 /**
  * @file flags.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Flag manipulation routines
+ * @brief Flag table definitions and utilities for setting/checking object flags
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

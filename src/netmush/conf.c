@@ -1,7 +1,7 @@
 /**
  * @file conf.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Configuration functions and defaults
+ * @brief Configuration parsing, defaults, and runtime reload support
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

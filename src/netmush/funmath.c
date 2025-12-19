@@ -1,7 +1,7 @@
 /**
  * @file funmath.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Math and logic functions
+ * @brief Numeric and logic built-ins: arithmetic, trig, bitwise, and statistics helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

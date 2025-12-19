@@ -1,7 +1,7 @@
 /**
  * @file eval.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Command evaluation and cracking
+ * @brief Expression parsing, evaluation, and command/function argument processing
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

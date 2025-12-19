@@ -1,7 +1,7 @@
 /**
  * @file funstring.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief String functions
+ * @brief String manipulation built-ins: search/replace, case handling, formatting
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

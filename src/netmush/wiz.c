@@ -1,7 +1,7 @@
 /**
  * @file wiz.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Wizard-only commands
+ * @brief Wizard/admin commands for control, security, and game maintenance
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

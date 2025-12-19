@@ -1,7 +1,7 @@
 /**
  * @file rob.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Commands dealing with giving/taking/killing things or money
+ * @brief Economy and combat commands: give/take currency, kill/rob interactions
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

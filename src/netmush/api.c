@@ -1,7 +1,7 @@
 /**
  * @file api.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief functions called only by modules
+ * @brief Module-facing API hooks for commands, functions, and game integration
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

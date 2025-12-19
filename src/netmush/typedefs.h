@@ -1,7 +1,7 @@
 /**
  * @file typedefs.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Type definitions for variables
+ * @brief Core typedefs for dbrefs, flags, buffers, and engine data structures
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

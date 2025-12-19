@@ -1,7 +1,7 @@
 /**
  * @file set.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Commands which set parameters
+ * @brief Attribute/flag/power setting commands (@set, @power, @lock, and related)
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

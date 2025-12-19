@@ -1,7 +1,7 @@
 /**
  * @file udb_misc.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Misc support routines for unter style error management.
+ * @brief Support routines for the UDBM backend: error handling and maintenance helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

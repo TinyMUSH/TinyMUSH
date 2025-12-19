@@ -1,7 +1,7 @@
 /**
  * @file funext.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Functions that rely on external call-outs
+ * @brief Built-in functions that rely on external processes, sockets, or system calls
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

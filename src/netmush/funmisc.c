@@ -1,7 +1,7 @@
 /**
  * @file funmisc.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Misc functions
+ * @brief Miscellaneous built-ins for time, environment, randomness, and utility helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

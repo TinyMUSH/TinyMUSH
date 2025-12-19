@@ -1,7 +1,7 @@
 /**
  * @file powers.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Power manipulation routines
+ * @brief Power bit definitions, parsing, and permission checks
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

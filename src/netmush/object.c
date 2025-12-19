@@ -1,7 +1,7 @@
 /**
  * @file object.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Low-level object manipulation routines
+ * @brief Object lifecycle helpers: creation, ownership, locks, attributes, and linkage
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

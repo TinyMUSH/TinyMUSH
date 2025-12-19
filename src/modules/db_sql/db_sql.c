@@ -1,7 +1,7 @@
 /**
  * @file db_sql.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module for SQL interface
+ * @brief Core SQL abstraction layer and dispatcher for database backends
  * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

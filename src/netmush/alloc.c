@@ -1,7 +1,7 @@
 /**
  * @file alloc.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief memory management subsystem
+ * @brief Tracked memory allocation, leak detection, and buffer safety helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

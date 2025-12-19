@@ -1,7 +1,7 @@
 /**
  * @file stringutil.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief String utilities
+ * @brief Core string utilities: safe buffer operations, munging, and helper routines
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

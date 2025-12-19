@@ -1,7 +1,7 @@
 /**
  * @file externs.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Prototypes for externs not defined elsewhere
+ * @brief Shared extern declarations and globals used across the game engine
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

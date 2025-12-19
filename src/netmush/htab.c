@@ -1,7 +1,7 @@
 /**
  * @file htab.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Table hashing routines
+ * @brief Hash table implementation used by runtime caches and lookup tables
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

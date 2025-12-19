@@ -1,7 +1,7 @@
 /**
  * @file game.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Main program and misc functions
+ * @brief Server startup/shutdown, main loop orchestration, and core engine glue
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

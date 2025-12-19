@@ -1,7 +1,7 @@
 /**
  * @file db_sql_mysql.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module for MySQL interface
+ * @brief MySQL backend driver for the SQL abstraction layer
  * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

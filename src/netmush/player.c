@@ -1,7 +1,7 @@
 /**
  * @file player.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Player handling and processing
+ * @brief Player lifecycle management: creation, connection handling, quotas, and idle checks
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

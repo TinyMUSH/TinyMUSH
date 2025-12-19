@@ -2,7 +2,7 @@
 /**
  * @file udb_obj.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Binary object handling gear.
+ * @brief UDBM binary object read/write and traversal helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

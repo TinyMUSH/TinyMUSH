@@ -1,7 +1,7 @@
 /**
  * @file move.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Routines for moving about
+ * @brief Movement commands, teleportation, and location transition handling
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

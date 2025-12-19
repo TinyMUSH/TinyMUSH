@@ -1,7 +1,7 @@
 /**
  * @file funlist.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief List functions
+ * @brief List manipulation built-ins: set operations, joins, sorting, and selection
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

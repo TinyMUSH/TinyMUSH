@@ -1,7 +1,7 @@
 /**
  * @file cque.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Commands and functions for manipulating the command queue
+ * @brief Command queue scheduling, throttling, and execution utilities
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

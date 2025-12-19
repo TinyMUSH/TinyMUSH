@@ -1,7 +1,7 @@
 /**
  * @file udb_ochunk.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Database handling functions
+ * @brief Chunked I/O helpers for the UDBM database backend
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

@@ -1,7 +1,7 @@
 /**
  * @file macros.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Macro definitions
+ * @brief Engine-wide macros for memory tracking, flag checks, logging, and utilities
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

@@ -1,7 +1,7 @@
 /**
  * @file create.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Commands that create new objects
+ * @brief Object creation commands and initial setup of rooms, exits, things, and players
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

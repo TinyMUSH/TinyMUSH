@@ -1,7 +1,7 @@
 /**
  * @file funiter.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Functions for user-defined iterations over lists
+ * @brief Iterator-style built-ins for looping, mapping, and folding over lists/attributes
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

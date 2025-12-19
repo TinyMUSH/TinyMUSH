@@ -1,7 +1,7 @@
 /**
  * @file bsd.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief BSD-style network and signal routines
+ * @brief Unix socket I/O, descriptor management, and signal handling for the server loop
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

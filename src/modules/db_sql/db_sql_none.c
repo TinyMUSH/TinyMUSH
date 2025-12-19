@@ -1,7 +1,7 @@
 /**
  * @file db_sql_none.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module placeholder when no SQL interface is implemented
+ * @brief Stub backend used when SQL support is disabled
  * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

@@ -1,7 +1,7 @@
 /**
  * @file netcommon.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Routines used by the networking code that do not depend on the implementation
+ * @brief Shared networking helpers for telnet negotiation, buffers, and descriptor bookkeeping
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

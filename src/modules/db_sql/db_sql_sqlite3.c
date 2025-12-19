@@ -1,7 +1,7 @@
 /**
  * @file db_sql_sqlite3.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module for SQLite3 interface
+ * @brief SQLite3 backend driver for the SQL abstraction layer
  * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

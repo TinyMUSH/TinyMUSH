@@ -1,7 +1,7 @@
 /**
  * @file boolexp.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Handle boolean expressions
+ * @brief Parse, evaluate, and render lock boolean expressions
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

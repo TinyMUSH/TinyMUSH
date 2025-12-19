@@ -1,7 +1,7 @@
 /**
  * @file quota.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Quota management commands
+ * @brief Quota tracking and commands that enforce building/resource limits
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

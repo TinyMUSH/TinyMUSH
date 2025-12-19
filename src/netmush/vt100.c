@@ -1,3 +1,14 @@
+/**
+ * @file vt100.c
+ * @author TinyMUSH development team (https://github.com/TinyMUSH)
+ * @brief VT100/ANSI terminal control helpers and telnet negotiation support
+ * @version 4.0
+ *
+ * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
+ *            You may distribute under the terms the Artistic License,
+ *            as specified in the COPYING file.
+ */
+
 #include "config.h"
 
 #include "constants.h"

@@ -1,7 +1,7 @@
 /**
  * @file version.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Version information
+ * @brief Build/version banner helpers exposed to the engine and players
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

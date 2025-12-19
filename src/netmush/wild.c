@@ -1,7 +1,7 @@
 /**
  * @file wild.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Wildcard routines
+ * @brief Wildcard/globbing utilities for pattern matching in strings and commands
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

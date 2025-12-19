@@ -1,7 +1,7 @@
 /**
  * @file mail.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module for penn-based mailer system
+ * @brief PennMUSH-compatible in-game mail delivery and mailbox management
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

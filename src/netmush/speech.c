@@ -1,7 +1,7 @@
 /**
  * @file speech.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Commands which involve speaking
+ * @brief Speaking commands (say/pose/page/emit) and message formatting helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

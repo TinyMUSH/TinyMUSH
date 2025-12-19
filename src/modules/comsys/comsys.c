@@ -1,7 +1,7 @@
 /**
  * @file comsys.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Module implementing DarkZone-style channel system
+ * @brief DarkZone-style channel subsystem for player-to-player communication
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

@@ -1,7 +1,7 @@
 /**
  * @file nametabs.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Command and other supporting tables
+ * @brief Command/flag/switch name tables and lookup helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
