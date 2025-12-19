@@ -1142,12 +1142,13 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	/*
 	 * room search
 	 */
+	thing = olist_first();
 	if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
 		bp = outbuf;
 
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		for (; thing != NOTHING; thing = olist_next())
 		{
 			if (Typeof(thing) != TYPE_ROOM)
 			{
@@ -1173,6 +1174,11 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		}
 		flush_lines(player, outbuf, &bp);
 	}
+	else
+	{
+		while (thing != NOTHING)
+			thing = olist_next();
+	}
 
 	/*
 	 * exit search
@@ -1182,7 +1188,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		flag = 1;
 		bp = outbuf;
 
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		for (; thing != NOTHING; thing = olist_next())
 		{
 			if (Typeof(thing) != TYPE_EXIT)
 			{
@@ -1234,6 +1240,11 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		}
 		flush_lines(player, outbuf, &bp);
 	}
+	else
+	{
+		while (thing != NOTHING)
+			thing = olist_next();
+	}
 
 	/*
 	 * object search
@@ -1243,7 +1254,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		flag = 1;
 		bp = outbuf;
 
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		for (; thing != NOTHING; thing = olist_next())
 		{
 			if (Typeof(thing) != TYPE_THING)
 			{
@@ -1274,6 +1285,11 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		}
 		flush_lines(player, outbuf, &bp);
 	}
+	else
+	{
+		while (thing != NOTHING)
+			thing = olist_next();
+	}
 
 	/*
 	 * garbage search
@@ -1283,7 +1299,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		flag = 1;
 		bp = outbuf;
 
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		for (; thing != NOTHING; thing = olist_next())
 		{
 			if (Typeof(thing) != TYPE_GARBAGE)
 			{
@@ -1314,6 +1330,11 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		}
 		flush_lines(player, outbuf, &bp);
 	}
+	else
+	{
+		while (thing != NOTHING)
+			thing = olist_next();
+	}
 
 	/*
 	 * player search
@@ -1323,7 +1344,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 		flag = 1;
 		bp = outbuf;
 
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		for (; thing != NOTHING; thing = olist_next())
 		{
 			if (Typeof(thing) != TYPE_PLAYER)
 			{
