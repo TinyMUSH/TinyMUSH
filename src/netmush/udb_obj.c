@@ -5,7 +5,7 @@
  * @brief Binary object handling gear.
  * @version 4.0
  *
- * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
+ * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  *
