@@ -194,9 +194,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>attrib_sync</b> (void
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Binary object handling gear. </p>
 <dl class="section author"><dt>Author</dt><dd>TinyMUSH development team (<a href="https://github.com/TinyMUSH">https://github.com/TinyMUSH</a>) </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>3.3 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2021-01-04</dd></dl>
-<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2021 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file.</dd></dl>
+<dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Why not just write the attributes individually to disk? Well, when you're running on a platform that does synchronous writes with a large database, thousands of I/O operations tend to be expensive. When you 'coalesce' many attribute writes onto a single object and do only one I/O operation, you can get an order of magnitude speed difference, especially on loading/unloading to flatfile. It also has the side effect of pre-fetching on reads, since you often have sequential attribute reads off of the same object.</dd></dl>
 <p>Wile all of this is extremely true, keep in mind that text was written over 25 years ago. Even if we didn't optimized our read/write sequence you woudn't see the difference.</p>
 <p>If you really want to see the difference, it's time to get youself into the retro-computing scene :) </p>
