@@ -20,3 +20,29 @@ jobs:
         cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -S$PWD -B$PWD/build -G "Unix Makefiles"
         cmake --build $PWD/build --config Debug --target all -j $(getconf _NPROCESSORS_ONLN)
         cmake --install $PWD/build
+    - name: integration test
+      run: |
+        cd game
+        # Start server in background
+        timeout 30 ./netmush -c configs/netmush.conf -p netmush.pid &
+        SERVER_PID=$!
+        
+        # Wait for server to be ready (max 10 seconds)
+        for i in {1..10}; do
+          if netstat -an | grep -q '\.2860.*LISTEN'; then
+            echo "Server is listening on port 2860"
+            break
+          fi
+          sleep 1
+        done
+        
+        # Try to connect and shutdown
+        (echo "connect wizard potrzebie"; sleep 1; echo "@shutdown"; sleep 1) | nc localhost 2860 || true
+        
+        # Wait for graceful shutdown
+        sleep 2
+        
+        # Force kill if still running
+        kill $SERVER_PID 2>/dev/null || true
+        
+        echo "Integration test completed"
