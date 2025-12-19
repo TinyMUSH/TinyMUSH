@@ -1362,11 +1362,13 @@ extern VATTR *vattr_first(void);
 extern VATTR *vattr_next(VATTR *vp);
 extern void fixcase(char *name);
 extern char *store_string(char *str);
+extern void do_dbclean(dbref player, dbref cause, int key);
 
 /* version.c */
 extern void do_version(dbref player, dbref cause, int extra);
 extern void init_version(void);
 extern void log_version(void);
+extern void format_version(void);
 
 /* vt100.c */
 extern xyzColor rgbToXyz(rgbColor rgb);
