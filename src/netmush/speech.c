@@ -527,20 +527,13 @@ void page_return(dbref player, dbref target, const char *tag, int anum, const ch
 	va_list ap;
 	va_start(ap, format);
 
-	if ((!format || !*format) && format != NULL)
+	if (format && *format)
 	{
-		if ((s = va_arg(ap, char *)) != NULL)
-		{
-			XSTRNCPY(dflt, s, LBUF_SIZE);
-		}
-		else
-		{
-			dflt[0] = 0x00;
-		}
+		XVSNPRINTF(dflt, LBUF_SIZE, format, ap);
 	}
 	else
 	{
-		XVSNPRINTF(dflt, LBUF_SIZE, format, ap);
+		dflt[0] = '\0';
 	}
 
 	va_end(ap);
