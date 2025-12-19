@@ -11,14 +11,13 @@ var searchData=
   ['address_8',['address',['../structsite__data.html#a1a41ec50193ef96f175661a7739901ca',1,'site_data']]],
   ['alarm_5ftriggered_9',['alarm_triggered',['../structstatedata.html#acde90384ff264f2559157226acf4aa5f',1,'statedata']]],
   ['ansi_5fcolors_10',['ansi_colors',['../structconfdata.html#afbc26dae4bc983c8c952cccbaa2c9082',1,'confdata']]],
-  ['ansicolor_11',['ansiColor',['../externs_8h.html#a6ec5276fd7c1be0bb47ffbf9c80f6daf',1,'externs.h']]],
-  ['anum_5falc_5ftop_12',['anum_alc_top',['../db_8c.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c'],['../externs_8h.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c']]],
-  ['api_5ffunc_5fhtab_13',['api_func_htab',['../structstatedata.html#aedd679c12558b213e5974b5c8cadbec6',1,'statedata']]],
-  ['atr_14',['atr',['../structufun.html#a6e04b5de22e850759f43c17565803c35',1,'ufun']]],
-  ['attr_15',['attr',['../structbque.html#ac5dcedaafe883d8dfdfabe9b2feb95e7',1,'bque::attr'],['../externs_8h.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c'],['../nametabs_8c.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c'],['../typedefs_8h.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c']]],
-  ['attr_5fname_5fhtab_16',['attr_name_htab',['../structstatedata.html#a578405538e4b5d5d3c06ea6973981c84',1,'statedata']]],
-  ['attr_5fnext_17',['attr_next',['../structstatedata.html#aa6899e5ef1506623018880fdffd6e123',1,'statedata']]],
-  ['attraccess_5fnametab_18',['attraccess_nametab',['../externs_8h.html#a4422723a22c04348b7497036003a836d',1,'attraccess_nametab:&#160;nametabs.c'],['../nametabs_8c.html#a4422723a22c04348b7497036003a836d',1,'attraccess_nametab:&#160;nametabs.c']]],
-  ['attrnum_19',['attrnum',['../structudb__attrib.html#a80708cd429e42e3d56548fe72db2d89e',1,'udb_attrib']]],
-  ['autozone_20',['autozone',['../structconfdata.html#ae5a19adf5735d88cb7a354120db359bd',1,'confdata']]]
+  ['anum_5falc_5ftop_11',['anum_alc_top',['../db_8c.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c'],['../externs_8h.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c']]],
+  ['api_5ffunc_5fhtab_12',['api_func_htab',['../structstatedata.html#aedd679c12558b213e5974b5c8cadbec6',1,'statedata']]],
+  ['atr_13',['atr',['../structufun.html#a6e04b5de22e850759f43c17565803c35',1,'ufun']]],
+  ['attr_14',['attr',['../structbque.html#ac5dcedaafe883d8dfdfabe9b2feb95e7',1,'bque::attr'],['../externs_8h.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c'],['../nametabs_8c.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c'],['../typedefs_8h.html#ad6463e4c7ca986a493bd2bfc18fdd086',1,'attr:&#160;nametabs.c']]],
+  ['attr_5fname_5fhtab_15',['attr_name_htab',['../structstatedata.html#a578405538e4b5d5d3c06ea6973981c84',1,'statedata']]],
+  ['attr_5fnext_16',['attr_next',['../structstatedata.html#aa6899e5ef1506623018880fdffd6e123',1,'statedata']]],
+  ['attraccess_5fnametab_17',['attraccess_nametab',['../externs_8h.html#a4422723a22c04348b7497036003a836d',1,'attraccess_nametab:&#160;nametabs.c'],['../nametabs_8c.html#a4422723a22c04348b7497036003a836d',1,'attraccess_nametab:&#160;nametabs.c']]],
+  ['attrnum_18',['attrnum',['../structudb__attrib.html#a80708cd429e42e3d56548fe72db2d89e',1,'udb_attrib']]],
+  ['autozone_19',['autozone',['../structconfdata.html#ae5a19adf5735d88cb7a354120db359bd',1,'confdata']]]
 ];
