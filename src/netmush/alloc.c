@@ -2,8 +2,7 @@
  * @file alloc.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief memory management subsystem
- * @version 3.3
- * @date 2020-11-14
+ * @version 4.0
  *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,

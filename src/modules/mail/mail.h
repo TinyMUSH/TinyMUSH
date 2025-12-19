@@ -2,8 +2,7 @@
  * @file mail.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Module for penn-based mailer system
- * @version 3.1
- * @date 2020-12-28
+ * @version 4.0
  *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,

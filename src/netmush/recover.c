@@ -3,8 +3,7 @@
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Tool to traverse a corrupted GDBM database, look for special
  *        tags, and rebuild a consistent database.
- * @version 3.3
- * @date 2021-01-04
+ * @version 4.0
  *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,

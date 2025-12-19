@@ -2,8 +2,7 @@
  * @file db_sql_pgsql.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Module for pgSQL interface
- * @version 3.3
- * @date 2020-12-28
+ * @version 4.0
  * 
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,

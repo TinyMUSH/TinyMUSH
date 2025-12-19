@@ -2,8 +2,7 @@
  * @file netcommon.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Routines used by the networking code that do not depend on the implementation
- * @version 3.3
- * @date 2021-01-04
+ * @version 4.0
  *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,

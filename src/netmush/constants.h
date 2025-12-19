@@ -2,8 +2,7 @@
  * @file constants.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Constants used by the engine.
- * @version 3.3
- * @date 2021-01-10
+ * @version 4.0
  *
  * @copyright Copyright (C) 1989-2021 TinyMUSH development team.
  *            You may distribute under the terms the Artistic License,
