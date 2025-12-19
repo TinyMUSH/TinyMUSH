@@ -864,6 +864,15 @@ int search_setup(dbref player, char *searchfor, SEARCH *parm)
 	}
 
 	/*
+	 * When searching without a specific type, show all owners
+	 * (like we do for player searches), not just owned objects
+	 */
+	if ((parm->s_rst_type == NOTYPE) && (parm->s_rst_owner == player))
+	{
+		parm->s_rst_owner = ANY_OWNER;
+	}
+
+	/*
 	 * Make sure player is authorized to do the search
 	 */
 
