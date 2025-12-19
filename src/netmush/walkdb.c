@@ -1140,225 +1140,172 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	rcount = ecount = tcount = pcount = gcount = 0;
 
 	/*
-	 * room search
+	 * Single pass through all objects, categorizing by type
 	 */
-	if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
+	int room_flag = 1, exit_flag = 1, thing_flag = 1, garbage_flag = 1, player_flag = 1;
+	bp = outbuf;
+	for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 	{
-		flag = 1;
-		bp = outbuf;
-
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
+		switch (Typeof(thing))
 		{
-			if (Typeof(thing) != TYPE_ROOM)
+		case TYPE_ROOM:
+			if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
 			{
-				continue;
+				if (room_flag)
+				{
+					room_flag = 0;
+					destitute = 0;
+					notify(player, "\nROOMS:");
+				}
+
+				buff = unparse_object(player, thing, 0);
+				XSAFELBSTR(buff, outbuf, &bp);
+				XSAFELBCHR('\n', outbuf, &bp);
+				XFREE(buff);
+				if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+				{
+					flush_lines(player, outbuf, &bp);
+				}
+				rcount++;
 			}
+			break;
 
-			if (flag)
+		case TYPE_EXIT:
+			if (searchparm.s_rst_type == TYPE_EXIT || searchparm.s_rst_type == NOTYPE)
 			{
-				flag = 0;
-				destitute = 0;
-				notify(player, "\nROOMS:");
-			}
+				if (exit_flag)
+				{
+					exit_flag = 0;
+					destitute = 0;
+					notify(player, "\nEXITS:");
+				}
 
-			buff = unparse_object(player, thing, 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
-			XFREE(buff);
-			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
-			{
-				flush_lines(player, outbuf, &bp);
-			}
-			rcount++;
-		}
-		flush_lines(player, outbuf, &bp);
-	}
+				from = Exits(thing);
+				to = Location(thing);
 
-	/*
-	 * exit search
-	 */
-	if (searchparm.s_rst_type == TYPE_EXIT || searchparm.s_rst_type == NOTYPE)
-	{
-		flag = 1;
-		bp = outbuf;
-
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
-		{
-			if (Typeof(thing) != TYPE_EXIT)
-			{
-				continue;
-			}
-
-			if (flag)
-			{
-				flag = 0;
-				destitute = 0;
-				notify(player, "\nEXITS:");
-			}
-
-			from = Exits(thing);
-			to = Location(thing);
-
-			buff = unparse_object(player, thing, 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-			XSAFELBSTR((char *)" [from ", outbuf, &bp);
-			if (from == NOTHING)
-			{
-				XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
-			}
-			else
-			{
-				buff = unparse_object(player, from, 0);
+				buff = unparse_object(player, thing, 0);
 				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
+				XSAFELBSTR((char *)" [from ", outbuf, &bp);
+				if (from == NOTHING)
+				{
+					XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
+				}
+				else
+				{
+					buff = unparse_object(player, from, 0);
+					XSAFELBSTR(buff, outbuf, &bp);
+					XFREE(buff);
+				}
+				XSAFELBSTR((char *)" to ", outbuf, &bp);
+				if (to == NOTHING)
+				{
+					XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
+				}
+				else
+				{
+					buff = unparse_object(player, to, 0);
+					XSAFELBSTR(buff, outbuf, &bp);
+					XFREE(buff);
+				}
+				XSAFELBCHR(']', outbuf, &bp);
+				XSAFELBCHR('\n', outbuf, &bp);
+				if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+				{
+					flush_lines(player, outbuf, &bp);
+				}
+				ecount++;
 			}
-			XSAFELBSTR((char *)" to ", outbuf, &bp);
-			if (to == NOTHING)
+			break;
+
+		case TYPE_THING:
+			if (searchparm.s_rst_type == TYPE_THING || searchparm.s_rst_type == NOTYPE)
 			{
-				XSAFELBSTR((char *)"NOWHERE", outbuf, &bp);
-			}
-			else
-			{
-				buff = unparse_object(player, to, 0);
+				if (thing_flag)
+				{
+					thing_flag = 0;
+					destitute = 0;
+					notify(player, "\nOBJECTS:");
+				}
+
+				buff = unparse_object(player, thing, 0);
 				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
-			}
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
-			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
-			{
-				flush_lines(player, outbuf, &bp);
-			}
-			ecount++;
-		}
-		flush_lines(player, outbuf, &bp);
-	}
-
-	/*
-	 * object search
-	 */
-	if (searchparm.s_rst_type == TYPE_THING || searchparm.s_rst_type == NOTYPE)
-	{
-		flag = 1;
-		bp = outbuf;
-
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
-		{
-			if (Typeof(thing) != TYPE_THING)
-			{
-				continue;
-			}
-
-			if (flag)
-			{
-				flag = 0;
-				destitute = 0;
-				notify(player, "\nOBJECTS:");
-			}
-
-			buff = unparse_object(player, thing, 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-			XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
-			buff = unparse_object(player, Owner(thing), 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
-			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
-			{
-				flush_lines(player, outbuf, &bp);
-			}
-			tcount++;
-		}
-		flush_lines(player, outbuf, &bp);
-	}
-
-	/*
-	 * garbage search
-	 */
-	if (searchparm.s_rst_type == TYPE_GARBAGE || searchparm.s_rst_type == NOTYPE)
-	{
-		flag = 1;
-		bp = outbuf;
-
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
-		{
-			if (Typeof(thing) != TYPE_GARBAGE)
-			{
-				continue;
-			}
-
-			if (flag)
-			{
-				flag = 0;
-				destitute = 0;
-				notify(player, "\nGARBAGE:");
-			}
-
-			buff = unparse_object(player, thing, 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-			XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
-			buff = unparse_object(player, Owner(thing), 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
-			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
-			{
-				flush_lines(player, outbuf, &bp);
-			}
-			gcount++;
-		}
-		flush_lines(player, outbuf, &bp);
-	}
-
-	/*
-	 * player search
-	 */
-	if (searchparm.s_rst_type == TYPE_PLAYER || searchparm.s_rst_type == NOTYPE)
-	{
-		flag = 1;
-		bp = outbuf;
-
-		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
-		{
-			if (Typeof(thing) != TYPE_PLAYER)
-			{
-				continue;
-			}
-
-			if (flag)
-			{
-				flag = 0;
-				destitute = 0;
-				notify(player, "\nPLAYERS:");
-			}
-
-			buff = unparse_object(player, thing, 0);
-			XSAFELBSTR(buff, outbuf, &bp);
-			XFREE(buff);
-
-			if (searchparm.s_wizard)
-			{
-				XSAFELBSTR((char *)" [location: ", outbuf, &bp);
-				buff = unparse_object(player, Location(thing), 0);
+				XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
+				buff = unparse_object(player, Owner(thing), 0);
 				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
 				XSAFELBCHR(']', outbuf, &bp);
+				XSAFELBCHR('\n', outbuf, &bp);
+				if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+				{
+					flush_lines(player, outbuf, &bp);
+				}
+				tcount++;
 			}
+			break;
 
-			XSAFELBCHR('\n', outbuf, &bp);
-			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+		case TYPE_GARBAGE:
+			if (searchparm.s_rst_type == TYPE_GARBAGE || searchparm.s_rst_type == NOTYPE)
 			{
-				flush_lines(player, outbuf, &bp);
+				if (garbage_flag)
+				{
+					garbage_flag = 0;
+					destitute = 0;
+					notify(player, "\nGARBAGE:");
+				}
+
+				buff = unparse_object(player, thing, 0);
+				XSAFELBSTR(buff, outbuf, &bp);
+				XFREE(buff);
+				XSAFELBSTR((char *)" [owner: ", outbuf, &bp);
+				buff = unparse_object(player, Owner(thing), 0);
+				XSAFELBSTR(buff, outbuf, &bp);
+				XFREE(buff);
+				XSAFELBCHR(']', outbuf, &bp);
+				XSAFELBCHR('\n', outbuf, &bp);
+				if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+				{
+					flush_lines(player, outbuf, &bp);
+				}
+				gcount++;
 			}
-			pcount++;
+			break;
+
+		case TYPE_PLAYER:
+			if (searchparm.s_rst_type == TYPE_PLAYER || searchparm.s_rst_type == NOTYPE)
+			{
+				if (player_flag)
+				{
+					player_flag = 0;
+					destitute = 0;
+					notify(player, "\nPLAYERS:");
+				}
+
+				buff = unparse_object(player, thing, 0);
+				XSAFELBSTR(buff, outbuf, &bp);
+				XFREE(buff);
+
+				if (searchparm.s_wizard)
+				{
+					XSAFELBSTR((char *)" [location: ", outbuf, &bp);
+					buff = unparse_object(player, Location(thing), 0);
+					XSAFELBSTR(buff, outbuf, &bp);
+					XFREE(buff);
+					XSAFELBCHR(']', outbuf, &bp);
+				}
+
+				XSAFELBCHR('\n', outbuf, &bp);
+				if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
+				{
+					flush_lines(player, outbuf, &bp);
+				}
+				pcount++;
+			}
+			break;
 		}
-		flush_lines(player, outbuf, &bp);
 	}
+	flush_lines(player, outbuf, &bp);
 
 	/*
 	 * if nothing found matching search criteria
