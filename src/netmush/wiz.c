@@ -442,7 +442,9 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 {
 	dbref victim;
 	char *pname, *vname;
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 	struct crypt_data cdata;
+#endif
 	char *crypt_result;
 
 	if ((victim = lookup_player(player, name, 0)) == NOTHING)
@@ -483,8 +485,12 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	/*
 	 * it's ok, do it
 	 */
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 	cdata.initialized = 0;
 	crypt_result = crypt_r((const char *)password, "XX", &cdata);
+#else
+	crypt_result = crypt((const char *)password, "XX");
+#endif
 	if (!crypt_result)
 	{
 		notify_quiet(player, "Password encryption failed.");
