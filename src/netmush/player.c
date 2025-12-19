@@ -196,9 +196,13 @@ int check_pass(dbref player, const char *password)
     char *target;
     target = atr_get(player, A_PASS, &aowner, &aflags, &alen);
 
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
     struct crypt_data cdata;
     cdata.initialized = 0;
     if (*target && strcmp(target, password) && strcmp(crypt_r(password, "XX", &cdata), target))
+#else
+    if (*target && strcmp(target, password) && strcmp(crypt(password, "XX"), target))
+#endif
     {
         XFREE(target);
         return 0;
@@ -330,9 +334,13 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
         }
     }
 
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
     struct crypt_data cdata;
     cdata.initialized = 0;
     s_Pass(player, crypt_r(pbuf, "XX", &cdata));
+#else
+    s_Pass(player, crypt(pbuf, "XX"));
+#endif
     s_Home(player, (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
     XFREE(pbuf);
     return player;
@@ -361,9 +369,13 @@ void do_password(dbref player, dbref cause __attribute__((unused)), int key __at
     }
     else
     {
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
         struct crypt_data cdata;
         cdata.initialized = 0;
         atr_add_raw(player, A_PASS, crypt_r(newpass, "XX", &cdata));
+#else
+        atr_add_raw(player, A_PASS, crypt(newpass, "XX"));
+#endif
         notify(player, "Password changed.");
     }
 

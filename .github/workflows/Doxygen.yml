@@ -7,6 +7,10 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+    paths:
+      - 'src/**'
+      - '.github/Doxyfile'
+      - '.github/workflows/Doxygen.yml'
   pull_request:
     branches: [ master ]
 
@@ -39,3 +43,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./code_docs
+          publish_branch: gh-pages
