@@ -44,12 +44,12 @@ char *unparse_object_quiet(dbref loc)
 }
 
 /**
- * @brief
+ * @brief Convert a BOOLEXP tree into a printable string with the requested formatting
  *
- * @param player
- * @param b
- * @param outer_type
- * @param format
+ * @param player Player requesting the render (used for formatting decisions)
+ * @param b Boolean expression tree to render
+ * @param outer_type Parent node type to control parentheses insertion
+ * @param format Output format selector (quiet/examine/decompile/function)
  */
 void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, char *boolexp_buf, char **buftop)
 {
@@ -241,13 +241,13 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 }
 
 /**
- * @brief
+ * @brief Render a boolean expression in quiet form (no *UNLOCKED* marker)
  *
  * External
  *
- * @param player
- * @param b
- * @return char*
+ * @param player Player requesting the render
+ * @param b Boolean expression tree to render
+ * @return char* Newly allocated buffer containing the rendered expression
  */
 char *unparse_boolexp_quiet(dbref player, BOOLEXP *b)
 {
@@ -262,13 +262,13 @@ char *unparse_boolexp_quiet(dbref player, BOOLEXP *b)
 }
 
 /**
- * @brief
+ * @brief Render a boolean expression for examine output (includes *UNLOCKED* handling)
  *
  * External
  *
- * @param player
- * @param b
- * @return char*
+ * @param player Player requesting the render
+ * @param b Boolean expression tree to render
+ * @return char* Newly allocated buffer containing the rendered expression
  */
 char *unparse_boolexp(dbref player, BOOLEXP *b)
 {
@@ -283,13 +283,13 @@ char *unparse_boolexp(dbref player, BOOLEXP *b)
 }
 
 /**
- * @brief
+ * @brief Render a boolean expression in decompile form suitable for @decompile/@lock
  *
  * External
  *
- * @param player
- * @param b
- * @return char*
+ * @param player Player requesting the render
+ * @param b Boolean expression tree to render
+ * @return char* Newly allocated buffer containing the rendered expression
  */
 char *unparse_boolexp_decompile(dbref player, BOOLEXP *b)
 {
@@ -304,13 +304,13 @@ char *unparse_boolexp_decompile(dbref player, BOOLEXP *b)
 }
 
 /**
- * @brief
+ * @brief Render a boolean expression for function return strings
  *
  * External
  *
- * @param player
- * @param b
- * @return char*
+ * @param player Player requesting the render
+ * @param b Boolean expression tree to render
+ * @return char* Newly allocated buffer containing the rendered expression
  */
 char *unparse_boolexp_function(dbref player, BOOLEXP *b)
 {

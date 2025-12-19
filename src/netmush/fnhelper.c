@@ -643,11 +643,11 @@ int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief
- *
+ * @brief Translate a boolean-like argument (numeric or string) into a boolean value
+
  * @param arg Boolean true/false check.
- * @return true
- * @return false
+ * @return true when the argument resolves to logical true
+ * @return false when the argument resolves to logical false
  */
 bool xlate(char *arg)
 {

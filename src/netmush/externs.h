@@ -128,7 +128,7 @@ extern int cs_size;      /*!<  total cache size */
 extern UDB_CHAIN *sys_c; /*!<  sys_c points to all cache lists */
 
 /**
- * @brief
+ * @brief Color lookup tables for ANSI, xterm, and CSS name mappings
  *
  */
 

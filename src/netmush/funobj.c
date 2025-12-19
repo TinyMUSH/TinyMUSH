@@ -3981,17 +3981,17 @@ void fun_lastcreate(char *buff, char **bufc, dbref player, dbref caller __attrib
  */
 
 /**
- * @brief
+ * @brief Transform spoken text via u-functions and emit formatted speech/pose output
  *
  * @param speaker DBref of speaker
  * @param sname Speaker's name
  * @param str Text being said
  * @param key Say or pose key
- * @param say_str Say string
- * @param trans_str Transform string
- * @param empty_str Buffer String
- * @param open_sep Open Separator
- * @param close_sep Close Separator
+ * @param say_str Default say string
+ * @param trans_str Transform u-function name (optional)
+ * @param empty_str Fallback text when transform returns empty
+ * @param open_sep Opening delimiter for transform chunks
+ * @param close_sep Closing delimiter for transform chunks
  * @param player DBref of player
  * @param caller DBref of caller
  * @param cause DBref of cause
