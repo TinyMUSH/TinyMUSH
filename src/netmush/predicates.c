@@ -1246,6 +1246,11 @@ void do_listcommands(dbref player, __attribute__((unused)) dbref cause, __attrib
 			notify(player, "Error: Command enumeration exceeded maximum iterations.");
 		}
 	}
+
+	if (!didit)
+	{
+		notify(player, "No added commands found in command table.");
+	}
 }
 
 void do_delcommand(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name, char *command)
