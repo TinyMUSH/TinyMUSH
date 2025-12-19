@@ -1137,7 +1137,6 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 
 	outbuf = XMALLOC(LBUF_SIZE, "outbuf");
-	bp = outbuf;  /* Initialize bp only once, not per section */
 	rcount = ecount = tcount = pcount = gcount = 0;
 
 	/*
@@ -1146,6 +1145,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_ROOM || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1180,6 +1180,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_EXIT || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1240,6 +1241,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_THING || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1279,6 +1281,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_GARBAGE || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
@@ -1318,6 +1321,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	if (searchparm.s_rst_type == TYPE_PLAYER || searchparm.s_rst_type == NOTYPE)
 	{
 		flag = 1;
+		bp = outbuf;
 
 		for (thing = olist_first(); thing != NOTHING; thing = olist_next())
 		{
