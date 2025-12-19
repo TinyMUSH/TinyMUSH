@@ -122,18 +122,11 @@ extern int cs_rhits;     /*!<  total reads filled from cache */
 extern int cs_ahits;     /*!<  total reads filled active cache */
 extern int cs_whits;     /*!<  total writes to dirty cache */
 extern int cs_fails;     /*!<  attempts to grab nonexistent */
-extern int cs_resets;    /*!<  total cache resets */
 extern int cs_syncs;     /*!<  total cache syncs */
 extern int cs_size;      /*!<  total cache size */
 extern UDB_CHAIN *sys_c; /*!<  sys_c points to all cache lists */
 
 /**
- * @brief Color lookup tables for ANSI, xterm, and CSS name mappings
- *
  */
-
-extern COLORINFO ansiColor[];
-extern COLORINFO xtermColor[];
-extern COLORINFO cssColors[];
 
 #endif /* __EXTERNS_H */
