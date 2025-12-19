@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['enable_5fnames_0',['enable_names',['../nametabs_8c.html#af3480ac72af9fa6a1498fb381273fcf5',1,'enable_names():&#160;nametabs.c'],['../externs_8h.html#af3480ac72af9fa6a1498fb381273fcf5',1,'enable_names():&#160;nametabs.c']]],
+  ['enable_5fnames_0',['enable_names',['../externs_8h.html#af3480ac72af9fa6a1498fb381273fcf5',1,'enable_names:&#160;nametabs.c'],['../nametabs_8c.html#af3480ac72af9fa6a1498fb381273fcf5',1,'enable_names:&#160;nametabs.c']]],
   ['env_1',['env',['../structbque.html#a09dc88062758e0a744ef3609b41b5ec0',1,'bque']]],
   ['epoch_2',['epoch',['../structstatedata.html#a63f48b403683efb72d874bf42bafb842',1,'statedata']]],
   ['events_5fcounter_3',['events_counter',['../structstatedata.html#a4958337922e56d1337534997c72bbd8c',1,'statedata']]],
@@ -14,6 +14,6 @@ var searchData=
   ['exit_5fparent_11',['exit_parent',['../structconfdata.html#ad64b870a5ef5cf9153f271b29eaee558',1,'confdata']]],
   ['exit_5fproto_12',['exit_proto',['../structconfdata.html#a0cf365e7083112a339cdff62d9492159',1,'confdata']]],
   ['exit_5fquota_13',['exit_quota',['../structconfdata.html#ae7d9d5dfe7faf70fda5641fc4974551a',1,'confdata']]],
-  ['exits_14',['exits',['../structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655',1,'object::exits()'],['../structdump__object.html#af394e0c8133d0beca77a243bb1283b69',1,'dump_object::exits()']]],
+  ['exits_14',['exits',['../structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655',1,'object::exits'],['../structdump__object.html#af394e0c8133d0beca77a243bb1283b69',1,'dump_object::exits']]],
   ['extra_15',['extra',['../structconfparm.html#ad8ecc1ede68994b0b24ce55f3276b960',1,'confparm']]]
 ];

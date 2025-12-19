@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['n_5fansi_5fnormal_0',['N_ANSI_NORMAL',['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL():&#160;constants.h'],['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL():&#160;constants.h']]],
+  ['n_5fansi_5fnormal_0',['N_ANSI_NORMAL',['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL:&#160;constants.h'],['../constants_8h.html#af2014dada9d5077942daaa89280964b0',1,'N_ANSI_NORMAL:&#160;constants.h']]],
   ['namefn_5ffullname_1',['NAMEFN_FULLNAME',['../constants_8h.html#ab1545f9351328f00c9ca5693258ba0f1',1,'constants.h']]],
   ['nearby_5for_5fcontrol_2',['nearby_or_control',['../macros_8h.html#a113d77f75d650927c07b0ccddd96f2f9',1,'macros.h']]],
   ['nfy_5fdrain_3',['NFY_DRAIN',['../constants_8h.html#a36ff247b5ce21d06c2aadb531c87048c',1,'constants.h']]],

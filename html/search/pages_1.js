@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bug_20list_0',['Bug List',['../bug.html',1,'']]]
+  ['4_200_20credits_0',['TinyMUSH 4.0 Credits',['../md_AUTHORS.html',1,'']]],
+  ['4_200_20news_1',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]]
 ];

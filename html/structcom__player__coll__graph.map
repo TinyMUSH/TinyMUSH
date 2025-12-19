@@ -1,3 +1,4 @@
 <map id="com_player" name="com_player">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,93,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="109,12,119,18,111,24,93,26,93,20,109,19,114,18,107,17"/>
 </map>

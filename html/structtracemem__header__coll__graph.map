@@ -1,3 +1,4 @@
 <map id="tracemem_header" name="tracemem_header">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,132,31"/>
+<area shape="rect" id="Node000001" title="Memory tracking header structure." alt="" coords="5,5,131,31"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="147,12,157,18,132,25,131,20,152,18,145,17"/>
 </map>

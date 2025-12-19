@@ -1,4 +1,6 @@
 <map id="_help_indx_list" name="_help_indx_list">
-<area shape="rect" id="node1" title=" " alt="" coords="5,93,112,119"/>
-<area shape="rect" id="node2" href="$structhelp__indx.html" title="Help related typedefs." alt="" coords="21,5,97,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,112,120"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="129,98,138,107,130,115,113,118,112,112,128,110,133,107,126,103"/>
+<area shape="rect" id="Node000002" href="$structhelp__indx.html" title="Help related typedefs." alt="" coords="21,5,96,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,47,61,94,56,94,56,47"/>
 </map>

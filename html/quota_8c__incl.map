@@ -1,19 +1,41 @@
-<map id="netmush/quota.c" name="netmush/quota.c">
-<area shape="rect" id="node1" title="Quota management commands." alt="" coords="329,5,448,31"/>
-<area shape="rect" id="node2" title=" " alt="" coords="86,79,153,104"/>
-<area shape="rect" id="node3" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="177,79,267,104"/>
-<area shape="rect" id="node5" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="265,152,347,177"/>
-<area shape="rect" id="node12" href="$macros_8h.html" title="Macro definitions." alt="" coords="459,79,534,104"/>
-<area shape="rect" id="node13" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="558,79,633,104"/>
-<area shape="rect" id="node14" href="$prototypes_8h_source.html" title=" " alt="" coords="343,79,435,104"/>
-<area shape="rect" id="node17" title=" " alt="" coords="657,79,721,104"/>
-<area shape="rect" id="node4" title=" " alt="" coords="134,152,190,177"/>
-<area shape="rect" id="node6" title=" " alt="" coords="90,225,154,251"/>
-<area shape="rect" id="node7" title=" " alt="" coords="5,225,65,251"/>
-<area shape="rect" id="node8" title=" " alt="" coords="178,225,253,251"/>
-<area shape="rect" id="node9" title=" " alt="" coords="277,225,335,251"/>
-<area shape="rect" id="node10" title=" " alt="" coords="359,225,440,251"/>
-<area shape="rect" id="node11" title=" " alt="" coords="465,225,550,251"/>
-<area shape="rect" id="node15" title=" " alt="" coords="476,152,539,177"/>
-<area shape="rect" id="node16" title=" " alt="" coords="563,152,631,177"/>
+<map id="src/netmush/quota.c" name="src/netmush/quota.c">
+<area shape="rect" id="Node000001" title="Quota management commands." alt="" coords="367,5,506,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="85,79,150,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="379,34,166,81,165,76,378,29"/>
+<area shape="rect" id="Node000003" href="$constants_8h.html" title="Constants used by the engine." alt="" coords="175,79,263,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="400,34,271,76,270,71,399,29"/>
+<area shape="rect" id="Node000005" href="$typedefs_8h.html" title="Type definitions for variables." alt="" coords="262,153,342,178"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="399,34,361,53,343,65,328,81,313,109,306,138,301,137,308,107,324,77,339,61,358,48,396,29"/>
+<area shape="rect" id="Node000012" href="$macros_8h.html" title="Macro definitions." alt="" coords="452,79,527,105"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="447,30,474,65,469,68,443,33"/>
+<area shape="rect" id="Node000013" href="$externs_8h.html" title="Prototypes for externs not defined elsewhere." alt="" coords="550,79,624,105"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="463,29,549,70,546,74,461,34"/>
+<area shape="rect" id="Node000014" href="$prototypes_8h_source.html" title=" " alt="" coords="337,79,429,105"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="430,33,403,68,399,65,425,30"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="647,79,711,105"/>
+<area shape="poly" id="edge20_Node000001_Node000017" title=" " alt="" coords="478,29,633,74,632,80,477,34"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="734,79,797,105"/>
+<area shape="poly" id="edge21_Node000001_Node000018" title=" " alt="" coords="500,29,720,76,719,81,499,34"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="131,153,187,178"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="211,107,181,142,177,139,207,103"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="89,226,152,252"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="272,181,166,223,165,218,270,176"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,226,65,252"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="262,180,81,228,79,223,260,175"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="176,226,249,252"/>
+<area shape="poly" id="edge7_Node000005_Node000008" title=" " alt="" coords="288,181,241,219,238,214,285,177"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="274,226,330,252"/>
+<area shape="poly" id="edge8_Node000005_Node000009" title=" " alt="" coords="304,179,304,211,299,211,299,179"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="354,226,434,252"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="319,177,368,215,365,219,316,181"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="458,226,542,252"/>
+<area shape="poly" id="edge10_Node000005_Node000011" title=" " alt="" coords="336,176,453,218,451,223,334,181"/>
+<area shape="poly" id="edge19_Node000014_Node000005" title=" " alt="" coords="371,107,328,144,325,140,367,103"/>
+<area shape="poly" id="edge16_Node000014_Node000007" title=" " alt="" coords="356,108,251,155,200,181,80,226,78,221,198,176,249,150,354,103"/>
+<area shape="poly" id="edge18_Node000014_Node000010" title=" " alt="" coords="387,105,394,211,389,211,381,105"/>
+<area shape="poly" id="edge17_Node000014_Node000011" title=" " alt="" coords="395,103,483,212,479,216,391,107"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="469,153,532,178"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="404,103,469,142,466,147,402,107"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="556,153,623,178"/>
+<area shape="poly" id="edge15_Node000014_Node000016" title=" " alt="" coords="419,103,542,145,540,150,417,108"/>
 </map>

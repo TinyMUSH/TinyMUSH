@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['tinymush_204_2e0_20credits_0',['TinyMUSH 4.0 Credits',['../md_AUTHORS.html',1,'']]],
-  ['tinymush_204_2e0_20news_1',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]],
-  ['todo_20list_2',['Todo List',['../todo.html',1,'']]]
+  ['in_20the_20future_20center_0',['IN THE FUTURE center',['../md_CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]],
+  ['installation_20instructions_1',['Installation Instructions',['../md_INSTALL.html',1,'']]],
+  ['instructions_2',['Installation Instructions',['../md_INSTALL.html',1,'']]],
+  ['is_20outdated_20and_20will_20be_20updated_20in_20the_20future_20center_3',['IS OUTDATED AND WILL BE UPDATED IN THE FUTURE center',['../md_CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]]
 ];

@@ -1,5 +1,7 @@
 <map id="search_type" name="search_type">
-<area shape="rect" id="node1" title="Search structure, used by @search and search()." alt="" coords="35,93,127,119"/>
-<area shape="rect" id="node2" href="$structflagset.html" title=" " alt="" coords="5,5,65,31"/>
-<area shape="rect" id="node3" href="$structpowerset.html" title=" " alt="" coords="90,5,165,31"/>
+<area shape="rect" id="Node000001" title="Search structure, used by @search and search()." alt="" coords="35,94,126,120"/>
+<area shape="rect" id="Node000002" href="$structflagset.html" title=" " alt="" coords="5,5,65,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="48,44,60,69,74,93,70,95,55,71,43,47"/>
+<area shape="rect" id="Node000003" href="$structpowerset.html" title=" " alt="" coords="88,5,163,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,46,89,95,84,92,110,44"/>
 </map>

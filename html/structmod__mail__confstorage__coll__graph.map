@@ -1,4 +1,5 @@
 <map id="mod_mail_confstorage" name="mod_mail_confstorage">
-<area shape="rect" id="node1" title=" " alt="" coords="5,93,159,119"/>
-<area shape="rect" id="node2" href="$structmail__entry.html" title=" " alt="" coords="41,5,123,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,158,120"/>
+<area shape="rect" id="Node000002" href="$structmail__entry.html" title=" " alt="" coords="41,5,122,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,47,84,94,79,94,79,47"/>
 </map>

@@ -1,6 +1,10 @@
 <map id="mod_hashes" name="mod_hashes">
-<area shape="rect" id="node1" title=" " alt="" coords="5,284,101,309"/>
-<area shape="rect" id="node2" href="$structhashtable.html" title=" " alt="" coords="14,196,93,221"/>
-<area shape="rect" id="node3" href="$structhashentry.html" title=" " alt="" coords="14,93,93,119"/>
-<area shape="rect" id="node4" href="$unionHASHKEY.html" title="htab related typedefs" alt="" coords="10,5,97,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,286,101,312"/>
+<area shape="rect" id="Node000002" href="$structhashtable.html" title=" " alt="" coords="14,198,92,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,239,56,286,50,286,50,239"/>
+<area shape="rect" id="Node000003" href="$structhashentry.html" title=" " alt="" coords="14,94,92,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="56,135,56,197,50,197,50,135"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="109,98,118,107,110,115,92,118,92,112,108,111,113,107,105,102"/>
+<area shape="rect" id="Node000004" href="$unionHASHKEY.html" title="htab related typedefs" alt="" coords="10,5,96,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="56,47,56,94,50,94,50,47"/>
 </map>

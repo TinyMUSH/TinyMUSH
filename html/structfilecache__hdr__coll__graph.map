@@ -1,5 +1,8 @@
 <map id="filecache_hdr" name="filecache_hdr">
-<area shape="rect" id="node1" title=" " alt="" coords="5,101,104,126"/>
-<area shape="rect" id="node2" href="$structfilecache__block.html" title=" " alt="" coords="105,5,215,31"/>
-<area shape="rect" id="node3" href="$structfilecache__block_1_1filecache__block__hdr.html" title=" " alt="" coords="128,93,296,133"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,102,103,127"/>
+<area shape="rect" id="Node000002" href="$structfilecache__block.html" title=" " alt="" coords="104,5,214,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,41,98,57,77,80,63,103,58,100,73,77,94,53,117,37"/>
+<area shape="rect" id="Node000003" href="$structfilecache__block_1_1filecache__block__hdr.html" title=" " alt="" coords="126,94,294,135"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="155,46,158,69,178,92,174,95,153,71,150,47"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="192,82,178,56,164,33,169,30,183,54,196,79"/>
 </map>

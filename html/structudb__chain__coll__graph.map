@@ -1,4 +1,6 @@
 <map id="udb_chain" name="udb_chain">
-<area shape="rect" id="node1" title=" " alt="" coords="7,127,89,152"/>
-<area shape="rect" id="node2" href="$structudb__cache.html" title=" " alt="" coords="5,15,91,40"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="7,128,88,154"/>
+<area shape="rect" id="Node000002" href="$structudb__cache.html" title=" " alt="" coords="5,15,90,41"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,56,50,128,45,128,45,56"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="107,16,113,21,116,28,108,39,91,42,90,37,105,34,111,27,109,24,104,21"/>
 </map>

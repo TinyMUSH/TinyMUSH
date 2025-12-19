@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wait_5fque_0',['wait_que',['../cque_8c.html#ade685b238a4a9145c479e5f8b6c5af5c',1,'cque.c']]]
+  ['validate_5flist_5fargs_0',['validate_list_args',['../funlist_8c.html#ac58586c2f7a343dcc079d3c06e3c771d',1,'funlist.c']]]
 ];

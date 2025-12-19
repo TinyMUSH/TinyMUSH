@@ -1,3 +1,4 @@
 <map id="boolexp" name="boolexp">
-<area shape="rect" id="node1" title=" " alt="" coords="5,7,72,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,8,71,33"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="88,14,97,20,88,27,71,28,71,22,87,22,92,20,85,19"/>
 </map>

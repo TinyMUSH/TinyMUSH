@@ -1,5 +1,7 @@
 <map id="VT100ATTR" name="VT100ATTR">
-<area shape="rect" id="node1" title=" " alt="" coords="11,196,106,221"/>
-<area shape="rect" id="node2" href="$structVT100COLOR.html" title=" " alt="" coords="5,93,112,119"/>
-<area shape="rect" id="node3" href="$structrgbColor.html" title=" " alt="" coords="23,5,94,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="11,198,105,223"/>
+<area shape="rect" id="Node000002" href="$structVT100COLOR.html" title=" " alt="" coords="5,94,111,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,135,61,197,55,197,55,135"/>
+<area shape="rect" id="Node000003" href="$structrgbColor.html" title=" " alt="" coords="23,5,93,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="61,47,61,94,55,94,55,47"/>
 </map>

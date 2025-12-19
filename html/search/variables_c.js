@@ -1,21 +1,21 @@
 var searchData=
 [
   ['n_5finstances_0',['n_instances',['../structstructure__def.html#a6cef95c3b613d433ece134b829f84805',1,'structure_def']]],
-  ['name_1',['name',['../structattr.html#a8635bc65695a57f506841c92e6666dfe',1,'attr::name()'],['../structfun.html#a96761b329fb9cbf9c686e7324c8fc490',1,'fun::name()'],['../structufun.html#a71febc1d2cae7b40ab5b61e13cdb3fbc',1,'ufun::name()'],['../structname__table.html#a7dac8144b1280f4bb667264c1e8a0aaa',1,'name_table::name()'],['../structuser__attribute.html#a019f6921dc5202bf13f904e5289aac58',1,'user_attribute::name()']]],
+  ['name_1',['name',['../structattr.html#a8635bc65695a57f506841c92e6666dfe',1,'attr::name'],['../structfun.html#a96761b329fb9cbf9c686e7324c8fc490',1,'fun::name'],['../structufun.html#a71febc1d2cae7b40ab5b61e13cdb3fbc',1,'ufun::name'],['../structname__table.html#a7dac8144b1280f4bb667264c1e8a0aaa',1,'name_table::name'],['../structuser__attribute.html#a019f6921dc5202bf13f904e5289aac58',1,'user_attribute::name']]],
   ['name_5flength_2',['name_length',['../structobject.html#ad7236619381ae73a01447b00723b9bd2',1,'object']]],
   ['name_5fspaces_3',['name_spaces',['../structconfdata.html#a578f21bfe1a57b7929dedd18cec8c862',1,'confdata']]],
-  ['names_4',['names',['../externs_8h.html#a331efbce3968c9f128ca29634765ca7b',1,'names():&#160;help.txt'],['../db_8c.html#a331efbce3968c9f128ca29634765ca7b',1,'names():&#160;db.c']]],
+  ['names_4',['names',['../db_8c.html#a331efbce3968c9f128ca29634765ca7b',1,'names:&#160;db.c'],['../externs_8h.html#a331efbce3968c9f128ca29634765ca7b',1,'names:&#160;help.txt']]],
   ['names_5fbase_5',['names_base',['../structstructure__def.html#ad44ba7fe7ce2e76ad3f97ee65ade5ee6',1,'structure_def']]],
-  ['nargs_6',['nargs',['../structbque.html#a0cea904812e606563c4a86cc1d6ce91d',1,'bque::nargs()'],['../structfun.html#ad8a2cca5feca9ed695221325e7ed29b9',1,'fun::nargs()']]],
-  ['ndescriptors_7',['ndescriptors',['../db_8c.html#a27cbb02a148f2ff205ef8a2dd80d1417',1,'ndescriptors():&#160;bsd.c'],['../bsd_8c.html#a27cbb02a148f2ff205ef8a2dd80d1417',1,'ndescriptors():&#160;bsd.c']]],
+  ['nargs_6',['nargs',['../structbque.html#a0cea904812e606563c4a86cc1d6ce91d',1,'bque::nargs'],['../structfun.html#ad8a2cca5feca9ed695221325e7ed29b9',1,'fun::nargs']]],
+  ['ndescriptors_7',['ndescriptors',['../bsd_8c.html#a27cbb02a148f2ff205ef8a2dd80d1417',1,'ndescriptors:&#160;bsd.c'],['../db_8c.html#a27cbb02a148f2ff205ef8a2dd80d1417',1,'ndescriptors:&#160;bsd.c']]],
   ['need_5ftypecheck_8',['need_typecheck',['../structstructure__def.html#a51641bcde8ed626fd1e79bb285a556cf',1,'structure_def']]],
-  ['next_9',['next',['../structufun.html#a8db1a23bbd8bf61050669980d7ece5fc',1,'ufun::next()'],['../structsite__data.html#a45a89493f410fa4361436c5abe809f1c',1,'site_data::next()'],['../structobjlist__stack.html#a520317f0e8f33a5bf89c9980cad59ac7',1,'objlist_stack::next()'],['../structdump__object.html#a38c202fe06b7a4a84bea93778da2ba31',1,'dump_object::next()'],['../structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d',1,'object::next()'],['../structbque.html#a4173e2e169c391e6a6d3f0f61df0426b',1,'bque::next()']]],
+  ['next_9',['next',['../structbque.html#a4173e2e169c391e6a6d3f0f61df0426b',1,'bque::next'],['../structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d',1,'object::next'],['../structdump__object.html#a38c202fe06b7a4a84bea93778da2ba31',1,'dump_object::next'],['../structufun.html#a8db1a23bbd8bf61050669980d7ece5fc',1,'ufun::next'],['../structsite__data.html#a45a89493f410fa4361436c5abe809f1c',1,'site_data::next'],['../structobjlist__stack.html#a520317f0e8f33a5bf89c9980cad59ac7',1,'objlist_stack::next']]],
   ['no_5fambiguous_5fmatch_10',['no_ambiguous_match',['../structconfdata.html#a66edb41ac89774fe756ba4c4212e6594',1,'confdata']]],
   ['now_11',['now',['../structstatedata.html#ac7ce05696823ea31fa4dec5b665637da',1,'statedata']]],
   ['nref_5fhtab_12',['nref_htab',['../structstatedata.html#a0dd607f5e54d32ad878c71c8cb046c24',1,'statedata']]],
   ['ntfy_5fnest_5flev_13',['ntfy_nest_lev',['../structstatedata.html#a19d7285b552f5524e621cc3bb6c3ea5f',1,'statedata']]],
   ['ntfy_5fnest_5flim_14',['ntfy_nest_lim',['../structconfdata.html#a1f3676fe21d0ad6406eb228ddb1a607e',1,'confdata']]],
-  ['number_15',['number',['../structattr.html#a1ba0edecc96e93720d58582d0fcd3f93',1,'attr::number()'],['../structuser__attribute.html#acb01fd03dc7e77f7e4110e3c754b77b8',1,'user_attribute::number()']]],
+  ['number_15',['number',['../structattr.html#a1ba0edecc96e93720d58582d0fcd3f93',1,'attr::number'],['../structuser__attribute.html#acb01fd03dc7e77f7e4110e3c754b77b8',1,'user_attribute::number']]],
   ['number_5fguests_16',['number_guests',['../structconfdata.html#aba706de9c432e60a6e1d8dee1878efbb',1,'confdata']]],
   ['numvars_5flim_17',['numvars_lim',['../structconfdata.html#a9487bd3380c4d4ddfa83cf829ad49cda',1,'confdata']]]
 ];

@@ -7,7 +7,7 @@ var searchData=
   ['terse_5fexits_4',['terse_exits',['../structconfdata.html#aa30928ec1f152663b7d7c10f633cab0b',1,'confdata']]],
   ['terse_5flook_5',['terse_look',['../structconfdata.html#aec427ca644bb7a62c8b0a7027e51b0e0',1,'confdata']]],
   ['terse_5fmovemsg_6',['terse_movemsg',['../structconfdata.html#a798fff870dd95f057e83fd6726f76e41',1,'confdata']]],
-  ['text_7',['text',['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text()'],['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text()']]],
+  ['text_7',['text',['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text'],['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text']]],
   ['thing_8',['thing',['../structboolexp.html#af446a5cf9b5614a1cee63ad57352fa7d',1,'boolexp']]],
   ['thing_5fdefobj_9',['thing_defobj',['../structconfdata.html#a21a9699fa587c334a38c47c575fc4cae',1,'confdata']]],
   ['thing_5fflags_10',['thing_flags',['../structconfdata.html#ac754f405b4d7a18bdd2e6fedd87c7db3',1,'confdata']]],

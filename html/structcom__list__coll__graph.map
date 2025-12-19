@@ -1,7 +1,14 @@
 <map id="com_list" name="com_list">
-<area shape="rect" id="node1" title=" " alt="" coords="90,303,161,328"/>
-<area shape="rect" id="node2" href="$structcom__alias.html" title=" " alt="" coords="85,215,166,240"/>
-<area shape="rect" id="node3" href="$structcom__channel.html" title=" " alt="" coords="76,127,175,152"/>
-<area shape="rect" id="node4" href="$structcom__player.html" title=" " alt="" coords="5,7,93,33"/>
-<area shape="rect" id="node5" href="$structboolexp.html" title=" " alt="" coords="169,7,236,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="88,306,159,331"/>
+<area shape="poly" id="edge7_Node000001_Node000001" title=" " alt="" coords="176,310,185,318,177,327,160,329,159,324,175,322,180,319,173,314"/>
+<area shape="rect" id="Node000002" href="$structcom__alias.html" title=" " alt="" coords="84,217,164,243"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,258,126,305,121,305,121,258"/>
+<area shape="rect" id="Node000003" href="$structcom__channel.html" title=" " alt="" coords="74,128,173,154"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="126,170,126,217,121,217,121,170"/>
+<area shape="rect" id="Node000004" href="$structcom__player.html" title=" " alt="" coords="5,8,93,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="58,47,68,75,83,103,107,126,103,130,79,106,63,78,53,49"/>
+<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="110,9,116,13,119,21,111,31,94,34,93,29,109,26,114,20,112,17,107,14"/>
+<area shape="rect" id="Node000005" href="$structboolexp.html" title=" " alt="" coords="168,8,234,33"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="194,49,181,77,163,106,141,130,137,126,159,103,176,74,189,46"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="250,8,257,13,260,21,252,32,235,34,234,29,249,27,255,20,253,16,248,13"/>
 </map>

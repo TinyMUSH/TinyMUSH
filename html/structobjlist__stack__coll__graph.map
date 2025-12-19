@@ -1,4 +1,7 @@
 <map id="objlist_stack" name="objlist_stack">
-<area shape="rect" id="node1" title=" " alt="" coords="5,123,100,148"/>
-<area shape="rect" id="node2" href="$structobjlist__block.html" title=" " alt="" coords="5,5,100,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,124,100,150"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="117,126,123,130,126,137,118,147,101,151,100,145,116,142,121,136,119,134,114,131"/>
+<area shape="rect" id="Node000002" href="$structobjlist__block.html" title=" " alt="" coords="6,5,99,31"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="55,47,55,123,50,123,50,47"/>
+<area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="115,7,123,11,126,19,118,28,100,32,99,27,115,24,121,18,119,15,113,12"/>
 </map>

@@ -1,6 +1,11 @@
 <map id="confdata" name="confdata">
-<area shape="rect" id="node1" title=" " alt="" coords="204,169,276,195"/>
-<area shape="rect" id="node2" href="$structkey__linked__list.html" title=" " alt="" coords="5,8,112,33"/>
-<area shape="rect" id="node3" href="$structstr__linked__list.html" title=" " alt="" coords="189,8,291,33"/>
-<area shape="rect" id="node4" href="$structflagset.html" title=" " alt="" coords="367,8,427,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="202,172,273,197"/>
+<area shape="rect" id="Node000002" href="$structkey__linked__list.html" title=" " alt="" coords="5,8,112,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,46,107,96,128,122,153,146,177,160,202,171,200,175,174,165,150,150,125,126,102,99,70,49"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="104,3,127,7,135,12,138,21,134,31,122,37,89,37,89,32,120,32,130,28,133,21,131,16,125,11,104,8"/>
+<area shape="rect" id="Node000003" href="$structstr__linked__list.html" title=" " alt="" coords="186,8,288,34"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="240,50,240,171,234,171,234,50"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="282,3,304,7,312,12,314,21,310,31,298,37,267,37,267,32,297,32,306,28,309,21,307,16,302,12,281,8"/>
+<area shape="rect" id="Node000004" href="$structflagset.html" title=" " alt="" coords="364,8,423,34"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="384,49,356,99,336,126,314,150,294,163,274,174,271,169,292,159,310,146,332,122,352,96,379,47"/>
 </map>

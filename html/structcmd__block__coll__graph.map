@@ -1,4 +1,6 @@
 <map id="cmd_block" name="cmd_block">
-<area shape="rect" id="node1" title=" " alt="" coords="18,5,103,31"/>
-<area shape="rect" id="node2" href="$structcmd__block__hdr.html" title="Interface related typedefs." alt="" coords="5,93,116,119"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,5,102,31"/>
+<area shape="rect" id="Node000002" href="$structcmd__block__hdr.html" title="Interface related typedefs." alt="" coords="5,94,115,120"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="42,45,37,56,36,65,39,75,50,92,46,95,34,77,31,66,32,54,37,43"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,78,57,31,63,31,63,78"/>
 </map>
