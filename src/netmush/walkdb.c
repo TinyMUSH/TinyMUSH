@@ -1198,7 +1198,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 
 			from = Exits(thing);
 			to = Location(thing);
-			bp = outbuf;
+
 			buff = unparse_object(player, thing, 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
@@ -1257,7 +1257,6 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				notify(player, "\nOBJECTS:");
 			}
 
-			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
@@ -1298,7 +1297,6 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				notify(player, "\nGARBAGE:");
 			}
 
-			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
@@ -1339,7 +1337,6 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				notify(player, "\nPLAYERS:");
 			}
 
-			bp = outbuf;
 			buff = unparse_object(player, thing, 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);

@@ -2,31 +2,38 @@
 """
 TinyMUSH command smoke tester.
 
-- Connects over telnet and runs a list of commands.
+- Connects over telnet, reads a config file listing commands to run and the expected output substring.
 - Reads credentials from environment to avoid hard-coding secrets.
-- Skips obviously destructive commands by default; adjust the lists below if needed.
+- Skips intentionally disconnecting commands unless explicitly allowed.
 
 Env vars:
-  TINY_HOST   (default: 127.0.0.1)
-  TINY_PORT   (default: 6250)
-  TINY_USER   (required)
-  TINY_PASS   (required)
-  TINY_TIMEOUT (optional, seconds, default: 3)
+    TINY_HOST   (default: 127.0.0.1)
+    TINY_PORT   (default: 6250)
+    TINY_USER   (required)
+    TINY_PASS   (required)
+    TINY_TIMEOUT (optional, seconds, default: 5)
+    TINY_COMMANDS_FILE (optional, path to config file; default: scripts/test_commands.conf)
 
 Usage:
-  python3 scripts/test_commands.py
+    python3 scripts/test_commands.py --config scripts/test_commands.conf
+
+Config file format:
+    - One command per line.
+    - Optional expected substring after a pipe ("|").
+        Example:  say hello world | You say
+    - Blank lines and lines starting with "#" are ignored.
 
 Notes:
-- The default command set is conservative. Add/remove commands in SAFE_COMMANDS / DANGEROUS_COMMANDS.
-- Outputs are printed to stdout and annotated with "OK"/"ERR" based on whether the server replied anything.
-- If you really want to exercise dangerous commands, move them from DANGEROUS_COMMANDS into SAFE_COMMANDS at your own risk.
+- If no expected substring is provided, any non-empty output is considered OK.
+- Use --allow-disconnect to run commands that terminate the session (quit/logout/etc.).
 """
 
+import argparse
 import os
 import sys
 import time
 import telnetlib
-from typing import List, Set
+from typing import List, Tuple
 
 HOST = os.getenv("TINY_HOST", "127.0.0.1")
 PORT = int(os.getenv("TINY_PORT", "6250"))
@@ -34,193 +41,9 @@ PORT = int(os.getenv("TINY_PORT", "6250"))
 USER = os.getenv("TINY_USER", "#1")
 PASS = os.getenv("TINY_PASS", "potrzebi")
 TIMEOUT = float(os.getenv("TINY_TIMEOUT", "5"))
+DEFAULT_CONFIG = os.getenv("TINY_COMMANDS_FILE", "scripts/test_commands.conf")
 
-# Full command list to exercise. Commands without arguments are sent as-is; those
-# that are obviously destructive are skipped unless explicitly requested.
-RAW_COMMANDS: List[str] = [
-    "@@",
-    "@addcommand",
-    "@admin",
-    "@alias",
-    "@apply_marked",
-    "@attribute",
-    "@boot",
-    "@chown",
-    "@chownall",
-    "@chzone",
-    "@clone",
-    "@colormap",
-    "@cpattr",
-    "@create",
-    "@cron",
-    "@crondel",
-    "@crontab",
-    "@cut",
-    "@dbck",
-    "@backup",
-    "@decompile",
-    "@delcommand",
-    "@destroy",
-    "@dig",
-    "@disable",
-    "@doing",
-    "@dolist",
-    "@drain",
-    "@dump",
-    "@edit",
-    "@emit",
-    "@enable",
-    "@end",
-    "@entrances",
-    "@eval",
-    "@femit",
-    "@fixdb",
-    "@floaters",
-    "@force",
-    "@fpose",
-    "@fsay",
-    "@freelist",
-    "@function",
-    "@halt",
-    "@hashresize",
-    "@hook",
-    "@include",
-    "@kick",
-    "@last",
-    "@link",
-    "@list",
-    "@listcommands",
-    "@list_file",
-    "@listmotd",
-    "@lock",
-    "@log",
-    "@logrotate",
-    "@mark",
-    "@mark_all",
-    "@motd",
-    "@mvattr",
-    "@name",
-    "@newpassword",
-    "@notify",
-    "@oemit",
-    "@open",
-    "@parent",
-    "@password",
-    "@pcreate",
-    "@pemit",
-    "@npemit",
-    "@poor",
-    "@power",
-    "@program",
-    "@ps",
-    "@quota",
-    "@quitprogram",
-    "@readcache",
-    "@redirect",
-    "@reference",
-    "@restart",
-    "@robot",
-    "@search",
-    "@set",
-    "@stats",
-    "@startslave",
-    "@sweep",
-    "@switch",
-    "@teleport",
-    "@timecheck",
-    "@timewarp",
-    "@toad",
-    "@trigger",
-    "@unlink",
-    "@unlock",
-    "@verb",
-    "@wait",
-    "@wall",
-    "@wipe",
-    "drop",
-    "enter",
-    "examine",
-    "get",
-    "give",
-    "goto",
-    "internalgoto",
-    "inventory",
-    "kill",
-    "leave",
-    "look",
-    "page",
-    "pose",
-    "reply",
-    "say",
-    "score",
-    "slay",
-    "think",
-    "use",
-    "version",
-    "whisper",
-    "doing",
-    "who",
-    "session",
-    "info",
-    "outputprefix",
-    "outputsuffix",
-    "puebloclient",
-    "DOING",
-    "OUTPUTPREFIX",
-    "OUTPUTSUFFIX",
-    "SESSION",
-    "WHO",
-    "PUEBLOCLIENT",
-    "INFO",
-]
-
-DANGEROUS: Set[str] = {
-    "@dump",
-    "@dbck",
-    "@restart",
-    "@backup",
-    "@destroy",
-    "@toad",
-    "@boot",
-    "@teleport",
-    "@link",
-    "@chown",
-    "@chownall",
-    "@chzone",
-    "@power",
-    "@quota",
-    "@timewarp",
-    "@wait",
-    "@force",
-    "@switch",
-    "@trigger",
-    "@program",
-    "@pcreate",
-    "@dig",
-    "@open",
-    "@lock",
-    "@unlock",
-    "@wipe",
-    "@mark",
-    "@mark_all",
-    "@search",
-    "@set",
-    "@verb",
-    "@include",
-    "@cron",
-    "@crondel",
-    "@crontab",
-    "@apply_marked",
-    "@startslave",
-    "@redirect",
-    "@robot",
-    "@poor",
-    "@wait",
-}
-
-# Commands that intentionally close the session; skipped from the main loop so
-# the remaining tests can continue. Run manually if needed.
-DISCONNECTING: Set[str] = {
+DISCONNECTING = {
     "quit",
     "logout",
     "QUIT",
@@ -229,58 +52,44 @@ DISCONNECTING: Set[str] = {
     "@shutdown",
 }
 
-# Commands that need explicit arguments to produce output. Keys are the lowercase
-# base command; values are the full command line to send.
-ARGUMENT_OVERRIDES = {
-    "say": "say [test] scripted",
-    "think": "think [test] scripted",
-    "pose": "pose strikes a testing pose",
-    "look": "look here",
-    "drop": "drop here",
-    "enter": "enter here",
-    "examine": "examine here",
-    "get": "get here",
-    "give": "give #1=0",
-    "goto": "goto here",
-    "@emit": "@emit [test] scripted emit",
-    "@pemit": "@pemit #1=[test] scripted pemit",
-    "@npemit": "@npemit #1=[test] scripted npemit",
-    "@oemit": "@oemit #1=[test] scripted oemit",
-    "@fsay": "@fsay [test] scripted fsay",
-    "@fpose": "@fpose [test] scripted fpose",
-    "@list": "@list functions",
-    "@list_file": "@list_file motd",
-    "@listmotd": "@listmotd/brief",
-    "@motd": "@motd show",
-    "@log": "@log dump",
-    "@mark": "@mark set",
-    "@mark_all": "@mark_all",
-    "@last": "@last #1",
-    "@set": "@set here=SAFE",
-    "@lock": "@lock here=me",
-    "@unlock": "@unlock here",
-    "@link": "@link here=here",
-    "@open": "@open __test_exit=here",
-    "@dig": "@dig __test_room",
-    "@create": "@create __test_thing",
-    "@teleport": "@teleport me=here",
-    "@name": "@name here=TestRoom",
-    "@chown": "@chown here=#1",
-    "@quota": "@quota",
-    "@stats": "@stats",
-    "@timecheck": "@timecheck",
-    "@timewarp": "@timewarp 0",
-    "@poor": "@poor here=0",
-    "@notify": "@notify here=[test] notify",
-    "page": "page #1=[test] scripted page",
-    "whisper": "whisper #1=[test] scripted whisper",
-}
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="TinyMUSH telnet smoke tester")
+    parser.add_argument("--config", default=DEFAULT_CONFIG, help="Path to the commands config file")
+    parser.add_argument("--allow-disconnect", action="store_true", help="Run commands that may close the session")
+    return parser.parse_args()
 
 
 def ensure_creds() -> None:
     if not USER or not PASS:
         sys.stderr.write("Missing TINY_USER and/or TINY_PASS environment variables.\n")
         sys.exit(1)
+
+
+def load_commands(path: str) -> List[Tuple[str, str]]:
+    commands: List[Tuple[str, str]] = []
+
+    if not os.path.exists(path):
+        sys.stderr.write(f"Config file not found: {path}\n")
+        sys.exit(1)
+
+    with open(path, "r", encoding="utf-8") as cfg:
+        for raw_line in cfg:
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+
+            if "|" in line:
+                cmd, expected = line.split("|", 1)
+                commands.append((cmd.strip(), expected.strip()))
+            else:
+                commands.append((line, ""))
+
+    if not commands:
+        sys.stderr.write("No commands found in config file.\n")
+        sys.exit(1)
+
+    return commands
 
 
 def read_some(tn: telnetlib.Telnet, timeout: float) -> str:
@@ -313,10 +122,12 @@ def send_cmd(tn: telnetlib.Telnet, cmd: str, timeout: float) -> str:
 
 
 def main() -> None:
-    include_dangerous = "--include-dangerous" in sys.argv or os.getenv("TINY_INCLUDE_DANGEROUS") == "1"
+    args = parse_args()
+    commands_with_expectations = load_commands(args.config)
 
     ensure_creds()
     print(f"Connecting to {HOST}:{PORT} as {USER}…", flush=True)
+    print(f"Using config: {args.config}")
 
     tn = telnetlib.Telnet(HOST, PORT, timeout=TIMEOUT)
     welcome = read_some(tn, TIMEOUT)
@@ -327,29 +138,28 @@ def main() -> None:
     print("[login]\n" + login_resp.strip())
 
     commands = []
-    for cmd in RAW_COMMANDS:
+    skipped_disconnect = []
+    for cmd, expected in commands_with_expectations:
         base = cmd.split()[0].lower()
-        if base in DISCONNECTING:
+        if (base in DISCONNECTING) and not args.allow_disconnect:
+            skipped_disconnect.append(cmd)
             continue
-        if (base in DANGEROUS) and not include_dangerous:
-            continue
-        override = ARGUMENT_OVERRIDES.get(base)
-        commands.append(override if override else cmd)
+        commands.append((cmd, expected))
 
-    if not include_dangerous:
-        skipped = [c for c in RAW_COMMANDS if c.split()[0].lower() in DANGEROUS]
-        print(f"Skipping {len(skipped)} dangerous commands (use --include-dangerous or TINY_INCLUDE_DANGEROUS=1 to run them)")
-
-    skipped_disconnect = [c for c in RAW_COMMANDS if c.split()[0].lower() in DISCONNECTING]
     if skipped_disconnect:
-        print(f"Skipping {len(skipped_disconnect)} disconnecting commands: {', '.join(skipped_disconnect)}")
+        print(f"Skipping {len(skipped_disconnect)} disconnecting commands (enable with --allow-disconnect): {', '.join(skipped_disconnect)}")
 
     results = []
-    for cmd in commands:
+    for cmd, expected in commands:
         resp = send_cmd(tn, cmd, TIMEOUT)
-        status = "OK" if resp.strip() else "ERR"
+
+        if expected:
+            status = "OK" if expected in resp else "ERR"
+        else:
+            status = "OK" if resp.strip() else "ERR"
+
         print(f"[{status}] {cmd}\n{resp.strip()}\n")
-        results.append((cmd, status, resp))
+        results.append((cmd, expected, status, resp))
 
     # Graceful logout if possible
     try:
@@ -359,17 +169,18 @@ def main() -> None:
     tn.close()
 
     # Summary
-    ok = sum(1 for _, status, _ in results if status == "OK")
-    failures = [(cmd, resp) for (cmd, status, resp) in results if status != "OK"]
+    ok = sum(1 for *_, status, __ in results if status == "OK")
+    failures = [(cmd, expected, resp) for (cmd, expected, status, resp) in results if status != "OK"]
     err = len(failures)
-    print(f"Summary: {ok} OK, {err} failed (empty response) out of {len(results)} commands")
+    print(f"Summary: {ok} OK, {err} failed out of {len(results)} commands")
 
     if failures:
         print("Failures:")
-        for cmd, resp in failures:
+        for cmd, expected, resp in failures:
             trimmed = resp.strip()
             preview = trimmed.splitlines()[0] if trimmed else "<no output>"
-            print(f" - {cmd}: {preview}")
+            expectation = f" (expected contains: '{expected}')" if expected else ""
+            print(f" - {cmd}: {preview}{expectation}")
 
     # Exit with non-zero status if any command failed
     if err:
