@@ -2,48 +2,25 @@
 
 ## Critical Bugs
 
-### sandbox() function - SIGSEGV crash (Critical)
+### sandbox() function - SIGSEGV crash (Resolved)
 
-**Status:** Unresolved  
-**Affected Version:** 4.0 alpha Revision 244  
-**Severity:** Critical - causes server crash
+**Status:** Fixed (December 19, 2025)  
+**Affected Version:** 4.0 alpha Revision 244 (pre-fix)  
+**Severity:** Critical - caused server crash
 
-**Description:**  
-The `sandbox()` function (an advanced version of `ucall()` with execution limits and register control) causes a segmentation fault (SIGSEGV) when called.
+**Issue:**  
+`sandbox()` (implemented via `handle_ucall()` in `src/netmush/funvars.c`) could crash due to:
+- Out-of-bounds access to `fargs[5]` when only 5 arguments were present.  
+- Dereferencing a null `preserve` pointer when no registers were saved.
 
-**Root Cause:**  
-In `src/netmush/funvars.c`, function `handle_ucall()` line ~1141:
-```c
-eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, 
-                      (Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3]), 
-                      nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3));
-```
+**Fix implemented:**
+- Compute `extra_args` and pass `NULL` to `eval_expression_string()` when there are no extra args, avoiding `fargs[5]` OOB access.  
+- Guard register restore/free loops with `if (preserve)` to avoid null dereference when no registers exist.
 
-When `sandbox()` is called with exactly 5 arguments (the minimum), `fargs` contains indices 0-4. The code attempts to access `&(fargs[5])` which is out of bounds, causing undefined behavior and typically a crash.
-
-**Reproduction:**
-```
-&TEST me=[add(1,2)]
-think sandbox(me,,@_,@_,TEST)
-# Server crashes with SIGSEGV
-```
-
-**Workaround:**  
-Do not use `sandbox()`. Use `localize()`, `private()`, or `nofx()` for register/effect control, and regular `u()` for function calls.
-
-**Suggested Fix:**  
-Check if extra arguments exist before passing pointer:
-```c
-int extra_args = nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3);
-eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, 
-                      (extra_args > 0) ? ((Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3])) : NULL, 
-                      extra_args);
-```
-
-However, this requires declaring `extra_args` variable at the top of the function (C89 compatibility).
+**Notes:** Regression tests for `sandbox()` remain commented out pending broader runtime validation, but the SIGSEGV root causes are addressed in code.
 
 ---
 
 ## Test Suite Status
 
-Regression tests for `sandbox()` are commented out in `scripts/functions_execution_control.conf` due to this bug.
+Regression tests for `sandbox()` are commented out in `scripts/functions_execution_control.conf` pending end-to-end validation.

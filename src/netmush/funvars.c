@@ -875,7 +875,7 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
     ATTR *ap = NULL;
     GDATA *preserve = NULL, *tmp = NULL;
     char *atext = NULL, *str = NULL, *callp = NULL, *call_list = NULL, *cbuf = NULL, **cregs = NULL;
-    int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0;
+    int aflags = 0, alen = 0, anum = 0, trace_flag = 0, i = 0, ncregs = 0, lmask = 0, save_state = 0, extra_args = 0;
 
     /*
      * Three arguments to ucall(), five to sandbox()
@@ -1138,7 +1138,10 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Evaluate it using the rest of the passed function args
      */
     str = atext;
-    eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str, (Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3]), nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3));
+    extra_args = nfargs - ((Is_Func(UCALL_SANDBOX)) ? 5 : 3);
+    eval_expression_string(buff, bufc, obj, player, cause, EV_FCHECK | EV_EVAL, &str,
+                          (extra_args > 0) ? ((Is_Func(UCALL_SANDBOX)) ? &(fargs[5]) : &(fargs[3])) : NULL,
+                          extra_args);
     XFREE(atext);
 
     /*
@@ -1311,29 +1314,33 @@ void handle_ucall(char *buff, char **bufc, dbref player, dbref caller __attribut
             ncregs = list2arr(&cregs, LBUF_SIZE / 2, call_list, &SPACE_DELIM);
         }
 
-        char cbuf[2];
-        for (i = 0; i < preserve->q_alloc; i++)
+        if (preserve)
         {
-            if (preserve->q_regs[i] && *(preserve->q_regs[i]))
+            char cbuf[2];
+            for (i = 0; i < preserve->q_alloc; i++)
             {
-                cbuf[0] = qidx_str(i);
-                cbuf[1] = '\0';
-
-                if (!call_list || !is_in_array(cbuf, cregs, ncregs))
-                    set_register("fun_ucall", cbuf, preserve->q_regs[i]);
-            }
-        }
-
-        for (i = 0; i < preserve->xr_alloc; i++)
-        {
-            if (preserve->x_names[i] && *(preserve->x_names[i]) && preserve->x_regs[i] && *(preserve->x_regs[i]))
-            {
-                if (!call_list || !is_in_array(preserve->x_names[i], cregs, ncregs))
+                if (preserve->q_regs[i] && *(preserve->q_regs[i]))
                 {
-                    set_register("fun_ucall", preserve->x_names[i], preserve->x_regs[i]);
+                    cbuf[0] = qidx_str(i);
+                    cbuf[1] = '\0';
+
+                    if (!call_list || !is_in_array(cbuf, cregs, ncregs))
+                        set_register("fun_ucall", cbuf, preserve->q_regs[i]);
+                }
+            }
+
+            for (i = 0; i < preserve->xr_alloc; i++)
+            {
+                if (preserve->x_names[i] && *(preserve->x_names[i]) && preserve->x_regs[i] && *(preserve->x_regs[i]))
+                {
+                    if (!call_list || !is_in_array(preserve->x_names[i], cregs, ncregs))
+                    {
+                        set_register("fun_ucall", preserve->x_names[i], preserve->x_regs[i]);
+                    }
                 }
             }
         }
+
 
         if (call_list != NULL)
         {
