@@ -28,7 +28,13 @@ jobs:
         cd $GITHUB_WORKSPACE/game
         pwd
         ls -la
+        
+        # Initialize minimal database
+        echo "Initializing minimal database..."
+        ./netmush -m -c configs/netmush.conf
+        
         # Start server in background
+        echo "Starting server..."
         gtimeout 30 ./netmush -c configs/netmush.conf -p netmush.pid &
         SERVER_PID=$!
         
@@ -42,6 +48,7 @@ jobs:
         done
         
         # Try to connect and shutdown
+        echo "Connecting and shutting down..."
         (echo "connect wizard potrzebie"; sleep 1; echo "@shutdown"; sleep 1) | nc localhost 2860 || true
         
         # Wait for graceful shutdown
