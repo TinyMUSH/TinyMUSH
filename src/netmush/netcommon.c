@@ -951,6 +951,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 	 */
 	if (mushconf.have_zones && ((zone = Zone(loc)) != NOTHING) && Good_obj(zone))
 	{
+		dbref zone_contents = NOTHING;
 		switch (Typeof(zone))
 		{
 		case TYPE_THING:
@@ -969,7 +970,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 			 * check every object in the room for a (dis)connect
 			 * * action
 			 */
-			dbref zone_contents = Contents(zone);
+			zone_contents = Contents(zone);
 
 			if (!Good_obj(zone_contents))
 			{

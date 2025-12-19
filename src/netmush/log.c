@@ -124,7 +124,7 @@ int start_log(const char *primary, const char *secondary, int key)
                 last_key = key;
                 log_fp = NULL;
 
-                if (logfds_table != NULL)
+                if (logfds_table[0].log_flag > 0)
                 {
                     for (lp = logfds_table; lp->log_flag; lp++)
                     {
@@ -615,7 +615,7 @@ void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __a
      * Any additional special ones
      */
 
-    if (logfds_table != NULL)
+    if (logfds_table[0].log_flag > 0)
     {
         for (lp = logfds_table; lp->log_flag; lp++)
         {
@@ -672,7 +672,7 @@ void logfile_close(void)
     {
         fprintf(stderr, "Error: Failed to generate timestamp for log closure, skipping file archiving\n");
         /* Still close files even if we can't archive them */
-        if (logfds_table != NULL)
+        if (logfds_table[0].log_flag > 0)
         {
             for (lp = logfds_table; lp->log_flag; lp++)
             {
@@ -691,7 +691,7 @@ void logfile_close(void)
         return;
     }
 
-    if (logfds_table != NULL)
+    if (logfds_table[0].log_flag > 0)
     {
         for (lp = logfds_table; lp->log_flag; lp++)
         {

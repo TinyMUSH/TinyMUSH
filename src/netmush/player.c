@@ -22,7 +22,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 #include <crypt.h>
+#endif
 
 /* ---------------------------------------------------------------------------
  * decrypt_logindata, encrypt_logindata: Decode and encode login info.

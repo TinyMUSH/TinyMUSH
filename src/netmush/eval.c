@@ -1524,7 +1524,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 				while (**dstr && (**dstr != '>'))
 				{
-				XSAFESBCHR(tolower(**dstr), xtbuf, &xtp);
+					XSAFESBCHR(tolower(**dstr), xtbuf, &xtp);
 					(*dstr)++;
 				}
 
@@ -1875,7 +1875,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (eval & EV_FMAND)
 				{
 					*bufc = oldp;
-				XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
+					XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
 				}
 
 				eval &= ~EV_FCHECK;
@@ -2140,20 +2140,22 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			}
 			else
 			{
-			XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
-		}
+				XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) EXPECTS %d ARGUMENTS BUT GOT %d", fp->name, fp->nargs, nfargs);
+			}
 
-		/**
-		 * Return the space allocated for the arguments
-				{
-					XFREE(fargs[i]);
-				}
+			/**
+			 * Return the space allocated for the arguments
+			 */
+			for (i = 0; i < nfargs; i++)
+			{
+				XFREE(fargs[i]);
+			}
 
 			eval &= ~EV_FCHECK;
 			break;
 
 		case '#':
-			/**
+			/*
 			 * We should never reach this point unless we're in a loop or
 			 * switch, thanks to the table lookup.
 			 *

@@ -772,26 +772,14 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	va_list ap;
 	va_start(ap, format);
 
-	if ((!format || !(*format)) || !ap)
+	if (!format || !(*format))
 	{
-		/*
-		 * @todo: Check if ap is NULL
-		 */
-		if ((tbuff = va_arg(ap, char *)) != NULL)
-		{
-			XSTRNCPY(msg, tbuff, LBUF_SIZE);
-		}
-		else
-		{
-			XFREE(msg);
-			return;
-		}
-	}
-	else
-	{
-		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
+		XFREE(msg);
+		va_end(ap);
+		return;
 	}
 
+	XVSNPRINTF(msg, LBUF_SIZE, format, ap);
 	va_end(ap);
 
 	/*
