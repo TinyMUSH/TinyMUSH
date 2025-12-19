@@ -199,6 +199,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a342a3517e85b22bc13ce01d775aae8aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain delimiter.  <br /></td></tr>
 <tr class="separator:a342a3517e85b22bc13ce01d775aae8aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab584c77bfaca2c2fae5675b95ff38c05" id="r_ab584c77bfaca2c2fae5675b95ff38c05"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab584c77bfaca2c2fae5675b95ff38c05">xlate</a> (char *arg)</td></tr>
+<tr class="memdesc:ab584c77bfaca2c2fae5675b95ff38c05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translate a boolean-like argument (numeric or string) into a boolean value.  <br /></td></tr>
 <tr class="separator:ab584c77bfaca2c2fae5675b95ff38c05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a267e7aa622804ac5c0b8dd3800baea85" id="r_a267e7aa622804ac5c0b8dd3800baea85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a267e7aa622804ac5c0b8dd3800baea85">do_reverse</a> (char *from, char *to)</td></tr>
 <tr class="memdesc:a267e7aa622804ac5c0b8dd3800baea85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used by fun_reverse and fun_revwords to reverse things.  <br /></td></tr>
@@ -948,15 +949,17 @@ PCG Random Number Generation for C, Copyright 2014 Melissa O'Neill <a href="#" o
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Translate a boolean-like argument (numeric or string) into a boolean value. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">arg</td><td>Boolean true/false check. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>true </dd>
+<dl class="section return"><dt>Returns</dt><dd>true when the argument resolves to logical true </dd>
 <dd>
-false </dd></dl>
+false when the argument resolves to logical false </dd></dl>
 <p>Case of '#-1 &lt;string&gt;'</p>
 
 </div>

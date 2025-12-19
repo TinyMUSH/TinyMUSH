@@ -353,6 +353,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a5727aed241bb5bf9e8f19772484a1868"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the last object of type Y that X created.  <br /></td></tr>
 <tr class="separator:a5727aed241bb5bf9e8f19772484a1868"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6283b2ec79e202fc1ee8c579bb9b584" id="r_ae6283b2ec79e202fc1ee8c579bb9b584"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6283b2ec79e202fc1ee8c579bb9b584">transform_say</a> (dbref speaker, char *sname, char *str, int key, char *say_str, char *trans_str, char *empty_str, const <a class="el" href="structdelim.html">Delim</a> *open_sep, const <a class="el" href="structdelim.html">Delim</a> *close_sep, dbref player, dbref caller, dbref cause, char *buff, char **bufc)</td></tr>
+<tr class="memdesc:ae6283b2ec79e202fc1ee8c579bb9b584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform spoken text via u-functions and emit formatted speech/pose output.  <br /></td></tr>
 <tr class="separator:ae6283b2ec79e202fc1ee8c579bb9b584"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a527224c2b64ca7e4060e7c3c9ef749a6" id="r_a527224c2b64ca7e4060e7c3c9ef749a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a527224c2b64ca7e4060e7c3c9ef749a6">fun_speak</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="memdesc:a527224c2b64ca7e4060e7c3c9ef749a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is used to format speech-like constructs, and is capable of transforming text within a speech string; it is useful for implementing "language code" and the like.  <br /></td></tr>
@@ -5165,17 +5166,19 @@ string&gt; &amp;&lt;name string&gt; (speaker defaults to player) &lt;thing strin
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Transform spoken text via u-functions and emit formatted speech/pose output. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">speaker</td><td>DBref of speaker </td></tr>
     <tr><td class="paramname">sname</td><td>Speaker's name </td></tr>
     <tr><td class="paramname">str</td><td>Text being said </td></tr>
     <tr><td class="paramname">key</td><td>Say or pose key </td></tr>
-    <tr><td class="paramname">say_str</td><td>Say string </td></tr>
-    <tr><td class="paramname">trans_str</td><td>Transform string </td></tr>
-    <tr><td class="paramname">empty_str</td><td>Buffer String </td></tr>
-    <tr><td class="paramname">open_sep</td><td>Open Separator </td></tr>
-    <tr><td class="paramname">close_sep</td><td>Close Separator </td></tr>
+    <tr><td class="paramname">say_str</td><td>Default say string </td></tr>
+    <tr><td class="paramname">trans_str</td><td>Transform u-function name (optional) </td></tr>
+    <tr><td class="paramname">empty_str</td><td>Fallback text when transform returns empty </td></tr>
+    <tr><td class="paramname">open_sep</td><td>Opening delimiter for transform chunks </td></tr>
+    <tr><td class="paramname">close_sep</td><td>Closing delimiter for transform chunks </td></tr>
     <tr><td class="paramname">player</td><td>DBref of player </td></tr>
     <tr><td class="paramname">caller</td><td>DBref of caller </td></tr>
     <tr><td class="paramname">cause</td><td>DBref of cause </td></tr>
