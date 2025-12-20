@@ -49,70 +49,52 @@ Every module must define:
 
 ## Building a Module
 
-### 1. Directory Structure
+### 1. Directory Structure (CMake-only)
 
 ```
 src/modules/<name>/
-├── configure.in
-├── configure
-├── Makefile.inc.in
-├── .depend
-└── <name>.c
+├── CMakeLists.txt
+├── <name>.c
+└── <name>.h
 ```
 
-### 2. Starting a New Module
-
-The easiest approach is to copy an existing module and adapt it:
+Start from the provided skeleton template:
 
 ```bash
-cp -r src/modules/mail src/modules/mymodule
+cp -r src/modules/skeleton src/modules/mymodule
 cd src/modules/mymodule
-# Edit configure.in, Makefile.inc.in, and .c files
+mv skeleton.c mymodule.c
+mv skeleton.h mymodule.h
+sed -i 's/skeleton/mymodule/g' mymodule.c mymodule.h CMakeLists.txt
 ```
 
-### 3. Configuration Script
-
-Update `configure.in` with your module name:
-
-```autoconf
-AC_INIT([src/mymodule.c])
-AC_OUTPUT(Makefile)
-```
-
-Generate the `configure` script:
+### 2. Build and Install
 
 ```bash
-autoconf configure.in > configure
-chmod +x configure
-```
-
-### 4. Build and Install
-
-The CMake build system handles module compilation:
-
-```bash
-cd build
+cd /home/eddy/source/TinyMUSH
+mkdir -p build && cd build
 cmake ..
 make
 ```
 
-Compiled modules are placed in `game/modules/`.
+Artifacts land in `build/modules/`; `make install` or the `install-upgrade` target copies them to `game/modules/`.
 
-### 5. Loading Modules
+### 3. Enable/Disable Modules
 
-Add to `netmush.conf`:
+- Add or remove module subdirectories in `modules.cmake` (leave uncommented to build, comment out to skip).
+- In `game/configs/netmush.conf`, list modules to load at runtime:
 
 ```
-module <name>
+module mymodule
 ```
 
-Modules are only loaded at server startup, not during reload.
+Modules load on server start; restart after changing the list.
 
 ## Module Structure
 
 ### Header Template
 
-Every module should include:
+Include the standard server headers plus your own module header:
 
 ```c
 #include "config.h"
@@ -121,7 +103,7 @@ Every module should include:
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "../../api.h"
+#include "mymodule.h"
 ```
 
 ### Namespace Conventions
@@ -145,46 +127,41 @@ struct mod_mail_confstorage mod_mail_config;
 
 ### Configuration Storage
 
-Define a configuration structure:
+Skeleton baseline:
 
 ```c
 struct mod_<name>_confstorage {
-    int param1;
-    char *param2;
-    int param3;
+    int enabled;
 } mod_<name>_config;
 ```
 
 ### Configuration Table
 
-Map configuration parameters:
+Map config directives to fields:
 
 ```c
 CONF mod_<name>_conftable[] = {
-    {(char *)"param1", cf_int, CA_GOD, CA_PUBLIC, 
-     &mod_<name>_config.param1, 0},
-    {(char *)"param2", cf_string, CA_GOD, CA_PUBLIC,
-     (int *)&mod_<name>_config.param2, 256},
+    {(char *)"<name>_enabled", cf_bool, CA_GOD, CA_PUBLIC,
+     &mod_<name>_config.enabled, (long)"Enable module"},
     {NULL, NULL, 0, 0, NULL, 0}
 };
 ```
 
 ### Initialization Function
 
-Called at server startup:
+Called at server startup; register tables and init hashes:
 
 ```c
-void mod_<name>_init()
+void mod_<name>_init(void)
 {
-    /* Set default configuration values */
-    mod_<name>_config.param1 = 10;
-    mod_<name>_config.param2 = XSTRDUP("default", "mod_<name>_init");
+    mod_<name>_config.enabled = 1;
 
-    /* Initialize hash tables */
-    hashinit(&mod_<name>_htab, 100);
+    hashinit(&mod_<name>_data_htab, 100, HT_KEYREF | HT_STR);
 
-    /* Register commands, functions, etc. */
-    // ...
+    register_commands(mod_<name>_cmdtable);
+    register_functions(mod_<name>_functable);
+
+    log_write(LOG_ALWAYS, "MOD", "XXXX", "Module <NAME> initialized");
 }
 ```
 
@@ -193,32 +170,21 @@ void mod_<name>_init()
 ### Boolean Parameters
 
 ```c
-CONF mod_<name>_conftable[] = {
-    {(char *)"feature_enabled", cf_bool, CA_GOD, CA_PUBLIC,
-     &mod_<name>_config.enabled, (long)"Enable feature"},
-    {NULL, NULL, 0, 0, NULL, 0}
-};
+{(char *)"mymodule_enabled", cf_bool, CA_GOD, CA_PUBLIC,
+ &mod_mymodule_config.enabled, (long)"Enable module"}
 ```
 
-### Integer Parameters
+### Integer / String / Const Patterns
 
 ```c
-{(char *)"max_messages", cf_int, CA_GOD, CA_PUBLIC,
- &mod_<name>_config.max_messages, 10000}
-```
+{(char *)"mymodule_limit", cf_int, CA_GOD, CA_PUBLIC,
+ &mod_mymodule_config.limit, 1000}
 
-### String Parameters
+{(char *)"mymodule_label", cf_string, CA_GOD, CA_PUBLIC,
+ (int *)&mod_mymodule_config.label, 128}
 
-```c
-{(char *)"database_path", cf_string, CA_GOD, CA_PUBLIC,
- (int *)&mod_<name>_config.db_path, 256}
-```
-
-### Read-Only Parameters
-
-```c
-{(char *)"version", cf_const, CA_STATIC, CA_PUBLIC,
- &mod_<name>_config.version, (long)"1.0.0"}
+{(char *)"mymodule_version", cf_const, CA_STATIC, CA_PUBLIC,
+ &mod_mymodule_version.version, (long)"1.0.0"}
 ```
 
 ## Example Modules
@@ -344,11 +310,10 @@ Check:
 
 ### Module Reload
 
-To reload a module after code changes:
+Modules load at server start. After changes:
 
-1. Rename old `.so` file in `game/modules/`
-2. Rebuild the module
-3. Restart the server
+1. Rebuild (`cmake --build build --target install-upgrade`)
+2. Restart the server to pick up the new `.so`
 
 ## Limitations and Constraints
 
