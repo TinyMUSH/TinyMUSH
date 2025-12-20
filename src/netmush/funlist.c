@@ -2626,7 +2626,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	number = (int)strtol(fargs[1], (char **)NULL, 10);
-	indent = (int)strtol(fargs[3], (char **)NULL, 10);
+	indent = (nfargs >= 4) ? (int)strtol(fargs[3], (char **)NULL, 10) : 0;
 
 	if (indent > 77)
 	{
