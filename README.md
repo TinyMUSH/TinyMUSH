@@ -168,10 +168,11 @@ cd ../game && ./netmush
 | [README.md](README.md) | This document - project overview and quick start |
 | [INSTALL.md](INSTALL.md) | Comprehensive installation guide |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute to TinyMUSH |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community guidelines and code of conduct |
 | [SECURITY.md](SECURITY.md) | Security policy and vulnerability reporting |
 | [KNOWN_BUGS.md](KNOWN_BUGS.md) | Current known issues and recent fixes |
 | [NEWS.md](NEWS.md) | Important announcements and updates |
-| [COPYING.md](COPYING.md) | License information (Artistic License 2.0) |
+| [COPYING.md](COPYING.md) | License information (Artistic License) |
 | [AUTHORS.md](AUTHORS.md) | Credits and acknowledgments |
 
 ## Developer Documentation
@@ -240,7 +241,7 @@ For security vulnerabilities, see [SECURITY.md](SECURITY.md).
 
 ## License
 
-TinyMUSH is distributed under the Artistic License 2.0. See [COPYING.md](COPYING.md) for details.
+TinyMUSH is distributed under the Artistic License. See [COPYING.md](COPYING.md) for details.
 
 ---
 
