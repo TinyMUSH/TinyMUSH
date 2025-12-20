@@ -57,27 +57,57 @@ function(get_git_tag_version default_version version_info hash_info dirty_info)
     endif()
 
     if(GIT_EXECUTABLE)
-        execute_process(COMMAND ${GIT_EXECUTABLE} describe --match "v[0-9]*.[0-9]*.[0-9]*" --abbrev=8
+        # Build tag name from default_version (e.g., "4.0.0.0" -> "v4.0.0.0")
+        set(BASE_TAG "v${default_version}")
+        
+        # Check if base tag exists
+        execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify ${BASE_TAG}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            RESULT_VARIABLE status
-            OUTPUT_VARIABLE GIT_V
-            ERROR_QUIET
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if(NOT ${status})
-            string(STRIP ${GIT_V} GIT_V)
-            string(REGEX REPLACE "-[0-9]+-g" "-" GIT_V ${GIT_V})
-            string(REPLACE "v" "" GIT_V ${GIT_V})
-            string(REPLACE "-" ";" GIT_V ${GIT_V})
-            list (LENGTH GIT_V GIT_V_LEN)
-            if(${GIT_V_LEN} GREATER 0)
-                list(GET GIT_V 0 GIT_VERSION)
-                set(${version_info} ${GIT_VERSION} PARENT_SCOPE)
-                if(${GIT_V_LEN} GREATER 1)
-                    list(GET GIT_V 1 GIT_HASH)
+            RESULT_VARIABLE tag_exists
+            OUTPUT_QUIET
+            ERROR_QUIET)
+        
+        if(NOT ${tag_exists})
+            # Count commits since base tag
+            execute_process(COMMAND ${GIT_EXECUTABLE} rev-list --count ${BASE_TAG}..HEAD
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                RESULT_VARIABLE count_status
+                OUTPUT_VARIABLE COMMIT_COUNT
+                ERROR_QUIET
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+            
+            if(NOT ${count_status})
+                string(STRIP ${COMMIT_COUNT} COMMIT_COUNT)
+                
+                # Split default_version to get major.minor.patch (e.g., "4.0.0.0" -> "4.0.0")
+                string(REPLACE "." ";" VERSION_PARTS ${default_version})
+                list(LENGTH VERSION_PARTS VERSION_PARTS_LEN)
+                if(${VERSION_PARTS_LEN} GREATER 2)
+                    list(GET VERSION_PARTS 0 V_MAJOR)
+                    list(GET VERSION_PARTS 1 V_MINOR)
+                    list(GET VERSION_PARTS 2 V_PATCH)
+                    # Build version with commit count as TWEAK (e.g., "4.0.0.368")
+                    set(${version_info} "${V_MAJOR}.${V_MINOR}.${V_PATCH}.${COMMIT_COUNT}" PARENT_SCOPE)
+                else()
+                    # Fallback if version format unexpected
+                    set(${version_info} "${default_version}.${COMMIT_COUNT}" PARENT_SCOPE)
+                endif()
+                
+                # Get current short hash
+                execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short=8 HEAD
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    RESULT_VARIABLE hash_status
+                    OUTPUT_VARIABLE GIT_HASH
+                    ERROR_QUIET
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                
+                if(NOT ${hash_status})
+                    string(STRIP ${GIT_HASH} GIT_HASH)
                     set(${hash_info} ${GIT_HASH} PARENT_SCOPE)
                 endif()
             endif()
         endif()
+        
         # Work out if the repository is dirty
         execute_process(COMMAND ${GIT_EXECUTABLE} update-index -q --refresh
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

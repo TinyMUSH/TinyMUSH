@@ -1,0 +1,6 @@
+add_library(skeleton MODULE skeleton.c)
+add_dependencies(skeleton netmush)
+target_link_libraries(skeleton netmush)
+install(TARGETS skeleton DESTINATION modules)
+message(STATUS "  Module directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "  Output library: ${CMAKE_BINARY_DIR}/modules/${MODULE_NAME}.so")

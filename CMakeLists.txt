@@ -130,8 +130,7 @@ macro(install_symlink filepath sympath)
 endmacro(install_symlink)
 
 add_subdirectory(src/netmush)
-add_subdirectory(src/modules/mail)
-add_subdirectory(src/modules/comsys)
+include("${CMAKE_SOURCE_DIR}/modules.cmake")
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/docs DESTINATION ${CMAKE_INSTALL_PREFIX} USE_SOURCE_PERMISSIONS)
 install(DIRECTORY DESTINATION backups)
