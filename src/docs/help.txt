@@ -9076,6 +9076,15 @@ performed and the walk down the list stops.
   Returns a list of all currently installed modules.
  
 & HELPTEXT()
+& MODULES()
+  Function: modules([<output delim>])
+
+  Returns a list of all currently installed modules.
+
+  If an output delimiter is provided, it is placed between module names;
+  otherwise module names are separated by spaces. The list order follows
+  the server's internal module list.
+
   Function: helptext(<help command>, <entry>)
  
   Returns the text of the entry indexed as <entry> in the external
