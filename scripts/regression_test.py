@@ -16,6 +16,7 @@ Env vars:
 
 Usage:
     python3 scripts/regression_test.py --config scripts/commands_messaging.conf
+    python3 scripts/regression_test.py -c scripts/commands_messaging.conf
 
 Config file format:
     - One command per line.
@@ -56,7 +57,7 @@ DISCONNECTING = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="TinyMUSH regression test runner")
-    parser.add_argument("--config", default=DEFAULT_CONFIG, help="Path to the test config file")
+    parser.add_argument("--config", "-c", default=DEFAULT_CONFIG, help="Path to the test config file")
     parser.add_argument("--allow-disconnect", action="store_true", help="Run commands that may close the session")
     return parser.parse_args()
 
