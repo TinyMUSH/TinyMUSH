@@ -1393,6 +1393,12 @@ size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_
 			{
 				size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
 			}
+			else
+			{
+				/* For untracked (stack) buffers, compute available space from provided size
+				 * and current write position, then clamp to requested length. */
+				size = n < XCALSIZE(size, dest, destp) ? n : XCALSIZE(size, dest, destp);
+			}
 
 			if (size > 0)
 			{
@@ -1461,6 +1467,12 @@ size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_
 			if (__xfind(dest))
 			{
 				size = n < XCALSIZE(XGETSIZE(dest), dest, destp) ? n : XCALSIZE(XGETSIZE(dest), dest, destp);
+			}
+			else
+			{
+				/* For untracked (stack) buffers, compute available space from provided size
+				 * and current write position, then clamp to requested length. */
+				size = n < XCALSIZE(size, dest, destp) ? n : XCALSIZE(size, dest, destp);
 			}
 
 			if (size > 0)
