@@ -148,18 +148,24 @@ See [docs/Code/MODULES_DEVELOPMENT.md](docs/Code/MODULES_DEVELOPMENT.md) for mod
 
 ## Starting the Server
 
-### Foreground Mode
+### Daemon Mode (Background)
+
+By default, the server forks to background:
 
 ```bash
 cd game
 ./netmush
 ```
 
-### Daemon Mode
+### Foreground Mode (Debug)
+
+Use `-d` or `--debug` to prevent forking (useful for debugging):
 
 ```bash
 cd game
-./netmush -D
+./netmush -d
+# or
+./netmush --debug
 ```
 
 ### Check Server Status
@@ -347,7 +353,7 @@ killall -9 netmush 2>/dev/null
 cd build
 cmake --build . --target install-upgrade -j$(nproc)
 cd ../game
-./netmush -D
+./netmush
 EOF
 chmod +x ../rebuild.sh
 ```
