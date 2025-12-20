@@ -4,95 +4,300 @@
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml)|
 
-- [TinyMUSH](#tinymush)
+- [TinyMUSH 4](#tinymush-4)
   - [Introduction](#introduction)
-  - [Development](#development)
-    - [TinyMUSH 3.0](#tinymush-30)
-    - [TinyMUSH 3.1](#tinymush-31)
-    - [TinyMUSH 3.2](#tinymush-32)
-    - [TinyMUSH 3.3](#tinymush-33)
-    - [TinyMUSH 4.0](#tinymush-40)
+  - [What's New in TinyMUSH 4](#whats-new-in-tinymush-4)
+  - [Quick Start](#quick-start)
+  - [Key Features](#key-features)
+  - [Development Goals](#development-goals)
+  - [Project History](#project-history)
 - [Installation](#installation)
-- [Full documentation](#full-documentation)
- - [Developer docs](#developer-docs)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Support](#support)
 
-# TinyMUSH
+# TinyMUSH 4
 
 ## Introduction
-                              
-TinyMUSH 3 began as a project to fuse the TinyMUSH 2.2 and TinyMUX codebases, in an effort to create a best-of-breed server that combined the best features and enhancements of both, and then built additional innovations and increased stability on top of that merged codebase.
 
-## Development
+**TinyMUSH 4** is a modern, actively maintained Multi-User Shared Hallucination (MUSH) server. It represents a comprehensive modernization of the TinyMUSH codebase, focusing on robustness, maintainability, and alignment with contemporary C standards.
 
-TinyMUSH 3.0 is not a rewrite; we wanted to maintain close to 100% backwards compatibility, and the sheer scope of effort that would have been necessary in order to create a new server from scratch was beyond our available time resources.  However, every line of the code has been gone through in the process of creating TinyMUSH 3.0.  A large number of bugs have been fixed, portions have been rewritten to be cleaner and more efficient, and a slew of new features have been added.  TinyMUSH 3.1 and beyond will extend this further, providing a solidly stable server, improved efficiency, and many feature enhancements.
+TinyMUSH 4 builds upon decades of MUSH development heritage while introducing significant architectural improvements, enhanced safety mechanisms, and a more flexible module system. Whether you're running a social roleplaying game, an educational environment, or a creative collaborative space, TinyMUSH 4 provides a solid, extensible foundation.
 
-### TinyMUSH 3.0
+**Current Status:** Active development (Alpha)
 
-The initial TinyMUSH 3.0 release was jointly developed by David Passmore and Lydia Leong; Robby Griffin joined the team with the release of 3.0 beta 18, and Scott Dorr joined with the release of 3.0 beta 23, and the team expects to continue to maintain TinyMUSH 3 into the forseeable future. Though we will continue to welcome contributions from the MUSH community, we expect to remain the primary developers. We believe that this will be a major platform of choice for MUSH users in the future, and we highly encourage existing TinyMUSH 2.2 and TinyMUX 1.x users to upgrade.
+## What's New in TinyMUSH 4
 
-### TinyMUSH 3.1
+- **Modern Build System**: CMake-based build with fast incremental compilation (ccache, LTO support)
+- **Enhanced Safety**: Comprehensive stack-safe string operations, memory tracking, bounds checking
+- **Modular Architecture**: Dynamic module loading system with template skeleton for rapid development
+- **Improved Robustness**: Fixed critical bugs, eliminated buffer overflows, crash prevention
+- **Better Developer Experience**: Streamlined API, clear documentation, regression test suites
+- **Code Modernization**: Aligned with modern C standards, cleaned up legacy code patterns
+- **Simplified Configuration**: Centralized module management, easier customization
 
-TinyMUSH 3.1 was jointly developped by David Passmore, Lydia Leong, Robby Griffin and Scott Dorr. Eddy Beaupre joined at TinyMUSh 3.1 patchlevel 1 and the move of the project to Sourceforce.
+## Quick Start
 
-### TinyMUSH 3.2
+```bash
+# Clone repository
+git clone https://github.com/TinyMUSH/TinyMUSH.git
+cd TinyMUSH
 
-TinyMUSH 3.2 was mostly developped by Lydia Leong.
+# Install dependencies (Ubuntu/Debian)
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
 
-### TinyMUSH 3.3
+# Build and install
+mkdir -p build && cd build
+cmake ..
+cmake --build . --target install-upgrade -j$(nproc)
 
-TinyMUSH 3.3 is no longer being developped and never left alpha stage.
+# Start server
+cd ../game
+./netmush
 
-### TinyMUSH 4.0
+# Connect: telnet localhost 6250
+# Login as God: connect #1 potrzebie
+```
 
-TinyMUSH 4.0 is the current development branch, it is still in alpha stage.
+See [INSTALL.md](INSTALL.md) for comprehensive installation instructions.
+
+## Key Features
+
+### Core Capabilities
+- **Rich Softcode Language**: Powerful scripting with 200+ built-in functions
+- **Flexible Permissions**: Granular control with flags, powers, and locks
+- **Persistent Storage**: GDBM-backed database with automatic checkpointing
+- **Multi-Channel Communication**: Built-in comsys module for chat channels
+- **Mail System**: Internal messaging with PennMUSH-compatible syntax
+- **Zone-based Organization**: Hierarchical object management
+- **Attribute System**: Extensible object properties with inheritance
+
+### Developer Features
+- **Module System**: Load custom C modules dynamically at runtime
+- **Regression Testing**: Comprehensive test suites for functions and commands
+- **Memory Debugging**: Built-in allocation tracking and leak detection
+- **Safe String API**: Prevent buffer overflows with XSAFE* macros
+- **API Documentation**: Auto-generated Doxygen docs at https://tinymush.github.io/TinyMUSH/
+- **Hot Reload**: Update softcode without server restarts
+
+### Administration
+- **Flexible Configuration**: Text-based config with runtime @admin adjustments
+- **Backup Tools**: Automated database dumps and flatfile conversion
+- **Logging System**: Configurable logging with multiple log types
+- **Command Aliases**: Customize command names for user preference
+- **Compatibility Modes**: Support for MUX/Penn command variations
+
+## Development Goals
+
+TinyMUSH 4 is guided by four core principles:
+
+### 1. **Future-Proofing**
+- Modernize codebase to ensure long-term viability
+- Align with current C standards (C11+)
+- Replace deprecated APIs and unsafe functions
+- Support contemporary build tools and platforms
+
+### 2. **Maintainability**
+- Reduce code complexity and technical debt
+- Improve code organization and modularity
+- Enhance documentation at all levels
+- Simplify contribution process for new developers
+
+### 3. **Robustness**
+- Eliminate undefined behavior and memory safety issues
+- Add comprehensive bounds checking
+- Implement thorough error handling
+- Build extensive regression test coverage
+
+### 4. **Extensibility**
+- Provide clean module API for custom extensions
+- Maintain backward compatibility where feasible
+- Enable easy feature addition without core modifications
+- Support diverse use cases through configuration
+
+## Project History
+
+### Origins (TinyMUSH 3)
+
+TinyMUSH 3 emerged from a merger of the TinyMUSH 2.2 and TinyMUX codebases, combining the strengths of both servers. The project maintained near-complete backward compatibility while introducing stability improvements and new features.
+
+**TinyMUSH 3 Development Team:**
+- David Passmore (core developer)
+- Lydia Leong (lead developer, 3.1-3.2)
+- Robby Griffin (joined 3.0 beta 18)
+- Scott Dorr (joined 3.0 beta 23)
+- Eddy Beaupré (joined 3.1 p1, continuing into 4.0)
+
+TinyMUSH 3 went through several major versions:
+- **3.0**: Initial merged release, bug fixes, feature additions
+- **3.1**: Enhanced stability, GDBM database, improved caching
+- **3.2**: Performance optimizations, additional features
+- **3.3**: Experimental branch (never released, discontinued)
+
+### TinyMUSH 4 (Current)
+
+TinyMUSH 4 represents a significant evolution, focusing on modernization rather than feature additions. While maintaining the essence of TinyMUSH 3, version 4 prioritizes code quality, safety, and developer experience.
+
+**Major Changes:**
+- Complete CMake conversion (removed Autoconf/Make)
+- Stack-safe string operations throughout codebase
+- Modular architecture with dynamic loading
+- Enhanced error handling and crash prevention
+- Modern memory management patterns
+- Comprehensive documentation overhaul
+- Active regression testing framework
+
+The server is currently in alpha development, with ongoing work to ensure stability before beta release.
 
 # Installation
 
-Since TinyMUSH 4.0 is currently in alpha, there will be bugs and time where the server will probably not even compile. But feel free to test and provide feedback.
-
-See INSTALL for an overview of the installation process.
-
-## Configuration
-
-TinyMUSH reads its configuration from a file passed at startup. See configs/netmush.conf.example.in for a full list of options.
+See [INSTALL.md](INSTALL.md) for detailed installation instructions, including:
+- Prerequisites and dependencies
+- Build process and configuration
+- Module setup and management
+- Server startup options
+- Troubleshooting common issues
 
 # Documentation
 
-Documentation for TinyMUSH covers user guides, developer resources, and historical changelogs.
+## User & Administrator Resources
 
-## User & Administrator Documentation
-
-|File             |Description                                                    |
-|-----------------|---------------------------------------------------------------|
-|README.md        |The mystery file nobody ever read...                           |
-|INSTALL          |Installation instructions.                                     |
-|CONVERTING       |Conversion instructions.                                       |
-|NEWS             |Important news and events.                                     |
-|FAQ              |Frequently ask questions.                                      |
-|COPYING          |TinyMUSH and previous licences.                                |
-|AUTHORS          |Credits and thanks.                                            |
+| Document | Description |
+|----------|-------------|
+| [README.md](README.md) | This document - project overview and quick start |
+| [INSTALL.md](INSTALL.md) | Comprehensive installation guide |
+| [KNOWN_BUGS.md](KNOWN_BUGS.md) | Current known issues and recent fixes |
+| [NEWS.md](NEWS.md) | Important announcements and updates |
+| [SECURITY.md](SECURITY.md) | Security considerations and best practices |
+| [COPYING.md](COPYING.md) | License information (Artistic License 2.0) |
+| [AUTHORS.md](AUTHORS.md) | Credits and acknowledgments |
 
 ## Developer Documentation
 
-Development-focused documentation is located in the [docs/](docs/) directory:
+Located in [docs/Code/](docs/Code/):
 
-|File             |Description                                                    |
-|-----------------|---------------------------------------------------------------|
-|[ALLOC_DOCUMENTATION.md](docs/ALLOC_DOCUMENTATION.md)|Memory allocation and safe string handling in TinyMUSH.|
-|[COMMANDS_AND_REGISTRIES_REFERENCE.md](docs/COMMANDS_AND_REGISTRIES_REFERENCE.md)|Consolidated guide to commands, functions, flags, powers, attributes, and config keywords.|
-|[MODULES.md](MODULES.md)|Overview for creating and integrating modules.                     |
+| Document | Description |
+|----------|-------------|
+| [MODULES_DEVELOPMENT.md](docs/Code/MODULES_DEVELOPMENT.md) | Complete guide to module development |
+| [ALLOC_DOCUMENTATION.md](docs/Code/ALLOC_DOCUMENTATION.md) | Memory management and safe string APIs |
+| [COMMANDS_AND_REGISTRIES_REFERENCE.md](docs/Code/COMMANDS_AND_REGISTRIES_REFERENCE.md) | Commands, functions, flags, powers, attributes |
 
-## Changelogs
+### Module Examples
 
-Version history and changes:
+| Module | Description |
+|--------|-------------|
+| [skeleton](src/modules/skeleton/) | Template for creating new modules ([README](src/modules/skeleton/README.md), [Quick Reference](src/modules/skeleton/QUICK_REFERENCE.md)) |
 
-|File             |Description                                                    |
-|-----------------|---------------------------------------------------------------|
-|ChangeLog        |TinyMUSH 3 general changelog.                                  |
-|ChangeLog.History|TinyMUX 1.0 and TinyMUSH 2.x changelog.                        |
+## Historical Documentation
 
-**Note:** Older documentation files (README, FAQ, etc.) have not been updated since TinyMUSH 3.2 and will be revised when 4.0 enters Beta.
+**Note:** Historical documents are preserved for reference but may not reflect current TinyMUSH 4 practices.
 
-## Source Documentation
 
-You can browse the auto-generated Doxygen source documentation (work in progress) at https://tinymush.github.io/TinyMUSH/html/
+Located in [docs/Historical/](docs/Historical/):
+
+| Document | Description |
+|----------|-------------|
+| [ChangeLog.md](docs/ChangeLog.md) | TinyMUSH 3 version history |
+| [ChangeLog.History.md](docs/Historical/ChangeLog.History.md) | TinyMUSH 2.x and TinyMUX 1.0 history |
+| [FAQ.md](docs/Historical/FAQ.md) | Frequently asked questions (TinyMUSH 3 era) |
+| [MODULES.md](docs/Historical/MODULES.md) | Legacy module documentation |
+| [CONVERTING.md](docs/Historical/CONVERTING.md) | Database conversion guide |
+
+
+## API Documentation
+
+Auto-generated Doxygen source code documentation:
+
+**https://tinymush.github.io/TinyMUSH/**
+
+Includes detailed API references for functions, structures, and macros used throughout the codebase.
+
+# Contributing
+
+We welcome contributions from the community! Here's how to get involved:
+
+## Reporting Issues
+
+- **Bugs**: File detailed bug reports at https://github.com/TinyMUSH/TinyMUSH/issues
+- **Feature Requests**: Propose new features through GitHub issues
+- **Security Issues**: See [SECURITY.md](SECURITY.md) for responsible disclosure
+
+## Contributing Code
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Follow existing code style and conventions
+4. Add tests for new functionality
+5. Update documentation as needed
+6. Submit a pull request
+
+### Development Setup
+
+```bash
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/TinyMUSH.git
+cd TinyMUSH
+
+# Build in debug mode
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make -j$(nproc)
+
+# Run tests
+cd ../scripts
+python3 regression_test.py
+```
+
+### Code Guidelines
+
+- Use safe string functions (`XSAFE*` macros, never `strcpy`/`sprintf`)
+- Track all allocations with `XMALLOC`/`XFREE`
+- Follow existing naming conventions (`mod_<name>_<function>`)
+- Document public APIs with Doxygen comments
+- Add regression tests for new functions/commands
+- Check for memory leaks before submitting
+
+## Module Development
+
+Creating custom modules is encouraged! See:
+- [docs/Code/MODULES_DEVELOPMENT.md](docs/Code/MODULES_DEVELOPMENT.md) - Complete guide
+- [src/modules/skeleton/](src/modules/skeleton/) - Working template
+
+Quick module creation:
+
+```bash
+cp -r src/modules/skeleton src/modules/mymodule
+cd src/modules/mymodule
+sed -i 's/skeleton/mymodule/g' *
+# Edit mymodule.c and mymodule.h
+```
+
+# Support
+
+## Community
+
+- **GitHub Issues**: https://github.com/TinyMUSH/TinyMUSH/issues
+- **Email**: tinymush@googlegroups.com
+- **Documentation**: Check [docs/](docs/) directory first
+
+## Getting Help
+
+1. Review relevant documentation (INSTALL.md, module READMEs, etc.)
+2. Check [KNOWN_BUGS.md](KNOWN_BUGS.md) for reported issues
+3. Search existing GitHub issues
+4. If needed, open a new issue with:
+   - TinyMUSH version (`@version` output)
+   - Operating system and version
+   - Relevant configuration settings
+   - Steps to reproduce the problem
+   - Error messages or log excerpts
+
+## License
+
+TinyMUSH is distributed under the Artistic License 2.0. See [COPYING.md](COPYING.md) for full license text.
+
+---
+
+**TinyMUSH 4.0** - Copyright © 1989-2025 TinyMUSH Development Team  
+**Repository**: https://github.com/TinyMUSH/TinyMUSH  
+**Website**: https://tinymush.github.io/TinyMUSH/
