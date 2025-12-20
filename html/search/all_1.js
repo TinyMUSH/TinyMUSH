@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['1_0',['1',['../md_FAQ.html#autotoc_md178',1,'How do I recover a lost password for God (#1)?'],['../md_README.html#autotoc_md216',1,'TinyMUSH 3.1']]],
+  ['1_0',['1',['../md_FAQ.html#autotoc_md178',1,'How do I recover a lost password for God (#1)?'],['../md_README.html#autotoc_md221',1,'TinyMUSH 3.1']]],
   ['1_200_1',['Converting from TinyMUX 1.0',['../md_CONVERTING.html#autotoc_md155',1,'']]],
   ['1_200_20credits_2',['TinyMUX 1.0 Credits',['../md_AUTHORS.html#autotoc_md100',1,'']]],
   ['1_20changes_3',['TinyMUSH 3.1 Changes',['../md_ChangeLog.html#autotoc_md106',1,'']]],

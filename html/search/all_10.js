@@ -92,7 +92,7 @@ var searchData=
   ['how_20do_20i_20use_20multiple_20guests_89',['How do I use multiple guests?',['../md_FAQ.html#autotoc_md180',1,'']]],
   ['how_20do_20i_20use_20the_20in_20memory_20database_90',['How do I use the in-memory database?',['../md_FAQ.html#autotoc_md184',1,'']]],
   ['how_20do_20logfiles_20work_91',['How do logfiles work?',['../md_FAQ.html#autotoc_md179',1,'']]],
-  ['how_20to_20build_20a_20module_92',['HOW TO BUILD A MODULE',['../md_MODULES.html#autotoc_md194',1,'']]],
+  ['how_20to_20build_20a_20module_92',['HOW TO BUILD A MODULE',['../md_MODULES.html#autotoc_md199',1,'']]],
   ['how_20to_20extend_93',['How to Extend',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md145',1,'']]],
   ['ht_5fkeyref_94',['HT_KEYREF',['../constants_8h.html#a1056b6e6b9cb73a581fe3ba3e3ca3548',1,'constants.h']]],
   ['ht_5fnum_95',['HT_NUM',['../constants_8h.html#a676f40ff18e8460d81d32f900a4dc09b',1,'constants.h']]],

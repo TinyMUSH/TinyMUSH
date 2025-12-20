@@ -8,5 +8,6 @@ var searchData=
   ['killguarantee_5',['killguarantee',['../structconfdata.html#a3bca8d0a249e145cb7fa916c2ab46a13',1,'confdata']]],
   ['killmax_6',['killmax',['../structconfdata.html#ae84920232faee5faa061a42e81b624f0',1,'confdata']]],
   ['killmin_7',['killmin',['../structconfdata.html#a3db94157ff962b7301413da38f8ebd59',1,'confdata']]],
-  ['know_8',['### If you have suggestions for more FAQs, please email us and let us know.',['../md_FAQ.html#autotoc_md188',1,'']]]
+  ['know_8',['### If you have suggestions for more FAQs, please email us and let us know.',['../md_FAQ.html#autotoc_md188',1,'']]],
+  ['known_20bugs_20in_20tinymush_9',['Known Bugs in TinyMUSH',['../md_KNOWN__BUGS.html',1,'']]]
 ];

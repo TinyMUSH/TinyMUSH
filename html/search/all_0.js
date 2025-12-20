@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['0_0',['0',['..//github/workspace/ChangeLog.md#autotoc_md126',1,'BUGFIX PATCHES TO 3.0'],['../md_CONVERTING.html#autotoc_md155',1,'Converting from TinyMUX 1.0'],['../md_README.html#autotoc_md215',1,'TinyMUSH 3.0'],['../md_README.html#autotoc_md219',1,'TinyMUSH 4.0']]],
+  ['0_0',['0',['..//github/workspace/ChangeLog.md#autotoc_md126',1,'BUGFIX PATCHES TO 3.0'],['../md_CONVERTING.html#autotoc_md155',1,'Converting from TinyMUX 1.0'],['../md_README.html#autotoc_md220',1,'TinyMUSH 3.0'],['../md_README.html#autotoc_md224',1,'TinyMUSH 4.0']]],
   ['0_20changes_1',['0 Changes',['../md_ChangeLog.html#autotoc_md121',1,'TinyMUSH 3.0 Changes'],['../md_ChangeLog.html#autotoc_md103',1,'TinyMUSH 4.0 Changes']]],
   ['0_20credits_2',['0 Credits',['../md_AUTHORS.html#autotoc_md102',1,'TinyMUSH 2.0 Credits'],['../md_AUTHORS.html#autotoc_md99',1,'TinyMUSH 3.0 Credits'],['../md_AUTHORS.html',1,'TinyMUSH 4.0 Credits'],['../md_AUTHORS.html#autotoc_md100',1,'TinyMUX 1.0 Credits']]],
   ['0_20news_3',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['2_0',['2',['../md_ChangeLog.html#autotoc_md112',1,'3.1 Patchlevel 2'],['../md_CONVERTING.html#autotoc_md159',1,'Converting from TinyMUSH 2.2'],['../md_README.html#autotoc_md217',1,'TinyMUSH 3.2']]],
+  ['2_0',['2',['../md_ChangeLog.html#autotoc_md112',1,'3.1 Patchlevel 2'],['../md_CONVERTING.html#autotoc_md159',1,'Converting from TinyMUSH 2.2'],['../md_README.html#autotoc_md222',1,'TinyMUSH 3.2']]],
   ['2_200_20credits_1',['TinyMUSH 2.0 Credits',['../md_AUTHORS.html#autotoc_md102',1,'']]],
   ['2_200_20source_20code_2',['TinyMUSH 2.0 Source code',['../md_COPYING.html#autotoc_md166',1,'']]],
   ['2_202_3',['Converting from TinyMUSH 2.2',['../md_CONVERTING.html#autotoc_md159',1,'']]],

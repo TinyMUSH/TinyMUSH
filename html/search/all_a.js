@@ -49,11 +49,13 @@ var searchData=
   ['bug_20what_20do_20i_20do_46',['I found a bug! What do I do?',['../md_FAQ.html#autotoc_md173',1,'']]],
   ['bugfix_47',['How do I apply a patch upgrade or bugfix?',['../md_FAQ.html#autotoc_md177',1,'']]],
   ['bugfix_20patches_20to_203_200_48',['BUGFIX PATCHES TO 3.0',['..//github/workspace/ChangeLog.md#autotoc_md126',1,'']]],
-  ['build_20a_20module_49',['HOW TO BUILD A MODULE',['../md_MODULES.html#autotoc_md194',1,'']]],
-  ['build_20instructions_3a_50',['Build instructions:',['../md_INSTALL.html#autotoc_md190',1,'']]],
-  ['building_51',['Pattern 1: Dynamic String Building',['../md_ALLOC__DOCUMENTATION.html#autotoc_md67',1,'']]],
-  ['building_5flimit_52',['building_limit',['../structconfdata.html#adce69737c315de8c39f64b0f9217b9bc',1,'confdata']]],
-  ['builtin_20command_53',['Add a Builtin Command',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md146',1,'']]],
-  ['builtin_20function_54',['Add a Builtin Function',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md148',1,'']]],
-  ['by_20cs_5f_20flags_55',['Handler Signatures (by CS_* flags)',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md142',1,'']]]
+  ['bugs_49',['Critical Bugs',['../md_KNOWN__BUGS.html#autotoc_md193',1,'']]],
+  ['bugs_20in_20tinymush_50',['Known Bugs in TinyMUSH',['../md_KNOWN__BUGS.html',1,'']]],
+  ['build_20a_20module_51',['HOW TO BUILD A MODULE',['../md_MODULES.html#autotoc_md199',1,'']]],
+  ['build_20instructions_3a_52',['Build instructions:',['../md_INSTALL.html#autotoc_md190',1,'']]],
+  ['building_53',['Pattern 1: Dynamic String Building',['../md_ALLOC__DOCUMENTATION.html#autotoc_md67',1,'']]],
+  ['building_5flimit_54',['building_limit',['../structconfdata.html#adce69737c315de8c39f64b0f9217b9bc',1,'confdata']]],
+  ['builtin_20command_55',['Add a Builtin Command',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md146',1,'']]],
+  ['builtin_20function_56',['Add a Builtin Function',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md148',1,'']]],
+  ['by_20cs_5f_20flags_57',['Handler Signatures (by CS_* flags)',['../md_COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md142',1,'']]]
 ];
