@@ -67,18 +67,15 @@ See [INSTALL.md](INSTALL.md) for comprehensive installation instructions.
 - **Rich Softcode Language**: Powerful scripting with 200+ built-in functions
 - **Flexible Permissions**: Granular control with flags, powers, and locks
 - **Persistent Storage**: GDBM-backed database with automatic checkpointing
-- **Multi-Channel Communication**: Built-in comsys module for chat channels
-- **Mail System**: Internal messaging with PennMUSH-compatible syntax
 - **Zone-based Organization**: Hierarchical object management
 - **Attribute System**: Extensible object properties with inheritance
 
 ### Developer Features
-- **Module System**: Load custom C modules dynamically at runtime
+- **Module System**: Load custom C modules dynamically at runtime (mail and comsys included by default)
 - **Regression Testing**: Comprehensive test suites for functions and commands
 - **Memory Debugging**: Built-in allocation tracking and leak detection
 - **Safe String API**: Prevent buffer overflows with XSAFE* macros
 - **API Documentation**: Auto-generated Doxygen docs at https://tinymush.github.io/TinyMUSH/
-- **Hot Reload**: Update softcode without server restarts
 
 ### Administration
 - **Flexible Configuration**: Text-based config with runtime @admin adjustments
@@ -151,12 +148,16 @@ The server is currently in alpha development, with ongoing work to ensure stabil
 
 # Installation
 
-See [INSTALL.md](INSTALL.md) for detailed installation instructions, including:
-- Prerequisites and dependencies
-- Build process and configuration
-- Module setup and management
-- Server startup options
-- Troubleshooting common issues
+See [INSTALL.md](INSTALL.md) for complete installation instructions.
+
+**Quick install:**
+
+```bash
+mkdir -p build && cd build
+cmake ..
+cmake --build . --target install-upgrade -j$(nproc)
+cd ../game && ./netmush
+```
 
 # Documentation
 
@@ -166,9 +167,10 @@ See [INSTALL.md](INSTALL.md) for detailed installation instructions, including:
 |----------|-------------|
 | [README.md](README.md) | This document - project overview and quick start |
 | [INSTALL.md](INSTALL.md) | Comprehensive installation guide |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute to TinyMUSH |
+| [SECURITY.md](SECURITY.md) | Security policy and vulnerability reporting |
 | [KNOWN_BUGS.md](KNOWN_BUGS.md) | Current known issues and recent fixes |
 | [NEWS.md](NEWS.md) | Important announcements and updates |
-| [SECURITY.md](SECURITY.md) | Security considerations and best practices |
 | [COPYING.md](COPYING.md) | License information (Artistic License 2.0) |
 | [AUTHORS.md](AUTHORS.md) | Credits and acknowledgments |
 
@@ -182,16 +184,21 @@ Located in [docs/Code/](docs/Code/):
 | [ALLOC_DOCUMENTATION.md](docs/Code/ALLOC_DOCUMENTATION.md) | Memory management and safe string APIs |
 | [COMMANDS_AND_REGISTRIES_REFERENCE.md](docs/Code/COMMANDS_AND_REGISTRIES_REFERENCE.md) | Commands, functions, flags, powers, attributes |
 
-### Module Examples
+### Included Modules
+
+TinyMUSH 4 includes the following modules enabled by default:
 
 | Module | Description |
 |--------|-------------|
-| [skeleton](src/modules/skeleton/) | Template for creating new modules ([README](src/modules/skeleton/README.md), [Quick Reference](src/modules/skeleton/QUICK_REFERENCE.md)) |
+| [mail](src/modules/mail/) | Internal mail system with PennMUSH-compatible syntax |
+| [comsys](src/modules/comsys/) | Communication channels for multi-user chat |
+| [skeleton](src/modules/skeleton/) | Template for creating new modules ([README](src/modules/skeleton/README.md)) |
+
+See [INSTALL.md](INSTALL.md) for module configuration and [docs/Code/MODULES_DEVELOPMENT.md](docs/Code/MODULES_DEVELOPMENT.md) for creating custom modules.
 
 ## Historical Documentation
 
 **Note:** Historical documents are preserved for reference but may not reflect current TinyMUSH 4 practices.
-
 
 Located in [docs/Historical/](docs/Historical/):
 
@@ -214,87 +221,26 @@ Includes detailed API references for functions, structures, and macros used thro
 
 # Contributing
 
-We welcome contributions from the community! Here's how to get involved:
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- How to report bugs and request features
+- Development setup and workflow
+- Code style guidelines
+- Testing requirements
+- Pull request process
 
-## Reporting Issues
-
-- **Bugs**: File detailed bug reports at https://github.com/TinyMUSH/TinyMUSH/issues
-- **Feature Requests**: Propose new features through GitHub issues
-- **Security Issues**: See [SECURITY.md](SECURITY.md) for responsible disclosure
-
-## Contributing Code
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Follow existing code style and conventions
-4. Add tests for new functionality
-5. Update documentation as needed
-6. Submit a pull request
-
-### Development Setup
-
-```bash
-# Clone your fork
-git clone https://github.com/YOUR_USERNAME/TinyMUSH.git
-cd TinyMUSH
-
-# Build in debug mode
-mkdir -p build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-make -j$(nproc)
-
-# Run tests
-cd ../scripts
-python3 regression_test.py
-```
-
-### Code Guidelines
-
-- Use safe string functions (`XSAFE*` macros, never `strcpy`/`sprintf`)
-- Track all allocations with `XMALLOC`/`XFREE`
-- Follow existing naming conventions (`mod_<name>_<function>`)
-- Document public APIs with Doxygen comments
-- Add regression tests for new functions/commands
-- Check for memory leaks before submitting
-
-## Module Development
-
-Creating custom modules is encouraged! See:
-- [docs/Code/MODULES_DEVELOPMENT.md](docs/Code/MODULES_DEVELOPMENT.md) - Complete guide
-- [src/modules/skeleton/](src/modules/skeleton/) - Working template
-
-Quick module creation:
-
-```bash
-cp -r src/modules/skeleton src/modules/mymodule
-cd src/modules/mymodule
-sed -i 's/skeleton/mymodule/g' *
-# Edit mymodule.c and mymodule.h
-```
+For security vulnerabilities, see [SECURITY.md](SECURITY.md).
 
 # Support
 
-## Community
-
-- **GitHub Issues**: https://github.com/TinyMUSH/TinyMUSH/issues
-- **Email**: tinymush@googlegroups.com
-- **Documentation**: Check [docs/](docs/) directory first
-
 ## Getting Help
 
-1. Review relevant documentation (INSTALL.md, module READMEs, etc.)
-2. Check [KNOWN_BUGS.md](KNOWN_BUGS.md) for reported issues
-3. Search existing GitHub issues
-4. If needed, open a new issue with:
-   - TinyMUSH version (`@version` output)
-   - Operating system and version
-   - Relevant configuration settings
-   - Steps to reproduce the problem
-   - Error messages or log excerpts
+1. Check [INSTALL.md](INSTALL.md) and [KNOWN_BUGS.md](KNOWN_BUGS.md)
+2. Search [GitHub issues](https://github.com/TinyMUSH/TinyMUSH/issues)
+3. Email: tinymush@googlegroups.com
 
 ## License
 
-TinyMUSH is distributed under the Artistic License 2.0. See [COPYING.md](COPYING.md) for full license text.
+TinyMUSH is distributed under the Artistic License 2.0. See [COPYING.md](COPYING.md) for details.
 
 ---
 
