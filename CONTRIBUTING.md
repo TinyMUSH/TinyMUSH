@@ -17,10 +17,21 @@ Thank you for your interest in contributing to TinyMUSH! This document provides 
 
 ## Code of Conduct
 
-- Be respectful and constructive in discussions
-- Welcome newcomers and help them get started
-- Focus on what is best for the community
-- Show empathy towards other community members
+This project is focused exclusively on the development, maintenance, and support of TinyMUSH. All interactions should be:
+
+- **Respectful and Constructive**: Treat all contributors with courtesy and professionalism
+- **Welcoming**: Help newcomers get started and answer questions patiently
+- **On-Topic**: Discussions must relate to TinyMUSH development, usage, or support
+- **Apolitical**: Politics, personal opinions, and unrelated social issues have no place in this project
+
+Keep discussions focused on:
+- Code contributions and technical decisions
+- Bug reports and feature requests
+- Documentation improvements
+- Installation and configuration help
+- Module development
+
+For topics unrelated to TinyMUSH development and usage, please use appropriate external platforms.
 
 ## How to Contribute
 
