@@ -40,7 +40,8 @@ PORT = int(os.getenv("TINY_PORT", "6250"))
 # Default to developer debug account (#1 potrzebi) unless overridden.
 USER = os.getenv("TINY_USER", "#1")
 PASS = os.getenv("TINY_PASS", "potrzebi")
-TIMEOUT = float(os.getenv("TINY_TIMEOUT", "5"))
+# Increase default timeout to reduce occasional read races; override with TINY_TIMEOUT.
+TIMEOUT = float(os.getenv("TINY_TIMEOUT", "7"))
 DEFAULT_CONFIG = os.getenv("TINY_CONFIG_FILE", "scripts/commands_messaging.conf")
 
 DISCONNECTING = {
