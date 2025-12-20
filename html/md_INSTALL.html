@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.12.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TinyMUSH: Installation Instructions</title>
+<title>TinyMUSH: TinyMUSH Installation Guide</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,61 +85,292 @@ $(function(){ initResizable(false); });
 </div><!-- top -->
 <div id="doc-content">
 <div><div class="header">
-  <div class="headertitle"><div class="title">Installation Instructions</div></div>
+  <div class="headertitle"><div class="title">TinyMUSH Installation Guide</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md189"></a></p>
-<p>TinyMUSH now uses the CMake build system. Use the CMake targets directly; install.sh has been removed.</p>
-<h1><a class="anchor" id="autotoc_md190"></a>
-Build instructions:</h1>
-<ol type="1">
-<li><p class="startli">Install dependencies:</p>
-<p class="startli">For Ubuntu/Debian: </p><div class="fragment"><div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev</div>
-</div><!-- fragment --><p class="startli">For macOS (Homebrew): </p><div class="fragment"><div class="line">brew install cmake gdbm pcre</div>
-</div><!-- fragment --></li>
-<li>Configure and build: <div class="fragment"><div class="line">mkdir -p build &amp;&amp; cd build</div>
+<div class="textblock"><p><a class="anchor" id="autotoc_md378"></a></p>
+<p>TinyMUSH 4.0 uses CMake as its build system. This guide covers installation, configuration, and basic setup.</p>
+<h1><a class="anchor" id="autotoc_md379"></a>
+Quick Start</h1>
+<div class="fragment"><div class="line"># Install dependencies (Ubuntu/Debian)</div>
+<div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev</div>
+<div class="line"> </div>
+<div class="line"># Build and install</div>
+<div class="line">mkdir -p build &amp;&amp; cd build</div>
 <div class="line">cmake ..</div>
 <div class="line">cmake --build . --target install-upgrade -j$(nproc)</div>
-</div><!-- fragment --><ul>
-<li><code>install-upgrade</code> (default): installs to <code>../game</code>, preserves existing configs, and backs them up under <code>game/backups/upgrade-&lt;timestamp&gt;</code>.</li>
-<li><code>install-fresh</code>: removes <code>../game</code> before installing (clean reinstall).</li>
-<li>Build options:<ul>
-<li><code>-DCMAKE_BUILD_TYPE=Release</code> (default) or <code>Debug</code></li>
-<li><code>-DTINYMUSH_USE_CCACHE=ON</code> (default): use ccache for faster rebuilds</li>
-<li><code>-DTINYMUSH_USE_LTO=ON</code> (default): enable link-time optimization for Release</li>
-<li><code>-DTINYMUSH_PRESERVE_CONFIGS=OFF</code>: overwrite existing configs</li>
-<li><code>-DTINYMUSH_BACKUP_CONFIGS=OFF</code>: skip config backups</li>
-<li><code>-G Ninja</code>: use Ninja generator (faster than Make, requires <code>ninja-build</code>)</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Start TinyMUSH: <div class="fragment"><div class="line">cd ../game</div>
+<div class="line"> </div>
+<div class="line"># Start server</div>
+<div class="line">cd ../game</div>
 <div class="line">./netmush</div>
-</div><!-- fragment --></li>
+</div><!-- fragment --><p>Default port: <b>6250</b> <br  />
+ Default God password: <b>potrzebie</b></p>
+<h1><a class="anchor" id="autotoc_md380"></a>
+Prerequisites</h1>
+<h2><a class="anchor" id="autotoc_md381"></a>
+Ubuntu/Debian</h2>
+<div class="fragment"><div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md382"></a>
+macOS (Homebrew)</h2>
+<div class="fragment"><div class="line">brew install cmake gdbm pcre</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md383"></a>
+Optional Tools</h2>
+<ul>
+<li><code>ccache</code> - Speeds up recompilation (enabled by default)</li>
+<li><code>ninja-build</code> - Faster build system than Make</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md384"></a>
+Build Process</h1>
+<h2><a class="anchor" id="autotoc_md385"></a>
+1. Configure</h2>
+<p>Create a build directory and configure the project:</p>
+<div class="fragment"><div class="line">mkdir -p build &amp;&amp; cd build</div>
+<div class="line">cmake ..</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md386"></a>
+2. Build</h2>
+<p>Compile the server and modules:</p>
+<div class="fragment"><div class="line">cmake --build . -j$(nproc)</div>
+</div><!-- fragment --><p>Or use the Makefile wrapper:</p>
+<div class="fragment"><div class="line">make -j$(nproc)</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md387"></a>
+3. Install</h2>
+<p>Two installation targets are available:</p>
+<p><b>Install/Upgrade (Preserves Config)</b></p>
+<div class="fragment"><div class="line">cmake --build . --target install-upgrade</div>
+</div><!-- fragment --><ul>
+<li>Installs to <code>../game/</code></li>
+<li>Preserves existing configuration files</li>
+<li>Backs up configs to <code>game/backups/upgrade-&lt;timestamp&gt;/</code></li>
+</ul>
+<p><b>Fresh Install (Clean Slate)</b></p>
+<div class="fragment"><div class="line">cmake --build . --target install-fresh</div>
+</div><!-- fragment --><ul>
+<li>Removes <code>../game/</code> completely before installing</li>
+<li>Use for initial setup or when config corruption occurs</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md388"></a>
+Build Options</h1>
+<p>Configure CMake with these options:</p>
+<div class="fragment"><div class="line">cmake -DCMAKE_BUILD_TYPE=Release \</div>
+<div class="line">      -DTINYMUSH_USE_CCACHE=ON \</div>
+<div class="line">      -DTINYMUSH_USE_LTO=ON \</div>
+<div class="line">      -DTINYMUSH_PRESERVE_CONFIGS=ON \</div>
+<div class="line">      -DTINYMUSH_BACKUP_CONFIGS=ON \</div>
+<div class="line">      ..</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md389"></a>
+Available Options</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Option   </th><th class="markdownTableHeadNone">Default   </th><th class="markdownTableHeadNone">Description    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>CMAKE_BUILD_TYPE</code>   </td><td class="markdownTableBodyNone"><code>Release</code>   </td><td class="markdownTableBodyNone">Build type: <code>Release</code> or <code>Debug</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>TINYMUSH_USE_CCACHE</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Use ccache for faster rebuilds    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>TINYMUSH_USE_LTO</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Enable link-time optimization (Release only)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>TINYMUSH_PRESERVE_CONFIGS</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Preserve existing config files during install    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>TINYMUSH_BACKUP_CONFIGS</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Backup configs before upgrading   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md390"></a>
+Using Ninja (Faster Builds)</h2>
+<div class="fragment"><div class="line">cmake -G Ninja ..</div>
+<div class="line">ninja</div>
+<div class="line">ninja install-upgrade</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md391"></a>
+Module Configuration</h1>
+<p>Modules are enabled/disabled in <code>modules.cmake</code>:</p>
+<div class="fragment"><div class="line"># List modules here; enable by leaving uncommented, disable by prefixing with &#39;#&#39;</div>
+<div class="line">add_subdirectory(src/modules/mail)</div>
+<div class="line">add_subdirectory(src/modules/comsys)</div>
+<div class="line">#add_subdirectory(src/modules/skeleton)</div>
+</div><!-- fragment --><p>After changing <code>modules.cmake</code>, reconfigure and rebuild:</p>
+<div class="fragment"><div class="line">cmake ..</div>
+<div class="line">make</div>
+</div><!-- fragment --><p>To load modules at runtime, add to <code>game/configs/netmush.conf</code>:</p>
+<div class="fragment"><div class="line">module mail</div>
+<div class="line">module comsys</div>
+</div><!-- fragment --><p>See <a class="el" href="md_docs_2Code_2MODULES__DEVELOPMENT.html">docs/Code/MODULES_DEVELOPMENT.md</a> for module development.</p>
+<h1><a class="anchor" id="autotoc_md392"></a>
+Starting the Server</h1>
+<h2><a class="anchor" id="autotoc_md393"></a>
+Daemon Mode (Background)</h2>
+<p>By default, the server forks to background:</p>
+<div class="fragment"><div class="line">cd game</div>
+<div class="line">./netmush</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md394"></a>
+Foreground Mode (Debug)</h2>
+<p>Use <code>-d</code> or <code>--debug</code> to prevent forking (useful for debugging):</p>
+<div class="fragment"><div class="line">cd game</div>
+<div class="line">./netmush -d</div>
+<div class="line"># or</div>
+<div class="line">./netmush --debug</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md395"></a>
+Check Server Status</h2>
+<div class="fragment"><div class="line"># Check if running</div>
+<div class="line">ps aux | grep netmush</div>
+<div class="line"> </div>
+<div class="line"># Check port</div>
+<div class="line">netstat -tuln | grep 6250</div>
+<div class="line"> </div>
+<div class="line"># View logs</div>
+<div class="line">tail -f game/logs/netmush.log</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md396"></a>
+Initial Setup</h1>
+<p>After first start:</p>
+<ol type="1">
+<li>Connect as God: <code>telnet localhost 6250</code></li>
+<li>Login: <code>connect #1 potrzebie</code></li>
+<li>Change password: <code>@password old=potrzebie, new=&lt;new_password&gt;</code></li>
+<li>Set up basic configuration via <code>@admin</code> commands</li>
 </ol>
-<p>Default port is '6250' and default God's password is 'potrzebie'.</p>
-<h1><a class="anchor" id="autotoc_md191"></a>
-Structure</h1>
-<p>The structure of TinyMUSH has changed again. Below are the repository layout (sources under <code>src/</code>) and the installed game layout.</p>
-<p>Repository layout:</p>
-<div class="fragment"><div class="line">├── src</div>
-<div class="line">│   ├── netmush     Core server sources</div>
-<div class="line">│   ├── modules     Optional modules (mail, comsys, db_sql)</div>
-<div class="line">│   ├── docs        Documentation sources</div>
-<div class="line">│   ├── configs     Example configuration templates</div>
-<div class="line">│   ├── scripts     Maintenance and helper scripts</div>
-<div class="line">│   └── systemd     Service template(s) for systemd</div>
-</div><!-- fragment --><div class="fragment"><div class="line">├── game           Game binaries and pid file.</div>
-<div class="line">    ├── backups    Game backups</div>
-<div class="line">    ├── configs    Installed configuration files</div>
-<div class="line">    ├── db         Databases</div>
-<div class="line">    ├── docs       Installed documentation and text files</div>
-<div class="line">    ├── logs       Game logs</div>
-<div class="line">    ├── modules    Installed optional modules</div>
-<div class="line">    ├── scripts    Installed helper scripts</div>
-<div class="line">    └── systemd    Generated unit file for systemd (optional)</div>
-</div><!-- fragment --><p>More documentation will be available as development goes. </p>
+<h1><a class="anchor" id="autotoc_md397"></a>
+Configuration Files</h1>
+<p>Located in <code>game/configs/</code>:</p>
+<ul>
+<li><code>netmush.conf</code> - Main server configuration</li>
+<li><code>alias.conf</code> - Command aliases</li>
+<li><code>compat.conf</code> - Compatibility settings</li>
+</ul>
+<p>Edit these after installation, then <code>@restart</code> or restart the server.</p>
+<h1><a class="anchor" id="autotoc_md398"></a>
+Common Issues</h1>
+<h2><a class="anchor" id="autotoc_md399"></a>
+Build Errors</h2>
+<p><b>Missing dependencies:</b> </p><div class="fragment"><div class="line"># Verify installations</div>
+<div class="line">dpkg -l | grep -E &#39;cmake|gdbm|pcre|crypt&#39;</div>
+</div><!-- fragment --><p><b>CMake cache issues:</b> </p><div class="fragment"><div class="line">rm -rf build</div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake ..</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md400"></a>
+Runtime Errors</h2>
+<p><b>Port already in use:</b></p><ul>
+<li>Change <code>port</code> in <code>netmush.conf</code></li>
+<li>Or: <code>killall netmush</code> to stop existing instance</li>
+</ul>
+<p><b>Database corruption:</b> </p><div class="fragment"><div class="line">cd game</div>
+<div class="line">cp db/*.db backups/</div>
+<div class="line">./netmush  # Will attempt recovery</div>
+</div><!-- fragment --><p><b>Module fails to load:</b></p><ul>
+<li>Check <code>module &lt;name&gt;</code> is in <code>netmush.conf</code></li>
+<li>Verify <code>.so</code> exists in <code>game/modules/</code></li>
+<li>Check logs: <code>tail game/logs/netmush.log</code></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md401"></a>
+Directory Structure</h1>
+<h2><a class="anchor" id="autotoc_md402"></a>
+Repository Layout</h2>
+<div class="fragment"><div class="line">TinyMUSH/</div>
+<div class="line">├── CMakeLists.txt          Main build configuration</div>
+<div class="line">├── modules.cmake           Module enable/disable list</div>
+<div class="line">├── build/                  Build artifacts (generated)</div>
+<div class="line">├── game/                   Installed game directory</div>
+<div class="line">├── src/</div>
+<div class="line">│   ├── netmush/           Core server sources</div>
+<div class="line">│   ├── modules/           Loadable modules</div>
+<div class="line">│   │   ├── mail/          Mail system module</div>
+<div class="line">│   │   ├── comsys/        Communication channels</div>
+<div class="line">│   │   └── skeleton/      Template for new modules</div>
+<div class="line">│   ├── configs/           Configuration templates</div>
+<div class="line">│   ├── scripts/           Maintenance scripts</div>
+<div class="line">│   ├── docs/              Documentation sources</div>
+<div class="line">│   └── systemd/           systemd service templates</div>
+<div class="line">├── docs/</div>
+<div class="line">│   ├── Code/              Development documentation</div>
+<div class="line">│   └── Historical/        Legacy documentation</div>
+<div class="line">└── scripts/               Regression test suites</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md403"></a>
+Game Directory Layout (after install)</h2>
+<div class="fragment"><div class="line">game/</div>
+<div class="line">├── netmush                 Server executable</div>
+<div class="line">├── netmush.pid             Process ID file</div>
+<div class="line">├── backups/                Database backups</div>
+<div class="line">├── configs/                Configuration files</div>
+<div class="line">│   ├── netmush.conf       Main configuration</div>
+<div class="line">│   ├── alias.conf         Command aliases</div>
+<div class="line">│   └── compat.conf        Compatibility settings</div>
+<div class="line">├── db/                     Database files</div>
+<div class="line">├── docs/                   Installed documentation</div>
+<div class="line">├── logs/                   Server logs</div>
+<div class="line">├── modules/                Compiled module .so files</div>
+<div class="line">├── scripts/                Helper scripts</div>
+<div class="line">└── systemd/                systemd service file</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md404"></a>
+Backup and Recovery</h1>
+<h2><a class="anchor" id="autotoc_md405"></a>
+Manual Backup</h2>
+<div class="fragment"><div class="line">cd game</div>
+<div class="line"># Backup database</div>
+<div class="line">tar czf backups/db-$(date +%Y%m%d-%H%M%S).tar.gz db/</div>
+<div class="line"> </div>
+<div class="line"># Backup everything</div>
+<div class="line">tar czf backups/full-$(date +%Y%m%d-%H%M%S).tar.gz .</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md406"></a>
+Restore from Backup</h2>
+<div class="fragment"><div class="line">cd game</div>
+<div class="line">tar xzf backups/db-&lt;timestamp&gt;.tar.gz</div>
+<div class="line">./netmush</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md407"></a>
+Automated Backups</h2>
+<p>Set up <code>@daily</code> in-game on God (#1):</p>
+<div class="fragment"><div class="line">@daily me = @dump/flatfile; @wait 5={@shutdown}</div>
+</div><!-- fragment --><p>Or use cron:</p>
+<div class="fragment"><div class="line">0 3 * * * cd /path/to/game &amp;&amp; ./netmush @dump/flatfile</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md408"></a>
+Upgrading</h1>
+<h2><a class="anchor" id="autotoc_md409"></a>
+From Previous Version</h2>
+<ol type="1">
+<li>Stop the server: <code>killall netmush</code></li>
+<li>Backup database: <code>tar czf db-backup.tar.gz game/db/</code></li>
+<li>Pull latest code: <code>git pull</code></li>
+<li>Rebuild: <code>cd build &amp;&amp; cmake .. &amp;&amp; make install-upgrade</code></li>
+<li>Review config changes in <code>game/configs/netmush.conf.example</code></li>
+<li>Restart: <code>cd game &amp;&amp; ./netmush</code></li>
+</ol>
+<h2><a class="anchor" id="autotoc_md410"></a>
+Config Migration</h2>
+<p>Config backups are stored in <code>game/backups/upgrade-&lt;timestamp&gt;/</code>:</p>
+<div class="fragment"><div class="line"># Compare old and new configs</div>
+<div class="line">diff game/backups/upgrade-*/netmush.conf game/configs/netmush.conf</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md411"></a>
+Development Setup</h1>
+<p>For active development:</p>
+<div class="fragment"><div class="line"># Debug build</div>
+<div class="line">mkdir -p build &amp;&amp; cd build</div>
+<div class="line">cmake -DCMAKE_BUILD_TYPE=Debug ..</div>
+<div class="line">make -j$(nproc)</div>
+<div class="line"> </div>
+<div class="line"># Quick rebuild script</div>
+<div class="line">cat &gt; ../rebuild.sh &lt;&lt; &#39;EOF&#39;</div>
+<div class="line">#!/bin/bash</div>
+<div class="line">killall -9 netmush 2&gt;/dev/null</div>
+<div class="line">cd build</div>
+<div class="line">cmake --build . --target install-upgrade -j$(nproc)</div>
+<div class="line">cd ../game</div>
+<div class="line">./netmush</div>
+<div class="line">EOF</div>
+<div class="line">chmod +x ../rebuild.sh</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md412"></a>
+Additional Resources</h1>
+<ul>
+<li><b>Main README</b>: <a class="el" href="md_README.html">README.md</a></li>
+<li><b>Module Development</b>: <a class="el" href="md_docs_2Code_2MODULES__DEVELOPMENT.html">docs/Code/MODULES_DEVELOPMENT.md</a></li>
+<li><b>Skeleton Module</b>: <a class="el" href="md_src_2modules_2skeleton_2README.html">src/modules/skeleton/README.md</a></li>
+<li><b>Known Issues</b>: <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a></li>
+<li><b>Security</b>: <a class="el" href="md_SECURITY.html">SECURITY.md</a></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md413"></a>
+Support</h1>
+<p>For issues, questions, or contributions:</p>
+<ul>
+<li><b>Issues</b>: <a href="https://github.com/TinyMUSH/TinyMUSH/issues">https://github.com/TinyMUSH/TinyMUSH/issues</a></li>
+<li><b>Email</b>: <a href="#" onclick="location.href='mai'+'lto:'+'tin'+'ym'+'ush'+'@g'+'oog'+'le'+'gro'+'up'+'s.c'+'om'; return false;">tinym<span class="obfuscator">.nosp@m.</span>ush@<span class="obfuscator">.nosp@m.</span>googl<span class="obfuscator">.nosp@m.</span>egro<span class="obfuscator">.nosp@m.</span>ups.c<span class="obfuscator">.nosp@m.</span>om</a></li>
+<li><b>Documentation</b>: Check <code>docs/</code> directory</li>
+</ul>
+<hr  />
+<p><b>TinyMUSH 4.0</b> - Copyright (C) 1989-2025 TinyMUSH Development Team </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

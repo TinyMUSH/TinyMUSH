@@ -88,8 +88,8 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md171"></a></p>
-<h1><a class="anchor" id="autotoc_md172"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md341"></a></p>
+<h1><a class="anchor" id="autotoc_md342"></a>
 Frequently-Asked Questions</h1>
 <ul>
 <li>I found a bug! What do I do?</li>
@@ -106,7 +106,7 @@ Frequently-Asked Questions</h1>
 <li>Help! I'm having database problems.</li>
 <li>How do I set up a link to an external SQL database?</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md173"></a>
+<h2><a class="anchor" id="autotoc_md343"></a>
 I found a bug! What do I do?</h2>
 <ul>
 <li>Make sure that it really is a bug, and not a new feature or design decision. If it crashes the server, it's a bug. If you can't tell, consider it a bug.</li>
@@ -120,7 +120,7 @@ I found a bug! What do I do?</h2>
 <p class="startli">dbx bin/netmush core where dump up dump up (Repeat until you're at the top procedure level.) quit</p>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md174"></a>
+<h2><a class="anchor" id="autotoc_md344"></a>
 How do I make a new configuration file?</h2>
 <p>TinyMUSH 3 gets the information it needs to operate the game (aside from the database itself) from a configuration file that is read in at startup. The configuration file contains various parameters, such as where to find the database, what port to listen for connects, and many other things.</p>
 <p>Follow these instructions to make a configuration file for your MUSH from the supplied template configuration file:</p>
@@ -144,18 +144,18 @@ How do I make a new configuration file?</h2>
      o player_starting_room &lt;roomno&gt;  The room that new players are
                               created in.
 </pre><p>There are many more configuration directives available. Information on individual directives can be obtained with the WIZHELP &lt;directive&gt; command within the MUSH.</p>
-<h2><a class="anchor" id="autotoc_md175"></a>
+<h2><a class="anchor" id="autotoc_md345"></a>
 How do I back up my database?</h2>
 <p>Shut down your game. Go into the game directory, and type './Backup' This will create a 'flatfile', and compress it with GNU zip; if there's no GNU zip on your system, you should edit the Backup script so it uses Unix compress instead.</p>
 <p>If you want to back up your database while the game is running, use @dump/flatfile; this is a strong candidate for a @daily on your God character.</p>
 <p>If for some reason, you can't run a backup from within the game (you've forgotten your passwords to the wizard characters, or something similarly problematic), and you can't or don't want to shut the game down, you can safely back up the database with Backup while the game is running, but you are not guaranteed 100% consistency within the flatfile. You can minimize consistency errors by doing a @dump, waiting a minute until the database is done saving, and then do the Backup; even if there are slight out-of-sync errors (due to changed attributes not yet being written to disk) they will not prevent the backup from being restorable. If the game is running, @dump/flatfile is strongly preferable, since the resulting flatfile will contain the most current, in-sync data.</p>
 <p>Do NOT simply naively copy around netmush.db, netmush.gdbm, etc., as they are not portable between platforms. Use the Backup script to create flatfiles.</p>
 <p>Note that this does NOT back up your comsys database or mail database, or other relevant MUSH files. You can simply copy comsys.db and mail.db to a safe place, to back them up. Alternatively, you can run the Archive script to back up all the important files.</p>
-<h2><a class="anchor" id="autotoc_md176"></a>
+<h2><a class="anchor" id="autotoc_md346"></a>
 How do I restore a database backup?</h2>
 <p>Shut down the game (if it's currently running). Then, go into the game directory and type './Restore name-of-flatfile', where name-of-flatfile is the name of your backup file.</p>
 <p>Note that this only restores your database; it does not restore the comsys or mail databases. To restore the latter, simply copy your saved copies of comsys.db and mail.db back to the game directory.</p>
-<h2><a class="anchor" id="autotoc_md177"></a>
+<h2><a class="anchor" id="autotoc_md347"></a>
 How do I apply a patch upgrade or bugfix?</h2>
 <p>The easiest way to patch the server, if you have perl installed on your system, is to type './Update' &ndash; this will automatically download patches, apply them, and clean up. You will then be given instructions as to what to do to build the new version of the server, which you should follow unless some other instructions were specifically given with the changes (check BETA, CHANGES, and INSTALL, for instance).</p>
 <p>To patch the server manually:</p>
@@ -167,7 +167,7 @@ How do I apply a patch upgrade or bugfix?</h2>
 </ul>
 <p>If there are problems with the patch, make sure that nothing strange has happened &ndash; for example, there are no carriage-return/newlines ('^M') characters at the end of lines.</p>
 <p>Also, if you're applying multiple patches, make sure to do them in chronological sequence &ndash; oldest to newest patch.</p>
-<h2><a class="anchor" id="autotoc_md178"></a>
+<h2><a class="anchor" id="autotoc_md348"></a>
 How do I recover a lost password for God (#1)?</h2>
 <p>You will need to recompile the server with a new God character, use it to change the password of the old God character, and then recompile again. To do this, do the following:</p>
 <ul>
@@ -184,7 +184,7 @@ How do I recover a lost password for God (#1)?</h2>
 <li>Start the MUSH.</li>
 </ul>
 <p>You should now be able to log into the God character with the new password.</p>
-<h2><a class="anchor" id="autotoc_md179"></a>
+<h2><a class="anchor" id="autotoc_md349"></a>
 How do logfiles work?</h2>
 <p>When you start your game from the command line, the startup information is logged to GAMENAME.log, where GAMENAME is what you specified it to be in your mush.config file.</p>
 <p>Subsequently, log information is written to whatever you set your game_log configuration parameter to be in your GAMENAME.conf file (whatever GAMENAME is); if you didn't specify that parameter, 'netmush.log' will be used. In general, you will probably want to set it to GAMENAME.log, so startup information and regular log information are all written to the same file.</p>
@@ -193,7 +193,7 @@ How do logfiles work?</h2>
 <p>When you start the game using the Startmush script, any existing GAMENAME.log files, or log files named by the game_log and divert_log conf parameters, will be renamed to LOGNAME.old (whatever the name of the log happens to be). Any previous logs by those names (with a .TIMESTAMP extension) will be deleted.</p>
 <p>When the MUSH is running, you can use, from the game directory, './Logclean' to remove logs with a .TIMESTAMP extension, and './Logclean -o' to remove logs with a .TIMESTAMP or .old extension.</p>
 <p>When the MUSH is not running, './Logclean -a' can be used to get rid of all logfiles &ndash; GAMENAME.log, anything named by the game_log and divert_log conf parameters, and their old versions with .TIMESTAMP and .old extensions.</p>
-<h2><a class="anchor" id="autotoc_md180"></a>
+<h2><a class="anchor" id="autotoc_md350"></a>
 How do I use multiple guests?</h2>
 <p>Using multiple guests is easy, and after you set it up, you'll never have to worry about it again. Here are the steps needed to implement multiple guests:</p>
 <ol type="1">
@@ -215,7 +215,7 @@ How do I use multiple guests?</h2>
 </li>
 </ol>
 <p>The file specified by the config parameter 'guest_file' is shown to every guest when they connect. You may wish to use the 'access' config parameter to bar guests from using certain commands, using the 'no_guest' permission. All guests have the 'Guest' power, which is a marker you may use to test whether a player is a guest or not. Guests copy the flags, attributes, parent, and zone of the guest prototype (the guest_char_num object).</p>
-<h2><a class="anchor" id="autotoc_md181"></a>
+<h2><a class="anchor" id="autotoc_md351"></a>
 How do I create my own flags? (How do I configure marker flags?)</h2>
 <p>You can define your own flags through the use of "marker flags". Flag names and permissions are defined in your conf file.</p>
 <p>There are ten marker flags, numbered 0 through 9; 0 through 9 are the single characters representing the flag when the flags of an object are displayed with the dbref when you control/can link to an object, by the flags() function, etc. In order to distinguish these flags from dbref numbers, if they are the only flags set on an object, there will be an underscore ('_') between the dbref and the flags.</p>
@@ -229,7 +229,7 @@ How do I create my own flags? (How do I configure marker flags?)</h2>
 <p>To alias the flag, use the flag_alias directive:</p>
 <p>flag_alias CHIEF _CHIEF</p>
 <p>which makes it possible to do '@set &lt;object&gt; = CHIEF'; the caveats listed above about future conflicts with built-ins should be kept in mind, though.</p>
-<h2><a class="anchor" id="autotoc_md182"></a>
+<h2><a class="anchor" id="autotoc_md352"></a>
 How do I create "altered reality" realm states like invisibility?</h2>
 <p>There are three special locks &ndash; the HeardLock, KnownLock, and MovedLock &ndash; that are only activated by the PRESENCE flag.</p>
 <p>When an object which is set PRESENCE tries to speak via a speech command such as "say", "pose", or "@emit", only those objects which pass the speaker's HeardLock are able to hear the message.</p>
@@ -273,24 +273,24 @@ How do I create "altered reality" realm states like invisibility?</h2>
 <p>&zwj;@set *Caspar = PRESENCE @set *Caspar = _GHOST @lock/hears *Caspar = #22 @lock/heard *Caspar = #33 @lock/known *Caspar = #33 @lock/motion *Caspar = #33 </p>
 </blockquote>
 <p>Fundamentally, you can combine these six locks to end up with any combination of what can hear, be heard, see, be seen, notice, and be noticed.</p>
-<h2><a class="anchor" id="autotoc_md183"></a>
+<h2><a class="anchor" id="autotoc_md353"></a>
 How do I tune the database cache?</h2>
 <p>Cache tuning is something of a black art. The basic tradeoff is this: If you make your cache larger, it will consume more memory, but you will (hopefully) need fewer disk accesses to get needed data, which will therefore be faster. However, if you consume too much memory, the operating system will begin to page random bits of your MUSH on and off of disk &ndash; you are better off staying small enough to not have that happen, and do your own getting data on and off disk.</p>
 <p>TinyMUSH 3.1 allows you to limit the total amount of cache memory the server consumes. This defaults to 1,000,000 bytes, or just under 1 MB of RAM. The size of the cache can be changed with the cache_size parameter in your conf file. We recommend that you don't set this value any lower, except on private or very small games. Otherwise, take a look at the size of your netmush.gdbm file via ls -l netmush.gdbm &ndash; the file's size in bytes should be next to its last-modified date. (If your GDBM file is not called netmush.gdbm, use whatever filename it's called.) You should never set your cache size larger than the size of this file.</p>
 <p>The optimal cache size is dependent on a number of different factors; these include the size of your master room objects, the number of players you have logged on at a time, and how much they move around. Generally any object which is 'used' by a player is cached; this includes rooms and exits, as well as objects in their inventory. Thus your cache size really shouldn't depend on the total size of your database, but on the size of the active playerbase, often-used softcode, and the areas your players typically move around in. Take a look at your @list cache sometime to determine what kind of objects are being cached.</p>
 <p>Let your game run for a few hours with normal player activity. Check '@list db_stats' and look at the Cache Size reported, and the Hit Ratio for Reads. You want the latter to be in the 90-97% range. If your actual reported cache size is much lower than your configured cache_size and your hit ratio is still in that range, then you should be able to safely lower cache_size in the future. If your hit ratio is low, try increasing the cache size (though eventually there will be a trade-off in paging behavior if the process becomes too large).</p>
 <p>You can also tune the cache width; this is the number of 'buckets' that cache entries are spread out over. For the vast majority of games the default if okay. If you want to tune this, take a look at the number of attributes being cached in '@list cache', divide this number by 50, and use that as your cache width.</p>
-<h2><a class="anchor" id="autotoc_md184"></a>
+<h2><a class="anchor" id="autotoc_md354"></a>
 How do I use the in-memory database?</h2>
 <p>Follow the 'Basic Installition' steps in the INSTALL file, with one exception: specify '&ndash;disable-disk-based' as an argument to configure (step 5). Please note that unlike previous versions, TinyMUSH 3.1 uses GDBM for its memory-based database instead of a flatfile. You can still create a flatfile using the Backup script the same way you would for a disk-based game.</p>
-<h2><a class="anchor" id="autotoc_md185"></a>
+<h2><a class="anchor" id="autotoc_md355"></a>
 Help! I'm having database problems.</h2>
 <p>Almost everyone who runs a MUSH experiences a database disaster at least once in their life. There can be many reasons for this; common ones include an NFS server dying, running out of disk space, overflowing your disk quota, a nasty game crash, and a nasty system crash.</p>
 <p>Typically, in this scenario, the server process either dumps core during an attempt to load the database, or simply hangs; sometimes, it may come back up and large chunks of your data may be missing.</p>
 <p>Sometimes, simply by flatfiling and reloading the flatfile (doing a Backup and a Restore), integrity issues that cause the database to fail to load can be dealt with. Be aware that you might experience some minor data loss in the process, though.</p>
 <p>However, your best bet in this scenario is to restore your database from backup. This means it's very important to keep backups; we strongly recommend that you back up once a week at minimum, if not nightly.</p>
 <p>If you don't have a recent backup you can restore from, you can try a database reconstruction. This is likely to be most effective if you have corruption resulting from a host machine crash or disk problem; you might not be able to get back all of your data, but it'll at least be something. If you haven't moved any files around, you can just go into the game directory and type './Reconstruct'. If it completes successfully, you can try to start it up with './Startmush' (though doing a './Backup' first would be a good idea). If it doesn't complete successfully, you'll need to revert to a backup.</p>
-<h2><a class="anchor" id="autotoc_md186"></a>
+<h2><a class="anchor" id="autotoc_md356"></a>
 How do I set up a link to an external SQL database?</h2>
 <p>There is built-in support in TinyMUSH 3 for connecting to an external mSQL or MySQL database. If you want to do this, you'll need to compile in the appropriate file (see ./configure &ndash;help for how to do this).</p>
 <p>You can also look at <a class="el" href="db__sql_8h.html" title="Public API for the SQL abstraction layer and backend drivers.">db_sql.h</a>, db_msql.c, and db_mysql.c for examples of how to write your own method of connecting to another type of external SQL database. If you do this, please let us know, and provide us with a copy of the code, so it can be included with the next TinyMUSH release.</p>
@@ -306,7 +306,7 @@ How do I set up a link to an external SQL database?</h2>
 <p>You should then be able to use the SQL() function from within the MUSH to make queries against this database. Note that users of this function need to have the use_sql power.</p>
 <p>Note for MySQL users: you may need to specify a username/password to connect to the database; use the sql_username and sql_password config parameters. These parameters have no effect for mSQL.</p>
 <hr  />
- <h1><a class="anchor" id="autotoc_md188"></a>
+ <h1><a class="anchor" id="autotoc_md358"></a>
 ### If you have suggestions for more FAQs, please email us and let us know.</h1>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

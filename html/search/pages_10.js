@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['updated_20in_20the_20future_20center_0',['UPDATED IN THE FUTURE center',['../md_CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]]
+  ['readme_0',['README',['../md_README.html',1,'']]],
+  ['reference_1',['TinyMUSH Commands and Registries Reference',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html',1,'']]],
+  ['reference_20card_2',['Skeleton Module - Quick Reference Card',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html',1,'']]],
+  ['registries_20reference_3',['TinyMUSH Commands and Registries Reference',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['news_0',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]]
+  ['list_0',['List',['../bug.html',1,'Bug List'],['../todo.html',1,'Todo List']]]
 ];

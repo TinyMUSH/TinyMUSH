@@ -88,18 +88,220 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">Security Policy</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md230"></a></p>
-<h1><a class="anchor" id="autotoc_md231"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md450"></a></p>
+<h1><a class="anchor" id="autotoc_md451"></a>
 Supported Versions</h1>
+<p>TinyMUSH 4.0 is currently in active development (alpha). Security updates and bug fixes are provided for:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Version   </th><th class="markdownTableHeadNone">Supported    </th></tr>
+<th class="markdownTableHeadNone">Version   </th><th class="markdownTableHeadNone">Status   </th><th class="markdownTableHeadNone">Support    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.3.x   </td><td class="markdownTableBodyNone">:white_check_mark:   </td></tr>
+<td class="markdownTableBodyNone">4.0.x (alpha)   </td><td class="markdownTableBodyNone">Active development   </td><td class="markdownTableBodyNone">:white_check_mark: Full support    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3.3.x   </td><td class="markdownTableBodyNone">Discontinued   </td><td class="markdownTableBodyNone">:x: No longer maintained    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">3.2.x   </td><td class="markdownTableBodyNone">Legacy   </td><td class="markdownTableBodyNone">:x: No longer maintained    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3.1.x   </td><td class="markdownTableBodyNone">Legacy   </td><td class="markdownTableBodyNone">:x: No longer maintained    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">&lt; 3.0   </td><td class="markdownTableBodyNone">Legacy   </td><td class="markdownTableBodyNone">:x: No longer maintained   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md232"></a>
+<p><b>Recommendation</b>: Always run the latest version from the master branch for current security fixes.</p>
+<h1><a class="anchor" id="autotoc_md452"></a>
 Reporting a Vulnerability</h1>
-<p>Please open an issue to report a security vulnerability. </p>
+<p><b>DO NOT report security vulnerabilities through public GitHub issues.</b></p>
+<p>Security vulnerabilities should be reported privately to allow time for fixes before public disclosure.</p>
+<h2><a class="anchor" id="autotoc_md453"></a>
+How to Report</h2>
+<p>Send a detailed report to: **tinymush@googlegroups.com**</p>
+<p>Include:</p><ul>
+<li><b>Description</b>: Clear explanation of the vulnerability</li>
+<li><b>Impact</b>: What could an attacker do with this vulnerability?</li>
+<li><b>Reproduction</b>: Step-by-step instructions to reproduce the issue</li>
+<li><b>Affected Versions</b>: Which versions are vulnerable</li>
+<li><b>Proof of Concept</b>: Code or commands demonstrating the vulnerability (if applicable)</li>
+<li><b>Suggested Fix</b>: If you have ideas for fixing it (optional)</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md454"></a>
+What to Expect</h2>
+<ol type="1">
+<li><b>Acknowledgment</b>: We will acknowledge receipt within 72 hours</li>
+<li><b>Assessment</b>: We will investigate and assess the severity</li>
+<li><b>Fix Development</b>: We will work on a fix for confirmed vulnerabilities</li>
+<li><b>Disclosure Timeline</b>: We aim to release fixes within 90 days</li>
+<li><b>Credit</b>: You will be credited in the security advisory (unless you prefer to remain anonymous)</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md455"></a>
+Disclosure Policy</h2>
+<ul>
+<li>We follow responsible disclosure practices</li>
+<li>We will coordinate with you on the disclosure timeline</li>
+<li>Public disclosure will occur after a fix is available</li>
+<li>Security advisories will be published on GitHub</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md456"></a>
+Security Considerations</h1>
+<h2><a class="anchor" id="autotoc_md457"></a>
+Running TinyMUSH Safely</h2>
+<h3><a class="anchor" id="autotoc_md458"></a>
+Network Security</h3>
+<p><b>Port Exposure:</b></p><ul>
+<li>Default port is 6250 (configurable in netmush.conf)</li>
+<li>Use a firewall to restrict access if needed</li>
+<li>Consider running behind a reverse proxy for additional security</li>
+</ul>
+<p><b>SSL/TLS:</b></p><ul>
+<li>TinyMUSH does not natively support SSL/TLS</li>
+<li>Use stunnel or similar tools to provide encrypted connections</li>
+<li>Example: <code>stunnel4 -d 6251 -r localhost:6250 -P none</code></li>
+</ul>
+<h3><a class="anchor" id="autotoc_md459"></a>
+File System Security</h3>
+<p><b>Permissions:</b> </p><div class="fragment"><div class="line"># Server executable - read/execute only</div>
+<div class="line">chmod 755 game/netmush</div>
+<div class="line"> </div>
+<div class="line"># Database files - restrict to server user</div>
+<div class="line">chmod 600 game/db/*</div>
+<div class="line"> </div>
+<div class="line"># Configuration files - read only by server user</div>
+<div class="line">chmod 600 game/configs/*.conf</div>
+<div class="line"> </div>
+<div class="line"># Logs - append only</div>
+<div class="line">chmod 640 game/logs/*.log</div>
+</div><!-- fragment --><p><b>Run as Non-Root User:</b> </p><div class="fragment"><div class="line"># NEVER run TinyMUSH as root</div>
+<div class="line"># Create a dedicated user</div>
+<div class="line">useradd -r -s /bin/false tinymush</div>
+<div class="line">chown -R tinymush:tinymush /path/to/game</div>
+<div class="line">sudo -u tinymush ./game/netmush</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md460"></a>
+Configuration Security</h3>
+<p><b>God Password:</b></p><ul>
+<li>Change the default God password immediately after installation</li>
+<li>Default is <code>potrzebie</code> - this is well-known and must be changed</li>
+<li>Use a strong, unique password</li>
+</ul>
+<div class="fragment"><div class="line">connect #1 potrzebie</div>
+<div class="line">@password potrzebie=&lt;strong_new_password&gt;</div>
+</div><!-- fragment --><p><b>Wizard Access:</b></p><ul>
+<li>Limit the number of wizard characters</li>
+<li>Audit wizard actions regularly</li>
+<li>Use <code>@log wizard</code> to track wizard commands</li>
+</ul>
+<p><b>Guest Access:</b></p><ul>
+<li>Disable guest access if not needed: <code>guests_disabled yes</code> in netmush.conf</li>
+<li>If enabled, restrict guest permissions appropriately</li>
+<li>Monitor guest activity</li>
+</ul>
+<h3><a class="anchor" id="autotoc_md461"></a>
+Input Validation</h3>
+<p>TinyMUSH 4 includes enhanced input validation, but administrators should:</p>
+<ul>
+<li>Monitor logs for unusual activity</li>
+<li>Set reasonable limits on user input (configured in netmush.conf)</li>
+<li>Use <code>@quota</code> to limit database object creation per player</li>
+<li>Review and adjust configuration parameters for your security needs</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md462"></a>
+Module Security</h2>
+<p><b>Built-in Modules:</b></p><ul>
+<li>Only load modules you trust and need</li>
+<li>mail and comsys modules are enabled by default</li>
+<li>Disable unused modules by commenting them out in modules.cmake</li>
+</ul>
+<p><b>Custom Modules:</b></p><ul>
+<li>Review code before loading third-party modules</li>
+<li>Modules have full access to server internals</li>
+<li>A malicious module can compromise the entire server</li>
+<li>Only use modules from trusted sources</li>
+</ul>
+<p><b>Module Configuration:</b> </p><div class="fragment"><div class="line"># In netmush.conf, only load necessary modules</div>
+<div class="line">module mail</div>
+<div class="line">module comsys</div>
+<div class="line"># module untrusted_module  # commented out</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md463"></a>
+Database Security</h2>
+<p><b>Backups:</b></p><ul>
+<li>Regular backups are essential for security and disaster recovery</li>
+<li>Store backups securely with appropriate permissions</li>
+<li>Test backup restoration periodically</li>
+</ul>
+<div class="fragment"><div class="line"># Automated daily backup</div>
+<div class="line">0 3 * * * cd /path/to/game &amp;&amp; tar czf backups/db-$(date +\%Y\%m\%d).tar.gz db/</div>
+</div><!-- fragment --><p><b>Database Integrity:</b></p><ul>
+<li>Monitor database size for unexpected growth</li>
+<li>Check logs for unusual patterns</li>
+<li>Use <code>@dbcheck</code> regularly to verify database integrity</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md464"></a>
+Server Security Updates</h2>
+<p><b>Operating System:</b></p><ul>
+<li>Keep your OS and dependencies up to date</li>
+<li>Regularly update: gdbm, pcre, libc, and other system libraries</li>
+<li>Subscribe to security mailing lists for your distribution</li>
+</ul>
+<p><b>TinyMUSH Updates:</b></p><ul>
+<li>Watch the GitHub repository for security updates</li>
+<li>Subscribe to GitHub notifications for the repository</li>
+<li>Review <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a> for recent fixes</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md465"></a>
+Common Security Issues</h1>
+<h2><a class="anchor" id="autotoc_md466"></a>
+What Constitutes a Security Vulnerability</h2>
+<p><b>Security Vulnerabilities (report privately):</b></p><ul>
+<li>Remote code execution exploits</li>
+<li>Authentication bypass</li>
+<li>Privilege escalation (non-wizard gaining wizard access)</li>
+<li>Database corruption through crafted input</li>
+<li>Server crashes exploitable for denial of service</li>
+<li>Information disclosure (reading protected data)</li>
+<li>Buffer overflows or memory corruption bugs</li>
+</ul>
+<p><b>Regular Bugs (report publicly):</b></p><ul>
+<li>Softcode execution errors</li>
+<li>Feature malfunctions</li>
+<li>Performance issues</li>
+<li>Non-exploitable crashes</li>
+<li>Documentation errors</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md467"></a>
+Known Security Enhancements in TinyMUSH 4</h2>
+<p>TinyMUSH 4 includes significant security improvements:</p>
+<ul>
+<li><b>Stack-safe string operations</b>: Eliminated buffer overflow risks with XSAFE* macros</li>
+<li><b>Memory tracking</b>: Prevents memory leaks and use-after-free vulnerabilities</li>
+<li><b>Input validation</b>: Enhanced bounds checking throughout</li>
+<li><b>Crash prevention</b>: Fixed multiple critical crashes (structure operations, sandbox, list operations)</li>
+<li><b>Safe defaults</b>: More secure default configuration</li>
+</ul>
+<p>See <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a> for recently fixed security-relevant issues.</p>
+<h1><a class="anchor" id="autotoc_md468"></a>
+Security Best Practices Summary</h1>
+<ol type="1">
+<li><b>Change default passwords</b> immediately</li>
+<li><b>Run as non-root</b> dedicated user</li>
+<li><b>Restrict file permissions</b> appropriately</li>
+<li><b>Keep software updated</b> (OS and TinyMUSH)</li>
+<li><b>Use firewall rules</b> to limit access</li>
+<li><b>Enable SSL/TLS</b> via stunnel or proxy</li>
+<li><b>Backup regularly</b> and test restores</li>
+<li><b>Monitor logs</b> for suspicious activity</li>
+<li><b>Limit wizards</b> and audit their actions</li>
+<li><b>Only load trusted modules</b></li>
+</ol>
+<h1><a class="anchor" id="autotoc_md469"></a>
+Additional Resources</h1>
+<ul>
+<li><a class="el" href="md_INSTALL.html">INSTALL.md</a> - Installation and configuration</li>
+<li><a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a> - Recent security fixes</li>
+<li><a class="el" href="md_CONTRIBUTING.html">CONTRIBUTING.md</a> - Code guidelines including safety requirements</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md470"></a>
+Contact</h1>
+<p>For security concerns: **tinymush@googlegroups.com**</p>
+<p>For general support: Open an issue on <a href="https://github.com/TinyMUSH/TinyMUSH/issues">GitHub</a></p>
+<hr  />
+<p><b>Remember</b>: Security is a continuous process, not a one-time setup. Stay vigilant and keep your installation updated. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

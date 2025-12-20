@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['known_20bugs_20in_20tinymush_0',['Known Bugs in TinyMUSH',['../md_KNOWN__BUGS.html',1,'']]]
+  ['guide_0',['Guide',['../md_docs_2Code_2MODULES__DEVELOPMENT.html',1,'Module Development Guide'],['../md_INSTALL.html',1,'TinyMUSH Installation Guide']]]
 ];

@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['warning_20br_20br_20this_20file_20is_20outdated_20and_20will_20be_20updated_20in_20the_20future_20center_0',['WARNING br br THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE center',['../md_CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]],
-  ['will_20be_20updated_20in_20the_20future_20center_1',['WILL BE UPDATED IN THE FUTURE center',['../md_CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]]
+  ['security_20policy_0',['Security Policy',['../md_SECURITY.html',1,'']]],
+  ['skeleton_20module_20complete_20template_20for_20tinymush_20modules_1',['Skeleton Module - Complete Template for TinyMUSH Modules',['../md_src_2modules_2skeleton_2README.html',1,'']]],
+  ['skeleton_20module_20quick_20reference_20card_2',['Skeleton Module - Quick Reference Card',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html',1,'']]],
+  ['subsystem_20tt_20alloc_20c_20tt_3',['TinyMUSH Memory Management Subsystem (&lt;tt&gt;alloc.c&lt;/tt&gt;)',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html',1,'']]]
 ];

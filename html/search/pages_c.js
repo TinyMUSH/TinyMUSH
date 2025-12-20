@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['policy_0',['Security Policy',['../md_SECURITY.html',1,'']]]
+  ['news_0',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]]
 ];

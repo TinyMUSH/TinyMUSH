@@ -88,8 +88,8 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">TinyMUSH Memory Management Subsystem (&lt;tt&gt;alloc.c&lt;/tt&gt;)</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md0"></a></p>
-<h1><a class="anchor" id="autotoc_md1"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md63"></a></p>
+<h1><a class="anchor" id="autotoc_md64"></a>
 Overview</h1>
 <p><code><a class="el" href="alloc_8c.html" title="Tracked memory allocation, leak detection, and buffer safety helpers.">alloc.c</a></code> implements a comprehensive, tracked memory management system for TinyMUSH. It provides safety-critical wrappers around standard C memory functions with built-in bounds checking, overflow detection, and detailed memory tracking capabilities.</p>
 <p><b>Key Features:</b></p><ul>
@@ -101,9 +101,9 @@ Overview</h1>
 <li>Support for aligned memory allocation (cache-line optimization)</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md3"></a>
+<h1><a class="anchor" id="autotoc_md66"></a>
 Architecture</h1>
-<h2><a class="anchor" id="autotoc_md4"></a>
+<h2><a class="anchor" id="autotoc_md67"></a>
 Memory Tracking Structure (MEMTRACK)</h2>
 <p>Each allocation is tracked with a <code>MEMTRACK</code> structure containing:</p>
 <div class="fragment"><div class="line"><span class="keyword">struct </span>{</div>
@@ -116,7 +116,7 @@ Memory Tracking Structure (MEMTRACK)</h2>
 <div class="line">    <span class="keyword">struct </span>memtrack *next;   <span class="comment">// Linked list pointer</span></div>
 <div class="line">    uint64_t *magic;         <span class="comment">// Magic number for overflow detection</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md5"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md68"></a>
 Memory Layout</h2>
 <div class="fragment"><div class="line">[MEMTRACK Header (variable)]</div>
 <div class="line">[Aligned allocation marker]</div>
@@ -125,11 +125,11 @@ Memory Layout</h2>
 <div class="line">^bptr points here         ^magic points here</div>
 </div><!-- fragment --><p>The magic number (<code>0xDEADBEEFCAFEBABE</code>) is placed after the user data to detect buffer overruns.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md70"></a>
 Core Functions</h1>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md71"></a>
 Memory Allocation</h2>
-<h3><a class="anchor" id="autotoc_md9"></a>
+<h3><a class="anchor" id="autotoc_md72"></a>
 <code>__xmalloc(size_t size, const char *file, int line, const char *function, const char *var)</code></h3>
 <p><b>Purpose:</b> Tracked malloc replacement with zero-initialization</p>
 <p><b>Usage:</b> </p><div class="fragment"><div class="line"><span class="comment">// Macro wrapper (recommended):</span></div>
@@ -147,7 +147,7 @@ Memory Allocation</h2>
 </ul>
 <p><b>Returns:</b> Pointer to allocated memory, or NULL on failure</p>
 <hr  />
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md74"></a>
 <code>__xcalloc(size_t nmemb, size_t size, const char *file, int line, const char *function, const char *var)</code></h3>
 <p><b>Purpose:</b> Tracked calloc replacement with overflow protection</p>
 <p><b>Usage:</b> </p><div class="fragment"><div class="line"><span class="comment">// Allocate array of 100 elements, 16 bytes each</span></div>
@@ -163,7 +163,7 @@ Memory Allocation</h2>
 <div class="line"><span class="comment">// NOT safe if rows comes from user input without validation:</span></div>
 <div class="line"><span class="comment">// Could overflow if rows * sizeof(int*) &gt; SIZE_MAX</span></div>
 </div><!-- fragment --><hr  />
-<h3><a class="anchor" id="autotoc_md13"></a>
+<h3><a class="anchor" id="autotoc_md76"></a>
 <code>__xrealloc(void *ptr, size_t size, const char *file, int line, const char *function, const char *var)</code></h3>
 <p><b>Purpose:</b> Tracked realloc with safe resizing</p>
 <p><b>Behavior:</b></p><ul>
@@ -175,9 +175,9 @@ Memory Allocation</h2>
 <div class="line">buffer = XREALLOC(buffer, 512, <span class="stringliteral">&quot;buffer&quot;</span>);   <span class="comment">// Shrink</span></div>
 <div class="line">buffer = XREALLOC(buffer, 0, <span class="stringliteral">&quot;buffer&quot;</span>);     <span class="comment">// Free</span></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h2><a class="anchor" id="autotoc_md78"></a>
 Memory Deallocation</h2>
-<h3><a class="anchor" id="autotoc_md16"></a>
+<h3><a class="anchor" id="autotoc_md79"></a>
 <code>__xfree(void *ptr)</code></h3>
 <p><b>Purpose:</b> Tracked free with overflow detection</p>
 <p><b>Usage:</b> </p><div class="fragment"><div class="line">XFREE(buffer);  <span class="comment">// Macro wrapper</span></div>
@@ -196,9 +196,9 @@ Memory Deallocation</h2>
 <div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1470</div></div>
 <div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:221</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md18"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 Memory Inspection</h2>
-<h3><a class="anchor" id="autotoc_md19"></a>
+<h3><a class="anchor" id="autotoc_md82"></a>
 <code>__xfind(void *ptr)</code></h3>
 <p><b>Purpose:</b> Find MEMTRACK entry for any pointer in allocated block</p>
 <p><b>Usage:</b> </p><div class="fragment"><div class="line">MEMTRACK *info = <a class="code hl_function" href="alloc_8c.html#a39788016153b54df3b35aefa562b9e6d">__xfind</a>(buffer);</div>
@@ -209,7 +209,7 @@ Memory Inspection</h2>
 <div class="ttc" id="aalloc_8c_html_a39788016153b54df3b35aefa562b9e6d"><div class="ttname"><a href="alloc_8c.html#a39788016153b54df3b35aefa562b9e6d">__xfind</a></div><div class="ttdeci">MEMTRACK * __xfind(void *ptr)</div><div class="ttdoc">Search the tracking list for a pointer and return it's information.</div><div class="ttdef"><b>Definition</b> alloc.c:262</div></div>
 </div><!-- fragment --><p><b>Returns:</b> Pointer to MEMTRACK structure, or NULL if not found</p>
 <hr  />
-<h3><a class="anchor" id="autotoc_md21"></a>
+<h3><a class="anchor" id="autotoc_md84"></a>
 <code>__xcheck(void *ptr)</code></h3>
 <p><b>Purpose:</b> Verify buffer integrity without freeing</p>
 <p><b>Return Values:</b></p><ul>
@@ -223,11 +223,11 @@ Memory Inspection</h2>
 <div class="line">}</div>
 <div class="ttc" id="aalloc_8c_html_a6fb3e6eacbda5141d4aa7c2fb0ec048b"><div class="ttname"><a href="alloc_8c.html#a6fb3e6eacbda5141d4aa7c2fb0ec048b">__xcheck</a></div><div class="ttdeci">int __xcheck(void *ptr)</div><div class="ttdoc">Check if a buffer wasn't overrun.</div><div class="ttdef"><b>Definition</b> alloc.c:290</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md23"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 String Functions</h1>
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md87"></a>
 Dynamic String Creation</h2>
-<h3><a class="anchor" id="autotoc_md25"></a>
+<h3><a class="anchor" id="autotoc_md88"></a>
 <code>__xasprintf(const char *file, int line, const char *function, const char *var, const char *format, ...)</code></h3>
 <p><b>Purpose:</b> Printf-style dynamic string allocation</p>
 <p><b>Usage:</b> </p><div class="fragment"><div class="line"><span class="keywordtype">char</span> *name = XASPRINTF(<span class="stringliteral">&quot;player_name&quot;</span>, <span class="stringliteral">&quot;Hello %s!&quot;</span>, <span class="stringliteral">&quot;World&quot;</span>);</div>
@@ -239,7 +239,7 @@ Dynamic String Creation</h2>
 <li>Memory is tracked like all other X* allocations</li>
 </ul>
 <hr  />
-<h3><a class="anchor" id="autotoc_md27"></a>
+<h3><a class="anchor" id="autotoc_md90"></a>
 <code>__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)</code></h3>
 <p><b>Purpose:</b> va_list version of asprintf</p>
 <p><b>Usage:</b> In functions that receive variadic arguments: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> log_message(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...) {</div>
@@ -252,71 +252,71 @@ Dynamic String Creation</h2>
 <div class="line">}</div>
 <div class="ttc" id="aalloc_8c_html_add0cb4a42b0f665e302370a23949e2ef"><div class="ttname"><a href="alloc_8c.html#add0cb4a42b0f665e302370a23949e2ef">__xavsprintf</a></div><div class="ttdeci">char * __xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)</div><div class="ttdoc">Tracked vsprintf replacement that create a new formatted string buffer.</div><div class="ttdef"><b>Definition</b> alloc.c:462</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md29"></a>
+<h2><a class="anchor" id="autotoc_md92"></a>
 Safe String Operations</h2>
 <p>All safe string functions perform automatic bounds checking against the tracked buffer size.</p>
-<h3><a class="anchor" id="autotoc_md30"></a>
+<h3><a class="anchor" id="autotoc_md93"></a>
 <code>__xstrcpy(char *dest, const char *src)</code></h3>
 <ul>
 <li>Copies src to dest with buffer overflow protection</li>
 <li>If dest is tracked: copies at most <code>buffer_size - 1</code> bytes</li>
 <li>If dest is untracked: performs regular strcpy (less safe)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md31"></a>
+<h3><a class="anchor" id="autotoc_md94"></a>
 <code>__xstrncpy(char *dest, const char *src, size_t n)</code></h3>
 <ul>
 <li>Copies at most n bytes with bounds checking</li>
 <li>Automatically limits to buffer size if tracked</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md32"></a>
+<h3><a class="anchor" id="autotoc_md95"></a>
 <code>__xstrcat(char *dest, const char *src)</code></h3>
 <ul>
 <li>Appends src to dest with overflow protection</li>
 <li>Calculates remaining space in buffer</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md33"></a>
+<h3><a class="anchor" id="autotoc_md96"></a>
 <code>__xstrncat(char *dest, const char *src, size_t n)</code></h3>
 <ul>
 <li>Appends at most n bytes with bounds checking</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md34"></a>
+<h3><a class="anchor" id="autotoc_md97"></a>
 <code>__xstrccat(char *dest, char c)</code> / <code>__xstrnccat(char *dest, char c, size_t n)</code></h3>
 <ul>
 <li>Appends single character to string</li>
 <li>Ensures null termination</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md35"></a>
+<h3><a class="anchor" id="autotoc_md98"></a>
 <code>__xstrdup(const char *s, const char *file, int line, const char *function, const char *var)</code></h3>
 <ul>
 <li>Duplicates string with tracking</li>
 <li>Usage: <code>char *copy = XSTRDUP(original, "copy");</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md36"></a>
+<h3><a class="anchor" id="autotoc_md99"></a>
 <code>__xstrndup(const char *s, size_t n, ...)</code></h3>
 <ul>
 <li>Duplicates at most n bytes of string</li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md38"></a>
+<h2><a class="anchor" id="autotoc_md101"></a>
 Printf Variants</h2>
-<h3><a class="anchor" id="autotoc_md39"></a>
+<h3><a class="anchor" id="autotoc_md102"></a>
 <code>__xsprintf(char *str, const char *format, ...)</code></h3>
 <ul>
 <li>Printf to buffer with overflow protection</li>
 <li>If buffer is tracked: output limited to buffer size</li>
 <li>Returns bytes written</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md40"></a>
+<h3><a class="anchor" id="autotoc_md103"></a>
 <code>__xsnprintf(char *str, size_t size, const char *format, ...)</code></h3>
 <ul>
 <li>Printf with explicit size limit and overflow protection</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md41"></a>
+<h3><a class="anchor" id="autotoc_md104"></a>
 <code>__xsprintfcat(char *str, const char *format, ...)</code></h3>
 <ul>
 <li>Printf-append: appends formatted output to end of string</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md42"></a>
+<h3><a class="anchor" id="autotoc_md105"></a>
 <code>__xsafesprintf(char *buff, char **bufp, const char *format, ...)</code></h3>
 <ul>
 <li>Printf to tracked buffer with pointer advancement</li>
@@ -334,32 +334,32 @@ Printf Variants</h2>
 </div><!-- fragment --></li>
 </ul>
 <hr  />
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md107"></a>
 Memory Operations</h2>
-<h3><a class="anchor" id="autotoc_md45"></a>
+<h3><a class="anchor" id="autotoc_md108"></a>
 <code>__xmemmove(void *dest, const void *src, size_t n)</code></h3>
 <ul>
 <li>Overlapping-safe memory copy with bounds checking</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md46"></a>
+<h3><a class="anchor" id="autotoc_md109"></a>
 <code>__xmempcpy(void *dest, const void *src, size_t n)</code></h3>
 <ul>
 <li>Memory copy that returns pointer to end of copied region</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md47"></a>
+<h3><a class="anchor" id="autotoc_md110"></a>
 <code>__xmemccpy(void *dest, const void *src, int c, size_t n)</code></h3>
 <ul>
 <li>Copy until character c is found, with bounds checking</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md48"></a>
+<h3><a class="anchor" id="autotoc_md111"></a>
 <code>__xmemset(void *s, int c, size_t n)</code></h3>
 <ul>
 <li>Fill memory with character, respecting buffer bounds</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md50"></a>
+<h1><a class="anchor" id="autotoc_md113"></a>
 Safe Buffer Operations</h1>
-<h2><a class="anchor" id="autotoc_md51"></a>
+<h2><a class="anchor" id="autotoc_md114"></a>
 <code>__xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_t size)</code></h2>
 <p><b>Purpose:</b> Copy with pointer tracking and overflow prevention</p>
 <p><b>Parameters:</b></p><ul>
@@ -380,12 +380,12 @@ Safe Buffer Operations</h1>
 <div class="line">XFREE(buffer);</div>
 <div class="ttc" id="aalloc_8c_html_adbbf8898a2d02a4dff693747bf9bc058"><div class="ttname"><a href="alloc_8c.html#adbbf8898a2d02a4dff693747bf9bc058">__xsafestrncpy</a></div><div class="ttdeci">size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_t size)</div><div class="ttdoc">Copy a string with at most n character from src and update the position pointer to the end of the des...</div><div class="ttdef"><b>Definition</b> alloc.c:1386</div></div>
 </div><!-- fragment --><hr  />
-<h2><a class="anchor" id="autotoc_md53"></a>
+<h2><a class="anchor" id="autotoc_md116"></a>
 <code>__xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)</code></h2>
 <p><b>Purpose:</b> Append with pointer tracking and bounds checking</p>
 <p><b>Returns:</b> Number of bytes from src that didn't fit</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md55"></a>
+<h2><a class="anchor" id="autotoc_md118"></a>
 <code>__xsafestrcatchr(char *dest, char **destp, char c, size_t size)</code></h2>
 <p><b>Purpose:</b> Append single character with pointer tracking</p>
 <p><b>Parameters:</b></p><ul>
@@ -396,9 +396,9 @@ Safe Buffer Operations</h1>
 </ul>
 <p><b>Returns:</b> 0 on success, 1 if buffer full</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md57"></a>
+<h1><a class="anchor" id="autotoc_md120"></a>
 Statistics and Debugging</h1>
-<h2><a class="anchor" id="autotoc_md58"></a>
+<h2><a class="anchor" id="autotoc_md121"></a>
 <code>list_rawmemory(dbref player)</code></h2>
 <p><b>Purpose:</b> Display memory allocation statistics to player</p>
 <p><b>Output Format:</b> </p><div class="fragment"><div class="line">File              Line Function            Variable             Allocs    Bytes</div>
@@ -410,14 +410,14 @@ Statistics and Debugging</h1>
 </div><!-- fragment --><p><b>Usage:</b> </p><div class="fragment"><div class="line">@list raw_memory      (In-game command)</div>
 </div><!-- fragment --><p><b>Caution:</b> Can cause lag on large muds with many allocations.</p>
 <hr  />
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md123"></a>
 <code>total_rawmemory(void)</code></h2>
 <p><b>Purpose:</b> Calculate total bytes currently allocated</p>
 <p><b>Returns:</b> Total memory in bytes across all tracked allocations</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md62"></a>
+<h1><a class="anchor" id="autotoc_md125"></a>
 Macro Wrappers</h1>
-<h2><a class="anchor" id="autotoc_md63"></a>
+<h2><a class="anchor" id="autotoc_md126"></a>
 Standard Allocation Macros</h2>
 <p>All X* functions have macro wrappers that automatically provide <code>__FILE__</code>, <code>__LINE__</code>, and <code>__func__</code>:</p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a>(size, <span class="stringliteral">&quot;variable_name&quot;</span>)</div>
@@ -434,16 +434,16 @@ Standard Allocation Macros</h2>
 <div class="line">XSPRINTF(str, &quot;format&quot;, ...)</div>
 <div class="line">XSNPRINTF(str, size, &quot;format&quot;, ...)</div>
 <div class="line">XSPRINTFCAT(str, &quot;format&quot;, ...)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md64"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md127"></a>
 Safe Buffer Macros</h2>
 <p>Used for safe pointer-advancing buffer operations:</p>
 <div class="fragment"><div class="line">SAFE_STRNCPY(dest, destp, src, n, size)</div>
 <div class="line">SAFE_STRNCAT(dest, destp, src, n, size)</div>
 <div class="line">SAFE_SPRINTF(dest, destp, <span class="stringliteral">&quot;format&quot;</span>, ...)</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md66"></a>
+<h1><a class="anchor" id="autotoc_md129"></a>
 Common Patterns</h1>
-<h2><a class="anchor" id="autotoc_md67"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Pattern 1: Dynamic String Building</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">char</span> *buffer = <a class="code hl_define" href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a>(<a class="code hl_define" href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a>, <span class="stringliteral">&quot;buffer&quot;</span>);</div>
 <div class="line"><span class="keywordtype">char</span> *bp = buffer;</div>
@@ -454,7 +454,7 @@ Pattern 1: Dynamic String Building</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_define" href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a>(player, buffer);</div>
 <div class="line">XFREE(buffer);</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md68"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md131"></a>
 Pattern 2: Array Allocation with Overflow Check</h2>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (count &gt; SIZE_MAX / <span class="keyword">sizeof</span>(OBJECT*)) {</div>
 <div class="line">    <a class="code hl_define" href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a>(player, <span class="stringliteral">&quot;Count too large!&quot;</span>);</div>
@@ -470,7 +470,7 @@ Pattern 2: Array Allocation with Overflow Check</h2>
 <div class="line"><span class="comment">// Use array...</span></div>
 <div class="line"> </div>
 <div class="line">XFREE(array);</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md69"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md132"></a>
 Pattern 3: Safe String Duplication</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">char</span> *original = <span class="stringliteral">&quot;Important Data&quot;</span>;</div>
 <div class="line"><span class="keywordtype">char</span> *copy = XSTRDUP(original, <span class="stringliteral">&quot;copy&quot;</span>);</div>
@@ -483,7 +483,7 @@ Pattern 3: Safe String Duplication</h2>
 <div class="line"><span class="comment">// Modify copy without affecting original...</span></div>
 <div class="line"> </div>
 <div class="line">XFREE(copy);</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md70"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md133"></a>
 Pattern 4: Buffer Overflow Detection</h2>
 <div class="fragment"><div class="line"><span class="comment">// During debug/testing</span></div>
 <div class="line"><span class="keywordtype">int</span> status = <a class="code hl_function" href="alloc_8c.html#a6fb3e6eacbda5141d4aa7c2fb0ec048b">__xcheck</a>(buffer);</div>
@@ -493,9 +493,9 @@ Pattern 4: Buffer Overflow Detection</h2>
 <div class="line">              <span class="stringliteral">&quot;Buffer overflow detected at %p&quot;</span>, buffer);</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md72"></a>
+<h1><a class="anchor" id="autotoc_md135"></a>
 Configuration</h1>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md136"></a>
 Memory Logging</h2>
 <p>Enable memory allocation logging via configuration:</p>
 <div class="fragment"><div class="line">mushconf.<a class="code hl_variable" href="structconfdata.html#a5241bab417873b6d368b4aa93bca95a5">malloc_logger</a> = 1;  <span class="comment">// Enable logging</span></div>
@@ -505,9 +505,9 @@ Memory Logging</h2>
 <div class="line">Alloc: file[line]function:variable Alloc N bytes</div>
 <div class="line">Free:  file[line]function:variable Free N bytes</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md75"></a>
+<h1><a class="anchor" id="autotoc_md138"></a>
 Performance Considerations</h1>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md139"></a>
 Overhead</h2>
 <ul>
 <li><b>Per-allocation overhead:</b> <code>sizeof(MEMTRACK) + 8 bytes</code> (magic number)<ul>
@@ -520,7 +520,7 @@ Overhead</h2>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md140"></a>
 Optimization Tips</h2>
 <ol type="1">
 <li><b>Minimize realloc() calls:</b> Pre-allocate with expected size</li>
@@ -529,9 +529,9 @@ Optimization Tips</h2>
 <li><b>Profile:</b> Use <code>@list raw_memory</code> to identify hot allocation sites</li>
 </ol>
 <hr  />
-<h1><a class="anchor" id="autotoc_md79"></a>
+<h1><a class="anchor" id="autotoc_md142"></a>
 Error Handling</h1>
-<h2><a class="anchor" id="autotoc_md80"></a>
+<h2><a class="anchor" id="autotoc_md143"></a>
 Allocation Failures</h2>
 <p>All X* functions return NULL on failure. Always check:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">char</span> *buffer = <a class="code hl_define" href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a>(size, <span class="stringliteral">&quot;buffer&quot;</span>);</div>
@@ -540,7 +540,7 @@ Allocation Failures</h2>
 <div class="line">              <span class="stringliteral">&quot;Failed to allocate %zu bytes&quot;</span>, size);</div>
 <div class="line">    <span class="keywordflow">return</span>; <span class="comment">// or error handling</span></div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md81"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md144"></a>
 Buffer Overruns</h2>
 <p>Detected at free time via magic number. Action:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="alloc_8c.html#adc770c55d160860dca77d400a7349421">__xfree</a>(buffer)) {</div>
@@ -548,7 +548,7 @@ Buffer Overruns</h2>
 <div class="line">    <a class="code hl_define" href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a>(<a class="code hl_define" href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a>, <span class="stringliteral">&quot;MEM&quot;</span>, <span class="stringliteral">&quot;OVERRUN&quot;</span>,</div>
 <div class="line">              <span class="stringliteral">&quot;Stack trace: %s&quot;</span>, stack_trace());</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md82"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md145"></a>
 Integer Overflow</h2>
 <p>Only in <code>__xcalloc</code>. Always handle:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> *result = XCALLOC(user_rows, user_cols, <span class="stringliteral">&quot;matrix&quot;</span>);</div>
@@ -560,9 +560,9 @@ Integer Overflow</h2>
 <div class="line">    <span class="keywordflow">return</span>;</div>
 <div class="line">}</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md84"></a>
+<h1><a class="anchor" id="autotoc_md147"></a>
 Security Implications</h1>
-<h2><a class="anchor" id="autotoc_md85"></a>
+<h2><a class="anchor" id="autotoc_md148"></a>
 Buffer Overflow Protection</h2>
 <p>The magic number system detects overwrites <b>after</b> they occur, not during. Never rely on this for security:</p>
 <div class="fragment"><div class="line"><span class="comment">// BAD - exploitable:</span></div>
@@ -573,7 +573,7 @@ Buffer Overflow Protection</h2>
 <div class="line"><span class="keywordtype">char</span> *buffer = <a class="code hl_define" href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a>(MAX_USER_INPUT, <span class="stringliteral">&quot;buffer&quot;</span>);</div>
 <div class="line">strncpy(buffer, user_input, MAX_USER_INPUT - 1);</div>
 <div class="line">buffer[MAX_USER_INPUT - 1] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md86"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md149"></a>
 Integer Overflow Protection</h2>
 <p>Only <code>XCALLOC</code> checks for overflow. Manual calculations must be validated:</p>
 <div class="fragment"><div class="line"><span class="comment">// BAD:</span></div>
@@ -587,9 +587,9 @@ Integer Overflow Protection</h2>
 <div class="line">}</div>
 <div class="line"><span class="keywordtype">char</span> *matrix = XCALLOC(rows, cols, <span class="stringliteral">&quot;matrix&quot;</span>);</div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md88"></a>
+<h1><a class="anchor" id="autotoc_md151"></a>
 Debugging Tips</h1>
-<h2><a class="anchor" id="autotoc_md89"></a>
+<h2><a class="anchor" id="autotoc_md152"></a>
 Find Allocation Source</h2>
 <div class="fragment"><div class="line">MEMTRACK *info = <a class="code hl_function" href="alloc_8c.html#a39788016153b54df3b35aefa562b9e6d">__xfind</a>(pointer);</div>
 <div class="line"><span class="keywordflow">if</span> (info) {</div>
@@ -597,17 +597,17 @@ Find Allocation Source</h2>
 <div class="line">           info-&gt;file, info-&gt;line, info-&gt;function, </div>
 <div class="line">           info-&gt;var, info-&gt;size);</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md90"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md153"></a>
 Trace All Allocations</h2>
 <p>Enable malloc_logger and grep logs: </p><div class="fragment"><div class="line">grep &quot;MEM.*TRACE&quot; game.log | grep &quot;allocation_site&quot;</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md91"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md154"></a>
 Memory Leak Detection</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a29f3880a920752ac225497297ccbdf4a">list_rawmemory</a>(player);</div>
 <div class="line"><span class="comment">// Check if size grows unexpectedly over time</span></div>
 <div class="line"><span class="comment">// Compare @list raw_memory output periodically</span></div>
 <div class="ttc" id="aalloc_8c_html_a29f3880a920752ac225497297ccbdf4a"><div class="ttname"><a href="alloc_8c.html#a29f3880a920752ac225497297ccbdf4a">list_rawmemory</a></div><div class="ttdeci">void list_rawmemory(dbref player)</div><div class="ttdoc">Show to the player a summary of all allocations.</div><div class="ttdef"><b>Definition</b> alloc.c:1224</div></div>
 </div><!-- fragment --><hr  />
-<h1><a class="anchor" id="autotoc_md93"></a>
+<h1><a class="anchor" id="autotoc_md156"></a>
 API Reference Summary</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -634,7 +634,7 @@ API Reference Summary</h1>
 <td class="markdownTableBodyNone"><code>SAFE_STRNCPY</code>   </td><td class="markdownTableBodyNone">Copy with pointer tracking   </td><td class="markdownTableBodyNone">Yes   </td></tr>
 </table>
 <hr  />
-<h1><a class="anchor" id="autotoc_md95"></a>
+<h1><a class="anchor" id="autotoc_md158"></a>
 Version Information</h1>
 <ul>
 <li><b>File:</b> <code><a class="el" href="alloc_8c.html" title="Tracked memory allocation, leak detection, and buffer safety helpers.">netmush/alloc.c</a></code></li>

@@ -88,13 +88,13 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md197"></a></p>
-<h1><a class="anchor" id="autotoc_md198"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md359"></a></p>
+<h1><a class="anchor" id="autotoc_md360"></a>
 DYNAMICALLY LOADABLE MODULES</h1>
 <p>TinyMUSH versions 3.1 and higher provide an interface for dynamically loadable modules. This allows server administrators to write and install "hardcode" that extends the functionality of the server, without creating undue difficulties with future upgrades.</p>
 <p>If you are writing a module, or you are installing a module written by someone else, please be forewarned: Modules muck directly with the server's internals. Using a module is, for all practical purposes, exactly like directly hacking the server. Thus, the safeguards that exist with softcode do not exist with modules; if modules contain bugs, they could cause severe issues with instability and database corruption.</p>
 <p>If you are writing a module, you should be fluent in reading and writing the C programming language. You should take the time to carefully study the existing server code. It's assumed you can read code to figure out things that aren't explicitly documented (which is just about everything not directly related to module interface). It's also assumed that you understand how dynamic loading works.</p>
-<h1><a class="anchor" id="autotoc_md199"></a>
+<h1><a class="anchor" id="autotoc_md361"></a>
 HOW TO BUILD A MODULE</h1>
 <p>Every module must have a one-word name, such as "hello", or "space3d", referred to generically as '&lt;name&gt;' in the rest of this document. This is the prefix of the shared object files that are loaded by netmush.</p>
 <p>The source for your module should be placed in src/modules/&lt;name&gt;. The directory must use the same name as the shared object files your code produces. The shared objects for modules go in the game/modules directory.</p>
@@ -104,13 +104,13 @@ HOW TO BUILD A MODULE</h1>
 <p>Getting the server to load a module is simple. For each module, add the following line to your netmush.conf file: module &lt;name&gt;</p>
 <p>Modules can only be loaded when the game is started.</p>
 <p>CAUTION: If you are changing a dynamically-loaded module while the game is running, do NOT overwrite the old shared objects. The Makefile fragments we've included will move old .so files out of the way, but because they keep only one backup copy, they won't help if you rebuild your module twice before reloading it into the game. To be certain, you must go to game/modules/ and rename the .so file associated with your module.</p>
-<h1><a class="anchor" id="autotoc_md200"></a>
+<h1><a class="anchor" id="autotoc_md362"></a>
 MODULE NAMES AND SYMBOLS</h1>
 <p>Everything within a module should occupy a unique namespace. Functions names, non-static global variables, and other public entities should be named 'mod_&lt;name&gt;_&lt;regular name&gt;'. Macros and constants should be named MOD_&lt;name&gt;_&lt;regular name&gt;. This avoids potential namespace collisions.</p>
 <p>All modules should begin with the following line: #include "../../api.h"</p>
 <p>Including this file should get you access to the commonplace structures and functions in the MUSH server, as well as specific module API things. Please note that if you plan to use any symbol that's not defined within api.h or a file that is #include'd by api.h, you will either need to declare it extern within your module's .c file, or #include the appropriate main server .h file, as appropriate.</p>
 <p>CAUTION: Not all operating system's dlopen() calls properly check for unresolved references. On such a system, if you reference a symbol that your module cannot locate because it's not local and it wasn't declared as extern, the server will crash when it tries to resolve the symbol.</p>
-<h1><a class="anchor" id="autotoc_md201"></a>
+<h1><a class="anchor" id="autotoc_md363"></a>
 MODULE CONFIGURATION</h1>
 <p>The module configuration should come next, since the rest of your module will use this information.</p>
 <p>You should declare a configuration structure for your module as follows:</p>
@@ -145,7 +145,7 @@ MODULE CONFIGURATION</h1>
 <div class="line">{ NULL, NULL, 0, 0, NULL, 0}};</div>
 </div><!-- fragment --><p>Note that the table must always end with a null entry.</p>
 <p>In the conf file, any config parameters for a module must, of course, be placed after module directive loading that module.</p>
-<h1><a class="anchor" id="autotoc_md202"></a>
+<h1><a class="anchor" id="autotoc_md364"></a>
 MODULE INITIALIZATION</h1>
 <p>The module initialization function goes LAST in your module's .c file. It should read as follows:</p>
 <div class="fragment"><div class="line"> C</div>
@@ -169,7 +169,7 @@ MODULE INITIALIZATION</h1>
 <div class="line">}</div>
 </div><!-- fragment --><p>If you have no hashtables, numeric hashtables, commands, and/or functions, you should still call these functions, with a parameter of NULL.</p>
 <p>Note that there is no <a class="el" href="game_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main entry point for TinyMUSH">main()</a> function in a module.</p>
-<h1><a class="anchor" id="autotoc_md203"></a>
+<h1><a class="anchor" id="autotoc_md365"></a>
 DEFINING COMMANDS</h1>
 <p>Commands fall into four categories of syntax:</p>
 <table class="markdownTable">
@@ -286,7 +286,7 @@ DEFINING COMMANDS</h1>
 <div class="line">    DB_GROW_MODULE(mod_&lt;name&gt;_db, newsize, newtop, MOD_&lt;name&gt;_OBJ);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>The above will automatically take care of extending and initializing your private module database as needed. Initialization of newly-created objects should be taken care of by creating a handler for create_obj() (see below).</p>
-<h1><a class="anchor" id="autotoc_md207"></a>
+<h1><a class="anchor" id="autotoc_md369"></a>
 MODULE API FUNCTIONS</h1>
 <p>The following are "hooks" into the server. If you place these functions in your module's .c file, they will automatically be called at the appropriate time.</p>
 <div class="fragment"><div class="line"> C</div>
@@ -319,7 +319,7 @@ MODULE API FUNCTIONS</h1>
 <div class="fragment"><div class="line"> C</div>
 <div class="line">void mod_&lt;name&gt;_do_second(void)</div>
 </div><!-- fragment --><p> Runs once a second.</p>
-<h1><a class="anchor" id="autotoc_md208"></a>
+<h1><a class="anchor" id="autotoc_md370"></a>
 MODULE API FUNCTION: process_command</h1>
 <div class="fragment"><div class="line"> C</div>
 <div class="line">int mod_&lt;name&gt;_process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)</div>
@@ -331,7 +331,7 @@ MODULE API FUNCTION: process_command</h1>
 <p>The 'interactive' parameter is passed as 1 if the command was entered from the keyboard (i.e., received over the network), and 0 otherwise.</p>
 <p>The 'command' parameter is a pointer to the command entered, space-compressed if space compression is turned on. This string SHOULD NOT be destructively modified.</p>
 <p>The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</p>
-<h1><a class="anchor" id="autotoc_md209"></a>
+<h1><a class="anchor" id="autotoc_md371"></a>
 MODULE API FUNCTION: process_no_match</h1>
 <div class="fragment"><div class="line"> C</div>
 <div class="line">int mod_&lt;name&gt;_process_no_match(dbref player, dbref cause, int interactive, char *eval_cmd, char *raw_cmd, char *args[], int nargs)</div>
@@ -344,7 +344,7 @@ MODULE API FUNCTION: process_no_match</h1>
 <p>The 'eval_cmd' parameter is a pointer to the command, after it has gone through percent-substitutions and other evaluations.</p>
 <p>The 'raw_cmd' parameter is a pointer to the command entered, space-compressed if space compression is turned on, but not otherwise evaluated.</p>
 <p>The 'args' parameter consists of the stack (%0 - %9) and the 'nargs' parameter is the number of arguments on the stack.</p>
-<h1><a class="anchor" id="autotoc_md210"></a>
+<h1><a class="anchor" id="autotoc_md372"></a>
 MODULE API FUNCTION: did_it</h1>
 <div class="fragment"><div class="line"> C</div>
 <div class="line">int mod_&lt;name&gt;_did_it(dbref player, dbref thing, dbref master, int what, const char *def, int owhat, const char *odef, int awhat, int ctrl_flags, char *args[], int nargs, int msg_key)</div>
@@ -356,7 +356,7 @@ MODULE API FUNCTION: did_it</h1>
 <p>args and nargs are the stack and number of items on the stack.</p>
 <p>msg_key is a bitmask of MSG_SPEECH, MSG_MOVE, and MSG_PRESENCE, allowing special processing related to the PRESENCE flag.</p>
 <p>This function can be used to react to a large number of server actions, by switching on &lt;what&gt;. For example, all commands that move objects eventually call did_it() with &lt;what&gt; of A_MOVE. If you want to intercept all movement, just check for 'what == A_MOVE' and act accordingly in this function.</p>
-<h1><a class="anchor" id="autotoc_md211"></a>
+<h1><a class="anchor" id="autotoc_md373"></a>
 STORING DATA IN FLATFILES</h1>
 <p>This is the first and easiest of three different methods available to a module for storing module-specific data.</p>
 <p>Using this method, the module reads its data from a pure ASCII text flatfile on startup, via a module API hook, as follows:</p>
@@ -369,7 +369,7 @@ STORING DATA IN FLATFILES</h1>
 </div><!-- fragment --><p> This dumps a flat text database specific to the module. It is called at checkpoint time. This function is passed a single input parameter, an open, write-only file pointer for the module flatfile.</p>
 <p>The module flatfile is named 'mod_&lt;name&gt;.db' and is stored in the directory specified by the conf parameter database_home. This database file should NEVER be opened or closed directly.</p>
 <p>Only printable ASCII data should be stored in this file. You, the module author, are responsible for versioning, the format of this file, etc. Useful functions for reading and writing flatfiles can be found in the core server's <a class="el" href="db__rw_8c.html" title="Flatfile persistence layer for reading/writing the game database.">db_rw.c</a> source.</p>
-<h1><a class="anchor" id="autotoc_md212"></a>
+<h1><a class="anchor" id="autotoc_md374"></a>
 STORING DATA IN GDBM WITH NO CACHING</h1>
 <p>This is the second of three different methods available to a module for storing module-specific data.</p>
 <p>This method directly stores data within the MUSH's general GDBM database. GDBM is a 'random-access' database that allows you to store and fetch individual pieces of data at a time. This is identical to how the MUSH stores its structure data and requires your module to be able to dump or convert a printable ASCII flatfile when database conversion (backups to and restores from flatfile) is run.</p>
@@ -459,19 +459,19 @@ db_put returns 0 on success and 1 on failure.
 <p>'dbtype' should be the dbtype ID registered for your module by <a class="el" href="api_8c.html#ac88119314cc5dc4a2de408653b586f64" title="Register a module&#39;s DB type.">register_dbtype()</a>.</p>
 <p>db_del returns 0 on success and 1 on failure.</p>
 <p>Your search key may be a string, a number, or binary data of any length. For example, if you want your search key to be three integers, you will create a buffer of length 'sizeof(int)*3' and copy your three integers into it. If you want it to be a null-terminated string, make sure your key length is 'strlen(string) + 1'.</p>
-<h1><a class="anchor" id="autotoc_md213"></a>
+<h1><a class="anchor" id="autotoc_md375"></a>
 STORING DATA IN GDBM WITH CACHING</h1>
 <p>This is the third of three different methods available to a module for storing module-specific data. It is fundamentally similar to the second method, except data is cached in memory.</p>
 <p>In MUSH, the cache is essentially a front-end to GDBM, and interacting with it is identical. In fact, the function calls match almost exactly. Instead of db_get(), db_put(), and db_del(), you use cache_get(), cache_put(), and cache_del(). The parameters to the cache functions are the same ones you pass to their GDBM counterparts. The cache acts as a 'buffer', making sure the most often accessed data is already in memory, and making writes more efficient by buffering them until a number of entries may be written at once. You don't need to worry about how the cache operates; it will make sure everything gets read and written properly.</p>
 <p>Note that you cannot pass a non-malloc()ed piece of memory to cache_put. It must have been malloc()ed, and it will become the cache subsystem's responsibility to free it.</p>
-<h1><a class="anchor" id="autotoc_md214"></a>
+<h1><a class="anchor" id="autotoc_md376"></a>
 WHICH METHOD OF STORING DATA TO USE</h1>
 <p>If the amount of data your module works with is small and fits easily into memory, use simple flatfiles with load_database() and dump_database() hooks. You do not need to worry about database conversion since all of your data is always in a flatfile!</p>
 <p>If you need random access to your data, consider using GDBM. The main server uses GDBM to store everything, from object structures to attribute names. Since it can write individual entries, it only has to write entries that have changed instead of writing them all, thus making the process more efficient. It also allows you to easily store binary data.</p>
 <p>If your module with large pieces of data that are needed infrequently, considering using the cache. MUSH attributes are stored using the cache, and data like mail messages or large pieces of text are perfect candidates for it.</p>
 <p>As an example, the main server does not cache object structures or attribute names. It reads these completely in at startup in its own <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>, and writes all changes out during every <a class="el" href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a" title="Write DB to file.">db_write()</a>. It does, however, cache attribute text, and may read or write attributes using the cache at any time while the MUSH process is running. A similar process takes place during database conversion. When it is creating a flatfile from GDBM, MUSH will first load all object structures and attribute names into memory during <a class="el" href="db__rw_8c.html#afa51b4a7bd45cad467913b376bdae48b" title="Read a DB.">db_read()</a>. When <a class="el" href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4" title="Write a db to Flat File.">db_write_flatfile()</a> executes, it will write a printable ASCII text representation of object structures and attribute names to the flatfile, and it will fetch attributes from GDBM and write them to the flatfile one at a time. At no time does it have all attributes in memory, and it does not even use the cache during database conversion, instead using the direct to GDBM routines.</p>
 <p>IMPORTANT NOTE: If you use GDBM, it is your responsibility to clean up your entries if they are no longer used. Since GDBM is not a relational database (you cannot do a wildcard search, you <em>must</em> search for an exact key), you must keep track of every entry that you write to it. Look at the code in <a class="el" href="db__rw_8c.html" title="Flatfile persistence layer for reading/writing the game database.">db_rw.c</a> that writes attribute names for an example of how to do this. If your module writes entries to GDBM and never deletes them, they will clog the database until it is converted to flatfile and back, dropping the unused entries in the process.</p>
-<h1><a class="anchor" id="autotoc_md215"></a>
+<h1><a class="anchor" id="autotoc_md377"></a>
 GETTING NOTIFIED WHEN DATA CHANGES</h1>
 <p>You can have your module notified when a key is stored or deleted in the cache using the following API hooks:</p>
 <div class="fragment"><div class="line"> C</div>

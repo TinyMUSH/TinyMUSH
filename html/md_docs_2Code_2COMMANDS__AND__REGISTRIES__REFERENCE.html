@@ -88,9 +88,9 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">TinyMUSH Commands and Registries Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md131"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md159"></a></p>
 <p>This reference consolidates how TinyMUSH registers and resolves commands, functions, flags, powers, attributes, and related switch/config tables. It is intended for contributors navigating or extending the server.</p>
-<h1><a class="anchor" id="autotoc_md132"></a>
+<h1><a class="anchor" id="autotoc_md160"></a>
 At-a-Glance Index</h1>
 <ul>
 <li>Commands: builtin <code>command_table[]</code> and dynamic <code>@addcommand</code></li>
@@ -101,9 +101,9 @@ At-a-Glance Index</h1>
 <li>Switch Tables: many <code>NAMETAB</code> arrays used by individual commands</li>
 <li>Config Keywords: <code>CONF conftable[]</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md133"></a>
+<h1><a class="anchor" id="autotoc_md161"></a>
 Core Registries</h1>
-<h2><a class="anchor" id="autotoc_md134"></a>
+<h2><a class="anchor" id="autotoc_md162"></a>
 Commands</h2>
 <ul>
 <li>Table: <code>CMDENT command_table[]</code></li>
@@ -129,7 +129,7 @@ Commands</h2>
 <div class="ttc" id="aexterns_8h_html_a3782006e6788cc7332f62bb190b69b25"><div class="ttname"><a href="externs_8h.html#a3782006e6788cc7332f62bb190b69b25">command_table</a></div><div class="ttdeci">CMDENT command_table[]</div><div class="ttdoc">Command table: Definitions for builtin commands, used to build the command hash table.</div><div class="ttdef"><b>Definition</b> nametabs.c:620</div></div>
 <div class="ttc" id="astructcmdentry_html"><div class="ttname"><a href="structcmdentry.html">cmdentry</a></div><div class="ttdef"><b>Definition</b> typedefs.h:540</div></div>
 </div><!-- fragment --><p>Call sequence flags (<code>CS_*</code>) determine the handler signature and pre/post processing (ARGV, INTERP, CMDARG, etc.). Permission bits (<code>CA_*</code>) gate access.</p>
-<h2><a class="anchor" id="autotoc_md135"></a>
+<h2><a class="anchor" id="autotoc_md163"></a>
 Functions</h2>
 <ul>
 <li>Table: <code>FUN flist[]</code></li>
@@ -152,7 +152,7 @@ Functions</h2>
 <div class="ttc" id="afunstring_8c_html_ae29c35bb771e313320095b4ebba175ea"><div class="ttname"><a href="funstring_8c.html#ae29c35bb771e313320095b4ebba175ea">fun_null</a></div><div class="ttdeci">void fun_null(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))</div><div class="ttdoc">Just eat the contents of the string. Handy for those times when you've output a bunch of junk in a fu...</div><div class="ttdef"><b>Definition</b> funstring.c:195</div></div>
 <div class="ttc" id="astructfun_html"><div class="ttname"><a href="structfun.html">fun</a></div><div class="ttdoc">Functions related typedefs.</div><div class="ttdef"><b>Definition</b> typedefs.h:326</div></div>
 </div><!-- fragment --><p>Function flags (e.g., <code>FN_VARARGS</code>, <code>FN_NO_EVAL</code>) and permission bits (<code>CA_*</code>) control evaluation and access.</p>
-<h2><a class="anchor" id="autotoc_md136"></a>
+<h2><a class="anchor" id="autotoc_md164"></a>
 Flags</h2>
 <ul>
 <li>Table: <code>FLAGENT gen_flags[]</code></li>
@@ -160,21 +160,21 @@ Flags</h2>
 <li>Loader: <code><a class="el" href="flags_8c.html#a936ae65388329f8e02da55582d401447" title="Initialize flag hash tables.">init_flagtab()</a></code> → <code>mushstate.flags_htab</code>. See <a href="netmush/flags.c#L459">netmush/flags.c</a>.</li>
 <li>Also see <code>OBJENT object_types[]</code> for type metadata in <a href="netmush/flags.c#L444">netmush/flags.c</a>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md137"></a>
+<h2><a class="anchor" id="autotoc_md165"></a>
 Powers</h2>
 <ul>
 <li>Table: <code>POWERENT gen_powers[]</code></li>
 <li>Where: <a href="netmush/powers.c#L171">netmush/powers.c</a></li>
 <li>Loader: <code>init_powertab()</code> → <code>mushstate.powers_htab</code>. See <a href="netmush/powers.c#L219">netmush/powers.c</a>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md138"></a>
+<h2><a class="anchor" id="autotoc_md166"></a>
 Attributes</h2>
 <ul>
 <li>Table: <code>ATTR attr[]</code></li>
 <li>Where: <a href="netmush/nametabs.c#L1063">netmush/nametabs.c</a></li>
 <li>Note: Attributes with <code>!(AF_NOCMD)</code> get auto-exposed as <code>@&lt;AttrName&gt;</code> commands inside <code><a class="el" href="command_8c.html#a69009db0d6b4333c7321278e9c168ea5" title="Initialize the command table.">init_cmdtab()</a></code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md139"></a>
+<h1><a class="anchor" id="autotoc_md167"></a>
 Switch Tables (NAMETAB)</h1>
 <p>Switch tables define per-command switches and decode into bitmasks or constants passed via <code>CMDENT.extra</code>. Common fields: name (lowercase), min abbrev length, permission, and value.</p>
 <p>Representative tables (all in <a href="netmush/nametabs.c">netmush/nametabs.c</a>):</p><ul>
@@ -190,14 +190,14 @@ Switch Tables (NAMETAB)</h1>
 <li>Feature toggles: <code>enable_names[]</code> [L402]</li>
 <li>Signals: <code>sigactions_nametab[]</code> [L418]</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md140"></a>
+<h1><a class="anchor" id="autotoc_md168"></a>
 Config Keywords</h1>
 <ul>
 <li>Table: <code>CONF conftable[]</code></li>
 <li>Where: <a href="netmush/nametabs.c#L765">netmush/nametabs.c</a></li>
 <li>Purpose: Maps <code>mush.cnf</code> keys to handlers and backing fields. Many entries reference nametabs to parse bitmasks (e.g., <code>access_nametab</code>).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md141"></a>
+<h1><a class="anchor" id="autotoc_md169"></a>
 Initialization Summary</h1>
 <ul>
 <li>Commands: <code><a class="el" href="command_8c.html#a69009db0d6b4333c7321278e9c168ea5" title="Initialize the command table.">init_cmdtab()</a></code> → <a href="netmush/command.c#L48">netmush/command.c</a></li>
@@ -206,7 +206,7 @@ Initialization Summary</h1>
 <li>Powers: <code>init_powertab()</code> → <a href="netmush/powers.c#L219">netmush/powers.c</a></li>
 </ul>
 <p>These populate the <code>mushstate</code> hash tables used at runtime.</p>
-<h1><a class="anchor" id="autotoc_md142"></a>
+<h1><a class="anchor" id="autotoc_md170"></a>
 Handler Signatures (by CS_* flags)</h1>
 <p>Common patterns (see <code>CS_*</code> in <a href="netmush/constants.h">netmush/constants.h</a>):</p>
 <ul>
@@ -217,7 +217,7 @@ Handler Signatures (by CS_* flags)</h1>
 <li><code>... | CS_CMDARG</code>: add <code>char *cargs[], int ncargs</code></li>
 </ul>
 <p><code>CS_INTERP</code> enables evaluation of arguments prior to dispatch; <code>CS_NOINTERP</code> disables it. <code>CS_STRIP_AROUND</code> controls brace stripping.</p>
-<h1><a class="anchor" id="autotoc_md143"></a>
+<h1><a class="anchor" id="autotoc_md171"></a>
 Execution Flow (Commands)</h1>
 <ol type="1">
 <li>Parse input → extract command token and args</li>
@@ -227,7 +227,7 @@ Execution Flow (Commands)</h1>
 <li>Dispatch to handler per <code>CS_*</code> signature</li>
 <li>Post-hook (if present)</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md144"></a>
+<h1><a class="anchor" id="autotoc_md172"></a>
 Interactions and Lookups</h1>
 <ul>
 <li>Builtin commands are in <code>command_table[]</code>.</li>
@@ -236,9 +236,9 @@ Interactions and Lookups</h1>
 <li>Functions are looked up through <code>mushstate.func_htab</code> (builtin + user-defined via <code>@function</code>).</li>
 <li>Flags and powers are found via <code>mushstate.flags_htab</code> and <code>mushstate.powers_htab</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md145"></a>
+<h1><a class="anchor" id="autotoc_md173"></a>
 How to Extend</h1>
-<h2><a class="anchor" id="autotoc_md146"></a>
+<h2><a class="anchor" id="autotoc_md174"></a>
 Add a Builtin Command</h2>
 <ol type="1">
 <li>Implement handler (match signature to intended <code>CS_*</code>).</li>
@@ -246,31 +246,31 @@ Add a Builtin Command</h2>
 <li>Optionally define a <code>NAMETAB</code> for switches in the same file and reference it from the command entry.</li>
 <li>Build and verify the dispatcher resolves it (<code>@list commands</code> can help).</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md147"></a>
+<h2><a class="anchor" id="autotoc_md175"></a>
 Add a Dynamic Command (Game Content)</h2>
 <p>Use <code>@addcommand</code> at runtime to create content-level commands attached to objects; these live under the <code>CMDENT.info.added</code> chain and follow the base handler’s mechanics with user permissions and hooks.</p>
-<h2><a class="anchor" id="autotoc_md148"></a>
+<h2><a class="anchor" id="autotoc_md176"></a>
 Add a Builtin Function</h2>
 <ol type="1">
 <li>Implement the function handler (<code>fun_*</code> prototype) respecting evaluation flags and varargs usage.</li>
 <li>Add it to <code>FUN flist[]</code> in <a href="netmush/functions.c#L497">netmush/functions.c</a> with argument count, function flags (e.g., <code>FN_VARARGS</code>, <code>FN_NO_EVAL</code>), and <code>CA_*</code>.</li>
 <li>If you need an extension-only permission, ensure appropriate <code>CA_*</code> exists and is surfaced in <code>access_nametab[]</code>.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md149"></a>
+<h2><a class="anchor" id="autotoc_md177"></a>
 Add a Flag</h2>
 <ol type="1">
 <li>Add a constant in <code><a class="el" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens.">constants.h</a></code> and integrate with flag word (FLAG_WORD1/2/3).</li>
 <li>Add an entry to <code>FLAGENT gen_flags[]</code> in <a href="netmush/flags.c#L362">netmush/flags.c</a> with a setter policy (e.g., <code>fh_wiz</code>, <code>fh_god</code>).</li>
 <li>If needed, add aliases via the <code>flag_alias</code> config.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md150"></a>
+<h2><a class="anchor" id="autotoc_md178"></a>
 Add a Power</h2>
 <ol type="1">
 <li>Add a constant in <code><a class="el" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens.">constants.h</a></code> and specify main vs extended word (<code>POWER_EXT</code>).</li>
 <li>Add an entry to <code>POWERENT gen_powers[]</code> in <a href="netmush/powers.c#L171">netmush/powers.c</a> with a policy (<code>ph_wiz</code>, <code>ph_god</code>, etc.).</li>
 <li>Use <code>power_alias</code> for aliases.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md151"></a>
+<h1><a class="anchor" id="autotoc_md179"></a>
 Practical Checks</h1>
 <ul>
 <li>Find where a command is registered:</li>
@@ -284,10 +284,10 @@ Practical Checks</h1>
 <li>Inspect function registry entry:</li>
 </ul>
 <div class="fragment"><div class="line">grep -n &#39;&quot;&lt;FUNCTIONNAME&gt;&quot;&#39; netmush/functions.c</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md152"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md180"></a>
 Notes on Placeholders</h1>
 <p>Handlers like <code>do_comment()</code> and <code>do_eval()</code> are intentionally minimal or no-op but are still valid command targets. If they appear in <code>command_table[]</code>, they are part of the user command surface and must not be removed without re-mapping or migration.</p>
-<h1><a class="anchor" id="autotoc_md153"></a>
+<h1><a class="anchor" id="autotoc_md181"></a>
 Related Source Pointers</h1>
 <ul>
 <li>Commands table and switches: <a href="netmush/nametabs.c">netmush/nametabs.c</a></li>
