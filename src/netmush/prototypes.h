@@ -1247,12 +1247,12 @@ extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *
 /* stringutil.c */
 extern const char *safe_strerror(int errnum);
 extern int safe_gettimeofday(struct timeval *tv, void *tz);
-extern char *ansiChar(int ch);
-extern int ansiNum(int ch);
-extern char ansiLetter(int num);
-extern char ansiMushCode(int num, _Bool bg);
-extern int ansiBitsMask(int num);
-extern int ansiBits(int num);
+extern const char *ansiChar(int ch);
+extern const int ansiNum(int ch);
+extern const char ansiLetter(int num);
+extern const char ansiMushCode(int num, bool bg);
+extern const int ansiBitsMask(int num);
+extern const int ansiBits(int num);
 extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
 extern char *strip_ansi(const char *s);
 extern char *strip_xterm(char *s);
