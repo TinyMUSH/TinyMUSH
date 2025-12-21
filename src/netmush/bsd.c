@@ -1085,11 +1085,7 @@ int process_input(DESC *d)
 				/* Handle two-byte IAC commands */
 				if (cmd >= 0xF0 && cmd <= 0xF9)
 				{
-					/* Commands like IP (0xF4), AO, AYT, etc. */
-					if (cmd == 0xF4)  /* IP - Interrupt Process */
-					{
-						log_write(LOG_PROBLEMS, "NET", "TELNET", "IAC IP (CTRL+C) received from descriptor %d, ignoring", d->descriptor);
-					}
+					/* Commands like IP (0xF4), AO, AYT, etc. - ignore them */
 					i++;  /* Skip both IAC and command byte */
 					continue;
 				}
