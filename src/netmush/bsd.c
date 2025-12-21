@@ -1070,22 +1070,63 @@ int process_input(DESC *d)
 	{
 		char *src, *dst;
 		int filtered_got = 0;
+		int has_content = 0;
 		
 		for (src = buf; src < buf + got; src++)
 		{
 			if (*src != 0x03)  /* Skip CTRL+C */
 			{
 				buf[filtered_got++] = *src;
+				/* Check if this byte is actual content (not whitespace/control) */
+				if (*src != '\n' && *src != '\r' && !isspace(*src))
+				{
+					has_content = 1;
+				}
 			}
 		}
-		got = in = filtered_got;
-	}
-
-	if (got <= 0)
-	{
-		mushstate.debug_cmd = cmdsave;
-		XFREE(buf);
-		return 1;  /* Not EOF, just filtered out all chars, continue */
+		
+		/**
+		 * If filtering removed all content but left only whitespace/newlines,
+		 * and we haven't seen any real content, ignore this input entirely
+		 */
+		if (filtered_got > 0 && has_content)
+		{
+			got = in = filtered_got;
+		}
+		else if (filtered_got > 0)
+		{
+			/**
+			 * Only whitespace/newlines left - if there's a newline, process it
+			 * to clear any pending partial command
+			 */
+			int has_newline = 0;
+			for (src = buf; src < buf + filtered_got; src++)
+			{
+				if (*src == '\n')
+				{
+					has_newline = 1;
+					break;
+				}
+			}
+			if (has_newline)
+			{
+				got = in = filtered_got;
+			}
+			else
+			{
+				/* No content, no newline - skip this input */
+				mushstate.debug_cmd = cmdsave;
+				XFREE(buf);
+				return 1;
+			}
+		}
+		else
+		{
+			/* Everything was filtered out */
+			mushstate.debug_cmd = cmdsave;
+			XFREE(buf);
+			return 1;
+		}
 	}
 
 	if (!d->raw_input)
