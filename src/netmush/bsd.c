@@ -1064,36 +1064,13 @@ int process_input(DESC *d)
 	}
 
 	/**
-	 * Filter out problematic control characters at the network level.
-	 * If we receive CTRL+C (0x03), close the connection gracefully.
+	 * Filter out problematic control characters at the network level,
+	 * including CTRL+C (0x03). Previous approach of closing connection
+	 * on CTRL+C caused telnet client to hang because some implementations
+	 * expect proper protocol negotiation before disconnection. Instead,
+	 * CTRL+C is now treated like other invalid control characters and
+	 * silently filtered. This is more compatible with standard telnet.
 	 */
-	{
-		int i;
-		unsigned char ch;
-		int has_ctrl_c = 0;
-		
-		for (i = 0; i < got; i++)
-		{
-			ch = (unsigned char)buf[i];
-			if (ch == 0x03)  /* CTRL+C */
-			{
-				has_ctrl_c = 1;
-				break;
-			}
-		}
-		
-		/**
-		 * If CTRL+C detected, close connection gracefully.
-		 * Some telnet clients send CTRL+C which can cause desynchronization.
-		 */
-		if (has_ctrl_c)
-		{
-			log_write(LOG_PROBLEMS, "NET", "CTRLC", "CTRL+C received from descriptor %d, closing connection", d->descriptor);
-			mushstate.debug_cmd = cmdsave;
-			XFREE(buf);
-			return 0;  /* Signal that connection should be closed */
-		}
-	}
 
 	/**
 	 * Filter out other dangerous control characters
