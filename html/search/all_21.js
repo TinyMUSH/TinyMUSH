@@ -27,13 +27,14 @@ var searchData=
   ['with_20overflow_20check_24',['Pattern 2: Array Allocation with Overflow Check',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md131',1,'']]],
   ['wiz_2ec_25',['wiz.c',['../wiz_8c.html',1,'']]],
   ['wiz_5fobey_5flinklock_26',['wiz_obey_linklock',['../structconfdata.html#af79f4a9780af01bff0c4cd870f1b03c7',1,'confdata']]],
-  ['wizard_27',['WIZARD',['../constants_8h.html#a7d25468f2993889250dd6664a4e6b011',1,'constants.h']]],
-  ['wizmotd_5ffile_28',['wizmotd_file',['../structconfdata.html#a26a09ea8ffaba549c2510f0e74e79f95',1,'confdata']]],
-  ['wizmotd_5fmsg_29',['wizmotd_msg',['../structconfdata.html#a41999340c0a32b11de22985836e48f80',1,'confdata']]],
-  ['word1_30',['word1',['../structpowerset.html#a4c0b960e09266d8f865fd9e3fadad547',1,'powerset']]],
-  ['word2_31',['word2',['../structpowerset.html#ad0c5c7c59764f57cc0dafb77a5e35e25',1,'powerset']]],
-  ['work_32',['How do logfiles work?',['../md_docs_2Historical_2FAQ.html#autotoc_md349',1,'']]],
-  ['wrappers_33',['Macro Wrappers',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md125',1,'']]],
-  ['write_5fattr_34',['Write_attr',['../macros_8h.html#a69e1ff5f1ff1c0f33952edf592e1f90f',1,'macros.h']]],
-  ['writes_20in_20tt_20fun_5fwrite_20tt_20resolved_35',['stack-safe writes in &lt;tt&gt;fun_write()&lt;/tt&gt; (Resolved)',['../md_KNOWN__BUGS.html#autotoc_md417',1,'']]]
+  ['wiz_5fobey_5fopenlock_27',['wiz_obey_openlock',['../structconfdata.html#a39b020a68f45d00e4301667671862934',1,'confdata']]],
+  ['wizard_28',['WIZARD',['../constants_8h.html#a7d25468f2993889250dd6664a4e6b011',1,'constants.h']]],
+  ['wizmotd_5ffile_29',['wizmotd_file',['../structconfdata.html#a26a09ea8ffaba549c2510f0e74e79f95',1,'confdata']]],
+  ['wizmotd_5fmsg_30',['wizmotd_msg',['../structconfdata.html#a41999340c0a32b11de22985836e48f80',1,'confdata']]],
+  ['word1_31',['word1',['../structpowerset.html#a4c0b960e09266d8f865fd9e3fadad547',1,'powerset']]],
+  ['word2_32',['word2',['../structpowerset.html#ad0c5c7c59764f57cc0dafb77a5e35e25',1,'powerset']]],
+  ['work_33',['How do logfiles work?',['../md_docs_2Historical_2FAQ.html#autotoc_md349',1,'']]],
+  ['wrappers_34',['Macro Wrappers',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md125',1,'']]],
+  ['write_5fattr_35',['Write_attr',['../macros_8h.html#a69e1ff5f1ff1c0f33952edf592e1f90f',1,'macros.h']]],
+  ['writes_20in_20tt_20fun_5fwrite_20tt_20resolved_36',['stack-safe writes in &lt;tt&gt;fun_write()&lt;/tt&gt; (Resolved)',['../md_KNOWN__BUGS.html#autotoc_md417',1,'']]]
 ];

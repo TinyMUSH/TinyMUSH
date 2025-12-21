@@ -466,6 +466,8 @@ Macros</h2></td></tr>
 <tr class="separator:a6c1cad1bafe7c178b97bfdec44757763"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53f56ecb672bf05407e52cccb96e3886" id="r_a53f56ecb672bf05407e52cccb96e3886"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53f56ecb672bf05407e52cccb96e3886">Link_ok</a>(x)</td></tr>
 <tr class="separator:a53f56ecb672bf05407e52cccb96e3886"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d38bedfc6de997f244cd2106a887ab6" id="r_a4d38bedfc6de997f244cd2106a887ab6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d38bedfc6de997f244cd2106a887ab6">Open_ok</a>(x)</td></tr>
+<tr class="separator:a4d38bedfc6de997f244cd2106a887ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7289d6da1af83f88f3f20d1a683537ef" id="r_a7289d6da1af83f88f3f20d1a683537ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7289d6da1af83f88f3f20d1a683537ef">Wizard</a>(x)</td></tr>
 <tr class="separator:a7289d6da1af83f88f3f20d1a683537ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07f6bfd38f065b63de820746ff2b371b" id="r_a07f6bfd38f065b63de820746ff2b371b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07f6bfd38f065b63de820746ff2b371b">Dark</a>(x)</td></tr>
@@ -681,6 +683,12 @@ Macros</h2></td></tr>
 <tr class="memitem:add86447cc6828dda234a4a153592a862" id="r_add86447cc6828dda234a4a153592a862"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add86447cc6828dda234a4a153592a862">Passes_Linklock</a>(p,  x)</td></tr>
 <tr class="memdesc:add86447cc6828dda234a4a153592a862"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can I pass the linklock check on this? - I must have link_to_any (or be a wizard) and wizards must ignore linklocks, OR - I must be able to pass the linklock.  <br /></td></tr>
 <tr class="separator:add86447cc6828dda234a4a153592a862"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0037f9416d60d7b68dbff4ee34edb32" id="r_ad0037f9416d60d7b68dbff4ee34edb32"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0037f9416d60d7b68dbff4ee34edb32">Openable</a>(p,  x)</td></tr>
+<tr class="memdesc:ad0037f9416d60d7b68dbff4ee34edb32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is this somewhere I can open exits from? - It must be a valid object, and be able to have contents. - I must control it, or have it be Open_ok, or I must have the open_anywhere power and not have the location be God.  <br /></td></tr>
+<tr class="separator:ad0037f9416d60d7b68dbff4ee34edb32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a705b71d52aad73effb9bf0a0b3d6e1a1" id="r_a705b71d52aad73effb9bf0a0b3d6e1a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a705b71d52aad73effb9bf0a0b3d6e1a1">Passes_Openlock</a>(p,  x)</td></tr>
+<tr class="memdesc:a705b71d52aad73effb9bf0a0b3d6e1a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can I pass the openlock check on this? - I must have open_anywhere (or be a wizard) and wizards must ignore openlocks, OR - I must be able to pass the openlock.  <br /></td></tr>
+<tr class="separator:a705b71d52aad73effb9bf0a0b3d6e1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c759018f34f1e60012e739410cab312" id="r_a6c759018f34f1e60012e739410cab312"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a>(a,  f)</td></tr>
 <tr class="memdesc:a6c759018f34f1e60012e739410cab312"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute visibility and write permissions.  <br /></td></tr>
 <tr class="separator:a6c759018f34f1e60012e739410cab312"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1460,7 +1468,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!(((p) == (x)) || isExit(x) || (mushconf.<a class="code hl_variable" href="structconfdata.html#a23c58f69fa82c8a79ddb93163a1a30b9">dark_sleepers</a> &amp;&amp; isPlayer(x) &amp;&amp; !Connected(x) &amp;&amp; !Puppet(x))) &amp;&amp; ((l) ? <a class="code hl_define" href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a>(p, x) : Sees_In_Dark(p, x)) &amp;&amp; ((!Unreal(x) || Check_Known(p, x)) &amp;&amp; (!Unreal(p) || Check_Knows(x, p))))</div>
-<div class="ttc" id="amacros_8h_html_ad87d11259673043b3eac817d49ba8d2d"><div class="ttname"><a href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a></div><div class="ttdeci">#define Sees(p, x)</div><div class="ttdoc">For an object in a room, don't show if all of the following apply: Sleeping players should not be see...</div><div class="ttdef"><b>Definition</b> macros.h:486</div></div>
+<div class="ttc" id="amacros_8h_html_ad87d11259673043b3eac817d49ba8d2d"><div class="ttname"><a href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a></div><div class="ttdeci">#define Sees(p, x)</div><div class="ttdoc">For an object in a room, don't show if all of the following apply: Sleeping players should not be see...</div><div class="ttdef"><b>Definition</b> macros.h:487</div></div>
 <div class="ttc" id="astructconfdata_html_a23c58f69fa82c8a79ddb93163a1a30b9"><div class="ttname"><a href="structconfdata.html#a23c58f69fa82c8a79ddb93163a1a30b9">confdata::dark_sleepers</a></div><div class="ttdeci">int dark_sleepers</div><div class="ttdef"><b>Definition</b> typedefs.h:931</div></div>
 </div><!-- fragment -->
 </div>
@@ -1489,7 +1497,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!<a class="code hl_define" href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a>(p, x) &amp;&amp; (!(l) || Light(x)) &amp;&amp; ((!Unreal(x) || Check_Known(p, x)) &amp;&amp; (!Unreal(p) || Check_Knows(x, p))))</div>
-<div class="ttc" id="amacros_8h_html_a59479cf48f8ef73d4abf7419e813826b"><div class="ttname"><a href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a></div><div class="ttdeci">#define Darkened(p, x)</div><div class="ttdoc">An object is considered Darkened if: It is set Dark. It does not have a DarkLock set (no HAS_DARKLOCK...</div><div class="ttdef"><b>Definition</b> macros.h:474</div></div>
+<div class="ttc" id="amacros_8h_html_a59479cf48f8ef73d4abf7419e813826b"><div class="ttname"><a href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a></div><div class="ttdeci">#define Darkened(p, x)</div><div class="ttdoc">An object is considered Darkened if: It is set Dark. It does not have a DarkLock set (no HAS_DARKLOCK...</div><div class="ttdef"><b>Definition</b> macros.h:475</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2265,7 +2273,7 @@ Macros</h2></td></tr>
 <div class="ttc" id="aconstants_8h_html_a4033ec224f472d23b46ce2e98f2a8fc4"><div class="ttname"><a href="constants_8h.html#a4033ec224f472d23b46ce2e98f2a8fc4">VE_LOC_XAM</a></div><div class="ttdeci">#define VE_LOC_XAM</div><div class="ttdef"><b>Definition</b> constants.h:1001</div></div>
 <div class="ttc" id="aconstants_8h_html_a5b5463d8ce30b6847624f83e31e1d43e"><div class="ttname"><a href="constants_8h.html#a5b5463d8ce30b6847624f83e31e1d43e">VE_LOC_DARK</a></div><div class="ttdeci">#define VE_LOC_DARK</div><div class="ttdef"><b>Definition</b> constants.h:1002</div></div>
 <div class="ttc" id="aconstants_8h_html_aca3af353b90dcf7d025783af9ea24d46"><div class="ttname"><a href="constants_8h.html#aca3af353b90dcf7d025783af9ea24d46">VE_BASE_DARK</a></div><div class="ttdeci">#define VE_BASE_DARK</div><div class="ttdef"><b>Definition</b> constants.h:1003</div></div>
-<div class="ttc" id="amacros_8h_html_af7278a8d1f533745474c572e695183e3"><div class="ttname"><a href="#af7278a8d1f533745474c572e695183e3">Examinable</a></div><div class="ttdeci">#define Examinable(p, x)</div><div class="ttdoc">Visibility constraints.</div><div class="ttdef"><b>Definition</b> macros.h:462</div></div>
+<div class="ttc" id="amacros_8h_html_af7278a8d1f533745474c572e695183e3"><div class="ttname"><a href="#af7278a8d1f533745474c572e695183e3">Examinable</a></div><div class="ttdeci">#define Examinable(p, x)</div><div class="ttdoc">Visibility constraints.</div><div class="ttdef"><b>Definition</b> macros.h:463</div></div>
 </div><!-- fragment -->
 <p>For exits visible (for lexits(), etc.), this is true if we can examine the exit's location, examine the exit, or the exit is LIGHT. It is also true if neither the location or base or exit is dark. </p>
 
@@ -2553,7 +2561,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(((x) &gt;= 0) &amp;&amp; ((x) &lt; mushstate.<a class="code hl_variable" href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">db_top</a>))</div>
-<div class="ttc" id="astructstatedata_html_a526e854ef5cc45c28d3796e11bc4bbd4"><div class="ttname"><a href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">statedata::db_top</a></div><div class="ttdeci">int db_top</div><div class="ttdef"><b>Definition</b> typedefs.h:1213</div></div>
+<div class="ttc" id="astructstatedata_html_a526e854ef5cc45c28d3796e11bc4bbd4"><div class="ttname"><a href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">statedata::db_top</a></div><div class="ttdeci">int db_top</div><div class="ttdef"><b>Definition</b> typedefs.h:1214</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3016,7 +3024,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_variable" href="externs_8h.html#ab41692eb9040834a8cc8bedaef848f7d">object_types</a>[Typeof(x)].flags &amp; <a class="code hl_define" href="constants_8h.html#a2e5c33b3b7ffffea5f5a01df2e0ba108">OF_CONTENTS</a>) != 0)</div>
 <div class="ttc" id="aconstants_8h_html_a2e5c33b3b7ffffea5f5a01df2e0ba108"><div class="ttname"><a href="constants_8h.html#a2e5c33b3b7ffffea5f5a01df2e0ba108">OF_CONTENTS</a></div><div class="ttdeci">#define OF_CONTENTS</div><div class="ttdef"><b>Definition</b> constants.h:993</div></div>
-<div class="ttc" id="aexterns_8h_html_ab41692eb9040834a8cc8bedaef848f7d"><div class="ttname"><a href="externs_8h.html#ab41692eb9040834a8cc8bedaef848f7d">object_types</a></div><div class="ttdeci">OBJENT object_types[8]</div><div class="ttdef"><b>Definition</b> flags.c:443</div></div>
+<div class="ttc" id="aexterns_8h_html_ab41692eb9040834a8cc8bedaef848f7d"><div class="ttname"><a href="externs_8h.html#ab41692eb9040834a8cc8bedaef848f7d">object_types</a></div><div class="ttdeci">OBJENT object_types[8]</div><div class="ttdef"><b>Definition</b> flags.c:444</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3560,7 +3568,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">((!<a class="code hl_define" href="#af7278a8d1f533745474c572e695183e3">Examinable</a>(p, x) &amp;&amp; (Owner(p) != o)) || ((<a class="code hl_define" href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a>(a, f) &amp; <a class="code hl_define" href="constants_8h.html#a06bde7d693d38f888bc26f6142a36bd2">AF_MDARK</a>) &amp;&amp; !Sees_Hidden_Attrs(p)) || ((<a class="code hl_define" href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a>(a, f) &amp; <a class="code hl_define" href="constants_8h.html#af6c2aa55a0cb486d0ad69e469419d0d4">AF_DARK</a>) &amp;&amp; !God(p)))</div>
 <div class="ttc" id="aconstants_8h_html_a06bde7d693d38f888bc26f6142a36bd2"><div class="ttname"><a href="constants_8h.html#a06bde7d693d38f888bc26f6142a36bd2">AF_MDARK</a></div><div class="ttdeci">#define AF_MDARK</div><div class="ttdef"><b>Definition</b> constants.h:51</div></div>
 <div class="ttc" id="aconstants_8h_html_af6c2aa55a0cb486d0ad69e469419d0d4"><div class="ttname"><a href="constants_8h.html#af6c2aa55a0cb486d0ad69e469419d0d4">AF_DARK</a></div><div class="ttdeci">#define AF_DARK</div><div class="ttdef"><b>Definition</b> constants.h:49</div></div>
-<div class="ttc" id="amacros_8h_html_a6c759018f34f1e60012e739410cab312"><div class="ttname"><a href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a></div><div class="ttdeci">#define AttrFlags(a, f)</div><div class="ttdoc">Attribute visibility and write permissions.</div><div class="ttdef"><b>Definition</b> macros.h:537</div></div>
+<div class="ttc" id="amacros_8h_html_a6c759018f34f1e60012e739410cab312"><div class="ttname"><a href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a></div><div class="ttdeci">#define AttrFlags(a, f)</div><div class="ttdoc">Attribute visibility and write permissions.</div><div class="ttdef"><b>Definition</b> macros.h:554</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4123,7 +4131,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(mushstate.<a class="code hl_variable" href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">markbits</a>[(x) &gt;&gt; 3] |= mushconf.<a class="code hl_variable" href="structconfdata.html#a8f9bc353e8932f60333f6f1310f5dd51">markdata</a>[(x) &amp; 7])</div>
 <div class="ttc" id="astructconfdata_html_a8f9bc353e8932f60333f6f1310f5dd51"><div class="ttname"><a href="structconfdata.html#a8f9bc353e8932f60333f6f1310f5dd51">confdata::markdata</a></div><div class="ttdeci">uint8_t markdata[8]</div><div class="ttdef"><b>Definition</b> typedefs.h:813</div></div>
-<div class="ttc" id="astructstatedata_html_a99fdacad30d9c1296c27e7da6a68a453"><div class="ttname"><a href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">statedata::markbits</a></div><div class="ttdeci">MARKBYTE * markbits</div><div class="ttdef"><b>Definition</b> typedefs.h:1217</div></div>
+<div class="ttc" id="astructstatedata_html_a99fdacad30d9c1296c27e7da6a68a453"><div class="ttname"><a href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">statedata::markbits</a></div><div class="ttdeci">MARKBYTE * markbits</div><div class="ttdef"><b>Definition</b> typedefs.h:1218</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5195,6 +5203,49 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a4d38bedfc6de997f244cd2106a887ab6" name="a4d38bedfc6de997f244cd2106a887ab6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d38bedfc6de997f244cd2106a887ab6">&#9670;&#160;</a></span>Open_ok</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Open_ok</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">(((Flags3(x) &amp; <a class="code hl_define" href="constants_8h.html#a237963211da91910dca0d44cc679f423">OPEN_OK</a>) != 0) &amp;&amp; Has_contents(x))</div>
+<div class="ttc" id="aconstants_8h_html_a237963211da91910dca0d44cc679f423"><div class="ttname"><a href="constants_8h.html#a237963211da91910dca0d44cc679f423">OPEN_OK</a></div><div class="ttdeci">#define OPEN_OK</div><div class="ttdef"><b>Definition</b> constants.h:970</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad0037f9416d60d7b68dbff4ee34edb32" name="ad0037f9416d60d7b68dbff4ee34edb32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0037f9416d60d7b68dbff4ee34edb32">&#9670;&#160;</a></span>Openable</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Openable</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>p</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>x</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">(Good_obj(x) &amp;&amp; Has_contents(x) &amp;&amp; (Controls(p, x) || Open_ok(x) || (Open_Anywhere(p) &amp;&amp; !God(x))))</div>
+</div><!-- fragment -->
+<p>Is this somewhere I can open exits from? - It must be a valid object, and be able to have contents. - I must control it, or have it be Open_ok, or I must have the open_anywhere power and not have the location be God. </p>
+
+</div>
+</div>
 <a id="a69eb299b00fbecba1fc37a97aae0951a" name="a69eb299b00fbecba1fc37a97aae0951a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a69eb299b00fbecba1fc37a97aae0951a">&#9670;&#160;</a></span>Orphan</h2>
 
@@ -5391,6 +5442,32 @@ Macros</h2></td></tr>
 <div class="ttc" id="astructconfdata_html_af79f4a9780af01bff0c4cd870f1b03c7"><div class="ttname"><a href="structconfdata.html#af79f4a9780af01bff0c4cd870f1b03c7">confdata::wiz_obey_linklock</a></div><div class="ttdeci">int wiz_obey_linklock</div><div class="ttdef"><b>Definition</b> typedefs.h:954</div></div>
 </div><!-- fragment -->
 <p>Can I pass the linklock check on this? - I must have link_to_any (or be a wizard) and wizards must ignore linklocks, OR - I must be able to pass the linklock. </p>
+
+</div>
+</div>
+<a id="a705b71d52aad73effb9bf0a0b3d6e1a1" name="a705b71d52aad73effb9bf0a0b3d6e1a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a705b71d52aad73effb9bf0a0b3d6e1a1">&#9670;&#160;</a></span>Passes_Openlock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Passes_Openlock</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>p</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>x</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">((Open_Anywhere(p) &amp;&amp; !mushconf.<a class="code hl_variable" href="structconfdata.html#a39b020a68f45d00e4301667671862934">wiz_obey_openlock</a>) || could_doit(p, x, <a class="code hl_define" href="constants_8h.html#acbd3f1abd27366d1b4e6c11bad2172c7">A_LOPEN</a>))</div>
+<div class="ttc" id="aconstants_8h_html_acbd3f1abd27366d1b4e6c11bad2172c7"><div class="ttname"><a href="constants_8h.html#acbd3f1abd27366d1b4e6c11bad2172c7">A_LOPEN</a></div><div class="ttdeci">#define A_LOPEN</div><div class="ttdef"><b>Definition</b> constants.h:229</div></div>
+<div class="ttc" id="astructconfdata_html_a39b020a68f45d00e4301667671862934"><div class="ttname"><a href="structconfdata.html#a39b020a68f45d00e4301667671862934">confdata::wiz_obey_openlock</a></div><div class="ttdeci">int wiz_obey_openlock</div><div class="ttdef"><b>Definition</b> typedefs.h:955</div></div>
+</div><!-- fragment -->
+<p>Can I pass the openlock check on this? - I must have open_anywhere (or be a wizard) and wizards must ignore openlocks, OR - I must be able to pass the openlock. </p>
 
 </div>
 </div>
@@ -5680,7 +5757,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
 <div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 <div class="ttc" id="aconstants_8h_html_ab78f34451c5c2be60321d0fa2fc0daac"><div class="ttname"><a href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div><div class="ttdeci">#define DIRTY</div><div class="ttdef"><b>Definition</b> constants.h:963</div></div>
-<div class="ttc" id="astructstatedata_html_ac7ce05696823ea31fa4dec5b665637da"><div class="ttname"><a href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">statedata::now</a></div><div class="ttdeci">time_t now</div><div class="ttdef"><b>Definition</b> typedefs.h:1145</div></div>
+<div class="ttc" id="astructstatedata_html_ac7ce05696823ea31fa4dec5b665637da"><div class="ttname"><a href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">statedata::now</a></div><div class="ttdeci">time_t now</div><div class="ttdef"><b>Definition</b> typedefs.h:1146</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7552,7 +7629,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((mushstate.<a class="code hl_variable" href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">qfirst</a> != NULL) ? 1 : 0)</div>
-<div class="ttc" id="astructstatedata_html_a37294b0f42597b052c5ebb0a65bd5fa6"><div class="ttname"><a href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">statedata::qfirst</a></div><div class="ttdeci">BQUE * qfirst</div><div class="ttdef"><b>Definition</b> typedefs.h:1193</div></div>
+<div class="ttc" id="astructstatedata_html_a37294b0f42597b052c5ebb0a65bd5fa6"><div class="ttname"><a href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">statedata::qfirst</a></div><div class="ttdeci">BQUE * qfirst</div><div class="ttdef"><b>Definition</b> typedefs.h:1194</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7590,9 +7667,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> = clock()), ((mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> &gt; mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> + mushconf.<a class="code hl_variable" href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">func_cpu_lim</a>) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> + mushconf.<a class="code hl_variable" href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">func_cpu_lim</a> &gt; mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a>) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> != -1) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> != -1)))</div>
-<div class="ttc" id="astructconfdata_html_a44975a6b4f0610c1e9a2f4426568bce5"><div class="ttname"><a href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">confdata::func_cpu_lim</a></div><div class="ttdeci">clock_t func_cpu_lim</div><div class="ttdef"><b>Definition</b> typedefs.h:1016</div></div>
-<div class="ttc" id="astructstatedata_html_aad469084582c1615118b419b1059a75d"><div class="ttname"><a href="structstatedata.html#aad469084582c1615118b419b1059a75d">statedata::cputime_base</a></div><div class="ttdeci">clock_t cputime_base</div><div class="ttdef"><b>Definition</b> typedefs.h:1241</div></div>
-<div class="ttc" id="astructstatedata_html_ab977888211553249c54b12a5fce4f0b3"><div class="ttname"><a href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">statedata::cputime_now</a></div><div class="ttdeci">clock_t cputime_now</div><div class="ttdef"><b>Definition</b> typedefs.h:1242</div></div>
+<div class="ttc" id="astructconfdata_html_a44975a6b4f0610c1e9a2f4426568bce5"><div class="ttname"><a href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">confdata::func_cpu_lim</a></div><div class="ttdeci">clock_t func_cpu_lim</div><div class="ttdef"><b>Definition</b> typedefs.h:1017</div></div>
+<div class="ttc" id="astructstatedata_html_aad469084582c1615118b419b1059a75d"><div class="ttname"><a href="structstatedata.html#aad469084582c1615118b419b1059a75d">statedata::cputime_base</a></div><div class="ttdeci">clock_t cputime_base</div><div class="ttdef"><b>Definition</b> typedefs.h:1242</div></div>
+<div class="ttc" id="astructstatedata_html_ab977888211553249c54b12a5fce4f0b3"><div class="ttname"><a href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">statedata::cputime_now</a></div><div class="ttdeci">clock_t cputime_now</div><div class="ttdef"><b>Definition</b> typedefs.h:1243</div></div>
 </div><!-- fragment -->
 <p>Handling CPU time checking. </p>
 <dl class="section note"><dt>Note</dt><dd>CPU time "clock()" compatibility notes:</dd></dl>
