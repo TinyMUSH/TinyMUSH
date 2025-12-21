@@ -952,9 +952,14 @@ int ansi_map_states(const char *s, int **m, char **p)
 				int ansi_diff = 0;
 				unsigned int param_val = 0;
 				++(s1);
+				if (!*(s1))
+				{
+					break;
+				}
 				if (*(s1) == ANSI_CSI)
 				{
-					while ((*(++(s1)) & 0xf0) == 0x30)
+					++(s1);
+					while (*(s1) && (*(s1) & 0xf0) == 0x30)
 					{
 						if (*(s1) < 0x3a)
 						{
@@ -970,9 +975,10 @@ int ansi_map_states(const char *s, int **m, char **p)
 							}
 							param_val = 0;
 						}
+						++(s1);
 					}
 				}
-				while ((*(s1) & 0xf0) == 0x20)
+				while (*(s1) && (*(s1) & 0xf0) == 0x20)
 				{
 					++(s1);
 				}
@@ -1029,15 +1035,24 @@ void skip_esccode(char **s)
 {
 	++(*s);
 
+	if (!**s)
+	{
+		return;
+	}
+
 	if (**s == ANSI_CSI)
 	{
 		do
 		{
 			++(*s);
+			if (!**s)
+			{
+				return;
+			}
 		} while ((**s & 0xf0) == 0x30);
 	}
 
-	while ((**s & 0xf0) == 0x20)
+	while (**s && (**s & 0xf0) == 0x20)
 	{
 		++(*s);
 	}
@@ -1060,6 +1075,11 @@ void copy_esccode(char **s, char **t)
 	++(*s);
 	++(*t);
 
+	if (!**s)
+	{
+		return;
+	}
+
 	if (**s == ANSI_CSI)
 	{
 		do
@@ -1067,10 +1087,14 @@ void copy_esccode(char **s, char **t)
 			**t = **s;
 			++(*s);
 			++(*t);
+			if (!**s)
+			{
+				return;
+			}
 		} while ((**s & 0xf0) == 0x30);
 	}
 
-	while ((**s & 0xf0) == 0x20)
+	while (**s && (**s & 0xf0) == 0x20)
 	{
 		**t = **s;
 		++(*s);
@@ -1097,16 +1121,25 @@ void safe_copy_esccode(char **s, char *buff, char **bufc)
 	XSAFELBCHR(**s, buff, bufc);
 	++(*s);
 
+	if (!**s)
+	{
+		return;
+	}
+
 	if (**s == ANSI_CSI)
 	{
 		do
 		{
 			XSAFELBCHR(**s, buff, bufc);
 			++(*s);
+			if (!**s)
+			{
+				return;
+			}
 		} while ((**s & 0xf0) == 0x30);
 	}
 
-	while ((**s & 0xf0) == 0x20)
+	while (**s && (**s & 0xf0) == 0x20)
 	{
 		XSAFELBCHR(**s, buff, bufc);
 		++(*s);
@@ -1291,9 +1324,14 @@ char *translate_string(char *str, int type)
 						int ansi_diff = 0;
 						unsigned int param_val = 0;
 						++(str);
+						if (!*(str))
+						{
+							break;
+						}
 						if (*(str) == ANSI_CSI)
 						{
-							while ((*(++(str)) & 0xf0) == 0x30)
+							++(str);
+							while (*(str) && (*(str) & 0xf0) == 0x30)
 							{
 								if (*(str) < 0x3a)
 								{
@@ -1309,9 +1347,10 @@ char *translate_string(char *str, int type)
 									}
 									param_val = 0;
 								}
+								++(str);
 							}
 						}
-						while ((*(str) & 0xf0) == 0x20)
+						while (*(str) && (*(str) & 0xf0) == 0x20)
 						{
 							++(str);
 						}

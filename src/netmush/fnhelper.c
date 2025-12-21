@@ -198,7 +198,7 @@ char *split_token(char **sp, const Delim *sep)
 }
 
 /**
- * @brief Parse ANSI escape sequence and update state.
+ * @brief Parse ANSI escape sequence and update state (with bounds checking).
  *
  * @param strp Pointer to string position (updated in place)
  * @param ansi_state Current ANSI state (updated in place)
@@ -210,9 +210,14 @@ char *split_token(char **sp, const Delim *sep)
 		int ansi_diff = 0;                                                                          \
 		unsigned int param_val = 0;                                                                 \
 		++(strp);                                                                                   \
+		if (!*(strp))                                                                               \
+		{                                                                                           \
+			break;                                                                                  \
+		}                                                                                           \
 		if (*(strp) == ANSI_CSI)                                                                    \
 		{                                                                                           \
-			while ((*(++(strp)) & 0xf0) == 0x30)                                                    \
+			++(strp);                                                                               \
+			while (*(strp) && (*(strp) & 0xf0) == 0x30)                                             \
 			{                                                                                       \
 				if (*(strp) < 0x3a)                                                                 \
 				{                                                                                   \
@@ -228,9 +233,10 @@ char *split_token(char **sp, const Delim *sep)
 					}                                                                               \
 					param_val = 0;                                                                  \
 				}                                                                                   \
+				++(strp);                                                                           \
 			}                                                                                       \
 		}                                                                                           \
-		while ((*(strp) & 0xf0) == 0x20)                                                            \
+		while (*(strp) && (*(strp) & 0xf0) == 0x20)                                                 \
 		{                                                                                           \
 			++(strp);                                                                               \
 		}                                                                                           \
