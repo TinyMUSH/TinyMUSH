@@ -159,12 +159,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9d2f17cc77b140dfe9b1573d963cfeb5" id="r_a9d2f17cc77b140dfe9b1573d963cfeb5"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d2f17cc77b140dfe9b1573d963cfeb5">safe_strerror</a> (int errnum)</td></tr>
 <tr class="memdesc:a9d2f17cc77b140dfe9b1573d963cfeb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-safe wrapper for strerror.  <br /></td></tr>
 <tr class="separator:a9d2f17cc77b140dfe9b1573d963cfeb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab69bc01ebdd6f669d4c33b032e9a7c5e" id="r_ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab69bc01ebdd6f669d4c33b032e9a7c5e">safe_gettimeofday</a> (struct timeval *tv, void *tz <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
-<tr class="separator:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af13548100dd67edeb1f53c49482d4ba3" id="r_af13548100dd67edeb1f53c49482d4ba3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af13548100dd67edeb1f53c49482d4ba3">str2xterm</a> (char *str)</td></tr>
-<tr class="memdesc:af13548100dd67edeb1f53c49482d4ba3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a value to xterm color.  <br /></td></tr>
-<tr class="separator:af13548100dd67edeb1f53c49482d4ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a024552f4a78374dc5be679d168cc98a7" id="r_a024552f4a78374dc5be679d168cc98a7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a024552f4a78374dc5be679d168cc98a7">safe_gettimeofday</a> (struct timeval *tv)</td></tr>
+<tr class="memdesc:a024552f4a78374dc5be679d168cc98a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
+<tr class="separator:a024552f4a78374dc5be679d168cc98a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af968a3f1c8e90d1b5d9f0fd6d6cb395a" id="r_af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af968a3f1c8e90d1b5d9f0fd6d6cb395a">upcasestr</a> (char *s)</td></tr>
 <tr class="memdesc:af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalizes an entire string.  <br /></td></tr>
 <tr class="separator:af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -451,8 +448,8 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 
 </div>
 </div>
-<a id="ab69bc01ebdd6f669d4c33b032e9a7c5e" name="ab69bc01ebdd6f669d4c33b032e9a7c5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab69bc01ebdd6f669d4c33b032e9a7c5e">&#9670;&#160;</a></span>safe_gettimeofday()</h2>
+<a id="a024552f4a78374dc5be679d168cc98a7" name="a024552f4a78374dc5be679d168cc98a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a024552f4a78374dc5be679d168cc98a7">&#9670;&#160;</a></span>safe_gettimeofday()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -460,12 +457,8 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
         <tr>
           <td class="memname">int safe_gettimeofday </td>
           <td>(</td>
-          <td class="paramtype">struct timeval *</td>          <td class="paramname"><span class="paramname"><em>tv</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">struct timeval *</td>          <td class="paramname"><span class="paramname"><em>tv</em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype">void *tz </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -474,7 +467,6 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tv</td><td>Pointer to timeval structure to fill </td></tr>
-    <tr><td class="paramname">tz</td><td>Unused (for gettimeofday compatibility) </td></tr>
   </table>
   </dd>
 </dl>
@@ -505,32 +497,6 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>const char* Error message string </dd></dl>
-
-</div>
-</div>
-<a id="af13548100dd67edeb1f53c49482d4ba3" name="af13548100dd67edeb1f53c49482d4ba3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af13548100dd67edeb1f53c49482d4ba3">&#9670;&#160;</a></span>str2xterm()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int str2xterm </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>str</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Convert a value to xterm color. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">str</td><td>A string representing the color to be convert into xterm value. The value can be express as hex (#rrggbb), decimal (r g b). a 24 bit integer value, or the actual xterm value.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The xterm value of the color. </dd></dl>
 
 </div>
 </div>
