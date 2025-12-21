@@ -72,7 +72,7 @@ if [ -f "netmush" ]; then
     # Le serveur fork et le parent quitte. Attendre que le fichier PID soit créé
     # par le processus enfant qui devient le vrai serveur
     echo -e "${YELLOW}Attente du démarrage du serveur...${NC}"
-    PID_FILE="db/mush.pid"
+    PID_FILE="netmush.pid"
     
     for i in {1..10}; do
         if [ -f "$PID_FILE" ]; then
