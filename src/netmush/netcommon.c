@@ -516,12 +516,6 @@ void queue_string(DESC *d, const char *format, ...)
 			}
 
 			queue_write(d, msg, strlen(msg));
-		
-		/* Append ANSI_NORMAL only if message contains ANSI codes to prevent color bleeding */
-		if ((Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)) && 
-		    strchr(msg, ESC_CHAR))
-		{
-			queue_write(d, ANSI_NORMAL, 4);
 		}
 	}
 }
