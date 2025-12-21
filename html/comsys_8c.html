@@ -177,6 +177,12 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a6c80b66650236095d6c77f18a536a539" id="r_a6c80b66650236095d6c77f18a536a539"><td class="memItemLeft" align="right" valign="top"><a id="a6c80b66650236095d6c77f18a536a539" name="a6c80b66650236095d6c77f18a536a539"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FPTS_DIG</b>&#160;&#160;&#160;LDBL_DIG - 1</td></tr>
+<tr class="separator:a6c80b66650236095d6c77f18a536a539"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a864e50b940cb9c6b220e8da8f7081643" id="r_a864e50b940cb9c6b220e8da8f7081643"><td class="memItemLeft" align="right" valign="top"><a id="a864e50b940cb9c6b220e8da8f7081643" name="a864e50b940cb9c6b220e8da8f7081643"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>DOW_COUNT</b>&#160;&#160;&#160;(LAST_DOW - <a class="el" href="constants_8h.html#aefe874bbcda766269786abfef610114c">FIRST_DOW</a> + 1)</td></tr>
+<tr class="separator:a864e50b940cb9c6b220e8da8f7081643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94e847e7a239dedc0c56f9d238b4946c" id="r_a94e847e7a239dedc0c56f9d238b4946c"><td class="memItemLeft" align="right" valign="top"><a id="a94e847e7a239dedc0c56f9d238b4946c" name="a94e847e7a239dedc0c56f9d238b4946c"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>NO_CHAN_MSG</b>&#160;&#160;&#160;&quot;That is not a valid channel name.&quot;</td></tr>
 <tr class="separator:a94e847e7a239dedc0c56f9d238b4946c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -748,7 +754,7 @@ struct <a class="el" href="structmod__comsys__confstorage.html">mod_comsys_confs
 <b>Initial value:</b><div class="fragment"><div class="line">= {</div>
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;quiet&quot;</span>, 1, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, CBOOT_QUIET},</div>
 <div class="line">    {NULL, 0, 0, 0}}</div>
-<div class="ttc" id="aconstants_8h_html_ac83d7116eca40585f086d0c0c5e02e0c"><div class="ttname"><a href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a></div><div class="ttdeci">#define CA_PUBLIC</div><div class="ttdoc">Command permission flags.</div><div class="ttdef"><b>Definition</b> constants.h:380</div></div>
+<div class="ttc" id="aconstants_8h_html_ac83d7116eca40585f086d0c0c5e02e0c"><div class="ttname"><a href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a></div><div class="ttdeci">#define CA_PUBLIC</div><div class="ttdoc">Command permission flags.</div><div class="ttdef"><b>Definition</b> constants.h:379</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -791,7 +797,7 @@ struct <a class="el" href="structmod__comsys__confstorage.html">mod_comsys_confs
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;transmit&quot;</span>, 1, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, CHANNEL_TRANS | <a class="code hl_define" href="constants_8h.html#a98a66cf3b99d908fce2f82b26b4a04c9">SW_MULTIPLE</a>},</div>
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;receive&quot;</span>, 1, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, CHANNEL_RECV | <a class="code hl_define" href="constants_8h.html#a98a66cf3b99d908fce2f82b26b4a04c9">SW_MULTIPLE</a>},</div>
 <div class="line">    {NULL, 0, 0, 0}}</div>
-<div class="ttc" id="aconstants_8h_html_a98a66cf3b99d908fce2f82b26b4a04c9"><div class="ttname"><a href="constants_8h.html#a98a66cf3b99d908fce2f82b26b4a04c9">SW_MULTIPLE</a></div><div class="ttdeci">#define SW_MULTIPLE</div><div class="ttdef"><b>Definition</b> constants.h:424</div></div>
+<div class="ttc" id="aconstants_8h_html_a98a66cf3b99d908fce2f82b26b4a04c9"><div class="ttname"><a href="constants_8h.html#a98a66cf3b99d908fce2f82b26b4a04c9">SW_MULTIPLE</a></div><div class="ttdeci">#define SW_MULTIPLE</div><div class="ttdef"><b>Definition</b> constants.h:423</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -856,13 +862,13 @@ struct <a class="el" href="structmod__comsys__confstorage.html">mod_comsys_confs
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;clearcom&quot;</span>, NULL, <a class="code hl_define" href="constants_8h.html#a4db873a63995f0bd3f895b09cf80c7a6">CA_NO_SLAVE</a>, 0, <a class="code hl_define" href="constants_8h.html#ad9f9f864d76a62b68d3fa073072bb11e">CS_NO_ARGS</a>, NULL, NULL, NULL, {do_clearcom}},</div>
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;delcom&quot;</span>, NULL, <a class="code hl_define" href="constants_8h.html#a4db873a63995f0bd3f895b09cf80c7a6">CA_NO_SLAVE</a>, 0, <a class="code hl_define" href="constants_8h.html#a81307841e3d0d23b22b17ae3075dff39">CS_ONE_ARG</a>, NULL, NULL, NULL, {do_delcom}},</div>
 <div class="line">    {(<span class="keywordtype">char</span> *)NULL, NULL, 0, 0, 0, NULL, NULL, NULL, {NULL}}}</div>
-<div class="ttc" id="aconstants_8h_html_a2a4a6765a2896ac19ae22a520d08433b"><div class="ttname"><a href="constants_8h.html#a2a4a6765a2896ac19ae22a520d08433b">CA_NO_GUEST</a></div><div class="ttdeci">#define CA_NO_GUEST</div><div class="ttdef"><b>Definition</b> constants.h:396</div></div>
-<div class="ttc" id="aconstants_8h_html_a38d091069b6462c1257324c034771221"><div class="ttname"><a href="constants_8h.html#a38d091069b6462c1257324c034771221">CS_INTERP</a></div><div class="ttdeci">#define CS_INTERP</div><div class="ttdef"><b>Definition</b> constants.h:361</div></div>
-<div class="ttc" id="aconstants_8h_html_a4db873a63995f0bd3f895b09cf80c7a6"><div class="ttname"><a href="constants_8h.html#a4db873a63995f0bd3f895b09cf80c7a6">CA_NO_SLAVE</a></div><div class="ttdeci">#define CA_NO_SLAVE</div><div class="ttdef"><b>Definition</b> constants.h:394</div></div>
-<div class="ttc" id="aconstants_8h_html_a65c6111b9c8b0dd6c30b3f6b6e2e18c9"><div class="ttname"><a href="constants_8h.html#a65c6111b9c8b0dd6c30b3f6b6e2e18c9">CS_TWO_ARG</a></div><div class="ttdeci">#define CS_TWO_ARG</div><div class="ttdef"><b>Definition</b> constants.h:358</div></div>
-<div class="ttc" id="aconstants_8h_html_a679e5975c38799425b8248a6ebfd7218"><div class="ttname"><a href="constants_8h.html#a679e5975c38799425b8248a6ebfd7218">CS_ARGV</a></div><div class="ttdeci">#define CS_ARGV</div><div class="ttdef"><b>Definition</b> constants.h:360</div></div>
-<div class="ttc" id="aconstants_8h_html_a81307841e3d0d23b22b17ae3075dff39"><div class="ttname"><a href="constants_8h.html#a81307841e3d0d23b22b17ae3075dff39">CS_ONE_ARG</a></div><div class="ttdeci">#define CS_ONE_ARG</div><div class="ttdef"><b>Definition</b> constants.h:357</div></div>
-<div class="ttc" id="aconstants_8h_html_ad9f9f864d76a62b68d3fa073072bb11e"><div class="ttname"><a href="constants_8h.html#ad9f9f864d76a62b68d3fa073072bb11e">CS_NO_ARGS</a></div><div class="ttdeci">#define CS_NO_ARGS</div><div class="ttdoc">Command handler call conventions.</div><div class="ttdef"><b>Definition</b> constants.h:356</div></div>
+<div class="ttc" id="aconstants_8h_html_a2a4a6765a2896ac19ae22a520d08433b"><div class="ttname"><a href="constants_8h.html#a2a4a6765a2896ac19ae22a520d08433b">CA_NO_GUEST</a></div><div class="ttdeci">#define CA_NO_GUEST</div><div class="ttdef"><b>Definition</b> constants.h:395</div></div>
+<div class="ttc" id="aconstants_8h_html_a38d091069b6462c1257324c034771221"><div class="ttname"><a href="constants_8h.html#a38d091069b6462c1257324c034771221">CS_INTERP</a></div><div class="ttdeci">#define CS_INTERP</div><div class="ttdef"><b>Definition</b> constants.h:360</div></div>
+<div class="ttc" id="aconstants_8h_html_a4db873a63995f0bd3f895b09cf80c7a6"><div class="ttname"><a href="constants_8h.html#a4db873a63995f0bd3f895b09cf80c7a6">CA_NO_SLAVE</a></div><div class="ttdeci">#define CA_NO_SLAVE</div><div class="ttdef"><b>Definition</b> constants.h:393</div></div>
+<div class="ttc" id="aconstants_8h_html_a65c6111b9c8b0dd6c30b3f6b6e2e18c9"><div class="ttname"><a href="constants_8h.html#a65c6111b9c8b0dd6c30b3f6b6e2e18c9">CS_TWO_ARG</a></div><div class="ttdeci">#define CS_TWO_ARG</div><div class="ttdef"><b>Definition</b> constants.h:357</div></div>
+<div class="ttc" id="aconstants_8h_html_a679e5975c38799425b8248a6ebfd7218"><div class="ttname"><a href="constants_8h.html#a679e5975c38799425b8248a6ebfd7218">CS_ARGV</a></div><div class="ttdeci">#define CS_ARGV</div><div class="ttdef"><b>Definition</b> constants.h:359</div></div>
+<div class="ttc" id="aconstants_8h_html_a81307841e3d0d23b22b17ae3075dff39"><div class="ttname"><a href="constants_8h.html#a81307841e3d0d23b22b17ae3075dff39">CS_ONE_ARG</a></div><div class="ttdeci">#define CS_ONE_ARG</div><div class="ttdef"><b>Definition</b> constants.h:356</div></div>
+<div class="ttc" id="aconstants_8h_html_ad9f9f864d76a62b68d3fa073072bb11e"><div class="ttname"><a href="constants_8h.html#ad9f9f864d76a62b68d3fa073072bb11e">CS_NO_ARGS</a></div><div class="ttdeci">#define CS_NO_ARGS</div><div class="ttdoc">Command handler call conventions.</div><div class="ttdef"><b>Definition</b> constants.h:355</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -884,8 +890,8 @@ struct <a class="el" href="structmod__comsys__confstorage.html">mod_comsys_confs
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;public_channel&quot;</span>, <a class="code hl_function" href="conf_8c.html#ad234822432f9ec1ea18767b51d4e498b">cf_string</a>, <a class="code hl_define" href="constants_8h.html#a78303ca1278b01d81c88f7855dd2cb24">CA_STATIC</a>, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, (<span class="keywordtype">int</span> *)&amp;mod_comsys_config.public_channel, <a class="code hl_define" href="constants_8h.html#a2facdfca371afebb3364c87fae328d95">SBUF_SIZE</a>},</div>
 <div class="line">    {NULL, NULL, 0, 0, NULL, 0}}</div>
 <div class="ttc" id="aconf_8c_html_ad234822432f9ec1ea18767b51d4e498b"><div class="ttname"><a href="conf_8c.html#ad234822432f9ec1ea18767b51d4e498b">cf_string</a></div><div class="ttdeci">CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)</div><div class="ttdoc">Set string parameter.</div><div class="ttdef"><b>Definition</b> conf.c:830</div></div>
-<div class="ttc" id="aconstants_8h_html_a2facdfca371afebb3364c87fae328d95"><div class="ttname"><a href="constants_8h.html#a2facdfca371afebb3364c87fae328d95">SBUF_SIZE</a></div><div class="ttdeci">#define SBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:22</div></div>
-<div class="ttc" id="aconstants_8h_html_a78303ca1278b01d81c88f7855dd2cb24"><div class="ttname"><a href="constants_8h.html#a78303ca1278b01d81c88f7855dd2cb24">CA_STATIC</a></div><div class="ttdeci">#define CA_STATIC</div><div class="ttdef"><b>Definition</b> constants.h:416</div></div>
+<div class="ttc" id="aconstants_8h_html_a2facdfca371afebb3364c87fae328d95"><div class="ttname"><a href="constants_8h.html#a2facdfca371afebb3364c87fae328d95">SBUF_SIZE</a></div><div class="ttdeci">#define SBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:21</div></div>
+<div class="ttc" id="aconstants_8h_html_a78303ca1278b01d81c88f7855dd2cb24"><div class="ttname"><a href="constants_8h.html#a78303ca1278b01d81c88f7855dd2cb24">CA_STATIC</a></div><div class="ttdeci">#define CA_STATIC</div><div class="ttdef"><b>Definition</b> constants.h:415</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -912,7 +918,7 @@ struct <a class="el" href="structmod__comsys__confstorage.html">mod_comsys_confs
 <div class="line">    {<span class="stringliteral">&quot;CWHO&quot;</span>, fun_cwho, 1, 0, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, NULL},</div>
 <div class="line">    {<span class="stringliteral">&quot;CWHOALL&quot;</span>, fun_cwhoall, 1, 0, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>, NULL},</div>
 <div class="line">    {NULL, NULL, 0, 0, 0, NULL}}</div>
-<div class="ttc" id="aconstants_8h_html_aaa08998f5d11d358612159fd982f2f04"><div class="ttname"><a href="constants_8h.html#aaa08998f5d11d358612159fd982f2f04">FN_VARARGS</a></div><div class="ttdeci">#define FN_VARARGS</div><div class="ttdef"><b>Definition</b> constants.h:772</div></div>
+<div class="ttc" id="aconstants_8h_html_aaa08998f5d11d358612159fd982f2f04"><div class="ttname"><a href="constants_8h.html#aaa08998f5d11d358612159fd982f2f04">FN_VARARGS</a></div><div class="ttdeci">#define FN_VARARGS</div><div class="ttdef"><b>Definition</b> constants.h:771</div></div>
 </div><!-- fragment -->
 </div>
 </div>

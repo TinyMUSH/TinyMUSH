@@ -249,7 +249,7 @@ Memory Management</h2>
 <div class="line"><span class="comment">// Never use raw malloc/free</span></div>
 <div class="line">malloc(size);   <span class="comment">// FORBIDDEN</span></div>
 <div class="line">free(ptr);      <span class="comment">// FORBIDDEN</span></div>
-<div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:22</div></div>
+<div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:21</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md34"></a>
 Naming Conventions</h2>
 <div class="fragment"><div class="line"><span class="comment">// Module functions and variables</span></div>
@@ -307,8 +307,8 @@ Error Checking</h2>
 <div class="line">    <a class="code hl_define" href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a>(<a class="code hl_define" href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a>, <span class="stringliteral">&quot;ERR&quot;</span>, <span class="stringliteral">&quot;FILE&quot;</span>, <span class="stringliteral">&quot;Cannot open %s: %s&quot;</span>, path, strerror(errno));</div>
 <div class="line">    <span class="keywordflow">return</span>;</div>
 <div class="line">}</div>
-<div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1470</div></div>
-<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:221</div></div>
+<div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1469</div></div>
+<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:220</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md37"></a>
 Testing</h1>
 <h2><a class="anchor" id="autotoc_md38"></a>

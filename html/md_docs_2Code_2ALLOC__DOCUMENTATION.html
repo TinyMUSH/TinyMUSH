@@ -138,7 +138,7 @@ Memory Allocation</h2>
 <div class="line"><span class="comment">// Direct call (not recommended):</span></div>
 <div class="line"><span class="keywordtype">char</span> *buffer = <a class="code hl_function" href="alloc_8c.html#a3133f65ceaa1203d553920c83380a8c8">__xmalloc</a>(1024, __FILE__, __LINE__, __func__, <span class="stringliteral">&quot;buffer&quot;</span>);</div>
 <div class="ttc" id="aalloc_8c_html_a3133f65ceaa1203d553920c83380a8c8"><div class="ttname"><a href="alloc_8c.html#a3133f65ceaa1203d553920c83380a8c8">__xmalloc</a></div><div class="ttdeci">void * __xmalloc(size_t size, const char *file, int line, const char *function, const char *var)</div><div class="ttdoc">Tracked version of malloc().</div><div class="ttdef"><b>Definition</b> alloc.c:96</div></div>
-<div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:22</div></div>
+<div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:21</div></div>
 </div><!-- fragment --><p><b>Features:</b></p><ul>
 <li>Aligned allocation using C11 <code>aligned_alloc</code>, POSIX <code>posix_memalign</code>, or standard <code>malloc</code></li>
 <li>Automatic zero-initialization of allocated memory</li>
@@ -193,8 +193,8 @@ Memory Deallocation</h2>
 <p><b>Critical:</b> Always check for overruns in debugging: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (XFREE(buffer)) {</div>
 <div class="line">    <a class="code hl_define" href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a>(<a class="code hl_define" href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a>, <span class="stringliteral">&quot;MEM&quot;</span>, <span class="stringliteral">&quot;ERROR&quot;</span>, <span class="stringliteral">&quot;Buffer overrun detected!&quot;</span>);</div>
 <div class="line">}</div>
-<div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1470</div></div>
-<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:221</div></div>
+<div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1469</div></div>
+<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:220</div></div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md81"></a>
 Memory Inspection</h2>
@@ -329,8 +329,8 @@ Printf Variants</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_define" href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a>(player, buffer);</div>
 <div class="line">XFREE(buffer);</div>
-<div class="ttc" id="aconstants_8h_html_a5f9bfff70bfa4747437d8320ccfa045a"><div class="ttname"><a href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a></div><div class="ttdeci">#define LBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:19</div></div>
-<div class="ttc" id="amacros_8h_html_abe044d79896c3d56e758f742f4765f61"><div class="ttname"><a href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a></div><div class="ttdeci">#define notify(p, m,...)</div><div class="ttdef"><b>Definition</b> macros.h:227</div></div>
+<div class="ttc" id="aconstants_8h_html_a5f9bfff70bfa4747437d8320ccfa045a"><div class="ttname"><a href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a></div><div class="ttdeci">#define LBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:18</div></div>
+<div class="ttc" id="amacros_8h_html_abe044d79896c3d56e758f742f4765f61"><div class="ttname"><a href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a></div><div class="ttdeci">#define notify(p, m,...)</div><div class="ttdef"><b>Definition</b> macros.h:226</div></div>
 </div><!-- fragment --></li>
 </ul>
 <hr  />
@@ -500,7 +500,7 @@ Memory Logging</h2>
 <p>Enable memory allocation logging via configuration:</p>
 <div class="fragment"><div class="line">mushconf.<a class="code hl_variable" href="structconfdata.html#a5241bab417873b6d368b4aa93bca95a5">malloc_logger</a> = 1;  <span class="comment">// Enable logging</span></div>
 <div class="line">mushconf.<a class="code hl_variable" href="structconfdata.html#a5241bab417873b6d368b4aa93bca95a5">malloc_logger</a> = 0;  <span class="comment">// Disable logging</span></div>
-<div class="ttc" id="astructconfdata_html_a5241bab417873b6d368b4aa93bca95a5"><div class="ttname"><a href="structconfdata.html#a5241bab417873b6d368b4aa93bca95a5">confdata::malloc_logger</a></div><div class="ttdeci">int malloc_logger</div><div class="ttdef"><b>Definition</b> typedefs.h:1003</div></div>
+<div class="ttc" id="astructconfdata_html_a5241bab417873b6d368b4aa93bca95a5"><div class="ttname"><a href="structconfdata.html#a5241bab417873b6d368b4aa93bca95a5">confdata::malloc_logger</a></div><div class="ttdeci">int malloc_logger</div><div class="ttdef"><b>Definition</b> typedefs.h:1002</div></div>
 </div><!-- fragment --><p>When enabled, allocations/deallocations are logged to: </p><div class="fragment"><div class="line">LOG_MALLOC facility with format:</div>
 <div class="line">Alloc: file[line]function:variable Alloc N bytes</div>
 <div class="line">Free:  file[line]function:variable Free N bytes</div>

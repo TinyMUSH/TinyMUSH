@@ -93,59 +93,57 @@ $(function(){ initResizable(false); });
 </div><!--header-->
 <div class="contents">
 <a href="skeleton_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#ifndef __MOD_SKELETON_H</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#define __MOD_SKELETON_H</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">/* ============================================================================</span></div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * MODULE CONFIGURATION STRUCTURE</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * ============================================================================</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * This structure holds all configuration parameters for the skeleton module.</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * Add your custom parameters here and reference them in the config table.</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structmod__skeleton__confstorage.html">   17</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>{</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keywordtype">int</span> enabled;                    <span class="comment">/* Is the module enabled? */</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>};</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">/* ============================================================================</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * MODULE CONFIGURATION STRUCTURE</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * ============================================================================</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * This structure holds all configuration parameters for the skeleton module.</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * Add your custom parameters here and reference them in the config table.</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="foldopen" id="foldopen00016" data-start="{" data-end="};">
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structmod__skeleton__confstorage.html">   16</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keywordtype">int</span> enabled;                    <span class="comment">/* Is the module enabled? */</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>};</div>
 </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment">/* External configuration storage */</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">extern</span> <span class="keyword">struct </span><a class="code hl_struct" href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a> <a class="code hl_variable" href="skeleton_8h.html#aae4eef9a8a40d8f00d79ac9dfd143c49">mod_skeleton_config</a>;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">/* ============================================================================</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * HASH TABLE DECLARATIONS</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * ============================================================================</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * Define any hash tables your module uses for fast lookups.</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keyword">extern</span> <a class="code hl_struct" href="structhashtable.html">HASHTAB</a> <a class="code hl_variable" href="skeleton_8h.html#ab3fca4618a027fc1d6f7ab42d1c75d74">mod_skeleton_data_htab</a>;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment">/* ============================================================================</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * MODULE METADATA</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * ============================================================================</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">extern</span> <a class="code hl_struct" href="structmodule__version__info.html">MODVER</a> <a class="code hl_variable" href="skeleton_8h.html#a88878085a9a994458aeacf8f8e3c5636">mod_skeleton_version</a>;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">/* ============================================================================</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * FUNCTION PROTOTYPES</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * ============================================================================</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> * Declare all module functions here. Remember to use mod_skeleton_ prefix.</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment"> */</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#a0cc28d02ce83a0fe6bb273b2d90e6282">mod_skeleton_init</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#a9147d4aa44f95b9ec96c752ce1704fea">mod_skeleton_cleanup</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ab2d01b2087bc02c2d01eeda7f5c4b666">mod_do_skeleton_command</a>(dbref, dbref, <span class="keywordtype">int</span>, <span class="keywordtype">char</span> *);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ae6610220a814f4f42e6ff49fe224c1b1">mod_do_skeleton_function</a>(<span class="keywordtype">char</span> *, <span class="keywordtype">char</span> **, dbref, dbref, dbref, <span class="keywordtype">char</span> *[], <span class="keywordtype">int</span>, <span class="keywordtype">char</span> *[], <span class="keywordtype">int</span> ncargs);</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keywordtype">int</span> *<a class="code hl_function" href="skeleton_8h.html#abbdd8700709e00d968d1a319fba05b07">mod_skeleton_get_data</a>(<span class="keywordtype">char</span> *);</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><a class="code hl_typedef" href="typedefs_8h.html#a55bab78d6ae3203b26f98c4b5c3e2d45">CF_Result</a> <a class="code hl_function" href="skeleton_8h.html#abdcf85d2721aeebb2a23dd4f020e76c3">mod_skeleton_set_data</a>(<span class="keywordtype">char</span> *, <span class="keywordtype">int</span> *);</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keywordtype">bool</span> <a class="code hl_function" href="skeleton_8h.html#a8fe59c86a418927149d22b5d02c896e1">mod_skeleton_delete_data</a>(<span class="keywordtype">char</span> *);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ad9f4123c01c16163e2ef6f538786de9a">mod_skeleton_list_data</a>(dbref);</div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#aee64d5e16ddad7ed5a8cfa333da7b093">mod_skeleton_reset_defaults</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#endif </span><span class="comment">/* __MOD_SKELETON_H */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">/* External configuration storage */</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">extern</span> <span class="keyword">struct </span><a class="code hl_struct" href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a> <a class="code hl_variable" href="skeleton_8h.html#aae4eef9a8a40d8f00d79ac9dfd143c49">mod_skeleton_config</a>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">/* ============================================================================</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * HASH TABLE DECLARATIONS</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * ============================================================================</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * Define any hash tables your module uses for fast lookups.</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">extern</span> <a class="code hl_struct" href="structhashtable.html">HASHTAB</a> <a class="code hl_variable" href="skeleton_8h.html#ab3fca4618a027fc1d6f7ab42d1c75d74">mod_skeleton_data_htab</a>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment">/* ============================================================================</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * MODULE METADATA</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> * ============================================================================</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keyword">extern</span> <a class="code hl_struct" href="structmodule__version__info.html">MODVER</a> <a class="code hl_variable" href="skeleton_8h.html#a88878085a9a994458aeacf8f8e3c5636">mod_skeleton_version</a>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">/* ============================================================================</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment"> * FUNCTION PROTOTYPES</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment"> * ============================================================================</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment"> * Declare all module functions here. Remember to use mod_skeleton_ prefix.</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#a0cc28d02ce83a0fe6bb273b2d90e6282">mod_skeleton_init</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#a9147d4aa44f95b9ec96c752ce1704fea">mod_skeleton_cleanup</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ab2d01b2087bc02c2d01eeda7f5c4b666">mod_do_skeleton_command</a>(dbref, dbref, <span class="keywordtype">int</span>, <span class="keywordtype">char</span> *);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ae6610220a814f4f42e6ff49fe224c1b1">mod_do_skeleton_function</a>(<span class="keywordtype">char</span> *, <span class="keywordtype">char</span> **, dbref, dbref, dbref, <span class="keywordtype">char</span> *[], <span class="keywordtype">int</span>, <span class="keywordtype">char</span> *[], <span class="keywordtype">int</span> ncargs);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keywordtype">int</span> *<a class="code hl_function" href="skeleton_8h.html#abbdd8700709e00d968d1a319fba05b07">mod_skeleton_get_data</a>(<span class="keywordtype">char</span> *);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><a class="code hl_typedef" href="typedefs_8h.html#a55bab78d6ae3203b26f98c4b5c3e2d45">CF_Result</a> <a class="code hl_function" href="skeleton_8h.html#abdcf85d2721aeebb2a23dd4f020e76c3">mod_skeleton_set_data</a>(<span class="keywordtype">char</span> *, <span class="keywordtype">int</span> *);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">bool</span> <a class="code hl_function" href="skeleton_8h.html#a8fe59c86a418927149d22b5d02c896e1">mod_skeleton_delete_data</a>(<span class="keywordtype">char</span> *);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#ad9f4123c01c16163e2ef6f538786de9a">mod_skeleton_list_data</a>(dbref);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8h.html#aee64d5e16ddad7ed5a8cfa333da7b093">mod_skeleton_reset_defaults</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
 <div class="ttc" id="askeleton_8h_html_a0cc28d02ce83a0fe6bb273b2d90e6282"><div class="ttname"><a href="skeleton_8h.html#a0cc28d02ce83a0fe6bb273b2d90e6282">mod_skeleton_init</a></div><div class="ttdeci">void mod_skeleton_init(void)</div><div class="ttdef"><b>Definition</b> skeleton.c:204</div></div>
 <div class="ttc" id="askeleton_8h_html_a88878085a9a994458aeacf8f8e3c5636"><div class="ttname"><a href="skeleton_8h.html#a88878085a9a994458aeacf8f8e3c5636">mod_skeleton_version</a></div><div class="ttdeci">MODVER mod_skeleton_version</div><div class="ttdef"><b>Definition</b> skeleton.c:43</div></div>
 <div class="ttc" id="askeleton_8h_html_a8fe59c86a418927149d22b5d02c896e1"><div class="ttname"><a href="skeleton_8h.html#a8fe59c86a418927149d22b5d02c896e1">mod_skeleton_delete_data</a></div><div class="ttdeci">bool mod_skeleton_delete_data(char *)</div><div class="ttdef"><b>Definition</b> skeleton.c:253</div></div>
@@ -158,9 +156,9 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="askeleton_8h_html_ad9f4123c01c16163e2ef6f538786de9a"><div class="ttname"><a href="skeleton_8h.html#ad9f4123c01c16163e2ef6f538786de9a">mod_skeleton_list_data</a></div><div class="ttdeci">void mod_skeleton_list_data(dbref)</div><div class="ttdef"><b>Definition</b> skeleton.c:267</div></div>
 <div class="ttc" id="askeleton_8h_html_ae6610220a814f4f42e6ff49fe224c1b1"><div class="ttname"><a href="skeleton_8h.html#ae6610220a814f4f42e6ff49fe224c1b1">mod_do_skeleton_function</a></div><div class="ttdeci">void mod_do_skeleton_function(char *, char **, dbref, dbref, dbref, char *[], int, char *[], int ncargs)</div><div class="ttdef"><b>Definition</b> skeleton.c:156</div></div>
 <div class="ttc" id="askeleton_8h_html_aee64d5e16ddad7ed5a8cfa333da7b093"><div class="ttname"><a href="skeleton_8h.html#aee64d5e16ddad7ed5a8cfa333da7b093">mod_skeleton_reset_defaults</a></div><div class="ttdeci">void mod_skeleton_reset_defaults(void)</div><div class="ttdef"><b>Definition</b> skeleton.c:290</div></div>
-<div class="ttc" id="astructhashtable_html"><div class="ttname"><a href="structhashtable.html">hashtable</a></div><div class="ttdef"><b>Definition</b> typedefs.h:490</div></div>
-<div class="ttc" id="astructmod__skeleton__confstorage_html"><div class="ttname"><a href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a></div><div class="ttdef"><b>Definition</b> skeleton.h:18</div></div>
-<div class="ttc" id="astructmodule__version__info_html"><div class="ttname"><a href="structmodule__version__info.html">module_version_info</a></div><div class="ttdoc">MUSH Configuration related typedefs.</div><div class="ttdef"><b>Definition</b> typedefs.h:723</div></div>
+<div class="ttc" id="astructhashtable_html"><div class="ttname"><a href="structhashtable.html">hashtable</a></div><div class="ttdef"><b>Definition</b> typedefs.h:489</div></div>
+<div class="ttc" id="astructmod__skeleton__confstorage_html"><div class="ttname"><a href="structmod__skeleton__confstorage.html">mod_skeleton_confstorage</a></div><div class="ttdef"><b>Definition</b> skeleton.h:17</div></div>
+<div class="ttc" id="astructmodule__version__info_html"><div class="ttname"><a href="structmodule__version__info.html">module_version_info</a></div><div class="ttdoc">MUSH Configuration related typedefs.</div><div class="ttdef"><b>Definition</b> typedefs.h:722</div></div>
 <div class="ttc" id="atypedefs_8h_html_a55bab78d6ae3203b26f98c4b5c3e2d45"><div class="ttname"><a href="typedefs_8h.html#a55bab78d6ae3203b26f98c4b5c3e2d45">CF_Result</a></div><div class="ttdeci">enum CF_RESULT CF_Result</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
