@@ -952,6 +952,7 @@ typedef struct confdata
     int safe_unowned;          /*!< Are objects not owned by you safe? */
     int trace_limit;           /*!< Max lines of trace output if top-down */
     int wiz_obey_linklock;     /*!< Do wizards obey linklocks? */
+    int wiz_obey_openlock;     /*!< Do wizards obey openlocks? */
     int local_masters;         /*!< Do we check Zone rooms as local masters? */
     int match_zone_parents;    /*!< Objects in local master rooms inherit commands from their parents, just like normal? */
     int req_cmds_flag;         /*!< COMMANDS flag required to check $-cmds? */

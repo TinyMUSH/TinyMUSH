@@ -2613,6 +2613,8 @@ Type 'help @lock locks' for a list of the different types of locks.
                                    location is LINK_OK (for linking exits or
                                    setting drop-tos) or ABODE (for setting
                                    homes).
+     OpenLock:     All but Exits:  controls who may open exits in the location
+                                   if the location is OPEN_OK.
      MovedLock:    All:            controls who notices a PRESENCE object's
                                    movement.
      MovesLock:    All:            controls what motion a PRESENCE object sees.
@@ -4581,6 +4583,14 @@ Example: @sex me = female
  
   See @link.
 
+& OPEN_OK
+  Flag: OPEN_OK (%)
+
+  If a room is OPEN_OK, anyone who passes its OpenLock can open exits
+  from it (but still not to it).
+
+  See @open.
+
 & UNFINDABLE
   Flag: UNFINDABLE (U)
  
@@ -5691,9 +5701,9 @@ made to and from players and objects. The location that you are traveling
 from is the exit's source; the location that you travel to (where the
 exit is "linked to") is the exit's destination.
  
-You can pick up an exit that you control, or which is in a location
-that you control. You can drop an exit anywhere that you control;
-if you have the Open_Anywhere power, you can drop an exit anywhere.
+You can pick up an exit that you control, or which is in a location that you
+control. You can drop an exit anywhere that you control or that has the flag
+OPEN_OK set; if you have the Open_Anywhere power, you can drop an exit anywhere.
 The source of an exit can also be changed via the @teleport command.
  
 If an exit is set DARK it will not show up in the list of obvious exits in

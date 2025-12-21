@@ -226,7 +226,7 @@
 #define A_TOFAIL 141      /*!< Teleport (from) fail message */
 #define A_OTOFAIL 142     /*!< Others teleport (from) fail message */
 #define A_ATOFAIL 143     /*!< Teleport (from) fail action */
-#define A_FREE144 144     /*!< Unused */
+#define A_LOPEN 144       /*!< Who may open from here */
 #define A_FREE145 145     /*!< Unused */
 #define A_FREE146 146     /*!< Unused */
 #define A_FREE147 147     /*!< Unused */
@@ -967,7 +967,7 @@
 #define HAS_PROPDIR 0X00000100   /*!< Internal: has Propdir attr */
 #define COLOR256 0x00000200      /*!< Player support XTERM 256 colors */
 #define COLOR24BIT 0x00000400    /*!< Player support XTERM 24 bit colors */
-#define FLAG_RES03 0x00000800
+#define OPEN_OK 0x00000800       /*!< anybody can open exits in this room */
 #define FLAG_RES04 0x00001000
 #define FLAG_RES05 0x00002000
 #define FLAG_RES06 0x00004000

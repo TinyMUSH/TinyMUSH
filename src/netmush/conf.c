@@ -188,6 +188,7 @@ void cf_init(void)
     mushconf.trace_limit = 200;
     mushconf.safe_unowned = 0;
     mushconf.wiz_obey_linklock = 0;
+    mushconf.wiz_obey_openlock = 0;
     mushconf.local_masters = 1;
     mushconf.match_zone_parents = 1;
     mushconf.req_cmds_flag = 1;

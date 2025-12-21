@@ -170,7 +170,7 @@ void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 
 	if (isExit(victim))
 	{
-		if (!Has_exits(destination) || (!Controls(player, destination) && !Open_Anywhere(player)))
+		if (!Has_exits(destination) || (!Controls(player, destination) && !Open_Anywhere(player) && !Open_ok(destination)))
 		{
 			notify_quiet(player, NOPERM_MESSAGE);
 			return;

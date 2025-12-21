@@ -89,7 +89,14 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
         notify_quiet(player, "Open where?");
         return;
     }
-    else if (!(controls(player, loc) || (Open_Anywhere(player) && !God(loc))))
+    /**
+     * Make sure we can open here: - We must control the destination or it must
+     * be OPEN_OK or we must have Open_Anywhere and the location's not God. - We
+     * must be able to pass the openlock, or we must be able to Open_Anywhere
+     * (power, or be a wizard) and be config'd so wizards ignore openlocks
+     *
+     */
+    else if (!(Openable(player, loc) && Passes_Openlock(player, loc)))
     {
         notify_quiet(player, NOPERM_MESSAGE);
         return;
