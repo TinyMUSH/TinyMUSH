@@ -447,21 +447,8 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 						
 						if (has_fg)
 						{
-							uint8_t f;
-							
-							// If it's already a standard ANSI color, use it directly
-							if (attr.foreground.type == ANSICOLORTYPE_STANDARD)
-							{
-								// Extract standard color index from RGB representation
-								f = attr.foreground.rgb.r;  // Standard colors encoded in r component
-								f += (f < 8) ? 30 : 82;
-							}
-							else
-							{
-								// Convert from RGB to nearest ANSI color
-								f = RGB2Ansi(attr.foreground.rgb);
-								f += (f < 8) ? 30 : 82;
-							}
+							uint8_t f = RGB2Ansi(attr.foreground.rgb);
+							f += (f < 8) ? 30 : 82;
 							
 							SAFE_LTOS(buf, &p, f, LBUF_SIZE);
 							
@@ -471,21 +458,8 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 						
 						if (has_bg)
 						{
-							uint8_t b;
-							
-							// If it's already a standard ANSI color, use it directly
-							if (attr.background.type == ANSICOLORTYPE_STANDARD)
-							{
-								// Extract standard color index from RGB representation
-								b = attr.background.rgb.r;  // Standard colors encoded in r component
-								b += (b < 8) ? 40 : 92;
-							}
-							else
-							{
-								// Convert from RGB to nearest ANSI color
-								b = RGB2Ansi(attr.background.rgb);
-								b += (b < 8) ? 40 : 92;
-							}
+							uint8_t b = RGB2Ansi(attr.background.rgb);
+							b += (b < 8) ? 40 : 92;
 							
 							SAFE_LTOS(buf, &p, b, LBUF_SIZE);
 							
