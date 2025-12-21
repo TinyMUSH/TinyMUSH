@@ -276,7 +276,7 @@ char *TrueColor2VT100(rgbColor rgb, bool background)
 {
     char *vt = NULL;
 
-    XASPRINTF(vt, "\e[%d;2;%d;%d;%dm", background ? 48 : 38, rgb.r, rgb.g, rgb.b);
+    XASPRINTF(vt, "\033[%d;2;%d;%d;%dm", background ? 48 : 38, rgb.r, rgb.g, rgb.b);
 
     return (vt);
 }
@@ -292,7 +292,7 @@ char *X112VT100(uint8_t color, bool background)
 {
     char *vt = NULL;
 
-    XASPRINTF(vt, "\e[%d;5;%dm", background ? 48 : 38, color);
+    XASPRINTF(vt, "\033[%d;5;%dm", background ? 48 : 38, color);
 
     return (vt);
 }
@@ -308,7 +308,7 @@ char *Ansi2VT100(uint8_t color, bool background)
 {
     char *vt = NULL;
 
-    XASPRINTF(vt, "\e[%dm", (background ? 40 : 30) + (color & 7) + (color > 7 ? 60 : 0));
+    XASPRINTF(vt, "\033[%dm", (background ? 40 : 30) + (color & 7) + (color > 7 ? 60 : 0));
 
     return (vt);
 }
@@ -478,7 +478,7 @@ VT100ATTR decodeVT100(const char **ansi)
     bool has_m = false;
     VT100ATTR attr = {{ANSICOLORTYPE_NONE, {0, 0, 0}}, {ANSICOLORTYPE_NONE, {0, 0, 0}}, false};
 
-    if (ansi == NULL || *ansi == NULL || **ansi != '\e')
+    if (ansi == NULL || *ansi == NULL || **ansi != ESC_CHAR)
     {
         return attr;
     }
