@@ -1073,6 +1073,7 @@ int process_input(DESC *d)
 		int i, j = 0;
 		unsigned char ch;
 		unsigned char response[3];
+		ssize_t write_result;
 		
 		for (i = 0; i < got; i++)
 		{
@@ -1101,7 +1102,8 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFC;  /* WONT */
 						response[2] = option;
-						(void)write(d->descriptor, response, 3);
+						write_result = write(d->descriptor, response, 3);
+						(void)write_result;  /* Telnet negotiation failure is not critical */
 					}
 					else if (cmd == 0xFB)  /* WILL - client will enable option */
 					{
@@ -1109,7 +1111,8 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFE;  /* DONT */
 						response[2] = option;
-						(void)write(d->descriptor, response, 3);
+						write_result = write(d->descriptor, response, 3);
+						(void)write_result;  /* Telnet negotiation failure is not critical */
 					}
 					/* DONT and WONT don't need responses */
 					
