@@ -1243,9 +1243,7 @@ extern void whisper_pose(dbref player, dbref target, char *message);
 extern void do_pemit_list(dbref player, char *list, const char *message, int do_contents);
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
-/* string_util.c */
-extern const char *safe_strerror(int errnum);
-extern int safe_gettimeofday(struct timeval *tv, void *tz);
+/* string_ansi.c */
 extern const char *ansiChar(int ch);
 extern const int ansiNum(int ch);
 extern const char ansiLetter(int num);
@@ -1262,6 +1260,14 @@ extern char *ansi_transition_esccode(int ansi_before, int ansi_after);
 extern char *ansi_transition_mushcode(int ansi_before, int ansi_after);
 extern char *ansi_transition_letters(int ansi_before, int ansi_after);
 extern int ansi_map_states(const char *s, int **m, char **p);
+extern void skip_esccode(char **s);
+extern void copy_esccode(char **s, char **t);
+extern void safe_copy_esccode(char **s, char *buff, char **bufc);
+extern void track_ansi_letters(char *t, int *ansi_state);
+
+/* string_util.c */
+extern const char *safe_strerror(int errnum);
+extern int safe_gettimeofday(struct timeval *tv, void *tz);
 extern char *remap_colors(const char *s, int *cmap);
 extern char *translate_string(char *str, int type);
 extern int rgb2xterm(long rgb);
@@ -1279,10 +1285,6 @@ extern int minmatch(char *str, char *target, int min);
 extern int matches_exit_from_list(char *exit_list, char *pattern);
 extern char *ltos(long num);
 extern char *repeatchar(int count, char ch);
-extern void skip_esccode(char **s);
-extern void copy_esccode(char **s, char **t);
-extern void safe_copy_esccode(char **s, char *buff, char **bufc);
-extern void track_ansi_letters(char *t, int *ansi_state);
 
 /* timer.c */
 extern void check_cron(void);
