@@ -64,14 +64,14 @@ if pgrep -x "netmush" > /dev/null; then
     exit 1
 fi
 
-# Lancer le serveur en arrière-plan
+# Lancer le serveur (fork automatique libère le terminal)
 if [ -f "netmush" ]; then
-    ./netmush 2>&1 &
-    PARENT_PID=$!
+    echo -e "${YELLOW}Démarrage du serveur...${NC}"
+    ./netmush 2>&1
     
     # Le serveur fork et le parent quitte. Attendre que le fichier PID soit créé
     # par le processus enfant qui devient le vrai serveur
-    echo -e "${YELLOW}Attente du démarrage du serveur...${NC}"
+    echo -e "${YELLOW}Vérification du démarrage...${NC}"
     PID_FILE="netmush.pid"
     
     for i in {1..10}; do
@@ -89,7 +89,6 @@ if [ -f "netmush" ]; then
     fi
     
     # Vérifier que le serveur est bien en cours d'exécution
-    sleep 2
     if kill -0 $SERVER_PID 2>/dev/null; then
         echo -e "${GREEN}=== Upgrade complété avec succès ===${NC}"
     else
