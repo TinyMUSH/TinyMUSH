@@ -62,7 +62,7 @@ int safe_gettimeofday(struct timeval *tv, void *tz __attribute__((unused)))
  * @param ch Character to convert
  * @return char* Ansi sequence
  */
-char *ansiChar(int ch)
+const char *ansiChar(int ch)
 {
 	static const char *ansi_table[256] = {
 		['B'] = ANSI_BBLUE,
@@ -99,7 +99,7 @@ char *ansiChar(int ch)
  * @param ch ANSI character
  * @return int ANSI numeric values
  */
-int ansiNum(int ch)
+const int ansiNum(int ch)
 {
 	static const int ansi_num_table[256] = {
 		['B'] = I_ANSI_BBLUE,
@@ -131,55 +131,23 @@ int ansiNum(int ch)
 
 /**
  * @brief Convert ansi numeric values to character code (%x?).
+ * Lookup table for fast O(1) numeric to character conversion.
  *
  * @param num ANSI number
  * @return char ANSI character
  */
 char ansiLetter(int num)
 {
-	switch (num)
-	{
-	case 1:
-		return 'h';
-	case 4:
-		return 'u';
-	case 5:
-		return 'f';
-	case 7:
-		return 'i';
-	case 30:
-		return 'x';
-	case 31:
-		return 'r';
-	case 32:
-		return 'g';
-	case 33:
-		return 'y';
-	case 34:
-		return 'b';
-	case 35:
-		return 'm';
-	case 36:
-		return 'c';
-	case 37:
-		return 'w';
-	case 40:
-		return 'X';
-	case 41:
-		return 'R';
-	case 42:
-		return 'G';
-	case 43:
-		return 'Y';
-	case 44:
-		return 'B';
-	case 45:
-		return 'M';
-	case 46:
-		return 'C';
-	case 47:
-		return 'W';
-	}
+	static const char ansi_letter_table[48] = {
+		[1] = 'h',   [4] = 'u',   [5] = 'f',   [7] = 'i',
+		[30] = 'x',  [31] = 'r',  [32] = 'g',  [33] = 'y',
+		[34] = 'b',  [35] = 'm',  [36] = 'c',  [37] = 'w',
+		[40] = 'X',  [41] = 'R',  [42] = 'G',  [43] = 'Y',
+		[44] = 'B',  [45] = 'M',  [46] = 'C',  [47] = 'W',
+	};
+	
+	if (num >= 0 && num < 48)
+		return ansi_letter_table[num];
 	return 0;
 }
 
