@@ -1064,13 +1064,76 @@ int process_input(DESC *d)
 	}
 
 	/**
-	 * Filter out problematic control characters at the network level,
-	 * including CTRL+C (0x03). Previous approach of closing connection
-	 * on CTRL+C caused telnet client to hang because some implementations
-	 * expect proper protocol negotiation before disconnection. Instead,
-	 * CTRL+C is now treated like other invalid control characters and
-	 * silently filtered. This is more compatible with standard telnet.
+	 * Handle telnet protocol sequences (IAC commands).
+	 * When CTRL+C is pressed in a telnet client, it sends IAC IP (0xFF 0xF4)
+	 * not the raw 0x03 byte. We need to strip these protocol sequences and
+	 * respond to telnet negotiations to prevent the client from hanging.
 	 */
+	{
+		int i, j = 0;
+		unsigned char ch;
+		unsigned char response[3];
+		
+		for (i = 0; i < got; i++)
+		{
+			ch = (unsigned char)buf[i];
+			
+			if (ch == 0xFF && i + 1 < got)  /* IAC (Interpret As Command) */
+			{
+				unsigned char cmd = (unsigned char)buf[i + 1];
+				
+				/* Handle two-byte IAC commands */
+				if (cmd >= 0xF0 && cmd <= 0xF9)
+				{
+					/* Commands like IP (0xF4), AO, AYT, etc. */
+					if (cmd == 0xF4)  /* IP - Interrupt Process */
+					{
+						log_write(LOG_PROBLEMS, "NET", "TELNET", "IAC IP (CTRL+C) received from descriptor %d, ignoring", d->descriptor);
+					}
+					i++;  /* Skip both IAC and command byte */
+					continue;
+				}
+				/* Handle three-byte IAC commands (DO, DONT, WILL, WONT) */
+				else if ((cmd >= 0xFB && cmd <= 0xFE) && i + 2 < got)
+				{
+					unsigned char option = (unsigned char)buf[i + 2];
+					
+					/* Respond to negotiations to prevent client hang */
+					if (cmd == 0xFD)  /* DO - client wants us to enable option */
+					{
+						/* Respond with WONT - we don't support this option */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFC;  /* WONT */
+						response[2] = option;
+						write(d->descriptor, response, 3);
+					}
+					else if (cmd == 0xFB)  /* WILL - client will enable option */
+					{
+						/* Respond with DONT - we don't want this option */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFE;  /* DONT */
+						response[2] = option;
+						write(d->descriptor, response, 3);
+					}
+					/* DONT and WONT don't need responses */
+					
+					i += 2;  /* Skip IAC, command, and option byte */
+					continue;
+				}
+				/* Handle IAC IAC (escaped 0xFF literal) */
+				else if (cmd == 0xFF)
+				{
+					buf[j++] = 0xFF;  /* Keep one 0xFF */
+					i++;  /* Skip second 0xFF */
+					continue;
+				}
+			}
+			
+			/* Keep non-IAC bytes */
+			buf[j++] = buf[i];
+		}
+		got = in = j;
+	}
 
 	/**
 	 * Filter out other dangerous control characters
