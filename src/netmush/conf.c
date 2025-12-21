@@ -319,6 +319,7 @@ void cf_init(void)
     mushstate.curr_cmd = (char *)"< none >";
     mushstate.shutdown_flag = 0;
     mushstate.flatfile_flag = 0;
+    mushstate.backup_flag = 0;
     mushstate.attr_next = A_USER_START;
     mushstate.debug_cmd = (char *)"< init >";
     mushstate.doing_hdr = XSTRDUP("Doing", "mushstate.doing_hdr");

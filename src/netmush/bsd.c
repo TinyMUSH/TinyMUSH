@@ -319,6 +319,15 @@ void shovechars(int port)
 			mushstate.flatfile_flag = 0;
 		}
 		/**
+		 * We've gotten a signal to backup
+		 *
+		 */
+		if (mushstate.backup_flag && !mushstate.dumping)
+		{
+			mushstate.backup_flag = 0;
+			backup_mush(NOTHING, NOTHING, 0);
+		}
+		/**
 		 * test for events
 		 *
 		 */
@@ -1273,8 +1282,7 @@ void sighandler(int sig)
 		break;
 
 	case SIGINT: /*!< Force a live backup */
-		log_signal(signames[sig]);
-		do_backup_mush(GOD, GOD, 0);
+		mushstate.backup_flag = 1;
 		break;
 
 	case SIGQUIT: /*!< Normal shutdown soon */
