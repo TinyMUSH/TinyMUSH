@@ -473,8 +473,8 @@ uint8_t RGB2Ansi(rgbColor rgb)
     uint8_t dark_base = x11_color & 0xF;
     
     /* If the color is bright (high luminance), use bright variant */
-    uint8_t brightness = cm.color.rgb.r + cm.color.rgb.g + cm.color.rgb.b;
-    if (brightness > 384)  /* >1.5 * 256 average */
+    uint16_t brightness = (uint16_t)cm.color.rgb.r + (uint16_t)cm.color.rgb.g + (uint16_t)cm.color.rgb.b;
+    if (brightness > 384)  /* Sum > 3 * 128 midpoint */
     {
         return dark_base == 0 ? 8 : dark_base + 8;
     }
