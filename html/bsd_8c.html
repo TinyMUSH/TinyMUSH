@@ -622,13 +622,16 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
-<p>Filter out CTRL+C (0x03) and other problematic control characters at the network level before any processing</p>
-<p>Allow only safe characters:</p><ul>
+<p>Filter out problematic control characters at the network level. If we receive CTRL+C (0x03), close the connection gracefully.</p>
+<p>If CTRL+C detected, close connection gracefully. Some telnet clients send CTRL+C which can cause desynchronization.</p>
+<p>Filter out other dangerous control characters</p>
+<p>Allow safe characters:</p><ul>
 <li>Printable ASCII (0x20-0x7E)</li>
 <li>Essential whitespace: <br  />
- (0x0A), \r (0x0D), \t (0x09)</li>
-<li>ANSI ESC (0x1B) for color codes</li>
-<li>DEL (0x7F) for backspace Reject: CTRL+C (0x03), CTRL+D, CTRL+Z, and all other control chars</li>
+, \r, \t</li>
+<li>ANSI ESC (0x1B)</li>
+<li>DEL (0x7F) for backspace</li>
+<li>BEEP (0x07) Reject all other control characters</li>
 </ul>
 
 </div>
