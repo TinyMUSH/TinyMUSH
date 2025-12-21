@@ -60,7 +60,6 @@ int safe_gettimeofday(struct timeval *tv)
  * @param s The string to capitalize
  * @return char* The capitalized string (same pointer as input)
  */
-
 char *upcasestr(char *s)
 {
 	char *p;
@@ -81,7 +80,6 @@ char *upcasestr(char *s)
  * @param string The string to munge
  * @return char* The munged string (newly allocated)
  */
-
 char *munge_space(char *string)
 {
 	char *buffer, *p, *q;
@@ -126,7 +124,6 @@ char *munge_space(char *string)
  * @param string The string to trim
  * @return char* The trimmed string (newly allocated)
  */
-
 char *trim_spaces(char *string)
 {
 	char *buffer, *p, *q;
@@ -173,7 +170,6 @@ char *trim_spaces(char *string)
  * @param targ The character to search for
  * @return char* The string up to the character, or NULL if str is invalid
  */
-
 char *grabto(char **str, char targ)
 {
 	char *savec, *cp;
@@ -206,7 +202,6 @@ char *grabto(char **str, char targ)
  * @param s2 The second string to compare
  * @return int 0 if strings match, non-zero otherwise
  */
-
 int string_compare(const char *s1, const char *s2)
 {
 	if (mushstate.standalone || mushconf.space_compress)
@@ -293,7 +288,6 @@ int string_compare(const char *s1, const char *s2)
  * @param prefix The prefix to search for
  * @return int Number of matching characters if prefix found, 0 otherwise
  */
-
 int string_prefix(const char *string, const char *prefix)
 {
 	int count = 0;
@@ -322,7 +316,6 @@ int string_prefix(const char *string, const char *prefix)
  * @param sub The substring to find
  * @return const char* Pointer to the match position, or NULL if not found
  */
-
 const char *string_match(const char *src, const char *sub)
 {
 	if ((*sub != '\0') && (src))
@@ -361,7 +354,6 @@ const char *string_match(const char *src, const char *sub)
  * @param string The string to modify
  * @return char* The modified string (newly allocated)
  */
-
 char *replace_string(const char *old, const char *new, const char *string)
 {
 	char *result, *r, *s;
@@ -423,7 +415,6 @@ char *replace_string(const char *old, const char *new, const char *string)
  * @param from The substring to replace
  * @param to The replacement substring
  */
-
 void edit_string(char *src, char **dst, char *from, char *to)
 {
 	char *cp, *p;
@@ -839,7 +830,6 @@ void edit_string(char *src, char **dst, char *from, char *to)
  * @param min Minimum number of characters that must match
  * @return int 1 if found, 0 if not
  */
-
 int minmatch(char *str, char *target, int min)
 {
 	while (*str && *target && (tolower((unsigned char)*str) == tolower((unsigned char)*target)))
@@ -869,7 +859,6 @@ int minmatch(char *str, char *target, int min)
  * @param pattern The pattern to search for
  * @return int 1 if the pattern is found, 0 otherwise
  */
-
 int matches_exit_from_list(char *exit_list, char *pattern)
 {
 	char *s;
@@ -926,7 +915,6 @@ int matches_exit_from_list(char *exit_list, char *pattern)
  * @param num Number to convert
  * @return char* String representation of the number (newly allocated)
  */
-
 char *ltos(long num)
 {
 	/* Mark Vasoll's long int to string converter. */
@@ -981,7 +969,6 @@ char *ltos(long num)
  * @param ch Character to repeat
  * @return char* String of repeated characters (newly allocated)
  */
-
 char *repeatchar(int count, char ch)
 {
 	char *str, *ptr;
@@ -1007,11 +994,3 @@ char *repeatchar(int count, char ch)
 	*str = '\0';
 	return ptr;
 }
-
-/**
- * \fn void skip_esccode ( char **s )
- * \brief Move the pointer after an ansi escape sequence.
- *
- * \param s Pointer that need to be modified.
- */
-
