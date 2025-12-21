@@ -85,7 +85,7 @@ var searchData=
   ['review_20process_82',['Review Process',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
   ['rgb2ansi_83',['RGB2Ansi',['../vt100_8c.html#ab5b66558b0011c1eb8bdc69b074d7b6a',1,'vt100.c']]],
   ['rgb2x11_84',['RGB2X11',['../vt100_8c.html#adc0cc7d529c4976827724ff5cce644e1',1,'vt100.c']]],
-  ['rgb2xterm_85',['rgb2xterm',['../string__util_8c.html#abb89350fd91a53ef5350e7bee1945a3d',1,'string_util.c']]],
+  ['rgb2xterm_85',['rgb2xterm',['../string__ansi_8c.html#abb89350fd91a53ef5350e7bee1945a3d',1,'string_ansi.c']]],
   ['rgb_5fto_5fcielab_86',['rgb_to_cielab',['../namespacecompute__lab.html#acfad060f08f5d3ed7cc397579a9742ed',1,'compute_lab.rgb_to_cielab()'],['../namespaceregenerate__palettes.html#addbb610a1dfa09a2b70a202d59797ff1',1,'regenerate_palettes.rgb_to_cielab()']]],
   ['rgb_5fto_5fxyz_87',['rgb_to_xyz',['../namespacecompute__lab.html#afb15f722f283b80705227047c3d260e2',1,'compute_lab']]],
   ['rgbcolor_88',['rgbColor',['../structrgbColor.html',1,'']]],

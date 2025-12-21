@@ -222,6 +222,9 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>strip_24bit</b> (ch
 <tr class="memitem:a7c959da9b63ab40192131e651ace565b" id="r_a7c959da9b63ab40192131e651ace565b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c959da9b63ab40192131e651ace565b">translate_string</a> (char *str, int type)</td></tr>
 <tr class="memdesc:a7c959da9b63ab40192131e651ace565b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert raw ansi to mushcode or strip it.  <br /></td></tr>
 <tr class="separator:a7c959da9b63ab40192131e651ace565b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb89350fd91a53ef5350e7bee1945a3d" id="r_abb89350fd91a53ef5350e7bee1945a3d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb89350fd91a53ef5350e7bee1945a3d">rgb2xterm</a> (long rgb)</td></tr>
+<tr class="memdesc:abb89350fd91a53ef5350e7bee1945a3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an RGB value to xterm value.  <br /></td></tr>
+<tr class="separator:abb89350fd91a53ef5350e7bee1945a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ANSI color and escape sequence handling utilities. </p>
@@ -656,6 +659,32 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>strip_24bit</b> (ch
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the remapped string. </dd></dl>
+
+</div>
+</div>
+<a id="abb89350fd91a53ef5350e7bee1945a3d" name="abb89350fd91a53ef5350e7bee1945a3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb89350fd91a53ef5350e7bee1945a3d">&#9670;&#160;</a></span>rgb2xterm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int rgb2xterm </td>
+          <td>(</td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>rgb</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert an RGB value to xterm value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rgb</td><td>Color to convert to xterm value</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The xterm value of the color. </dd></dl>
 
 </div>
 </div>
