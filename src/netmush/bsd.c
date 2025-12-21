@@ -263,7 +263,8 @@ void shovechars(int port)
 	 *
 	 */
 
-	msgq_Path = mkdtemp(XASPRINTF("s", "%s/%sXXXXXX", mushconf.pid_home, mushconf.mush_shortname));
+	msgq_Path = XASPRINTF("s", "/tmp/%sXXXXXX", mushconf.mush_shortname);
+	msgq_Path = mkdtemp(msgq_Path);
 	msgq_Key = ftok(msgq_Path, 0x32);
 	msgq_Id = msgget(msgq_Key, 0666 | IPC_CREAT);
 	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
