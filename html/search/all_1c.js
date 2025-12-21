@@ -55,7 +55,7 @@ var searchData=
   ['related_20source_20pointers_52',['Related Source Pointers',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md181',1,'']]],
   ['release_204_201_2095_53',['TinyMUSH 2.2 Initial Public Release (4/1/95)',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md299',1,'']]],
   ['reload_54',['Module Reload',['../md_docs_2Code_2MODULES__DEVELOPMENT.html#autotoc_md216',1,'']]],
-  ['remap_5fcolors_55',['remap_colors',['../string__util_8c.html#a860915ab1e4fa7b3525b4ef1e18dd4ea',1,'string_util.c']]],
+  ['remap_5fcolors_55',['remap_colors',['../string__ansi_8c.html#a860915ab1e4fa7b3525b4ef1e18dd4ea',1,'string_ansi.c']]],
   ['remove_5fwaitq_56',['remove_waitq',['../cque_8c.html#ac9c417fbe72f221f0d5273cf5c4cdabd',1,'cque.c']]],
   ['repeatchar_57',['repeatchar',['../string__util_8c.html#a8cb207aba5b27261862d0bccc3225bff',1,'string_util.c']]],
   ['replace_5fstring_58',['replace_string',['../string__util_8c.html#a70c4fc8bc55fd0849a4ae9d573a000e3',1,'string_util.c']]],

@@ -8,7 +8,7 @@ var searchData=
   ['register_5ffunctions_5',['register_functions',['../api_8c.html#a3e28939ab772d85f2ce15d7499908871',1,'api.c']]],
   ['register_5fhashtables_6',['register_hashtables',['../api_8c.html#a34beca859d15650522ebe3a800b2e702',1,'api.c']]],
   ['register_5fprefix_5fcmds_7',['register_prefix_cmds',['../api_8c.html#a0f1ec855f01525a7c9f05ca64d2cbcdf',1,'api.c']]],
-  ['remap_5fcolors_8',['remap_colors',['../string__util_8c.html#a860915ab1e4fa7b3525b4ef1e18dd4ea',1,'string_util.c']]],
+  ['remap_5fcolors_8',['remap_colors',['../string__ansi_8c.html#a860915ab1e4fa7b3525b4ef1e18dd4ea',1,'string_ansi.c']]],
   ['remove_5fwaitq_9',['remove_waitq',['../cque_8c.html#ac9c417fbe72f221f0d5273cf5c4cdabd',1,'cque.c']]],
   ['repeatchar_10',['repeatchar',['../string__util_8c.html#a8cb207aba5b27261862d0bccc3225bff',1,'string_util.c']]],
   ['replace_5fstring_11',['replace_string',['../string__util_8c.html#a70c4fc8bc55fd0849a4ae9d573a000e3',1,'string_util.c']]],

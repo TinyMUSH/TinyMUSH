@@ -216,6 +216,9 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>strip_24bit</b> (ch
 <tr class="memitem:a291922bbc383badf03b65e647c407215" id="r_a291922bbc383badf03b65e647c407215"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a291922bbc383badf03b65e647c407215">track_ansi_letters</a> (char *t, int *ansi_state)</td></tr>
 <tr class="memdesc:a291922bbc383badf03b65e647c407215"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert mushcode to ansi state.  <br /></td></tr>
 <tr class="separator:a291922bbc383badf03b65e647c407215"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a860915ab1e4fa7b3525b4ef1e18dd4ea" id="r_a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a860915ab1e4fa7b3525b4ef1e18dd4ea">remap_colors</a> (const char *s, int *cmap)</td></tr>
+<tr class="memdesc:a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allow a change of the color sequences.  <br /></td></tr>
+<tr class="separator:a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ANSI color and escape sequence handling utilities. </p>
@@ -618,6 +621,38 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>strip_24bit</b> (ch
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the string terminated. </dd></dl>
+
+</div>
+</div>
+<a id="a860915ab1e4fa7b3525b4ef1e18dd4ea" name="a860915ab1e4fa7b3525b4ef1e18dd4ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a860915ab1e4fa7b3525b4ef1e18dd4ea">&#9670;&#160;</a></span>remap_colors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * remap_colors </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>cmap</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allow a change of the color sequences. </p>
+<p>It is the responsibility of the caller to free the returned buffer with XFREE().</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to the string to be remap. </td></tr>
+    <tr><td class="paramname">m</td><td>Pointer to the ansi color map to use.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the remapped string. </dd></dl>
 
 </div>
 </div>
