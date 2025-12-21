@@ -1107,10 +1107,15 @@ int process_input(DESC *d)
 		}
 		else if (*q == ESC_CHAR && p < pend)
 		{
-			/* Allow ESC for ANSI sequences, but only if it's part of a valid sequence */
+			/* Allow ESC for ANSI sequences */
 			*p++ = *q;
 		}
-		else if (p < pend && isascii(*q) && isprint(*q) && !iscntrl(*q))
+		else if ((*q == '\t' || *q == '\r' || *q == BEEP_CHAR) && p < pend)
+		{
+			/* Allow TAB (%t), CR (%r), and BEEP (%b) for mushcode */
+			*p++ = *q;
+		}
+		else if (p < pend && isascii(*q) && isprint(*q))
 		{
 			*p++ = *q;
 		}
