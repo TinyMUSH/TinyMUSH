@@ -468,7 +468,18 @@ uint8_t RGB2Ansi(rgbColor rgb)
         return (cm.color.rgb.r & 1) + (cm.color.rgb.g & 2) + (cm.color.rgb.b & 4) + 8;
     }
 
-    return RGB2X11(cm.color.rgb) & 0xF;
+    /* For other bright colors, prefer bright variants (8-15) for better contrast on dark backgrounds */
+    uint8_t x11_color = RGB2X11(cm.color.rgb);
+    uint8_t dark_base = x11_color & 0xF;
+    
+    /* If the color is bright (high luminance), use bright variant */
+    uint8_t brightness = cm.color.rgb.r + cm.color.rgb.g + cm.color.rgb.b;
+    if (brightness > 384)  /* >1.5 * 256 average */
+    {
+        return dark_base == 0 ? 8 : dark_base + 8;
+    }
+    
+    return dark_base;
 }
 
 VT100ATTR decodeVT100(const char **ansi)
