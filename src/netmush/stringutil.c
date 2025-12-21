@@ -151,7 +151,7 @@ const char ansiLetter(int num)
 	return 0;
 }
 
-char ansiMushCode(int num, bool bg)
+const char ansiMushCode(int num, bool bg)
 {
 	static const char fg_table[8] = {'x', 'r', 'g', 'y', 'b', 'm', 'c', 'w'};
 	static const char bg_table[8] = {'X', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'};
@@ -210,43 +210,20 @@ int ansi_mask_bits[I_ANSI_LIM] = {
  */
 int ansiBitsMask(int num)
 {
-	switch (num)
-	{
-	case 0:
-		return 0x1fff;
-	case 1:
-	case 2:
-	case 21:
-	case 22:
-		return 0x1100;
-	case 4:
-	case 24:
-		return 0x1200;
-	case 5:
-	case 25:
-		return 0x1400;
-	case 7:
-	case 27:
-		return 0x1800;
-	case 30:
-	case 31:
-	case 32:
-	case 33:
-	case 34:
-	case 35:
-	case 36:
-	case 37:
-		return 0x100f;
-	case 40:
-	case 41:
-	case 42:
-	case 43:
-	case 44:
-	case 45:
-	case 46:
-	case 47:
-		return 0x10f0;
-	}
+	static const int mask_table[48] = {
+		[0] = 0x1fff,
+		[1] = 0x1100, [2] = 0x1100, [21] = 0x1100, [22] = 0x1100,
+		[4] = 0x1200, [24] = 0x1200,
+		[5] = 0x1400, [25] = 0x1400,
+		[7] = 0x1800, [27] = 0x1800,
+		[30] = 0x100f, [31] = 0x100f, [32] = 0x100f, [33] = 0x100f,
+		[34] = 0x100f, [35] = 0x100f, [36] = 0x100f, [37] = 0x100f,
+		[40] = 0x10f0, [41] = 0x10f0, [42] = 0x10f0, [43] = 0x10f0,
+		[44] = 0x10f0, [45] = 0x10f0, [46] = 0x10f0, [47] = 0x10f0,
+	};
+	
+	if (num >= 0 && num < 48)
+		return mask_table[num];
 	return 0;
 }
 
