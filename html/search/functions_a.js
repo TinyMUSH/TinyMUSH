@@ -5,10 +5,10 @@ var searchData=
   ['make_5fsocket_2',['make_socket',['../bsd_8c.html#afb2fcc762246422cc47ab8d2ff58bbaa',1,'bsd.c']]],
   ['makekey_3',['makekey',['../db_8c.html#a562f79870e745b7a8294ee02a616f99d',1,'db.c']]],
   ['match_5fthing_4',['match_thing',['../fnhelper_8c.html#a498059e29721bd8cfe4b61de540d8829',1,'fnhelper.c']]],
-  ['matches_5fexit_5ffrom_5flist_5',['matches_exit_from_list',['../stringutil_8c.html#a325056c0b50914cae7a5bfe2f32abb6d',1,'stringutil.c']]],
+  ['matches_5fexit_5ffrom_5flist_5',['matches_exit_from_list',['../string__util_8c.html#a325056c0b50914cae7a5bfe2f32abb6d',1,'string_util.c']]],
   ['mem_5fusage_6',['mem_usage',['../funobj_8c.html#a82297bd2992d1df4664b722b44bc41c3',1,'funobj.c']]],
   ['mem_5fusage_5fattr_7',['mem_usage_attr',['../funobj_8c.html#a0aff79d8e3b0eccd0d9e0f59ef5a0299',1,'funobj.c']]],
-  ['minmatch_8',['minmatch',['../stringutil_8c.html#aefdde0a45362b2f36a48636efd3c4c65',1,'stringutil.c']]],
+  ['minmatch_8',['minmatch',['../string__util_8c.html#aefdde0a45362b2f36a48636efd3c4c65',1,'string_util.c']]],
   ['mk_5fmsgq_5fdnsresolver_9',['mk_msgq_dnsresolver',['../bsd_8c.html#a7e4629dd734aa22da274769b902965fb',1,'bsd.c']]],
   ['mkattr_10',['mkattr',['../db_8c.html#a2203103a3d3f6ae5c4478fac9da606f2',1,'db.c']]],
   ['mod_5fdo_5fskeleton_5fcommand_11',['mod_do_skeleton_command',['../skeleton_8c.html#a43c9cb1608fda8b8f1181f6ff22502b6',1,'mod_do_skeleton_command(dbref player, dbref cause, int key, char *arg1):&#160;skeleton.c'],['../skeleton_8h.html#ab2d01b2087bc02c2d01eeda7f5c4b666',1,'mod_do_skeleton_command(dbref, dbref, int, char *):&#160;skeleton.c']]],
@@ -22,5 +22,5 @@ var searchData=
   ['mod_5fskeleton_5fset_5fdata_19',['mod_skeleton_set_data',['../skeleton_8c.html#abcacc6885c863fe01915f3ba1ad947e2',1,'mod_skeleton_set_data(char *key, int *data):&#160;skeleton.c'],['../skeleton_8h.html#abdcf85d2721aeebb2a23dd4f020e76c3',1,'mod_skeleton_set_data(char *, int *):&#160;skeleton.c']]],
   ['mode_5ftxt_20',['mode_txt',['../db_8c.html#a4615843657a00d7f02ec99c35e38d0a9',1,'db.c']]],
   ['modify_5fxfuncs_21',['modify_xfuncs',['../conf_8c.html#a200953a534900eeed30b799daead0e3c',1,'conf.c']]],
-  ['munge_5fspace_22',['munge_space',['../stringutil_8c.html#a17d9aec24a10b4e4273c92ac9eefd1b5',1,'stringutil.c']]]
+  ['munge_5fspace_22',['munge_space',['../string__util_8c.html#a17d9aec24a10b4e4273c92ac9eefd1b5',1,'string_util.c']]]
 ];

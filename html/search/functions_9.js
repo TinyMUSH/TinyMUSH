@@ -1,7 +1,7 @@
 var searchData=
 [
   ['letter_5fto_5fflag_0',['letter_to_flag',['../flags_8c.html#a21f89f3a36e485d217314e08e69343d2',1,'flags.c']]],
-  ['level_5fansi_1',['level_ansi',['../stringutil_8c.html#a717386e8da894eee3a7cd535b5926eb4',1,'stringutil.c']]],
+  ['level_5fansi_1',['level_ansi',['../string__util_8c.html#a717386e8da894eee3a7cd535b5926eb4',1,'string_util.c']]],
   ['link_5fexit_2',['link_exit',['../create_8c.html#a9a43561f130b458f5d02253b123c320a',1,'create.c']]],
   ['list2ansi_3',['list2ansi',['../fnhelper_8c.html#a274d6dfceb74b4c4763e967d2d11d60d',1,'fnhelper.c']]],
   ['list2arr_4',['list2arr',['../fnhelper_8c.html#a8462e33f6de2528ee7651433539de137',1,'fnhelper.c']]],

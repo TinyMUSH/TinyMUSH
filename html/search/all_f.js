@@ -1,7 +1,7 @@
 var searchData=
 [
   ['eat_5fspaces_0',['Eat_Spaces',['../macros_8h.html#a7a382e5f49a62abed735b8b1af320b5c',1,'macros.h']]],
-  ['edit_5fstring_1',['edit_string',['../stringutil_8c.html#a6c8d57248ab7b4a0dafc1f43a3a1ceb4',1,'stringutil.c']]],
+  ['edit_5fstring_1',['edit_string',['../string__util_8c.html#a6c8d57248ab7b4a0dafc1f43a3a1ceb4',1,'string_util.c']]],
   ['efo_5fconvert_2',['efo_convert',['../db__rw_8c.html#a0e9f096bb89fd27e023ec66aeefdfa6f',1,'db_rw.c']]],
   ['email_20us_20and_20let_20us_20know_3',['### If you have suggestions for more FAQs, please email us and let us know.',['../md_docs_2Historical_2FAQ.html#autotoc_md358',1,'']]],
   ['emergency_5fshutdown_4',['emergency_shutdown',['../bsd_8c.html#a1308957901686e523f7683a51ebca2e7',1,'bsd.c']]],

@@ -16,5 +16,5 @@ var searchData=
   ['getref_13',['getref',['../db_8c.html#a9c760b283de7813e710fcab3dc09a712',1,'db.c']]],
   ['getstring_14',['getstring',['../db_8c.html#a2a57a313ae2a3c58242512df045d33aa',1,'db.c']]],
   ['give_5fque_15',['give_que',['../cque_8c.html#ad42b5a68e8ff34ceedca52df77b818d5',1,'cque.c']]],
-  ['grabto_16',['grabto',['../stringutil_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'stringutil.c']]]
+  ['grabto_16',['grabto',['../string__util_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'string_util.c']]]
 ];

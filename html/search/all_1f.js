@@ -39,7 +39,7 @@ var searchData=
   ['unset_5fsignals_36',['unset_signals',['../bsd_8c.html#ac23ef3489c6682dfaf36314b457bd22e',1,'bsd.c']]],
   ['up_20a_20link_20to_20an_20external_20sql_20database_37',['How do I set up a link to an external SQL database?',['../md_docs_2Historical_2FAQ.html#autotoc_md356',1,'']]],
   ['up_20my_20database_38',['How do I back up my database?',['../md_docs_2Historical_2FAQ.html#autotoc_md345',1,'']]],
-  ['upcasestr_39',['upcasestr',['../stringutil_8c.html#af968a3f1c8e90d1b5d9f0fd6d6cb395a',1,'stringutil.c']]],
+  ['upcasestr_39',['upcasestr',['../string__util_8c.html#af968a3f1c8e90d1b5d9f0fd6d6cb395a',1,'string_util.c']]],
   ['updated_20in_20the_20future_20center_40',['UPDATED IN THE FUTURE center',['../md_docs_2Historical_2CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]],
   ['updates_41',['Server Security Updates',['../md_SECURITY.html#autotoc_md464',1,'']]],
   ['upgrade_20or_20bugfix_42',['How do I apply a patch upgrade or bugfix?',['../md_docs_2Historical_2FAQ.html#autotoc_md347',1,'']]],

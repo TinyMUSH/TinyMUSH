@@ -52,7 +52,7 @@ var searchData=
   ['god_201_49',['How do I recover a lost password for God (#1)?',['../md_docs_2Historical_2FAQ.html#autotoc_md348',1,'']]],
   ['going_50',['GOING',['../constants_8h.html#a6300abce54abf88160f8f1cc0887208f',1,'constants.h']]],
   ['goodtype_51',['GOODTYPE',['../constants_8h.html#adcaa79b843a9e2fafb90bfc972869176',1,'constants.h']]],
-  ['grabto_52',['grabto',['../stringutil_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'stringutil.c']]],
+  ['grabto_52',['grabto',['../string__util_8c.html#a9ae9f257089fccd6c0b93d2fe5eb1090',1,'string_util.c']]],
   ['guest_5fbasename_53',['guest_basename',['../structconfdata.html#a75529e9400f55fc5734c95ee9cf64856',1,'confdata']]],
   ['guest_5fchar_54',['guest_char',['../structconfdata.html#af70ba0c09f025f1f30e91c71201502c6',1,'confdata']]],
   ['guest_5ffile_55',['guest_file',['../structconfdata.html#a44de921b25fa0879750efefeb394fe10',1,'confdata']]],
