@@ -2561,7 +2561,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(((x) &gt;= 0) &amp;&amp; ((x) &lt; mushstate.<a class="code hl_variable" href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">db_top</a>))</div>
-<div class="ttc" id="astructstatedata_html_a526e854ef5cc45c28d3796e11bc4bbd4"><div class="ttname"><a href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">statedata::db_top</a></div><div class="ttdeci">int db_top</div><div class="ttdef"><b>Definition</b> typedefs.h:1213</div></div>
+<div class="ttc" id="astructstatedata_html_a526e854ef5cc45c28d3796e11bc4bbd4"><div class="ttname"><a href="structstatedata.html#a526e854ef5cc45c28d3796e11bc4bbd4">statedata::db_top</a></div><div class="ttdeci">int db_top</div><div class="ttdef"><b>Definition</b> typedefs.h:1214</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4131,7 +4131,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(mushstate.<a class="code hl_variable" href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">markbits</a>[(x) &gt;&gt; 3] |= mushconf.<a class="code hl_variable" href="structconfdata.html#a8f9bc353e8932f60333f6f1310f5dd51">markdata</a>[(x) &amp; 7])</div>
 <div class="ttc" id="astructconfdata_html_a8f9bc353e8932f60333f6f1310f5dd51"><div class="ttname"><a href="structconfdata.html#a8f9bc353e8932f60333f6f1310f5dd51">confdata::markdata</a></div><div class="ttdeci">uint8_t markdata[8]</div><div class="ttdef"><b>Definition</b> typedefs.h:812</div></div>
-<div class="ttc" id="astructstatedata_html_a99fdacad30d9c1296c27e7da6a68a453"><div class="ttname"><a href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">statedata::markbits</a></div><div class="ttdeci">MARKBYTE * markbits</div><div class="ttdef"><b>Definition</b> typedefs.h:1217</div></div>
+<div class="ttc" id="astructstatedata_html_a99fdacad30d9c1296c27e7da6a68a453"><div class="ttname"><a href="structstatedata.html#a99fdacad30d9c1296c27e7da6a68a453">statedata::markbits</a></div><div class="ttdeci">MARKBYTE * markbits</div><div class="ttdef"><b>Definition</b> typedefs.h:1218</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7629,7 +7629,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((mushstate.<a class="code hl_variable" href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">qfirst</a> != NULL) ? 1 : 0)</div>
-<div class="ttc" id="astructstatedata_html_a37294b0f42597b052c5ebb0a65bd5fa6"><div class="ttname"><a href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">statedata::qfirst</a></div><div class="ttdeci">BQUE * qfirst</div><div class="ttdef"><b>Definition</b> typedefs.h:1193</div></div>
+<div class="ttc" id="astructstatedata_html_a37294b0f42597b052c5ebb0a65bd5fa6"><div class="ttname"><a href="structstatedata.html#a37294b0f42597b052c5ebb0a65bd5fa6">statedata::qfirst</a></div><div class="ttdeci">BQUE * qfirst</div><div class="ttdef"><b>Definition</b> typedefs.h:1194</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7668,8 +7668,8 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> = clock()), ((mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> &gt; mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> + mushconf.<a class="code hl_variable" href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">func_cpu_lim</a>) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> + mushconf.<a class="code hl_variable" href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">func_cpu_lim</a> &gt; mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a>) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#aad469084582c1615118b419b1059a75d">cputime_base</a> != -1) &amp;&amp; (mushstate.<a class="code hl_variable" href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">cputime_now</a> != -1)))</div>
 <div class="ttc" id="astructconfdata_html_a44975a6b4f0610c1e9a2f4426568bce5"><div class="ttname"><a href="structconfdata.html#a44975a6b4f0610c1e9a2f4426568bce5">confdata::func_cpu_lim</a></div><div class="ttdeci">clock_t func_cpu_lim</div><div class="ttdef"><b>Definition</b> typedefs.h:1016</div></div>
-<div class="ttc" id="astructstatedata_html_aad469084582c1615118b419b1059a75d"><div class="ttname"><a href="structstatedata.html#aad469084582c1615118b419b1059a75d">statedata::cputime_base</a></div><div class="ttdeci">clock_t cputime_base</div><div class="ttdef"><b>Definition</b> typedefs.h:1241</div></div>
-<div class="ttc" id="astructstatedata_html_ab977888211553249c54b12a5fce4f0b3"><div class="ttname"><a href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">statedata::cputime_now</a></div><div class="ttdeci">clock_t cputime_now</div><div class="ttdef"><b>Definition</b> typedefs.h:1242</div></div>
+<div class="ttc" id="astructstatedata_html_aad469084582c1615118b419b1059a75d"><div class="ttname"><a href="structstatedata.html#aad469084582c1615118b419b1059a75d">statedata::cputime_base</a></div><div class="ttdeci">clock_t cputime_base</div><div class="ttdef"><b>Definition</b> typedefs.h:1242</div></div>
+<div class="ttc" id="astructstatedata_html_ab977888211553249c54b12a5fce4f0b3"><div class="ttname"><a href="structstatedata.html#ab977888211553249c54b12a5fce4f0b3">statedata::cputime_now</a></div><div class="ttdeci">clock_t cputime_now</div><div class="ttdef"><b>Definition</b> typedefs.h:1243</div></div>
 </div><!-- fragment -->
 <p>Handling CPU time checking. </p>
 <dl class="section note"><dt>Note</dt><dd>CPU time "clock()" compatibility notes:</dd></dl>
