@@ -362,21 +362,21 @@ uint8_t RGB2X11(rgbColor rgb)
     if (rgb.r + rgb.g + rgb.b == 0)
         return 0;
 
-    // Standard ANSI colors (0-15)
+    // Default gray (192,192,192) - CHECK BEFORE bit-shifting!
+    if (rgb.r == 192 && rgb.g == 192 && rgb.b == 192)
+        return 7;
+
+    // Bright standard colors (matching 0-15 bright variants) - CHECK BEFORE bit-shifting!
+    if ((rgb.r == 255 || rgb.r == 0) && (rgb.g == 255 || rgb.g == 0) && (rgb.b == 255 || rgb.b == 0))
+    {
+        return (rgb.r & 1) + (rgb.g & 2) + (rgb.b & 4) + 8;
+    }
+
+    // Standard ANSI colors (0-15) - bit-shifting approach for other dark colors
     if ((rgb.r & 128) && (rgb.g & 128) && (rgb.b & 128))
     {
         uint8_t c = (rgb.r >> 7) + (rgb.g >> 6) + (rgb.b >> 5);
         return c == 7 ? 8 : c;
-    }
-
-    // Default gray (192,192,192)
-    if (rgb.r == 192 && rgb.g == 192 && rgb.b == 192)
-        return 7;
-
-    // Bright standard colors (matching 0-15 bright variants)
-    if ((rgb.r == 255 || rgb.r == 0) && (rgb.g == 255 || rgb.g == 0) && (rgb.b == 255 || rgb.b == 0))
-    {
-        return (rgb.r & 1) + (rgb.g & 2) + (rgb.b & 4) + 8;
     }
 
     // Grayscale (232-255)
