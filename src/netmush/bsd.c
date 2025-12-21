@@ -1040,21 +1040,59 @@ int process_output(DESC *d)
 }
 
 /**
+ * @brief Character validation lookup table for fast filtering
+ * Bit 0: character is safe to process
+ * Initialized once at startup for O(1) lookups vs multiple conditionals
+ */
+static unsigned char char_valid_table[256] = {0};
+
+/**
+ * @brief Initialize character validation table
+ * Called once during server initialization
+ */
+static void init_char_table(void)
+{
+	static int initialized = 0;
+	if (initialized) return;
+	
+	/* Printable ASCII (0x20-0x7E) */
+	for (int i = 0x20; i <= 0x7E; i++)
+		char_valid_table[i] = 1;
+	
+	/* Safe control characters */
+	char_valid_table[0x07] = 1;  /* BEEP */
+	char_valid_table[0x09] = 1;  /* TAB */
+	char_valid_table[0x0A] = 1;  /* LF */
+	char_valid_table[0x0D] = 1;  /* CR */
+	char_valid_table[0x1B] = 1;  /* ESC */
+	char_valid_table[0x7F] = 1;  /* DEL */
+	
+	initialized = 1;
+}
+
+/**
  * @brief Process input from a socket
  *
+ * Optimized single-pass processing combining:
+ * - Telnet IAC protocol handling
+ * - Control character filtering
+ * - Command line assembly
+ *
  * @param d		Socket description
- * @return int
+ * @return int	1 on success, 0 on error/EOF
  */
 int process_input(DESC *d)
 {
-	char *buf = NULL;
-	int got = 0, in = 0, lost = 0;
-	char *p = NULL, *pend = NULL, *q = NULL, *qend = NULL, *cmdsave = NULL;
-
+	char *buf, *p, *pend, *q, *qend, *cmdsave;
+	int got, in, lost;
+	unsigned char ch, cmd, option, response[3];
+	
+	init_char_table();
+	
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = (char *)DBG_PROCESS_INPUT;
 	buf = XMALLOC(LBUF_SIZE, "buf");
-	got = in = read(d->descriptor, buf, LBUF_SIZE);
+	got = read(d->descriptor, buf, LBUF_SIZE);
 
 	if (got <= 0)
 	{
@@ -1063,118 +1101,7 @@ int process_input(DESC *d)
 		return 0;
 	}
 
-	/**
-	 * Handle telnet protocol sequences (IAC commands).
-	 * When CTRL+C is pressed in a telnet client, it sends IAC IP (0xFF 0xF4)
-	 * not the raw 0x03 byte. We need to strip these protocol sequences and
-	 * respond to telnet negotiations to prevent the client from hanging.
-	 */
-	{
-		int i, j = 0;
-		unsigned char ch;
-		unsigned char response[3];
-		ssize_t write_result;
-		
-		for (i = 0; i < got; i++)
-		{
-			ch = (unsigned char)buf[i];
-			
-			if (ch == 0xFF && i + 1 < got)  /* IAC (Interpret As Command) */
-			{
-				unsigned char cmd = (unsigned char)buf[i + 1];
-				
-				/* Handle two-byte IAC commands */
-				if (cmd >= 0xF0 && cmd <= 0xF9)
-				{
-					/* Commands like IP (0xF4), AO, AYT, etc. - ignore them */
-					i++;  /* Skip both IAC and command byte */
-					continue;
-				}
-				/* Handle three-byte IAC commands (DO, DONT, WILL, WONT) */
-				else if ((cmd >= 0xFB && cmd <= 0xFE) && i + 2 < got)
-				{
-					unsigned char option = (unsigned char)buf[i + 2];
-					
-					/* Respond to negotiations to prevent client hang */
-					if (cmd == 0xFD)  /* DO - client wants us to enable option */
-					{
-						/* Respond with WONT - we don't support this option */
-						response[0] = 0xFF;  /* IAC */
-						response[1] = 0xFC;  /* WONT */
-						response[2] = option;
-						write_result = write(d->descriptor, response, 3);
-						(void)write_result;  /* Telnet negotiation failure is not critical */
-					}
-					else if (cmd == 0xFB)  /* WILL - client will enable option */
-					{
-						/* Respond with DONT - we don't want this option */
-						response[0] = 0xFF;  /* IAC */
-						response[1] = 0xFE;  /* DONT */
-						response[2] = option;
-						write_result = write(d->descriptor, response, 3);
-						(void)write_result;  /* Telnet negotiation failure is not critical */
-					}
-					/* DONT and WONT don't need responses */
-					
-					i += 2;  /* Skip IAC, command, and option byte */
-					continue;
-				}
-				/* Handle IAC IAC (escaped 0xFF literal) */
-				else if (cmd == 0xFF)
-				{
-					buf[j++] = 0xFF;  /* Keep one 0xFF */
-					i++;  /* Skip second 0xFF */
-					continue;
-				}
-			}
-			
-			/* Keep non-IAC bytes */
-			buf[j++] = buf[i];
-		}
-		got = in = j;
-	}
-
-	/**
-	 * Filter out other dangerous control characters
-	 */
-	{
-		int i, j = 0;
-		unsigned char ch;
-		
-		for (i = 0; i < got; i++)
-		{
-			ch = (unsigned char)buf[i];
-			
-			/**
-			 * Allow safe characters:
-			 * - Printable ASCII (0x20-0x7E)
-			 * - Essential whitespace: \n, \r, \t
-			 * - ANSI ESC (0x1B)
-			 * - DEL (0x7F) for backspace
-			 * - BEEP (0x07)
-			 * Reject all other control characters
-			 */
-			if ((ch >= 0x20 && ch <= 0x7E) ||  /* Printable ASCII */
-			    ch == 0x09 ||  /* TAB */
-			    ch == 0x0A ||  /* LF */
-			    ch == 0x0D ||  /* CR */
-			    ch == 0x1B ||  /* ESC */
-			    ch == 0x07 ||  /* BEEP */
-			    ch == 0x7F)    /* DEL */
-			{
-				buf[j++] = buf[i];
-			}
-		}
-		got = in = j;
-	}
-
-	if (got <= 0)
-	{
-		mushstate.debug_cmd = cmdsave;
-		XFREE(buf);
-		return 1;  /* Not EOF, just filtered out all chars, continue */
-	}
-
+	/* Ensure raw_input buffer exists */
 	if (!d->raw_input)
 	{
 		d->raw_input = (CBLK *)XMALLOC(LBUF_SIZE, "d->raw_input");
@@ -1183,14 +1110,70 @@ int process_input(DESC *d)
 
 	p = d->raw_input_at;
 	pend = d->raw_input->cmd - sizeof(CBLKHDR) - 1 + LBUF_SIZE;
-	lost = 0;
+	in = lost = 0;
 
+	/**
+	 * Single-pass processing: IAC handling, filtering, and line assembly
+	 * This eliminates two complete buffer passes from the original code
+	 */
 	for (q = buf, qend = buf + got; q < qend; q++)
 	{
-		if (*q == '\n')
+		ch = (unsigned char)*q;
+		
+		/* Fast path: handle telnet IAC protocol sequences */
+		if (ch == 0xFF && q + 1 < qend)
+		{
+			cmd = (unsigned char)q[1];
+			
+			/* Two-byte IAC commands (IP, AO, AYT, etc.) - strip them */
+			if (cmd >= 0xF0 && cmd <= 0xF9)
+			{
+				q++;  /* Skip both IAC and command */
+				continue;
+			}
+			
+			/* Three-byte IAC negotiation (DO, DONT, WILL, WONT) */
+			if ((cmd >= 0xFB && cmd <= 0xFE) && q + 2 < qend)
+			{
+				option = (unsigned char)q[2];
+				
+				/* Respond to prevent client hang - queue instead of sync write */
+				if (cmd == 0xFD)  /* DO -> respond WONT */
+				{
+					response[0] = 0xFF;  /* IAC */
+					response[1] = 0xFC;  /* WONT */
+					response[2] = option;
+					queue_write(d, (char *)response, 3);
+				}
+				else if (cmd == 0xFB)  /* WILL -> respond DONT */
+				{
+					response[0] = 0xFF;  /* IAC */
+					response[1] = 0xFE;  /* DONT */
+					response[2] = option;
+					queue_write(d, (char *)response, 3);
+				}
+				
+				q += 2;  /* Skip IAC, command, and option */
+				continue;
+			}
+			
+			/* IAC IAC -> escaped 0xFF literal */
+			if (cmd == 0xFF)
+			{
+				q++;  /* Skip second 0xFF, fall through to process first */
+				ch = 0xFF;
+			}
+		}
+		
+		/* Filter: reject invalid control characters using lookup table */
+		if (!char_valid_table[ch])
+			continue;
+		
+		/* Process character based on type */
+		if (ch == '\n')
 		{
 			*p = '\0';
-
+			
 			if (p > d->raw_input->cmd)
 			{
 				save_command(d, d->raw_input);
@@ -1200,66 +1183,39 @@ int process_input(DESC *d)
 			}
 			else
 			{
-				in -= 1; /* for newline */
+				in--;  /* Empty line */
 			}
 		}
-		else if ((*q == '\b') || (*q == 127))
+		else if (ch == '\b' || ch == 0x7F)
 		{
-			if (*q == 127)
-			{
-				queue_string(d, NULL, "\b \b");
-			}
-			else
-			{
-				queue_string(d, NULL, " \b");
-			}
-
+			/* Backspace/delete - echo and remove char */
+			queue_string(d, NULL, (ch == 0x7F) ? "\b \b" : " \b");
 			in -= 2;
-
+			
 			if (p > d->raw_input->cmd)
-			{
 				p--;
-			}
-
 			if (p < d->raw_input_at)
-			{
-				(d->raw_input_at)--;
-			}
+				d->raw_input_at--;
 		}
-		else if (*q == ESC_CHAR && p < pend)
+		else if (p < pend)
 		{
-			/* Allow ESC for ANSI sequences */
-			*p++ = *q;
-		}
-		else if ((*q == '\t' || *q == '\r' || *q == BEEP_CHAR) && p < pend)
-		{
-			/* Allow TAB (%t), CR (%r), and BEEP (%b) for mushcode */
-			*p++ = *q;
-		}
-		else if (p < pend && isascii(*q) && isprint(*q))
-		{
-			*p++ = *q;
+			/* Add valid character to buffer */
+			*p++ = ch;
+			in++;
 		}
 		else
 		{
-			in--;
-
-			if (p >= pend)
-			{
-				lost++;
-			}
+			/* Buffer overflow */
+			lost++;
 		}
 	}
 
+	/* Update buffer pointer and statistics */
 	if (in < 0)
-	{
-		in = 0; /* backspace and delete by themselves */
-	}
+		in = 0;
 
 	if (p > d->raw_input->cmd)
-	{
 		d->raw_input_at = p;
-	}
 	else
 	{
 		XFREE(d->raw_input);
@@ -1270,6 +1226,7 @@ int process_input(DESC *d)
 	d->input_tot += got;
 	d->input_size += in;
 	d->input_lost += lost;
+	
 	XFREE(buf);
 	mushstate.debug_cmd = cmdsave;
 	return 1;
