@@ -1092,7 +1092,7 @@ int process_input(DESC *d)
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = (char *)DBG_PROCESS_INPUT;
 	buf = XMALLOC(LBUF_SIZE, "buf");
-	got = read(d->descriptor, buf, LBUF_SIZE);
+	got = in = read(d->descriptor, buf, LBUF_SIZE);
 
 	if (got <= 0)
 	{
@@ -1110,7 +1110,7 @@ int process_input(DESC *d)
 
 	p = d->raw_input_at;
 	pend = d->raw_input->cmd - sizeof(CBLKHDR) - 1 + LBUF_SIZE;
-	in = lost = 0;
+	lost = 0;
 
 	/**
 	 * Single-pass processing: IAC handling, filtering, and line assembly
@@ -1129,6 +1129,7 @@ int process_input(DESC *d)
 			if (cmd >= 0xF0 && cmd <= 0xF9)
 			{
 				q++;  /* Skip both IAC and command */
+				in--;  /* Discount from input count */
 				continue;
 			}
 			
@@ -1154,6 +1155,7 @@ int process_input(DESC *d)
 				}
 				
 				q += 2;  /* Skip IAC, command, and option */
+				in -= 2;  /* Discount from input count */
 				continue;
 			}
 			
@@ -1161,13 +1163,17 @@ int process_input(DESC *d)
 			if (cmd == 0xFF)
 			{
 				q++;  /* Skip second 0xFF, fall through to process first */
+				in--;  /* One less byte counted */
 				ch = 0xFF;
 			}
 		}
 		
 		/* Filter: reject invalid control characters using lookup table */
 		if (!char_valid_table[ch])
+		{
+			in--;  /* Discount rejected character */
 			continue;
+		}
 		
 		/* Process character based on type */
 		if (ch == '\n')
@@ -1201,11 +1207,11 @@ int process_input(DESC *d)
 		{
 			/* Add valid character to buffer */
 			*p++ = ch;
-			in++;
 		}
 		else
 		{
-			/* Buffer overflow */
+			/* Buffer overflow - character lost */
+			in--;
 			lost++;
 		}
 	}
