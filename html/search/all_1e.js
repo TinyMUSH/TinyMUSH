@@ -213,7 +213,7 @@ var searchData=
   ['track_5fansi_5fletters_210',['track_ansi_letters',['../string__ansi_8c.html#a291922bbc383badf03b65e647c407215',1,'string_ansi.c']]],
   ['tracking_20structure_20memtrack_211',['Memory Tracking Structure (MEMTRACK)',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md67',1,'']]],
   ['transform_5fsay_212',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
-  ['translate_5fstring_213',['translate_string',['../string__util_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_util.c']]],
+  ['translate_5fstring_213',['translate_string',['../string__ansi_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_ansi.c']]],
   ['trig_5farc_214',['TRIG_ARC',['../constants_8h.html#a09dd4df79a3ee7c15373eafb9b56cb77',1,'constants.h']]],
   ['trig_5fco_215',['TRIG_CO',['../constants_8h.html#a247c7c74466898ff6da63f5740ccee35',1,'constants.h']]],
   ['trig_5fdeg_216',['TRIG_DEG',['../constants_8h.html#a9d61621f1218aa1cf4cc9454a1f07134',1,'constants.h']]],

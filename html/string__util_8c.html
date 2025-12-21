@@ -162,9 +162,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ab69bc01ebdd6f669d4c33b032e9a7c5e" id="r_ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab69bc01ebdd6f669d4c33b032e9a7c5e">safe_gettimeofday</a> (struct timeval *tv, void *tz <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
 <tr class="memdesc:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
 <tr class="separator:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c959da9b63ab40192131e651ace565b" id="r_a7c959da9b63ab40192131e651ace565b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c959da9b63ab40192131e651ace565b">translate_string</a> (char *str, int type)</td></tr>
-<tr class="memdesc:a7c959da9b63ab40192131e651ace565b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert raw ansi to mushcode or strip it.  <br /></td></tr>
-<tr class="separator:a7c959da9b63ab40192131e651ace565b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb89350fd91a53ef5350e7bee1945a3d" id="r_abb89350fd91a53ef5350e7bee1945a3d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb89350fd91a53ef5350e7bee1945a3d">rgb2xterm</a> (long rgb)</td></tr>
 <tr class="memdesc:abb89350fd91a53ef5350e7bee1945a3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an RGB value to xterm value.  <br /></td></tr>
 <tr class="separator:abb89350fd91a53ef5350e7bee1945a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -656,38 +653,6 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 if the prefix isn't found. </dd></dl>
-
-</div>
-</div>
-<a id="a7c959da9b63ab40192131e651ace565b" name="a7c959da9b63ab40192131e651ace565b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c959da9b63ab40192131e651ace565b">&#9670;&#160;</a></span>translate_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char * translate_string </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>str</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Convert raw ansi to mushcode or strip it. </p>
-<p>It is the responsibility of the caller to free the returned buffer with XFREE().</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">str</td><td>Pointer to the string to be translated </td></tr>
-    <tr><td class="paramname">type</td><td>1 = Convert to mushcode, 0 strip ansi.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Pointer to the translatted string. </dd></dl>
 
 </div>
 </div>
