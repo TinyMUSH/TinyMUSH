@@ -1063,6 +1063,31 @@ int process_input(DESC *d)
 		return 0;
 	}
 
+	/**
+	 * Filter out CTRL+C (0x03) immediately to prevent client telnet issues
+	 * Some telnet clients send CTRL+C which can cause connection problems
+	 */
+	{
+		char *src, *dst;
+		int filtered_got = 0;
+		
+		for (src = buf; src < buf + got; src++)
+		{
+			if (*src != 0x03)  /* Skip CTRL+C */
+			{
+				buf[filtered_got++] = *src;
+			}
+		}
+		got = in = filtered_got;
+	}
+
+	if (got <= 0)
+	{
+		mushstate.debug_cmd = cmdsave;
+		XFREE(buf);
+		return 1;  /* Not EOF, just filtered out all chars, continue */
+	}
+
 	if (!d->raw_input)
 	{
 		d->raw_input = (CBLK *)XMALLOC(LBUF_SIZE, "d->raw_input");
