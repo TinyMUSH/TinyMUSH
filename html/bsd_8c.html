@@ -615,23 +615,19 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Process input from a socket. </p>
+<p>Optimized single-pass processing combining:</p><ul>
+<li>Telnet IAC protocol handling</li>
+<li>Control character filtering</li>
+<li>Command line assembly</li>
+</ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">d</td><td>Socket description </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
-<p>Handle telnet protocol sequences (IAC commands). When CTRL+C is pressed in a telnet client, it sends IAC IP (0xFF 0xF4) not the raw 0x03 byte. We need to strip these protocol sequences and respond to telnet negotiations to prevent the client from hanging.</p>
-<p>Filter out other dangerous control characters</p>
-<p>Allow safe characters:</p><ul>
-<li>Printable ASCII (0x20-0x7E)</li>
-<li>Essential whitespace: <br  />
-, \r, \t</li>
-<li>ANSI ESC (0x1B)</li>
-<li>DEL (0x7F) for backspace</li>
-<li>BEEP (0x07) Reject all other control characters</li>
-</ul>
+<dl class="section return"><dt>Returns</dt><dd>int 1 on success, 0 on error/EOF </dd></dl>
+<p>Single-pass processing: IAC handling, filtering, and line assembly This eliminates two complete buffer passes from the original code</p>
 
 </div>
 </div>
