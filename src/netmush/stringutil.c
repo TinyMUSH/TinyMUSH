@@ -136,7 +136,7 @@ const int ansiNum(int ch)
  * @param num ANSI number
  * @return char ANSI character
  */
-char ansiLetter(int num)
+const char ansiLetter(int num)
 {
 	static const char ansi_letter_table[48] = {
 		[1] = 'h',   [4] = 'u',   [5] = 'f',   [7] = 'i',
@@ -153,25 +153,11 @@ char ansiLetter(int num)
 
 char ansiMushCode(int num, bool bg)
 {
-	switch (num)
-	{
-	case 0:
-		return bg ? 'X' : 'x';
-	case 1:
-		return bg ? 'R' : 'r';
-	case 2:
-		return bg ? 'G' : 'g';
-	case 3:
-		return bg ? 'Y' : 'y';
-	case 4:
-		return bg ? 'B' : 'b';
-	case 5:
-		return bg ? 'M' : 'm';
-	case 6:
-		return bg ? 'C' : 'c';
-	case 7:
-		return bg ? 'W' : 'w';
-	}
+	static const char fg_table[8] = {'x', 'r', 'g', 'y', 'b', 'm', 'c', 'w'};
+	static const char bg_table[8] = {'X', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'};
+	
+	if (num >= 0 && num < 8)
+		return bg ? bg_table[num] : fg_table[num];
 	return 0;
 }
 
