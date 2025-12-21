@@ -417,7 +417,8 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 				
 				if (xterm)
 				{
-					// Player support xterm colors, convert to xterm
+					// Player support xterm colors, convert ALL colors to xterm format
+					// This includes STANDARD colors (0-15) which should be 38;5;N not 30-37
 					bool has_fg = attr.foreground.type;
 					bool has_bg = attr.background.type;
 					
