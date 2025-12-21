@@ -55,12 +55,10 @@ int safe_gettimeofday(struct timeval *tv)
 }
 
 /**
- * \fn char *upcasestr ( char *s )
- * \brief Capitalizes an entire string
+ * @brief Capitalize an entire string
  *
- * \param s The string that need to be capitalized.
- *
- * \return The string capitalized.
+ * @param s The string to capitalize
+ * @return char* The capitalized string (same pointer as input)
  */
 
 char *upcasestr(char *s)
@@ -76,15 +74,12 @@ char *upcasestr(char *s)
 }
 
 /**
- * \fn char *munge_space ( char *string )
- * \brief Compress multiple spaces into one and remove leading/trailing spaces.
+ * @brief Compress multiple spaces into one and remove leading/trailing spaces
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param s The string that need to be munge
- *
- * \return The string munged
+ * @param string The string to munge
+ * @return char* The munged string (newly allocated)
  */
 
 char *munge_space(char *string)
@@ -124,12 +119,12 @@ char *munge_space(char *string)
 }
 
 /**
- * \fn char *trim_spaces ( char *string )
- * \brief Remove leading and trailing spaces.
+ * @brief Remove leading and trailing spaces
  *
- * \param s The string that need to be trimmed.
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \return The trimmed string.
+ * @param string The string to trim
+ * @return char* The trimmed string (newly allocated)
  */
 
 char *trim_spaces(char *string)
@@ -168,17 +163,15 @@ char *trim_spaces(char *string)
 }
 
 /**
- * \fn char *grabto ( char **str, char targ )
- * \brief Return portion of a string up to the indicated character.
+ * @brief Return portion of a string up to the indicated character
  *
- * Note that str will be move to the position following the searched
+ * Note that str will be moved to the position following the searched
  * character. If you need the original string, save it before calling
  * this function.
  *
- * \param str The string you want to search
- * \param targ The caracter you want to search for,
- *
- * \return The string up to the character you've search for.
+ * @param str Pointer to the string pointer to search
+ * @param targ The character to search for
+ * @return char* The string up to the character, or NULL if str is invalid
  */
 
 char *grabto(char **str, char targ)
@@ -207,13 +200,11 @@ char *grabto(char **str, char targ)
 }
 
 /**
- * \fn int string_compare ( const char *s1, const char *s2 )
- * \brief Compare two string. Treat multiple spaces as one.
+ * @brief Compare two strings case-insensitively, treating multiple spaces as one
  *
- * \param s1 The first string to compare
- * \param s2 The second string to compare
- *
- * \return 0 if the string are different.
+ * @param s1 The first string to compare
+ * @param s2 The second string to compare
+ * @return int 0 if strings match, non-zero otherwise
  */
 
 int string_compare(const char *s1, const char *s2)
@@ -296,13 +287,11 @@ int string_compare(const char *s1, const char *s2)
 }
 
 /**
- * \fn int string_prefix ( const char *string, const char *prefix )
- * \brief Compare a string with a prefix
+ * @brief Compare a string with a prefix case-insensitively
  *
- * \param string The string you want to search
- * \param prefix The prefix you are searching for.
- *
- * \return 0 if the prefix isn't found.
+ * @param string The string to search
+ * @param prefix The prefix to search for
+ * @return int Number of matching characters if prefix found, 0 otherwise
  */
 
 int string_prefix(const char *string, const char *prefix)
@@ -325,13 +314,13 @@ int string_prefix(const char *string, const char *prefix)
 }
 
 /**
- * \fn const char *string_match ( const char *src, const char *sub )
- * \brief Compare a string with a substring, accepts only nonempty matches starting at the beginning of a word
+ * @brief Find a substring within a string, matching only at word boundaries
  *
- * \param src The string you want to search
- * \param sub The search term.
+ * Accepts only nonempty matches starting at the beginning of a word.
  *
- * \return The position of the search term. 0 if not found.
+ * @param src The string to search
+ * @param sub The substring to find
+ * @return const char* Pointer to the match position, or NULL if not found
  */
 
 const char *string_match(const char *src, const char *sub)
@@ -363,14 +352,14 @@ const char *string_match(const char *src, const char *sub)
 }
 
 /**
- * \fn char *replace_string ( const char *old, const char *new, const char *string )
- * \brief Replace all occurences of a substring with a new substring.
+ * @brief Replace all occurrences of a substring with a new substring
  *
- * \param old The string you want to replace.
- * \param new The string you want to replace with.
- * \param string The string that is modified.
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \return A pointer to the modified string.
+ * @param old The string to replace
+ * @param new The replacement string
+ * @param string The string to modify
+ * @return char* The modified string (newly allocated)
  */
 
 char *replace_string(const char *old, const char *new, const char *string)
@@ -420,16 +409,19 @@ char *replace_string(const char *old, const char *new, const char *string)
 }
 
 /**
- * \fn void edit_string ( char *src, char **dst, char *from, char *to )
- * \brief Replace all occurences of a substring with a new substring.
- *        Sensitive about ANSI codes, and handles special ^ and $ cases.
+ * @brief Replace all occurrences of a substring, handling ANSI codes and special ^ and $ cases
  *
- * \param src Pointer to the original string.
- * \param dst Pointer to the new string.
- * \param from Pointer to the string to be replaced
- * \param to Pointer to the string to be replaced with.
+ * Special cases:
+ * - from="^" prepends 'to' to the string
+ * - from="$" appends 'to' to the string
+ * - from="\^" or from="\$" matches literal ^ or $ characters
  *
- * \return None
+ * Caller is responsible for freeing *dst with XFREE().
+ *
+ * @param src The original string
+ * @param dst Pointer to receive the new string (newly allocated)
+ * @param from The substring to replace
+ * @param to The replacement substring
  */
 
 void edit_string(char *src, char **dst, char *from, char *to)
@@ -837,17 +829,15 @@ void edit_string(char *src, char **dst, char *from, char *to)
 }
 
 /**
- * \fn int minmatch ( char *str, char *target, int min )
- * \brief Find if a substring at the start of a string exist.
+ * @brief Find if a substring matches at the start of a string with minimum length
  *
- * At least MIN characters must match. This is how flags are
- * match by the command queue.
+ * At least min characters must match. This is how flags are matched
+ * by the command queue.
  *
- * \param str Pointer to the string that will be search.
- * \param target Pointer to the string being search.
- * \param min Minimum length of match.
- *
- * \return 1 if found, 0 if not.
+ * @param str The string to search
+ * @param target The target substring
+ * @param min Minimum number of characters that must match
+ * @return int 1 if found, 0 if not
  */
 
 int minmatch(char *str, char *target, int min)
@@ -873,13 +863,11 @@ int minmatch(char *str, char *target, int min)
 }
 
 /**
- * \fn int matches_exit_from_list ( char *exit_list, char *pattern )
- * \brief Find if pattern is found in the exit list.
+ * @brief Check if a pattern is found in the exit list
  *
- * \param exit_list Pointer to the list of names of an exit
- * \param pattern Pointer to the pattern we are searching
- *
- * \return 1 if the pattern is in the list, 0 if not.
+ * @param exit_list Semicolon-separated list of exit names
+ * @param pattern The pattern to search for
+ * @return int 1 if the pattern is found, 0 otherwise
  */
 
 int matches_exit_from_list(char *exit_list, char *pattern)
@@ -930,15 +918,13 @@ int matches_exit_from_list(char *exit_list, char *pattern)
 }
 
 /**
- * \fn char *ltos ( char long num )
- * \brief Convert a long signed number into string.
+ * @brief Convert a long signed number to string
  *
- * It is the caller's responsibility to free the returned buffer with
- * XFREE();
+ * Caller is responsible for freeing the returned buffer with XFREE().
+ * Uses Mark Vasoll's long int to string converter algorithm.
  *
- * \param num Number to convert.
- *
- * \return A pointer to the resulting string.
+ * @param num Number to convert
+ * @return char* String representation of the number (newly allocated)
  */
 
 char *ltos(long num)
@@ -987,16 +973,13 @@ char *ltos(long num)
 }
 
 /**
- * \fn char *repeatchar ( int count, char ch )
- * \brief Return a string with 'count' number of 'ch' characters.
+ * @brief Create a string filled with a repeated character
  *
- * It is the responsibility of the caller to free the resulting
- * buffer.
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param count Length of the string to build
- * \param ch Character used to fill the string.
- *
- * \return A Pointer to the new string.
+ * @param count Number of characters (clamped to 0..LBUF_SIZE-1)
+ * @param ch Character to repeat
+ * @return char* String of repeated characters (newly allocated)
  */
 
 char *repeatchar(int count, char ch)
