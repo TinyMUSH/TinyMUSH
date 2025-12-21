@@ -391,6 +391,36 @@ int ansiBits(int num)
 }
 
 /**
+ * @brief Append a character to buffer with bounds checking
+ * @param p_ptr Pointer to current position pointer
+ * @param end End of buffer
+ * @param ch Character to append
+ */
+static inline void append_ch(char **p_ptr, const char *end, char ch)
+{
+	if (*p_ptr < end)
+	{
+		**p_ptr = ch;
+		(*p_ptr)++;
+	}
+}
+
+/**
+ * @brief Append a string to buffer with bounds checking
+ * @param p_ptr Pointer to current position pointer
+ * @param end End of buffer
+ * @param str String to append
+ */
+static inline void append_str(char **p_ptr, const char *end, const char *str)
+{
+	while (*str && (*p_ptr < end))
+	{
+		**p_ptr = *str++;
+		(*p_ptr)++;
+	}
+}
+
+/**
  * @brief Go to a string and convert ansi to the lowest supported level.
  *
  * @param s String to convert
@@ -405,25 +435,6 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 	p = buf = XMALLOC(LBUF_SIZE, "buf");
 	end = buf + LBUF_SIZE - 1;
 
-#define APPEND_CH(ch)    \
-	do                   \
-	{                    \
-		if (p < end)     \
-		{                \
-			*p++ = (ch); \
-		}                \
-	} while (0)
-
-#define APPEND_STR(str)             \
-	do                              \
-	{                               \
-		const char *tmp__ = (str);  \
-		while (*tmp__ && (p < end)) \
-		{                           \
-			*p++ = *tmp__++;        \
-		}                           \
-	} while (0)
-
 	if (s && *s)
 	{
 		while (*s)
@@ -434,7 +445,7 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 				if (truecolors)
 				{
 					// Player support everything, just shove it and continue
-					APPEND_CH(*s++);
+					append_ch(&p, end, *s++);
 				}
 				else
 				{
@@ -444,46 +455,46 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 					{
 						char *t = NULL;
 						// Player support xterm colors, convert to xterm
-						APPEND_CH('\e');
-						APPEND_CH('[');
+						append_ch(&p, end, '\e');
+						append_ch(&p, end, '[');
 
 						if (attr.foreground.type)
 						{
 							t = XASPRINTF("level_ansi.t", "38;5;%d", RGB2X11(attr.foreground.rgb));
-							APPEND_STR(t);
+							append_str(&p, end, t);
 							XFREE(t);
 
 							if (attr.background.type)
 							{
-								APPEND_CH(';');
+								append_ch(&p, end, ';');
 							}
 						}
 
 						if (attr.background.type)
 						{
 							t = XASPRINTF("level_ansi.t", "48;5;%d", RGB2X11(attr.background.rgb));
-							APPEND_STR(t);
+							append_str(&p, end, t);
 							XFREE(t);
 
 							if (attr.reset)
 							{
-								APPEND_CH(';');
+								append_ch(&p, end, ';');
 							}
 						}
 
 						if (attr.reset)
 						{
-							APPEND_CH('0');
+							append_ch(&p, end, '0');
 						}
-						APPEND_CH('m');
+						append_ch(&p, end, 'm');
 					}
 					else if (ansi)
 					{
 						// Player support ansi colors, convert to ansi
 						char *t = NULL;
 						// Player support xterm colors, convert to xterm
-						APPEND_CH('\e');
-						APPEND_CH('[');
+						append_ch(&p, end, '\e');
+						append_ch(&p, end, '[');
 
 						if (attr.foreground.type)
 						{
@@ -497,12 +508,12 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 								f += 82;
 							}
 							t = XASPRINTF("level_ansi.t", "%d", f);
-							APPEND_STR(t);
+							append_str(&p, end, t);
 							XFREE(t);
 
 							if (attr.background.type)
 							{
-								APPEND_CH(';');
+								append_ch(&p, end, ';');
 							}
 						}
 
@@ -518,34 +529,31 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 								b += 92;
 							}
 							t = XASPRINTF("level_ansi.t", "%d", b);
-							APPEND_STR(t);
+							append_str(&p, end, t);
 							XFREE(t);
 
 							if (attr.reset)
 							{
-								APPEND_CH(';');
+								append_ch(&p, end, ';');
 							}
 						}
 
 						if (attr.reset)
 						{
-							APPEND_CH('0');
+							append_ch(&p, end, '0');
 						}
 
-						APPEND_CH('m');
+						append_ch(&p, end, 'm');
 					}
 				}
 			}
 			else
 			{
-				APPEND_CH(*s++);
+				append_ch(&p, end, *s++);
 			}
 		}
 		*p = '\0';
 	}
-
-#undef APPEND_CH
-#undef APPEND_STR
 
 	return buf;
 }
