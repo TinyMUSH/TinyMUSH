@@ -622,9 +622,14 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
-<p>Filter out CTRL+C (0x03) immediately to prevent client telnet issues Some telnet clients send CTRL+C which can cause connection problems</p>
-<p>If filtering removed all content but left only whitespace/newlines, and we haven't seen any real content, ignore this input entirely</p>
-<p>Only whitespace/newlines left - if there's a newline, process it to clear any pending partial command</p>
+<p>Filter out CTRL+C (0x03) and other problematic control characters at the network level before any processing</p>
+<p>Allow only safe characters:</p><ul>
+<li>Printable ASCII (0x20-0x7E)</li>
+<li>Essential whitespace: <br  />
+ (0x0A), \r (0x0D), \t (0x09)</li>
+<li>ANSI ESC (0x1B) for color codes</li>
+<li>DEL (0x7F) for backspace Reject: CTRL+C (0x03), CTRL+D, CTRL+Z, and all other control chars</li>
+</ul>
 
 </div>
 </div>
