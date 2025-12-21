@@ -1125,16 +1125,16 @@ int process_input(DESC *d)
 		{
 			cmd = (unsigned char)q[1];
 			
-			/* Two-byte IAC commands (IP, AO, AYT, etc.) - strip them */
-			if (cmd >= 0xF0 && cmd <= 0xF9)
+			/* IAC IAC -> escaped 0xFF literal (check this first) */
+			if (cmd == 0xFF)
 			{
-				q++;  /* Skip both IAC and command */
-				in--;  /* Discount from input count */
-				continue;
+				q++;  /* Skip second 0xFF, fall through to process first */
+				in--;  /* One less byte counted */
+				ch = 0xFF;
+				/* Continue to normal processing below */
 			}
-			
 			/* Three-byte IAC negotiation (DO, DONT, WILL, WONT) */
-			if ((cmd >= 0xFB && cmd <= 0xFE) && q + 2 < qend)
+			else if ((cmd >= 0xFB && cmd <= 0xFE) && q + 2 < qend)
 			{
 				option = (unsigned char)q[2];
 				
@@ -1158,13 +1158,13 @@ int process_input(DESC *d)
 				in -= 2;  /* Discount from input count */
 				continue;
 			}
-			
-			/* IAC IAC -> escaped 0xFF literal */
-			if (cmd == 0xFF)
+			/* All other two-byte IAC commands - strip them */
+			else
 			{
-				q++;  /* Skip second 0xFF, fall through to process first */
-				in--;  /* One less byte counted */
-				ch = 0xFF;
+				/* This catches: SE, NOP, DM, BRK, IP, AO, AYT, EC, EL, GA, SB, etc. */
+				q++;  /* Skip both IAC and command byte */
+				in--;  /* Discount from input count */
+				continue;
 			}
 		}
 		
